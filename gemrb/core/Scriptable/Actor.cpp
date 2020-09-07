@@ -726,7 +726,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 
 	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
-	CalculateSpeed(false);
+	SetSpeed(false);
 }
 
 CharAnimations* Actor::GetAnims() const
@@ -5415,18 +5415,17 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 	return 123456789; // large enough to round to 0 when used as a divisor
 }
 
-int Actor::CalculateSpeed(bool feedback)
+int Actor::CalculateSpeed(bool feedback) const
 {
 	if (core->HasFeature(GF_RESDATA_INI)) {
-		CalculateSpeedFromINI(feedback);
+		return CalculateSpeedFromINI(feedback);
 	} else {
-		CalculateSpeedFromRate(feedback);
+		return CalculateSpeedFromRate(feedback);
 	}
-	return speed;
 }
 
 // NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
-void Actor::CalculateSpeedFromRate(bool feedback)
+int Actor::CalculateSpeedFromRate(bool feedback) const
 {
 	int movementRate = GetStat(IE_MOVEMENTRATE);
 	int encumbranceFactor = GetEncumbranceFactor(feedback);
@@ -5436,13 +5435,13 @@ void Actor::CalculateSpeedFromRate(bool feedback)
 		movementRate /= encumbranceFactor;
 	}
 	if (movementRate) {
-		speed = 1500 / movementRate;
+		return 1500 / movementRate;
 	} else {
-		speed = 0;
+		return 0;
 	}
 }
 
-void Actor::CalculateSpeedFromINI(bool feedback)
+int Actor::CalculateSpeedFromINI(bool feedback) const
 {
 	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	ieDword animid = BaseStats[IE_ANIMATION_ID];
@@ -5451,20 +5450,22 @@ void Actor::CalculateSpeedFromINI(bool feedback)
 	}
 	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
 	const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	int newSpeed = 0;
 	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
-		speed = avatar->RunScale;
+		newSpeed = avatar->RunScale;
 	} else if (avatar->WalkScale) {
-		speed = avatar->WalkScale;
+		newSpeed = avatar->WalkScale;
 	} else {
 		// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
-		speed = 0;
 	}
+
 	// the speeds are already inverted, so we need to increase them to slow down
 	if (encumbranceFactor <= 2) {
-		speed *= encumbranceFactor;
+		newSpeed *= encumbranceFactor;
 	} else {
-		speed = 0;
+		newSpeed = 0;
 	}
+	return newSpeed;
 }
 
 //receive turning

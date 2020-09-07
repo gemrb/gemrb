@@ -448,8 +448,8 @@ private:
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
 	const char* GetArmorSound() const;
-	void CalculateSpeedFromRate(bool feedback);
-	void CalculateSpeedFromINI(bool feedback);
+	int CalculateSpeedFromRate(bool feedback) const;
+	int CalculateSpeedFromINI(bool feedback) const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -559,7 +559,8 @@ public:
 	/* Returns by how much movement speed should be divided to account for loot weight */
 	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
-	int CalculateSpeed(bool feedback);
+	int CalculateSpeed(bool feedback) const;
+	void SetSpeed(bool feedback) { speed = CalculateSpeed(feedback); }
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
 	/* receives undead turning message */

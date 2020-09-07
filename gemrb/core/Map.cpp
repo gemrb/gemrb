@@ -755,7 +755,7 @@ void Map::UpdateScripts()
 		actor->Update();
 
 		actor->UpdateActorState(game->GameTime);
-		actor->CalculateSpeed(false);
+		actor->SetSpeed(false);
 	}
 
 	//clean up effects on dead actors too
