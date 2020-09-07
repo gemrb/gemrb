@@ -1660,32 +1660,24 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 /** call this from ~Interface() */
 void Actor::ReleaseMemory()
 {
-	int i;
-
 	if (classcount>=0) {
 		if (clericspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (clericspelltables[i]) {
-					free (clericspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free (clericspelltables[i]);
 			}
 			free(clericspelltables);
 			clericspelltables=NULL;
 		}
 		if (druidspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (druidspelltables[i]) {
-					free (druidspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free (druidspelltables[i]);
 			}
 			free(druidspelltables);
 			druidspelltables=NULL;
 		}
 		if (wizardspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (wizardspelltables[i]) {
-					free(wizardspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free(wizardspelltables[i]);
 			}
 			free(wizardspelltables);
 			wizardspelltables=NULL;
@@ -1729,10 +1721,8 @@ void Actor::ReleaseMemory()
 		}
 
 		if (levelslots) {
-			for (i=0; i<classcount; i++) {
-				if (levelslots[i]) {
-					free(levelslots[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free(levelslots[i]);
 			}
 			free(levelslots);
 			levelslots=NULL;
@@ -1752,72 +1742,58 @@ void Actor::ReleaseMemory()
 		skillstats.clear();
 
 		if (afcomments) {
-			for(i=0;i<afcount;i++) {
-				if(afcomments[i]) {
-					free(afcomments[i]);
-				}
+			for(int i = 0; i < afcount; i++) {
+				free(afcomments[i]);
 			}
 			free(afcomments);
 			afcomments=NULL;
 		}
 
 		if (wspattack) {
-			for (i=0; i<wspattack_rows; i++) {
-				if (wspattack[i]) {
-					free(wspattack[i]);
-				}
+			for (int i = 0; i < wspattack_rows; i++) {
+				free(wspattack[i]);
 			}
 			free(wspattack);
 			wspattack=NULL;
 		}
 		if (wsdualwield) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wsdualwield[i]) {
-					free(wsdualwield[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wsdualwield[i]);
 			}
 			free(wsdualwield);
 			wsdualwield=NULL;
 		}
 		if (wstwohanded) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wstwohanded[i]) {
-					free(wstwohanded[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wstwohanded[i]);
 			}
 			free(wstwohanded);
 			wstwohanded=NULL;
 		}
 		if (wsswordshield) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wsswordshield[i]) {
-					free(wsswordshield[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wsswordshield[i]);
 			}
 			free(wsswordshield);
 			wsswordshield=NULL;
 		}
 		if (wssingle) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wssingle[i]) {
-					free(wssingle[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wssingle[i]);
 			}
 			free(wssingle);
 			wssingle=NULL;
 		}
 		if (monkbon) {
 			for (unsigned i=0; i<monkbon_rows; i++) {
-				if (monkbon[i]) {
-					free(monkbon[i]);
-				}
+				free(monkbon[i]);
 			}
 			free(monkbon);
 			monkbon=NULL;
 		}
-		for(i=0;i<20;i++) {
-			free(wmlevels[i]);
-			wmlevels[i]=NULL;
+		for (auto wml : wmlevels) {
+			free(wml);
+			wml = NULL;
 		}
 		skilldex.clear();
 		skillrac.clear();
