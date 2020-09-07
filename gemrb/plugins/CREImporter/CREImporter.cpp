@@ -39,12 +39,6 @@ using namespace GemRB;
 
 static unsigned int RandColor = 1;
 std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
-static int MagicBit;
-
-static void Initializer()
-{
-	MagicBit = core->HasFeature(GF_MAGICBIT);
-}
 
 //one column, these don't have a level
 static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
@@ -2344,7 +2338,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 		stream->WriteWord( &it->Usages[2]);
 		tmpDword = it->Flags;
 		//IWD uses this bit differently
-		if (MagicBit) {
+		if (core->HasFeature(GF_MAGICBIT)) {
 			if (it->Flags&IE_INV_ITEM_MAGICAL) {
 				tmpDword|=IE_INV_ITEM_UNDROPPABLE;
 			} else {
@@ -3254,6 +3248,5 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
-PLUGIN_INITIALIZER(Initializer)
 PLUGIN_CLEANUP(ReleaseMemoryCRE)
 END_PLUGIN()
