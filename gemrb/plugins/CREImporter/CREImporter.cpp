@@ -37,12 +37,8 @@
 
 using namespace GemRB;
 
-#define MAXCOLOR 12
-typedef unsigned char ColorSet[MAXCOLOR];
-
 static unsigned int RandColor = 1;
-static int RandRows = -1;
-static ColorSet* randcolors=NULL;
+std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
 static int MagicBit;
 
 static void Initializer()
@@ -387,10 +383,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 
 static void ReleaseMemoryCRE()
 {
-	if (randcolors) {
-		delete [] randcolors;
-		randcolors = NULL;
-	}
+	randcolors.clear();
 
 	if (spllist) {
 		delete [] spllist;
@@ -876,21 +869,21 @@ void CREImporter::SetupColor(ieDword &stat)
 	if (stat < 200 || RandColor == 0) return;
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
-	if (RandRows == -1) {
+	int RandRows = 0;
+	if (randcolors.size() == 0) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
 		}
 		if (RandRows <= 1 || RandColor == 0) {
-			RandRows = RandColor = 0;
+			RandColor = 0;
 			return;
 		}
 
-		if (RandRows > MAXCOLOR) RandRows = MAXCOLOR;
-		randcolors = new ColorSet[RandColor];
-		int cols = RandColor;
-		while (cols--) {
+		randcolors.resize(RandColor);
+		for (int cols = RandColor - 1; cols >= 0; cols--) {
+			randcolors[cols] = std::vector<unsigned char>(RandRows);
 			for (int i = 0; i < RandRows; i++) {
 				randcolors[cols][i] = atoi(rndcol->QueryField(i, cols));
 			}
@@ -898,6 +891,7 @@ void CREImporter::SetupColor(ieDword &stat)
 		}
 	}
 
+	RandRows = randcolors[0].size();
 	stat -= 200;
 	// assuming an ordered list, so looking in the middle first
 	for (int i = (int) stat; i >= 0; i--) {
