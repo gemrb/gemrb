@@ -113,6 +113,7 @@ void StdioLogger::LogInternal(log_level level, const char* owner, const char* me
 void StdioLogger::destroy()
 {
 	textcolor(DEFAULT);
+	delete this;
 }
 
 Logger* createStdioLogger()

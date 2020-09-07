@@ -1998,6 +1998,7 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Write(pathString, strlen(pathString));
 		pathFile->Close();
 	}
+	delete pathFile;
 	return GEM_OK;
 }
 
