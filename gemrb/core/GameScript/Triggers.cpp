@@ -3648,7 +3648,7 @@ int GameScript::PCCanSeePoint( Scriptable* /*Sender*/, Trigger* parameters)
 	return 0;
 }
 
-//i'm clueless about this trigger
+// I'm clueless about this trigger ... but it looks fine, pst dgaoha.d is the only user
 int GameScript::StuffGlobalRandom( Scriptable* Sender, Trigger* parameters)
 {
 	unsigned int max=parameters->int0Parameter+1;
@@ -4329,10 +4329,9 @@ int GameScript::NumBouncingSpellLevel(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4340,7 +4339,7 @@ int GameScript::NumBouncingSpellLevel(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount == parameters->int1Parameter;
+	return bounceCount == (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::NumBouncingSpellLevelGT(Scriptable* Sender, Trigger* parameters)
@@ -4351,10 +4350,9 @@ int GameScript::NumBouncingSpellLevelGT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4362,7 +4360,7 @@ int GameScript::NumBouncingSpellLevelGT(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount > parameters->int1Parameter;
+	return bounceCount > (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::NumBouncingSpellLevelLT(Scriptable* Sender, Trigger* parameters)
@@ -4373,10 +4371,9 @@ int GameScript::NumBouncingSpellLevelLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4384,7 +4381,7 @@ int GameScript::NumBouncingSpellLevelLT(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount < parameters->int1Parameter;
+	return bounceCount < (unsigned) parameters->int1Parameter;
 }
 
 /* Returns true if the target creature specified by Object is protected from spells of power Level.
@@ -4416,10 +4413,9 @@ int GameScript::NumImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4427,7 +4423,7 @@ int GameScript::NumImmuneToSpellLevel(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount == parameters->int1Parameter;
+	return bounceCount == (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::NumImmuneToSpellLevelGT(Scriptable* Sender, Trigger* parameters)
@@ -4438,10 +4434,9 @@ int GameScript::NumImmuneToSpellLevelGT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4449,7 +4444,7 @@ int GameScript::NumImmuneToSpellLevelGT(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount > parameters->int1Parameter;
+	return bounceCount > (unsigned) parameters->int1Parameter;
 }
 
 int GameScript::NumImmuneToSpellLevelLT(Scriptable* Sender, Trigger* parameters)
@@ -4460,10 +4455,9 @@ int GameScript::NumImmuneToSpellLevelLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 
-	int bounceCount = 0;
+	unsigned int bounceCount = 0;
 	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		// FIXME: cheating, probably doesn't matter
-		bounceCount = 0xFFFF;
+		bounceCount = 0xFFFFFFFF;
 	} else {
 		Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
 		if (fx) {
@@ -4471,7 +4465,7 @@ int GameScript::NumImmuneToSpellLevelLT(Scriptable* Sender, Trigger* parameters)
 		}
 	}
 
-	return bounceCount < parameters->int1Parameter;
+	return bounceCount < (unsigned) parameters->int1Parameter;
 }
 
 // Compares the number of ticks left of time stop to Number.
