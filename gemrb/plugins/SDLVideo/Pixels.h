@@ -189,6 +189,7 @@ struct IPixelIterator
 	virtual IPixelIterator* Clone() const=0;
 	virtual void Advance(int)=0;
 	virtual Uint8 Channel(Uint32 mask, Uint8 shift) const=0;
+	virtual const Point& Position() const=0;
 
 	IPixelIterator& operator++() {
 		Advance(1);
@@ -203,20 +204,21 @@ struct IPixelIterator
 template <typename PIXEL>
 struct PixelIterator : IPixelIterator
 {
-	int w, xpos;
+	Size size;
+	Point pos;
 
-	PixelIterator(PIXEL* p, int w, int pitch)
-	: IPixelIterator(p, pitch, Forward, Forward), w(w) {
-		assert(w >= 0); // == 0 is the same thing as an end iterator so it is valid too
-		assert(pitch >= w);
-		xpos = 0;
+	PixelIterator(PIXEL* p, Size s, int pitch)
+	: IPixelIterator(p, pitch, Forward, Forward), size(s) {
+		assert(size.w >= 0); // == 0 is the same thing as an end iterator so it is valid too
+		assert(pitch >= size.w);
 	}
 
-	PixelIterator(PIXEL* p, Direction x, Direction y, int w, int pitch)
-	: IPixelIterator(p, pitch, x, y), w(w) {
-		assert(w >= 0); // == 0 is the same thing as an end iterator so it is valid too
-		assert(pitch >= w);
-		xpos = (x == Reverse) ? w - 1 : 0;
+	PixelIterator(PIXEL* p, Direction x, Direction y, Size s, int pitch)
+	: IPixelIterator(p, pitch, x, y), size(s) {
+		assert(size.w >= 0); // == 0 is the same thing as an end iterator so it is valid too
+		assert(pitch >= size.w);
+		pos.x = (x == Reverse) ? size.w - 1 : 0;
+		pos.y = (y == Reverse) ? size.h - 1 : 0;
 	}
 
 	virtual PIXEL& operator*() const {
@@ -236,36 +238,42 @@ struct PixelIterator : IPixelIterator
 	}
 
 	void Advance(int dx) {
-		if (dx == 0 || w == 0) return;
+		if (dx == 0 || size.IsEmpty()) return;
 
 		Uint8* ptr = static_cast<Uint8*>(pixel);
 		
 		int pixelsToAdvance = xdir * dx;
-		int rowsToAdvance = std::abs(pixelsToAdvance / w);
-		int xToAdvance = pixelsToAdvance % w;
-		int tmpx = xpos + xToAdvance;
+		int rowsToAdvance = std::abs(pixelsToAdvance / size.w);
+		int xToAdvance = pixelsToAdvance % size.w;
+		int tmpx = pos.x + xToAdvance;
 		
 		if (tmpx < 0) {
 			++rowsToAdvance;
-			tmpx = w + tmpx;
-			xToAdvance = tmpx - xpos;
-		} else if (tmpx >= w) {
+			tmpx = size.w + tmpx;
+			xToAdvance = tmpx - pos.x;
+		} else if (tmpx >= size.w) {
 			++rowsToAdvance;
-			tmpx = tmpx - w;
-			xToAdvance = tmpx - xpos;
+			tmpx = tmpx - size.w;
+			xToAdvance = tmpx - pos.x;
 		}
 		
 		if (dx < 0) {
 			ptr -= pitch * rowsToAdvance * ydir;
+			pos.y -= rowsToAdvance;
 		} else {
 			ptr += pitch * rowsToAdvance * ydir;
+			pos.y += rowsToAdvance;
 		}
 		
 		ptr += int(xToAdvance * sizeof(PIXEL));
 		
-		xpos = tmpx;
-		assert(xpos >= 0 && xpos < w);
+		pos.x = tmpx;
+		assert(pos.x >= 0 && pos.x < size.w);
 		pixel = ptr;
+	}
+	
+	const Point& Position() const {
+		return pos;
 	}
 };
 
@@ -331,21 +339,21 @@ struct StaticAlphaIterator : public IAlphaIterator
 
 struct SDLPixelIterator : IPixelIterator
 {
-//private:
+private:
 	IPixelIterator* imp;
 
 	void InitImp(void* pixel, int pitch, int bpp) {
 		switch (bpp) {
 			case 4:
-				imp = new PixelIterator<Uint32>(static_cast<Uint32*>(pixel), xdir, ydir, clip.w, pitch);
+				imp = new PixelIterator<Uint32>(static_cast<Uint32*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 				break;
 			case 3:
 				ERROR_UNHANDLED_24BPP;
 			case 2:
-				imp = new PixelIterator<Uint16>(static_cast<Uint16*>(pixel), xdir, ydir, clip.w, pitch);
+				imp = new PixelIterator<Uint16>(static_cast<Uint16*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 				break;
 			case 1:
-				imp = new PixelIterator<Uint8>(static_cast<Uint8*>(pixel), xdir, ydir, clip.w, pitch);
+				imp = new PixelIterator<Uint8>(static_cast<Uint8*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 				break;
 			default:
 				ERROR_UNKNOWN_BPP;
@@ -558,6 +566,10 @@ public:
 				ERROR_UNKNOWN_BPP;
 		}
 	}
+	
+	const Point& Position() const {
+		return imp->Position();
+	}
 };
 
 struct RGBAChannelIterator : public IAlphaIterator
@@ -586,7 +598,6 @@ static void Blit(SDLPixelIterator src,
 				 const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst, ++src, ++mask) {
-		assert(dst.imp->pixel < dstend.imp->pixel);
 		Color srcc, dstc;
 		src.ReadRGBA(srcc.r, srcc.g, srcc.b, srcc.a);
 		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
@@ -626,7 +637,6 @@ static void WriteColor(Color srcc,
 					   IAlphaIterator& mask, const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst, ++mask) {
-		assert(dst.imp->pixel < dstend.imp->pixel);
 		Color dstc;
 		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
 
