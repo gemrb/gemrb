@@ -24,7 +24,7 @@
 #include "SDLVideo.h"
 #include "SDLSurfaceSprite2D.h"
 
-#if OPENGL_BACKEND
+#if USE_OPENGL_BACKEND
 #include "GLSLProgram.h"
 #else
 class GLSLProgram {};
@@ -201,6 +201,7 @@ class SDL20VideoDriver : public SDLVideoDriver {
 private:
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+	int sdl2_runtime_version;
 
 	SDL_BlendMode stencilAlphaBlender;
 

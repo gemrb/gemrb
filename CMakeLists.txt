@@ -32,17 +32,25 @@ PROJECT(gemrb)
 
 # check for RaspberryPi
 IF(UNIX)
-	SET(RPI_GLES_PATH "/opt/vc")
-	SET(RPI_GLES_PATH "/opt/vc" CACHE STRING "The Raspberry Pi GLES path. Defaults to /opt/vc")
-	FIND_FILE(RPI NAMES bcm_host.h PATHS "${RPI_GLES_PATH}/include")
+	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+	# By default, Pi0 to Pi3 models use the legacy (Broadcom) GLESv2 drivers, from /opt/vc.
+	# Newer models (Pi4) don't support it, using the open source MESA drivers.
+	# NOTE: the Pi3B(+) models can also run with open source MESA drivers, but support for it must be explicitely enabled
+	IF(RPI AND NOT DISABLE_VIDEOCORE)
+		SET(HINT_GLES_LIBNAME brcmGLESv2)
+		SET(HINT_GLES_INCDIR "/opt/vc/include")
+		SET(HINT_GLES_LIBDIR "/opt/vc/lib")
+		SET(OPENGL_BACKEND GLES)
+		SET(SDL_BACKEND SDL2)
+	ENDIF()
 ENDIF()
 
 # Options list
 SET(SDL_BACKEND "Auto" CACHE STRING "libSDL version (possible values: Auto, SDL or SDL2)")
 SET_PROPERTY(CACHE SDL_BACKEND PROPERTY STRINGS Auto SDL SDL2)
 
-SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible values: None, OpenGL)")
-SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL)
+SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible values: None, OpenGL, GLES)")
+SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
 
 OPTION(USE_SDLMIXER "Enable SDL_mixer support" ON)
 OPTION(USE_OPENAL "Enable OpenAL support" ON)
@@ -51,12 +59,6 @@ OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(USE_ICONV "Enable Iconv support" ON)
-
-IF(RPI AND NOT OPENGL_BACKEND STREQUAL "None")
-	SET(OPENGL_BACKEND GLES)
-	SET(SDL_BACKEND SDL2)
-ENDIF()
-
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
 IF(WIN32 AND _VCPKG_INSTALLED_DIR)
@@ -297,7 +299,7 @@ IF(USE_SDL2)
 	MESSAGE(WARNING "USE_SDL2 has been deprecated, use SDL_BACKEND instead: Auto, SDL, SDL2.")
 ENDIF()
 IF(USE_OPENGL)
-	MESSAGE(WARNING "USE_OPENGL has been dropped, use OPENGL_BACKEND instead: None, OpenGL")
+	MESSAGE(WARNING "USE_OPENGL has been dropped, use OPENGL_BACKEND instead: None, OpenGL, GLES")
 	SET(OPENGL_BACKEND "OpenGL")
 ENDIF()
 
@@ -319,46 +321,29 @@ ELSE()
 ENDIF()
 
 IF(NOT OPENGL_BACKEND STREQUAL "None")
-	SET(OPENGL_BACKEND 1)
+
 	IF(SDL_BACKEND STREQUAL "SDL")
-		MESSAGE(FATAL_ERROR "SDL2 is required for the OpenGL custom code!")
+		MESSAGE(FATAL_ERROR "SDL2 is required for OpenGL backend support!")
 	ENDIF()
 
-	IF(RPI)
- 		MESSAGE(STATUS "RPI_GLES_PATH: ${RPI_GLES_PATH}")
- 		MESSAGE(STATUS "RPI: ${RPI}")
- 		MESSAGE(STATUS "Setting _OPENGL_INCLUDE_PATH: ${RPI_GLES_PATH}/include")
- 		MESSAGE(STATUS "Setting _OPENGL_LIB_PATH: ${RPI_GLES_PATH}/libs")
- 		SET(_OPENGL_INCLUDE_PATH ${RPI_GLES_PATH}/include)
- 		SET(_OPENGL_LIB_PATH ${RPI_GLES_PATH}/lib)
- 		# for newer cmake
- 		MESSAGE(STATUS "Checking for ${RPI_GLES_PATH}/GLES2/GL2.h and ${RPI_GLES_PATH}/lib")
- 		IF(EXISTS ${RPI_GLES_PATH}/include/GLES2/GL2.h AND EXISTS ${RPI_GLES_PATH}/lib)
- 			MESSAGE(STATUS "Found ${RPI_GLES_PATH}/include/GLES2/GL2.h and ${RPI_GLES_PATH}/lib.")
- 			MESSAGE(STATUS "Setting OPENGL_EGL_INCLUDE_DIRS ${RPI_GLES_PATH}/include/GLES2/GL2.h")
- 			MESSAGE(STATUS "Setting OPENGL_LIBRARIES ${RPI_GLES_PATH}/lib")
- 			SET(OpenGL_EGL_FOUND "True")
- 			SET(OPENGL_EGL_INCLUDE_DIRS RPI_${RPI_GLES_PATH}/include)
- 			SET(OPENGL_LIBRARIES ${RPI_GLES_PATH}/lib)
- 		ENDIF()
- 	ENDIF()
+	IF(OPENGL_BACKEND STREQUAL "OpenGL")
+		INCLUDE(FindOpenGL)
+		IF(NOT OPENGL_FOUND)
+			MESSAGE(FATAL_ERROR "OpenGL library not found!")
+		ENDIF()
 
-	INCLUDE(FindOpenGL)
-	IF(NOT OPENGL_FOUND)
-		MESSAGE(FATAL_ERROR "OpenGL library not found!")
-	ENDIF()
-
-	IF(NOT APPLE)
 		INCLUDE(FindGLEW)
-		IF(GLEW_FOUND)
-			MESSAGE(STATUS "Looking for Glew: found")
-		ELSE()
-			MESSAGE(SEND_ERROR "Looking for Glew: not found!")
-			MESSAGE(FATAL_ERROR "Please install the Glew library and headers first!")
+		IF(NOT GLEW_FOUND AND NOT APPLE)
+			MESSAGE(FATAL "GLEW library not found!")
+		ENDIF()
+
+	ELSEIF(OPENGL_BACKEND STREQUAL "GLES")
+		INCLUDE(FindOpenGLES2)
+		IF(NOT OPENGLES2_FOUND)
+			MESSAGE(FATAL_ERROR "OpenGLES2 library not found!")
 		ENDIF()
 	ENDIF()
-ELSE()
-	SET(OPENGL_BACKEND 0)
+
 ENDIF()
 
 INCLUDE(FindZLIB)

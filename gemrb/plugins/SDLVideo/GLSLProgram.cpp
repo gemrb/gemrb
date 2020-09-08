@@ -64,8 +64,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#if OPENGL_BACKEND == OpenGL
-		// remove precisions
+#if USE_OPENGL_API
+		// remove precisions when using OpenGL and not GLES
 		if (line.find("precision") == 0) continue;
 #endif
         vertexContent.append(line + "\n");
@@ -97,7 +97,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream2, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#if OPENGL_BACKEND == OpenGL
+#if USE_OPENGL_API
 		// remove precisions
 		if (line.find("precision") == 0) continue;
 #endif
@@ -109,9 +109,11 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 
 GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source)
 {
-#if OPENGL_BACKEND == OpenGL
+#if USE_OPENGL_API
+	// for GLSL 1.X (GL 2.0)
 	shader_source.insert(0, "#version 110\n");
 #else
+	// for GLSL ES 1.00 (GLES 2.0)
 	shader_source.insert(0, "#version 100\n");
 #endif
     GLuint id = glCreateShader(type);

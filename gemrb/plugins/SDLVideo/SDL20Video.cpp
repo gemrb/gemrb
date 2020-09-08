@@ -38,6 +38,10 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 	// WARNING: do _not_ call opengl here
 	// all function pointers will be NULL
 	// until after SDL_CreateRenderer is called
+
+	SDL_version ver;
+	SDL_GetVersion(&ver);
+	sdl2_runtime_version = SDL_VERSIONNUM(ver.major, ver.minor, ver.patch);
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
@@ -58,29 +62,26 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-	//SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
 
-#if OPENGL_BACKEND
-#if OPENGL_BACKEND == OpenGL
+#if USE_OPENGL_BACKEND
+#if USE_OPENGL_API
 	const char* driverName = "opengl";
-#elif
+#elif USE_GLES_API
 	const char* driverName = "opengles2";
 #endif
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
-
-	/*
-	 these have no effect on the context created by SDL_CreateRenderer
-	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
-	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-	*/
 #endif
 
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-	SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
-#endif
+	if (sdl2_runtime_version >= SDL_VERSIONNUM(2,0,10)) {
+		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
+	}
+
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+#if USE_OPENGL_BACKEND
+	winFlags |= SDL_WINDOW_OPENGL;
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+#endif
+
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
@@ -97,13 +98,16 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
-#if OPENGL_BACKEND
+#if USE_OPENGL_BACKEND
+	Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: %s, renderer: %s, vendor: %s", glGetString(GL_VERSION), glGetString(GL_RENDERER), glGetString(GL_VENDOR));
+	Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
 	if (strcmp(info.name, driverName) != 0) {
 		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
 		return GEM_ERROR;
 	}
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && defined(USE_OPENGL_API)
 	glewInit();
 #endif
 
@@ -246,7 +250,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 
 		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
-#if OPENGL_BACKEND
+#if USE_OPENGL_BACKEND
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 		SDL_RenderFlush(renderer);
 #endif
