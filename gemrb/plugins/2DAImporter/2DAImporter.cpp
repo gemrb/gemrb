@@ -32,6 +32,10 @@ using namespace GemRB;
 
 p2DAImporter::p2DAImporter(void)
 {
+	colNames.reserve(10);
+	rowNames.reserve(10);
+	ptrs.reserve(10);
+	rows.reserve(10);
 }
 
 p2DAImporter::~p2DAImporter(void)
@@ -97,6 +101,7 @@ bool p2DAImporter::Open(DataStream* str)
 			rowNames.push_back( str );
 			RowEntry r;
 			rows.push_back( r );
+			rows[row].reserve(10);
 			while (( str = strtok( NULL, " " ) ) != NULL) {
 				rows[row].push_back( str );
 			}
