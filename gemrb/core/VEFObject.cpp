@@ -280,12 +280,12 @@ void VEFObject::LoadVEF(DataStream *stream)
 	}
 }
 
-ScriptedAnimation *VEFObject::GetSingleObject()
+ScriptedAnimation *VEFObject::GetSingleObject() const
 {
 	ScriptedAnimation *sca = NULL;
 
 	if (SingleObject) {
-		std::list<ScheduleEntry>::iterator iter = entries.begin();
+		std::list<ScheduleEntry>::const_iterator iter = entries.begin();
 		if (iter!=entries.end() ) {
 			if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
 				sca = (ScriptedAnimation *) (*iter).ptr;

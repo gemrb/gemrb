@@ -377,18 +377,18 @@ public:
 
 	/** prints useful information on console */
 	void dump(bool show_actors=0) const;
-	TileMap *GetTileMap() { return TMap; }
+	TileMap *GetTileMap() const { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
-	void SeeSpellCast(Scriptable *caster, ieDword spell);
+	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
 	/* low level function to perform the daylight changes */
 	void ChangeTileMap(Image* lm, Sprite2D* sm);
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
 	void AutoLockDoors();
 	void UpdateScripts();
-	void ResolveTerrainSound(ieResRef &sound, Point &pos);
-	void DoStepForActor(Actor *actor, int walkScale, ieDword time);
+	void ResolveTerrainSound(ieResRef &sound, Point &pos) const;
+	void DoStepForActor(Actor *actor, int walkScale, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
@@ -398,23 +398,23 @@ public:
 	void MoveVisibleGroundPiles(const Point &Pos);
 	/* draws stationary vvc graphics */
 	//void DrawVideocells(Region screen);
-	void DrawHighlightables();
+	void DrawHighlightables() const;
 	void DrawMap(Region screen);
-	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
+	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
 	void AddAnimation(AreaAnimation* anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
-	AreaAnimation* GetNextAnimation(aniIterator &iter)
+	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
 		if (iter == animations.end()) {
 			return NULL;
 		}
 		return *iter++;
 	}
-	AreaAnimation* GetAnimation(const char* Name);
+	AreaAnimation *GetAnimation(const char *Name) const;
 	size_t GetAnimationCount() const { return animations.size(); }
 
-	unsigned int GetWallCount() { return WallCount; }
-	Wall_Polygon *GetWallGroup(int i) { return Walls[i]; }
+	unsigned int GetWallCount() const { return WallCount; }
+	Wall_Polygon *GetWallGroup(int i) const { return Walls[i]; }
 	void SetWallGroups(unsigned int count, Wall_Polygon **walls)
 	{
 		WallCount = count;
@@ -424,41 +424,41 @@ public:
 		unsigned int width, unsigned int height, int flag, bool areaanim = false);
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, bool global);
-	void ActorSpottedByPlayer(Actor *actor);
+	void ActorSpottedByPlayer(Actor *actor) const;
 	void InitActors();
 	void InitActor(Actor *actor);
 	void AddActor(Actor* actor, bool init);
 	//counts the summons already in the area
-	int CountSummons(ieDword flag, ieDword sex);
+	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p);
 	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
 	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
-	Door *GetDoorByGlobalID(ieDword objectID);
-	Container *GetContainerByGlobalID(ieDword objectID);
-	InfoPoint *GetInfoPointByGlobalID(ieDword objectID);
+	Door *GetDoorByGlobalID(ieDword objectID) const;
+	Container *GetContainerByGlobalID(ieDword objectID) const;
+	InfoPoint *GetInfoPointByGlobalID(ieDword objectID) const;
 	Actor* GetActorByGlobalID(ieDword objectID) const;
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius) const;
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
-	Actor* GetActor(const char* Name, int flags);
+	Actor *GetActor(const char *Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
-	Scriptable* GetActorByDialog(const char* resref);
-	Scriptable* GetItemByDialog(ieResRef resref);
-	Actor* GetActorByResource(const char* resref);
-	Actor* GetActorByScriptName(const char* name);
+	Scriptable *GetActorByDialog(const char *resref) const;
+	Scriptable *GetItemByDialog(ieResRef resref) const;
+	Actor *GetActorByResource(const char *resref) const;
+	Actor *GetActorByScriptName(const char *name) const;
 	bool HasActor(const Actor *actor) const;
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
-	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
+	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty) const;
 	int GetActorCount(bool any) const;
 	//fix actors position if required
 	void JumpActors(bool jump);
 	//selects all selectable actors in the area
-	void SelectActors();
+	void SelectActors() const;
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 
@@ -479,10 +479,10 @@ public:
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
-	ieDword HasVVCCell(const ieResRef resource, const Point &p);
+	ieDword HasVVCCell(const ieResRef resource, const Point &p) const;
 	void AddVVCell(VEFObject* vvc);
 	bool CanFree();
-	int GetCursor( const Point &p);
+	int GetCursor(const Point &p) const;
 	//adds a sparkle puff of colour to a point in the area
 	//FragAnimID is an optional avatar animation ID (see avatars.2da) for
 	//fragment animation
@@ -492,8 +492,8 @@ public:
 
 	//entrances
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);
-	Entrance* GetEntrance(const char* Name);
-	Entrance* GetEntrance(int i) { return entrances[i]; }
+	Entrance *GetEntrance(const char *Name) const;
+	Entrance *GetEntrance(int i) const { return entrances[i]; }
 	int GetEntranceCount() const { return (int) entrances.size(); }
 
 	//containers
@@ -516,7 +516,7 @@ public:
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
 	void BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value);
-	void ClearSearchMapFor(Movable *actor);
+	void ClearSearchMapFor(const Movable *actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder
@@ -527,9 +527,9 @@ public:
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
 	PathNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false);
+	bool TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking = false) const;
 	/* returns true if there is enemy visible */
-	bool AnyPCSeesEnemy();
+	bool AnyPCSeesEnemy() const;
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
 	PathNode* GetLine(const Point &start, const Point &dest, int flags) const;
 	PathNode* GetLine(const Point &start, int steps, unsigned int orient) const;
@@ -539,27 +539,27 @@ public:
 	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, unsigned int minDistance = 0, int flags = PF_SIGHT, const Actor *caller = NULL) const;
 
 	/* returns false if point isn't visible on visibility/explored map */
-	bool IsVisible(const Point &s, int explored);
+	bool IsVisible(const Point &s, int explored) const;
 	bool IsVisibleLOS(const Point &s, const Point &d, const Actor *caller = NULL) const;
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
-	int WhichEdge(const Point &s);
+	int WhichEdge(const Point &s) const;
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
-	Ambient *GetAmbient(int i) { return ambients[i]; }
-	unsigned int GetAmbientCount(bool toSave=false);
+	Ambient *GetAmbient(int i) const { return ambients[i]; }
+	unsigned int GetAmbientCount(bool toSave=false) const;
 
 	//mapnotes
 	void AddMapNote(const Point &point, int color, String* text);
 	void AddMapNote(const Point &point, int color, ieStrRef strref);
 	void AddMapNote(const Point &point, const MapNote& note);
 	void RemoveMapNote(const Point &point);
-	const MapNote& GetMapNote(int i) { return mapnotes[i]; }
-	const MapNote* MapNoteAtPoint(const Point &point);
-	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
+	const MapNote &GetMapNote(int i) const { return mapnotes[i]; }
+	const MapNote *MapNoteAtPoint(const Point &point) const;
+	unsigned int GetMapNoteCount() const { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns the remaining number of (unrested) hours for interrupted rest */
 	int CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day);
@@ -569,25 +569,25 @@ public:
 	//spawns
 	void LoadIniSpawn();
 	Spawn *AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count);
-	Spawn *GetSpawn(int i) { return spawns[i]; }
+	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
-	Spawn *GetSpawn(const char *Name);
+	Spawn *GetSpawn(const char *Name) const;
 	//returns spawn inside circle, checks for schedule and other
 	//conditions as well
-	Spawn *GetSpawnRadius(const Point &point, unsigned int radius);
-	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
+	Spawn *GetSpawnRadius(const Point &point, unsigned int radius) const;
+	unsigned int GetSpawnCount() const { return (unsigned int) spawns.size(); }
 	void TriggerSpawn(Spawn *spawn);
 
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor);
-	bool HasWeather();
-	int GetWeather();
+	bool HasWeather() const;
+	int GetWeather() const;
 	void ClearTrap(Actor *actor, ieDword InTrap);
 
 	//tracking stuff
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
-	bool DisplayTrackString(Actor *actor);
+	bool DisplayTrackString(Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
 	unsigned short GetInternalSearchMap(int x, int y) const;
@@ -596,13 +596,13 @@ public:
 	void SetupReverbInfo();
 
 private:
-	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
-	Particles *GetNextSpark(spaIterator &iter);
-	VEFObject *GetNextScriptedAnimation(scaIterator &iter);
-	Actor *GetNextActor(int &q, int &index);
+	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
+	Particles *GetNextSpark(spaIterator &iter) const;
+	VEFObject *GetNextScriptedAnimation(scaIterator &iter) const;
+	Actor *GetNextActor(int &q, int &index) const;
 	Container *GetNextPile (int &index) const;
-	void DrawPile (Region screen, int pileidx);
-	void DrawSearchMap(const Region &screen);
+	void DrawPile (Region screen, int pileidx) const;
+	void DrawSearchMap(const Region &screen) const;
 	void GenerateQueues();
 	void SortQueues();
 	//Actor* GetRoot(int priority, int &index);

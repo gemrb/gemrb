@@ -153,8 +153,8 @@ public:
 	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
 	/* get stored SpriteCover */
 	SpriteCover* GetSpriteCover() const { return cover; }
-	int GetCurrentFrame();
-	ieDword GetSequenceDuration(ieDword multiplier);
+	int GetCurrentFrame() const;
+	ieDword GetSequenceDuration(ieDword multiplier) const;
 	/* sets up a delay in the beginning of the vvc */
 	void SetDelay(ieDword delay);
 	/* sets default duration if it wasn't set yet */

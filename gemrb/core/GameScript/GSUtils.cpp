@@ -543,7 +543,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
+int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
 {
 	Map *map;
 
