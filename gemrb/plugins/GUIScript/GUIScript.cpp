@@ -489,8 +489,8 @@ static PyObject* GemRB_TextArea_SetChapterText(PyObject* self, PyObject* args)
 		int lines = ta->ContentHeight() / rowHeight;
 		float heightScale = 12.0f / rowHeight; // scale based on text size so smaller text scrolls more slowly
 		float widthScale = 640.0f / w;  // scale based on width to become more slow as we get wider
-		// TODO: add a global configurable scale factor... but we cant store floats in the INI?
-		int ticksPerLine = 1100.0f * heightScale * widthScale;
+		int textSpeed = gamedata->GetTextSpeed();
+		int ticksPerLine = 11.0f * heightScale * widthScale * textSpeed;
 		ta->ScrollToY(-ta->ContentHeight(), lines * ticksPerLine);
 	}
 	Py_RETURN_NONE;

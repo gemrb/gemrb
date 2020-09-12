@@ -125,6 +125,8 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	inline int GetStepTime() { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
+	inline int GetTextSpeed() const { return TextScreenSpeed; }
+	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
 private:
 	void ReadItemSounds();
 private:
@@ -142,6 +144,7 @@ private:
 	AutoTable trapSaveBonus;
 	AutoTable summoningLimit;
 	int stepTime = 0;
+	int TextScreenSpeed = 0;
 };
 
 extern GEM_EXPORT GameData * gamedata;
