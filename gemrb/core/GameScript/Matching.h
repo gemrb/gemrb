@@ -34,13 +34,13 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0)
 Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 Scriptable *GetActorObject(TileMap *TMap, const char *name);
 
-Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags);
+Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags);
 Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);
 Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags);
-Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_flags);
-Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
-Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
+Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int ga_flags);
+Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
+Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
 
 /* returns true if actor matches the object specs. */
 bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
