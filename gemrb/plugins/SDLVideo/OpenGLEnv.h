@@ -21,10 +21,20 @@
 #ifndef GemRB_OpenGLEnv_h
 #define GemRB_OpenGLEnv_h
 
-#if __APPLE__
+#define GL_GLEXT_PROTOTYPES 1
+
+#ifdef __APPLE__
 	#include <OpenGL/gl3.h>
 #else
-	#include <GL/glew.h>
+	#ifdef USE_OPENGL_API
+		#ifdef _WIN32
+			#include <GL/glew.h>
+		#else
+			#include <SDL_opengl.h>
+		#endif
+	#else // USE_GLES_API
+		#include <SDL_opengles2.h>
+	#endif
 #endif
 
 #endif
