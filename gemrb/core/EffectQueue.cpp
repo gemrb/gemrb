@@ -469,12 +469,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
 		newfx->Target = FX_TARGET_PRESET;
-		if( newfx->Resource3[0]) {
-			strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
-		} else {
-			//FIXME: unhardcode; should probably use a spell hit (shtable) in some way
-			strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
-		}
+		strnuprcpy(newfx->Resource, newfx->Resource3[0] ? newfx->Resource3 : "SPGFLSH1", sizeof(ieResRef) - 1);
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 			//unprepare duration
 			newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
