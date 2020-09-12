@@ -332,9 +332,12 @@ IF(NOT OPENGL_BACKEND STREQUAL "None")
 			MESSAGE(FATAL_ERROR "OpenGL library not found!")
 		ENDIF()
 
-		INCLUDE(FindGLEW)
-		IF(NOT GLEW_FOUND AND NOT APPLE)
-			MESSAGE(FATAL "GLEW library not found!")
+		# GLEW is required only for Windows
+		IF (WIN32)
+			INCLUDE(FindGLEW)
+			IF(NOT GLEW_FOUND)
+				MESSAGE(FATAL "GLEW library not found!")
+			ENDIF()
 		ENDIF()
 
 	ELSEIF(OPENGL_BACKEND STREQUAL "GLES")

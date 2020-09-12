@@ -107,7 +107,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 		return GEM_ERROR;
 	}
 
-#if !defined(__APPLE__) && defined(USE_OPENGL_API)
+#if defined(_WIN32) && defined(USE_OPENGL_API)
 	glewInit();
 #endif
 
