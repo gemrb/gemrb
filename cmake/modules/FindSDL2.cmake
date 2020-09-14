@@ -76,7 +76,6 @@ find_path(SDL2_INCLUDE_DIR SDL.h
   PATHS
      ~/Library/Frameworks/
      /Library/Frameworks/
-     $ENV{VITASDK}/arm-vita-eabi/
 )
 
 find_library(SDL2_LIBRARY_TEMP

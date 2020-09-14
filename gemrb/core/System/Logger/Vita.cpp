@@ -20,17 +20,12 @@
 
 #include <psp2/kernel/clib.h> 
 
-//#include "debugScreen.h"
-//#include "debugScreen.c"
-
-//#define printf psvDebugScreenPrintf
 #define printf sceClibPrintf
 
 namespace GemRB {
 
 VitaLogger::VitaLogger()
 {
-        //psvDebugScreenInit();
 }
 
 VitaLogger::~VitaLogger()

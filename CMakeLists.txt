@@ -488,26 +488,8 @@ IF(APPLE)
 ENDIF(APPLE)
 
 IF(VITA)
-    ADD_DEFINITIONS("-DVITA")
-	INSTALL( FILES Makefile.vita DESTINATION ${BIN_DIR} )
-	INSTALL( FILES sce_sys/icon0.png DESTINATION ${BIN_DIR}/sce_sys/ )
-	INSTALL( FILES sce_sys/livearea/contents/bg.png DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
-	INSTALL( FILES sce_sys/livearea/contents/startup.png DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
-	INSTALL( FILES sce_sys/livearea/contents/template.xml DESTINATION ${BIN_DIR}/sce_sys/livearea/contents )
-	INSTALL( FILES gemrb/GemRB.cfg.vita DESTINATION ${BIN_DIR} )
-	
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Ofast -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -ftree-vectorize -D_GLIBCXX_USE_C99_MATH=0 -DNDEBUG")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=hard -ftree-vectorize -D_GLIBCXX_USE_C99_MATH=0 -DNDEBUG")
-	#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O1 -D_GLIBCXX_USE_C99_MATH=0 -DNDEBUG")
-	#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1 -D_GLIBCXX_USE_C99_MATH=0 -DNDEBUG")
-
-	IF ((SDL_BACKEND STREQUAL "SDL") OR USE_SDL)
-		#SET(CMAKE_CXX_STANDARD_LIBRARIES "-lvitaGL -lvorbis -logg -lmikmod -lSceAudio_stub -lSceCtrl_stub -lSceGxm_stub -lSceHid_stub -lSceDisplay_stub -lSceAppMgr_stub -lSceCommonDialog_stub -lScePower_stub -lmathneon -lvitashark -lSceShaccCg_stub")
-		SET(CMAKE_CXX_STANDARD_LIBRARIES "-lvorbis -logg -lmikmod -lSceAudio_stub -lSceCtrl_stub -lvita2d -lSceGxm_stub -lSceHid_stub -lSceDisplay_stub -lSceSysmodule_stub -lSceAppMgr_stub -lSceCommonDialog_stub -lScePower_stub")
-	ELSEIF ((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
-		SET(CMAKE_CXX_STANDARD_LIBRARIES "-lvorbis -logg -lFLAC -lmikmod -lmpg123 -lSceAudio_stub -lSceCtrl_stub -lvita2d -lSceGxm_stub -lSceHid_stub -lSceDisplay_stub -lSceSysmodule_stub -lSceAppMgr_stub -lSceCommonDialog_stub -lScePower_stub -lSceTouch_stub")
-	ENDIF ()
-ENDIF()
+	INCLUDE(platforms/vita/vita.cmake)
+ENDIF(VITA)
 
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)

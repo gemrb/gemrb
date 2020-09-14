@@ -182,64 +182,44 @@ protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDLKey SDL_Keycode
 #endif
+    const uint32_t VITA_FULLSCREEN_WIDTH = 960;
+    const uint32_t VITA_FULLSCREEN_HEIGHT = 544;
+	SDL_Rect vitaDestRect;
+
+	const float VITA_SPEED_MOD = 2000000.0f;
+	const float VITA_AXIS_SPEEDUP = 1.03f;
+	float vitaPointerSpeed;
+	int16_t xAxisLValue = 0;
+	int16_t yAxisLValue = 0;
+	int16_t xAxisRValue = 0;
+	int16_t yAxisRValue = 0; 
+	float xAxisFloatPos = 0;
+	float yAxisFloatPos = 0;
+	uint32_t lastAxisMovementTime = 0;
 
 	static const int TOTAL_CHARACTERS_VITA = 37;
+	bool vitaInputActive = false;
+	bool emptyInput = false;
+	bool currentUpper = false;
+	int32_t currentCharIndex;
+	std::vector <int32_t> inputIndexes;
+
+	unsigned char vitaKeys[TOTAL_CHARACTERS_VITA] = 
+	{
+		//lowercase letters
+		97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
+		//space
+		32,
+		//nums
+		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
+	};
+
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
 	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
 	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
 	void ProcessAxisMotion();
 	unsigned char GetCurrentKeyValue();
-
-	bool vitaInputActive = false;
-	bool emptyInput = false;
-	bool currentUpper = false;
-	int currentCharIndex;
-	std::vector <int> inputIndexes;
-
-	unsigned char vitaKeys[TOTAL_CHARACTERS_VITA] = 
-	{
-		//lowercase letters
-		97,
-		98,
-		99,
-		100,
-		101,
-		102,
-		103,
-		104,
-		105,
-		106,
-		107,
-		108,
-		109,
-		110,
-		111,
-		112,
-		113,
-		114,
-		115,
-		116,
-		117,
-		118,
-		119,
-		120,
-		121,
-		122,
-		//space
-		32,
-		//nums
-		48,
-		49,
-		50,
-		51,
-		52,
-		53,
-		54,
-		55,
-		56,
-		57
-	};
 #endif
 
 public:

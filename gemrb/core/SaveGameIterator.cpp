@@ -709,9 +709,9 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
 #ifdef VITA
-        sceIoRemove(game->GetPath());
+    sceIoRemove(game->GetPath());
 #else
-		rmdir( game->GetPath() );
+	rmdir( game->GetPath() );
 #endif
 }
 

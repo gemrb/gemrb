@@ -300,6 +300,10 @@ PluginsPath=./gemrb/plugins/
 
 #NumFingInfo=2
 
+# Vita specific options
+VitaPointerSpeed=10
+VitaKeepAspectRatio=1
+
 #####################################################
 #  END                                              #
 #####################################################

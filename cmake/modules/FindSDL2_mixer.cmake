@@ -41,7 +41,6 @@ find_path(SDL2_MIXER_INCLUDE_DIR SDL_mixer.h
   PATHS
     ~/Library/Frameworks/
     /Library/Frameworks/
-    $ENV{VITASDK}/arm-vita-eabi/
 )
 
 if(NOT SDL2_MIXER_LIBRARY AND SDL2MIXER_LIBRARY)

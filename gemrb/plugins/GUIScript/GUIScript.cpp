@@ -15994,6 +15994,7 @@ PyDoc_STRVAR( GemRB_internal__doc,
 bool GUIScript::Init(void)
 {
 #ifdef VITA
+	//Py_Initialize crashes on VIta otherwise
 	Py_NoSiteFlag = 1;
     Py_IgnoreEnvironmentFlag = 1;
     Py_NoUserSiteDirectory = 1;

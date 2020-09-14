@@ -92,50 +92,49 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	SDL_FreeSurface( tmp );
 
 #ifdef VITA
-	if (width != 960 || height != 544)
+	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)
 	{
-		int xpos = 0;
-		int ypos = 0;
+		vitaDestRect.x = 0;
+        vitaDestRect.y = 0;
+        vitaDestRect.w = width;
+        vitaDestRect.h = height;
 
 		if (fullscreen)
 		{
 			//resize to fullscreen
-			int xsize;
-			int ysize;
-
 			if (core->VitaKeepAspectRatio)
 			{
-				if ((960.0 / 544.0) >= ((float)width / height))
+				if ((static_cast<float>(VITA_FULLSCREEN_WIDTH) / VITA_FULLSCREEN_HEIGHT) >= (static_cast<float>(width) / height))
 				{
-					float scale = 544.0 / height;
-					xsize = width * scale;
-					ysize = 544;
-					xpos = (960 - xsize) / 2;
+					float scale = static_cast<float>(VITA_FULLSCREEN_HEIGHT) / height;
+					vitaDestRect.w = width * scale;
+					vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
+					vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - vitaDestRect.w) / 2;
 				}
 				else
 				{
-					float scale = 960.0 / width;
-					xsize = 960;
-					ysize = height * scale;
-					ypos = (544 - ysize) / 2;
+					float scale = static_cast<float>(VITA_FULLSCREEN_WIDTH) / width;
+					vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+					vitaDestRect.h = height * scale;
+					vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - vitaDestRect.h) / 2;
 				}
 			}
 			else
 			{
-				xsize = 960;
-				ysize = 544;
+				vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+				vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
 			}
 			
-			SDL_SetVideoModeScaling(xpos, ypos, xsize, ysize);
-			SDL_SetVideoModeBilinear(core->VitaBilinear);
+			SDL_SetVideoModeBilinear(true);
 		}
 		else
 		{
 			//center game area
-			xpos = (960 - width) / 2;
-			ypos = (544 - height) / 2;
-			SDL_SetVideoModeScaling(xpos, ypos, width, height);
+			vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - width) / 2;
+			vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - height) / 2;
 		}
+
+		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
 	}
 #endif
 

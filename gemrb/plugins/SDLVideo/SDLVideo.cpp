@@ -101,6 +101,9 @@ SDLVideoDriver::SDLVideoDriver(void)
 	subtitlestrref = 0;
 	subtitletext = NULL;
 	disp = tmpBuf =  NULL;
+#ifdef VITA
+	vitaPointerSpeed = core->VitaPointerSpeed / VITA_SPEED_MOD;
+#endif
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -420,37 +423,29 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 }
 
 #ifdef VITA
-Sint16 xaxisl_value = 0;
-Sint16 yaxisl_value = 0;
-Sint16 xaxisr_value = 0;
-Sint16 yaxisr_value = 0; 
-float xaxis_float = 0;
-float yaxis_float = 0;
-Uint32 lastAxisMovementTime = 0;
-
 void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
 {
     if (motion.axis == JOY_XAXISL)
     {
         if(std::abs(motion.value) > JOY_DEADZONE)
-            xaxisl_value = motion.value;
+            xAxisLValue = motion.value;
         else
-            xaxisl_value = 0;
+            xAxisLValue = 0;
     }
     else if (motion.axis == JOY_YAXISL)
     {
         if(std::abs(motion.value) > JOY_DEADZONE)
-            yaxisl_value = motion.value;
+            yAxisLValue = motion.value;
         else
-            yaxisl_value = 0;
+            yAxisLValue = 0;
     }
 	else if (motion.axis == JOY_XAXISR)
     {
-        xaxisr_value = motion.value;
+        xAxisRValue = motion.value;
     }
 	else if (motion.axis == JOY_YAXISR)
     {
-        yaxisr_value = motion.value;
+        yAxisRValue = motion.value;
     }
 }
 
@@ -525,7 +520,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				}
 				else
 				{
-					currentCharIndex++;
+					++currentCharIndex;
 					if (currentCharIndex >= TOTAL_CHARACTERS_VITA)
 						currentCharIndex = 0;
 				}
@@ -545,7 +540,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				}
 				else
 				{
-					currentCharIndex--;
+					--currentCharIndex;
 					if (currentCharIndex < 0)
 						currentCharIndex = TOTAL_CHARACTERS_VITA - 1;
 				}
@@ -704,14 +699,14 @@ void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
 		if (!core->ConsolePopped)
-			EvntManager->MouseDown( static_cast<int>(xaxis_float), static_cast<int>(yaxis_float), 1 << ( buttonCode - 1 ), GetModState() );
+			EvntManager->MouseDown( static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos), 1 << ( buttonCode - 1 ), GetModState() );
 	}
 	else
 	{
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_UP;
 		if (!core->ConsolePopped)
-			EvntManager->MouseUp( static_cast<int>(xaxis_float), static_cast<int>(yaxis_float), 1 << ( buttonCode - 1 ), GetModState() );
+			EvntManager->MouseUp( static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos), 1 << ( buttonCode - 1 ), GetModState() );
 	}
 }
 
@@ -725,43 +720,43 @@ void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
 
 void SDLVideoDriver::ProcessAxisMotion()
 {
-    float movementSpeedMod = 2000000;
-	float settingsSpeed = core->VitaPointerSpeed;
-    
-    Uint32 currentTime = SDL_GetTicks();
-    Uint32 deltaTime = currentTime - lastAxisMovementTime;
+    uint32_t currentTime = SDL_GetTicks();
+    uint32_t deltaTime = currentTime - lastAxisMovementTime;
     lastAxisMovementTime = currentTime;
     
 	//cursor movement
-    if (xaxisl_value != 0 || yaxisl_value != 0)
+    if (xAxisLValue != 0 || yAxisLValue != 0)
     {
-		xaxis_float += ((pow(abs(xaxisl_value), 1.03f) * (xaxisl_value / abs(xaxisl_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
-		yaxis_float += ((pow(abs(yaxisl_value), 1.03f) * (yaxisl_value / abs(yaxisl_value)) * deltaTime) / movementSpeedMod) * settingsSpeed;
+		int16_t xSign = ( xAxisLValue > 0 ) - ( xAxisLValue < 0 );
+		int16_t ySign = ( yAxisLValue > 0 ) - ( yAxisLValue < 0 );
 
-		if(xaxis_float < 0) 
-			xaxis_float = 0;
-		if(yaxis_float < 0) 
-			yaxis_float = 0;
+		xAxisFloatPos += ((pow(abs(xAxisLValue), VITA_AXIS_SPEEDUP) * xSign * deltaTime)) * vitaPointerSpeed;
+		yAxisFloatPos += ((pow(abs(yAxisLValue), VITA_AXIS_SPEEDUP) * ySign * deltaTime)) * vitaPointerSpeed;
 
-		if(xaxis_float > GetWidth())
-			xaxis_float = GetWidth();
-		if(yaxis_float > GetHeight())
-			yaxis_float = GetHeight();
+		if(xAxisFloatPos < 0) 
+			xAxisFloatPos = 0;
+		if(yAxisFloatPos < 0) 
+			yAxisFloatPos = 0;
+
+		if(xAxisFloatPos > GetWidth())
+			xAxisFloatPos = GetWidth();
+		if(yAxisFloatPos > GetHeight())
+			yAxisFloatPos = GetHeight();
 		
-		MouseMovement(static_cast<int>(xaxis_float), static_cast<int>(yaxis_float));
+		MouseMovement(static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos));
 	}
 
 	//map scroll
-    if (xaxisr_value != 0 || yaxisr_value != 0)
+    if (xAxisRValue != 0 || yAxisRValue != 0)
     {
-		if (xaxisr_value > JOY_MAP_SCROLL_DEADZONE)
+		if (xAxisRValue > JOY_MAP_SCROLL_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-		else if (xaxisr_value < -JOY_MAP_SCROLL_DEADZONE)
+		else if (xAxisRValue < -JOY_MAP_SCROLL_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_LEFT);
 		
-		if (yaxisr_value > JOY_MAP_SCROLL_DEADZONE)
+		if (yAxisRValue > JOY_MAP_SCROLL_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_DOWN);
-		else if (yaxisr_value < -JOY_MAP_SCROLL_DEADZONE)
+		else if (yAxisRValue < -JOY_MAP_SCROLL_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_UP);
 	}
 }
