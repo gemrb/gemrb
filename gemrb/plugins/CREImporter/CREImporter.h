@@ -101,21 +101,20 @@ private:
 	CREMemorizedSpell* GetMemorizedSpell();
 	CREItem* GetItem();
 	void SetupColor(ieDword&);
-	int GetHpAdjustment(Actor *actor);
 
-	int PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize);
-	int PutActorPST(DataStream *stream, Actor *actor);
-	int PutActorBG(DataStream *stream, Actor *actor);
-	int PutActorIWD1(DataStream *stream, Actor *actor);
-	int PutActorIWD2(DataStream *stream, Actor *actor);
+	int PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize);
+	int PutActorPST(DataStream *stream, const Actor *actor);
+	int PutActorBG(DataStream *stream, const Actor *actor);
+	int PutActorIWD1(DataStream *stream, const Actor *actor);
+	int PutActorIWD2(DataStream *stream, const Actor *actor);
 	int PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level);
-	int PutKnownSpells(DataStream *stream, Actor *actor);
-	int PutSpellPages(DataStream *stream, Actor *actor);
-	int PutMemorizedSpells(DataStream *stream, Actor *actor);
-	int PutEffects(DataStream *stream, Actor *actor);
-	int PutVariables(DataStream *stream, Actor *actor);
-	int PutInventory(DataStream *stream, Actor *actor, unsigned int size);
-	int PutHeader(DataStream *stream, Actor *actor);
+	int PutKnownSpells(DataStream *stream, const Actor *actor);
+	int PutSpellPages(DataStream *stream, const Actor *actor);
+	int PutMemorizedSpells(DataStream *stream, const Actor *actor);
+	int PutEffects(DataStream *stream, const Actor *actor);
+	int PutVariables(DataStream *stream, const Actor *actor);
+	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size);
+	int PutHeader(DataStream *stream, const Actor *actor);
 };
 
 }

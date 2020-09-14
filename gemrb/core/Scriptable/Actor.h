@@ -576,7 +576,7 @@ public:
 	/** handle idle actions, that shouldn't mess with scripting */
 	void IdleActions(bool nonidle);
 	/* sets the actor in panic (turn/morale break) */
-	void Panic(Scriptable *attacker, int panicmode);
+	void Panic(const Scriptable *attacker, int panicmode);
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
@@ -907,7 +907,7 @@ public:
 	/* checks if the alignment matches one of the masking constants */
 	//bool MatchesAlignmentMask(ieDword mask);
 	/** untargetable by spells/attack due to invisibility or sanctuary */
-	bool Untargetable(ieResRef spellRef);
+	bool Untargetable(ieResRef spellRef) const;
 	/* returns true if this it is futile to try to harm actor (dead/sanctuaried) */
 	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target

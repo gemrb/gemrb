@@ -545,17 +545,15 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
 {
-	Map *map;
-
 	if (target->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) target;
+		const Actor *tar = (const Actor *) target;
 
 		if (!tar->ValidTarget(seeflag, Sender)) {
 			return 0;
 		}
 	}
 
-	map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	//if (!(seeflag&GA_GLOBAL)) {
 		if (!map || map!=Sender->GetCurrentArea() ) {
 			return 0;
@@ -566,7 +564,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 		unsigned int dist;
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
-			Actor* snd = ( Actor* ) Sender;
+			const Actor *snd = (const Actor *) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
 		} else {
 			dist = VOODOO_VISUAL_RANGE;
@@ -596,7 +594,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	} else {
 		flags |= GA_NO_DEAD;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter, flags );
+	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter, flags);
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
@@ -941,7 +939,7 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 	}
 }
 
-void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
+void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest)
 {
 	if (!dest) {
 		position = scr->Pos;
@@ -953,16 +951,16 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			break;
 		case ST_ACTOR:
 		//if there are other moveables, put them here
-			position = ((Movable *) scr)->GetMostLikelyPosition();
+			position = ((const Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((InfoPoint *) scr)->GetUsePoint()) {
-				position=((InfoPoint *) scr)->UsePoint;
+			if (((const InfoPoint *) scr)->GetUsePoint()) {
+				position = ((const InfoPoint *) scr)->UsePoint;
 				break;
 			}
 		// intentional fallthrough
 		case ST_DOOR: case ST_CONTAINER:
-			position=((Highlightable *) scr)->TrapLaunch;
+			position = ((const Highlightable *) scr)->TrapLaunch;
 	}
 }
 
@@ -1283,15 +1281,15 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable *target = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Point dest = target->Pos;
-	if (target->Type == ST_TRIGGER && ((InfoPoint *)target)->GetUsePoint()) {
-		dest = ((InfoPoint *)target)->UsePoint;
+	if (target->Type == ST_TRIGGER && ((const InfoPoint *)target)->GetUsePoint()) {
+		dest = ((const InfoPoint *)target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
 		Sender->LastSeen = target->GetGlobalID();
@@ -1784,10 +1782,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	return newAction;
 }
 
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release)
+void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release)
 {
 	Point p;
-	Map *myarea, *hisarea;
 
 	if (Sender->Type != ST_ACTOR) {
 		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
@@ -1795,8 +1792,8 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont
 		return;
 	}
 
-	myarea = Sender->GetCurrentArea();
-	hisarea = target->GetCurrentArea();
+	const Map *myarea = Sender->GetCurrentArea();
+	const Map *hisarea = target->GetCurrentArea();
 	if (hisarea && hisarea!=myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
@@ -1819,7 +1816,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont
 		distance += ((Actor *)Sender)->size*10;
 	}
 	if (distance && target->Type == ST_ACTOR) {
-		distance += ((Actor *)target)->size*10;
+		distance += ((const Actor *) target)->size * 10;
 	}
 
 	MoveNearerTo(Sender, p, distance, dont_release);

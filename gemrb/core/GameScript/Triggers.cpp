@@ -219,7 +219,7 @@ int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
+	const Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
 	if ( !target ) {
 		return 0;
 	}
@@ -244,7 +244,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//don't accept parties currently in dialog!
 	//this might disturb some modders, but this is the correct behaviour
 	//for example the aaquatah dialog in irenicus dungeon depends on it
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (gc->dialoghandler->InDialog(scr)) {
 		return 0;
 	}
@@ -293,7 +293,7 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
 {
-	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter, false);
+	const Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter, false);
 	return MatchActor(Sender, actor->GetGlobalID(), parameters->objectParameter);
 }
 
@@ -835,7 +835,7 @@ int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 
 int GameScript::SummoningLimit(Scriptable* Sender, Trigger* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return 0;
 
 	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
@@ -845,7 +845,7 @@ int GameScript::SummoningLimit(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::SummoningLimitGT(Scriptable* Sender, Trigger* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return 0;
 
 	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
@@ -855,7 +855,7 @@ int GameScript::SummoningLimitGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::SummoningLimitLT(Scriptable* Sender, Trigger* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return 0;
 
 	int sl = map->CountSummons(GA_NO_DEAD, SEX_SUMMON);
@@ -1512,18 +1512,18 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InLine(Scriptable* Sender, Trigger* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		return 0;
 	}
 
-	Scriptable* scr1 = GetActorFromObject( Sender, parameters->objectParameter );
+	const Scriptable *scr1 = GetActorFromObject(Sender, parameters->objectParameter);
 	if (!scr1) {
 		return 0;
 	}
 
 	//looking for a scriptable by scriptname only
-	Scriptable* scr2 = map->GetActor( parameters->string0Parameter, 0 );
+	const Scriptable *scr2 = map->GetActor(parameters->string0Parameter, 0);
 	if (!scr2) {
 		scr2 = GetActorObject(map->GetTileMap(), parameters->string0Parameter);
 	}
@@ -1709,7 +1709,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_PROXIMITY) {
 		return 0;
 	}
-	Highlightable *trap = (Highlightable *)Sender;
+	const Highlightable *trap = (Highlightable *) Sender;
 
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	int ret = 0;
@@ -1717,7 +1717,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
-			Actor *actor = (Actor *) tt->actor;
+			const Actor *actor = (Actor *) tt->actor;
 			if (trap->IsOver(actor->Pos)) {
 				ret = 1;
 				break;
@@ -3266,7 +3266,7 @@ int GameScript::LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor *scr = (Actor *) Sender;
+	const Actor *scr = (const Actor *) Sender;
 	if (MatchActor(Sender, scr->LastTalker, parameters->objectParameter)) {
 		return 1;
 	}
@@ -3352,7 +3352,7 @@ int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	const Actor *actor = (const Actor *) Sender;
 	if (MatchActor(Sender, actor->LastMarked, parameters->objectParameter)) {
 		//don't mark this object for clear
 		//Sender->AddTrigger(&actor->LastSeen);
@@ -3641,7 +3641,7 @@ int GameScript::IsPlayerNumber( Scriptable* Sender, Trigger* parameters)
 
 int GameScript::PCCanSeePoint( Scriptable* /*Sender*/, Trigger* parameters)
 {
-	Map* map = core->GetGame()->GetCurrentArea();
+	const Map *map = core->GetGame()->GetCurrentArea();
 	if (map->IsVisible(parameters->pointParameter, false) ) {
 		return 1;
 	}
@@ -3996,10 +3996,10 @@ int GameScript::InMyGroup(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AnyPCSeesEnemy(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	unsigned int i = (unsigned int) game->GetLoadedMapCount();
 	while(i--) {
-		Map *map = game->GetMap(i);
+		const Map *map = game->GetMap(i);
 		if (map->AnyPCSeesEnemy()) {
 			return 1;
 		}

@@ -206,13 +206,13 @@ public:
 	void SetLastActor(Actor *actor, Actor *prevActor);
 	void SetCutSceneMode(bool active);
 	bool SetGUIHidden(bool hide);
-	void TryToAttack(Actor *source, Actor *target);
+	void TryToAttack(Actor *source, const Actor *target);
 	void TryToCast(Actor *source, const Point &p);
-	void TryToCast(Actor *source, Actor *target);
-	void TryToDefend(Actor *source, Actor *target);
-	void TryToTalk(Actor *source, Actor *target);
-	void TryToPick(Actor *source, Scriptable *tgt);
-	void TryToDisarm(Actor *source, InfoPoint *tgt);
+	void TryToCast(Actor *source, const Actor *target);
+	void TryToDefend(Actor *source, const Actor *target);
+	void TryToTalk(Actor *source, const Actor *target);
+	void TryToPick(Actor *source, const Scriptable *tgt);
+	void TryToDisarm(Actor *source, const InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
 	void ResetTargetMode();
 	void UpdateTargetMode();
@@ -220,17 +220,17 @@ public:
 	// returns the default cursor fitting the targeting mode 
 	int GetDefaultCursor() const;
 	//containers
-	int GetCursorOverContainer(Container *overContainer) const;
+	int GetCursorOverContainer(const Container *overContainer) const;
 	void HandleContainer(Container *container, Actor *actor);
 	//doors
-	int GetCursorOverDoor(Door *overDoor) const;
+	int GetCursorOverDoor(const Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
 	//infopoints
-	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
+	int GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const;
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 
 	Point GetFormationOffset(ieDword formation, ieDword pos);
-	Point GetFormationPoint(Map *map, unsigned int pos, Point src, Point p);
+	Point GetFormationPoint(const Map *map, unsigned int pos, Point src, Point p);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append=true);
 	/** checks if the actor should be running instead of walking */

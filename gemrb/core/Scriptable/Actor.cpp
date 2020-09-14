@@ -4472,7 +4472,7 @@ bool Actor::OverrideActions()
 	return false;
 }
 
-void Actor::Panic(Scriptable *attacker, int panicmode)
+void Actor::Panic(const Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
 		print("Already panicked");
@@ -8574,7 +8574,7 @@ bool Actor::HasBodyHeat() const
 
 void Actor::Draw(const Region &screen)
 {
-	Map* area = GetCurrentArea();
+	const Map *area = GetCurrentArea();
 	if (!area) {
 		InternalFlags &= ~IF_TRIGGER_AP;
 		return;
@@ -11027,7 +11027,7 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable(ieResRef spellRef)
+bool Actor::Untargetable(ieResRef spellRef) const
 {
 	if (spellRef[0]) {
 		Spell *spl = gamedata->GetSpell(spellRef, true);

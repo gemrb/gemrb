@@ -4929,12 +4929,11 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_remove_creature(%2d)", fx->Opcode);
 
-	Map *map = NULL;
+	const Map *map;
 
 	if (target) {
 		map = target->GetCurrentArea();
-	}
-	else {
+	} else {
 		map = core->GetGame()->GetCurrentArea();
 	}
 	Actor *actor = target;
@@ -6131,7 +6130,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// get the actor to cast spells at
 	Actor *actor = NULL;
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
 	switch (fx->Parameter1) {
@@ -7177,7 +7176,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (map) {
 		Object oC;
 		oC.objectFields[0]=EA_ENEMY;
@@ -7187,7 +7186,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		int rnd = core->Roll(1,tgts->Count(),-1);
-		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
+		const Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
@@ -7565,7 +7564,7 @@ int fx_right_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_tracks (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_reveal_tracks(%2d): Distance: %d", fx->Opcode, fx->Parameter1);
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;

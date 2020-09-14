@@ -114,7 +114,7 @@ Targets *GameScript::Protagonist(const Scriptable *Sender, Targets *parameters, 
 	//this sucks but IWD2 is like that...
 	static bool charnameisgabber = core->HasFeature(GF_CHARNAMEISGABBER);
 	if (charnameisgabber) {
-		GameControl* gc = core->GetGameControl();
+		const GameControl* gc = core->GetGameControl();
 		if (gc) {
 			parameters->AddTarget(gc->dialoghandler->GetSpeaker(), 0, ga_flags);
 		}
@@ -164,7 +164,7 @@ Targets *GameScript::LastMarkedObject(const Scriptable *Sender, Targets *paramet
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -182,7 +182,7 @@ Targets *GameScript::SpellTarget(const Scriptable *Sender, Targets *parameters, 
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -201,7 +201,7 @@ Targets *GameScript::LastSeenBy(const Scriptable *Sender, Targets *parameters, i
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -219,7 +219,7 @@ Targets *GameScript::LastHelp(const Scriptable *Sender, Targets *parameters, int
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -237,7 +237,7 @@ Targets *GameScript::LastHeardBy(const Scriptable *Sender, Targets *parameters, 
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -257,7 +257,7 @@ Targets *GameScript::GroupOf(const Scriptable *Sender, Targets *parameters, int 
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -281,7 +281,7 @@ Targets *GameScript::ProtectorOf(const Scriptable *Sender, Targets *parameters, 
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -310,7 +310,7 @@ Targets *GameScript::ProtectedBy(const Scriptable *Sender, Targets *parameters, 
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -328,7 +328,7 @@ Targets *GameScript::LastCommandedBy(const Scriptable *Sender, Targets *paramete
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -370,7 +370,7 @@ Targets *GameScript::LastAttackerOf(const Scriptable *Sender, Targets *parameter
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -388,7 +388,7 @@ Targets *GameScript::LastHitter(const Scriptable *Sender, Targets *parameters, i
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -406,7 +406,7 @@ Targets *GameScript::LeaderOf(const Scriptable *Sender, Targets *parameters, int
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -424,7 +424,7 @@ Targets *GameScript::LastTalkedToBy(const Scriptable *Sender, Targets *parameter
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -442,7 +442,7 @@ Targets *GameScript::LastSummonerOf(const Scriptable *Sender, Targets *parameter
 	const Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -941,7 +941,7 @@ Targets *GameScript::NearestPC(const Scriptable *Sender, Targets *parameters, in
 		Actor *newactor=game->GetPC(i,true);
 		//NearestPC for PC's will not give themselves as a result
 		//this might be different from the original engine
-		if ((Sender->Type==ST_ACTOR) && (newactor == (Actor *) Sender)) {
+		if (Sender->Type == ST_ACTOR && (newactor == (const Actor *) Sender)) {
 			continue;
 		}
 		if (newactor->GetCurrentArea()!=map) {

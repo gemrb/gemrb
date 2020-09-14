@@ -289,7 +289,7 @@ Actor* Game::FindNPC(const char *scriptingname)
 	return NULL;
 }
 
-Actor *Game::GetGlobalActorByGlobalID(ieDword globalID)
+Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 {
 	for (auto pc : PCs) {
 		if (pc->GetGlobalID() == globalID) {
@@ -2143,7 +2143,7 @@ bool Game::IsDay()
 	return true;
 }
 
-void Game::ChangeSong(bool always, bool force)
+void Game::ChangeSong(bool always, bool force) const
 {
 	int Song;
 	static int BattleSong = 0;

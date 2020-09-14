@@ -3567,7 +3567,7 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //449 CallLightning
-static Actor *GetRandomEnemySeen(Map *map, Actor *origin)
+static Actor *GetRandomEnemySeen(const Map *map, const Actor *origin)
 {
 	int type = GetGroup(origin);
 
@@ -3622,7 +3622,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	int ret = FX_APPLIED;
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return ret;
 
 	if (fx->Parameter1<=1) {

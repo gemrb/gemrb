@@ -1885,7 +1885,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	//don't break on bad values
 	if (parameters->int0Parameter >= 10) return;
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	bool force, restart;
 
@@ -1913,7 +1913,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 
 void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->PlayAreaSong(3, 1, 1);
 }
@@ -4871,12 +4871,12 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		return;
 	}
 
-	Actor *act = (Actor *) Sender;
+	const Actor *act = (const Actor *) Sender;
 	const Actor *target;
 
 	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
@@ -5418,14 +5418,14 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
+	const Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!tar) {
 		// target died on us
 		return;
 	}
-	Actor *actor = NULL;
+	const Actor *actor = nullptr;
 	if (tar->Type == ST_ACTOR) {
-		actor = (Actor *) tar;
+		actor = (const Actor *) tar;
 	}
 
 	int flags = parameters->int0Parameter;
@@ -6131,7 +6131,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
+	const WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
 	if (!wmap) {
 		//no such starting area
 		return;
@@ -6146,7 +6146,7 @@ void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* paramet
 void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 1;
@@ -6157,7 +6157,7 @@ void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 0;

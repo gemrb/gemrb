@@ -255,7 +255,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
-static int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
+static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type)
 {
 	int i;
 
@@ -2273,7 +2273,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	ItemsCount = 0;
 	for (i=0;i<Inventory_Size;i++) {
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem(j);
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
 			ItemsCount++;
 		}
@@ -2297,7 +2297,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	return headersize;
 }
 
-int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
+int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned int size)
 {
 	unsigned int i;
 	ieDword tmpDword;
@@ -2312,7 +2312,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem( j );
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
 			indices[i] = ItemCount++;
 		}
@@ -2327,7 +2327,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem( j );
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (!it) {
 			continue;
 		}
@@ -2350,7 +2350,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	return 0;
 }
 
-int CREImporter::PutHeader(DataStream *stream, Actor *actor)
+int CREImporter::PutHeader(DataStream *stream, const Actor *actor)
 {
 	char Signature[8];
 	ieByte tmpByte;
@@ -2684,7 +2684,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
+int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2711,7 +2711,7 @@ int CREImporter::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize
 	return 0;
 }
 
-int CREImporter::PutActorBG(DataStream *stream, Actor *actor)
+int CREImporter::PutActorBG(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2738,7 +2738,7 @@ int CREImporter::PutActorBG(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
+int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2796,7 +2796,7 @@ int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD1(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2844,7 +2844,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2907,7 +2907,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
+int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2915,7 +2915,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
 			for (int k=count-1;k>=0;k--) {
-				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
+				const CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
 				stream->WriteWord( &ck->Level);
@@ -2926,7 +2926,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
+int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor)
 {
 	ieWord tmpWord;
 	ieDword tmpDword;
@@ -2953,7 +2953,7 @@ int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
+int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2961,7 +2961,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			for (unsigned int k=0;k<count;k++) {
-				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
+				const CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i, j, k);
 				assert(cm);
 				stream->WriteResRef( cm->SpellResRef);
 				stream->WriteDword( &cm->Flags);
@@ -2971,7 +2971,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutEffects( DataStream *stream, Actor *actor)
+int CREImporter::PutEffects( DataStream *stream, const Actor *actor)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -3021,7 +3021,7 @@ int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 }
 
 //add as effect!
-int CREImporter::PutVariables( DataStream *stream, Actor *actor)
+int CREImporter::PutVariables(DataStream *stream, const Actor *actor)
 {
 	char filling[104];
 	Variables::iterator pos=NULL;
@@ -3065,7 +3065,7 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellT
 
 	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
 	for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-		CREKnownSpell *ck = sm->known_spells[k];
+		const CREKnownSpell *ck = sm->known_spells[k];
 		ID = ResolveSpellName(ck->SpellResRef, level, type);
 		stream->WriteDword ( &ID);
 		max = actor->spellbook.CountSpells(ck->SpellResRef, type, 1);

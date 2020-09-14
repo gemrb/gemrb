@@ -320,7 +320,7 @@ public:
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
 	/** Finds a global actor by global ID */
-	Actor* GetGlobalActorByGlobalID(ieDword globalID);
+	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
 	int InParty(Actor* pc) const;
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
@@ -492,7 +492,7 @@ public:
 	/** draw weather */
 	void DrawWeather(const Region &screen, bool update);
 	/** updates current area music */
-	void ChangeSong(bool always = true, bool force = true);
+	void ChangeSong(bool always = true, bool force = true) const;
 	/** sets expansion mode */
 	void SetExpansion(ieDword value);
 	/** Dumps information about the object */

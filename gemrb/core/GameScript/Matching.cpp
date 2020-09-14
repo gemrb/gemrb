@@ -42,7 +42,7 @@ static inline Targets* ReturnScriptableAsTarget(Scriptable *sc)
 }
 
 /* do IDS filtering: [PC], [ENEMY], etc */
-static inline bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
+static inline bool DoObjectIDSCheck(const Object *oC, const Actor *ac, bool *filtered) {
 	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
 			continue;
@@ -61,11 +61,11 @@ static inline bool DoObjectIDSCheck(Object *oC, Actor *ac, bool *filtered) {
 }
 
 /* do object filtering: Myself, LastAttackerOf(Player1), etc */
-static inline Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Object *oC, int ga_flags) {
+static inline Targets *DoObjectFiltering(const Scriptable *Sender, Targets *tgts, const Object *oC, int ga_flags) {
 	targetlist::iterator m;
 	const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 	while (tt) {
-		Actor *target = (Actor *) tt->actor;
+		const Actor *target = (const Actor *) tt->actor;
 		if (oC->objectName[0] || target->ValidTarget(GA_NO_DEAD)) {
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		} else {
@@ -96,7 +96,7 @@ static inline Targets *DoObjectFiltering(Scriptable *Sender, Targets *tgts, Obje
 
 static EffectRef fx_protection_creature_ref = { "Protection:Creature", -1 };
 
-static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, int &dist, bool ignoreinvis=false)
+static inline bool DoObjectChecks(const Map *map, const Scriptable *Sender, const Actor *target, int &dist, bool ignoreinvis = false)
 {
 	dist = SquaredMapDistance(Sender, target);
 
@@ -105,7 +105,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 	// see voodooconst.h for more info, currently the rest of the code uses 30 for non-actors
 
 	if (Sender->Type == ST_ACTOR) {
-		Actor *source = (Actor *)Sender;
+		const Actor *source = (const Actor *) Sender;
 
 		// Detect() ignores invisibility completely
 		if (!ignoreinvis && target->IsInvisibleTo(source)) {
@@ -138,7 +138,7 @@ static inline bool DoObjectChecks(Map *map, Scriptable *Sender, Actor *target, i
 }
 
 /* returns actors that match the [x.y.z] expression */
-static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
+static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	// if you ActionOverride a global actor, they might not have a map :(
 	// TODO: don't allow this to happen?
@@ -232,7 +232,7 @@ static Targets* EvaluateObject(Map *map, Scriptable* Sender, Object* oC, int ga_
 	return tgts;
 }
 
-Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
+Targets *GetAllObjects(const Map *map, Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	if (!oC) {
 		//return all objects
@@ -259,7 +259,7 @@ Targets* GetAllObjects(Map *map, Scriptable* Sender, Object* oC, int ga_flags)
 
 Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 
 	int i = map->GetActorCount(true);
 	Targets *tgts = new Targets();
@@ -277,7 +277,7 @@ Targets *GetAllActors(Scriptable *Sender, int ga_flags)
 }
 
 /* get a non-actor object from a map, by name */
-Scriptable *GetActorObject(TileMap *TMap, const char *name)
+Scriptable *GetActorObject(const TileMap *TMap, const char *name)
 {
 	Scriptable * aC = TMap->GetDoor( name );
 	if (aC) {
@@ -304,7 +304,7 @@ Scriptable *GetActorObject(TileMap *TMap, const char *name)
 }
 
 // blocking actions need to store some kinds of objects between ticks
-Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
+Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	Scriptable *tar = NULL;
 	// retrieve an existing target if it still exists and is valid
@@ -329,7 +329,7 @@ Scriptable* GetStoredActorFromObject(Scriptable* Sender, Object* oC, int ga_flag
 	return tar;
 }
 
-Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
+Scriptable *GetActorFromObject(Scriptable *Sender, const Object *oC, int ga_flags)
 {
 	Scriptable *aC = NULL;
 
@@ -374,7 +374,7 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 	return NULL;
 }
 
-bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
+bool MatchActor(const Scriptable *Sender, ieDword actorID, const Object *oC)
 {
 	if (!Sender) {
 		return false;
@@ -432,7 +432,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
-			Actor *actor = (Actor *) tt->actor;
+			const Actor *actor = (const Actor *) tt->actor;
 			if (actor->GetGlobalID() == actorID) {
 				ret = true;
 				break;
@@ -445,7 +445,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	return true;
 }
 
-int GetObjectCount(Scriptable* Sender, Object* oC)
+int GetObjectCount(Scriptable *Sender, const Object *oC)
 {
 	if (!oC) {
 		return 0;
@@ -469,7 +469,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 //evaluates object filters
 //also check numcreaturesgtmylevel(myself,0) with
 //actor having at high level
-int GetObjectLevelCount(Scriptable* Sender, Object* oC)
+int GetObjectLevelCount(Scriptable *Sender, const Object *oC)
 {
 	if (!oC) {
 		return 0;
@@ -495,7 +495,7 @@ Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *para
 {
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
+			actor = (const Actor *) Sender;
 		}
 	}
 	parameters->Clear();
@@ -517,7 +517,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 		return parameters;
 	}
 	//get the doors based on it
-	Map *map = origin->GetCurrentArea();
+	const Map *map = origin->GetCurrentArea();
 	unsigned int i =(unsigned int) map->TMap->GetDoorCount();
 	if (count>i) {
 		return parameters;
@@ -573,7 +573,7 @@ Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, 
 	if (!t) {
 		return parameters;
 	}
-	const Actor *actor = (Actor *) origin;
+	const Actor *actor = (const Actor *) origin;
 	//determining the specifics of origin
 	ieDword type = actor->GetStat(IE_SPECIFIC); //my group
 
@@ -582,7 +582,7 @@ Targets *XthNearestMyGroupOfType(const Scriptable *origin, Targets *parameters, 
 			t=parameters->RemoveTargetAt(m);
 			continue;
 		}
-		actor = (Actor *) (t->actor);
+		actor = (const Actor *) (t->actor);
 		if (actor->GetStat(IE_SPECIFIC) != type) {
 			t=parameters->RemoveTargetAt(m);
 			continue;
@@ -604,16 +604,16 @@ Targets *ClosestEnemySummoned(const Scriptable *origin, Targets *parameters, int
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor = (Actor *) origin;
+	const Actor *sender = (const Actor *) origin;
 	//determining the allegiance of the origin
-	int type = GetGroup(actor);
+	int type = GetGroup(sender);
 
 	if (type==2) {
 		parameters->Clear();
 		return parameters;
 	}
 
-	actor = NULL;
+	Actor *actor = nullptr;
 	ieDword gametime = core->GetGame()->GameTime;
 	while ( t ) {
 		Actor *tmp = (Actor *) (t->actor);
@@ -656,7 +656,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 	if (!t) {
 		return parameters;
 	}
-	const Actor *actor = (Actor *) origin;
+	const Actor *actor = (const Actor *) origin;
 	//determining the allegiance of the origin
 	int type = GetGroup(actor);
 
@@ -671,7 +671,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 			t=parameters->RemoveTargetAt(m);
 			continue;
 		}
-		actor = (Actor *) (t->actor);
+		actor = (const Actor *) (t->actor);
 		// IDS targeting already did object checks (unless we need to override Detect?)
 		if (!actor->Schedule(gametime, true)) {
 			t = parameters->RemoveTargetAt(m);
@@ -695,7 +695,7 @@ Targets *XthNearestEnemyOfType(const Scriptable *origin, Targets *parameters, un
 
 Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 {
-	Actor *origin = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	const Actor *origin = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	parameters->Clear();
 	if (!origin) {
 		return parameters;
@@ -706,7 +706,7 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 	if (type==2) {
 		return parameters;
 	}
-	Map *map = origin->GetCurrentArea();
+	const Map *map = origin->GetCurrentArea();
 	int i = map->GetActorCount(true);
 	ga_flags |= GA_NO_UNSCHEDULED|GA_NO_DEAD;
 	while (i--) {
