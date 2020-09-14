@@ -455,144 +455,117 @@ Targets *GameScript::LastSummonerOf(const Scriptable *Sender, Targets *parameter
 	return parameters;
 }
 
-Targets *GameScript::Player1(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
+inline Targets *PlayerX(Targets *parameters, int ga_flags, unsigned int slot, bool fill = false)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0, ga_flags);
+	Actor *pc;
+	if (fill) {
+		pc = core->GetGame()->FindPC(slot + 1);
+	} else {
+		pc = core->GetGame()->GetPC(slot, false);
+	}
+	parameters->AddTarget(pc, 0, ga_flags);
 	return parameters;
+}
+
+Targets *GameScript::Player1(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
+{
+	return PlayerX(parameters, ga_flags, 0);
 }
 
 Targets *GameScript::Player1Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 0, true);
 }
 
 Targets *GameScript::Player2(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 1);
 }
 
 Targets *GameScript::Player2Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(2), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 1, true);
 }
 
 Targets *GameScript::Player3(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 2);
 }
 
 Targets *GameScript::Player3Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(3), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 2, true);
 }
 
 Targets *GameScript::Player4(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 3);
 }
 
 Targets *GameScript::Player4Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(4), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 3, true);
 }
 
 Targets *GameScript::Player5(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 4);
 }
 
 Targets *GameScript::Player5Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(5), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 4, true);
 }
 
 Targets *GameScript::Player6(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 5);
 }
 
 Targets *GameScript::Player6Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(6), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 5, true);
 }
 
 Targets *GameScript::Player7(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 6);
 }
 
 Targets *GameScript::Player7Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(7), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 6, true);
 }
 
 Targets *GameScript::Player8(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 7);
 }
 
 Targets *GameScript::Player8Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(8), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 7, true);
 }
 
 Targets *GameScript::Player9(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(8,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 8);
 }
 
 Targets *GameScript::Player9Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(9), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 8, true);
 }
 
 Targets *GameScript::Player10(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(9,false), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 9);
 }
 
 Targets *GameScript::Player10Fill(const Scriptable */*Sender*/, Targets *parameters, int ga_flags)
 {
-	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(10), 0, ga_flags);
-	return parameters;
+	return PlayerX(parameters, ga_flags, 9, true);
 }
 
 //This filter works only on the Party - silly restriction, but the dataset expects this
