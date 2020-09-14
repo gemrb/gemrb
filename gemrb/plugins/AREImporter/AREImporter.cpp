@@ -791,8 +791,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			//cannot add directly to inventory (ground piles)
 			c->AddItem( core->ReadItem(str));
 		}
-		//update item flags (like movable flag)
-		c->inventory.CalculateWeight();
 
 		if (Type==IE_CONTAINER_PILE)
 			Script[0]=0;
@@ -863,8 +861,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &OpenImpededCount );
 		str->ReadWord( &ClosedImpededCount );
 		str->ReadDword( &ClosedFirstImpeded );
-		str->ReadWord( &hp); //TODO: store these
-		str->ReadWord( &ac); //hitpoints AND armorclass, according to IE dev info
+		str->ReadWord(&hp); // hitpoints
+		str->ReadWord(&ac); // AND armorclass, according to IE dev info
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -1384,7 +1382,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord TrapSize, ProID;
 		ieWord X,Y,Z;
 		ieDword Ticks;
-		ieByte PartyID;
+		ieByte TargetType;
 		ieByte Owner;
 
 		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
@@ -1397,8 +1395,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
 		str->ReadWord( &Z );
-		str->Read( &PartyID,1 );  //according to dev info, this is 'targettype'
-		str->Read( &Owner,1 );
+		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targetting" on IESDP
+		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
 			Log(ERROR, "AREImporter", "TrapEffectSize in game: %d != %d. Clearing it",
@@ -1416,11 +1414,15 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
 		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
-		Actor * caster = core->GetGame()->FindPC(PartyID);
+		Actor * caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
-			//FIXME: i don't know the level info
-			pro->SetCaster(caster->GetGlobalID(), 10);
+			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
+			// It matters for the normal thief traps (they scale with level 4 times), while the rest don't scale.
+			// To be more flexible and better handle disabled dualclasses, we don't hardcode it to the thief level.
+			// Perhaps simplify and store the level in Z? Would need a check in the original (don't break saves).
+			ieDword level = caster->GetThiefLevel();
+			pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 		}
 		Point pos(X,Y);
 		map->AddProjectile( pro, pos, pos);
@@ -1433,28 +1435,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
-		//these fields could be different size
-		//ieDword ClosedCount, OpenCount;
+		// these fields could be different size: ieDword ClosedCount, OpenCount;
 		ieWord ClosedCount, OpenCount;
 		ieDword ClosedIndex, OpenIndex;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadResRef( ID );
 		str->ReadDword( &Flags );
-		//TODO check this structure again
-/*
-		str->ReadDword( &OpenIndex );
-		str->ReadDword( &OpenCount );
-		str->ReadDword( &ClosedIndex );
-		str->ReadDword( &ClosedCount );
-*/
 		//IE dev info says this:
 		str->ReadDword( &OpenIndex );
 		str->ReadWord( &OpenCount );
 		str->ReadWord( &ClosedCount );
 		str->ReadDword( &ClosedIndex );
 		//end of disputed section
-
 
 		str->Seek( 48, GEM_CURRENT_POS );
 		//absolutely no idea where these 'tile indices' are stored
@@ -2356,12 +2349,10 @@ int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 	return 0;
 }
 
-int AREImporter::PutTraps( DataStream *stream, Map *map)
+int AREImporter::PutTraps( DataStream *stream, const Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
-	ieWord tmpWord;
-	ieByte tmpByte;
 	ieResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
@@ -2369,7 +2360,8 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 	Offset = EffectOffset;
 	ieDword i = map->GetTrapCount(piter);
 	while(i--) {
-		tmpWord = 0;
+		ieWord tmpWord = 0;
+		ieByte tmpByte = 0xff;
 		Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
@@ -2382,11 +2374,11 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 				tmpWord = fxqueue->GetSavedEffectsCount();
 			}
 			ieDword ID = pro->GetCaster();
-			Actor *actor = map->GetActorByGlobalID(ID);
+			// lookup caster via Game, since the the current map can already be empty when switching them
+			const Actor *actor = core->GetGame()->GetActorByGlobalID(ID);
 			//0xff if not in party
 			//party slot if in party
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);
-			else tmpByte = 0xff;
 		}
 
 		stream->WriteResRef( name );
@@ -2398,15 +2390,15 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );  //size in bytes
 		stream->WriteWord( &type );     //missile.ids
 		tmpDword = 0;
-		stream->WriteDword( &tmpDword );//unknown field
+		stream->WriteDword(&tmpDword); // unknown field, Ticks
 		tmpWord = (ieWord) dest.x;
 		stream->WriteWord( &tmpWord );
 		tmpWord = (ieWord) dest.y;
 		stream->WriteWord( &tmpWord );
 		tmpWord = 0;
-		stream->WriteWord( &tmpWord ); //unknown field
-		stream->Write( &tmpByte,1 );   //unknown field
-		stream->Write( &tmpByte,1 );   //InParty flag
+		stream->WriteWord(&tmpWord); // unknown field, Z
+		stream->Write(&tmpByte, 1);   // unknown field, TargetType
+		stream->Write(&tmpByte, 1);   // Owner
 	}
 	return 0;
 }

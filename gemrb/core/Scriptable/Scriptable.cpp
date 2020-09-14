@@ -188,7 +188,11 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
 	}
-	delete Scripts[idx];
+	if (Scripts[idx] && Scripts[idx]->running) {
+		Scripts[idx]->dead = true;
+	} else {
+		delete Scripts[idx];
+	}
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
@@ -196,16 +200,6 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript( aScript, this, idx, ai );
 	}
-}
-
-void Scriptable::SetScript(int index, GameScript* script)
-{
-	if (index >= MAX_SCRIPTS) {
-		Log(ERROR, "Scriptable", "Invalid script index!");
-		return;
-	}
-	delete Scripts[index];
-	Scripts[index] = script;
 }
 
 void Scriptable::SetSpellResRef(ieResRef resref) {
@@ -435,6 +429,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 		GameScript *Script = Scripts[scriptlevel];
 		if (Script) {
 			changed |= Script->Update(&continuing, &done);
+			if (Script->dead) {
+				delete Script;
+			}
 		}
 
 		/* scripts are not concurrent, see WAITPC override script for example */
@@ -1045,6 +1042,12 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		break;
 	}
 
+	Actor *target = area->GetActor(LastTargetPos, GA_NO_UNSCHEDULED|GA_NO_HIDDEN);
+	if (target) {
+		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));
+		target->LastSpellOnMe = spellID;
+	}
+
 	ResetCastingState(caster);
 }
 
@@ -1115,7 +1118,6 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		break;
 	}
 
-	// TODO: maybe it should be set on effect application, since the data uses it with dispel magic and true sight a lot
 	Actor *target = area->GetActorByGlobalID(LastSpellTarget);
 	if (target) {
 		target->AddTrigger(TriggerEntry(trigger_spellcastonme, GetGlobalID(), spellID));

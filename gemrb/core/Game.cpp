@@ -117,7 +117,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	weather->SetRegion(0, 0, core->Width, core->Height);
 	LastScriptUpdate = 0;
 	WhichFormation = 0;
-	NpcInParty = 0;
 	CurrentLink = 0;
 	PartyAttack = false;
 
@@ -1474,6 +1473,9 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 				pc->Heal(add / conHealRate);
 			}
 		}
+
+		// bg1 also closed doors
+		GetCurrentArea()->AutoLockDoors();
 	}
 
 	Ticks+=add*interval;

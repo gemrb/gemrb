@@ -291,17 +291,20 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	ieDword value;
+	// int1Parameter is from delta.ids
+	// int2Parameter is supposed to support also bones.ids, but nothing uses it like that
+	// if we need it, take the implementation from GameScript::Damage
 	switch (parameters->int1Parameter) {
-		case 1:
+		case 1: // lower
 			value = actor->GetBase(parameters->int0Parameter);
 			value-= parameters->int2Parameter;
 			break;
-		case 2:
+		case 2: // raise
 			value = actor->GetBase(parameters->int0Parameter);
 			value+= parameters->int2Parameter;
 			break;
 		case 3:
-		default: //no idea what happens
+		default: // set
 			value = parameters->int2Parameter;
 			break;
 	}
@@ -319,7 +322,7 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	ieDword value = parameters->int1Parameter;
-	if (parameters->int2Parameter==1) {
+	if (parameters->int2Parameter==1) { // basically statmod.ids entries, but there's only two
 		value+=actor->GetBase(parameters->int0Parameter);
 	}
 	actor->SetBase( parameters->int0Parameter, value);
@@ -1886,15 +1889,20 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 	if (!map) return;
 	bool force, restart;
 
+	// values from mflags.ids
+	// in the originals it's only used with QUICK_FADE, otherwise we'd have a few todos here
 	switch (parameters->int1Parameter) {
 	case 1: //force switch
 		force = true;
 		restart = true;
 		break;
-	case 3: //force switch, but wait for previous music to end gracefully
+	case 3: // QUICK_FADE
+		//force switch, but wait for previous music to end gracefully
 		force = false;
 		restart = true;
 		break;
+	case 2: // play
+	case 4: // SLOW_FADE
 	default:
 		force = false;
 		restart = false;
@@ -4725,7 +4733,7 @@ void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 //always quits game, but based on game it can play end animation, or display
 //death text, etc
 //this covers:
-//QuitGame (play two of 3 movies in PST, display death screen with strref)
+//QuitGame (play two of 3 movies in PST, display death screen with strref; names also in movval.ids)
 //EndGame (display death screen with strref)
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
@@ -4801,6 +4809,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	// bones.ids handling
 	int diceNum = (parameters->int1Parameter>>12)&15;
 	int diceSize = (parameters->int1Parameter>>4)&255;
 	int diceAdd = parameters->int1Parameter&15;
@@ -4817,15 +4826,23 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		damage = core->Roll(diceNum, diceSize, diceAdd);
 	}
 	int type=MOD_ADDITIVE;
+	// delta.ids
 	switch(parameters->int0Parameter) {
+	case 1: // lower
+		break;
 	case 2: //raise
 		damage=-damage;
 		break;
 	case 3: //set
 		type=MOD_ABSOLUTE;
 		break;
-	case 4: //
+	case 4: // GemRB extension
 		type=MOD_PERCENT;
+		break;
+	// NOTE: forge.d has a bunch of calls missing a parameter, eg. Damage(Protagonist, 15)
+	// it's unclear if it worked, but let's accommodate it
+	default:
+		damage = parameters->int0Parameter;
 		break;
 	}
 	//damagetype seems to be always 0
@@ -4860,7 +4877,7 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	Actor *act = (Actor *) Sender;
-	Actor *target;
+	const Actor *target;
 
 	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
 		//anyone
@@ -7085,7 +7102,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 
 //this action plays a vvc animation over target
 //we simply apply the appropriate opcode on the target (see iwdopcodes)
-//the list of vvcs is in iwdshtab.2da
+//the list of vvcs is in iwdshtab.2da (sheffect.ids)
 static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 };
 
 void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)

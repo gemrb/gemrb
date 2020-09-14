@@ -671,4 +671,48 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
 }
 
+int GameData::GetTrapLimit(Scriptable *trapper)
+{
+	if (!trapLimit.ok()) {
+		trapLimit.load("traplimt", true);
+	}
+
+	if (trapper->Type != ST_ACTOR) {
+		return 6; // not using table default, since EE's file has it at 0
+	}
+
+	const Actor *caster = (Actor *) trapper;
+	ieDword kit = caster->GetStat(IE_KIT);
+	const char *rowName;
+	if (kit != 0x4000) { // KIT_BASECLASS
+		rowName = caster->GetKitName(kit);
+	} else {
+		ieDword cls = caster->GetActiveClass();
+		rowName = caster->GetClassName(cls);
+	}
+
+	return atoi(trapLimit->QueryField(rowName, "LIMIT"));
+}
+
+int GameData::GetSummoningLimit(ieDword sex)
+{
+	if (!summoningLimit.ok()) {
+		summoningLimit.load("summlimt", true);
+	}
+
+	unsigned int row = 1000;
+	switch (sex) {
+		case SEX_SUMMON:
+		case SEX_SUMMON_DEMON:
+			row = 0;
+			break;
+		case SEX_BOTH:
+			row = 1;
+			break;
+		default:
+			break;
+	}
+	return atoi(summoningLimit->QueryField(row, 0));
+}
+
 }

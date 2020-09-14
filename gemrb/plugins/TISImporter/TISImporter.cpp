@@ -96,10 +96,6 @@ Sprite2D* TISImporter::GetTile(int index)
 		// try to only report error once per file
 		static TISImporter *last_corrupt = NULL;
 		if (last_corrupt != this) {
-			/*print("Invalid tile index: %d", index);
-			print("FileSize: %ld", str->Size());
-			print("Position: %ld", pos);
-			print("Shift: %d", headerShift);*/
 			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile %d", index);
 			last_corrupt = this;
 		}

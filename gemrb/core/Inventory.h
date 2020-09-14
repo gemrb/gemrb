@@ -212,10 +212,8 @@ private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
 	int InventoryType;
-	/// Flag indicating whether weight needs to be recalculated
-	mutable int Changed;
 	/** Total weight of all items in Inventory */
-	mutable int Weight;
+	int Weight;
 
 	ieWordSigned Equipped;
 	ieWord EquippedHeader;
@@ -243,7 +241,6 @@ public:
 	 * flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags) const;
 
-	void CalculateWeight(void) const;
 	void SetInventoryType(int arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
@@ -375,6 +372,7 @@ public:
 	static int GetQuickSlot();
 	static int GetInventorySlot();
 private:
+	void CalculateWeight(void);
 	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
 	void RemoveSlotEffects( /*CREItem* slot*/ ieDword slot );

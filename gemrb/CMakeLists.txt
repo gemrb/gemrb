@@ -80,7 +80,7 @@ ELSE(APPLE)
 	ADD_SUBDIRECTORY( tests )
 
 	IF(WIN32)
-		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../windows/window.rc)
+		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/window.rc)
 	ELSE(WIN32)
 		ADD_EXECUTABLE(gemrb GemRB.cpp )
 	ENDIF()

@@ -1870,7 +1870,6 @@ int Interface::Init(InterfaceConfig* config)
 		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
 		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
-		// FIXME: crashes if file does not open
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
@@ -1880,7 +1879,6 @@ int Interface::Init(InterfaceConfig* config)
 		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
 		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
-		// FIXME: crashes if file does not open
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
@@ -2004,6 +2002,7 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Write(pathString, strlen(pathString));
 		pathFile->Close();
 	}
+	delete pathFile;
 	return GEM_OK;
 }
 
@@ -2540,9 +2539,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	int cnt=10;
 	Actor * ab = NULL;
 
-	//TODO:
-	//decrease the number of summoned creatures with the number of already summoned creatures here
-	//the summoned creatures have a special IE_SEX
 	Map *map;
 	if (target) {
 		map = target->GetCurrentArea();
@@ -2557,17 +2553,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		Actor *tmp = gamedata->GetCreature(resource);
 		if (!tmp) {
 			return NULL;
-		}
-		ieDword sex = tmp->GetStat(IE_SEX);
-		//TODO: make this external as summlimt.2da
-		int limit = 0;
-		switch (sex) {
-		case SEX_SUMMON: case SEX_SUMMON_DEMON:
-			limit = 5;
-			break;
-		case SEX_BOTH:
-			limit = 1;
-			break;
 		}
 
 		//if summoner is an actor, filter out opponent summons
@@ -2586,6 +2571,15 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			}
 		}
 
+		// mark the summon, but only if they don't have a special sex already
+		if (sexmod && tmp->BaseStats[IE_SEX] < SEX_EXTRA && tmp->BaseStats[IE_SEX] != SEX_ILLUSION) {
+			tmp->SetBase(IE_SEX, SEX_SUMMON);
+		}
+
+		// only allow up to the summoning limit of new summoned creatures
+		// the summoned creatures have a special IE_SEX
+		ieDword sex = tmp->GetStat(IE_SEX);
+		int limit = gamedata->GetSummoningLimit(sex);
 		if (limit && sexmod && map->CountSummons(flag, sex)>=limit) {
 			//summoning limit reached
 			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
@@ -2634,11 +2628,6 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			break;
 		default:
 			break;
-		}
-
-		// mark the summon, but only if they don't have a special sex already
-		if (sexmod && ab->BaseStats[IE_SEX] < SEX_EXTRA && ab->BaseStats[IE_SEX] != SEX_ILLUSION) {
-			ab->SetBase(IE_SEX, SEX_SUMMON);
 		}
 
 		map->AddActor(ab, true);
@@ -4992,6 +4981,8 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
 
+	// forcefully rerandomize
+	RandomNumValue = RAND_ALL();
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {

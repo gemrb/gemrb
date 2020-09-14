@@ -37,18 +37,8 @@
 
 using namespace GemRB;
 
-#define MAXCOLOR 12
-typedef unsigned char ColorSet[MAXCOLOR];
-
-static int RandColor=-1;
-static int RandRows=-1;
-static ColorSet* randcolors=NULL;
-static int MagicBit;
-
-static void Initializer()
-{
-	MagicBit = core->HasFeature(GF_MAGICBIT);
-}
+static unsigned int RandColor = 1;
+std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
 
 //one column, these don't have a level
 static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
@@ -387,11 +377,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 
 static void ReleaseMemoryCRE()
 {
-	if (randcolors) {
-		delete [] randcolors;
-		randcolors = NULL;
-	}
-	RandColor = -1;
+	randcolors.clear();
 
 	if (spllist) {
 		delete [] spllist;
@@ -874,47 +860,44 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat)
 {
-	if (RandColor==-1) {
-		RandColor=0;
-		RandRows=0;
+	if (stat < 200 || RandColor == 0) return;
+
+	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
+	int RandRows = 0;
+	if (randcolors.size() == 0) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
-			if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
 		}
-		if (RandRows>1 && RandColor>0) {
-			randcolors = new ColorSet[RandColor];
-			int cols = RandColor;
-			while(cols--)
-			{
-				for (int i=0;i<RandRows;i++) {
-					randcolors[cols][i]=atoi( rndcol->QueryField( i, cols ) );
-				}
-				randcolors[cols][0]-=200;
+		if (RandRows <= 1 || RandColor == 0) {
+			RandColor = 0;
+			return;
+		}
+
+		randcolors.resize(RandColor);
+		for (int cols = RandColor - 1; cols >= 0; cols--) {
+			randcolors[cols] = std::vector<unsigned char>(RandRows);
+			for (int i = 0; i < RandRows; i++) {
+				randcolors[cols][i] = atoi(rndcol->QueryField(i, cols));
 			}
-		}
-		else {
-			RandColor=0;
+			randcolors[cols][0] -= 200;
 		}
 	}
 
-	if (stat<200) return;
-	if (RandColor>0) {
-		stat-=200;
-		//assuming an ordered list, so looking in the middle first
-		int i;
-		for (i=(int) stat;i>=0;i--) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	RandRows = randcolors[0].size();
+	stat -= 200;
+	// assuming an ordered list, so looking in the middle first
+	for (int i = (int) stat; i >= 0; i--) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
-		for (i=(int) stat+1;i<RandColor;i++) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	}
+	for (unsigned int i = stat + 1; i < RandColor; i++) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
 	}
 }
@@ -2355,7 +2338,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 		stream->WriteWord( &it->Usages[2]);
 		tmpDword = it->Flags;
 		//IWD uses this bit differently
-		if (MagicBit) {
+		if (core->HasFeature(GF_MAGICBIT)) {
 			if (it->Flags&IE_INV_ITEM_MAGICAL) {
 				tmpDword|=IE_INV_ITEM_UNDROPPABLE;
 			} else {
@@ -3265,6 +3248,5 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
-PLUGIN_INITIALIZER(Initializer)
 PLUGIN_CLEANUP(ReleaseMemoryCRE)
 END_PLUGIN()

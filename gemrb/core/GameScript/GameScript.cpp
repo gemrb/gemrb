@@ -1256,7 +1256,7 @@ void ScriptDebugLog(int bit, const char *message, ...)
 
 	va_list ap;
 	va_start(ap, message);
-	Log(DEBUG, "GameScript", message, ap);
+	LogVA(DEBUG, "GameScript", message, ap);
 	va_end(ap);
 }
 
@@ -2067,6 +2067,9 @@ static Condition* ReadCondition(DataStream* stream)
  * if you pass non-NULL parameters, continuing is set to whether we Continue()ed
  * (should start false and be passed to next script's Update),
  * and done is set to whether we processed a block without Continue()
+ *
+ * NOTE: After calling, callers should deallocate this object if `dead==true`.
+ *  Scripts can replace themselves while running but it's up to the caller to clean up.
  */
 bool GameScript::Update(bool *continuing, bool *done)
 {
@@ -2120,7 +2123,9 @@ bool GameScript::Update(bool *continuing, bool *done)
 				}
 				lastAction=a;
 			}
+			running = true;
 			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
+			running = false;
 			if (continuing) *continuing = continueExecution;
 			if (!continueExecution) {
 				if (done) *done = true;
@@ -2134,7 +2139,10 @@ bool GameScript::Update(bool *continuing, bool *done)
 //IE simply takes the first action's object for cutscene object
 //then adds these actions to its queue:
 // SetInterrupt(false), <actions>, SetInterrupt(true)
-
+/*
+ * NOTE: After calling, callers should deallocate this object if `dead==true`.
+ *  Scripts can replace themselves while running but it's up to the caller to clean up.
+ */
 void GameScript::EvaluateAllBlocks()
 {
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
@@ -2414,14 +2422,6 @@ int Response::Execute(Scriptable* Sender)
 {
 	int ret = 0; // continue or not
 	for (size_t i = 0; i < actions.size(); i++) {
-		if (!CheckCanary()) {
-			// FIXME: hack to prevent crashing when a script deletes itself.
-			// this object has been deleted and this should not be considered a fix (it may cause unforseen problems too).
-			Log(ERROR, "GameScript", "Aborting response execution due to object deletion.\n \
-									  This should not happen and we need to fix it.");
-			ret = 0;
-			break;
-		}
 		Action* aC = actions[i];
 		switch (actionflags[aC->actionID] & AF_MASK) {
 			case AF_IMMEDIATE:
@@ -2602,7 +2602,7 @@ Action* GenerateAction(const char* String)
 	return action;
 }
 
-Action* GenerateActionDirect(const char *String, Scriptable *object)
+Action *GenerateActionDirect(const char *String, const Scriptable *object)
 {
 	Action* action = GenerateAction(String);
 	if (!action) return NULL;

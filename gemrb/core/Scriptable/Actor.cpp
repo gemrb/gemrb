@@ -162,6 +162,7 @@ static bool iwd2class = false;
 //used in many places, but different in engines
 static ieDword state_invisible = STATE_INVISIBLE;
 static AutoTable extspeed;
+static AutoTable wspecial;
 
 //item animation override array
 struct ItemAnimType {
@@ -201,8 +202,10 @@ static unsigned int classesiwd2[ISCLASSES] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 struct ClassKits {
 	std::vector<int> indices;
 	std::vector<ieDword> ids;
-	std::vector<const char*> clabs;
-	const char* clab;
+	std::vector<char*> clabs;
+	std::vector<char*> kitNames;
+	char *clab;
+	char *className;
 };
 static std::map<int, ClassKits> class2kits;
 
@@ -217,11 +220,8 @@ static ieByte featstats[MAX_FEATS]={0
 static ieByte featmax[MAX_FEATS]={0
 };
 
-//holds the wspecial table for weapon prof bonuses
-static int wspecial_max = 0;
 static int wspattack_rows = 0;
 static int wspattack_cols = 0;
-static int **wspecial = NULL;
 static int **wspattack = NULL;
 
 //holds the weapon style bonuses
@@ -445,6 +445,7 @@ void ReleaseMemoryActor()
 	}
 	FistRows = -1;
 	extspeed.release();
+	wspecial.release();
 }
 
 Actor::Actor()
@@ -725,11 +726,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 
 	// set internal speed too, since we may need it in the same tick (eg. csgolem in the bg2 intro)
-	int walkSpeed = CalculateSpeed(false);
-	if (walkSpeed) {
-		walkSpeed = 1500/walkSpeed;
-	}
-	speed = walkSpeed;
+	SetSpeed(false);
 }
 
 CharAnimations* Actor::GetAnims() const
@@ -1663,32 +1660,24 @@ NULL, NULL, NULL, NULL, pcf_morale, pcf_bounce, NULL, NULL //ff
 /** call this from ~Interface() */
 void Actor::ReleaseMemory()
 {
-	int i;
-
 	if (classcount>=0) {
 		if (clericspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (clericspelltables[i]) {
-					free (clericspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free (clericspelltables[i]);
 			}
 			free(clericspelltables);
 			clericspelltables=NULL;
 		}
 		if (druidspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (druidspelltables[i]) {
-					free (druidspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free (druidspelltables[i]);
 			}
 			free(druidspelltables);
 			druidspelltables=NULL;
 		}
 		if (wizardspelltables) {
-			for (i=0;i<classcount;i++) {
-				if (wizardspelltables[i]) {
-					free(wizardspelltables[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free(wizardspelltables[i]);
 			}
 			free(wizardspelltables);
 			wizardspelltables=NULL;
@@ -1732,10 +1721,8 @@ void Actor::ReleaseMemory()
 		}
 
 		if (levelslots) {
-			for (i=0; i<classcount; i++) {
-				if (levelslots[i]) {
-					free(levelslots[i]);
-				}
+			for (int i = 0; i < classcount; i++) {
+				free(levelslots[i]);
 			}
 			free(levelslots);
 			levelslots=NULL;
@@ -1755,87 +1742,74 @@ void Actor::ReleaseMemory()
 		skillstats.clear();
 
 		if (afcomments) {
-			for(i=0;i<afcount;i++) {
-				if(afcomments[i]) {
-					free(afcomments[i]);
-				}
+			for(int i = 0; i < afcount; i++) {
+				free(afcomments[i]);
 			}
 			free(afcomments);
 			afcomments=NULL;
 		}
 
-		if (wspecial) {
-			for (i=0; i<=wspecial_max; i++) {
-				if (wspecial[i]) {
-					free(wspecial[i]);
-				}
-			}
-			free(wspecial);
-			wspecial=NULL;
-		}
 		if (wspattack) {
-			for (i=0; i<wspattack_rows; i++) {
-				if (wspattack[i]) {
-					free(wspattack[i]);
-				}
+			for (int i = 0; i < wspattack_rows; i++) {
+				free(wspattack[i]);
 			}
 			free(wspattack);
 			wspattack=NULL;
 		}
 		if (wsdualwield) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wsdualwield[i]) {
-					free(wsdualwield[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wsdualwield[i]);
 			}
 			free(wsdualwield);
 			wsdualwield=NULL;
 		}
 		if (wstwohanded) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wstwohanded[i]) {
-					free(wstwohanded[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wstwohanded[i]);
 			}
 			free(wstwohanded);
 			wstwohanded=NULL;
 		}
 		if (wsswordshield) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wsswordshield[i]) {
-					free(wsswordshield[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wsswordshield[i]);
 			}
 			free(wsswordshield);
 			wsswordshield=NULL;
 		}
 		if (wssingle) {
-			for (i=0; i<=STYLE_MAX; i++) {
-				if (wssingle[i]) {
-					free(wssingle[i]);
-				}
+			for (int i = 0; i<= STYLE_MAX; i++) {
+				free(wssingle[i]);
 			}
 			free(wssingle);
 			wssingle=NULL;
 		}
 		if (monkbon) {
 			for (unsigned i=0; i<monkbon_rows; i++) {
-				if (monkbon[i]) {
-					free(monkbon[i]);
-				}
+				free(monkbon[i]);
 			}
 			free(monkbon);
 			monkbon=NULL;
 		}
-		for(i=0;i<20;i++) {
-			free(wmlevels[i]);
-			wmlevels[i]=NULL;
+		for (auto wml : wmlevels) {
+			free(wml);
+			wml = NULL;
 		}
 		skilldex.clear();
 		skillrac.clear();
 		IWD2HitTable.clear();
 		BABClassMap.clear();
 		ModalStates.clear();
+		for (auto clskit : class2kits) {
+			free(clskit.second.clab);
+			free(clskit.second.className);
+			for (auto kit : clskit.second.clabs) {
+				free(kit);
+			}
+			for (auto kit : clskit.second.kitNames) {
+				free(kit);
+			}
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
@@ -2056,6 +2030,7 @@ static void InitActorTables()
 			}
 			// everyone but pst (none at all) and iwd2 (different table)
 			class2kits[i].clab = strdup(field);
+			class2kits[i].className = strdup(rowname);
 
 			field = tm->QueryField(rowname, "NO_PROF");
 			defaultprof[i]=atoi(field);
@@ -2261,6 +2236,7 @@ static void InitActorTables()
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
+				class2kits[classcol].kitNames.push_back(strdup(classname));
 				continue;
 			} else if (i < classcount) {
 				// populate classesiwd2
@@ -2494,27 +2470,16 @@ static void InitActorTables()
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
 			int classID = atoi(tm->QueryField(rowName, "CLASS"));
 			const char *clab = tm->QueryField(rowName, "ABILITIES");
+			const char *kitName = tm->QueryField(rowName, "ROWNAME");
 			class2kits[classID].indices.push_back(i);
 			class2kits[classID].ids.push_back(kitUsability);
 			class2kits[classID].clabs.push_back(strdup(clab));
+			class2kits[classID].kitNames.push_back(strdup(kitName));
 		}
 	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
-	tm.load("wspecial");
-	if (tm) {
-		//load in the identifiers
-		wspecial_max = tm->GetRowCount()-1;
-		int cols = tm->GetColumnCount();
-		wspecial = (int **) calloc(wspecial_max+1, sizeof(int *));
-
-		for (i=0; i<=wspecial_max; i++) {
-			wspecial[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
-				wspecial[i][j] = atoi(tm->QueryField(i, j));
-			}
-		}
-	}
+	wspecial.load("wspecial", true);
 
 	//pre-cache attack per round bonuses
 	tm.load("wspatck");
@@ -4238,8 +4203,8 @@ bool Actor::GetPartyComment()
 
 	//not an NPC
 	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
-	//don't even bother
-	if (game->NpcInParty<2) return false;
+	// don't bother if we're not around
+	if (GetCurrentArea() != game->GetCurrentArea()) return false;
 	ieDword size = game->GetPartySize(true);
 	//don't even bother, again
 	if (size<2) return false;
@@ -4877,7 +4842,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	bool detailed = false;
 	const char *type_name = "unknown";
-	if (displaymsg->HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
+	if (DisplayMessage::HasStringReference(STR_DAMAGE_DETAIL1)) { // how and iwd2
 		std::multimap<ieDword, DamageInfoStruct>::iterator it;
 		it = core->DamageInfoMap.find(damagetype);
 		if (it != core->DamageInfoMap.end()) {
@@ -5058,12 +5023,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		// TODO: RE and unhardcode, especially the "armor" mapping
 		// no idea what RK stands for, so use it for everything else
 		if (type > 5) type = 5;
-		armor = Modified[IE_ARMOR_TYPE]; // goes from 0 (none) to 3 (eg. plate)
+		armor = Modified[IE_ARMOR_TYPE];
 		switch (armor) {
-			case 0: armor = 5; break;
-			case 1: armor = core->Roll(1, 2, 1); break;
-			case 2: armor = 1; break;
-			case 3: armor = 7; break;
+			case IE_ANI_NO_ARMOR: armor = 5; break;
+			case IE_ANI_LIGHT_ARMOR: armor = core->Roll(1, 2, 1); break;
+			case IE_ANI_MEDIUM_ARMOR: armor = 1; break;
+			case IE_ANI_HEAVY_ARMOR: armor = 7; break;
 			default: armor = 6; break;
 		}
 
@@ -5436,22 +5401,57 @@ int Actor::GetEncumbranceFactor(bool feedback) const
 	return 123456789; // large enough to round to 0 when used as a divisor
 }
 
-// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
-int Actor::CalculateSpeed(bool feedback)
+int Actor::CalculateSpeed(bool feedback) const
 {
-	int speed = GetStat(IE_MOVEMENTRATE);
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		return CalculateSpeedFromINI(feedback);
+	} else {
+		return CalculateSpeedFromRate(feedback);
+	}
+}
 
+// NOTE: for ini-based speed users this will only update their encumbrance, speed will be 0
+int Actor::CalculateSpeedFromRate(bool feedback) const
+{
+	int movementRate = GetStat(IE_MOVEMENTRATE);
+	int encumbranceFactor = GetEncumbranceFactor(feedback);
 	if (BaseStats[IE_EA] > EA_GOODCUTOFF && !third) {
 		// cheating bastards (drow in ar2401 for example)
-		return speed;
+	} else {
+		movementRate /= encumbranceFactor;
+	}
+	if (movementRate) {
+		return 1500 / movementRate;
+	} else {
+		return 0;
+	}
+}
+
+int Actor::CalculateSpeedFromINI(bool feedback) const
+{
+	int encumbranceFactor = GetEncumbranceFactor(feedback);
+	ieDword animid = BaseStats[IE_ANIMATION_ID];
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+		animid = animid & 0xff;
+	}
+	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
+	const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	int newSpeed = 0;
+	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
+		newSpeed = avatar->RunScale;
+	} else if (avatar->WalkScale) {
+		newSpeed = avatar->WalkScale;
+	} else {
+		// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
 	}
 
-	inventory.CalculateWeight();
-	int encumbrance = inventory.GetWeight();
-	int encumbranceFactor = GetEncumbranceFactor(feedback);
-	SetStat(IE_ENCUMBRANCE, encumbrance, false);
-
-	return speed / encumbranceFactor;
+	// the speeds are already inverted, so we need to increase them to slow down
+	if (encumbranceFactor <= 2) {
+		newSpeed *= encumbranceFactor;
+	} else {
+		newSpeed = 0;
+	}
+	return newSpeed;
 }
 
 //receive turning
@@ -6279,7 +6279,6 @@ void Actor::InitStatsOnLoad()
 			SetStance( IE_ANI_AWAKE );
 		}
 	}
-	inventory.CalculateWeight();
 	CreateDerivedStats();
 	Modified[IE_CON]=BaseStats[IE_CON]; // used by GetHpAdjustment
 	ieDword hp = BaseStats[IE_HITPOINTS] + GetHpAdjustment(GetXPLevel(false));
@@ -7127,8 +7126,9 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	//hit/damage/speed bonuses from wspecial (with tohit inverted in adnd)
-	if ((signed)stars > wspecial_max) {
-		stars = wspecial_max;
+	static ieDword wspecialMax = wspecial->GetRowCount() - 1;
+	if (stars > wspecialMax) {
+		stars = wspecialMax;
 	}
 
 	int prof = 0;
@@ -7136,12 +7136,13 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	// but everyone is proficient with fists
 	// cheesily limited to party only (10gob hits it - practically can't hit you otherwise)
 	if (InParty && !inventory.FistsEquipped()) {
-		prof += wspecial[stars][0];
+		prof += atoi(wspecial->QueryField(stars, 0));
 	}
 
-	wi.profdmgbon = wspecial[stars][1];
+	wi.profdmgbon = atoi(wspecial->QueryField(stars, 1));
 	DamageBonus += wi.profdmgbon;
-	speed += wspecial[stars][2];
+	// only bg2 wspecial.2da has this column, but all have 0 as the default table value, so this lookup is fine
+	speed += atoi(wspecial->QueryField(stars, 2));
 	// add non-proficiency penalty, which is missing from the table in non-iwd2
 	// stored negative
 	if (stars == 0 && !third) {
@@ -11464,17 +11465,15 @@ ieDword Actor::GetActiveClass() const
 // like IsDualInactive(), but accounts for the possibility of the active (second) class being kitted
 bool Actor::IsKitInactive() const
 {
+	if (third) return false;
 	if (!IsDualInactive()) return false;
 
-	const int CLASS = 7;
-
-	int table = gamedata->LoadTable("kitlist");
-	if (table == -1) return false;
-	Holder<TableMgr> tm = gamedata->GetTable(table);
-	if (tm) {
-		ieDword kitindex = GetKitIndex(GetStat(IE_KIT));
-		ieDword kitclass = atoi(tm->QueryField(kitindex, CLASS));
-		if (kitclass == GetActiveClass()) return false;
+	ieDword baseclass = GetActiveClass();
+	ieDword kit = GetStat(IE_KIT);
+	std::vector<ieDword> kits = class2kits[baseclass].ids;
+	std::vector<ieDword>::iterator it = kits.begin();
+	for (int idx = 0; it != kits.end(); it++, idx++) {
+		if (kit & (*it)) return false;
 	}
 	return true;
 }
@@ -11495,6 +11494,27 @@ unsigned int Actor::GetAdjustedTime(unsigned int time) const
 
 ieDword Actor::GetClassID (const ieDword isclass) {
 	return classesiwd2[isclass];
+}
+
+const char *Actor::GetClassName(ieDword classID) const
+{
+	return class2kits[classID].className;
+}
+
+// NOTE: returns first kit name for multikit chars
+const char *Actor::GetKitName(ieDword kitID) const
+{
+	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
+	for (int cidx = 0; clskit != class2kits.end(); clskit++, cidx++) {
+		std::vector<ieDword> kits = class2kits[cidx].ids;
+		std::vector<ieDword>::iterator it = kits.begin();
+		for (int kidx = 0; it != kits.end(); it++, kidx++) {
+			if (kitID & (*it)) {
+				return class2kits[cidx].kitNames[kidx];
+			}
+		}
+	}
+	return "";
 }
 
 void Actor::SetAnimatedTalking (unsigned int length) {

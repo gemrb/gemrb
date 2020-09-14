@@ -1775,15 +1775,27 @@ def DonateGold ():
 
 	Field = Window.GetControl (5)
 	donation = int("0"+Field.QueryText ())
-	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
-	if GemRB.IncreaseReputation (donation):
-		TextArea.Append (strrefs['donorgood'])
-		GemRB.PlaySound (DEF_DONATE1)
-		UpdateStoreDonateWindow ()
-		return
 
-	TextArea.Append (strrefs['donorfail'])
-	GemRB.PlaySound (DEF_DONATE2)
+	# for some reason temple donations get a boost to rumour generation,
+	# even though comparatively they're higher than drink prices and with
+	# the default factor of 3, very quickly guarantee a rumour
+	RumourTable = GemRB.LoadTable ("donarumr")
+	RumourFactor = RumourTable.GetValue ("RUMORRATE", "VALUE", GTV_INT)
+	RumourChance = min(RumourFactor * donation, 100) # cap is from the original
+	text = GemRB.GetRumour (RumourChance, Store['TempleRumour'])
+	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold ()-donation)
+	feedbackSound = DEF_DONATE2
+	feedbackString = strrefs['donorfail']
+	if GemRB.IncreaseReputation (donation):
+		feedbackSound = DEF_DONATE1
+		feedbackString = strrefs['donorgood']
+
+	TextArea.Append (feedbackString)
+	TextArea.Append ("\n\n")
+	if text > -1:
+		TextArea.Append (text)
+		TextArea.Append ("\n\n")
+	GemRB.PlaySound (feedbackSound)
 	UpdateStoreDonateWindow ()
 	return
 
@@ -1946,6 +1958,7 @@ def GulpDrink ():
 	intox = GemRB.GetPlayerStat (pc, IE_INTOXICATION)
 	if intox > 80:
 		TextArea.Append (strrefs["toodrunk"])
+		TextArea.Append ("\n\n")
 		return
 
 	gold = GemRB.GameGetPartyGold ()
@@ -1958,8 +1971,9 @@ def GulpDrink ():
 	GemRB.GameSetPartyGold (gold-Drink['Price'])
 	GemRB.SetPlayerStat (pc, IE_INTOXICATION, intox+Drink['Strength'])
 	text = GemRB.GetRumour (Drink['Strength'], Store['TavernRumour'])
-	TextArea.Append (text)
-	if text > -1: TextArea.Append ("\n\n")
+	if text > -1:
+		TextArea.Append (text)
+		TextArea.Append ("\n\n")
 	GemRB.PlaySound (DEF_DRUNK)
 	UpdateStoreRumourWindow ()
 	return

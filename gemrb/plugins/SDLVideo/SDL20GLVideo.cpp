@@ -1,15 +1,6 @@
 
 #include "OpenGLEnv.h"
 
-#if _MSC_VER
-	#if USE_GL
-		#pragma comment(lib, "glew32")
-		#pragma comment(lib, "opengl32")
-	#else
-		#pragma comment(lib, "libGLESv2")
-	#endif
-#endif
-
 #include <algorithm>
 #include "SDL20GLVideo.h"
 #include "Interface.h"
@@ -66,23 +57,25 @@ int GLVideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* tit
 	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, winFlags);
 	if (window == NULL) 
 	{
-		Log(ERROR, "SDL 2 GL Driver", "couldnt create window:%s", SDL_GetError());
+		Log(ERROR, "SDL 2 GL Driver", "Unable to create window:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
 
 	context = SDL_GL_CreateContext(window);
 	if (context == NULL) 
 	{
-		Log(ERROR, "SDL 2 GL Driver", "couldnt create GL context:%s", SDL_GetError());
+		Log(ERROR, "SDL 2 GL Driver", "Unable to create GL context:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
 	SDL_GL_MakeCurrent(window, context);
+	Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: %s, renderer: %s, vendor: %s", glGetString(GL_VERSION), glGetString(GL_RENDERER), glGetString(GL_VENDOR));
+	Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	renderer = SDL_CreateRenderer(window, -1, 0);
 
 	if (renderer == NULL) 
 	{
-		Log(ERROR, "SDL 2 GL Driver", "couldnt create renderer:%s", SDL_GetError());
+		Log(ERROR, "SDL 2 GL Driver", "Unable to create renderer:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
 	SDL_RenderSetLogicalSize(renderer, width, height);

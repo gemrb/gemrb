@@ -279,6 +279,7 @@ public:
 	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;
+	int GetPhase() const;
 	void Cleanup();
 
 	inline Point GetDestination() const { return Destination; }

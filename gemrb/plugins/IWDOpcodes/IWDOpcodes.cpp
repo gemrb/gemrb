@@ -1074,7 +1074,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//timing
-	if (core->GetGame()->GameTime%6) {
+	if (core->GetGame()->GameTime % core->Time.round_sec) {
 		return FX_APPLIED;
 	}
 

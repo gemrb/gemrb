@@ -34,7 +34,7 @@ class TileOverlay;
 #define DOOR_DETECTABLE  8   //trap detectable
 #define DOOR_BROKEN      16  //door is broken (force opened)
 #define DOOR_CANTCLOSE   32  // used in BG1 (at least TotSC). Prevents random closing of doors in CGameDoor::CompressTime. (The random closing is only done when more than a hour of ingame time passed.) 
-#define DOOR_LINKED      64   //info trigger linked to this door
+#define DOOR_LINKED      64   //info trigger linked to this door, iwd2: DETECTED in the ids
 #define DOOR_SECRET      128  //door is secret
 #define DOOR_FOUND       256  //secret door found
 #define DOOR_TRANSPARENT 512  //obscures vision (LOCKEDINFOTEXT in iwd2)
@@ -42,7 +42,7 @@ class TileOverlay;
 #define DOOR_SLIDE       2048 //impeded blocks ignored (WARNINGINFOTEXT in iwd2)
 #define DOOR_WARNINGTEXTDISPLAYED 0x1000 // iwd2
 #define DOOR_HIDDEN      8192 // iwd2, ignore the door
-#define DOOR_USEUPKEY    0x4000 // treating as identical to DOOR_KEY
+#define DOOR_USEUPKEY    0x4000 // iwd2, treating as identical to DOOR_KEY
 #define DOOR_LOCKEDINFOTEXT 0x8000
 #define DOOR_WARNINGINFOTEXT 0x10000
 
@@ -102,6 +102,7 @@ public:
 	bool Visible();
 	void dump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
+	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
 	void SetNewOverlay(TileOverlay *Overlay);
 };
 

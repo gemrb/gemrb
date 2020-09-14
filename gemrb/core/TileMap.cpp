@@ -31,44 +31,33 @@ namespace GemRB {
 
 TileMap::TileMap(void)
 {
-	XCellCount = 0;
-	YCellCount = 0;
 	LargeMap = !core->HasFeature(GF_SMALL_FOG);
 }
 
 TileMap::~TileMap(void)
 {
-	size_t i;
-
-	for (i = 0; i < overlays.size(); i++) {
-		delete( overlays[i] );
+	ClearOverlays();
+	for (const InfoPoint *infoPoint : infoPoints) {
+		delete infoPoint;
 	}
-	for (i = 0; i < overlays.size(); i++) {
-		delete( rain_overlays[i]);
+	for (const Container *container : containers) {
+		delete container;
 	}
-	for (i = 0; i < infoPoints.size(); i++) {
-		delete( infoPoints[i] );
-	}
-	for (i = 0; i < containers.size(); i++) {
-		delete( containers[i] );
-	}
-	for (i = 0; i < doors.size(); i++) {
-		delete( doors[i] );
+	for (const Door *door : doors) {
+		delete door;
 	}
 }
 
 //this needs in case of a tileset switch (for extended night)
 void TileMap::ClearOverlays()
 {
-	size_t i;
-
-	for (i = 0; i < overlays.size(); i++) {
-		delete( overlays[i] );
+	for (const TileOverlay *overlay : overlays) {
+		delete overlay;
+	}
+	for (const TileOverlay *rain : rain_overlays) {
+		delete rain;
 	}
 	overlays.clear();
-	for (i = 0; i < overlays.size(); i++) {
-		delete( rain_overlays[i]);
-	}
 	rain_overlays.clear();
 }
 
@@ -121,10 +110,9 @@ Door* TileMap::GetDoor(unsigned int idx) const
 
 Door* TileMap::GetDoor(const Point &p) const
 {
-	for (size_t i = 0; i < doors.size(); i++) {
+	for (Door *door : doors) {
 		Gem_Polygon *doorpoly;
 
-		Door* door = doors[i];
 		if (door->Flags&DOOR_HIDDEN) {
 			continue;
 		}
@@ -149,9 +137,7 @@ Door* TileMap::GetDoor(const Point &p) const
 
 Door* TileMap::GetDoorByPosition(const Point &p) const
 {
-	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors[i];
-
+	for (Door *door : doors) {
 		if (door->toOpen[0].x==p.x && door->toOpen[0].y==p.y) {
 			return door;
 		}
@@ -167,8 +153,7 @@ Door* TileMap::GetDoor(const char* Name) const
 	if (!Name) {
 		return NULL;
 	}
-	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors[i];
+	for (Door *door : doors) {
 		if (stricmp( door->GetScriptName(), Name ) == 0)
 			return door;
 	}
@@ -177,9 +162,20 @@ Door* TileMap::GetDoor(const char* Name) const
 
 void TileMap::UpdateDoors()
 {
-	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors[i];
+	for (Door *door : doors) {
 		door->SetNewOverlay(overlays[0]);
+	}
+}
+
+// used during time compression in bg1 ... but potentially problematic, so we don't enable it elsewhere
+void TileMap::AutoLockDoors() const
+{
+	if (!core->HasFeature(GF_RANDOM_BANTER_DIALOGS)) return;
+
+	for (Door *door : doors) {
+		if (door->CantAutoClose()) continue;
+		if (core->Roll(1, 2, -1)) continue; // just a guess
+		door->SetDoorOpen(false, false, 0);
 	}
 }
 
@@ -212,11 +208,7 @@ void TileMap::AddRainOverlay(TileOverlay* overlay)
 
 void TileMap::DrawOverlays(Region screen, int rain, int flags)
 {
-	if (rain) {
-		overlays[0]->Draw( screen, rain_overlays, flags );
-	} else {
-		overlays[0]->Draw( screen, overlays, flags );
-	}
+	overlays[0]->Draw(screen, rain ? rain_overlays : overlays, flags);
 }
 
 // Size of Fog-Of-War shadow tile (and bitmap)
@@ -431,10 +423,10 @@ Container* TileMap::GetContainer(unsigned int idx) const
 
 Container* TileMap::GetContainer(const char* Name) const
 {
-	for (size_t i = 0; i < containers.size(); i++) {
-		Container* cn = containers[i];
-		if (stricmp( cn->GetScriptName(), Name ) == 0)
-			return cn;
+	for (Container *container : containers) {
+		if (stricmp(container->GetScriptName(), Name) == 0) {
+			return container;
+		}
 	}
 	return NULL;
 }
@@ -444,61 +436,55 @@ Container* TileMap::GetContainer(const char* Name) const
 //in this case, empty piles won't be found!
 Container* TileMap::GetContainer(const Point &position, int type) const
 {
-	for (size_t i = 0; i < containers.size(); i++) {
-		Container* c = containers[i];
-		if (type!=-1) {
-			if (c->Type!=type) {
-				continue;
-			}
+	for (Container *container : containers) {
+		if (type != -1 && type != container->Type) {
+			continue;
 		}
-		if (c->outline->BBox.x > position.x)
+		if (container->outline->BBox.x > position.x)
 			continue;
-		if (c->outline->BBox.y > position.y)
+		if (container->outline->BBox.y > position.y)
 			continue;
-		if (c->outline->BBox.x + c->outline->BBox.w < position.x)
+		if (container->outline->BBox.x + container->outline->BBox.w < position.x)
 			continue;
-		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
+		if (container->outline->BBox.y + container->outline->BBox.h < position.y)
 			continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (c->Type == IE_CONTAINER_PILE) {
+		if (container->Type == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
-			if ((type==-1) && !c->inventory.GetSlotCount()) {
+			if ((type == -1) && !container->inventory.GetSlotCount()) {
 				continue;
 			}
-			return c;
+			return container;
 		}
-		if (c->outline->PointIn( position ))
-			return c;
+		if (container->outline->PointIn(position))
+			return container;
 	}
 	return NULL;
 }
 
 Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
-	for (size_t i = 0; i < containers.size(); i++) {
-		Container* c = containers[i];
-		if (type!=-1) {
-			if (c->Type!=type) {
-				continue;
-			}
+	for (Container *container : containers) {
+		if (type != -1 && type != container->Type) {
+			continue;
 		}
 
-		if (c->Pos.x!=position.x || c->Pos.y!=position.y) {
+		if (container->Pos.x != position.x || container->Pos.y != position.y) {
 			continue;
 		}
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (c->Type == IE_CONTAINER_PILE) {
+		if (container->Type == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
-			if ((type==-1) && !c->inventory.GetSlotCount()) {
+			if ((type == -1) && !container->inventory.GetSlotCount()) {
 				continue;
 			}
-			return c;
+			return container;
 		}
-		return c;
+		return container;
 	}
 	return NULL;
 }
@@ -554,47 +540,44 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 //if detectable is set, then only detectable infopoints will be returned
 InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 {
-	for (size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint* ip = infoPoints[i];
+	for (InfoPoint *infoPoint : infoPoints) {
 		//these flags disable any kind of user interaction
 		//scripts can still access an infopoint by name
-		if (ip->Flags&(INFO_DOOR|TRAP_DEACTIVATED) )
+		if (infoPoint->Flags & (INFO_DOOR | TRAP_DEACTIVATED))
 			continue;
 
 		if (detectable) {
-			if ((ip->Type==ST_PROXIMITY) && !ip->VisibleTrap(0) ) {
+			if (infoPoint->Type == ST_PROXIMITY && !infoPoint->VisibleTrap(0)) {
 				continue;
 			}
-			if (ip->IsPortal()) {
-				// skip portals without PORTAL_CURSOR set
-				if (!(ip->Trapped & PORTAL_CURSOR)) {
+			// skip portals without PORTAL_CURSOR set
+			if (infoPoint->IsPortal() && !(infoPoint->Trapped & PORTAL_CURSOR)) {
 					continue;
-				}
 			}
 		}
 
-		if (!(ip->GetInternalFlag()&IF_ACTIVE))
+		if (!(infoPoint->GetInternalFlag() & IF_ACTIVE))
 			continue;
-		if (ip->outline->BBox.x > p.x)
+		if (infoPoint->outline->BBox.x > p.x)
 			continue;
-		if (ip->outline->BBox.y > p.y)
+		if (infoPoint->outline->BBox.y > p.y)
 			continue;
-		if (ip->outline->BBox.x + ip->outline->BBox.w < p.x)
+		if (infoPoint->outline->BBox.x + infoPoint->outline->BBox.w < p.x)
 			continue;
-		if (ip->outline->BBox.y + ip->outline->BBox.h < p.y)
+		if (infoPoint->outline->BBox.y + infoPoint->outline->BBox.h < p.y)
 			continue;
-		if (ip->outline->PointIn( p ))
-			return ip;
+		if (infoPoint->outline->PointIn(p))
+			return infoPoint;
 	}
 	return NULL;
 }
 
 InfoPoint* TileMap::GetInfoPoint(const char* Name) const
 {
-	for (size_t i = 0; i < infoPoints.size(); i++) {
-		InfoPoint* ip = infoPoints[i];
-		if (stricmp( ip->GetScriptName(), Name ) == 0)
-			return ip;
+	for (InfoPoint *infoPoint : infoPoints) {
+		if (stricmp(infoPoint->GetScriptName(), Name) == 0) {
+			return infoPoint;
+		}
 	}
 	return NULL;
 }
@@ -609,15 +592,11 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx) const
 
 InfoPoint* TileMap::GetTravelTo(const char* Destination) const
 {
-	size_t i=infoPoints.size();
-	while (i--) {
-		InfoPoint *ip = infoPoints[i];
+	for (InfoPoint *infoPoint : infoPoints) {
+		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		if (ip->Type!=ST_TRAVEL)
-			continue;
-
-		if (strnicmp( ip->Destination, Destination, 8 ) == 0) {
-			return ip;
+		if (strnicmp(infoPoint->Destination, Destination, 8) == 0) {
+			return infoPoint;
 		}
 	}
 	return NULL;
@@ -628,17 +607,13 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	int min = -1;
 	InfoPoint *best = NULL;
 
-	size_t i=infoPoints.size();
-	while (i--) {
-		InfoPoint *ip = infoPoints[i];
+	for (InfoPoint *infoPoint : infoPoints) {
+		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		if (ip->Type!=ST_TRAVEL)
-			continue;
-
-		unsigned int dist = Distance(p, ip);
+		unsigned int dist = Distance(p, infoPoint);
 		if (dist<(unsigned int) min) {
 			min = dist;
-			best = ip;
+			best = infoPoint;
 		}
 	}
 	if (best) {

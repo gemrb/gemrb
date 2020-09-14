@@ -6711,17 +6711,14 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	if(0) print("fx_set_trap(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieDword skill, roll;
-	Map *map;
-
-	map = target->GetCurrentArea();
+	ieDword skill, roll, level;
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_NOT_APPLIED;
 
 	proIterator iter;
 
-	//check if trap count is over an amount (only saved traps count)
-	//actually, only projectiles in trigger phase should count here
-	if (map->GetTrapCount(iter)>6) {
+	// check if the new trap count is cheesy (only saved traps count)
+	if (map->GetTrapCount(iter) + 1 > gamedata->GetTrapLimit(Owner)) {
 		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
 	}
@@ -6733,11 +6730,17 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (Owner->Type==ST_ACTOR) {
-		skill = ((Actor *)Owner)->GetStat(IE_SETTRAPS);
+		const Actor *caster = (Actor *) Owner;
+		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
+		// assuming functioning thief, but allowing modded exceptions
+		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
+		level = caster->GetThiefLevel();
+		level = level ? level : caster->GetXPLevel(false);
 	} else {
 		roll=0;
 		skill=0;
+		level = 0;
 	}
 
 	if (roll>skill) {
@@ -6762,7 +6765,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, 0, 1, false);
+	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, level, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -7122,7 +7125,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if(0) print("fx_remove_projectile(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (!target) return FX_NOT_APPLIED;
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;
 
 	switch (fx->Parameter2) {

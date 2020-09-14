@@ -61,6 +61,7 @@ public:
 	size_t GetDoorCount() { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
+	void AutoLockDoors() const;
 
 	/* type is an optional filter for container type*/
 	void AddContainer(Container *c);
@@ -96,7 +97,7 @@ public:
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
 	Point GetMapSize();
 public:
-	int XCellCount, YCellCount;
+	int XCellCount = 0, YCellCount = 0;
 };
 
 }

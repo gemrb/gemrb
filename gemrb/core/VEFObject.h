@@ -61,7 +61,7 @@ public:
 	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
-	ScriptedAnimation *GetSingleObject();
+	ScriptedAnimation *GetSingleObject() const;
 private:
 	//clears the schedule, used internally
 	void Init();

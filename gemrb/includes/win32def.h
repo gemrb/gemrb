@@ -43,8 +43,6 @@
 #define _UNICODE
 
 # include <windows.h>
-# define swprintf  _snwprintf
-# define vswprintf _vsnwprintf
 
 #else //WIN32
 # ifdef HAVE_CONFIG_H
@@ -54,11 +52,6 @@
 # include <cstdlib>
 
 #endif //WIN32
-
-#if defined(WIN32) && !defined(__MINGW32__)
-# define snprintf _snprintf
-# define vsnprintf _vsnprintf
-#endif
 
 #include "System/VFS.h"
 

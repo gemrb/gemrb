@@ -132,7 +132,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 	return step;
 }
 
-bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking)
+bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, bool actorsAreBlocking) const
 {
 	int flags = PF_SIGHT;
 	if (actorsAreBlocking) flags |= PF_ACTORS_ARE_BLOCKING;

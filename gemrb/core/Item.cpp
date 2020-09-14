@@ -294,7 +294,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) c
 			ieDword damagetype = fx->Parameter2 >> 16;
 			it = core->DamageInfoMap.find(damagetype);
 			if (it == core->DamageInfoMap.end()) {
-				print("Unhandled damagetype: %d", damagetype);
+				Log(ERROR, "Combat", "Unhandled damagetype: %u", damagetype);
 				continue;
 			}
 			DMGOpcodeInfo damage;
