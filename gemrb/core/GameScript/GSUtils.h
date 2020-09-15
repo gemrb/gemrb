@@ -128,7 +128,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead);
-GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
+GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);

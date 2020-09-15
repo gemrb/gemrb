@@ -584,7 +584,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 
 //non actors can see too (reducing function to LOS)
 //non actors can be seen too (reducing function to LOS)
-int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
+int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 {
 	//see dead; unscheduled actors are never visible, though
 	int flags = GA_NO_UNSCHEDULED;

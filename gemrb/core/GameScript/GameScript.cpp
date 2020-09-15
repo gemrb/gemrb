@@ -2360,7 +2360,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 }
 
 /* this may return more than a boolean, in case of Or(x) */
-int Trigger::Evaluate(Scriptable* Sender)
+int Trigger::Evaluate(Scriptable *Sender) const
 {
 	if (triggerID >= MAX_TRIGGERS) {
 		Log(ERROR, "GameScript", "Corrupted (too high) trigger code: %d", triggerID);
