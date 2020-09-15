@@ -161,7 +161,7 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 		return NULL;
 	}
 
-	Cache::MyAssoc* pAssocRet = (Cache::MyAssoc*)Position;
+	Cache::MyAssoc *pAssocRet = Position;
 
 	if (pAssocRet == NULL)
 	{
@@ -281,7 +281,7 @@ int Cache::DecRef(void *data, const ieResRef key, bool remove)
 		return -1;
 	}
 
-	pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
+	pAssoc = GetNextAssoc(nullptr);
 
 	while (pAssoc) {
 		if (pAssoc->data == data) {
@@ -302,7 +302,7 @@ int Cache::DecRef(void *data, const ieResRef key, bool remove)
 
 void Cache::Cleanup()
 {
-	Cache::MyAssoc* pAssoc=(Cache::MyAssoc *) GetNextAssoc(NULL);
+	Cache::MyAssoc *pAssoc = GetNextAssoc(nullptr);
 
 	while (pAssoc)
 	{

@@ -819,22 +819,19 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 
 	//dropping gold too
 	if (!resref[0]) {
-		if (Owner->Type==ST_ACTOR) {
-			Actor *act = (Actor *) Owner;
-			if (! act->BaseStats[IE_GOLD]) {
-				return dropped;
-			}
-			CREItem *gold = new CREItem();
-		
-			gold->Expired=0;
-			gold->Flags=0;
-			gold->Usages[1]=0;
-			gold->Usages[2]=0;
-			memcpy(gold->ItemResRef, core->GoldResRef, sizeof(ieResRef) );
-			gold->Usages[0] = act->BaseStats[IE_GOLD];
-			act->BaseStats[IE_GOLD] = 0;
-			map->AddItemToLocation(loc, gold);
+		if (!Owner->GetBase(IE_GOLD)) {
+			return dropped;
 		}
+		CREItem *gold = new CREItem();
+	
+		gold->Expired = 0;
+		gold->Flags = 0;
+		gold->Usages[1] = 0;
+		gold->Usages[2] = 0;
+		CopyResRef(gold->ItemResRef, core->GoldResRef);
+		gold->Usages[0] = Owner->BaseStats[IE_GOLD];
+		Owner->BaseStats[IE_GOLD] = 0;
+		map->AddItemToLocation(loc, gold);
 	}
 	return dropped;
 }

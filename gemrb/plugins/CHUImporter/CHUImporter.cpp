@@ -191,7 +191,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					break;
 				}
 				/** Cycle is only a byte for buttons */
-				Sprite2D* tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
+				Sprite2D *tspr = bam->GetFrame(UnpressedIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
@@ -200,13 +200,13 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					if (bam->GetCycleSize(Cycle) == 4 )
 						SelectedIndex=2;
 				}
-				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );
+				tspr = bam->GetFrame(SelectedIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
+					if (bam->GetCycleSize(Cycle) == 4)
 						DisabledIndex=3;
 				}
-				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
+				tspr = bam->GetFrame(DisabledIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 			}
 			break;

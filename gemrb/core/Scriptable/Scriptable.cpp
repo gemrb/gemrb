@@ -1226,7 +1226,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;
 		}
-		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
+		if (detective->GetSkill(IE_SPELLCRAFT) <= 0) {
 			continue;
 		}
 

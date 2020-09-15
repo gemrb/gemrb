@@ -1604,7 +1604,7 @@ void Game::UpdateScripts()
 
 		//starting from 0, so we see the most recent master area first
 		for(unsigned int i=0;i<idx;i++) {
-			DelMap( (unsigned int) i, false );
+			DelMap(i, false);
 		}
 	}
 

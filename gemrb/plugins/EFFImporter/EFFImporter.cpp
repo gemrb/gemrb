@@ -227,12 +227,12 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
 	}
-	tmpDword1 = (ieDword) fx->SourceX;
-	tmpDword2 = (ieDword) fx->SourceY;
+	tmpDword1 = fx->SourceX;
+	tmpDword2 = fx->SourceY;
 	stream->WriteDword( &tmpDword1 );
 	stream->WriteDword( &tmpDword2 );
-	tmpDword1 = (ieDword) fx->PosX;
-	tmpDword2 = (ieDword) fx->PosY;
+	tmpDword1 = fx->PosX;
+	tmpDword2 = fx->PosY;
 	stream->WriteDword( &tmpDword1 );
 	stream->WriteDword( &tmpDword2 );
 	stream->WriteDword( &fx->SourceType );

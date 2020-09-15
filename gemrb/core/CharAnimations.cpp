@@ -1505,7 +1505,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_PST_STAND:
 			sprintf(NewResRef,"%cSTD%4s",ResRef[0], ResRef+1);
-			Cycle = (ieByte) SixteenToFive[Orient];
+			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
 			//still doesn't handle the second cycle of the golem anim

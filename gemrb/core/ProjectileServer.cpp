@@ -191,7 +191,7 @@ int ProjectileServer::InitExplosion()
 	if (explist) {
 		explosioncount = 0;
 
-		unsigned int rows = (unsigned int) explist->GetRowCount();
+		unsigned int rows = explist->GetRowCount();
 		//cannot handle 0xff and it is easier to set up the fields
 		//without areapro.2da anyway. So this isn't a restriction
 		if(rows>254) {
@@ -224,8 +224,8 @@ unsigned int ProjectileServer::PrepareSymbols(Holder<SymbolMgr> projlist) {
 			Log(WARNING, "ProjectileServer", "Too high projectilenumber");
 			continue; // ignore
 		}
-		if (value>(unsigned int) count) {
-			count = (unsigned int) value;
+		if (value > count) {
+			count = value;
 		}
 	}
 

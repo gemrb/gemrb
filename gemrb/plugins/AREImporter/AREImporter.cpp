@@ -1413,7 +1413,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		EffectQueue *fxqueue = new EffectQueue();
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
-		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
+		ReadEffects(fs, fxqueue, TrapEffectCount);
 		Actor * caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
@@ -1539,7 +1539,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += InfoPointsCount * 0xc4;
 	SpawnOffset = headersize;
 
-	SpawnCount = (ieDword) map->GetSpawnCount();
+	SpawnCount = map->GetSpawnCount();
 	headersize += SpawnCount * 0xc8;
 	EntrancesOffset = headersize;
 
@@ -1576,7 +1576,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = (ieDword) map->GetAmbientCount(true);
+	AmbiCount = map->GetAmbientCount(true);
 	headersize += AmbiCount * 0xd4;
 	VariablesOffset = headersize;
 
@@ -1612,7 +1612,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	NoteOffset = headersize;
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
-	NoteCount = (ieDword) map->GetMapNoteCount();
+	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (pst?0x214: 0x34);
 	SongHeader = headersize;
 

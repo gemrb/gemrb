@@ -337,7 +337,7 @@ void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	Actor* actor = ( Actor* ) scr;
 	if (parameters->int1Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
@@ -1260,7 +1260,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 
 	Point p;
 	Actor* actor = ( Actor* ) tar;
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	p.fromDword(value);
 	actor->SetPosition(p, true );
 	Sender->ReleaseCurrentAction();
@@ -1845,7 +1845,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
+	value = CheckVariable(target, parameters->string0Parameter);
 	Point p;
 	p.fromDword(value);
 
@@ -2173,9 +2173,7 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 //same as PlaySequence, but the value comes from a variable
 void GameScript::PlaySequenceGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword value;
-
-	value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	PlaySequenceCore(Sender, parameters, value);
 }
 
@@ -2873,7 +2871,7 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 //this apparently doesn't check the gold, thus could be used from non actors
 void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword gold = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword gold = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	if (Sender->Type == ST_ACTOR) {
 		Actor* act = ( Actor* ) Sender;
 		ieDword mygold = act->GetStat(IE_GOLD);

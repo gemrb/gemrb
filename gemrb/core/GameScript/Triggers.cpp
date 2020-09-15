@@ -1906,7 +1906,7 @@ int GameScript::DamageTaken(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	int damage = actor->LastDamage;
-	if (damage==(int) parameters->int0Parameter) {
+	if (damage == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1919,7 +1919,7 @@ int GameScript::DamageTakenGT(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	int damage = actor->LastDamage;
-	if (damage>(int) parameters->int0Parameter) {
+	if (damage > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1932,7 +1932,7 @@ int GameScript::DamageTakenLT(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	int damage = actor->LastDamage;
-	if (damage<(int) parameters->int0Parameter) {
+	if (damage < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1949,7 +1949,7 @@ int GameScript::HPLost(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	//max-current
-	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) == (signed) parameters->int0Parameter) {
+	if ((signed) actor->GetStat(IE_MAXHITPOINTS) - (signed) actor->GetBase(IE_HITPOINTS) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1966,7 +1966,7 @@ int GameScript::HPLostGT(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	//max-current
-	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) > (signed) parameters->int0Parameter) {
+	if ((signed) actor->GetStat(IE_MAXHITPOINTS) - (signed) actor->GetBase(IE_HITPOINTS) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1983,7 +1983,7 @@ int GameScript::HPLostLT(Scriptable *Sender, const Trigger *parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	//max-current
-	if ( (signed) actor->GetStat(IE_MAXHITPOINTS)-(signed) actor->GetBase( IE_HITPOINTS ) < (signed) parameters->int0Parameter) {
+	if ((signed) actor->GetStat(IE_MAXHITPOINTS) - (signed) actor->GetBase(IE_HITPOINTS) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

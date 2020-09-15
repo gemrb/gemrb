@@ -2361,7 +2361,7 @@ static void InitActorTables()
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
 			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
-			classnames[0] = (char*)strtok(strdup((char*)classname), "_");
+			classnames[0] = strtok(strdup(classname), "_");
 			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
 				numfound++;
 			}
@@ -2850,7 +2850,7 @@ int Actor::GetDexterityAC() const
 		// the maximum dexterity bonus isn't stored,
 		// but can reliably be calculated from 8-spell failure (except for robes, which have no limit)
 		ieWord armtype = inventory.GetArmorItemType();
-		int armor = (int) core->GetArmorFailure(armtype);
+		int armor = core->GetArmorFailure(armtype);
 
 		if (armor) {
 			armor = 8-armor;

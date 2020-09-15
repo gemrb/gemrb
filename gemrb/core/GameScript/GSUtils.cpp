@@ -2129,14 +2129,12 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( VarName, value, NoCreate);
-		}
-		else if (InDebug&ID_VARIABLES) {
+		} else if (InDebug & ID_VARIABLES) {
 			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
 				Context, VarName);
 		}
-	}
-	else {
-		game->locals->SetAt( VarName, ( ieDword ) value, NoCreate );
+	} else {
+		game->locals->SetAt(VarName, value, NoCreate);
 	}
 }
 
@@ -2171,14 +2169,12 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
-		}
-		else if (InDebug&ID_VARIABLES) {
+		} else if (InDebug & ID_VARIABLES) {
 			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
 				VarName);
 		}
-	}
-	else {
-		game->locals->SetAt( poi, ( ieDword ) value, NoCreate );
+	} else {
+		game->locals->SetAt(poi, value, NoCreate);
 	}
 }
 

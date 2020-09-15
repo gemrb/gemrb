@@ -1008,11 +1008,11 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 	//convert to signed so -1 doesn't turn to an astronomical number
 	if (type == 16) { // natural AC
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if ((signed)target->AC.GetNatural() > (signed)fx->Parameter1) {
+			if (target->AC.GetNatural() > (signed) fx->Parameter1) {
 				target->AC.SetNatural(fx->Parameter1);
 			}
 		} else {
-			if ((signed)target->AC.GetTotal() > (signed)fx->Parameter1) {
+			if (target->AC.GetTotal() > (signed) fx->Parameter1) {
 				// previously we were overriding the whole stat, but now we can be finegrained
 				// and reuse the deflection bonus, since iwd2 has its own version of this effect
 				target->AC.SetDeflectionBonus(- (target->AC.GetNatural()-fx->Parameter1));
@@ -5439,7 +5439,7 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	delete newfx;
 
 	//remove the maximum hp bonus
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 

@@ -2739,7 +2739,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
-	bool interrupt = (int) RAND(0, 99) < chance;
+	bool interrupt = RAND(0, 99) < chance;
 	unsigned int spawncount = 0;
 	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
