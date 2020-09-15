@@ -27,7 +27,7 @@ jobs:
           TOKEN: ${{ secrets.COVERITY_SCAN_TOKEN }}
 
       - name: Run CMake
-        run: cmake -DINSOURCEBUILD=1 -DDISABLE_WERROR=1
+        run: cmake -DINSOURCEBUILD=1 -DDISABLE_WERROR=1 .
 
       - name: Build with cov-build
         run: |
