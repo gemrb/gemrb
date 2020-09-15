@@ -72,9 +72,11 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
 #endif
 
+#if SDL_VERSION_ATLEAST(2, 0, 10)
 	if (sdl2_runtime_version >= SDL_VERSIONNUM(2,0,10)) {
 		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 	}
+#endif
 
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 #if USE_OPENGL_BACKEND
