@@ -466,7 +466,7 @@ public:
 	void StartRainOrSnow(bool conditional, int weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/** Adds or removes gold */
-	void AddGold(ieDword add);
+	void AddGold(int add);
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add, bool fatigue=true);
 	/** Runs the script engine on the global script and the area scripts

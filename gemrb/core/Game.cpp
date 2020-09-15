@@ -1422,17 +1422,13 @@ void Game::SetControlStatus(unsigned int value, int mode)
 	core->SetEventFlag(EF_CONTROL);
 }
 
-void Game::AddGold(ieDword add)
+void Game::AddGold(int add)
 {
 	if (!add) {
 		return;
 	}
 	ieDword old = PartyGold;
-	if (signed(PartyGold + add) < 0) {
-		PartyGold = 0;
-	} else {
-		PartyGold += add;
-	}
+	PartyGold = std::max(0, signed(PartyGold) + add);
 	if (old<PartyGold) {
 		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, DMC_GOLD, PartyGold-old);
 	} else {

@@ -6972,7 +6972,7 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (flag) {
-		game->AddGold((ieDword) Gold);
+		game->AddGold(Gold);
 	} else {
 		game->PartyGold=Gold;
 	}

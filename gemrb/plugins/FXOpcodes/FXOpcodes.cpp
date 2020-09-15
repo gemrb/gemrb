@@ -3411,13 +3411,13 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_MOD( IE_GOLD );
 		return FX_NOT_APPLIED;
 	}
-	ieDword gold;
+	int gold;
 	Game *game = core->GetGame();
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
 			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
-				gold = (ieDword) -fx->Parameter1;
+				gold = -fx->Parameter1;
 			} else {
 				gold = fx->Parameter1;
 			}
@@ -3429,7 +3429,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			gold = game->PartyGold*fx->Parameter1/100-game->PartyGold;
 			break;
 		default:
-			gold = (ieDword) -fx->Parameter1;
+			gold = -fx->Parameter1;
 			break;
 	}
 	game->AddGold (gold);
