@@ -877,21 +877,27 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (!step) {
 		step = path;
 	}
+
+	PathNode *start = step->Next;
+	unsigned int steps = 0;
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
-		step = step->Next;
-		if (!walk_speed) {
-			timeStartStep = time;
-			break;
+		unsigned int count = Speed;
+		while (step->Next && count) {
+			++steps;
+			step = step->Next;
+			--count;
 		}
 		timeStartStep = timeStartStep + walk_speed;
+
+		if (!walk_speed) {
+			break;
+		}
 	}
 
-	if (ExtFlags&PEF_CONTINUE) {
-		// FIXME: should this depth be > 1?
-		// Also, should we look behind as well?
+	if (ExtFlags & PEF_CONTINUE) {
+		// check for every step along the way
 		// the test case is lightning bolt, its a long projectile,
-		// so its possible we should search starting from step->Parent with depth 2
-		LineTarget(step, 1);
+		LineTarget(start, steps);
 	}
 
 	SetOrientation (step->orient, false);
@@ -945,10 +951,6 @@ void Projectile::NextTarget(const Point &p)
 {
 	ClearPath();
 	Destination = p;
-	//call this with destination
-	if (path) {
-		return;
-	}
 	if (!Speed) {
 		Pos = Destination;
 		return;
@@ -965,7 +967,7 @@ void Projectile::NextTarget(const Point &p)
 	}
 
 	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
-	path = area->GetLine( Pos, Destination, Speed, Orientation, flags);
+	path = area->GetLine(Pos, Destination, 1, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)
