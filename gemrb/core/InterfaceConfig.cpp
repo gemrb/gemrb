@@ -99,14 +99,6 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 	isValid = false;
 	FileStream* config = new FileStream();
 
-#ifdef VITA
-    char path[_MAX_PATH] = "ux0:/data/GemRB/GemRB.cfg";
-    if (config->Open(path) \
-	&& InitWithINIData(config)) { \
-		goto done; \
-	}
-#endif
-
 	// skip arg0 (it is just gemrb)
 	for (int i=1; i < argc; i++) {
 		if (stricmp(argv[i], "-c") == 0) {
@@ -170,6 +162,7 @@ if (config->Open(path) \
 #endif
 
 #ifdef VITA
+		path[0] = '\0';
 		strcat(path, "ux0:/data/GemRB/GemRB.cfg");
 		ATTEMPT_INIT
 #endif
