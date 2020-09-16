@@ -2372,7 +2372,7 @@ int GameScript::NumCreatureVsParty(Scriptable *Sender, const Trigger *parameters
 		obj = new Object();
 	}
 	int value = GetObjectCount(Sender, obj);
-	if (obj->isNull()) obj->Release();
+	if (!obj->isNull()) obj->Release();
 	value -= core->GetGame()->GetPartySize(true);
 	return value == parameters->int0Parameter;
 }
@@ -2384,7 +2384,7 @@ int GameScript::NumCreatureVsPartyGT(Scriptable *Sender, const Trigger *paramete
 		obj = new Object();
 	}
 	int value = GetObjectCount(Sender, obj);
-	if (obj->isNull()) obj->Release();
+	if (!obj->isNull()) obj->Release();
 	value -= core->GetGame()->GetPartySize(true);
 	return value > parameters->int0Parameter;
 }
@@ -2396,7 +2396,7 @@ int GameScript::NumCreatureVsPartyLT(Scriptable *Sender, const Trigger *paramete
 		obj = new Object();
 	}
 	int value = GetObjectCount(Sender, obj);
-	if (obj->isNull()) obj->Release();
+	if (!obj->isNull()) obj->Release();
 	value -= core->GetGame()->GetPartySize(true);
 	return value < parameters->int0Parameter;
 }
