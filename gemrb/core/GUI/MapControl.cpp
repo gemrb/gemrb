@@ -121,7 +121,7 @@ MapControl::~MapControl(void)
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(const Region& rgn)
+void MapControl::DrawFog(const Region& rgn) const
 {
 	ieWord XWin = rgn.x;
 	ieWord YWin = rgn.y;

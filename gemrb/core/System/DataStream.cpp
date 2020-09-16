@@ -207,11 +207,11 @@ int DataStream::ReadLine(void* buf, unsigned int maxlen)
 	while (i < ( maxlen - 1 )) {
 		char ch;
 		Read(&ch, 1);
-		if (( ( char ) ch ) == '\n')
+		if (ch == '\n')
 			break;
-		if (( ( char ) ch ) == '\t')
+		if (ch == '\t')
 			ch = ' ';
-		if (( ( char ) ch ) != '\r')
+		if (ch != '\r')
 			p[i++] = ch;
 		if (Pos == size)
 			break;

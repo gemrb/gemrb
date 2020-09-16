@@ -4854,7 +4854,7 @@ static PyObject* GemRB_Button_SetFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Control* btn = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	Control *btn = GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
 	}
@@ -4909,7 +4909,7 @@ static PyObject* GemRB_TextArea_SetFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Control* ta = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+	Control *ta = GetControl(WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
 	if (!ta) {
 		return NULL;
 	}
@@ -4949,7 +4949,7 @@ static PyObject* GemRB_ScrollBar_SetDefaultScrollBar(PyObject * /*self*/, PyObje
 		return AttributeError( GemRB_ScrollBar_SetDefaultScrollBar__doc );
 	}
 
-	Control* sb = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
+	Control *sb = GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
 	if (!sb) {
 		return NULL;
 	}
@@ -7005,7 +7005,7 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (flag) {
-		game->AddGold((ieDword) Gold);
+		game->AddGold(Gold);
 	} else {
 		game->PartyGold=Gold;
 	}
@@ -8982,7 +8982,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	if (!container) {
 		return RuntimeError("No current container!");
 	}
-	if (index>=(int) container->inventory.GetSlotCount()) {
+	if (index >= container->inventory.GetSlotCount()) {
 		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
@@ -9075,7 +9075,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 
 	Sound[0]=0;
 	if (action) { //get stuff from container
-		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
+		if (Slot < 0 || Slot >= container->inventory.GetSlotCount()) {
 			return RuntimeError("Invalid Container slot!");
 		}
 
@@ -9767,7 +9767,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
-	if (index>=(int) store->GetRealStockSize()) {
+	if (index >= store->GetRealStockSize()) {
 		Log(WARNING, "GUIScript", "Item is not available???");
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -14661,7 +14661,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	Actor* attacker = game->FindPC((int) game->GetSelectedPCSingle() );
+	Actor *attacker = game->FindPC(game->GetSelectedPCSingle());
 	if (!attacker) {
 		Log(WARNING, "GUIScript", "No thief found!");
 		Py_INCREF( Py_None );

@@ -710,7 +710,7 @@ bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
 	return false;
 }
 
-bool Scriptable::MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param) {
+bool Scriptable::MatchTriggerWithObject(unsigned short id, const Object *obj, ieDword param) {
 	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
 		TriggerEntry &trigger = *m;
 		if (trigger.triggerID != id)
@@ -1226,7 +1226,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;
 		}
-		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
+		if (detective->GetSkill(IE_SPELLCRAFT) <= 0) {
 			continue;
 		}
 
@@ -2024,9 +2024,9 @@ Movable::~Movable(void)
 	}
 }
 
-int Movable::GetPathLength()
+int Movable::GetPathLength() const
 {
-	PathNode *node = GetNextStep(0);
+	const PathNode *node = GetNextStep(0);
 	if (!node) return 0;
 
 	int i = 0;
@@ -2037,7 +2037,7 @@ int Movable::GetPathLength()
 	return i;
 }
 
-PathNode *Movable::GetNextStep(int x)
+PathNode *Movable::GetNextStep(int x) const
 {
 	if (!step) {
 		error("GetNextStep", "Hit with step = null");
@@ -2049,7 +2049,7 @@ PathNode *Movable::GetNextStep(int x)
 	return node;
 }
 
-Point Movable::GetMostLikelyPosition()
+Point Movable::GetMostLikelyPosition() const
 {
 	if (!path) {
 		return Pos;
@@ -2058,7 +2058,7 @@ Point Movable::GetMostLikelyPosition()
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
 	int halfway = GetPathLength()/2;
-	PathNode *node = GetNextStep(halfway);
+	const PathNode *node = GetNextStep(halfway);
 	if (node) {
 		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
 	}

@@ -337,7 +337,7 @@ void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	Actor* actor = ( Actor* ) scr;
 	if (parameters->int1Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
@@ -1260,7 +1260,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 
 	Point p;
 	Actor* actor = ( Actor* ) tar;
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	p.fromDword(value);
 	actor->SetPosition(p, true );
 	Sender->ReleaseCurrentAction();
@@ -1845,7 +1845,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
+	value = CheckVariable(target, parameters->string0Parameter);
 	Point p;
 	p.fromDword(value);
 
@@ -1885,7 +1885,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	//don't break on bad values
 	if (parameters->int0Parameter >= 10) return;
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	bool force, restart;
 
@@ -1913,7 +1913,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 
 void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->PlayAreaSong(3, 1, 1);
 }
@@ -2173,9 +2173,7 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 //same as PlaySequence, but the value comes from a variable
 void GameScript::PlaySequenceGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword value;
-
-	value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	PlaySequenceCore(Sender, parameters, value);
 }
 
@@ -2873,7 +2871,7 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 //this apparently doesn't check the gold, thus could be used from non actors
 void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword gold = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword gold = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	if (Sender->Type == ST_ACTOR) {
 		Actor* act = ( Actor* ) Sender;
 		ieDword mygold = act->GetStat(IE_GOLD);
@@ -4871,12 +4869,12 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		return;
 	}
 
-	Actor *act = (Actor *) Sender;
+	const Actor *act = (const Actor *) Sender;
 	const Actor *target;
 
 	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
@@ -5418,14 +5416,14 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
+	const Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!tar) {
 		// target died on us
 		return;
 	}
-	Actor *actor = NULL;
+	const Actor *actor = nullptr;
 	if (tar->Type == ST_ACTOR) {
-		actor = (Actor *) tar;
+		actor = (const Actor *) tar;
 	}
 
 	int flags = parameters->int0Parameter;
@@ -6131,7 +6129,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
+	const WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
 	if (!wmap) {
 		//no such starting area
 		return;
@@ -6146,7 +6144,7 @@ void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* paramet
 void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 1;
@@ -6157,7 +6155,7 @@ void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 0;

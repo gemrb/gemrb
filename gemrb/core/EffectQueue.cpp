@@ -826,7 +826,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		return false;
 	}
 
-	ieDword level = (ieDword) target->GetXPLevel( true );
+	ieDword level = target->GetXPLevel(true);
 	//return true if resisted
 	if ((signed)fx->MinAffectedLevel > 0) {
 		if ((signed)level < (signed)fx->MinAffectedLevel) {

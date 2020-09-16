@@ -1008,11 +1008,11 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 	//convert to signed so -1 doesn't turn to an astronomical number
 	if (type == 16) { // natural AC
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if ((signed)target->AC.GetNatural() > (signed)fx->Parameter1) {
+			if (target->AC.GetNatural() > (signed) fx->Parameter1) {
 				target->AC.SetNatural(fx->Parameter1);
 			}
 		} else {
-			if ((signed)target->AC.GetTotal() > (signed)fx->Parameter1) {
+			if (target->AC.GetTotal() > (signed) fx->Parameter1) {
 				// previously we were overriding the whole stat, but now we can be finegrained
 				// and reuse the deflection bonus, since iwd2 has its own version of this effect
 				target->AC.SetDeflectionBonus(- (target->AC.GetNatural()-fx->Parameter1));
@@ -3411,13 +3411,13 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_MOD( IE_GOLD );
 		return FX_NOT_APPLIED;
 	}
-	ieDword gold;
+	int gold;
 	Game *game = core->GetGame();
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
 			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
-				gold = (ieDword) -fx->Parameter1;
+				gold = -fx->Parameter1;
 			} else {
 				gold = fx->Parameter1;
 			}
@@ -3429,7 +3429,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			gold = game->PartyGold*fx->Parameter1/100-game->PartyGold;
 			break;
 		default:
-			gold = (ieDword) -fx->Parameter1;
+			gold = -fx->Parameter1;
 			break;
 	}
 	game->AddGold (gold);
@@ -4929,12 +4929,11 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_remove_creature(%2d)", fx->Opcode);
 
-	Map *map = NULL;
+	const Map *map;
 
 	if (target) {
 		map = target->GetCurrentArea();
-	}
-	else {
+	} else {
 		map = core->GetGame()->GetCurrentArea();
 	}
 	Actor *actor = target;
@@ -5440,7 +5439,7 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	delete newfx;
 
 	//remove the maximum hp bonus
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 
@@ -6131,7 +6130,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// get the actor to cast spells at
 	Actor *actor = NULL;
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
 	switch (fx->Parameter1) {
@@ -7177,7 +7176,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (map) {
 		Object oC;
 		oC.objectFields[0]=EA_ENEMY;
@@ -7187,7 +7186,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		int rnd = core->Roll(1,tgts->Count(),-1);
-		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
+		const Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
@@ -7565,7 +7564,7 @@ int fx_right_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_tracks (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_reveal_tracks(%2d): Distance: %d", fx->Opcode, fx->Parameter1);
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;

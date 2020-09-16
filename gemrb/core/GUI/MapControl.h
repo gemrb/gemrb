@@ -49,7 +49,7 @@ class GEM_EXPORT MapControl : public Control {
 protected:
 	/** Draws the Control on the Output Display */
 	void DrawInternal(Region& drawFrame);
-	void DrawFog(const Region& rgn);
+	void DrawFog(const Region& rgn) const;
 public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;

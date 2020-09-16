@@ -48,10 +48,8 @@ bool ACMReader::Open(DataStream* stream)
 	str->ReadWord( &hdr.rate );
 	ieWord tmpword;
 	str->ReadWord( &tmpword );
-	//subblocks = (int) (tmpword&0xfff);
-	//levels = (int) (tmpword>>12);
-	subblocks = (int) (tmpword>>4);
-	levels = (int) (tmpword&15);
+	subblocks = tmpword >> 4;
+	levels = tmpword & 15;
 
 	if (hdr.signature != IP_ACM_SIG) {
 		return false;

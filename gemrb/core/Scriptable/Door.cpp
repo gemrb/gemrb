@@ -82,7 +82,7 @@ Door::~Door(void)
 	}
 }
 
-void Door::ImpedeBlocks(int count, Point *points, unsigned char value)
+void Door::ImpedeBlocks(int count, Point *points, unsigned char value) const
 {
 	for(int i = 0;i<count;i++) {
 		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_NOTDOOR;
@@ -198,7 +198,7 @@ int Door::IsOpen() const
 }
 
 //also mark actors to fix position
-bool Door::BlockedOpen(int Open, int ForceOpen)
+bool Door::BlockedOpen(int Open, int ForceOpen) const
 {
 	bool blocked;
 	int count;
@@ -301,7 +301,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 }
 
 // return true if the door isn't secret or if it is, but was already discovered
-bool Door::Visible()
+bool Door::Visible() const
 {
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }

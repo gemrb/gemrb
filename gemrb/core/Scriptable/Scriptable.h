@@ -41,6 +41,7 @@ class Highlightable;
 class InfoPoint;
 class Map;
 class Movable;
+class Object;
 struct PathNode;
 class Scriptable;
 class Selectable;
@@ -345,7 +346,7 @@ public:
 	void InitTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
-	bool MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param = 0);
+	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0);
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0);
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
@@ -499,12 +500,12 @@ public:
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
-	PathNode *GetNextStep(int x);
+	PathNode *GetNextStep(int x) const;
 	inline PathNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return pathTries; }
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
-	int GetPathLength();
+	int GetPathLength() const;
 //inliners to protect data consistency
 	inline PathNode * GetStep() {
 		if (!step) {
@@ -542,7 +543,7 @@ public:
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */
-	Point GetMostLikelyPosition();
+	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
 };
 

@@ -289,7 +289,7 @@ Actor* Game::FindNPC(const char *scriptingname)
 	return NULL;
 }
 
-Actor *Game::GetGlobalActorByGlobalID(ieDword globalID)
+Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 {
 	for (auto pc : PCs) {
 		if (pc->GetGlobalID() == globalID) {
@@ -1422,17 +1422,13 @@ void Game::SetControlStatus(unsigned int value, int mode)
 	core->SetEventFlag(EF_CONTROL);
 }
 
-void Game::AddGold(ieDword add)
+void Game::AddGold(int add)
 {
 	if (!add) {
 		return;
 	}
 	ieDword old = PartyGold;
-	if (signed(PartyGold + add) < 0) {
-		PartyGold = 0;
-	} else {
-		PartyGold += add;
-	}
+	PartyGold = std::max(0, signed(PartyGold) + add);
 	if (old<PartyGold) {
 		displaymsg->DisplayConstantStringValue( STR_GOTGOLD, DMC_GOLD, PartyGold-old);
 	} else {
@@ -1604,7 +1600,7 @@ void Game::UpdateScripts()
 
 		//starting from 0, so we see the most recent master area first
 		for(unsigned int i=0;i<idx;i++) {
-			DelMap( (unsigned int) i, false );
+			DelMap(i, false);
 		}
 	}
 
@@ -2143,7 +2139,7 @@ bool Game::IsDay()
 	return true;
 }
 
-void Game::ChangeSong(bool always, bool force)
+void Game::ChangeSong(bool always, bool force) const
 {
 	int Song;
 	static int BattleSong = 0;

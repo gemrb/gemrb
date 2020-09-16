@@ -83,7 +83,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 {
 	assert( m_pHashTable != NULL ); // never call on empty map
 
-	Variables::MyAssoc* pAssocRet = ( Variables::MyAssoc* ) rNextPosition;
+	Variables::MyAssoc *pAssocRet = rNextPosition;
 
 	if (pAssocRet == NULL) {
 		// find the first association
@@ -105,7 +105,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 	// fill in return data
 	rKey = pAssocRet->key;
 	rValue = pAssocRet->Value.nValue;
-	return ( iterator ) pAssocNext;
+	return pAssocNext;
 }
 
 Variables::Variables(int nBlockSize, int nHashTableSize)

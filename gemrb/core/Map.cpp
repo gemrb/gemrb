@@ -478,7 +478,8 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	//delete the original searchmap
 	delete sr;
 }
-void Map::AutoLockDoors() {
+void Map::AutoLockDoors() const
+{
 	GetTileMap()->AutoLockDoors();
 }
 
@@ -503,13 +504,13 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		//perform autosave
 		core->GetSaveGameIterator()->CreateSaveGame(0, false);
 	}
-	Map* map = game->GetMap(area, false);
+	const Map *map = game->GetMap(area, false);
 	if (!map) {
 		Log(ERROR, "Map", "Invalid map: %s", area);
 		command[0]=0;
 		return;
 	}
-	Entrance* ent = NULL;
+	const Entrance *ent = nullptr;
 	if (entrance[0]) {
 		ent = map->GetEntrance( entrance );
 		if (!ent) {
@@ -1006,7 +1007,7 @@ retry:
 	return a;
 }
 
-Particles *Map::GetNextSpark(spaIterator &iter) const
+Particles *Map::GetNextSpark(const spaIterator &iter) const
 {
 	if (iter==particles.end()) {
 		return NULL;
@@ -1056,7 +1057,7 @@ int Map::GetTrapCount(proIterator &iter) const
 
 
 //doesn't increase iterator, because we might need to erase it from the list
-VEFObject *Map::GetNextScriptedAnimation(scaIterator &iter) const
+VEFObject *Map::GetNextScriptedAnimation(const scaIterator &iter) const
 {
 	if (iter==vvcCells.end()) {
 		return NULL;
@@ -1875,7 +1876,7 @@ Actor *Map::GetActorByScriptName(const char *name) const
 	return NULL;
 }
 
-int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty) const
+int Map::GetActorInRect(Actor**& actorlist, const Region& rgn, bool onlyparty) const
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
@@ -2075,7 +2076,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	return sc;
 }
 
-void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg)
+void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg) const
 {
 	if (!Walls) {
 		return;
@@ -2701,7 +2702,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	}
 }
 
-void Map::UpdateSpawns()
+void Map::UpdateSpawns() const
 {
 	//don't reactivate if there are spawns left in the area
 	if (SpawnsAlive()) {
@@ -2738,7 +2739,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
-	bool interrupt = (int) RAND(0, 99) < chance;
+	bool interrupt = RAND(0, 99) < chance;
 	unsigned int spawncount = 0;
 	int spawnamount = core->GetGame()->GetTotalPartyLevel(true) * RestHeader.Difficulty;
 	if (spawnamount < 1) spawnamount = 1;
@@ -3240,7 +3241,7 @@ void Map::SetTrackString(ieStrRef strref, int flg, int difficulty)
 	trackDiff = (ieWord) difficulty;
 }
 
-bool Map::DisplayTrackString(Actor *target) const
+bool Map::DisplayTrackString(const Actor *target) const
 {
 	// this stat isn't saved
 	// according to the HoW manual the chance of success is:

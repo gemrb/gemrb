@@ -937,7 +937,7 @@ bool Interface::ReadDamageTypeTable() {
 		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
-		DamageInfoMap.insert(std::make_pair ((ieDword)di.value, di));
+		DamageInfoMap.insert(std::make_pair(di.value, di));
 	}
 
 	return true;
@@ -2156,7 +2156,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 			return "wmp";
 
 		default:
-			Log(ERROR, "Interface", "No extension associated to class ID: %lu", (unsigned long) type );
+			Log(ERROR, "Interface", "No extension associated to class ID: %lu", type);
 	}
 	return NULL;
 }
@@ -4118,7 +4118,7 @@ bool Interface::InitItemTypes()
 				k <<= 1;
 			}
 			//we let any items in the inventory
-			slotmatrix[i] = (ieDword) value | SLOT_INVENTORY;
+			slotmatrix[i] = value | SLOT_INVENTORY;
 		}
 	}
 
@@ -4833,7 +4833,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			i=Roll(1,itemlist->Count,-1);
 		}
 		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
-		char *p=(char *) strchr(NewItem,'*');
+		char *p = strchr(NewItem, '*');
 		if (p) {
 			*p=0; //doing this so endptr is ok
 			k=strtol(p+1,NULL,10);

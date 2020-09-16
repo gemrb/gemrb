@@ -81,7 +81,7 @@ void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
 void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations);
-void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
+void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
 void PolymorphCopyCore(Actor *src, Actor *tar);
@@ -98,7 +98,7 @@ GEM_EXPORT ieDword ResolveSpellNumber(const ieResRef spellres);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const Point &enter, int flags, int wait);
 void GoNear(Scriptable *Sender, const Point &p);
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release=0);
+void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release = 0);
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
 
 #define NO_OPERATION -1
@@ -128,7 +128,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead);
-GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
+GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);

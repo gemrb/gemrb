@@ -239,7 +239,7 @@ public:
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 	Spawn();
 	~Spawn() { if(Creatures) free(Creatures); }
-	unsigned int GetCreatureCount() { return Count; }
+	unsigned int GetCreatureCount() const { return Count; }
 };
 
 class TerrainSounds {
@@ -317,10 +317,10 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJ
 #define PR_DISPLAY 1
 #define PR_IGNORE  2
 
-typedef std::list<AreaAnimation*>::iterator aniIterator;
-typedef std::list<VEFObject*>::iterator scaIterator;
+typedef std::list<AreaAnimation*>::const_iterator aniIterator;
+typedef std::list<VEFObject*>::const_iterator scaIterator;
 typedef std::list<Projectile*>::const_iterator proIterator;
-typedef std::list<Particles*>::iterator spaIterator;
+typedef std::list<Particles*>::const_iterator spaIterator;
 
 
 class GEM_EXPORT Map : public Scriptable {
@@ -385,7 +385,7 @@ public:
 	void ChangeTileMap(Image* lm, Sprite2D* sm);
 	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
-	void AutoLockDoors();
+	void AutoLockDoors() const;
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos) const;
 	void DoStepForActor(Actor *actor, int walkScale, ieDword time) const;
@@ -402,7 +402,7 @@ public:
 	void DrawMap(Region screen);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
 	void AddAnimation(AreaAnimation* anim);
-	aniIterator GetFirstAnimation() { return animations.begin(); }
+	aniIterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
 		if (iter == animations.end()) {
@@ -422,7 +422,7 @@ public:
 	}
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
 		unsigned int width, unsigned int height, int flag, bool areaanim = false);
-	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
+	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg) const;
 	void Shout(Actor* actor, int shoutID, bool global);
 	void ActorSpottedByPlayer(Actor *actor) const;
 	void InitActors();
@@ -453,7 +453,7 @@ public:
 	bool SpawnsAlive() const;
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
-	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty) const;
+	int GetActorInRect(Actor**& actors, const Region& rgn, bool onlyparty) const;
 	int GetActorCount(bool any) const;
 	//fix actors position if required
 	void JumpActors(bool jump);
@@ -587,7 +587,7 @@ public:
 	//tracking stuff
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
 	//returns true if tracking failed
-	bool DisplayTrackString(Actor *actor) const;
+	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
 	unsigned short GetInternalSearchMap(int x, int y) const;
@@ -597,8 +597,8 @@ public:
 
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
-	Particles *GetNextSpark(spaIterator &iter) const;
-	VEFObject *GetNextScriptedAnimation(scaIterator &iter) const;
+	Particles *GetNextSpark(const spaIterator &iter) const;
+	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, int &index) const;
 	Container *GetNextPile (int &index) const;
 	void DrawPile (Region screen, int pileidx) const;
@@ -613,7 +613,7 @@ private:
 	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
 	void DrawPortal(InfoPoint *ip, int enable);
-	void UpdateSpawns();
+	void UpdateSpawns() const;
 	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 };
 

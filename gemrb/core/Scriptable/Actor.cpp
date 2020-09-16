@@ -2361,7 +2361,7 @@ static void InitActorTables()
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
 			char **classnames = (char **) calloc(tmpbits, sizeof(char *));
-			classnames[0] = (char*)strtok(strdup((char*)classname), "_");
+			classnames[0] = strtok(strdup(classname), "_");
 			while (numfound<tmpbits && (classnames[numfound] = strdup(strtok(NULL, "_")))) {
 				numfound++;
 			}
@@ -2850,7 +2850,7 @@ int Actor::GetDexterityAC() const
 		// the maximum dexterity bonus isn't stored,
 		// but can reliably be calculated from 8-spell failure (except for robes, which have no limit)
 		ieWord armtype = inventory.GetArmorItemType();
-		int armor = (int) core->GetArmorFailure(armtype);
+		int armor = core->GetArmorFailure(armtype);
 
 		if (armor) {
 			armor = 8-armor;
@@ -3740,7 +3740,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
-			wchar_t tmp[3];
+			wchar_t tmp[4];
 			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L" %d", ret);
 			String msg = *str + tmp;
 			delete str;
@@ -4472,7 +4472,7 @@ bool Actor::OverrideActions()
 	return false;
 }
 
-void Actor::Panic(Scriptable *attacker, int panicmode)
+void Actor::Panic(const Scriptable *attacker, int panicmode)
 {
 	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
 		print("Already panicked");
@@ -8574,7 +8574,7 @@ bool Actor::HasBodyHeat() const
 
 void Actor::Draw(const Region &screen)
 {
-	Map* area = GetCurrentArea();
+	const Map *area = GetCurrentArea();
 	if (!area) {
 		InternalFlags &= ~IF_TRIGGER_AP;
 		return;
@@ -11027,7 +11027,7 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable(ieResRef spellRef)
+bool Actor::Untargetable(ieResRef spellRef) const
 {
 	if (spellRef[0]) {
 		Spell *spl = gamedata->GetSpell(spellRef, true);

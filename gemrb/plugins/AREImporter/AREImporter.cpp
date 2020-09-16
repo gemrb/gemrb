@@ -1413,7 +1413,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		EffectQueue *fxqueue = new EffectQueue();
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
-		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
+		ReadEffects(fs, fxqueue, TrapEffectCount);
 		Actor * caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
@@ -1539,7 +1539,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += InfoPointsCount * 0xc4;
 	SpawnOffset = headersize;
 
-	SpawnCount = (ieDword) map->GetSpawnCount();
+	SpawnCount = map->GetSpawnCount();
 	headersize += SpawnCount * 0xc8;
 	EntrancesOffset = headersize;
 
@@ -1576,7 +1576,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = (ieDword) map->GetAmbientCount(true);
+	AmbiCount = map->GetAmbientCount(true);
 	headersize += AmbiCount * 0xd4;
 	VariablesOffset = headersize;
 
@@ -1598,7 +1598,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 	TrapCount = (ieDword) map->GetTrapCount(piter);
 	for(i=0;i<TrapCount;i++) {
-		Projectile *pro = map->GetNextTrap(piter);
+		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
@@ -1612,7 +1612,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	NoteOffset = headersize;
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
-	NoteCount = (ieDword) map->GetMapNoteCount();
+	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (pst?0x214: 0x34);
 	SongHeader = headersize;
 
@@ -1623,7 +1623,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	return headersize;
 }
 
-int AREImporter::PutHeader(DataStream *stream, Map *map)
+int AREImporter::PutHeader(DataStream *stream, const Map *map)
 {
 	char Signature[56];
 	ieDword tmpDword = 0;
@@ -1693,7 +1693,7 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &tmpDword);
 
 	//the saved area script is in the last script slot!
-	GameScript *s = map->Scripts[MAX_SCRIPTS-1];
+	const GameScript *s = map->Scripts[MAX_SCRIPTS - 1];
 	if (s) {
 		stream->WriteResRef( s->GetName() );
 	} else {
@@ -1729,7 +1729,7 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	char filling[8];
 	ieWord tmpWord = 0;
@@ -1793,7 +1793,7 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) d->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteResRef( d->KeyResRef);
-		GameScript *s = d->Scripts[0];
+		const GameScript *s = d->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -1826,7 +1826,7 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImporter::PutPoints( DataStream *stream, Point *p, unsigned int count)
+int AREImporter::PutPoints(DataStream *stream, const Point *p, unsigned int count)
 {
 	ieWord tmpWord;
 	unsigned int j;
@@ -1840,7 +1840,7 @@ int AREImporter::PutPoints( DataStream *stream, Point *p, unsigned int count)
 	return 0;
 }
 
-int AREImporter::PutVertices( DataStream *stream, Map *map)
+int AREImporter::PutVertices(DataStream *stream, const Map *map)
 {
 	unsigned int i;
 
@@ -1851,12 +1851,12 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 		PutPoints(stream, c->outline->points, c->outline->count);
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
-		Door *d = map->TMap->GetDoor(i);
+		const Door *d = map->TMap->GetDoor(i);
 		PutPoints(stream, d->open->points, d->open->count);
 		PutPoints(stream, d->closed->points, d->closed->count);
 		PutPoints(stream, d->open_ib, d->oibcount);
@@ -1865,13 +1865,13 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutItems( DataStream *stream, Map *map)
+int AREImporter::PutItems(DataStream *stream, const Map *map)
 {
 	for (unsigned int i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 
 		for(int j=0;j<c->inventory.GetSlotCount();j++) {
-			CREItem *ci = c->inventory.GetSlotItem(j);
+			const CREItem *ci = c->inventory.GetSlotItem(j);
 
 			stream->WriteResRef( ci->ItemResRef);
 			stream->WriteWord( &ci->Expired);
@@ -1884,7 +1884,7 @@ int AREImporter::PutItems( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	char filling[56];
 	ieDword ItemIndex = 0;
@@ -1893,7 +1893,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 
 		//this is the editor name
 		stream->Write( c->GetScriptName(), 32);
@@ -1926,7 +1926,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 		stream->WriteDword( &ItemIndex);
 		stream->WriteDword( &tmpDword);
 		ItemIndex +=tmpDword;
-		GameScript *s = c->Scripts[0];
+		const GameScript *s = c->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -1949,7 +1949,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -1957,7 +1957,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
-		InfoPoint *ip = map->TMap->GetInfoPoint(i);
+		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
 		stream->Write( ip->GetScriptName(), 32);
 		//this is a hack, we abuse a coincidence
@@ -1993,7 +1993,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) ip->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteResRef( ip->KeyResRef);
-		GameScript *s = ip->Scripts[0];
+		const GameScript *s = ip->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -2024,14 +2024,14 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImporter::PutSpawns( DataStream *stream, Map *map)
+int AREImporter::PutSpawns(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 	char filling[56];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<SpawnCount;i++) {
-		Spawn *sp = map->GetSpawn(i);
+		const Spawn *sp = map->GetSpawn(i);
 
 		stream->Write( sp->Name, 32);
 		tmpWord = (ieWord) sp->Pos.x;
@@ -2063,11 +2063,11 @@ int AREImporter::PutSpawns( DataStream *stream, Map *map)
 	return 0;
 }
 
-void AREImporter::PutScript(DataStream *stream, Actor *ac, unsigned int index)
+void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int index)
 {
 	char filling[8];
 
-	GameScript *s = ac->Scripts[index];
+	const GameScript *s = ac->Scripts[index];
 	if (s) {
 		stream->WriteResRef( s->GetName() );
 	} else {
@@ -2076,7 +2076,7 @@ void AREImporter::PutScript(DataStream *stream, Actor *ac, unsigned int index)
 	}
 }
 
-int AREImporter::PutActors( DataStream *stream, Map *map)
+int AREImporter::PutActors(DataStream *stream, const Map *map)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -2148,12 +2148,12 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutAnimations( DataStream *stream, Map *map)
+int AREImporter::PutAnimations(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 
 	aniIterator iter = map->GetFirstAnimation();
-	while(AreaAnimation *an = map->GetNextAnimation(iter) ) {
+	while(const AreaAnimation *an = map->GetNextAnimation(iter)) {
 		stream->Write( an->Name, 32);
 		tmpWord = (ieWord) an->Pos.x;
 		stream->WriteWord( &tmpWord);
@@ -2172,7 +2172,7 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 			stream->WriteDword(&an->Flags);
 		}
 
-		stream->WriteWord( (ieWord *) &an->height);
+		stream->WriteWord((const ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START
 		stream->Write( &an->startchance,1);
@@ -2183,14 +2183,14 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutEntrances( DataStream *stream, Map *map)
+int AREImporter::PutEntrances(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 	char filling[66];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<EntrancesCount;i++) {
-		Entrance *e = map->GetEntrance(i);
+		const Entrance *e = map->GetEntrance(i);
 
 		stream->Write( e->Name, 32);
 		tmpWord = (ieWord) e->Pos.x;
@@ -2204,7 +2204,7 @@ int AREImporter::PutEntrances( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutVariables( DataStream *stream, Map *map)
+int AREImporter::PutVariables(DataStream *stream, const Map *map)
 {
 	char filling[40];
 	Variables::iterator pos=NULL;
@@ -2226,7 +2226,7 @@ int AREImporter::PutVariables( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutAmbients( DataStream *stream, Map *map)
+int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 {
 	char filling[64];
 	ieWord tmpWord;
@@ -2234,7 +2234,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 	memset(filling,0,sizeof(filling) );
 	unsigned int realCount = map->GetAmbientCount();
 	for (unsigned int i=0; i<realCount; i++) {
-		Ambient *am = map->GetAmbient(i);
+		const Ambient *am = map->GetAmbient(i);
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->Write( am->name, 32 );
 		tmpWord = (ieWord) am->origin.x;
@@ -2265,7 +2265,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutMapnotes( DataStream *stream, Map *map)
+int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 {
 	char filling[8];
 	ieDword tmpDword;
@@ -2332,7 +2332,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
+int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -2369,7 +2369,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 			type = pro->GetType()+1;
 			dest = pro->GetDestination();
 			strnuprcpy(name, pro->GetName(), 8);
-			EffectQueue *fxqueue = pro->GetEffects();
+			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();
 			}
@@ -2403,20 +2403,20 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutExplored( DataStream *stream, Map *map)
+int AREImporter::PutExplored(DataStream *stream, const Map *map)
 {
 	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
 	return 0;
 }
 
-int AREImporter::PutTiles( DataStream * stream, Map * map)
+int AREImporter::PutTiles(DataStream *stream, const Map *map)
 {
 	char filling[48];
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<TileCount;i++) {
-		TileObject *am = map->TMap->GetTile(i);
+		const TileObject *am = map->TMap->GetTile(i);
 		stream->Write( am->Name, 32 );
 		stream->WriteResRef( am->Tileset );
 		stream->WriteDword( &am->Flags);
@@ -2431,7 +2431,7 @@ int AREImporter::PutTiles( DataStream * stream, Map * map)
 	return 0;
 }
 
-int AREImporter::PutSongHeader( DataStream *stream, Map *map)
+int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 {
 	int i;
 	char filling[8];
@@ -2458,7 +2458,7 @@ int AREImporter::PutSongHeader( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutRestHeader( DataStream *stream, Map *map)
+int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 {
 	int i;
 	ieDword tmpDword = 0;
@@ -2569,12 +2569,12 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 
 	ieDword i = map->GetTrapCount(piter);
 	while(i--) {
-		Projectile *trap = map->GetNextTrap(piter);
+		const Projectile *trap = map->GetNextTrap(piter);
 		if (!trap) {
 			continue;
 		}
 
-		EffectQueue *fxqueue = trap->GetEffects();
+		const EffectQueue *fxqueue = trap->GetEffects();
 
 		if (!fxqueue) {
 			continue;
