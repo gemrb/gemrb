@@ -95,9 +95,9 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)
 	{
 		vitaDestRect.x = 0;
-        vitaDestRect.y = 0;
-        vitaDestRect.w = width;
-        vitaDestRect.h = height;
+		vitaDestRect.y = 0;
+		vitaDestRect.w = width;
+		vitaDestRect.h = height;
 
 		if (fullscreen)
 		{

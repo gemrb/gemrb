@@ -6670,7 +6670,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 		pch = strtok (NULL, " ,()");
 	}
 
-    if (result.size() >= 3)
+	if (result.size() >= 3)
 	{
 		wi = result[0];
 		ci = result[1];
@@ -15981,8 +15981,8 @@ bool GUIScript::Init(void)
 #ifdef VITA
 	//Py_Initialize crashes on VIta otherwise
 	Py_NoSiteFlag = 1;
-    Py_IgnoreEnvironmentFlag = 1;
-    Py_NoUserSiteDirectory = 1;
+	Py_IgnoreEnvironmentFlag = 1;
+	Py_NoUserSiteDirectory = 1;
 #endif
 
 	Py_Initialize();

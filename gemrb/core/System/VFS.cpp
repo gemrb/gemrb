@@ -138,8 +138,8 @@ static void closedir(DIR* dirp)
 using namespace GemRB;
 
 struct DIR {
-    bool is_first;
-    SceUID descriptor;
+	bool is_first;
+	SceUID descriptor;
 };
 
 struct dirent {
@@ -152,12 +152,12 @@ static dirent de;
 static DIR* opendir(const char* filename)
 {
 	DIR* dirp = (DIR*) malloc(sizeof(DIR));
-    dirp->is_first = 1;
-    dirp->descriptor = sceIoDopen(filename);
+	dirp->is_first = 1;
+	dirp->descriptor = sceIoDopen(filename);
 
-    if (dirp->descriptor <= 0)
+	if (dirp->descriptor <= 0)
 	{
-        return NULL;
+		return NULL;
 	}
 
 	return dirp;
@@ -165,18 +165,18 @@ static DIR* opendir(const char* filename)
 
 static dirent* readdir(DIR* dirp)
 {
-    //vitasdk kind of skips current directory entry..
-    if (dirp->is_first) 
-    {
-        dirp->is_first = 0;
-        strcpy( de.d_name, "." );
+	//vitasdk kind of skips current directory entry..
+	if (dirp->is_first) 
+	{
+		dirp->is_first = 0;
+		strcpy( de.d_name, "." );
 	} 
-    else 
-    {
-        SceIoDirent dir;
-        if (sceIoDread(dirp->descriptor, &dir) <= 0)
-            return NULL;
-        strcpy( de.d_name, dir.d_name );
+	else 
+	{
+		SceIoDirent dir;
+		if (sceIoDread(dirp->descriptor, &dir) <= 0)
+			return NULL;
+		strcpy( de.d_name, dir.d_name );
 	}
 
 	return &de;
@@ -184,7 +184,7 @@ static dirent* readdir(DIR* dirp)
 
 static void closedir(DIR* dirp)
 {
-    sceIoDclose(dirp->descriptor);
+	sceIoDclose(dirp->descriptor);
 	free(dirp);
 }
 
@@ -511,8 +511,8 @@ bool MakeDirectories(const char* path)
 bool MakeDirectory(const char* path)
 {
 #ifdef VITA
-    sceIoMkdir(path, 0777);
-    return true;
+	sceIoMkdir(path, 0777);
+	return true;
 #endif
 
 #ifdef WIN32

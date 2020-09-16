@@ -1341,10 +1341,8 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
-#ifdef VITA
 	CONFIG_INT("VitaPointerSpeed", VitaPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
-#endif
 
 #undef CONFIG_INT
 

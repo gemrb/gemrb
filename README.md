@@ -31,15 +31,21 @@ are both working fine
 ### Build & installation
 ```
 mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DLAYOUT=home -DPREFIX="vitabuild" -DUSE_OPENAL=false -DUSE_FREETYPE=false -DCMAKE_BUILD_TYPE=None -DNOCOLOR=1
+cmake .. -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DSDL_BACKEND=SDL -DSTATIC_LINK=enabled -DDISABLE_WERROR=enabled -DCMAKE_MAKE_PROGRAM=make -DVITA=true -DUSE_OPENAL=false -DUSE_FREETYPE=false -DCMAKE_BUILD_TYPE=None -DNOCOLOR=1
 make
-make install && cd vitabuild/vitabuild/ && make -f Makefile.vita
 ```
-Install gemrb.vpk to your Vita system.
+Generated VPK file is located in build/gemrb folder. Install it to your Vita system.
 
-Copy folders "GUIScripts", "override" and "unhardcoded" from build/vitabuild/vitabuild folder into ux0:data/GemRB/
+Copy folders "GUIScripts", "override" and "unhardcoded" from gemrb folder into ux0:data/GemRB/
 
-Rename GemRB.cfg.vita into GemRB.cfg, copy it to ux0:data/GemRB/ and edit it.
+Rename build/gemrb/GemRB.cfg.sample into GemRB.cfg, copy it to ux0:data/GemRB/ and change the following options:
+
+```
+Bpp=16 #recommended for better performance.
+AudioDriver=sdlaudio
+CachePath=ux0:data/GemRB/Cache2/
+GemRBPath=ux0:data/GemRB/
+```
 
 Debug output can be previewed with psp2shell
 
@@ -64,8 +70,6 @@ Pointer movement speed can be changed with 'VitaPointerSpeed' parameter in GemRB
 Use "Fullscreen=1" to scale game area to native Vita resolution or "Fullscreen=0" to keep game area at the center of the screen.
 
 VitaKeepAspectRatio=1 keeps aspect ratio of original image when scaling. VitaKeepAspectRatio=0 just scales it to 960x544.
-
-VitaBilinear=1 uses bilinear filtering when scaling.
 
 ### Performance
 

@@ -406,7 +406,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		myslots.erase(myslots.begin()+hole);
 		core->DelTree(from, false);
 #ifdef VITA
-        sceIoRemove(from);
+		sceIoRemove(from);
 #else
 		rmdir(from);
 #endif
@@ -709,7 +709,7 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
 #ifdef VITA
-    sceIoRemove(game->GetPath());
+	sceIoRemove(game->GetPath());
 #else
 	rmdir( game->GetPath() );
 #endif

@@ -30,11 +30,7 @@
 #include "win32def.h"
 
 #ifdef VITA
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 #endif
 
 namespace GemRB {

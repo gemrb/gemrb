@@ -119,7 +119,7 @@ ELSE(WIN32)
  ELSE(APPLE)
   if (STATIC_LINK)
 	  TARGET_LINK_LIBRARIES(gemrb ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT}
-		-Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
+		  -Wl,--whole-archive gemrb_core ${plugins} -Wl,--no-whole-archive)
   else (STATIC_LINK)
 	  TARGET_LINK_LIBRARIES(gemrb gemrb_core ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT})
   endif (STATIC_LINK)
