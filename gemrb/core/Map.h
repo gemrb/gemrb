@@ -442,6 +442,7 @@ public:
 	Actor* GetActorByGlobalID(ieDword objectID) const;
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius) const;
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
+	const std::vector<Actor *> &GetAllActors() const { return actors; }
 	Actor *GetActor(const char *Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;

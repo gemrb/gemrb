@@ -187,6 +187,36 @@ unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 	return (unsigned int) ret;
 }
 
+unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptable *s, double *proj) {
+	double t;
+	Point p;
+
+	int len = SquaredDistance(w, v);
+	if (len == 0) {
+		// that's a short line...
+		t = 0.0;
+		p = v;
+	} else {
+		// find the projection of Pos onto the line
+		t = ((s->Pos.x - v.x) * (w.x - v.x) + (s->Pos.y - v.y) * (w.y - v.y)) / (double) len;
+		if (t < 0.0) {
+			// projection beyond the v end of the line
+			p = v;
+		} else if (t > 1.0) {
+			// projection beyond the w end of the line
+			p = w;
+		} else {
+			// projection on the line
+			p = Point(v.x + (w.x - v.x) * t, v.y + (w.y - v.y) * t);
+		}
+	}
+
+	if (proj != NULL) {
+		(*proj) = t;
+	}
+	return PersonalDistance(p, s);
+}
+
 // What's the deal with the spell and item ranges in their descriptions being in feet?
 //
 // Kjeron provided these notes:
