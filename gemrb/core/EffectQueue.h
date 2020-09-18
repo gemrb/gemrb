@@ -256,7 +256,7 @@ public:
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
-	void ModifyAllEffectSources(Point &source);
+	void ModifyAllEffectSources(const Point &source);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }

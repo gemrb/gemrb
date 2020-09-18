@@ -508,7 +508,7 @@ void Projectile::SetDelay(int delay)
 #define WEAPON_FIST        0
 #define WEAPON_BYPASS      0x10000
 
-bool Projectile::FailedIDS(Actor *target) const
+bool Projectile::FailedIDS(const Actor *target) const
 {
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
 	if (ExtFlags&PEF_NOTIDS) {
@@ -780,7 +780,7 @@ void Projectile::EndTravel()
 }
 
 //Note: trails couldn't be higher than VVC, but this shouldn't be a problem
-int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
+int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 {
 /*
 	VEFObject *vef=gamedata->GetVEFObject(BAM,0);
@@ -878,12 +878,10 @@ void Projectile::DoStep(unsigned int walk_speed)
 		step = path;
 	}
 
-	PathNode *start = step->Next;
-	unsigned int steps = 0;
+	PathNode *start = step;
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		unsigned int count = Speed;
 		while (step->Next && count) {
-			++steps;
 			step = step->Next;
 			--count;
 		}
@@ -897,7 +895,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	if (ExtFlags & PEF_CONTINUE) {
 		// check for every step along the way
 		// the test case is lightning bolt, its a long projectile,
-		LineTarget(start, steps);
+		LineTarget(start, step->Next);
 	}
 
 	SetOrientation (step->orient, false);
@@ -1039,7 +1037,7 @@ void Projectile::ClearPath()
 	step = NULL;
 }
 
-int Projectile::CalculateTargetFlag()
+int Projectile::CalculateTargetFlag() const
 {
 	//if there are any, then change phase to exploding
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED;
@@ -1114,9 +1112,9 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
+void Projectile::SetEffectsCopy(EffectQueue *eq, const Point &source)
 {
-	if(effects) delete effects;
+	delete effects;
 	if(!eq) {
 		effects=NULL;
 		return;
@@ -1125,30 +1123,56 @@ void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
 	effects->ModifyAllEffectSources(source);
 }
 
-void Projectile::LineTarget()
+void Projectile::LineTarget() const
 {
-	LineTarget(path, -1);
+	LineTarget(path, nullptr);
 }
 
-void Projectile::LineTarget(PathNode* beg, unsigned int depth)
+void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
 {
-	if(!effects) {
+	if (!effects) {
 		return;
 	}
 
 	Actor *original = area->GetActorByGlobalID(Caster);
-	Actor *prev = NULL;
-	PathNode *iter = beg;
-	while(iter && depth > 0) {
-		Point pos(iter->x,iter->y);
-		Actor *target = area->GetActorInRadius(pos, CalculateTargetFlag(), 1);
-		if (target && target->GetGlobalID()!=Caster && prev!=target) {
-			prev = target;
-	 		int res = effects->CheckImmunity ( target );
-			if (res>0) {
+	int targetFlags = CalculateTargetFlag();
+	const PathNode *iter = beg;
+
+	do {
+		const PathNode *first = iter;
+		const PathNode *last = iter;
+		unsigned int orient = first->orient;
+		while (iter && iter != end && iter->orient == orient) {
+			last = iter;
+			iter = iter->Next;
+		}
+
+		const Point s(first->x, first->y), d(last->x, last->y);
+		const std::vector<Actor *> &actors = area->GetAllActors();
+
+		for (Actor *target : actors) {
+			if (target->GetGlobalID() == Caster) {
+				continue;
+			}
+			if (!target->ValidTarget(targetFlags)) {
+				continue;
+			}
+			double t = 0.0;
+			if (PersonalLineDistance(s, d, target, &t) > 1) {
+				continue;
+			}
+			if (t < 0.0 && first->Parent != nullptr && first->Parent->orient == orient) {
+				// skip; assume we've hit the target before
+				continue;
+			} else if (t > 1.0 && last->Next != nullptr && last->Next->orient == orient) {
+				// skip; assume we'll hit it after
+				continue;
+			}
+
+			if (effects->CheckImmunity(target) > 0) {
 				EffectQueue *eff = effects->CopySelf();
 				eff->SetOwner(original);
-				if(ExtFlags&PEF_RGB) {
+				if (ExtFlags & PEF_RGB) {
 					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
 						RGB >> 8, RGB >> 16, RGB >> 24);
 				}
@@ -1157,9 +1181,7 @@ void Projectile::LineTarget(PathNode* beg, unsigned int depth)
 				delete eff;
 			}
 		}
-		iter = iter->Next;
-		--depth;
-	}
+	} while (iter && iter != end);
 }
 
 //secondary projectiles target all in the explosion radius
@@ -1204,9 +1226,8 @@ void Projectile::SecondaryTarget()
 
 	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
-	std::vector<Actor *>::iterator poi;
-	for (poi = actors.begin(); poi != actors.end(); ++poi) {
-		ieDword Target = (*poi)->GetGlobalID();
+	for (const Actor *actor : actors) {
+		ieDword Target = actor->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
@@ -1214,7 +1235,7 @@ void Projectile::SecondaryTarget()
 		}
 
 		//IDS targeting for area projectiles
-		if (FailedIDS(*poi)) {
+		if (FailedIDS(actor)) {
 			continue;
 		}
 
@@ -1223,8 +1244,8 @@ void Projectile::SecondaryTarget()
 			if(Caster==Target) {
 				continue;
 			}
-			double xdiff = (*poi)->Pos.x-Pos.x;
-			double ydiff = Pos.y-(*poi)->Pos.y;
+			double xdiff = actor->Pos.x - Pos.x;
+			double ydiff = Pos.y - actor->Pos.y;
 			int deg;
 
 			// a dragon will definitely be easier to hit than a mouse
@@ -1269,8 +1290,8 @@ void Projectile::SecondaryTarget()
 			}
 			//if target counting is per HD and this target is an actor, use the xp level field
 			//otherwise count it as one
-			if ((Extension->APFlags&APF_COUNT_HD) && ((*poi)->Type==ST_ACTOR) ) {
-				extension_targetcount-= (*poi)->GetXPLevel(true);
+			if (Extension->APFlags & APF_COUNT_HD) {
+				extension_targetcount -= actor->GetXPLevel(true);
 			} else {
 				extension_targetcount--;
 			}
@@ -1300,7 +1321,7 @@ int Projectile::Update()
 		return 1;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		return 1;
 	}
