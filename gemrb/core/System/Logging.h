@@ -29,8 +29,10 @@
 #include "exports.h"
 #include "win32def.h"
 
-#ifdef VITA
-#include <cstdarg>
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
 #endif
 
 namespace GemRB {

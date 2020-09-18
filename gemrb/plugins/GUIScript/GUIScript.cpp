@@ -6650,41 +6650,9 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 	RESOURCE_DIRECTORY type;
 	int flags = 0;
 
-#ifndef VITA
 	if (!PyArg_ParseTuple( args, "iii|i", &wi, &ci, &type, &flags )) {
 		return AttributeError( GemRB_TextArea_ListResources__doc );
 	}
-#else
-	// Do custom tuple parse here. It can't get any worse anyway, since PyArg_ParseTuple returns wrong values here (wi or ci is 0)
-	// This is pretty damn bad, but so far seems like the only visibly affected place (other (iii|i) parses are accurate)
-	PyObject* objectsRepresentation = PyObject_Repr(args);
-	char* str = PyString_AsString(objectsRepresentation);
-
-	std::vector<int> result;
-	char* pch;
-	pch = strtok (str, " ,()");
-
-	while (pch != NULL)
-	{
-		result.push_back(atoi(pch));
-		pch = strtok (NULL, " ,()");
-	}
-
-	if (result.size() >= 3)
-	{
-		wi = result[0];
-		ci = result[1];
-		type = (RESOURCE_DIRECTORY)result[2];
-
-		if (result.size() >= 4)
-			flags = result[3];
-	}
-	else
-	{
-		Log(ERROR, "VitaTupleParse:", "Something went horribly wrong with that custom parser..");
-		return PyInt_FromLong(0);
-	}
-#endif
 
 	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
 	if (!ta) {

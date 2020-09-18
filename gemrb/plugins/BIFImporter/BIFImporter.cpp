@@ -28,7 +28,7 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
-#ifndef VITA
+#if defined(HAVE_MMAP) || defined(WIN32)
 #include "System/MappedFileMemoryStream.h"
 #endif
 
@@ -83,7 +83,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		}
 	}
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
-#ifndef VITA
+#if defined(HAVE_MMAP) || defined(WIN32)
 	return new MappedFileMemoryStream{path};
 #else
 	return FileStream::OpenFile(path);
@@ -113,7 +113,7 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
-#ifndef VITA
+#if defined(HAVE_MMAP) || defined(WIN32)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
 	char Signature[8];
@@ -151,7 +151,7 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
-#ifndef VITA
+#if defined(HAVE_MMAP) || defined(WIN32)
 	} else {
 		stream = cacheStream;
 #endif

@@ -141,9 +141,16 @@ static bool FindFiles(char* path, std::list<char*> &files)
 #endif  // ! WIN32
 #endif // ! VITA
 
+#ifdef VITA
+
 void LoadPlugins(char* pluginpath)
 {
-#ifndef VITA
+}
+
+#else // VITA
+
+void LoadPlugins(char* pluginpath)
+{
 	std::set<PluginID> libs;
 
 	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
@@ -259,7 +266,8 @@ void LoadPlugins(char* pluginpath)
 		// We do not need the basename anymore now
 		free(t_file);
 	}
-#endif
 }
+
+#endif // ! VITA
 
 }

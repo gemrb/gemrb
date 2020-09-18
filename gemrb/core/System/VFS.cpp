@@ -48,10 +48,13 @@
 #ifndef WIN32
 #ifndef VITA
 #include <dirent.h>
-#include <sys/mman.h>
 #else
 #include <psp2/io/dirent.h>
 #endif
+#endif
+
+#ifdef HAVE_MMAP
+#include <sys/mman.h>
 #endif
 
 #ifdef __APPLE__
@@ -613,7 +616,7 @@ void munmap(void *start, size_t) {
 	UnmapViewOfFile(start);
 }
 
-#elif !defined(VITA)
+#elif defined(HAVE_MMAP)
 
 void* readonly_mmap(void *vfd) {
 	int fd = fileno(static_cast<FILE*>(vfd));

@@ -133,7 +133,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Scriptable/PCStatStruct.cpp
 	System/DataStream.cpp
 	System/FileStream.cpp
-	System/MappedFileMemoryStream.cpp
 	System/MemoryStream.cpp
 	System/Logger.cpp
 	System/Logger/File.cpp
@@ -147,6 +146,13 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/VFS.cpp
 	${PLATFORM_SRC}
 	)
+
+IF(HAVE_MMAP OR WIN32)
+	SET(gemrb_core_LIB_SRCS
+		${gemrb_core_LIB_SRCS}
+		System/MappedFileMemoryStream.cpp
+	)
+ENDIF()
 
 IF(WIN32 AND HAVE_ICONV)
 	SET(gemrb_core_LIB_SRCS

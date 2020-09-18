@@ -126,7 +126,7 @@ GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen);
 // default directory housing GUIScripts/Override/Unhardcoded
 GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
 
-#ifndef VITA
+#ifdef HAVE_MMAP
 void* readonly_mmap(void *fd);
 #endif
 #ifdef WIN32

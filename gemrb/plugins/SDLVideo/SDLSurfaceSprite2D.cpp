@@ -25,11 +25,6 @@
 
 #include <SDL.h>
 
-#ifdef VITA
-//compiler error with GCC 9.1
-#define Uint32 ieDword
-#endif
-
 namespace GemRB {
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (int Width, int Height, int Bpp, void* pixels,

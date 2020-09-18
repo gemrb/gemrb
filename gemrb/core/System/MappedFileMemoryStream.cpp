@@ -16,7 +16,7 @@
  */
 #include <cassert>
 
-#if !defined(WIN32) && !defined(VITA)
+#ifndef WIN32
 #include <sys/mman.h>
 #endif
 
@@ -53,7 +53,7 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 		assert(fileSize.QuadPart <= ULONG_MAX);
 		size = static_cast<unsigned long>(fileSize.QuadPart);
 	}
-#elif !defined (VITA)
+#else
 	this->fileHandle = fopen(fileName.c_str(), "rb");
 	this->fileOpened = fileHandle != nullptr;
 
@@ -65,12 +65,10 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 	}
 #endif
 
-#ifndef VITA
 	if (fileOpened) {
 		this->data = static_cast<char*>(readonly_mmap(fileHandle));
 		this->fileMapped = data != nullptr;
 	}
-#endif
 }
 
 bool MappedFileMemoryStream::isOk() const {
@@ -102,7 +100,6 @@ int MappedFileMemoryStream::Write(const void*, unsigned int) {
 }
 
 MappedFileMemoryStream::~MappedFileMemoryStream() {
-#if !defined(VITA)
 	if (fileMapped) {
 		munmap(data, size);
 	}
@@ -116,7 +113,6 @@ MappedFileMemoryStream::~MappedFileMemoryStream() {
 		fclose(static_cast<FILE*>(fileHandle));
 #endif
 	}
-#endif
 }
 
 }
