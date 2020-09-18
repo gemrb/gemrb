@@ -688,10 +688,10 @@ public:
 	/* returns melee penalty */
 	int MeleePenalty() const;
 	/* gets the to hit value */
-	int GetToHit(ieDword Flags, Actor* target);
+	int GetToHit(ieDword Flags, const Actor *target);
 	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType, ieDword wflags, Actor *attacker);
+	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* checks if something is wrong with the weapon we are using for the attack */
 	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
@@ -896,7 +896,7 @@ public:
 	/* checks whether the actor is behind the target */
 	bool IsBehind(Actor* target) const;
 	/* checks whether the target is the actor's racial enemy */
-	int GetRacialEnemyBonus(Actor* target) const;
+	int GetRacialEnemyBonus(const Actor *target) const;
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
 	/* check if this actor is seen by or seeing anyone */

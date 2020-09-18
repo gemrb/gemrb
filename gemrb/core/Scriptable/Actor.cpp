@@ -7252,7 +7252,7 @@ int Actor::MeleePenalty() const
 }
 
 //FIXME: can get called on its own and ToHit could erroneusly give weapon and some prof boni in that case
-int Actor::GetToHit(ieDword Flags, Actor *target)
+int Actor::GetToHit(ieDword Flags, const Actor *target)
 {
 	int generic = 0;
 	int prof = 0;
@@ -7404,7 +7404,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 	}
 }
 
-int Actor::GetDefense(int DamageType, ieDword wflags, Actor *attacker)
+int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const
 {
 	//specific damage type bonus.
 	int defense = 0;
@@ -10782,7 +10782,7 @@ bool Actor::IsBehind(Actor* target) const
 }
 
 // checks all the actor's stats to see if the target is her racial enemy
-int Actor::GetRacialEnemyBonus(Actor* target) const
+int Actor::GetRacialEnemyBonus(const Actor *target) const
 {
 	if (!target) {
 		return 0;

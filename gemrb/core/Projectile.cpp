@@ -508,7 +508,7 @@ void Projectile::SetDelay(int delay)
 #define WEAPON_FIST        0
 #define WEAPON_BYPASS      0x10000
 
-bool Projectile::FailedIDS(Actor *target) const
+bool Projectile::FailedIDS(const Actor *target) const
 {
 	bool fail = !EffectQueue::match_ids( target, IDSType, IDSValue);
 	if (ExtFlags&PEF_NOTIDS) {
@@ -780,7 +780,7 @@ void Projectile::EndTravel()
 }
 
 //Note: trails couldn't be higher than VVC, but this shouldn't be a problem
-int Projectile::AddTrail(ieResRef BAM, const ieByte *pal)
+int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 {
 /*
 	VEFObject *vef=gamedata->GetVEFObject(BAM,0);
@@ -1112,9 +1112,9 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq, Point &source)
+void Projectile::SetEffectsCopy(EffectQueue *eq, const Point &source)
 {
-	if(effects) delete effects;
+	delete effects;
 	if(!eq) {
 		effects=NULL;
 		return;
@@ -1226,9 +1226,8 @@ void Projectile::SecondaryTarget()
 
 	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
-	std::vector<Actor *>::iterator poi;
-	for (poi = actors.begin(); poi != actors.end(); ++poi) {
-		ieDword Target = (*poi)->GetGlobalID();
+	for (const Actor *actor : actors) {
+		ieDword Target = actor->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
 		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
@@ -1236,7 +1235,7 @@ void Projectile::SecondaryTarget()
 		}
 
 		//IDS targeting for area projectiles
-		if (FailedIDS(*poi)) {
+		if (FailedIDS(actor)) {
 			continue;
 		}
 
@@ -1245,8 +1244,8 @@ void Projectile::SecondaryTarget()
 			if(Caster==Target) {
 				continue;
 			}
-			double xdiff = (*poi)->Pos.x-Pos.x;
-			double ydiff = Pos.y-(*poi)->Pos.y;
+			double xdiff = actor->Pos.x - Pos.x;
+			double ydiff = Pos.y - actor->Pos.y;
 			int deg;
 
 			// a dragon will definitely be easier to hit than a mouse
@@ -1291,8 +1290,8 @@ void Projectile::SecondaryTarget()
 			}
 			//if target counting is per HD and this target is an actor, use the xp level field
 			//otherwise count it as one
-			if ((Extension->APFlags&APF_COUNT_HD) && ((*poi)->Type==ST_ACTOR) ) {
-				extension_targetcount-= (*poi)->GetXPLevel(true);
+			if (Extension->APFlags & APF_COUNT_HD) {
+				extension_targetcount -= actor->GetXPLevel(true);
 			} else {
 				extension_targetcount--;
 			}
@@ -1322,7 +1321,7 @@ int Projectile::Update()
 		return 1;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		return 1;
 	}

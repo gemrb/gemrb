@@ -398,7 +398,7 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
-void EffectQueue::ModifyAllEffectSources(Point &source)
+void EffectQueue::ModifyAllEffectSources(const Point &source)
 {
 	std::list< Effect* >::const_iterator f;
 
@@ -864,7 +864,7 @@ static inline int DecreaseEffect(Effect *efx)
 }
 
 //lower decreasing immunities/bounces
-static int check_type(Actor* actor, const Effect* fx)
+static int check_type(const Actor *actor, const Effect *fx)
 {
 	//the protective effect (if any)
 	Effect *efx;
