@@ -49,7 +49,7 @@
 #ifndef VITA
 #include <dirent.h>
 #else
-#include <psp2/io/dirent.h>
+#include <psp2/kernel/iofilemgr.h>
 #endif
 #endif
 

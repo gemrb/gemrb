@@ -6653,7 +6653,6 @@ static PyObject* GemRB_TextArea_ListResources(PyObject * /*self*/, PyObject* arg
 	if (!PyArg_ParseTuple( args, "iii|i", &wi, &ci, &type, &flags )) {
 		return AttributeError( GemRB_TextArea_ListResources__doc );
 	}
-
 	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
 	if (!ta) {
 		return NULL;

@@ -182,8 +182,8 @@ protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDLKey SDL_Keycode
 #endif
-    const uint32_t VITA_FULLSCREEN_WIDTH = 960;
-    const uint32_t VITA_FULLSCREEN_HEIGHT = 544;
+	const int32_t VITA_FULLSCREEN_WIDTH = 960;
+	const int32_t VITA_FULLSCREEN_HEIGHT = 544;
 	SDL_Rect vitaDestRect;
 
 	const float VITA_SPEED_MOD = 2000000.0f;

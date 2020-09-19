@@ -63,6 +63,9 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
+#if !defined(HAVE_MMAP) && !defined(WIN32)
+	fflush(stdout);
+#endif
 	FileStream out;
 	if (!out.Create(path)) {
 		Log(ERROR, "BIFImporter", "Cannot write %s.", path);
@@ -113,10 +116,10 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
+	char Signature[8];
 #if defined(HAVE_MMAP) || defined(WIN32)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
-	char Signature[8];
 	if (!cacheStream->isOk()) {
 		delete cacheStream;
 
@@ -126,7 +129,6 @@ int BIFImporter::OpenArchive(const char* path)
 #else
 	stream = FileStream::OpenFile(cachePath);
 
-	char Signature[8];
 	if (!stream) {
 		FileStream* file = FileStream::OpenFile(path);
 	if (!file) {

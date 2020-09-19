@@ -98,7 +98,6 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 {
 	isValid = false;
 	FileStream* config = new FileStream();
-
 	// skip arg0 (it is just gemrb)
 	for (int i=1; i < argc; i++) {
 		if (stricmp(argv[i], "-c") == 0) {
