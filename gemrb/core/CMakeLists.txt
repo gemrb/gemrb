@@ -63,7 +63,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Particles.cpp
 	PathFinder.cpp
 	Plugin.cpp
-	PluginLoader.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp
@@ -152,6 +151,13 @@ IF(HAVE_MMAP OR WIN32)
 		${gemrb_core_LIB_SRCS}
 		System/MappedFileMemoryStream.cpp
 	)
+ENDIF()
+
+IF(NOT STATIC_LINK)
+	SET(gemrb_core_LIB_SRCS
+		${gemrb_core_LIB_SRCS}
+		PluginLoader.cpp
+)
 ENDIF()
 
 IF(WIN32 AND HAVE_ICONV)
