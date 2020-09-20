@@ -604,7 +604,12 @@ int TextArea::ContentHeight() const
 String TextArea::QueryText() const
 {
 	if (selectOptions) {
-		return selectOptions->Selection()->Text();
+		if (selectOptions->Selection()) {
+			return selectOptions->Selection()->Text();
+		} else {
+			Log(ERROR, "TextArea", "QueryText: No selection found!");
+			return String();
+		}
 	}
 	if (textContainer) {
 		return textContainer->Text();
