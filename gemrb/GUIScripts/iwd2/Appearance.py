@@ -18,8 +18,9 @@
 #
 #character generation, color (GUICG13)
 import GemRB
-from GUIDefines import *
 import CommonTables
+import IDLUCommon
+from GUIDefines import *
 
 ColorTable = 0
 HairTable = 0
@@ -59,9 +60,11 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindow(13)
 
-	Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race") )
-	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 5))
-	SkinTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 6))
+	pc = GemRB.GetVar ("Slot")
+	Race = IDLUCommon.GetRace (pc)
+	RaceName = CommonTables.Races.GetRowName (Race)
+	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(RaceName, "HAIR"))
+	SkinTable = GemRB.LoadTable(CommonTables.Races.GetValue(RaceName, "SKIN"))
 	ColorTable = GemRB.LoadTable("clowncol")
 
 	#set these colors to some default
