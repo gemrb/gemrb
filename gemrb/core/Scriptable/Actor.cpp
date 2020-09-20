@@ -9972,24 +9972,26 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 // initializes the fist data the first time it is called
 void Actor::SetupFistData() const
 {
-	if (FistRows<0) {
-		FistRows=0;
-		AutoTable fist("fistweap");
-		if (fist) {
-			//default value
-			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
-			FistRows = fist->GetRowCount();
-			fistres = new FistResType[FistRows];
-			fistresclass = new int[FistRows];
-			for (int i=0;i<FistRows;i++) {
-				int maxcol = fist->GetColumnCount(i)-1;
-				for (int cols = 0;cols<MAX_LEVEL;cols++) {
-					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols>maxcol?maxcol:cols ), 8);
-				}
-				fistresclass[i] = atoi(fist->GetRowName(i));
+	if (FistRows >= 0) {
+		return;
+	}
+
+	FistRows = 0;
+	AutoTable fist("fistweap");
+	if (fist) {
+		strnlwrcpy(DefaultFist, fist->QueryDefault(), 8);
+		FistRows = fist->GetRowCount();
+		fistres = new FistResType[FistRows];
+		fistresclass = new int[FistRows];
+		for (int i = 0; i < FistRows; i++) {
+			int maxcol = fist->GetColumnCount(i) - 1;
+			for (int cols = 0; cols < MAX_LEVEL; cols++) {
+				strnlwrcpy(fistres[i][cols], fist->QueryField(i, cols > maxcol ? maxcol : cols), 8);
 			}
+			fistresclass[i] = atoi(fist->GetRowName(i));
 		}
 	}
+
 }
 
 void Actor::SetupFist()
