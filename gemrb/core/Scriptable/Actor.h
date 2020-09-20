@@ -436,10 +436,10 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	void RefreshHP();
-	bool ShouldHibernate();
+	bool ShouldHibernate() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
-	void SetupFistData();
+	void SetupFistData() const;
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
@@ -474,7 +474,7 @@ public:
 	/** returns the animations */
 	CharAnimations* GetAnims() const;
 	/** returns the gender of actor for cg sound - illusions are tricky */
-	ieDword GetCGGender();
+	ieDword GetCGGender() const;
 	/** some hardcoded effects in puppetmaster based on puppet type */
 	void CheckPuppet(Actor *puppet, ieDword type);
 	/** Re/Inits the Modified vector */
@@ -494,7 +494,7 @@ public:
 	/** Sets a Stat Value (unsaved) */
 	bool SetStat(unsigned int StatIndex, ieDword Value, int pcf);
 	/** Returns the difference */
-	int GetMod(unsigned int StatIndex);
+	int GetMod(unsigned int StatIndex) const;
 	/** Returns a Stat Base Value */
 	ieDword GetBase(unsigned int StatIndex) const;
 	/** Sets a Base Stat Value */
@@ -580,7 +580,7 @@ public:
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
-	void Interact(int type);
+	void Interact(int type) const;
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
 	/* returns a random remapped verbal constant strref */
@@ -595,13 +595,13 @@ public:
 	bool HasSpecialDeathReaction(const char *deadname) const;
 	void ReactToDeath(const char *deadname);
 	/* sends trigger_died to everyone in visual range */
-	void SendDiedTrigger();
+	void SendDiedTrigger() const;
 	/* called when someone talks to Actor */
-	void DialogInterrupt();
+	void DialogInterrupt() const;
 	/* called when actor was hit */
 	void GetHit(int damage=0, int spellLevel=0);
 	/* checks whether taking damage should disrupt spellcasting */
-	bool CheckSpellDisruption(int damage, int spellLevel);
+	bool CheckSpellDisruption(int damage, int spellLevel) const;
 	/* called when actor starts to cast a spell*/
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant);
 	/* check if the actor should be just knocked out by a lethal hit */
@@ -668,7 +668,7 @@ public:
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp, int combat);
 	/* Calculate experience bonus */
-	int CalculateExperience(int type, int level);
+	int CalculateExperience(int type, int level) const;
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force=1);
 	/* Sets the modal spell after checks */
@@ -696,7 +696,7 @@ public:
 	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target);
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* returns the adjusted weapon range, since items have odd values stored */
@@ -720,7 +720,7 @@ public:
 	/* sets an RGB colour modification effect; location 0xff for global */
 	void SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		unsigned char r, unsigned char g, unsigned char b,
-		int phase=-1 );
+		int phase = -1) const;
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	void NewPath();
 	/* overridden method, won't walk if dead */
@@ -900,7 +900,7 @@ public:
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
 	/* check if this actor is seen by or seeing anyone */
-	bool SeeAnyOne(bool enemy, bool seen);
+	bool SeeAnyOne(bool enemy, bool seen) const;
 	/* does all the game logic checks to see if the actor can hide */
 	bool TryToHide();
 	bool TryToHideIWD2();

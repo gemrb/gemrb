@@ -3005,7 +3005,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 	return true;
 }
 
-int Actor::GetMod(unsigned int StatIndex)
+int Actor::GetMod(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -3130,11 +3130,11 @@ void Actor::DisablePortraitIcon(ieByte icon)
 
 
 //hack to get the proper casting sounds of copied images
-ieDword Actor::GetCGGender()
+ieDword Actor::GetCGGender() const
 {
 	ieDword gender = Modified[IE_SEX];
 	if (gender == SEX_ILLUSION) {
-		Actor *master = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETMASTERID]);
+		const Actor *master = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETMASTERID]);
 		if (master) {
 			gender = master->Modified[IE_SEX];
 		}
@@ -3963,7 +3963,7 @@ inline int CountElements(const char *s, char separator)
 	return ret;
 }
 
-void Actor::Interact(int type)
+void Actor::Interact(int type) const
 {
 	int start;
 	int count;
@@ -4518,7 +4518,7 @@ void Actor::SetMCFlag(ieDword arg, int op)
 	SetBase(IE_MC_FLAGS, tmp);
 }
 
-void Actor::DialogInterrupt()
+void Actor::DialogInterrupt() const
 {
 	//if dialoginterrupt was set, no verbal constant
 	if ( Modified[IE_MC_FLAGS]&MC_NO_TALK)
@@ -4560,7 +4560,7 @@ void Actor::GetHit(int damage, int spellLevel)
 // iwd2 however has two mechanisms: spell disruption and concentration checks:
 // - disruption is checked when a caster is damaged while casting
 // - concentration is checked when casting is taking place <= 5' from an enemy
-bool Actor::CheckSpellDisruption(int damage, int spellLevel)
+bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 {
 	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
@@ -5595,7 +5595,7 @@ static bool OfType(const Actor *a, const Actor *b)
 	return a->GetStat(IE_SUBRACE) == b->GetStat(IE_SUBRACE);
 }
 
-void Actor::SendDiedTrigger()
+void Actor::SendDiedTrigger() const
 {
 	if (!area) return;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
@@ -7042,7 +7042,7 @@ bool Actor::WeaponIsUsable(bool leftorright, ITMExtHeader *header) const
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target)
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target)
 {
 	SetBaseAPRandAB(true);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
@@ -8136,7 +8136,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 
 void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 			unsigned char r, unsigned char g, unsigned char b,
-			int phase)
+			int phase) const
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
@@ -8275,7 +8275,7 @@ int Actor::GetFavoredPenalties() const
 	return -20*penalty;
 }
 
-int Actor::CalculateExperience(int type, int level)
+int Actor::CalculateExperience(int type, int level) const
 {
 	if (type>=xpbonustypes) {
 		return 0;
@@ -8423,7 +8423,8 @@ static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0
 static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
 static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
-bool Actor::ShouldHibernate() {
+bool Actor::ShouldHibernate() const
+{
 	//finding an excuse why we don't hybernate the actor
 	if (Modified[IE_ENABLEOFFSCREENAI])
 		return false;
@@ -9969,7 +9970,7 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 }
 
 // initializes the fist data the first time it is called
-void Actor::SetupFistData()
+void Actor::SetupFistData() const
 {
 	if (FistRows<0) {
 		FistRows=0;
@@ -10861,7 +10862,7 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 }
 
 //checks if we are seen, or seeing anyone
-bool Actor::SeeAnyOne(bool enemy, bool seenby)
+bool Actor::SeeAnyOne(bool enemy, bool seenby) const
 {
 	if (!area) return false;
 
@@ -10883,7 +10884,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 	//we need to look harder if we look for seenby anyone
 	std::vector<Actor *>::iterator neighbour;
 	for (neighbour = visActors.begin(); neighbour != visActors.end() && !seeEnemy; ++neighbour) {
-		Actor *toCheck = *neighbour;
+		const Actor *toCheck = *neighbour;
 		if (seenby) {
 			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
 				seeEnemy = true;
