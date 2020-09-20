@@ -2627,7 +2627,7 @@ def ImportDonePress():
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (MyChar))
 	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (MyChar, 1)["ResRef"])
 	Portrait = GemRB.GetPlayerPortrait (MyChar, 0)
-	GemRB.SetToken ("LargePortrait", PortraitName)
+	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
 	PortraitButton.SetPicture (Portrait["Sprite"], "NOPORTLG")
 	Portrait = -1
 
