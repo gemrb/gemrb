@@ -19,6 +19,7 @@
 #character generation, color (GUICG13)
 import GemRB
 import CommonTables
+import GUICommon
 import IDLUCommon
 from GUIDefines import *
 
@@ -110,13 +111,16 @@ def OnLoad():
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
-	AnimID = 0x6000 + table.GetValue (GemRB.GetVar("BaseRace"), 0)
+	AnimID = 0x6000 + table.GetValue (RaceName, "RACE")
 
 	table = GemRB.LoadTable ("avprefc")
-	AnimID = AnimID + table.GetValue (GemRB.GetVar("BaseClass"), 0)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassName = GUICommon.GetClassRowName (Class - 1, "index")
+	AnimID = AnimID + table.GetValue (ClassName, "PREFIX")
 
 	table = GemRB.LoadTable ("avprefg")
-	AnimID = AnimID + table.GetValue (GemRB.GetVar("Gender"), 0)
+	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
+	AnimID = AnimID + table.GetValue (Gender, 0)
 
 	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G11"
 	if PDollResRef == "*G11":
