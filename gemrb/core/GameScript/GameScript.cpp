@@ -2641,7 +2641,7 @@ void Object::dump(StringBuffer& buffer) const
 }
 
 /** Return true if object is null */
-bool Object::isNull()
+bool Object::isNull() const
 {
 	if (objectName[0]!=0) {
 		return false;

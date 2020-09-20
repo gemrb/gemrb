@@ -71,11 +71,11 @@ extern Gem_Polygon **polygons;
 #define MIC_NOITEM 0
 #define MIC_GOTITEM 1
 
-GEM_EXPORT int GetReaction(Actor *target, Scriptable *Sender);
-GEM_EXPORT int GetHappiness(Scriptable *Sender, int reputation);
-int GetHPPercent(Scriptable *Sender);
+GEM_EXPORT int GetReaction(const Actor *target, const Scriptable *Sender);
+GEM_EXPORT int GetHappiness(const Scriptable *Sender, int reputation);
+int GetHPPercent(const Scriptable *Sender);
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname);
-bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags);
+bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags);
 void ClickCore(Scriptable *Sender, Point point, int type, int speed);
 void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);

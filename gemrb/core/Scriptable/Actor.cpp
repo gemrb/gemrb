@@ -10039,7 +10039,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	return 0;
 }
 
-int Actor::CheckUsability(Item *item) const
+int Actor::CheckUsability(const Item *item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
 	int kitignore = 0;
@@ -10126,7 +10126,7 @@ ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
 }
 
 //checks usability only
-int Actor::Unusable(Item *item) const
+int Actor::Unusable(const Item *item) const
 {
 	if (!GetStat(IE_CANUSEANYITEM)) {
 		int unusable = CheckUsability(item);

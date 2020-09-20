@@ -322,7 +322,7 @@ public:
 	void SetOverheadText(const String& text, bool display = true);
 	const String& GetOverheadText() { return OverheadText; };
 	bool DisplayOverheadText(bool);
-	bool OverheadTextIsDisplaying() { return overheadTextDisplaying; }
+	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
 	void FixHeadTextPos();
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible

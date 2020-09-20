@@ -1355,7 +1355,7 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 // Returns index of first empty slot or slot with the same
 // item and not full stack. On fail returns -1
 // Can be used to check for full inventory
-int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref)
+int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref) const
 {
 	if (first_slot >= Slots.size())
 		return -1;

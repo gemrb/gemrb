@@ -220,7 +220,7 @@ public:
 	{
 		delete this;
 	}
-	bool isNull();
+	bool isNull() const;
 };
 
 class GEM_EXPORT Trigger : protected Canary {

@@ -422,7 +422,7 @@ private:
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which);
 	/* helper for usability checks */
-	int CheckUsability(Item *item) const;
+	int CheckUsability(const Item *item) const;
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsBG();
 	/* Set up all the missing stats on load time, or after level up */
@@ -829,7 +829,7 @@ public:
 	/* Returns strref if the item is unusable due to name/type restrictions */
 	ieStrRef Disabled(ieResRef name, ieDword type) const;
 	/* Returns constant string if the item is unusable */
-	int Unusable(Item *item) const;
+	int Unusable(const Item *item) const;
 	/* Sets all clown colour to the given gradient */
 	void SetGradient(ieDword gradient);
 	/* Enables an overlay */

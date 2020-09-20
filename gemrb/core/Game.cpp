@@ -320,7 +320,7 @@ Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
 	return PCs[slot];
 }
 
-int Game::InStore(Actor* pc) const
+int Game::InStore(const Actor *pc) const
 {
 	for (unsigned int i = 0; i < NPCs.size(); i++) {
 		if (NPCs[i] == pc) {
@@ -330,7 +330,7 @@ int Game::InStore(Actor* pc) const
 	return -1;
 }
 
-int Game::InParty(Actor* pc) const
+int Game::InParty(const Actor *pc) const
 {
 	for (unsigned int i = 0; i < PCs.size(); i++) {
 		if (PCs[i] == pc) {
@@ -992,7 +992,7 @@ bool Game::CheckForReplacementActor(int i)
 		return false;
 	}
 
-	Actor* act = NPCs[i];
+	const Actor *act = NPCs[i];
 	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
 	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
 		ieResRef newcre = "****"; // default table value
