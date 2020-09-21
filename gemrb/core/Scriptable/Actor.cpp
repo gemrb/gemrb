@@ -4167,7 +4167,7 @@ static int CheckInteract(const char *talker, const char *target)
 	return I_NONE;
 }
 
-void Actor::HandleInteractV1(Actor *target)
+void Actor::HandleInteractV1(const Actor *target)
 {
 	LastTalker = target->GetGlobalID();
 	char tmp[50];
@@ -4175,7 +4175,7 @@ void Actor::HandleInteractV1(Actor *target)
 	AddAction(GenerateAction(tmp));
 }
 
-int Actor::HandleInteract(Actor *target)
+int Actor::HandleInteract(const Actor *target) const
 {
 	int type = CheckInteract(scriptName, target->GetScriptName());
 
@@ -4212,7 +4212,7 @@ bool Actor::GetPartyComment()
 	if (core->Roll(1, 2, -1)) return false;
 
 	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
-		Actor *target = game->GetPC(i%size, true);
+		const Actor *target = game->GetPC(i % size, true);
 		if (target==this) continue;
 		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;

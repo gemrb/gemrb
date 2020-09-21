@@ -314,7 +314,7 @@ public:
 
 	void SetIdentifiers(const char *name, ieWord type);
 
-	void SetEffectsCopy(EffectQueue *eq, const Point &source);
+	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload

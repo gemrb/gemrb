@@ -2232,8 +2232,8 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 	ieWord tmpWord;
 
 	memset(filling,0,sizeof(filling) );
-	unsigned int realCount = map->GetAmbientCount();
-	for (unsigned int i=0; i<realCount; i++) {
+	ieWord realCount = map->GetAmbientCount();
+	for (ieWord i = 0; i < realCount; i++) {
 		const Ambient *am = map->GetAmbient(i);
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->Write( am->name, 32 );

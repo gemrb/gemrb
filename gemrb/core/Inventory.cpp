@@ -829,7 +829,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		gold->Usages[1] = 0;
 		gold->Usages[2] = 0;
 		CopyResRef(gold->ItemResRef, core->GoldResRef);
-		gold->Usages[0] = Owner->BaseStats[IE_GOLD];
+		gold->Usages[0] = static_cast<ieWord>(Owner->BaseStats[IE_GOLD]);
 		Owner->BaseStats[IE_GOLD] = 0;
 		map->AddItemToLocation(loc, gold);
 	}
@@ -970,7 +970,7 @@ bool Inventory::EquipItem(ieDword slot)
 
 //the removecurse flag will check if it is possible to move the item to the inventory
 //after a remove curse spell
-bool Inventory::UnEquipItem(ieDword slot, bool removecurse)
+bool Inventory::UnEquipItem(ieDword slot, bool removecurse) const
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {

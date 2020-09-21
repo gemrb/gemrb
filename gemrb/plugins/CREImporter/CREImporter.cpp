@@ -863,7 +863,7 @@ void CREImporter::SetupColor(ieDword &stat)
 	if (stat < 200 || RandColor == 0) return;
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
-	int RandRows = 0;
+	size_t RandRows = 0;
 	if (randcolors.size() == 0) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
@@ -878,8 +878,8 @@ void CREImporter::SetupColor(ieDword &stat)
 		randcolors.resize(RandColor);
 		for (int cols = RandColor - 1; cols >= 0; cols--) {
 			randcolors[cols] = std::vector<unsigned char>(RandRows);
-			for (int i = 0; i < RandRows; i++) {
-				randcolors[cols][i] = atoi(rndcol->QueryField(i, cols));
+			for (size_t i = 0; i < RandRows; i++) {
+				randcolors[cols][i] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
 			}
 			randcolors[cols][0] -= 200;
 		}

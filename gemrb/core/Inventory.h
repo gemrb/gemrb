@@ -305,7 +305,7 @@ public:
 	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);
-	bool UnEquipItem(ieDword slot, bool removecurse);
+	bool UnEquipItem(ieDword slot, bool removecurse) const;
 	/** Returns equipped weapon, also its slot */
 	CREItem *GetUsedWeapon(bool leftorright, int &slot) const;
 	/** returns slot of launcher weapon currently equipped */

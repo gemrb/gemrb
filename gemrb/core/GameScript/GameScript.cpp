@@ -2311,7 +2311,7 @@ int GameScript::EvaluateString(Scriptable* Sender, char* String)
 	return 0;
 }
 
-bool Condition::Evaluate(Scriptable* Sender)
+bool Condition::Evaluate(Scriptable *Sender) const
 {
 	int ORcount = 0;
 	unsigned int result = 0;
@@ -2322,8 +2322,7 @@ bool Condition::Evaluate(Scriptable* Sender)
 		return false;
 	}
 
-	for (size_t i = 0; i < triggers.size(); i++) {
-		Trigger* tR = triggers[i];
+	for (const Trigger *tR : triggers) {
 		//do not evaluate triggers in an Or() block if one of them
 		//was already True() ... but this sane approach was only used in iwd2!
 		if (!core->HasFeature(GF_EFFICIENT_OR) || !ORcount || !subresult) {

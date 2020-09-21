@@ -733,9 +733,9 @@ public:
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
-	int HandleInteract(Actor *target);
+	int HandleInteract(const Actor *target) const;
 	/* start bg1-style banter dialog */
-	void HandleInteractV1(Actor *target);
+	void HandleInteractV1(const Actor *target);
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */

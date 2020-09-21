@@ -2207,7 +2207,7 @@ void Map::SortQueues()
 	}
 }
 
-void Map::AddProjectile(Projectile* pro, const Point &source, ieWord actorID, bool fake)
+void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake)
 {
 	proIterator iter;
 
@@ -2544,11 +2544,11 @@ void Map::SetupAmbients()
 	ambim->setAmbients( ambients );
 }
 
-unsigned int Map::GetAmbientCount(bool toSave) const
+ieWord Map::GetAmbientCount(bool toSave) const
 {
-	if (!toSave) return (unsigned int) ambients.size();
+	if (!toSave) return static_cast<ieWord>(ambients.size());
 
-	unsigned int ambiCount = 0;
+	ieWord ambiCount = 0;
 	for (const Ambient *ambient : ambients) {
 		if (!(ambient->flags & IE_AMBI_NOSAVE)) ambiCount++;
 	}

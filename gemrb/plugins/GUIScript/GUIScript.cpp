@@ -12635,7 +12635,7 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Actor *actor = game->FindPC(game->GetSelectedPCSingle());
+	const Actor *actor = game->FindPC(game->GetSelectedPCSingle());
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}

@@ -245,7 +245,7 @@ public:
 		}
 	}
 	int Evaluate(Scriptable *Sender) const;
-public:
+
 	unsigned short triggerID;
 	int int0Parameter;
 	int flags;
@@ -256,7 +256,6 @@ public:
 	char string1Parameter[65];
 	Object* objectParameter;
 
-public:
 	void dump() const;
 	void dump(StringBuffer&) const;
 
@@ -281,8 +280,8 @@ public:
 	{
 		delete this;
 	}
-	bool Evaluate(Scriptable* Sender);
-public:
+	bool Evaluate(Scriptable *Sender) const;
+
 	std::vector<Trigger*> triggers;
 };
 
@@ -317,7 +316,7 @@ public:
 			}
 		}
 	}
-public:
+
 	unsigned short actionID;
 	Object* objects[3];
 	int int0Parameter;
@@ -383,7 +382,7 @@ public:
 		delete this;
 	}
 	int Execute(Scriptable* Sender);
-public:
+
 	unsigned char weight;
 	std::vector<Action*> actions;
 };
@@ -402,7 +401,7 @@ public:
 		delete this;
 	}
 	int Execute(Scriptable* Sender);
-public:
+
 	std::vector<Response*> responses;
 };
 
@@ -428,7 +427,7 @@ public:
 	{
 		delete this;
 	}
-public:
+
 	Condition* condition;
 	ResponseSet* responseSet;
 };
@@ -444,9 +443,9 @@ public:
 			}
 		}
 	}
-public:
+
 	std::vector<ResponseBlock*> responseBlocks;
-public:
+
 	void Release()
 	{
 		delete this;
@@ -554,7 +553,7 @@ public:
 	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
-public:
+
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
@@ -564,7 +563,8 @@ private: //Internal Functions
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
 	static int InParty(Scriptable *Sender, const Trigger *parameters, bool allowdead);
-private: //Internal variables
+
+	// Internal variables
 	Scriptable* const MySelf;
 	ieResRef Name;
 	Script* script;
@@ -944,7 +944,7 @@ public: //Script Functions
 	static int XP(Scriptable *Sender, const Trigger *parameters);
 	static int XPGT(Scriptable *Sender, const Trigger *parameters);
 	static int XPLT(Scriptable *Sender, const Trigger *parameters);
-public:
+
 	//Actions
 	static void Activate(Scriptable* Sender, Action* parameters);
 	static void ActivatePortalCursor(Scriptable* Sender, Action* parameters);
@@ -1440,7 +1440,7 @@ public:
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 	static void Weather(Scriptable* Sender, Action* parameters);
 	static void XEquipItem(Scriptable *Sender, Action *parameters);
-public:
+
 	//Objects
 	static Targets *BestAC(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *EighthNearest(const Scriptable *Sender, Targets *parameters, int ga_flagss);
@@ -1538,7 +1538,6 @@ public:
 	static Targets *WeakestOf(const Scriptable *Sender, Targets *parameters, int ga_flags);
 	static Targets *WorstAC(const Scriptable *Sender, Targets *parameters, int ga_flags);
 
-public:
 	/*GemRB extensions/actions*/
 	static void RunAwayFromPoint(Scriptable* Sender, Action* parameters);
 	static void UnMakeGlobal(Scriptable* Sender, Action* parameters);

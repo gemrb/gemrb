@@ -446,7 +446,7 @@ public:
 		return NULL;
 	}
 	void SetTrapDetected(int x);
-	void TryDisarm(Actor *actor);
+	void TryDisarm(const Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill, ieDword actorID);
 	//returns true if trap is visible, only_detected must be true

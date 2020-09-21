@@ -207,7 +207,7 @@ unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptab
 			p = w;
 		} else {
 			// projection on the line
-			p = Point(v.x + (w.x - v.x) * t, v.y + (w.y - v.y) * t);
+			p = Point(short(v.x + (w.x - v.x) * t), short(v.y + (w.y - v.y) * t));
 		}
 	}
 
