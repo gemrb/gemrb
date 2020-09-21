@@ -283,7 +283,7 @@ void View::Draw()
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 			Region r = drawFrame;
 			r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
-			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, true};
+			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, 0, true};
 			fnt->StringSize(string, &metrics);
 			r.h = metrics.size.h;
 			r.w = metrics.size.w;
