@@ -241,8 +241,8 @@ def ExitPress():
 
 	#quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
-	QuitWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
-	QuitWindow.ShowModal()
+	Pos = QuitWindow.GetPos ()
+	QuitWindow.SetPos (Pos[0] - 3, Pos[1] + 12)
 	QuitTextArea = QuitWindow.GetControl (0)
 	CancelButton = QuitWindow.GetControl (2)
 	ConfirmButton = QuitWindow.GetControl (1)
