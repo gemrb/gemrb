@@ -21,6 +21,7 @@ import GemRB
 import CommonTables
 import GUICommon
 import IDLUCommon
+import Portrait
 from GUIDefines import *
 
 ColorTable = 0
@@ -69,12 +70,16 @@ def OnLoad():
 	ColorTable = GemRB.LoadTable("clowncol")
 
 	#set these colors to some default
+	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
+	Portrait.Init (Gender)
+	Portrait.Set (GemRB.GetPlayerPortrait (pc))
+	PortraitName = Portrait.Name () # strips the last char like the table needs
+
 	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitIndex = GemRB.GetVar("PortraitIndex")
-	Color1=PortraitTable.GetValue(PortraitIndex,1)
-	Color2=PortraitTable.GetValue(PortraitIndex,2)
-	Color3=PortraitTable.GetValue(PortraitIndex,3)
-	Color4=PortraitTable.GetValue(PortraitIndex,4)
+	Color1 = PortraitTable.GetValue(PortraitName, "HAIR", GTV_INT)
+	Color2 = PortraitTable.GetValue(PortraitName, "SKIN", GTV_INT)
+	Color3 = PortraitTable.GetValue(PortraitName, "MAJOR", GTV_INT)
+	Color4 = PortraitTable.GetValue(PortraitName, "MINOR", GTV_INT)
 	PDollButton = ColorWindow.GetControl(1)
 	PDollButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	PDollButton.SetState(IE_GUI_BUTTON_LOCKED)
@@ -119,7 +124,6 @@ def OnLoad():
 	AnimID = AnimID + table.GetValue (ClassName, "PREFIX")
 
 	table = GemRB.LoadTable ("avprefg")
-	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	AnimID = AnimID + table.GetValue (Gender, 0)
 
 	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G11"
