@@ -295,16 +295,16 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 	// int2Parameter is supposed to support also bones.ids, but nothing uses it like that
 	// if we need it, take the implementation from GameScript::Damage
 	switch (parameters->int1Parameter) {
-		case 1: // lower
+		case DM_LOWER:
 			value = actor->GetBase(parameters->int0Parameter);
 			value-= parameters->int2Parameter;
 			break;
-		case 2: // raise
+		case DM_RAISE:
 			value = actor->GetBase(parameters->int0Parameter);
 			value+= parameters->int2Parameter;
 			break;
-		case 3:
-		default: // set
+		case DM_SET:
+		default:
 			value = parameters->int2Parameter;
 			break;
 	}
@@ -4826,12 +4826,12 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	int type=MOD_ADDITIVE;
 	// delta.ids
 	switch(parameters->int0Parameter) {
-	case 1: // lower
+	case DM_LOWER: // lower
 		break;
-	case 2: //raise
+	case DM_RAISE: //raise
 		damage=-damage;
 		break;
-	case 3: //set
+	case DM_SET: //set
 		type=MOD_ABSOLUTE;
 		break;
 	case 4: // GemRB extension

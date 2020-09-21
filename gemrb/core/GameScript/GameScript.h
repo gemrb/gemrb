@@ -112,7 +112,7 @@ class StringBuffer;
 #define MSO_IGNORE_RANGE   16
 #define MSO_IGNORE_NULL    32
 
-//delta (pst)
+// delta.ids (pst)
 #define DM_LOWER   1
 #define DM_RAISE   2
 #define DM_SET     3
