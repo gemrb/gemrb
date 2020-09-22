@@ -5510,7 +5510,10 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
-	if (!anim->HasControl()) Py_RETURN_NONE;
+	if (!anim->HasControl()) {
+		delete anim;
+		Py_RETURN_NONE;
+	}
 
 	if (Blend) {
 		anim->SetBlend(true);

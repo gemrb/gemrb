@@ -34,7 +34,6 @@ namespace GemRB {
 ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {
 	control = NULL;
-	bam = NULL;
 	cycle = Cycle;
 	frame = 0;
 	anim_phase = 0;
@@ -112,11 +111,12 @@ void ControlAnimation::UpdateAnimation(bool paused)
 		}
 	}
 
-	UpdateAnimationSprite();
-	core->timer->AddAnimation( this, time );
+	if (UpdateAnimationSprite()) {
+		core->timer->AddAnimation(this, time);
+	}
 }
 
-void ControlAnimation::UpdateAnimationSprite () {
+bool ControlAnimation::UpdateAnimationSprite () {
 	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
 
 	if (pic == NULL) {
@@ -124,7 +124,7 @@ void ControlAnimation::UpdateAnimationSprite () {
 		if (control->Flags & IE_GUI_BUTTON_PLAYONCE) {
 			core->timer->RemoveAnimation( this );
 			control->SetAnimPicture( NULL );
-			return;
+			return false;
 		}
 		anim_phase = 0;
 		frame = 0;
@@ -132,7 +132,7 @@ void ControlAnimation::UpdateAnimationSprite () {
 	}
 
 	if (pic == NULL) {
-		return;
+		return true;
 	}
 
 	if (has_palette) {
@@ -153,6 +153,7 @@ void ControlAnimation::UpdateAnimationSprite () {
 	}
 
 	control->SetAnimPicture( pic );
+	return true;
 }
 
 void ControlAnimation::SetPaletteGradients(ieDword *col)

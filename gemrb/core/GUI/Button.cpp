@@ -151,7 +151,7 @@ void Button::CloseUpColor()
 
 bool Button::IsOpaque() const
 {
-	if (AnimPicture || (Picture && (Flags & IE_GUI_BUTTON_PICTURE))) {
+	if (AnimPicture || (Picture && (Flags & IE_GUI_BUTTON_PICTURE)) || animation) {
 		// no good way of knowing if a button has transparancy :(
 		// TODO: maybe add something to Sprite2D for determining alpha status
 		return false;
