@@ -9081,16 +9081,17 @@ bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 			}
 			break;
 	}
-	int count = CountElements(resource,',');
-	if (count <= 0) return false;
-	count = core->Roll(1,count,-1);
-	while(count--) {
-		while(*resource && *resource!=',') resource++;
-			if (*resource==',') resource++;
+
+	int count = CountElements(resource, ',');
+	int slot = RAND(0, count - 1);
+	while (slot--) {
+		while (*resource && *resource != ',') resource++;
+		if (*resource == ',') resource++;
 	}
-	CopyResRef(Sound, resource);
-	for(count=0;count<8 && Sound[count]!=',';count++) {};
-	Sound[count]=0;
+	size_t len = strcspn(resource, ",");
+	assert(len < sizeof(ieResRef));
+	strlcpy(Sound, resource, len + 1);
+
 	return true;
 }
 
