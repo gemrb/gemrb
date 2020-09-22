@@ -1015,7 +1015,7 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 			if (target->AC.GetTotal() > (signed) fx->Parameter1) {
 				// previously we were overriding the whole stat, but now we can be finegrained
 				// and reuse the deflection bonus, since iwd2 has its own version of this effect
-				target->AC.SetDeflectionBonus(- (target->AC.GetNatural()-fx->Parameter1));
+				target->AC.SetDeflectionBonus((signed) fx->Parameter1 - target->AC.GetNatural());
 			}
 		}
 		return FX_INSERT;
@@ -3417,7 +3417,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
 			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
-				gold = -fx->Parameter1;
+				gold = - signed(fx->Parameter1);
 			} else {
 				gold = fx->Parameter1;
 			}
@@ -3429,7 +3429,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			gold = game->PartyGold*fx->Parameter1/100-game->PartyGold;
 			break;
 		default:
-			gold = -fx->Parameter1;
+			gold = - signed(fx->Parameter1);
 			break;
 	}
 	game->AddGold (gold);
@@ -5856,16 +5856,17 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//never subtract more than the maximum hitpoints
 	ieDword x = STAT_GET(IE_MAXHITPOINTS)-1;
-	if (fx->Parameter1*4<x) {
-		x=fx->Parameter1*4;
+	int mod = signed(fx->Parameter1);
+	if (mod * 4 < signed(x)) {
+		x = mod * 4;
 	}
-	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
+	STAT_ADD(IE_LEVELDRAIN, mod);
 	STAT_SUB(IE_MAXHITPOINTS, x);
-	HandleBonus(target, IE_SAVEVSDEATH, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSWANDS, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSPOLY, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSBREATH, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSDEATH, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, -mod, fx->TimingMode);
 
 	target->AddPortraitIcon(PI_LEVELDRAIN);
 	//decrease current hitpoints on first apply
@@ -7025,7 +7026,7 @@ int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		break;
 	case 1:
 		x=fx->Parameter1;
-		y=-fx->Parameter1;
+		y = - signed(fx->Parameter1);
 		break;
 	case 2:
 		//gemrb addition
