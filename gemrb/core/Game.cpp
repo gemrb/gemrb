@@ -1456,7 +1456,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 	if (add >= core->Time.hour_size) {
 		for (auto pc : PCs) {
 			pc->ResetCommentTime();
-			int conHealRate = pc->GetConHealAmount();;
+			int conHealRate = pc->GetConHealAmount();
 			// 1. regeneration as an effect
 			// No matter the mode, if it is persistent, the actor will get fully healed in an hour.
 			// However the effect does its own timekeeping, so we can't easily check the duration,

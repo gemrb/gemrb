@@ -2468,7 +2468,7 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 			if (AdjustPositionX(goal, radiusx, radiusy)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radiusy, radiusx)) {
+			if (AdjustPositionY(goal, radiusx, radiusy)) {
 				return;
 			}
 		} else {

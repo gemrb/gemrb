@@ -1841,7 +1841,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 
 	if (!actor->InMove() || actor->Destination != p) {
 		bool always_run = core->GetGameControl()->ShouldRun(actor);
-		actor->WalkTo(p, IF_RUNNING * always_run, distance);
+		actor->WalkTo(p, always_run ? IF_RUNNING : 0, distance);
 	}
 
 	if (!actor->InMove()) {

@@ -59,6 +59,7 @@ static int SLOT_ARMOR = -1;
 //IWD2 style slots
 static bool IWD2 = false;
 
+[[noreturn]]
 static void InvalidSlot(int slot)
 {
 	error("Inventory", "Invalid slot: %d!\n", slot);
@@ -145,7 +146,6 @@ CREItem *Inventory::GetItem(unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	CREItem *item = Slots[slot];
 	Slots.erase(Slots.begin()+slot);
@@ -495,7 +495,6 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	item = Slots[slot];
 
@@ -550,7 +549,6 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return;
 	}
 
 	delete Slots[slot];
@@ -570,7 +568,6 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
 			InvalidSlot(slot);
-			return ASI_FAILED;
 		}
 
 		//check for equipping weapons
@@ -840,7 +837,6 @@ CREItem *Inventory::GetSlotItem(ieDword slot) const
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	return Slots[slot];
 }
@@ -1615,6 +1611,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 					break;
 				case ID_NEED:
 					if (!idreq1) continue;
+					break;
 				default:;
 			}
 

@@ -10857,6 +10857,7 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 		case 2:
 			// ~Failed hide in shadows because you were heard by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
 			displaymsg->DisplayRollStringName(39297, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			break;
 		default:
 			// no message
 			break;

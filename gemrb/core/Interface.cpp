@@ -1405,7 +1405,7 @@ int Interface::Init(InterfaceConfig* config)
 #endif
 
 	CONFIG_PATH("SavePath", SavePath, GamePath);
-#undef CONFIG_STRING
+#undef CONFIG_PATH
 
 #define CONFIG_STRING(key, var) \
 		value = config->GetValueForKey(key); \
