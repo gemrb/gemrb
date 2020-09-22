@@ -4682,7 +4682,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		sprintf(params->string0Parameter, "%s", tab->QueryField(9999,9999));
+		snprintf(params->string0Parameter, sizeof(params->string0Parameter), "%s", tab->QueryDefault());
 		CreateItem(Sender, params);
 		delete params;
 	}

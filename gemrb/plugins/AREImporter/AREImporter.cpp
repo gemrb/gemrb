@@ -1329,13 +1329,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			while (count) {
 				char key[32];
 				int value;
-				sprintf(key, "xPos%d",count);
+				snprintf(key, sizeof(key), "xPos%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.x = value;
-				sprintf(key, "yPos%d",count);
+				snprintf(key, sizeof(key), "yPos%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.y = value;
-				sprintf(key, "text%d",count);
+				snprintf(key, sizeof(key), "text%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				map->AddMapNote( point, color, value);
 				count--;

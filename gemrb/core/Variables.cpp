@@ -349,7 +349,7 @@ void Variables::SetAtCopy(const char* key, const char* value)
 void Variables::SetAtCopy(const char* key, int newValue)
 {
 	char tmpstr[10]; // should be enough
-	sprintf(tmpstr, "%d", newValue);
+	snprintf(tmpstr, sizeof(tmpstr), "%d", newValue);
 	SetAtCopy(key, tmpstr);
 }
 

@@ -1418,7 +1418,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	unsigned int pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
 		char varname[16];
-		sprintf(varname, "CheckLevelUp%d", pc);
+		snprintf(varname, sizeof(varname), "CheckLevelUp%d", pc);
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", true, pc);
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
@@ -2464,7 +2464,7 @@ static void InitActorTables()
 		}
 		for (unsigned int i=0; i < tm->GetRowCount(); i++) {
 			char rowName[6];
-			sprintf(rowName, "%d", i);
+			snprintf(rowName, sizeof(rowName), "%d", i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);

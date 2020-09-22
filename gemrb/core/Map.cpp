@@ -553,7 +553,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		face = ent->Face;
 	}
 	//LeaveArea is the same in ALL engine versions
-	sprintf(command, "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
+	snprintf(command, sizeof(command), "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
 
 	if (EveryOne&CT_GO_CLOSER) {
 		int i=game->GetPartySize(false);
@@ -3066,7 +3066,7 @@ Container *Map::GetPile(Point position)
 	//converting to search square
 	position.x=position.x/16;
 	position.y=position.y/12;
-	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
+	snprintf(heapname, sizeof(heapname), "heap_%hd.%hd", position.x, position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;
 	position.y=position.y*12+6;

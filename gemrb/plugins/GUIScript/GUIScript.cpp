@@ -266,7 +266,7 @@ static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int 
 			int ret;
 			if (ShowHotkeys) {
 				char *txt2 = (char *) malloc(strlen(txt) + 10);
-				sprintf(txt2, "F%d - %s", Function, txt);
+				snprintf(txt2, strlen(txt) + 10, "F%d - %s", Function, txt);
 				ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
 				free(txt2);
 			} else {
