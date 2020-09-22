@@ -3260,7 +3260,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	actor->CurrentActionState--;
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3268,10 +3268,10 @@ void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME * 2);
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3279,7 +3279,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME);
 }
 
 void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
