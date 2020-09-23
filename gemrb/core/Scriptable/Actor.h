@@ -913,8 +913,6 @@ public:
 	/* returns true if the spell is useless to cast on target
 	or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
-	/* returns true if the lightmap under the actor is dark */
-	bool PCInDark() const;
 	/* function to get a class level used by scripting */
 	ieDword GetLevelInClass (const ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */
