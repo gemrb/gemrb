@@ -579,7 +579,7 @@ void Scriptable::ProcessActions()
 		}
 		if (!CurrentAction) {
 			ClearActions();
-			lastAction = -1;
+			// clear lastAction here if you'll ever need it after exiting the loop
 			break;
 		}
 		lastAction = CurrentAction->actionID;

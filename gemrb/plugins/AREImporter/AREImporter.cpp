@@ -361,7 +361,7 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 		}
 	}
 	// delayed bad bit removal due to chain overlapping
-	return Flags = (Flags & ~maskOff) | maskOn;
+	return (Flags & ~maskOff) | maskOn;
 }
 
 static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {

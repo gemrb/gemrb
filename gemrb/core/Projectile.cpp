@@ -1194,14 +1194,13 @@ void Projectile::SecondaryTarget()
 	int mindeg = 0;
 	int maxdeg = 0;
 	int degOffset = 0;
-	char saneOrientation = Orientation;
 
 	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
 		// see CharAnimations.cpp for a nice visualization of the orientation directions
 		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
 		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
-		saneOrientation = 12 - Orientation;
+		char saneOrientation = 12 - Orientation;
 		if (saneOrientation < 0) saneOrientation = MAX_ORIENT + saneOrientation;
 
 		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
