@@ -10870,7 +10870,7 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby) const
 {
 	if (!area) return false;
 
-	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF;
+	int flag = (seenby ? 0 : GA_NO_HIDDEN) | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
 	if (enemy) {
 		ieDword ea = GetSafeStat(IE_EA);
 		if (ea>=EA_EVILCUTOFF) {
@@ -10882,15 +10882,13 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby) const
 		}
 	}
 
-	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby ? VOODOO_VISUAL_RANGE/2 : GetSafeStat(IE_VISUALRANGE), this);
+	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby ? VOODOO_VISUAL_RANGE / 2 : GetSafeStat(IE_VISUALRANGE) / 2, this);
 	bool seeEnemy = false;
 
 	//we need to look harder if we look for seenby anyone
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = visActors.begin(); neighbour != visActors.end() && !seeEnemy; ++neighbour) {
-		const Actor *toCheck = *neighbour;
+	for (const Actor *toCheck : visActors) {
 		if (seenby) {
-			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
+			if (WithinRange(toCheck, Pos, toCheck->GetStat(IE_VISUALRANGE) / 2)) {
 				seeEnemy = true;
 			}
 		} else {
@@ -10908,7 +10906,6 @@ bool Actor::TryToHide()
 	}
 
 	// iwd2 is like the others only when trying to hide for the first time
-	// TODO: once understood, the visual checks need syncing (not just lightness)
 	bool continuation = Modified[IE_STATE_ID] & state_invisible;
 	if (third && continuation) {
 		return TryToHideIWD2();
@@ -10945,7 +10942,7 @@ bool Actor::TryToHide()
 		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation
 	}
 	// TODO: figure out how iwd2 uses the area lightness and crelight.2da
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
 	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
@@ -10968,30 +10965,32 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, VOODOO_VISUAL_RANGE/2, this);
+	int flags = GA_NO_DEAD | GA_NO_NEUTRAL | GA_NO_SELF | GA_NO_UNSCHEDULED;
+	ieDword ea = GetSafeStat(IE_EA);
+	if (ea >= EA_EVILCUTOFF) {
+		flags |= GA_NO_ENEMY;
+	} else if (ea <= EA_GOODCUTOFF) {
+		flags |= GA_NO_ALLY;
+	}
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, flags, Modified[IE_VISUALRANGE] / 2, this);
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
-	bool checked = false;
 
 	// visibility check, you can try hiding while enemies are nearby
-	// TODO: add lightness check as in TryToHide
-	// TODO: use crehidemd.2da as a skill bonus/malus (after refreshing effects, not here)
-	ieDword skill = GetStat(IE_HIDEINSHADOWS);
-	bool seen = false;
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *toCheck = *neighbour;
+	ieDword skill = GetSkill(IE_HIDEINSHADOWS);
+	for (const Actor *toCheck : neighbours) {
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
 		}
-		// we need to do a visual range check here, since we ignored it above, so hearing is not affected
-		if (toCheck->GetStat(IE_VISUALRANGE)*10 < PersonalDistance(toCheck, this)) {
+		// we need to do an additional visual range check from the perspective of the observer
+		if (!WithinRange(toCheck, Pos, toCheck->GetStat(IE_VISUALRANGE) / 2)) {
 			continue;
 		}
-		// IE_XPVALUE is the CR value in iwd2
-		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
-		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
-		seen = skill < (roll + targetDC);
+		// IE_CLASSLEVELSUM is set for all cres in iwd2 and use here was confirmed by RE
+		// the third summand is a racial bonus (crehidemd.2da), but we use their search skill directly
+		// the original actually multiplied the roll and DC by 5, making the check practically impossible to pass
+		targetDC = toCheck->GetStat(IE_CLASSLEVELSUM) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		bool seen = skill < roll + targetDC;
 		if (seen) {
 			HideFailed(this, 1, skill, roll, targetDC);
 			return false;
@@ -11002,23 +11001,23 @@ bool Actor::TryToHideIWD2()
 	}
 
 	// we're stationary, so no need to check if we're making movement sounds
-	if (!InMove() && !checked) {
+	if (!InMove()) {
 		return true;
 	}
 
 	// separate move silently check
-	skill = GetStat(IE_STEALTH);
-	bool heard = false;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *toCheck = *neighbour;
+	skill = GetSkill(IE_STEALTH);
+	for (const Actor *toCheck : neighbours) {
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;
 		}
-		// NOTE: pretending there is no hearing range
-		// IE_XPVALUE is the CR value in iwd2
-		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
-		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
-		heard = skill < (roll + targetDC);
+		// NOTE: pretending there is no hearing range, just as in the original
+
+		// the third summand is a racial bonus from the nonexisting QUIETMOD column of crehidemd.2da,
+		// but we're fair and use their search skill directly
+		// the original actually multiplied the roll and DC by 5 and inverted the comparison, making the check practically impossible to pass
+		targetDC = toCheck->GetStat(IE_CLASSLEVELSUM) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		bool heard = skill < roll + targetDC;
 		if (heard) {
 			HideFailed(this, 2, skill, roll, targetDC);
 			return false;
@@ -11027,6 +11026,9 @@ bool Actor::TryToHideIWD2()
 			displaymsg->DisplayRollStringName(112, DMC_LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
+
+	// NOTE: the original checked lightness for creatures that were both deaf and blind (or if nobody is around)
+	// check TryToHide if it ever becomes important (crelight.2da)
 
 	return true;
 }
