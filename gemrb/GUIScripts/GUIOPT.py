@@ -624,6 +624,7 @@ def QuitGamePress ():
 		GemRB.Quit()
 		return
 
+	GemRB.SetVar ("SelectedWindow", 0)
 	CloseQuitMsgWindow()
 
 	GemRB.QuitGame ()
