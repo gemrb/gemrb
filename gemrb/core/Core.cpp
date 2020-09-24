@@ -116,7 +116,7 @@ unsigned int PersonalDistance(const Point &p, const Scriptable *b)
 	long y = ( p.y - b->Pos.y );
 	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*10;
+		ret -= ((const Actor *) b)->size * 10;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -128,7 +128,7 @@ unsigned int SquaredPersonalDistance(const Point &p, const Scriptable *b)
 	long y = ( p.y - b->Pos.y );
 	int ret =  x*x + y*y;
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*100;
+		ret -= ((const Actor *) b)->size * 100;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -163,10 +163,10 @@ unsigned int PersonalDistance(const Scriptable *a, const Scriptable *b)
 	long y = ( a->Pos.y - b->Pos.y );
 	int ret = (int) std::sqrt( ( double ) ( x* x + y* y ) );
 	if (a->Type==ST_ACTOR) {
-		ret-=((Actor *)a)->size*10;
+		ret -= ((const Actor *) a)->size * 10;
 	}
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*10;
+		ret -= ((const Actor *) b)->size * 10;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -178,10 +178,10 @@ unsigned int SquaredPersonalDistance(const Scriptable *a, const Scriptable *b)
 	long y = ( a->Pos.y - b->Pos.y );
 	int ret =  x*x + y*y;
 	if (a->Type==ST_ACTOR) {
-		ret-=((Actor *)a)->size*100;
+		ret -= ((const Actor *) a)->size * 100;
 	}
 	if (b->Type==ST_ACTOR) {
-		ret-=((Actor *)b)->size*100;
+		ret -= ((const Actor *) b)->size * 100;
 	}
 	if (ret<0) return (unsigned int) 0;
 	return (unsigned int) ret;
@@ -207,7 +207,7 @@ unsigned int PersonalLineDistance(const Point &v, const Point &w, const Scriptab
 			p = w;
 		} else {
 			// projection on the line
-			p = Point(v.x + (w.x - v.x) * t, v.y + (w.y - v.y) * t);
+			p = Point(short(v.x + (w.x - v.x) * t), short(v.y + (w.y - v.y) * t));
 		}
 	}
 
@@ -285,7 +285,7 @@ int EARelation(const Scriptable* Owner, const Actor* target)
 	ieDword eao = EA_ENEMY;
 
 	if (Owner && Owner->Type==ST_ACTOR) {
-		eao = ((Actor *) Owner)->GetStat(IE_EA);
+		eao = ((const Actor *) Owner)->GetStat(IE_EA);
 	}
 
 	ieDword eat = target->GetStat(IE_EA);

@@ -305,7 +305,7 @@ public:
 	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);
-	bool UnEquipItem(ieDword slot, bool removecurse);
+	bool UnEquipItem(ieDword slot, bool removecurse) const;
 	/** Returns equipped weapon, also its slot */
 	CREItem *GetUsedWeapon(bool leftorright, int &slot) const;
 	/** returns slot of launcher weapon currently equipped */
@@ -315,7 +315,7 @@ public:
 	/** returns slot of launcher weapon for projectile in specified slot */
 	int FindSlotRangedWeapon(ieDword slot) const;
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
-	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
+	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL) const;
 	/** Creates an item in the slot*/
 	void SetSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
 	/** Adds item to slot*/

@@ -127,7 +127,7 @@ void InitScriptTables()
 	}
 }
 
-int GetReaction(Actor *target, Scriptable *Sender)
+int GetReaction(const Actor *target, const Scriptable *Sender)
 {
 	int chr, rep, reaction;
 
@@ -146,18 +146,18 @@ int GetReaction(Actor *target, Scriptable *Sender)
 
 	// add -4 penalty when dealing with racial enemies
 	if (Sender && target->GetRangerLevel() && (Sender->Type == ST_ACTOR) ) {
-		reaction -= target->GetRacialEnemyBonus((Actor *) Sender);
+		reaction -= target->GetRacialEnemyBonus((const Actor *) Sender);
 	}
 
 	return reaction;
 }
 
-int GetHappiness(Scriptable* Sender, int reputation)
+int GetHappiness(const Scriptable *Sender, int reputation)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* ab = ( Actor* ) Sender;
+	const Actor *ab = (const Actor *) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
 	// handle unset alignment
 	if (!alignment) {
@@ -167,12 +167,12 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	return happiness[alignment-1][reputation/10-1];
 }
 
-int GetHPPercent(Scriptable* Sender)
+int GetHPPercent(const Scriptable *Sender)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* ab = ( Actor* ) Sender;
+	const Actor *ab = (const Actor *) Sender;
 	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
 	if (hp1<1) {
 		return 0;
@@ -396,7 +396,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
+bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags)
 {
 	if (inventory->HasItem(itemname, flags)) {
 		return true;
@@ -1841,7 +1841,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 
 	if (!actor->InMove() || actor->Destination != p) {
 		bool always_run = core->GetGameControl()->ShouldRun(actor);
-		actor->WalkTo(p, IF_RUNNING * always_run, distance);
+		actor->WalkTo(p, always_run ? IF_RUNNING : 0, distance);
 	}
 
 	if (!actor->InMove()) {

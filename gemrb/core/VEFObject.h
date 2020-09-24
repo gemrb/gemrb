@@ -33,7 +33,7 @@ class DataStream;
 class Map;
 class ScriptedAnimation;
 
-typedef enum VEF_TYPES {VEF_INVALID=-1, VEF_BAM=0, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
+typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
 
 struct ScheduleEntry {
 	ieResRef resourceName;

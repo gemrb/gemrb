@@ -696,7 +696,7 @@ def SetupDamageInfo (pc, Button, Window):
 	hp_max = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	state = GemRB.GetPlayerStat (pc, IE_STATE_ID)
 
-	if hp_max < 1 or hp is "?":
+	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
 		ratio = (hp+0.0) / hp_max
@@ -734,7 +734,7 @@ def SetupDamageInfo (pc, Button, Window):
 		hpBar.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	ratio_str = ""
-	if hp is not "?":
+	if hp != "?":
 		ratio_str = "\n%d/%d" %(hp, hp_max)
 	Button.SetTooltip (GemRB.GetPlayerName (pc, 1) + ratio_str)
 

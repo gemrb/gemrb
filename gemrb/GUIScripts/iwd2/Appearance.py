@@ -18,8 +18,11 @@
 #
 #character generation, color (GUICG13)
 import GemRB
-from GUIDefines import *
 import CommonTables
+import GUICommon
+import IDLUCommon
+import Portrait
+from GUIDefines import *
 
 ColorTable = 0
 HairTable = 0
@@ -59,18 +62,24 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindow(13)
 
-	Race = CommonTables.Races.FindValue (3, GemRB.GetVar ("Race") )
-	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 5))
-	SkinTable = GemRB.LoadTable(CommonTables.Races.GetValue(Race, 6))
+	pc = GemRB.GetVar ("Slot")
+	Race = IDLUCommon.GetRace (pc)
+	RaceName = CommonTables.Races.GetRowName (Race)
+	HairTable = GemRB.LoadTable(CommonTables.Races.GetValue(RaceName, "HAIR"))
+	SkinTable = GemRB.LoadTable(CommonTables.Races.GetValue(RaceName, "SKIN"))
 	ColorTable = GemRB.LoadTable("clowncol")
 
 	#set these colors to some default
+	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
+	Portrait.Init (Gender)
+	Portrait.Set (GemRB.GetPlayerPortrait (pc))
+	PortraitName = Portrait.Name () # strips the last char like the table needs
+
 	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitIndex = GemRB.GetVar("PortraitIndex")
-	Color1=PortraitTable.GetValue(PortraitIndex,1)
-	Color2=PortraitTable.GetValue(PortraitIndex,2)
-	Color3=PortraitTable.GetValue(PortraitIndex,3)
-	Color4=PortraitTable.GetValue(PortraitIndex,4)
+	Color1 = PortraitTable.GetValue(PortraitName, "HAIR", GTV_INT)
+	Color2 = PortraitTable.GetValue(PortraitName, "SKIN", GTV_INT)
+	Color3 = PortraitTable.GetValue(PortraitName, "MAJOR", GTV_INT)
+	Color4 = PortraitTable.GetValue(PortraitName, "MINOR", GTV_INT)
 	PDollButton = ColorWindow.GetControl(1)
 	PDollButton.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 	PDollButton.SetState(IE_GUI_BUTTON_LOCKED)
@@ -107,13 +116,15 @@ def OnLoad():
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
-	AnimID = 0x6000 + table.GetValue (GemRB.GetVar("BaseRace"), 0)
+	AnimID = 0x6000 + table.GetValue (RaceName, "RACE")
 
 	table = GemRB.LoadTable ("avprefc")
-	AnimID = AnimID + table.GetValue (GemRB.GetVar("BaseClass"), 0)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassName = GUICommon.GetClassRowName (Class - 1, "index")
+	AnimID = AnimID + table.GetValue (ClassName, "PREFIX")
 
 	table = GemRB.LoadTable ("avprefg")
-	AnimID = AnimID + table.GetValue (GemRB.GetVar("Gender"), 0)
+	AnimID = AnimID + table.GetValue (Gender, 0)
 
 	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G11"
 	if PDollResRef == "*G11":

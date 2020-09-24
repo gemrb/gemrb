@@ -335,7 +335,7 @@ void Highlightable::SetTrapDetected(int x)
 	}
 }
 
-void Highlightable::TryDisarm(Actor *actor)
+void Highlightable::TryDisarm(const Actor *actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
@@ -384,7 +384,7 @@ void Highlightable::TryDisarm(Actor *actor)
 	ImmediateEvent();
 }
 
-void Door::TryPickLock(Actor *actor)
+void Door::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != (ieDword)-1) {

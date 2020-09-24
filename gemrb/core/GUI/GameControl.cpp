@@ -816,7 +816,7 @@ bool GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					int size = game->GetPartySize(true);
 					if (size < 2 || lastActor->GetCurrentArea() != game->GetCurrentArea()) break;
 					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
-						Actor *target = game->GetPC(i%size, true);
+						const Actor *target = game->GetPC(i % size, true);
 						if (target == lastActor) continue;
 						if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; //not NPC
 						lastActor->HandleInteractV1(target);

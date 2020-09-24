@@ -3231,7 +3231,7 @@ int fx_energy_drain (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//if there is another energy drain effect (level drain), add them up
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
 	// bonus to all saves
-	HandleSaveBoni(target, -fx->Parameter1, fx->TimingMode);
+	HandleSaveBoni(target, - signed(fx->Parameter1), fx->TimingMode);
 	STAT_SUB(IE_MAXHITPOINTS, fx->Parameter1*5);
 	return FX_APPLIED;
 }
@@ -3331,7 +3331,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// medium hack (better than original)
 	// the original used explicit race/subrace values
-	ieDword penalty;
+	int penalty;
 
 	//the original engine let the effect stay on non affected races, doing the same so the spell state sticks
 	if (check_iwd_targeting(Owner, target, 0, 82, fx)) penalty = 1; //dark elf
@@ -3735,8 +3735,9 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_BANE);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
 	}
-	target->ToHit.HandleFxBonus(-fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_MORALEBREAK, -fx->Parameter1);
+	int mod = signed(fx->Parameter1);
+	target->ToHit.HandleFxBonus(-mod, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
+	STAT_ADD( IE_MORALEBREAK, -mod);
 	return FX_APPLIED;
 }
 

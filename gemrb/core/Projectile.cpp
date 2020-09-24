@@ -878,7 +878,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 		step = path;
 	}
 
-	PathNode *start = step;
+	const PathNode *start = step;
 	while (step->Next && (( time - timeStartStep ) >= walk_speed)) {
 		unsigned int count = Speed;
 		while (step->Next && count) {
@@ -1112,7 +1112,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
-void Projectile::SetEffectsCopy(EffectQueue *eq, const Point &source)
+void Projectile::SetEffectsCopy(const EffectQueue *eq, const Point &source)
 {
 	delete effects;
 	if(!eq) {
@@ -1147,7 +1147,8 @@ void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
 			iter = iter->Next;
 		}
 
-		const Point s(first->x, first->y), d(last->x, last->y);
+		const Point s(short(first->x), short(first->y));
+		const Point d(short(last->x), short(last->y));
 		const std::vector<Actor *> &actors = area->GetAllActors();
 
 		for (Actor *target : actors) {
@@ -1193,14 +1194,13 @@ void Projectile::SecondaryTarget()
 	int mindeg = 0;
 	int maxdeg = 0;
 	int degOffset = 0;
-	char saneOrientation = Orientation;
 
 	//the AOE (area of effect) is cone shaped
 	if (Extension->AFlags&PAF_CONE) {
 		// see CharAnimations.cpp for a nice visualization of the orientation directions
 		// they start at 270° and go anticlockwise, so we have to rotate (reflect over y=-x) to match what math functions expect
 		// TODO: check if we can ignore this and use the angle between caster pos and target pos (are they still available here?)
-		saneOrientation = 12 - Orientation;
+		char saneOrientation = 12 - Orientation;
 		if (saneOrientation < 0) saneOrientation = MAX_ORIENT + saneOrientation;
 
 		// for cone angles (widths) bigger than 22.5 we will always have a range of values greater than 360
@@ -1227,10 +1227,10 @@ void Projectile::SecondaryTarget()
 	int radius = Extension->ExplosionRadius / 16;
 	std::vector<Actor *> actors = area->GetAllActorsInRadius(Pos, CalculateTargetFlag(), radius);
 	for (const Actor *actor : actors) {
-		ieDword Target = actor->GetGlobalID();
+		ieDword targetID = actor->GetGlobalID();
 
 		//this flag is actually about ignoring the caster (who is at the center)
-		if ((SFlags & PSF_IGNORE_CENTER) && (Caster==Target)) {
+		if ((SFlags & PSF_IGNORE_CENTER) && Caster == targetID) {
 			continue;
 		}
 
@@ -1241,7 +1241,7 @@ void Projectile::SecondaryTarget()
 
 		if (Extension->AFlags&PAF_CONE) {
 			//cone never affects the caster
-			if(Caster==Target) {
+			if (Caster == targetID) {
 				continue;
 			}
 			double xdiff = actor->Pos.x - Pos.x;
@@ -1279,7 +1279,7 @@ void Projectile::SecondaryTarget()
 		pro->SetTarget(Pos);
 		//TODO:actually some of the splash projectiles are a good example of faketarget
 		//projectiles (that don't follow the target, but still hit)
-		area->AddProjectile(pro, Pos, Target, false);
+		area->AddProjectile(pro, Pos, targetID, false);
 		fail=false;
 
 		//we already got one target affected in the AOE, this flag says

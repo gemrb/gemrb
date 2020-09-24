@@ -194,9 +194,9 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 		delete Scripts[idx];
 	}
 	Scripts[idx] = NULL;
-	// NONE is an 'invalid' script name, never used seriously
-	// This hack is to prevent flooding of the console
-	if (aScript[0] && stricmp(aScript, "NONE") ) {
+	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
+	// This check is to prevent flooding of the console
+	if (aScript[0] && stricmp(aScript, "NONE")) {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript( aScript, this, idx, ai );
 	}
@@ -579,7 +579,7 @@ void Scriptable::ProcessActions()
 		}
 		if (!CurrentAction) {
 			ClearActions();
-			lastAction = -1;
+			// clear lastAction here if you'll ever need it after exiting the loop
 			break;
 		}
 		lastAction = CurrentAction->actionID;

@@ -94,7 +94,7 @@ public:
 	void SetDoorOpen(int Open, int playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	int IsOpen() const;
-	void TryPickLock(Actor *actor);
+	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
 	void TryDetectSecret(int skill, ieDword actorID);

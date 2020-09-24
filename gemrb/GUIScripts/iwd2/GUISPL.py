@@ -106,12 +106,12 @@ def OpenSpellBookWindow ():
 		Button = Window.GetControl (6 + i)
 		Button.SetBorder (0,0,0,0,0,0,0,0,160,0,1)
 		#Button.SetBAM ("SPELFRAM",0,0,0)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	# Setup book spells buttons
 	for i in range (8):
 		Button = Window.GetControl (30 + i)
-		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellIndex", i)
 
@@ -207,13 +207,13 @@ def UpdateSpellBookWindow ():
 			ms = MemorizedSpellList[i]
 			spell = ms['SpellResRef']
 			Button.SetSpellIcon (spell)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE, OP_OR)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetTooltip (ms['SpellName'])
 			Button.SetVarAssoc ("SpellButton", i)
 			# since spells are stacked, we need to check first whether to unmemorize (deplete) or remove (already depleted)
 			if ms['MemoCount'] < ms['KnownCount']:
 				# already depleted, just remove
-				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnSpellBookUnmemorizeSpell(ms['MemoCount']))
+				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda mc = ms['MemoCount']: OnSpellBookUnmemorizeSpell (mc))
 			else:
 				# deplete and remove
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSpellBookSpellRemoveWindow)

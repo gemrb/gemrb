@@ -295,16 +295,16 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 	// int2Parameter is supposed to support also bones.ids, but nothing uses it like that
 	// if we need it, take the implementation from GameScript::Damage
 	switch (parameters->int1Parameter) {
-		case 1: // lower
+		case DM_LOWER:
 			value = actor->GetBase(parameters->int0Parameter);
 			value-= parameters->int2Parameter;
 			break;
-		case 2: // raise
+		case DM_RAISE:
 			value = actor->GetBase(parameters->int0Parameter);
 			value+= parameters->int2Parameter;
 			break;
-		case 3:
-		default: // set
+		case DM_SET:
+		default:
 			value = parameters->int2Parameter;
 			break;
 	}
@@ -3260,7 +3260,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	actor->CurrentActionState--;
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3268,10 +3268,10 @@ void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME * 2);
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3279,7 +3279,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME);
 }
 
 void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
@@ -4682,7 +4682,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		sprintf(params->string0Parameter, "%s", tab->QueryField(9999,9999));
+		snprintf(params->string0Parameter, sizeof(params->string0Parameter), "%s", tab->QueryDefault());
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -4826,12 +4826,12 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	int type=MOD_ADDITIVE;
 	// delta.ids
 	switch(parameters->int0Parameter) {
-	case 1: // lower
+	case DM_LOWER: // lower
 		break;
-	case 2: //raise
+	case DM_RAISE: //raise
 		damage=-damage;
 		break;
-	case 3: //set
+	case DM_SET: //set
 		type=MOD_ABSOLUTE;
 		break;
 	case 4: // GemRB extension

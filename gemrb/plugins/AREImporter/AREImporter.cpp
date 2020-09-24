@@ -361,7 +361,7 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 		}
 	}
 	// delayed bad bit removal due to chain overlapping
-	return Flags = (Flags & ~maskOff) | maskOn;
+	return (Flags & ~maskOff) | maskOn;
 }
 
 static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
@@ -1329,13 +1329,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			while (count) {
 				char key[32];
 				int value;
-				sprintf(key, "xPos%d",count);
+				snprintf(key, sizeof(key), "xPos%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.x = value;
-				sprintf(key, "yPos%d",count);
+				snprintf(key, sizeof(key), "yPos%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				point.y = value;
-				sprintf(key, "text%d",count);
+				snprintf(key, sizeof(key), "text%d",count);
 				value = INInote->GetKeyAsInt(scriptName, key, 0);
 				map->AddMapNote( point, color, value);
 				count--;
@@ -2232,8 +2232,8 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 	ieWord tmpWord;
 
 	memset(filling,0,sizeof(filling) );
-	unsigned int realCount = map->GetAmbientCount();
-	for (unsigned int i=0; i<realCount; i++) {
+	ieWord realCount = map->GetAmbientCount();
+	for (ieWord i = 0; i < realCount; i++) {
 		const Ambient *am = map->GetAmbient(i);
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->Write( am->name, 32 );

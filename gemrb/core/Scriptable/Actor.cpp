@@ -1418,7 +1418,7 @@ static void pcf_xp(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	unsigned int pc = actor->InParty;
 	if (pc && !actor->GotLUFeedback) {
 		char varname[16];
-		sprintf(varname, "CheckLevelUp%d", pc);
+		snprintf(varname, sizeof(varname), "CheckLevelUp%d", pc);
 		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CheckLevelUp", true, pc);
 		ieDword NeedsLevelUp = 0;
 		core->GetDictionary()->Lookup(varname, NeedsLevelUp);
@@ -2464,7 +2464,7 @@ static void InitActorTables()
 		}
 		for (unsigned int i=0; i < tm->GetRowCount(); i++) {
 			char rowName[6];
-			sprintf(rowName, "%d", i);
+			snprintf(rowName, sizeof(rowName), "%d", i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
 			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
@@ -3005,7 +3005,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 	return true;
 }
 
-int Actor::GetMod(unsigned int StatIndex)
+int Actor::GetMod(unsigned int StatIndex) const
 {
 	if (StatIndex >= MAX_STATS) {
 		return 0xdadadada;
@@ -3130,11 +3130,11 @@ void Actor::DisablePortraitIcon(ieByte icon)
 
 
 //hack to get the proper casting sounds of copied images
-ieDword Actor::GetCGGender()
+ieDword Actor::GetCGGender() const
 {
 	ieDword gender = Modified[IE_SEX];
 	if (gender == SEX_ILLUSION) {
-		Actor *master = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETMASTERID]);
+		const Actor *master = core->GetGame()->GetActorByGlobalID(Modified[IE_PUPPETMASTERID]);
 		if (master) {
 			gender = master->Modified[IE_SEX];
 		}
@@ -3963,7 +3963,7 @@ inline int CountElements(const char *s, char separator)
 	return ret;
 }
 
-void Actor::Interact(int type)
+void Actor::Interact(int type) const
 {
 	int start;
 	int count;
@@ -4167,7 +4167,7 @@ static int CheckInteract(const char *talker, const char *target)
 	return I_NONE;
 }
 
-void Actor::HandleInteractV1(Actor *target)
+void Actor::HandleInteractV1(const Actor *target)
 {
 	LastTalker = target->GetGlobalID();
 	char tmp[50];
@@ -4175,7 +4175,7 @@ void Actor::HandleInteractV1(Actor *target)
 	AddAction(GenerateAction(tmp));
 }
 
-int Actor::HandleInteract(Actor *target)
+int Actor::HandleInteract(const Actor *target) const
 {
 	int type = CheckInteract(scriptName, target->GetScriptName());
 
@@ -4212,7 +4212,7 @@ bool Actor::GetPartyComment()
 	if (core->Roll(1, 2, -1)) return false;
 
 	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
-		Actor *target = game->GetPC(i%size, true);
+		const Actor *target = game->GetPC(i % size, true);
 		if (target==this) continue;
 		if (target->BaseStats[IE_MC_FLAGS]&MC_EXPORTABLE) continue; //not NPC
 		if (target->GetCurrentArea()!=GetCurrentArea()) continue;
@@ -4518,7 +4518,7 @@ void Actor::SetMCFlag(ieDword arg, int op)
 	SetBase(IE_MC_FLAGS, tmp);
 }
 
-void Actor::DialogInterrupt()
+void Actor::DialogInterrupt() const
 {
 	//if dialoginterrupt was set, no verbal constant
 	if ( Modified[IE_MC_FLAGS]&MC_NO_TALK)
@@ -4560,7 +4560,7 @@ void Actor::GetHit(int damage, int spellLevel)
 // iwd2 however has two mechanisms: spell disruption and concentration checks:
 // - disruption is checked when a caster is damaged while casting
 // - concentration is checked when casting is taking place <= 5' from an enemy
-bool Actor::CheckSpellDisruption(int damage, int spellLevel)
+bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 {
 	if (core->HasFeature(GF_SIMPLE_DISRUPTION)) {
 		return LuckyRoll(1, 20, 0) < (damage + spellLevel);
@@ -5595,7 +5595,7 @@ static bool OfType(const Actor *a, const Actor *b)
 	return a->GetStat(IE_SUBRACE) == b->GetStat(IE_SUBRACE);
 }
 
-void Actor::SendDiedTrigger()
+void Actor::SendDiedTrigger() const
 {
 	if (!area) return;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED, GetSafeStat(IE_VISUALRANGE));
@@ -7042,7 +7042,7 @@ bool Actor::WeaponIsUsable(bool leftorright, ITMExtHeader *header) const
 }
 
 bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target)
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target)
 {
 	SetBaseAPRandAB(true);
 	speed = -(int)GetStat(IE_PHYSICALSPEED);
@@ -8136,7 +8136,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 
 void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 			unsigned char r, unsigned char g, unsigned char b,
-			int phase)
+			int phase) const
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
@@ -8275,7 +8275,7 @@ int Actor::GetFavoredPenalties() const
 	return -20*penalty;
 }
 
-int Actor::CalculateExperience(int type, int level)
+int Actor::CalculateExperience(int type, int level) const
 {
 	if (type>=xpbonustypes) {
 		return 0;
@@ -8423,7 +8423,8 @@ static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0
 static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
 static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
-bool Actor::ShouldHibernate() {
+bool Actor::ShouldHibernate() const
+{
 	//finding an excuse why we don't hybernate the actor
 	if (Modified[IE_ENABLEOFFSCREENAI])
 		return false;
@@ -9080,16 +9081,17 @@ bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 			}
 			break;
 	}
-	int count = CountElements(resource,',');
-	if (count <= 0) return false;
-	count = core->Roll(1,count,-1);
-	while(count--) {
-		while(*resource && *resource!=',') resource++;
-			if (*resource==',') resource++;
+
+	int count = CountElements(resource, ',');
+	int slot = RAND(0, count - 1);
+	while (slot--) {
+		while (*resource && *resource != ',') resource++;
+		if (*resource == ',') resource++;
 	}
-	CopyResRef(Sound, resource);
-	for(count=0;count<8 && Sound[count]!=',';count++) {};
-	Sound[count]=0;
+	size_t len = strcspn(resource, ",");
+	assert(len < sizeof(ieResRef));
+	strlcpy(Sound, resource, len + 1);
+
 	return true;
 }
 
@@ -9969,26 +9971,28 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 }
 
 // initializes the fist data the first time it is called
-void Actor::SetupFistData()
+void Actor::SetupFistData() const
 {
-	if (FistRows<0) {
-		FistRows=0;
-		AutoTable fist("fistweap");
-		if (fist) {
-			//default value
-			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
-			FistRows = fist->GetRowCount();
-			fistres = new FistResType[FistRows];
-			fistresclass = new int[FistRows];
-			for (int i=0;i<FistRows;i++) {
-				int maxcol = fist->GetColumnCount(i)-1;
-				for (int cols = 0;cols<MAX_LEVEL;cols++) {
-					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols>maxcol?maxcol:cols ), 8);
-				}
-				fistresclass[i] = atoi(fist->GetRowName(i));
+	if (FistRows >= 0) {
+		return;
+	}
+
+	FistRows = 0;
+	AutoTable fist("fistweap");
+	if (fist) {
+		strnlwrcpy(DefaultFist, fist->QueryDefault(), 8);
+		FistRows = fist->GetRowCount();
+		fistres = new FistResType[FistRows];
+		fistresclass = new int[FistRows];
+		for (int i = 0; i < FistRows; i++) {
+			int maxcol = fist->GetColumnCount(i) - 1;
+			for (int cols = 0; cols < MAX_LEVEL; cols++) {
+				strnlwrcpy(fistres[i][cols], fist->QueryField(i, cols > maxcol ? maxcol : cols), 8);
 			}
+			fistresclass[i] = atoi(fist->GetRowName(i));
 		}
 	}
+
 }
 
 void Actor::SetupFist()
@@ -10039,7 +10043,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	return 0;
 }
 
-int Actor::CheckUsability(Item *item) const
+int Actor::CheckUsability(const Item *item) const
 {
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
 	int kitignore = 0;
@@ -10126,7 +10130,7 @@ ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
 }
 
 //checks usability only
-int Actor::Unusable(Item *item) const
+int Actor::Unusable(const Item *item) const
 {
 	if (!GetStat(IE_CANUSEANYITEM)) {
 		int unusable = CheckUsability(item);
@@ -10854,6 +10858,7 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 		case 2:
 			// ~Failed hide in shadows because you were heard by creature! Hide in Shadows check %d vs. creature's Level+Wisdom+Race modifier  %d + %d D20 Roll.~
 			displaymsg->DisplayRollStringName(39297, DMC_LIGHTGREY, actor, skill, targetDC, roll);
+			break;
 		default:
 			// no message
 			break;
@@ -10861,11 +10866,11 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 }
 
 //checks if we are seen, or seeing anyone
-bool Actor::SeeAnyOne(bool enemy, bool seenby)
+bool Actor::SeeAnyOne(bool enemy, bool seenby) const
 {
 	if (!area) return false;
 
-	int flag = (seenby?0:GA_NO_HIDDEN)|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_SELF;
+	int flag = (seenby ? 0 : GA_NO_HIDDEN) | GA_NO_DEAD | GA_NO_UNSCHEDULED | GA_NO_SELF;
 	if (enemy) {
 		ieDword ea = GetSafeStat(IE_EA);
 		if (ea>=EA_EVILCUTOFF) {
@@ -10877,15 +10882,13 @@ bool Actor::SeeAnyOne(bool enemy, bool seenby)
 		}
 	}
 
-	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby ? VOODOO_VISUAL_RANGE/2 : GetSafeStat(IE_VISUALRANGE), this);
+	std::vector<Actor *> visActors = area->GetAllActorsInRadius(Pos, flag, seenby ? VOODOO_VISUAL_RANGE / 2 : GetSafeStat(IE_VISUALRANGE) / 2, this);
 	bool seeEnemy = false;
 
 	//we need to look harder if we look for seenby anyone
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = visActors.begin(); neighbour != visActors.end() && !seeEnemy; ++neighbour) {
-		Actor *toCheck = *neighbour;
+	for (const Actor *toCheck : visActors) {
 		if (seenby) {
-			if (ValidTarget(GA_NO_HIDDEN, toCheck) && (toCheck->Modified[IE_VISUALRANGE]*10 < PersonalDistance(toCheck, this))) {
+			if (WithinRange(toCheck, Pos, toCheck->GetStat(IE_VISUALRANGE) / 2)) {
 				seeEnemy = true;
 			}
 		} else {
@@ -10903,7 +10906,6 @@ bool Actor::TryToHide()
 	}
 
 	// iwd2 is like the others only when trying to hide for the first time
-	// TODO: once understood, the visual checks need syncing (not just lightness)
 	bool continuation = Modified[IE_STATE_ID] & state_invisible;
 	if (third && continuation) {
 		return TryToHideIWD2();
@@ -10940,7 +10942,7 @@ bool Actor::TryToHide()
 		skill *= 7; // FIXME: temporary increase for the lightness percentage calculation
 	}
 	// TODO: figure out how iwd2 uses the area lightness and crelight.2da
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	// check how bright our spot is
 	ieDword lightness = game->GetCurrentArea()->GetLightLevel(Pos);
 	// seems to be the color overlay at midnight; lightness of a point with rgb (200, 100, 100)
@@ -10963,30 +10965,32 @@ bool Actor::TryToHide()
 // skill check when trying to maintain invisibility: separate move silently and visibility check
 bool Actor::TryToHideIWD2()
 {
-	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_ALLY|GA_NO_NEUTRAL|GA_NO_SELF|GA_NO_UNSCHEDULED, VOODOO_VISUAL_RANGE/2, this);
+	int flags = GA_NO_DEAD | GA_NO_NEUTRAL | GA_NO_SELF | GA_NO_UNSCHEDULED;
+	ieDword ea = GetSafeStat(IE_EA);
+	if (ea >= EA_EVILCUTOFF) {
+		flags |= GA_NO_ENEMY;
+	} else if (ea <= EA_GOODCUTOFF) {
+		flags |= GA_NO_ALLY;
+	}
+	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, flags, Modified[IE_VISUALRANGE] / 2, this);
 	ieDword roll = LuckyRoll(1, 20, GetArmorSkillPenalty(0));
 	int targetDC = 0;
-	bool checked = false;
 
 	// visibility check, you can try hiding while enemies are nearby
-	// TODO: add lightness check as in TryToHide
-	// TODO: use crehidemd.2da as a skill bonus/malus (after refreshing effects, not here)
-	ieDword skill = GetStat(IE_HIDEINSHADOWS);
-	bool seen = false;
-	std::vector<Actor *>::iterator neighbour;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *toCheck = *neighbour;
+	ieDword skill = GetSkill(IE_HIDEINSHADOWS);
+	for (const Actor *toCheck : neighbours) {
 		if (toCheck->GetStat(IE_STATE_ID)&STATE_BLIND) {
 			continue;
 		}
-		// we need to do a visual range check here, since we ignored it above, so hearing is not affected
-		if (toCheck->GetStat(IE_VISUALRANGE)*10 < PersonalDistance(toCheck, this)) {
+		// we need to do an additional visual range check from the perspective of the observer
+		if (!WithinRange(toCheck, Pos, toCheck->GetStat(IE_VISUALRANGE) / 2)) {
 			continue;
 		}
-		// IE_XPVALUE is the CR value in iwd2
-		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
-		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
-		seen = skill < (roll + targetDC);
+		// IE_CLASSLEVELSUM is set for all cres in iwd2 and use here was confirmed by RE
+		// the third summand is a racial bonus (crehidemd.2da), but we use their search skill directly
+		// the original actually multiplied the roll and DC by 5, making the check practically impossible to pass
+		targetDC = toCheck->GetStat(IE_CLASSLEVELSUM) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		bool seen = skill < roll + targetDC;
 		if (seen) {
 			HideFailed(this, 1, skill, roll, targetDC);
 			return false;
@@ -10997,23 +11001,23 @@ bool Actor::TryToHideIWD2()
 	}
 
 	// we're stationary, so no need to check if we're making movement sounds
-	if (!InMove() && !checked) {
+	if (!InMove()) {
 		return true;
 	}
 
 	// separate move silently check
-	skill = GetStat(IE_STEALTH);
-	bool heard = false;
-	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *toCheck = *neighbour;
+	skill = GetSkill(IE_STEALTH);
+	for (const Actor *toCheck : neighbours) {
 		if (toCheck->HasSpellState(SS_DEAF)) {
 			continue;
 		}
-		// NOTE: pretending there is no hearing range
-		// IE_XPVALUE is the CR value in iwd2
-		// the third summand should be a racial bonus, but since skillrac has other values, we use their search skill directly
-		targetDC = toCheck->GetStat(IE_XPVALUE) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
-		heard = skill < (roll + targetDC);
+		// NOTE: pretending there is no hearing range, just as in the original
+
+		// the third summand is a racial bonus from the nonexisting QUIETMOD column of crehidemd.2da,
+		// but we're fair and use their search skill directly
+		// the original actually multiplied the roll and DC by 5 and inverted the comparison, making the check practically impossible to pass
+		targetDC = toCheck->GetStat(IE_CLASSLEVELSUM) + toCheck->GetAbilityBonus(IE_WIS) + toCheck->GetStat(IE_SEARCH);
+		bool heard = skill < roll + targetDC;
 		if (heard) {
 			HideFailed(this, 2, skill, roll, targetDC);
 			return false;
@@ -11022,6 +11026,9 @@ bool Actor::TryToHideIWD2()
 			displaymsg->DisplayRollStringName(112, DMC_LIGHTGREY, this, skill, targetDC, roll);
 		}
 	}
+
+	// NOTE: the original checked lightness for creatures that were both deaf and blind (or if nobody is around)
+	// check TryToHide if it ever becomes important (crelight.2da)
 
 	return true;
 }
@@ -11065,15 +11072,6 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 
 	int srange = GetSpellDistance(spellres, caster);
 	return srange<range;
-}
-
-bool Actor::PCInDark() const
-{
-	unsigned int level = area->GetLightLevel(Pos);
-	if (level<ref_lightness) {
-		return true;
-	}
-	return false;
 }
 
 int Actor::GetClassMask() const

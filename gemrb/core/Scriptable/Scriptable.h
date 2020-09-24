@@ -322,7 +322,7 @@ public:
 	void SetOverheadText(const String& text, bool display = true);
 	const String& GetOverheadText() { return OverheadText; };
 	bool DisplayOverheadText(bool);
-	bool OverheadTextIsDisplaying() { return overheadTextDisplaying; }
+	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
 	void FixHeadTextPos();
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible
@@ -446,7 +446,7 @@ public:
 		return NULL;
 	}
 	void SetTrapDetected(int x);
-	void TryDisarm(Actor *actor);
+	void TryDisarm(const Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill, ieDword actorID);
 	//returns true if trap is visible, only_detected must be true

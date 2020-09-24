@@ -1,9 +1,12 @@
-GemRB git (403d908fc):
+GemRB git (dd8fa044c21):
   New features:
     - 
 
   Improved features:
     - 
+    - lightning bolts
+    - build system
+    - externalized summoning limit, trap limit, narration text speed
     - bugfixes
 
 GemRB v0.8.7 (2020-08-23):

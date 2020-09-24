@@ -553,7 +553,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		face = ent->Face;
 	}
 	//LeaveArea is the same in ALL engine versions
-	sprintf(command, "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
+	snprintf(command, sizeof(command), "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
 
 	if (EveryOne&CT_GO_CLOSER) {
 		int i=game->GetPartySize(false);
@@ -2207,7 +2207,7 @@ void Map::SortQueues()
 	}
 }
 
-void Map::AddProjectile(Projectile* pro, const Point &source, ieWord actorID, bool fake)
+void Map::AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake)
 {
 	proIterator iter;
 
@@ -2468,7 +2468,7 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 			if (AdjustPositionX(goal, radiusx, radiusy)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radiusy, radiusx)) {
+			if (AdjustPositionY(goal, radiusx, radiusy)) {
 				return;
 			}
 		} else {
@@ -2544,11 +2544,11 @@ void Map::SetupAmbients()
 	ambim->setAmbients( ambients );
 }
 
-unsigned int Map::GetAmbientCount(bool toSave) const
+ieWord Map::GetAmbientCount(bool toSave) const
 {
-	if (!toSave) return (unsigned int) ambients.size();
+	if (!toSave) return static_cast<ieWord>(ambients.size());
 
-	unsigned int ambiCount = 0;
+	ieWord ambiCount = 0;
 	for (const Ambient *ambient : ambients) {
 		if (!(ambient->flags & IE_AMBI_NOSAVE)) ambiCount++;
 	}
@@ -3066,7 +3066,7 @@ Container *Map::GetPile(Point position)
 	//converting to search square
 	position.x=position.x/16;
 	position.y=position.y/12;
-	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
+	snprintf(heapname, sizeof(heapname), "heap_%hd.%hd", position.x, position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;
 	position.y=position.y*12+6;

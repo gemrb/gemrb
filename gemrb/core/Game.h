@@ -322,9 +322,9 @@ public:
 	/** Finds a global actor by global ID */
 	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
-	int InParty(Actor* pc) const;
+	int InParty(const Actor *pc) const;
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
-	int InStore(Actor* pc) const;
+	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
 	Actor* FindPC(const char *deathvar);
 	/** Finds an actor in store by scripting name*/

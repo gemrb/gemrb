@@ -50,8 +50,8 @@ public:
 	//returns dithering option
 	int WantDither();
 	int IsOpen() const;
-	void TryPickLock(Actor *actor);
-	void TryBashLock(Actor* actor) ;
+	void TryPickLock(const Actor *actor);
+	void TryBashLock(Actor *actor);
 	bool TryUnlock(Actor *actor);
 	void dump() const;
 	int TrapResets() const { return Flags & CONT_RESET; }

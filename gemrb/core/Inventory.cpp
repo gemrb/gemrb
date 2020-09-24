@@ -59,6 +59,7 @@ static int SLOT_ARMOR = -1;
 //IWD2 style slots
 static bool IWD2 = false;
 
+[[noreturn]]
 static void InvalidSlot(int slot)
 {
 	error("Inventory", "Invalid slot: %d!\n", slot);
@@ -145,7 +146,6 @@ CREItem *Inventory::GetItem(unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	CREItem *item = Slots[slot];
 	Slots.erase(Slots.begin()+slot);
@@ -495,7 +495,6 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	item = Slots[slot];
 
@@ -550,7 +549,6 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return;
 	}
 
 	delete Slots[slot];
@@ -570,7 +568,6 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype, bool ranged)
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
 			InvalidSlot(slot);
-			return ASI_FAILED;
 		}
 
 		//check for equipping weapons
@@ -829,7 +826,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		gold->Usages[1] = 0;
 		gold->Usages[2] = 0;
 		CopyResRef(gold->ItemResRef, core->GoldResRef);
-		gold->Usages[0] = Owner->BaseStats[IE_GOLD];
+		gold->Usages[0] = static_cast<ieWord>(Owner->BaseStats[IE_GOLD]);
 		Owner->BaseStats[IE_GOLD] = 0;
 		map->AddItemToLocation(loc, gold);
 	}
@@ -840,7 +837,6 @@ CREItem *Inventory::GetSlotItem(ieDword slot) const
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
-		return NULL;
 	}
 	return Slots[slot];
 }
@@ -970,7 +966,7 @@ bool Inventory::EquipItem(ieDword slot)
 
 //the removecurse flag will check if it is possible to move the item to the inventory
 //after a remove curse spell
-bool Inventory::UnEquipItem(ieDword slot, bool removecurse)
+bool Inventory::UnEquipItem(ieDword slot, bool removecurse) const
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
@@ -1355,7 +1351,7 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 // Returns index of first empty slot or slot with the same
 // item and not full stack. On fail returns -1
 // Can be used to check for full inventory
-int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref)
+int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref) const
 {
 	if (first_slot >= Slots.size())
 		return -1;
@@ -1615,6 +1611,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 					break;
 				case ID_NEED:
 					if (!idreq1) continue;
+					break;
 				default:;
 			}
 

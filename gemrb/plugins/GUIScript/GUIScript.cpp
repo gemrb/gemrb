@@ -266,7 +266,7 @@ static int SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt, int 
 			int ret;
 			if (ShowHotkeys) {
 				char *txt2 = (char *) malloc(strlen(txt) + 10);
-				sprintf(txt2, "F%d - %s", Function, txt);
+				snprintf(txt2, strlen(txt) + 10, "F%d - %s", Function, txt);
 				ret = core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2, Function);
 				free(txt2);
 			} else {
@@ -5510,7 +5510,10 @@ static PyObject* GemRB_Control_SetAnimation(PyObject * /*self*/, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
-	if (!anim->HasControl()) Py_RETURN_NONE;
+	if (!anim->HasControl()) {
+		delete anim;
+		Py_RETURN_NONE;
+	}
 
 	if (Blend) {
 		anim->SetBlend(true);
@@ -12635,7 +12638,7 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Actor *actor = game->FindPC(game->GetSelectedPCSingle());
+	const Actor *actor = game->FindPC(game->GetSelectedPCSingle());
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
