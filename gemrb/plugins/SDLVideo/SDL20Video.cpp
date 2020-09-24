@@ -64,11 +64,7 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-#ifdef VITA
-	Uint32 winFlags = SDL_WINDOW_SHOWN;
-#else
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
-#endif
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
