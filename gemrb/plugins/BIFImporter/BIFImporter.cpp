@@ -28,7 +28,7 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 #include "System/MappedFileMemoryStream.h"
 #endif
 
@@ -63,7 +63,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
-#if !defined(HAVE_MMAP) && !defined(WIN32)
+#if !defined(SUPPORTS_MEMSTREAM)
 	fflush(stdout);
 #endif
 	FileStream out;
@@ -86,7 +86,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		}
 	}
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 	return new MappedFileMemoryStream{path};
 #else
 	return FileStream::OpenFile(path);
@@ -117,7 +117,7 @@ int BIFImporter::OpenArchive(const char* path)
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
 	char Signature[8];
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
 	if (!cacheStream->isOk()) {
@@ -153,7 +153,7 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 	} else {
 		stream = cacheStream;
 #endif

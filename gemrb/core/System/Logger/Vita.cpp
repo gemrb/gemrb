@@ -34,13 +34,7 @@ VitaLogger::~VitaLogger()
 
 void VitaLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
 {
-        printf("[");
-        printf(owner);
-        printf("/");
-        printf(log_level_text[level]);
-        printf("]: ");
-        printf(message);
-        printf("\n");
+	printf("[%s/%s]: %s\n", owner, log_level_text[level], message);
 }
 
 Logger* createVitaLogger()

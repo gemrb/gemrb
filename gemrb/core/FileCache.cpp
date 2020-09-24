@@ -22,7 +22,7 @@
 #include "Interface.h"
 #include "PluginMgr.h"
 #include "System/FileStream.h"
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 #include "System/MappedFileMemoryStream.h"
 #endif
 #include "System/VFS.h"
@@ -54,7 +54,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	} else {
 		stream->Seek(length, GEM_CURRENT_POS);
 	}
-#if defined(HAVE_MMAP) || defined(WIN32)
+#if defined(SUPPORTS_MEMSTREAM)
 	return new MappedFileMemoryStream{path};
 #else
 	return FileStream::OpenFile(path);

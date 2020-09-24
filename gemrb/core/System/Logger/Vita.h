@@ -21,8 +21,6 @@
 
 #include "System/Logger.h"
 
-using namespace std;
-
 namespace GemRB {
 
 class GEM_EXPORT VitaLogger : public Logger {

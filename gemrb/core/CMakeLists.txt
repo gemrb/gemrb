@@ -146,7 +146,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	${PLATFORM_SRC}
 	)
 
-IF(HAVE_MMAP OR WIN32)
+IF(SUPPORTS_MEMSTREAM)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
 		System/MappedFileMemoryStream.cpp

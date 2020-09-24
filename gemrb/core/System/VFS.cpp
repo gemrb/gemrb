@@ -140,12 +140,14 @@ static void closedir(DIR* dirp)
 
 using namespace GemRB;
 
-struct DIR {
+struct DIR
+{
 	bool is_first;
 	SceUID descriptor;
 };
 
-struct dirent {
+struct dirent
+{
 	char d_name[_MAX_PATH];
 };
 
@@ -172,7 +174,7 @@ static dirent* readdir(DIR* dirp)
 	if (dirp->is_first) 
 	{
 		dirp->is_first = 0;
-		strcpy( de.d_name, "." );
+		strcpy(de.d_name, ".");
 	} 
 	else 
 	{

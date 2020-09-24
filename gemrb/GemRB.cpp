@@ -36,6 +36,7 @@
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h>
 
+// allocating memory for application on Vita
 int _newlib_heap_size_user = 320 * 1024 * 1024;
 #endif
 
@@ -65,10 +66,10 @@ static void appPutToForeground()
 int main(int argc, char* argv[])
 {
 #ifdef VITA
-    scePowerSetArmClockFrequency(444);
-    scePowerSetBusClockFrequency(222);
-    scePowerSetGpuClockFrequency(222);
-    scePowerSetGpuXbarClockFrequency(166);
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
 #endif
 
 	setlocale(LC_ALL, "");
@@ -105,7 +106,7 @@ int main(int argc, char* argv[])
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
 #ifdef VITA
-        sceKernelExitProcess(0);
+		sceKernelExitProcess(0);
 #endif
 		return -1;
 	}
@@ -119,7 +120,7 @@ int main(int argc, char* argv[])
 	delete( core );
 	ShutdownLogging();
 #ifdef VITA
-    sceKernelExitProcess(0);
+	sceKernelExitProcess(0);
 #endif
 	return 0;
 }
