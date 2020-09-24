@@ -45,34 +45,6 @@ extern "C" double round(double);
 
 using namespace GemRB;
 
-#ifdef VITA
-#define JOY_DEADZONE 1000
-#define JOY_MAP_SCROLL_DEADZONE 25000
-#define JOY_ANALOG
-#define JOY_XAXISL 0
-#define JOY_YAXISL 1
-#define JOY_XAXISR 2
-#define JOY_YAXISR 3
-
-enum {
-	BTN_LEFT		= 7,
-	BTN_DOWN		= 6,
-	BTN_RIGHT		= 9,
-	BTN_UP			= 8,
-
-	BTN_START		= 11,
-	BTN_SELECT		= 10,
-
-	BTN_SQUARE		= 3,
-	BTN_CROSS		= 2,
-	BTN_CIRCLE		= 1,
-	BTN_TRIANGLE	= 0,
-
-	BTN_R1			= 5,
-	BTN_L1			= 4
-};
-#endif
-
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
@@ -101,9 +73,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	subtitlestrref = 0;
 	subtitletext = NULL;
 	disp = tmpBuf =  NULL;
-#ifdef VITA
-	vitaPointerSpeed = core->VitaPointerSpeed / VITA_SPEED_MOD;
-#endif
+	joystickControl.SetPointerSpeed(core->VitaPointerSpeed);
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -112,11 +82,7 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
-
-#ifdef VITA
-    SDL_JoystickClose(gGameController);
-#endif
-
+	if(gameController) SDL_JoystickClose(gameController);
 	SDL_Quit();
 
 	// This sprite needs to have been freed earlier, because
@@ -132,20 +98,18 @@ int SDLVideoDriver::Init(void)
 		return GEM_ERROR;
 	}
 
-#ifdef VITA
-	if (SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == -1) {
+	if (SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == -1)
+	{
 		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
-		return GEM_ERROR;
 	}
-#endif
+	else
+	{
+		gameController = SDL_JoystickOpen(0);
+	}
 
 	if (!(MouseFlags&MOUSE_HIDDEN)) {
 		SDL_ShowCursor( SDL_DISABLE );
 	}
-
-#ifdef VITA
-    gGameController = SDL_JoystickOpen(0);
-#endif
 
 	return GEM_OK;
 }
@@ -162,9 +126,8 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-#ifdef VITA
-	ProcessAxisMotion();
-#endif
+	if (SDL_NumJoysticks() > 0)
+		ProcessAxisMotion();
 
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
@@ -239,6 +202,13 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			/* Quit event originated from outside GemRB so ask the user if we should exit */
 			core->AskAndExit();
 			return GEM_OK;
+		case SDL_JOYAXISMOTION:
+			joystickControl.HandleJoyAxisEvent(event.jaxis);
+		break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			HandleJoyButtonEvent(event.jbutton);
+			break;
 		case SDL_KEYUP:
 			switch(sym) {
 				case SDLK_LALT:
@@ -266,17 +236,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			if (!core->ConsolePopped && ( key != 0 ))
 				EvntManager->KeyRelease( key, modstate );
 			break;
-
-#ifdef VITA
-            case SDL_JOYAXISMOTION:
-                HandleJoyAxisEvent(event.jaxis);
-                break;
-            case SDL_JOYBUTTONDOWN:
-            case SDL_JOYBUTTONUP:
-                HandleJoyButtonEvent(event.jbutton);
-                break;
-#endif
-
 		case SDL_KEYDOWN:
 			if ((sym == SDLK_SPACE) && modstate & GEM_MOD_CTRL) {
 				core->PopupConsole();
@@ -422,172 +381,60 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-#ifdef VITA
-void SDLVideoDriver::HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
-{
-    if (motion.axis == JOY_XAXISL)
-    {
-        if(std::abs(motion.value) > JOY_DEADZONE)
-            xAxisLValue = motion.value;
-        else
-            xAxisLValue = 0;
-    }
-    else if (motion.axis == JOY_YAXISL)
-    {
-        if(std::abs(motion.value) > JOY_DEADZONE)
-            yAxisLValue = motion.value;
-        else
-            yAxisLValue = 0;
-    }
-	else if (motion.axis == JOY_XAXISR)
-    {
-        xAxisRValue = motion.value;
-    }
-	else if (motion.axis == JOY_YAXISR)
-    {
-        yAxisRValue = motion.value;
-    }
-}
-
-unsigned char SDLVideoDriver::GetCurrentKeyValue()
-{
-	unsigned char modKeyValue = vitaKeys[currentCharIndex];
-
-	if (currentUpper && vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
-	{
-		modKeyValue -= 32;
-	}
-
-	return modKeyValue;
-}
-
 void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 {
-	if (vitaInputActive)
+#ifdef VITA
+	// DPad input
+	if (dPadSoftKeyboard.IsInputActive())
 	{
-		//name editing phase
+		// add/change characters only on key down
+		if (button.state != SDL_PRESSED && button.button != JoystickControl::BTN_CROSS && button.button != JoystickControl::BTN_CIRCLE)
+			return;
+
 		switch(button.button)
 		{
-			case BTN_LEFT:
+			case JoystickControl::BTN_LEFT:
 			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (inputIndexes.empty())
-				{
-					emptyInput = true;
-					currentUpper = true;
-					currentCharIndex = 0;
-				}
-				else
-				{
-					currentCharIndex = inputIndexes.back();
-					inputIndexes.pop_back();
-					if (inputIndexes.empty())
-						currentUpper = true;
-				}
-					
+				dPadSoftKeyboard.RemoveCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
 				break;
 			}
-			case BTN_RIGHT:
+			case JoystickControl::BTN_RIGHT:
 			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (emptyInput)
-				{
-					emptyInput = false;
-				}
-				else
-				{
-					currentUpper = false;
-					inputIndexes.push_back(currentCharIndex);
-					currentCharIndex = 0;
-				}
-
-				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				dPadSoftKeyboard.AddCharacter();
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
-			case BTN_DOWN:
+			case JoystickControl::BTN_DOWN:
 			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (emptyInput)
-				{
-					emptyInput = false;
-				}
-				else
-				{
-					++currentCharIndex;
-					if (currentCharIndex >= TOTAL_CHARACTERS_VITA)
-						currentCharIndex = 0;
-				}
-
+				dPadSoftKeyboard.NextCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
-				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
-			case BTN_UP:
+			case JoystickControl::BTN_UP:
 			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (emptyInput)
-				{
-					emptyInput = false;
-				}
-				else
-				{
-					--currentCharIndex;
-					if (currentCharIndex < 0)
-						currentCharIndex = TOTAL_CHARACTERS_VITA - 1;
-				}
-
+				dPadSoftKeyboard.PreviousCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
-				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
-			case BTN_L1:
+			case JoystickControl::BTN_L1:
+			case JoystickControl::BTN_R1:
 			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (emptyInput)
-					emptyInput = false;
-				
-				if (vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
-					currentUpper = !currentUpper;
-
+				dPadSoftKeyboard.ToggleUppercase();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
-				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
-
-				break;
-			}
-			case BTN_R1:
-			{
-				if (button.state != SDL_PRESSED)
-					return;
-
-				if (emptyInput)
-					emptyInput = false;
-
-				if (vitaKeys[currentCharIndex] >= 97 && vitaKeys[currentCharIndex] <= 122)
-					currentUpper = !currentUpper;
-
-				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
-				EvntManager->KeyPress(GetCurrentKeyValue(), KMOD_NONE);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
 			}
 			//LMB event
-			case BTN_CROSS:
+			case JoystickControl::BTN_CROSS:
 			{
 				GamepadMouseEvent(1, button.state);
 				break;
 			}
 			//RMB event
-			case BTN_CIRCLE:
+			case JoystickControl::BTN_CIRCLE:
 			{
 				GamepadMouseEvent(3, button.state);
 				break;
@@ -598,68 +445,69 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 		}
 	}
 	else
+#endif
 	{
 		//gameplay bindings
 		switch(button.button)
 		{
 			//LMB event
-			case BTN_CROSS:
+			case JoystickControl::BTN_CROSS:
 			{
 				GamepadMouseEvent(1, button.state);
 				break;
 			}
 			//RMB event
-			case BTN_CIRCLE:
+			case JoystickControl::BTN_CIRCLE:
 			{
 				GamepadMouseEvent(3, button.state);
 				break;
 			}
 			//scroll map
-			case BTN_LEFT:
+			case JoystickControl::BTN_LEFT:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_LEFT);
 				break;
 			}
-			case BTN_RIGHT:
+			case JoystickControl::BTN_RIGHT:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_RIGHT);
 				break;
 			}
-			case BTN_UP:
+			case JoystickControl::BTN_UP:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_UP);
 				break;
 			}
-			case BTN_DOWN:
+			case JoystickControl::BTN_DOWN:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_DOWN);
 				break;
 			}
 			//open menu
-			case BTN_SELECT:
+			case JoystickControl::BTN_SELECT:
 			{
 				GamepadKeyboardEvent(SDLK_o, button.state);
 				break;
 			}
 			//ESC
-			case BTN_START:
+			case JoystickControl::BTN_START:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_ESCAPE);
 				break;
 			}
 			//pause combat
-			case BTN_R1:
+			case JoystickControl::BTN_R1:
 			{
 				GamepadKeyboardEvent(SDLK_SPACE, button.state);
 				break;
 			}
 			//highlight items
-			case BTN_L1:
+			case JoystickControl::BTN_L1:
 			{
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_ALT);
@@ -669,13 +517,13 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				break;
 			}
 			//inventory
-			case BTN_TRIANGLE:
+			case JoystickControl::BTN_TRIANGLE:
 			{
 				GamepadKeyboardEvent(SDLK_i, button.state);
 				break;
 			}
 			//map
-			case BTN_SQUARE:
+			case JoystickControl::BTN_SQUARE:
 			{
 				GamepadKeyboardEvent(SDLK_m, button.state);
 				break;
@@ -699,14 +547,14 @@ void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
 		if (!core->ConsolePopped)
-			EvntManager->MouseDown( static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos), 1 << ( buttonCode - 1 ), GetModState() );
+			EvntManager->MouseDown(static_cast<unsigned short>(joystickControl.xAxisFloatPos), static_cast<unsigned short>(joystickControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
 	}
 	else
 	{
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_UP;
 		if (!core->ConsolePopped)
-			EvntManager->MouseUp( static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos), 1 << ( buttonCode - 1 ), GetModState() );
+			EvntManager->MouseUp(static_cast<unsigned short>(joystickControl.xAxisFloatPos), static_cast<unsigned short>(joystickControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
 	}
 }
 
@@ -720,47 +568,46 @@ void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
 
 void SDLVideoDriver::ProcessAxisMotion()
 {
-    uint32_t currentTime = SDL_GetTicks();
-    uint32_t deltaTime = currentTime - lastAxisMovementTime;
-    lastAxisMovementTime = currentTime;
-    
+	uint32_t currentTime = SDL_GetTicks();
+	uint32_t deltaTime = currentTime - joystickControl.lastAxisMovementTime;
+	joystickControl.lastAxisMovementTime = currentTime;
+
 	//cursor movement
-    if (xAxisLValue != 0 || yAxisLValue != 0)
-    {
-		int16_t xSign = ( xAxisLValue > 0 ) - ( xAxisLValue < 0 );
-		int16_t ySign = ( yAxisLValue > 0 ) - ( yAxisLValue < 0 );
+	if (joystickControl.xAxisLValue != 0 || joystickControl.yAxisLValue != 0)
+	{
+		int16_t xSign = (joystickControl.xAxisLValue > 0) - (joystickControl.xAxisLValue < 0);
+		int16_t ySign = (joystickControl.yAxisLValue > 0) - (joystickControl.yAxisLValue < 0);
 
-		xAxisFloatPos += ((pow(abs(xAxisLValue), VITA_AXIS_SPEEDUP) * xSign * deltaTime)) * vitaPointerSpeed;
-		yAxisFloatPos += ((pow(abs(yAxisLValue), VITA_AXIS_SPEEDUP) * ySign * deltaTime)) * vitaPointerSpeed;
+		joystickControl.xAxisFloatPos += ((pow(abs(joystickControl.xAxisLValue), joystickControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * joystickControl.GetPointerSpeed();
+		joystickControl.yAxisFloatPos += ((pow(abs(joystickControl.yAxisLValue), joystickControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * joystickControl.GetPointerSpeed();
 
-		if(xAxisFloatPos < 0) 
-			xAxisFloatPos = 0;
-		if(yAxisFloatPos < 0) 
-			yAxisFloatPos = 0;
+		if(joystickControl.xAxisFloatPos < 0)
+			joystickControl.xAxisFloatPos = 0;
+		if(joystickControl.yAxisFloatPos < 0)
+			joystickControl.yAxisFloatPos = 0;
 
-		if(xAxisFloatPos > GetWidth())
-			xAxisFloatPos = GetWidth();
-		if(yAxisFloatPos > GetHeight())
-			yAxisFloatPos = GetHeight();
+		if(joystickControl.xAxisFloatPos > GetWidth())
+			joystickControl.xAxisFloatPos = GetWidth();
+		if(joystickControl.yAxisFloatPos > GetHeight())
+			joystickControl.yAxisFloatPos = GetHeight();
 		
-		MouseMovement(static_cast<int>(xAxisFloatPos), static_cast<int>(yAxisFloatPos));
+		MouseMovement(static_cast<int>(joystickControl.xAxisFloatPos), static_cast<int>(joystickControl.yAxisFloatPos));
 	}
 
 	//map scroll
-    if (xAxisRValue != 0 || yAxisRValue != 0)
-    {
-		if (xAxisRValue > JOY_MAP_SCROLL_DEADZONE)
+	if (joystickControl.xAxisRValue != 0 || joystickControl.yAxisRValue != 0)
+	{
+		if (joystickControl.xAxisRValue > JoystickControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-		else if (xAxisRValue < -JOY_MAP_SCROLL_DEADZONE)
+		else if (joystickControl.xAxisRValue < -JoystickControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_LEFT);
 		
-		if (yAxisRValue > JOY_MAP_SCROLL_DEADZONE)
+		if (joystickControl.yAxisRValue > JoystickControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_DOWN);
-		else if (yAxisRValue < -JOY_MAP_SCROLL_DEADZONE)
+		else if (joystickControl.yAxisRValue < -JoystickControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_UP);
 	}
 }
-#endif
 
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
@@ -1836,13 +1683,11 @@ int SDLVideoDriver::PollMovieEvents()
 						break;
 				}
 				break;
-#ifdef VITA
 			//skip videos with buttons
-            case SDL_JOYBUTTONDOWN:
-				if (event.jbutton.button == BTN_START || event.jbutton.button == BTN_CROSS || event.jbutton.button == BTN_CIRCLE)
+			case SDL_JOYBUTTONDOWN:
+				if (event.jbutton.button == JoystickControl::BTN_START || event.jbutton.button == JoystickControl::BTN_CROSS || event.jbutton.button == JoystickControl::BTN_CIRCLE)
 					return 1;
 				break;
-#endif
 			default:
 				break;
 		}

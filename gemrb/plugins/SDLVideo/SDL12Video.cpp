@@ -94,6 +94,7 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 #ifdef VITA
 	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)
 	{
+		SDL_Rect vitaDestRect;
 		vitaDestRect.x = 0;
 		vitaDestRect.y = 0;
 		vitaDestRect.w = width;
@@ -328,11 +329,7 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
 #ifdef VITA
-	vitaInputActive = true;
-	emptyInput = true;
-	currentUpper = true;
-	currentCharIndex = 0;
-	inputIndexes.clear();
+	dPadSoftKeyboard.StartInput();
 #else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
@@ -343,7 +340,7 @@ void SDL12VideoDriver::ShowSoftKeyboard()
 void SDL12VideoDriver::HideSoftKeyboard()
 {
 #ifdef VITA
-	vitaInputActive = false;
+	dPadSoftKeyboard.StopInput();
 #else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");

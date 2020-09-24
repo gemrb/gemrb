@@ -51,6 +51,205 @@ inline int GetModState()
 	return GetModState(SDL_GetModState());
 }
 
+#ifdef VITA
+struct DPadSoftKeyboard
+{
+	static const int TOTAL_CHARACTERS_DPAD = 37;
+	bool inputActive = false;
+	bool emptyInput = false;
+	bool currentUpper = false;
+	int32_t currentCharIndex;
+	std::vector <int32_t> inputIndexes;
+
+	unsigned char dpadKeys[TOTAL_CHARACTERS_DPAD] = 
+	{
+		//lowercase letters
+		97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
+		//space
+		32,
+		//nums
+		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
+	};
+
+	void StartInput()
+	{
+		inputActive = true;
+		emptyInput = true;
+		currentUpper = true;
+		currentCharIndex = 0;
+		inputIndexes.clear();
+	}
+
+	void StopInput()
+	{
+		inputActive = false;
+	}
+ 
+	bool IsInputActive() const
+	{
+		return inputActive;
+	}
+
+	unsigned char GetCurrentKeyValue() const
+	{
+		unsigned char modKeyValue = dpadKeys[currentCharIndex];
+
+		if (currentUpper && dpadKeys[currentCharIndex] >= 97 && dpadKeys[currentCharIndex] <= 122)
+		{
+			modKeyValue -= 32;
+		}
+
+		return modKeyValue;
+	}
+
+	void ToggleUppercase()
+	{
+		if (emptyInput)
+			emptyInput = false;
+
+		if (dpadKeys[currentCharIndex] >= 97 && dpadKeys[currentCharIndex] <= 122)
+			currentUpper = !currentUpper;
+	}
+
+	void RemoveCharacter()
+	{
+		if (inputIndexes.empty())
+		{
+			emptyInput = true;
+			currentUpper = true;
+			currentCharIndex = 0;
+		}
+		else
+		{
+			currentCharIndex = inputIndexes.back();
+			inputIndexes.pop_back();
+			if (inputIndexes.empty())
+				currentUpper = true;
+		}
+	}
+
+	void AddCharacter()
+	{
+		if (emptyInput)
+		{
+			emptyInput = false;
+		}
+		else
+		{
+			currentUpper = false;
+			inputIndexes.push_back(currentCharIndex);
+			currentCharIndex = 0;
+		}
+	}
+
+	void NextCharacter()
+	{
+		if (emptyInput)
+		{
+			emptyInput = false;
+		}
+		else
+		{
+			++currentCharIndex;
+			if (currentCharIndex >= TOTAL_CHARACTERS_DPAD)
+				currentCharIndex = 0;
+		}
+	}
+
+	void PreviousCharacter()
+	{
+		if (emptyInput)
+		{
+			emptyInput = false;
+		}
+		else
+		{
+			--currentCharIndex;
+			if (currentCharIndex < 0)
+				currentCharIndex = TOTAL_CHARACTERS_DPAD - 1;
+		}
+	}
+};
+#endif
+
+struct JoystickControl
+{
+	enum 
+	{
+		JOY_L_DEADZONE 	= 1000,
+		JOY_R_DEADZONE = 25000,
+
+		JOY_L_XAXIS		= 0,
+		JOY_L_YAXIS		= 1,
+		JOY_R_XAXIS		= 2,
+		JOY_R_YAXIS		= 3,
+
+		BTN_LEFT		= 7,
+		BTN_DOWN		= 6,
+		BTN_RIGHT		= 9,
+		BTN_UP			= 8,
+
+		BTN_START		= 11,
+		BTN_SELECT		= 10,
+
+		BTN_SQUARE		= 3,
+		BTN_CROSS		= 2,
+		BTN_CIRCLE		= 1,
+		BTN_TRIANGLE	= 0,
+
+		BTN_R1			= 5,
+		BTN_L1			= 4
+	};
+
+	const float JOY_SPEED_MOD = 2000000.0f;
+	const float JOY_AXIS_SPEEDUP = 1.03f;
+
+	float joyPointerSpeed;
+	int16_t xAxisLValue = 0;
+	int16_t yAxisLValue = 0;
+	int16_t xAxisRValue = 0;
+	int16_t yAxisRValue = 0; 
+	float xAxisFloatPos = 0;
+	float yAxisFloatPos = 0;
+	uint32_t lastAxisMovementTime = 0;
+
+	void SetPointerSpeed(int pointerSpeed)
+	{
+		joyPointerSpeed = pointerSpeed / JOY_SPEED_MOD;
+	}
+
+	float GetPointerSpeed()
+	{
+		return joyPointerSpeed;
+	}
+
+	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
+	{
+		if (motion.axis == JOY_L_XAXIS)
+		{
+			if(std::abs(motion.value) > JOY_L_DEADZONE)
+				xAxisLValue = motion.value;
+			else
+				xAxisLValue = 0;
+		}
+		else if (motion.axis == JOY_L_YAXIS)
+		{
+			if(std::abs(motion.value) > JOY_L_DEADZONE)
+				yAxisLValue = motion.value;
+			else
+				yAxisLValue = 0;
+		}
+		else if (motion.axis == JOY_R_XAXIS)
+		{
+			xAxisRValue = motion.value;
+		}
+		else if (motion.axis == JOY_R_YAXIS)
+		{
+			yAxisRValue = motion.value;
+		}
+	}
+};
+
 class SDLVideoDriver : public Video {
 protected:
 	SDL_Surface* disp;
@@ -66,9 +265,7 @@ protected:
 	String *subtitletext;
 	ieDword subtitlestrref;
 
-#ifdef VITA
-	SDL_Joystick* gGameController = NULL;
-#endif
+	SDL_Joystick *gameController = NULL;
 
 public:
 	SDLVideoDriver(void);
@@ -184,43 +381,16 @@ protected:
 #endif
 	const int32_t VITA_FULLSCREEN_WIDTH = 960;
 	const int32_t VITA_FULLSCREEN_HEIGHT = 544;
-	SDL_Rect vitaDestRect;
+	DPadSoftKeyboard dPadSoftKeyboard;
+#endif
 
-	const float VITA_SPEED_MOD = 2000000.0f;
-	const float VITA_AXIS_SPEEDUP = 1.03f;
-	float vitaPointerSpeed;
-	int16_t xAxisLValue = 0;
-	int16_t yAxisLValue = 0;
-	int16_t xAxisRValue = 0;
-	int16_t yAxisRValue = 0; 
-	float xAxisFloatPos = 0;
-	float yAxisFloatPos = 0;
-	uint32_t lastAxisMovementTime = 0;
-
-	static const int TOTAL_CHARACTERS_VITA = 37;
-	bool vitaInputActive = false;
-	bool emptyInput = false;
-	bool currentUpper = false;
-	int32_t currentCharIndex;
-	std::vector <int32_t> inputIndexes;
-
-	unsigned char vitaKeys[TOTAL_CHARACTERS_VITA] = 
-	{
-		//lowercase letters
-		97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
-		//space
-		32,
-		//nums
-		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
-	};
+	JoystickControl joystickControl;
 
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
 	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
 	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
 	void ProcessAxisMotion();
-	unsigned char GetCurrentKeyValue();
-#endif
 
 public:
 	// static functions for manipulating surfaces
