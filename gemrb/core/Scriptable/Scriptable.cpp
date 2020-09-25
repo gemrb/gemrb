@@ -410,7 +410,10 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	// don't run scripts if we're in dialog
-	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
+	// ... if it's a script-blocking one (exceptions only possible in bg2, see use of GF_FORCE_DIALOGPAUSE)
+	constexpr int freezingDLG = DF_IN_DIALOG | DF_FREEZE_SCRIPTS;
+	if ((gc->GetDialogueFlags() & freezingDLG) == freezingDLG &&
+		gc->dialoghandler->InDialog(this) &&
 		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
 		return;
 	}
