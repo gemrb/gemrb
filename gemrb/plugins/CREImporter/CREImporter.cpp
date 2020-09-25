@@ -942,7 +942,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	ieWordSigned tmps;
 	str->ReadWordSigned( &tmps );
 	act->BaseStats[IE_HITPOINTS]=(ieDwordSigned)tmps;
-	if (tmps <= 0) {
+	if (tmps <= 0 && ((ieDwordSigned) act->BaseStats[IE_XPVALUE]) < 0) {
 		act->BaseStats[IE_STATE_ID] |= STATE_DEAD;
 	}
 	str->ReadWord( &tmp );
