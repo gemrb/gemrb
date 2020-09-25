@@ -275,7 +275,7 @@ def WorldMapWindowCommon (Window, Travel):
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
 	Button.SetHotKey('m')
 
 	return
