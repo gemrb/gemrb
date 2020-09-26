@@ -157,7 +157,7 @@ IF(NOT STATIC_LINK)
 	SET(gemrb_core_LIB_SRCS
 		${gemrb_core_LIB_SRCS}
 		PluginLoader.cpp
-)
+	)
 ENDIF()
 
 IF(WIN32 AND HAVE_ICONV)

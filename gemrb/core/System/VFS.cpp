@@ -174,14 +174,14 @@ static dirent* readdir(DIR* dirp)
 	if (dirp->is_first) 
 	{
 		dirp->is_first = 0;
-		strcpy(de.d_name, ".");
+		strncpy(de.d_name, ".", 1);
 	} 
 	else 
 	{
 		SceIoDirent dir;
 		if (sceIoDread(dirp->descriptor, &dir) <= 0)
 			return NULL;
-		strcpy( de.d_name, dir.d_name );
+		strncpy(de.d_name, dir.d_name, 256);
 	}
 
 	return &de;
