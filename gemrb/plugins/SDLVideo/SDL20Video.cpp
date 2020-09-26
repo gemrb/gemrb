@@ -524,25 +524,23 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// currently finger up clears the gesture and finger down does not
 	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	switch (event.type) {
-        case SDL_CONTROLLERDEVICEREMOVED:
-            if (gameController != NULL)
-            {
-                SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
-                if (removedController == gameController)
-                {
-					Log(ERROR, "SDLJoystick", "REMOVE!!!!!!!!!");
-                    SDL_GameControllerClose(gameController);
-                    gameController = NULL;
-                }
-            }
-            break;
-        case SDL_CONTROLLERDEVICEADDED:
-            if (gameController == NULL)
-            {
-				Log(ERROR, "SDLJoystick", "ADDDDDDD!!!!!!!!!");
-                gameController = SDL_GameControllerOpen(event.jdevice.which);
-            }
-            break;
+		case SDL_CONTROLLERDEVICEREMOVED:
+			if (gameController != NULL)
+			{
+				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				if (removedController == gameController)
+				{
+					SDL_GameControllerClose(gameController);
+					gameController = NULL;
+				}
+			}
+			break;
+		case SDL_CONTROLLERDEVICEADDED:
+			if (gameController == NULL)
+			{
+				gameController = SDL_GameControllerOpen(event.jdevice.which);
+			}
+			break;
 		case SDL_CONTROLLERAXISMOTION:
 			gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
 		break;
