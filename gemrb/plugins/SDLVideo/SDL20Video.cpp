@@ -50,10 +50,37 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
+	if (SDL_GameControllerGetAttached(gameController))
+ 		SDL_GameControllerClose(gameController);
+
 	// no need to call DestroyMovieScreen()
 	SDL_DestroyTexture(screenTexture);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+}
+
+int SDL20VideoDriver::Init(void)
+{
+	int ret = SDLVideoDriver::Init();
+
+	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1)
+	{
+		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+	}
+	else
+	{
+		for (int i = 0; i < SDL_NumJoysticks(); ++i)
+		{
+			if (SDL_IsGameController(i))
+			{
+				gameController = SDL_GameControllerOpen(i);
+				if (gameController != NULL)
+					break;
+			}
+		}
+	}
+
+	return ret;
 }
 
 int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* title)
@@ -64,7 +91,11 @@ int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* 
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+#ifdef VITA
+	Uint32 winFlags = SDL_WINDOW_SHOWN;
+#else
 	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
+#endif
 #if TARGET_OS_IPHONE || ANDROID
 	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
 	// it also for some unknown reason is required for retina displays
@@ -145,6 +176,13 @@ doneFormat:
 	Uint32 r, g, b, a;
 	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
 	a = 0; //force a to 0 or screenshots will be all black!
+#ifdef VITA
+	//screen is black in Vita otherwise
+    r = 0x000000ff;
+    g = 0x0000ff00;
+    b = 0x00ff0000;
+    a = 0xff000000;
+#endif
 
 	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
 		width, height, SDL_GetPixelFormatName(format));
@@ -497,6 +535,32 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// currently finger up clears the gesture and finger down does not
 	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	switch (event.type) {
+        case SDL_CONTROLLERDEVICEREMOVED:
+            if (gameController != NULL)
+            {
+                SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+                if (removedController == gameController)
+                {
+					Log(ERROR, "SDLJoystick", "REMOVE!!!!!!!!!");
+                    SDL_GameControllerClose(gameController);
+                    gameController = NULL;
+                }
+            }
+            break;
+        case SDL_CONTROLLERDEVICEADDED:
+            if (gameController == NULL)
+            {
+				Log(ERROR, "SDLJoystick", "ADDDDDDD!!!!!!!!!");
+                gameController = SDL_GameControllerOpen(event.jdevice.which);
+            }
+            break;
+		case SDL_CONTROLLERAXISMOTION:
+			gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
+		break;
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_CONTROLLERBUTTONUP:
+			HandleJoyButtonEvent(event.cbutton);
+			break;
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
 			if (currentGesture.type) {

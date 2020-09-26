@@ -35,6 +35,49 @@ typedef unsigned char
 #endif
 	Pixel;
 
+#if SDL_VERSION_ATLEAST(1,3,0)
+#define SDLKey SDL_Keycode
+#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
+#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
+#else
+#ifdef VITA
+#define SDL_CONTROLLER_AXIS_LEFTX 0
+#define SDL_CONTROLLER_AXIS_LEFTY 1
+#define SDL_CONTROLLER_AXIS_RIGHTX 2
+#define SDL_CONTROLLER_AXIS_RIGHTY 3
+#define SDL_CONTROLLER_BUTTON_A 2
+#define SDL_CONTROLLER_BUTTON_B 1
+#define SDL_CONTROLLER_BUTTON_X 3
+#define SDL_CONTROLLER_BUTTON_Y 0
+#define SDL_CONTROLLER_BUTTON_BACK 11
+#define SDL_CONTROLLER_BUTTON_START 10
+#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 4
+#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 5
+#define SDL_CONTROLLER_BUTTON_DPAD_UP 8
+#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 6
+#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 7
+#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 9
+#else
+//XBone mapping on Linux. Some buttons aren't working in SDL12
+#define SDL_CONTROLLER_AXIS_LEFTX 0
+#define SDL_CONTROLLER_AXIS_LEFTY 1
+#define SDL_CONTROLLER_AXIS_RIGHTX 2
+#define SDL_CONTROLLER_AXIS_RIGHTY 3
+#define SDL_CONTROLLER_BUTTON_A 0
+#define SDL_CONTROLLER_BUTTON_B 1
+#define SDL_CONTROLLER_BUTTON_X 3
+#define SDL_CONTROLLER_BUTTON_Y 4
+#define SDL_CONTROLLER_BUTTON_BACK 100
+#define SDL_CONTROLLER_BUTTON_START 11
+#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 6
+#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 7
+#define SDL_CONTROLLER_BUTTON_DPAD_UP 101
+#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 102
+#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 103
+#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 104
+#endif
+#endif
+
 namespace GemRB {
 
 inline int GetModState(int modstate)
@@ -52,8 +95,9 @@ inline int GetModState()
 }
 
 #ifdef VITA
-struct DPadSoftKeyboard
+class DPadSoftKeyboard
 {
+private:
 	static const int TOTAL_CHARACTERS_DPAD = 37;
 	bool inputActive = false;
 	bool emptyInput = false;
@@ -71,6 +115,7 @@ struct DPadSoftKeyboard
 		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
 	};
 
+public:
 	void StartInput()
 	{
 		inputActive = true;
@@ -172,36 +217,18 @@ struct DPadSoftKeyboard
 };
 #endif
 
-struct JoystickControl
+class GamepadControl
 {
+private:
+	const float JOY_SPEED_MOD = 2000000.0f;
+
+public:
 	enum 
 	{
 		JOY_L_DEADZONE 	= 1000,
 		JOY_R_DEADZONE = 25000,
-
-		JOY_L_XAXIS		= 0,
-		JOY_L_YAXIS		= 1,
-		JOY_R_XAXIS		= 2,
-		JOY_R_YAXIS		= 3,
-
-		BTN_LEFT		= 7,
-		BTN_DOWN		= 6,
-		BTN_RIGHT		= 9,
-		BTN_UP			= 8,
-
-		BTN_START		= 11,
-		BTN_SELECT		= 10,
-
-		BTN_SQUARE		= 3,
-		BTN_CROSS		= 2,
-		BTN_CIRCLE		= 1,
-		BTN_TRIANGLE	= 0,
-
-		BTN_R1			= 5,
-		BTN_L1			= 4
 	};
 
-	const float JOY_SPEED_MOD = 2000000.0f;
 	const float JOY_AXIS_SPEEDUP = 1.03f;
 
 	float joyPointerSpeed;
@@ -223,29 +250,35 @@ struct JoystickControl
 		return joyPointerSpeed;
 	}
 
-	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion)
+	void SetGamepadPosition(int x, int y)
 	{
-		if (motion.axis == JOY_L_XAXIS)
+		xAxisFloatPos = x;
+		yAxisFloatPos = y;
+	}
+
+	void HandleAxisEvent(uint8_t axis, int16_t value)
+	{
+		if (axis == SDL_CONTROLLER_AXIS_LEFTX)
 		{
-			if(std::abs(motion.value) > JOY_L_DEADZONE)
-				xAxisLValue = motion.value;
+			if(std::abs(value) > JOY_L_DEADZONE)
+				xAxisLValue = value;
 			else
 				xAxisLValue = 0;
 		}
-		else if (motion.axis == JOY_L_YAXIS)
+		else if (axis == SDL_CONTROLLER_AXIS_LEFTY)
 		{
-			if(std::abs(motion.value) > JOY_L_DEADZONE)
-				yAxisLValue = motion.value;
+			if(std::abs(value) > JOY_L_DEADZONE)
+				yAxisLValue = value;
 			else
 				yAxisLValue = 0;
 		}
-		else if (motion.axis == JOY_R_XAXIS)
+		else if (axis == SDL_CONTROLLER_AXIS_RIGHTX)
 		{
-			xAxisRValue = motion.value;
+			xAxisRValue = value;
 		}
-		else if (motion.axis == JOY_R_YAXIS)
+		else if (axis == SDL_CONTROLLER_AXIS_RIGHTY)
 		{
-			yAxisRValue = motion.value;
+			yAxisRValue = value;
 		}
 	}
 };
@@ -264,8 +297,6 @@ protected:
 
 	String *subtitletext;
 	ieDword subtitlestrref;
-
-	SDL_Joystick *gameController = NULL;
 
 public:
 	SDLVideoDriver(void);
@@ -376,15 +407,11 @@ protected:
 	virtual int ProcessEvent(const SDL_Event & event);
 
 #ifdef VITA
-#if SDL_VERSION_ATLEAST(1,3,0)
-#define SDLKey SDL_Keycode
-#endif
 	const int32_t VITA_FULLSCREEN_WIDTH = 960;
 	const int32_t VITA_FULLSCREEN_HEIGHT = 544;
 	DPadSoftKeyboard dPadSoftKeyboard;
 #endif
-
-	JoystickControl joystickControl;
+	GamepadControl gamepadControl;
 
 	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
 	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);

@@ -66,7 +66,7 @@ Keyboard input is done with D-Pad (on character creation and game saves. 'a-z', 
 
 ### Vita specific options
 
-Pointer movement speed can be changed with 'VitaPointerSpeed' parameter in GemRB.cfg.
+Pointer movement speed can be changed with 'GamepadPointerSpeed' parameter in GemRB.cfg.
 
 Use "Fullscreen=1" to scale game area to native Vita resolution or "Fullscreen=0" to keep game area at the center of the screen.
 

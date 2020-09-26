@@ -809,7 +809,7 @@ public:
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];
 	char GameType[10];
-	int VitaPointerSpeed = 10;
+	int GamepadPointerSpeed = 10;
 	bool VitaKeepAspectRatio = true;
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];

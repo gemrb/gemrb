@@ -300,8 +300,10 @@ PluginsPath=./gemrb/plugins/
 
 #NumFingInfo=2
 
-# Vita specific options
-VitaPointerSpeed=10
+#Pointer speed with thumbstick
+GamepadPointerSpeed=10
+
+#Vita specific options
 VitaKeepAspectRatio=1
 
 #####################################################

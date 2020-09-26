@@ -49,6 +49,8 @@ using namespace GemRB;
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
 #define SDLKey SDL_Keycode
+#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
+#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
 #define SDLK_KP1 SDLK_KP_1
 #define SDLK_KP2 SDLK_KP_2
@@ -60,6 +62,42 @@ using namespace GemRB;
 #define SDLK_KP9 SDLK_KP_9
 #else
 typedef Sint32 SDL_Keycode;
+#ifdef VITA
+#define SDL_CONTROLLER_AXIS_LEFTX 0
+#define SDL_CONTROLLER_AXIS_LEFTY 1
+#define SDL_CONTROLLER_AXIS_RIGHTX 2
+#define SDL_CONTROLLER_AXIS_RIGHTY 3
+#define SDL_CONTROLLER_BUTTON_A 2
+#define SDL_CONTROLLER_BUTTON_B 1
+#define SDL_CONTROLLER_BUTTON_X 3
+#define SDL_CONTROLLER_BUTTON_Y 0
+#define SDL_CONTROLLER_BUTTON_BACK 11
+#define SDL_CONTROLLER_BUTTON_START 10
+#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 4
+#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 5
+#define SDL_CONTROLLER_BUTTON_DPAD_UP 8
+#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 6
+#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 7
+#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 9
+#else
+//XBone mapping on Linux. Some buttons aren't working in SDL12
+#define SDL_CONTROLLER_AXIS_LEFTX 0
+#define SDL_CONTROLLER_AXIS_LEFTY 1
+#define SDL_CONTROLLER_AXIS_RIGHTX 2
+#define SDL_CONTROLLER_AXIS_RIGHTY 3
+#define SDL_CONTROLLER_BUTTON_A 0
+#define SDL_CONTROLLER_BUTTON_B 1
+#define SDL_CONTROLLER_BUTTON_X 3
+#define SDL_CONTROLLER_BUTTON_Y 4
+#define SDL_CONTROLLER_BUTTON_BACK 100
+#define SDL_CONTROLLER_BUTTON_START 11
+#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 6
+#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 7
+#define SDL_CONTROLLER_BUTTON_DPAD_UP 101
+#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 102
+#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 103
+#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 104
+#endif
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -73,7 +111,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	subtitlestrref = 0;
 	subtitletext = NULL;
 	disp = tmpBuf =  NULL;
-	joystickControl.SetPointerSpeed(core->VitaPointerSpeed);
+	gamepadControl.SetPointerSpeed(core->GamepadPointerSpeed);
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -82,7 +120,6 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
-	if(gameController) SDL_JoystickClose(gameController);
 	SDL_Quit();
 
 	// This sprite needs to have been freed earlier, because
@@ -96,15 +133,6 @@ int SDLVideoDriver::Init(void)
 	if (SDL_InitSubSystem( SDL_INIT_VIDEO ) == -1) {
 		Log(ERROR, "SDLVideo", "InitSubSystem failed: %s", SDL_GetError());
 		return GEM_ERROR;
-	}
-
-	if (SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == -1)
-	{
-		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
-	}
-	else
-	{
-		gameController = SDL_JoystickOpen(0);
 	}
 
 	if (!(MouseFlags&MOUSE_HIDDEN)) {
@@ -202,13 +230,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			/* Quit event originated from outside GemRB so ask the user if we should exit */
 			core->AskAndExit();
 			return GEM_OK;
-		case SDL_JOYAXISMOTION:
-			joystickControl.HandleJoyAxisEvent(event.jaxis);
-		break;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			HandleJoyButtonEvent(event.jbutton);
-			break;
 		case SDL_KEYUP:
 			switch(sym) {
 				case SDLK_LALT:
@@ -353,6 +374,8 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MOUSEMOTION:
 			MouseMovement(event.motion.x, event.motion.y);
+			if (SDL_NumJoysticks() > 0)
+				gamepadControl.SetGamepadPosition(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (MouseFlags & MOUSE_DISABLED)
@@ -388,57 +411,43 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 	if (dPadSoftKeyboard.IsInputActive())
 	{
 		// add/change characters only on key down
-		if (button.state != SDL_PRESSED && button.button != JoystickControl::BTN_CROSS && button.button != JoystickControl::BTN_CIRCLE)
+		if (button.state != SDL_PRESSED && button.button != SDL_CONTROLLER_BUTTON_A && button.button != SDL_CONTROLLER_BUTTON_B)
 			return;
 
 		switch(button.button)
 		{
-			case JoystickControl::BTN_LEFT:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
 				dPadSoftKeyboard.RemoveCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
 				break;
-			}
-			case JoystickControl::BTN_RIGHT:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
 				dPadSoftKeyboard.AddCharacter();
 				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
-			}
-			case JoystickControl::BTN_DOWN:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
 				dPadSoftKeyboard.NextCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
 				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
-			}
-			case JoystickControl::BTN_UP:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
 				dPadSoftKeyboard.PreviousCharacter();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
 				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
-			}
-			case JoystickControl::BTN_L1:
-			case JoystickControl::BTN_R1:
-			{
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
 				dPadSoftKeyboard.ToggleUppercase();
 				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
 				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
 				break;
-			}
 			//LMB event
-			case JoystickControl::BTN_CROSS:
-			{
+			case SDL_CONTROLLER_BUTTON_A:
 				GamepadMouseEvent(1, button.state);
 				break;
-			}
 			//RMB event
-			case JoystickControl::BTN_CIRCLE:
-			{
+			case SDL_CONTROLLER_BUTTON_B:
 				GamepadMouseEvent(3, button.state);
 				break;
-			}
 
 			default:
 				return;
@@ -451,83 +460,58 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 		switch(button.button)
 		{
 			//LMB event
-			case JoystickControl::BTN_CROSS:
-			{
+			case SDL_CONTROLLER_BUTTON_A:
 				GamepadMouseEvent(1, button.state);
 				break;
-			}
 			//RMB event
-			case JoystickControl::BTN_CIRCLE:
-			{
+			case SDL_CONTROLLER_BUTTON_B:
 				GamepadMouseEvent(3, button.state);
 				break;
-			}
 			//scroll map
-			case JoystickControl::BTN_LEFT:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_LEFT);
 				break;
-			}
-			case JoystickControl::BTN_RIGHT:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_RIGHT);
 				break;
-			}
-			case JoystickControl::BTN_UP:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_UP);
 				break;
-			}
-			case JoystickControl::BTN_DOWN:
-			{
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_DOWN);
 				break;
-			}
 			//open menu
-			case JoystickControl::BTN_SELECT:
-			{
+			case SDL_CONTROLLER_BUTTON_START:
 				GamepadKeyboardEvent(SDLK_o, button.state);
 				break;
-			}
 			//ESC
-			case JoystickControl::BTN_START:
-			{
+			case SDL_CONTROLLER_BUTTON_BACK:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_ESCAPE);
 				break;
-			}
 			//pause combat
-			case JoystickControl::BTN_R1:
-			{
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
 				GamepadKeyboardEvent(SDLK_SPACE, button.state);
 				break;
-			}
 			//highlight items
-			case JoystickControl::BTN_L1:
-			{
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
 				if (button.state == SDL_PRESSED)
 					EvntManager->OnSpecialKeyPress(GEM_ALT);
 				else
 					EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
-				
 				break;
-			}
 			//inventory
-			case JoystickControl::BTN_TRIANGLE:
-			{
+			case SDL_CONTROLLER_BUTTON_Y:
 				GamepadKeyboardEvent(SDLK_i, button.state);
 				break;
-			}
 			//map
-			case JoystickControl::BTN_SQUARE:
-			{
+			case SDL_CONTROLLER_BUTTON_X:
 				GamepadKeyboardEvent(SDLK_m, button.state);
 				break;
-			}
 
 			default:
 				return;
@@ -547,14 +531,14 @@ void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_DOWN;
 		if (!core->ConsolePopped)
-			EvntManager->MouseDown(static_cast<unsigned short>(joystickControl.xAxisFloatPos), static_cast<unsigned short>(joystickControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
+			EvntManager->MouseDown(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
 	}
 	else
 	{
 		if (CursorIndex != VID_CUR_DRAG)
 			CursorIndex = VID_CUR_UP;
 		if (!core->ConsolePopped)
-			EvntManager->MouseUp(static_cast<unsigned short>(joystickControl.xAxisFloatPos), static_cast<unsigned short>(joystickControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
+			EvntManager->MouseUp(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
 	}
 }
 
@@ -569,42 +553,42 @@ void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
 void SDLVideoDriver::ProcessAxisMotion()
 {
 	uint32_t currentTime = SDL_GetTicks();
-	uint32_t deltaTime = currentTime - joystickControl.lastAxisMovementTime;
-	joystickControl.lastAxisMovementTime = currentTime;
+	uint32_t deltaTime = currentTime - gamepadControl.lastAxisMovementTime;
+	gamepadControl.lastAxisMovementTime = currentTime;
 
 	//cursor movement
-	if (joystickControl.xAxisLValue != 0 || joystickControl.yAxisLValue != 0)
+	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0)
 	{
-		int16_t xSign = (joystickControl.xAxisLValue > 0) - (joystickControl.xAxisLValue < 0);
-		int16_t ySign = (joystickControl.yAxisLValue > 0) - (joystickControl.yAxisLValue < 0);
+		int16_t xSign = (gamepadControl.xAxisLValue > 0) - (gamepadControl.xAxisLValue < 0);
+		int16_t ySign = (gamepadControl.yAxisLValue > 0) - (gamepadControl.yAxisLValue < 0);
 
-		joystickControl.xAxisFloatPos += ((pow(abs(joystickControl.xAxisLValue), joystickControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * joystickControl.GetPointerSpeed();
-		joystickControl.yAxisFloatPos += ((pow(abs(joystickControl.yAxisLValue), joystickControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * joystickControl.GetPointerSpeed();
+		gamepadControl.xAxisFloatPos += ((pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * gamepadControl.GetPointerSpeed();
+		gamepadControl.yAxisFloatPos += ((pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * gamepadControl.GetPointerSpeed();
 
-		if(joystickControl.xAxisFloatPos < 0)
-			joystickControl.xAxisFloatPos = 0;
-		if(joystickControl.yAxisFloatPos < 0)
-			joystickControl.yAxisFloatPos = 0;
+		if(gamepadControl.xAxisFloatPos < 0)
+			gamepadControl.xAxisFloatPos = 0;
+		if(gamepadControl.yAxisFloatPos < 0)
+			gamepadControl.yAxisFloatPos = 0;
 
-		if(joystickControl.xAxisFloatPos > GetWidth())
-			joystickControl.xAxisFloatPos = GetWidth();
-		if(joystickControl.yAxisFloatPos > GetHeight())
-			joystickControl.yAxisFloatPos = GetHeight();
+		if(gamepadControl.xAxisFloatPos > GetWidth())
+			gamepadControl.xAxisFloatPos = GetWidth();
+		if(gamepadControl.yAxisFloatPos > GetHeight())
+			gamepadControl.yAxisFloatPos = GetHeight();
 		
-		MouseMovement(static_cast<int>(joystickControl.xAxisFloatPos), static_cast<int>(joystickControl.yAxisFloatPos));
+		MouseMovement(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos));
 	}
 
 	//map scroll
-	if (joystickControl.xAxisRValue != 0 || joystickControl.yAxisRValue != 0)
+	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0)
 	{
-		if (joystickControl.xAxisRValue > JoystickControl::JOY_R_DEADZONE)
+		if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-		else if (joystickControl.xAxisRValue < -JoystickControl::JOY_R_DEADZONE)
+		else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_LEFT);
 		
-		if (joystickControl.yAxisRValue > JoystickControl::JOY_R_DEADZONE)
+		if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_DOWN);
-		else if (joystickControl.yAxisRValue < -JoystickControl::JOY_R_DEADZONE)
+		else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE)
 			EvntManager->OnSpecialKeyPress(GEM_UP);
 	}
 }
@@ -1684,8 +1668,12 @@ int SDLVideoDriver::PollMovieEvents()
 				}
 				break;
 			//skip videos with buttons
+#if SDL_VERSION_ATLEAST(1,3,0)
+			case SDL_CONTROLLERBUTTONDOWN:
+#else
 			case SDL_JOYBUTTONDOWN:
-				if (event.jbutton.button == JoystickControl::BTN_START || event.jbutton.button == JoystickControl::BTN_CROSS || event.jbutton.button == JoystickControl::BTN_CIRCLE)
+#endif
+				if (event.jbutton.button == SDL_CONTROLLER_BUTTON_BACK || event.jbutton.button == SDL_CONTROLLER_BUTTON_A || event.jbutton.button == SDL_CONTROLLER_BUTTON_B)
 					return 1;
 				break;
 			default:

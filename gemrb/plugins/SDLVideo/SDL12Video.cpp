@@ -32,6 +32,8 @@ SDL12VideoDriver::SDL12VideoDriver(void)
 
 SDL12VideoDriver::~SDL12VideoDriver(void)
 {
+	if (gameController != NULL)
+ 		SDL_JoystickClose(gameController);
 	DestroyMovieScreen();
 }
 
@@ -48,6 +50,17 @@ int SDL12VideoDriver::Init(void)
 		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
 #endif
 	}
+
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1)
+	{
+		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+	}
+	else
+	{
+		if (SDL_NumJoysticks() > 0)
+			gameController = SDL_JoystickOpen(0);
+	}
+
 	return ret;
 }
 
@@ -319,6 +332,13 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (!event.active.gain)
 					EvntManager->OnSpecialKeyPress( GEM_MOUSEOUT );
 			}
+			break;
+		case SDL_JOYAXISMOTION:
+			gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
+		break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			HandleJoyButtonEvent(event.jbutton);
 			break;
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
