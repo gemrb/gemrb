@@ -965,7 +965,8 @@ void Projectile::NextTarget(const Point &p)
 	}
 
 	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
-	path = area->GetLine(Pos, Destination, 1, Orientation, flags);
+	int stepping = (ExtFlags & PEF_BOUNCE) ? 1 : Speed;
+	path = area->GetLine(Pos, Destination, stepping, Orientation, flags);
 }
 
 void Projectile::SetTarget(const Point &p)

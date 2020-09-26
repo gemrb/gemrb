@@ -1336,9 +1336,12 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 			actor->VerbalConstant(VB_HURT, 1, DS_QUEUE);
 		}
 	}
-	actor->BaseStats[IE_HITPOINTS]=hp;
-	actor->Modified[IE_HITPOINTS]=hp;
-	if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
+	// don't fire off events if nothing changed, which can happen when called indirectly
+	if (actor->BaseStats[IE_HITPOINTS] != hp || actor->Modified[IE_HITPOINTS] != hp) {
+		actor->BaseStats[IE_HITPOINTS] = hp;
+		actor->Modified[IE_HITPOINTS] = hp;
+		if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
+	}
 }
 
 static void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)

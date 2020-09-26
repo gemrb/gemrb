@@ -820,13 +820,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 			return dropped;
 		}
 		CREItem *gold = new CREItem();
-	
-		gold->Expired = 0;
-		gold->Flags = 0;
-		gold->Usages[1] = 0;
-		gold->Usages[2] = 0;
-		CopyResRef(gold->ItemResRef, core->GoldResRef);
-		gold->Usages[0] = static_cast<ieWord>(Owner->BaseStats[IE_GOLD]);
+		CreateItemCore(gold, core->GoldResRef, static_cast<int>(Owner->BaseStats[IE_GOLD]), 0, 0);
 		Owner->BaseStats[IE_GOLD] = 0;
 		map->AddItemToLocation(loc, gold);
 	}
