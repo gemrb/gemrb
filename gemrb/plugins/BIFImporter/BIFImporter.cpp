@@ -130,7 +130,7 @@ int BIFImporter::OpenArchive(const char* path)
 	stream = FileStream::OpenFile(cachePath);
 
 	if (!stream) {
-		FileStream* file = FileStream::OpenFile(path);
+		FileStream *file = FileStream::OpenFile(path);
 	if (!file) {
 #endif
 			return GEM_ERROR;

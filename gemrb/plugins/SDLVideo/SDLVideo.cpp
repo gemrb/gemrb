@@ -112,8 +112,9 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-	if (SDL_NumJoysticks() > 0)
+	if (SDL_NumJoysticks() > 0) {
 		ProcessAxisMotion();
+	}
 
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
@@ -332,8 +333,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MOUSEMOTION:
 			MouseMovement(event.motion.x, event.motion.y);
-			if (SDL_NumJoysticks() > 0)
+			if (SDL_NumJoysticks() > 0) {
 				gamepadControl.SetGamepadPosition(event.motion.x, event.motion.y);
+			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (MouseFlags & MOUSE_DISABLED)
