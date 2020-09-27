@@ -50,8 +50,9 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
-	if (SDL_GameControllerGetAttached(gameController))
+	if (SDL_GameControllerGetAttached(gameController)) {
  		SDL_GameControllerClose(gameController);
+	}
 
 	// no need to call DestroyMovieScreen()
 	SDL_DestroyTexture(screenTexture);
@@ -63,19 +64,15 @@ int SDL20VideoDriver::Init(void)
 {
 	int ret = SDLVideoDriver::Init();
 
-	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1)
-	{
+	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
 		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
-	}
-	else
-	{
-		for (int i = 0; i < SDL_NumJoysticks(); ++i)
-		{
-			if (SDL_IsGameController(i))
-			{
+	} else {
+		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+			if (SDL_IsGameController(i)) {
 				gameController = SDL_GameControllerOpen(i);
-				if (gameController != NULL)
+				if (gameController != nullptr) {
 					break;
+				}
 			}
 		}
 	}
@@ -525,19 +522,16 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	switch (event.type) {
 		case SDL_CONTROLLERDEVICEREMOVED:
-			if (gameController != NULL)
-			{
+			if (gameController != nullptr) {
 				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
-				if (removedController == gameController)
-				{
+				if (removedController == gameController) {
 					SDL_GameControllerClose(gameController);
-					gameController = NULL;
+					gameController = nullptr;
 				}
 			}
 			break;
 		case SDL_CONTROLLERDEVICEADDED:
-			if (gameController == NULL)
-			{
+			if (gameController == nullptr) {
 				gameController = SDL_GameControllerOpen(event.jdevice.which);
 			}
 			break;

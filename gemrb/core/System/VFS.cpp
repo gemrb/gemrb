@@ -154,30 +154,26 @@ struct dirent
 // buffer which readdir returns
 static dirent de;
 
-static DIR* opendir(const char* filename)
+static DIR* opendir(const char *filename)
 {
-	DIR* dirp = (DIR*) malloc(sizeof(DIR));
+	DIR *dirp = (DIR*) malloc(sizeof(DIR));
 	dirp->is_first = 1;
 	dirp->descriptor = sceIoDopen(filename);
 
-	if (dirp->descriptor <= 0)
-	{
+	if (dirp->descriptor <= 0) {
 		return NULL;
 	}
 
 	return dirp;
 }
 
-static dirent* readdir(DIR* dirp)
+static dirent* readdir(DIR *dirp)
 {
 	//vitasdk kind of skips current directory entry..
-	if (dirp->is_first) 
-	{
+	if (dirp->is_first) {
 		dirp->is_first = 0;
 		strncpy(de.d_name, ".", 1);
-	} 
-	else 
-	{
+	} else {
 		SceIoDirent dir;
 		if (sceIoDread(dirp->descriptor, &dir) <= 0)
 			return NULL;
@@ -187,7 +183,7 @@ static dirent* readdir(DIR* dirp)
 	return &de;
 }
 
-static void closedir(DIR* dirp)
+static void closedir(DIR *dirp)
 {
 	sceIoDclose(dirp->descriptor);
 	free(dirp);

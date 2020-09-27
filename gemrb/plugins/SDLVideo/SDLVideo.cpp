@@ -48,9 +48,6 @@ using namespace GemRB;
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
-#define SDLKey SDL_Keycode
-#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
-#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
 #define SDLK_KP1 SDLK_KP_1
 #define SDLK_KP2 SDLK_KP_2
@@ -60,44 +57,6 @@ using namespace GemRB;
 #define SDLK_KP7 SDLK_KP_7
 #define SDLK_KP8 SDLK_KP_8
 #define SDLK_KP9 SDLK_KP_9
-#else
-typedef Sint32 SDL_Keycode;
-#ifdef VITA
-#define SDL_CONTROLLER_AXIS_LEFTX 0
-#define SDL_CONTROLLER_AXIS_LEFTY 1
-#define SDL_CONTROLLER_AXIS_RIGHTX 2
-#define SDL_CONTROLLER_AXIS_RIGHTY 3
-#define SDL_CONTROLLER_BUTTON_A 2
-#define SDL_CONTROLLER_BUTTON_B 1
-#define SDL_CONTROLLER_BUTTON_X 3
-#define SDL_CONTROLLER_BUTTON_Y 0
-#define SDL_CONTROLLER_BUTTON_BACK 11
-#define SDL_CONTROLLER_BUTTON_START 10
-#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 4
-#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 5
-#define SDL_CONTROLLER_BUTTON_DPAD_UP 8
-#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 6
-#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 7
-#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 9
-#else
-//XBone mapping on Linux. Some buttons aren't working in SDL12
-#define SDL_CONTROLLER_AXIS_LEFTX 0
-#define SDL_CONTROLLER_AXIS_LEFTY 1
-#define SDL_CONTROLLER_AXIS_RIGHTX 2
-#define SDL_CONTROLLER_AXIS_RIGHTY 3
-#define SDL_CONTROLLER_BUTTON_A 0
-#define SDL_CONTROLLER_BUTTON_B 1
-#define SDL_CONTROLLER_BUTTON_X 3
-#define SDL_CONTROLLER_BUTTON_Y 4
-#define SDL_CONTROLLER_BUTTON_BACK 100
-#define SDL_CONTROLLER_BUTTON_START 11
-#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 6
-#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 7
-#define SDL_CONTROLLER_BUTTON_DPAD_UP 101
-#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 102
-#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 103
-#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 104
-#endif
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -120,6 +79,7 @@ SDLVideoDriver::~SDLVideoDriver(void)
 
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
+
 	SDL_Quit();
 
 	// This sprite needs to have been freed earlier, because
@@ -134,11 +94,9 @@ int SDLVideoDriver::Init(void)
 		Log(ERROR, "SDLVideo", "InitSubSystem failed: %s", SDL_GetError());
 		return GEM_ERROR;
 	}
-
 	if (!(MouseFlags&MOUSE_HIDDEN)) {
 		SDL_ShowCursor( SDL_DISABLE );
 	}
-
 	return GEM_OK;
 }
 
@@ -400,7 +358,6 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				EvntManager->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 			break;
 	}
-
 	return GEM_OK;
 }
 
@@ -408,8 +365,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 {
 #ifdef VITA
 	// DPad input
-	if (dPadSoftKeyboard.IsInputActive())
-	{
+	if (dPadSoftKeyboard.IsInputActive()) {
 		// add/change characters only on key down
 		if (button.state != SDL_PRESSED && button.button != SDL_CONTROLLER_BUTTON_A && button.button != SDL_CONTROLLER_BUTTON_B)
 			return;
@@ -452,8 +408,7 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 			default:
 				return;
 		}
-	}
-	else
+	} else
 #endif
 	{
 		//gameplay bindings
@@ -469,20 +424,24 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				break;
 			//scroll map
 			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_LEFT);
+				}
 				break;
 			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+				}
 				break;
 			case SDL_CONTROLLER_BUTTON_DPAD_UP:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_UP);
+				}
 				break;
 			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_DOWN);
+				}
 				break;
 			//open menu
 			case SDL_CONTROLLER_BUTTON_START:
@@ -490,8 +449,9 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				break;
 			//ESC
 			case SDL_CONTROLLER_BUTTON_BACK:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_ESCAPE);
+				}
 				break;
 			//pause combat
 			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
@@ -499,10 +459,11 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 				break;
 			//highlight items
 			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-				if (button.state == SDL_PRESSED)
+				if (button.state == SDL_PRESSED) {
 					EvntManager->OnSpecialKeyPress(GEM_ALT);
-				else
+				} else {
 					EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
+				}
 				break;
 			//inventory
 			case SDL_CONTROLLER_BUTTON_Y:
@@ -521,33 +482,34 @@ void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
 
 void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
 {
-	if (buttonState == SDL_PRESSED)
-	{
+	if (buttonState == SDL_PRESSED) {
 		lastMouseDownTime = EvntManager->GetRKDelay();
-		if (lastMouseDownTime != (unsigned long) ~0)
-		{
+		if (lastMouseDownTime != (unsigned long) ~0) {
 			lastMouseDownTime += lastMouseDownTime + lastTime;
 		}
-		if (CursorIndex != VID_CUR_DRAG)
+		if (CursorIndex != VID_CUR_DRAG) {
 			CursorIndex = VID_CUR_DOWN;
-		if (!core->ConsolePopped)
+		}
+		if (!core->ConsolePopped) {
 			EvntManager->MouseDown(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
-	}
-	else
-	{
-		if (CursorIndex != VID_CUR_DRAG)
+		}
+	} else {
+		if (CursorIndex != VID_CUR_DRAG) {
 			CursorIndex = VID_CUR_UP;
-		if (!core->ConsolePopped)
+		}
+		if (!core->ConsolePopped) {
 			EvntManager->MouseUp(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
+		}
 	}
 }
 
 void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
 {
-	if (buttonState == SDL_PRESSED)
+	if (buttonState == SDL_PRESSED) {
 		EvntManager->KeyPress(keyCode, KMOD_NONE);
-	else
+	} else {
 		EvntManager->KeyRelease(keyCode, KMOD_NONE);
+	}
 }
 
 void SDLVideoDriver::ProcessAxisMotion()
@@ -557,39 +519,43 @@ void SDLVideoDriver::ProcessAxisMotion()
 	gamepadControl.lastAxisMovementTime = currentTime;
 
 	//cursor movement
-	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0)
-	{
+	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0) {
 		int16_t xSign = (gamepadControl.xAxisLValue > 0) - (gamepadControl.xAxisLValue < 0);
 		int16_t ySign = (gamepadControl.yAxisLValue > 0) - (gamepadControl.yAxisLValue < 0);
 
 		gamepadControl.xAxisFloatPos += ((pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * gamepadControl.GetPointerSpeed();
 		gamepadControl.yAxisFloatPos += ((pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * gamepadControl.GetPointerSpeed();
 
-		if(gamepadControl.xAxisFloatPos < 0)
+		if(gamepadControl.xAxisFloatPos < 0) {
 			gamepadControl.xAxisFloatPos = 0;
-		if(gamepadControl.yAxisFloatPos < 0)
+		}
+		if(gamepadControl.yAxisFloatPos < 0) {
 			gamepadControl.yAxisFloatPos = 0;
+		}
 
-		if(gamepadControl.xAxisFloatPos > GetWidth())
+		if(gamepadControl.xAxisFloatPos > GetWidth()) {
 			gamepadControl.xAxisFloatPos = GetWidth();
-		if(gamepadControl.yAxisFloatPos > GetHeight())
+		}
+		if(gamepadControl.yAxisFloatPos > GetHeight()) {
 			gamepadControl.yAxisFloatPos = GetHeight();
+		}
 		
 		MouseMovement(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos));
 	}
 
 	//map scroll
-	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0)
-	{
-		if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE)
+	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
+		if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
 			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-		else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE)
+		} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
 			EvntManager->OnSpecialKeyPress(GEM_LEFT);
+		}
 		
-		if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE)
+		if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
 			EvntManager->OnSpecialKeyPress(GEM_DOWN);
-		else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE)
+		} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
 			EvntManager->OnSpecialKeyPress(GEM_UP);
+		}
 	}
 }
 
@@ -1673,8 +1639,9 @@ int SDLVideoDriver::PollMovieEvents()
 #else
 			case SDL_JOYBUTTONDOWN:
 #endif
-				if (event.jbutton.button == SDL_CONTROLLER_BUTTON_BACK || event.jbutton.button == SDL_CONTROLLER_BUTTON_A || event.jbutton.button == SDL_CONTROLLER_BUTTON_B)
+				if (event.jbutton.button == SDL_CONTROLLER_BUTTON_BACK || event.jbutton.button == SDL_CONTROLLER_BUTTON_A || event.jbutton.button == SDL_CONTROLLER_BUTTON_B) {
 					return 1;
+				}
 				break;
 			default:
 				break;

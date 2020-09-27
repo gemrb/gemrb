@@ -22,6 +22,7 @@
 #define SDLVIDEODRIVER_H
 
 #include "Video.h"
+#include "GamepadControl.h"
 
 #include "GUI/EventMgr.h"
 #include "win32def.h"
@@ -35,47 +36,16 @@ typedef unsigned char
 #endif
 	Pixel;
 
+#ifdef VITA
+#include "DPadSoftKeyboard.h"
+#endif
+
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDLKey SDL_Keycode
 #define SDL_JoyAxisEvent SDL_ControllerAxisEvent
 #define SDL_JoyButtonEvent SDL_ControllerButtonEvent
 #else
-#ifdef VITA
-#define SDL_CONTROLLER_AXIS_LEFTX 0
-#define SDL_CONTROLLER_AXIS_LEFTY 1
-#define SDL_CONTROLLER_AXIS_RIGHTX 2
-#define SDL_CONTROLLER_AXIS_RIGHTY 3
-#define SDL_CONTROLLER_BUTTON_A 2
-#define SDL_CONTROLLER_BUTTON_B 1
-#define SDL_CONTROLLER_BUTTON_X 3
-#define SDL_CONTROLLER_BUTTON_Y 0
-#define SDL_CONTROLLER_BUTTON_BACK 11
-#define SDL_CONTROLLER_BUTTON_START 10
-#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 4
-#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 5
-#define SDL_CONTROLLER_BUTTON_DPAD_UP 8
-#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 6
-#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 7
-#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 9
-#else
-//XBone mapping on Linux. Some buttons aren't working in SDL12
-#define SDL_CONTROLLER_AXIS_LEFTX 0
-#define SDL_CONTROLLER_AXIS_LEFTY 1
-#define SDL_CONTROLLER_AXIS_RIGHTX 2
-#define SDL_CONTROLLER_AXIS_RIGHTY 3
-#define SDL_CONTROLLER_BUTTON_A 0
-#define SDL_CONTROLLER_BUTTON_B 1
-#define SDL_CONTROLLER_BUTTON_X 3
-#define SDL_CONTROLLER_BUTTON_Y 4
-#define SDL_CONTROLLER_BUTTON_BACK 100
-#define SDL_CONTROLLER_BUTTON_START 11
-#define SDL_CONTROLLER_BUTTON_LEFTSHOULDER 6
-#define SDL_CONTROLLER_BUTTON_RIGHTSHOULDER 7
-#define SDL_CONTROLLER_BUTTON_DPAD_UP 101
-#define SDL_CONTROLLER_BUTTON_DPAD_DOWN 102
-#define SDL_CONTROLLER_BUTTON_DPAD_LEFT 103
-#define SDL_CONTROLLER_BUTTON_DPAD_RIGHT 104
-#endif
+typedef Sint32 SDL_Keycode;
 #endif
 
 namespace GemRB {
@@ -94,195 +64,6 @@ inline int GetModState()
 	return GetModState(SDL_GetModState());
 }
 
-#ifdef VITA
-class DPadSoftKeyboard
-{
-private:
-	static const int TOTAL_CHARACTERS_DPAD = 37;
-	bool inputActive = false;
-	bool emptyInput = false;
-	bool currentUpper = false;
-	int32_t currentCharIndex;
-	std::vector <int32_t> inputIndexes;
-
-	unsigned char dpadKeys[TOTAL_CHARACTERS_DPAD] = 
-	{
-		//lowercase letters
-		97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122,
-		//space
-		32,
-		//nums
-		48, 49, 50, 51, 52, 53, 54, 55, 56, 57
-	};
-
-public:
-	void StartInput()
-	{
-		inputActive = true;
-		emptyInput = true;
-		currentUpper = true;
-		currentCharIndex = 0;
-		inputIndexes.clear();
-	}
-
-	void StopInput()
-	{
-		inputActive = false;
-	}
- 
-	bool IsInputActive() const
-	{
-		return inputActive;
-	}
-
-	unsigned char GetCurrentKeyValue() const
-	{
-		unsigned char modKeyValue = dpadKeys[currentCharIndex];
-
-		if (currentUpper && dpadKeys[currentCharIndex] >= 97 && dpadKeys[currentCharIndex] <= 122)
-		{
-			modKeyValue -= 32;
-		}
-
-		return modKeyValue;
-	}
-
-	void ToggleUppercase()
-	{
-		if (emptyInput)
-			emptyInput = false;
-
-		if (dpadKeys[currentCharIndex] >= 97 && dpadKeys[currentCharIndex] <= 122)
-			currentUpper = !currentUpper;
-	}
-
-	void RemoveCharacter()
-	{
-		if (inputIndexes.empty())
-		{
-			emptyInput = true;
-			currentUpper = true;
-			currentCharIndex = 0;
-		}
-		else
-		{
-			currentCharIndex = inputIndexes.back();
-			inputIndexes.pop_back();
-			if (inputIndexes.empty())
-				currentUpper = true;
-		}
-	}
-
-	void AddCharacter()
-	{
-		if (emptyInput)
-		{
-			emptyInput = false;
-		}
-		else
-		{
-			currentUpper = false;
-			inputIndexes.push_back(currentCharIndex);
-			currentCharIndex = 0;
-		}
-	}
-
-	void NextCharacter()
-	{
-		if (emptyInput)
-		{
-			emptyInput = false;
-		}
-		else
-		{
-			++currentCharIndex;
-			if (currentCharIndex >= TOTAL_CHARACTERS_DPAD)
-				currentCharIndex = 0;
-		}
-	}
-
-	void PreviousCharacter()
-	{
-		if (emptyInput)
-		{
-			emptyInput = false;
-		}
-		else
-		{
-			--currentCharIndex;
-			if (currentCharIndex < 0)
-				currentCharIndex = TOTAL_CHARACTERS_DPAD - 1;
-		}
-	}
-};
-#endif
-
-class GamepadControl
-{
-private:
-	const float JOY_SPEED_MOD = 2000000.0f;
-
-public:
-	enum 
-	{
-		JOY_L_DEADZONE 	= 1000,
-		JOY_R_DEADZONE = 25000,
-	};
-
-	const float JOY_AXIS_SPEEDUP = 1.03f;
-
-	float joyPointerSpeed;
-	int16_t xAxisLValue = 0;
-	int16_t yAxisLValue = 0;
-	int16_t xAxisRValue = 0;
-	int16_t yAxisRValue = 0; 
-	float xAxisFloatPos = 0;
-	float yAxisFloatPos = 0;
-	uint32_t lastAxisMovementTime = 0;
-
-	void SetPointerSpeed(int pointerSpeed)
-	{
-		joyPointerSpeed = pointerSpeed / JOY_SPEED_MOD;
-	}
-
-	float GetPointerSpeed()
-	{
-		return joyPointerSpeed;
-	}
-
-	void SetGamepadPosition(int x, int y)
-	{
-		xAxisFloatPos = x;
-		yAxisFloatPos = y;
-	}
-
-	void HandleAxisEvent(uint8_t axis, int16_t value)
-	{
-		if (axis == SDL_CONTROLLER_AXIS_LEFTX)
-		{
-			if(std::abs(value) > JOY_L_DEADZONE)
-				xAxisLValue = value;
-			else
-				xAxisLValue = 0;
-		}
-		else if (axis == SDL_CONTROLLER_AXIS_LEFTY)
-		{
-			if(std::abs(value) > JOY_L_DEADZONE)
-				yAxisLValue = value;
-			else
-				yAxisLValue = 0;
-		}
-		else if (axis == SDL_CONTROLLER_AXIS_RIGHTX)
-		{
-			xAxisRValue = value;
-		}
-		else if (axis == SDL_CONTROLLER_AXIS_RIGHTY)
-		{
-			yAxisRValue = value;
-		}
-	}
-};
-
 class SDLVideoDriver : public Video {
 protected:
 	SDL_Surface* disp;
@@ -297,7 +78,6 @@ protected:
 
 	String *subtitletext;
 	ieDword subtitlestrref;
-
 public:
 	SDLVideoDriver(void);
 	virtual ~SDLVideoDriver(void);
@@ -413,8 +193,8 @@ protected:
 #endif
 	GamepadControl gamepadControl;
 
-	void HandleJoyAxisEvent(const SDL_JoyAxisEvent & motion);
-	void HandleJoyButtonEvent(const SDL_JoyButtonEvent & button);
+	void HandleJoyAxisEvent(const SDL_JoyAxisEvent &motion);
+	void HandleJoyButtonEvent(const SDL_JoyButtonEvent &button);
 	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
 	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
 	void ProcessAxisMotion();

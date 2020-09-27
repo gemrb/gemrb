@@ -47,7 +47,7 @@ private:
 	SDL_TouchFingerEvent firstFingerDown;
 	unsigned long firstFingerDownTime;
 	MultiGesture currentGesture;
-	SDL_GameController *gameController = NULL;
+	SDL_GameController *gameController = nullptr;
 protected:
 	SDL_Window* window;
 	SDL_Texture* screenTexture;

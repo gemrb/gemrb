@@ -56,8 +56,9 @@ TextEdit::~TextEdit(void)
 	Sprite2D::FreeSprite( Back );
 	Sprite2D::FreeSprite( Cursor );
 #ifdef VITA
-	if (hasFocus)
+	if (hasFocus) {
 		core->GetVideoDriver()->HideSoftKeyboard();
+	}
 #endif
 }
 
@@ -200,8 +201,9 @@ void TextEdit::SetFocus(bool focus)
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
 #ifdef VITA
-	else
+	else {
 		core->GetVideoDriver()->HideSoftKeyboard();
+	}
 #endif
 }
 
