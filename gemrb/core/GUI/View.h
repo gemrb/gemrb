@@ -150,6 +150,10 @@ protected:
 	virtual bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	virtual bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	virtual bool OnTouchGesture(const GestureEvent& gesture);
+	
+	virtual bool OnControllerAxis(const ControllerEvent&);
+	virtual bool OnControllerButtonDown(const ControllerEvent&);
+	virtual bool OnControllerButtonUp(const ControllerEvent&);
 
 public:
 	#include "ViewInterfaces.h"
@@ -233,6 +237,10 @@ public:
 	void TouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	void TouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
 	void TouchGesture(const GestureEvent& gesture);
+	
+	void ControllerAxis(const ControllerEvent&);
+	void ControllerButtonDown(const ControllerEvent&);
+	void ControllerButtonUp(const ControllerEvent&);
 
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }

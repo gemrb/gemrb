@@ -722,6 +722,21 @@ void View::TouchGesture(const GestureEvent& gesture)
 	HandleEvent1(TouchGesture, gesture);
 }
 
+void View::ControllerAxis(const ControllerEvent& ce)
+{
+	HandleEvent1(ControllerAxis, ce);
+}
+
+void View::ControllerButtonDown(const ControllerEvent& ce)
+{
+	HandleEvent1(ControllerButtonDown, ce);
+}
+
+void View::ControllerButtonUp(const ControllerEvent& ce)
+{
+	HandleEvent1(ControllerButtonUp, ce);
+}
+
 bool View::OnTouchDown(const TouchEvent& te, unsigned short mod)
 {
 	// default acts as left mouse down
@@ -754,6 +769,27 @@ bool View::OnTouchGesture(const GestureEvent& gesture)
 		return OnMouseWheelScroll(gesture.Delta());
 	}
 	return false;
+}
+
+bool View::OnControllerAxis(const ControllerEvent& ce)
+{
+	MouseEvent me = MouseEventFromController(ce, true);
+	if (me.buttonStates) {
+		return OnMouseDrag(me);
+	}
+	return OnMouseOver(me);
+}
+
+bool View::OnControllerButtonDown(const ControllerEvent& ce)
+{
+	MouseEvent me = MouseEventFromController(ce, true);
+	return OnMouseDown(me, 0);
+}
+
+bool View::OnControllerButtonUp(const ControllerEvent& ce)
+{
+	MouseEvent me = MouseEventFromController(ce, false);
+	return OnMouseUp(me, 0);
 }
 
 const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group)

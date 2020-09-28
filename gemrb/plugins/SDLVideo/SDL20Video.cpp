@@ -46,12 +46,35 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
+	if (SDL_GameControllerGetAttached(gameController)) {
+		SDL_GameControllerClose(gameController);
+	}
 	SDL_DestroyTexture(scratchBuffer);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
 	delete stencilShader;
 	delete spriteShader;
+}
+
+int SDL20VideoDriver::Init()
+{
+	int ret = SDLVideoDriver::Init();
+
+	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
+		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
+	} else {
+		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+			if (SDL_IsGameController(i)) {
+				gameController = SDL_GameControllerOpen(i);
+				if (gameController != nullptr) {
+					break;
+				}
+			}
+		}
+	}
+
+	return ret;
 }
 
 int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)
@@ -535,6 +558,41 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	Event e;
 
 	switch (event.type) {
+		case SDL_CONTROLLERDEVICEREMOVED:
+			if (gameController != nullptr) {
+				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				if (removedController == gameController) {
+					SDL_GameControllerClose(gameController);
+					gameController = nullptr;
+				}
+			}
+			break;
+		case SDL_CONTROLLERDEVICEADDED:
+			// I guess we assume that if you plug in a device while play that is the one to use?
+			if (gameController == nullptr) {
+				gameController = SDL_GameControllerOpen(event.jdevice.which);
+			}
+			break;
+		case SDL_CONTROLLERAXISMOTION:
+			{
+				float pct = event.caxis.value / sizeof(Sint16);
+				bool xaxis = event.caxis.axis % 2;
+				// FIXME: I'm sure this delta needs to be scaled
+				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				InputAxis axis = InputAxis(event.caxis.axis);
+				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
+				EvntManager->DispatchEvent(e);
+			}
+			break;
+		case SDL_CONTROLLERBUTTONDOWN:
+		case SDL_CONTROLLERBUTTONUP:
+			{
+				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
+				EventButton btn = EventButton(event.cbutton.button);
+				e = EvntManager->CreateControllerButtonEvent(btn, down);
+				EvntManager->DispatchEvent(e);
+			}
+			break;
 		case SDL_FINGERDOWN: // fallthough
 		case SDL_FINGERUP:
 			{

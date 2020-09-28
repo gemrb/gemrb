@@ -29,9 +29,11 @@ class SDL12VideoDriver : public SDLVideoDriver {
 private:
 	SDL_Surface* disp;
 	bool inTextInput;
+	SDL_Joystick* gameController = nullptr;
 
 public:
 	SDL12VideoDriver(void);
+	~SDL12VideoDriver();
 	
 	int Init(void) override;
 	int CreateDriverDisplay(const Size&, int bpp, const char* title) override;

@@ -209,11 +209,14 @@ private:
 	GLSLProgram* spriteShader = nullptr;
 
 	SDL_Texture* scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
+	
+	SDL_GameController* gameController = nullptr;
 
 public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
 
+	int Init() override;
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 
 	int CreateDriverDisplay(const Size& s, int bpp, const char* title) override;

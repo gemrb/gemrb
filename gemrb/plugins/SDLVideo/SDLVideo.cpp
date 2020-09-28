@@ -224,14 +224,36 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			EventButton btn = SDL_BUTTON(event.button.button);
-			if (btn) {
-				// it has been observed that multibutton mice can
-				// result in 0 for some of their extra buttons
-				// on at least some platforms
-				bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
-				Point p(event.button.x, event.button.y);
-				e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
+			{
+				EventButton btn = SDL_BUTTON(event.button.button);
+				if (btn) {
+					// it has been observed that multibutton mice can
+					// result in 0 for some of their extra buttons
+					// on at least some platforms
+					bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
+					Point p(event.button.x, event.button.y);
+					e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
+					EvntManager->DispatchEvent(e);
+				}
+			}
+			break;
+		case SDL_JOYAXISMOTION:
+			{
+				float pct = event.jaxis.value / sizeof(Sint16);
+				bool xaxis = event.jaxis.axis % 2;
+				// FIXME: I'm sure this delta needs to be scaled
+				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				InputAxis axis = InputAxis(event.jaxis.axis);
+				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
+				EvntManager->DispatchEvent(e);
+			}
+			break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			{
+				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
+				EventButton btn = EventButton(event.jbutton.button);
+				e = EvntManager->CreateControllerButtonEvent(btn, down);
 				EvntManager->DispatchEvent(e);
 			}
 			break;

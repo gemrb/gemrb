@@ -35,6 +35,7 @@ EventMgr::buttonbits EventMgr::mouseButtonFlags;
 EventMgr::buttonbits EventMgr::modKeys;
 Point EventMgr::mousePos;
 std::map<uint64_t, TouchEvent::Finger> EventMgr::fingerStates;
+EventMgr::buttonbits EventMgr::controllerButtonStates;
 
 EventMgr::KeyMap EventMgr::HotKeys = KeyMap();
 EventMgr::EventTaps EventMgr::Taps = EventTaps();
@@ -53,12 +54,41 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 	return me;
 }
 
+MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
+{
+	Point p = EventMgr::MousePos();
+	
+	MouseEvent me;
+	me.x = p.x;
+	me.y = p.y;
+	
+	if (ce.axis % 2) {
+		me.deltaX = ce.axisDelta;
+		me.deltaY = 0;
+	} else {
+		me.deltaX = 0;
+		me.deltaY = ce.axisDelta;
+	}
+	
+	EventButton btn = 0;
+	if (ce.button == CONTROLLER_BUTTON_A) {
+		btn = GEM_MB_ACTION;
+	} else if (ce.button == CONTROLLER_BUTTON_B) {
+		btn = GEM_MB_MENU;
+	}
+
+	me.buttonStates = (down) ? btn : 0;
+	me.button = btn;
+
+	return me;
+}
+
 bool EventMgr::ModState(unsigned short mod)
 {
 	return (modKeys & buttonbits(mod)).any();
 }
 
-bool EventMgr::MouseButtonState(unsigned short btn)
+bool EventMgr::MouseButtonState(EventButton btn)
 {
 	return (mouseButtonFlags & buttonbits(btn)).any();
 }
@@ -71,6 +101,11 @@ bool EventMgr::MouseDown()
 bool EventMgr::FingerDown()
 {
 	return fingerStates.size() > 0;
+}
+
+bool EventMgr::ControllerButtonState(EventButton btn)
+{
+	return (controllerButtonStates & buttonbits(btn)).any();
 }
 
 void EventMgr::DispatchEvent(Event& e)
@@ -118,6 +153,15 @@ void EventMgr::DispatchEvent(Event& e)
 				return;
 			}
 		}
+	} else if (e.EventMaskFromType(e.type) & Event::ControllerAxisMask) {
+		// only the left stick moves the cursor
+		if (e.controller.axis == AXIS_LEFT_X) {
+			mousePos.x += e.controller.axisDelta;
+		} else if (e.controller.axis == AXIS_LEFT_Y) {
+			mousePos.y += e.controller.axisDelta;
+		}
+	} else if (e.EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
+		controllerButtonStates = e.controller.buttonStates;
 	} else if (e.isScreen) {
 		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
 										   | Event::TouchUp | Event::TouchDown)
@@ -186,7 +230,6 @@ void EventMgr::DispatchEvent(Event& e)
 			}
 		}
 	} else {
-		// TODO: implement controller events
 		if (video->InTextInput())
 			video->StopTextInput();
 	}
@@ -388,6 +431,34 @@ Event EventMgr::CreateTextEvent(const String& text)
 	e.type = Event::TextInput;
 	e.text.text = text;
 
+	return e;
+}
+
+Event EventMgr::CreateControllerAxisEvent(InputAxis axis, int delta, float pct)
+{
+	Event e = {};
+	e.type = Event::ControllerAxis;
+	e.controller.axis = axis;
+	e.controller.axisPct = pct;
+	e.controller.axisDelta = delta;
+	e.isScreen = true;
+	return e;
+}
+
+Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
+{
+	Event e = {};
+	e.controller.buttonStates = controllerButtonStates.to_ulong();
+	
+	if (down) {
+		e.type = Event::ControllerButtonDown;
+		e.controller.buttonStates |= btn;
+	} else {
+		e.type = Event::ControllerButtonUp;
+		e.controller.buttonStates &= ~btn;
+	}
+	e.controller.button = btn;
+	
 	return e;
 }
 

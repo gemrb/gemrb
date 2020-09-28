@@ -78,6 +78,33 @@ class Window;
 
 #define FINGER_MAX 5
 
+enum InputAxis : int8_t {
+	AXIS_INVALID = -1,
+	AXIS_LEFT_X,
+	AXIS_LEFT_Y,
+	AXIS_RIGHT_X,
+	AXIS_RIGHT_Y
+};
+
+enum ControllerButton : int8_t {
+	CONTROLLER_INVALID = -1,
+	CONTROLLER_BUTTON_A,
+	CONTROLLER_BUTTON_B,
+    CONTROLLER_BUTTON_X,
+    CONTROLLER_BUTTON_Y,
+    CONTROLLER_BUTTON_BACK,
+    CONTROLLER_BUTTON_GUIDE,
+    CONTROLLER_BUTTON_START,
+    CONTROLLER_BUTTON_LEFTSTICK,
+    CONTROLLER_BUTTON_RIGHTSTICK,
+    CONTROLLER_BUTTON_LEFTSHOULDER,
+    CONTROLLER_BUTTON_RIGHTSHOULDER,
+    CONTROLLER_BUTTON_DPAD_UP,
+    CONTROLLER_BUTTON_DPAD_DOWN,
+    CONTROLLER_BUTTON_DPAD_LEFT,
+    CONTROLLER_BUTTON_DPAD_RIGHT
+};
+
 typedef unsigned char EventButton;
 typedef unsigned short KeyboardKey;
 typedef unsigned short ButtonMask;
@@ -113,8 +140,10 @@ struct GEM_EXPORT TextEvent : public EventBase {
 	String text; // activate the soft keyboard and disable hot keys until next (non TextEvent) event
 };
 
-// TODO: Unused event type...
 struct GEM_EXPORT ControllerEvent : public EventBase {
+	InputAxis axis;
+	float axisPct;
+	int axisDelta;
 	ButtonMask buttonStates;
 	EventButton button;
 };
@@ -149,8 +178,12 @@ struct GEM_EXPORT Event {
 		TouchUp,
 		TouchDown,
 
-		TextInput // clipboard or faux event sent to signal the soft keyboard+temp disable hotkeys
-		// TODO: need types for controller
+		TextInput, // clipboard or faux event sent to signal the soft keyboard+temp disable hotkeys
+		
+		ControllerAxis,
+		ControllerButtonUp,
+		ControllerButtonDown
+
 		// leaving off types for unused events
 	};
 
@@ -176,6 +209,12 @@ struct GEM_EXPORT Event {
 		AllTouchMask = TouchGestureMask | TouchUpMask | TouchDownMask,
 
 		TextInputMask = 1 << TextInput,
+		
+		ControllerAxisMask = 1 << ControllerAxis,
+		ControllerButtonUpMask = 1 << ControllerButtonUp,
+		ControllerButtonDownMask = 1 << ControllerButtonDown,
+		
+		AllControllerMask = ControllerAxisMask | ControllerButtonUpMask | ControllerButtonDownMask,
 
 		AllEventsMask = 0xffffffffU
 	};
@@ -184,7 +223,7 @@ struct GEM_EXPORT Event {
 
 	union {
 		MouseEvent mouse;
-		//ControllerEvent; unused currently
+		ControllerEvent controller;
 		KeyboardEvent keyboard;
 		TouchEvent touch;
 		GestureEvent gesture;
@@ -201,6 +240,7 @@ struct GEM_EXPORT Event {
 };
 
 MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
+MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down);
 
 /**
  * @class EventMgr
@@ -229,6 +269,9 @@ public:
 
 	static Event CreateTextEvent(const char* text);
 	static Event CreateTextEvent(const String& text);
+	
+	static Event CreateControllerAxisEvent(InputAxis axis, int delta, float pct);
+	static Event CreateControllerButtonEvent(EventButton btn, bool down);
 
 	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
 	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
@@ -250,19 +293,23 @@ private:
 	static Point mousePos;
 
 	static std::map<uint64_t, TouchEvent::Finger> fingerStates;
+	
+	static buttonbits controllerButtonStates;
 
 public:
 	void DispatchEvent(Event& e);
 
 	static bool ModState(unsigned short mod);
 
-	static bool MouseButtonState(unsigned short btn);
+	static bool MouseButtonState(EventButton btn);
 	static bool MouseDown();
 	static Point MousePos() { return mousePos; }
 
 	static const TouchEvent::Finger* FingerState(uint64_t id) { return (fingerStates.count(id)) ? &fingerStates[id] : NULL; };
 	static bool FingerDown();
 	static ieByte NumFingersDown() { return fingerStates.size(); };
+	
+	static bool ControllerButtonState(EventButton btn);
 };
 
 }
