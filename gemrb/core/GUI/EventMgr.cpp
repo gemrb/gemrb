@@ -71,16 +71,45 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 	}
 	
 	EventButton btn = 0;
-	if (ce.button == CONTROLLER_BUTTON_A) {
-		btn = GEM_MB_ACTION;
-	} else if (ce.button == CONTROLLER_BUTTON_B) {
-		btn = GEM_MB_MENU;
+	switch (ce.button) {
+		case CONTROLLER_BUTTON_A:
+			btn = GEM_MB_ACTION;
+			break;
+		case CONTROLLER_BUTTON_B:
+			btn = GEM_MB_MENU;
+			break;
+		case CONTROLLER_BUTTON_LEFTSTICK:
+			btn = GEM_MB_MIDDLE;
+			break;
 	}
 
 	me.buttonStates = (down) ? btn : 0;
 	me.button = btn;
 
 	return me;
+}
+
+KeyboardEvent KeyEventFromController(const ControllerEvent& ce, bool down)
+{
+	KeyboardEvent ke;
+	
+	// TODO: probably want more than the DPad
+	switch (ce.button) {
+		case CONTROLLER_BUTTON_DPAD_UP:
+			ke.keycode = GEM_UP;
+			break;
+		case CONTROLLER_BUTTON_DPAD_DOWN:
+			ke.keycode = GEM_DOWN;
+			break;
+		case CONTROLLER_BUTTON_DPAD_LEFT:
+			ke.keycode = GEM_LEFT;
+			break;
+		case CONTROLLER_BUTTON_DPAD_RIGHT:
+			ke.keycode = GEM_RIGHT;
+			break;
+	}
+	
+	return ke;
 }
 
 bool EventMgr::ModState(unsigned short mod)

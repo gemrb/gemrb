@@ -782,14 +782,34 @@ bool View::OnControllerAxis(const ControllerEvent& ce)
 
 bool View::OnControllerButtonDown(const ControllerEvent& ce)
 {
-	MouseEvent me = MouseEventFromController(ce, true);
-	return OnMouseDown(me, 0);
+	if (ce.button == CONTROLLER_BUTTON_A
+		|| ce.button == CONTROLLER_BUTTON_B
+		|| ce.button == CONTROLLER_BUTTON_LEFTSTICK)
+	{
+		MouseEvent me = MouseEventFromController(ce, true);
+		// TODO: we might want to add modifiers for "trigger" buttons
+		return OnMouseDown(me, 0);
+	}
+	
+	// TODO: we might want to add modifiers for "trigger" buttons
+	KeyboardEvent ke = KeyEventFromController(ce, true);
+	return OnKeyPress(ke, 0);
 }
 
 bool View::OnControllerButtonUp(const ControllerEvent& ce)
 {
-	MouseEvent me = MouseEventFromController(ce, false);
-	return OnMouseUp(me, 0);
+	if (ce.button == CONTROLLER_BUTTON_A
+		|| ce.button == CONTROLLER_BUTTON_B
+		|| ce.button == CONTROLLER_BUTTON_LEFTSTICK)
+	{
+		MouseEvent me = MouseEventFromController(ce, false);
+		// TODO: we might want to add modifiers for "trigger" buttons
+		return OnMouseUp(me, 0);
+	}
+	
+	// TODO: we might want to add modifiers for "trigger" buttons
+	KeyboardEvent ke = KeyEventFromController(ce, false);
+	return OnKeyRelease(ke, 0);
 }
 
 const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group)

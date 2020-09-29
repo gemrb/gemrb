@@ -241,6 +241,7 @@ struct GEM_EXPORT Event {
 
 MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
 MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down);
+KeyboardEvent KeyEventFromController(const ControllerEvent& ce, bool down);
 
 /**
  * @class EventMgr
