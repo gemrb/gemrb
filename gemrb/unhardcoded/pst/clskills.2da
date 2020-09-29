@@ -1,6 +1,6 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARD  THIEF    LAYHANDS  TURNLEVEL  BOOKTYPE  SAVEBONUS  SPONCAST
+                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARDSKILL  THIEFSKILL    LAYHANDS  TURNLEVEL  BOOKTYPE  SAVEBONUS  SPONCAST
 UNUSED              *          *           *          *        *     *        *         0          0         0          *
 MAGE                *          *           MXSPLWIZ   0        *     *        *         0          1         0          *
 FIGHTER             *          *           *          0        *     *        *         0          0         0          *
