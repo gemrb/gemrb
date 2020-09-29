@@ -227,9 +227,8 @@ struct GEM_EXPORT Event {
 		KeyboardEvent keyboard;
 		TouchEvent touch;
 		GestureEvent gesture;
+		TextEvent text;
 	};
-
-	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
     
     typedef unsigned short EventMods;
 
@@ -237,6 +236,59 @@ struct GEM_EXPORT Event {
 	unsigned long time;
 	EventMods mod; // modifier keys held during the event
 	bool isScreen; // event coresponsds to location on screen
+	
+	Event() {}
+	
+	Event(const Event& obj) {
+		*this = obj;
+	}
+	
+	Event& operator=(const Event& obj) {
+		type = obj.type;
+		time = obj.time;
+		mod = obj.mod;
+		isScreen = obj.isScreen;
+		
+		switch (type) {
+			case MouseMove:
+			case MouseUp:
+			case MouseDown:
+			case MouseScroll:
+				mouse = obj.mouse;
+				break;
+			case KeyUp:
+			case KeyDown:
+				keyboard = obj.keyboard;
+				break;
+			case TouchGesture:
+				gesture = obj.gesture;
+				break;
+			case TouchUp:
+			case TouchDown:
+				touch = obj.touch;
+				break;
+			case TextInput:
+				text = obj.text;
+				break;
+			case ControllerAxis:
+			case ControllerButtonUp:
+			case ControllerButtonDown:
+				controller = obj.controller;
+				break;
+		}
+		
+		return *this;
+	}
+	
+	~Event() {
+		switch (type) {
+			case TextInput:
+				text.~TextEvent();
+				break;
+			default:
+				break;
+		}
+	}
 };
 
 MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
