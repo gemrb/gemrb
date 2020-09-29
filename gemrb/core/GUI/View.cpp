@@ -792,7 +792,7 @@ bool View::OnControllerButtonDown(const ControllerEvent& ce)
 	}
 	
 	// TODO: we might want to add modifiers for "trigger" buttons
-	KeyboardEvent ke = KeyEventFromController(ce, true);
+	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyPress(ke, 0);
 }
 
@@ -808,7 +808,7 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 	}
 	
 	// TODO: we might want to add modifiers for "trigger" buttons
-	KeyboardEvent ke = KeyEventFromController(ce, false);
+	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyRelease(ke, 0);
 }
 

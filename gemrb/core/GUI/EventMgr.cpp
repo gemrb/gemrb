@@ -89,7 +89,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 	return me;
 }
 
-KeyboardEvent KeyEventFromController(const ControllerEvent& ce, bool down)
+KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 {
 	KeyboardEvent ke;
 	
