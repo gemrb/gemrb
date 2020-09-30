@@ -84,7 +84,19 @@ INSTALL(FILES ${DLL_PATHS_DEBUG} CONFIGURATIONS Debug DESTINATION ${BIN_DIR})
 INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release RelWithDebInfo DESTINATION ${BIN_DIR})
 
 # copy over python core modules, so the buildbot binaries work without python installed
-INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
+
+#this copies the modules bundled with the standard python installer if found
+#otherwise, this uses the vcpkg bundled python modules if detected
+#site.py is searched for by name because the vcpkg uninstall process doesn't properly purge the folder
+#so if you switch between them for any reason, it will try to copy the wrong folder
+
+GET_FILENAME_COMPONENT(PYTHON_PARENT_DIR ${PYTHON_INCLUDE_DIR} DIRECTORY)
+
+IF(EXISTS ${PYTHON_PARENT_DIR}/Lib/site.py )
+	INSTALL(DIRECTORY ${PYTHON_PARENT_DIR}/Lib DESTINATION ${BIN_DIR})
+ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python2/Lib/site.py)
+	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
+ENDIF()
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")
 MESSAGE(STATUS "Disable option VCPKG_AUTO_DEPLOY to skip this")
