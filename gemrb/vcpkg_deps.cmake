@@ -66,6 +66,19 @@ FOREACH(ENTRY IN LISTS DLL_SET_RELEASE)
 	ENDIF()
 ENDFOREACH()
 
+# a custom target which copies the dll files to the build directory if needed, useful for rapid testing
+IF(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+	SET(DLL_SET ${DLL_PATHS_DEBUG} )
+ELSE()
+	SET(DLL_SET ${DLL_PATHS_RELEASE} )
+ENDIF()
+
+ADD_CUSTOM_COMMAND(TARGET gemrb POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+	${DLL_SET}
+	${CMAKE_BINARY_DIR}/gemrb/)
+
+
 # if a user decides to install, they also need a copy of the dll in their game directory.
 INSTALL(FILES ${DLL_PATHS_DEBUG} CONFIGURATIONS Debug DESTINATION ${BIN_DIR})
 INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release DESTINATION ${BIN_DIR})
