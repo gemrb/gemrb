@@ -1477,25 +1477,25 @@ uint32_t Map::SetDrawingStencilForScriptable(Scriptable* scriptable, const Regio
 	ieDword always_dither;
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
 	
-	uint32_t flags = 0;
+	uint32_t flags = BLIT_STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
-		flags = BLIT_STENCIL_ALPHA;
+		flags |= BLIT_STENCIL_ALPHA;
 	} else if (core->FogOfWar&FOG_DITHERSPRITES) {
 		// dithering is set to disabled
-		flags = BLIT_STENCIL_BLUE;
+		flags |= BLIT_STENCIL_BLUE;
 	} else if (scriptable->Type == ST_ACTOR) {
 		Actor* a = static_cast<Actor*>(scriptable);
 		if (a->IsSelected() || a->Over) {
-			flags = BLIT_STENCIL_ALPHA;
+			flags |= BLIT_STENCIL_ALPHA;
 		} else {
-			flags = BLIT_STENCIL_RED;
+			flags |= BLIT_STENCIL_RED;
 		}
 	} else if (scriptable->Type == ST_CONTAINER) {
 		Container* c = static_cast<Container*>(scriptable);
 		if (c->Highlight) {
-			flags = BLIT_STENCIL_ALPHA;
+			flags |= BLIT_STENCIL_ALPHA;
 		} else {
-			flags = BLIT_STENCIL_RED;
+			flags |= BLIT_STENCIL_RED;
 		}
 	}
 	

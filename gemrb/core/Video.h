@@ -59,7 +59,8 @@ enum SpriteBlitFlags : uint32_t {
 	BLIT_STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
 	BLIT_STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
 	BLIT_STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
-	BLIT_STENCIL_BLUE = 0x10000000 // blend with the stencil buffer using the stencil's b channel as the stencil
+	BLIT_STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
+	BLIT_STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
 
 #define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)
