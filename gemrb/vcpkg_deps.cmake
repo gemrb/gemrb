@@ -81,7 +81,7 @@ ADD_CUSTOM_COMMAND(TARGET gemrb POST_BUILD
 
 # if a user decides to install, they also need a copy of the dll in their game directory.
 INSTALL(FILES ${DLL_PATHS_DEBUG} CONFIGURATIONS Debug DESTINATION ${BIN_DIR})
-INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release DESTINATION ${BIN_DIR})
+INSTALL(FILES ${DLL_PATHS_RELEASE} CONFIGURATIONS Release RelWithDebInfo DESTINATION ${BIN_DIR})
 
 # copy over python core modules, so the buildbot binaries work without python installed
 INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
