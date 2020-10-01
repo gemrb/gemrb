@@ -164,6 +164,8 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 	for (i = 0xB8; i < 0xFF; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+	
+	col[1] = Color(0, 0, 0, col[1].a); // shadows are always black
 
 	version++;
 }
