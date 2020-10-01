@@ -248,19 +248,13 @@ void MaskedTintedBlend(SDLPixelIterator& dest, Uint8 maskval,
 		if ((flags & BLIT_STENCIL_DITHER) && maskval == 128) {
 			const Point& pos = dest.Position();
 			if (pos.y % 2 == 0) {
-				if (pos.x % 2 == 0) {
-					TintedBlend<PTYPE>(dest, 0x80, col, flags, tint, blend);
-				} else {
-					TintedBlend<PTYPE>(dest, 0xC0, col, flags, tint, blend);
-				}
-			} else if (pos.x % 2 != 0) {
-				TintedBlend<PTYPE>(dest, 0x80, col, flags, tint, blend);
+				maskval = (pos.x % 2) ? 0xC0 : 0x80;
 			} else {
-				TintedBlend<PTYPE>(dest, 0xC0, col, flags, tint, blend);
+				maskval = (pos.x % 2) ? 0x80 : 0xC0;
 			}
-		} else {
-			TintedBlend<PTYPE>(dest, maskval, col, flags, tint, blend);
 		}
+		
+		TintedBlend<PTYPE>(dest, maskval, col, flags, tint, blend);
 	}
 }
 
