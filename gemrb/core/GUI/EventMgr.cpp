@@ -206,6 +206,7 @@ void EventMgr::DispatchEvent(Event& e)
 			EventButton btn = (e.type == Event::MouseDown) ? e.mouse.button : 0;
 
 			if (e.type == Event::MouseDown || e.type == Event::TouchDown) {
+				core->GetVideoDriver()->CaptureMouse(true);
 				if (video->InTextInput())
 					video->StopTextInput();
 
@@ -220,6 +221,8 @@ void EventMgr::DispatchEvent(Event& e)
 				repeatPos = se.Pos();
 				repeatButton = btn;
 				lastMouseDown = GetTickCount();
+			} else if (e.type == Event::MouseUp && e.mouse.buttonStates == 0) {
+				core->GetVideoDriver()->CaptureMouse(false);
 			}
 
 			se.repeats = repeatCount;
