@@ -193,7 +193,7 @@ void EventMgr::DispatchEvent(Event& e)
 		controllerButtonStates = e.controller.buttonStates;
 	} else if (e.isScreen) {
 		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
-										   | Event::TouchUp | Event::TouchDown)
+										   | Event::TouchUpMask | Event::TouchDownMask)
 		) {
 			// WARNING: these are shared between mouse and touch
 			// it is assumed we wont be using both simultaniously

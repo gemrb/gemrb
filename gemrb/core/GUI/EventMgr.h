@@ -219,7 +219,7 @@ struct GEM_EXPORT Event {
 		AllEventsMask = 0xffffffffU
 	};
 
-	static EventTypeMask EventMaskFromType (EventType type ) { return static_cast<EventTypeMask>(1U << type); };
+	static EventTypeMask EventMaskFromType (EventType type) { return static_cast<EventTypeMask>(1U << type); };
 
 	union {
 		MouseEvent mouse;
