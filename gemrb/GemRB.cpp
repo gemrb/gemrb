@@ -37,7 +37,7 @@
 #include <psp2/power.h>
 
 // allocating memory for application on Vita
-int _newlib_heap_size_user = 320 * 1024 * 1024;
+int _newlib_heap_size_user = 344 * 1024 * 1024;
 #endif
 
 using namespace GemRB;
