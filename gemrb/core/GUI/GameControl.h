@@ -166,6 +166,8 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void WillDraw();
+	
+	bool CapturesMouseDrag() const { return true; }
 
 	bool CanLockFocus() const { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/);
