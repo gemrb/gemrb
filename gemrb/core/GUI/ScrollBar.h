@@ -109,6 +109,8 @@ private:
 	/** Range of the slider in pixels. The height - buttons - slider */
 	int SliderPxRange() const;
 	
+	bool IsPerPixelScrollable() const { return false; }
+	
 protected:
 	/** Mouse Button Down */
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);

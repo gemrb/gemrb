@@ -21,7 +21,7 @@
 #define ViewInterfaces_h
 
 class Scrollable {
-	public:
+public:
 	virtual void ScrollDelta(const Point& p) = 0;
 	virtual void ScrollTo(const Point& p) = 0;
 	

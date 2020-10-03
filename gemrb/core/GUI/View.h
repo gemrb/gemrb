@@ -122,6 +122,8 @@ private:
 	virtual void WillDraw() {}
 	virtual void DidDraw() {}
 	
+	virtual bool IsPerPixelScrollable() const { return true; }
+	
 	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
 
 protected:

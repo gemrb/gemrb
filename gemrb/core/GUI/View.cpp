@@ -704,7 +704,27 @@ void View::MouseUp(const MouseEvent& me, unsigned short mod)
 
 void View::MouseWheelScroll(const Point& delta)
 {
-	HandleEvent1(MouseWheelScroll, delta);
+	if ((eventProxy && !eventProxy->IsPerPixelScrollable())
+		|| (eventProxy == nullptr && !IsPerPixelScrollable())) {
+		Point scaledDelta;
+		int speed = core->GetMouseScrollSpeed();
+
+		if (delta.x < 0) {
+			scaledDelta.x = std::min<int>(delta.x / speed, -1);
+		} else if (delta.x > 0) {
+			scaledDelta.x = std::max<int>(delta.x / speed, 1);
+		}
+		
+		if (delta.y < 0) {
+			scaledDelta.y = std::min<int>(delta.y / speed, -1);
+		} else if (delta.y > 0) {
+			scaledDelta.y = std::max<int>(delta.y / speed, 1);
+		}
+		
+		HandleEvent1(MouseWheelScroll, scaledDelta);
+	} else {
+		HandleEvent1(MouseWheelScroll, delta);
+	}
 }
 
 void View::TouchDown(const TouchEvent& te, unsigned short mod)
