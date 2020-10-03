@@ -44,7 +44,7 @@ public:
 	bool SetFullscreenMode(bool set) override;
 
 	bool ToggleGrabInput() override;
-	void CaptureMouse(bool enabled) override {}; // FIXME: can this be done?
+	void CaptureMouse(bool /*enabled*/) override {}; // FIXME: can this be done?
 
 	void StartTextInput() override;
 	void StopTextInput() override;
