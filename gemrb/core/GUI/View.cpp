@@ -689,7 +689,13 @@ void View::MouseOver(const MouseEvent& me)
 
 void View::MouseDrag(const MouseEvent& me)
 {
-	HandleEvent1(MouseDrag, me);
+	if (CapturesMouseDrag()) {
+		core->GetVideoDriver()->CaptureMouse(true);
+		HandleEvent1(MouseDrag, me);
+		core->GetVideoDriver()->CaptureMouse(false);
+	} else {
+		HandleEvent1(MouseDrag, me);
+	}
 }
 
 void View::MouseDown(const MouseEvent& me, unsigned short mod)

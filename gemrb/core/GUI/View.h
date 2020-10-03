@@ -123,6 +123,7 @@ private:
 	virtual void DidDraw() {}
 	
 	virtual bool IsPerPixelScrollable() const { return true; }
+	virtual bool CapturesMouseDrag() const { return true; }
 	
 	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
 
