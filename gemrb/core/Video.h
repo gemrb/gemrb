@@ -176,6 +176,7 @@ public:
 	void SetStencilBuffer(const VideoBufferPtr&);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
+	virtual void CaptureMouse(bool enabled) = 0;
 	const Size& GetScreenSize() { return screenSize; }
 
 	virtual void StartTextInput() = 0;

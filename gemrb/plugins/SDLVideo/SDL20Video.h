@@ -228,6 +228,7 @@ public:
 	bool SetFullscreenMode(bool set) override;
 	void SetGamma(int brightness, int contrast) override;
 	bool ToggleGrabInput() override;
+	void CaptureMouse(bool enabled) override;
 
 	void StartTextInput() override;
 	void StopTextInput() override;

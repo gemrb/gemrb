@@ -819,6 +819,11 @@ bool SDL20VideoDriver::ToggleGrabInput()
 	return (isGrabbed != SDL_GetWindowGrab(window));
 }
 
+void SDL20VideoDriver::CaptureMouse(bool enabled)
+{
+	SDL_CaptureMouse(SDL_bool(enabled));
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
