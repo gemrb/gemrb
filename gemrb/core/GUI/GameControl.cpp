@@ -1614,6 +1614,13 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 		return false;
 	}
 	
+	if (e.mouse.ButtonState(GEM_MB_MIDDLE)) {
+		// if we are panning the map don't scroll from being at the edge
+		moveX = 0;
+		moveY = 0;
+		return false;
+	}
+	
 #define SCROLL_AREA_WIDTH 5
 	Region mask = frame;
 	mask.x += SCROLL_AREA_WIDTH;
