@@ -57,6 +57,7 @@ WindowManager::WindowManager(Video* vid)
 
 	cb = METHOD_CALLBACK(&WindowManager::HotKey, this);
 	eventMgr.RegisterHotKeyCallback(cb, 'f', GEM_MOD_CTRL);
+	eventMgr.RegisterHotKeyCallback(cb, GEM_GRAB, 0);
 
 	screen = Region(Point(), vid->GetScreenSize());
 	// FIXME: technically we should unset the current video event manager...
@@ -295,6 +296,9 @@ bool WindowManager::HotKey(const Event& event)
 		switch (event.keyboard.keycode) {
 			case 'f':
 				video->ToggleFullscreenMode();
+				return true;
+			case GEM_GRAB:
+				video->ToggleGrabInput();
 				return true;
 			default:
 				return false;
