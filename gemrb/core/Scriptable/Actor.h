@@ -450,6 +450,7 @@ private:
 	const char* GetArmorSound() const;
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
+	ieDword IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start = 0) const;
 public:
 	Actor(void);
 	~Actor(void);

@@ -5625,8 +5625,6 @@ void Actor::SendDiedTrigger() const
 
 void Actor::Die(Scriptable *killer, bool grantXP)
 {
-	int i,j;
-
 	if (InternalFlags&IF_REALLYDIED) {
 		return; //can die only once
 	}
@@ -5764,136 +5762,67 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	ClearPath(true);
 	SetModal( MS_NONE );
 
-	ieDword value = 0;
-	ieVariable varname;
 	if (InParty && killerPC) {
 		game->locals->SetAt("PM_KILLED", 1, nocreate);
 	}
 
 	// death variables are updated at the moment of death
-	if (KillVar[0]) {
+	if (core->HasFeature(GF_HAS_KAPUTZ)) {
+		const char *format = AppearanceFlags & APP_ADDKILL ? "KILL_%s" : "%s";
+
 		//don't use the raw killVar here (except when the flags explicitly ask for it)
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			if (AppearanceFlags&APP_DEATHTYPE) {
-				size_t len;
-				if (AppearanceFlags&APP_ADDKILL) {
-					len = snprintf(varname, 32, "KILL_%s", KillVar);
-				} else {
-					len = snprintf(varname, 32, "%s", KillVar);
-				}
-				if (len > 32) {
-					Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", KillVar, LongName);
-				}
-				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1, nocreate);
-			}
-		} else {
-			// iwd/iwd2 path *sets* this var, so i changed it, not sure about pst above
-			game->locals->SetAt(KillVar, 1, nocreate);
+		if (AppearanceFlags & APP_DEATHTYPE) {
+			IncrementDeathVariable(game->kaputz, format, KillVar);
 		}
+		if (AppearanceFlags & APP_FACTION) {
+			IncrementDeathVariable(game->kaputz, format, GetVarName("faction", BaseStats[IE_FACTION]));
+		}
+		if (AppearanceFlags & APP_TEAM) {
+			IncrementDeathVariable(game->kaputz, format, GetVarName("team", BaseStats[IE_TEAM]));
+		}
+		if (AppearanceFlags & APP_DEATHVAR) {
+			IncrementDeathVariable(game->kaputz, "%s_DEAD", scriptName);
+		}
+
+	} else {
+		IncrementDeathVariable(game->locals, "%s", KillVar);
+		IncrementDeathVariable(game->locals, core->GetDeathVarFormat(), scriptName);
 	}
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_FACTION) ) {
-		value = 0;
-		const char *tmp = GetVarName("faction", BaseStats[IE_FACTION]);
-		if (tmp && tmp[0]) {
-			size_t len;
-			if (AppearanceFlags&APP_ADDKILL) {
-				len = snprintf(varname, 32, "KILL_%s", tmp);
-			} else {
-				len = snprintf(varname, 32, "%s", tmp);
-			}
-			if (len > 32) {
-				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", tmp, LongName);
-			}
-			game->kaputz->Lookup(varname, value);
-			game->kaputz->SetAt(varname, value+1, nocreate);
-		}
-	}
-	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_TEAM) ) {
-		value = 0;
-		const char *tmp = GetVarName("team", BaseStats[IE_TEAM]);
-		if (tmp && tmp[0]) {
-			size_t len;
-			if (AppearanceFlags&APP_ADDKILL) {
-				len = snprintf(varname, 32, "KILL_%s", tmp);
-			} else {
-				len = snprintf(varname, 32, "%s", tmp);
-			}
-			if (len > 32) {
-				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", tmp, LongName);
-			}
-			game->kaputz->Lookup(varname, value);
-			game->kaputz->SetAt(varname, value+1, nocreate);
-		}
-	}
+	IncrementDeathVariable(game->locals, "%s", IncKillVar);
 
-	if (IncKillVar[0]) {
+	ieDword value;
+	if (scriptName[0] && SetDeathVar) {
+		ieVariable varname;
 		value = 0;
-		game->locals->Lookup(IncKillVar, value);
-		game->locals->SetAt(IncKillVar, value + 1, nocreate);
-	}
-
-	if (scriptName[0]) {
-		value = 0;
-		size_t len = 0;
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			if (AppearanceFlags&APP_DEATHVAR) {
-				len = snprintf(varname, 32, "%s_DEAD", scriptName);
-				game->kaputz->Lookup(varname, value);
-				game->kaputz->SetAt(varname, value+1, nocreate);
-			}
-		} else {
-			len = snprintf(varname, 32, core->GetDeathVarFormat(), scriptName);
-			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, value+1, nocreate);
-		}
+		size_t len = snprintf(varname, 32, "%s_DEAD", scriptName);
+		game->locals->Lookup(varname, value);
+		game->locals->SetAt(varname, 1, nocreate);
 		if (len > 32) {
 			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
 		}
-
-		if (SetDeathVar) {
-			value = 0;
-			len = snprintf(varname, 32, "%s_DEAD", scriptName);
-			game->locals->Lookup(varname, value);
-			game->locals->SetAt(varname, 1, nocreate);
-			if (value) {
-				// possibly overwrite len, but this one will always be longer anyway
-				len = snprintf(varname, 32, "%s_KILL_CNT", scriptName);
-				value = 1;
-				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value + 1, nocreate);
-			}
-			if (len > 32) {
-				Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
-			}
+		if (value) {
+			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
 		}
 	}
 
 	if (IncKillCount) {
 		// racial dead count
-		value = 0;
 		int racetable = core->LoadSymbol("race");
 		if (racetable != -1) {
 			Holder<SymbolMgr> race = core->GetSymbol(racetable);
-			const char *raceName = race->GetValue(Modified[IE_RACE]);
-			if (raceName) {
-				snprintf(varname, 32, "KILL_%s_CNT", raceName);
-				game->locals->Lookup(varname, value);
-				game->locals->SetAt(varname, value+1, nocreate);
-			}
+			IncrementDeathVariable(game->locals, "KILL_%s_CNT", race->GetValue(Modified[IE_RACE]));
 		}
 	}
 
 	//death counters for PST
-	j=APP_GOOD;
-	for(i=0;i<4;i++) {
-		if (AppearanceFlags&j) {
+	for (int i = 0, j = APP_GOOD; i < 4; i++) {
+		if (AppearanceFlags & j) {
 			value = 0;
 			game->locals->Lookup(CounterNames[i], value);
-			game->locals->SetAt(CounterNames[i], value+DeathCounters[i], nocreate);
+			game->locals->SetAt(CounterNames[i], value + DeathCounters[i], nocreate);
 		}
-		j+=j;
+		j += j;
 	}
 
 	// EXTRACOUNT is updated at the moment of death
@@ -5914,7 +5843,7 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 			area->locals->Lookup(varname, value);
 			// i am guessing that we shouldn't decrease below 0
 			if (value > 0) {
-				area->locals->SetAt(varname, value-1);
+				area->locals->SetAt(varname, value - 1);
 			}
 		}
 	}
@@ -6043,6 +5972,19 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	return false;
+}
+
+ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start) const {
+	if (name && name[0]) {
+		ieVariable varname;
+		size_t len = snprintf(varname, 32, format, name);
+		vars->Lookup(varname, start);
+		vars->SetAt(varname, start + 1, nocreate);
+		if (len > 32) {
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", name, LongName);
+		}
+	}
+	return start;
 }
 
 /* this will create a heap at location, and transfer the item(s) */
