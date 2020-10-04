@@ -359,9 +359,9 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 
 	s = inifile->GetKeyAsString(crittername,"spec",NULL);
 	if (s) {
-		int x[9];
+		ieByte x[9];
 		
-		ps = sscanf(s,"[%d.%d.%d.%d.%d.%d.%d.%d.%d]", x, x+1, x+2, x+3, x+4, x+5,
+		ps = sscanf(s,"[%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu.%hhu]", x, x+1, x+2, x+3, x+4, x+5,
 			x+6, x+7, x+8);
 		if (ps == 0) {
 			strnuprcpy(critter.ScriptName, s, 32);
@@ -369,7 +369,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			memset(critter.Spec,-1,sizeof(critter.Spec));
 		} else {
 			while(ps--) {
-				critter.Spec[ps]=(ieByte) x[ps];
+				critter.Spec[ps] = x[ps];
 			}
 		}
 	}
