@@ -76,7 +76,7 @@ private:
 	static void buffer_callback(void *udata, char *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
-	Mix_Chunk* loadSound(const char* ResRef, unsigned int &time_length);
+	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
 
 	int XPos, YPos;
 	Holder<SoundMgr> MusicReader;
@@ -90,7 +90,6 @@ private:
 	int audio_channels;
 
 	SDL_mutex* OurMutex;
-
 	LRUCache buffercache;
 };
 
