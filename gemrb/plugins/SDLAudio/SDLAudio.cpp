@@ -126,13 +126,13 @@ bool SDLAudio::evictBuffer()
 
 	SDL_LockAudio();
 
-	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() > BUFFER_CACHE_SIZE) {
+	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
 		CacheEntry* e = (CacheEntry*)p;
 		bool chunkPlaying = false;
 		int numChannels = Mix_AllocateChannels(-1);
 
 		for (int i = 0; i < numChannels; ++i) {
-			if (Mix_GetChunk(i) == e->chunk) {
+			if (Mix_Playing(i) && Mix_GetChunk(i) == e->chunk) {
 				chunkPlaying = true;
 				break;
 			}
@@ -225,11 +225,13 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 	e->chunk = chunk;
 	e->Length = time_length;
 
-	buffercache.SetAt(ResRef, (void*)e);
-	//print("LoadSound: added %s to cache. Cache size now %d", ResRef, buffercache.GetCount());
-	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
+	if (buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
 		evictBuffer();
 	}
+
+	buffercache.SetAt(ResRef, (void*)e);
+	//print("LoadSound: added %s to cache. Cache size now %d", ResRef, buffercache.GetCount());
+
 	return chunk;
 }
 

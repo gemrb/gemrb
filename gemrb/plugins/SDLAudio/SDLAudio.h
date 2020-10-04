@@ -27,7 +27,7 @@
 #include <vector>
 #include <SDL_mixer.h>
 
-#define BUFFER_CACHE_SIZE 30
+#define BUFFER_CACHE_SIZE 40
 
 struct SDL_mutex;
 
