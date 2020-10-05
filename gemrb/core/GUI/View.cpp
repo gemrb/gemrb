@@ -98,6 +98,9 @@ void View::SetEventProxy(View* proxy)
 // this method takes the dirty region so the framework exists, but currently this just invalidates any intersecting subviews
 void View::MarkDirty(const Region* rgn)
 {
+	// TODO: we could implement partial redraws by storing the dirty region
+	// not much to gain at the moment, however
+
 	if (dirty == false) {
 		dirty = true;
 
@@ -108,9 +111,18 @@ void View::MarkDirty(const Region* rgn)
 		std::list<View*>::iterator it;
 		for (it = subViews.begin(); it != subViews.end(); ++it) {
 			View* view = *it;
-			if (rgn == NULL || view->frame.IntersectsRegion(*rgn)) {
-				// TODO: implement partial redraws and pass the intersection rather than invalidating the entire view
-				view->MarkDirty();
+			if (rgn) {
+				Region intersect = view->frame.Intersect(*rgn);
+				const Size& idims = intersect.Dimensions();
+				if (!idims.IsEmpty()) {
+					Point p = view->ConvertPointFromSuper(intersect.Origin());
+					Region r = Region(p, idims);
+					view->MarkDirty(&r);
+				}
+			} else {
+				Point p = view->ConvertPointFromSuper(Point());
+				Region r = Region(p, Dimensions());
+				view->MarkDirty(&r);
 			}
 		}
 	}
