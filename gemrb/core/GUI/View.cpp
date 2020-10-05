@@ -131,12 +131,20 @@ bool View::NeedsDraw() const
 		return true;
 	}
 
-	// check our ancestors
-	if (superView) {
-		return superView->NeedsDraw();
-	}
-
 	// else we don't need an update
+	return false;
+}
+
+bool View::NeedsDrawRecursive() const
+{
+	if (NeedsDraw()) {
+		return true;
+	}
+	
+	if (superView) {
+		return superView->NeedsDrawRecursive();
+	}
+	
 	return false;
 }
 
@@ -167,7 +175,7 @@ void View::DirtyBGRect(const Region& r)
 	}
 
 	// if we are going to draw the entire BG, no need to compute and store this
-	if (NeedsDraw())
+	if (NeedsDrawRecursive())
 		return;
 
 	// do we want to intersect this too?
@@ -238,7 +246,7 @@ void View::Draw()
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
 
-	bool needsDraw = NeedsDraw(); // check this before WillDraw else an animation update might get missed
+	bool needsDraw = NeedsDrawRecursive(); // check this before WillDraw else an animation update might get missed
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
 	WillDraw();
 
