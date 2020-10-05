@@ -1456,10 +1456,8 @@ int GameScript::PersonalSpaceDistance(Scriptable *Sender, const Trigger *paramet
 	if (!scr) {
 		return 0;
 	}
-	int range = parameters->int0Parameter;
 
-	int distance = PersonalDistance(Sender, scr);
-	if (distance <= ( range * 10 )) {
+	if (WithinPersonalRange(scr, Sender, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;

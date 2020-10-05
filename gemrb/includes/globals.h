@@ -201,7 +201,7 @@ GEM_EXPORT unsigned int PersonalLineDistance(const Point &v, const Point &w, con
 GEM_EXPORT double Feet2Pixels(int feet, double angle);
 GEM_EXPORT bool WithinAudibleRange(const Actor *actor, const Point &dest);
 GEM_EXPORT bool WithinRange(const Actor *actor, const Point &dest, int distance);
-GEM_EXPORT bool WithinPersonalRange(const Actor *actor, const Scriptable *dest, int distance);
+GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance);
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
