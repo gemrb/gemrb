@@ -547,17 +547,25 @@ void SDLVideoDriver::ProcessAxisMotion()
 
 	//map scroll
 	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
-		if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
-			EvntManager->OnSpecialKeyPress(GEM_RIGHT);
-		} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
-			EvntManager->OnSpecialKeyPress(GEM_LEFT);
+		gamepadControl.gamepadScrollTimer += deltaTime;
+
+		if (gamepadControl.gamepadScrollTimer > gamepadControl.GAMEPAD_SCROLL_DELAY) {
+			gamepadControl.gamepadScrollTimer -= gamepadControl.GAMEPAD_SCROLL_DELAY;
+
+			if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+			} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_LEFT);
+			}
+			
+			if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_DOWN);
+			} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_UP);
+			}
 		}
-		
-		if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
-			EvntManager->OnSpecialKeyPress(GEM_DOWN);
-		} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
-			EvntManager->OnSpecialKeyPress(GEM_UP);
-		}
+	} else {
+		gamepadControl.gamepadScrollTimer = 0;
 	}
 }
 

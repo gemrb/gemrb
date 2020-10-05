@@ -41,6 +41,7 @@ public:
 	};
 
 	const float JOY_AXIS_SPEEDUP = 1.03F;
+	const uint32_t GAMEPAD_SCROLL_DELAY = 50;
 
 	float joyPointerSpeed;
 	int16_t xAxisLValue = 0;
@@ -50,6 +51,7 @@ public:
 	float xAxisFloatPos = 0;
 	float yAxisFloatPos = 0;
 	uint32_t lastAxisMovementTime = 0;
+	uint32_t gamepadScrollTimer = 0;
 
 	void SetPointerSpeed(int pointerSpeed);
 	float GetPointerSpeed();
