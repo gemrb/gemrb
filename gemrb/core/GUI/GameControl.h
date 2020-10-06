@@ -92,6 +92,7 @@ private:
 	Point screenMousePos;
 	Point vpOrigin;
 	bool updateVPTimer;
+	double formationBaseAngle;
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
@@ -221,6 +222,7 @@ public:
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 
 	void MakeSelection(bool extend = false);
+	void InitFormation(const Point &);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append=true);
