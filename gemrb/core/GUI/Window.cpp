@@ -102,10 +102,11 @@ void Window::DrawWindow()
 		video->SetScreenClip( NULL );
 		//removed this?
 		video->DrawRect( screen, ColorBlack );
+		int content_x = (core->Width - core->WindowFrames[2]->Width) / 2;
 		if (core->WindowFrames[0])
-			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
+			video->BlitSprite( core->WindowFrames[0], content_x - core->WindowFrames[0]->Width, 0, true );
 		if (core->WindowFrames[1])
-			video->BlitSprite( core->WindowFrames[1], core->Width - core->WindowFrames[1]->Width, 0, true );
+			video->BlitSprite( core->WindowFrames[1], content_x + core->WindowFrames[2]->Width, 0, true );
 		if (core->WindowFrames[2])
 			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
 		if (core->WindowFrames[3])
