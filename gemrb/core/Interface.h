@@ -518,6 +518,8 @@ public:
 	int ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow);
 	/** Set the Status of a Control in a Window */
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
+	/** Set the focus to a window and control.  */
+	int SetFocus(unsigned short WindowIndex, unsigned short ControlIndex);
 	/** Get a Window from the Loaded Window List */
 	Window * GetWindow(unsigned short WindowIndex) const;
 	/** Returns true if wnd is a valid window with WindowIndex */

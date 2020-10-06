@@ -124,6 +124,7 @@ class GControl:
     'SetText': _GemRB.Control_SetText,
     'SetTooltip': _GemRB.Control_SetTooltip,
     'SetEvent': _GemRB.Control_SetEvent,
+    'SetFocus': _GemRB.Control_SetFocus,
     'SetStatus': _GemRB.Control_SetStatus,
   }
   def AttachScrollBar(self, scrollbar):

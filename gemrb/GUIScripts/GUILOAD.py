@@ -81,6 +81,7 @@ def OnLoad ():
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
 	ScrollBarPress ()
 	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	ScrollBar.SetFocus ()
 	return
 
 def ScrollBarPress ():

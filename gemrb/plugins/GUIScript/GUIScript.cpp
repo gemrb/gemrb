@@ -2641,6 +2641,40 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 	Py_RETURN_NONE;
 }
 
+PyDoc_STRVAR( GemRB_Control_SetFocus__doc,
+"===== SetControlFocus =====\n\
+\n\
+**Prototype:** GemRB.SetControlFocus (WindowIndex, ControlIndex)\n\
+\n\
+**Metaclass Prototype:** SetFocus ()\n\
+\n\
+**Description:** Sets a Control to be focused.\n\
+\n\
+**Parameters:**\n\
+  * WindowIndex, ControlIndex - the control's reference\n\
+\n\
+**Return value:** N/A\n\
+\n\
+**See also:** [[guiscript:Button_SetState]]"
+);
+
+static PyObject* GemRB_Control_SetFocus(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex )) {
+		return AttributeError( GemRB_Control_SetFocus__doc );
+	}
+
+	int ret = core->SetFocus( WindowIndex, ControlIndex );
+	switch (ret) {
+	case -1:
+		return RuntimeError( "Control is not found." );
+	}
+
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_Control_SetStatus__doc,
 "===== SetControlStatus =====\n\
 \n\
@@ -15802,6 +15836,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Control_SetAnimation, METH_VARARGS),
 	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetEvent, METH_VARARGS),
+	METHOD(Control_SetFocus, METH_VARARGS),
 	METHOD(Control_SetPos, METH_VARARGS),
 	METHOD(Control_SetSize, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),

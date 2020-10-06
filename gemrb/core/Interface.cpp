@@ -2955,6 +2955,20 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	return 0;
 }
 
+/** Set the focus to a window and control.  */
+int Interface::SetFocus(unsigned short WindowIndex, unsigned short ControlIndex)
+{
+	//don't set the status of an already invalidated window
+	Window* win = GetWindow(WindowIndex);
+	if (win == NULL)
+		return -1;
+	Control* ctrl = win->GetControl(ControlIndex);
+	if (ctrl == NULL)
+		return -1;
+
+	evntmgr->SetFocused(win, ctrl);
+	return 0;
+}
 
 /** Set the Status of a Control in a Window */
 int Interface::SetControlStatus(unsigned short WindowIndex,

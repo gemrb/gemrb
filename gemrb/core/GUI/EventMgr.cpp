@@ -341,6 +341,8 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button
 /** BroadCast Mouse ScrollWheel Event */
 void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
 {
+	if (last_win_mousefocused == NULL)
+		last_win_mousefocused = last_win_focused;
 	Control *ctrl = GetMouseFocusedControl();
 	if (ctrl) {
 		ctrl->OnMouseWheelScroll( x, y);
@@ -472,6 +474,8 @@ void EventMgr::SetFocused(Window *win, Control *ctrl)
 {
 	last_win_focused = win;
 	last_win_focused->SetFocused(ctrl);
+	last_win_mousefocused = win;
+	last_win_focused->SetMouseFocused(ctrl);
 	//this is to refresh changing mouse cursors should the focus change)
 	FakeMouseMove();
 }
