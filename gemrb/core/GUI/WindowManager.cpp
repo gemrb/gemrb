@@ -505,17 +505,22 @@ void WindowManager::DrawWindowFrame() const
 
 	video->SetScreenClip( NULL );
 
-	Sprite2D* edge = WinFrameEdge(0); // left
-	if (edge) {
+	Sprite2D* left_edge = WinFrameEdge(0);
+	if (left_edge) {
 		// we assume if one fails, they all do
-		video->BlitSprite(edge, 0, 0);
-		edge = WinFrameEdge(1); // right
-		int sideW = edge->Frame.w;
-		video->BlitSprite(edge, screen.w - sideW, 0);
-		edge = WinFrameEdge(2); // top
-		video->BlitSprite(edge, sideW, 0);
-		edge = WinFrameEdge(3); // bottom
-		video->BlitSprite(edge, sideW, screen.h - edge->Frame.h);
+		Sprite2D *right_edge = WinFrameEdge(1);
+		Sprite2D *top_edge = WinFrameEdge(2);
+		Sprite2D *bot_edge = WinFrameEdge(3);
+
+		int left_w = left_edge->Frame.w;
+		int right_w = right_edge->Frame.w;
+		int v_margin = (screen.h - left_edge->Frame.h) / 2;
+		// Also assume top and bottom are the same width.
+		int h_margin = (screen.w - left_w - right_w - top_edge->Frame.w) / 2;
+		video->BlitSprite(left_edge, h_margin, v_margin);
+		video->BlitSprite(right_edge, screen.w - right_w - h_margin, v_margin);
+		video->BlitSprite(top_edge, h_margin + left_w, v_margin);
+		video->BlitSprite(bot_edge, h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin);
 	}
 }
 
@@ -633,22 +638,13 @@ Sprite2D* WindowManager::WinFrameEdge(int edge) const
 {
 	std::string refstr = "STON";
 
-	// FIXME: This probably doesnt work with widescreen mod
 	// we probably need a HasResource("CSTON" + width + height) call
 	// to check for a custom resource
 
-	// TODO: once we switch to c++11 lets just change this
-	// to std::to_string(screen.w).substr(0, 2)
-	// this should work for all standard resulutions plus any custom ones
-
-	switch (screen.w) {
-		case 800:
-			refstr += "08";
-			break;
-		case 1024:
-			refstr += "10";
-			break;
-	}
+	if (screen.w >= 800 && screen.w < 1024)
+		refstr += "08";
+	else if (screen.w >= 1024)
+		refstr += "10";
 
 	switch (edge) {
 		case 0:
