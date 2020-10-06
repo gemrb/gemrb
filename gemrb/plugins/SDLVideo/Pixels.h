@@ -122,12 +122,12 @@ public:
 	}
 
 	void operator()(const Color& src, Color& dst, Uint8 mask) const {
-		Color c = src;
-		c.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
-
-		if (c.a == 0) {
+		if (SRCALPHA && src.a == 0) {
 			return;
 		}
+		
+		Color c = src;
+		c.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		// first apply "shader"
 		switch (SHADE) {
