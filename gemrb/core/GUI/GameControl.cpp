@@ -50,6 +50,10 @@
 
 namespace GemRB {
 
+// A deadzone when rotating the formation, to prevent erratic movement near
+// the initial click.
+const int rotate_deadzone = 5;
+
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
@@ -183,6 +187,9 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 
 	Point stepVec;
 	int direction = (pos % 2 == 0) ? 1 : -1;
+
+	/* Correct for the innate orientation of the points.  */
+	angle += M_PI_2;
 
 	if (pos < FORMATIONSIZE) {
 		// calculate new coordinates by rotating formation around (0,0)
@@ -608,7 +615,10 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	Point gameMousePos = GameMousePos();
 	// draw reticles
 	if (isFormationRotation) {
-		double angle = AngleFromPoints(gameMousePos, gameClickPoint);
+		double angle = formationBaseAngle;
+		if (Distance(gameMousePos, gameClickPoint) > rotate_deadzone) {
+			angle = AngleFromPoints(gameMousePos, gameClickPoint);
+		}
 		DrawFormation(game->selected, gameClickPoint, angle);
 	} else {
 		int max = game->GetPartySize(false);
@@ -1469,7 +1479,7 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		Scroll(me.Delta());
 		return true;
 	}
-	
+
 	if (target_mode != TARGET_MODE_NONE) {
 		// we are in a target mode; nothing here applies
 		return true;
@@ -1479,22 +1489,8 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		return true;
 	}
 
-	if (me.ButtonState(GEM_MB_ACTION)) {
-		// PST uses alt + left click for formation rotation
-		// is there any harm in this being true in all games?
-		if (EventMgr::ModState(GEM_MOD_ALT)) {
-			isFormationRotation = true;
-		} else {
-			isSelectionRect = true;
-		}
-	}
-
-	if (me.ButtonState(GEM_MB_MENU)) {
-		isFormationRotation = true;
-	}
-
-	if (core->GetGame()->selected.size() <= 1) {
-		isFormationRotation = false;
+	if (me.ButtonState(GEM_MB_ACTION) && !isFormationRotation) {
+		isSelectionRect = true;
 	}
 
 	if (isFormationRotation) {
@@ -1558,8 +1554,8 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 			if (core->GetGame()->selected.size() <= 1) {
 				isFormationRotation = false;
 			} else {
-				isFormationRotation = true;
 				screenMousePos = gesture.fingers[1].Pos();
+				InitFormation(screenMousePos);
 			}
 		} else { // scroll viewport
 			MoveViewportTo( vpOrigin - gesture.Delta(), false );
@@ -2038,6 +2034,31 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 	return false;
 }
 
+// Calculate the angle between a clicked point and the first selected character,
+// so that we can set a sensible orientation for the formation.
+void GameControl::InitFormation(const Point &clickPoint)
+{
+	if (isFormationRotation) return;
+
+	// Of course single actors don't get rotated, but we need to ensure
+	// isFormationRotation is set in all cases where we initiate movement,
+	// since OnMouseUp tests for it.
+	if (core->GetGame()->selected.size() == 0) {
+		isFormationRotation = false;
+		return;
+	}
+
+	Game *game = core->GetGame();
+	Actor *selectedActor = core->GetFirstSelectedPC(false);
+	if (!selectedActor) {
+		selectedActor = game->selected[0];
+	}
+
+	isFormationRotation = true;
+	formationBaseAngle = AngleFromPoints(clickPoint, selectedActor->Pos);
+	SetCursor(core->Cursors[IE_CURSOR_USE]);
+}
+
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
@@ -2048,10 +2069,19 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
+		} else {
+			InitFormation(gameClickPoint);
 		}
 		break;
 	case GEM_MB_ACTION:
 		isDoubleClick = me.repeats == 2;
+
+		// PST uses alt + left click for formation rotation
+		// is there any harm in this being true in all games?
+		if (!isDoubleClick && EventMgr::ModState(GEM_MOD_ALT)) {
+			InitFormation(gameClickPoint);
+		}
+
 		break;
 	}
 	return true;
@@ -2163,6 +2193,9 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			ClearMouseState();
 			return true;
 		}
+		// Ensure that left-click movement also orients the formation
+		// in the direction of movement.
+		InitFormation(p);
 	}
 
 	// handle movement/travel
@@ -2249,7 +2282,11 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 
 	double angle = 0.0;
 	if (isFormationRotation) {
-		angle = AngleFromPoints(GameMousePos(), p);
+		angle = formationBaseAngle;
+		Point mp = GameMousePos();
+		if (Distance(mp, p) > rotate_deadzone) {
+			angle = AngleFromPoints(mp, p);
+		}
 	}
 
 	bool doWorldMap = ShouldTriggerWorldMap(party[0]);

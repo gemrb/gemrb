@@ -59,24 +59,16 @@ namespace GemRB {
 
 double AngleFromPoints(const Point& p1, const Point& p2)
 {
-	double angle = 0.0;
-	Point diff = p1 - p2;
-	if (diff.y == 0) {
-		if (diff.x > 0) {
-			angle = M_PI_2;
-		} else {
-			angle = -M_PI_2;
-		}
-	} else {
-		angle = std::atan(diff.x / diff.y);
-		if (diff.y < 0) angle += M_PI;
-	}
+	double xdiff = p1.x - p2.x;
+	double ydiff = p1.y - p2.y;
+
+	double angle = std::atan2(ydiff, xdiff);
 	return angle;
 }
 
 Point RotatePoint(const Point& p, double angle)
 {
-	int newx = -p.x * std::cos(angle) + p.y * std::sin(angle);
+	int newx = p.x * std::cos(angle) - p.y * std::sin(angle);
 	int newy = p.x * std::sin(angle) + p.y * std::cos(angle);
 	return Point(newx, newy);
 }
