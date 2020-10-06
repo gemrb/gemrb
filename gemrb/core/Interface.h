@@ -442,9 +442,9 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
-	const ColorPal<16>& GetPalette16(uint8_t idx) const { return palettes16[idx]; }
-	const ColorPal<32>& GetPalette32(uint8_t idx) const { return palettes32[idx]; }
-	const ColorPal<256>& GetPalette256(uint8_t idx) const { return palettes256[idx]; }
+	const ColorPal<16>& GetPalette16(uint8_t idx) const { return (idx >= palettes16.size()) ? palettes16[0] : palettes16[idx]; }
+	const ColorPal<32>& GetPalette32(uint8_t idx) const { return (idx >= palettes32.size()) ? palettes32[0] : palettes32[idx]; }
+	const ColorPal<256>& GetPalette256(uint8_t idx) const { return (idx >= palettes256.size()) ? palettes256[0] : palettes256[idx]; }
 	/** Returns a preloaded Font */
 	Font* GetFont(const ResRef&) const;
 	Font* GetTextFont() const;
