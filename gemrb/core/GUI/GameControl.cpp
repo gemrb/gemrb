@@ -158,6 +158,18 @@ Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
 	return formations[formation][pos];
 }
 
+static double AngleFromPoints (Point src, Point p)
+{
+	double xdiff = src.x - p.x;
+	// Flip Y axis, since the coordinate system starts in the top left
+	// instead of the bottom left.
+	double ydiff = -(src.y - p.y);
+
+	double angle = std::atan2(ydiff, xdiff);
+	if (angle < 0) angle += M_PI * 2;
+	return angle;
+}
+
 //WARNING: don't pass p as a reference because it gets modified
 Point GameControl::GetFormationPoint(const Map *map, unsigned int pos, Point src, Point p)
 {
@@ -165,19 +177,11 @@ Point GameControl::GetFormationPoint(const Map *map, unsigned int pos, Point src
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
 
 	// calculate angle
-	double angle;
-	double xdiff = src.x - p.x;
-	double ydiff = src.y - p.y;
-	if (ydiff == 0) {
-		if (xdiff > 0) {
-			angle = M_PI_2;
-		} else {
-			angle = -M_PI_2;
-		}
-	} else {
-		angle = std::atan(xdiff/ydiff);
-		if (ydiff < 0) angle += M_PI;
-	}
+	double angle = FormationBaseAngle;
+	if (Distance (src, p) > 5)
+		angle = AngleFromPoints (src, p);
+	// This corrects for the innate orientation of the formation.
+	angle -= M_PI / 2;
 
 	// calculate new coordinates by rotating formation around (0,0)
 	double newx = -formations[formation][pos].x * std::cos(angle) + formations[formation][pos].y * std::sin(angle);
@@ -1906,6 +1910,16 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short
 	if (FormationRotation) {
 		lastCursor = IE_CURSOR_USE;
 		Owner->Cursor = lastCursor;
+		Game* game = core->GetGame();
+		int max = game->GetPartySize(false);
+		FormationBaseAngle = 0;
+		for (int idx = 1; idx <= max; idx++) {
+			Actor *act = game->FindPC(idx);
+			if (act->IsSelected()) {
+				FormationBaseAngle = AngleFromPoints (ClickPoint, act->Pos);
+				break;
+			}
+		}
 	}
 }
 

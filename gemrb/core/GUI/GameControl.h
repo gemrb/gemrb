@@ -117,6 +117,7 @@ private:
 	bool MouseIsDown;
 	bool DoubleClick;
 	Region SelectionRect;
+	double FormationBaseAngle;
 	Point FormationApplicationPoint;
 	Point ClickPoint;
 public:
