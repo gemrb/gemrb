@@ -339,6 +339,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
+ 			target->LeaveDialog();
 			tgt = NULL;
 			tgta = NULL;
 			if (originalTargetID) {
