@@ -762,18 +762,12 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				case '=':
 					SelectActor(-1);
 					break;
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-					game->SelectPCSingle(keycode-'0');
-					SelectActor(keycode-'0');
-					break;
 				case '7': // 1 & 2
 				case '8': // 3 & 4
 				case '9': // 5 & 6
+					// We do not handle the range 1..6, these are handled as hotkeys
+					// for the portrait buttons, so that they remain working when the
+					// inventory screen is open.
 					game->SelectActor( NULL, false, SELECT_NORMAL );
 					i = game->GetPartySize(false);
 					pc = 2*(keycode - '6')-1;
