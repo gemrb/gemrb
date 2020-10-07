@@ -1707,7 +1707,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	SelectionChanged ()
 	return Window
 
-def UpdatePortraitWindow ():
+def UpdatePortraitWindow (indialog = False):
 	"""Updates all of the portraits."""
 
 	Window = PortraitWindow
@@ -1718,9 +1718,13 @@ def UpdatePortraitWindow ():
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.iteritems():
 		pcID = i + 1
+		if indialog:
+			Button.SetHotKey(None)
 		if (pcID <= GemRB.GetPartySize()):
 			Button.SetAction(lambda btn, val, pc=pcID: GemRB.GameControlLocateActor(pc), IE_ACT_MOUSE_ENTER);
 			Button.SetAction(lambda: GemRB.GameControlLocateActor(-1), IE_ACT_MOUSE_LEAVE);
+			if (i < 6 and not indialog):
+				Button.SetHotKey(chr(ord('1') + i), 0, True)
 
 		if GameCheck.IsPST():
 			UpdateAnimatedPortrait(Window, i)
