@@ -503,15 +503,15 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
 	bool drag = core->GetDraggedItem () != NULL;
 
-    if (drag && me.repeats == 1) {
-        ActionKey key(Action::DragDrop);
-        if (SupportsAction(key)) {
-            return PerformAction(key);
-        } else {
-            //if something was dropped, but it isn't handled here: it didn't happen
-            return false;
-        }
-    }
+	if (drag && me.repeats == 1) {
+		ActionKey key(Action::DragDrop);
+		if (SupportsAction(key)) {
+			return PerformAction(key);
+		} else {
+			//if something was dropped, but it isn't handled here: it didn't happen
+			return false;
+		}
+	}
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
@@ -522,12 +522,17 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		}
 		break;
 	case IE_GUI_BUTTON_LOCKED_PRESSED:
+		if (IS_PORTRAIT) {
+			// Ensure we clear out the dragging cursor even if there
+			// was no actual drag operation.
+			SetCursor(nullptr);
+		}
 		SetState( IE_GUI_BUTTON_LOCKED );
 		break;
 	}
 
 	DoToggle();
-    return Control::OnMouseUp(me, mod);
+	return Control::OnMouseUp(me, mod);
 }
 
 bool Button::OnMouseOver(const MouseEvent& me)
