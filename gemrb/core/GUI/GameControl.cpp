@@ -1110,6 +1110,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		}
 		return true; //return from cheatkeys
 	}
+	Game* game = core->GetGame();
 	switch (Key.keycode) {
 //FIXME: move these to guiscript
 		case ' ': //soft pause
@@ -1120,6 +1121,13 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		case 'c': // show containers in ANDROID, GEM_ALT is not possible to use
 #endif
 			DebugFlags &= ~(DEBUG_SHOW_CONTAINERS|DEBUG_SHOW_DOORS);
+			break;
+		case GEM_TAB: // remove overhead partymember hp/maxhp
+			for (int pm = 0; pm < game->GetPartySize(false); pm++) {
+				Actor *pc = game->GetPC(pm, true);
+				if (!pc) continue;
+				pc->DisplayOverheadText(false);
+			}
 			break;
 		default:
 			return false;
