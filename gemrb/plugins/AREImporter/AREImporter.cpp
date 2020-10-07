@@ -1226,6 +1226,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			anim->startFrameRange = 0; //this will never get resaved (iirc)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
+			// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
+			// 0x4a holds the height
 			str->ReadDword( &anim->unknown48 );
 
 			if (pst) {
