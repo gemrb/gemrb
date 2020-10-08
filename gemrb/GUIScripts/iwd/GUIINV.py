@@ -221,29 +221,7 @@ def RefreshInventoryWindow (Window):
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	Button.SetBAM ("COLGRAD", 1, 0, Color)
 
-	# update ground inventory slots
-	Container = GemRB.GetContainer (pc, 1)
-	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range (5):
-		Button = Window.GetControl (i+68)
-		if GemRB.IsDraggingItem ()==1:
-			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
-
-		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		else:
-			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
-
-		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+	InventoryCommon.UpdateGroundSlots (Window, pc, 5)
 
 	# making window visible/shaded depending on the pc's state
 	GUICommon.AdjustWindowVisibility (Window, pc, False)

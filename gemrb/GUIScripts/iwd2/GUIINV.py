@@ -236,33 +236,7 @@ def RefreshInventoryWindow ():
 	Color = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1) & 0xFF
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
-	# update ground inventory slots
-	Container = GemRB.GetContainer(pc, 1)
-	TopIndex = GemRB.GetVar ("TopIndex")
-	for i in range (6):
-		if i<5:
-			Button = Window.GetControl (i+68)
-		else:
-			Button = Window.GetControl (i+76)
-
-		if GemRB.IsDraggingItem ()==1:
-			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
-
-		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
-		if Slot == None:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		else:
-			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
-			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)
-
-		InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "ground")
+	InventoryCommon.UpdateGroundSlots (Window, pc, 6)
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, False)

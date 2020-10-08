@@ -544,6 +544,39 @@ def OpenItemAmountWindow (btn, slot):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
+# count goes up to 5 for all games except IWD2, which uses 6, and
+# PST, which does not use this function.
+def UpdateGroundSlots (Window, pc, count):
+	"""Updates the five (or six, for IWD2) inventory ground slots."""
+
+	Container = GemRB.GetContainer (pc, 1)
+	TopIndex = GemRB.GetVar ("TopIndex")
+	for i in range (count):
+		if i<5:
+			Button = Window.GetControl (i+68)
+		else:
+			Button = Window.GetControl (i+76)
+
+		if GemRB.IsDraggingItem ()==1:
+			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetAction (OnDragItemGround, IE_ACT_DRAG_DROP_DST)
+		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+
+		if Slot == None:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		else:
+			Button.SetAction (OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItemGround)
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenGroundItemInfoWindow)
+			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenGroundItemAmountWindow)
+
+		UpdateInventorySlot (pc, Button, Slot, "ground")
+	return
+
 def UpdateSlot (pc, slot):
 	"""Updates a specific slot."""
 
