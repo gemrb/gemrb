@@ -95,7 +95,7 @@ void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw, unsigned int bufh
 	Size s = vidBuf->Size();
 	int dest_x = unsigned(s.w - bufw) >> 1;
 	int dest_y = unsigned(s.h - bufh) >> 1;
-	vidBuf->CopyPixels(Region(dest_x, dest_y, bufw, bufh), buf, NULL, g_palette);
+	vidBuf->CopyPixels(Region(dest_x, dest_y, bufw, bufh), buf, NULL, g_palette.get());
 }
 
 void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
