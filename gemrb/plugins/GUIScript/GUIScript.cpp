@@ -3018,24 +3018,28 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
 			 "Button.SetHotKey(char, bool global)\n\n"
 			 "Binds a keyboard key to trigger the control event when its window is focused.\n"
-			 "If global is set the hot key works even if the window does not have focus." );
+			 "If global is set the hot key works even if the window does not have focus.\n"
+			 "If None is passed as the key, any existing hotkey binding is cleared.");
 
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
-	unsigned char hotkey;
+	unsigned char hotkey = 0;
 	unsigned int mods = 0;
 	int global = false;
 	Button* btn = NULL;
 	PyObject* arg1 = PyTuple_GetItem(args, 1);
 
-	// work around a bug in cpython where PyArg_ParseTuple doesnt return as expected when 'c' format doesn't match
-	if (PyObject_TypeCheck(arg1, &PyString_Type) && PyString_Size(arg1) == 1) {
+	if (arg1 == Py_None) {
+		btn = GetView<Button>(PyTuple_GetItem(args, 0));
+		Py_RETURN_NONE;
+	} // work around a bug in cpython where PyArg_ParseTuple doesnt return as expected when 'c' format doesn't match
+	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyString_Size(arg1) == 1) {
 		PARSE_ARGS(args, "Oc|Ii", &self, &hotkey, &mods, &global);
 		btn = GetView<Button>(self);
 		assert(btn);
 	} else {
 		char* keymap = NULL;
-		PARSE_ARGS(args,  "Os|i", &self, &keymap, &global);
+		PARSE_ARGS(args, "Os|i", &self, &keymap, &global);
 
 		Function* func = core->GetKeyMap()->LookupFunction(keymap);
 		if (func == NULL) {
