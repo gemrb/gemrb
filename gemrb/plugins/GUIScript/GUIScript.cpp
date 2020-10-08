@@ -8776,7 +8776,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	int header = -1;
 
 	if (globalID==0) {
-		si = core->GetDraggedItem();
+		si = core->GetDraggedItem()->item;
 	} else {
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
@@ -9423,7 +9423,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (!cc) {
 			return RuntimeError( "No current container!" );
 		}
-		CREItem *si = core->GetDraggedItem();
+		CREItem *si = core->GetDraggedItem()->item;
 		res = cc->AddItem(si);
 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
@@ -9471,7 +9471,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong(ASI_FAILED);
 	}
 
-	CREItem * slotitem = core->GetDraggedItem();
+	CREItem * slotitem = core->GetDraggedItem()->item;
 	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {
 		return PyInt_FromLong(ASI_FAILED);

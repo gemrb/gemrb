@@ -316,6 +316,20 @@ enum FeedbackType {
 template<int SIZE>
 using ColorPal = std::array<Color, SIZE>;
 
+// TODO: there is no reason why this can't be generated directly from
+// the inventory button drag event using the button value as the slot id
+// to get the appropriate CREItem
+struct ItemDragOp : public View::DragOp {
+	CREItem* item;
+	
+	// FIXME: DragOp should be initialized with the button we are dragging from
+	// for now use a dummy until we truly implement this as a drag event
+	View dummy;
+
+	ItemDragOp(CREItem* item)
+	: DragOp(&dummy), item(item), dummy(Region()) {}
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -376,7 +390,7 @@ private:
 	int ItemTypes;
 
 	// Currently dragged item or NULL
-	CREItem* DraggedItem;
+	Holder<ItemDragOp> DraggedItem = nullptr;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
@@ -586,7 +600,7 @@ public:
 	void LoadProgress(int percent);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
-	CREItem* GetDraggedItem() const { return DraggedItem; }
+	Holder<ItemDragOp> GetDraggedItem() const { return DraggedItem; }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
 	CREItem *ReadItem(DataStream *str);

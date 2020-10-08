@@ -205,7 +205,6 @@ Interface::Interface()
 	}
 
 	TooltipBG = NULL;
-	DraggedItem = NULL;
 	DefSound = NULL;
 	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
@@ -305,7 +304,6 @@ Interface::~Interface(void)
 
 	delete winmgr;
 
-	DragItem(NULL,NULL);
 	delete AreaAliasTable;
 
 	if (music) {
@@ -3906,9 +3904,9 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	//Anyway, if there is still a dragged item, it will be destroyed.
 	if (DraggedItem) {
 		Log(WARNING, "Core", "Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!");
-		delete DraggedItem;
+		delete DraggedItem->item;
 	}
-	DraggedItem = item;
+	DraggedItem = new ItemDragOp(item);
 	if (!item) return;
 
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
