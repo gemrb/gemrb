@@ -106,9 +106,9 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 }
 
 /** Get the Palette of a Sprite */
-Palette* SDLSurfaceSprite2D::GetPalette() const
+PaletteHolder SDLSurfaceSprite2D::GetPalette() const
 {
-	Palette* palette = surface->palette.get();
+	PaletteHolder palette = surface->palette;
 	if (palette == NULL) {
 		SDL_PixelFormat* fmt = (*surface)->format;
 		if (fmt->BytesPerPixel != 1) {
@@ -119,7 +119,6 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 		const Color* end = begin + fmt->palette->ncolors;
 		palette = new Palette(begin, end);
 	}
-	palette->acquire();
 	surface->palette = palette;
 
 	return palette;
@@ -127,19 +126,18 @@ Palette* SDLSurfaceSprite2D::GetPalette() const
 
 bool SDLSurfaceSprite2D::IsPaletteStale() const
 {
-	Palette* pal = GetPalette();
+	PaletteHolder pal = GetPalette();
 	return pal && pal->GetVersion() != palVersion;
 }
 
-void SDLSurfaceSprite2D::SetPalette(Palette* pal)
+void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
 {
-	Palette* palette = surface->palette.get();
+	PaletteHolder palette = surface->palette;
 
 	// we don't use shared palettes because it is a performance bottleneck on SDL2
 	assert(pal != palette);
 
 	if (palette) {
-		palette->release();
 		palette = nullptr;
 	}
 
@@ -296,15 +294,14 @@ void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
 	}
 
 	if (Bpp == 8) {
-		Palette* pal = GetPalette(); // generate the backup
-		pal->release();
-		
+		PaletteHolder pal = GetPalette(); // generate the backup
+
 		palVersion = pal->GetVersion();
-		
+
 		// we just allow overwritting the palette
 		return surface->surface->format->palette;
 	}
-	
+
 	palVersion = 0;
 
 	if (version != newversion) {

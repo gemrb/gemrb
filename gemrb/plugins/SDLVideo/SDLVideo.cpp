@@ -258,9 +258,8 @@ Sprite2D* SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
-										Palette* palette, bool cK, int index)
+										PaletteHolder palette, bool cK, int index)
 {
-	assert(palette);
 	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 

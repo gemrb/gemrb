@@ -36,7 +36,7 @@ protected:
 	struct SurfaceHolder : public Held<SurfaceHolder>
 	{
 		SDL_Surface* surface;
-		Holder<Palette> palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
+		PaletteHolder palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
 		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
 		~SurfaceHolder() { SDL_FreeSurface(surface); }
@@ -62,9 +62,9 @@ public:
 	void* LockSprite();
 	void UnlockSprite() const;
 
-	Palette *GetPalette() const;
+	PaletteHolder GetPalette() const;
 	int SetPalette(const Color* pal) const;
-	void SetPalette(Palette *pal);
+	void SetPalette(PaletteHolder pal);
 	int32_t GetColorKey() const;
 	void SetColorKey(ieDword pxvalue);
 	bool HasTransparency() const;

@@ -66,12 +66,18 @@ public:
 		operator=(str);
 	};
 
+	struct Hash
+	{
+		size_t operator() (const ResRef &) const;
+	};
+	friend struct Hash;
+
 	bool IsEmpty() {
 		return (ref[0] == '\0');
 	}
 
 	const char* CString() const { return ref; }
-	
+
 	operator const char*() const {
 		return (ref[0] == '\0') ? NULL : ref;
 	}

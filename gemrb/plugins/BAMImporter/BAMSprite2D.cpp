@@ -26,10 +26,9 @@
 namespace GemRB {
 
 BAMSprite2D::BAMSprite2D(const Region& rgn, void* pixels,
-						 Palette* palette, ieDword ck)
+						 PaletteHolder palette, ieDword ck)
 	: Sprite2D(rgn, 8, pixels)
 {
-	palette->acquire();
 	pal = palette;
 	colorkey = ck;
 	BAM = true;
@@ -44,7 +43,6 @@ BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	assert(obj.pal);
 
 	pal = obj.pal;
-	pal->acquire();
 	colorkey = obj.GetColorKey();
 
 	BAM = true;
@@ -56,29 +54,19 @@ BAMSprite2D* BAMSprite2D::copy() const
 	return new BAMSprite2D(*this);
 }
 
-BAMSprite2D::~BAMSprite2D()
-{
-	pal->release();
-}
-
 /** Get the Palette of a Sprite */
-Palette* BAMSprite2D::GetPalette() const
+PaletteHolder BAMSprite2D::GetPalette() const
 {
-	pal->acquire();
 	return pal;
 }
 
-void BAMSprite2D::SetPalette(Palette* palette)
+void BAMSprite2D::SetPalette(PaletteHolder palette)
 {
 	if (palette == NULL) {
 		Log(WARNING, "BAMSprite2D", "cannot set a NULL palette.");
 		return;
 	}
 
-	palette->acquire();
-	if (pal) {
-		pal->release();
-	}
 	pal = palette;
 }
 

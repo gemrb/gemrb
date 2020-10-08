@@ -42,9 +42,8 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 
 	//Original engine values
 	//Color white = {0xc8, 0xc8, 0xc8, 0x00}, black = {0x3c, 0x3c, 0x3c, 0x00};
-	Palette* palette = new Palette( ColorWhite, ColorBlack );
+	PaletteHolder palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);
-	palette->release();
 	max = maxLength;
 	textContainer.SetMargin(p.y, p.x);
 

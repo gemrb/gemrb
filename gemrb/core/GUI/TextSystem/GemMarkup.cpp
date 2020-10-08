@@ -22,7 +22,7 @@ namespace GemRB {
 
 GemMarkupParser::PaletteCache GemMarkupParser::PalCache;
 
-Holder<Palette> GemMarkupParser::GetSharedPalette(const String& colorString)
+PaletteHolder GemMarkupParser::GetSharedPalette(const String& colorString)
 {
 	PaletteCache::const_iterator it = PalCache.find(colorString);
 	if (it != PalCache.end()) {
@@ -35,12 +35,9 @@ Holder<Palette> GemMarkupParser::GetSharedPalette(const String& colorString)
 	palCol.r = r;
 	palCol.g = g;
 	palCol.b = b;
-	Palette* pal = new Palette(palCol, ColorBlack);
+	PaletteHolder pal = new Palette(palCol, ColorBlack);
 	pal->CreateShadedAlphaChannel();
-	// stifle clang analyzer about pal (falsely) being deleted by release()
-	Holder<Palette> ret = PalCache.insert(std::make_pair(colorString, pal)).first->second;
-	pal->release();
-	return ret;
+	return PalCache.insert(std::make_pair(colorString, pal)).first->second;
 }
 
 GemMarkupParser::GemMarkupParser()
@@ -48,13 +45,13 @@ GemMarkupParser::GemMarkupParser()
 	state = TEXT;
 }
 
-GemMarkupParser::GemMarkupParser(const Font* ftext, Palette* textPal, const Font* finit, Palette* initPal)
+GemMarkupParser::GemMarkupParser(const Font* ftext, PaletteHolder textPal, const Font* finit, PaletteHolder initPal)
 {
 	state = TEXT;
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
 }
 
-void GemMarkupParser::ResetAttributes(const Font* ftext, Holder<Palette> textPal, const Font* finit, Holder<Palette> initPal)
+void GemMarkupParser::ResetAttributes(const Font* ftext, PaletteHolder textPal, const Font* finit, PaletteHolder initPal)
 {
 	while(context.size()) context.pop();
 	context.push(TextAttributes(ftext, textPal, finit, initPal));
@@ -156,7 +153,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						Holder<Palette> pal = GetSharedPalette(token);
+						PaletteHolder pal = GetSharedPalette(token);
 						context.push(TextAttributes(attributes));
 						context.top().SetTextPalette(pal);
 						state = TEXT;

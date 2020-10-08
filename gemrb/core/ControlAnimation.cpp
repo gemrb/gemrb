@@ -136,17 +136,15 @@ void ControlAnimation::UpdateAnimationSprite () {
 	}
 
 	if (has_palette) {
-		Palette* palette = pic->GetPalette();
+		PaletteHolder palette = pic->GetPalette();
 		palette->SetupPaperdollColours(colors, 0);
 		if (is_blended) {
 			palette->CreateShadedAlphaChannel();
 		}
-		palette->release();
 	} else {
 		if (is_blended) {
-			Palette* palette = pic->GetPalette();
+			PaletteHolder palette = pic->GetPalette();
 			palette->CreateShadedAlphaChannel();
-			palette->release();
 		}
 	}
 

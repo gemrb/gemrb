@@ -46,7 +46,7 @@ Public methods
 	void Close();
 
 	Font* GetFont(unsigned short pxSize,
-				  FontStyle style, Palette* pal = NULL);
+				  FontStyle style, PaletteHolder pal = nullptr) override;
 
 	// freetype "callbacks"
 	static unsigned long read( FT_Stream       stream,

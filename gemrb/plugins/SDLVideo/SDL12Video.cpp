@@ -185,7 +185,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 	// other combinations use general case
 
-	Palette* palette = spr->GetPalette();
+	PaletteHolder palette = spr->GetPalette();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 	SDL_Rect drect = RectFromRegion(dst);
@@ -243,7 +243,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 	}
 
 	spr->UnlockSprite();
-	palette->release();
 	delete maskit;
 }
 

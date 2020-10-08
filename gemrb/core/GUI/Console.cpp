@@ -53,9 +53,8 @@ Console::Console(const Region& frame, TextArea* ta)
 	feedback.AssignScriptingRef(1, "CONSOLE");
 	feedback.SetFlags(TextArea::AutoScroll | TextArea::ClearHistory, OP_OR);
 
-	Palette* palette = new Palette( ColorWhite, ColorBlack );
+	PaletteHolder palette = new Palette( ColorWhite, ColorBlack );
 	textContainer.SetPalette(palette);
-	palette->release();
 	textContainer.SetMargin(3);
 
 	textContainer.SetAlignment(align);

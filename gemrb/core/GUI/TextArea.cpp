@@ -417,7 +417,6 @@ void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
 	assert(idx < PALETTE_TYPE_COUNT);
 	if (color) {
 		palettes[idx] = new Palette( *color, ColorBlack );
-		palettes[idx]->release();
 	} else if (idx > PALETTE_NORMAL) {
 		// default to normal
 		palettes[idx] = palettes[PALETTE_NORMAL];

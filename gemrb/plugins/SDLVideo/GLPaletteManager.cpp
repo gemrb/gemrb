@@ -8,7 +8,7 @@
 
 using namespace GemRB;
 
-GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int colorKey, bool attached)
+GLuint GLPaletteManager::CreatePaletteTexture(PaletteHolder palette, unsigned int colorKey, bool attached)
 {
 	const PaletteKey key(palette, colorKey);
 	std::map<PaletteKey, GLuint, PaletteKey> *currentTextures;
@@ -59,7 +59,7 @@ GLuint GLPaletteManager::CreatePaletteTexture(Palette* palette, unsigned int col
 	return currentTextures->at(key);
 }
 
-void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int colorKey, bool attached)
+void GLPaletteManager::RemovePaletteTexture(PaletteHolder palette, unsigned int colorKey, bool attached)
 {
 	const PaletteKey key(palette, colorKey);
 
@@ -84,7 +84,6 @@ void GLPaletteManager::RemovePaletteTexture(Palette* palette, unsigned int color
 	{
 		if (!palette->IsShared())
 		{
-			palette->release();
 			currentIndexes->erase(currentTextures->at(key));
 			glDeleteTextures(1, &(currentTextures->at(key)));
 			currentTextures->erase(key);
@@ -116,7 +115,6 @@ void GLPaletteManager::RemovePaletteTexture(GLuint texture, bool attached)
 		PaletteKey key = currentIndexes->at(texture);
 		if (!key.palette->IsShared())
 		{
-			key.palette->release();
 			currentIndexes->erase(texture);
 			glDeleteTextures(1, &texture);
 			currentTextures->erase(key);
@@ -143,7 +141,6 @@ void GLPaletteManager::ClearUnused(bool attached)
 	{
 		if (!it->first.palette->IsShared())
 		{
-			it->first.palette->release();
 			glDeleteTextures(1, &(currentTextures->at(it->first)));
 			currentIndexes->erase(it->second);
 			currentTextures->erase(it++);
@@ -160,7 +157,6 @@ void GLPaletteManager::Clear()
 	std::map<PaletteKey, GLuint, PaletteKey>::iterator it = textures.begin();
 	while (it != textures.end())
 	{
-		it->first.palette->release();
 		glDeleteTextures(1, &(textures[it->first]));
 		it = textures.erase(it);
 	}
@@ -169,7 +165,6 @@ void GLPaletteManager::Clear()
 	it = a_textures.begin();
 	while (it != a_textures.end())
 	{
-		it->first.palette->release();
 		glDeleteTextures(1, &(a_textures[it->first]));
 		it = a_textures.erase(it);
 	}

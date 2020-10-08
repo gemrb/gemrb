@@ -69,7 +69,7 @@ public:
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) override;
 	Sprite2D* CreateSprite8(const Region& rgn, void* pixels,
-							Palette* palette, bool cK, int index) override;
+							PaletteHolder palette, bool cK, int index) override;
 	Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0) override;
 

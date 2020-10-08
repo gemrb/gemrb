@@ -25,6 +25,7 @@
 
 #include "RGBAColor.h"
 #include "globals.h"
+#include "Holder.h"
 
 namespace GemRB {
 
@@ -37,6 +38,7 @@ struct FrameEntry {
 };
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 class BAMImporter : public AnimationMgr {
 private:
@@ -45,7 +47,7 @@ private:
 	CycleEntry* cycles;
 	ieWord FramesCount;
 	ieByte CyclesCount;
-	Palette* palette;
+	PaletteHolder palette;
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	unsigned long DataStart;

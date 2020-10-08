@@ -33,6 +33,7 @@
 #include "TableMgr.h"
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
@@ -45,6 +46,7 @@ class Factory;
 class FactoryObject;
 class Item;
 class Palette;
+using PaletteHolder = Holder<Palette>;
 class ScriptedAnimation;
 class Spell;
 class Sprite2D;
@@ -84,9 +86,9 @@ public:
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
-	Palette* GetPalette(const ieResRef resname);
-	void FreePalette(Palette *&pal, const ieResRef name=NULL);
-	
+	PaletteHolder GetPalette(const ResRef resname);
+	void FreePalette(PaletteHolder &pal, const ieResRef name=NULL);
+
 	Item* GetItem(const ieResRef resname, bool silent=false);
 	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
 	Spell* GetSpell(const ieResRef resname, bool silent=false);
@@ -133,7 +135,7 @@ private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	Cache PaletteCache;
+	std::unordered_map<const ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;

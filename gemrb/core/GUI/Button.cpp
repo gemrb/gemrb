@@ -245,7 +245,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Button label
 	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
-		Palette* ppoi = normal_palette;
+		PaletteHolder ppoi = normal_palette;
 		ieByte align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled())

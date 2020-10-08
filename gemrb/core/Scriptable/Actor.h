@@ -387,7 +387,7 @@ private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
 	
-	using AnimationPart = std::pair<Animation*, Palette*>;
+	using AnimationPart = std::pair<Animation*, PaletteHolder>;
 	struct {
 		std::vector<AnimationPart> anim;
 		std::vector<AnimationPart> shadow;

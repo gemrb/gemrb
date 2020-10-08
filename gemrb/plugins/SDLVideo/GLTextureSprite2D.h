@@ -13,7 +13,7 @@ namespace GemRB
 		GLuint glTexture;
 		GLuint glPaletteTexture;
 		GLuint glMaskTexture;
-		Palette* currentPalette;
+		PaletteHolder currentPalette;
 		Uint32 rMask, gMask, bMask, aMask;
 		ieDword colorKeyIndex;
 		GLPaletteManager* paletteManager;
@@ -26,8 +26,8 @@ namespace GemRB
 		GLuint GetPaletteTexture();
 		GLuint GetMaskTexture();
 		void SetPaletteTexture(int texture);
-		Palette* GetPalette() const;
-		void SetPalette(Palette *pal);
+		PaletteHolder GetPalette() const;
+		void SetPalette(PaletteHolder pal);
 		Color GetPixel(unsigned short x, unsigned short y) const;
 		ieDword GetColorKey() const { return colorKeyIndex; }
 		void SetColorKey(ieDword);

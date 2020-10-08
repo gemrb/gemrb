@@ -36,6 +36,7 @@
 namespace GemRB {
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_LABEL_ON_PRESS      0x06000000
@@ -72,7 +73,7 @@ private: // Private attributes
 	/** Font for Text Writing */
 	Font* font;
 	/** Foreground & Background Colors */
-	Palette* palette;
+	PaletteHolder palette;
 
 	/** Alignment Variable */
 	unsigned char Alignment;

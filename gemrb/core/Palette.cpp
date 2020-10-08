@@ -116,7 +116,7 @@ void Palette::Darken()
 	version++;
 }
 
-Palette* Palette::Copy() const
+PaletteHolder Palette::Copy() const
 {
 	return new Palette(std::begin(col), std::end(col));
 }
@@ -251,7 +251,7 @@ static inline void applyMod(const Color& src, Color& dest,
 	}
 }
 
-void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
+void Palette::SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
 	unsigned int type)
 {
 	const RGBModifier* tmods = mods+(8*type);
@@ -302,7 +302,7 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 	version++;
 }
 
-void Palette::SetupGlobalRGBModification(const Palette* src,
+void Palette::SetupGlobalRGBModification(const PaletteHolder src,
 	const RGBModifier& mod)
 {
 	int i;

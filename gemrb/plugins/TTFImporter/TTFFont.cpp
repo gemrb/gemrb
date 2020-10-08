@@ -196,7 +196,7 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 	return (int)(-kerning.x / 64);
 }
 
-TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
+TTFFont::TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline)
 	: Font(pal, lineheight, baseline), face(face)
 {
 // on FT < 2.4.2 the manager will defer ownership to this object
