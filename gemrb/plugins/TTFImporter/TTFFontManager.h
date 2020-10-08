@@ -42,7 +42,7 @@ Public methods
 	~TTFFontManager(void);
 	TTFFontManager(void);
 
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 	void Close();
 
 	Font* GetFont(unsigned short pxSize,
