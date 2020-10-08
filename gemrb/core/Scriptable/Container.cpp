@@ -100,12 +100,11 @@ void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 			} else {
 				const Color trans;
-				Palette* p = icon->GetPalette();
+				PaletteHolder p = icon->GetPalette();
 				Color tmpc = p->col[1];
 				p->CopyColorRange(&trans, &trans + 1, 1);
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);
 				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
-				p->release();
 			}
 		}
 	}

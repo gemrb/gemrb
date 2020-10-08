@@ -116,7 +116,7 @@ void TTFFontManager::Close()
 }
 
 Font* TTFFontManager::GetFont(unsigned short pxSize,
-							  FontStyle /*style*/, Palette* pal)
+							  FontStyle /*style*/, PaletteHolder pal)
 {
 	if (!pal) {
 		pal = new Palette( ColorWhite, ColorBlack );

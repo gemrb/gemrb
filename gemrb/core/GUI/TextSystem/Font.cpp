@@ -141,7 +141,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 #endif
 
 
-Font::Font(Palette* pal, ieWord lineheight, ieWord baseline)
+Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline)
 : palette(NULL), LineHeight(lineheight), Baseline(baseline)
 {
 	CurrentAtlasPage = NULL;
@@ -529,7 +529,7 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	return canvas;
 }
 
-void Font::SetAtlasPalette(Palette* pal) const
+void Font::SetAtlasPalette(PaletteHolder pal) const
 {
 	GlyphAtlas::const_iterator it;
 	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
@@ -540,7 +540,7 @@ void Font::SetAtlasPalette(Palette* pal) const
 }
 
 size_t Font::Print(Region rgn, const String& string,
-				   Palette* color, ieByte alignment, Point* point) const
+				   PaletteHolder color, ieByte alignment, Point* point) const
 {
 	if (rgn.Dimensions().IsEmpty()) return 0;
 
@@ -570,7 +570,7 @@ size_t Font::Print(Region rgn, const String& string,
 		}
 	}
 
-	Palette* restore = NULL;
+	PaletteHolder restore = nullptr;
 	if (color) {
 		// we set palette in this way because we want all the Atlas pages to inherit the change
 		restore = palette;
@@ -720,10 +720,8 @@ Holder<Palette> Font::GetPalette() const
 	return palette;
 }
 
-void Font::SetPalette(Palette* pal)
+void Font::SetPalette(PaletteHolder pal)
 {
-	if (pal) pal->acquire();
-	if (palette) palette->release();
 	palette = pal;
 }
 

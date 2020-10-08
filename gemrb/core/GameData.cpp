@@ -64,14 +64,6 @@ static void ReleaseEffect(void *poi)
 	delete ((Effect *) poi);
 }
 
-static void ReleasePalette(void *poi)
-{
-	//we allow nulls, but we shouldn't release them
-	if (!poi) return;
-	//as long as palette has its own refcount, this should be Release
-	((Palette *) poi)->release();
-}
-
 GEM_EXPORT GameData* gamedata;
 
 GameData::GameData()
@@ -90,7 +82,7 @@ void GameData::ClearCaches()
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
-	PaletteCache.RemoveAll(ReleasePalette);
+	PaletteCache.clear ();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
@@ -239,56 +231,32 @@ bool GameData::DelTable(unsigned int index)
 	return true;
 }
 
-Palette *GameData::GetPalette(const ieResRef resname)
+PaletteHolder GameData::GetPalette(const ResRef resname)
 {
-	Palette *palette = (Palette *) PaletteCache.GetResource(resname);
-	if (palette) {
-		return palette;
-	}
-	//additional hack for allowing NULL's
-	if (PaletteCache.RefCount(resname)!=-1) {
-		return NULL;
-	}
+	auto iter = PaletteCache.find(resname);
+	if (iter != PaletteCache.end())
+		return iter->second;
+
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resname);
 	if (im == nullptr) {
-		PaletteCache.SetAt(resname, NULL);
+		PaletteCache[resname] = nullptr;
 		return NULL;
 	}
 
-	palette = new Palette();
+	PaletteHolder palette = new Palette();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
-	PaletteCache.SetAt(resname, (void *) palette);
+	PaletteCache[resname] = palette;
 	return palette;
 }
 
-void GameData::FreePalette(Palette *&pal, const ieResRef name)
+void GameData::FreePalette(PaletteHolder &pal, const ieResRef)
 {
-	int res;
-
-	if (!pal) {
-		return;
-	}
-	if (!name || !name[0]) {
-		if(pal->named) {
-			error("GameData", "Palette is supposed to be named, but got no name!\n");
-		} else {
-			pal->release();
-			pal=NULL;
-		}
-		return;
-	}
-	if (!pal->named) {
-		error("GameData", "Unnamed palette, it should be %s!\n", name);
-	}
-	res=PaletteCache.DecRef((void *) pal, name, true);
-	if (res<0) {
-		error("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", name);
-	}
-	if (!res) {
-		pal->release();
-	}
-	pal = NULL;
+	// This was previously much hairier, trying to keep track of two different
+	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
+	// is freed, while not bothering about freeing named palettes from the
+	// map.
+	pal = nullptr;
 }
 
 Item* GameData::GetItem(const ieResRef resname, bool silent)

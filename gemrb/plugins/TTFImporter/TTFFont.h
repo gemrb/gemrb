@@ -37,7 +37,7 @@ private:
 	const Glyph& AliasBlank(ieWord chr) const;
 
 public:
-	TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline);
+	TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline);
 	~TTFFont(void);
 
 	const Glyph& GetGlyph(ieWord chr) const;

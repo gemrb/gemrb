@@ -136,7 +136,7 @@ public:
 			sprite = SDL_CreateRGBSurfaceFrom( const_cast<void*>(pixelBuf), bufDest.w, bufDest.h, 8, bufDest.w, 0, 0, 0, 0 );
 			va_list args;
 			va_start(args, pitch);
-			Palette* pal = va_arg(args, Palette*);
+			PaletteHolder pal = va_arg(args, PaletteHolder);
 			memcpy(sprite->format->palette->colors, pal->col, sprite->format->palette->ncolors * 4);
 			va_end(args);
 		}

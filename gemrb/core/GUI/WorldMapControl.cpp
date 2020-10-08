@@ -91,11 +91,10 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Sprite2D* icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		if( icon ) {
 			if (m == Area && m->HighlightSelected()) {
-				Palette *pal = icon->GetPalette();
+				PaletteHolder pal = icon->GetPalette();
 				icon->SetPalette(pal_selected.get());
 				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 				icon->SetPalette(pal);
-				pal->release();
 			} else {
 				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 			}
@@ -129,7 +128,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (!m->GetCaption())
 			continue;
 
-		Palette* text_pal = pal_normal.get();
+		PaletteHolder text_pal = pal_normal;
 
 		if (Area == m) {
 			text_pal = pal_selected.get();

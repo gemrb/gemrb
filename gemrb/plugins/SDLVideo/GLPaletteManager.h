@@ -11,10 +11,10 @@ namespace GemRB
 
 	struct PaletteKey
 	{
-		Palette* palette;
+		PaletteHolder palette;
 		unsigned int colorKey;
-		bool operator () (const PaletteKey& lhs, const PaletteKey& rhs) const 
-		{ 
+		bool operator () (const PaletteKey& lhs, const PaletteKey& rhs) const
+		{
 			if (lhs.palette < rhs.palette) return true;
 			else
 			if (rhs.palette < lhs.palette) return false;
@@ -23,7 +23,7 @@ namespace GemRB
 			if (rhs.colorKey < lhs.colorKey) return false;
 			return false;
 		}
-		PaletteKey(Palette* pal, unsigned int key) { colorKey = key; palette = pal; }
+		PaletteKey(PaletteHolder pal, unsigned int key) { colorKey = key; palette = pal; }
 		PaletteKey() {}
 	};
 
@@ -40,8 +40,8 @@ namespace GemRB
 			std::map<GLuint, PaletteKey> a_indexes;
 
 		public:
-			GLuint CreatePaletteTexture(Palette* palette, unsigned int colorKey, bool attached = false);
-			void RemovePaletteTexture(Palette* palette, unsigned int colorKey, bool attached = false);
+			GLuint CreatePaletteTexture(PaletteHolder palette, unsigned int colorKey, bool attached = false);
+			void RemovePaletteTexture(PaletteHolder palette, unsigned int colorKey, bool attached = false);
 			void RemovePaletteTexture(GLuint texture, bool attached = false);
 			void ClearUnused(bool attached = false);
 			void Clear();

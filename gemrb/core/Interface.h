@@ -83,6 +83,7 @@ class Label;
 class Map;
 class MusicMgr;
 class Palette;
+using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
 class Resource;
 class SPLExtHeader;
@@ -414,7 +415,7 @@ public:
 	Holder<StringMgr> strings;
 	Holder<StringMgr> strings2;
 	GlobalTimer * timer;
-	Palette *InfoTextPalette;
+	PaletteHolder InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;

@@ -47,6 +47,7 @@ class Image;
 class IniSpawn;
 class MapReverb;
 class Palette;
+using PaletteHolder = Holder<Palette>;
 class Particles;
 struct PathNode;
 class Projectile;
@@ -313,7 +314,7 @@ public:
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
-	Palette* palette;
+	PaletteHolder palette;
 	AreaAnimation();
 	AreaAnimation(AreaAnimation *src);
 	~AreaAnimation();

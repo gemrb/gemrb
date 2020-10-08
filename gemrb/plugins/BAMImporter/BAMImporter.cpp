@@ -163,9 +163,8 @@ Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mod
 	if (mode == IE_SHADED) {
 		// CHECKME: is this ever used? Should we modify the sprite's palette
 		// without creating a local copy for this sprite?
-		Palette* pal = spr->GetPalette();
+		PaletteHolder pal = spr->GetPalette();
 		pal->CreateShadedAlphaChannel();
-		pal->release();
 	}
 	return spr;
 }

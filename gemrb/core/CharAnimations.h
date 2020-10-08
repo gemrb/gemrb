@@ -170,9 +170,9 @@ public:
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[PAL_MAX];
-	Palette* palette[PAL_MAX];
-	Palette* modifiedPalette[PAL_MAX];
-	Palette* shadowPalette;
+	PaletteHolder palette[PAL_MAX];
+	PaletteHolder modifiedPalette[PAL_MAX];
+	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
@@ -202,8 +202,8 @@ public:
 	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
 
 	// returns Palette for a given part (unlocked)
-	Palette* GetPartPalette(int part); // TODO: clean this up
-	Palette* GetShadowPalette() const;
+	PaletteHolder GetPartPalette(int part); // TODO: clean this up
+	PaletteHolder GetShadowPalette() const;
 
 public: //attribute functions
 	static int GetAvatarsCount();

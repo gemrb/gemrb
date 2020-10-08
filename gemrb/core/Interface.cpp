@@ -960,7 +960,7 @@ void Interface::Main()
 	time = GetTickCount();
 	timebase = time;
 	double frames = 0.0;
-	Palette* palette = new Palette( ColorWhite, ColorBlack );
+	PaletteHolder palette = new Palette( ColorWhite, ColorBlack );
 
 	do {
 		std::deque<Timer>::iterator it;
@@ -1184,7 +1184,7 @@ int Interface::LoadFonts()
 		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
 
-		Palette* pal = NULL;
+		PaletteHolder pal;
 		if (needpalette) {
 			Color fore = ColorWhite;
 			Color back = ColorBlack;
@@ -2870,7 +2870,7 @@ int Interface::PlayMovie(const char* resref)
 		mutable String* cachedSub;
 
 	public:
-		IESubtitles(class Font* fnt, ResRef resref, Palette* pal = nullptr)
+		IESubtitles(class Font* fnt, ResRef resref, PaletteHolder pal = nullptr)
 		: MoviePlayer::SubtitleSet(fnt, pal)
 		{
 			AutoTable sttable(resref);
@@ -2925,9 +2925,8 @@ int Interface::PlayMovie(const char* resref)
 			// FIXME: this doesn't look very good (IWD2), wrong font?
 			Color bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
 			Color fg = Color(0, 0, 0, 0xff);
-			Palette* pal = new Palette(fg, bg);
+			PaletteHolder pal = new Palette(fg, bg);
 			mp->SetSubtitles(new IESubtitles(font, resref, pal));
-			pal->release();
 		} else {
 			mp->SetSubtitles(new IESubtitles(font, resref));
 		}

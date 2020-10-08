@@ -23,6 +23,7 @@
 #include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
+#include "Holder.h"
 
 #include <algorithm>
 #include <cassert>
@@ -44,11 +45,12 @@ struct RGBModifier {
 	bool locked;
 };
 
+class Palette;
+using PaletteHolder = Holder<Palette>;
 
-class GEM_EXPORT Palette {
+class GEM_EXPORT Palette : public Held<Palette>
+{
 private:
-	~Palette() {}
-	
 	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst);
 	void UpdateAlpha();
 public:
@@ -61,23 +63,12 @@ public:
 	}
 
 	Palette() {
-		refcount = 1;
 		named = false;
 		version = 0;
 	}
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool named; //< true if the palette comes from a bmp and cached
-
-	void acquire() {
-		refcount++;
-	}
-
-	void release() {
-		assert(refcount > 0);
-		if (!--refcount)
-			delete this;
-	}
 
 	unsigned short GetVersion() const { return version; }
 
@@ -87,18 +78,17 @@ public:
 	void Darken();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
-	void SetupRGBModification(const Palette* src, const RGBModifier* mods,
+	void SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
 		unsigned int type);
-	void SetupGlobalRGBModification(const Palette* src,
+	void SetupGlobalRGBModification(const PaletteHolder src,
 		const RGBModifier& mod);
 
-	Palette* Copy() const;
+	PaletteHolder Copy() const;
 
 	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst);
 	bool operator==(const Palette&) const;
 	bool operator!=(const Palette&) const;
 private:
-	unsigned int refcount;
 	unsigned short version;
 	bool alpha = false; // true if any colors in the palette have an alpha < 255
 	// FIXME: version is not enough since `col` is public

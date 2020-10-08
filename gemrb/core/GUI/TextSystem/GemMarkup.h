@@ -37,12 +37,12 @@ public:
 	};
 
 	GemMarkupParser();
-	GemMarkupParser(const Font* ftext, Palette* textPal = NULL,
-					const Font* finit = NULL, Palette* initPal = NULL);
+	GemMarkupParser(const Font* ftext, PaletteHolder textPal = nullptr,
+					const Font* finit = nullptr, PaletteHolder initPal = nullptr);
 	~GemMarkupParser() {};
 
-	void ResetAttributes(const Font* ftext = NULL, Holder<Palette> textPal = NULL,
-						 const Font* finit = NULL, Holder<Palette> initPal = NULL);
+	void ResetAttributes(const Font *ftext = nullptr, PaletteHolder textPal = nullptr,
+						 const Font *finit = nullptr, PaletteHolder initPal = nullptr);
 
 	void Reset();
 
@@ -60,8 +60,8 @@ private:
 		const Font* SwapFont;
 
 		public:
-		TextAttributes(const Font* text, Holder<Palette> textPal = NULL,
-					   const Font* init = NULL, Holder<Palette> initPal = NULL)
+		TextAttributes(const Font* text, PaletteHolder textPal = nullptr,
+					   const Font *init = nullptr, PaletteHolder initPal = nullptr)
 		: palette(textPal), swapPalette(initPal)
 		{
 			TextFont = text;

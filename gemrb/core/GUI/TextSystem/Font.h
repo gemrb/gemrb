@@ -50,6 +50,7 @@ enum FontStyle {
 };
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01
@@ -149,7 +150,7 @@ private:
 	GlyphAtlas Atlas;
 
 protected:
-	mutable Palette* palette;
+	mutable PaletteHolder palette;
 
 public:
 	const int LineHeight;
@@ -164,10 +165,10 @@ private:
 	size_t RenderLine(const String& string, const Region& rgn,
 					  Point& dp, ieByte** canvas = NULL) const;
 
-	void SetAtlasPalette(Palette* pal) const;
+	void SetAtlasPalette(PaletteHolder pal) const;
 
 public:
-	Font(Palette*, ieWord lineheight, ieWord baseline);
+	Font(PaletteHolder, ieWord lineheight, ieWord baseline);
 	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
@@ -178,8 +179,8 @@ public:
 	//allow reading but not setting glyphs
 	virtual const Glyph& GetGlyph(ieWord chr) const;
 
-	Holder<Palette> GetPalette() const;
-	void SetPalette(Palette* pal);
+	PaletteHolder GetPalette() const;
+	void SetPalette(PaletteHolder pal);
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
@@ -190,7 +191,7 @@ public:
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
 	size_t Print(Region rgn, const String& string,
-				 Palette* hicolor, ieByte Alignment, Point* point = NULL) const;
+				 PaletteHolder hicolor, ieByte Alignment, Point* point = nullptr) const;
 
 	/** Returns size of the string rendered in this font in pixels */
 	struct StringSizeMetrics {

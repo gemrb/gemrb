@@ -257,7 +257,7 @@ void Scriptable::DrawOverheadText()
 		return;
 
 	unsigned long time = core->GetGame()->Ticks;
-	Palette *palette = NULL;
+	PaletteHolder palette;
 
 	time -= timeStartDisplaying;
 	if (time >= MAX_DELAY) {
@@ -279,7 +279,6 @@ void Scriptable::DrawOverheadText()
 
 	if (!palette) {
 		palette = core->InfoTextPalette;
-		palette->acquire();
 	}
 
 	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
@@ -287,8 +286,6 @@ void Scriptable::DrawOverheadText()
 	Region rgn(p - Point(100, cs) - vp.Origin(), Size(200, 400));
 	core->GetTextFont()->Print( rgn, OverheadText, palette,
 							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
-
-	palette->release();
 }
 
 Region Scriptable::DrawingRegion() const

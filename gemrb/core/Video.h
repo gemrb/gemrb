@@ -40,7 +40,8 @@ namespace GemRB {
 
 class EventMgr;
 class Palette;
-
+using PaletteHolder = Holder<Palette>;
+  
 // Note: not all these flags make sense together.
 // Specifically: BLIT_GREY overrides BLIT_SEPIA
 enum SpriteBlitFlags : uint32_t {
@@ -189,7 +190,7 @@ public:
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(const Region&, void* pixels,
-									Palette* palette, bool cK = false, int index = 0) = 0;
+									PaletteHolder palette, bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreatePalettedSprite(const Region&, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
@@ -206,7 +207,7 @@ public:
 								uint32_t flags, Color tint,
 								const Region* clip = NULL) = 0;
 
-	void BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
+	void BlitGameSpriteWithPalette(Sprite2D* spr, PaletteHolder pal, int x, int y,
 				   uint32_t flags, Color tint, const Region* clip = NULL);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,

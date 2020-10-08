@@ -50,11 +50,11 @@ public:
 	static const TypeID ID;
 
 	class SubtitleSet {
-		Holder<Palette> pal;
+		PaletteHolder pal;
 		Font* font;
 	
 	public:
-		SubtitleSet(Font* fnt, Palette* pal = nullptr)
+		SubtitleSet(Font* fnt, PaletteHolder pal = nullptr)
 		: pal(pal) {
 			font = fnt;
 			assert(font);

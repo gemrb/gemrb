@@ -367,26 +367,26 @@ static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
 
 	if (srect.Dimensions().IsEmpty())
 		return;
-	
+
 	if (drect.Dimensions().IsEmpty())
 		return;
-	
-	Palette* palette = spr->GetPalette();
+
+	PaletteHolder palette = spr->GetPalette();
 	const Uint8* rledata = (const Uint8*)spr->LockSprite();
 	uint8_t ck = spr->GetColorKey();
-	
+
 	bool partial = spr->Frame.Dimensions() != srect.Dimensions();
-		
+
 	IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 	IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-	
+
 	SDLPixelIterator dstit = SDLPixelIterator(xdir, ydir, RectFromRegion(drect), dst);
-	
+
 	static StaticAlphaIterator nomask(0);
 	if (cover == nullptr) {
 		cover = &nomask;
 	}
-	
+
 	switch (dstit.format->BytesPerPixel) {
 		case 4:
 		{
@@ -412,8 +412,6 @@ static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
 			Log(ERROR, "SpriteRenderer", "Invalid Bpp");
 			break;
 	}
-	
-	palette->release();
 }
 
 #undef ADVANCE_ITERATORS

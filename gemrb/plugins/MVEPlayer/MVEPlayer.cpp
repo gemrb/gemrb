@@ -52,7 +52,6 @@ MVEPlay::MVEPlay(void)
 
 MVEPlay::~MVEPlay(void)
 {
-	g_palette->release();
 }
 
 bool MVEPlay::Open(DataStream* stream)

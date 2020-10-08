@@ -243,7 +243,7 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 }
 
 //apply gradient colors
-void Projectile::SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients)
+void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients)
 {
 	ieDword Colors[7];
 
@@ -256,7 +256,7 @@ void Projectile::SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gr
 	}
 }
 
-void Projectile::GetPaletteCopy(Animation *anim[], Palette *&pal)
+void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal)
 {
 	if (pal)
 		return;
@@ -1913,7 +1913,7 @@ void Projectile::Draw(Sprite2D* spr, const Point& p,
 		  unsigned int flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();
-	Palette* pal = (spr->Bpp == 8) ? palette : NULL;
+	PaletteHolder pal = (spr->Bpp == 8) ? palette : nullptr;
 	video->BlitGameSpriteWithPalette(spr, pal, p.x, p.y, flags|BLIT_BLENDED, tint, NULL);
 }
 

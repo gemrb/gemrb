@@ -228,19 +228,18 @@ Sprite2D* GLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* 
 
 	GLTextureSprite2D* spr = new GLTextureSprite2D(rgn, bpp, pixels);
 	spr->SetPaletteManager(paletteManager);
-	Palette* pal = new Palette(palette);
+	PaletteHolder pal = new Palette(palette);
 	spr->SetPalette(pal);
-	pal->release();
 	if (cK) spr->SetColorKey(index);
 	return spr;
 }
 
-Sprite2D* GLVideoDriver::CreateSprite8(const Region& rgn, void* pixels, Palette* palette, bool cK, int index)
+Sprite2D* GLVideoDriver::CreateSprite8(const Region& rgn, void* pixels, PaletteHolder palette, bool cK, int index)
 {
 	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 
-void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, Palette* attachedPal,
+void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, PaletteHolder attachedPal,
 								 unsigned int flags, const Color* tint, GLTextureSprite2D* mask)
 {
 	// TODO: clip dst to the screen?
@@ -384,7 +383,7 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 	spritesPerFrame++;
 }
 
-void GLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, Palette* palette)
+void GLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, PaletteHolder palette)
 {
 	GLBlitSprite((GLTextureSprite2D*)spr, src, dst, palette);
 }
@@ -563,7 +562,7 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* cl
 }
 
 void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
-								   SpriteCover* cover, Palette *palette, const Region* clip, bool anchor)
+								   SpriteCover* cover, PaletteHolder palette, const Region* clip, bool anchor)
 {
 	int tx = x - spr->Frame.x;
 	int ty = y - spr->Frame.y;

@@ -247,15 +247,14 @@ void Video::BlitTiled(Region rgn, const Sprite2D* img)
 	}
 }
 
-void Video::BlitGameSpriteWithPalette(Sprite2D* spr, Palette* pal, int x, int y,
+void Video::BlitGameSpriteWithPalette(Sprite2D* spr, PaletteHolder pal, int x, int y,
 							   uint32_t flags, Color tint, const Region* clip)
 {
 	if (pal) {
-		Palette* oldpal = spr->GetPalette();
+		PaletteHolder oldpal = spr->GetPalette();
 		spr->SetPalette(pal);
 		BlitGameSprite(spr, x, y, flags, tint, clip);
 		spr->SetPalette(oldpal);
-		if (oldpal) oldpal->release();
 	} else {
 		BlitGameSprite(spr, x, y, flags, tint, clip);
 	}

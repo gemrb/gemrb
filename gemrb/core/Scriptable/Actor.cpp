@@ -618,7 +618,7 @@ void Actor::SetName(int strref, unsigned char type)
 void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
-	Palette *recover = NULL;
+	PaletteHolder recover = nullptr;
 	ieResRef paletteResRef;
 
 	if (anims) {
@@ -8474,7 +8474,7 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 
 	for (const auto& part : anims) {
 		Animation* anim = part.first;
-		Palette* palette = part.second;
+		PaletteHolder palette = part.second;
 
 		Sprite2D* currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
@@ -8484,13 +8484,12 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 				palette->col[1].a = tmpa;
 			} else if (TranslucentShadows) {
-				Palette* cpy = palette->Copy();
+				PaletteHolder cpy = palette->Copy();
 				cpy->col[1].a = tint.a / 2;
 				for (int i = 2; i < 256; ++i) {
 					cpy->col[i].a = tint.a;
 				}
 				video->BlitGameSpriteWithPalette(currentFrame, cpy, cx, cy, flags, tint);
-				cpy->release();
 			} else {
 				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 			}

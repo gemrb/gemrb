@@ -232,7 +232,7 @@ public:
 	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
-	Palette* palette;
+	PaletteHolder palette;
 	//internals
 protected:
 	ieResRef smokebam;
@@ -364,7 +364,7 @@ private:
 	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
 	//oriented animations (also simple ones)
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
-	void GetPaletteCopy(Animation *anim[], Palette *&pal);
+	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
@@ -407,7 +407,7 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
+	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
 
 private:
 	void Draw(Sprite2D* spr, const Point& p,

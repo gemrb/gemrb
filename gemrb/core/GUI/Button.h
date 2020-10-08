@@ -40,6 +40,7 @@
 namespace GemRB {
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 // NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_UNPRESSED 0
@@ -181,8 +182,8 @@ private: // Private attributes
 	Font* font;
 	bool ToggleState;
 	bool pulseBorder;
-	Palette* normal_palette;
-	Palette* disabled_palette;
+	PaletteHolder normal_palette;
+	PaletteHolder disabled_palette;
 	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;

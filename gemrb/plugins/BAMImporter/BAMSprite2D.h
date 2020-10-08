@@ -29,20 +29,19 @@ class AnimationFactory;
 
 class BAMSprite2D : public Sprite2D {
 private:
-	Palette* pal;
+	PaletteHolder pal;
 	ieByte colorkey;
 
 public:
 	// all BAMs have a palette and colorkey so force them at construction
 	// for BAMs the actual colorkey is always green (RGB(0,255,0)) so use colorkey to store the transparency index
 	BAMSprite2D(const Region&, void* pixels,
-				Palette* palette, ieDword colorkey);
+				PaletteHolder palette, ieDword colorkey);
 	BAMSprite2D(const BAMSprite2D &obj);
 	BAMSprite2D* copy() const;
-	~BAMSprite2D();
 
-	Palette *GetPalette() const;
-	void SetPalette(Palette *pal);
+	PaletteHolder GetPalette() const;
+	void SetPalette(PaletteHolder pal);
 	Color GetPixel(const Point&) const;
 	int32_t GetColorKey() const { return colorkey; };
 	void SetColorKey(ieDword ck) { colorkey = (ieByte)ck; };

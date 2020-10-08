@@ -32,8 +32,6 @@ GLTextureSprite2D::GLTextureSprite2D (int Width, int Height, int Bpp, void* pixe
 
 GLTextureSprite2D::~GLTextureSprite2D()
 {
-	if (currentPalette != NULL)
-		currentPalette->release();
 	MakeUnused();
 }
 
@@ -58,23 +56,17 @@ GLTextureSprite2D* GLTextureSprite2D::copy() const
 	return new GLTextureSprite2D(*this);
 }
 
-void GLTextureSprite2D::SetPalette(Palette *pal)
+void GLTextureSprite2D::SetPalette(PaletteHolder pal)
 {
 	if (!IsPaletted() || pal == NULL || currentPalette == pal) return;
-	pal->acquire();
-	if (currentPalette != NULL) 
-	{
-		currentPalette->release();
-	}
 	if (glPaletteTexture != 0) paletteManager->RemovePaletteTexture(glPaletteTexture);
 	glPaletteTexture = 0;
 	currentPalette = pal;
 }
 
-Palette* GLTextureSprite2D::GetPalette() const
+PaletteHolder GLTextureSprite2D::GetPalette() const
 {
 	if(!IsPaletted() || currentPalette == NULL) return NULL;
-	currentPalette->acquire();
 	return currentPalette;
 }
 

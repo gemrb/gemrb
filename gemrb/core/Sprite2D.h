@@ -73,8 +73,8 @@ public:
 	virtual void* LockSprite();
 	virtual void UnlockSprite() const;
 
-	virtual Palette *GetPalette() const = 0;
-	virtual void SetPalette(Palette *pal) = 0;
+	virtual PaletteHolder GetPalette() const = 0;
+	virtual void SetPalette(PaletteHolder pal) = 0;
 	virtual Color GetPixel(const Point&) const = 0;
 	Color GetPixel(int x, int y) const;
 	virtual bool HasTransparency() const = 0;
