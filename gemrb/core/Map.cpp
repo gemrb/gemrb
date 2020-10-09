@@ -1677,13 +1677,21 @@ void Map::ActorSpottedByPlayer(Actor *actor)
 			core->GetGame()->SetBeastKnown(avatar->Bestiary);
 		}
 	}
+}
 
-	if (!(actor->GetInternalFlag()&IF_STOPATTACK) && !core->GetGame()->AnyPCInCombat()) {
-		if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_TRIGGER_AP)) {
-			actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+// Call this for any visible actor.  do_pause can be false if hostile
+// actors were already seen on the map.  We used to check AnyPCInCombat,
+// which is less reliable.  Returns true if this is a hostile enemy
+// that should trigger pause.
+bool Map::HandleAutopauseForVisible(Actor *actor, bool do_pause)
+{
+	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
+		if (do_pause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AP_ENEMY, actor);
-		}
+		actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+		return true;
 	}
+	return false;
 }
 
 //call this once, after area was loaded
@@ -1704,8 +1712,16 @@ void Map::InitActor(Actor *actor)
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
 
-	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
-		ActorSpottedByPlayer(actor);
+	if (IsVisible(actor->Pos, false)) {
+		// This case is probably not possible.  At this point, the actor's position
+		// ought to be 0,0 and the caller of AddActor is expected to follow up with
+		// SetPosition to move the actor to its real position.
+		// The Schedule call here preserves previous behaviour, while also logging
+		// the event if something unexpected happens.  It's unclear whether an
+		// actor can be visible at 0,0 by accident and whether the Schedule call
+		// is meaningful for that case.
+		Log(ERROR, "Map", "Actor visible in InitActor before real position was set");
+		actor->Schedule(gametime, true);
 	}
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
@@ -2380,6 +2396,7 @@ void Map::GenerateQueues()
 	}
 
 	ieDword gametime = core->GetGame()->GameTime;
+	bool hostiles_new = false;
 	while (i--) {
 		Actor* actor = actors[i];
 
@@ -2402,6 +2419,8 @@ void Map::GenerateQueues()
 					priority = PR_IGNORE; //don't run scripts for out of schedule actors
 				}
 			}
+			if (IsVisible(actor->Pos, false))
+				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 		} else {
 			//dead actors are always visible on the map, but run no scripts
 			if ((stance == IE_ANI_TWITCH) || (stance == IE_ANI_DIE) ) {
@@ -2415,6 +2434,7 @@ void Map::GenerateQueues()
 					//more like activate!
 					actor->Activate();
 					ActorSpottedByPlayer(actor);
+					hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 				} else {
 					priority = PR_IGNORE;
 				}
@@ -2427,6 +2447,7 @@ void Map::GenerateQueues()
 		queue[priority][Qcount[priority]] = actor;
 		Qcount[priority]++;
 	}
+	hostiles_visible = hostiles_new;
 }
 
 //the original qsort implementation was flawed
