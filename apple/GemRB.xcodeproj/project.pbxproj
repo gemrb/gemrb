@@ -457,11 +457,7 @@
 		A2E5A49819992C6100CCE6D8 /* SDL20Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */; settings = {COMPILER_FLAGS = "-DUSE_OPENGL=1"; }; };
 		A2E5A49B19992C6100CCE6D8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2491880141092F20038B170 /* Cocoa.framework */; };
 		A2E5A49C19992C6100CCE6D8 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
-		A2E5A4AF19992CAB00CCE6D8 /* GLPaletteManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */; };
 		A2E5A4B019992CAB00CCE6D8 /* GLSLProgram.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */; };
-		A2E5A4B119992CAB00CCE6D8 /* GLTextureSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */; };
-		A2E5A4B219992CAB00CCE6D8 /* Matrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */; };
-		A2E5A4B319992CAB00CCE6D8 /* SDL20GLVideo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */; };
 		A2E5A4C219992EC300CCE6D8 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E5A4C019992CE800CCE6D8 /* OpenGL.framework */; };
 		A2E6634E139E882900310FC8 /* ActorMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */; };
 		A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */; };
@@ -1771,7 +1767,6 @@
 		A2D4C52513A978110086BCC4 /* ie_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_types.h; sourceTree = "<group>"; };
 		A2D4C52613A978110086BCC4 /* iless.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iless.h; sourceTree = "<group>"; };
 		A2D4C52813A978110086BCC4 /* opcode_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opcode_params.h; sourceTree = "<group>"; };
-		A2D4C52913A978110086BCC4 /* operatorbool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = operatorbool.h; sourceTree = "<group>"; };
 		A2D4C52A13A978110086BCC4 /* overlays.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlays.h; sourceTree = "<group>"; };
 		A2D4C52B13A978110086BCC4 /* plugindef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugindef.h; sourceTree = "<group>"; };
 		A2D4C52C13A978110086BCC4 /* RGBAColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RGBAColor.h; sourceTree = "<group>"; };
@@ -1795,16 +1790,8 @@
 		A2E27EF616EEA7B00079E104 /* InterfaceConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterfaceConfig.h; sourceTree = "<group>"; };
 		A2E27EFB16F12B5A0079E104 /* GemRB.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GemRB.xib; path = CocoaWrapper/mac/nibs/GemRB.xib; sourceTree = "<group>"; };
 		A2E5A4A019992C6100CCE6D8 /* SDLVideo.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = SDLVideo.so; sourceTree = BUILT_PRODUCTS_DIR; };
-		A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLPaletteManager.cpp; sourceTree = "<group>"; };
-		A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLPaletteManager.h; sourceTree = "<group>"; };
 		A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLSLProgram.cpp; sourceTree = "<group>"; };
 		A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLSLProgram.h; sourceTree = "<group>"; };
-		A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLTextureSprite2D.cpp; sourceTree = "<group>"; };
-		A2E5A4A619992CAB00CCE6D8 /* GLTextureSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLTextureSprite2D.h; sourceTree = "<group>"; };
-		A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Matrix.cpp; sourceTree = "<group>"; };
-		A2E5A4A819992CAB00CCE6D8 /* Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix.h; sourceTree = "<group>"; };
-		A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDL20GLVideo.cpp; sourceTree = "<group>"; };
-		A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL20GLVideo.h; sourceTree = "<group>"; };
 		A2E5A4B719992CC000CCE6D8 /* Ellipse.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Ellipse.glslf; sourceTree = "<group>"; };
 		A2E5A4B819992CC000CCE6D8 /* Ellipse.glslv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Ellipse.glslv; sourceTree = "<group>"; };
 		A2E5A4B919992CC000CCE6D8 /* Rect.glslf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Rect.glslf; sourceTree = "<group>"; };
@@ -2856,20 +2843,12 @@
 			isa = PBXGroup;
 			children = (
 				A249187B141075A60038B170 /* CocoaWrapper.m */,
-				A2E5A4A119992CAB00CCE6D8 /* GLPaletteManager.cpp */,
-				A2E5A4A219992CAB00CCE6D8 /* GLPaletteManager.h */,
 				A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */,
 				A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */,
-				A2E5A4A519992CAB00CCE6D8 /* GLTextureSprite2D.cpp */,
-				A2E5A4A619992CAB00CCE6D8 /* GLTextureSprite2D.h */,
-				A2E5A4A719992CAB00CCE6D8 /* Matrix.cpp */,
-				A2E5A4A819992CAB00CCE6D8 /* Matrix.h */,
 				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
 				A20B1199204F70F600B10A0C /* Pixels.h */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
 				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
-				A2E5A4A919992CAB00CCE6D8 /* SDL20GLVideo.cpp */,
-				A2E5A4AA19992CAB00CCE6D8 /* SDL20GLVideo.h */,
 				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
 				A298DD1814EB4EEB00F59F56 /* SDL20Video.h */,
 				A231677923A7267A00D04811 /* SDLSurfaceDrawing.h */,
@@ -3364,7 +3343,6 @@
 				A2D4C52513A978110086BCC4 /* ie_types.h */,
 				A2D4C52613A978110086BCC4 /* iless.h */,
 				A2D4C52813A978110086BCC4 /* opcode_params.h */,
-				A2D4C52913A978110086BCC4 /* operatorbool.h */,
 				A2D4C52A13A978110086BCC4 /* overlays.h */,
 				A2D4C52B13A978110086BCC4 /* plugindef.h */,
 				A23A9EB418CD4C4B0047420C /* Predicates.h */,
@@ -4505,7 +4483,7 @@
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1130;
+				LastUpgradeCheck = 1200;
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "GemRB" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -5308,13 +5286,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A20574FC19994A83007FF22C /* SDLSurfaceSprite2D.cpp in Sources */,
-				A2E5A4B319992CAB00CCE6D8 /* SDL20GLVideo.cpp in Sources */,
-				A2E5A4B219992CAB00CCE6D8 /* Matrix.cpp in Sources */,
 				A2E5A49619992C6100CCE6D8 /* CocoaWrapper.m in Sources */,
-				A2E5A4B119992CAB00CCE6D8 /* GLTextureSprite2D.cpp in Sources */,
 				A2E5A49719992C6100CCE6D8 /* SDLVideo.cpp in Sources */,
 				A2E5A4B019992CAB00CCE6D8 /* GLSLProgram.cpp in Sources */,
-				A2E5A4AF19992CAB00CCE6D8 /* GLPaletteManager.cpp in Sources */,
 				A2E5A49819992C6100CCE6D8 /* SDL20Video.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7498,6 +7472,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -7534,7 +7509,7 @@
 					../gemrb/includes,
 					/usr/local/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -7589,6 +7564,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_REPEATED_USE_OF_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -7623,7 +7599,7 @@
 					../gemrb/includes,
 					/usr/local/include,
 				);
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
