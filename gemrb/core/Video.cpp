@@ -288,8 +288,10 @@ Holder<Sprite2D> Video::CreateAlpha( const Holder<Sprite2D> sprite)
 			pixels[i++]=tmp;
 		}
 	}
-	return CreateSprite( sprite->Frame, 32, 0xFF000000,
-		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
+	Holder<Sprite2D> newspr = CreateSprite(sprite->Frame, 32, 0xFF000000,
+											0x00FF0000, 0x0000FF00, 0x000000FF, pixels);
+	newspr->renderFlags = sprite->renderFlags;
+	return newspr;
 }
 
 Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned int ratio )
