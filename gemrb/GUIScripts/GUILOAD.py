@@ -26,7 +26,6 @@ import GemRB
 import LoadScreen
 import GameCheck
 import GUICommon
-import GUICommonWindows
 
 from GameCheck import MAX_PARTY_SIZE
 

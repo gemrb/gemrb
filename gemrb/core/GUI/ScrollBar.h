@@ -83,7 +83,7 @@ private: //Private attributes
 	/** Images for drawing the Scroll Bar */
 	Holder<Sprite2D> Frames[IMAGE_COUNT];
 	/** Scroll Bar Status */
-	unsigned short State;
+	unsigned short State = 0;
 
 private:
 	void Init(const Holder<Sprite2D> images[IMAGE_COUNT]) {

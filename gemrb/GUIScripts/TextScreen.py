@@ -23,7 +23,6 @@ from ie_restype import RES_2DA
 from ie_sounds import CHAN_GUI
 from GUIDefines import *
 import GameCheck
-import GUICommonWindows
 
 TextScreen = None
 TextArea = None

@@ -23,7 +23,6 @@ import GUICommonWindows
 import GUIClasses
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
-import CommonWindow
 
 MTASize = GS_SMALLDIALOG
 smallID = -1

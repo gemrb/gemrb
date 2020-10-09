@@ -56,4 +56,4 @@ def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
 
-	GemRB.SetTimer(lambda: LoadScreen.Close(), 500, 0)
+	GemRB.SetTimer(LoadScreen.Close, 500, 0)

@@ -156,7 +156,7 @@ private: // Private attributes
 	Holder<DragOp> drag;
 	unsigned long lastMouseMoveTime;
 
-	VideoBufferPtr backBuffer;
+	VideoBufferPtr backBuffer = nullptr;
 	WindowManager& manager;
 	
 	WindowEventHandler eventHandlers[3];

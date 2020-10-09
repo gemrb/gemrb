@@ -105,6 +105,8 @@ private:
 public:
 	WindowManager(Video* vid);
 	~WindowManager();
+	
+	WindowManager(const WindowManager&) = delete;
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);

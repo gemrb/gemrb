@@ -199,7 +199,7 @@ def QuitPress():
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
-	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitQuitPress)
+	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
 	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl(0)
@@ -221,8 +221,4 @@ def QuitCancelPress():
 	if QuitWindow:
 		QuitWindow.Unload()
 	StartWindow.Focus()
-	return
-
-def QuitQuitPress():
-	GemRB.Quit()
 	return

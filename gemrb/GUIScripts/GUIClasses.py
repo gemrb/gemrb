@@ -66,7 +66,7 @@ class GSymbol:
     'Unload': _GemRB.Symbol_Unload
   }
 
-class Scrollable:
+class Scrollable(object):
 	def Scroll(self, x, y, relative = True):
 		_GemRB.Scrollable_Scroll(self, x, y, relative)
 
@@ -150,7 +150,7 @@ class GView:
 		return self.CreateSubview(id, type, frame, *args)
 
 	def ReplaceSubview(self, subview, ctype, *args):
-		if type(subview) == int:
+		if isinstance(subview, int):
 			subview = self.GetControl (subview)
 		id = subview.ID & 0x00000000ffffffff
 		frame = subview.GetFrame()

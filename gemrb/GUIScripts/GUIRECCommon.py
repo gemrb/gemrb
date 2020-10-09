@@ -119,8 +119,8 @@ def OpenCustomizeWindow ():
 	PortraitSelectButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPortraitSelectWindow)
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenSoundWindow)
 	ScriptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenScriptWindow)
-	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CustomizeWindow.Close())
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS,  lambda: CustomizeWindow.Close())
+	CustomizeDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeWindow.Close)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomizeWindow.Close)
 
 	CustomizeWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

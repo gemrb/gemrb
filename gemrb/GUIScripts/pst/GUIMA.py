@@ -56,7 +56,7 @@ def InitMapWindow (Window):
 	Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, SetMapNote)
-	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+	Map.SetAction(Window.Close, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	MapTable = GemRB.LoadTable( "MAPNAME" )
 	MapName = MapTable.GetValue (GemRB.GetCurrentArea (), "STRING")
@@ -75,7 +75,7 @@ def InitMapWindow (Window):
 	# Done
 	Button = Window.GetControl (5)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 	Button.MakeEscape()
 
 	return
@@ -101,7 +101,7 @@ def OpenTravelWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.ToggleWindow, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMA", GUICommonWindows.OpenWindowOnce, InitMapWindow, None, WINDOW_TOP|WINDOW_HCENTER)

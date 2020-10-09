@@ -64,12 +64,12 @@ def QuitPress():
 	
 	ConfirmButton = QuitWindow.GetControl(1)
 	ConfirmButton.SetText(23787)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
 	ConfirmButton.MakeDefault()
 
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetText(23789)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitWindow.Close)
 	CancelButton.MakeEscape()
 	
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)

@@ -441,13 +441,11 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 	// we do know by definition that the content itself is ordered ltr-ttb
 	// based on the above a simple binary search should suffice
 
-	int index = 0;
 	ContentLayout::const_iterator it = layout.begin();
 	size_t count = layout.size();
 	while (count > 0) {
 		size_t step = count / 2;
 		std::advance(it, step);
-		index += step;
 		if (it->PointInside(p)) {
 			// i know we are casting away const.
 			// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
@@ -458,7 +456,6 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			count -= step + 1;
 		} else {
 			std::advance(it, -step);
-			index -= step;
 			count = step;
 		}
 	}

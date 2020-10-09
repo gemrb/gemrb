@@ -415,9 +415,9 @@ def InitStoreShoppingWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetFont ('NUMBER')
 	else:
-		Label = BackpackButton.CreateLabel (0x10000043, "NUMBER", "0:",
+		BackpackButton.CreateLabel (0x10000043, "NUMBER", "0:",
 			IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = BackpackButton.CreateLabel (0x10000044, "NUMBER", "0:",
+		BackpackButton.CreateLabel (0x10000044, "NUMBER", "0:",
 			IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	return
@@ -1565,7 +1565,7 @@ def InfoWindow (Slot, Item):
 	#Done
 	Button = Window.GetControl (4)
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 
 	# hide the empty button
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
@@ -1853,7 +1853,7 @@ def InfoHealWindow ():
 	#Done
 	Button = Window.GetControl (5)
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -1967,7 +1967,7 @@ def RentRoom ():
 	#deny
 	Button = Window.GetControl (1)
 	Button.SetText (strrefs["cancel"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 	Button.MakeEscape()
 
 	#textarea
@@ -1986,7 +1986,7 @@ def ErrorWindow (strref):
 	#done
 	Button = Window.GetControl (0)
 	Button.SetText (strrefs["done"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return

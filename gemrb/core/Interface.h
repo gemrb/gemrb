@@ -435,6 +435,9 @@ public:
 public:
 	Interface();
 	~Interface(void);
+	
+	Interface(const Interface&) = delete;
+	
 	int Init(InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(int value, int position);

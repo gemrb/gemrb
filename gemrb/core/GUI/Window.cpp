@@ -33,7 +33,6 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
-	backBuffer = NULL;
 	lastMouseMoveTime = GetTickCount();
 
 	SetFlags(DestroyOnClose, OP_OR);

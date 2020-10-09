@@ -124,19 +124,6 @@ def InitOptionButton(Window, Index, HotKey=True):
 ##these defaults don't seem to break the games other than pst
 def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
-	
-	# needed for all the Open*Window callbacks in the OptionsWindow
-	import GUIJRNL
-	import GUIMA
-	import GUIINV
-	import GUIOPT
-	if GameCheck.IsIWD2():
-		# one spellbook for all spell types
-		import GUISPL
-	else:
-		import GUIMG
-		import GUIPR
-	import GUIREC
 
 	global OptionsWindow, ActionBarControlOffset
 
@@ -1683,7 +1670,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
 			#   is used by effect icons
-			HPLabel = Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
+			Button.CreateLabel(100+i, "NUMFONT", "", IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT|IE_FONT_SINGLE_LINE)
 
 		# unlike other buttons, this one lacks extra frames for a selection effect
 		# so we create it and shift it to cover the grooves of the image
@@ -2122,7 +2109,7 @@ def RealRestPress ():
 			Label.SetText (info["ErrorMsg"])
 			Button = Window.GetControl (1)
 			Button.SetText (1403)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close ())
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
 			Window.ShowModal (MODAL_SHADOW_GRAY)
 		else:
 			GemRB.DisplayString (info["ErrorMsg"], 0xff0000)
