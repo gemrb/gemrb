@@ -630,8 +630,6 @@ void Actor::SetAnimationID(unsigned int AnimID)
 			CopyResRef(paletteResRef, anims->PaletteResRef[PAL_MAIN]);
 			if (recover->named) {
 				recover = gamedata->GetPalette(paletteResRef);
-			} else {
-				recover->acquire();
 			}
 		}
 		delete( anims );

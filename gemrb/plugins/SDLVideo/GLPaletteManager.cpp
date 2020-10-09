@@ -52,7 +52,6 @@ GLuint GLPaletteManager::CreatePaletteTexture(PaletteHolder palette, unsigned in
 #endif
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 256, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) colors);
 		delete[] colors;
-		palette->acquire();
 		currentTextures->insert(std::make_pair(key, texture));
 		currentIndexes->insert(std::make_pair(texture, key));
 	}
