@@ -62,7 +62,7 @@ public:
 
 	int StepIncrement;
 
-	ScrollBar(const Region& frame, Sprite2D*[IMAGE_COUNT]);
+	ScrollBar(const Region& frame, Holder<Sprite2D>[IMAGE_COUNT]);
 	ScrollBar(const ScrollBar& sb);
 	ScrollBar& operator=(const ScrollBar& sb);
 
@@ -86,8 +86,7 @@ private: //Private attributes
 	unsigned short State;
 
 private:
-	template <typename T>
-	void Init(T images) {
+	void Init(const Holder<Sprite2D> images[IMAGE_COUNT]) {
 		ControlType = IE_GUI_SCROLLBAR;
 		State = 0;
 		StepIncrement = 1;

@@ -32,8 +32,8 @@
 namespace GemRB {
 
 Animation::Animation(int count)
+: frames(count, nullptr)
 {
-	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
 	indicesCount = count;
 	if (count) {
 		pos = RAND(0, count-1);
@@ -57,7 +57,6 @@ Animation::~Animation(void)
 	for (unsigned int i = 0; i < indicesCount; i++) {
 		frames[i]->release();
 	}
-	free(frames);
 }
 
 void Animation::SetPos(unsigned int index)

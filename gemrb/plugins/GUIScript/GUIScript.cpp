@@ -2086,8 +2086,8 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				return RuntimeError( tmpstr );
 			}
 
-			Sprite2D* images[ScrollBar::IMAGE_COUNT];
-			for(int i=0; i < ScrollBar::IMAGE_COUNT; i++) {
+			Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
+			for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
 				long frame = PyInt_AsLong( PyList_GetItem(pyImgList, i));
 				if (PyErr_Occurred()) {
 					return AttributeError("Error retrieving image from list");
