@@ -30,10 +30,16 @@ addons:
     - libvorbis-dev
     - openssh-client
     - python-dev
+  homebrew:
+    packages:
+    - sdl
+    - openal-soft
+    - sdl_mixer
+    - libpng
+    - libvorbis
   ssh_known_hosts: frs.sourceforge.net
 
 before_install:
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl openal-soft sdl_mixer libpng libvorbis; fi
   - touch id_travissfbot
   - if [[ $TRAVIS_SECURE_ENV_VARS == "true" ]]; then openssl aes-256-cbc -K $encrypted_d3cf1349d561_key -iv $encrypted_d3cf1349d561_iv -in testing/id_travissfbot.enc -out id_travissfbot -d; fi
   - chmod 0600 id_travissfbot
