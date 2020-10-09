@@ -54,9 +54,8 @@ Animation::Animation(int count)
 
 Animation::~Animation(void)
 {
-	for (unsigned int i = 0; i < indicesCount; i++) {
-		frames[i]->release();
-	}
+	// Empty, but having it here rather than defined implicitly means
+	// we don't have to include Sprite2D.h in the header.
 }
 
 void Animation::SetPos(unsigned int index)
@@ -69,13 +68,12 @@ void Animation::SetPos(unsigned int index)
 }
 
 /* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(Sprite2D* frame, unsigned int index)
+void Animation::AddFrame(Holder<Sprite2D> frame, unsigned int index)
 {
 	if (index>=indicesCount) {
 		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
 	}
-	Sprite2D::FreeSprite(frames[index]);
-	frames[index]=frame;
+	frames[index] = frame;
 
 	int x = -frame->Frame.x;
 	int y = -frame->Frame.y;
@@ -104,12 +102,12 @@ unsigned int Animation::GetCurrentFrameIndex() const
 	return pos;
 }
 
-Sprite2D* Animation::CurrentFrame() const
+Holder<Sprite2D> Animation::CurrentFrame() const
 {
 	return GetFrame(GetCurrentFrameIndex());
 }
 
-Sprite2D* Animation::LastFrame(void)
+Holder<Sprite2D> Animation::LastFrame(void)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive1!");
@@ -120,7 +118,7 @@ Sprite2D* Animation::LastFrame(void)
 	} else {
 		starttime = GetTickCount();
 	}
-	Sprite2D* ret;
+	Holder<Sprite2D> ret;
 	if (playReversed)
 		ret = frames[indicesCount-pos-1];
 	else
@@ -128,7 +126,7 @@ Sprite2D* Animation::LastFrame(void)
 	return ret;
 }
 
-Sprite2D* Animation::NextFrame(void)
+Holder<Sprite2D> Animation::NextFrame(void)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive2!");
@@ -141,7 +139,7 @@ Sprite2D* Animation::NextFrame(void)
 			starttime = GetTickCount();
 		}
 	}
-	Sprite2D* ret;
+	Holder<Sprite2D> ret;
 	if (playReversed)
 		ret = frames[indicesCount-pos-1];
 	else
@@ -181,13 +179,13 @@ Sprite2D* Animation::NextFrame(void)
 	return ret;
 }
 
-Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
+Holder<Sprite2D> Animation::GetSyncedNextFrame(Animation* master)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
 		return NULL;
 	}
-	Sprite2D* ret;
+	Holder<Sprite2D> ret;
 	if (playReversed)
 		ret = frames[indicesCount-pos-1];
 	else
@@ -208,7 +206,7 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Sprite2D* Animation::GetFrame(unsigned int i) const
+Holder<Sprite2D> Animation::GetFrame(unsigned int i) const
 {
 	if (i >= indicesCount) {
 		return NULL;
@@ -221,9 +219,7 @@ void Animation::MirrorAnimation()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		Sprite2D* tmp = frames[i];
-		frames[i] = video->MirrorSprite( tmp, BLIT_MIRRORX, true );
-		tmp->release();
+		frames[i] = video->MirrorSprite(frames[i], BLIT_MIRRORX, true);
 	}
 
 	// flip animArea horizontally as well
@@ -235,9 +231,7 @@ void Animation::MirrorAnimationVert()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		Sprite2D* tmp = frames[i];
-		frames[i] = video->MirrorSprite( tmp, BLIT_MIRRORY, true );
-		tmp->release();
+		frames[i] = video->MirrorSprite(frames[i], BLIT_MIRRORY, true);
 	}
 
 	// flip animArea vertically as well

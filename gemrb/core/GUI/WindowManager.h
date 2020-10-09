@@ -88,7 +88,7 @@ private:
 
 private:
 	bool IsOpenWindow(Window* win) const;
-	Sprite2D* WinFrameEdge(int edge) const;
+	Holder<Sprite2D> WinFrameEdge(int edge) const;
 
 	inline void DrawWindowFrame() const;
 	inline void DrawMouse() const;
@@ -135,7 +135,7 @@ public:
 
 	Size ScreenSize() const { return screen.Dimensions(); }
 
-	Sprite2D* GetScreenshot(Window* win);
+	Holder<Sprite2D> GetScreenshot(Window* win);
 	Window* GetGameWindow() const { return gameWin; }
 
 	static void SetTooltipDelay(int);

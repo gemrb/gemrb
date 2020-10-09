@@ -145,7 +145,7 @@ public:
 
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
-	virtual void SetAnimPicture(Sprite2D* Picture);
+	virtual void SetAnimPicture(Holder<Sprite2D> Picture);
 
 	typedef std::pair<ieDword, ieDword> ValueRange;
 	const static ValueRange MaxValueRange;

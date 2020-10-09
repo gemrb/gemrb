@@ -135,7 +135,7 @@ SaveGame::~SaveGame()
 {
 }
 
-Sprite2D* SaveGame::GetPortrait(int index) const
+Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 {
 	if (index > PortraitCount) {
 		return NULL;
@@ -148,7 +148,7 @@ Sprite2D* SaveGame::GetPortrait(int index) const
 	return im->GetSprite2D();
 }
 
-Sprite2D* SaveGame::GetPreview() const
+Holder<Sprite2D> SaveGame::GetPreview() const
 {
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(Prefix, manager, true);
 	if (!im)
@@ -456,18 +456,17 @@ static bool DoSaveGame(const char *Path)
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
 		Actor *actor = game->GetPC( i, false );
-		Sprite2D* portrait = actor->CopyPortrait(true);
+		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
 			char FName[_MAX_PATH];
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
-			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
+			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
 			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
 			// we do this because: 1. the GUI should be able to use whatever size it wants
 			// and 2. its more appropriate to have a flag on the buttons to do the scaling/cropping
-			im->PutImage( &outfile, portrait );
-			Sprite2D::FreeSprite(portrait);
+			im->PutImage(&outfile, portrait);
 		}
 	}
 
@@ -475,7 +474,7 @@ static bool DoSaveGame(const char *Path)
 	// FIXME: the preview shoudl be passed in by the caller!
 
 	WindowManager* wm = core->GetWindowManager();
-	Sprite2D* preview = wm->GetScreenshot(wm->GetGameWindow());
+	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());
 
 	// scale down to get more of the screen and reduce the size
 	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);

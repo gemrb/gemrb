@@ -45,7 +45,7 @@ public:
 	 * @param[in] type Type of palette to use.
 	 * @param[in] paletteIndex Array of palettes to use.
 	 */
-	virtual Sprite2D* GetSprite2D(unsigned int type, ieDword paletteIndex[8]) = 0;
+	virtual Holder<Sprite2D> GetSprite2D(unsigned int type, ieDword paletteIndex[8]) = 0;
 };
 
 }

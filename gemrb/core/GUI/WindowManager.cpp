@@ -505,12 +505,12 @@ void WindowManager::DrawWindowFrame() const
 
 	video->SetScreenClip( NULL );
 
-	Sprite2D* left_edge = WinFrameEdge(0);
+	Holder<Sprite2D> left_edge = WinFrameEdge(0);
 	if (left_edge) {
 		// we assume if one fails, they all do
-		Sprite2D *right_edge = WinFrameEdge(1);
-		Sprite2D *top_edge = WinFrameEdge(2);
-		Sprite2D *bot_edge = WinFrameEdge(3);
+		Holder<Sprite2D> right_edge = WinFrameEdge(1);
+		Holder<Sprite2D> top_edge = WinFrameEdge(2);
+		Holder<Sprite2D> bot_edge = WinFrameEdge(3);
 
 		int left_w = left_edge->Frame.w;
 		int right_w = right_edge->Frame.w;
@@ -615,9 +615,9 @@ void WindowManager::DrawWindows() const
 }
 
 //copies a screenshot into a sprite
-Sprite2D* WindowManager::GetScreenshot(Window* win)
+Holder<Sprite2D> WindowManager::GetScreenshot(Window* win)
 {
-	Sprite2D* screenshot = NULL;
+	Holder<Sprite2D> screenshot;
 	if (win) { // we dont really care if we are managing the window
 		// only a screen shot of passed win
 		auto& winBuf = win->DrawWithoutComposition();
@@ -634,7 +634,7 @@ Sprite2D* WindowManager::GetScreenshot(Window* win)
 	return screenshot;
 }
 
-Sprite2D* WindowManager::WinFrameEdge(int edge) const
+Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 {
 	std::string refstr = "STON";
 
@@ -665,7 +665,7 @@ Sprite2D* WindowManager::WinFrameEdge(int edge) const
 	static std::map<ResRef, FrameImage> frames;
 
 	ResRef ref = refstr.c_str();
-	Sprite2D* frame = NULL;
+	Holder<Sprite2D> frame;
 	if (frames.find(ref) != frames.end()) {
 		frame = frames[ref].get();
 	} else {

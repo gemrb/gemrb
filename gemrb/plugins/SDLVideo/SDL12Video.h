@@ -39,7 +39,7 @@ public:
 	int CreateDriverDisplay(const Size&, int bpp, const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
-	Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
+	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
 
 	bool SetFullscreenMode(bool set) override;
 
@@ -69,7 +69,7 @@ private:
 
 	int ProcessEvent(const SDL_Event & event) override;
 
-	void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
+	void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
 							  uint32_t flags = 0, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
 								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;

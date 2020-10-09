@@ -83,7 +83,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj)
 	original = surface;
 }
 
-SDLSurfaceSprite2D* SDLSurfaceSprite2D::copy() const
+Holder<Sprite2D> SDLSurfaceSprite2D::copy() const
 {
 	return new SDLSurfaceSprite2D(*this);
 }
@@ -335,7 +335,7 @@ SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& obj)
 	texture = obj.texture;
 }
 
-SDLTextureSprite2D* SDLTextureSprite2D::copy() const
+Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
 	return new SDLTextureSprite2D(*this);
 }

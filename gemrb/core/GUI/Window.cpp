@@ -189,9 +189,9 @@ String Window::TooltipText() const
 	return ScrollView::TooltipText();
 }
 
-Sprite2D* Window::Cursor() const
+Holder<Sprite2D> Window::Cursor() const
 {
-	Sprite2D* cursor = ScrollView::Cursor();
+	Holder<Sprite2D> cursor = ScrollView::Cursor();
 	if (cursor == NULL && hoverView) {
 		cursor = hoverView->Cursor();
 	}

@@ -31,7 +31,7 @@ public:
 	~ImageWriter(void);
 
 	/** Writes an Sprite2D to a stream and frees the sprite. */
-	virtual void PutImage(DataStream *output, Sprite2D *sprite) = 0;
+	virtual void PutImage(DataStream *output, Holder<Sprite2D> sprite) = 0;
 };
 
 }

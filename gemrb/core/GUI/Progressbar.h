@@ -57,11 +57,11 @@ public:
 	bool IsOpaque() const { return BackGround && BackGround->HasTransparency() == false; }
 
 	/** Sets the background images */
-	void SetImage(Sprite2D * img, Sprite2D * img2);
+	void SetImage(Holder<Sprite2D> img, Holder<Sprite2D> img2);
 	/** Sets a bam resource for progressbar */
 	void SetAnimation(Animation *arg);
 	/** Sets a mos resource for progressbar cap */
-	void SetBarCap(Sprite2D *img3);
+	void SetBarCap(Holder<Sprite2D> img3);
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(int x, int y, int x2, int y2);
 	/** Refreshes a progressbar which is associated with VariableName */

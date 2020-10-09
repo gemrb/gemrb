@@ -224,7 +224,7 @@ public:
 
 	void SwapBuffers(VideoBuffers& buffers) override;
 
-	Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
+	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
 	bool SetFullscreenMode(bool set) override;
 	void SetGamma(int brightness, int contrast) override;
 	bool ToggleGrabInput() override;
@@ -261,7 +261,7 @@ private:
 
 	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) override;
 
-	void BlitSpriteBAMClipped(const Sprite2D* /*spr*/, const Region& /*src*/, const Region& /*dst*/,
+	void BlitSpriteBAMClipped(const Holder<Sprite2D> /*spr*/, const Region& /*src*/, const Region& /*dst*/,
 					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
 								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;

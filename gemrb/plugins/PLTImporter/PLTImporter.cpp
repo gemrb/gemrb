@@ -76,7 +76,7 @@ bool PLTImporter::Open(DataStream* str)
 	return true;
 }
 
-Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
+Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
 	static int pperm[8]={3,6,0,5,4,1,2,7};
 	ColorPal<256> Palettes[8];
@@ -100,7 +100,7 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 				*dest++ = 0xff;
 		}
 	}
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
+	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
 		red_mask, green_mask, blue_mask, 0, p,
 		true, green_mask );
 	spr->Frame.x = 0;

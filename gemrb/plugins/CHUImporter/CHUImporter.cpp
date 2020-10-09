@@ -136,7 +136,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	str->ReadWord( &FirstControl );
 
 	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
-	Sprite2D* bg = NULL;
+	Holder<Sprite2D> bg;
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosFile);
 		if (mos) {
@@ -226,7 +226,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					break;
 				}
 				/** Cycle is only a byte for buttons */
-				Sprite2D* tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
+				Holder<Sprite2D> tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
 				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
@@ -269,8 +269,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
 				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
 
-				Sprite2D* img = NULL;
-				Sprite2D* img2 = NULL;
+				Holder<Sprite2D> img;
+				Holder<Sprite2D> img2;
 				if ( MOSFile[0] ) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
@@ -294,7 +294,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				}
 				else {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BAMFile);
-					Sprite2D* img3 = mos->GetSprite2D();
+					Holder<Sprite2D> img3 = mos->GetSprite2D();
 					pbar->SetBarCap( img3 );
 				}
 				ctrl = pbar;
@@ -317,7 +317,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &KnobStepsCount );
 				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
-				Sprite2D* img = mos->GetSprite2D();
+				Holder<Sprite2D> img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
 				AnimationFactory* bam = ( AnimationFactory* )
@@ -373,13 +373,13 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					gamedata->GetFactoryResource( CursorResRef,
 							IE_BAM_CLASS_ID,
 							IE_NORMAL );
-				Sprite2D *cursor = NULL;
+				Holder<Sprite2D> cursor;
 				if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
 				}
 
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BGMos);
-				Sprite2D *img = NULL;
+				Holder<Sprite2D> img;
 				if(mos) {
 					img = mos->GetSprite2D();
 				}

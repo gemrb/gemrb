@@ -175,7 +175,7 @@ void Control::SetValueRange(ieDword min, ieDword max)
 	SetValueRange(ValueRange(min, max));
 }
 
-void Control::SetAnimPicture(Sprite2D* newpic)
+void Control::SetAnimPicture(Holder<Sprite2D> newpic)
 {
 	AnimPicture = newpic;
 	MarkDirty();

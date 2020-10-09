@@ -33,7 +33,7 @@ Image::~Image()
 	delete[] data;
 }
 
-Sprite2D* Image::GetSprite2D()
+Holder<Sprite2D> Image::GetSprite2D()
 {
 	union {
 		unsigned char color[sizeof(ieDword)];

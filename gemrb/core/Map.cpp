@@ -332,7 +332,6 @@ Map::Map(void)
 	TMap = NULL;
 	LightMap = NULL;
 	HeightMap = NULL;
-	SmallMap = NULL;
 	SrchMap = NULL;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
@@ -403,7 +402,7 @@ Map::~Map(void)
 	}
 	delete LightMap;
 	delete HeightMap;
-	Sprite2D::FreeSprite( SmallMap );
+
 	for (int i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
@@ -434,10 +433,9 @@ Map::~Map(void)
 	free( VisibleBitmap );
 }
 
-void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
+void Map::ChangeTileMap(Image* lm, Holder<Sprite2D> sm)
 {
 	delete LightMap;
-	Sprite2D::FreeSprite(SmallMap);
 
 	LightMap = lm;
 	SmallMap = sm;
@@ -445,7 +443,7 @@ void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm)
+void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
@@ -1096,8 +1094,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	int bgoverride = false;
 
 	if (Background) {
-		if (BgDuration<gametime) {
-			Sprite2D::FreeSprite(Background);
+		if (BgDuration < gametime) {
+			Background = nullptr;
 		} else {
 			video->BlitSprite(Background, 0, 0);
 			bgoverride = true;
@@ -3677,7 +3675,7 @@ void AreaAnimation::BlendAnimation()
 		// from first frame of first animation
 
 		if (animcount == 0 || !animation[0]) return;
-		Sprite2D* spr = animation[0]->GetFrame(0);
+		Holder<Sprite2D> spr = animation[0]->GetFrame(0);
 		if (!spr) return;
 		palette = spr->GetPalette()->Copy();
 		PaletteRef[0] = 0;
@@ -3733,7 +3731,7 @@ void AreaAnimation::Draw(const Region& viewport, Map *area, uint32_t flags)
 	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
-		Sprite2D *frame = anim->NextFrame();
+		Holder<Sprite2D> frame = anim->NextFrame();
 		
 		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y, flags, tint);
 	}
@@ -3805,9 +3803,6 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
 	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
 
-	if (Background) {
-		Sprite2D::FreeSprite(Background);
-	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
 }

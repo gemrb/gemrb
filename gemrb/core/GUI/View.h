@@ -195,7 +195,7 @@ public:
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);
-	void SetBackground(Sprite2D*, const Color* = nullptr);
+	void SetBackground(Holder<Sprite2D>, const Color* = nullptr);
 
 	// FIXME: I don't think I like this being virtual. Currently required because ScrollView is "overriding" this
 	// we perhapps should instead have ScrollView implement SubviewAdded and move the view to its contentView there
@@ -248,8 +248,8 @@ public:
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
-	virtual Sprite2D* Cursor() const { return cursor.get(); }
-	void SetCursor(Sprite2D* c);
+	virtual Holder<Sprite2D> Cursor() const { return cursor.get(); }
+	void SetCursor(Holder<Sprite2D> c);
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting

@@ -125,7 +125,7 @@ public:
 
 	void SetPosition(WindowPosition);
 	String TooltipText() const override;
-	Sprite2D* Cursor() const override;
+	Holder<Sprite2D> Cursor() const override;
 	bool IsDisabledCursor() const override;
 	bool IsReceivingEvents() const override { return true; }
 

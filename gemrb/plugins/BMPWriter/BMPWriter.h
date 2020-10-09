@@ -7,7 +7,7 @@ public:
 	BMPWriter(void);
 	~BMPWriter(void);
 
-	void PutImage(DataStream *output, Sprite2D *sprite);
+	void PutImage(DataStream *output, Holder<Sprite2D> sprite);
 };
 
 }

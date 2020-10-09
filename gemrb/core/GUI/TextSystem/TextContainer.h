@@ -105,10 +105,10 @@ private:
 class ImageSpan : public Content
 {
 private:
-	Sprite2D* image;
+	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(Sprite2D* image);
+	ImageSpan(Holder<Sprite2D> image);
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;

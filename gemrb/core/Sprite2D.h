@@ -46,11 +46,10 @@ class AnimationFactory;
  * Objects of this class are usually created by Video driver.
  */
 
-class GEM_EXPORT Sprite2D {
+class Sprite2D;
+class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
-private:
-	int RefCount;
 protected:
 	bool freePixels;
 	void* pixels;
@@ -64,7 +63,7 @@ public:
 
 	Sprite2D(const Region&, int Bpp, void* pixels);
 	Sprite2D(const Sprite2D &obj);
-	virtual Sprite2D* copy() const = 0;
+	virtual Holder<Sprite2D> copy() const = 0;
 	virtual ~Sprite2D();
 
 	bool IsPixelTransparent(const Point& p) const;
@@ -84,16 +83,6 @@ public:
 	virtual void SetColorKey(ieDword) = 0;
 	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
 							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
-	void acquire() { ++RefCount; }
-	void release();
-
-public:
-	static void FreeSprite(Sprite2D*& spr) {
-		if (spr) {
-			spr->release();
-			spr = NULL;
-		}
-	}
 };
 
 }

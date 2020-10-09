@@ -43,7 +43,7 @@ public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
 	/** Returns a \ref Sprite2D containing the image. */
-	virtual Sprite2D* GetSprite2D() = 0;
+	virtual Holder<Sprite2D> GetSprite2D() = 0;
 	virtual Image* GetImage();
 	virtual Bitmap* GetBitmap();
 	/**

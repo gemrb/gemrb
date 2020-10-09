@@ -115,12 +115,11 @@ Holder<SymbolMgr> GetSymbols(PyObject* obj)
 
 Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 {
-	Holder<Sprite2D> pic = NULL;
+	Holder<Sprite2D> pic;
 	if (PyObject_TypeCheck( pypic, &PyString_Type )) {
 		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PyString_AsString(pypic));
 		if (im) {
 			pic = im->GetSprite2D();
-			pic->release(); // prevent leak
 		}
 	} else if (pypic != Py_None) {
 		pic = CObject<Sprite2D>(pypic);

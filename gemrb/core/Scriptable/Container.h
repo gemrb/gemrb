@@ -67,7 +67,7 @@ public:
 	Inventory inventory;
 	ieStrRef OpenFail;
 	//these are not saved
-	Sprite2D *groundicons[3];
+	Holder<Sprite2D> groundicons[3];
 	//keyresref is stored in Highlightable
 };
 

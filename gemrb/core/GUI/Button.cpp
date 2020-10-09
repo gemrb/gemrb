@@ -63,7 +63,6 @@ Button::Button(Region& frame)
 Button::~Button()
 {
 	SetImage(BUTTON_IMAGE_NONE, NULL);
-	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 
 	gamedata->FreePalette( normal_palette);
@@ -87,7 +86,7 @@ void Button::UnregisterHotKey()
 
 /** Sets the 'type' Image of the Button to 'img'.
  see 'BUTTON_IMAGE_TYPE' */
-void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
+void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 {
 	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
 		Log(ERROR, "Button", "Trying to set a button image index out of range: %d", type);
@@ -95,14 +94,12 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 	}
 
 	if (type <= BUTTON_IMAGE_NONE) {
-		for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			Sprite2D::FreeSprite(buttonImages[i]);
+		for (int i = 0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+			buttonImages[i] = nullptr;
 		}
 		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		Sprite2D::FreeSprite(buttonImages[type]);
 		buttonImages[type] = img;
-		// FIXME: why do we not acquire the image here?!
 		/*
 		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
@@ -141,7 +138,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Button image
 	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
-		Sprite2D* Image = NULL;
+		Holder<Sprite2D> Image;
 
 		switch (State) {
 			case IE_GUI_BUTTON_FAKEPRESSED:
@@ -222,7 +219,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Composite pictures (paperdolls/description icons)
 	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
-		std::vector<Sprite2D*>::iterator iter = PictureList.begin();
+		auto iter = PictureList.begin();
 		int xOffs = 0, yOffs = 0;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
@@ -423,12 +420,12 @@ String Button::TooltipText() const
 	return Control::TooltipText();
 }
 
-Sprite2D* Button::Cursor() const
+Holder<Sprite2D> Button::Cursor() const
 {
 	if (IS_PORTRAIT) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
-			Sprite2D* cur = gc->GetTargetActionCursor();
+			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
 			if (cur) return cur;
 		}
 	}
@@ -650,20 +647,17 @@ void Button::DoToggle()
 }
 
 /** Sets the Picture */
-void Button::SetPicture(Sprite2D* newpic)
+void Button::SetPicture(Holder<Sprite2D> newpic)
 {
-	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 	Picture = newpic;
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
 		unsigned int ratio = round((float) Picture->Frame.w / (float) frame.w);
 		if (ratio > 1) {
-			Sprite2D *img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
-			Sprite2D::FreeSprite(Picture);
+			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
 			Picture = img;
 		}
-		Picture->acquire();
 		flags |= IE_GUI_BUTTON_PICTURE;
 	} else {
 		flags &= ~IE_GUI_BUTTON_PICTURE;
@@ -674,15 +668,12 @@ void Button::SetPicture(Sprite2D* newpic)
 /** Clears the list of Pictures */
 void Button::ClearPictureList()
 {
-	for (std::vector<Sprite2D*>::iterator iter = PictureList.begin();
-		 iter != PictureList.end(); ++iter)
-		Sprite2D::FreeSprite( *iter );
 	PictureList.clear();
 	MarkDirty();
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(Sprite2D* Picture)
+void Button::StackPicture(Holder<Sprite2D> Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();
@@ -695,7 +686,7 @@ bool Button::HitTest(const Point& p) const
 	if (hit) {
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
-		Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
+		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
 		if (Picture || PictureList.size() || !Unpressed) return true;
 
 		Point off;

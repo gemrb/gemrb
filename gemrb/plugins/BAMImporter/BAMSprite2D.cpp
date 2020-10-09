@@ -49,7 +49,7 @@ BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	freePixels = false; // managed by AnimationFactory
 }
 
-BAMSprite2D* BAMSprite2D::copy() const
+Holder<Sprite2D> BAMSprite2D::copy() const
 {
 	return new BAMSprite2D(*this);
 }

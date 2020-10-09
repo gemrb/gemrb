@@ -171,7 +171,7 @@ public:
 	Font(PaletteHolder, ieWord lineheight, ieWord baseline);
 	virtual ~Font();
 
-	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
+	const Glyph& CreateGlyphForCharSprite(ieWord chr, Holder<Sprite2D>);
 	// BAM fonts use alisases a lot so this saves quite a bit of space
 	// Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 	void CreateAliasForChar(ieWord chr, ieWord alias);
@@ -184,7 +184,7 @@ public:
 
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
-	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
+	Holder<Sprite2D> RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
 								 size_t* numPrinted = NULL, Point* = NULL) const;
 
 	// return the number of glyphs printed

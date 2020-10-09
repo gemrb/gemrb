@@ -421,11 +421,10 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	if (tgta) {
 		// displaying npc text and portrait
-		Sprite2D* portrait = tgta->CopyPortrait(1);
+		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
 		ta->SetAnimPicture(portrait);
 		ta->AppendText(L"\n");
 		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
-		Sprite2D::FreeSprite(portrait);
 	}
 
 	int idx = 0;

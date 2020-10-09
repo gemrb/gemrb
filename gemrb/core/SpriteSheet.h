@@ -35,20 +35,16 @@ protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
-	SpriteSheet() {
-		Sheet = NULL;
-	}
+	SpriteSheet() = default;
 
 public:
-	Sprite2D* Sheet;
+	Holder<Sprite2D> Sheet;
 
 public:
-	SpriteSheet(Sprite2D* sheet) : Sheet(sheet) {
-		Sheet->acquire();
+	SpriteSheet(Holder<Sprite2D> sheet) : Sheet(sheet) {
 		SheetRegion = Sheet->Frame;
 	};
 	virtual ~SpriteSheet() {
-		if (Sheet) Sheet->release();
 	}
 
 	const Region& operator[](KeyType key) {

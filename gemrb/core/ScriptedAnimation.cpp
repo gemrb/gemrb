@@ -369,9 +369,6 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		delete twin;
 	}
 	StopSound();
-	if (light) {
-		Sprite2D::FreeSprite(light);
-	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
@@ -502,7 +499,7 @@ void ScriptedAnimation::SetOrientation(int orientation)
 	}
 }
 
-bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
+bool ScriptedAnimation::HandlePhase(Holder<Sprite2D> &frame)
 {
 	Game *game = core->GetGame();
 
@@ -639,7 +636,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 
-	Sprite2D* frame;
+	Holder<Sprite2D> frame;
 
 	if (HandlePhase(frame)) {
 		//expired
@@ -749,7 +746,7 @@ void ScriptedAnimation::GetPaletteCopy()
 	//therefore the cycle
 	for (Animation *anim : anims) {
 		if (anim) {
-			Sprite2D* spr = anim->GetFrame(0);
+			Holder<Sprite2D> spr = anim->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
 				if ((Transparency&IE_VVC_BLENDED) && palette->HasAlpha() == false) {

@@ -6656,7 +6656,7 @@ void Actor::SetDialog(const ieResRef resref)
 	CopyResRef(Dialog, resref);
 }
 
-Sprite2D* Actor::CopyPortrait(int which) const
+Holder<Sprite2D> Actor::CopyPortrait(int which) const
 {
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(which ? SmallPortrait : LargePortrait, true);
 	return (im) ? im->GetSprite2D() : NULL;
@@ -8476,7 +8476,7 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 		Animation* anim = part.first;
 		PaletteHolder palette = part.second;
 
-		Sprite2D* currentFrame = anim->CurrentFrame();
+		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
 			if (palette->HasAlpha() && TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
@@ -8710,7 +8710,7 @@ bool Actor::UpdateDrawingState()
 		Region newBBox(Pos, Size());
 		for (const auto& part : currentStance.anim) {
 			Animation* anim = part.first;
-			Sprite2D* animframe = anim->CurrentFrame();
+			Holder<Sprite2D> animframe = anim->CurrentFrame();
 			assert(animframe);
 			Region partBBox = animframe->Frame;
 			partBBox.x = Pos.x - partBBox.x;

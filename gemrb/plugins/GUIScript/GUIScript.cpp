@@ -2219,14 +2219,14 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(view);
 
 	if (pypic == Py_None) {
-		view->SetBackground(NULL);
+		view->SetBackground(nullptr);
 	} else {
 		Holder<Sprite2D> pic = SpriteFromPy(pypic);
 
 		if (pic == NULL) {
 			return RuntimeError("Failed to acquire the picture!\n");
 		}
-		view->SetBackground(pic.get());
+		view->SetBackground(pic);
 	}
 
 	Py_RETURN_NONE;
@@ -2370,7 +2370,7 @@ static PyObject* GemRB_Button_SetSprites(PyObject* self, PyObject* args)
 			snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", ResRef);
 			return RuntimeError( tmpstr );
 		}
-		Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
+		Holder<Sprite2D> tspr = af->GetFrame(unpressed, (unsigned char)cycle);
 		btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 		tspr = af->GetFrame( pressed, (unsigned char) cycle);
 		btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
@@ -3532,8 +3532,8 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	Sprite2D *Picture;
-	Sprite2D *Picture2=NULL;
+	Holder<Sprite2D> Picture;
+	Holder<Sprite2D> Picture2;
 
 	// NOTE: it seems nobody actually wants to use external palettes!
 	// the only users with external plts are in bg2, but they don't match the bam:
@@ -3614,16 +3614,14 @@ static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, i
 		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af)
 		return NULL;
-	Sprite2D* Picture = af->GetFrame ( FrameIndex, CycleIndex );
+	Holder<Sprite2D> Picture = af->GetFrame (FrameIndex, CycleIndex);
 
 	if (Picture == NULL) {
 		return NULL;
 	}
 
 	if (col1 >= 0) {
-		Sprite2D* old = Picture;
-		Picture = old->copy();
-		Sprite2D::FreeSprite(old);
+		Picture = Picture->copy();
 
 		PaletteHolder newpal = Picture->GetPalette()->Copy();
 		const auto& pal16 = core->GetPalette16(col1);
@@ -6084,9 +6082,8 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	Actor* actor = game->FindPC( PartyID );
 	if (actor) {
-		Sprite2D* portrait = actor->CopyPortrait(which);
+		Holder<Sprite2D> portrait = actor->CopyPortrait(which);
 		CObject<Sprite2D> obj(portrait);
-		if (portrait) portrait->release();
 		PyObject* dict = PyDict_New();
 		PyDict_SetItemString(dict, "Sprite", obj);
 		PyDict_SetItemString(dict, "ResRef", PyString_FromString(which ? actor->SmallPortrait : actor->LargePortrait));
@@ -6480,7 +6477,7 @@ static PyObject* GemRB_Button_SetSpellIcon(PyObject* self, PyObject* args)
 }
 
 
-static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
+static Holder<Sprite2D> GetUsedWeaponIcon(Item *item, int which)
 {
 	ITMExtHeader *ieh = item->GetWeaponHeader(false);
 	if (!ieh) {
@@ -6552,7 +6549,7 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 	}
 
 	btn->SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR);
-	Sprite2D* Picture;
+	Holder<Sprite2D> Picture;
 	bool setpicture = true;
 	int i;
 	switch (Which) {
@@ -6577,7 +6574,7 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 				btn->SetPicture( NULL ); // also calls ClearPictureList
 				Item* item2 = gamedata->GetItem(Item2ResRef, true);
 				if (item2) {
-					Sprite2D* Picture2;
+					Holder<Sprite2D> Picture2;
 					Picture2 = gamedata->GetBAMSprite(item2->ItemIcon, -1, Which-4, true);
 					if (Picture2) btn->StackPicture(Picture2);
 					gamedata->FreeItem( item2, Item2ResRef, false );
@@ -10453,8 +10450,8 @@ static void ReadActionButtons()
 
 static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
 {
-	Sprite2D *tspr = bam->GetFrame( cycle, 0 );
-	btn->SetImage( (BUTTON_IMAGE_TYPE)which, tspr );
+	Holder<Sprite2D> tspr = bam->GetFrame(cycle, 0);
+	btn->SetImage((BUTTON_IMAGE_TYPE)which, tspr);
 }
 
 PyDoc_STRVAR( GemRB_Button_SetActionIcon__doc,
@@ -10646,7 +10643,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		btn->SetValue( Start+i );
 
 		ItemExtHeader *item = ItemArray+i;
-		Sprite2D *Picture = NULL;
+		Holder<Sprite2D> Picture;
 
 		if (item->UseIcon[0]) {
 			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0, true);

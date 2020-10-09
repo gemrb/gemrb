@@ -141,10 +141,10 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
+Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
 										bool RLESprite, unsigned char* data)
 {
-	Sprite2D* spr = 0;
+	Holder<Sprite2D> spr;
 
 	if (RLESprite) {
 		assert(data);
@@ -266,7 +266,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 
 	for (i = 0; i < FramesCount; ++i) {
 		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
-		Sprite2D* frame = GetFrameInternal(i, mode, RLECompressed, data);
+		Holder<Sprite2D> frame = GetFrameInternal(i, mode, RLECompressed, data);
 		assert(!RLECompressed || frame->BAM);
 		af->AddFrame(frame);
 	}
@@ -280,7 +280,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 If the Global Animation Palette is NULL, returns NULL. */
-Sprite2D* BAMImporter::GetPalette()
+Holder<Sprite2D> BAMImporter::GetPalette()
 {
 	unsigned char * pixels = ( unsigned char * ) malloc( 256 );
 	unsigned char * p = pixels;

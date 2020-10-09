@@ -553,7 +553,7 @@ public:
 	const char* GetDialog(int flags=GD_NORMAL) const;
 	void SetDialog(const ieResRef resref);
 	/** Gets the Portrait */
-	Sprite2D* CopyPortrait(int which) const;
+	Holder<Sprite2D> CopyPortrait(int which) const;
 
 	/** Gets the attack projectile */
 	Projectile* GetAttackProjectile()

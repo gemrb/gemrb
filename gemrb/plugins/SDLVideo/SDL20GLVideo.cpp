@@ -215,18 +215,18 @@ bool GLVideoDriver::createPrograms()
 	return true;
 }
 
-Sprite2D* GLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
+Holder<Sprite2D> GLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask, ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
-	GLTextureSprite2D* spr = new GLTextureSprite2D(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
+	GLTextureHolder<Sprite2D> spr = new GLTextureSprite2D(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
 	if (cK) spr->SetColorKey(index);
 	return spr;
 }
 
-Sprite2D* GLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels, Color* palette, bool cK, int index)
+Holder<Sprite2D> GLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels, Color* palette, bool cK, int index)
 {
 	if (palette == NULL) return NULL;
 
-	GLTextureSprite2D* spr = new GLTextureSprite2D(rgn, bpp, pixels);
+	GLTextureHolder<Sprite2D> spr = new GLTextureSprite2D(rgn, bpp, pixels);
 	spr->SetPaletteManager(paletteManager);
 	PaletteHolder pal = new Palette(palette);
 	spr->SetPalette(pal);
@@ -234,13 +234,13 @@ Sprite2D* GLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* 
 	return spr;
 }
 
-Sprite2D* GLVideoDriver::CreateSprite8(const Region& rgn, void* pixels, PaletteHolder palette, bool cK, int index)
+Holder<Sprite2D> GLVideoDriver::CreateSprite8(const Region& rgn, void* pixels, PaletteHolder palette, bool cK, int index)
 {
 	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 
-void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, const Region& dst, PaletteHolder attachedPal,
-								 unsigned int flags, const Color* tint, GLTextureSprite2D* mask)
+void GLVideoDriver::GLBlitSprite(GLTextureHolder<Sprite2D> spr, const Region& src, const Region& dst, PaletteHolder attachedPal,
+								 unsigned int flags, const Color* tint, GLTextureHolder<Sprite2D> mask)
 {
 	// TODO: clip dst to the screen?
 	if (dst.w <= 0 || dst.h <= 0 || src.w <= 0 || src.h <= 0)
@@ -383,7 +383,7 @@ void GLVideoDriver::GLBlitSprite(GLTextureSprite2D* spr, const Region& src, cons
 	spritesPerFrame++;
 }
 
-void GLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst, PaletteHolder palette)
+void GLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, const Region& dst, PaletteHolder palette)
 {
 	GLBlitSprite((GLTextureSprite2D*)spr, src, dst, palette);
 }
@@ -523,7 +523,7 @@ static Region ClipSprite(const Sprite2D &sprite, const Region &clip, const int t
 	return r;
 }
 
-void GLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
+void GLVideoDriver::BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip, unsigned int flags, const Color* tint)
 {
 	int tx = x - spr->Frame.x;
 	int ty = y - spr->Frame.y;
@@ -561,7 +561,7 @@ void GLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* cl
 						NULL, blitFlags, (totint ? &tileTint : NULL), (GLTextureSprite2D*)mask);
 }
 
-void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned int flags, Color tint,
+void GLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, int x, int y, unsigned int flags, Color tint,
 								   SpriteCover* cover, PaletteHolder palette, const Region* clip, bool anchor)
 {
 	int tx = x - spr->Frame.x;
@@ -571,7 +571,7 @@ void GLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y, unsigned i
 		tx -= Viewport.x;
 		ty -= Viewport.y;
 	}
-	GLTextureSprite2D* glSprite = (GLTextureSprite2D*)spr;
+	GLTextureHolder<Sprite2D> glSprite = (GLTextureSprite2D*)spr;
 	GLuint coverTexture = 0;
 
 	if(glSprite->IsPaletted())
@@ -772,7 +772,7 @@ int GLVideoDriver::SwapBuffers()
 	return val;
 }
 
-Sprite2D* GLVideoDriver::GetScreenshot(Region r)
+Holder<Sprite2D> GLVideoDriver::GetScreenshot(Region r)
 {
 	unsigned int w = r.w ? r.w : width - r.x;
 	unsigned int h = r.h ? r.h : height - r.y;
@@ -793,7 +793,7 @@ Sprite2D* GLVideoDriver::GetScreenshot(Region r)
 		pixelSrcPointer -= w;
 	}
 	free(glPixels);
-	Sprite2D* screenshot = new GLTextureSprite2D(w, h, 32, pixels, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
+	Holder<Sprite2D> screenshot = new GLTextureSprite2D(w, h, 32, pixels, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000);
 	return screenshot;
 }
 

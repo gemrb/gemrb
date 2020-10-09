@@ -223,9 +223,9 @@ void BMPImporter::Read4To8(void *rpixels)
 	}
 }
 
-Sprite2D* BMPImporter::GetSprite2D()
+Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
-	Sprite2D* spr = NULL;
+	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
 		const ieDword red_mask = 0x000000ff;
 		const ieDword green_mask = 0x0000ff00;

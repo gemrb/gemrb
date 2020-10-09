@@ -51,7 +51,7 @@ GLTextureSprite2D::GLTextureSprite2D(const GLTextureSprite2D &obj) : Sprite2D(ob
 	SetPalette(obj.currentPalette);
 }
 
-GLTextureSprite2D* GLTextureSprite2D::copy() const
+GLTextureHolder<Sprite2D> GLTextureSprite2D::copy() const
 {
 	return new GLTextureSprite2D(*this);
 }

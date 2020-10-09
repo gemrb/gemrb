@@ -358,7 +358,7 @@ static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const R
 }
 
 template<typename Blender, typename Tinter>
-static void BlitSpriteRLE(const Sprite2D* spr, const Region& srect,
+static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 						  SDL_Surface* dst, const Region& drect,
 						  IAlphaIterator* cover,
 						  uint32_t flags, const Tinter& tint)

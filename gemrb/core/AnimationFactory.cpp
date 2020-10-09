@@ -36,9 +36,6 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 
 AnimationFactory::~AnimationFactory(void)
 {
-	for (unsigned int i = 0; i < frames.size(); i++) {
-		frames[i]->release();
-	}
 	if (FLTable)
 		free( FLTable);
 
@@ -46,7 +43,7 @@ AnimationFactory::~AnimationFactory(void)
 		free( FrameData);
 }
 
-void AnimationFactory::AddFrame(Sprite2D* frame)
+void AnimationFactory::AddFrame(Holder<Sprite2D> frame)
 {
 	frames.push_back( frame );
 }
@@ -82,14 +79,13 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 	Animation* anim = new Animation( cycles[cycle].FramesCount );
 	int c = 0;
 	for (int i = ff; i < lf; i++) {
-		frames[FLTable[i]]->acquire();
-		anim->AddFrame( frames[FLTable[i]], c++ );
+		anim->AddFrame(frames[FLTable[i]], c++);
 	}
 	return anim;
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */
-Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
+Holder<Sprite2D> AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
 {
 	if (cycle >= cycles.size()) {
 		return NULL;
@@ -98,23 +94,19 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) 
 	if(index >= fc) {
 		return NULL;
 	}
-	Sprite2D* spr = frames[FLTable[ff+index]];
-	spr->acquire();
-	return spr;
+	return frames[FLTable[ff+index]];
 }
 
-Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
+Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
 {
 	if(index >= frames.size()) {
 		return NULL;
 	}
-	Sprite2D* spr = frames[index];
-	spr->acquire();
-	return spr;
+	return frames[index];
 }
 
-Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
-		Sprite2D *&Picture2, unsigned int type) const
+Holder<Sprite2D> AnimationFactory::GetPaperdollImage(ieDword *Colors,
+		Holder<Sprite2D> &Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {
 		return NULL;
@@ -148,7 +140,7 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	Picture2->Frame.x = (short)frames[second]->Frame.x;
 	Picture2->Frame.y = (short)frames[second]->Frame.y - 80;
 
-	Sprite2D* spr = frames[first]->copy();
+	Holder<Sprite2D> spr = frames[first]->copy();
 	if (Colors) {
 		PaletteHolder palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);

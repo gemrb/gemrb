@@ -133,17 +133,17 @@ public:
 	bool IsOpaque() const;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
-	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);
+	void SetImage(BUTTON_IMAGE_TYPE, Holder<Sprite2D> img);
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	/** Sets the Picture */
-	void SetPicture(Sprite2D* Picture);
+	void SetPicture(Holder<Sprite2D> Picture);
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
-	void StackPicture(Sprite2D* Picture);
+	void StackPicture(Holder<Sprite2D> Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
@@ -160,7 +160,7 @@ public:
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
 
-	Sprite2D* Cursor() const;
+	Holder<Sprite2D> Cursor() const;
 
 	/** Refreshes the button from a radio group */
 	void UpdateState(unsigned int Sum);
@@ -184,11 +184,11 @@ private: // Private attributes
 	bool pulseBorder;
 	PaletteHolder normal_palette;
 	PaletteHolder disabled_palette;
-	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
+	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
-	Sprite2D* Picture;
+	Holder<Sprite2D> Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
-	std::vector<Sprite2D*> PictureList;
+	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;

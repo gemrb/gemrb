@@ -158,7 +158,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskc
 	return maskit;
 }
 
-void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst,
+void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
 											uint32_t flags, const Color* t)
 {
 	Color tint(255,255,255,255);
@@ -248,7 +248,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Sprite2D* spr, const Region& s
 
 void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
 {
-	const SDLSurfaceSprite2D* sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
+	const SDLSurfaceSprite2D *sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
 	SDL_Surface* surf = sdlspr->GetSurface();
 
 	Color c;
@@ -522,12 +522,12 @@ SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
 	return std::static_pointer_cast<SDLSurfaceVideoBuffer>(stencilBuffer)->Surface();
 }
 
-Sprite2D* SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr& buf)
+Holder<Sprite2D> SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr& buf)
 {
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLSurfaceSprite2D* screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
+	SDLSurfaceSprite2D *screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
 															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
 	SDL_Rect src = RectFromRegion(r);
 	if (buf) {

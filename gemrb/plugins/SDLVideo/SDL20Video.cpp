@@ -509,7 +509,7 @@ void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 	}
 }
 
-Sprite2D* SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr& buf)
+Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr& buf)
 {
 	SDL_Rect rect = RectFromRegion(r);
 

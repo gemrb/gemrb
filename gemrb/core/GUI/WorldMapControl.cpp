@@ -88,8 +88,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 		int xOffs = MAP_TO_SCREENX(m->X);
 		int yOffs = MAP_TO_SCREENY(m->Y);
-		Sprite2D* icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
-		if( icon ) {
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
 				PaletteHolder pal = icon->GetPalette();
 				icon->SetPalette(pal_selected.get());
@@ -98,7 +98,6 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			} else {
 				video->BlitSprite( icon, xOffs, yOffs, &rgn );
 			}
-			Sprite2D::FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
@@ -114,14 +113,13 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		Sprite2D *icon=m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		int h=0,w=0,xpos=0,ypos=0;
 		if (icon) {
 			h=icon->Frame.h;
 			w=icon->Frame.w;
 			xpos=icon->Frame.x;
 			ypos=icon->Frame.y;
-			Sprite2D::FreeSprite( icon );
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
@@ -156,7 +154,7 @@ void WorldMapControl::ScrollTo(const Point& pos)
 {
 	Pos = pos;
 	WorldMap* worldmap = core->GetWorldMap();
-	Sprite2D *MapMOS = worldmap->GetMapMOS();
+	Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
 
 	int maxx = MapMOS->Frame.w - frame.w;
 	int maxy = MapMOS->Frame.h - frame.h;
@@ -187,14 +185,13 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 				continue; //invisible or inaccessible
 			}
 
-			Sprite2D *icon=ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
+			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
 			Region rgn(ae->X, ae->Y, 0, 0);
 			if (icon) {
 				rgn.x -= icon->Frame.x;
 				rgn.y -= icon->Frame.y;
 				rgn.w = icon->Frame.w;
 				rgn.h = icon->Frame.h;
-				Sprite2D::FreeSprite( icon );
 			}
 			if (ftext && ae->GetCaption()) {
 				Size ts = ftext->StringSize(*ae->GetCaption());

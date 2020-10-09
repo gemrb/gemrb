@@ -55,11 +55,8 @@ Container::Container(void)
 
 void Container::FreeGroundIcons()
 {
-	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		if (groundicons[i]) {
-			Sprite2D::FreeSprite( groundicons[i] );
-			groundicons[i]=NULL;
-		}
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
+		groundicons[i] = nullptr;
 	}
 }
 
@@ -73,7 +70,7 @@ Region Container::DrawingRegion() const
 	Region r;
 	
 	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
-		const Sprite2D* icon = groundicons[i];
+		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
 			r.ExpandToRegion(icon->Frame);
 		}
@@ -94,7 +91,7 @@ void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color
 	game->ApplyGlobalTint(tint, flags);
 
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		const Sprite2D* icon = groundicons[i];
+		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
 			if (highlight) {
 				video->BlitGameSprite(icon, Pos.x - vp.x, Pos.y - vp.y, flags, tint);

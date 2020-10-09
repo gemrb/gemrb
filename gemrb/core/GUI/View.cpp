@@ -71,7 +71,7 @@ View::~View()
 	}
 }
 
-void View::SetBackground(Sprite2D* bg, const Color* c)
+void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 {
 	background = bg;
 	if (c) backgroundColor = *c;
@@ -79,7 +79,7 @@ void View::SetBackground(Sprite2D* bg, const Color* c)
 	MarkDirty();
 }
 
-void View::SetCursor(Sprite2D* c)
+void View::SetCursor(Holder<Sprite2D> c)
 {
 	cursor = c;
 }

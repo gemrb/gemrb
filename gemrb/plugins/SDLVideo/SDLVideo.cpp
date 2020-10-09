@@ -238,7 +238,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask,
+Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask,
 	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
 {
 	sprite_t* spr = new sprite_t(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
@@ -257,13 +257,13 @@ Sprite2D* SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask
 	return spr;
 }
 
-Sprite2D* SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
+Holder<Sprite2D> SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
 										PaletteHolder palette, bool cK, int index)
 {
 	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
 }
 
-Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
+Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 											   Color* palette, bool cK, int index)
 {
 	sprite_t* spr = new sprite_t(rgn, bpp, pixels, 0, 0, 0, 0);
@@ -275,7 +275,7 @@ Sprite2D* SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void*
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* clip, uint32_t flags, const Color* tint)
+void SDLVideoDriver::BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip, uint32_t flags, const Color* tint)
 {
 	assert(spr->BAM == false);
 
@@ -287,7 +287,7 @@ void SDLVideoDriver::BlitTile(const Sprite2D* spr, int x, int y, const Region* c
 	BlitSpriteClipped(spr, srect, fClip, flags, tint);
 }
 
-void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region dst)
+void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst)
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
@@ -295,7 +295,7 @@ void SDLVideoDriver::BlitSprite(const Sprite2D* spr, const Region& src, Region d
 	BlitSpriteClipped(spr, src, dst, flags);
 }
 
-void SDLVideoDriver::BlitGameSprite(const Sprite2D* spr, int x, int y,
+void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, int x, int y,
 									uint32_t flags, Color tint, const Region* clip)
 {
 	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Frame.w, spr->Frame.h));
@@ -536,7 +536,7 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, uint32_t flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, uint32_t flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BLIT_MIRRORX or BLIT_MIRRORY is set
@@ -590,7 +590,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Sprite2D* spr, Region src, const Re
 	} else {
 		SDL_Rect srect = RectFromRegion(src);
 		SDL_Rect drect = RectFromRegion(dclipped);
-		const sprite_t* native = static_cast<const sprite_t*>(spr);
+		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
 		BlitSpriteNativeClipped(native, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
 }
