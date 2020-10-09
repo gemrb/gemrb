@@ -500,15 +500,15 @@ endalign:
 					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
 					break;
 				}
-				Sprite2D* images[ScrollBar::IMAGE_COUNT];
-				for (int i=0; i < ScrollBar::IMAGE_COUNT; i++) {
-					str->ReadWord( &imgIdx );
-					images[i] = bam->GetFrame( imgIdx, Cycle );
+				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
+				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
+					str->ReadWord(&imgIdx);
+					images[i] = bam->GetFrame(imgIdx, Cycle);
 				}
 				str->ReadWord( &TAID );
-				
+
 				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
-				
+
 				if (TAID == 0xffff) {
 					// text areas produce their own scrollbars in GemRB
 					ctrl = sb;

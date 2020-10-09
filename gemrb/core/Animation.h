@@ -37,7 +37,7 @@ class Sprite2D;
 
 class GEM_EXPORT Animation {
 private:
-	Sprite2D **frames;
+	std::vector<Sprite2D *> frames;
 	unsigned int indicesCount;
 	unsigned long starttime;
 public:

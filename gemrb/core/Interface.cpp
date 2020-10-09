@@ -152,9 +152,6 @@ Interface::Interface()
 
 	UseCorruptedHack = false;
 
-	CursorCount = 0;
-	Cursors = NULL;
-
 	mousescrollspd = 10;
 
 	GameType[0] = '\0';
@@ -210,8 +207,6 @@ Interface::Interface()
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
 	//GameFeatures2 = 0;
-	memset( GroundCircles, 0, sizeof( GroundCircles ));
-	memset(FogSprites, 0, sizeof( FogSprites ));
 	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
@@ -358,11 +353,8 @@ Interface::~Interface(void)
 
 	delete sgiterator;
 
-	if (Cursors) {
-		for (int i = 0; i < CursorCount; i++) {
-			Sprite2D::FreeSprite( Cursors[i] );
-		}
-		delete[] Cursors;
+	for (auto &c: Cursors) {
+		Sprite2D::FreeSprite(c);
 	}
 
 	size_t i;
@@ -1042,12 +1034,13 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
+	int CursorCount = 0;
 	if (anim)
 	{
 		CursorCount = anim->GetCycleCount();
-		Cursors = new Sprite2D * [CursorCount];
+		Cursors.reserve(CursorCount);
 		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetFrame( 0, (ieByte) i );
+			Cursors.push_back(anim->GetFrame(0, (ieByte) i));
 		}
 	}
 

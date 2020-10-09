@@ -425,11 +425,9 @@ public:
 	ResRef GlobalScript;
 	ResRef WorldMapName[2];
 	Variables * AreaAliasTable;
-	Sprite2D **Cursors;
-	int CursorCount;
-	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
-	Sprite2D *FogSprites[32];
-	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
+	std::vector<Sprite2D *> Cursors;
+	Sprite2D *FogSprites[32] {};
+	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time;
