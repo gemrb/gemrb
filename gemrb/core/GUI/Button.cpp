@@ -48,8 +48,6 @@ Button::Button(Region& frame)
 	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);
 
 	hasText = false;
-	normal_palette = NULL;
-	disabled_palette = NULL;
 	SetFont(core->GetButtonFont());
 	SetFlags(IE_GUI_BUTTON_NORMAL, OP_OR);
 	ToggleState = false;
@@ -64,9 +62,6 @@ Button::~Button()
 {
 	SetImage(BUTTON_IMAGE_NONE, NULL);
 	ClearPictureList();
-
-	gamedata->FreePalette( normal_palette);
-	gamedata->FreePalette( disabled_palette);
 
 	if (hotKey.global) {
 		UnregisterHotKey();
@@ -368,7 +363,6 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
-	gamedata->FreePalette(disabled_palette);
 	disabled_palette = font->GetPalette()->Copy();
 	disabled_palette->Darken();
 }
@@ -700,10 +694,7 @@ bool Button::HitTest(const Point& p) const
 // Set palette used for drawing button label in normal state
 void Button::SetTextColor(const Color &fore, const Color &back)
 {
-	gamedata->FreePalette( normal_palette );
-	gamedata->FreePalette(disabled_palette);
-
-	normal_palette = new Palette( fore, back );
+	normal_palette = new Palette(fore, back);
 	disabled_palette = new Palette(fore, back);
 	disabled_palette->Darken();
 	MarkDirty();

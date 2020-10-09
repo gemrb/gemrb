@@ -363,8 +363,6 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		delete anim;
 	}
 
-	palette = nullptr;
-
 	if (twin) {
 		delete twin;
 	}
@@ -719,9 +717,7 @@ void ScriptedAnimation::SetBlend()
 {
 	if ((Transparency&IE_VVC_BLENDED) == 0) {
 		Transparency |= IE_VVC_BLENDED;
-		if (palette) {
-			palette = nullptr;
-		}
+		palette = nullptr;
 		GetPaletteCopy();
 		if (twin)
 			twin->SetBlend();

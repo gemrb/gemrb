@@ -3571,7 +3571,6 @@ AreaAnimation::AreaAnimation()
 {
 	animation=NULL;
 	animcount=0;
-	palette=NULL;
 	appearance = sequence = frame = transparency = height = 0;
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
@@ -3616,7 +3615,6 @@ AreaAnimation::~AreaAnimation()
 		}
 	}
 	free(animation);
-	gamedata->FreePalette(palette, PaletteRef);
 }
 
 Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)

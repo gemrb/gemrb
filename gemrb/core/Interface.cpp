@@ -144,7 +144,6 @@ Interface::Interface()
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
 	UseContainer = false;
-	InfoTextPalette = NULL;
 	timer = NULL;
 	displaymsg = NULL;
 	slottypes = NULL;
@@ -367,12 +366,6 @@ Interface::~Interface(void)
 	delete timer;
 	delete displaymsg;
 	delete TooltipBG;
-
-	if (video) {
-		if (InfoTextPalette) {
-			gamedata->FreePalette(InfoTextPalette);
-		}
-	}
 
 	delete vars;
 	delete tokens;
@@ -980,8 +973,6 @@ void Interface::Main()
 					   IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
 		}
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
-
-	gamedata->FreePalette( palette );
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
@@ -1184,7 +1175,6 @@ int Interface::LoadFonts()
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
 		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
-		gamedata->FreePalette(pal);
 
 		if (!fnt) {
 			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());
@@ -4763,9 +4753,6 @@ void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
 
 void Interface::SetInfoTextColor(const Color &color)
 {
-	if (InfoTextPalette) {
-		gamedata->FreePalette(InfoTextPalette);
-	}
 	InfoTextPalette = new Palette(color, ColorBlack);
 }
 

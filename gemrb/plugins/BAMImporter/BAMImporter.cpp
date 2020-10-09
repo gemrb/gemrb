@@ -45,7 +45,6 @@ BAMImporter::BAMImporter(void)
 	str = NULL;
 	frames = NULL;
 	cycles = NULL;
-	palette = NULL;
 	FramesCount = 0;
 	CyclesCount = 0;
 	CompressedColorIndex = DataStart = 0;
@@ -57,7 +56,6 @@ BAMImporter::~BAMImporter(void)
 	delete str;
 	delete[] frames;
 	delete[] cycles;
-	gamedata->FreePalette(palette);
 }
 
 bool BAMImporter::Open(DataStream* stream)
@@ -70,7 +68,9 @@ bool BAMImporter::Open(DataStream* stream)
 	delete str;
 	delete[] frames;
 	delete[] cycles;
-	gamedata->FreePalette(palette);
+	frames = nullptr;
+	cycles = nullptr;
+	palette = nullptr;
 
 	str = stream;
 	char Signature[8];
