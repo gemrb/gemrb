@@ -35,7 +35,6 @@ Label::Label(const Region& frame, Font* font, const String& string)
 {
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
-	palette = NULL;
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
 	SetFlags(IgnoreEvents, OP_OR);
@@ -44,8 +43,8 @@ Label::Label(const Region& frame, Font* font, const String& string)
 
 Label::~Label()
 {
-	gamedata->FreePalette( palette );
 }
+
 /** Draws the Control on the Output Display */
 void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {
@@ -74,8 +73,7 @@ void Label::SetText(const String& string)
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)
 {
-	gamedata->FreePalette( palette );
-	palette = new Palette( col, bac );
+	palette = new Palette(col, bac);
 	MarkDirty();
 }
 

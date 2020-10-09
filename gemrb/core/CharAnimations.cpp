@@ -670,10 +670,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	Colors = NULL;
 	for (size_t i = 0; i < PAL_MAX; ++i) {
 		change[i] = true;
-		modifiedPalette[i] = NULL;
-		palette[i] = NULL;
 	}
-	shadowPalette = NULL;
 	previousStanceID = nextStanceID = 0;
 	StanceID = 0;
 	autoSwitchOnEnd = false;
