@@ -56,9 +56,6 @@ SDLAudio::~SDLAudio(void)
 	Mix_ChannelFinished(NULL);
 }
 
-// no user data for Mix_ChannelFinished :(
-SDLAudio *g_sdlaudio = NULL;
-
 bool SDLAudio::Init(void)
 {
 	// TODO: we assume SDLVideo already got loaded
@@ -75,7 +72,6 @@ bool SDLAudio::Init(void)
 	}
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
-	g_sdlaudio = this;
 	Mix_ReserveChannels(1); // for speech
 	return true;
 }
@@ -83,32 +79,38 @@ bool SDLAudio::Init(void)
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
 	SDL_mutexP(driver->OurMutex);
+	
+	// It's brutal, but at least it prevents the game from crashing
+	try {
+		do {
 
-	do {
+			// TODO: conversion? mutexes? sanity checks? :)
+			int num_samples = len / 2;
+			int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
 
-		// TODO: conversion? mutexes? sanity checks? :)
-		int num_samples = len / 2;
-		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
+			// Done?
+			if (cnt == num_samples)
+				break;
 
-		// Done?
-		if (cnt == num_samples)
-			break;
+			// TODO: this shouldn't be in the callback (see also the openal thread)
+			Log(MESSAGE, "SDLAudio", "Playing Next Music");
+			core->GetMusicMgr()->PlayNext();
 
-		// TODO: this shouldn't be in the callback (see also the openal thread)
-		Log(MESSAGE, "SDLAudio", "Playing Next Music");
-		core->GetMusicMgr()->PlayNext();
+			stream = stream + cnt;
+			len = len - (cnt * 2);
 
-		stream = stream + cnt;
-		len = len - (cnt * 2);
+			if (!driver->MusicPlaying) {
+				Log(MESSAGE, "SDLAudio", "No Other Music to play");
+				memset(stream, 0, len);
+				Mix_HookMusic(NULL, NULL);
+				break;
+			}
 
-		if (!driver->MusicPlaying) {
-			Log(MESSAGE, "SDLAudio", "No Other Music to play");
-			memset(stream, 0, len);
-			Mix_HookMusic(NULL, NULL);
-			break;
-		}
-
-	} while(true);
+		} while(true);
+	}
+	catch(std::exception &e) {
+		Log(ERROR, "SDLAudio", "Music callback error! %s", e.what());
+	}
 
 	SDL_mutexV(driver->OurMutex);
 }
