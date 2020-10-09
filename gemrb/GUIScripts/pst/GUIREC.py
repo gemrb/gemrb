@@ -67,6 +67,7 @@
 import GemRB
 import GUICommon
 import CommonTables
+import LUCommon
 import GUICommonWindows
 import NewLife
 from GUIDefines import *
@@ -148,17 +149,10 @@ def UpdateRecordsWindow (Window):
 
 	# Checking whether character has leveled up.
 	Button = Window.GetControl (9)
-	if avatar_header['SecoLevel'] == 0:
-		if avatar_header['XP'] >= avatar_header['PrimNextLevXP']:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
+	if LUCommon.CanLevelUp (pc):
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
-		# Character is Multi-Class
-		if avatar_header['XP'] >= avatar_header['PrimNextLevXP'] or avatar_header['XP'] >= avatar_header['SecoNextLevXP']:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# name
 	Label = Window.GetControl (0x1000000a)
