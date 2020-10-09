@@ -558,6 +558,20 @@ def IsMultiClassed (actor, verbose):
 	# return the tuple
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
+def NamelessOneClass (actor):
+	# simple check to identify if the actor is TNO
+	# and return his active class (by name)
+
+	if not GameCheck.IsPST():
+		return None
+
+	Specific = GemRB.GetPlayerStat (actor, IE_SPECIFIC)
+	if Specific == 2:
+		Class = GetClassRowName(actor)
+		return Class
+
+	return None
+
 def CanDualClass(actor):
 	# race restriction (human)
 	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))

@@ -59,6 +59,21 @@ def CanLevelUp(actor):
 		next = GUIREC.GetNextLevelExp(levelsum, GUIREC.GetECL(actor))
 		return next <= xp
 
+	# hardcoded special case to handle TNO, who is usually a single class 
+	# but with three separate Levels/XP values and the ability to switch between them
+	# it returns the active class if true
+	SwitcherClass = GUICommon.NamelessOneClass(actor) 
+	if SwitcherClass:
+		xp = { "FIGHTER" : GemRB.GetPlayerStat (actor, IE_XP), "MAGE" : GemRB.GetPlayerStat (actor, IE_XP_MAGE), "THIEF" : GemRB.GetPlayerStat (actor, IE_XP_THIEF) }
+		lvls = { "FIGHTER" : Levels[0] , "MAGE": Levels[1], "THIEF": Levels [2] }
+
+		tmpNext = GetNextLevelExp (lvls[SwitcherClass], SwitcherClass)
+		if (tmpNext != 0 or lvls[SwitcherClass] == 0) and tmpNext <= xp[SwitcherClass]:
+			return 1
+		#ignore the rest of this function, to avoid false positives
+		#other classes can only be achieved by hacking the game somehow
+		return 0
+
 	if Multi[0] > 1: # multiclassed
 		xp = xp/Multi[0] # divide the xp evenly between the classes
 		for i in range (Multi[0]):
