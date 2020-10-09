@@ -56,21 +56,21 @@ public:
 	SDLSurfaceSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
-	SDLSurfaceSprite2D* copy() const;
+	SDLSurfaceSprite2D* copy() const override;
 
-	const void* LockSprite() const;
-	void* LockSprite();
-	void UnlockSprite() const;
+	const void* LockSprite() const override;
+	void* LockSprite() override;
+	void UnlockSprite() const override;
 
-	PaletteHolder GetPalette() const;
+	PaletteHolder GetPalette() const override;
 	int SetPalette(const Color* pal) const;
-	void SetPalette(PaletteHolder pal);
-	int32_t GetColorKey() const;
-	void SetColorKey(ieDword pxvalue);
-	bool HasTransparency() const;
-	Color GetPixel(const Point&) const;
+	void SetPalette(PaletteHolder pal) override;
+	int32_t GetColorKey() const override;
+	void SetColorKey(ieDword pxvalue) override;
+	bool HasTransparency() const override;
+	Color GetPixel(const Point&) const override;
 	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
-						 ieDword bmask, ieDword amask);
+						 ieDword bmask, ieDword amask) override;
 
 	SDL_Surface* GetSurface() const { return *surface; };
 
@@ -108,15 +108,15 @@ public:
 	SDLTextureSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLTextureSprite2D(const SDLTextureSprite2D& obj);
-	SDLTextureSprite2D* copy() const;
+	SDLTextureSprite2D* copy() const override;
 
 	using SDLSurfaceSprite2D::SetPalette;
-	void SetColorKey(ieDword pxvalue);
+	void SetColorKey(ieDword pxvalue) override;
 
 	SDL_Texture* GetTexture(SDL_Renderer* renderer) const;
 
-	void* NewVersion(version_t version) const;
-	void Restore() const;
+	void* NewVersion(version_t version) const override;
+	void Restore() const override;
 };
 #endif
 
