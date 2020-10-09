@@ -63,7 +63,7 @@ public:
 	/** Sets the actual Slider Position trimming to the Max and Min Values */
 	void SetPosition(unsigned int pos);
 	/** Sets the selected image */
-	void SetImage(unsigned char type, Sprite2D * img);
+	void SetImage(unsigned char type, Holder<Sprite2D> img);
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */

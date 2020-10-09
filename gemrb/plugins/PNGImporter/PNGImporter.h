@@ -38,7 +38,7 @@ public:
 	~PNGImporter(void);
 	void Close();
 	bool Open(DataStream* stream);
-	Sprite2D* GetSprite2D();
+	Holder<Sprite2D> GetSprite2D();
 	void GetPalette(int colors, Color* pal);
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }

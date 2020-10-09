@@ -116,7 +116,7 @@ public:
 	//these are signed
 	int XPos, YPos, ZPos;
 	ieDword LightX, LightY, LightZ;
-	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
+	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	ieDword FrameRate;
 	ieDword NumOrientations;
 	ieDword Orientation;
@@ -168,7 +168,7 @@ public:
 	ScriptedAnimation *DetachTwin();
 private:
 	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false);
-	bool HandlePhase(Sprite2D *&frame);
+	bool HandlePhase(Holder<Sprite2D> &frame);
 	void GetPaletteCopy();
 	void IncrementPhase();
 	/* stops any sound playing */

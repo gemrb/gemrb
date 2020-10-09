@@ -26,6 +26,7 @@
 #include "globals.h"
 
 #include "Region.h"
+#include "Holder.h"
 
 #include <vector>
 
@@ -37,7 +38,7 @@ class Sprite2D;
 
 class GEM_EXPORT Animation {
 private:
-	std::vector<Sprite2D *> frames;
+	std::vector<Holder<Sprite2D>> frames;
 	unsigned int indicesCount;
 	unsigned long starttime;
 public:
@@ -49,16 +50,17 @@ public:
 	bool gameAnimation;
 	Region animArea;
 	ieDword Flags;
+
 	Animation(int count);
-	~Animation(void);
-	void AddFrame(Sprite2D* frame, unsigned int index);
-	Sprite2D* CurrentFrame() const;
-	Sprite2D* LastFrame();
-	Sprite2D* NextFrame();
-	Sprite2D* GetSyncedNextFrame(Animation* master);
+	~Animation();
+	void AddFrame(Holder<Sprite2D> frame, unsigned int index);
+	Holder<Sprite2D> CurrentFrame() const;
+	Holder<Sprite2D> LastFrame();
+	Holder<Sprite2D> NextFrame();
+	Holder<Sprite2D> GetSyncedNextFrame(Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
-	Sprite2D* GetFrame(unsigned int i) const;
+	Holder<Sprite2D> GetFrame(unsigned int i) const;
 	/** Mirrors all the frames vertically */
 	void MirrorAnimationVert();
 	/** Mirrors all the frames horizontally */

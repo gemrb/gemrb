@@ -367,7 +367,7 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 		draw |= D_UP;
 	}
 
-	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
+	Holder<Sprite2D> spr = core->GetScrollCursorSprite(0,0);
 	int tmp = spr->Frame.w;
 	if (p.x > vpOrigin.x + frame.w - tmp) {
 		p.x = vpOrigin.x + frame.w;
@@ -382,11 +382,9 @@ void GameControl::DrawArrowMarker(Point p, const Color& color)
 
 	if (arrow_orientations[draw]>=0) {
 		Video* video = core->GetVideoDriver();
-		Sprite2D *arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
+		Holder<Sprite2D> arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
 		video->BlitGameSprite(arrow, p.x - vpOrigin.x, p.y - vpOrigin.y, BLIT_TINTED | BLIT_BLENDED, color, NULL);
-		arrow->release();
 	}
-	spr->release();
 }
 
 void GameControl::DrawTargetReticle(int size, const Color& color, const Point& p) const
@@ -457,9 +455,7 @@ void GameControl::WillDraw()
 
 				if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
 					// set these cursors on game window so they are universal
-					Sprite2D* cursor = core->GetScrollCursorSprite(cursorFrame, numScrollCursor);
-					window->SetCursor(cursor);
-					Sprite2D::FreeSprite(cursor);
+					window->SetCursor(core->GetScrollCursorSprite(cursorFrame, numScrollCursor));
 
 					numScrollCursor = (numScrollCursor+1) % 15;
 				}
@@ -652,11 +648,10 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// Draw lightmap
 	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
-		Sprite2D* spr = area->LightMap->GetSprite2D();
-		video->BlitSprite( spr, 0, 0 );
-		Sprite2D::FreeSprite( spr );
-		Region point( gameMousePos.x / 16, gameMousePos.y / 12, 2, 2 );
-		video->DrawRect( point, ColorRed );
+		Holder<Sprite2D> spr = area->LightMap->GetSprite2D();
+		video->BlitSprite(spr, 0, 0);
+		Region point(gameMousePos.x / 16, gameMousePos.y / 12, 2, 2);
+		video->DrawRect(point, ColorRed);
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
@@ -1266,7 +1261,7 @@ int GameControl::GetCursorOverContainer(Container *overContainer) const
 	return IE_CURSOR_TAKE;
 }
 
-Sprite2D* GameControl::GetTargetActionCursor() const
+Holder<Sprite2D> GameControl::GetTargetActionCursor() const
 {
 	int curIdx = -1;
 	switch(target_mode) {
@@ -1292,9 +1287,9 @@ Sprite2D* GameControl::GetTargetActionCursor() const
 	return nullptr;
 }
 
-Sprite2D* GameControl::Cursor() const
+Holder<Sprite2D> GameControl::Cursor() const
 {
-	Sprite2D* cursor = View::Cursor();
+	Holder<Sprite2D> cursor = View::Cursor();
 	if (cursor == NULL && lastCursor != IE_CURSOR_INVALID) {
 		int idx = lastCursor & ~IE_CURSOR_GRAY;
 		if (EventMgr::MouseDown()) {

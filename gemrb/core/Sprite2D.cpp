@@ -31,14 +31,12 @@ Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
-	RefCount = 1;
 	renderFlags = 0;
 }
 
 Sprite2D::Sprite2D(const Sprite2D &obj)
 {
 	BAM = false;
-	RefCount = 1;
 
 	Frame = obj.Frame;
 	Bpp = obj.Bpp;
@@ -77,13 +75,5 @@ void* Sprite2D::LockSprite()
 
 void Sprite2D::UnlockSprite() const
 {}
-
-void Sprite2D::release()
-{
-	assert(RefCount > 0);
-	if (--RefCount == 0) {
-		delete this;
-	}
-}
 
 }

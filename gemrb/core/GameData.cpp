@@ -420,9 +420,9 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
 {
-	Sprite2D *tspr;
+	Holder<Sprite2D> tspr;
 	AnimationFactory* af = ( AnimationFactory* )
 		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL, silent );
 	if (!af) return 0;

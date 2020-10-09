@@ -181,12 +181,12 @@ void Video::SetEventMgr(EventMgr* evnt)
 // Flips given sprite according to the flags. If MirrorAnchor=true,
 // flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Sprite2D* Video::MirrorSprite(const Sprite2D* sprite, uint32_t flags, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
 
-	Sprite2D* dest = sprite->copy();
+	Holder<Sprite2D> dest = sprite->copy();
 
 	if (flags&BLIT_MIRRORX) {
 		dest->renderFlags ^= BLIT_MIRRORX;
@@ -209,7 +209,7 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitSprite(const Sprite2D* spr, int x, int y,
+void Video::BlitSprite(const Holder<Sprite2D> spr, int x, int y,
 								const Region* clip)
 {
 	Region dst(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
@@ -235,7 +235,7 @@ void Video::BlitSprite(const Sprite2D* spr, int x, int y,
 	BlitSprite(spr, src, fClip);
 }
 
-void Video::BlitTiled(Region rgn, const Sprite2D* img)
+void Video::BlitTiled(Region rgn, const Holder<Sprite2D> img)
 {
 	int xrep = ( rgn.w + img->Frame.w - 1 ) / img->Frame.w;
 	int yrep = ( rgn.h + img->Frame.h - 1 ) / img->Frame.h;
@@ -247,7 +247,7 @@ void Video::BlitTiled(Region rgn, const Sprite2D* img)
 	}
 }
 
-void Video::BlitGameSpriteWithPalette(Sprite2D* spr, PaletteHolder pal, int x, int y,
+void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, int x, int y,
 							   uint32_t flags, Color tint, const Region* clip)
 {
 	if (pal) {
@@ -261,7 +261,7 @@ void Video::BlitGameSpriteWithPalette(Sprite2D* spr, PaletteHolder pal, int x, i
 }
 
 //Sprite conversion, creation
-Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
+Holder<Sprite2D> Video::CreateAlpha( const Holder<Sprite2D> sprite)
 {
 	if (!sprite)
 		return 0;
@@ -292,7 +292,7 @@ Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
 		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
-Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
+Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned int ratio )
 {
 	Region scaledFrame = sprite->Frame;
 	scaledFrame.w /= ratio;
@@ -309,7 +309,7 @@ Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 		}
 	}
 
-	Sprite2D* small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
+	Holder<Sprite2D> small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
 0xff000000, pixels, false, 0 );
 
 	small->Frame.x = sprite->Frame.x / ratio;
@@ -320,7 +320,7 @@ Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
 
 //TODO light could be elliptical in the original engine
 //is it difficult?
-Sprite2D* Video::CreateLight(int radius, int intensity)
+Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
 	Point p, q;
@@ -339,7 +339,7 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 		}
 	}
 
-	Sprite2D* light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
 
 	light->Frame.x = radius;
 	light->Frame.y = radius;
@@ -347,7 +347,7 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
 {
 	// TODO: turn this into one of our software "shaders"
 	Color sum;

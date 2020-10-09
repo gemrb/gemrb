@@ -36,7 +36,7 @@ public:
 	bool Open(DataStream* stream);
 	Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL);
-	Sprite2D* GetTile(int index);
+	Holder<Sprite2D> GetTile(int index);
 public:
 };
 

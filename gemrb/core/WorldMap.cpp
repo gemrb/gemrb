@@ -52,13 +52,12 @@ WMPAreaEntry::~WMPAreaEntry()
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
-	Sprite2D::FreeSprite(MapIcon);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 {
 	SetBits(AreaStatus, arg, op);
-	Sprite2D::FreeSprite(MapIcon);
+	MapIcon = nullptr;
 }
 
 const String* WMPAreaEntry::GetCaption()
@@ -79,14 +78,14 @@ const char* WMPAreaEntry::GetTooltip()
 
 static int gradients[5]={18,22,19,3,4};
 
-void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
+void WMPAreaEntry::SetPalette(int gradient, Holder<Sprite2D> MapIcon)
 {
 	if (!MapIcon) return;
 	const auto& colors = core->GetPalette256(gradient);
 	MapIcon->SetPalette(new Palette(&colors[0], &colors[256]));
 }
 
-Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
+Holder<Sprite2D> WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
@@ -123,7 +122,6 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
 			SetPalette(color, MapIcon);
 		}
 	}
-	MapIcon->acquire();
 	return MapIcon;
 }
 
@@ -242,9 +240,6 @@ WorldMap::~WorldMap(void)
 	for (i = 0; i < area_links.size(); i++) {
 		delete( area_links[i] );
 	}
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
 	if (Distances) {
 		free(Distances);
 	}
@@ -259,11 +254,8 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 	bam = newicons;
 }
 
-void WorldMap::SetMapMOS(Sprite2D *newmos)
+void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 {
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
 	MapMOS = newmos;
 }
 

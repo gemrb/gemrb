@@ -130,7 +130,7 @@ public:
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	void SetAnimPicture(Sprite2D* Picture);
+	void SetAnimPicture(Holder<Sprite2D> Picture);
 
 	ContentContainer::Margin GetMargins() const;
 	void SetMargins(ContentContainer::Margin m);

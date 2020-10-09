@@ -425,9 +425,9 @@ public:
 	ResRef GlobalScript;
 	ResRef WorldMapName[2];
 	Variables * AreaAliasTable;
-	std::vector<Sprite2D *> Cursors;
-	Sprite2D *FogSprites[32] {};
-	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6] {};
+	std::vector<Holder<Sprite2D> > Cursors;
+	Holder<Sprite2D> FogSprites[32] {};
+	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time;
@@ -627,9 +627,9 @@ public:
 	/** is an area loaded? (prefer Game::GetCurrentArea if including Game.h makes sense) */
 	bool HasCurrentArea() const;
 	/** returns a cursor sprite (not cached) */
-	Sprite2D *GetCursorSprite();
+	Holder<Sprite2D> GetCursorSprite();
 	/** returns a scroll cursor sprite */
-	Sprite2D *GetScrollCursorSprite(int frameNum, int spriteNum);
+	Holder<Sprite2D> GetScrollCursorSprite(int frameNum, int spriteNum);
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;

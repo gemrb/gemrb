@@ -117,7 +117,7 @@ void ControlAnimation::UpdateAnimation(bool paused)
 }
 
 void ControlAnimation::UpdateAnimationSprite () {
-	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
+	Holder<Sprite2D> pic = bam->GetFrame((unsigned short) frame, (unsigned char) cycle);
 
 	if (pic == NULL) {
 		//stopping at end frame

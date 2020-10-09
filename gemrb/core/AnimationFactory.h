@@ -32,26 +32,26 @@ namespace GemRB {
 
 class GEM_EXPORT AnimationFactory : public FactoryObject {
 private:
-	std::vector< Sprite2D*> frames;
-	std::vector< CycleEntry> cycles;
+	std::vector<Holder<Sprite2D>> frames;
+	std::vector<CycleEntry> cycles;
 	unsigned short* FLTable;	// Frame Lookup Table
 	unsigned char* FrameData;
 
 public:
 	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void);
-	void AddFrame(Sprite2D* frame);
+	void AddFrame(Holder<Sprite2D> frame);
 	void AddCycle(CycleEntry cycle);
 	void LoadFLT(unsigned short* buffer, int count);
 	void SetFrameData(unsigned char* FrameData);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
-	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0) const;
-	Sprite2D* GetFrameWithoutCycle(unsigned short index) const;
+	Holder<Sprite2D> GetFrame(unsigned short index, unsigned char cycle=0) const;
+	Holder<Sprite2D> GetFrameWithoutCycle(unsigned short index) const;
 	size_t GetCycleCount() const { return cycles.size(); }
 	size_t GetFrameCount() const { return frames.size(); }
 	int GetCycleSize(size_t idx) const;
-	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
+	Holder<Sprite2D> GetPaperdollImage(ieDword *Colors, Holder<Sprite2D> &Picture2,
 		unsigned int type) const;
 
 };

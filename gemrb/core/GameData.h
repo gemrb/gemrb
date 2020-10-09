@@ -103,7 +103,7 @@ public:
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
+	Holder<Sprite2D> GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
 
 	/** returns factory resource, currently works only with animations */
 	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,

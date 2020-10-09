@@ -22,6 +22,8 @@
 #include "RGBAColor.h"
 #include "exports.h"
 
+#include "Holder.h"
+
 namespace GemRB {
 
 class Sprite2D;
@@ -53,7 +55,7 @@ public:
 	{
 		return width;
 	}
-	Sprite2D *GetSprite2D();
+	Holder<Sprite2D> GetSprite2D();
 private:
 	unsigned int height, width;
 	Color *data;

@@ -36,7 +36,7 @@ namespace GemRB
 		GLTextureSprite2D (int Width, int Height, int Bpp, void* pixels, Uint32 rmask=0, Uint32 gmask=0, Uint32 bmask=0, Uint32 amask=0);
 		~GLTextureSprite2D();
 		GLTextureSprite2D(const GLTextureSprite2D &obj);
-		GLTextureSprite2D* copy() const;
+		GLTextureHolder<Sprite2D> copy() const;
 		void MakeUnused();
 	};
 }

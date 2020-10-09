@@ -87,7 +87,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 			const ieByte* pixels = static_cast<const ieByte*>(Sheet->LockSprite());
 			std::copy(pixels, pixels + (Sheet->Frame.w * Sheet->Frame.h), pageData);
 			Sheet->UnlockSprite();
-			Sprite2D::FreeSprite(Sheet);
+			Sheet = nullptr;
 		} else {
 			pageData = (ieByte*)realloc(pageData, SheetRegion.w * glyphH);
 		}
@@ -169,7 +169,7 @@ void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
 	AtlasIndex[chr] = GlyphIndexEntry(chr, pageIdx, g);
 }
 
-const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Sprite2D* spr)
+const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D> spr)
 {
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);
@@ -452,7 +452,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 	return linePos;
 }
 
-Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
+Holder<Sprite2D> Font::RenderTextAsSprite(const String& string, const Size& size,
 								   ieByte alignment, size_t* numPrinted, Point* endPoint) const
 {
 	Size canvasSize = StringSize(string); // same as size(0, 0)
@@ -524,7 +524,7 @@ Sprite2D* Font::RenderTextAsSprite(const String& string, const Size& size,
 	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
 		rgn.y = -(size.h - rgn.h);
 	}
-	Sprite2D* canvas = core->GetVideoDriver()->CreateSprite8(rgn, canvasPx, palette, true, 0);
+	Holder<Sprite2D> canvas = core->GetVideoDriver()->CreateSprite8(rgn, canvasPx, palette, true, 0);
 
 	return canvas;
 }
@@ -533,7 +533,7 @@ void Font::SetAtlasPalette(PaletteHolder pal) const
 {
 	GlyphAtlas::const_iterator it;
 	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
-		Sprite2D* sheet = (*it)->Sheet;
+		Holder<Sprite2D> sheet = (*it)->Sheet;
 		if (sheet)
 			sheet->SetPalette(pal);
 	}

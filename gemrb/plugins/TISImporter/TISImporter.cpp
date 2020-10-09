@@ -86,7 +86,7 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	return new Tile( ani );
 }
 
-Sprite2D* TISImporter::GetTile(int index)
+Holder<Sprite2D> TISImporter::GetTile(int index)
 {
 	Color Col[256];
 	Color Palette[256]{};

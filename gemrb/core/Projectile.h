@@ -264,7 +264,7 @@ protected:
 	//special (not using char animations)
 	Animation* travel[MAX_ORIENT];
 	Animation* shadow[MAX_ORIENT];
-	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
+	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	EffectQueue* effects;
 	Projectile **children;
 	int child_size;
@@ -410,7 +410,7 @@ private:
 	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
 
 private:
-	void Draw(Sprite2D* spr, const Point& p,
+	void Draw(Holder<Sprite2D> spr, const Point& p,
 			  unsigned int flags, Color tint) const;
 };
 

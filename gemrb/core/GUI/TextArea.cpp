@@ -285,7 +285,7 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 	}
 }
 
-void TextArea::SetAnimPicture(Sprite2D* pic)
+void TextArea::SetAnimPicture(Holder<Sprite2D> pic)
 {
 	if (core->HasFeature(GF_ANIMATED_DIALOG)) {
 		// FIXME: there isnt a specific reason why animatied dialog couldnt also use pics

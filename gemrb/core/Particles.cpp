@@ -232,7 +232,7 @@ void Particles::Draw(const Region &vp)
 		case SP_TYPE_BITMAP:
 			/*
 			if (bitmap[state]) {
-				Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
+				Holder<Sprite2D> frame = bitmap[state]->GetFrame(points[i].state&255);
 				video->BlitGameSprite(frame,
 					points[i].pos.x+screen.x,
 					points[i].pos.y+screen.y, 0, clr,
@@ -244,7 +244,7 @@ void Particles::Draw(const Region &vp)
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
 				if (anims) {
 					Animation* anim = anims[0];
-					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
+					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
 					ieDword flags = 0;
 					if (game) game->ApplyGlobalTint(clr, flags);

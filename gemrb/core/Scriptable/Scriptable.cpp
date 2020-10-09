@@ -1743,7 +1743,7 @@ void Selectable::DrawCircle(const Point& p) const
 
 	Color mix;
 	const Color* col = &selectedColor;
-	Sprite2D* sprite = circleBitmap[0];
+	Holder<Sprite2D> sprite = circleBitmap[0];
 
 	if (Selected && !Over) {
 		sprite = circleBitmap[1];
@@ -1805,7 +1805,7 @@ void Selectable::Select(int Value)
 	}
 }
 
-void Selectable::SetCircle(int circlesize, float factor, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)
+void Selectable::SetCircle(int circlesize, float factor, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle)
 {
 	size = circlesize;
 	sizeFactor = factor;

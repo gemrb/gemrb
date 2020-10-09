@@ -154,9 +154,9 @@ bool PNGImporter::Open(DataStream* stream)
 	return true;
 }
 
-Sprite2D* PNGImporter::GetSprite2D()
+Holder<Sprite2D> PNGImporter::GetSprite2D()
 {
-	Sprite2D* spr = 0;
+	Holder<Sprite2D> spr;
 	unsigned char* buffer = 0;
 	png_bytep* row_pointers = new png_bytep[Height];
 	buffer = (unsigned char *) malloc((hasPalette?1:4)*Width*Height);

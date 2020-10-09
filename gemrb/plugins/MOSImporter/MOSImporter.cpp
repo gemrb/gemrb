@@ -73,7 +73,7 @@ bool MOSImporter::Open(DataStream* stream)
 	return true;
 }
 
-Sprite2D* MOSImporter::GetSprite2D()
+Holder<Sprite2D> MOSImporter::GetSprite2D()
 {
 	Color Col[256];
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
@@ -120,7 +120,7 @@ Sprite2D* MOSImporter::GetSprite2D()
 		}
 	}
 	free( blockpixels );
-	Sprite2D* ret = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
+	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
 		red_mask, green_mask, blue_mask, 0,
 		pixels, true, green_mask );
 	return ret;

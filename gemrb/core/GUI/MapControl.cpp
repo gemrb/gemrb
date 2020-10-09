@@ -201,7 +201,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			Point pos = ConvertPointFromGame(mn.Pos);
 
-			Sprite2D* anim = (flags) ? flags->GetFrame(0, mn.color) : NULL;
+			Holder<Sprite2D> anim = flags ? flags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
 				video->BlitSprite( anim, pos.x - anim->Frame.w/2, pos.y - anim->Frame.h/2, &rgn );
 			} else {
@@ -241,7 +241,7 @@ void MapControl::UpdateCursor()
 			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			Sprite2D* cursor = (EventMgr::MouseButtonState(GEM_MB_ACTION)) ? core->Cursors[IE_CURSOR_PRESSED] : NULL;
+			Holder<Sprite2D> cursor = EventMgr::MouseButtonState(GEM_MB_ACTION) ? core->Cursors[IE_CURSOR_PRESSED] : nullptr;
 			SetCursor(cursor);
 			break;
 	}

@@ -19,7 +19,7 @@ BMPWriter::~BMPWriter()
 {
 }
 
-void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
+void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
 	ieDword tmpDword;
 	ieWord tmpWord;

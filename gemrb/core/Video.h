@@ -186,28 +186,28 @@ public:
 
 	virtual bool TouchInputEnabled() = 0;
 
-	virtual Sprite2D* CreateSprite(const Region&, int bpp, ieDword rMask,
+	virtual Holder<Sprite2D> CreateSprite(const Region&, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSprite8(const Region&, void* pixels,
+	virtual Holder<Sprite2D> CreateSprite8(const Region&, void* pixels,
 									PaletteHolder palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreatePalettedSprite(const Region&, int bpp, void* pixels,
+	virtual Holder<Sprite2D> CreatePalettedSprite(const Region&, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 
-	virtual void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
+	virtual void BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip,
 						  uint32_t flags, const Color* tint = NULL) = 0;
-	void BlitSprite(const Sprite2D* spr, int x, int y,
+	void BlitSprite(const Holder<Sprite2D> spr, int x, int y,
 					const Region* clip = NULL);
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) = 0;
+	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) = 0;
 
 	// Note: Tint cannot be constified, because it is modified locally
 	// not a pretty interface :)
-	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
+	virtual void BlitGameSprite(const Holder<Sprite2D> spr, int x, int y,
 								uint32_t flags, Color tint,
 								const Region* clip = NULL) = 0;
 
-	void BlitGameSpriteWithPalette(Sprite2D* spr, PaletteHolder pal, int x, int y,
+	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, int x, int y,
 				   uint32_t flags, Color tint, const Region* clip = NULL);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
@@ -215,7 +215,7 @@ public:
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
-	virtual Sprite2D* GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr) = 0;
+	virtual Holder<Sprite2D> GetScreenshot(Region r, const VideoBufferPtr& buf = nullptr) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
 
@@ -235,13 +235,13 @@ public:
 	void DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags = 0);
 	void DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Sprite2D* img);
+	void BlitTiled(Region rgn, const Holder<Sprite2D> img);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
-	Sprite2D *MirrorSprite(const Sprite2D *sprite, uint32_t flags, bool MirrorAnchor);
+	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor);
 	/** Duplicates and transforms sprite to have an alpha channel */
-	Sprite2D* CreateAlpha(const Sprite2D *sprite);
+	Holder<Sprite2D> CreateAlpha(const Holder<Sprite2D> sprite);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
@@ -250,12 +250,12 @@ public:
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */
-	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
+	Holder<Sprite2D> SpriteScaleDown(const Holder<Sprite2D> sprite, unsigned int ratio);
 	/** Creates an ellipse or circle shaped sprite with various intensity
 	 *  for projectile light spots */
-	Sprite2D* CreateLight(int radius, int intensity);
+	Holder<Sprite2D> CreateLight(int radius, int intensity);
 
-	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
+	Color SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 };
 
 }

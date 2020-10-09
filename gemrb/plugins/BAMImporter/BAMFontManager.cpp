@@ -51,12 +51,9 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
 	// FIXME: this test only exists to let the minimal test pass
 	// we should maybe instead use a *valid* font for such a "test"
-	Sprite2D* spr = af->GetFrame(0);
-	if (spr == NULL) {
-		return NULL;
+	if (af->GetFrame(0) == nullptr) {
+		return nullptr;
 	}
-	spr->release();
-	spr = NULL;
 
 	if (af->GetFrameCount() == 0) return NULL; // the minimal test will explode without this...
 	bool isNumeric = (af->GetCycleCount() <= 1);
@@ -68,10 +65,9 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		// since state icons should all be the same size/position we can just take the position of the first one
 		static const ieWord topIconCycles[] = {254 /* level up icon */, 153 /* dialog icon */, 154 /* store icon */, 37 /* separator glyph (like '-')*/};
 		for (size_t i = 0; i < 3; i++) {
-			spr = af->GetFrame(0, topIconCycles[i]);
+			Holder<Sprite2D> spr = af->GetFrame(0, topIconCycles[i]);
 			if (spr->Frame.x > 0) // not all datasets are messed up here
 				spr->Frame.y = spr->Frame.x;
-			spr->release();
 		}
 	}
 
@@ -84,31 +80,22 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 	ieWord baseLine = 0;
 	ieWord lineHeight = 0;
 	if (isNumeric) {
-		spr = af->GetFrame(0);
 		baseLine = 0;
-		lineHeight = spr->Frame.h;
-		spr->release();
+		lineHeight = af->GetFrame(0)->Frame.h;
 	} else {
-		spr = af->GetFrame(0, 0);
-		baseLine = spr->Frame.h;
-		spr->release();
-		spr = af->GetFrame(0, 1);
-		lineHeight = spr->Frame.h;
-		spr->release();
+		baseLine = af->GetFrame(0, 0)->Frame.h;
+		lineHeight = af->GetFrame(0, 1)->Frame.h;
 	}
 
-	spr = af->GetFrameWithoutCycle(0);
 	if (!pal) {
-		pal = spr->GetPalette();
+		pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	}
 	Font* fnt = new Font(pal, lineHeight, baseLine);
-	spr->release();
 
 	std::map<Sprite2D*, ieWord> tmp;
-	std::map<Sprite2D*, ieWord>::const_iterator i;
 	for (ieWord cycle = 0; cycle < af->GetCycleCount(); cycle++) {
 		for (ieWord frame = 0; frame < af->GetCycleSize(cycle); frame++) {
-			spr = af->GetFrame(frame, cycle);
+			Holder<Sprite2D> spr = af->GetFrame(frame, cycle);
 			assert(spr);
 
 			ieWord chr = '\0';
@@ -117,7 +104,8 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 			} else {
 				chr = ((frame << 8) | (cycle&0x00ff)) + 1;
 			}
-			i = tmp.find(spr);
+			Sprite2D *key = spr.get();
+			auto i = tmp.find(key);
 			if (i != tmp.end()) {
 				// opimization for when glyphs are shared between cycles
 				// just alias the existing character
@@ -125,9 +113,8 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 				fnt->CreateAliasForChar(i->second, chr);
 			} else {
 				fnt->CreateGlyphForCharSprite(chr, spr);
-				tmp[spr] = chr;
+				tmp[key] = chr;
 			}
-			spr->release();
 		}
 	}
 

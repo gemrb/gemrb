@@ -216,8 +216,8 @@ public:
 	void UpdateTargetMode();
 
 	// returns the default cursor fitting the targeting mode
-	Sprite2D* GetTargetActionCursor() const;
-	Sprite2D* Cursor() const;
+	Holder<Sprite2D> GetTargetActionCursor() const;
+	Holder<Sprite2D> Cursor() const;
 
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 

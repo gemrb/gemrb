@@ -38,7 +38,7 @@ public:
 	BAMSprite2D(const Region&, void* pixels,
 				PaletteHolder palette, ieDword colorkey);
 	BAMSprite2D(const BAMSprite2D &obj);
-	BAMSprite2D* copy() const override;
+	Holder<Sprite2D> copy() const override;
 
 	PaletteHolder GetPalette() const override;
 	void SetPalette(PaletteHolder pal) override;

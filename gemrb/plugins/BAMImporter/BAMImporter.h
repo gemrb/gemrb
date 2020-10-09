@@ -52,7 +52,7 @@ private:
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	unsigned long DataStart;
 private:
-	Sprite2D* GetFrameInternal(unsigned short findex, unsigned char mode,
+	Holder<Sprite2D> GetFrameInternal(unsigned short findex, unsigned char mode,
 							   bool RLESprite, unsigned char* data);
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
@@ -65,7 +65,7 @@ public:
 		unsigned char mode = IE_NORMAL, bool allowCompression = true);
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
-	Sprite2D* GetPalette();
+	Holder<Sprite2D> GetPalette();
 
 	/** Gets a Pixel Index from the Image, unused */
 	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)

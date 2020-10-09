@@ -118,7 +118,6 @@ Projectile::~Projectile()
 			if(shadow[i])
 				delete shadow[i];
 		}
-		Sprite2D::FreeSprite(light);
 	}
 
 	if(children) {
@@ -262,7 +261,7 @@ void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal)
 		return;
 	for (unsigned int i=0;i<MAX_ORIENT;i++) {
 		if (anim[i]) {
-			Sprite2D* spr = anim[i]->GetFrame(0);
+			Holder<Sprite2D> spr = anim[i]->GetFrame(0);
 			if (spr) {
 				pal = spr->GetPalette()->Copy();
 				break;
@@ -1697,7 +1696,7 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
 	Game *game = core->GetGame();
 	PathNode *iter = path;
-	Sprite2D *frame;
+	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		frame = travel[face]->LastFrame();
 		flag |= BLIT_GREY;
@@ -1789,7 +1788,7 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	if (ExtFlags&PEF_POP) {
 			//draw pop in/hold/pop out animation sequences
-			Sprite2D *frame;
+			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
 				flags |= BLIT_GREY;
@@ -1819,7 +1818,7 @@ void Projectile::DrawTravel(const Region& viewport)
 	}
 	
 	if (shadow[face]) {
-		Sprite2D *frame = shadow[face]->NextFrame();
+		Holder<Sprite2D> frame = shadow[face]->NextFrame();
 		Draw(frame, pos, flags, tint2);
 	}
 
@@ -1829,14 +1828,14 @@ void Projectile::DrawTravel(const Region& viewport)
 		//draw all frames simultaneously on top of each other
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {
-				Sprite2D *frame = travel[i]->NextFrame();
+				Holder<Sprite2D> frame = travel[i]->NextFrame();
 				Draw(frame, pos, flags, tint2);
 				pos.y-=frame->Frame.y;
 			}
 		}
 	} else {
 		if (travel[face]) {
-			Sprite2D *frame;
+			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
 				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
@@ -1909,7 +1908,7 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
-void Projectile::Draw(Sprite2D* spr, const Point& p,
+void Projectile::Draw(Holder<Sprite2D> spr, const Point& p,
 		  unsigned int flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();

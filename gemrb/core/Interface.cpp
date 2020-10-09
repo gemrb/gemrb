@@ -353,10 +353,6 @@ Interface::~Interface(void)
 
 	delete sgiterator;
 
-	for (auto &c: Cursors) {
-		Sprite2D::FreeSprite(c);
-	}
-
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
@@ -373,17 +369,6 @@ Interface::~Interface(void)
 	delete TooltipBG;
 
 	if (video) {
-
-		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			Sprite2D::FreeSprite(FogSprites[i]);
-		}
-
-		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-			for(i=0;i<6;i++) {
-				Sprite2D::FreeSprite(GroundCircles[size][i]);
-			}
-		}
-
 		if (InfoTextPalette) {
 			gamedata->FreePalette(InfoTextPalette);
 		}
@@ -1117,11 +1102,9 @@ int Interface::LoadSprites()
 	ieDword i = 0;
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
-		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			if (FogSprites[i]) {
-				Sprite2D* alphasprite = video->CreateAlpha( FogSprites[i] );
-				Sprite2D::FreeSprite ( FogSprites[i] );
-				FogSprites[i] = alphasprite;
+		for(auto &sprite: FogSprites) {
+			if (sprite) {
+				sprite = video->CreateAlpha(sprite);
 			}
 		}
 	}
@@ -1138,13 +1121,11 @@ int Interface::LoadSprites()
 			}
 
 			for (int i = 0; i < 6; i++) {
-				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
+				Holder<Sprite2D> sprite = anim->GetFrame(0, (ieByte) i);
 				if (GroundCircleScale[size]) {
-					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
-					Sprite2D::FreeSprite( sprite );
-				} else {
-					GroundCircles[size][i] = sprite;
+					sprite = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
 				}
+				GroundCircles[size][i] = sprite;
 			}
 		}
 	}
@@ -3904,7 +3885,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
 	Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
-	Sprite2D* pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
+	Holder<Sprite2D> pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
 	if (pic == nullptr) {
 		// use any / the smaller icon if the dragging one is unavailable
 		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
@@ -3912,7 +3893,6 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 
 	if (pic) {
 		winmgr->GetGameWindow()->SetCursor(pic);
-		pic->release();
 	}
 }
 
@@ -4296,9 +4276,9 @@ bool Interface::HasCurrentArea() const
 }
 
 //this is used only for the console
-Sprite2D *Interface::GetCursorSprite()
+Holder<Sprite2D> Interface::GetCursorSprite()
 {
-	Sprite2D *spr = gamedata->GetBAMSprite(CursorBam, 0, 0);
+	Holder<Sprite2D> spr = gamedata->GetBAMSprite(CursorBam, 0, 0);
 	if (spr)
 	{
 		if(HasFeature(GF_OVERRIDE_CURSORPOS))
@@ -4310,7 +4290,7 @@ Sprite2D *Interface::GetCursorSprite()
 	return spr;
 }
 
-Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
+Holder<Sprite2D> Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 {
 	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum, true);
 }

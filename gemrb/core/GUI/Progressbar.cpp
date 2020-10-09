@@ -79,7 +79,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 	//animated progressbar (bg2)
 	Count=val*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
-		Sprite2D *Knob = PBarAnim->GetFrame(i);
+		Holder<Sprite2D> Knob = PBarAnim->GetFrame(i);
 		core->GetVideoDriver()->BlitSprite( Knob, 0, 0 );
 	}
 }
@@ -93,14 +93,14 @@ void Progressbar::UpdateState(unsigned int Sum)
 }
 
 /** Sets the selected image */
-void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
+void Progressbar::SetImage(Holder<Sprite2D> img, Holder<Sprite2D> img2)
 {
 	BackGround = img;
 	BackGround2 = img2;
 	MarkDirty();
 }
 
-void Progressbar::SetBarCap(Sprite2D* img3)
+void Progressbar::SetBarCap(Holder<Sprite2D> img3)
 {
 	PBarCap = img3;
 }

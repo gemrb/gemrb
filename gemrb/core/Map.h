@@ -363,7 +363,7 @@ public:
 	TileMap* TMap;
 	Image* LightMap;
 	Bitmap* HeightMap;
-	Sprite2D* SmallMap;
+	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
 	ieWord AreaType;
@@ -377,7 +377,7 @@ public:
 	bool DayNight;
 	//movies for day/night (only in ToB)
 	ieResRef Dream[2];
-	Sprite2D *Background;
+	Holder<Sprite2D> Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
 	MapReverb *reverb;
@@ -422,9 +422,9 @@ public:
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell);
 	/* low level function to perform the daylight changes */
-	void ChangeTileMap(Image* lm, Sprite2D* sm);
+	void ChangeTileMap(Image *lm, Holder<Sprite2D> sm);
 	/* sets all the auxiliary maps and the tileset */
-	void AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm);
+	void AddTileMap(TileMap *tm, Image *lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
 	void AutoLockDoors();
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos);

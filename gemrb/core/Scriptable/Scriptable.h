@@ -393,7 +393,7 @@ public:
 	bool Over;
 	Color selectedColor;
 	Color overColor;
-	Sprite2D *circleBitmap[2];
+	Holder<Sprite2D> circleBitmap[2];
 	int size;
 	float sizeFactor;
 public:
@@ -403,7 +403,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
+	void SetCircle(int size, float, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {

@@ -256,11 +256,9 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	}
 }
 
-ImageSpan::ImageSpan(Sprite2D* im)
+ImageSpan::ImageSpan(Holder<Sprite2D> im)
 	: Content(im->Frame.Dimensions())
 {
-	assert(im);
-	im->acquire();
 	image = im;
 }
 
@@ -272,7 +270,7 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 	r.y += offset.y;
 	core->GetVideoDriver()->BlitSprite(image, r.x, r.y, &r);
 }
-	
+
 ContentContainer::ContentContainer(const Region& frame)
 : View(frame)
 {
@@ -702,9 +700,8 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 		Region sc = video->GetScreenClip();
 		video->SetScreenClip(NULL);
 
-		Sprite2D* cursor = core->GetCursorSprite();
+		Holder<Sprite2D> cursor = core->GetCursorSprite();
 		video->BlitSprite(cursor, drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
-		cursor->release();
 
 		video->SetScreenClip(&sc);
 	}
@@ -749,9 +746,8 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		Region sc = video->GetScreenClip();
 		video->SetScreenClip(NULL);
 
-		Sprite2D* cursor = core->GetCursorSprite();
+		Holder<Sprite2D> cursor = core->GetCursorSprite();
 		video->BlitSprite(cursor, cursorPoint.x + dp.x, cursorPoint.y + dp.y + cursor->Frame.y);
-		cursor->release();
 
 		video->SetScreenClip(&sc);
 	}

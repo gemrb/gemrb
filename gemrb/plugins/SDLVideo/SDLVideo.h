@@ -65,22 +65,22 @@ public:
 	virtual ~SDLVideoDriver(void);
 	int Init(void) override;
 
-	Sprite2D* CreateSprite(const Region& rgn, int bpp, ieDword rMask,
+	Holder<Sprite2D> CreateSprite(const Region& rgn, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) override;
-	Sprite2D* CreateSprite8(const Region& rgn, void* pixels,
+	Holder<Sprite2D> CreateSprite8(const Region& rgn, void* pixels,
 							PaletteHolder palette, bool cK, int index) override;
-	Sprite2D* CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
+	Holder<Sprite2D> CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0) override;
 
-	void BlitTile(const Sprite2D* spr, int x, int y, const Region* clip,
+	void BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip,
 						  uint32_t flags, const Color* tint = NULL) override;
-	void BlitSprite(const Sprite2D* spr, const Region& src, Region dst) override;
-	void BlitGameSprite(const Sprite2D* spr, int x, int y, uint32_t flags, Color tint,
+	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) override;
+	void BlitGameSprite(const Holder<Sprite2D> spr, int x, int y, uint32_t flags, Color tint,
 								const Region* clip = NULL) override;
 
 	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Sprite2D* img);
+	void BlitTiled(Region rgn, const Holder<Sprite2D> img);
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -98,9 +98,9 @@ protected:
 	
 	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* = NULL);
 
-	virtual void BlitSpriteBAMClipped(const Sprite2D* spr, const Region& src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL)=0;
+	virtual void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Sprite2D* spr, Region src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL);
+	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL);
 
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
