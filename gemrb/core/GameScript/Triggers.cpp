@@ -1456,10 +1456,8 @@ int GameScript::PersonalSpaceDistance(Scriptable *Sender, const Trigger *paramet
 	if (!scr) {
 		return 0;
 	}
-	int range = parameters->int0Parameter;
 
-	int distance = PersonalDistance(Sender, scr);
-	if (distance <= ( range * 10 )) {
+	if (WithinPersonalRange(scr, Sender, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -3525,13 +3523,14 @@ int GameScript::InWeaponRange(Scriptable *Sender, const Trigger *parameters)
 	unsigned int wrange = 0;
 	const ITMExtHeader *header = actor->GetWeapon(wi, false);
 	if (header) {
-		wrange = wi.range;
+		wrange = actor->GetWeaponRange(wi);
 	}
+	// checking also the left hand, in case they're dualwielding
 	header = actor->GetWeapon(wi, true);
 	if (header && (wi.range>wrange)) {
-		wrange = wi.range;
+		wrange = actor->GetWeaponRange(wi);
 	}
-	if ( PersonalDistance( Sender, tar ) <= wrange * 10 ) {
+	if (WithinPersonalRange(actor, tar, wrange)) {
 		return 1;
 	}
 	return 0;

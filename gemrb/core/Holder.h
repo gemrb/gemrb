@@ -83,11 +83,23 @@ public:
 		ptr = rhs.ptr;
 		return *this;
 	}
-	T& operator*() const { return *ptr; }
-	T* operator->() const { return ptr; }
+	
+	T &operator*() const noexcept {
+		return *ptr;
+	}
+	
+	T *operator->() const noexcept {
+		return ptr;
+	}
+	
+	explicit operator bool() const noexcept {
+		return ptr != nullptr;
+	}
 
-	explicit operator bool() const noexcept { return ptr != nullptr; }
-	T* get() const { return ptr; }
+	T *get() const noexcept {
+		return ptr;
+	}
+
 	void release() {
 		if (ptr)
 			ptr->release();
