@@ -403,6 +403,7 @@ private:
 	Actor** queue[QUEUE_COUNT];
 	int Qcount[QUEUE_COUNT];
 	unsigned int lastActorCount[QUEUE_COUNT];
+	bool hostiles_visible = false;
 
 	VideoBufferPtr wallStencil;
 	Region stencilViewport;
@@ -436,7 +437,7 @@ public:
 	void CopyGroundPiles(Map *othermap, const Point &Pos);
 	/* transfers all ever visible piles (loose items) to the specified position */
 	void MoveVisibleGroundPiles(const Point &Pos);
-	
+
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false);
 	void AddAnimation(AreaAnimation* anim);
@@ -458,6 +459,7 @@ public:
 	bool BehindWall(const Point&, const Region&) const;
 	void Shout(Actor* actor, int shoutID, bool global);
 	void ActorSpottedByPlayer(Actor *actor);
+	bool HandleAutopauseForVisible(Actor *actor, bool);
 	void InitActors();
 	void InitActor(Actor *actor);
 	void AddActor(Actor* actor, bool init);

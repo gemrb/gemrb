@@ -7994,15 +7994,6 @@ void Actor::UpdateActorState()
 		DisplayHeadHPRatio();
 	}
 
-	// trigger on-enemy-sighted autopause
-	if (!(InternalFlags & IF_TRIGGER_AP)) {
-		// always recheck in case of EA changes (npc going hostile)
-		if (Modified[IE_EA] > EA_EVILCUTOFF && !(InternalFlags & IF_STOPATTACK)) {
-			InternalFlags |= IF_TRIGGER_AP;
-			core->Autopause(AP_ENEMY, this);
-		}
-	}
-
 	const auto& anim = currentStance.anim;
 	if (attackProjectile) {
 		// default so that the projectile fires if we dont have an animation for some reason
@@ -8723,9 +8714,10 @@ bool Actor::UpdateDrawingState()
 	}
 
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
+	bool visible = area->IsVisible(Pos, explored);
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) && (InternalFlags&IF_ACTIVE) ) {
+	if ((!visible || (InternalFlags & IF_REALLYDIED)) && (InternalFlags & IF_ACTIVE) ) {
 		//turning actor inactive if there is no action next turn
 		if (ShouldHibernate()) {
 			InternalFlags|=IF_IDLE;
