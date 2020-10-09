@@ -722,6 +722,7 @@ private:
 					palettes[row][col] = image->GetPixel(col, row);
 				}
 			}
+			delete image;
 			return true;
 		}
 		return false;
