@@ -224,11 +224,11 @@ void DialogHandler::EndDialog(bool try_to_break)
 	originalTargetID = 0;
 
 	if (tmp) {
-		tmp->LeaveDialog();
+		tmp->LeftDialog();
 	}
 	if (tmp2 && tmp2->Type == ST_ACTOR) {
 		tmp = (Actor *)tmp2;
-		tmp->LeaveDialog();
+		tmp->LeftDialog();
 		tmp->SetCircleSize();
 	}
 	ds = NULL;
@@ -363,6 +363,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
+			target->LeftDialog();
 			tgt = NULL;
 			tgta = NULL;
 			if (originalTargetID) {

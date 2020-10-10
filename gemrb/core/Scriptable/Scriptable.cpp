@@ -626,7 +626,7 @@ unsigned long Scriptable::GetWait() const
 	return WaitCounter;
 }
 
-void Scriptable::LeaveDialog()
+void Scriptable::LeftDialog()
 {
 	AddTrigger(TriggerEntry(trigger_wasindialog));
 }
