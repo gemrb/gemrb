@@ -51,8 +51,9 @@
 namespace GemRB {
 
 // A deadzone when rotating the formation, to prevent erratic movement near
-// the initial click.
-constexpr int rotate_deadzone = 5;
+// the initial click.  Also used when deciding whether to go into
+// rectangle select mode.
+constexpr int movement_deadzone = 10;
 
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
@@ -612,7 +613,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	// draw reticles
 	if (isFormationRotation) {
 		double angle = formationBaseAngle;
-		if (Distance(gameMousePos, gameClickPoint) > rotate_deadzone) {
+		if (Distance(gameMousePos, gameClickPoint) > movement_deadzone) {
 			angle = AngleFromPoints(gameMousePos, gameClickPoint);
 		}
 		DrawFormation(game->selected, gameClickPoint, angle);
@@ -1486,7 +1487,9 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		return true;
 	}
 
-	if (me.ButtonState(GEM_MB_ACTION) && !isFormationRotation) {
+	Point gameMousePos = GameMousePos();
+	if (me.ButtonState(GEM_MB_ACTION) && !isFormationRotation
+		&& Distance(gameMousePos, gameClickPoint) > movement_deadzone) {
 		isSelectionRect = true;
 	}
 
@@ -2278,7 +2281,7 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 	if (isFormationRotation) {
 		angle = formationBaseAngle;
 		Point mp = GameMousePos();
-		if (Distance(mp, p) > rotate_deadzone) {
+		if (Distance(mp, p) > movement_deadzone) {
 			angle = AngleFromPoints(mp, p);
 		}
 	}
