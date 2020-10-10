@@ -519,11 +519,6 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 		}
 		break;
 	case IE_GUI_BUTTON_LOCKED_PRESSED:
-		if (IS_PORTRAIT) {
-			// Ensure we clear out the dragging cursor even if there
-			// was no actual drag operation.
-			SetCursor(nullptr);
-		}
 		SetState( IE_GUI_BUTTON_LOCKED );
 		break;
 	}
@@ -546,9 +541,9 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 	Control::OnMouseEnter(me, dop);
 
 	if (dop && AcceptsDragOperation(*dop)) {
-		SetCursor(core->Cursors[IE_CURSOR_SWAP]);
-	} else {
-		SetCursor(nullptr);
+		if (IS_PORTRAIT) {
+			SetCursor(core->Cursors[IE_CURSOR_SWAP]);
+		}
 	}
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {

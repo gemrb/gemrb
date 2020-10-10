@@ -357,8 +357,12 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 			target->CompleteDragOperation(*drag);
 		}
 	} else if (trackingView) {
-		if (trackingView == target || trackingView->TracksMouseDown())
+		if (trackingView == target || trackingView->TracksMouseDown()) {
+			// we dragged the mouse on a view, but never left it
+			// possibly this is a canceled drag event that we should instantiate and destroy
+			drag = trackingView->DragOperation();
 			trackingView->MouseUp(me, mod);
+		}
 	} else if (target) {
 		target->MouseUp(me, mod);
 	}
