@@ -37,6 +37,7 @@ addons:
     - sdl_mixer
     - libpng
     - libvorbis
+    update: true
   ssh_known_hosts: frs.sourceforge.net
 
 before_install:
