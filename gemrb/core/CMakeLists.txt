@@ -127,6 +127,11 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GUI/Window.cpp
 	GUI/WindowManager.cpp
 	GUI/WorldMapControl.cpp
+	Sources/BIFImporter.cpp
+	Sources/DirectoryImporter.cpp
+	Sources/KEYImporter.cpp
+	Sources/MUSImporter.cpp
+	Sources/NullSource.cpp
 	RNG.cpp
 	Scriptable/Actor.cpp
 	Scriptable/CombatInfo.cpp

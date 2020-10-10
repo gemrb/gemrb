@@ -21,22 +21,20 @@
 #ifndef RESOURCESOURCE_H
 #define RESOURCESOURCE_H
 
-#include "SClassID.h"
-#include "exports.h"
 #include "globals.h"
 
-#include "Plugin.h"
+#include "Holder.h"
 
 namespace GemRB {
 
 class DataStream;
 class ResourceDesc;
 
-class GEM_EXPORT ResourceSource : public Plugin {
+class ResourceSource : public Held<ResourceSource> {
 public:
-	ResourceSource(void);
+	ResourceSource(const char *desc);
 	virtual ~ResourceSource(void);
-	virtual bool Open(const char *filename, const char *description) = 0;
+	virtual bool Open(const char *filename) = 0;
 	virtual bool HasResource(const char* resname, SClass_ID type) = 0;
 	virtual bool HasResource(const char* resname, const ResourceDesc &type) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type) = 0;

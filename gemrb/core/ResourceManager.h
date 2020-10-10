@@ -48,14 +48,8 @@ public:
 	ResourceManager();
 	~ResourceManager();
 
-	/**
-	 * Add ResourceSource to search path
-	 * @param[in] path Path to be used for source.
-	 *                 Note: This is modified by ResolveFilePath.
-	 * @param[in] description Description of the source.
-	 * @param[in] type Plugin type used for source.
-	 **/
-	bool AddSource(const char *path, const char *description, PluginID type, int flags=0);
+	/** Add ResourceSource to search path */
+	bool AddSource(const char *path, Holder<ResourceSource>, int flags=0);
 
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type, bool silent=false) const;

@@ -27,17 +27,17 @@
 #include "Interface.h"
 #include "ResourceDesc.h"
 #include "System/FileStream.h"
+#include "Sources/BIFImporter.h"
 
 using namespace GemRB;
 
-KEYImporter::KEYImporter(void)
+KEYImporter::KEYImporter(const char *desc)
+: ResourceSource(desc)
 {
-	description = NULL;
 }
 
 KEYImporter::~KEYImporter(void)
 {
-	free(description);
 	for (unsigned int i = 0; i < biffiles.size(); i++) {
 		free( biffiles[i].name );
 	}
@@ -111,14 +111,8 @@ static void FindBIF(BIFEntry *entry)
 	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name);
 }
 
-bool KEYImporter::Open(const char *resfile, const char *desc)
+bool KEYImporter::Open(const char *resfile)
 {
-	free(description);
-	description = strdup(desc);
-	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
-		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
-		return false;
-	}
 	unsigned int i;
 	// NOTE: Interface::Init has already resolved resfile.
 	Log(MESSAGE, "KEYImporter", "Opening %s...", resfile);
@@ -225,13 +219,13 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 		return NULL;
 	}
 
-	PluginHolder<IndexedArchive> ai(IE_BIF_CLASS_ID);
-	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
+	BIFImporter ai;
+	if (ai.OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 		print("Cannot open archive %s", biffiles[bifnum].path);
 		return NULL;
 	}
 
-	DataStream* ret = ai->GetStream( *ResLocator, type );
+	DataStream* ret = ai.GetStream(*ResLocator, type);
 	if (ret) {
 		strnlwrcpy( ret->filename, resname, 8 );
 		strcat( ret->filename, "." );
@@ -252,9 +246,3 @@ DataStream* KEYImporter::GetResource(const char* resname, const ResourceDesc &ty
 {
 	return GetStream(resname, type.GetKeyType());
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0x1DFDEF80, "KEY File Importer")
-PLUGIN_CLASS(PLUGIN_RESOURCE_KEY, KEYImporter)
-END_PLUGIN()

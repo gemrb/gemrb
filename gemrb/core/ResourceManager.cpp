@@ -38,17 +38,17 @@ ResourceManager::~ResourceManager()
 {
 }
 
-bool ResourceManager::AddSource(const char *path, const char *description, PluginID type, int flags)
+bool ResourceManager::AddSource(const char *path, Holder<ResourceSource> source, int flags)
 {
-	PluginHolder<ResourceSource> source(type);
-	if (!source->Open(path, description)) {
-		Log(WARNING, "ResourceManager", "Invalid path given: %s (%s)", path, description);
+	const char *desc = source->GetDescription();
+	if (!source->Open(path)) {
+		Log(WARNING, "ResourceManager", "Invalid path given: %s (%s)", path, desc);
 		return false;
 	}
 
 	if (flags & RM_REPLACE_SAME_SOURCE) {
 		for (size_t i = 0; i < searchPath.size(); i++) {
-			if (!stricmp(description, searchPath[i]->GetDescription())) {
+			if (!stricmp(desc, searchPath[i]->GetDescription())) {
 				searchPath[i] = source;
 				break;
 			}

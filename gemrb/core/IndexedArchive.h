@@ -23,11 +23,11 @@
 
 #include "globals.h"
 
-#include "Plugin.h"
+#include "Holder.h"
 
 namespace GemRB {
 
-class GEM_EXPORT IndexedArchive : public Plugin {
+class IndexedArchive : public Held<IndexedArchive> {
 public:
 	IndexedArchive(void);
 	virtual ~IndexedArchive(void);

@@ -27,23 +27,16 @@
 
 using namespace GemRB;
 
-DirectoryImporter::DirectoryImporter(void)
+DirectoryImporter::DirectoryImporter(const char *desc)
+: ResourceSource(desc)
 {
-	description = NULL;
 }
 
-DirectoryImporter::~DirectoryImporter(void)
-{
-	free(description);
-}
-
-bool DirectoryImporter::Open(const char *dir, const char *desc)
+bool DirectoryImporter::Open(const char *dir)
 {
 	if (!dir_exists(dir))
 		return false;
 
-	free(description);
-	description = strdup(desc);
 	if (strlcpy(path, dir, _MAX_PATH) >= _MAX_PATH) {
 		Log(ERROR, "DirectoryImporter", "Directory with too long path: %s!", dir);
 		return false;
@@ -98,17 +91,14 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-CachedDirectoryImporter::CachedDirectoryImporter()
+CachedDirectoryImporter::CachedDirectoryImporter(const char *desc)
+: DirectoryImporter(desc)
 {
 }
 
-CachedDirectoryImporter::~CachedDirectoryImporter()
+bool CachedDirectoryImporter::Open(const char *dir)
 {
-}
-
-bool CachedDirectoryImporter::Open(const char *dir, const char *desc)
-{
-	if (!DirectoryImporter::Open(dir, desc))
+	if (!DirectoryImporter::Open(dir))
 		return false;
 
 	Refresh();
@@ -191,10 +181,3 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, const Reso
 	PathAppend(buf, s->c_str());
 	return FileStream::OpenFile(buf);
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0xAB4534, "Directory Importer")
-PLUGIN_CLASS(PLUGIN_RESOURCE_DIRECTORY, DirectoryImporter)
-PLUGIN_CLASS(PLUGIN_RESOURCE_CACHEDDIRECTORY, CachedDirectoryImporter)
-END_PLUGIN()

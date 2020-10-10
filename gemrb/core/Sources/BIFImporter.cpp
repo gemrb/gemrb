@@ -213,9 +213,3 @@ void BIFImporter::ReadBIF(void)
 		stream->ReadWord( &tentries[i].u1);
 	}
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0xC7F133C, "BIF File Importer")
-PLUGIN_CLASS(IE_BIF_CLASS_ID, BIFImporter)
-END_PLUGIN()

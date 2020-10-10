@@ -26,6 +26,7 @@
 #include "GameData.h" // For ResourceHolder
 #include "Interface.h"
 #include "SoundMgr.h"
+#include "Sources/DirectoryImporter.h"
 
 using namespace GemRB;
 
@@ -43,7 +44,7 @@ MUSImporter::MUSImporter()
 	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
 	PathJoin(path, core->GamePath, musicsubfolder, NULL);
-	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
+	manager.AddSource(path, new DirectoryImporter("Music"));
 }
 
 MUSImporter::~MUSImporter()
@@ -324,9 +325,3 @@ void MUSImporter::PlayMusic(char* name)
 bool MUSImporter::CurrentPlayList(const char* name) {
 	return stricmp(name, PLName) == 0;
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0x2DCB9E8, "MUS File Importer")
-PLUGIN_CLASS(IE_MUS_CLASS_ID, MUSImporter)
-END_PLUGIN()

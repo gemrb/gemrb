@@ -21,12 +21,12 @@
 #ifndef MUSICMGR_H
 #define MUSICMGR_H
 
-#include "Plugin.h"
+#include "Holder.h"
 
 namespace GemRB {
 
-class GEM_EXPORT MusicMgr : public Plugin {
-public: 
+class MusicMgr : public Held<MusicMgr> {
+public:
 	MusicMgr();
 	virtual ~MusicMgr();
 	/** Ends the Current PlayList Execution */

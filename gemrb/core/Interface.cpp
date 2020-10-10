@@ -84,6 +84,10 @@
 #include "System/FileStream.h"
 #include "System/FileFilters.h"
 #include "System/StringBuffer.h"
+#include "Sources/NullSource.h"
+#include "Sources/DirectoryImporter.h"
+#include "Sources/KEYImporter.h"
+#include "Sources/MUSImporter.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -1440,60 +1444,56 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Initializing Search Path...");
-		if (!IsAvailable( PLUGIN_RESOURCE_DIRECTORY )) {
-			Log(FATAL, "Core", "no DirectoryImporter!");
-			return GEM_ERROR;
-		}
 
 		char path[_MAX_PATH];
 
 		PathJoin( path, CachePath, NULL);
-		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
+		if (!gamedata->AddSource(path, new DirectoryImporter("Cache"))) {
 			Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
 			return GEM_ERROR;
 		}
 
 		size_t i;
 		for (i = 0; i < ModPath.size(); ++i)
-			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			gamedata->AddSource(ModPath[i].c_str(), new CachedDirectoryImporter("Mod paths"));
 
 		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
-		if (!strcmp( GameType, "auto" ))
-			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
+		if (!strcmp(GameType, "auto"))
+			gamedata->AddSource(path, new NullSource("GemRB Override"));
 		else
-			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			gamedata->AddSource(path, new CachedDirectoryImporter("GemRB Override"));
 
 		PathJoin( path, GemRBOverridePath, "override", "shared", NULL);
-		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("shared GemRB Override"));
 
 		PathJoin( path, GamePath, GameOverridePath, NULL);
-		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("Override"));
 
 		//GAME sounds are intentionally not cached, in IWD there are directory structures,
 		//that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
 		PathJoin( path, GamePath, GameSoundsPath, NULL);
-		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
+		gamedata->AddSource(path, new DirectoryImporter("Sounds"));
 
 		PathJoin( path, GamePath, GameScriptsPath, NULL);
-		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("Scripts"));
 
 		PathJoin( path, GamePath, GamePortraitsPath, NULL);
-		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("Portraits"));
 
 		PathJoin( path, GamePath, GameDataPath, NULL);
-		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("Data"));
 
 		// accomodating silly installers that create a data/Data/.* structure
 		PathJoin( path, GamePath, GameDataPath, "Data", NULL);
-		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("Data"));
 
 		//IWD2 movies are on the CD but not in the BIF
 		char *description = strdup("CD1/data");
 		for (i = 0; i < MAX_CD; i++) {
 			for (size_t j=0;j<CD[i].size();j++) {
 				description[2]='1'+i;
-				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
-				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
+				PathJoin(path, CD[i][j].c_str(), GameDataPath, NULL);
+				gamedata->AddSource(path, new CachedDirectoryImporter(description));
 			}
 		}
 		free(description);
@@ -1502,19 +1502,19 @@ int Interface::Init(InterfaceConfig* config)
 		// so they have a lower priority than the game files and can more easily be modded
 		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
 		if (!strcmp(GameType, "auto")) {
-			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
+				gamedata->AddSource(path, new NullSource ("GemRB Unhardcoded data"));
 		} else {
-			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+			gamedata->AddSource(path, new CachedDirectoryImporter("GemRB Unhardcoded data"));
 		}
 		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", "shared", NULL);
-		gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		gamedata->AddSource(path, new CachedDirectoryImporter("shared GemRB Unhardcoded data"));
 	}
 
 	{
 		Log(MESSAGE, "Core", "Initializing KEY Importer...");
 		char ChitinPath[_MAX_PATH];
 		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
-		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
+		if (!gamedata->AddSource(ChitinPath, new KEYImporter("chitin.key"))) {
 			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 			Log(ERROR, "Core", "This means you set the GamePath config variable incorrectly or that the game is running (Windows only).");
 			Log(ERROR, "Core", "It must point to the game directory that holds a readable chitin.key");
@@ -1537,10 +1537,10 @@ int Interface::Init(InterfaceConfig* config)
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
 	char path[_MAX_PATH];
 	PathJoin(path, GemRBOverridePath, "override", GameType, NULL);
-	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	gamedata->AddSource(path, new CachedDirectoryImporter("GemRB Override"), RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
-	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
+	gamedata->AddSource(unhardcodedTypePath, new CachedDirectoryImporter("GemRB Unhardcoded data"), RM_REPLACE_SAME_SOURCE);
 
 	// fix the sample config default resolution for iwd2
 	if (stricmp(GameType, "iwd2") == 0 && Width == 640 && Height == 480) {
@@ -1587,7 +1587,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
-	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, new DirectoryImporter("CustomFonts"));
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	if (!LoadGemRBINI()) {
@@ -1726,7 +1726,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
-	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
+	music = new MUSImporter;
 	if (!music) {
 		Log(FATAL, "Core", "Failed to load Music Manager.");
 		return GEM_ERROR;
@@ -1999,9 +1999,6 @@ const char* Interface::TypeExt(SClass_ID type) const
 
 		case IE_MOS_CLASS_ID:
 			return "mos";
-
-		case IE_MUS_CLASS_ID:
-			return "mus";
 
 		case IE_MVE_CLASS_ID:
 			return "mve";

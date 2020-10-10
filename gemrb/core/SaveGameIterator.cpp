@@ -36,6 +36,7 @@
 #include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
+#include "Sources/DirectoryImporter.h"
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -127,7 +128,7 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	} else {
 		strftime(Date, _MAX_PATH, "%c", localtime(&my_stat.st_mtime));
 	}
-	manager.AddSource(Path, Name, PLUGIN_RESOURCE_DIRECTORY);
+	manager.AddSource(Path, new DirectoryImporter(Name));
 	GameDate[0] = '\0';
 }
 

@@ -27,9 +27,8 @@ namespace GemRB {
 
 class NullSource : public ResourceSource {
 public:
-	NullSource(void);
-	virtual ~NullSource(void);
-	virtual bool Open(const char *filename, const char *description);
+	NullSource(const char *desc);
+	virtual bool Open(const char *filename);
 	virtual bool HasResource(const char* resname, SClass_ID type);
 	virtual bool HasResource(const char* resname, const ResourceDesc &type);
 	virtual DataStream* GetResource(const char* resname, SClass_ID type);

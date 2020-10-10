@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef KEYIMP_H
-#define KEYIMP_H
+#ifndef DIRIMP_H
+#define DIRIMP_H
 
 #include "ResourceSource.h"
 #include "StringMap.h"
@@ -32,9 +32,8 @@ protected:
 	char path[_MAX_PATH];
 
 public:
-	DirectoryImporter(void);
-	~DirectoryImporter(void);
-	bool Open(const char *dir, const char *desc);
+	DirectoryImporter(const char *desc);
+	bool Open(const char *dir);
 	/** predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type);
 	bool HasResource(const char* resname, const ResourceDesc &type);
@@ -48,10 +47,9 @@ protected:
 	StringMap cache;
 
 public:
-	CachedDirectoryImporter();
-	~CachedDirectoryImporter();
+	CachedDirectoryImporter(const char *desc);
 
-	bool Open(const char *dir, const char *desc);
+	bool Open(const char *dir);
 	void Refresh();
 	/** predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type);

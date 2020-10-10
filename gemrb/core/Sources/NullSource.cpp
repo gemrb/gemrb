@@ -27,20 +27,13 @@
 
 using namespace GemRB;
 
-NullSource::NullSource(void)
+NullSource::NullSource(const char *desc)
+: ResourceSource (desc)
 {
-	description = NULL;
 }
 
-NullSource::~NullSource(void)
+bool NullSource::Open(const char *)
 {
-	free(description);
-}
-
-bool NullSource::Open(const char *, const char *desc)
-{
-	free(description);
-	description = strdup(desc);
 	return true;
 }
 
@@ -63,9 +56,3 @@ DataStream* NullSource::GetResource(const char*, const ResourceDesc&)
 {
 	return NULL;
 }
-
-#include "plugindef.h"
-
-GEMRB_PLUGIN(0xFA42E34A, "Null Resource Source")
-PLUGIN_CLASS(PLUGIN_RESOURCE_NULL, NullSource)
-END_PLUGIN()

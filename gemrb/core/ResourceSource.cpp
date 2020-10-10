@@ -22,13 +22,14 @@
 
 namespace GemRB {
 
-ResourceSource::ResourceSource(void)
+ResourceSource::ResourceSource(const char *d)
+: description (strdup (d))
 {
-	description = NULL;
 }
 
 ResourceSource::~ResourceSource(void)
 {
+	free (description);
 }
 
 }

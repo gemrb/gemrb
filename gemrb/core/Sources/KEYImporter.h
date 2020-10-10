@@ -24,7 +24,6 @@
 #include "ResourceSource.h"
 
 #include "IndexedArchive.h"
-#include "PluginMgr.h"
 
 #include "StringMap.h"
 
@@ -42,13 +41,6 @@ struct BIFEntry {
 	char path[_MAX_PATH];
 	int cd;
 	bool found;
-};
-
-struct KEYCache {
-	KEYCache() { bifnum = 0xffffffff; }
-
-	unsigned int bifnum;
-	PluginHolder<IndexedArchive> plugin;
 };
 
 // the key for this specific hashmap
@@ -135,9 +127,9 @@ private:
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const char *resname, ieWord type);
 public:
-	KEYImporter(void);
+	KEYImporter(const char *desc);
 	~KEYImporter(void);
-	bool Open(const char *file, const char *desc);
+	bool Open(const char *file);
 	/* predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type);
 	bool HasResource(const char* resname, const ResourceDesc &type);
