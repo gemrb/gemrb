@@ -563,6 +563,10 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseLeave(me, dop);
+	
+	if (IS_PORTRAIT) {
+		SetCursor(nullptr);
+	}
 
 	if (State == IE_GUI_BUTTON_PRESSED && dop == NULL) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
