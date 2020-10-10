@@ -192,7 +192,6 @@ private: // Private attributes
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;
-	Point drag_start;
 	/** HP Bar over portraits */
 	ColorAnimation overlayAnim;
 	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */

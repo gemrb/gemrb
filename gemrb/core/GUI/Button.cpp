@@ -471,10 +471,6 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
     }
     
 	if (me.button == GEM_MB_ACTION) {
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		drag_start = me.Pos();
-
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
 			return true;
