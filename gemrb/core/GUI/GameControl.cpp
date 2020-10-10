@@ -2293,7 +2293,7 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 			actor->Stop();
 		}
 		
-		if (party.size() > 1 || isFormationRotation) {
+		if (party.size() > 1) {
 			CreateMovement(actor, formationPoints[i], Mod & GEM_MOD_SHIFT);
 		} else {
 			CreateMovement(actor, p, Mod & GEM_MOD_SHIFT);
