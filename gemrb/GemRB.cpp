@@ -35,6 +35,7 @@
 #ifdef VITA
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h>
+#include <psp2/apputil.h> 
 
 // allocating memory for application on Vita
 int _newlib_heap_size_user = 344 * 1024 * 1024;
@@ -70,6 +71,33 @@ int main(int argc, char* argv[])
 	scePowerSetBusClockFrequency(222);
 	scePowerSetGpuClockFrequency(222);
 	scePowerSetGpuXbarClockFrequency(166);
+
+	// Selecting game config from init params
+	SceAppUtilInitParam appUtilParam;
+	SceAppUtilBootParam appUtilBootParam;
+	memset(&appUtilParam, 0, sizeof(SceAppUtilInitParam));
+	memset(&appUtilBootParam, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&appUtilParam, &appUtilBootParam);
+	SceAppUtilAppEventParam eventParam;
+	memset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
+	sceAppUtilReceiveAppEvent(&eventParam);
+	int vita_argc = 1;
+	char *vita_argv[3];
+	vita_argv[0] = (char*)"";
+	if (eventParam.type == 0x05) {
+		char buffer[2048];
+		memset(buffer, 0, 2048);
+		sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
+		vita_argv[1] = (char*)"-c";
+		char configPath[2080];
+		sprintf(configPath, "ux0:data/GemRB/%s.cfg", buffer);
+		vita_argv[2] = configPath;
+		vita_argc = 3;
+	}
+	argc = vita_argc;
+	argv = vita_argv;
+#else
+
 #endif
 
 	setlocale(LC_ALL, "");

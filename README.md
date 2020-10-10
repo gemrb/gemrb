@@ -7,6 +7,15 @@ Install gemrb.vpk to your Vita. Extract "GemRB" folder from gemrb_data.zip to ux
 
 Copy original game folder to ux0:data/GemRB/ and edit ux0:data/GemRB/GemRB.cfg file (set correct "GameType" and "GamePath" parameters. Game auto detection isn't working, so set "GameType" manually).
 
+LiveArea launcher supports launching different games from it by selecting appropriate game title.
+
+Here are the game config names and default game folders (where you should copy your game data) that are used by each title from LiveArea (configs should be located in ux0:data/GemRB/):
+
+- Baldur's Gate - BG1.cfg. Default game path: ux0:data/GemRB/BG1
+- Baldur's Gate 2 - BG2.cfg. Default game path: ux0:data/GemRB/BG2
+- Icewind Dale - IWD.cfg. Default game path: ux0:data/GemRB/IWD
+- Planescape: Torment - PST.cfg . Default game path: ux0:data/GemRB/PST
+
 rePatch reDux0 plugin is required for proper suspend/resume support
 
 https://github.com/dots-tb/rePatch-reDux0
@@ -76,9 +85,7 @@ VitaKeepAspectRatio=1 keeps aspect ratio of original image when scaling. VitaKee
 
 Widescreen mod is supported, but performance with native resolution can be poor in areas with a lot of characters.
 
-The game is pretty IO heavy. Loading can take quite some time. And a big number of sound effects playing at the same time can cause a lot of stuttering. To improve the situation I STRONGLY recommend disabling character movement and attack sounds in game options. Disabling sound altogether (by seting "AudioDriver = none" in GemRB.cfg) can improve it even further.
-
-"Bpp=16" option is recommended for better performance.
+"Bpp=16" option is recommended for better performance. The game is pretty IO heavy. Loading can take quite some time. 
 
 ## Controls
 - Left analog stick - Pointer movement
