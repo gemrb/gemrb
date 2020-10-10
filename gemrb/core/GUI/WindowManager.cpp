@@ -372,13 +372,11 @@ bool WindowManager::DispatchEvent(const Event& event)
 					trackingWin->DispatchEvent(event);
 				}
 
-				if (event.type == Event::TouchUp) {
-					trackingWin = NULL;
-				}
+				trackingWin = NULL;
 			}
 
 			// we don't deliver mouse up events if there isn't a corresponding mouse down (trackingWin == NULL).
-			return bool(trackingWin);
+			return false;
 		}
 
 		if (event.type != Event::TouchGesture) {
