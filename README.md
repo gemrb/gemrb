@@ -9,7 +9,7 @@ Copy original game folder to ux0:data/GemRB/ and edit ux0:data/GemRB/GemRB.cfg f
 
 LiveArea launcher supports launching different games from it by selecting appropriate game title.
 
-Here are the game config names and default game folders (where you should copy your game data) that are used by each title from LiveArea (configs should be located in ux0:data/GemRB/):
+Here are the game config names and default game folders (where you should copy your game data) that are used by each title (configs should be located in ux0:data/GemRB/):
 
 - Baldur's Gate - BG1.cfg. Default game path: ux0:data/GemRB/BG1
 - Baldur's Gate 2 - BG2.cfg. Default game path: ux0:data/GemRB/BG2
