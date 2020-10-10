@@ -1708,21 +1708,6 @@ void Map::InitActors()
 
 void Map::InitActor(Actor *actor)
 {
-	//if a visible aggressive actor was put on the map, it is an autopause reason
-	//guess game is always loaded? if not, then we'll crash
-	ieDword gametime = core->GetGame()->GameTime;
-
-	if (IsVisible(actor->Pos, false)) {
-		// This case is probably not possible.  At this point, the actor's position
-		// ought to be 0,0 and the caller of AddActor is expected to follow up with
-		// SetPosition to move the actor to its real position.
-		// The Schedule call here preserves previous behaviour, while also logging
-		// the event if something unexpected happens.  It's unclear whether an
-		// actor can be visible at 0,0 by accident and whether the Schedule call
-		// is meaningful for that case.
-		Log(ERROR, "Map", "Actor visible in InitActor before real position was set");
-		actor->Schedule(gametime, true);
-	}
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
 		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName);
