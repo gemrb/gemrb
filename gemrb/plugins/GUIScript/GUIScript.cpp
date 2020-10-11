@@ -1259,6 +1259,9 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 		PyObject* obj = ConstructObjectForScriptableView(retView->GetScriptingRef());
 		if (Window* win = dynamic_cast<Window*>(retView)) {
 			PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
+		} else if (Control* ctl = dynamic_cast<Control*>(retView)) {
+			PyObject_SetAttrString(obj, "VarName", PyString_FromString(ctl->VarName));
+			PyObject_SetAttrString(obj, "Value", PyLong_FromUnsignedLong(ctl->GetValue()));
 		}
 		return obj;
 	}

@@ -249,6 +249,8 @@ class GControl(GView):
     'SetActionInterval': _GemRB.Control_SetActionInterval,
     'SetStatus': _GemRB.Control_SetStatus
   }
+  
+  __slots__ = ['VarName', 'Value']
 
   # backwards compatibility
   # map old event identifiers to new action system
