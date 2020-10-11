@@ -137,7 +137,6 @@ template<class T, typename... ARGS>
 inline Holder<T> MakeHolder(ARGS&&... args)
 {
 	Holder<T> holder(new T(std::forward<ARGS>(args)...));
-	holder.release();
 	return holder;
 }
 
