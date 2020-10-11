@@ -444,21 +444,14 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 
 	if (fill) {
 		if (flags&BLIT_BLENDED && color.a < 0xff) {
-			SDL_Surface* rectsurf = SDL_CreateRGBSurface( SDL_SWSURFACE, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
-			SDL_Color c = {color.r, color.g, color.b, color.a};
-			SetSurfacePalette(rectsurf, &c, 1);
-
-			assert(rectsurf->format->palette->colors[0].unused == color.a);
 			assert(rgn.w > 0 && rgn.h > 0);
+			
+			static RGBBlendingPipeline<NONE, false> blender;
+
 			Region clippedrgn = ClippedDrawingRect(rgn);
-			SDL_Rect srect = {0, 0, (unsigned short)clippedrgn.w, (unsigned short)clippedrgn.h};
-			SDL_Rect drect = RectFromRegion(clippedrgn);
-
-			// use our RGBBlendingPipeline because SDL 1.2 apprently doesnt support blending 8bit surface + SDL_SRCALPHA to 32bit RGBA (seems like a bug)
-			RGBBlendingPipeline<NONE, false> blender;
-			BlitBlendedRect(rectsurf, currentBuf, srect, drect, blender, 0, NULL);
-
-			SDL_FreeSurface( rectsurf );
+			SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
+			SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+			ColorFill(color, dstit, dstend, blender);
 		} else {
 			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));

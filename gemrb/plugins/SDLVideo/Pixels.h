@@ -592,6 +592,21 @@ struct RGBAChannelIterator : public IAlphaIterator
 };
 
 template<class BLENDER>
+static void ColorFill(const Color& c,
+				 SDLPixelIterator dst, SDLPixelIterator dstend,
+				 const BLENDER& blender)
+{
+	for (; dst != dstend; ++dst) {
+		Color dstc;
+		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
+
+		blender(c, dstc, 0);
+
+		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
+	}
+}
+
+template<class BLENDER>
 static void Blit(SDLPixelIterator src,
 				 SDLPixelIterator dst, SDLPixelIterator dstend,
 				 IAlphaIterator& mask,
