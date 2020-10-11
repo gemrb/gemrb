@@ -230,7 +230,6 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 	}
 
 	buffercache.SetAt(ResRef, (void*)e);
-	//print("LoadSound: added %s to cache. Cache size now %d", ResRef, buffercache.GetCount());
 
 	return chunk;
 }
