@@ -22,8 +22,12 @@
 #define SDLAUDIO_H
 
 #include "Audio.h"
+#include "LRUCache.h"
 
 #include <vector>
+#include <SDL_mixer.h>
+
+#define BUFFER_CACHE_SIZE 40
 
 struct SDL_mutex;
 
@@ -32,6 +36,11 @@ namespace GemRB {
 struct BufferedData {
 	char *buf;
 	unsigned int size;
+};
+
+struct CacheEntry {
+	Mix_Chunk *chunk;
+	unsigned int Length;
 };
 
 class SDLAudio : public Audio {
@@ -65,9 +74,9 @@ private:
 
 	static void music_callback(void *udata, unsigned short *stream, int len);
 	static void buffer_callback(void *udata, char *stream, int len);
-	static void channel_done_callback(int channel);
-
-	std::vector<void *> channel_data;
+	bool evictBuffer();
+	void clearBufferCache();
+	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
 
 	int XPos, YPos;
 	Holder<SoundMgr> MusicReader;
@@ -81,6 +90,7 @@ private:
 	int audio_channels;
 
 	SDL_mutex* OurMutex;
+	LRUCache buffercache;
 };
 
 }
