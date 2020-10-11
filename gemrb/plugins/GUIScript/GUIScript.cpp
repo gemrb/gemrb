@@ -6026,6 +6026,27 @@ static PyObject* GemRB_GameGetFirstSelectedActor(PyObject * /*self*/, PyObject* 
 	return PyInt_FromLong( 0 );
 }
 
+PyDoc_STRVAR( GemRB_GameSwapPCs__doc,
+"===== GameSwapPCs =====\n\
+\n\
+**Prototype:** GemRB.GameSwapPCs (int PC1, int PC2)\n\
+\n\
+**Description:**  Swap the party order of PC1 with PC2.\n\
+\n\
+**Return value:** None"
+);
+
+static PyObject* GemRB_GameSwapPCs(PyObject * /*self*/, PyObject* args)
+{
+	uint32_t PC1, PC2;
+	PARSE_ARGS(args,  "|II", &PC1, &PC2);
+	GET_GAME();
+	
+	game->SwapPCs(PC1, PC2);
+	
+	Py_RETURN_NONE;
+}
+
 PyDoc_STRVAR( GemRB_ActOnPC__doc,
 "===== ActOnPC =====\n\
 \n\
@@ -13127,6 +13148,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetPartySize, METH_VARARGS),
 	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
+	METHOD(GameSwapPCs, METH_VARARGS),
 	METHOD(GetAreaInfo, METH_NOARGS),
 	METHOD(GetAvatarsValue, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
