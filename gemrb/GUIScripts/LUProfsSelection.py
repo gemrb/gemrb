@@ -255,7 +255,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 			ProfsColumn = ProfsTable.GetColumnIndex (ClassName)
 
 	#setup some basic counts
-	RowCount = ProfsTable.GetRowCount () - ProfsTableOffset + 1
+	RowCount = ProfsTable.GetRowCount () - ProfsTableOffset
 	ProfCount = RowCount-ProfsNumButtons #decrease it with the number of controls
 
 	ProfsAssignable = 0
@@ -263,7 +263,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	for i in range(RowCount):
 		ProfName = ProfsTable.GetValue (i+ProfsTableOffset, 1)
 		#decrease it with the number of invalid proficiencies
-		if ProfName > 0x1000000 or ProfName < 0:
+		if ProfName > 0x1000000 or ProfName <= 0:
 			ProfCount -= 1
 
 		#we only need the low 3 bits for proficiencies on levelup; otherwise
