@@ -180,7 +180,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 		return chunk;
 	}
 
-	if(buffercache.Lookup(ResRef, p)) {
+	if (buffercache.Lookup(ResRef, p)) {
 		e = (CacheEntry*) p;
 		time_length = e->Length;
 		return e->chunk;
