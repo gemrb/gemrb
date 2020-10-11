@@ -254,7 +254,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
-	chunk = loadSound( ResRef, time_length );
+	chunk = loadSound(ResRef, time_length);
 	if (chunk == nullptr) {
 		return Holder<SoundHandle>();
 	}
