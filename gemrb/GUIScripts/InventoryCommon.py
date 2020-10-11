@@ -128,7 +128,7 @@ def OnDragItem (btn, slot):
 	UpdateInventoryWindow ()
 	return
 
-def OnDropItemToPC (pc):
+def OnDropItemToPC (btn, pc):
 	"""Gives an item to another character."""
 
 	if pc > GemRB.GetPartySize ():

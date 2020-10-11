@@ -1579,7 +1579,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	return pairs
 
-def OpenInventoryWindowClick (pcID):
+def OpenInventoryWindowClick (btn, pcID):
 	import GUIINV
 	GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
 	GUIINV.OpenInventoryWindow ()
@@ -1647,6 +1647,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	for i, Button in PortraitButtons.iteritems():
 		pcID = i + 1
 		
+		Button.SetVarAssoc("Portrait", pcID)
+		
 		if not GameCheck.IsPST():
 			fontref = "STATES2"
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
@@ -1659,13 +1661,13 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			label.SetFrame(Button.GetInsetFrame(4))
 
 		if needcontrols or GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (OpenInventoryWindowClick, pcID))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenInventoryWindowClick)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, PortraitButtonOnPress)
 
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ButtonIndexBinder(PortraitButtonOnShiftPress, pcID))
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, ButtonIndexBinder(InventoryCommon.OnDropItemToPC, pcID))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDropItemToPC)
 
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
@@ -1685,7 +1687,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(3,3,4,4))
 			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
-			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonHPOnPress, pcID))
+			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(4,3,4,3))
 			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
@@ -1737,8 +1739,8 @@ def UpdatePortraitWindow (indialog = False):
 		portraitFlags = IE_GUI_BUTTON_PORTRAIT | IE_GUI_BUTTON_HORIZONTAL | IE_GUI_BUTTON_ALIGN_LEFT | IE_GUI_BUTTON_ALIGN_BOTTOM
 
 		if GameCheck.IsIWD2():
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, ButtonIndexBinder (OpenInventoryWindowClick, pcID))
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ButtonIndexBinder(PortraitButtonOnPress, pcID))
+			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenInventoryWindowClick)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 
 		Button.SetFlags (portraitFlags, OP_SET)
 
@@ -1858,51 +1860,47 @@ def UpdateAnimatedPortrait (Window,i):
 
 	return
 
-def ButtonIndexBinder (fn, idx):
-	# returned function must take no parameters
-	return lambda: fn(idx)
-
-def PortraitButtonOnPress (i):
+def PortraitButtonOnPress (btn, pcID):
 	"""Selects the portrait individually."""
 
 	if GemRB.GameControlGetTargetMode() != TARGET_MODE_NONE:
-		GemRB.ActOnPC (i)
+		GemRB.ActOnPC (pcID)
 		return
 
 	if (not SelectionChangeHandler):
-		if GemRB.GameIsPCSelected (i):
+		if GemRB.GameIsPCSelected (pcID):
 			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
-		GemRB.GameSelectPC (i, True, SELECT_REPLACE)
+		GemRB.GameSelectPC (pcID, True, SELECT_REPLACE)
 	else:
-		GemRB.GameSelectPCSingle (i)
+		GemRB.GameSelectPCSingle (pcID)
 		SelectionChanged ()
 	return
 
-def PortraitButtonOnShiftPress (i):
+def PortraitButtonOnShiftPress (btn, pcID):
 	"""Handles selecting multiple portaits with shift."""
 
 	if (not SelectionChangeHandler):
-		sel = GemRB.GameIsPCSelected (i)
+		sel = GemRB.GameIsPCSelected (pcID)
 		sel = not sel
-		GemRB.GameSelectPC (i, sel)
+		GemRB.GameSelectPC (pcID, sel)
 	else:
-		GemRB.GameSelectPCSingle (i)
+		GemRB.GameSelectPCSingle (pcID)
 		SelectionChanged ()
 	return
 
-def PortraitButtonHPOnPress (i): ##pst hitpoint display
+def PortraitButtonHPOnPress (btn, pcID): ##pst hitpoint display
 	Window = PortraitWindow
 
 	hbs = GemRB.GetVar('Health Bar Settings')
-	ButtonHP = Window.GetControl (5 + i)
+	ButtonHP = Window.GetControl (5 + pcID)
 
-	if hbs & (1 << (i-1)):
+	if hbs & (1 << (pcID - 1)):
 		op = OP_NAND
 	else:
 		op = OP_OR
 
 	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
-	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (i-1)))
+	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (pcID - 1)))
 	return
 
 def SelectionChanged ():
