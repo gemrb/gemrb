@@ -190,6 +190,10 @@ String Window::TooltipText() const
 
 Holder<Sprite2D> Window::Cursor() const
 {
+	if (drag) {
+		return drag->cursor;
+	}
+	
 	Holder<Sprite2D> cursor = ScrollView::Cursor();
 	if (cursor == NULL && hoverView) {
 		cursor = hoverView->Cursor();

@@ -33,7 +33,8 @@
 
 namespace GemRB {
 
-View::DragOp::DragOp(View* v) : dragView(v)
+View::DragOp::DragOp(View* v, Holder<Sprite2D> cursor)
+: dragView(v), cursor(cursor)
 {}
 
 View::DragOp::~DragOp() {

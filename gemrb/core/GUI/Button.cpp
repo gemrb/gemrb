@@ -39,6 +39,9 @@
 
 namespace GemRB {
 
+Button::PortraitDragOp::PortraitDragOp(Button* b)
+: DragOp(b, core->Cursors[IE_CURSOR_SWAP]), PC(b->ControlID + 1) {}
+
 Button::Button(Region& frame)
 	: Control(frame),
 	buttonImages()
@@ -535,12 +538,6 @@ bool Button::OnMouseOver(const MouseEvent& me)
 void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseEnter(me, dop);
-
-	if (dop && AcceptsDragOperation(*dop)) {
-		if (IS_PORTRAIT) {
-			SetCursor(core->Cursors[IE_CURSOR_SWAP]);
-		}
-	}
 
 	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
 		SetState( IE_GUI_BUTTON_PRESSED );

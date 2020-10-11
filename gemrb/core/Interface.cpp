@@ -122,6 +122,20 @@ static ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
 
+ItemDragOp::ItemDragOp(CREItem* item)
+: DragOp(&dummy, nullptr), item(item), dummy(Region()) {
+	// FIXME: not sure if this is the best place or if there is a better way to get the icon
+	Item* i = gamedata->GetItem(item->ItemResRef);
+	assert(i);
+	Holder<Sprite2D> pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
+	if (pic == nullptr) {
+		// use any / the smaller icon if the dragging one is unavailable
+		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
+	}
+
+	cursor = pic;
+}
+
 Interface::Interface()
 {
 	unsigned int i;
@@ -3865,9 +3879,8 @@ void Interface::LoadProgress(int percent)
 
 void Interface::ReleaseDraggedItem()
 {
-	DraggedItem=NULL; //shouldn't free this
-	
-	winmgr->GetGameWindow()->SetCursor(NULL);
+	DraggedItem = nullptr;
+	winmgr->GetGameWindow()->SetCursor(nullptr);
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
@@ -3878,22 +3891,13 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	if (DraggedItem) {
 		Log(WARNING, "Core", "Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!");
 		delete DraggedItem->item;
+		DraggedItem = nullptr;
 	}
-	DraggedItem = new ItemDragOp(item);
+	
 	if (!item) return;
-
-	// FIXME: not sure if this is the best place or if there is a better way to get the icon
-	Item* i = gamedata->GetItem(item->ItemResRef);
-	assert(i);
-	Holder<Sprite2D> pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
-	if (pic == nullptr) {
-		// use any / the smaller icon if the dragging one is unavailable
-		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
-	}
-
-	if (pic) {
-		winmgr->GetGameWindow()->SetCursor(pic);
-	}
+	
+	DraggedItem = new ItemDragOp(item);
+	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)

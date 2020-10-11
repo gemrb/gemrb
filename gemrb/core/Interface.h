@@ -327,8 +327,7 @@ struct ItemDragOp : public View::DragOp {
 	// for now use a dummy until we truly implement this as a drag event
 	View dummy;
 
-	ItemDragOp(CREItem* item)
-	: DragOp(&dummy), item(item), dummy(Region()) {}
+	ItemDragOp(CREItem* item);
 };
 
 /**

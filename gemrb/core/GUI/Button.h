@@ -121,8 +121,7 @@ public:
 	struct PortraitDragOp : public DragOp {
 		const ieDword PC;
 
-		PortraitDragOp(Button* b)
-		: DragOp(b), PC(b->ControlID + 1) {}
+		PortraitDragOp(Button* b);
 	};
 
 public:
