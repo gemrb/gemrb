@@ -743,9 +743,6 @@ def ReadItemWindow ():
 		OpenErrorWindow (strref)
 		return
 
-	if GameCheck.IsPST():
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-
 	# we already checked for most failures, but we can still fail with bad % rolls vs intelligence
 	ret = Spellbook.LearnFromScroll (pc, slot)
 	if ret == LSR_OK:
@@ -806,10 +803,7 @@ def IdentifyUseSpell ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GameCheck.IsPST():
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot = GemRB.GetVar ("ItemButton")
+	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
 	GemRB.HasSpecialSpell (pc, SP_IDENTIFY, 1)
@@ -826,10 +820,7 @@ def IdentifyUseScroll ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if GameCheck.IsPST():
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot = GemRB.GetVar ("ItemButton")
+	slot = GemRB.GetVar ("ItemButton")
 	if ItemIdentifyWindow:
 		ItemIdentifyWindow.Unload ()
 	if ItemInfoWindow:
