@@ -51,7 +51,6 @@ addons:
 before_install:
   - if [[ $CC == gcc ]]; then CC=gcc-5 && CXX=g++-5; fi
   - export CC CXX
-  - if [ $TRAVIS_OS_NAME == osx ]; then brew update && brew install sdl openal-soft sdl_mixer libpng libvorbis; fi
   - touch id_travissfbot
   - if [[ $TRAVIS_SECURE_ENV_VARS == "true" ]]; then openssl aes-256-cbc -K $encrypted_d3cf1349d561_key -iv $encrypted_d3cf1349d561_iv -in testing/id_travissfbot.enc -out id_travissfbot -d; fi
   - chmod 0600 id_travissfbot
