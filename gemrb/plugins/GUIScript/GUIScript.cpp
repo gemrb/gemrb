@@ -13767,18 +13767,15 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
 	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
 	
-	PyObject* meta = PyObject_Type(obj);
-			
-	if (PyObject_TypeCheck(meta, Py_TYPE(controlClass))) {
+	if (PyObject_IsInstance(obj, controlClass)) {
 		Control* ctl = static_cast<Control*>(GetView(ref));
 		PyObject_SetAttrString(obj, "VarName", PyString_FromString(ctl->VarName));
 		PyObject_SetAttrString(obj, "Value", PyLong_FromUnsignedLong(ctl->GetValue()));
-	} else if (PyObject_TypeCheck(obj, Py_TYPE(windowClass))) {
+		//PyErr_Clear();
+	} else if (PyObject_IsInstance(obj, windowClass)) {
 		Window* win = static_cast<Window*>(GetView(ref));
 		PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
 	}
-	
-	Py_DecRef(meta);
 	
 	return obj;
 }
