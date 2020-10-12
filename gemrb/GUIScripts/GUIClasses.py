@@ -250,7 +250,7 @@ class GControl(GView):
     'SetStatus': _GemRB.Control_SetStatus
   }
   
-  __slots__ = ['VarName', 'Value']
+  __slots__ = ['ControlID', 'VarName', 'Value']
 
   # backwards compatibility
   # map old event identifiers to new action system

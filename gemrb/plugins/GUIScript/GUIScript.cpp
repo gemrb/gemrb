@@ -13772,9 +13772,9 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	
 	if (PyObject_IsInstance(obj, controlClass)) {
 		Control* ctl = static_cast<Control*>(GetView(ref));
+		PyObject_SetAttrString(obj, "ControlID", DecRef(PyLong_FromUnsignedLong, ctl->ControlID));
 		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->VarName));
 		PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, ctl->GetValue()));
-		//PyErr_Clear();
 	} else if (PyObject_IsInstance(obj, windowClass)) {
 		Window* win = static_cast<Window*>(GetView(ref));
 		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
