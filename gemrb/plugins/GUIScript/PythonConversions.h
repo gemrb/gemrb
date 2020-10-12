@@ -148,4 +148,22 @@ PyObject* MakePyList(const Container &source)
 
 }
 
+class DecRef
+{
+	PyObject* obj = nullptr;
+public:
+	template<typename FUNC, typename... ARGS>
+	DecRef(FUNC fn, ARGS&&... args) {
+		obj = fn(std::forward<ARGS>(args)...);
+	}
+	
+	~DecRef() {
+		Py_DecRef(obj);
+	}
+	
+	operator PyObject* () const {
+		return obj;
+	}
+};
+
 #endif

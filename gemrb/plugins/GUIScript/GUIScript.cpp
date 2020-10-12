@@ -1974,14 +1974,14 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 			win->Close();
 			if (win->Flags()&Window::DestroyOnClose) {
 				// invalidate the reference
-				PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
+				PyObject_SetAttrString(pyView, "ID", DecRef(PyInt_FromLong, -1));
 			}
 			Py_RETURN_NONE;
 		}
 
 		if (del) {
 			// invalidate the reference
-			PyObject_SetAttrString(pyView, "ID", PyInt_FromLong(-1));
+			PyObject_SetAttrString(pyView, "ID", DecRef(PyInt_FromLong, -1));
 			view->RemoveFromSuperview();
 			delete view;
 			Py_RETURN_NONE;
@@ -2889,8 +2889,8 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
 		return dict;
 	}
-	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
-	PyDict_SetItemString(dict, "Direction", PyInt_FromLong (wal->DirectionFlags) );
+	PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, wal->DestEntryPoint));
+	PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, wal->DirectionFlags));
 	distance = wm->GetDistance(wmc->Area->AreaName);
 
 	if (eval) {
@@ -2910,8 +2910,8 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 			CopyResRef(tmpresref, linkdest->AreaResRef);
 			if (core->GetGame()->RandomEncounter(tmpresref)) {
 				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-				PyDict_SetItemString(dict, "Destination", PyString_FromString (tmpresref) );
-				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, tmpresref));
+				PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
 				distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
 				wm->SetEncounterArea(tmpresref, wal);
 			} else {
@@ -2923,10 +2923,10 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 
 					if (area[0]) {
 						displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-						PyDict_SetItemString(dict, "Destination", PyString_FromString (area) );
+						PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, area));
 						//drop player in the middle of the map
-						PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
-						PyDict_SetItemString(dict, "Direction", PyInt_FromLong (ADIRF_CENTER) );
+						PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
+						PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, ADIRF_CENTER));
 						//only count half the distance of the final link
 						distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
 						wm->SetEncounterArea(area, wal);
@@ -2937,7 +2937,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 		}
 	}
 
-	PyDict_SetItemString(dict, "Distance", PyInt_FromLong (distance));
+	PyDict_SetItemString(dict, "Distance", DecRef(PyInt_FromLong, distance));
 	return dict;
 }
 
@@ -5700,7 +5700,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 
 	PyObject* dict = PyDict_New();
 	if (idx==-1) {
-		PyDict_SetItemString(dict, "Count", PyInt_FromLong(core->GetInventorySize()));
+		PyDict_SetItemString(dict, "Count", DecRef(PyInt_FromLong, core->GetInventorySize()));
 		return dict;
 	}
 	int tmp = core->QuerySlot(idx);
@@ -5708,10 +5708,10 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		tmp=idx;
 	}
 
-	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(tmp));
-	PyDict_SetItemString(dict, "Type", PyInt_FromLong((int)core->QuerySlotType(tmp)));
-	PyDict_SetItemString(dict, "ID", PyInt_FromLong((int)core->QuerySlotID(tmp)));
-	PyDict_SetItemString(dict, "Tip", PyInt_FromLong((int)core->QuerySlottip(tmp)));
+	PyDict_SetItemString(dict, "Slot", DecRef(PyInt_FromLong, tmp));
+	PyDict_SetItemString(dict, "Type", DecRef(PyInt_FromLong, core->QuerySlotType(tmp)));
+	PyDict_SetItemString(dict, "ID", DecRef(PyInt_FromLong, core->QuerySlotID(tmp)));
+	PyDict_SetItemString(dict, "Tip", DecRef(PyInt_FromLong, core->QuerySlottip(tmp)));
 	//see if the actor shouldn't have some slots displayed
 	if (!actor || !actor->PCStats) {
 		goto has_slot;
@@ -5722,13 +5722,13 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		goto has_slot;
 	}
 	if (actor->GetQuickSlot(tmp-idx)==0xffff) {
-		PyDict_SetItemString(dict, "ResRef", PyString_FromString (""));
+		PyDict_SetItemString(dict, "ResRef", DecRef(PyString_FromString, ""));
 		goto continue_quest;
 	}
 has_slot:
-	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(tmp)));
+	PyDict_SetItemString(dict, "ResRef", DecRef(PyString_FromString, core->QuerySlotResRef(tmp)));
 continue_quest:
-	PyDict_SetItemString(dict, "Effects", PyInt_FromLong (core->QuerySlotEffects(tmp)));
+	PyDict_SetItemString(dict, "Effects", DecRef(PyInt_FromLong, core->QuerySlotEffects(tmp)));
 	return dict;
 }
 
@@ -5770,14 +5770,14 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PCStatsStruct* ps = MyActor->PCStats;
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong ((signed) ps->BestKilledName));
-	PyDict_SetItemString(dict, "BestKilledXP", PyInt_FromLong (ps->BestKilledXP));
-	PyDict_SetItemString(dict, "AwayTime", PyInt_FromLong (ps->AwayTime));
-	PyDict_SetItemString(dict, "JoinDate", PyInt_FromLong (ps->JoinDate));
-	PyDict_SetItemString(dict, "KillsChapterXP", PyInt_FromLong (ps->KillsChapterXP));
-	PyDict_SetItemString(dict, "KillsChapterCount", PyInt_FromLong (ps->KillsChapterCount));
-	PyDict_SetItemString(dict, "KillsTotalXP", PyInt_FromLong (ps->KillsTotalXP));
-	PyDict_SetItemString(dict, "KillsTotalCount", PyInt_FromLong (ps->KillsTotalCount));
+	PyDict_SetItemString(dict, "BestKilledName", DecRef(PyInt_FromLong, ps->BestKilledName));
+	PyDict_SetItemString(dict, "BestKilledXP", DecRef(PyInt_FromLong, ps->BestKilledXP));
+	PyDict_SetItemString(dict, "AwayTime", DecRef(PyInt_FromLong, ps->AwayTime));
+	PyDict_SetItemString(dict, "JoinDate", DecRef(PyInt_FromLong, ps->JoinDate));
+	PyDict_SetItemString(dict, "KillsChapterXP", DecRef(PyInt_FromLong, ps->KillsChapterXP));
+	PyDict_SetItemString(dict, "KillsChapterCount", DecRef(PyInt_FromLong, ps->KillsChapterCount));
+	PyDict_SetItemString(dict, "KillsTotalXP", DecRef(PyInt_FromLong, ps->KillsTotalXP));
+	PyDict_SetItemString(dict, "KillsTotalCount", DecRef(PyInt_FromLong, ps->KillsTotalCount));
 
 	if (ps->FavouriteSpells[0][0]) {
 		int largest = 0;
@@ -5794,11 +5794,11 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong ((signed) spell->SpellName));
+		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyInt_FromLong, spell->SpellName));
 
 		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
-		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (-1));
+		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyInt_FromLong, -1));
 	}
 
 	if (ps->FavouriteWeapons[0][0]) {
@@ -5815,11 +5815,11 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "Item not found!\n" );
 		}
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(true)));
+		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyInt_FromLong, item->GetItemName(true)));
 
 		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (-1));
+		PyDict_SetItemString(dict, "FavouriteWeapon", DecRef(PyInt_FromLong, -1));
 	}
 
 	return dict;
@@ -6102,7 +6102,9 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 		CObject<Sprite2D> obj(portrait);
 		PyObject* dict = PyDict_New();
 		PyDict_SetItemString(dict, "Sprite", obj);
-		PyDict_SetItemString(dict, "ResRef", PyString_FromString(which ? actor->SmallPortrait : actor->LargePortrait));
+		PyObject* pystr = PyString_FromString(which ? actor->SmallPortrait : actor->LargePortrait);
+		PyDict_SetItemString(dict, "ResRef", pystr);
+		Py_DecRef(pystr);
 		return dict;
 	} else {
 		return Py_BuildValue("{s:O,s:s}", "Sprite", Py_None, "ResRef", "");
@@ -6879,11 +6881,11 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	CREItem *ci=container->inventory.GetSlotItem( index );
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( ci->ItemResRef ));
-	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (ci->Usages[0]));
-	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (ci->Usages[1]));
-	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (ci->Usages[2]));
-	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ci->Flags));
+	PyDict_SetItemString(dict, "ItemResRef", DecRef(PyString_FromResRef, ci->ItemResRef));
+	PyDict_SetItemString(dict, "Usages0", DecRef(PyInt_FromLong, ci->Usages[0]));
+	PyDict_SetItemString(dict, "Usages1", DecRef(PyInt_FromLong, ci->Usages[1]));
+	PyDict_SetItemString(dict, "Usages2", DecRef(PyInt_FromLong, ci->Usages[2]));
+	PyDict_SetItemString(dict, "Flags", DecRef(PyInt_FromLong, ci->Flags));
 
 	Item *item = gamedata->GetItem(ci->ItemResRef, true);
 	if (!item) {
@@ -6892,8 +6894,8 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	bool identified = ci->Flags & IE_INV_ITEM_IDENTIFIED;
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( identified )) );
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyInt_FromLong, item->GetItemName( identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyInt_FromLong, item->GetItemDesc( identified )) );
 	gamedata->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
@@ -7113,13 +7115,13 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
-	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( (signed) store->StoreName ));
-	PyDict_SetItemString(dict, "StoreDrinkCount", PyInt_FromLong( store->DrinksCount ));
-	PyDict_SetItemString(dict, "StoreCureCount", PyInt_FromLong( store->CuresCount ));
-	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->GetRealStockSize() ));
-	PyDict_SetItemString(dict, "StoreCapacity", PyInt_FromLong( store->Capacity ));
-	PyDict_SetItemString(dict, "StoreOwner", PyInt_FromLong( store->GetOwnerID() ));
+	PyDict_SetItemString(dict, "StoreType", DecRef(PyInt_FromLong, store->Type ));
+	PyDict_SetItemString(dict, "StoreName", DecRef(PyInt_FromLong, store->StoreName ));
+	PyDict_SetItemString(dict, "StoreDrinkCount", DecRef(PyInt_FromLong, store->DrinksCount ));
+	PyDict_SetItemString(dict, "StoreCureCount", DecRef(PyInt_FromLong, store->CuresCount ));
+	PyDict_SetItemString(dict, "StoreItemCount", DecRef(PyInt_FromLong, store->GetRealStockSize() ));
+	PyDict_SetItemString(dict, "StoreCapacity", DecRef(PyInt_FromLong, store->Capacity ));
+	PyDict_SetItemString(dict, "StoreOwner", DecRef(PyInt_FromLong, store->GetOwnerID() ));
 	PyObject* p = PyTuple_New( 4 );
 
 	int i;
@@ -7152,15 +7154,15 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 		PyTuple_SetItem( p, j, PyInt_FromLong( -1 ) );
 	}
 	PyDict_SetItemString(dict, "StoreButtons", p);
-	PyDict_SetItemString(dict, "StoreFlags", PyInt_FromLong( store->Flags ) );
-	PyDict_SetItemString(dict, "TavernRumour", PyString_FromResRef( store->RumoursTavern ));
-	PyDict_SetItemString(dict, "TempleRumour", PyString_FromResRef( store->RumoursTemple ));
-	PyDict_SetItemString(dict, "IDPrice", PyInt_FromLong( store->IDPrice ) );
-	PyDict_SetItemString(dict, "Lore", PyInt_FromLong( store->Lore ) );
-	PyDict_SetItemString(dict, "Depreciation", PyInt_FromLong( store->DepreciationRate ) );
-	PyDict_SetItemString(dict, "SellMarkup", PyInt_FromLong( store->SellMarkup ) );
-	PyDict_SetItemString(dict, "BuyMarkup", PyInt_FromLong( store->BuyMarkup ) );
-	PyDict_SetItemString(dict, "StealFailure", PyInt_FromLong( store->StealFailureChance ) );
+	PyDict_SetItemString(dict, "StoreFlags", DecRef(PyInt_FromLong, store->Flags));
+	PyDict_SetItemString(dict, "TavernRumour", DecRef(PyString_FromResRef, store->RumoursTavern));
+	PyDict_SetItemString(dict, "TempleRumour", DecRef(PyString_FromResRef, store->RumoursTemple));
+	PyDict_SetItemString(dict, "IDPrice", DecRef(PyInt_FromLong, store->IDPrice));
+	PyDict_SetItemString(dict, "Lore", DecRef(PyInt_FromLong, store->Lore));
+	PyDict_SetItemString(dict, "Depreciation", DecRef(PyInt_FromLong, store->DepreciationRate));
+	PyDict_SetItemString(dict, "SellMarkup", DecRef(PyInt_FromLong, store->SellMarkup));
+	PyDict_SetItemString(dict, "BuyMarkup", DecRef(PyInt_FromLong, store->BuyMarkup));
+	PyDict_SetItemString(dict, "StealFailure", DecRef(PyInt_FromLong, store->StealFailureChance));
 
 	return dict;
 }
@@ -7658,17 +7660,17 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( si->ItemResRef ));
-	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
-	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
-	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
-	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
-	PyDict_SetItemString(dict, "Purchased", PyInt_FromLong (si->PurchasedAmount) );
+	PyDict_SetItemString(dict, "ItemResRef", DecRef(PyString_FromResRef, si->ItemResRef));
+	PyDict_SetItemString(dict, "Usages0", DecRef(PyInt_FromLong, si->Usages[0]));
+	PyDict_SetItemString(dict, "Usages1", DecRef(PyInt_FromLong, si->Usages[1]));
+	PyDict_SetItemString(dict, "Usages2", DecRef(PyInt_FromLong, si->Usages[2]));
+	PyDict_SetItemString(dict, "Flags", DecRef(PyInt_FromLong, si->Flags));
+	PyDict_SetItemString(dict, "Purchased", DecRef(PyInt_FromLong, si->PurchasedAmount));
 
 	if (si->InfiniteSupply==-1) {
-		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
+		PyDict_SetItemString(dict, "Amount", DecRef(PyInt_FromLong, -1));
 	} else {
-		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( si->AmountInStock ) );
+		PyDict_SetItemString(dict, "Amount", DecRef(PyInt_FromLong, si->AmountInStock));
 	}
 
 	Item *item = gamedata->GetItem(si->ItemResRef, true);
@@ -7678,8 +7680,8 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( (bool) identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( (bool) identified )) );
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyInt_FromLong, item->GetItemName(identified)));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyInt_FromLong, item->GetItemDesc(identified)));
 
 	int price = item->Price * store->SellMarkup / 100;
 	//calculate depreciation too
@@ -7691,7 +7693,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	if (price<1) {
 		price = 1;
 	}
-	PyDict_SetItemString(dict, "Price", PyInt_FromLong( price ) );
+	PyDict_SetItemString(dict, "Price", DecRef(PyInt_FromLong, price));
 
 	gamedata->FreeItem( item, si->ItemResRef, false );
 	return dict;
@@ -13629,6 +13631,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 	PyObject *dict = PyModule_GetDict(module);
 
 	PyObject *pFunc = PyDict_GetItemString(dict, functionName);
+	
 	/* pFunc: Borrowed reference */
 	if (!PyCallable_Check(pFunc)) {
 		if (report_error) {
@@ -13761,7 +13764,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 
 	PyObject* obj = ConstructObject(ref->ScriptingClass().c_str(), ref->Id);
 	if (!obj) return RuntimeError("Failed to construct object");
-	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
+	PyObject_SetAttrString(obj, "SCRIPT_GROUP", DecRef(PyString_FromString, ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
 	
 	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
@@ -13769,12 +13772,12 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	
 	if (PyObject_IsInstance(obj, controlClass)) {
 		Control* ctl = static_cast<Control*>(GetView(ref));
-		PyObject_SetAttrString(obj, "VarName", PyString_FromString(ctl->VarName));
-		PyObject_SetAttrString(obj, "Value", PyLong_FromUnsignedLong(ctl->GetValue()));
+		PyObject_SetAttrString(obj, "VarName", DecRef(PyString_FromString, ctl->VarName));
+		PyObject_SetAttrString(obj, "Value", DecRef(PyLong_FromUnsignedLong, ctl->GetValue()));
 		//PyErr_Clear();
 	} else if (PyObject_IsInstance(obj, windowClass)) {
 		Window* win = static_cast<Window*>(GetView(ref));
-		PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
+		PyObject_SetAttrString(obj, "HasFocus", DecRef(PyBool_FromLong, win->HasFocus()));
 	}
 	
 	return obj;
@@ -13784,7 +13787,7 @@ PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
 {
 	PyObject* pyView = gs->ConstructObjectForScriptable(ref);
 	if (pyView) {
-		PyObject_SetAttrString(pyView, "Flags", PyInt_FromLong(ref->GetObject()->Flags()));
+		PyObject_SetAttrString(pyView, "Flags", DecRef(PyInt_FromLong, ref->GetObject()->Flags()));
 	}
 	return pyView;
 }
