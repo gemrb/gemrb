@@ -37,18 +37,8 @@
 
 using namespace GemRB;
 
-#define MAXCOLOR 12
-typedef unsigned char ColorSet[MAXCOLOR];
-
-static int RandColor=-1;
-static int RandRows=-1;
-static ColorSet* randcolors=NULL;
-static int MagicBit;
-
-static void Initializer()
-{
-	MagicBit = core->HasFeature(GF_MAGICBIT);
-}
+static unsigned int RandColor = 1;
+std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
 
 //one column, these don't have a level
 static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
@@ -265,7 +255,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 }
 
 //int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
-static int ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type)
+static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type)
 {
 	int i;
 
@@ -387,11 +377,7 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 
 static void ReleaseMemoryCRE()
 {
-	if (randcolors) {
-		delete [] randcolors;
-		randcolors = NULL;
-	}
-	RandColor = -1;
+	randcolors.clear();
 
 	if (spllist) {
 		delete [] spllist;
@@ -874,47 +860,44 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 
 void CREImporter::SetupColor(ieDword &stat)
 {
-	if (RandColor==-1) {
-		RandColor=0;
-		RandRows=0;
+	if (stat < 200 || RandColor == 0) return;
+
+	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
+	size_t RandRows = 0;
+	if (randcolors.size() == 0) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
-			if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
 		}
-		if (RandRows>1 && RandColor>0) {
-			randcolors = new ColorSet[RandColor];
-			int cols = RandColor;
-			while(cols--)
-			{
-				for (int i=0;i<RandRows;i++) {
-					randcolors[cols][i]=atoi( rndcol->QueryField( i, cols ) );
-				}
-				randcolors[cols][0]-=200;
+		if (RandRows <= 1 || RandColor == 0) {
+			RandColor = 0;
+			return;
+		}
+
+		randcolors.resize(RandColor);
+		for (int cols = RandColor - 1; cols >= 0; cols--) {
+			randcolors[cols] = std::vector<unsigned char>(RandRows);
+			for (size_t i = 0; i < RandRows; i++) {
+				randcolors[cols][i] = atoi(rndcol->QueryField(static_cast<unsigned int>(i), cols));
 			}
-		}
-		else {
-			RandColor=0;
+			randcolors[cols][0] -= 200;
 		}
 	}
 
-	if (stat<200) return;
-	if (RandColor>0) {
-		stat-=200;
-		//assuming an ordered list, so looking in the middle first
-		int i;
-		for (i=(int) stat;i>=0;i--) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	RandRows = randcolors[0].size();
+	stat -= 200;
+	// assuming an ordered list, so looking in the middle first
+	for (int i = (int) stat; i >= 0; i--) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
-		for (i=(int) stat+1;i<RandColor;i++) {
-			if (randcolors[i][0]==stat) {
-				stat = randcolors[i][RAND(0, RandRows - 1)];
-				return;
-			}
+	}
+	for (unsigned int i = stat + 1; i < RandColor; i++) {
+		if (randcolors[i][0] == stat) {
+			stat = randcolors[i][RAND(0, RandRows - 1)];
+			return;
 		}
 	}
 }
@@ -959,6 +942,9 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	ieWordSigned tmps;
 	str->ReadWordSigned( &tmps );
 	act->BaseStats[IE_HITPOINTS]=(ieDwordSigned)tmps;
+	if (tmps <= 0 && ((ieDwordSigned) act->BaseStats[IE_XPVALUE]) < 0) {
+		act->BaseStats[IE_STATE_ID] |= STATE_DEAD;
+	}
 	str->ReadWord( &tmp );
 	act->BaseStats[IE_MAXHITPOINTS]=tmp;
 	str->ReadDword( &act->BaseStats[IE_ANIMATION_ID] );//animID is a dword
@@ -2290,7 +2276,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	ItemsCount = 0;
 	for (i=0;i<Inventory_Size;i++) {
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem(j);
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
 			ItemsCount++;
 		}
@@ -2314,7 +2300,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	return headersize;
 }
 
-int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
+int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned int size)
 {
 	unsigned int i;
 	ieDword tmpDword;
@@ -2329,7 +2315,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem( j );
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
 			indices[i] = ItemCount++;
 		}
@@ -2344,7 +2330,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		CREItem *it = actor->inventory.GetSlotItem( j );
+		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (!it) {
 			continue;
 		}
@@ -2355,7 +2341,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 		stream->WriteWord( &it->Usages[2]);
 		tmpDword = it->Flags;
 		//IWD uses this bit differently
-		if (MagicBit) {
+		if (core->HasFeature(GF_MAGICBIT)) {
 			if (it->Flags&IE_INV_ITEM_MAGICAL) {
 				tmpDword|=IE_INV_ITEM_UNDROPPABLE;
 			} else {
@@ -2367,7 +2353,7 @@ int CREImporter::PutInventory(DataStream *stream, Actor *actor, unsigned int siz
 	return 0;
 }
 
-int CREImporter::PutHeader(DataStream *stream, Actor *actor)
+int CREImporter::PutHeader(DataStream *stream, const Actor *actor)
 {
 	char Signature[8];
 	ieByte tmpByte;
@@ -2701,7 +2687,7 @@ int CREImporter::PutHeader(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
+int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2728,7 +2714,7 @@ int CREImporter::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize
 	return 0;
 }
 
-int CREImporter::PutActorBG(DataStream *stream, Actor *actor)
+int CREImporter::PutActorBG(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2755,7 +2741,7 @@ int CREImporter::PutActorBG(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
+int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2813,7 +2799,7 @@ int CREImporter::PutActorPST(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD1(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2861,7 +2847,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
+int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2924,7 +2910,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
+int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2932,7 +2918,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
 			for (int k=count-1;k>=0;k--) {
-				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
+				const CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				assert(ck);
 				stream->WriteResRef(ck->SpellResRef);
 				stream->WriteWord( &ck->Level);
@@ -2943,7 +2929,7 @@ int CREImporter::PutKnownSpells( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
+int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor)
 {
 	ieWord tmpWord;
 	ieDword tmpDword;
@@ -2970,7 +2956,7 @@ int CREImporter::PutSpellPages( DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
+int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2978,7 +2964,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j, false);
 			for (unsigned int k=0;k<count;k++) {
-				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
+				const CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i, j, k);
 				assert(cm);
 				stream->WriteResRef( cm->SpellResRef);
 				stream->WriteDword( &cm->Flags);
@@ -2988,7 +2974,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutEffects( DataStream *stream, Actor *actor)
+int CREImporter::PutEffects( DataStream *stream, const Actor *actor)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -3038,7 +3024,7 @@ int CREImporter::PutEffects( DataStream *stream, Actor *actor)
 }
 
 //add as effect!
-int CREImporter::PutVariables( DataStream *stream, Actor *actor)
+int CREImporter::PutVariables(DataStream *stream, const Actor *actor)
 {
 	char filling[104];
 	Variables::iterator pos=NULL;
@@ -3082,7 +3068,7 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellT
 
 	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
 	for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-		CREKnownSpell *ck = sm->known_spells[k];
+		const CREKnownSpell *ck = sm->known_spells[k];
 		ID = ResolveSpellName(ck->SpellResRef, level, type);
 		stream->WriteDword ( &ID);
 		max = actor->spellbook.CountSpells(ck->SpellResRef, type, 1);
@@ -3265,6 +3251,5 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 
 GEMRB_PLUGIN(0xE507B60, "CRE File Importer")
 PLUGIN_CLASS(IE_CRE_CLASS_ID, CREImporter)
-PLUGIN_INITIALIZER(Initializer)
 PLUGIN_CLEANUP(ReleaseMemoryCRE)
 END_PLUGIN()

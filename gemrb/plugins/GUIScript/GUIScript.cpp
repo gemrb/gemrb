@@ -3348,7 +3348,6 @@ PyDoc_STRVAR( GemRB_GameControlToggleAlwaysRun__doc,
 
 static PyObject* GemRB_GameControlToggleAlwaysRun(PyObject * /*self*/, PyObject* /*args*/)
 {
-
 	GET_GAMECONTROL();
 
 	gc->ToggleAlwaysRun();
@@ -3768,7 +3767,10 @@ static PyObject* GemRB_Control_SetAnimation(PyObject* self, PyObject* args)
 	}
 
 	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
-	if (!anim->HasControl()) Py_RETURN_NONE;
+	if (!anim->HasControl()) {
+		delete anim;
+		Py_RETURN_NONE;
+	}
 
 	if (Blend) {
 		anim->SetBlend(true);
@@ -5026,7 +5028,7 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 
 	if (flag) {
-		game->AddGold((ieDword) Gold);
+		game->AddGold(Gold);
 	} else {
 		game->PartyGold=Gold;
 	}
@@ -6874,7 +6876,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	if (!container) {
 		return RuntimeError("No current container!");
 	}
-	if (index>=(int) container->inventory.GetSlotCount()) {
+	if (index >= container->inventory.GetSlotCount()) {
 		Py_RETURN_NONE;
 	}
 
@@ -6963,7 +6965,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	int res;
 
 	if (action) { //get stuff from container
-		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
+		if (Slot < 0 || Slot >= container->inventory.GetSlotCount()) {
 			return RuntimeError("Invalid Container slot!");
 		}
 
@@ -7648,7 +7650,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
-	if (index>=(int) store->GetRealStockSize()) {
+	if (index >= store->GetRealStockSize()) {
 		Log(WARNING, "GUIScript", "Item is not available???");
 		Py_RETURN_NONE;
 	}
@@ -10357,7 +10359,7 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Actor *actor = game->FindPC(game->GetSelectedPCSingle());
+	const Actor *actor = game->FindPC(game->GetSelectedPCSingle());
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -12256,7 +12258,7 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 		Log(WARNING, "GUIScript", "No owner found!");
 		Py_RETURN_NONE;
 	}
-	Actor* attacker = game->FindPC((int) game->GetSelectedPCSingle() );
+	Actor *attacker = game->FindPC(game->GetSelectedPCSingle());
 	if (!attacker) {
 		Log(WARNING, "GUIScript", "No thief found!");
 		Py_RETURN_NONE;

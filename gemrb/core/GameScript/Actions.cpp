@@ -291,17 +291,20 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	ieDword value;
+	// int1Parameter is from delta.ids
+	// int2Parameter is supposed to support also bones.ids, but nothing uses it like that
+	// if we need it, take the implementation from GameScript::Damage
 	switch (parameters->int1Parameter) {
-		case 1:
+		case DM_LOWER:
 			value = actor->GetBase(parameters->int0Parameter);
 			value-= parameters->int2Parameter;
 			break;
-		case 2:
+		case DM_RAISE:
 			value = actor->GetBase(parameters->int0Parameter);
 			value+= parameters->int2Parameter;
 			break;
-		case 3:
-		default: //no idea what happens
+		case DM_SET:
+		default:
 			value = parameters->int2Parameter;
 			break;
 	}
@@ -319,7 +322,7 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	ieDword value = parameters->int1Parameter;
-	if (parameters->int2Parameter==1) {
+	if (parameters->int2Parameter==1) { // basically statmod.ids entries, but there's only two
 		value+=actor->GetBase(parameters->int0Parameter);
 	}
 	actor->SetBase( parameters->int0Parameter, value);
@@ -334,7 +337,7 @@ void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	Actor* actor = ( Actor* ) scr;
 	if (parameters->int1Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
@@ -1256,7 +1259,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 
 	Point p;
 	Actor* actor = ( Actor* ) tar;
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	p.fromDword(value);
 	actor->SetPosition(p, true );
 	Sender->ReleaseCurrentAction();
@@ -1841,7 +1844,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
+	value = CheckVariable(target, parameters->string0Parameter);
 	Point p;
 	p.fromDword(value);
 
@@ -1881,19 +1884,24 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	//don't break on bad values
 	if (parameters->int0Parameter >= 10) return;
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	bool force, restart;
 
+	// values from mflags.ids
+	// in the originals it's only used with QUICK_FADE, otherwise we'd have a few todos here
 	switch (parameters->int1Parameter) {
 	case 1: //force switch
 		force = true;
 		restart = true;
 		break;
-	case 3: //force switch, but wait for previous music to end gracefully
+	case 3: // QUICK_FADE
+		//force switch, but wait for previous music to end gracefully
 		force = false;
 		restart = true;
 		break;
+	case 2: // play
+	case 4: // SLOW_FADE
 	default:
 		force = false;
 		restart = false;
@@ -1904,7 +1912,7 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 
 void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
 	map->PlayAreaSong(3, 1, 1);
 }
@@ -2164,9 +2172,7 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 //same as PlaySequence, but the value comes from a variable
 void GameScript::PlaySequenceGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword value;
-
-	value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
 	PlaySequenceCore(Sender, parameters, value);
 }
 
@@ -2864,7 +2870,7 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 //this apparently doesn't check the gold, thus could be used from non actors
 void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword gold = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	ieDword gold = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter);
 	if (Sender->Type == ST_ACTOR) {
 		Actor* act = ( Actor* ) Sender;
 		ieDword mygold = act->GetStat(IE_GOLD);
@@ -3253,7 +3259,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	actor->CurrentActionState--;
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3261,10 +3267,10 @@ void GameScript::Swing(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME * 2);
 }
 
-/* this may not be correct, just a placeholder you can fix */
+/* this is not correct, see #92 */
 void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3272,7 +3278,7 @@ void GameScript::SwingOnce(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetWait(AI_UPDATE_TIME);
 }
 
 void GameScript::Recoil(Scriptable* Sender, Action* /*parameters*/)
@@ -4675,7 +4681,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (count == 1) {
 		// grant the default table item to the Sender in regular games
 		Action *params = new Action(true);
-		sprintf(params->string0Parameter, "%s", tab->QueryField(9999,9999));
+		snprintf(params->string0Parameter, sizeof(params->string0Parameter), "%s", tab->QueryDefault());
 		CreateItem(Sender, params);
 		delete params;
 	}
@@ -4724,7 +4730,7 @@ void GameScript::ExpansionEndCredits(Scriptable *Sender, Action *parameters)
 //always quits game, but based on game it can play end animation, or display
 //death text, etc
 //this covers:
-//QuitGame (play two of 3 movies in PST, display death screen with strref)
+//QuitGame (play two of 3 movies in PST, display death screen with strref; names also in movval.ids)
 //EndGame (display death screen with strref)
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
@@ -4800,6 +4806,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	// bones.ids handling
 	int diceNum = (parameters->int1Parameter>>12)&15;
 	int diceSize = (parameters->int1Parameter>>4)&255;
 	int diceAdd = parameters->int1Parameter&15;
@@ -4816,15 +4823,23 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 		damage = core->Roll(diceNum, diceSize, diceAdd);
 	}
 	int type=MOD_ADDITIVE;
+	// delta.ids
 	switch(parameters->int0Parameter) {
-	case 2: //raise
+	case DM_LOWER: // lower
+		break;
+	case DM_RAISE: //raise
 		damage=-damage;
 		break;
-	case 3: //set
+	case DM_SET: //set
 		type=MOD_ABSOLUTE;
 		break;
-	case 4: //
+	case 4: // GemRB extension
 		type=MOD_PERCENT;
+		break;
+	// NOTE: forge.d has a bunch of calls missing a parameter, eg. Damage(Protagonist, 15)
+	// it's unclear if it worked, but let's accommodate it
+	default:
+		damage = parameters->int0Parameter;
 		break;
 	}
 	//damagetype seems to be always 0
@@ -4853,13 +4868,13 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		return;
 	}
 
-	Actor *act = (Actor *) Sender;
-	Actor *target;
+	const Actor *act = (const Actor *) Sender;
+	const Actor *target;
 
 	if (!act->GetStat(IE_BERSERKSTAGE2) && (core->Roll(1,100,0)<50) ) {
 		//anyone
@@ -5400,14 +5415,14 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
+	const Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!tar) {
 		// target died on us
 		return;
 	}
-	Actor *actor = NULL;
+	const Actor *actor = nullptr;
 	if (tar->Type == ST_ACTOR) {
-		actor = (Actor *) tar;
+		actor = (const Actor *) tar;
 	}
 
 	int flags = parameters->int0Parameter;
@@ -6114,7 +6129,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
+	const WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
 	if (!wmap) {
 		//no such starting area
 		return;
@@ -6129,7 +6144,7 @@ void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* paramet
 void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 1;
@@ -6140,7 +6155,7 @@ void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->objects[1]) {
-		Map *map = Sender->GetCurrentArea();
+		const Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
 		if (spawn) {
 			spawn->Enabled = 0;
@@ -7075,7 +7090,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 
 //this action plays a vvc animation over target
 //we simply apply the appropriate opcode on the target (see iwdopcodes)
-//the list of vvcs is in iwdshtab.2da
+//the list of vvcs is in iwdshtab.2da (sheffect.ids)
 static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 };
 
 void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)

@@ -77,7 +77,7 @@ private:
 	void WillDraw();
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
-	void DrawFog(const Region& rgn);
+	void DrawFog(const Region& rgn) const;
 	
 	Point ConvertPointToGame(Point) const;
 	Point ConvertPointFromGame(Point) const;

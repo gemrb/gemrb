@@ -33,7 +33,7 @@ class DataStream;
 class Map;
 class ScriptedAnimation;
 
-typedef enum VEF_TYPES {VEF_INVALID=-1, VEF_BAM=0, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
+typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
 
 struct ScheduleEntry {
 	ieResRef resourceName;
@@ -61,7 +61,7 @@ public:
 	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
-	ScriptedAnimation *GetSingleObject();
+	ScriptedAnimation *GetSingleObject() const;
 private:
 	//clears the schedule, used internally
 	void Init();

@@ -1857,7 +1857,7 @@ def UpdateAnimatedPortrait (Window,i):
 	Button.SetAnimation (pic, cycle)
 	ButtonHP.SetFlags(IE_GUI_BUTTON_PICTURE, OP_SET)
 
-	if hp_max < 1 or hp is "?":
+	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
 		ratio = (hp + 0.0) / hp_max

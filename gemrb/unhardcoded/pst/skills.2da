@@ -1,0 +1,9 @@
+2DA V1.0
+-1
+             DESC_REF CAP_REF  ID   THIEF    MAGE_THIEF FIGHTER_THIEF CLERIC_THIEF FIGHTER_MAGE_THIEF
+FIRST_LEVEL  *	      *        *    40       40         40            40           40
+RATE         *        *        *    40       40         40            40           40
+OPEN_LOCKS   *        38575    26   1        1          1             1            1
+STEALTH      *        38571    27   1        1          1             1            1
+FIND_TRAPS   *        38572    28   1        1          1             1            1
+PICK_POCKETS *        38574    29   1        1          1             1            1

@@ -117,8 +117,8 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
 
         for(i=0; i<(n/2); i++) {
             alpha = (float) (2 * M_PI * (float)i / (float)n);
-            c1 = (float) cos(alpha);
-            s1 = (float) (sin(alpha) * s2);
+            c1 = cos(alpha);
+            s1 = sin(alpha) * s2;
             s->exptab[i].re = c1;
             s->exptab[i].im = s1;
         }

@@ -81,12 +81,23 @@ public:
 		std::swap(rhs.ptr, ptr);
 		return *this;
 	}
+	
+	T &operator*() const noexcept {
+		return *ptr;
+	}
+	
+	T *operator->() const noexcept {
+		return ptr;
+	}
+	
+	explicit operator bool() const noexcept {
+		return ptr != nullptr;
+	}
 
-	T& operator*() const { return *ptr; }
-	T* operator->() const { return ptr; }
-	explicit operator bool() const noexcept { return ptr != nullptr; }
+	T *get() const noexcept {
+		return ptr;
+	}
 
-	T* get() const { return ptr; }
 	void release() {
 		if (ptr)
 			ptr->release();

@@ -22,6 +22,7 @@
 #include "win32def.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
+#include "voodooconst.h"
 
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
@@ -193,26 +194,12 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 		delete Scripts[idx];
 	}
 	Scripts[idx] = NULL;
-	// NONE is an 'invalid' script name, never used seriously
-	// This hack is to prevent flooding of the console
-	if (aScript[0] && stricmp(aScript, "NONE") ) {
+	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
+	// This check is to prevent flooding of the console
+	if (aScript[0] && stricmp(aScript, "NONE")) {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript( aScript, this, idx, ai );
 	}
-}
-
-void Scriptable::SetScript(int index, GameScript* script)
-{
-	if (index >= MAX_SCRIPTS) {
-		Log(ERROR, "Scriptable", "Invalid script index!");
-		return;
-	}
-	if (Scripts[index] && Scripts[index]->running) {
-		Scripts[index]->dead = true;
-	} else {
-		delete Scripts[index];
-	}
-	Scripts[index] = script;
 }
 
 void Scriptable::SetSpellResRef(ieResRef resref) {
@@ -417,7 +404,10 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	// don't run scripts if we're in dialog
-	if ((gc->GetDialogueFlags() & DF_IN_DIALOG) && gc->dialoghandler->InDialog(this) &&
+	// ... if it's a script-blocking one (exceptions only possible in bg2, see use of GF_FORCE_DIALOGPAUSE)
+	constexpr int freezingDLG = DF_IN_DIALOG | DF_FREEZE_SCRIPTS;
+	if ((gc->GetDialogueFlags() & freezingDLG) == freezingDLG &&
+		gc->dialoghandler->InDialog(this) &&
 		(!act || act->Modified[IE_IGNOREDIALOGPAUSE] == 0)) {
 		return;
 	}
@@ -585,6 +575,7 @@ void Scriptable::ProcessActions()
 		}
 		if (!CurrentAction) {
 			ClearActions();
+			// clear lastAction here if you'll ever need it after exiting the loop
 			break;
 		}
 		lastAction = CurrentAction->actionID;
@@ -628,7 +619,7 @@ unsigned long Scriptable::GetWait() const
 	return WaitCounter;
 }
 
-void Scriptable::LeaveDialog()
+void Scriptable::LeftDialog()
 {
 	AddTrigger(TriggerEntry(trigger_wasindialog));
 }
@@ -715,7 +706,7 @@ bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
 	return false;
 }
 
-bool Scriptable::MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param) {
+bool Scriptable::MatchTriggerWithObject(unsigned short id, const Object *obj, ieDword param) {
 	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
 		TriggerEntry &trigger = *m;
 		if (trigger.triggerID != id)
@@ -1231,7 +1222,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;
 		}
-		if ((signed)detective->GetSkill(IE_SPELLCRAFT) <= 0) {
+		if (detective->GetSkill(IE_SPELLCRAFT) <= 0) {
 			continue;
 		}
 
@@ -1991,9 +1982,9 @@ Movable::~Movable(void)
 	}
 }
 
-int Movable::GetPathLength()
+int Movable::GetPathLength() const
 {
-	PathNode *node = GetNextStep(0);
+	const PathNode *node = GetNextStep(0);
 	if (!node) return 0;
 
 	int i = 0;
@@ -2004,7 +1995,7 @@ int Movable::GetPathLength()
 	return i;
 }
 
-PathNode *Movable::GetNextStep(int x)
+PathNode *Movable::GetNextStep(int x) const
 {
 	if (!step) {
 		error("GetNextStep", "Hit with step = null");
@@ -2016,7 +2007,7 @@ PathNode *Movable::GetNextStep(int x)
 	return node;
 }
 
-Point Movable::GetMostLikelyPosition()
+Point Movable::GetMostLikelyPosition() const
 {
 	if (!path) {
 		return Pos;
@@ -2025,7 +2016,7 @@ Point Movable::GetMostLikelyPosition()
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
 	int halfway = GetPathLength()/2;
-	PathNode *node = GetNextStep(halfway);
+	const PathNode *node = GetNextStep(halfway);
 	if (node) {
 		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
 	}
@@ -2186,8 +2177,6 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	const int XEPS = 72;
-	const int YEPS = 36;
 	Actor *actor = nullptr;
 	if (Type == ST_ACTOR) actor = (Actor*)this;
 	// Only bump back if not moving
@@ -2229,11 +2218,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 
 		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS && std::abs(nmptStep.y - Pos.y) < YEPS) {
+			if (!(step->Next) && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				// Do not call ReleaseCurrentAction() since other actions
 				// than MoveToPoint can cause movement
+				Log(DEBUG, "PathFinderWIP", "Abandoning because I'm close to the goal");
 				pathAbandoned = true;
 				return;
 			}

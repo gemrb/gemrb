@@ -99,10 +99,9 @@ public:
 	ieStrRef NameStrRef;
 	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
-	void SetWallgroups(int count, int value);
-	void ImpedeBlocks(int count, Point *points, unsigned char value);
+	void ImpedeBlocks(int count, Point *points, unsigned char value) const;
 	void UpdateDoor();
-	bool BlockedOpen(int Open, int ForceOpen);
+	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
 	void ToggleTiles(int State, int playsound = false);
 	void SetName(const char* Name); // sets door ID
@@ -112,11 +111,11 @@ public:
 	void SetDoorOpen(int Open, int playsound, ieDword ID);
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
-	void TryPickLock(Actor *actor);
+	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor* actor) ;
 	bool TryUnlock(Actor *actor);
 	void TryDetectSecret(int skill, ieDword actorID);
-	bool Visible();
+	bool Visible() const;
 	void dump() const;
 	int TrapResets() const { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }

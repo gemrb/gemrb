@@ -480,7 +480,7 @@ int BIKPlayer::video_init()
 		if(!c_bundle[i].data) {
 			return 1;
 		}
-		c_bundle[i].data_end = (uint8_t *) c_bundle[i].data + blocks * 64;
+		c_bundle[i].data_end = c_bundle[i].data + blocks * 64;
 	}
 
 	return 0;

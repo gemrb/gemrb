@@ -34,6 +34,15 @@ addons:
     - python-dev
     - g++-5
     
+  homebrew:
+    packages:
+    - sdl
+    - openal-soft
+    - sdl_mixer
+    - libpng
+    - libvorbis
+    update: true
+    
     # not needed for building
     - gdb
 

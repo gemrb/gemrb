@@ -962,7 +962,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	//quickspells
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (i=0;i<MAX_QSLOTS;i++) {
-			if ( (ieByte) ac->PCStats->QuickSpellClass[i]>=0xfe) {
+			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
 				stream->Write(filling,8);
 			} else {
 				stream->Write(ac->PCStats->QuickSpells[i],8);
@@ -1009,14 +1009,14 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	//innates, bard songs and quick slots are saved only in iwd2
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (i=0;i<MAX_QSLOTS;i++) {
-			if ( (ieByte) ac->PCStats->QuickSpellClass[i]==0xff) {
+			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
 				stream->Write(ac->PCStats->QuickSpells[i],8);
 			} else {
 				stream->Write(filling,8);
 			}
 		}
 		for (i=0;i<MAX_QSLOTS;i++) {
-			if ((ieByte) ac->PCStats->QuickSpellClass[i]==0xfe) {
+			if (ac->PCStats->QuickSpellClass[i] == 0xfe) {
 				stream->Write(ac->PCStats->QuickSpells[i],8);
 			} else {
 				stream->Write(filling,8);

@@ -85,7 +85,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 {
 	assert( m_pHashTable != NULL ); // never call on empty map
 
-	Variables::MyAssoc* pAssocRet = ( Variables::MyAssoc* ) rNextPosition;
+	Variables::MyAssoc *pAssocRet = rNextPosition;
 
 	if (pAssocRet == NULL) {
 		// find the first association
@@ -107,7 +107,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 	// fill in return data
 	rKey = pAssocRet->key;
 	rValue = pAssocRet->Value.nValue;
-	return ( iterator ) pAssocNext;
+	return pAssocNext;
 }
 
 Variables::Variables(int nBlockSize, int nHashTableSize)
@@ -355,7 +355,7 @@ void Variables::SetAtCopy(const char* key, const char* value)
 void Variables::SetAtCopy(const char* key, int newValue)
 {
 	char tmpstr[10]; // should be enough
-	sprintf(tmpstr, "%d", newValue);
+	snprintf(tmpstr, sizeof(tmpstr), "%d", newValue);
 	SetAtCopy(key, tmpstr);
 }
 

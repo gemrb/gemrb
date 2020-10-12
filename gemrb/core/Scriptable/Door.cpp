@@ -97,7 +97,7 @@ Door::~Door(void)
 	}
 }
 
-void Door::ImpedeBlocks(int count, Point *points, unsigned char value)
+void Door::ImpedeBlocks(int count, Point *points, unsigned char value) const
 {
 	for(int i = 0;i<count;i++) {
 		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_NOTDOOR;
@@ -241,7 +241,7 @@ std::shared_ptr<Gem_Polygon> Door::ClosedTriggerArea() const
 }
 
 //also mark actors to fix position
-bool Door::BlockedOpen(int Open, int ForceOpen)
+bool Door::BlockedOpen(int Open, int ForceOpen) const
 {
 	bool blocked;
 	int count;
@@ -343,7 +343,7 @@ void Door::TryDetectSecret(int skill, ieDword actorID)
 }
 
 // return true if the door isn't secret or if it is, but was already discovered
-bool Door::Visible()
+bool Door::Visible() const
 {
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
@@ -364,7 +364,7 @@ void Highlightable::SetTrapDetected(int x)
 	}
 }
 
-void Highlightable::TryDisarm(Actor *actor)
+void Highlightable::TryDisarm(const Actor *actor)
 {
 	if (!Trapped || !TrapDetected) return;
 
@@ -413,7 +413,7 @@ void Highlightable::TryDisarm(Actor *actor)
 	ImmediateEvent();
 }
 
-void Door::TryPickLock(Actor *actor)
+void Door::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenStrRef != (ieDword)-1) {

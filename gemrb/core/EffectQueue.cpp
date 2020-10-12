@@ -390,7 +390,7 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
-void EffectQueue::ModifyAllEffectSources(Point &source)
+void EffectQueue::ModifyAllEffectSources(const Point &source)
 {
 	std::list< Effect* >::const_iterator f;
 
@@ -461,12 +461,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
 		newfx->Target = FX_TARGET_PRESET;
-		if( newfx->Resource3[0]) {
-			strnuprcpy(newfx->Resource,newfx->Resource3, sizeof(ieResRef)-1 );
-		} else {
-			//FIXME: unhardcode; should probably use a spell hit (shtable) in some way
-			strnuprcpy(newfx->Resource,"SPGFLSH1", sizeof(ieResRef)-1 );
-		}
+		strnuprcpy(newfx->Resource, newfx->Resource3[0] ? newfx->Resource3 : "SPGFLSH1", sizeof(ieResRef) - 1);
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 			//unprepare duration
 			newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
@@ -823,7 +818,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		return false;
 	}
 
-	ieDword level = (ieDword) target->GetXPLevel( true );
+	ieDword level = target->GetXPLevel(true);
 	//return true if resisted
 	if ((signed)fx->MinAffectedLevel > 0) {
 		if ((signed)level < (signed)fx->MinAffectedLevel) {
@@ -861,7 +856,7 @@ static inline int DecreaseEffect(Effect *efx)
 }
 
 //lower decreasing immunities/bounces
-static int check_type(Actor* actor, const Effect* fx)
+static int check_type(const Actor *actor, const Effect *fx)
 {
 	//the protective effect (if any)
 	Effect *efx;

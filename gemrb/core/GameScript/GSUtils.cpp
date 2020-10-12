@@ -126,7 +126,7 @@ void InitScriptTables()
 	}
 }
 
-int GetReaction(Actor *target, Scriptable *Sender)
+int GetReaction(const Actor *target, const Scriptable *Sender)
 {
 	int chr, rep, reaction;
 
@@ -145,18 +145,18 @@ int GetReaction(Actor *target, Scriptable *Sender)
 
 	// add -4 penalty when dealing with racial enemies
 	if (Sender && target->GetRangerLevel() && (Sender->Type == ST_ACTOR) ) {
-		reaction -= target->GetRacialEnemyBonus((Actor *) Sender);
+		reaction -= target->GetRacialEnemyBonus((const Actor *) Sender);
 	}
 
 	return reaction;
 }
 
-int GetHappiness(Scriptable* Sender, int reputation)
+int GetHappiness(const Scriptable *Sender, int reputation)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* ab = ( Actor* ) Sender;
+	const Actor *ab = (const Actor *) Sender;
 	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
 	// handle unset alignment
 	if (!alignment) {
@@ -166,12 +166,12 @@ int GetHappiness(Scriptable* Sender, int reputation)
 	return happiness[alignment-1][reputation/10-1];
 }
 
-int GetHPPercent(Scriptable* Sender)
+int GetHPPercent(const Scriptable *Sender)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
-	Actor* ab = ( Actor* ) Sender;
+	const Actor *ab = (const Actor *) Sender;
 	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
 	if (hp1<1) {
 		return 0;
@@ -376,7 +376,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
+bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags)
 {
 	if (inventory->HasItem(itemname, flags)) {
 		return true;
@@ -523,19 +523,17 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
+int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int seeflag)
 {
-	Map *map;
-
 	if (target->Type==ST_ACTOR) {
-		Actor *tar = (Actor *) target;
+		const Actor *tar = (const Actor *) target;
 
 		if (!tar->ValidTarget(seeflag, Sender)) {
 			return 0;
 		}
 	}
 
-	map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	//if (!(seeflag&GA_GLOBAL)) {
 		if (!map || map!=Sender->GetCurrentArea() ) {
 			return 0;
@@ -546,7 +544,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 		unsigned int dist;
 		bool los = true;
 		if (Sender->Type == ST_ACTOR) {
-			Actor* snd = ( Actor* ) Sender;
+			const Actor *snd = (const Actor *) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
 		} else {
 			dist = VOODOO_VISUAL_RANGE;
@@ -566,7 +564,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seeflag)
 
 //non actors can see too (reducing function to LOS)
 //non actors can be seen too (reducing function to LOS)
-int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
+int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 {
 	//see dead; unscheduled actors are never visible, though
 	int flags = GA_NO_UNSCHEDULED;
@@ -576,7 +574,7 @@ int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 	} else {
 		flags |= GA_NO_DEAD;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter, flags );
+	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter, flags);
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
@@ -921,7 +919,7 @@ static void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
 	}
 }
 
-void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
+void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest)
 {
 	if (!dest) {
 		position = scr->Pos;
@@ -933,16 +931,16 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			break;
 		case ST_ACTOR:
 		//if there are other moveables, put them here
-			position = ((Movable *) scr)->GetMostLikelyPosition();
+			position = ((const Movable *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			if (((InfoPoint *) scr)->GetUsePoint()) {
-				position=((InfoPoint *) scr)->UsePoint;
+			if (((const InfoPoint *) scr)->GetUsePoint()) {
+				position = ((const InfoPoint *) scr)->UsePoint;
 				break;
 			}
 		// intentional fallthrough
 		case ST_DOOR: case ST_CONTAINER:
-			position=((Highlightable *) scr)->TrapLaunch;
+			position = ((const Highlightable *) scr)->TrapLaunch;
 	}
 }
 
@@ -1263,15 +1261,15 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable *target = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Point dest = target->Pos;
-	if (target->Type == ST_TRIGGER && ((InfoPoint *)target)->GetUsePoint()) {
-		dest = ((InfoPoint *)target)->UsePoint;
+	if (target->Type == ST_TRIGGER && ((const InfoPoint *)target)->GetUsePoint()) {
+		dest = ((const InfoPoint *)target)->UsePoint;
 	}
 	if (untilsee && CanSee(actor, target, true, 0) ) {
 		Sender->LastSeen = target->GetGlobalID();
@@ -1764,10 +1762,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	return newAction;
 }
 
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release)
+void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release)
 {
 	Point p;
-	Map *myarea, *hisarea;
 
 	if (Sender->Type != ST_ACTOR) {
 		Log(ERROR, "GameScript", "MoveNearerTo only works with actors");
@@ -1775,8 +1772,8 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont
 		return;
 	}
 
-	myarea = Sender->GetCurrentArea();
-	hisarea = target->GetCurrentArea();
+	const Map *myarea = Sender->GetCurrentArea();
+	const Map *hisarea = target->GetCurrentArea();
 	if (hisarea && hisarea!=myarea) {
 		target = myarea->GetTileMap()->GetTravelTo(hisarea->GetScriptName());
 
@@ -1799,7 +1796,7 @@ void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont
 		distance += ((Actor *)Sender)->size*10;
 	}
 	if (distance && target->Type == ST_ACTOR) {
-		distance += ((Actor *)target)->size*10;
+		distance += ((const Actor *) target)->size * 10;
 	}
 
 	MoveNearerTo(Sender, p, distance, dont_release);
@@ -1824,7 +1821,7 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 
 	if (!actor->InMove() || actor->Destination != p) {
 		bool always_run = core->GetGameControl()->ShouldRun(actor);
-		actor->WalkTo(p, IF_RUNNING * always_run, distance);
+		actor->WalkTo(p, always_run ? IF_RUNNING : 0, distance);
 	}
 
 	if (!actor->InMove()) {
@@ -2112,14 +2109,12 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( VarName, value, NoCreate);
-		}
-		else if (InDebug&ID_VARIABLES) {
+		} else if (InDebug & ID_VARIABLES) {
 			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
 				Context, VarName);
 		}
-	}
-	else {
-		game->locals->SetAt( VarName, ( ieDword ) value, NoCreate );
+	} else {
+		game->locals->SetAt(VarName, value, NoCreate);
 	}
 }
 
@@ -2154,14 +2149,12 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
-		}
-		else if (InDebug&ID_VARIABLES) {
+		} else if (InDebug & ID_VARIABLES) {
 			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
 				VarName);
 		}
-	}
-	else {
-		game->locals->SetAt( poi, ( ieDword ) value, NoCreate );
+	} else {
+		game->locals->SetAt(poi, value, NoCreate);
 	}
 }
 
@@ -2348,7 +2341,7 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 	return 0;
 }
 
-int GetGroup(Actor *actor)
+int GetGroup(const Actor *actor)
 {
 	int type = 2; //neutral, has no enemies
 	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -2360,7 +2353,7 @@ int GetGroup(Actor *actor)
 	return type;
 }
 
-Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
+Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho)
 {
 	//determining the allegiance of the origin
 	int type = GetGroup(origin);
@@ -2406,7 +2399,7 @@ Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho)
 	return ac;
 }
 
-Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho)
+Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 {
 	Targets *tgts = new Targets();
 
@@ -2444,11 +2437,11 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 		return p;
 	}
 	const char *tmpstr = tab->QueryField(areaname, entryname);
-	int x=-1;
-	int y=-1;
-	sscanf(tmpstr, "%d.%d", &x, &y);
-	p.x=(short) x;
-	p.y=(short) y;
+	short x = -1;
+	short y = -1;
+	sscanf(tmpstr, "%hd.%hd", &x, &y);
+	p.x = x;
+	p.y = y;
 	return p;
 }
 

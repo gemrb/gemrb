@@ -71,17 +71,17 @@ extern Gem_Polygon **polygons;
 #define MIC_NOITEM 0
 #define MIC_GOTITEM 1
 
-GEM_EXPORT int GetReaction(Actor *target, Scriptable *Sender);
-GEM_EXPORT int GetHappiness(Scriptable *Sender, int reputation);
-int GetHPPercent(Scriptable *Sender);
+GEM_EXPORT int GetReaction(const Actor *target, const Scriptable *Sender);
+GEM_EXPORT int GetHappiness(const Scriptable *Sender, int reputation);
+int GetHPPercent(const Scriptable *Sender);
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname);
-bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags);
+bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags);
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed);
 void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
 void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations);
-void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
+void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool trap);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
 void PolymorphCopyCore(Actor *src, Actor *tar);
@@ -98,7 +98,7 @@ GEM_EXPORT ieDword ResolveSpellNumber(const ieResRef spellres);
 bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot);
 void EscapeAreaCore(Scriptable *Sender, const Point &p, const char *area, const Point &enter, int flags, int wait);
 void GoNear(Scriptable *Sender, const Point &p);
-void MoveNearerTo(Scriptable *Sender, Scriptable *target, int distance, int dont_release=0);
+void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, int dont_release = 0);
 int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_release);
 
 #define NO_OPERATION -1
@@ -116,9 +116,9 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_releas
 #define BINARY_MORE 10          //left has more bits than right
 #define BINARY_LESS 11          //left has less bits than right
 
-GEM_EXPORT int GetGroup(Actor *actor);
-GEM_EXPORT Actor *GetNearestOf(Map *map, Actor *origin, int whoseeswho);
-GEM_EXPORT Actor *GetNearestEnemyOf(Map *map, Actor *origin, int whoseeswho);
+GEM_EXPORT int GetGroup(const Actor *actor);
+GEM_EXPORT Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho);
+GEM_EXPORT Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho);
 GEM_EXPORT void FreeSrc(SrcVector *poi, const ieResRef key);
 GEM_EXPORT SrcVector *LoadSrc(const ieResRef resname);
 bool IsInObjectRect(const Point &pos, const Region &rect);
@@ -127,8 +127,8 @@ Action *ParamCopyNoOverride(Action *parameters);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
-GEM_EXPORT int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead);
-GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
+GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead);
+GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);

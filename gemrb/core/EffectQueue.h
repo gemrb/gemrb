@@ -98,12 +98,6 @@ class StringBuffer;
 //pst immunities
 #define IMM_GUARDIAN  0x80000000
 
-// FIXME: Dice roll should be probably done just once, e.g. when equipping
-// the item, not each time the fx are applied
-// <avenger> the dice values are actually level limits, except in 3 hp modifier functions
-// the damage function is an instant (the other 2 functions might be tricky with random values)
-//#define DICE_ROLL(max_val) ((fx->DiceThrown && fx->DiceSides) ? ((max_val >=0) ? (MIN( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val )) : (MAX( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val ))) : max_val)
-
 //sometimes damage doesn't comply with the calculated value
 #define DICE_ROLL(adjustment) (core->Roll( fx->DiceThrown, fx->DiceSides, adjustment) )
 
@@ -294,7 +288,7 @@ public:
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
-	void ModifyAllEffectSources(Point &source);
+	void ModifyAllEffectSources(const Point &source);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }

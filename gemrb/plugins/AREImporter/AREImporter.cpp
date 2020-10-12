@@ -362,7 +362,7 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 		}
 	}
 	// delayed bad bit removal due to chain overlapping
-	return Flags = (Flags & ~maskOff) | maskOn;
+	return (Flags & ~maskOff) | maskOn;
 }
 
 static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
@@ -904,8 +904,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &OpenImpededCount );
 		str->ReadWord( &ClosedImpededCount );
 		str->ReadDword( &ClosedFirstImpeded );
-		str->ReadWord( &hp); //TODO: store these
-		str->ReadWord( &ac); //hitpoints AND armorclass, according to IE dev info
+		str->ReadWord(&hp); // hitpoints
+		str->ReadWord(&ac); // AND armorclass, according to IE dev info
 		ieResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
@@ -1276,6 +1276,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			anim->startFrameRange = 0; //this will never get resaved (iirc)
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
 			str->ReadResRef( anim->PaletteRef );
+			// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
+			// 0x4a holds the height
 			str->ReadDword( &anim->unknown48 );
 
 			if (pst) {
@@ -1365,6 +1367,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Point point;
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
+
 	if (pst) {
 		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
 		if (flags == NULL) {
@@ -1396,13 +1399,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				while (count) {
 					char key[32];
 					int value;
-					sprintf(key, "xPos%d",count);
+					snprintf(key, sizeof(key), "xPos%d",count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.x = value;
-					sprintf(key, "yPos%d",count);
+					snprintf(key, sizeof(key), "yPos%d",count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					point.y = value;
-					sprintf(key, "text%d",count);
+					snprintf(key, sizeof(key), "text%d",count);
 					value = INInote->GetKeyAsInt(scriptName, key, 0);
 					map->AddMapNote(point, 0, value, true);
 					count--;
@@ -1464,7 +1467,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord TrapSize, ProID;
 		ieWord X,Y,Z;
 		ieDword Ticks;
-		ieByte PartyID;
+		ieByte TargetType;
 		ieByte Owner;
 
 		str->Seek( TrapOffset + ( i * 0x1c ), GEM_STREAM_START );
@@ -1477,8 +1480,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord( &X );
 		str->ReadWord( &Y );
 		str->ReadWord( &Z );
-		str->Read( &PartyID,1 );  //according to dev info, this is 'targettype'
-		str->Read( &Owner,1 );
+		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targetting" on IESDP
+		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {
 			Log(ERROR, "AREImporter", "TrapEffectSize in game: %d != %d. Clearing it",
@@ -1495,12 +1498,16 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		EffectQueue *fxqueue = new EffectQueue();
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
-		ReadEffects((DataStream *) fs,fxqueue, TrapEffectCount);
-		Actor * caster = core->GetGame()->FindPC(PartyID);
+		ReadEffects(fs, fxqueue, TrapEffectCount);
+		Actor *caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
-			//FIXME: i don't know the level info
-			pro->SetCaster(caster->GetGlobalID(), 10);
+			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
+			// It matters for the normal thief traps (they scale with level 4 times), while the rest don't scale.
+			// To be more flexible and better handle disabled dualclasses, we don't hardcode it to the thief level.
+			// Perhaps simplify and store the level in Z? Would need a check in the original (don't break saves).
+			ieDword level = caster->GetThiefLevel();
+			pro->SetCaster(caster->GetGlobalID(), level ? level : caster->GetXPLevel(false));
 		}
 		Point pos(X,Y);
 		map->AddProjectile( pro, pos, pos);
@@ -1513,28 +1520,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
-		//these fields could be different size
-		//ieDword ClosedCount, OpenCount;
+		// these fields could be different size: ieDword ClosedCount, OpenCount;
 		ieWord ClosedCount, OpenCount;
 		ieDword ClosedIndex, OpenIndex;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadResRef( ID );
 		str->ReadDword( &Flags );
-		//TODO check this structure again
-/*
-		str->ReadDword( &OpenIndex );
-		str->ReadDword( &OpenCount );
-		str->ReadDword( &ClosedIndex );
-		str->ReadDword( &ClosedCount );
-*/
 		//IE dev info says this:
 		str->ReadDword( &OpenIndex );
 		str->ReadWord( &OpenCount );
 		str->ReadWord( &ClosedCount );
 		str->ReadDword( &ClosedIndex );
 		//end of disputed section
-
 
 		str->Seek( 48, GEM_CURRENT_POS );
 		//absolutely no idea where these 'tile indices' are stored
@@ -1626,7 +1624,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += InfoPointsCount * 0xc4;
 	SpawnOffset = headersize;
 
-	SpawnCount = (ieDword) map->GetSpawnCount();
+	SpawnCount = map->GetSpawnCount();
 	headersize += SpawnCount * 0xc8;
 	EntrancesOffset = headersize;
 
@@ -1675,7 +1673,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
 
-	AmbiCount = (ieDword) map->GetAmbientCount(true);
+	AmbiCount = map->GetAmbientCount(true);
 	headersize += AmbiCount * 0xd4;
 	VariablesOffset = headersize;
 
@@ -1697,7 +1695,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 	TrapCount = (ieDword) map->GetTrapCount(piter);
 	for(i=0;i<TrapCount;i++) {
-		Projectile *pro = map->GetNextTrap(piter);
+		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
@@ -1711,7 +1709,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	NoteOffset = headersize;
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
-	NoteCount = (ieDword) map->GetMapNoteCount();
+	NoteCount = map->GetMapNoteCount();
 	headersize += NoteCount * (pst?0x214: 0x34);
 	SongHeader = headersize;
 
@@ -1722,7 +1720,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	return headersize;
 }
 
-int AREImporter::PutHeader(DataStream *stream, Map *map)
+int AREImporter::PutHeader(DataStream *stream, const Map *map)
 {
 	char Signature[56];
 	ieDword tmpDword = 0;
@@ -1792,7 +1790,7 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &tmpDword);
 
 	//the saved area script is in the last script slot!
-	GameScript *s = map->Scripts[MAX_SCRIPTS-1];
+	const GameScript *s = map->Scripts[MAX_SCRIPTS - 1];
 	if (s) {
 		stream->WriteResRef( s->GetName() );
 	} else {
@@ -1828,7 +1826,7 @@ int AREImporter::PutHeader(DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	char filling[8];
 	ieWord tmpWord = 0;
@@ -1894,7 +1892,7 @@ int AREImporter::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) d->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteResRef( d->KeyResRef);
-		GameScript *s = d->Scripts[0];
+		const GameScript *s = d->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -1945,7 +1943,7 @@ int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 	return 0;
 }
 
-int AREImporter::PutVertices( DataStream *stream, Map *map)
+int AREImporter::PutVertices(DataStream *stream, const Map *map)
 {
 	unsigned int i;
 
@@ -1961,14 +1959,14 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 		if (c->outline) {
 			PutPoints(stream, c->outline->vertices);
 		}
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
-		Door *d = map->TMap->GetDoor(i);
+		const Door *d = map->TMap->GetDoor(i);
 		auto open = d->OpenTriggerArea();
 		auto closed = d->ClosedTriggerArea();
 		if (open)
@@ -1981,13 +1979,13 @@ int AREImporter::PutVertices( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutItems( DataStream *stream, Map *map)
+int AREImporter::PutItems(DataStream *stream, const Map *map)
 {
 	for (unsigned int i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 
 		for(int j=0;j<c->inventory.GetSlotCount();j++) {
-			CREItem *ci = c->inventory.GetSlotItem(j);
+			const CREItem *ci = c->inventory.GetSlotItem(j);
 
 			stream->WriteResRef( ci->ItemResRef);
 			stream->WriteWord( &ci->Expired);
@@ -2000,7 +1998,7 @@ int AREImporter::PutItems( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	char filling[56];
 	ieDword ItemIndex = 0;
@@ -2009,7 +2007,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<ContainersCount;i++) {
-		Container *c = map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 
 		//this is the editor name
 		stream->Write( c->GetScriptName(), 32);
@@ -2042,7 +2040,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 		stream->WriteDword( &ItemIndex);
 		stream->WriteDword( &tmpDword);
 		ItemIndex +=tmpDword;
-		GameScript *s = c->Scripts[0];
+		const GameScript *s = c->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -2065,7 +2063,7 @@ int AREImporter::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
+int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -2073,7 +2071,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
-		InfoPoint *ip = map->TMap->GetInfoPoint(i);
+		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
 		stream->Write( ip->GetScriptName(), 32);
 		//this is a hack, we abuse a coincidence
@@ -2109,7 +2107,7 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) ip->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteResRef( ip->KeyResRef);
-		GameScript *s = ip->Scripts[0];
+		const GameScript *s = ip->Scripts[0];
 		if (s) {
 			stream->WriteResRef( s->GetName() );
 		} else {
@@ -2140,14 +2138,14 @@ int AREImporter::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 	return 0;
 }
 
-int AREImporter::PutSpawns( DataStream *stream, Map *map)
+int AREImporter::PutSpawns(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 	char filling[56];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<SpawnCount;i++) {
-		Spawn *sp = map->GetSpawn(i);
+		const Spawn *sp = map->GetSpawn(i);
 
 		stream->Write( sp->Name, 32);
 		tmpWord = (ieWord) sp->Pos.x;
@@ -2179,11 +2177,11 @@ int AREImporter::PutSpawns( DataStream *stream, Map *map)
 	return 0;
 }
 
-void AREImporter::PutScript(DataStream *stream, Actor *ac, unsigned int index)
+void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int index)
 {
 	char filling[8];
 
-	GameScript *s = ac->Scripts[index];
+	const GameScript *s = ac->Scripts[index];
 	if (s) {
 		stream->WriteResRef( s->GetName() );
 	} else {
@@ -2192,7 +2190,7 @@ void AREImporter::PutScript(DataStream *stream, Actor *ac, unsigned int index)
 	}
 }
 
-int AREImporter::PutActors( DataStream *stream, Map *map)
+int AREImporter::PutActors(DataStream *stream, const Map *map)
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -2264,12 +2262,12 @@ int AREImporter::PutActors( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutAnimations( DataStream *stream, Map *map)
+int AREImporter::PutAnimations(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 
 	aniIterator iter = map->GetFirstAnimation();
-	while(AreaAnimation *an = map->GetNextAnimation(iter) ) {
+	while(const AreaAnimation *an = map->GetNextAnimation(iter)) {
 		stream->Write( an->Name, 32);
 		tmpWord = (ieWord) an->Pos.x;
 		stream->WriteWord( &tmpWord);
@@ -2288,7 +2286,7 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 			stream->WriteDword(&an->Flags);
 		}
 
-		stream->WriteWord( (ieWord *) &an->height);
+		stream->WriteWord((const ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->startFrameRange); //used by A_ANI_RANDOM_START
 		stream->Write( &an->startchance,1);
@@ -2299,14 +2297,14 @@ int AREImporter::PutAnimations( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutEntrances( DataStream *stream, Map *map)
+int AREImporter::PutEntrances(DataStream *stream, const Map *map)
 {
 	ieWord tmpWord;
 	char filling[66];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<EntrancesCount;i++) {
-		Entrance *e = map->GetEntrance(i);
+		const Entrance *e = map->GetEntrance(i);
 
 		stream->Write( e->Name, 32);
 		tmpWord = (ieWord) e->Pos.x;
@@ -2320,7 +2318,7 @@ int AREImporter::PutEntrances( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutVariables( DataStream *stream, Map *map)
+int AREImporter::PutVariables(DataStream *stream, const Map *map)
 {
 	char filling[40];
 	Variables::iterator pos=NULL;
@@ -2342,15 +2340,15 @@ int AREImporter::PutVariables( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutAmbients( DataStream *stream, Map *map)
+int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 {
 	char filling[64];
 	ieWord tmpWord;
 
 	memset(filling,0,sizeof(filling) );
-	unsigned int realCount = map->GetAmbientCount();
-	for (unsigned int i=0; i<realCount; i++) {
-		Ambient *am = map->GetAmbient(i);
+	ieWord realCount = map->GetAmbientCount();
+	for (ieWord i = 0; i < realCount; i++) {
+		const Ambient *am = map->GetAmbient(i);
 		if (am->flags & IE_AMBI_NOSAVE) continue;
 		stream->Write( am->name, 32 );
 		tmpWord = (ieWord) am->origin.x;
@@ -2381,7 +2379,7 @@ int AREImporter::PutAmbients( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutMapnotes( DataStream *stream, Map *map)
+int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 {
 	char filling[8];
 	ieDword tmpDword;
@@ -2450,7 +2448,7 @@ int AREImporter::PutMapnotes( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
+int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue)
 {
 	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -2467,12 +2465,10 @@ int AREImporter::PutEffects( DataStream *stream, EffectQueue *fxqueue)
 	return 0;
 }
 
-int AREImporter::PutTraps( DataStream *stream, Map *map)
+int AREImporter::PutTraps( DataStream *stream, const Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
-	ieWord tmpWord;
-	ieByte tmpByte;
 	ieResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
@@ -2480,7 +2476,8 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 	Offset = EffectOffset;
 	ieDword i = map->GetTrapCount(piter);
 	while(i--) {
-		tmpWord = 0;
+		ieWord tmpWord = 0;
+		ieByte tmpByte = 0xff;
 		Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
@@ -2488,16 +2485,16 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 			type = pro->GetType()+1;
 			dest = pro->GetDestination();
 			strnuprcpy(name, pro->GetName(), 8);
-			EffectQueue *fxqueue = pro->GetEffects();
+			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();
 			}
 			ieDword ID = pro->GetCaster();
-			Actor *actor = map->GetActorByGlobalID(ID);
+			// lookup caster via Game, since the the current map can already be empty when switching them
+			const Actor *actor = core->GetGame()->GetActorByGlobalID(ID);
 			//0xff if not in party
 			//party slot if in party
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);
-			else tmpByte = 0xff;
 		}
 
 		stream->WriteResRef( name );
@@ -2509,33 +2506,33 @@ int AREImporter::PutTraps( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );  //size in bytes
 		stream->WriteWord( &type );     //missile.ids
 		tmpDword = 0;
-		stream->WriteDword( &tmpDword );//unknown field
+		stream->WriteDword(&tmpDword); // unknown field, Ticks
 		tmpWord = (ieWord) dest.x;
 		stream->WriteWord( &tmpWord );
 		tmpWord = (ieWord) dest.y;
 		stream->WriteWord( &tmpWord );
 		tmpWord = 0;
-		stream->WriteWord( &tmpWord ); //unknown field
-		stream->Write( &tmpByte,1 );   //unknown field
-		stream->Write( &tmpByte,1 );   //InParty flag
+		stream->WriteWord(&tmpWord); // unknown field, Z
+		stream->Write(&tmpByte, 1);   // unknown field, TargetType
+		stream->Write(&tmpByte, 1);   // Owner
 	}
 	return 0;
 }
 
-int AREImporter::PutExplored( DataStream *stream, Map *map)
+int AREImporter::PutExplored(DataStream *stream, const Map *map)
 {
 	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
 	return 0;
 }
 
-int AREImporter::PutTiles( DataStream * stream, Map * map)
+int AREImporter::PutTiles(DataStream *stream, const Map *map)
 {
 	char filling[48];
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<TileCount;i++) {
-		TileObject *am = map->TMap->GetTile(i);
+		const TileObject *am = map->TMap->GetTile(i);
 		stream->Write( am->Name, 32 );
 		stream->WriteResRef( am->Tileset );
 		stream->WriteDword( &am->Flags);
@@ -2550,7 +2547,7 @@ int AREImporter::PutTiles( DataStream * stream, Map * map)
 	return 0;
 }
 
-int AREImporter::PutSongHeader( DataStream *stream, Map *map)
+int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 {
 	int i;
 	char filling[8];
@@ -2577,7 +2574,7 @@ int AREImporter::PutSongHeader( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImporter::PutRestHeader( DataStream *stream, Map *map)
+int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 {
 	int i;
 	ieDword tmpDword = 0;
@@ -2688,12 +2685,12 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 
 	ieDword i = map->GetTrapCount(piter);
 	while(i--) {
-		Projectile *trap = map->GetNextTrap(piter);
+		const Projectile *trap = map->GetNextTrap(piter);
 		if (!trap) {
 			continue;
 		}
 
-		EffectQueue *fxqueue = trap->GetEffects();
+		const EffectQueue *fxqueue = trap->GetEffects();
 
 		if (!fxqueue) {
 			continue;

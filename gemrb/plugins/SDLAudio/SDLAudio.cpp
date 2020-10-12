@@ -47,6 +47,8 @@ SDLAudio::SDLAudio(void)
 SDLAudio::~SDLAudio(void)
 {
 	// TODO
+	Mix_HaltChannel(-1);
+	clearBufferCache();
 	delete ambim;
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
@@ -73,14 +75,8 @@ bool SDLAudio::Init(void)
 	}
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
-	channel_data.resize(Mix_AllocateChannels(-1));
-	for (unsigned int i = 0; i < channel_data.size(); i++) {
-		channel_data[i] = NULL;
-	}
-
 	g_sdlaudio = this;
 	Mix_ReserveChannels(1); // for speech
-	Mix_ChannelFinished(channel_done_callback);
 	return true;
 }
 
@@ -117,52 +113,93 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDL_mutexV(driver->OurMutex);
 }
 
-void SDLAudio::channel_done_callback(int channel) {
-	SDL_mutexP(g_sdlaudio->OurMutex);
-	assert(g_sdlaudio);
-	assert((unsigned int)channel < g_sdlaudio->channel_data.size());
-	assert(g_sdlaudio->channel_data[channel]);
-	free(g_sdlaudio->channel_data[channel]);
-	g_sdlaudio->channel_data[channel] = NULL;
-	SDL_mutexV(g_sdlaudio->OurMutex);
-}
-
-Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
-	int XPos, int YPos, unsigned int flags, unsigned int *length)
+bool SDLAudio::evictBuffer()
 {
-	// TODO: some panning
-	(void)XPos;
-	(void)YPos;
+	// Note: this function assumes the caller holds bufferMutex
 
-	// TODO: flags
-	(void)flags;
+	// Room for optimization: this is O(n^2) in the number of buffers
+	// at the tail that are used. It can be O(n) if LRUCache supports it.
+	unsigned int n = 0;
+	void *p;
+	const char *k;
+	bool res;
 
-	if (!ResRef) {
-		if (flags & GEM_SND_SPEECH) {
-			Mix_HaltChannel(0);
+	SDL_LockAudio();
+
+	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
+		CacheEntry *e = (CacheEntry*)p;
+		bool chunkPlaying = false;
+		int numChannels = Mix_AllocateChannels(-1);
+
+		for (int i = 0; i < numChannels; ++i) {
+			if (Mix_Playing(i) && Mix_GetChunk(i) == e->chunk) {
+				chunkPlaying = true;
+				break;
+			}
 		}
-		return Holder<SoundHandle>();
+
+		if (chunkPlaying) {
+			++n;
+		} else {		
+			//Mix_FreeChunk(e->chunk) fails to free anything here
+			free(e->chunk->abuf);
+			free(e->chunk);
+			delete e;
+			buffercache.Remove(k);
+		}
 	}
 
-	// TODO: move this loading code somewhere central
+	SDL_UnlockAudio();
+
+	return res;
+}
+
+void SDLAudio::clearBufferCache()
+{
+	// Room for optimization: any method of iterating over the buffers
+	// would suffice. It doesn't have to be in LRU-order.
+	void *p;
+	const char *k;
+	int n = 0;
+	while (buffercache.getLRU(n, k, p)) {
+		CacheEntry *e = (CacheEntry*)p;
+		free(e->chunk->abuf);
+		free(e->chunk);
+		delete e;
+		buffercache.Remove(k);
+	}
+}
+
+Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
+{
+	Mix_Chunk *chunk = nullptr;
+	CacheEntry *e;
+	void *p;
+
+	if (!ResRef[0]) {
+		return chunk;
+	}
+
+	if (buffercache.Lookup(ResRef, p)) {
+		e = (CacheEntry*) p;
+		time_length = e->Length;
+		return e->chunk;
+	}
+
 	ResourceHolder<SoundMgr> acm = GetResourceHolder<SoundMgr>(ResRef);
 	if (!acm) {
 		print("failed acm load");
-		return Holder<SoundHandle>();
+		return chunk;
 	}
 	int cnt = acm->get_length();
 	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	// Use 16-bit word for memory allocation because read_samples takes a 16 bit alignment
-	short * memory = (short *) malloc(cnt*2);
+	short *memory = (short*) malloc(cnt*2);
 	//multiply always with 2 because it is in 16 bits
 	int cnt1 = acm->read_samples( memory, cnt ) * 2;
 	//Sound Length in milliseconds
-	unsigned int time_length = ((cnt / riff_chans) * 1000) / samplerate;
-
-	if (length) {
-		*length = time_length;
-	}
+	time_length = ((cnt / riff_chans) * 1000) / samplerate;
 
 	// convert our buffer, if necessary
 	SDL_AudioCVT cvt;
@@ -177,11 +214,55 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	free(memory);
 
 	// make SDL_mixer chunk
-	Mix_Chunk *chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
+	chunk = Mix_QuickLoad_RAW(cvt.buf, cvt.len*cvt.len_ratio);
 	if (!chunk) {
 		print("error loading chunk");
+		free(cvt.buf);
+		return chunk;
+	}
+
+	e = new CacheEntry;
+	e->chunk = chunk;
+	e->Length = time_length;
+
+	if (buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
+		evictBuffer();
+	}
+
+	buffercache.SetAt(ResRef, (void*)e);
+
+	return chunk;
+}
+
+Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
+	int XPos, int YPos, unsigned int flags, unsigned int *length)
+{
+	Mix_Chunk *chunk;
+	unsigned int time_length;
+
+	// TODO: some panning
+	(void)XPos;
+	(void)YPos;
+
+	// TODO: flags
+	(void)flags;
+
+	if (!ResRef) {
+		if (flags & GEM_SND_SPEECH) {
+			Mix_HaltChannel(0);
+		}
 		return Holder<SoundHandle>();
 	}
+
+	chunk = loadSound(ResRef, time_length);
+	if (chunk == nullptr) {
+		return Holder<SoundHandle>();
+	}
+
+	if (length) {
+		*length = time_length;
+	}
+
 	Mix_VolumeChunk(chunk, MIX_MAX_VOLUME * GetVolume(channel) / 100);
 
 	// play
@@ -196,9 +277,6 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
-
-	assert((unsigned int)chan < channel_data.size());
-	channel_data[chan] = cvt.buf;
 	SDL_mutexV(OurMutex);
 
 	// TODO

@@ -425,7 +425,7 @@ private:
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which);
 	/* helper for usability checks */
-	int CheckUsability(Item *item) const;
+	int CheckUsability(const Item *item) const;
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsBG();
 	/* Set up all the missing stats on load time, or after level up */
@@ -439,10 +439,10 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	void RefreshHP();
-	bool ShouldHibernate();
+	bool ShouldHibernate() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
-	void SetupFistData();
+	void SetupFistData() const;
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
 	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
@@ -456,8 +456,9 @@ private:
 	/* applies modal spell etc, if needed */
 	void UpdateModalState(ieDword gameTime);
 
-	void CalculateSpeedFromRate(bool feedback);
-	void CalculateSpeedFromINI(bool feedback);
+	int CalculateSpeedFromRate(bool feedback) const;
+	int CalculateSpeedFromINI(bool feedback) const;
+	ieDword IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start = 0) const;
 
 public:
 	Actor(void);
@@ -483,7 +484,7 @@ public:
 	/** returns the animations */
 	CharAnimations* GetAnims() const;
 	/** returns the gender of actor for cg sound - illusions are tricky */
-	ieDword GetCGGender();
+	ieDword GetCGGender() const;
 	/** some hardcoded effects in puppetmaster based on puppet type */
 	void CheckPuppet(Actor *puppet, ieDword type);
 	/** Re/Inits the Modified vector */
@@ -503,7 +504,7 @@ public:
 	/** Sets a Stat Value (unsaved) */
 	bool SetStat(unsigned int StatIndex, ieDword Value, int pcf);
 	/** Returns the difference */
-	int GetMod(unsigned int StatIndex);
+	int GetMod(unsigned int StatIndex) const;
 	/** Returns a Stat Base Value */
 	ieDword GetBase(unsigned int StatIndex) const;
 	/** Sets a Base Stat Value */
@@ -565,7 +566,8 @@ public:
 	/* Returns by how much movement speed should be divided to account for loot weight */
 	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
-	int CalculateSpeed(bool feedback);
+	int CalculateSpeed(bool feedback) const;
+	void SetSpeed(bool feedback) { speed = CalculateSpeed(feedback); }
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
 	/* receives undead turning message */
@@ -581,11 +583,11 @@ public:
 	/** handle idle actions, that shouldn't mess with scripting */
 	void IdleActions(bool nonidle);
 	/* sets the actor in panic (turn/morale break) */
-	void Panic(Scriptable *attacker, int panicmode);
+	void Panic(const Scriptable *attacker, int panicmode);
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, int op);
 	/* inlined dialogue start */
-	void Interact(int type);
+	void Interact(int type) const;
 	/* returns a remapped verbal constant strref */
 	ieStrRef GetVerbalConstant(int index) const;
 	/* returns a random remapped verbal constant strref */
@@ -600,13 +602,13 @@ public:
 	bool HasSpecialDeathReaction(const char *deadname) const;
 	void ReactToDeath(const char *deadname);
 	/* sends trigger_died to everyone in visual range */
-	void SendDiedTrigger();
+	void SendDiedTrigger() const;
 	/* called when someone talks to Actor */
-	void DialogInterrupt();
+	void DialogInterrupt() const;
 	/* called when actor was hit */
 	void GetHit(int damage=0, int spellLevel=0);
 	/* checks whether taking damage should disrupt spellcasting */
-	bool CheckSpellDisruption(int damage, int spellLevel);
+	bool CheckSpellDisruption(int damage, int spellLevel) const;
 	/* called when actor starts to cast a spell*/
 	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant);
 	/* check if the actor should be just knocked out by a lethal hit */
@@ -674,7 +676,7 @@ public:
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp, int combat);
 	/* Calculate experience bonus */
-	int CalculateExperience(int type, int level);
+	int CalculateExperience(int type, int level) const;
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate, bool force=1);
 	/* Sets the modal spell after checks */
@@ -694,15 +696,15 @@ public:
 	/* returns melee penalty */
 	int MeleePenalty() const;
 	/* gets the to hit value */
-	int GetToHit(ieDword Flags, Actor* target);
+	int GetToHit(ieDword Flags, const Actor *target);
 	void GetTHAbilityBonus(ieDword Flags);
 	/* gets the defense against an attack */
-	int GetDefense(int DamageType, ieDword wflags, Actor *attacker);
+	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* checks if something is wrong with the weapon we are using for the attack */
 	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
 	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
-		int &DamageBonus, int &speed, int &CriticalBonus, int &style, Actor *target);
+		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
 	/* returns the adjusted weapon range, since items have odd values stored */
@@ -724,7 +726,7 @@ public:
 	/* sets an RGB colour modification effect; location 0xff for global */
 	void SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		unsigned char r, unsigned char g, unsigned char b,
-		int phase=-1 );
+		int phase = -1) const;
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	void NewPath();
 	/* overridden method, won't walk if dead */
@@ -737,9 +739,9 @@ public:
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
-	int HandleInteract(Actor *target);
+	int HandleInteract(const Actor *target) const;
 	/* start bg1-style banter dialog */
-	void HandleInteractV1(Actor *target);
+	void HandleInteractV1(const Actor *target);
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */
@@ -834,7 +836,7 @@ public:
 	/* Returns strref if the item is unusable due to name/type restrictions */
 	ieStrRef Disabled(ieResRef name, ieDword type) const;
 	/* Returns constant string if the item is unusable */
-	int Unusable(Item *item) const;
+	int Unusable(const Item *item) const;
 	/* Sets all clown colour to the given gradient */
 	void SetGradient(ieDword gradient);
 	/* Enables an overlay */
@@ -864,6 +866,8 @@ public:
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
 	static ieDword GetClassID (const ieDword isclass);
+	const char *GetClassName(ieDword classID) const;
+	const char *GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */
 	ieDword GetFighterLevel() const { return GetClassLevel(ISFIGHTER); }
 	ieDword GetMageLevel() const { return GetClassLevel(ISMAGE); }
@@ -899,25 +903,23 @@ public:
 	/* checks whether the actor is behind the target */
 	bool IsBehind(Actor* target) const;
 	/* checks whether the target is the actor's racial enemy */
-	int GetRacialEnemyBonus(Actor* target) const;
+	int GetRacialEnemyBonus(const Actor *target) const;
 	/* checks whether the actor can stay in the current modal state */
 	bool ModalSpellSkillCheck();
 	/* check if this actor is seen by or seeing anyone */
-	bool SeeAnyOne(bool enemy, bool seen);
+	bool SeeAnyOne(bool enemy, bool seen) const;
 	/* does all the game logic checks to see if the actor can hide */
 	bool TryToHide();
 	bool TryToHideIWD2();
 	/* checks if the alignment matches one of the masking constants */
 	//bool MatchesAlignmentMask(ieDword mask);
 	/** untargetable by spells/attack due to invisibility or sanctuary */
-	bool Untargetable(ieResRef spellRef);
+	bool Untargetable(ieResRef spellRef) const;
 	/* returns true if this it is futile to try to harm actor (dead/sanctuaried) */
 	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target
 	or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
-	/* returns true if the lightmap under the actor is dark */
-	bool PCInDark() const;
 	/* function to get a class level used by scripting */
 	ieDword GetLevelInClass (const ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */

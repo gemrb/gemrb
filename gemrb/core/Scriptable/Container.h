@@ -50,8 +50,8 @@ public:
 	void DrawPile(bool highlight, const Region& viewport, uint32_t flags, Color tint);
 
 	int IsOpen() const;
-	void TryPickLock(Actor *actor);
-	void TryBashLock(Actor* actor) ;
+	void TryPickLock(const Actor *actor);
+	void TryBashLock(Actor *actor);
 	bool TryUnlock(Actor *actor);
 	void dump() const;
 	int TrapResets() const override { return Flags & CONT_RESET; }

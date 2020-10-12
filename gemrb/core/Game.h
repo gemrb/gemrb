@@ -321,11 +321,11 @@ public:
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
 	/** Finds a global actor by global ID */
-	Actor* GetGlobalActorByGlobalID(ieDword globalID);
+	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
-	int InParty(Actor* pc) const;
+	int InParty(const Actor *pc) const;
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
-	int InStore(Actor* pc) const;
+	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
 	Actor* FindPC(const char *deathvar);
 	/** Finds an actor in store by scripting name*/
@@ -467,7 +467,7 @@ public:
 	void StartRainOrSnow(bool conditional, int weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/** Adds or removes gold */
-	void AddGold(ieDword add);
+	void AddGold(int add);
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add, bool fatigue=true);
 	/** Runs the script engine on the global script and the area scripts
@@ -493,7 +493,7 @@ public:
 	/** draw weather */
 	void DrawWeather(const Region &screen, bool update);
 	/** updates current area music */
-	void ChangeSong(bool always = true, bool force = true);
+	void ChangeSong(bool always = true, bool force = true) const;
 	/** sets expansion mode */
 	void SetExpansion(ieDword value);
 	/** Dumps information about the object */

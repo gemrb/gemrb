@@ -148,10 +148,10 @@ private:
 	void Scroll(const Point& amt);
 
 	//containers
-	int GetCursorOverContainer(Container *overContainer) const;
+	int GetCursorOverContainer(const Container *overContainer) const;
 	void HandleContainer(Container *container, Actor *actor);
 	//doors
-	int GetCursorOverDoor(Door *overDoor) const;
+	int GetCursorOverDoor(const Door *overDoor) const;
 	void HandleDoor(Door *door, Actor *actor);
 	
 	void UpdateCursor();
@@ -161,7 +161,7 @@ private:
 	void CommandSelectedMovement(const Point& p, unsigned short Mod=0);
 
 	//infopoints
-	int GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const;
+	int GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const;
 	bool OnGlobalMouseMove(const Event&);
 
 	/** Draws the Control on the Output Display */
@@ -204,13 +204,13 @@ public:
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
 	void SetCutSceneMode(bool active);
-	void TryToAttack(Actor *source, Actor *target);
+	void TryToAttack(Actor *source, const Actor *target);
 	void TryToCast(Actor *source, const Point &p);
-	void TryToCast(Actor *source, Actor *target);
-	void TryToDefend(Actor *source, Actor *target);
-	void TryToTalk(Actor *source, Actor *target);
-	void TryToPick(Actor *source, Scriptable *tgt);
-	void TryToDisarm(Actor *source, InfoPoint *tgt);
+	void TryToCast(Actor *source, const Actor *target);
+	void TryToDefend(Actor *source, const Actor *target);
+	void TryToTalk(Actor *source, const Actor *target);
+	void TryToPick(Actor *source, const Scriptable *tgt);
+	void TryToDisarm(Actor *source, const InfoPoint *tgt);
 	void PerformActionOn(Actor *actor);
 	void ResetTargetMode();
 	void UpdateTargetMode();

@@ -226,7 +226,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					break;
 				}
 				/** Cycle is only a byte for buttons */
-				Holder<Sprite2D> tspr = bam->GetFrame( UnpressedIndex, (unsigned char) Cycle );
+				Holder<Sprite2D> tspr = bam->GetFrame(UnpressedIndex, Cycle);
+
 				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
@@ -240,9 +241,9 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 						SelectedIndex = 2;
 						if (cycleSize == 4) DisabledIndex = 3;
 				}
-				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );
+				tspr = bam->GetFrame(SelectedIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
+				tspr = bam->GetFrame(DisabledIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 			}
 			break;

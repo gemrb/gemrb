@@ -76,7 +76,7 @@ void Dialog::FreeDialogState(DialogState* ds)
 int Dialog::FindFirstState(Scriptable* target)
 {
 	for (unsigned int i = 0; i < TopLevelCount; i++) {
-		Condition *cond = GetState( Order[i] )->condition;
+		const Condition *cond = GetState(Order[i])->condition;
 		if (cond && cond->Evaluate(target)) {
 			return Order[i];
 		}
@@ -90,13 +90,13 @@ int Dialog::FindRandomState(Scriptable* target)
 	if (!max) return -1;
 	unsigned int pick = RAND(0, max-1);
 	for (unsigned int i = pick; i < max; i++) {
-		Condition *cond = GetState(i)->condition;
+		const Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;
 		}
 	}
 	for (unsigned int i = 0; i < pick; i++) {
-		Condition *cond = GetState(i)->condition;
+		const Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {
 			return i;
 		}

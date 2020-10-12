@@ -589,8 +589,8 @@ bool OpenALAudioDriver::CanPlay()
 
 void OpenALAudioDriver::ResetMusics()
 {
+	SDL_mutexP(musicMutex);
 	MusicPlaying = false;
-	SDL_mutexP( musicMutex );
 	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
 		checkALError("Unable to stop music source", WARNING);

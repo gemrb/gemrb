@@ -1007,14 +1007,14 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 	//convert to signed so -1 doesn't turn to an astronomical number
 	if (type == 16) { // natural AC
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if ((signed)target->AC.GetNatural() > (signed)fx->Parameter1) {
+			if (target->AC.GetNatural() > (signed) fx->Parameter1) {
 				target->AC.SetNatural(fx->Parameter1);
 			}
 		} else {
-			if ((signed)target->AC.GetTotal() > (signed)fx->Parameter1) {
+			if (target->AC.GetTotal() > (signed) fx->Parameter1) {
 				// previously we were overriding the whole stat, but now we can be finegrained
 				// and reuse the deflection bonus, since iwd2 has its own version of this effect
-				target->AC.SetDeflectionBonus(- (target->AC.GetNatural()-fx->Parameter1));
+				target->AC.SetDeflectionBonus((signed) fx->Parameter1 - target->AC.GetNatural());
 			}
 		}
 		return FX_INSERT;
@@ -3410,13 +3410,13 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		STAT_MOD( IE_GOLD );
 		return FX_NOT_APPLIED;
 	}
-	ieDword gold;
+	int gold;
 	Game *game = core->GetGame();
 	//for party members, the gold is stored in the game object
 	switch( fx->Parameter2) {
 		case MOD_ADDITIVE:
 			if (core->HasFeature(GF_FIXED_MORALE_OPCODE)) {
-				gold = (ieDword) -fx->Parameter1;
+				gold = - signed(fx->Parameter1);
 			} else {
 				gold = fx->Parameter1;
 			}
@@ -3428,7 +3428,7 @@ int fx_gold_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			gold = game->PartyGold*fx->Parameter1/100-game->PartyGold;
 			break;
 		default:
-			gold = (ieDword) -fx->Parameter1;
+			gold = - signed(fx->Parameter1);
 			break;
 	}
 	game->AddGold (gold);
@@ -4927,12 +4927,11 @@ int fx_remove_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_remove_creature(%2d)", fx->Opcode);
 
-	Map *map = NULL;
+	const Map *map;
 
 	if (target) {
 		map = target->GetCurrentArea();
-	}
-	else {
+	} else {
 		map = core->GetGame()->GetCurrentArea();
 	}
 	Actor *actor = target;
@@ -5440,7 +5439,7 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	delete newfx;
 
 	//remove the maximum hp bonus
-	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, (ieDword) -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
 	delete newfx;
 
@@ -5857,16 +5856,17 @@ int fx_leveldrain_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//never subtract more than the maximum hitpoints
 	ieDword x = STAT_GET(IE_MAXHITPOINTS)-1;
-	if (fx->Parameter1*4<x) {
-		x=fx->Parameter1*4;
+	int mod = signed(fx->Parameter1);
+	if (mod * 4 < signed(x)) {
+		x = mod * 4;
 	}
-	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
+	STAT_ADD(IE_LEVELDRAIN, mod);
 	STAT_SUB(IE_MAXHITPOINTS, x);
-	HandleBonus(target, IE_SAVEVSDEATH, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSWANDS, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSPOLY, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSBREATH, -fx->Parameter1, fx->TimingMode);
-	HandleBonus(target, IE_SAVEVSSPELL, -fx->Parameter1, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSDEATH, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSWANDS, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSPOLY, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSBREATH, -mod, fx->TimingMode);
+	HandleBonus(target, IE_SAVEVSSPELL, -mod, fx->TimingMode);
 
 	target->AddPortraitIcon(PI_LEVELDRAIN);
 	//decrease current hitpoints on first apply
@@ -6131,7 +6131,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// get the actor to cast spells at
 	Actor *actor = NULL;
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
 	switch (fx->Parameter1) {
@@ -6711,17 +6711,14 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_set_trap(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieDword skill, roll;
-	Map *map;
-
-	map = target->GetCurrentArea();
+	ieDword skill, roll, level;
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_NOT_APPLIED;
 
 	proIterator iter;
 
-	//check if trap count is over an amount (only saved traps count)
-	//actually, only projectiles in trigger phase should count here
-	if (map->GetTrapCount(iter)>6) {
+	// check if the new trap count is cheesy (only saved traps count)
+	if (map->GetTrapCount(iter) + 1 > gamedata->GetTrapLimit(Owner)) {
 		displaymsg->DisplayConstantStringName(STR_NOMORETRAP, DMC_WHITE, target);
 		return FX_NOT_APPLIED;
 	}
@@ -6733,11 +6730,17 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (Owner->Type==ST_ACTOR) {
-		skill = ((Actor *)Owner)->GetStat(IE_SETTRAPS);
+		const Actor *caster = (Actor *) Owner;
+		skill = caster->GetStat(IE_SETTRAPS);
 		roll = target->LuckyRoll(1,100,0,LR_NEGATIVE);
+		// assuming functioning thief, but allowing modded exceptions
+		// thieves aren't casters, so 0 for a later spell type lookup is not good enough
+		level = caster->GetThiefLevel();
+		level = level ? level : caster->GetXPLevel(false);
 	} else {
 		roll=0;
 		skill=0;
+		level = 0;
 	}
 
 	if (roll>skill) {
@@ -6762,7 +6765,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// save the current spell ref, so the rest of its effects can be applied afterwards
 	ieResRef OldSpellResRef;
 	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
-	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, 0, 1, false);
+	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, level, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
 }
@@ -7023,7 +7026,7 @@ int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		break;
 	case 1:
 		x=fx->Parameter1;
-		y=-fx->Parameter1;
+		y = - signed(fx->Parameter1);
 		break;
 	case 2:
 		//gemrb addition
@@ -7122,7 +7125,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_remove_projectile(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (!target) return FX_NOT_APPLIED;
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	if (!area) return FX_NOT_APPLIED;
 
 	switch (fx->Parameter2) {
@@ -7174,7 +7177,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		return FX_NOT_APPLIED;
 	}
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (map) {
 		Object oC;
 		oC.objectFields[0]=EA_ENEMY;
@@ -7184,7 +7187,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 			return FX_NOT_APPLIED;
 		}
 		int rnd = core->Roll(1,tgts->Count(),-1);
-		Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
+		const Actor *victim = (Actor *) tgts->GetTarget(rnd, ST_ACTOR);
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
@@ -7562,7 +7565,7 @@ int fx_right_to_hit_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_tracks (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_reveal_tracks(%2d): Distance: %d", fx->Opcode, fx->Parameter1);
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;

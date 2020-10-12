@@ -42,6 +42,7 @@ class Highlightable;
 class InfoPoint;
 class Map;
 class Movable;
+class Object;
 struct PathNode;
 class Scriptable;
 class Selectable;
@@ -306,7 +307,7 @@ public:
 	void SetSpellResRef(ieResRef resref);
 	void SetWait(unsigned long time);
 	unsigned long GetWait() const;
-	void LeaveDialog();
+	void LeftDialog();
 	void Interrupt();
 	void NoInterrupt();
 	void Hide();
@@ -319,11 +320,10 @@ public:
 	const char* GetScriptName() const;
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
-	void SetScript(int index, GameScript* script);
 	void SetOverheadText(const String& text, bool display = true);
 	const String& GetOverheadText() { return OverheadText; };
 	bool DisplayOverheadText(bool);
-	bool OverheadTextIsDisplaying() { return overheadTextDisplaying; }
+	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
 	void FixHeadTextPos();
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible
@@ -347,7 +347,7 @@ public:
 	void InitTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
-	bool MatchTriggerWithObject(unsigned short id, class Object *obj, ieDword param = 0);
+	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0);
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0);
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
@@ -435,7 +435,7 @@ public:
 		return NULL;
 	}
 	void SetTrapDetected(int x);
-	void TryDisarm(Actor *actor);
+	void TryDisarm(const Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill, ieDword actorID);
 	//returns true if trap is visible, only_detected must be true
@@ -488,12 +488,12 @@ public:
 	void BumpAway();
 	void BumpBack();
 	inline bool IsBumped() const { return bumped; }
-	PathNode *GetNextStep(int x);
+	PathNode *GetNextStep(int x) const;
 	inline PathNode *GetPath() const { return path; };
 	inline int GetPathTries() const	{ return pathTries; }
 	inline void IncrementPathTries() { pathTries++; }
 	inline void ResetPathTries() { pathTries = 0; }
-	int GetPathLength();
+	int GetPathLength() const;
 //inliners to protect data consistency
 	inline PathNode * GetStep() {
 		if (!step) {
@@ -531,7 +531,7 @@ public:
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */
-	Point GetMostLikelyPosition();
+	Point GetMostLikelyPosition() const;
 	virtual bool BlocksSearchMap() const = 0;
 };
 

@@ -275,10 +275,11 @@ protected:
 public:
 	void SetCaster(ieDword t, int level);
 	ieDword GetCaster() const;
-	bool FailedIDS(Actor *target) const;
+	bool FailedIDS(const Actor *target) const;
 	void SetTarget(ieDword t, bool fake);
 	void SetTarget(const Point &p);
 	bool PointInRadius(const Point &p) const;
+	int GetPhase() const;
 	void Cleanup();
 
 	inline Point GetDestination() const { return Destination; }
@@ -313,7 +314,7 @@ public:
 
 	void SetIdentifiers(const char *name, ieWord type);
 
-	void SetEffectsCopy(EffectQueue *eq, Point &source);
+	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
@@ -381,10 +382,10 @@ private:
 	//reached end of single travel missile, explode or expire now
 	void ChangePhase();
 	//drop a BAM or VVC on the trail path, return the length of the animation
-	int AddTrail(ieResRef BAM, const ieByte *pal);
+	int AddTrail(const ieResRef BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
-	void LineTarget();      //line projectiles (walls, scorchers)
-	void LineTarget(PathNode* beg, unsigned int depth);
+	void LineTarget() const;      //line projectiles (walls, scorchers)
+	void LineTarget(const PathNode *beg, const PathNode *end) const;
 	void SecondaryTarget(); //area projectiles (circles, cones)
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
@@ -401,7 +402,7 @@ private:
 	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination
-	int CalculateTargetFlag();
+	int CalculateTargetFlag() const;
 	//logic to resolve the explosion count (may be based on caster level)
 	int CalculateExplosionCount();
 

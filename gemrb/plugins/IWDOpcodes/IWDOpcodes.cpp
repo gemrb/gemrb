@@ -941,8 +941,8 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, owner, fx->IsVariable, fx->SavingThrowType);
-	receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
+	int damage = donor->Damage(fx->Parameter1, DAMAGE_MAGIC, owner, fx->IsVariable, fx->SavingThrowType);
+	receiver->SetBase(IE_HITPOINTS, receiver->GetBase(IE_HITPOINTS) + damage);
 	return FX_NOT_APPLIED;
 }
 
@@ -1074,7 +1074,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//timing
-	if (core->GetGame()->GameTime%6) {
+	if (core->GetGame()->GameTime % core->Time.round_sec) {
 		return FX_APPLIED;
 	}
 
@@ -1486,7 +1486,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	int real = core->Roll(1,cnt,-1);
-	const char *resrefs[2]={tab->QueryField((size_t)0,0), tab->QueryField((int) 0,1) };
+	const char *resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
@@ -3215,7 +3215,7 @@ int fx_energy_drain (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//if there is another energy drain effect (level drain), add them up
 	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
 	// bonus to all saves
-	HandleSaveBoni(target, -fx->Parameter1, fx->TimingMode);
+	HandleSaveBoni(target, - signed(fx->Parameter1), fx->TimingMode);
 	STAT_SUB(IE_MAXHITPOINTS, fx->Parameter1*5);
 	return FX_APPLIED;
 }
@@ -3315,7 +3315,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 
 	// medium hack (better than original)
 	// the original used explicit race/subrace values
-	ieDword penalty;
+	int penalty;
 
 	//the original engine let the effect stay on non affected races, doing the same so the spell state sticks
 	if (check_iwd_targeting(Owner, target, 0, 82, fx)) penalty = 1; //dark elf
@@ -3551,7 +3551,7 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //449 CallLightning
-static Actor *GetRandomEnemySeen(Map *map, Actor *origin)
+static Actor *GetRandomEnemySeen(const Map *map, const Actor *origin)
 {
 	int type = GetGroup(origin);
 
@@ -3606,7 +3606,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	int ret = FX_APPLIED;
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return ret;
 
 	if (fx->Parameter1<=1) {
@@ -3719,8 +3719,9 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_BANE);
 		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
 	}
-	target->ToHit.HandleFxBonus(-fx->Parameter1, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
-	STAT_ADD( IE_MORALEBREAK, -fx->Parameter1);
+	int mod = signed(fx->Parameter1);
+	target->ToHit.HandleFxBonus(-mod, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);
+	STAT_ADD( IE_MORALEBREAK, -mod);
 	return FX_APPLIED;
 }
 

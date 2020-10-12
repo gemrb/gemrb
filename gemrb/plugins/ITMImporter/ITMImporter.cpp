@@ -144,13 +144,13 @@ static void AddZZFeatures(Item *s)
 	char targetIDS = toupper(s->Name[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
-	if (atoi(&targetIDS)) {
+	if (targetIDS <= '9') {
 		IDSfile = 8;
 	}
 
 	// the numeric code (4th char) is translated to attack bonus with this pattern:
 	// 0: -5, 1: -4, 2: -3, 3: -2, 4: -1,
-	// 5: +1, 6:+2 ... 9: +5
+	// 5: +1, 6: +2 ... 9: +5
 	// this bonus is on top of the default one, so less descriptions are wrong than it may seem
 	int bonus = atoi(&s->Name[3]);
 	if (bonus < 5) {

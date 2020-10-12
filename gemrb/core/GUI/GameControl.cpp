@@ -179,7 +179,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	Point vec;
 	
 	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
+	const Map* area = game->GetCurrentArea();
 	assert(area);
 
 	static constexpr int radius = 36 / 2; // 36 diameter is copied from make_formation.py
@@ -890,7 +890,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					int size = game->GetPartySize(true);
 					if (size < 2 || lastActor->GetCurrentArea() != game->GetCurrentArea()) break;
 					for (int i = core->Roll(1, size, 0); i < 2*size; i++) {
-						Actor *target = game->GetPC(i%size, true);
+						const Actor *target = game->GetPC(i % size, true);
 						if (target == lastActor) continue;
 						if (target->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE) continue; //not NPC
 						lastActor->HandleInteractV1(target);
@@ -1198,7 +1198,7 @@ String GameControl::TooltipText() const {
 }
 
 //returns the appropriate cursor over an active region (trap, infopoint, travel region)
-int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
+int GameControl::GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const
 {
 	if (target_mode == TARGET_MODE_PICK) {
 		if (overInfoPoint->VisibleTrap(0)) {
@@ -1215,14 +1215,14 @@ int GameControl::GetCursorOverInfoPoint(InfoPoint *overInfoPoint) const
 }
 
 //returns the appropriate cursor over a door
-int GameControl::GetCursorOverDoor(Door *overDoor) const
+int GameControl::GetCursorOverDoor(const Door *overDoor) const
 {
 	if (!overDoor->Visible()) {
 		if (target_mode == TARGET_MODE_NONE) {
 			// most secret doors are in walls, so default to the blocked cursor to not give them away
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
-			Game *game = core->GetGame();
-			Map *area = game->GetCurrentArea();
+			const Game *game = core->GetGame();
+			const Map *area = game->GetCurrentArea();
 			assert(area);
 			return area->GetCursor(overDoor->Pos);
 		} else {
@@ -1243,7 +1243,7 @@ int GameControl::GetCursorOverDoor(Door *overDoor) const
 }
 
 //returns the appropriate cursor over a container (or pile)
-int GameControl::GetCursorOverContainer(Container *overContainer) const
+int GameControl::GetCursorOverContainer(const Container *overContainer) const
 {
 	if (overContainer->Flags & CONT_DISABLED) {
 		return lastCursor;
@@ -1336,7 +1336,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 
 void GameControl::UpdateCursor()
 {
-	Map *area = CurrentArea();
+	const Map *area = CurrentArea();
 	if (area == NULL) {
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
@@ -1710,14 +1710,14 @@ Region GameControl::Viewport()
 }
 
 //generate action code for source actor to try to attack a target
-void GameControl::TryToAttack(Actor *source, Actor *tgt)
+void GameControl::TryToAttack(Actor *source, const Actor *tgt)
 {
 	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	source->CommandActor(GenerateActionDirect( "NIDSpecial3()", tgt));
 }
 
 //generate action code for source actor to try to defend a target
-void GameControl::TryToDefend(Actor *source, Actor *tgt)
+void GameControl::TryToDefend(Actor *source, const Actor *tgt)
 {
 	source->SetModal(MS_NONE);
 	source->CommandActor(GenerateActionDirect( "NIDSpecial4()", tgt));
@@ -1726,7 +1726,7 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 // generate action code for source actor to try to pick pockets of a target (if an actor)
 // else if door/container try to pick a lock/disable trap
 // The -1 flag is a placeholder for dynamic target IDs
-void GameControl::TryToPick(Actor *source, Scriptable *tgt)
+void GameControl::TryToPick(Actor *source, const Scriptable *tgt)
 {
 	source->SetModal(MS_NONE);
 	const char* cmdString = NULL;
@@ -1736,7 +1736,7 @@ void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 			break;
 		case ST_DOOR:
 		case ST_CONTAINER:
-			if (((Highlightable*)tgt)->Trapped && ((Highlightable*)tgt)->TrapDetected) {
+			if (((const Highlightable *) tgt)->Trapped && ((const Highlightable *) tgt)->TrapDetected) {
 				cmdString = "RemoveTraps([-1])";
 			} else {
 				cmdString = "PickLock([-1])";
@@ -1750,7 +1750,7 @@ void GameControl::TryToPick(Actor *source, Scriptable *tgt)
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
-void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
+void GameControl::TryToDisarm(Actor *source, const InfoPoint *tgt)
 {
 	if (tgt->Type!=ST_PROXIMITY) return;
 
@@ -1816,7 +1816,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 }
 
 //generate action code for source actor to use item/cast spell on another actor
-void GameControl::TryToCast(Actor *source, Actor *tgt)
+void GameControl::TryToCast(Actor *source, const Actor *tgt)
 {
 	char Tmp[40];
 
@@ -1857,7 +1857,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		if (spellIndex<0) {
 			sprintf(action->string0Parameter,"%.8s",spellName);
 		} else {
-			CREMemorizedSpell *si;
+			const CREMemorizedSpell *si;
 			//spell casting at target
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
@@ -1886,7 +1886,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 }
 
 //generate action code for source actor to use talk to target actor
-void GameControl::TryToTalk(Actor *source, Actor *tgt)
+void GameControl::TryToTalk(Actor *source, const Actor *tgt)
 {
 	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	//Nidspecial1 is just an unused action existing in all games

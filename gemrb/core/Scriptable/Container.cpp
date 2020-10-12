@@ -176,7 +176,7 @@ int Container::IsOpen() const
 	return true;
 }
 
-void Container::TryPickLock(Actor *actor)
+void Container::TryPickLock(const Actor *actor)
 {
 	if (LockDifficulty == 100) {
 		if (OpenFail != (ieDword)-1) {

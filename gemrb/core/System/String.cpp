@@ -85,8 +85,10 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 				}
 
 				ch = currentChr & ((1 << (7 - nb)) - 1);
-				while (--nb)
-					ch <<= 6, ch |= string[++i] & 0x3f;
+				while (--nb) {
+					ch <<= 6;
+					ch |= string[++i] & 0x3f;
+				}
 			} else {
 				ch = (string[++i] << 8) + currentChr;
 			}

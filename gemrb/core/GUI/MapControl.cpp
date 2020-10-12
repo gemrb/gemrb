@@ -60,7 +60,7 @@ void MapControl::UpdateMap()
 }
 
 // Draw fog on the small bitmap
-void MapControl::DrawFog(const Region& rgn)
+void MapControl::DrawFog(const Region& rgn) const
 {
 	Video *video = core->GetVideoDriver();
 	const Size mapsize = MyMap->GetSize();
