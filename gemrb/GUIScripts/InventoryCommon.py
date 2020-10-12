@@ -220,7 +220,12 @@ def DisplayItem (slotItem, type):
 	global ItemInfoWindow
 
 	item = GemRB.GetItem (slotItem["ItemResRef"])
-	ItemInfoWindow = Window = GemRB.LoadWindow (5)
+	
+	#window can be refreshed by cycling to next/prev item, so it may still exist
+	if not ItemInfoWindow:
+		ItemInfoWindow = GemRB.LoadWindow (5)
+
+	Window = ItemInfoWindow
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
@@ -270,12 +275,16 @@ def DisplayItem (slotItem, type):
 	if type&2:
 		Button.SetText (strrefs[1])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	elif select and not GameCheck.IsPST():
 		Button.SetText (strrefs[2])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesItemWindow)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	else:
+		Button.SetText ("")
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 	# description icon (not present in iwds)
 	if not GameCheck.IsIWD1() and not GameCheck.IsIWD2():
@@ -289,6 +298,7 @@ def DisplayItem (slotItem, type):
 
 	#right button
 	Button = Window.GetControl(9)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	drink = (type&1) and (item["Function"]&ITM_F_DRINK)
 	read = (type&1) and (item["Function"]&ITM_F_READ)
 	# sorcerers cannot learn spells
@@ -353,6 +363,8 @@ def DisplayItem (slotItem, type):
 	else:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		Button.SetText ("")
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 	Label = Window.GetControl(0x1000000b)
 	if Label:
@@ -364,31 +376,41 @@ def DisplayItem (slotItem, type):
 
 	# in pst one can cycle through all the items from the description window
 	if GameCheck.IsPST():
-		def DisplayNext(dir):
-			import GUIINV
-
-			id = GemRB.GetVar('ItemButton') + dir;
-			while id not in GUIINV.ItemHash or not GUIINV.ItemHash[id][1]:
-				id += dir;
-				if id < 0:
-					id = 43
-				elif id > 43:
-					id = 0
-
-			GemRB.SetVar('ItemButton', id)
-			CloseItemInfoWindow()
-			OpenItemInfoWindow(None, GUIINV.ItemHash[id][0])
 
 		#left scroll
 		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(-1))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CycleDisplayItem(-1))
 
 		#right scroll
 		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: DisplayNext(1))
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CycleDisplayItem(1))
 
 	ItemInfoWindow.ShowModal(MODAL_SHADOW_GRAY)
 	return
+
+def CycleDisplayItem(direction):
+
+	slot = int(GemRB.GetVar('ItemButton'))
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	slot_item = None
+	
+	#try the next slot for an item. if the slot is empty, loop until one is found.
+	while not slot_item:
+		slot += direction
+
+		#wrap around if last slot is reached
+		if slot > 53:
+			slot = 0
+		elif slot < 0:
+			slot = 53
+
+		slot_item = GemRB.GetSlotItem (pc, slot)
+		GemRB.SetVar('ItemButton', slot)
+
+	if slot_item:
+		OpenItemInfoWindow (None, slot)
 
 def OpenItemInfoWindow (btn, slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
