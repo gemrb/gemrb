@@ -519,7 +519,7 @@ def UpdateSlot (pc, slot):
 	Button = Window.GetControl (ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
+	Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 	# characters should auto-identify any item they recieve

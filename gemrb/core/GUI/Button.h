@@ -113,18 +113,6 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
-	struct Action {
-		// !!! Keep these synchronized with GUIDefines.py !!!
-		static const Control::Action DragDrop = ACTION_CUSTOM(0); // drag and drop complete
-	};
-
-	struct PortraitDragOp : public DragOp {
-		const ieDword PC;
-
-		PortraitDragOp(Button* b);
-	};
-
-public:
 	Button(Region& frame);
 	~Button();
 
@@ -155,9 +143,9 @@ public:
 	String QueryText() const { return Text; }
 	String TooltipText() const;
 
-	UniqueDragOp DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
+	Holder<Sprite2D> DragCursor() const;
 
 	Holder<Sprite2D> Cursor() const;
 

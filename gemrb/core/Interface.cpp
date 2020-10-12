@@ -122,8 +122,12 @@ static ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
 
+// FIXME: DragOp should be initialized with the button we are dragging from
+// for now use a dummy until we truly implement this as a drag event
+Control ItemDragOp::dragDummy = Control(Region());
+
 ItemDragOp::ItemDragOp(CREItem* item)
-: DragOp(&dummy, nullptr), item(item), dummy(Region()) {
+: ControlDragOp(&dragDummy), item(item) {
 	// FIXME: not sure if this is the best place or if there is a better way to get the icon
 	Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
@@ -134,6 +138,9 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	}
 
 	cursor = pic;
+	
+	// FIXME: this VarName is not consistant
+	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
 }
 
 Interface::Interface()

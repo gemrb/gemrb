@@ -39,9 +39,6 @@
 
 namespace GemRB {
 
-Button::PortraitDragOp::PortraitDragOp(Button* b)
-: DragOp(b, core->Cursors[IE_CURSOR_SWAP]), PC(b->ControlID + 1) {}
-
 Button::Button(Region& frame)
 	: Control(frame),
 	buttonImages()
@@ -429,21 +426,15 @@ Holder<Sprite2D> Button::Cursor() const
 	return Control::Cursor();
 }
 
-View::UniqueDragOp Button::DragOperation()
-{
-	if (IS_PORTRAIT) {
-		EnableBorder(1, true);
-		return std::unique_ptr<PortraitDragOp>(new PortraitDragOp(this));
-	}
-	return View::DragOperation();
-}
-
 bool Button::AcceptsDragOperation(const DragOp& dop) const
 {
-	if (dop.dragView != this && IS_PORTRAIT) {
-		return dynamic_cast<const PortraitDragOp*>(&dop);
+	// FIXME: this implementation is obviously not future proof
+	// portrait buttons accept other portraits and dropped items
+	if (IS_PORTRAIT) {
+		return true;
 	}
-	return View::AcceptsDragOperation(dop);
+	
+	return Control::AcceptsDragOperation(dop);
 }
 
 void Button::CompleteDragOperation(const DragOp& dop)
@@ -452,17 +443,25 @@ void Button::CompleteDragOperation(const DragOp& dop)
 	if (dop.dragView == this) {
 		// this was the dragged view
 		EnableBorder(1, false);
-	} else {
-		// this was the receiver
-		const PortraitDragOp* pdop = static_cast<const PortraitDragOp*>(&dop);
-		core->GetGame()->SwapPCs(pdop->PC, ControlID + 1);
 	}
+	
+	Control::CompleteDragOperation(dop);
+}
+
+Holder<Sprite2D> Button::DragCursor() const
+{
+	if (IS_PORTRAIT == false && Picture) {
+		// TODO: would it be an enhancement to actually use the portrait for the drag icon?
+		return Picture;
+	}
+	
+	return Control::DragCursor();
 }
 
 /** Mouse Button Down */
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	ActionKey key(Action::DragDrop);
+	ActionKey key(Action::DragDropDest);
     if (core->GetDraggedItem() && !SupportsAction(key)) {
         return true;
     }
@@ -494,7 +493,7 @@ bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	bool drag = core->GetDraggedItem () != NULL;
 
 	if (drag && me.repeats == 1) {
-		ActionKey key(Action::DragDrop);
+		ActionKey key(Action::DragDropDest);
 		if (SupportsAction(key)) {
 			return PerformAction(key);
 		} else {

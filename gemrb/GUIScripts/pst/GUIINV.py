@@ -108,7 +108,7 @@ def InitInventoryWindow (Window):
 	Button = Window.GetControl (44)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnAutoEquip)
+	Button.SetAction (OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	# encumbrance
 	Button = Window.GetControl (46)
@@ -225,7 +225,7 @@ def RefreshInventoryWindow (Window):
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
+		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if Slot != None:
 			item = GemRB.GetItem (Slot['ItemResRef'])
@@ -318,7 +318,7 @@ def UpdateSlot (pc, i):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InventoryCommon.OpenItemInfoWindow(None, slot=slot))
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
+		Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -330,11 +330,11 @@ def UpdateSlot (pc, i):
 		if slot_list[i]>=0:
 			Button.SetSprites (SlotType["ResRef"], 0, 0, 1, 2, 3)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, OnDragItem)
+			Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 			Button.SetTooltip (SlotType["Tip"])
 		else:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
+			Button.SetAction (None, IE_ACT_DRAG_DROP_DST)
 			Button.SetTooltip ('')
 			itemname = ""
 

@@ -94,9 +94,41 @@ public: // Public attributes
 		// other events
 		ValueChange, // many times we only care that the value has changed, not about the event that changed it
 
-		// TODO: probably others will be needed
+		DragDropSource, // a DragOp was succesfully taken from here
+		DragDropDest, // a DragOp was successfully dropped here
 
 		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
+	};
+	
+	struct ControlDragOp : public DragOp {
+		ControlDragOp(Control* c)
+		: DragOp(c, c->DragCursor()){}
+		
+		Control* Source() const {
+			return static_cast<Control*>(dragView);
+		}
+		
+		Control* Destination() const {
+			return static_cast<Control*>(dropView);
+		}
+		
+		~ControlDragOp() {
+			Control* src = Source();
+			ActionKey srckey(Action::DragDropSource);
+			
+			Control* dst = Destination();
+			ActionKey dstkey(Action::DragDropDest);
+			
+			if (dst) { // only send actions for successful drags
+				if (src->SupportsAction(srckey)) {
+					src->PerformAction(srckey);
+				}
+				
+				if (dst->SupportsAction(dstkey)) {
+					dst->PerformAction(dstkey);
+				}
+			}
+		}
 	};
 
 	/** Variable length is 40-1 (zero terminator) */
@@ -132,6 +164,10 @@ public:
 	bool IsFocused();
     
 	bool TracksMouseDown() const override { return bool(actionTimer); }
+	
+	UniqueDragOp DragOperation() override;
+	bool AcceptsDragOperation(const DragOp&) const override;
+	virtual Holder<Sprite2D> DragCursor() const;
 
 	//Events
 	void SetAction(Responder handler, Action type, EventButton button = 0,

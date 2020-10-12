@@ -23,6 +23,7 @@
 #include "GUI/Window.h"
 
 #include "win32def.h"
+#include "ie_cursors.h"
 
 #include "ControlAnimation.h"
 #include "Interface.h"
@@ -214,6 +215,27 @@ bool Control::HitTest(const Point& p) const
 		return View::HitTest(p);
 	}
 	return false;
+}
+
+View::UniqueDragOp Control::DragOperation()
+{
+	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+}
+
+bool Control::AcceptsDragOperation(const DragOp& dop) const
+{
+	const ControlDragOp* cdop = dynamic_cast<const ControlDragOp*>(&dop);
+	if (cdop && cdop->dragView != this) {
+		// if 2 controls share the same VarName we assume they are swappable...
+		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
+	}
+	
+	return View::AcceptsDragOperation(dop);
+}
+
+Holder<Sprite2D> Control::DragCursor() const
+{
+	return core->Cursors[IE_CURSOR_SWAP];
 }
 
 bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)

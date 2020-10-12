@@ -75,7 +75,7 @@ def InitInventoryWindow (Window):
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnAutoEquip)
+	Button.SetAction (InventoryCommon.OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	#encumbrance
 	Button = Window.GetControl (67)
@@ -253,7 +253,7 @@ def RefreshInventoryWindow (Window):
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
+		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:

@@ -33,6 +33,7 @@
 #include "Cache.h"
 #include "Callback.h"
 #include "GameData.h"
+#include "GUI/Control.h"
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
 #include "GUI/GUIFactory.h"
@@ -65,7 +66,6 @@ class Audio;
 class CREItem;
 class Calendar;
 class Container;
-class Control;
 class DataFileMgr;
 struct Effect;
 class EffectQueue;
@@ -320,14 +320,13 @@ using ColorPal = std::array<Color, SIZE>;
 // TODO: there is no reason why this can't be generated directly from
 // the inventory button drag event using the button value as the slot id
 // to get the appropriate CREItem
-struct ItemDragOp : public View::DragOp {
+struct ItemDragOp : public Control::ControlDragOp {
 	CREItem* item;
-	
-	// FIXME: DragOp should be initialized with the button we are dragging from
-	// for now use a dummy until we truly implement this as a drag event
-	View dummy;
 
 	ItemDragOp(CREItem* item);
+	
+private:
+	static Control dragDummy;
 };
 
 /**
