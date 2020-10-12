@@ -41,7 +41,8 @@ class GEM_EXPORT View {
 public:
 	// using Held so we can have polymorphic drag operations
 	struct DragOp : public Held<DragOp> {
-		View* dragView;
+		View* dragView = nullptr;
+		View* dropView = nullptr;
 		
 		Holder<Sprite2D> cursor = nullptr;
 		

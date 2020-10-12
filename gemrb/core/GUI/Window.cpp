@@ -358,6 +358,7 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 
 	if (drag) {
 		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+			drag->dropView = target;
 			target->CompleteDragOperation(*drag);
 		}
 	} else if (trackingView) {
@@ -394,6 +395,7 @@ void Window::DispatchTouchUp(View* target, const TouchEvent& te, unsigned short 
 
 	if (drag && te.numFingers == 1) {
 		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+			drag->dropView = target;
 			target->CompleteDragOperation(*drag);
 		}
 	} else if (trackingView) {
