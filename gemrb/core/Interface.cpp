@@ -3886,7 +3886,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	
 	if (!item) return;
 	
-	DraggedItem = new ItemDragOp(item);
+	DraggedItem.reset(new ItemDragOp(item));
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 

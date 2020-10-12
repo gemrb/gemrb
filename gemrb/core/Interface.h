@@ -390,7 +390,7 @@ private:
 	int ItemTypes;
 
 	// Currently dragged item or NULL
-	Holder<ItemDragOp> DraggedItem = nullptr;
+	std::unique_ptr<ItemDragOp> DraggedItem;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
@@ -601,7 +601,7 @@ public:
 	void LoadProgress(int percent);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
-	Holder<ItemDragOp> GetDraggedItem() const { return DraggedItem; }
+	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
 	CREItem *ReadItem(DataStream *str);

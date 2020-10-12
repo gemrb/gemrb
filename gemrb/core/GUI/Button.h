@@ -155,7 +155,7 @@ public:
 	String QueryText() const { return Text; }
 	String TooltipText() const;
 
-	Holder<DragOp> DragOperation();
+	UniqueDragOp DragOperation();
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
 

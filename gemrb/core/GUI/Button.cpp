@@ -429,11 +429,11 @@ Holder<Sprite2D> Button::Cursor() const
 	return Control::Cursor();
 }
 
-Holder<Button::DragOp> Button::DragOperation()
+View::UniqueDragOp Button::DragOperation()
 {
 	if (IS_PORTRAIT) {
 		EnableBorder(1, true);
-		return Holder<Button::DragOp>(new PortraitDragOp(this));
+		return std::unique_ptr<PortraitDragOp>(new PortraitDragOp(this));
 	}
 	return View::DragOperation();
 }

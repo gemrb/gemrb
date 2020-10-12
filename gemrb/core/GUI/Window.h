@@ -153,7 +153,7 @@ private: // Private attributes
 	View* focusView; // keyboard focus
 	View* trackingView; // out of bounds mouse tracking
 	View* hoverView; // view the mouse was last over
-	Holder<DragOp> drag;
+	UniqueDragOp drag;
 	unsigned long lastMouseMoveTime;
 
 	VideoBufferPtr backBuffer = nullptr;

@@ -27,6 +27,7 @@
 #include "ScriptEngine.h"
 
 #include <list>
+#include <memory>
 #include <vector>
 
 #define DEBUG_VIEWS 0
@@ -40,7 +41,7 @@ class Window;
 class GEM_EXPORT View {
 public:
 	// using Held so we can have polymorphic drag operations
-	struct DragOp : public Held<DragOp> {
+	struct DragOp {
 		View* dragView = nullptr;
 		View* dropView = nullptr;
 		
@@ -49,6 +50,8 @@ public:
 		DragOp(View* v, Holder<Sprite2D> cursor);
 		virtual ~DragOp();
 	};
+	
+	using UniqueDragOp = std::unique_ptr<DragOp>;
 	
 	enum AutoresizeFlags {
 		// when a superview frame changes...
@@ -223,7 +226,7 @@ public:
 
 	virtual bool TracksMouseDown() const { return false; }
 
-	virtual Holder<DragOp> DragOperation() { return Holder<DragOp>(NULL); }
+	virtual UniqueDragOp DragOperation() { return nullptr; }
 	virtual bool AcceptsDragOperation(const DragOp&) const { return false; }
 	virtual void CompleteDragOperation(const DragOp&) {}
 
