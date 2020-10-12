@@ -6039,7 +6039,7 @@ PyDoc_STRVAR( GemRB_GameSwapPCs__doc,
 static PyObject* GemRB_GameSwapPCs(PyObject * /*self*/, PyObject* args)
 {
 	uint32_t PC1, PC2;
-	PARSE_ARGS(args,  "|II", &PC1, &PC2);
+	PARSE_ARGS(args,  "II", &PC1, &PC2);
 	GET_GAME();
 	
 	game->SwapPCs(PC1, PC2);
