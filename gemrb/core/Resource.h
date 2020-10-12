@@ -65,6 +65,25 @@ public:
 	ResRef(const char* str) {
 		operator=(str);
 	};
+	
+	ResRef& operator=(const ResRef& rhs) {
+		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+		return *this;
+	}
+	
+	ResRef& operator=(const char* str) {
+		if (str == NULL) {
+			Clear();
+		} else {
+			// using strnlwrcpy: this wrapper is case insensitive,
+			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
+			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
+			strnlwrcpy(ref, str, sizeof(ref)-1 );
+			ref[sizeof(ref)-1] = '\0';
+		}
+		
+		return *this;
+	}
 
 	struct Hash
 	{
@@ -80,18 +99,6 @@ public:
 
 	operator const char*() const {
 		return (ref[0] == '\0') ? NULL : ref;
-	}
-
-	void operator=(const char* str) {
-		if (str == NULL) {
-			Clear();
-		} else {
-			// using strnlwrcpy: this wrapper is case insensitive,
-			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
-			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
-			strnlwrcpy(ref, str, sizeof(ref)-1 );
-			ref[sizeof(ref)-1] = '\0';
-		}
 	}
 
 	// Case insensitive
