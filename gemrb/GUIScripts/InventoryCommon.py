@@ -39,11 +39,11 @@ StackAmount = 0
 
 UpdateInventoryWindow = None
 
-def OnDragItemGround ():
+def OnDragItemGround (btn, slot):
 	"""Drops and item to the ground."""
-
+	
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar ("TopIndex")
+	slot = slot + GemRB.GetVar ("TopIndex") - btn.ControlID
 
 	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
@@ -199,30 +199,12 @@ def MouseLeaveSlot (btn, slot):
 	UpdateSlot (pc, slot-1)
 	return
 
-def MouseEnterGround ():
-	Window = GemRB.GetView("WIN_INV")
-
-	if GameCheck.IsPST():
-		offset = 47
-	else:
-		offset = 68
-	i = GemRB.GetVar ("GroundItemButton")
-	Button = Window.GetControl (i+offset)
-
+def MouseEnterGround (Button):
 	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_SELECTED)
 	return
 
-def MouseLeaveGround ():
-	Window = GemRB.GetView("WIN_INV")
-
-	if GameCheck.IsPST():
-		offset = 47
-	else:
-		offset = 68
-	i = GemRB.GetVar ("GroundItemButton")
-	Button = Window.GetControl (i+offset)
-
+def MouseLeaveGround (Button):
 	if GemRB.IsDraggingItem ()==1:
 		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 	return
@@ -413,11 +395,11 @@ def TryAutoIdentification(pc, item, slot, slot_item, enabled=0):
 		return True
 	return False
 
-def OpenGroundItemInfoWindow ():
+def OpenGroundItemInfoWindow (btn, slot):
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar("TopIndex")+GemRB.GetVar("GroundItemButton")
+	slot = slot + GemRB.GetVar("TopIndex") - btn.ControlID
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
 	#the ground items are only displayable

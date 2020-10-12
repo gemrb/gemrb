@@ -47,7 +47,7 @@ def InitInventoryWindow (Window):
 		Button = Window.GetControl (i+68)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
-		Button.SetVarAssoc ("GroundItemButton", i)
+		Button.SetVarAssoc ("ItemButton", i + 68)
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 
 	#major & minor clothing color

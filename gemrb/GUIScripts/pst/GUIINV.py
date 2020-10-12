@@ -85,7 +85,7 @@ def InitInventoryWindow (Window):
 	# Ground Item
 	for i in range (10):
 		Button = Window.GetControl (i+47)
-		Button.SetVarAssoc ("GroundItemButton", i)
+		Button.SetVarAssoc ("ItemButton", i + 47)
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 		Button.SetFont ("NUMBER")
 
