@@ -1585,6 +1585,27 @@ def OpenInventoryWindowClick (btn, pcID):
 	GUIINV.OpenInventoryWindow ()
 	return
 
+DragButton = None
+def ButtonDragSourceHandler(btn):
+	global DragButton
+	DragButton = btn;
+	
+def ButtonDragDestHandler(btn, pcID):
+	global DragButton
+	
+	# So far this is only used for portrait buttons
+	if DragButton: # DragButton will be none for item drags instantiated by clicking (not sragging) an inventory item
+		if DragButton.VarName == "portrait":
+			if btn.VarName == "portrait":
+				GemRB.GameSwapPCs(DragButton.Value, pcID)
+			
+	else: # TODO: something like this: DragButton.VarName.startswith("slot")
+		if btn.VarName == "portrait":
+			InventoryCommon.OnDropItemToPC(pcID)
+		# TODO: handle inventory/ground slots
+		
+	DragButton = None
+
 def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	global PortraitWindow
 
@@ -1647,7 +1668,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	for i, Button in PortraitButtons.iteritems():
 		pcID = i + 1
 		
-		Button.SetVarAssoc("Portrait", pcID)
+		Button.SetVarAssoc("portrait", pcID)
 		
 		if not GameCheck.IsPST():
 			fontref = "STATES2"
@@ -1667,7 +1688,8 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonOnPress)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, PortraitButtonOnShiftPress)
-		Button.SetAction(InventoryCommon.OnDropItemToPC, IE_ACT_DRAG_DROP_DST)
+		Button.SetAction(ButtonDragSourceHandler, IE_ACT_DRAG_DROP_SRC)
+		Button.SetAction(ButtonDragDestHandler, IE_ACT_DRAG_DROP_DST)
 
 		if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			# overlay a label, so we can display the hp with the correct font. Regular button label
