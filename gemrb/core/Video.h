@@ -142,7 +142,7 @@ private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
 	virtual void SwapBuffers(VideoBuffers&)=0;
 	virtual int PollEvents() = 0;
-	virtual int CreateDriverDisplay(const Size& s, int bpp, const char* title) = 0;
+	virtual int CreateDriverDisplay(const char* title) = 0;
 
 	// the actual drawing implementations
 	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) = 0;

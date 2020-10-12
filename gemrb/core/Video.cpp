@@ -60,9 +60,12 @@ Video::~Video(void)
 	}
 }
 
-int Video::CreateDisplay(const Size& s, int bpp, bool fs, const char* title)
+int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title)
 {
-	int ret = CreateDriverDisplay(s, bpp, title);
+	bpp = bits;
+	screenSize = s;
+
+	int ret = CreateDriverDisplay(title);
 	if (ret == GEM_OK) {
 		SetScreenClip(NULL);
 		if (fs) {

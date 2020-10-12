@@ -77,11 +77,8 @@ int SDL20VideoDriver::Init()
 	return ret;
 }
 
-int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* title)
+int SDL20VideoDriver::CreateDriverDisplay(const char* title)
 {
-	screenSize = s;
-	this->bpp = bpp;
-
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -107,7 +104,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
 #endif
 
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, s.w, s.h, winFlags);
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
 		return GEM_ERROR;
@@ -161,7 +158,7 @@ int SDL20VideoDriver::CreateDriverDisplay(const Size& s, int bpp, const char* ti
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
 	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
-	scratchBuffer = SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, s.w, s.h);
+	scratchBuffer = SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, screenSize.w, screenSize.h);
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
 

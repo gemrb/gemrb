@@ -36,7 +36,7 @@ public:
 	~SDL12VideoDriver();
 	
 	int Init(void) override;
-	int CreateDriverDisplay(const Size&, int bpp, const char* title) override;
+	int CreateDriverDisplay(const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
 	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;

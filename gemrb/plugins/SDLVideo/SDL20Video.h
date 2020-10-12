@@ -219,7 +219,7 @@ public:
 	int Init() override;
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 
-	int CreateDriverDisplay(const Size& s, int bpp, const char* title) override;
+	int CreateDriverDisplay(const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_SetWindowTitle(window, title); };
 
 	void SwapBuffers(VideoBuffers& buffers) override;

@@ -65,16 +65,13 @@ int SDL12VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL12VideoDriver::CreateDriverDisplay(const Size& s, int b, const char* title)
+int SDL12VideoDriver::CreateDriverDisplay(const char* title)
 {
-	bpp = b;
-	screenSize = s;
-
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
 
 	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
-	disp = SDL_SetVideoMode( s.w, s.h, bpp, flags );
+	disp = SDL_SetVideoMode(screenSize.w, screenSize.h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
 		Log(ERROR, "SDL 1.2 Driver", "%s", SDL_GetError());
@@ -86,7 +83,6 @@ int SDL12VideoDriver::CreateDriverDisplay(const Size& s, int b, const char* titl
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Display Surface...");
 
 	return GEM_OK;
 }
