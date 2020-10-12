@@ -645,7 +645,6 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	ABORT_IF_NULL(win);
 	win->SetFlags(Window::AlphaChannel, OP_OR);
 	PyObject* pyWin = ConstructObjectForScriptableView( win->GetScriptingRef() );
-	PyObject_SetAttrString(pyWin, "HasFocus", PyBool_FromLong(win->HasFocus()));
 	return pyWin;
 }
 
@@ -1256,14 +1255,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 	if (ref) {
 		View* retView = GetView(ref);
 		// return retView->GetScriptingRef() so that Python objects compare correctly (instread of returning the alias ref)
-		PyObject* obj = ConstructObjectForScriptableView(retView->GetScriptingRef());
-		if (Window* win = dynamic_cast<Window*>(retView)) {
-			PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
-		} else if (Control* ctl = dynamic_cast<Control*>(retView)) {
-			PyObject_SetAttrString(obj, "VarName", PyString_FromString(ctl->VarName));
-			PyObject_SetAttrString(obj, "Value", PyLong_FromUnsignedLong(ctl->GetValue()));
-		}
-		return obj;
+		return ConstructObjectForScriptableView(retView->GetScriptingRef());
 	}
 	Py_RETURN_NONE;
 }
@@ -13771,6 +13763,23 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	if (!obj) return RuntimeError("Failed to construct object");
 	PyObject_SetAttrString(obj, "SCRIPT_GROUP", PyString_FromString(ref->ScriptingGroup()));
 	PyErr_Clear(); // only controls can have their SCRIPT_GROUP modified so clear the exception for them
+	
+	static PyObject* controlClass = PyDict_GetItemString(pGUIClasses, "GControl");
+	static PyObject* windowClass = PyDict_GetItemString(pGUIClasses, "GWindow");
+	
+	PyObject* meta = PyObject_Type(obj);
+			
+	if (PyObject_TypeCheck(meta, Py_TYPE(controlClass))) {
+		Control* ctl = static_cast<Control*>(GetView(ref));
+		PyObject_SetAttrString(obj, "VarName", PyString_FromString(ctl->VarName));
+		PyObject_SetAttrString(obj, "Value", PyLong_FromUnsignedLong(ctl->GetValue()));
+	} else if (PyObject_TypeCheck(obj, Py_TYPE(windowClass))) {
+		Window* win = static_cast<Window*>(GetView(ref));
+		PyObject_SetAttrString(obj, "HasFocus", PyBool_FromLong(win->HasFocus()));
+	}
+	
+	Py_DecRef(meta);
+	
 	return obj;
 }
 
