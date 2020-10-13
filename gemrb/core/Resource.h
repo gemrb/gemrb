@@ -65,7 +65,11 @@ public:
 	ResRef(const char* str) {
 		operator=(str);
 	};
-	
+
+	ResRef(const ResRef& rhs) {
+		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+	}
+
 	ResRef& operator=(const ResRef& rhs) {
 		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
 		return *this;
