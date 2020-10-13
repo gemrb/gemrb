@@ -27,12 +27,11 @@
 
 #include "Region.h"
 #include "Holder.h"
+#include "Sprite2D.h"
 
 #include <vector>
 
 namespace GemRB {
-
-class Sprite2D;
 
 #define ANI_DEFAULT_FRAMERATE	15
 
