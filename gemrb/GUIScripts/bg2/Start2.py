@@ -249,8 +249,8 @@ def ExitPress():
 	QuitTextArea.SetText (19532)
 	CancelButton.SetText (13727)
 	ConfirmButton.SetText (15417)
-	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitWindow.Close)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	ConfirmButton.MakeDefault()
 	CancelButton.MakeEscape()
 	return

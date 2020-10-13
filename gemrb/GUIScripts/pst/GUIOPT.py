@@ -55,7 +55,7 @@ def InitOptionsWindow (Window):
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
 
 	# Return to Game
-	ConfigOptButton(Window.GetControl (0), 28638, Window.Close)
+	ConfigOptButton(Window.GetControl (0), 28638, lambda: Window.Close())
 
 	# Quit Game
 	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
@@ -108,8 +108,8 @@ def OpenVideoOptionsWindow ():
 
 	VideoHelpText = GUIOPTControls.OptHelpText ('VideoOptions', Window, 9, 31052)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 7)
-	GUIOPTControls.OptCancel (Window.Close, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31052, 31431, VideoHelpText, Window, 1, 10, 31234, "Brightness Correction", lambda: GammaFeedback(31431))
 	GUIOPTControls.OptSlider (31052, 31459, VideoHelpText, Window, 2, 11, 31429, "Gamma Correction", lambda: GammaFeedback(31459))
@@ -155,8 +155,8 @@ def OpenAudioOptionsWindow ():
 
 	AudioHelpText = GUIOPTControls.OptHelpText ('AudioOptions', Window, 9, 31210)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 7)
-	GUIOPTControls.OptCancel (Window.Close, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31210, 31227, AudioHelpText, Window, 1, 10, 31460, "Volume Ambients", lambda: UpdateVolume(31227))
 	GUIOPTControls.OptSlider (31210, 31228, AudioHelpText, Window, 2, 11, 31466, "Volume SFX", lambda: UpdateVolume(31228))
@@ -191,8 +191,8 @@ def OpenGameplayOptionsWindow ():
 
 	GameplayHelpText = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 12, 31212)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 10)
-	GUIOPTControls.OptCancel (Window.Close, Window, 11)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 10)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 11)
 
 	GUIOPTControls.OptSlider (31212, 31232, GameplayHelpText, Window, 1, 13, 31481, "Tooltips", UpdateTooltips, TOOLTIP_DELAY_FACTOR)
 	GUIOPTControls.OptSlider (31212, 31230, GameplayHelpText, Window, 2, 14, 31482, "Mouse Scroll Speed", UpdateMouseSpeed)
@@ -229,8 +229,8 @@ def OpenFeedbackOptionsWindow ():
 
 	FeedbackHelpText = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 9, 37410)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 7)
-	GUIOPTControls.OptCancel (Window.Close, Window, 8)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 7)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 8)
 
 	GUIOPTControls.OptSlider (31213, 37411, FeedbackHelpText, Window, 1, 10, 37463, "Circle Feedback", UpdateMarkerFeedback)
 	GUIOPTControls.OptSlider (31213, 37447, FeedbackHelpText, Window, 2, 11, 37586, "Locator Feedback Level")
@@ -262,8 +262,8 @@ def OpenAutopauseOptionsWindow ():
 
 	AutopauseHelpText = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 1, 31214)
 
-	GUIOPTControls.OptDone (Window.Close, Window, 16)
-	GUIOPTControls.OptCancel (Window.Close, Window, 17)
+	GUIOPTControls.OptDone (lambda: Window.Close(), Window, 16)
+	GUIOPTControls.OptCancel (lambda: Window.Close(), Window, 17)
 
 	# checkboxes OR the values if they associate to the same variable
 	GUIOPTControls.OptCheckbox (31214, 37688, AutopauseHelpText, Window, 2, 9, 37598, "Auto Pause State", None, 4)
@@ -290,7 +290,7 @@ def OpenLoadMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	# Loading a game will destroy ...
 	Text = Window.GetControl (3)
@@ -327,7 +327,7 @@ def OpenQuitMsgWindow ():
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	# The game has not been saved ....
@@ -382,13 +382,13 @@ def OpenKeyboardMappingsWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (5)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	keys_setup_page (Window, 0)
@@ -467,7 +467,7 @@ def OpenMoviesWindow ():
 	# Done
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Window.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	# movie list
 	List = Window.GetControl (0)

@@ -98,7 +98,7 @@ def InitMapWindow (Window):
 	else:
 		Map = Window.ReplaceSubview(2, IE_GUI_MAP)
 
-	Map.SetAction(Window.Close, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
 
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)

@@ -816,7 +816,7 @@ def OpenInformationWindow ():
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InformationWindow.Close)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InformationWindow.Close())
 	Button.MakeEscape()
 
 	TotalPartyExp = 0
