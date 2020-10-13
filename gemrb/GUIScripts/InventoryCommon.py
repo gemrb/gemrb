@@ -177,7 +177,7 @@ def DragItemAmount ():
 		Amount = Text.QueryText ()
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
-	OpenItemAmountWindow (None, UsedSlot)
+	ItemAmountWindow.Close()
 	return
 
 def MouseEnterSlot (btn, slot):
@@ -414,6 +414,13 @@ def OpenGroundItemInfoWindow (btn, slot):
 # TODO: implement, reuse OpenItemAmountWindow, but be careful about any other uses of ItemButton
 def OpenGroundItemAmountWindow ():
 	pass
+	
+def ItemAmountWindowClosed(win):
+	global ItemAmountWindow, UsedSlot
+
+	ItemAmountWindow = None
+	UsedSlot = None
+	UpdateInventoryWindow()
 
 # TODO: can the GUISTORE be consolidate with this one?
 def OpenItemAmountWindow (btn, slot):
@@ -423,14 +430,6 @@ def OpenItemAmountWindow (btn, slot):
 	global ItemAmountWindow, StackAmount
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-
-	if ItemAmountWindow != None:
-		if ItemAmountWindow:
-			ItemAmountWindow.Unload ()
-		ItemAmountWindow = None
-		UsedSlot = None
-		UpdateInventoryWindow()
-		return
 
 	UsedSlot = slot
 	if GemRB.IsDraggingItem ()==1:
@@ -456,6 +455,7 @@ def OpenItemAmountWindow (btn, slot):
 
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
 
 	# item icon
 	Icon = Window.GetControl (0)
@@ -491,7 +491,7 @@ def OpenItemAmountWindow (btn, slot):
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
