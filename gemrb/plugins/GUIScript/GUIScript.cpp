@@ -796,8 +796,10 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 			long val;
 			bool valid = valid_number(ret, val);
 			if (type == 3) {
-				//if which = 3 then return resolved string
-				return PyString_FromString(core->GetCString( ieStrRef(val) ));
+				char* cstr = core->GetCString(ieStrRef(val));
+				PyObject* pystr = PyString_FromString(cstr);
+				free(cstr);
+				return pystr;
 			}
 			if (valid || type == 1) {
 				return PyInt_FromLong( val );
