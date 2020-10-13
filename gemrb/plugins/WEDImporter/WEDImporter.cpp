@@ -28,6 +28,7 @@
 #include "TileSetMgr.h"
 
 #include <cmath>
+#include <iterator>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>

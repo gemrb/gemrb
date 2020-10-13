@@ -136,7 +136,7 @@ private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	std::unordered_map<const ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
+	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;

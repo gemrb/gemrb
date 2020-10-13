@@ -61,6 +61,9 @@
 #ifndef M_PI_2
 #define M_PI_2  1.57079632679489661923 // pi/2
 #endif
+#ifndef M_PI_4
+#define 	M_PI_4   0.78539816339744830962
+#endif
 
  /* WinAPI collision. GetObject from wingdi.h conflicts with a type used in the GUIScript source (core\ScriptEngine.h) */
 #ifdef GetObject
