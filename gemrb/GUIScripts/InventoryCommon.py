@@ -27,7 +27,6 @@ from ie_slots import *
 from ie_spells import *
 from ie_sounds import DEF_IDENTIFY
 
-OverSlot = None
 UsedSlot = None
 ItemInfoWindow = None
 ItemAmountWindow = None
@@ -182,20 +181,22 @@ def DragItemAmount ():
 	return
 
 def MouseEnterSlot (btn, slot):
-	global OverSlot
-
 	pc = GemRB.GameGetSelectedPCSingle ()
-	OverSlot = slot
+
 	if GemRB.IsDraggingItem ()==1:
-		UpdateSlot (pc, slot-1)
+		drag_item = GemRB.GetSlotItem (0,0)
+		SlotType = UpdateSlot (pc, slot-1)
+
+		if GemRB.CanUseItemType (SlotType["Type"], drag_item["ItemResRef"]):
+			btn.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			btn.SetState (IE_GUI_BUTTON_ENABLED)
+		
 	return
 
 def MouseLeaveSlot (btn, slot):
-	global OverSlot
-
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if slot == OverSlot or not GemRB.IsDraggingItem ():
-		OverSlot = None
+
 	UpdateSlot (pc, slot-1)
 	return
 
@@ -428,7 +429,6 @@ def OpenItemAmountWindow (btn, slot):
 			ItemAmountWindow.Unload ()
 		ItemAmountWindow = None
 		UsedSlot = None
-		OverSlot = None
 		UpdateInventoryWindow()
 		return
 
@@ -506,7 +506,7 @@ def UpdateSlot (pc, slot):
 	ControlID = SlotType["ID"]
 
 	if not ControlID:
-		return
+		return None
 
 	if GemRB.IsDraggingItem ()==1:
 		#get dragged item
@@ -552,21 +552,15 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, OpenItemAmountWindow)
 
-	if OverSlot == slot+1:
-		if GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_SELECTED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
-		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
-		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
-			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
-	return
+	return SlotType
 
 def CancelColor():
 	global ColorPicker

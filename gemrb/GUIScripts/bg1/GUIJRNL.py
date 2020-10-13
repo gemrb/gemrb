@@ -27,7 +27,6 @@ import GUICommonWindows
 from GUIDefines import *
 
 ###################################################
-OverSlot = None
 Chapter = 0
 StartTime = 0
 StartYear = 0
