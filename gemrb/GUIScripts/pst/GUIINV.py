@@ -318,7 +318,7 @@ def UpdateSlot (pc, i):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InventoryCommon.OpenItemInfoWindow(None, slot=slot))
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
+		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenItemAmountWindow)
 		Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
@@ -416,138 +416,6 @@ def OnDragItem (btn, slot):
 	UpdateInventoryWindow ()
 	return
 
-# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
-def DecreaseStackAmount ():
-	"""Decreases the split size."""
-
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	number = int ("0"+Amount)-1
-	if number<1:
-		number=1
-	Text.SetText (str (number))
-	return
-
-# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
-def IncreaseStackAmount ():
-	"""Increases the split size."""
-
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	number = int ("0"+Amount)+1
-	if number>StackAmount:
-		number=StackAmount
-	Text.SetText (str (number))
-	return
-
-# Duplicated from InventoryCommon and should be removed once behaviour is consolidated
-def DragItemAmount ():
-	"""Drag a split item."""
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	#emergency dropping
-	if GemRB.IsDraggingItem()==1:
-		GemRB.DropDraggedItem (pc, UsedSlot)
-		UpdateSlot (pc, UsedSlot-1)
-
-	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
-
-	#if dropping didn't help, don't die if slot_item isn't here
-	if slot_item:
-		Text = ItemAmountWindow.GetControl (6)
-		Amount = Text.QueryText ()
-		item = GemRB.GetItem (slot_item["ItemResRef"])
-		GemRB.DragItem (pc, UsedSlot, item["ItemIcon"], int ("0"+Amount), 0)
-	OpenItemAmountWindow (None, UsedSlot)
-
-	return
-
-def OpenItemAmountWindow (btn, slot):
-	"""Open the split window."""
-
-	global UsedSlot, OverSlot
-	global ItemAmountWindow, StackAmount
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	if ItemAmountWindow != None:
-		if ItemAmountWindow:
-			ItemAmountWindow.Unload ()
-		ItemAmountWindow = None
-		UsedSlot = None
-		OverSlot = None
-		UpdateInventoryWindow()
-		return
-
-	UsedSlot = slot
-	if GemRB.IsDraggingItem ()==1:
-		GemRB.DropDraggedItem (pc, UsedSlot)
-		#redraw slot
-		UpdateSlot (pc, UsedSlot-1)
-		# disallow splitting while holding split items (double splitting)
-		if GemRB.IsDraggingItem () == 1:
-			return
-
-	slot_item = GemRB.GetSlotItem (pc, UsedSlot)
-
-	if slot_item:
-		StackAmount = slot_item["Usages0"]
-	else:
-		StackAmount = 0
-	if StackAmount<=1:
-		UpdateSlot (pc, UsedSlot-1)
-		return
-
-	ResRef = slot_item['ItemResRef']
-	item = GemRB.GetItem (ResRef)
-
-	ItemAmountWindow = Window = GemRB.LoadWindow (4)
-	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
-
-	# item icon
-	Icon = Window.GetControl (0)
-	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Icon.SetItemIcon (ResRef)
-
-	# item amount
-	Text = Window.GetControl (6)
-	Text.SetSize (40, 40)
-	Text.SetText (str (StackAmount//2))
-	Text.SetStatus (IE_GUI_EDIT_NUMBER)
-	Text.Focus()
-
-	# Decrease
-	Button = Window.GetControl (4)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreaseStackAmount)
-	Button.SetActionInterval (200)
-
-	# Increase
-	Button = Window.GetControl (3)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreaseStackAmount)
-	Button.SetActionInterval (200)
-
-	# Done
-	Button = Window.GetControl (2)
-	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
-	Button.MakeDefault()
-
-	# Cancel
-	Button = Window.GetControl (1)
-	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
-	Button.MakeEscape()
-
-	# 0 bmp
-	# 1,2 done/cancel?
-	# 3 +
-	# 4 -
-	# 6 text
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
-	return
 def MouseEnterSlot (btn,slot):
 	global OverSlot
 

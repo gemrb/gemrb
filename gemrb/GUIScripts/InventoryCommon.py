@@ -457,6 +457,10 @@ def OpenItemAmountWindow (btn, slot):
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
 
+	strings = { 'Done': 11973, "Cancel": 13727}
+	if GameCheck.IsPST():
+		strings = { 'Done': 1403, "Cancel": 4196}
+
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -484,13 +488,13 @@ def OpenItemAmountWindow (btn, slot):
 
 	# Done
 	Button = Window.GetControl (2)
-	Button.SetText (11973)
+	Button.SetText (strings['Done'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (13727)
+	Button.SetText (strings['Cancel'])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
