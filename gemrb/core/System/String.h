@@ -23,7 +23,7 @@
 #include "ie_types.h"
 
 #ifdef __amigaos4__
-#include "OS4Helpers.h"
+#include "../platforms/amigaos/OS4Helpers.h"
 #endif
 
 #include <cstring>

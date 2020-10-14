@@ -49,8 +49,6 @@
 #include <dirent.h>
 #ifndef __amigaos4__
 #include <sys/mman.h>
-#else
-#include "OS4Helpers.h" //mmap/munmap
 #endif
 #endif
 
