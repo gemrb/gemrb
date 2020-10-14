@@ -207,8 +207,6 @@ private:
 
 	GLSLProgram* stencilShader = nullptr;
 	GLSLProgram* spriteShader = nullptr;
-
-	SDL_Texture* scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 	
 	SDL_GameController* gameController = nullptr;
 
@@ -217,12 +215,8 @@ public:
 	~SDL20VideoDriver(void);
 
 	int Init() override;
-	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 
-	int CreateDriverDisplay(const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_SetWindowTitle(window, title); };
-
-	void SwapBuffers(VideoBuffers& buffers) override;
 
 	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
 	bool SetFullscreenMode(bool set) override;
@@ -243,7 +237,11 @@ private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
 
 	int ProcessEvent(const SDL_Event & event) override;
+	
+	int CreateSDLDisplay(const char* title) override;
+	void SwapBuffers(VideoBuffers& buffers) override;
 
+	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	int UpdateRenderTarget(const Color* color = NULL, uint32_t flags = 0);

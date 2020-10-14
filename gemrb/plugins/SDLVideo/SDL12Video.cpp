@@ -65,7 +65,7 @@ int SDL12VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL12VideoDriver::CreateDriverDisplay(const char* title)
+int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
@@ -443,11 +443,11 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			assert(rgn.w > 0 && rgn.h > 0);
 			
 			static RGBBlendingPipeline<NONE, false> blender;
-
-			Region clippedrgn = ClippedDrawingRect(rgn);
-			SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
-			SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-			ColorFill(color, dstit, dstend, blender);
+			
+				Region clippedrgn = ClippedDrawingRect(rgn);
+				SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
+				SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+				ColorFill(color, dstit, dstend, blender);
 		} else {
 			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
@@ -497,6 +497,12 @@ void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 	
 	if (flip) SDL_Flip( disp );
+}
+
+SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::ScratchBuffer() const
+{
+	assert(scratchBuffer);
+	return std::static_pointer_cast<SDLSurfaceVideoBuffer>(scratchBuffer)->Surface();
 }
 
 SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer() const

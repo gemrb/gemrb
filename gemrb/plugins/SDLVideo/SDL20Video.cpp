@@ -33,8 +33,6 @@ SDL20VideoDriver::SDL20VideoDriver(void)
 													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
 													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
 
-	scratchBuffer = NULL;
-
 	// WARNING: do _not_ call opengl here
 	// all function pointers will be NULL
 	// until after SDL_CreateRenderer is called
@@ -49,7 +47,6 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	if (SDL_GameControllerGetAttached(gameController)) {
 		SDL_GameControllerClose(gameController);
 	}
-	SDL_DestroyTexture(scratchBuffer);
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
@@ -77,7 +74,7 @@ int SDL20VideoDriver::Init()
 	return ret;
 }
 
-int SDL20VideoDriver::CreateDriverDisplay(const char* title)
+int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
@@ -158,8 +155,6 @@ int SDL20VideoDriver::CreateDriverDisplay(const char* title)
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
 	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
-	scratchBuffer = SDL_CreateTexture(renderer, info.texture_formats[0], SDL_TEXTUREACCESS_TARGET, screenSize.w, screenSize.h);
-
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
 	return GEM_OK;
@@ -188,6 +183,12 @@ void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 	}
 
 	SDL_RenderPresent( renderer );
+}
+
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::ScratchBuffer() const
+{
+	assert(scratchBuffer);
+	return std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->GetTexture();
 }
 
 SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer() const
@@ -266,7 +267,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
 		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 
-		SDL_SetRenderTarget(renderer, scratchBuffer);
+		SDL_SetRenderTarget(renderer, ScratchBuffer());
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 		SDL_RenderFillRect(renderer, &drect);
@@ -313,8 +314,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 #endif
 
 		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
-		SDL_SetTextureBlendMode(scratchBuffer, SDL_BLENDMODE_BLEND);
-		ret = SDL_RenderCopy(renderer, scratchBuffer, &drect, &drect);
+		SDL_SetTextureBlendMode(ScratchBuffer(), SDL_BLENDMODE_BLEND);
+		ret = SDL_RenderCopy(renderer, ScratchBuffer(), &drect, &drect);
 	} else {
 		UpdateRenderTarget();
 		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);

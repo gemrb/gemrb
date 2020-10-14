@@ -56,6 +56,14 @@ int SDLVideoDriver::Init(void)
 	return GEM_OK;
 }
 
+int SDLVideoDriver::CreateDriverDisplay(const char* title)
+{
+	int ret = CreateSDLDisplay(title);
+	scratchBuffer = CreateBuffer(Region(Point(), screenSize), DISPLAY);
+	scratchBuffer->Clear();
+	return ret;
+}
+
 int SDLVideoDriver::PollEvents()
 {
 	int ret = GEM_OK;

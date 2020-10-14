@@ -36,7 +36,6 @@ public:
 	~SDL12VideoDriver();
 	
 	int Init(void) override;
-	int CreateDriverDisplay(const char* title) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
 
 	Holder<Sprite2D> GetScreenshot( Region r, const VideoBufferPtr& buf = nullptr ) override;
@@ -59,13 +58,16 @@ public:
 						 const Color* tint = nullptr, const Region* clip = nullptr) override;
 
 private:
+	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
+
+	int CreateSDLDisplay(const char* title) override;
 	void SwapBuffers(VideoBuffers&) override;
+	
+	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	
 	IAlphaIterator* StencilIterator(uint32_t flags, SDL_Rect dst) const;
-	
-	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;
 
 	int ProcessEvent(const SDL_Event & event) override;
 

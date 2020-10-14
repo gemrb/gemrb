@@ -91,7 +91,11 @@ protected:
 	typedef SDLSurfaceSprite2D sprite_t;
 	typedef Point SDL_Point;
 #endif
+	VideoBufferPtr scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 
+	int CreateDriverDisplay(const char* title) override;
+
+	virtual vid_buf_t* ScratchBuffer() const = 0;
 	virtual inline vid_buf_t* CurrentRenderBuffer() const=0;
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	Region CurrentRenderClip() const;
@@ -108,6 +112,7 @@ protected:
 	void Wait(unsigned long w) override { SDL_Delay(w); }
 
 private:
+	virtual int CreateSDLDisplay(const char* title) = 0;
 	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0)=0;
 
 	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) override;
