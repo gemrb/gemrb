@@ -90,7 +90,7 @@ private:
 	bool IsOpenWindow(Window* win) const;
 	Holder<Sprite2D> WinFrameEdge(int edge) const;
 
-	inline void DrawWindowFrame() const;
+	inline void DrawWindowFrame(uint32_t flags) const;
 	inline void DrawMouse() const;
 	// DrawMouse simply calls the following with some position calculations and buffer context changes
 	inline void DrawCursor(const Point& pos) const;

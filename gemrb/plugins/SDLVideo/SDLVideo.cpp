@@ -59,7 +59,7 @@ int SDLVideoDriver::Init(void)
 int SDLVideoDriver::CreateDriverDisplay(const char* title)
 {
 	int ret = CreateSDLDisplay(title);
-	scratchBuffer = CreateBuffer(Region(Point(), screenSize), DISPLAY);
+	scratchBuffer = CreateBuffer(Region(Point(), screenSize), DISPLAY_ALPHA);
 	scratchBuffer->Clear();
 	return ret;
 }

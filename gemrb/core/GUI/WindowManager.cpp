@@ -495,7 +495,7 @@ void WindowManager::DrawTooltip(Point pos) const
 	}
 }
 
-void WindowManager::DrawWindowFrame() const
+void WindowManager::DrawWindowFrame(uint32_t flags) const
 {
 	// the window buffers dont have room for the frame
 	// we also only need to draw the frame *once* (even if it applies to multiple windows)
@@ -517,10 +517,12 @@ void WindowManager::DrawWindowFrame() const
 		int v_margin = (screen.h - left_edge->Frame.h) / 2;
 		// Also assume top and bottom are the same width.
 		int h_margin = (screen.w - left_w - right_w - top_edge->Frame.w) / 2;
-		video->BlitSprite(left_edge, h_margin, v_margin);
-		video->BlitSprite(right_edge, screen.w - right_w - h_margin, v_margin);
-		video->BlitSprite(top_edge, h_margin + left_w, v_margin);
-		video->BlitSprite(bot_edge, h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin);
+		
+		const static Color dummy;
+		video->BlitGameSprite(left_edge, h_margin, v_margin, flags, dummy);
+		video->BlitGameSprite(right_edge, screen.w - right_w - h_margin, v_margin, flags, dummy);
+		video->BlitGameSprite(top_edge, h_margin + left_w, v_margin, flags, dummy);
+		video->BlitGameSprite(bot_edge, h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin, flags, dummy);
 	}
 }
 
@@ -587,21 +589,19 @@ void WindowManager::DrawWindows() const
 
 	video->PushDrawingBuffer(HUDBuf);
 
-	if (drawFrame) {
-		DrawWindowFrame();
-	}
-
+	uint32_t frame_flags = BLIT_NO_FLAGS;
 	if (modalWin) {
+		frame_flags |= BLIT_HALFTRANS;
 		if (modalShadow != ShadowNone) {
-			uint32_t flags = 0;
-
-			if (modalShadow == ShadowGray) {
-				flags |= BLIT_HALFTRANS;
-			}
-			video->DrawRect(screen, ColorBlack, true, flags|BLIT_BLENDED);
+			uint32_t flags = (modalShadow == ShadowGray) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
+			video->DrawRect(screen, ColorBlack, true, flags);
 		}
 		auto& modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
+	}
+	
+	if (drawFrame) {
+		DrawWindowFrame(frame_flags);
 	}
 
 	if (FadeColor.a > 0) {

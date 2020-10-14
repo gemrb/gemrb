@@ -30,7 +30,6 @@ private:
 	SDL_Surface* disp;
 	bool inTextInput;
 	SDL_Joystick* gameController = nullptr;
-	Color scratchColor;
 
 public:
 	SDL12VideoDriver(void);
