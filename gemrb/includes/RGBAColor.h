@@ -41,6 +41,10 @@ struct Color {
 	bool operator==(const Color& rhs) const {
 		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
 	}
+	
+	bool operator!=(const Color& rhs) const {
+		return !operator==(rhs);
+	}
 }
 #ifdef __GNUC__
 	__attribute__((aligned(4)))
