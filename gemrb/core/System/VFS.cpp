@@ -473,11 +473,7 @@ bool MakeDirectory(const char* path)
 
 GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 {
-#ifndef __amigaos4__
         char *home = getenv("HOME");
-#else
-        const char *home = "PROGDIR:";
-#endif
 	if (home) {
 		strlcpy(outPath, home, maxLen);
 		return outPath;
