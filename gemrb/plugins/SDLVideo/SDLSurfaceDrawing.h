@@ -185,10 +185,9 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		r.h = 1;
 		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-		static StaticAlphaIterator alpha(0);
 		const static OneMinusSrcA<false, false> blender;
 
-		WriteColor(color, dstit, dstend, alpha, blender);
+		ColorFill(color, dstit, dstend, blender);
 	} else {
 		Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
@@ -225,14 +224,13 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	r.w = 1;
 	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-	static StaticAlphaIterator alpha(0);
 
 	if (BLENDED) {
 		const static OneMinusSrcA<false, false> blender;
-		WriteColor(color, dstit, dstend, alpha, blender);
+		ColorFill(color, dstit, dstend, blender);
 	} else {
 		const static SrcRGBA<false> blender;
-		WriteColor(color, dstit, dstend, alpha, blender);
+		ColorFill(color, dstit, dstend, blender);
 	}
 }
 

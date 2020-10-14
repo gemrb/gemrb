@@ -646,21 +646,6 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	}
 }
 
-template<class BLENDER>
-static void WriteColor(Color srcc,
-					   SDLPixelIterator dst, SDLPixelIterator dstend,
-					   IAlphaIterator& mask, const BLENDER& blender)
-{
-	for (; dst != dstend; ++dst, ++mask) {
-		Color dstc;
-		dst.ReadRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
-
-		blender(srcc, dstc, *mask);
-
-		dst.WriteRGBA(dstc.r, dstc.g, dstc.b, dstc.a);
-	}
-}
-
 }
 
 #endif // PIXELS_H
