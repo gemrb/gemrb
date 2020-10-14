@@ -75,6 +75,9 @@ GEM_EXPORT void ResolveFilePath(std::string& FilePath);
 #ifdef WIN32
 const char PathDelimiter = '\\';
 const char PathListSeparator = ';';
+#elif defined(__amigaos4__)
+const char PathDelimiter = '/';
+const char PathListSeparator = ';';
 #else
 const char PathDelimiter = '/';
 const char PathListSeparator = ':';

@@ -47,7 +47,11 @@
 
 #ifndef WIN32
 #include <dirent.h>
+#ifndef __amigaos4__
 #include <sys/mman.h>
+#else
+#include "OS4Helpers.h" //mmap/munmap
+#endif
 #endif
 
 #ifdef __APPLE__
@@ -203,6 +207,9 @@ char* PathAppend (char* target, const char* name)
 	size_t len = strlen(target);
 
 	if (target[0] != 0 && target[len-1] != PathDelimiter && len+1 < _MAX_PATH) {
+#ifdef __amigaos4__
+                if (target[len-1] != ':')
+#endif
 		target[len++] = PathDelimiter;
 		target[len] = 0;
 	}
@@ -320,6 +327,9 @@ void FixPath (char *path, bool needslash)
 
 	if (needslash) {
 		if (path[i] == PathDelimiter) return;
+#ifdef __amigaos4__
+                if (path[i] == ':') return;
+#endif
 
 		// if path is already too long, don't do anything
 		if (i >= _MAX_PATH - 2) return;
@@ -465,7 +475,11 @@ bool MakeDirectory(const char* path)
 
 GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 {
-	char* home = getenv( "HOME" );
+#ifndef __amigaos4__
+        char *home = getenv("HOME");
+#else
+        const char *home = "PROGDIR:";
+#endif
 	if (home) {
 		strlcpy(outPath, home, maxLen);
 		return outPath;
@@ -545,6 +559,17 @@ void* readonly_mmap(void *fd) {
 
 void munmap(void *start, size_t) {
 	UnmapViewOfFile(start);
+}
+
+#elif defined(__amigaos4__)
+
+void* readonly_mmap(void *vfd) {
+        int fd = fileno(static_cast<FILE*>(vfd));
+        struct stat statData;
+        int ret = fstat(fd, &statData);
+        assert(ret != -1);
+
+        return mmap(nullptr, statData.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 }
 
 #else

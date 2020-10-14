@@ -33,7 +33,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
- 
+
+#ifdef __amigaos4__
+#include <malloc.h> //memalign
+#endif
+
 #define av_const
 #define av_cold
 #define av_flatten

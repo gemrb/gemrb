@@ -22,6 +22,10 @@
 #include "exports.h"
 #include "ie_types.h"
 
+#ifdef __amigaos4__
+#include "OS4Helpers.h"
+#endif
+
 #include <cstring>
 #include <string>
 

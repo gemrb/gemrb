@@ -231,12 +231,17 @@ IF(NOT STATIC_LINK)
 ENDIF()
 
 # Check for all the required and optional dependencies
-FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
-IF(PYTHONLIBS_FOUND)
-	MESSAGE(STATUS "Looking for Python libraries and headers: found")
+IF(NOT AmigaOS4)
+	FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
+	IF(PYTHONLIBS_FOUND)
+		MESSAGE(STATUS "Looking for Python libraries and headers: found")
+	ELSE()
+		MESSAGE(SEND_ERROR "Looking for Python libraries and headers: not found!")
+		MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
+	ENDIF()
 ELSE()
-	MESSAGE(SEND_ERROR "Looking for Python libraries and headers: not found!")
-	MESSAGE(FATAL_ERROR "Please get them (www.python.org)")
+	# Due a bug cross compiler environment we have to hack this
+        INCLUDE_DIRECTORIES(/usr/ppc-amigaos/SDK/local/newlib/include/python2.5/)
 ENDIF()
 
 # Autodetection mechanism

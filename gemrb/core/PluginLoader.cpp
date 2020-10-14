@@ -38,7 +38,9 @@
 #else
 #include <sys/types.h>
 #include <dirent.h>
+#ifndef __amigaos4__
 #include <fnmatch.h>
+#endif
 #include <dlfcn.h>
 #endif
 

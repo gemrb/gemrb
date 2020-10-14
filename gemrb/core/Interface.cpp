@@ -192,7 +192,7 @@ Interface::Interface()
 	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
 	EventFlag = EF_CONTROL;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__amigaos4__)
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
 	CaseSensitive = false;

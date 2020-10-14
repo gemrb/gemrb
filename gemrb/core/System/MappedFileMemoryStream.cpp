@@ -16,7 +16,7 @@
  */
 #include <cassert>
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__amigaos4__)
 #include <sys/mman.h>
 #endif
 

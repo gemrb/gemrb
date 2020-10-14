@@ -32,6 +32,13 @@
 #include <unistd.h>
 #endif
 
+#ifdef __amigaos4__
+#include "exports.h"
+static const char __attribute__((used)) stackcookie[] = "$STACK: 2000000";
+static const char __attribute__((used)) *version      = "$VER: GemRB COVID-19 for AmigaOS4.1 (2020-10-13)";
+#undef M_TRIM_THRESHOLD //defined somewhere in the newlib black hole..
+#endif
+
 using namespace GemRB;
 
 #ifdef ANDROID

@@ -95,6 +95,7 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 	return CacheCompressedStream(compressed, compressed->filename, complen);
 }
 
+#ifndef __amigaos4__
 int BIFImporter::OpenArchive(const char* path)
 {
 	if (stream) {
@@ -152,6 +153,63 @@ int BIFImporter::OpenArchive(const char* path)
 	ReadBIF();
 	return GEM_OK;
 }
+
+#else
+// The new MemoryMapped loader on amigaos4 IS SLOW AS HELL!
+// We need to revert to the old loader that is faster. Really. A lot..
+int BIFImporter::OpenArchive(const char* path)
+{
+        if (stream) {
+                delete( stream );
+                stream = NULL;
+        }
+
+        char filename[_MAX_PATH];
+        ExtractFileFromPath(filename, path);
+
+        char cachePath[_MAX_PATH];
+        PathJoin(cachePath, core->CachePath, filename, NULL);
+        stream = FileStream::OpenFile(cachePath);
+
+        char Signature[8];
+        if (!stream) {
+                FileStream* file = FileStream::OpenFile(path);
+                if (!file) {
+                        return GEM_ERROR;
+                }
+                if (file->Read(Signature, 8) == GEM_ERROR) {
+                        delete file;
+                        return GEM_ERROR;
+                }
+
+                if (strncmp(Signature, "BIF V1.0", 8) == 0) {
+                        stream = DecompressBIF(file, cachePath);
+                        delete file;
+                } else if (strncmp(Signature, "BIFCV1.0", 8) == 0) {
+                        stream = DecompressBIFC(file, cachePath);
+                        delete file;
+                } else if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
+                        file->Seek(0, GEM_STREAM_START);
+                        stream = file;
+                } else {
+                        delete file;
+                        return GEM_ERROR;
+                }
+        }
+
+        if (!stream)
+                return GEM_ERROR;
+
+        stream->Read( Signature, 8 );
+
+        if (strncmp( Signature, "BIFFV1  ", 8 ) != 0) {
+                return GEM_ERROR;
+        }
+
+        ReadBIF();
+        return GEM_OK;
+}
+#endif
 
 DataStream* BIFImporter::GetStream(unsigned long Resource, unsigned long Type)
 {

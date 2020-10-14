@@ -321,7 +321,11 @@ void DisplayMessage::DisplayRollStringName(int stridx, unsigned int color, const
 		va_start(numbers, speaker);
 		// fill it out
 		String* str = core->GetString(stridx);
-		vswprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), str->c_str(), numbers);
+#ifndef __amigaos4__
+                vswprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), str->c_str(), numbers);
+#else
+                Log(DEBUG, "DisplayMessage", "vswprintf not implemented! You will see an empty message");
+#endif
 		delete str;
 		displaymsg->DisplayStringName(tmp, color, speaker);
 		va_end(numbers);
