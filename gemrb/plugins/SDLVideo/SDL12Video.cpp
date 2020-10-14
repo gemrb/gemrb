@@ -442,7 +442,7 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 		if (flags&BLIT_BLENDED && color.a < 0xff) {
 			assert(rgn.w > 0 && rgn.h > 0);
 			
-			static RGBBlendingPipeline<NONE, false> blender;
+			const static OneMinusSrcA<false, false> blender;
 			
 			Region clippedrgn = ClippedDrawingRect(rgn);
 			SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
