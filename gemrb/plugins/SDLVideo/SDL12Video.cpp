@@ -444,10 +444,24 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			
 			static RGBBlendingPipeline<NONE, false> blender;
 			
+			Region screenRgn(Point(), screenSize);
+			if (rgn == screenRgn) {
+				// this is a weird hack for modal window "shadow" performance issues
+				SDL_Surface* scratch = ScratchBuffer();
+				SDL_Rect r = RectFromRegion(screenRgn);
+				if (color != scratchColor) {
+					Uint32 c = SDL_MapRGB(scratch->format, color.r, color.g, color.b);
+					SDL_FillRect(scratch, &r, c);
+					SDL_SetAlpha(scratch, SDL_SRCALPHA, color.a);
+				}
+				
+				SDL_LowerBlit(scratch, &r, currentBuf, &r);
+			} else {
 				Region clippedrgn = ClippedDrawingRect(rgn);
 				SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
 				SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 				ColorFill(color, dstit, dstend, blender);
+			}
 		} else {
 			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
