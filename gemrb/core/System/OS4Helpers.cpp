@@ -43,7 +43,7 @@ namespace std {
 }
 
 static int _putwc_cb(wchar_t wc, void *abstract) {
-	_putwc_data_cb *data = (_putwc_data_cb*) abstract;
+	_putwc_data_cb *data = static_cast<_putwc_data_cb*>(abstract);
 	char buf[8];
 	size_t len;
 
@@ -104,10 +104,9 @@ static void reverse(char *str, size_t len) {
 	if (len > 1) {
 		char *start = str;
 		char *end = str + len - 1;
-		char tmp;
 
 		while (start < end) {
-			tmp = *end;
+			char tmp = *end;
 			*end-- = *start;
 			*start++ = tmp;
 		}
@@ -699,7 +698,7 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 			read(fd, addr, len);
 		}
 
-		if (!addr || (addr == MAP_FAILED)) {
+		if (!addr) {
                 	return nullptr;
         	}
 
@@ -712,7 +711,7 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
                         read(fd, data, len);
 		}
 
-		if (!data || (data == MAP_FAILED)) {
+		if (!data) {
 			return nullptr;
 		}
 
