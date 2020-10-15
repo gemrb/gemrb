@@ -22,6 +22,7 @@
 #define GAMEPADCONTROL_H
 
 #include <stdint.h>
+#include <cstdlib>
 #include <SDL.h>
 
 #if !SDL_VERSION_ATLEAST(1,3,0)

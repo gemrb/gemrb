@@ -3645,6 +3645,8 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			filter = new ExtFilter("BS");
 			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
 			break;
+		default:
+			error("Interface", "Uknown resource directory type: %d!", dir);
 	}
 
 	PathJoin( Path, GamePath, resourcePath, NULL );

@@ -17,6 +17,8 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 50
 
     - name: Setup Python
       uses: actions/setup-python@v1
@@ -25,4 +27,4 @@ jobs:
       run: |
         git fetch origin
         pip install pycodestyle &&
-        git diff -u origin/master... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source
+        git diff -u origin/${{github.base_ref}}... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source

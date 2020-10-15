@@ -2318,8 +2318,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 	bool subresult = true;
 
 	if (triggers.empty()) {
-		Log(ERROR, "GameScript", "Trigger block without triggers encountered!");
-		return false;
+		return true;
 	}
 
 	for (const Trigger *tR : triggers) {

@@ -1452,7 +1452,10 @@ static PyObject* GemRB_Table_GetValue(PyObject * /*self*/, PyObject* args)
 	//if which = 3 then return resolved string
 	bool valid = valid_number(ret, val);
 	if (which == 3) {
-		return PyString_FromString(core->GetCString(val));
+		char* cstr = core->GetCString(ieStrRef(val));
+		PyObject* pystr = PyString_FromString(cstr);
+		free(cstr);
+		return pystr;
 	}
 	//if which = 1 then return number
 	//if which = -1 (omitted) then return the best format
@@ -11191,8 +11194,7 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int slot = -1;
-	slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
 	return PyInt_FromLong(slot);
 }
 

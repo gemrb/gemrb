@@ -96,8 +96,6 @@ int main(int argc, char* argv[])
 	}
 	argc = vita_argc;
 	argv = vita_argv;
-#else
-
 #endif
 
 	setlocale(LC_ALL, "");

@@ -156,6 +156,47 @@ bool SDLAudio::evictBuffer()
 	return res;
 }
 
+bool SDLAudio::evictBuffer()
+{
+	// Note: this function assumes the caller holds bufferMutex
+
+	// Room for optimization: this is O(n^2) in the number of buffers
+	// at the tail that are used. It can be O(n) if LRUCache supports it.
+	unsigned int n = 0;
+	void *p;
+	const char *k;
+	bool res;
+
+	SDL_LockAudio();
+
+	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
+		CacheEntry *e = (CacheEntry*)p;
+		bool chunkPlaying = false;
+		int numChannels = Mix_AllocateChannels(-1);
+
+		for (int i = 0; i < numChannels; ++i) {
+			if (Mix_Playing(i) && Mix_GetChunk(i) == e->chunk) {
+				chunkPlaying = true;
+				break;
+			}
+		}
+
+		if (chunkPlaying) {
+			++n;
+		} else {		
+			//Mix_FreeChunk(e->chunk) fails to free anything here
+			free(e->chunk->abuf);
+			free(e->chunk);
+			delete e;
+			buffercache.Remove(k);
+		}
+	}
+
+	SDL_UnlockAudio();
+
+	return res;
+}
+
 void SDLAudio::clearBufferCache()
 {
 	// Room for optimization: any method of iterating over the buffers
@@ -182,7 +223,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 		return chunk;
 	}
 
-	if(buffercache.Lookup(ResRef, p)) {
+	if (buffercache.Lookup(ResRef, p)) {
 		e = (CacheEntry*) p;
 		time_length = e->Length;
 		return e->chunk;
@@ -232,7 +273,6 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 	}
 
 	buffercache.SetAt(ResRef, (void*)e);
-	//print("LoadSound: added %s to cache. Cache size now %d", ResRef, buffercache.GetCount());
 
 	return chunk;
 }
@@ -257,7 +297,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
-	chunk = loadSound( ResRef, time_length );
+	chunk = loadSound(ResRef, time_length);
 	if (chunk == nullptr) {
 		return Holder<SoundHandle>();
 	}
