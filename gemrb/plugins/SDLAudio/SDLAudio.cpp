@@ -180,7 +180,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 		return chunk;
 	}
 
-	if(buffercache.Lookup(ResRef, p)) {
+	if (buffercache.Lookup(ResRef, p)) {
 		e = (CacheEntry*) p;
 		time_length = e->Length;
 		return e->chunk;
@@ -230,7 +230,6 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 	}
 
 	buffercache.SetAt(ResRef, (void*)e);
-	//print("LoadSound: added %s to cache. Cache size now %d", ResRef, buffercache.GetCount());
 
 	return chunk;
 }
@@ -255,7 +254,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
-	chunk = loadSound( ResRef, time_length );
+	chunk = loadSound(ResRef, time_length);
 	if (chunk == nullptr) {
 		return Holder<SoundHandle>();
 	}

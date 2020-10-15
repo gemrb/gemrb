@@ -4,7 +4,7 @@ name: Style checks
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ master, subviews ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,4 +25,4 @@ jobs:
       run: |
         git fetch origin
         pip install pycodestyle &&
-        git diff -u origin/master... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source
+        git diff -u origin/${{github.base_ref}}... -- gemrb/GUIScripts | pycodestyle --select=E1,E201,E202,E203,E225 --diff --show-source

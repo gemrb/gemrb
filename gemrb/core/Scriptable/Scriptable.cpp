@@ -22,6 +22,7 @@
 #include "win32def.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
+#include "voodooconst.h"
 
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
@@ -626,7 +627,7 @@ unsigned long Scriptable::GetWait() const
 	return WaitCounter;
 }
 
-void Scriptable::LeaveDialog()
+void Scriptable::LeftDialog()
 {
 	AddTrigger(TriggerEntry(trigger_wasindialog));
 }
@@ -2222,8 +2223,6 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	const int XEPS = 72;
-	const int YEPS = 36;
 	Actor *actor = nullptr;
 	if (Type == ST_ACTOR) actor = (Actor*)this;
 	// Only bump back if not moving
@@ -2265,11 +2264,12 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 
 		if (BlocksSearchMap() && actorInTheWay && actorInTheWay != this && actorInTheWay->BlocksSearchMap()) {
 			// Give up instead of bumping if you are close to the goal
-			if (!(step->Next) && std::abs(nmptStep.x - Pos.x) < XEPS && std::abs(nmptStep.y - Pos.y) < YEPS) {
+			if (!(step->Next) && PersonalDistance(nmptStep, this) < MAX_OPERATING_DISTANCE) {
 				ClearPath(true);
 				NewOrientation = Orientation;
 				// Do not call ReleaseCurrentAction() since other actions
 				// than MoveToPoint can cause movement
+				Log(DEBUG, "PathFinderWIP", "Abandoning because I'm close to the goal");
 				pathAbandoned = true;
 				return;
 			}

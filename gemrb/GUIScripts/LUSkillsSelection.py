@@ -43,6 +43,10 @@ SkillsOffsetPoints = 0
 SkillsOffsetSum = 0
 SkillsNumButtons = 0
 
+#The number of steps between each control ID for the skill label and points of each skill
+#Set to 2 for PST, as they are 'interleaved' ie label/amount/label/amount
+SkillsLabelIncrement = 1
+
 #internal variables
 SkillsIndices = []
 SkillPointsLeft = 0
@@ -61,9 +65,11 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetButton1, SkillsOffsetName
 	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft, SkillsTopIndex
 	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
-	global SkillsTextArea, SkillsKitName, SkillsAssignable
+	global SkillsTextArea, SkillsKitName, SkillsAssignable, SkillsLabelIncrement
 
 	#reset some basic values
+	SkillLeftPress = SkillIncreasePress
+	SkillRightPress = SkillDecreasePress
 	SkillsWindow = window
 	SkillsCallback = callback
 	SkillsOldPos = 0
@@ -89,6 +95,20 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (110)
 		ScrollBar = SkillsWindow.GetControl (109)
+	elif type == LUSKILLS_TYPE_LEVELUP and GameCheck.IsPST():
+		SkillsOffsetPress = -1
+		SkillsOffsetButton1 = 16
+		SkillsOffsetSum = 6
+		SkillsOffsetName = 7
+		SkillsOffsetPoints = 8
+		SkillsNumButtons = 4
+		SkillsLabelIncrement = 2
+		#The order of the buttons is the opposite of the other games
+		SkillLeftPress = SkillDecreasePress
+		SkillRightPress = SkillIncreasePress
+		#There is actually no hint text to describe the skills, so this is a dummy
+		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG", IE_FONT_ALIGN_LEFT)
+		SkillsTextArea =  SkillsWindow.GetControl (45)
 	elif type == LUSKILLS_TYPE_LEVELUP:
 		SkillsOffsetPress = -1
 		SkillsOffsetButton1 = 17
@@ -243,7 +263,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
 		SkillSumLabel.SetText("")
 		return
-	
+
 	#skills scrollbar
 	SkillsTopIndex = 0
 	GemRB.SetVar ("SkillsTopIndex", SkillsTopIndex)
@@ -277,7 +297,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	return
 
 def SkillsRedraw (direction=0):
-	global SkillsOldDirection, SkillsClickCount
+	global SkillsOldDirection, SkillsClickCount, SkillsLabelIncrement
 
 	#update how many skill points are left and call the callback function
 	SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
@@ -291,7 +311,7 @@ def SkillsRedraw (direction=0):
 		#show the current skills name
 		Pos = SkillsIndices[SkillsTopIndex+i]
 		SkillName = SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "CAP_REF")
-		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+i)
+		Label = SkillsWindow.GetControl (0x10000000+SkillsOffsetName+(i*SkillsLabelIncrement))
 		Label.SetText (SkillName)
 
 		#enable/disable the button if we can(not) get the skills
@@ -311,7 +331,7 @@ def SkillsRedraw (direction=0):
 			Button2.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 	
 		#show how many points are allocated to this skill		
-		Label = SkillsWindow.GetControl(0x10000000+SkillsOffsetPoints+i)
+		Label = SkillsWindow.GetControl(0x10000000+SkillsOffsetPoints+(i*SkillsLabelIncrement))
 		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		Label.SetText(str(ActPoint))
 
@@ -332,7 +352,7 @@ def SkillJustPress():
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
-def SkillRightPress():
+def SkillDecreasePress():
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
@@ -352,7 +372,7 @@ def SkillRightPress():
 	SkillsCallback ()
 	return
 
-def SkillLeftPress():
+def SkillIncreasePress():
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
 	Pos = GemRB.GetVar("Skill")+SkillsTopIndex

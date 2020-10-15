@@ -2457,11 +2457,11 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 		return p;
 	}
 	const char *tmpstr = tab->QueryField(areaname, entryname);
-	int x=-1;
-	int y=-1;
-	sscanf(tmpstr, "%d.%d", &x, &y);
-	p.x=(short) x;
-	p.y=(short) y;
+	short x = -1;
+	short y = -1;
+	sscanf(tmpstr, "%hd.%hd", &x, &y);
+	p.x = x;
+	p.y = y;
 	return p;
 }
 

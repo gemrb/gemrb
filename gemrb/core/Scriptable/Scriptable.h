@@ -306,7 +306,7 @@ public:
 	void SetSpellResRef(ieResRef resref);
 	void SetWait(unsigned long time);
 	unsigned long GetWait() const;
-	void LeaveDialog();
+	void LeftDialog();
 	void Interrupt();
 	void NoInterrupt();
 	void Hide();
