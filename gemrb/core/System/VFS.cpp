@@ -161,6 +161,7 @@ static DIR* opendir(const char *filename)
 	dirp->descriptor = sceIoDopen(filename);
 
 	if (dirp->descriptor <= 0) {
+		free(dirp);
 		return NULL;
 	}
 
