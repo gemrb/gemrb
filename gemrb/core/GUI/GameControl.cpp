@@ -2323,6 +2323,21 @@ bool GameControl::OnMouseWheelScroll(const Point& delta)
 	return true;
 }
 
+bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
+{
+	switch (ce.button) {
+		case CONTROLLER_BUTTON_Y:
+			return core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false);
+		case CONTROLLER_BUTTON_X:
+			return core->GetGUIScriptEngine()->RunFunction("GUIMAP", "ToggleMapWindow", false);
+		case CONTROLLER_BUTTON_BACK:
+			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+			return true;
+		default:
+			return View::OnControllerButtonDown(ce);
+	}
+}
+
 void GameControl::Scroll(const Point& amt)
 {
 	MoveViewportTo(vpOrigin + amt, false);

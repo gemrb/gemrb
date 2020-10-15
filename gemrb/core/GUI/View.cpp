@@ -832,6 +832,18 @@ bool View::OnControllerButtonDown(const ControllerEvent& ce)
 		return OnMouseDown(me, 0);
 	}
 	
+	if (ce.button == CONTROLLER_BUTTON_START)
+	{
+		core->TogglePause();
+		return true;
+	}
+	
+	if (ce.button == CONTROLLER_BUTTON_GUIDE)
+	{
+		core->GetVideoDriver()->StartTextInput();
+		return true;
+	}
+	
 	// TODO: we might want to add modifiers for "trigger" buttons
 	KeyboardEvent ke = KeyEventFromController(ce);
 	return OnKeyPress(ke, 0);

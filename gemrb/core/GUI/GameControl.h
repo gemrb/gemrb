@@ -264,6 +264,8 @@ protected:
 	/** Mouse Button Up */
 	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
 	bool OnMouseWheelScroll(const Point& delta);
+	
+	bool OnControllerButtonDown(const ControllerEvent& ce);
 };
 
 }

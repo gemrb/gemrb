@@ -106,6 +106,8 @@ private:
 	bool OnMouseDrag(const MouseEvent&) override;
 	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 	
+	bool OnControllerButtonDown(const ControllerEvent& ce);
+	
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
 
 public:

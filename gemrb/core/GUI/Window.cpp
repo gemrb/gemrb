@@ -355,19 +355,19 @@ void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned shor
 void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short mod)
 {
 	assert(target);
-
-	if (drag) {
-		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
-			drag->dropView = target;
-			target->CompleteDragOperation(*drag);
-		}
-	} else if (trackingView) {
-		if (trackingView == target || trackingView->TracksMouseDown()) {
-			// we dragged the mouse on a view, but never left it
-			// possibly this is a canceled drag event that we should instantiate and destroy
-			drag = trackingView->DragOperation();
-			trackingView->MouseUp(me, mod);
-		}
+	
+		if (drag) {
+			if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+				drag->dropView = target;
+				target->CompleteDragOperation(*drag);
+			}
+		} else if (trackingView) {
+			if (trackingView == target || trackingView->TracksMouseDown()) {
+				// we dragged the mouse on a view, but never left it
+				// possibly this is a canceled drag event that we should instantiate and destroy
+				drag = trackingView->DragOperation();
+				trackingView->MouseUp(me, mod);
+			}
 	} else if (target) {
 		target->MouseUp(me, mod);
 	}
@@ -603,6 +603,16 @@ bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			return true;
 	}
 	return ScrollView::OnKeyPress(key, mod);
+}
+
+bool Window::OnControllerButtonDown(const ControllerEvent& ce)
+{
+	if (ce.button == CONTROLLER_BUTTON_BACK) {
+		Close();
+		return true;
+	}
+		
+	return View::OnControllerButtonDown(ce);
 }
 	
 ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
