@@ -32,7 +32,6 @@ from ie_stats import *
 from ie_slots import *
 
 ItemAmountWindow = None
-OverSlot = None
 
 # Control ID's:
 # 0 - 9 eye, rings, earrings, tattoos, etc
@@ -265,7 +264,9 @@ def UpdateSlot (pc, i):
 
 	using_fists = 0
 	if i >= len(slot_list):
-		return #this prevents accidental out of range errors from the avslots list
+		#this prevents accidental out of range errors from the avslots list
+		#any slots beyond the table are treated as unchanging
+		return GemRB.GetSlotType (i+1)
 	elif slot_list[i]<0:
 		slot = i+1
 		SlotType = GemRB.GetSlotType (slot)
@@ -349,21 +350,15 @@ def UpdateSlot (pc, i):
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 
-	if OverSlot == slot:
-		if GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_SELECTED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 	else:
-		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
+		Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 
-		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
-			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
+	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
+		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
-	return
+	return SlotType
 
 def DefaultWeapon ():
 	pc = GemRB.GameGetFirstSelectedActor ()
@@ -416,22 +411,25 @@ def OnDragItem (btn, slot):
 	UpdateInventoryWindow ()
 	return
 
-def MouseEnterSlot (btn,slot):
-	global OverSlot
-
+def MouseEnterSlot (btn, slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	OverSlot = slot
+
 	if GemRB.IsDraggingItem ()==1:
-		UpdateSlot (pc, slot-1)
+		drag_item = GemRB.GetSlotItem (0,0)
+		SlotType = UpdateSlot (pc, slot-1)
+
+		if GemRB.CanUseItemType (SlotType["Type"], drag_item["ItemResRef"]):
+			btn.SetState (IE_GUI_BUTTON_SELECTED)
+		else:
+			btn.SetState (IE_GUI_BUTTON_ENABLED)
+		
 	return
 
-def MouseLeaveSlot (btn,slot):
-	global OverSlot
-	#print("mouse leaving slot", slot)
+def MouseLeaveSlot (btn, slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if slot == OverSlot or not GemRB.IsDraggingItem ():
-		OverSlot = None
+
 	UpdateSlot (pc, slot-1)
 	return
+
 ###################################################
 # End of file GUIINV.py
