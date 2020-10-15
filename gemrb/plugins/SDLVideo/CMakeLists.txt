@@ -1,6 +1,9 @@
 INCLUDE_DIRECTORIES( ${SDL_INCLUDE_DIR} ${GLEW_INCLUDE_DIR} )
 
-SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp)
+SET(COMMON_FILES COCOA SDLVideo.cpp SDLSurfaceSprite2D.cpp GamepadControl.cpp)
+IF(VITA)
+	SET(COMMON_FILES ${COMMON_FILES} DPadSoftKeyboard.cpp)
+ENDIF()
 IF(SDL_BACKEND STREQUAL "SDL2")
 	IF(USE_OPENGL)
 		ADD_GEMRB_PLUGIN( SDLVideo ${COMMON_FILES} SDL20Video.cpp SDL20GLVideo.cpp GLSLProgram.cpp Matrix.cpp GLTextureSprite2D.cpp GLPaletteManager.cpp)

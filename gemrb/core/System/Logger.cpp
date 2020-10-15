@@ -87,6 +87,11 @@ Logger* (*GemRB::createDefaultLogger)() = createAndroidLogger;
 #include "System/Logger/Win32Console.h"
 Logger* (*GemRB::createDefaultLogger)() = createWin32ConsoleLogger;
 
+#elif defined (VITA)
+
+#include "System/Logger/Vita.h"
+Logger* (*GemRB::createDefaultLogger)() = createVitaLogger;
+
 #else
 
 #include "System/Logger/Stdio.h"

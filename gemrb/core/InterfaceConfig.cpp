@@ -160,6 +160,12 @@ if (config->Open(path) \
 		ATTEMPT_INIT;
 #endif
 
+#ifdef VITA
+		path[0] = '\0';
+		strcat(path, "ux0:/data/GemRB/GemRB.cfg");
+		ATTEMPT_INIT
+#endif
+
 		// Don't try with default binary name if we have tried it already
 		if (strcmp( name, PACKAGE ) != 0) {
 			PathJoinExt( path, datadir, PACKAGE, "cfg" );

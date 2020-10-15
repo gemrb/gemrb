@@ -48,6 +48,10 @@
 #include <set>
 #include <time.h>
 
+#ifdef VITA
+#include <psp2/kernel/iofilemgr.h> 
+#endif
+
 namespace GemRB {
 
 const TypeID SaveGame::ID = { "SaveGame" };
@@ -401,7 +405,11 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		FormatQuickSavePath(from, myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
 		core->DelTree(from, false);
+#ifdef VITA
+		sceIoRemove(from);
+#else
 		rmdir(from);
+#endif
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
@@ -700,7 +708,11 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 	}
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
+#ifdef VITA
+	sceIoRemove(game->GetPath());
+#else
 	rmdir( game->GetPath() );
+#endif
 }
 
 }

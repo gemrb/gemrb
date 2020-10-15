@@ -47,6 +47,7 @@ private:
 	SDL_TouchFingerEvent firstFingerDown;
 	unsigned long firstFingerDownTime;
 	MultiGesture currentGesture;
+	SDL_GameController *gameController = nullptr;
 protected:
 	SDL_Window* window;
 	SDL_Texture* screenTexture;
@@ -55,6 +56,7 @@ public:
 	SDL20VideoDriver(void);
 	~SDL20VideoDriver(void);
 
+	int Init(void);
 	int CreateDisplay(int w, int h, int b, bool fs, const char* title);
 	void SetWindowTitle(const char *title) { SDL_SetWindowTitle(window, title); };
 	int SwapBuffers(void);

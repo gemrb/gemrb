@@ -270,14 +270,20 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 	}
+#ifndef VITA
 	SDL_mutexP(OurMutex);
+#endif
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
+#ifndef VITA
 		SDL_mutexV(OurMutex);
+#endif
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
+#ifndef VITA
 	SDL_mutexV(OurMutex);
+#endif
 
 	// TODO
 	return Holder<SoundHandle>();

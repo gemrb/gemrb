@@ -1341,6 +1341,8 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
+	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
+	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
 
 #undef CONFIG_INT
 
@@ -1477,9 +1479,13 @@ int Interface::Init(InterfaceConfig* config)
 	char bundlePluginsPath[_MAX_PATH];
 	CopyBundlePath(bundlePluginsPath, sizeof(bundlePluginsPath), PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
+#ifndef STATIC_LINK
 	LoadPlugins(bundlePluginsPath);
 #endif
+#endif
+#ifndef STATIC_LINK
 	LoadPlugins(PluginsPath);
+#endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
 	} else {

@@ -48,7 +48,6 @@ using namespace GemRB;
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
-#define SDLKey SDL_Keycode
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
 #define SDLK_KP1 SDLK_KP_1
 #define SDLK_KP2 SDLK_KP_2
@@ -58,8 +57,6 @@ using namespace GemRB;
 #define SDLK_KP7 SDLK_KP_7
 #define SDLK_KP8 SDLK_KP_8
 #define SDLK_KP9 SDLK_KP_9
-#else
-typedef Sint32 SDL_Keycode;
 #endif
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -73,6 +70,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	subtitlestrref = 0;
 	subtitletext = NULL;
 	disp = tmpBuf =  NULL;
+	gamepadControl.SetPointerSpeed(core->GamepadPointerSpeed);
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -113,6 +111,10 @@ int SDLVideoDriver::SwapBuffers(void)
 		time = GetTickCount();
 	}
 	lastTime = time;
+
+	if (SDL_NumJoysticks() > 0) {
+		ProcessAxisMotion();
+	}
 
 	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
 		
@@ -331,6 +333,9 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_MOUSEMOTION:
 			MouseMovement(event.motion.x, event.motion.y);
+			if (SDL_NumJoysticks() > 0) {
+				gamepadControl.SetGamepadPosition(event.motion.x, event.motion.y);
+			}
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			if (MouseFlags & MOUSE_DISABLED)
@@ -356,6 +361,212 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 	}
 	return GEM_OK;
+}
+
+void SDLVideoDriver::HandleJoyButtonEvent(const SDL_JoyButtonEvent & button)
+{
+#ifdef VITA
+	// DPad input
+	if (dPadSoftKeyboard.IsInputActive()) {
+		// add/change characters only on key down
+		if (button.state != SDL_PRESSED && button.button != SDL_CONTROLLER_BUTTON_A && button.button != SDL_CONTROLLER_BUTTON_B)
+			return;
+
+		switch(button.button)
+		{
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+				dPadSoftKeyboard.RemoveCharacter();
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+				dPadSoftKeyboard.AddCharacter();
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+				dPadSoftKeyboard.NextCharacter();
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
+				dPadSoftKeyboard.PreviousCharacter();
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+				dPadSoftKeyboard.ToggleUppercase();
+				EvntManager->OnSpecialKeyPress(GEM_BACKSP);
+				EvntManager->KeyPress(dPadSoftKeyboard.GetCurrentKeyValue(), KMOD_NONE);
+				break;
+			//LMB event
+			case SDL_CONTROLLER_BUTTON_A:
+				GamepadMouseEvent(1, button.state);
+				break;
+			//RMB event
+			case SDL_CONTROLLER_BUTTON_B:
+				GamepadMouseEvent(3, button.state);
+				break;
+
+			default:
+				return;
+		}
+	} else
+#endif
+	{
+		//gameplay bindings
+		switch(button.button)
+		{
+			//LMB event
+			case SDL_CONTROLLER_BUTTON_A:
+				GamepadMouseEvent(1, button.state);
+				break;
+			//RMB event
+			case SDL_CONTROLLER_BUTTON_B:
+				GamepadMouseEvent(3, button.state);
+				break;
+			//scroll map
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_LEFT);
+				}
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+				}
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_UP);
+				}
+				break;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_DOWN);
+				}
+				break;
+			//open menu
+			case SDL_CONTROLLER_BUTTON_START:
+				GamepadKeyboardEvent(SDLK_o, button.state);
+				break;
+			//ESC
+			case SDL_CONTROLLER_BUTTON_BACK:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_ESCAPE);
+				}
+				break;
+			//pause combat
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+				GamepadKeyboardEvent(SDLK_SPACE, button.state);
+				break;
+			//highlight items
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+				if (button.state == SDL_PRESSED) {
+					EvntManager->OnSpecialKeyPress(GEM_ALT);
+				} else {
+					EvntManager->KeyRelease(GEM_ALT, KMOD_NONE);
+				}
+				break;
+			//inventory
+			case SDL_CONTROLLER_BUTTON_Y:
+				GamepadKeyboardEvent(SDLK_i, button.state);
+				break;
+			//map
+			case SDL_CONTROLLER_BUTTON_X:
+				GamepadKeyboardEvent(SDLK_m, button.state);
+				break;
+
+			default:
+				return;
+		}
+	}
+}
+
+void SDLVideoDriver::GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState)
+{
+	if (buttonState == SDL_PRESSED) {
+		lastMouseDownTime = EvntManager->GetRKDelay();
+		if (lastMouseDownTime != (unsigned long) ~0) {
+			lastMouseDownTime += lastMouseDownTime + lastTime;
+		}
+		if (CursorIndex != VID_CUR_DRAG) {
+			CursorIndex = VID_CUR_DOWN;
+		}
+		if (!core->ConsolePopped) {
+			EvntManager->MouseDown(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
+		}
+	} else {
+		if (CursorIndex != VID_CUR_DRAG) {
+			CursorIndex = VID_CUR_UP;
+		}
+		if (!core->ConsolePopped) {
+			EvntManager->MouseUp(static_cast<unsigned short>(gamepadControl.xAxisFloatPos), static_cast<unsigned short>(gamepadControl.yAxisFloatPos), 1 << (buttonCode - 1), GetModState());
+		}
+	}
+}
+
+void SDLVideoDriver::GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState)
+{
+	if (buttonState == SDL_PRESSED) {
+		EvntManager->KeyPress(keyCode, KMOD_NONE);
+	} else {
+		EvntManager->KeyRelease(keyCode, KMOD_NONE);
+	}
+}
+
+void SDLVideoDriver::ProcessAxisMotion()
+{
+	uint32_t currentTime = SDL_GetTicks();
+	uint32_t deltaTime = currentTime - gamepadControl.lastAxisMovementTime;
+	gamepadControl.lastAxisMovementTime = currentTime;
+
+	//cursor movement
+	if (gamepadControl.xAxisLValue != 0 || gamepadControl.yAxisLValue != 0) {
+		int16_t xSign = (gamepadControl.xAxisLValue > 0) - (gamepadControl.xAxisLValue < 0);
+		int16_t ySign = (gamepadControl.yAxisLValue > 0) - (gamepadControl.yAxisLValue < 0);
+
+		gamepadControl.xAxisFloatPos += ((pow(abs(gamepadControl.xAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * xSign * deltaTime)) * gamepadControl.GetPointerSpeed();
+		gamepadControl.yAxisFloatPos += ((pow(abs(gamepadControl.yAxisLValue), gamepadControl.JOY_AXIS_SPEEDUP) * ySign * deltaTime)) * gamepadControl.GetPointerSpeed();
+
+		if(gamepadControl.xAxisFloatPos < 0) {
+			gamepadControl.xAxisFloatPos = 0;
+		}
+		if(gamepadControl.yAxisFloatPos < 0) {
+			gamepadControl.yAxisFloatPos = 0;
+		}
+
+		if(gamepadControl.xAxisFloatPos > GetWidth()) {
+			gamepadControl.xAxisFloatPos = GetWidth();
+		}
+		if(gamepadControl.yAxisFloatPos > GetHeight()) {
+			gamepadControl.yAxisFloatPos = GetHeight();
+		}
+		
+		MouseMovement(static_cast<int>(gamepadControl.xAxisFloatPos), static_cast<int>(gamepadControl.yAxisFloatPos));
+	}
+
+	//map scroll
+	if (gamepadControl.xAxisRValue != 0 || gamepadControl.yAxisRValue != 0) {
+		gamepadControl.gamepadScrollTimer += deltaTime;
+
+		if (gamepadControl.gamepadScrollTimer > gamepadControl.GAMEPAD_SCROLL_DELAY) {
+			gamepadControl.gamepadScrollTimer -= gamepadControl.GAMEPAD_SCROLL_DELAY;
+
+			if (gamepadControl.xAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_RIGHT);
+			} else if (gamepadControl.xAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_LEFT);
+			}
+			
+			if (gamepadControl.yAxisRValue > GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_DOWN);
+			} else if (gamepadControl.yAxisRValue < -GamepadControl::JOY_R_DEADZONE) {
+				EvntManager->OnSpecialKeyPress(GEM_UP);
+			}
+		}
+	} else {
+		gamepadControl.gamepadScrollTimer = 0;
+	}
 }
 
 Sprite2D* SDLVideoDriver::CreateSprite(int w, int h, int bpp, ieDword rMask,
@@ -1430,6 +1641,16 @@ int SDLVideoDriver::PollMovieEvents()
 						break;
 					default:
 						break;
+				}
+				break;
+			//skip videos with buttons
+#if SDL_VERSION_ATLEAST(1,3,0)
+			case SDL_CONTROLLERBUTTONDOWN:
+#else
+			case SDL_JOYBUTTONDOWN:
+#endif
+				if (event.jbutton.button == SDL_CONTROLLER_BUTTON_BACK || event.jbutton.button == SDL_CONTROLLER_BUTTON_A || event.jbutton.button == SDL_CONTROLLER_BUTTON_B) {
+					return 1;
 				}
 				break;
 			default:

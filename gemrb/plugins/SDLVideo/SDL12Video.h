@@ -29,6 +29,7 @@ class SDL12VideoDriver : public SDLVideoDriver {
 private:
 	/* yuv overlay for bink movie */
 	SDL_Overlay *overlay;
+	SDL_Joystick *gameController = nullptr;
 public:
 	SDL12VideoDriver(void);
 	~SDL12VideoDriver(void);

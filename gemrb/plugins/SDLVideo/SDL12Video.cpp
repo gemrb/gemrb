@@ -32,6 +32,9 @@ SDL12VideoDriver::SDL12VideoDriver(void)
 
 SDL12VideoDriver::~SDL12VideoDriver(void)
 {
+	if (gameController != nullptr) {
+ 		SDL_JoystickClose(gameController);
+	}
 	DestroyMovieScreen();
 }
 
@@ -48,6 +51,15 @@ int SDL12VideoDriver::Init(void)
 		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
 #endif
 	}
+
+	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
+		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+	} else {
+		if (SDL_NumJoysticks() > 0) {
+			gameController = SDL_JoystickOpen(0);
+		}
+	}
+
 	return ret;
 }
 
@@ -90,6 +102,44 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 	SDL_FillRect( extra, NULL, val );
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
+
+#ifdef VITA
+	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)	{
+		SDL_Rect vitaDestRect;
+		vitaDestRect.x = 0;
+		vitaDestRect.y = 0;
+		vitaDestRect.w = width;
+		vitaDestRect.h = height;
+
+		if (fullscreen) {
+			//resize to fullscreen
+			if (core->VitaKeepAspectRatio) {
+				if ((static_cast<float>(VITA_FULLSCREEN_WIDTH) / VITA_FULLSCREEN_HEIGHT) >= (static_cast<float>(width) / height)) {
+					float scale = static_cast<float>(VITA_FULLSCREEN_HEIGHT) / height;
+					vitaDestRect.w = width * scale;
+					vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
+					vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - vitaDestRect.w) / 2;
+				} else {
+					float scale = static_cast<float>(VITA_FULLSCREEN_WIDTH) / width;
+					vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+					vitaDestRect.h = height * scale;
+					vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - vitaDestRect.h) / 2;
+				}
+			} else {
+				vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+				vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
+			}
+			
+			SDL_SetVideoModeBilinear(true);
+		} else {
+			//center game area
+			vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - width) / 2;
+			vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - height) / 2;
+		}
+
+		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
+	}
+#endif
 
 	return GEM_OK;
 }
@@ -272,6 +322,13 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 					EvntManager->OnSpecialKeyPress( GEM_MOUSEOUT );
 			}
 			break;
+		case SDL_JOYAXISMOTION:
+			gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
+		break;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			HandleJoyButtonEvent(event.jbutton);
+			break;
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
@@ -280,16 +337,24 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
 
 void SDL12VideoDriver::ShowSoftKeyboard()
 {
+#ifdef VITA
+	dPadSoftKeyboard.StartInput();
+#else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 	}
+#endif
 }
 
 void SDL12VideoDriver::HideSoftKeyboard()
 {
+#ifdef VITA
+	dPadSoftKeyboard.StopInput();
+#else
 	if(core->UseSoftKeyboard){
 		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
 	}
+#endif
 }
 
 bool SDL12VideoDriver::TouchInputEnabled() const

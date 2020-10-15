@@ -55,6 +55,11 @@ TextEdit::~TextEdit(void)
 	gamedata->FreePalette( palette );
 	Sprite2D::FreeSprite( Back );
 	Sprite2D::FreeSprite( Cursor );
+#ifdef VITA
+	if (hasFocus) {
+		core->GetVideoDriver()->HideSoftKeyboard();
+	}
+#endif
 }
 
 void TextEdit::SetAlignment(unsigned char Alignment)
@@ -195,6 +200,11 @@ void TextEdit::SetFocus(bool focus)
 	if (hasFocus) {
 		core->GetVideoDriver()->ShowSoftKeyboard();
 	}
+#ifdef VITA
+	else {
+		core->GetVideoDriver()->HideSoftKeyboard();
+	}
+#endif
 }
 
 /** Sets the Text of the current control */

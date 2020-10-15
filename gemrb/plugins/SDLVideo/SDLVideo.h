@@ -22,6 +22,7 @@
 #define SDLVIDEODRIVER_H
 
 #include "Video.h"
+#include "GamepadControl.h"
 
 #include "GUI/EventMgr.h"
 #include "win32def.h"
@@ -34,6 +35,18 @@ typedef unsigned char
 	__attribute__((aligned(4)))
 #endif
 	Pixel;
+
+#ifdef VITA
+#include "DPadSoftKeyboard.h"
+#endif
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+#define SDLKey SDL_Keycode
+#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
+#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
+#else
+typedef Sint32 SDL_Keycode;
+#endif
 
 namespace GemRB {
 
@@ -172,6 +185,19 @@ protected:
 	virtual bool SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)=0;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
+
+#ifdef VITA
+	const int32_t VITA_FULLSCREEN_WIDTH = 960;
+	const int32_t VITA_FULLSCREEN_HEIGHT = 544;
+	DPadSoftKeyboard dPadSoftKeyboard;
+#endif
+	GamepadControl gamepadControl;
+
+	void HandleJoyAxisEvent(const SDL_JoyAxisEvent &motion);
+	void HandleJoyButtonEvent(const SDL_JoyButtonEvent &button);
+	void GamepadMouseEvent(Uint8 buttonCode, Uint8 buttonState);
+	void GamepadKeyboardEvent(SDLKey keyCode, Uint8 buttonState);
+	void ProcessAxisMotion();
 
 public:
 	// static functions for manipulating surfaces

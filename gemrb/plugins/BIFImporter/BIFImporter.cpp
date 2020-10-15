@@ -28,7 +28,9 @@
 #include "PluginMgr.h"
 #include "System/SlicedStream.h"
 #include "System/FileStream.h"
+#if defined(SUPPORTS_MEMSTREAM)
 #include "System/MappedFileMemoryStream.h"
+#endif
 
 using namespace GemRB;
 
@@ -61,6 +63,9 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword( &unCompBifSize );
+#if !defined(SUPPORTS_MEMSTREAM)
+	fflush(stdout);
+#endif
 	FileStream out;
 	if (!out.Create(path)) {
 		Log(ERROR, "BIFImporter", "Cannot write %s.", path);
@@ -81,7 +86,11 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		}
 	}
 	out.Close(); // This is necesary, since windows won't open the file otherwise.
+#if defined(SUPPORTS_MEMSTREAM)
 	return new MappedFileMemoryStream{path};
+#else
+	return FileStream::OpenFile(path);
+#endif
 }
 
 DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*path*/)
@@ -107,15 +116,23 @@ int BIFImporter::OpenArchive(const char* path)
 
 	char cachePath[_MAX_PATH];
 	PathJoin(cachePath, core->CachePath, filename, NULL);
+	char Signature[8];
+#if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
 
-	char Signature[8];
 	if (!cacheStream->isOk()) {
 		delete cacheStream;
 
 		auto file = new MappedFileMemoryStream{path};
 		if (!file->isOk()) {
 			delete file;
+#else
+	stream = FileStream::OpenFile(cachePath);
+
+	if (!stream) {
+		FileStream *file = FileStream::OpenFile(path);
+	if (!file) {
+#endif
 			return GEM_ERROR;
 		}
 		if (file->Read(Signature, 8) == GEM_ERROR) {
@@ -136,8 +153,10 @@ int BIFImporter::OpenArchive(const char* path)
 			delete file;
 			return GEM_ERROR;
 		}
+#if defined(SUPPORTS_MEMSTREAM)
 	} else {
 		stream = cacheStream;
+#endif
 	}
 
 	if (!stream)
