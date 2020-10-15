@@ -555,17 +555,6 @@ void munmap(void *start, size_t) {
 	UnmapViewOfFile(start);
 }
 
-#elif defined(__amigaos4__)
-
-void* readonly_mmap(void *vfd) {
-        int fd = fileno(static_cast<FILE*>(vfd));
-        struct stat statData;
-        int ret = fstat(fd, &statData);
-        assert(ret != -1);
-
-        return mmap(nullptr, statData.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-}
-
 #else
 
 void* readonly_mmap(void *vfd) {
