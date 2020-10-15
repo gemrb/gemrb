@@ -39,6 +39,34 @@
 
 // allocating memory for application on Vita
 int _newlib_heap_size_user = 344 * 1024 * 1024;
+char *vitaArgv[3];
+char configPath[25];
+
+void VitaSetArguments(int *argc, char **argv[])
+{
+	SceAppUtilInitParam appUtilParam;
+	SceAppUtilBootParam appUtilBootParam;
+	memset(&appUtilParam, 0, sizeof(SceAppUtilInitParam));
+	memset(&appUtilBootParam, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&appUtilParam, &appUtilBootParam);
+	SceAppUtilAppEventParam eventParam;
+	memset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
+	sceAppUtilReceiveAppEvent(&eventParam);
+	int vitaArgc = 1;
+	vitaArgv[0] = (char*)"";
+	// 0x05 probably corresponds to psla event sent from launcher screen of the app in LiveArea
+	if (eventParam.type == 0x05) {
+		char buffer[2048];
+		memset(buffer, 0, 2048);
+		sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
+		vitaArgv[1] = (char*)"-c";
+		sprintf(configPath, "ux0:data/GemRB/%s.cfg", buffer);
+		vitaArgv[2] = configPath;
+		vitaArgc = 3;
+	}
+	*argc = vitaArgc;
+	*argv = vitaArgv;
+}
 #endif
 
 using namespace GemRB;
@@ -73,29 +101,7 @@ int main(int argc, char* argv[])
 	scePowerSetGpuXbarClockFrequency(166);
 
 	// Selecting game config from init params
-	SceAppUtilInitParam appUtilParam;
-	SceAppUtilBootParam appUtilBootParam;
-	memset(&appUtilParam, 0, sizeof(SceAppUtilInitParam));
-	memset(&appUtilBootParam, 0, sizeof(SceAppUtilBootParam));
-	sceAppUtilInit(&appUtilParam, &appUtilBootParam);
-	SceAppUtilAppEventParam eventParam;
-	memset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
-	sceAppUtilReceiveAppEvent(&eventParam);
-	int vita_argc = 1;
-	char *vita_argv[3];
-	vita_argv[0] = (char*)"";
-	if (eventParam.type == 0x05) {
-		char buffer[2048];
-		memset(buffer, 0, 2048);
-		sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
-		vita_argv[1] = (char*)"-c";
-		char configPath[2080];
-		sprintf(configPath, "ux0:data/GemRB/%s.cfg", buffer);
-		vita_argv[2] = configPath;
-		vita_argc = 3;
-	}
-	argc = vita_argc;
-	argv = vita_argv;
+	VitaSetArguments(&argc, &argv);
 #endif
 
 	setlocale(LC_ALL, "");
