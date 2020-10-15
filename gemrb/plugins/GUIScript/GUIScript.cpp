@@ -11194,8 +11194,7 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int slot = -1;
-	slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
 	return PyInt_FromLong(slot);
 }
 
