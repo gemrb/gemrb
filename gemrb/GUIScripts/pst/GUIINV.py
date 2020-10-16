@@ -258,35 +258,14 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
  	return
 
-def UpdateSlot (pc, i):
+def UpdateSlot (pc, slot):
+	"""Updates a specific slot."""
+
 	Window = GemRB.GetView("WIN_INV")
 
-	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
-	# used to assign powers and protections
+	SlotType = GemRB.GetSlotType (slot+1, pc)
 
-	using_fists = 0
-	if i >= len(slot_list):
-		#this prevents accidental out of range errors from the avslots list
-		#any slots beyond the table are treated as unchanging
-		return GemRB.GetSlotType (i+1)
-	elif slot_list[i]<0:
-		slot = i+1
-		SlotType = GemRB.GetSlotType (slot)
-		slot_item = 0
-	else:
-		slot = slot_list[i]+1
-		SlotType = GemRB.GetSlotType (slot)
-		slot_item = GemRB.GetSlotItem (pc, slot)
-		#PST displays the default weapon in the first slot if nothing else was equipped
-		if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
-			slot_item = GemRB.GetSlotItem (pc, 0)
-			using_fists = 1
-
-	ControlID = SlotType["ID"]
-	if ControlID<0:
-		return
-
-	if GemRB.IsDraggingItem ():
+	if GemRB.IsDraggingItem ()==1:
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
 		itemname = drag_item["ItemResRef"]
@@ -294,35 +273,51 @@ def UpdateSlot (pc, i):
 	else:
 		itemname = ""
 
+	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
+	# used to assign powers and protections
+
+	using_fists = 0
+	if slot >= len(slot_list):
+		#this prevents accidental out of range errors from the avslots list
+		return GemRB.GetSlotType (slot+1)
+	elif slot_list[slot] == -1:
+		#This decides which icon to display in the empty slot (?)
+		SlotType = GemRB.GetSlotType (slot+1, pc)
+		slot_item = None
+	else:
+		#slot = slot_list[slot]+1
+		SlotType = GemRB.GetSlotType (slot_list[slot]+1)
+		slot_item = GemRB.GetSlotItem (pc, slot_list[slot]+1)
+		#PST displays the default weapon in the first slot if nothing else was equipped
+		if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
+			slot_item = GemRB.GetSlotItem (pc, 0)
+			using_fists = 1
+
+	ControlID = SlotType["ID"]
+
+	if ControlID is None:
+		return None
+	
 	Button = Window.GetControl (ControlID)
-	Button.SetSprites ('IVSLOT', 0, 0, 1, 2, 3)
+
+	if not Button:
+		return None
+
+	Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+
+	# characters should auto-identify any item they recieve
 	if slot_item:
-		item = GemRB.GetItem (slot_item['ItemResRef'])
-		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		InventoryCommon.TryAutoIdentification(pc, item, slot+1, slot_item, GemRB.GetVar("GUIEnhancements")&GE_TRY_IDENTIFY_ON_TRANSFER)
 
-		Button.SetItemIcon (slot_item['ItemResRef'])
-		if item['MaxStackAmount'] > 1:
-			Button.SetText (str (slot_item['Usages0']))
-		else:
-			Button.SetText ('')
+	UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 
-		if not identified or item['ItemNameIdentified'] == -1:
-			Button.SetTooltip (item['ItemName'])
-			Button.EnableBorder (0, 1)
-		else:
-			Button.SetTooltip (item['ItemNameIdentified'])
-			Button.EnableBorder (0, 0)
-
-		if GemRB.CanUseItemType (SLOT_ANY, slot_item['ItemResRef'], pc):
-			Button.EnableBorder (1, 0)
-		else:
-			Button.EnableBorder (1, 1)
-
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	if slot_item:
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InventoryCommon.OpenItemInfoWindow(None, slot=slot))
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenItemAmountWindow)
-		Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
+
 		#If the slot is being used to display the 'default' weapon, disable dragging.
 		if SlotType["ID"] == 10 and using_fists:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -331,7 +326,7 @@ def UpdateSlot (pc, i):
 		Button.SetItemIcon ('')
 		Button.SetText ('')
 
-		if slot_list[i]>=0:
+		if slot_list[slot]>=0:
 			Button.SetSprites (SlotType["ResRef"], 0, 0, 1, 2, 3)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
@@ -351,6 +346,7 @@ def UpdateSlot (pc, i):
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_DOUBLE_PRESS, InventoryCommon.OpenItemAmountWindow)
 
 	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -361,6 +357,52 @@ def UpdateSlot (pc, i):
 		Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
 
 	return SlotType
+
+def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
+
+	Button.SetSprites ('IVSLOT', 0, 0, 1, 2, 3)
+	Button.SetFont ("NUMBER")
+	Button.SetText ("")
+	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
+
+	if Slot == None:
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		if Type == "inventory":
+			Button.SetTooltip (12013) # Personal Item
+		elif Type == "ground":
+			Button.SetTooltip (12011) # Ground Item
+		else:
+			Button.SetTooltip ("")
+		Button.EnableBorder (0, 0)
+		Button.EnableBorder (1, 0)
+		Button.EnableBorder (2, 0)
+
+	else:
+		item = GemRB.GetItem (Slot['ItemResRef'])
+		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
+
+		# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
+		if item["MaxStackAmount"] > 1:
+			Button.SetText (str (Slot["Usages0"]))
+		else:
+			Button.SetText ("")
+
+		if not identified or item['ItemNameIdentified'] == -1:
+			Button.SetTooltip (item['ItemName'])
+			Button.EnableBorder (0, 1)
+		else:
+			Button.SetTooltip (item['ItemNameIdentified'])
+			Button.EnableBorder (0, 0)
+
+		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
+			Button.EnableBorder (1, 0)
+		else:
+			Button.EnableBorder (1, 1)
+
+		Button.SetItemIcon (Slot['ItemResRef'])
+
+InventoryCommon.UpdateInventorySlot = UpdateInventorySlot
 
 def DefaultWeapon ():
 	pc = GemRB.GameGetFirstSelectedActor ()
