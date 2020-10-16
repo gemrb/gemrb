@@ -591,10 +591,11 @@ void WindowManager::DrawWindows() const
 
 	uint32_t frame_flags = BLIT_NO_FLAGS;
 	if (modalWin) {
-		frame_flags |= BLIT_HALFTRANS;
 		if (modalShadow != ShadowNone) {
-			uint32_t flags = (modalShadow == ShadowGray) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
-			video->DrawRect(screen, ColorBlack, true, flags);
+			if (modalShadow == ShadowGray) {
+				frame_flags |= BLIT_HALFTRANS;
+			}
+			video->DrawRect(screen, ColorBlack, true, frame_flags);
 		}
 		auto& modalBuffer = modalWin->DrawWithoutComposition();
 		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
