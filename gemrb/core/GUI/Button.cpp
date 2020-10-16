@@ -439,7 +439,6 @@ bool Button::AcceptsDragOperation(const DragOp& dop) const
 
 void Button::CompleteDragOperation(const DragOp& dop)
 {
-	SetCursor(nullptr);
 	if (dop.dragView == this) {
 		// this was the dragged view
 		EnableBorder(1, false);
@@ -477,14 +476,6 @@ bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 		}
 	}
 	return Control::OnMouseDown(me, mod);
-}
-
-bool Button::OnMouseDrag(const MouseEvent& me)
-{
-	if (IS_PORTRAIT) {
-		SetCursor(core->Cursors[IE_CURSOR_SWAP]);
-	}
-	return Control::OnMouseDrag(me);
 }
 
 /** Mouse Button Up */
@@ -549,10 +540,6 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseLeave(me, dop);
-	
-	if (IS_PORTRAIT) {
-		SetCursor(nullptr);
-	}
 
 	if (State == IE_GUI_BUTTON_PRESSED && dop == NULL) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
