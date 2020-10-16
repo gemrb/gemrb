@@ -77,8 +77,8 @@ def InitInventoryWindow (Window):
 		SlotType = GemRB.GetSlotType (slot)
 		Button = Window.GetControl (SlotType["ID"])
 		if Button:
-			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
-			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
+			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
+			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot)
 
 			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -169,7 +169,7 @@ def UpdateInventoryWindow (Window = None):
 
 	# populate inventory slot controls
 	for i in range (46):
-		UpdateSlot (pc, i)
+		InventoryCommon.UpdateSlot (pc, i)
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP|WINDOW_HCENTER)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP|WINDOW_HCENTER)
@@ -459,26 +459,6 @@ def OnDragItem (btn, slot):
 			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
 
 	UpdateInventoryWindow ()
-	return
-
-def MouseEnterSlot (btn, slot):
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	if GemRB.IsDraggingItem ()==1:
-		drag_item = GemRB.GetSlotItem (0,0)
-		SlotType = UpdateSlot (pc, slot-1)
-
-		if GemRB.CanUseItemType (SlotType["Type"], drag_item["ItemResRef"]):
-			btn.SetState (IE_GUI_BUTTON_SELECTED)
-		else:
-			btn.SetState (IE_GUI_BUTTON_ENABLED)
-		
-	return
-
-def MouseLeaveSlot (btn, slot):
-	pc = GemRB.GameGetSelectedPCSingle ()
-
-	UpdateSlot (pc, slot-1)
 	return
 
 ###################################################
