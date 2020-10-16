@@ -155,6 +155,8 @@ private: // Private attributes
 	View* focusView; // keyboard focus
 	View* trackingView; // out of bounds mouse tracking
 	View* hoverView; // view the mouse was last over
+	
+	Point dragOrigin;
 	UniqueDragOp drag;
 	unsigned long lastMouseMoveTime;
 

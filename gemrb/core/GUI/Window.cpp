@@ -311,13 +311,8 @@ bool Window::SupportsAction(const ActionKey& key)
 
 void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 {
-	if (target != hoverView) {
-		if (hoverView) {
+	if (hoverView && target != hoverView) {
 			hoverView->MouseLeave(me, drag.get());
-			if (trackingView && !drag) {
-				drag = trackingView->DragOperation();
-			}
-		}
 	}
 	
 	if (target && target != hoverView) {
@@ -326,10 +321,15 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 	}
 	if (trackingView) {
 		// tracking will eat this event
-		if (me.buttonStates)
+		if (me.buttonStates) {
 			trackingView->MouseDrag(me);
-		else
+			if (trackingView == target && drag == nullptr
+				&& dragOrigin.isWithinRadius(5, me.Pos())) {
+				drag = trackingView->DragOperation();
+			}
+		} else {
 			trackingView = NULL;
+		}
 	} else if (target) {
 		target->MouseOver(me);
 	}
@@ -349,6 +349,7 @@ void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned shor
 	TrySetFocus(target);
 	target->MouseDown(me, mod);
 	trackingView = target; // all views track the mouse within their bounds
+	dragOrigin = me.Pos();
 	assert(me.buttonStates);
 }
 
@@ -356,18 +357,15 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 {
 	assert(target);
 	
-		if (drag) {
-			if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
-				drag->dropView = target;
-				target->CompleteDragOperation(*drag);
-			}
-		} else if (trackingView) {
-			if (trackingView == target || trackingView->TracksMouseDown()) {
-				// we dragged the mouse on a view, but never left it
-				// possibly this is a canceled drag event that we should instantiate and destroy
-				drag = trackingView->DragOperation();
-				trackingView->MouseUp(me, mod);
-			}
+	if (drag) {
+		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+			drag->dropView = target;
+			target->CompleteDragOperation(*drag);
+		}
+	} else if (trackingView) {
+		if (trackingView == target || trackingView->TracksMouseDown()) {
+			trackingView->MouseUp(me, mod);
+		}
 	} else if (target) {
 		target->MouseUp(me, mod);
 	}
