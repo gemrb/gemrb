@@ -36,6 +36,9 @@ ErrorWindow = None
 ColorPicker = None
 StackAmount = 0
 
+ # A map that defines which inventory slots are used per character (PST)
+SlotMap = None
+
 UpdateInventoryWindow = None
 
 def OnDragItemGround (btn, slot):
@@ -546,7 +549,30 @@ def UpdateSlot (pc, slot):
 
 	Window = GemRB.GetView("WIN_INV")
 
-	SlotType = GemRB.GetSlotType (slot+1, pc)
+	using_fists = slot_item = SlotType = None
+
+	if not GameCheck.IsPST():
+		SlotType = GemRB.GetSlotType (slot+1, pc)
+		slot_item = GemRB.GetSlotItem (pc, slot+1)
+	else:
+		if slot >= len(SlotMap):
+			#this prevents accidental out of range errors from the avslots list
+			return GemRB.GetSlotType (slot+1)
+		elif SlotMap[slot] == -1:
+			# This decides which icon to display in the empty slot
+			# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
+			# used to assign powers and protections
+
+			SlotType = GemRB.GetSlotType (slot+1, pc)
+			slot_item = None
+		else:
+			SlotType = GemRB.GetSlotType (SlotMap[slot]+1)
+			slot_item = GemRB.GetSlotItem (pc, SlotMap[slot]+1)
+			#PST displays the default weapon in the first slot if nothing else was equipped
+			if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
+				slot_item = GemRB.GetSlotItem (pc, 0)
+				using_fists = 1
+
 	ControlID = SlotType["ID"]
 
 	if ControlID == -1:
@@ -561,7 +587,6 @@ def UpdateSlot (pc, slot):
 		itemname = ""
 
 	Button = Window.GetControl (ControlID)
-	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	# It is important to check for a control - some games use CID 0 for slots with no control, others -1
 	if not Button:
@@ -582,6 +607,10 @@ def UpdateSlot (pc, slot):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
+		#If the slot is being used to display the 'default' weapon, disable dragging.
+		if SlotType["ID"] == 10 and using_fists:
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+			#dropping is ok, because it will drop in the quick weapon slot and not the default weapon slot.
 	else:
 		if SlotType["ResRef"]=="*":
 			Button.SetBAM ("",0,0)
@@ -595,6 +624,12 @@ def UpdateSlot (pc, slot):
 		else:
 			Button.SetBAM (SlotType["ResRef"],0,0)
 			Button.SetTooltip (SlotType["Tip"])
+
+		if SlotMap and SlotMap[slot]<0:
+			Button.SetBAM ("",0,0)
+			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			Button.SetTooltip ("")
+			itemname = ""
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
