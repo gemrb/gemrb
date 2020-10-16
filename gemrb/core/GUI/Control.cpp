@@ -219,6 +219,16 @@ bool Control::HitTest(const Point& p) const
 
 View::UniqueDragOp Control::DragOperation()
 {
+	ActionKey key(Action::DragDropCreate);
+	
+	if (SupportsAction(key)) {
+		// we have to use a timer so that the dragop is set before the callback is called
+		EventHandler h = [this, key] () {
+			return actions[key](this);
+		};
+
+		actionTimer = &core->SetTimer(h, 0, 0);
+	}
 	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
 }
 

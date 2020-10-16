@@ -94,6 +94,7 @@ public: // Public attributes
 		// other events
 		ValueChange, // many times we only care that the value has changed, not about the event that changed it
 
+		DragDropCreate,
 		DragDropSource, // a DragOp was succesfully taken from here
 		DragDropDest, // a DragOp was successfully dropped here
 
