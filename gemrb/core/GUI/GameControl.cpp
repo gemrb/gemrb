@@ -1558,9 +1558,9 @@ bool GameControl::OnTouchGesture(const GestureEvent& gesture)
 
 		enum SWIPE {DOWN = -1, NONE = 0, UP = 1};
 		SWIPE swipe = NONE;
-		if (gesture.deltaY < -10) {
+		if (gesture.deltaY < -EventMgr::mouseDragRadius) {
 			swipe = UP;
-		} else if (gesture.deltaY > 10) {
+		} else if (gesture.deltaY > EventMgr::mouseDragRadius) {
 			swipe = DOWN;
 		}
 
