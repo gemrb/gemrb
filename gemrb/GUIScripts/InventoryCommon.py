@@ -549,7 +549,7 @@ def UpdateSlot (pc, slot):
 	SlotType = GemRB.GetSlotType (slot+1, pc)
 	ControlID = SlotType["ID"]
 
-	if not ControlID:
+	if ControlID == -1:
 		return None
 
 	if GemRB.IsDraggingItem ()==1:
@@ -562,6 +562,10 @@ def UpdateSlot (pc, slot):
 
 	Button = Window.GetControl (ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
+
+	# It is important to check for a control - some games use CID 0 for slots with no control, others -1
+	if not Button:
+		return
 
 	Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
