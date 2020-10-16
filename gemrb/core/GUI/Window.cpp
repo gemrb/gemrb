@@ -357,11 +357,9 @@ void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short 
 {
 	assert(target);
 	
-	if (drag) {
-		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+	if (drag && drag->dragView != target && target->AcceptsDragOperation(*drag)) {
 			drag->dropView = target;
 			target->CompleteDragOperation(*drag);
-		}
 	} else if (trackingView) {
 		if (trackingView == target || trackingView->TracksMouseDown()) {
 			trackingView->MouseUp(me, mod);

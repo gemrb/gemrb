@@ -225,7 +225,8 @@ View::UniqueDragOp Control::DragOperation()
 bool Control::AcceptsDragOperation(const DragOp& dop) const
 {
 	const ControlDragOp* cdop = dynamic_cast<const ControlDragOp*>(&dop);
-	if (cdop && cdop->dragView != this) {
+	if (cdop) {
+		assert(cdop->dragView != this);
 		// if 2 controls share the same VarName we assume they are swappable...
 		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
 	}
