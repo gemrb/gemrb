@@ -52,6 +52,11 @@ ItemAmountWindow = None
 # 0x10000000 + 62 - party gold
 # 0x10000000 + 63 - class
 
+# The appearance and usability of inventory slots in PST
+# varies from character to character and is defined
+# by unhardcoded/avslots.2da
+SlotMap = None
+
 
 def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
@@ -140,7 +145,7 @@ def InitInventoryWindow (Window):
 def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
 
-	global slot_list
+	global SlotMap
 
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
@@ -159,7 +164,7 @@ def UpdateInventoryWindow (Window = None):
 
 	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	slot_list = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
+	SlotMap = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
 
 	# populate inventory slot controls
 	for i in range (46):
@@ -277,17 +282,17 @@ def UpdateSlot (pc, slot):
 	# used to assign powers and protections
 
 	using_fists = 0
-	if slot >= len(slot_list):
+	if slot >= len(SlotMap):
 		#this prevents accidental out of range errors from the avslots list
 		return GemRB.GetSlotType (slot+1)
-	elif slot_list[slot] == -1:
+	elif SlotMap[slot] == -1:
 		#This decides which icon to display in the empty slot (?)
 		SlotType = GemRB.GetSlotType (slot+1, pc)
 		slot_item = None
 	else:
-		#slot = slot_list[slot]+1
-		SlotType = GemRB.GetSlotType (slot_list[slot]+1)
-		slot_item = GemRB.GetSlotItem (pc, slot_list[slot]+1)
+		#slot = SlotMap[slot]+1
+		SlotType = GemRB.GetSlotType (SlotMap[slot]+1)
+		slot_item = GemRB.GetSlotItem (pc, SlotMap[slot]+1)
 		#PST displays the default weapon in the first slot if nothing else was equipped
 		if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
 			slot_item = GemRB.GetSlotItem (pc, 0)
@@ -326,7 +331,7 @@ def UpdateSlot (pc, slot):
 		Button.SetItemIcon ('')
 		Button.SetText ('')
 
-		if slot_list[slot]>=0:
+		if SlotMap[slot]>=0:
 			Button.SetSprites (SlotType["ResRef"], 0, 0, 1, 2, 3)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
