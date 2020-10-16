@@ -541,7 +541,7 @@ void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
 {
 	Control::OnMouseLeave(me, dop);
 
-	if (State == IE_GUI_BUTTON_PRESSED && dop == NULL) {
+	if (State == IE_GUI_BUTTON_PRESSED && (dop == nullptr || dop->dragView == this)) {
 		SetState( IE_GUI_BUTTON_UNPRESSED );
 	}
 
