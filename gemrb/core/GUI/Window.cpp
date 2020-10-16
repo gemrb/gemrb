@@ -319,12 +319,12 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 		// must create the drag event before calling MouseEnter
 		target->MouseEnter(me, drag.get());
 	}
-	if (trackingView) {
+	
+	if (trackingView && Distance(dragOrigin, me.Pos()) > 10) {
 		// tracking will eat this event
 		if (me.buttonStates) {
 			trackingView->MouseDrag(me);
-			if (trackingView == target && drag == nullptr
-				&& dragOrigin.isWithinRadius(5, me.Pos())) {
+			if (trackingView == target && drag == nullptr) {
 				drag = trackingView->DragOperation();
 			}
 		} else {

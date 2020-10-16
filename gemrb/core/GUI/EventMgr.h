@@ -254,6 +254,9 @@ public:
 	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
 	using EventCallback = Callback<bool, const Event&>;
 	typedef size_t TapMonitorId;
+	
+	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
+	static constexpr int mouseDragRadius = 10; // radius for drag events
 
 	static unsigned long DCDelay;
 	static unsigned long DPDelay;

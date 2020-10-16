@@ -212,7 +212,7 @@ void EventMgr::DispatchEvent(Event& e)
 
 				if (btn == repeatButton
 					&& e.time <= lastMouseDown + DCDelay
-					&& repeatPos.isWithinRadius(5, se.Pos())
+					&& repeatPos.isWithinRadius(mouseClickRadius, se.Pos())
 				) {
 					repeatCount++;
 				} else {
