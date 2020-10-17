@@ -1444,6 +1444,8 @@ void Map::InitActors()
 	while (i--) {
 		Actor *actor = actors[i];
 		actor->SetMap(this);
+		// make sure to bump away in case someone or something is already there
+		actor->SetPosition(actor->Pos, 1);
 		InitActor(actor);
 	}
 }
