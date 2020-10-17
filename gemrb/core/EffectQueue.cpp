@@ -513,13 +513,12 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 //... but some require reinitialisation
 void EffectQueue::ApplyAllEffects(Actor* target) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if (Opcodes[(*f)->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
+	for (auto fx : effects) {
+		if (Opcodes[fx->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
 			// pretend to be the first application (FirstApply==1)
-			ApplyEffect(target, *f, 1);
+			ApplyEffect(target, fx, 1);
 		} else {
-			ApplyEffect(target, *f, 0);
+			ApplyEffect(target, fx, 0);
 		}
 	}
 }

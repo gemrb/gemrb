@@ -42,7 +42,7 @@ MUSImporter::MUSImporter()
 	PLNameNew[0] = '\0';
 	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, NULL);
+	PathJoin(path, core->GamePath, musicsubfolder, nullptr);
 	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
@@ -72,7 +72,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		return false;
 	}
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, name, NULL);
+	PathJoin(path, core->GamePath, musicsubfolder, name, nullptr);
 	Log(MESSAGE, "MUSImporter", "Loading %s...", path);
 	if (!str->Open(path)) {
 		Log(ERROR, "MUSImporter", "Didn't find playlist '%s'.", path);
@@ -110,7 +110,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		}
 		pls.PLFile[p] = 0;
 		p = 0;
-		if (line[i] != '@' && ( i < len )) {
+		if (i < len && line[i] != '@') {
 			while (i < len) {
 				if (( line[i] != ' ' ) && ( line[i] != '\t' ))
 					pls.PLTag[p++] = line[i++];
@@ -298,13 +298,13 @@ void MUSImporter::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
-		PathJoin(FName, "mx9000", name, NULL);
+		PathJoin(FName, "mx9000", name, nullptr);
 	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
-		PathJoin(FName, "mx0000", name, NULL);
+		PathJoin(FName, "mx0000", name, nullptr);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
 		char File[_MAX_PATH];
 		snprintf(File, _MAX_PATH, "%s%s", PLName, name);
-		PathJoin(FName, PLName, File, NULL);
+		PathJoin(FName, PLName, File, nullptr);
 	} else {
 		strlcpy(FName, name, _MAX_PATH);
 	}

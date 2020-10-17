@@ -346,8 +346,8 @@ public:
 	void InitTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
-	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0);
-	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0);
+	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
+	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(const Region &screen);

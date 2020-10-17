@@ -307,7 +307,6 @@ static int GetActionLength(const char* string)
      bg2's QUAYLE.DLG (missing closing bracket) */
 static char** GetStrings(char* string, unsigned int& count)
 {
-	int col = 0;
 	int level = 0;
 	bool quotes = true;
 	bool ignore = false;
@@ -317,11 +316,9 @@ static char** GetStrings(char* string, unsigned int& count)
 	while (*poi) {
 		switch (*poi++) {
 			case '/':
-				if(col==0) {
-					if(*poi=='/') {
-						poi++;
-						ignore=true;
-					}
+				if (*poi == '/') {
+					poi++;
+					ignore = true;
 				}
 				break;
 			case '"':
