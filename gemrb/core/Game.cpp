@@ -739,30 +739,32 @@ Map* Game::GetMap(unsigned int index) const
 Map *Game::GetMap(const char *areaname, bool change)
 {
 	int index = LoadMap(areaname, change);
-	if (index >= 0) {
-		if (change) {
-			MapIndex = index;
-			area = GetMap(index);
-			memcpy (CurrentArea, areaname, 8);
-			//change the tileset if needed
-			area->ChangeMap(IsDay());
-			area->SetupAmbients();
-			ChangeSong(false, true);
-			Infravision();
+	if (index < 0) {
+		return nullptr;
+	}
 
-			//call area customization script for PST
-			//moved here because the current area is set here
-			ScriptEngine *sE = core->GetGUIScriptEngine();
-			if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
-				//area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
-				sE->RunFunction("Maze", "CustomizeArea");
-			}
-
-			return area;
-		}
+	if (!change) {
 		return GetMap(index);
 	}
-	return NULL;
+
+	MapIndex = index;
+	area = GetMap(index);
+	memcpy(CurrentArea, areaname, 8);
+	// change the tileset if needed
+	area->ChangeMap(IsDay());
+	area->SetupAmbients();
+	ChangeSong(false, true);
+	Infravision();
+
+	// call area customization script for PST
+	// moved here because the current area is set here
+	ScriptEngine *sE = core->GetGUIScriptEngine();
+	if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
+		// area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
+		sE->RunFunction("Maze", "CustomizeArea");
+	}
+
+	return area;
 }
 
 bool Game::MasterArea(const char *area)
