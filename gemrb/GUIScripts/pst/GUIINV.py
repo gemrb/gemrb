@@ -63,6 +63,8 @@ def InitInventoryWindow (Window):
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
 
+	# Reset the ScrollBar index, since it is shared with other windows eg GUILOAD
+	GemRB.SetVar("TopIndex", 0)
 
 	# inventory slots
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
