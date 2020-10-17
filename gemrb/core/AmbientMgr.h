@@ -44,7 +44,7 @@ public:
 	virtual bool isActive(const std::string &name) const;
 protected:
 	std::vector<Ambient *> ambients;
-	bool active;
+	bool active = false;
 };
 
 }
