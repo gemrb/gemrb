@@ -772,7 +772,7 @@ void Map::UpdateScripts()
 	q = Qcount[PR_SCRIPT];
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
-		if (actor->GetRandomBackoff() || !actor->GetStep() || actor->speed == 0) {
+		if (actor->GetRandomBackoff() || !actor->GetStep() || actor->GetSpeed() == 0) {
 			continue;
 		}
 		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
@@ -786,7 +786,7 @@ void Map::UpdateScripts()
 		Actor* actor = queue[PR_SCRIPT][q];
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
-			if (!actor->GetRandomBackoff() && actor->speed > 0) {
+			if (!actor->GetRandomBackoff() && actor->GetSpeed() > 0) {
 				actor->NewPath();
 			}
 			continue;
@@ -888,7 +888,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) const
 
 void Map::DoStepForActor(Actor *actor, ieDword time) const
 {
-	int walkScale = actor->speed;
+	int walkScale = actor->GetSpeed();
 	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {
@@ -2013,7 +2013,7 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 	while (p != d) {
 		double dx = d.x - p.x;
 		double dy = d.y - p.y;
-		double factor = caller && caller->speed ? double(gamedata->GetStepTime()) / double(caller->speed) : 1;
+		double factor = caller && caller->GetSpeed() ? double(gamedata->GetStepTime()) / double(caller->GetSpeed()) : 1;
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
