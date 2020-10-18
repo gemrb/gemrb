@@ -18,6 +18,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
+import CharGenCommon
 import CommonTables
 import GUICommon
 from GUIDefines import *
@@ -61,6 +62,7 @@ def OnLoad():
 		GemRB.SetNextScript("GUICG7")
 		return
 	RaceWindow = GemRB.LoadWindow(15, "GUICG")
+	CharGenCommon.PositionCharGenWin (RaceWindow)
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = RaceTable.GetRowCount()-LISTSIZE+1
 	if RaceCount<0:
