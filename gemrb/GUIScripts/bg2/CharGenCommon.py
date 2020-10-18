@@ -136,10 +136,11 @@ def DisplayOverview(step):
 	AbilityTable = GemRB.LoadTable ("ability")
 
 	MyChar = GemRB.GetVar ("Slot")
+	TextAreaControl= CharGenWindow.GetControl (9)
+	TextAreaControl.SetText ("")
 
 	for part in range(1, step+1):
 		if part == 1:
-			TextAreaControl= CharGenWindow.GetControl (9)
 			if step == 1:
 				TextAreaControl.SetText (GemRB.GetString(16575))
 			elif step == 9:
