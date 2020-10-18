@@ -21,6 +21,8 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+#include <array>
+
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
 
@@ -67,7 +69,7 @@ public:
 	Inventory inventory;
 	ieStrRef OpenFail;
 	//these are not saved
-	Holder<Sprite2D> groundicons[3];
+	std::array<Holder<Sprite2D>, 3> groundicons;
 	//keyresref is stored in Highlightable
 };
 
