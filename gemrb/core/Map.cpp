@@ -791,7 +791,7 @@ void Map::UpdateScripts()
 			}
 			continue;
 		}
-		DoStepForActor(actor, actor->speed, time);
+		DoStepForActor(actor, time);
 	}
 
 
@@ -886,8 +886,9 @@ void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) const
 	}
 }
 
-void Map::DoStepForActor(Actor *actor, int walkScale, ieDword time) const
+void Map::DoStepForActor(Actor *actor, ieDword time) const
 {
+	int walkScale = actor->speed;
 	// Immobile, dead and actors in another map can't walk here
 	if (actor->Immobile() || walkScale == 0 || actor->GetCurrentArea() != this
 		|| !actor->ValidTarget(GA_NO_DEAD)) {

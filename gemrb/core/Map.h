@@ -388,7 +388,7 @@ public:
 	void AutoLockDoors() const;
 	void UpdateScripts();
 	void ResolveTerrainSound(ieResRef &sound, Point &pos) const;
-	void DoStepForActor(Actor *actor, int walkScale, ieDword time) const;
+	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
