@@ -343,8 +343,6 @@ def OnDragItem (btn, slot):
 	slot_item = GemRB.GetSlotItem (pc, slot)
 
 	if not GemRB.IsDraggingItem ():
-		if not slot_item:
-			return
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 		if slot == 2:
