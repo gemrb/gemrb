@@ -48,8 +48,6 @@ Container::Container(void)
 	Trapped = 0;
 	TrapDetected = 0;
 	inventory.SetInventoryType(INVENTORY_HEAP);
-	// NULL should be 0 for this
-	memset (groundicons, 0, sizeof(groundicons) );
 	OpenFail = 0;
 }
 
