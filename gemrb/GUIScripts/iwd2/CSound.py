@@ -18,6 +18,8 @@
 #
 #character generation, sound (GUICG19)
 import GemRB
+
+import CharOverview
 from GUIDefines import *
 
 SoundWindow = 0
@@ -31,6 +33,7 @@ def OnLoad():
 
 	#this hack will redraw the base CG window
 	SoundWindow = GemRB.LoadWindow(19, "GUICG")
+	CharOverview.PositionCharGenWin (SoundWindow)
 
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]

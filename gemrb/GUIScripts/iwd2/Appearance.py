@@ -25,6 +25,7 @@ import GUICommon
 import IDLUCommon
 import Portrait
 from GUIDefines import *
+from ie_stats import IE_SEX, IE_CLASS
 
 ColorTable = 0
 HairTable = 0
@@ -74,7 +75,7 @@ def OnLoad():
 	#set these colors to some default
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	Portrait.Init (Gender)
-	Portrait.Set (GemRB.GetPlayerPortrait (pc))
+	Portrait.Set (GemRB.GetPlayerPortrait (pc)["ResRef"])
 	PortraitName = Portrait.Name () # strips the last char like the table needs
 
 	PortraitTable = GemRB.LoadTable("pictures")
