@@ -544,11 +544,7 @@ def CannotLearnSlotSpell ():
 	if GameCheck.IsIWD2():
 		booktype = IE_IWD2_SPELL_WIZARD
 
-	if GameCheck.IsPST():
-		import GUIINV
-		slot, slot_item = GUIINV.ItemHash[GemRB.GetVar ('ItemButton')]
-	else:
-		slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
+	slot_item = GemRB.GetSlotItem (pc, GemRB.GetVar ("ItemButton"))
 	spell_ref = GemRB.GetItem (slot_item['ItemResRef'], pc)['Spell']
 	spell = GemRB.GetSpell (spell_ref)
 	level = spell['SpellLevel']

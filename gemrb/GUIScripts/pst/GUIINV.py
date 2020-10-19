@@ -32,9 +32,6 @@ from ie_stats import *
 from ie_slots import *
 
 ItemAmountWindow = None
-OverSlot = None
-
-ItemHash = {}
 
 # Control ID's:
 # 0 - 9 eye, rings, earrings, tattoos, etc
@@ -55,6 +52,11 @@ ItemHash = {}
 # 0x10000000 + 62 - party gold
 # 0x10000000 + 63 - class
 
+# The appearance and usability of inventory slots in PST
+# varies from character to character and is defined
+# by unhardcoded/avslots.2da
+SlotMap = None
+
 
 def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
@@ -66,21 +68,26 @@ def InitInventoryWindow (Window):
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 	Window.GetControl(0x1000003d).AddAlias("MsgSys", 1)
 
+	# Reset the ScrollBar index, since it is shared with other windows eg GUILOAD
+	GemRB.SetVar("TopIndex", 0)
 
 	# inventory slots
-	for i in range (44):
-		Button = Window.GetControl (i)
-		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		Button.SetFont ("NUMBER")
-		Button.SetVarAssoc ("ItemButton", i)
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for slot in range (SlotCount):
+		SlotType = GemRB.GetSlotType (slot)
+		Button = Window.GetControl (SlotType["ID"])
+		if Button:
+			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
+			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
+			Button.SetVarAssoc ("ItemButton", slot)
 
-		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
-		Button.SetBorder (0,color,0,1)
-		color['r'], color['b'] = color['b'], color['r']
-		Button.SetBorder (1,color,0,1)
+			Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
+			Button.SetFont ("NUMBER")
 
-		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, MouseEnterSlot)
-		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, MouseLeaveSlot)
+			color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+			Button.SetBorder (0,color,0,1)
+			color['r'], color['b'] = color['b'], color['r']
+			Button.SetBorder (1,color,0,1)
 
 	# Ground Item
 	for i in range (10):
@@ -137,8 +144,8 @@ def InitInventoryWindow (Window):
 
 def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
-	global ItemHash
-	global slot_list
+
+	global SlotMap
 
 	if Window == None:
 		Window = GemRB.GetView("WIN_INV")
@@ -154,17 +161,15 @@ def UpdateInventoryWindow (Window = None):
 		Count=1
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
 	RefreshInventoryWindow (Window)
-	# And now for the items ....
 
-	ItemHash = {}
-
-	# get a list which maps slot number to slot type/icon/tooltip
+	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	slot_list = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
+	SlotMap = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
+	InventoryCommon.SlotMap = SlotMap
 
 	# populate inventory slot controls
 	for i in range (46):
-		UpdateSlot (pc, i)
+		InventoryCommon.UpdateSlot (pc, i)
 
 ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP|WINDOW_HCENTER)
 OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow, WINDOW_TOP|WINDOW_HCENTER)
@@ -259,112 +264,6 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
  	return
 
-def UpdateSlot (pc, i):
-	Window = GemRB.GetView("WIN_INV")
-
-	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
-	# used to assign powers and protections
-
-	using_fists = 0
-	if slot_list[i]<0:
-		slot = i+1
-		SlotType = GemRB.GetSlotType (slot)
-		slot_item = 0
-	else:
-		slot = slot_list[i]+1
-		SlotType = GemRB.GetSlotType (slot)
-		slot_item = GemRB.GetSlotItem (pc, slot)
-		#PST displays the default weapon in the first slot if nothing else was equipped
-		if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
-			slot_item = GemRB.GetSlotItem (pc, 0)
-			using_fists = 1
-
-	ControlID = SlotType["ID"]
-	if ControlID<0:
-		return
-
-	if GemRB.IsDraggingItem ():
-		#get dragged item
-		drag_item = GemRB.GetSlotItem (0,0)
-		itemname = drag_item["ItemResRef"]
-		drag_item = GemRB.GetItem (itemname)
-	else:
-		itemname = ""
-
-	Button = Window.GetControl (ControlID)
-	ItemHash[ControlID] = [slot, slot_item]
-	Button.SetSprites ('IVSLOT', 0, 0, 1, 2, 3)
-	if slot_item:
-		item = GemRB.GetItem (slot_item['ItemResRef'])
-		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
-
-		Button.SetItemIcon (slot_item['ItemResRef'])
-		if item['MaxStackAmount'] > 1:
-			Button.SetText (str (slot_item['Usages0']))
-		else:
-			Button.SetText ('')
-
-		if not identified or item['ItemNameIdentified'] == -1:
-			Button.SetTooltip (item['ItemName'])
-			Button.EnableBorder (0, 1)
-		else:
-			Button.SetTooltip (item['ItemNameIdentified'])
-			Button.EnableBorder (0, 0)
-
-		if GemRB.CanUseItemType (SLOT_ANY, slot_item['ItemResRef'], pc):
-			Button.EnableBorder (1, 0)
-		else:
-			Button.EnableBorder (1, 1)
-
-		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: InventoryCommon.OpenItemInfoWindow(None, slot=slot))
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
-		Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
-		#If the slot is being used to display the 'default' weapon, disable dragging.
-		if SlotType["ID"] == 10 and using_fists:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			#dropping is ok, because it will drop in the quick weapon slot and not the default weapon slot.
-	else:
-		Button.SetItemIcon ('')
-		Button.SetText ('')
-
-		if slot_list[i]>=0:
-			Button.SetSprites (SlotType["ResRef"], 0, 0, 1, 2, 3)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_DST)
-			Button.SetTooltip (SlotType["Tip"])
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetAction (None, IE_ACT_DRAG_DROP_DST)
-			Button.SetTooltip ('')
-			itemname = ""
-
-		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
-
-		if SlotType["Effects"]==4:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DefaultWeapon)
-		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-
-	if OverSlot == slot-1:
-		if GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_SELECTED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-	else:
-		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
-
-		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
-			Button.SetState (IE_GUI_BUTTON_FAKEDISABLED)
-	return
-
 def DefaultWeapon ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetEquippedQuickSlot (pc, 1000, -1)
@@ -387,14 +286,18 @@ def OnAutoEquip ():
 	UpdateInventoryWindow ()
 	return
 
-def OnDragItem ():
-	pc = GemRB.GameGetSelectedPCSingle ()
+def OnDragItem (btn, slot):
+	"""Updates dragging."""
 
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	#don't call when splitting items
+	if ItemAmountWindow != None:
+		return
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot_item = GemRB.GetSlotItem (pc, slot)
 
 	if not GemRB.IsDraggingItem ():
-		ResRef = slot_item['ItemResRef']
-		item = GemRB.GetItem (ResRef)
+		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 		if slot == 2:
 			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
@@ -408,96 +311,6 @@ def OnDragItem ():
 			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
 
 	UpdateInventoryWindow ()
-
-def DragItemAmount ():
-	"""Drag a split item."""
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
-	Text = ItemAmountWindow.GetControl (6)
-	Amount = Text.QueryText ()
-	item = GemRB.GetItem (slot_item["ItemResRef"])
-	GemRB.DragItem (pc, slot, item["ItemIcon"], int ("0"+Amount), 0)
-	OpenItemAmountWindow ()
-	return
-
-def OpenItemAmountWindow ():
-	global ItemAmountWindow
-
-	if ItemAmountWindow != None:
-		if ItemAmountWindow:
-			ItemAmountWindow.Unload ()
-		ItemAmountWindow = None
-
-		return
-
-	ItemAmountWindow = Window = GemRB.LoadWindow (4)
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
-	ResRef = slot_item['ItemResRef']
-	item = GemRB.GetItem (ResRef)
-
-	# item icon
-	Icon = Window.GetControl (0)
-	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Icon.SetItemIcon (ResRef)
-
-	# item amount
-	Text = Window.GetControl (6)
-	Text.SetSize (40, 40)
-	Text.SetText ("1")
-	Text.SetStatus (IE_GUI_EDIT_NUMBER)
-	Text.Focus()
-
-	# Done
-	Button = Window.GetControl (2)
-	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
-	Button.MakeDefault()
-
-	# Cancel
-	Button = Window.GetControl (1)
-	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
-	Button.MakeEscape()
-
-	# 0 bmp
-	# 1,2 done/cancel?
-	# 3 +
-	# 4 -
-	# 6 text
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-
-def MouseEnterSlot ():
-	global OverSlot
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ('ItemButton')
-	if slot not in ItemHash:
-		return
-	OverSlot = ItemHash[slot][0]-1
-	if GemRB.IsDraggingItem ():
-		for i in range(len(slot_list)):
-			if slot_list[i]==OverSlot:
-				UpdateSlot (pc, i)
-	return
-
-def MouseLeaveSlot ():
-	global OverSlot
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ('ItemButton')
-	if slot not in ItemHash:
-		return
-	slot = ItemHash[slot][0]-1
-	if slot == OverSlot or not GemRB.IsDraggingItem ():
-		OverSlot = None
-
-	for i in range(len(slot_list)):
-		if slot_list[i]==slot:
-			UpdateSlot (pc, i)
 	return
 
 ###################################################
