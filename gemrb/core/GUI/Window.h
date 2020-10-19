@@ -33,7 +33,7 @@
 
 #include <set>
 
-#define DEBUG_WINDOWS 1
+#define DEBUG_WINDOWS 0
 
 namespace GemRB {
 
