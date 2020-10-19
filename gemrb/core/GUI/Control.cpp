@@ -219,6 +219,10 @@ bool Control::HitTest(const Point& p) const
 
 View::UniqueDragOp Control::DragOperation()
 {
+	if (actionTimer) {
+		return nullptr;
+	}
+	
 	ActionKey key(Action::DragDropCreate);
 	
 	if (SupportsAction(key)) {
