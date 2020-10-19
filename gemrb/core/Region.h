@@ -117,6 +117,7 @@ public:
 	
 	void ExpandToPoint(const Point& p);
 	void ExpandToRegion(const Region& r);
+	void ExpandAllSides(int amt);
 	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
 		Point min, max;

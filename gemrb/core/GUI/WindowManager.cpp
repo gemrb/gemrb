@@ -609,15 +609,13 @@ void WindowManager::DrawWindows() const
 	// ensure this is drawin over the window frames
 	if (trackingWin) {
 		Region r = trackingWin->Frame();
-		r.x -= 5;
-		r.w += 10;
+		r.ExpandAllSides(5);
 		video->DrawRect(r, ColorRed, false);
 	}
 	
 	if (hoverWin) {
 		Region r = hoverWin->Frame();
-		r.x -= 10;
-		r.w += 20;
+		r.ExpandAllSides(10);
 		video->DrawRect(r, ColorWhite, false);
 	}
 #endif

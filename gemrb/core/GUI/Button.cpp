@@ -279,7 +279,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 				// we do know that if a button is multiline it should not have margins
 				// I'm actually wondering if we need this at all anymore
 				// I suspect its origins predate the fixing of font baseline alignment
-				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+				r.ExpandAllSides(-5);
 			}
 		}
 

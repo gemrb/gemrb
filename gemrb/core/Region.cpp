@@ -209,4 +209,12 @@ void Region::ExpandToRegion(const Region& r)
 	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }
 
+void Region::ExpandAllSides(int amt)
+{
+	x -= amt;
+	w += amt * 2;
+	y -= amt;
+	h += amt * 2;
+}
+
 }

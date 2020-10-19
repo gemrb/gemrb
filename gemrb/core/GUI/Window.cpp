@@ -185,15 +185,13 @@ void Window::DidDraw()
 	
 	if (hoverView) {
 		Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
-		r.x += 5;
-		r.w -= 10;
+		r.ExpandAllSides(-5);
 		video->DrawRect(r, ColorBlue, false);
 	}
 	
 	if (trackingView) {
 		Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
-		r.x += 10;
-		r.w -= 20;
+		r.ExpandAllSides(-10);
 		video->DrawRect(r, ColorRed, false);
 	}
 }
