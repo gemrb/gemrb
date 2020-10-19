@@ -264,52 +264,6 @@ def RefreshInventoryWindow (Window):
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
  	return
 
-def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
-
-	Button.SetSprites ('IVSLOT', 0, 0, 1, 2, 3)
-	Button.SetFont ("NUMBER")
-	Button.SetText ("")
-	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
-
-	if Slot == None:
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		if Type == "inventory":
-			Button.SetTooltip (12013) # Personal Item
-		elif Type == "ground":
-			Button.SetTooltip (12011) # Ground Item
-		else:
-			Button.SetTooltip ("")
-		Button.EnableBorder (0, 0)
-		Button.EnableBorder (1, 0)
-		Button.EnableBorder (2, 0)
-
-	else:
-		item = GemRB.GetItem (Slot['ItemResRef'])
-		identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-		magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
-
-		# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
-		if item["MaxStackAmount"] > 1:
-			Button.SetText (str (Slot["Usages0"]))
-		else:
-			Button.SetText ("")
-
-		if not identified or item['ItemNameIdentified'] == -1:
-			Button.SetTooltip (item['ItemName'])
-			Button.EnableBorder (0, 1)
-		else:
-			Button.SetTooltip (item['ItemNameIdentified'])
-			Button.EnableBorder (0, 0)
-
-		if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
-			Button.EnableBorder (1, 0)
-		else:
-			Button.EnableBorder (1, 1)
-
-		Button.SetItemIcon (Slot['ItemResRef'])
-
-InventoryCommon.UpdateInventorySlot = UpdateInventorySlot
-
 def DefaultWeapon ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	GemRB.SetEquippedQuickSlot (pc, 1000, -1)

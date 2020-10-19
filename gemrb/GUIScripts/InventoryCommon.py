@@ -1069,7 +1069,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 		else:
 			Button.SetTooltip (item["ItemNameIdentified"])
 			Button.EnableBorder (0, 0)
-			if magical:
+			if magical and not GameCheck.IsPST():
 				Button.EnableBorder (1, 1)
 			else:
 				Button.EnableBorder (1, 0)
