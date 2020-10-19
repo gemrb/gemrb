@@ -151,7 +151,7 @@ protected:
 	virtual bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnKeyRelease(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnMouseOver(const MouseEvent& /*me*/) { return false; }
-	virtual bool OnMouseDrag(const MouseEvent& /*me*/) { return false; }
+	virtual bool OnMouseDrag(const MouseEvent& /*me*/) { return TracksMouseDown(); }
 	virtual bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) { return false; }
 	virtual bool OnMouseWheelScroll(const Point&) { return false; }
