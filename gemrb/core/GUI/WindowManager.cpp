@@ -363,11 +363,11 @@ bool WindowManager::DispatchEvent(const Event& event)
 			trackingWin = NULL;
 		}
 	} else if (event.isScreen && trackingWin) {
-		if (trackingWin->IsDisabled() == false) {
-			trackingWin->DispatchEvent(event);
+			if (trackingWin->IsDisabled() == false) {
+				trackingWin->DispatchEvent(event);
+			}
+			return true;
 		}
-		return true;
-	}
 
 	if (windows.empty()) return false;
 
@@ -604,6 +604,23 @@ void WindowManager::DrawWindows() const
 	if (drawFrame) {
 		DrawWindowFrame(frame_flags);
 	}
+	
+#if DEBUG_WINDOWS
+	// ensure this is drawin over the window frames
+	if (trackingWin) {
+		Region r = trackingWin->Frame();
+		r.x -= 5;
+		r.w += 10;
+		video->DrawRect(r, ColorRed, false);
+	}
+	
+	if (hoverWin) {
+		Region r = hoverWin->Frame();
+		r.x -= 10;
+		r.w += 20;
+		video->DrawRect(r, ColorWhite, false);
+	}
+#endif
 
 	if (FadeColor.a > 0) {
 		video->DrawRect(screen, FadeColor, true);

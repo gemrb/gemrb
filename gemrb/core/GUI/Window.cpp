@@ -170,6 +170,35 @@ void Window::WillDraw()
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 
+#if DEBUG_WINDOWS
+void Window::DidDraw()
+{
+	Video* video = core->GetVideoDriver();
+	video->SetScreenClip(nullptr);
+	
+	auto lock = manager.DrawHUD();
+
+	if (focusView) {
+		Region r = focusView->ConvertRegionToScreen(Region(Point(), focusView->Dimensions()));
+		video->DrawRect(r, ColorWhite, false);
+	}
+	
+	if (hoverView) {
+		Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
+		r.x += 5;
+		r.w -= 10;
+		video->DrawRect(r, ColorBlue, false);
+	}
+	
+	if (trackingView) {
+		Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
+		r.x += 10;
+		r.w -= 20;
+		video->DrawRect(r, ColorRed, false);
+	}
+}
+#endif
+
 void Window::Focus()
 {
 	manager.FocusWindow(this);

@@ -33,6 +33,8 @@
 
 #include <set>
 
+#define DEBUG_WINDOWS 1
+
 namespace GemRB {
 
 class Control;
@@ -86,6 +88,10 @@ private:
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	void SizeChanged(const Size&) override;
 	void WillDraw() override;
+	
+#if DEBUG_WINDOWS
+	void DidDraw() override;
+#endif
 
 	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
 	View* TrySetFocus(View* view);
@@ -145,7 +151,7 @@ public:
 	void SetAction(Responder handler, const ActionKey& key) override;
 	bool PerformAction(const ActionKey& action) override;
 	bool SupportsAction(const ActionKey& action) override;
-
+	
 private: // Private attributes
 	typedef std::map<KeyboardKey, EventMgr::EventCallback> KeyMap;
 
