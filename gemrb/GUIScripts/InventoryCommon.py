@@ -551,10 +551,7 @@ def UpdateSlot (pc, slot):
 
 	using_fists = slot_item = SlotType = None
 
-	if not GameCheck.IsPST():
-		SlotType = GemRB.GetSlotType (slot+1, pc)
-		slot_item = GemRB.GetSlotItem (pc, slot+1)
-	else:
+	if GameCheck.IsPST():
 		if slot >= len(SlotMap):
 			#this prevents accidental out of range errors from the avslots list
 			return GemRB.GetSlotType (slot+1)
@@ -572,6 +569,9 @@ def UpdateSlot (pc, slot):
 			if slot_item is None and SlotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
 				slot_item = GemRB.GetSlotItem (pc, 0)
 				using_fists = 1
+	else:
+		SlotType = GemRB.GetSlotType (slot+1, pc)
+		slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	ControlID = SlotType["ID"]
 
