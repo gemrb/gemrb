@@ -218,6 +218,13 @@ public:
 	Point ConvertPointFromWindow(const Point&) const;
 	Point ConvertPointToScreen(const Point&) const;
 	Point ConvertPointFromScreen(const Point&) const;
+	
+	Region ConvertRegionToSuper(Region) const;
+	Region ConvertRegionFromSuper(Region) const;
+	Region ConvertRegionToWindow(Region) const;
+	Region ConvertRegionFromWindow(Region) const;
+	Region ConvertRegionToScreen(Region) const;
+	Region ConvertRegionFromScreen(Region) const;
 
 	virtual bool CanLockFocus() const { return (flags&(IgnoreEvents|Disabled)) == 0; };
 	virtual bool CanUnlockFocus() const { return true; };

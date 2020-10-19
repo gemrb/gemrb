@@ -96,6 +96,7 @@ class GEM_EXPORT Region {
 public:
 	int x, y;
 	int w, h;
+
 	Region(void);
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
@@ -109,6 +110,7 @@ public:
 	bool IntersectsRegion(const Region& rgn) const;
 	Region Intersect(const Region& rgn) const;
 
+	void SetOrigin(const Point& p) { x = p.x; y = p.y; }
 	Point Origin() const { return Point(x, y); }
 	Point Maximum() const { return Point(x + w, y + h); }
 	Size Dimensions() const { return Size(w, h); }

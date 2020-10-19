@@ -367,6 +367,42 @@ Point View::ConvertPointFromScreen(const Point& p) const
 	return newP;
 }
 
+Region View::ConvertRegionToSuper(Region r) const
+{
+	r.SetOrigin(ConvertPointToSuper(r.Origin()));
+	return r;
+}
+
+Region View::ConvertRegionFromSuper(Region r) const
+{
+	r.SetOrigin(ConvertPointFromSuper(r.Origin()));
+	return r;
+}
+
+Region View::ConvertRegionToWindow(Region r) const
+{
+	r.SetOrigin(ConvertPointToWindow(r.Origin()));
+	return r;
+}
+
+Region View::ConvertRegionFromWindow(Region r) const
+{
+	r.SetOrigin(ConvertPointFromWindow(r.Origin()));
+	return r;
+}
+
+Region View::ConvertRegionToScreen(Region r) const
+{
+	r.SetOrigin(ConvertPointToScreen(r.Origin()));
+	return r;
+}
+
+Region View::ConvertRegionFromScreen(Region r) const
+{
+	r.SetOrigin(ConvertPointFromScreen(r.Origin()));
+	return r;
+}
+
 void View::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	if (front == NULL) return;
