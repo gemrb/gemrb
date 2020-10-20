@@ -671,12 +671,12 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		if (newline || eos) {
 			w = std::max(w, lineW);
 			if (stop) {
+				if (stop->h && (LineHeight * (lines + 1)) > stop->h ) {
+					break;
+				}
 				if (eos && stop->w && wordW < stop->w ) {
 					// its possible the last word of string is longer than any of the previous lines
 					w = std::max(w, wordW);
-				}
-				if (stop->h && (LineHeight * (lines + 1)) > stop->h ) {
-					break;
 				}
 			} else {
 				w = std::max(w, wordW);
