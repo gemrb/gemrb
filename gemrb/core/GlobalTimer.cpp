@@ -129,18 +129,21 @@ void GlobalTimer::DoStep(int count)
 
 		currentVP.SetOrigin(p);
 	}
-
-	if (shakeCounter) {
-		shakeCounter-=count;
-		if (shakeCounter<0) {
-			shakeCounter=0;
-		}
-		if (shakeCounter) {
-			p += RandomPoint(0, shakeVec.x - 1, 0, shakeVec.y - 1);
-		}
-		gc->MoveViewportTo(p, false);
-	} else if (gc->MoveViewportTo(p, false) == false) {
+	
+	if (!goal.isempty() && gc->MoveViewportTo(p, false) == false) {
 		goal = Point(-1,-1);
+	}
+
+	// do a possible shake in addition to the standard pan
+	// this is separate because it is unbounded by the map boundaries
+	// and swe assume it is possible to get a shake and pan simultaniously
+	if (shakeCounter > 0) {
+		shakeCounter = std::max(0, shakeCounter - count);
+		if (shakeCounter) {
+			Point shakeP = gc->Viewport().Origin();
+			shakeP += RandomPoint(0, shakeVec.x - 1, 0, shakeVec.y - 1);
+			gc->MoveViewportUnlockedTo(shakeP, false);
+		}
 	}
 }
 
@@ -342,9 +345,6 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
 	shakeVec = shake;
 	shakeCounter = count + 1;
-	
-	GameControl* gc = core->GetGameControl();
-	currentVP = gc->Viewport();
 }
 
 }
