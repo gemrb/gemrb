@@ -50,7 +50,7 @@ void GlobalTimer::Init()
 	fadeFromMax = 0;
 	fadeToMax = 0;
 	fadeToFactor = fadeFromFactor = 1;
-	shakeX = shakeY = 0;
+	shakeVec = Point();
 	shakeCounter = 0;
 	startTime = 0; //forcing an update
 	speed = 0;
@@ -79,7 +79,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return goal.isempty() ? false : goal != currentVP.Origin();
+	return goal.isempty() ? shakeCounter : goal != currentVP.Origin();
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -127,8 +127,7 @@ void GlobalTimer::DoStep(int count)
 			}
 		}
 
-		currentVP.x = p.x;
-		currentVP.y = p.y;
+		currentVP.SetOrigin(p);
 	}
 
 	if (shakeCounter) {
@@ -137,16 +136,10 @@ void GlobalTimer::DoStep(int count)
 			shakeCounter=0;
 		}
 		if (shakeCounter) {
-			if (shakeX) {
-				p.x += RAND(0, shakeX-1);
-			}
-			if (shakeY) {
-				p.y += RAND(0, shakeY-1);
-			}
+			p += RandomPoint(0, shakeVec.x - 1, 0, shakeVec.y - 1);
 		}
-	}
-
-	if (gc->MoveViewportTo(p, false) == false) {
+		gc->MoveViewportTo(p, false);
+	} else if (gc->MoveViewportTo(p, false) == false) {
 		goal = Point(-1,-1);
 	}
 }
@@ -345,12 +338,13 @@ void GlobalTimer::ClearAnimations()
 	first_animation = (unsigned int) animations.size();
 }
 
-void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
-	unsigned long Count)
+void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
-	this->shakeX = shakeX;
-	this->shakeY = shakeY;
-	shakeCounter = Count+1;
+	shakeVec = shake;
+	shakeCounter = count + 1;
+	
+	GameControl* gc = core->GetGameControl();
+	currentVP = gc->Viewport();
 }
 
 }

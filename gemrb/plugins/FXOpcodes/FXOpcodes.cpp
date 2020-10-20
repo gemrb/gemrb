@@ -7010,31 +7010,31 @@ int fx_explore_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_screenshake(%2d): Strength: %d", fx->Opcode, fx->Parameter1);
-	unsigned long count;
+	int count;
 
 	if (fx->TimingMode!=FX_PERMANENT) {
 		count = fx->Duration-core->GetGame()->GameTime;
 	} else {
 		count = core->Time.round_size;
 	}
-	int x,y;
 
+	Point shake;
 	switch(fx->Parameter2) {
 	case 0: default:
-		x=fx->Parameter1;
-		y=fx->Parameter1;
+		shake.x = fx->Parameter1;
+		shake.y = fx->Parameter1;
 		break;
 	case 1:
-		x=fx->Parameter1;
-		y = - signed(fx->Parameter1);
+		shake.x = fx->Parameter1;
+		shake.y = -signed(fx->Parameter1);
 		break;
 	case 2:
 		//gemrb addition
-		x=(short) (fx->Parameter1&0xffff);
-		y=(short) (fx->Parameter1>>16);
+		shake.x = fx->Parameter1 & 0xffff;
+		shake.y = fx->Parameter1 >> 16;
 		break;
 	}
-	core->timer->SetScreenShake( x, y, count);
+	core->timer->SetScreenShake(shake, count);
 	return FX_NOT_APPLIED;
 }
 

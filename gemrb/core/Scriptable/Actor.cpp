@@ -9534,7 +9534,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 
 			// check if critical hit needs a screenshake
 			if (crit_hit_scr_shake && (InParty || target->InParty) ) {
-				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
+				core->timer->SetScreenShake(Point(10, -10), AI_UPDATE_TIME);
 			}
 
 			//apply the dirty fighting spell

@@ -47,7 +47,7 @@ private:
 	int fadeFromCounter, fadeFromMax;
 	unsigned short fadeToFactor, fadeFromFactor;
 	int shakeCounter;
-	int shakeX, shakeY;
+	Point shakeVec;
 	unsigned int first_animation;
 	std::vector<AnimationRef*>  animations;
 	//move viewport to this coordinate
@@ -69,7 +69,7 @@ public:
 	void SetMoveViewPort(Point p, int spd, bool center);
 	void SetFadeToColor(unsigned long Count, unsigned short factor = 1);
 	void SetFadeFromColor(unsigned long Count, unsigned short factor = 1);
-	void SetScreenShake(int shakeX, int shakeY, unsigned long Count);
+	void SetScreenShake(const Point&, int Count);
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();

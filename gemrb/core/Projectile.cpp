@@ -558,7 +558,7 @@ bool Projectile::FailedIDS(const Actor *target) const
 void Projectile::Payload()
 {
 	if(Shake) {
-		core->timer->SetScreenShake( Shake, Shake, Shake);
+		core->timer->SetScreenShake(Point(Shake, Shake), Shake);
 		Shake = 0;
 	}
 
@@ -1460,7 +1460,7 @@ void Projectile::DrawExplosion(const Region& vp)
 	}
 
 	if(Shake) {
-		core->timer->SetScreenShake( Shake, Shake, Shake);
+		core->timer->SetScreenShake(Point(Shake, Shake), Shake);
 		Shake = 0;
 	}
 

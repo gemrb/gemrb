@@ -1998,11 +1998,10 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->int1Parameter) { //IWD2 has a different profile
-		core->timer->SetScreenShake( parameters->int1Parameter,
-			parameters->int2Parameter, parameters->int0Parameter );
+		Point p(parameters->int1Parameter, parameters->int2Parameter);
+		core->timer->SetScreenShake(p, parameters->int0Parameter);
 	} else {
-		core->timer->SetScreenShake( parameters->pointParameter.x,
-			parameters->pointParameter.y, parameters->int0Parameter );
+		core->timer->SetScreenShake(parameters->pointParameter, parameters->int0Parameter);
 	}
 	Sender->SetWait( parameters->int0Parameter );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
