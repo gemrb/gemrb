@@ -23,6 +23,8 @@
 
 #include "exports.h"
 
+#include "Region.h"
+
 #include <climits>
 #include <random>
 
@@ -40,6 +42,14 @@ class GEM_EXPORT RNG {
 		static RNG& getInstance();
 		int32_t rand(int32_t min = 0, int32_t max = INT_MAX-1);
 };
+
+inline Point RandomPoint(int xmin = 0, int xmax = INT_MAX - 1,
+						 int ymin = 0, int ymax = INT_MAX - 1)
+{
+	auto x = RAND(xmin, xmax);
+	auto y = RAND(ymin, ymax);
+	return Point(x, y);
+}
 
 }
 
