@@ -669,9 +669,9 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		}
 
 		if (newline || eos) {
-			w = std::max(w, lineW);
 			if (stop) {
 				if (stop->h && (LineHeight * (lines + 1)) > stop->h ) {
+					w = std::max(w, lineW);
 					break;
 				}
 				if (eos && stop->w && wordW < stop->w ) {
