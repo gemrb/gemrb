@@ -141,7 +141,7 @@ void GlobalTimer::DoStep(int count)
 		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {
 			Point shakeP = gc->Viewport().Origin();
-			shakeP += RandomPoint(0, shakeVec.x - 1, 0, shakeVec.y - 1);
+			shakeP += RandomPoint(-shakeVec.x, shakeVec.x, -shakeVec.y, shakeVec.y);
 			gc->MoveViewportUnlockedTo(shakeP, false);
 		}
 	}
@@ -343,7 +343,8 @@ void GlobalTimer::ClearAnimations()
 
 void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
-	shakeVec = shake;
+	shakeVec.x = std::abs(shake.x);
+	shakeVec.y = std::abs(shake.y);
 	shakeCounter = count + 1;
 }
 
