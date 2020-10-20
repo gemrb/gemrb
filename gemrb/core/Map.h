@@ -84,6 +84,8 @@ class Wall_Polygon;
 #define AT_DUNGEON        0x20
 #define AT_EXTENDED_NIGHT 0x40
 #define AT_CAN_REST_INDOORS 0x80
+//...
+#define AT_PST_DAYNIGHT 0x400
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible

@@ -2097,7 +2097,8 @@ const Color *Game::GetGlobalTint() const
 	if (map->AreaFlags&AF_DREAM) {
 		return &DreamTint;
 	}
-	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
+	bool pstDayNight = map->AreaType & AT_PST_DAYNIGHT && core->HasFeature(GF_PST_STATE_FLAGS);
+	if ((map->AreaType & (AT_OUTDOOR | AT_DAYNIGHT | AT_EXTENDED_NIGHT)) == (AT_OUTDOOR | AT_DAYNIGHT) || pstDayNight) {
 		//get daytime colour
 		ieDword daynight = core->Time.GetHour(GameTime);
 		if (daynight<2 || daynight>22) {
