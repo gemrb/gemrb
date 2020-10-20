@@ -198,6 +198,7 @@ public:
 	void ClearMouseState();
 	Point GameMousePos() const;
 
+	void MoveViewportUnlockedTo(Point, bool center);
 	bool MoveViewportTo(Point, bool center, int speed = 0);
 	Region Viewport();
 

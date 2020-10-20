@@ -1640,6 +1640,17 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	return true;
 }
 
+void GameControl::MoveViewportUnlockedTo(Point p, bool center)
+{
+	if (center) {
+		p.x -= frame.w / 2;
+		p.y -= frame.h / 2;
+	}
+	
+	core->GetAudioDrv()->UpdateListenerPos(p.x + frame.w / 2, p.y + frame.h / 2);
+	vpOrigin = p;
+}
+
 bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
 	Map* area = CurrentArea();
@@ -1687,8 +1698,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			canMove = false;
 		}
 
-		core->GetAudioDrv()->UpdateListenerPos( p.x + frame.w / 2, p.y + frame.h / 2 );
-		vpOrigin = p;
+		MoveViewportUnlockedTo(p, false); // we already handled centering
 	} else {
 		updateVPTimer = true;
 		canMove = false;
