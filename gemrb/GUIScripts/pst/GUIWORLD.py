@@ -45,12 +45,16 @@ def DialogStarted ():
 
 	MWin = GemRB.GetView("MSGWIN")
 	CloseButton= MWin.GetControl (0)
+	CloseButton.SetText ("")
 	CloseButton.SetDisabled(True)
+	CloseButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 def DialogEnded ():
 	Button = MessageWindow.MWindow.GetControl (0)
 	Button.MakeDefault(True)
 	Button.SetDisabled(False)
+	Button.SetText (28082)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open
@@ -61,7 +65,6 @@ def NextDialogState ():
 		return
 
 	Button = MessageWindow.MWindow.GetControl (0)
-	Button.SetText(28082)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.MWindow.Close())
 
 def OpenEndMessageWindow ():
