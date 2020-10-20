@@ -446,7 +446,13 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			dp.x += curGlyph.size.w;
 		}
 		linePos += i;
+
 		if (done) break;
+
+		// There are some bad strings with two spaces that appear as one in the original.
+		if (linePos < line.length() - 1 && line[linePos] == L' ' && line[linePos+1] == L' ') {
+			linePos += 1;
+		}
 	} while (linePos < line.length());
 	assert(linePos <= line.length());
 	return linePos;
@@ -661,7 +667,8 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 					// always append *everything* if there is \n
 					lineW += spaceW; // everything else appended later
 					newline = true;
-				} else if (ws && string[i] != L'\r') {
+				// Don't take 2nd space into account, we will ignore it.
+				} else if (ws && string[i] != L'\r' && i > 0 && string[i-1] != L' ') {
 					spaceW += curGlyph.size.w;
 				}
 				APPEND_TO_LINE(wordW);
