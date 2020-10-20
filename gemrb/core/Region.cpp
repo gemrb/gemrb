@@ -48,6 +48,20 @@ Point Point::operator-(const Point& p) const
 	return Point(x - p.x, y - p.y);
 }
 
+Point& Point::operator+=(const Point& rhs)
+{
+	x += rhs.x;
+	y += rhs.y;
+	return *this;
+}
+
+Point& Point::operator-=(const Point& rhs)
+{
+	x -= rhs.x;
+	y -= rhs.y;
+	return *this;
+}
+
 Point::Point(short x, short y)
 {
 	this->x = x;

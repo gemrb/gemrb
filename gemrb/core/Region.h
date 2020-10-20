@@ -51,6 +51,9 @@ public:
 
 	Point operator+(const Point& p) const;
 	Point operator-(const Point& p) const;
+	
+	Point& operator+=(const Point& rhs);
+	Point& operator-=(const Point& rhs);
 
 	/** if it is [-1.-1] */
 	bool isempty() const;
