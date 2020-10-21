@@ -2593,7 +2593,6 @@ Action* GenerateAction(const char* String)
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
 		Log(ERROR, "GameScript", "Malformed scripting action: %s", String);
-		goto done;
 	}
 	done:
 	free(actionString);
