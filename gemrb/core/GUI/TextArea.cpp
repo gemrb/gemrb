@@ -699,6 +699,7 @@ void TextArea::ClearText()
 	scrollview.AddSubviewInFrontOfView(textContainer);
 
 	UpdateScrollview();
+	scrollview.ScrollTo(Point());
 }
 
 }
