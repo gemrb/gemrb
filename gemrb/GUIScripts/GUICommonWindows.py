@@ -1722,6 +1722,7 @@ def UpdatePortraitWindow (indialog = False):
 	"""Updates all of the portraits."""
 
 	Window = PortraitWindow
+	Window.Focus(None)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")

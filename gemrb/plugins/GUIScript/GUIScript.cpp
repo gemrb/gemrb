@@ -1533,17 +1533,27 @@ static PyObject* GemRB_View_SetTooltip(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Window_Focus__doc,
+PyDoc_STRVAR(GemRB_Window_Focus__doc,
 "Focus(GWindow)\n\n"
-"Brings window to front and makes it visible if it is not already." );
+"Brings window to front and makes it visible if it is not already.\n"
+"Optionally pass a subview to also make that the focused view of the window.");
 
 static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 {
-	PARSE_ARGS( args, "O", &self );
+	PyObject* pyview = nullptr;
+	PARSE_ARGS(args, "O|O", &self, &pyview);
 
 	Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
 	win->Focus();
+	
+	if (pyview) {
+		View* view = GetView<View>(pyview);
+		if (view && view->GetWindow() != win) {
+			return RuntimeError("View must be a subview of the window!");
+		}
+		win->SetFocused(view);
+	}
 
 	Py_RETURN_NONE;
 }
