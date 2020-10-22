@@ -340,14 +340,19 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 		current = windows.end(); // invalidate the iterator, no other target is possible.
 		return modalWin;
 	}
-
-	while (current != windows.end()) {
-		Window* win = *current++;
-		if (win->IsVisible() && (!event.isScreen || HIT_TEST(event,win))) {
-			// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
-			// we still need to update which window is under the mouse and block events from reaching the windows below
-			return win;
+	
+	if (event.isScreen) {
+		while (current != windows.end()) {
+			Window* win = *current++;
+			if (win->IsVisible() && HIT_TEST(event,win)) {
+				// NOTE: we want to "target" the first window hit regardless of it being disabled or otherwise
+				// we still need to update which window is under the mouse and block events from reaching the windows below
+				return win;
+			}
 		}
+	} else {
+		current = windows.end(); // invalidate the iterator, no other target is possible.
+		return GetFocusWindow();
 	}
 
 	// we made it though with no takers...
