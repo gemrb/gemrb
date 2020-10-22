@@ -267,7 +267,7 @@ static EffectDesc effectnames[] = {
 	{ "Recitation", fx_recitation, 0, -1 }, //f9
 	{ "RecitationBad", fx_recitation_bad, 0, -1 },//fa
 	{ "LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1 },//fb
-	{ "BlindingOrb", fx_blinding_orb, 0, -1 }, //fc
+	{ "BlindingOrb", fx_blinding_orb, EFFECT_DICED, -1 }, //fc
 	{ "RemoveEffects", fx_remove_effects, 0, -1 }, //fe
 	{ "SalamanderAura", fx_salamander_aura, 0, -1 }, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, 0, -1 }, //100
