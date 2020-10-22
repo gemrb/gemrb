@@ -290,7 +290,7 @@ def SetButtonStateFromStep (buttonName, button, step):
 	button.SetState (state)
 
 	if state == IE_GUI_BUTTON_ENABLED:
-		button.MakeDefault()
+		button.Focus()
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	return
 
