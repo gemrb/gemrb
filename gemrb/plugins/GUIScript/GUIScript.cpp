@@ -7149,7 +7149,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 			k = store->RoomPrices[i];
 		}
 		else k=-1;
-		PyTuple_SetItem(p, i, DecRef(PyInt_FromLong, k));
+		PyTuple_SetItem(p, i, PyInt_FromLong(k));
 		j<<=1;
 	}
 	PyDict_SetItemString(dict, "StoreRoomPrices", p);
@@ -7165,10 +7165,10 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 				continue;
 			}
 		}
-		PyTuple_SetItem(p, j++, DecRef(PyInt_FromLong, k ));
+		PyTuple_SetItem(p, j++, PyInt_FromLong(k));
 	}
 	for (; j < STOREBUTTON_COUNT; j++) {
-		PyTuple_SetItem(p, j, DecRef(PyInt_FromLong, -1 ));
+		PyTuple_SetItem(p, j, PyInt_FromLong(-1));
 	}
 	PyDict_SetItemString(dict, "StoreButtons", p);
 	PyDict_SetItemString(dict, "StoreFlags", DecRef(PyInt_FromLong, store->Flags));
@@ -8482,7 +8482,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	PyObject* spell_list = PyTuple_New(count);
 	for (i=0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
-		PyTuple_SetItem(spell_list, i, DecRef(PyString_FromResRef, spelldata.spellname));
+		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellname));
 	}
 	return spell_list;
 }
@@ -8986,7 +8986,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 			if(flag<0 && slot) continue;
 			if(flag>0 && !slot) continue;
 		}
-		PyTuple_SetItem(tuple, Count++, DecRef(PyInt_FromLong, i));
+		PyTuple_SetItem(tuple, Count++, PyInt_FromLong(i));
 	}
 
 	return tuple;
@@ -9119,8 +9119,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
 		ITMExtHeader *eh = item->ext_headers+i;
-		PyTuple_SetItem(tooltiptuple, i, DecRef(PyInt_FromLong, eh->Tooltip));
-		PyTuple_SetItem(locationtuple, i, DecRef(PyInt_FromLong, eh->Location));
+		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
+		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyInt_FromLong, eh->Charges));
 	}
 
