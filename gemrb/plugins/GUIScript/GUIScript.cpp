@@ -7149,7 +7149,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 			k = store->RoomPrices[i];
 		}
 		else k=-1;
-		PyTuple_SetItem( p, i, PyInt_FromLong( k ) );
+		PyTuple_SetItem(p, i, DecRef(PyInt_FromLong, k));
 		j<<=1;
 	}
 	PyDict_SetItemString(dict, "StoreRoomPrices", p);
@@ -7165,10 +7165,10 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 				continue;
 			}
 		}
-		PyTuple_SetItem( p, j++, PyInt_FromLong( k ) );
+		PyTuple_SetItem(p, j++, DecRef(PyInt_FromLong, k ));
 	}
 	for (; j < STOREBUTTON_COUNT; j++) {
-		PyTuple_SetItem( p, j, PyInt_FromLong( -1 ) );
+		PyTuple_SetItem(p, j, DecRef(PyInt_FromLong, -1 ));
 	}
 	PyDict_SetItemString(dict, "StoreButtons", p);
 	PyDict_SetItemString(dict, "StoreFlags", DecRef(PyInt_FromLong, store->Flags));
@@ -8482,7 +8482,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	PyObject* spell_list = PyTuple_New(count);
 	for (i=0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
-		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellname) );
+		PyTuple_SetItem(spell_list, i, DecRef(PyString_FromResRef, spelldata.spellname));
 	}
 	return spell_list;
 }
@@ -8986,7 +8986,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 			if(flag<0 && slot) continue;
 			if(flag>0 && !slot) continue;
 		}
-		PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
+		PyTuple_SetItem(tuple, Count++, DecRef(PyInt_FromLong, i));
 	}
 
 	return tuple;
@@ -9096,22 +9096,22 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong ((signed) item->GetItemName(false)));
-	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong ((signed) item->GetItemName(true)));
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong ((signed) item->GetItemDesc(false)));
-	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong ((signed)item->GetItemDesc(true)));
-	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
-	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->DescriptionIcon));
-	PyDict_SetItemString(dict, "BrokenItem", PyString_FromResRef (item->ReplacementItem));
-	PyDict_SetItemString(dict, "MaxStackAmount", PyInt_FromLong (item->MaxStackAmount));
-	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
-	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong ((signed)item->DialogName));
-	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
-	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
-	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
-	PyDict_SetItemString(dict, "Exclusion", PyInt_FromLong(item->ItemExcl));
-	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
-	PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(0) );
+	PyDict_SetItemString(dict, "ItemName", DecRef(PyInt_FromLong, (signed)item->GetItemName(false)));
+	PyDict_SetItemString(dict, "ItemNameIdentified", DecRef(PyInt_FromLong, (signed)item->GetItemName(true)));
+	PyDict_SetItemString(dict, "ItemDesc", DecRef(PyInt_FromLong, (signed)item->GetItemDesc(false)));
+	PyDict_SetItemString(dict, "ItemDescIdentified", DecRef(PyInt_FromLong, (signed)item->GetItemDesc(true)));
+	PyDict_SetItemString(dict, "ItemIcon", DecRef(PyString_FromResRef, item->ItemIcon));
+	PyDict_SetItemString(dict, "DescIcon", DecRef(PyString_FromResRef, item->DescriptionIcon));
+	PyDict_SetItemString(dict, "BrokenItem", DecRef(PyString_FromResRef, item->ReplacementItem));
+	PyDict_SetItemString(dict, "MaxStackAmount", DecRef(PyInt_FromLong, item->MaxStackAmount));
+	PyDict_SetItemString(dict, "Dialog", DecRef(PyString_FromResRef, item->Dialog));
+	PyDict_SetItemString(dict, "DialogName", DecRef(PyInt_FromLong, (signed)item->DialogName));
+	PyDict_SetItemString(dict, "Price", DecRef(PyInt_FromLong, item->Price));
+	PyDict_SetItemString(dict, "Type", DecRef(PyInt_FromLong, item->ItemType));
+	PyDict_SetItemString(dict, "AnimationType", DecRef(PyString_FromAnimID, item->AnimationType));
+	PyDict_SetItemString(dict, "Exclusion", DecRef(PyInt_FromLong, item->ItemExcl));
+	PyDict_SetItemString(dict, "LoreToID", DecRef(PyInt_FromLong, item->LoreToID));
+	PyDict_SetItemString(dict, "MaxCharge", DecRef(PyInt_FromLong, 0));
 
 	int ehc = item->ExtHeaderCount;
 
@@ -9119,13 +9119,16 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
 		ITMExtHeader *eh = item->ext_headers+i;
-		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
-		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));
-		PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(eh->Charges) );
+		PyTuple_SetItem(tooltiptuple, i, DecRef(PyInt_FromLong, eh->Tooltip));
+		PyTuple_SetItem(locationtuple, i, DecRef(PyInt_FromLong, eh->Location));
+		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyInt_FromLong, eh->Charges));
 	}
 
 	PyDict_SetItemString(dict, "Tooltips", tooltiptuple);
 	PyDict_SetItemString(dict, "Locations", locationtuple);
+	
+	Py_DecRef(tooltiptuple);
+	Py_DecRef(locationtuple);
 
 	int function=0;
 
