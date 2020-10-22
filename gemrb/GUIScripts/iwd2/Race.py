@@ -21,6 +21,7 @@ import GemRB
 from GUIDefines import *
 import CharOverview
 import CommonTables
+import GUICommon
 
 RaceWindow = 0
 TextAreaControl = 0
