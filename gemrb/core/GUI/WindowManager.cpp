@@ -307,6 +307,20 @@ bool WindowManager::HotKey(const Event& event)
 	return false;
 }
 
+Window* WindowManager::GetFocusWindow() const
+{
+	if (IsPresentingModalWindow()) {
+		return modalWin;
+	}
+
+	for (Window* win : windows) {
+		if (win->IsVisible()) {
+			return win;
+		}
+	}
+	return nullptr;
+}
+
 #define HIT_TEST(e, w) \
 ((w)->HitTest((w)->ConvertPointFromScreen(e.mouse.Pos())))
 

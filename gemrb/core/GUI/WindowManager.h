@@ -139,6 +139,7 @@ public:
 
 	Holder<Sprite2D> GetScreenshot(Window* win);
 	Window* GetGameWindow() const { return gameWin; }
+	Window* GetFocusWindow() const;
 
 	static void SetTooltipDelay(int);
 };
