@@ -308,6 +308,15 @@ bool Control::OnTouchUp(const TouchEvent& te, unsigned short mod)
 	return false; // touch was already handled as a long press
 }
 
+bool Control::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
+{
+	if (key.keycode == GEM_RETURN) {
+		return PerformAction();
+	}
+	
+	return View::OnKeyPress(key, mod);
+}
+
 void Control::HandleTouchActionTimer(Control* ctrl)
 {
 	assert(ctrl == this);

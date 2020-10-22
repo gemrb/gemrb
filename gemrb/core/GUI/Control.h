@@ -226,6 +226,8 @@ protected:
 
 	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
 	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 
 private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
