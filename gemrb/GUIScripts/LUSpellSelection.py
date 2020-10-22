@@ -122,8 +122,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			import CharOverview
 			CharOverview.PositionCharGenWin (SpellsWindow)
 
-		if not recommend:
-			SpellsWindow.Close()
 		DoneButton = SpellsWindow.GetControl (0)
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
@@ -145,6 +143,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
 			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsPickPress)
 			SpellsPickButton.SetText(34210)
+		else:
+			SpellsWindow.Close()
 	else:
 		SpellsWindow = GemRB.LoadWindow (8)
 		if IWD2:
