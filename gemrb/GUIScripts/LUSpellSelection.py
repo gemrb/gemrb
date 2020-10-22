@@ -128,8 +128,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
-			SpellsWindow.CreateScrollBar (1000, {'x' : 325, 'y' : 42, 'w' : 16, 'h' :252})
-			HideUnhideScrollBar(1)
+			sb = SpellsWindow.CreateScrollBar (1000, {'x' : 325, 'y' : 42, 'w' : 16, 'h' :252})
+			sb.SetVisible(False)
 		SpellStart = 2
 
 		# cancel button only applicable for chargen
@@ -156,8 +156,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsTextArea = SpellsWindow.GetControl(26)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(EnhanceGUI):
-			SpellsWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252})
-			HideUnhideScrollBar(1)
+			sb = SpellsWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252})
+			sb.SetVisible(False)
 			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
 
@@ -247,7 +247,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
 				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
-					HideUnhideScrollBar(0)
+					ScrollBar.SetVisible(True)
 					extraCount = len (Spells[i]) - ButtonCount
 					if chargen:
 						count = GUICommon.ceildiv (extraCount, 6) + 1
@@ -258,7 +258,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 				else:
 					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
 					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
-					HideUnhideScrollBar(1)
+					ScrollBar.SetVisible(False)
 
 			# show our spells
 			ShowSpells ()
@@ -313,14 +313,14 @@ def SpellsDonePress ():
 					# setup the scrollbar
 					ScrollBar = SpellsWindow.GetControl (1000)
 					if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
-						HideUnhideScrollBar(0)
+						ScrollBar.SetVisible(True)
 						if chargen:
 							ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount ) , 6 ) + 1 )
 						else:
 							ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount-1 ) , 5 ) + 1 )
 					else:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
-						HideUnhideScrollBar(1)
+						ScrollBar.SetVisible(False)
 
 				# show the spells and set the done button to off
 				ShowSpells ()
@@ -714,19 +714,3 @@ def ExtraSpellButtons ():
 		return 1
 	else:
 		return 0
-
-def HideUnhideScrollBar (hide = 0):
-	ScrollBar = SpellsWindow.GetControl (1000)
-
-	if hide == 1:
-		scrollx = -1
-		scrolly = -1
-	else:
-		if chargen:
-			scrollx = 325
-			scrolly = 42
-		else:
-			scrollx = 290
-			scrolly = 142
-
-	ScrollBar.SetPos (scrollx, scrolly)
