@@ -184,6 +184,7 @@ static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		return NULL;
 	}
 	ScriptingId id = (ScriptingId)PyLong_AsUnsignedLongLong( attr );
+	Py_DecRef(attr);
 
 	attr = PyObject_GetAttrString(obj, "SCRIPT_GROUP");
 	if (!attr) {
@@ -191,6 +192,7 @@ static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		return NULL;
 	}
 	ResRef group = ResRefFromPy(attr);
+	Py_DecRef(attr);
 
 	return gs->GetScripingRef(group, id);
 }
@@ -2085,6 +2087,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 
 			Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
 			for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
+				PyErr_Clear();
 				long frame = PyInt_AsLong( PyList_GetItem(pyImgList, i));
 				if (PyErr_Occurred()) {
 					return AttributeError("Error retrieving image from list");
