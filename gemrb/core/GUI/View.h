@@ -40,7 +40,6 @@ class Window;
 
 class GEM_EXPORT View {
 public:
-	// using Held so we can have polymorphic drag operations
 	struct DragOp {
 		View* dragView = nullptr;
 		View* dropView = nullptr;
@@ -137,10 +136,6 @@ protected:
 	void ClearScriptingRefs();
 
 	void ResizeSubviews(const Size& oldsize);
-
-	// TODO: recheck use of IgnoreEvents flag. It may not be needed anymore since we can just return false for those cases.
-	// TODO: examine window event dispatch, all bubbling should be handled implicitly here
-	// TODO: recheck drag/drop code. probably should return false sometimes.
 	
 	// these events make no sense to forward
 	virtual void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) {}
