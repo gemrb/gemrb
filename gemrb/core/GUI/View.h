@@ -30,8 +30,6 @@
 #include <memory>
 #include <vector>
 
-#define DEBUG_VIEWS 0
-
 namespace GemRB {
 
 class Sprite2D;
@@ -162,9 +160,7 @@ protected:
 public:
 	#include "ViewInterfaces.h"
 
-#if DEBUG_VIEWS
-	bool debuginfo;
-#endif
+	bool debuginfo = false;
 
 	View(const Region& frame);
 	virtual ~View();

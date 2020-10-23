@@ -33,8 +33,6 @@
 
 #include <set>
 
-#define DEBUG_WINDOWS 0
-
 namespace GemRB {
 
 class Control;
@@ -88,10 +86,8 @@ private:
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	void SizeChanged(const Size&) override;
 	void WillDraw() override;
-	
-#if DEBUG_WINDOWS
+
 	void DidDraw() override;
-#endif
 
 	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
 	View* TrySetFocus(View* view);

@@ -21,15 +21,12 @@
 
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/ScrollBar.h"
+#include "GUI/TextSystem/Font.h"
 #include "Interface.h"
 #include "Sprite2D.h"
 #include "Video.h"
 
-#if DEBUG_VIEWS
-#include "GUI/TextSystem/Font.h"
-
 #include <typeinfo>
-#endif
 
 namespace GemRB {
 
@@ -51,10 +48,6 @@ View::View(const Region& frame)
 	dirty = true;
 	flags = 0;
 	autoresizeFlags = ResizeNone;
-	
-#if DEBUG_VIEWS
-	debuginfo = false;
-#endif
 }
 
 View::~View()
@@ -279,42 +272,42 @@ void View::Draw()
 	DrawSubviews();
 	DidDraw(); // notify subclasses that drawing finished
 	dirty = false;
-	
-#if DEBUG_VIEWS
-	Window* win = GetWindow();
-	if (win == NULL ) {
-		video->DrawRect(drawFrame, ColorBlue, false);
-		debuginfo = EventMgr::ModState(GEM_MOD_SHIFT);
-	} else if (NeedsDraw()) {
-		video->DrawRect(drawFrame, ColorRed, false);
-	} else {
-		video->DrawRect(drawFrame, ColorGreen, false);
-	}
-	debuginfo = debuginfo || EventMgr::ModState(GEM_MOD_CTRL);
-	
-	if (debuginfo) {
-		const ViewScriptingRef* ref = GetScriptingRef();
-		if (ref) {
-			Font* fnt = core->GetTextFont();
-			ScriptingId id = ref->Id;
-			id &= 0x00000000ffffffff; // control id is lower 32bits
-			
-			wchar_t string[256];
-			swprintf(string, sizeof(string), L"id: %lu  grp: %s  \nflgs: %lu\ntype:%s",
+
+	if (core->InDebugMode(ID_VIEWS)) {
+		Window* win = GetWindow();
+		if (win == nullptr) {
+			video->DrawRect(drawFrame, ColorBlue, false);
+			debuginfo = EventMgr::ModState(GEM_MOD_SHIFT);
+		} else if (NeedsDraw()) {
+			video->DrawRect(drawFrame, ColorRed, false);
+		} else {
+			video->DrawRect(drawFrame, ColorGreen, false);
+		}
+		debuginfo = debuginfo || EventMgr::ModState(GEM_MOD_CTRL);
+
+		if (debuginfo) {
+			const ViewScriptingRef* ref = GetScriptingRef();
+			if (ref) {
+				Font* fnt = core->GetTextFont();
+				ScriptingId id = ref->Id;
+				id &= 0x00000000ffffffff; // control id is lower 32bits
+
+				wchar_t string[256];
+				swprintf(string, sizeof(string), L"id: %lu  grp: %s  \nflgs: %lu\ntype:%s",
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
-			Region r = drawFrame;
-			r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
-			Font::StringSizeMetrics metrics = {r.Dimensions(), 0, 0, true};
-			fnt->StringSize(string, &metrics);
-			r.h = metrics.size.h;
-			r.w = metrics.size.w;
-			video->SetScreenClip(NULL);
-			video->DrawRect(r, ColorBlack, true);
-			fnt->Print(r, string, NULL, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
+				Region r = drawFrame;
+				r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
+				Font::StringSizeMetrics metrics = {r.Dimensions(), 0, 0, true};
+				fnt->StringSize(string, &metrics);
+				r.h = metrics.size.h;
+				r.w = metrics.size.w;
+				video->SetScreenClip(nullptr);
+				video->DrawRect(r, ColorBlack, true);
+				fnt->Print(r, string, nullptr, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
+			}
 		}
 	}
-#endif
-	
+
 	// restore the screen clip
 	video->SetScreenClip(&clip);
 }
@@ -722,20 +715,20 @@ void View::TextInput(const TextEvent& te)
 
 void View::MouseEnter(const MouseEvent& me, const DragOp* op)
 {
-#if DEBUG_VIEWS
-	debuginfo = true;
-#endif
-	
+	if (core->InDebugMode(ID_VIEWS)) {
+		debuginfo = true;
+	}
+
 	OnMouseEnter(me, op);
 }
 
 void View::MouseLeave(const MouseEvent& me, const DragOp* op)
 {
-#if DEBUG_VIEWS
-	debuginfo = false;
-	MarkDirty();
-#endif
-	
+	if (core->InDebugMode(ID_VIEWS)) {
+		debuginfo = false;
+		MarkDirty();
+	}
+
 	OnMouseLeave(me, op);
 }
 

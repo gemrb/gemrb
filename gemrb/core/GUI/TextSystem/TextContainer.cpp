@@ -27,8 +27,6 @@
 #include <algorithm>
 #include <climits>
 
-#define DEBUG_TEXT 0
-
 namespace GemRB {
 
 Content::Content(const Size& size)
@@ -240,19 +238,19 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 			printPalette = container->TextPalette();
 		}
 		assert(printFont && printPalette);
-#if (DEBUG_TEXT)
 		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
-		// for now only assert when DEBUG_TEXT is set
+		// for now only assert when ID_TEXT is set
 		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
-		assert(charsPrinted < text.length());
-		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
-#endif
+		if (core->InDebugMode(ID_TEXT)) {
+			assert(charsPrinted < text.length());
+			core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
+		}
 		// FIXME: layout assumes left alignment, so alignment is mostly broken
 		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
 		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette.get(), Alignment);
-#if (DEBUG_TEXT)
-		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
-#endif
+		if (core->InDebugMode(ID_TEXT)) {
+			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
+		}
 	}
 }
 
@@ -299,11 +297,9 @@ void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte
 void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 {
 	Video* video = core->GetVideoDriver();
-#if DEBUG_TEXT
-	video->DrawRect(clip, ColorGreen, true);
-#else
-	(void)clip;
-#endif
+	if (core->InDebugMode(ID_TEXT)) {
+		video->DrawRect(clip, ColorGreen, true);
+	}
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;

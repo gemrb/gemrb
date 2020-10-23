@@ -388,6 +388,18 @@ This parameter is meant for developers. It is a combination of bit values
 .IR 16
 - display trigger warnings.
 
+.IR 32
+- enable views debug mode.
+
+.IR 64
+- enable window debug mode.
+
+.IR 128
+- enable font debug mode.
+
+.IR 256
+- enable text debug mode.
+
 The default is
 .IR 0 .
 

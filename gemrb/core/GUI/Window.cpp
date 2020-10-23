@@ -170,9 +170,10 @@ void Window::WillDraw()
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 
-#if DEBUG_WINDOWS
 void Window::DidDraw()
 {
+	if (!core->InDebugMode(ID_WINDOWS)) return;
+
 	Video* video = core->GetVideoDriver();
 	video->SetScreenClip(nullptr);
 	
@@ -195,7 +196,6 @@ void Window::DidDraw()
 		video->DrawRect(r, ColorRed, false);
 	}
 }
-#endif
 
 void Window::Focus()
 {

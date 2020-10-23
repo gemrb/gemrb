@@ -624,20 +624,20 @@ void WindowManager::DrawWindows() const
 		DrawWindowFrame(frame_flags);
 	}
 	
-#if DEBUG_WINDOWS
-	// ensure this is drawin over the window frames
-	if (trackingWin) {
-		Region r = trackingWin->Frame();
-		r.ExpandAllSides(5);
-		video->DrawRect(r, ColorRed, false);
+	if (core->InDebugMode(ID_WINDOWS)) {
+		// ensure this is drawin over the window frames
+		if (trackingWin) {
+			Region r = trackingWin->Frame();
+			r.ExpandAllSides(5);
+			video->DrawRect(r, ColorRed, false);
+		}
+
+		if (hoverWin) {
+			Region r = hoverWin->Frame();
+			r.ExpandAllSides(10);
+			video->DrawRect(r, ColorWhite, false);
+		}
 	}
-	
-	if (hoverWin) {
-		Region r = hoverWin->Frame();
-		r.ExpandAllSides(10);
-		video->DrawRect(r, ColorWhite, false);
-	}
-#endif
 
 	if (FadeColor.a > 0) {
 		video->DrawRect(screen, FadeColor, true);

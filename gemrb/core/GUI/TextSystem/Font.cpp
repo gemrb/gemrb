@@ -128,18 +128,15 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
 	SpriteSheet<ieWord>::Draw(chr, dest);
 }
 
-#if DEBUG_FONT
 void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 {
 	Video* video = core->GetVideoDriver();
 	video->SetScreenClip(NULL);
-	Region drawRgn = Region(0, 0, 1024, Sheet->Height);
+	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h);
 	video->DrawRect(drawRgn, ColorBlack, true);
 	video->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
 	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn);
 }
-#endif
-
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline)
 : palette(NULL), LineHeight(lineheight), Baseline(baseline)
@@ -260,10 +257,10 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 			int vGrow = (numLines * LineHeight);
 			rgn.h += vGrow;
 
-#if DEBUG_FONT
-			Log(MESSAGE, "Font", "Resizing canvas from %dx%d to %dx%d",
-				rgn.w, rgn.h - vGrow, rgn.w, rgn.h);
-#endif
+			if (core->InDebugMode(ID_FONTS)) {
+				Log(MESSAGE, "Font", "Resizing canvas from %dx%d to %dx%d",
+					rgn.w, rgn.h - vGrow, rgn.w, rgn.h);
+			}
 
 			*canvas = (ieByte*)realloc(*canvas, rgn.w * rgn.h);
 			assert(canvas);
@@ -300,9 +297,9 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 							// we have to rewind, word by word, until X >= 0
 							linePos = line.find_last_of(L' ', prevPos);
 							if (linePos == String::npos) {
-#if DEBUG_FONT
-								Log(MESSAGE, "Font", "Horizontal alignment invalidated for '%ls' due to insufficient width %d", line.c_str(), lineSize.w);
-#endif
+								if (core->InDebugMode(ID_FONTS)) {
+									Log(MESSAGE, "Font", "Horizontal alignment invalidated for '%ls' due to insufficient width %d", line.c_str(), lineSize.w);
+								}
 								linePoint.x = 0;
 								break;
 							}
@@ -316,11 +313,11 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 						linePoint.x /= 2;
 					}
 				}
-#if DEBUG_FONT
-				core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
-				core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
+				if (core->InDebugMode(ID_FONTS)) {
+					core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
+					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
-#endif
+				}
 				linePos = RenderLine(line, lineRgn, linePoint, canvas);
 			}
 			if (linePos == 0) {
@@ -428,9 +425,9 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			Point blitPoint = dp + lineRgn.Origin() + curGlyph.pos;
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
-#if DEBUG_FONT
-				core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
-#endif
+				if (core->InDebugMode(ID_FONTS)) {
+					core->GetVideoDriver()->DrawRect(lineRgn, ColorRed, false);
+				}
 				assert(metrics.forceBreak == false || dp.x > 0);
 				done = true;
 				break;
@@ -705,10 +702,10 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 		metrics->numChars = charCount;
 		metrics->size = Size(w, (LineHeight * lines));
 		metrics->numLines = lines;
-#if DEBUG_FONT
-		assert(metrics->numChars <= string.length());
-		assert(w <= stop->w);
-#endif
+		if (core->InDebugMode(ID_FONTS)) {
+			assert(metrics->numChars <= string.length());
+			assert(w <= stop->w);
+		}
 		return metrics->size;
 	}
 

@@ -319,7 +319,11 @@ enum DebugModeBits {
 	ID_CUTSCENE = 2,
 	ID_VARIABLES = 4,
 	ID_ACTIONS = 8,
-	ID_TRIGGERS = 16
+	ID_TRIGGERS = 16,
+	ID_VIEWS = 32,
+	ID_WINDOWS = 64,
+	ID_FONTS = 128,
+	ID_TEXT = 256
 };
 
 template<int SIZE>
