@@ -1444,6 +1444,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
 	SPLExtHeader *sph = spell->GetExtHeader(0);
+	if (!sph) return; // some iwd2 clabs are only markers
 	for (int i=0; i < sph->FeatureCount; i++) {
 		Effect *origfx = sph->features+i;
 
