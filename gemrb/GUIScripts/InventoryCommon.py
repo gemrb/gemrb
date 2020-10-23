@@ -43,7 +43,7 @@ UpdateInventoryWindow = None
 
 def OnDragItemGround (btn, slot):
 	"""Drops and item to the ground."""
-	
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = slot + GemRB.GetVar ("TopIndex") - btn.ControlID
 
@@ -85,7 +85,7 @@ def OnDragItem (btn, slot):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot_item = GemRB.GetSlotItem (pc, slot)
-	
+
 	if not GemRB.IsDraggingItem ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
@@ -565,6 +565,7 @@ def UpdateGroundSlots (Window, pc, count):
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
+			Button.SetAction (None, IE_ACT_DRAG_DROP_CRT)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
@@ -636,7 +637,7 @@ def UpdateSlot (pc, slot):
 	UpdateInventorySlot (pc, Button, slot_item, "inventory", SlotType["Type"]&SLOT_INVENTORY == 0)
 
 	if slot_item:
-		Button.SetAction(OnDragItem, IE_ACT_DRAG_DROP_CRT)
+		Button.SetAction (OnDragItem, IE_ACT_DRAG_DROP_CRT)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnDragItem)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenItemInfoWindow)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, OpenItemAmountWindow)
@@ -664,6 +665,7 @@ def UpdateSlot (pc, slot):
 			Button.SetTooltip ("")
 			itemname = ""
 
+		Button.SetAction (None, IE_ACT_DRAG_DROP_CRT)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
