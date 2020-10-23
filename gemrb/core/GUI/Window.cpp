@@ -351,7 +351,7 @@ void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
 		// tracking will eat this event
 		if (me.buttonStates) {
 			trackingView->MouseDrag(me);
-			if (trackingView == target && drag == nullptr) {
+			if (drag == nullptr) {
 				drag = trackingView->DragOperation();
 			}
 		} else {

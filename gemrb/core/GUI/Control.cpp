@@ -228,6 +228,8 @@ View::UniqueDragOp Control::DragOperation()
 	if (SupportsAction(key)) {
 		// we have to use a timer so that the dragop is set before the callback is called
 		EventHandler h = [this, key] () {
+			actionTimer->Invalidate();
+			actionTimer = nullptr;
 			return actions[key](this);
 		};
 
