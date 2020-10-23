@@ -143,6 +143,7 @@ public:
 	String QueryText() const { return Text; }
 	String TooltipText() const;
 
+	View::UniqueDragOp DragOperation() override;
 	bool AcceptsDragOperation(const DragOp&) const;
 	void CompleteDragOperation(const DragOp&);
 	Holder<Sprite2D> DragCursor() const;

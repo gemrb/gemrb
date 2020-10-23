@@ -447,6 +447,13 @@ void Button::CompleteDragOperation(const DragOp& dop)
 	Control::CompleteDragOperation(dop);
 }
 
+View::UniqueDragOp Button::DragOperation()
+{
+	if (IS_PORTRAIT)
+		return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+	return Control::DragOperation();
+}
+
 Holder<Sprite2D> Button::DragCursor() const
 {
 	if (IS_PORTRAIT) {

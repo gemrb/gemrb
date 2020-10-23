@@ -208,7 +208,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
 	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
 }
-	
+
 bool Control::HitTest(const Point& p) const
 {
 	if (!(flags & (IgnoreEvents | Invisible))) {
@@ -222,19 +222,20 @@ View::UniqueDragOp Control::DragOperation()
 	if (actionTimer) {
 		return nullptr;
 	}
-	
-	ActionKey key(Action::DragDropCreate);
-	
-	if (SupportsAction(key)) {
-		// we have to use a timer so that the dragop is set before the callback is called
-		EventHandler h = [this, key] () {
-			actionTimer->Invalidate();
-			actionTimer = nullptr;
-			return actions[key](this);
-		};
 
-		actionTimer = &core->SetTimer(h, 0, 0);
+	ActionKey key(Action::DragDropCreate);
+	if (!SupportsAction(key)) {
+		return nullptr;
 	}
+
+	// we have to use a timer so that the dragop is set before the callback is called
+	EventHandler h = [this, key] () {
+		actionTimer->Invalidate();
+		actionTimer = nullptr;
+		return actions[key](this);
+	};
+
+	actionTimer = &core->SetTimer(h, 0, 0);
 	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
 }
 
@@ -246,7 +247,7 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 		// if 2 controls share the same VarName we assume they are swappable...
 		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
 	}
-	
+
 	return View::AcceptsDragOperation(dop);
 }
 
