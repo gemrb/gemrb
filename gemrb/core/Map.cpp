@@ -1257,6 +1257,9 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	}
 
 	video->SetStencilBuffer(NULL);
+	
+	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
+	game->DrawWeather(update_scripts);
 
 	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
 		DrawSearchMap(viewport);

@@ -569,9 +569,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	}
 
 	//drawmap should be here so it updates fog of war
-	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 	area->DrawMap(Viewport(), DebugFlags);
-	game->DrawWeather(update_scripts);
 
 	if (trackerID) {
 		Actor *actor = area->GetActorByGlobalID(trackerID);
@@ -652,7 +650,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
 		core->GetTextFont()->Print(screen, *DisplayText, core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE);
-		if (update_scripts) {
+		if (!(DialogueFlags & DF_FREEZE_SCRIPTS)) {
 			// just replicating original engine behaviour
 			if (DisplayTextTime == 0) {
 				SetDisplayText((String*)NULL, 0);
