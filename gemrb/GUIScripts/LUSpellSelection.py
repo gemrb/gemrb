@@ -55,12 +55,7 @@ SpellsCancelButton = 0		# << cancel chargen
 IWD2 = False
 SpellBookType = IE_SPELL_TYPE_WIZARD
 if GameCheck.IsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
 	IWD2 = True
-else:
-	WIDTH = 640
-	HEIGHT = 480
 
 def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, booktype=0):
 	"""Opens the spells selection window.
