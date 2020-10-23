@@ -192,11 +192,10 @@ bool Particles::AddNew(const Point &point)
 	return true;
 }
 
-void Particles::Draw(const Region &vp)
+void Particles::Draw(Point p)
 {
 	Video *video=core->GetVideoDriver();
 	Game *game = core->GetGame();
-	Point p = vp.Origin();
 
 	if (owner) {
 		p.x-=pos.x;

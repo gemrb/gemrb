@@ -113,7 +113,7 @@ public:
 	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
 	bool AddNew(const Point &point);
-	void Draw(const Region &viewport);
+	void Draw(Point p);
 	void AddParticles(int count);
 	/* returns true if it could be destroyed (didn't draw anything) */
 	int Update();

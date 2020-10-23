@@ -571,7 +571,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	//drawmap should be here so it updates fog of war
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 	area->DrawMap(Viewport(), DebugFlags);
-	game->DrawWeather(screen, update_scripts);
+	game->DrawWeather(update_scripts);
 
 	if (trackerID) {
 		Actor *actor = area->GetActorByGlobalID(trackerID);

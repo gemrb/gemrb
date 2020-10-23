@@ -1242,7 +1242,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					drawn = 1;
 				}
 				if (drawn) {
-					spark->Draw( viewport );
+					spark->Draw(viewport.Origin());
 					spaidx++;
 				} else {
 					delete( spark );
