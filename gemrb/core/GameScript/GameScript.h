@@ -537,7 +537,6 @@ struct IDSLink {
 #define MAX_OBJECTS			256
 #define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
-extern void SetScriptDebugMode(int arg);
 extern void ScriptDebugLog(int bit, const char* message, ...);
 extern int RandomNumValue;
 

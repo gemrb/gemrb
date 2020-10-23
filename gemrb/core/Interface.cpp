@@ -1242,7 +1242,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
-	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
+	CONFIG_INT("DebugMode", debugMode = );
 	CONFIG_INT("TooltipDelay", WindowManager::SetTooltipDelay);
 	CONFIG_INT("Width", Width = );
 	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );

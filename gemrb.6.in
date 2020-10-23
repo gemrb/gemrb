@@ -370,7 +370,7 @@ the current FPS (Frames per Second) value is drawn in the top left window corner
 .IR 0 .
 
 .TP
-.BR ScriptDebugMode =(n)
+.BR DebugMode =(n)
 This parameter is meant for developers. It is a combination of bit values
 
 .IR 1

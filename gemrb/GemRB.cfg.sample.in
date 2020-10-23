@@ -143,6 +143,9 @@ GUIEnhancements = 15
 #   full listing
 #EnableCheatKeys=1
 
+# Developer debug mode toggle (see DebugModeBits enum)
+#DebugMode=0
+
 #####################################################
 #  Paths                                            #
 #####################################################

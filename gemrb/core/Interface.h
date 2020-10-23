@@ -314,6 +314,14 @@ enum FeedbackType {
 	FT_CASTING = 64
 };
 
+enum DebugModeBits {
+	ID_REFERENCE = 1,
+	ID_CUTSCENE = 2,
+	ID_VARIABLES = 4,
+	ID_ACTIONS = 8,
+	ID_TRIGGERS = 16
+};
+
 template<int SIZE>
 using ColorPal = std::array<Color, SIZE>;
 
@@ -407,6 +415,7 @@ private:
 	KeyMap *keymap;
 	std::string Encoding;
 	Scriptable *CutSceneRunner;
+	int debugMode = 0;
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
@@ -596,6 +605,8 @@ public:
 	bool ProtectedExtension(const char *filename);
 	/*returns true if the directory path isn't good as a Cache */
 	bool StupidityDetector(const char* Pt);
+	bool InDebugMode(int mode) const { return debugMode & mode; };
+	void SetDebugMode(int mode) { debugMode = mode; };
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 

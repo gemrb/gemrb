@@ -3708,7 +3708,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
-	InDebug=parameters->int0Parameter;
+	core->SetDebugMode(parameters->int0Parameter);
 	Log(WARNING, "GameScript", "DEBUG: %s", parameters->string0Parameter);
 }
 

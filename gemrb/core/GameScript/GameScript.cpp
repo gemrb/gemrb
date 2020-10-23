@@ -1245,14 +1245,9 @@ static const IDSLink* FindIdentifier(const char* idsname)
 	return NULL;
 }
 
-void SetScriptDebugMode(int arg)
-{
-	InDebug=arg;
-}
-
 void ScriptDebugLog(int bit, const char *message, ...)
 {
-	if (!(InDebug & bit)) return;
+	if (!core->InDebugMode(bit)) return;
 
 	va_list ap;
 	va_start(ap, message);
@@ -1541,7 +1536,7 @@ void InitializeIEScript()
 				printFunction(buffer, triggersTable, triggersTable->FindValue(triggersTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", buffer);
 			} else {
-				if (InDebug&ID_TRIGGERS) {
+				if (core->InDebugMode(ID_TRIGGERS)) {
 					StringBuffer buffer;
 					buffer.appendFormatted("%s is a synonym of ",
 						triggersTable->GetStringIndex( j ) );
@@ -1608,7 +1603,7 @@ void InitializeIEScript()
 				printFunction(buffer, actionsTable, actionsTable->FindValue(actionsTable->GetValueIndex(j)));
 				Log(WARNING, "GameScript", buffer);
 			} else {
-				if (InDebug&ID_ACTIONS) {
+				if (core->InDebugMode(ID_ACTIONS)) {
 					StringBuffer buffer;
 
 					buffer.appendFormatted("%s is a synonym of ",
@@ -2185,7 +2180,7 @@ void GameScript::EvaluateAllBlocks()
 					target->ReleaseCurrentAction();
 				} else {
 					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
-					if (InDebug&ID_CUTSCENE) {
+					if (core->InDebugMode(ID_CUTSCENE)) {
 						if (action->objects[1]) {
 							action->objects[1]->dump();
 						}
@@ -2484,7 +2479,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		aC->Release();
 		return;
 	}
-	if (InDebug&ID_ACTIONS) {
+	if (core->InDebugMode(ID_ACTIONS)) {
 		StringBuffer buffer;
 		PrintAction(buffer, actionID);
 		buffer.appendFormatted("Sender: %s\n", Sender->GetScriptName());

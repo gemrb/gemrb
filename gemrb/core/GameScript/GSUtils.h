@@ -30,13 +30,6 @@
 
 namespace GemRB {
 
-//indebug flags
-#define ID_REFERENCE 1
-#define ID_CUTSCENE  2
-#define ID_VARIABLES 4
-#define ID_ACTIONS   8
-#define ID_TRIGGERS  16
-
 //whoseeswho for GetNearestEnemy:
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
@@ -63,7 +56,6 @@ extern bool HasKaputz;
 extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
-extern int InDebug;
 extern Gem_Polygon **polygons;
 
 #define MIC_INVALID -2

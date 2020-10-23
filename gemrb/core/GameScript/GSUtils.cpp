@@ -80,7 +80,6 @@ bool HasKaputz = false;
 ieResRef *ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
-int InDebug = 0;
 int RandomNumValue;
 // reaction modifiers (by reputation and charisma)
 #define MAX_REP_COLUMN 20
@@ -2109,7 +2108,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( VarName, value, NoCreate);
-		} else if (InDebug & ID_VARIABLES) {
+		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
 				Context, VarName);
 		}
@@ -2149,7 +2148,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
-		} else if (InDebug & ID_VARIABLES) {
+		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
 				VarName);
 		}
