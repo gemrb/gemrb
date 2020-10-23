@@ -49,7 +49,7 @@ EnhanceGUI = 0			# << scrollbars and extra spell slot for sorcs on LU
 BonusPoints = [0]*9		# bonus learning/memo points
 
 # chargen only
-SpellsPickButton = 0		# << button to select random spells
+SpellsPickButton = None	# << button to select random spells
 SpellsCancelButton = 0		# << cancel chargen
 
 IWD2 = False
@@ -138,8 +138,6 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsPickButton.SetState(IE_GUI_BUTTON_ENABLED)
 			SpellsPickButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpellsPickPress)
 			SpellsPickButton.SetText(34210)
-		else:
-			SpellsWindow.Close()
 	else:
 		SpellsWindow = GemRB.LoadWindow (8)
 		if IWD2:
@@ -235,10 +233,8 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			if(EnhanceGUI):
-				# setup the scrollbar
-				ScrollBar = SpellsWindow.GetControl (1000)
-
+			ScrollBar = SpellsWindow.GetControl (1000)
+			if ScrollBar:
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
 				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
@@ -304,9 +300,8 @@ def SpellsDonePress ():
 				if not (chargen and GameCheck.IsBG1()):
 					SpellBook = [0]*len(Spells[i])
 
-				if (EnhanceGUI):
-					# setup the scrollbar
-					ScrollBar = SpellsWindow.GetControl (1000)
+				ScrollBar = SpellsWindow.GetControl (1000)
+				if ScrollBar:
 					if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 						ScrollBar.SetVisible(True)
 						if chargen:
@@ -330,7 +325,7 @@ def SpellsDonePress ():
 			SpellsSelectPointsLeft[SpellLevel] = 1 + BonusPoints[SpellLevel]
 			# FIXME: setting the proper count here breaks original characters, see #680
 			#GemRB.SetMemorizableSpellsCount (pc, SpellsSelectPointsLeft[SpellLevel], SpellBookType, SpellLevel)
-			DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+			DoneButton.SetDisabled (True)
 			Memorization = 1
 			ShowKnownSpells()
 			return
@@ -345,6 +340,7 @@ def SpellsDonePress ():
 		if GameCheck.IsBG2():
 			GemRB.SetNextScript("GUICG6")
 		elif GameCheck.IsBG1():
+			SpellsWindow.Close ()
 			# HACK
 			from CharGenCommon import next
 			next()
