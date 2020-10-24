@@ -928,6 +928,9 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	act->SetName( poi, 1 ); //setting longname
 	free( poi );
 	str->ReadDword( &act->ShortStrRef );
+	if (act->ShortStrRef == (ieStrRef) -1) {
+		act->ShortStrRef = act->LongStrRef;
+	}
 	poi = core->GetCString( act->ShortStrRef );
 	act->SetName( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );

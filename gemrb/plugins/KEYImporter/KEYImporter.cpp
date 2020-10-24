@@ -60,11 +60,11 @@ static char* AddCBF(char *file)
 
 static bool PathExists(BIFEntry *entry, const char *path)
 {
-	PathJoin(entry->path, path, entry->name, NULL);
+	PathJoin(entry->path, path, entry->name, nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
-	PathJoin(entry->path, path, AddCBF(entry->name), NULL);
+	PathJoin(entry->path, path, AddCBF(entry->name), nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
@@ -94,7 +94,7 @@ static void FindBIF(BIFEntry *entry)
 	}
 	// also check the data/Data path for gog
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, core->GameDataPath, NULL);
+	PathJoin(path, core->GamePath, core->GameDataPath, nullptr);
 	entry->found = PathExists(entry, path);
 	if (entry->found) {
 		return;

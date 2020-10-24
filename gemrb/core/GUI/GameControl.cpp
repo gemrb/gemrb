@@ -1259,29 +1259,28 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	overContainer = 0;
 
 	overDoor = area->TMap->GetDoor(p);
-	// ignore infopoints beneath invisible doors
-	if (!overDoor || overDoor->Visible()) {
+	// ignore infopoints and containers beneath doors
+	if (!overDoor) {
 		overInfoPoint = area->TMap->GetInfoPoint(p, true);
-	}
+		if (overInfoPoint) {
+			nextCursor = GetCursorOverInfoPoint(overInfoPoint);
+		}
+		// recheck in case the position was different, resulting in a new isVisible check
+		if (nextCursor == IE_CURSOR_INVALID) {
+			Owner->Cursor = IE_CURSOR_BLOCKED;
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
+		}
 
-	if (overInfoPoint) {
-		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
-	}
-	// recheck in case the position was different, resulting in a new isVisible check
-	if (nextCursor == IE_CURSOR_INVALID) {
-		Owner->Cursor = IE_CURSOR_BLOCKED;
-		lastCursor = IE_CURSOR_BLOCKED;
-		return;
-	}
+		// don't allow summons to try travelling (alone), since it causes tons of loading
+		if (nextCursor == IE_CURSOR_TRAVEL && game->OnlyNPCsSelected()) {
+			Owner->Cursor = IE_CURSOR_BLOCKED;
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
+		}
 
-	// don't allow summons to try travelling (alone), since it causes tons of loading
-	if (nextCursor == IE_CURSOR_TRAVEL && game->OnlyNPCsSelected()) {
-		Owner->Cursor = IE_CURSOR_BLOCKED;
-		lastCursor = IE_CURSOR_BLOCKED;
-		return;
+		overContainer = area->TMap->GetContainer(p);
 	}
-
-	overContainer = area->TMap->GetContainer(p);
 
 	if (!DrawSelectionRect) {
 		if (overDoor) {
@@ -1359,11 +1358,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		} else if (target_mode == TARGET_MODE_ATTACK) {
 			nextCursor = IE_CURSOR_ATTACK;
-			if (overDoor) {
-				if (!overDoor->Visible()) {
-					nextCursor |= IE_CURSOR_GRAY;
-				}
-			} else if (!lastActor && !overContainer) {
+			if (!overDoor && !lastActor && !overContainer) {
 				nextCursor |= IE_CURSOR_GRAY;
 			}
 		} else if (target_mode == TARGET_MODE_CAST) {

@@ -15993,7 +15993,7 @@ bool GUIScript::Init(void)
 	char path2[_MAX_PATH];
 	char quoted[_MAX_PATH];
 
-	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
+	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
 
 	// Add generic script path early, so GameType detection works
 	sprintf( string, "sys.path.append(\"%s\")", QuotePath( quoted, path ));
@@ -16018,9 +16018,9 @@ bool GUIScript::Init(void)
 
 	// use the iwd guiscripts for how, but leave its override
 	if (stricmp( core->GameType, "how" ) == 0) {
-		PathJoin(path2, path, "iwd", NULL);
+		PathJoin(path2, path, "iwd", nullptr);
 	} else {
-		PathJoin(path2, path, core->GameType, NULL);
+		PathJoin(path2, path, core->GameType, nullptr);
 	}
 
 	// GameType-specific import path must have a higher priority than
@@ -16061,7 +16061,7 @@ bool GUIScript::Init(void)
 	// TODO: Put this file somewhere user editable
 	// TODO: Search multiple places for this file
 	char include[_MAX_PATH];
-	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", NULL);
+	PathJoin(include, core->GUIScriptsPath, "GUIScripts/include.py", nullptr);
 	ExecFile(include);
 
 	PyObject *pClassesMod = PyImport_AddModule( "GUIClasses" );
@@ -16077,7 +16077,7 @@ bool GUIScript::Autodetect(void)
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
 	char path[_MAX_PATH];
-	PathJoin( path, core->GUIScriptsPath, "GUIScripts", NULL );
+	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
 	DirectoryIterator iter( path );
 	if (!iter)
 		return false;
@@ -16093,7 +16093,7 @@ bool GUIScript::Autodetect(void)
 		if (iter.IsDirectory() && dirent[0] != '.') {
 			// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 			// Method1:
-			PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", NULL);
+			PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
 			ExecFile(module);
 			// Method2:
 			//strcpy( module, dirent );

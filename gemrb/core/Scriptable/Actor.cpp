@@ -546,7 +546,6 @@ Actor::Actor()
 	RollSaves();
 	WMLevelMod = 0;
 	TicksLastRested = LastFatigueCheck = 0;
-	speed = 0;
 	remainingTalkSoundTime = lastTalkTimeCheckAt = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
@@ -8259,7 +8258,7 @@ void Actor::NewPath()
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	ResetPathTries();
-	if (InternalFlags & IF_REALLYDIED || speed == 0) {
+	if (InternalFlags & IF_REALLYDIED || walkScale == 0) {
 		return;
 	}
 	SetRunFlags(flags);
@@ -10534,7 +10533,9 @@ ieDword Actor::GetWarriorLevel() const
 
 bool Actor::BlocksSearchMap() const
 {
-	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED && !(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED));
+	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED &&
+		!(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED)) &&
+		!Modified[IE_AVATARREMOVAL];
 }
 
 //return true if the actor doesn't want to use an entrance

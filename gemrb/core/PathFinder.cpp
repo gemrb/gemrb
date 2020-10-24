@@ -63,13 +63,13 @@ constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.70
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
 {
-	if (!caller || !caller->speed) return nullptr;
+	if (!caller || !caller->GetSpeed()) return nullptr;
 	Point p = s;
 	double dx = s.x - d.x;
 	double dy = s.y - d.y;
 	char xSign = 1, ySign = 1;
 	size_t tries = 0;
-	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
+	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		if (!(GetBlockedInRadius(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy), size) & PATH_MAP_PASSABLE)) {
 			tries++;
@@ -90,13 +90,13 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 
 PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *caller) const
 {
-	if (!caller || !caller->speed) return nullptr;
+	if (!caller || !caller->GetSpeed()) return nullptr;
 	NavmapPoint p = s;
 	size_t i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
 	double dx = 3 * dxRand[i];
 	double dy = 3 * dyRand[i];
 
-	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
+	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	size_t tries = 0;
 	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
 		if (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & PATH_MAP_PASSABLE)) {
@@ -109,7 +109,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 			i = RAND(0, RAND_DEGREES_OF_FREEDOM - 1);
 			dx = 3 * dxRand[i];
 			dy = 3 * dyRand[i];
-			NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->speed);
+			NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 			p = s;
 		} else {
 			p.x += dx;

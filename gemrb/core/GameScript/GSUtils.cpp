@@ -1569,6 +1569,13 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	}
 }
 
+// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen, 30gobpon, 11oswald)
+// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
+inline bool paramDelimiter(const char *src)
+{
+	return *src == '"' || (*src == '#' && (*(src-1) == '(' || *(src-1) == ',' || *(src+1) == ')'));
+}
+
 /* this function was lifted from GenerateAction, to make it clearer */
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID)
 {
@@ -1720,8 +1727,8 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				}
 				//breaking on ',' in case of a monkey attack
 				//fixes bg1:melicamp.dlg, bg1:sharte.dlg, bg2:udvith.dlg
-				//if strings ever need a , inside, this is a FIXME
-				while (*src != '"' && *src !=',') {
+				// NOTE: if strings ever need a , inside, this is will need to change
+				while (*src != ',' && !paramDelimiter(src)) {
 					if (*src == 0) {
 						delete newAction;
 						return NULL;
@@ -1733,7 +1740,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					}
 					src++;
 				}
-				if (*src == '"') {
+				if (*src == '"' || *src == '#') {
 					src++;
 				}
 				*dst = 0;
@@ -2044,7 +2051,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				}
 				// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen)
 				// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
-				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ',' && *(src+1) != ')'))) {
+				while (!paramDelimiter(src)) {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;

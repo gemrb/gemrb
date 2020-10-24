@@ -370,7 +370,7 @@ bool PathJoinExt (char* target, const char* dir, const char* base, const char* e
 	}
 	strcat(file, ".");
 	strcat(file, ext);
-	return PathJoin(target, dir, file, NULL);
+	return PathJoin(target, dir, file, nullptr);
 }
 
 /** Fixes path delimiter character (slash).
@@ -448,7 +448,7 @@ void ResolveFilePath(char* FilePath)
 		Log(ERROR, "VFS", "Too long path to resolve: %s!", FilePath);
 		return;
 	}
-	PathJoin(FilePath, TempFilePath[0]==PathDelimiter?SPathDelimiter:"", TempFilePath, NULL);
+	PathJoin(FilePath, TempFilePath[0] == PathDelimiter ? SPathDelimiter : "", TempFilePath, nullptr);
 }
 
 void ResolveFilePath(std::string& FilePath)
@@ -466,7 +466,7 @@ void ResolveFilePath(std::string& FilePath)
 	if (core && !core->CaseSensitive) {
 		return;
 	}
-	PathJoin(TempFilePath, FilePath[0]==PathDelimiter?SPathDelimiter:"", FilePath.c_str(), NULL);
+	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);
 	FilePath = TempFilePath;
 }
 
@@ -500,7 +500,7 @@ bool MakeDirectories(const char* path)
 			assert(strnlen(Token, _MAX_PATH/2) < _MAX_PATH/2);
 			strcat(TempFilePath, Token);
 		} else
-			PathJoin(TempFilePath, TempFilePath, Token, NULL);
+			PathJoin(TempFilePath, TempFilePath, Token, nullptr);
 
 		if(!MakeDirectory(TempFilePath))
 			return false;

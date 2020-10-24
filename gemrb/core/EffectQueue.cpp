@@ -513,13 +513,12 @@ bool EffectQueue::RemoveEffect(const Effect* fx)
 //... but some require reinitialisation
 void EffectQueue::ApplyAllEffects(Actor* target) const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if (Opcodes[(*f)->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
+	for (auto fx : effects) {
+		if (Opcodes[fx->Opcode].Flags & EFFECT_REINIT_ON_LOAD) {
 			// pretend to be the first application (FirstApply==1)
-			ApplyEffect(target, *f, 1);
+			ApplyEffect(target, fx, 1);
 		} else {
-			ApplyEffect(target, *f, 0);
+			ApplyEffect(target, fx, 0);
 		}
 	}
 }
@@ -1445,6 +1444,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
 	SPLExtHeader *sph = spell->GetExtHeader(0);
+	if (!sph) return; // some iwd2 clabs are only markers
 	for (int i=0; i < sph->FeatureCount; i++) {
 		Effect *origfx = sph->features+i;
 

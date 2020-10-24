@@ -739,30 +739,32 @@ Map* Game::GetMap(unsigned int index) const
 Map *Game::GetMap(const char *areaname, bool change)
 {
 	int index = LoadMap(areaname, change);
-	if (index >= 0) {
-		if (change) {
-			MapIndex = index;
-			area = GetMap(index);
-			memcpy (CurrentArea, areaname, 8);
-			//change the tileset if needed
-			area->ChangeMap(IsDay());
-			area->SetupAmbients();
-			ChangeSong(false, true);
-			Infravision();
+	if (index < 0) {
+		return nullptr;
+	}
 
-			//call area customization script for PST
-			//moved here because the current area is set here
-			ScriptEngine *sE = core->GetGUIScriptEngine();
-			if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
-				//area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
-				sE->RunFunction("Maze", "CustomizeArea");
-			}
-
-			return area;
-		}
+	if (!change) {
 		return GetMap(index);
 	}
-	return NULL;
+
+	MapIndex = index;
+	area = GetMap(index);
+	memcpy(CurrentArea, areaname, 8);
+	// change the tileset if needed
+	area->ChangeMap(IsDay());
+	area->SetupAmbients();
+	ChangeSong(false, true);
+	Infravision();
+
+	// call area customization script for PST
+	// moved here because the current area is set here
+	ScriptEngine *sE = core->GetGUIScriptEngine();
+	if (core->HasFeature(GF_AREA_OVERRIDE) && sE) {
+		// area ResRef is accessible by GemRB.GetGameString (STR_AREANAME)
+		sE->RunFunction("Maze", "CustomizeArea");
+	}
+
+	return area;
 }
 
 bool Game::MasterArea(const char *area)
@@ -2095,7 +2097,8 @@ const Color *Game::GetGlobalTint() const
 	if (map->AreaFlags&AF_DREAM) {
 		return &DreamTint;
 	}
-	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
+	bool pstDayNight = map->AreaType & AT_PST_DAYNIGHT && core->HasFeature(GF_PST_STATE_FLAGS);
+	if ((map->AreaType & (AT_OUTDOOR | AT_DAYNIGHT | AT_EXTENDED_NIGHT)) == (AT_OUTDOOR | AT_DAYNIGHT) || pstDayNight) {
 		//get daytime colour
 		ieDword daynight = core->Time.GetHour(GameTime);
 		if (daynight<2 || daynight>22) {

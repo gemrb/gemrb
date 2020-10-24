@@ -26,7 +26,6 @@ namespace GemRB {
 
 AmbientMgr::AmbientMgr()
 {
-	active = false;
 }
 
 AmbientMgr::~AmbientMgr()
@@ -36,9 +35,9 @@ AmbientMgr::~AmbientMgr()
  
 void AmbientMgr::activate(const std::string &name)
 {
-	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			(*it) -> setActive();
+	for (auto ambient : ambients) {
+		if (ambient->getName() == name) {
+			ambient->setActive();
 			break;
 		}
 	}
@@ -46,9 +45,9 @@ void AmbientMgr::activate(const std::string &name)
 
 void AmbientMgr::deactivate(const std::string &name)
 {
-	for (std::vector<Ambient *>::iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			(*it) -> setInactive();
+	for (auto ambient : ambients) {
+		if (ambient->getName() == name) {
+			ambient->setInactive();
 			break;
 		}
 	}
@@ -56,9 +55,9 @@ void AmbientMgr::deactivate(const std::string &name)
 
 bool AmbientMgr::isActive(const std::string &name) const
 {
-	for (std::vector<Ambient *>::const_iterator it = ambients.begin(); it != ambients.end(); ++it) {
-		if ((*it) -> getName() == name) {
-			return (*it) -> getFlags() & IE_AMBI_ENABLED;
+	for (auto ambient : ambients) {
+		if (ambient->getName() == name) {
+			return ambient->getFlags() & IE_AMBI_ENABLED;
 		}
 	}
 	return false;

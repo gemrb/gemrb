@@ -267,7 +267,7 @@ static EffectDesc effectnames[] = {
 	{ "Recitation", fx_recitation, 0, -1 }, //f9
 	{ "RecitationBad", fx_recitation_bad, 0, -1 },//fa
 	{ "LichTouch", fx_lich_touch, EFFECT_NO_LEVEL_CHECK, -1 },//fb
-	{ "BlindingOrb", fx_blinding_orb, 0, -1 }, //fc
+	{ "BlindingOrb", fx_blinding_orb, EFFECT_DICED, -1 }, //fc
 	{ "RemoveEffects", fx_remove_effects, 0, -1 }, //fe
 	{ "SalamanderAura", fx_salamander_aura, 0, -1 }, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, 0, -1 }, //100
@@ -3343,7 +3343,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	//saving throw penalty (bigger is better in iwd2)
 	HandleSaveBoni(target, -penalty, fx->TimingMode);
 
-	target->ToHit.HandleFxBonus(-penalty, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	target->ToHit.HandleFxBonus(-penalty, false);
 
 	//decrease all skills by 1
 	for(int i=0;i<32;i++) {
@@ -3869,7 +3869,7 @@ int fx_rapid_shot (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->PCStats->ExtraSettings[ES_RAPIDSHOT]) {
 		if (target->SetSpellState( SS_RAPIDSHOT)) return FX_NOT_APPLIED; //don't apply it twice
 
-		target->ToHit.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+		target->ToHit.HandleFxBonus(-2, false);
 		if (fx->FirstApply) {
 			//disable mutually exclusive feats
 			//none i know of

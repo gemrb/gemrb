@@ -61,7 +61,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 	}
 
 	char tINIkeymap[_MAX_PATH];
-	PathJoin( tINIkeymap, core->GamePath, inifile, NULL );
+	PathJoin(tINIkeymap, core->GamePath, inifile, nullptr);
 	FileStream* config = FileStream::OpenFile( tINIkeymap );
 
 	if (config == NULL) {

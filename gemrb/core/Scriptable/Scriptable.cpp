@@ -714,29 +714,24 @@ bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
 	return false;
 }
 
-bool Scriptable::MatchTriggerWithObject(unsigned short id, const Object *obj, ieDword param) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
-		TriggerEntry &trigger = *m;
-		if (trigger.triggerID != id)
-			continue;
-		if (param && trigger.param2 != param)
-			continue;
-		if (!MatchActor(this, trigger.param1, obj))
-			continue;
+bool Scriptable::MatchTriggerWithObject(unsigned short id, const Object *obj, ieDword param) const
+{
+	for (auto& trigger : triggers) {
+		if (trigger.triggerID != id) continue;
+		if (param && trigger.param2 != param) continue;
+		if (!MatchActor(this, trigger.param1, obj)) continue;
 		return true;
 	}
 
 	return false;
 }
 
-const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned int notflags) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
-		TriggerEntry &trigger = *m;
-		if (trigger.triggerID != id)
-			continue;
-		if (notflags & trigger.flags)
-			continue;
-		return &*m;
+const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned int notflags) const
+{
+	for (auto& trigger : triggers) {
+		if (trigger.triggerID != id) continue;
+		if (notflags & trigger.flags) continue;
+		return &trigger;
 	}
 
 	return NULL;
