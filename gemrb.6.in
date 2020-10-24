@@ -425,7 +425,7 @@ if you want to ignore the settings from the original configuration files - baldu
 
 .TP
 .BR GamepadPointerSpeed =INT
-Pointer movement speed with gemepads. The default is 10.
+Pointer movement speed with gamepads. The default is 10.
 
 .TP
 .BR VitaKeepAspectRatio =(0|1)
