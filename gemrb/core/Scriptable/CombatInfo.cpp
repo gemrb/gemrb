@@ -316,9 +316,7 @@ int ToHitStats::GetTotalForAttackNum(unsigned int number) const
 	}
 	number--;
 	// compute the cascaded values
-	// only base tohit affects the number of attacks (Actor::GetBaseAPRandAB),
-	// so make sure the other boni don't grant new ones if called with a too high number
-	assert((base-(signed)number*babDecrement) >= 0);
+	// at low levels with poor stats, even the total can be negatice
 	return total-number*babDecrement;
 }
 
