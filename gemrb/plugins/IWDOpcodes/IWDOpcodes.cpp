@@ -3343,7 +3343,7 @@ int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 	//saving throw penalty (bigger is better in iwd2)
 	HandleSaveBoni(target, -penalty, fx->TimingMode);
 
-	target->ToHit.HandleFxBonus(-penalty, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
+	target->ToHit.HandleFxBonus(-penalty, false);
 
 	//decrease all skills by 1
 	for(int i=0;i<32;i++) {
