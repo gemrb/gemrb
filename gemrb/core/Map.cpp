@@ -2888,7 +2888,7 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 	// actor. This matches the behaviour of the original BG2.
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
-	if (size < 2) size = 2;
+	if (size < 1) size = 1;
 	unsigned int ppx = Pos.x/16;
 	unsigned int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
