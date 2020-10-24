@@ -79,7 +79,7 @@ bool SDLAudio::Init(void)
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
 	SDL_mutexP(driver->OurMutex);
-	
+
 	do {
 
 		// TODO: conversion? mutexes? sanity checks? :)
