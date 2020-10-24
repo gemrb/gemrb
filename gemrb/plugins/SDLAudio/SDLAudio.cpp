@@ -56,9 +56,6 @@ SDLAudio::~SDLAudio(void)
 	Mix_ChannelFinished(NULL);
 }
 
-// no user data for Mix_ChannelFinished :(
-SDLAudio *g_sdlaudio = NULL;
-
 bool SDLAudio::Init(void)
 {
 	// TODO: we assume SDLVideo already got loaded
@@ -75,7 +72,6 @@ bool SDLAudio::Init(void)
 	}
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
-	g_sdlaudio = this;
 	Mix_ReserveChannels(1); // for speech
 	return true;
 }
