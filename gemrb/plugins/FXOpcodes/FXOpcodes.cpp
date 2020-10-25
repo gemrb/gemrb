@@ -838,7 +838,7 @@ static EffectRef fx_pst_jumble_curse_ref = { "JumbleCurse", -1 };  //PST specifi
 static EffectRef fx_bane_ref = { "Bane", -1 }; //iwd2
 static EffectRef fx_protection_from_animation_ref = { "Protection:Animation", -1 }; //0x128
 static EffectRef fx_change_bardsong_ref = { "ChangeBardSong", -1 };
-static EffectRef fx_eye_stone_ref = { "EyeOfFortitude", -1 };
+static EffectRef fx_eye_stone_ref = { "EyeOfStone", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
@@ -1155,6 +1155,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1404,6 +1405,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SPIRIT, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1819,6 +1821,7 @@ int fx_set_panic_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1844,6 +1847,7 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_VENOM) {
 		target->fxqueue.RemoveAllEffects(fx_eye_venom_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_VENOM]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_VENOM, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -2092,6 +2096,7 @@ int fx_set_silenced_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_FORT, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -2273,6 +2278,7 @@ int fx_set_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_FORT, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -2869,6 +2875,7 @@ int fx_set_blind_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_FORT, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -3063,6 +3070,7 @@ int fx_set_deaf_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_FORT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_fortitude_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_FORT, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -4114,7 +4122,8 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_STONE) {
 		target->fxqueue.RemoveAllEffects(fx_eye_stone_ref);
-		target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
+		target->spellbook.RemoveSpell(SevenEyes[EYE_STONE]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_STONE, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -5649,6 +5658,7 @@ int fx_power_word_kill (Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SPIRIT, false);
 		return FX_NOT_APPLIED;
 	}
 

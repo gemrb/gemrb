@@ -1662,7 +1662,7 @@ int fx_eye_of_the_mind (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_the_mind(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYEMIND)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_MIND);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_MIND], LS_MEMO);
@@ -1674,7 +1674,7 @@ int fx_eye_of_the_sword (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_the_sword(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYESWORD)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_SWORD);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SWORD, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_SWORD], LS_MEMO);
@@ -1687,7 +1687,7 @@ int fx_eye_of_the_mage (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_the_mage(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYEMAGE)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_MAGE);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MAGE, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_MAGE], LS_MEMO);
@@ -1700,7 +1700,7 @@ int fx_eye_of_venom (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_venom(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYEVENOM)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_VENOM);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_VENOM, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_VENOM], LS_MEMO);
@@ -1713,7 +1713,7 @@ int fx_eye_of_the_spirit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_the_spirit(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYESPIRIT)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_SPIRIT);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SPIRIT, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_SPIRIT], LS_MEMO);
@@ -1726,7 +1726,7 @@ int fx_eye_of_fortitude (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_fortitude(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYEFORTITUDE)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_FORT);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_FORT, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_FORT], LS_MEMO);
@@ -1739,7 +1739,7 @@ int fx_eye_of_stone (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_eye_of_stone(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_EYESTONE)) return FX_APPLIED;
-	EXTSTATE_SET(EXTSTATE_EYE_STONE);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_STONE, true);
 
 	if (fx->FirstApply) {
 		target->LearnSpell(SevenEyes[EYE_STONE], LS_MEMO);

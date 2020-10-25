@@ -1295,12 +1295,9 @@ static void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
-		ieDword mask = EXTSTATE_EYE_MIND;
 		int eyeCount = 7;
-		for (int i=0;i<7;i++)
-		{
-			if (State&mask) eyeCount--;
-			mask<<=1;
+		for (ieDword mask = EXTSTATE_EYE_MIND; mask <= EXTSTATE_EYE_STONE; mask <<= 1) {
+			if (State & mask) --eyeCount;
 		}
 		ScriptedAnimation *sca = actor->FindOverlay(OV_SEVENEYES);
 		if (sca) {
@@ -4691,6 +4688,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		if (damagetype & (DAMAGE_FIRE|DAMAGE_COLD|DAMAGE_ACID|DAMAGE_ELECTRICITY)) {
 			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
 			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
+			SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MAGE, false);
 			damage = 0;
 		}
 	}
@@ -7627,6 +7625,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SWORD) {
 		target->fxqueue.RemoveAllEffects(fx_eye_sword_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SWORD, false);
 		success = false;
 		roll = 2; // avoid chance critical misses
 	}
