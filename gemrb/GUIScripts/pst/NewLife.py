@@ -63,17 +63,11 @@ def OpenLUStatsWindow(Type = 1):
 
 	LevelUp = Type
 	if LevelUp:
-		import GUICommonWindows
 		import GUIREC
-		GUICommonWindows.OptionsWindow.SetVisible (False)
-		GUICommonWindows.PortraitWindow.SetVisible (False)
-		GUICommonWindows.ActionsWindow.SetVisible (False)
-		GUIREC.RecordsWindow.SetVisible (False)
 		# only TNO gets the main stat boosts
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 		if Specific != 2:
-			GUIREC.OpenLevelUpWindow ()
 			return
 	else:
 		GemRB.LoadGame(None)  #loading the base game
@@ -174,6 +168,8 @@ def OpenLUStatsWindow(Type = 1):
 	CancelButton = NewLifeWindow.GetControl(1)
 	CancelButton.SetText(4196)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	if LevelUp:
+		CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	UpdateLabels()
 
@@ -250,9 +246,8 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_CHR, Stats[5])
 
 	if LevelUp:
-		# hp is handled in GUIREC
-		import GUIREC
-		GUIREC.OpenLevelUpWindow ()
+		# Return to the RecordsWindow
+		NewLifeWindow.Close()
 		return
 
 	#don't add con bonus, it will be calculated by the game
