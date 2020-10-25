@@ -102,7 +102,7 @@ def InitRecordsWindow (Window):
 	# Level Up
 	Button = Window.GetControl (9)
 	Button.SetText (4246)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NewLife.OpenLUStatsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
 
 	statevents = (OnRecordsHelpStrength, OnRecordsHelpIntelligence, OnRecordsHelpWisdom, OnRecordsHelpDexterity, OnRecordsHelpConstitution, OnRecordsHelpCharisma)
 	# stat buttons
@@ -832,7 +832,9 @@ def AcceptLevelUp():
 			GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL2)+NumOfSecoLevUp)
 	
 	LUSkillsSelection.SkillsSave (pc)
-	UpdateRecordsWindow ()
+
+	UpdateRecordsWindow(RecordsWindow)
+	NewLife.OpenLUStatsWindow()
 
 def RedrawSkills():
 	DoneButton = LevelUpWindow.GetControl(0)
