@@ -107,7 +107,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillLeftPress = SkillDecreasePress
 		SkillRightPress = SkillIncreasePress
 		#There is actually no hint text to describe the skills, so this is a dummy
-		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG", IE_FONT_ALIGN_LEFT)
+		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG")
 		SkillsTextArea =  SkillsWindow.GetControl (45)
 	elif type == LUSKILLS_TYPE_LEVELUP:
 		SkillsOffsetPress = -1
