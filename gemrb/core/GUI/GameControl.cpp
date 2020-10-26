@@ -2218,7 +2218,12 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 
 	//add a check if you don't want some random monster handle doors and such
-	if (overDoor) {
+	if (targetActor) {
+		PerformActionOn(targetActor);
+	} else if (target_mode == TARGET_MODE_CAST) {
+		//the player is using an item or spell on the ground
+		TryToCast(selectedActor, p);
+	} else if (overDoor) {
 		CommandSelectedMovement(p);
 		HandleDoor(overDoor, selectedActor);
 	} else if (overContainer) {
@@ -2245,11 +2250,6 @@ void GameControl::PerformSelectedAction(const Point& p)
 		if (HandleActiveRegion(overInfoPoint, selectedActor, p)) {
 			core->SetEventFlag(EF_RESETTARGET);
 		}
-	} else if (targetActor) {
-		PerformActionOn(targetActor);
-	} else if (target_mode == TARGET_MODE_CAST) {
-		//the player is using an item or spell on the ground
-		TryToCast(selectedActor, p);
 	}
 }
 
