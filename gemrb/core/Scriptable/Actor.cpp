@@ -8184,14 +8184,33 @@ void Actor::AddExperience(int exp, int combat)
 		bonus += adjustmentPercent;
 	}
 	bonus += GetFavoredPenalties();
-	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
+
+	int xpStat = IE_XP;
+
+	// decide which particular XP stat to add to (only for TNO's switchable classes)
+	Game* game = core->GetGame();
+	if (pstflags && this == game->GetPC(0, false)) { // rule only applies to the protagonist
+		switch (BaseStats[IE_CLASS]) {
+			case 4:
+				xpStat = IE_XP_THIEF;
+				break;
+			case 1:
+				xpStat = IE_XP_MAGE;
+				break;
+			case 2:
+			default: //just in case the character was modified
+				break;
+		}
+	}
+
+	exp = ((exp * (100 + bonus)) / 100) + BaseStats[xpStat];
 	if (xpcap != NULL) {
 		int classid = GetActiveClass() - 1;
 		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
 			exp = xpcap[classid];
 		}
 	}
-	SetBase(IE_XP, exp);
+	SetBase(xpStat, exp);
 }
 
 static bool is_zero(const int& value) {
