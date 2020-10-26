@@ -1545,7 +1545,6 @@ static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 
 	Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
-	win->Focus();
 	
 	if (pyview) {
 		View* view = GetView<View>(pyview);
@@ -1553,6 +1552,8 @@ static PyObject* GemRB_Window_Focus(PyObject* self, PyObject* args)
 			return RuntimeError("View must be a subview of the window!");
 		}
 		win->SetFocused(view);
+	} else {
+		win->Focus();
 	}
 
 	Py_RETURN_NONE;
