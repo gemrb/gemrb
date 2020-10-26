@@ -1365,6 +1365,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1519,6 +1520,7 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1620,6 +1622,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_MIND) {
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
 		return FX_NOT_APPLIED;
 	}
 
@@ -1759,6 +1762,7 @@ int fx_remove_seven_eyes (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
 	target->spellbook.RemoveSpell(SevenEyes[EYE_FORT]);
 	target->spellbook.RemoveSpell(SevenEyes[EYE_STONE]);
+	target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_SEVEN_EYES, false);
 	return FX_NOT_APPLIED;
 }
 
@@ -1785,6 +1789,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SPIRIT) {
 		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SPIRIT, false);
 		return FX_NOT_APPLIED;
 	}
 
