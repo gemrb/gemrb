@@ -121,7 +121,7 @@ public:
 	
 	void FocusLost();
 	void FocusGained();
-	bool HasFocus() const { return hasFocus; }
+	bool HasFocus() const;
 
 	/** Sets 'view' as Focused */
 	void SetFocused(View* view);
@@ -166,7 +166,6 @@ private: // Private attributes
 	WindowManager& manager;
 	
 	WindowEventHandler eventHandlers[3];
-	bool hasFocus = false;
 };
 
 }

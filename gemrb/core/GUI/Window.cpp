@@ -65,7 +65,6 @@ void Window::Close()
 
 void Window::FocusLost()
 {
-	hasFocus = false;
 	if (eventHandlers[LostFocus]) {
 		eventHandlers[LostFocus](this);
 	}
@@ -73,10 +72,14 @@ void Window::FocusLost()
 
 void Window::FocusGained()
 {
-	hasFocus = true;
 	if (eventHandlers[GainedFocus]) {
 		eventHandlers[GainedFocus](this);
 	}
+}
+
+bool Window::HasFocus() const
+{
+	return manager.GetFocusWindow() == this;
 }
 
 bool Window::DisplayModal(WindowManager::ModalShadow shadow)
