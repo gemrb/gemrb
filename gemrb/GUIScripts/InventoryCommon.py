@@ -873,9 +873,7 @@ def DialogItemWindow ():
 	dialog=item["Dialog"]
 	if ItemInfoWindow:
 		ItemInfoWindow.Unload ()
-		
-	import GUIINV
-	GUIINV.OpenInventoryWindow ()
+
 	GemRB.ExecuteString ("StartDialogOverride(\""+dialog+"\",Myself,0,0,1)", pc)
 	return
 
