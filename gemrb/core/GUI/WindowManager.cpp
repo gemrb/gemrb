@@ -314,11 +314,14 @@ Window* WindowManager::GetFocusWindow() const
 	}
 
 	for (Window* win : windows) {
-		if (win->IsVisible()) {
+		if ((win->Flags() & (View::IgnoreEvents | View::Invisible)) == 0) {
 			return win;
 		}
 	}
-	return nullptr;
+
+	// for all intents and purposes there must always be a window considered to be the focus
+	// gameWin is the "root" window so it will be considered the focus if no eligable windows are
+	return gameWin;
 }
 
 #define HIT_TEST(e, w) \
