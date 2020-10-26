@@ -1366,7 +1366,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
-		return FX_NOT_APPLIED;
+		return FX_ABORT;
 	}
 
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
@@ -1521,7 +1521,7 @@ int fx_control_undead (Scriptable* Owner, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
-		return FX_NOT_APPLIED;
+		return FX_ABORT;
 	}
 
 	bool enemyally = true;
@@ -1623,7 +1623,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_eye_mind_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_MIND]);
 		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MIND, false);
-		return FX_NOT_APPLIED;
+		return FX_ABORT;
 	}
 
 	//timing (set up next fire)
@@ -1790,7 +1790,7 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_eye_spirit_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SPIRIT]);
 		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SPIRIT, false);
-		return FX_NOT_APPLIED;
+		return FX_ABORT;
 	}
 
 	// Soul Eater has no effect on undead, constructs, and elemental creatures,

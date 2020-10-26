@@ -1324,11 +1324,11 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		res=fn( Owner, target, fx );
 		fx->FirstApply = 0;
 
-		//if there is no owner, we assume it is the target
 		switch( res ) {
 			case FX_APPLIED:
 				//normal effect with duration
 				break;
+			case FX_ABORT:
 			case FX_NOT_APPLIED:
 				//instant effect, pending removal
 				//for example, a damage effect
@@ -1346,8 +1346,6 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 				if( fx->TimingMode == FX_DURATION_INSTANT_PERMANENT ) {
 					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 				}
-				break;
-			case FX_ABORT:
 				break;
 			default:
 				error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
