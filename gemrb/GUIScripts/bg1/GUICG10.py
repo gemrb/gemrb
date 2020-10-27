@@ -18,19 +18,19 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-from GUIDefines import *
-from ie_stats import *
+
 import GUICommon
+import CharGenCommon
 import CommonTables
 
-import CharGenCommon
+from GUIDefines import *
+from ie_stats import *
 
-ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 
 def OnLoad():
-	global ClassWindow, TextAreaControl, DoneButton
+	global TextAreaControl, DoneButton
 
 	ClassWindow = GemRB.LoadWindow(10, "GUICG")
 
