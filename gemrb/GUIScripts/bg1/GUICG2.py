@@ -112,10 +112,12 @@ def OnLoad():
 	return
 
 def MultiClassPress():
+	ClassWindow.Close ()
 	GemRB.SetVar("Multi Class",1)
 	CharGenCommon.next()
 
 def SpecialistPress():
+	ClassWindow.Close ()
 	GemRB.SetVar("Specialist",1)
 
 	GemRB.SetVar("Class Kit", 0)

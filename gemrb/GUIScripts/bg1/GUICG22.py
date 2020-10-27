@@ -114,6 +114,7 @@ def KitPress():
 	return
 
 def NextPress():
+	KitWindow.Close ()
 	#class	
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")
