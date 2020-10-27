@@ -142,7 +142,10 @@ def OpenLUStatsWindow(Type = 1):
 		Button.SetActionInterval (200)
 
 	NewLifeLabel = NewLifeWindow.GetControl(0x10000023)
-	NewLifeLabel.SetText(1899)
+	if LevelUp:
+		NewLifeLabel.SetText(19356)
+	else:
+		NewLifeLabel.SetText(1899)
 
 	TextArea = NewLifeWindow.GetControl(23)
 	TextArea.SetText(18495)
