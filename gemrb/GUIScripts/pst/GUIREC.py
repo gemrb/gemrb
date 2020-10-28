@@ -824,9 +824,15 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPGained+oldhp)
 	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1)
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
-	#increase weapon proficiency if needed
-	if WeapProfType!=-1:
-		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained )
+
+	# Weapon Proficiencies
+	if WeapProfType != -1:
+		# Companion NPC's get points added directly to their chosen weapon
+		GemRB.SetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD+WeapProfType, CurrWeapProf + WeapProfGained)
+	else:
+		# TNO has points added to the "Unused Slots" dummy proficiency
+		freeSlots = GemRB.GetPlayerStat(pc, IE_FREESLOTS)
+		GemRB.SetPlayerStat (pc, IE_FREESLOTS, freeSlots + WeapProfGained)
 
 	SwitcherClass = GUICommon.NamelessOneClass(pc)
 	if SwitcherClass:
