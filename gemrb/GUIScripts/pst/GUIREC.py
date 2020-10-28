@@ -819,12 +819,13 @@ def AcceptLevelUp():
 	#increase weapon proficiency if needed
 	if WeapProfType!=-1:
 		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained )
-	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	if Specific == 1:
-		#TODO:
-		#the nameless one is dual classed
-		#so we have to determine which level to increase
-		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
+
+	SwitcherClass = GUICommon.NamelessOneClass(pc) 
+	if SwitcherClass:
+		# Handle saving of TNO class level in the correct CRE stat
+		Levels = { "FIGHTER" : GemRB.GetPlayerStat (pc, IE_LEVEL) , "MAGE": GemRB.GetPlayerStat (pc, IE_LEVEL2), "THIEF": GemRB.GetPlayerStat (pc, IE_LEVEL3) }
+		LevelStats = { "FIGHTER" : IE_LEVEL , "MAGE": IE_LEVEL2, "THIEF": IE_LEVEL3 }
+		GemRB.SetPlayerStat (pc, LevelStats[SwitcherClass], Levels[SwitcherClass]+NumOfPrimLevUp)
 	else:
 		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
 		if avatar_header['SecoLevel'] != 0:
