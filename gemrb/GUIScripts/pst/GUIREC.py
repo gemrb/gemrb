@@ -404,13 +404,13 @@ def GetCharacterHeader (pc):
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GUICommon.HasMultiClassBits (pc)
-	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
-	#Nameless is Specific == 1
+	#Nameless is Specific == 2
 	avatar_header['Specific'] = Specific
 
 	# Nameless is a special case (dual class)
-	if Specific == 1:
+	if Specific == 2:
 		avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
 		avatar_header['SecoClass'] = "*"
 
@@ -872,7 +872,7 @@ def OpenLevelUpWindow ():
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
 	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	AvatarName = BioTable.GetRowName (Specific+1)
+	AvatarName = BioTable.GetRowName (Specific)
 
 	# These will be used for saving throws
 	SavThrUpdated = False
@@ -892,8 +892,8 @@ def OpenLevelUpWindow ():
 	WeapProfType = -1
 	CurrWeapProf = -1
 	#This does not apply to Nameless since he uses unused slots system
-	#Nameless is Specific == 1
-	if Specific != "1":
+	#Nameless is Specific == 2
+	if Specific != 2:
 		# Searching for the column name where value is 1
 		for i in range (6):
 			WeapProfName = CommonTables.WeapProfs.GetRowName (i)
@@ -953,7 +953,7 @@ def OpenLevelUpWindow ():
 		NumOfPrimLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
 
 		# Is avatar Nameless One?
-		if Specific == "1":
+		if Specific == 2:
 			# Saving Throws
 			# Nameless One gets the best possible throws from all the classes except Priest
 			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
