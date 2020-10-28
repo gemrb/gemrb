@@ -99,6 +99,7 @@ def RacePress():
 	return
 
 def NextPress():
+	RaceWindow.Close ()
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
 	CharGenCommon.next()

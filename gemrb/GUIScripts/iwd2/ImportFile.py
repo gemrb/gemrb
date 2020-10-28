@@ -18,6 +18,8 @@
 #
 #character generation, import (GUICG20)
 import GemRB
+
+import CharOverview
 from GUIDefines import *
 
 #import from a character sheet
@@ -37,6 +39,7 @@ def OnLoad():
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	ImportWindow = GemRB.LoadWindow(20)
+	CharOverview.PositionCharGenWin (ImportWindow)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
@@ -60,7 +63,6 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectFile)
-	MainWindow.Focus()
 	ImportWindow.Focus()
 	return
 

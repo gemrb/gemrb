@@ -293,8 +293,6 @@ def NoExitPress():
 	return
 
 def ImportPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
 	if StartOverWindow:
 		StartOverWindow.Unload()
 	GemRB.SetToken('NextScript', 'CharGen')
