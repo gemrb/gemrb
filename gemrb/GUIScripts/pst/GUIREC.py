@@ -805,7 +805,6 @@ def OpenBiographyWindow ():
 
 
 def AcceptLevelUp():
-	LevelUpWindow.Close()
 	#do level up
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, SavThrows[0])
@@ -833,7 +832,7 @@ def AcceptLevelUp():
 	
 	LUSkillsSelection.SkillsSave (pc)
 
-	UpdateRecordsWindow(RecordsWindow)
+	LevelUpWindow.Close()
 	NewLife.OpenLUStatsWindow()
 
 def RedrawSkills():
