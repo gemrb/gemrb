@@ -818,7 +818,10 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
 	#increase weapon proficiency if needed
 	if WeapProfType!=-1:
-		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained )
+		GemRB.SetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD+WeapProfType, CurrWeapProf + WeapProfGained )
+	else:
+		freeSlots = GemRB.GetPlayerStat(pc, IE_FREESLOTS)
+		GemRB.SetPlayerStat (pc, IE_FREESLOTS, freeSlots + WeapProfGained )
 
 	SwitcherClass = GUICommon.NamelessOneClass(pc) 
 	if SwitcherClass:
