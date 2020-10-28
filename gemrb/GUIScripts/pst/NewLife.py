@@ -63,7 +63,6 @@ def OpenLUStatsWindow(Type = 1):
 
 	LevelUp = Type
 	if LevelUp:
-		import GUIREC
 		# only TNO gets the main stat boosts
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
