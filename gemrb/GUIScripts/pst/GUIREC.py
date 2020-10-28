@@ -805,7 +805,7 @@ def OpenBiographyWindow ():
 
 
 def AcceptLevelUp():
-	OpenLevelUpWindow()
+	LevelUpWindow.Close()
 	#do level up
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, SavThrows[0])
@@ -851,13 +851,6 @@ def OpenLevelUpWindow ():
 	global HPGained
 	global WeapProfType, CurrWeapProf, WeapProfGained
 	global NumOfPrimLevUp, NumOfSecoLevUp
-
-	if LevelUpWindow != None:
-		if LevelUpWindow:
-			LevelUpWindow.Unload ()
-		LevelUpWindow = None
-
-		return
 
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
 
