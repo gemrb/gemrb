@@ -884,16 +884,16 @@ def OpenLevelUpWindow ():
 	Thac0 = 0
 	WeapProfGained = 0
 
-	ClasWeapTable = GemRB.LoadTable ("weapprof")
+	WeapProfTable = GemRB.LoadTable ("weapprof")
 	WeapProfType = -1
 	CurrWeapProf = -1
 	#This does not apply to Nameless since he uses unused slots system
 	#Nameless is Specific == 2
 	if Specific != 2:
 		# Searching for the column name where value is 1
-		for i in range (5):
-			WeapProfName = ClasWeapTable.GetRowName (i)
-			value = ClasWeapTable.GetValue (WeapProfName, AvatarName)
+		for i in range (6):
+			WeapProfName = WeapProfTable.GetRowName (i)
+			value = WeapProfTable.GetValue (WeapProfName,AvatarName)
 			if value == 1:
 				WeapProfType = i
 				break
@@ -1000,7 +1000,7 @@ def OpenLevelUpWindow ():
 		else:
 			#How many weapon procifiencies we get
 			for i in range (NumOfPrimLevUp):
-				if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, avatar_header['PrimClass']):
+				if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i):
 					WeapProfGained += 1
 
 			# Saving Throws
@@ -1052,7 +1052,7 @@ def OpenLevelUpWindow ():
 		NumOfPrimLevUp = PrimNextLevel - avatar_header['PrimLevel']
 
 		for i in range (NumOfPrimLevUp):
-			if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, avatar_header['PrimClass']):
+			if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i):
 				WeapProfGained += 1
 
 		# Saving Throws
@@ -1188,15 +1188,29 @@ def GetThac0 (Class, Level):
 	return Thac0Table.GetValue (Class, str (Level))
 
 #apparently the original code doesn't follow profsmax/profs tables
-def HasGainedWeapProf (pc, currProf, currLevel, Class):
-	#only fighters gain weapon proficiencies
-	if Class!="FIGHTER":
+def HasGainedWeapProf (pc, currProf, currLevel):
+
+ 	Class = GUICommon.GetClassRowName(pc)
+
+	# Limits obtained from testing original game
+	limit = 1000
+	if Class == "FIGHTER":
+		# Morte, Nordom amd Vhailor are limited to 5, but not TNO
+		if not GUICommon.NamelessOneClass(pc):
+			limit = 5
+	elif Class == "FIGHTER_MAGE" or Class == "FIGHTER_THIEF":
+		# Dakkon and Annah are limited to 4
+		limit = 4
+	else:
+		# Non fighters ie Grace get nothing
+		return
+	if  currProf >= limit:
 		return False
-	#hardcoded limit is 4
-	if currProf>3:
+
+	# Calculate the total limit (1 point for every 3 fighter levels)
+	if currProf >= (currLevel) / 3:
 		return False
-	if currProf > (currLevel - 1) / 3:
-		return False
+
 	return True
 
 ###################################################
