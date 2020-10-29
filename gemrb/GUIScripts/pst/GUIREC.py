@@ -899,7 +899,14 @@ def OpenLevelUpWindow ():
 				break
 
 	if WeapProfType!=-1:
+		# NPC: Just count the points in the favoured weapon proficiency
 		CurrWeapProf = GemRB.GetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD + WeapProfType)
+	else:
+		# TNO: Count the total amount of assigned and unassigned proficiencies
+		CurrWeapProf = GemRB.GetPlayerStat(pc, IE_FREESLOTS)
+		for i in range (6):
+			CurrWeapProf += GemRB.GetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD + i)
+		CurrWeapProf -= 4 #adjust for the 4 slots already given at level 1
 
 	# Recording this avatar's current proficiency level
 	# Since Nameless one is not covered, hammer and club can't occur
@@ -947,6 +954,11 @@ def OpenLevelUpWindow ():
 		while avatar_header['XP'] >= GetNextLevelExp (NextLevel, Class):
 			NextLevel = NextLevel + 1
 		NumOfPrimLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
+
+		#How many weapon procifiencies we get
+		for i in range (NumOfPrimLevUp):
+			if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i):
+				WeapProfGained += 1
 
 		# Is avatar Nameless One?
 		if Specific == 2:
@@ -998,10 +1010,6 @@ def OpenLevelUpWindow ():
 						SavThrUpdated = True
 			# Cleaning up
 		else:
-			#How many weapon procifiencies we get
-			for i in range (NumOfPrimLevUp):
-				if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i):
-					WeapProfGained += 1
 
 			# Saving Throws
 			# Loading the right saving throw table
