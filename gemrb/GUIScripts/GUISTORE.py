@@ -1147,7 +1147,7 @@ def OpenItemAmountWindow (store = STORE_MAIN):
 		return
 
 	wid = 16
-	if GameCheck.IsIWD2():
+	if GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		wid = 20
 	elif GameCheck.IsBG2():
 		pass
