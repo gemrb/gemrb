@@ -864,6 +864,8 @@ def OpenLevelUpWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
+	Class = GUICommon.GetClassRowName(pc)
+
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
 	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
@@ -960,9 +962,24 @@ def OpenLevelUpWindow ():
 			if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i):
 				WeapProfGained += 1
 
-		# Is avatar Nameless One?
+		# Hit Points Gained and Hit Points from Constitution Bonus
+		for i in range (NumOfPrimLevUp):
+			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
+
+		if not "FIGHTER" in Class:
+			CONType = 0
+		else:
+			CONType = 1
+		ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0, CONType)
+
+		# Thac0
+		Thac0 = GetThac0 (Class, NextLevel)
+		# Is the new thac0 better than old? (The smaller, the better)
+		if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
+			Thac0Updated = True
+
+		# Saving Throws
 		if Specific == 2:
-			# Saving Throws
 			# Nameless One gets the best possible throws from all the classes except Priest
 			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
 			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
@@ -973,18 +990,13 @@ def OpenLevelUpWindow ():
 			FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
 			MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
 			ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
-			# this is the constitution bonus type for this level
-			CONType = 1
 			# We are leveling up one of those levels. Therefore, one of them has to be updated.
-			if avatar_header['PrimClass'] == "FIGHTER":
+			if Class == "FIGHTER":
 				FighterLevel = NextLevel - 1
-				CONType = 0
-			elif avatar_header['PrimClass'] == "MAGE":
+			elif Class == "MAGE":
 				MageLevel = NextLevel - 1
 			else:
 				ThiefLevel = NextLevel - 1
-
-			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0, CONType)
 			# Now we need to update the saving throws with the best values from those tables.
 			# The smaller the number, the better saving throw it is.
 			# We also need to check if any of the levels are larger than 21, since
@@ -1008,11 +1020,7 @@ def OpenLevelUpWindow ():
 					if Throw < SavThrows[i]:
 						SavThrows[i] = Throw
 						SavThrUpdated = True
-			# Cleaning up
 		else:
-
-			# Saving Throws
-			# Loading the right saving throw table
 			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
 			# Updating the current saving throws. They are changed only if the
 			# new ones are better than current. The smaller the number, the better.
@@ -1025,23 +1033,6 @@ def OpenLevelUpWindow ():
 					if Throw < SavThrows[i]:
 						SavThrows[i] = Throw
 						SavThrUpdated = True
-			# Cleaning Up
-
-			# Hit Points Gained and Hit Points from Constitution Bonus
-			for i in range (NumOfPrimLevUp):
-				HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
-
-			if avatar_header['PrimClass'] == "FIGHTER":
-				CONType = 0
-			else:
-				CONType = 1
-			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0, CONType)
-
-			# Thac0
-			Thac0 = GetThac0 (Class, NextLevel)
-			# Is the new thac0 better than old? (The smaller, the better)
-			if Thac0 < GemRB.GetPlayerStat (pc, IE_TOHIT, 1):
-				Thac0Updated = True
 
 	else:
 		# avatar is multi class
