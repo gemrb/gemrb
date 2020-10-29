@@ -31,6 +31,7 @@
 #include "Interface.h"
 #include "Map.h"
 #include "PluginMgr.h"
+#include "ScriptEngine.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 #include "GUI/GameControl.h"
@@ -625,6 +626,15 @@ void IniSpawn::RespawnNameless()
 {
 	Game *game = core->GetGame();
 	Actor *nameless = game->GetPC(0, false);
+
+	// the final fight is fatal
+	ieDword finale = 0;
+	game->locals->Lookup("Transcendent_Final_Speech", finale);
+	if (finale) {
+		nameless->Die(NULL);
+		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "OpenPSTDeathWindow");
+		return;
+	}
 
 	if (NamelessSpawnPoint.isnull()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);
