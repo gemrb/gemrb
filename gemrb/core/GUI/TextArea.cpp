@@ -336,6 +336,7 @@ Region TextArea::UpdateTextFrame()
 		}
 
 		textContainer->SetFrame(r);
+		scrollview.Update();
 		return textContainer->Frame();
 	}
 	return Region(Point(0,0), Size(scrollview.ContentRegion().Dimensions().w, 0));
