@@ -243,7 +243,7 @@ void Game::ReversePCs()
 	core->SetEventFlag(EF_PORTRAIT|EF_SELECTION);
 }
 
-int Game::FindPlayer(unsigned int partyID)
+int Game::FindPlayer(unsigned int partyID) const
 {
 	for (unsigned int slot=0; slot<PCs.size(); slot++) {
 		if (PCs[slot]->InParty==partyID) {
@@ -253,7 +253,7 @@ int Game::FindPlayer(unsigned int partyID)
 	return -1;
 }
 
-Actor* Game::FindPC(unsigned int partyID)
+Actor* Game::FindPC(unsigned int partyID) const
 {
 	for (auto pc : PCs) {
 		if (pc->InParty == partyID) return pc;
@@ -261,7 +261,7 @@ Actor* Game::FindPC(unsigned int partyID)
 	return NULL;
 }
 
-Actor* Game::FindPC(const char *scriptingname)
+Actor* Game::FindPC(const char *scriptingname) const
 {
 	for (auto pc : PCs) {
 		if (strnicmp(pc->GetScriptName(), scriptingname, 32) == 0) {
@@ -271,7 +271,7 @@ Actor* Game::FindPC(const char *scriptingname)
 	return NULL;
 }
 
-Actor* Game::FindNPC(unsigned int partyID)
+Actor* Game::FindNPC(unsigned int partyID) const
 {
 	for (auto npc : NPCs) {
 		if (npc->InParty == partyID) return npc;
@@ -279,7 +279,7 @@ Actor* Game::FindNPC(unsigned int partyID)
 	return NULL;
 }
 
-Actor* Game::FindNPC(const char *scriptingname)
+Actor* Game::FindNPC(const char *scriptingname) const
 {
 	for (auto npc : NPCs) {
 		if (strnicmp(npc->GetScriptName(), scriptingname, 32) == 0) {

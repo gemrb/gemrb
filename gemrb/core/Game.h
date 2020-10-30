@@ -313,12 +313,12 @@ private:
 	ieDword timestop_end;
 public:
 	/** Returns the PC's slot count for partyID */
-	int FindPlayer(unsigned int partyID);
+	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
 	Actor* GetPC(unsigned int slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
-	Actor* FindPC(unsigned int partyID);
-	Actor* FindNPC(unsigned int partyID);
+	Actor* FindPC(unsigned int partyID) const;
+	Actor* FindNPC(unsigned int partyID) const;
 	/** Finds a global actor by global ID */
 	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
@@ -326,9 +326,9 @@ public:
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
 	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
-	Actor* FindPC(const char *deathvar);
+	Actor* FindPC(const char *deathvar) const;
 	/** Finds an actor in store by scripting name*/
-	Actor* FindNPC(const char *deathvar);
+	Actor* FindNPC(const char *deathvar) const;
 	/** Sets the area and position of the actor to the starting position */
 	void InitActorPos(Actor *actor);
 	/** Joins party */

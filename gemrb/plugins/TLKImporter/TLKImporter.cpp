@@ -33,37 +33,26 @@
 
 using namespace GemRB;
 
-//set this to -1 if charname is gabber (iwd2)
-static int charname=0;
 struct gt_type
 {
 	int type;
 	ieStrRef male;
 	ieStrRef female;
 };
-static Variables gtmap;
 
 TLKImporter::TLKImporter(void)
 {
-	int gtcount;
-
 	gtmap.RemoveAll(NULL);
 	gtmap.SetType(GEM_VARIABLES_POINTER);
 
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
 		charname=-1;
-	} else {
-		charname=0;
 	}
-	str = NULL;
-	OverrideTLK = NULL;
-	StrRefCount = Offset = Language = 0;
 
 	AutoTable tm("gender");
+	int gtcount = 0;
 	if (tm) {
 		gtcount = tm->GetRowCount();
-	} else {
-		gtcount = 0;
 	}
 	for(int i=0;i<gtcount;i++) {
 		ieVariable key;
@@ -103,11 +92,9 @@ void TLKImporter::OpenAux()
 {
 	CloseAux();
 	OverrideTLK = new CTlkOverride();
-	if (OverrideTLK) {
-		if (!OverrideTLK->Init()) {
-			CloseAux();
-			Log(ERROR, "TlkImporter", "Cannot open tlk override!");
-		}
+	if (OverrideTLK && !OverrideTLK->Init()) {
+		CloseAux();
+		Log(ERROR, "TlkImporter", "Cannot open tlk override!");
 	}
 }
 
@@ -141,7 +128,6 @@ inline const char* mystrncpy(char* dest, const char* source, int maxlength,
 	while (*source && ( *source != delim ) && maxlength--) {
 		char chr = *source++;
 		if (chr!=' ') *dest++ = chr;
-		//*dest++ = *source++;
 	}
 	*dest = 0;
 	return source;
@@ -154,13 +140,13 @@ inline const char* mystrncpy(char* dest, const char* source, int maxlength,
 static inline Actor *GetActorFromSlot(int slot)
 {
 	if (slot==-1) {
-		GameControl *gc = core->GetGameControl();
+		const GameControl *gc = core->GetGameControl();
 		if (gc) {
 			return gc->dialoghandler->GetSpeaker();
 		}
 		return NULL;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) {
 		return NULL;
 	}
@@ -170,38 +156,30 @@ static inline Actor *GetActorFromSlot(int slot)
 	return game->FindPC(slot);
 }
 
-char *TLKImporter::Gabber()
+char *TLKImporter::Gabber() const
 {
-	Actor *act;
-
-	act=core->GetGameControl()->dialoghandler->GetSpeaker();
+	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
 		return strdup(act->LongName);
 	}
 	return strdup("?");
 }
 
-char *TLKImporter::CharName(int slot)
+char *TLKImporter::CharName(int slot) const
 {
-	Actor *act;
-
-	act=GetActorFromSlot(slot);
+	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
 		return strdup(act->LongName);
 	}
 	return strdup("?");
 }
 
-int TLKImporter::ClassStrRef(int slot)
+int TLKImporter::ClassStrRef(int slot) const
 {
-	Actor *act;
-	int clss;
-
-	act=GetActorFromSlot(slot);
+	int clss = 0;
+	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
 		clss = act->GetActiveClass();
-	} else {
-		clss=0;
 	}
 
 	AutoTable tab("classes");
@@ -212,16 +190,12 @@ int TLKImporter::ClassStrRef(int slot)
 	return atoi(tab->QueryField(row,0) );
 }
 
-int TLKImporter::RaceStrRef(int slot)
+int TLKImporter::RaceStrRef(int slot) const
 {
-	Actor *act;
-	int race;
-
-	act=GetActorFromSlot(slot);
+	int race = 0;
+	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
 		race=act->GetStat(IE_RACE);
-	} else {
-		race=0;
 	}
 
 	AutoTable tab("races");
@@ -234,9 +208,7 @@ int TLKImporter::RaceStrRef(int slot)
 
 int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
 {
-	Actor *act;
-
-	act = GetActorFromSlot(slot);
+	const Actor *act = GetActorFromSlot(slot);
 	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
 		return femalestrref;
 	}
@@ -244,10 +216,9 @@ int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
 }
 
 //if this function returns -1 then it is not a built in token, dest may be NULL
-int TLKImporter::BuiltinToken(char* Token, char* dest)
+int TLKImporter::BuiltinToken(const char* Token, char* dest)
 {
 	char* Decoded = NULL;
-	int TokenLength;	 //decoded token length
 	gt_type *entry = NULL;
 
 	//these are gender specific tokens, they are customisable by gender.2da
@@ -329,23 +300,21 @@ int TLKImporter::BuiltinToken(char* Token, char* dest)
 
 	exit_function:
 	if (Decoded) {
-		TokenLength = ( int ) strlen( Decoded );
+		size_t TokenLength = strlen(Decoded);
 		if (dest) {
 			memcpy( dest, Decoded, TokenLength );
 		}
 		//Decoded is always a copy
 		free( Decoded );
-		return TokenLength;
+		return static_cast<int>(TokenLength);
 	}
 	return -1;
 }
 
-bool TLKImporter::ResolveTags(char* dest, char* source, int Length)
+bool TLKImporter::ResolveTags(char* dest, const char* source, int Length)
 {
-	int NewLength;
 	char Token[MAX_VARIABLE_LENGTH + 1];
-
-	NewLength = 0;
+	int NewLength = 0;
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
 			i = (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source);
@@ -353,37 +322,31 @@ bool TLKImporter::ResolveTags(char* dest, char* source, int Length)
 			if (TokenLength == -1) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
 				if (TokenLength) {
-					if (TokenLength + NewLength > Length)
-						return false;
+					if (TokenLength + NewLength > Length) return false;
 					core->GetTokenDictionary()->Lookup( Token, dest + NewLength, TokenLength );
 				}
 			}
 			NewLength += TokenLength;
+		} else if (source[i] == '[') {
+			// voice actor directives
+			const char* tmppoi = strchr(source + i + 1, ']');
+			if (!tmppoi) break;
+			i = (int) (tmppoi - source);
+			if (NewLength > Length) return false;
 		} else {
-			if (source[i] == '[') {
-				const char* tmppoi = strchr( source + i + 1, ']' );
-				if (tmppoi)
-					i = (int) (tmppoi - source);
-				else
-					break;
-			} else
-				dest[NewLength++] = source[i];
-			if (NewLength > Length)
-				return false;
+			dest[NewLength++] = source[i];
+			if (NewLength > Length) return false;
 		}
 	}
 	dest[NewLength] = 0;
 	return true;
 }
 
-bool TLKImporter::GetNewStringLength(char* string, int& Length)
+bool TLKImporter::GetNewStringLength(const char* string, int& Length)
 {
-	int NewLength;
-	bool lChange;
 	char Token[MAX_VARIABLE_LENGTH + 1];
-
-	lChange = false;
-	NewLength = 0;
+	bool lChange = false;
+	int NewLength = 0;
 	for (int i = 0; i < Length; i++) {
 		if (string[i] == '<') {
 			// token
@@ -395,18 +358,14 @@ bool TLKImporter::GetNewStringLength(char* string, int& Length)
 			} else {
 				NewLength += TokenLength;
 			}
+		} else if (string[i] == '[') {
+			// voice actor directives
+			lChange = true;
+			const char* tmppoi = strchr(string + i + 1, ']');
+			if (!tmppoi) break;
+			i += (int) (tmppoi - string) - i;
 		} else {
-			if (string[i] == '[') {
-				//voice actor directives
-				lChange = true;
-				const char* tmppoi = strchr( string + i + 1, ']' );
-				if (tmppoi)
-					i += (int) (tmppoi - string) - i;
-				else
-					break;
-			} else {
-				NewLength++;
-			}
+			NewLength++;
 		}
 	}
 	Length = NewLength;
@@ -434,16 +393,12 @@ String* TLKImporter::GetString(ieStrRef strref, ieDword flags)
 char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 {
 	char* string;
-	
-	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
-		goto empty;
-	}
+	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
 	int Length;
 	ieResRef SoundResRef;
 
-	if((strref>=STRREF_START) || (strref>=BIO_START && strref<=BIO_END) ) {
-empty:
+	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
 			string = OverrideTLK->ResolveAuxString(strref, Length);
 		} else {
@@ -497,15 +452,10 @@ empty:
 			string = string2;
 		}
 	}
-	if (( type & 2 ) && ( flags & IE_STR_SOUND )) {
-		//if flags&IE_STR_SOUND play soundresref
-		if (SoundResRef[0] != 0) {
-			int xpos = 0;
-			int ypos = 0;
-			unsigned int flag = GEM_SND_RELATIVE | (flags&(GEM_SND_SPEECH|GEM_SND_QUEUE));
-			//IE_STR_SPEECH will stop the previous sound source
-			core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, xpos, ypos, flag);
-		}
+	if (type & 2 && flags & IE_STR_SOUND && SoundResRef[0] != 0) {
+		// GEM_SND_SPEECH will stop the previous sound source
+		unsigned int flag = GEM_SND_RELATIVE | (flags & (GEM_SND_SPEECH | GEM_SND_QUEUE));
+		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, 0, 0, flag);
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 13 );
@@ -528,11 +478,8 @@ bool TLKImporter::HasAltTLK() const
 
 StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
-	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
-		goto empty;
-	}
-	if (strref >= StrRefCount) {
-empty:
+	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
+	if (empty || strref >= StrRefCount) {
 		return StringBlock();
 	}
 	ieWord type;
