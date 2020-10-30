@@ -136,9 +136,16 @@ Store* STOImporter::GetStore(Store *s)
 	GetPurchasedCategories( s );
 
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
+	std::vector<STOItem*> toDelete;
 	for (i = 0; i < s->ItemsCount; i++) {
 		STOItem *item = s->items[i];
 		GetItem(item, s);
+		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
+		// some iwd2 stores like 60sheemi contain crap
+		if (signed(itm->ItemNameIdentified) == -1) {
+			toDelete.push_back(item);
+			continue;
+		}
 		//it is important to handle this field as signed
 		if (item->InfiniteSupply>0) {
 			char *TriggerCode = core->GetCString( (ieStrRef) item->InfiniteSupply );
@@ -152,6 +159,9 @@ Store* STOImporter::GetStore(Store *s)
 			//also it is compatible only with pst/gemrb saved stores
 			s->HasTriggers=true;
 		}
+	}
+	for (auto item : toDelete) {
+		s->RemoveItem(item);
 	}
 
 	str->Seek( s->DrinksOffset, GEM_STREAM_START );
