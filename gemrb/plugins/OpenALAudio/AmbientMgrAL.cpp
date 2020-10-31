@@ -122,7 +122,7 @@ void AmbientMgrAL::deactivate()
 	}
 }
 
-void AmbientMgrAL::hardStop()
+void AmbientMgrAL::hardStop() const
 {
 	for (auto source : ambientSources) {
 		source->hardStop();
@@ -145,7 +145,7 @@ int AmbientMgrAL::play(void *am)
 	return 0;
 }
 
-unsigned int AmbientMgrAL::tick(unsigned int ticks)
+unsigned int AmbientMgrAL::tick(unsigned int ticks) const
 {
 	unsigned int delay = 60000; // wait one minute if all sources are off
 

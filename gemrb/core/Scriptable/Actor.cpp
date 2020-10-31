@@ -8581,7 +8581,7 @@ void Actor::Draw(const Region &screen)
 
 	bool shoulddrawcircle = ShouldDrawCircle();
 	bool drawcircle = shoulddrawcircle;
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (gc->GetScreenFlags()&SF_CUTSCENE) {
 		// ground circles are not drawn in cutscenes
 		drawcircle = false;

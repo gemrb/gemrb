@@ -66,8 +66,8 @@ private:
 	std::vector<AmbientSource *> ambientSources;
 	
 	static int play(void *am);
-	unsigned int tick(unsigned int ticks);
-	void hardStop();
+	unsigned int tick(unsigned int ticks) const;
+	void hardStop() const;
 	
 	SDL_mutex *mutex;
 	SDL_Thread *player;
