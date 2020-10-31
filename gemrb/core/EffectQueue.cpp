@@ -64,7 +64,7 @@ static EffectRef fx_protection_from_display_string_ref = { "Protection:String", 
 static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
 
 //immunity effects
-static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_level_immunity_ref = { "Protection:SpellLevel", -1 };
 static EffectRef fx_opcode_immunity_ref = { "Protection:Opcode", -1 }; //bg2
 static EffectRef fx_opcode_immunity2_ref = { "Protection:Opcode2", -1 };//iwd
 static EffectRef fx_spell_immunity_ref = { "Protection:Spell", -1 }; //bg2
