@@ -102,7 +102,7 @@ public:
 	// GameControl always needs to redraw
 	bool NeedsDraw() const { return true; };
 	/** Draws the target reticle for Actor movement. */
-	void DrawTargetReticle(Point p, int size, bool animate, bool flash=false, bool actorSelected=false);
+	void DrawTargetReticle(Point p, int size, bool animate, bool flash = false, bool actorSelected = false) const;
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
 	void SetTracker(Actor *actor, ieDword dist);
@@ -169,8 +169,8 @@ public: //Events
 	int GetTargetMode() { return target_mode; }
 	void SetScreenFlags(unsigned int value, int mode);
 	void SetDialogueFlags(unsigned int value, int mode);
-	int GetScreenFlags() { return ScreenFlags; }
-	int GetDialogueFlags() { return DialogueFlags; }
+	int GetScreenFlags() const { return ScreenFlags; }
+	int GetDialogueFlags() const { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	/* centers viewport to the points specified */

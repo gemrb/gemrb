@@ -41,7 +41,7 @@ MessageWindowLogger::~MessageWindowLogger()
 
 void MessageWindowLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
 {
-	GameControl* gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	if (displaymsg && gc && !(gc->GetDialogueFlags()&DF_IN_DIALOG)) {
 		// FIXME: we check DF_IN_DIALOG here to avoid recurssion in the MessageWindowLogger, but what happens when an error happens during dialog?
 		// I'm not super sure about how to avoid that. for now the logger will not log anything in dialog mode.

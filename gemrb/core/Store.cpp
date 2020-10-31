@@ -88,7 +88,7 @@ Store::~Store(void)
 
 bool Store::IsItemAvailable(unsigned int slot) const
 {
-	Game * game = core->GetGame();
+	const Game *game = core->GetGame();
 	//0     - not infinite, not conditional
 	//-1    - infinite
 	//other - pst trigger ref

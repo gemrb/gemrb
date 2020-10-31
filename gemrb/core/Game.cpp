@@ -105,7 +105,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	BanterBlockTime = 0;
 	BanterBlockFlag = 0;
 	WeatherBits = 0;
-	crtable = NULL;
 	kaputz = NULL;
 	beasts = NULL;
 	mazedata = NULL;
@@ -170,6 +169,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		}
 	}
 
+	LoadCRTable();
+
 	interval = 1000/AI_UPDATE_TIME;
 	hasInfra = false;
 	familiarBlock = false;
@@ -227,7 +228,7 @@ Game::~Game(void)
 	}
 }
 
-static bool IsAlive(Actor *pc)
+static bool IsAlive(const Actor *pc)
 {
 	if (pc->GetStat(IE_STATE_ID)&STATE_DEAD) {
 		return false;
@@ -235,7 +236,7 @@ static bool IsAlive(Actor *pc)
 	return true;
 }
 
-void Game::ReversePCs()
+void Game::ReversePCs() const
 {
 	for (auto pc : PCs) {
 		pc->InParty = PCs.size() - pc->InParty + 1;
@@ -374,7 +375,7 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 }
 
 //i'm sure this could be faster
-void Game::ConsolidateParty()
+void Game::ConsolidateParty() const
 {
 	int max = (int) PCs.size();
 	for (int i=1;i<=max;) {
@@ -434,7 +435,7 @@ int Game::LeaveParty (Actor* actor)
 }
 
 //determines if startpos.2da has rotation rows (it cannot have tutorial line)
-bool Game::DetermineStartPosType(const TableMgr *strta)
+bool Game::DetermineStartPosType(const TableMgr *strta) const
 {
 	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4),"START_ROT" ) )
 	{
@@ -445,7 +446,7 @@ bool Game::DetermineStartPosType(const TableMgr *strta)
 
 #define PMODE_COUNT 3
 
-void Game::InitActorPos(Actor *actor)
+void Game::InitActorPos(Actor *actor) const
 {
 	//start.2da row labels
 	const char *mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
@@ -569,7 +570,7 @@ int Game::GetPartySize(bool onlyalive) const
 }
 
 /* sends the hotkey trigger to all selected actors */
-void Game::SetHotKey(unsigned long Key)
+void Game::SetHotKey(unsigned long Key) const
 {
 	for (auto actor : selected) {
 		if (actor->IsSelected()) {
@@ -580,7 +581,7 @@ void Game::SetHotKey(unsigned long Key)
 
 bool Game::SelectPCSingle(int index)
 {
-	Actor* actor = FindPC( index );
+	const Actor* actor = FindPC( index );
 	if (!actor)
 		return false;
 
@@ -595,7 +596,7 @@ int Game::GetSelectedPCSingle() const
 	return SelectedSingle;
 }
 
-Actor* Game::GetSelectedPCSingle(bool onlyalive)
+Actor* Game::GetSelectedPCSingle(bool onlyalive) const
 {
 	Actor *pc = FindPC(SelectedSingle);
 	if (!pc) return NULL;
@@ -716,11 +717,11 @@ int Game::GetTotalPartyLevel(bool onlyalive) const
 }
 
 // Returns map structure (ARE) if it is already loaded in memory
-int Game::FindMap(const char *ResRef)
+int Game::FindMap(const char *ResRef) const
 {
 	int index = (int) Maps.size();
 	while (index--) {
-		Map *map=Maps[index];
+		const Map *map = Maps[index];
 		if (strnicmp(ResRef, map->GetScriptName(), 8) == 0) {
 			return index;
 		}
@@ -767,7 +768,7 @@ Map *Game::GetMap(const char *areaname, bool change)
 	return area;
 }
 
-bool Game::MasterArea(const char *area)
+bool Game::MasterArea(const char *area) const
 {
 	for (auto ma : mastarea) {
 		if (!strnicmp(ma, area, 8)) {
@@ -1053,7 +1054,7 @@ int Game::AddNPC(Actor* npc)
 	return (int) NPCs.size() - 1;
 }
 
-Actor* Game::GetNPC(unsigned int Index)
+Actor* Game::GetNPC(unsigned int Index) const
 {
 	if (Index >= NPCs.size()) {
 		return NULL;
@@ -1061,7 +1062,7 @@ Actor* Game::GetNPC(unsigned int Index)
 	return NPCs[Index];
 }
 
-void Game::SwapPCs(unsigned int Index1, unsigned int Index2)
+void Game::SwapPCs(unsigned int Index1, unsigned int Index2) const
 {
 	if (Index1 >= PCs.size()) {
 		return;
@@ -1149,7 +1150,7 @@ unsigned int Game::GetJournalCount() const
 	return (unsigned int) Journals.size();
 }
 
-GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref)
+GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref) const
 {
 	for (auto entry : Journals) {
 		if (entry->Text == strref) {
@@ -1160,7 +1161,7 @@ GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref)
 	return NULL;
 }
 
-GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
+GAMJournalEntry* Game::GetJournalEntry(unsigned int Index) const
 {
 	if (Index >= Journals.size()) {
 		return NULL;
@@ -1250,9 +1251,8 @@ void Game::LoadCRTable()
 }
 
 // FIXME: figure out the real mechanism
-int Game::GetXPFromCR(int cr)
+int Game::GetXPFromCR(int cr) const
 {
-	if (!crtable) LoadCRTable();
 	if (!crtable) {
 		Log(ERROR, "Game", "Cannot find moncrate.2da!");
 		return 0;
@@ -1275,7 +1275,7 @@ int Game::GetXPFromCR(int cr)
 	return crtable[level-1][cr-1]/2;
 }
 
-void Game::ShareXP(int xp, int flags)
+void Game::ShareXP(int xp, int flags) const
 {
 	int individual;
 
@@ -1322,7 +1322,7 @@ bool Game::EveryoneStopped() const
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false
-bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
+bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 {
 	for (auto pc : PCs) {
 		if (flags&ENP_ONLYSELECT) {
@@ -1355,10 +1355,10 @@ bool Game::EveryoneNearPoint(Map *area, const Point &p, int flags) const
 }
 
 //called when someone died
-void Game::PartyMemberDied(Actor *actor)
+void Game::PartyMemberDied(const Actor *actor)
 {
 	//this could be null, in some extreme cases...
-	Map *area = actor->GetCurrentArea();
+	const Map *area = actor->GetCurrentArea();
 
 	unsigned int size = PCs.size();
 	Actor *react = NULL;
@@ -1389,7 +1389,7 @@ void Game::PartyMemberDied(Actor *actor)
 	}
 }
 
-void Game::IncrementChapter()
+void Game::IncrementChapter() const
 {
 	//chapter first set to 0 (prologue)
 	ieDword chapter = (ieDword) -1;
@@ -1510,7 +1510,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 //returns true if there are excess players in the team
 bool Game::PartyOverflow() const
 {
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
 		return false;
 	}
@@ -1541,7 +1541,7 @@ bool Game::EveryoneDead() const
 		return true;
 	}
 	if (protagonist==PM_NO) {
-		Actor *nameless = PCs[0];
+		const Actor *nameless = PCs[0];
 		// don't trigger this outside pst, our game loop depends on it
 		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE && core->HasFeature(GF_PST_STATE_FLAGS)) {
 			if (area->INISpawn) {
@@ -1726,9 +1726,9 @@ int Game::CanPartyRest(int checks) const
 		}
 	}
 
-	Actor *leader = GetPC(0, true);
+	const Actor *leader = GetPC(0, true);
 	assert(leader);
-	Map *area = leader->GetCurrentArea();
+	const Map *area = leader->GetCurrentArea();
 	//we let them rest if someone is paralyzed, but the others gather around
 	if (checks & REST_SCATTER) {
 		if (!EveryoneNearPoint(area, leader->Pos, 0)) {
@@ -1792,7 +1792,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 		return false;
 	}
 
-	Actor *leader = GetPC(0, true);
+	const Actor *leader = GetPC(0, true);
 	assert(leader);
 	// TODO: implement "rest until healed", it's an option in some games
 	int hours = 8;
@@ -1923,7 +1923,7 @@ inline static int CastOnRestHealingAmount(Actor *caster, SpecialSpellType &speci
 }
 
 // heal on rest and similar
-void Game::CastOnRest()
+void Game::CastOnRest() const
 {
 	typedef std::vector<HealingResource> RestSpells;
 	typedef std::vector<Injured> RestTargets;
@@ -2037,7 +2037,7 @@ void Game::TimeStop(Actor* owner, ieDword end)
 }
 
 // check if the passed actor is a victim of timestop
-bool Game::TimeStoppedFor(const Actor* target)
+bool Game::TimeStoppedFor(const Actor* target) const
 {
 	if (!timestop_owner) {
 		return false;
@@ -2052,7 +2052,7 @@ bool Game::TimeStoppedFor(const Actor* target)
 void Game::Infravision()
 {
 	hasInfra = false;
-	Map *map = GetCurrentArea();
+	const Map *map = GetCurrentArea();
 	if (!map) return;
 
 	ieDword tmp = 0;
@@ -2092,7 +2092,7 @@ static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
 {
-	Map *map = GetCurrentArea();
+	const Map *map = GetCurrentArea();
 	if (!map) return NULL;
 	if (map->AreaFlags&AF_DREAM) {
 		return &DreamTint;
@@ -2133,7 +2133,7 @@ void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
 	}
 }
 
-bool Game::IsDay()
+bool Game::IsDay() const
 {
 	ieDword daynight = core->Time.GetHour(GameTime);
 	if(daynight<4 || daynight>20) {
@@ -2294,7 +2294,7 @@ void Game::dump() const
 	Log(DEBUG, "Game", buffer);
 }
 
-Actor *Game::GetActorByGlobalID(ieDword globalID)
+Actor *Game::GetActorByGlobalID(ieDword globalID) const
 {
 	for (auto map : Maps) {
 		Actor *actor = map->GetActorByGlobalID(globalID);
@@ -2347,7 +2347,7 @@ bool Game::RandomEncounter(ieResRef &BaseArea)
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
 }
 
-void Game::ResetPartyCommentTimes()
+void Game::ResetPartyCommentTimes() const
 {
 	for (auto pc : PCs) {
 		pc->ResetCommentTime();

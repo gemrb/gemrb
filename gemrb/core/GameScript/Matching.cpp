@@ -333,7 +333,7 @@ Scriptable *GetActorFromObject(Scriptable *Sender, const Object *oC, int ga_flag
 {
 	Scriptable *aC = NULL;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, oC, ga_flags);
 	if (tgts) {
 		//now this could return other than actor objects

@@ -760,7 +760,7 @@ void Actor::SetCircleSize()
 	if (!anims)
 		return;
 
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	float oscillationFactor = 1.0f;
 
 	if (UnselectableTimer) {
@@ -6556,7 +6556,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
 		int xp = CalculateExperience(XP_LEARNSPELL, explev);
-		Game *game = core->GetGame();
+		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 	}
 	return LSR_OK;
@@ -6750,7 +6750,7 @@ int Actor::Immobile() const
 	if (GetStat(IE_STATE_ID) & STATE_STILL) {
 		return 1;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game && game->TimeStoppedFor(this)) {
 		return 1;
 	}
@@ -8302,7 +8302,7 @@ void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& 
 	Region vp = video->GetViewport();
 	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
 	if (!ca->lockPalette) flags |= BLIT_TINTED;
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
 	if (game->TimeStoppedFor(this)) {
 		flags |= BLIT_GREY;
@@ -8747,7 +8747,7 @@ void Actor::Draw(const Region &screen)
 			}
 		}
 
-		Game* game = core->GetGame();
+		const Game* game = core->GetGame();
 		ieDword flags = !ca->lockPalette ? BLIT_TINTED : 0;
 		game->ApplyGlobalTint(tint, flags);
 

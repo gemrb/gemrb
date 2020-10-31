@@ -567,7 +567,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
@@ -636,7 +636,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 //moves pcs and npcs from an area to another area
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);

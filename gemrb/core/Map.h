@@ -433,7 +433,7 @@ public:
 	//counts the summons already in the area
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
-	bool AnyEnemyNearPoint(const Point &p);
+	bool AnyEnemyNearPoint(const Point &p) const;
 	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
 	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;

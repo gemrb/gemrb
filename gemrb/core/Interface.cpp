@@ -3808,7 +3808,7 @@ void Interface::SetCutSceneMode(bool active)
 /** returns true if in dialogue or cutscene */
 bool Interface::InCutSceneMode() const
 {
-	GameControl *gc = GetGameControl();
+	const GameControl *gc = GetGameControl();
 	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&(SF_DISABLEMOUSE|SF_CUTSCENE))) {
 		return true;
 	}
@@ -5461,7 +5461,7 @@ int Interface::GetReputationMod(int column) const
 
 PauseSetting Interface::TogglePause()
 {
-	GameControl *gc = GetGameControl();
+	const GameControl *gc = GetGameControl();
 	if (!gc) return PAUSE_OFF;
 	PauseSetting pause = (PauseSetting)(~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 	if (SetPause(pause)) return pause;

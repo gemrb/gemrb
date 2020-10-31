@@ -330,7 +330,7 @@ void GameControl::DrawArrowMarker(const Region &screen, Point p, const Region &v
 	spr->release();
 }
 
-void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash, bool actorSelected)
+void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash, bool actorSelected) const
 {
 	// reticles are never drawn in cutscenes
 	if (GetScreenFlags()&SF_CUTSCENE)
@@ -1829,7 +1829,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			//there. Here we have to check on the
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
-				GameControl *gc = core->GetGameControl();
+				const GameControl *gc = core->GetGameControl();
 				if (!(trap->Flags & TRAP_DEACTIVATED) && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 					actor->LastMarked = trap->GetGlobalID();
@@ -2078,7 +2078,7 @@ formation_handling:
 
 void GameControl::ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	Point p(x,y);
 	core->GetVideoDriver()->ConvertToGame(p.x, p.y);
 

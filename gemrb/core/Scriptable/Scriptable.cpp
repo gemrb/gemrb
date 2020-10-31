@@ -375,7 +375,7 @@ void Scriptable::TickScripting()
 
 void Scriptable::ExecuteScript(int scriptCount)
 {
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 
 	// area scripts still run for at least the current area, in bg1 (see ar2631, confirmed by testing)
 	// but not in bg2 (kill Abazigal in ar6005)
@@ -1919,7 +1919,7 @@ bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
 	Actor *haskey = NULL;
 
 	if (Key && actor->InParty) {
-		Game *game = core->GetGame();
+		const Game *game = core->GetGame();
 		//allow unlock when the key is on any partymember
 		for (int idx = 0; idx < game->GetPartySize(false); idx++) {
 			Actor *pc = game->FindPC(idx + 1);

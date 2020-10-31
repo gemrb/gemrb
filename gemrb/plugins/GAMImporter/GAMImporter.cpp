@@ -690,10 +690,10 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	return headersize + PPLocCount * 12;
 }
 
-int GAMImporter::PutJournals(DataStream *stream, Game *game)
+int GAMImporter::PutJournals(DataStream *stream, const Game *game)
 {
 	for (unsigned int i=0;i<JournalCount;i++) {
-		GAMJournalEntry *j = game->GetJournalEntry(i);
+		const GAMJournalEntry *j = game->GetJournalEntry(i);
 
 		stream->WriteDword( &j->Text );
 		stream->WriteDword( &j->GameTime );
@@ -750,7 +750,7 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
 }
 
 //only in PST
-int GAMImporter::PutKillVars(DataStream *stream, Game *game)
+int GAMImporter::PutKillVars(DataStream *stream, const Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -772,7 +772,7 @@ int GAMImporter::PutKillVars(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImporter::PutVariables(DataStream *stream, Game *game)
+int GAMImporter::PutVariables(DataStream *stream, const Game *game)
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -1075,7 +1075,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	return 0;
 }
 
-int GAMImporter::PutPCs(DataStream *stream, Game *game)
+int GAMImporter::PutPCs(DataStream *stream, const Game *game)
 {
 	unsigned int i;
 	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
@@ -1103,7 +1103,7 @@ int GAMImporter::PutPCs(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImporter::PutNPCs(DataStream *stream, Game *game)
+int GAMImporter::PutNPCs(DataStream *stream, const Game *game)
 {
 	unsigned int i;
 	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
@@ -1193,7 +1193,7 @@ void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
 	stream->WriteDword( &h->visited );
 }
 
-int GAMImporter::PutMaze(DataStream *stream, Game *game)
+int GAMImporter::PutMaze(DataStream *stream, const Game *game)
 {
 	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
 		PutMazeEntry(stream, game->mazedata+i*MAZE_ENTRY_SIZE);

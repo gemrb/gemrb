@@ -484,12 +484,12 @@ static bool DoSaveGame(const char *Path)
 static int CanSave()
 {
 	//some of these restrictions might not be needed
-	Store * store = core->GetCurrentStore();
+	const Store *store = core->GetCurrentStore();
 	if (store) {
 		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, DMC_BG2XPGREEN);
 		return 1; //can't save while store is open
 	}
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1; //no gamecontrol!!!
@@ -499,7 +499,7 @@ static int CanSave()
 		return 2; //can't save while in dialog
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
@@ -509,7 +509,7 @@ static int CanSave()
 		return 3;
 	}
 
-	Map *map = game->GetCurrentArea();
+	const Map *map = game->GetCurrentArea();
 	if (!map) {		
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
@@ -523,7 +523,7 @@ static int CanSave()
 
 	int i = game->GetPartySize(true);
 	while(i--) {
-		Actor *actor = game->GetPC(i, true);
+		const Actor *actor = game->GetPC(i, true);
 		// can't save while (party) actors are in helpless or dead states
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
 		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {

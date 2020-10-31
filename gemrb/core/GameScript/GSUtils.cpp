@@ -2208,7 +2208,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 		return value;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( poi, value );
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
@@ -2251,7 +2251,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( VarName, value );
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
@@ -2280,7 +2280,7 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	ieDword value = 0;
 	char newVarName[8];
 	strlcpy(newVarName, Context, 7);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
 		return true;

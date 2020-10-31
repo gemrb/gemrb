@@ -11254,7 +11254,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetItem__doc );
 	}
 	//it isn't a problem if actor not found
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game) {
 		if (!PartyID) {
 			PartyID = game->GetSelectedPCSingle();

@@ -246,7 +246,7 @@ void Container::TryPickLock(const Actor *actor)
 	core->PlaySound(DS_PICKLOCK, SFX_CHAN_HITS); //AMB_D21D
 	ImmediateEvent();
 	int xp = actor->CalculateExperience(XP_LOCKPICK, actor->GetXPLevel(1));
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	game->ShareXP(xp, SX_DIVIDE);
 }
 
