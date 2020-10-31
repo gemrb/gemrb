@@ -369,7 +369,7 @@ void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 			&& !core->IsPresentingModalWindow()
 			&& !core->InCutSceneMode()
 			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
-			core->GetGame()->SetHotKey(toupper(Key));
+			core->GetGame()->SendHotKey(toupper(Key));
 		}
 		//this is to refresh changing mouse cursors should the focus change)
 		FakeMouseMove();

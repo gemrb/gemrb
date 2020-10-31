@@ -338,7 +338,7 @@ public:
 	/** Returns the npcs count */
 	int GetNPCCount() const { return (int)NPCs.size(); }
 	/** Sends the hotkey trigger to all selected pcs */
-	void SetHotKey(unsigned long Key) const;
+	void SendHotKey(unsigned long Key) const;
 	/** Select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/** Get index of selected PC for non-walking env (shops, inventory, ...) */

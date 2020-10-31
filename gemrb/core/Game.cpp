@@ -570,7 +570,7 @@ int Game::GetPartySize(bool onlyalive) const
 }
 
 /* sends the hotkey trigger to all selected actors */
-void Game::SetHotKey(unsigned long Key) const
+void Game::SendHotKey(unsigned long Key) const
 {
 	for (auto actor : selected) {
 		if (actor->IsSelected()) {
