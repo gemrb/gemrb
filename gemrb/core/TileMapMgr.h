@@ -32,18 +32,18 @@ public:
 	TileMapMgr(void);
 	virtual ~TileMapMgr(void);
 	virtual bool Open(DataStream* stream) = 0;
-	virtual TileMap* GetTileMap(TileMap *tm) = 0;
+	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
 		bool& BaseClosed) = 0;
-	virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) = 0;
-	virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) = 0;
+	virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) const = 0;
+	virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) const = 0;
 	virtual void SetExtendedNight(bool night) = 0;
 
-	virtual Wall_Polygon** GetWallGroups() = 0;
+	virtual Wall_Polygon** GetWallGroups() const = 0;
 	//returns only the wall polygon counts
-	virtual ieDword GetWallPolygonsCount() = 0;
+	virtual ieDword GetWallPolygonsCount() const = 0;
 	//returns Wall + Door polygon counts
-	virtual ieDword GetPolygonsCount() = 0;
+	virtual ieDword GetPolygonsCount() const = 0;
 };
 
 }

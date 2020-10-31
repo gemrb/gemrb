@@ -48,12 +48,6 @@ struct wed_polygon {
 
 WEDImporter::WEDImporter(void)
 {
-	str = NULL;
-	OverlaysCount = DoorsCount = OverlaysOffset = SecHeaderOffset = 0;
-	DoorPolygonsCount = DoorsOffset = DoorTilesOffset = PILTOffset = 0;
-	WallPolygonsCount = PolygonsOffset = VerticesOffset = WallGroupsOffset = 0;
-	OpenPolyCount = ClosedPolyCount = OpenPolyOffset = ClosedPolyOffset = 0;
-	ExtendedNight = false;
 }
 
 WEDImporter::~WEDImporter(void)
@@ -111,7 +105,7 @@ bool WEDImporter::Open(DataStream* stream)
 	return true;
 }
 
-int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
+int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
 {
 	ieResRef res;
 	int usedoverlays = 0;
@@ -188,7 +182,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 }
 
 //this will replace the tileset of an existing tilemap, or create a new one
-TileMap* WEDImporter::GetTileMap(TileMap *tm)
+TileMap* WEDImporter::GetTileMap(TileMap *tm) const
 {
 	int usedoverlays;
 	bool freenew = false;
@@ -242,13 +236,13 @@ void WEDImporter::GetDoorPolygonCount(ieWord count, ieDword offset)
 	}
 }
 
-void WEDImporter::SetupClosedDoor(unsigned int &index, unsigned int &count)
+void WEDImporter::SetupClosedDoor(unsigned int &index, unsigned int &count) const
 {
 	index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
 	count = ClosedPolyCount;
 }
 
-void WEDImporter::SetupOpenDoor(unsigned int &index, unsigned int &count)
+void WEDImporter::SetupOpenDoor(unsigned int &index, unsigned int &count) const
 {
 	index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
 	count = OpenPolyCount;
@@ -296,7 +290,7 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	return DoorTiles;
 }
 
-Wall_Polygon **WEDImporter::GetWallGroups()
+Wall_Polygon **WEDImporter::GetWallGroups() const
 {
 	ieDword polygonCount = WallPolygonsCount+DoorPolygonsCount;
 
