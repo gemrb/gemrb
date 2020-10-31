@@ -769,7 +769,14 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	Point pos(fx->PosX,fx->PosY);
-	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
+	Projectile *pro;
+	if (fx->Parameter4) {
+		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
+		// we don't just check for both, since there's some overlap
+		pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
+	} else {
+		pro = core->GetProjectileServer()->GetProjectileByIndex(0x1001+fx->Parameter2);
+	}
 	pro->SetCaster(fx->CasterID, fx->CasterLevel);
 	if (target) {
 		//i believe the spell hit projectiles don't follow anyone

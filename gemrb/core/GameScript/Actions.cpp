@@ -7124,6 +7124,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
+	fx->Parameter4 = 1; // mark for special treatment
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
@@ -7152,6 +7153,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
+	fx->Parameter4 = 1; // mark for special treatment
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
