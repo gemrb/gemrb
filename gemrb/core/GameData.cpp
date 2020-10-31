@@ -664,7 +664,7 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
-	if (!trapSaveBonus->GetRowCount()) {
+	if (!trapSaveBonus.ok()) {
 		trapSaveBonus.load("trapsave", true);
 	}
 
