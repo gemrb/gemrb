@@ -663,7 +663,7 @@ static EffectDesc effectnames[] = {
 	{ "Protection:Opcode", fx_protection_opcode, 0, -1 },
 	{ "Protection:Opcode2", fx_protection_opcode, 0, -1 },
 	{ "Protection:Projectile",fx_protection_from_projectile, 0, -1 },
-	{ "Protection:School",fx_generic_effect, 0, -1 },//overlay?
+	{ "Protection:School", fx_protection_school, 0, -1 },//overlay?
 	{ "Protection:SchoolDec",fx_protection_school_dec, 0, -1 },//overlay?
 	{ "Protection:SecondaryType",fx_protection_secondary_type, 0, -1 },//overlay?
 	{ "Protection:SecondaryTypeDec",fx_protection_secondary_type_dec, 0, -1 },//overlay?
