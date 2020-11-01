@@ -257,7 +257,7 @@ private:
 	std::vector<std::vector<char *> > npclevels;
 	int *bntchnc;
 	int bntrows;
-	CRRow *crtable;
+	CRRow *crtable = nullptr;
 	ieResRef restmovies[8];
 	ieResRef daymovies[8];
 	ieResRef nightmovies[8];
