@@ -696,8 +696,14 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 	assert(trigger.triggerID < MAX_TRIGGERS);
 	if (triggerflags[trigger.triggerID] & TF_SAVED) {
 		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
-		Scriptable *scr = area->GetScriptableByGlobalID(trigger.param1);
-		Log(DEBUG, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName, trigger.param1, scr ? scr->GetScriptName() : "none", trigger.triggerID);
+		const char *name = "none";
+		if (area) {
+			Scriptable *scr = area->GetScriptableByGlobalID(trigger.param1);
+			if (scr) {
+				name = scr->GetScriptName();
+			}
+		}
+		Log(DEBUG, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName, trigger.param1, name, trigger.triggerID);
 		LastTrigger = trigger.param1;
 	}
 }
