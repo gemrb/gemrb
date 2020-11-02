@@ -2636,6 +2636,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
 
+		// guessing, since this trigger was unused in the originals — likely duplicating LastSummoner
+		if (Owner) {
+			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
+		}
+
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {

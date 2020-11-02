@@ -136,18 +136,18 @@ typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
 enum {
-	trigger_acquired = 0x1,
+	trigger_acquired = 0x1, // unused and broken in the original
 	trigger_attackedby = 0x2,
 	trigger_help = 0x3,
 	trigger_joins = 0x4,
 	trigger_leaves = 0x5,
 	trigger_receivedorder = 0x6,
-	trigger_said = 0x7,
+	trigger_said = 0x7, // unused in the originals
 	trigger_turnedby = 0x8,
 	trigger_unusable = 0x9,
 	trigger_hitby = 0x20,
 	trigger_hotkey = 0x21,
-	trigger_timerexpired = 0x22,
+	trigger_timerexpired = 0x22, // handled internally through TimerExpired
 	trigger_trigger = 0x24,
 	trigger_die = 0x25,
 	trigger_targetunreachable = 0x26,
@@ -169,7 +169,7 @@ enum {
 	trigger_disarmfailed  = 0x5f,
 	trigger_picklockfailed = 0x60,
 	trigger_clicked = 0x70,
-	trigger_triggerclick = 0x79, // pst
+	trigger_triggerclick = 0x79, // pst; we map it to trigger_clicked
 	trigger_traptriggered = 0x87, // bg2
 	trigger_partymemberdied = 0x88, // bg2
 	trigger_spellcast = 0x91, // bg2
@@ -180,7 +180,7 @@ enum {
 	trigger_harmlessclosed = 0x9e, // pst
 	trigger_harmlessentered = 0x9f, // pst
 	trigger_spellcastonme = 0xa1, // bg2
-	trigger_nulldialog = 0xa4, // pst
+	trigger_nulldialog = 0xa4, // pst, checked directly in NullDialog
 	trigger_wasindialog = 0xa5, // pst
 	trigger_spellcastpriest = 0xa6, // bg2
 	trigger_spellcastinnate = 0xa7, // bg2

@@ -478,6 +478,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		trigger->Flags &= ~TRAP_DEACTIVATED;
 		if (trigger->TrapResets()) {
 			trigger->Trapped = 1;
+			Sender->AddTrigger(TriggerEntry(trigger_reset, trigger->GetGlobalID()));
 		}
 	} else {
 		trigger->Flags |= TRAP_DEACTIVATED;
