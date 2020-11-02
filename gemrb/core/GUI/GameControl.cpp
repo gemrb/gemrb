@@ -1996,12 +1996,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 		}
 
 		if (Button & GEM_MB_ACTION) {
+			Actor *pc = core->GetFirstSelectedPC(false);
+			if (!pc) {
+				//this could be a non-PC
+				pc = game->selected[0];
+			}
 			if (!actor) {
-				Actor *pc = core->GetFirstSelectedPC(false);
-				if (!pc) {
-					//this could be a non-PC
-					pc = game->selected[0];
-				}
 				//add a check if you don't want some random monster handle doors and such
 				if (overDoor) {
 					HandleDoor(overDoor, pc);
@@ -2032,15 +2032,15 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 						goto formation_handling;
 					}
 				}
-				//just a single actor, no formation
-				if (game->selected.size()==1
-					&& target_mode == TARGET_MODE_CAST
-					&& spellCount
-					&& (target_types&GA_POINT)) {
-					//the player is using an item or spell on the ground
-					TryToCast(pc, p);
-					goto formation_handling;
-				}
+			}
+			//just a single actor, no formation
+			if (game->selected.size()==1
+				&& target_mode == TARGET_MODE_CAST
+				&& spellCount
+				&& (target_types&GA_POINT)) {
+				//the player is using an item or spell on the ground
+				TryToCast(pc, p);
+				goto formation_handling;
 			}
 			doMove = (!actor && target_mode == TARGET_MODE_NONE);
 		} else if (Button & GEM_MB_MENU) {
