@@ -2381,6 +2381,8 @@ int Trigger::Evaluate(Scriptable *Sender) const
 	if (flags & TF_NEGATE) {
 		return !ret;
 	}
+	// ideally we'd set LastTrigger here, but we need the resolved target object
+
 	return ret;
 }
 

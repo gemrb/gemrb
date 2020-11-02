@@ -708,6 +708,17 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 	}
 }
 
+// plenty of triggers in svitrobj don't send trigger messages and so never see the code in AddTrigger
+void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
+{
+	assert(triggerID < MAX_TRIGGERS);
+	if (triggerflags[triggerID] & TF_SAVED) {
+		Scriptable *scr = area->GetScriptableByGlobalID(globalID);
+		Log(DEBUG, "Scriptable", "%s: Added LastTrigger 2: %d (%s) for trigger %d\n", scriptName, globalID, scr ? scr->GetScriptName() : "none", triggerID);
+		LastTrigger = globalID;
+	}
+}
+
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
 	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
 		TriggerEntry &trigger = *m;

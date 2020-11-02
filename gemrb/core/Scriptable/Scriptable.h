@@ -142,9 +142,20 @@ enum {
 	trigger_joins = 0x4,
 	trigger_leaves = 0x5,
 	trigger_receivedorder = 0x6,
-	trigger_said = 0x7, // unused in the originals
+	trigger_said = 0x7, // unused in the originals; if added, don't forget to set LastTrigger
 	trigger_turnedby = 0x8,
 	trigger_unusable = 0x9,
+	trigger_alignment = 0xa,
+	trigger_allegiance = 0xb,
+	trigger_class = 0xc,
+	trigger_exists = 0xd,
+	trigger_general = 0xe,
+	trigger_hpgt = 0x11,
+	trigger_morale = 0x14,
+	trigger_race = 0x17,
+	trigger_range = 0x18,
+	trigger_reputation = 0x19,
+	trigger_specifics = 0x1d,
 	trigger_hitby = 0x20,
 	trigger_hotkey = 0x21,
 	trigger_timerexpired = 0x22, // handled internally through TimerExpired
@@ -154,9 +165,14 @@ enum {
 	trigger_heard = 0x2f,
 	trigger_becamevisible = 0x33,
 	trigger_oncreation = 0x36,
+	trigger_statecheck = 0x37,
+	trigger_reaction = 0x3c,
+	trigger_inparty = 0x43,
+	trigger_checkstat = 0x44,
 	trigger_died = 0x4a,
 	trigger_killed = 0x4b,
 	trigger_entered = 0x4c,
+	trigger_gender = 0x4c,
 	trigger_opened = 0x52,
 	trigger_closed = 0x53,
 	trigger_detected = 0x54,
@@ -345,6 +361,7 @@ public:
 	//true condition (whole triggerblock returned true)
 	void InitTriggers();
 	void AddTrigger(TriggerEntry trigger);
+	void SetLastTrigger(ieDword triggerID, ieDword globalID);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
