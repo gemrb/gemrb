@@ -2205,19 +2205,14 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 {
 	//check iwd ids targeting
-	// was the opposite for a while (cure light wounds resisted by undead), but that spell uses 0x122 anyway
-	// eg. bard songs check for non-allies and deaf actors to exclude them
-	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
-		return FX_ABORT;
+	if (!check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
 	}
 
-	// don't abort if we passed the check and we're in the same spell
-	if (!strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource))) {
+	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource))) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
-	// FIXME: should probably return FX_NOT_APPLIED instead
-	Log(DEBUG, "IWDOpcodes", "fx_resist_spell: blatantly resisted spell %s!", fx->Source);
 	return FX_ABORT;
 }
 
