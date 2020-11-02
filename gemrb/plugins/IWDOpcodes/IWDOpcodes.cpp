@@ -887,7 +887,7 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //this requires the FXOpcode package
 ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
- "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","CDOOM","GINSECT",
+ "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","GINSECT","CDOOM",
  "MSUMMOM"};
 
 //0xf0 IWDMonsterSummoning

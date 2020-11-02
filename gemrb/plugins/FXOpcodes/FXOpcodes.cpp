@@ -771,7 +771,7 @@ static EffectDesc effectnames[] = {
 	{ "UncannyDodge", fx_uncanny_dodge, 0, -1 },
 	{ "Unknown", fx_unknown, EFFECT_NO_ACTOR, -1 },
 	{ "Unlock", fx_knock, EFFECT_NO_ACTOR, -1 }, //open doors/containers
-	{ "UnsummonCreature", fx_unsummon_creature, 0, -1 },
+	{ "UnsummonCreature", fx_unsummon_creature, EFFECT_NO_LEVEL_CHECK, -1 },
 	{ "Variable:StoreLocalVariable", fx_local_variable, 0, -1 },
 	{ "VisualAnimationEffect", fx_visual_animation_effect, 0, -1 }, //unknown
 	{ "VisualRangeModifier", fx_visual_range_modifier, 0, -1 },
