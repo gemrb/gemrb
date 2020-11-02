@@ -495,14 +495,13 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
-//FIXME: the constant return values do not match the rest
-static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
+static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
 {
 	if (spellrescnt==-1) {
 		ReadSpellProtTable("splprot");
 	}
 	if (type>=(ieDword) spellrescnt) {
-		return 0; //not resisted
+		return false; //not resisted
 	}
 
 	ieDword idx = spellres[type].stat;
@@ -512,10 +511,9 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 	if (val==0xffffffff) {
 		val = value;
 	}
-	ieDword animID; int ret;
 	switch (idx) {
 	case STI_INVALID:
-		return 0;
+		return false;
 	case STI_EA:
 		return DiffCore(EARelation(Owner, target), val, rel);
 	case STI_DAYTIME:
@@ -534,24 +532,16 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 		}
 	case STI_TWO_ROWS:
 		//used in checks where any of two matches are ok (golem or undead etc)
-		if (check_iwd_targeting(Owner, target, value, rel, fx)) return 1;
-		if (check_iwd_targeting(Owner, target, value, val, fx)) return 1;
-		return 0;
+		return check_iwd_targeting(Owner, target, value, rel, fx) ||
+			check_iwd_targeting(Owner, target, value, val, fx);
 	case STI_NOT_TWO_ROWS:
 		//this should be the opposite as above
-		if (check_iwd_targeting(Owner, target, value, rel, fx)) return 0;
-		if (check_iwd_targeting(Owner, target, value, val, fx)) return 0;
-		return 1;
+		return !(check_iwd_targeting(Owner, target, value, rel, fx) ||
+			check_iwd_targeting(Owner, target, value, val, fx));
 	case STI_SOURCE_TARGET:
-		if (Owner==target) {
-			return 0;
-		}
-		return 1;
+		return Owner == target;
 	case STI_SOURCE_NOT_TARGET:
-		if (Owner!=target) {
-			return 0;
-		}
-		return 1;
+		return Owner != target;
 	case STI_CIRCLESIZE:
 		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
 	case STI_EVASION:
@@ -559,29 +549,28 @@ static int check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, 
 			// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
 			// FIXME: check for evasion itself
 			if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
-				return 0;
+				return false;
 			}
 			val = target->GetSavingThrow(4, 0, fx); // reflex
 		} else {
 			if (target->GetThiefLevel() < 7 ) {
-				return 0;
+				return false;
 			}
 			val = target->GetSavingThrow(1,0); //breath
 		}
 
-		if (val) {
-			return 1;
-		}
-		return 0;
+		return val;
 	case STI_WATERY:
-		// hardcoded via animation id, so we can't use STI_TWO_ROWS
-		// sahuagin x2, water elementals x2 (and water weirds)
-		animID = target->GetSafeStat(IE_ANIMATION_ID);
-		ret = !val;
-		if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
-			ret = val;
+		{
+			// hardcoded via animation id, so we can't use STI_TWO_ROWS
+			// sahuagin x2, water elementals x2 (and water weirds)
+			ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
+			int ret = !val;
+			if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+				ret = val;
+			}
+			return ret;
 		}
-		return ret;
 	default:
 		{
 			//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
