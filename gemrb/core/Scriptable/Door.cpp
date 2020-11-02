@@ -242,7 +242,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	return blocked;
 }
 
-void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
+void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 {
 	if (playsound) {
 		//the door cannot be blocked when opening,
@@ -256,17 +256,19 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID)
 		area->JumpActors(true);
 	}
 	if (Open) {
-		if (Trapped) {
-			AddTrigger(TriggerEntry(trigger_opened, ID));
-		} else {
-			AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
+		if (addTrigger) {
+			if (Trapped) {
+				AddTrigger(TriggerEntry(trigger_opened, ID));
+			} else {
+				AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
+			}
 		}
 
 		// in PS:T, opening a door does not unlock it
 		if (!core->HasFeature(GF_REVERSE_DOOR)) {
 			SetDoorLocked(false,playsound);
 		}
-	} else {
+	} else if (addTrigger) {
 		if (Trapped) {
 			AddTrigger(TriggerEntry(trigger_closed, ID));
 		} else {
