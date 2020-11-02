@@ -692,20 +692,7 @@ void Scriptable::AddTrigger(TriggerEntry trigger)
 {
 	triggers.push_back(trigger);
 	ImmediateEvent();
-
-	assert(trigger.triggerID < MAX_TRIGGERS);
-	if (triggerflags[trigger.triggerID] & TF_SAVED) {
-		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
-		const char *name = "none";
-		if (area) {
-			Scriptable *scr = area->GetScriptableByGlobalID(trigger.param1);
-			if (scr) {
-				name = scr->GetScriptName();
-			}
-		}
-		Log(DEBUG, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName, trigger.param1, name, trigger.triggerID);
-		LastTrigger = trigger.param1;
-	}
+	SetLastTrigger(trigger.triggerID, trigger.param1);
 }
 
 // plenty of triggers in svitrobj don't send trigger messages and so never see the code in AddTrigger
@@ -713,8 +700,15 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 {
 	assert(triggerID < MAX_TRIGGERS);
 	if (triggerflags[triggerID] & TF_SAVED) {
-		Scriptable *scr = area->GetScriptableByGlobalID(globalID);
-		Log(DEBUG, "Scriptable", "%s: Added LastTrigger 2: %d (%s) for trigger %d\n", scriptName, globalID, scr ? scr->GetScriptName() : "none", triggerID);
+		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
+		const char *name = "none";
+		if (area) {
+			Scriptable *scr = area->GetScriptableByGlobalID(globalID);
+			if (scr) {
+				name = scr->GetScriptName();
+			}
+		}
+		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName, globalID, name, triggerID);
 		LastTrigger = globalID;
 	}
 }
