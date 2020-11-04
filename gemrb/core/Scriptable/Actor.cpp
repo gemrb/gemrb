@@ -5815,7 +5815,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	// FIXME
-	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction()) {
+	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction() || GetStance() == IE_ANI_DIE) {
 		return false; //actor is currently dying, let him die first
 	}
 	if (!(InternalFlags&IF_REALLYDIED) ) {
@@ -5831,8 +5831,6 @@ bool Actor::CheckOnDeath()
 		return false;
 	}
 
-	//we need to check animID here, if it has not played the death
-	//sequence yet, then we could return now
 	ClearActions();
 	//missed the opportunity of Died()
 	InternalFlags&=~IF_JUSTDIED;
