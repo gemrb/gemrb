@@ -494,14 +494,15 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_WATERY            0x110
 #define STI_INVALID           0xffff
 
-//returns true if iwd ids targeting resists the spell
+//returns true if the target matches iwd ids targeting
+//usually, this is used to restrict an effect to specific targets
 static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
 {
 	if (spellrescnt==-1) {
 		ReadSpellProtTable("splprot");
 	}
 	if (type>=(ieDword) spellrescnt) {
-		return false; //not resisted
+		return false; //not matched
 	}
 
 	ieDword idx = spellres[type].stat;
