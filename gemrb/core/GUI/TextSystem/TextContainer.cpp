@@ -722,7 +722,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 	const String& text = ts->Text();
 	size_t textLen = ts->Text().length();
 
-	if (Editable() && printPos < cursorPos && printPos + textLen >= cursorPos) {
+	if (Editable() && printPos <= cursorPos && printPos + textLen >= cursorPos) {
 		const Font* printFont = ts->LayoutFont();
 		
 		auto it = FindCursorRegion(layout);
