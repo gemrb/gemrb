@@ -2493,7 +2493,7 @@ def BiographyPress():
 
 	BiographyClearButton = BiographyWindow.GetControl (5)
 	BiographyClearButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BiographyClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BiographyTextArea.Clear())
+	BiographyClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BiographyClearPress (BiographyTextArea))
 	BiographyClearButton.SetText (18622)
 
 	BiographyCancelButton = BiographyWindow.GetControl (2)
@@ -2509,6 +2509,10 @@ def BiographyPress():
 
 	BiographyWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
+
+def BiographyClearPress(TA):
+	TA.Clear ()
+	TA.Focus ()
 
 def BiographyDonePress():
 	global CharGenWindow, BiographyWindow, BiographyTextArea

@@ -73,6 +73,7 @@ def ClearPress():
 
 	GemRB.SetToken("BIO", "")
 	EditControl.SetText (GemRB.GetToken("BIO") )
+	EditControl.Focus ()
 	return
 
 def RevertPress():

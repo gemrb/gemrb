@@ -51,9 +51,15 @@ def OnLoad ():
 	CancelButton.MakeEscape()
 
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OkPress)
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: EditTextArea.Clear())
+	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	EditTextArea.Focus ()
 	return
+
+def ClearBiography():
+	EditTextArea = GemRB.GetView ("BIO")
+	EditTextArea.Clear ()
+	EditTextArea.Focus ()
 
 def OkPress ():
 	global BioWindow
