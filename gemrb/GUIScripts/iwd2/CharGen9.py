@@ -78,7 +78,8 @@ def ClearPress():
 def RevertPress():
 	global BioStrRef
 	BioTable = GemRB.LoadTable ("bios")
-	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("BaseClass")-1, "index")
+	MyChar = GemRB.GetVar ("Slot")
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	GemRB.SetToken ("BIO", GemRB.GetString(BioStrRef) )
 	if type (EditControl) != type (7350): # just some int
