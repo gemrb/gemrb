@@ -46,10 +46,10 @@ namespace GemRB {
 class VLCPlayer : public MoviePlayer {
 private:
 	libvlc_instance_t *libvlc;
-	libvlc_media_t *media;
-	libvlc_media_player_t *mediaPlayer;
+	libvlc_media_t *media = nullptr;
+	libvlc_media_player_t *mediaPlayer = nullptr;
 
-	VideoContext* ctx;
+	VideoContext* ctx = nullptr;
 
 	// libvlc_video_set_callbacks
 	static void display(void *data, void *id);
