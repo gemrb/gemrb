@@ -24,8 +24,9 @@ jobs:
         # FindOpenAL prefers the framework version by default ... which deprecated OpenAL
         openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib"
         mkdir build && cd build &&
+        export OPENALDIR="/usr/local/opt/openal-soft/" &&
         cmake --version &&
-        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DDISABLE_WERROR=1 ..
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST ..
         grep -i openal CMakeCache.txt
 
     - name: Build
