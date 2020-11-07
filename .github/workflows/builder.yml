@@ -17,7 +17,7 @@ jobs:
 
     - name: Set up Homebrew
       run: |
-        brew install sdl openal-soft sdl_mixer libpng libvorbis
+        brew install sdl openal-soft sdl_mixer libpng libvorbis sccache
 
     - name: Set up build
       run: |
@@ -29,21 +29,38 @@ jobs:
         cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST ..
         grep -i openal CMakeCache.txt
 
+    - name: Compiler cache (sccache)
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/sccache
+          ~/Library/Caches/Mozilla.sccache
+        key: ${{ runner.os }}-sccache-v1-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-sccache-v1-${{ github.ref }}-
+          ${{ runner.os }}-sccache-v1-refs/heads/master-
+          ${{ runner.os }}-sccache-v1-
+
     - name: Build
       run: |
         cd build &&
         make &&
         make install
 
+    - name: Show build cache stats
+      run: |
+        command -v sccache &&
+        sccache -s
+
     - name: Set up SSH
       uses: kielabokkie/ssh-key-and-known-hosts-action@v1
-      if: ${{ github.event_name == 'push' }}
+      if: github.event_name == 'push'
       with:
         ssh-private-key: ${{ secrets.SSH_SF_PRIVATE_KEY }}
         ssh-host: frs.sourceforge.net
 
     - name: Upload
-      if: ${{ github.event_name == 'push' }}
+      if: github.event_name == 'push'
       env:
         OS: ${{ runner.os }}
       run: |
