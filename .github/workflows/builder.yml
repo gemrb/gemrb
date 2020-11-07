@@ -1,6 +1,8 @@
 name: Builders
 
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master, subviews ]
 
