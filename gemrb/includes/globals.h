@@ -37,9 +37,9 @@
 #define VERSION_GEMRB "0.8.7-git"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
+#define PACKAGE "GemRB"
 
 #ifdef ANDROID
-# define PACKAGE "GemRB"
 # define S_IEXEC  S_IXUSR
 # define S_IREAD  S_IRUSR
 # define S_IWRITE S_IWUSR
