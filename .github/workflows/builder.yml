@@ -22,6 +22,8 @@ jobs:
     - name: Build
       run: |
         cmake --version
+        export LDFLAGS="-L/usr/local/opt/openal-soft/lib"
+        export CPPFLAGS="-I/usr/local/opt/openal-soft/include"
         mkdir build && cd build &&
         cmake -DCMAKE_INSTALL_PREFIX=iprefix .. &&
         make &&
