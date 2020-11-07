@@ -19,12 +19,15 @@ jobs:
       run: |
         brew install sdl openal-soft sdl_mixer libpng libvorbis
 
+    - name: Set up build
+      run: |
+        # FindOpenAL prefers the framework version by default ... which deprecated OpenAL
+        export OPENALDIR="/usr/local/opt/openal-soft/"
+        mkdir build && cd build &&
+        cmake --version &&
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix ..
+
     - name: Build
       run: |
-        cmake --version
-        export LDFLAGS="-L/usr/local/opt/openal-soft/lib"
-        export CPPFLAGS="-I/usr/local/opt/openal-soft/include"
-        mkdir build && cd build &&
-        cmake -DCMAKE_INSTALL_PREFIX=iprefix .. &&
         make &&
         make install
