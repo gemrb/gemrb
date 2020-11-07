@@ -25,7 +25,7 @@ jobs:
         openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib"
         mkdir build && cd build &&
         cmake --version &&
-        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DDISABLE_WERROR ..
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DDISABLE_WERROR=1 ..
         grep -i openal CMakeCache.txt
 
     - name: Build
