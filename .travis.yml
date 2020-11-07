@@ -30,14 +30,6 @@ addons:
     - libvorbis-dev
     - openssh-client
     - python-dev
-  homebrew:
-    packages:
-    - sdl
-    - openal-soft
-    - sdl_mixer
-    - libpng
-    - libvorbis
-    update: true
   ssh_known_hosts: frs.sourceforge.net
 
 before_install:
@@ -51,15 +43,11 @@ before_script:
 script:
   - |
     mkdir build && cd build &&
-    if [ $TRAVIS_OS_NAME != osx ]; then
-      static="-DSTATIC_LINK=1 -DLAYOUT=home"
-    fi &&
+    static="-DSTATIC_LINK=1 -DLAYOUT=home" &&
     cmake -DCMAKE_INSTALL_PREFIX=iprefix $static .. &&
     make &&
-    if [ $TRAVIS_OS_NAME != osx ]; then
-      sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&
-      gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample
-    fi &&
+    sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&
+    gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample &&
     make install
 
 deploy:
@@ -82,9 +70,3 @@ notifications:
 
 os:
   - linux
-  - osx
-
-jobs:
-  exclude:
-    - os: osx
-      compiler: gcc # actually just linked to clang

@@ -1,0 +1,26 @@
+name: Builders
+
+on:
+  pull_request:
+    branches: [ master, subviews ]
+
+jobs:
+  macos:
+    name: MacOS build
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Homebrew
+      run: |
+        brew install sdl openal-soft sdl_mixer libpng libvorbis
+
+    - name: Build
+      run: |
+        cmake --version
+        mkdir build && cd build &&
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix .. &&
+        make &&
+        make install
