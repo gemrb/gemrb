@@ -26,7 +26,7 @@ jobs:
         mkdir build && cd build &&
         export OPENALDIR="/usr/local/opt/openal-soft/" &&
         cmake --version &&
-        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST ..
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
         grep -i openal CMakeCache.txt
 
     - name: Compiler cache (sccache)
