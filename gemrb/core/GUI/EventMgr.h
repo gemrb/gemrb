@@ -301,7 +301,7 @@ private:
 	static buttonbits controllerButtonStates;
 
 public:
-	void DispatchEvent(Event& e);
+	void DispatchEvent(Event e);
 
 	static bool ModState(unsigned short mod);
 

@@ -627,16 +627,47 @@ int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 		EvntManager->DispatchEvent(e);
 		return GEM_OK;
 	}
+	
+	if (InTextInput()) {
+		if (event.type == SDL_KEYDOWN) {
+			int modstate = GetModState(SDL_GetModState());
+			Uint16 chr = event.key.keysym.unicode;
 
-	if (event.type == SDL_KEYDOWN && InTextInput()) {
-		int modstate = GetModState(SDL_GetModState());
-		Uint16 chr = event.key.keysym.unicode;
-
-		if (isprint(chr) && modstate <= GEM_MOD_SHIFT) {
-			char text[2] = { (char)chr, '\0' };
-			Event e = EventMgr::CreateTextEvent(text);
-			EvntManager->DispatchEvent(e);
-			return GEM_OK;
+			if (isprint(chr) && modstate <= GEM_MOD_SHIFT) {
+				char text[2] = { (char)chr, '\0' };
+				Event e = EventMgr::CreateTextEvent(text);
+				EvntManager->DispatchEvent(e);
+				return GEM_OK;
+			}
+		} else if (event.type == SDL_JOYBUTTONDOWN) {
+			Event bsp = EventMgr::CreateKeyEvent(GEM_BACKSP, true);
+			
+			switch(event.jbutton.button) {
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+				dPadSoftKeyboard.RemoveCharacter();
+				EvntManager->DispatchEvent(bsp);
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+				dPadSoftKeyboard.AddCharacter();
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+				dPadSoftKeyboard.NextCharacter();
+				EvntManager->DispatchEvent(bsp);
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
+				dPadSoftKeyboard.PreviousCharacter();
+				EvntManager->DispatchEvent(bsp);
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+				dPadSoftKeyboard.ToggleUppercase();
+				EvntManager->DispatchEvent(bsp);
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			}
 		}
 	}
 

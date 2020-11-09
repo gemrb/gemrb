@@ -137,7 +137,7 @@ bool EventMgr::ControllerButtonState(EventButton btn)
 	return (controllerButtonStates & buttonbits(btn)).any();
 }
 
-void EventMgr::DispatchEvent(Event& e)
+void EventMgr::DispatchEvent(Event e)
 {
 	if (TouchInputEnabled == false && e.EventMaskFromType(e.type) & Event::AllTouchMask) {
 		return;
