@@ -139,3 +139,7 @@ INSTALL( TARGETS gemrb DESTINATION ${BIN_DIR} )
 IF(VCPKG_AUTO_DEPLOY)
 	INCLUDE(vcpkg_deps.cmake)
 ENDIF()
+
+IF(VITA)
+	INCLUDE(${CMAKE_SOURCE_DIR}/platforms/vita/vita_build_vpk.cmake)
+ENDIF(VITA)

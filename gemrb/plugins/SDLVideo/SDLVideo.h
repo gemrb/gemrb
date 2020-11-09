@@ -26,10 +26,19 @@
 #include "GUI/EventMgr.h"
 #include "win32def.h"
 
+#include "DPadSoftKeyboard.h"
 #include "SDLSurfaceDrawing.h"
 #include "SDLSurfaceSprite2D.h"
 
 #include <vector>
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+#define SDLKey SDL_Keycode
+#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
+#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
+#else
+typedef Sint32 SDL_Keycode;
+#endif
 
 namespace GemRB {
 

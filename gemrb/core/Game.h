@@ -258,7 +258,7 @@ private:
 	std::vector<std::vector<ResRef> > npclevels;
 	int *bntchnc;
 	int bntrows;
-	CRRow *crtable;
+	CRRow *crtable = nullptr;
 	ieResRef restmovies[8];
 	ieResRef daymovies[8];
 	ieResRef nightmovies[8];
@@ -314,12 +314,12 @@ private:
 	ieDword timestop_end;
 public:
 	/** Returns the PC's slot count for partyID */
-	int FindPlayer(unsigned int partyID);
+	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
 	Actor* GetPC(unsigned int slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
-	Actor* FindPC(unsigned int partyID);
-	Actor* FindNPC(unsigned int partyID);
+	Actor* FindPC(unsigned int partyID) const;
+	Actor* FindNPC(unsigned int partyID) const;
 	/** Finds a global actor by global ID */
 	Actor *GetGlobalActorByGlobalID(ieDword globalID) const;
 	/** Finds an actor in party, returns slot, if not there, returns -1*/
@@ -327,11 +327,11 @@ public:
 	/** Finds an actor in store, returns slot, if not there, returns -1*/
 	int InStore(const Actor *pc) const;
 	/** Finds an actor in party by scripting name*/
-	Actor* FindPC(const char *deathvar);
+	Actor* FindPC(const char *deathvar) const;
 	/** Finds an actor in store by scripting name*/
-	Actor* FindNPC(const char *deathvar);
+	Actor* FindNPC(const char *deathvar) const;
 	/** Sets the area and position of the actor to the starting position */
-	void InitActorPos(Actor *actor);
+	void InitActorPos(Actor *actor) const;
 	/** Joins party */
 	int JoinParty(Actor* pc, int join=JP_JOIN);
 	/** Return current party size */
@@ -339,19 +339,19 @@ public:
 	/** Returns the npcs count */
 	int GetNPCCount() const { return (int)NPCs.size(); }
 	/** Sends the hotkey trigger to all selected pcs */
-	void SetHotKey(unsigned long Key);
+	void SendHotKey(unsigned long Key) const;
 	/** Select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/** Get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle() const;
-	Actor* GetSelectedPCSingle(bool onlyalive);
+	Actor* GetSelectedPCSingle(bool onlyalive) const;
 	/** (De)selects actor. */
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 
 	/** Return current party level count for xp calculations */
 	int GetTotalPartyLevel(bool onlyalive) const;
 	/** Reassigns inparty numbers, call it after party creation */
-	void ConsolidateParty();
+	void ConsolidateParty() const;
 	/** Removes actor from party (if in there) */
 	int LeaveParty(Actor* pc);
 	/** Returns slot*/
@@ -363,10 +363,10 @@ public:
 	 * use it for the biggest safety, change = true will change the current map */
 	Map* GetMap(const char *areaname, bool change);
 	/** Returns slot of the map if found */
-	int FindMap(const char *ResRef);
+	int FindMap(const char *ResRef) const;
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
-	bool MasterArea(const char *area);
+	bool MasterArea(const char *area) const;
 	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const char *area);
 	/** Guess the master area of the given area*/
@@ -379,9 +379,9 @@ public:
 	int LoadMap(const char* ResRef, bool loadscreen);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
-	Actor* GetNPC(unsigned int Index);
-	void SwapPCs(unsigned int pc1, unsigned int pc2);
-	bool IsDay();
+	Actor* GetNPC(unsigned int Index) const;
+	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
+	bool IsDay() const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
 	bool CheckForReplacementActor(int i);
 
@@ -397,8 +397,8 @@ public:
 	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	unsigned int GetJournalCount() const;
-	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
-	GAMJournalEntry* GetJournalEntry(unsigned int Index);
+	GAMJournalEntry* FindJournalEntry(ieStrRef strref) const;
+	GAMJournalEntry* GetJournalEntry(unsigned int Index) const;
 
 	//saved locations
 	unsigned int GetSavedLocationCount() const;
@@ -438,9 +438,9 @@ public:
 	}
 
 	/** converts challenge rating to xp */
-	int GetXPFromCR(int cr);
+	int GetXPFromCR(int cr) const;
 	/** shares XP among all party members */
-	void ShareXP(int XP, int flags);
+	void ShareXP(int XP, int flags) const;
 	/** returns true if we should start the party overflow window */
 	bool PartyOverflow() const;
 	/** returns true if any pc is attacker or being attacked */
@@ -449,11 +449,11 @@ public:
 	bool EveryoneDead() const;
 	/** returns true if no one moves */
 	bool EveryoneStopped() const;
-	bool EveryoneNearPoint(Map *map, const Point &p, int flags) const;
+	bool EveryoneNearPoint(const Map *map, const Point &p, int flags) const;
 	/** a party member just died now */
-	void PartyMemberDied(Actor *);
+	void PartyMemberDied(const Actor *);
 	/** Increments chapter variable and refreshes kill stats */
-	void IncrementChapter();
+	void IncrementChapter() const;
 	/** Sets party reputation */
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
@@ -480,7 +480,7 @@ public:
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** check if the passed actor is a victim of timestop */
-	bool TimeStoppedFor(const Actor* target=NULL);
+	bool TimeStoppedFor(const Actor* target = nullptr) const;
 	/** updates the infravision info */
 	void Infravision();
 	/** applies the global tint if it is needed */
@@ -499,7 +499,7 @@ public:
 	/** Dumps information about the object */
 	void dump() const;
 	/** Finds an actor by global ID */
-	Actor *GetActorByGlobalID(ieDword objectID);
+	Actor *GetActorByGlobalID(ieDword objectID) const;
 	/** Allocates maze data */
 	ieByte *AllocateMazeData();
 	/** Checks if any timestop effects are active */
@@ -510,13 +510,13 @@ public:
 	/** Checks the bounty encounters (used in bg1) */
 	bool RandomEncounter(ieResRef &BaseArea);
 	/** Resets the area and bored comment timers of the whole party */
-	void ResetPartyCommentTimes();
-	void ReversePCs();
+	void ResetPartyCommentTimes() const;
+	void ReversePCs() const;
 	bool OnlyNPCsSelected() const;
 private:
-	bool DetermineStartPosType(const TableMgr *strta);
+	bool DetermineStartPosType(const TableMgr *strta) const;
 	ieResRef *GetDream(Map *area);
-	void CastOnRest();
+	void CastOnRest() const;
 	void PlayerDream();
 	void TextDream();
 };

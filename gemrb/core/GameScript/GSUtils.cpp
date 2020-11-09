@@ -587,7 +587,8 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
-			//TODO: maybe set the object references here too
+			//TODO: maybe set the other object references here too
+			Sender->LastTrigger = tar->GetGlobalID();
 			return 1;
 		}
 		// NOTE: Detect supposedly doesn't set LastMarked — disable on GA_DETECT if needed
@@ -597,6 +598,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 			snd->LastSeen = tar->GetGlobalID();
 			snd->LastMarked = tar->GetGlobalID();
 		}
+		Sender->LastTrigger = tar->GetGlobalID();
 		return 1;
 	}
 	return 0;
@@ -1548,6 +1550,13 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 	}
 }
 
+// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen, 30gobpon, 11oswald)
+// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
+inline bool paramDelimiter(const char *src)
+{
+	return *src == '"' || (*src == '#' && (*(src-1) == '(' || *(src-1) == ',' || *(src+1) == ')'));
+}
+
 /* this function was lifted from GenerateAction, to make it clearer */
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID)
 {
@@ -1699,8 +1708,8 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 				}
 				//breaking on ',' in case of a monkey attack
 				//fixes bg1:melicamp.dlg, bg1:sharte.dlg, bg2:udvith.dlg
-				//if strings ever need a , inside, this is a FIXME
-				while (*src != '"' && *src !=',') {
+				// NOTE: if strings ever need a , inside, this is will need to change
+				while (*src != ',' && !paramDelimiter(src)) {
 					if (*src == 0) {
 						delete newAction;
 						return NULL;
@@ -1712,7 +1721,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					}
 					src++;
 				}
-				if (*src == '"') {
+				if (*src == '"' || *src == '#') {
 					src++;
 				}
 				*dst = 0;
@@ -2023,7 +2032,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				}
 				// some iwd2 dialogs use # instead of " for delimiting parameters (11phaen)
 				// BUT at the same time, some bg2 mod prefixes use it too (eg. Tashia)
-				while (*src != '"' && (*src != '#' || (*(src-1) != '(' && *(src-1) != ',' && *(src+1) != ')'))) {
+				while (!paramDelimiter(src)) {
 					if (*src == 0) {
 						delete newTrigger;
 						return NULL;
@@ -2180,7 +2189,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
 		return value;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( poi, value );
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
@@ -2223,7 +2232,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
 		game->kaputz->Lookup( VarName, value );
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
@@ -2252,7 +2261,7 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	ieDword value = 0;
 	char newVarName[8];
 	strlcpy(newVarName, Context, 7);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (Sender->GetCurrentArea()->locals->Lookup(VarName, value)) {
 		return true;

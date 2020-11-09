@@ -336,7 +336,7 @@ public:
 	ArmorClass AC;
 	ToHitStats ToHit;
 	ModalState Modal;
-public:
+
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
 	ieResRef LastArea;
@@ -366,7 +366,6 @@ public:
 	ieDword nextBored;           //do something when bored
 	int FatigueComplaintDelay;   // stagger tired messages
 	ieDword lastInit;
-	int speed;
 	//how many attacks left in this round, must be public for cleave opcode
 	int attackcount;
 
@@ -395,6 +394,7 @@ private:
 
 	ieByte SavingThrow[5];
 	ieByte weapSlotCount;
+	int walkScale = 0;
 	// true when command has been played after select
 	bool playedCommandSound;
 	//true every second round of attack
@@ -567,7 +567,8 @@ public:
 	int GetEncumbranceFactor(bool feedback) const;
 	/* calculates speed, encumbrance etc */
 	int CalculateSpeed(bool feedback) const;
-	void SetSpeed(bool feedback) { speed = CalculateSpeed(feedback); }
+	int GetSpeed() const { return walkScale; }
+	void SetSpeed(bool feedback) { walkScale = CalculateSpeed(feedback); }
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
 	/* receives undead turning message */

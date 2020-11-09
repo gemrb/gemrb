@@ -32,6 +32,43 @@
 #include <unistd.h>
 #endif
 
+#ifdef VITA
+#include <psp2/kernel/processmgr.h>
+#include <psp2/power.h>
+#include <psp2/apputil.h> 
+
+// allocating memory for application on Vita
+int _newlib_heap_size_user = 344 * 1024 * 1024;
+char *vitaArgv[3];
+char configPath[25];
+
+void VitaSetArguments(int *argc, char **argv[])
+{
+	SceAppUtilInitParam appUtilParam;
+	SceAppUtilBootParam appUtilBootParam;
+	memset(&appUtilParam, 0, sizeof(SceAppUtilInitParam));
+	memset(&appUtilBootParam, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&appUtilParam, &appUtilBootParam);
+	SceAppUtilAppEventParam eventParam;
+	memset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
+	sceAppUtilReceiveAppEvent(&eventParam);
+	int vitaArgc = 1;
+	vitaArgv[0] = (char*)"";
+	// 0x05 probably corresponds to psla event sent from launcher screen of the app in LiveArea
+	if (eventParam.type == 0x05) {
+		char buffer[2048];
+		memset(buffer, 0, 2048);
+		sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
+		vitaArgv[1] = (char*)"-c";
+		sprintf(configPath, "ux0:data/GemRB/%s.cfg", buffer);
+		vitaArgv[2] = configPath;
+		vitaArgc = 3;
+	}
+	*argc = vitaArgc;
+	*argv = vitaArgv;
+}
+#endif
+
 using namespace GemRB;
 
 #ifdef ANDROID
@@ -57,6 +94,16 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
+#ifdef VITA
+	scePowerSetArmClockFrequency(444);
+	scePowerSetBusClockFrequency(222);
+	scePowerSetGpuClockFrequency(222);
+	scePowerSetGpuXbarClockFrequency(166);
+
+	// Selecting game config from init params
+	VitaSetArguments(&argc, &argv);
+#endif
+
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
@@ -72,7 +119,7 @@ int main(int argc, char* argv[])
 // due to fragmentation since we use a lot of small objects. On the other hand
 // if the threshold is too low, free() starts to permanently ask the kernel
 // about shrinking the heap.
-	#ifdef HAVE_UNISTD_H
+	#if defined(HAVE_UNISTD_H) && !defined(VITA)
 		int pagesize = sysconf(_SC_PAGESIZE);
 	#else
 		int pagesize = 4*1024;
@@ -90,6 +137,9 @@ int main(int argc, char* argv[])
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
+#ifdef VITA
+		sceKernelExitProcess(0);
+#endif
 		return -1;
 	}
 	delete config;
@@ -101,5 +151,8 @@ int main(int argc, char* argv[])
 	core->Main();
 	delete( core );
 	ShutdownLogging();
+#ifdef VITA
+	sceKernelExitProcess(0);
+#endif
 	return 0;
 }

@@ -110,7 +110,7 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 	case 9:
 		c = SixteenToNine[i];
 		break;
-	case 16:
+	default:
 		if (af->GetCycleCount() > i) c = i;
 		break;
 	}

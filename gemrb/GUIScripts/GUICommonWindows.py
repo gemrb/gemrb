@@ -2136,3 +2136,22 @@ def RealRestPress ():
 			GemRB.DisplayString (info["ErrorMsg"], 0xff0000)
 
 	return
+
+# special pst death screen for the finale
+def OpenPSTDeathWindow ():
+	if not GameCheck.IsPST ():
+		return
+
+	def ShowCredits():
+		GemRB.ExecuteString ("EndCredits()")
+		# will also exit to the main menu
+
+	# reuse the main error window
+	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
+	Window = GemRB.LoadWindow (25)
+	Label = Window.GetControl (0xfffffff) # -1 in the CHU
+	Label.SetText (48155)
+	Button = Window.GetControl (1)
+	Button.SetText (1403)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ShowCredits)
+	Window.ShowModal (MODAL_SHADOW_GRAY)

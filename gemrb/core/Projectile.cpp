@@ -1068,6 +1068,10 @@ int Projectile::CalculateTargetFlag() const
 	if (caster && (!checkingEA || (caster->Type == ST_ACTOR && ((Actor *) caster)->GetStat(IE_EA) < EA_GOODCUTOFF))) {
 		return flags;
 	}
+	// iwd2 ar6050 has doors casting chain lightning :)
+	if (caster && caster->Type != ST_ACTOR && checkingEA) {
+		return flags;
+	}
 
 	return flags^(GA_NO_ALLY|GA_NO_ENEMY);
 }

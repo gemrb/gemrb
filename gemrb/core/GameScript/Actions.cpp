@@ -478,6 +478,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 		trigger->Flags &= ~TRAP_DEACTIVATED;
 		if (trigger->TrapResets()) {
 			trigger->Trapped = 1;
+			Sender->AddTrigger(TriggerEntry(trigger_reset, trigger->GetGlobalID()));
 		}
 	} else {
 		trigger->Flags |= TRAP_DEACTIVATED;
@@ -567,7 +568,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 
 void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
@@ -636,7 +637,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 //moves pcs and npcs from an area to another area
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
@@ -2613,7 +2614,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters) {
 		}
 	}
 	//if not an actor opens, it don't play sound
-	door->SetDoorOpen(true, (Sender->Type == ST_ACTOR), gid);
+	door->SetDoorOpen(true, (Sender->Type == ST_ACTOR), gid, false);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -3093,7 +3094,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 //HideCreature hides only the visuals of a creature
 //(feet circle and avatar)
 //the scripts of the creature are still running
-//iwd2 stores this flag in the MC field
+//iwd2 stores this flag in the MC field (MC_HIDDEN)
 void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -7113,6 +7114,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
+	fx->Parameter4 = 1; // mark for special treatment
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
@@ -7141,6 +7143,7 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
+	fx->Parameter4 = 1; // mark for special treatment
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;

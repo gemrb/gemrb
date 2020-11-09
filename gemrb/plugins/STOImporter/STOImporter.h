@@ -32,8 +32,8 @@ namespace GemRB {
 
 class STOImporter : public StoreMgr {
 private:
-	DataStream* str;
-	int version;
+	DataStream* str = nullptr;
+	int version = 0;
 
 public:
 	STOImporter(void);
@@ -42,7 +42,7 @@ public:
 	Store* GetStore(Store *store);
 
 	//returns saved size, updates internal offsets before save
-	void CalculateStoredFileSize(Store *st);
+	void CalculateStoredFileSize(Store *st) const;
 	//saves file
 	bool PutStore(DataStream *stream, Store *store);
 
@@ -52,11 +52,11 @@ private:
 	void GetCure(STOCure *cure);
 	void GetPurchasedCategories(Store* s);
 
-	void PutItems(DataStream *stream, Store* s);
-	void PutDrinks(DataStream *stream, Store* s);
-	void PutCures(DataStream *stream, Store* s);
-	void PutPurchasedCategories(DataStream *stream, Store* s);
-	void PutHeader(DataStream *stream, Store *store);
+	void PutItems(DataStream *stream, const Store* s) const;
+	void PutDrinks(DataStream *stream, const Store* s) const;
+	void PutCures(DataStream *stream, const Store* s) const;
+	void PutPurchasedCategories(DataStream *stream, const Store* s) const;
+	void PutHeader(DataStream *stream, const Store *store);
 };
 
 

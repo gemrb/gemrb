@@ -41,22 +41,29 @@ struct Overlay {
 class WEDImporter : public TileMapMgr {
 private:
 	std::vector<Overlay> overlays;
-	DataStream* str;
-	ieDword OverlaysCount, DoorsCount, OverlaysOffset, SecHeaderOffset,
-		DoorsOffset, DoorTilesOffset;
-	ieDword WallPolygonsCount, PolygonsOffset, VerticesOffset,
-		WallGroupsOffset, PLTOffset;
+	DataStream* str = nullptr;
+	ieDword OverlaysCount = 0;
+	ieDword DoorsCount = 0;
+	ieDword OverlaysOffset = 0;
+	ieDword SecHeaderOffset = 0;
+	ieDword DoorsOffset = 0;
+	ieDword DoorTilesOffset = 0;
+	ieDword WallPolygonsCount = 0;
+	ieDword PolygonsOffset = 0;
+	ieDword VerticesOffset = 0;
+	ieDword WallGroupsOffset = 0;
+	ieDword PLTOffset = 0;
 	ieDword DoorPolygonsCount;
 	//these will change as doors are being read, so get them in time!
-	ieWord OpenPolyCount, ClosedPolyCount;
-	ieDword OpenPolyOffset, ClosedPolyOffset;
-	bool ExtendedNight;
+	ieWord OpenPolyCount = 0, ClosedPolyCount = 0;
+	ieDword OpenPolyOffset = 0, ClosedPolyOffset = 0;
+	bool ExtendedNight = false;
 
 	WallPolygonGroup polygonTable;
 
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
-	int AddOverlay(TileMap *tm, Overlay *overlays, bool rain);
+	int AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const;
 	void ReadWallPolygons();
 	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const;
 
@@ -65,7 +72,7 @@ public:
 	~WEDImporter(void);
 	bool Open(DataStream* stream);
 	//if tilemap already exists, don't create it
-	TileMap* GetTileMap(TileMap *tm);
+	TileMap* GetTileMap(TileMap *tm) const;
 	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
 
 	std::vector<WallPolygonGroup> GetWallGroups() const;

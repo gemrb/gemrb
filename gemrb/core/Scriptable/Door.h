@@ -108,7 +108,7 @@ public:
 	void SetTiles(unsigned short* Tiles, int count);
 	bool CanDetectTrap() const;
 	void SetDoorLocked(int Locked, int playsound);
-	void SetDoorOpen(int Open, int playsound, ieDword ID);
+	void SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger = true);
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
 	void TryPickLock(const Actor *actor);

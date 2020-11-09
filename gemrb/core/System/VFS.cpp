@@ -46,7 +46,14 @@
 #include <cerrno>
 
 #ifndef WIN32
+#ifndef VITA
 #include <dirent.h>
+#else
+#include <psp2/kernel/iofilemgr.h>
+#endif
+#endif
+
+#ifdef HAVE_MMAP
 #include <sys/mman.h>
 #endif
 
@@ -128,6 +135,62 @@ static void closedir(DIR* dirp)
 }
 
 #endif // WIN32
+
+#ifdef VITA
+
+using namespace GemRB;
+
+struct DIR
+{
+	bool is_first;
+	SceUID descriptor;
+};
+
+struct dirent
+{
+	char d_name[_MAX_PATH];
+};
+
+// buffer which readdir returns
+static dirent de;
+
+static DIR* opendir(const char *filename)
+{
+	DIR *dirp = (DIR*) malloc(sizeof(DIR));
+	dirp->is_first = 1;
+	dirp->descriptor = sceIoDopen(filename);
+
+	if (dirp->descriptor <= 0) {
+		free(dirp);
+		return NULL;
+	}
+
+	return dirp;
+}
+
+static dirent* readdir(DIR *dirp)
+{
+	//vitasdk kind of skips current directory entry..
+	if (dirp->is_first) {
+		dirp->is_first = 0;
+		strncpy(de.d_name, ".", 1);
+	} else {
+		SceIoDirent dir;
+		if (sceIoDread(dirp->descriptor, &dir) <= 0)
+			return NULL;
+		strncpy(de.d_name, dir.d_name, 256);
+	}
+
+	return &de;
+}
+
+static void closedir(DIR *dirp)
+{
+	sceIoDclose(dirp->descriptor);
+	free(dirp);
+}
+
+#endif // VITA
 
 namespace GemRB {
 #if __APPLE__
@@ -307,7 +370,7 @@ bool PathJoinExt (char* target, const char* dir, const char* base, const char* e
 	}
 	strcat(file, ".");
 	strcat(file, ext);
-	return PathJoin(target, dir, file, NULL);
+	return PathJoin(target, dir, file, nullptr);
 }
 
 /** Fixes path delimiter character (slash).
@@ -353,7 +416,7 @@ void ResolveFilePath(char* FilePath)
 		Log(ERROR, "VFS", "Too long path to resolve: %s!", FilePath);
 		return;
 	}
-	PathJoin(FilePath, TempFilePath[0]==PathDelimiter?SPathDelimiter:"", TempFilePath, NULL);
+	PathJoin(FilePath, TempFilePath[0] == PathDelimiter ? SPathDelimiter : "", TempFilePath, nullptr);
 }
 
 void ResolveFilePath(std::string& FilePath)
@@ -371,7 +434,7 @@ void ResolveFilePath(std::string& FilePath)
 	if (core && !core->CaseSensitive) {
 		return;
 	}
-	PathJoin(TempFilePath, FilePath[0]==PathDelimiter?SPathDelimiter:"", FilePath.c_str(), NULL);
+	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);
 	FilePath = TempFilePath;
 }
 
@@ -405,7 +468,7 @@ bool MakeDirectories(const char* path)
 			assert(strnlen(Token, _MAX_PATH/2) < _MAX_PATH/2);
 			strcat(TempFilePath, Token);
 		} else
-			PathJoin(TempFilePath, TempFilePath, Token, NULL);
+			PathJoin(TempFilePath, TempFilePath, Token, nullptr);
 
 		if(!MakeDirectory(TempFilePath))
 			return false;
@@ -417,6 +480,11 @@ bool MakeDirectories(const char* path)
 
 bool MakeDirectory(const char* path)
 {
+#ifdef VITA
+	sceIoMkdir(path, 0777);
+	return true;
+#endif
+
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
@@ -515,7 +583,7 @@ void munmap(void *start, size_t) {
 	UnmapViewOfFile(start);
 }
 
-#else
+#elif defined(HAVE_MMAP)
 
 void* readonly_mmap(void *vfd) {
 	int fd = fileno(static_cast<FILE*>(vfd));

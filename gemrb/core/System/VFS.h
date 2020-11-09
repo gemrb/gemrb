@@ -117,7 +117,9 @@ GEM_EXPORT char* CopyHomePath(char* outPath, unsigned short maxLen);
 // default directory housing GUIScripts/Override/Unhardcoded
 GEM_EXPORT char* CopyGemDataPath(char* outPath, unsigned short maxLen);
 
+#ifdef SUPPORTS_MEMSTREAM
 void* readonly_mmap(void *fd);
+#endif
 #ifdef WIN32
 void munmap(void *start, size_t);
 #endif

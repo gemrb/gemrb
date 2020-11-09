@@ -1250,6 +1250,8 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingScroll", NumFingScroll = );
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
+	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
+	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
 
 #undef CONFIG_INT
 
@@ -1331,7 +1333,7 @@ int Interface::Init(InterfaceConfig* config)
 #else
 	CONFIG_PATH("PluginsPath", PluginsPath, "");
 	if (!PluginsPath[0]) {
-		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
+		PathJoin(PluginsPath, GemRBPath, "plugins", nullptr);
 	}
 #endif
 
@@ -1382,9 +1384,9 @@ int Interface::Init(InterfaceConfig* config)
 			// nothing in config so create our own
 			char name[_MAX_PATH];
 
-			PathJoin(name, GamePath, keyname, NULL);
+			PathJoin(name, GamePath, keyname, nullptr);
 			CD[i].push_back(name);
-			PathJoin(name, GamePath, GameDataPath, keyname, NULL);
+			PathJoin(name, GamePath, GameDataPath, keyname, nullptr);
 			CD[i].push_back(name);
 		}
 	}
@@ -1408,9 +1410,13 @@ int Interface::Init(InterfaceConfig* config)
 	char bundlePluginsPath[_MAX_PATH];
 	CopyBundlePath(bundlePluginsPath, sizeof(bundlePluginsPath), PLUGINS);
 	ResolveFilePath(bundlePluginsPath);
+#ifndef STATIC_LINK
 	LoadPlugins(bundlePluginsPath);
 #endif
+#endif
+#ifndef STATIC_LINK
 	LoadPlugins(PluginsPath);
+#endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
 	} else {
@@ -1447,7 +1453,7 @@ int Interface::Init(InterfaceConfig* config)
 
 		char path[_MAX_PATH];
 
-		PathJoin( path, CachePath, NULL);
+		PathJoin(path, CachePath, nullptr);
 		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
 			Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
 			return GEM_ERROR;
@@ -1457,34 +1463,34 @@ int Interface::Init(InterfaceConfig* config)
 		for (i = 0; i < ModPath.size(); ++i)
 			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin( path, GemRBOverridePath, "override", GameType, NULL);
+		PathJoin(path, GemRBOverridePath, "override", GameType, nullptr);
 		if (!strcmp( GameType, "auto" ))
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 		else
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin( path, GemRBOverridePath, "override", "shared", NULL);
+		PathJoin(path, GemRBOverridePath, "override", "shared", nullptr);
 		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin( path, GamePath, GameOverridePath, NULL);
+		PathJoin(path, GamePath, GameOverridePath, nullptr);
 		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//GAME sounds are intentionally not cached, in IWD there are directory structures,
 		//that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-		PathJoin( path, GamePath, GameSoundsPath, NULL);
+		PathJoin(path, GamePath, GameSoundsPath, nullptr);
 		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin( path, GamePath, GameScriptsPath, NULL);
+		PathJoin(path, GamePath, GameScriptsPath, nullptr);
 		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin( path, GamePath, GamePortraitsPath, NULL);
+		PathJoin(path, GamePath, GamePortraitsPath, nullptr);
 		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin( path, GamePath, GameDataPath, NULL);
+		PathJoin(path, GamePath, GameDataPath, nullptr);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		// accomodating silly installers that create a data/Data/.* structure
-		PathJoin( path, GamePath, GameDataPath, "Data", NULL);
+		PathJoin(path, GamePath, GameDataPath, "Data", nullptr);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
@@ -1492,7 +1498,7 @@ int Interface::Init(InterfaceConfig* config)
 		for (i = 0; i < MAX_CD; i++) {
 			for (size_t j=0;j<CD[i].size();j++) {
 				description[2]='1'+i;
-				PathJoin( path, CD[i][j].c_str(), GameDataPath, NULL);
+				PathJoin(path, CD[i][j].c_str(), GameDataPath, nullptr);
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 			}
 		}
@@ -1500,20 +1506,20 @@ int Interface::Init(InterfaceConfig* config)
 
 		// most of the old gemrb override files can be found here,
 		// so they have a lower priority than the game files and can more easily be modded
-		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+		PathJoin(path, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 		if (!strcmp(GameType, "auto")) {
 			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
 		} else {
 			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 		}
-		PathJoin( path, GemRBUnhardcodedPath, "unhardcoded", "shared", NULL);
+		PathJoin(path, GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
 		gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
 	{
 		Log(MESSAGE, "Core", "Initializing KEY Importer...");
 		char ChitinPath[_MAX_PATH];
-		PathJoin( ChitinPath, GamePath, "chitin.key", NULL );
+		PathJoin(ChitinPath, GamePath, "chitin.key", nullptr);
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 			Log(ERROR, "Core", "This means you set the GamePath config variable incorrectly or that the game is running (Windows only).");
@@ -1536,10 +1542,10 @@ int Interface::Init(InterfaceConfig* config)
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
 	char path[_MAX_PATH];
-	PathJoin(path, GemRBOverridePath, "override", GameType, NULL);
+	PathJoin(path, GemRBOverridePath, "override", GameType, nullptr);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, NULL);
+	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// fix the sample config default resolution for iwd2
@@ -1601,15 +1607,15 @@ int Interface::Init(InterfaceConfig* config)
 	char gemrbINI[_MAX_PATH+4] = { '\0' };
 	char tmp[_MAX_PATH+4] = { '\0' };
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
-	PathJoin(ini_path, SavePath, gemrbINI, NULL);
+	PathJoin(ini_path, SavePath, gemrbINI, nullptr);
 	if (!file_exists(ini_path)) {
-		PathJoin(ini_path, GamePath, gemrbINI, NULL);
+		PathJoin(ini_path, GamePath, gemrbINI, nullptr);
 	}
 	if (file_exists(ini_path)) {
 		strlcpy(tmp, INIConfig, sizeof(tmp));
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
 	} else if (!IgnoreOriginalINI) {
-		PathJoin( ini_path, GamePath, INIConfig, NULL );
+		PathJoin(ini_path, GamePath, INIConfig, nullptr);
 		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
@@ -1647,7 +1653,7 @@ int Interface::Init(InterfaceConfig* config)
 	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
-	PathJoin(strpath, GamePath, "dialog.tlk", NULL);
+	PathJoin(strpath, GamePath, "dialog.tlk", nullptr);
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
 		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
@@ -1660,7 +1666,7 @@ int Interface::Init(InterfaceConfig* config)
 		strings2 = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
 		char strpath[_MAX_PATH];
-		PathJoin(strpath, GamePath, "dialogf.tlk", NULL);
+		PathJoin(strpath, GamePath, "dialogf.tlk", nullptr);
 		FileStream* fs = FileStream::OpenFile(strpath);
 		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
@@ -1765,7 +1771,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
-		PathJoin( tINIparty, GamePath, "Party.ini", NULL );
+		PathJoin(tINIparty, GamePath, "Party.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIparty );
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
@@ -1780,7 +1786,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
-		PathJoin( tINIbeasts, GamePath, "beast.ini", NULL );
+		PathJoin(tINIbeasts, GamePath, "beast.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
@@ -1789,7 +1795,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
-		PathJoin( tINIquests, GamePath, "quests.ini", NULL );
+		PathJoin(tINIquests, GamePath, "quests.ini", nullptr);
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
@@ -1898,7 +1904,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 #endif
 	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
-	PathJoin(strpath, GamePath, "gemrb_path.txt", NULL);
+	PathJoin(strpath, GamePath, "gemrb_path.txt", nullptr);
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
 	if (pathFile->Create(strpath)) {
@@ -2515,6 +2521,11 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
 
+		// guessing, since this trigger was unused in the originals — likely duplicating LastSummoner
+		if (Owner) {
+			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
+		}
+
 		if (vvcres[0]) {
 			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
@@ -3002,9 +3013,11 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			filter = new ExtFilter("BS");
 			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
 			break;
+		default:
+			error("Interface", "Uknown resource directory type: %d!", dir);
 	}
 
-	PathJoin( Path, GamePath, resourcePath, NULL );
+	PathJoin(Path, GamePath, resourcePath, nullptr);
 	DirectoryIterator dirIt(Path);
 	dirIt.SetFilterPredicate(filter);
 	return dirIt;
@@ -3092,10 +3105,10 @@ bool Interface::SaveConfig()
 	if (strncmp(INIConfig, "gem-", 4)) {
 		snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	}
-	PathJoin(ini_path, GamePath, gemrbINI, NULL);
+	PathJoin(ini_path, GamePath, gemrbINI, nullptr);
 	FileStream *fs = new FileStream();
 	if (!fs->Create(ini_path)) {
-		PathJoin(ini_path, SavePath, gemrbINI, NULL);
+		PathJoin(ini_path, SavePath, gemrbINI, nullptr);
 		if (!fs->Create(ini_path)) {
 			return false;
 		}
@@ -3155,7 +3168,7 @@ void Interface::SetCutSceneMode(bool active)
 /** returns true if in dialogue or cutscene */
 bool Interface::InCutSceneMode() const
 {
-	GameControl *gc = GetGameControl();
+	const GameControl *gc = GetGameControl();
 	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_CUTSCENE)) {
 		return true;
 	}
@@ -4449,7 +4462,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 {
 	char Path[_MAX_PATH];
 
-	PathJoin( Path, GamePath, GameCharactersPath, NULL );
+	PathJoin(Path, GamePath, GameCharactersPath, nullptr);
 	if (!actor) {
 		return -1;
 	}
@@ -4704,7 +4717,7 @@ int Interface::GetReputationMod(int column) const
 
 PauseSetting Interface::TogglePause()
 {
-	GameControl *gc = GetGameControl();
+	const GameControl *gc = GetGameControl();
 	if (!gc) return PAUSE_OFF;
 	PauseSetting pause = (PauseSetting)(~gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 	if (SetPause(pause)) return pause;
@@ -4908,7 +4921,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 
-			PathJoin(name, CD[disc_number-1][i].c_str(),path,NULL);
+			PathJoin(name, CD[disc_number-1][i].c_str(), path, nullptr);
 			if (file_exists (name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;

@@ -253,6 +253,8 @@
 		A28062861878D1BC009E577D /* TextContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = A28062831878D1BC009E577D /* TextContainer.h */; };
 		A2806287187B7C89009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
 		A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
+		A286361C2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
+		A286361D2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
 		A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621F14A54FFD009AC280 /* libarchive.dylib */; };
 		A288622214A5501F009AC280 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288622114A5501F009AC280 /* libz.dylib */; };
 		A288622314A550BF009AC280 /* BAMFontManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28D24A0143C24C100A27897 /* BAMFontManager.cpp */; };
@@ -1468,6 +1470,8 @@
 		A2830A3913A05B5F000A63FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2830A3F13A05B81000A63FE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		A2830ABA13A0624D000A63FE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ios/Info.plist; sourceTree = "<group>"; };
+		A28636182559D9F800E5730C /* DPadSoftKeyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DPadSoftKeyboard.h; sourceTree = "<group>"; };
+		A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DPadSoftKeyboard.cpp; sourceTree = "<group>"; };
 		A288621F14A54FFD009AC280 /* libarchive.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libarchive.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libarchive.dylib; sourceTree = DEVELOPER_DIR; };
 		A288622114A5501F009AC280 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/usr/lib/libz.dylib; sourceTree = DEVELOPER_DIR; };
 		A288628720793ABC00E47351 /* GLEW.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLEW.framework; path = ../../../../../Library/Frameworks/GLEW.framework; sourceTree = "<group>"; };
@@ -2842,6 +2846,8 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */,
+				A28636182559D9F800E5730C /* DPadSoftKeyboard.h */,
 				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */,
 				A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */,
@@ -4639,7 +4645,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n#copy shaders to bundle\ncp -r ../gemrb/plugins/SDLVideo/Shaders/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/Shaders\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n#copy shaders to bundle\ncp -r ../gemrb/plugins/SDLVideo/Shaders/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/Shaders\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 		A2BD125D15A8E32B000FAB95 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -4953,6 +4959,7 @@
 				A276B4EF13A28BE100D41A8A /* SDLVideo.cpp in Sources */,
 				A298DD1614EB4EDE00F59F56 /* SDL12Video.cpp in Sources */,
 				A2EC2F95176BD44D00FD960E /* SDLSurfaceSprite2D.cpp in Sources */,
+				A286361C2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5046,6 +5053,7 @@
 				A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */,
 				A298DD0814EB4E8C00F59F56 /* CocoaWrapper.m in Sources */,
 				A26ECB4623A61CDC00D3DD59 /* GLSLProgram.cpp in Sources */,
+				A286361D2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */,
 				A298DD0914EB4E8C00F59F56 /* SDLVideo.cpp in Sources */,
 				A298DD1A14EB4EEB00F59F56 /* SDL20Video.cpp in Sources */,
 			);

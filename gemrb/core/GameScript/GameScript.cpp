@@ -2313,8 +2313,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 	bool subresult = true;
 
 	if (triggers.empty()) {
-		Log(ERROR, "GameScript", "Trigger block without triggers encountered!");
-		return false;
+		return true;
 	}
 
 	for (const Trigger *tR : triggers) {
@@ -2377,6 +2376,8 @@ int Trigger::Evaluate(Scriptable *Sender) const
 	if (flags & TF_NEGATE) {
 		return !ret;
 	}
+	// ideally we'd set LastTrigger here, but we need the resolved target object
+
 	return ret;
 }
 
@@ -2589,7 +2590,6 @@ Action* GenerateAction(const char* String)
 	action = GenerateActionCore( src, str, actionID);
 	if (!action) {
 		Log(ERROR, "GameScript", "Malformed scripting action: %s", String);
-		goto done;
 	}
 	done:
 	free(actionString);

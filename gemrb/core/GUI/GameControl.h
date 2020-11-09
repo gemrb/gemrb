@@ -137,9 +137,9 @@ private:
 	Map* CurrentArea() const;
 
 	Region SelectionRect() const;
-	void ReadFormations();
+	void ReadFormations() const;
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
-	void DrawArrowMarker(Point p, const Color& color);
+	void DrawArrowMarker(Point p, const Color& color) const;
 	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
 	
 	Point GetFormationPoint(const Point& origin, size_t pos, double angle, const FormationPoints& exclude = FormationPoints()) const;
@@ -191,8 +191,8 @@ public:
 	int GetTargetMode() { return target_mode; }
 	bool SetScreenFlags(unsigned int value, int mode);
 	void SetDialogueFlags(unsigned int value, int mode);
-	int GetScreenFlags() { return ScreenFlags; }
-	int GetDialogueFlags() { return DialogueFlags; }
+	int GetScreenFlags() const { return ScreenFlags; }
+	int GetDialogueFlags() const { return DialogueFlags; }
 	void SetDisplayText(String* text, unsigned int time);
 	void SetDisplayText(ieStrRef text, unsigned int time);
 	void ClearMouseState();

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<livearea style="a5" format-ver="01.00" content-rev="1">
+	<livearea-background>
+		<image>bg.png</image>
+	</livearea-background>
+	
+	<gate>
+		<startup-image>startup.png</startup-image>
+	</gate>
+
+	<frame id='frame1' multi='o' autoflip='3' >
+		<liveitem>
+			<target>psla:BG1</target>
+			<text valign="bottom" align="left" text-align="left" margin-left="60" word-wrap="off" ellipsis="on">
+				<str bold="on" size="30" color="#ffffff" emboss="on" shadow="on">Baldur's Gate</str>
+			</text>
+		</liveitem>
+	</frame>
+	
+	<frame id='frame2' multi='o' autoflip='3' >
+		<liveitem>
+			<target>psla:BG2</target>
+			<text valign="bottom" align="left" text-align="left" margin-left="60" word-wrap="off" ellipsis="on">
+				<str bold="on" size="30" color="#ffffff" emboss="on" shadow="on">Baldur's Gate 2</str>
+			</text>
+		</liveitem>
+	</frame>
+	
+	<frame id='frame3' multi='o' autoflip='3' >
+		<liveitem>
+			<target>psla:IWD</target>
+			<text valign="bottom" align="left" text-align="left" margin-left="60" word-wrap="off" ellipsis="on">
+				<str bold="on" size="30" color="#ffffff" emboss="on" shadow="on">Icewind Dale</str>
+			</text>
+		</liveitem>
+	</frame>
+
+	<frame id='frame4' multi='o' autoflip='3' >
+		<liveitem>
+			<target>psla:PST</target>
+			<text valign="bottom" align="left" text-align="left" margin-left="60" word-wrap="off" ellipsis="on">
+				<str bold="on" size="30" color="#ffffff" emboss="on" shadow="on">Planescape: Torment</str>
+			</text>
+		</liveitem>
+	</frame>	
+</livearea>

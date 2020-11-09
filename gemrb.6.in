@@ -442,6 +442,15 @@ Set this parameter to
 if you want to ignore the settings from the original configuration files - baldur.ini
 / icewind.ini / torment.ini. It is disabled by default.
 
+.TP
+.BR GamepadPointerSpeed =INT
+Pointer movement speed with gamepads. The default is 10.
+
+.TP
+.BR VitaKeepAspectRatio =(0|1)
+If set to
+.IR 1 ,
+original aspect ratio is preserved while game area is scaled to native PS Vita resolution. It is enabled by default.
 
 .\"###################################################
 .SH FILES

@@ -138,7 +138,7 @@ GameControl::~GameControl()
 //There could be a custom formation which is saved in the save game
 //alternatively, all formations could be saved in some compatible way
 //so it doesn't cause problems with the original engine
-void GameControl::ReadFormations()
+void GameControl::ReadFormations() const
 {
 	AutoTable tab("formatio");
 	if (!tab) {
@@ -348,7 +348,7 @@ static const int arrow_orientations[16]={
 
 //Draws arrow markers along the edge of the game window
 //WARNING:don't use reference for point, because it is altered
-void GameControl::DrawArrowMarker(Point p, const Color& color)
+void GameControl::DrawArrowMarker(Point p, const Color& color) const
 {
 	WindowManager* wm = core->GetWindowManager();
 	auto lock = wm->DrawHUD();
@@ -699,7 +699,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				// eg. ctrl-j should be ignored for keymap.ini handling and
 				// passed straight on
 				if (!core->GetKeyMap()->ResolveKey(Key.keycode, mod<<20)) {
-					game->SetHotKey(toupper(Key.character));
+					game->SendHotKey(toupper(Key.character));
 					return View::OnKeyPress(Key, mod);
 				}
 				break;
@@ -769,7 +769,7 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 					break;
 				default:
 					if (!core->GetKeyMap()->ResolveKey(Key.keycode, 0)) {
-						game->SetHotKey(toupper(Key.character));
+						game->SendHotKey(toupper(Key.character));
 						return View::OnKeyPress(Key, 0);
 					}
 					break;
@@ -1351,30 +1351,27 @@ void GameControl::UpdateCursor()
 	}
 	
 	overDoor = area->TMap->GetDoor(gameMousePos);
-	// ignore infopoints beneath invisible doors
-	if (!overDoor || overDoor->Visible()) {
-		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, true);
-	}
-	
-	if (overInfoPoint) {
-		nextCursor = GetCursorOverInfoPoint(overInfoPoint);
-	}
-	// recheck in case the position was different, resulting in a new isVisible check
-	if (nextCursor == IE_CURSOR_INVALID) {
-		lastCursor = IE_CURSOR_BLOCKED;
-		return;
-	}
-
-	// don't allow summons to try travelling (alone), since it causes tons of loading
-	if (nextCursor == IE_CURSOR_TRAVEL && core->GetGame()->OnlyNPCsSelected()) {
-		lastCursor = IE_CURSOR_BLOCKED;
-		return;
-	}
-
-	overContainer = area->TMap->GetContainer( gameMousePos );
-
+	// ignore infopoints and containers beneath doors
 	if (overDoor) {
 		nextCursor = GetCursorOverDoor(overDoor);
+	} else {
+		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, true);
+		if (overInfoPoint) {
+			nextCursor = GetCursorOverInfoPoint(overInfoPoint);
+		}
+		// recheck in case the position was different, resulting in a new isVisible check
+		if (nextCursor == IE_CURSOR_INVALID) {
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
+		}
+
+		// don't allow summons to try travelling (alone), since it causes tons of loading
+		if (nextCursor == IE_CURSOR_TRAVEL && core->GetGame()->OnlyNPCsSelected()) {
+			lastCursor = IE_CURSOR_BLOCKED;
+			return;
+		}
+
+		overContainer = area->TMap->GetContainer( gameMousePos );
 	}
 
 	if (overContainer) {
@@ -1420,11 +1417,7 @@ void GameControl::UpdateCursor()
 		}
 	} else if (target_mode == TARGET_MODE_ATTACK) {
 		nextCursor = IE_CURSOR_ATTACK;
-		if (overDoor) {
-			if (!overDoor->Visible()) {
-				nextCursor |= IE_CURSOR_GRAY;
-			}
-		} else if (!lastActor && !overContainer) {
+		if (!overDoor && !lastActor && !overContainer) {
 			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (target_mode == TARGET_MODE_CAST) {
@@ -2012,7 +2005,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			//there. Here we have to check on the
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
-				GameControl *gc = core->GetGameControl();
+				const GameControl *gc = core->GetGameControl();
 				if (!(trap->Flags & TRAP_DEACTIVATED) && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 					actor->LastMarked = trap->GetGlobalID();
@@ -2255,7 +2248,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 
 void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 {
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 
 	// construct a sorted party
 	std::vector<Actor *> party;

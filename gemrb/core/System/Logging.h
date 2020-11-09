@@ -29,6 +29,12 @@
 #include "exports.h"
 #include "win32def.h"
 
+#if defined(__sgi)
+#  include <stdarg.h>
+#else
+#  include <cstdarg>
+#endif
+
 namespace GemRB {
 
 #ifdef WIN32

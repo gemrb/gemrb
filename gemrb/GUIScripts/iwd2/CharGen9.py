@@ -79,7 +79,8 @@ def ClearPress():
 def RevertPress():
 	global BioStrRef
 	BioTable = GemRB.LoadTable ("bios")
-	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("BaseClass")-1, "index")
+	MyChar = GemRB.GetVar ("Slot")
+	ClassName = GUICommon.GetClassRowName (MyChar)
 	BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	GemRB.SetToken ("BIO", GemRB.GetString(BioStrRef) )
 	if type (EditControl) != type (7350): # just some int
@@ -129,11 +130,29 @@ def BioPress():
 	EditControl.Focus()
 	return
 
+def SaveBio():
+	MyChar = GemRB.GetVar ("Slot")
+	BioData = GemRB.GetToken ("BIO")
+	if BioData == GemRB.GetString (BioStrRef):
+		NewRef = BioStrRef
+	else:
+		NewRef = GemRB.CreateString (62015 + MyChar, BioData)
+	GemRB.SetPlayerString (MyChar, 63, NewRef)
+
 def NextPress():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
 
-	racename = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
+	if GemRB.GetVar ("ImportedChar"):
+		SaveBio ()
+		GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
+		LargePortrait = GemRB.GetToken ("LargePortrait")
+		SmallPortrait = GemRB.GetToken ("SmallPortrait")
+		GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait, 1)
+		GemRB.SetNextScript ("SPPartyFormation")
+		GemRB.SetVar ("ImportedChar", 0)
+		GemRB.ChargeSpells (MyChar)
+		return
 
 	#base class
 	Class=GemRB.GetVar ("BaseClass")
@@ -148,6 +167,7 @@ def NextPress():
 		clssname = CommonTables.Classes.GetRowName (kitrow)
 	IDLUCommon.AddResistances (MyChar, clssname, "clssrsmd")
 
+	racename = CommonTables.Races.GetRowName (IDLUCommon.GetRace (MyChar))
 	IDLUCommon.AddResistances (MyChar, racename, "racersmd")
 	SetRaceBonuses(MyChar, racename)
 	SetRaceAbilities (MyChar, racename)
@@ -156,14 +176,12 @@ def NextPress():
 	IDLUCommon.SetupSavingThrows (MyChar, Class, True)
 
 	# 10 is a weapon slot (see slottype.2da row 10)
-	if not GemRB.GetVar ("ImportedChar"):
-		GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
+	GemRB.CreateItem (MyChar, "00staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# reset hitpoints
-	if not GemRB.GetVar ("ImportedChar"):
-		GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
-		GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
 	LUCommon.SetupHP (MyChar)
 
 	t=GemRB.GetVar ("Alignment")
@@ -217,12 +235,7 @@ def NextPress():
 	xp = TmpTable.GetValue (racename, "VALUE")
 	GemRB.SetPlayerStat (MyChar, IE_XP, xp )
 
-	BioData = GemRB.GetToken("BIO")
-	if BioData == GemRB.GetString (BioStrRef):
-		NewRef = BioStrRef
-	else:
-		NewRef = GemRB.CreateString (62015+MyChar, BioData)
-	GemRB.SetPlayerString (MyChar, 63, NewRef)
+	SaveBio ()
 	GemRB.SetVar ("ImportedChar", 0)
 
 	# set memorized spells as non-depleted - ready to use

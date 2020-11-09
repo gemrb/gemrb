@@ -39,15 +39,15 @@ using namespace GemRB;
 // legal nop if already reset
 void AmbientMgrAL::reset()
 {
-	if (NULL != player){
+	if (player) {
 		SDL_mutexP(mutex);
 	}
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		delete (*it);
+	for (auto ambientSource : ambientSources) {
+		delete ambientSource;
 	}
 	ambientSources.clear();
 	AmbientMgr::reset();
-	if (NULL != player) {
+	if (player) {
 		SDL_CondSignal(cond);
 		SDL_mutexV(mutex);
 		SDL_WaitThread(player, NULL);
@@ -61,8 +61,8 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 	assert(NULL == player);
 
 	ambientSources.reserve(a.size());
-	for (std::vector<Ambient *>::const_iterator it = a.begin(); it != a.end(); ++it) {
-		ambientSources.push_back(new AmbientSource(*it));
+	for (auto source : a) {
+		ambientSources.push_back(new AmbientSource(source));
 	}
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 
@@ -76,10 +76,11 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 
 void AmbientMgrAL::activate(const std::string &name)
 {
-	if (NULL != player)
+	if (player) {
 		SDL_mutexP(mutex);
+	}
 	AmbientMgr::activate(name);
-	if (NULL != player) {
+	if (player) {
 		SDL_CondSignal(cond);
 		SDL_mutexV(mutex);
 	}
@@ -87,10 +88,11 @@ void AmbientMgrAL::activate(const std::string &name)
 
 void AmbientMgrAL::activate()
 {
-	if (NULL != player)
+	if (player) {
 		SDL_mutexP(mutex);
+	}
 	AmbientMgr::activate();
-	if (NULL != player) {
+	if (player) {
 		SDL_CondSignal(cond);
 		SDL_mutexV(mutex);
 	}
@@ -98,10 +100,11 @@ void AmbientMgrAL::activate()
 
 void AmbientMgrAL::deactivate(const std::string &name)
 {
-	if (NULL != player)
+	if (player) {
 		SDL_mutexP(mutex);
+	}
 	AmbientMgr::deactivate(name);
-	if (NULL != player) {
+	if (player) {
 		SDL_CondSignal(cond);
 		SDL_mutexV(mutex);
 	}
@@ -109,18 +112,20 @@ void AmbientMgrAL::deactivate(const std::string &name)
 
 void AmbientMgrAL::deactivate()
 {
-	if (NULL != player)
+	if (player) {
 		SDL_mutexP(mutex);
+	}
 	AmbientMgr::deactivate();
 	hardStop();
-	if (NULL != player)
+	if (player) {
 		SDL_mutexV(mutex);
+	}
 }
 
-void AmbientMgrAL::hardStop()
+void AmbientMgrAL::hardStop() const
 {
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		(*it)->hardStop();
+	for (auto source : ambientSources) {
+		source->hardStop();
 	}
 }
 
@@ -128,8 +133,8 @@ int AmbientMgrAL::play(void *am)
 {
 	AmbientMgrAL * ambim = (AmbientMgrAL *) am;
 	SDL_mutexP(ambim->mutex);
-	while (0 != ambim->ambientSources.size()) {
-		if (NULL == core->GetGame()) { // we don't have any game, and we need one
+	while (!ambim->ambientSources.empty()) {
+		if (!core->GetGame()) { // we don't have any game, and we need one
 			break;
 		}
 		unsigned int delay = ambim->tick(SDL_GetTicks());
@@ -140,7 +145,7 @@ int AmbientMgrAL::play(void *am)
 	return 0;
 }
 
-unsigned int AmbientMgrAL::tick(unsigned int ticks)
+unsigned int AmbientMgrAL::tick(unsigned int ticks) const
 {
 	unsigned int delay = 60000; // wait one minute if all sources are off
 
@@ -155,10 +160,9 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 
 	ieDword timeslice = SCHEDULE_MASK(core->GetGame()->GameTime);
 
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		unsigned int newdelay = (*it)->tick(ticks, listener, timeslice);
-		if (newdelay < delay)
-			delay = newdelay;
+	for (auto source : ambientSources) {
+		unsigned int newdelay = source->tick(ticks, listener, timeslice);
+		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
 }
@@ -166,8 +170,8 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 void AmbientMgrAL::UpdateVolume(unsigned short volume)
 {
 	SDL_mutexP( mutex );
-	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
-		(*it) -> SetVolume( volume );
+	for (auto source : ambientSources) {
+		source->SetVolume(volume);
 	}
 	SDL_mutexV( mutex );
 }

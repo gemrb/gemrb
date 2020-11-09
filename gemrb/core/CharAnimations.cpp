@@ -2554,13 +2554,13 @@ void CharAnimations::AddLRSuffix( char *dest, unsigned char StanceID,
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle = Orient / 2;
 			break;
-		case IE_ANI_READY:
+		case IE_ANI_AWAKE:
 			strcat(dest, "g1");
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 8 + Orient / 2;
 			break;
+		case IE_ANI_READY:
 		case IE_ANI_HEAD_TURN: //could be wrong
-		case IE_ANI_AWAKE:
 			strcat(dest, "g1");
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 16 + Orient / 2;

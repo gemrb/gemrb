@@ -1668,7 +1668,7 @@ ieDword Inventory::GetEquipExclusion(int index) const
 void Inventory::UpdateShieldAnimation(Item *it)
 {
 	char AnimationType[2]={0,0};
-	int WeaponType = -1;
+	int WeaponType;
 
 	if (it) {
 		memcpy(AnimationType, it->AnimationType, 2);

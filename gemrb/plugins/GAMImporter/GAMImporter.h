@@ -65,16 +65,16 @@ private:
 
 	int PutHeader(DataStream *stream, Game *game);
 	int PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version);
-	int PutPCs(DataStream *stream, Game *game);
-	int PutNPCs(DataStream *stream, Game *game);
-	int PutJournals(DataStream *stream, Game *game);
-	int PutVariables( DataStream *stream, Game *game);
-	int PutKillVars(DataStream *stream, Game *game);
+	int PutPCs(DataStream *stream, const Game *game);
+	int PutNPCs(DataStream *stream, const Game *game);
+	int PutJournals(DataStream *stream, const Game *game);
+	int PutVariables( DataStream *stream, const Game *game);
+	int PutKillVars(DataStream *stream, const Game *game);
 	void GetMazeHeader(void *memory);
 	void GetMazeEntry(void *memory);
 	void PutMazeHeader(DataStream *stream, void *memory);
 	void PutMazeEntry(DataStream *stream, void *memory);
-	int PutMaze(DataStream *stream, Game *game);
+	int PutMaze(DataStream *stream, const Game *game);
 	int PutFamiliars(DataStream *stream, Game *game);
 	int PutSavedLocations(DataStream *stream, Game *game);
 	int PutPlaneLocations(DataStream *stream, Game *game);

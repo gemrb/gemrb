@@ -21,20 +21,24 @@
 #ifndef TLKIMPORTER_H
 #define TLKIMPORTER_H
 
-#include "StringMgr.h"
 
+#include "StringMgr.h"
+#include "Variables.h"
 #include "TlkOverride.h"
 
 namespace GemRB {
 
 class TLKImporter : public StringMgr {
 private:
-	DataStream* str;
+	DataStream* str = nullptr;
 
 	//Data
-	ieWord Language;
-	ieDword StrRefCount, Offset;
-	CTlkOverride *OverrideTLK;
+	ieWord Language = 0;
+	ieDword StrRefCount = 0;
+	ieDword Offset = 0;
+	CTlkOverride *OverrideTLK = nullptr;
+	Variables gtmap;
+	int charname = 0;
 
 public:
 	TLKImporter(void);
@@ -42,7 +46,7 @@ public:
 	/** open string refs coming from saved game */
 	void OpenAux();
 	/** purge string defs coming from saved game */
-	void CloseAux();
+	void CloseAux() final;
 	bool Open(DataStream* stream);
 	/** construct a new custom string */
 	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
@@ -56,18 +60,18 @@ private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);
 	/** replaces tags in dest, don't exceed Length */
-	bool ResolveTags(char* dest, char* source, int Length);
+	bool ResolveTags(char* dest, const char* source, int Length);
 	/** returns the needed length in Length, 
 		if there was no token, returns false */
-	bool GetNewStringLength(char* string, int& Length);
+	bool GetNewStringLength(const char* string, int& Length);
 	/**returns the decoded length of the built-in token
 		 if dest is not NULL it also returns the decoded value */
-	int BuiltinToken(char* Token, char* dest);
-	int ClassStrRef(int slot);
-	int RaceStrRef(int slot);
+	int BuiltinToken(const char* Token, char* dest);
+	int ClassStrRef(int slot) const;
+	int RaceStrRef(int slot) const;
 	int GenderStrRef(int slot, int malestrref, int femalestrref);
-	char *Gabber();
-	char *CharName(int slot);
+	char *Gabber() const;
+	char *CharName(int slot) const;
 };
 
 }

@@ -468,6 +468,10 @@ IF(APPLE)
 	SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -DTARGET_OS_MAC")
 ENDIF(APPLE)
 
+IF(VITA)
+	INCLUDE(platforms/vita/vita.cmake)
+ENDIF(VITA)
+
 #Plugin addition macro
 MACRO(ADD_GEMRB_PLUGIN plugin_name)
 	SET (PLUGIN_BUILD_FILES ${ARGN})

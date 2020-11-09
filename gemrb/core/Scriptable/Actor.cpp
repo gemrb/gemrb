@@ -525,7 +525,6 @@ Actor::Actor()
 	RollSaves();
 	WMLevelMod = 0;
 	TicksLastRested = LastFatigueCheck = 0;
-	speed = 0;
 	remainingTalkSoundTime = lastTalkTimeCheckAt = 0;
 	WeaponType = AttackStance = 0;
 	DifficultyMargin = disarmTrap = 0;
@@ -734,7 +733,7 @@ void Actor::SetCircleSize()
 	if (!anims)
 		return;
 
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	float oscillationFactor = 1.0f;
 
 	if (UnselectableTimer) {
@@ -1269,12 +1268,9 @@ static void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 static void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
-		ieDword mask = EXTSTATE_EYE_MIND;
 		int eyeCount = 7;
-		for (int i=0;i<7;i++)
-		{
-			if (State&mask) eyeCount--;
-			mask<<=1;
+		for (ieDword mask = EXTSTATE_EYE_MIND; mask <= EXTSTATE_EYE_STONE; mask <<= 1) {
+			if (State & mask) --eyeCount;
 		}
 		ScriptedAnimation *sca = actor->FindOverlay(OV_SEVENEYES);
 		if (sca) {
@@ -4666,6 +4662,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		if (damagetype & (DAMAGE_FIRE|DAMAGE_COLD|DAMAGE_ACID|DAMAGE_ELECTRICITY)) {
 			fxqueue.RemoveAllEffects(fx_eye_mage_ref);
 			spellbook.RemoveSpell(SevenEyes[EYE_MAGE]);
+			SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_MAGE, false);
 			damage = 0;
 		}
 	}
@@ -5793,7 +5790,7 @@ bool Actor::CheckOnDeath()
 		return true;
 	}
 	// FIXME
-	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction()) {
+	if (InternalFlags&IF_JUSTDIED || CurrentAction || GetNextAction() || GetStance() == IE_ANI_DIE) {
 		return false; //actor is currently dying, let him die first
 	}
 	if (!(InternalFlags&IF_REALLYDIED) ) {
@@ -5809,8 +5806,6 @@ bool Actor::CheckOnDeath()
 		return false;
 	}
 
-	//we need to check animID here, if it has not played the death
-	//sequence yet, then we could return now
 	ClearActions();
 	//missed the opportunity of Died()
 	InternalFlags&=~IF_JUSTDIED;
@@ -6534,7 +6529,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 	}
 	if (flags&LS_ADDXP && !(flags&LS_NOXP)) {
 		int xp = CalculateExperience(XP_LEARNSPELL, explev);
-		Game *game = core->GetGame();
+		const Game *game = core->GetGame();
 		game->ShareXP(xp, SX_DIVIDE);
 	}
 	return LSR_OK;
@@ -6734,7 +6729,7 @@ int Actor::Immobile() const
 	if (GetStat(IE_STATE_ID) & STATE_STILL) {
 		return 1;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game && game->TimeStoppedFor(this)) {
 		return 1;
 	}
@@ -7609,6 +7604,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (target->GetStat(IE_EXTSTATE_ID) & EXTSTATE_EYE_SWORD) {
 		target->fxqueue.RemoveAllEffects(fx_eye_sword_ref);
 		target->spellbook.RemoveSpell(SevenEyes[EYE_SWORD]);
+		target->SetBaseBit(IE_EXTSTATE_ID, EXTSTATE_EYE_SWORD, false);
 		success = false;
 		roll = 2; // avoid chance critical misses
 	}
@@ -8339,7 +8335,7 @@ void Actor::NewPath()
 void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 {
 	ResetPathTries();
-	if (InternalFlags & IF_REALLYDIED || speed == 0) {
+	if (InternalFlags & IF_REALLYDIED || walkScale == 0) {
 		return;
 	}
 	SetRunFlags(flags);
@@ -8529,7 +8525,7 @@ bool Actor::ShouldDrawCircle() const
 		}
 	}
 	
-	GameControl* gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	if (gc->GetScreenFlags()&SF_CUTSCENE) {
 		// ground circles are not drawn in cutscenes
 		// except for the speaker
@@ -10570,7 +10566,9 @@ ieDword Actor::GetWarriorLevel() const
 
 bool Actor::BlocksSearchMap() const
 {
-	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED && !(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED));
+	return Modified[IE_DONOTJUMP] < DNJ_UNHINDERED &&
+		!(InternalFlags & (IF_REALLYDIED | IF_JUSTDIED)) &&
+		!Modified[IE_AVATARREMOVAL];
 }
 
 //return true if the actor doesn't want to use an entrance

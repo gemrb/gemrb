@@ -9024,8 +9024,7 @@ static PyObject* GemRB_FindItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int slot = -1;
-	slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
+	int slot = actor->inventory.FindItem(ItemName, IE_INV_ITEM_UNDROPPABLE);
 	return PyInt_FromLong(slot);
 }
 
@@ -9082,7 +9081,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	Actor *actor = NULL;
 	PARSE_ARGS( args,  "s|i", &ResRef, &PartyID);
 	//it isn't a problem if actor not found
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game) {
 		if (!PartyID) {
 			PartyID = game->GetSelectedPCSingle();
@@ -13448,6 +13447,13 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 bool GUIScript::Init(void)
 {
+#ifdef VITA
+	//Py_Initialize crashes on Vita otherwise
+	Py_NoSiteFlag = 1;
+	Py_IgnoreEnvironmentFlag = 1;
+	Py_NoUserSiteDirectory = 1;
+#endif
+
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;
@@ -13469,7 +13475,7 @@ bool GUIScript::Init(void)
 	}
 
 	char path[_MAX_PATH];
-	PathJoin(path, core->GUIScriptsPath, "GUIScripts", NULL);
+	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
 
 	char string[256] = "path";
 	PyObject* sysPath = PySys_GetObject(string);
@@ -13501,9 +13507,9 @@ bool GUIScript::Init(void)
 	// use the iwd guiscripts for how, but leave its override
 	char path2[_MAX_PATH];
 	if (stricmp( core->GameType, "how" ) == 0) {
-		PathJoin(path2, path, "iwd", NULL);
+		PathJoin(path2, path, "iwd", nullptr);
 	} else {
-		PathJoin(path2, path, core->GameType, NULL);
+		PathJoin(path2, path, core->GameType, nullptr);
 	}
 
 	// GameType-specific import path must have a higher priority than
@@ -13536,7 +13542,7 @@ bool GUIScript::Autodetect(void)
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
 	char path[_MAX_PATH];
-	PathJoin( path, core->GUIScriptsPath, "GUIScripts", NULL );
+	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
 	DirectoryIterator iter( path );
 	if (!iter)
 		return false;
@@ -13551,7 +13557,7 @@ bool GUIScript::Autodetect(void)
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", NULL);
+		PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
 		ExecFile(module);
 		// Method2:
 		//strcpy( module, dirent );

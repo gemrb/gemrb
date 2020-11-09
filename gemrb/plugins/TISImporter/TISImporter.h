@@ -27,9 +27,11 @@ namespace GemRB {
 
 class TISImporter : public TileSetMgr {
 private:
-	DataStream* str;
-	ieDword headerShift;
-	ieDword TilesCount, TilesSectionLen, TileSize;
+	DataStream* str = nullptr;
+	ieDword headerShift = 0;
+	ieDword TilesCount = 0;
+	ieDword TilesSectionLen = 0;
+	ieDword TileSize = 0;
 public:
 	TISImporter(void);
 	~TISImporter(void);

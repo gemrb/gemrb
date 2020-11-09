@@ -1,10 +1,12 @@
-GemRB git (dd8fa044c21):
+GemRB git (ac899f08):
   New features:
     - 
+    - SDLAudio caching
+    - PlayStation Vita port
 
   Improved features:
     - 
-    - lightning bolts
+    - lightning bolts, iwd2 stealth, iwd effects, pst levelup
     - build system
     - externalized summoning limit, trap limit, narration text speed
     - bugfixes

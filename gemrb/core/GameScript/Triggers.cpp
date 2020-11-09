@@ -61,7 +61,11 @@ int GameScript::Reaction(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	int value = GetReaction((const Actor *) scr, Sender);
-	return value == parameters->int0Parameter;
+	bool matched = value == parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_reaction, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::ReactionGT(Scriptable *Sender, const Trigger *parameters)
@@ -72,7 +76,11 @@ int GameScript::ReactionGT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	int value = GetReaction((const Actor *) scr, Sender);
-	return value > parameters->int0Parameter;
+	bool matched = value > parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_reaction, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::ReactionLT(Scriptable *Sender, const Trigger *parameters)
@@ -83,7 +91,11 @@ int GameScript::ReactionLT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	int value = GetReaction((const Actor *) scr, Sender);
-	return value < parameters->int0Parameter;
+	bool matched = value < parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_reaction, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::Happiness(Scriptable *Sender, const Trigger *parameters)
@@ -104,19 +116,36 @@ int GameScript::HappinessLT(Scriptable *Sender, const Trigger *parameters)
 	return value < parameters->int0Parameter;
 }
 
-int GameScript::Reputation(Scriptable */*Sender*/, const Trigger *parameters)
+// these also take an object parameter, but reputation is global
+// but we do need to use it to be precise for LastTrigger purposes
+int GameScript::Reputation(Scriptable *Sender, const Trigger *parameters)
 {
-	return core->GetGame()->Reputation/10 == (ieDword) parameters->int0Parameter;
+	const Scriptable *scr = GetActorFromObject(Sender, parameters->objectParameter);
+	bool matched = core->GetGame()->Reputation / 10 == (ieDword) parameters->int0Parameter;
+	if (matched && scr) {
+		Sender->SetLastTrigger(trigger_reputation, scr->GetGlobalID());
+	}
+	return matched;
 }
 
-int GameScript::ReputationGT(Scriptable */*Sender*/, const Trigger *parameters)
+int GameScript::ReputationGT(Scriptable *Sender, const Trigger *parameters)
 {
-	return core->GetGame()->Reputation/10 > (ieDword) parameters->int0Parameter;
+	const Scriptable *scr = GetActorFromObject(Sender, parameters->objectParameter);
+	bool matched = core->GetGame()->Reputation / 10 > (ieDword) parameters->int0Parameter;
+	if (matched && scr) {
+		Sender->SetLastTrigger(trigger_reputation, scr->GetGlobalID());
+	}
+	return matched;
 }
 
-int GameScript::ReputationLT(Scriptable */*Sender*/, const Trigger *parameters)
+int GameScript::ReputationLT(Scriptable *Sender, const Trigger *parameters)
 {
-	return core->GetGame()->Reputation/10 < (ieDword) parameters->int0Parameter;
+	const Scriptable *scr = GetActorFromObject(Sender, parameters->objectParameter);
+	bool matched = core->GetGame()->Reputation / 10 < (ieDword) parameters->int0Parameter;
+	if (matched && scr) {
+		Sender->SetLastTrigger(trigger_reputation, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::Alignment(Scriptable *Sender, const Trigger *parameters)
@@ -126,7 +155,11 @@ int GameScript::Alignment(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Alignment(actor, parameters->int0Parameter);
+	bool matched = ID_Alignment(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_alignment, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::Allegiance(Scriptable *Sender, const Trigger *parameters)
@@ -136,7 +169,11 @@ int GameScript::Allegiance(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Allegiance(actor, parameters->int0Parameter);
+	bool matched = ID_Allegiance(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_allegiance, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 //should return *_ALL stuff
@@ -147,7 +184,11 @@ int GameScript::Class(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Class(actor, parameters->int0Parameter);
+	bool matched = ID_Class(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_class, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::ClassEx(Scriptable *Sender, const Trigger *parameters)
@@ -276,8 +317,12 @@ int GameScript::InParty(Scriptable *Sender, const Trigger *parameters, bool allo
 	if (!allowdead && (!act->ValidTarget(GA_NO_DEAD) || act->GetStat(IE_AVATARREMOVAL) != 0)) {
 		return 0;
 	}
-	
-	return core->GetGame()->InParty(act) >= 0 ? 1 : 0;
+
+	bool matched = core->GetGame()->InParty(act) >= 0;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_inparty, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::InParty(Scriptable *Sender, const Trigger *parameters)
@@ -302,6 +347,7 @@ int GameScript::Exists(Scriptable *Sender, const Trigger *parameters)
 	if (!scr) {
 		return 0;
 	}
+	Sender->SetLastTrigger(trigger_exists, scr->GetGlobalID());
 	return 1;
 }
 
@@ -433,7 +479,11 @@ int GameScript::General(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_General(actor, parameters->int0Parameter);
+	bool matched = ID_General(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_general, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::Specifics(Scriptable *Sender, const Trigger *parameters)
@@ -446,7 +496,11 @@ int GameScript::Specifics(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Specific(actor, parameters->int0Parameter);
+	bool matched = ID_Specific(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_specifics, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::BitCheck(Scriptable *Sender, const Trigger *parameters)
@@ -1476,7 +1530,11 @@ int GameScript::Range(Scriptable *Sender, const Trigger *parameters)
 		Sender->LastMarked = scr->GetGlobalID();
 	}
 	int distance = SquaredMapDistance(Sender, scr);
-	return DiffCore(distance, (parameters->int0Parameter+1)*(parameters->int0Parameter+1), parameters->int1Parameter);
+	bool matched = DiffCore(distance, (parameters->int0Parameter + 1) * (parameters->int0Parameter + 1), parameters->int1Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_range, scr->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::InLine(Scriptable *Sender, const Trigger *parameters)
@@ -1802,7 +1860,11 @@ int GameScript::Race(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Race(actor, parameters->int0Parameter);
+	bool matched = ID_Race(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_race, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::Gender(Scriptable *Sender, const Trigger *parameters)
@@ -1815,7 +1877,11 @@ int GameScript::Gender(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	return ID_Gender(actor, parameters->int0Parameter);
+	bool matched = ID_Gender(actor, parameters->int0Parameter);
+	if (matched) {
+		Sender->SetLastTrigger(trigger_gender, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::HP(Scriptable *Sender, const Trigger *parameters)
@@ -1829,6 +1895,7 @@ int GameScript::HP(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) scr;
 	if ((signed) actor->GetBase(IE_HITPOINTS) == parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -1845,6 +1912,7 @@ int GameScript::HPGT(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) scr;
 	if ((signed) actor->GetBase(IE_HITPOINTS) > parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -1861,6 +1929,7 @@ int GameScript::HPLT(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) scr;
 	if ((signed) actor->GetBase(IE_HITPOINTS) < parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -1965,6 +2034,7 @@ int GameScript::HPPercent(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	if (GetHPPercent( scr ) == parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, scr->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -1977,6 +2047,7 @@ int GameScript::HPPercentGT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	if (GetHPPercent( scr ) > parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, scr->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -1989,6 +2060,7 @@ int GameScript::HPPercentLT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	if (GetHPPercent( scr ) < parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_hpgt, scr->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2071,6 +2143,7 @@ int GameScript::CheckStat(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) target;
 	if ((signed) actor->GetStat(parameters->int1Parameter) == parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2086,6 +2159,7 @@ int GameScript::CheckSkillGT(Scriptable *Sender, const Trigger *parameters)
 	int sk = actor->GetSkill(parameters->int1Parameter, true);
 	if (sk<0) return 0;
 	if (sk > parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2099,6 +2173,7 @@ int GameScript::CheckStatGT(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) tar;
 	if ((signed) actor->GetStat(parameters->int1Parameter) > parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_checkstat, actor->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2272,7 +2347,11 @@ int GameScript::LOS(Scriptable *Sender, const Trigger *parameters)
 int GameScript::NumCreatures(Scriptable *Sender, const Trigger *parameters)
 {
 	int value = GetObjectCount(Sender, parameters->objectParameter);
-	return value == parameters->int0Parameter;
+	bool matched = value == parameters->int0Parameter;
+	// NOTE: in the original this is also supposed to set LastTarget, but it's not
+	// clear to which of the possibly several actors, however
+	// there are only two users and neither relies on LastTrigger, so we ignore it
+	return matched;
 }
 
 int GameScript::NumCreaturesAtMyLevel(Scriptable *Sender, const Trigger *parameters)
@@ -2294,6 +2373,7 @@ int GameScript::NumCreaturesAtMyLevel(Scriptable *Sender, const Trigger *paramet
 int GameScript::NumCreaturesLT(Scriptable *Sender, const Trigger *parameters)
 {
 	int value = GetObjectCount(Sender, parameters->objectParameter);
+	// see NOTE in NumCreatures; there are more users of LT and GT, but still none rely on LastTrigger
 	return value < parameters->int0Parameter;
 }
 
@@ -2316,6 +2396,7 @@ int GameScript::NumCreaturesLTMyLevel(Scriptable *Sender, const Trigger *paramet
 int GameScript::NumCreaturesGT(Scriptable *Sender, const Trigger *parameters)
 {
 	int value = GetObjectCount(Sender, parameters->objectParameter);
+	// see NOTE in NumCreatures
 	return value > parameters->int0Parameter;
 }
 
@@ -2379,7 +2460,11 @@ int GameScript::Morale(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) tar;
-	return (signed) actor->GetStat(IE_MORALEBREAK) == parameters->int0Parameter;
+	bool matched = (signed) actor->GetStat(IE_MORALEBREAK) == parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_morale, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::MoraleGT(Scriptable *Sender, const Trigger *parameters)
@@ -2389,7 +2474,11 @@ int GameScript::MoraleGT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) tar;
-	return (signed) actor->GetStat(IE_MORALEBREAK) > parameters->int0Parameter;
+	bool matched = (signed) actor->GetStat(IE_MORALEBREAK) > parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_morale, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::MoraleLT(Scriptable *Sender, const Trigger *parameters)
@@ -2399,7 +2488,11 @@ int GameScript::MoraleLT(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) tar;
-	return (signed) actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
+	bool matched = (signed) actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
+	if (matched) {
+		Sender->SetLastTrigger(trigger_morale, actor->GetGlobalID());
+	}
+	return matched;
 }
 
 int GameScript::CheckSpellState(Scriptable *Sender, const Trigger *parameters)
@@ -2428,6 +2521,7 @@ int GameScript::StateCheck(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) tar;
 	if (actor->GetStat(IE_STATE_ID) & parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_statecheck, tar->GetGlobalID());
 		return 1;
 	}
 	return 0;
@@ -2454,6 +2548,7 @@ int GameScript::NotStateCheck(Scriptable *Sender, const Trigger *parameters)
 	}
 	const Actor *actor = (const Actor *) tar;
 	if (actor->GetStat(IE_STATE_ID) & ~parameters->int0Parameter) {
+		Sender->SetLastTrigger(trigger_statecheck, tar->GetGlobalID());
 		return 1;
 	}
 	return 0;

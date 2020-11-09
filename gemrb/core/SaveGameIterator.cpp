@@ -48,6 +48,10 @@
 #include <set>
 #include <time.h>
 
+#ifdef VITA
+#include <psp2/kernel/iofilemgr.h> 
+#endif
+
 namespace GemRB {
 
 const TypeID SaveGame::ID = { "SaveGame" };
@@ -256,7 +260,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	//The matcher got matched correctly.
 	char dtmp[_MAX_PATH];
-	PathJoin(dtmp, Path, slotname, NULL);
+	PathJoin(dtmp, Path, slotname, nullptr);
 
 	char ftmp[_MAX_PATH];
 	PathJoinExt(ftmp, dtmp, core->GameNameResRef, "bmp");
@@ -288,7 +292,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	PathJoin(Path, core->SavePath, SaveDir(), NULL);
+	PathJoin(Path, core->SavePath, SaveDir(), nullptr);
 
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
@@ -347,7 +351,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->SavePath, SaveDir(), slotname, NULL);
+	PathJoin(Path, core->SavePath, SaveDir(), slotname, nullptr);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -402,7 +406,11 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		FormatQuickSavePath(from, myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
 		core->DelTree(from, false);
+#ifdef VITA
+		sceIoRemove(from);
+#else
 		rmdir(from);
+#endif
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
@@ -488,12 +496,12 @@ static bool DoSaveGame(const char *Path)
 static int CanSave()
 {
 	//some of these restrictions might not be needed
-	Store * store = core->GetCurrentStore();
+	const Store *store = core->GetCurrentStore();
 	if (store) {
 		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, DMC_BG2XPGREEN);
 		return 1; //can't save while store is open
 	}
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1; //no gamecontrol!!!
@@ -503,7 +511,7 @@ static int CanSave()
 		return 2; //can't save while in dialog
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
@@ -513,7 +521,7 @@ static int CanSave()
 		return 3;
 	}
 
-	Map *map = game->GetCurrentArea();
+	const Map *map = game->GetCurrentArea();
 	if (!map) {		
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
@@ -527,7 +535,7 @@ static int CanSave()
 
 	int i = game->GetPartySize(true);
 	while(i--) {
-		Actor *actor = game->GetPC(i, true);
+		const Actor *actor = game->GetPC(i, true);
 		// can't save while (party) actors are in helpless or dead states
 		// STATE_NOSAVE tracks actors not to be stored in GAM, not game saveability
 		if (actor->GetStat(IE_STATE_ID) & (STATE_NOSAVE|STATE_MINDLESS)) {
@@ -566,7 +574,7 @@ static int CanSave()
 static bool CreateSavePath(char *Path, int index, const char *slotname) WARN_UNUSED;
 static bool CreateSavePath(char *Path, int index, const char *slotname)
 {
-	PathJoin( Path, core->SavePath, SaveDir(), NULL );
+	PathJoin(Path, core->SavePath, SaveDir(), nullptr);
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {
@@ -577,7 +585,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 
 	char dir[_MAX_PATH];
 	snprintf( dir, _MAX_PATH, "%09d-%s", index, slotname );
-	PathJoin(Path, Path, dir, NULL);
+	PathJoin(Path, Path, dir, nullptr);
 	//this is required in case the old slot wasn't recognised but still there
 	core->DelTree(Path, false);
 	if (!MakeDirectory(Path)) {
@@ -710,7 +718,11 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 	}
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
+#ifdef VITA
+	sceIoRemove(game->GetPath());
+#else
 	rmdir( game->GetPath() );
+#endif
 }
 
 }

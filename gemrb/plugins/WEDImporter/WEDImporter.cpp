@@ -44,12 +44,6 @@ using namespace GemRB;
 
 WEDImporter::WEDImporter(void)
 {
-	str = NULL;
-	OverlaysCount = DoorsCount = OverlaysOffset = SecHeaderOffset = 0;
-	DoorPolygonsCount = DoorsOffset = DoorTilesOffset = PLTOffset = 0;
-	WallPolygonsCount = PolygonsOffset = VerticesOffset = WallGroupsOffset = 0;
-	OpenPolyCount = ClosedPolyCount = OpenPolyOffset = ClosedPolyOffset = 0;
-	ExtendedNight = false;
 }
 
 WEDImporter::~WEDImporter(void)
@@ -109,7 +103,7 @@ bool WEDImporter::Open(DataStream* stream)
 	return true;
 }
 
-int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
+int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
 {
 	ieResRef res;
 	int usedoverlays = 0;
@@ -186,7 +180,7 @@ int WEDImporter::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 }
 
 //this will replace the tileset of an existing tilemap, or create a new one
-TileMap* WEDImporter::GetTileMap(TileMap *tm)
+TileMap* WEDImporter::GetTileMap(TileMap *tm) const
 {
 	int usedoverlays;
 	bool freenew = false;

@@ -71,7 +71,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 	assert(key != NULL);
 
 	unsigned int nHash = 0;
-	for (int i = 0; key[i] && i < MAX_VARIABLE_LENGTH; i++) {
+	for (int i = 0; i < MAX_VARIABLE_LENGTH && key[i]; i++) {
 		//the original engine ignores spaces in variable names
 		if (key[i] != ' ')
 			nHash = ( nHash << 5 ) + nHash + tolower( key[i] );

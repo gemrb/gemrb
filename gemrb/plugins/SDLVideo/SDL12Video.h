@@ -30,6 +30,7 @@ private:
 	SDL_Surface* disp;
 	bool inTextInput;
 	SDL_Joystick* gameController = nullptr;
+	DPadSoftKeyboard dPadSoftKeyboard;
 
 public:
 	SDL12VideoDriver(void);

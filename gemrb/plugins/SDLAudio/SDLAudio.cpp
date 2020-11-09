@@ -56,9 +56,6 @@ SDLAudio::~SDLAudio(void)
 	Mix_ChannelFinished(NULL);
 }
 
-// no user data for Mix_ChannelFinished :(
-SDLAudio *g_sdlaudio = NULL;
-
 bool SDLAudio::Init(void)
 {
 	// TODO: we assume SDLVideo already got loaded
@@ -75,7 +72,6 @@ bool SDLAudio::Init(void)
 	}
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
-	g_sdlaudio = this;
 	Mix_ReserveChannels(1); // for speech
 	return true;
 }
@@ -270,14 +266,20 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 	}
+#ifndef VITA
 	SDL_mutexP(OurMutex);
+#endif
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
+#ifndef VITA
 		SDL_mutexV(OurMutex);
+#endif
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
+#ifndef VITA
 	SDL_mutexV(OurMutex);
+#endif
 
 	// TODO
 	return Holder<SoundHandle>();
