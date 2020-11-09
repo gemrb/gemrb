@@ -24,6 +24,7 @@
 #include "Interface.h"
 #include "Pixels.h"
 #include "SDLSurfaceSprite2D.h"
+#include "SDL12GamepadMappings.h"
 
 #include "SpriteRenderer.inl"
 
