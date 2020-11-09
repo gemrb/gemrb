@@ -1,0 +1,86 @@
+name: Builders
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master, subviews ]
+
+jobs:
+  macos:
+    name: MacOS build
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Homebrew
+      run: |
+        brew install sdl openal-soft sdl_mixer libpng libvorbis sccache
+
+    - name: Set up build
+      run: |
+        # FindOpenAL prefers the framework version by default ... which deprecated OpenAL
+        openal="-DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/AL -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib"
+        mkdir build && cd build &&
+        export OPENALDIR="/usr/local/opt/openal-soft/" &&
+        cmake --version &&
+        cmake -DCMAKE_INSTALL_PREFIX=iprefix $openal -DCMAKE_FIND_FRAMEWORK=LAST -DUSE_OPENAL=off ..
+        grep -i openal CMakeCache.txt
+
+    - name: Compiler cache (sccache)
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/sccache
+          ~/Library/Caches/Mozilla.sccache
+        key: ${{ runner.os }}-sccache-v1-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-sccache-v1-${{ github.ref }}-
+          ${{ runner.os }}-sccache-v1-refs/heads/master-
+          ${{ runner.os }}-sccache-v1-
+
+    - name: Build
+      run: |
+        cd build &&
+        make &&
+        make install
+
+    - name: Show build cache stats
+      run: |
+        command -v sccache &&
+        sccache -s
+
+    - name: Set up SSH
+      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+      if: github.event_name == 'push'
+      with:
+        ssh-private-key: ${{ secrets.SSH_SF_PRIVATE_KEY }}
+        ssh-host: frs.sourceforge.net
+
+    - name: Upload
+      if: github.event_name == 'push'
+      env:
+        OS: ${{ runner.os }}
+      run: |
+        # NOTE: only do it on clang builds if we ever add more compilers
+        if [[ $OS == macOS ]]; then
+          filepath=Apple/OSX
+          tarpath=/Applications/GemRB.app
+        elif [[ $OS == Linux ]]; then
+          filepath=Linux
+          tarpath=iprefix
+        else
+          echo "Unknown platform, exiting!"
+          exit 13
+        fi
+
+        # there are no tags, so improvise
+        version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
+        file=gemrb-$version.tar.bz2
+        tar cjf $file $tarpath || exit 15
+
+        filepath="$filepath/$file"
+        scp $file \
+        gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath

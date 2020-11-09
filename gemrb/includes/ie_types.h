@@ -34,9 +34,12 @@
 
 namespace GemRB {
 
-//we need this for Windows and Android
-#if defined (WIN32) || defined (ANDROID)
+// we need this fallback for Android and anyone else skipping
+// cmake, where the proper sizes are checked for
+#ifndef SIZEOF_INT
 #define SIZEOF_INT 4
+#endif
+#ifndef SIZEOF_LONG_INT
 #define SIZEOF_LONG_INT 4
 #endif
 

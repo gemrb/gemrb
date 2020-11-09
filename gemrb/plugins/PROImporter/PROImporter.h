@@ -32,8 +32,8 @@ namespace GemRB {
 
 class PROImporter : public ProjectileMgr {
 private:
-	DataStream* str;
-	int version;
+	DataStream* str = nullptr;
+	int version = 0;
 
 public:
 	PROImporter(void);

@@ -1,11 +1,11 @@
 2DA V1.0
 NORMAL
 	RESREF		NEED_PALETTE	FONT_NAME	PX_SIZE		STYLE	COLOR
-0	NORMAL		1				DejaVuSans	14			0		0xffffffff
-1	FLOATTXT	1				DejaVuSans	12			0		0xffffffff
+0	NORMAL		1				Lato-Regular	14			0		0xffffffff
+1	FLOATTXT	1				Lato-Regular	12			0		0xffffffff
 #these are the same font so list the larger one first and gemrb only needs to create one font
 2	INITIALS	0				Eadui		36			0		0xffffffff
 3	NUMBER		0				Eadui		14			0		0xffffffff
-4	INFOFONT	1				DejaVuSans	12			0		0xffffffff
+4	INFOFONT	1				Lato-Regular	12			0		0xffffffff
 
 # Customization How To: https://gemrb.org/Fonts

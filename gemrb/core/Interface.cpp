@@ -246,6 +246,8 @@ Interface::Interface()
 #else // HAVE_ICONV
 	SystemEncoding = nullptr;
 #endif// HAVE_ICONV
+#elif defined(__MORPHOS__)
+	SystemEncoding = nullptr;
 #else // WIN32
 	SystemEncoding = nl_langinfo(CODESET);
 #endif // WIN32

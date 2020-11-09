@@ -21,6 +21,13 @@
 #ifndef GemRB_Predicates_h
 #define GemRB_Predicates_h
 
+#if defined(__MORPHOS__) && !defined(WARPUP)
+#undef bind
+#undef Debug
+#undef Wait
+#undef Remove
+#endif
+
 #include <functional>
 
 namespace GemRB {
