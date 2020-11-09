@@ -49,8 +49,7 @@ Event DPadSoftKeyboard::GetTextEvent() const
 		modKeyValue -= 32;
 	}
 
-	char string[2] = {};
-	string[0] = modKeyValue;
+	char string[2] = { modKeyValue, '\0' };
 	return EventMgr::CreateTextEvent(string);
 }
 
