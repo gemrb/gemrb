@@ -8759,10 +8759,6 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		// could be used with higher granularity. When we need the face value
 		// it could be divided so it will become a 0-15 number.
 		//
-
-		Color mirrortint = tint;
-		//mirror images are also half transparent when invis
-		//if (mirrortint.a > 0) mirrortint.a = 255;
 		
 		if (!anims->lockPalette) {
 			flags |= BLIT_TINTED;
@@ -8787,7 +8783,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, currentStance.anim, mirrortint);
+					DrawActorSprite(icx, icy, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8853,7 +8849,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, currentStance.anim, mirrortint);
+					DrawActorSprite(icx, icy, flags, currentStance.anim, tint);
 				}
 			}
 		}
