@@ -2542,6 +2542,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	//maximum number of monsters summoned
 	int cnt=10;
 	Actor * ab = NULL;
+	Actor *summoner = nullptr;
 
 	Map *map;
 	if (target) {
@@ -2552,6 +2553,10 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		map = game->GetCurrentArea();
 	}
 	if (!map) return ab;
+
+	if (Owner && Owner->Type == ST_ACTOR) {
+		summoner = (Actor *) Owner;
+	}
 
 	while (cnt--) {
 		Actor *tmp = gamedata->GetCreature(resource);
@@ -2564,10 +2569,9 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		//non actors and neutrals can summon as much as they want
 		ieDword flag = GA_NO_DEAD|GA_NO_ALLY|GA_NO_ENEMY;
 
-		if (Owner && Owner->Type==ST_ACTOR) {
+		if (summoner) {
 			tmp->LastSummoner = Owner->GetGlobalID();
-			Actor *owner = (Actor *) Owner;
-			ieDword ea = owner->GetStat(IE_EA);
+			ieDword ea = summoner->GetStat(IE_EA);
 			if (ea<=EA_GOODCUTOFF) {
 				flag &= ~GA_NO_ALLY;
 			} else if (ea>=EA_EVILCUTOFF) {
@@ -2582,9 +2586,10 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 		// only allow up to the summoning limit of new summoned creatures
 		// the summoned creatures have a special IE_SEX
+		// but also only limit the party, so spore colonies can reproduce more
 		ieDword sex = tmp->GetStat(IE_SEX);
 		int limit = gamedata->GetSummoningLimit(sex);
-		if (limit && sexmod && map->CountSummons(flag, sex)>=limit) {
+		if (limit && sexmod && map->CountSummons(flag, sex) >= limit && summoner && summoner->InParty) {
 			//summoning limit reached
 			displaymsg->DisplayConstantString(STR_SUMMONINGLIMIT, DMC_WHITE);
 			delete tmp;
@@ -2597,8 +2602,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		int enemyally;
 
 		if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
-			if (Owner && Owner->Type==ST_ACTOR) {
-				enemyally = ((Actor *) Owner)->GetStat(IE_EA)>EA_GOODCUTOFF;
+			if (summoner) {
+				enemyally = summoner->GetStat(IE_EA) > EA_GOODCUTOFF;
 			} else {
 				enemyally = true;
 			}
