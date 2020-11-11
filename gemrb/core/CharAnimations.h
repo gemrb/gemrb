@@ -171,7 +171,7 @@ public:
 
 	bool change[PAL_MAX];
 	PaletteHolder PartPalettes[PAL_MAX];
-	PaletteHolder modifiedPalette[PAL_MAX];
+	PaletteHolder ModPartPalettes[PAL_MAX];
 	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;

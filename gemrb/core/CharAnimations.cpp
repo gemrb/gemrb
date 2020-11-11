@@ -261,7 +261,7 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	//       bottleneck. (wjp)
 	DropAnims();
 	gamedata->FreePalette(PartPalettes[PAL_HELMET], 0);
-	gamedata->FreePalette(modifiedPalette[PAL_HELMET], 0);
+	gamedata->FreePalette(ModPartPalettes[PAL_HELMET], 0);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -272,7 +272,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 	// TODO: Only drop weapon anims?
 	DropAnims();
 	gamedata->FreePalette(PartPalettes[PAL_WEAPON], 0);
-	gamedata->FreePalette(modifiedPalette[PAL_WEAPON], 0);
+	gamedata->FreePalette(ModPartPalettes[PAL_WEAPON], 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -283,7 +283,7 @@ void CharAnimations::SetOffhandRef(const char* ref)
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
 	gamedata->FreePalette(PartPalettes[PAL_OFFHAND], 0);
-	gamedata->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
+	gamedata->FreePalette(ModPartPalettes[PAL_OFFHAND], 0);
 }
 
 void CharAnimations::LockPalette(const ieDword *gradients)
@@ -400,11 +400,11 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 
 		if (needmod) {
-			if (!modifiedPalette[PAL_MAIN])
-				modifiedPalette[PAL_MAIN] = new Palette();
-			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
+			if (!ModPartPalettes[PAL_MAIN])
+				ModPartPalettes[PAL_MAIN] = new Palette();
+			ModPartPalettes[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
+			gamedata->FreePalette(ModPartPalettes[PAL_MAIN], 0);
 		}
 		return;
 	}
@@ -435,11 +435,11 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 		bool needmod = GlobalColorMod.type != RGBModifier::NONE;
 		if (needmod) {
-			if (!modifiedPalette[type])
-				modifiedPalette[type] = new Palette();
-			modifiedPalette[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
+			if (!ModPartPalettes[type])
+				ModPartPalettes[type] = new Palette();
+			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(modifiedPalette[type], 0);
+			gamedata->FreePalette(ModPartPalettes[type], 0);
 		}
 		return;
 	}
@@ -461,16 +461,16 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	if (needmod) {
-		if (!modifiedPalette[type])
-			modifiedPalette[type] = new Palette();
+		if (!ModPartPalettes[type])
+			ModPartPalettes[type] = new Palette();
 
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			modifiedPalette[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
+			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			modifiedPalette[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
+			ModPartPalettes[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
 		}
 	} else {
-		gamedata->FreePalette(modifiedPalette[type], 0);
+		gamedata->FreePalette(ModPartPalettes[type], 0);
 	}
 
 }
@@ -490,8 +490,8 @@ PaletteHolder CharAnimations::GetPartPalette(int part)
 	else if (part == actorPartCount+1) type = PAL_OFFHAND;
 	else if (part == actorPartCount+2) type = PAL_HELMET;
 
-	if (modifiedPalette[type])
-		return modifiedPalette[type];
+	if (ModPartPalettes[type])
+		return ModPartPalettes[type];
 
 	return PartPalettes[type];
 }
@@ -762,7 +762,7 @@ CharAnimations::~CharAnimations(void)
 	for (; i < PAL_MAX; ++i)
 		gamedata->FreePalette(PartPalettes[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
-		gamedata->FreePalette(modifiedPalette[i], 0);
+		gamedata->FreePalette(ModPartPalettes[i], 0);
 
 	if (shadowPalette) {
 		gamedata->FreePalette(shadowPalette, 0);
