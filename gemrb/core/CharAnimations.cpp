@@ -360,6 +360,8 @@ void CharAnimations::SetupColors(PaletteType type)
 	if (!Colors) {
 		return;
 	}
+	
+	int PType = NoPalette();
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Only do main palette
@@ -406,11 +408,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		} else {
 			gamedata->FreePalette(ModPartPalettes[PAL_MAIN], 0);
 		}
-		return;
-	}
-
-	int PType = NoPalette();
-	if ( PType && (type <= PAL_MAIN_5) ) {
+	} else if (PType && (type <= PAL_MAIN_5)) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
 			ieResRef oldResRef;
@@ -441,38 +439,36 @@ void CharAnimations::SetupColors(PaletteType type)
 		} else {
 			gamedata->FreePalette(ModPartPalettes[type], 0);
 		}
-		return;
-	}
-
-	pal->SetupPaperdollColours(Colors, type);
-	if (lockPalette) {
-		return;
-	}
-
-	bool needmod = false;
-	if (GlobalColorMod.type != RGBModifier::NONE) {
-		needmod = true;
 	} else {
-		// TODO: should that -1 really be there??
-		for (size_t i = 0; i < PAL_MAX - 1; ++i) {
-			if (ColorMods[i+8*type].type != RGBModifier::NONE)
-				needmod = true;
+		pal->SetupPaperdollColours(Colors, type);
+		if (lockPalette) {
+			return;
 		}
-	}
 
-	if (needmod) {
-		if (!ModPartPalettes[type])
-			ModPartPalettes[type] = new Palette();
-
+		bool needmod = false;
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
+			needmod = true;
 		} else {
-			ModPartPalettes[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
+			// TODO: should that -1 really be there??
+			for (size_t i = 0; i < PAL_MAX - 1; ++i) {
+				if (ColorMods[i+8*type].type != RGBModifier::NONE)
+					needmod = true;
+			}
 		}
-	} else {
-		gamedata->FreePalette(ModPartPalettes[type], 0);
-	}
 
+		if (needmod) {
+			if (!ModPartPalettes[type])
+				ModPartPalettes[type] = new Palette();
+
+			if (GlobalColorMod.type != RGBModifier::NONE) {
+				ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
+			} else {
+				ModPartPalettes[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
+			}
+		} else {
+			gamedata->FreePalette(ModPartPalettes[type], 0);
+		}
+	}
 }
 
 PaletteHolder CharAnimations::GetPartPalette(int part)
