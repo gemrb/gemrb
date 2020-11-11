@@ -623,7 +623,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 
 	if (anims) {
 		if (anims->lockPalette) {
-			recover = anims->palette[PAL_MAIN];
+			recover = anims->PartPalettes[PAL_MAIN];
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
@@ -655,8 +655,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims->SetWeaponRef(WeaponRef);
 
 	//if we have a recovery palette, then set it back
-	assert(anims->palette[PAL_MAIN] == 0);
-	anims->palette[PAL_MAIN] = recover;
+	assert(anims->PartPalettes[PAL_MAIN] == 0);
+	anims->PartPalettes[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
 		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);

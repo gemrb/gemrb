@@ -147,11 +147,11 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
 void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 	if (previousStanceID != StanceID) {
 		// Test if the palette in question is actually different to the one loaded.
-		if (*palette[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
-			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef[PAL_MAIN]);
+		if (*PartPalettes[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
+			gamedata->FreePalette(PartPalettes[PAL_MAIN], PaletteResRef[PAL_MAIN]);
 			PaletteResRef[PAL_MAIN][0] = 0;
 
-			palette[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
+			PartPalettes[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
 			SetupColors(PAL_MAIN);
 		}
 	}
@@ -260,7 +260,7 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	gamedata->FreePalette(palette[PAL_HELMET], 0);
+	gamedata->FreePalette(PartPalettes[PAL_HELMET], 0);
 	gamedata->FreePalette(modifiedPalette[PAL_HELMET], 0);
 }
 
@@ -271,7 +271,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	gamedata->FreePalette(palette[PAL_WEAPON], 0);
+	gamedata->FreePalette(PartPalettes[PAL_WEAPON], 0);
 	gamedata->FreePalette(modifiedPalette[PAL_WEAPON], 0);
 }
 
@@ -282,7 +282,7 @@ void CharAnimations::SetOffhandRef(const char* ref)
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	gamedata->FreePalette(palette[PAL_OFFHAND], 0);
+	gamedata->FreePalette(PartPalettes[PAL_OFFHAND], 0);
 	gamedata->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
 }
 
@@ -297,7 +297,7 @@ void CharAnimations::LockPalette(const ieDword *gradients)
 	//force initialisation of animation
 	SetColors( gradients );
 	GetAnimation(0,0);
-	if (palette[PAL_MAIN]) {
+	if (PartPalettes[PAL_MAIN]) {
 		lockPalette=true;
 	}
 }
@@ -351,7 +351,7 @@ void CharAnimations::CheckColorMod()
 
 void CharAnimations::SetupColors(PaletteType type)
 {
-	PaletteHolder pal = palette[type];
+	PaletteHolder pal = PartPalettes[type];
 
 	if (!pal) {
 		return;
@@ -395,14 +395,14 @@ void CharAnimations::SetupColors(PaletteType type)
 		*/
 		for (int i = 0; i < colorcount; i++) {
 			const auto& pal32 = core->GetPalette32(Colors[i]);
-			palette[PAL_MAIN]->CopyColorRange(&pal32[0], &pal32[32], dest);
+			PartPalettes[PAL_MAIN]->CopyColorRange(&pal32[0], &pal32[32], dest);
 			dest +=size;
 		}
 
 		if (needmod) {
 			if (!modifiedPalette[PAL_MAIN])
 				modifiedPalette[PAL_MAIN] = new Palette();
-			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
+			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
 		} else {
 			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
 		}
@@ -427,8 +427,8 @@ void CharAnimations::SetupColors(PaletteType type)
 			strlwr(PaletteResRef[type]);
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
-				gamedata->FreePalette(palette[type], oldResRef);
-				palette[type] = tmppal;
+				gamedata->FreePalette(PartPalettes[type], oldResRef);
+				PartPalettes[type] = tmppal;
 			} else {
 				PaletteResRef[type][0]=0;
 			}
@@ -437,7 +437,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (needmod) {
 			if (!modifiedPalette[type])
 				modifiedPalette[type] = new Palette();
-			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
+			modifiedPalette[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
 			gamedata->FreePalette(modifiedPalette[type], 0);
 		}
@@ -465,9 +465,9 @@ void CharAnimations::SetupColors(PaletteType type)
 			modifiedPalette[type] = new Palette();
 
 		if (GlobalColorMod.type != RGBModifier::NONE) {
-			modifiedPalette[type]->SetupGlobalRGBModification(palette[type], GlobalColorMod);
+			modifiedPalette[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			modifiedPalette[type]->SetupRGBModification(palette[type],ColorMods, type);
+			modifiedPalette[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
 		}
 	} else {
 		gamedata->FreePalette(modifiedPalette[type], 0);
@@ -493,7 +493,7 @@ PaletteHolder CharAnimations::GetPartPalette(int part)
 	if (modifiedPalette[type])
 		return modifiedPalette[type];
 
-	return palette[type];
+	return PartPalettes[type];
 }
 
 PaletteHolder CharAnimations::GetShadowPalette() const {
@@ -758,9 +758,9 @@ CharAnimations::~CharAnimations(void)
 	DropAnims();
 	int i;
 	for (i = 0; i <= PAL_MAIN_5; ++i)
-		gamedata->FreePalette(palette[i], PaletteResRef[i]);
+		gamedata->FreePalette(PartPalettes[i], PaletteResRef[i]);
 	for (; i < PAL_MAX; ++i)
-		gamedata->FreePalette(palette[i], 0);
+		gamedata->FreePalette(PartPalettes[i], 0);
 	for (i = 0; i < PAL_MAX; ++i)
 		gamedata->FreePalette(modifiedPalette[i], 0);
 
@@ -1130,28 +1130,28 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			//animations which need a GlobalColorMod (mgir for example)
 
 			//if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
-			if(!palette[ptype]) {
+			if(!PartPalettes[ptype]) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				palette[ptype] = a->GetFrame(0)->GetPalette()->Copy();
+				PartPalettes[ptype] = a->GetFrame(0)->GetPalette()->Copy();
 				// ...and setup the colours properly
 				SetupColors(ptype);
 			} else if (ptype == PAL_MAIN) {
 				MaybeUpdateMainPalette(anims);
 			}
 		} else if (part == actorPartCount) {
-			if (!palette[PAL_WEAPON]) {
-				palette[PAL_WEAPON] = a->GetFrame(0)->GetPalette()->Copy();
+			if (!PartPalettes[PAL_WEAPON]) {
+				PartPalettes[PAL_WEAPON] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_WEAPON);
 			}
 		} else if (part == actorPartCount+1) {
-			if (!palette[PAL_OFFHAND]) {
-				palette[PAL_OFFHAND] = a->GetFrame(0)->GetPalette()->Copy();
+			if (!PartPalettes[PAL_OFFHAND]) {
+				PartPalettes[PAL_OFFHAND] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_OFFHAND);
 			}
 		} else if (part == actorPartCount+2) {
-			if (!palette[PAL_HELMET]) {
-				palette[PAL_HELMET] = a->GetFrame(0)->GetPalette()->Copy();
+			if (!PartPalettes[PAL_HELMET]) {
+				PartPalettes[PAL_HELMET] = a->GetFrame(0)->GetPalette()->Copy();
 				SetupColors(PAL_HELMET);
 			}
 		}

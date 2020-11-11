@@ -170,7 +170,7 @@ public:
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[PAL_MAX];
-	PaletteHolder palette[PAL_MAX];
+	PaletteHolder PartPalettes[PAL_MAX];
 	PaletteHolder modifiedPalette[PAL_MAX];
 	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
