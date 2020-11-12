@@ -128,7 +128,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	uint8_t* pixels = NULL;
 
 	/* Render the glyph */
-	error = FT_Render_Glyph( glyph, ft_render_mode_normal );
+	error = FT_Render_Glyph(glyph, FT_RENDER_MODE_NORMAL);
 	if( error ) {
 		LogFTError(error);
 		return AliasBlank(chr);
