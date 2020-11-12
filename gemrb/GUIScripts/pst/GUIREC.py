@@ -889,16 +889,15 @@ def OpenLevelUpWindow ():
 	Thac0 = 0
 	WeapProfGained = 0
 
-	ClasWeapTable = GemRB.LoadTable ("weapprof")
 	WeapProfType = -1
 	CurrWeapProf = -1
 	#This does not apply to Nameless since he uses unused slots system
 	#Nameless is Specific == 1
 	if Specific != "1":
 		# Searching for the column name where value is 1
-		for i in range (5):
-			WeapProfName = ClasWeapTable.GetRowName (i)
-			value = ClasWeapTable.GetValue (WeapProfName, AvatarName)
+		for i in range (6):
+			WeapProfName = CommonTables.WeapProfs.GetRowName (i)
+			value = CommonTables.WeapProfs.GetValue (WeapProfName,AvatarName)
 			if value == 1:
 				WeapProfType = i
 				break
