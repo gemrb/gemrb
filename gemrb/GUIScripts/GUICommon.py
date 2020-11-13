@@ -558,17 +558,22 @@ def IsMultiClassed (actor, verbose):
 	# return the tuple
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
-def NamelessOneClass (actor):
-	# simple check to identify if the actor is TNO
-	# and return his active class (by name)
-
+def IsNamelessOne (actor):
+	# A very simple test to identify the actor as TNO
 	if not GameCheck.IsPST():
-		return None
+		return False
 
 	Specific = GemRB.GetPlayerStat (actor, IE_SPECIFIC)
 	if Specific == 2:
-		Class = GetClassRowName(actor)
-		return Class
+		return True
+
+	return False
+
+def NamelessOneClass (actor):
+	# A shortcut function to determine the identity of the nameless one 
+	# and get his class if that is the case
+	if IsNamelessOne(actor):
+		return GetClassRowName(actor)
 
 	return None
 
