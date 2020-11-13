@@ -82,6 +82,14 @@ InformationWindow = None
 BiographyWindow = None
 
 ###################################################
+
+LevelDiff = 0
+Level = 0
+Classes = 0
+NumClasses = 0
+
+###################################################
+
 def InitRecordsWindow (Window):
 	global RecordsWindow
 	global StatTable
@@ -862,6 +870,8 @@ def OpenLevelUpWindow ():
 	global WeapProfType, CurrWeapProf, WeapProfGained
 	global NumOfPrimLevUp, NumOfSecoLevUp
 
+	global LevelDiff, Level, Classes, NumClasses
+
 	LevelUpWindow = Window = GemRB.LoadWindow (4, "GUIREC") # since we get called from NewLife
 
 	# Accept
@@ -927,25 +937,32 @@ def OpenLevelUpWindow ():
 	Label = Window.GetControl (0x10000023)
 	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
 
+	# our multiclass variables
+	IsMulti = GUICommon.IsMultiClassed (pc, 1)
+	Classes = [IsMulti[1], IsMulti[2], IsMulti[3]]
+	NumClasses = IsMulti[0] # 2 or 3 if IsMulti; 0 otherwise
+	IsMulti = NumClasses > 1
+
+	if not IsMulti:
+		NumClasses = 1
+		Classes = [GemRB.GetPlayerStat (pc, IE_CLASS)]
+
+	if GUICommon.IsNamelessOne(pc):
+		# Override the multiclass info for TNO
+		IsMulti = 1
+		NumClasses = 3
+		# Fighter, Mage, Thief ID
+		Classes = [2, 1, 4]
+
+	Level = LUCommon.GetNextLevels(pc, Classes)
+	LevelDiff = LUCommon.GetLevelDiff(pc, Level)
+
+
 	# Thief Skills
-	# For now we shall set them to the current levels and disable the increment buttons
-	# Points Left
-	Label = Window.GetControl (0x10000006)
-	Label.SetText ('0')
-	# Stealth
-	Label = Window.GetControl (0x10000008)
-	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_STEALTH)) + '%')
-	# Detect Traps
-	Label = Window.GetControl (0x1000000A)
-	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_TRAPS)) + '%')
-	# Pick Pockets
-	Label = Window.GetControl (0x1000000C)
-	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_PICKPOCKET)) + '%')
-	# Open Doors
-	Label = Window.GetControl (0x1000000E)
-	Label.SetText (str (GemRB.GetPlayerStat (pc, IE_LOCKPICKING)) + '%')
-	# Plus and Minus buttons
-	LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, [0,0,0], [1,1,1], 0, False)
+	Level1 = []
+	for i in range (len (Level)):
+		Level1.append (Level[i]-LevelDiff[i])
+	LUSkillsSelection.SetupSkillsWindow (pc, LUSkillsSelection.LUSKILLS_TYPE_LEVELUP, LevelUpWindow, RedrawSkills, Level1, Level, 0, False)
 	RedrawSkills()
 
 	# Is avatar multi-class?
