@@ -404,13 +404,9 @@ def GetCharacterHeader (pc):
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GUICommon.HasMultiClassBits (pc)
-	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-
-	#Nameless is Specific == 2
-	avatar_header['Specific'] = Specific
 
 	# Nameless is a special case (dual class)
-	if Specific == 2:
+	if GUICommon.IsNamelessOne(pc):
 		avatar_header['PrimClass'] = CommonTables.Classes.GetRowName (Class)
 		avatar_header['SecoClass'] = "*"
 
@@ -899,21 +895,20 @@ def OpenLevelUpWindow ():
 	WeapProfType = -1
 	CurrWeapProf = 0
 
-	# Scan the weapprof table for the characters favoured weapon proficiency (WeapProfType)
-	# This does not apply to Nameless since he uses unused slots system (Nameless is Specific == 2)
-	if Specific != 2:
-		# Searching for the column name where value is 1
+	# Count the number of existing weapon procifiencies
+	if GUICommon.IsNamelessOne(pc):
+		# TNO: Count the total amount of unassigned proficiencies
+		CurrWeapProf = GemRB.GetPlayerStat(pc, IE_FREESLOTS)
+	else:
+		# Scan the weapprof table for the characters favoured weapon proficiency (WeapProfType)
+		# This does not apply to Nameless since he uses unused slots system
 		for i in range (6):
 			WeapProfName = CommonTables.WeapProfs.GetRowName (i)
 			value = CommonTables.WeapProfs.GetValue (WeapProfName,AvatarName)
 			if value == 1:
 				WeapProfType = i
 				break
-	else:
-		# TNO: Count the total amount of unassigned proficiencies
-		CurrWeapProf = GemRB.GetPlayerStat(pc, IE_FREESLOTS)
 
-	# Count the number of existing weapon procifiencies
 	for i in range (6):
 		CurrWeapProf += GemRB.GetPlayerStat (pc, IE_PROFICIENCYBASTARDSWORD + i)
 
@@ -982,20 +977,7 @@ def OpenLevelUpWindow ():
 			Thac0Updated = True
 
 		# Saving Throws
-		if Specific != 2:
-			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
-			# Updating the current saving throws. They are changed only if the
-			# new ones are better than current. The smaller the number, the better.
-			# We need to substract one from the NextLevel, so that we get right values.
-			# We also need to check if NextLevel is larger than 21, since after that point
-			# the table runs out, and the throws remain the same
-			if NextLevel < 22:
-				for i in range (5):
-					Throw = SavThrTable.GetValue (i, NextLevel-1)
-					if Throw < SavThrows[i]:
-						SavThrows[i] = Throw
-						SavThrUpdated = True
-		else:
+		if GUICommon.IsNamelessOne(pc):
 			# Nameless One always uses the best possible save from each class
 			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
 			MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
@@ -1036,6 +1018,21 @@ def OpenLevelUpWindow ():
 					if Throw < SavThrows[i]:
 						SavThrows[i] = Throw
 						SavThrUpdated = True
+		else:
+			SavThrTable = GemRB.LoadTable (CommonTables.Classes.GetValue (Class, "SAVE"))
+			# Updating the current saving throws. They are changed only if the
+			# new ones are better than current. The smaller the number, the better.
+			# We need to substract one from the NextLevel, so that we get right values.
+			# We also need to check if NextLevel is larger than 21, since after that point
+			# the table runs out, and the throws remain the same
+			if NextLevel < 22:
+				for i in range (5):
+					Throw = SavThrTable.GetValue (i, NextLevel-1)
+					if Throw < SavThrows[i]:
+						SavThrows[i] = Throw
+						SavThrUpdated = True
+
+
 
 	else:
 		# avatar is multi class
@@ -1200,7 +1197,7 @@ def GainedWeapProfs (pc, currProf, currLevel, AvatarName):
 		return maxProf - currProf
 
 	# Nameless continues gaining points forever	at a rate of 1 every 3 levels
-	elif AvatarName == "NAMELESS" and (currProf-3) <= (nextLevel / 3):
+	elif GUICommon.IsNamelessOne(pc) and (currProf-3) <= (nextLevel / 3):
 		return 1
 
 	return 0
