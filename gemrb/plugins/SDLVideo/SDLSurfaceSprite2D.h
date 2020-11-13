@@ -100,14 +100,15 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 		operator SDL_Texture* () { return texture; }
 	};
 
+	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;
 	mutable Holder<TextureHolder> texture;
-
+	mutable bool staleTexture = false;
+	
 public:
 	SDLTextureSprite2D(const Region&, int Bpp, void* pixels,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	SDLTextureSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLTextureSprite2D(const SDLTextureSprite2D& obj);
 	Holder<Sprite2D> copy() const override;
 
 	using SDLSurfaceSprite2D::SetPalette;

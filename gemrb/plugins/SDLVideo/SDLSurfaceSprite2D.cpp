@@ -319,20 +319,12 @@ SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, int Bpp, void* pixels,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
 : SDLSurfaceSprite2D(rgn, Bpp, pixels, rmask, gmask, bmask, amask)
 {
-	texture = NULL;
 }
 
 SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, int Bpp,
 									   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask)
 : SDLSurfaceSprite2D(rgn, Bpp, rmask, gmask, bmask, amask)
 {
-	texture = NULL;
-}
-
-SDLTextureSprite2D::SDLTextureSprite2D(const SDLTextureSprite2D& obj)
-: SDLSurfaceSprite2D(obj)
-{
-	texture = obj.texture;
 }
 
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
@@ -342,27 +334,44 @@ Holder<Sprite2D> SDLTextureSprite2D::copy() const
 
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 {
-	if (texture == NULL) {
-		texture = new TextureHolder(SDL_CreateTextureFromSurface(renderer, GetSurface()));
+	if (texture == nullptr) {
+		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, GetSurface());
+		SDL_QueryTexture(tex, &texFormat, nullptr, nullptr, nullptr);
+		texture = new TextureHolder(tex);
+	} else if (staleTexture) {
+		SDL_Surface *surface = GetSurface();
+		if (texFormat == surface->format->format) {
+			SDL_UpdateTexture(*texture, nullptr, surface->pixels, surface->pitch);
+		} else {
+			/* Set up a destination surface for the texture update */
+			SDL_PixelFormat *dst_fmt = SDL_AllocFormat(texFormat);
+			assert(dst_fmt);
+			
+			SDL_Surface *temp = SDL_ConvertSurface(surface, dst_fmt, 0);
+			SDL_FreeFormat(dst_fmt);
+			assert(temp);
+			SDL_UpdateTexture(*texture, nullptr, temp->pixels, temp->pitch);
+			SDL_FreeSurface(temp);
+		}
 	}
 	return *texture;
 }
 
 void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 {
-	texture = NULL;
+	staleTexture = true;
 	SDLSurfaceSprite2D::SetColorKey(pxvalue);
 }
 
 void* SDLTextureSprite2D::NewVersion(version_t version) const
 {
-	texture = NULL;
+	staleTexture = true;
 	return SDLSurfaceSprite2D::NewVersion(version);
 }
 
 void SDLTextureSprite2D::Restore() const
 {
-	texture = NULL;
+	staleTexture = true;
 	SDLSurfaceSprite2D::Restore();
 }
 #endif
