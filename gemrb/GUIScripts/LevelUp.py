@@ -165,25 +165,18 @@ def OpenLevelUpWindow():
 
 	print "NumClasses:",NumClasses,"\tActor NumClasses:",actor.NumClasses()
 
-	Level = [0]*3
-	LevelDiff = [0]*3
-
-	# reorganize the leves if we're dc so the one we want to use is in Level[0]
-	# and the old one is in Level[1] (used to regain old class abilities)
 	if IsDual:
 		# convert the classes from indicies to class id's
 		DualSwap = GUICommon.IsDualSwap (pc)
 		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
 
-		# we need the old level as well
-		if DualSwap:
-			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL)
-		else:
-			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
-
 	print "Classes:",Classes,"\tActor Classes:",actor.Classes()
-	print "IsDual:",IsDual>0,"\tActor IsDual",actor.isdual
+	print "IsDual:",IsDual > 0,"\tActor IsDual",actor.isdual
+
+	# get the next target levels and difference between levels
+	Level = LUCommon.GetNextLevels(pc, Classes)
+	LevelDiff = LUCommon.GetLevelDiff(pc, Level)
 
 	hp = 0
 	HaveCleric = 0
@@ -195,27 +188,10 @@ def OpenLevelUpWindow():
 	NewDSpells = [0]*7
 	NewWSpells = [0]*9
 
-	# get a bunch of different things each level
+	# calculate the new spells
 	for i in range(NumClasses):
-#		print "Class:",Classes[i]
-		# we don't care about the current level, but about the to-be-achieved one
-		# get the next level
-		Level[i] = LUCommon.GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
+
 		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
-
-		# find the level diff for each classes (3 max, obviously)
-		if i == 0:
-			if DualSwap:
-				LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL2)
-			else:
-				LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL)
-		elif i == 1:
-			LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL2)
-		elif i == 2:
-			LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL3)
-
-#		print "Level (",i,"):",Level[i]
-#		print "Level Diff (",i,"):",LevelDiff[i]
 
 		# save our current and next spell amounts
 		StartLevel = Level[i] - LevelDiff[i]

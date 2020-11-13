@@ -37,6 +37,57 @@ def GetNextLevelExp (Level, Class):
 	# if you change it, check that all callers can handle it
 	return 0
 
+def GetNextLevels (actor, Classes):
+	"""Returns the next level the PC will attain based on current XP"""
+
+	Level = [0]*3
+
+	# Used only for TNO, all other games divide XP/Number of classes
+	XPStat = [IE_XP, IE_XP_MAGE, IE_XP_THIEF]
+
+	# Dual class character only care about the first class
+	# However the inactive class is needed to handle reactivation
+	if (GUICommon.IsDualClassed(actor, 0)):
+		NumClasses = 1
+		if GUICommon.IsDualSwap(actor):
+			Level[1] = GemRB.GetPlayerStat (actor, IE_LEVEL)
+		else:
+			Level[1] = GemRB.GetPlayerStat (actor, IE_LEVEL2)
+	else:
+		NumClasses = len (Classes)
+
+	for i in range(NumClasses):
+		# Get the next level we will use to look up new stats from the 2da tables
+		if GUICommon.IsNamelessOne(actor):
+			#TNO is the only character in all games that tracks individual XP stats
+			Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (actor, XPStat[i]), Classes[i])
+		else:
+			# In all other cases, XP cut exactly by number of classes
+			Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (actor, IE_XP)/NumClasses, Classes[i])
+
+	return Level
+
+def GetLevelDiff (actor, Level):
+	"""Calculate the number of new levels based on current levels"""
+
+	LevelDiff = [0]*3
+	LevelStat = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
+
+	# Dual Swap: since dual class characters are based on mc combinations
+	# the level stat used by the 'new' class must be the one that
+	# matches the multiclass combo. EG a Fighter that duals to a Mage
+	# will now advance the IE_LEVEL2 stat since he will be FIGHTER_MAGE
+
+	if (GUICommon.IsDualSwap(actor)):
+		LevelStat = [IE_LEVEL2, IE_LEVEL, IE_LEVEL3]
+
+	for i in range(len(Level)):
+		LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (actor, LevelStat[i])
+
+	print Level, LevelDiff
+
+	return LevelDiff
+
 def CanLevelUp(actor):
 	"""Returns true if the actor can level up."""
 
