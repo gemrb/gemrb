@@ -1575,13 +1575,34 @@ void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
 	 * break things (like stopping early, hiding under FoW).
 	 *
 	 * So far, a better approximation towards handling animations is:
-	 * - always set A_ANI_BLEND, A_ANI_SYNC,
-	 * - unset A_ANI_PLAYONCE, A_ANI_NOT_IN_FOG, A_ANI_BACKGROUND.
+	 * - zero everything
+	 * - always set A_ANI_SYNC
+	 * - copy/map known flags (A_ANI_ACTIVE, A_ANI_NO_WALL, A_ANI_BLEND)
+	 *
+	 * Note that WF_COVERANIMS is enabled by default for PST, so ANI_NO_WALL
+	 *   is important.
 	 *
 	 * The actual use of bits in PST map anims isn't fully solved here.
 	 */
-	areaAnim->Flags |= (A_ANI_BLEND | A_ANI_SYNC);
-	areaAnim->Flags &= ~(A_ANI_PLAYONCE | A_ANI_NOT_IN_FOG | A_ANI_BACKGROUND);
+
+	#define PST_ANI_NO_WALL 0x0008  // A_ANI_PLAYONCE in other games
+	#define PST_ANI_BLEND 0x0100  // A_ANI_BACKGROUND in other games
+
+	areaAnim->Flags = 0;             // Clear everything
+
+	// Set default-on flags (currently only A_ANI_SYNC)
+	areaAnim->Flags |= A_ANI_SYNC;
+
+	// Copy still-relevant A_ANI_* flags
+	areaAnim->Flags |= areaAnim->originalFlags & A_ANI_ACTIVE;
+
+	// Map known flags
+	if (areaAnim->originalFlags & PST_ANI_BLEND) {
+		areaAnim->Flags |= A_ANI_BLEND;
+	}
+	if (areaAnim->originalFlags & PST_ANI_NO_WALL) {
+		areaAnim->Flags |= A_ANI_NO_WALL;
+	}
 }
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
