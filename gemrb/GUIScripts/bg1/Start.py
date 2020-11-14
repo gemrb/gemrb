@@ -28,7 +28,7 @@ MultiPlayerButton = 0
 MoviesButton = 0
 
 def OnLoad():
-	global StartWindow, QuitWindow
+	global StartWindow
 	global ExitButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
@@ -40,21 +40,8 @@ def OnLoad():
 		GemRB.PlayMovie ('INTRO',1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	#quit subwindow
-	QuitWindow = GemRB.LoadWindow(3, "START")
-	QuitTextArea = QuitWindow.GetControl(0)
-	CancelButton = QuitWindow.GetControl(2)
-	ConfirmButton = QuitWindow.GetControl(1)
-	QuitTextArea.SetText(19532)
-	CancelButton.SetText(13727)
-	ConfirmButton.SetText(15417)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	ConfirmButton.MakeDefault()
-	CancelButton.MakeEscape()
-
 	#main window
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow (0, "START")
 	SinglePlayerButton = StartWindow.GetControl(0)
 	MultiPlayerButton = StartWindow.GetControl(1)
 	MoviesButton = StartWindow.GetControl(2)
@@ -105,8 +92,6 @@ def ConnectPress():
 def PregenPress():
 	if StartWindow:
 		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -117,8 +102,6 @@ def PregenPress():
 def LoadSingle():
 	if StartWindow:
 		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetNextScript("GUILOAD")
@@ -127,8 +110,6 @@ def LoadSingle():
 def MissionPack():
 	if StartWindow:
 		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",1)
 	GemRB.SetToken ("SaveDir", "mpsave")
 	GemRB.SetNextScript("GUILOAD")
@@ -137,8 +118,6 @@ def MissionPack():
 def NewSingle():
 	if StartWindow:
 		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -146,6 +125,23 @@ def NewSingle():
 	return
 
 def ExitPress():
+	global QuitWindow
+
+	QuitWindow = GemRB.LoadWindow (3)
+
+	QuitTextArea = QuitWindow.GetControl (0)
+	QuitTextArea.SetText (19532)
+
+	CancelButton = QuitWindow.GetControl (2)
+	CancelButton.SetText (13727)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
+	CancelButton.MakeEscape ()
+
+	ConfirmButton = QuitWindow.GetControl (1)
+	ConfirmButton.SetText (15417)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
+	ConfirmButton.MakeDefault ()
+
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
@@ -157,13 +153,11 @@ def MoviesPress():
 #apparently the order is important
 	if StartWindow:
 		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetNextScript("GUIMOVIE")
 	return
 
 def ExitCancelled():
-	QuitWindow.SetVisible(False)
+	QuitWindow.Close ()
 	StartWindow.Focus()
 	return
 	
