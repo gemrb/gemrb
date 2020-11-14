@@ -34,9 +34,11 @@ def CreateScrollbarARGs(bam = None):
 		bam = bam if bam else 'CGSCRL1'
 	elif GameCheck.IsIWD2():
 		bam = bam if bam else 'GBTNSCRL'
-	elif GameCheck.IsBG1() or GameCheck.IsIWD1():
+	elif GameCheck.IsBG1():
 		bam = bam if bam else 'GUIWSBR'
 		bamframes = [0,1,2,3,6,7]
+	elif GameCheck.IsIWD1():
+		bam = bam if bam else 'GUISBR'
 	else: # demo
 		bam = bam if bam else 'scrlbar1'
 		bamframes = [0,1,2,3,5,4]
