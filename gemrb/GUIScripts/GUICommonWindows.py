@@ -159,6 +159,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OnLockViewPress)
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
 		AIPress(0) #this initialises the state and tooltip
 
 		# Message popup FIXME disable on non game screen...
@@ -322,7 +323,7 @@ def AIPress (toggle=1):
 	else:
 		GemRB.SetVar ("AI", GS_PARTYAI)
 		Button.SetTooltip (AITip['Enable'])
-		Button.SetState(IE_GUI_BUTTON_NORMAL)
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if GameCheck.IsPST ():
 		GemRB.SetGlobal ("partyScriptsActive", "GLOBALS", AI)
