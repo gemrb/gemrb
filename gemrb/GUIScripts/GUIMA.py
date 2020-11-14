@@ -117,7 +117,7 @@ ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWind
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
 if GameCheck.IsIWD2():
-	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow, WINDOW_TOP|WINDOW_HCENTER)
+	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 else:
 	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
