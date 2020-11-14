@@ -33,7 +33,6 @@ import GUICommonWindows
 from GUIDefines import *
 
 ###################################################
-JournalWindow = None
 LogWindow = None
 BeastsWindow = None
 QuestsWindow = None
@@ -99,7 +98,7 @@ def CloseAll(Callback):
 
 ###################################################
 def OpenQuestsWindow ():
-	global JournalWindow, QuestsWindow, QuestsList, QuestDesc
+	global QuestsWindow, QuestsList, QuestDesc
 		
 	if QuestsWindow:
 		if QuestsWindow:
@@ -257,7 +256,7 @@ def EvaluateAllQuests ():
 ###################################################
 
 def OpenBeastsWindow ():
-	global JournalWindow, BeastsWindow, BeastsList, BeastImage, BeastDesc
+	global BeastsWindow, BeastsList, BeastImage, BeastDesc
 		
 	if BeastsWindow:
 		if BeastsWindow:
@@ -356,7 +355,7 @@ def EvaluateAllBeasts ():
 ###################################################
 
 def OpenLogWindow ():
-	global JournalWindow, LogWindow
+	global LogWindow
 		
 	if LogWindow:
 		if LogWindow:
