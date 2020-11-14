@@ -1711,6 +1711,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 			Button.SetBAM ("PPPANN", 0, 0, -1) # NOTE: just a dummy, won't be visible
 			ButtonHP = Window.GetControl (6 + i)
 			ButtonHP.SetEvent (IE_GUI_BUTTON_ON_PRESS, PortraitButtonHPOnPress)
+			ButtonHP.SetVarAssoc ("pid", i + 1) # storing so the callback knows which button it's operating on
 		else:
 			Button.SetBorder (FRAME_PC_SELECTED, green, 0, 0, Button.GetInsetFrame(4,3,4,3))
 			Button.SetBorder (FRAME_PC_TARGET, yellow, 0, 0, Button.GetInsetFrame(2,2,3,3))
