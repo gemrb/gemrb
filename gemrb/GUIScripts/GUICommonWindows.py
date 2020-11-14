@@ -1914,17 +1914,13 @@ def PortraitButtonOnShiftPress (btn, pcID):
 	return
 
 def PortraitButtonHPOnPress (btn, pcID): ##pst hitpoint display
-	Window = PortraitWindow
-
 	hbs = GemRB.GetVar('Health Bar Settings')
-	ButtonHP = Window.GetControl (5 + pcID)
-
 	if hbs & (1 << (pcID - 1)):
 		op = OP_NAND
 	else:
 		op = OP_OR
 
-	ButtonHP.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
+	btn.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 	GemRB.SetVar('Health Bar Settings', hbs ^ (1 << (pcID - 1)))
 	return
 
