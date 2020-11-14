@@ -93,6 +93,10 @@ def InitJournalWindow (JournalWindow):
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow)
 OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow)
 
+def CloseAll(Callback):
+	Callback ()
+	GUICommonWindows.CloseTopWindow ()
+
 ###################################################
 def OpenQuestsWindow ():
 	global JournalWindow, QuestsWindow, QuestsList, QuestDesc
@@ -126,7 +130,7 @@ def OpenQuestsWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenQuestsWindow))
 
 	QuestsList = List = Window.GetControl (1)
 	List.SetVarAssoc ('SelectedQuest', -1)
@@ -284,7 +288,7 @@ def OpenBeastsWindow ():
 	# Done
 	Button = BeastsWindow.GetControl (4)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenBeastsWindow))
 
 	BeastsList = List = Window.GetControl (0)
 	List.SetVarAssoc ('SelectedBeast', -1)
@@ -373,7 +377,7 @@ def OpenLogWindow ():
 	# Done
 	Button = Window.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenLogWindow))
 
 	# text area
 	Text = Window.GetControl (2)
