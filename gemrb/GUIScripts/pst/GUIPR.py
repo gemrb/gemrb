@@ -37,6 +37,9 @@ PriestSpellUnmemorizeWindow = None
 
 
 def InitPriestWindow (Window):
+	global PriestSpellWindow
+	PriestSpellWindow = Window
+
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
 
