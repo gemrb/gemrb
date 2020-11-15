@@ -11,7 +11,7 @@ If you want to use it to explore or modify data, you can open files one by one w
 any other game open.
 
 If you want the full experience:
- - create demo/baldur.exe demo/BGConfig.exe
+ - create demo/baldur.exe demo/BGConfig.exe (or pass `-t bg2tob` when invoking NI)
  - symlink demo/data to demo/override
 
 # AUTHORS
