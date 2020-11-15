@@ -67,6 +67,7 @@
 import GemRB
 import GUICommon
 import CommonTables
+import LevelUp
 import LUCommon
 import GUICommonWindows
 import NewLife
@@ -851,6 +852,13 @@ def AcceptLevelUp():
 	
 	LUSkillsSelection.SkillsSave (pc)
 
+	# Spells
+	LevelUp.pc = pc
+	LevelUp.Classes = Classes
+	LevelUp.NumClasses = NumClasses
+	# (we need to override the globals this function uses there since they wouldn't have been set)
+	LevelUp.SaveNewSpells()
+
 	LevelUpWindow.Close()
 	NewLife.OpenLUStatsWindow()
 
@@ -957,6 +965,8 @@ def OpenLevelUpWindow ():
 	Level = LUCommon.GetNextLevels(pc, Classes)
 	LevelDiff = LUCommon.GetLevelDiff(pc, Level)
 
+	# calculate the new spells (results are stored in global variables in LevelUp)
+	LevelUp.GetNewSpells(pc, Classes, Level, LevelDiff)
 
 	# Thief Skills
 	Level1 = []
