@@ -188,62 +188,8 @@ def OpenLevelUpWindow():
 	NewDSpells = [0]*7
 	NewWSpells = [0]*9
 
-	# calculate the new spells
-	for i in range(NumClasses):
-
-		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
-
-		# save our current and next spell amounts
-		StartLevel = Level[i] - LevelDiff[i]
-		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
-		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
-		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR)
-
-		# see if we have mage spells
-		if MageTable != "*":
-			# we get 1 extra spell per level if we're a specialist
-			Specialist = 0
-			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
-				Specialist = 1
-
-			if Spellbook.HasSorcererBook (pc, Classes[i]):
-				MageTable = "SPLSRCKN"
-
-			MageTable = GemRB.LoadTable (MageTable)
-			# loop through each spell level and save the amount possible to cast (current)
-			for j in range (MageTable.GetColumnCount ()):
-				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-				if NewWSpells[j] > 0: # don't want specialist to get 1 in levels they should have 0
-					NewWSpells[j] += Specialist
-				if OldWSpells[j] > 0:
-					OldWSpells[j] += Specialist
-			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
-		elif ClericTable != "*":
-			# check for cleric spells
-			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
-				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
-			ClericTable = GemRB.LoadTable (ClericTable)
-			HaveCleric = 1
-			# same as above
-			for j in range (ClericTable.GetColumnCount ()):
-				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
-		elif DruidTable != "*":
-			# clerics have precedence in multis (ranger/cleric)
-			if HaveCleric == 0:
-				#use MXSPLPRS if we can't find the resource (SoA fix)
-				if not GemRB.HasResource (DruidTable, RES_2DA):
-					DruidTable = "MXSPLPRS"
-
-				# check druid spells
-				DruidTable = GemRB.LoadTable (DruidTable)
-				# same as above
-				for j in range (DruidTable.GetColumnCount ()):
-					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+	# calculate the new spells (results are stored in global variables)
+	GetNewSpells(pc, Classes, Level, LevelDiff, Kit)
 
 # this is handled by core
 #		# setup class bonuses for this class
@@ -717,3 +663,73 @@ def ReactivateBaseClass ():
 				if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 					GemRB.LearnSpell(pc, Learnable[k])
 
+def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
+	'''Scan each class for new spells. Values are stored in the global variables'''
+
+	global DeltaDSpells, DeltaWSpells, NewDSpells, NewWSpells, OldDSpells, OldWSpells
+
+	# clear the globals, since we may get called multiple times with different classes
+	HaveCleric = 0
+	DeltaWSpells = 0
+	DeltaDSpells = 0
+	OldDSpells = [0]*7
+	OldWSpells = [0]*9
+	NewDSpells = [0]*7
+	NewWSpells = [0]*9
+
+	# run through each class to detect new spells
+	for i in range(len(Classes)):
+
+		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
+
+		# save our current and next spell amounts
+		StartLevel = Level[i] - LevelDiff[i]
+		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR)
+
+		# see if we have mage spells
+		if MageTable != "*":
+			# we get 1 extra spell per level if we're a specialist
+			Specialist = 0
+			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
+				Specialist = 1
+
+			if Spellbook.HasSorcererBook (actor, Classes[i]):
+				MageTable = "SPLSRCKN"
+
+			MageTable = GemRB.LoadTable (MageTable)
+			# loop through each spell level and save the amount possible to cast (current)
+			for j in range (MageTable.GetColumnCount ()):
+				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+				if NewWSpells[j] > 0: # don't want specialist to get 1 in levels they should have 0
+					NewWSpells[j] += Specialist
+				if OldWSpells[j] > 0:
+					OldWSpells[j] += Specialist
+			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
+		elif ClericTable != "*":
+			# check for cleric spells
+			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
+				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
+			ClericTable = GemRB.LoadTable (ClericTable)
+			HaveCleric = 1
+			# same as above
+			for j in range (ClericTable.GetColumnCount ()):
+				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+		elif DruidTable != "*":
+			# clerics have precedence in multis (ranger/cleric)
+			if HaveCleric == 0:
+				#use MXSPLPRS if we can't find the resource (SoA fix)
+				if not GemRB.HasResource (DruidTable, RES_2DA):
+					DruidTable = "MXSPLPRS"
+
+				# check druid spells
+				DruidTable = GemRB.LoadTable (DruidTable)
+				# same as above
+				for j in range (DruidTable.GetColumnCount ()):
+					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
