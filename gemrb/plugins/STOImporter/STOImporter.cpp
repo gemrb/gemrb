@@ -137,7 +137,7 @@ Store* STOImporter::GetStore(Store *s)
 		GetItem(item, s);
 		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		// some iwd2 stores like 60sheemi contain crap
-		if (signed(itm->ItemNameIdentified) == -1) {
+		if (itm && signed(itm->ItemNameIdentified) == -1) {
 			toDelete.push_back(item);
 			continue;
 		}
