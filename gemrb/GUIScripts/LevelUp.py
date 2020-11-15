@@ -510,38 +510,8 @@ def LevelUpDonePress():
 
 	print "Levels:",Level[0],"/",Level[1],"/",Level[2]
 
-	# save our number of memorizable spells per level
-	if DeltaWSpells > 0:
-		# loop through each wizard spell level
-		for i in range(len(NewWSpells)):
-			if NewWSpells[i] > 0: # we have new spells, so update
-				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
-
-	# save our number of memorizable priest spells
-	if DeltaDSpells > 0: # druids and clerics count
-		for i in range (len(NewDSpells)):
-			# get each update
-			if NewDSpells[i] > 0:
-				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
-
-			# learn all the spells we're given, but don't have, up to our given casting level
-			# bonus spells don't count in determining if we can use this level
-			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
-				for j in range(NumClasses): # loop through each class
-					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
-					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
-					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
-					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
-						continue
-					elif IsCleric == "*": # druid spells
-						ClassFlag = 0x8000
-					else: # cleric spells
-						ClassFlag = 0x4000
-
-					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
-					for k in range(len(Learnable)): # loop through all the learnable spells
-						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
-							GemRB.LearnSpell(pc, Learnable[k])
+	# spells
+	SaveNewSpells()
 
 	# hlas
 	# level, xp and other stuff by the core?
@@ -733,3 +703,37 @@ def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
 					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
 					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
 				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+
+def SaveNewSpells():
+	# save our number of memorizable spells per level
+	if DeltaWSpells > 0:
+		# loop through each wizard spell level
+		for i in range(len(NewWSpells)):
+			if NewWSpells[i] > 0: # we have new spells, so update
+				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
+
+	# save our number of memorizable priest spells
+	if DeltaDSpells > 0: # druids and clerics count
+		for i in range (len(NewDSpells)):
+			# get each update
+			if NewDSpells[i] > 0:
+				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
+
+			# learn all the spells we're given, but don't have, up to our given casting level
+			# bonus spells don't count in determining if we can use this level
+			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
+				for j in range(NumClasses): # loop through each class
+					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
+					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
+						continue
+					elif IsCleric == "*": # druid spells
+						ClassFlag = 0x8000
+					else: # cleric spells
+						ClassFlag = 0x4000
+
+					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+					for k in range(len(Learnable)): # loop through all the learnable spells
+						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+							GemRB.LearnSpell(pc, Learnable[k])
