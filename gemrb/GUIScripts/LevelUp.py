@@ -81,15 +81,14 @@ def OpenLevelUpWindow():
 		InfoButton = LevelUpWindow.GetControl (125)
 		InfoButton.SetText (13707)
 		InfoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpInfoPress)
+		# hide "Character Generation"
+		LevelUpWindow.DeleteControl(0x1000007e)
 
 	DoneButton = LevelUpWindow.GetControl (0)
 	DoneButton.SetText (11962)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpDonePress)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DoneButton.MakeDefault()
-
-	# hide "Character Generation"
-	LevelUpWindow.DeleteControl(0x1000007e)
 
 	# name
 	pc = GemRB.GameGetSelectedPCSingle ()
