@@ -520,7 +520,7 @@ def IsDualSwap (actor, override=None):
 		if BaseClass == "*":
 			# mod boilerplate
 			return 0
-		BaseClass = GetClassRowName(BaseClass, "index")
+		BaseClass = GetClassRowName(BaseClass, "class")
 
 	# if our old class is the first class, we need to swap
 	if Class[0] == BaseClass:
