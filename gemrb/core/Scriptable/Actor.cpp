@@ -8365,30 +8365,28 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 }
 
 void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
-							const std::vector<AnimationPart>& anims, const Color& tint) const
+							const std::vector<AnimationPart>& animParts, const Color& tint) const
 {
-	if (TranslucentShadows && tint.a == 0) return;
+	if (tint.a == 0) return;
+	
+	if (!anims->lockPalette) {
+		flags |= BLIT_COLOR_MOD;
+	}
+	flags |= BLIT_ALPHA_MOD;
 	
 	Video* video = core->GetVideoDriver();
 
-	for (const auto& part : anims) {
+	for (const auto& part : animParts) {
 		Animation* anim = part.first;
 		PaletteHolder palette = part.second;
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			if (palette->HasAlpha() && TranslucentShadows) {
+			if (TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
 				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 				palette->col[1].a = tmpa;
-			} else if (TranslucentShadows) {
-				PaletteHolder cpy = palette->Copy();
-				cpy->col[1].a = tint.a / 2;
-				for (int i = 2; i < 256; ++i) {
-					cpy->col[i].a = tint.a;
-				}
-				video->BlitGameSpriteWithPalette(currentFrame, cpy, cx, cy, flags, tint);
 			} else {
 				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
 			}
@@ -8754,10 +8752,6 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		// could be used with higher granularity. When we need the face value
 		// it could be divided so it will become a 0-15 number.
 		//
-		
-		if (!anims->lockPalette) {
-			flags |= BLIT_COLOR_MOD;
-		}
 		
 		Game* game = core->GetGame();
 		game->ApplyGlobalTint(tint, flags);
