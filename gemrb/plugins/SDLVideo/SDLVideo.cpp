@@ -610,7 +610,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 	
 	if (spr->Bpp == 8) {
 		if (tint) {
-			assert(renderflags&BLIT_TINTED);
+			assert(renderflags&BLIT_COLOR_MOD);
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
 			newVersion |= tintv << 32;
 		}
@@ -625,7 +625,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 			for (size_t i = 0; i < 256; ++i) {
 				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
 
-				if (renderflags&BLIT_TINTED) {
+				if (renderflags&BLIT_COLOR_MOD) {
 					assert(tint);
 					ShaderTint(*tint, dstc);
 				}

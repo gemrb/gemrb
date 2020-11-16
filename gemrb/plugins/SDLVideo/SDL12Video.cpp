@@ -221,10 +221,10 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
 
 	// most game sprites:
-	// covered, BLIT_TINTED
+	// covered, BLIT_COLOR_MOD
 
 	// area-animations?
-	// BLIT_TINTED
+	// BLIT_COLOR_MOD
 
 	// (hopefully) most video overlays:
 	// BLIT_HALFTRANS
@@ -246,7 +246,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
-	if (remflags == BLIT_TINTED && tint.a == 255) {
+	if (remflags == BLIT_COLOR_MOD && tint.a == 255) {
 		SRTinter_Tint<true, true> tinter(tint);
 		BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 	} else if (remflags == BLIT_HALFTRANS) {
@@ -270,10 +270,10 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 		// covered
 		// hflip
 
-		if (!(remflags & BLIT_TINTED)) tint.a = 255;
+		if (!(remflags & BLIT_COLOR_MOD)) tint.a = 255;
 
 		if (palette->HasAlpha()) {
-			if (remflags & BLIT_TINTED) {
+			if (remflags & BLIT_COLOR_MOD) {
 				SRTinter_Flags<true> tinter(tint);
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			} else {
@@ -281,7 +281,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			}
 		} else {
-			if (remflags & BLIT_TINTED) {
+			if (remflags & BLIT_COLOR_MOD) {
 				SRTinter_Flags<false> tinter(tint);
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			} else {
@@ -301,16 +301,16 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	SDL_Surface* surf = sdlspr->GetSurface();
 
 	Color c;
-	if (tint && (flags&BLIT_TINTED)){
+	if (tint && (flags&BLIT_COLOR_MOD)){
 		c = Color(tint->r, tint->g, tint->b, tint->unused);
 	}
 
 	if (surf->format->BytesPerPixel == 1) {
 		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
 
-		const unsigned int shaderflags = (BLIT_TINTED|BLIT_GREY|BLIT_SEPIA);
+		const unsigned int shaderflags = (BLIT_COLOR_MOD|BLIT_GREY|BLIT_SEPIA);
 		uint32_t version = flags&shaderflags;
-		if (flags&BLIT_TINTED) {
+		if (flags&BLIT_COLOR_MOD) {
 			RenderSpriteVersion(sdlspr, version, &c);
 		} else {
 			RenderSpriteVersion(sdlspr, version);
@@ -355,9 +355,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	bool halftrans = remflags & BLIT_HALFTRANS;
 	if (halftrans && (remflags ^ BLIT_HALFTRANS)) { // other flags are set too
 		// handle halftrans with 50% alpha tinting
-		if (!(remflags & BLIT_TINTED)) {
+		if (!(remflags & BLIT_COLOR_MOD)) {
 			tint.r = tint.g = tint.b = tint.a = 255;
-			remflags |= BLIT_TINTED;
+			remflags |= BLIT_COLOR_MOD;
 		}
 		tint.a >>= 1;
 	}
@@ -366,7 +366,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	// we don't currently have a need for non blended sprites (we do for primitives, which is handled elsewhere)
 	// however, it could make things faster if we handled it
 
-	if (remflags&BLIT_TINTED) {
+	if (remflags&BLIT_COLOR_MOD) {
 		if (remflags&BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender(tint);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);

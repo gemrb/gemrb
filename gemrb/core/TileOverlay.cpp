@@ -60,7 +60,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 	assert(game);
 	const Color* tintcol = game->GetGlobalTint();
 	if (tintcol) {
-		flags |= BLIT_TINTED;
+		flags |= BLIT_COLOR_MOD;
 	}
 
 	Video* vid = core->GetVideoDriver();

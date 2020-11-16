@@ -2110,10 +2110,10 @@ void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
 {
 	const Color *globalTint = GetGlobalTint();
 	if (globalTint) {
-		if (flags & BLIT_TINTED) {
+		if (flags & BLIT_COLOR_MOD) {
 			Color::MultiplyTint(tint, globalTint);
 		} else {
-			flags |= BLIT_TINTED;
+			flags |= BLIT_COLOR_MOD;
 			tint = *globalTint;
 			tint.a = 255;
 		}

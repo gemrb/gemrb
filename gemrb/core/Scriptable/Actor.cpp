@@ -8756,7 +8756,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		//
 		
 		if (!anims->lockPalette) {
-			flags |= BLIT_TINTED;
+			flags |= BLIT_COLOR_MOD;
 		}
 		
 		Game* game = core->GetGame();

@@ -784,7 +784,7 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 		if (ExtFlags & PEF_TINT) {
 			const auto& pal32 = core->GetPalette32( pal[0] );
 			sca->Tint = pal32[PALSIZE/2];
-			sca->Transparency |= BLIT_TINTED;
+			sca->Transparency |= BLIT_COLOR_MOD;
 		} else {
 			for(int i=0;i<7;i++) {
 				sca->SetPalette(pal[i], 4+i*PALSIZE);
@@ -1507,7 +1507,7 @@ void Projectile::DrawExplosion(const Region& vp)
 					if (apflags & APF_TINT) {
 						const auto& pal32 = core->GetPalette32(Extension->ExplColor);
 						vvc->Tint = pal32[PALSIZE/2];
-						vvc->Transparency |= BLIT_TINTED;
+						vvc->Transparency |= BLIT_COLOR_MOD;
 					} else {
 						vvc->SetPalette(Extension->ExplColor);
 					}
@@ -1751,14 +1751,14 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	//static tint (use the tint field)
 	if(ExtFlags&PEF_TINT) {
-		flag|=BLIT_TINTED;
+		flag|=BLIT_COLOR_MOD;
 	}
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = 255;
-		flag |= BLIT_TINTED;
+		flag |= BLIT_COLOR_MOD;
 	}
 
 	unsigned int face = GetNextFace();

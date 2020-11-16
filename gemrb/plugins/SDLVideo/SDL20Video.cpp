@@ -205,7 +205,7 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 {
-	// TODO: add support for BLIT_HALFTRANS, BLIT_TINTED, and others (no use for them ATM)
+	// TODO: add support for BLIT_HALFTRANS, BLIT_COLOR_MOD, and others (no use for them ATM)
 
 	SDL_Texture* target = CurrentRenderBuffer();
 
@@ -372,7 +372,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		SDL_SetTextureAlphaMod(texture, SDL_ALPHA_OPAQUE);
 	}
 
-	if (tint && flags&BLIT_TINTED) {
+	if (tint && (flags & BLIT_COLOR_MOD)) {
 		if (tint->a != SDL_ALPHA_OPAQUE) {
 			// FIXME: do we actually have to handle this?
 			// setting the alpha mod for the texture is not what we want.

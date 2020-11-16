@@ -956,7 +956,7 @@ void Map::DrawPile(const Region& screen, Container* c, bool highlight)
 	tint.a = 255;
 
 	uint32_t flags = SetDrawingStencilForScriptable(c, screen);
-	flags |= BLIT_TINTED|BLIT_BLENDED;
+	flags |= BLIT_COLOR_MOD|BLIT_BLENDED;
 	c->DrawPile(highlight, screen, flags, tint);
 }
 
@@ -1132,7 +1132,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	aniIterator aniidx = animations.begin();
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
-		a->Draw(viewport, this, BLIT_TINTED | BLIT_BLENDED);
+		a->Draw(viewport, this, BLIT_COLOR_MOD | BLIT_BLENDED);
 		a = GetNextAreaAnimation(aniidx, gametime);
 	}
 
@@ -1194,7 +1194,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			{
 				//draw animation
 				uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
-				flags |= BLIT_TINTED | BLIT_BLENDED;
+				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
 
 				a->Draw(viewport, this, flags);
 				a = GetNextAreaAnimation(aniidx,gametime);

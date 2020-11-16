@@ -672,8 +672,8 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 	}
 
 	ieDword flags = flag;
-	if (Transparency & BLIT_TINTED) {
-		flags |= BLIT_TINTED;
+	if (Transparency & BLIT_COLOR_MOD) {
+		flags |= BLIT_COLOR_MOD;
 		game->ApplyGlobalTint(tint, flags);
 	}
 
@@ -731,7 +731,7 @@ void ScriptedAnimation::SetFade(ieByte initial, int speed)
 	Tint.b=255;
 	Tint.a=initial;
 	Fade=speed;
-	Transparency|=BLIT_TINTED;
+	Transparency|=BLIT_COLOR_MOD;
 }
 
 void ScriptedAnimation::GetPaletteCopy()

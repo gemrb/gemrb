@@ -387,7 +387,7 @@ Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
 		outC.a = 128;
 	}
 
-	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_TINTED?
+	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_COLOR_MOD?
 	// if so we should do that here instead of in the implementations
 
 	if (flags & BLIT_GREY) {
@@ -396,12 +396,12 @@ Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
 		//static RGBBlendingPipeline<SEPIA, true> blender;
 	}
 
-	if (flags & BLIT_TINTED) {
+	if (flags & BLIT_COLOR_MOD) {
 		// FIXME: we would need another parameter for tinting the color
 	}
 
 	// clear handled flags
-	flags &= ~(BLIT_HALFTRANS|BLIT_GREY|BLIT_SEPIA|BLIT_TINTED);
+	flags &= ~(BLIT_HALFTRANS|BLIT_GREY|BLIT_SEPIA|BLIT_COLOR_MOD);
 	return outC;
 }
 
