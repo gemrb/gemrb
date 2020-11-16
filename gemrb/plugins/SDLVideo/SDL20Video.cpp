@@ -366,23 +366,23 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	// "shaders" were already applied via software (RenderSpriteVersion)
 	// they had to be applied very first so we could create a texture from the software rendering
 #endif
-	if (flags & BLIT_HALFTRANS) {
-		SDL_SetTextureAlphaMod(texture, 0x80);
-	} else {
-		SDL_SetTextureAlphaMod(texture, SDL_ALPHA_OPAQUE);
+	Uint8 alpha = SDL_ALPHA_OPAQUE;
+	if (flags & BLIT_ALPHA_MOD) {
+		alpha = tint->a;
 	}
+	
+	if (flags & BLIT_HALFTRANS) {
+		alpha /= 2;
+	}
+	
+	SDL_SetTextureAlphaMod(texture, alpha);
 
-	if (tint && (flags & BLIT_COLOR_MOD)) {
-		if (tint->a != SDL_ALPHA_OPAQUE) {
-			// FIXME: do we actually have to handle this?
-			// setting the alpha mod for the texture is not what we want.
-			//SDL_SetTextureAlphaMod(texture, 255-tint->a);
-		}
+	if (flags & BLIT_COLOR_MOD) {
 		SDL_SetTextureColorMod(texture, tint->r, tint->g, tint->b);
 	} else {
 		SDL_SetTextureColorMod(texture, 0xff, 0xff, 0xff);
 	}
-
+	
 	if (flags & BLIT_BLENDED) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	} else if (flags & BLIT_MULTIPLY) {
@@ -392,7 +392,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	} else {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 	}
-
+	
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 

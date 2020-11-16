@@ -52,7 +52,8 @@ enum SpriteBlitFlags : uint32_t {
 	BLIT_MIRRORY = IE_VVC_MIRRORY, // 0x20
 	//BLIT_NOSHADOW = 0x1000, no longer used
 	//BLIT_TRANSSHADOW = 0x2000, no longer used
-	BLIT_COLOR_MOD = 0x00010000, // IE_VVC_TINT = 0x00030000
+	BLIT_COLOR_MOD = 0x00010000, // IE_VVC_TINT = 0x00030000. srcC = srcC * (color / 255)
+	BLIT_ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
 	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000; timestop palette
 	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
 	BLIT_MULTIPLY = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
