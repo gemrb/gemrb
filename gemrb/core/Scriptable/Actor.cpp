@@ -8367,6 +8367,8 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 							const std::vector<AnimationPart>& anims, const Color& tint) const
 {
+	if (TranslucentShadows && tint.a == 0) return;
+	
 	Video* video = core->GetVideoDriver();
 
 	for (const auto& part : anims) {
@@ -8711,28 +8713,21 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
-	int Trans = Modified[IE_TRANSLUCENT];
-
-	if (Trans>255) {
-		Trans=255;
-	}
+	uint8_t trans = std::min<int>(Modified[IE_TRANSLUCENT], 255);
 
 	int State = Modified[IE_STATE_ID];
 
 	//adjust invisibility for enemies
-	if (Modified[IE_EA]>EA_GOODCUTOFF) {
-		if (State&state_invisible) {
-			Trans = 255;
-		}
+	if (Modified[IE_EA] > EA_GOODCUTOFF && (State & state_invisible)) {
+		trans = 255;
+	} else if (State & STATE_BLUR) {
+		//can't move this, because there is permanent blur state where
+		//there is no effect (just state bit)
+		trans = 128;
 	}
 
-	//can't move this, because there is permanent blur state where
-	//there is no effect (just state bit)
-	if ((State&STATE_BLUR) && Trans < 128) {
-		Trans = 128;
-	}
 	Color tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-	tint.a = (ieByte) (255-Trans);
+	tint.a = 255 - trans;
 
 	//draw videocells under the actor
 	DrawVideocells(Pos - vp.Origin(), vvcShields, tint);
