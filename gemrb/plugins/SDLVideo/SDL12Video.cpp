@@ -346,18 +346,17 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	//		print("Unoptimized blit: %04X", flags);
 
 	// remove already handled flags and incompatible combinations
-	unsigned int remflags = flags;
-	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
+	if (flags & BLIT_GREY) flags &= ~BLIT_SEPIA;
 
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
-	IAlphaIterator* maskIt = StencilIterator(remflags, drect);
+	IAlphaIterator* maskIt = StencilIterator(flags, drect);
 
-	bool halftrans = remflags & BLIT_HALFTRANS;
-	if (halftrans && (remflags ^ BLIT_HALFTRANS)) { // other flags are set too
+	bool halftrans = flags & BLIT_HALFTRANS;
+	if (halftrans && (flags ^ BLIT_HALFTRANS)) { // other flags are set too
 		// handle halftrans with 50% alpha tinting
-		if (!(remflags & BLIT_COLOR_MOD)) {
+		if (!(flags & BLIT_COLOR_MOD)) {
 			tint.r = tint.g = tint.b = tint.a = 255;
-			remflags |= BLIT_COLOR_MOD;
+			flags |= BLIT_COLOR_MOD;
 		}
 		tint.a >>= 1;
 	}
@@ -366,26 +365,26 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	// we don't currently have a need for non blended sprites (we do for primitives, which is handled elsewhere)
 	// however, it could make things faster if we handled it
 
-	if (remflags&BLIT_COLOR_MOD) {
-		if (remflags&BLIT_GREY) {
+	if (flags&BLIT_COLOR_MOD) {
+		if (flags&BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
-		} else if (remflags&BLIT_SEPIA) {
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+		} else if (flags&BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		} else {
 			RGBBlendingPipeline<TINT, true> blender(tint);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		}
-	} else if (remflags&BLIT_GREY) {
+	} else if (flags&BLIT_GREY) {
 		RGBBlendingPipeline<GREYSCALE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
-	} else if (remflags&BLIT_SEPIA) {
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+	} else if (flags&BLIT_SEPIA) {
 		RGBBlendingPipeline<SEPIA, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
-	} else if (maskIt || (remflags&(BLIT_MIRRORX|BLIT_MIRRORY)) || ((surf->flags & SDL_SRCCOLORKEY) == 0 && remflags&BLIT_BLENDED)) {
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+	} else if (maskIt || (flags&(BLIT_MIRRORX|BLIT_MIRRORY)) || ((surf->flags & SDL_SRCCOLORKEY) == 0 && flags&BLIT_BLENDED)) {
 		RGBBlendingPipeline<NONE, true> blender;
-		BlitBlendedRect(surf, currentBuf, srect, drect, blender, remflags, maskIt);
+		BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 	} else {
 		// must be checked afer palette versioning is done
 		
@@ -397,7 +396,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		if (halftrans) {
 			// we can only use SDL_SetAlpha if we dont need our general purpose blitter for another reason
 			SDL_SetAlpha(surf, SDL_SRCALPHA, 128);
-		} else if (remflags&BLIT_BLENDED) {
+		} else if (flags&BLIT_BLENDED) {
 			SDL_SetAlpha(surf, SDL_SRCALPHA, SDL_ALPHA_OPAQUE);
 		} else {
 			SDL_SetAlpha(surf, 0, SDL_ALPHA_OPAQUE);
