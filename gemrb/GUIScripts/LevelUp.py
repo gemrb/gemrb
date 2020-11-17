@@ -165,25 +165,18 @@ def OpenLevelUpWindow():
 
 	print "NumClasses:",NumClasses,"\tActor NumClasses:",actor.NumClasses()
 
-	Level = [0]*3
-	LevelDiff = [0]*3
-
-	# reorganize the leves if we're dc so the one we want to use is in Level[0]
-	# and the old one is in Level[1] (used to regain old class abilities)
 	if IsDual:
 		# convert the classes from indicies to class id's
 		DualSwap = GUICommon.IsDualSwap (pc)
 		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
 
-		# we need the old level as well
-		if DualSwap:
-			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL)
-		else:
-			Level[1] = GemRB.GetPlayerStat (pc, IE_LEVEL2)
-
 	print "Classes:",Classes,"\tActor Classes:",actor.Classes()
-	print "IsDual:",IsDual>0,"\tActor IsDual",actor.isdual
+	print "IsDual:",IsDual > 0,"\tActor IsDual",actor.isdual
+
+	# get the next target levels and difference between levels
+	Level = LUCommon.GetNextLevels(pc, Classes)
+	LevelDiff = LUCommon.GetLevelDiff(pc, Level)
 
 	hp = 0
 	HaveCleric = 0
@@ -195,79 +188,8 @@ def OpenLevelUpWindow():
 	NewDSpells = [0]*7
 	NewWSpells = [0]*9
 
-	# get a bunch of different things each level
-	for i in range(NumClasses):
-#		print "Class:",Classes[i]
-		# we don't care about the current level, but about the to-be-achieved one
-		# get the next level
-		Level[i] = LUCommon.GetNextLevelFromExp (GemRB.GetPlayerStat (pc, IE_XP)/NumClasses, Classes[i])
-		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
-
-		# find the level diff for each classes (3 max, obviously)
-		if i == 0:
-			if DualSwap:
-				LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL2)
-			else:
-				LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL)
-		elif i == 1:
-			LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL2)
-		elif i == 2:
-			LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (pc, IE_LEVEL3)
-
-#		print "Level (",i,"):",Level[i]
-#		print "Level Diff (",i,"):",LevelDiff[i]
-
-		# save our current and next spell amounts
-		StartLevel = Level[i] - LevelDiff[i]
-		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
-		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
-		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR)
-
-		# see if we have mage spells
-		if MageTable != "*":
-			# we get 1 extra spell per level if we're a specialist
-			Specialist = 0
-			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
-				Specialist = 1
-
-			if Spellbook.HasSorcererBook (pc, Classes[i]):
-				MageTable = "SPLSRCKN"
-
-			MageTable = GemRB.LoadTable (MageTable)
-			# loop through each spell level and save the amount possible to cast (current)
-			for j in range (MageTable.GetColumnCount ()):
-				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-				if NewWSpells[j] > 0: # don't want specialist to get 1 in levels they should have 0
-					NewWSpells[j] += Specialist
-				if OldWSpells[j] > 0:
-					OldWSpells[j] += Specialist
-			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
-		elif ClericTable != "*":
-			# check for cleric spells
-			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
-				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
-			ClericTable = GemRB.LoadTable (ClericTable)
-			HaveCleric = 1
-			# same as above
-			for j in range (ClericTable.GetColumnCount ()):
-				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
-		elif DruidTable != "*":
-			# clerics have precedence in multis (ranger/cleric)
-			if HaveCleric == 0:
-				#use MXSPLPRS if we can't find the resource (SoA fix)
-				if not GemRB.HasResource (DruidTable, RES_2DA):
-					DruidTable = "MXSPLPRS"
-
-				# check druid spells
-				DruidTable = GemRB.LoadTable (DruidTable)
-				# same as above
-				for j in range (DruidTable.GetColumnCount ()):
-					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
-					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
-				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+	# calculate the new spells (results are stored in global variables)
+	GetNewSpells(pc, Classes, Level, LevelDiff, Kit)
 
 # this is handled by core
 #		# setup class bonuses for this class
@@ -588,38 +510,8 @@ def LevelUpDonePress():
 
 	print "Levels:",Level[0],"/",Level[1],"/",Level[2]
 
-	# save our number of memorizable spells per level
-	if DeltaWSpells > 0:
-		# loop through each wizard spell level
-		for i in range(len(NewWSpells)):
-			if NewWSpells[i] > 0: # we have new spells, so update
-				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
-
-	# save our number of memorizable priest spells
-	if DeltaDSpells > 0: # druids and clerics count
-		for i in range (len(NewDSpells)):
-			# get each update
-			if NewDSpells[i] > 0:
-				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
-
-			# learn all the spells we're given, but don't have, up to our given casting level
-			# bonus spells don't count in determining if we can use this level
-			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
-				for j in range(NumClasses): # loop through each class
-					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
-					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
-					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
-					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
-						continue
-					elif IsCleric == "*": # druid spells
-						ClassFlag = 0x8000
-					else: # cleric spells
-						ClassFlag = 0x4000
-
-					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
-					for k in range(len(Learnable)): # loop through all the learnable spells
-						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
-							GemRB.LearnSpell(pc, Learnable[k])
+	# spells
+	SaveNewSpells()
 
 	# hlas
 	# level, xp and other stuff by the core?
@@ -741,3 +633,107 @@ def ReactivateBaseClass ():
 				if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
 					GemRB.LearnSpell(pc, Learnable[k])
 
+def GetNewSpells(actor, Classes, Level, LevelDiff, Kit=0):
+	'''Scan each class for new spells. Values are stored in the global variables'''
+
+	global DeltaDSpells, DeltaWSpells, NewDSpells, NewWSpells, OldDSpells, OldWSpells
+
+	# clear the globals, since we may get called multiple times with different classes
+	HaveCleric = 0
+	DeltaWSpells = 0
+	DeltaDSpells = 0
+	OldDSpells = [0]*7
+	OldWSpells = [0]*9
+	NewDSpells = [0]*7
+	NewWSpells = [0]*9
+
+	# run through each class to detect new spells
+	for i in range(len(Classes)):
+
+		TmpClassName = GUICommon.GetClassRowName (Classes[i], "class")
+
+		# save our current and next spell amounts
+		StartLevel = Level[i] - LevelDiff[i]
+		DruidTable = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+		ClericTable = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+		MageTable = CommonTables.ClassSkills.GetValue (TmpClassName, "MAGESPELL", GTV_STR)
+
+		# see if we have mage spells
+		if MageTable != "*":
+			# we get 1 extra spell per level if we're a specialist
+			Specialist = 0
+			if CommonTables.KitList.GetValue (Kit, 7) == 1: # see if we're a kitted mage
+				Specialist = 1
+
+			if Spellbook.HasSorcererBook (actor, Classes[i]):
+				MageTable = "SPLSRCKN"
+
+			MageTable = GemRB.LoadTable (MageTable)
+			# loop through each spell level and save the amount possible to cast (current)
+			for j in range (MageTable.GetColumnCount ()):
+				NewWSpells[j] = MageTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldWSpells[j] = MageTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+				if NewWSpells[j] > 0: # don't want specialist to get 1 in levels they should have 0
+					NewWSpells[j] += Specialist
+				if OldWSpells[j] > 0:
+					OldWSpells[j] += Specialist
+			DeltaWSpells = sum(NewWSpells)-sum(OldWSpells)
+		elif ClericTable != "*":
+			# check for cleric spells
+			if not GemRB.HasResource(ClericTable, RES_2DA, 1):
+				ClericTable = "MXSPLPRS" # iwd1 doesn't have a DRUIDSPELL column in the table
+			ClericTable = GemRB.LoadTable (ClericTable)
+			HaveCleric = 1
+			# same as above
+			for j in range (ClericTable.GetColumnCount ()):
+				NewDSpells[j] = ClericTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+				OldDSpells[j] = ClericTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+			DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+		elif DruidTable != "*":
+			# clerics have precedence in multis (ranger/cleric)
+			if HaveCleric == 0:
+				#use MXSPLPRS if we can't find the resource (SoA fix)
+				if not GemRB.HasResource (DruidTable, RES_2DA):
+					DruidTable = "MXSPLPRS"
+
+				# check druid spells
+				DruidTable = GemRB.LoadTable (DruidTable)
+				# same as above
+				for j in range (DruidTable.GetColumnCount ()):
+					NewDSpells[j] = DruidTable.GetValue (str(Level[i]), str(j+1), GTV_INT)
+					OldDSpells[j] = DruidTable.GetValue (str(StartLevel), str(j+1), GTV_INT)
+				DeltaDSpells = sum(NewDSpells)-sum(OldDSpells)
+
+def SaveNewSpells():
+	# save our number of memorizable spells per level
+	if DeltaWSpells > 0:
+		# loop through each wizard spell level
+		for i in range(len(NewWSpells)):
+			if NewWSpells[i] > 0: # we have new spells, so update
+				GemRB.SetMemorizableSpellsCount(pc, NewWSpells[i], IE_SPELL_TYPE_WIZARD, i)
+
+	# save our number of memorizable priest spells
+	if DeltaDSpells > 0: # druids and clerics count
+		for i in range (len(NewDSpells)):
+			# get each update
+			if NewDSpells[i] > 0:
+				GemRB.SetMemorizableSpellsCount (pc, NewDSpells[i], IE_SPELL_TYPE_PRIEST, i)
+
+			# learn all the spells we're given, but don't have, up to our given casting level
+			# bonus spells don't count in determining if we can use this level
+			if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, i, 0) > 0: # we can memorize spells of this level
+				for j in range(NumClasses): # loop through each class
+					TmpClassName = GUICommon.GetClassRowName (Classes[j], "class")
+					IsDruid = CommonTables.ClassSkills.GetValue (TmpClassName, "DRUIDSPELL", GTV_STR)
+					IsCleric = CommonTables.ClassSkills.GetValue (TmpClassName, "CLERICSPELL", GTV_STR)
+					if IsCleric == "*" and IsDruid == "*": # no divine spells (so mage/cleric multis don't screw up)
+						continue
+					elif IsCleric == "*": # druid spells
+						ClassFlag = 0x8000
+					else: # cleric spells
+						ClassFlag = 0x4000
+
+					Learnable = Spellbook.GetLearnablePriestSpells(ClassFlag, GemRB.GetPlayerStat (pc, IE_ALIGNMENT), i+1)
+					for k in range(len(Learnable)): # loop through all the learnable spells
+						if Spellbook.HasSpell (pc, IE_SPELL_TYPE_PRIEST, i, Learnable[k]) < 0: # only write it if we don't yet know it
+							GemRB.LearnSpell(pc, Learnable[k])
