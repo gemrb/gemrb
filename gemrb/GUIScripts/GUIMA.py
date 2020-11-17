@@ -116,10 +116,8 @@ def InitWorldMapWindow (Window):
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
-if GameCheck.IsIWD2():
-	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
-else:
-	OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
+WMWID = 2 if GameCheck.IsIWD2 () else 0
+OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
