@@ -156,6 +156,16 @@ void WorldMapControl::ScrollTo(const Point& pos)
 	WorldMap* worldmap = core->GetWorldMap();
 	Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
 
+	if (pos.isnull()) {
+		// center worldmap on current area
+		unsigned entry;
+		const WMPAreaEntry *areaEntry = worldmap->GetArea(currentArea, entry);
+		if (areaEntry) {
+			Pos.x = areaEntry->X - frame.w/2;
+			Pos.y = areaEntry->Y - frame.h/2;
+		}
+	}
+
 	int maxx = MapMOS->Frame.w - frame.w;
 	int maxy = MapMOS->Frame.h - frame.h;
 	Pos.x = Clamp<int>(Pos.x, 0, maxx);
