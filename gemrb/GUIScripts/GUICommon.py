@@ -515,8 +515,7 @@ def IsDualSwap (actor, override=None):
 	if Dual[0] > 1:
 		BaseClass = GetClassRowName(Dual[1], "index")
 	else:
-		BaseClass = GetKitIndex (actor)
-		BaseClass = CommonTables.KitList.GetValue (BaseClass, 7)
+		BaseClass = CommonTables.KitList.GetValue (Dual[1], 7)
 		if BaseClass == "*":
 			# mod boilerplate
 			return 0
