@@ -21,6 +21,7 @@
 
 import GemRB
 import GameCheck
+import GUICommonWindows
 from GUIDefines import STR_AREANAME, LOG_MESSAGE
 
 def MoveToNewArea ():
@@ -30,7 +31,7 @@ def MoveToNewArea ():
 		return
 
 	hours = travel["Distance"]
-	GUIMA.WorldMapWindow.Close()
+	GUICommonWindows.CloseTopWindow ()
 
 	if travel["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return

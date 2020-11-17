@@ -195,7 +195,7 @@ def OpenTravelWindow ():
 	return
 
 def ChangeTooltip ():
-	global WorldMapWindow, WorldMapControl
+	global WorldMapControl
 
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
