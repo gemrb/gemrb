@@ -351,7 +351,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	IAlphaIterator* maskIt = StencilIterator(flags, drect);
 	
-	bool nativeBlit = !(flags & ~(BLIT_HALFTRANS | BLIT_ALPHA_MOD | BLIT_BLENDED));
+	bool nativeBlit = (flags & ~(BLIT_HALFTRANS | BLIT_ALPHA_MOD | BLIT_BLENDED)) == 0
+						&& maskIt == nullptr && ((surf->flags & SDL_SRCCOLORKEY) != 0
+						|| (flags & BLIT_BLENDED) == 0);
 	if (nativeBlit) {
 		// must be checked afer palette versioning is done
 		
@@ -412,7 +414,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		} else if (flags&BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender;
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
-		} else if (maskIt || (flags&(BLIT_MIRRORX|BLIT_MIRRORY)) || ((surf->flags & SDL_SRCCOLORKEY) == 0 && flags&BLIT_BLENDED)) {
+		} else {
 			RGBBlendingPipeline<NONE, true> blender;
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		}
