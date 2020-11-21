@@ -298,10 +298,9 @@ def OpenFeatsWindow(chargen=0):
 
 	if chargen:
 		FeatWindow = GemRB.LoadWindow (55, "GUICG")
+		CharOverview.PositionCharGenWin (FeatWindow)
 	else:
 		FeatWindow = GemRB.LoadWindow (56, "GUIREC")
-
-	CharOverview.PositionCharGenWin(FeatWindow)
 
 	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)

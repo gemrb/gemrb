@@ -173,11 +173,10 @@ def OpenSkillsWindow(chargen, level=0):
 	if CharGen:
 		SkillWindow = GemRB.LoadWindow (6, "GUICG")
 		ButtonCount = 10
+		CharOverview.PositionCharGenWin (SkillWindow)
 	else:
 		SkillWindow = GemRB.LoadWindow (55, "GUIREC")
 		ButtonCount = 9
-
-	CharOverview.PositionCharGenWin(SkillWindow)
 
 	for i in range(ButtonCount):
 		Button = SkillWindow.GetControl(i+93)
