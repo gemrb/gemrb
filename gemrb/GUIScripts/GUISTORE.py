@@ -256,7 +256,7 @@ def OpenStoreWindow ():
 	return
 
 def InitStoreShoppingWindow (Window):
-	global LeftButton, RightButton
+	global LeftButton, RightButton, Inventory
 
 	Window.AddAlias('WINSHOP')
 	PositionStoreWinRelativeTo(Window)
@@ -305,6 +305,10 @@ def InitStoreShoppingWindow (Window):
 	ScrollBarRight = Window.GetControlAlias ('STOSBARR')
 	ScrollBarRight.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreShoppingWindow(Window))
 
+	if GemRB.GetVar ("Inventory"):
+		Inventory = 1
+	else:
+		Inventory = None
 	if Inventory:
 		# Title
 		Label = Window.GetControl (0xfffffff)
