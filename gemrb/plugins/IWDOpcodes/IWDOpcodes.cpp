@@ -574,10 +574,20 @@ static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value,
 		}
 	default:
 		{
-			//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
 			ieDword stat = STAT_GET(idx);
-			if (idx==IE_SUBRACE) {
-				stat |= STAT_GET(IE_RACE)<<16;
+			if (idx == IE_SUBRACE) {
+				//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
+				stat |= STAT_GET(IE_RACE) << 16;
+			} else if (idx == IE_ALIGNMENT) {
+				//alignment checks can be for good vs. evil, or chaotic vs. lawful, or both
+				ieDword almask = 0;
+				if (val & AL_GE_MASK) {
+					almask |= AL_GE_MASK;
+				}
+				if (val & AL_LC_MASK) {
+					almask |= AL_LC_MASK;
+				}
+				stat &= almask;
 			}
 			return DiffCore(stat, val, rel);
 		}
