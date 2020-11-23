@@ -65,17 +65,17 @@ Container::~Container()
 
 Region Container::DrawingRegion() const
 {
-	Region r;
+	Region r(Pos.x, Pos.y, 0, 0);
 	
 	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
 		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
-			r.ExpandToRegion(icon->Frame);
+			Region frame = icon->Frame;
+			frame.x = frame.x * -1 + Pos.x;
+			frame.y = frame.y * -1 + Pos.y;
+			r.ExpandToRegion(frame);
 		}
 	}
-	
-	r.x = Pos.x - r.x;
-	r.y = Pos.y - r.y;
 	
 	return r;
 }
