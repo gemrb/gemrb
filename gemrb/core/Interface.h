@@ -361,6 +361,7 @@ private:
 	Calendar * calendar;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures[(GF_COUNT+31)/32];
+	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
