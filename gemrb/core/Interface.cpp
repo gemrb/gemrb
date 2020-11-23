@@ -2339,7 +2339,7 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", name, NULL ); \
 	resref = s; s = NULL;
 
-	ASSIGN_RESREF(CursorBam, "CursorBAM"); //console cursor
+	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor
 	ASSIGN_RESREF(ScrollCursorBam, "ScrollCursorBAM");
 	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
 	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
@@ -5049,7 +5049,7 @@ Actor *Interface::GetFirstSelectedActor()
 //this is used only for the console
 Sprite2D *Interface::GetCursorSprite()
 {
-	Sprite2D *spr = gamedata->GetBAMSprite(CursorBam, 0, 0);
+	Sprite2D *spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
 	if (spr)
 	{
 		if(HasFeature(GF_OVERRIDE_CURSORPOS))
