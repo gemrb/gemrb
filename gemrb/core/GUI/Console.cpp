@@ -38,7 +38,7 @@ constexpr size_t HistoryMaxSize = 5;
 Console::Console(const Region& frame, TextArea* ta)
 : View(frame), History(HistoryMaxSize),
 	textContainer(Region(0, 0, 0, 25), core->GetTextFont(), nullptr),
-	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont())
+	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont(), nullptr, ColorWhite, ColorWhite, ColorBlack)
 {
 	// TODO: move all the control composition to Console.py
 
