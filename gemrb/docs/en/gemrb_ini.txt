@@ -67,9 +67,13 @@ These are types of values used in description of particular options.
 List of Options
 ---------------
 
-CursorBAM = <resref>
+MainCursorsImage = <resref>
 - - - - - - - - - - -
-Name of bitmap resource with cursor images (e.g. PST: CARET)
+Name of image resource with main cursor images (e.g. CURSORS)
+
+TextCursorBAM = <resref>
+- - - - - - - - - - -
+Name of bitmap resource with text cursor image (e.g. PST: CARET)
 
 ScrollCursorBAM = <resref>
 - - - - - - - - - - - - - -

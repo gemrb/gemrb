@@ -1032,7 +1032,7 @@ int Interface::LoadSprites()
 
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
-	anim = (AnimationFactory*) gamedata->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
+	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
 	int CursorCount = 0;
 	if (anim)
 	{
@@ -2249,7 +2249,8 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", name, NULL ); \
 	resref = s; s = NULL;
 
-	ASSIGN_RESREF(CursorBam, "CursorBAM"); //console cursor
+	ASSIGN_RESREF(MainCursorsImage, "MainCursorsImage");
+	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor
 	ASSIGN_RESREF(ScrollCursorBam, "ScrollCursorBAM");
 	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
 	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
