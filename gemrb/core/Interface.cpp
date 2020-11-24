@@ -1034,12 +1034,23 @@ int Interface::LoadSprites()
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
 	int CursorCount = 0;
-	if (anim)
-	{
+	if (anim) {
 		CursorCount = anim->GetCycleCount();
 		Cursors.reserve(CursorCount);
 		for (int i = 0; i < CursorCount; i++) {
 			Cursors.push_back(anim->GetFrame(0, (ieByte) i));
+		}
+	} else {
+		// support non-BAM cursors
+		// load MainCursorsImage + XX until all images are exhausted
+		// same layout as in the originals, with odd indices having the pressed cursor image
+		char fileName[32];
+		while (CursorCount < 99) {
+			snprintf(fileName, sizeof(fileName), "%.29s%02d", MainCursorsImage.CString(), CursorCount);
+			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
+			if (!im) break;
+			Cursors.push_back(im->GetSprite2D());
+			CursorCount++;
 		}
 	}
 
