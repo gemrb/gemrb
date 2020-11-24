@@ -1,11 +1,20 @@
-HOWTO RUN
+# HOWTO RUN
 Set:
 GameType=demo
 GamePath to the parent of the parent dir containing this file
 Width=800
 Height=600
 
-AUTHORS 
+# NearInfinity
+
+If you want to use it to explore or modify data, you can open files one by one while having
+any other game open.
+
+If you want the full experience:
+ - create demo/baldur.exe demo/BGConfig.exe (or pass `-t bg2tob` when invoking NI)
+ - symlink demo/data to demo/override
+
+# AUTHORS
 
 If not otherwise noted, the author of the files is GemRB team and they are available under GPL2+ like GemRB itself.
 
@@ -18,3 +27,6 @@ The big avatar animation was contributed by Copyright 2010-2012 Jochen Winkler <
 The Eadui font was made by Peter S. Baker and is available under the OFL (SIL Open Font License). Lato is also available under the OFL.
 
 Hand cursor icon was done by yd of OpenGameArt (CC0)
+
+Map window design based on Lamoot's RPG GUI construction kit v1.0 (CC-BY)
+World map by Pepper Racoon (CC-BY)

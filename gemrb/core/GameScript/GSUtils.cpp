@@ -476,6 +476,13 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 	}
 
+	// PST does not echo verbal constants in the console, their strings
+	// actually contain development related identifying comments
+	// thus the console flag is unset.
+	if (core->HasFeature(GF_ONSCREEN_TEXT)) {
+		flags &= ~DS_CONSOLE;
+	}
+
 	if ((Strref != -1) && !soundRef[0]) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
 		memcpy(Sound, sb.Sound, sizeof(ieResRef) );

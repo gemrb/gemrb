@@ -1181,7 +1181,6 @@ public: //Script Functions
 	static void Kill(Scriptable* Sender, Action* parameters);
 	static void KillFloatMessage(Scriptable* Sender, Action* parameters);
 	static void Leader(Scriptable* Sender, Action* parameters);
-	static void LeaveArea(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters);
 	static void LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters);

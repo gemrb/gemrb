@@ -9,7 +9,4 @@ def OnLoad():
 	for (stat, color) in statcolors:
 		GemRB.SetPlayerStat (1, stat, color)
 
-	# make it day time
-	GemRB.SetTimedEvent(lambda: GemRB.ExecuteString("AdvanceTime(2400)"), 1)
-
 	GemRB.EnterGame()
