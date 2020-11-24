@@ -114,9 +114,9 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		
 		PaletteHolder text_pal;
 		if (Area == m) {
-			text_pal = pal_selected.get();
+			text_pal = pal_selected;
 		} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-			text_pal = pal_notvisited.get();
+			text_pal = pal_notvisited;
 		} else {
 			text_pal = pal_normal;
 		}
