@@ -3027,7 +3027,7 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
-			 "Button.SetHotKey(char, bool global)\n\n"
+			 "Button.SetHotKey(char or keymaping, [int modifiers=0, bool global=False])\n\n"
 			 "Binds a keyboard key to trigger the control event when its window is focused.\n"
 			 "If global is set the hot key works even if the window does not have focus.\n"
 			 "If None is passed as the key, any existing hotkey binding is cleared.");
