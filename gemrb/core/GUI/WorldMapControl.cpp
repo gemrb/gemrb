@@ -104,43 +104,29 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
 			video->BlitSprite( AnimPicture.get(), xOffs, yOffs, &rgn );
 		}
-	}
-
-	// Draw WMP entry labels
-	if (ftext==NULL) {
-		return;
-	}
-	for(i=0;i<ec;i++) {
-		WMPAreaEntry *m = worldmap->GetEntry(i);
-		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
-		int h=0,w=0,xpos=0,ypos=0;
-		if (icon) {
-			h=icon->Frame.h;
-			w=icon->Frame.w;
-			xpos=icon->Frame.x;
-			ypos=icon->Frame.y;
-		}
-
-		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
-		if (!m->GetCaption())
+		
+		const String* caption = m->GetCaption();
+		if (ftext == nullptr || caption == nullptr)
 			continue;
-
-		PaletteHolder text_pal = pal_normal;
-
+		
+		const Region& icon_frame = icon->Frame;
+		Region r2 = Region( MAP_TO_SCREENX(m->X - icon_frame.x), MAP_TO_SCREENY(m->Y - icon_frame.y), icon_frame.w, icon_frame.h );
+		
+		PaletteHolder text_pal;
 		if (Area == m) {
 			text_pal = pal_selected.get();
+		} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+			text_pal = pal_notvisited.get();
 		} else {
-			if (! (m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				text_pal = pal_notvisited.get();
-			}
+			text_pal = pal_normal;
 		}
 
-		Size ts = ftext->StringSize(*m->GetCaption());
+		Size ts = ftext->StringSize(*caption);
 		ts.w += 10;
 		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
-					 *m->GetCaption(), text_pal, 0 );
+					 *caption, text_pal, 0 );
 	}
+
 #undef MAP_TO_SCREENX
 #undef MAP_TO_SCREENY
 }
