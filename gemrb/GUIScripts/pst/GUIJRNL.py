@@ -384,6 +384,7 @@ def OpenLogWindow ():
 	# limit the log to the last entries (original did something similar)
 	js = GemRB.GetJournalSize (0)
 	frame = 250
+	journalText = ""
 	for i in range (js-frame, js):
 		je = GemRB.GetJournalEntry (0, i)
 
@@ -400,9 +401,10 @@ def OpenLogWindow ():
 		date = str (1 + dt)
 		#time = str (gt - dt*86400)
 		
-		Text.Append ("[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]")
-		Text.Append (" " + GemRB.GetString (je['Text']) + "\n\n")
+		journalText += "[color=FFFF00]" + GemRB.GetString(19310)+" "+date+":[/color]"
+		journalText += " " + GemRB.GetString (je['Text']) + "\n\n"
 			
+	Text.Append(journalText)
 	Window.Focus()
 	
 ###################################################
