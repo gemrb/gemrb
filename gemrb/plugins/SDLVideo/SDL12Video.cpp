@@ -22,7 +22,7 @@
 
 #include "Game.h"
 #include "Interface.h"
-#include "Pixels.h"
+#include "SDLPixelIterator.h"
 #include "SDLSurfaceSprite2D.h"
 #include "SDL12GamepadMappings.h"
 

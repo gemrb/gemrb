@@ -43,7 +43,6 @@
 		A20A278B1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278C1A71E3200077077C /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A20A27891A71E3200077077C /* View.cpp */; };
 		A20A278D1A71E3200077077C /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = A20A278A1A71E3200077077C /* View.h */; };
-		A20B119A204F70F600B10A0C /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A20B1199204F70F600B10A0C /* Pixels.h */; };
 		A20C698013B0FA430082EEBA /* AmbientMgrAL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B8737139F0A7D0002DC13 /* AmbientMgrAL.cpp */; };
 		A20C698113B0FA430082EEBA /* OpenALAudio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873B139F0A7D0002DC13 /* OpenALAudio.cpp */; };
 		A20C698213B0FA430082EEBA /* StackLock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B873D139F0A7D0002DC13 /* StackLock.cpp */; };
@@ -253,6 +252,8 @@
 		A28062861878D1BC009E577D /* TextContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = A28062831878D1BC009E577D /* TextContainer.h */; };
 		A2806287187B7C89009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
 		A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
+		A281CDDB256F119D00058D76 /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A281CDDA256F119C00058D76 /* Pixels.h */; };
+		A281CE0F256F11BA00058D76 /* SDLPixelIterator.h in Headers */ = {isa = PBXBuildFile; fileRef = A281CE0E256F11B900058D76 /* SDLPixelIterator.h */; };
 		A286361C2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
 		A286361D2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
 		A288622014A54FFD009AC280 /* libarchive.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A288621F14A54FFD009AC280 /* libarchive.dylib */; };
@@ -1254,7 +1255,6 @@
 		A20574F919994967007FF22C /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = /Library/Frameworks/SDL2.framework; sourceTree = "<absolute>"; };
 		A20A27891A71E3200077077C /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = View.cpp; sourceTree = "<group>"; };
 		A20A278A1A71E3200077077C /* View.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = View.h; sourceTree = "<group>"; };
-		A20B1199204F70F600B10A0C /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A20E4ACF197344BD00A6BC96 /* FileCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCache.h; sourceTree = "<group>"; };
 		A2111CC81D0A49650044939E /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
 		A218A75114A8F3DB001142CF /* ../artwork/gemrb.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = ../artwork/gemrb.icns; sourceTree = "<group>"; };
@@ -1466,6 +1466,8 @@
 		A27E830A13A0358200B41410 /* 2DAImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = 2DAImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A28062821878D1BC009E577D /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextContainer.cpp; sourceTree = "<group>"; };
 		A28062831878D1BC009E577D /* TextContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextContainer.h; sourceTree = "<group>"; };
+		A281CDDA256F119C00058D76 /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
+		A281CE0E256F11B900058D76 /* SDLPixelIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLPixelIterator.h; sourceTree = "<group>"; };
 		A2830A0F13A05A64000A63FE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2830A3913A05B5F000A63FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		A2830A3F13A05B81000A63FE /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -2846,13 +2848,13 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A281CE0E256F11B900058D76 /* SDLPixelIterator.h */,
 				A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */,
 				A28636182559D9F800E5730C /* DPadSoftKeyboard.h */,
 				A249187B141075A60038B170 /* CocoaWrapper.m */,
 				A2E5A4A319992CAB00CCE6D8 /* GLSLProgram.cpp */,
 				A2E5A4A419992CAB00CCE6D8 /* GLSLProgram.h */,
 				A276FB04199EA3C800BD6CEF /* OpenGLEnv.h */,
-				A20B1199204F70F600B10A0C /* Pixels.h */,
 				A298DD1314EB4EDE00F59F56 /* SDL12Video.cpp */,
 				A298DD1414EB4EDE00F59F56 /* SDL12Video.h */,
 				A298DD1714EB4EEB00F59F56 /* SDL20Video.cpp */,
@@ -3014,6 +3016,7 @@
 		A2BF9F8C1395FF61006ADC12 /* core */ = {
 			isa = PBXGroup;
 			children = (
+				A281CDDA256F119C00058D76 /* Pixels.h */,
 				A2BF9F8D1395FF61006ADC12 /* ActorMgr.cpp */,
 				A2BF9F8E1395FF61006ADC12 /* ActorMgr.h */,
 				A2BF9F8F1395FF61006ADC12 /* Ambient.cpp */,
@@ -3461,6 +3464,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2E6634F139E882900310FC8 /* ActorMgr.h in Headers */,
+				A281CE0F256F11BA00058D76 /* SDLPixelIterator.h in Headers */,
 				A2E66351139E882900310FC8 /* Ambient.h in Headers */,
 				A2E66353139E882900310FC8 /* AmbientMgr.h in Headers */,
 				A2E66355139E882900310FC8 /* Animation.h in Headers */,
@@ -3509,7 +3513,6 @@
 				A2E66394139E883E00310FC8 /* IniSpawn.h in Headers */,
 				A2E66396139E883E00310FC8 /* Interface.h in Headers */,
 				A2E66398139E883E00310FC8 /* Inventory.h in Headers */,
-				A20B119A204F70F600B10A0C /* Pixels.h in Headers */,
 				A2E6639A139E883E00310FC8 /* Item.h in Headers */,
 				A2E6639C139E883E00310FC8 /* ItemMgr.h in Headers */,
 				A2E6639E139E883E00310FC8 /* LRUCache.h in Headers */,
@@ -3577,6 +3580,7 @@
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
 				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
 				A2E66407139E885300310FC8 /* VFS.h in Headers */,
+				A281CDDB256F119D00058D76 /* Pixels.h in Headers */,
 				A2E66409139E885A00310FC8 /* Actor.h in Headers */,
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,

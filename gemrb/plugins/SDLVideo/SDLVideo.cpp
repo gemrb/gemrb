@@ -22,8 +22,7 @@
 
 #include "Interface.h"
 #include "Palette.h"
-#include "Pixels.h"
-
+#include "SDLPixelIterator.h"
 
 #if defined(__sgi)
 #  include <math.h>

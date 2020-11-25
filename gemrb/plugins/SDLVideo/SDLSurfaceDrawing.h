@@ -25,7 +25,7 @@
 
 #include <cmath>
 
-#include "Pixels.h"
+#include "SDLPixelIterator.h"
 #include "Polygon.h"
 
 namespace GemRB {
