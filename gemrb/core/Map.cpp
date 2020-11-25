@@ -904,33 +904,14 @@ void Map::ClearSearchMapFor(const Movable *actor) {
 	}
 }
 
-// Size of Fog-Of-War shadow tile (and bitmap)
-#define CELL_SIZE  32
-
-// Ratio of bg tile size and fog tile size
-#define CELL_RATIO 2
-
-inline bool MaskHit( int x, int y, const Size& s, ieByte* mask)
-{
-	if (x <= 0 || x >= (s.w - 1) || y <= 0 || y >= (s.h - 1)) {
-		// edges are always foggy
-		return false;
-	}
-
-	div_t res = div(s.w * y + x, 8);
-	return mask[res.quot] & (1 << res.rem);
-}
-
-// Returns 1 if map at (x;y) was explored, else 0. Points outside map are
-//   always considered as explored
-#define IS_EXPLORED( x, y ) MaskHit(x, y, size, explored_mask)
-	
-#define IS_VISIBLE( x, y ) MaskHit(x, y, size, visible_mask)
-	
-#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
-
 void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
 {
+	// Size of Fog-Of-War shadow tile (and bitmap)
+	constexpr int CELL_SIZE = 32;
+
+	// Ratio of bg tile size and fog tile size
+	constexpr int CELL_RATIO = 2;
+
 	// viewport - pos & size of the control
 	Size size(TMap->XCellCount * CELL_RATIO, TMap->YCellCount * CELL_RATIO);
 	
@@ -953,17 +934,38 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		dx++;
 		dy++;
 	}
+	
+	// Returns true if map at (x;y) was explored, else false.
+	// Points outside map are always considered as explored
+	auto MaskHit = [&size](int x, int y, ieByte* mask)
+	{
+		if (x <= 0 || x >= (size.w - 1) || y <= 0 || y >= (size.h - 1)) {
+			// edges are always foggy
+			return false;
+		}
+
+		div_t res = div(size.w * y + x, 8);
+		return bool(mask[res.quot] & (1 << res.rem));
+	};
+	
+	auto IsExplored = [&](int x, int y) {
+		return MaskHit(x, y, explored_mask);
+	};
+	
+	auto IsVisible = [&](int x, int y) {
+		return MaskHit(x, y, visible_mask);
+	};
 
 	Video* vid = core->GetVideoDriver();
+#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
 	for (int y = sy; y < dy; y++) {
 		for (int x = sx; x < dx; x++) {
 			Region r = Region(x0 + ( (x - sx) * CELL_SIZE ), y0 + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-			if (! IS_EXPLORED( x, y )) {
+			if (!IsExplored(x, y)) {
 				// Unexplored tiles are all black
 				vid->DrawRect(r, ColorBlack, true);
 				continue;  // Don't draw 'invisible' fog
-			}
-			else {
+			} else {
 				// If an explored tile is adjacent to an
 				//   unexplored one, we draw border sprite
 				//   (gradient black <-> transparent)
@@ -980,10 +982,10 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 				//   some tiles are made 'on the fly' by
 				//   drawing two or more tiles
 
-				int e = ! IS_EXPLORED( x, y - 1);
-				if (! IS_EXPLORED( x - 1, y )) e |= 2;
-				if (! IS_EXPLORED( x, y + 1 )) e |= 4;
-				if (! IS_EXPLORED( x + 1, y )) e |= 8;
+				int e = !IsExplored(x, y - 1);
+				if (!IsExplored(x - 1, y)) e |= 2;
+				if (!IsExplored(x, y + 1)) e |= 4;
+				if (!IsExplored(x + 1, y )) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -1026,12 +1028,11 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 				}
 			}
 
-			if (! IS_VISIBLE( x, y )) {
+			if (!IsVisible(x, y)) {
 				// Invisible tiles are all gray
 				FOG( 16 );
 				continue;  // Don't draw 'invisible' fog
-			}
-			else {
+			} else {
 				// If a visible tile is adjacent to an
 				//   invisible one, we draw border sprite
 				//   (gradient gray <-> transparent)
@@ -1048,10 +1049,10 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 				//   some tiles are made 'on the fly' by
 				//   drawing two or more tiles
 
-				int e = ! IS_VISIBLE( x, y - 1);
-				if (! IS_VISIBLE( x - 1, y )) e |= 2;
-				if (! IS_VISIBLE( x, y + 1 )) e |= 4;
-				if (! IS_VISIBLE( x + 1, y )) e |= 8;
+				int e = !IsVisible( x, y - 1);
+				if (!IsVisible(x - 1, y)) e |= 2;
+				if (!IsVisible(x, y + 1)) e |= 4;
+				if (!IsVisible(x + 1, y)) e |= 8;
 
 				switch (e) {
 				case 1:
@@ -1095,6 +1096,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			}
 		}
 	}
+#undef FOG
 }
 
 void Map::DrawHighlightables(const Region& viewport)
