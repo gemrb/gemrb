@@ -654,6 +654,7 @@ private:
 	void DrawSearchMap(const Region &vp) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport);
+	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
 	
 	void GenerateQueues();
 	void SortQueues();

@@ -904,6 +904,199 @@ void Map::ClearSearchMapFor(const Movable *actor) {
 	}
 }
 
+// Size of Fog-Of-War shadow tile (and bitmap)
+#define CELL_SIZE  32
+
+// Ratio of bg tile size and fog tile size
+#define CELL_RATIO 2
+
+inline bool MaskHit( int x, int y, const Size& s, ieByte* mask)
+{
+	if (x <= 0 || x >= (s.w - 1) || y <= 0 || y >= (s.h - 1)) {
+		// edges are always foggy
+		return false;
+	}
+
+	div_t res = div(s.w * y + x, 8);
+	return mask[res.quot] & (1 << res.rem);
+}
+
+// Returns 1 if map at (x;y) was explored, else 0. Points outside map are
+//   always considered as explored
+#define IS_EXPLORED( x, y ) MaskHit(x, y, size, explored_mask)
+	
+#define IS_VISIBLE( x, y ) MaskHit(x, y, size, visible_mask)
+	
+#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
+
+void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
+{
+	// viewport - pos & size of the control
+	Size size(TMap->XCellCount * CELL_RATIO, TMap->YCellCount * CELL_RATIO);
+	
+	static bool LargeMap = !core->HasFeature(GF_SMALL_FOG);
+
+	if (LargeMap) {
+		size.w++;
+		size.h++;
+	}
+
+	int sx = ( vp.x ) / CELL_SIZE;
+	int sy = ( vp.y ) / CELL_SIZE;
+	int dx = sx + vp.w / CELL_SIZE + 2;
+	int dy = sy + vp.h / CELL_SIZE + 2;
+	int x0 = sx * CELL_SIZE - vp.x;
+	int y0 = sy * CELL_SIZE - vp.y;
+	if (LargeMap) {
+		x0 -= CELL_SIZE / 2;
+		y0 -= CELL_SIZE / 2;
+		dx++;
+		dy++;
+	}
+
+	Video* vid = core->GetVideoDriver();
+	for (int y = sy; y < dy; y++) {
+		for (int x = sx; x < dx; x++) {
+			Region r = Region(x0 + ( (x - sx) * CELL_SIZE ), y0 + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
+			if (! IS_EXPLORED( x, y )) {
+				// Unexplored tiles are all black
+				vid->DrawRect(r, ColorBlack, true);
+				continue;  // Don't draw 'invisible' fog
+			}
+			else {
+				// If an explored tile is adjacent to an
+				//   unexplored one, we draw border sprite
+				//   (gradient black <-> transparent)
+				// Tiles in four cardinal directions have these
+				//   values.
+				//
+				//      1
+				//    2   8
+				//      4
+				//
+				// Values of those unexplored are
+				//   added together, the resulting number being
+				//   an index of shadow sprite to use. For now,
+				//   some tiles are made 'on the fly' by
+				//   drawing two or more tiles
+
+				int e = ! IS_EXPLORED( x, y - 1);
+				if (! IS_EXPLORED( x - 1, y )) e |= 2;
+				if (! IS_EXPLORED( x, y + 1 )) e |= 4;
+				if (! IS_EXPLORED( x + 1, y )) e |= 8;
+
+				switch (e) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 6:
+				case 8:
+				case 9:
+				case 12:
+					FOG( e );
+					break;
+				case 5:
+					FOG( 1 );
+					FOG( 4 );
+					break;
+				case 7:
+					FOG( 3 );
+					FOG( 6 );
+					break;
+				case 10:
+					FOG( 2 );
+					FOG( 8 );
+					break;
+				case 11:
+					FOG( 3 );
+					FOG( 9 );
+					break;
+				case 13:
+					FOG( 9 );
+					FOG( 12 );
+					break;
+				case 14:
+					FOG( 6 );
+					FOG( 12 );
+					break;
+				case 15: //this is black too
+					vid->DrawRect(r, ColorBlack, true);
+					break;
+				}
+			}
+
+			if (! IS_VISIBLE( x, y )) {
+				// Invisible tiles are all gray
+				FOG( 16 );
+				continue;  // Don't draw 'invisible' fog
+			}
+			else {
+				// If a visible tile is adjacent to an
+				//   invisible one, we draw border sprite
+				//   (gradient gray <-> transparent)
+				// Tiles in four cardinal directions have these
+				//   values.
+				//
+				//      1
+				//    2   8
+				//      4
+				//
+				// Values of those invisible are
+				//   added together, the resulting number being
+				//   an index of shadow sprite to use. For now,
+				//   some tiles are made 'on the fly' by
+				//   drawing two or more tiles
+
+				int e = ! IS_VISIBLE( x, y - 1);
+				if (! IS_VISIBLE( x - 1, y )) e |= 2;
+				if (! IS_VISIBLE( x, y + 1 )) e |= 4;
+				if (! IS_VISIBLE( x + 1, y )) e |= 8;
+
+				switch (e) {
+				case 1:
+				case 2:
+				case 3:
+				case 4:
+				case 6:
+				case 8:
+				case 9:
+				case 12:
+					FOG( 16 + e );
+					break;
+				case 5:
+					FOG( 16 + 1 );
+					FOG( 16 + 4 );
+					break;
+				case 7:
+					FOG( 16 + 3 );
+					FOG( 16 + 6 );
+					break;
+				case 10:
+					FOG( 16 + 2 );
+					FOG( 16 + 8 );
+					break;
+				case 11:
+					FOG( 16 + 3 );
+					FOG( 16 + 9 );
+					break;
+				case 13:
+					FOG( 16 + 9 );
+					FOG( 16 + 12 );
+					break;
+				case 14:
+					FOG( 16 + 6 );
+					FOG( 16 + 12 );
+					break;
+				case 15: //this is unseen too
+					FOG( 16 );
+					break;
+				}
+			}
+		}
+	}
+}
+
 void Map::DrawHighlightables(const Region& viewport)
 {
 	// NOTE: piles are drawn in the main queue
@@ -1266,7 +1459,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		DrawSearchMap(viewport);
 	} else {
 		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
-			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, viewport );
+			DrawFogOfWar(ExploredBitmap, VisibleBitmap, viewport);
 		}
 	}
 

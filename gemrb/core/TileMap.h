@@ -43,7 +43,6 @@ private:
 	std::vector< Container*> containers;
 	std::vector< InfoPoint*> infoPoints;
 	std::vector< TileObject*> tiles;
-	bool LargeMap;
 public:
 	TileMap(void);
 	~TileMap(void);
@@ -91,7 +90,6 @@ public:
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(const Region& screen, bool rain, int flags);
-	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
 	Size GetMapSize();
 public:
 	int XCellCount = 0, YCellCount = 0;
