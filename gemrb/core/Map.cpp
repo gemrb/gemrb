@@ -915,9 +915,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	// viewport - pos & size of the control
 	Size size(TMap->XCellCount * CELL_RATIO, TMap->YCellCount * CELL_RATIO);
 	
-	static bool LargeMap = !core->HasFeature(GF_SMALL_FOG);
-
-	if (LargeMap) {
+	if (LargeFog) {
 		size.w++;
 		size.h++;
 	}
@@ -928,7 +926,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	int dy = sy + vp.h / CELL_SIZE + 2;
 	int x0 = sx * CELL_SIZE - vp.x;
 	int y0 = sy * CELL_SIZE - vp.y;
-	if (LargeMap) {
+	if (LargeFog) {
 		x0 -= CELL_SIZE / 2;
 		y0 -= CELL_SIZE / 2;
 		dx++;
