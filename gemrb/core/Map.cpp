@@ -1458,7 +1458,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
 		DrawSearchMap(viewport);
 	} else {
-		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
+		if ((core->FogOfWar&FOG_DRAWFOG)) {
 			DrawFogOfWar(ExploredBitmap, VisibleBitmap, viewport);
 		}
 	}
@@ -1466,7 +1466,6 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
-		assert(TMap);
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
