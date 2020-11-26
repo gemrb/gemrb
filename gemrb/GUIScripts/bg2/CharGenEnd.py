@@ -116,6 +116,9 @@ def OnLoad():
 		#LETS PLAY!!
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
+		if GameCheck.IsTOB ():
+			# delay for sorcerers, since their class pcf needs to run first to set up their spellbook properly
+			GemRB.SetTimedEvent (lambda: GemRB.ChargeSpells (MyChar), 1)
 	else:
 		#when export is done, go to start
 		if GameCheck.HasTOB():
