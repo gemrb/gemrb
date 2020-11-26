@@ -273,39 +273,6 @@ struct PixelIterator : IPixelIterator
 	}
 };
 
-struct IColorIterator
-{
-	virtual const Color& operator*() const=0;
-	virtual const Color* operator->() const=0;
-
-	virtual IColorIterator& operator++()=0;
-};
-
-struct PaletteIterator : public IColorIterator
-{
-	Color* pal;
-	uint8_t* pixel;
-
-	PaletteIterator(Color* c, uint8_t* p) {
-		assert(c && p);
-		pal = c;
-		pixel = p;
-	}
-
-	const Color& operator*() const {
-		return pal[*pixel];
-	}
-
-	const Color* operator->() const {
-		return &pal[*pixel];
-	}
-
-	IColorIterator& operator++() {
-		++pixel;
-		return *this;
-	}
-};
-
 struct IAlphaIterator
 {
 	virtual ~IAlphaIterator() = default;
