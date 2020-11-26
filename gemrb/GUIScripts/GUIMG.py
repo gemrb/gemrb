@@ -478,10 +478,6 @@ def OpenSequencerWindow ():
 		CondLabel.SetPos (-1,-1)
 		TargSelect.SetPos (-1,-1)
 		TargLabel.SetPos (-1,-1)
-		sb = Window.GetControl (5)
-		sb.SetPos (-1,-1)
-		sb = Window.GetControl (7)
-		sb.SetPos (-1,-1)
 	else:
 		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpCondition)
 		CondSelect.SetOptions ([elem[0] for elem in ContCond], "ContCond", 0)
