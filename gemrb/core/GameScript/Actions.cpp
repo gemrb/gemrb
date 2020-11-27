@@ -4559,7 +4559,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		if (tgt != 255) {
 			skill -= tgt;
 			//if you want original behaviour: remove this
-			skill += core->Roll(1,100, snd->GetStat(IE_LUCK) );
+			skill += snd->LuckyRoll(1, 100, 0);
 		} else {
 			skill = 0;
 		}
