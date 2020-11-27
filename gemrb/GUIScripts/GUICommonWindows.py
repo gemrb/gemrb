@@ -1360,10 +1360,10 @@ def CloseTopWindow ():
 def TopWindowClosed(window):
 	optwin = GemRB.GetView("OPTWIN")
 	btnid = GemRB.GetVar("OPTBTN")
-	button = optwin.GetControl(btnid)
+	button = optwin.GetControl(btnid) if optwin else None
 	if button:
 		button.SetState(IE_GUI_BUTTON_UNPRESSED)
-	rtgbtn = optwin.GetControl(0) # return to game button
+	rtgbtn = optwin.GetControl(0) if optwin else None # return to game button
 	if rtgbtn: # not in PST or IWD2
 		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
 		
@@ -1373,7 +1373,9 @@ def TopWindowClosed(window):
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
-	GemRB.GetView ("ACTWIN").SetVisible (True)
+	ActWin = GemRB.GetView ("ACTWIN")
+	if ActWin:
+		ActWin.SetVisible (True)
 	if not GameCheck.IsPST(): #PST Doesn't have the message window visible in the main game screen
 		GemRB.GetView ("MSGWIN").SetVisible(True)
 		
@@ -1428,8 +1430,9 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 				CreateTopWinLoader.PauseState = None
 
 			optwin = GemRB.GetView("OPTWIN")
-			rtgbtn = optwin.GetControl(0) # return to game button
-			if rtgbtn: # not in PST or IWD2
+			if optwin:
+				rtgbtn = optwin.GetControl(0) # return to game button
+			if optwin and rtgbtn: # not in PST or IWD2
 				rtgbtn.SetState(IE_GUI_BUTTON_UNPRESSED)
 			if btn:
 				btn.SetState(IE_GUI_BUTTON_SELECTED)
@@ -1437,7 +1440,7 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
-			if not (GameCheck.IsIWD2() or GameCheck.IsPST()):
+			if not (GameCheck.IsIWD2() or GameCheck.IsPST()) and GemRB.GetView ("ACTWIN"):
 				# hide some windows to declutter higher resolutions and avoid unwanted interaction
 				GemRB.GetView ("ACTWIN").SetVisible(False)
 				GemRB.GetView ("MSGWIN").SetVisible(False)
