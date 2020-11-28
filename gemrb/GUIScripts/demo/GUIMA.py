@@ -27,7 +27,6 @@ import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
-WorldMapWindow = None
 WorldMapControl = None
 
 def InitMapWindow (Window):
@@ -67,7 +66,7 @@ def OpenTravelWindow ():
 	return
 
 def ChangeTooltip ():
-	global WorldMapWindow, WorldMapControl
+	global WorldMapControl
 
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
