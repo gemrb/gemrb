@@ -31,9 +31,7 @@ namespace GemRB {
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
 
-#define SPARK_COUNT 13
-
-static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
+static int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7, 9, 3, 4, 10, 11};
 
 static void TranslateColor(const char *value, Color &color)
 {
@@ -78,7 +76,7 @@ static void InitSparks()
 		for (int j=0;j<MAX_SPARK_PHASE;j++) {
 			int idx;
 
-			if (i<SPARK_COUNT) {
+			if (i < MAX_SPARK_COLOR) {
 				idx = spark_color_indices[i];
 			} else {
 				idx = i;
