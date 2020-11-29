@@ -3677,11 +3677,11 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter2) {
 		images = 1; //reflection
-	}
-	else {
+	} else {
 		// the original uses only IE_LEVEL, but that can be awefully bad in
 		// the case of dual- and multiclasses
 		unsigned int level = target->GetCasterLevel(IE_SPL_WIZARD);
+		if (!level) level = target->GetAnyActiveCasterLevel();
 		// 2-8 mirror images
 		images = level/3 + 2;
 		if (images > 8) images = 8;
