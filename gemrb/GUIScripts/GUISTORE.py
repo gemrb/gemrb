@@ -687,6 +687,8 @@ def InitStoreDonateWindow (Window):
 		elif Number > MaxAmount:
 			Number = MaxAmount
 		Field.SetText (str(Number))
+		Button = Window.GetControlAlias ("DONATE")
+		Button.SetDisabled (not Number)
 
 	# +
 	Button = Window.GetControlAlias ('STOPLUS')
