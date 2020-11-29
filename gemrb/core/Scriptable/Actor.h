@@ -640,6 +640,7 @@ public:
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
+	bool IsRunning() const { return InternalFlags & IF_RUNFLAGS; }
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(bool remove, ieDword baseclass=0, int diff=0);
 	/* applies the class abilities*/
