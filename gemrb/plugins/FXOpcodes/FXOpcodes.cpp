@@ -3783,11 +3783,19 @@ int fx_visual_animation_effect (Scriptable* /*Owner*/, Actor* /*target*/, Effect
 int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_create_inventory_item(%2d)", fx->Opcode);
-	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	// EEs added randomness that can't hurt elsewhere
+	ieResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
+	char count = 1;
+	if (fx->Resource2) count++;
+	if (fx->Resource3) count++;
+	int choice = RAND(0, count - 1);
+
+	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
+		CopyResRef(fx->Resource, *refs[choice]);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 		return FX_APPLIED;
 	}
