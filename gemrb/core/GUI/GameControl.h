@@ -85,7 +85,6 @@ private:
 
 	bool isSelectionRect;
 	bool isFormationRotation;
-	bool isDoubleClick;
 
 	// mouse coordinates represented in game coordinates
 	Point gameClickPoint;
@@ -158,7 +157,7 @@ private:
 	bool IsDisabledCursor() const;
 
 	void PerformSelectedAction(const Point& p);
-	void CommandSelectedMovement(const Point& p, unsigned short Mod=0);
+	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false);
 
 	//infopoints
 	int GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const;
@@ -226,7 +225,7 @@ public:
 	void InitFormation(const Point &);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	/** calls MoveToPoint or RunToPoint */
-	void CreateMovement(Actor *actor, const Point &p, bool append=true);
+	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false);
 	/** checks if the actor should be running instead of walking */
 	bool ShouldRun(Actor *actor) const;
 	/** Displays a string over an object */

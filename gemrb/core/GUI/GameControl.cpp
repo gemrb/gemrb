@@ -283,26 +283,21 @@ void GameControl::ClearMouseState()
 {
 	isSelectionRect = false;
 	isFormationRotation = false;
-	isDoubleClick = false;
 	
 	SetCursor(NULL);
 }
 
 // generate an action to do the actual movement
 // only PST supports RunToPoint
-void GameControl::CreateMovement(Actor *actor, const Point &p, bool append)
+void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun)
 {
 	char Tmp[256];
 	Action *action = NULL;
-	static bool CanRun = true;
 
 	//try running (in PST) only if not encumbered
-	if (CanRun && ShouldRun(actor)) {
+	if (tryToRun && ShouldRun(actor)) {
 		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 		action = GenerateAction( Tmp );
-		//if it didn't work don't insist
-		if (!action)
-			CanRun = false;
 	}
 	if (!action) {
 		if (append) {
@@ -324,7 +319,7 @@ bool GameControl::ShouldRun(Actor *actor) const
 	if (actor->GetEncumbranceFactor(true) != 1) {
 		return false;
 	}
-	return (isDoubleClick || AlwaysRun);
+	return AlwaysRun;
 }
 
 // ArrowSprite cycles
@@ -2064,11 +2059,9 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 		}
 		break;
 	case GEM_MB_ACTION:
-		isDoubleClick = me.repeats == 2;
-
 		// PST uses alt + left click for formation rotation
 		// is there any harm in this being true in all games?
-		if (!isDoubleClick && EventMgr::ModState(GEM_MOD_ALT)) {
+		if (me.repeats != 2 && EventMgr::ModState(GEM_MOD_ALT)) {
 			InitFormation(gameClickPoint);
 		}
 
@@ -2123,6 +2116,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	core->CloseCurrentContainer();
 
 	Point p = ConvertPointFromScreen(me.Pos()) + vpOrigin;
+	bool isDoubleClick = me.repeats == 2;
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
@@ -2177,19 +2171,25 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			// don't allow travel if the destination is actually blocked
 			return false;
 		}
-
+		
+		if (overContainer || overDoor || (overInfoPoint && overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE)) {
+			// move to the object before trying to interact with it
+			CommandSelectedMovement(p, false, isDoubleClick);
+		}
+		
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
 			PerformSelectedAction(p);
 			ClearMouseState();
 			return true;
 		}
+
 		// Ensure that left-click movement also orients the formation
 		// in the direction of movement.
 		InitFormation(p);
 	}
 
 	// handle movement/travel
-	CommandSelectedMovement(p, Mod);
+	CommandSelectedMovement(p, Mod & GEM_MOD_SHIFT, isDoubleClick);
 	ClearMouseState();
 	return true;
 }
@@ -2216,15 +2216,11 @@ void GameControl::PerformSelectedAction(const Point& p)
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
 	} else if (overDoor) {
-		CommandSelectedMovement(p);
 		HandleDoor(overDoor, selectedActor);
 	} else if (overContainer) {
-		CommandSelectedMovement(p);
 		HandleContainer(overContainer, selectedActor);
 	} else if (overInfoPoint) {
 		if (overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE) {
-			CommandSelectedMovement(p);
-
 			ieDword exitID = overInfoPoint->GetGlobalID();
 			if (core->HasFeature(GF_TEAM_MOVEMENT)) {
 				// pst forces everyone to travel (eg. ar0201 outside_portal)
@@ -2245,7 +2241,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 }
 
-void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
+void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun)
 {
 	const Game* game = core->GetGame();
 
@@ -2285,14 +2281,14 @@ void GameControl::CommandSelectedMovement(const Point& p, unsigned short Mod)
 	for (size_t i = 0; i < party.size(); i++) {
 		Actor *actor = party[i];
 		// don't stop the party if we're just trying to add a waypoint
-		if (!(Mod & GEM_MOD_SHIFT)) {
+		if (!append) {
 			actor->Stop();
 		}
 		
 		if (party.size() > 1) {
-			CreateMovement(actor, formationPoints[i], Mod & GEM_MOD_SHIFT);
+			CreateMovement(actor, formationPoints[i], append, tryToRun);
 		} else {
-			CreateMovement(actor, p, Mod & GEM_MOD_SHIFT);
+			CreateMovement(actor, p, append, tryToRun);
 		}
 		
 		// don't trigger the travel region, so everyone can bunch up there and NIDSpecial2 can take over
