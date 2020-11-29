@@ -69,19 +69,21 @@ struct Element {
 #define SP_SPAWN_FULL  1       //fill all at setup, then switch to none
 #define SP_SPAWN_SOME  2       //add some new elements regularly
 
-#define SPARK_COLOR_BLUE 0
-#define SPARK_COLOR_GOLD 1
-#define SPARK_COLOR_PURPLE 2
-#define SPARK_COLOR_ICE 3
-#define SPARK_COLOR_STONE 4
-#define SPARK_COLOR_BLACK 5
-#define SPARK_COLOR_CHROM 6
+// order of names as in sprklclr.2da is never used, they permuted it for some reason
+// NOTE: the first (default) phase is almost white for most colors
+#define SPARK_COLOR_BLUE 2
+#define SPARK_COLOR_GOLD 4
+#define SPARK_COLOR_PURPLE 6
+#define SPARK_COLOR_ICE 9
+#define SPARK_COLOR_STONE 10
+#define SPARK_COLOR_BLACK 1
+#define SPARK_COLOR_CHROM 3
 #define SPARK_COLOR_RED 7
-#define SPARK_COLOR_GREEN 8
-#define SPARK_COLOR_WHITE 9
-#define SPARK_COLOR_MAGENTA 10
-#define SPARK_COLOR_ORANGE 11
-#define SPARK_COLOR_CUSTOM 12
+#define SPARK_COLOR_GREEN 5
+#define SPARK_COLOR_WHITE 8
+#define SPARK_COLOR_MAGENTA 11
+#define SPARK_COLOR_ORANGE 12
+#define SPARK_COLOR_CUSTOM 0
 
 #define MAX_SPARK_COLOR  13
 #define MAX_SPARK_PHASE  5
