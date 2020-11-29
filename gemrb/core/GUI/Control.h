@@ -149,7 +149,7 @@ public:
 	Control(const Region& frame);
 	virtual ~Control();
 
-	virtual bool IsAnimated() const override { return animation; }
+	virtual bool IsAnimated() const override { return animation && AnimPicture; }
 	bool IsOpaque() const override;
 
 	/** Sets the Text of the current control */
