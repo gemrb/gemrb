@@ -2286,9 +2286,7 @@ void Movable::AdjustPosition()
 void Movable::AddWayPoint(const Point &Des)
 {
 	if (!path) {
-		// pass the current run flags
-		// adding a waypoint should keep the current movement mode
-		WalkTo(Des, InternalFlags & IF_RUNNING);
+		WalkTo(Des);
 		return;
 	}
 	Destination = Des;
