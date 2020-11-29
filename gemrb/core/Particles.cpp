@@ -213,7 +213,8 @@ void Particles::Draw(const Region &screen)
 		}
 
 		if (state>=MAX_SPARK_PHASE) {
-			length = 6-abs(state-MAX_SPARK_PHASE-6);
+			constexpr int maxDropLength = 6;
+			length = maxDropLength - abs(state - MAX_SPARK_PHASE - maxDropLength);
 			state = 0;
 		} else {
 			state=MAX_SPARK_PHASE-state-1;
