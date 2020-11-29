@@ -96,18 +96,10 @@ Particles::Particles(int s)
 		bitmap[i]=NULL;
 	}
 	*/
-	fragments = NULL;
 	if (!inited) {
 		InitSparks();
 	}
 	size = last_insert = s;
-	color = 0;
-	phase = P_FADE;
-	owner = NULL;
-	type = SP_TYPE_POINT;
-	path = SP_PATH_FALL;
-	spawn_type = SP_SPAWN_NONE;
-	timetolive = 0;
 }
 
 Particles::~Particles()

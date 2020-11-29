@@ -121,22 +121,22 @@ public:
 	int Update();
 	int GetHeight() const { return pos.y+pos.h; }
 private:
-	Element *points;
-	ieDword timetolive;
+	Element *points = nullptr;
+	ieDword timetolive = 0;
 //	ieDword target;    //could be 0, in that case target is pos
-	ieWord size;       //spark number
-	ieWord last_insert;//last spark idx added
-	Scriptable *owner; //could be area or game or actor
+	ieWord size = 0;       // spark number
+	ieWord last_insert = 0;// last spark idx added
+	Scriptable *owner = nullptr; // could be area or game or actor
 	Region pos;
-	ieByte phase;      //global phase
-	ieByte type;       //draw type (snow, rain)
-	ieByte path;       //path type
-	ieByte color;      //general spark color
-	ieByte spawn_type;
+	ieByte phase = P_FADE;      // global phase
+	ieByte type = SP_TYPE_POINT;       // draw type (snow, rain)
+	ieByte path = SP_PATH_FALL;       // path type
+	ieByte color = 0;      // general spark color (index, see SPARK_COLOR_*)
+	ieByte spawn_type = SP_SPAWN_NONE;
 	//use char animations for the fragment animations
 	//1. the cycles are loaded only when needed
 	//2. the fragments ARE avatar animations in the original IE (for some unknown reason)
-	CharAnimations *fragments;
+	CharAnimations *fragments = nullptr;
 };
 
 }
