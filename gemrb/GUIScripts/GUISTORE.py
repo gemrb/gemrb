@@ -132,7 +132,6 @@ def CloseStoreWindow ():
 	else:
 		GemRB.GamePause (0, 3)
 		GUICommonWindows.SetSelectionChangeHandler( None )
-		GUICommonWindows.CloseTopWindow()
 	return
 
 def PositionStoreWinRelativeTo(win):
@@ -165,10 +164,11 @@ def OpenStoreWindow ():
 	global CureTable
 	
 	def ChangeStoreView(func):
-		# WIN_TOP needs to be focused for us to change it (see CreateTopWinLoader)
+		# WIN_TOP needs to be closed manually because
+		# it has the IE_GUI_VIEW_IGNORE_EVENTS flag set
 		top = GemRB.GetView("WIN_TOP")
 		if top:
-			top.Focus()
+			top.Close()
 		return func()
 	
 	store_funcs = (lambda: ChangeStoreView(OpenStoreShoppingWindow),
@@ -211,7 +211,7 @@ def OpenStoreWindow ():
 		# IWD2 has weird overlay windows
 		StoreWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.AddAlias("WIN_STORE")
-	#this window is static and grey, but good to stick the frame onto
+	Window.SetAction(lambda: topwin.Close(), ACTION_WINDOW_CLOSED)
 
 	if GameCheck.IsPST():
 		MenuWindow = GemRB.LoadWindow (2)
