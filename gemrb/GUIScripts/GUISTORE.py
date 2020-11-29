@@ -835,7 +835,7 @@ def InitStoreRumourWindow (Window):
 		Window.AliasControls ({ 'STOTITLE' : 0x10000011, 'STOGOLD' : 0x10000012})
 
 	#removing those pesky labels
-	if not GameCheck.IsIWD2():
+	if not (GameCheck.IsIWD2 () or GameCheck.IsBG1 ()):
 		for i in range (5):
 			Window.DeleteControl (0x10000005+i)
 
@@ -886,6 +886,10 @@ def UpdateStoreRumourWindow (Window):
 				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Drink['DrinkName']))
 				GemRB.SetToken ("ITEMCOST", str(Drink['Price']) )
 				Button.SetText (strrefs["itemnamecost"])
+				if GameCheck.IsBG1 ():
+					CostLabel = Window.GetControl (0x10000005 + i)
+					CostLabel.SetText (str(Drink['Price']))
+					Button.SetText (Drink['DrinkName'])
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GulpDrink)
 		else:
@@ -893,6 +897,9 @@ def UpdateStoreRumourWindow (Window):
 			Button.SetDisabled (True)
 			if GameCheck.IsIWD2():
 				CostLabel = Window.GetControl (0x10000000+29+i)
+				CostLabel.SetText ("")
+			elif GameCheck.IsBG1 ():
+				CostLabel = Window.GetControl (0x100000005 + i)
 				CostLabel.SetText ("")
 	return
 
