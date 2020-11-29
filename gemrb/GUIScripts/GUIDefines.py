@@ -140,9 +140,6 @@ IE_GUI_BUTTON_FAKEDISABLED    = 0x00000005
 # Draws PRESSED bitmap, but it isn't shifted
 IE_GUI_BUTTON_FAKEPRESSED   = 0x00000006
 
-#edit field states
-IE_GUI_EDIT_NUMBER    =  0x030000001
-
 #mapcontrol states (add 0x090000000 if used with SetControlStatus)
 IE_GUI_MAP_NO_NOTES   =  0
 IE_GUI_MAP_VIEW_NOTES =  1

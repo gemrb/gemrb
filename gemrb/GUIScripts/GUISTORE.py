@@ -677,7 +677,7 @@ def InitStoreDonateWindow (Window):
 	Field = Window.GetControlAlias ('STOTEDIT')
 	Field.SetText ("0")
 	Field.SetEvent (IE_GUI_EDIT_ON_CHANGE, lambda: UpdateStoreDonateWindow(Window))
-	Field.SetStatus (IE_GUI_EDIT_NUMBER)
+	Field.SetFlags (IE_GUI_TEXTEDIT_ALPHACHARS, OP_NAND)
 	Field.Focus()
 
 	def SetItemAmount (Number):
@@ -1338,7 +1338,7 @@ def OpenItemAmountWindow (ShopWin, store = STORE_MAIN):
 	# item amount
 	Text = Window.GetControl (6)
 	Text.SetText (str (Amount))
-	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.SetFlags (IE_GUI_TEXTEDIT_ALPHACHARS, OP_NAND)
 	Text.Focus()
 
 	def SetItemAmount (Number):

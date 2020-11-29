@@ -32,9 +32,6 @@
 
 namespace GemRB {
 
-//this is stored in 'Value' of Control class
-#define IE_GUI_EDIT_NUMBER         1
-
 /**
  * @class TextEdit
  * Widget displaying single line text input field

@@ -516,7 +516,7 @@ def OpenItemAmountWindow (btn, slot):
 	if GameCheck.IsIWD2():
 		Text.SetSize (40, 40)
 	Text.SetText (str (StackAmount//2))
-	Text.SetStatus (IE_GUI_EDIT_NUMBER)
+	Text.SetFlags (IE_GUI_TEXTEDIT_ALPHACHARS, OP_NAND)
 	Text.Focus()
 
 	# Decrease

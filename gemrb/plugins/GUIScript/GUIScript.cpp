@@ -1855,8 +1855,6 @@ control, which has various uses.\n\
     * IE_GUI_BUTTON_LOCKED     = 0x00000004, the button is inactive (like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap)\n\
     * IE_GUI_BUTTON_FAKEDISABLED = 0x00000005, draws DISABLED bitmap, but it isn't disabled\n\
     * IE_GUI_BUTTON_FAKEPRESSED = 0x00000006, draws PRESSED bitmap, but it isn't shifted\n\
-  * Text Edit states\n\
-    * IE_GUI_EDIT_NUMBER    =  0x030000001, the textedit will accept only digits\n\
   * Map Control States (add 0x09000000 to these):\n\
     * IE_GUI_MAP_NO_NOTES   =  0, no mapnotes visible\n\
     * IE_GUI_MAP_VIEW_NOTES =  1, view notes (no setting)\n\
