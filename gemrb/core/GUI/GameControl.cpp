@@ -1463,6 +1463,11 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 		Scroll(me.Delta());
 		return true;
 	}
+	
+	if (me.ButtonState(GEM_MB_MENU)) {
+		InitFormation(gameClickPoint);
+		return true;
+	}
 
 	if (target_mode != TARGET_MODE_NONE) {
 		// we are in a target mode; nothing here applies
@@ -1475,13 +1480,9 @@ bool GameControl::OnMouseDrag(const MouseEvent& me)
 
 	if (me.ButtonState(GEM_MB_ACTION) && !isFormationRotation) {
 		isSelectionRect = true;
-	}
-
-	if (isFormationRotation) {
-		SetCursor(core->Cursors[IE_CURSOR_USE]);
-	} else if (isSelectionRect) {
 		SetCursor(core->Cursors[IE_CURSOR_PRESSED]);
 	}
+
 	return true;
 }
 
@@ -2060,8 +2061,6 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 	case GEM_MB_MENU: //right click.
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
-		} else {
-			InitFormation(gameClickPoint);
 		}
 		break;
 	case GEM_MB_ACTION:
@@ -2132,7 +2131,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
-			core->SetEventFlag(EF_ACTION);
+			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			ClearMouseState();
 			return true;
 		} else {
