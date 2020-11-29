@@ -99,6 +99,8 @@ elif GameCheck.IsPST():
 	StoreButtonCount = 7
 else:
 	storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
+	if GameCheck.IsBG1 ():
+		strrefs["heal"] = strrefs["buy"]
 Buttons = [-1] * StoreButtonCount
 
 # center the windows according to game needs and available space
