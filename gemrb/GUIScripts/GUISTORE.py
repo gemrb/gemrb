@@ -637,7 +637,7 @@ def UpdateStoreStealWindow (Window):
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("RightTopIndex", max(0, RightCount - ItemButtonCount))
 	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
