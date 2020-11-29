@@ -122,7 +122,7 @@ int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 	//walks (7) or runs away (all others) from owner
 	target->RunAwayFrom(Owner->Pos, fx->Parameter3, true);
 	if (fx->Parameter2!=7) {
-		target->SetRunFlags(IF_RUNNING);
+		target->SetIsRunning(true);
 	}
 
 	//has a duration

@@ -8308,10 +8308,13 @@ void Actor::SetInTrap(ieDword setreset)
 	}
 }
 
-void Actor::SetRunFlags(ieDword flags)
+void Actor::SetIsRunning(bool run)
 {
-	InternalFlags &= ~IF_RUNFLAGS;
-	InternalFlags |= (flags & IF_RUNFLAGS);
+	if (run) {
+		InternalFlags |= IF_RUNFLAGS;
+	} else {
+		InternalFlags &= ~IF_RUNFLAGS;
+	}
 }
 
 void Actor::NewPath()
@@ -8331,14 +8334,13 @@ void Actor::NewPath()
 	}
 }
 
-
-void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
+void Actor::WalkTo(const Point &Des, bool run, int MinDistance)
 {
 	ResetPathTries();
 	if (InternalFlags & IF_REALLYDIED || walkScale == 0) {
 		return;
 	}
-	SetRunFlags(flags);
+	SetIsRunning(run);
 	ResetCommentTime();
 	Movable::WalkTo(Des, MinDistance);
 }
