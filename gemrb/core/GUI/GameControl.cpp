@@ -293,19 +293,23 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 {
 	char Tmp[256];
 	Action *action = NULL;
-
-	//try running (in PST) only if not encumbered
-	if (tryToRun && ShouldRun(actor)) {
-		sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
-		action = GenerateAction( Tmp );
-	}
-	if (!action) {
-		if (append) {
-			sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
-		} else {
-			sprintf(Tmp, "MoveToPoint([%d.%d])", p.x, p.y);
+	
+	if (append) {
+		sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
+		action = GenerateAction(Tmp);
+		assert(action);
+	} else {
+		//try running (in PST) only if not encumbered
+		if (tryToRun && ShouldRun(actor)) {
+			sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
+			action = GenerateAction( Tmp );
 		}
-		action = GenerateAction( Tmp );
+		
+		// check again because GenerateAction can fail (non PST)
+		if (!action) {
+			sprintf(Tmp, "MoveToPoint([%d.%d])", p.x, p.y);
+			action = GenerateAction( Tmp );
+		}
 	}
 
 	actor->CommandActor(action, !append);
