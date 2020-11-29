@@ -2126,12 +2126,12 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 
 	// right click
 	if (me.button == GEM_MB_MENU) {
-		if (!isFormationRotation) {
+		if (target_mode != TARGET_MODE_NONE) {
 			if (!core->HasFeature(GF_HAS_FLOAT_MENU)) {
 				SetTargetMode(TARGET_MODE_NONE);
 			}
 			// update the action bar
-			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+			core->SetEventFlag(EF_ACTION);
 			ClearMouseState();
 			return true;
 		} else {
