@@ -48,6 +48,7 @@ def InitMapWindow (Window):
 	Button = Window.GetControl (3)
 	Button.SetText ("Close")
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.SetHotKey ('m')
 
 	Map.Focus ()
 	return
