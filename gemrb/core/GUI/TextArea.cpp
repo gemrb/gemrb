@@ -657,9 +657,11 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 			m = ContentContainer::Margin(10, 20);
 		else
 			m = ContentContainer::Margin(LineHeight(), 40, 10);
-	} else {
+	} else if (LineCount() > 0) {
 		m = ContentContainer::Margin(0, 3);
 		selectIdx = GetValue();
+	} else {
+		m = textMargins;
 	}
 
 	selectOptions = new SpanSelector(*this, strings, numbered, m);
