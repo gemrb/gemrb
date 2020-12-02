@@ -104,10 +104,9 @@ def WorldMapWindowCommon (Window, Travel):
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
 	Button.SetHotKey ('m')
 
-	Window.SetVisible (WINDOW_VISIBLE)
-	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	WorldMapControl.Focus ()
 	return
 
 def MapC():
-	WorldMapControl.AdjustScrolling (0, 0)
+	WorldMapControl.Scroll (0, 0, False)
 	return
