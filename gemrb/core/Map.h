@@ -109,6 +109,8 @@ class Wall_Polygon;
 // 0x4000: Draw stenciled (can be used to stencil animations using the water overlay mask of the tileset, eg. to give water surface a more natural look)
 // 0x8000: Use PVRZ resref
 
+#define ANI_PRI_BACKGROUND	-9999
+
 //creature area flags
 #define AF_CRE_NOT_LOADED 1
 #define AF_NAME_OVERRIDE  8

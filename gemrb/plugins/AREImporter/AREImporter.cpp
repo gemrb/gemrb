@@ -1264,6 +1264,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &anim->Flags );
 			anim->originalFlags = anim->Flags;
 			str->ReadWordSigned( &anim->height );
+			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && anim->height <= 0) {
+				anim->height = ANI_PRI_BACKGROUND;
+			}
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &startFrameRange );
 			str->Read( &anim->startchance,1 );

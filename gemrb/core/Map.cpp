@@ -64,8 +64,6 @@ namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
-#define ANI_PRI_BACKGROUND	-9999
-
 // TODO: fix this hardcoded resource reference
 static ieResRef PortalResRef={"EF03TPR3"};
 static unsigned int PortalTime = 15;
