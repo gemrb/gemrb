@@ -32,11 +32,6 @@ import GUICommon
 import GUICommonWindows
 from GUIDefines import *
 
-###################################################
-LogWindow = None
-BeastsWindow = None
-QuestsWindow = None
-
 # list of all assigned (0) or completed (1) quests
 global quests
 quests = [ [], [] ]
@@ -92,55 +87,66 @@ def InitJournalWindow (JournalWindow):
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow)
 OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(0, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow)
 
-def CloseAll(Callback):
-	Callback ()
+def CloseAll(win):
+	win.Close ()
 	GUICommonWindows.CloseTopWindow ()
 
 ###################################################
 def OpenQuestsWindow ():
-	global QuestsWindow, QuestsList, QuestDesc
-		
-	if QuestsWindow:
-		if QuestsWindow:
-			QuestsWindow.Unload()
-		QuestsWindow = None
-
-		return
+	global QuestsList, QuestDesc
 	
 	QuestsWindow = Window = GemRB.LoadWindow (1)
+	
+	def OnJournalAssignedPress ():
+		global selected_quest_class
+
+		# Assigned Quests
+		Label = QuestsWindow.GetControl (0x10000005)
+		Label.SetText (38585)
+
+		selected_quest_class = 0
+		PopulateQuestsList ()
+		
+	def OnJournalCompletedPress ():
+		global selected_quest_class
+
+		# Completed Quests
+		Label = QuestsWindow.GetControl (0x10000005)
+		Label.SetText (39527)
+
+		selected_quest_class = 1
+		PopulateQuestsList ()
 
 	# Assigned
-	Button = Window.GetControl (8)
+	Button = QuestsWindow.GetControl (8)
 	Button.SetText (39433)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalAssignedPress)
 
 	# Completed
-	Button = Window.GetControl (9)
+	Button = QuestsWindow.GetControl (9)
 	Button.SetText (39434)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnJournalCompletedPress)
 
 	# Back
-	Button = Window.GetControl (5)
+	Button = QuestsWindow.GetControl (5)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenQuestsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuestsWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
-	Button = Window.GetControl (0)
+	Button = QuestsWindow.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenQuestsWindow))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(QuestsWindow))
 
-	QuestsList = List = Window.GetControl (1)
+	QuestsList = List = QuestsWindow.GetControl (1)
 	List.SetVarAssoc ('SelectedQuest', -1)
 	List.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, OnJournalQuestSelect)
 
-	QuestDesc = Window.GetControl (3)
+	QuestDesc = QuestsWindow.GetControl (3)
 
 	EvaluateAllQuests ()
 	PopulateQuestsList ()
-
-	#QuestsWindow.Focus()
 	
 
 def OnJournalQuestSelect ():
@@ -148,27 +154,6 @@ def OnJournalQuestSelect ():
 	q = quests[selected_quest_class][row]
 	QuestDesc.SetText (int (q[1])) 
 	
-def OnJournalAssignedPress ():
-	global selected_quest_class
-
-	# Assigned Quests
-	Label = QuestsWindow.GetControl (0x10000005)
-	Label.SetText (38585)
-
-	selected_quest_class = 0
-	PopulateQuestsList ()
-	
-def OnJournalCompletedPress ():
-	global selected_quest_class
-
-	# Completed Quests
-	Label = QuestsWindow.GetControl (0x10000005)
-	Label.SetText (39527)
-
-	selected_quest_class = 1
-	PopulateQuestsList ()
-
-
 def PopulateQuestsList ():
 	GemRB.SetVar ('SelectedQuest', -1)
 	QuestDesc.Clear ()
@@ -256,16 +241,9 @@ def EvaluateAllQuests ():
 ###################################################
 
 def OpenBeastsWindow ():
-	global BeastsWindow, BeastsList, BeastImage, BeastDesc
-		
-	if BeastsWindow:
-		if BeastsWindow:
-			BeastsWindow.Unload()
-		BeastsWindow = None
-
-		return
+	global BeastsList, BeastImage, BeastDesc
 	
-	BeastsWindow = Window = GemRB.LoadWindow (2)
+	BeastsWindow = GemRB.LoadWindow (2)
 
 	# PC
 	Button = BeastsWindow.GetControl (5)
@@ -280,23 +258,23 @@ def OpenBeastsWindow ():
 	# Back
 	Button = BeastsWindow.GetControl (7)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenBeastsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: BeastsWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
 	Button = BeastsWindow.GetControl (4)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenBeastsWindow))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(BeastsWindow))
 
-	BeastsList = List = Window.GetControl (0)
+	BeastsList = List = BeastsWindow.GetControl (0)
 	List.SetVarAssoc ('SelectedBeast', -1)
 	List.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, OnJournalBeastSelect)
 
-	BeastImage = Window.CreateButton (8, 19, 19, 281, 441)
+	BeastImage = BeastsWindow.CreateButton (8, 19, 19, 281, 441)
 	BeastImage.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
-	BeastDesc = Window.GetControl (2)
+	BeastDesc = BeastsWindow.GetControl (2)
 	
 	EvaluateAllBeasts ()
 	PopulateBeastsList ()
@@ -355,31 +333,22 @@ def EvaluateAllBeasts ():
 ###################################################
 
 def OpenLogWindow ():
-	global LogWindow
-		
-	if LogWindow:
-		if LogWindow:
-			LogWindow.Unload()
-		LogWindow = None
-
-		return
-	
-	LogWindow = Window = GemRB.LoadWindow (3)
+	LogWindow = GemRB.LoadWindow (3)
 
 	# Back
-	Button = Window.GetControl (1)
+	Button = LogWindow.GetControl (1)
 	Button.SetText (46677)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLogWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LogWindow.Close())
 	Button.MakeEscape()
 	Button.Focus()
 
 	# Done
-	Button = Window.GetControl (0)
+	Button = LogWindow.GetControl (0)
 	Button.SetText (20636)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(OpenLogWindow))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CloseAll(LogWindow))
 
 	# text area
-	Text = Window.GetControl (2)
+	Text = LogWindow.GetControl (2)
 
 	# limit the log to the last entries (original did something similar)
 	js = GemRB.GetJournalSize (0)
@@ -405,7 +374,7 @@ def OpenLogWindow ():
 		journalText += " " + GemRB.GetString (je['Text']) + "\n\n"
 			
 	Text.Append(journalText)
-	Window.Focus()
+	LogWindow.Focus()
 	
 ###################################################
 # End of file GUIJRNL.py
