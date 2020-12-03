@@ -2322,7 +2322,7 @@ bool GameControl::OnControllerButtonDown(const ControllerEvent& ce)
 		case CONTROLLER_BUTTON_Y:
 			return core->GetGUIScriptEngine()->RunFunction("GUIINV", "ToggleInventoryWindow", false);
 		case CONTROLLER_BUTTON_X:
-			return core->GetGUIScriptEngine()->RunFunction("GUIMAP", "ToggleMapWindow", false);
+			return core->GetGUIScriptEngine()->RunFunction("GUIMA", "ToggleMapWindow", false);
 		case CONTROLLER_BUTTON_BACK:
 			core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
 			return true;
