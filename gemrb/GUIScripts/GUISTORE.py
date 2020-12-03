@@ -496,7 +496,7 @@ def InitStoreIdentifyWindow (Window):
 	# Identify
 	LeftButton = Button = Window.GetControlAlias ('IDLBTN')
 	Button.SetText (strrefs["identify"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyPressed)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: IdentifyPressed (Window))
 	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 
 	# price ...
@@ -517,7 +517,7 @@ def InitStoreIdentifyWindow (Window):
 
 		Button = Window.GetControl (i+8)
 		Button.SetBorder (0, color, 0, 1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SelectID)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SelectID (Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
@@ -1041,7 +1041,7 @@ def UnselectNoRedraw ():
 			GemRB.ChangeStoreItem (pc, inventory_slots[Slot], SHOP_SELL|SHOP_SELECT)
 			# same code for ID, so no repeat needed
 
-def SelectID ():
+def SelectID (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Index = GemRB.GetVar ("Index")
 	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID|SHOP_SELECT)
@@ -1466,7 +1466,7 @@ def RedrawStoreIdentifyWindow (Window):
 		Label.SetText (str(0) )
 	return
 
-def IdentifyPressed ():
+def IdentifyPressed (Window):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Count = len(inventory_slots)
 
@@ -1484,7 +1484,6 @@ def IdentifyPressed ():
 		return
 
 	# identify
-	Window = StoreIdentifyWindow
 	TextArea = Window.GetControl (23)
 	for i in toID:
 		GemRB.ChangeStoreItem (pc, inventory_slots[i], SHOP_ID)
@@ -1497,7 +1496,7 @@ def IdentifyPressed ():
 		TextArea.Append("\n\n\n")
 	GemRB.GameSetPartyGold (EndGold)
 
-	UpdateStoreIdentifyWindow ()
+	UpdateStoreIdentifyWindow (Window)
 	return
 
 def InfoIdentifyWindow ():
