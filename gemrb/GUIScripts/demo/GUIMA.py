@@ -26,44 +26,84 @@ import GUICommonWindows
 import GUIMACommon
 from GUIDefines import *
 
-MapWindow = None
 WorldMapControl = None
+AreaMapControl = None
 
-def InitMapWindow (Window):
-	global MapWindow
-	MapWindow = Window
+def InitMapWindow (Window, WorldMap = False, Travel = -1):
+	global WorldMapControl, AreaMapControl
 
 	Label = Window.GetControl (0)
-	Label.SetText ("Area map")
+	if WorldMap:
+		Label.SetText ("World map")
+	else:
+		Label.SetText ("Area map")
 
 	# World Map
 	Button = Window.GetControl (1)
-	Button.SetText ("WMAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenWorldMapWindow())
+	if WorldMap:
+		Button.SetText ("MAP")
+	else:
+		Button.SetText ("WMAP")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InitMapWindow (Window, not WorldMap, Travel))
 
-	# Map Control
-	Map = Window.ReplaceSubview (2, IE_GUI_MAP)
-	Map.SetAction (lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+	# Map or World Map control
+	if WorldMap:
+		if AreaMapControl:
+			AreaMapControl.SetVisible (False)
+			AreaMapControl.SetDisabled (True)
+
+		if WorldMapControl:
+			WorldMapControl.SetVisible (True)
+			WorldMapControl.SetDisabled (False)
+		else:
+			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, Travel, "floattxt")
+			WorldMapControl.SetAnimation ("WMDAG")
+			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+			WorldMapControl.SetAction (ChangeTooltip, IE_ACT_MOUSE_ENTER)
+
+		# center on current area
+		WorldMapControl.Scroll (0, 0, False)
+		WorldMapControl.Focus ()
+	else:
+		if WorldMapControl:
+			WorldMapControl.SetVisible (False)
+			WorldMapControl.SetDisabled (True)
+
+		if AreaMapControl:
+			AreaMapControl.SetVisible (True)
+			AreaMapControl.SetDisabled (False)
+		else:
+			AreaMapControl = Window.ReplaceSubview (4, IE_GUI_MAP)
+			AreaMapControl.SetAction (CloseMapWindow, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+		AreaMapControl.Focus ()
 
 	Button = Window.GetControl (3)
 	Button.SetText ("Close")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
 	Button.SetHotKey ('m')
 
-	Map.Focus ()
+	# workaround for proper closure with ESC
+	Button = Window.GetControl (99)
+	if not Button:
+		Button = Window.CreateButton (99, 0, 0, 0, 0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
+	Button.MakeEscape ()
+
 	return
 
-def InitWorldMapWindow (Window):
-	WorldMapWindowCommon (Window, -1)
-	return
+def CloseMapWindow ():
+	global WorldMapControl, AreaMapControl
+
+	WorldMapControl = None
+	AreaMapControl = None
+	GUICommonWindows.CloseTopWindow ()
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
-OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
 def OpenTravelWindow ():
-	Window = OpenWorldMapWindow ()
-	WorldMapWindowCommon (Window, GemRB.GetVar ("Travel"))
+	Window = OpenMapWindow ()
+	InitMapWindow (Window, True, GemRB.GetVar ("Travel"))
 	return
 
 def ChangeTooltip ():
@@ -77,36 +117,4 @@ def ChangeTooltip ():
 			tt = "%s: %d"%(str,area["Distance"])
 
 	WorldMapControl.SetTooltip (tt)
-	return
-
-def WorldMapWindowCommon (Window, Travel):
-	global WorldMapControl
-
-	Label = Window.GetControl (0)
-	Label.SetText ("World map")
-
-	Button = Window.GetControl (1)
-	Button.SetText ("MAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
-
-	WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, Travel, "floattxt")
-	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
-	WorldMapControl.SetAction (ChangeTooltip, IE_ACT_MOUSE_ENTER)
-	# center on current area
-	MapC()
-
-	Button = Window.GetControl (3)
-	Button.SetText ("Close")
-	if Travel >= 0:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
-	else:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
-	Button.SetHotKey ('m')
-
-	WorldMapControl.Focus ()
-	return
-
-def MapC():
-	WorldMapControl.Scroll (0, 0, False)
 	return
