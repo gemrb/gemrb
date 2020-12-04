@@ -282,9 +282,11 @@ public:
 #define SLOT_EFFECT_HEAD     7 //head slot
 
 //fog of war bits
-#define FOG_DRAWFOG       1
-#define FOG_DRAWSEARCHMAP 2
-#define FOG_DITHERSPRITES 4
+#define FOG_DRAW_UNEXPLORED 1
+#define FOG_DRAW_INVISIBLE  2
+#define FOG_DRAW_ALL        (FOG_DRAW_UNEXPLORED | FOG_DRAW_INVISIBLE)
+#define FOG_DRAWSEARCHMAP   4
+#define FOG_DITHERSPRITES   8
 
 enum PluginFlagsType {
 	PLF_NORMAL,

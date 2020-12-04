@@ -939,6 +939,8 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			// edges are always foggy
 			return false;
 		}
+		
+		if (mask == nullptr) return true;
 
 		div_t res = div(size.w * y + x, 8);
 		return bool(mask[res.quot] & (1 << res.rem));
@@ -1452,14 +1454,21 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
-
-	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
-		DrawSearchMap(viewport);
-	} else {
-		if ((core->FogOfWar&FOG_DRAWFOG)) {
-			DrawFogOfWar(ExploredBitmap, VisibleBitmap, viewport);
+	
+	uint8_t* exploredBits = nullptr;
+	uint8_t* visibleBits = nullptr;
+	if ((core->FogOfWar & FOG_DRAWSEARCHMAP) == 0) {
+		if (core->FogOfWar & FOG_DRAW_UNEXPLORED) {
+			exploredBits = ExploredBitmap;
 		}
+		if (core->FogOfWar & FOG_DRAW_INVISIBLE) {
+			visibleBits = VisibleBitmap;
+		}
+	} else {
+		DrawSearchMap(viewport);
 	}
+	
+	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
 	while (true) {
@@ -1722,6 +1731,8 @@ uint32_t Map::SetDrawingStencilForAreaAnimation(AreaAnimation* anim, const Regio
 
 void Map::DrawSearchMap(const Region &vp) const
 {
+	assert(SrchMap);
+
 	static const Color inaccessible = ColorGray;
 	static const Color impassible(128, 64, 64, 0xff); // red-ish
 	static const Color sidewall(64, 64, 128, 0xff); // blue-ish

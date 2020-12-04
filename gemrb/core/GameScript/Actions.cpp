@@ -6995,12 +6995,12 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar|=FOG_DRAWFOG;
+	core->FogOfWar |= FOG_DRAW_ALL;
 }
 
 void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar&=~FOG_DRAWFOG;
+	core->FogOfWar &= ~FOG_DRAW_ALL;
 }
 
 void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)

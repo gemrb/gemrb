@@ -1063,7 +1063,8 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case '5':
 				{
-					static uint32_t wallFlags[6]{
+					constexpr int flagCnt = 6;
+					static uint32_t wallFlags[flagCnt]{
 						0,
 						DEBUG_SHOW_DOORS_SECRET,
 						DEBUG_SHOW_DOORS_DISABLED,
@@ -1074,7 +1075,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					static uint32_t flagIdx = 0;
 					DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
 					DebugFlags |= wallFlags[flagIdx++];
-					flagIdx = flagIdx % 6;
+					flagIdx = flagIdx % flagCnt;
 				}
 				break;
 			case '6': //show the lightmap
@@ -1082,8 +1083,18 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				Log(MESSAGE, "GameControl", "Show lightmap %s", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
-				core->FogOfWar ^= FOG_DRAWFOG;
-				Log(MESSAGE, "GameControl", "Show Fog-Of-War: %s", core->FogOfWar & FOG_DRAWFOG ? "ON" : "OFF");
+				{
+					constexpr int flagCnt = 3;
+					static uint32_t fogFlags[flagCnt]{
+						0,
+						FOG_DRAW_INVISIBLE,
+						FOG_DRAW_UNEXPLORED,
+					};
+					static uint32_t flagIdx = 0;
+					core->FogOfWar &= ~FOG_DRAW_ALL;
+					core->FogOfWar |= fogFlags[flagIdx++];
+					flagIdx = flagIdx % flagCnt;
+				}
 				break;
 			case '8': //show searchmap over area
 				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
