@@ -271,27 +271,27 @@ def InitStoreShoppingWindow (Window):
 	if GameCheck.IsPST():
 		# remap controls, so we can avoid too many ifdefs
 		# strings must be able to fit into a resref (<= 8 char)
-		aliases = { 'STOLBTN' : 0, 'STORBTN' : 1, 'STODONAT' : 7,
-					'STOTEDIT' : 8, 'STOPLUS' : 9, 'STOMINUS' : 10,
-					'???' : 11, 'STOSBARR' : 16, 'STOSBARL' : 110,
+		aliases = { 'STOLBTN' : 0, 'STORBTN' : 1,
+					'STOSBARR' : 16, 'STOSBARL' : 7,
 
 					'PRICEB' : 0x10000003, 'PRICES' : 0x10000004,
 					'STOTITLE' : 0x10000001, 'STONAME' : 0x10000005, 'STOGOLD' : 0x10000002,
 					}
 
+		Window.AliasControls ({'LBTN' + str(x) : x+8 for x in range(ItemButtonCount)})
 		Window.AliasControls ({'RBTN' + str(x) : x+17 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'RLBL' + str(x) : x+0x10000014 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'LLBL' + str(x) : x+0x1000000b for x in range(ItemButtonCount)} )
 
 	else:
-		aliases = { 'STOLBTN' : 2, 'STORBTN' : 3, 'STODONAT' : 110,
-					'STOTEDIT' : 7, 'STOPLUS' : 5, 'STOMINUS' : 6,
-					'???' : 8, 'STOSBARR' : 12, 'STOSBARL' : 11,
+		aliases = { 'STOLBTN' : 2, 'STORBTN' : 3,
+					'STOSBARR' : 12, 'STOSBARL' : 11,
 
 					'PRICEB' : 0x1000002b, 'PRICES' : 0x1000002c,
 					'STOTITLE' : 0x10000003, 'STONAME' : 0x1000002e, 'STOGOLD' : 0x1000002a,
 					}
 
+		Window.AliasControls ({'LBTN' + str(x) : x+5 for x in range(ItemButtonCount)})
 		Window.AliasControls ({'RBTN' + str(x) : x+13 for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'RLBL' + str(x) : x+0x1000001e for x in range(ItemButtonCount)} )
 		Window.AliasControls ({'LLBL' + str(x) : x+0x10000012 for x in range(ItemButtonCount)} )
@@ -349,7 +349,7 @@ def InitStoreShoppingWindow (Window):
 		else:
 			color = {'r' : 32, 'g' : 32, 'b' : 192, 'a' : 128}
 
-		Button = Window.GetControl (i+5)
+		Button = Window.GetControlAlias ('LBTN' + str(i))
 		Button.SetBorder (0,color,0,1)
 		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
 		Button.SetBorder (1, color, 0,1)
@@ -359,7 +359,7 @@ def InitStoreShoppingWindow (Window):
 		Button.SetFont ("NUMBER")
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
 
-		Button = Window.GetControl (i+13)
+		Button = Window.GetControlAlias ('RBTN' + str(i))
 		if GameCheck.IsBG2():
 			Button.SetSprites ("GUIBTBUT", 0, 0,1,2,5)
 
@@ -439,7 +439,7 @@ def UpdateStoreShoppingWindow (Window):
 	LeftCount = Store['StoreItemCount'] - ItemButtonCount
 	if LeftCount<0:
 		LeftCount=0
-	ScrollBar = Window.GetControl (11)
+	ScrollBar = Window.GetControlAlias ('STOSBARL')
 	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
@@ -453,7 +453,7 @@ def UpdateStoreShoppingWindow (Window):
 	if RightCount<0:
 		RightCount=0
 
-	ScrollBar = Window.GetControl (12)
+	ScrollBar = Window.GetControlAlias ('STOSBARR')
 	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	if RightTopIndex>RightCount:
@@ -1236,7 +1236,7 @@ def RedrawStoreShoppingWindow (Window):
 				Price = 1
 			SellSum = SellSum + Price
 
-	Label = Window.GetControl (0x1000002b)
+	Label = Window.GetControlAlias ('PRICEB')
 	if Inventory:
 		Label.SetText ("")
 	else:
@@ -1257,7 +1257,7 @@ def RedrawStoreShoppingWindow (Window):
 	else:
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 
-	Label = Window.GetControl (0x1000002c)
+	Label = Window.GetControlAlias ('PRICES')
 	if Inventory:
 		Label.SetText ("")
 	else:
@@ -1283,8 +1283,8 @@ def RedrawStoreShoppingWindow (Window):
 			Slot = GemRB.GetStoreItem (i+LeftTopIndex)
 		else:
 			Slot = None
-		Button = Window.GetControl (i+5)
-		Label = Window.GetControl (0x10000012+i)
+		Button = Window.GetControlAlias ('LBTN' + str(i))
+		Label = Window.GetControlAlias ('LLBL' + str(i))
 		Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_STORE, idx)
 
@@ -1295,8 +1295,8 @@ def RedrawStoreShoppingWindow (Window):
 				Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
 			Slot = None
-		Button = Window.GetControl (i+13)
-		Label = Window.GetControl (0x1000001e+i)
+		Button = Window.GetControlAlias ('RBTN' + str(i))
+		Label = Window.GetControlAlias ('RLBL' + str(i))
 		Button.SetVarAssoc ("RightIndex", RightTopIndex+i)
 		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
 
