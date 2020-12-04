@@ -812,11 +812,11 @@ def UpdateStoreHealWindow (Window):
 			Label.SetText ("")
 
 		if TopIndex+i==Index:
-			TextArea = Window.GetControl (23)
+			TextArea = Window.GetControlAlias ("HWTA")
 			TextArea.SetText (Cure['Description'])
-			Label = Window.GetControl (0x10000003)
+			Label = Window.GetControlAlias ("HWPRICE")
 			Label.SetText (str(Cure['Price']) )
-			Button = Window.GetControl (5)
+			Button = Window.GetControlAlias ("HEALBTN")
 			Button.SetDisabled (False)
 	return
 
@@ -1869,7 +1869,7 @@ def InfoHealWindow ():
 	Label = Window.GetControl (0x10000000)
 	Label.SetText (Spell['SpellName'])
 
-	Button = Window.GetControlAlias ("STOLBTN")
+	Button = Window.GetControl (2)
 	Button.SetSpellIcon (Cure['CureResRef'], 1)
 	if GameCheck.IsPST():
 		Button = Window.GetControl (6)
