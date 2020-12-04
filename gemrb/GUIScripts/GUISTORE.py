@@ -479,13 +479,13 @@ def InitStoreIdentifyWindow (Window):
 								'IDPRICE' : 0x10000001, 'STOGOLD' : 0x10000000,
 								'STOTITLE' : 0x0fffffff, 'STONAME' : 0x10000002
 							  } )
-		Window.AliasControls ({'IDBTN' + str(x) : 9-x for x in range(ItemButtonCount)} )
+		Window.AliasControls ({'IDBTN' + str(x) : 6+x for x in range(ItemButtonCount)})
 	else:
 		Window.AliasControls ({ 'IDSBAR' : 7, 'IDLBTN' : 5, 'IDTA' : 23,
 								'IDPRICE' : 0x10000003, 'STOGOLD' : 0x10000001,
 								'STOTITLE' : 0x10000000, 'STONAME' : 0x10000005
 							  } )
-		Window.AliasControls ({'IDBTN' + str(x) : 11-x for x in range(ItemButtonCount)} )
+		Window.AliasControls ({'IDBTN' + str(x) : 8+x for x in range(ItemButtonCount)})
 
 	ScrollBar = Window.GetControlAlias ('IDSBAR')
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RedrawStoreIdentifyWindow(Window))
@@ -515,7 +515,7 @@ def InitStoreIdentifyWindow (Window):
 		else:
 			color = {'r' : 0, 'g' : 0, 'b' : 128, 'a' : 160}
 
-		Button = Window.GetControl (i+8)
+		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		Button.SetBorder (0, color, 0, 1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SelectID (Window))
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InfoIdentifyWindow)
@@ -631,7 +631,7 @@ def UpdateStoreStealWindow (Window):
 	Store = GemRB.GetStore ()
 	LeftCount = Store['StoreItemCount']
 	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount-ItemButtonCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", max(0, LeftCount - ItemButtonCount))
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
@@ -1414,7 +1414,7 @@ def RedrawStoreIdentifyWindow (Window):
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[TopIndex+i])
 		else:
 			Slot = None
-		Button = Window.GetControl (i+8)
+		Button = Window.GetControlAlias ("IDBTN" + str(i))
 		# TODO: recheck iwd2 vs non-pst really differ
 		if GameCheck.IsIWD2():
 			Label = Window.GetControl (0x1000000d+i)
@@ -1456,8 +1456,8 @@ def RedrawStoreIdentifyWindow (Window):
 			Button.SetText ("")
 			Label.SetText ("")
 
-	Button = Window.GetControl (5)
-	Label = Window.GetControl (0x10000003)
+	Button = Window.GetControlAlias ("IDLBTN")
+	Label = Window.GetControlAlias ("IDPRICE")
 	if Selected:
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
 		Label.SetText (str(IDPrice * Selected) )
@@ -1484,7 +1484,7 @@ def IdentifyPressed (Window):
 		return
 
 	# identify
-	TextArea = Window.GetControl (23)
+	TextArea = Window.GetControlAlias ("IDTA")
 	for i in toID:
 		GemRB.ChangeStoreItem (pc, inventory_slots[i], SHOP_ID)
 		Slot = GemRB.GetSlotItem (pc, inventory_slots[i])
