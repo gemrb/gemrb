@@ -1542,19 +1542,24 @@ def InfoWindow (Slot, Item):
 		NameLabel = Window.GetControl (0x10000000)
 		FakeLabel = Window.GetControl (0x10000007)
 	elif GameCheck.IsPST():
-		Window.ReassignControls ((4,3,6), (5,4,7))
 		NameLabel = Window.GetControl (0x0fffffff)
 		FakeLabel = Window.GetControl (0x10000000)
 	else:
 		NameLabel = Window.GetControl (0x10000007)
 		FakeLabel = Window.GetControl (0x10000000)
 
+	if GameCheck.IsPST():
+		aliases = { "INFTA": 4, "INFBTN": 3, "INFIMG": 6 }
+	else:
+		aliases = { "INFTA": 5, "INFBTN": 4, "INFIMG": 7 }
+	Window.AliasControls (aliases)
+
 	#fake label
 	FakeLabel.SetText ("")
 
 	#description bam
 	if GameCheck.IsBG1() or GameCheck.IsBG2() or GameCheck.IsPST():
-		Button = Window.GetControl (7)
+		Button = Window.GetControlAlias ("INFIMG")
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES | IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if GameCheck.IsPST():
@@ -1568,7 +1573,7 @@ def InfoWindow (Slot, Item):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 	Button.SetItemIcon (Slot['ItemResRef'], 0)
 
-	TextArea = Window.GetControl (5)
+	TextArea = Window.GetControlAlias ("INFTA")
 	if Identify:
 		NameLabel.SetText (Item['ItemNameIdentified'])
 		TextArea.SetText (Item['ItemDescIdentified'])
@@ -1577,7 +1582,7 @@ def InfoWindow (Slot, Item):
 		TextArea.SetText (Item['ItemDesc'])
 
 	#Done
-	Button = Window.GetControl (4)
+	Button = Window.GetControlAlias ("INFBTN")
 	Button.SetText (strrefs["done"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
@@ -1867,17 +1872,18 @@ def InfoHealWindow ():
 	Button = Window.GetControlAlias ("STOLBTN")
 	Button.SetSpellIcon (Cure['CureResRef'], 1)
 	if GameCheck.IsPST():
-		Window.ReassignControls ((3,4), (5,3))
 		Button = Window.GetControl (6)
 		Button.SetSpellIcon (Cure['CureResRef'], 2)
+		aliases = { "HEALBTN": 3, "HEALTA": 4 }
 	else:
-		pass
+		aliases = { "HEALBTN": 5, "HEALTA": 3 }
+	Window.AliasControls (aliases)
 
-	TextArea = Window.GetControl (3)
+	TextArea = Window.GetControlAlias ("HEALTA")
 	TextArea.SetText (Spell['SpellDesc'])
 
 	#Done
-	Button = Window.GetControl (5)
+	Button = Window.GetControlAlias ("HEALBTN")
 	Button.SetText (strrefs["done"])
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
