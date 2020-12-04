@@ -154,10 +154,23 @@ the intro and logo videos are skipped to save developer's nerves. The default is
 .IR 0 .
 
 .TP
-.BR FogOfWar =(0|1)
-If set to
-.IR 1 ,
-the unexplored parts of an area are blacked out. It is enabled by default.
+.BR GCDebug =(0|2047)
+Bitfield with reserved bits for drawing Map debug layers.
+  No Debugging features = 0 (default)
+  DEBUG_SHOW_INFOPOINTS   		= 0x01
+  DEBUG_SHOW_CONTAINERS   		= 0x02
+  DEBUG_SHOW_DOORS				= 0x04
+  DEBUG_SHOW_DOORS_SECRET		= 0x08
+  DEBUG_SHOW_DOORS_DISABLED		= 0x10
+  DEBUG_SHOW_DOORS_ALL			= (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET|DEBUG_SHOW_DOORS_DISABLED)
+  DEBUG_SHOW_LIGHTMAP     		= 0x20
+  DEBUG_SHOW_WALLS				= 0x40
+  DEBUG_SHOW_WALLS_ANIM_COVER	= 0x80
+  DEBUG_SHOW_WALLS_ALL			= (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER)
+  DEBUG_SHOW_SEARCHMAP			= 0x0100
+  DEBUG_SHOW_FOG_UNEXPLORED		= 0x0200
+  DEBUG_SHOW_FOG_INVISIBLE		= 0x0400
+  DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE)
 
 
 .\"###################################################

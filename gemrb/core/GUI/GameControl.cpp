@@ -56,6 +56,8 @@ ieDword formationcount;
 static formation_type *formations=NULL;
 static ieResRef TestSpell="SPWI207";
 
+uint32_t GameControl::DebugFlags = 0;
+
 //If one of the actors has tracking on, the gamecontrol needs to display
 //arrow markers on the edges to point at detected monsters
 //tracterID is the tracker actor's global ID
@@ -1066,11 +1068,11 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					constexpr int flagCnt = 6;
 					static uint32_t wallFlags[flagCnt]{
 						0,
+						DEBUG_SHOW_WALLS_ALL,
 						DEBUG_SHOW_DOORS_SECRET,
 						DEBUG_SHOW_DOORS_DISABLED,
 						DEBUG_SHOW_WALLS,
-						DEBUG_SHOW_WALLS_ANIM_COVER,
-						DEBUG_SHOW_WALLS_ALL
+						DEBUG_SHOW_WALLS_ANIM_COVER
 					};
 					static uint32_t flagIdx = 0;
 					DebugFlags &= ~DEBUG_SHOW_WALLS_ALL;
@@ -1084,21 +1086,23 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case '7': //toggles fog of war
 				{
-					constexpr int flagCnt = 3;
+					constexpr int flagCnt = 4;
 					static uint32_t fogFlags[flagCnt]{
 						0,
-						FOG_DRAW_INVISIBLE,
-						FOG_DRAW_UNEXPLORED,
+						DEBUG_SHOW_FOG_ALL,
+						DEBUG_SHOW_FOG_INVISIBLE,
+						DEBUG_SHOW_FOG_UNEXPLORED
 					};
 					static uint32_t flagIdx = 0;
-					core->FogOfWar &= ~FOG_DRAW_ALL;
-					core->FogOfWar |= fogFlags[flagIdx++];
+					DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+					DebugFlags |= fogFlags[flagIdx++];
 					flagIdx = flagIdx % flagCnt;
 				}
 				break;
-			case '8': //show searchmap over area
-				core->FogOfWar ^= FOG_DRAWSEARCHMAP;
-				Log(MESSAGE, "GameControl", "Show searchmap %s", core->FogOfWar & FOG_DRAWSEARCHMAP ? "ON" : "OFF");
+			case '8': //show searchmap over area, we also clear the fog for debug purposes, but you can manually toggle it back on
+				DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
+				DebugFlags |= DEBUG_SHOW_FOG_ALL;
+				Log(MESSAGE, "GameControl", "Show searchmap %s", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
 				break;
 		}
 		return true; //return from cheatkeys

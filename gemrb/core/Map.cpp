@@ -1455,19 +1455,12 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
 	
-	uint8_t* exploredBits = nullptr;
-	uint8_t* visibleBits = nullptr;
-	if ((core->FogOfWar & FOG_DRAWSEARCHMAP) == 0) {
-		if (core->FogOfWar & FOG_DRAW_UNEXPLORED) {
-			exploredBits = ExploredBitmap;
-		}
-		if (core->FogOfWar & FOG_DRAW_INVISIBLE) {
-			visibleBits = VisibleBitmap;
-		}
-	} else {
+	if ((dFlags & DEBUG_SHOW_SEARCHMAP)) {
 		DrawSearchMap(viewport);
 	}
 	
+	uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap;
+	uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap;
 	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
@@ -1684,7 +1677,7 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	uint32_t flags = BLIT_STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
 		flags |= BLIT_STENCIL_ALPHA;
-	} else if (core->FogOfWar&FOG_DITHERSPRITES) {
+	} else if (core->DitherSprites) {
 		// dithering is set to disabled
 		flags |= BLIT_STENCIL_BLUE;
 	} else if (scriptable->Type == ST_ACTOR) {

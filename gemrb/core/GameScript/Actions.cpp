@@ -6995,22 +6995,22 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar |= FOG_DRAW_ALL;
+	core->GetGameControl()->DebugFlags |= DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar &= ~FOG_DRAW_ALL;
+	core->GetGameControl()->DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar&=~FOG_DITHERSPRITES;
+	core->DitherSprites = true;
 }
 
 void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar |= FOG_DITHERSPRITES;
+	core->DitherSprites = false;
 }
 
 //the PST crew apparently loved hardcoding stuff

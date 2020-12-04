@@ -99,7 +99,6 @@ private:
 	int lastCursor;
 	short moveX, moveY;
 	int numScrollCursor;
-	int DebugFlags;
 	Point pfs;
 	PathNode* drawPath;
 	unsigned long AIUpdateCounter;
@@ -119,6 +118,8 @@ private:
 	EventMgr::TapMonitorId eventMonitors[2];
 
 public:
+	static uint32_t DebugFlags;
+
 	DialogHandler *dialoghandler;
 	//the name of the spell to cast
 	ieResRef spellName;

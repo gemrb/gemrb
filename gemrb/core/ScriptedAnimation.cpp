@@ -684,7 +684,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
 		if (dither) {
 			flags |= BLIT_STENCIL_ALPHA;
-		} else if (core->FogOfWar&FOG_DITHERSPRITES) {
+		} else if (core->DitherSprites) {
 			flags |= BLIT_STENCIL_BLUE;
 		} else {
 			flags |= BLIT_STENCIL_RED;

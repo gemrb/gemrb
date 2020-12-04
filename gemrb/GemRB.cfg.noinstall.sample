@@ -129,8 +129,8 @@ GUIEnhancements = 15
 # Draw Frames per Second info [Boolean]
 #DrawFPS=1
 
-# Hide unexplored parts of a map
-#FogOfWar=1
+# Show unexplored parts of a map
+#GCDebug=1536
 
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt
 #   full listing

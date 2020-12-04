@@ -169,7 +169,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		video->BlitSprite( MapMOS.get(), mosRgn.x, mosRgn.y, NULL );
 	}
 
-	if (core->FogOfWar & FOG_DRAW_UNEXPLORED)
+	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)
 		DrawFog(mosRgn);
 
 	Region vp = GetViewport();

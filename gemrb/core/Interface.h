@@ -281,13 +281,6 @@ public:
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
 #define SLOT_EFFECT_HEAD     7 //head slot
 
-//fog of war bits
-#define FOG_DRAW_UNEXPLORED 1
-#define FOG_DRAW_INVISIBLE  2
-#define FOG_DRAW_ALL        (FOG_DRAW_UNEXPLORED | FOG_DRAW_INVISIBLE)
-#define FOG_DRAWSEARCHMAP   4
-#define FOG_DITHERSPRITES   8
-
 enum PluginFlagsType {
 	PLF_NORMAL,
 	PLF_SKIP,
@@ -803,7 +796,7 @@ public:
 	std::vector<std::string> ModPath;
 	int Width, Height, Bpp;
 	int IgnoreOriginalINI;
-	unsigned int FogOfWar;
+	bool DitherSprites = true;
 	bool CaseSensitive, DrawFPS;
 	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;

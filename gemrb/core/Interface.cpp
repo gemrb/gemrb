@@ -176,7 +176,6 @@ Interface::Interface()
 
 	GameType[0] = '\0';
 	CheatFlag = false;
-	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
 	EventFlag = EF_CONTROL;
 #ifndef WIN32
@@ -1246,7 +1245,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("DrawFPS", DrawFPS = );
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
-	CONFIG_INT("FogOfWar", FogOfWar = );
+	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
