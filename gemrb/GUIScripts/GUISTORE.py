@@ -161,7 +161,7 @@ def PositionStoreWinRelativeTo(win):
 
 def OpenStoreWindow ():
 	global Store
-	global StoreWindow, MenuWindow
+	global StoreWindow
 	global store_funcs
 	global SpellTable, RepModTable
 	global Inventory, BarteringPC
@@ -214,9 +214,6 @@ def OpenStoreWindow ():
 		# IWD2 has weird overlay windows
 		StoreWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.AddAlias("WIN_STORE")
-
-	if GameCheck.IsPST():
-		MenuWindow = GemRB.LoadWindow (2)
 
 	PositionStoreWinRelativeTo(topwin)
 
