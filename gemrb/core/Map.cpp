@@ -3320,23 +3320,17 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	if (!(core->FogOfWar&FOG_DRAWFOG) ) {
-		SetMapVisibility( -1 );
-		Explore(-1);
-	} else {
-		SetMapVisibility( 0 );
-	}
-
 	for (size_t i = 0; i < actors.size(); i++) {
 		const Actor *actor = actors[i];
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
-		if (core->FogOfWar&FOG_DRAWFOG) {
-			int state = actor->Modified[IE_STATE_ID];
-			if (state & STATE_CANTSEE) continue;
-			int vis2 = actor->Modified[IE_VISUALRANGE];
-			if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-			ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
-		}
+		
+		int state = actor->Modified[IE_STATE_ID];
+		if (state & STATE_CANTSEE) continue;
+		
+		int vis2 = actor->Modified[IE_VISUALRANGE];
+		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
+		ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
+		
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);
