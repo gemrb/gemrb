@@ -46,8 +46,7 @@ def OnLoad():
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	smallID = smallMTA.ID
 
-	# FIXME: I dont know what this TextEdit is for
-	# if we need it, then we should hide it until it is used because it is being drawn in the same area as the MEssageTA
+	# remove the cheat input textedit
 	OptionsWindow.RemoveSubview(OptionsWindow.GetControl(3))
 
 	ActionsWindow = GUICommonWindows.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
