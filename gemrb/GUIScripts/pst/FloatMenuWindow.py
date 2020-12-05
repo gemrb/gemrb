@@ -101,7 +101,7 @@ def DoSingleAction ():
 		pc = GemRB.GameGetFirstSelectedPC ()
 		ClassName = GUICommon.GetClassRowName (pc)
 		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
-			GUIMG.OpenMageWindow ()
+			GUIMG.OpenSpellWindow ()
 		else:
 			GUIPR.OpenPriestWindow ()
 
