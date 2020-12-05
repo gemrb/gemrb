@@ -2216,7 +2216,7 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 	}
 
 	// handle movement/travel, but not if we just opened the float window
-	if (!core->HasFeature(GF_HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) {
+	if ((!core->HasFeature(GF_HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) && lastCursor != IE_CURSOR_BLOCKED) {
 		CommandSelectedMovement(p, Mod & GEM_MOD_SHIFT, isDoubleClick);
 	}
 	ClearMouseState();
