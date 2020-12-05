@@ -265,13 +265,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		if iwd2:
 			UpdateClock ()
 
-	# Rest
-	Button = Window.GetControl (rb)
-	if Button:
-		Button.SetTooltip (OptionTip['Rest'])
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
-
-	# BG1 doesn't have a rest button on the main window, so this creates one 
+	# BG1 doesn't have a rest button on the main window, so this creates one
 	# from what would be the multiplayer arbitration control
 	if bg1:
 		Button = Window.GetControl (8)
@@ -280,6 +274,11 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		Button.SetSize(55,37)
 		Button.SetPos(4,359)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
+		rb = 8
+
+	# Rest
+	Button = Window.GetControl (rb)
+	if Button:
 		Button.SetTooltip (OptionTip['Rest'])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
