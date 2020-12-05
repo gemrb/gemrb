@@ -39,6 +39,9 @@ def DialogStarted ():
 	GUICommonWindows.CloseTopWindow()
 	CommonWindow.CloseContainerWindow()
 
+	# disable the 1-6 hotkeys, so they'll work for choosing answers
+	GUICommonWindows.UpdatePortraitWindow (True)
+
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
