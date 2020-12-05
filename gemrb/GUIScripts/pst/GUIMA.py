@@ -28,6 +28,8 @@ import GUICommonWindows
 import GUIMACommon
 from GUIDefines import *
 
+WorldMapControl = None
+
 ###################################################
 def InitMapWindow (Window):
 	Window.AddAlias("WIN_MAP")
@@ -81,13 +83,15 @@ def InitMapWindow (Window):
 	return
 
 def OpenTravelWindow ():
+	global WorldMapControl
+
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
 
-	WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "FONTDLG")
+	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0x84, 'g' : 0x4a, 'b' : 0x2c, 'a' : 0x00})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
