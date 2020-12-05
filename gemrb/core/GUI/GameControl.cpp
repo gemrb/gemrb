@@ -2207,8 +2207,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		InitFormation(p);
 	}
 
-	// handle movement/travel
-	CommandSelectedMovement(p, Mod & GEM_MOD_SHIFT, isDoubleClick);
+	// handle movement/travel, but not if we just opened the float window
+	if (!core->HasFeature(GF_HAS_FLOAT_MENU) || me.button != GEM_MB_MENU) {
+		CommandSelectedMovement(p, Mod & GEM_MOD_SHIFT, isDoubleClick);
+	}
 	ClearMouseState();
 	return true;
 }
