@@ -45,7 +45,7 @@ CID_WEAPONS = 2
 CID_SPELLS = 3
 CID_ITEMS = 4
 CID_ABILITIES = 5
-# FIXME: there are buttons 6-10 we hide completely. What are they?
+# buttons 6-10 are completely redundant
 CID_HANDLE1 = 11
 CID_HANDLE2 = 12
 CID_PREV = 13
@@ -128,7 +128,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 			UseSpell()
 		return
 
-	ActionLevel = 0
 	if not GemRB.GameGetFirstSelectedPC ():
 		return
 
@@ -188,7 +187,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuNextItem)
 
 	# 6 - 10 - items/spells/other
-	for i in range (6, 11):
+	for i in range (CID_ABILITIES + 1, CID_HANDLE1):
 		Window.DeleteControl (i)
 
 	# 15 - 19 - empty item slot
