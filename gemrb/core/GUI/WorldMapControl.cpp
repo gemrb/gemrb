@@ -21,7 +21,9 @@
 
 #include "win32def.h"
 #include "ie_cursors.h"
+#include "strrefs.h"
 
+#include "DisplayMessage.h"
 #include "Game.h"
 #include "Interface.h"
 #include "WorldMap.h"
@@ -202,8 +204,8 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 			Area=ae;
 			if(oldArea!=ae) {
-				String* str = core->GetString(23084);
-				if (str) {
+				String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
+				if (str && !str->empty()) {
 					wchar_t dist[10];
 					swprintf(dist, 10, L": %d", worldmap->GetDistance(Area->AreaName));
 					SetTooltip(*str + dist);

@@ -231,8 +231,9 @@ namespace GemRB {
 #define STR_DAMAGE_DETAIL1 196
 #define STR_DAMAGE_DETAIL2 197
 #define STR_DAMAGE_DETAIL3 198
+#define STR_TRAVEL_TIME 199
 
-#define STRREF_COUNT 199
+#define STRREF_COUNT 200
 }
 
 #endif //! IE_STRINGS_H
