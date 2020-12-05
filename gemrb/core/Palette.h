@@ -69,6 +69,8 @@ public:
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
 	bool named; //< true if the palette comes from a bmp and cached
+	Color front; // Original colors used by core->CreatePalette()
+	Color back;
 
 	unsigned short GetVersion() const { return version; }
 

@@ -30,6 +30,8 @@ namespace GemRB {
 Palette::Palette(const Color &color, const Color &back)
 : Palette()
 {
+	front = color;
+	this->back = back;
 	col[0].r = 0;
 	col[0].g = 0xff;
 	col[0].b = 0;

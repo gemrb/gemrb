@@ -301,18 +301,18 @@ void WorldMapControl::SetColor(int which, Color color)
 	//   because setting background color creates all palettes anew.
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal_normal = MakeHolder<Palette>(normal, color);
-		pal_selected = MakeHolder<Palette>(selected, color);
-		pal_notvisited = MakeHolder<Palette>(notvisited, color);
+		pal_normal = MakeHolder<Palette>(pal_normal ? pal_normal->front : normal, color);
+		pal_selected = MakeHolder<Palette>(pal_selected ? pal_selected->front : selected, color);
+		pal_notvisited = MakeHolder<Palette>(pal_notvisited ? pal_notvisited->front : notvisited, color);
 		break;
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal_normal = MakeHolder<Palette>(normal, color);
+		pal_normal = MakeHolder<Palette>(color, pal_normal->back);
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal_selected = MakeHolder<Palette>(selected, color);
+		pal_selected = MakeHolder<Palette>(color, pal_selected->back);
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal_notvisited = MakeHolder<Palette>(notvisited, color);
+		pal_notvisited = MakeHolder<Palette>(color, pal_notvisited->back);
 		break;
 	default:
 		break;
