@@ -37,7 +37,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenTravelWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow (False))
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -82,7 +82,7 @@ def InitMapWindow (Window):
 
 	return
 
-def OpenTravelWindow ():
+def OpenTravelWindow (Travel = True):
 	global WorldMapControl
 
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -100,7 +100,8 @@ def OpenTravelWindow ():
 	#center on current area
 	WMap.Scroll (0,0)
 	WMap.Focus()
-	WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+	if Travel:
+		WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done
 	Button = Window.GetControl (0)
