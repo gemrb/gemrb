@@ -82,9 +82,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	Video* video = core->GetVideoDriver();
 	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), &rgn );
 
-	unsigned int i;
 	unsigned int ec = worldmap->GetEntryCount();
-	for(i=0;i<ec;i++) {
+	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
@@ -106,11 +105,17 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
 			video->BlitSprite( AnimPicture.get(), xOffs, yOffs, &rgn );
 		}
-		
+	}
+
+	// draw labels in separate pass, so icons don't overlap them
+	for (unsigned int i = 0; i < ec; i++) {
+		WMPAreaEntry *m = worldmap->GetEntry(i);
+		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 		const String* caption = m->GetCaption();
 		if (ftext == nullptr || caption == nullptr)
 			continue;
-		
+
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		const Region& icon_frame = icon->Frame;
 		Region r2 = Region( MAP_TO_SCREENX(m->X - icon_frame.x), MAP_TO_SCREENY(m->Y - icon_frame.y), icon_frame.w, icon_frame.h );
 		
@@ -125,7 +130,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 		Size ts = ftext->StringSize(*caption);
 		ts.w += 10;
-		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
+		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
 					 *caption, text_pal, 0 );
 	}
 
