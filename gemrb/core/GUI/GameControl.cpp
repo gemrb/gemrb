@@ -2149,6 +2149,14 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			return true;
 		} else {
 			p = gameClickPoint;
+
+			ieDword actionLevel = core->GetDictionary()->Lookup("ActionLevel", actionLevel);
+			if (actionLevel) {
+				// update the action bar
+				core->GetDictionary()->SetAt("ActionLevel", 0, false);
+				core->SetEventFlag(EF_ACTION);
+				ClearMouseState();
+			}
 		}
 	} else {
 		// any other button behaves as left click (scrollwhell buttons are mouse wheel events now)
