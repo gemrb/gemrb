@@ -109,9 +109,7 @@ def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index, float_menu_selected
 
-	if FloatMenuWindow:
-		FloatMenuWindow.Close ()
-
+	def OnClose():
 		GemRB.GamePause (False, 0)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
 
@@ -139,11 +137,12 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Window.SetFlags (WF_DRAGGABLE|WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetPos (x, y)
 	Window.SetTooltip (8199)
+	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenFloatMenuWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: Window.Close ())
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)
@@ -188,7 +187,8 @@ def OpenFloatMenuWindow (x=0, y=0):
 
 	# 6 - 10 - items/spells/other
 	for i in range (CID_ABILITIES + 1, CID_HANDLE1):
-		Window.DeleteControl (i)
+		if Window.GetControl (i):
+			Window.DeleteControl (i)
 
 	# 15 - 19 - empty item slot
 	for i in range (SLOT_COUNT):
