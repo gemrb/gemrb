@@ -59,7 +59,6 @@ def InitMapWindow (Window, WorldMap = False, Travel = -1):
 			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, Travel, "floattxt")
 			WorldMapControl.SetAnimation ("WMDAG")
 			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
-			WorldMapControl.SetAction (ChangeTooltip, IE_ACT_MOUSE_ENTER)
 
 		# center on current area
 		WorldMapControl.Scroll (0, 0, False)
@@ -104,17 +103,4 @@ OpenMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindo
 def OpenTravelWindow ():
 	Window = OpenMapWindow ()
 	InitMapWindow (Window, True, GemRB.GetVar ("Travel"))
-	return
-
-def ChangeTooltip ():
-	global WorldMapControl
-
-	tt = ""
-	area = WorldMapControl.GetDestinationArea ()
-	if area and area["Distance"] >= 0:
-		str = GemRB.GetString (4)
-		if (str):
-			tt = "%s: %d"%(str,area["Distance"])
-
-	WorldMapControl.SetTooltip (tt)
 	return
