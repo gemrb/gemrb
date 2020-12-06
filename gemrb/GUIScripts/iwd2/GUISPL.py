@@ -306,14 +306,10 @@ def OpenSpellBookSpellInfoWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-# FIXME: for now don't do anything if paused, since we'd get stuck with the first frame
-# EH, doesn't work on the known spell buttons?
 def FlashOverButton (ControlID):
-	pause = GemRB.GamePause (10, 1) # quietly get the pause state
-	if pause == 1: # paused
-		return
 	Button = SpellBookWindow.GetControl(ControlID)
 	Button.SetAnimation ("FLASH")
+	Button.SetFlags (IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 	# TODO: wait until it is done; the two flashes for memorizing were not shown in parallel
 
 def OnSpellBookMemorizeSpell ():
