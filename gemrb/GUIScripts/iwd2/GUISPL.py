@@ -38,7 +38,6 @@ SpellBookSpellUnmemorizeWindow = None
 ActiveSpellBooks = []
 BookCount = 0
 BookTopIndex = 0
-SelectedBook = 0
 BookNames = (1083,1079,1080,1078,1077,32,1081,39722)
 
 def InitSpellBookWindow (Window):
@@ -78,7 +77,7 @@ def InitSpellBookWindow (Window):
 
 def SelectedNewPlayer (Window):
 	global ActiveSpellBooks
-	global BookTopIndex, BookCount, SelectedBook
+	global BookTopIndex, BookCount
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ActiveSpellBooks=[]
@@ -89,11 +88,12 @@ def SelectedNewPlayer (Window):
 
 	BookCount = len(ActiveSpellBooks)
 	BookTopIndex = 0
-	if len (ActiveSpellBooks):
-		SelectedBook = ActiveSpellBooks[0]
-	else:
-		SelectedBook = 0
-	GemRB.SetVar ("SelectedBook",SelectedBook)
+	if GemRB.GetVar ("SelectedBook") == 0:
+		if len (ActiveSpellBooks):
+			SelectedBook = ActiveSpellBooks[0]
+		else:
+			SelectedBook = 0
+		GemRB.SetVar ("SelectedBook", SelectedBook)
 	UpdateSpellBook ()
 	return
 
@@ -112,9 +112,6 @@ def ScrollBarPress ():
 	UpdateSpellBookWindow ()
 
 def UpdateSpellBook ():
-	global SelectedBook
-
-	SelectedBook = GemRB.GetVar ("SelectedBook")
 	RefreshSpellBookLevel (False) # set up all the spell lists first
 	ResetScrollBar ()
 	UpdateSpellBookWindow ()
@@ -139,8 +136,7 @@ def UpdateSpellBookWindow ():
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
 
-	SelectedBook = GemRB.GetVar("SelectedBook")
-	BookType = SelectedBook
+	BookType = GemRB.GetVar ("SelectedBook")
 	level = SpellBookSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, BookType, level)
 	sorcerer_style = (BookType == IE_IWD2_SPELL_BARD) or (BookType == IE_IWD2_SPELL_SORCERER)
@@ -262,6 +258,7 @@ def RefreshSpellBookLevel (update=True):
 	global SpellBookSpellLevel, KnownSpellList, MemorizedSpellList
 
 	SpellBookSpellLevel = GemRB.GetVar ("SpellBookSpellLevel")
+	SelectedBook = GemRB.GetVar ("SelectedBook")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	KnownSpellList = Spellbook.GetKnownSpellsLevel (pc, SelectedBook, SpellBookSpellLevel)
 	MemorizedSpellList = Spellbook.GetMemorizedSpells (pc, SelectedBook, SpellBookSpellLevel)
@@ -288,7 +285,7 @@ def OpenSpellBookSpellInfoWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
-	BookType = SelectedBook
+	BookType = GemRB.GetVar ("SelectedBook")
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ms = GemRB.GetMemorizedSpell (pc, BookType, level, index)
@@ -322,7 +319,7 @@ def FlashOverButton (ControlID):
 def OnSpellBookMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
-	BookType = SelectedBook
+	BookType = GemRB.GetVar ("SelectedBook")
 	Window = SpellBookWindow
 
 	index = GemRB.GetVar ("SpellButton") - 100
@@ -392,7 +389,7 @@ def OnSpellBookRemoveSpell ():
 def UnmemoSpell (index, onlydepleted=False):
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
-	BookType = SelectedBook
+	BookType = GemRB.GetVar ("SelectedBook")
 
 	# remove spell from memory
 	if GemRB.UnmemorizeSpell (pc, BookType, level, index, onlydepleted):
