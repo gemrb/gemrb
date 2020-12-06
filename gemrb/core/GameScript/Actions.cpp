@@ -5824,8 +5824,11 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *actor = (Actor *) Sender;
 	actor->SetOrientation(RAND(0, MAX_ORIENT-1), true);
-	actor->SetWait( 1 );
-	Sender->ReleaseCurrentAction(); // todo, blocking?
+	// the original waited more if the actor was offscreen, perhaps as an optimization
+	int diceSides = 40;
+	Region vp = core->GetVideoDriver()->GetViewport();
+	if (vp.PointInside(actor->Pos)) diceSides = 10;
+	actor->SetWait(AI_UPDATE_TIME * core->Roll(1, diceSides, 0));
 }
 
 void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
