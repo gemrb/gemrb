@@ -5541,7 +5541,6 @@ void GameScript::RandomWalk(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->RandomWalk( true, false );
-	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RandomRun(Scriptable* Sender, Action* /*parameters*/)
@@ -5552,7 +5551,6 @@ void GameScript::RandomRun(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->RandomWalk( true, true );
-	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/)
@@ -5816,9 +5814,15 @@ void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
-void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::RandomTurn(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	// it doesn't take parameters, but we used them internally for one-shot runs
+	if (parameters->int0Parameter > 1) parameters->int0Parameter--;
+	if (parameters->int0Parameter == 1) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}

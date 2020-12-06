@@ -2407,10 +2407,24 @@ void Movable::RandomWalk(bool can_stop, bool run)
 		return;
 	}
 	//if not continous random walk, then stops for a while
-	if (can_stop && RAND(0, 9) < 4) {
-		if (RAND(0, 2)) SetOrientation(RAND(0, MAX_ORIENT), true);
-		SetWait(RAND(core->Time.round_size / 2, 2 * core->Time.round_size));
-		return;
+	if (can_stop) {
+		Region vp = core->GetVideoDriver()->GetViewport();
+		if (!vp.PointInside(Pos)) {
+			SetWait(AI_UPDATE_TIME * core->Roll(1, 40, 0));
+			return;
+		}
+		// a 50/50 chance to move or do a spin (including its own wait)
+		if (RAND(1, 2) == 1) {
+			Action *me = ParamCopy(CurrentAction);
+			Action *turnAction = GenerateAction("RandomTurn()");
+			// only spin once before relinquishing control back
+			turnAction->int0Parameter = 3;
+			// remove and readd ourselves, so the turning gets a chance to run
+			ReleaseCurrentAction();
+			AddActionInFront(me);
+			AddActionInFront(turnAction);
+			return;
+		}
 	}
 	randomWalkCounter++;
 	if (randomWalkCounter > MAX_RAND_WALK) {
