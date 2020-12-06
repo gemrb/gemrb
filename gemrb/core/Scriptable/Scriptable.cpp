@@ -2426,6 +2426,21 @@ void Movable::RandomWalk(bool can_stop, bool run)
 			return;
 		}
 	}
+
+	// handle the RandomWalkTime variants, which only count moves
+	if (CurrentAction->int0Parameter && !CurrentAction->int1Parameter) {
+		// first run only
+		CurrentAction->int1Parameter = 1;
+		CurrentAction->int0Parameter++;
+	}
+	if (CurrentAction->int0Parameter) {
+		CurrentAction->int0Parameter--;
+	}
+	if (CurrentAction->int1Parameter && !CurrentAction->int0Parameter) {
+		ReleaseCurrentAction();
+		return;
+	}
+
 	randomWalkCounter++;
 	if (randomWalkCounter > MAX_RAND_WALK) {
 		randomWalkCounter = 0;
