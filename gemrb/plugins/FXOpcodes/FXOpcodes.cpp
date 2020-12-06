@@ -3788,8 +3788,8 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// EEs added randomness that can't hurt elsewhere
 	ieResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
 	char count = 1;
-	if (fx->Resource2) count++;
-	if (fx->Resource3) count++;
+	if (fx->Resource2[0]) count++;
+	if (fx->Resource3[0]) count++;
 	int choice = RAND(0, count - 1);
 
 	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
