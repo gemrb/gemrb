@@ -2702,6 +2702,8 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	//position of appearance is target's pos
 	int eamod = -1;
 	if (fx->Parameter2<6){
+		// NOTE: IESDP suggests eamods might have some wrong values
+		// keep it in mind if anything goes wrong
 		eamod = eamods[fx->Parameter2];
 	}
 
