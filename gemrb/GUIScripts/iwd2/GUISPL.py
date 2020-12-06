@@ -310,7 +310,6 @@ def FlashOverButton (ControlID):
 	Button = SpellBookWindow.GetControl(ControlID)
 	Button.SetAnimation ("FLASH")
 	Button.SetFlags (IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
-	# TODO: wait until it is done; the two flashes for memorizing were not shown in parallel
 
 def OnSpellBookMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -325,7 +324,8 @@ def OnSpellBookMemorizeSpell ():
 		GemRB.PlaySound ("GAM_24")
 		FlashOverButton (index - SpellTopIndex + 30) # FIXME: wrong button if the spell will be stacked
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, BookType, level, False)
-		FlashOverButton (mem_cnt + 5)
+		# mimic the original, which staggered the two animations
+		GemRB.SetTimedEvent(lambda: FlashOverButton (mem_cnt + 5), 1)
 	return
 
 def OpenSpellBookSpellRemoveWindow ():
