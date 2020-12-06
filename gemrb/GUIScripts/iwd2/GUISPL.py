@@ -393,14 +393,12 @@ def UnmemoSpell (index, onlydepleted=False):
 
 	# remove spell from memory
 	if GemRB.UnmemorizeSpell (pc, BookType, level, index, onlydepleted):
+		RefreshSpellBookLevel (False)
 		UpdateSpellBookWindow ()
 		GemRB.PlaySound ("GAM_44")
 		FlashOverButton (index + 6)
 	else:
 		print "Spell unmemorization failed, huh?", pc, BookType, level, index, onlydepleted
-
-	RefreshSpellBookLevel (False)
-	UpdateSpellBookWindow ()
 
 ###################################################
 # End of file GUISPL.py
