@@ -2701,6 +2701,8 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	//position of appearance is target's pos
 	int eamod = -1;
 	if (fx->Parameter2<6){
+		// NOTE: IESDP suggests eamods might have some wrong values
+		// keep it in mind if anything goes wrong
 		eamod = eamods[fx->Parameter2];
 	}
 
@@ -3676,11 +3678,11 @@ int fx_mirror_image (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (fx->Parameter2) {
 		images = 1; //reflection
-	}
-	else {
+	} else {
 		// the original uses only IE_LEVEL, but that can be awefully bad in
 		// the case of dual- and multiclasses
 		unsigned int level = target->GetCasterLevel(IE_SPL_WIZARD);
+		if (!level) level = target->GetAnyActiveCasterLevel();
 		// 2-8 mirror images
 		images = level/3 + 2;
 		if (images > 8) images = 8;
@@ -3782,11 +3784,19 @@ int fx_visual_animation_effect (Scriptable* /*Owner*/, Actor* /*target*/, Effect
 int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_create_inventory_item(%2d)", fx->Opcode);
-	target->inventory.AddSlotItemRes( fx->Resource, SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	// EEs added randomness that can't hurt elsewhere
+	ieResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
+	char count = 1;
+	if (fx->Resource2[0]) count++;
+	if (fx->Resource3[0]) count++;
+	int choice = RAND(0, count - 1);
+
+	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
 	if ((fx->TimingMode&0xff) == FX_DURATION_INSTANT_LIMITED) {
 		//if this effect has expiration, then it will remain as a remove_item
 		//on the effect queue, inheriting all the parameters
 		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
+		CopyResRef(fx->Resource, *refs[choice]);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 		return FX_APPLIED;
 	}

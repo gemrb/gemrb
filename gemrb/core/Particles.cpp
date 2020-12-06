@@ -31,9 +31,7 @@ namespace GemRB {
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
 
-#define SPARK_COUNT 13
-
-static int spark_color_indices[SPARK_COUNT]={12,5,0,6,1,8,2,7,9,3,4,10,11};
+static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7, 9, 3, 4, 10, 11};
 
 static void TranslateColor(const char *value, Color &color)
 {
@@ -77,7 +75,7 @@ static void InitSparks()
 		for (int j=0;j<MAX_SPARK_PHASE;j++) {
 			int idx;
 
-			if (i<SPARK_COUNT) {
+			if (i < MAX_SPARK_COLOR) {
 				idx = spark_color_indices[i];
 			} else {
 				idx = i;
@@ -97,18 +95,10 @@ Particles::Particles(int s)
 		bitmap[i]=NULL;
 	}
 	*/
-	fragments = NULL;
 	if (!inited) {
 		InitSparks();
 	}
 	size = last_insert = s;
-	color = 0;
-	phase = P_FADE;
-	owner = NULL;
-	type = SP_TYPE_POINT;
-	path = SP_PATH_FALL;
-	spawn_type = SP_SPAWN_NONE;
-	timetolive = 0;
 }
 
 Particles::~Particles()
@@ -220,7 +210,8 @@ void Particles::Draw(Point p)
 
 		int length; //used only for raindrops
 		if (state>=MAX_SPARK_PHASE) {
-			length = 6-abs(state-MAX_SPARK_PHASE-6);
+			constexpr int maxDropLength = 6;
+			length = maxDropLength - abs(state - MAX_SPARK_PHASE - maxDropLength);
 			state = 0;
 		} else {
 			state=MAX_SPARK_PHASE-state-1;

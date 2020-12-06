@@ -69,19 +69,21 @@ struct Element {
 #define SP_SPAWN_FULL  1       //fill all at setup, then switch to none
 #define SP_SPAWN_SOME  2       //add some new elements regularly
 
-#define SPARK_COLOR_BLUE 0
-#define SPARK_COLOR_GOLD 1
-#define SPARK_COLOR_PURPLE 2
-#define SPARK_COLOR_ICE 3
-#define SPARK_COLOR_STONE 4
-#define SPARK_COLOR_BLACK 5
-#define SPARK_COLOR_CHROM 6
+// order of names as in sprklclr.2da is never used, they permuted it for some reason
+// NOTE: the first (default) phase is almost white for most colors
+#define SPARK_COLOR_BLUE 2
+#define SPARK_COLOR_GOLD 4
+#define SPARK_COLOR_PURPLE 6
+#define SPARK_COLOR_ICE 9
+#define SPARK_COLOR_STONE 10
+#define SPARK_COLOR_BLACK 1
+#define SPARK_COLOR_CHROM 3
 #define SPARK_COLOR_RED 7
-#define SPARK_COLOR_GREEN 8
-#define SPARK_COLOR_WHITE 9
-#define SPARK_COLOR_MAGENTA 10
-#define SPARK_COLOR_ORANGE 11
-#define SPARK_COLOR_CUSTOM 12
+#define SPARK_COLOR_GREEN 5
+#define SPARK_COLOR_WHITE 8
+#define SPARK_COLOR_MAGENTA 11
+#define SPARK_COLOR_ORANGE 12
+#define SPARK_COLOR_CUSTOM 0
 
 #define MAX_SPARK_COLOR  13
 #define MAX_SPARK_PHASE  5
@@ -119,22 +121,22 @@ public:
 	int Update();
 	int GetHeight() const { return pos.y+pos.h; }
 private:
-	Element *points;
-	ieDword timetolive;
+	Element *points = nullptr;
+	ieDword timetolive = 0;
 //	ieDword target;    //could be 0, in that case target is pos
-	ieWord size;       //spark number
-	ieWord last_insert;//last spark idx added
-	Scriptable *owner; //could be area or game or actor
+	ieWord size = 0;       // spark number
+	ieWord last_insert = 0;// last spark idx added
+	Scriptable *owner = nullptr; // could be area or game or actor
 	Region pos;
-	ieByte phase;      //global phase
-	ieByte type;       //draw type (snow, rain)
-	ieByte path;       //path type
-	ieByte color;      //general spark color
-	ieByte spawn_type;
+	ieByte phase = P_FADE;      // global phase
+	ieByte type = SP_TYPE_POINT;       // draw type (snow, rain)
+	ieByte path = SP_PATH_FALL;       // path type
+	ieByte color = 0;      // general spark color (index, see SPARK_COLOR_*)
+	ieByte spawn_type = SP_SPAWN_NONE;
 	//use char animations for the fragment animations
 	//1. the cycles are loaded only when needed
 	//2. the fragments ARE avatar animations in the original IE (for some unknown reason)
-	CharAnimations *fragments;
+	CharAnimations *fragments = nullptr;
 };
 
 }

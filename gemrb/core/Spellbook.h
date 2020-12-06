@@ -148,7 +148,7 @@ private:
 	/** regenerates the spellinfo list */
 	void GenerateSpellInfo();
 	/** looks up the spellinfo list for an element */
-	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name);
+	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name) const;
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef);
 	/** adds a spell to the book, internal */
@@ -187,11 +187,11 @@ public:
 	unsigned int GetTotalMemorizedSpellsCount() const;
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
 	/** adds the priest slot bonuses from mxsplwis */
-	void BonusSpells(int type, int count, int *bonuses);
+	void BonusSpells(int type, int count, const int *bonuses);
 	/** clears up the spell bonuses before recalculation */
 	void ClearBonus();
 	/** removes a spell from memory/book */
-	bool RemoveSpell(CREKnownSpell* spell);
+	bool RemoveSpell(const CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
 	void RemoveSpell(const ieResRef ResRef, bool onlyknown=false);
 	/** this removes ALL spells matching spellid */
@@ -211,10 +211,10 @@ public:
 	void SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus);
 
 	/** Adds spell from known to memorized */
-	bool MemorizeSpell(CREKnownSpell* spl, bool usable);
+	bool MemorizeSpell(const CREKnownSpell* spl, bool usable);
 
 	/** Removes memorized spell */
-	bool UnmemorizeSpell(CREMemorizedSpell* spl);
+	bool UnmemorizeSpell(const CREMemorizedSpell* spl);
 
 	/** Removes (or just depletes) memorized spell by ResRef */
 	bool UnmemorizeSpell(const char *resref, bool deplete, bool onlydepleted=false);
@@ -242,7 +242,7 @@ public:
 	unsigned int GetSpellInfoSize(int type);
 
 	/** generates a custom spellinfo list for fx_select_spell */
-	void SetCustomSpellInfo(ieResRef *data, ieResRef spell, int type);
+	void SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int type);
 
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();
