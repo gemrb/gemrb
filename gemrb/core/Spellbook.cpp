@@ -417,7 +417,7 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResR
 }
 
 //removes one instance of spell (from creknownspell)
-bool Spellbook::RemoveSpell(CREKnownSpell* spell)
+bool Spellbook::RemoveSpell(const CREKnownSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -690,7 +690,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 
 //apply the wisdom bonus on all spell levels for type
 //count is optimally the count of spell levels
-void Spellbook::BonusSpells(int type, int count, int *bonuses)
+void Spellbook::BonusSpells(int type, int count, const int *bonuses)
 {
 	int level = GetSpellLevelCount(type);
 	if (level>count) level=count;
@@ -777,7 +777,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 	return sm->SlotCount;
 }
 
-bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
+bool Spellbook::MemorizeSpell(const CREKnownSpell* spell, bool usable)
 {
 	ieWord spellType = spell->Type;
 	CRESpellMemorization* sm = spells[spellType][spell->Level];
@@ -796,7 +796,7 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	return true;
 }
 
-bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
+bool Spellbook::UnmemorizeSpell(const CREMemorizedSpell* spell)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -1075,7 +1075,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 	return 0;
 }
 
-SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname)
+SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname) const
 {
 	size_t i = spellinfo.size();
 	while(i--) {
@@ -1132,7 +1132,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	gamedata->FreeSpell(spl, spellname, false);
 }
 
-void Spellbook::SetCustomSpellInfo(ieResRef *data, ieResRef spell, int type)
+void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int type)
 {
 	ClearSpellInfo();
 	if (data) {

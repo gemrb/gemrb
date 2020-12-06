@@ -31,7 +31,7 @@ namespace GemRB {
 Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
 bool inited = false;
 
-static int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7, 9, 3, 4, 10, 11};
+static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7, 9, 3, 4, 10, 11};
 
 static void TranslateColor(const char *value, Color &color)
 {

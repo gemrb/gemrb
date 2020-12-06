@@ -2543,7 +2543,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	//maximum number of monsters summoned
 	int cnt=10;
 	Actor * ab = NULL;
-	Actor *summoner = nullptr;
+	const Actor *summoner = nullptr;
 
 	Map *map;
 	if (target) {
