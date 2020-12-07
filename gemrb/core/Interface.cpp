@@ -128,7 +128,6 @@ Control ItemDragOp::dragDummy = Control(Region());
 
 ItemDragOp::ItemDragOp(CREItem* item)
 : ControlDragOp(&dragDummy), item(item) {
-	// FIXME: not sure if this is the best place or if there is a better way to get the icon
 	Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
 	Holder<Sprite2D> pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
@@ -976,7 +975,7 @@ void Interface::Main()
 
 		GameLoop();
 		// TODO: find other animations that need to be synchronized
-		// we can create a manager for them and everything can by updated at once
+		// we can create a manager for them and everything can be updated at once
 		GlobalColorCycle.AdvanceTime(time);
 		winmgr->DrawWindows();
 		time = GetTickCount();
@@ -2272,7 +2271,7 @@ bool Interface::LoadGemRBINI()
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
-			// FIXME: this is an arbitrary huristic and speed
+			// FIXME: this is an arbitrary heuristic and speed
 			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 5 : 0);
 			TooltipBG->SetMargin(ttMargin);
 		}

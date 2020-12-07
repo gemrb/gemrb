@@ -479,7 +479,7 @@ static bool DoSaveGame(const char *Path)
 	}
 
 	// Create area preview
-	// FIXME: the preview shoudl be passed in by the caller!
+	// FIXME: the preview should be passed in by the caller!
 
 	WindowManager* wm = core->GetWindowManager();
 	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());

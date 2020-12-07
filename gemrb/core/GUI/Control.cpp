@@ -325,7 +325,7 @@ void Control::HandleTouchActionTimer(Control* ctrl)
 	ClearActionTimer();
 
 	// long press action (GEM_MB_MENU)
-	// TODO: we could save the mod value from OnTouchDown to support modifiers to the touch, but we dont have a use ATM
+	// NOTE: we could save the mod value from OnTouchDown to support modifiers to the touch, but we don't have a use ATM
 	ControlActionKey key(Click, 0, GEM_MB_MENU, 1);
 	PerformAction(key);
 }

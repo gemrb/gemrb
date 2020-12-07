@@ -43,6 +43,9 @@ static const int *sectionMap;
 static const int bg2Sections[4] = {4,1,2,0};
 static const int noSections[4] = {0,0,0,0};
 
+// FIXME: arbitrary guess value
+#define DIALOG_MOVE_SPEED 75
+
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
@@ -166,7 +169,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 
 	core->ToggleViewsEnabled(false, "NOT_DLG");
 	prevViewPortLoc = gc->Viewport().Origin();
-	gc->MoveViewportTo(tgt->Pos, true, 75); // FIXME: arbitrary guess value
+	gc->MoveViewportTo(tgt->Pos, true, DIALOG_MOVE_SPEED);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	// NOTE: besides marking pause/not pause, they determine what happens if
@@ -226,7 +229,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
 	GameControl* gc = core->GetGameControl();
 	gc->SetDialogueFlags(0, OP_SET);
-	gc->MoveViewportTo(prevViewPortLoc, false, 75); // FIXME: arbitrary guess value
+	gc->MoveViewportTo(prevViewPortLoc, false, DIALOG_MOVE_SPEED);
 	core->SetEventFlag(EF_PORTRAIT);
 }
 

@@ -2164,7 +2164,6 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			MoveViewportTo(p, true);
 
 		// handle actions
-		// FIXME: is this the right place to do this? seems ok.
 		if (target_mode == TARGET_MODE_NONE && lastActorID) {
 			switch (lastCursor & ~IE_CURSOR_GRAY) {
 				case IE_CURSOR_TALK:
