@@ -79,7 +79,7 @@ static Point **VisibilityMasks=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
-static int LargeFog;
+static bool LargeFog;
 static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
 static ieDword oldGameTime = 0;
@@ -910,39 +910,28 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	// Ratio of bg tile size and fog tile size
 	constexpr int CELL_RATIO = 2;
 
-	// viewport - pos & size of the control
-	Size size(TMap->XCellCount * CELL_RATIO, TMap->YCellCount * CELL_RATIO);
-	
-	if (LargeFog) {
-		size.w++;
-		size.h++;
-	}
+	// size for explored_mask and visible_mask
+	Size mapSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
 
 	int sx = ( vp.x ) / CELL_SIZE;
 	int sy = ( vp.y ) / CELL_SIZE;
-	int dx = sx + vp.w / CELL_SIZE + 2;
-	int dy = sy + vp.h / CELL_SIZE + 2;
-	int x0 = sx * CELL_SIZE - vp.x;
-	int y0 = sy * CELL_SIZE - vp.y;
-	if (LargeFog) {
-		x0 -= CELL_SIZE / 2;
-		y0 -= CELL_SIZE / 2;
-		dx++;
-		dy++;
-	}
+	int dx = (sx + vp.w / CELL_SIZE + 2) + LargeFog;
+	int dy = (sy + vp.h / CELL_SIZE + 2) + LargeFog;
+	int x0 = (sx * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
+	int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
 	
 	// Returns true if map at (x;y) was explored, else false.
 	// Points outside map are always considered as explored
-	auto MaskHit = [&size](int x, int y, ieByte* mask)
+	auto MaskHit = [&mapSize](int x, int y, ieByte* mask)
 	{
-		if (x <= 0 || x >= (size.w - 1) || y <= 0 || y >= (size.h - 1)) {
+		if (x <= 0 || x >= (mapSize.w - 1) || y <= 0 || y >= (mapSize.h - 1)) {
 			// edges are always foggy
 			return false;
 		}
 		
 		if (mask == nullptr) return true;
 
-		div_t res = div(size.w * y + x, 8);
+		div_t res = div(mapSize.w * y + x, 8);
 		return bool(mask[res.quot] & (1 << res.rem));
 	};
 	
