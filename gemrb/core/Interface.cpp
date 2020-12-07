@@ -1122,16 +1122,6 @@ int Interface::LoadSprites()
 	assert(FogSprites[28]->renderFlags&BLIT_MIRRORX);
 	assert(FogSprites[28]->renderFlags&BLIT_MIRRORY);
 
-	ieDword i = 0;
-	vars->Lookup("3D Acceleration", i);
-	if (i) {
-		for(auto &sprite: FogSprites) {
-			if (sprite) {
-				sprite = video->CreateAlpha(sprite);
-			}
-		}
-	}
-
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {

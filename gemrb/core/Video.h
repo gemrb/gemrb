@@ -241,8 +241,6 @@ public:
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
 	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor);
-	/** Duplicates and transforms sprite to have an alpha channel */
-	Holder<Sprite2D> CreateAlpha(const Holder<Sprite2D> sprite);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
