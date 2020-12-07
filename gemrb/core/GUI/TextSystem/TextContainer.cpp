@@ -247,7 +247,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		}
 		// FIXME: layout assumes left alignment, so alignment is mostly broken
 		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
-		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette.get(), Alignment);
+		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, Alignment);
 		if (core->InDebugMode(ID_TEXT)) {
 			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 		}
