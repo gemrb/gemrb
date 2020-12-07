@@ -20,6 +20,7 @@
 
 #include "SDLSurfaceSprite2D.h"
 
+#include "SDLPixelIterator.h"
 #include "SDLSurfaceDrawing.h"
 #include "SDLVideo.h"
 
@@ -201,44 +202,14 @@ bool SDLSurfaceSprite2D::HasTransparency() const
 
 Color SDLSurfaceSprite2D::GetPixel(const Point& p) const
 {
-	Color c;
-
-	if (p.x < 0 || p.x >= Frame.w) return c;
-	if (p.y < 0 || p.y >= Frame.h) return c;
-
-	SDL_Surface* surf = *surface;
-
-	SDL_LockSurface( surf );
-	Uint8 Bpp = surf->format->BytesPerPixel;
-	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
-	( ( p.y * surf->pitch + (p.x*Bpp)) );
-	Uint32 val = 0;
-
-	if (Bpp == 1) {
-		val = *pixels;
-	} else if (Bpp == 2) {
-		val = *(Uint16 *)pixels;
-	} else if (Bpp == 3) {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-		val = pixels[0] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[2] << 16);
-#else
-		val = pixels[2] + ((unsigned int)pixels[1] << 8) + ((unsigned int)pixels[0] << 16);
-#endif
-	} else if (Bpp == 4) {
-		val = *(Uint32 *)pixels;
+	if (Frame.PointInside(p)) {
+		IPixelIterator::Direction xdir = (renderFlags & BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		IPixelIterator::Direction ydir = (renderFlags & BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		SDLPixelIterator it(xdir, ydir, RectFromRegion(Frame), *surface);
+		it.Advance(p.y * Frame.w + p.x);
+		return it.ReadRGBA();
 	}
-
-	SDL_UnlockSurface( surf );
-	SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
-
-	// check color key... SDL_GetRGBA wont get this
-#if SDL_VERSION_ATLEAST(1,3,0)
-	Uint32 ck;
-	if (SDL_GetColorKey(surf, &ck) != -1 && ck == val) c.a = SDL_ALPHA_TRANSPARENT;
-#else
-	if (surf->format->colorkey == val) c.a = SDL_ALPHA_TRANSPARENT;
-#endif
-	return c;
+	return Color();
 }
 
 bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
