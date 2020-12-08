@@ -119,7 +119,7 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 	MarkDirty();
 }
 
-void Button::WillDraw()
+void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (overlayAnim) {
 		overlayAnim.Next(GetTickCount());

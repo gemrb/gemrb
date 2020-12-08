@@ -206,7 +206,7 @@ private: // Private attributes
 	bool HitTest (const Point&) const;
 	void DoToggle();
 
-	void WillDraw();
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	

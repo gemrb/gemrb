@@ -74,7 +74,7 @@ private:
 	const MapNote* MapNoteAtPoint(const Point& p) const;
 
 	Region GetViewport() const;
-	void WillDraw();
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
 	void DrawFog(const Region& rgn) const;

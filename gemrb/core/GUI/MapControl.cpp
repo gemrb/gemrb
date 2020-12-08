@@ -116,7 +116,7 @@ Point MapControl::ConvertPointFromGame(Point p) const
 	return p + mosRgn.Origin();
 }
 	
-void MapControl::WillDraw()
+void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	UpdateMap();
 

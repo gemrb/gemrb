@@ -254,7 +254,7 @@ void View::Draw()
 
 	bool needsDraw = NeedsDrawRecursive(); // check this before WillDraw else an animation update might get missed
 	// notify subclasses that drawing is about to happen. could pass the rects too, but no need ATM.
-	WillDraw();
+	WillDraw(drawFrame, intersect);
 
 	if (needsDraw) {
 		DrawBackground(NULL);
@@ -270,7 +270,7 @@ void View::Draw()
 
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
-	DidDraw(); // notify subclasses that drawing finished
+	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
 	dirty = false;
 
 	if (core->InDebugMode(ID_VIEWS)) {

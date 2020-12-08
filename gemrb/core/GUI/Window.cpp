@@ -167,13 +167,13 @@ const VideoBufferPtr& Window::DrawWithoutComposition()
 	return backBuffer;
 }
 
-void Window::WillDraw()
+void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	backBuffer->SetOrigin(frame.Origin());
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 
-void Window::DidDraw()
+void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (!core->InDebugMode(ID_WINDOWS)) return;
 

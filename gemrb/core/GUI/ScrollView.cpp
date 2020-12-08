@@ -79,7 +79,7 @@ void ScrollView::ContentView::ResizeToSubviews()
 	sv->UpdateScrollbars();
 }
 	
-void ScrollView::ContentView::WillDraw()
+void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
 	screenClip = video->GetScreenClip();
@@ -98,7 +98,7 @@ void ScrollView::ContentView::WillDraw()
 	video->SetScreenClip(&intersect);
 }
 
-void ScrollView::ContentView::DidDraw()
+void ScrollView::ContentView::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	core->GetVideoDriver()->SetScreenClip(&screenClip);
 }
@@ -193,7 +193,7 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 	}
 }
 	
-void ScrollView::WillDraw()
+void ScrollView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation) {
 		// temporarily change the origin for drawing purposes
@@ -201,7 +201,7 @@ void ScrollView::WillDraw()
 	}
 }
 	
-void ScrollView::DidDraw()
+void ScrollView::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	if (animation) {
 		// restore the origin to the true location passed to ScrollTo

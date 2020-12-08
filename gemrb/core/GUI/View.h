@@ -123,8 +123,8 @@ private:
 	virtual void FlagsChanged(unsigned int /*oldflags*/) {}
 	virtual void SizeChanged(const Size&) {}
 	virtual void OriginChanged(const Point&) {}
-	virtual void WillDraw() {}
-	virtual void DidDraw() {}
+	virtual void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
+	virtual void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) {}
 	
 	virtual bool IsPerPixelScrollable() const { return true; }
 	

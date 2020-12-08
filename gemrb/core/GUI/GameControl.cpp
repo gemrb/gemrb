@@ -419,7 +419,7 @@ void GameControl::DrawTargetReticle(const Movable* target, const Point& p) const
 	DrawTargetReticle(size, color, p);
 }
 	
-void GameControl::WillDraw()
+void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
 	UpdateCursor();
 

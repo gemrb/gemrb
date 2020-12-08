@@ -38,8 +38,8 @@ namespace GemRB {
 			void SubviewAdded(View* view, View* parent);
 			void SubviewRemoved(View* view, View* parent);
 			
-			void WillDraw();
-			void DidDraw();
+			void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+			void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 			
 		public:
 			ContentView(const Region& frame)
@@ -61,8 +61,8 @@ namespace GemRB {
 		void UpdateScrollbars();
 		void ScrollbarValueChange(ScrollBar*);
 		
-		void WillDraw();
-		void DidDraw();
+		void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 		
 		void FlagsChanged(unsigned int /*oldflags*/);
 

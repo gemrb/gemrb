@@ -166,7 +166,7 @@ private:
 
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip);
-	void WillDraw();
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 	
 	bool CanLockFocus() const { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/);
