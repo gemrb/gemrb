@@ -49,9 +49,11 @@ static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
 	if (sbr.x > tar.x + tar.w) {
 		margins.right += sbr.x - (tar.x + tar.w) + sbr.w;
 		tar.w += margins.right;
-	} else {
-		// TODO: there aren't actually scrollbars on the left
-		// but if there were we would handle that here
+	} else if (sbr.x < tar.x) {
+		margins.left += tar.x - sbr.x;
+		margins.right += sbr.w; // FIXME: this shouldn't be needed, but we dont support left sided scrollbars yet
+		tar.w += tar.x - sbr.x;
+		tar.x = sbr.x;
 	}
 
 	if (sbr.y < tar.y) {
