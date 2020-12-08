@@ -690,7 +690,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 
 	if (layout.empty() && Editable()) {
 		Video* video = core->GetVideoDriver();
-		Region sc = video->GetScreenClip();
+		const Region& sc = video->GetScreenClip();
 		video->SetScreenClip(NULL);
 
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
@@ -736,7 +736,7 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		}
 
 		Video* video = core->GetVideoDriver();
-		Region sc = video->GetScreenClip();
+		const Region& sc = video->GetScreenClip();
 		video->SetScreenClip(NULL);
 
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
