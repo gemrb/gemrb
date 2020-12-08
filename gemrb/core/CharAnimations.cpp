@@ -969,12 +969,6 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			}
 			break;
 	}
-	//pst animations don't have separate animation for sleep/die
-	if (AnimType >= IE_ANI_PST_ANIMATION_1) {
-		if (StanceID==IE_ANI_DIE) {
-			StanceID=IE_ANI_TWITCH;
-		}
-	}
 
 	StanceID = MaybeOverrideStance(StanceID);
 
@@ -994,6 +988,10 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = false;
 			break;
 		case IE_ANI_DIE: //going to die
+			//pst animations don't have separate animations for sleep/die
+			if (AnimType >= IE_ANI_PST_ANIMATION_1) {
+				StanceID = IE_ANI_TWITCH;
+			}
 			nextStanceID = IE_ANI_TWITCH;
 			autoSwitchOnEnd = true;
 			break;

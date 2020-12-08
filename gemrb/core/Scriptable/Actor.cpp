@@ -8850,7 +8850,7 @@ bool Actor::HandleActorStance()
 		int nextstance = ca->nextStanceID;
 		SetStance( nextstance );
 		ca->autoSwitchOnEnd = false;
-		return true;
+		return nextstance != ca->previousStanceID;
 	}
 	int x = RAND(0, 25);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
