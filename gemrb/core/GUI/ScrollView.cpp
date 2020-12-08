@@ -79,11 +79,8 @@ void ScrollView::ContentView::ResizeToSubviews()
 	sv->UpdateScrollbars();
 }
 	
-void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	Video* video = core->GetVideoDriver();
-	screenClip = video->GetScreenClip();
-	
 	ScrollView* parent = static_cast<ScrollView*>(superView);
 	
 	Region clipArea = parent->ContentRegion();
@@ -91,16 +88,17 @@ void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region
 	clipArea.x = origin.x;
 	clipArea.y = origin.y;
 	
-	const Region intersect = screenClip.Intersect(clipArea);
+	const Region intersect = clip.Intersect(clipArea);
 	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
 	
 	// clip drawing to the ContentRegion, then restore after drawing
+	Video* video = core->GetVideoDriver();
 	video->SetScreenClip(&intersect);
 }
 
-void ScrollView::ContentView::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+void ScrollView::ContentView::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	core->GetVideoDriver()->SetScreenClip(&screenClip);
+	core->GetVideoDriver()->SetScreenClip(&clip);
 }
 
 ScrollView::ScrollView(const Region& frame)

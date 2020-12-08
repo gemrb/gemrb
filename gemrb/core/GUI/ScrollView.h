@@ -30,9 +30,6 @@ namespace GemRB {
 
 		class ContentView : public View {
 		private:
-			Region screenClip;
-
-		private:
 			void SizeChanged(const Size& /* oldsize */);
 			
 			void SubviewAdded(View* view, View* parent);
