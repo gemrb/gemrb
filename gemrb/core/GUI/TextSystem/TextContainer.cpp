@@ -319,7 +319,9 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 		sc.w += margin.right - diff;
 	}
 	
-	sc.y += margin.top; // TODO: if we ever support horzontal scrollbars this will need to be fixed
+	// TODO: if we ever support horzontal scrollbars these will need to be fixed
+	sc.y += margin.top;
+	sc.h -= margin.top + margin.bottom;
 
 	video->SetScreenClip(&sc);
 	ContentLayout::const_iterator it = layout.begin();
