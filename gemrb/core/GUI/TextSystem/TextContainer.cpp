@@ -306,12 +306,22 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
 	
 	Region sc = video->GetScreenClip();
-	sc.x += margin.left;
-	sc.y += margin.top;
-	sc.w -= margin.left + margin.right;
-	sc.h -= margin.top + margin.bottom;
-	video->SetScreenClip(&sc);
+	assert(sc == clip);
+	
+	int diff = clip.x - drawFrame.x;
+	if (diff < margin.left) {
+		sc.x += margin.left - diff;
+		sc.w -= margin.left - diff;
+	}
+	
+	diff = (drawFrame.x + drawFrame.w) - (clip.x + clip.w);
+	if (diff < margin.right) {
+		sc.w += margin.right - diff;
+	}
+	
+	sc.y += margin.top; // TODO: if we ever support horzontal scrollbars this will need to be fixed
 
+	video->SetScreenClip(&sc);
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
 		const Layout& l = *it;
