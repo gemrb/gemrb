@@ -107,9 +107,7 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 		origin.y += selOption->Dimensions().h;
 	}
 	
-	if (origin.y > frame.h) {
-		frame.h = origin.y;
-	}
+	frame.h = std::max(frame.h, origin.y + margin.bottom);
 }
 
 bool TextArea::SpanSelector::KeyEvent(const Event& event)
