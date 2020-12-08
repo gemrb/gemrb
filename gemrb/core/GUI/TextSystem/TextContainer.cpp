@@ -294,19 +294,9 @@ void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte
 	SetMargin(Margin(top, right, bottom, left));
 }
 
-void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+void ContentContainer::WillDraw(const Region& drawFrame, const Region& clip)
 {
-	Video* video = core->GetVideoDriver();
-	if (core->InDebugMode(ID_TEXT)) {
-		video->DrawRect(clip, ColorGreen, true);
-	}
-
-	// layout shouldn't be empty unless there is no content anyway...
-	if (layout.empty()) return;
-	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
-	
-	Region sc = video->GetScreenClip();
-	assert(sc == clip);
+	Region sc = clip;
 	
 	int diff = clip.x - drawFrame.x;
 	if (diff < margin.left) {
@@ -323,7 +313,25 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 	sc.y += margin.top;
 	sc.h -= margin.top + margin.bottom;
 
-	video->SetScreenClip(&sc);
+	core->GetVideoDriver()->SetScreenClip(&sc);
+}
+
+void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
+{
+	core->GetVideoDriver()->SetScreenClip(&clip);
+}
+
+void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+{
+	Video* video = core->GetVideoDriver();
+	if (core->InDebugMode(ID_TEXT)) {
+		video->DrawRect(clip, ColorGreen, true);
+	}
+
+	// layout shouldn't be empty unless there is no content anyway...
+	if (layout.empty()) return;
+	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
+	
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
 		const Layout& l = *it;

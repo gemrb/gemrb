@@ -224,6 +224,9 @@ protected:
 
 private:
 	virtual void ContentRemoved(const Content* /*content*/) {};
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
