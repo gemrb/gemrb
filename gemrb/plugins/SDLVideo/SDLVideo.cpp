@@ -641,7 +641,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 		SDL_LockSurface(newV);
 
 		SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
-		SDLPixelIterator beg(r, newV);
+		SDLPixelIterator beg(newV, r);
 		SDLPixelIterator end = SDLPixelIterator::end(beg);
 		StaticAlphaIterator alpha(0xff);
 

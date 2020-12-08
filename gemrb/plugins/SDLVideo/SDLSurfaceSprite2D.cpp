@@ -205,7 +205,7 @@ Color SDLSurfaceSprite2D::GetPixel(const Point& p) const
 	if (Frame.PointInside(p)) {
 		IPixelIterator::Direction xdir = (renderFlags & BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		IPixelIterator::Direction ydir = (renderFlags & BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		SDLPixelIterator it(xdir, ydir, {0, 0, static_cast<Uint16>(Frame.w), static_cast<Uint16>(Frame.h)}, *surface);
+		SDLPixelIterator it(*surface, xdir, ydir);
 		it.Advance(p.y * Frame.w + p.x);
 		return it.ReadRGBA();
 	}

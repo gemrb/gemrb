@@ -77,14 +77,18 @@ public:
 	int colorKey = -1;
 
 	SDLPixelIterator(SDL_Surface* surf)
-	: SDLPixelIterator(SurfaceRect(surf), surf)
+	: SDLPixelIterator(surf, SurfaceRect(surf))
 	{}
 
-	SDLPixelIterator(const SDL_Rect& clip, SDL_Surface* surf)
-	: SDLPixelIterator(Forward, Forward, clip, surf)
+	SDLPixelIterator(SDL_Surface* surf, const SDL_Rect& clip)
+	: SDLPixelIterator(surf, Forward, Forward, clip)
+	{}
+	
+	SDLPixelIterator(SDL_Surface* surf, Direction x, Direction y)
+	: SDLPixelIterator(surf, x, y, SurfaceRect(surf))
 	{}
 
-	SDLPixelIterator(Direction x, Direction y, const SDL_Rect& clip, SDL_Surface* surf)
+	SDLPixelIterator(SDL_Surface* surf, Direction x, Direction y, const SDL_Rect& clip)
 	: IPixelIterator(NULL, surf->pitch, x, y), imp(NULL), format(surf->format), clip(clip)
 	{
 		Uint8* pixels = static_cast<Uint8*>(surf->pixels);
@@ -308,9 +312,9 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	SDLPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
 	SDLPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
 
-	SDLPixelIterator dstbeg(SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn, dst);
+	SDLPixelIterator dstbeg(dst, SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
-	SDLPixelIterator srcbeg(xdir, ydir, srcrgn, src);
+	SDLPixelIterator srcbeg(src, xdir, ydir, srcrgn);
 
 	if (maskIt) {
 		Blit(srcbeg, dstbeg, dstend, *maskIt, blender);

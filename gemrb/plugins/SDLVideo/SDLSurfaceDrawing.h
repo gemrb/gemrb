@@ -183,7 +183,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	if (BLENDED) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
-		SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
+		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 		const static OneMinusSrcA<false, false> blender;
 
@@ -222,7 +222,7 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
-	SDLPixelIterator dstit(RectFromRegion(r.Intersect(clip)), dst);
+	SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 
 	if (BLENDED) {
