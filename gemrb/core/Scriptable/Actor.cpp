@@ -6645,15 +6645,17 @@ void Actor::SetModal(ieDword newstate, bool force)
 			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
+		//update the action bar
+		if (Modal.State != newstate || newstate != MS_NONE) {
+			core->SetEventFlag(EF_ACTION);
+		}
+
 		// when called with the same state twice, toggle to MS_NONE
 		if (!force && Modal.State == newstate) {
 			Modal.State = MS_NONE;
 		} else {
 			Modal.State = newstate;
 		}
-
-		//update the action bar
-		core->SetEventFlag(EF_ACTION);
 	} else {
 		Modal.State = newstate;
 	}
