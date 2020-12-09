@@ -418,17 +418,24 @@ def CycleDisplayItem(direction):
 def OpenItemInfoWindow (btn, slot):
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	slot_item = GemRB.GetSlotItem (pc, slot)
-	item = GemRB.GetItem (slot_item["ItemResRef"])
+	slotItem = GemRB.GetSlotItem (pc, slot)
+	slotType = GemRB.GetSlotType (slot, pc)
 
-	if TryAutoIdentification(pc, item, slot, slot_item, True):
+	# PST: if the slot is empty but is also the first quick weapon slot, display the info for the "default" weapon
+	if GameCheck.IsPST() and slotItem is None and slotType["ID"] == 10 and GemRB.GetEquippedQuickSlot(pc) == 10:
+		DisplayItem (GemRB.GetSlotItem (pc, 0), 1)
+		return
+
+	item = GemRB.GetItem (slotItem["ItemResRef"])
+
+	if TryAutoIdentification(pc, item, slot, slotItem, True):
 		UpdateInventoryWindow ()
 
-	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
+	if slotItem["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 1
 	else:
 		value = 3
-	DisplayItem (slot_item, value)
+	DisplayItem (slotItem, value)
 	return
 
 #auto identify when lore is high enough
