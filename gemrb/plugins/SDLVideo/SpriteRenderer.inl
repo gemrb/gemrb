@@ -380,7 +380,7 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 	IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 	IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 
-	SDLPixelIterator dstit = SDLPixelIterator(xdir, ydir, RectFromRegion(drect), dst);
+	SDLPixelIterator dstit = SDLPixelIterator(dst, xdir, ydir, RectFromRegion(drect));
 
 	static StaticAlphaIterator nomask(0);
 	if (cover == nullptr) {

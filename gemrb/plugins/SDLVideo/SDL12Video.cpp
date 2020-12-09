@@ -173,7 +173,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskc
 		
 		SurfaceAlphaIterator(SDL_Surface* surface, const SDL_Rect& clip, Uint32 mask, Uint8 shift,
 							 IPixelIterator::Direction x, IPixelIterator::Direction y)
-		: RGBAChannelIterator(&pixit, mask, shift), pixit(x, y, clip, surface) {}
+		: RGBAChannelIterator(&pixit, mask, shift), pixit(surface, x, y, clip) {}
 	} *maskit = nullptr;
 
 	if (flags&BLIT_STENCIL_MASK) {
@@ -510,7 +510,7 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			const static OneMinusSrcA<false, false> blender;
 			
 			Region clippedrgn = ClippedDrawingRect(rgn);
-			SDLPixelIterator dstit(RectFromRegion(clippedrgn), currentBuf);
+			SDLPixelIterator dstit(currentBuf, RectFromRegion(clippedrgn));
 			SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 			ColorFill(color, dstit, dstend, blender);
 		} else {
