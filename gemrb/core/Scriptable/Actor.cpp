@@ -6646,8 +6646,9 @@ void Actor::SetModal(ieDword newstate, bool force)
 		}
 
 		//update the action bar
-		if (Modal.State != newstate || newstate != MS_NONE)
+		if (Modal.State != newstate || newstate != MS_NONE) {
 			core->SetEventFlag(EF_ACTION);
+		}
 
 		// when called with the same state twice, toggle to MS_NONE
 		if (!force && Modal.State == newstate) {
