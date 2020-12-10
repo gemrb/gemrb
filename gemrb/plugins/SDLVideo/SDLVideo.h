@@ -32,20 +32,14 @@
 
 #include <vector>
 
-#if SDL_VERSION_ATLEAST(1,3,0)
-#define SDLKey SDL_Keycode
-#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
-#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
-#else
-typedef Sint32 SDL_Keycode;
-#endif
-
 namespace GemRB {
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 #define SDL_SRCCOLORKEY SDL_TRUE
 #define SDL_SRCALPHA 0
 #define SDLKey SDL_Keycode
+#define SDL_JoyAxisEvent SDL_ControllerAxisEvent
+#define SDL_JoyButtonEvent SDL_ControllerButtonEvent
 #define SDLK_SCROLLOCK SDLK_SCROLLLOCK
 #define SDLK_KP1 SDLK_KP_1
 #define SDLK_KP2 SDLK_KP_2
