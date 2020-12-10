@@ -5215,12 +5215,12 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(-1);
+	Sender->GetCurrentArea()->FillExplored(true);
 }
 
 void GameScript::UndoExplore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(0);
+	Sender->GetCurrentArea()->FillExplored(false);
 }
 
 void GameScript::ExploreMapChunk( Scriptable* Sender, Action* parameters)

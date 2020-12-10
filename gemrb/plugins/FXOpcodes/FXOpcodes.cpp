@@ -3655,9 +3655,10 @@ int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2) {
-		map->Explore(fx->Parameter1);
+		// GemRB extension
+		map->FillExplored(fx->Parameter1);
 	} else {
-		map->Explore(-1);
+		map->FillExplored(true);
 	}
 	return FX_NOT_APPLIED;
 }

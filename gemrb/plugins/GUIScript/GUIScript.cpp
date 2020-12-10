@@ -10029,16 +10029,14 @@ static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_ExploreArea__doc,
 "===== ExploreArea =====\n\
 \n\
-**Prototype:** ExploreArea ([bitvalue=-1])\n\
+**Prototype:** ExploreArea ([explored=True])\n\
 \n\
-**Description:** Explores or unexplores the whole area. Basically fills the \n\
-explored bitmap with the value given. If there was no value given, it will \n\
-fill with -1 (all bit set).\n\
+**Description:** Explores or unexplores the whole area.\n\
 \n\
 **Parameters:**\n\
-  * bitvalue:\n\
-    * 0 - undo explore\n\
-    * -1 - explore\n\
+  * explored:\n\
+    * False - undo explore\n\
+    * True - explore\n\
     * all other values give meaningless results\n\
 \n\
 **Return value:** N/A\n\
@@ -10048,13 +10046,13 @@ fill with -1 (all bit set).\n\
 
 static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 {
-	int Value=-1;
-	PARSE_ARGS( args,  "|i", &Value);
+	bool explored = true;
+	PARSE_ARGS( args,  "|p", &explored);
 	GET_GAME();
 
 	GET_MAP();
 
-	map->Explore( Value );
+	map->FillExplored(explored);
 
 	Py_RETURN_NONE;
 }

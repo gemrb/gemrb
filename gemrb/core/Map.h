@@ -552,8 +552,7 @@ public:
 	int GetHeight() const { return Height; }
 	Size GetSize() const;
 	int GetExploredMapSize() const;
-	/*fills the explored bitmap with setreset */
-	void Explore(int setreset);
+	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point &Tile);
 	/* explore map from given point in map coordinates */

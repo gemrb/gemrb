@@ -3235,9 +3235,9 @@ int Map::GetExploredMapSize() const
 	return (x*y+7)/8;
 }
 
-void Map::Explore(int setreset)
+void Map::FillExplored(bool explored)
 {
-	memset (ExploredBitmap, setreset, GetExploredMapSize() );
+	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), (explored) ? 0xff : 0x00);
 }
 
 // x, y are not in tile coordinates
