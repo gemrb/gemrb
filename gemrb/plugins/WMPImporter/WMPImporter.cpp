@@ -182,8 +182,12 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str, WMPAreaEntry* ae)
 	str->ReadDword( &ae->IconSeq );
 	//this should be set after iconseq is known
 	ae->SetAreaStatus(tmpDword, OP_SET);
-	str->ReadDword( &ae->X );
-	str->ReadDword( &ae->Y );
+	// TODO: fix this with #232
+	ieDword coord;
+	str->ReadDword(&coord);
+	ae->pos.x = coord;
+	str->ReadDword(&coord);
+	ae->pos.y = coord;
 	str->ReadDword( &ae->LocCaptionName );
 	str->ReadDword( &ae->LocTooltipName );
 	str->ReadResRef( ae->LoadScreenResRef );
@@ -315,8 +319,11 @@ int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
 		tmpDword = ae->GetAreaStatus();
 		stream->WriteDword( &tmpDword );
 		stream->WriteDword( &ae->IconSeq );
-		stream->WriteDword( &ae->X );
-		stream->WriteDword( &ae->Y );
+		// TODO: fix this with #232
+		ieDword coord = ae->pos.x;
+		stream->WriteDword(&coord);
+		coord = ae->pos.y;
+		stream->WriteDword(&coord);
 		stream->WriteDword( &ae->LocCaptionName );
 		stream->WriteDword( &ae->LocTooltipName );
 		stream->WriteResRef( ae->LoadScreenResRef );

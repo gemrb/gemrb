@@ -75,35 +75,36 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 /** Draws the Control on the Output Display */
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-#define MAP_TO_SCREENX(i) rgn.x - Pos.x + (i)
-#define MAP_TO_SCREENY(i) rgn.y - Pos.y + (i)
+	auto MapToScreen = [&rgn, this](const Point& p) {
+		return rgn.Origin() - Pos + p;
+	};
+	
 	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
-	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), &rgn );
+	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()), &rgn );
 
 	unsigned int ec = worldmap->GetEntryCount();
 	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
-		int xOffs = MAP_TO_SCREENX(m->X);
-		int yOffs = MAP_TO_SCREENY(m->Y);
+		Point offset = MapToScreen(m->pos);
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
 				PaletteHolder pal = icon->GetPalette();
 				icon->SetPalette(pal_selected.get());
-				video->BlitSprite( icon, xOffs, yOffs, &rgn );
+				video->BlitSprite( icon, offset, &rgn );
 				icon->SetPalette(pal);
 			} else {
-				video->BlitSprite( icon, xOffs, yOffs, &rgn );
+				video->BlitSprite( icon, offset, &rgn );
 			}
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite(AnimPicture, xOffs, yOffs, &rgn);
+			video->BlitSprite(AnimPicture, offset, &rgn);
 		}
 	}
 
@@ -117,7 +118,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		const Region& icon_frame = icon->Frame;
-		Region r2 = Region( MAP_TO_SCREENX(m->X - icon_frame.x), MAP_TO_SCREENY(m->Y - icon_frame.y), icon_frame.w, icon_frame.h );
+		Point p = m->pos - icon_frame.Origin();
+		Region r2 = Region(MapToScreen(p), icon_frame.Dimensions());
 		
 		PaletteHolder text_pal;
 		if (Area == m) {
@@ -133,9 +135,6 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
 					 *caption, text_pal, 0 );
 	}
-
-#undef MAP_TO_SCREENX
-#undef MAP_TO_SCREENY
 }
 
 void WorldMapControl::ScrollDelta(const Point& delta)
@@ -154,8 +153,8 @@ void WorldMapControl::ScrollTo(const Point& pos)
 		unsigned entry;
 		const WMPAreaEntry *areaEntry = worldmap->GetArea(currentArea, entry);
 		if (areaEntry) {
-			Pos.x = areaEntry->X - frame.w/2;
-			Pos.y = areaEntry->Y - frame.h/2;
+			Pos.x = areaEntry->pos.x - frame.w / 2;
+			Pos.y = areaEntry->pos.y - frame.h / 2;
 		}
 	}
 
@@ -189,7 +188,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			}
 
 			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
-			Region rgn(ae->X, ae->Y, 0, 0);
+			Region rgn(ae->pos, Size());
 			if (icon) {
 				rgn.x -= icon->Frame.x;
 				rgn.y -= icon->Frame.y;

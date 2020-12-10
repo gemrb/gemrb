@@ -2720,8 +2720,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		strnuprcpy(entry->AreaLongName, script, 32);
 		entry->SetAreaStatus(flags, OP_SET);
 		entry->IconSeq = icon;
-		entry->X = locx;
-		entry->Y = locy;
+		entry->pos.x = locx;
+		entry->pos.y = locy;
 		entry->LocCaptionName = label;
 		entry->LocTooltipName = name;
 		memset(entry->LoadScreenResRef, 0, sizeof(ieResRef));

@@ -90,8 +90,7 @@ public:
 	ieResRef AreaResRef;
 	ieVariable AreaLongName;
 	ieDword IconSeq;
-	ieDword X;
-	ieDword Y;
+	Point pos;
 	ieStrRef LocCaptionName;
 	ieStrRef LocTooltipName;
 	ieResRef LoadScreenResRef;

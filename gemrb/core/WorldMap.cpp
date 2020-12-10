@@ -42,7 +42,6 @@ WMPAreaEntry::WMPAreaEntry()
 	LoadScreenResRef[0] = 0;
 	LocCaptionName = LocTooltipName = 0;
 	AreaLinksCount[0] = AreaLinksIndex[0] = 0;
-	X = Y = 0;
 	IconSeq = AreaStatus = 0;
 }
 
@@ -502,8 +501,8 @@ void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
 
 	WMPAreaEntry *src = area_entries[i];
 	WMPAreaEntry *dest = area_entries[link->AreaIndex];
-	ae->X = src->X + (int) (dest->X - src->X) / 2;
-	ae->Y = src->Y + (int) (dest->Y - src->Y) / 2;
+	ae->pos.x = src->pos.x + (dest->pos.x - src->pos.x) / 2;
+	ae->pos.y = src->pos.y + (dest->pos.y - src->pos.y) / 2;
 
 	//setup the area links
 	WMPAreaLink *ldest = new WMPAreaLink();
