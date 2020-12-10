@@ -36,8 +36,6 @@ Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
 
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
-	KnobXPos = KnobYPos = 0;
-	CapXPos = CapYPos = 0;
 
 	SetValueRange(0, 100);
 }
@@ -74,11 +72,11 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		const Size& size = BackGround2->Frame.Dimensions();
 		//this is the PST/IWD specific part
 		Count = val * size.w / 100;
-		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, size.h );
+		Region r(rgn.Origin() + KnobPos, Size(Count, size.h));
 		core->GetVideoDriver()->BlitSprite(BackGround2, r.Origin(), &r);
 
-		core->GetVideoDriver()->BlitSprite(PBarCap,
-			rgn.x+CapXPos+Count-PBarCap->Frame.w, rgn.y+CapYPos);
+		core->GetVideoDriver()->BlitSprite(PBarCap, rgn.x + CapPos.x + Count-PBarCap->Frame.w,
+										   rgn.y + CapPos.y);
 		return;
 	}
 
@@ -112,12 +110,10 @@ void Progressbar::SetAnimation(Animation *arg)
 	PBarAnim = arg;
 }
 
-void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
+void Progressbar::SetSliderPos(const Point& knob, const Point& cap)
 {
-	KnobXPos=x;
-	KnobYPos=y;
-	CapXPos=x2;
-	CapYPos=y2;
+	KnobPos = knob;
+	CapPos = cap;
 }
 
 }

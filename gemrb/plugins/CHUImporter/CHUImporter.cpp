@@ -270,7 +270,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
-				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
+				// TODO: fix this with #232
+				pbar->SetSliderPos(Point(KnobXPos, KnobYPos), Point(CapXPos, CapYPos));
 
 				Holder<Sprite2D> img;
 				Holder<Sprite2D> img2;

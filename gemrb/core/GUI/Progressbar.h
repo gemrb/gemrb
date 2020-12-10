@@ -60,7 +60,7 @@ public:
 	/** Sets a bam resource for progressbar */
 	void SetAnimation(Animation *arg);
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
-	void SetSliderPos(int x, int y, int x2, int y2);
+	void SetSliderPos(const Point& knob, const Point& cap);
 	/** Refreshes a progressbar which is associated with VariableName */
 	void UpdateState(unsigned int Sum);
 
@@ -68,8 +68,8 @@ private: // Private attributes
 	Holder<Sprite2D> BackGround2; //mos resource for the filling of the bar
 	/** Knob Steps Count */
 	unsigned int KnobStepsCount;
-	int KnobXPos, KnobYPos; //relative coordinates for Background2
-	int CapXPos, CapYPos; //relative coordinates for PBarCap
+	Point KnobPos; //relative coordinates for Background2
+	Point CapPos; //relative coordinates for PBarCap
 
 	/** The mos for the progressbar cap (linear progressbar) */
 	Holder<Sprite2D> PBarCap;
