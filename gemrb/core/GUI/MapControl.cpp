@@ -166,7 +166,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (MapMOS) {
-		video->BlitSprite(MapMOS, mosRgn.Origin(), NULL);
+		video->BlitSprite(MapMOS, mosRgn.Origin());
 	}
 
 	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)

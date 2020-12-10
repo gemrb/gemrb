@@ -341,7 +341,7 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 	}
 }
 
-void ContentContainer::DrawContents(const Layout& layout, const Point& point)
+void ContentContainer::DrawContents(const Layout& layout, Point point)
 {
 	layout.content->DrawContentsInRegions(layout.regions, point);
 }
@@ -734,7 +734,7 @@ TextContainer::FindCursorRegion(const Layout& layout)
 	return end;
 }
 
-void TextContainer::DrawContents(const Layout& layout, const Point& dp)
+void TextContainer::DrawContents(const Layout& layout, Point dp)
 {	
 	ContentContainer::DrawContents(layout, dp);
 
@@ -760,7 +760,8 @@ void TextContainer::DrawContents(const Layout& layout, const Point& dp)
 		video->SetScreenClip(NULL);
 
 		Holder<Sprite2D> cursor = core->GetCursorSprite();
-		video->BlitSprite(cursor, cursorPoint.x + dp.x, cursorPoint.y + dp.y + cursor->Frame.y);
+		dp.y += cursor->Frame.y;
+		video->BlitSprite(cursor, cursorPoint + dp);
 
 		video->SetScreenClip(&sc);
 	}

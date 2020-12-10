@@ -56,7 +56,7 @@ void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Frame.w), AnimPicture->Frame.h );
-		core->GetVideoDriver()->BlitSprite( AnimPicture.get(), r.x + xOffs, r.y + yOffs, &r );
+		core->GetVideoDriver()->BlitSprite(AnimPicture, r.Origin(), &r );
 	}
 
 }

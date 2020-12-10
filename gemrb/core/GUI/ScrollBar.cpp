@@ -149,9 +149,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_UP_PRESSED].get(), drawFrame.Origin(), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.Origin(), &drawFrame);
 	} else {
-		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED].get(), drawFrame.Origin(), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.Origin(), &drawFrame);
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);

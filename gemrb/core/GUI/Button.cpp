@@ -191,11 +191,11 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			}
 
 			Region rb = Region(picXPos, picYPos, Picture->Frame.w, buttonHeight);
-			video->BlitSprite( Picture, picXPos, picYPos, &rb );
+			video->BlitSprite( Picture, rb.Origin(), &rb );
 		}
 		else {
 			Region r( picXPos, picYPos, (int)(Picture->Frame.w * Clipping), Picture->Frame.h );
-			video->BlitSprite( Picture, picXPos + Picture->Frame.x, picYPos + Picture->Frame.y, &r );
+			video->BlitSprite(Picture, Picture->Frame.Origin() + r.Origin(), &r);
 		}
 	}
 
@@ -206,9 +206,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs + AnimPicture->Frame.x, rgn.y + yOffs + AnimPicture->Frame.y, &r );
+			video->BlitSprite( AnimPicture, r.Origin() + AnimPicture->Frame.Origin(), &r );
 		} else {
-			video->BlitSprite( AnimPicture.get(), rgn.x + xOffs, rgn.y + yOffs, &r );
+			video->BlitSprite( AnimPicture, r.Origin(), &r );
 		}
 	}
 

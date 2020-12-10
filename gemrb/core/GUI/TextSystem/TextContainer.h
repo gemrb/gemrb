@@ -218,7 +218,7 @@ protected:
 	const Layout* LayoutAtPoint(const Point& p) const;
 
 	void DrawSelf(Region drawFrame, const Region& clip);
-	virtual void DrawContents(const Layout& layout, const Point& point);
+	virtual void DrawContents(const Layout& layout, Point point);
 	
 	void SizeChanged(const Size& oldSize);
 
@@ -260,7 +260,7 @@ private:
 	void OnTextInput(const TextEvent& /*te*/);
 
 	void DrawSelf(Region drawFrame, const Region& clip);
-	virtual void DrawContents(const Layout& layout, const Point& point);
+	virtual void DrawContents(const Layout& layout, Point point);
 
 	virtual bool Editable() const { return IsReceivingEvents(); }
 	void SizeChanged(const Size& oldSize);
