@@ -447,54 +447,54 @@ void SDL12VideoDriver::BlitVideoBuffer( const VideoBufferPtr& buf, const Point& 
 void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointSurface<true>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+		DrawPointSurface<BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	} else {
-		DrawPointSurface<false>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+		DrawPointSurface<NONE>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointsSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawPointsSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.unused < 0xff) {
-		DrawPointsSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
-		DrawPointsSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	}
 }
 
 void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPolygonSurface<true>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+		DrawPolygonSurface<BLEND>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	} else {
-		DrawPolygonSurface<false>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+		DrawPolygonSurface<NONE>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	}
 }
 
 void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLineSurface<true>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+		DrawLineSurface<BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	} else {
-		DrawLineSurface<false>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+		DrawLineSurface<NONE>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	}
 }
 
 void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
 {
 	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLinesSurface<true>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawLinesSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawLinesSurface<false>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawLinesSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 
@@ -519,15 +519,15 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			SDL_FillRect( currentBuf, &drect, val );
 		}
 	} else if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawHLineSurface<true>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<true>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
-		DrawHLineSurface<true>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<true>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	} else {
-		DrawHLineSurface<false>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<false>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
-		DrawHLineSurface<false>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<false>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<NONE>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<NONE>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	}
 }
 

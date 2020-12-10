@@ -88,9 +88,11 @@ struct SrcRGBA : RGBBlender {
 
 enum SHADER {
 	NONE,
+	BLEND,
 	TINT,
 	GREYSCALE,
-	SEPIA
+	SEPIA,
+	MOD
 };
 
 // using a template to avoid runtime branch evaluation

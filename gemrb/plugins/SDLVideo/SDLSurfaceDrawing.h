@@ -59,7 +59,7 @@ inline SDL_Rect RectFromRegion(const Region& rgn)
 }
 #endif
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
@@ -69,17 +69,18 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 
 	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 
-	if (BLENDED) {
+	if (SHADE == BLEND) {
 		Color dstc;
 		SDL_GetRGB( *px, dst->format, &dstc.r, &dstc.g, &dstc.b );
 		ShaderBlend<false>(color, dstc);
 		*px = SDL_MapRGBA(dst->format, dstc.r, dstc.g, dstc.b, dstc.a);
+	} else if (SHADE == MOD) {
 	} else {
 		*px = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
 	}
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
 	SDL_PixelFormat* fmt = surface->format;
@@ -97,19 +98,23 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 		Color dstc;
 		switch (fmt->BytesPerPixel) {
 			case 1:
-				if (BLENDED) {
+				if (SHADE == BLEND) {
 					SDL_GetRGB( *dst, surface->format, &dstc.r, &dstc.g, &dstc.b );
 					ShaderBlend<false>(srcc, dstc);
 					*dst = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
+				} else if (SHADE == MOD) {
+					
 				} else {
 					*dst = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
 				break;
 			case 2:
-				if (BLENDED) {
+				if (SHADE == BLEND) {
 					SDL_GetRGB( *reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
 					ShaderBlend<false>(srcc, dstc);
 					*reinterpret_cast<Uint16*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
+				} else if (SHADE == MOD) {
+					
 				} else {
 					*reinterpret_cast<Uint16*>(dst) = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
@@ -133,10 +138,11 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 			}
 				break;
 			case 4:
-				if (BLENDED) {
+				if (SHADE == BLEND) {
 					SDL_GetRGB( *reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
 					ShaderBlend<false>(srcc, dstc);
 					*reinterpret_cast<Uint32*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
+				} else if (SHADE == MOD) {
 				} else {
 					*reinterpret_cast<Uint32*>(dst) = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
@@ -150,7 +156,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 	SDL_UnlockSurface( surface );
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
@@ -172,7 +178,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	x2 = Clamp<int>(x2, p.x, clip.x + clip.w);
 
 	if (p.x == x2)
-		return DrawPointSurface<BLENDED>(dst, p, clip, color);
+		return DrawPointSurface<SHADE>(dst, p, clip, color);
 
 	assert(p.x < x2);
 	if (p.y >= dst->h || p.x >= dst->w) {
@@ -180,7 +186,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		return;
 	}
 
-	if (BLENDED) {
+	if (SHADE == BLEND) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
 		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
@@ -188,6 +194,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		const static OneMinusSrcA<false, false> blender;
 
 		ColorFill(color, dstit, dstend, blender);
+	} else if (SHADE == MOD) {
 	} else {
 		Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
@@ -197,7 +204,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	}
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
@@ -218,27 +225,28 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	y2 = Clamp<int>(y2, p.y, clip.y + clip.h);
 
 	if (p.y == y2)
-		return DrawPointSurface<BLENDED>(dst, p, clip, color);
+		return DrawPointSurface<SHADE>(dst, p, clip, color);
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
 	SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 
-	if (BLENDED) {
+	if (SHADE == BLEND) {
 		const static OneMinusSrcA<false, false> blender;
 		ColorFill(color, dstit, dstend, blender);
+	} else if (SHADE == MOD) {
 	} else {
 		const static SrcRGBA<false> blender;
 		ColorFill(color, dstit, dstend, blender);
 	}
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end, const Region& clip, const Color& color)
 {
-	if (start.y == end.y) return DrawHLineSurface<BLENDED>(surface, start, end.x, clip, color);
-	if (start.x == end.x) return DrawVLineSurface<BLENDED>(surface, start, end.y, clip, color);
+	if (start.y == end.y) return DrawHLineSurface<SHADE>(surface, start, end.x, clip, color);
+	if (start.x == end.x) return DrawVLineSurface<SHADE>(surface, start, end.y, clip, color);
 
 	assert(clip.x >= 0 && clip.w <= surface->w);
 	assert(clip.y >= 0 && clip.h <= surface->h);
@@ -316,28 +324,28 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 		}
 	} while (false);
 
-	DrawPointsSurface<BLENDED>(surface, s_points, clip, color);
+	DrawPointsSurface<SHADE>(surface, s_points, clip, color);
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawLinesSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& color)
 {
 	size_t count = points.size();
 	assert(count % 2 == 0);
 	for (size_t i = 0; i < count; i+=2)
 	{
-		DrawLineSurface<BLENDED>(surface, points[i], points[i+1], clip, color);
+		DrawLineSurface<SHADE>(surface, points[i], points[i+1], clip, color);
 	}
 }
 
-template<bool BLENDED=false>
+template<SHADER SHADE=NONE>
 void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
 {
 	if (fill) {
 		for (const auto& lineSegments : poly->rasterData)
 		{
 			for (const auto& segment : lineSegments) {
-				DrawHLineSurface<BLENDED>(surface, segment.first + origin, (segment.second + origin).x, clip, color);
+				DrawHLineSurface<SHADE>(surface, segment.first + origin, (segment.second + origin).x, clip, color);
 			}
 		}
 	} else {
@@ -366,7 +374,7 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		s_points[j].x = p.x;
 		s_points[j].y = p.y;
 
-		DrawLinesSurface<BLENDED>(surface, s_points, clip, color);
+		DrawLinesSurface<SHADE>(surface, s_points, clip, color);
 	}
 }
 
