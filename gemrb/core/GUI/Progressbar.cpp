@@ -36,7 +36,6 @@ Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
 
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
-	PBarCap = NULL;
 	KnobXPos = KnobYPos = 0;
 	CapXPos = CapYPos = 0;
 
@@ -48,6 +47,15 @@ Progressbar::~Progressbar()
 	delete PBarAnim;
 }
 
+bool Progressbar::IsOpaque() const
+{
+	bool isOpaque = Control::IsOpaque();
+	if (!isOpaque) {
+		isOpaque = BackGround2 && BackGround2->HasTransparency() == false;
+	}
+	return isOpaque;
+}
+
 /** Draws the Control on the Output Display */
 void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 {
@@ -57,8 +65,6 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		//animated progbar end stage
 		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin(), &rgn);
 		return; //done for animated progbar
-	} else if (BackGround) {
-		core->GetVideoDriver()->BlitSprite(BackGround, rgn.Origin(), &rgn);
 	}
 
 	unsigned int Count;
@@ -93,16 +99,11 @@ void Progressbar::UpdateState(unsigned int Sum)
 }
 
 /** Sets the selected image */
-void Progressbar::SetImage(Holder<Sprite2D> img, Holder<Sprite2D> img2)
+void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 {
-	BackGround = img;
-	BackGround2 = img2;
+	BackGround2 = bg;
+	PBarCap = cap;
 	MarkDirty();
-}
-
-void Progressbar::SetBarCap(Holder<Sprite2D> img3)
-{
-	PBarCap = img3;
 }
 
 void Progressbar::SetAnimation(Animation *arg)

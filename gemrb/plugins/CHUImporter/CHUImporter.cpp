@@ -274,6 +274,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				Holder<Sprite2D> img;
 				Holder<Sprite2D> img2;
+				Holder<Sprite2D> img3;
 				if ( MOSFile[0] ) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
@@ -283,7 +284,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					img2 = mos->GetSprite2D();
 				}
 
-				pbar->SetImage( img, img2 );
 				if( KnobStepsCount ) {
 					/* getting the bam */
 					AnimationFactory *af = (AnimationFactory *)
@@ -297,9 +297,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				}
 				else {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BAMFile);
-					Holder<Sprite2D> img3 = mos->GetSprite2D();
-					pbar->SetBarCap( img3 );
+					img3 = mos->GetSprite2D();
 				}
+				pbar->SetBackground(img);
+				pbar->SetImages(img2, img3);
 				ctrl = pbar;
 			}
 			break;
