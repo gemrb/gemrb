@@ -8757,6 +8757,8 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		
 		Game* game = core->GetGame();
 		game->ApplyGlobalTint(tint, flags);
+		
+		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
 
 		int cx = Pos.x - vp.x;
 		int cy = Pos.y - vp.y - GetElevation();
