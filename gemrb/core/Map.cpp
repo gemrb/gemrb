@@ -945,10 +945,15 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		return MaskHit(x, y, visible_mask);
 	};
 	
-	auto FillFog = [=](int x, int y, int count) {
+	auto ConvertPointToScreen = [=](int x, int y) {
 		x = (x - sx) * CELL_SIZE + x0;
 		y = (y - sy) * CELL_SIZE + y0;
-		vid->DrawRect(Region(x, y, CELL_SIZE * count, CELL_SIZE), ColorBlack, true);
+		return Point(x, y);
+	};
+	
+	auto FillFog = [=](int x, int y, int count) {
+		Region r(ConvertPointToScreen(x, y), Size(CELL_SIZE * count, CELL_SIZE));
+		vid->DrawRect(r, ColorBlack, true);
 	};
 	
 	auto Fill = [=](int x, int y, uint8_t dirs, uint8_t idxBase = 0) {
@@ -981,8 +986,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 
 		assert((dirs & 0xf0) == 0);
 
-		x = (x - sx) * CELL_SIZE + x0;
-		y = (y - sy) * CELL_SIZE + y0;
+		Point p = ConvertPointToScreen(x, y);
 		switch (dirs & 0x0f) {
 			case N:
 			case W:
@@ -992,31 +996,31 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			case E:
 			case NE:
 			case SE:
-				vid->BlitSprite(core->FogSprites[idxBase + dirs], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + dirs], p);
 				return true;
 			case N|S:
-				vid->BlitSprite(core->FogSprites[idxBase + N], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + S], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + N], p);
+				vid->BlitSprite(core->FogSprites[idxBase + S], p);
 				return true;
 			case NW|SW:
-				vid->BlitSprite(core->FogSprites[idxBase + NW], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + SW], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + NW], p);
+				vid->BlitSprite(core->FogSprites[idxBase + SW], p);
 				return true;
 			case W|E:
-				vid->BlitSprite(core->FogSprites[idxBase + W], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + E], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + W], p);
+				vid->BlitSprite(core->FogSprites[idxBase + E], p);
 				return true;
 			case NW|NE:
-				vid->BlitSprite(core->FogSprites[idxBase + NW], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + NE], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + NW], p);
+				vid->BlitSprite(core->FogSprites[idxBase + NE], p);
 				return true;
 			case NE|SE:
-				vid->BlitSprite(core->FogSprites[idxBase + NE], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + SE], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + NE], p);
+				vid->BlitSprite(core->FogSprites[idxBase + SE], p);
 				return true;
 			case SW|SE:
-				vid->BlitSprite(core->FogSprites[idxBase + SW], x, y);
-				vid->BlitSprite(core->FogSprites[idxBase + SE], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + SW], p);
+				vid->BlitSprite(core->FogSprites[idxBase + SE], p);
 				return true;
 			default: // a fully surrounded tile is filled
 				return false;
@@ -1041,9 +1045,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		if (!IsVisible(x + 1, y)) dirs |= 8;
 
 		if (dirs && !Fill(x, y, dirs, 16)) {
-			x = (x - sx) * CELL_SIZE + x0;
-			y = (y - sy) * CELL_SIZE + y0;
-			vid->BlitSprite(core->FogSprites[16], x, y);
+			vid->BlitSprite(core->FogSprites[16], ConvertPointToScreen(x, y));
 		}
 	};
 
@@ -1060,7 +1062,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 				if (IsVisible(x, y)) {
 					FillVisible(x, y);
 				} else {
-					vid->BlitSprite(core->FogSprites[16], (x - sx) * CELL_SIZE + x0, (y - sy) * CELL_SIZE + y0);
+					vid->BlitSprite(core->FogSprites[16], ConvertPointToScreen(x, y));
 				}
 				
 				FillExplored(x, y);
