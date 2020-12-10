@@ -554,8 +554,6 @@ public:
 	int GetExploredMapSize() const;
 	/*fills the explored bitmap with setreset */
 	void Explore(int setreset);
-	/*fills the visible bitmap with setreset */
-	void SetMapVisibility(int setreset = 0);
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point &Tile);
 	/* explore map from given point in map coordinates */

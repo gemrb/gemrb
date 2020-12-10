@@ -3240,11 +3240,6 @@ void Map::Explore(int setreset)
 	memset (ExploredBitmap, setreset, GetExploredMapSize() );
 }
 
-void Map::SetMapVisibility(int setreset)
-{
-	memset( VisibleBitmap, setreset, GetExploredMapSize() );
-}
-
 // x, y are not in tile coordinates
 void Map::ExploreTile(const Point &pos)
 {
@@ -3306,6 +3301,8 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
+	std::fill(VisibleBitmap, VisibleBitmap + GetExploredMapSize(), 0);
+	
 	for (size_t i = 0; i < actors.size(); i++) {
 		const Actor *actor = actors[i];
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
