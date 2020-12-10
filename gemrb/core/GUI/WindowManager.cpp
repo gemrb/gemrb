@@ -469,7 +469,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 		video->BlitGameSprite(cur.get(), pos.x, pos.y, BLIT_GREY|BLIT_BLENDED, ColorGray, NULL);
 	} else {
 		// draw normal cursor
-		video->BlitSprite(cur.get(), pos.x, pos.y);
+		video->BlitSprite(cur, pos);
 	}
 }
 

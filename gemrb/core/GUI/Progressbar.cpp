@@ -55,10 +55,10 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if((val >= 100) && KnobStepsCount && BackGround2) {
 		//animated progbar end stage
-		core->GetVideoDriver()->BlitSprite( BackGround2.get(), rgn.x, rgn.y, &rgn );
+		core->GetVideoDriver()->BlitSprite( BackGround2.get(), rgn.Origin(), &rgn );
 		return; //done for animated progbar
 	} else if (BackGround) {
-		core->GetVideoDriver()->BlitSprite( BackGround.get(), rgn.x, rgn.y, &rgn );
+		core->GetVideoDriver()->BlitSprite( BackGround.get(), rgn.Origin(), &rgn );
 	}
 
 	unsigned int Count;
@@ -69,10 +69,10 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		//this is the PST/IWD specific part
 		Count = val * size.w / 100;
 		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, size.h );
-		core->GetVideoDriver()->BlitSprite( BackGround2.get(), r.x, r.y, &r );
+		core->GetVideoDriver()->BlitSprite(BackGround2, r.x, r.y, &r );
 
-		core->GetVideoDriver()->BlitSprite( PBarCap.get(),
-			rgn.x+CapXPos+Count-PBarCap->Frame.w, rgn.y+CapYPos );
+		core->GetVideoDriver()->BlitSprite(PBarCap,
+			rgn.x+CapXPos+Count-PBarCap->Frame.w, rgn.y+CapYPos);
 		return;
 	}
 
@@ -80,7 +80,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 	Count=val*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Holder<Sprite2D> Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, 0, 0 );
+		core->GetVideoDriver()->BlitSprite(Knob, Point());
 	}
 }
 

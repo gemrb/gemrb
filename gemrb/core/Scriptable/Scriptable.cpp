@@ -1753,7 +1753,7 @@ void Selectable::DrawCircle(const Point& p) const
 	}
 
 	if (sprite) {
-		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - p.x, Pos.y - p.y );
+		core->GetVideoDriver()->BlitSprite(sprite, Pos - p);
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9

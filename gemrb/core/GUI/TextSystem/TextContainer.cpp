@@ -266,7 +266,7 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
-	core->GetVideoDriver()->BlitSprite(image, r.x, r.y, &r);
+	core->GetVideoDriver()->BlitSprite(image, r.Origin(), &r);
 }
 
 ContentContainer::ContentContainer(const Region& frame)

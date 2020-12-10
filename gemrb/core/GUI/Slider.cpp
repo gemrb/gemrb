@@ -49,15 +49,15 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
-			core->GetVideoDriver()->BlitSprite( Knob.get(),
+			core->GetVideoDriver()->BlitSprite(Knob,
 				rgn.x + KnobPos.x + ( Pos * KnobStep ),
-				rgn.y + KnobPos.y );
+				rgn.y + KnobPos.y);
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			core->GetVideoDriver()->BlitSprite( GrabbedKnob.get(),
+			core->GetVideoDriver()->BlitSprite(GrabbedKnob,
 				rgn.x + KnobPos.x + ( Pos * KnobStep ),
-				rgn.y + KnobPos.y );
+				rgn.y + KnobPos.y);
 			break;
 	}
 }

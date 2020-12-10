@@ -149,9 +149,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite( Frames[IMAGE_UP_PRESSED].get(), drawFrame.x, drawFrame.y, &drawFrame );
+		video->BlitSprite(Frames[IMAGE_UP_PRESSED].get(), drawFrame.Origin(), &drawFrame);
 	} else {
-		video->BlitSprite( Frames[IMAGE_UP_UNPRESSED].get(), drawFrame.x, drawFrame.y, &drawFrame );
+		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED].get(), drawFrame.Origin(), &drawFrame);
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
@@ -163,24 +163,24 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 			Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
 			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
-				video->BlitSprite( Frames[IMAGE_TROUGH].get(),
+				video->BlitSprite(Frames[IMAGE_TROUGH],
 					drawFrame.x + Frames[IMAGE_TROUGH]->Frame.x + ( ( frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1 ) / 2 ),
-					dy + Frames[IMAGE_TROUGH]->Frame.y, &rgn );
+					dy + Frames[IMAGE_TROUGH]->Frame.y, &rgn);
 			}
 		}
 		// draw the slider
 		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
 		// FIXME: doesnt respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
-		video->BlitSprite( Frames[IMAGE_SLIDER].get(),
+		video->BlitSprite(Frames[IMAGE_SLIDER],
 						  drawFrame.x + slx + Frames[IMAGE_SLIDER]->Frame.x,
-						  drawFrame.y + Frames[IMAGE_SLIDER]->Frame.y + upMy + sly, &drawFrame );
+						  drawFrame.y + Frames[IMAGE_SLIDER]->Frame.y + upMy + sly, &drawFrame);
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
-		video->BlitSprite( Frames[IMAGE_DOWN_PRESSED].get(), drawFrame.x, maxy, &drawFrame );
+		video->BlitSprite(Frames[IMAGE_DOWN_PRESSED], drawFrame.x, maxy, &drawFrame);
 	} else {
-		video->BlitSprite( Frames[IMAGE_DOWN_UNPRESSED].get(), drawFrame.x, maxy, &drawFrame );
+		video->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], drawFrame.x, maxy, &drawFrame);
 	}
 }
 
