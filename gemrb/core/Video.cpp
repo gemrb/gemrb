@@ -212,10 +212,10 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitSprite(const Holder<Sprite2D> spr, int x, int y,
-								const Region* clip)
+void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 {
-	Region dst(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
+	p -= spr->Frame.Origin();
+	Region dst(p, spr->Frame.Dimensions());
 	Region fClip = ClippedDrawingRect(dst, clip);
 
 	if (fClip.Dimensions().IsEmpty()) {
