@@ -1069,7 +1069,6 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			} else {
 				// coalese all horizontally adjacent unexplored cells
 				++unexploredQueue;
-				continue;
 			}
 		}
 		
