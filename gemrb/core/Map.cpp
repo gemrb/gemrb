@@ -911,14 +911,16 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	constexpr int CELL_RATIO = 2;
 
 	// size for explored_mask and visible_mask
-	Size mapSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+	const Size mapSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
 
-	int sx = ( vp.x ) / CELL_SIZE;
-	int sy = ( vp.y ) / CELL_SIZE;
-	int dx = (sx + vp.w / CELL_SIZE + 2) + LargeFog;
-	int dy = (sy + vp.h / CELL_SIZE + 2) + LargeFog;
-	int x0 = (sx * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
-	int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+	const int sx = ( vp.x ) / CELL_SIZE;
+	const int sy = ( vp.y ) / CELL_SIZE;
+	const int dx = (sx + vp.w / CELL_SIZE + 2) + LargeFog;
+	const int dy = (sy + vp.h / CELL_SIZE + 2) + LargeFog;
+	const int x0 = (sx * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
+	const int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+		
+	Video* vid = core->GetVideoDriver();
 	
 	// Returns true if map at (x;y) was explored, else false.
 	// Points outside map are always considered as explored
@@ -935,155 +937,144 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		return bool(mask[res.quot] & (1 << res.rem));
 	};
 	
-	auto IsExplored = [&](int x, int y) {
+	auto IsExplored = [=](int x, int y) {
 		return MaskHit(x, y, explored_mask);
 	};
 	
-	auto IsVisible = [&](int x, int y) {
+	auto IsVisible = [=](int x, int y) {
 		return MaskHit(x, y, visible_mask);
 	};
+	
+	auto FillFog = [=](int x, int y, int count) {
+		x = (x - sx) * CELL_SIZE + x0;
+		y = (y - sy) * CELL_SIZE + y0;
+		vid->DrawRect(Region(x, y, CELL_SIZE * count, CELL_SIZE), ColorBlack, true);
+	};
+	
+	auto Fill = [=](int x, int y, uint8_t dirs, uint8_t idxBase = 0) {
+		// If an explored tile is adjacent to an
+		//   unexplored one, we draw border sprite
+		//   (gradient black <-> transparent)
+		// Tiles in four cardinal directions have these
+		//   values.
+		//
+		//      1
+		//    2   8
+		//      4
+		//
+		// Values of those unexplored are
+		//   added together, the resulting number being
+		//   an index of shadow sprite to use. For now,
+		//   some tiles are made 'on the fly' by
+		//   drawing two or more tiles
+		
+		enum Directions : uint8_t {
+			N = 1,
+			W = 2,
+			NW = N|W,
+			S = 4,
+			SW = S|W,
+			E = 8,
+			NE = N|E,
+			SE = S|E
+		};
 
-	Video* vid = core->GetVideoDriver();
-#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, &r )
+		assert((dirs & 0xf0) == 0);
+
+		x = (x - sx) * CELL_SIZE + x0;
+		y = (y - sy) * CELL_SIZE + y0;
+		switch (dirs & 0x0f) {
+			case N:
+			case W:
+			case NW:
+			case S:
+			case SW:
+			case E:
+			case NE:
+			case SE:
+				vid->BlitSprite(core->FogSprites[idxBase + dirs], x, y);
+				return true;
+			case N|S:
+				vid->BlitSprite(core->FogSprites[idxBase + N], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + S], x, y);
+				return true;
+			case NW|SW:
+				vid->BlitSprite(core->FogSprites[idxBase + NW], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + SW], x, y);
+				return true;
+			case W|E:
+				vid->BlitSprite(core->FogSprites[idxBase + W], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + E], x, y);
+				return true;
+			case NW|NE:
+				vid->BlitSprite(core->FogSprites[idxBase + NW], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + NE], x, y);
+				return true;
+			case NE|SE:
+				vid->BlitSprite(core->FogSprites[idxBase + NE], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + SE], x, y);
+				return true;
+			case SW|SE:
+				vid->BlitSprite(core->FogSprites[idxBase + SW], x, y);
+				vid->BlitSprite(core->FogSprites[idxBase + SE], x, y);
+				return true;
+			default: // a fully surrounded tile is filled
+				return false;
+		}
+	};
+	
+	auto FillExplored = [=](int x, int y) {
+		int dirs = !IsExplored(x, y - 1);
+		if (!IsExplored(x - 1, y)) dirs |= 2;
+		if (!IsExplored(x, y + 1)) dirs |= 4;
+		if (!IsExplored(x + 1, y )) dirs |= 8;
+
+		if (dirs && !Fill(x, y, dirs)) {
+			FillFog(x, y, 1);
+		}
+	};
+	
+	auto FillVisible = [=](int x, int y) {
+		int dirs = !IsVisible( x, y - 1);
+		if (!IsVisible(x - 1, y)) dirs |= 2;
+		if (!IsVisible(x, y + 1)) dirs |= 4;
+		if (!IsVisible(x + 1, y)) dirs |= 8;
+
+		if (dirs && !Fill(x, y, dirs, 16)) {
+			x = (x - sx) * CELL_SIZE + x0;
+			y = (y - sy) * CELL_SIZE + y0;
+			vid->BlitSprite(core->FogSprites[16], x, y);
+		}
+	};
+
 	for (int y = sy; y < dy; y++) {
-		for (int x = sx; x < dx; x++) {
-			Region r = Region(x0 + ( (x - sx) * CELL_SIZE ), y0 + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-			if (!IsExplored(x, y)) {
-				// Unexplored tiles are all black
-				vid->DrawRect(r, ColorBlack, true);
-				continue;  // Don't draw 'invisible' fog
-			} else {
-				// If an explored tile is adjacent to an
-				//   unexplored one, we draw border sprite
-				//   (gradient black <-> transparent)
-				// Tiles in four cardinal directions have these
-				//   values.
-				//
-				//      1
-				//    2   8
-				//      4
-				//
-				// Values of those unexplored are
-				//   added together, the resulting number being
-				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by
-				//   drawing two or more tiles
-
-				int e = !IsExplored(x, y - 1);
-				if (!IsExplored(x - 1, y)) e |= 2;
-				if (!IsExplored(x, y + 1)) e |= 4;
-				if (!IsExplored(x + 1, y )) e |= 8;
-
-				switch (e) {
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 6:
-				case 8:
-				case 9:
-				case 12:
-					FOG( e );
-					break;
-				case 5:
-					FOG( 1 );
-					FOG( 4 );
-					break;
-				case 7:
-					FOG( 3 );
-					FOG( 6 );
-					break;
-				case 10:
-					FOG( 2 );
-					FOG( 8 );
-					break;
-				case 11:
-					FOG( 3 );
-					FOG( 9 );
-					break;
-				case 13:
-					FOG( 9 );
-					FOG( 12 );
-					break;
-				case 14:
-					FOG( 6 );
-					FOG( 12 );
-					break;
-				case 15: //this is black too
-					vid->DrawRect(r, ColorBlack, true);
-					break;
+		int unexploredQueue = 0;
+		int x = sx;
+		for (; x < dx; x++) {
+			if (IsExplored(x, y)) {
+				if (unexploredQueue) {
+					FillFog(x - unexploredQueue, y, unexploredQueue);
+					unexploredQueue = 0;
 				}
-			}
-
-			if (!IsVisible(x, y)) {
-				// Invisible tiles are all gray
-				FOG( 16 );
-				continue;  // Don't draw 'invisible' fog
-			} else {
-				// If a visible tile is adjacent to an
-				//   invisible one, we draw border sprite
-				//   (gradient gray <-> transparent)
-				// Tiles in four cardinal directions have these
-				//   values.
-				//
-				//      1
-				//    2   8
-				//      4
-				//
-				// Values of those invisible are
-				//   added together, the resulting number being
-				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by
-				//   drawing two or more tiles
-
-				int e = !IsVisible( x, y - 1);
-				if (!IsVisible(x - 1, y)) e |= 2;
-				if (!IsVisible(x, y + 1)) e |= 4;
-				if (!IsVisible(x + 1, y)) e |= 8;
-
-				switch (e) {
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 6:
-				case 8:
-				case 9:
-				case 12:
-					FOG( 16 + e );
-					break;
-				case 5:
-					FOG( 16 + 1 );
-					FOG( 16 + 4 );
-					break;
-				case 7:
-					FOG( 16 + 3 );
-					FOG( 16 + 6 );
-					break;
-				case 10:
-					FOG( 16 + 2 );
-					FOG( 16 + 8 );
-					break;
-				case 11:
-					FOG( 16 + 3 );
-					FOG( 16 + 9 );
-					break;
-				case 13:
-					FOG( 16 + 9 );
-					FOG( 16 + 12 );
-					break;
-				case 14:
-					FOG( 16 + 6 );
-					FOG( 16 + 12 );
-					break;
-				case 15: //this is unseen too
-					FOG( 16 );
-					break;
+				
+				if (IsVisible(x, y)) {
+					FillVisible(x, y);
+				} else {
+					vid->BlitSprite(core->FogSprites[16], (x - sx) * CELL_SIZE + x0, (y - sy) * CELL_SIZE + y0);
 				}
+				
+				FillExplored(x, y);
+			} else {
+				// coalese all horizontally adjacent unexplored cells
+				++unexploredQueue;
+				continue;
 			}
 		}
+		
+		if (unexploredQueue) {
+			FillFog(x - unexploredQueue, y, unexploredQueue);
+		}
 	}
-#undef FOG
 }
 
 void Map::DrawHighlightables(const Region& viewport)
