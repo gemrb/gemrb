@@ -363,7 +363,7 @@ Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
 	}
 
 	if (flags & BLIT_COLOR_MOD) {
-		// FIXME: we would need another parameter for tinting the color
+		flags |= BLIT_MULTIPLY;
 	}
 
 	// clear handled flags

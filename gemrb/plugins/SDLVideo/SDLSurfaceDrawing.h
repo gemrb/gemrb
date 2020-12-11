@@ -69,12 +69,15 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 
 	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 
-	if (SHADE == BLEND) {
+	if (SHADE != NONE) {
 		Color dstc;
 		SDL_GetRGB( *px, dst->format, &dstc.r, &dstc.g, &dstc.b );
-		ShaderBlend<false>(color, dstc);
+		if (SHADE == TINT) {
+			ShaderTint(color, dstc);
+		} else {
+			ShaderBlend<false>(color, dstc);
+		}
 		*px = SDL_MapRGBA(dst->format, dstc.r, dstc.g, dstc.b, dstc.a);
-	} else if (SHADE == MOD) {
 	} else {
 		*px = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
 	}
@@ -98,23 +101,27 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 		Color dstc;
 		switch (fmt->BytesPerPixel) {
 			case 1:
-				if (SHADE == BLEND) {
+				if (SHADE != NONE) {
 					SDL_GetRGB( *dst, surface->format, &dstc.r, &dstc.g, &dstc.b );
-					ShaderBlend<false>(srcc, dstc);
+					if (SHADE == TINT) {
+						ShaderTint(srcc, dstc);
+					} else {
+						ShaderBlend<false>(srcc, dstc);
+					}
 					*dst = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
-				} else if (SHADE == MOD) {
-					
 				} else {
 					*dst = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
 				break;
 			case 2:
-				if (SHADE == BLEND) {
+				if (SHADE != NONE) {
 					SDL_GetRGB( *reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
-					ShaderBlend<false>(srcc, dstc);
+					if (SHADE == TINT) {
+						ShaderTint(srcc, dstc);
+					} else {
+						ShaderBlend<false>(srcc, dstc);
+					}
 					*reinterpret_cast<Uint16*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
-				} else if (SHADE == MOD) {
-					
 				} else {
 					*reinterpret_cast<Uint16*>(dst) = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
@@ -138,11 +145,14 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 			}
 				break;
 			case 4:
-				if (SHADE == BLEND) {
+				if (SHADE != NONE) {
 					SDL_GetRGB( *reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
-					ShaderBlend<false>(srcc, dstc);
+					if (SHADE == TINT) {
+						ShaderTint(srcc, dstc);
+					} else {
+						ShaderBlend<false>(srcc, dstc);
+					}
 					*reinterpret_cast<Uint32*>(dst) = SDL_MapRGB(surface->format, dstc.r, dstc.g, dstc.b);
-				} else if (SHADE == MOD) {
 				} else {
 					*reinterpret_cast<Uint32*>(dst) = SDL_MapRGB(surface->format, srcc.r, srcc.g, srcc.b);
 				}
@@ -186,15 +196,19 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		return;
 	}
 
-	if (SHADE == BLEND) {
+	if (SHADE != NONE) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
 		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
-		const static OneMinusSrcA<false, false> blender;
-
-		ColorFill(color, dstit, dstend, blender);
-	} else if (SHADE == MOD) {
+		
+		if (SHADE == TINT) {
+			const static TintDst<false> blender;
+			ColorFill(color, dstit, dstend, blender);
+		} else {
+			const static OneMinusSrcA<false, false> blender;
+			ColorFill(color, dstit, dstend, blender);
+		}
 	} else {
 		Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 		Uint32 c = SDL_MapRGBA(dst->format, color.r, color.g, color.b, color.a);
@@ -235,7 +249,9 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	if (SHADE == BLEND) {
 		const static OneMinusSrcA<false, false> blender;
 		ColorFill(color, dstit, dstend, blender);
-	} else if (SHADE == MOD) {
+	} else if (SHADE == TINT) {
+		const static TintDst<false> blender;
+		ColorFill(color, dstit, dstend, blender);
 	} else {
 		const static SrcRGBA<false> blender;
 		ColorFill(color, dstit, dstend, blender);
