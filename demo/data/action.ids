@@ -1,1 +1,5 @@
 23 MoveToPoint(P:Point*)
+30 SetGlobal(S:Name*,S:Area*,I:Value*)
+66 DayNight(I:TimeOfDay*Time)
+67 Weather(I:Weather*Weather)
+248 RunToPoint(P:Point*)

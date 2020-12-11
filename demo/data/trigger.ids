@@ -1,0 +1,2 @@
+0x0036 OnCreation()
+0x400F Global(S:Name*,S:Area*,I:Value*)

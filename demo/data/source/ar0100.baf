@@ -1,0 +1,9 @@
+IF
+  Global("ReturnedOutside","GLOBAL",1)
+THEN
+  RESPONSE #100
+    Weather(0) // NOWEATHER
+    DayNight(0) // MIDNIGHT
+    SetGlobal("ReturnedOutside","GLOBAL",2)
+END
+
