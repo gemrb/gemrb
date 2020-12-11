@@ -602,7 +602,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 	}
 }
 
-void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* tint)
+void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t& renderflags, const Color* tint)
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
@@ -636,6 +636,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 				}
 			}
 		}
+		renderflags &= ~(BLIT_GREY | BLIT_SEPIA | BLIT_COLOR_MOD);
 	} else if (oldVersion != newVersion) {
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
@@ -652,6 +653,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 			RGBBlendingPipeline<SEPIA, true> blender;
 			Blit(beg, beg, end, alpha, blender);
 		}
+		renderflags &= ~(BLIT_GREY | BLIT_SEPIA);
 		SDL_UnlockSurface(newV);
 	}
 }

@@ -308,16 +308,11 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	if (surf->format->BytesPerPixel == 1) {
 		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
 
-		const unsigned int shaderflags = (BLIT_COLOR_MOD|BLIT_GREY|BLIT_SEPIA);
-		uint32_t version = flags&shaderflags;
 		if (flags&BLIT_COLOR_MOD) {
-			RenderSpriteVersion(sdlspr, version, &c);
+			RenderSpriteVersion(sdlspr, flags, &c);
 		} else {
-			RenderSpriteVersion(sdlspr, version);
+			RenderSpriteVersion(sdlspr, flags);
 		}
-		
-		// since the "shading" has been done we clear the flags
-		flags &= ~shaderflags;
 	}
 
 	BlitSpriteNativeClipped(surf, srect, drect, flags, c);

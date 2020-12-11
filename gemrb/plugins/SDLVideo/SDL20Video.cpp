@@ -245,10 +245,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 #if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
 	// OPENGL
 #else
-	// we need to isolate flags that require software rendering to use as the "version"
-	uint32_t version = (BLIT_GREY|BLIT_SEPIA) & flags;
 	// WARNING: software fallback == slow
-	RenderSpriteVersion(spr, version);
+	RenderSpriteVersion(spr, flags);
 #endif
 
 	SDL_Texture* tex = spr->GetTexture(renderer);
