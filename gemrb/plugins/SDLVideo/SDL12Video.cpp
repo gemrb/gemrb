@@ -149,9 +149,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		if (fmt == RGB555) {
 			buf = SDL_CreateRGBSurface(0, r.w, r.h, 16, 0x7C00, 0x03E0, 0x001F, 0);
 		} else if (fmt == RGBA8888) {
-			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
-			buf = SDL_DisplayFormatAlpha(tmp);
-			SDL_FreeSurface(tmp);
+			buf = SDL_CreateRGBSurface(0, r.w, r.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 		} else if (fmt == DISPLAY_ALPHA) {
 			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
 			buf = SDL_DisplayFormatAlpha(tmp);
