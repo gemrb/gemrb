@@ -39,6 +39,7 @@
 #include "GameScript/GameScript.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "Pixels.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 #include "Video.h"
@@ -2111,7 +2112,7 @@ void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
 	const Color *globalTint = GetGlobalTint();
 	if (globalTint) {
 		if (flags & BLIT_COLOR_MOD) {
-			Color::MultiplyTint(tint, globalTint);
+			ShaderTint(*globalTint, tint);
 		} else {
 			flags |= BLIT_COLOR_MOD;
 			tint = *globalTint;
