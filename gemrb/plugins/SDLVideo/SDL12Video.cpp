@@ -149,15 +149,15 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		if (fmt == RGB555) {
 			buf = SDL_CreateRGBSurface(0, r.w, r.h, 16, 0x7C00, 0x03E0, 0x001F, 0);
 		} else if (fmt == RGBA8888) {
-			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
+			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
 			buf = SDL_DisplayFormatAlpha(tmp);
 			SDL_FreeSurface(tmp);
 		} else if (fmt == DISPLAY_ALPHA) {
-			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
+			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
 			buf = SDL_DisplayFormatAlpha(tmp);
 			SDL_FreeSurface(tmp);
 		} else {
-			SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_HWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0 );
+			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
 			buf = SDL_DisplayFormat(tmp);
 			SDL_FreeSurface(tmp);
 		}
@@ -556,7 +556,7 @@ bool SDL12VideoDriver::SetFullscreenMode(bool set)
 	if (fullscreen != set) {
 		Uint32 flags = disp->flags;
 		flags ^= SDL_FULLSCREEN;
-		disp = SDL_SetVideoMode(disp->w, disp->h, disp->format->BitsPerPixel, flags);
+		disp = SDL_SetVideoMode(disp->w, disp->h, disp->format->BitsPerPixel, flags | SDL_SWSURFACE | SDL_ANYFORMAT);
 
 		fullscreen=set;
 		return true;
