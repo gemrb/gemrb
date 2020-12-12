@@ -9855,6 +9855,7 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 		
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
+	ClearCurrentStanceAnims();
 	SetAttackMoveChances(MeleeAnimation);
 	if (InParty) {
 		//update the paperdoll weapon animation
@@ -9893,6 +9894,7 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
 	
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
+	ClearCurrentStanceAnims();
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
@@ -9906,6 +9908,7 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 		return;
 	
 	anims->SetHelmetRef(AnimationType);
+	ClearCurrentStanceAnims();
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
