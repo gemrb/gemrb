@@ -197,8 +197,6 @@ Interface::Interface()
 #else
 	CaseSensitive = false;
 #endif
-	SkipIntroVideos = false;
-	DrawFPS = false;
 	TouchScrollAreas = false;
 	UseSoftKeyboard = false;
 	KeepCache = false;
@@ -1345,6 +1343,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
+	CONFIG_INT("Logging", Logging = );
 
 #undef CONFIG_INT
 

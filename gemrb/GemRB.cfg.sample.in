@@ -126,6 +126,9 @@ GUIEnhancements = 15
 # Requires 10pp mod: https://github.com/lynxlynxlynx/gemrb-mods
 #MaxPartySize = 6
 
+# Enable or disable (0) logging
+#Logging = 1
+
 #####################################################
 #  Debug                                            #
 #####################################################

@@ -825,7 +825,7 @@ public:
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
-	bool CaseSensitive, SkipIntroVideos, DrawFPS;
+	bool CaseSensitive = true, SkipIntroVideos = false, DrawFPS = false, Logging = false;
 	bool TouchScrollAreas, UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;

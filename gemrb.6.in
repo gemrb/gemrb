@@ -114,6 +114,12 @@ enough room for all the party portraits! No space for that in PST or IWD2. The
 10pp mod is required to fix various game scripts, so the extra party members
 don't get stuck in cutscenes.
 
+.TP
+.BR Logging =(0|1)
+By default (set to 1) logging is enabled and several loggers are used depending
+on the plaftorm. Use 0 to disable all logging, which can help in performance
+critical settings.
+
 .\"###################################################
 .SH Video Parameters:
 
