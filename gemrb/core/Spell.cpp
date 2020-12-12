@@ -134,7 +134,7 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //otherwise set to caster level
 static EffectRef fx_casting_glow_ref = { "CastingGlow", -1 };
 
-void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender)
+void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) const
 {
 	char g, t;
 	Effect *fx;
@@ -244,7 +244,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		// apply the stat-based spell duration modifier
 		if (self && self->Type == ST_ACTOR) {
-			Actor *caster = (Actor *) self;
+			const Actor *caster = (const Actor *) self;
 			if (caster->Modified[IE_SPELLDURATIONMODMAGE] && SpellType == IE_SPL_WIZARD) {
 				fx->Duration = (fx->Duration * caster->Modified[IE_SPELLDURATIONMODMAGE]) / 100;
 			} else if (caster->Modified[IE_SPELLDURATIONMODPRIEST] && SpellType == IE_SPL_PRIEST) {
@@ -300,7 +300,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const Point &target) const
 {
-	SPLExtHeader *seh = GetExtHeader(header);
+	const SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
 			header, (int) ExtHeaderCount);
@@ -320,10 +320,9 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 {
 	int level = 0;
-	Actor *actor = NULL;
 	unsigned int limit = VOODOO_VISUAL_RANGE;
 	if (Sender && Sender->Type==ST_ACTOR) {
-		actor = (Actor *) Sender;
+		Actor *actor = (Actor *) Sender;
 		level = actor->GetCasterLevel(SpellType);
 		limit = actor->GetStat(IE_VISUALRANGE);
 	}
@@ -332,7 +331,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 		level = 1;
 	}
 	int idx = GetHeaderIndexFromLevel(level);
-	SPLExtHeader *seh = GetExtHeader(idx);
+	const SPLExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
 			idx, (int) ExtHeaderCount);
@@ -350,7 +349,7 @@ bool Spell::ContainsDamageOpcode() const
 {
 	for (int h=0; h< ExtHeaderCount; h++) {
 		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
-			Effect *fx = ext_headers[h].features+i;
+			const Effect *fx = ext_headers[h].features + i;
 			if (fx->Opcode == damageOpcode) {
 				return true;
 			}
