@@ -23,11 +23,36 @@
 
 #include "Pixels.h"
 
-// FIXME: could handle 24bpp with a packed struct
-#define ERROR_UNHANDLED_24BPP error("SDLVideo", "24bpp is not supported.")
 #define ERROR_UNKNOWN_BPP error("SDLVideo", "Invalid bpp.")
 
 namespace GemRB {
+
+#pragma pack(push,1)
+struct Pixel24Bit {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+#else
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+#endif
+	
+	Pixel24Bit& operator=(Uint32 pixel) {
+		r = pixel & 0xff000000;
+		g = pixel & 0x00ff0000;
+		b = pixel & 0x0000ff00;
+		return *this;
+	}
+	
+	operator Uint32() {
+		return r + ((Uint32)g << 8) + ((Uint32)b << 16);
+	}
+};
+#pragma pack(pop)
+
+static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
 
 struct SDLPixelIterator : IPixelIterator
 {
@@ -40,7 +65,8 @@ private:
 				imp = new PixelIterator<Uint32>(static_cast<Uint32*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 				break;
 			case 3:
-				ERROR_UNHANDLED_24BPP;
+				imp = new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				break;
 			case 2:
 				imp = new PixelIterator<Uint16>(static_cast<Uint16*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 				break;
@@ -169,7 +195,7 @@ public:
 			case 2:
 				return static_cast<PixelIterator<Uint16>*>(imp)->Channel(mask, shift);
 			case 3:
-				ERROR_UNHANDLED_24BPP;
+				return static_cast<PixelIterator<Pixel24Bit>*>(imp)->Channel(mask, shift);
 			case 4:
 				return static_cast<PixelIterator<Uint32>*>(imp)->Channel(mask, shift);
 			default:
@@ -198,7 +224,8 @@ public:
 				pixel = *reinterpret_cast<Uint32*>(imp->pixel);
 				break;
 			case 3:
-				ERROR_UNHANDLED_24BPP;
+				pixel = *reinterpret_cast<Pixel24Bit*>(imp->pixel);
+				break;
 			case 2:
 				pixel = *reinterpret_cast<Uint16*>(imp->pixel);
 				break;
@@ -254,7 +281,8 @@ public:
 				*reinterpret_cast<Uint32*>(imp->pixel) = pixel;
 				break;
 			case 3:
-				ERROR_UNHANDLED_24BPP;
+				*reinterpret_cast<Pixel24Bit*>(imp->pixel) = pixel;
+				break;
 			case 2:
 				*reinterpret_cast<Uint16*>(imp->pixel) = pixel;
 				break;
