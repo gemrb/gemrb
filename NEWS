@@ -1,4 +1,4 @@
-GemRB git (ac899f08):
+GemRB git (7306dbe):
   New features:
     - 
     - SDLAudio caching
@@ -7,7 +7,8 @@ GemRB git (ac899f08):
   Improved features:
     - 
     - lightning bolts, iwd2 stealth, iwd effects, pst levelup
-    - build system
+    - scripting, demo data
+    - build system, portability and performance improvements
     - externalized summoning limit, trap limit, narration text speed
     - bugfixes
 
