@@ -1,18 +1,9 @@
-# HOWTO RUN
+# HOW TO RUN
 Set:
 GameType=demo
 GamePath to the parent of the parent dir containing this file
 Width=800
 Height=600
-
-# NearInfinity
-
-If you want to use it to explore or modify data, you can open files one by one while having
-any other game open.
-
-If you want the full experience:
- - create demo/baldur.exe demo/BGConfig.exe (or pass `-t bg2tob` when invoking NI)
- - symlink demo/data to demo/override
 
 # AUTHORS
 
