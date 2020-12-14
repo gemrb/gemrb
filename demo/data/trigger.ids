@@ -1,5 +1,6 @@
 0x0036 OnCreation()
 0x400F Global(S:Name*,S:Area*,I:Value*)
 0x401C See(O:Object*)
+0x4034 GlobalGT(S:Name*,S:Area*,I:Value*)
 0x4039 NumTimesTalkedTo(I:Num*)
 0x40E0 NextTriggerObject(O:Object*)
