@@ -1,4 +1,5 @@
 import GemRB
+from GUIDefines import GS_PARTYAI
 
 def OnLoad():
 	# skipping chargen
@@ -9,4 +10,6 @@ def OnLoad():
 	for (stat, color) in statcolors:
 		GemRB.SetPlayerStat (1, stat, color)
 
+	GemRB.SetToken ("CHARNAME", "Seeker")
+	GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
 	GemRB.EnterGame()
