@@ -797,7 +797,7 @@ public:
 	int Width, Height, Bpp;
 	int IgnoreOriginalINI;
 	bool DitherSprites = true;
-	bool CaseSensitive, DrawFPS;
+	bool CaseSensitive = true, DrawFPS = false, Logging = true;
 	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;

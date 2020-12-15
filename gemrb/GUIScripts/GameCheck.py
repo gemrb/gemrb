@@ -48,6 +48,9 @@ def IsBG2 ():
 def IsBG2Demo ():
 	return ('BG2Demo' in GemRB.__dict__) and (GemRB.BG2Demo == True)
 
+def IsGemRBDemo ():
+	return GemRB.GameType == "demo"
+
 def IsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP) and GemRB.GetVar("oldgame") == 0
 

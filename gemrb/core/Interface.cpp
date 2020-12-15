@@ -182,7 +182,6 @@ Interface::Interface()
 #else
 	CaseSensitive = false;
 #endif
-	DrawFPS = false;
 	UseSoftKeyboard = false;
 	KeepCache = false;
 	NumFingInfo = 2;
@@ -1238,6 +1237,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
+	CONFIG_INT("Logging", Logging = );
 
 #undef CONFIG_INT
 

@@ -7,5 +7,6 @@ NORMAL
 2	INITIALS	0				Eadui		36			0		0xffffffff
 3	NUMBER		0				Eadui		14			0		0xffffffff
 4	INFOFONT	1				Lato-Regular	12			0		0xffffffff
+5	TOOLFONT	1				Lato-Regular	12			0		0xffffffff
 
 # Customization How To: https://gemrb.org/Fonts

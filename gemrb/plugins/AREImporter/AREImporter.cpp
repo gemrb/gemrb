@@ -1116,6 +1116,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//the rest is not read, we seek for every record
 	}
 
+	int pst = core->HasFeature(GF_AUTOMAP_INI);
+
 	core->LoadProgress(75);
 	Log(DEBUG, "AREImporter", "Loading actors");
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -1187,6 +1189,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab = actmgr->GetActor(0);
 			if(!ab)
 				continue;
+			// PST generally doesn't appear to use the starting MC_ bits, but for some reason
+			// there's a coaxmetal copy in the mortuary with both KEEP and REMOVE corpse
+			// set that should never be seen. The actor is also already dead, so we don't end
+			// up doing any of the regular cleanup on it (it's mrtghost.cre). Banish it instead.
+			if (pst && ab->GetBase(IE_STATE_ID) & STATE_DEAD && ab->GetBase(IE_MC_FLAGS) & MC_REMOVE_CORPSE) {
+				continue;
+			}
 			map->AddActor(ab, false);
 			ab->Pos.x = XPos;
 			ab->Pos.y = YPos;
@@ -1240,8 +1249,6 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ab->RefreshEffects(NULL);
 		}
 	}
-
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
 	core->LoadProgress(90);
 	Log(DEBUG, "AREImporter", "Loading animations");

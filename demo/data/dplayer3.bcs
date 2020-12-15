@@ -1,0 +1,26 @@
+SC
+CR
+CO
+TR
+16399 1 1 0 0 "GLOBALSeenBlockade" "" OB
+0 0 0 0 0 0 0 0 0 0 0 0 ""OB
+TR
+TR
+16412 0 0 0 0 "" "" OB
+0 0 0 0 0 0 0 0 0 0 0 0 "Caveentrance"OB
+TR
+CO
+RS
+RE
+100AC
+30OB
+0 0 0 0 0 0 0 0 0 0 0 0 ""OB
+OB
+0 0 0 0 0 0 0 0 0 0 0 0 ""OB
+OB
+0 0 0 0 0 0 0 0 0 0 0 0 ""OB
+1 0 0 0 0"GLOBALSeenBlockade" "" AC
+RE
+RS
+CR
+SC

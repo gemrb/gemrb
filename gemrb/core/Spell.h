@@ -175,7 +175,7 @@ public:
 	//-1 will return the cfb
 	EffectQueue *GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro=0) const;
 	// add appropriate casting glow effect
-	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender);
+	void AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(Scriptable *self, int headerindex, int level, const Point &pos) const;
 	unsigned int GetCastingDistance(Scriptable *Sender) const;

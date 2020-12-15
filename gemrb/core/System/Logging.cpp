@@ -21,6 +21,8 @@
 #include "System/Logger.h"
 #include "System/StringBuffer.h"
 
+#include "Interface.h"
+
 #if defined(__sgi)
 #  include <stdarg.h>
 #else
@@ -47,8 +49,10 @@ void InitializeLogging()
 
 void AddLogger(Logger* logger)
 {
-	if (logger)
-		theLogger.push_back(logger);
+	// check if logging was disabled in settings first
+	if (!core->Logging) return;
+
+	if (logger) theLogger.push_back(logger);
 }
 
 void RemoveLogger(Logger* logger)

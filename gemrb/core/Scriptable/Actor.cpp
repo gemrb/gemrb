@@ -5897,7 +5897,6 @@ bool Actor::CheckOnDeath()
 		return false;
 	}
 
-	//TODO: verify removal times
 	ieDword time = core->GetGame()->GameTime;
 	if (!pstflags && Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) {
 		RemovalTime = time;
@@ -6626,15 +6625,17 @@ void Actor::SetModal(ieDword newstate, bool force)
 			displaymsg->DisplayStringName(ModalStates[Modal.State].leaving_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 		}
 
+		//update the action bar
+		if (Modal.State != newstate || newstate != MS_NONE) {
+			core->SetEventFlag(EF_ACTION);
+		}
+
 		// when called with the same state twice, toggle to MS_NONE
 		if (!force && Modal.State == newstate) {
 			Modal.State = MS_NONE;
 		} else {
 			Modal.State = newstate;
 		}
-
-		//update the action bar
-		core->SetEventFlag(EF_ACTION);
 	} else {
 		Modal.State = newstate;
 	}
@@ -8856,7 +8857,7 @@ bool Actor::HandleActorStance()
 		int nextstance = ca->nextStanceID;
 		SetStance( nextstance );
 		ca->autoSwitchOnEnd = false;
-		return true;
+		return nextstance != ca->previousStanceID;
 	}
 	int x = RAND(0, 25);
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
