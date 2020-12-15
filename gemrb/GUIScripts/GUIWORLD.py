@@ -69,7 +69,8 @@ def DialogStarted ():
 	GUICommonWindows.EmptyControls()
 	OldActionsWindow = GUICommonWindows.ActionsWindow
 	#GUICommonWindows.ActionsWindow = None
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	if OldActionsWindow:
+		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	GemRB.SetVar ("ActionsWindow", -1)
 
 def DialogEnded ():
@@ -80,8 +81,9 @@ def DialogEnded ():
 		return
 
 	#GUICommonWindows.ActionsWindow = OldActionsWindow
-	OldActionsWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
+	if OldActionsWindow:
+		OldActionsWindow.SetVisible(WINDOW_VISIBLE)
+		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 	GUICommonWindows.UpdateActionsWindow()
 
 	ContinueWindow.Unload ()
@@ -100,25 +102,34 @@ def NextDialogState ():
 		return
 
 	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_VISIBLE)
+	if OldActionsWindow:
+		OldActionsWindow.SetVisible(WINDOW_VISIBLE)
 
 	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenEndMessageWindow ():
 	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	if OldActionsWindow:
+		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	Button = ContinueWindow.GetControl (0)
-	Button.SetText (9371)
+	EndDLGStrref = 9371
+	if GameCheck.IsGemRBDemo ():
+		EndDLGStrref = 67
+	Button.SetText (EndDLGStrref)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
 
 def OpenContinueMessageWindow ():
 	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
+	if OldActionsWindow:
+		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	#continue
 	Button = ContinueWindow.GetControl (0)
-	Button.SetText (9372)
+	ContinueStrref = 9372
+	if GameCheck.IsGemRBDemo ():
+		ContinueStrref = 66
+	Button.SetText (ContinueStrref)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
