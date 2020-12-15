@@ -911,29 +911,50 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	constexpr int CELL_RATIO = 2;
 
 	// size for explored_mask and visible_mask
-	const Size mapSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+	const Size mapCellSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
 
-	const int sx = ( vp.x ) / CELL_SIZE;
-	const int sy = ( vp.y ) / CELL_SIZE;
-	const int dx = (sx + vp.w / CELL_SIZE + 2) + LargeFog;
-	const int dy = (sy + vp.h / CELL_SIZE + 2) + LargeFog;
+	const int sx = (vp.x < 0) ? 0 : vp.x / CELL_SIZE;
+	const int sy = (vp.y < 0) ? 0 : vp.y / CELL_SIZE;
+	const int dx = std::max(mapCellSize.w, (sx + vp.w / CELL_SIZE + 2) + LargeFog);
+	const int dy = std::max(mapCellSize.h, (sy + vp.h / CELL_SIZE + 2) + LargeFog);
 	const int x0 = (sx * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
 	const int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+	
+	const Size mapSize = GetSize();
 		
 	Video* vid = core->GetVideoDriver();
+	if (vp.y < 0) { // top border
+		Region r(0, 0, vp.w, -vp.y);
+		vid->DrawRect(r, ColorBlack, true);
+	}
+	
+	if (vp.y + vp.h > mapSize.h) { // bottom border
+		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+	}
+	
+	if (vp.x < 0) { // left border
+		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+	}
+	
+	if (vp.x + vp.w > mapSize.w) { // right border
+		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+	}
 	
 	// Returns true if map at (x;y) was explored, else false.
 	// Points outside map are always considered as explored
-	auto MaskHit = [&mapSize](int x, int y, ieByte* mask)
+	auto MaskHit = [&mapCellSize](int x, int y, ieByte* mask)
 	{
-		if (x <= 0 || x >= (mapSize.w - 1) || y <= 0 || y >= (mapSize.h - 1)) {
+		if (x <= 0 || x >= (mapCellSize.w - 1) || y <= 0 || y >= (mapCellSize.h - 1)) {
 			// edges are always foggy
 			return false;
 		}
 		
 		if (mask == nullptr) return true;
 
-		div_t res = div(mapSize.w * y + x, 8);
+		div_t res = div(mapCellSize.w * y + x, 8);
 		return bool(mask[res.quot] & (1 << res.rem));
 	};
 	
