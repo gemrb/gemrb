@@ -34,6 +34,7 @@ from GameCheck import MAX_PARTY_SIZE
 import GameCheck
 import GUICommon
 import CommonTables
+import CommonWindow
 import LUCommon
 import InventoryCommon
 if not GameCheck.IsPST():
@@ -1372,12 +1373,11 @@ def TopWindowClosed(window):
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(False)
-	ActWin = GemRB.GetView ("ACTWIN")
-	if ActWin:
-		ActWin.SetVisible (True)
-	if not GameCheck.IsPST(): #PST Doesn't have the message window visible in the main game screen
+
+	if not CommonWindow.IsGameGUIHidden() and GemRB.GetView ("ACTWIN") and not (GameCheck.IsIWD2() or GameCheck.IsPST()):
+		GemRB.GetView ("ACTWIN").SetVisible (True)
 		GemRB.GetView ("MSGWIN").SetVisible(True)
-		
+
 	# TODO: this should be moved to GUIINV and that window should have a custom close handler
 	# that does this stuff then calls this manually
 
@@ -1439,7 +1439,8 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			
 			GameWin = GemRB.GetView("GAMEWIN")
 			GameWin.SetDisabled(True)
-			if not (GameCheck.IsIWD2() or GameCheck.IsPST()) and GemRB.GetView ("ACTWIN"):
+			
+			if not CommonWindow.IsGameGUIHidden() and GemRB.GetView ("ACTWIN") and not (GameCheck.IsIWD2() or GameCheck.IsPST()):
 				# hide some windows to declutter higher resolutions and avoid unwanted interaction
 				GemRB.GetView ("ACTWIN").SetVisible(False)
 				GemRB.GetView ("MSGWIN").SetVisible(False)
@@ -1965,7 +1966,7 @@ def SelectionChanged ():
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
 		for i, Button in PortraitButtons.iteritems():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
-	import CommonWindow
+
 	CommonWindow.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
