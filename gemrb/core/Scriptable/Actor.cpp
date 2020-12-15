@@ -8510,10 +8510,6 @@ bool Actor::ShouldDrawCircle() const
 		return false;
 	}
 
-	if (Modified[IE_AVATARREMOVAL]) {
-		return false;
-	}
-
 	int State = Modified[IE_STATE_ID];
 
 	if ((State&STATE_DEAD) || (InternalFlags&IF_REALLYDIED)) {
