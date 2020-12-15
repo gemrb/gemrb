@@ -382,6 +382,8 @@ public:
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
 	 */
 	ieByte pstColorBytes[10];
+	
+	Region drawingRegion;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -453,6 +455,7 @@ private:
 	const char* GetArmorSound() const;
 
 	bool AdvanceAnimations();
+	void UpdateDrawingRegion();
 	/* applies modal spell etc, if needed */
 	void UpdateModalState(ieDword gameTime);
 

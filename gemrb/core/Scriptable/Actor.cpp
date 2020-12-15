@@ -8591,8 +8591,6 @@ uint8_t Actor::GetElevation() const
 
 bool Actor::UpdateDrawingState()
 {
-	// TODO: we should update and cache the DrawingRegion here
-
 	const Map* area = GetCurrentArea();
 	if (!area) {
 		InternalFlags &= ~IF_TRIGGER_AP;
@@ -8623,6 +8621,8 @@ bool Actor::UpdateDrawingState()
 		
 		SetBBox(newBBox);
 	}
+	
+	UpdateDrawingRegion();
 
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
 	bool visible = area->IsVisible(Pos, explored);
@@ -8656,13 +8656,10 @@ bool Actor::UpdateDrawingState()
 	return true;
 }
 
-Region Actor::DrawingRegion() const
+void Actor::UpdateDrawingRegion()
 {
 	// We assume BBox is the the box containing the actor and all its equipment
 	Region box = BBox;
-	
-	// FIXME: we should just do this when we recalc the bbox in UpdateDrawingState()
-	// instead of every time this is called
 	int mirrorimages = Modified[IE_MIRRORIMAGES];
 	for (int i = 0; i < mirrorimages; ++i) {
 		int dir = MirrorImageLocation[i];
@@ -8702,7 +8699,12 @@ Region Actor::DrawingRegion() const
 		assert(r.w <= box.w && r.h <= box.h);
 	}
 	
-	return box;
+	drawingRegion = box;
+}
+
+Region Actor::DrawingRegion() const
+{
+	return drawingRegion;
 }
 
 void Actor::Draw(const Region& vp, uint32_t flags) const
