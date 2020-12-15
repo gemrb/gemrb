@@ -8589,14 +8589,12 @@ bool Actor::UpdateDrawingState()
 {
 	const Map* area = GetCurrentArea();
 	if (!area) {
-		InternalFlags &= ~IF_TRIGGER_AP;
 		return false;
 	}
 
 	//visual feedback
 	CharAnimations* ca = GetAnims();
 	if (!ca) {
-		InternalFlags &= ~IF_TRIGGER_AP;
 		return false;
 	}
 	
@@ -8632,7 +8630,6 @@ bool Actor::UpdateDrawingState()
 		if (!(InternalFlags&IF_REALLYDIED)) {
 			// for a while this didn't return (disable drawing) if about to hibernate;
 			// Avenger said (aa10aaed) "we draw the actor now for the last time".
-			InternalFlags &= ~IF_TRIGGER_AP;
 			return false;
 		}
 	}
@@ -8640,7 +8637,6 @@ bool Actor::UpdateDrawingState()
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
 	if (!(InternalFlags & IF_VISIBLE)) {
-		InternalFlags &= ~IF_TRIGGER_AP;
 		return false;
 	}
 

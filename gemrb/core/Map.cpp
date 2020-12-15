@@ -1348,6 +1348,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					flags |= BLIT_GREY;
 				}
 				actor->Draw(viewport, flags|BLIT_BLENDED);
+			} else {
+				actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
 			}
 
 			actor = GetNextActor(q, index);
