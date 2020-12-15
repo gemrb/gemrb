@@ -281,10 +281,6 @@ def CloseContainerWindow ():
 
 	if GameCheck.IsPST():
 		GUICommonWindows.EnableAnimatedWindows ()
-		 #PST needs a reminder to redraw the  clock for some reason
-		if GUICommonWindows.ActionsWindow:
-			GUICommonWindows.ActionsWindow.Focus()
-
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
