@@ -912,7 +912,6 @@ Size Map::FogMapSize() const
 bool Map::FogTileUncovered(const Point &p, uint8_t* mask) const
 {
 	// Returns true if map at (x;y) was explored, else false.
-	// Points outside map are always considered as explored
 	const Size fogSize = FogMapSize();
 	if (p.x < 0 || p.x >= fogSize.w || p.y < 0 || p.y >= fogSize.h) {
 		// out of bounds is always foggy
