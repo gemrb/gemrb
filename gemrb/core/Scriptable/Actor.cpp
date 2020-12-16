@@ -8600,22 +8600,6 @@ bool Actor::UpdateDrawingState()
 		return false;
 	}
 	
-	Region newBBox(Pos, Size());
-	for (const auto& part : currentStance.anim) {
-		Animation* anim = part.first;
-		Holder<Sprite2D> animframe = anim->CurrentFrame();
-		assert(animframe);
-		Region partBBox = animframe->Frame;
-		partBBox.x = Pos.x - partBBox.x;
-		partBBox.y = Pos.y - partBBox.y;
-		newBBox.ExpandToRegion(partBBox);
-		assert(newBBox.RectInside(partBBox));
-	}
-			
-	newBBox.y -= GetElevation();
-	
-	SetBBox(newBBox);
-	
 	UpdateDrawingRegion();
 
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
@@ -8650,8 +8634,23 @@ bool Actor::UpdateDrawingState()
 
 void Actor::UpdateDrawingRegion()
 {
-	// We assume BBox is the the box containing the actor and all its equipment
-	Region box = BBox;
+	Region box(Pos, Size());
+	for (const auto& part : currentStance.anim) {
+		Animation* anim = part.first;
+		Holder<Sprite2D> animframe = anim->CurrentFrame();
+		assert(animframe);
+		Region partBBox = animframe->Frame;
+		partBBox.x = Pos.x - partBBox.x;
+		partBBox.y = Pos.y - partBBox.y;
+		box.ExpandToRegion(partBBox);
+		assert(box.RectInside(partBBox));
+	}
+			
+	box.y -= GetElevation();
+	
+	// BBox is the the box containing the actor and all its equipment, but nothing else
+	SetBBox(box);
+	
 	int mirrorimages = Modified[IE_MIRRORIMAGES];
 	for (int i = 0; i < mirrorimages; ++i) {
 		int dir = MirrorImageLocation[i];
@@ -8691,6 +8690,7 @@ void Actor::UpdateDrawingRegion()
 		assert(r.w <= box.w && r.h <= box.h);
 	}
 	
+	// drawingRegion is the the box containing all gfx attached to the actor
 	drawingRegion = box;
 }
 
