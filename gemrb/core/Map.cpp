@@ -1388,19 +1388,31 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
-			assert(actor != NULL);
-			if (actor->UpdateDrawingState()) {
-				uint32_t flags = SetDrawingStencilForScriptable(actor, viewport);
-				// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-				if (game->TimeStoppedFor(actor)) {
-					flags |= BLIT_GREY;
+			{
+				bool visible = false;
+				// always update the animations even if we arent visible
+				if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
+					// apparently birds and the dead are always visible?
+					visible = IsVisible(actor->Pos) || (actor->Modified[IE_DONOTJUMP] & DNJ_BIRD) || (actor->GetInternalFlag() & IF_REALLYDIED);
+					if (visible) {
+						uint32_t flags = SetDrawingStencilForScriptable(actor, viewport);
+						if (game->TimeStoppedFor(actor)) {
+							// when time stops, almost everything turns dull grey,
+							// the caster and immune actors being the most notable exceptions
+							flags |= BLIT_GREY;
+						}
+						actor->Draw(viewport, flags|BLIT_BLENDED);
+					}
 				}
-				actor->Draw(viewport, flags|BLIT_BLENDED);
-			} else {
-				actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
-			}
+				
+				if (!visible) {
+					actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
+					//turning actor inactive if there is no action next turn
+					actor->HibernateIfAble();
+				}
 
-			actor = GetNextActor(q, index);
+				actor = GetNextActor(q, index);
+			}
 			break;
 		case AOT_PILE:
 			// draw piles

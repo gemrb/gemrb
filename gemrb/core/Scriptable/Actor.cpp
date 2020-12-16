@@ -8593,30 +8593,11 @@ uint8_t Actor::GetElevation() const
 
 bool Actor::UpdateDrawingState()
 {
-	const Map* area = GetCurrentArea();
-	if (!area) {
-		return false;
-	}
-	
 	if (!AdvanceAnimations()) {
 		return false;
 	}
 	
 	UpdateDrawingRegion();
-
-	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
-	bool visible = (explored) ? area->IsExplored(Pos) : area->IsVisible(Pos);
-	//check the deactivation condition only if needed
-	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if ((!visible || (InternalFlags & IF_REALLYDIED)) && (InternalFlags & IF_ACTIVE) ) {
-		//turning actor inactive if there is no action next turn
-		HibernateIfAble();
-		if (!(InternalFlags&IF_REALLYDIED)) {
-			// for a while this didn't return (disable drawing) if about to hibernate;
-			// Avenger said (aa10aaed) "we draw the actor now for the last time".
-			return false;
-		}
-	}
 
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
