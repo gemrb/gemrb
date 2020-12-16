@@ -8598,18 +8598,6 @@ bool Actor::UpdateDrawingState()
 	}
 	
 	UpdateDrawingRegion();
-
-	// if an actor isn't visible, should we still draw video cells?
-	// let us assume not, for now..
-	if (!(InternalFlags & IF_VISIBLE)) {
-		return false;
-	}
-
-	//iwd has this flag saved in the creature
-	if (Modified[IE_AVATARREMOVAL]) {
-		return false;
-	}
-
 	return true;
 }
 
@@ -8682,6 +8670,17 @@ Region Actor::DrawingRegion() const
 
 void Actor::Draw(const Region& vp, uint32_t flags) const
 {
+	// if an actor isn't visible, should we still draw video cells?
+	// let us assume not, for now..
+	if (!(InternalFlags & IF_VISIBLE)) {
+		return;
+	}
+
+	//iwd has this flag saved in the creature
+	if (Modified[IE_AVATARREMOVAL]) {
+		return;
+	}
+
 	if (!DrawingRegion().IntersectsRegion(vp)) {
 		return;
 	}
