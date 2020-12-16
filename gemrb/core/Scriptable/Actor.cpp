@@ -8431,7 +8431,10 @@ bool Actor::ShouldHibernate() const
 
 bool Actor::AdvanceAnimations()
 {
-	assert(anims);
+	if (!anims) {
+		return false;
+	}
+	
 	anims->PulseRGBModifiers();
 	
 	ClearCurrentStanceAnims();
@@ -8592,30 +8595,26 @@ bool Actor::UpdateDrawingState()
 	if (!area) {
 		return false;
 	}
-
-	//visual feedback
-	CharAnimations* ca = GetAnims();
-	if (!ca) {
+	
+	if (!AdvanceAnimations()) {
 		return false;
 	}
 	
-	if (AdvanceAnimations()) {
-		Region newBBox(Pos, Size());
-		for (const auto& part : currentStance.anim) {
-			Animation* anim = part.first;
-			Holder<Sprite2D> animframe = anim->CurrentFrame();
-			assert(animframe);
-			Region partBBox = animframe->Frame;
-			partBBox.x = Pos.x - partBBox.x;
-			partBBox.y = Pos.y - partBBox.y;
-			newBBox.ExpandToRegion(partBBox);
-			assert(newBBox.RectInside(partBBox));
-		}
-				
-		newBBox.y -= GetElevation();
-		
-		SetBBox(newBBox);
+	Region newBBox(Pos, Size());
+	for (const auto& part : currentStance.anim) {
+		Animation* anim = part.first;
+		Holder<Sprite2D> animframe = anim->CurrentFrame();
+		assert(animframe);
+		Region partBBox = animframe->Frame;
+		partBBox.x = Pos.x - partBBox.x;
+		partBBox.y = Pos.y - partBBox.y;
+		newBBox.ExpandToRegion(partBBox);
+		assert(newBBox.RectInside(partBBox));
 	}
+			
+	newBBox.y -= GetElevation();
+	
+	SetBBox(newBBox);
 	
 	UpdateDrawingRegion();
 
