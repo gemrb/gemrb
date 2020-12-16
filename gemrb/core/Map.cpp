@@ -959,7 +959,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		vid->DrawRect(r, ColorBlack, true);
 		r.y += r.h;
 		r.h = FUZZ_AMT;
-		for (int x = r.x; x < r.w; x += CELL_SIZE) {
+		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
 			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r);
 		}
 	}
@@ -969,7 +969,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		vid->DrawRect(r, ColorBlack, true);
 		r.y -= FUZZ_AMT;
 		r.h = FUZZ_AMT;
-		for (int x = r.x; x < r.w; x += CELL_SIZE) {
+		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
 			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r);
 		}
 	}
@@ -979,7 +979,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		vid->DrawRect(r, ColorBlack, true);
 		r.x += r.w;
 		r.w = FUZZ_AMT;
-		for (int y = r.y; y < r.h; y += CELL_SIZE) {
+		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
 			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r);
 		}
 	}
@@ -989,7 +989,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		vid->DrawRect(r, ColorBlack, true);
 		r.x -= FUZZ_AMT;
 		r.w = FUZZ_AMT;
-		for (int y = r.y; y < r.h; y += CELL_SIZE) {
+		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
 			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r);
 		}
 	}
