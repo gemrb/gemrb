@@ -902,26 +902,44 @@ void Map::ClearSearchMapFor(const Movable *actor) {
 	}
 }
 
+Size Map::FogMapSize() const
+{
+	// Ratio of bg tile size and fog tile size
+	constexpr int CELL_RATIO = 2;
+	return Size(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+}
+
+bool Map::FogTileUncovered(const Point &p, uint8_t* mask) const
+{
+	// Returns true if map at (x;y) was explored, else false.
+	// Points outside map are always considered as explored
+	const Size fogSize = FogMapSize();
+	if (p.x < 0 || p.x >= fogSize.w || p.y < 0 || p.y >= fogSize.h) {
+		// out of bounds is always foggy
+		return false;
+	}
+	
+	if (mask == nullptr) return true;
+
+	div_t res = div(fogSize.w * p.y + p.x, 8);
+	return bool(mask[res.quot] & (1 << res.rem));
+}
+
 void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
 {
 	// Size of Fog-Of-War shadow tile (and bitmap)
 	constexpr int CELL_SIZE = 32;
-
-	// Ratio of bg tile size and fog tile size
-	constexpr int CELL_RATIO = 2;
 	
 	// the amount of fuzzing to apply to map edges wehn the viewport overscans
 	constexpr int FUZZ_AMT = 8;
 
 	// size for explored_mask and visible_mask
-	const Size mapCellSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+	const Size fogSize = FogMapSize();
 
-	const int sx = (vp.x < 0) ? 0 : vp.x / CELL_SIZE;
-	const int sy = (vp.y < 0) ? 0 : vp.y / CELL_SIZE;
-	const int dx = std::max(mapCellSize.w, (sx + vp.w / CELL_SIZE + 2) + LargeFog);
-	const int dy = std::max(mapCellSize.h, (sy + vp.h / CELL_SIZE + 2) + LargeFog);
-	const int x0 = (sx * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
-	const int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+	const Point start = Clamp(ConvertPointToFog(vp.Origin()), Point(), Point(fogSize.w, fogSize.h));
+	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + LargeFog, 2 + LargeFog), Point(), Point(fogSize.w, fogSize.h));
+	const int x0 = (start.x * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
+	const int y0 = (start.y * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
 	
 	const Size mapSize = GetSize();
 	
@@ -977,32 +995,17 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		}
 	}
 	
-	// Returns true if map at (x;y) was explored, else false.
-	// Points outside map are always considered as explored
-	auto MaskHit = [&mapCellSize](int x, int y, ieByte* mask)
-	{
-		if (x < 0 || x >= mapCellSize.w || y < 0 || y >= mapCellSize.h) {
-			// out of bounds is always foggy
-			return false;
-		}
-		
-		if (mask == nullptr) return true;
-
-		div_t res = div(mapCellSize.w * y + x, 8);
-		return bool(mask[res.quot] & (1 << res.rem));
-	};
-	
 	auto IsExplored = [=](int x, int y) {
-		return MaskHit(x, y, explored_mask);
+		return FogTileUncovered(Point(x, y), explored_mask);
 	};
 	
 	auto IsVisible = [=](int x, int y) {
-		return MaskHit(x, y, visible_mask);
+		return FogTileUncovered(Point(x, y), visible_mask);
 	};
 	
 	auto ConvertPointToScreen = [=](int x, int y) {
-		x = (x - sx) * CELL_SIZE + x0;
-		y = (y - sy) * CELL_SIZE + y0;
+		x = (x - start.x) * CELL_SIZE + x0;
+		y = (y - start.y) * CELL_SIZE + y0;
 		return Point(x, y);
 	};
 	
@@ -1093,10 +1096,10 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		}
 	};
 
-	for (int y = sy; y < dy; y++) {
+	for (int y = start.y; y < end.y; y++) {
 		int unexploredQueue = 0;
-		int x = sx;
-		for (; x < dx; x++) {
+		int x = start.x;
+		for (; x < end.x; x++) {
 			if (IsExplored(x, y)) {
 				if (unexploredQueue) {
 					FillFog(x - unexploredQueue, y, unexploredQueue);
@@ -1221,9 +1224,10 @@ retry:
 	if (!a->Schedule(gametime) ) {
 		goto retry;
 	}
-	if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) ) {
+	if ((a->Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a->Pos) : !IsExplored(a->Pos)) {
 		goto retry;
 	}
+
 	return a;
 }
 
@@ -1966,7 +1970,7 @@ bool Map::AnyPCSeesEnemy() const
 	ieDword gametime = core->GetGame()->GameTime;
 	for (const Actor *actor : actors) {
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
+			if (IsVisible(actor->Pos) && actor->Schedule(gametime, true) ) {
 				return true;
 			}
 		}
@@ -2634,7 +2638,7 @@ void Map::GenerateQueues()
 					priority = PR_IGNORE; //don't run scripts for out of schedule actors
 				}
 			}
-			if (IsVisible(actor->Pos, false))
+			if (IsVisible(actor->Pos))
 				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 		} else {
 			//dead actors are always visible on the map, but run no scripts
@@ -2644,7 +2648,7 @@ void Map::GenerateQueues()
 				//isvisible flag is false (visibilitymap) here,
 				//coz we want to reactivate creatures that
 				//just became visible
-				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, false) ) {
+				if (IsVisible(actor->Pos) && actor->Schedule(gametime, false) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					//more like activate!
 					actor->Activate();
@@ -2985,26 +2989,19 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 	}
 }
 
-//single point visible or not (visible/exploredbitmap)
-//if explored = true then explored otherwise currently visible
-bool Map::IsVisible(const Point &pos, int explored) const
+Point Map::ConvertPointToFog(Point p) const
 {
-	if (!VisibleBitmap)
-		return false;
-	int sX=pos.x/32;
-	int sY=pos.y/32;
-	if (sX<0) return false;
-	if (sY<0) return false;
-	int w = TMap->XCellCount * 2 + LargeFog;
-	int h = TMap->YCellCount * 2 + LargeFog;
-	if (sX>=w) return false;
-	if (sY>=h) return false;
-	int b0 = (sY * w) + sX;
-	int by = b0/8;
-	int bi = 1<<(b0%8);
+	return Point(p.x / 32, p.y / 32);
+}
 
-	if (explored) return (ExploredBitmap[by] & bi)!=0;
-	return (VisibleBitmap[by] & bi)!=0;
+bool Map::IsVisible(const Point &pos) const
+{
+	return FogTileUncovered(ConvertPointToFog(pos), VisibleBitmap);
+}
+
+bool Map::IsExplored(const Point &pos) const
+{
+	return FogTileUncovered(ConvertPointToFog(pos), ExploredBitmap);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
@@ -3210,7 +3207,7 @@ void Map::UpdateSpawns() const
 		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
 			//only reactivate the spawn point if the party cannot currently see it;
 			//also make sure the party has moved away some
-			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false) &&
+			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos) &&
 				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_UNSCHEDULED, SPAWN_RANGE * 2)) {
 				spawn->Method &= ~SPF_WAIT;
 			}
@@ -3271,13 +3268,8 @@ Size Map::GetSize() const
 //--------explored bitmap-----------
 int Map::GetExploredMapSize() const
 {
-	int x = TMap->XCellCount*2;
-	int y = TMap->YCellCount*2;
-	if (LargeFog) {
-		x++;
-		y++;
-	}
-	return (x*y+7)/8;
+	Size fogSize = FogMapSize();
+	return (fogSize.w * fogSize.h + 7) / 8;
 }
 
 void Map::FillExplored(bool explored)
@@ -3285,25 +3277,18 @@ void Map::FillExplored(bool explored)
 	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), (explored) ? 0xff : 0x00);
 }
 
-// x, y are not in tile coordinates
-void Map::ExploreTile(const Point &pos)
+void Map::ExploreTile(const Point &p)
 {
-	int h = TMap->YCellCount * 2 + LargeFog;
-	int y = pos.y/32;
-	if (y < 0 || y >= h)
+	Point fogP = ConvertPointToFog(p);
+
+	const Size fogSize = FogMapSize();
+	if (fogP.x < 0 || fogP.x >= fogSize.w || fogP.y < 0 || fogP.y >= fogSize.h) {
 		return;
-
-	int w = TMap->XCellCount * 2 + LargeFog;
-	int x = pos.x/32;
-	if (x < 0 || x >= w)
-		return;
-
-	int b0 = (y * w) + x;
-	int by = b0/8;
-	int bi = 1<<(b0%8);
-
-	ExploredBitmap[by] |= bi;
-	VisibleBitmap[by] |= bi;
+	}
+	
+	div_t res = div(fogSize.w * fogP.y + fogP.x, 8);
+	ExploredBitmap[res.quot] |= (1 << res.rem);
+	VisibleBitmap[res.quot] |= (1 << res.rem);
 }
 
 void Map::ExploreMapChunk(const Point &Pos, int range, int los)
@@ -3523,7 +3508,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
+		if (c->Type==IE_CONTAINER_PILE && IsExplored(c->Pos)) {
 			//transfer the pile to the other container
 			MergePiles(c, othercontainer);
 		}
@@ -3596,7 +3581,7 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 
 int Map::GetCursor(const Point &p) const
 {
-	if (!IsVisible( p, true ) ) {
+	if (!IsExplored(p)) {
 		return IE_CURSOR_INVALID;
 	}
 	switch (GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL)) {

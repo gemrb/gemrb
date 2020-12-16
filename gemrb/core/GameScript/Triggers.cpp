@@ -3718,7 +3718,7 @@ int GameScript::IsPlayerNumber( Scriptable *Sender, const Trigger *parameters)
 int GameScript::PCCanSeePoint( Scriptable */*Sender*/, const Trigger *parameters)
 {
 	const Map *map = core->GetGame()->GetCurrentArea();
-	if (map->IsVisible(parameters->pointParameter, false) ) {
+	if (map->IsVisible(parameters->pointParameter) ) {
 		return 1;
 	}
 	return 0;

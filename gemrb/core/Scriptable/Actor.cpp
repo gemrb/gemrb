@@ -8605,7 +8605,7 @@ bool Actor::UpdateDrawingState()
 	UpdateDrawingRegion();
 
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
-	bool visible = area->IsVisible(Pos, explored);
+	bool visible = (explored) ? area->IsExplored(Pos) : area->IsVisible(Pos);
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
 	if ((!visible || (InternalFlags & IF_REALLYDIED)) && (InternalFlags & IF_ACTIVE) ) {

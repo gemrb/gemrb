@@ -6609,7 +6609,7 @@ int fx_farsee (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//don't explore unexplored points
 	if (!(fx->Parameter2&FS_UNEXPLORED)) {
-		if (!map->IsVisible(p, 1)) {
+		if (!map->IsExplored(p)) {
 			return FX_NOT_APPLIED;
 		}
 	}

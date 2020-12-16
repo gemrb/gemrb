@@ -245,7 +245,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			continue;
 		}
 		
-		if (area->IsVisible(dest, true) == false || (area->GetBlockedNavmap(dest) & PATH_MAP_PASSABLE) == 0) {
+		if (area->IsExplored(dest) == false || (area->GetBlockedNavmap(dest) & PATH_MAP_PASSABLE) == 0) {
 			dest = NextDest();
 			continue;
 		}
@@ -1139,7 +1139,7 @@ String GameControl::TooltipText() const {
 	}
 
 	const Point& gameMousePos = GameMousePos();
-	if (!area->IsVisible(gameMousePos, false)) {
+	if (!area->IsVisible(gameMousePos)) {
 		return View::TooltipText();
 	}
 
@@ -1325,7 +1325,7 @@ bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 	// let us target party members even if they are invisible
 	lastActor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (lastActor && lastActor->Modified[IE_EA] >= EA_CONTROLLED) {
-		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos, false)) {
+		if (!lastActor->ValidTarget(target_types) || !area->IsVisible(gameMousePos)) {
 			lastActor = NULL;
 		}
 	}
