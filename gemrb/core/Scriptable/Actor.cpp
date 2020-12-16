@@ -8403,7 +8403,7 @@ static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0
 static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
 static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
-bool Actor::ShouldHibernate() const
+bool Actor::HibernateIfAble()
 {
 	//finding an excuse why we don't hybernate the actor
 	if (Modified[IE_ENABLEOFFSCREENAI])
@@ -8426,6 +8426,8 @@ bool Actor::ShouldHibernate() const
 		return false;
 	if (GetWait()) //would never stop waiting
 		return false;
+	
+	InternalFlags |= IF_IDLE;
 	return true;
 }
 
@@ -8608,9 +8610,7 @@ bool Actor::UpdateDrawingState()
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
 	if ((!visible || (InternalFlags & IF_REALLYDIED)) && (InternalFlags & IF_ACTIVE) ) {
 		//turning actor inactive if there is no action next turn
-		if (ShouldHibernate()) {
-			InternalFlags|=IF_IDLE;
-		}
+		HibernateIfAble();
 		if (!(InternalFlags&IF_REALLYDIED)) {
 			// for a while this didn't return (disable drawing) if about to hibernate;
 			// Avenger said (aa10aaed) "we draw the actor now for the last time".

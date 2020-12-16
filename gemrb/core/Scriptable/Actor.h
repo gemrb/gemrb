@@ -441,7 +441,6 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	void RefreshHP();
-	bool ShouldHibernate() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData() const;
@@ -973,6 +972,7 @@ public:
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
 	bool ShouldModifyMorale() const;
+	bool HibernateIfAble();
 };
 }
 
