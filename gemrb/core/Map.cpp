@@ -909,6 +909,9 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 
 	// Ratio of bg tile size and fog tile size
 	constexpr int CELL_RATIO = 2;
+	
+	// the amount of fuzzing to apply to map edges wehn the viewport overscans
+	constexpr int FUZZ_AMT = 8;
 
 	// size for explored_mask and visible_mask
 	const Size mapCellSize(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
@@ -921,34 +924,65 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	const int y0 = (sy * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
 	
 	const Size mapSize = GetSize();
+	
+	enum Directions : uint8_t {
+		N = 1,
+		W = 2,
+		NW = N|W,
+		S = 4,
+		SW = S|W,
+		E = 8,
+		NE = N|E,
+		SE = S|E
+	};
 		
 	Video* vid = core->GetVideoDriver();
 	if (vp.y < 0) { // top border
 		Region r(0, 0, vp.w, -vp.y);
 		vid->DrawRect(r, ColorBlack, true);
+		r.y += r.h;
+		r.h = FUZZ_AMT;
+		for (int x = r.x; x < r.w; x += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r);
+		}
 	}
 	
 	if (vp.y + vp.h > mapSize.h) { // bottom border
 		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
+		r.y -= FUZZ_AMT;
+		r.h = FUZZ_AMT;
+		for (int x = r.x; x < r.w; x += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r);
+		}
 	}
 	
 	if (vp.x < 0) { // left border
 		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
+		r.x += r.w;
+		r.w = FUZZ_AMT;
+		for (int y = r.y; y < r.h; y += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r);
+		}
 	}
 	
 	if (vp.x + vp.w > mapSize.w) { // right border
 		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
 		vid->DrawRect(r, ColorBlack, true);
+		r.x -= FUZZ_AMT;
+		r.w = FUZZ_AMT;
+		for (int y = r.y; y < r.h; y += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r);
+		}
 	}
 	
 	// Returns true if map at (x;y) was explored, else false.
 	// Points outside map are always considered as explored
 	auto MaskHit = [&mapCellSize](int x, int y, ieByte* mask)
 	{
-		if (x <= 0 || x >= (mapCellSize.w - 1) || y <= 0 || y >= (mapCellSize.h - 1)) {
-			// edges are always foggy
+		if (x < 0 || x >= mapCellSize.w || y < 0 || y >= mapCellSize.h) {
+			// out of bounds is always foggy
 			return false;
 		}
 		
@@ -993,17 +1027,6 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		//   an index of shadow sprite to use. For now,
 		//   some tiles are made 'on the fly' by
 		//   drawing two or more tiles
-		
-		enum Directions : uint8_t {
-			N = 1,
-			W = 2,
-			NW = N|W,
-			S = 4,
-			SW = S|W,
-			E = 8,
-			NE = N|E,
-			SE = S|E
-		};
 
 		assert((dirs & 0xf0) == 0);
 
