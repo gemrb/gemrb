@@ -1333,7 +1333,7 @@ static void pcf_hitpoint(Actor *actor, ieDword oldValue, ieDword hp)
 		}
 	}
 	// don't fire off events if nothing changed, which can happen when called indirectly
-	if (actor->BaseStats[IE_HITPOINTS] != hp || actor->Modified[IE_HITPOINTS] != hp) {
+	if (oldValue != hp) {
 		actor->BaseStats[IE_HITPOINTS] = hp;
 		actor->Modified[IE_HITPOINTS] = hp;
 		if (actor->InParty) core->SetEventFlag(EF_PORTRAIT);
