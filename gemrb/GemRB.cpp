@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
 // due to fragmentation since we use a lot of small objects. On the other hand
 // if the threshold is too low, free() starts to permanently ask the kernel
 // about shrinking the heap.
-	#if defined(HAVE_UNISTD_H) && !defined(VITA)
+	#if defined(HAVE_UNISTD_H)
 		int pagesize = sysconf(_SC_PAGESIZE);
 	#else
 		int pagesize = 4*1024;

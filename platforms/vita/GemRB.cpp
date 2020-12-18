@@ -69,6 +69,8 @@ void main(int argc, char* argv[])
 	scePowerSetBusClockFrequency(222);
 	scePowerSetGpuClockFrequency(222);
 	scePowerSetGpuXbarClockFrequency(166);
+	
+	mallopt(M_TRIM_THRESHOLD, 20 * 1024);
 
 	// Selecting game config from init params
 	VitaSetArguments(&argc, &argv);
