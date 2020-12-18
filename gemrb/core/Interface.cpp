@@ -1237,7 +1237,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
-	CONFIG_INT("Logging", Logging = );
 
 #undef CONFIG_INT
 

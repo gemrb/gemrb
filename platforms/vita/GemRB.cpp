@@ -77,16 +77,16 @@ void main(int argc, char* argv[])
 
 	core = new Interface();
 	CFGConfig* config = new CFGConfig(argc, argv);
+	InitializeLogging(config);
+
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
-		InitializeLogging();
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
 		sceKernelExitProcess(0);
 		return -1;
 	}
-	InitializeLogging();
 	delete config;
 
 	core->Main();

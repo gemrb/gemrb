@@ -42,16 +42,16 @@ void ShutdownLogging()
 	theLogger.clear();
 }
 
-void InitializeLogging()
+void InitializeLogging(InterfaceConfig* config)
 {
-	AddLogger(createDefaultLogger());
+	const char* loggingOpt = config->GetValueForKey("Logging");
+	if (loggingOpt && atoi(loggingOpt)) {
+		AddLogger(createDefaultLogger());
+	}
 }
 
 void AddLogger(Logger* logger)
 {
-	// check if logging was disabled in settings first
-	if (!core->Logging) return;
-
 	if (logger) theLogger.push_back(logger);
 }
 

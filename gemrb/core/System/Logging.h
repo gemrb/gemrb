@@ -51,10 +51,11 @@ enum log_level {
 	DEBUG = 5
 };
 
+class InterfaceConfig;
 class Logger;
 class StringBuffer;
 
-GEM_EXPORT void InitializeLogging();
+GEM_EXPORT void InitializeLogging(InterfaceConfig* cfg);
 GEM_EXPORT void AddLogger(Logger*);
 GEM_EXPORT void RemoveLogger(Logger*);
 GEM_EXPORT void ShutdownLogging();
