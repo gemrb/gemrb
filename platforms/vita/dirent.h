@@ -20,6 +20,10 @@
 
 #include <psp2/kernel/iofilemgr.h>
 
+#define S_IREAD SCE_S_IRUSR
+#define S_IWRITE SCE_S_IWUSR
+#define S_IEXEC SCE_S_IXUSR
+
 struct DIR
 {
 	bool is_first;
@@ -66,4 +70,9 @@ inline void closedir(DIR *dirp)
 {
 	sceIoDclose(dirp->descriptor);
 	free(dirp);
+}
+
+inline int mkdir(const char *path, SceMode mode)
+{
+	return sceIoMkdir(path, mode);
 }

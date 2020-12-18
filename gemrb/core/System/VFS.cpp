@@ -420,11 +420,6 @@ bool MakeDirectories(const char* path)
 
 bool MakeDirectory(const char* path)
 {
-#ifdef VITA
-	sceIoMkdir(path, 0777);
-	return true;
-#endif
-
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
