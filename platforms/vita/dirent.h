@@ -31,10 +31,7 @@ struct dirent
 	char d_name[_MAX_PATH];
 };
 
-// buffer which readdir returns
-static dirent de;
-
-static DIR* opendir(const char *filename)
+inline DIR* opendir(const char *filename)
 {
 	DIR *dirp = (DIR*) malloc(sizeof(DIR));
 	dirp->is_first = 1;
@@ -48,8 +45,9 @@ static DIR* opendir(const char *filename)
 	return dirp;
 }
 
-static dirent* readdir(DIR *dirp)
+inline dirent* readdir(DIR *dirp)
 {
+	static dirent de;
 	//vitasdk kind of skips current directory entry..
 	if (dirp->is_first) {
 		dirp->is_first = 0;
@@ -64,7 +62,7 @@ static dirent* readdir(DIR *dirp)
 	return &de;
 }
 
-static void closedir(DIR *dirp)
+inline void closedir(DIR *dirp)
 {
 	sceIoDclose(dirp->descriptor);
 	free(dirp);
