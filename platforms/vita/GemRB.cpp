@@ -26,7 +26,9 @@
 
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h>
-#include <psp2/apputil.h> 
+#include <psp2/apputil.h>
+
+#include <Python.h>
 
 // allocating memory for application on Vita
 int _newlib_heap_size_user = 344 * 1024 * 1024;
@@ -74,6 +76,11 @@ void main(int argc, char* argv[])
 	setlocale(LC_ALL, "");
 
 	Interface::SanityCheck(VERSION_GEMRB);
+	
+	//Py_Initialize crashes on Vita otherwise
+	Py_NoSiteFlag = 1;
+	Py_IgnoreEnvironmentFlag = 1;
+	Py_NoUserSiteDirectory = 1;
 
 	core = new Interface();
 	CFGConfig* config = new CFGConfig(argc, argv);

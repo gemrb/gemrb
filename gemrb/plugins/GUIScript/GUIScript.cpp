@@ -13443,13 +13443,6 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 bool GUIScript::Init(void)
 {
-#ifdef VITA
-	//Py_Initialize crashes on Vita otherwise
-	Py_NoSiteFlag = 1;
-	Py_IgnoreEnvironmentFlag = 1;
-	Py_NoUserSiteDirectory = 1;
-#endif
-
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;

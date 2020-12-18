@@ -166,6 +166,11 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 endif (${LAYOUT} MATCHES "home")
+
+#IF(VITA)
+	SET(SYSCONF_DIR "ux0:/data/GemRB")
+#ENDIF
+
 # convert the slashes for windows' users' convenience
 file(TO_NATIVE_PATH ${PLUGIN_DIR} DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
