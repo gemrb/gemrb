@@ -33,6 +33,7 @@
 namespace GemRB {
 
 static std::vector<Logger*> theLogger;
+static bool skipLogging = true;
 
 void ShutdownLogging()
 {
@@ -46,12 +47,16 @@ void InitializeLogging(InterfaceConfig* config)
 {
 	const char* loggingOpt = config->GetValueForKey("Logging");
 	if (!loggingOpt || atoi(loggingOpt) > 0) {
+		skipLogging = false;
 		AddLogger(createDefaultLogger());
 	}
 }
 
 void AddLogger(Logger* logger)
 {
+	// check if logging was disabled in settings first
+	if (skipLogging) return;
+
 	if (logger) theLogger.push_back(logger);
 }
 
