@@ -45,7 +45,7 @@ void ShutdownLogging()
 void InitializeLogging(InterfaceConfig* config)
 {
 	const char* loggingOpt = config->GetValueForKey("Logging");
-	if (loggingOpt && atoi(loggingOpt)) {
+	if (!loggingOpt || atoi(loggingOpt) > 0) {
 		AddLogger(createDefaultLogger());
 	}
 }
