@@ -99,9 +99,7 @@ private:
 	int lastCursor;
 	short moveX, moveY;
 	int numScrollCursor;
-	Point pfs;
 	PathNode* drawPath;
-	unsigned long AIUpdateCounter;
 	unsigned int ScreenFlags;
 	unsigned int DialogueFlags;
 	String* DisplayText;

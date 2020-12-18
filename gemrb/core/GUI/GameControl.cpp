@@ -88,12 +88,10 @@ GameControl::GameControl(const Region& frame)
 	overContainer = NULL;
 	overInfoPoint = NULL;
 	drawPath = NULL;
-	pfs.null();
 	lastCursor = IE_CURSOR_INVALID;
 	moveX = moveY = 0;
 	numScrollCursor = 0;
 	DebugFlags = 0;
-	AIUpdateCounter = 1;
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
