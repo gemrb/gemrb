@@ -20,16 +20,28 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
-#include "win32def.h" // logging
 #include <clocale> //language encoding
+#include <SDL.h>
 
 #include "Interface.h"
 
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
+// if/when android moves to SDL 1.3 remove these special functions.
+// SDL 1.3 fires window events for these conditions that are handled in SDLVideo.cpp.
+// see SDL_WINDOWEVENT_MINIMIZED and SDL_WINDOWEVENT_RESTORED
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+#include "Audio.h"
+
+// pause audio playing if app goes in background
+static void appPutToBackground()
+{
+  core->GetAudioDrv()->Pause();
+}
+// resume audio playing if app return to foreground
+static void appPutToForeground()
+{
+  core->GetAudioDrv()->Resume();
+}
+
 #endif
 
 using namespace GemRB;
@@ -37,9 +49,8 @@ using namespace GemRB;
 int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, "");
-#ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
-#endif
+	setenv("GEM_DATA", SDL_AndroidGetExternalStoragePath(), 1);
 
 #ifdef M_TRIM_THRESHOLD
 // Prevent fragmentation of the heap by malloc (glibc).
@@ -66,14 +77,18 @@ int main(int argc, char* argv[])
 		InitializeLogging();
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
+
 		return -1;
 	}
 	InitializeLogging();
 	delete config;
 
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+#endif
+
 	core->Main();
 	delete( core );
 	ShutdownLogging();
-
 	return 0;
 }
