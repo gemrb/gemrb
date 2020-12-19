@@ -23,6 +23,7 @@
 #include "Interface.h"
 
 #include <stdlib.h>
+#include <cerrno>
 #include <ctype.h>
 #include <cwctype>
 #ifdef WIN32
@@ -34,7 +35,6 @@
 
 #if HAVE_ICONV
 #include <iconv.h>
-#include <cerrno>
 #endif
 
 namespace GemRB {
