@@ -63,7 +63,7 @@ void VitaSetArguments(int *argc, char **argv[])
 
 using namespace GemRB;
 
-void main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
 	scePowerSetArmClockFrequency(444);
 	scePowerSetBusClockFrequency(222);
@@ -93,8 +93,7 @@ void main(int argc, char* argv[])
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 		ShutdownLogging();
-		sceKernelExitProcess(0);
-		return -1;
+		return sceKernelExitProcess(-1);
 	}
 	delete config;
 
@@ -102,5 +101,5 @@ void main(int argc, char* argv[])
 	delete( core );
 	ShutdownLogging();
 
-	sceKernelExitProcess(0);
+	return sceKernelExitProcess(0);
 }
