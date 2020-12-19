@@ -784,7 +784,6 @@ public:
 	char GameName[_MAX_PATH];
 	char GameType[10];
 	int GamepadPointerSpeed = 10;
-	bool VitaKeepAspectRatio = true;
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];

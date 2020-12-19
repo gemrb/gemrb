@@ -29,6 +29,7 @@
 #include <psp2/apputil.h>
 
 #include <Python.h>
+#include <SDL.h>
 
 // allocating memory for application on Vita
 int _newlib_heap_size_user = 344 * 1024 * 1024;
@@ -95,6 +96,47 @@ int main(int argc, char* argv[])
 		ShutdownLogging();
 		return sceKernelExitProcess(-1);
 	}
+	
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+	constexpr int32_t VITA_FULLSCREEN_WIDTH = 960;
+	constexpr int32_t VITA_FULLSCREEN_HEIGHT = 544;
+	
+	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)	{
+		SDL_Rect vitaDestRect;
+		vitaDestRect.x = 0;
+		vitaDestRect.y = 0;
+		vitaDestRect.w = width;
+		vitaDestRect.h = height;
+
+		if (fullscreen) {
+			const char* optstr = config->GetValueForKey("VitaKeepAspectRatio");
+			if (optstr && atoi(optstr) > 0) {
+				if ((static_cast<float>(VITA_FULLSCREEN_WIDTH) / VITA_FULLSCREEN_HEIGHT) >= (static_cast<float>(width) / height)) {
+					float scale = static_cast<float>(VITA_FULLSCREEN_HEIGHT) / height;
+					vitaDestRect.w = width * scale;
+					vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
+					vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - vitaDestRect.w) / 2;
+				} else {
+					float scale = static_cast<float>(VITA_FULLSCREEN_WIDTH) / width;
+					vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+					vitaDestRect.h = height * scale;
+					vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - vitaDestRect.h) / 2;
+				}
+			} else {
+				vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
+				vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
+			}
+			
+			SDL_SetVideoModeBilinear(true);
+		} else {
+			//center game area
+			vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - width) / 2;
+			vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - height) / 2;
+		}
+
+		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
+	}
+#endif
 	delete config;
 
 	core->Main();
