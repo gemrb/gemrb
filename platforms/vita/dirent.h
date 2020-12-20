@@ -76,3 +76,8 @@ inline int mkdir(const char *path, SceMode mode)
 {
 	return sceIoMkdir(path, mode);
 }
+
+inline int rmdir(const char *path)
+{
+	return sceIoRemove(path);
+}
