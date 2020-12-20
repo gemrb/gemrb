@@ -12,6 +12,7 @@
 121 StartCutSceneMode()
 122 EndCutSceneMode()
 127 CutSceneId(O:Object*)
+143 OpenDoor(O:Object*)
 153 ChangeEnemyAlly(O:Object*,I:Value*Ea)
 177 TriggerActivation(O:Object*,I:State*Boolean)
 178 BreakInstants()
