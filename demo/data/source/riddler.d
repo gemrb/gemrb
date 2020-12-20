@@ -1,3 +1,5 @@
+//NOTE: weidu --game demo/ demo/data/source/riddler.d; mv -v riddler.dlg demo/data
+
 BEGIN ~RIDDLER~ 7
 
 IF ~GlobalLT("Riddles","GLOBAL",7)~ THEN BEGIN 0
@@ -103,13 +105,9 @@ IF ~~ THEN BEGIN 13
   IF ~~ THEN GOTO 5
 END
 
-// TODO: this is the final victory state - add cutscene stuff
-//StartCutSceneMode()
-//StartCutScene("scene01")
-//NOTE: weidu --game demo/ demo/data/source/riddler.d; mv -v riddler.dlg demo/data
 IF ~~ THEN BEGIN 14
   SAY #70 /* ~That is correct and thus all the riddles are solved. You may pass.~ */
-  IF ~~ THEN REPLY #71 /* Farewell, quizzical figure. */ DO ~SetGlobal("Riddles","GLOBAL",8)~ EXIT
+  IF ~~ THEN REPLY #71 /* Farewell, quizzical figure. */ DO ~SetGlobal("Riddles","GLOBAL",8) StartCutSceneMode() StartCutScene("scene01")~ EXIT
 END
 
 IF ~GlobalGT("Riddles","GLOBAL",6)~ THEN BEGIN 15
