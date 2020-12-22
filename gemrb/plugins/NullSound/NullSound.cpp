@@ -50,17 +50,17 @@ Holder<SoundHandle> NullSound::Play(const char*, unsigned int, int, int, unsigne
 	return Holder<SoundHandle>();
 }
 
-int NullSound::CreateStream(Holder<SoundMgr>, bool lockAudioThread)
+int NullSound::CreateStream(Holder<SoundMgr>, bool)
 {
 	return 0;
 }
 
-bool NullSound::Stop(bool lockAudioThread)
+bool NullSound::Stop(bool)
 {
 	return true;
 }
 
-bool NullSound::Play(bool lockAudioThread)
+bool NullSound::Play(bool)
 {
 	return true;
 }
@@ -75,7 +75,7 @@ bool NullSound::Resume()
 	return true;
 }
 
-void NullSound::ResetMusics(bool lockAudioThread)
+void NullSound::ResetMusics(bool)
 {
 }
 
