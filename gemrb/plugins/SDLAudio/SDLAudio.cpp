@@ -39,7 +39,7 @@ SDLAudio::SDLAudio(void)
 	YPos = 0;
 	ambim = new AmbientMgr();
 	MusicPlaying = false;
-	OurMutex = NULL;
+	MusicMutex = NULL;
 	curr_buffer_offset = 0;
 	audio_rate = audio_format = audio_channels = 0;
 }
@@ -52,7 +52,7 @@ SDLAudio::~SDLAudio(void)
 	delete ambim;
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
-	SDL_DestroyMutex(OurMutex);
+	SDL_DestroyMutex(MusicMutex);
 	Mix_ChannelFinished(NULL);
 }
 
@@ -62,7 +62,7 @@ bool SDLAudio::Init(void)
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
 		return false;
 	}
-	OurMutex = SDL_CreateMutex();
+	MusicMutex = SDL_CreateMutex();
 #ifdef RPI
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
 #else
@@ -70,18 +70,25 @@ bool SDLAudio::Init(void)
 #endif
 		return false;
 	}
+
+	int result = Mix_AllocateChannels(MIXER_CHANNELS);
+	if( result < 0 ) {
+		Log(ERROR, "SDLAudio", "Unable to allocate mixing channels: %s\n", SDL_GetError());
+		return false;
+	}
+
 	Mix_QuerySpec(&audio_rate, (Uint16 *)&audio_format, &audio_channels);
 
 	Mix_ReserveChannels(1); // for speech
 	return true;
 }
 
-void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
+void SDLAudio::music_callback(void *udata, unsigned short *stream, int len)
+{
 	SDLAudio *driver = (SDLAudio *)udata;
-	SDL_mutexP(driver->OurMutex);
-
+	SDL_LockMutex(driver->MusicMutex);
+	
 	do {
-
 		// TODO: conversion? mutexes? sanity checks? :)
 		int num_samples = len / 2;
 		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
@@ -106,7 +113,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 
 	} while(true);
 
-	SDL_mutexV(driver->OurMutex);
+	SDL_UnlockMutex(driver->MusicMutex);
 }
 
 bool SDLAudio::evictBuffer()
@@ -119,8 +126,6 @@ bool SDLAudio::evictBuffer()
 	void *p;
 	const char *k;
 	bool res;
-
-	SDL_LockAudio();
 
 	while ((res = buffercache.getLRU(n, k, p)) == true && buffercache.GetCount() >= BUFFER_CACHE_SIZE) {
 		CacheEntry *e = (CacheEntry*)p;
@@ -144,8 +149,6 @@ bool SDLAudio::evictBuffer()
 			buffercache.Remove(k);
 		}
 	}
-
-	SDL_UnlockAudio();
 
 	return res;
 }
@@ -266,55 +269,81 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 	}
-#ifndef VITA
-	SDL_mutexP(OurMutex);
-#endif
+
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
-#ifndef VITA
-		SDL_mutexV(OurMutex);
-#endif
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
-#ifndef VITA
-	SDL_mutexV(OurMutex);
-#endif
 
 	// TODO
 	return Holder<SoundHandle>();
 }
 
-int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
+int SDLAudio::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThread)
 {
+	if (lockAudioThread) {
+		SDL_LockMutex(MusicMutex);
+	}
+
 	print("SDLAudio setting new music");
 	MusicReader = newMusic;
 
-	// TODO
+	if (lockAudioThread) {
+		SDL_UnlockMutex(MusicMutex);
+	}
+
 	return 0;
 }
 
-bool SDLAudio::Stop()
+bool SDLAudio::Stop(bool lockAudioThread)
 {
-	// TODO
+	if (lockAudioThread) {
+		SDL_LockMutex(MusicMutex);
+	}
+
 	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
+
+	if (lockAudioThread) {
+		SDL_UnlockMutex(MusicMutex);
+	}
+
 	return true;
 }
 
-bool SDLAudio::Play()
+bool SDLAudio::Play(bool lockAudioThread)
 {
+	if (!MusicReader) {
+		return false;
+	}
+
+	if (lockAudioThread) {
+		SDL_LockMutex(MusicMutex);
+	}
+
 	MusicPlaying = true;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
-	// TODO
+
+	if (lockAudioThread) {
+		SDL_UnlockMutex(MusicMutex);
+	}
+
 	return true;
 }
 
-void SDLAudio::ResetMusics()
+void SDLAudio::ResetMusics(bool lockAudioThread)
 {
-	// TODO
+	if (lockAudioThread) {
+		SDL_LockMutex(MusicMutex);
+	}
+
 	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
+
+	if (lockAudioThread) {
+		SDL_UnlockMutex(MusicMutex);
+	}
 }
 
 bool SDLAudio::CanPlay()
@@ -336,9 +365,10 @@ void SDLAudio::GetListenerPos(int& x, int& y)
 	y = YPos;
 }
 
-void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
+void SDLAudio::buffer_callback(void *udata, char *stream, int len)
+{
 	SDLAudio *driver = (SDLAudio *)udata;
-	SDL_mutexP(driver->OurMutex);
+	SDL_LockMutex(driver->MusicMutex);
 	unsigned int remaining = len;
 	while (remaining && driver->buffers.size() > 0) {
 		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
@@ -362,14 +392,18 @@ void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 		// underrun (out of buffers)
 		memset(stream, 0, remaining);
 	}
-	SDL_mutexV(driver->OurMutex);
+	SDL_UnlockMutex(driver->MusicMutex);
 }
 
+//This one is used for movies and ambients.
 int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 			ieWord gain, bool point, int ambientRange)
 {
+	SDL_LockMutex(MusicMutex);
+
 	if (ambientRange) {
 		// TODO: ambient sounds
+		SDL_UnlockMutex(MusicMutex);
 		return -1;
 	}
 
@@ -386,6 +420,8 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	MusicPlaying = false;
 	curr_buffer_offset = 0;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))buffer_callback, this);
+
+	SDL_UnlockMutex(MusicMutex);
 	return 0;
 }
 
@@ -415,12 +451,12 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 
 void SDLAudio::FreeBuffers()
 {
-	SDL_mutexP(OurMutex);
+	SDL_LockMutex(MusicMutex);
 	for (unsigned int i = 0; i < buffers.size(); i++) {
 		free(buffers[i].buf);
 	}
 	buffers.clear();
-	SDL_mutexV(OurMutex);
+	SDL_UnlockMutex(MusicMutex);
 }
 
 void SDLAudio::SetAmbientStreamVolume(int, int)
@@ -466,9 +502,9 @@ void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 		memcpy(d.buf, memory, d.size);
 	}
 
-	SDL_mutexP(OurMutex);
+	SDL_LockMutex(MusicMutex);
 	buffers.push_back(d);
-	SDL_mutexV(OurMutex);
+	SDL_UnlockMutex(MusicMutex);
 }
 
 #include "plugindef.h"

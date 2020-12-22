@@ -33,11 +33,11 @@ public:
 	virtual void End(void) = 0;
 	virtual void HardEnd(void) = 0;
 	/** Start the PlayList Music Execution */
-	virtual void Start(void) = 0;
+	virtual void Start(bool lockAudioThread) = 0;
 	/** Initializes the PlayList Manager */
 	virtual bool Init();
 	/** Loads a PlayList for playing */
-	virtual bool OpenPlaylist(const char* name) = 0;
+	virtual bool OpenPlaylist(const char* name, bool lockAudioThread) = 0;
 	/** Switches the current PlayList while playing the current one, return nonzero on error */
 	virtual int SwitchPlayList(const char* name, bool Hard) = 0;
 	/** Plays the Next Entry */

@@ -54,13 +54,13 @@ private:
 	unsigned int lastSound;
 	ResourceManager manager;
 private:
-	void PlayMusic(int pos);
-	void PlayMusic(char* name);
+	void PlayMusic(int pos, bool lockAudioThread);
+	void PlayMusic(char* name, bool lockAudioThread);
 public:
 	MUSImporter();
 	~MUSImporter();
 	/** Loads a PlayList for playing */
-	bool OpenPlaylist(const char* name);
+	bool OpenPlaylist(const char* name, bool lockAudioThread);
 	/** Initializes the PlayList Manager */
 	bool Init();
 	/** Switches the current PlayList while playing the current one */
@@ -69,7 +69,7 @@ public:
 	void End();
 	void HardEnd();
 	/** Start the PlayList Music Execution */
-	void Start();
+	void Start(bool lockAudioThread);
 	/** Plays the Next Entry */
 	void PlayNext();
 	/** Returns whether music is currently playing */

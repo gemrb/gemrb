@@ -27,7 +27,8 @@
 #include <vector>
 #include <SDL_mixer.h>
 
-#define BUFFER_CACHE_SIZE 50
+#define MIXER_CHANNELS 8
+#define BUFFER_CACHE_SIZE 100
 
 struct SDL_mutex;
 
@@ -50,13 +51,13 @@ public:
 	bool Init(void);
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
-	int CreateStream(Holder<SoundMgr>);
-	bool Play();
-	bool Stop();
+	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
+	bool Play(bool lockAudioThread);
+	bool Stop(bool lockAudioThread);
 	bool Pause() { return true; } /*not implemented*/
 	bool Resume() { return true; } /*not implemented*/
 	bool CanPlay();
-	void ResetMusics();
+	void ResetMusics(bool lockAudioThread);
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);
 	void UpdateVolume(unsigned int) {}
@@ -89,7 +90,7 @@ private:
 	unsigned short audio_format;
 	int audio_channels;
 
-	SDL_mutex* OurMutex;
+	SDL_mutex *MusicMutex;
 	LRUCache buffercache;
 };
 

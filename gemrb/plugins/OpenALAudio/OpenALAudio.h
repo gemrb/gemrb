@@ -107,12 +107,12 @@ public:
 					unsigned int *length = 0);
 	void UpdateVolume(unsigned int flags);
 	bool CanPlay();
-	void ResetMusics();
-	bool Play();
-	bool Stop();
+	void ResetMusics(bool lockAudioThread);
+	bool Play(bool lockAudioThread);
+	bool Stop(bool lockAudioThread);
 	bool Pause();
 	bool Resume();
-	int CreateStream(Holder<SoundMgr>);
+	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
 	void UpdateListenerPos(int XPos, int YPos );
 	void GetListenerPos( int &XPos, int &YPos );
 	bool ReleaseStream(int stream, bool HardStop);
