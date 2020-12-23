@@ -970,11 +970,7 @@ bool Inventory::UnEquipItem(ieDword slot, bool removecurse) const
 		return false;
 	}
 
-	if (removecurse) {
-		if (FindCandidateSlot(SLOT_INVENTORY, 0, item->ItemResRef) < 0) {
-			return false;
-		}
-	} else if (item->Flags & IE_INV_ITEM_CURSED && core->QuerySlotEffects(slot)) {
+	if (!removecurse && item->Flags & IE_INV_ITEM_CURSED && core->QuerySlotEffects(slot)) {
 		return false;
 	}
 	item->Flags &= ~IE_INV_ITEM_EQUIPPED; //no idea if this is needed, won't hurt

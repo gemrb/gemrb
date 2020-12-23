@@ -1950,7 +1950,6 @@ int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
 					continue;
 				}
-				inv->ChangeItemFlag(i, IE_INV_ITEM_CURSED, OP_NAND);
 				if (inv->UnEquipItem(i,true)) {
 					CREItem *tmp = inv->RemoveItem(i);
 					if(inv->AddSlotItem(tmp,-3)!=ASI_SUCCESS) {
