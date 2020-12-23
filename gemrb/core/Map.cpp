@@ -738,6 +738,7 @@ void Map::UpdateScripts()
 			//it looks like STATE_SLEEP allows scripts, probably it is STATE_HELPLESS what disables scripts
 			//if that isn't true either, remove this block completely
 			if (actor->GetStat(IE_STATE_ID) & STATE_HELPLESS) {
+				actor->SetInternalFlag(IF_JUSTDIED, OP_NAND);
 				continue;
 			}
 		}
