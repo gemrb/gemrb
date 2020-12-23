@@ -3746,16 +3746,16 @@ int fx_immune_to_weapon (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	case 7: //all not twohanded
 		mask = IE_INV_ITEM_TWOHANDED;
 		break;
-	case 8: //all twohanded
+	case 8: //all cursed
 		value = IE_INV_ITEM_CURSED;
 		//fallthrough
-	case 9: //all not twohanded
+	case 9: //all non-cursed
 		mask = IE_INV_ITEM_CURSED;
 		break;
-	case 10: //all twohanded
+	case 10: //all cold-iron
 		value = IE_INV_ITEM_COLDIRON;
 		//fallthrough
-	case 11: //all not twohanded
+	case 11: //all non cold-iron
 		mask = IE_INV_ITEM_COLDIRON;
 		break;
 	case 12:
