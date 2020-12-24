@@ -36,10 +36,16 @@
 
 #include <SDL.h>
 
+#if __APPLE__
+#include <OpenAL/al.h>
+#include <OpenAL/alc.h>
+#include <OpenAL/MacOSX_OALExtensions.h> // mac implementation of efx.h and some others
+#else
 #include "al.h"
 #include "alc.h"
 #ifdef HAVE_OPENAL_EFX_H
 # include "efx.h"
+#endif
 #endif
 
 #if ANDROID && SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
