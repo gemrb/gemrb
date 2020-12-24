@@ -50,10 +50,10 @@
 46         0x110      0          *          not_water_based
 47         0x104      32         27         breathes/not_undead_fungus_golem
 48         0x103      32         27         not_breathes/undead_fungus_or_golem
-49         EA         0          1          allies
-50         EA         0          5          not_allies
-51         EA         2          1          enemies
-52         EA         2          5          not_enemies
+49         0x108      0          1          allies
+50         0x108      0          5          not_allies
+51         0x108      2          1          enemies
+52         0x108      2          5          not_enemies
 53         0x103      3          25         race/fire_or_cold_using 
 54         0x104      3          25         race/not_fire_or_cold_using 
 55         0x103      1          27         unnatural  
