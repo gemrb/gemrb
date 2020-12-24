@@ -37,6 +37,11 @@ if(SCCACHE_PROGRAM)
 	set(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
 endif()
 
+IF(APPLE)
+	# favor mac frameworks over unix libraries
+	set(CMAKE_FIND_FRAMEWORK FIRST)
+ENDIF()
+
 # check for RaspberryPi
 IF(UNIX)
 	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
@@ -98,8 +103,6 @@ if (NOT LAYOUT)
 		set(LAYOUT "home")
 	elseif (APPLE)
 		set(LAYOUT "bundle")
-		# favor mac frameworks over unix libraries
-		set(CMAKE_FIND_FRAMEWORK FIRST)
 	else (APPLE)
 		set(LAYOUT "fhs")
 	endif (WIN32)
