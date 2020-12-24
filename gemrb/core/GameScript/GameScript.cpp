@@ -957,7 +957,7 @@ static const ActionLink actionnames[] = {
 	{"shout", GameScript::Shout, 0},
 	{"sinisterpoof", GameScript::CreateVisualEffect, 0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
-	{"smallwaitrandom", GameScript::SmallWaitRandom,AF_BLOCKING},
+	{"smallwaitrandom", GameScript::SmallWaitRandom, AF_BLOCKING|AF_ALIVE},
 	{"soundactivate", GameScript::SoundActivate, 0},
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
@@ -1044,7 +1044,7 @@ static const ActionLink actionnames[] = {
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
 	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},//iwd2
-	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING},
+	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING|AF_ALIVE},
 	{"weather", GameScript::Weather, 0},
 	{"xequipitem", GameScript::XEquipItem, 0},
 	{ NULL,NULL, 0}
