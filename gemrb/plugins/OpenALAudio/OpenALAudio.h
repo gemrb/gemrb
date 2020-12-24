@@ -37,9 +37,7 @@
 #include <SDL.h>
 
 #if __APPLE__
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#include <OpenAL/MacOSX_OALExtensions.h> // mac implementation of efx.h and some others
+#include <OpenAL/OpenAL.h> // umbrella include for all the headers we want
 #else
 #include "al.h"
 #include "alc.h"
