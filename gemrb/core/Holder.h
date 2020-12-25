@@ -35,6 +35,7 @@ template <class T>
 class Held {
 public:
 	Held() : RefCount(0) {}
+	virtual ~Held() = default;
 	void acquire() { ++RefCount; }
 	void release() { assert(RefCount && "Broken Held usage.");
 		if (!--RefCount) delete static_cast<T*>(this); }
