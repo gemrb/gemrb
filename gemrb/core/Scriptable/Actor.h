@@ -641,7 +641,7 @@ public:
 	/* actor is in trap */
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
-	void SetIsRunning(bool run);
+	void SetRunFlags(ieDword flags);
 	bool IsRunning() const { return InternalFlags & IF_RUNFLAGS; }
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(bool remove, ieDword baseclass=0, int diff=0);
@@ -734,7 +734,7 @@ public:
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	void NewPath();
 	/* overridden method, won't walk if dead */
-	void WalkTo(const Point &Des, bool run = false, int MinDistance = 0);
+	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef& sound, unsigned int index) const;
 	bool GetSoundFromFile(ieResRef &Sound, unsigned int index) const;
