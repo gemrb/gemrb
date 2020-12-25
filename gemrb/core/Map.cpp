@@ -3000,7 +3000,7 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 	}
 }
 
-Point Map::ConvertPointToFog(Point p) const
+Point Map::ConvertPointToFog(const Point &p) const
 {
 	return Point(p.x / 32, p.y / 32);
 }

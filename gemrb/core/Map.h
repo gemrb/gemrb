@@ -660,7 +660,7 @@ private:
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point &p, uint8_t*) const;
-	Point ConvertPointToFog(Point p) const;
+	Point ConvertPointToFog(const Point &p) const;
 	
 	void GenerateQueues();
 	void SortQueues();
