@@ -901,7 +901,8 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 				
 				if (it != layout->regions.end()) {
 					auto cursorRegion = static_cast<const TextLayout&>(**it);
-					cursorPos = cursorRegion.beginCharIdx + offset;
+					size_t length = cursorRegion.endCharIdx - cursorRegion.beginCharIdx;
+					cursorPos = cursorRegion.beginCharIdx + std::min(offset, length);
 					MarkDirty();
 				}
 			}
