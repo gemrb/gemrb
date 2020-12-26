@@ -38,6 +38,8 @@
 
 using namespace GemRB;
 
+constexpr int MINIMUM_LEFT_MARGIN = 3;
+
 static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
 {
 	// we assume the 2 dont overlap
@@ -66,6 +68,8 @@ static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
 		margins.bottom += (sbr.y + sbr.h) - (tar.y + tar.h);
 		tar.h += margins.bottom;
 	}
+
+	if (!margins.left) margins.left += MINIMUM_LEFT_MARGIN;
 
 	ta->SetFrame(tar);
 	ta->SetMargins(margins);
