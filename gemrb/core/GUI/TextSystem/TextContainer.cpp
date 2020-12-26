@@ -187,6 +187,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 						// saves looping again for the known to be useless segment
 						newline = true;
 						lineSegment.w = LINE_REMAINDER;
+						end--;
 					} else {
 						assert(printSize.w);
 						lineSegment.w = printSize.w;
