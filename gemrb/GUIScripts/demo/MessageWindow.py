@@ -90,6 +90,10 @@ def UpdateControlStatus():
 	MapButton.SetText ("M")
 	MapButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 
+	CenterButton = TMessageWindow.GetControl (4)
+	CenterButton.SetText ("C")
+	CenterButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR))
+
 	if hideflag:
 		GemRB.UnhideGUI()
 
