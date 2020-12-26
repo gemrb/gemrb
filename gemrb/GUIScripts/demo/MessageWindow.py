@@ -4,6 +4,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+import GUIMA
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
@@ -79,6 +80,15 @@ def UpdateControlStatus():
 		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
 	else:
 		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
+
+	PauseButton = TMessageWindow.GetControl (2)
+	PauseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
+	PauseButton.SetAnimation ("loading")
+	PauseButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+
+	MapButton = TMessageWindow.GetControl (3)
+	MapButton.SetText ("M")
+	MapButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
 
 	if hideflag:
 		GemRB.UnhideGUI()
