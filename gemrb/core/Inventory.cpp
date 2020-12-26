@@ -796,7 +796,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (!item) {
 			continue;
 		}
-		//if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
+		//if you want to drop undroppable items, simply set IE_INV_UNDROPPABLE
 		//by default, it won't drop them
 		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
@@ -956,9 +956,6 @@ bool Inventory::EquipItem(ieDword slot)
 	}
 	gamedata->FreeItem(itm, item->ItemResRef, false);
 	if (effect) {
-		if (item->Flags & IE_INV_ITEM_CURSED) {
-			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
-		}
 		AddSlotEffects( slot );
 	}
 	return true;
@@ -972,18 +969,12 @@ bool Inventory::UnEquipItem(ieDword slot, bool removecurse) const
 	if (!item) {
 		return false;
 	}
-	if (removecurse) {
-		if (item->Flags & IE_INV_ITEM_MOVABLE) {
-			item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
-		}
-		if (FindCandidateSlot(SLOT_INVENTORY,0,item->ItemResRef)<0) {
-			return false;
-		}
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !core->HasFeature(GF_NO_DROP_CAN_MOVE)) {
+		return false;
 	}
-	if (!core->HasFeature(GF_NO_DROP_CAN_MOVE) || (item->Flags&IE_INV_ITEM_CURSED) ) {
-		if (item->Flags & IE_INV_ITEM_UNDROPPABLE ) {
-			return false;
-		}
+
+	if (!removecurse && item->Flags & IE_INV_ITEM_CURSED && core->QuerySlotEffects(slot)) {
+		return false;
 	}
 	
 	Owner->ClearCurrentStanceAnims();
@@ -1251,9 +1242,6 @@ bool Inventory::SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX)
 	if (effects) {
 		CREItem* item = GetSlotItem(newslot);
 		item->Flags|=IE_INV_ITEM_EQUIPPED;
-		if (item->Flags & IE_INV_ITEM_CURSED) {
-			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
-		}
 		if (!noFX) {
 			AddSlotEffects(newslot);
 

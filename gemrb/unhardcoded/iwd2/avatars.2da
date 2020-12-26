@@ -288,7 +288,7 @@
 0xE759     MUMB       MUMB       MUMB       MUMB       9          2          1          *
 0xE0E0     MCOR       MCOR       MCOR       MCOR       9          3          1          *
 0xED09     MCOR       MCOR       MCOR       MCOR       9          3          1          *
-0xE0F0     MGIC       MGIC       MGIC       MGIC       9          2          1          *
+0xE0F0     MGIC       MGIC       MGIC       MGIC       9          3          1          *
 0xE0F1     MGLA       MGLA       MGLA       MGLA       9          2          1          *
 0xE108     MCYC       MCYC       MCYC       MCYC       9          4          1          *
 0xE118     METN       METN       METN       METN       9          4          1          *

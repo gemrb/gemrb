@@ -4307,9 +4307,8 @@ Holder<Sprite2D> Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 int Interface::CanMoveItem(const CREItem *item) const
 {
 	//This is an inventory slot, switch to IE_ITEM_* if you use Item
-	if (!HasFeature(GF_NO_DROP_CAN_MOVE) ) {
-		if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
-			return 0;
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE && !HasFeature(GF_NO_DROP_CAN_MOVE)) {
+		return 0;
 	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
