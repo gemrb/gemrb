@@ -873,6 +873,10 @@ bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
 				size_t offset = 0;
 				const Layout* layout = LayoutAtPoint(cursorPoint);
 				LayoutRegions::const_iterator it;
+				if (!layout && key.keycode == GEM_UP) {
+					// end of text workaround for GEM_UP to compute the proper cursor position to move to
+					layout = LayoutAtPoint(Point(cursorPoint.x - 1, cursorPoint.y));
+				}
 				if (layout) {
 					it = FindCursorRegion(*layout);
 					assert(it != layout->regions.end());
