@@ -2661,30 +2661,44 @@ int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
+#define CALL_MEMBER_FN(obj, memberFunc)  ((obj)->*(memberFunc))
+
 // 0x42 TransparencyModifier
 int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_transparency_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	//maybe this needs some timing
+	ieDword (Actor::*get)(unsigned int) const;
+	int (Actor::*set)(unsigned int, ieDword, ieDword);
+
+	bool permanent = fx->TimingMode == FX_DURATION_INSTANT_PERMANENT;
+	if (permanent) {
+		get = &Actor::GetBase;
+		set = &Actor::NewBase;
+	} else {
+		get = &Actor::GetStat;
+		set = &Actor::NewStat;
+	}
+
+	bool finished;
 	switch (fx->Parameter2) {
 	case 1: //fade in
-		if (fx->Parameter1<255) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1++;
-			}
-		}
+		// the stat setting functions don't handle minimum values so we need to do it ourselves
+		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, -std::min(std::max(fx->Parameter1, 1u),
+			CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT)), MOD_ADDITIVE);
+		finished = CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT) <= 0;
 		break;
-	case 2://fade out
-		if (fx->Parameter1) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1--;
-			}
-		}
+	case 2: //fade out
+		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, std::max(fx->Parameter1, 1u), MOD_ADDITIVE);
+		finished = CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT) >= 255;
+		break;
+	default: //set
+		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, fx->Parameter1, MOD_ABSOLUTE);
+		finished = true;
 		break;
 	}
-	STAT_MOD( IE_TRANSLUCENT );
-	return FX_APPLIED;
+
+	return finished && permanent ? FX_PERMANENT : FX_APPLIED;
 }
 
 // 0x43 SummonCreature
