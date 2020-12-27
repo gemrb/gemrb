@@ -972,6 +972,8 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	if Slot == None:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		tooltips = { "inventory": 12013, "ground": 12011, "container": "" }
+		if GameCheck.IsGemRBDemo ():
+			tooltips = { "inventory": 82, "ground": 83, "container": "" }
 		Button.SetTooltip (tooltips[Type])
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
