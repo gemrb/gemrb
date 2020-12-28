@@ -5,6 +5,9 @@ GamePath to the parent of the parent dir containing this file
 Width=800
 Height=600
 
+If you want to skip the intro windows, add also:
+SkipIntroVideos = 1
+
 # AUTHORS
 
 If not otherwise noted, the author of the files is GemRB team and they are available under GPL2+ like GemRB itself.
