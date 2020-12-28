@@ -1641,10 +1641,12 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	VideoBufferPtr stencil = nullptr;
 	Video* video = core->GetVideoDriver();
 	Color debugColor = ColorGray;
+	
+	const bool behindWall = walls.first.size();
+	const bool inFrontOfWall = walls.second.size();
 
-	if (walls.first.size() && walls.second.size()) {
-		// we are both in front of and behind a wall
-		// so we need a custom stencil
+	if (behindWall && inFrontOfWall) {
+		// we need a custom stencil if both behind and in front of a wall
 		auto it = objectStencils.find(object);
 		if (it != objectStencils.end()) {
 			// we already made one
@@ -1673,11 +1675,9 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	} else {
 		stencil = wallStencil;
 		
-		if (walls.first.size()) {
-			// behind a wall, but not in front of a wall
+		if (behindWall) {
 			debugColor = ColorBlue;
-		} else if (walls.second.size()) {
-			// in front of a wall, but not behind a wall
+		} else if (inFrontOfWall) {
 			debugColor = ColorMagenta;
 		}
 	}
