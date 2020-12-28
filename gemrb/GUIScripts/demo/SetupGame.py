@@ -11,4 +11,5 @@ def OnLoad():
 	GemRB.SetPlayerStat (1, IE_STR, 14)
 
 	GemRB.GameSetScreenFlags (GS_PARTYAI, OP_OR)
+	GemRB.SetVar("CHAPTER", 1)
 	GemRB.EnterGame()
