@@ -648,11 +648,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, bool dither,
 
 	UpdateSound(Pos);
 	
-	uint32_t flag = BLIT_NO_FLAGS;
-	if (Transparency & IE_VVC_TRANSPARENT) {
-		flag |= BLIT_HALFTRANS;
-	}
-
+	uint32_t flag = Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
 	Color tint = Tint;
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
@@ -661,10 +657,6 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, bool dither,
 
 	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
 		flag |= BLIT_GREY;
-	}
-
-	if (Transparency & IE_VVC_SEPIA) {
-		flag |= BLIT_SEPIA;
 	}
 
 	if ((Transparency & IE_VVC_TINT) == IE_VVC_TINT) {
