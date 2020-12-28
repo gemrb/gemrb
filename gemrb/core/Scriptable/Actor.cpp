@@ -8351,7 +8351,7 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 		ScriptedAnimation* vvc = vvcCells[i];
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(pos, tint, false, GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(pos, tint, GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);

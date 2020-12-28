@@ -57,7 +57,7 @@ public:
 	//adds a new entry (use when loading)
 	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
-	bool Draw(const Region &screen, Point &position, const Color &p_tint, int dither, int orientation, int height);
+	bool Draw(const Region &screen, Point &position, const Color &p_tint, int orientation, int height);
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;

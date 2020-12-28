@@ -128,7 +128,7 @@ VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
 	return NULL;
 }
 
-bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, int dither, int orientation, int height)
+bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, int orientation, int height)
 {
 	bool ret = true;
 
@@ -177,11 +177,11 @@ bool VEFObject::Draw(const Region &vp, Point &position, const Color &p_tint, int
 		switch((*iter).type) {
 		case VEF_BAM:
 		case VEF_VVC:
-			tmp = ((ScriptedAnimation *) (*iter).ptr)->Draw(pos - vp.Origin(), p_tint, dither, orientation, height);
+			tmp = ((ScriptedAnimation *) (*iter).ptr)->Draw(pos - vp.Origin(), p_tint, orientation, height);
 			break;
 		case VEF_2DA:
 		case VEF_VEF:
-			tmp = ((VEFObject *) (*iter).ptr)->Draw(vp, pos, p_tint, dither, orientation, height);
+			tmp = ((VEFObject *) (*iter).ptr)->Draw(vp, pos, p_tint, orientation, height);
 			break;
 		default:
 			tmp = true; //unknown/invalid type
