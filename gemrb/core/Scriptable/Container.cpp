@@ -80,7 +80,7 @@ Region Container::DrawingRegion() const
 	return r;
 }
 
-void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color tint)
+void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color tint) const
 {
 	Video* video = core->GetVideoDriver();
 	Game *game = core->GetGame();

@@ -49,7 +49,7 @@ public:
 	int AddItem(CREItem *item);
 	//draws the ground icons
 	Region DrawingRegion() const override;
-	void DrawPile(bool highlight, const Region& viewport, uint32_t flags, Color tint);
+	void DrawPile(bool highlight, const Region& viewport, uint32_t flags, Color tint) const;
 
 	int IsOpen() const;
 	void TryPickLock(const Actor *actor);
