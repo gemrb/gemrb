@@ -9,7 +9,7 @@ def OnLoad():
 
 	# shortcircuting support for easier development
 	if GemRB.GetVar ("SkipIntroVideos"):
-		NewGamePress()
+		NewGamePress("Jora the Seeker")
 		return
 
 	GemRB.LoadWindowPack("START", 800, 600)
@@ -39,10 +39,13 @@ def QuitPress():
 
 	GemRB.Quit()
 
-def NewGamePress():
+def NewGamePress(name = ""):
 	global StartWindow, Name
 
-	Name = StartWindow.GetControl(3).QueryText()
+	if name:
+		Name = name
+	else:
+		Name = StartWindow.GetControl(3).QueryText()
 
 	if StartWindow:
 		StartWindow.Unload()
