@@ -691,7 +691,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 		}
 	}
 
-	video->BlitGameSpriteWithPalette(frame, palette.get(), cx, cy, flags, tint);
+	video->BlitGameSpriteWithPalette(frame, palette, cx, cy, flags, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, cx, cy, flags^flag, tint, NULL);
