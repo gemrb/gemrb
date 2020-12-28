@@ -620,7 +620,7 @@ void ScriptedAnimation::IncrementPhase()
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientation, int height)
+bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientation, int height, uint32_t flags)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);
@@ -628,7 +628,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 
 	// not sure
 	if (twin) {
-		twin->Draw(Pos, p_tint, -1, height);
+		twin->Draw(Pos, p_tint, -1, height, flags);
 	}
 
 	Video *video = core->GetVideoDriver();
@@ -648,7 +648,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 
 	UpdateSound(Pos);
 	
-	uint32_t flag = Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
+	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
 	Color tint = Tint;
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
@@ -656,14 +656,13 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 	//on the other hand
 
 	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
-		flag |= BLIT_GREY;
+		flags |= BLIT_GREY;
 	}
 
 	if ((Transparency & IE_VVC_TINT) == IE_VVC_TINT) {
 		tint = p_tint;
 	}
 
-	ieDword flags = flag;
 	if (Transparency & BLIT_COLOR_MOD) {
 		flags |= BLIT_COLOR_MOD;
 		game->ApplyGlobalTint(tint, flags);
@@ -673,20 +672,14 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 	int cy = Pos.y - ZPos + YPos;
 	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
 
-	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
-		if (Transparency & BLIT_STENCIL_MASK) {
-			flags |= Transparency & BLIT_STENCIL_MASK;
-		} else if (core->DitherSprites == false) {
-			flags |= BLIT_STENCIL_BLUE;
-		} else {
-			flags |= BLIT_STENCIL_RED;
-		}
+	if (SequenceFlags & IE_VVC_NOCOVER) {
+		flags &= ~BLIT_STENCIL_MASK;
 	}
 
-	video->BlitGameSpriteWithPalette(frame, palette, cx, cy, flags, tint);
+	video->BlitGameSpriteWithPalette(frame, palette, cx, cy, flags | BLIT_BLENDED, tint);
 
 	if (light) {
-		video->BlitGameSprite(light, cx, cy, flags^flag, tint, NULL);
+		video->BlitGameSprite(light, cx, cy, flags, tint, NULL);
 	}
 	return false;
 }

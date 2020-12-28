@@ -8349,11 +8349,9 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 {
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
-		vvc->Transparency &= ~BLIT_STENCIL_MASK;
-		vvc->Transparency |= flags & BLIT_STENCIL_MASK;
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(pos, tint, GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(pos, tint, GetOrientation(), BBox.h, flags & BLIT_STENCIL_MASK);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);

@@ -133,7 +133,7 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool Draw(const Point &Pos, const Color &p_tint, int orientation, int height);
+	bool Draw(const Point &Pos, const Color &p_tint, int orientation, int height, uint32_t flags);
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
