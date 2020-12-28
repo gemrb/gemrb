@@ -1720,7 +1720,7 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	uint32_t flags = BLIT_STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
 		flags |= BLIT_STENCIL_ALPHA;
-	} else if (core->DitherSprites) {
+	} else if (core->DitherSprites == false) {
 		// dithering is set to disabled
 		flags |= BLIT_STENCIL_BLUE;
 	} else if (scriptable->Type == ST_ACTOR) {

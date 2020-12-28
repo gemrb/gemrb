@@ -684,7 +684,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, bool dither,
 	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
 		if (dither) {
 			flags |= BLIT_STENCIL_ALPHA;
-		} else if (core->DitherSprites) {
+		} else if (core->DitherSprites == false) {
 			flags |= BLIT_STENCIL_BLUE;
 		} else {
 			flags |= BLIT_STENCIL_RED;
