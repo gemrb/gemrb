@@ -4348,11 +4348,6 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 	if (cgcount<0) {
 		cgcount = core->ReadResRefTable("cgtable",casting_glows);
 	}
-	//remove effect if map is not loaded
-	Map *map = target->GetCurrentArea();
-	if (!map) {
-		return FX_NOT_APPLIED;
-	}
 
 	if (fx->Parameter2<(ieDword) cgcount) {
 		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
@@ -4372,7 +4367,8 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		} else {
 			sca->SetDefaultDuration(10000);
 		}
-		map->AddVVCell(new VEFObject(sca));
+		
+		target->AddVVCell(sca);
 	} else {
 		//simulate sparkle casting glows
 		target->ApplyEffectCopy(fx, fx_sparkle_ref, Owner, fx->Parameter2, 3);

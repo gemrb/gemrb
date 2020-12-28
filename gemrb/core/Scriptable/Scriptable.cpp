@@ -1426,7 +1426,7 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 			ieDword gender = actor->GetCGGender();
 			fxqueue->SetOwner(actor);
 			spl->AddCastingGlow(fxqueue, duration, gender);
-			fxqueue->AddAllEffects(actor, actor->Pos);
+			fxqueue->AddAllEffects(actor, Point());
 		}
 		delete fxqueue;
 
