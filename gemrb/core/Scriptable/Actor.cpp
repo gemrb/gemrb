@@ -9772,18 +9772,8 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	}
 	ieDword mask = 1<<(feat&31);
 	ieDword idx = feat>>5;
-
-	switch (mode) {
-		case OP_SET: case OP_OR:
-			BaseStats[IE_FEATS1+idx]|=mask;
-			break;
-		case OP_NAND:
-			BaseStats[IE_FEATS1+idx]&=~mask;
-			break;
-		case OP_XOR:
-			BaseStats[IE_FEATS1+idx]^=mask;
-			break;
-	}
+	
+	SetBits(BaseStats[IE_FEATS1+idx], mask, mode);
 }
 
 void Actor::SetFeatValue(unsigned int feat, int value, bool init)
