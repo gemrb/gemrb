@@ -8345,10 +8345,12 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const
+void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint, uint32_t flags) const
 {
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
+		vvc->Transparency &= ~BLIT_STENCIL_MASK;
+		vvc->Transparency |= flags & BLIT_STENCIL_MASK;
 
 		// actually this is better be drawn by the vvc
 		bool endReached = vvc->Draw(pos, tint, GetOrientation(), BBox.h);
@@ -8700,7 +8702,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	tint.a = 255 - trans;
 
 	//draw videocells under the actor
-	DrawVideocells(Pos - vp.Origin(), vvcShields, tint);
+	DrawVideocells(Pos - vp.Origin(), vvcShields, tint, flags);
 
 	if (ShouldDrawCircle()) {
 		DrawCircle(vp.Origin());
@@ -8819,7 +8821,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	}
 
 	//draw videocells over the actor
-	DrawVideocells(Pos - vp.Origin(), vvcOverlays, tint);
+	DrawVideocells(Pos - vp.Origin(), vvcOverlays, tint, flags);
 }
 
 /* Handling automatic stance changes */

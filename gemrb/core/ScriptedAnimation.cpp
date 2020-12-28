@@ -674,7 +674,9 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
 
 	if(!(SequenceFlags&IE_VVC_NOCOVER)) {
-		if (core->DitherSprites == false) {
+		if (Transparency & BLIT_STENCIL_MASK) {
+			flags |= Transparency & BLIT_STENCIL_MASK;
+		} else if (core->DitherSprites == false) {
 			flags |= BLIT_STENCIL_BLUE;
 		} else {
 			flags |= BLIT_STENCIL_RED;

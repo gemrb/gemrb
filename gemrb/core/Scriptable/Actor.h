@@ -782,7 +782,7 @@ public:
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
 	/* draw videocells */
-	void DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const;
+	void DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint, uint32_t flags) const;
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
