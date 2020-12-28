@@ -30,7 +30,6 @@ namespace GemRB {
 class Animation;
 class AnimationFactory;
 class DataStream;
-class Map;
 class Sprite2D;
 
 //scripted animation flags 
@@ -134,7 +133,7 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool Draw(const Point &Pos, const Color &p_tint, Map *area, bool dither, int orientation, int height);
+	bool Draw(const Point &Pos, const Color &p_tint, bool dither, int orientation, int height);
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);

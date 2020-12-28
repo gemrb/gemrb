@@ -8347,13 +8347,11 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 //there is a similar function in Map for stationary vvcs
 void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint) const
 {
-	Map* area = GetCurrentArea();
-
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(pos, tint, area, false, GetOrientation(), BBox.h);
+		bool endReached = vvc->Draw(pos, tint, false, GetOrientation(), BBox.h);
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);

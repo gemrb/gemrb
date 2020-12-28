@@ -620,7 +620,7 @@ void ScriptedAnimation::IncrementPhase()
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, bool dither, int orientation, int height)
+bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, bool dither, int orientation, int height)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);
@@ -628,7 +628,7 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, Map *area, b
 
 	// not sure
 	if (twin) {
-		twin->Draw(Pos, p_tint, area, dither, -1, height);
+		twin->Draw(Pos, p_tint, dither, -1, height);
 	}
 
 	Video *video = core->GetVideoDriver();

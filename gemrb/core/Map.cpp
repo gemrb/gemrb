@@ -1442,7 +1442,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 
 				Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
 				tint.a = 255;
-				bool endReached = sca->Draw(viewport, Pos, tint, this, 0, -1, 0);
+				bool endReached = sca->Draw(viewport, Pos, tint, 0, -1, 0);
 				if (endReached) {
 					delete( sca );
 					scaidx=vvcCells.erase(scaidx);
