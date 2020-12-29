@@ -33,14 +33,10 @@ namespace GemRB {
 
 Animation::Animation(int count)
 {
+	assert(count > 0);
 	frames = (Sprite2D **) calloc(count, sizeof(Sprite2D *));
 	indicesCount = count;
-	if (count) {
-		pos = RAND(0, count-1);
-	}
-	else {
-		pos = 0;
-	}
+	pos = RAND(0, count-1);
 	starttime = 0;
 	x = 0;
 	y = 0;

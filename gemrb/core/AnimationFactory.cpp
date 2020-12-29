@@ -80,8 +80,8 @@ void AnimationFactory::SetFrameData(unsigned char* FrameData)
 
 Animation* AnimationFactory::GetCycle(unsigned char cycle)
 {
-	if (cycle >= cycles.size()) {
-		return NULL;
+	if (cycle >= cycles.size() || cycles[cycle].FramesCount == 0) {
+		return nullptr;
 	}
 	int ff = cycles[cycle].FirstFrame;
 	int lf = ff + cycles[cycle].FramesCount;
