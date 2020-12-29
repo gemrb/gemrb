@@ -4,6 +4,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIClasses
+import GUIINV
 import GUIMA
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -93,6 +94,10 @@ def UpdateControlStatus():
 	CenterButton = TMessageWindow.GetControl (4)
 	CenterButton.SetText ("C")
 	CenterButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR))
+
+	InventoryButton = TMessageWindow.GetControl (5)
+	InventoryButton.SetText ("I")
+	InventoryButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIINV.OpenInventoryWindow)
 
 	if hideflag:
 		GemRB.UnhideGUI()
