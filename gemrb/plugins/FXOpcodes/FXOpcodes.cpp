@@ -2661,44 +2661,43 @@ int fx_set_blur_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-#define CALL_MEMBER_FN(obj, memberFunc)  ((obj)->*(memberFunc))
-
 // 0x42 TransparencyModifier
 int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_transparency_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	ieDword (Actor::*get)(unsigned int) const;
-	int (Actor::*set)(unsigned int, ieDword, ieDword);
-
 	bool permanent = fx->TimingMode == FX_DURATION_INSTANT_PERMANENT;
-	if (permanent) {
-		get = &Actor::GetBase;
-		set = &Actor::NewBase;
+	bool done = true;
+	ieDword transp;
+	if (fx->Parameter2 == 1 || fx->Parameter2 == 2) {
+		if (permanent) {
+			transp = target->GetBase(IE_TRANSLUCENT);
+		} else {
+			transp = target->GetStat(IE_TRANSLUCENT);
+		}
+		
+		if (fx->Parameter2 == 1) { // fade in
+			// the stat setting functions don't handle minimum values so we need to do it ourselves
+			transp -= std::min(std::max(fx->Parameter1, 1u), transp);
+			done = transp <= 0;
+		} else { // fade out
+			transp += std::max(fx->Parameter1 ,1u);
+			done = transp >= 255;
+		}
 	} else {
-		get = &Actor::GetStat;
-		set = &Actor::NewStat;
+		transp = fx->Parameter1;
 	}
 
-	bool finished;
-	switch (fx->Parameter2) {
-	case 1: //fade in
-		// the stat setting functions don't handle minimum values so we need to do it ourselves
-		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, -std::min(std::max(fx->Parameter1, 1u),
-			CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT)), MOD_ADDITIVE);
-		finished = CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT) <= 0;
-		break;
-	case 2: //fade out
-		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, std::max(fx->Parameter1, 1u), MOD_ADDITIVE);
-		finished = CALL_MEMBER_FN(target, get)(IE_TRANSLUCENT) >= 255;
-		break;
-	default: //set
-		CALL_MEMBER_FN(target, set)(IE_TRANSLUCENT, fx->Parameter1, MOD_ABSOLUTE);
-		finished = true;
-		break;
+	if (permanent) {
+		target->SetBase(IE_TRANSLUCENT, transp);
+		if (done) {
+			return FX_PERMANENT;
+		}
+	} else {
+		target->SetStat(IE_TRANSLUCENT, transp, 1);
 	}
 
-	return finished && permanent ? FX_PERMANENT : FX_APPLIED;
+	return FX_APPLIED;
 }
 
 // 0x43 SummonCreature
