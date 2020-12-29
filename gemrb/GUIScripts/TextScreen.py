@@ -45,6 +45,11 @@ def FindTextRow (Table):
 def StartTextScreen ():
 	global TextScreen, TextArea, TableName, Row
 
+	# for easier development
+	if GameCheck.IsGemRBDemo () and GemRB.GetVar ("SkipIntroVideos"):
+		GemRB.GamePause (0, 3)
+		return
+
 	GemRB.GamePause (1, 3)
 	ToggleAmbients (0)
 
