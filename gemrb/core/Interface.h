@@ -353,7 +353,7 @@ private:
 	WindowManager* winmgr;
 	Holder<GUIFactory> guifact;
 	Holder<ScriptEngine> guiscript;
-	GameControl* gamectrl;
+	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator;
 	Variables * vars;
 	Variables * tokens;

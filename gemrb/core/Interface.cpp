@@ -151,7 +151,6 @@ Interface::Interface()
 	}
 
 	winmgr = NULL;
-	gamectrl = NULL;
 	projserv = NULL;
 	VideoDriverName = "sdl";
 	AudioDriverName = "openal";
@@ -415,7 +414,7 @@ Interface::~Interface(void)
 
 GameControl* Interface::StartGameControl()
 {
-	assert(gamectrl == NULL);
+	assert(gamectrl == nullptr);
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0,0, Width, Height);
@@ -557,13 +556,15 @@ void Interface::HandleFlags()
 {
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
-
-	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+	
+	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
 		winmgr->DestroyAllWindows();
 		delete gamectrl;
-		gamectrl = NULL;
+		gamectrl = nullptr;
 		winmgr->GetGameWindow()->SetVisible(false);
-		
+	}
+
+	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
@@ -579,7 +580,6 @@ void Interface::HandleFlags()
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
-		winmgr->DestroyAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
