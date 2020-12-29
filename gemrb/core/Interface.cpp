@@ -558,13 +558,13 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 	
 	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
-		winmgr->DestroyAllWindows();
 		delete gamectrl;
 		gamectrl = nullptr;
 		winmgr->GetGameWindow()->SetVisible(false);
 	}
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		winmgr->DestroyAllWindows();
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
@@ -580,6 +580,7 @@ void Interface::HandleFlags()
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
+		winmgr->DestroyAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
