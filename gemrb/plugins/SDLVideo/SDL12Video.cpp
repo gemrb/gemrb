@@ -26,7 +26,7 @@
 #include "SDLSurfaceSprite2D.h"
 #include "SDL12GamepadMappings.h"
 
-#include "SpriteRenderer.inl"
+#include "SDLSpriteRendererRLE.h"
 
 using namespace GemRB;
 

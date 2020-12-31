@@ -363,7 +363,7 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 						  IAlphaIterator* cover,
 						  uint32_t flags, const Tinter& tint)
 {
-	assert(spr->BAM);
+	assert(spr->IsRLE());
 
 	if (srect.Dimensions().IsEmpty())
 		return;
