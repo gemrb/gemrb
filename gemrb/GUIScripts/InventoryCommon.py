@@ -244,6 +244,8 @@ def DisplayItem (slotItem, type):
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
+	elif GameCheck.IsGemRBDemo ():
+		strrefs = [ 84, 105, 106, 104, 107, item["DialogName"], 108 ]
 	else:
 		strrefs = [ 11973, 14133, 11960, 19392, 17104, item["DialogName"], 17108 ]
 
@@ -493,13 +495,19 @@ def OpenItemAmountWindow ():
 
 	# Done
 	Button = Window.GetControl (2)
-	Button.SetText (11973)
+	if GameCheck.IsGemRBDemo ():
+		Button.SetText (84)
+	else:
+		Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DragItemAmount)
 	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# Cancel
 	Button = Window.GetControl (1)
-	Button.SetText (13727)
+	if GameCheck.IsGemRBDemo ():
+		Button.SetText (103)
+	else:
+		Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemAmountWindow)
 	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
@@ -653,10 +661,12 @@ def GetColor():
 	GUIINV.InventoryWindow.SetVisible (WINDOW_GRAYED) #darken it
 	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
-	if GameCheck.IsIWD2():
+	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
 		Button = ColorPicker.GetControl (35)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
-		Button.SetText(13727)
+		Button.SetText (103)
+		if GameCheck.IsIWD2 ():
+			Button.SetText (13727)
 
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
