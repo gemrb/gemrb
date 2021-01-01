@@ -90,6 +90,8 @@ def InitInventoryWindow (Window):
 	Button = Window.GetControl (84)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.SetHotKey ('i')
 
 	# armor class
 	Label = Window.GetControl (0x10000038)
