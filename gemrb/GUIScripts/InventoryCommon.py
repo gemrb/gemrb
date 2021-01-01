@@ -562,7 +562,10 @@ def UpdateSlot (pc, slot):
 			Button.SetTooltip ("")
 			itemname = ""
 		else:
-			Button.SetBAM (SlotType["ResRef"],0,0)
+			if SlotType["Flags"] & 2:
+				Button.SetPicture (SlotType["ResRef"])
+			else:
+				Button.SetBAM (SlotType["ResRef"], 0, 0)
 			Button.SetTooltip (SlotType["Tip"])
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
