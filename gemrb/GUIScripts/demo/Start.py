@@ -12,8 +12,7 @@ def OnLoad():
 		NewGamePress("Jora the Seeker")
 		return
 
-	GemRB.LoadWindowPack("START", 800, 600)
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow(0, "START")
 
 	NewGameButton = StartWindow.GetControl(0)
 	QuitGameButton = StartWindow.GetControl(1)
@@ -27,9 +26,7 @@ def OnLoad():
 
 	NameEdit = StartWindow.GetControl(3)
 	NameEdit.SetText("Jora the Seeker")
-	NameEdit.SetStatus(IE_GUI_CONTROL_FOCUSED)
-
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	NameEdit.Focus()
 
 def QuitPress():
 	global StartWindow
@@ -42,7 +39,7 @@ def QuitPress():
 def NewGamePress(name = ""):
 	global StartWindow, Name
 
-	if name:
+	if name and isinstance(name, str):
 		Name = name
 	else:
 		Name = StartWindow.GetControl(3).QueryText()
