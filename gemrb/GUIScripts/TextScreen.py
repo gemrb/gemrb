@@ -44,6 +44,11 @@ def FindTextRow (Table):
 def StartTextScreen ():
 	global TextScreen, TextArea, TableName, Row
 
+	# for easier development
+	if GameCheck.IsGemRBDemo () and GemRB.GetVar ("SkipIntroVideos"):
+		GemRB.GamePause (0, 3)
+		return
+
 	GemRB.GamePause (1, 3)
 	ToggleAmbients (0)
 
@@ -60,6 +65,9 @@ def StartTextScreen ():
 			MusicName = "chap1"
 		TableName = "chapters"
 	elif GameCheck.IsIWD2():
+		TableName = "chapters"
+	elif GameCheck.IsGemRBDemo ():
+		#TODO: set MusicName
 		TableName = "chapters"
 
 	if TableName == "":
@@ -127,13 +135,19 @@ def StartTextScreen ():
 
 	#done
 	Button=TextScreen.GetControl (0)
-	Button.SetText (11973)
+	if GameCheck.IsGemRBDemo ():
+		Button.SetText (84)
+	else:
+		Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, EndTextScreen)
 	Button.MakeDefault()
 
 	#replay
 	Button=TextScreen.GetControl (3)
-	Button.SetText (16510)
+	if GameCheck.IsGemRBDemo ():
+		Button.SetText (85)
+	else:
+		Button.SetText (16510)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReplayTextScreen)
 
 	#if this was opened from somewhere other than game control close that window
@@ -192,7 +206,8 @@ def ReplayTextScreen ():
 	text = ""
 	for i in range(1, Count):
 		# flag value of 14 = IE_STR_SOUND|IE_STR_SPEECH/GEM_SND_SPEECH|GEM_SND_QUEUE
-		text += "\n\n" + GemRB.GetString(Table.GetValue (Row, i), 14)
+		text += "\n\n" if not GameCheck.IsGemRBDemo () else ""
+		text += GemRB.GetString(Table.GetValue (Row, i), 14)
 
 	TextArea.ChapterText (text)
 

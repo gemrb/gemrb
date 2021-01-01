@@ -34,13 +34,9 @@ namespace GemRB {
 Animation::Animation(int count)
 : frames(count, nullptr)
 {
+	assert(count > 0);
 	indicesCount = count;
-	if (count) {
-		pos = RAND(0, count-1);
-	}
-	else {
-		pos = 0;
-	}
+	pos = RAND(0, count-1);
 	starttime = 0;
 	x = 0;
 	y = 0;

@@ -1493,6 +1493,35 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	return valHook->GetValue(symbolname);
 }
 
+static int ParseIntParam(const char *&src, const char *&str)
+{
+	//going to the variable name
+	while (*str != '*' && *str !=',' && *str != ')' ) {
+		str++;
+	}
+	if (*str=='*') { //there may be an IDS table
+		str++;
+		ieResRef idsTabName;
+		char *cur = idsTabName;
+		const char *end = idsTabName + sizeof(ieResRef) - 1;
+		while (*str != ',' && *str != ')') {
+			// limit IDS file length to 8 characters
+			 if (cur != end) {
+				*cur = *str;
+				++cur;
+			}
+			++str;
+		}
+		*cur = 0;
+
+		if (idsTabName[0]) {
+			return GetIdsValue(src, idsTabName);
+		}
+	}
+	//no IDS table
+	return strtol(src, (char **) &src, 0);
+}
+
 static void ParseIdsTarget(const char *&src, Object *&object)
 {
 	for (int i=0;i<ObjectFieldsCount;i++) {
@@ -1590,7 +1619,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 		switch (*str) {
 			default:
 				Log(WARNING, "GSUtils", "Invalid type: %s", str);
-				//str++;
 				delete newAction;
 				return NULL;
 
@@ -1605,31 +1633,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 
 			case 'i': //Integer
 			{
-				//going to the variable name
-				while (*str != '*' && *str !=',' && *str != ')' ) {
-					str++;
-				}
-				int value;
-				if (*str=='*') { //there may be an IDS table
-					str++;
-					ieVariable idsTabName;
-					char* tmp = idsTabName;
-					while (( *str != ',' ) && ( *str != ')' )) {
-						*tmp = *str;
-						tmp++;
-						str++;
-					}
-					*tmp = 0;
-					if (idsTabName[0]) {
-						value = GetIdsValue(src, idsTabName);
-					}
-					else {
-						value = strtol( src, (char **) &src, 0);
-					}
-				}
-				else { //no IDS table
-					value = strtol( src, (char **) &src, 0);
-				}
+				int value = ParseIntParam(src, str);
 				if (!intCount) {
 					newAction->int0Parameter = value;
 				} else if (intCount == 1) {
@@ -1963,7 +1967,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 		switch (*str) {
 			default:
 				Log(ERROR, "GSUtils", "Invalid type: %s", str);
-				//str++;
 				delete newTrigger;
 				return NULL;
 
@@ -1978,31 +1981,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 
 			case 'i': //Integer
 			{
-				//going to the variable name
-				while (*str != '*' && *str !=',' && *str != ')' ) {
-					str++;
-				}
-				int value;
-				if (*str=='*') { //there may be an IDS table
-					str++;
-					ieVariable idsTabName;
-					char* tmp = idsTabName;
-					while (( *str != ',' ) && ( *str != ')' )) {
-						*tmp = *str;
-						tmp++;
-						str++;
-					}
-					*tmp = 0;
-					if (idsTabName[0]) {
-						value = GetIdsValue(src, idsTabName);
-					}
-					else {
-						value = strtol( src, (char **) &src, 0);
-					}
-				}
-				else { //no IDS table
-					value = strtol( src, (char **) &src, 0);
-				}
+				int value = ParseIntParam(src, str);
 				if (!intCount) {
 					newTrigger->int0Parameter = value;
 				} else if (intCount == 1) {

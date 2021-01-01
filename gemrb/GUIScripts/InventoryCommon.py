@@ -232,6 +232,8 @@ def DisplayItem (slotItem, type):
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
+	elif GameCheck.IsGemRBDemo ():
+		strrefs = [ 84, 105, 106, 104, 107, item["DialogName"], 108 ]
 	else:
 		strrefs = [ 11973, 14133, 11960, 19392, 17104, item["DialogName"], 17108 ]
 
@@ -510,6 +512,8 @@ def OpenItemAmountWindow (btn, slot):
 	strings = { 'Done': 11973, "Cancel": 13727}
 	if GameCheck.IsPST():
 		strings = { 'Done': 1403, "Cancel": 4196}
+	elif GameCheck.IsGemRBDemo ():
+		strings = { 'Done': 84, 'Cancel': 103}
 
 	# item icon
 	Icon = Window.GetControl (0)
@@ -629,7 +633,10 @@ def UpdateSlot (pc, slot):
 			Button.SetTooltip ("")
 			itemname = ""
 		else:
-			Button.SetBAM (SlotType["ResRef"],0,0)
+			if SlotType["Flags"] & 2:
+				Button.SetPicture (SlotType["ResRef"])
+			else:
+				Button.SetBAM (SlotType["ResRef"], 0, 0)
 			Button.SetTooltip (SlotType["Tip"])
 
 		if SlotMap and SlotMap[slot]<0:
@@ -730,10 +737,12 @@ def GetColor():
 	InventoryWindow.SetDisabled (True) #darken it
 	ColorPicker = GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
-	if GameCheck.IsIWD2():
+	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
 		Button = ColorPicker.GetControl (35)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelColor)
-		Button.SetText(13727)
+		Button.SetText (103)
+		if GameCheck.IsIWD2 ():
+			Button.SetText (13727)
 
 	for i in range (34):
 		Button = ColorPicker.GetControl (i)
@@ -1043,12 +1052,10 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 	if Slot == None:
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-		if Type == "inventory":
-			Button.SetTooltip (12013) # Personal Item
-		elif Type == "ground":
-			Button.SetTooltip (12011) # Ground Item
-		else:
-			Button.SetTooltip ("")
+		tooltips = { "inventory": 12013, "ground": 12011, "container": "" }
+		if GameCheck.IsGemRBDemo ():
+			tooltips = { "inventory": 82, "ground": 83, "container": "" }
+		Button.SetTooltip (tooltips[Type])
 		Button.EnableBorder (0, 0)
 		Button.EnableBorder (1, 0)
 		Button.EnableBorder (2, 0)

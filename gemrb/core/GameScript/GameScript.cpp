@@ -644,7 +644,7 @@ static const ActionLink actionnames[] = {
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
 	{"exportparty", GameScript::ExportParty, 0},
-	{"face", GameScript::Face,AF_BLOCKING},
+	{"face", GameScript::Face, AF_BLOCKING|AF_ALIVE},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
 	{"fadefromblack", GameScript::FadeFromColor, AF_BLOCKING}, //probably the same

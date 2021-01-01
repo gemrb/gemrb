@@ -1,4 +1,4 @@
 2DA V1.0
-*
-        RESREF
-DEFAULT	*
+0
+        TO_HIT   DAMAGE   BEND_BARS_LIFT_GATES      WEIGHT_ALLOWANCE
+14      0        0        0                         10

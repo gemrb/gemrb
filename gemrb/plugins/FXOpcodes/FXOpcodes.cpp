@@ -2665,24 +2665,37 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_transparency_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	//maybe this needs some timing
-	switch (fx->Parameter2) {
-	case 1: //fade in
-		if (fx->Parameter1<255) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1++;
-			}
+	bool permanent = fx->TimingMode == FX_DURATION_INSTANT_PERMANENT;
+	bool done = true;
+	ieDword transp;
+	if (fx->Parameter2 == 1 || fx->Parameter2 == 2) {
+		if (permanent) {
+			transp = target->GetBase(IE_TRANSLUCENT);
+		} else {
+			transp = target->GetStat(IE_TRANSLUCENT);
 		}
-		break;
-	case 2://fade out
-		if (fx->Parameter1) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1--;
-			}
+		
+		if (fx->Parameter2 == 1) { // fade in
+			// the stat setting functions don't handle minimum values so we need to do it ourselves
+			transp -= std::min(std::max(fx->Parameter1, 1u), transp);
+			done = transp <= 0;
+		} else { // fade out
+			transp += std::max(fx->Parameter1 ,1u);
+			done = transp >= 255;
 		}
-		break;
+	} else {
+		transp = fx->Parameter1;
 	}
-	STAT_MOD( IE_TRANSLUCENT );
+
+	if (permanent) {
+		target->SetBase(IE_TRANSLUCENT, transp);
+		if (done) {
+			return FX_PERMANENT;
+		}
+	} else {
+		target->SetStat(IE_TRANSLUCENT, transp, 1);
+	}
+
 	return FX_APPLIED;
 }
 
