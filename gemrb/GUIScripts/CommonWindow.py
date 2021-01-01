@@ -160,7 +160,9 @@ def OpenContainerWindow ():
 		# GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
 	else:
 		GemRB.GetView ("MSGWIN").SetVisible (False)
-		GemRB.GetView ("ACTWIN").SetVisible (False)
+		ActWin = GemRB.GetView ("ACTWIN")
+		if ActWin:
+			ActWin.SetVisible (False)
 
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	# fix wrong height in the guiw10.chu and reposition
@@ -174,7 +176,7 @@ def OpenContainerWindow ():
 	#stop gears from interfering
 	if GameCheck.IsPST():
 		GUICommonWindows.DisableAnimatedWindows ()
-	elif not GameCheck.IsIWD2():
+	elif not GameCheck.IsIWD2 () and not GameCheck.IsGemRBDemo ():
 		# container window shouldnt be in front
 		GemRB.GetView("OPTWIN").Focus()
 		GemRB.GetView("PORTWIN").Focus()
@@ -276,7 +278,8 @@ def CloseContainerWindow ():
 	ContainerWindow.Close ()
 	ContainerWindow = None
 	GemRB.GetView ("MSGWIN").SetVisible (True)
-	GemRB.GetView ("ACTWIN").SetVisible (True)
+	if GemRB.GetView ("ACTWIN"):
+		GemRB.GetView ("ACTWIN").SetVisible (True)
 	SetGameGUIHidden(HideOnClose)
 
 	if GameCheck.IsPST():
