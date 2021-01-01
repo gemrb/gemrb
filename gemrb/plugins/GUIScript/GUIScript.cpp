@@ -7067,7 +7067,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	if (Sound[0]) {
+	if (Sound && Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 	Py_RETURN_NONE;
@@ -9393,7 +9393,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
-	if (Sound[0]) {
+	if (Sound && Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 
@@ -9613,7 +9613,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		displaymsg->DisplayConstantString(STR_INVFULL, DMC_WHITE);
 	}
 
-	if (Sound[0]) {
+	if (Sound && Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 	}
 	return PyInt_FromLong( res );
