@@ -27,6 +27,8 @@
 #include "RGBAColor.h"
 #include "SClassID.h"
 
+#include <cstdint>
+
 namespace GemRB {
 
 class DataStream;
