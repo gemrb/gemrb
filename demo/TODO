@@ -6,8 +6,7 @@ https://github.com/gemrb/gemrb/issues/313
 
 OLD NOTES
 fist.itm is missing some resources like icons
-dialog.tlk entries
-(proper mapicon0.png)
+chitin.key is not updated
 
 CONSIDER REMOVING:
 - the fonts, now included for easier testing (otherwise add all the needed boilerplate)

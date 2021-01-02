@@ -13,6 +13,9 @@ SkipIntroVideos = 1
 If not otherwise noted, the author of the files is GemRB team and they are
 available under GPL2+ (code) like GemRB itself. Art assets under CC-BY-SA 4.0.
 
+For XCF and other files used to generate some of the used artwork, see the
+[gemrb-assets repo](https://github.com/gemrb/gemrb-assets).
+
 The background graphic for ar0100 was contributed by Aranthor (made from
 scratch) and is available as-is, requiring only attribution.
 
