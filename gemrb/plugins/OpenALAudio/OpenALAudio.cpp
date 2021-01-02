@@ -356,7 +356,7 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		streams[i].ForceClear();
 	}
 	speech.ForceClear();
-	ResetMusics(true);
+	ResetMusics();
 	clearBufferCache(true);
 
 #ifdef HAVE_OPENAL_EFX_H

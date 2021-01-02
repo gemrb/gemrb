@@ -87,7 +87,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len)
 {
 	SDLAudio *driver = (SDLAudio *)udata;
 	SDL_LockMutex(driver->MusicMutex);
-	
+
 	do {
 		// TODO: conversion? mutexes? sanity checks? :)
 		int num_samples = len / 2;
@@ -300,7 +300,6 @@ bool SDLAudio::Stop()
 {
 	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
-
 	return true;
 }
 
@@ -309,10 +308,8 @@ bool SDLAudio::Play()
 	if (!MusicReader) {
 		return false;
 	}
-
 	MusicPlaying = true;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
-
 	return true;
 }
 

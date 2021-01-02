@@ -108,9 +108,9 @@ public:
 					unsigned int *length = 0);
 	void UpdateVolume(unsigned int flags);
 	bool CanPlay();
-	void ResetMusics(bool lockAudioThread);
-	bool Play(bool lockAudioThread);
-	bool Stop(bool lockAudioThread);
+	void ResetMusics();
+	bool Play();
+	bool Stop();
 	bool Pause();
 	bool Resume();
 	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
