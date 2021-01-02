@@ -34,8 +34,6 @@ Portrait image "fan-art Boromir 'Lotr'" by Deevad (CC BY 3.0).
 All used OpenGameArt assets are collated in this collection:
 https://opengameart.org/content/gemrb-demo-assets
 
-Hand cursor icon was done by yd (CC0).
-
 Window and GUI design based on Lamoot's RPG GUI construction kit v1.0 (CC-BY)
 
 Main cursors are from Tempest in the Aether and Ryzom Core (CC-BY-SA 3.0)
