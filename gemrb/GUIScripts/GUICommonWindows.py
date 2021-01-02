@@ -1648,7 +1648,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		else:
 			if GameCheck.HasHOW():
 				# Rest (how)
-				pos = ScreenHeight - 37
+				pos = Window.GetFrame()["h"] - 37
 				Button = Window.CreateButton (8, 6, pos, 55, 37)
 				Button.SetSprites ("GUIRSBUT", 0,0,1,0,0)
 				Button.SetTooltip (11942)
