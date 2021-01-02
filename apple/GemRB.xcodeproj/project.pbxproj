@@ -1486,6 +1486,7 @@
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
 		A28D24A3143C24E500A27897 /* BAMFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFontManager.h; sourceTree = "<group>"; };
+		A291763325A0C5E9005F727E /* SDLSpriteRendererRLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDLSpriteRendererRLE.h; sourceTree = "<group>"; };
 		A29504771609721300BB22AA /* TTFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TTFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CombatInfo.cpp; sourceTree = "<group>"; };
 		A2969F0E168CDC0D00D9C6FC /* CombatInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CombatInfo.h; sourceTree = "<group>"; };
@@ -1785,7 +1786,6 @@
 		A2D672DF1B30F40C00264D16 /* WindowManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WindowManager.cpp; sourceTree = "<group>"; };
 		A2D672E01B30F40C00264D16 /* WindowManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowManager.h; sourceTree = "<group>"; };
 		A2D72B181B671329009F4D33 /* SpriteSheet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpriteSheet.h; sourceTree = "<group>"; };
-		A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; path = SpriteRenderer.inl; sourceTree = "<group>"; };
 		A2DE329714EB071200117503 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
 		A2DE329814EB071200117503 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		A2DE8806181064DF007B8CC5 /* libvlc.5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlc.5.dylib; path = /Applications/VLC.app/Contents/MacOS/lib/libvlc.5.dylib; sourceTree = "<absolute>"; };
@@ -2848,6 +2848,7 @@
 		A27B8757139F0A7D0002DC13 /* SDLVideo */ = {
 			isa = PBXGroup;
 			children = (
+				A291763325A0C5E9005F727E /* SDLSpriteRendererRLE.h */,
 				A281CE0E256F11B900058D76 /* SDLPixelIterator.h */,
 				A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */,
 				A28636182559D9F800E5730C /* DPadSoftKeyboard.h */,
@@ -2865,7 +2866,6 @@
 				A27B875A139F0A7D0002DC13 /* SDLVideo.cpp */,
 				A27B875B139F0A7D0002DC13 /* SDLVideo.h */,
 				A2E5A4B619992CC000CCE6D8 /* Shaders */,
-				A2DB6D5715D9ECB300D70E88 /* SpriteRenderer.inl */,
 			);
 			path = SDLVideo;
 			sourceTree = "<group>";
@@ -7528,7 +7528,7 @@
 					/opt/X11/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
@@ -7618,7 +7618,7 @@
 					/opt/X11/lib,
 					/usr/local/lib,
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_CFLAGS = (
 					"-DHAVE_CONFIG_H",
 					"-isystem",
