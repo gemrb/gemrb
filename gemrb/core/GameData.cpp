@@ -433,6 +433,19 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int fr
 	return tspr;
 }
 
+Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame, bool silent)
+{
+	Holder<Sprite2D> img = gamedata->GetBAMSprite(resRef, cycle, frame, silent);
+	if (img) return img;
+
+	// try static image formats to support PNG
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resRef);
+	if (im) {
+		img = im->GetSprite2D();
+	}
+	return img;
+}
+
 FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode, bool silent)
 {

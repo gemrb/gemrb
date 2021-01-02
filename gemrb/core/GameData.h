@@ -105,6 +105,9 @@ public:
 	/** returns a single sprite (not cached) from a BAM resource */
 	Holder<Sprite2D> GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
 
+	/* returns a single BAM or static image sprite, checking in that order */
+	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
+
 	/** returns factory resource, currently works only with animations */
 	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false);
