@@ -35,6 +35,7 @@
 #include "System/FileStream.h"
 #include "MapReverb.h"
 
+#include <atomic>
 #include <SDL.h>
 
 #include "al.h"
@@ -131,7 +132,7 @@ private:
 private:
 	ALCcontext *alutContext;
 	ALuint MusicSource;
-	bool MusicPlaying;
+	std::atomic<bool> MusicPlaying;
 	SDL_mutex* musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS];
 	Holder<SoundMgr> MusicReader;

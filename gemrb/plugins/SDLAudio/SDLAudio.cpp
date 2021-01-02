@@ -296,54 +296,30 @@ int SDLAudio::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThread)
 	return 0;
 }
 
-bool SDLAudio::Stop(bool lockAudioThread)
+bool SDLAudio::Stop()
 {
-	if (lockAudioThread) {
-		SDL_LockMutex(MusicMutex);
-	}
-
 	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
-
-	if (lockAudioThread) {
-		SDL_UnlockMutex(MusicMutex);
-	}
 
 	return true;
 }
 
-bool SDLAudio::Play(bool lockAudioThread)
+bool SDLAudio::Play()
 {
 	if (!MusicReader) {
 		return false;
 	}
 
-	if (lockAudioThread) {
-		SDL_LockMutex(MusicMutex);
-	}
-
 	MusicPlaying = true;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))music_callback, this);
-
-	if (lockAudioThread) {
-		SDL_UnlockMutex(MusicMutex);
-	}
 
 	return true;
 }
 
-void SDLAudio::ResetMusics(bool lockAudioThread)
+void SDLAudio::ResetMusics()
 {
-	if (lockAudioThread) {
-		SDL_LockMutex(MusicMutex);
-	}
-
 	MusicPlaying = false;
 	Mix_HookMusic(NULL, NULL);
-
-	if (lockAudioThread) {
-		SDL_UnlockMutex(MusicMutex);
-	}
 }
 
 bool SDLAudio::CanPlay()

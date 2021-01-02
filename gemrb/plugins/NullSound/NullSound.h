@@ -33,12 +33,12 @@ public:
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
 	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
-	bool Play(bool lockAudioThread);
-	bool Stop(bool lockAudioThread);
+	bool Play();
+	bool Stop();
 	bool Pause();
 	bool Resume();
 	bool CanPlay();
-	void ResetMusics(bool lockAudioThread);
+	void ResetMusics();
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);
 	void UpdateVolume(unsigned int) {}

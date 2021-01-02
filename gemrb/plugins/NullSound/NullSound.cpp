@@ -55,12 +55,12 @@ int NullSound::CreateStream(Holder<SoundMgr>, bool)
 	return 0;
 }
 
-bool NullSound::Stop(bool)
+bool NullSound::Stop()
 {
 	return true;
 }
 
-bool NullSound::Play(bool)
+bool NullSound::Play()
 {
 	return true;
 }
@@ -75,7 +75,7 @@ bool NullSound::Resume()
 	return true;
 }
 
-void NullSound::ResetMusics(bool)
+void NullSound::ResetMusics()
 {
 }
 

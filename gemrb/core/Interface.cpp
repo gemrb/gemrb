@@ -3858,7 +3858,7 @@ void Interface::QuitGame(int BackToMain)
 	if (AudioDriver) {
 		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
-		AudioDriver->Stop(true); // also kill sounds
+		AudioDriver->Stop(); // also kill sounds
 	}
 	//delete game, worldmap
 	if (game) {

@@ -110,9 +110,9 @@ public:
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
-	virtual void ResetMusics(bool lockAudioThread) = 0;
-	virtual bool Play(bool lockAudioThread) = 0;
-	virtual bool Stop(bool lockAudioThread) = 0;
+	virtual void ResetMusics() = 0;
+	virtual bool Play() = 0;
+	virtual bool Stop() = 0;
 	virtual bool Pause() = 0;
 	virtual bool Resume() = 0;
 	virtual int CreateStream(Holder<SoundMgr> , bool lockAudioThread) = 0;
