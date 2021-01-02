@@ -50,18 +50,13 @@ def GetWindowPack():
 	#    but the can be the entire height
 	# 2. the originals were for 4:3 screens,
 	#    but modern screens are usually a wider aspect
-	if height >= 960:
-		gui = "GUIW12"
-		if GemRB.HasResource (gui, RES_CHU, 1):
-			return gui
-	elif height >= 768:
-		gui = "GUIW10"
-		if GemRB.HasResource (gui, RES_CHU, 1):
-			return gui
-	elif height >= 600:
-		gui = "GUIW08"
-		if GemRB.HasResource (gui, RES_CHU, 1):
-			return gui
+	# 3. not all games have all the window packs
+	if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
+		return "GUIW12"
+	elif height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
+		return "GUIW10"
+	elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
+		return "GUIW08"
 
 	# fallback to the smallest resolution
 	return default
