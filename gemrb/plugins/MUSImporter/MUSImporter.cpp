@@ -59,7 +59,7 @@ bool MUSImporter::Init()
 	return true;
 }
 /** Loads a PlayList for playing */
-bool MUSImporter::OpenPlaylist(const char* name, bool lockAudioThread)
+bool MUSImporter::OpenPlaylist(const char* name)
 {
 	if (Playing || CurrentPlayList(name)) {
 		return true;
@@ -244,7 +244,7 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 		}
 	}
 
-	if (OpenPlaylist(name, true)) {
+	if (OpenPlaylist(name)) {
 		Start(true);
 		return 0;
 	}
@@ -281,7 +281,7 @@ void MUSImporter::PlayNext()
 		core->GetAudioDrv()->Stop();
 		//start new music after the old faded out
 		if (PLNameNew[0]) {
-			if (OpenPlaylist(PLNameNew, false)) {
+			if (OpenPlaylist(PLNameNew)) {
 				Start(false);
 			}
 			PLNameNew[0]='\0';

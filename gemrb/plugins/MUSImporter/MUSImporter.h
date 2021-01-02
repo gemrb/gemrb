@@ -60,7 +60,7 @@ public:
 	MUSImporter();
 	~MUSImporter();
 	/** Loads a PlayList for playing */
-	bool OpenPlaylist(const char* name, bool lockAudioThread);
+	bool OpenPlaylist(const char* name);
 	/** Initializes the PlayList Manager */
 	bool Init();
 	/** Switches the current PlayList while playing the current one */
