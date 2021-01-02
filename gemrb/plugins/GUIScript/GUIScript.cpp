@@ -9476,7 +9476,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, si->ItemResRef,0);
-			if (Sound[0]) {
+			if (Sound && Sound[0]) {
 				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 			}
 		}
