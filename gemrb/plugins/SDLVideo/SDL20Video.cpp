@@ -138,7 +138,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return GEM_ERROR;
 	}
-#if 0
+#if USE_OPENGL_BACKEND
 	spriteShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/GameSpriteF.glsl");
 	if (!spriteShader)
 	{
@@ -242,9 +242,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
 {
-#if 0 // FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-	// OPENGL
-#else
+#if !USE_OPENGL_BACKEND
 	// we need to isolate flags that require software rendering to use as the "version"
 	uint32_t version = (BLIT_GREY|BLIT_SEPIA) & flags;
 	// WARNING: software fallback == slow
@@ -275,9 +273,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
 #if USE_OPENGL_BACKEND
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-		SDL_RenderFlush(renderer);
-#endif
 		GLint previous_program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
@@ -297,8 +292,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		} else {
 			stencilShader->SetUniformValue("u_dither", 1, 0);
 		}
-
-		glActiveTexture(GL_TEXTURE0);
+		
+		stencilShader->SetUniformValue("s_stencil", 1, 1);
+		glActiveTexture(GL_TEXTURE1);
 		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
 
 		SDL_Rect stencilRect = drect;
@@ -345,10 +341,9 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
 {
-	// FIXME: OpenGL shader disabled until we have a chance to fix it/combine it with the stencil shader
-#if 0
-	GLint activeTex;
-	glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTex);
+#if USE_OPENGL_BACKEND
+	GLint previous_program;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
 	spriteShader->Use();
 	if (flags&BLIT_GREY) {
@@ -359,9 +354,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 		spriteShader->SetUniformValue("u_greyMode", 1, 0);
 	}
 
-	//spriteShader->SetUniformValue("s_texture", 1, 0);
-	glActiveTexture(GL_TEXTURE0);
-	SDL_GL_BindTexture(texture, nullptr, nullptr);
+	spriteShader->SetUniformValue("s_sprite", 1, 0);
 #else
 	// "shaders" were already applied via software (RenderSpriteVersion)
 	// they had to be applied very first so we could create a texture from the software rendering
@@ -396,11 +389,8 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
-#if 0
+#if USE_OPENGL_BACKEND
 	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
-
-	SDL_GL_UnbindTexture(texture);
-	glActiveTexture(activeTex);
 
 	return ret;
 #else

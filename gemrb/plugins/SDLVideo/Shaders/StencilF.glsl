@@ -1,14 +1,16 @@
 precision highp float;
 
-varying vec2 v_texCoord;
-uniform sampler2D s_texture;
+//varying vec4 v_color; // glColor, we set this to the "tint" parameter
+//varying vec2 v_texCoord;
+varying vec2 v_stencilCoord;
 
+uniform sampler2D s_stencil;
 uniform int u_channel;
 uniform int u_dither;
 
 void main()
 {
-	vec4 color = texture2D(s_texture, v_texCoord);
+	vec4 color = texture2D(s_stencil, v_stencilCoord);
 	gl_FragColor = vec4(0, 0, 0, color[u_channel - 1]);
 	
 	// FIXME: I feel like there is a better way of testing half alpha
