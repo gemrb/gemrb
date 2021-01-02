@@ -45,6 +45,10 @@ Swirl by Beast (CC0), temporarily selectively dithered with imagemagick.
 Loading spinner by qubodup (CC0).
 
 Ground pile container image and inventory gold image by Clint Bellanger (CC-BY-SA 3.0).
-Backpack image by mold and Ravenmore (CC-BY 3.0).
+Backpack image by mold and Ravenmore (CC-BY 3.0). Pile pick-up sound under
+(CC-BY-SA 3.0) by Hansjörg Malthaner (http://opengameart.org/users/varkalandar).
+
 Inventory slot item backgrounds collected by lukems-br (CC-BY 3.0) plus
 from Game-Icons.net: quiver icon by Delapouite (CC-BY 3.0) and bag icon by Lorc (CC-BY 3.0).
+
+Button press sound by Kenney.nl (CC0), window open close sounds by rubberduck (CC0).
