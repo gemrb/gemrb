@@ -11,7 +11,7 @@ uniform int u_dither;
 void main()
 {
 	vec4 color = texture2D(s_stencil, v_stencilCoord);
-	gl_FragColor = vec4(0, 0, 0, color[u_channel - 1]);
+	gl_FragColor = vec4(0, 0, 0, color[u_channel]);
 	
 	// FIXME: I feel like there is a better way of testing half alpha
 	if (u_dither == 1 && gl_FragColor.a <= 0.51 && gl_FragColor.a >= 0.49) {

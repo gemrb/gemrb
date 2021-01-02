@@ -276,13 +276,13 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		GLint previous_program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
-		GLint channel = 4;
+		GLint channel = 3;
 		if (flags&BLIT_STENCIL_RED) {
-			channel = 1;
+			channel = 0;
 		} else if (flags&BLIT_STENCIL_GREEN) {
-			channel = 2;
+			channel = 1;
 		} else if (flags&BLIT_STENCIL_BLUE) {
-			channel = 3;
+			channel = 2;
 		}
 
 		stencilShader->Use();
