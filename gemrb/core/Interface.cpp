@@ -130,7 +130,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 : ControlDragOp(&dragDummy), item(item) {
 	Item* i = gamedata->GetItem(item->ItemResRef);
 	assert(i);
-	Holder<Sprite2D> pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 1);
+	Holder<Sprite2D> pic = gamedata->GetAnySprite(i->ItemIcon, -1, 1);
 	if (pic == nullptr) {
 		// use any / the smaller icon if the dragging one is unavailable
 		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
