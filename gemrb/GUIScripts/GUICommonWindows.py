@@ -243,8 +243,8 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		# Pendulum, gears, sun/moon dial (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
-			pos = ScreenHeight - 71
-			Window.CreateButton (OptionControl['Time'], 6, pos, 64, 71)
+			pos = Window.GetFrame()["h"] - 71
+			Window.CreateButton (OptionControl['Time'], 6-6, pos, 64, 71)
 
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
