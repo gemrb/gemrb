@@ -1,0 +1,6 @@
+2DA V1.0
+*
+           RESREF     MIN        MAX        RANGE
+NONE       *          0x0000     0xffff     0
+DEFAULT    terrain    0x5000     0x6fff     10
+PROTAGO    terrain    0xC800     0xC900     10

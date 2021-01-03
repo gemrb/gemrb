@@ -768,7 +768,8 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	Point pos(fx->PosX,fx->PosY);
+
+	Point pos(target->Pos.x, target->Pos.y);
 	Projectile *pro;
 	if (fx->Parameter4) {
 		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller

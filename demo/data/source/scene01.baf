@@ -1,0 +1,18 @@
+IF
+	True()
+THEN
+	RESPONSE #100
+		CutSceneId(Player1)
+		Weather(1)
+		Wait(1)
+		MoveViewPoint([533.359],6)
+		Wait(4)
+		ScreenShake([10.10],30)
+		TriggerActivation("Caveentrance",TRUE)
+		OpenDoor("swirldoor")
+		AmbientActivate("swirl",FALSE)
+		Wait(1)
+		MoveViewObject(Player1,4)
+		Wait(2)
+		EndCutSceneMode()
+END
