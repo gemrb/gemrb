@@ -53,4 +53,5 @@ from Game-Icons.net: quiver icon by Delapouite (CC-BY 3.0) and bag icon by Lorc 
 
 Button press sound by Kenney.nl (CC0), window open close sounds by rubberduck (CC0).
 
-Footstep sounds by Little Robot Sound Factory (www.littlerobotsoundfactory.com; CC-BY 3.0).
+Footstep sounds and portal destruction sfx by Little Robot Sound Factory
+(www.littlerobotsoundfactory.com; CC-BY 3.0).
