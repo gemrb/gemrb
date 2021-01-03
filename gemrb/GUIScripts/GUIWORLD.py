@@ -46,7 +46,10 @@ def OpenDialogButton(id):
 	MsgWin = GemRB.GetView("MSGWIN")
 
 	frame = MsgWin.GetFrame()
-	window.SetPos(frame['x'], frame['y'] + frame['h'])
+	offset = 0
+	if GameCheck.IsGemRBDemo ():
+		offset = window.GetFrame()['h']
+	window.SetPos(frame['x'], frame['y'] + frame['h'] - offset)
 
 	# Dialog button shouldnt be in front
 	win = GemRB.GetView("OPTWIN")
