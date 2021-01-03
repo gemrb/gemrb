@@ -2251,6 +2251,15 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 	int Operation = OP_SET;
 	PARSE_ARGS( args, "OI|i", &self, &Flags, &Operation );
 
+	// check if we were called by a button, so we can ensure the
+	// Disabled state is preserved — also set by SetState
+	Button* btn = GetView<Button>(self);
+	if (btn && Operation == OP_SET) {
+		bool wasDisabled = btn->Flags() & View::Disabled;
+		bool set = btn->SetFlags(Flags, Operation);
+		if (wasDisabled) btn->SetFlags(View::Disabled, OP_OR);
+		RETURN_BOOL(set);
+	}
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
 	RETURN_BOOL(view->SetFlags( Flags, Operation ));
