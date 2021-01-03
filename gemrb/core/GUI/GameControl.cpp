@@ -1691,7 +1691,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			mwinframe = mta->GetWindow()->Frame();
 		}
 
-		if (frame.h >= mapsize.h) {
+		if (frame.h >= mapsize.h + mwinframe.h + 32) {
 			p.y = (mapsize.h - frame.h)/2;
 			canMove = false;
 		} else if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
