@@ -35,6 +35,7 @@
 #endif
 #endif
 
+#include "config.h"
 #include "exports.h"
 #include "Predicates.h"
 
