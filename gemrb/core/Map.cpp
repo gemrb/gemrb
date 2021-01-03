@@ -1014,7 +1014,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		vid->DrawRect(r, ColorBlack, true);
 	};
 	
-	auto Fill = [=](int x, int y, uint8_t dirs, uint8_t idxBase = 0) {
+	auto Fill = [=](int x, int y, uint8_t dirs, uint8_t idxBase) {
 		// If an explored tile is adjacent to an
 		//   unexplored one, we draw border sprite
 		//   (gradient black <-> transparent)
@@ -1080,7 +1080,7 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		if (!IsExplored(x, y + 1)) dirs |= 4;
 		if (!IsExplored(x + 1, y )) dirs |= 8;
 
-		if (dirs && !Fill(x, y, dirs)) {
+		if (dirs && !Fill(x, y, dirs, 0)) {
 			FillFog(x, y, 1);
 		}
 	};
