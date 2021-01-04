@@ -1708,7 +1708,7 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	}
 	
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
-	SetDrawingStencilForObject(scriptable, scriptable->DrawingRegion(), walls, vp.Origin());
+	SetDrawingStencilForObject(scriptable, bbox, walls, vp.Origin());
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {

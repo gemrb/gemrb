@@ -8600,16 +8600,22 @@ bool Actor::UpdateDrawingState()
 void Actor::UpdateDrawingRegion()
 {
 	Region box(Pos, Size());
-	for (const auto& part : currentStance.anim) {
-		Animation* anim = part.first;
-		Holder<Sprite2D> animframe = anim->CurrentFrame();
-		assert(animframe);
-		Region partBBox = animframe->Frame;
-		partBBox.x = Pos.x - partBBox.x;
-		partBBox.y = Pos.y - partBBox.y;
-		box.ExpandToRegion(partBBox);
-		assert(box.RectInside(partBBox));
-	}
+	
+	auto ExpandBoxForAnimationParts = [&box, this](const std::vector<AnimationPart>& parts) {
+		for (const auto& part : parts) {
+			Animation* anim = part.first;
+			Holder<Sprite2D> animframe = anim->CurrentFrame();
+			assert(animframe);
+			Region partBBox = animframe->Frame;
+			partBBox.x = Pos.x - partBBox.x;
+			partBBox.y = Pos.y - partBBox.y;
+			box.ExpandToRegion(partBBox);
+			assert(box.RectInside(partBBox));
+		}
+	};
+	
+	ExpandBoxForAnimationParts(currentStance.anim);
+	ExpandBoxForAnimationParts(currentStance.shadow);
 			
 	box.y -= GetElevation();
 	
