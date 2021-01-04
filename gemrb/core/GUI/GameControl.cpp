@@ -1083,6 +1083,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				Log(MESSAGE, "GameControl", "Show lightmap %s", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
 			case '7': //toggles fog of war
+			case '8': // searchmap debugging
 				{
 					constexpr int flagCnt = 4;
 					static uint32_t fogFlags[flagCnt]{
@@ -1092,15 +1093,17 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						DEBUG_SHOW_FOG_UNEXPLORED
 					};
 					static uint32_t flagIdx = 0;
+					
 					DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+					if (Key.character == '8') {
+						DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
+						flagIdx = (DebugFlags & DEBUG_SHOW_SEARCHMAP) ? 1 : 0;
+						Log(MESSAGE, "GameControl", "Show searchmap %s", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
+					}
+					
 					DebugFlags |= fogFlags[flagIdx++];
 					flagIdx = flagIdx % flagCnt;
 				}
-				break;
-			case '8': //show searchmap over area, we also clear the fog for debug purposes, but you can manually toggle it back on
-				DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
-				DebugFlags |= DEBUG_SHOW_FOG_ALL;
-				Log(MESSAGE, "GameControl", "Show searchmap %s", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
 				break;
 		}
 		return true; //return from cheatkeys
