@@ -1438,12 +1438,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			break;
 		case AOT_SCRIPTED:
 			{
-				Point Pos(0,0);
-
 				Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
 				tint.a = 255;
 				uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
-				bool endReached = sca->Draw(viewport, Pos, tint, -1, 0, flags);
+				bool endReached = sca->Draw(viewport, Point(), tint, -1, 0, flags);
 				if (endReached) {
 					delete( sca );
 					scaidx=vvcCells.erase(scaidx);
