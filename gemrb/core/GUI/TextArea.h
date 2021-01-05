@@ -141,6 +141,8 @@ public:
 	void UpdateState(unsigned int optIdx);
 	void DidFocus();
 	void DidUnFocus();
+	
+	void AddSubviewInFrontOfView(View*, const View* = NULL);
 
 private: // Private attributes
 	// dialog and listbox handling

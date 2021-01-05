@@ -584,6 +584,14 @@ void TextArea::DidUnFocus()
 		textContainer->DidUnFocus();
 	}
 }
+
+void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
+{
+	// we dont have a way of retrieving a TextArea's scrollview so
+	// we have no direct way of placing subviews in front of it so we let NULL represent it
+	const View* target = (back) ? back : &scrollview;
+	View::AddSubviewInFrontOfView(front, target);
+}
 	
 int TextArea::TextHeight() const
 {
