@@ -43,11 +43,15 @@ def InitJournalWindow (JournalWindow):
 	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
+	
+	TextArea = JournalWindow.GetControl (1)
 
 	Button = JournalWindow.GetControl (3)
+	Button = JournalWindow.ReparentSubview (Button, TextArea)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalPrevSectionPress)
 
 	Button = JournalWindow.GetControl (4)
+	Button = JournalWindow.ReparentSubview (Button, TextArea)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, JournalNextSectionPress)
 
 	Chapter = GemRB.GetGameVar("chapter")
