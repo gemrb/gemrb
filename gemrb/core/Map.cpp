@@ -1163,7 +1163,11 @@ void Map::DrawHighlightables(const Region& viewport)
 		if (p->Highlight) {
 			p->DrawOutline(viewport.Origin());
 		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
-			p->outlineColor = ColorBlue;
+			if (p->VisibleTrap(true)) {
+				p->outlineColor = ColorRed;
+			} else {
+				p->outlineColor = ColorBlue;
+			}
 			p->DrawOutline(viewport.Origin());
 		}
 	}
