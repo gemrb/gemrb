@@ -1,12 +1,29 @@
 # HOW TO RUN
-Set:
+
+Copy either sample config from gemrb/ and set:
 GameType=demo
-GamePath to the parent of the parent dir containing this file
+GamePath to the parent of the parent dir containing this file (demo)
 Width=800
 Height=600
 
-If you want to skip the intro windows, add also:
+If you want to skip the intro windows for faster development, add also:
 SkipIntroVideos = 1
+
+## Shortcut for running from the build dir
+
+Create the config:
+```
+cat > demo.cfg <<KUKU
+GameType=demo
+GamePath=../demo
+GemRBPath=../gemrb
+PluginsPath=./gemrb/plugins/
+Width=800
+Height=600
+KUKU
+```
+
+Run: `gemrb/gemrb -c demo.cfg`
 
 # AUTHORS
 
