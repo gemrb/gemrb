@@ -770,15 +770,13 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 
-	ScriptedAnimation *vvc = target->GetVVCCell(&target->vvcOverlays, fx->Resource);
-	if (vvc) {
-		vvc->active = true;
-		vvc = target->GetVVCCell(&target->vvcShields, fx->Resource);
-		if (vvc) {
-			vvc->active = true;
-		}
-	} else {
+	auto range = target->GetVVCCells(fx->Resource);
+	if (range.first == range.second) {
 		return FX_NOT_APPLIED;
+	}
+	
+	for (; range.first != range.second; ++range.first) {
+		range.first->second->active = true;
 	}
 
 	switch(fx->Parameter2) {

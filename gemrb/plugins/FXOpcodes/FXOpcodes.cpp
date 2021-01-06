@@ -5819,9 +5819,11 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//if it is sticky, don't add it if it is already played
 	if (fx->Parameter2) {
-		ScriptedAnimation *vvc = target->GetVVCCell(fx->Resource);
-		if (vvc) {
-			vvc->active = true;
+		auto range = target->GetVVCCells(fx->Resource);
+		if (range.first != range.second) {
+			for (; range.first != range.second; ++range.first) {
+				range.first->second->active = true;
+			}
 			return FX_APPLIED;
 		}
 		if (! fx->FirstApply) return FX_NOT_APPLIED;

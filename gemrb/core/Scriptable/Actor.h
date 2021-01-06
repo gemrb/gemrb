@@ -34,6 +34,8 @@
 #include "Palette.h"
 #include "Polygon.h"
 
+#include <map>
+#include <set>
 #include <vector>
 
 namespace GemRB {
@@ -248,8 +250,6 @@ struct ActionButtonRow2 {
 	ieByte clss;
 };
 
-typedef std::vector< ScriptedAnimation*> vvcVector;
-
 struct WeaponInfo {
 	int slot;
 	ieDword enchantment;
@@ -293,6 +293,10 @@ struct ModalState {
 
 extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
+
+bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs);
+using vvcSet = std::set<ScriptedAnimation*, decltype(VVCSort)*>;
+using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {
 public:
@@ -356,8 +360,9 @@ public:
 	ieDword TargetDoor;
 
 	EffectQueue fxqueue;
-	vvcVector vvcOverlays;
-	vvcVector vvcShields;
+	
+	vvcDict vfxDict;
+	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
@@ -771,18 +776,15 @@ public:
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
 	/* remove a vvc from the list, graceful means animated removal */
-	void RemoveVVCell(const ieResRef vvcname, bool graceful);
+	void RemoveVVCells(const ResRef& vvcname, bool graceful);
 	/* returns true if actor already has the overlay (slow) */
-	bool HasVVCCell(const ieResRef resource) const;
-	/* returns overlay (or underlay) if actor already has it, faster */
-	ScriptedAnimation *GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const;
+	bool HasVVCCell(const ResRef& resource) const;
 	/* returns overlay if actor already has it (slow) */
-	ScriptedAnimation *GetVVCCell(const ieResRef resource) const;
+	std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
+	GetVVCCells(const ResRef& resource) const;
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
-	/* draw videocells */
-	void DrawVideocells(const Point& pos, const vvcVector &vvcCells, const Color &tint, uint32_t flags) const;
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();

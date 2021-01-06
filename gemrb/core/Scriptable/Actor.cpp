@@ -295,7 +295,7 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	-1,-1,-1
 };
 
-static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
+static ResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
 static ieDword hc_locations = 0;
@@ -542,16 +542,11 @@ Actor::Actor()
 
 Actor::~Actor(void)
 {
-	unsigned int i;
-
 	delete anims;
 	delete PCStats;
 
-	for (i = 0; i < vvcOverlays.size(); i++) {
-		delete vvcOverlays[i];
-	}
-	for (i = 0; i < vvcShields.size(); i++) {
-		delete vvcShields[i];
+	for (ScriptedAnimation* vvc : vfxQueue) {
+		delete vvc;
 	}
 
 	delete attackProjectile;
@@ -1438,7 +1433,7 @@ static void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 		handle_overlay(actor, OV_ENTANGLE);
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_ENTANGLE], true);
+		actor->RemoveVVCells(hc_overlays[OV_ENTANGLE], true);
 	}
 }
 
@@ -1456,7 +1451,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 			if (newValue&mask) {
 				handle_overlay(actor, i);
 			} else if (oldValue&mask) {
-				actor->RemoveVVCell(hc_overlays[i], true);
+				actor->RemoveVVCells(hc_overlays[i], true);
 			}
 		}
 		mask<<=1;
@@ -1471,7 +1466,7 @@ static void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_SHIELDGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_SHIELDGLOBE], true);
 	}
 }
 
@@ -1483,7 +1478,7 @@ static void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_MINORGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_MINORGLOBE], true);
 	}
 }
 
@@ -1495,7 +1490,7 @@ static void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_GREASE], true);
+		actor->RemoveVVCells(hc_overlays[OV_GREASE], true);
 	}
 }
 
@@ -1508,7 +1503,7 @@ static void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_WEB], true);
+		actor->RemoveVVCells(hc_overlays[OV_WEB], true);
 	}
 }
 
@@ -1521,7 +1516,7 @@ static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 	}
 	if (oldValue) {
 		//it seems we have to remove it abruptly
-		actor->RemoveVVCell(hc_overlays[OV_BOUNCE], false);
+		actor->RemoveVVCells(hc_overlays[OV_BOUNCE], false);
 	}
 }
 
@@ -2042,12 +2037,11 @@ static void InitActorTables()
 	if (tm) {
 		ieDword mask = 1;
 		for (i=0;i<OVERLAY_COUNT;i++) {
-			const char *tmp = tm->QueryField( i, 0 );
-			strnlwrcpy(hc_overlays[i], tmp, 8);
+			hc_overlays[i] = tm->QueryField(i, 0);
 			if (atoi(tm->QueryField( i, 1))) {
 				hc_locations|=mask;
 			}
-			tmp = tm->QueryField( i, 2 );
+			const char *tmp = tm->QueryField( i, 2 );
 			hc_flags[i] = atoi(tmp);
 			mask<<=1;
 		}
@@ -3189,14 +3183,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//ToHit.ResetAll();
 	}
 
-	unsigned int i;
-
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
-	for (i = 0; i < vvcOverlays.size(); i++) {
-		if (vvcOverlays[i] && vvcOverlays[i]->effect_owned) vvcOverlays[i]->active = false;
-	}
-	for (i = 0; i < vvcShields.size(); i++) {
-		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
+	for (ScriptedAnimation* vvc : vfxQueue) {
+		if (vvc->effect_owned) vvc->active = false;
 	}
 
 	// apply palette changes not caused by persistent effects
@@ -3283,7 +3272,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
-	for (i=0;i<MAX_STATS;i++) {
+	for (int i=0; i < MAX_STATS; ++i) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
@@ -3302,7 +3291,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (mxsplwis) {
 		if (spellbook.IsIWDSpellBook()) {
 			// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
-			for (i=0; i < ISCLASSES; i++) {
+			for (int i = 0; i < ISCLASSES; ++i) {
 				int level = GetClassLevel(i);
 				int booktype = booksiwd2[i]; // ieIWD2SpellType
 				if (!level || booktype == -1) {
@@ -8338,14 +8327,6 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-//there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Point& pos, const vvcVector &vvcCells, const Color &tint, uint32_t flags) const
-{
-	for (const auto& vvc : vvcCells) {
-		vvc->Draw(pos, tint, BBox.h, flags & BLIT_STENCIL_MASK);
-	}
-}
-
 void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 							const std::vector<AnimationPart>& animParts, const Color& tint) const
 {
@@ -8574,27 +8555,23 @@ bool Actor::UpdateDrawingState()
 {
 	GameControl* gc = core->GetGameControl();
 	const Region& vp = gc->Viewport();
-
-	auto UpdateVisualEffects = [this, &vp](vvcVector& vvcs) {
-		for (auto it = vvcs.cbegin(); it != vvcs.cend();) {
-			ScriptedAnimation* vvc = *it;
-			bool endReached = vvc->UpdateDrawingState(Pos - vp.Origin(), GetOrientation());
-			if (endReached) {
-				delete vvc;
-				it = vvcs.erase(it);
-				continue;
-			}
-
-			if (!vvc->active) {
-				vvc->SetPhase(P_RELEASE);
-			}
-			
-			++it;
-		}
-	};
 	
-	UpdateVisualEffects(vvcShields);
-	UpdateVisualEffects(vvcOverlays);
+	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
+		ScriptedAnimation* vvc = *it;
+		bool endReached = vvc->UpdateDrawingState(Pos - vp.Origin(), GetOrientation());
+		if (endReached) {
+			vfxDict.erase(vvc->ResName);
+			it = vfxQueue.erase(it);
+			delete vvc;
+			continue;
+		}
+
+		if (!vvc->active) {
+			vvc->SetPhase(P_RELEASE);
+		}
+		
+		++it;
+	}
 	
 	if (!AdvanceAnimations()) {
 		return false;
@@ -8652,22 +8629,14 @@ void Actor::UpdateDrawingRegion()
 		box.ExpandToRegion(blurBox);
 	}
 	
-	for (const auto& vvc : vvcOverlays) {
+	for (const auto& vvc : vfxQueue) {
 		Region r = vvc->DrawingRegion();
 		r.x += Pos.x;
 		r.y += Pos.y;
 		box.ExpandToRegion(r);
 		assert(r.w <= box.w && r.h <= box.h);
 	}
-	
-	for (const auto& vvc : vvcShields) {
-		Region r = vvc->DrawingRegion();
-		r.x += Pos.x;
-		r.y += Pos.y;
-		box.ExpandToRegion(r);
-		assert(r.w <= box.w && r.h <= box.h);
-	}
-	
+
 	// drawingRegion is the the box containing all gfx attached to the actor
 	drawingRegion = box;
 }
@@ -8713,7 +8682,14 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	tint.a = 255 - trans;
 
 	//draw videocells under the actor
-	DrawVideocells(Pos - vp.Origin(), vvcShields, tint, flags);
+	auto it = vfxQueue.cbegin();
+	for (; it != vfxQueue.end(); ++it) {
+		ScriptedAnimation* vvc = *it;
+		if (vvc->YPos >= 0) {
+			break;
+		}
+		vvc->Draw(Pos - vp.Origin(), tint, BBox.h, flags);
+	}
 
 	if (ShouldDrawCircle()) {
 		DrawCircle(vp.Origin());
@@ -8832,7 +8808,10 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	}
 
 	//draw videocells over the actor
-	DrawVideocells(Pos - vp.Origin(), vvcOverlays, tint, flags);
+	for (; it != vfxQueue.end(); ++it) {
+		ScriptedAnimation* vvc = *it;
+		vvc->Draw(Pos - vp.Origin(), tint, BBox.h, flags);
+	}
 }
 
 /* Handling automatic stance changes */
@@ -9217,55 +9196,38 @@ void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 	}
 }
 
-bool Actor::HasVVCCell(const ieResRef resource) const
+bool Actor::HasVVCCell(const ResRef &resource) const
 {
-	return GetVVCCell(resource) != NULL;
+	return GetVVCCells(resource).first != vfxDict.end();
 }
 
-ScriptedAnimation *Actor::GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const
+bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
 {
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
-			return vvc;
-		}
-	}
-	return NULL;
+	return lhs->YPos < rhs->YPos;
 }
 
-ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource) const
+std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
+Actor::GetVVCCells(const ResRef &resource) const
 {
-	ScriptedAnimation *vvc = GetVVCCell(&vvcShields, resource);
-	if (vvc) return vvc;
-	return GetVVCCell(&vvcOverlays, resource);
+	return vfxDict.equal_range(resource);
 }
 
-void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
+void Actor::RemoveVVCells(const ResRef &resource, bool graceful)
 {
-	bool j = true;
-	vvcVector *vvcCells=&vvcShields;
-retry:
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
+	auto range = vfxDict.equal_range(resource);
+	if (range.first != vfxDict.end()) {
+		for (auto it = range.first; it != range.second;) {
+			ScriptedAnimation *vvc = it->second;
 			if (graceful) {
 				vvc->SetPhase(P_RELEASE);
+				++it;
 			} else {
-				delete vvc;
-				vvcCells->erase(vvcCells->begin()+i);
+				it = vfxDict.erase(it);
+				auto it2 = std::find(vfxQueue.begin(), vfxQueue.end(), vvc);
+				vfxQueue.erase(it2);
 			}
 		}
 	}
-	vvcCells=&vvcOverlays;
-	if (j) { j = false; goto retry; }
 }
 
 //this is a faster version of hasvvccell, because it knows where to look
@@ -9273,49 +9235,17 @@ retry:
 //use this for the seven eyes overlay
 ScriptedAnimation *Actor::FindOverlay(int index) const
 {
-	const vvcVector *vvcCells;
-
 	if (index >= OVERLAY_COUNT) return NULL;
-
-	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
-	else vvcCells=&vvcOverlays;
-
-	const char *resRef = hc_overlays[index];
-
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resRef, 8) == 0) {
-			return vvc;
-		}
-	}
-	return NULL;
+	
+	auto it = vfxDict.find(hc_overlays[index]);
+	return (it != vfxDict.end()) ? it->second : nullptr;
 }
 
 void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
-	vvcVector *vvcCells;
-
-	//if the vvc was not created, don't try to add it
-	if (!vvc) {
-		return;
-	}
-	if (vvc->YPos < 0) {
-		vvcCells=&vvcShields;
-	} else {
-		vvcCells=&vvcOverlays;
-	}
-	size_t i=vvcCells->size();
-	while (i--) {
-		if ((*vvcCells)[i] == NULL) {
-			(*vvcCells)[i] = vvc;
-			return;
-		}
-	}
-	vvcCells->push_back( vvc );
+	assert(vvc);
+	vfxDict.insert(std::make_pair(vvc->ResName, vvc));
+	vfxQueue.insert(vvc);
 }
 
 //returns restored spell level
