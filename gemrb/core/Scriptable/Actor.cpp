@@ -548,16 +548,10 @@ Actor::~Actor(void)
 	delete PCStats;
 
 	for (i = 0; i < vvcOverlays.size(); i++) {
-		if (vvcOverlays[i]) {
-			delete vvcOverlays[i];
-			vvcOverlays[i] = NULL;
-		}
+		delete vvcOverlays[i];
 	}
 	for (i = 0; i < vvcShields.size(); i++) {
-		if (vvcShields[i]) {
-			delete vvcShields[i];
-			vvcShields[i] = NULL;
-		}
+		delete vvcShields[i];
 	}
 
 	delete attackProjectile;
