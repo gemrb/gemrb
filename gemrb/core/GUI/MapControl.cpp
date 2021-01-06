@@ -143,7 +143,7 @@ Region MapControl::GetViewport() const
 {
 	GameControl* gc = core->GetGameControl();
 	Region vp = gc->Viewport();
-	const Size mapsize = MyMap->GetSize();
+	const Size& mapsize = MyMap->GetSize();
 
 	vp.x *= double(mosRgn.w) / mapsize.w;
 	vp.y *= double(mosRgn.h) / mapsize.h;
