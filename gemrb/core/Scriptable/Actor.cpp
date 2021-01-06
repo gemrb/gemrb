@@ -8339,23 +8339,10 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint, uint32_t flags) const
+void Actor::DrawVideocells(const Point& pos, const vvcVector &vvcCells, const Color &tint, uint32_t flags) const
 {
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
-		ScriptedAnimation* vvc = vvcCells[i];
-
-		bool endReached = vvc->UpdateDrawingState(pos, GetOrientation());
-		if (endReached) {
-			delete vvc;
-			vvcCells.erase(vvcCells.begin()+i);
-			continue;
-		}
-		
+	for (const auto& vvc : vvcCells) {
 		vvc->Draw(pos, tint, BBox.h, flags & BLIT_STENCIL_MASK);
-		
-		if (!vvc->active) {
-			vvc->SetPhase(P_RELEASE);
-		}
 	}
 }
 
@@ -8585,6 +8572,30 @@ uint8_t Actor::GetElevation() const
 
 bool Actor::UpdateDrawingState()
 {
+	GameControl* gc = core->GetGameControl();
+	const Region& vp = gc->Viewport();
+
+	auto UpdateVisualEffects = [this, &vp](vvcVector& vvcs) {
+		for (auto it = vvcs.cbegin(); it != vvcs.cend();) {
+			ScriptedAnimation* vvc = *it;
+			bool endReached = vvc->UpdateDrawingState(Pos - vp.Origin(), GetOrientation());
+			if (endReached) {
+				delete vvc;
+				it = vvcs.erase(it);
+				continue;
+			}
+
+			if (!vvc->active) {
+				vvc->SetPhase(P_RELEASE);
+			}
+			
+			++it;
+		}
+	};
+	
+	UpdateVisualEffects(vvcShields);
+	UpdateVisualEffects(vvcOverlays);
+	
 	if (!AdvanceAnimations()) {
 		return false;
 	}

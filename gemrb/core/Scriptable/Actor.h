@@ -356,8 +356,8 @@ public:
 	ieDword TargetDoor;
 
 	EffectQueue fxqueue;
-	mutable vvcVector vvcOverlays; // FIXME: this should not be mutable
-	mutable vvcVector vvcShields; // FIXME: this should not be mutable
+	vvcVector vvcOverlays;
+	vvcVector vvcShields;
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
@@ -782,7 +782,7 @@ public:
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
 	/* draw videocells */
-	void DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &tint, uint32_t flags) const;
+	void DrawVideocells(const Point& pos, const vvcVector &vvcCells, const Color &tint, uint32_t flags) const;
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
