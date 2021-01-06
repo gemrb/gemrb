@@ -497,7 +497,7 @@ void ScriptedAnimation::SetOrientation(int orientation)
 	}
 }
 
-bool ScriptedAnimation::HandlePhase(Holder<Sprite2D> &frame)
+bool ScriptedAnimation::UpdatePhase()
 {
 	Game *game = core->GetGame();
 
@@ -550,11 +550,10 @@ retry:
 	}
 
 	if (game->IsTimestopActive()) {
-		frame = anim->LastFrame();
 		return false;
-	} else {
-		frame = anim->NextFrame();
 	}
+	
+	auto frame = anim->NextFrame();
 
 	//explicit duration
 	if (Phase == P_HOLD && game->GameTime > Duration) {
@@ -619,24 +618,17 @@ void ScriptedAnimation::IncrementPhase()
 	Phase++;
 }
 
-//it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientation, int height, uint32_t flags)
+bool ScriptedAnimation::UpdateDrawingState(const Point &pos, int orientation)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);
 	}
-
-	// not sure
+	
 	if (twin) {
-		twin->Draw(Pos, p_tint, -1, height, flags);
+		twin->UpdateDrawingState(pos, orientation);
 	}
-
-	Video *video = core->GetVideoDriver();
-	Game *game = core->GetGame();
-
-	Holder<Sprite2D> frame;
-
-	if (HandlePhase(frame)) {
+	
+	if (UpdatePhase()) {
 		//expired
 		return true;
 	}
@@ -646,7 +638,25 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 		return false;
 	}
 
-	UpdateSound(Pos);
+	UpdateSound(pos);
+	
+	return false;
+}
+
+//it is not sure if we need tint at all
+void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, uint32_t flags) const
+{
+	if (twin) {
+		twin->Draw(pos, p_tint, height, flags);
+	}
+	
+	//delayed
+	if (justCreated) {
+		return;
+	}
+
+	Video *video = core->GetVideoDriver();
+	Game *game = core->GetGame();
 	
 	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
 	Color tint = Tint;
@@ -668,20 +678,20 @@ bool ScriptedAnimation::Draw(const Point &Pos, const Color &p_tint, int orientat
 		game->ApplyGlobalTint(tint, flags);
 	}
 
-	int cx = Pos.x + XPos;
-	int cy = Pos.y - ZPos + YPos;
+	int cx = pos.x + XPos;
+	int cy = pos.y - ZPos + YPos;
 	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
 
 	if (SequenceFlags & IE_VVC_NOCOVER) {
 		flags &= ~BLIT_STENCIL_MASK;
 	}
 
-	video->BlitGameSpriteWithPalette(frame, palette, cx, cy, flags | BLIT_BLENDED, tint);
+	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
+	video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, cx, cy, flags | BLIT_BLENDED, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, cx, cy, flags, tint, NULL);
 	}
-	return false;
 }
 
 Region ScriptedAnimation::DrawingRegion() const

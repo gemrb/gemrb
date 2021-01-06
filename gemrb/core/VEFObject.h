@@ -22,12 +22,12 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include <list>
 #include "Region.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
 
 #include <cstdint>
+#include <vector>
 
 namespace GemRB {
 
@@ -53,13 +53,15 @@ public:
 	VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
-	std::list<ScheduleEntry> entries;
+	std::vector<ScheduleEntry> entries;
+	std::vector<ScheduleEntry> drawQueue;
 	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
 	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
-	bool Draw(const Region &screen, const Point &position, const Color &p_tint, int orientation, int height, uint32_t flags);
+	bool UpdateDrawingState(const Point &pos, int orientation);
+	void Draw(const Region &screen, const Point &position, const Color &p_tint, int height, uint32_t flags) const;
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;

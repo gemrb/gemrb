@@ -70,18 +70,16 @@ VEFObject::~VEFObject()
 
 void VEFObject::Init()
 {
-	std::list<ScheduleEntry>::iterator iter;
-
-	for(iter = entries.begin(); iter != entries.end(); ++iter) {
-		if (!(*iter).ptr) continue;
-		switch((*iter).type) {
+	for(auto& entry : entries) {
+		if (!entry.ptr) continue;
+		switch(entry.type) {
 			case VEF_BAM:
 			case VEF_VVC:
-				delete (ScriptedAnimation *) (*iter).ptr;
+				delete (ScriptedAnimation *)entry.ptr;
 				break;
 			case VEF_VEF:
 			case VEF_2DA:
-				delete (VEFObject *) (*iter).ptr;
+				delete (VEFObject *)entry.ptr;
 				break;
 			default:; //error, no suitable destructor
 		}
@@ -128,68 +126,78 @@ VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
 	return NULL;
 }
 
-bool VEFObject::Draw(const Region &vp, const Point &position, const Color &p_tint, int orientation, int height, uint32_t flags)
+bool VEFObject::UpdateDrawingState(const Point &position, int orientation)
 {
-	bool ret = true;
-
+	drawQueue.clear();
 	ieDword GameTime = core->GetGame()->GameTime;
-
-	std::list<ScheduleEntry>::iterator iter;
-
-	for (iter = entries.begin(); iter != entries.end(); ++iter) {
+	for (auto& entry : entries) {
 		//don't render the animation if it is outside of the cycle
-		if ( (*iter).start>GameTime) continue;
-		if ( (*iter).length<GameTime) continue;
+		if (entry.start > GameTime) continue;
+		if (entry.length < GameTime) continue;
 
-		Point pos = (*iter).offset + position;
-
-		bool tmp;
-
-		if (!(*iter).ptr) {
-			switch((*iter).type) {
+		if (!entry.ptr) {
+			switch(entry.type) {
 				case VEF_2DA: //original gemrb implementation of composite video effects
-					(*iter).ptr = CreateObject( (*iter).resourceName, IE_2DA_CLASS_ID);
-					if ( (*iter).ptr ) {
+					entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
+					if (entry.ptr) {
 						break;
 					}
 					// fall back to VEF
 					// intentional fallthrough
 				case VEF_VEF: //vanilla engine implementation of composite video effects
-					(*iter).ptr = CreateObject( (*iter).resourceName, IE_VEF_CLASS_ID);
-					if ( (*iter).ptr ) {
+					entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
+					if (entry.ptr ) {
 						break;
 					}
 					// fall back to BAM or VVC
 					// intentional fallthrough
 				case VEF_BAM: //just a BAM
 				case VEF_VVC: //videocell (can contain a BAM)
-					(*iter).ptr = CreateCell( (*iter).resourceName, (*iter).length, (*iter).start);
+					entry.ptr = CreateCell(entry.resourceName, entry.length, entry.start);
 					break;
 				default:;
 			}
 		}
-
-		void *ptr = (*iter).ptr;
-		if (!ptr) (*iter).type = VEF_INVALID;
-
-		switch((*iter).type) {
+		
+		if (!entry.ptr) entry.type = VEF_INVALID;
+		
+		Point pos = entry.offset + position;
+		
+		bool ended = true;
+		switch(entry.type) {
 		case VEF_BAM:
 		case VEF_VVC:
-			tmp = ((ScriptedAnimation *) (*iter).ptr)->Draw(pos - vp.Origin(), p_tint, orientation, height, flags);
+			ended = ((ScriptedAnimation *) entry.ptr)->UpdateDrawingState(pos, orientation);
 			break;
 		case VEF_2DA:
 		case VEF_VEF:
-			tmp = ((VEFObject *) (*iter).ptr)->Draw(vp, pos, p_tint, orientation, height, flags);
+			ended = ((VEFObject *) entry.ptr)->UpdateDrawingState(pos, orientation);
 			break;
-		default:
-			tmp = true; //unknown/invalid type
 		}
-		if (tmp) {
-			(*iter).length = 0; //stop playing this if reached end
-		}
-		ret &= tmp;
+		
+		if (ended) return true;
+		
+		drawQueue.push_back(entry);
 	}
-	return ret;
+	return false;
+}
+
+void VEFObject::Draw(const Region &vp, const Point &position, const Color &p_tint, int height, uint32_t flags) const
+{
+	for (const auto& entry : drawQueue) {
+		Point pos = entry.offset + position;
+
+		switch (entry.type) {
+		case VEF_BAM:
+		case VEF_VVC:
+			((ScriptedAnimation *)entry.ptr)->Draw(pos - vp.Origin(), p_tint, height, flags);
+			break;
+		case VEF_2DA:
+		case VEF_VEF:
+			((VEFObject *)entry.ptr)->Draw(vp, pos, p_tint, height, flags);
+			break;
+		}
+	}
 }
 
 void VEFObject::Load2DA(const ieResRef resource)
@@ -282,10 +290,10 @@ ScriptedAnimation *VEFObject::GetSingleObject() const
 	ScriptedAnimation *sca = NULL;
 
 	if (SingleObject) {
-		std::list<ScheduleEntry>::const_iterator iter = entries.begin();
-		if (iter!=entries.end() ) {
-			if ( (*iter).type==VEF_VVC || (*iter).type==VEF_BAM ) {
-				sca = (ScriptedAnimation *) (*iter).ptr;
+		if (entries.size()) {
+			const ScheduleEntry& entry = entries[0];
+			if (entry.type==VEF_VVC || entry.type==VEF_BAM) {
+				sca = (ScriptedAnimation *)entry.ptr;
 			}
 		}
 	}

@@ -133,7 +133,8 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool Draw(const Point &Pos, const Color &p_tint, int orientation, int height, uint32_t flags);
+	bool UpdateDrawingState(const Point &pos, int orientation);
+	void Draw(const Point &pos, const Color &p_tint, int height, uint32_t flags) const;
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
@@ -167,7 +168,7 @@ public:
 	ScriptedAnimation *DetachTwin();
 private:
 	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false);
-	bool HandlePhase(Holder<Sprite2D> &frame);
+	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();
 	/* stops any sound playing */

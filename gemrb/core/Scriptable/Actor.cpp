@@ -8344,13 +8344,15 @@ void Actor::DrawVideocells(const Point& pos, vvcVector &vvcCells, const Color &t
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 
-		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(pos, tint, GetOrientation(), BBox.h, flags & BLIT_STENCIL_MASK);
+		bool endReached = vvc->UpdateDrawingState(pos, GetOrientation());
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
 			continue;
 		}
+		
+		vvc->Draw(pos, tint, BBox.h, flags & BLIT_STENCIL_MASK);
+		
 		if (!vvc->active) {
 			vvc->SetPhase(P_RELEASE);
 		}
