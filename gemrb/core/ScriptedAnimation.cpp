@@ -144,7 +144,12 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 	//special case, PST double animations
 
 	CopyResRef(ResName, af->ResRef);
-	unsigned int cCount = af->GetCycleCount();
+	// some anims like FIREL.BAM in IWD contain empty cycles
+	unsigned int cCount = 0;
+	for (unsigned int i = 0; i < af->GetCycleCount() && af->GetCycleSize(i) > 0; ++i) {
+		++cCount;
+	}
+
 	if (cCount >= MAX_CYCLE_TYPE) {
 		cCount = 1;
 	}
