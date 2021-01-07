@@ -1447,6 +1447,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					delete(sca);
 					scaidx = vvcCells.erase(scaidx);
 				} else {
+					video->SetStencilBuffer(wallStencil);
 					Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
 					tint.a = 255;
 					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
