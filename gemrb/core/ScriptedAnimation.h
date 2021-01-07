@@ -106,7 +106,6 @@ public:
 	//there is only one palette
 	Holder<Palette> palette;
 	ieResRef sounds[3];
-	ieResRef PaletteName;
 	Color Tint;
 	int Fade;
 	ieDword Transparency;

@@ -85,7 +85,6 @@ void ScriptedAnimation::Init()
 	Dither = 0;
 	Duration = 0xffffffff;
 	justCreated = true;
-	PaletteName[0]=0;
 	twin = NULL;
 	Phase = P_NOTINITED;
 	SoundPhase = P_NOTINITED;
@@ -407,7 +406,6 @@ void ScriptedAnimation::PlayOnce()
 void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
 {
 	palette = gamedata->GetPalette(PaletteResRef);
-	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
 	if (twin) {
 		twin->SetFullPalette(PaletteResRef);
 	}
