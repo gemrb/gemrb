@@ -63,7 +63,7 @@ inline void ShaderBlend(const Color& src, Color& dst) {
 	dst.b = DIV255(src.a * src.b) + DIV255((255 - src.a) * dst.b);
 #undef DIV255
 	if (ALPHA)
-		dst.a = src.a + dst.a * (255 - src.a);
+		dst.a = std::min<int>(src.a + dst.a * (255 - src.a), 255);
 }
 
 template <bool MASKED, bool SRCALPHA>
