@@ -74,10 +74,9 @@ Image* ImageMgr::GetImage()
 	return data;
 }
 
-void ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
+int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 {
-	Log(ERROR, "ImageMgr", "Can't get non-existant palette from %s... ",
-		str->filename);
+	return -1;
 }
 
 ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)

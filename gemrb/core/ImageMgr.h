@@ -54,7 +54,7 @@ public:
 	 *
 	 * This does nothing if there is no palette.
 	 */
-	virtual void GetPalette(int colors, Color* pal);
+	virtual int GetPalette(int colors, Color* pal);
 	/** Returns the width of the image */
 	virtual int GetWidth() = 0;
 	/** Returns the height of the image */

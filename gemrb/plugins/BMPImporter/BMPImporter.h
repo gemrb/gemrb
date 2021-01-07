@@ -47,7 +47,7 @@ public:
 	Holder<Sprite2D> GetSprite2D();
 	virtual Bitmap* GetBitmap();
 	virtual Image* GetImage();
-	void GetPalette(int colors, Color* pal);
+	int GetPalette(int colors, Color* pal);
 
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }

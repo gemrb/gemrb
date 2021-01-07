@@ -244,11 +244,10 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 	return spr;
 }
 
-void BMPImporter::GetPalette(int colors, Color* pal)
+int BMPImporter::GetPalette(int colors, Color* pal)
 {
 	if (BitCount > 8) {
-		ImageMgr::GetPalette(colors, pal);
-		return;
+		return ImageMgr::GetPalette(colors, pal);
 	}
 
 	for (int i = 0; i < colors; i++) {
@@ -257,6 +256,7 @@ void BMPImporter::GetPalette(int colors, Color* pal)
 		pal[i].b = Palette[i%NumColors].b;
 		pal[i].a = 0xff;
 	}
+	return -1;
 }
 
 Bitmap* BMPImporter::GetBitmap()
