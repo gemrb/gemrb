@@ -190,6 +190,8 @@ using namespace GemRB;
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
 		}
 	}
+	
+	InitializeLogging(config);
 
 	int status;
 	if ((status = core->Init(config)) == GEM_ERROR) {
