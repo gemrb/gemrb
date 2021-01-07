@@ -696,8 +696,24 @@ void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, 
 
 Region ScriptedAnimation::DrawingRegion() const
 {
+	Region r = (twin) ? twin->DrawingRegion() : Region();
+
 	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
-	return (anim) ? anim->animArea : Region();
+	if (anim) {
+		Region animArea = anim->animArea;
+		animArea.x += XPos;
+		animArea.y += (YPos - ZPos);
+		r.ExpandToRegion(animArea);
+	}
+	
+	if (light) {
+		Region lightArea = light->Frame;
+		lightArea.x = XPos - light->Frame.x;
+		lightArea.y = YPos - ZPos - light->Frame.y;
+		r.ExpandToRegion(lightArea);
+	}
+
+	return r;
 }
 
 void ScriptedAnimation::SetEffectOwned(bool flag)

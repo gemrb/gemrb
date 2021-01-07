@@ -8631,6 +8631,7 @@ void Actor::UpdateDrawingRegion()
 	
 	for (const auto& vvc : vfxQueue) {
 		Region r = vvc->DrawingRegion();
+		if (vvc->SequenceFlags & IE_VVC_HEIGHT) r.y -= BBox.h;
 		r.x += Pos.x;
 		r.y += Pos.y;
 		box.ExpandToRegion(r);
