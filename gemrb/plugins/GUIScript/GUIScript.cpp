@@ -13449,6 +13449,27 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 /** Initialization Routine */
 
+PyObject* InitializeModule(const char* name, const char* doc, PyMethodDef* methods)
+{
+#if PY_MAJOR_VERSION >= 3
+	struct PyModuleDef moduledef = {
+		PyModuleDef_HEAD_INIT,
+		name,     /* m_name */
+		doc,  /* m_doc */
+		-1,                  /* m_size */
+		methods,    /* m_methods */
+		NULL,                /* m_reload */
+		NULL,                /* m_traverse */
+		NULL,                /* m_clear */
+		NULL,                /* m_free */
+	};
+	
+	return PyModule_Create(&moduledef);
+#else
+	return Py_InitModule3(name, methods, doc);
+#endif
+}
+
 bool GUIScript::Init(void)
 {
 	Py_Initialize();
@@ -13461,12 +13482,12 @@ bool GUIScript::Init(void)
 	pMainDic = PyModule_GetDict( pMainMod );
 	/* pMainDic is a borrowed reference */
 
-	PyObject* pGemRB = Py_InitModule3( "GemRB", GemRBMethods, GemRB__doc );
+	PyObject* pGemRB = InitializeModule("GemRB", GemRB__doc, GemRBMethods);
 	if (!pGemRB) {
 		return false;
 	}
 
-	PyObject* p_GemRB = Py_InitModule3( "_GemRB", GemRBInternalMethods, GemRB_internal__doc );
+	PyObject* p_GemRB = InitializeModule("_GemRB", GemRB_internal__doc, GemRBInternalMethods);
 	if (!p_GemRB) {
 		return false;
 	}
