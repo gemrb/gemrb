@@ -12,6 +12,7 @@ def OnLoad():
 	MessageWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	MessageWindow.SetFlags (WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	MessageWindow.AddAlias("MSGWIN")
+	MessageWindow.AddAlias("HIDE_CUT", 0)
 
 	# set up some *initial* text (UpdateControlStatus will get called several times)
 	TMessageTA = MessageWindow.GetControl(0)
