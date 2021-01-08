@@ -6142,7 +6142,7 @@
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.5/Python;
+				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.7/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Debug;
@@ -6161,7 +6161,7 @@
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.5/Python;
+				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.7/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Release;
