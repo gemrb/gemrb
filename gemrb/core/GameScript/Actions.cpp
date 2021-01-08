@@ -1708,6 +1708,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	}
 }
 
+// TODO: fix these two actions — they actually take a point, not an object
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
