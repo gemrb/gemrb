@@ -106,17 +106,14 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 {
 	int c = cycle;
 
-	switch (NumOrientations) {
-	case 5:
-		c = SixteenToFive[i];
-		break;
-	case 9:
-		c = SixteenToNine[i];
-		break;
-	default:
+	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
 		if (af->GetCycleCount() > i) c = i;
-		break;
+	} else if (NumOrientations == 5) {
+		c = SixteenToFive[i];
+	} else if (NumOrientations == 9) {
+		c = SixteenToNine[i];
 	}
+
 	Animation *anim = af->GetCycle(c);
 	if (anim) {
 		if (Transparency & IE_VVC_MIRRORX) {
