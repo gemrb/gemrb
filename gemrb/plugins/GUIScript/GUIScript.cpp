@@ -13449,7 +13449,7 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 /** Initialization Routine */
 
-PyObject* InitializeModule(const char* name, const char* doc, PyMethodDef* methods)
+static PyObject* InitializeModule(const char* name, const char* doc, PyMethodDef* methods)
 {
 #if PY_MAJOR_VERSION >= 3
 	struct PyModuleDef moduledef = {
