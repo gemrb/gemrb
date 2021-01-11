@@ -327,6 +327,11 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 	Video* video = core->GetVideoDriver();
 	if (core->InDebugMode(ID_TEXT)) {
 		video->DrawRect(clip, ColorGreen, true);
+		
+		video->DrawRect(Region(clip.x, clip.y, margin.left, clip.h), ColorYellow, true);
+		video->DrawRect(Region(clip.x + clip.w - margin.right, clip.y, margin.right, clip.h), ColorYellow, true);
+		video->DrawRect(Region(clip.x, clip.y, clip.w, margin.top), ColorYellow, true);
+		video->DrawRect(Region(clip.x, clip.y + clip.h - margin.bottom, clip.w, margin.bottom), ColorYellow, true);
 	}
 
 	// layout shouldn't be empty unless there is no content anyway...
