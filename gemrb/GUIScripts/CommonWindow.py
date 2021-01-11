@@ -167,7 +167,7 @@ def OpenContainerWindow ():
 	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	# fix wrong height in the guiw10.chu and reposition
 	# that chu is also used as a base for some arbitrary resolutions
-	if GemRB.GetSystemVariable (SV_HEIGHT) > 768:
+	if GemRB.GetSystemVariable (SV_HEIGHT) >= 768:
 		Size = Window.GetSize ()
 		Pos = Window.GetPos ()
 		Window.SetSize (Size[0], 90)
