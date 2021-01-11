@@ -687,7 +687,8 @@ void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, 
 	}
 
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
-	video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, cx, cy, flags | BLIT_BLENDED, tint);
+	if (anim)
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, cx, cy, flags | BLIT_BLENDED, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, cx, cy, flags, tint, NULL);
