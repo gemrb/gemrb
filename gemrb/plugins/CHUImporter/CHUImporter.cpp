@@ -49,8 +49,8 @@ static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
 	ContentContainer::Margin margins = ta->GetMargins();
 
 	if (sbr.x > tar.x + tar.w) {
-		margins.right += sbr.x - (tar.x + tar.w) + sbr.w;
-		tar.w += margins.right;
+		margins.right += sbr.x - (tar.x + tar.w);
+		tar.w += margins.right + sbr.w;
 	} else if (sbr.x < tar.x) {
 		margins.left += tar.x - sbr.x;
 		margins.right += sbr.w; // FIXME: this shouldn't be needed, but we dont support left sided scrollbars yet
