@@ -9234,20 +9234,8 @@ ScriptedAnimation *Actor::FindOverlay(int index) const
 {
 	if (index >= OVERLAY_COUNT) return NULL;
 	
-	bool belowActor = hc_locations & (1 << index);
-	
-	auto range = vfxDict.equal_range(hc_overlays[index]);
-	for (; range.first != range.second; ++range.first) {
-		ScriptedAnimation* vvc = range.first->second;
-		// we are sorted by YPos...
-		if (belowActor) {
-			return (vvc->Pos.y < 0) ? vvc : nullptr;
-		}
-		
-		if (vvc->Pos.y >= 0)
-			return vvc;
-	}
-	return nullptr;
+	auto it = vfxDict.find(hc_overlays[index]);
+	return (it != vfxDict.end()) ? it->second : nullptr;
 }
 
 void Actor::AddVVCell(ScriptedAnimation* vvc)
