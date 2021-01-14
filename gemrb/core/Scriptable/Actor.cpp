@@ -8680,7 +8680,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
-	for (; it != vfxQueue.end(); ++it) {
+	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
 		if (vvc->YOffset >= 0) {
 			break;
@@ -8805,7 +8805,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	}
 
 	//draw videocells over the actor
-	for (; it != vfxQueue.end(); ++it) {
+	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
 		vvc->Draw(vp, tint, BBox.h, flags);
 	}
