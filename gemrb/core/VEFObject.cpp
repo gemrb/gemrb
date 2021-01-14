@@ -38,18 +38,12 @@ namespace GemRB {
 
 VEFObject::VEFObject()
 {
-	XPos=0;
-	YPos=0;
-	ZPos=0;
 	ResName[0]=0;
 	SingleObject=false;
 }
 
 VEFObject::VEFObject(ScriptedAnimation *sca)
 {
-	XPos=sca->XPos;
-	YPos=sca->YPos;
-	ZPos=sca->ZPos; //sometimes this is not an actual ZPos - PST portals, don't use it for rendering?
 	strnlwrcpy(ResName, sca->ResName, 8);
 	SingleObject=true;
 	ScheduleEntry entry;
@@ -126,7 +120,7 @@ VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
 	return NULL;
 }
 
-bool VEFObject::UpdateDrawingState(const Point &position, int orientation)
+bool VEFObject::UpdateDrawingState(int orientation)
 {
 	drawQueue.clear();
 	ieDword GameTime = core->GetGame()->GameTime;
@@ -160,18 +154,16 @@ bool VEFObject::UpdateDrawingState(const Point &position, int orientation)
 		}
 		
 		if (!entry.ptr) entry.type = VEF_INVALID;
-		
-		Point pos = entry.offset + position;
-		
+				
 		bool ended = true;
 		switch(entry.type) {
 		case VEF_BAM:
 		case VEF_VVC:
-			ended = ((ScriptedAnimation *) entry.ptr)->UpdateDrawingState(pos, orientation);
+			ended = ((ScriptedAnimation *) entry.ptr)->UpdateDrawingState(orientation);
 			break;
 		case VEF_2DA:
 		case VEF_VEF:
-			ended = ((VEFObject *) entry.ptr)->UpdateDrawingState(pos, orientation);
+			ended = ((VEFObject *) entry.ptr)->UpdateDrawingState(orientation);
 			break;
 		}
 		
@@ -182,19 +174,17 @@ bool VEFObject::UpdateDrawingState(const Point &position, int orientation)
 	return false;
 }
 
-void VEFObject::Draw(const Region &vp, const Point &position, const Color &p_tint, int height, uint32_t flags) const
+void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const
 {
 	for (const auto& entry : drawQueue) {
-		Point pos = entry.offset + position;
-
 		switch (entry.type) {
 		case VEF_BAM:
 		case VEF_VVC:
-			((ScriptedAnimation *)entry.ptr)->Draw(pos - vp.Origin(), p_tint, height, flags);
+			((ScriptedAnimation *)entry.ptr)->Draw(vp, p_tint, height, flags);
 			break;
 		case VEF_2DA:
 		case VEF_VEF:
-			((VEFObject *)entry.ptr)->Draw(vp, pos, p_tint, height, flags);
+			((VEFObject *)entry.ptr)->Draw(vp, p_tint, height, flags);
 			break;
 		}
 	}

@@ -834,8 +834,7 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
-		vvc->XPos +=position.x;
-		vvc->YPos +=position.y;
+		vvc->Pos = position;
 		Map *area = Sender->GetCurrentArea();
 		if (area) {
 			area->AddVVCell(new VEFObject(vvc));

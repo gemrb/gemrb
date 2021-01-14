@@ -77,7 +77,7 @@ void ScriptedAnimation::Init()
 	Transparency = 0;
 	Fade = 0;
 	SequenceFlags = 0;
-	XPos = YPos = ZPos = 0;
+	XOffset = YOffset = ZOffset = 0;
 	FrameRate = ANI_DEFAULT_FRAMERATE;
 	NumOrientations = 0;
 	Orientation = 0;
@@ -267,9 +267,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 	ieDword tmp;
 	stream->ReadDword( &tmp );
-	XPos = (signed) tmp;
+	XOffset = int(tmp);
 	stream->ReadDword( &tmp );  //this affects visibility
-	YPos = (signed) tmp;
+	YOffset = int(tmp);
 	stream->Seek( 4, GEM_CURRENT_POS ); // (offset) position flags in the original, "use orientation" on IESDP
 	stream->ReadDword( &FrameRate );
 
@@ -282,7 +282,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->Seek( 8, GEM_CURRENT_POS ); // CResRef m_cNewPaletteRef in the original
 
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	ZPos = (signed) tmp;
+	ZOffset = int(tmp);
 
 	stream->ReadDword( &LightX ); // and Lighting effect radius / width / glow
 	stream->ReadDword( &LightY );
@@ -588,7 +588,7 @@ void ScriptedAnimation::StopSound()
 	}
 }
 
-void ScriptedAnimation::UpdateSound(const Point &pos)
+void ScriptedAnimation::UpdateSound()
 {
 	if (Delay > 0 || SoundPhase > P_RELEASE) {
 		return;
@@ -600,12 +600,12 @@ void ScriptedAnimation::UpdateSound(const Point &pos)
 		}
 
 		if (SoundPhase <= P_RELEASE) {
-			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, XPos + pos.x, YPos + pos.y,
+			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, Pos.x + XOffset, Pos.y + YOffset,
 						   (SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP)) ? GEM_SND_LOOPING : 0);
 			SoundPhase++;
 		}
 	} else {
-		sound_handle->SetPos(XPos + pos.x, YPos + pos.y);
+		sound_handle->SetPos(Pos.x + XOffset, Pos.y + YOffset);
 	}
 }
 
@@ -618,14 +618,14 @@ void ScriptedAnimation::IncrementPhase()
 	Phase++;
 }
 
-bool ScriptedAnimation::UpdateDrawingState(const Point &pos, int orientation)
+bool ScriptedAnimation::UpdateDrawingState(int orientation)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);
 	}
 	
 	if (twin) {
-		twin->UpdateDrawingState(pos, orientation);
+		twin->UpdateDrawingState(orientation);
 	}
 	
 	if (UpdatePhase()) {
@@ -638,16 +638,16 @@ bool ScriptedAnimation::UpdateDrawingState(const Point &pos, int orientation)
 		return false;
 	}
 
-	UpdateSound(pos);
+	UpdateSound();
 	
 	return false;
 }
 
 //it is not sure if we need tint at all
-void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, uint32_t flags) const
+void ScriptedAnimation::Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const
 {
 	if (twin) {
-		twin->Draw(pos, p_tint, height, flags);
+		twin->Draw(vp, p_tint, height, flags);
 	}
 	
 	//delayed
@@ -678,8 +678,8 @@ void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, 
 		game->ApplyGlobalTint(tint, flags);
 	}
 
-	int cx = pos.x + XPos;
-	int cy = pos.y - ZPos + YPos;
+	int cx = Pos.x - vp.x + XOffset;
+	int cy = Pos.y - vp.y - ZOffset + YOffset;
 	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
 
 	if (SequenceFlags & IE_VVC_NOCOVER) {
@@ -697,20 +697,20 @@ void ScriptedAnimation::Draw(const Point &pos, const Color &p_tint, int height, 
 
 Region ScriptedAnimation::DrawingRegion() const
 {
-	Region r = (twin) ? twin->DrawingRegion() : Region();
+	Region r = (twin) ? twin->DrawingRegion() : Region(Pos, Size());
 
 	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
 	if (anim) {
 		Region animArea = anim->animArea;
-		animArea.x += XPos;
-		animArea.y += (YPos - ZPos);
+		animArea.x += XOffset;
+		animArea.y += (YOffset - ZOffset);
 		r.ExpandToRegion(animArea);
 	}
 	
 	if (light) {
 		Region lightArea = light->Frame;
-		lightArea.x = XPos - light->Frame.x;
-		lightArea.y = YPos - ZPos - light->Frame.y;
+		lightArea.x = XOffset - light->Frame.x;
+		lightArea.y = YOffset - ZOffset - light->Frame.y;
 		r.ExpandToRegion(lightArea);
 	}
 
@@ -789,8 +789,8 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 	}
 	ScriptedAnimation * ret = twin;
 	//ret->Frame.y+=ret->ZPos+1;
-	if (ret->ZPos>=0) {
-		ret->ZPos=-1;
+	if (ret->ZOffset >= 0) {
+		ret->ZOffset =- 1;
 	}
 	twin=NULL;
 	return ret;

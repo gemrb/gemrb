@@ -111,8 +111,8 @@ public:
 	ieDword Transparency;
 	ieDword SequenceFlags;
 	int Dither;
-	//these are signed
-	int XPos, YPos, ZPos;
+	Point Pos; // position of the effect in game coordinates
+	int XOffset, YOffset, ZOffset; // orientation relative to Pos
 	ieDword LightX, LightY, LightZ;
 	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	ieDword FrameRate;
@@ -132,8 +132,8 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool UpdateDrawingState(const Point &pos, int orientation);
-	void Draw(const Point &pos, const Color &p_tint, int height, uint32_t flags) const;
+	bool UpdateDrawingState(int orientation);
+	void Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const;
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
@@ -173,7 +173,7 @@ private:
 	/* stops any sound playing */
 	void StopSound();
 	/* updates the sound playing */
-	void UpdateSound(const Point &pos);
+	void UpdateSound();
 };
 
 }

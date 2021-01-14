@@ -48,7 +48,8 @@ struct ScheduleEntry {
 class GEM_EXPORT VEFObject {
 public:
 	ieResRef ResName;
-	int XPos, YPos, ZPos;
+	Point Pos; // position of the effect in game coordinates
+
 	VEFObject();
 	VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
@@ -60,8 +61,8 @@ public:
 	//adds a new entry (use when loading)
 	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
-	bool UpdateDrawingState(const Point &pos, int orientation);
-	void Draw(const Region &screen, const Point &position, const Color &p_tint, int height, uint32_t flags) const;
+	bool UpdateDrawingState(int orientation);
+	void Draw(const Region &screen, const Color &p_tint, int height, uint32_t flags) const;
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;

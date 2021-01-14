@@ -794,8 +794,7 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 	sca->SetOrientation(Orientation);
 	sca->PlayOnce();
 	sca->SetBlend();
-	sca->XPos += Pos.x;
-	sca->YPos += Pos.y;
+	sca->Pos = Pos;
 	area->AddVVCell(vef);
 	return sca->GetSequenceDuration(AI_UPDATE_TIME);
 }
@@ -1516,8 +1515,7 @@ void Projectile::DrawExplosion(const Region& vp)
 				if (ExtFlags&PEF_TRAIL) {
 					vvc->SetOrientation(Orientation);
 				}
-				vvc->XPos+=Pos.x;
-				vvc->YPos+=Pos.y;
+				vvc->Pos = Pos;
 				vvc->PlayOnce();
 				vvc->SetBlend();
 				//quick hack to use the single object envelope
@@ -1528,8 +1526,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
 				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 				if (vvc) {
-					vvc->XPos += Pos.x;
-					vvc->YPos += Pos.y;
+					vvc->Pos = Pos;
 					vvc->PlayOnce();
 					vvc->SetBlend();
 					area->AddVVCell(new VEFObject(vvc));

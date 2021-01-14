@@ -1421,7 +1421,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	}
 
 	if (flag) {
-		sca->ZPos=-1;
+		sca->ZOffset = -1;
 	}
 	actor->AddVVCell(sca);
 }
@@ -2758,7 +2758,7 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(resource, false);
 	if (!sca)
 		return;
-	sca->ZPos=height;
+	sca->ZOffset = height;
 	if (flags&AA_PLAYONCE) {
 		sca->PlayOnce();
 	}
@@ -8553,12 +8553,10 @@ uint8_t Actor::GetElevation() const
 
 bool Actor::UpdateDrawingState()
 {
-	GameControl* gc = core->GetGameControl();
-	const Region& vp = gc->Viewport();
-	
 	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
 		ScriptedAnimation* vvc = *it;
-		bool endReached = vvc->UpdateDrawingState(Pos - vp.Origin(), GetOrientation());
+		vvc->Pos = Pos;
+		bool endReached = vvc->UpdateDrawingState(GetOrientation());
 		if (endReached) {
 			vfxDict.erase(vvc->ResName);
 			it = vfxQueue.erase(it);
@@ -8632,8 +8630,6 @@ void Actor::UpdateDrawingRegion()
 	for (const auto& vvc : vfxQueue) {
 		Region r = vvc->DrawingRegion();
 		if (vvc->SequenceFlags & IE_VVC_HEIGHT) r.y -= BBox.h;
-		r.x += Pos.x;
-		r.y += Pos.y;
 		box.ExpandToRegion(r);
 		assert(r.w <= box.w && r.h <= box.h);
 	}
@@ -8686,10 +8682,10 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	auto it = vfxQueue.cbegin();
 	for (; it != vfxQueue.end(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		if (vvc->YPos >= 0) {
+		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(Pos - vp.Origin(), tint, BBox.h, flags);
+		vvc->Draw(vp, tint, BBox.h, flags);
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8811,7 +8807,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	//draw videocells over the actor
 	for (; it != vfxQueue.end(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Draw(Pos - vp.Origin(), tint, BBox.h, flags);
+		vvc->Draw(vp, tint, BBox.h, flags);
 	}
 }
 
@@ -9204,7 +9200,7 @@ bool Actor::HasVVCCell(const ResRef &resource) const
 
 bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
 {
-	return lhs->YPos < rhs->YPos;
+	return lhs->YOffset < rhs->YOffset;
 }
 
 std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
@@ -9245,10 +9241,10 @@ ScriptedAnimation *Actor::FindOverlay(int index) const
 		ScriptedAnimation* vvc = range.first->second;
 		// we are sorted by YPos...
 		if (belowActor) {
-			return (vvc->YPos < 0) ? vvc : nullptr;
+			return (vvc->Pos.y < 0) ? vvc : nullptr;
 		}
 		
-		if (vvc->YPos >= 0)
+		if (vvc->Pos.y >= 0)
 			return vvc;
 	}
 	return nullptr;

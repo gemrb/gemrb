@@ -134,7 +134,7 @@ static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimatio
 
 	int scah;
 	if (sca) {
-		scah = sca->YPos;//+sca->ZPos;
+		scah = sca->Pos.y;//+sca->ZPos;
 	} else {
 		scah = 0x7fffffff;
 	}
@@ -635,10 +635,9 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 			sca->SetBlend();
 			sca->PlayOnce();
 			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
-			sca->XPos = ip->Pos.x;
-			sca->YPos = ip->Pos.y;
+			sca->Pos = ip->Pos;
 			//this is actually ordered by time, not by height
-			sca->ZPos = gotportal;
+			sca->ZOffset = gotportal;
 			AddVVCell( new VEFObject(sca));
 		}
 		return;
@@ -1442,16 +1441,16 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			break;
 		case AOT_SCRIPTED:
 			{
-				bool endReached = sca->UpdateDrawingState(Point(), -1);
+				bool endReached = sca->UpdateDrawingState(-1);
 				if (endReached) {
 					delete(sca);
 					scaidx = vvcCells.erase(scaidx);
 				} else {
 					video->SetStencilBuffer(wallStencil);
-					Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
+					Color tint = LightMap->GetPixel( sca->Pos.x / 16, sca->Pos.y / 12);
 					tint.a = 255;
 					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
-					sca->Draw(viewport, Point(), tint, 0, flags);
+					sca->Draw(viewport, tint, 0, flags);
 					scaidx++;
 				}
 			}
@@ -2756,8 +2755,8 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p) const
 
 	for (const VEFObject *vvc: vvcCells) {
 		if (!p.isempty()) {
-			if (vvc->XPos!=p.x) continue;
-			if (vvc->YPos!=p.y) continue;
+			if (vvc->Pos.x != p.x) continue;
+			if (vvc->Pos.y != p.y) continue;
 		}
 		if (strnicmp(resource, vvc->ResName, sizeof(ieResRef))) continue;
 		const ScriptedAnimation *sca = vvc->GetSingleObject();
@@ -2778,7 +2777,7 @@ void Map::AddVVCell(VEFObject* vvc)
 {
 	scaIterator iter;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos<vvc->ZPos; iter++) ;
+	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->Pos.y < vvc->Pos.y; iter++) ;
 	vvcCells.insert(iter, vvc);
 }
 

@@ -2739,8 +2739,7 @@ int fx_unsummon_creature (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//play the vanish animation
 		ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 		if (sca) {
-			sca->XPos+=target->Pos.x;
-			sca->YPos+=target->Pos.y;
+			sca->Pos = target->Pos;
 			area->AddVVCell(new VEFObject(sca));
 		}
 		//remove the creature
@@ -4371,9 +4370,9 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		//12 is just an approximate value to set the height of the casting glow
 		//based on the avatar's size
 		int heightmod = target->GetAnims()->GetCircleSize()*12;
-		sca->XPos+=fx->PosX+xpos_by_direction[target->GetOrientation()];
-		sca->YPos+=fx->PosY+ypos_by_direction[target->GetOrientation()];
-		sca->ZPos+=heightmod;
+		sca->XOffset = xpos_by_direction[target->GetOrientation()];
+		sca->YOffset = ypos_by_direction[target->GetOrientation()];
+		sca->ZOffset += heightmod;
 		sca->SetBlend();
 		if (fx->Duration) {
 			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
@@ -4409,13 +4408,11 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 		if (fx->Parameter1) {
-			sca->XPos+=target->Pos.x;
-			sca->YPos+=target->Pos.y;
+			sca->Pos = target->Pos;
 		} else {
-			sca->XPos+=fx->PosX;
-			sca->YPos+=fx->PosY;
+			sca->Pos = Point(fx->PosX, fx->PosY);
 		}
-		sca->ZPos += 45; // roughly half the target height; empirical value to match original
+		sca->ZOffset += 45; // roughly half the target height; empirical value to match original
 		if (fx->Parameter2<32) {
 			int tmp = fx->Parameter2>>2;
 			if (tmp) {
@@ -5366,8 +5363,7 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, ieResRef
 		if (vvc) {
 			//This is the final position of the summoned creature
 			//not the original target point
-			vvc->XPos=fam->Pos.x;
-			vvc->YPos=fam->Pos.y;
+			vvc->Pos = fam->Pos;
 			//force vvc to play only once
 			vvc->PlayOnce();
 			map->AddVVCell( new VEFObject(vvc) );
@@ -5864,15 +5860,12 @@ int fx_play_visual_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				delete sca;
 				return FX_NOT_APPLIED;
 			}
-			sca->XPos = fx->SourceX;
-			sca->YPos = fx->SourceY;
+			sca->Pos = Point(fx->SourceX, fx->SourceY);
 		} else {
-			sca->XPos = fx->PosX;
-			sca->YPos = fx->PosY;
+			sca->Pos = Point(fx->PosX, fx->PosY);
 		}
 	} else {
-		sca->XPos = target->Pos.x;
-		sca->YPos = target->Pos.y;
+		sca->Pos = target->Pos;
 	}
 	sca->PlayOnce();
 	map->AddVVCell( new VEFObject(sca) );
