@@ -4370,8 +4370,8 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 		//12 is just an approximate value to set the height of the casting glow
 		//based on the avatar's size
 		int heightmod = target->GetAnims()->GetCircleSize()*12;
-		sca->XOffset = xpos_by_direction[target->GetOrientation()];
-		sca->YOffset = ypos_by_direction[target->GetOrientation()];
+		sca->XOffset += xpos_by_direction[target->GetOrientation()];
+		sca->YOffset += ypos_by_direction[target->GetOrientation()];
 		sca->ZOffset += heightmod;
 		sca->SetBlend();
 		if (fx->Duration) {
