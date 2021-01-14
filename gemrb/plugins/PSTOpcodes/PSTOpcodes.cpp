@@ -323,12 +323,15 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}
+		
+		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->XOffset -= x;
+		sca->YOffset -= y;
 
-		sca->Pos.x = fx->PosX - x;
-		sca->Pos.y = fx->PosY + sca->ZOffset - y;
 		if (twin) {
-			twin->Pos.x = fx->PosX - x;
-			twin->Pos.y = fx->PosY + twin->ZOffset - y;
+			twin->Pos = Point(fx->PosX, fx->PosY);
+			twin->XOffset -= x;
+			twin->YOffset -= y;
 			area->AddVVCell( new VEFObject(twin) );
 		}
 		area->AddVVCell( new VEFObject(sca) );
