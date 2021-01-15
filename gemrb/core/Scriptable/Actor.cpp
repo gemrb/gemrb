@@ -8675,8 +8675,9 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		trans = 128;
 	}
 
-	Color tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-	tint.a = 255 - trans;
+	Color baseTint = area->LightMap->GetPixel(Pos.x / 16, Pos.y / 12);
+	baseTint.a = 255 - trans;
+	Color tint(baseTint);
 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
@@ -8685,7 +8686,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, tint, BBox.h, flags);
+		vvc->Draw(vp, baseTint, BBox.h, flags & BLIT_STENCIL_MASK);
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8807,7 +8808,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, tint, BBox.h, flags);
+		vvc->Draw(vp, baseTint, BBox.h, flags & BLIT_STENCIL_MASK);
 	}
 }
 
