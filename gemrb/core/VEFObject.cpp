@@ -44,6 +44,7 @@ VEFObject::VEFObject()
 
 VEFObject::VEFObject(ScriptedAnimation *sca)
 {
+	Pos = sca->Pos;
 	strnlwrcpy(ResName, sca->ResName, 8);
 	SingleObject=true;
 	ScheduleEntry entry;
