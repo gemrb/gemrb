@@ -53,7 +53,7 @@ class Sprite2D;
 // start of Colour flags on iesdp (though same field in original bg2)
 // 0x10000 Not light source
 // 0x20000 Light source
-#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
+#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)
 // 0x40000 Internal brightness
 #define IE_VVC_GREYSCALE	0x00080000   //timestopped palette
 #define IE_VVC_DARKEN       0x00100000   // unused
