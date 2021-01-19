@@ -1443,7 +1443,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			{
 				bool endReached = sca->UpdateDrawingState(-1);
 				if (endReached) {
-					delete(sca);
+					delete sca;
 					scaidx = vvcCells.erase(scaidx);
 				} else {
 					video->SetStencilBuffer(wallStencil);
@@ -1468,7 +1468,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					pro->Draw( viewport );
 					proidx++;
 				} else {
-					delete( pro );
+					delete pro;
 					proidx = projectiles.erase(proidx);
 				}
 			}
