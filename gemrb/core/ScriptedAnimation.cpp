@@ -738,10 +738,7 @@ void ScriptedAnimation::SetBlend()
 
 void ScriptedAnimation::SetFade(ieByte initial, int speed)
 {
-	Tint.r=255;
-	Tint.g=255;
-	Tint.b=255;
-	Tint.a=initial;
+	Tint = Color(255, 255, 255, initial);
 	Fade=speed;
 	Transparency|=BLIT_COLOR_MOD;
 }
