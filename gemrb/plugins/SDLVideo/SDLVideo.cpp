@@ -609,7 +609,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 	
 	if (spr->Bpp == 8) {
 		if (tint) {
-			assert(renderflags&BLIT_COLOR_MOD);
+			assert(renderflags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
 			newVersion |= tintv << 32;
 		}
@@ -628,6 +628,11 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 					assert(tint);
 					ShaderTint(*tint, dstc);
 				}
+				
+				if (renderflags & BLIT_ALPHA_MOD) {
+					assert(tint);
+					dstc.a = tint->a;
+				}
 
 				if (renderflags&BLIT_GREY) {
 					ShaderGreyscale(dstc);
@@ -636,7 +641,7 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 				}
 			}
 		}
-		renderflags &= ~(BLIT_GREY | BLIT_SEPIA | BLIT_COLOR_MOD);
+		renderflags &= ~(BLIT_GREY | BLIT_SEPIA | BLIT_COLOR_MOD | BLIT_ALPHA_MOD);
 	} else if (oldVersion != newVersion) {
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
