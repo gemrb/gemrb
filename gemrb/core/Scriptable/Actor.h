@@ -295,7 +295,7 @@ extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
 bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs);
-using vvcSet = std::set<ScriptedAnimation*, decltype(VVCSort)*>;
+using vvcSet = std::multiset<ScriptedAnimation*, decltype(VVCSort)*>;
 using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
 
 class GEM_EXPORT Actor : public Movable {

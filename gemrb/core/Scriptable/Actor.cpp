@@ -9199,9 +9199,6 @@ bool Actor::HasVVCCell(const ResRef &resource) const
 
 bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
 {
-	if (lhs->YOffset == rhs->YOffset) {
-		return lhs < rhs;
-	}
 	return lhs->YOffset < rhs->YOffset;
 }
 
