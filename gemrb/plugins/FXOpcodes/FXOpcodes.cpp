@@ -7440,7 +7440,7 @@ int fx_protection_from_animation (Scriptable* /*Owner*/, Actor* target, Effect* 
 {
 	// print("fx_protection_from_animation(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	//remove vvc from actor if active
-	target->RemoveVVCell(fx->Resource, false);
+	target->RemoveVVCell(fx->Resource);
 	return FX_APPLIED;
 }
 #endif

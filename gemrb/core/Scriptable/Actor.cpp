@@ -1433,7 +1433,7 @@ static void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 		handle_overlay(actor, OV_ENTANGLE);
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCells(hc_overlays[OV_ENTANGLE], true);
+		actor->RemoveVVCells(hc_overlays[OV_ENTANGLE]);
 	}
 }
 
@@ -1451,7 +1451,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 			if (newValue&mask) {
 				handle_overlay(actor, i);
 			} else if (oldValue&mask) {
-				actor->RemoveVVCells(hc_overlays[i], true);
+				actor->RemoveVVCells(hc_overlays[i]);
 			}
 		}
 		mask<<=1;
@@ -1466,7 +1466,7 @@ static void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCells(hc_overlays[OV_SHIELDGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_SHIELDGLOBE]);
 	}
 }
 
@@ -1478,7 +1478,7 @@ static void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCells(hc_overlays[OV_MINORGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_MINORGLOBE]);
 	}
 }
 
@@ -1490,7 +1490,7 @@ static void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCells(hc_overlays[OV_GREASE], true);
+		actor->RemoveVVCells(hc_overlays[OV_GREASE]);
 	}
 }
 
@@ -1503,7 +1503,7 @@ static void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCells(hc_overlays[OV_WEB], true);
+		actor->RemoveVVCells(hc_overlays[OV_WEB]);
 	}
 }
 
@@ -1515,8 +1515,7 @@ static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue) {
-		//it seems we have to remove it abruptly
-		actor->RemoveVVCells(hc_overlays[OV_BOUNCE], false);
+		actor->RemoveVVCells(hc_overlays[OV_BOUNCE]);
 	}
 }
 
@@ -9210,20 +9209,13 @@ Actor::GetVVCCells(const ResRef &resource) const
 	return vfxDict.equal_range(resource);
 }
 
-void Actor::RemoveVVCells(const ResRef &resource, bool graceful)
+void Actor::RemoveVVCells(const ResRef &resource)
 {
 	auto range = vfxDict.equal_range(resource);
 	if (range.first != vfxDict.end()) {
-		for (auto it = range.first; it != range.second;) {
+		for (auto it = range.first; it != range.second; ++it) {
 			ScriptedAnimation *vvc = it->second;
-			if (graceful) {
-				vvc->SetPhase(P_RELEASE);
-				++it;
-			} else {
-				it = vfxDict.erase(it);
-				auto it2 = std::find(vfxQueue.begin(), vfxQueue.end(), vvc);
-				vfxQueue.erase(it2);
-			}
+			vvc->SetPhase(P_RELEASE);
 		}
 	}
 }
