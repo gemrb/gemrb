@@ -9200,6 +9200,9 @@ bool Actor::HasVVCCell(const ResRef &resource) const
 
 bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
 {
+	if (lhs->YOffset == rhs->YOffset) {
+		return lhs < rhs;
+	}
 	return lhs->YOffset < rhs->YOffset;
 }
 
@@ -9236,6 +9239,7 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 	assert(vvc);
 	vfxDict.insert(std::make_pair(vvc->ResName, vvc));
 	vfxQueue.insert(vvc);
+	assert(vfxDict.size() == vfxQueue.size());
 }
 
 //returns restored spell level
