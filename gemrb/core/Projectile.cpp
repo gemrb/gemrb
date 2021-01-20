@@ -1935,6 +1935,10 @@ void Projectile::Draw(Holder<Sprite2D> spr, const Point& p,
 {
 	Video *video = core->GetVideoDriver();
 	PaletteHolder pal = (spr->Bpp == 8) ? palette : nullptr;
+	if (flags & BLIT_COLOR_MOD) {
+		// FIXME: this may not apply universally
+		flags |= BLIT_ALPHA_MOD;
+	}
 	video->BlitGameSpriteWithPalette(spr, pal, p.x, p.y, flags|BLIT_BLENDED, tint, NULL);
 }
 
