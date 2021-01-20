@@ -657,15 +657,16 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 	}
 
 	Video *video = core->GetVideoDriver();
-	Game *game = core->GetGame();
 	
 	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
-
-	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
+	
+	if (Transparency & IE_VVC_NO_TIMESTOP) {
+		flags &= ~BLIT_GREY;
+	} else if (Transparency & IE_VVC_GREYSCALE) {
 		flags |= BLIT_GREY;
 	}
 

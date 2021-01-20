@@ -1288,6 +1288,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
+	bool timestop = game->IsTimestopActive();
 
 	//area specific spawn.ini files (a PST feature)
 	if (INISpawn) {
@@ -1322,7 +1323,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		int rain = 0;
 		int flags = 0;
 
-		if (game->IsTimestopActive()) {
+		if (timestop) {
 			flags = BLIT_GREY;
 		} else if (AreaFlags&AF_DREAM) {
 			flags = BLIT_SEPIA;
@@ -1346,6 +1347,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	auto DrawAreaAnimation = [&, this](AreaAnimation *a) {
 		uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
 		flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+		
+		if (timestop) {
+			flags |= BLIT_GREY;
+		}
 		
 		Color tint = ColorWhite;
 		if (a->Flags & A_ANI_NO_SHADOW) {
@@ -1431,6 +1436,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 				uint32_t flags = SetDrawingStencilForScriptable(c, viewport);
 				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
 				
+				if (timestop) {
+					flags |= BLIT_GREY;
+				}
+				
 				Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
 				game->ApplyGlobalTint(tint, flags);
 
@@ -1460,8 +1469,13 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					
 					// FIXME: these should actually make use of SetDrawingStencilForObject too
 					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
-					game->ApplyGlobalTint(tint, flags);
 					
+					if (timestop) {
+						flags |= BLIT_GREY;
+					}
+
+					game->ApplyGlobalTint(tint, flags);
+
 					sca->Draw(viewport, tint, 0, flags);
 					scaidx++;
 				}
