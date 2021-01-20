@@ -8642,7 +8642,7 @@ Region Actor::DrawingRegion() const
 	return drawingRegion;
 }
 
-void Actor::Draw(const Region& vp, uint32_t flags) const
+void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 {
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
@@ -8674,11 +8674,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		trans = 128;
 	}
 
-	Color tint = area->LightMap->GetPixel(Pos.x / 16, Pos.y / 12);
 	tint.a = 255 - trans;
-	
-	Game* game = core->GetGame();
-	game->ApplyGlobalTint(tint, flags);
 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
@@ -8753,6 +8749,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		}
 
 		if (!currentStance.shadow.empty()) {
+			Game* game = core->GetGame();
 			// infravision, independent of light map and global light
 			if (HasBodyHeat() &&
 				game->PartyHasInfravision() &&

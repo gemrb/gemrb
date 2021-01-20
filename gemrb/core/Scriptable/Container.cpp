@@ -80,13 +80,9 @@ Region Container::DrawingRegion() const
 	return r;
 }
 
-void Container::DrawPile(bool highlight, const Region& vp, uint32_t flags, Color tint) const
+void Container::Draw(bool highlight, const Region& vp, Color tint, uint32_t flags) const
 {
 	Video* video = core->GetVideoDriver();
-	Game *game = core->GetGame();
-
-	//draw it with highlight
-	game->ApplyGlobalTint(tint, flags);
 
 	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		const Holder<Sprite2D> icon = groundicons[i];

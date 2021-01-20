@@ -1172,18 +1172,6 @@ void Map::DrawHighlightables(const Region& viewport)
 	}
 }
 
-void Map::DrawPile(const Region& screen, Container* c, bool highlight)
-{
-	assert(c != NULL);
-
-	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
-	tint.a = 255;
-
-	uint32_t flags = SetDrawingStencilForScriptable(c, screen);
-	flags |= BLIT_COLOR_MOD|BLIT_BLENDED;
-	c->DrawPile(highlight, screen, flags, tint);
-}
-
 Container *Map::GetNextPile(int &index) const
 {
 	Container *c = TMap->GetContainer(index++);
@@ -1292,7 +1280,6 @@ VEFObject *Map::GetNextScriptedAnimation(const scaIterator &iter) const
 	return *iter;
 }
 
-
 //Draw the game area (including overlays, actors, animations, weather)
 void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 {
@@ -1352,13 +1339,28 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
 	RedrawScreenStencil(viewport, viewportWalls.first);
 	video->SetStencilBuffer(wallStencil);
-
+	
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
+
+	auto DrawAreaAnimation = [&, this](AreaAnimation *a) {
+		uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
+		flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+		
+		Color tint = ColorWhite;
+		if (a->Flags & A_ANI_NO_SHADOW) {
+			tint = LightMap->GetPixel(a->Pos.x / 16, a->Pos.y / 12);
+		}
+		
+		game->ApplyGlobalTint(tint, flags);
+
+		a->Draw(viewport, tint, flags);
+		return GetNextAreaAnimation(aniidx, gametime);
+	};
+	
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
-		a->Draw(viewport, this, BLIT_COLOR_MOD | BLIT_BLENDED);
-		a = GetNextAreaAnimation(aniidx, gametime);
+		a = DrawAreaAnimation(a);
 	}
 
 	if (!bgoverride) {
@@ -1404,7 +1406,11 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 							// the caster and immune actors being the most notable exceptions
 							flags |= BLIT_GREY;
 						}
-						actor->Draw(viewport, flags|BLIT_BLENDED);
+						
+						Color tint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
+						game->ApplyGlobalTint(tint, flags);
+						
+						actor->Draw(viewport, tint, flags|BLIT_BLENDED);
 					}
 				}
 				
@@ -1421,22 +1427,24 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			// draw piles
 			if (!bgoverride) {
 				Container* c = TMap->GetContainer(pileidx-1);
+				
+				uint32_t flags = SetDrawingStencilForScriptable(c, viewport);
+				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+				
+				Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
+				game->ApplyGlobalTint(tint, flags);
+
 				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
-					DrawPile(viewport, c, true);
+					c->Draw(true, viewport, tint, flags);
 				} else {
-					DrawPile(viewport, c, false);
+					c->Draw(false, viewport, tint, flags);
 				}
 				pile = GetNextPile(pileidx);
 			}
 			break;
 		case AOT_AREA:
 			{
-				//draw animation
-				uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
-				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
-
-				a->Draw(viewport, this, flags);
-				a = GetNextAreaAnimation(aniidx,gametime);
+				a = DrawAreaAnimation(a);
 			}
 			break;
 		case AOT_SCRIPTED:
@@ -1450,6 +1458,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					Color tint = LightMap->GetPixel( sca->Pos.x / 16, sca->Pos.y / 12);
 					tint.a = 255;
 					
+					// FIXME: these should actually make use of SetDrawingStencilForObject too
 					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
 					game->ApplyGlobalTint(tint, flags);
 					
@@ -3943,20 +3952,11 @@ Region AreaAnimation::DrawingRegion() const
 	return r;
 }
 
-void AreaAnimation::Draw(const Region& viewport, Map *area, uint32_t flags)
+void AreaAnimation::Draw(const Region &viewport, Color tint, uint32_t flags) const
 {
 	Video* video = core->GetVideoDriver();
-
-	//always draw the animation tinted because tint is also used for
-	//transparency
-	ieByte inverseTransparency = 255-transparency;
-	Color tint(255, 255, 255, inverseTransparency);
-	if (Flags & A_ANI_NO_SHADOW) {
-		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-		tint.a = inverseTransparency;
-	}
 	
-	core->GetGame()->ApplyGlobalTint(tint, flags);
+	tint.a = 255 - transparency;
 
 	int ac = animcount;
 	while (ac--) {

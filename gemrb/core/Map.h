@@ -327,7 +327,7 @@ public:
 	void BlendAnimation();
 	bool Schedule(ieDword gametime) const;
 	Region DrawingRegion() const;
-	void Draw(const Region &screen, Map *area, uint32_t flags);
+	void Draw(const Region &screen, Color tint, uint32_t flags) const;
 	int GetHeight() const;
 private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
@@ -653,7 +653,6 @@ private:
 	uint32_t SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
 	uint32_t SetDrawingStencilForAreaAnimation(AreaAnimation*, const Region& viewPort);
 	
-	void DrawPile(const Region& screen, Container* c, bool highlight);
 	void DrawSearchMap(const Region &vp) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport);
