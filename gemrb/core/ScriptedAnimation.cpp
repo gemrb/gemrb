@@ -32,6 +32,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Pixels.h"
 #include "Sprite2D.h"
 #include "Video.h"
 
@@ -644,10 +645,10 @@ bool ScriptedAnimation::UpdateDrawingState(int orientation)
 }
 
 //it is not sure if we need tint at all
-void ScriptedAnimation::Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const
+void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t flags) const
 {
 	if (twin) {
-		twin->Draw(vp, p_tint, height, flags);
+		twin->Draw(vp, tint, height, flags);
 	}
 	
 	//delayed
@@ -659,7 +660,6 @@ void ScriptedAnimation::Draw(const Region &vp, const Color &p_tint, int height, 
 	Game *game = core->GetGame();
 	
 	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
-	Color tint = Tint;
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
@@ -669,13 +669,8 @@ void ScriptedAnimation::Draw(const Region &vp, const Color &p_tint, int height, 
 		flags |= BLIT_GREY;
 	}
 
-	if ((Transparency & IE_VVC_TINT) == IE_VVC_TINT) {
-		tint = p_tint;
-	}
-
-	if (Transparency & BLIT_COLOR_MOD) {
-		flags |= BLIT_COLOR_MOD;
-		game->ApplyGlobalTint(tint, flags);
+	if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
+		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
 	int cx = Pos.x - vp.x + XOffset;

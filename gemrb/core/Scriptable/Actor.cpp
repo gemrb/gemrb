@@ -8674,9 +8674,11 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		trans = 128;
 	}
 
-	Color baseTint = area->LightMap->GetPixel(Pos.x / 16, Pos.y / 12);
-	baseTint.a = 255 - trans;
-	Color tint(baseTint);
+	Color tint = area->LightMap->GetPixel(Pos.x / 16, Pos.y / 12);
+	tint.a = 255 - trans;
+	
+	Game* game = core->GetGame();
+	game->ApplyGlobalTint(tint, flags);
 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
@@ -8685,7 +8687,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, baseTint, BBox.h, flags & BLIT_STENCIL_MASK);
+		vvc->Draw(vp, tint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8710,9 +8712,6 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 		// could be used with higher granularity. When we need the face value
 		// it could be divided so it will become a 0-15 number.
 		//
-		
-		Game* game = core->GetGame();
-		game->ApplyGlobalTint(tint, flags);
 		
 		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
 
@@ -8753,23 +8752,23 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 			}
 		}
 
-		// infravision, independent of light map and global light
-		if ( HasBodyHeat() &&
-			game->PartyHasInfravision() &&
-			!game->IsDay() &&
-			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-			tint.r = 255;
-
-			/* IWD2: infravision is white, not red. */
-			if(core->HasFeature(GF_3ED_RULES)) {
-				tint.g = tint.b = 255;
-			} else {
-				tint.g = tint.b = 120;
-			}
-		}
-
 		if (!currentStance.shadow.empty()) {
-			DrawActorSprite(cx, cy, flags, currentStance.shadow, tint);
+			// infravision, independent of light map and global light
+			if (HasBodyHeat() &&
+				game->PartyHasInfravision() &&
+				!game->IsDay() &&
+				(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+				Color irTint = Color(255, 120, 120, tint.a);
+
+				/* IWD2: infravision is white, not red. */
+				if(core->HasFeature(GF_3ED_RULES)) {
+					irTint = Color(255, 255, 255, tint.a);
+				}
+
+				DrawActorSprite(cx, cy, flags, currentStance.shadow, irTint);
+			} else {
+				DrawActorSprite(cx, cy, flags, currentStance.shadow, tint);
+			}
 		}
 
 		// actor itself
@@ -8807,7 +8806,7 @@ void Actor::Draw(const Region& vp, uint32_t flags) const
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, baseTint, BBox.h, flags & BLIT_STENCIL_MASK);
+		vvc->Draw(vp, tint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
 	}
 }
 

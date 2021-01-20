@@ -1449,7 +1449,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					video->SetStencilBuffer(wallStencil);
 					Color tint = LightMap->GetPixel( sca->Pos.x / 16, sca->Pos.y / 12);
 					tint.a = 255;
+					
 					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
+					game->ApplyGlobalTint(tint, flags);
+					
 					sca->Draw(viewport, tint, 0, flags);
 					scaidx++;
 				}

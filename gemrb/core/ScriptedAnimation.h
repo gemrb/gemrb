@@ -133,7 +133,7 @@ public:
 public:
 	//draws the next frame of the videocell
 	bool UpdateDrawingState(int orientation);
-	void Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const;
+	void Draw(const Region &vp, Color tint, int height, uint32_t flags) const;
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
