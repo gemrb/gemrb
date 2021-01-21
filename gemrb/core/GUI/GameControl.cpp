@@ -1229,9 +1229,7 @@ int GameControl::GetCursorOverDoor(const Door *overDoor) const
 		if (target_mode == TARGET_MODE_NONE) {
 			// most secret doors are in walls, so default to the blocked cursor to not give them away
 			// iwd ar6010 table/door/puzzle is walkable, secret and undetectable
-			const Game *game = core->GetGame();
-			const Map *area = game->GetCurrentArea();
-			assert(area);
+			const Map *area = overDoor->GetCurrentArea();
 			return area->GetCursor(overDoor->Pos);
 		} else {
 			return lastCursor|IE_CURSOR_GRAY;
@@ -2021,8 +2019,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			//there. Here we have to check on the
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
-				const GameControl *gc = core->GetGameControl();
-				if (!(trap->Flags & TRAP_DEACTIVATED) && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+				if (!(trap->Flags & TRAP_DEACTIVATED) && !(GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 					trap->AddTrigger(TriggerEntry(trigger_clicked, actor->GetGlobalID()));
 					actor->LastMarked = trap->GetGlobalID();
 					//directly feeding the event, even if there are actions in the queue
