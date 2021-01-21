@@ -580,7 +580,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.caxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_CONTROLLERBUTTONDOWN:
@@ -589,7 +589,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
 				EventButton btn = EventButton(event.cbutton.button);
 				e = EvntManager->CreateControllerButtonEvent(btn, down);
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_FINGERDOWN: // fallthough
@@ -604,7 +604,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
 				e.mod = modstate;
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
@@ -617,7 +617,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
 				e = EvntManager->CreateTouchGesture(touch.touch, 0.0, 0.0);
 				e.mod = modstate;
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_DOLLARGESTURE:
@@ -635,7 +635,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0)
 				{
 					e.mod = modstate;
-					EvntManager->DispatchEvent(e);
+					EvntManager->DispatchEvent(std::move(e));
 				}
 			}
 			break;
@@ -660,13 +660,13 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
 				}
 				
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		/* not user input events */
 		case SDL_TEXTINPUT:
 			e = EvntManager->CreateTextEvent(event.text.text);
-			EvntManager->DispatchEvent(e);
+			EvntManager->DispatchEvent(std::move(e));
 			break;
 		/* not user input events */
 
@@ -723,7 +723,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 
 					if (pasteValue != NULL) {
 						e = EvntManager->CreateTextEvent(pasteValue);
-						EvntManager->DispatchEvent(e);
+						EvntManager->DispatchEvent(std::move(e));
 						SDL_free(pasteValue);
 					}
 				}
@@ -738,7 +738,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 							char* text = SDL_GetClipboardText();
 							e = EvntManager->CreateTextEvent(text);
 							SDL_free(text);
-							EvntManager->DispatchEvent(e);
+							EvntManager->DispatchEvent(std::move(e));
 							return GEM_OK;
 						}
 						break;

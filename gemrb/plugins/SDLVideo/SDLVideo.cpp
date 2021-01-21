@@ -167,7 +167,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			key = TranslateKeycode(sym);
 			if (key != 0) {
 				Event e = EvntManager->CreateKeyEvent(key, false, modstate);
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_KEYDOWN:
@@ -200,11 +200,11 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 #endif
 			}
 
-			EvntManager->DispatchEvent(e);
+			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEMOTION:
 			e = EvntManager->CreateMouseMotionEvent(Point(event.motion.x, event.motion.y), modstate);
-			EvntManager->DispatchEvent(e);
+			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
@@ -217,7 +217,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 					bool down = (event.type == SDL_MOUSEBUTTONDOWN) ? true : false;
 					Point p(event.button.x, event.button.y);
 					e = EvntManager->CreateMouseBtnEvent(p, btn, down, modstate);
-					EvntManager->DispatchEvent(e);
+					EvntManager->DispatchEvent(std::move(e));
 				}
 			}
 			break;
@@ -229,7 +229,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.jaxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		case SDL_JOYBUTTONDOWN:
@@ -238,7 +238,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
 				EventButton btn = EventButton(event.jbutton.button);
 				e = EvntManager->CreateControllerButtonEvent(btn, down);
-				EvntManager->DispatchEvent(e);
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 	}
