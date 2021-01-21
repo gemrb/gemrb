@@ -198,9 +198,7 @@ public:
 	
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
-	struct ControlActionKey : public ActionKey {
-		uint32_t key;
-		
+	struct ControlActionKey : public ActionKey {		
 		static uint32_t BuildKeyValue(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
 			// pack the parameters into the 32 bit key...
 			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
