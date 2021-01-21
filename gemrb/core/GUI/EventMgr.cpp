@@ -107,6 +107,9 @@ KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 		case CONTROLLER_BUTTON_DPAD_RIGHT:
 			ke.keycode = GEM_RIGHT;
 			break;
+		default:
+			ke.keycode = 0;
+			break;
 	}
 	
 	return ke;
