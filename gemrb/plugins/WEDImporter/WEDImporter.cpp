@@ -92,7 +92,6 @@ bool WEDImporter::Open(DataStream* stream)
 	//Reading the Secondary Header
 	str->Seek( SecHeaderOffset, GEM_STREAM_START );
 	str->ReadDword( &WallPolygonsCount );
-	DoorPolygonsCount = 0;
 	str->ReadDword( &PolygonsOffset );
 	str->ReadDword( &VerticesOffset );
 	str->ReadDword( &WallGroupsOffset );

@@ -53,7 +53,7 @@ private:
 	ieDword VerticesOffset = 0;
 	ieDword WallGroupsOffset = 0;
 	ieDword PLTOffset = 0;
-	ieDword DoorPolygonsCount;
+	ieDword DoorPolygonsCount = 0;
 	//these will change as doors are being read, so get them in time!
 	ieWord OpenPolyCount = 0, ClosedPolyCount = 0;
 	ieDword OpenPolyOffset = 0, ClosedPolyOffset = 0;
