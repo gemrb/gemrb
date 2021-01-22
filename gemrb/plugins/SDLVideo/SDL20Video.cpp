@@ -242,7 +242,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
 {
 	uint32_t version = 0;
-#if !USE_OPENGL_BACKEND
+#if 1 // !USE_OPENGL_BACKEND
 	// we need to isolate flags that require software rendering to use as the "version"
 	version = (BLIT_GREY|BLIT_SEPIA) & flags;
 #endif
@@ -278,6 +278,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
 #if USE_OPENGL_BACKEND
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
+
 		GLint previous_program;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
@@ -298,8 +302,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 			stencilShader->SetUniformValue("u_dither", 1, 0);
 		}
 		
-		stencilShader->SetUniformValue("s_stencil", 1, 1);
-		glActiveTexture(GL_TEXTURE1);
+		stencilShader->SetUniformValue("s_stencil", 1, 0);
+		glActiveTexture(GL_TEXTURE0);
 		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
 
 		SDL_Rect stencilRect = drect;
@@ -346,7 +350,7 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
 {
-#if USE_OPENGL_BACKEND
+#if 0 // USE_OPENGL_BACKEND
 	GLint previous_program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
@@ -394,7 +398,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
-#if USE_OPENGL_BACKEND
+#if 0 // USE_OPENGL_BACKEND
 	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
 
 	return ret;

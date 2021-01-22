@@ -1,7 +1,6 @@
 precision highp float;
 
 //varying vec4 v_color; // glColor, we set this to the "tint" parameter
-//varying vec2 v_texCoord;
 varying vec2 v_stencilCoord;
 
 uniform sampler2D s_stencil;
