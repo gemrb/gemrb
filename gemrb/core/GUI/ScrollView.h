@@ -58,21 +58,23 @@ namespace GemRB {
 		void UpdateScrollbars();
 		void ScrollbarValueChange(ScrollBar*);
 		
-		void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
-		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+		void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 		
-		void FlagsChanged(unsigned int /*oldflags*/);
+		void FlagsChanged(unsigned int /*oldflags*/) override;
 
 	protected:
-		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-		bool OnMouseWheelScroll(const Point& delta);
-		bool OnMouseDrag(const MouseEvent&);
+		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+		bool OnMouseWheelScroll(const Point& delta) override;
+		bool OnMouseDrag(const MouseEvent&) override;
 
 	public:
 		ScrollView(const Region& frame);
 		~ScrollView();
+		
+		bool IsAnimated() const override { return animation; }
 
-		void AddSubviewInFrontOfView(View*, const View* = NULL);
+		void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 		View* RemoveSubview(const View*);
 		View* SubviewAt(const Point&, bool ignoreTransparency = false, bool recursive = false);
 		
@@ -84,9 +86,9 @@ namespace GemRB {
 		void SetScrollIncrement(int);
 
 		// we implement the Scrollable interface so we cant just use a default param
-		void ScrollDelta(const Point& p);
+		void ScrollDelta(const Point& p) override;
 		void ScrollDelta(const Point& p, ieDword duration);
-		void ScrollTo(const Point& p);
+		void ScrollTo(const Point& p) override;
 		void ScrollTo(Point p, ieDword duration);
 		bool CanScroll(const Point& p) const;
 		
