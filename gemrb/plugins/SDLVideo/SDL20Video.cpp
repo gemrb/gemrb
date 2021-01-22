@@ -138,7 +138,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return GEM_ERROR;
 	}
-#if USE_OPENGL_BACKEND
+
 	spriteShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/GameSpriteF.glsl");
 	if (!spriteShader)
 	{
@@ -146,7 +146,6 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
 		return GEM_ERROR;
 	}
-#endif
 #endif
 
 	// we set logical size so that platforms where the window can be a diffrent size then requested
