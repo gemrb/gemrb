@@ -783,7 +783,7 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 	ScriptedAnimation * ret = twin;
 	//ret->Frame.y+=ret->ZPos+1;
 	if (ret->ZOffset >= 0) {
-		ret->ZOffset =- 1;
+		ret->ZOffset = -1;
 	}
 	twin=NULL;
 	return ret;
