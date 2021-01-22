@@ -27,10 +27,10 @@ namespace GemRB {
 class GEM_EXPORT Win32ConsoleLogger : public StdioLogger {
 public:
 	Win32ConsoleLogger(bool useColor);
-	virtual ~Win32ConsoleLogger();
+	~Win32ConsoleLogger() override;
 
-	void print(const char* message);
-	void textcolor(log_color);
+	void print(const char* message) override;
+	void textcolor(log_color) override;
 
 private:
 	HANDLE hConsole;

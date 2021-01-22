@@ -144,7 +144,7 @@ public:
 		colorKey = orig.colorKey;
 	}
 
-	~SDLPixelIterator() {
+	~SDLPixelIterator() override {
 		delete imp;
 	}
 
@@ -188,7 +188,7 @@ public:
 		return static_cast<Uint8*>(imp->pixel);
 	}
 
-	Uint8 Channel(Uint32 mask, Uint8 shift) const {
+	Uint8 Channel(Uint32 mask, Uint8 shift) const override {
 		switch (format->BytesPerPixel) {
 			case 1:
 				return static_cast<PixelIterator<Uint8>*>(imp)->Channel(mask, shift);
@@ -203,11 +203,11 @@ public:
 		}
 	}
 
-	IPixelIterator* Clone() const {
+	IPixelIterator* Clone() const override {
 		return new SDLPixelIterator(*this);
 	}
 
-	void Advance(int amt) {
+	void Advance(int amt) override {
 		imp->Advance(amt);
 	}
 	
@@ -291,7 +291,7 @@ public:
 		}
 	}
 	
-	const Point& Position() const {
+	const Point& Position() const override {
 		return imp->Position();
 	}
 };

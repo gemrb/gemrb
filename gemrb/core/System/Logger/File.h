@@ -28,9 +28,9 @@ class DataStream;
 class GEM_EXPORT FileLogger : public StdioLogger {
 public:
 	FileLogger(DataStream*);
-	virtual ~FileLogger();
+	~FileLogger() override;
 
-	void print(const char* message);
+	void print(const char* message) override;
 
 private:
 	DataStream* log_file;

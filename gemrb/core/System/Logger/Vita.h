@@ -26,10 +26,10 @@ namespace GemRB {
 class GEM_EXPORT VitaLogger : public Logger {
 public:
 	VitaLogger();
-	virtual ~VitaLogger();
+	~VitaLogger() override;
 
 protected:
-	void LogInternal(log_level, const char*, const char*, log_color);
+	void LogInternal(log_level, const char*, const char*, log_color) override;
 };
 
 Logger* createVitaLogger();

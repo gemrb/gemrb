@@ -113,7 +113,7 @@ public: // Public attributes
 			return static_cast<Control*>(dropView);
 		}
 		
-		~ControlDragOp() {
+		~ControlDragOp() override {
 			Control* src = Source();
 			ActionKey srckey(Action::DragDropSource);
 			
@@ -147,9 +147,9 @@ public: // Public attributes
 
 public:
 	Control(const Region& frame);
-	virtual ~Control();
+	~Control() override;
 
-	virtual bool IsAnimated() const override { return animation && AnimPicture; }
+	bool IsAnimated() const override { return animation && AnimPicture; }
 	bool IsOpaque() const override;
 
 	/** Sets the Text of the current control */

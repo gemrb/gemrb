@@ -469,7 +469,7 @@ private:
 
 public:
 	Actor(void);
-	~Actor(void);
+	~Actor(void) override;
 	/** releases memory */
 	static void ReleaseMemory();
 	/** sets game specific parameter (which stat should determine the fist weapon type */

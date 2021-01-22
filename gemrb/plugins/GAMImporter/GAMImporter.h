@@ -51,13 +51,13 @@ private:
 	ieDword PPLocOffset, PPLocCount;
 public:
 	GAMImporter(void);
-	~GAMImporter(void);
-	bool Open(DataStream* stream);
-	Game* LoadGame(Game *newGame, int ver_override = 0);
+	~GAMImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Game* LoadGame(Game *newGame, int ver_override = 0) override;
 
-	int GetStoredFileSize(Game *game);
+	int GetStoredFileSize(Game *game) override;
 	/* stores a gane in the savegame folder */
-	int PutGame(DataStream *stream, Game *game);
+	int PutGame(DataStream *stream, Game *game) override;
 private:
 	Actor* GetActor(Holder<ActorMgr> aM, bool is_in_party );
 	void GetPCStats(PCStatsStruct* ps, bool extended);

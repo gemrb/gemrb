@@ -277,12 +277,12 @@ private:
 	int EndVideo();
 
 protected:
-	bool DecodeFrame(VideoBuffer&);
+	bool DecodeFrame(VideoBuffer&) override;
 
 public:
 	BIKPlayer(void);
-	~BIKPlayer(void);
-	bool Open(DataStream* stream);
+	~BIKPlayer(void) override;
+	bool Open(DataStream* stream) override;
 
 	void Stop();
 };

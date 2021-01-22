@@ -54,9 +54,9 @@ private:
 	DataStream* stream;
 public:
 	BIFImporter(void);
-	~BIFImporter(void);
-	int OpenArchive(const char* filename);
-	DataStream* GetStream(unsigned long Resource, unsigned long Type);
+	~BIFImporter(void) override;
+	int OpenArchive(const char* filename) override;
+	DataStream* GetStream(unsigned long Resource, unsigned long Type) override;
 private:
 	static DataStream* DecompressBIF(DataStream* compressed, const char* path);
 	static DataStream* DecompressBIFC(DataStream* compressed, const char* path);

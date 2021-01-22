@@ -28,7 +28,7 @@ namespace GemRB {
 class GEM_EXPORT MusicMgr : public Plugin {
 public: 
 	MusicMgr();
-	virtual ~MusicMgr();
+	~MusicMgr() override;
 	/** Ends the Current PlayList Execution */
 	virtual void End(void) = 0;
 	virtual void HardEnd(void) = 0;

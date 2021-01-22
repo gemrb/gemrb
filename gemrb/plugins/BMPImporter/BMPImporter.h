@@ -42,15 +42,15 @@ private:
 	unsigned int PaddedRowLength;
 public:
 	BMPImporter(void);
-	~BMPImporter(void);
-	bool Open(DataStream* stream);
-	Holder<Sprite2D> GetSprite2D();
-	virtual Bitmap* GetBitmap();
-	virtual Image* GetImage();
-	int GetPalette(int colors, Color* pal);
+	~BMPImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Holder<Sprite2D> GetSprite2D() override;
+	Bitmap* GetBitmap() override;
+	Image* GetImage() override;
+	int GetPalette(int colors, Color* pal) override;
 
-	int GetWidth() { return (int) Width; }
-	int GetHeight() { return (int) Height; }
+	int GetWidth() override { return (int) Width; }
+	int GetHeight() override { return (int) Height; }
 private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);

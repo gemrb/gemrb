@@ -64,7 +64,7 @@ public:
 	Sprite2D(const Region&, int Bpp, void* pixels);
 	Sprite2D(const Sprite2D &obj);
 	virtual Holder<Sprite2D> copy() const = 0;
-	virtual ~Sprite2D();
+	~Sprite2D() override;
 
 	bool IsPixelTransparent(const Point& p) const;
 

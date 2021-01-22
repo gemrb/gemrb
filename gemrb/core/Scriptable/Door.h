@@ -69,7 +69,7 @@ public:
 class GEM_EXPORT Door : public Highlightable {
 public:
 	Door(TileOverlay* Overlay, DoorTrigger&& trigger);
-	~Door(void);
+	~Door(void) override;
 public:
 	ieVariable LinkedInfo;
 	ieResRef ID; //WED ID
@@ -106,7 +106,7 @@ public:
 	void ToggleTiles(int State, int playsound = false);
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
-	bool CanDetectTrap() const;
+	bool CanDetectTrap() const override;
 	void SetDoorLocked(int Locked, int playsound);
 	void SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger = true);
 	int IsOpen() const;
@@ -117,7 +117,7 @@ public:
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
 	void dump() const;
-	int TrapResets() const { return Flags & DOOR_RESET; }
+	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
 	void SetNewOverlay(TileOverlay *Overlay);
 

@@ -38,7 +38,7 @@ public:
 	static const TypeID ID;
 public:
 	PalettedImageMgr(void);
-	virtual ~PalettedImageMgr(void);
+	~PalettedImageMgr(void) override;
 	/**
 	 * Returns a @ref{Sprite2D} that has been colored with the given palette.
 	 *

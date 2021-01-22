@@ -48,7 +48,7 @@ static const Color SelectOptionSelected(55, 100, 0, 0);// default selected color
 class GEM_EXPORT TextArea : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
@@ -56,12 +56,12 @@ private:
 			: TextContainer(frame, font, pal) {}
 			
 			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
-			void OnMouseLeave(const MouseEvent& me, const DragOp*) {
+			void OnMouseLeave(const MouseEvent& me, const DragOp*) override {
 				assert(superView);
 				superView->MouseOver(me);
 			}
 
-			bool Editable() const { return false; }
+			bool Editable() const override { return false; }
 		};
 	private:
 		TextArea& ta;
@@ -74,14 +74,14 @@ private:
 		TextContainer* TextAtPoint(const Point&);
 		TextContainer* TextAtIndex(size_t idx);
 
-		bool OnMouseOver(const MouseEvent& /*me*/);
-		bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+		bool OnMouseOver(const MouseEvent& /*me*/) override;
+		bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
+		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 
-		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 		bool KeyEvent(const Event& event);
 
-		void SizeChanged(const Size&);
+		void SizeChanged(const Size&) override;
 
 		bool Editable() const { return false; }
 
@@ -89,13 +89,13 @@ private:
 		// FIXME: we get messed up is SetMargin is called. there is no notification that they have changed and so our subviews are overflowing.
 		// working around that by passing them in the ctor, but its a poor fix.
 		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered, ContentContainer::Margin m = Margin());
-		~SpanSelector();
+		~SpanSelector() override;
 
 		size_t NumOpts() const { return size;};
 		void MakeSelection(size_t idx);
 		TextContainer* Selection() const { return selectedSpan; }
 		
-		bool CanLockFocus() const { return false; }
+		bool CanLockFocus() const override { return false; }
 	};
 
 public:
@@ -103,10 +103,10 @@ public:
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 Color hitextcolor, Color initcolor, Color lowtextcolor);
 
-	bool IsOpaque() const { return false; }
+	bool IsOpaque() const override { return false; }
 
 	/** Sets the Actual Text */
-	void SetText(const String& text);
+	void SetText(const String& text) override;
 	/** Clears the textarea */
 	void ClearText();
 
@@ -116,8 +116,8 @@ public:
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollDelta(const Point& p);
-	void ScrollTo(const Point& p);
+	void ScrollDelta(const Point& p) override;
+	void ScrollTo(const Point& p) override;
 	void ScrollToY(int y, ieDword lineduration = 0);
 	int ContentHeight() const;
 
@@ -130,19 +130,19 @@ public:
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	void SetAnimPicture(Holder<Sprite2D> Picture);
+	void SetAnimPicture(Holder<Sprite2D> Picture) override;
 
 	ContentContainer::Margin GetMargins() const;
 	void SetMargins(ContentContainer::Margin m);
 
 	/** Returns the selected text */
-	String QueryText() const;
+	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(unsigned int optIdx);
-	void DidFocus();
-	void DidUnFocus();
+	void UpdateState(unsigned int optIdx) override;
+	void DidFocus() override;
+	void DidUnFocus() override;
 	
-	void AddSubviewInFrontOfView(View*, const View* = NULL);
+	void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 
 private: // Private attributes
 	// dialog and listbox handling
@@ -177,8 +177,8 @@ private: //internal functions
 
 	void UpdateScrollview();
 	Region UpdateTextFrame();
-	void SizeChanged(const Size&) { UpdateScrollview(); }
-	void FlagsChanged(unsigned int /*oldflags*/);
+	void SizeChanged(const Size&) override { UpdateScrollview(); }
+	void FlagsChanged(unsigned int /*oldflags*/) override;
 
 	int TextHeight() const;
 	int OptionsHeight() const;

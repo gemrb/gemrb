@@ -41,12 +41,12 @@ private:
 
 public:
 	WMPImporter(void);
-	~WMPImporter(void);
-	bool Open(DataStream* stream1, DataStream* stream2);
-	WorldMapArray *GetWorldMapArray();
+	~WMPImporter(void) override;
+	bool Open(DataStream* stream1, DataStream* stream2) override;
+	WorldMapArray *GetWorldMapArray() override;
 
-	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index);
-	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap);
+	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) override;
+	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) override;
 private:
 	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index);
 

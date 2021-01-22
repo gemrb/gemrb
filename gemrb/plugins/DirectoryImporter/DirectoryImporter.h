@@ -33,14 +33,14 @@ protected:
 
 public:
 	DirectoryImporter(void);
-	~DirectoryImporter(void);
-	bool Open(const char *dir, const char *desc);
+	~DirectoryImporter(void) override;
+	bool Open(const char *dir, const char *desc) override;
 	/** predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type);
-	bool HasResource(const char* resname, const ResourceDesc &type);
+	bool HasResource(const char* resname, SClass_ID type) override;
+	bool HasResource(const char* resname, const ResourceDesc &type) override;
 	/** returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type);
-	DataStream* GetResource(const char* resname, const ResourceDesc &type);
+	DataStream* GetResource(const char* resname, SClass_ID type) override;
+	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
 };
 
 class CachedDirectoryImporter : public DirectoryImporter {
@@ -49,16 +49,16 @@ protected:
 
 public:
 	CachedDirectoryImporter();
-	~CachedDirectoryImporter();
+	~CachedDirectoryImporter() override;
 
-	bool Open(const char *dir, const char *desc);
+	bool Open(const char *dir, const char *desc) override;
 	void Refresh();
 	/** predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type);
-	bool HasResource(const char* resname, const ResourceDesc &type);
+	bool HasResource(const char* resname, SClass_ID type) override;
+	bool HasResource(const char* resname, const ResourceDesc &type) override;
 	/** returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type);
-	DataStream* GetResource(const char* resname, const ResourceDesc &type);
+	DataStream* GetResource(const char* resname, SClass_ID type) override;
+	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
 };
 
 

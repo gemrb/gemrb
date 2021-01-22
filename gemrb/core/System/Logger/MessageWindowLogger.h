@@ -25,9 +25,9 @@ namespace GemRB {
 class GEM_EXPORT MessageWindowLogger : public Logger {
 public:
 	MessageWindowLogger( log_level = WARNING ); // this logger has a diffrent default level than its base class.
-	virtual ~MessageWindowLogger();
+	~MessageWindowLogger() override;
 protected:
-	void LogInternal(log_level level, const char* owner, const char* message, log_color color);
+	void LogInternal(log_level level, const char* owner, const char* message, log_color color) override;
 private:
 	void PrintStatus(bool);
 };

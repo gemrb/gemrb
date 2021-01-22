@@ -39,7 +39,7 @@ protected:
 		PaletteHolder palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
 		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
-		~SurfaceHolder() { SDL_FreeSurface(surface); }
+		~SurfaceHolder() override { SDL_FreeSurface(surface); }
 
 		SDL_Surface* operator->() { return surface; }
 		operator SDL_Surface* () { return surface; }

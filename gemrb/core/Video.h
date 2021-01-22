@@ -160,7 +160,7 @@ private:
 
 public:
 	Video(void);
-	virtual ~Video(void);
+	~Video(void) override;
 
 	virtual int Init(void) = 0;
 

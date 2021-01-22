@@ -68,7 +68,7 @@ inline void ShaderBlend(const Color& src, Color& dst) {
 
 template <bool MASKED, bool SRCALPHA>
 struct OneMinusSrcA : RGBBlender {
-	void operator()(const Color& c, Color& dst, uint8_t mask) const {
+	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderBlend<SRCALPHA>(c, dst);
 		if (MASKED) {
 			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
@@ -78,7 +78,7 @@ struct OneMinusSrcA : RGBBlender {
 
 template <bool MASKED>
 struct TintDst : RGBBlender {
-	void operator()(const Color& c, Color& dst, uint8_t mask) const {
+	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderTint(c, dst);
 		if (MASKED) {
 			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
@@ -88,7 +88,7 @@ struct TintDst : RGBBlender {
 
 template <bool MASKED>
 struct SrcRGBA : RGBBlender {
-	void operator()(const Color& c, Color& dst, uint8_t mask) const {
+	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		dst = c;
 		if (MASKED) {
 			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
@@ -128,7 +128,7 @@ public:
 		}
 	}
 
-	void operator()(const Color& src, Color& dst, uint8_t mask) const {
+	void operator()(const Color& src, Color& dst, uint8_t mask) const override {
 		if (SRCALPHA && src.a == 0) {
 			return;
 		}
@@ -236,15 +236,15 @@ struct PixelIterator : IPixelIterator
 		return static_cast<PIXEL*>(pixel);
 	}
 
-	uint8_t Channel(uint32_t mask, uint8_t shift) const {
+	uint8_t Channel(uint32_t mask, uint8_t shift) const override {
 		return ((*static_cast<PIXEL*>(pixel))&mask) >> shift;
 	}
 
-	IPixelIterator* Clone() const {
+	IPixelIterator* Clone() const override {
 		return new PixelIterator<PIXEL>(*this);
 	}
 
-	void Advance(int dx) {
+	void Advance(int dx) override {
 		if (dx == 0 || size.IsEmpty()) return;
 
 		uint8_t* ptr = static_cast<uint8_t*>(pixel);
@@ -279,7 +279,7 @@ struct PixelIterator : IPixelIterator
 		pixel = ptr;
 	}
 	
-	const Point& Position() const {
+	const Point& Position() const override {
 		return pos;
 	}
 };
@@ -304,11 +304,11 @@ struct StaticAlphaIterator : public IAlphaIterator
 
 	StaticAlphaIterator(uint8_t a) : alpha(a) {}
 
-	uint8_t operator*() const {
+	uint8_t operator*() const override {
 		return alpha;
 	}
 
-	void Advance(int) {}
+	void Advance(int) override {}
 };
 
 struct RGBAChannelIterator : public IAlphaIterator
@@ -321,11 +321,11 @@ struct RGBAChannelIterator : public IAlphaIterator
 	: mask(mask), shift(shift), pixelIt(it)
 	{}
 
-	uint8_t operator*() const {
+	uint8_t operator*() const override {
 		return pixelIt->Channel(mask, shift);
 	}
 	
-	void Advance(int amt) {
+	void Advance(int amt) override {
 		pixelIt->Advance(amt);
 	}
 };

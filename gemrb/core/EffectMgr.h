@@ -42,7 +42,7 @@ namespace GemRB {
 class GEM_EXPORT EffectMgr : public Plugin {
 public:
 	EffectMgr(void);
-	virtual ~EffectMgr(void);
+	~EffectMgr(void) override;
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 
 	/** Fills fx with Effect data loaded from the stream */

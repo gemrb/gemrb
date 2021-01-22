@@ -60,8 +60,8 @@ public:
 	MapControl(const Region& frame, AnimationFactory* af);
 
 	/** Refreshes the control after its associated variable has changed */
-	void UpdateState(unsigned int Sum);
-	bool IsAnimated() const { return true; } // map must constantly update actor positions
+	void UpdateState(unsigned int Sum) override;
+	bool IsAnimated() const override { return true; } // map must constantly update actor positions
 
 private:
 	/** Call event handler on click */
@@ -74,9 +74,9 @@ private:
 	const MapNote* MapNoteAtPoint(const Point& p) const;
 
 	Region GetViewport() const;
-	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	void DrawFog(const Region& rgn) const;
 	
 	Point ConvertPointToGame(Point) const;
@@ -84,14 +84,14 @@ private:
 	
 protected:
 	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Mouse Over Event */
-	bool OnMouseOver(const MouseEvent&);
-	bool OnMouseDrag(const MouseEvent& /*me*/);
+	bool OnMouseOver(const MouseEvent&) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 };
 
 }

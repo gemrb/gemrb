@@ -35,7 +35,7 @@ public:
 public:
 	// Public methods
 	FontManager();
-	virtual ~FontManager(void);
+	~FontManager(void) override;
 
 	virtual Font* GetFont(ieWord pxSize, FontStyle style, PaletteHolder = nullptr)=0;
 };

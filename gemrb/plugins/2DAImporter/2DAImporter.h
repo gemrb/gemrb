@@ -41,21 +41,21 @@ private:
 	char defVal[32];
 public:
 	p2DAImporter(void);
-	~p2DAImporter(void);
-	bool Open(DataStream* stream);
+	~p2DAImporter(void) override;
+	bool Open(DataStream* stream) override;
 	/** Returns the actual number of Rows in the Table */
-	inline ieDword GetRowCount() const
+	inline ieDword GetRowCount() const override
 	{
 		return ( ieDword ) rows.size();
 	}
 
-	inline ieDword GetColNamesCount() const
+	inline ieDword GetColNamesCount() const override
 	{
 		return (ieDword) colNames.size();
 	}
 
 	/** Returns the actual number of Columns in the Table */
-	inline ieDword GetColumnCount(unsigned int row = 0) const
+	inline ieDword GetColumnCount(unsigned int row = 0) const override
 	{
 		if (rows.size() <= row) {
 			return 0;
@@ -64,7 +64,7 @@ public:
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
-	inline const char* QueryField(size_t row = 0, size_t column = 0) const
+	inline const char* QueryField(size_t row = 0, size_t column = 0) const override
 	{
 		if (rows.size() <= row) {
 			return ( char * ) defVal;
@@ -79,7 +79,7 @@ public:
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		 uses column name and row name to search the field */
-	inline const char* QueryField(const char* row, const char* column) const
+	inline const char* QueryField(const char* row, const char* column) const override
 	{
 		int rowi, coli;
 
@@ -98,12 +98,12 @@ public:
 		return QueryField((unsigned int) rowi, (unsigned int) coli);
 	}
 
-	virtual const char* QueryDefault() const
+	const char* QueryDefault() const override
 	{
 		return defVal;
 	}
 
-	inline int GetRowIndex(const char* string) const
+	inline int GetRowIndex(const char* string) const override
 	{
 		for (unsigned int index = 0; index < rowNames.size(); index++) {
 			if (stricmp( rowNames[index], string ) == 0) {
@@ -113,7 +113,7 @@ public:
 		return -1;
 	}
 
-	inline int GetColumnIndex(const char* string) const
+	inline int GetColumnIndex(const char* string) const override
 	{
 		for (unsigned int index = 0; index < colNames.size(); index++) {
 			if (stricmp( colNames[index], string ) == 0) {
@@ -123,7 +123,7 @@ public:
 		return -1;
 	}
 
-	inline const char* GetColumnName(unsigned int index) const
+	inline const char* GetColumnName(unsigned int index) const override
 	{
 		if (index < colNames.size()) {
 			return colNames[index];
@@ -131,7 +131,7 @@ public:
 		return "";
 	}
 
-	inline const char* GetRowName(unsigned int index) const
+	inline const char* GetRowName(unsigned int index) const override
 	{
 		if (index < rowNames.size()) {
 			return rowNames[index];
@@ -139,7 +139,7 @@ public:
 		return "";
 	}
 
-	inline int FindTableValue(unsigned int col, long val, int start) const
+	inline int FindTableValue(unsigned int col, long val, int start) const override
 	{
 		ieDword row, max;
 		
@@ -153,7 +153,7 @@ public:
 		return -1;
 	}
 
-	inline int FindTableValue(unsigned int col, const char* val, int start) const
+	inline int FindTableValue(unsigned int col, const char* val, int start) const override
 	{
 		ieDword row, max;
 
@@ -166,13 +166,13 @@ public:
 		return -1;
 	}
 
-	inline int FindTableValue(const char* col, long val, int start) const
+	inline int FindTableValue(const char* col, long val, int start) const override
 	{
 		ieDword coli = GetColumnIndex(col);
 		return FindTableValue(coli, val, start);
 	}
 
-	inline int FindTableValue(const char* col, const char* val, int start) const
+	inline int FindTableValue(const char* col, const char* val, int start) const override
 	{
 		ieDword coli = GetColumnIndex(col);
 		return FindTableValue(coli, val, start);

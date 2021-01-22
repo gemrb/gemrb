@@ -26,10 +26,10 @@ namespace GemRB {
 class GEM_EXPORT AndroidLogger : public Logger {
 public:
 	AndroidLogger();
-	virtual ~AndroidLogger();
+	~AndroidLogger() override;
 
 protected:
-	void LogInternal(log_level, const char*, const char*, log_color);
+	void LogInternal(log_level, const char*, const char*, log_color) override;
 };
 
 Logger* createAndroidLogger();

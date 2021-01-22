@@ -42,7 +42,7 @@ public:
 	{
 		memset(&OggStream, 0, sizeof(OggStream) );
 	}
-	virtual ~OGGReader()
+	~OGGReader() override
 	{
 		Close();
 	}
@@ -50,8 +50,8 @@ public:
 	{
 		ov_clear(&OggStream);
 	}
-	bool Open(DataStream* stream);
-	int read_samples(short* buffer, int count);
+	bool Open(DataStream* stream) override;
+	int read_samples(short* buffer, int count) override;
 };
 
 }

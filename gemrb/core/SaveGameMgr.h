@@ -29,7 +29,7 @@ namespace GemRB {
 class GEM_EXPORT SaveGameMgr : public Plugin {
 public:
 	SaveGameMgr(void);
-	virtual ~SaveGameMgr(void);
+	~SaveGameMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Game* LoadGame(Game *newGame, int ver_override = 0) = 0;
 

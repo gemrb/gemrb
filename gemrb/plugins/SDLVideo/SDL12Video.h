@@ -34,7 +34,7 @@ private:
 
 public:
 	SDL12VideoDriver(void);
-	~SDL12VideoDriver();
+	~SDL12VideoDriver() override;
 	
 	int Init(void) override;
 	void SetWindowTitle(const char *title) override { SDL_WM_SetCaption(title, 0); };
@@ -104,11 +104,11 @@ public:
 		Clear();
 	}
 
-	~SDLSurfaceVideoBuffer() {
+	~SDLSurfaceVideoBuffer() override {
 		SDL_FreeSurface(buffer);
 	}
 
-	void Clear() {
+	void Clear() override {
 		if (buffer->flags & SDL_SRCCOLORKEY) {
 			SDL_FillRect(buffer, NULL, buffer->format->colorkey);
 		} else {
@@ -120,14 +120,14 @@ public:
 		return buffer;
 	}
 
-	bool RenderOnDisplay(void* display) const {
+	bool RenderOnDisplay(void* display) const override {
 		SDL_Surface* sdldisplay = static_cast<SDL_Surface*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_BlitSurface( buffer, NULL, sdldisplay, &dst );
 		return true;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
 		SDL_Surface* sprite = NULL;
 
 		// we can safely const_cast pixelBuf because the surface is destroyed before return and we dont alter it
@@ -164,13 +164,13 @@ public:
 		changed = false;
 	}
 
-	~SDLOverlayVideoBuffer() {
+	~SDLOverlayVideoBuffer() override {
 		SDL_FreeYUVOverlay(overlay);
 	}
 
-	void Clear() {}
+	void Clear() override {}
 
-	bool RenderOnDisplay(void* /*display*/) const {
+	bool RenderOnDisplay(void* /*display*/) const override {
 		if (changed) {
 			SDL_Rect dest = RectFromRegion(rect);
 			SDL_DisplayYUVOverlay(overlay, &dest);
@@ -190,7 +190,7 @@ public:
 		return false;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
 		va_list args;
 		va_start(args, pitch);
 

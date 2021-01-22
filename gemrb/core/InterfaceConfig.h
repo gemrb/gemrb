@@ -56,7 +56,7 @@ private:
 
 public:
 	CFGConfig(int argc, char *argv[]);
-	~CFGConfig();
+	~CFGConfig() override;
 
 	bool IsValidConfig() {return isValid;};
 };

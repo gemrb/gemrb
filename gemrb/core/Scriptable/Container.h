@@ -39,7 +39,7 @@ namespace GemRB {
 class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
-	~Container(void);
+	~Container(void) override;
 	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();

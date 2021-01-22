@@ -32,12 +32,12 @@ public:
 	ViewScriptingRef(View* view, ScriptingId id, ResRef group)
 	: ScriptingRef(view, id), group(group) {}
 
-	const ResRef& ScriptingGroup() const {
+	const ResRef& ScriptingGroup() const override {
 		return group;
 	}
 
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() const {
+	const ScriptingClassId ScriptingClass() const override {
 		return {"View"};
 	};
 
@@ -56,12 +56,12 @@ public:
 	: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() const {
+	const ScriptingClassId ScriptingClass() const override {
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
 
-	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+	ViewScriptingRef* Clone(ScriptingId id, ResRef group) const override {
 		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
 	}
 };
@@ -74,7 +74,7 @@ public:
 	: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const {
+	const ScriptingClassId ScriptingClass() const override {
 		Control* ctrl = static_cast<Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
@@ -94,7 +94,7 @@ public:
 		}
 	};
 
-	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+	ViewScriptingRef* Clone(ScriptingId id, ResRef group) const override {
 		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
 	}
 };

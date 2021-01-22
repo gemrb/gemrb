@@ -37,14 +37,14 @@ private:
 
 public:
 	EFFImporter(void);
-	~EFFImporter(void);
+	~EFFImporter(void) override;
 	// We need this autoFree, since Effects are included inline
 	// in other file types, without a size header.
-	bool Open(DataStream* stream, bool autoFree = true);
-	Effect* GetEffect(Effect *fx);
-	Effect* GetEffectV1(Effect *fx);
-	Effect* GetEffectV20(Effect *fx);
-	void PutEffectV2(DataStream *stream, const Effect *fx); // used in the area and cre importer
+	bool Open(DataStream* stream, bool autoFree = true) override;
+	Effect* GetEffect(Effect *fx) override;
+	Effect* GetEffectV1(Effect *fx) override;
+	Effect* GetEffectV20(Effect *fx) override;
+	void PutEffectV2(DataStream *stream, const Effect *fx) override; // used in the area and cre importer
 };
 
 

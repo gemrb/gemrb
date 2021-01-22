@@ -26,7 +26,7 @@ namespace GemRB {
 class GEM_EXPORT MappedFileMemoryStream : public MemoryStream {
 	public:
 		explicit MappedFileMemoryStream(const std::string& fileName);
-		~MappedFileMemoryStream();
+		~MappedFileMemoryStream() override;
 
 		bool isOk() const;
 

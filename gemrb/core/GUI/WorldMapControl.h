@@ -55,14 +55,14 @@ class WorldMapControl;
 class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region&);
+	void DrawSelf(Region drawFrame, const Region&) override;
 
 public:
 	WorldMapControl(const Region& frame, const char *fontname, int direction);
 
 	/** Allows modification of the scrolling factor from outside */
-	void ScrollDelta(const Point& delta);
-	void ScrollTo(const Point& pos);
+	void ScrollDelta(const Point& delta) override;
+	void ScrollTo(const Point& pos) override;
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
 	/** Set color for one type of area labels */
@@ -74,18 +74,18 @@ public:
 
 protected:
 	/** Mouse Over Event */
-	bool OnMouseOver(const MouseEvent& /*me*/);
-	bool OnMouseDrag(const MouseEvent& /*me*/);
+	bool OnMouseOver(const MouseEvent& /*me*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 	/** Mouse Leave Event */
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Wheel Event */
-	bool OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta) override;
 
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 
 private:
 	//font for printing area names

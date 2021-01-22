@@ -32,10 +32,10 @@ namespace GemRB {
 class SAVImporter : public ArchiveImporter {
 public:
 	SAVImporter(void);
-	~SAVImporter(void);
-	int DecompressSaveGame(DataStream *compressed);
-	int AddToSaveGame(DataStream *str, DataStream *uncompressed);
-	int CreateArchive(DataStream *compressed);
+	~SAVImporter(void) override;
+	int DecompressSaveGame(DataStream *compressed) override;
+	int AddToSaveGame(DataStream *str, DataStream *uncompressed) override;
+	int CreateArchive(DataStream *compressed) override;
 };
 
 }

@@ -68,11 +68,11 @@ protected:
 
 public:
 	OpenALSoundHandle(AudioStream *p) : parent(p) { }
-	virtual ~OpenALSoundHandle() { }
-	virtual void SetPos(int XPos, int YPos);
-	virtual bool Playing();
-	virtual void Stop();
-	virtual void StopLooping();
+	~OpenALSoundHandle() override { }
+	void SetPos(int XPos, int YPos) override;
+	bool Playing() override;
+	void Stop() override;
+	void StopLooping() override;
 	void Invalidate() { parent = 0; }
 };
 
@@ -102,32 +102,32 @@ struct CacheEntry {
 class OpenALAudioDriver : public Audio {
 public:
 	OpenALAudioDriver(void);
-	~OpenALAudioDriver(void);
+	~OpenALAudioDriver(void) override;
 	void PrintDeviceList();
-	bool Init(void);
+	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 					int XPos, int YPos, unsigned int flags = 0,
-					unsigned int *length = 0);
-	void UpdateVolume(unsigned int flags);
-	bool CanPlay();
-	void ResetMusics();
-	bool Play();
-	bool Stop();
-	bool Pause();
-	bool Resume();
-	int CreateStream(Holder<SoundMgr>);
-	void UpdateListenerPos(int XPos, int YPos );
-	void GetListenerPos( int &XPos, int &YPos );
-	bool ReleaseStream(int stream, bool HardStop);
+					unsigned int *length = 0) override;
+	void UpdateVolume(unsigned int flags) override;
+	bool CanPlay() override;
+	void ResetMusics() override;
+	bool Play() override;
+	bool Stop() override;
+	bool Pause() override;
+	bool Resume() override;
+	int CreateStream(Holder<SoundMgr>) override;
+	void UpdateListenerPos(int XPos, int YPos ) override;
+	void GetListenerPos( int &XPos, int &YPos ) override;
+	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
-					ieWord gain, bool point, int ambientRange);
-	int QueueAmbient(int stream, const char* sound);
-	void SetAmbientStreamVolume(int stream, int volume);
-	void SetAmbientStreamPitch(int stream, int pitch);
+					ieWord gain, bool point, int ambientRange) override;
+	int QueueAmbient(int stream, const char* sound) override;
+	void SetAmbientStreamVolume(int stream, int volume) override;
+	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
-				int size, int samplerate);
-	void UpdateMapAmbient(MapReverb&);
+				int size, int samplerate) override;
+	void UpdateMapAmbient(MapReverb&) override;
 private:
 	int QueueALBuffer(ALuint source, ALuint buffer);
 

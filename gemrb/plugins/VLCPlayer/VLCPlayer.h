@@ -57,14 +57,14 @@ private:
 	static unsigned setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines);
 
 private:
-	bool DecodeFrame(VideoBuffer&);
+	bool DecodeFrame(VideoBuffer&) override;
 	void DestroyPlayer();
 
 public:
 	VLCPlayer();
-	~VLCPlayer();
+	~VLCPlayer() override;
 
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 };
 
 }

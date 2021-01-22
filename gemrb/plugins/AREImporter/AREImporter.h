@@ -62,13 +62,13 @@ private:
 	ieByte AreaDifficulty;
 public:
 	AREImporter(void);
-	~AREImporter(void);
-	bool Open(DataStream* stream);
-	bool ChangeMap(Map *map, bool day_or_night);
-	Map* GetMap(const char* ResRef, bool day_or_night);
-	int GetStoredFileSize(Map *map);
+	~AREImporter(void) override;
+	bool Open(DataStream* stream) override;
+	bool ChangeMap(Map *map, bool day_or_night) override;
+	Map* GetMap(const char* ResRef, bool day_or_night) override;
+	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
-	int PutArea(DataStream *stream, Map *map);
+	int PutArea(DataStream *stream, Map *map) override;
 private:
 	void AdjustPSTFlags(AreaAnimation*);
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);

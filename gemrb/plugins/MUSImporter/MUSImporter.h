@@ -58,24 +58,24 @@ private:
 	void PlayMusic(char* name);
 public:
 	MUSImporter();
-	~MUSImporter();
+	~MUSImporter() override;
 	/** Loads a PlayList for playing */
-	bool OpenPlaylist(const char* name);
+	bool OpenPlaylist(const char* name) override;
 	/** Initializes the PlayList Manager */
-	bool Init();
+	bool Init() override;
 	/** Switches the current PlayList while playing the current one */
-	int SwitchPlayList(const char* name, bool Hard);
+	int SwitchPlayList(const char* name, bool Hard) override;
 	/** Ends the Current PlayList Execution */
-	void End();
-	void HardEnd();
+	void End() override;
+	void HardEnd() override;
 	/** Start the PlayList Music Execution */
-	void Start();
+	void Start() override;
 	/** Plays the Next Entry */
-	void PlayNext();
+	void PlayNext() override;
 	/** Returns whether music is currently playing */
-	bool IsPlaying() { return Playing; }
+	bool IsPlaying() override { return Playing; }
 	/** Returns whether given playlist is currently loaded */
-	bool CurrentPlayList(const char* name);
+	bool CurrentPlayList(const char* name) override;
 };
 
 }

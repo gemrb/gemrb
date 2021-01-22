@@ -33,7 +33,7 @@ protected:
 	char *data;
 public:
 	MemoryStream(const char *name, void* data, unsigned long size);
-	~MemoryStream();
+	~MemoryStream() override;
 	DataStream* Clone() override;
 
 	int Read(void* dest, unsigned int length) override;

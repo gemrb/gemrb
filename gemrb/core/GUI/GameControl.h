@@ -153,7 +153,7 @@ private:
 	void HandleDoor(Door *door, Actor *actor);
 	
 	void UpdateCursor();
-	bool IsDisabledCursor() const;
+	bool IsDisabledCursor() const override;
 
 	void PerformSelectedAction(const Point& p);
 	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false);
@@ -163,18 +163,18 @@ private:
 	bool OnGlobalMouseMove(const Event&);
 
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
-	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	
-	bool CanLockFocus() const { return true; };
-	void FlagsChanged(unsigned int /*oldflags*/);
+	bool CanLockFocus() const override { return true; };
+	void FlagsChanged(unsigned int /*oldflags*/) override;
 
 public:
 	GameControl(const Region& frame);
-	~GameControl(void);
+	~GameControl(void) override;
 
 	// GameControl always needs to redraw unless we arent in a game (disabled)
-	bool IsAnimated() const { return !IsDisabled(); }
+	bool IsAnimated() const override { return !IsDisabled(); }
 	void DrawTargetReticle(int size, const Color& color, const Point& p) const;
 	/** Draws the target reticle for Actor movement. */
 	void DrawTargetReticle(const Movable* target, const Point& point) const;
@@ -183,7 +183,7 @@ public:
 	void SetTracker(Actor *actor, ieDword dist);
 
 	void DrawTooltip(const Point& p) const;
-	String TooltipText() const;
+	String TooltipText() const override;
 
 	void SetTargetMode(int mode);
 	int GetTargetMode() { return target_mode; }
@@ -216,7 +216,7 @@ public:
 
 	// returns the default cursor fitting the targeting mode
 	Holder<Sprite2D> GetTargetActionCursor() const;
-	Holder<Sprite2D> Cursor() const;
+	Holder<Sprite2D> Cursor() const override;
 
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, const Point& p);
 
@@ -244,27 +244,27 @@ public:
 protected:
 	//Events
 	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Key Release Event */
-	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod);
+	bool OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Mouse Over Event */
-	bool OnMouseOver(const MouseEvent&);
-	bool OnMouseDrag(const MouseEvent& /*me*/);
+	bool OnMouseOver(const MouseEvent&) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 
-	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/);
-	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/);
-	bool OnTouchGesture(const GestureEvent& gesture);
+	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	bool OnTouchGesture(const GestureEvent& gesture) override;
 
 	/** Currently only deals with the GEM_TAB exception */
 	bool DispatchEvent(const Event& event);
 	
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
-	bool OnMouseWheelScroll(const Point& delta);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
+	bool OnMouseWheelScroll(const Point& delta) override;
 	
-	bool OnControllerButtonDown(const ControllerEvent& ce);
+	bool OnControllerButtonDown(const ControllerEvent& ce) override;
 };
 
 }

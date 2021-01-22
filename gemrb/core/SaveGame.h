@@ -37,7 +37,7 @@ public:
 	static const TypeID ID;
 public:
 	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
-	~SaveGame();
+	~SaveGame() override;
 	int GetPortraitCount() const
 	{
 		return PortraitCount;

@@ -31,11 +31,11 @@ private:
 	ieDword BlockSize, PalOffset;
 public:
 	MOSImporter(void);
-	~MOSImporter(void);
-	bool Open(DataStream* stream);
-	Holder<Sprite2D> GetSprite2D();
-	int GetWidth() { return (int) Width; }
-	int GetHeight() { return (int) Height; }
+	~MOSImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Holder<Sprite2D> GetSprite2D() override;
+	int GetWidth() override { return (int) Width; }
+	int GetHeight() override { return (int) Height; }
 };
 
 }

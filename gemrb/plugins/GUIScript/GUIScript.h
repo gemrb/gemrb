@@ -63,22 +63,22 @@ private:
 
 public:
 	GUIScript(void);
-	~GUIScript(void);
+	~GUIScript(void) override;
 	/** Initialization Routine */
-	bool Init(void);
+	bool Init(void) override;
 	/** Autodetect GameType */
 	bool Autodetect(void);
 	/** Load Script */
-	bool LoadScript(const char* filename);
+	bool LoadScript(const char* filename) override;
 	/** Run Function */
-	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true);
+	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
 	// TODO: eleminate these RunFunction variants.
-	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1);
-	bool RunFunction(const char *module, const char* fname, bool report_error, Point param);
+	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1) override;
+	bool RunFunction(const char *module, const char* fname, bool report_error, Point param) override;
 	/** Exec a single File */
 	bool ExecFile(const char* file);
 	/** Exec a single String */
-	bool ExecString(const char* string, bool feedback=false);
+	bool ExecString(const char* string, bool feedback=false) override;
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
 
 	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);

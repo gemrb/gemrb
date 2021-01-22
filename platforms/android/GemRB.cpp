@@ -34,12 +34,12 @@
 // pause audio playing if app goes in background
 static void appPutToBackground()
 {
-  core->GetAudioDrv()->Pause();
+  GemRB::core->GetAudioDrv()->Pause();
 }
 // resume audio playing if app return to foreground
 static void appPutToForeground()
 {
-  core->GetAudioDrv()->Resume();
+  GemRB::core->GetAudioDrv()->Resume();
 }
 
 #endif

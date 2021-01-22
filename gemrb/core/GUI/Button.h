@@ -114,17 +114,17 @@ enum BUTTON_IMAGE_TYPE {
 class GEM_EXPORT Button : public Control {
 public:
 	Button(Region& frame);
-	~Button();
+	~Button() override;
 
-	bool IsAnimated() const;
-	bool IsOpaque() const;
+	bool IsAnimated() const override;
+	bool IsOpaque() const override;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
 	void SetImage(BUTTON_IMAGE_TYPE, Holder<Sprite2D> img);
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Sets the Picture */
 	void SetPicture(Holder<Sprite2D> Picture);
 	/** Clears the list of Pictures */
@@ -140,17 +140,17 @@ public:
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
 
-	String QueryText() const { return Text; }
-	String TooltipText() const;
+	String QueryText() const override { return Text; }
+	String TooltipText() const override;
 
-	bool AcceptsDragOperation(const DragOp&) const;
-	void CompleteDragOperation(const DragOp&);
-	Holder<Sprite2D> DragCursor() const;
+	bool AcceptsDragOperation(const DragOp&) const override;
+	void CompleteDragOperation(const DragOp&) override;
+	Holder<Sprite2D> DragCursor() const override;
 
-	Holder<Sprite2D> Cursor() const;
+	Holder<Sprite2D> Cursor() const override;
 
 	/** Refreshes the button from a radio group */
-	void UpdateState(unsigned int Sum);
+	void UpdateState(unsigned int Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */
@@ -203,24 +203,24 @@ private: // Private attributes
 	void UnregisterHotKey();
 
 	bool HandleHotKey(const Event&);
-	bool HitTest (const Point&) const;
+	bool HitTest (const Point&) const override;
 	void DoToggle();
 
-	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	
 protected:
 	/** Mouse Enter */
-	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*);
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
 	/** Mouse Leave */
-	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*);
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
 	/** Mouse Over */
-	bool OnMouseOver(const MouseEvent&);
+	bool OnMouseOver(const MouseEvent&) override;
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 };
 
 }
