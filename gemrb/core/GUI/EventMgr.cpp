@@ -57,11 +57,11 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 {
 	Point p = EventMgr::MousePos();
-	
+
 	MouseEvent me;
 	me.x = p.x;
 	me.y = p.y;
-	
+
 	if (ce.axis % 2) {
 		me.deltaX = ce.axisDelta;
 		me.deltaY = 0;
@@ -69,7 +69,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 		me.deltaX = 0;
 		me.deltaY = ce.axisDelta;
 	}
-	
+
 	EventButton btn = 0;
 	switch (ce.button) {
 		case CONTROLLER_BUTTON_A:
@@ -92,7 +92,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 {
 	KeyboardEvent ke;
-	
+
 	// TODO: probably want more than the DPad
 	switch (ce.button) {
 		case CONTROLLER_BUTTON_DPAD_UP:
@@ -111,7 +111,7 @@ KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 			ke.keycode = 0;
 			break;
 	}
-	
+
 	return ke;
 }
 
@@ -159,7 +159,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		static unsigned long lastKeyDown = 0;
 		static unsigned char repeatCount = 0;
 		static KeyboardKey repeatKey = 0;
-		
+
 		if (e.type == Event::KeyDown) {
 			if (e.keyboard.keycode == repeatKey && e.time <= lastKeyDown + DPDelay) {
 				repeatCount++;
@@ -196,7 +196,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		controllerButtonStates = e.controller.buttonStates;
 	} else if (e.isScreen) {
 		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
-										   | Event::TouchUpMask | Event::TouchDownMask)
+									    | Event::TouchUpMask | Event::TouchDownMask)
 		) {
 			// WARNING: these are shared between mouse and touch
 			// it is assumed we wont be using both simultaniously
@@ -451,11 +451,14 @@ Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, floa
 Event EventMgr::CreateTextEvent(const char* text)
 {
 	Event e = {};
-	String* string = StringFromCString(text);
+	char *str = ConvertCharEncoding(text, "UTF-8", core->TLKEncoding.encoding.c_str());
+	String* string = StringFromCString(str);
+
 	if (string) {
 		e = EventMgr::CreateTextEvent(*string);
 	}
 	delete string;
+	free(str);
 
 	return e;
 }
@@ -484,7 +487,7 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 {
 	Event e = {};
 	e.controller.buttonStates = controllerButtonStates.to_ulong();
-	
+
 	if (down) {
 		e.type = Event::ControllerButtonDown;
 		e.controller.buttonStates |= btn;
@@ -493,7 +496,7 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 		e.controller.buttonStates &= ~btn;
 	}
 	e.controller.button = btn;
-	
+
 	return e;
 }
 
