@@ -65,7 +65,7 @@ inline int GetModState(int modstate)
 class SDLVideoDriver : public Video {
 public:
 	SDLVideoDriver(void);
-	virtual ~SDLVideoDriver(void);
+	~SDLVideoDriver(void) override;
 	int Init(void) override;
 
 	Holder<Sprite2D> CreateSprite(const Region& rgn, int bpp, ieDword rMask,

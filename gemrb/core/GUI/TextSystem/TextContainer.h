@@ -182,7 +182,7 @@ protected:
 
 public:
 	ContentContainer(const Region& frame);
-	virtual ~ContentContainer();
+	~ContentContainer() override;
 
 	// append a container to the end of the container. The container takes ownership of the span.
 	virtual void AppendContent(Content* content);
@@ -207,7 +207,7 @@ public:
 	inline void SetMargin(ieByte top) { SetMargin(top, top, top, top); }
 
 protected:
-	void SubviewAdded(View* view, View* parent);
+	void SubviewAdded(View* view, View* parent) override;
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
@@ -217,16 +217,16 @@ protected:
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
 
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	virtual void DrawContents(const Layout& layout, Point point);
 	
-	void SizeChanged(const Size& oldSize);
+	void SizeChanged(const Size& oldSize) override;
 
 private:
 	virtual void ContentRemoved(const Content* /*content*/) {};
 	
-	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
-	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
@@ -245,7 +245,7 @@ private:
 private:
 	String TextFrom(ContentList::const_iterator) const;
 
-	void ContentRemoved(const Content* content);
+	void ContentRemoved(const Content* content) override;
 
 	void MoveCursorToPoint(const Point& p);
 	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
@@ -254,16 +254,16 @@ private:
 	void InsertText(const String& text);
 	void DeleteText(size_t len);
 
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	bool OnMouseDrag(const MouseEvent& /*me*/);
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
-	void OnTextInput(const TextEvent& /*te*/);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
-	void DrawSelf(Region drawFrame, const Region& clip);
-	virtual void DrawContents(const Layout& layout, Point point);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawContents(const Layout& layout, Point point) override;
 
 	virtual bool Editable() const { return IsReceivingEvents(); }
-	void SizeChanged(const Size& oldSize);
+	void SizeChanged(const Size& oldSize) override;
 
 	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
 	ContentIndex FindContentForChar(size_t idx);
@@ -276,8 +276,8 @@ public:
 	String TextFrom(const Content*) const;
 	String Text() const;
 
-	void DidFocus();
-	void DidUnFocus();
+	void DidFocus() override;
+	void DidUnFocus() override;
 
 	void SetPalette(Holder<Palette> pal);
 	Holder<Palette> TextPalette() const { return palette; }

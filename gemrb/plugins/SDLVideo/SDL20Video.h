@@ -100,12 +100,12 @@ public:
 		Clear();
 	}
 
-	~SDLTextureVideoBuffer() {
+	~SDLTextureVideoBuffer() override {
 		SDL_DestroyTexture(texture);
 		SDL_FreeSurface(conversionBuffer);
 	}
 
-	void Clear() {
+	void Clear() override {
 		SDL_SetRenderTarget(renderer, texture);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
 #if SDL_COMPILEDVERSION == SDL_VERSIONNUM(2, 0, 10)
@@ -119,7 +119,7 @@ public:
 		SDL_RenderClear(renderer);
 	}
 
-	bool RenderOnDisplay(void* display) const {
+	bool RenderOnDisplay(void* display) const override {
 		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);
 		SDL_Rect dst = RectFromRegion(rect);
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
@@ -130,7 +130,7 @@ public:
 		return true;
 	}
 
-	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) {
+	void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) override {
 		int sdlpitch = bufDest.w * SDL_BYTESPERPIXEL(nativeFormat);
 		SDL_Rect dest = RectFromRegion(bufDest);
 
@@ -212,7 +212,7 @@ private:
 
 public:
 	SDL20VideoDriver(void);
-	~SDL20VideoDriver(void);
+	~SDL20VideoDriver(void) override;
 
 	int Init() override;
 

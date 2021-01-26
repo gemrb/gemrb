@@ -75,7 +75,7 @@ public:
 	virtual void SetPos(int XPos, int YPos) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
-	virtual ~SoundHandle();
+	~SoundHandle() override;
 };
 
 class GEM_EXPORT Channel {
@@ -101,7 +101,7 @@ public:
 	static const TypeID ID;
 public:
 	Audio(void);
-	virtual ~Audio();
+	~Audio() override;
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 				int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) = 0;

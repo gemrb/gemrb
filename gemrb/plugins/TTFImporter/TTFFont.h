@@ -38,10 +38,10 @@ private:
 
 public:
 	TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline);
-	~TTFFont(void);
+	~TTFFont(void) override;
 
-	const Glyph& GetGlyph(ieWord chr) const;
-	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const;
+	const Glyph& GetGlyph(ieWord chr) const override;
+	int GetKerningOffset(ieWord leftChr, ieWord rightChr) const override;
 };
 
 }

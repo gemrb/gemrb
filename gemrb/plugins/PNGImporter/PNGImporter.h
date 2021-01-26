@@ -35,13 +35,13 @@ private:
 	bool hasPalette;
 public:
 	PNGImporter(void);
-	~PNGImporter(void);
+	~PNGImporter(void) override;
 	void Close();
-	bool Open(DataStream* stream);
-	Holder<Sprite2D> GetSprite2D();
-	int GetPalette(int colors, Color* pal);
-	int GetWidth() { return (int) Width; }
-	int GetHeight() { return (int) Height; }
+	bool Open(DataStream* stream) override;
+	Holder<Sprite2D> GetSprite2D() override;
+	int GetPalette(int colors, Color* pal) override;
+	int GetWidth() override { return (int) Width; }
+	int GetHeight() override { return (int) Height; }
 };
 
 }

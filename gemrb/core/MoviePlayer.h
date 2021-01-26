@@ -94,7 +94,7 @@ protected:
 
 public:
 	MoviePlayer(void);
-	virtual ~MoviePlayer(void);
+	~MoviePlayer(void) override;
 
 	Size Dimensions() { return movieSize; }
 	void Play(Window* win);
@@ -110,9 +110,9 @@ class MoviePlayerControls : public View {
 
 private:
 	// currently dont have any real controls
-	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {}
+	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) override {}
 	
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) {
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override {
 		KeyboardKey keycode = Key.keycode;
 		switch (keycode) {
 			case 's':
@@ -126,7 +126,7 @@ private:
 		return true;
 	}
 	
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) {
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override {
 		player.Stop();
 		return true;
 	}

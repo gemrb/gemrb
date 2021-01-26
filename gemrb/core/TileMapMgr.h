@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT TileMapMgr : public Plugin {
 public:
 	TileMapMgr(void);
-	virtual ~TileMapMgr(void);
+	~TileMapMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,

@@ -44,8 +44,8 @@ public:
 	{
 	}
 
-	bool Open(DataStream* stream);
-	virtual int read_samples(short* buffer, int count);
+	bool Open(DataStream* stream) override;
+	int read_samples(short* buffer, int count) override;
 };
 
 // WAV files
@@ -55,7 +55,7 @@ public:
 		: RawPCMReader( 16 )
 	{
 	}
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 };
 
 }

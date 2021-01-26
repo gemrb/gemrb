@@ -136,14 +136,14 @@ private:
 	DataStream *GetStream(const char *resname, ieWord type);
 public:
 	KEYImporter(void);
-	~KEYImporter(void);
-	bool Open(const char *file, const char *desc);
+	~KEYImporter(void) override;
+	bool Open(const char *file, const char *desc) override;
 	/* predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type);
-	bool HasResource(const char* resname, const ResourceDesc &type);
+	bool HasResource(const char* resname, SClass_ID type) override;
+	bool HasResource(const char* resname, const ResourceDesc &type) override;
 	/* returns resource */
-	DataStream* GetResource(const char* resname, SClass_ID type);
-	DataStream* GetResource(const char* resname, const ResourceDesc &type);
+	DataStream* GetResource(const char* resname, SClass_ID type) override;
+	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
 };
 
 }

@@ -31,9 +31,9 @@ private:
 	void* pixels;
 public:
 	PLTImporter(void);
-	~PLTImporter(void);
-	bool Open(DataStream* stream);
-	Holder<Sprite2D> GetSprite2D(unsigned int type, ieDword col[8]);
+	~PLTImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Holder<Sprite2D> GetSprite2D(unsigned int type, ieDword col[8]) override;
 };
 
 }

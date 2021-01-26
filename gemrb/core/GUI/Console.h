@@ -57,15 +57,15 @@ private:
 
 public:
 	Console(const Region& frame, TextArea* ta);
-	~Console();
+	~Console() override;
 
 	/** Sets the Text of the current control */
 	void SetText(const String& string);
 	bool SetEvent(int eventType, ControlEventHandler handler);
 	bool Execute(const String&);
 
-	void DidFocus() { textContainer.DidFocus(); }
-	void DidUnFocus() { textContainer.DidUnFocus(); }
+	void DidFocus() override { textContainer.DidFocus(); }
+	void DidUnFocus() override { textContainer.DidUnFocus(); }
 
 private:
 	void UpdateTextArea();
@@ -76,9 +76,9 @@ private:
 	
 protected:
 	/** Key Press Event */
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	void OnTextInput(const TextEvent& /*te*/);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 };
 
 }

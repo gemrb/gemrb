@@ -30,19 +30,19 @@ namespace GemRB {
 
 		class ContentView : public View {
 		private:
-			void SizeChanged(const Size& /* oldsize */);
+			void SizeChanged(const Size& /* oldsize */) override;
 			
-			void SubviewAdded(View* view, View* parent);
-			void SubviewRemoved(View* view, View* parent);
+			void SubviewAdded(View* view, View* parent) override;
+			void SubviewRemoved(View* view, View* parent) override;
 			
-			void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
-			void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/);
+			void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+			void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 			
 		public:
 			ContentView(const Region& frame)
 			: View(frame) {}
 			
-			bool CanLockFocus() const { return false; }
+			bool CanLockFocus() const override { return false; }
 			// TODO: this should be private and happen automatically
 			void ResizeToSubviews();
 		};
@@ -70,7 +70,7 @@ namespace GemRB {
 
 	public:
 		ScrollView(const Region& frame);
-		~ScrollView();
+		~ScrollView() override;
 		
 		bool IsAnimated() const override { return animation; }
 

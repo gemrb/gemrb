@@ -28,10 +28,10 @@ namespace GemRB {
 class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
-	~InfoPoint(void);
+	~InfoPoint(void) override;
 	//returns true if trap has been triggered, tumble skill???
 	void SetEnter(const char *resref);
-	bool TriggerTrap(int skill, ieDword ID);
+	bool TriggerTrap(int skill, ieDword ID) override;
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);
   //returns true if
@@ -39,9 +39,9 @@ public:
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void dump() const;
-	int TrapResets() const { return Flags & TRAP_RESET; }
-	bool CanDetectTrap() const;
-	bool PossibleToSeeTrap() const;
+	int TrapResets() const override { return Flags & TRAP_RESET; }
+	bool CanDetectTrap() const override;
+	bool PossibleToSeeTrap() const override;
 	bool IsPortal() const;
 
 public:

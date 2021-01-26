@@ -50,7 +50,7 @@ protected:
 public:
 	GUIFactory()
 	: winmgr(NULL) {};
-	virtual ~GUIFactory() {};
+	~GUIFactory() override {};
 
 	void SetWindowManager(WindowManager& mgr) { winmgr = &mgr; }
 

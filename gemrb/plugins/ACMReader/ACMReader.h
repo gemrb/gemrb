@@ -51,7 +51,7 @@ public:
 		samples_ready( 0 ), unpacker( NULL ), decoder( NULL )
 	{
 	}
-	virtual ~ACMReader()
+	~ACMReader() override
 	{
 		Close();
 	}
@@ -68,8 +68,8 @@ public:
 		}
 	}
 
-	bool Open(DataStream* stream);
-	virtual int read_samples(short* buffer, int count);
+	bool Open(DataStream* stream) override;
+	int read_samples(short* buffer, int count) override;
 };
 
 }

@@ -127,7 +127,7 @@ protected:
 	DataStream* str;
 public:
 	Resource();
-	virtual ~Resource();
+	~Resource() override;
 	/**
 	 * Reads the resource from the given stream.
 	 *

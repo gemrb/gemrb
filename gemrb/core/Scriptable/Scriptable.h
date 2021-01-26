@@ -494,7 +494,7 @@ public:
 		randomBackoff--;
 	}
 	Movable(ScriptableType type);
-	virtual ~Movable(void);
+	~Movable(void) override;
 	Point Destination;
 	ieResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
@@ -544,7 +544,7 @@ public:
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
-	void Stop();
+	void Stop() override;
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */

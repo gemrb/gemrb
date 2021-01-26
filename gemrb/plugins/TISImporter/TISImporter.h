@@ -34,10 +34,10 @@ private:
 	ieDword TileSize = 0;
 public:
 	TISImporter(void);
-	~TISImporter(void);
-	bool Open(DataStream* stream);
+	~TISImporter(void) override;
+	bool Open(DataStream* stream) override;
 	Tile* GetTile(unsigned short* indexes, int count,
-		unsigned short* secondary = NULL);
+		unsigned short* secondary = NULL) override;
 	Holder<Sprite2D> GetTile(int index);
 public:
 };

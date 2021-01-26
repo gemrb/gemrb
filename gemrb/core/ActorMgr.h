@@ -31,7 +31,7 @@ class DataStream;
 class GEM_EXPORT ActorMgr : public Plugin {
 public:
 	ActorMgr(void);
-	virtual ~ActorMgr(void);
+	~ActorMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Actor* GetActor(unsigned char is_in_party) = 0;
   virtual int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const = 0;

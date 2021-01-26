@@ -420,7 +420,7 @@ private:
 
 public:
 	Map(void);
-	~Map(void);
+	~Map(void) override;
 	static void ReleaseMemory();
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 

@@ -71,8 +71,8 @@ public:
 	}
 
 private:
-	Point GenerateNext(unsigned long time);
-	bool HasEnded() const;
+	Point GenerateNext(unsigned long time) override;
+	bool HasEnded() const override;
 };
 
 class ColorCycle {
@@ -120,8 +120,8 @@ public:
 	}
 
 private:
-	Color GenerateNext(unsigned long time);
-	bool HasEnded() const;
+	Color GenerateNext(unsigned long time) override;
+	bool HasEnded() const override;
 };
 
 }

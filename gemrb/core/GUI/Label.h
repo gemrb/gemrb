@@ -49,15 +49,15 @@ using PaletteHolder = Holder<Palette>;
 class GEM_EXPORT Label : public Control {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 
 public: 
 	Label(const Region& frame, Font* font, const String& string);
-	~Label();
+	~Label() override;
 
 	/** This function sets the actual Label Text */
 	using Control::SetText;
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Sets the Foreground Font Color */
 	void SetColor(Color col, Color bac);
 	/** Set the font being used */
@@ -65,7 +65,7 @@ public:
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
 	/** Simply returns the pointer to the text, don't modify it! */
-	String QueryText() const;
+	String QueryText() const override;
 
 private: // Private attributes
 	/** Text String Buffer */

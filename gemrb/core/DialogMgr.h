@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT DialogMgr : public Plugin {
 public:
 	DialogMgr(void);
-	virtual ~DialogMgr(void);
+	~DialogMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Dialog* GetDialog() const = 0;
 	virtual Condition* GetCondition(char *string) const = 0;

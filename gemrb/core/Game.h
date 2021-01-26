@@ -246,7 +246,7 @@ typedef int CRRow[MAX_CRLEVEL];
 class GEM_EXPORT Game : public Scriptable {
 public:
 	Game(void);
-	~Game(void);
+	~Game(void) override;
 private:
 	std::vector< Actor*> PCs;
 	std::vector< Actor*> NPCs;

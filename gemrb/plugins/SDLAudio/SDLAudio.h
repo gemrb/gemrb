@@ -46,28 +46,28 @@ struct CacheEntry {
 class SDLAudio : public Audio {
 public:
 	SDLAudio(void);
-	~SDLAudio(void);
-	bool Init(void);
+	~SDLAudio(void) override;
+	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
-	int CreateStream(Holder<SoundMgr>);
-	bool Play();
-	bool Stop();
-	bool Pause() { return true; } /*not implemented*/
-	bool Resume() { return true; } /*not implemented*/
-	bool CanPlay();
-	void ResetMusics();
-	void UpdateListenerPos(int XPos, int YPos);
-	void GetListenerPos(int& XPos, int& YPos);
-	void UpdateVolume(unsigned int) {}
+		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) override;
+	int CreateStream(Holder<SoundMgr>) override;
+	bool Play() override;
+	bool Stop() override;
+	bool Pause() override { return true; } /*not implemented*/
+	bool Resume() override { return true; } /*not implemented*/
+	bool CanPlay() override;
+	void ResetMusics() override;
+	void UpdateListenerPos(int XPos, int YPos) override;
+	void GetListenerPos(int& XPos, int& YPos) override;
+	void UpdateVolume(unsigned int) override {}
 
-	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange);
-	int QueueAmbient(int stream, const char* sound);
-	bool ReleaseStream(int stream, bool hardstop);
-	void SetAmbientStreamVolume(int stream, int gain);
-	void SetAmbientStreamPitch(int stream, int pitch);
+	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;
+	int QueueAmbient(int stream, const char* sound) override;
+	bool ReleaseStream(int stream, bool hardstop) override;
+	void SetAmbientStreamVolume(int stream, int gain) override;
+	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits, int channels,
-				short* memory, int size, int samplerate);
+				short* memory, int size, int samplerate) override;
 
 private:
 	void FreeBuffers();

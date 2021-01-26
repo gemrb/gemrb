@@ -65,21 +65,21 @@ private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
 	int AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const;
 	void ReadWallPolygons();
-	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const;
+	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
 
 public:
 	WEDImporter(void);
-	~WEDImporter(void);
-	bool Open(DataStream* stream);
+	~WEDImporter(void) override;
+	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it
-	TileMap* GetTileMap(TileMap *tm) const;
-	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
+	TileMap* GetTileMap(TileMap *tm) const override;
+	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed) override;
 
-	std::vector<WallPolygonGroup> GetWallGroups() const;
+	std::vector<WallPolygonGroup> GetWallGroups() const override;
 
-	WallPolygonGroup OpenDoorPolygons() const;
-	WallPolygonGroup ClosedDoorPolygons() const;
-	void SetExtendedNight(bool night) { ExtendedNight = night; }
+	WallPolygonGroup OpenDoorPolygons() const override;
+	WallPolygonGroup ClosedDoorPolygons() const override;
+	void SetExtendedNight(bool night) override { ExtendedNight = night; }
 };
 
 }

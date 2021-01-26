@@ -35,7 +35,7 @@ private:
 	ResRef resRef;
 public:
 	/** public methods */
-	~BAMFontManager(void);
+	~BAMFontManager(void) override;
 	BAMFontManager();
 
 	bool Open(DataStream* stream) override;

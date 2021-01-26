@@ -29,7 +29,7 @@ struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 		strncpy(extension, ext, sizeof(extension) - 1);
 	}
 
-	bool operator()(const char* fname) const {
+	bool operator()(const char* fname) const override {
 		const char* extpos = strrchr(fname, '.');
 		if (extpos) {
 			return stricmp(++extpos, extension) == 0;
@@ -47,11 +47,11 @@ struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
 		len = strlen(endMatch);
 	}
 
-	~EndsWithFilter() {
+	~EndsWithFilter() override {
 		free(endMatch);
 	}
 
-	bool operator()(const char* fname) const {
+	bool operator()(const char* fname) const override {
 		// this filter ignores file extension
 		const char* rpos = strrchr(fname, '.');
 		if (rpos) {

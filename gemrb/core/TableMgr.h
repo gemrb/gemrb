@@ -42,7 +42,7 @@ namespace GemRB {
 class GEM_EXPORT TableMgr : public Plugin {
 public: 
 	TableMgr();
-	virtual ~TableMgr();
+	~TableMgr() override;
 	/** Returns the actual number of Rows in the Table */
 	virtual ieDword GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */

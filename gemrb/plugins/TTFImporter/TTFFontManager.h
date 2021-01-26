@@ -39,7 +39,7 @@ public:
 /*
 Public methods
 */
-	~TTFFontManager(void);
+	~TTFFontManager(void) override;
 	TTFFontManager(void);
 
 	bool Open(DataStream* stream) override;

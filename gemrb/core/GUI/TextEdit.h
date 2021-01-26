@@ -47,11 +47,11 @@ private:
 private:
 	// TextContainer can respond to keys by itself, but we want to interpose so we can capture return/esc
 	// we simply forward all other key presses. For this to work textContainer needs View::IgnoreEvents set
-	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod);
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 
 	// this forwards to textContainer. only needed because we set View::IgnoreEvents on textContainer in order to interpose key events
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/);
-	void OnTextInput(const TextEvent& /*te*/);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
 	void TextChanged(TextContainer& tc);
 
@@ -70,22 +70,22 @@ public:
 	};
 
 	TextEdit(const Region& frame, unsigned short maxLength, Point p);
-	~TextEdit();
+	~TextEdit() override;
 
 	// these all forward to the underlying TextContainer
 	void SetFont(Font* f);
 
 	/** Sets the Text of the current control */
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Gets the Text of the current control */
-	String QueryText() const;
+	String QueryText() const override;
 	/** Sets the buffer length */
 	void SetBufferLength(size_t buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
 
-	void DidFocus() { textContainer.DidFocus(); }
-	void DidUnFocus() { textContainer.DidUnFocus(); }
+	void DidFocus() override { textContainer.DidFocus(); }
+	void DidUnFocus() override { textContainer.DidUnFocus(); }
 };
 
 }

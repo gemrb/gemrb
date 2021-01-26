@@ -38,14 +38,14 @@ private:
 	ieDword WindowCount, CTOffset, WEOffset;
 public: 
 	CHUImporter();
-	~CHUImporter();
+	~CHUImporter() override;
 	/** Returns the number of available windows */
-	unsigned int GetWindowsCount();
-	bool LoadWindowPack(const ResRef&);
+	unsigned int GetWindowsCount() override;
+	bool LoadWindowPack(const ResRef&) override;
 	/** Returns the i-th window in the Previously Loaded Stream */
-	Window* GetWindow(ScriptingId) const;
+	Window* GetWindow(ScriptingId) const override;
 	/** This function loads all available windows from the 'stream' parameter. */
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 };
 
 }

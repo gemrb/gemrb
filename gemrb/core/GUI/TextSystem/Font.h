@@ -113,7 +113,7 @@ private:
 				pageData = (ieByte*)calloc(pageSize.h, pageSize.w);
 			}
 
-			~GlyphAtlasPage() {
+			~GlyphAtlasPage() override {
 				if (Sheet == NULL) {
 					free(pageData);
 				}

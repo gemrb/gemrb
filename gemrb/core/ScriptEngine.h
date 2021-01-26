@@ -105,12 +105,12 @@ public:
 			T value;
 			ConcreteType(T value) : value(value) {}
 
-			virtual TypeInterface *Clone() const
+			TypeInterface *Clone() const override
 			{
 				return new ConcreteType(value);
 			}
 
-			const std::type_info& Type() const {
+			const std::type_info& Type() const override {
 				return typeid(T);
 			}
 		};
@@ -165,7 +165,7 @@ public:
 
 public:
 	ScriptEngine(void) {};
-	virtual ~ScriptEngine(void) {};
+	~ScriptEngine(void) override {};
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */

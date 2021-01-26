@@ -42,20 +42,20 @@ private:
 
 public:
 	TLKImporter(void);
-	~TLKImporter(void);
+	~TLKImporter(void) override;
 	/** open string refs coming from saved game */
-	void OpenAux();
+	void OpenAux() override;
 	/** purge string defs coming from saved game */
 	void CloseAux() final;
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 	/** construct a new custom string */
-	ieStrRef UpdateString(ieStrRef strref, const char *newvalue);
+	ieStrRef UpdateString(ieStrRef strref, const char *newvalue) override;
 	/** resolve a string reference */
-	String* GetString(ieStrRef strref, ieDword flags = 0);
-	char* GetCString(ieStrRef strref, ieDword flags = 0);
-	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
+	String* GetString(ieStrRef strref, ieDword flags = 0) override;
+	char* GetCString(ieStrRef strref, ieDword flags = 0) override;
+	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) override;
 	void FreeString(char *str);
-	bool HasAltTLK() const;
+	bool HasAltTLK() const override;
 private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);

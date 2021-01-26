@@ -28,12 +28,12 @@ namespace GemRB {
 class NullSource : public ResourceSource {
 public:
 	NullSource(void);
-	virtual ~NullSource(void);
-	virtual bool Open(const char *filename, const char *description);
-	virtual bool HasResource(const char* resname, SClass_ID type);
-	virtual bool HasResource(const char* resname, const ResourceDesc &type);
-	virtual DataStream* GetResource(const char* resname, SClass_ID type);
-	virtual DataStream* GetResource(const char* resname, const ResourceDesc &type);
+	~NullSource(void) override;
+	bool Open(const char *filename, const char *description) override;
+	bool HasResource(const char* resname, SClass_ID type) override;
+	bool HasResource(const char* resname, const ResourceDesc &type) override;
+	DataStream* GetResource(const char* resname, SClass_ID type) override;
+	DataStream* GetResource(const char* resname, const ResourceDesc &type) override;
 };
 
 }

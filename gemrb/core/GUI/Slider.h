@@ -49,7 +49,7 @@ namespace GemRB {
 class GEM_EXPORT Slider : public Control  {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	
 	// set postion pased on a point expressed in local (frame) coordinates
 	void SetPosition(const Point& p);
@@ -67,7 +67,7 @@ public:
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */
-	void UpdateState(unsigned int Sum);
+	void UpdateState(unsigned int Sum) override;
 
 private: // Private attributes
 	/** Knob Image */
@@ -88,11 +88,11 @@ private: // Private attributes
 
 protected:
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Over Event */
-	bool OnMouseDrag(const MouseEvent& /*me*/);
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 };
 
 }

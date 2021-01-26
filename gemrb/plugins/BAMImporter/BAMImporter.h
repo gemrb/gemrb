@@ -58,14 +58,14 @@ private:
 	ieWord * CacheFLT(unsigned int &count);
 public:
 	BAMImporter(void);
-	~BAMImporter(void);
-	bool Open(DataStream* stream);
-	int GetCycleSize(unsigned char Cycle);
+	~BAMImporter(void) override;
+	bool Open(DataStream* stream) override;
+	int GetCycleSize(unsigned char Cycle) override;
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
-		unsigned char mode = IE_NORMAL, bool allowCompression = true);
+		unsigned char mode = IE_NORMAL, bool allowCompression = true) override;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
-	Holder<Sprite2D> GetPalette();
+	Holder<Sprite2D> GetPalette() override;
 
 	/** Gets a Pixel Index from the Image, unused */
 	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
@@ -78,7 +78,7 @@ public:
 		return Color();
 	}
 public:
-	int GetCycleCount()
+	int GetCycleCount() override
 	{
 		return CyclesCount;
 	}

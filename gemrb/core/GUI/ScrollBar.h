@@ -66,18 +66,18 @@ public:
 	ScrollBar(const ScrollBar& sb);
 	ScrollBar& operator=(const ScrollBar& sb);
 
-	bool IsOpaque() const;
+	bool IsOpaque() const override;
 
 	/* scroll so the slider is centered at point p */
-	void ScrollDelta(const Point& p);
-	void ScrollTo(const Point& p);
+	void ScrollDelta(const Point& p) override;
+	void ScrollTo(const Point& p) override;
 	void ScrollUp();
 	void ScrollDown();
 	void ScrollBySteps(int steps);
 
 	/** refreshes scrollbar if associated with VarName */
-	void UpdateState(unsigned int Sum);
-	bool TracksMouseDown() const { return true; }
+	void UpdateState(unsigned int Sum) override;
+	bool TracksMouseDown() const override { return true; }
 
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
@@ -102,25 +102,25 @@ private:
 		SetFrameSize(s);
 	}
 
-	void DrawSelf(Region drawFrame, const Region& clip);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 	Point AxisPosFromValue() const;
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */
 	int SliderPxRange() const;
 	
-	bool IsPerPixelScrollable() const { return false; }
+	bool IsPerPixelScrollable() const override { return false; }
 	
 protected:
 	/** Mouse Button Down */
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Drag Event */
-	bool OnMouseDrag(const MouseEvent&);
+	bool OnMouseDrag(const MouseEvent&) override;
 	/** Mouse Wheel Scroll Event */
-	bool OnMouseWheelScroll(const Point& delta);
+	bool OnMouseWheelScroll(const Point& delta) override;
 	
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/);
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
 };
 
 }

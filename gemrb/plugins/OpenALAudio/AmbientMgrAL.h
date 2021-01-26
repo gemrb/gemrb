@@ -37,13 +37,13 @@ class AmbientMgrAL : public AmbientMgr {
 public:
 	AmbientMgrAL() : AmbientMgr(), mutex(SDL_CreateMutex()), 
 			player(NULL), cond(SDL_CreateCond()) { }
-	~AmbientMgrAL() { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
-	void reset();
-	void setAmbients(const std::vector<Ambient *> &a);
-	void activate(const std::string &name);
-	void activate();
-	void deactivate(const std::string &name);
-	void deactivate();
+	~AmbientMgrAL() override { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
+	void reset() override;
+	void setAmbients(const std::vector<Ambient *> &a) override;
+	void activate(const std::string &name) override;
+	void activate() override;
+	void deactivate(const std::string &name) override;
+	void deactivate() override;
 	void UpdateVolume(unsigned short value);
 private:
 	class AmbientSource {

@@ -53,12 +53,12 @@ private:
 				int size, int samplerate);
 
 protected:
-	bool DecodeFrame(VideoBuffer&);
+	bool DecodeFrame(VideoBuffer&) override;
 
 public:
 	MVEPlay(void);
-	~MVEPlay(void);
-	bool Open(DataStream* stream);
+	~MVEPlay(void) override;
+	bool Open(DataStream* stream) override;
 };
 
 }

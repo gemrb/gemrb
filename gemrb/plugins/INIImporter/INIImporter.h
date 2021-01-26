@@ -187,27 +187,27 @@ private:
 
 public:
 	INIImporter(void);
-	~INIImporter(void);
-	bool Open(DataStream* stream);
-	int GetTagsCount() const
+	~INIImporter(void) override;
+	bool Open(DataStream* stream) override;
+	int GetTagsCount() const override
 	{
 		return ( int ) tags.size();
 	}
-	const char* GetTagNameByIndex(int index) const
+	const char* GetTagNameByIndex(int index) const override
 	{
 		return tags[index]->GetTagName();
 	}
 
-	int GetKeysCount(const char* Tag) const;
-	const char* GetKeyNameByIndex(const char* Tag, int index) const;
+	int GetKeysCount(const char* Tag) const override;
+	const char* GetKeyNameByIndex(const char* Tag, int index) const override;
 	const char* GetKeyAsString(const char* Tag, const char* Key,
-		const char* Default) const;
+		const char* Default) const override;
 	int GetKeyAsInt(const char* Tag, const char* Key, 
-		const int Default) const;
+		const int Default) const override;
 	float GetKeyAsFloat(const char* Tag, const char* Key, 
-		const float Default) const;
+		const float Default) const override;
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
-		const bool Default) const;
+		const bool Default) const override;
 };
 
 }

@@ -41,7 +41,7 @@ public:
 	static const TypeID ID;
 public:
 	ImageMgr(void);
-	virtual ~ImageMgr(void);
+	~ImageMgr(void) override;
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
 	virtual Image* GetImage();
