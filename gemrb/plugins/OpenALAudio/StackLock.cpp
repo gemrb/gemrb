@@ -43,7 +43,7 @@ void StackLock::lock() {
 	}
 #endif
 
-	SDL_mutexP(_mutex);
+	SDL_LockMutex(_mutex);
 }
 
 void StackLock::unlock() {
@@ -53,6 +53,6 @@ void StackLock::unlock() {
 	}
 #endif
 
-	SDL_mutexV(_mutex);
+	SDL_UnlockMutex(_mutex);
 }
 

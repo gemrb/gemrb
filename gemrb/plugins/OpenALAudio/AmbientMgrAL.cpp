@@ -40,7 +40,7 @@ using namespace GemRB;
 void AmbientMgrAL::reset()
 {
 	if (player) {
-		SDL_mutexP(mutex);
+		SDL_LockMutex(mutex);
 	}
 	for (auto ambientSource : ambientSources) {
 		delete ambientSource;
@@ -49,7 +49,7 @@ void AmbientMgrAL::reset()
 	AmbientMgr::reset();
 	if (player) {
 		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
+		SDL_UnlockMutex(mutex);
 		SDL_WaitThread(player, NULL);
 		player = NULL;
 	}
@@ -77,48 +77,48 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 void AmbientMgrAL::activate(const std::string &name)
 {
 	if (player) {
-		SDL_mutexP(mutex);
+		SDL_LockMutex(mutex);
 	}
 	AmbientMgr::activate(name);
 	if (player) {
 		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
+		SDL_UnlockMutex(mutex);
 	}
 }
 
 void AmbientMgrAL::activate()
 {
 	if (player) {
-		SDL_mutexP(mutex);
+		SDL_LockMutex(mutex);
 	}
 	AmbientMgr::activate();
 	if (player) {
 		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
+		SDL_UnlockMutex(mutex);
 	}
 }
 
 void AmbientMgrAL::deactivate(const std::string &name)
 {
 	if (player) {
-		SDL_mutexP(mutex);
+		SDL_LockMutex(mutex);
 	}
 	AmbientMgr::deactivate(name);
 	if (player) {
 		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
+		SDL_UnlockMutex(mutex);
 	}
 }
 
 void AmbientMgrAL::deactivate()
 {
 	if (player) {
-		SDL_mutexP(mutex);
+		SDL_LockMutex(mutex);
 	}
 	AmbientMgr::deactivate();
 	hardStop();
 	if (player) {
-		SDL_mutexV(mutex);
+		SDL_UnlockMutex(mutex);
 	}
 }
 
@@ -132,7 +132,7 @@ void AmbientMgrAL::hardStop() const
 int AmbientMgrAL::play(void *am)
 {
 	AmbientMgrAL * ambim = (AmbientMgrAL *) am;
-	SDL_mutexP(ambim->mutex);
+	SDL_LockMutex(ambim->mutex);
 	while (!ambim->ambientSources.empty()) {
 		if (!core->GetGame()) { // we don't have any game, and we need one
 			break;
@@ -141,7 +141,7 @@ int AmbientMgrAL::play(void *am)
 		assert(delay > 0);
 		SDL_CondWaitTimeout(ambim->cond, ambim->mutex, delay);
 	}
-	SDL_mutexV(ambim->mutex);
+	SDL_UnlockMutex(ambim->mutex);
 	return 0;
 }
 
@@ -169,11 +169,11 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks) const
 
 void AmbientMgrAL::UpdateVolume(unsigned short volume)
 {
-	SDL_mutexP( mutex );
+	SDL_LockMutex( mutex );
 	for (auto source : ambientSources) {
 		source->SetVolume(volume);
 	}
-	SDL_mutexV( mutex );
+	SDL_UnlockMutex( mutex );
 }
 
 

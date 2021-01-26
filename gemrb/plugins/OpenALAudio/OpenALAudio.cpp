@@ -568,11 +568,11 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 	ieDword volume;
 
 	if (flags & GEM_SND_VOL_MUSIC) {
-		SDL_mutexP( musicMutex );
+		SDL_LockMutex( musicMutex );
 		core->GetDictionary()->Lookup("Volume Music", volume);
 		if (MusicSource && alIsSource(MusicSource))
 			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
-		SDL_mutexV(musicMutex);
+		SDL_UnlockMutex(musicMutex);
 	}
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
@@ -588,7 +588,7 @@ bool OpenALAudioDriver::CanPlay()
 
 void OpenALAudioDriver::ResetMusics()
 {
-	SDL_mutexP(musicMutex);
+	SDL_LockMutex(musicMutex);
 	MusicPlaying = false;
 	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
@@ -603,26 +603,26 @@ void OpenALAudioDriver::ResetMusics()
 			}
 		}
 	}
-	SDL_mutexV( musicMutex );
+	SDL_UnlockMutex( musicMutex );
 }
 
 bool OpenALAudioDriver::Play()
 {
 	if (!MusicReader) return false;
 
-	SDL_mutexP( musicMutex );
+	SDL_LockMutex( musicMutex );
 	if (!MusicPlaying)
 		MusicPlaying = true;
-	SDL_mutexV( musicMutex );
+	SDL_UnlockMutex( musicMutex );
 
 	return true;
 }
 
 bool OpenALAudioDriver::Stop()
 {
-	SDL_mutexP( musicMutex );
+	SDL_LockMutex( musicMutex );
 	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_mutexV( musicMutex );
+		SDL_UnlockMutex( musicMutex );
 		return false;
 	}
 	alSourceStop( MusicSource );
@@ -631,21 +631,21 @@ bool OpenALAudioDriver::Stop()
 	alDeleteSources( 1, &MusicSource );
 	checkALError("Unable to delete music source", WARNING);
 	MusicSource = 0;
-	SDL_mutexV( musicMutex );
+	SDL_UnlockMutex( musicMutex );
 	return true;
 }
 
 bool OpenALAudioDriver::Pause()
 {
-	SDL_mutexP( musicMutex );
+	SDL_LockMutex( musicMutex );
 	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_mutexV( musicMutex );
+		SDL_UnlockMutex( musicMutex );
 		return false;
 	}
 	alSourcePause(MusicSource);
 	checkALError("Unable to pause music source", WARNING);
 	MusicPlaying = false;
-	SDL_mutexV( musicMutex );
+	SDL_UnlockMutex( musicMutex );
 	((AmbientMgrAL*) ambim)->deactivate();
 #ifdef ANDROID
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
@@ -662,15 +662,15 @@ bool OpenALAudioDriver::Resume()
 	al_android_resume_playback(); //call AudioTrack.play() from JNI
 #endif
 #endif
-	SDL_mutexP( musicMutex );
+	SDL_LockMutex( musicMutex );
 	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_mutexV( musicMutex );
+		SDL_UnlockMutex( musicMutex );
 		return false;
 	}
 	alSourcePlay(MusicSource);
 	checkALError("Unable to resume music source", WARNING);
 	MusicPlaying = true;
-	SDL_mutexV( musicMutex );
+	SDL_UnlockMutex( musicMutex );
 	((AmbientMgrAL*) ambim)->activate();
 	return true;
 }
