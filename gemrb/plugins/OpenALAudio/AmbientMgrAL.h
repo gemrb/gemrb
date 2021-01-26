@@ -23,10 +23,11 @@
 
 #include "AmbientMgr.h"
 
-#include <vector>
+#include <condition_variable>
+#include <mutex>
 #include <string>
-
-#include <SDL_thread.h>
+#include <thread>
+#include <vector>
 
 namespace GemRB {
 
@@ -34,10 +35,9 @@ class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
 public:
-	AmbientMgrAL() : AmbientMgr(), mutex(SDL_CreateMutex()), 
-			player(NULL), cond(SDL_CreateCond()) { }
-	~AmbientMgrAL() { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
-	void reset();
+	AmbientMgrAL() : AmbientMgr() { }
+	~AmbientMgrAL();
+
 	void setAmbients(const std::vector<Ambient *> &a);
 	void activate(const std::string &name);
 	void activate();
@@ -49,13 +49,13 @@ private:
 	public:
 		AmbientSource(const Ambient *a);
 		~AmbientSource();
-		unsigned int tick(unsigned int ticks, Point listener, ieDword timeslice);
+		unsigned int tick(long long ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume);
 	private:
 		int stream;
 		const Ambient* ambient;
-		unsigned int lastticks;
+		uint64_t lastticks;
 		unsigned int nextdelay;
 		unsigned int nextref;
 		unsigned int totalgain;
@@ -65,13 +65,13 @@ private:
 	};
 	std::vector<AmbientSource *> ambientSources;
 	
-	static int play(void *am);
-	unsigned int tick(unsigned int ticks) const;
+	int play();
+	unsigned int tick(uint64_t ticks) const;
 	void hardStop() const;
 	
-	SDL_mutex *mutex;
-	SDL_Thread *player;
-	SDL_cond *cond;
+	std::mutex mutex;
+	std::thread player;
+	std::condition_variable cond;
 };
 
 }
