@@ -26,11 +26,13 @@
 #include "win32def.h"
 #include "globals.h"
 
+#define _USE_MATH_DEFINES
+
+#include <cmath>
 #include <cstdint>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -41,16 +43,7 @@
 #define attribute_deprecated
 #define av_unused
 #define av_uninit(x) x
-#define av_always_inline inline 
-
-
-#ifndef M_PI
-#define M_PI           3.14159265358979323846  /* pi */
-#endif
-
-#ifndef M_SQRT1_2
-#define M_SQRT1_2      0.70710678118654752440  /* 1/sqrt(2) */
-#endif
+#define av_always_inline inline
 
 void *av_malloc(unsigned int size);
 void av_free(void *ptr);
