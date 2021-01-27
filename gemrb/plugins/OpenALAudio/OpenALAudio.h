@@ -37,7 +37,8 @@
 #include <mutex>
 #include <thread>
 
-#include <OpenAL/OpenAL.h>
+#include "al.h"
+#include "alc.h"
 #ifdef HAVE_OPENAL_EFX_H
 # include "efx.h"
 #endif
