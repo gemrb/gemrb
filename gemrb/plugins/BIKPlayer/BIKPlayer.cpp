@@ -675,7 +675,7 @@ void BIKPlayer::DecodeBlock(short *out)
 
 		for (i = 0; i < s_num_bands; i++) {
 			int value = s_gb.get_bits(8);
-			quant[i] = (float) pow(10.0, FFMIN(value, 95) * 0.066399999) * s_root;
+			quant[i] = (float) pow(10.0, std::min(value, 95) * 0.066399999) * s_root;
 		}
 
 		// find band (k)
@@ -1186,7 +1186,7 @@ int BIKPlayer::read_dcs(Bundle *b, int start_bits, int has_sign)
 	//*dst++ = v;
 	len--;
 	for (i = 0; i < len; i += 8) {
-		len2 = FFMIN(len - i, 8);
+		len2 = std::min(len - i, 8);
 		bsize = v_gb.get_bits(4);
 		if (bsize) {
 			for (j = 0; j < len2; j++) {
