@@ -26,6 +26,7 @@
 #include "win32def.h"
 #include "globals.h"
 
+#include <cstdint>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -41,16 +42,6 @@
 #define av_unused
 #define av_uninit(x) x
 #define av_always_inline inline 
-
-#define uint8_t unsigned char
-#define uint16_t unsigned short
-#define uint32_t unsigned int
-#define uint64_t __int64
-
-#define int8_t signed char
-#define int16_t signed short
-#define int32_t signed int
-#define int64_t signed __int64
 
 #define FFABS(a) ((a) >= 0 ? (a) : (-(a)))
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))

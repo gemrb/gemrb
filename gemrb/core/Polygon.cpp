@@ -158,8 +158,8 @@ static bool intersectSegments(Point& a, Point& b, Point& c, Point& d, Point& s)
 		(left(c, d, a) != left(c, d, b))))
 		return false;
 
-	__int64 A1 = area2(c, d, a);
-	__int64 A2 = area2(d, c, b);
+	int64_t A1 = area2(c, d, a);
+	int64_t A2 = area2(d, c, b);
 
 	s.x = (short) ((b.x*A1 + a.x*A2) / (A1 + A2));
 	s.y = (short) ((b.y*A1 + a.y*A2) / (A1 + A2));
