@@ -49,7 +49,7 @@ private:
 	public:
 		AmbientSource(const Ambient *a);
 		~AmbientSource();
-		unsigned int tick(long long ticks, Point listener, ieDword timeslice);
+		unsigned int tick(uint64_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume);
 	private:

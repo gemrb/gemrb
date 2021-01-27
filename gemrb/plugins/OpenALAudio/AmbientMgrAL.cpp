@@ -163,7 +163,7 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 	}
 }
 
-unsigned int AmbientMgrAL::AmbientSource::tick(long long ticks, Point listener, ieDword timeslice)
+unsigned int AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDword timeslice)
 {
 	/* if we are out of sounds do nothing */
 	if (ambient->sounds.empty()) {
