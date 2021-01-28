@@ -602,10 +602,11 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 	}
 }
 
-void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t& renderflags, const Color* tint)
+uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* tint)
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
+	uint32_t ret = 0;
 	
 	if (spr->Bpp == 8) {
 		if (tint) {
@@ -627,21 +628,24 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 				if (renderflags&BLIT_COLOR_MOD) {
 					assert(tint);
 					ShaderTint(*tint, dstc);
+					ret |= BLIT_COLOR_MOD;
 				}
 				
 				if (renderflags & BLIT_ALPHA_MOD) {
 					assert(tint);
 					dstc.a = tint->a;
+					ret |= BLIT_ALPHA_MOD;
 				}
 
 				if (renderflags&BLIT_GREY) {
 					ShaderGreyscale(dstc);
+					ret |= BLIT_GREY;
 				} else if (renderflags&BLIT_SEPIA) {
 					ShaderSepia(dstc);
+					ret |= BLIT_SEPIA;
 				}
 			}
 		}
-		renderflags &= ~(BLIT_GREY | BLIT_SEPIA | BLIT_COLOR_MOD | BLIT_ALPHA_MOD);
 	} else if (oldVersion != newVersion) {
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
@@ -654,13 +658,15 @@ void SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t
 		if (renderflags & BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender;
 			Blit(beg, beg, end, alpha, blender);
+			ret |= BLIT_GREY;
 		} else if (renderflags & BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender;
 			Blit(beg, beg, end, alpha, blender);
+			ret |= BLIT_SEPIA;
 		}
-		renderflags &= ~(BLIT_GREY | BLIT_SEPIA);
 		SDL_UnlockSurface(newV);
 	}
+	return ret;
 }
 
 // static class methods

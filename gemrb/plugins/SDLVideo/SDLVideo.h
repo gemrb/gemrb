@@ -103,7 +103,7 @@ protected:
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	Region CurrentRenderClip() const;
 	
-	void RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t& renderflags, const Color* = NULL);
+	uint32_t RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* = NULL);
 
 	virtual void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL)=0;

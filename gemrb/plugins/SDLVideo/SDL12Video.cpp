@@ -263,9 +263,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
 
 		if (flags&BLIT_COLOR_MOD) {
-			RenderSpriteVersion(sdlspr, flags, &c);
+			flags &= ~RenderSpriteVersion(sdlspr, flags, &c);
 		} else {
-			RenderSpriteVersion(sdlspr, flags);
+			flags &= ~RenderSpriteVersion(sdlspr, flags);
 		}
 	}
 

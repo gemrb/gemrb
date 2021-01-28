@@ -249,9 +249,9 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	// WARNING: software fallback == slow
 	if (spr->Bpp == 8 && (flags & BLIT_ALPHA_MOD)) {
 		version |= BLIT_ALPHA_MOD;
-		RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
+		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
 	} else if (version) {
-		RenderSpriteVersion(spr, version);
+		flags &= ~RenderSpriteVersion(spr, version);
 	}
 
 	SDL_Texture* tex = spr->GetTexture(renderer);
