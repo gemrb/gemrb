@@ -3970,8 +3970,12 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, uint32_t flags) con
 {
 	Video* video = core->GetVideoDriver();
 	
-	tint.a = 255 - transparency;
-	flags |= BLIT_ALPHA_MOD;
+	if (transparency) {
+		tint.a = 255 - transparency;
+		flags |= BLIT_ALPHA_MOD;
+	} else {
+		tint.a = 255;
+	}
 
 	int ac = animcount;
 	while (ac--) {
