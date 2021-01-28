@@ -2124,13 +2124,13 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_GUI_WORLDMAP:
 		{
-			int direction, recolor = 0;
+			int recolor = 0;
 			char *fontname = nullptr;
 			int paletteOverride = false;
-			PARSE_ARGS( constructArgs, "i|sii", &direction, &fontname, &recolor, &paletteOverride);
+			PARSE_ARGS(constructArgs, "|sii", &fontname, &recolor, &paletteOverride);
 			
 			Font* font = (fontname) ? core->GetFont(fontname) : nullptr;
-			WorldMapControl* wmap = new WorldMapControl(rgn, font, direction );
+			WorldMapControl* wmap = new WorldMapControl(rgn, font);
 			wmap->SetOverrideIconPalette(paletteOverride);
 			view = wmap;
 		}

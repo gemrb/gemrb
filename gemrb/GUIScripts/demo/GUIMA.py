@@ -29,7 +29,7 @@ from GUIDefines import *
 WorldMapControl = None
 AreaMapControl = None
 
-def InitMapWindow (Window, WorldMap = False, Travel = -1):
+def InitMapWindow (Window, WorldMap = False):
 	global WorldMapControl, AreaMapControl
 
 	Label = Window.GetControl (0)
@@ -48,6 +48,8 @@ def InitMapWindow (Window, WorldMap = False, Travel = -1):
 
 	# Map or World Map control
 	if WorldMap:
+		Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
+
 		if AreaMapControl:
 			AreaMapControl.SetVisible (False)
 			AreaMapControl.SetDisabled (True)
@@ -60,6 +62,7 @@ def InitMapWindow (Window, WorldMap = False, Travel = -1):
 			WorldMapControl.SetAnimation ("WMDAG")
 			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
+		WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
 		# center on current area
 		WorldMapControl.Scroll (0, 0, False)
 		WorldMapControl.Focus ()
@@ -102,5 +105,5 @@ OpenMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindo
 
 def OpenTravelWindow ():
 	Window = OpenMapWindow ()
-	InitMapWindow (Window, True, GemRB.GetVar ("Travel"))
+	InitMapWindow (Window, True)
 	return

@@ -33,12 +33,10 @@
 
 namespace GemRB {
 
-WorldMapControl::WorldMapControl(const Region& frame, Font *font, int direction)
+WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 	: Control(frame), ftext(font)
 {
 	ControlType = IE_GUI_WORLDMAP;
-	Area = NULL;
-	SetValue(direction);
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	OverrideIconPalette = false;
 	Game* game = core->GetGame();
@@ -58,11 +56,16 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, int direction)
 			CopyResRef(currentArea, m->AreaResRef);
 		}
 	}
-
-	//this also updates visible locations
-	worldmap->CalculateDistances(currentArea, direction);
 	
 	SetColor(IE_GUI_WMAP_COLOR_BACKGROUND, ColorBlack);
+	
+	ControlEventHandler handler = [this](Control* /*this*/) {
+		//this also updates visible locations
+		WorldMap* worldmap = core->GetWorldMap();
+		worldmap->CalculateDistances(currentArea, GetValue());
+	};
+	
+	SetAction(handler, Control::ValueChange);
 }
 
 /** Draws the Control on the Output Display */

@@ -58,7 +58,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region&) override;
 
 public:
-	WorldMapControl(const Region& frame, Font *font, int direction);
+	WorldMapControl(const Region& frame, Font *font);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;
@@ -70,7 +70,7 @@ public:
 	void SetOverrideIconPalette(bool ipOverride) { OverrideIconPalette = ipOverride; };
 	Point Pos;
 	/** pointer to last pointed area */
-	WMPAreaEntry *Area;
+	WMPAreaEntry *Area = nullptr;
 
 protected:
 	/** Mouse Over Event */

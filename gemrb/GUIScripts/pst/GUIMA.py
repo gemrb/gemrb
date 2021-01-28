@@ -37,7 +37,7 @@ def InitMapWindow (Window):
 	# World Map
 	Button = Window.GetControl (0)
 	Button.SetText (20429)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow (False))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenTravelWindow())
 
 	# Add Note
 	Button = Window.GetControl (1)
@@ -82,7 +82,7 @@ def InitMapWindow (Window):
 
 	return
 
-def OpenTravelWindow (Travel = True):
+def OpenTravelWindow ():
 	global WorldMapControl
 
 	GUICommonWindows.DisableAnimatedWindows ()
@@ -90,13 +90,15 @@ def OpenTravelWindow (Travel = True):
 	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
+	Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
 
-	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "FONTDLG")
+	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0x84, 'g' : 0x4a, 'b' : 0x2c, 'a' : 0x00})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xa0})
 	WMap.SetAnimation ("WMPTY")
+	WMap.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
 	#center on current area
 	WMap.Scroll (0,0)
 	WMap.Focus()

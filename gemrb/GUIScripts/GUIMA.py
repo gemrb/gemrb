@@ -78,8 +78,12 @@ def InitMapWindow (Window):
 	MapWindow = Window
 
 	# World Map
+	def OpenWorldMap():
+		GemRB.SetVar("Travel", -1)
+		OpenTravelWindow()
+
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenWorldMapWindow())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMap)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -109,14 +113,85 @@ def InitMapWindow (Window):
 	return
 	
 def InitWorldMapWindow (Window):
-	WorldMapWindowCommon (Window, -1)
+	global WorldMapControl
+
+	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
+	Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
+
+	if GameCheck.IsBG2():
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")
+	elif GameCheck.IsBG1():
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", 1, True)
+		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0xa4, 'g' : 0x6a, 'b' : 0x4c})
+	else:
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont")
+
+	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
+	WorldMapControl.SetAnimation ("WMDAG")
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
+	# center on current area
+	MapC()
+
+	if not GameCheck.IsIWD2():
+		#north
+		Button = Window.GetControl (1)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
+		Button.SetActionInterval (200)
+
+		#south
+		Button = Window.GetControl (2)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
+		Button.SetActionInterval (200)
+
+	if GameCheck.IsBG2():
+		#northwest
+		Button = Window.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
+		Button.SetActionInterval (200)
+
+		#northeast
+		Button = Window.GetControl (9)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
+		Button.SetActionInterval (200)
+
+		#west
+		Button = Window.GetControl (10)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
+		Button.SetActionInterval (200)
+
+		#center
+		Button = Window.GetControl (11)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
+		Button.SetActionInterval (200)
+
+		#east
+		Button = Window.GetControl (12)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
+		Button.SetActionInterval (200)
+
+		#southwest
+		Button = Window.GetControl (13)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
+		Button.SetActionInterval (200)
+
+		#southeast
+		Button = Window.GetControl (14)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
+		Button.SetActionInterval (200)
+
+	# Done
+	Button = Window.GetControl (0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	Button.SetHotKey('m')
+
 	return
 
 ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
 OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
 
 WMWID = 2 if GameCheck.IsIWD2 () else 0
-OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
+OpenTravelWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
@@ -185,11 +260,6 @@ def AddNoteWindow ():
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
 	NoteLabel.Focus()
 	return
-	
-def OpenTravelWindow ():
-	Window = OpenWorldMapWindow()
-	WorldMapWindowCommon (Window, GemRB.GetVar ("Travel"))
-	return
 
 def ChangeTooltip ():
 	global WorldMapControl
@@ -202,79 +272,6 @@ def ChangeTooltip ():
 			tt = "%s: %d"%(str,area["Distance"])
 
 	WorldMapControl.SetTooltip (tt)
-	return
-
-def WorldMapWindowCommon (Window, Travel):
-	global WorldMapControl
-
-	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
-
-	if GameCheck.IsBG2():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "floattxt")
-	elif GameCheck.IsBG1():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "toolfont", 1, True)
-		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0xa4, 'g' : 0x6a, 'b' : 0x4c})
-	else:
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, Travel, "infofont")
-
-	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
-	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
-	# center on current area
-	MapC()
-
-	if not GameCheck.IsIWD2():
-		#north
-		Button = Window.GetControl (1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
-		Button.SetActionInterval (200)
-
-		#south
-		Button = Window.GetControl (2)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
-		Button.SetActionInterval (200)
-
-	if GameCheck.IsBG2():
-		#northwest
-		Button = Window.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
-		Button.SetActionInterval (200)
-
-		#northeast
-		Button = Window.GetControl (9)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
-		Button.SetActionInterval (200)
-
-		#west
-		Button = Window.GetControl (10)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
-		Button.SetActionInterval (200)
-
-		#center
-		Button = Window.GetControl (11)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
-		Button.SetActionInterval (200)
-
-		#east
-		Button = Window.GetControl (12)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
-		Button.SetActionInterval (200)
-
-		#southwest
-		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
-		Button.SetActionInterval (200)
-
-		#southeast
-		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
-		Button.SetActionInterval (200)
-
-	# Done
-	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
-	Button.SetHotKey('m')
-
 	return
 
 def MapN():
