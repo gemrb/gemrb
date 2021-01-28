@@ -29,7 +29,6 @@ import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
-NoteWindow = None
 WorldMapControl = None
 
 def RevealMap ():
@@ -122,16 +121,8 @@ OpenWorldMapWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICo
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 
-def SetMapNote (Text):
-	PosX = GemRB.GetVar ("MapControlX")
-	PosY = GemRB.GetVar ("MapControlY")
-	Color = GemRB.GetVar ("Color")
-	GemRB.SetMapnote (PosX, PosY, Color, Text)
-	NoteWindow.Close()
-	return
-
 def AddNoteWindow ():
-	global NoteWindow, NoteLabel, MapWindow
+	global NoteLabel, MapWindow
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
@@ -165,6 +156,14 @@ def AddNoteWindow ():
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
 		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteLabel.Focus())
+		
+	def SetMapNote (Text):
+		PosX = GemRB.GetVar ("MapControlX")
+		PosY = GemRB.GetVar ("MapControlY")
+		Color = GemRB.GetVar ("Color")
+		GemRB.SetMapnote (PosX, PosY, Color, Text)
+		NoteWindow.Close()
+		return
 
 	#set
 	Label = NoteWindow.GetControl (0)
