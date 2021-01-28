@@ -58,7 +58,7 @@ private:
 	void DrawSelf(Region drawFrame, const Region&) override;
 
 public:
-	WorldMapControl(const Region& frame, const char *fontname, int direction);
+	WorldMapControl(const Region& frame, Font *font, int direction);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;

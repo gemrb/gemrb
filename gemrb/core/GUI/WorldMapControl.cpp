@@ -33,8 +33,8 @@
 
 namespace GemRB {
 
-WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
-	: Control(frame)
+WorldMapControl::WorldMapControl(const Region& frame, Font *font, int direction)
+	: Control(frame), ftext(font)
 {
 	ControlType = IE_GUI_WORLDMAP;
 	Area = NULL;
@@ -61,13 +61,6 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 
 	//this also updates visible locations
 	worldmap->CalculateDistances(currentArea, direction);
-
-	// alpha bit is unfortunately ignored
-	if (font[0]) {
-		ftext = core->GetFont(font);
-	} else {
-		ftext = NULL;
-	}
 	
 	SetColor(IE_GUI_WMAP_COLOR_BACKGROUND, ColorBlack);
 }
