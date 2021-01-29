@@ -79,7 +79,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return goal.isempty() ? shakeCounter : goal != currentVP.Origin();
+	return shakeCounter || (!goal.isempty() && goal != currentVP.Origin());
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -109,34 +109,30 @@ void GlobalTimer::DoStep(int count)
 	GameControl* gc = core->GetGameControl();
 
 	Point p = currentVP.Origin();
-	if (p != goal) {
-		if (speed) {
-			if (p.x < goal.x) {
-				p.x += speed*count;
-				if (p.x > goal.x) p.x = goal.x;
-			} else {
-				p.x -= speed*count;
-				if (p.x < goal.x) p.x = goal.x;
-			}
-			if (p.y < goal.y) {
-				p.y += speed*count;
-				if (p.y > goal.y) p.y = goal.y;
-			} else {
-				p.y -= speed*count;
-				if (p.y < goal.y) p.y = goal.y;
-			}
+	if (p != goal && !goal.isempty()) {
+		if (p.x < goal.x) {
+			p.x += speed*count;
+			if (p.x > goal.x) p.x = goal.x;
+		} else {
+			p.x -= speed*count;
+			if (p.x < goal.x) p.x = goal.x;
+		}
+		if (p.y < goal.y) {
+			p.y += speed*count;
+			if (p.y > goal.y) p.y = goal.y;
+		} else {
+			p.y -= speed*count;
+			if (p.y < goal.y) p.y = goal.y;
 		}
 
-		currentVP.SetOrigin(p);
-	}
-	
-	if (!goal.isempty() && gc->MoveViewportTo(p, false) == false) {
-		goal = Point(-1,-1);
+		if (gc->MoveViewportTo(p, false) == false) {
+			goal = Point(-1,-1);
+		}
 	}
 
 	// do a possible shake in addition to the standard pan
 	// this is separate because it is unbounded by the map boundaries
-	// and swe assume it is possible to get a shake and pan simultaniously
+	// and we assume it is possible to get a shake and pan simultaniously
 	if (shakeCounter > 0) {
 		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {
@@ -145,6 +141,8 @@ void GlobalTimer::DoStep(int count)
 			gc->MoveViewportUnlockedTo(shakeP, false);
 		}
 	}
+	
+	currentVP.SetOrigin(gc->Viewport().Origin());
 }
 
 bool GlobalTimer::UpdateViewport(unsigned long thisTime)
@@ -346,6 +344,13 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 	shakeVec.x = std::abs(shake.x);
 	shakeVec.y = std::abs(shake.y);
 	shakeCounter = count + 1;
+	
+	if (goal.isempty()) {
+		GameControl* gc = core->GetGameControl();
+		currentVP = gc->Viewport();
+		goal = currentVP.Origin();
+		speed = 1000;
+	}
 }
 
 }
