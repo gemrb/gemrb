@@ -103,6 +103,7 @@ void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 void GlobalTimer::DoStep(int count)
 {
 	if (!ViewportIsMoving()) {
+		goal = Point(-1,-1);
 		return;
 	}
 
@@ -125,9 +126,7 @@ void GlobalTimer::DoStep(int count)
 			if (p.y < goal.y) p.y = goal.y;
 		}
 
-		if (gc->MoveViewportTo(p, false) == false) {
-			goal = Point(-1,-1);
-		}
+		gc->MoveViewportTo(p, false);
 	}
 
 	// do a possible shake in addition to the standard pan
@@ -142,7 +141,7 @@ void GlobalTimer::DoStep(int count)
 		}
 	}
 	
-	currentVP.SetOrigin(gc->Viewport().Origin());
+	currentVP = gc->Viewport();
 }
 
 bool GlobalTimer::UpdateViewport(unsigned long thisTime)
