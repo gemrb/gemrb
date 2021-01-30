@@ -90,7 +90,6 @@ def OpenTravelWindow ():
 	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
-	Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
 
 	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, {'r' : 0x84, 'g' : 0x4a, 'b' : 0x2c, 'a' : 0x00})

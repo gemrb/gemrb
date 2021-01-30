@@ -116,7 +116,6 @@ def InitWorldMapWindow (Window):
 	global WorldMapControl
 
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
-	Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
 
 	if GameCheck.IsBG2():
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")

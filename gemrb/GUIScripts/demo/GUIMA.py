@@ -48,8 +48,6 @@ def InitMapWindow (Window, WorldMap = False):
 
 	# Map or World Map control
 	if WorldMap:
-		Window.SetAction(lambda: GemRB.SetVar("Travel", -1), ACTION_WINDOW_CLOSED)
-
 		if AreaMapControl:
 			AreaMapControl.SetVisible (False)
 			AreaMapControl.SetDisabled (True)
