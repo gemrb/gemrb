@@ -75,10 +75,9 @@ bool SDLAudio::Init(void)
 
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
-	std::lock_guard<std::mutex> l(driver->OurMutex);
 
 	do {
-
+		std::lock_guard<std::mutex> l(driver->OurMutex);
 		// TODO: conversion? mutexes? sanity checks? :)
 		int num_samples = len / 2;
 		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
@@ -100,9 +99,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 			Mix_HookMusic(NULL, NULL);
 			break;
 		}
-
 	} while(true);
-
 }
 
 bool SDLAudio::evictBuffer()
