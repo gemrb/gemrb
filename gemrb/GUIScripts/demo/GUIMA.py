@@ -44,7 +44,7 @@ def InitMapWindow (Window, WorldMap = False):
 		Button.SetText ("MAP")
 	else:
 		Button.SetText ("WMAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InitMapWindow (Window, not WorldMap, Travel))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InitMapWindow (Window, not WorldMap))
 
 	# Map or World Map control
 	if WorldMap:
@@ -58,7 +58,7 @@ def InitMapWindow (Window, WorldMap = False):
 			WorldMapControl.SetVisible (True)
 			WorldMapControl.SetDisabled (False)
 		else:
-			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, Travel, "floattxt")
+			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, "floattxt")
 			WorldMapControl.SetAnimation ("WMDAG")
 			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
