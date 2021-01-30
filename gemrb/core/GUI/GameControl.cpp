@@ -1604,7 +1604,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	// we are using the window->IsDisabled on purpose
 	// to avoid bugs, we are disabling the window when we open one of the "top window"s
 	// GC->IsDisabled is for other uses
-	if (!window || window->IsDisabled() || Flags()&IgnoreEvents) {
+	if (!window || window->IsDisabled() || (Flags()&IgnoreEvents)) {
 		return false;
 	}
 	
@@ -2575,6 +2575,8 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (Flags()&IgnoreEvents) {
 		ClearMouseState();
+		moveX = 0;
+		moveY = 0;
 	}
 }
 
