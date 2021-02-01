@@ -111,22 +111,21 @@ void GlobalTimer::DoStep(int count)
 
 	Point p = currentVP.Origin();
 	if (p != goal && !goal.isempty()) {
-		if (p.x < goal.x) {
-			p.x += speed*count;
-			if (p.x > goal.x) p.x = goal.x;
+		int d = SquaredDistance(goal, p);
+		int magnitude = count * speed;
+		magnitude *= magnitude; // distance is squared, so too must be the magnitude
+		
+		if (d <= magnitude) {
+			gc->MoveViewportTo(goal, false);
 		} else {
-			p.x -= speed*count;
-			if (p.x < goal.x) p.x = goal.x;
+			magnitude = std::min(magnitude, d);
+			float r = magnitude / float(d);
+			Point target;
+			target.x = (1 - r) * p.x + r * goal.x;
+			target.y = (1 - r) * p.y + r * goal.y;
+			
+			gc->MoveViewportTo(target, false);
 		}
-		if (p.y < goal.y) {
-			p.y += speed*count;
-			if (p.y > goal.y) p.y = goal.y;
-		} else {
-			p.y -= speed*count;
-			if (p.y < goal.y) p.y = goal.y;
-		}
-
-		gc->MoveViewportTo(p, false);
 	}
 
 	// do a possible shake in addition to the standard pan
