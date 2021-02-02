@@ -7058,7 +7058,7 @@ int fx_screenshake (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		shake.y = fx->Parameter1 >> 16;
 		break;
 	}
-	core->timer->SetScreenShake(shake, count);
+	core->timer.SetScreenShake(shake, count);
 	return FX_NOT_APPLIED;
 }
 

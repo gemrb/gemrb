@@ -33,6 +33,7 @@
 #include "Cache.h"
 #include "Callback.h"
 #include "GameData.h"
+#include "GlobalTimer.h"
 #include "GUI/Control.h"
 #include "GUI/Tooltip.h"
 #include "GUI/Window.h"
@@ -421,7 +422,7 @@ public:
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	Holder<StringMgr> strings2;
-	GlobalTimer * timer;
+	GlobalTimer timer;
 	PaletteHolder InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;

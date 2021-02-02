@@ -40,19 +40,19 @@ struct AnimationRef
 
 class GEM_EXPORT GlobalTimer {
 private:
-	unsigned long startTime;
+	unsigned long startTime = 0; //forcing an update;
 	unsigned long interval;
 
-	int fadeToCounter, fadeToMax;
-	int fadeFromCounter, fadeFromMax;
-	unsigned short fadeToFactor, fadeFromFactor;
-	int shakeCounter;
+	int fadeToCounter = 0, fadeToMax = 0;
+	int fadeFromCounter = 0, fadeFromMax = 0;
+	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
+	int shakeCounter = 0;
 	Point shakeVec;
 	unsigned int first_animation;
 	std::vector<AnimationRef*>  animations;
 	//move viewport to this coordinate
-	Point goal;
-	int speed;
+	Point goal = Point(-1, -1);
+	int speed = 0;
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
@@ -61,7 +61,6 @@ public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
 public:
-	void Init();
 	void Freeze();
 	bool Update();
 	bool ViewportIsMoving();

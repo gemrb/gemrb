@@ -46,7 +46,6 @@
 #include "FontManager.h"
 #include "Game.h"
 #include "GameScript/GameScript.h"
-#include "GlobalTimer.h"
 #include "ItemMgr.h"
 #include "KeyMap.h"
 #include "MapMgr.h"
@@ -163,7 +162,6 @@ Interface::Interface()
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
 	UseContainer = false;
-	timer = NULL;
 	displaymsg = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
@@ -382,7 +380,6 @@ Interface::~Interface(void)
 
 	delete projserv;
 
-	delete timer;
 	delete displaymsg;
 	delete TooltipBG;
 
@@ -561,6 +558,8 @@ void Interface::HandleFlags()
 		delete gamectrl;
 		gamectrl = nullptr;
 		winmgr->GetGameWindow()->SetVisible(false);
+		//clear cutscenes; clear fade/screenshake effects
+		timer = GlobalTimer();
 	}
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
@@ -584,7 +583,6 @@ void Interface::HandleFlags()
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
-			timer->Init();
 
 			Log(MESSAGE, "Core", "Setting up the Console...");
 			CreateConsole();
@@ -1789,13 +1787,6 @@ int Interface::Init(InterfaceConfig* config)
 	game = NULL;
 	calendar = NULL;
 	keymap = NULL;
-
-	Log(MESSAGE, "Core", "Bringing up the Global Timer...");
-	timer = new GlobalTimer();
-	if (!timer) {
-		Log(FATAL, "Core", "Failed to create global timer.");
-		return GEM_ERROR;
-	}
 
 	Log(MESSAGE, "Core", "Initializing effects...");
 	ret = Init_EffectQueue();
@@ -3169,10 +3160,10 @@ bool Interface::InCutSceneMode() const
 bool Interface::GSUpdate(bool update_scripts)
 {
 	if(update_scripts) {
-		return timer->Update();
+		return timer.Update();
 	}
 	else {
-		timer->Freeze();
+		timer.Freeze();
 		return false;
 	}
 }
@@ -3180,9 +3171,6 @@ bool Interface::GSUpdate(bool update_scripts)
 void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
-	//clear cutscenes
-	//clear fade/screenshake effects
-	timer->Init();
 
 	//shutting down ingame music
 	//(do it before deleting the game)

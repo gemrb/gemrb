@@ -1663,7 +1663,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 	if (updateVPTimer && speed) {
 		updateVPTimer = false;
-		core->timer->SetMoveViewPort(p, speed, center);
+		core->timer.SetMoveViewPort(p, speed, center);
 	} else if (canMove && p != vpOrigin) {
 		updateVPTimer = true;
 

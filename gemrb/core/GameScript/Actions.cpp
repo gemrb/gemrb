@@ -487,22 +487,22 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeToColor( parameters->pointParameter.x );
+	core->timer.SetFadeToColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	core->timer.SetFadeFromColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeToColor( parameters->pointParameter.x );
-	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	core->timer.SetFadeToColor( parameters->pointParameter.x );
+	core->timer.SetFadeFromColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x<<1 ); //multiply by 2
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1081,7 +1081,7 @@ void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
 	GameControl *gc = core->GetGameControl();
 	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
-	core->timer->SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
+	core->timer.SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1093,7 +1093,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	core->timer->SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
+	core->timer.SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -2000,9 +2000,9 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->int1Parameter) { //IWD2 has a different profile
 		Point p(parameters->int1Parameter, parameters->int2Parameter);
-		core->timer->SetScreenShake(p, parameters->int0Parameter);
+		core->timer.SetScreenShake(p, parameters->int0Parameter);
 	} else {
-		core->timer->SetScreenShake(parameters->pointParameter, parameters->int0Parameter);
+		core->timer.SetScreenShake(parameters->pointParameter, parameters->int0Parameter);
 	}
 	Sender->SetWait( parameters->int0Parameter );
 	Sender->ReleaseCurrentAction(); // todo, blocking?

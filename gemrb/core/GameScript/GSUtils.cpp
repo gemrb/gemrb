@@ -310,10 +310,10 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GlobalTimer *timer = core->timer;
-	timer->SetMoveViewPort( mp, speed, true );
-	timer->DoStep(0);
-	if (timer->ViewportIsMoving()) {
+	GlobalTimer& timer = core->timer;
+	timer.SetMoveViewPort( mp, speed, true );
+	timer.DoStep(0);
+	if (timer.ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->GetCurrentAction() );
 		Sender->SetWait(1);
 		Sender->ReleaseCurrentAction();

@@ -54,7 +54,7 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 ControlAnimation::~ControlAnimation(void)
 {
 	//removing from timer first
-	core->timer->RemoveAnimation( this );
+	core->timer.RemoveAnimation( this );
 
 	bam = NULL;
 }
@@ -78,7 +78,7 @@ void ControlAnimation::UpdateAnimation(bool paused)
 
 	if (paused && !(control->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later
-		core->timer->AddAnimation( this, 1 );
+		core->timer.AddAnimation( this, 1 );
 		return;
 	}
 
@@ -112,7 +112,7 @@ void ControlAnimation::UpdateAnimation(bool paused)
 	}
 
 	if (UpdateAnimationSprite()) {
-		core->timer->AddAnimation(this, time);
+		core->timer.AddAnimation(this, time);
 	}
 }
 
@@ -122,7 +122,7 @@ bool ControlAnimation::UpdateAnimationSprite() {
 	if (pic == NULL) {
 		//stopping at end frame
 		if (control->Flags() & IE_GUI_BUTTON_PLAYONCE) {
-			core->timer->RemoveAnimation( this );
+			core->timer.RemoveAnimation( this );
 			control->SetAnimPicture( NULL );
 			return false;
 		}

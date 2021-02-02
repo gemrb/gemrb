@@ -225,7 +225,7 @@ void MapControl::UpdateViewport(Point vp)
 	vp = ConvertPointToGame(vp);
 	
 	// clear any previously scheduled moves and then do it asap, so it works while paused
-	core->timer->SetMoveViewPort( vp, 0, false );
+	core->timer.SetMoveViewPort( vp, 0, false );
 
 	MarkDirty();
 }

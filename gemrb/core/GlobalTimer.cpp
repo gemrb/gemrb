@@ -32,7 +32,7 @@ GlobalTimer::GlobalTimer(void)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
-	Init();
+	ClearAnimations();
 }
 
 GlobalTimer::~GlobalTimer(void)
@@ -41,21 +41,6 @@ GlobalTimer::~GlobalTimer(void)
 	for(i = animations.begin(); i != animations.end(); ++i) {
 		delete (*i);
 	}
-}
-
-void GlobalTimer::Init()
-{
-	fadeToCounter = 0;
-	fadeFromCounter = 0;
-	fadeFromMax = 0;
-	fadeToMax = 0;
-	fadeToFactor = fadeFromFactor = 1;
-	shakeVec = Point();
-	shakeCounter = 0;
-	startTime = 0; //forcing an update
-	speed = 0;
-	goal = Point(-1,-1);
-	ClearAnimations();
 }
 
 void GlobalTimer::Freeze()
