@@ -122,7 +122,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->GetPalette().get(), true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->GetPalette(), true, 0);
 	}
 
 	SpriteSheet<ieWord>::Draw(chr, dest);

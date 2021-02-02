@@ -3497,7 +3497,7 @@ static PyObject* GemRB_Button_SetPicture(PyObject* self, PyObject* args)
 			return RuntimeError("Picture resource not found!\n");
 		}
 
-		btn->SetPicture(pic.get());
+		btn->SetPicture(pic);
 	}
 
 	Py_RETURN_NONE;

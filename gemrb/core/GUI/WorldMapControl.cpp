@@ -90,7 +90,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
 				PaletteHolder pal = icon->GetPalette();
-				icon->SetPalette(pal_selected.get());
+				icon->SetPalette(pal_selected);
 				video->BlitSprite( icon, offset, &rgn );
 				icon->SetPalette(pal);
 			} else {

@@ -252,7 +252,7 @@ public:
 	void SetTooltip(const String& string);
 	virtual String TooltipText() const { return tooltip; }
 	/* override the standard cursors. default does not override (returns NULL). */
-	virtual Holder<Sprite2D> Cursor() const { return cursor.get(); }
+	virtual Holder<Sprite2D> Cursor() const { return cursor; }
 	void SetCursor(Holder<Sprite2D> c);
 	void SetEventProxy(View* proxy);
 

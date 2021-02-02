@@ -703,7 +703,7 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 	ResRef ref = refstr.c_str();
 	Holder<Sprite2D> frame;
 	if (frames.find(ref) != frames.end()) {
-		frame = frames[ref].get();
+		frame = frames[ref];
 	} else {
 		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ref);
 		if (im) {
