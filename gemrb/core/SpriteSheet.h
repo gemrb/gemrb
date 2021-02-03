@@ -65,10 +65,10 @@ public:
 		return nullRgn;
 	}
 
-	void Draw(KeyType key, const Region& dest) const {
+	void Draw(KeyType key, const Region& dest, uint32_t flags, const Color& tint) const {
 		typename std::map<KeyType, Region>::const_iterator i = RegionMap.find(key);
 		if (i != RegionMap.end()) {
-			core->GetVideoDriver()->BlitSprite(Sheet, i->second, dest);
+			core->GetVideoDriver()->BlitSprite(Sheet, i->second, dest, flags, tint);
 		}
 	}
 };

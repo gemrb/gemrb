@@ -117,15 +117,15 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	return blank;
 }
 
-void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest)
+void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, uint32_t flags, const Color& tint)
 {
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->GetPalette(), true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->palette, true, 0);
 	}
 
-	SpriteSheet<ieWord>::Draw(chr, dest);
+	SpriteSheet<ieWord>::Draw(chr, dest, flags, tint);
 }
 
 void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
@@ -139,10 +139,15 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline)
-: palette(NULL), LineHeight(lineheight), Baseline(baseline)
+: palette(pal), LineHeight(lineheight), Baseline(baseline)
 {
+	invertedPalette = palette->Copy();
+	for (auto& c : invertedPalette->col) {
+		c.r = 255 - c.r;
+		c.g = 255 - c.g;
+		c.b = 255 - c.b;
+	}
 	CurrentAtlasPage = NULL;
-	SetPalette(pal);
 }
 
 Font::~Font(void)
@@ -215,7 +220,7 @@ const Glyph& Font::GetGlyph(ieWord chr) const
 	return blank;
 }
 
-size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
+size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, const PrintColors* colors,
 						Point* point, ieByte** canvas, bool grow) const
 {
 	// NOTE: vertical alignment is not handled here.
@@ -318,7 +323,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 				}
-				linePos = RenderLine(line, lineRgn, linePoint, canvas);
+				linePos = RenderLine(line, lineRgn, linePoint, colors, canvas);
 			}
 			if (linePos == 0) {
 				break; // if linePos == 0 then we would loop till we are out of bounds so just stop here
@@ -371,7 +376,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment,
 }
 
 size_t Font::RenderLine(const String& line, const Region& lineRgn,
-						Point& dp, ieByte** canvas) const
+						Point& dp, const PrintColors* colors, ieByte** canvas) const
 {
 	assert(lineRgn.h == LineHeight);
 
@@ -438,7 +443,17 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				GlyphAtlasPage* page = Atlas[pageIdx];
-				page->Draw(currChar, Region(blitPoint, curGlyph.size));
+				if (colors) {
+					// no point in BLIT_ADD with black so let's optimize away some blits
+					page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_COLOR_MOD | BLIT_BLENDED, colors->bg);
+					if (colors->fg != ColorBlack) {
+						page->Sheet->SetPalette(invertedPalette);
+						page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_COLOR_MOD | BLIT_ADD, colors->fg);
+						page->Sheet->SetPalette(palette);
+					}
+				} else {
+					page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_BLENDED, ColorWhite);
+				}
 			}
 			dp.x += curGlyph.size.w;
 		}
@@ -505,7 +520,7 @@ Holder<Sprite2D> Font::RenderTextAsSprite(const String& string, const Size& size
 	ieByte* canvasPx = (ieByte*)calloc(canvasSize.w, canvasSize.h);
 
 	Region rgn = Region(Point(0,0), canvasSize);
-	size_t ret = RenderText(string, rgn, alignment, endPoint, &canvasPx, (size.h) ? false : true);
+	size_t ret = RenderText(string, rgn, alignment, nullptr, endPoint, &canvasPx, (size.h) ? false : true);
 	if (numPrinted) {
 		*numPrinted = ret;
 	}
@@ -575,12 +590,60 @@ size_t Font::Print(Region rgn, const String& string,
 		SetAtlasPalette(palette);
 	}
 
-	size_t ret = RenderText(string, rgn, alignment, &p);
+	size_t ret = RenderText(string, rgn, alignment, nullptr, &p);
 
 	if (color) {
 		palette = restore;
 		SetAtlasPalette(palette);
 	}
+
+	if (point) {
+		*point = p;
+	}
+	return ret;
+}
+
+size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, Point* point) const
+{
+	return Print(rgn, string, alignment, nullptr, point);
+}
+
+size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, const PrintColors& colors, Point* point) const
+{
+	return Print(rgn, string, alignment, &colors, point);
+}
+
+size_t Font::Print(Region rgn, const String& string, ieByte alignment, const PrintColors* colors, Point* point) const
+{
+	if (rgn.Dimensions().IsEmpty()) return 0;
+
+	Point p = (point) ? *point : Point();
+	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
+		// we assume that point will be an offset from midde/bottom position
+		Size stringSize;
+		if (alignment&IE_FONT_SINGLE_LINE) {
+			// we can optimize single lines without StringSize()
+			stringSize.h = LineHeight;
+		} else {
+			stringSize = rgn.Dimensions();
+			StringSizeMetrics metrics = {stringSize, 0, 0, true};
+			stringSize = StringSize(string, &metrics);
+			if (alignment&IE_FONT_NO_CALC && metrics.numChars < string.length()) {
+				// PST GUISTORE, not sure what else
+				stringSize.h = rgn.h;
+			}
+		}
+
+		// important: we must do this adjustment even if it leads to -p.y!
+		// some labels depend on this behavior (BG2 GUIINV) :/
+		if (alignment&IE_FONT_ALIGN_MIDDLE) {
+			p.y += (rgn.h - stringSize.h) / 2;
+		} else { // bottom alignment
+			p.y += rgn.h - stringSize.h;
+		}
+	}
+
+	size_t ret = RenderText(string, rgn, alignment, colors, &p);
 
 	if (point) {
 		*point = p;

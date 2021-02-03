@@ -123,7 +123,7 @@ private:
 
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
-		void Draw(ieWord chr, const Region& dest);
+		void Draw(ieWord chr, const Region& dest, uint32_t flags, const Color& tint);
 		void DumpToScreen(const Region&);
 	};
 
@@ -147,20 +147,28 @@ private:
 
 protected:
 	mutable PaletteHolder palette;
+	PaletteHolder invertedPalette;
 
 public:
 	const int LineHeight;
 	const int Baseline;
+	
+	struct PrintColors {
+		Color fg;
+		Color bg;
+	};
 
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL
-	size_t RenderText(const String&, Region&, ieByte alignment,
+	size_t RenderText(const String&, Region&, ieByte alignment, const PrintColors*,
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 	// render a single line of text. called by RenderText()
 	size_t RenderLine(const String& string, const Region& rgn,
-					  Point& dp, ieByte** canvas = NULL) const;
-
+					  Point& dp, const PrintColors*, ieByte** canvas = NULL) const;
+	
+	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
+	
 	void SetAtlasPalette(PaletteHolder pal) const;
 
 public:
@@ -186,6 +194,12 @@ public:
 	// return the number of glyphs printed
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
+	
+	size_t Print(Region rgn, const String& string,
+				 const Color* hicolor, ieByte Alignment, Point* point = nullptr) const;
+	size_t Print(const Region& rgn, const String& string, ieByte Alignment, Point* point = nullptr) const;
+	size_t Print(const Region& rgn, const String& string, ieByte Alignment, const PrintColors& colors, Point* point = nullptr) const;
+	
 	size_t Print(Region rgn, const String& string,
 				 PaletteHolder hicolor, ieByte Alignment, Point* point = nullptr) const;
 

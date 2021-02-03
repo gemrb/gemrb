@@ -79,10 +79,10 @@ public:
 	void BlitTile(const Holder<Sprite2D> spr, const Point& p, const Region* clip,
 						  uint32_t flags, const Color* tint = NULL) override;
 	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) override;
+	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+						uint32_t flags, Color tint) override;
 	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint,
 								const Region* clip = NULL) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
-						uint32_t flags, Color tint) override;
 
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, const Holder<Sprite2D> img);
