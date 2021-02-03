@@ -2220,18 +2220,21 @@ PyDoc_STRVAR( GemRB_View_SetBackground__doc,
 
 static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 {
-	PyObject* pypic;
-	if (!PyArg_ParseTuple( args, "OO", &self, &pypic) ) {
+	PyObject* pybg;
+	if (!PyArg_ParseTuple( args, "OO", &self, &pybg) ) {
 		return NULL;
 	}
 
 	View* view = GetView<View>(self);
 	ABORT_IF_NULL(view);
 
-	if (pypic == Py_None) {
+	if (pybg == Py_None) {
 		view->SetBackground(nullptr);
+	} else if (PyDict_Check(pybg)) {
+		const Color color = ColorFromPy(pybg);
+		view->SetBackground(nullptr, &color);
 	} else {
-		Holder<Sprite2D> pic = SpriteFromPy(pypic);
+		Holder<Sprite2D> pic = SpriteFromPy(pybg);
 
 		if (pic == NULL) {
 			return RuntimeError("Failed to acquire the picture!\n");
