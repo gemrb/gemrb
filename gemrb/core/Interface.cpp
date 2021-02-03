@@ -948,7 +948,6 @@ void Interface::Main()
 	time = GetTickCount();
 	timebase = time;
 	double frames = 0.0;
-	PaletteHolder palette = new Palette( ColorWhite, ColorBlack );
 
 	do {
 		std::deque<Timer>::iterator it;
@@ -987,8 +986,7 @@ void Interface::Main()
 			}
 			auto lock = winmgr->DrawHUD();
 			video->DrawRect( fpsRgn, ColorBlack );
-			fps->Print( fpsRgn, String(fpsstring), palette,
-					   IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
+			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 }
