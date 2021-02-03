@@ -191,7 +191,7 @@ def RefreshInventoryWindow (Window):
 	Button.SetPicture (GUICommonWindows.GetActorPortrait (pc, 'INVENTORY'))
 
 	Label = Window.GetControl (0x1000003a)
-	GUICommon.SetEncumbranceLabels (Window, 46, None, pc, True)
+	GUICommon.SetEncumbranceLabels (Window, 46, None, pc)
 	Label = Window.GetControl (0x1000003a)
 
 	# armor class

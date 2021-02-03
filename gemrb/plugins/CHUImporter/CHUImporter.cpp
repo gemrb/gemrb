@@ -447,25 +447,21 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
 
-				Color f, b;
-				str->Read( &f.r, 1 );
-				str->Read( &f.g, 1 );
-				str->Read( &f.b, 1 );
-				str->Read( &f.a, 1 ); // FIXME: seek 1 instead? previously alpha was 0
-
-				str->Read( &b.r, 1 );
-				str->Read( &b.g, 1 );
-				str->Read( &b.b, 1 );
-				str->Read( &b.a, 1 ); // FIXME: seek 1 instead? previously alpha was 0
+				Color textCol, bgCol;
+				str->Read(&textCol, 4);
+				str->Read(&bgCol, 4);
+				
+				textCol.a = bgCol.a = 0xff;
 
 				str->ReadWord( &alignment );
 				String* str = core->GetString( StrRef );
-				Label* lab = new Label( ctrlFrame, fnt, *str );
+				Label* lab = new Label(ctrlFrame, fnt, *str);
 				delete str;
 
 				if (alignment & 1) {
-					lab->SetColor(f, b);
+					lab->SetFlags(Label::UseColor, OP_OR);
 				}
+				lab->SetColors(textCol, bgCol);
 				int align = IE_FONT_ALIGN_CENTER;
 				if (( alignment & 0x10 ) != 0) {
 					align = IE_FONT_ALIGN_RIGHT;

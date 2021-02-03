@@ -2302,17 +2302,15 @@ static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
  "===== Label_SetTextColor =====\n\
  \n\
- **Prototype:** GemRB.SetLabelTextColor (GLabel, color, swap)\n\
+ **Prototype:** GemRB.SetLabelTextColor (GLabel, color)\n\
  \n\
  **Metaclass Prototype:** SetTextColor (color)\n\
  \n\
- **Description:** Sets the Text Color of a Label Control. If the the Font \n\
- has no own palette, you can set a default palette by this command.\n\
+ **Description:** Sets the Text Color of a Label Control.\n\
  \n\
  **Parameters:**\n\
  * GLabel - the control's reference\n\
  * color - the control's desired text color as a rgb dict\n\
- * swap - use color as the back color for the palette\n\
  \n\
  **Return value:** N/A\n\
 "
@@ -2320,22 +2318,14 @@ PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
 
 static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
 {
-	int swap = 0;
 	PyObject* pyColor;
-	PARSE_ARGS( args, "OO|i", &self, &pyColor, &swap );
+	PARSE_ARGS( args, "OO", &self, &pyColor);
 
 	Label* lab = GetView<Label>(self);
 	ABORT_IF_NULL(lab);
 
-	const Color fore = ColorFromPy(pyColor);
-	const Color& back = ColorBlack;
-
-	// FIXME: swap is a hack for fonts which apparently have swapped f & B
-	// colors. Maybe it depends on need_palette?
-	if (! swap)
-		lab->SetColor( fore, back );
-	else
-		lab->SetColor( back, fore );
+	const Color color = ColorFromPy(pyColor);
+	lab->SetColors(color, ColorBlack);
 
 	Py_RETURN_NONE;
 }

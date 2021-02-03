@@ -49,7 +49,11 @@ Label::~Label()
 void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
-		font->Print( rgn, Text, (palette) ? palette : NULL, Alignment);
+		if (flags & UseColor) {
+			font->Print(rgn, Text, Alignment, colors);
+		} else {
+			font->Print(rgn, Text, Alignment);
+		}
 	}
 
 	if (AnimPicture) {
@@ -70,10 +74,11 @@ void Label::SetText(const String& string)
 	}
 	MarkDirty();
 }
-/** Sets the Foreground Font Color */
-void Label::SetColor(Color col, Color bac)
+
+void Label::SetColors(const Color& col, const Color& bg)
 {
-	palette = new Palette(col, bac);
+	colors.fg = col;
+	colors.bg = bg;
 	MarkDirty();
 }
 

@@ -263,7 +263,7 @@ def RemoveClassAbilities (pc, table, Level):
 					print "ERROR, unknown class ability (type): ", ab
 
 # PST uses a button, IWD2 two types, the rest are the same with two labels
-def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = False):
+def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 	"""Displays the encumbrance as a ratio of current to maximum."""
 
 	# encumbrance
@@ -287,11 +287,11 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	ratio = (0.0 + encumbrance) / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
-			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0}, invert_colors)
+			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		elif ratio > 0.8:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0}, invert_colors)
+			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255}, invert_colors)
+			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 		if Control2ID:
 			Control2.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})

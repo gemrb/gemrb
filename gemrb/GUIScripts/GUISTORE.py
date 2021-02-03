@@ -1298,7 +1298,7 @@ def RedrawStoreShoppingWindow (Window):
 		SetupItems (pc, Slot, Button, Label, i, ITEM_BAG if Bag else ITEM_PC, idx)
 
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 25, None, pc, True)
+		GUICommon.SetEncumbranceLabels (Window, 25, None, pc)
 	else:
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
@@ -1655,7 +1655,7 @@ def RedrawStoreStealWindow (Window):
 		LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 22, None, pc, True)
+		GUICommon.SetEncumbranceLabels (Window, 22, None, pc)
 	else:
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return

@@ -176,14 +176,14 @@ void DisplayMessage::DisplayString(int stridx, unsigned int color, ieDword flags
 
 }
 
-void DisplayMessage::DisplayString(const String& text, unsigned int color, Scriptable *target) const
+void DisplayMessage::DisplayString(const String& text, unsigned int pixel, Scriptable *target) const
 {
 	if (!text.length()) return;
 
 	Label *l = core->GetMessageLabel();
 	if (l) {
-		const Color fore(ieByte((color >> 16) & 0xFF), ieByte((color >> 8) & 0xFF), ieByte(color & 0xFF), ieByte((color >> 24) & 0xFF));
-		l->SetColor( fore, ColorBlack );
+		const Color color(ieByte((pixel >> 16) & 0xFF), ieByte((pixel >> 8) & 0xFF), ieByte(pixel & 0xFF), ieByte((pixel >> 24) & 0xFF));
+		l->SetColors(color, ColorBlack);
 		l->SetText(text);
 	}
 
@@ -191,7 +191,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 	if (ta) {
 		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
-		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
+		swprintf(newstr, newlen, DisplayFormat, pixel, text.c_str());
 		DisplayMarkupString( newstr );
 		free( newstr );
 	}

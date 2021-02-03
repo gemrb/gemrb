@@ -51,7 +51,11 @@ private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip) override;
 
-public: 
+public:
+	enum LabelFlags {
+		UseColor = 1 // when set the label is prented with the PrintColors
+	};
+
 	Label(const Region& frame, Font* font, const String& string);
 	~Label() override;
 
@@ -59,7 +63,7 @@ public:
 	using Control::SetText;
 	void SetText(const String& string) override;
 	/** Sets the Foreground Font Color */
-	void SetColor(Color col, Color bac);
+	void SetColors(const Color& col, const Color& bg);
 	/** Set the font being used */
 	void SetFont(Font *font) { this->font = font; }
 	/** Sets the Alignment of Text */
@@ -72,8 +76,7 @@ private: // Private attributes
 	String Text;
 	/** Font for Text Writing */
 	Font* font;
-	/** Foreground & Background Colors */
-	PaletteHolder palette;
+	Font::PrintColors colors;
 
 	/** Alignment Variable */
 	unsigned char Alignment;
