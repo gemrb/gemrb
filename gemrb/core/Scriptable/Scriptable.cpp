@@ -244,7 +244,7 @@ void Scriptable::DrawOverheadText()
 		return;
 
 	unsigned long time = core->GetGame()->Ticks;
-	PaletteHolder palette;
+	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
 
 	time -= timeStartDisplaying;
 	if (time >= MAX_DELAY) {
@@ -254,8 +254,7 @@ void Scriptable::DrawOverheadText()
 		time = (MAX_DELAY-time)/10;
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
-			const Color overHeadColor(time2, time2, time2, time2);
-			palette = new Palette(overHeadColor, ColorBlack);
+			color.fg = Color(time2, time2, time2, time2);
 		}
 	}
 
@@ -264,15 +263,10 @@ void Scriptable::DrawOverheadText()
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	if (!palette) {
-		palette = core->InfoTextPalette;
-	}
-
 	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.Origin(), Size(200, 400));
-	core->GetTextFont()->Print( rgn, OverheadText, palette,
-							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
+	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
 }
 
 Region Scriptable::DrawingRegion() const

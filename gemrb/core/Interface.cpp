@@ -1422,8 +1422,7 @@ int Interface::Init(InterfaceConfig* config)
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
 
-	Color defcolor(255, 255, 255, 200);
-	SetInfoTextColor(defcolor);
+	SetInfoTextColor(ColorWhite);
 
 	{
 		Log(MESSAGE, "Core", "Initializing Search Path...");
@@ -4756,7 +4755,7 @@ void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
 
 void Interface::SetInfoTextColor(const Color &color)
 {
-	InfoTextPalette = new Palette(color, ColorBlack);
+	InfoTextColor = color;
 }
 
 //todo row?

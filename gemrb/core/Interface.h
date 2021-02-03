@@ -423,7 +423,7 @@ public:
 	Holder<StringMgr> strings;
 	Holder<StringMgr> strings2;
 	GlobalTimer timer;
-	PaletteHolder InfoTextPalette;
+	Color InfoTextColor;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;
