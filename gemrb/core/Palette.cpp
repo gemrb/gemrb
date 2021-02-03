@@ -108,16 +108,6 @@ void Palette::Brighten()
 	version++;
 }
 
-void Palette::Darken()
-{
-	for (int i = 0; i < 256; i++) {
-		col[i].r = (col[i].r * 2) / 3;
-		col[i].g = (col[i].g * 2) / 3;
-		col[i].b = (col[i].b * 2) / 3;
-	}
-	version++;
-}
-
 PaletteHolder Palette::Copy() const
 {
 	return new Palette(std::begin(col), std::end(col));

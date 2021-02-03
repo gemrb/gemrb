@@ -2622,13 +2622,11 @@ PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
 \n\
 **Metaclass Prototype:** SetTextColor (red, green, blue[, invert=0])\n\
 \n\
-**Description:** Sets the text color of a Button control. Invert is used \n\
-for fonts with swapped background and text colors.\n\
+**Description:** Sets the text color of a Button control.\n\
 \n\
 **Parameters:**\n\
   * WindowIndex, ControlIndex - the control's reference\n\
   * red, green, blue - the rgb color values as a rgb dict\n\
-  * invert - swap background and text colors?\n\
 \n\
 **Return value:** N/A\n\
 \n\
@@ -2637,22 +2635,13 @@ for fonts with swapped background and text colors.\n\
 
 static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
 {
-	int swap = 0;
 	PyObject* pyColor;
-	PARSE_ARGS( args,  "OO|i", &self, &pyColor, &swap );
+	PARSE_ARGS(args,  "OO", &self, &pyColor);
 
 	Button* but = GetView<Button>(self);
 	ABORT_IF_NULL(but);
 
-	const Color fore = ColorFromPy(pyColor), back;
-
-	// FIXME: swap is a hack for fonts which apparently have swapped f & B
-	// colors. Maybe it depends on need_palette?
-	if (! swap)
-		but->SetTextColor( fore, back );
-	else
-		but->SetTextColor( back, fore );
-
+	but->SetTextColor(ColorFromPy(pyColor));
 
 	Py_RETURN_NONE;
 }

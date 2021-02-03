@@ -77,7 +77,6 @@ public:
 	bool HasAlpha() const { return alpha; }
 	void CreateShadedAlphaChannel();
 	void Brighten();
-	void Darken();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
 	void SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,

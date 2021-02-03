@@ -231,15 +231,11 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	// Button label
 	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
-		PaletteHolder ppoi = normal_palette;
-		ieByte align = 0;
-
-		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled())
-			ppoi = disabled_palette;
 		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
 
+		ieByte align = 0;
 		if (flags & IE_GUI_BUTTON_ALIGN_LEFT)
 			align |= IE_FONT_ALIGN_LEFT;
 		else if (flags & IE_GUI_BUTTON_ALIGN_RIGHT)
@@ -276,8 +272,18 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 				r.ExpandAllSides(-5);
 			}
 		}
+		
+		Color c = textColor;
+		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled()) {
+			c.r *= 0.66;
+			c.g *= 0.66;
+			c.b *= 0.66;
+		}
 
-		font->Print( r, Text, ppoi, align );
+		// yes, black is the fg color because
+		// the font buttons use doesnt have a foreground/background
+		Font::PrintColors colors {ColorBlack, c};
+		font->Print(r, Text, align, colors);
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
@@ -357,8 +363,6 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
-	disabled_palette = font->GetPalette()->Copy();
-	disabled_palette->Darken();
 }
 
 String Button::TooltipText() const
@@ -664,11 +668,9 @@ bool Button::HitTest(const Point& p) const
 }
 
 // Set palette used for drawing button label in normal state
-void Button::SetTextColor(const Color &fore, const Color &back)
+void Button::SetTextColor(const Color &color)
 {
-	normal_palette = new Palette(fore, back);
-	disabled_palette = new Palette(fore, back);
-	disabled_palette->Darken();
+	textColor = color;
 	MarkDirty();
 }
 

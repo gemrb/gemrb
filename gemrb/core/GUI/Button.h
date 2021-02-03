@@ -152,7 +152,7 @@ public:
 	/** Refreshes the button from a radio group */
 	void UpdateState(unsigned int Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
-	void SetTextColor(const Color &fore, const Color &back);
+	void SetTextColor(const Color &color);
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; }
 	/** Set explicit anchor point for text */
@@ -169,8 +169,8 @@ private: // Private attributes
 	Font* font;
 	bool ToggleState;
 	bool pulseBorder;
-	PaletteHolder normal_palette;
-	PaletteHolder disabled_palette;
+	Color textColor = ColorWhite;
+
 	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture;
