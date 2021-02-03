@@ -2961,7 +2961,6 @@ selects the color affected.\n\
   * WindowIndex - the window control id\n\
   * ControlID - the id of the target control\n\
   * which - selects the color affected:\n\
-    * IE_GUI_WMAP_COLOR_BACKGROUND\n\
     * IE_GUI_WMAP_COLOR_NORMAL - main text color\n\
     * IE_GUI_WMAP_COLOR_SELECTED - color of hovered on text\n\
     * IE_GUI_WMAP_COLOR_NOTVISITED - color of unvisited entries\n\

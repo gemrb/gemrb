@@ -40,10 +40,9 @@ class WorldMapControl;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
 /** Which label color is set with SetColor() */
-#define IE_GUI_WMAP_COLOR_BACKGROUND  0
-#define IE_GUI_WMAP_COLOR_NORMAL      1
-#define IE_GUI_WMAP_COLOR_SELECTED    2
-#define IE_GUI_WMAP_COLOR_NOTVISITED  3
+#define IE_GUI_WMAP_COLOR_NORMAL      0
+#define IE_GUI_WMAP_COLOR_SELECTED    1
+#define IE_GUI_WMAP_COLOR_NOTVISITED  2
 
 
 /**
@@ -95,11 +94,11 @@ private:
 	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
 	bool OverrideIconPalette;
 	/** Label color of a visited area */
-	Holder<Palette> pal_normal;
+	Color color_normal = ColorWhite;
 	/** Label color of a currently selected area */
-	Holder<Palette> pal_selected;
+	Color color_selected = ColorWhite;
 	/** Label color of a not yet visited area */
-	Holder<Palette> pal_notvisited;
+	Color color_notvisited = ColorWhite;
 
 };
 

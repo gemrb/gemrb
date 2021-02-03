@@ -56,9 +56,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 			CopyResRef(currentArea, m->AreaResRef);
 		}
 	}
-	
-	SetColor(IE_GUI_WMAP_COLOR_BACKGROUND, ColorBlack);
-	
+		
 	ControlEventHandler handler = [this](Control* /*this*/) {
 		//this also updates visible locations
 		WorldMap* worldmap = core->GetWorldMap();
@@ -89,10 +87,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
-				PaletteHolder pal = icon->GetPalette();
-				icon->SetPalette(pal_selected);
-				video->BlitSprite( icon, offset, &rgn );
-				icon->SetPalette(pal);
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD, color_selected);
 			} else {
 				video->BlitSprite( icon, offset, &rgn );
 			}
@@ -117,19 +112,21 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Point p = m->pos - icon_frame.Origin();
 		Region r2 = Region(MapToScreen(p), icon_frame.Dimensions());
 		
-		PaletteHolder text_pal;
+		Font::PrintColors colors;
 		if (Area == m) {
-			text_pal = pal_selected;
+			colors.fg = color_selected;
 		} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-			text_pal = pal_notvisited;
+			colors.fg = color_notvisited;
 		} else {
-			text_pal = pal_normal;
+			colors.fg = color_normal;
 		}
+		
+		colors.bg = ColorBlack;
 
 		Size ts = ftext->StringSize(*caption);
 		ts.w += 10;
 		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
-					 *caption, text_pal, 0 );
+					 *caption, 0, colors);
 	}
 }
 
@@ -291,28 +288,15 @@ bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*
 
 void WorldMapControl::SetColor(int which, Color color)
 {
-	// initialize label colors
-	// NOTE: it would be better to initialize these colors from
-	//   some 2da file
-	static const Color normal(0xf0, 0xf0, 0xf0, 0xff);
-	static const Color selected(0xf0, 0x80, 0x80, 0xff);
-	static const Color notvisited(0x80, 0x80, 0xf0, 0xff);
-	// FIXME: clearly it can cause palettes to be re-created several times,
-	//   because setting background color creates all palettes anew.
 	switch (which) {
-	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal_normal = MakeHolder<Palette>(pal_normal ? pal_normal->front : normal, color);
-		pal_selected = MakeHolder<Palette>(pal_selected ? pal_selected->front : selected, color);
-		pal_notvisited = MakeHolder<Palette>(pal_notvisited ? pal_notvisited->front : notvisited, color);
-		break;
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal_normal = MakeHolder<Palette>(color, pal_normal->back);
+		color_normal = color;
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal_selected = MakeHolder<Palette>(color, pal_selected->back);
+		color_selected = color;
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal_notvisited = MakeHolder<Palette>(color, pal_notvisited->back);
+		color_notvisited = color;
 		break;
 	default:
 		break;

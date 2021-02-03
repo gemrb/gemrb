@@ -148,10 +148,9 @@ IE_GUI_MAP_REVEAL_MAP =  3
 
 # !!! Keep these synchronized with WorldMapControl.h !!!
 # WorldMap label colors
-IE_GUI_WMAP_COLOR_BACKGROUND = 0
-IE_GUI_WMAP_COLOR_NORMAL     = 1
-IE_GUI_WMAP_COLOR_SELECTED   = 2
-IE_GUI_WMAP_COLOR_NOTVISITED = 3
+IE_GUI_WMAP_COLOR_NORMAL     = 0
+IE_GUI_WMAP_COLOR_SELECTED   = 1
+IE_GUI_WMAP_COLOR_NOTVISITED = 2
 
 # !!! Keep these synchronized with Font.h !!!
 IE_FONT_ALIGN_LEFT       = 0x00
