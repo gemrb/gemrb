@@ -37,12 +37,12 @@ public:
 	};
 
 	GemMarkupParser();
-	GemMarkupParser(const Font* ftext, PaletteHolder textPal = nullptr,
-					const Font* finit = nullptr, PaletteHolder initPal = nullptr);
+	GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
+					const Font* finit, Font::PrintColors initCols);
 	~GemMarkupParser() {};
 
-	void ResetAttributes(const Font *ftext = nullptr, PaletteHolder textPal = nullptr,
-						 const Font *finit = nullptr, PaletteHolder initPal = nullptr);
+	void ResetAttributes(const Font *ftext, Font::PrintColors textCols,
+						 const Font *finit, Font::PrintColors initCols);
 
 	void Reset();
 
@@ -52,63 +52,43 @@ public:
 private:
 	class TextAttributes {
 		private:
-		Holder<Palette> palette;
-		Holder<Palette> swapPalette;
+		Font::PrintColors textColor;
+		Font::PrintColors swapColor;
 
 		public:
 		const Font* TextFont;
 		const Font* SwapFont;
 
 		public:
-		TextAttributes(const Font* text, PaletteHolder textPal = nullptr,
-					   const Font *init = nullptr, PaletteHolder initPal = nullptr)
-		: palette(textPal), swapPalette(initPal)
+		TextAttributes(const Font *text, Font::PrintColors textColor,
+					   const Font *init, Font::PrintColors initColor)
+		: textColor(textColor), swapColor(initColor)
 		{
 			TextFont = text;
-			SwapFont = (init) ? init : TextFont;
-			assert(TextFont);
+			SwapFont = init;
+			assert(TextFont && SwapFont);
 		}
 
-		TextAttributes(const TextAttributes& ta)
-		: palette(ta.palette), swapPalette(ta.swapPalette)
-		{
-			TextFont = ta.TextFont;
-			SwapFont = ta.SwapFont;
-		}
-
-		TextAttributes& operator=(const TextAttributes& ta) {
-			if (&ta != this) {
-				TextFont = ta.TextFont;
-				SwapFont = ta.SwapFont;
-				palette = ta.palette;
-				swapPalette = ta.swapPalette;
-			}
-			return *this;
-		}
+		TextAttributes(const TextAttributes& ta) = default;
+		TextAttributes& operator=(const TextAttributes& ta) = default;
 
 		void SwapFonts() {
 			std::swap(TextFont, SwapFont);
-			std::swap(palette, swapPalette);
+			std::swap(textColor, swapColor);
 		}
 
-		void SetTextPalette(Holder<Palette> pal) {
-			palette = pal;
+		void SetTextColor(Font::PrintColors c) {
+			textColor = std::move(c);
 		}
 
-		Holder<Palette> TextPalette() const {
-			if (palette) {
-				return palette;
-			}
-			return TextFont->GetPalette();
+		const Font::PrintColors& TextColor() const {
+			return textColor;
 		}
 	};
 
-	static Holder<Palette> GetSharedPalette(const String& colorString);
-
-	typedef std::map<String, Holder<Palette> > PaletteCache;
-	static PaletteCache PalCache;
 	std::stack<TextAttributes> context;
 	ParseState state;
+	Color textBg;
 };
 
 }

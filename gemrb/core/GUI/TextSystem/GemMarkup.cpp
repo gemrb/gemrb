@@ -20,24 +20,11 @@
 
 namespace GemRB {
 
-GemMarkupParser::PaletteCache GemMarkupParser::PalCache;
-
-PaletteHolder GemMarkupParser::GetSharedPalette(const String& colorString)
+static Color ParseColor(const String& colorString)
 {
-	PaletteCache::const_iterator it = PalCache.find(colorString);
-	if (it != PalCache.end()) {
-		return it->second;
-	}
-
-	Color palCol;
-	unsigned int r, g, b;
-	swscanf(colorString.c_str(), L"%02X%02X%02X", &r, &g, &b);
-	palCol.r = r;
-	palCol.g = g;
-	palCol.b = b;
-	PaletteHolder pal = new Palette(palCol, ColorBlack);
-	pal->CreateShadedAlphaChannel();
-	return PalCache.insert(std::make_pair(colorString, pal)).first->second;
+	Color color = ColorWhite;
+	swscanf(colorString.c_str(), L"%02hhx%02hhx%02hhx", &color.r, &color.g, &color.b);
+	return color;
 }
 
 GemMarkupParser::GemMarkupParser()
@@ -45,16 +32,18 @@ GemMarkupParser::GemMarkupParser()
 	state = TEXT;
 }
 
-GemMarkupParser::GemMarkupParser(const Font* ftext, PaletteHolder textPal, const Font* finit, PaletteHolder initPal)
+GemMarkupParser::GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
+								 const Font* finit, Font::PrintColors initCols)
 {
 	state = TEXT;
-	context.push(TextAttributes(ftext, textPal, finit, initPal));
+	ResetAttributes(ftext, textCols, finit, initCols);
 }
 
-void GemMarkupParser::ResetAttributes(const Font* ftext, PaletteHolder textPal, const Font* finit, PaletteHolder initPal)
+void GemMarkupParser::ResetAttributes(const Font* ftext, Font::PrintColors textCols, const Font* finit, Font::PrintColors initCols)
 {
 	while(context.size()) context.pop();
-	context.push(TextAttributes(ftext, textPal, finit, initPal));
+	textBg = textCols.bg;
+	context.push(TextAttributes(ftext, textCols, finit, initCols));
 }
 
 void GemMarkupParser::Reset()
@@ -138,7 +127,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
-							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextPalette(), &frame));
+							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextColor(), &frame));
 						}
 						token.clear();
 						if (*++it == '/')
@@ -153,9 +142,8 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						PaletteHolder pal = GetSharedPalette(token);
 						context.push(TextAttributes(attributes));
-						context.top().SetTextPalette(pal);
+						context.top().SetTextColor({ParseColor(token), textBg});
 						state = TEXT;
 						token.clear();
 						continue;

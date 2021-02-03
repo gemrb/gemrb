@@ -46,9 +46,11 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	Region r(origin, Dimensions());
 	r.w = std::max(r.w - margin.left - margin.right, 0);
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+	
+	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
 
 	for (size_t i = 0; i < opts.size(); i++) {
-		TextContainer* selOption = new OptSpan(r, ta.ftext, ta.palettes[PALETTE_OPTIONS]);
+		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
 		selOption->SetAutoResizeFlags(ResizeHorizontal, OP_SET);
 
 		if (numbered) {
@@ -56,9 +58,9 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", static_cast<int>(i+1));
 			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
 			// but that should probably actually be done by the dialog handler, not here.
-			selOption->AppendContent(new TextSpan(optNum, NULL, ta.palettes[PALETTE_SELECTED]));
+			selOption->AppendContent(new TextSpan(optNum, nullptr, colors));
 		}
-		selOption->AppendContent(new TextSpan(*opts[i], NULL, NULL, &flexFrame));
+		selOption->AppendContent(new TextSpan(*opts[i], nullptr, &flexFrame));
 		AddSubviewInFrontOfView(selOption);
 
 		if (EventMgr::TouchInputEnabled) {
@@ -130,10 +132,10 @@ void TextArea::SpanSelector::ClearHover()
 {
 	if (hoverSpan) {
 		if (hoverSpan == selectedSpan) {
-			hoverSpan->SetPalette(ta.palettes[PALETTE_SELECTED]);
+			hoverSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
 		} else {
 			// reset the old hover span
-			hoverSpan->SetPalette(ta.palettes[PALETTE_OPTIONS]);
+			hoverSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
 		}
 		hoverSpan = NULL;
 	}
@@ -149,12 +151,12 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 
 	if (selectedSpan && selectedSpan != optspan) {
 		// reset the previous selection
-		selectedSpan->SetPalette(ta.palettes[PALETTE_OPTIONS]);
+		selectedSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
 	}
 	selectedSpan = optspan;
 	
 	if (selectedSpan) {
-		selectedSpan->SetPalette(ta.palettes[PALETTE_SELECTED]);
+		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
 	}
 
 	// beware, this will recursively call this function.
@@ -189,7 +191,7 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 	ClearHover();
 	if (span) {
 		hoverSpan = span;
-		hoverSpan->SetPalette(ta.palettes[PALETTE_HOVER]);
+		hoverSpan->SetColors(ta.colors[COLOR_HOVER], ta.colors[COLOR_BACKGROUND]);
 	}
 	return true;
 }
@@ -216,46 +218,23 @@ void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op
 }
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), textMargins(0,3), palettes()
-{
-	palettes[PALETTE_NORMAL] = text->GetPalette();
-	finit = ftext;
-	
-	parser.ResetAttributes(text, palettes[PALETTE_NORMAL], text, palettes[PALETTE_NORMAL]);
-	Init();
-}
+: TextArea(frame, text, text, ColorWhite, ColorWhite, ColorBlack)
+{}
 
 TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), palettes()
+				   const Color& textcolor, const Color& initcolor, const Color& textBgColor)
+: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), colors()
 {
-	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
+	colors[COLOR_NORMAL] = textcolor;
+	colors[COLOR_INITIALS] = initcolor;
+	colors[COLOR_BACKGROUND] = textBgColor;
 
 	// quick font optimization (prevents creating unnecessary cap spans)
-	finit = (caps != ftext) ? caps : ftext;
+	finit = (caps && caps != ftext) ? caps : ftext;
+	assert(ftext && finit);
 
-	// in case a bad or missing font was specified, use an obvious fallback
-	if (!finit) {
-		Log(ERROR, "TextArea", "Tried to use missing font, resorting to a fallback!");
-		finit = core->GetTextFont();
-		ftext = finit;
-	}
+	parser.ResetAttributes(text, {textcolor, textBgColor}, finit, {initcolor, textBgColor});
 
-	if (finit->Baseline < ftext->LineHeight) {
-		// FIXME: initcolor is only used for *some* initial fonts
-		// this is a hack to workaround the INITIALS font getting its palette set
-		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
-		SetPalette(&initcolor, PALETTE_INITIALS);
-	} else {
-		palettes[PALETTE_INITIALS] = finit->GetPalette();
-	}
-
-	parser.ResetAttributes(text, palettes[PALETTE_NORMAL], finit, palettes[PALETTE_INITIALS]);
-	Init();
-}
-
-void TextArea::Init()
-{
 	ControlType = IE_GUI_TEXTAREA;
 	strncpy(VarName, "Selected", sizeof(VarName));
 
@@ -411,15 +390,10 @@ void TextArea::SetText(const String& text)
 	AppendText(text);
 }
 
-void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
+void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
 {
-	assert(idx < PALETTE_TYPE_COUNT);
-	if (color) {
-		palettes[idx] = new Palette( *color, ColorBlack );
-	} else if (idx > PALETTE_NORMAL) {
-		// default to normal
-		palettes[idx] = palettes[PALETTE_NORMAL];
-	}
+	assert(idx < COLOR_TYPE_COUNT);
+	colors[idx] = color;
 }
 
 void TextArea::TrimHistory(size_t lines)
@@ -486,7 +460,7 @@ void TextArea::AppendText(const String& text)
 					// see BG2 chargen
 					s.w += 3;
 				}
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]}, &s);
 				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
@@ -636,11 +610,11 @@ void TextArea::ClearSelectOptions()
 }
 
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
-								const Color* color, const Color* hiColor, const Color* selColor)
+								const Color& color, const Color& hiColor, const Color& selColor)
 {
-	SetPalette(color, PALETTE_OPTIONS);
-	SetPalette(hiColor, PALETTE_HOVER);
-	SetPalette(selColor, PALETTE_SELECTED);
+	SetColor(color, COLOR_OPTIONS);
+	SetColor(hiColor, COLOR_HOVER);
+	SetColor(selColor, COLOR_SELECTED);
 
 	ClearSelectOptions(); // deletes previous options
 
@@ -694,7 +668,8 @@ void TextArea::ClearText()
 	delete scrollview.RemoveSubview(textContainer);
 
 	parser.Reset(); // reset in case any tags were left open from before
-	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext, palettes[PALETTE_NORMAL]);
+	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext);
+	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
 	textContainer->SetMargin(textMargins);
 	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
 	if (Flags()&Editable) {

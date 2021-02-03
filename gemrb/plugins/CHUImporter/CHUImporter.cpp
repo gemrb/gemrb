@@ -417,8 +417,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
+				
+				fore.a = init.a = back.a = 0xff;
 
-				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
+				TextArea* ta = new TextArea(ctrlFrame, fnt, ini, fore, init, back);
 				if (SBID != 0xffff) {
 					// we dont actually care about the scrollbar,
 					// TextAreas automatically produce their own in GemRB

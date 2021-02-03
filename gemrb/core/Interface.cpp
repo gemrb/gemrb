@@ -426,7 +426,7 @@ void Interface::CreateConsole()
 	Region frame(0, 0, 640, 200);
 	
 	Window* consoleWin = winmgr->MakeWindow(frame);
-	TextArea* ta = new TextArea(frame, GetTextFont(), nullptr, ColorWhite, ColorWhite, ColorBlack);
+	TextArea* ta = new TextArea(frame, GetTextFont());
 	Console* console = new Console(frame, ta);
 
 	consoleWin->AddSubviewInFrontOfView(console);

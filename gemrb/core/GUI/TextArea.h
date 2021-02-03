@@ -36,8 +36,8 @@ namespace GemRB {
 
 typedef std::pair<int, String> SelectOption;
 
-static const Color SelectOptionHover(255, 180, 0, 0);  // default hover color for SelectOption
-static const Color SelectOptionSelected(55, 100, 0, 0);// default selected color for SelectOption
+static const Color SelectOptionHover(255, 180, 0, 255);  // default hover color for SelectOption
+static const Color SelectOptionSelected(55, 100, 0, 255);// default selected color for SelectOption
 
 /**
  * @class TextArea
@@ -52,8 +52,11 @@ private:
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {
-			OptSpan(const Region& frame, Font* font, Holder<Palette> pal)
-			: TextContainer(frame, font, pal) {}
+			OptSpan(const Region& frame, Font* font, const Color& fg, const Color& bg)
+			: TextContainer(frame, font)
+			{
+				SetColors(fg, bg);
+			}
 			
 			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
 			void OnMouseLeave(const MouseEvent& me, const DragOp*) override {
@@ -101,7 +104,7 @@ private:
 public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
-			 Color hitextcolor, Color initcolor, Color lowtextcolor);
+			 const Color& textcolor, const Color& initcolor, const Color& textBgColor);
 
 	bool IsOpaque() const override { return false; }
 
@@ -125,7 +128,7 @@ public:
 	ieWord LineHeight() const;
 
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color* color, const Color* hiColor, const Color* selColor);
+						  const Color& = ColorWhite, const Color& = ColorWhite, const Color& = ColorWhite);
 	
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
@@ -160,20 +163,21 @@ private: // Private attributes
 	GemMarkupParser parser;
 	ContentContainer::Margin textMargins;
 
-	enum PALETTE_TYPE {
-		PALETTE_NORMAL = 0,	// standard text color
-		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
-		PALETTE_HOVER,		// palette for hovering options (dialog/listbox)
-		PALETTE_SELECTED,	// selected list box/dialog option.
-		PALETTE_INITIALS,	// palette for finit. used only is some cases.
-
-		PALETTE_TYPE_COUNT
+	enum COLOR_TYPE {
+		COLOR_NORMAL = 0,	// standard text color
+		COLOR_INITIALS,	// color for finit. used only is some cases.
+		COLOR_BACKGROUND, // the background color for all text
+		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
+		COLOR_HOVER,	// color for hovering options (dialog/listbox)
+		COLOR_SELECTED,	// selected list box/dialog option.
+		
+		COLOR_TYPE_COUNT
 	};
-	Holder<Palette> palettes[PALETTE_TYPE_COUNT];
+	Color colors[COLOR_TYPE_COUNT];
+	PaletteHolder invertedText;
 
 private: //internal functions
-	void Init();
-	void SetPalette(const Color*, PALETTE_TYPE);
+	void SetColor(const Color&, COLOR_TYPE);
 
 	void UpdateScrollview();
 	Region UpdateTextFrame();

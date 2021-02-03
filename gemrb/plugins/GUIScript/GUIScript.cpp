@@ -4801,7 +4801,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	for (size_t i =0; i < strings.size(); i++) {
 		TAOptions.push_back(std::make_pair(i, strings[i]));
 	}
-	ta->SetSelectOptions(TAOptions, false, NULL, &SelectOptionHover, &SelectOptionSelected);
+	ta->SetSelectOptions(TAOptions, false, ColorWhite, SelectOptionHover, SelectOptionSelected);
 
 	return MakePyList<const String&, PyString_FromStringObj>(strings);
 }
@@ -4854,7 +4854,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		TAOptions.push_back(std::make_pair(i, *string));
 		delete string;
 	}
-	ta->SetSelectOptions(TAOptions, false, NULL, &SelectOptionHover, &SelectOptionSelected);
+	ta->SetSelectOptions(TAOptions, false, ColorWhite, SelectOptionHover, SelectOptionSelected);
 
 	Py_RETURN_NONE;
 }

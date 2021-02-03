@@ -37,10 +37,11 @@ constexpr size_t HistoryMaxSize = 5;
 
 Console::Console(const Region& frame, TextArea* ta)
 : View(frame), History(HistoryMaxSize),
-	textContainer(Region(0, 0, 0, 25), core->GetTextFont(), nullptr),
-	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont(), nullptr, ColorWhite, ColorWhite, ColorBlack)
+	textContainer(Region(0, 0, 0, 25), core->GetTextFont()),
+	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont())
 {
 	// TODO: move all the control composition to Console.py
+	textContainer.SetColors(ColorWhite, ColorBlack);
 
 	textArea = ta;
 	HistPos = 0;
@@ -53,8 +54,6 @@ Console::Console(const Region& frame, TextArea* ta)
 	feedback.AssignScriptingRef(1, "CONSOLE");
 	feedback.SetFlags(TextArea::AutoScroll | TextArea::ClearHistory, OP_OR);
 
-	PaletteHolder palette = new Palette( ColorWhite, ColorBlack );
-	textContainer.SetPalette(palette);
 	textContainer.SetMargin(3);
 
 	textContainer.SetAlignment(align);
@@ -148,7 +147,7 @@ void Console::UpdateTextArea()
 			options.push_back(item);
 		}
 		textArea->SetValue(-1);
-		textArea->SetSelectOptions(options, false, nullptr, &SelectOptionHover, &SelectOptionSelected);
+		textArea->SetSelectOptions(options, false);
 		//textArea->SelectAvailableOption(History.Size() - HistPos);
 		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
 		// then we can change the color to red for failed commands and green for successfull ones

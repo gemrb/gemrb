@@ -73,7 +73,7 @@ friend class TextContainer;
 private:
 	String text;
 	const Font* font;
-	Holder<Palette> palette;
+	Font::PrintColors* colors = nullptr;
 	
 	struct TextLayoutRegion : LayoutRegion {
 		size_t beginCharIdx;
@@ -86,7 +86,12 @@ private:
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(const String& string, const Font* font, Holder<Palette> pal = NULL, const Size* = NULL);
+	TextSpan(const String& string, const Font* font, const Size* = nullptr);
+	TextSpan(const String& string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
+	~TextSpan();
+	
+	void ClearColors();
+	void SetColors(const Color& fg, const Color& bg);
 
 	const String& Text() const { return text; };
 
@@ -235,7 +240,7 @@ private:
 	using TextLayout = TextSpan::TextLayoutRegion;
 	// default font/palette for adding plain text
 	Font* font;
-	Holder<Palette> palette;
+	Font::PrintColors* colors = nullptr;
 	unsigned char alignment;
 
 	size_t textLen;
@@ -269,18 +274,20 @@ private:
 	ContentIndex FindContentForChar(size_t idx);
 
 public:
-	TextContainer(const Region& frame, Font* font, Holder<Palette>);
+	TextContainer(const Region& frame, Font* font);
+	~TextContainer();
 
 	void AppendText(const String& text);
-	void AppendText(const String& text, Font* fnt, Holder<Palette> pal);
+	void AppendText(const String& text, Font* fnt, const Font::PrintColors* = nullptr);
 	String TextFrom(const Content*) const;
 	String Text() const;
 
 	void DidFocus() override;
 	void DidUnFocus() override;
 
-	void SetPalette(Holder<Palette> pal);
-	Holder<Palette> TextPalette() const { return palette; }
+	void ClearColors();
+	void SetColors(const Color& fg, const Color& bg);
+	const Font::PrintColors* TextColors() const { return colors; }
 	void SetFont(Font* fnt) { font = fnt; }
 	const Font* TextFont() const { return font; }
 	void SetAlignment(unsigned char align) { alignment = align; }

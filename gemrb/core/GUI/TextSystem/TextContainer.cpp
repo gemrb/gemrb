@@ -40,10 +40,32 @@ LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 	return { std::make_shared<LayoutRegion>(Region(rgn.Origin() + p, frame.Dimensions())) };
 }
 
-TextSpan::TextSpan(const String& string, const Font* fnt, Holder<Palette> pal, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt), palette(pal)
+TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
+	: Content((frame) ? *frame : Size()), text(string), font(fnt)
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
+}
+
+TextSpan::TextSpan(const String& string, const Font* fnt, Font::PrintColors cols, const Size* frame)
+	: Content((frame) ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
+{
+	Alignment = IE_FONT_ALIGN_LEFT;
+}
+
+TextSpan::~TextSpan()
+{
+	delete colors;
+}
+
+void TextSpan::ClearColors()
+{
+	delete colors;
+}
+
+void TextSpan::SetColors(const Color& fg, const Color& bg)
+{
+	ClearColors();
+	colors = new Font::PrintColors {fg, bg};
 }
 
 inline const Font* TextSpan::LayoutFont() const
@@ -233,12 +255,12 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
 		const Font* printFont = LayoutFont();
-		Holder<Palette> printPalette = palette;
+		const Font::PrintColors* pc = colors;
 		TextContainer* container = static_cast<TextContainer*>(parent);
-		if (!printPalette && container) {
-			printPalette = container->TextPalette();
+		if (!pc && container) {
+			pc = container->TextColors();
 		}
-		assert(printFont && printPalette);
+		assert(printFont);
 		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
 		// for now only assert when ID_TEXT is set
 		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
@@ -248,7 +270,12 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		}
 		// FIXME: layout assumes left alignment, so alignment is mostly broken
 		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
-		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, Alignment);
+		if (colors) {
+			charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), Alignment, *colors);
+		} else {
+			charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), Alignment);
+		}
+
 		if (core->InDebugMode(ID_TEXT)) {
 			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
 		}
@@ -648,25 +675,32 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 }
 
 
-TextContainer::TextContainer(const Region& frame, Font* fnt, Holder<Palette> pal)
+TextContainer::TextContainer(const Region& frame, Font* fnt)
 	: ContentContainer(frame), font(fnt)
 {
-	SetPalette(pal);
 	alignment = IE_FONT_ALIGN_LEFT;
 	textLen = 0;
 	cursorPos = 0;
 	printPos = 0;
 }
 
-void TextContainer::AppendText(const String& text)
+TextContainer::~TextContainer()
 {
-	AppendText(text, NULL, NULL);
+	delete colors;
 }
 
-void TextContainer::AppendText(const String& text, Font* fnt, Holder<Palette> pal)
+void TextContainer::AppendText(const String& text)
+{
+	AppendText(text, nullptr, colors);
+}
+
+void TextContainer::AppendText(const String& text, Font* fnt, const Font::PrintColors* cols)
 {
 	if (text.length()) {
-		TextSpan* span = new TextSpan(text, fnt, pal);
+		TextSpan* span = new TextSpan(text, fnt);
+		if (cols) {
+			span->SetColors(cols->fg, cols->bg);
+		}
 		span->Alignment = alignment;
 		AppendContent(span);
 		textLen += text.length();
@@ -681,9 +715,16 @@ void TextContainer::ContentRemoved(const Content* content)
 	textLen -= ts->Text().length();
 }
 
-void TextContainer::SetPalette(Holder<Palette> pal)
+void TextContainer::ClearColors()
 {
-	palette = (pal) ? pal : font->GetPalette();
+	delete colors;
+	MarkDirty();
+}
+
+void TextContainer::SetColors(const Color& fg, const Color& bg)
+{
+	ClearColors();
+	colors = new Font::PrintColors {fg, bg};
 }
 
 String TextContainer::Text() const
