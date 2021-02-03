@@ -204,6 +204,9 @@ public:
 					const Region* clip = NULL);
 
 	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) = 0;
+	
+	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+							uint32_t flags, Color tint) = 0;
 
 	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 								uint32_t flags, Color tint,

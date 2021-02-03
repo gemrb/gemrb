@@ -302,6 +302,14 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 	BlitSpriteClipped(spr, src, dst, flags);
 }
 
+void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+								uint32_t flags, Color tint)
+{
+	dst.x -= spr->Frame.x;
+	dst.y -= spr->Frame.y;
+	BlitSpriteClipped(spr, src, dst, flags, &tint);
+}
+
 void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 									uint32_t flags, Color tint, const Region* clip)
 {
