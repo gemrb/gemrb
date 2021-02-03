@@ -118,6 +118,17 @@ public:
 #endif
 		SDL_RenderClear(renderer);
 	}
+	
+	void Clear(const SDL_Rect& rgn) {
+		SDL_SetRenderTarget(renderer, texture);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+		SDL_RenderFillRect(renderer, &rgn);
+	}
+	
+	void Clear(const Region& rgn) override {
+		return Clear(RectFromRegion(rgn));
+	}
 
 	bool RenderOnDisplay(void* display) const override {
 		SDL_Renderer* renderer = static_cast<SDL_Renderer*>(display);

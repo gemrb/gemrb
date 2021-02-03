@@ -101,18 +101,19 @@ public:
 		assert(surf);
 		buffer = surf;
 
-		Clear();
+		VideoBuffer::Clear();
 	}
 
 	~SDLSurfaceVideoBuffer() override {
 		SDL_FreeSurface(buffer);
 	}
 
-	void Clear() override {
+	void Clear(const Region& rgn) override {
+		SDL_Rect r = RectFromRegion(rgn);
 		if (buffer->flags & SDL_SRCCOLORKEY) {
-			SDL_FillRect(buffer, NULL, buffer->format->colorkey);
+			SDL_FillRect(buffer, &r, buffer->format->colorkey);
 		} else {
-			SDL_FillRect(buffer, NULL, 0);
+			SDL_FillRect(buffer, &r, 0);
 		}
 	}
 

@@ -86,7 +86,8 @@ public:
 	
 	void SetOrigin(const Point& p) { rect.x = p.x, rect.y = p.y; }
 
-	virtual void Clear() = 0;
+	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
+	virtual void Clear(const Region& rgn) = 0;
 	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
 	virtual void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) = 0;
 	

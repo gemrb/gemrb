@@ -270,10 +270,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		SDL_Texture* stencilTex = CurrentStencilBuffer();
 		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
 
-		SDL_SetRenderTarget(renderer, ScratchBuffer());
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_TRANSPARENT);
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
-		SDL_RenderFillRect(renderer, &drect);
+		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
 
 		RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
 
