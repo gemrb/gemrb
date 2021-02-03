@@ -2845,8 +2845,8 @@ int Interface::PlayMovie(const char* resref)
 		mutable String* cachedSub;
 
 	public:
-		IESubtitles(class Font* fnt, ResRef resref, PaletteHolder pal = nullptr)
-		: MoviePlayer::SubtitleSet(fnt, pal)
+		IESubtitles(class Font* fnt, ResRef resref, const Color& col = ColorWhite)
+		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			AutoTable sttable(resref);
 			cachedSub = NULL;
@@ -2890,18 +2890,12 @@ int Interface::PlayMovie(const char* resref)
 	AutoTable sttable(resref);
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
-		Holder<Palette> pal = font->GetPalette();
-
 		int r = atoi(sttable->QueryField("red", "frame"));
 		int g = atoi(sttable->QueryField("green", "frame"));
 		int b = atoi(sttable->QueryField("blue", "frame"));
 
 		if (r || g || b) {
-			// FIXME: this doesn't look very good (IWD2), wrong font?
-			Color bg = Color(ieByte(r), ieByte(g), ieByte(b), 0);
-			Color fg = Color(0, 0, 0, 0xff);
-			PaletteHolder pal = new Palette(fg, bg);
-			mp->SetSubtitles(new IESubtitles(font, resref, pal));
+			mp->SetSubtitles(new IESubtitles(font, resref, Color(r, g, b, 0xff)));
 		} else {
 			mp->SetSubtitles(new IESubtitles(font, resref));
 		}
