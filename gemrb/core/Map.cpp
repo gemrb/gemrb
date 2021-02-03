@@ -1314,7 +1314,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		if (BgDuration < gametime) {
 			Background = nullptr;
 		} else {
-			video->BlitSprite(Background, 0, 0);
+			video->BlitSprite(Background, Point());
 			bgoverride = true;
 		}
 	}
@@ -3982,7 +3982,7 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, uint32_t flags) con
 		Animation *anim = animation[ac];
 		Holder<Sprite2D> frame = anim->NextFrame();
 		
-		video->BlitGameSpriteWithPalette(frame, palette, Pos.x - viewport.x, Pos.y - viewport.y, flags, tint);
+		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.Origin(), flags, tint);
 	}
 }
 

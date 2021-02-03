@@ -240,8 +240,7 @@ void Particles::Draw(Point p)
 					if (game) game->ApplyGlobalTint(clr, flags);
 
 					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
-													 points[i].pos.x - p.x, points[i].pos.y - p.y,
-													 flags, clr, NULL);
+													 points[i].pos - p, flags, clr, NULL);
 				}
 			}
 			break;

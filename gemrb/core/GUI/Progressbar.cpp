@@ -75,8 +75,9 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 		Region r(rgn.Origin() + KnobPos, Size(Count, size.h));
 		core->GetVideoDriver()->BlitSprite(BackGround2, r.Origin(), &r);
 
-		core->GetVideoDriver()->BlitSprite(PBarCap, rgn.x + CapPos.x + Count-PBarCap->Frame.w,
-										   rgn.y + CapPos.y);
+		Point p = rgn.Origin() + CapPos;
+		p.x += Count - PBarCap->Frame.w;
+		core->GetVideoDriver()->BlitSprite(PBarCap, p);
 		return;
 	}
 

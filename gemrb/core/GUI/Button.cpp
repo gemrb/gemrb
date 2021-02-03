@@ -153,10 +153,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
-			int xOffs = ( frame.w / 2 ) - ( Image->Frame.w / 2 );
-			int yOffs = ( frame.h / 2 ) - ( Image->Frame.h / 2 );
-
-			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs );
+			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
+			video->BlitSprite(Image, rgn.Origin() + offset);
 		}
 	}
 
@@ -167,14 +165,13 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	// Button picture
-	int picXPos = 0, picYPos = 0;
+	Point picPos;
 	if (Picture && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		picXPos = ( rgn.w / 2 ) - ( Picture->Frame.w / 2 ) + rgn.x;
-		picYPos = ( rgn.h / 2 ) - ( Picture->Frame.h / 2 ) + rgn.y;
+		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
+		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
 		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
-			picXPos += Picture->Frame.x;
-			picYPos += Picture->Frame.y;
+			picPos += Picture->Frame.Origin();
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
 			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
@@ -187,14 +184,13 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (overlayHeight) {
 				// TODO: Add an option to add BLIT_GREY to the flags
 				const Color& col = overlayAnim.Current();
-				video->BlitGameSprite(Picture, picXPos, picYPos, BLIT_COLOR_MOD, col, NULL);
+				video->BlitGameSprite(Picture, picPos, BLIT_COLOR_MOD, col, NULL);
 			}
 
-			Region rb = Region(picXPos, picYPos, Picture->Frame.w, buttonHeight);
+			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
 			video->BlitSprite( Picture, rb.Origin(), &rb );
-		}
-		else {
-			Region r( picXPos, picYPos, (int)(Picture->Frame.w * Clipping), Picture->Frame.h );
+		} else {
+			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
 			video->BlitSprite(Picture, Picture->Frame.Origin() + r.Origin(), &r);
 		}
 	}
@@ -215,23 +211,21 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	// Composite pictures (paperdolls/description icons)
 	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		auto iter = PictureList.begin();
-		int xOffs = 0, yOffs = 0;
+		Point offset;
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
-			xOffs = frame.w / 2;
-			yOffs = frame.h / 2;
+			offset.x = frame.w / 2;
+			offset.y = frame.h / 2;
 		} else if (flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
 			// Display as-is
-			xOffs = 0;
-			yOffs = 0;
 		} else {
 			// Center the first picture, and align the rest to that
-			xOffs = frame.w / 2 - (*iter)->Frame.w/2 + (*iter)->Frame.x;
-			yOffs = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
+			offset.x = frame.w / 2 - (*iter)->Frame.w/2 + (*iter)->Frame.x;
+			offset.y = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite( *iter, rgn.x + xOffs, rgn.y + yOffs );
+			video->BlitSprite(*iter, rgn.Origin() + offset);
 		}
 	}
 
@@ -264,7 +258,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (IS_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picXPos, picYPos, Picture->Frame.w + 1, Picture->Frame.h);
+			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
 		} else if (flags&IE_GUI_BUTTON_ANCHOR) {
 			r.x += Anchor.x;
 			r.y += Anchor.y;

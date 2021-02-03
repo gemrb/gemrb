@@ -282,14 +282,14 @@ Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip, uint32_t flags, const Color* tint)
+void SDLVideoDriver::BlitTile(const Holder<Sprite2D> spr, const Point& p, const Region* clip, uint32_t flags, const Color* tint)
 {
 	assert(spr->BAM == false);
 
-	Region fClip = ClippedDrawingRect(Region(x, y, 64, 64), clip);
+	Region fClip = ClippedDrawingRect(Region(p.x, p.y, 64, 64), clip);
 	Region srect(0, 0, fClip.w, fClip.h);
-	srect.x -= x - fClip.x;
-	srect.y -= y - fClip.y;
+	srect.x -= p.x - fClip.x;
+	srect.y -= p.y - fClip.y;
 
 	BlitSpriteClipped(spr, srect, fClip, flags, tint);
 }
@@ -302,11 +302,11 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 	BlitSpriteClipped(spr, src, dst, flags);
 }
 
-void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, int x, int y,
+void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 									uint32_t flags, Color tint, const Region* clip)
 {
 	Region srect(Point(0, 0), (clip) ? clip->Dimensions() : Size(spr->Frame.w, spr->Frame.h));
-	Region drect = (clip) ? *clip : Region(x - spr->Frame.x, y - spr->Frame.y, spr->Frame.w, spr->Frame.h);
+	Region drect = (clip) ? *clip : Region(p - spr->Frame.Origin(), spr->Frame.Dimensions());
 	BlitSpriteClipped(spr, srect, drect, flags, &tint);
 }
 

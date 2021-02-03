@@ -464,7 +464,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 
 	if (hoverWin && hoverWin->IsDisabledCursor()) {
 		// draw greayed cursor
-		video->BlitGameSprite(cur, pos.x, pos.y, BLIT_GREY|BLIT_BLENDED, ColorGray, NULL);
+		video->BlitGameSprite(cur, pos, BLIT_GREY|BLIT_BLENDED, ColorGray, NULL);
 	} else {
 		// draw normal cursor
 		video->BlitSprite(cur, pos);
@@ -539,10 +539,10 @@ void WindowManager::DrawWindowFrame(uint32_t flags) const
 		int h_margin = (screen.w - left_w - right_w - top_edge->Frame.w) / 2;
 		
 		const static Color dummy;
-		video->BlitGameSprite(left_edge, h_margin, v_margin, flags, dummy);
-		video->BlitGameSprite(right_edge, screen.w - right_w - h_margin, v_margin, flags, dummy);
-		video->BlitGameSprite(top_edge, h_margin + left_w, v_margin, flags, dummy);
-		video->BlitGameSprite(bot_edge, h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin, flags, dummy);
+		video->BlitGameSprite(left_edge, Point(h_margin, v_margin), flags, dummy);
+		video->BlitGameSprite(right_edge, Point(screen.w - right_w - h_margin, v_margin), flags, dummy);
+		video->BlitGameSprite(top_edge, Point(h_margin + left_w, v_margin), flags, dummy);
+		video->BlitGameSprite(bot_edge, Point(h_margin + left_w, screen.h - bot_edge->Frame.h - v_margin), flags, dummy);
 	}
 }
 

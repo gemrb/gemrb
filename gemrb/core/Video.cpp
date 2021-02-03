@@ -244,22 +244,22 @@ void Video::BlitTiled(Region rgn, const Holder<Sprite2D> img)
 	int yrep = ( rgn.h + img->Frame.h - 1 ) / img->Frame.h;
 	for (int y = 0; y < yrep; y++) {
 		for (int x = 0; x < xrep; x++) {
-			BlitSprite(img, rgn.x + (x*img->Frame.w),
-				 rgn.y + (y*img->Frame.h), &rgn);
+			Point p(x * img->Frame.w, y * img->Frame.h);
+			BlitSprite(img, p + rgn.Origin(), &rgn);
 		}
 	}
 }
 
-void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, int x, int y,
+void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
 							   uint32_t flags, Color tint, const Region* clip)
 {
 	if (pal) {
 		PaletteHolder oldpal = spr->GetPalette();
 		spr->SetPalette(pal);
-		BlitGameSprite(spr, x, y, flags, tint, clip);
+		BlitGameSprite(spr, p, flags, tint, clip);
 		spr->SetPalette(oldpal);
 	} else {
-		BlitGameSprite(spr, x, y, flags, tint, clip);
+		BlitGameSprite(spr, p, flags, tint, clip);
 	}
 }
 

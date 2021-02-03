@@ -8326,7 +8326,7 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
+void Actor::DrawActorSprite(const Point& p, uint32_t flags,
 							const std::vector<AnimationPart>& animParts, const Color& tint) const
 {
 	if (tint.a == 0) return;
@@ -8347,10 +8347,10 @@ void Actor::DrawActorSprite(int cx, int cy, uint32_t flags,
 			if (TranslucentShadows) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
-				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
+				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 				palette->col[1].a = tmpa;
 			} else {
-				video->BlitGameSpriteWithPalette(currentFrame, palette, cx, cy, flags, tint);
+				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			}
 		}
 	}
@@ -8711,23 +8711,23 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 		
 		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
 
-		int cx = Pos.x - vp.x;
-		int cy = Pos.y - vp.y - GetElevation();
+		Point drawPos = Pos - vp.Origin();
+		drawPos.y -= GetElevation();
 
 		// mirror images behind the actor
 		for (int i = 0; i < 4; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
 				int dir = MirrorImageLocation[m];
-				int icx = cx + 3*OrientdX[dir];
-				int icy = cy + 3*OrientdY[dir];
+				int icx = drawPos.x + 3 * OrientdX[dir];
+				int icy = drawPos.y + 3 * OrientdY[dir];
 				Point iPos(icx, icy);
 				// FIXME: I don't know if GetBlocked() is good enough
 				// consider the possibility the mirror image is behind a wall (walls.second)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, currentStance.anim, tint);
+					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8735,15 +8735,14 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 		// blur sprites behind the actor
 		int blurdx = (OrientdX[face]*(int)Modified[IE_MOVEMENTRATE])/20;
 		int blurdy = (OrientdY[face]*(int)Modified[IE_MOVEMENTRATE])/20;
-		int blurx = cx;
-		int blury = cy;
+		Point blurPos = drawPos;
 		if (State & STATE_BLUR) {
 			if (face < 4 || face >= 12) {
-				blurx -= 4*blurdx; blury -= 4*blurdy;
+				blurPos -= Point(4 * blurdx, 4 * blurdy);
 				for (int i = 0; i < 3; ++i) {
-					blurx += blurdx; blury += blurdy;
+					blurPos += Point(blurdx, blurdy);
 					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
-					DrawActorSprite(blurx, blury, flags, currentStance.anim, tint);
+					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8762,21 +8761,21 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 					irTint = Color(255, 255, 255, tint.a);
 				}
 
-				DrawActorSprite(cx, cy, flags, currentStance.shadow, irTint);
+				DrawActorSprite(drawPos, flags, currentStance.shadow, irTint);
 			} else {
-				DrawActorSprite(cx, cy, flags, currentStance.shadow, tint);
+				DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
 			}
 		}
 
 		// actor itself
-		DrawActorSprite(cx, cy, flags, currentStance.anim, tint);
+		DrawActorSprite(drawPos, flags, currentStance.anim, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
 			if (face >= 4 && face < 12) {
 				for (int i = 0; i < 3; ++i) {
-					blurx -= blurdx; blury -= blurdy;
-					DrawActorSprite(blurx, blury, flags, currentStance.anim, tint);
+					blurPos -= Point(blurdx, blurdy);
+					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 				}
 			}
 		}
@@ -8786,15 +8785,15 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
 				int dir = MirrorImageLocation[m];
-				int icx = cx + 3*OrientdX[dir];
-				int icy = cy + 3*OrientdY[dir];
+				int icx = drawPos.x + 3 * OrientdX[dir];
+				int icy = drawPos.y + 3 * OrientdY[dir];
 				Point iPos(icx, icy);
 				// FIXME: I don't know if GetBlocked() is good enough
 				// consider the possibility the mirror image is in front of a wall (walls.first)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
 				if (area->GetBlockedNavmap(iPos) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					DrawActorSprite(icx, icy, flags, currentStance.anim, tint);
+					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
 		}

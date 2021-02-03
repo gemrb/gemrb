@@ -76,10 +76,10 @@ public:
 	Holder<Sprite2D> CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
 								   Color* palette, bool cK = false, int index = 0) override;
 
-	void BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip,
+	void BlitTile(const Holder<Sprite2D> spr, const Point& p, const Region* clip,
 						  uint32_t flags, const Color* tint = NULL) override;
 	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, int x, int y, uint32_t flags, Color tint,
+	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint,
 								const Region* clip = NULL) override;
 
 	/** Blits a Sprite filling the Region */

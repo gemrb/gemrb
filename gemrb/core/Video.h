@@ -197,23 +197,19 @@ public:
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 
-	virtual void BlitTile(const Holder<Sprite2D> spr, int x, int y, const Region* clip,
+	virtual void BlitTile(const Holder<Sprite2D> spr, const Point& p, const Region* clip,
 						  uint32_t flags, const Color* tint = NULL) = 0;
 	
 	void BlitSprite(const Holder<Sprite2D> spr, Point p,
 					const Region* clip = NULL);
 
-	void BlitSprite(const Holder<Sprite2D> spr, int x, int y,
-					const Region* clip = NULL) { return BlitSprite(spr, Point(x, y), clip); }
 	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst) = 0;
 
-	// Note: Tint cannot be constified, because it is modified locally
-	// not a pretty interface :)
-	virtual void BlitGameSprite(const Holder<Sprite2D> spr, int x, int y,
+	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 								uint32_t flags, Color tint,
 								const Region* clip = NULL) = 0;
 
-	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, int x, int y,
+	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
 				   uint32_t flags, Color tint, const Region* clip = NULL);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,

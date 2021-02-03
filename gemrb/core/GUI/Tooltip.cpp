@@ -91,13 +91,13 @@ void TooltipBackground::Draw(Region rgn) const
 
 	// draw unrolled paper
 	// note that there is transparency at the edges... this will get covered up by the right curl's Xpos offset
-	video->BlitSprite(background, dp.x + background->Frame.x+3, dp.y, &bgclip);
+	video->BlitSprite(background, Point(dp.x + background->Frame.x+3, dp.y), &bgclip);
 	
 	// draw left paper curl
 	video->BlitSprite(leftbg, dp);
 	
 	// draw right paper curl (note it's sprite has a non 0 xpos)
-	video->BlitSprite(rightbg, dp.x + animationPos - 1, dp.y);
+	video->BlitSprite(rightbg, Point(dp.x + animationPos - 1, dp.y));
 
 	// clip the tooltip text to the background
 	video->SetScreenClip(&bgclip);

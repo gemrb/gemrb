@@ -1939,7 +1939,7 @@ void Projectile::Draw(Holder<Sprite2D> spr, const Point& p,
 		// FIXME: this may not apply universally
 		flags |= BLIT_ALPHA_MOD;
 	}
-	video->BlitGameSpriteWithPalette(spr, pal, p.x, p.y, flags|BLIT_BLENDED, tint, NULL);
+	video->BlitGameSpriteWithPalette(spr, pal, p, flags|BLIT_BLENDED, tint, NULL);
 }
 
 }

@@ -674,9 +674,8 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
-	int cx = Pos.x - vp.x + XOffset;
-	int cy = Pos.y - vp.y - ZOffset + YOffset;
-	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
+	Point p(Pos.x - vp.x + XOffset, Pos.y - vp.y - ZOffset + YOffset);
+	if (SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
 
 	if (SequenceFlags & IE_VVC_NOCOVER) {
 		flags &= ~BLIT_STENCIL_MASK;
@@ -684,10 +683,10 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
-		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, cx, cy, flags | BLIT_BLENDED, tint);
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BLIT_BLENDED, tint);
 
 	if (light) {
-		video->BlitGameSprite(light, cx, cy, flags, tint, NULL);
+		video->BlitGameSprite(light, p, flags, tint, NULL);
 	}
 }
 

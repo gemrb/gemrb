@@ -203,7 +203,8 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			Holder<Sprite2D> anim = flags ? flags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
-				video->BlitSprite( anim, pos.x - anim->Frame.w/2, pos.y - anim->Frame.h/2, &rgn );
+				Point p(anim->Frame.w / 2, anim->Frame.h / 2);
+				video->BlitSprite(anim, pos - p, &rgn);
 			} else {
 				video->DrawEllipse( pos, 6, 5, mn.GetColor() );
 			}

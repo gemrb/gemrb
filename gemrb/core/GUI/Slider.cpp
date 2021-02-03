@@ -47,17 +47,16 @@ Slider::Slider(const Region& frame, Point pos,
 /** Draws the Control on the Output Display */
 void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
+	Point p = rgn.Origin() + KnobPos;
+	p.x += Pos * KnobStep;
+
 	switch (State) {
 		case IE_GUI_SLIDER_KNOB:
-			core->GetVideoDriver()->BlitSprite(Knob,
-				rgn.x + KnobPos.x + ( Pos * KnobStep ),
-				rgn.y + KnobPos.y);
+			core->GetVideoDriver()->BlitSprite(Knob, p);
 			break;
 
 		case IE_GUI_SLIDER_GRABBEDKNOB:
-			core->GetVideoDriver()->BlitSprite(GrabbedKnob,
-				rgn.x + KnobPos.x + ( Pos * KnobStep ),
-				rgn.y + KnobPos.y);
+			core->GetVideoDriver()->BlitSprite(GrabbedKnob, p);
 			break;
 	}
 }

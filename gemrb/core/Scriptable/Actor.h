@@ -422,7 +422,7 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(int cx, int cy, uint32_t flags,
+	void DrawActorSprite(const Point& p, uint32_t flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
 
 	/** fixes the palette */
