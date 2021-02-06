@@ -48,6 +48,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
 	
 	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
+	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]};
 
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
@@ -58,7 +59,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", static_cast<int>(i+1));
 			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
 			// but that should probably actually be done by the dialog handler, not here.
-			selOption->AppendContent(new TextSpan(optNum, nullptr, colors));
+			selOption->AppendContent(new TextSpan(optNum, nullptr, selectedCol));
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], nullptr, &flexFrame));
 		AddSubviewInFrontOfView(selOption);
@@ -396,6 +397,15 @@ void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
 	colors[idx] = color;
 }
 
+void TextArea::SetColor(const Color* color, COLOR_TYPE idx)
+{
+	if (color) {
+		SetColor(*color, idx);
+	} else {
+		SetColor(colors[COLOR_NORMAL], idx);
+	}
+}
+
 void TextArea::TrimHistory(size_t lines)
 {
 	if (dialogBeginNode) {
@@ -610,7 +620,7 @@ void TextArea::ClearSelectOptions()
 }
 
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
-								const Color& color, const Color& hiColor, const Color& selColor)
+								const Color* color, const Color* hiColor, const Color* selColor)
 {
 	SetColor(color, COLOR_OPTIONS);
 	SetColor(hiColor, COLOR_HOVER);

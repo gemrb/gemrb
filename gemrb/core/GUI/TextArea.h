@@ -128,7 +128,7 @@ public:
 	ieWord LineHeight() const;
 
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color& = ColorWhite, const Color& = ColorWhite, const Color& = ColorWhite);
+						  const Color* = nullptr, const Color* = &SelectOptionHover, const Color* = &SelectOptionSelected);
 	
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
@@ -178,6 +178,7 @@ private: // Private attributes
 
 private: //internal functions
 	void SetColor(const Color&, COLOR_TYPE);
+	void SetColor(const Color*, COLOR_TYPE);
 
 	void UpdateScrollview();
 	Region UpdateTextFrame();
