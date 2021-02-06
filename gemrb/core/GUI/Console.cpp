@@ -65,9 +65,11 @@ Console::Console(const Region& frame, TextArea* ta)
 		frame.h = 12;
 		
 		Label* label = new Label(frame, core->GetTextFont(), L"History:");
+
 		AddSubviewInFrontOfView(label);
 		label->SetAlignment(align);
 		label->SetColors(ColorWhite, ColorBlack);
+		label->SetFlags(Label::UseColor, OP_OR);
 		
 		frame.y = frame.y + frame.h;
 		frame.h = feedback.Frame().h;
