@@ -349,6 +349,8 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		void (*BlendFn)(const Color& src, Color& dst) = ShaderBlend<true>;
 		if (flags & BLIT_ADD) {
 			BlendFn = ShaderAdditive;
+		} else if (flags & BLIT_MULTIPLY) {
+			BlendFn = ShaderTint;
 		}
 
 		if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
