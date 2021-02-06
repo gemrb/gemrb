@@ -156,8 +156,6 @@ Font::~Font(void)
 	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
 		delete *it;
 	}
-
-	SetPalette(NULL);
 }
 
 void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
@@ -551,58 +549,6 @@ void Font::SetAtlasPalette(PaletteHolder pal) const
 	}
 }
 
-size_t Font::Print(Region rgn, const String& string,
-				   PaletteHolder color, ieByte alignment, Point* point) const
-{
-	if (rgn.Dimensions().IsEmpty()) return 0;
-
-	Point p = (point) ? *point : Point();
-	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
-		// we assume that point will be an offset from midde/bottom position
-		Size stringSize;
-		if (alignment&IE_FONT_SINGLE_LINE) {
-			// we can optimize single lines without StringSize()
-			stringSize.h = LineHeight;
-		} else {
-			stringSize = rgn.Dimensions();
-			StringSizeMetrics metrics = {stringSize, 0, 0, true};
-			stringSize = StringSize(string, &metrics);
-			if (alignment&IE_FONT_NO_CALC && metrics.numChars < string.length()) {
-				// PST GUISTORE, not sure what else
-				stringSize.h = rgn.h;
-			}
-		}
-
-		// important: we must do this adjustment even if it leads to -p.y!
-		// some labels depend on this behavior (BG2 GUIINV) :/
-		if (alignment&IE_FONT_ALIGN_MIDDLE) {
-			p.y += (rgn.h - stringSize.h) / 2;
-		} else { // bottom alignment
-			p.y += rgn.h - stringSize.h;
-		}
-	}
-
-	PaletteHolder restore = nullptr;
-	if (color) {
-		// we set palette in this way because we want all the Atlas pages to inherit the change
-		restore = palette;
-		palette = color;
-		SetAtlasPalette(palette);
-	}
-
-	size_t ret = RenderText(string, rgn, alignment, nullptr, &p);
-
-	if (color) {
-		palette = restore;
-		SetAtlasPalette(palette);
-	}
-
-	if (point) {
-		*point = p;
-	}
-	return ret;
-}
-
 size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, Point* point) const
 {
 	return Print(rgn, string, alignment, nullptr, point);
@@ -773,16 +719,6 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	}
 
 	return Size(w, (LineHeight * lines));
-}
-
-Holder<Palette> Font::GetPalette() const
-{
-	return palette;
-}
-
-void Font::SetPalette(PaletteHolder pal)
-{
-	palette = pal;
 }
 
 }

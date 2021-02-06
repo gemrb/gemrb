@@ -159,7 +159,7 @@ void Tooltip::Draw(const Point& pos) const
 		textr.y = pos.y - textr.h/2;
 	}
 	
-	font->Print( textr, text, NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
+	font->Print(textr, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE);
 }
 
 }

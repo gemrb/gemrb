@@ -146,7 +146,7 @@ private:
 	GlyphAtlas Atlas;
 
 protected:
-	mutable PaletteHolder palette;
+	PaletteHolder palette;
 	PaletteHolder invertedPalette;
 
 public:
@@ -183,9 +183,6 @@ public:
 	//allow reading but not setting glyphs
 	virtual const Glyph& GetGlyph(ieWord chr) const;
 
-	PaletteHolder GetPalette() const;
-	void SetPalette(PaletteHolder pal);
-
 	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
 	Holder<Sprite2D> RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
@@ -195,8 +192,6 @@ public:
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
 	
-	size_t Print(Region rgn, const String& string,
-				 const Color* hicolor, ieByte Alignment, Point* point = nullptr) const;
 	size_t Print(const Region& rgn, const String& string, ieByte Alignment, Point* point = nullptr) const;
 	size_t Print(const Region& rgn, const String& string, ieByte Alignment, const PrintColors& colors, Point* point = nullptr) const;
 	
