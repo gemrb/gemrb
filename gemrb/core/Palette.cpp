@@ -30,19 +30,12 @@ namespace GemRB {
 Palette::Palette(const Color &color, const Color &back)
 : Palette()
 {
-	front = color;
-	this->back = back;
-	col[0].r = 0;
-	col[0].g = 0xff;
-	col[0].b = 0;
-	col[0].a = 0;
+	col[0] = Color(0, 0xff, 0, 0);
 	for (int i = 1; i < 256; i++) {
-		col[i].r = back.r +
-		( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
-		col[i].g = back.g +
-		( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
-		col[i].b = back.b +
-		( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
+		float p = i / 255.0f;
+		col[i].r = std::min<int>(back.r * (1 - p) + color.r * p, 255);
+		col[i].g = std::min<int>(back.g * (1 - p) + color.g * p, 255);
+		col[i].b = std::min<int>(back.b * (1 - p) + color.b * p, 255);
 		// FIXME: alpha value changed to opaque to fix these palettes on SDL 2
 		// I'm not sure if the previous implementation had a purpose, but historically the alpha is ignored in IE
 		col[i].a = 0xff;
@@ -77,21 +70,14 @@ void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t d
 
 void Palette::CreateShadedAlphaChannel()
 {
-	for (int i = 0; i < 256; ++i) {
-		unsigned int r = col[i].r;
-		unsigned int g = col[i].g;
-		unsigned int b = col[i].b;
-		unsigned int m = (r + g + b) / 3;
+	for (int i = 1; i < 256; ++i) {
+		Color& c = col[i];
+		unsigned int m = (c.r + c.g + c.b) / 3;
 		if (m > MINCOL) {
-			if (( r == 0 ) && ( g == 0xff ) && ( b == 0 )) {
-				col[i].a = 0xff;
-			} else {
-				int tmp = m * MUL;
-				col[i].a = ( tmp > 0xff ) ? 0xff : (unsigned char) tmp;
-			}
-		}
-		else {
-			col[i].a = 0;
+			int tmp = m * MUL;
+			c.a = std::min(tmp, 0xff);
+		} else {
+			c.a = 0;
 		}
 	}
 	alpha = true;
