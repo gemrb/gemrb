@@ -1147,37 +1147,13 @@ int Interface::LoadFonts()
 		rowName = tab->GetRowName(row);
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
-		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
 		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
 
-		PaletteHolder pal;
-		if (needpalette) {
-			Color fore = ColorWhite;
-			Color back = ColorBlack;
-			const char* colorString = tab->QueryField( rowName, "COLOR" );
-			if (colorString) {
-				ieDword c;
-				sscanf(colorString, "0x%x", &c);
-				fore.r = ieByte((c >> 24) & 0xFF);
-				fore.g = ieByte((c >> 16) & 0xFF);
-				fore.b = ieByte((c >> 8) & 0xFF);
-				fore.a = ieByte(c & 0xFF);
-			}
-			if (TooltipFontResRef == resref) {
-				if (fore.a != 0xff) {
-					// FIXME: should have an explaination
-					back = fore;
-					fore = ColorBlack;
-				}
-			}
-			pal = new Palette(fore, back);
-		}
-
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
-		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
+		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style);
 
 		if (!fnt) {
 			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());

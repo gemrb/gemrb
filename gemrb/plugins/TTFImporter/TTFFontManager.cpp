@@ -115,13 +115,10 @@ void TTFFontManager::Close()
 	close(ftStream);
 }
 
-Font* TTFFontManager::GetFont(unsigned short pxSize,
-							  FontStyle /*style*/, PaletteHolder pal)
+Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/)
 {
-	if (!pal) {
-		pal = new Palette( ColorWhite, ColorBlack );
-		pal->CreateShadedAlphaChannel();
-	}
+	PaletteHolder pal = new Palette(ColorWhite, ColorBlack);
+	pal->CreateShadedAlphaChannel();
 
 	FT_Error error = 0;
 	ieWord lineHeight = 0, baseline = 0;

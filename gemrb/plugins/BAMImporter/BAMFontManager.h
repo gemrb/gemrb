@@ -40,7 +40,7 @@ public:
 
 	bool Open(DataStream* stream) override;
 
-	Font* GetFont(ieWord pxSize, FontStyle style, PaletteHolder pal = nullptr) override;
+	Font* GetFont(ieWord pxSize, FontStyle style) override;
 };
 
 }

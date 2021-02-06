@@ -45,8 +45,7 @@ bool BAMFontManager::Open(DataStream* stream)
 	return bamImp->Open(stream);
 }
 
-Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
-							  FontStyle /*style*/, PaletteHolder pal)
+Font* BAMFontManager::GetFont(unsigned short /*ptSize*/, FontStyle /*style*/)
 {
 	AnimationFactory* af = bamImp->GetAnimationFactory(resRef, IE_NORMAL, false); // released by BAMFont
 	// FIXME: this test only exists to let the minimal test pass
@@ -87,9 +86,7 @@ Font* BAMFontManager::GetFont(unsigned short /*ptSize*/,
 		lineHeight = af->GetFrame(0, 1)->Frame.h;
 	}
 
-	if (!pal) {
-		pal = af->GetFrameWithoutCycle(0)->GetPalette();
-	}
+	auto pal = af->GetFrameWithoutCycle(0)->GetPalette();
 	Font* fnt = new Font(pal, lineHeight, baseLine);
 
 	std::map<Sprite2D*, ieWord> tmp;
