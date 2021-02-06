@@ -168,7 +168,7 @@ public:
 		SDL_FreeYUVOverlay(overlay);
 	}
 
-	void Clear() override {}
+	void Clear(const Region&) override {}
 
 	bool RenderOnDisplay(void* /*display*/) const override {
 		if (changed) {
