@@ -42,7 +42,7 @@ EventMgr::EventTaps EventMgr::Taps = EventTaps();
 
 MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 {
-	MouseEvent me;
+	MouseEvent me {};
 	me.x = te.x;
 	me.y = te.y;
 	me.deltaX = te.deltaX;
@@ -58,7 +58,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 {
 	Point p = EventMgr::MousePos();
 
-	MouseEvent me;
+	MouseEvent me {};
 	me.x = p.x;
 	me.y = p.y;
 
