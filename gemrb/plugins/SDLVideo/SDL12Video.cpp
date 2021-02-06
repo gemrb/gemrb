@@ -342,29 +342,34 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 			tint.a /= 2;
 		}
 
-		// FIXME: this always assumes BLIT_BLENDED if any "shader" flags are set
+		// FIXME: this always assumes some kind of blending if any "shader" flags are set
 		// we don't currently have a need for non blended sprites (we do for primitives, which is handled elsewhere)
 		// however, it could make things faster if we handled it
+		
+		void (*BlendFn)(const Color& src, Color& dst) = ShaderBlend<true>;
+		if (flags & BLIT_ADD) {
+			BlendFn = ShaderAdditive;
+		}
 
 		if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
 			if (flags&BLIT_GREY) {
-				RGBBlendingPipeline<GREYSCALE, true> blender(tint);
+				RGBBlendingPipeline<GREYSCALE, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 			} else if (flags&BLIT_SEPIA) {
-				RGBBlendingPipeline<SEPIA, true> blender(tint);
+				RGBBlendingPipeline<SEPIA, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 			} else {
-				RGBBlendingPipeline<TINT, true> blender(tint);
+				RGBBlendingPipeline<TINT, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 			}
 		} else if (flags&BLIT_GREY) {
-			RGBBlendingPipeline<GREYSCALE, true> blender;
+			RGBBlendingPipeline<GREYSCALE, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		} else if (flags&BLIT_SEPIA) {
-			RGBBlendingPipeline<SEPIA, true> blender;
+			RGBBlendingPipeline<SEPIA, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		} else {
-			RGBBlendingPipeline<NONE, true> blender;
+			RGBBlendingPipeline<NONE, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		}
 	}

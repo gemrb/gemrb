@@ -66,6 +66,15 @@ inline void ShaderBlend(const Color& src, Color& dst) {
 #undef DIV255
 }
 
+inline void ShaderAdditive(const Color& src, Color& dst) {
+	// dstRGB = (srcRGB * srcA) + dstRGB
+	// dstA = dstA
+	// FIXME: I guess we will ignore alpha for now...
+	dst.r = src.r + dst.r;
+	dst.g = src.g + dst.g;
+	dst.b = src.b + dst.b;
+}
+
 template <bool MASKED, bool SRCALPHA>
 struct OneMinusSrcA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
@@ -110,18 +119,19 @@ template <SHADER SHADE, bool SRCALPHA>
 class RGBBlendingPipeline : RGBBlender {
 	Color tint;
 	unsigned int shift;
+	void (*blender)(const Color& src, Color& dst);
 
 public:
-	RGBBlendingPipeline()
-	: tint(1,1,1,0xff) {
+	RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	: tint(1,1,1,0xff), blender(blender) {
 		shift = 0;
 		if (SHADE == GREYSCALE || SHADE == SEPIA) {
 			shift += 2;
 		}
 	}
 
-	RGBBlendingPipeline(const Color& tint)
-	: tint(tint) {
+	RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	: tint(tint), blender(blender) {
 		shift = 8; // we shift by 8 as a fast aproximation of dividing by 255
 		if (SHADE == GREYSCALE || SHADE == SEPIA) {
 			shift += 2;
@@ -170,7 +180,7 @@ public:
 				break;
 		}
 
-		ShaderBlend<SRCALPHA>(c, dst);
+		blender(c, dst);
 	}
 };
 

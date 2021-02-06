@@ -59,6 +59,7 @@ enum SpriteBlitFlags : uint32_t {
 	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
 	BLIT_MULTIPLY = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
 	BLIT_GLOW = IE_VVC_GLOWING, // 0x00200000; not implemented in SDLVideo yet
+	BLIT_ADD = 0x00400000,
 	BLIT_STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
 	BLIT_STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
 	BLIT_STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
