@@ -539,16 +539,6 @@ Holder<Sprite2D> Font::RenderTextAsSprite(const String& string, const Size& size
 	return canvas;
 }
 
-void Font::SetAtlasPalette(PaletteHolder pal) const
-{
-	GlyphAtlas::const_iterator it;
-	for (it = Atlas.begin(); it != Atlas.end(); ++it) {
-		Holder<Sprite2D> sheet = (*it)->Sheet;
-		if (sheet)
-			sheet->SetPalette(pal);
-	}
-}
-
 size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, Point* point) const
 {
 	return Print(rgn, string, alignment, nullptr, point);
