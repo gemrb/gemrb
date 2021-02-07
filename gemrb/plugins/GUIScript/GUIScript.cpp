@@ -2329,6 +2329,7 @@ static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
 
 	const Color color = ColorFromPy(pyColor);
 	lab->SetColors(color, ColorBlack);
+	lab->SetFlags(Label::UseColor, OP_OR);
 
 	Py_RETURN_NONE;
 }
