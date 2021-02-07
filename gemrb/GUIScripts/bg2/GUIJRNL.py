@@ -145,7 +145,7 @@ def UpdateLogWindow (JournalWindow):
 		# each journal entry consists of the title and description
 		# but the game displays the entry date between the two
 		je2 = GemRB.GetString(je['Text']).split("\n",1)
-		JournalTitle = "\n[color=d00000]" + je2[0] + "[/color]\n"
+		JournalTitle = "\n[color=800000]" + je2[0] + "[/color]\n"
 		if len(je2) == 1:
 			# broken entry, bg1 style (no title)
 			JournalText = ""
