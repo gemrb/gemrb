@@ -2821,7 +2821,8 @@ int Interface::PlayMovie(const char* resref)
 		mutable String* cachedSub;
 
 	public:
-		IESubtitles(class Font* fnt, ResRef resref, const Color& col = ColorWhite)
+		// default color taken from BGEE.lua
+		IESubtitles(class Font* fnt, ResRef resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			AutoTable sttable(resref);
