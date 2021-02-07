@@ -39,7 +39,6 @@ SDLAudio::SDLAudio(void)
 	YPos = 0;
 	ambim = new AmbientMgr();
 	MusicPlaying = false;
-	OurMutex = NULL;
 	curr_buffer_offset = 0;
 	audio_rate = audio_format = audio_channels = 0;
 }
@@ -52,7 +51,6 @@ SDLAudio::~SDLAudio(void)
 	delete ambim;
 	Mix_HookMusic(NULL, NULL);
 	FreeBuffers();
-	SDL_DestroyMutex(OurMutex);
 	Mix_ChannelFinished(NULL);
 }
 
@@ -62,7 +60,6 @@ bool SDLAudio::Init(void)
 	if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
 		return false;
 	}
-	OurMutex = SDL_CreateMutex();
 #ifdef RPI
 	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 512) < 0) {
 #else
@@ -78,10 +75,9 @@ bool SDLAudio::Init(void)
 
 void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
-	SDL_mutexP(driver->OurMutex);
 
 	do {
-
+		std::lock_guard<std::mutex> l(driver->OurMutex);
 		// TODO: conversion? mutexes? sanity checks? :)
 		int num_samples = len / 2;
 		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
@@ -103,10 +99,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 			Mix_HookMusic(NULL, NULL);
 			break;
 		}
-
 	} while(true);
-
-	SDL_mutexV(driver->OurMutex);
 }
 
 bool SDLAudio::evictBuffer()
@@ -266,20 +259,14 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
 	}
-#ifndef VITA
-	SDL_mutexP(OurMutex);
-#endif
+
+	std::lock_guard<std::mutex> l(OurMutex);
+	
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
-#ifndef VITA
-		SDL_mutexV(OurMutex);
-#endif
 		print("error playing channel");
 		return Holder<SoundHandle>();
 	}
-#ifndef VITA
-	SDL_mutexV(OurMutex);
-#endif
 
 	// TODO
 	return Holder<SoundHandle>();
@@ -338,7 +325,8 @@ void SDLAudio::GetListenerPos(int& x, int& y)
 
 void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
-	SDL_mutexP(driver->OurMutex);
+	std::lock_guard<std::mutex> l(driver->OurMutex);
+
 	unsigned int remaining = len;
 	while (remaining && driver->buffers.size() > 0) {
 		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
@@ -362,7 +350,6 @@ void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 		// underrun (out of buffers)
 		memset(stream, 0, remaining);
 	}
-	SDL_mutexV(driver->OurMutex);
 }
 
 int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
@@ -415,12 +402,11 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 
 void SDLAudio::FreeBuffers()
 {
-	SDL_mutexP(OurMutex);
+	std::lock_guard<std::mutex> l(OurMutex);
 	for (unsigned int i = 0; i < buffers.size(); i++) {
 		free(buffers[i].buf);
 	}
 	buffers.clear();
-	SDL_mutexV(OurMutex);
 }
 
 void SDLAudio::SetAmbientStreamVolume(int, int)
@@ -466,9 +452,9 @@ void SDLAudio::QueueBuffer(int stream, unsigned short bits,
 		memcpy(d.buf, memory, d.size);
 	}
 
-	SDL_mutexP(OurMutex);
+	OurMutex.lock();
 	buffers.push_back(d);
-	SDL_mutexV(OurMutex);
+	OurMutex.unlock();
 }
 
 #include "plugindef.h"

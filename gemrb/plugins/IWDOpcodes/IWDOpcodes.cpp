@@ -769,7 +769,6 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Point pos(target->Pos.x, target->Pos.y);
 	Projectile *pro;
 	if (fx->Parameter4) {
 		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
@@ -781,8 +780,10 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	pro->SetCaster(fx->CasterID, fx->CasterLevel);
 	if (target) {
 		//i believe the spell hit projectiles don't follow anyone
+		Point pos(target->Pos.x, target->Pos.y);
 		map->AddProjectile( pro, pos, target->GetGlobalID(), true);
 	} else {
+		Point pos(fx->PosX, fx->PosY);
 		map->AddProjectile( pro, pos, pos);
 	}
 	return FX_NOT_APPLIED;

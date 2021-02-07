@@ -220,8 +220,8 @@ static bool intersectSegments(const Point& a, const Point& b, const Point& c, co
 		(left(c, d, a) != left(c, d, b))))
 		return false;
 
-	long int A1 = area2(c, d, a);
-	long int A2 = area2(d, c, b);
+	int64_t A1 = area2(c, d, a);
+	int64_t A2 = area2(d, c, b);
 
 	s.x = (short) ((b.x*A1 + a.x*A2) / (A1 + A2));
 	s.y = (short) ((b.y*A1 + a.y*A2) / (A1 + A2));
