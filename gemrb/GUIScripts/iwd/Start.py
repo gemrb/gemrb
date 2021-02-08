@@ -65,6 +65,7 @@ def OnLoad ():
 	QuitGameButton = StartWindow.GetControl (0x01)
 	VersionLabel = StartWindow.CreateLabel (0x0fff0000, 0, 0, 640, 30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	VersionLabel.SetText (GemRB.Version)
+	VersionLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	ProtocolButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	LoadGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
