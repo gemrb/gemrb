@@ -117,15 +117,33 @@ const Glyph& Font::GlyphAtlasPage::GlyphForChr(ieWord chr) const
 	return blank;
 }
 
-void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, uint32_t flags, const Color& tint)
+void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColors* colors)
 {
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
 		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->palette, true, 0);
+		invertedSheet = Sheet->copy();
+		auto invertedPalette = font->palette->Copy();
+		for (auto& c : invertedPalette->col) {
+			c.r = 255 - c.r;
+			c.g = 255 - c.g;
+			c.b = 255 - c.b;
+		}
+		invertedSheet->SetPalette(invertedPalette);
 	}
-
-	SpriteSheet<ieWord>::Draw(chr, dest, flags, tint);
+	
+	if (colors) {
+		// no point in BLIT_ADD with black so let's optimize away some blits
+		SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->bg);
+		if (colors->fg != ColorBlack) {
+			std::swap(Sheet, invertedSheet);
+			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_ADD | BLIT_COLOR_MOD, colors->fg);
+			std::swap(Sheet, invertedSheet);
+		}
+	} else {
+		SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED, ColorWhite);
+	}
 }
 
 void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
@@ -141,12 +159,6 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline)
 : palette(pal), LineHeight(lineheight), Baseline(baseline)
 {
-	invertedPalette = palette->Copy();
-	for (auto& c : invertedPalette->col) {
-		c.r = 255 - c.r;
-		c.g = 255 - c.g;
-		c.b = 255 - c.b;
-	}
 	CurrentAtlasPage = NULL;
 }
 
@@ -441,17 +453,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				GlyphAtlasPage* page = Atlas[pageIdx];
-				if (colors) {
-					// no point in BLIT_ADD with black so let's optimize away some blits
-					page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_COLOR_MOD | BLIT_BLENDED, colors->bg);
-					if (colors->fg != ColorBlack) {
-						page->Sheet->SetPalette(invertedPalette);
-						page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_COLOR_MOD | BLIT_ADD, colors->fg);
-						page->Sheet->SetPalette(palette);
-					}
-				} else {
-					page->Draw(currChar, Region(blitPoint, curGlyph.size), BLIT_BLENDED, ColorWhite);
-				}
+				page->Draw(currChar, Region(blitPoint, curGlyph.size), colors);
 			}
 			dp.x += curGlyph.size.w;
 		}

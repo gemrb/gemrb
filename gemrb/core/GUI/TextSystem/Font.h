@@ -94,6 +94,21 @@ class GEM_EXPORT Font {
 	 until either the page is full, or until a call to a print method is made.
 	 To avoid generating more than one partial page, subsequent calls to add new glyphs will destroy the partial Sprite (not the source pixels of course)
 	*/
+public:
+	struct PrintColors {
+		Color fg;
+		Color bg;
+	};
+	
+	struct StringSizeMetrics {
+		// specifiy behavior of StringSize based on values of struct
+		// StringSize will modify the struct with the results
+		Size size;		// maximum size allowed; updated with actual size <= initial value
+		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
+		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
+		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
+	};
+
 private:
 	class GlyphAtlasPage : public SpriteSheet<ieWord> {
 		private:
@@ -102,6 +117,7 @@ private:
 			ieByte* pageData; // current raw page being built
 			int pageXPos; // current position on building page
 			Font* font;
+			Holder<Sprite2D> invertedSheet;
 		public:
 			GlyphAtlasPage(Size pageSize, Font* font)
 			: SpriteSheet<ieWord>(), font(font)
@@ -123,7 +139,7 @@ private:
 
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
-		void Draw(ieWord chr, const Region& dest, uint32_t flags, const Color& tint);
+		void Draw(ieWord chr, const Region& dest, const PrintColors* colors);
 		void DumpToScreen(const Region&);
 	};
 
@@ -147,16 +163,10 @@ private:
 
 protected:
 	PaletteHolder palette;
-	PaletteHolder invertedPalette;
 
 public:
 	const int LineHeight;
 	const int Baseline;
-	
-	struct PrintColors {
-		Color fg;
-		Color bg;
-	};
 
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
@@ -197,14 +207,6 @@ public:
 				 PaletteHolder hicolor, ieByte Alignment, Point* point = nullptr) const;
 
 	/** Returns size of the string rendered in this font in pixels */
-	struct StringSizeMetrics {
-		// specifiy behavior of StringSize based on values of struct
-		// StringSize will modify the struct with the results
-		Size size;		// maximum size allowed; updated with actual size <= initial value
-		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
-		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
-		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
-	};
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;
 
 	// like StringSize, but single line and doens't take whitespace into consideration
