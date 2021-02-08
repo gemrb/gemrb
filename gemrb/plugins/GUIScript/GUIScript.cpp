@@ -2215,8 +2215,9 @@ static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetBackground__doc,
-			 "SetBackground(GView, ResRef)\n\n"
-			 "Set the background image for the view to the image obtained by the ResRef." );
+			 "SetBackground(GView, ResRef|Color)\n\n"
+			 "Set the background image or color for the view to the image\n\n"
+			 "obtained by the ResRef or the passed color dict respectively." );
 
 static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 {
