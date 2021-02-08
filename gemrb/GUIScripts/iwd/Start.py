@@ -87,6 +87,7 @@ def OnLoad ():
 	MoviesButton.SetText (15415)
 	QuitGameButton.SetText (13731)
 	QuitGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	QuitGameButton.MakeEscape ()
 	ProtocolButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
 	LoadGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadPress)
