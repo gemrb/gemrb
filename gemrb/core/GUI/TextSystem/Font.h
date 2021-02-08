@@ -168,8 +168,6 @@ private:
 					  Point& dp, const PrintColors*, ieByte** canvas = NULL) const;
 	
 	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
-	
-	void SetAtlasPalette(PaletteHolder pal) const;
 
 public:
 	Font(PaletteHolder, ieWord lineheight, ieWord baseline);
