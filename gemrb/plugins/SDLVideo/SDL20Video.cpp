@@ -250,7 +250,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	if (spr->Bpp == 8 && (flags & BLIT_ALPHA_MOD)) {
 		version |= BLIT_ALPHA_MOD;
 		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
-	} else if (version) {
+	} else {
 		flags &= ~RenderSpriteVersion(spr, version);
 	}
 

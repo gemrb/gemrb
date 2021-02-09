@@ -614,7 +614,7 @@ uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
-	uint32_t ret = 0;
+	uint32_t ret = (BLIT_GREY | BLIT_SEPIA) & newVersion;
 	
 	if (spr->Bpp == 8) {
 		if (tint) {
@@ -647,12 +647,12 @@ uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint
 
 				if (renderflags&BLIT_GREY) {
 					ShaderGreyscale(dstc);
-					ret |= BLIT_GREY;
 				} else if (renderflags&BLIT_SEPIA) {
 					ShaderSepia(dstc);
-					ret |= BLIT_SEPIA;
 				}
 			}
+		} else {
+			ret |= (BLIT_COLOR_MOD | BLIT_ALPHA_MOD) & newVersion;
 		}
 	} else if (oldVersion != newVersion) {
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
@@ -666,11 +666,9 @@ uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint
 		if (renderflags & BLIT_GREY) {
 			RGBBlendingPipeline<GREYSCALE, true> blender;
 			Blit(beg, beg, end, alpha, blender);
-			ret |= BLIT_GREY;
 		} else if (renderflags & BLIT_SEPIA) {
 			RGBBlendingPipeline<SEPIA, true> blender;
 			Blit(beg, beg, end, alpha, blender);
-			ret |= BLIT_SEPIA;
 		}
 		SDL_UnlockSurface(newV);
 	}
