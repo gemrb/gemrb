@@ -35,7 +35,7 @@ class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
 public:
-	AmbientMgrAL() : AmbientMgr() { }
+	AmbientMgrAL() : AmbientMgr(), player(nullptr) { }
 	~AmbientMgrAL();
 
 	void setAmbients(const std::vector<Ambient *> &a);
@@ -70,7 +70,7 @@ private:
 	void hardStop() const;
 	
 	std::mutex mutex;
-	std::thread player;
+	std::thread *player;
 	std::condition_variable cond;
 };
 

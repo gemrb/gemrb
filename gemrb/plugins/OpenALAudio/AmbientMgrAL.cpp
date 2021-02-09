@@ -47,9 +47,11 @@ AmbientMgrAL::~AmbientMgrAL()
 	mutex.unlock();
 	
 	cond.notify_all();
-	
-	if (player.joinable())
-		player.join();
+
+	if (player && player->joinable()) {
+		player->join();
+		delete player;
+	}
 }
 
 void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
@@ -62,7 +64,7 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 	}
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 
-	player = std::thread(&AmbientMgrAL::play, this);
+	player = new std::thread(&AmbientMgrAL::play, this);
 }
 
 void AmbientMgrAL::activate(const std::string &name)
