@@ -35,7 +35,12 @@ using namespace GemRB;
 
 // TODO: no more dependency on OpenAL, rename and move it?
 
-// legal nop if already reset
+AmbientMgrAL::AmbientMgrAL()
+: AmbientMgr()
+{
+	player = std::thread(&AmbientMgrAL::play, this);
+}
+
 AmbientMgrAL::~AmbientMgrAL()
 {
 	mutex.lock();
@@ -47,9 +52,7 @@ AmbientMgrAL::~AmbientMgrAL()
 	mutex.unlock();
 	
 	cond.notify_all();
-	
-	if (player.joinable())
-		player.join();
+	player.join();
 }
 
 void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
@@ -61,8 +64,6 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 		ambientSources.push_back(new AmbientSource(source));
 	}
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
-
-	player = std::thread(&AmbientMgrAL::play, this);
 }
 
 void AmbientMgrAL::activate(const std::string &name)

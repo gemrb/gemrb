@@ -35,7 +35,7 @@ class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
 public:
-	AmbientMgrAL() : AmbientMgr() { }
+	AmbientMgrAL();
 	~AmbientMgrAL();
 
 	void setAmbients(const std::vector<Ambient *> &a);
