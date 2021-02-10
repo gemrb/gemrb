@@ -57,39 +57,40 @@ AmbientMgrAL::~AmbientMgrAL()
 
 void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 {
+	mutex.lock();
 	AmbientMgr::setAmbients(a);
-
 	ambientSources.reserve(a.size());
 	for (auto source : a) {
 		ambientSources.push_back(new AmbientSource(source));
 	}
+	mutex.unlock();
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 }
 
 void AmbientMgrAL::activate(const std::string &name)
 {
-	std::lock_guard<std::mutex> l(mutex);
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::activate(name);
 	cond.notify_all();
 }
 
 void AmbientMgrAL::activate()
 {
-	std::lock_guard<std::mutex> l(mutex);
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::activate();
 	cond.notify_all();
 }
 
 void AmbientMgrAL::deactivate(const std::string &name)
 {
-	std::lock_guard<std::mutex> l(mutex);
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::deactivate(name);
 	cond.notify_all();
 }
 
 void AmbientMgrAL::deactivate()
 {
-	std::lock_guard<std::mutex> l(mutex);
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::deactivate();
 	hardStop();
 }
@@ -103,7 +104,7 @@ void AmbientMgrAL::hardStop() const
 
 int AmbientMgrAL::play()
 {
-	std::unique_lock<std::mutex> l(mutex);
+	std::unique_lock<std::recursive_mutex> l(mutex);
 	while (!ambientSources.empty()) {
 		if (!core->GetGame()) { // we don't have any game, and we need one
 			break;
@@ -144,7 +145,7 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 
 void AmbientMgrAL::UpdateVolume(unsigned short volume)
 {
-	std::lock_guard<std::mutex> l(mutex);
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
 		source->SetVolume(volume);
 	}
