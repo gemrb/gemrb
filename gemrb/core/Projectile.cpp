@@ -427,7 +427,7 @@ void Projectile::Setup()
 	if (TFlags&PTF_LIGHT) {
 		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 	}
-	if (TFlags&PTF_BLEND) {
+	if (TFlags&PTF_TRANS) {
 		SetBlend(TFlags&PTF_BRIGHTEN);
 	}
 	if (SFlags&PSF_FLYING) {
@@ -1641,7 +1641,7 @@ void Projectile::DrawExplosion(const Region& vp)
 				pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
 			}
 			//i'm unsure if we need blending for all anims or just the tinted ones
-			pro->TFlags|=PTF_BLEND;
+			pro->TFlags|=PTF_TRANS;
 			//random frame is needed only for some of these, make it an areapro flag?
 			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
 				pro->ExtFlags|=PEF_RANDOM;

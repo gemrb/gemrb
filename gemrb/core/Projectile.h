@@ -73,8 +73,10 @@ namespace GemRB {
 // bg2: 10 height
 #define PTF_SHADOW  32      //has shadow bam
 #define PTF_LIGHT   64      //has light shadow / glow
-#define PTF_BLEND   128     //blend colours (use alpha)
+#define PTF_TRANS   128     // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
 #define PTF_BRIGHTEN 256    //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
+#define PTF_BLEND	512		// glBlendFunc(GL_DST_COLOR, GL_ONE);
+#define PTF_TRANS_BLEND (PTF_TRANS | PTF_BLEND) // glBlendFunc(GL_SRC_COLOR, GL_ONE); IWD only?
 // 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST BRIGHTEST3DONLYOFF
 #define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
