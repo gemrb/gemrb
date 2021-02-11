@@ -96,21 +96,24 @@ void GlobalTimer::DoStep(int count)
 
 	Point p = currentVP.Origin();
 	if (p != goal && !goal.isempty()) {
-		int d = SquaredDistance(goal, p);
+		int d = Distance(goal, p);
 		int magnitude = count * speed;
-		magnitude *= magnitude; // distance is squared, so too must be the magnitude
 		
 		if (d <= magnitude) {
-			gc->MoveViewportTo(goal, false);
+			p = goal;
 		} else {
 			magnitude = std::min(magnitude, d);
 			float r = magnitude / float(d);
-			Point target;
-			target.x = (1 - r) * p.x + r * goal.x;
-			target.y = (1 - r) * p.y + r * goal.y;
-			
-			gc->MoveViewportTo(target, false);
+			p.x = (1 - r) * p.x + r * goal.x;
+			p.y = (1 - r) * p.y + r * goal.y;
 		}
+	}
+	
+	if (!gc->MoveViewportTo(p, false)) {
+		// we have moved as close to the goal as possible
+		// something must have set a goal beyond the map
+		// update the goal just in case we are in a shake
+		goal = gc->Viewport().Origin();
 	}
 
 	// do a possible shake in addition to the standard pan
