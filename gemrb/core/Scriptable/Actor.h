@@ -381,6 +381,9 @@ public:
 	/**
 	 * We don't know how to profit of them, but PST needs them saved.
 	 * Otherwise, some actors are badly drawn, like TNO but not Morte.
+	 * bit 0 for a "plasma" effect: palette color entries shift by one index position per cycle update
+	 * bit 1 is for enabling pulsating for the particular color range (we store them in IE_COLOR*)
+	 *   it periodically reduces brightness to ~50% and back to full
 	 */
 	ieByte pstColorBytes[10];
 private:
