@@ -1642,6 +1642,14 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	} else {
 		moveY = 0;
 	}
+	
+	if (moveX || moveY) {
+		// cancel any scripted moves
+		// we are not in dialog or cutscene mode anymore
+		// and the user is attempting to move the viewport
+		core->timer.SetMoveViewPort(vpOrigin, 0, false);
+	}
+	
 	return true;
 }
 
