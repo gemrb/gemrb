@@ -23,6 +23,7 @@
 
 #include "AmbientMgr.h"
 
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
 #include <string>
@@ -72,6 +73,7 @@ private:
 	std::recursive_mutex mutex;
 	std::thread player;
 	std::condition_variable_any cond;
+	std::atomic_bool playing {true};
 };
 
 }

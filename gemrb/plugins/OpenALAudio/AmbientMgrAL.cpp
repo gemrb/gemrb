@@ -43,6 +43,7 @@ AmbientMgrAL::AmbientMgrAL()
 
 AmbientMgrAL::~AmbientMgrAL()
 {
+	playing = false;
 	mutex.lock();
 	for (auto ambientSource : ambientSources) {
 		delete ambientSource;
@@ -104,11 +105,8 @@ void AmbientMgrAL::hardStop() const
 
 int AmbientMgrAL::play()
 {
-	std::unique_lock<std::recursive_mutex> l(mutex);
-	while (!ambientSources.empty()) {
-		if (!core->GetGame()) { // we don't have any game, and we need one
-			break;
-		}
+	while (playing) {
+		std::unique_lock<std::recursive_mutex> l(mutex);
 		using namespace std::chrono;
 		using Clock = high_resolution_clock;
 		high_resolution_clock::time_point time = Clock::now();
@@ -134,7 +132,12 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 	listener.x = (short) xpos;
 	listener.y = (short) ypos;
 
-	ieDword timeslice = SCHEDULE_MASK(core->GetGame()->GameTime);
+	Game* game = core->GetGame();
+	ieDword time = 0;
+	if (game) {
+		time = game->GameTime;
+	}
+	ieDword timeslice = SCHEDULE_MASK(time);
 
 	for (auto source : ambientSources) {
 		unsigned int newdelay = source->tick(ticks, listener, timeslice);
