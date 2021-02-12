@@ -36,7 +36,7 @@ class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
 public:
-	AmbientMgrAL() : AmbientMgr() { }
+	AmbientMgrAL();
 	~AmbientMgrAL();
 
 	void setAmbients(const std::vector<Ambient *> &a) override;
@@ -70,9 +70,9 @@ private:
 	unsigned int tick(uint64_t ticks) const;
 	void hardStop() const;
 	
-	std::mutex mutex;
+	std::recursive_mutex mutex;
 	std::thread player;
-	std::condition_variable cond;
+	std::condition_variable_any cond;
 };
 
 }

@@ -89,7 +89,7 @@ private:
 	unsigned short audio_format;
 	int audio_channels;
 
-	std::mutex OurMutex;
+	std::recursive_mutex OurMutex;
 	LRUCache buffercache;
 };
 

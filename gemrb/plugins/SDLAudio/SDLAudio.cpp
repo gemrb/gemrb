@@ -77,7 +77,7 @@ void SDLAudio::music_callback(void *udata, unsigned short *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
 
 	do {
-		std::lock_guard<std::mutex> l(driver->OurMutex);
+		std::lock_guard<std::recursive_mutex> l(driver->OurMutex);
 		// TODO: conversion? mutexes? sanity checks? :)
 		int num_samples = len / 2;
 		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
@@ -260,7 +260,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		chan = 0;
 	}
 
-	std::lock_guard<std::mutex> l(OurMutex);
+	std::lock_guard<std::recursive_mutex> l(OurMutex);
 	
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
@@ -325,7 +325,7 @@ void SDLAudio::GetListenerPos(int& x, int& y)
 
 void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 	SDLAudio *driver = (SDLAudio *)udata;
-	std::lock_guard<std::mutex> l(driver->OurMutex);
+	std::lock_guard<std::recursive_mutex> l(driver->OurMutex);
 
 	unsigned int remaining = len;
 	while (remaining && driver->buffers.size() > 0) {
@@ -402,7 +402,7 @@ bool SDLAudio::ReleaseStream(int stream, bool HardStop)
 
 void SDLAudio::FreeBuffers()
 {
-	std::lock_guard<std::mutex> l(OurMutex);
+	std::lock_guard<std::recursive_mutex> l(OurMutex);
 	for (unsigned int i = 0; i < buffers.size(); i++) {
 		free(buffers[i].buf);
 	}

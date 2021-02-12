@@ -579,7 +579,7 @@ bool OpenALAudioDriver::CanPlay()
 
 void OpenALAudioDriver::ResetMusics()
 {
-	std::lock_guard<std::mutex> l(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	MusicPlaying = false;
 	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
@@ -598,7 +598,7 @@ void OpenALAudioDriver::ResetMusics()
 
 bool OpenALAudioDriver::Play()
 {
-	std::lock_guard<std::mutex> l(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	if (!MusicReader) return false;
 
 	MusicPlaying = true;
@@ -608,7 +608,7 @@ bool OpenALAudioDriver::Play()
 
 bool OpenALAudioDriver::Stop()
 {
-	std::lock_guard<std::mutex> l(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	
 	if (!MusicSource || !alIsSource( MusicSource )) {
 		return false;
@@ -624,7 +624,7 @@ bool OpenALAudioDriver::Stop()
 
 bool OpenALAudioDriver::Pause()
 {
-	std::lock_guard<std::mutex> l(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	if (!MusicSource || !alIsSource( MusicSource )) {
 		return false;
 	}
@@ -639,7 +639,7 @@ bool OpenALAudioDriver::Pause()
 bool OpenALAudioDriver::Resume()
 {
 	{
-		std::lock_guard<std::mutex> l(musicMutex);
+		std::lock_guard<std::recursive_mutex> l(musicMutex);
 		if (!MusicSource || !alIsSource( MusicSource )) {
 			return false;
 		}
@@ -653,7 +653,7 @@ bool OpenALAudioDriver::Resume()
 
 int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 {
-	std::lock_guard<std::mutex> l(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 
 	// Free old MusicReader
 	MusicReader = newMusic;
@@ -893,7 +893,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
-		std::lock_guard<std::mutex> l(driver->musicMutex);
+		std::lock_guard<std::recursive_mutex> l(driver->musicMutex);
 		if (driver->MusicPlaying) {
 			ALint state;
 			alGetSourcei( driver->MusicSource, AL_SOURCE_STATE, &state );
