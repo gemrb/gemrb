@@ -1765,7 +1765,8 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map)
 	}
 	stream->Write( Signature, 8);
 	stream->WriteResRef( map->WEDResRef);
-	stream->WriteDword( &core->GetGame()->GameTime ); //lastsaved
+	uint32_t time = core->GetGame()->GameTime;
+	stream->WriteDword(&time); //lastsaved
 	stream->WriteDword( &map->AreaFlags);
 
 	memset(Signature, 0, sizeof(Signature)); //8 bytes 0
