@@ -70,7 +70,7 @@ public:
 				buffer.Clear();
 				const String& str = SubtitleAtFrame(frame);
 				Region rect(Point(), buffer.Size());
-				font->Print(rect, str, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE, {ColorBlack, col});
+				font->Print(rect, str, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE, {col, ColorBlack});
 			}
 		}
 	};
