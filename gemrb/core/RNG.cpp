@@ -54,8 +54,7 @@ RNG::RNG() {
  * Singleton.
  */
 RNG& RNG::getInstance() {
-	static RNG instance;
-
+	thread_local RNG instance;
 	return instance;
 }
 
