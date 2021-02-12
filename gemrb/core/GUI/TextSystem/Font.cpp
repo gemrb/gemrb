@@ -123,23 +123,29 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
 		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->palette, true, 0);
-		invertedSheet = Sheet->copy();
-		auto invertedPalette = font->palette->Copy();
-		for (auto& c : invertedPalette->col) {
-			c.r = 255 - c.r;
-			c.g = 255 - c.g;
-			c.b = 255 - c.b;
+		if (font->background) {
+			invertedSheet = Sheet->copy();
+			auto invertedPalette = font->palette->Copy();
+			for (auto& c : invertedPalette->col) {
+				c.r = 255 - c.r;
+				c.g = 255 - c.g;
+				c.b = 255 - c.b;
+			}
+			invertedSheet->SetPalette(invertedPalette);
 		}
-		invertedSheet->SetPalette(invertedPalette);
 	}
 	
 	if (colors) {
-		// no point in BLIT_ADD with black so let's optimize away some blits
-		SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->bg);
-		if (colors->fg != ColorBlack) {
-			std::swap(Sheet, invertedSheet);
-			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_ADD | BLIT_COLOR_MOD, colors->fg);
-			std::swap(Sheet, invertedSheet);
+		if (font->background) {
+			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->bg);
+			// no point in BLIT_ADD with black so let's optimize away some blits
+			if (colors->fg != ColorBlack) {
+				std::swap(Sheet, invertedSheet);
+				SpriteSheet<ieWord>::Draw(chr, dest, BLIT_ADD | BLIT_COLOR_MOD, colors->fg);
+				std::swap(Sheet, invertedSheet);
+			}
+		} else {
+			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->fg);
 		}
 	} else {
 		SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED, ColorWhite);
@@ -156,10 +162,11 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn);
 }
 
-Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline)
+Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
 : palette(pal), LineHeight(lineheight), Baseline(baseline)
 {
 	CurrentAtlasPage = NULL;
+	background = bg;
 }
 
 Font::~Font(void)

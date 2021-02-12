@@ -280,9 +280,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			c.b *= 0.66;
 		}
 
-		// yes, black is the fg color because
-		// the font buttons use doesnt have a foreground/background
-		Font::PrintColors colors {ColorBlack, c};
+		Font::PrintColors colors {c, ColorBlack};
 		font->Print(r, Text, align, colors);
 	}
 

@@ -470,7 +470,7 @@ void TextArea::AppendText(const String& text)
 					// see BG2 chargen
 					s.w += 3;
 				}
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, {ColorBlack, ColorWhite}, &s);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, {ColorWhite, ColorBlack}, &s);
 				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!

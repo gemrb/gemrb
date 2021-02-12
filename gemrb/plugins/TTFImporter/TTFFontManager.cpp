@@ -115,7 +115,7 @@ void TTFFontManager::Close()
 	close(ftStream);
 }
 
-Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/)
+Font* TTFFontManager::GetFont(unsigned short pxSize, FontStyle /*style*/, bool /*background*/)
 {
 	PaletteHolder pal = new Palette(ColorWhite, ColorBlack);
 	pal->CreateShadedAlphaChannel();

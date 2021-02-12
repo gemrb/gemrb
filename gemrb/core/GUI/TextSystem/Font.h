@@ -163,6 +163,7 @@ private:
 
 protected:
 	PaletteHolder palette;
+	bool background = false;
 
 public:
 	const int LineHeight;
@@ -180,7 +181,7 @@ private:
 	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
 
 public:
-	Font(PaletteHolder, ieWord lineheight, ieWord baseline);
+	Font(PaletteHolder, ieWord lineheight, ieWord baseline, bool background);
 	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, Holder<Sprite2D>);

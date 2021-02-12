@@ -45,7 +45,7 @@ Public methods
 	bool Open(DataStream* stream) override;
 	void Close();
 
-	Font* GetFont(unsigned short pxSize, FontStyle style) override;
+	Font* GetFont(unsigned short pxSize, FontStyle style, bool background) override;
 
 	// freetype "callbacks"
 	static unsigned long read( FT_Stream       stream,

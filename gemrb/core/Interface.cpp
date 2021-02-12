@@ -1150,10 +1150,11 @@ int Interface::LoadFonts()
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
 		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
+		bool background = atoi(tab->QueryField(rowName, "BACKGRND"));
 
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
-		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style);
+		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {
 			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());

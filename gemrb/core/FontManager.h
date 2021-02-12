@@ -37,7 +37,7 @@ public:
 	FontManager();
 	~FontManager(void) override;
 
-	virtual Font* GetFont(ieWord pxSize, FontStyle style)=0;
+	virtual Font* GetFont(ieWord pxSize, FontStyle style, bool background)=0;
 };
 
 }
