@@ -94,11 +94,12 @@ private:
 	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
 	bool OverrideIconPalette;
 	/** Label color of a visited area */
-	Color color_normal = ColorWhite;
+
+	Color color_normal = Color(0xf0, 0xf0, 0xf0, 0xff);
 	/** Label color of a currently selected area */
-	Color color_selected = ColorWhite;
+	Color color_selected = Color(0xf0, 0x80, 0x80, 0xff);
 	/** Label color of a not yet visited area */
-	Color color_notvisited = ColorWhite;
+	Color color_notvisited = Color(0x80, 0x80, 0xf0, 0xff);
 
 };
 
