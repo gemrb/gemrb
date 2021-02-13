@@ -39,7 +39,7 @@ MessageWindowLogger::~MessageWindowLogger()
 	mwl = NULL;
 }
 
-void MessageWindowLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
+void MessageWindowLogger::LogInternal(LogMessage&& msg)
 {
 	const GameControl* gc = core->GetGameControl();
 	if (displaymsg && gc && !(gc->GetDialogueFlags()&DF_IN_DIALOG)) {
@@ -72,25 +72,21 @@ void MessageWindowLogger::LogInternal(log_level level, const char* owner, const 
 			BLUE
 		};
 
-		if (level < 0) {
-			// re-assign our internal message level to the real one
-			level = MESSAGE;
-		}
 		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]";
-		size_t len = strlen(message) + strlen(owner) + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
-		wchar_t* msg = (wchar_t*)malloc(len * sizeof(wchar_t));
-		swprintf(msg, len, fmt, colors[color], owner, colors[log_level_color[level]], message);
-		displaymsg->DisplayMarkupString(msg);
-		free(msg);
+		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
+		wchar_t* text = (wchar_t*)malloc(len * sizeof(wchar_t));
+		swprintf(text, len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[msg.level]], msg.message.c_str());
+		displaymsg->DisplayMarkupString(text);
+		free(text);
 	}
 }
 
 void MessageWindowLogger::PrintStatus(bool toggle)
 {
 	if (toggle) {
-		LogInternal( INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
+		log(INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
 	} else {
-		LogInternal( INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
+		log(INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
 	}
 }
 

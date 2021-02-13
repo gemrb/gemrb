@@ -28,14 +28,32 @@ Logger::Logger(log_level level)
 {
 	// set level directly instead of calling SetLogLevel() to avoid pure virtual call
 	myLevel = level;
+	loggingThread = std::thread([this] {
+		QueueType queue;
+		while (running) {
+			std::unique_lock<std::mutex> lk(queueLock);
+			cv.wait(lk);
+			if (messageQueue.size()) {
+				queue.swap(messageQueue);
+			}
+			lk.unlock();
+			ProcessMessages(std::move(queue));
+		}
+	});
 }
 
 Logger::~Logger()
-{}
-
-void Logger::destroy()
 {
-	delete this;
+	running = false;
+	loggingThread.join();
+}
+
+void Logger::ProcessMessages(QueueType queue)
+{
+	while (queue.size()) {
+		LogInternal(std::move(queue.front()));
+		queue.pop_front();
+	}
 }
 
 bool Logger::SetLogLevel(log_level level)
@@ -47,12 +65,12 @@ bool Logger::SetLogLevel(log_level level)
 		snprintf(msg, 25, fmt, level%100);
 		// careful to use our log function and not the global one to prevent this message form
 		// propagating to other loggers.
-		LogInternal(INTERNAL, "Logger", msg, DEFAULT);
+		log(INTERNAL, "Logger", msg, DEFAULT);
 		return true;
 	} else {
 		// careful to use our log function and not the global one to prevent this message form
 		// propagating to other loggers.
-		LogInternal(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
+		log(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
 	}
 	return false;
 }
@@ -60,7 +78,19 @@ bool Logger::SetLogLevel(log_level level)
 void Logger::log(log_level level, const char* owner, const char* message, log_color color)
 {
 	if (level <= myLevel) {
-		LogInternal(level, owner, message, color);
+		LogMsg(LogMessage(level, owner, message, color));
+	}
+}
+
+void Logger::LogMsg(LogMessage&& msg)
+{
+	if (msg.level <= myLevel) {
+		if (msg.level < FATAL) {
+			msg.level = FATAL;
+		}
+		std::lock_guard<std::mutex> l(queueLock);
+		messageQueue.push_back(std::move(msg));
+		cv.notify_all();
 	}
 }
 

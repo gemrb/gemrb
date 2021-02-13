@@ -29,6 +29,13 @@
 
 #include "System/Logging.h"
 
+#include <atomic>
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <string>
+#include <thread>
+
 namespace GemRB {
 
 enum log_color {
@@ -51,17 +58,38 @@ enum log_color {
 };
 
 class GEM_EXPORT Logger {
+public:
+	struct LogMessage {
+		log_level level = DEBUG;
+		std::string owner;
+		std::string message;
+		log_color color = DEFAULT;
+		
+		LogMessage(log_level level, std::string owner, std::string message, log_color color = DEFAULT)
+		: level(level), owner(std::move(owner)), message(std::move(message)), color(color) {}
+	};
 private:
-	log_level myLevel;
+	using QueueType = std::deque<LogMessage>;
+	QueueType messageQueue;
+	
+	std::atomic<log_level> myLevel;
+	std::atomic_bool running {true};
+	std::condition_variable cv;
+	std::mutex queueLock;
+	std::thread loggingThread;
+	
+	void threadLoop();
+	void ProcessMessages(QueueType queue);
+	
 public:
 	Logger(log_level = DEBUG);
 	virtual ~Logger();
-	virtual void destroy();
 
 	bool SetLogLevel(log_level);
 	void log(log_level, const char* owner, const char* message, log_color color);
+	void LogMsg(LogMessage&& msg);
 protected:
-	virtual void LogInternal(log_level, const char*, const char*, log_color)=0;
+	virtual void LogInternal(LogMessage&& msg)=0;
 };
 
 extern const char* log_level_text[];

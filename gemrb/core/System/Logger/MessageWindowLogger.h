@@ -27,7 +27,7 @@ public:
 	MessageWindowLogger( log_level = WARNING ); // this logger has a diffrent default level than its base class.
 	virtual ~MessageWindowLogger();
 protected:
-	void LogInternal(log_level level, const char* owner, const char* message, log_color color);
+	void LogInternal(LogMessage&& msg);
 private:
 	void PrintStatus(bool);
 };

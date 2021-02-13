@@ -80,7 +80,7 @@ void StdioLogger::printStatus(const char* status, log_color color)
 	print("\n");
 }
 
-static log_color log_level_color[] = {
+static constexpr log_color log_level_color[] = {
 	LIGHT_RED,
 	LIGHT_RED,
 	YELLOW,
@@ -89,24 +89,21 @@ static log_color log_level_color[] = {
 	BLUE
 };
 
-void StdioLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
+void StdioLogger::LogInternal(LogMessage&& msg)
 {
-	if (level < FATAL) {
-		level = FATAL;
-	}
 	textcolor(LIGHT_WHITE);
 	print("[");
-	print(owner);
-	if (log_level_text[level][0]) {
+	print(msg.owner.c_str());
+	if (log_level_text[msg.level][0]) {
 		print("/");
-		textcolor(log_level_color[level]);
-		print(log_level_text[level]);
+		textcolor(log_level_color[msg.level]);
+		print(log_level_text[msg.level]);
 	}
 	textcolor(LIGHT_WHITE);
 	print("]: ");
 
-	textcolor(color);
-	print(message);
+	textcolor(msg.color);
+	print(msg.message.c_str());
 	print("\n");
 }
 

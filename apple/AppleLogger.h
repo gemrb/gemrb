@@ -30,7 +30,7 @@ public:
 
 	void textcolor(log_color);
 protected:
-	void LogInternal(log_level level, const char* owner, const char* message, log_color color);
+	void LogInternal(LogMessage&& msg);
 };
 
 Logger* createAppleLogger();

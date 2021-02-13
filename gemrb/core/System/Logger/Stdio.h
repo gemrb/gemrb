@@ -29,7 +29,7 @@ public:
 	virtual ~StdioLogger();
 	virtual void destroy();
 protected:
-	virtual void LogInternal(log_level, const char* owner, const char* message, log_color color);
+	virtual void LogInternal(LogMessage&& msg);
 	virtual void print(const char*);
 	virtual void textcolor(log_color);
 	bool useColor;

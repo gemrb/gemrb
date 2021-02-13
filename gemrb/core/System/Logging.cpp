@@ -28,18 +28,16 @@
 #else
 #  include <cstdarg>
 #endif
+#include <memory>
 #include <vector>
 
 namespace GemRB {
 
-static std::vector<Logger*> theLogger;
+static std::vector<std::unique_ptr<Logger>> loggers;
 
 void ShutdownLogging()
 {
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->destroy();
-	}
-	theLogger.clear();
+	loggers.clear();
 }
 
 void InitializeLogging()
@@ -52,28 +50,24 @@ void AddLogger(Logger* logger)
 	// check if logging was disabled in settings first
 	if (!core->Logging) return;
 
-	if (logger) theLogger.push_back(logger);
+	if (logger) loggers.push_back(std::unique_ptr<Logger>(logger));
 }
 
 void RemoveLogger(Logger* logger)
 {
 	if (logger) {
-		std::vector<Logger*>::iterator itr = theLogger.begin();
-		while (itr != theLogger.end()) {
-			if (*itr == logger) {
-				itr = theLogger.erase(itr);
-			} else {
-				++itr;
-			}
+		auto it = std::find_if(loggers.begin(), loggers.end(), [logger](const std::unique_ptr<Logger>& item) {
+			return item.get() == logger;
+		});
+		if (it != loggers.end()) {
+			loggers.erase(it);
 		}
-		logger->destroy();
-		logger = NULL;
 	}
 }
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
 {
-	if (theLogger.empty())
+	if (loggers.empty())
 		return;
 
     va_list ap_copy;
@@ -83,8 +77,8 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 
 	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->log(level, owner, buf, color);
+	for (size_t i = 0; i < loggers.size(); ++i) {
+		loggers[i]->log(level, owner, buf, color);
 	}
 	delete[] buf;
 }
@@ -124,8 +118,8 @@ void LogVA(log_level level, const char* owner, const char* message, va_list args
 
 void Log(log_level level, const char* owner, StringBuffer const& buffer)
 {
-	for (size_t i = 0; i < theLogger.size(); ++i) {
-		theLogger[i]->log(level, owner, buffer.get().c_str(), WHITE);
+	for (const auto& logger : loggers) {
+		logger->log(level, owner, buffer.get().c_str(), WHITE);
 	}
 }
 
