@@ -72,7 +72,6 @@ void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 #endif
 	}
 	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
-	StdioLogWriter::WriteLogMessage(msg); // send to stdout
 }
 
 }
