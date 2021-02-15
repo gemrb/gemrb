@@ -25,18 +25,18 @@ namespace GemRB {
 
 class DataStream;
 
-class GEM_EXPORT FileLogger : public StdioLogger {
+class GEM_EXPORT FileLogger : public StdioLogWriter {
 public:
-	FileLogger(DataStream*);
-	virtual ~FileLogger();
+	FileLogger(log_level, DataStream*);
+	~FileLogger();
 
-	void print(const char* message);
+	void print(const char* message) override;
 
 private:
 	DataStream* log_file;
 };
 
-Logger* createFileLogger(DataStream*);
+Logger::WriterPtr createFileLogger(DataStream*);
 
 }
 

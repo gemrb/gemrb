@@ -69,13 +69,13 @@ using namespace GemRB;
 
 - (void)applicationWillTerminate:(NSNotification *) __unused aNotification
 {
-	ShutdownLogging();
+	
 }
 
 // always called before openFile when launched via CLI/DragDrop
 - (void)applicationWillFinishLaunching:(NSNotification *) __unused aNotification
 {
-	AddLogger(createAppleLogger());
+	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
 
 	// Load default defaults
 	NSString* defaultsPath = [[NSBundle mainBundle] pathForResource:@"defaults" ofType:@"plist"];

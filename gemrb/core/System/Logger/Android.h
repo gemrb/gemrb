@@ -23,16 +23,12 @@
 
 namespace GemRB {
 
-class GEM_EXPORT AndroidLogger : public Logger {
+class GEM_EXPORT AndroidLogger : public Logger::LogWriter {
 public:
-	AndroidLogger();
-	virtual ~AndroidLogger();
-
-protected:
-	void LogInternal(log_level, const char*, const char*, log_color);
+	void WriteLogMessage(const Logger::LogMessage& msg) override;
 };
 
-Logger* createAndroidLogger();
+Logger::LogWriter* createAndroidLogger();
 
 }
 

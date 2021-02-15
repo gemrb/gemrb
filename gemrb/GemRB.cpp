@@ -134,15 +134,12 @@ int main(int argc, char* argv[])
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
-		InitializeLogging();
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-		ShutdownLogging();
 #ifdef VITA
 		sceKernelExitProcess(0);
 #endif
 		return -1;
 	}
-	InitializeLogging();
 	delete config;
 #ifdef ANDROID
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
@@ -151,7 +148,6 @@ int main(int argc, char* argv[])
 #endif
 	core->Main();
 	delete( core );
-	ShutdownLogging();
 #ifdef VITA
 	sceKernelExitProcess(0);
 #endif

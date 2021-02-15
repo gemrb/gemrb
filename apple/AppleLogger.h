@@ -23,17 +23,15 @@
 
 namespace GemRB {
 
-class GEM_EXPORT AppleLogger : public StdioLogger {
+class GEM_EXPORT AppleLogger : public StdioLogWriter {
 public:
 	AppleLogger();
 	virtual ~AppleLogger();
 
 	void textcolor(log_color);
 protected:
-	void LogInternal(LogMessage&& msg);
+	void WriteLogMessage(const Logger::LogMessage& msg) override;
 };
-
-Logger* createAppleLogger();
 
 }
 

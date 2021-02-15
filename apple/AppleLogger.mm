@@ -32,7 +32,7 @@ TODO: override parent so we can use NSLog
 */
 
 AppleLogger::AppleLogger()
-	: StdioLogger(false)
+: StdioLogWriter(DEBUG, false)
 {}
 
 AppleLogger::~AppleLogger()
@@ -41,7 +41,7 @@ AppleLogger::~AppleLogger()
 void AppleLogger::textcolor(log_color /*c*/)
 {}
 	
-void AppleLogger::LogInternal(LogMessage&& msg)
+void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	if (msg.level == FATAL) {
 		// display a GUI alert for FATAL errors
@@ -72,12 +72,7 @@ void AppleLogger::LogInternal(LogMessage&& msg)
 #endif
 	}
 	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
-	StdioLogger::LogInternal(std::move(msg)); // send to stdout
-}
-
-Logger* createAppleLogger()
-{
-	return new AppleLogger();
+	StdioLogWriter::WriteLogMessage(msg); // send to stdout
 }
 
 }

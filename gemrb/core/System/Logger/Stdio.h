@@ -23,15 +23,13 @@
 
 namespace GemRB {
 
-class GEM_EXPORT StdioLogger : public Logger {
+class GEM_EXPORT StdioLogWriter : public Logger::LogWriter {
 public:
-	StdioLogger(bool useColor);
-	virtual ~StdioLogger();
-	virtual void destroy();
+	StdioLogWriter(log_level, bool useColor);
 protected:
-	virtual void LogInternal(LogMessage&& msg);
+	virtual void WriteLogMessage(const Logger::LogMessage& msg) override;
 	virtual void print(const char*);
-	virtual void textcolor(log_color);
+	void textcolor(log_color);
 	bool useColor;
 private:
 	void printBracket(const char *status, log_color color);
@@ -39,7 +37,7 @@ private:
 
 };
 
-Logger* createStdioLogger();
+Logger::LogWriter* createStdioLogWriter();
 
 }
 

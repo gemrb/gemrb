@@ -24,10 +24,10 @@
 
 namespace GemRB {
 
-Logger::Logger(log_level level)
+std::atomic_bool Logger::EnableLogging {true};
+
+Logger::Logger()
 {
-	// set level directly instead of calling SetLogLevel() to avoid pure virtual call
-	myLevel = level;
 	loggingThread = std::thread([this] {
 		QueueType queue;
 		while (running) {
@@ -48,50 +48,52 @@ Logger::~Logger()
 	loggingThread.join();
 }
 
+Logger::LogWriterID Logger::AddLogWriter(WriterPtr&& writer)
+{
+	std::lock_guard<std::mutex> l(writerLock);
+	writers.push_back(std::move(writer));
+	return LogWriterID(&writers.back());
+}
+
+void Logger::DestroyLogWriter(LogWriterID id)
+{
+	std::lock_guard<std::mutex> l(writerLock);
+	auto it = std::find_if(writers.begin(), writers.end(), [id](const std::unique_ptr<LogWriter>& writer) {
+		return LogWriterID(&writer) == id;
+	});
+
+	if (it != writers.end()) {
+		writers.erase(it);
+	}
+}
+
 void Logger::ProcessMessages(QueueType queue)
 {
+	std::lock_guard<std::mutex> l(writerLock);
 	while (queue.size()) {
-		LogInternal(std::move(queue.front()));
+		for (auto& writer : writers) {
+			writer->WriteLogMessage(queue.front());
+		}
 		queue.pop_front();
 	}
 }
 
-bool Logger::SetLogLevel(log_level level)
+void Logger::LogMsg(log_level level, const char* owner, const char* message, log_color color)
 {
-	if (level > INTERNAL) {
-		myLevel = level;
-		static const char* fmt = "Log Level set to %d";
-		char msg[25];
-		snprintf(msg, 25, fmt, level%100);
-		// careful to use our log function and not the global one to prevent this message form
-		// propagating to other loggers.
-		log(INTERNAL, "Logger", msg, DEFAULT);
-		return true;
-	} else {
-		// careful to use our log function and not the global one to prevent this message form
-		// propagating to other loggers.
-		log(INTERNAL, "Logger", "Log Level cannot be set below CRITICAL.", RED);
-	}
-	return false;
-}
-
-void Logger::log(log_level level, const char* owner, const char* message, log_color color)
-{
-	if (level <= myLevel) {
-		LogMsg(LogMessage(level, owner, message, color));
-	}
+	if (EnableLogging) LogMsg(LogMessage(level, owner, message, color));
 }
 
 void Logger::LogMsg(LogMessage&& msg)
 {
-	if (msg.level <= myLevel) {
-		if (msg.level < FATAL) {
-			msg.level = FATAL;
-		}
-		std::lock_guard<std::mutex> l(queueLock);
-		messageQueue.push_back(std::move(msg));
-		cv.notify_all();
+	if (EnableLogging == false) return;
+	
+	if (msg.level < FATAL) {
+		msg.level = FATAL;
 	}
+
+	std::lock_guard<std::mutex> l(queueLock);
+	messageQueue.push_back(std::move(msg));
+	cv.notify_all();
 }
 
 const char* log_level_text[] = {
@@ -110,22 +112,22 @@ using namespace GemRB;
 #ifdef ANDROID
 
 #include "System/Logger/Android.h"
-Logger* (*GemRB::createDefaultLogger)() = createAndroidLogger;
+Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createAndroidLogWriter;
 
 #elif defined(WIN32) && !defined(WIN32_USE_STDIO)
 
 #include "System/Logger/Win32Console.h"
-Logger* (*GemRB::createDefaultLogger)() = createWin32ConsoleLogger;
+Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createWin32ConsoleLogWriter;
 
 #elif defined (VITA)
 
 #include "System/Logger/Vita.h"
-Logger* (*GemRB::createDefaultLogger)() = createVitaLogger;
+Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createVitaLogWriter;
 
 #else
 
 #include "System/Logger/Stdio.h"
-Logger* (*GemRB::createDefaultLogger)() = createStdioLogger;
+Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createStdioLogWriter;
 
 #endif
 

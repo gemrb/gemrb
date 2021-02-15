@@ -24,22 +24,18 @@
 
 namespace GemRB {
 
-MessageWindowLogger* mwl = NULL;
-
-MessageWindowLogger::MessageWindowLogger( log_level level)
-	: Logger(level)
+MessageWindowLogWriter::MessageWindowLogWriter()
+: LogWriter(WARNING) // this logger has a diffrent default level than its base class.
 {
 	PrintStatus(true);
 }
 
-MessageWindowLogger::~MessageWindowLogger()
+MessageWindowLogWriter::~MessageWindowLogWriter()
 {
 	PrintStatus(false);
-	assert(mwl == this);
-	mwl = NULL;
 }
 
-void MessageWindowLogger::LogInternal(LogMessage&& msg)
+void MessageWindowLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	const GameControl* gc = core->GetGameControl();
 	if (displaymsg && gc && !(gc->GetDialogueFlags()&DF_IN_DIALOG)) {
@@ -81,24 +77,24 @@ void MessageWindowLogger::LogInternal(LogMessage&& msg)
 	}
 }
 
-void MessageWindowLogger::PrintStatus(bool toggle)
+void MessageWindowLogWriter::PrintStatus(bool toggle)
 {
 	if (toggle) {
-		log(INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
+		Logger::LogWriter::WriteLogMessage(INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
 	} else {
-		log(INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
+		Logger::LogWriter::WriteLogMessage(INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
 	}
 }
 
-// this MUST be a singleton. we only have one message window and multiple messages to that window are useless
-// additionally GUIScript doesnt check its existance and simply calls this function whenever the command is given
-Logger* getMessageWindowLogger( bool create )
+void SetMessageWindowLogLevel(log_level level)
 {
-	if (create && !mwl) {
-		mwl = new MessageWindowLogger();
-		AddLogger(mwl);
+	static Logger::LogWriterID id = Logger::InvalidWriter;
+	if (level == INTERNAL) {
+		DestroyLogWriter(id);
+		id = Logger::InvalidWriter;
+	} else if (id == Logger::InvalidWriter) {
+		id = AddLogWriter(Logger::WriterPtr(new MessageWindowLogWriter()));
 	}
-	return mwl;
 }
 
 }

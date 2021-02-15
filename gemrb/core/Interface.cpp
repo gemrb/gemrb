@@ -1343,7 +1343,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
-	CONFIG_INT("Logging", Logging = );
+	CONFIG_INT("Logging", Logger::EnableLogging = );
 
 #undef CONFIG_INT
 

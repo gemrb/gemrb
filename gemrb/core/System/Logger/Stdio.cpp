@@ -18,20 +18,15 @@
 
 #include "System/Logger/Stdio.h"
 
-#include "System/Logging.h"
-
 #include <cstdio>
 
 namespace GemRB {
 
-StdioLogger::StdioLogger(bool useColor)
-	: useColor(useColor)
+StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
+: LogWriter(level), useColor(useColor)
 {}
 
-StdioLogger::~StdioLogger()
-{}
-
-void StdioLogger::print(const char* message)
+void StdioLogWriter::print(const char* message)
 {
 	fprintf(stdout, "%s", message);
 }
@@ -56,7 +51,7 @@ static const char* colors[] = {
 };
 
 
-void StdioLogger::textcolor(log_color c)
+void StdioLogWriter::textcolor(log_color c)
 {
 	// Shold this be in an ansi-term subclass?
 	// Probably not worth the bother
@@ -64,7 +59,7 @@ void StdioLogger::textcolor(log_color c)
 		print(colors[c]);
 }
 
-void StdioLogger::printBracket(const char* status, log_color color)
+void StdioLogWriter::printBracket(const char* status, log_color color)
 {
 	textcolor(WHITE);
 	print("[");
@@ -74,7 +69,7 @@ void StdioLogger::printBracket(const char* status, log_color color)
 	print("]");
 }
 
-void StdioLogger::printStatus(const char* status, log_color color)
+void StdioLogWriter::printStatus(const char* status, log_color color)
 {
 	printBracket(status, color);
 	print("\n");
@@ -89,7 +84,7 @@ static constexpr log_color log_level_color[] = {
 	BLUE
 };
 
-void StdioLogger::LogInternal(LogMessage&& msg)
+void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	textcolor(LIGHT_WHITE);
 	print("[");
@@ -107,18 +102,12 @@ void StdioLogger::LogInternal(LogMessage&& msg)
 	print("\n");
 }
 
-void StdioLogger::destroy()
-{
-	textcolor(DEFAULT);
-	delete this;
-}
-
-Logger* createStdioLogger()
+Logger::LogWriter* createStdioLogWriter()
 {
 #ifndef NOCOLOR
-	return new StdioLogger(true);
+	return new StdioLogWriter(DEBUG, true);
 #else
-	return new StdioLogger(false);
+	return new StdioLogWriter(DEBUG, false);
 #endif
 }
 

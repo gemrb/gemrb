@@ -32,8 +32,8 @@
 
 namespace GemRB {
 
-FileLogger::FileLogger(DataStream* log_file)
-	: StdioLogger(false), log_file(log_file)
+FileLogger::FileLogger(log_level level, DataStream* log_file)
+: StdioLogWriter(level, false), log_file(log_file)
 {}
 
 FileLogger::~FileLogger()
@@ -46,9 +46,9 @@ void FileLogger::print(const char *message)
 	log_file->Write(message, strlen(message));
 }
 
-Logger* createFileLogger(DataStream* log_file)
+Logger::WriterPtr createFileLogger(DataStream* log_file)
 {
-	return new FileLogger(log_file);
+	return Logger::WriterPtr(new FileLogger(DEBUG, log_file));
 }
 
 static void addLogger()
@@ -57,13 +57,13 @@ static void addLogger()
 	FileStream* log_file = new FileStream();
 	PathJoin(log_path, core->GamePath, "GemRB.log", NULL);
 	if (log_file->Create(log_path)) {
-		AddLogger(createFileLogger(log_file));
+		AddLogWriter(createFileLogger(log_file));
 	} else {
 		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
 		if (log_file->Create(log_path)) {
-			AddLogger(createFileLogger(log_file));
+			AddLogWriter(createFileLogger(log_file));
 		} else if (log_file->Create("/tmp/GemRB.log")) {
-			AddLogger(createFileLogger(log_file));
+			AddLogWriter(createFileLogger(log_file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");
 		}

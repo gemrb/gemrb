@@ -17,8 +17,6 @@
  */
 
 #include "System/Logging.h"
-
-#include "System/Logger.h"
 #include "System/StringBuffer.h"
 
 #include "Interface.h"
@@ -33,43 +31,20 @@
 
 namespace GemRB {
 
-static std::vector<std::unique_ptr<Logger>> loggers;
+Logger logger;
 
-void ShutdownLogging()
+Logger::LogWriterID AddLogWriter(Logger::WriterPtr&& writer)
 {
-	loggers.clear();
+	return logger.AddLogWriter(std::move(writer));
 }
 
-void InitializeLogging()
+void DestroyLogWriter(Logger::LogWriterID id)
 {
-	AddLogger(createDefaultLogger());
-}
-
-void AddLogger(Logger* logger)
-{
-	// check if logging was disabled in settings first
-	if (!core->Logging) return;
-
-	if (logger) loggers.push_back(std::unique_ptr<Logger>(logger));
-}
-
-void RemoveLogger(Logger* logger)
-{
-	if (logger) {
-		auto it = std::find_if(loggers.begin(), loggers.end(), [logger](const std::unique_ptr<Logger>& item) {
-			return item.get() == logger;
-		});
-		if (it != loggers.end()) {
-			loggers.erase(it);
-		}
-	}
+	logger.DestroyLogWriter(id);
 }
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
 {
-	if (loggers.empty())
-		return;
-
     va_list ap_copy;
     va_copy(ap_copy, ap);
     const size_t len = vsnprintf(NULL, 0, message, ap_copy);
@@ -77,9 +52,7 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 
 	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);
-	for (size_t i = 0; i < loggers.size(); ++i) {
-		loggers[i]->log(level, owner, buf, color);
-	}
+	logger.LogMsg(level, owner, buf, color);
 	delete[] buf;
 }
 
@@ -97,8 +70,6 @@ void error(const char* owner, const char* message, ...)
 	va_start(ap, message);
 	vLog(FATAL, owner, message, LIGHT_RED, ap);
 	va_end(ap);
-
-	ShutdownLogging();
 
 	exit(1);
 }
@@ -118,9 +89,7 @@ void LogVA(log_level level, const char* owner, const char* message, va_list args
 
 void Log(log_level level, const char* owner, StringBuffer const& buffer)
 {
-	for (const auto& logger : loggers) {
-		logger->log(level, owner, buffer.get().c_str(), WHITE);
-	}
+	logger.LogMsg(level, owner, buffer.get().c_str(), WHITE);
 }
 
 }

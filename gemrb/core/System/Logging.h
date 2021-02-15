@@ -29,6 +29,8 @@
 #include "exports.h"
 #include "win32def.h"
 
+#include "System/Logger.h"
+
 #if defined(__sgi)
 #  include <stdarg.h>
 #else
@@ -37,27 +39,10 @@
 
 namespace GemRB {
 
-#ifdef WIN32
-# undef ERROR
-#endif
-// !!! Keep this synchronized with GUIDefines !!!
-enum log_level : int {
-	INTERNAL = -1, // special value that can only be used by the logger itself. these messages cannot be supressed
-	FATAL = 0,
-	ERROR = 1,
-	WARNING = 2,
-	MESSAGE = 3,
-	COMBAT = 4,
-	DEBUG = 5
-};
-
-class Logger;
 class StringBuffer;
 
-GEM_EXPORT void InitializeLogging();
-GEM_EXPORT void AddLogger(Logger*);
-GEM_EXPORT void RemoveLogger(Logger*);
-GEM_EXPORT void ShutdownLogging();
+GEM_EXPORT Logger::LogWriterID AddLogWriter(Logger::WriterPtr&&);
+GEM_EXPORT void DestroyLogWriter(Logger::LogWriterID);
 
 #if defined(__GNUC__)
 # define PRINTF_FORMAT(x, y) \

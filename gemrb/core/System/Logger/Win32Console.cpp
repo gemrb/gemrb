@@ -32,13 +32,10 @@ namespace GemRB {
 #endif
 
 Win32ConsoleLogger::Win32ConsoleLogger(bool useColor)
-	: StdioLogger(useColor)
+: StdioLogger(useColor)
 {
 	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
 }
-
-Win32ConsoleLogger::~Win32ConsoleLogger()
-{}
 
 void Win32ConsoleLogger::print(const char *message)
 {
@@ -71,7 +68,7 @@ void Win32ConsoleLogger::textcolor(log_color c)
 		SetConsoleTextAttribute(hConsole, colors[c]);
 }
 
-Logger* createWin32ConsoleLogger()
+Logger::LogWriter* createWin32ConsoleLogger()
 {
 	return new Win32ConsoleLogger(true);
 }

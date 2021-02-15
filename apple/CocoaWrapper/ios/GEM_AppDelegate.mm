@@ -42,7 +42,7 @@ using namespace GemRB;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Normally you would call super implemetation first, but don't!
-	AddLogger(createAppleLogger());
+	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
 	[self setupWrapper];
 
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
@@ -116,7 +116,6 @@ using namespace GemRB;
 			delete config;
 			core->Main();
 			delete( core );
-			ShutdownLogging();
 			// We must exit since the application runloop never returns.
 			exit(ret);
 		}
