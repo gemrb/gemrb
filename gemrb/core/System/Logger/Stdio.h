@@ -42,6 +42,7 @@ private:
 class GEM_EXPORT StdioLogWriter : public StreamLogWriter {
 public:
 	StdioLogWriter(log_level, bool useColor);
+	~StdioLogWriter();
 	
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 protected:

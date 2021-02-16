@@ -54,6 +54,11 @@ StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
 : StreamLogWriter(level, new FileStream(File(stdout))), useColor(useColor)
 {}
 
+StdioLogWriter::~StdioLogWriter()
+{
+	textcolor(DEFAULT); // undo any changes to the terminal
+}
+
 void StdioLogWriter::textcolor(log_color c)
 {
 	// Shold this be in an ansi-term subclass?
