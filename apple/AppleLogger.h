@@ -28,7 +28,6 @@ public:
 	AppleLogger();
 	virtual ~AppleLogger();
 
-	void textcolor(log_color);
 protected:
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 };

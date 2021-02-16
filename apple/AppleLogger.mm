@@ -37,9 +37,6 @@ AppleLogger::AppleLogger()
 
 AppleLogger::~AppleLogger()
 {}
-
-void AppleLogger::textcolor(log_color /*c*/)
-{}
 	
 void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
