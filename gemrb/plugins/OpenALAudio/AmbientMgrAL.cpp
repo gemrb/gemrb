@@ -133,11 +133,10 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 	listener.y = (short) ypos;
 
 	Game* game = core->GetGame();
-	ieDword time = 0;
+	ieDword timeslice = 0;
 	if (game) {
-		time = game->GameTime;
+		timeslice = SCHEDULE_MASK(game->GameTime);
 	}
-	ieDword timeslice = SCHEDULE_MASK(time);
 
 	for (auto source : ambientSources) {
 		unsigned int newdelay = source->tick(ticks, listener, timeslice);
