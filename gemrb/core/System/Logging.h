@@ -43,7 +43,7 @@ class StringBuffer;
 
 GEM_EXPORT Logger::LogWriterID AddLogWriter(Logger::WriterPtr&&);
 GEM_EXPORT void DestroyLogWriter(Logger::LogWriterID);
-
+GEM_EXPORT void SetMessageWindowLogLevel(log_level level);
 #if defined(__GNUC__)
 # define PRINTF_FORMAT(x, y) \
     __attribute__ ((format(printf, x, y)))

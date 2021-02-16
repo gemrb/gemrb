@@ -20,6 +20,8 @@
 #include "System/StringBuffer.h"
 
 #include "Interface.h"
+#include "DisplayMessage.h"
+#include "GUI/GameControl.h"
 
 #if defined(__sgi)
 #  include <stdarg.h>
@@ -31,7 +33,73 @@
 
 namespace GemRB {
 
+using LogMessage = Logger::LogMessage;
+
+static std::atomic<log_level> MWLL;
+
+static void MessageWinLogMsg(const LogMessage& msg)
+{
+	if (msg.level > MWLL || msg.level < INTERNAL) return;
+	
+	const GameControl* gc = core->GetGameControl();
+	if (displaymsg && gc && !(gc->GetDialogueFlags()&DF_IN_DIALOG)) {
+		// FIXME: we check DF_IN_DIALOG here to avoid recurssion in the MessageWindowLogger, but what happens when an error happens during dialog?
+		// I'm not super sure about how to avoid that. for now the logger will not log anything in dialog mode.
+		static const char* colors[] = {
+			"[color=FFFFFF]",	// DEFAULT
+			"[color=000000]",	// BLACK
+			"[color=FF0000]",	// RED
+			"[color=00FF00]",	// GREEN
+			"[color=603311]",	// BROWN
+			"[color=0000FF]",	// BLUE
+			"[color=8B008B]",	// MAGENTA
+			"[color=00CDCD]",	// CYAN
+			"[color=FFFFFF]",	// WHITE
+			"[color=CD5555]",	// LIGHT_RED
+			"[color=90EE90]",	// LIGHT_GREEN
+			"[color=FFFF00]",	// YELLOW
+			"[color=BFEFFF]",	// LIGHT_BLUE
+			"[color=FF00FF]",	// LIGHT_MAGENTA
+			"[color=B4CDCD]",	// LIGHT_CYAN
+			"[color=CDCDCD]"		// LIGHT_WHITE
+		};
+		static const log_color log_level_color[] = {
+			RED,
+			RED,
+			YELLOW,
+			LIGHT_WHITE,
+			GREEN,
+			BLUE
+		};
+
+		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]";
+		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
+		wchar_t* text = (wchar_t*)malloc(len * sizeof(wchar_t));
+		swprintf(text, len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[msg.level]], msg.message.c_str());
+		displaymsg->DisplayMarkupString(text);
+		free(text);
+	}
+}
+
+void SetMessageWindowLogLevel(log_level level)
+{
+	if (level <= INTERNAL) {
+		static const LogMessage offMsg(INTERNAL, "Logger", "MessageWindow logging disabled.", LIGHT_RED);
+		MessageWinLogMsg(offMsg);
+	} else if (level <= DEBUG) {
+		static const LogMessage onMsg(INTERNAL, "Logger", "MessageWindow logging active.", LIGHT_GREEN);
+		MessageWinLogMsg(onMsg);
+	}
+	MWLL = level;
+}
+
 Logger logger;
+
+static void LogMsg(LogMessage&& msg)
+{
+	MessageWinLogMsg(msg);
+	logger.LogMsg(std::move(msg));
+}
 
 Logger::LogWriterID AddLogWriter(Logger::WriterPtr&& writer)
 {
@@ -52,7 +120,7 @@ static void vLog(log_level level, const char* owner, const char* message, log_co
 
 	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);
-	logger.LogMsg(level, owner, buf, color);
+	LogMsg(LogMessage(level, owner, buf, color));
 	delete[] buf;
 }
 
@@ -89,7 +157,7 @@ void LogVA(log_level level, const char* owner, const char* message, va_list args
 
 void Log(log_level level, const char* owner, StringBuffer const& buffer)
 {
-	logger.LogMsg(level, owner, buffer.get().c_str(), WHITE);
+	LogMsg(LogMessage(level, owner, buffer.get().c_str(), WHITE));
 }
 
 }

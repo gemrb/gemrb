@@ -61,7 +61,6 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/FileStream.h"
-#include "System/Logger/MessageWindowLogger.h"
 #include "System/VFS.h"
 
 #include <algorithm>
