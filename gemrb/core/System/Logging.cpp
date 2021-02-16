@@ -44,7 +44,24 @@ using LogMessage = Logger::LogMessage;
 
 static std::atomic<log_level> MWLL;
 
-std::deque<Logger::WriterPtr> initialWriters;
+std::deque<Logger::WriterPtr> writers;
+
+std::unique_ptr<Logger> logger;
+
+void ToggleLogging(bool enable)
+{
+	if (enable && logger == nullptr) {
+		logger = std::unique_ptr<Logger>(new Logger(writers));
+	} else if (!enable) {
+		logger = nullptr;
+	}
+}
+
+void SetupDefaultLogging()
+{
+	AddLogWriter(Logger::WriterPtr(createDefaultLogWriter()));
+	ToggleLogging(true);
+}
 
 static void MessageWinLogMsg(const LogMessage& msg)
 {
@@ -102,28 +119,20 @@ void SetMessageWindowLogLevel(log_level level)
 	MWLL = level;
 }
 
-static Logger& getLogger() {
-	// dont create a logging thread until we actually need one
-	// if logging is disabled this never happens
-	static Logger logger(std::move(initialWriters));
-	assert(initialWriters.empty());
-	return logger;
-}
-
 static void LogMsg(LogMessage&& msg)
 {
 	MessageWinLogMsg(msg);
-	if (Logger::EnableLogging) {
-		getLogger().LogMsg(std::move(msg));
+	if (logger) {
+		logger->LogMsg(std::move(msg));
 	}
 }
 
 void AddLogWriter(Logger::WriterPtr&& writer)
 {
-	if (Logger::EnableLogging) {
-		return getLogger().AddLogWriter(std::move(writer));
+	writers.push_back(std::move(writer));
+	if (logger) {
+		return logger->AddLogWriter(writers.back());
 	}
-	initialWriters.push_back(std::move(writer));
 }
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)

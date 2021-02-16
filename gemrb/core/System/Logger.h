@@ -91,10 +91,8 @@ public:
 		}
 		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
 	};
-	
-	static std::atomic_bool EnableLogging;
-	
-	using WriterPtr = std::unique_ptr<LogWriter>;
+
+	using WriterPtr = std::shared_ptr<LogWriter>;
 private:
 	using QueueType = std::deque<LogMessage>;
 	QueueType messageQueue;
@@ -110,10 +108,10 @@ private:
 	void ProcessMessages(QueueType queue);
 	
 public:
-	Logger(std::deque<WriterPtr>&&);
+	Logger(std::deque<WriterPtr>);
 	~Logger();
 	
-	void AddLogWriter(WriterPtr&& writer);
+	void AddLogWriter(WriterPtr writer);
 
 	void LogMsg(log_level, const char* owner, const char* message, log_color color);
 	void LogMsg(LogMessage&& msg);

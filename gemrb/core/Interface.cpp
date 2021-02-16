@@ -1343,7 +1343,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
 	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
-	CONFIG_INT("Logging", Logger::EnableLogging = );
 
 #undef CONFIG_INT
 
@@ -1470,6 +1469,10 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
+	
+	// potentially disable logging before plugins are loaded (the log file is a plugin)
+	value = config->GetValueForKey("Logging");
+	if (value) ToggleLogging(atoi(value));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
 	PluginMgr *plugin = PluginMgr::Get();

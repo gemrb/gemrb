@@ -95,7 +95,8 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
-	AddLogWriter(Logger::WriterPtr(createDefaultLogWriter()));
+	SetupDefaultLogging();
+	
 #ifdef VITA
 	scePowerSetArmClockFrequency(444);
 	scePowerSetBusClockFrequency(222);

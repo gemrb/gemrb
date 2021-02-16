@@ -24,9 +24,7 @@
 
 namespace GemRB {
 
-std::atomic_bool Logger::EnableLogging {true};
-
-Logger::Logger(std::deque<WriterPtr>&& writers)
+Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
 {
 	loggingThread = std::thread([this] {
@@ -49,7 +47,7 @@ Logger::~Logger()
 	loggingThread.join();
 }
 
-void Logger::AddLogWriter(WriterPtr&& writer)
+void Logger::AddLogWriter(WriterPtr writer)
 {
 	std::lock_guard<std::mutex> l(writerLock);
 	writers.push_back(std::move(writer));
@@ -68,13 +66,11 @@ void Logger::ProcessMessages(QueueType queue)
 
 void Logger::LogMsg(log_level level, const char* owner, const char* message, log_color color)
 {
-	if (EnableLogging) LogMsg(LogMessage(level, owner, message, color));
+	LogMsg(LogMessage(level, owner, message, color));
 }
 
 void Logger::LogMsg(LogMessage&& msg)
-{
-	if (EnableLogging == false) return;
-	
+{	
 	if (msg.level < FATAL) {
 		msg.level = FATAL;
 	}

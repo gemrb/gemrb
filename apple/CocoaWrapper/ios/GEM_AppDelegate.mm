@@ -43,6 +43,7 @@ using namespace GemRB;
 {
 	// Normally you would call super implemetation first, but don't!
 	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
+	ToggleLogging(true);
 	[self setupWrapper];
 
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
