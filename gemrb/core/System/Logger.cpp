@@ -26,7 +26,8 @@ namespace GemRB {
 
 std::atomic_bool Logger::EnableLogging {true};
 
-Logger::Logger()
+Logger::Logger(std::deque<WriterPtr>&& writers)
+: writers(std::move(writers))
 {
 	loggingThread = std::thread([this] {
 		QueueType queue;

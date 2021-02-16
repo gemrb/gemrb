@@ -37,6 +37,8 @@ using LogMessage = Logger::LogMessage;
 
 static std::atomic<log_level> MWLL;
 
+std::deque<Logger::WriterPtr> initialWriters;
+
 static void MessageWinLogMsg(const LogMessage& msg)
 {
 	if (msg.level > MWLL || msg.level < INTERNAL) return;
@@ -93,17 +95,28 @@ void SetMessageWindowLogLevel(log_level level)
 	MWLL = level;
 }
 
-Logger logger;
+static Logger& getLogger() {
+	// dont create a logging thread until we actually need one
+	// if logging is disabled this never happens
+	static Logger logger(std::move(initialWriters));
+	assert(initialWriters.empty());
+	return logger;
+}
 
 static void LogMsg(LogMessage&& msg)
 {
 	MessageWinLogMsg(msg);
-	logger.LogMsg(std::move(msg));
+	if (Logger::EnableLogging) {
+		getLogger().LogMsg(std::move(msg));
+	}
 }
 
 void AddLogWriter(Logger::WriterPtr&& writer)
 {
-	return logger.AddLogWriter(std::move(writer));
+	if (Logger::EnableLogging) {
+		return getLogger().AddLogWriter(std::move(writer));
+	}
+	initialWriters.push_back(std::move(writer));
 }
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)

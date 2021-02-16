@@ -110,7 +110,7 @@ private:
 	void ProcessMessages(QueueType queue);
 	
 public:
-	Logger();
+	Logger(std::deque<WriterPtr>&&);
 	~Logger();
 	
 	void AddLogWriter(WriterPtr&& writer);
