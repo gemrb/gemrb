@@ -30,7 +30,6 @@
 #include <atomic>
 #include <condition_variable>
 #include <deque>
-#include <list>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -99,7 +98,7 @@ public:
 private:
 	using QueueType = std::deque<LogMessage>;
 	QueueType messageQueue;
-	std::list<WriterPtr> writers;
+	std::deque<WriterPtr> writers;
 	
 	std::atomic_bool running {true};
 	std::condition_variable cv;
@@ -114,10 +113,7 @@ public:
 	Logger();
 	~Logger();
 	
-	using LogWriterID = uint64_t;
-	static constexpr LogWriterID InvalidWriter = 0;
-	LogWriterID AddLogWriter(WriterPtr&& writer);
-	void DestroyLogWriter(LogWriterID);
+	void AddLogWriter(WriterPtr&& writer);
 
 	void LogMsg(log_level, const char* owner, const char* message, log_color color);
 	void LogMsg(LogMessage&& msg);

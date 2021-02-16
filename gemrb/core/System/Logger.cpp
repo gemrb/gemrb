@@ -48,23 +48,10 @@ Logger::~Logger()
 	loggingThread.join();
 }
 
-Logger::LogWriterID Logger::AddLogWriter(WriterPtr&& writer)
+void Logger::AddLogWriter(WriterPtr&& writer)
 {
 	std::lock_guard<std::mutex> l(writerLock);
 	writers.push_back(std::move(writer));
-	return LogWriterID(&writers.back());
-}
-
-void Logger::DestroyLogWriter(LogWriterID id)
-{
-	std::lock_guard<std::mutex> l(writerLock);
-	auto it = std::find_if(writers.begin(), writers.end(), [id](const std::unique_ptr<LogWriter>& writer) {
-		return LogWriterID(&writer) == id;
-	});
-
-	if (it != writers.end()) {
-		writers.erase(it);
-	}
 }
 
 void Logger::ProcessMessages(QueueType queue)

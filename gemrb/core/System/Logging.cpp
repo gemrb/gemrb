@@ -101,14 +101,9 @@ static void LogMsg(LogMessage&& msg)
 	logger.LogMsg(std::move(msg));
 }
 
-Logger::LogWriterID AddLogWriter(Logger::WriterPtr&& writer)
+void AddLogWriter(Logger::WriterPtr&& writer)
 {
 	return logger.AddLogWriter(std::move(writer));
-}
-
-void DestroyLogWriter(Logger::LogWriterID id)
-{
-	logger.DestroyLogWriter(id);
 }
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
