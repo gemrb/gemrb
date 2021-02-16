@@ -24,6 +24,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "System/Logging.h"
 
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
@@ -94,6 +95,7 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
+	AddLogWriter(Logger::WriterPtr(createDefaultLogWriter()));
 #ifdef VITA
 	scePowerSetArmClockFrequency(444);
 	scePowerSetBusClockFrequency(222);
