@@ -17,6 +17,8 @@
  */
 
 #include "System/Logging.h"
+#include "System/FileStream.h"
+#include "System/Logger/Stdio.h"
 #include "System/StringBuffer.h"
 
 #include "Interface.h"
@@ -30,6 +32,11 @@
 #endif
 #include <memory>
 #include <vector>
+
+#ifndef STATIC_LINK
+# define STATIC_LINK
+#endif
+#include "plugindef.h"
 
 namespace GemRB {
 
@@ -168,4 +175,27 @@ void Log(log_level level, const char* owner, StringBuffer const& buffer)
 	LogMsg(LogMessage(level, owner, buffer.get().c_str(), WHITE));
 }
 
+static void addGemRBLog()
+{
+	char log_path[_MAX_PATH];
+	FileStream* log_file = new FileStream();
+	PathJoin(log_path, core->GamePath, "GemRB.log", NULL);
+	if (log_file->Create(log_path)) {
+		AddLogWriter(createStreamLogWriter(log_file));
+	} else {
+		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
+		if (log_file->Create(log_path)) {
+			AddLogWriter(createStreamLogWriter(log_file));
+		} else if (log_file->Create("/tmp/GemRB.log")) {
+			AddLogWriter(createStreamLogWriter(log_file));
+		} else {
+			Log (WARNING, "Logger", "Could not create a log file, skipping!");
+		}
+	}
 }
+
+}
+
+GEMRB_PLUGIN(unused, "tmp/file logger")
+PLUGIN_INITIALIZER(addGemRBLog)
+END_PLUGIN()

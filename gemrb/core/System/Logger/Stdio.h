@@ -23,13 +23,29 @@
 
 namespace GemRB {
 
-class GEM_EXPORT StdioLogWriter : public Logger::LogWriter {
+class DataStream;
+
+class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
+public:
+	StreamLogWriter(log_level, DataStream*);
+	~StreamLogWriter();
+
+	void WriteLogMessage(const Logger::LogMessage& msg) override;
+
+protected:
+	void Print(const std::string& message);
+
+private:
+	DataStream* stream;
+};
+
+class GEM_EXPORT StdioLogWriter : public StreamLogWriter {
 public:
 	StdioLogWriter(log_level, bool useColor);
+	
+	void WriteLogMessage(const Logger::LogMessage& msg) override;
 protected:
-	virtual void WriteLogMessage(const Logger::LogMessage& msg) override;
-	virtual void print(const char*);
-	void textcolor(log_color);
+	virtual void textcolor(log_color);
 	bool useColor;
 private:
 	void printBracket(const char *status, log_color color);
@@ -38,6 +54,7 @@ private:
 };
 
 Logger::LogWriter* createStdioLogWriter();
+Logger::WriterPtr createStreamLogWriter(DataStream*);
 
 }
 

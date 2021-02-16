@@ -23,7 +23,6 @@
 #import "AppleLogger.h"
 #import "Interface.h"
 #import "System/FileStream.h"
-#import "System/Logger/File.h"
 
 using namespace GemRB;
 

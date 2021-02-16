@@ -17,89 +17,115 @@
  */
 
 #include "System/Logger/Stdio.h"
+#include "System/FileStream.h"
 
 #include <cstdio>
 
+#include "Interface.h"
+#include "plugindef.h"
+
 namespace GemRB {
 
-StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
-: LogWriter(level), useColor(useColor)
+StreamLogWriter::StreamLogWriter(log_level level, DataStream* stream)
+: Logger::LogWriter(level), stream(stream)
 {}
 
-void StdioLogWriter::print(const char* message)
+StreamLogWriter::~StreamLogWriter()
 {
-	fprintf(stdout, "%s", message);
+	delete stream;
 }
 
-static const char* colors[] = {
-	"\033[0m",
-	"\033[0m\033[30;40m",
-	"\033[0m\033[31;40m",
-	"\033[0m\033[32;40m",
-	"\033[0m\033[33;40m",
-	"\033[0m\033[34;40m",
-	"\033[0m\033[35;40m",
-	"\033[0m\033[36;40m",
-	"\033[0m\033[37;40m",
-	"\033[1m\033[31;40m",
-	"\033[1m\033[32;40m",
-	"\033[1m\033[33;40m",
-	"\033[1m\033[34;40m",
-	"\033[1m\033[35;40m",
-	"\033[1m\033[36;40m",
-	"\033[1m\033[37;40m"
-};
+void StreamLogWriter::Print(const std::string& msg)
+{
+	stream->Write(msg.c_str(), (uint32_t)msg.length());
+}
 
+void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
+{
+	Print("[" + msg.owner + "/" + log_level_text[msg.level] + "]: " + msg.message + "\n");
+}
+
+Logger::WriterPtr createStreamLogWriter(DataStream* stream)
+{
+	return Logger::WriterPtr(new StreamLogWriter(DEBUG, stream));
+}
+
+StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
+: StreamLogWriter(level, new FileStream(File(stdout))), useColor(useColor)
+{}
 
 void StdioLogWriter::textcolor(log_color c)
 {
 	// Shold this be in an ansi-term subclass?
 	// Probably not worth the bother
+	static const char* colors[] = {
+		"\033[0m",
+		"\033[0m\033[30;40m",
+		"\033[0m\033[31;40m",
+		"\033[0m\033[32;40m",
+		"\033[0m\033[33;40m",
+		"\033[0m\033[34;40m",
+		"\033[0m\033[35;40m",
+		"\033[0m\033[36;40m",
+		"\033[0m\033[37;40m",
+		"\033[1m\033[31;40m",
+		"\033[1m\033[32;40m",
+		"\033[1m\033[33;40m",
+		"\033[1m\033[34;40m",
+		"\033[1m\033[35;40m",
+		"\033[1m\033[36;40m",
+		"\033[1m\033[37;40m"
+	};
+
 	if (useColor)
-		print(colors[c]);
+		Print(colors[c]);
 }
 
 void StdioLogWriter::printBracket(const char* status, log_color color)
 {
 	textcolor(WHITE);
-	print("[");
+	Print("[");
 	textcolor(color);
-	print(status);
+	Print(status);
 	textcolor(WHITE);
-	print("]");
+	Print("]");
 }
 
 void StdioLogWriter::printStatus(const char* status, log_color color)
 {
 	printBracket(status, color);
-	print("\n");
+	Print("\n");
 }
-
-static constexpr log_color log_level_color[] = {
-	LIGHT_RED,
-	LIGHT_RED,
-	YELLOW,
-	LIGHT_WHITE,
-	GREEN,
-	BLUE
-};
 
 void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
-	textcolor(LIGHT_WHITE);
-	print("[");
-	print(msg.owner.c_str());
-	if (log_level_text[msg.level][0]) {
-		print("/");
-		textcolor(log_level_color[msg.level]);
-		print(log_level_text[msg.level]);
-	}
-	textcolor(LIGHT_WHITE);
-	print("]: ");
+	if (useColor) {
+		static constexpr log_color log_level_color[] = {
+			LIGHT_RED,
+			LIGHT_RED,
+			YELLOW,
+			LIGHT_WHITE,
+			GREEN,
+			BLUE
+		};
 
-	textcolor(msg.color);
-	print(msg.message.c_str());
-	print("\n");
+		textcolor(LIGHT_WHITE);
+		Print("[");
+		Print(msg.owner);
+		if (log_level_text[msg.level][0]) {
+			Print("/");
+			textcolor(log_level_color[msg.level]);
+			Print(log_level_text[msg.level]);
+		}
+		textcolor(LIGHT_WHITE);
+		Print("]: ");
+
+		textcolor(msg.color);
+		Print(msg.message);
+		Print("\n");
+	} else {
+		StreamLogWriter::WriteLogMessage(msg);
+	}
 }
 
 Logger::LogWriter* createStdioLogWriter()

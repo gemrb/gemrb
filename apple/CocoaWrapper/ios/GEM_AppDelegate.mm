@@ -130,7 +130,7 @@ using namespace GemRB;
 	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
 	FileStream *fs = new FileStream();
 	if (fs->Create(cLogFile)) {
-		AddLogger(createFileLogger(fs));
+		AddLogger(createStreamLogWriter(fs));
 		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
 	} else {
 		delete fs;
