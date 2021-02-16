@@ -26,10 +26,6 @@
 
 namespace GemRB {
 
-#ifdef _DEBUG
-int FileStream::FileStreamPtrCount = 0;
-#endif
-
 #ifdef WIN32
 
 #define TCHAR_NAME(name) \
@@ -38,52 +34,14 @@ int FileStream::FileStreamPtrCount = 0;
 
 #endif
 
-struct FileStream::File {
-private:
-	FILE* file;
-public:
-	File() : file(NULL) {}
-	void Close() { fclose(file); }
-	size_t Length() {
-		fseek(file, 0, SEEK_END);
-		size_t size = ftell(file);
-		fseek(file, 0, SEEK_SET);
-		return size;
-	}
-	bool OpenRO(const char *name) {
-		return (file = fopen(name, "rb"));
-	}
-	bool OpenRW(const char *name) {
-		return (file = fopen(name, "r+b"));
-	}
-	bool OpenNew(const char *name) {
-		return (file = fopen(name, "wb"));
-	}
-	size_t Read(void* ptr, size_t length) {
-		return fread(ptr, 1, length, file);
-	}
-	size_t Write(const void* ptr, size_t length) {
-		return fwrite(ptr, 1, length, file);
-	}
-	bool SeekStart(int offset)
-	{
-		return !fseek(file, offset, SEEK_SET);
-	}
-	bool SeekCurrent(int offset)
-	{
-		return !fseek(file, offset, SEEK_CUR);
-	}
-	bool SeekEnd(int offset)
-	{
-		return !fseek(file, offset, SEEK_END);
-	}
-};
+FileStream::FileStream(File&& f)
+: str(std::move(f)), opened(true), created(true)
+{}
 
 FileStream::FileStream(void)
 {
 	opened = false;
 	created = false;
-	str = new File();
 }
 
 DataStream* FileStream::Clone()
@@ -91,27 +49,16 @@ DataStream* FileStream::Clone()
 	return OpenFile(originalfile);
 }
 
-FileStream::~FileStream(void)
-{
-	Close();
-	delete str;
-}
-
 void FileStream::Close()
 {
-	if (opened) {
-#ifdef _DEBUG
-		FileStreamPtrCount--;
-#endif
-		str->Close();
-	}
+	str = File();
 	opened = false;
 	created = false;
 }
 
 void FileStream::FindLength()
 {
-	size = str->Length();
+	size = str.Length();
 	Pos = 0;
 }
 
@@ -123,12 +70,9 @@ bool FileStream::Open(const char* fname)
 		return false;
 	}
 
-	if (!str->OpenRO(fname)) {
+	if (!str.OpenRO(fname)) {
 		return false;
 	}
-#ifdef _DEBUG
-	FileStreamPtrCount++;
-#endif
 	opened = true;
 	created = false;
 	FindLength();
@@ -141,12 +85,9 @@ bool FileStream::Modify(const char* fname)
 {
 	Close();
 
-	if (!str->OpenRW(fname)) {
+	if (!str.OpenRW(fname)) {
 		return false;
 	}
-#ifdef _DEBUG
-	FileStreamPtrCount++;
-#endif
 	opened = true;
 	created = true;
 	FindLength();
@@ -179,7 +120,7 @@ bool FileStream::Create(const char *path)
 	ExtractFileFromPath( filename, path );
 	strlcpy(originalfile, path, _MAX_PATH);
 
-	if (!str->OpenNew(originalfile)) {
+	if (!str.OpenNew(originalfile)) {
 		return false;
 	}
 	opened = true;
@@ -199,7 +140,7 @@ int FileStream::Read(void* dest, unsigned int length)
 	if (Pos+length>size ) {
 		return GEM_ERROR;
 	}
-	size_t c = str->Read(dest, length);
+	size_t c = str.Read(dest, length);
 	if (c != length) {
 		return GEM_ERROR;
 	}
@@ -217,7 +158,7 @@ int FileStream::Write(const void* src, unsigned int length)
 	}
 	// do encryption here if needed
 
-	size_t c = str->Write(src, length);
+	size_t c = str.Write(src, length);
 	if (c != length) {
 		return GEM_ERROR;
 	}
@@ -235,16 +176,16 @@ int FileStream::Seek(int newpos, int type)
 	}
 	switch (type) {
 		case GEM_STREAM_END:
-			str->SeekStart(size - newpos);
+			str.SeekStart(size - newpos);
 			Pos = size - newpos;
 			break;
 		case GEM_CURRENT_POS:
-			str->SeekCurrent(newpos);
+			str.SeekCurrent(newpos);
 			Pos += newpos;
 			break;
 
 		case GEM_STREAM_START:
-			str->SeekStart(newpos);
+			str.SeekStart(newpos);
 			Pos = newpos;
 			break;
 
