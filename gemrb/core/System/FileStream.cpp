@@ -36,79 +36,8 @@ int FileStream::FileStreamPtrCount = 0;
 	TCHAR t_name[MAX_PATH] = {0}; \
 	mbstowcs(t_name, name, MAX_PATH - 1);
 
-struct FileStream::File {
-private:
-	HANDLE file;
-public:
-	File() : file() {}
-	void Close() { CloseHandle(file); }
-	size_t Length() {
-		LARGE_INTEGER size;
-		DWORD high;
-		DWORD low = GetFileSize(file, &high);
-		if (low != 0xFFFFFFFF || GetLastError() == NO_ERROR) {
-			size.LowPart = low;
-			size.HighPart = high;
-			return size.QuadPart;
-		}
-		return 0;
-	}
-	bool OpenRO(const char *name) {
-		TCHAR_NAME(name)
-		file = CreateFile(t_name,
-			GENERIC_READ,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL, NULL);
-		return (file != INVALID_HANDLE_VALUE);
-	}
-	bool OpenRW(const char *name) {
-		TCHAR_NAME(name)
-		file = CreateFile(t_name,
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			NULL,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL, NULL);
-		return (file != INVALID_HANDLE_VALUE);
-	}
-	bool OpenNew(const char *name) {
-		TCHAR_NAME(name)
-		file = CreateFile(t_name,
-			GENERIC_WRITE,
-			FILE_SHARE_READ,
-			NULL,
-			OPEN_ALWAYS,
-			FILE_ATTRIBUTE_NORMAL, NULL);
-		return (file != INVALID_HANDLE_VALUE);
-	}
-	size_t Read(void* ptr, size_t length) {
-		unsigned long read;
-		if (!ReadFile(file, ptr, length, &read, NULL))
-			return 0;
-		return read;
-	}
-	size_t Write(const void* ptr, size_t length) {
-		unsigned long wrote;
-		if (!WriteFile(file, ptr, length, &wrote, NULL))
-			return 0;
-		return wrote;
-	}
-	bool SeekStart(int offset)
-	{
-		return SetFilePointer(file, offset, NULL, FILE_BEGIN) != 0xffffffff;
-	}
-	bool SeekCurrent(int offset)
-	{
-		return SetFilePointer(file, offset, NULL, FILE_CURRENT) != 0xffffffff;
-	}
-	bool SeekEnd(int offset)
-	{
-		return SetFilePointer(file, offset, NULL, FILE_END) != 0xffffffff;
-	}
-};
-#else
+#endif
+
 struct FileStream::File {
 private:
 	FILE* file;
@@ -149,7 +78,6 @@ public:
 		return !fseek(file, offset, SEEK_END);
 	}
 };
-#endif
 
 FileStream::FileStream(void)
 {
