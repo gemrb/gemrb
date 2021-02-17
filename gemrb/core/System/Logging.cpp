@@ -87,9 +87,9 @@ static void MessageWinLogMsg(const LogMessage& msg)
 			"[color=BFEFFF]",	// LIGHT_BLUE
 			"[color=FF00FF]",	// LIGHT_MAGENTA
 			"[color=B4CDCD]",	// LIGHT_CYAN
-			"[color=CDCDCD]"		// LIGHT_WHITE
+			"[color=CDCDCD]"	// LIGHT_WHITE
 		};
-		static const log_color log_level_color[] = {
+		static constexpr log_color log_level_color[] = {
 			RED,
 			RED,
 			YELLOW,
