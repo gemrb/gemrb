@@ -47,8 +47,8 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	r.w = std::max(r.w - margin.left - margin.right, 0);
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
 	
-	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
-	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]};
+	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKDROP]};
+	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKDROP]};
 
 	for (size_t i = 0; i < opts.size(); i++) {
 		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
@@ -133,10 +133,10 @@ void TextArea::SpanSelector::ClearHover()
 {
 	if (hoverSpan) {
 		if (hoverSpan == selectedSpan) {
-			hoverSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
+			hoverSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKDROP]);
 		} else {
 			// reset the old hover span
-			hoverSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
+			hoverSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKDROP]);
 		}
 		hoverSpan = NULL;
 	}
@@ -152,12 +152,12 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 
 	if (selectedSpan && selectedSpan != optspan) {
 		// reset the previous selection
-		selectedSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
+		selectedSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKDROP]);
 	}
 	selectedSpan = optspan;
 	
 	if (selectedSpan) {
-		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
+		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKDROP]);
 	}
 
 	// beware, this will recursively call this function.
@@ -192,7 +192,7 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 	ClearHover();
 	if (span) {
 		hoverSpan = span;
-		hoverSpan->SetColors(ta.colors[COLOR_HOVER], ta.colors[COLOR_BACKGROUND]);
+		hoverSpan->SetColors(ta.colors[COLOR_HOVER], ta.colors[COLOR_BACKDROP]);
 	}
 	return true;
 }
@@ -228,7 +228,7 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 {
 	colors[COLOR_NORMAL] = textcolor;
 	colors[COLOR_INITIALS] = initcolor;
-	colors[COLOR_BACKGROUND] = textBgColor;
+	colors[COLOR_BACKDROP] = textBgColor;
 
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps && caps != ftext) ? caps : ftext;
@@ -679,7 +679,7 @@ void TextArea::ClearText()
 
 	parser.Reset(); // reset in case any tags were left open from before
 	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext);
-	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
+	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKDROP]);
 	textContainer->SetMargin(textMargins);
 	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
 	if (Flags()&Editable) {

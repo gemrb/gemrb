@@ -166,7 +166,7 @@ private: // Private attributes
 	enum COLOR_TYPE {
 		COLOR_NORMAL = 0,	// standard text color
 		COLOR_INITIALS,	// color for finit. used only is some cases.
-		COLOR_BACKGROUND, // the background color for all text
+		COLOR_BACKDROP, // the background color for all text
 		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
 		COLOR_HOVER,	// color for hovering options (dialog/listbox)
 		COLOR_SELECTED,	// selected list box/dialog option.
