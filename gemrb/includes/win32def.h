@@ -42,6 +42,8 @@
 #define UNICODE
 #define _UNICODE
 
+#define NOCOLOR
+
 # include <windows.h>
 
 #else //WIN32
