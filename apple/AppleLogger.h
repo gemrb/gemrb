@@ -23,7 +23,7 @@
 
 namespace GemRB {
 
-class GEM_EXPORT AppleLogger : public StdioLogWriter {
+class GEM_EXPORT AppleLogger : public Logger::LogWriter {
 public:
 	AppleLogger();
 	virtual ~AppleLogger();

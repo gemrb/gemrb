@@ -32,7 +32,7 @@ TODO: override parent so we can use NSLog
 */
 
 AppleLogger::AppleLogger()
-: StdioLogWriter(DEBUG, false)
+: Logger::LogWriter(DEBUG)
 {}
 
 AppleLogger::~AppleLogger()
