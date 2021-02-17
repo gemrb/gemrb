@@ -202,7 +202,7 @@ bool SDLSurfaceSprite2D::HasTransparency() const
 
 Color SDLSurfaceSprite2D::GetPixel(const Point& p) const
 {
-	if (Frame.PointInside(p)) {
+	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
 		IPixelIterator::Direction xdir = (renderFlags & BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		IPixelIterator::Direction ydir = (renderFlags & BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		SDLPixelIterator it(*surface, xdir, ydir);

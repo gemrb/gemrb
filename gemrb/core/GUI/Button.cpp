@@ -658,8 +658,8 @@ bool Button::HitTest(const Point& p) const
 		if (Picture || PictureList.size() || !Unpressed) return true;
 
 		Point off;
-		off.x = ( frame.w / 2 ) - ( Unpressed->Frame.w / 2 );
-		off.y = ( frame.h / 2 ) - ( Unpressed->Frame.h / 2 );
+		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;
+		off.y = (frame.h / 2) - (Unpressed->Frame.h / 2) + Unpressed->Frame.y;
 		hit = !Unpressed->IsPixelTransparent(p - off);
 	}
 	return hit;
