@@ -29,6 +29,10 @@ class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
 public:
 	StreamLogWriter(log_level, DataStream*);
 	~StreamLogWriter();
+	
+	StreamLogWriter(const StreamLogWriter&) = delete;
+
+	StreamLogWriter& operator=(const StreamLogWriter&) = delete;
 
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 
