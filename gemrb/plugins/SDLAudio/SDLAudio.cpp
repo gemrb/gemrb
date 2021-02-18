@@ -78,7 +78,7 @@ void SDLAudio::SetAudioStreamVolume(uint8_t *stream, int len, int volume)
 	uint8_t *mixData = new uint8_t[len];
 	memcpy(mixData, stream, len * sizeof(uint8_t));
 	memset(stream, 0, len); // mix audio data against silence
-	SDL_MixAudio(static_cast<uint8_t*>(stream), static_cast<const uint8_t*>(mixData), len, volume);
+	SDL_MixAudio(stream, mixData, len, volume);
 	delete[] mixData;
 }
 
