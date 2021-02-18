@@ -44,6 +44,7 @@ Logger::Logger(std::deque<WriterPtr> writers)
 Logger::~Logger()
 {
 	running = false;
+	cv.notify_all();
 	loggingThread.join();
 }
 
