@@ -58,8 +58,7 @@ public:
 	File& operator=(const File&) = delete;
 	File& operator=(File&& f) {
 		if (&f != this) {
-			file = f.file;
-			f.file = nullptr;
+			std::swap(file, f.file);
 		}
 		return *this;
 	}
