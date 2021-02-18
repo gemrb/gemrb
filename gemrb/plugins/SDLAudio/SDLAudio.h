@@ -72,8 +72,9 @@ public:
 private:
 	void FreeBuffers();
 
-	static void music_callback(void *udata, unsigned short *stream, int len);
-	static void buffer_callback(void *udata, char *stream, int len);
+	static void SetAudioStreamVolume(uint8_t *stream, int len, int volume);
+	static void music_callback(void *udata, uint8_t *stream, int len);
+	static void buffer_callback(void *udata, uint8_t *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
 	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
