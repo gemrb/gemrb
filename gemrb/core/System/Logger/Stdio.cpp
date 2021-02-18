@@ -21,6 +21,12 @@
 
 #include <cstdio>
 
+#include "win32def.h"
+
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include "Interface.h"
 #include "plugindef.h"
 
@@ -50,8 +56,15 @@ Logger::WriterPtr createStreamLogWriter(DataStream* stream)
 	return Logger::WriterPtr(new StreamLogWriter(DEBUG, stream));
 }
 
+static FileStream* DupStdOut()
+{
+	int fd = dup(STDOUT_FILENO);
+	FILE* fp = fdopen(fd, "w");
+	return new FileStream(File(fp));
+}
+
 StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
-: StreamLogWriter(level, new FileStream(File(stdout))), useColor(useColor)
+: StreamLogWriter(level, DupStdOut()), useColor(useColor)
 {}
 
 StdioLogWriter::~StdioLogWriter()

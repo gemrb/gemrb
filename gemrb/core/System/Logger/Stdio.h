@@ -55,7 +55,6 @@ protected:
 private:
 	void printBracket(const char *status, log_color color);
 	void printStatus(const char* status, log_color color);
-
 };
 
 Logger::LogWriter* createStdioLogWriter();
