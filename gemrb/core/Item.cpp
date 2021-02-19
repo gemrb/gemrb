@@ -35,7 +35,7 @@ namespace GemRB {
 ITMExtHeader::ITMExtHeader(void)
 {
 	features = NULL;
-	Location = Range = Speed = unknown1 = RechargeFlags = IDReq = 0;
+	Location = Range = RechargeFlags = IDReq = 0;
 	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
 	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
 	ProjectileAnimation = ProjectileQualifier = FeatureCount = FeatureOffset = 0;
@@ -137,6 +137,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 }
 
 /** returns the average damage this weapon would cause */
+// there might not be any target, so we can't consider also AltDiceThrown ...
 int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 {
 	header = GetWeaponHeader(ranged);

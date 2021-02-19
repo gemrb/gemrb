@@ -136,7 +136,7 @@ public:
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
-	ieByte unknown1;
+	ieByte AltDiceSides = 0;
 	ieResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
@@ -146,8 +146,10 @@ public:
 	//determine projectile type (ProjectileQualifier is almost always set too)
 	//We use this field only when really needed, and resolve the redundancy
 	//in the exporter. The reason: using bitfields is more flexible.
-	//ieWord ProjectileType;
-	ieWord Speed;
+	//ieByte ProjectileType;
+	ieByte AltDiceThrown = 0;
+	ieByte Speed = 0;
+	ieByte AltDamageBonus = 0;
 	ieWord THAC0Bonus;
 	ieWord DiceSides;
 	ieWord DiceThrown;
