@@ -5768,8 +5768,8 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	//a plot critical creature has died (iwd2)
-	//FIXME: BG2 uses the same field for special creatures (alternate melee damage)
-	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
+	// BG2 uses the same field for special creatures (alternate melee damage): MC_LARGE_CREATURE
+	if (third && BaseStats[IE_MC_FLAGS] & MC_PLOT_CRITICAL) {
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
 	}
 	//ensure that the scripts of the actor will run as soon as possible

@@ -203,7 +203,7 @@ namespace GemRB {
 #define MC_EXPORTABLE           0x0800  // iwd2: either different meaning or leftover cruft (set in a few creatures)
 #define MC_HIDE_HP              0x1000  // also 'large creature' according to IE dev info (definitely something else in pst)
 #define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over (IWD2)
-#define MC_LARGE_CREATURE       0x2000  //creature is subject to alternative melee damage - semi invulnerability (BG2)
+#define MC_LARGE_CREATURE       0x2000  // creature is subject to alternative melee damage (BG2), overlaps with MC_PLOT_CRITICAL
 #define MC_LIMBO_CREATURE       0x4000
 #define MC_BEENINPARTY          0x8000
 #define MC_ENABLED              0x8000  // TODO iwd2 override; used like activate/deactivate?
