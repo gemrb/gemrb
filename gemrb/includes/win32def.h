@@ -42,6 +42,8 @@
 #define UNICODE
 #define _UNICODE
 
+#define NOGDI
+
 # include <windows.h>
 
 #else //WIN32

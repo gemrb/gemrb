@@ -119,7 +119,7 @@ public:
 
 extern const char* log_level_text[];
 
-extern Logger::LogWriter* (*createDefaultLogWriter)();
+extern GEM_EXPORT Logger::LogWriter* (*createDefaultLogWriter)();
 
 }
 
