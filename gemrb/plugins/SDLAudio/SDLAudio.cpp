@@ -30,13 +30,14 @@
 
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include <cmath>
 
 using namespace GemRB;
 
 SDLAudio::SDLAudio(void)
 {
-	XPos = 0;
-	YPos = 0;
+	listenerXPos = 0;
+	listenerYPos = 0;
 	ambim = new AmbientMgr();
 	MusicPlaying = false;
 	curr_buffer_offset = 0;
@@ -252,10 +253,6 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	Mix_Chunk *chunk;
 	unsigned int time_length;
 
-	// TODO: some panning
-	(void)XPos;
-	(void)YPos;
-
 	if (!ResRef) {
 		if (flags & GEM_SND_SPEECH) {
 			Mix_HaltChannel(0);
@@ -289,11 +286,24 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	Mix_VolumeChunk(chunk, MIX_MAX_VOLUME * (GetVolume(channel) * volume / 10000.0f));
 
 	std::lock_guard<std::recursive_mutex> l(OurMutex);
-	
+
 	chan = Mix_PlayChannel(chan, chunk, 0);
 	if (chan < 0) {
 		print("error playing channel");
 		return Holder<SoundHandle>();
+	}
+
+	// Positional audio
+	if (!(flags & GEM_SND_RELATIVE))
+	{
+		int x = listenerXPos - XPos;
+		int y = listenerYPos - YPos;
+		int16_t angle = atan2(y, x) * 180 / M_PI - 90;
+		if (angle < 0) {
+			angle += 360;
+		}
+		uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
+		Mix_SetPosition(chan, angle, distance);
 	}
 
 	// TODO
@@ -339,16 +349,14 @@ bool SDLAudio::CanPlay()
 
 void SDLAudio::UpdateListenerPos(int x, int y)
 {
-	// TODO
-	XPos = x;
-	YPos = y;
+	listenerXPos = x;
+	listenerYPos = y;
 }
 
 void SDLAudio::GetListenerPos(int& x, int& y)
 {
-	// TODO
-	x = XPos;
-	y = YPos;
+	x = listenerXPos;
+	y = listenerYPos;
 }
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)

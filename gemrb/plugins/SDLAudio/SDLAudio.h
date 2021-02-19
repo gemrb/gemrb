@@ -30,6 +30,7 @@
 #include <SDL_mixer.h>
 
 #define BUFFER_CACHE_SIZE 50
+#define AUDIO_DISTANCE_ROLLOFF_MOD 1.5
 
 namespace GemRB {
 
@@ -79,7 +80,7 @@ private:
 	void clearBufferCache();
 	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
 
-	int XPos, YPos;
+	int listenerXPos, listenerYPos;
 	Holder<SoundMgr> MusicReader;
 
 	bool MusicPlaying;
