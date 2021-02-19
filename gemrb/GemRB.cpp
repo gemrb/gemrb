@@ -154,5 +154,7 @@ int main(int argc, char* argv[])
 #ifdef VITA
 	sceKernelExitProcess(0);
 #endif
+	
+	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	return 0;
 }
