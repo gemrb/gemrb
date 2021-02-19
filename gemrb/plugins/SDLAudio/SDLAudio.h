@@ -30,9 +30,25 @@
 #include <SDL_mixer.h>
 
 #define BUFFER_CACHE_SIZE 50
-#define AUDIO_DISTANCE_ROLLOFF_MOD 1.5
+#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
 
 namespace GemRB {
+
+class SDLAudioSoundHandle : public SoundHandle 
+{
+public:
+	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
+	virtual ~SDLAudioSoundHandle() { }
+	virtual void SetPos(int XPos, int YPos);
+	virtual bool Playing();
+	virtual void Stop();
+	virtual void StopLooping();
+	void Invalidate() { }
+private:
+	Mix_Chunk *mixChunk;
+	int chunkChannel;
+	bool sndRelative;
+};
 
 struct BufferedData {
 	char *buf;
@@ -80,7 +96,7 @@ private:
 	void clearBufferCache();
 	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
 
-	int listenerXPos, listenerYPos;
+	Point listenerPos;
 	Holder<SoundMgr> MusicReader;
 
 	bool MusicPlaying;

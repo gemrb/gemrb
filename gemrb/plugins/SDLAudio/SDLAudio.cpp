@@ -34,10 +34,44 @@
 
 using namespace GemRB;
 
+void SDLAudioSoundHandle::SetPos(int XPos, int YPos)
+{
+	if (sndRelative)
+		return;
+
+	int listenerXPos = 0;
+	int listenerYPos = 0;
+	core->GetAudioDrv()->GetListenerPos(listenerXPos, listenerYPos);
+	
+	int x = listenerXPos - XPos;
+	int y = listenerYPos - YPos;
+	double angle = atan2(y, x);
+	if (angle < 0) {
+		angle += 360;
+	}
+	uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
+	Mix_SetPosition(chunkChannel, angle * 180 / M_PI - 90, distance);
+}
+
+bool SDLAudioSoundHandle::Playing()
+{
+	return (mixChunk && Mix_Playing(chunkChannel) && Mix_GetChunk(chunkChannel) == mixChunk);
+}
+
+void SDLAudioSoundHandle::Stop()
+{
+	// Mix_FadeOutChannel is not as agressive sounding (especially when stopping spellcasting) as Mix_HaltChannel
+	Mix_FadeOutChannel(chunkChannel, 500);
+}
+
+void SDLAudioSoundHandle::StopLooping()
+{
+	// No way to stop looping. Fading out instead..
+	Mix_FadeOutChannel(chunkChannel, 1000);
+}
+
 SDLAudio::SDLAudio(void)
 {
-	listenerXPos = 0;
-	listenerYPos = 0;
 	ambim = new AmbientMgr();
 	MusicPlaying = false;
 	curr_buffer_offset = 0;
@@ -261,10 +295,12 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	}
 
 	int chan = -1;
+	int loop = (flags & GEM_SND_LOOPING) ? -1 : 0;
 	ieDword volume = 100;
 
 	if (flags & GEM_SND_SPEECH) {
 		chan = 0;
+		loop = 0; // Speech ignores GEM_SND_LOOPING
 		core->GetDictionary()->Lookup("Volume Voices", volume);
 	} else {
 		core->GetDictionary()->Lookup("Volume SFX", volume);
@@ -287,7 +323,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 
 	std::lock_guard<std::recursive_mutex> l(OurMutex);
 
-	chan = Mix_PlayChannel(chan, chunk, 0);
+	chan = Mix_PlayChannel(chan, chunk, loop);
 	if (chan < 0) {
 		print("error playing channel");
 		return Holder<SoundHandle>();
@@ -296,18 +332,17 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	// Positional audio
 	if (!(flags & GEM_SND_RELATIVE))
 	{
-		int x = listenerXPos - XPos;
-		int y = listenerYPos - YPos;
-		int16_t angle = atan2(y, x) * 180 / M_PI - 90;
+		int x = listenerPos.x - XPos;
+		int y = listenerPos.y - YPos;
+		double angle = atan2(y, x);
 		if (angle < 0) {
 			angle += 360;
 		}
 		uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
-		Mix_SetPosition(chan, angle, distance);
+		Mix_SetPosition(chan, angle * 180 / M_PI - 90, distance);
 	}
 
-	// TODO
-	return Holder<SoundHandle>();
+	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
 }
 
 int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
@@ -349,14 +384,14 @@ bool SDLAudio::CanPlay()
 
 void SDLAudio::UpdateListenerPos(int x, int y)
 {
-	listenerXPos = x;
-	listenerYPos = y;
+	listenerPos.x = x;
+	listenerPos.y = y;
 }
 
 void SDLAudio::GetListenerPos(int& x, int& y)
 {
-	x = listenerXPos;
-	y = listenerYPos;
+	x = listenerPos.x;
+	y = listenerPos.y;
 }
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
