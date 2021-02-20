@@ -20,7 +20,6 @@
 
 #include "KEYImporter.h"
 
-#include "Platform.h"
 #include "globals.h"
 
 #include "IndexedArchive.h"

@@ -23,7 +23,6 @@
 #include "IDSImporterDefs.h"
 
 #include "globals.h"
-#include "Platform.h"
 
 #include <cstring>
 

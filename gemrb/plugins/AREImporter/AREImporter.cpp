@@ -20,7 +20,6 @@
 
 #include "AREImporter.h"
 
-#include "Platform.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
 

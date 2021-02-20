@@ -21,7 +21,6 @@
 #include "MOSImporter.h"
 
 #include "RGBAColor.h"
-#include "Platform.h"
 
 #include "FileCache.h"
 #include "Interface.h"

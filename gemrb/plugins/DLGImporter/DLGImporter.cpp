@@ -20,8 +20,6 @@
 
 #include "DLGImporter.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "GameScript/GameScript.h"
 #include "System/FileStream.h"

@@ -19,7 +19,6 @@
 
 #include "GUI/WorldMapControl.h"
 
-#include "Platform.h"
 #include "ie_cursors.h"
 
 #include "Game.h"

@@ -20,8 +20,6 @@
 
 #include "INIImporter.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 
 using namespace GemRB;

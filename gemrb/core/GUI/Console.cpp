@@ -20,8 +20,6 @@
 
 #include "GUI/Console.h"
 
-#include "Platform.h"
-
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"

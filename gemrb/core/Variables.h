@@ -25,7 +25,6 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "globals.h"
-#include "Platform.h"
 
 #include <cassert>
 

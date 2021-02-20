@@ -20,8 +20,6 @@
 
 #include "NullSound.h"
 
-#include "Platform.h"
-
 #include "AmbientMgr.h"
 #include "SoundMgr.h"
 

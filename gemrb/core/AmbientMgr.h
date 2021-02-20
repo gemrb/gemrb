@@ -22,8 +22,8 @@
 #define AMBIENTMGR_H
 
 #include "exports.h"
-#include "Platform.h"
 
+#include <atomic>
 #include <string>
 #include <vector>
 

@@ -20,8 +20,6 @@
 
 #include "STOImporter.h"
 
-#include "Platform.h"
-
 #include "DialogMgr.h"
 #include "GameData.h"
 #include "Interface.h"

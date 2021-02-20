@@ -20,8 +20,6 @@
 
 #include "ImageMgr.h"
 
-#include "Platform.h"
-
 #include "ImageFactory.h"
 #include "Interface.h"
 

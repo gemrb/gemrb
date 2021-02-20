@@ -30,7 +30,6 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include "Platform.h"
 
 #include <vector>
 

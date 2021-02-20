@@ -20,8 +20,6 @@
 
 #include "Animation.h"
 
-#include "Platform.h"
-
 #include "Game.h"
 #include "Interface.h"
 #include "Map.h"

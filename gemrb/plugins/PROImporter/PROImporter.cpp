@@ -20,8 +20,6 @@
 
 #include "PROImporter.h"
 
-#include "Platform.h"
-
 #include "EffectMgr.h"
 #include "Interface.h"
 

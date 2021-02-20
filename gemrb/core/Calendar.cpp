@@ -20,8 +20,6 @@
 
 #include "Calendar.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "TableMgr.h"
 #include "Variables.h"

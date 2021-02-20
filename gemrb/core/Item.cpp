@@ -23,7 +23,6 @@
 
 #include "Item.h"
 
-#include "Platform.h"
 #include "voodooconst.h"
 
 #include "Interface.h"

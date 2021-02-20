@@ -19,8 +19,6 @@
 
 #include "Polygon.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 
 #include <algorithm>

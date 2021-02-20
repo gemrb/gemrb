@@ -31,7 +31,6 @@
 #include "exports.h"
 #include "globals.h"
 #include "iless.h"
-#include "Platform.h"
 #include "Holder.h"
 
 #include "ResourceDesc.h"

@@ -22,8 +22,6 @@
 
 #include "Map.h"
 
-#include "Platform.h"
-
 #include "Ambient.h"
 #include "AmbientMgr.h"
 #include "Audio.h"

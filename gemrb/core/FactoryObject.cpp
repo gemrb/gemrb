@@ -20,7 +20,7 @@
 
 #include "FactoryObject.h"
 
-#include "Platform.h"
+#include "System/String.h"
 
 namespace GemRB {
 

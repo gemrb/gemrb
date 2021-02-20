@@ -22,7 +22,6 @@
 
 #include "Spell.h"
 
-#include "Platform.h"
 #include "voodooconst.h"
 
 #include "Audio.h"

@@ -19,7 +19,6 @@
 #include "DirectoryImporter.h"
 
 #include "globals.h"
-#include "Platform.h"
 
 #include "Interface.h"
 #include "ResourceDesc.h"

@@ -20,8 +20,6 @@
 
 #include "GUI/Slider.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/Window.h"

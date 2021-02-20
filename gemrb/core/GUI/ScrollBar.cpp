@@ -20,8 +20,6 @@
 
 #include "GUI/ScrollBar.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"

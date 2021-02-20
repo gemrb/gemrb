@@ -20,8 +20,6 @@
 
 #include "EFFImporter.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 
 using namespace GemRB;

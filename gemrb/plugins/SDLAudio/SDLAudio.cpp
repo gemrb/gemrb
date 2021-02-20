@@ -20,8 +20,6 @@
 
 #include "SDLAudio.h"
 
-#include "Platform.h"
-
 #include "AmbientMgr.h"
 #include "GameData.h"
 #include "Interface.h" // GetMusicMgr()

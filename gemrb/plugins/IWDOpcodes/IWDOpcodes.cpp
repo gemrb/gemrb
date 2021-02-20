@@ -21,7 +21,6 @@
 #include "ie_feats.h" //cannot avoid declaring these
 #include "opcode_params.h"
 #include "overlays.h"
-#include "Platform.h"
 
 #include "Audio.h"  //needs for a playsound call
 #include "DisplayMessage.h"

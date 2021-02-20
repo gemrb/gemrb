@@ -22,7 +22,6 @@
 
 #include "iless.h"
 #include "strrefs.h"
-#include "Platform.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h" // For ResourceHolder

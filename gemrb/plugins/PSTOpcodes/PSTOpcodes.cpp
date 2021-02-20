@@ -19,7 +19,6 @@
  */
 
 #include "strrefs.h"
-#include "Platform.h"
 
 #include "EffectQueue.h"
 #include "Game.h"

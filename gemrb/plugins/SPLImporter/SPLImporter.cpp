@@ -20,8 +20,6 @@
 
 #include "SPLImporter.h"
 
-#include "Platform.h"
-
 #include "EffectMgr.h"
 #include "Interface.h"
 #include "PluginMgr.h"

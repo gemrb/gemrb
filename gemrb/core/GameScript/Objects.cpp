@@ -23,8 +23,6 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
-#include "Platform.h"
-
 #include "DialogHandler.h"
 #include "Game.h"
 #include "GUI/GameControl.h"

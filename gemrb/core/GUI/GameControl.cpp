@@ -20,7 +20,6 @@
 #include "GUI/GameControl.h"
 
 #include "strrefs.h"
-#include "Platform.h"
 
 #include "CharAnimations.h"
 #include "DialogHandler.h"

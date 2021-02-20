@@ -18,8 +18,6 @@
 
 #include "SAVImporter.h"
 
-#include "Platform.h"
-
 #include "Compressor.h"
 #include "FileCache.h"
 #include "Interface.h"

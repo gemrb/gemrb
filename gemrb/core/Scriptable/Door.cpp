@@ -20,7 +20,6 @@
 #include "Scriptable/Door.h"
 
 #include "strrefs.h"
-#include "Platform.h"
 
 #include "DisplayMessage.h"
 #include "Game.h"

@@ -20,8 +20,6 @@
 
 #include "System/DataStream.h"
 
-#include "Platform.h"
-
 #include <ctype.h>
 
 namespace GemRB {

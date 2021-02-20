@@ -20,8 +20,6 @@
 
 #include "Projectile.h"
 
-#include "Platform.h"
-
 #include "AnimationFactory.h"
 #include "DisplayMessage.h"
 #include "Game.h"

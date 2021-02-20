@@ -22,7 +22,6 @@
 #ifndef __GST_MVE_DEMUX_H__
 #define __GST_MVE_DEMUX_H__
 
-#include "Platform.h"
 #include "globals.h"
 
 using namespace GemRB;

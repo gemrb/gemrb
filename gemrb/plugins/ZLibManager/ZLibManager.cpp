@@ -21,7 +21,6 @@
 #include "ZLibManager.h"
 
 #include "globals.h"
-#include "Platform.h"
 
 #include <zlib.h>
 

@@ -24,8 +24,6 @@
 #include "GUI/MapControl.h"
 #include "GUI/ScrollBar.h"
 
-#include "Platform.h"
-
 #include "ie_cursors.h"
 
 namespace GemRB {

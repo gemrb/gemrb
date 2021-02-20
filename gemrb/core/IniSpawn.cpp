@@ -23,8 +23,6 @@
 
 #include "IniSpawn.h"
 
-#include "Platform.h"
-
 #include "CharAnimations.h"
 #include "Game.h"
 #include "GameData.h"

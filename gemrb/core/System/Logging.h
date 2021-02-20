@@ -27,7 +27,6 @@
 #define LOGGING_H
 
 #include "exports.h"
-#include "Platform.h"
 
 #include "System/Logger.h"
 

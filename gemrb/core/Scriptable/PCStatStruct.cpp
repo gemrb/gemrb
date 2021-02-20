@@ -19,8 +19,7 @@
  */
 
 #include "Scriptable/PCStatStruct.h"
-
-#include "Platform.h"
+#include "System/Logging.h"
 
 #include <cstring>
 

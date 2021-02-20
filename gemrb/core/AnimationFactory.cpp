@@ -20,8 +20,6 @@
 
 #include "AnimationFactory.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "Sprite2D.h"
 

@@ -21,7 +21,6 @@
 #include "GAMImporter.h"
 
 #include "globals.h"
-#include "Platform.h"
 
 #include "DataFileMgr.h"
 #include "GameData.h"

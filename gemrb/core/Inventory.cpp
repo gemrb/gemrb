@@ -23,7 +23,6 @@
 
 #include "Inventory.h"
 
-#include "Platform.h"
 #include "strrefs.h"
 
 #include "CharAnimations.h"

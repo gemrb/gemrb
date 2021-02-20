@@ -20,8 +20,6 @@
 
 #include "2DAImporter.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "System/FileStream.h"
 

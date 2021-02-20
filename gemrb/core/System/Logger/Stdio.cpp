@@ -21,8 +21,6 @@
 
 #include <cstdio>
 
-#include "Platform.h"
-
 #include "Interface.h"
 #include "plugindef.h"
 

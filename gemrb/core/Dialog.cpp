@@ -20,8 +20,6 @@
 
 #include "Dialog.h"
 
-#include "Platform.h"
-
 #include "GameScript/GameScript.h"
 #include "RNG.h"
 

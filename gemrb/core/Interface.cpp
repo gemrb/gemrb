@@ -24,7 +24,6 @@
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
-#include "Platform.h"
 #include "ie_cursors.h"
 
 #include "ActorMgr.h"

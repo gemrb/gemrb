@@ -22,7 +22,6 @@
 
 #include "ie_stats.h"
 #include "voodooconst.h"
-#include "Platform.h"
 
 #include "EffectMgr.h"
 #include "GameData.h"

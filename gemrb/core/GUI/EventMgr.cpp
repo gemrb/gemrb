@@ -22,7 +22,6 @@
 
 #include "GUI/GameControl.h"
 
-#include "Platform.h"
 #include "ie_cursors.h"
 
 #include "Game.h"

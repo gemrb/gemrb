@@ -18,8 +18,6 @@
 
 #include "System/StringBuffer.h"
 
-#include "Platform.h"
-
 #include <cstdio>
 #if defined(__sgi)
 #  include <stdarg.h>

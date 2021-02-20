@@ -20,10 +20,6 @@
 
 #include "Factory.h"
 
-#include "Platform.h"
-
-#include <cstring>
-
 namespace GemRB {
 
 Factory::Factory(void)

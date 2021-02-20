@@ -21,8 +21,6 @@
 
 #include "BAMImporter.h"
 
-#include "Platform.h"
-
 #include "FileCache.h"
 #include "GameData.h"
 #include "Interface.h"

@@ -20,8 +20,6 @@
 
 #include "TLKImporter.h"
 
-#include "Platform.h"
-
 #include "Audio.h"
 #include "Calendar.h"
 #include "DialogHandler.h"

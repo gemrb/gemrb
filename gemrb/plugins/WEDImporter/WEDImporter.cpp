@@ -20,8 +20,6 @@
 
 #include "WEDImporter.h"
 
-#include "Platform.h"
-
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"

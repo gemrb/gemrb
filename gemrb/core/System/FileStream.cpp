@@ -20,8 +20,6 @@
 
 #include "System/FileStream.h"
 
-#include "Platform.h"
-
 #include "Interface.h"
 
 namespace GemRB {

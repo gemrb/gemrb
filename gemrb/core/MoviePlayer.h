@@ -29,7 +29,6 @@
 #define MOVIEPLAYER_H
 
 #include "globals.h"
-#include "Platform.h"
 
 #include "Resource.h"
 

@@ -22,7 +22,6 @@
 
 #include "System/MemoryStream.h"
 
-#include "Platform.h"
 #include "errors.h"
 
 #include "Interface.h"

@@ -20,8 +20,6 @@
 
 #include "CharAnimations.h"
 
-#include "Platform.h"
-
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "Game.h"

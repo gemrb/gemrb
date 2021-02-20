@@ -18,8 +18,6 @@
 
 #include "PluginMgr.h"
 
-#include "Platform.h"
-
 #include "Plugin.h"
 #include "ResourceDesc.h"
 

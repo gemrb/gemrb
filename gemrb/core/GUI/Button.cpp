@@ -25,7 +25,6 @@
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
 
-#include "Platform.h"
 #include "defsounds.h"
 #include "ie_cursors.h"
 

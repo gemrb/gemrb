@@ -21,7 +21,6 @@
 #include "CHUImporter.h"
 
 #include "RGBAColor.h"
-#include "Platform.h"
 
 #include "AnimationFactory.h"
 #include "GameData.h"

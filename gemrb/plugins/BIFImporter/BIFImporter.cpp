@@ -20,8 +20,6 @@
 
 #include "BIFImporter.h"
 
-#include "Platform.h"
-
 #include "Compressor.h"
 #include "FileCache.h"
 #include "Interface.h"

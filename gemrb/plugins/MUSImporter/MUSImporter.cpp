@@ -20,8 +20,6 @@
 
 #include "MUSImporter.h"
 
-#include "Platform.h"
-
 #include "Audio.h"
 #include "GameData.h" // For ResourceHolder
 #include "Interface.h"

@@ -21,7 +21,6 @@
 #include "PLTImporter.h"
 
 #include "RGBAColor.h"
-#include "Platform.h"
 
 #include "Interface.h"
 #include "Video.h"

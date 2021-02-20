@@ -19,7 +19,6 @@
  */
 
 #include "KeyMap.h"
-#include "Platform.h"
 #include "Interface.h"
 #include "TableMgr.h"
 #include "ScriptEngine.h"

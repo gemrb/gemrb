@@ -23,7 +23,6 @@
 #include "overlays.h"
 #include "strrefs.h"
 #include "voodooconst.h"
-#include "Platform.h"
 
 #include "Audio.h"
 #include "DisplayMessage.h"

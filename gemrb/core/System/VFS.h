@@ -29,7 +29,6 @@
 
 #include "exports.h"
 #include "globals.h"
-#include "Platform.h"
 #include "Predicates.h"
 
 #include <string>

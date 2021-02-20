@@ -20,8 +20,6 @@
 
 #include "ControlAnimation.h"
 
-#include "Platform.h"
-
 #include "AnimationFactory.h"
 #include "GameData.h"
 #include "GlobalTimer.h"

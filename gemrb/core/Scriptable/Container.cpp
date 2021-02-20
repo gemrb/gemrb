@@ -20,7 +20,6 @@
 #include "Scriptable/Container.h"
 
 #include "strrefs.h"
-#include "Platform.h"
 
 #include "DisplayMessage.h"
 #include "Game.h"

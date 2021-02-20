@@ -21,7 +21,6 @@
 #include "TISImporter.h"
 
 #include "RGBAColor.h"
-#include "Platform.h"
 
 #include "Interface.h"
 #include "Sprite2D.h"

@@ -23,8 +23,6 @@
 
 #include "Store.h"
 
-#include "Platform.h"
-
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"

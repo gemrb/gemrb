@@ -25,7 +25,6 @@
 #include "GamepadControl.h"
 
 #include "GUI/EventMgr.h"
-#include "Platform.h"
 
 #include <vector>
 #include <SDL.h>
