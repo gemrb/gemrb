@@ -2272,6 +2272,10 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 		strcat( ResRef, "e" );
 		strcat( EquipData->Suffix, "e" );
 	}
+	// NOTE: the two shadow animations (cshd, sshd) also have x-suffixed files,
+	// but those are used (instead of the eastern ones) only if sprite
+	// mirroring is on. "Mirror sprites" in bgee.lua, probably what was
+	// SoftMirrorBlt in the original ini. Pretty useless.
 	EquipData->Cycle = Cycle;
 }
 
