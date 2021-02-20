@@ -39,7 +39,6 @@ int main(int argc, char* argv[])
 
 	core = new Interface();
 	CFGConfig* config = new CFGConfig(argc, argv);
-	InitializeLogging(config);
 
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;

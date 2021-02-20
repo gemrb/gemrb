@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Win32Console.h"
+#include "Win32Console.h"
 
 #include <cstdio>
 
