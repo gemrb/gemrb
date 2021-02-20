@@ -21,28 +21,37 @@
 // GemRB.cpp : Defines the entry point for the application.
 
 #include <clocale> //language encoding
+#include <SDL.h>
 
+#include "AndroidLogger.h"
 #include "Interface.h"
-#include "System/Logger/Stdio.h"
 
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
+// if/when android moves to SDL 1.3 remove these special functions.
+// SDL 1.3 fires window events for these conditions that are handled in SDLVideo.cpp.
+// see SDL_WINDOWEVENT_MINIMIZED and SDL_WINDOWEVENT_RESTORED
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+#include "Audio.h"
+
+// pause audio playing if app goes in background
+static void appPutToBackground()
+{
+  GemRB::core->GetAudioDrv()->Pause();
+}
+// resume audio playing if app return to foreground
+static void appPutToForeground()
+{
+  GemRB::core->GetAudioDrv()->Resume();
+}
+
 #endif
 
 using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
-	AddLogWriter(createStdioLogWriter());
-	ToggleLogging(true);
-
 	setlocale(LC_ALL, "");
-#ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
-#endif
+	setenv("GEM_DATA", SDL_AndroidGetExternalStoragePath(), 1);
 
 #ifdef M_TRIM_THRESHOLD
 // Prevent fragmentation of the heap by malloc (glibc).
@@ -51,19 +60,22 @@ int main(int argc, char* argv[])
 // due to fragmentation since we use a lot of small objects. On the other hand
 // if the threshold is too low, free() starts to permanently ask the kernel
 // about shrinking the heap.
-	#if defined(HAVE_UNISTD_H)
+	#if defined(HAVE_UNISTD_H) && !defined(VITA)
 		int pagesize = sysconf(_SC_PAGESIZE);
 	#else
 		int pagesize = 4*1024;
 	#endif
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
+	
+	AddLogWriter(createAndroidLogger());
+	ToggleLogging(true);
 
 	Interface::SanityCheck(VERSION_GEMRB);
 
 	core = new Interface();
 	CFGConfig* config = new CFGConfig(argc, argv);
-
+	
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
@@ -73,8 +85,11 @@ int main(int argc, char* argv[])
 	}
 	delete config;
 
+#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
+    SDL_ANDROID_SetApplicationPutToBackgroundCallback(&appPutToBackground, &appPutToForeground);
+#endif
+
 	core->Main();
 	delete( core );
-
 	return 0;
 }

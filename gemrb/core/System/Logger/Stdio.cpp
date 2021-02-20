@@ -144,12 +144,12 @@ void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 	}
 }
 
-Logger::LogWriter* createStdioLogWriter()
+Logger::WriterPtr createStdioLogWriter()
 {
 #ifndef NOCOLOR
-	return new StdioLogWriter(DEBUG, true);
+	return Logger::WriterPtr(new StdioLogWriter(DEBUG, true));
 #else
-	return new StdioLogWriter(DEBUG, false);
+	return Logger::WriterPtr(new StdioLogWriter(DEBUG, false));
 #endif
 }
 

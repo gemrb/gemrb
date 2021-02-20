@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Android.h"
+#include "AndroidLogger.h"
 
 #include <android/log.h>
 
@@ -42,9 +42,9 @@ void AndroidLogger::WriteLogMessage(const Logger::LogMessage& msg)
 	__android_log_print(priority, "GemRB", "[%s/%s]: %s", msg.owner, log_level_text[msg.level], msg.message);
 }
 
-Logger::LogWriter* createAndroidLogger()
+Logger::WriterPtr createAndroidLogger()
 {
-	return new AndroidLogger();
+	return Logger::WriterPtr(new AndroidLogger());
 }
 
 }

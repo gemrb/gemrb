@@ -1,5 +1,6 @@
+
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2011 The GemRB Project
+ * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,30 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Vita.h"
+#ifndef LOGGER_WIN32_H
+#define LOGGER_WIN32_H
 
-#include <psp2/kernel/clib.h> 
+#include "System/Logger/Stdio.h"
 
-#define printf sceClibPrintf
+#include <consoleapi.h>
 
 namespace GemRB {
 
-VitaLogger::VitaLogger()
-{
-}
+class GEM_EXPORT Win32ConsoleLogger : public StdioLogWriter {
+public:
+	Win32ConsoleLogger(log_level level, bool useColor);
 
-VitaLogger::~VitaLogger()
-{
-}
+protected:
+	void textcolor(log_color) override;
 
-void VitaLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
-{
-	printf("[%s/%s]: %s\n", owner, log_level_text[level], message);
-}
+private:
+	HANDLE hConsole;
+};
 
-Logger* createVitaLogger()
-{
-	return new VitaLogger();
-}
+Logger::WriterPtr createWin32ConsoleLogger();
 
 }
+
+#endif
