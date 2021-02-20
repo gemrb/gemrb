@@ -23,7 +23,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
-#include "System/Logging.h"
+#include "System/Logger/Stdio.h"
 
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
