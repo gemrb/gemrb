@@ -272,7 +272,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("SalamanderAura", fx_salamander_aura, 0, -1), //ff
 	EffectDesc("UmberHulkGaze", fx_umberhulk_gaze, 0, -1), //100
 	EffectDesc("ZombieLordAura", fx_zombielord_aura, 0, -1),//101, duff in iwd2
-	EffectDesc("SummonCreature2", fx_summon_creature2, 0, -1), //103
+	EffectDesc("SummonCreature2", fx_summon_creature2, EFFECT_DICED|EFFECT_PRESET_TARGET, -1), //103
 	EffectDesc("AvatarRemoval", fx_avatar_removal, 0, -1), //104
 	EffectDesc("SummonPomab", fx_summon_pomab, 0, -1), //106
 	EffectDesc("ControlUndead", fx_control_undead, 0, -1), //107
@@ -1446,10 +1446,15 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 		eamod = eamods[fx->Parameter2];
 	}
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	if (fx->Parameter2 == 3) { // summon at source
-		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, Owner->Pos, eamod, 0, newfx);
-	} else {
-		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0, newfx);
+	Point pos(target->Pos);
+	while (fx->Parameter1--) {
+		if (fx->Parameter2 == 3) { // summon at source
+			pos = Owner->Pos;
+		} else if (fx->Target == FX_TARGET_PRESET) {
+			pos.x = fx->PosX;
+			pos.y = fx->PosY;
+		}
+		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
 	}
 	delete newfx;
 	return FX_NOT_APPLIED;

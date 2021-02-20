@@ -132,7 +132,7 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 	listener.x = (short) xpos;
 	listener.y = (short) ypos;
 
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	ieDword timeslice = 0;
 	if (game) {
 		timeslice = SCHEDULE_MASK(game->GameTime);

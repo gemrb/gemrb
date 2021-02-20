@@ -189,8 +189,6 @@ static void addGemRBLog()
 		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
 		if (log_file->Create(log_path)) {
 			AddLogWriter(createStreamLogWriter(log_file));
-		} else if (log_file->Create("/tmp/GemRB.log")) {
-			AddLogWriter(createStreamLogWriter(log_file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");
 		}

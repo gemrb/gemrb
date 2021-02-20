@@ -1377,8 +1377,8 @@ void EffectQueue::RemoveAllEffects(ieDword opcode) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1391,7 +1391,7 @@ bool EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( !IsEquipped((*f)->TimingMode)) continue;
-		MATCH_SLOTCODE();
+		MATCH_SLOTCODE()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 		removed = true;
@@ -1404,7 +1404,7 @@ void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_PROJECTILE();
+		MATCH_PROJECTILE()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1415,8 +1415,8 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_LIVE_FX();
-		MATCH_SOURCE();
+		MATCH_LIVE_FX()
+		MATCH_SOURCE()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1467,8 +1467,8 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieByte timing) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_TIMING();
-		MATCH_SOURCE();
+		MATCH_TIMING()
+		MATCH_SOURCE()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1489,9 +1489,9 @@ void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef re
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_RESOURCE();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_RESOURCE()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1510,8 +1510,8 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) c
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		switch((*f)->Parameter2) {
 		case 0:case 3:
 			if( ((signed) (*f)->Parameter1)>=0) continue;
@@ -1544,9 +1544,9 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) cons
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
@@ -1564,11 +1564,11 @@ void EffectQueue::RemoveAllEffectsWithParamAndResource(ieDword opcode, ieDword p
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 		if(resource[0]) {
-			MATCH_RESOURCE();
+			MATCH_RESOURCE()
 		}
 
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
@@ -1631,7 +1631,7 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 		}
 
 		if( Removed[0]) {
-			MATCH_SOURCE();
+			MATCH_SOURCE()
 		}
 		if( Flags&RL_MATCHSCHOOL) {
 			if( (*f)->PrimaryType!=match) {
@@ -1691,8 +1691,8 @@ Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 
 		return (*f);
 	}
@@ -1712,9 +1712,9 @@ Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 
 		return (*f);
 	}
@@ -1738,12 +1738,12 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 		//0 is always accepted as first parameter
 		if( param1) {
-			MATCH_PARAM1();
+			MATCH_PARAM1()
 		}
 
 		return (*f);
@@ -1766,8 +1766,8 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		ieDword value = (*f)->Parameter1;
 		if( value>amount) {
 			value -= amount;
@@ -1798,9 +1798,9 @@ int EffectQueue::DecreaseParam3OfEffect(ieDword opcode, ieDword amount, ieDword 
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 		ieDword value = (*f)->Parameter3;
 		if( value>amount) {
 			value -= amount;
@@ -1838,8 +1838,8 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 	int sum = 0;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		if( (*f)->Parameter1) {
 			ieDword param1;
 			ieDword ids = (*f)->Parameter2;
@@ -1853,11 +1853,11 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, const Actor *actor) const
 			case 7:
 			case 8:
 				param1 = actor->GetStat(ids_stats[ids]);
-				MATCH_PARAM1();
+				MATCH_PARAM1()
 				break;
 			case 5:
 				param1 = actor->GetActiveClass();
-				MATCH_PARAM1();
+				MATCH_PARAM1()
 				break;
 			case 9:
 				//pseudo stat/classmask
@@ -1891,9 +1891,9 @@ int EffectQueue::BonusForParam2(ieDword opcode, ieDword param2) const
 	int sum = 0;
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_PARAM2();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_PARAM2()
 		sum += (*f)->Parameter1;
 	}
 	return sum;
@@ -1914,8 +1914,8 @@ int EffectQueue::MaxParam1(ieDword opcode, bool positive) const
 	ieDwordSigned param1 = 0;
 	std::list< Effect* >::const_iterator f;
 	for (f = effects.begin(); f != effects.end(); f++) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 
 		param1 = signed((*f)->Parameter1);
 		if ((positive && param1 > max) || (!positive && param1 < max)) {
@@ -1938,8 +1938,8 @@ bool EffectQueue::WeaponImmunity(ieDword opcode, int enchantment, ieDword weapon
 {
 	std::list< Effect* >::const_iterator f;
 	for (f = effects.begin(); f != effects.end(); f++) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 
 		int magic = (int) (*f)->Parameter1;
 		ieDword mask = (*f)->Parameter3;
@@ -1979,8 +1979,8 @@ void EffectQueue::AddWeaponEffects(EffectQueue *fxqueue, EffectRef &fx_ref) cons
 
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		//
 		Effect *fx = core->GetEffect( (*f)->Resource, (*f)->Power, p);
 		if (!fx) continue;
@@ -1999,8 +1999,8 @@ int EffectQueue::SumDamageReduction(EffectRef &effect_reference, ieDword weaponE
 
 	std::list< Effect* >::const_iterator f;
 	for (f = effects.begin(); f != effects.end(); f++) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 
 		Effect* fx = *f;
 		if (!fx) continue;
@@ -2023,9 +2023,9 @@ Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resour
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_RESOURCE();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_RESOURCE()
 
 		return (*f);
 	}
@@ -2049,8 +2049,8 @@ Effect *EffectQueue::HasOpcodeWithPower(ieDword opcode, ieDword power) const
 {
 	std::list< Effect* >::const_iterator f;
 	for (f = effects.begin(); f != effects.end(); f++) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		// NOTE: matching greater or equals!
 		if ((*f)->Power < power) { continue; }
 
@@ -2064,8 +2064,8 @@ Effect *EffectQueue::HasSource(const ieResRef Removed) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_LIVE_FX();
-		MATCH_SOURCE();
+		MATCH_LIVE_FX()
+		MATCH_SOURCE()
 
 		return (*f);
 	}
@@ -2077,9 +2077,9 @@ Effect *EffectQueue::HasOpcodeWithSource(ieDword opcode, const ieResRef Removed)
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
-		MATCH_SOURCE();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
+		MATCH_SOURCE()
 
 		return (*f);
 	}
@@ -2211,13 +2211,13 @@ ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2
 	std::list< Effect* >::const_iterator f;
 
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
+		MATCH_OPCODE()
 		if( param1!=0xffffffff)
-			MATCH_PARAM1();
+			MATCH_PARAM1()
 		if( param2!=0xffffffff)
-			MATCH_PARAM2();
+			MATCH_PARAM2()
 		if( resource) {
-			MATCH_RESOURCE();
+			MATCH_RESOURCE()
 		}
 		cnt++;
 	}
@@ -2231,8 +2231,8 @@ unsigned int EffectQueue::GetEffectOrder(EffectRef& effect_reference, const Effe
 
 	std::list< Effect* >::const_iterator f;
 	for (f = effects.begin(); f != effects.end(); ++f) {
-		MATCH_OPCODE();
-		MATCH_LIVE_FX();
+		MATCH_OPCODE()
+		MATCH_LIVE_FX()
 		if (*f == fx) break;
 		cnt++;
 	}
@@ -2244,7 +2244,7 @@ void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
 	std::list< Effect* >::const_iterator f;
 
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		MATCH_OPCODE();
+		MATCH_OPCODE()
 		(*f)->PosX=x;
 		(*f)->PosY=y;
 		(*f)->Parameter3=0;

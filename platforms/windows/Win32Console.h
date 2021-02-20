@@ -37,7 +37,7 @@ private:
 	HANDLE hConsole;
 };
 
-Logger::WriterPtr createWin32ConsoleLogger();
+GEM_EXPORT Logger::WriterPtr createWin32ConsoleLogger();
 
 }
 

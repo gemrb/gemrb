@@ -31,7 +31,7 @@ Logger::Logger(std::deque<WriterPtr> writers)
 		QueueType queue;
 		while (running) {
 			std::unique_lock<std::mutex> lk(queueLock);
-			cv.wait(lk);
+			cv.wait(lk, [this]() { return !running; });
 			if (messageQueue.size()) {
 				queue.swap(messageQueue);
 			}
@@ -58,7 +58,7 @@ void Logger::ProcessMessages(QueueType queue)
 {
 	std::lock_guard<std::mutex> l(writerLock);
 	while (queue.size()) {
-		for (auto& writer : writers) {
+		for (const auto& writer : writers) {
 			writer->WriteLogMessage(queue.front());
 		}
 		queue.pop_front();
