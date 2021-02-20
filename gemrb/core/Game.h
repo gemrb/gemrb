@@ -39,6 +39,7 @@
 #include "Variables.h"
 
 #include <atomic>
+#include <cstdint>
 #include <vector>
 
 namespace GemRB {
