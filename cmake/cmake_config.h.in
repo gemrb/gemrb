@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 // automatically generated file from cmake!
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}
@@ -26,3 +29,5 @@
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
 #cmakedefine01 ICONV_ACCEPTS_NONCONST_INPUT
+
+#endif
