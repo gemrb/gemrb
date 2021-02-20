@@ -66,18 +66,18 @@ int main(int argc, char* argv[])
 	#endif
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
+	
+	SetupDefaultLogging();
 
 	Interface::SanityCheck(VERSION_GEMRB);
 
 	core = new Interface();
 	CFGConfig* config = new CFGConfig(argc, argv);
-	InitializeLogging(config);
 	
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-		ShutdownLogging();
 
 		return -1;
 	}
@@ -89,6 +89,5 @@ int main(int argc, char* argv[])
 
 	core->Main();
 	delete( core );
-	ShutdownLogging();
 	return 0;
 }

@@ -63,7 +63,6 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 #include "System/FileStream.h"
-#include "System/Logger/MessageWindowLogger.h"
 #include "System/FileFilters.h"
 
 #include <algorithm>
@@ -7990,16 +7989,10 @@ PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
 
 static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
 {
-	int logLevel;
-	PARSE_ARGS( args, "i", &logLevel );
+	log_level logLevel;
+	PARSE_ARGS(args, "i", &logLevel);
 
-	if (logLevel == -1) {
-		RemoveLogger(getMessageWindowLogger());
-	} else {
-		// convert it to the internal representation
-		getMessageWindowLogger(true)->SetLogLevel((log_level)logLevel);
-	}
-
+	SetMessageWindowLogLevel(logLevel);
 	Py_RETURN_NONE;
 }
 

@@ -110,8 +110,6 @@
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
-		A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
-		A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */; };
 		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
 		A232B0FE1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
@@ -424,9 +422,6 @@
 		A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
 		A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2C76D2914F196E900961680 /* StringBuffer.h */; };
 		A2C8E56D175E973F00863FA9 /* EmptyStringTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */; };
-		A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
-		A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CB5AC115000A0D00B5C154 /* File.cpp */; };
-		A2CB5AC515000A0D00B5C154 /* File.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CB5AC215000A0D00B5C154 /* File.h */; };
 		A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */; };
 		A2CD07B21CE2E0AB008CE1D0 /* ScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */; };
 		A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */; };
@@ -441,7 +436,6 @@
 		A2D672E21B30F40C00264D16 /* WindowManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D672DF1B30F40C00264D16 /* WindowManager.cpp */; };
 		A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D672E01B30F40C00264D16 /* WindowManager.h */; };
 		A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D72B181B671329009F4D33 /* SpriteSheet.h */; };
-		A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */; };
 		A2DBE468186C862F00B39AF8 /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2DE329914EB071200117503 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2DE329714EB071200117503 /* Logger.cpp */; };
 		A2DE329A14EB071200117503 /* Logger.h in Headers */ = {isa = PBXBuildFile; fileRef = A2DE329814EB071200117503 /* Logger.h */; };
@@ -1268,8 +1262,6 @@
 		A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ios/Icon-72.png"; sourceTree = "<group>"; };
 		A22EBDCC14FF18030029C9C1 /* AppleLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleLogger.h; sourceTree = "<group>"; };
 		A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AppleLogger.mm; sourceTree = "<group>"; };
-		A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageWindowLogger.cpp; sourceTree = "<group>"; };
-		A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageWindowLogger.h; sourceTree = "<group>"; };
 		A231677923A7267A00D04811 /* SDLSurfaceDrawing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceDrawing.h; sourceTree = "<group>"; };
 		A231677E23AA071E00D04811 /* GameSpriteF.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GemMarkup.cpp; sourceTree = "<group>"; };
@@ -1751,8 +1743,6 @@
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
 		A2C8E56B175E973F00863FA9 /* EmptyStringTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmptyStringTransformer.h; sourceTree = "<group>"; };
 		A2C8E56C175E973F00863FA9 /* EmptyStringTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmptyStringTransformer.m; sourceTree = "<group>"; };
-		A2CB5AC115000A0D00B5C154 /* File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = File.cpp; sourceTree = "<group>"; };
-		A2CB5AC215000A0D00B5C154 /* File.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = File.h; sourceTree = "<group>"; };
 		A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScrollView.cpp; sourceTree = "<group>"; };
 		A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollView.h; sourceTree = "<group>"; };
 		A2CE96891B70596100E189C4 /* FileFilters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileFilters.h; sourceTree = "<group>"; };
@@ -3360,12 +3350,8 @@
 		A2DE329B14EB078200117503 /* Logger */ = {
 			isa = PBXGroup;
 			children = (
-				A2CB5AC115000A0D00B5C154 /* File.cpp */,
-				A2CB5AC215000A0D00B5C154 /* File.h */,
 				A298DD2114EB61D300F59F56 /* Stdio.cpp */,
 				A298DD1B14EB61C100F59F56 /* Stdio.h */,
-				A230584715D5BBCC00BDF69C /* MessageWindowLogger.cpp */,
-				A230584815D5BBCC00BDF69C /* MessageWindowLogger.h */,
 			);
 			path = Logger;
 			sourceTree = "<group>";
@@ -3604,8 +3590,6 @@
 				A2DE329A14EB071200117503 /* Logger.h in Headers */,
 				A298DD1D14EB61C100F59F56 /* Stdio.h in Headers */,
 				A2C76D2C14F196E900961680 /* StringBuffer.h in Headers */,
-				A2CB5AC515000A0D00B5C154 /* File.h in Headers */,
-				A230584A15D5BBCC00BDF69C /* MessageWindowLogger.h in Headers */,
 				A2969F11168CDC0D00D9C6FC /* CombatInfo.h in Headers */,
 				A2E27EF916EEA7B00079E104 /* InterfaceConfig.h in Headers */,
 			);
@@ -5265,8 +5249,6 @@
 				A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A2C76D2B14F196E900961680 /* StringBuffer.cpp in Sources */,
 				A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */,
-				A2CB5AC415000A0D00B5C154 /* File.cpp in Sources */,
-				A2DB6D5A15D9EE8C00D70E88 /* MessageWindowLogger.cpp in Sources */,
 				A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
 				A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */,
@@ -5436,9 +5418,7 @@
 				A2DE329914EB071200117503 /* Logger.cpp in Sources */,
 				A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */,
 				A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */,
-				A2CB5AC315000A0D00B5C154 /* File.cpp in Sources */,
 				A27E5D6118106384009434E5 /* VEFObject.cpp in Sources */,
-				A230584915D5BBCC00BDF69C /* MessageWindowLogger.cpp in Sources */,
 				A2969F0F168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2E27EF716EEA7B00079E104 /* InterfaceConfig.cpp in Sources */,
 			);

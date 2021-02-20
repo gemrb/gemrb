@@ -24,6 +24,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "System/Logging.h"
 
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
@@ -36,6 +37,8 @@ using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
+	SetupDefaultLogging();
+
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV
 	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
@@ -66,14 +69,14 @@ int main(int argc, char* argv[])
 		delete config;
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-		ShutdownLogging();
+
 		return -1;
 	}
 	delete config;
 
 	core->Main();
 	delete( core );
-	ShutdownLogging();
 
+	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	return 0;
 }

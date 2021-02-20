@@ -43,6 +43,7 @@
 #define _UNICODE
 
 #define NOCOLOR
+#define NOGDI
 
 # include <windows.h>
 
