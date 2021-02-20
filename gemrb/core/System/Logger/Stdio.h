@@ -57,7 +57,7 @@ private:
 	void printStatus(const char* status, log_color color);
 };
 
-Logger::WriterPtr createStdioLogWriter();
+GEM_EXPORT Logger::WriterPtr createStdioLogWriter();
 Logger::WriterPtr createStreamLogWriter(DataStream*);
 
 }
