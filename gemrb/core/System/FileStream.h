@@ -47,7 +47,7 @@ public:
 	File(FILE* f) : file(f) {}
 	File() = default;
 	File(const File&) = delete;
-	File(File&& f) {
+	File(File&& f) noexcept {
 		file = f.file;
 		f.file = nullptr;
 	}
@@ -56,7 +56,7 @@ public:
 	}
 	
 	File& operator=(const File&) = delete;
-	File& operator=(File&& f) {
+	File& operator=(File&& f) noexcept {
 		if (&f != this) {
 			std::swap(file, f.file);
 		}
