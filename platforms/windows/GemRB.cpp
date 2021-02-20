@@ -20,17 +20,11 @@
 
 // GemRB.cpp : Defines the entry point for the application.
 
+#include "win32def.h" // logging
 #include <clocale> //language encoding
 
 #include "Interface.h"
 #include "System/Logging.h"
-
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 using namespace GemRB;
 
@@ -39,24 +33,6 @@ int main(int argc, char* argv[])
 	SetupDefaultLogging();
 
 	setlocale(LC_ALL, "");
-#ifdef HAVE_SETENV
-	setenv("SDL_VIDEO_X11_WMCLASS", argv[0], 0);
-#endif
-
-#ifdef M_TRIM_THRESHOLD
-// Prevent fragmentation of the heap by malloc (glibc).
-//
-// The default threshold is 128*1024, which can result in a large memory usage
-// due to fragmentation since we use a lot of small objects. On the other hand
-// if the threshold is too low, free() starts to permanently ask the kernel
-// about shrinking the heap.
-	#if defined(HAVE_UNISTD_H)
-		int pagesize = sysconf(_SC_PAGESIZE);
-	#else
-		int pagesize = 4*1024;
-	#endif
-	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
-#endif
 
 	Interface::SanityCheck(VERSION_GEMRB);
 
@@ -69,6 +45,7 @@ int main(int argc, char* argv[])
 		delete( core );
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 
+		ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 		return -1;
 	}
 	delete config;
@@ -76,5 +53,6 @@ int main(int argc, char* argv[])
 	core->Main();
 	delete( core );
 
+	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	return 0;
 }

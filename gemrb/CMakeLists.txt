@@ -80,7 +80,7 @@ ELSE(APPLE)
 	ADD_SUBDIRECTORY( tests )
 
 	IF(WIN32)
-		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/window.rc)
+		ADD_EXECUTABLE(gemrb ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/window.rc)
 	ELSEIF(VITA)
 		ADD_EXECUTABLE(gemrb ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/vita/GemRB.cpp)
 	ELSEIF(ANDROID)
