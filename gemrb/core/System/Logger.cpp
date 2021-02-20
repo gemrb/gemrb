@@ -31,7 +31,7 @@ Logger::Logger(std::deque<WriterPtr> writers)
 		QueueType queue;
 		while (running) {
 			std::unique_lock<std::mutex> lk(queueLock);
-			cv.wait(lk);
+			cv.wait(lk, [this]() { return !running; });
 			if (messageQueue.size()) {
 				queue.swap(messageQueue);
 			}
