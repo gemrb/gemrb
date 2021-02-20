@@ -44,7 +44,6 @@ StreamLogWriter::~StreamLogWriter()
 void StreamLogWriter::Print(const std::string& msg)
 {
 	stream->Write(msg.c_str(), (uint32_t)msg.length());
-	fflush(stdout);
 }
 
 void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
@@ -143,6 +142,8 @@ void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 	} else {
 		StreamLogWriter::WriteLogMessage(msg);
 	}
+	
+	fflush(stdout);
 }
 
 Logger::WriterPtr createStdioLogWriter()
