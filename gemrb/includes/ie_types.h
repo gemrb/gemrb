@@ -32,15 +32,6 @@
 
 namespace GemRB {
 
-// we need this fallback for Android and anyone else skipping
-// cmake, where the proper sizes are checked for
-#ifndef SIZEOF_INT
-#define SIZEOF_INT 4
-#endif
-#ifndef SIZEOF_LONG_INT
-#define SIZEOF_LONG_INT 4
-#endif
-
 typedef unsigned char ieByte;
 typedef signed char ieByteSigned;
 typedef unsigned short ieWord;
