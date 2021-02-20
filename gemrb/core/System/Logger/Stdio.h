@@ -57,7 +57,7 @@ private:
 	void printStatus(const char* status, log_color color);
 };
 
-Logger::LogWriter* createStdioLogWriter();
+Logger::WriterPtr createStdioLogWriter();
 Logger::WriterPtr createStreamLogWriter(DataStream*);
 
 }

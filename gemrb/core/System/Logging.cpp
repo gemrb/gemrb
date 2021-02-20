@@ -57,12 +57,6 @@ void ToggleLogging(bool enable)
 	}
 }
 
-void SetupDefaultLogging()
-{
-	AddLogWriter(Logger::WriterPtr(createDefaultLogWriter()));
-	ToggleLogging(true);
-}
-
 static void MessageWinLogMsg(const LogMessage& msg)
 {
 	if (msg.level > MWLL || msg.level < INTERNAL) return;

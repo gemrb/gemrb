@@ -36,7 +36,8 @@ using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
-	SetupDefaultLogging();
+	AddLogWriter(createStdioLogWriter());
+	ToggleLogging(true);
 
 	setlocale(LC_ALL, "");
 #ifdef HAVE_SETENV

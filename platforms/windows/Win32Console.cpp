@@ -57,9 +57,9 @@ void Win32ConsoleLogger::textcolor(log_color c)
 		SetConsoleTextAttribute(hConsole, colors[c]);
 }
 
-Logger::LogWriter* createWin32ConsoleLogger()
+Logger::WriterPtr createWin32ConsoleLogger()
 {
-	return new Win32ConsoleLogger(DEBUG, true);
+	return Logger::WriterPtr(new Win32ConsoleLogger(DEBUG, true));
 }
 
 }

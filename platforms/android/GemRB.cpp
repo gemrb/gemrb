@@ -23,6 +23,7 @@
 #include <clocale> //language encoding
 #include <SDL.h>
 
+#include "AndroidLogger.h"
 #include "Interface.h"
 
 // if/when android moves to SDL 1.3 remove these special functions.
@@ -67,7 +68,8 @@ int main(int argc, char* argv[])
 	mallopt(M_TRIM_THRESHOLD, 5*pagesize);
 #endif
 	
-	SetupDefaultLogging();
+	AddLogWriter(createAndroidLogger());
+	ToggleLogging(true);
 
 	Interface::SanityCheck(VERSION_GEMRB);
 

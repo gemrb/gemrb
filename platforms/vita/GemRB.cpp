@@ -23,6 +23,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "VitaLogger.h"
 
 #include <psp2/kernel/processmgr.h>
 #include <psp2/power.h>
@@ -78,7 +79,8 @@ int main(int argc, char* argv[])
 
 	setlocale(LC_ALL, "");
 	
-	SetupDefaultLogging();
+	AddLogWriter(createWin32ConsoleLogger());
+	ToggleLogging(true);
 
 	Interface::SanityCheck(VERSION_GEMRB);
 	

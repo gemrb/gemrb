@@ -91,28 +91,3 @@ const char* log_level_text[] = {
 };
 
 }
-
-using namespace GemRB;
-
-#ifdef ANDROID
-
-#include "System/Logger/Android.h"
-Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createAndroidLogWriter;
-
-#elif defined(WIN32) && !defined(WIN32_USE_STDIO)
-
-#include "System/Logger/Win32Console.h"
-Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createWin32ConsoleLogWriter;
-
-#elif defined (VITA)
-
-#include "System/Logger/Vita.h"
-Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createVitaLogWriter;
-
-#else
-
-#include "System/Logger/Stdio.h"
-Logger::LogWriter* (*GemRB::createDefaultLogWriter)() = createStdioLogWriter;
-
-#endif
-

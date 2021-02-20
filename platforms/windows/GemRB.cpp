@@ -24,13 +24,14 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
-#include "System/Logging.h"
+#include "Win32Console.h"
 
 using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
-	SetupDefaultLogging();
+	AddLogWriter(createWin32ConsoleLogger());
+	ToggleLogging(true);
 
 	setlocale(LC_ALL, "");
 

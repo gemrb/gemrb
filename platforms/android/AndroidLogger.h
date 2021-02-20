@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2011 The GemRB Project
+ * Copyright (C) 2003 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,35 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logger/Android.h"
+#ifndef LOGGER_ANDROID_H
+#define LOGGER_ANDROID_H
 
-#include <android/log.h>
+#include "System/Logger.h"
 
 namespace GemRB {
 
-void AndroidLogger::WriteLogMessage(const Logger::LogMessage& msg)
-{
-	android_LogPriority priority = ANDROID_LOG_INFO;
-	switch (msg.level) {
-		case FATAL:
-			priority = ANDROID_LOG_FATAL;
-			break;
-		case ERROR:
-			priority = ANDROID_LOG_ERROR;
-			break;
-		case WARNING:
-			priority = ANDROID_LOG_WARN;
-			break;
-		case DEBUG:
-			priority = ANDROID_LOG_DEBUG;
-			break;
-	}
-	__android_log_print(priority, "GemRB", "[%s/%s]: %s", msg.owner, log_level_text[msg.level], msg.message);
-}
+class GEM_EXPORT AndroidLogger : public Logger::LogWriter {
+public:
+	void WriteLogMessage(const Logger::LogMessage& msg) override;
+};
 
-Logger::LogWriter* createAndroidLogger()
-{
-	return new AndroidLogger();
-}
+Logger::WriterPtr createAndroidLogger();
 
 }
+
+#endif
