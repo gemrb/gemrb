@@ -42,7 +42,8 @@ using namespace GemRB;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 	// Normally you would call super implemetation first, but don't!
-	AddLogger(createAppleLogger());
+	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
+	ToggleLogging(true);
 	[self setupWrapper];
 
     return [super application:application didFinishLaunchingWithOptions:launchOptions];
@@ -116,7 +117,6 @@ using namespace GemRB;
 			delete config;
 			core->Main();
 			delete( core );
-			ShutdownLogging();
 			// We must exit since the application runloop never returns.
 			exit(ret);
 		}
@@ -131,7 +131,7 @@ using namespace GemRB;
 	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
 	FileStream *fs = new FileStream();
 	if (fs->Create(cLogFile)) {
-		AddLogger(createFileLogger(fs));
+		AddLogger(createStreamLogWriter(fs));
 		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
 	} else {
 		delete fs;

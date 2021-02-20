@@ -32,21 +32,18 @@ TODO: override parent so we can use NSLog
 */
 
 AppleLogger::AppleLogger()
-	: StdioLogger(false)
+: Logger::LogWriter(DEBUG)
 {}
 
 AppleLogger::~AppleLogger()
 {}
-
-void AppleLogger::textcolor(log_color /*c*/)
-{}
 	
-void AppleLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
+void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
-	if (level == FATAL) {
+	if (msg.level == FATAL) {
 		// display a GUI alert for FATAL errors
-		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", owner];
-		NSString* alertMessage = [NSString stringWithCString:message encoding:NSASCIIStringEncoding];
+		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", msg.owner.c_str()];
+		NSString* alertMessage = [NSString stringWithCString:msg.message.c_str() encoding:NSASCIIStringEncoding];
 #if TARGET_OS_IPHONE
 		UIAlertView *alert =
 		[[UIAlertView alloc] initWithTitle: alertTitle
@@ -71,13 +68,7 @@ void AppleLogger::LogInternal(log_level level, const char* owner, const char* me
 		[alert release];
 #endif
 	}
-	NSLog(@"%s", message); // send to OS X logging system
-	StdioLogger::LogInternal(level, owner, message, color); // send to stdout
-}
-
-Logger* createAppleLogger()
-{
-	return new AppleLogger();
+	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
 }
 
 }

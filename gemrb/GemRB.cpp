@@ -24,6 +24,7 @@
 #include <clocale> //language encoding
 
 #include "Interface.h"
+#include "System/Logging.h"
 
 #ifdef HAVE_MALLOC_H
 #include <malloc.h>
@@ -94,6 +95,8 @@ static void appPutToForeground()
 
 int main(int argc, char* argv[])
 {
+	SetupDefaultLogging();
+	
 #ifdef VITA
 	scePowerSetArmClockFrequency(444);
 	scePowerSetBusClockFrequency(222);
@@ -134,15 +137,12 @@ int main(int argc, char* argv[])
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
 		delete( core );
-		InitializeLogging();
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
-		ShutdownLogging();
 #ifdef VITA
 		sceKernelExitProcess(0);
 #endif
 		return -1;
 	}
-	InitializeLogging();
 	delete config;
 #ifdef ANDROID
 #if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
@@ -151,9 +151,10 @@ int main(int argc, char* argv[])
 #endif
 	core->Main();
 	delete( core );
-	ShutdownLogging();
 #ifdef VITA
 	sceKernelExitProcess(0);
 #endif
+	
+	ToggleLogging(false); // Windows build will hang if we leave the logging thread running
 	return 0;
 }

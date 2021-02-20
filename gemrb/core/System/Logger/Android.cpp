@@ -22,16 +22,10 @@
 
 namespace GemRB {
 
-AndroidLogger::AndroidLogger()
-{}
-
-AndroidLogger::~AndroidLogger()
-{}
-
-void AndroidLogger::LogInternal(log_level level, const char* owner, const char* message, log_color /*color*/)
+void AndroidLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	android_LogPriority priority = ANDROID_LOG_INFO;
-	switch (level) {
+	switch (msg.level) {
 		case FATAL:
 			priority = ANDROID_LOG_FATAL;
 			break;
@@ -45,10 +39,10 @@ void AndroidLogger::LogInternal(log_level level, const char* owner, const char* 
 			priority = ANDROID_LOG_DEBUG;
 			break;
 	}
-	__android_log_print(priority, "GemRB", "[%s/%s]: %s", owner, log_level_text[level], message);
+	__android_log_print(priority, "GemRB", "[%s/%s]: %s", msg.owner, log_level_text[msg.level], msg.message);
 }
 
-Logger* createAndroidLogger()
+Logger::LogWriter* createAndroidLogger()
 {
 	return new AndroidLogger();
 }
