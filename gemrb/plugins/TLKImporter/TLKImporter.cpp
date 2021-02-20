@@ -20,7 +20,7 @@
 
 #include "TLKImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Audio.h"
 #include "Calendar.h"

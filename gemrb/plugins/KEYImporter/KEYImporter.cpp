@@ -20,7 +20,7 @@
 
 #include "KEYImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 #include "globals.h"
 
 #include "IndexedArchive.h"

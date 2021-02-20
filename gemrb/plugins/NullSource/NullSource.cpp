@@ -19,7 +19,7 @@
 #include "NullSource.h"
 
 #include "globals.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Interface.h"
 #include "ResourceDesc.h"

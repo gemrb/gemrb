@@ -27,7 +27,7 @@
 #define LOGGING_H
 
 #include "exports.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "System/Logger.h"
 

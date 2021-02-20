@@ -18,7 +18,7 @@
 
 #include "System/StringBuffer.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include <cstdio>
 #if defined(__sgi)

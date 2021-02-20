@@ -23,7 +23,7 @@
 
 #include "ScriptedAnimation.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Animation.h"
 #include "AnimationFactory.h"

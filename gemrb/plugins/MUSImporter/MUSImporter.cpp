@@ -20,7 +20,7 @@
 
 #include "MUSImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Audio.h"
 #include "GameData.h" // For ResourceHolder

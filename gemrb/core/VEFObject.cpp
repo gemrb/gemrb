@@ -22,7 +22,7 @@
 
 #include "VEFObject.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #define YESNO(x) ( (x)?"Yes":"No")
 

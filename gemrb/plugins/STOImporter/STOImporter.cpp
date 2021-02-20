@@ -20,7 +20,7 @@
 
 #include "STOImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "DialogMgr.h"
 #include "GameData.h"

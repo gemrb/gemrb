@@ -24,7 +24,7 @@
 
 #include "defsounds.h"
 #include "strrefs.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h"

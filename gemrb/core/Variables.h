@@ -25,7 +25,7 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "globals.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include <cassert>
 

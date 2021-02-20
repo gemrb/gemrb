@@ -20,7 +20,7 @@
 
 #include "Dialog.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "GameScript/GameScript.h"
 #include "RNG.h"

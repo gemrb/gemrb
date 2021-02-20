@@ -41,7 +41,7 @@
 #include "RNG.h"
 #include "Scriptable/Actor.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include <array>
 #include <cmath>

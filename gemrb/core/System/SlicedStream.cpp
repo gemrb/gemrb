@@ -22,7 +22,7 @@
 
 #include "System/MemoryStream.h"
 
-#include "win32def.h"
+#include "Platform.h"
 #include "errors.h"
 
 #include "Interface.h"

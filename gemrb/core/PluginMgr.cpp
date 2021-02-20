@@ -18,7 +18,7 @@
 
 #include "PluginMgr.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Plugin.h"
 #include "ResourceDesc.h"

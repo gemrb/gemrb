@@ -23,9 +23,6 @@
  * @file libavutil/mem.c
  * default memory allocator for libavutil
  */
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 
 #include <limits.h>
 #include <stdlib.h>

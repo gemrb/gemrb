@@ -19,7 +19,7 @@
  */
 
 #include "KeyMap.h"
-#include "win32def.h"
+#include "Platform.h"
 #include "Interface.h"
 #include "TableMgr.h"
 #include "ScriptEngine.h"

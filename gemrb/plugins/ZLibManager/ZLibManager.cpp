@@ -21,7 +21,7 @@
 #include "ZLibManager.h"
 
 #include "globals.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include <zlib.h>
 

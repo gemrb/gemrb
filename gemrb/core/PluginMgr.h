@@ -31,7 +31,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "iless.h"
-#include "win32def.h"
+#include "Platform.h"
 #include "Holder.h"
 
 #include "ResourceDesc.h"

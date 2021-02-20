@@ -28,10 +28,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "ie_types.h"
 
 #define VERSION_GEMRB "0.8.7-git"
@@ -48,15 +44,14 @@
 #include "RGBAColor.h"
 #include "SClassID.h"
 #include "errors.h"
-#include "win32def.h"
 
 #include "Region.h"
 #include "System/DataStream.h"
 #include "System/String.h"
 
-#ifdef WIN32
-# include <algorithm>
-#else
+#include <algorithm>
+
+#ifndef WIN32
 # include <sys/time.h>
 #endif
 

@@ -44,10 +44,6 @@
 #include <cassert>
 #include <cstdio>
 
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
 using namespace GemRB;
 
 static int g_truecolor;

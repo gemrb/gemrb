@@ -19,7 +19,7 @@
  */
 
 #include "strrefs.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "EffectQueue.h"
 #include "Game.h"

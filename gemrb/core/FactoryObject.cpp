@@ -20,7 +20,7 @@
 
 #include "FactoryObject.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 namespace GemRB {
 

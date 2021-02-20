@@ -22,7 +22,7 @@
 #define CACHE_H
 
 #include "globals.h"
-#include "win32def.h"
+#include "Platform.h"
 
 namespace GemRB {
 

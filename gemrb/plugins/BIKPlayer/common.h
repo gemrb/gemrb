@@ -23,7 +23,7 @@
 #ifndef AVUTIL_COMMON_H
 #define AVUTIL_COMMON_H
 
-#include "win32def.h"
+#include "Platform.h"
 #include "globals.h"
 
 #define _USE_MATH_DEFINES

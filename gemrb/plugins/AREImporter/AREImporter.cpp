@@ -20,7 +20,7 @@
 
 #include "AREImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
 

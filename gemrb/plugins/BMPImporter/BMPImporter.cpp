@@ -21,7 +21,7 @@
 #include "BMPImporter.h"
 
 #include "RGBAColor.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Interface.h"
 #include "Video.h"

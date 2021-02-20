@@ -20,7 +20,7 @@
 
 #include "GUI/Label.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "GameData.h"
 #include "Interface.h"

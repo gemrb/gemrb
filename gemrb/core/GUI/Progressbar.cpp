@@ -20,7 +20,7 @@
 
 #include "GUI/Progressbar.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Interface.h"
 #include "GUI/Window.h"

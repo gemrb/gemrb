@@ -20,7 +20,7 @@
 
 #include "SDLAudio.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "AmbientMgr.h"
 #include "GameData.h"

@@ -22,6 +22,7 @@
 #define AMBIENTMGRAL_H
 
 #include "AmbientMgr.h"
+#include "Region.h"
 
 #include <atomic>
 #include <condition_variable>

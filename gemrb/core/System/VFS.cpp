@@ -27,10 +27,6 @@
 
 #include "Interface.h"
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
 // in case unistd isn't there or nonconformant
 #ifndef R_OK
 #define R_OK 04

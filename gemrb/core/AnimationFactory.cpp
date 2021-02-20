@@ -20,7 +20,7 @@
 
 #include "AnimationFactory.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Interface.h"
 #include "Sprite2D.h"

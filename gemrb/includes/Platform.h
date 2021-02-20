@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2004 The GemRB Project
+ * Copyright (C) 2021 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,35 +18,33 @@
  *
  */
 
-#ifndef AMBIENTMGR_H
-#define AMBIENTMGR_H
+#ifndef PLATFORM_H
+#define PLATFORM_H
+
+#ifdef HAVE_CONFIG_H
+	#include <config.h>
+#endif
 
 #include "exports.h"
-#include "Platform.h"
 
-#include <string>
-#include <vector>
-
-namespace GemRB {
-
-class Ambient;
-
-class GEM_EXPORT AmbientMgr {
-public:
-	AmbientMgr();
-	virtual ~AmbientMgr();
-	virtual void reset() { ambients = std::vector<Ambient *> (); }
-	virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; activate(); }
-	virtual void activate(const std::string &name);
-	virtual void activate() { active = true; } // hard play ;-)
-	virtual void deactivate(const std::string &name);
-	virtual void deactivate() { active = false; } // hard stop
-	virtual bool isActive(const std::string &name) const;
-protected:
-	std::vector<Ambient *> ambients;
-	std::atomic_bool active {false};
-};
-
-}
-
+#ifndef _MAX_PATH
+	#ifdef WIN32
+		#define _MAX_PATH 260
+	#else
+		#define _MAX_PATH FILENAME_MAX
+	#endif
 #endif
+
+#ifdef WIN32
+	#include "win32def.h"
+#elif defined(HAVE_UNISTD_H)
+	#include <unistd.h>
+#endif
+
+#include <cstdio>
+#include <cstdlib>
+
+#include "System/Logging.h"
+#include "System/String.h"
+
+#endif  //! PLATFORM_H

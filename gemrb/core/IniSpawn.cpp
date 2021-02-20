@@ -23,7 +23,7 @@
 
 #include "IniSpawn.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "CharAnimations.h"
 #include "Game.h"

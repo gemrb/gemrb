@@ -26,12 +26,6 @@
 #include <cerrno>
 #include <ctype.h>
 #include <cwctype>
-#ifdef WIN32
-#include "win32def.h"
-#ifdef _DEBUG
-#include <crtdbg.h>
-#endif
-#endif
 
 #if HAVE_ICONV
 #include <iconv.h>

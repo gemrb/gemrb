@@ -21,7 +21,7 @@
 #define GLOBALTIMER_H
 
 #include "exports.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Region.h"
 

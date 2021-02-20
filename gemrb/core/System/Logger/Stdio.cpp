@@ -21,11 +21,7 @@
 
 #include <cstdio>
 
-#include "win32def.h"
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
+#include "Platform.h"
 
 #include "Interface.h"
 #include "plugindef.h"

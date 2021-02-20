@@ -20,7 +20,7 @@
 
 #include "WMPImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "GameData.h"
 #include "ImageMgr.h"

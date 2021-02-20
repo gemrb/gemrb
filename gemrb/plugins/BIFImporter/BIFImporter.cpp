@@ -20,7 +20,7 @@
 
 #include "BIFImporter.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Compressor.h"
 #include "FileCache.h"

@@ -35,6 +35,7 @@
 #include "Holder.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
+#include "System/VFS.h"
 
 #include <map>
 #include <string>

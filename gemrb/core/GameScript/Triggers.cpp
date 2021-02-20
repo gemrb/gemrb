@@ -24,7 +24,7 @@
 #include "GameScript/Matching.h"
 
 #include "voodooconst.h"
-#include "win32def.h"
+#include "Platform.h"
 
 #include "AmbientMgr.h"
 #include "Calendar.h"

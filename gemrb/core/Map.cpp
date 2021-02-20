@@ -22,7 +22,7 @@
 
 #include "Map.h"
 
-#include "win32def.h"
+#include "Platform.h"
 
 #include "Ambient.h"
 #include "AmbientMgr.h"
