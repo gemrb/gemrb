@@ -101,6 +101,11 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		} else {
 			fx->SourceFlags = 0;
 		}
+
+		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
+			fx->Target = FX_TARGET_PRESET;
+		}
+
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
 			fxqueue->AddEffect( fx );
