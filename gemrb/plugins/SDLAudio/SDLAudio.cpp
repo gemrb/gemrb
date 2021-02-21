@@ -328,7 +328,7 @@ void SDLAudio::buffer_callback(void *udata, char *stream, int len) {
 	std::lock_guard<std::recursive_mutex> l(driver->OurMutex);
 
 	unsigned int remaining = len;
-	while (remaining && driver->buffers.size() > 0) {
+	while (remaining && !driver->buffers.empty()) {
 		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
 		if (avail > remaining) {
 			// more data available in this buffer than we need
