@@ -130,9 +130,11 @@ void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 		textcolor(LIGHT_WHITE);
 		Print("[");
 		Print(msg.owner);
-		Print("/");
-		textcolor(log_level_color[msg.level]);
-		Print(log_level_text[int(msg.level)]);
+		if (log_level_text[msg.level][0]) {
+			Print("/");
+			textcolor(log_level_color[msg.level]);
+			Print(log_level_text[int(msg.level)]);
+		}
 		textcolor(LIGHT_WHITE);
 		Print("]: ");
 
