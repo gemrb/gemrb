@@ -34,6 +34,18 @@
 
 using namespace GemRB;
 
+static void SetChannelPosition(int listenerXPos, int listenerYPos, int XPos, int YPos, int channel)
+{
+	int x = listenerXPos - XPos;
+	int y = listenerYPos - YPos;
+	int16_t angle = atan2(y, x) * 180 / M_PI - 90;
+	if (angle < 0) {
+		angle += 360;
+	}
+	uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
+	Mix_SetPosition(channel, angle, distance);
+}
+
 void SDLAudioSoundHandle::SetPos(int XPos, int YPos)
 {
 	if (sndRelative)
@@ -42,15 +54,7 @@ void SDLAudioSoundHandle::SetPos(int XPos, int YPos)
 	int listenerXPos = 0;
 	int listenerYPos = 0;
 	core->GetAudioDrv()->GetListenerPos(listenerXPos, listenerYPos);
-	
-	int x = listenerXPos - XPos;
-	int y = listenerYPos - YPos;
-	double angle = atan2(y, x);
-	if (angle < 0) {
-		angle += 360;
-	}
-	uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
-	Mix_SetPosition(chunkChannel, angle * 180 / M_PI - 90, distance);
+	SetChannelPosition(listenerXPos, listenerYPos, XPos, YPos, chunkChannel);
 }
 
 bool SDLAudioSoundHandle::Playing()
@@ -122,7 +126,7 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 	ieDword volume = 100;
 	core->GetDictionary()->Lookup("Volume Music", volume);
 
-	// No point of bothering if it's off anyway. Hope nothing breaks..
+	// No point of bothering if it's off anyway
 	if (volume == 0) {
 		return;
 	}
@@ -329,17 +333,8 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
-	// Positional audio
-	if (!(flags & GEM_SND_RELATIVE))
-	{
-		int x = listenerPos.x - XPos;
-		int y = listenerPos.y - YPos;
-		double angle = atan2(y, x);
-		if (angle < 0) {
-			angle += 360;
-		}
-		uint8_t distance = std::min(static_cast<int32_t>(sqrt(x * x + y * y) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
-		Mix_SetPosition(chan, angle * 180 / M_PI - 90, distance);
+	if (!(flags & GEM_SND_RELATIVE)) {
+		SetChannelPosition(listenerPos.x, listenerPos.y, XPos, YPos, chan);
 	}
 
 	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
@@ -397,10 +392,10 @@ void SDLAudio::GetListenerPos(int& x, int& y)
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 {
 	ieDword volume = 100;
-	// Check only movie volume, since ambiens aren't supported anyway
+	// Check only movie volume, since ambiens aren't supported right now
 	core->GetDictionary()->Lookup("Volume Movie", volume);
 
-	// No point of bothering if it's off anyway. Hope nothing breaks..
+	// No point of bothering if it's off anyway
 	if (volume == 0) {
 		return;
 	}
