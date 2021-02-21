@@ -20,6 +20,8 @@
 
 #include "SDL20Video.h"
 
+#include "gemrb-icon.h"
+
 #include "Interface.h"
 
 using namespace GemRB;
@@ -74,6 +76,23 @@ int SDL20VideoDriver::Init()
 	return ret;
 }
 
+static void SetWindowIcon(SDL_Window* window)
+{
+	// gemrb_icon and gemrb_icon_size are generated in gemrb-icon.h
+	SDL_RWops* const iconStream = SDL_RWFromConstMem((void *) gemrb_icon, gemrb_icon_size);
+	if (!iconStream) {
+		Log(WARNING, "SDL 2 Driver", "Failed to create icon stream.");
+		return;
+	}
+	SDL_Surface* const windowIcon = SDL_LoadBMP_RW(iconStream, 1);
+	if (!windowIcon) {
+		Log(WARNING, "SDL 2 Driver", "Failed to read icon BMP from stream.");
+		return;
+	}
+	SDL_SetWindowIcon(window, windowIcon);
+	SDL_FreeSurface(windowIcon);
+}
+
 int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
@@ -106,6 +125,8 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
+
+	SetWindowIcon(window);
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
 	SDL_RendererInfo info;

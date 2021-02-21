@@ -98,6 +98,16 @@ ENDIF(APPLE)
 # we need to add gemrb target before processing plugins or COCOA plugins don't work right.
 ADD_SUBDIRECTORY( plugins )
 
+# create a compilable icon from a bmp
+FUNCTION(create_icon file output filename)
+	FILE(READ ${file} filedata HEX)
+	# convert hex data for C compatibility
+	STRING(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," filedata ${filedata})
+	#SET(RESOURCES_DIR "${PROJECT_BINARY_DIR}" PARENT_SCOPE)
+	FILE(WRITE "${PROJECT_BINARY_DIR}/${output}" "const unsigned char ${filename}[] = {${filedata}};\nconst unsigned ${filename}_size = sizeof(${filename});\n")
+ENDFUNCTION()
+create_icon("${CMAKE_SOURCE_DIR}/artwork/gemrb.bmp" "gemrb-icon.h" "gemrb_icon")
+
 SET_TARGET_PROPERTIES(gemrb PROPERTIES INSTALL_RPATH ${LIB_DIR})
 INCLUDE_DIRECTORIES( ${SDL_INCLUDE_DIR} )
 IF(WIN32)
