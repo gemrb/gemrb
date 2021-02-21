@@ -205,7 +205,7 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 		if (type>4) {
 			return false;
 		}
-		sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
+		snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
 	}
 	return gamedata->Exists(spellres, IE_SPL_CLASS_ID);
 }
@@ -218,7 +218,7 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 	if (type>4) {
 		type=0;
 	}
-	sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
+	snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
 }
 
 ieDword ResolveSpellNumber(const ieResRef spellres)
