@@ -102,8 +102,7 @@ struct HashKey<MapKey> {
 	}
 };
 
-// FIXME: The captialization of KEYMap is important, since there is also a KeyMap defined in core.
-class KEYMap : public HashMap<MapKey, ieDword> {
+class KEYImpMap : public HashMap<MapKey, ieDword> {
 public:
 	// lookup without MapKey construction
 	const ieDword *get(const ieResRef ref, SClass_ID type) const
@@ -130,7 +129,7 @@ public:
 class KEYImporter : public ResourceSource {
 private:
 	std::vector< BIFEntry> biffiles;
-	KEYMap resources;
+	KEYImpMap resources;
 
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const char *resname, ieWord type);
