@@ -1010,7 +1010,7 @@ void Spellbook::ClearSpellInfo()
 bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
 {
 	memset(array, 0, count * sizeof(SpellExtHeader) );
-	if (spellinfo.size() == 0) {
+	if (spellinfo.empty()) {
 		GenerateSpellInfo();
 	}
 	int actual = 0;
@@ -1058,7 +1058,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type)
 {
 	memset(array, 0, sizeof(SpellExtHeader) );
-	if (spellinfo.size() == 0) {
+	if (spellinfo.empty()) {
 		GenerateSpellInfo();
 	}
 	int offset = 0;
