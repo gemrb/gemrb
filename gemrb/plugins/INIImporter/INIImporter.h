@@ -80,6 +80,8 @@ public:
 		*equal = 0;
 		char* NameKey = Line;
 		char* ValueKey = equal + 1;
+		if (!NameKey || !ValueKey) return true; // line starting or ending with sole =
+
 		//Left Trimming
 		while (*NameKey != '\0') {
 			if (*NameKey != ' ')
