@@ -3757,6 +3757,7 @@ bool Interface::SaveConfig()
 	if (!fs->Create(ini_path)) {
 		PathJoin(ini_path, SavePath, gemrbINI, nullptr);
 		if (!fs->Create(ini_path)) {
+			delete fs;
 			return false;
 		}
 	}
