@@ -489,7 +489,7 @@ public:
 	void ToggleViewsVisible(bool visible, const ResRef& group);
 	void ToggleViewsEnabled(bool enabled, const ResRef& group);
 
-	Tooltip CreateTooltip(const String&);
+	Tooltip CreateTooltip();
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */

@@ -477,7 +477,7 @@ void WindowManager::DrawTooltip(Point pos) const
 		return;
 	}
 
-	static Tooltip tt = core->CreateTooltip(L"");
+	static Tooltip tt = core->CreateTooltip();
 	static unsigned long time = 0;
 	static Holder<SoundHandle> tooltip_sound = NULL;
 	static bool reset = false;

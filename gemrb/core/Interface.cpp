@@ -2662,7 +2662,7 @@ void Interface::HandleGUIBehaviour(void)
 	}
 }
 
-Tooltip Interface::CreateTooltip(const String& text)
+Tooltip Interface::CreateTooltip()
 {
 	Font::PrintColors colors = {ColorWhite, ColorBlack};
 	AutoTable tab("colors");
@@ -2694,7 +2694,7 @@ Tooltip Interface::CreateTooltip(const String& text)
 	if (TooltipBG) {
 		bg = new TooltipBackground(*TooltipBG);
 	}
-	return Tooltip(text, GetFont(TooltipFontResRef), colors, bg);
+	return Tooltip(L"", GetFont(TooltipFontResRef), colors, bg);
 }
 
 /** Get the Sound Manager */
