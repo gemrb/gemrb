@@ -7983,16 +7983,16 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_MessageWindowDebug__doc,
-			 "MessageWindowDebug(log_level)\n\n"
-			 "Enable/Disable debug messages of log_level in the MessageWindow." );
+PyDoc_STRVAR( GemRB_ConsoleWindowLog__doc,
+			 "ConsoleWindowLog(log_level)\n\n"
+			 "Enable/Disable debug messages of log_level in the Console Window." );
 
-static PyObject* GemRB_MessageWindowDebug(PyObject * /*self*/, PyObject* args)
+static PyObject* GemRB_ConsoleWindowLog(PyObject * /*self*/, PyObject* args)
 {
 	log_level logLevel;
 	PARSE_ARGS(args, "i", &logLevel);
 
-	SetMessageWindowLogLevel(logLevel);
+	SetConsoleWindowLogLevel(logLevel);
 	Py_RETURN_NONE;
 }
 
@@ -13175,7 +13175,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetMemorizedSpellsCount, METH_VARARGS),
 	METHOD(GetMultiClassPenalty, METH_VARARGS),
-	METHOD(MessageWindowDebug, METH_VARARGS),
+	METHOD(ConsoleWindowLog, METH_VARARGS),
 	METHOD(GetPartySize, METH_NOARGS),
 	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
