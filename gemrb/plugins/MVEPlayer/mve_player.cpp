@@ -30,6 +30,8 @@
 #include "gstmvedemux.h"
 #include "mve.h"
 
+#include "Interface.h"
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif

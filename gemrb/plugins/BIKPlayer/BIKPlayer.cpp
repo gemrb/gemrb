@@ -38,6 +38,7 @@
 #include "ie_types.h"
 
 #include "Audio.h"
+#include "Interface.h"
 #include "Variables.h"
 #include "Video.h"
 

@@ -69,6 +69,15 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 	}
 }
 
+Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
+: SpriteSheet<ieWord>(core->GetVideoDriver()), font(font)
+{
+	pageXPos = 0;
+	SheetRegion.w = pageSize.w;
+	SheetRegion.h = pageSize.h;
+
+	pageData = (ieByte*)calloc(pageSize.h, pageSize.w);
+}
 
 bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 {

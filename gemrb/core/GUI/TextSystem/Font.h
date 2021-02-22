@@ -119,15 +119,7 @@ private:
 			Font* font;
 			Holder<Sprite2D> invertedSheet;
 		public:
-			GlyphAtlasPage(Size pageSize, Font* font)
-			: SpriteSheet<ieWord>(), font(font)
-			{
-				pageXPos = 0;
-				SheetRegion.w = pageSize.w;
-				SheetRegion.h = pageSize.h;
-
-				pageData = (ieByte*)calloc(pageSize.h, pageSize.w);
-			}
+			GlyphAtlasPage(Size pageSize, Font* font);
 
 			~GlyphAtlasPage() override {
 				if (Sheet == NULL) {

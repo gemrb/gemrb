@@ -21,7 +21,6 @@
 #ifndef SPRITESHEET_H
 #define SPRITESHEET_H
 
-#include "Interface.h"
 #include "Sprite2D.h"
 #include "Video.h"
 
@@ -35,17 +34,20 @@ protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
-	SpriteSheet() = default;
+	SpriteSheet(Holder<Video> video)
+	: video(video) {};
 
 public:
 	Holder<Sprite2D> Sheet;
+	Holder<Video> video;
 
 public:
-	SpriteSheet(Holder<Sprite2D> sheet) : Sheet(sheet) {
+	SpriteSheet(Holder<Video> video, Holder<Sprite2D> sheet)
+	: Sheet(sheet), video(video) {
 		SheetRegion = Sheet->Frame;
 	};
-	virtual ~SpriteSheet() {
-	}
+
+	virtual ~SpriteSheet() = default;
 
 	const Region& operator[](KeyType key) {
 		return RegionMap[key];
@@ -66,9 +68,9 @@ public:
 	}
 
 	void Draw(KeyType key, const Region& dest, uint32_t flags, const Color& tint) const {
-		typename std::map<KeyType, Region>::const_iterator i = RegionMap.find(key);
+		const auto& i = RegionMap.find(key);
 		if (i != RegionMap.end()) {
-			core->GetVideoDriver()->BlitSprite(Sheet, i->second, dest, flags, tint);
+			video->BlitSprite(Sheet, i->second, dest, flags, tint);
 		}
 	}
 };
