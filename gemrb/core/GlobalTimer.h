@@ -60,6 +60,9 @@ private:
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
+	
+	GlobalTimer(GlobalTimer&&) = default;
+	GlobalTimer& operator=(GlobalTimer&&) = default;
 public:
 	void Freeze();
 	bool Update();
