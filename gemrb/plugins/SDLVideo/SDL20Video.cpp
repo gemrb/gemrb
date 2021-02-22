@@ -20,7 +20,9 @@
 
 #include "SDL20Video.h"
 
+#ifdef BAKE_ICON
 #include "gemrb-icon.h"
+#endif
 
 #include "Interface.h"
 
@@ -126,7 +128,9 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 		return GEM_ERROR;
 	}
 
+#ifdef BAKE_ICON
 	SetWindowIcon(window);
+#endif
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
 	SDL_RendererInfo info;

@@ -103,7 +103,6 @@ FUNCTION(create_icon file output filename)
 	FILE(READ ${file} filedata HEX)
 	# convert hex data for C compatibility
 	STRING(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," filedata ${filedata})
-	#SET(RESOURCES_DIR "${PROJECT_BINARY_DIR}" PARENT_SCOPE)
 	FILE(WRITE "${PROJECT_BINARY_DIR}/${output}" "const unsigned char ${filename}[] = {${filedata}};\nconst unsigned ${filename}_size = sizeof(${filename});\n")
 ENDFUNCTION()
 create_icon("${CMAKE_SOURCE_DIR}/artwork/gemrb.bmp" "gemrb-icon.h" "gemrb_icon")
