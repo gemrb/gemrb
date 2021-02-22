@@ -23,9 +23,9 @@
 #include "Region.h"
 #include "Video.h"
 
-namespace GemRB {
+#include "GUI/TextSystem/Font.h"
 
-class Font;
+namespace GemRB {
 
 class TooltipBackground {
 	int animationSpeed;
@@ -54,9 +54,10 @@ class Tooltip {
 	Font* font;
 	TooltipBackground* background;
 	Size textSize;
+	Font::PrintColors colors;
 
 public:
-	Tooltip(const String& s, Font* fnt, TooltipBackground* bg);
+	Tooltip(const String& s, Font* fnt, const Font::PrintColors& cols, TooltipBackground* bg);
 	~Tooltip();
 
 	void SetText(const String& s);

@@ -20,7 +20,6 @@
 #include "Tooltip.h"
 
 #include "Interface.h"
-#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 
@@ -112,8 +111,8 @@ void TooltipBackground::Draw(Region rgn) const
 }
 
 
-Tooltip::Tooltip(const String& s, Font* fnt, TooltipBackground* bg)
-: font(fnt), background(bg)
+Tooltip::Tooltip(const String& s, Font* fnt, const Font::PrintColors& cols, TooltipBackground* bg)
+: font(fnt), background(bg), colors(cols)
 {
 	SetText(s);
 }
@@ -159,7 +158,7 @@ void Tooltip::Draw(const Point& pos) const
 		textr.y = pos.y - textr.h/2;
 	}
 	
-	font->Print(textr, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE);
+	font->Print(textr, text, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, colors);
 }
 
 }

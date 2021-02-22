@@ -2664,11 +2664,37 @@ void Interface::HandleGUIBehaviour(void)
 
 Tooltip Interface::CreateTooltip(const String& text)
 {
+	Font::PrintColors colors = {ColorWhite, ColorBlack};
+	AutoTable tab("colors");
+	if (tab) {
+		auto ParseColor = [](const char* str) {
+			Color color;
+			ieDword c;
+			sscanf(str, "0x%x", &c);
+			color.r = (ieByte)((c >> 24) & 0xFF);
+			color.g = (ieByte)((c >> 16) & 0xFF);
+			color.b = (ieByte)((c >> 8) & 0xFF);
+			color.a = (ieByte)(c & 0xFF);
+			
+			return color;
+		};
+		
+		const char* colorString = tab->QueryField("TOOLTIP", "COLOR");
+		if (colorString) {
+			colors.fg = ParseColor(colorString);
+		}
+		
+		colorString = tab->QueryField("TOOLTIPBG", "COLOR");
+		if (colorString) {
+			colors.bg = ParseColor(colorString);
+		}
+	}
+	
 	TooltipBackground* bg = NULL;
 	if (TooltipBG) {
 		bg = new TooltipBackground(*TooltipBG);
 	}
-	return Tooltip(text, GetFont( TooltipFontResRef ), bg);
+	return Tooltip(text, GetFont(TooltipFontResRef), colors, bg);
 }
 
 /** Get the Sound Manager */
