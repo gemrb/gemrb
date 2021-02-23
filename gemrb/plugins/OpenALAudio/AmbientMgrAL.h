@@ -39,13 +39,15 @@ public:
 	AmbientMgrAL();
 	~AmbientMgrAL();
 
-	void setAmbients(const std::vector<Ambient *> &a);
-	void activate(const std::string &name);
-	void activate();
-	void deactivate(const std::string &name);
-	void deactivate();
+	void activate(const std::string &name) override;
+	void activate() override;
+	void deactivate(const std::string &name) override;
+	void deactivate() override;
+
 	void UpdateVolume(unsigned short value);
 private:
+	void ambientsSet(const std::vector<Ambient *>&) override;
+	
 	class AmbientSource {
 	public:
 		AmbientSource(const Ambient *a);

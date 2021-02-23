@@ -24,17 +24,24 @@
 
 namespace GemRB {
 
-AmbientMgr::AmbientMgr()
+void AmbientMgr::reset()
 {
+	std::lock_guard<std::mutex> l(ambientsMutex);
+	ambients.clear();
+	ambientsSet(ambients);
 }
 
-AmbientMgr::~AmbientMgr()
+void AmbientMgr::setAmbients(const std::vector<Ambient *> &a)
 {
-	reset();
+	std::lock_guard<std::mutex> l(ambientsMutex);
+	ambients = a;
+	ambientsSet(ambients);
+	activate();
 }
  
 void AmbientMgr::activate(const std::string &name)
 {
+	std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
 		if (ambient->getName() == name) {
 			ambient->setActive();
@@ -45,6 +52,7 @@ void AmbientMgr::activate(const std::string &name)
 
 void AmbientMgr::deactivate(const std::string &name)
 {
+	std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
 		if (ambient->getName() == name) {
 			ambient->setInactive();
@@ -55,6 +63,7 @@ void AmbientMgr::deactivate(const std::string &name)
 
 bool AmbientMgr::isActive(const std::string &name) const
 {
+	std::lock_guard<std::mutex> l(ambientsMutex);
 	for (auto ambient : ambients) {
 		if (ambient->getName() == name) {
 			return ambient->getFlags() & IE_AMBI_ENABLED;

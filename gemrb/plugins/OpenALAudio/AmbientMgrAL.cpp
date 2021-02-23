@@ -56,12 +56,14 @@ AmbientMgrAL::~AmbientMgrAL()
 	player.join();
 }
 
-void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
+void AmbientMgrAL::ambientsSet(const std::vector<Ambient *>& a)
 {
 	mutex.lock();
-	AmbientMgr::setAmbients(a);
-	ambientSources.reserve(a.size());
-	for (auto source : a) {
+	for (auto ambientSource : ambientSources) {
+		delete ambientSource;
+	}
+	ambientSources.resize(0);
+	for (auto& source : a) {
 		ambientSources.push_back(new AmbientSource(source));
 	}
 	mutex.unlock();
