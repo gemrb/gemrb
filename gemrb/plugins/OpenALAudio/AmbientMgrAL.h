@@ -72,7 +72,7 @@ private:
 	unsigned int tick(uint64_t ticks) const;
 	void hardStop() const;
 	
-	std::recursive_mutex mutex;
+	mutable std::recursive_mutex mutex;
 	std::thread player;
 	std::condition_variable_any cond;
 	std::atomic_bool playing {true};

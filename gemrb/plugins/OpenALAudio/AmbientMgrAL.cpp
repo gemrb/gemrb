@@ -140,6 +140,7 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 		timeslice = SCHEDULE_MASK(game->GameTime);
 	}
 
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
 		unsigned int newdelay = source->tick(ticks, listener, timeslice);
 		if (newdelay < delay) delay = newdelay;
