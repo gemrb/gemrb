@@ -2664,32 +2664,10 @@ void Interface::HandleGUIBehaviour(void)
 
 Tooltip Interface::CreateTooltip()
 {
-	Font::PrintColors colors = {ColorWhite, ColorBlack};
-	AutoTable tab("colors");
-	if (tab) {
-		auto ParseColor = [](const char* str) {
-			Color color;
-			ieDword c;
-			sscanf(str, "0x%x", &c);
-			color.r = (ieByte)((c >> 24) & 0xFF);
-			color.g = (ieByte)((c >> 16) & 0xFF);
-			color.b = (ieByte)((c >> 8) & 0xFF);
-			color.a = (ieByte)(c & 0xFF);
-			
-			return color;
-		};
-		
-		const char* colorString = tab->QueryField("TOOLTIP", "COLOR");
-		if (colorString) {
-			colors.fg = ParseColor(colorString);
-		}
-		
-		colorString = tab->QueryField("TOOLTIPBG", "COLOR");
-		if (colorString) {
-			colors.bg = ParseColor(colorString);
-		}
-	}
-	
+	Font::PrintColors colors;
+	colors.fg = gamedata->GetColor("TOOLTIP");
+	colors.bg = gamedata->GetColor("TOOLTIPBG");
+
 	TooltipBackground* bg = NULL;
 	if (TooltipBG) {
 		bg = new TooltipBackground(*TooltipBG);

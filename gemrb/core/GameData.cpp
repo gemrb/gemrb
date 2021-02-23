@@ -701,4 +701,27 @@ int GameData::GetSummoningLimit(ieDword sex)
 	return atoi(summoningLimit->QueryField(row, 0));
 }
 
+const Color& GameData::GetColor(const char *row)
+{
+	// preload converted colors
+	if (colors.empty()) {
+		AutoTable colorTable("colors", true);
+		Color color;
+		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
+			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
+			color.r = (ieByte)((c >> 24) & 0xFF);
+			color.g = (ieByte)((c >> 16) & 0xFF);
+			color.b = (ieByte)((c >> 8) & 0xFF);
+			color.a = (ieByte)(c & 0xFF);
+
+			colors[strdup(colorTable->GetRowName(r))] = color;
+		}
+	}
+	const auto it = colors.find(row);
+	if (it != colors.end()) {
+		return it->second;
+	}
+	return ColorRed;
+}
+
 }

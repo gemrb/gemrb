@@ -129,6 +129,7 @@ public:
 	int GetTrapSaveBonus(ieDword level, int cls);
 	int GetTrapLimit(Scriptable *trapper);
 	int GetSummoningLimit(ieDword sex);
+	const Color& GetColor(const char *row);
 	inline int GetStepTime() { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
@@ -150,6 +151,7 @@ private:
 	AutoTable trapSaveBonus;
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
+	std::map<const char*, Color, iless> colors;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 };
