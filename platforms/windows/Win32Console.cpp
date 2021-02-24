@@ -30,13 +30,13 @@ Win32ConsoleLogger::Win32ConsoleLogger(log_level level, bool useColor)
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	
-	GetConsoleMode(hOut, &dwMode);
-	SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	GetConsoleMode(hConsole, &dwMode);
+	SetConsoleMode(hConsole, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
 
 Win32ConsoleLogger::~Win32ConsoleLogger()
 {
-	SetConsoleMode(hOut, dwMode);
+	SetConsoleMode(hConsole, dwMode);
 }
 
 Logger::WriterPtr createWin32ConsoleLogger()
