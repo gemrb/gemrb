@@ -31,10 +31,8 @@ Logger::Logger(std::deque<WriterPtr> writers)
 		QueueType queue;
 		while (running) {
 			std::unique_lock<std::mutex> lk(queueLock);
-			cv.wait(lk, [this]() { return !running; });
-			if (messageQueue.size()) {
-				queue.swap(messageQueue);
-			}
+			cv.wait(lk, [this]() { return !messageQueue.empty() || !running; });
+			queue.swap(messageQueue);
 			lk.unlock();
 			ProcessMessages(std::move(queue));
 		}

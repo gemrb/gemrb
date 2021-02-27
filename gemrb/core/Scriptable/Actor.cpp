@@ -11296,7 +11296,7 @@ bool Actor::ConcentrationCheck() const
 
 	// anyone in a 5' radius?
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5, this);
-	if (neighbours.size() == 0) return true;
+	if (neighbours.empty()) return true;
 
 	// so there is someone out to get us and we should do the real concentration check
 	int roll = LuckyRoll(1, 20, 0);

@@ -40,13 +40,15 @@ public:
 	AmbientMgrAL();
 	~AmbientMgrAL();
 
-	void setAmbients(const std::vector<Ambient *> &a);
-	void activate(const std::string &name);
-	void activate();
-	void deactivate(const std::string &name);
-	void deactivate();
+	void activate(const std::string &name) override;
+	void activate() override;
+	void deactivate(const std::string &name) override;
+	void deactivate() override;
+
 	void UpdateVolume(unsigned short value);
 private:
+	void ambientsSet(const std::vector<Ambient *>&) override;
+	
 	class AmbientSource {
 	public:
 		AmbientSource(const Ambient *a);
@@ -71,7 +73,7 @@ private:
 	unsigned int tick(uint64_t ticks) const;
 	void hardStop() const;
 	
-	std::recursive_mutex mutex;
+	mutable std::recursive_mutex mutex;
 	std::thread player;
 	std::condition_variable_any cond;
 	std::atomic_bool playing {true};

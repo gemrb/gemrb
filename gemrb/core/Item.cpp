@@ -126,15 +126,13 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 
 	//adding a pulse effect for weapons (PST)
 	//if it is an equipping effect block
-	if ((usage==-1) && (WieldColor!=0xffff)) {
-		if (Flags&IE_ITEM_PULSATING) {
-			Effect *tmp = BuildGlowEffect(WieldColor);
-			if (tmp) {
-				tmp->InventorySlot = invslot;
-				tmp->Projectile=pro;
-				fxqueue->AddEffect( tmp );
-				delete tmp;
-			}
+	if (usage == -1 && WieldColor != 0xffff && Flags & IE_ITEM_PULSATING) {
+		Effect *tmp = BuildGlowEffect(WieldColor);
+		if (tmp) {
+			tmp->InventorySlot = invslot;
+			tmp->Projectile=pro;
+			fxqueue->AddEffect( tmp );
+			delete tmp;
 		}
 	}
 	return fxqueue;

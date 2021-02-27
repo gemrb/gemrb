@@ -133,7 +133,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadWord( &s->unknown5 );
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
-	if (core->HasFeature(GF_SPELLBOOKICONHACK)) {
+	if (s->SpellbookIcon[0] && core->HasFeature(GF_SPELLBOOKICONHACK)) {
 		i=strlen(s->SpellbookIcon);
 		if (i) s->SpellbookIcon[i-1]='c';
 	}

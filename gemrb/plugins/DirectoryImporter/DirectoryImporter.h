@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef KEYIMP_H
-#define KEYIMP_H
+#ifndef DIRIMP_H
+#define DIRIMP_H
 
 #include "ResourceSource.h"
 #include "StringMap.h"

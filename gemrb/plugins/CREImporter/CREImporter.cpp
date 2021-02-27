@@ -863,7 +863,7 @@ void CREImporter::SetupColor(ieDword &stat)
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
 	size_t RandRows = 0;
-	if (randcolors.size() == 0) {
+	if (randcolors.empty()) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();

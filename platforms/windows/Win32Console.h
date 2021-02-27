@@ -29,12 +29,11 @@ namespace GemRB {
 class GEM_EXPORT Win32ConsoleLogger : public StdioLogWriter {
 public:
 	Win32ConsoleLogger(log_level level, bool useColor);
-
-protected:
-	void textcolor(log_color) override;
+	~Win32ConsoleLogger();
 
 private:
 	HANDLE hConsole;
+	DWORD dwMode = 0;
 };
 
 GEM_EXPORT Logger::WriterPtr createWin32ConsoleLogger();
