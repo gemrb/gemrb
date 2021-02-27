@@ -20,6 +20,7 @@
 
 #include "System/DataStream.h"
 
+#include "errors.h"
 #include <ctype.h>
 
 namespace GemRB {
