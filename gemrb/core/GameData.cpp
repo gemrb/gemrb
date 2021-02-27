@@ -89,6 +89,9 @@ void GameData::ClearCaches()
 		stores.erase(stores.begin());
 		delete store;
 	}
+	for (auto& c : colors) {
+		free(const_cast<char*>(c.first));
+	}
 }
 
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
