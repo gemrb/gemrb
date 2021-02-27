@@ -2164,6 +2164,9 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 				ClearMouseState();
 			}
 		}
+	} else if (me.button == GEM_MB_MIDDLE) {
+		// do nothing, so middle button panning doesn't trigger a move
+		return true;
 	} else {
 		// any other button behaves as left click (scrollwhell buttons are mouse wheel events now)
 		if (isDoubleClick)
