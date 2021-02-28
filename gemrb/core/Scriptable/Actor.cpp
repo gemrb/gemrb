@@ -11192,8 +11192,8 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	wchar_t tmpstr[10];
-	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	wchar_t tmpstr[20];
+	swprintf(tmpstr, 20, L"%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
 	SetOverheadText(tmpstr);
 }
 
