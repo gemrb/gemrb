@@ -12957,8 +12957,7 @@ static PyObject* GemRB_AddGameTypeHint(PyObject* /*self*/, PyObject* args)
 
 	if (weight > gametype_hint_weight) {
 		gametype_hint_weight = weight;
-		strncpy(gametype_hint, type, sizeof(gametype_hint)-1);
-		// I assume the '\0' in the end of gametype_hint
+		strlcpy(gametype_hint, type, sizeof(gametype_hint));
 	}
 
 	Py_RETURN_NONE;

@@ -28,33 +28,15 @@ namespace GemRB {
 Win32ConsoleLogger::Win32ConsoleLogger(log_level level, bool useColor)
 : StdioLogWriter(level, useColor)
 {
-	hConsole = GetStdHandle( STD_OUTPUT_HANDLE );
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	
+	GetConsoleMode(hConsole, &dwMode);
+	SetConsoleMode(hConsole, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 }
 
-void Win32ConsoleLogger::textcolor(log_color c)
+Win32ConsoleLogger::~Win32ConsoleLogger()
 {
-	static constexpr int colors[] = {
-		0,
-		0,
-		FOREGROUND_RED,
-		FOREGROUND_GREEN,
-		FOREGROUND_GREEN | FOREGROUND_RED,
-		FOREGROUND_BLUE,
-		FOREGROUND_RED | FOREGROUND_BLUE,
-		FOREGROUND_BLUE | FOREGROUND_GREEN,
-		FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED,
-		FOREGROUND_RED | FOREGROUND_INTENSITY,
-		FOREGROUND_GREEN | FOREGROUND_INTENSITY,
-		FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY,
-		FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-		FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-		FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY,
-		FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY,
-		FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED,
-	};
-
-	if (useColor)
-		SetConsoleTextAttribute(hConsole, colors[c]);
+	SetConsoleMode(hConsole, dwMode);
 }
 
 Logger::WriterPtr createWin32ConsoleLogger()

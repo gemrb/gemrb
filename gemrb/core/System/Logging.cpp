@@ -190,6 +190,7 @@ static void addGemRBLog()
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {
 			Log (WARNING, "Logger", "Could not create a log file, skipping!");
+			delete log_file;
 		}
 	}
 }

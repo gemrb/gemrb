@@ -59,6 +59,7 @@ Logger::WriterPtr createStreamLogWriter(DataStream* stream)
 static FileStream* DupStdOut()
 {
 	int fd = dup(fileno(stdout));
+	assert(fd != -1);
 	FILE* fp = fdopen(fd, "w");
 	return new FileStream(File(fp));
 }

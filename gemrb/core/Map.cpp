@@ -418,6 +418,8 @@ Map::~Map(void)
 		delete particle;
 	}
 
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
+	ambim->reset();
 	for (auto ambient : ambients) {
 		delete ambient;
 	}

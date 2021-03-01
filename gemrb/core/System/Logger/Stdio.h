@@ -50,7 +50,7 @@ public:
 	
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 protected:
-	virtual void textcolor(log_color);
+	void textcolor(log_color);
 	bool useColor;
 private:
 	void printBracket(const char *status, log_color color);
