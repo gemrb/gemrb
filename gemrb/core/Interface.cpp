@@ -555,7 +555,7 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 	
 	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
-		delete gamectrl;
+		delete winmgr->GetGameWindow()->RemoveSubview(gamectrl);
 		gamectrl = nullptr;
 		winmgr->GetGameWindow()->SetVisible(false);
 		//clear cutscenes; clear fade/screenshake effects
