@@ -95,7 +95,8 @@ Console::Console(const Region& frame, TextArea* ta)
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
 
-	SetBackground(nullptr, &ColorBlack);
+	static const Color trans(0, 0, 0, 128);
+	SetBackground(nullptr, &trans);
 }
 
 Console::~Console()

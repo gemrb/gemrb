@@ -430,7 +430,7 @@ void Interface::CreateConsole()
 	Console* console = new Console(frame, ta);
 
 	consoleWin->AddSubviewInFrontOfView(console);
-	consoleWin->SetFlags(Window::Borderless|View::Invisible, OP_OR);
+	consoleWin->SetFlags(Window::Borderless | View::Invisible | Window::AlphaChannel, OP_OR);
 	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
 	consoleWin->SetPosition(Window::PosHmid);
 	consoleWin->SetBackground(nullptr, &ColorBlack);
