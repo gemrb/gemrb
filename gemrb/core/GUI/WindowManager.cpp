@@ -560,8 +560,15 @@ void WindowManager::DrawWindows() const
 	}
 
 	// draw the game window now (beneath everything else); its not part of the windows collection
-	gameWin->SetVisible(true); // gamewin must always be drawn
-	gameWin->Draw();
+	if (gameWin->IsVisible()) {
+		gameWin->Draw();
+	} else {
+		// something must get drawn or else we get smearing
+		// this is kind of a hacky way to clear it, but it works
+		auto& buffer = gameWin->DrawWithoutComposition();
+		buffer->Clear();
+		video->PushDrawingBuffer(buffer);
+	}
 
 	bool drawFrame = false;
 	Window* frontWin = windows.front();
