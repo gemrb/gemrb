@@ -32,13 +32,9 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
 MWindow = 0
-ActionsWindow = 0
-PortraitWindow = 0
-OptionsWindow = 0
-MessageTA = 0
 
 def OnLoad():
-	global MWindow, ActionsWindow, PortraitWindow, OptionsWindow
+	global MWindow
 
 	# TODO: we can uncomment the "HIDE_CUT" lines below to hide the windows for cutscenes
 	# the original doesn't hide them and it looks like there is a map drawing bug at the bottom of the screen due to the bottom
@@ -89,6 +85,40 @@ def OnLoad():
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
+	
+def SetupClockWindowControls (Window):
+	# time button
+	Button = Window.GetControl (0)
+	Button.SetAnimation ("WMTIME")
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, GUICommonWindows.UpdateClock)
+	SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
+
+	# 41627 - Return to the Game World
+	Button = Window.GetControl (2)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
+	Button.SetTooltip (41627)
+
+	# Select all characters
+	Button = Window.GetControl (1)
+	Button.SetTooltip (41659)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+
+	# Abort current action
+	Button = Window.GetControl (3)
+	Button.SetTooltip (41655)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
+
+	# Formations
+	import GUIWORLD
+	Button = Window.GetControl (4)
+	Button.SetTooltip (44945)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
+
+	return
 
 def UpdateControlStatus ():
 	if GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG):

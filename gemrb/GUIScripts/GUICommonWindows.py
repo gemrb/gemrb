@@ -439,43 +439,6 @@ def OpenActionsWindowControls (Window):
 	UpdateActionsWindow ()
 	return
 
-def SetupClockWindowControls (Window):
-	global ActionsWindow
-
-	ActionsWindow = Window
-	# time button
-	Button = Window.GetControl (0)
-	Button.SetAnimation ("WMTIME")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
-	SetPSTGamedaysAndHourToken ()
-	Button.SetTooltip (GemRB.GetString(65027))
-
-	# 41627 - Return to the Game World
-	Button = Window.GetControl (2)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
-	Button.SetTooltip (41627)
-
-	# Select all characters
-	Button = Window.GetControl (1)
-	Button.SetTooltip (41659)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
-
-	# Abort current action
-	Button = Window.GetControl (3)
-	Button.SetTooltip (41655)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
-
-	# Formations
-	import GUIWORLD
-	Button = Window.GetControl (4)
-	Button.SetTooltip (44945)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
-
-	return
-
 ##not used in pst - not sure any items have abilities, but it is worth making a note to find out
 def SelectItemAbility():
 	pc = GemRB.GameGetFirstSelectedActor ()
