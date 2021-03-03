@@ -142,7 +142,7 @@ class GView:
 		self.SetFlags(IE_GUI_VIEW_INVISIBLE, OP_NAND if visible else OP_OR)
 		
 	def IsVisible(self):
-		return (self.Flags&IE_GUI_VIEW_INVISIBLE) != 0
+		return not (self.Flags & IE_GUI_VIEW_INVISIBLE)
 
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
