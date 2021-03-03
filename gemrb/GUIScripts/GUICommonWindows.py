@@ -43,9 +43,6 @@ if not GameCheck.IsPST():
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
-PortraitWindow = None
-OptionsWindow = None
-ActionsWindow = None
 CurrentWindow = None
 ActionBarControlOffset = 0
 ScreenHeight = GemRB.GetSystemVariable (SV_HEIGHT)
@@ -126,9 +123,7 @@ def InitOptionButton(Window, Index, HotKey=True):
 def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	"""Binds all of the basic controls and windows to the options pane."""
 
-	global OptionsWindow, ActionBarControlOffset
-
-	OptionsWindow = Window
+	global ActionBarControlOffset
 
 	bg1 = GameCheck.IsBG1()
 	bg2 = GameCheck.IsBG2()
@@ -286,6 +281,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	return
 
 def OnLockViewPress ():
+	OptionsWindow = GemRB.GetView("OPTWIN")
 	Button = OptionsWindow.GetControl (0)
 	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_XOR)
 
@@ -419,9 +415,6 @@ def GroupControls ():
 	return
 
 def OpenActionsWindowControls (Window):
-	global ActionsWindow
-
-	ActionsWindow = Window
 	# 1280 and higher don't have this control
 	if not Window.GetControl (62):
 		UpdateActionsWindow ()
@@ -616,8 +609,11 @@ def SetupSkillSelection ():
 
 def UpdateActionsWindow ():
 	"""Redraws the actions section of the window."""
-	global CurrentWindow, OptionsWindow, PortraitWindow
+	global CurrentWindow
 	global level, TopIndex
+	
+	PortraitWindow = GemRB.GetView("PORTWIN")
+	ActionsWindow = GemRB.GetView("ACTWIN")
 
 	if not GameCheck.IsIWD2():
 		CurrentWindow = ActionsWindow
@@ -1589,8 +1585,6 @@ def ButtonDragDestHandler(btn, pcID):
 	DragButton = None
 
 def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
-	global PortraitWindow
-
 	#take care, this window is different in how/iwd
 	if GameCheck.HasHOW() and needcontrols:
 		PortraitWindow = Window = GemRB.LoadWindow (26, GUICommon.GetWindowPack(), pos)
@@ -1704,7 +1698,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 def UpdatePortraitWindow (indialog = False):
 	"""Updates all of the portraits."""
 
-	Window = PortraitWindow
+	Window = GemRB.GetView("PORTWIN")
 	Window.Focus(None)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -1908,8 +1902,7 @@ def PortraitButtonHPOnPress (btn, pcID): ##pst hitpoint display
 def SelectionChanged ():
 	"""Ran by the Game class when a PC selection is changed."""
 
-	global PortraitWindow
-
+	PortraitWindow = GemRB.GetView("PORTWIN")
 	# FIXME: hack. If defined, display single selection
 	GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	if (not SelectionChangeHandler):
@@ -2049,7 +2042,6 @@ def SetPSTGamedaysAndHourToken ():
 
 def UpdateClock ():
 	OptionsWindow = GemRB.GetView("OPTWIN")
-
 	ActionsWindow = GemRB.GetView("ACTWIN")
 
 	if GameCheck.IsPST ():
