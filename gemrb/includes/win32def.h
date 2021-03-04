@@ -24,7 +24,11 @@
 #define WIN32DEF_H
 
 #define WIN32_LEAN_AND_MEAN
+
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
+
 #define UNICODE
 #define _UNICODE
 #define NOGDI
