@@ -697,8 +697,8 @@ Region ScriptedAnimation::DrawingRegion() const
 	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
 	if (anim) {
 		Region animArea = anim->animArea;
-		animArea.x += XOffset;
-		animArea.y += (YOffset - ZOffset);
+		animArea.x += XOffset + Pos.x;
+		animArea.y += (YOffset - ZOffset) + Pos.y;
 		r.ExpandToRegion(animArea);
 	}
 	
