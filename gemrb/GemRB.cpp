@@ -25,14 +25,18 @@
 #include "Interface.h"
 #include "System/Logger/Stdio.h"
 
-#ifdef HAVE_MALLOC_H
-#include <malloc.h>
-#endif
+#include <csignal>
+#include <thread>
 
 using namespace GemRB;
 
 int main(int argc, char* argv[])
 {
+	sigset_t sigmask;
+	sigemptyset(&sigmask);
+	sigaddset(&sigmask, SIGTERM);
+	sigprocmask(SIG_BLOCK, &sigmask, nullptr);
+	
 	AddLogWriter(createStdioLogWriter());
 	ToggleLogging(true);
 
@@ -69,9 +73,16 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 	delete config;
+	
+	std::thread sigthread([core, &sigmask] {
+		sigwait(&sigmask, nullptr);
+		core->ExitGemRB();
+	});
 
 	core->Main();
 	delete( core );
+	
+	sigthread.join();
 
 	return 0;
 }
