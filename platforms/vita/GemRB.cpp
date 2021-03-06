@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	setlocale(LC_ALL, "");
 	
-	AddLogWriter(createWin32ConsoleLogger());
+	AddLogWriter(createVitaLogger());
 	ToggleLogging(true);
 
 	Interface::SanityCheck(VERSION_GEMRB);

@@ -1,15 +1,5 @@
 ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
-IF (ANDROID)
-	set (PLATFORM_SRC System/Logger/Android.cpp)
-ELSEIF (WIN32)
-	set (PLATFORM_SRC System/Logger/Win32Console.cpp)
-ELSEIF (VITA)
-	set (PLATFORM_SRC System/Logger/Vita.cpp)
-ELSE ()
-	set (PLATFORM_SRC)
-ENDIF ()
-
 FILE(GLOB gemrb_core_LIB_SRCS
 	ActorMgr.cpp
 	Ambient.cpp
@@ -134,8 +124,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/FileStream.cpp
 	System/MemoryStream.cpp
 	System/Logger.cpp
-	System/Logger/File.cpp
-	System/Logger/MessageWindowLogger.cpp
 	System/Logger/Stdio.cpp
 	System/Logging.cpp
 	System/SlicedStream.cpp
@@ -143,7 +131,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/StringBuffer.cpp
 	System/swab.c
 	System/VFS.cpp
-	${PLATFORM_SRC}
 	)
 
 IF(SUPPORTS_MEMSTREAM)
