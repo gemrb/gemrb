@@ -1024,6 +1024,7 @@ void Interface::Main()
 		if (TickHook)
 			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
+	QuitGame(0);
 	gamedata->FreePalette( palette );
 }
 
