@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-class GEM_EXPORT Win32ConsoleLogger : public StdioLogWriter {
+class Win32ConsoleLogger : public StdioLogWriter {
 public:
 	Win32ConsoleLogger(log_level level, bool useColor);
 	~Win32ConsoleLogger();
@@ -36,7 +36,7 @@ private:
 	DWORD dwMode = 0;
 };
 
-GEM_EXPORT Logger::WriterPtr createWin32ConsoleLogger();
+Logger::WriterPtr createWin32ConsoleLogger();
 
 }
 

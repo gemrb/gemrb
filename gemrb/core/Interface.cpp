@@ -317,14 +317,8 @@ Interface::~Interface(void)
 
 	delete AreaAliasTable;
 
-	if (music) {
-		music->HardEnd();
-	}
-	// stop any ambients which are still enqueued
-	if (AudioDriver) {
-		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
-		if (ambim) ambim->deactivate();
-	}
+	AudioDriver.release();
+
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	// delete gamectrl;
@@ -405,7 +399,6 @@ Interface::~Interface(void)
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
 
-	AudioDriver.release();
 	video.release();
 }
 
