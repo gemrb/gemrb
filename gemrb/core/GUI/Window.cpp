@@ -24,8 +24,6 @@
 #include "GUI/MapControl.h"
 #include "GUI/ScrollBar.h"
 
-#include "win32def.h"
-
 #include "ie_cursors.h"
 
 namespace GemRB {

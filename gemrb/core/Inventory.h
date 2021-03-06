@@ -30,7 +30,6 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include "win32def.h"
 
 #include "Item.h"  //needs item for itmextheader
 #include "Store.h"

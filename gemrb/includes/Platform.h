@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2021 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,26 +18,42 @@
  *
  */
 
-// TODO: move this to platforms/windows
+#ifndef PLATFORM_H
+#define PLATFORM_H
 
-#ifndef WIN32DEF_H
-#define WIN32DEF_H
-
-#define WIN32_LEAN_AND_MEAN
-
-#ifndef NOMINMAX
-#define NOMINMAX
+#ifdef HAVE_CONFIG_H
+	#include <config.h>
+#else
+	// we need this fallback for Android and anyone else skipping
+	// cmake, where the proper sizes are checked for
+	#ifndef SIZEOF_INT
+	#define SIZEOF_INT 4
+	#endif
+	#ifndef SIZEOF_LONG_INT
+	#define SIZEOF_LONG_INT 4
+	#endif
 #endif
 
-#define UNICODE
-#define _UNICODE
-#define NOGDI
-#define _USE_MATH_DEFINES
+#include "exports.h"
 
-#ifdef _DEBUG
-#include <crtdbg.h>
+#ifndef _MAX_PATH
+	#ifdef WIN32
+		#define _MAX_PATH 260
+	#else
+		#define _MAX_PATH FILENAME_MAX
+	#endif
 #endif
 
-#include <windows.h>
+#ifdef WIN32
+	#include "win32def.h"
+#elif defined(HAVE_UNISTD_H)
+	#include <unistd.h>
+#endif
 
-#endif  //! WIN32DEF_H
+#include <cstdio>
+#include <cstdlib>
+
+#include "System/Logging.h"
+#include "System/String.h"
+
+#endif  //! PLATFORM_H

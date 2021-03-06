@@ -20,8 +20,6 @@
 
 #include "WorldMap.h"
 
-#include "win32def.h"
-
 #include "Game.h"
 #include "Interface.h"
 #include "TableMgr.h"

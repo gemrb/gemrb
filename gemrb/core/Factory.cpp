@@ -20,10 +20,6 @@
 
 #include "Factory.h"
 
-#include "win32def.h"
-
-#include <cstring>
-
 namespace GemRB {
 
 Factory::Factory(void)

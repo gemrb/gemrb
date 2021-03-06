@@ -18,17 +18,12 @@
 *
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "Interface.h"
 
 #include "defsounds.h" // for DS_TOOLTIP
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
-#include "win32def.h"
 #include "ie_cursors.h"
 
 #include "ActorMgr.h"
@@ -87,10 +82,6 @@
 #include "System/FileStream.h"
 #include "System/VFS.h"
 #include "System/StringBuffer.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #include <vector>
 

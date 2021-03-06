@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "globals.h"
-#include "win32def.h"
 
 #include "Plugin.h"
 #include "Holder.h"

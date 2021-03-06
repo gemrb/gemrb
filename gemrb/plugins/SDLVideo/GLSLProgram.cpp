@@ -5,9 +5,6 @@
 #include <cctype>
 #include <sstream>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
 #include "System/VFS.h" // for PathDelimiter
 
 #include "GLSLProgram.h"

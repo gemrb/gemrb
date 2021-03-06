@@ -18,8 +18,6 @@
 
 #include "System/StringBuffer.h"
 
-#include "win32def.h"
-
 #include <cstdio>
 #if defined(__sgi)
 #  include <stdarg.h>

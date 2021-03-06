@@ -20,8 +20,6 @@
 
 #include "Sprite2D.h"
 
-#include "win32def.h"
-
 namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };

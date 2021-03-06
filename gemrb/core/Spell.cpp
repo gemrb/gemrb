@@ -22,7 +22,6 @@
 
 #include "Spell.h"
 
-#include "win32def.h"
 #include "voodooconst.h"
 
 #include "Audio.h"

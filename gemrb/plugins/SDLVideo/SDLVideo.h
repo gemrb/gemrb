@@ -25,7 +25,6 @@
 #include "GamepadControl.h"
 
 #include "GUI/EventMgr.h"
-#include "win32def.h"
 
 #include <vector>
 #include <SDL.h>

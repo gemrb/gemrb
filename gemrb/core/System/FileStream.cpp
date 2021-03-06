@@ -20,8 +20,6 @@
 
 #include "System/FileStream.h"
 
-#include "win32def.h"
-
 #include "Interface.h"
 
 namespace GemRB {

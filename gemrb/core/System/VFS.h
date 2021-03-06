@@ -27,14 +27,6 @@
 #ifndef VFS_H
 #define VFS_H
 
-#ifndef _MAX_PATH
-#ifdef WIN32
-#define _MAX_PATH 260
-#else
-#define _MAX_PATH FILENAME_MAX
-#endif
-#endif
-
 #include "exports.h"
 #include "globals.h"
 #include "Predicates.h"
@@ -45,7 +37,6 @@
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
-#include <windows.h>
 #endif
 
 namespace GemRB {

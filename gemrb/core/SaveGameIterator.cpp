@@ -22,7 +22,6 @@
 
 #include "iless.h"
 #include "strrefs.h"
-#include "win32def.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h" // For ResourceHolder
@@ -37,9 +36,6 @@
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 #ifndef R_OK
 #define R_OK 04
 #endif

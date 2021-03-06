@@ -22,8 +22,8 @@
 #define AMBIENTMGR_H
 
 #include "exports.h"
-#include "win32def.h"
 
+#include <atomic>
 #include <mutex>
 #include <string>
 #include <vector>
