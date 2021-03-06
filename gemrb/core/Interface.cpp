@@ -344,7 +344,7 @@ Interface::~Interface(void)
 	AudioDriver.release();
 
 	//destroy the highest objects in the hierarchy first!
-	delete game;
+	assert (game == nullptr);
 	delete calendar;
 	delete worldmap;
 	delete keymap;
