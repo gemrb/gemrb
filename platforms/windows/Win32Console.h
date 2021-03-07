@@ -22,7 +22,7 @@
 
 #include "System/Logger/Stdio.h"
 
-#include <consoleapi.h>
+#include <windows.h>
 
 namespace GemRB {
 
