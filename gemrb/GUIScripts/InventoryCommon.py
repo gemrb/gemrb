@@ -995,7 +995,7 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 
 	item = GemRB.GetItem (Slot['ItemResRef'])
 	identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
-	magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL > 0
+	magical = item["Enchantment"] > 0
 
 	# MaxStackAmount holds the *maximum* item count in the stack while Usages0 holds the actual
 	if item["MaxStackAmount"] > 1:

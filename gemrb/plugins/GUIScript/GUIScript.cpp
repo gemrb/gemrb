@@ -11291,6 +11291,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
 	PyDict_SetItemString(dict, "Exclusion", PyInt_FromLong(item->ItemExcl));
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
+	PyDict_SetItemString(dict, "Enchantment", PyInt_FromLong(item->Enchantment));
 	PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(0) );
 
 	int ehc = item->ExtHeaderCount;
