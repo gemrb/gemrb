@@ -223,7 +223,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_JOYAXISMOTION:
 			{
-				float pct = event.jaxis.value / sizeof(Sint16);
+				float pct = event.jaxis.value / float(sizeof(Sint16));
 				bool xaxis = event.jaxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
 				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;

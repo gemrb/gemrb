@@ -599,7 +599,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			break;
 		case SDL_CONTROLLERAXISMOTION:
 			{
-				float pct = event.caxis.value / sizeof(Sint16);
+				float pct = event.caxis.value / float(sizeof(Sint16));
 				bool xaxis = event.caxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
 				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
