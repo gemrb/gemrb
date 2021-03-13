@@ -28,6 +28,9 @@ def ci(item, slot=-1, c0=1, c1=0, c2=0):
 def cv(var, context="GLOBAL"):
 	GemRB.CheckVar(var, context)
 
+def ex(cmd):
+	GemRB.ExecuteString(cmd)
+
 # the actual function that the GemRB::Console calls
 def Exec(cmd):
 	import sys
