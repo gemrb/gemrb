@@ -202,9 +202,10 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			Area=ae;
 			if(oldArea!=ae) {
 				String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
-				if (str && !str->empty()) {
+				int hours = worldmap->GetDistance(Area->AreaName);
+				if (str && !str->empty() && hours >= 0) {
 					wchar_t dist[10];
-					swprintf(dist, 10, L": %d", worldmap->GetDistance(Area->AreaName));
+					swprintf(dist, 10, L": %d", hours);
 					SetTooltip(*str + dist);
 					delete str;
 				}
