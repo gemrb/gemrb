@@ -8564,7 +8564,7 @@ bool Actor::UpdateDrawingState()
 		vvc->Pos = Pos;
 		bool endReached = vvc->UpdateDrawingState(GetOrientation());
 		if (endReached) {
-			vfxDict.erase(vvc->ResName);
+			vfxDict.erase(vfxDict.find(vvc->ResName)); // make sure to delete only one element
 			it = vfxQueue.erase(it);
 			delete vvc;
 			continue;
