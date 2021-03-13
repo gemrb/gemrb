@@ -229,6 +229,10 @@ def DisplayItem (slotItem, type):
 		ItemInfoWindow = GemRB.LoadWindow (5)
 
 	Window = ItemInfoWindow
+	def OnClose():
+		global ItemInfoWindow
+		ItemInfoWindow = None
+	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
 
 	if GameCheck.IsPST():
 		strrefs = [ 1403, 4256, 4255, 4251, 4252, 4254, 4279 ]
