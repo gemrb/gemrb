@@ -1414,10 +1414,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 							flags |= BLIT_GREY;
 						}
 						
-						Color tint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
+						Color baseTint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
+						Color tint(baseTint);
 						game->ApplyGlobalTint(tint, flags);
-						
-						actor->Draw(viewport, tint, flags|BLIT_BLENDED);
+						actor->Draw(viewport, baseTint, tint, flags|BLIT_BLENDED);
 					}
 				}
 				

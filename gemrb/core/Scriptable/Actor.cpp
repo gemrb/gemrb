@@ -8649,7 +8649,7 @@ Region Actor::DrawingRegion() const
 	return drawingRegion;
 }
 
-void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
+void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) const
 {
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
@@ -8690,7 +8690,7 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, tint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8809,7 +8809,7 @@ void Actor::Draw(const Region& vp, Color tint, uint32_t flags) const
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, tint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
 	}
 }
 

@@ -774,7 +774,7 @@ public:
 	uint8_t GetElevation() const;
 	bool ShouldDrawReticle() const;
 	void DoStep(unsigned int walkScale, ieDword time = 0) override;
-	void Draw(const Region &screen, Color tint, uint32_t flags) const;
+	void Draw(const Region &screen, Color baseTint, Color tint, uint32_t flags) const;
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
