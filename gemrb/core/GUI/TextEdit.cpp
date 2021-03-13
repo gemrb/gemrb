@@ -36,6 +36,7 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 
 	// FIXME: should we set IE_FONT_SINGLE_LINE?
 	textContainer.SetAlignment(IE_FONT_ALIGN_MIDDLE | IE_FONT_ALIGN_LEFT);
+	textContainer.SetColors(ColorWhite, ColorBlack);
 	AddSubviewInFrontOfView(&textContainer);
 
 	textContainer.callback = METHOD_CALLBACK(&TextEdit::TextChanged, this);
