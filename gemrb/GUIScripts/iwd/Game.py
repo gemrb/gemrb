@@ -27,7 +27,7 @@ from GameCheck import MAX_PARTY_SIZE
 
 def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
-	GemRB.GameSetProtagonistMode(1)
+	GemRB.GameSetProtagonistMode (2)
 
 	MessageWindow.OnLoad()
 	GemRB.GamePause (0, 0)
