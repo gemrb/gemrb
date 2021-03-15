@@ -1435,7 +1435,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 		//update clock display
-		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
+		core->GetGUIScriptEngine()->RunFunction("Clock", "UpdateClock");
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)

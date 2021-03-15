@@ -31,6 +31,7 @@ from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_HITS
 from GameCheck import MAX_PARTY_SIZE
+from Clock import UpdateClock
 import GameCheck
 import GUICommon
 import CommonTables
@@ -2028,53 +2029,6 @@ def OpenWaitForDiscWindow ():
 	# 31578 - No disc could be found in drive. Please place Disc 1 in drive.
 	# 49152 - To quit the game, press Alt-F4
 
-def SetPSTGamedaysAndHourToken ():
-	currentTime = GemRB.GetGameTime()
-	hours = (currentTime % 7200) / 300
-	if hours < 12:
-		ampm = "AM"
-	else:
-		ampm = "PM"
-		hours -= 12
-	minutes = (currentTime % 300) / 60
-
-	GemRB.SetToken ('CLOCK_HOUR', str (hours))
-	GemRB.SetToken ('CLOCK_MINUTE', '%02d' %minutes)
-	GemRB.SetToken ('CLOCK_AMPM', ampm)
-
-def UpdateClock ():
-	OptionsWindow = GemRB.GetView("OPTWIN")
-	ActionsWindow = GemRB.GetView("ACTWIN")
-
-	if GameCheck.IsPST ():
-		SetPSTGamedaysAndHourToken ()
-		twin = GemRB.GetView("WIN_TOP")
-		Button = ActionsWindow.GetControl (2)
-
-		if twin:
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		else:
-			Button.SetState (IE_GUI_BUTTON_DISABLED)
-
-	else:
-		Clock = None
-		if OptionsWindow:
-			if GameCheck.IsIWD2():
-				Clock = OptionsWindow.GetControl (10)
-			elif OptionsWindow.GetControl(9):
-				Clock = OptionsWindow.GetControl (9)
-				
-			if Clock.IsVisible() == False:
-				Clock = None
-		
-		if Clock is None and ActionsWindow:
-			Clock = ActionsWindow.GetControl (62)
-		
-		if Clock and (Clock.HasAnimation("CGEAR") or GameCheck.IsIWD2()):
-			Hours = (GemRB.GetGameTime () % 7200) / 300
-			GUICommon.SetGamedaysAndHourToken ()
-			Clock.SetBAM ("CDIAL", 0, (Hours + 12) % 24)
-			Clock.SetTooltip (GemRB.GetString (16041)) # refetch the string, since the tokens changed
 
 def CheckLevelUp(pc):
 	GemRB.SetVar ("CheckLevelUp"+str(pc), LUCommon.CanLevelUp (pc))

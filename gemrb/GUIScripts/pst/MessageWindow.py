@@ -28,6 +28,7 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIWORLD
+import Clock
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
@@ -93,13 +94,13 @@ def SetupClockWindowControls (Window):
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, GUICommonWindows.UpdateClock)
-	SetPSTGamedaysAndHourToken ()
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, Clock.UpdateClock)
+	Clock.SetPSTGamedaysAndHourToken ()
 	Button.SetTooltip (GemRB.GetString(65027))
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseTopWindow)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
 	Button.SetTooltip (41627)
 
 	# Select all characters
