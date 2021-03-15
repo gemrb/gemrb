@@ -39,12 +39,12 @@ def DialogStarted ():
 	GUICommonWindows.CloseTopWindow()
 	CommonWindow.CloseContainerWindow()
 
-	# disable the 1-6 hotkeys, so they'll work for choosing answers
-	GUICommonWindows.UpdatePortraitWindow ()
-
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+	
+	# disable the 1-6 hotkeys, so they'll work for choosing answers
+	GUICommonWindows.UpdatePortraitWindow ()
 
 	MWin = GemRB.GetView("MSGWIN")
 	CloseButton= MWin.GetControl (0)
