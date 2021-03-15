@@ -81,8 +81,8 @@ def OnLoad():
 	OpenButton = OptionsWindow.GetControl (10)
 	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
 
-	GUICommonWindows.SetupClockWindowControls (ActionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
+	SetupClockWindowControls (ActionsWindow)
+	SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
 	
