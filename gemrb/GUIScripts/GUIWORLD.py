@@ -72,8 +72,7 @@ def DialogStarted ():
 	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
-	if GUICommonWindows.PortraitWindow:
-		GUICommonWindows.UpdatePortraitWindow (True)
+	GUICommonWindows.UpdatePortraitWindow ()
 
 	ContinueWindow = OpenDialogButton(9)
 

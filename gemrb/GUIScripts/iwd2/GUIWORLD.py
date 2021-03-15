@@ -48,7 +48,7 @@ def DialogStarted ():
 	CommonWindow.CloseContainerWindow()
 
 	# disable the 1-6 hotkeys, so they'll work for choosing answers
-	GUICommonWindows.UpdatePortraitWindow (True)
+	GUICommonWindows.UpdatePortraitWindow ()
 
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)

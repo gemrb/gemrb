@@ -1695,7 +1695,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	SelectionChanged ()
 	return Window
 
-def UpdatePortraitWindow (indialog = False):
+def UpdatePortraitWindow ():
 	"""Updates all of the portraits."""
 
 	Window = GemRB.GetView("PORTWIN")
@@ -1703,6 +1703,8 @@ def UpdatePortraitWindow (indialog = False):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Inventory = GemRB.GetVar ("Inventory")
+	GSFlags = GemRB.GetGUIFlags()
+	indialog = GSFlags & GS_DIALOG
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
 	for i, Button in PortraitButtons.iteritems():
