@@ -83,7 +83,7 @@ def OnLoad():
 	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
 
 	SetupClockWindowControls (ActionsWindow)
-	SetupMenuWindowControls (OptionsWindow)
+	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
 	
@@ -111,7 +111,7 @@ def SetupClockWindowControls (Window):
 	# Abort current action
 	Button = Window.GetControl (3)
 	Button.SetTooltip (41655)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ActionStopPressed)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.ActionStopPressed)
 
 	# Formations
 	import GUIWORLD
