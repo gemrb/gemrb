@@ -21,6 +21,7 @@
 # racial enemy), but that will only affect testers (6-10 level gain or more)
 import GemRB
 import GUICommon
+import CharOverview
 import CommonTables
 from GUIDefines import *
 from ie_stats import IE_CLASS, IE_LEVELRANGER, IE_HATEDRACE, IE_HATEDRACE2
@@ -70,6 +71,7 @@ def OpenEnemyWindow(chargen=0):
 	rankDiff = 0
 	if chargen:
 		RaceWindow = GemRB.LoadWindow (15, "GUICG")
+		CharOverview.PositionCharGenWin (RaceWindow)
 		pc = GemRB.GetVar ("Slot")
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	else:
