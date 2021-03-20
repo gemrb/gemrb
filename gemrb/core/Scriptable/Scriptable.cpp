@@ -2290,6 +2290,13 @@ void Movable::AddWayPoint(const Point &Des)
 	Point p(endNode->x, endNode->y);
 	area->ClearSearchMapFor(this);
 	PathNode *path2 = area->FindPath(p, Des, size);
+	// if the waypoint is too close to the current position, no path is generated
+	if (!path2) {
+		if (BlocksSearchMap()) {
+			area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+		}
+		return;
+	}
 	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
 	path2->Parent = endNode;
