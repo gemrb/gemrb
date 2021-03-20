@@ -277,7 +277,7 @@
 0xE0C0     MTSN       MTSN       MTSN       MTSN       9          2          1          *
 0xE0D0     MUMB       MUMB       MUMB       MUMB       9          2          1          *
 0xE0E0     MCOR       MCOR       MCOR       MCOR       9          2          1          *
-0xE0F0     MGIC       MGIC       MGIC       MGIC       9          2          1          *
+0xE0F0     MGIC       MGIC       MGIC       MGIC       9          3          1          *
 0xE0F1     MGLA       MGLA       MGLA       MGLA       9          2          1          *
 0xE0F2     MWAV       MWAV       MWAV       MWAV       9          2          1          *
 0xE200     MBET       MBET       MBET       MBET       9          2          1          *

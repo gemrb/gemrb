@@ -14,6 +14,7 @@
 127 CutSceneId(O:Object*)
 143 OpenDoor(O:Object*)
 153 ChangeEnemyAlly(O:Object*,I:Value*Ea)
+161 IncrementChapter(S:RESREF*)
 177 TriggerActivation(O:Object*,I:State*Boolean)
 178 BreakInstants()
 248 RunToPoint(P:Point*)

@@ -29,7 +29,6 @@
 #include "strrefs.h"
 #include "opcode_params.h"
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "Bitmap.h"
 #include "DataFileMgr.h"
@@ -5768,8 +5767,8 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	}
 
 	//a plot critical creature has died (iwd2)
-	//FIXME: BG2 uses the same field for special creatures (alternate melee damage)
-	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
+	// BG2 uses the same field for special creatures (alternate melee damage): MC_LARGE_CREATURE
+	if (third && BaseStats[IE_MC_FLAGS] & MC_PLOT_CRITICAL) {
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindowPlot", false);
 	}
 	//ensure that the scripts of the actor will run as soon as possible
@@ -7600,7 +7599,14 @@ void Actor::PerformAttack(ieDword gameTime)
 	int damage = 0;
 
 	if (hittingheader->DiceThrown<256) {
-		damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
+		// another bizarre 2E feature that's unused, but working
+		if (!third && hittingheader->AltDiceSides && target->GetStat(IE_MC_FLAGS) & MC_LARGE_CREATURE) {
+			// make sure not to discard other damage bonuses from above
+			int dmgBon = DamageBonus - hittingheader->DamageBonus + hittingheader->AltDamageBonus;
+			damage += LuckyRoll(hittingheader->AltDiceThrown, hittingheader->AltDiceSides, dmgBon, LR_DAMAGELUCK);
+		} else {
+			damage += LuckyRoll(hittingheader->DiceThrown, hittingheader->DiceSides, DamageBonus, LR_DAMAGELUCK);
+		}
 		if (damage < 0) damage = 0; // bad luck, effects and/or profs on lowlevel chars
 	} else {
 		damage = 0;
@@ -11290,7 +11296,7 @@ bool Actor::ConcentrationCheck() const
 
 	// anyone in a 5' radius?
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_DEAD|GA_NO_NEUTRAL|GA_NO_ALLY|GA_NO_SELF|GA_NO_UNSCHEDULED|GA_NO_HIDDEN, 5, this);
-	if (neighbours.size() == 0) return true;
+	if (neighbours.empty()) return true;
 
 	// so there is someone out to get us and we should do the real concentration check
 	int roll = LuckyRoll(1, 20, 0);

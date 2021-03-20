@@ -73,14 +73,20 @@ IF(APPLE) #application bundle generation
 		ADD_CUSTOM_COMMAND(TARGET gemrb PRE_BUILD COMMAND ${CMAKE_INSTALL_NAME_TOOL} -id "@loader_path/../Frameworks/${SDL_BASENAME}" "${SDL_LIBRARY}")
 	ENDIF()
 
-	SET (BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/${PROJECT_NAME}") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
+	SET(BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/GemRB") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
 	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
 ELSE(APPLE)
 	ADD_SUBDIRECTORY( docs )
 	ADD_SUBDIRECTORY( tests )
 
+	SET(PLATFORM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../platforms")
+
 	IF(WIN32)
-		ADD_EXECUTABLE(gemrb GemRB.cpp ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/windows/window.rc)
+		ADD_EXECUTABLE(gemrb ${PLATFORM_DIR}/windows/GemRB.cpp ${PLATFORM_DIR}/windows/Win32Console.cpp ${PLATFORM_DIR}/windows/window.rc)
+	ELSEIF(VITA)
+		ADD_EXECUTABLE(gemrb ${PLATFORM_DIR}/vita/GemRB.cpp ${PLATFORM_DIR}/vita/VitaLogger.cpp)
+	ELSEIF(ANDROID)
+		ADD_EXECUTABLE(gemrb ${PLATFORM_DIR}/android/GemRB.cpp ${PLATFORM_DIR}/android/AndroidLogger.cpp)
 	ELSE(WIN32)
 		ADD_EXECUTABLE(gemrb GemRB.cpp )
 	ENDIF()

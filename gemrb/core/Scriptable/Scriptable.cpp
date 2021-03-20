@@ -19,7 +19,6 @@
 
 #include "Scriptable/Scriptable.h"
 
-#include "win32def.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
 #include "voodooconst.h"
@@ -499,17 +498,14 @@ void Scriptable::AddActionInFront(Action* aC)
 
 Action* Scriptable::GetNextAction() const
 {
-	if (actionQueue.size() == 0) {
-		return NULL;
-	}
+	if (actionQueue.empty()) return nullptr;
 	return actionQueue.front();
 }
 
 Action* Scriptable::PopNextAction()
 {
-	if (actionQueue.size() == 0) {
-		return NULL;
-	}
+	if (actionQueue.empty()) return nullptr;
+
 	Action* aC = actionQueue.front();
 	actionQueue.pop_front();
 	return aC;

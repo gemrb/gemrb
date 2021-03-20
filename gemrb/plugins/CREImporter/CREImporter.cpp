@@ -22,7 +22,6 @@
 
 #include "ie_stats.h"
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "EffectMgr.h"
 #include "GameData.h"
@@ -864,7 +863,7 @@ void CREImporter::SetupColor(ieDword &stat)
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
 	size_t RandRows = 0;
-	if (randcolors.size() == 0) {
+	if (randcolors.empty()) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
@@ -1185,12 +1184,13 @@ void CREImporter::GetActorPST(Actor *act)
 
 	str->ReadDword( &act->AppearanceFlags );
 
+	// just overwrite the bg1 color stat range, since it's not used in pst
 	for (i = 0; i < 7; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_COLORS+i] = tmpWord;
 	}
-	act->BaseStats[IE_COLORCOUNT] = tmpByte; //hack
-	str->Read(act->pstColorBytes, 10);
+	act->BaseStats[IE_COLORCOUNT] = tmpByte;
+	str->Read(act->pstColorBytes, 10); // color location in IESDP, sort of a palette index and flags
 	str->Seek(21, GEM_CURRENT_POS);
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SPECIES]=tmpByte; // offset: 0x311

@@ -45,10 +45,12 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
+#include "globals.h"
 #include "ie_types.h"
-#include "win32def.h"
 
 #include "Callback.h"
+#include "Region.h"
+#include "System/String.h"
 
 namespace GemRB {
 

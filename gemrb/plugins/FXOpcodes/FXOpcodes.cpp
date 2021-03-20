@@ -23,7 +23,6 @@
 #include "overlays.h"
 #include "strrefs.h"
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "Audio.h"
 #include "DisplayMessage.h"
@@ -1950,7 +1949,6 @@ int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
 					continue;
 				}
-				inv->ChangeItemFlag(i, IE_INV_ITEM_CURSED, OP_NAND);
 				if (inv->UnEquipItem(i,true)) {
 					CREItem *tmp = inv->RemoveItem(i);
 					if(inv->AddSlotItem(tmp,-3)!=ASI_SUCCESS) {
@@ -2667,24 +2665,37 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if(0) print("fx_transparency_modifier(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	//maybe this needs some timing
-	switch (fx->Parameter2) {
-	case 1: //fade in
-		if (fx->Parameter1<255) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1++;
-			}
+	bool permanent = fx->TimingMode == FX_DURATION_INSTANT_PERMANENT;
+	bool done = true;
+	ieDword transp;
+	if (fx->Parameter2 == 1 || fx->Parameter2 == 2) {
+		if (permanent) {
+			transp = target->GetBase(IE_TRANSLUCENT);
+		} else {
+			transp = target->GetStat(IE_TRANSLUCENT);
 		}
-		break;
-	case 2://fade out
-		if (fx->Parameter1) {
-			if (core->GetGame()->GameTime%2) {
-				fx->Parameter1--;
-			}
+		
+		if (fx->Parameter2 == 1) { // fade in
+			// the stat setting functions don't handle minimum values so we need to do it ourselves
+			transp -= std::min(std::max(fx->Parameter1, 1u), transp);
+			done = transp <= 0;
+		} else { // fade out
+			transp += std::max(fx->Parameter1 ,1u);
+			done = transp >= 255;
 		}
-		break;
+	} else {
+		transp = fx->Parameter1;
 	}
-	STAT_MOD( IE_TRANSLUCENT );
+
+	if (permanent) {
+		target->SetBase(IE_TRANSLUCENT, transp);
+		if (done) {
+			return FX_PERMANENT;
+		}
+	} else {
+		target->SetStat(IE_TRANSLUCENT, transp, 1);
+	}
+
 	return FX_APPLIED;
 }
 
@@ -3746,16 +3757,16 @@ int fx_immune_to_weapon (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	case 7: //all not twohanded
 		mask = IE_INV_ITEM_TWOHANDED;
 		break;
-	case 8: //all twohanded
+	case 8: //all cursed
 		value = IE_INV_ITEM_CURSED;
 		//fallthrough
-	case 9: //all not twohanded
+	case 9: //all non-cursed
 		mask = IE_INV_ITEM_CURSED;
 		break;
-	case 10: //all twohanded
+	case 10: //all cold-iron
 		value = IE_INV_ITEM_COLDIRON;
 		//fallthrough
-	case 11: //all not twohanded
+	case 11: //all non cold-iron
 		mask = IE_INV_ITEM_COLDIRON;
 		break;
 	case 12:

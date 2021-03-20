@@ -20,10 +20,6 @@
 
 #include "Factory.h"
 
-#include "win32def.h"
-
-#include <cstring>
-
 namespace GemRB {
 
 Factory::Factory(void)
@@ -44,6 +40,10 @@ void Factory::AddFactoryObject(FactoryObject* fobject)
 
 int Factory::IsLoaded(const char* ResRef, SClass_ID type) const
 {
+	if (ResRef == nullptr) {
+		return -1;
+	}
+
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		if (fobjects[i]->SuperClassID == type) {
 			if (strnicmp( fobjects[i]->ResRef, ResRef, 8 ) == 0) {

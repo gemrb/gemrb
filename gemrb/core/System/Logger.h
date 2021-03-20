@@ -27,11 +27,28 @@
 
 #include "exports.h"
 
-#include "System/Logging.h"
+#include <atomic>
+#include <condition_variable>
+#include <deque>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
 
 namespace GemRB {
 
-enum log_color {
+// !!! Keep this synchronized with GUIDefines !!!
+enum log_level : int {
+	INTERNAL = -1, // special value that can only be used by the logger itself. these messages cannot be supressed
+	FATAL = 0,
+	ERROR = 1,
+	WARNING = 2,
+	MESSAGE = 3,
+	COMBAT = 4,
+	DEBUG = 5
+};
+
+enum log_color : int {
 	DEFAULT,
 	BLACK,
 	RED,
@@ -50,23 +67,57 @@ enum log_color {
 	LIGHT_WHITE
 };
 
-class GEM_EXPORT Logger {
-private:
-	log_level myLevel;
+class GEM_EXPORT Logger final {
 public:
-	Logger(log_level = DEBUG);
-	virtual ~Logger();
-	virtual void destroy();
+	struct LogMessage {
+		log_level level = DEBUG;
+		std::string owner;
+		std::string message;
+		log_color color = DEFAULT;
+		
+		LogMessage(log_level level, std::string owner, std::string message, log_color color = DEFAULT)
+		: level(level), owner(std::move(owner)), message(std::move(message)), color(color) {}
+	};
 
-	bool SetLogLevel(log_level);
-	void log(log_level, const char* owner, const char* message, log_color color);
-protected:
-	virtual void LogInternal(log_level, const char*, const char*, log_color)=0;
+	class LogWriter {
+	public:
+		std::atomic<log_level> level;
+		
+		LogWriter(log_level level) : level(level) {}
+		virtual ~LogWriter() = default;
+		
+		void WriteLogMessage(log_level level, const char* owner, const char* message, log_color color) {
+			WriteLogMessage(LogMessage(level, owner, message, color));
+		}
+		virtual void WriteLogMessage(const Logger::LogMessage& msg)=0;
+	};
+
+	using WriterPtr = std::shared_ptr<LogWriter>;
+private:
+	using QueueType = std::deque<LogMessage>;
+	QueueType messageQueue;
+	std::deque<WriterPtr> writers;
+	
+	std::atomic_bool running {true};
+	std::condition_variable cv;
+	std::mutex queueLock;
+	std::mutex writerLock;
+	std::thread loggingThread;
+	
+	void threadLoop();
+	void ProcessMessages(QueueType queue);
+	
+public:
+	Logger(std::deque<WriterPtr>);
+	~Logger();
+	
+	void AddLogWriter(WriterPtr writer);
+
+	void LogMsg(log_level, const char* owner, const char* message, log_color color);
+	void LogMsg(LogMessage&& msg);
 };
 
 extern const char* log_level_text[];
-
-extern Logger* (*createDefaultLogger)();
 
 }
 

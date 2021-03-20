@@ -20,8 +20,7 @@
 
 #include "System/DataStream.h"
 
-#include "win32def.h"
-
+#include "errors.h"
 #include <ctype.h>
 
 namespace GemRB {
@@ -168,13 +167,16 @@ int DataStream::WriteDword(const ieDword *src)
 int DataStream::ReadResRef(ieResRef dest)
 {
 	int len = Read(dest, 8);
-	int i;
+	if (len == GEM_ERROR) {
+		dest[0] = 0;
+		return 0;
+	}
 	// lowercase the resref
-	for(i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		dest[i] = (char) tolower(dest[i]);
 	}
 	// remove trailing spaces
-	for (i = 7; i >= 0; i--) {
+	for (int i = 7; i >= 0; i--) {
 		if (dest[i] == ' ') dest[i] = 0;
 		else break;
 	}

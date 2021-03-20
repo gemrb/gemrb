@@ -25,15 +25,31 @@
 #include "LRUCache.h"
 
 #include <vector>
-#include <atomic>
+#include <mutex>
+
 #include <SDL_mixer.h>
 
-#define MIXER_CHANNELS 8
+#define MIXER_CHANNELS 16
 #define BUFFER_CACHE_SIZE 100
-
-struct SDL_mutex;
+#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
 
 namespace GemRB {
+
+class SDLAudioSoundHandle : public SoundHandle 
+{
+public:
+	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
+	virtual ~SDLAudioSoundHandle() { }
+	virtual void SetPos(int XPos, int YPos);
+	virtual bool Playing();
+	virtual void Stop();
+	virtual void StopLooping();
+	void Invalidate() { }
+private:
+	Mix_Chunk *mixChunk;
+	int chunkChannel;
+	bool sndRelative;
+};
 
 struct BufferedData {
 	char *buf;
@@ -52,7 +68,7 @@ public:
 	bool Init(void);
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
-	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
+	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();
 	bool Pause() { return true; } /*not implemented*/
@@ -74,16 +90,17 @@ public:
 private:
 	void FreeBuffers();
 
-	static void music_callback(void *udata, unsigned short *stream, int len);
-	static void buffer_callback(void *udata, char *stream, int len);
+	static void SetAudioStreamVolume(uint8_t *stream, int len, int volume);
+	static void music_callback(void *udata, uint8_t *stream, int len);
+	static void buffer_callback(void *udata, uint8_t *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
 	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
 
-	int XPos, YPos;
+	Point listenerPos;
 	Holder<SoundMgr> MusicReader;
 
-	std::atomic<bool> MusicPlaying;
+	bool MusicPlaying;
 	unsigned int curr_buffer_offset;
 	std::vector<BufferedData> buffers;
 
@@ -91,7 +108,7 @@ private:
 	unsigned short audio_format;
 	int audio_channels;
 
-	SDL_mutex *MusicMutex;
+	std::recursive_mutex MusicMutex;
 	LRUCache buffercache;
 };
 

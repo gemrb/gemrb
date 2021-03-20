@@ -22,8 +22,9 @@
 #define AMBIENTMGR_H
 
 #include "exports.h"
-#include "win32def.h"
 
+#include <atomic>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -33,18 +34,27 @@ class Ambient;
 
 class GEM_EXPORT AmbientMgr {
 public:
-	AmbientMgr();
-	virtual ~AmbientMgr();
-	virtual void reset() { ambients = std::vector<Ambient *> (); }
-	virtual void setAmbients(const std::vector<Ambient *> &a) { reset(); ambients = a; activate(); }
+	AmbientMgr() = default;
+	virtual ~AmbientMgr() = default;
+
+	void reset();
+	void setAmbients(const std::vector<Ambient *> &a);
+
 	virtual void activate(const std::string &name);
 	virtual void activate() { active = true; } // hard play ;-)
 	virtual void deactivate(const std::string &name);
 	virtual void deactivate() { active = false; } // hard stop
 	virtual bool isActive(const std::string &name) const;
+	
+private:
+	virtual void ambientsSet(const std::vector<Ambient *>&) {}
+
 protected:
+	std::atomic_bool active {false};
+	
+private:
+	mutable std::mutex ambientsMutex;
 	std::vector<Ambient *> ambients;
-	bool active = false;
 };
 
 }

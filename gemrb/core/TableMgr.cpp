@@ -23,6 +23,8 @@
 #include "GameData.h"
 #include "Interface.h"
 
+#include "System/DataStream.h"
+
 namespace GemRB {
 
 TableMgr::TableMgr()

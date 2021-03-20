@@ -21,7 +21,6 @@
 #include "ie_feats.h" //cannot avoid declaring these
 #include "opcode_params.h"
 #include "overlays.h"
-#include "win32def.h"
 
 #include "Audio.h"  //needs for a playsound call
 #include "DisplayMessage.h"
@@ -272,7 +271,7 @@ static EffectDesc effectnames[] = {
 	{ "SalamanderAura", fx_salamander_aura, 0, -1 }, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, 0, -1 }, //100
 	{ "ZombieLordAura", fx_zombielord_aura, 0, -1 },//101, duff in iwd2
-	{ "SummonCreature2", fx_summon_creature2, 0, -1 }, //103
+	{ "SummonCreature2", fx_summon_creature2, EFFECT_DICED|EFFECT_PRESET_TARGET, -1 }, //103
 	{ "AvatarRemoval", fx_avatar_removal, 0, -1 }, //104
 	{ "SummonPomab", fx_summon_pomab, 0, -1 }, //106
 	{ "ControlUndead", fx_control_undead, 0, -1 }, //107
@@ -768,7 +767,7 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	Point pos(fx->PosX,fx->PosY);
+
 	Projectile *pro;
 	if (fx->Parameter4) {
 		// SpellHitEffectPoint is used with sheffect.ids, so the indices are smaller
@@ -780,8 +779,10 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 	pro->SetCaster(fx->CasterID, fx->CasterLevel);
 	if (target) {
 		//i believe the spell hit projectiles don't follow anyone
+		Point pos(target->Pos.x, target->Pos.y);
 		map->AddProjectile( pro, pos, target->GetGlobalID(), true);
 	} else {
+		Point pos(fx->PosX, fx->PosY);
 		map->AddProjectile( pro, pos, pos);
 	}
 	return FX_NOT_APPLIED;
@@ -1444,10 +1445,15 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 		eamod = eamods[fx->Parameter2];
 	}
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	if (fx->Parameter2 == 3) { // summon at source
-		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, Owner->Pos, eamod, 0, newfx);
-	} else {
-		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0, newfx);
+	Point pos(target->Pos);
+	while (fx->Parameter1--) {
+		if (fx->Parameter2 == 3) { // summon at source
+			pos = Owner->Pos;
+		} else if (fx->Target == FX_TARGET_PRESET) {
+			pos.x = fx->PosX;
+			pos.y = fx->PosY;
+		}
+		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
 	}
 	delete newfx;
 	return FX_NOT_APPLIED;

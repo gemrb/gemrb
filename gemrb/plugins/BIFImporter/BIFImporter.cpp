@@ -20,8 +20,6 @@
 
 #include "BIFImporter.h"
 
-#include "win32def.h"
-
 #include "Compressor.h"
 #include "FileCache.h"
 #include "Interface.h"

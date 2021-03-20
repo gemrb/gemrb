@@ -7,3 +7,9 @@ THEN
     SetGlobal("ReturnedOutside","GLOBAL",2)
 END
 
+IF
+	OnCreation()
+THEN
+	RESPONSE #100
+		IncrementChapter("")
+END

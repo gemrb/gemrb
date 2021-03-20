@@ -17,111 +17,138 @@
  */
 
 #include "System/Logger/Stdio.h"
-
-#include "System/Logging.h"
+#include "System/FileStream.h"
 
 #include <cstdio>
 
+#include "Interface.h"
+#include "plugindef.h"
+
 namespace GemRB {
 
-StdioLogger::StdioLogger(bool useColor)
-	: useColor(useColor)
+StreamLogWriter::StreamLogWriter(log_level level, DataStream* stream)
+: Logger::LogWriter(level), stream(stream)
 {}
 
-StdioLogger::~StdioLogger()
-{}
-
-void StdioLogger::print(const char* message)
+StreamLogWriter::~StreamLogWriter()
 {
-	fprintf(stdout, "%s", message);
+	delete stream;
 }
 
-static const char* colors[] = {
-	"\033[0m",
-	"\033[0m\033[30;40m",
-	"\033[0m\033[31;40m",
-	"\033[0m\033[32;40m",
-	"\033[0m\033[33;40m",
-	"\033[0m\033[34;40m",
-	"\033[0m\033[35;40m",
-	"\033[0m\033[36;40m",
-	"\033[0m\033[37;40m",
-	"\033[1m\033[31;40m",
-	"\033[1m\033[32;40m",
-	"\033[1m\033[33;40m",
-	"\033[1m\033[34;40m",
-	"\033[1m\033[35;40m",
-	"\033[1m\033[36;40m",
-	"\033[1m\033[37;40m"
-};
+void StreamLogWriter::Print(const std::string& msg)
+{
+	stream->Write(msg.c_str(), (uint32_t)msg.length());
+}
 
+void StreamLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
+{
+	Print("[" + msg.owner + "/" + log_level_text[msg.level] + "]: " + msg.message + "\n");
+}
 
-void StdioLogger::textcolor(log_color c)
+Logger::WriterPtr createStreamLogWriter(DataStream* stream)
+{
+	return Logger::WriterPtr(new StreamLogWriter(DEBUG, stream));
+}
+
+static FileStream* DupStdOut()
+{
+	int fd = dup(fileno(stdout));
+	assert(fd != -1);
+	FILE* fp = fdopen(fd, "w");
+	return new FileStream(File(fp));
+}
+
+StdioLogWriter::StdioLogWriter(log_level level, bool useColor)
+: StreamLogWriter(level, DupStdOut()), useColor(useColor)
+{}
+
+StdioLogWriter::~StdioLogWriter()
+{
+	textcolor(DEFAULT); // undo any changes to the terminal
+}
+
+void StdioLogWriter::textcolor(log_color c)
 {
 	// Shold this be in an ansi-term subclass?
 	// Probably not worth the bother
+	static const char* colors[] = {
+		"\033[0m",
+		"\033[0m\033[30;40m",
+		"\033[0m\033[31;40m",
+		"\033[0m\033[32;40m",
+		"\033[0m\033[33;40m",
+		"\033[0m\033[34;40m",
+		"\033[0m\033[35;40m",
+		"\033[0m\033[36;40m",
+		"\033[0m\033[37;40m",
+		"\033[1m\033[31;40m",
+		"\033[1m\033[32;40m",
+		"\033[1m\033[33;40m",
+		"\033[1m\033[34;40m",
+		"\033[1m\033[35;40m",
+		"\033[1m\033[36;40m",
+		"\033[1m\033[37;40m"
+	};
+
 	if (useColor)
-		print(colors[c]);
+		Print(colors[c]);
 }
 
-void StdioLogger::printBracket(const char* status, log_color color)
+void StdioLogWriter::printBracket(const char* status, log_color color)
 {
 	textcolor(WHITE);
-	print("[");
+	Print("[");
 	textcolor(color);
-	print(status);
+	Print(status);
 	textcolor(WHITE);
-	print("]");
+	Print("]");
 }
 
-void StdioLogger::printStatus(const char* status, log_color color)
+void StdioLogWriter::printStatus(const char* status, log_color color)
 {
 	printBracket(status, color);
-	print("\n");
+	Print("\n");
 }
 
-static log_color log_level_color[] = {
-	LIGHT_RED,
-	LIGHT_RED,
-	YELLOW,
-	LIGHT_WHITE,
-	GREEN,
-	BLUE
-};
-
-void StdioLogger::LogInternal(log_level level, const char* owner, const char* message, log_color color)
+void StdioLogWriter::WriteLogMessage(const Logger::LogMessage& msg)
 {
-	if (level < FATAL) {
-		level = FATAL;
-	}
-	textcolor(LIGHT_WHITE);
-	print("[");
-	print(owner);
-	if (log_level_text[level][0]) {
-		print("/");
-		textcolor(log_level_color[level]);
-		print(log_level_text[level]);
-	}
-	textcolor(LIGHT_WHITE);
-	print("]: ");
+	if (useColor) {
+		static constexpr log_color log_level_color[] = {
+			LIGHT_RED,
+			LIGHT_RED,
+			YELLOW,
+			LIGHT_WHITE,
+			GREEN,
+			BLUE
+		};
 
-	textcolor(color);
-	print(message);
-	print("\n");
+		textcolor(LIGHT_WHITE);
+		Print("[");
+		Print(msg.owner);
+		if (log_level_text[msg.level][0]) {
+			Print("/");
+			textcolor(log_level_color[msg.level]);
+			Print(log_level_text[int(msg.level)]);
+		}
+		textcolor(LIGHT_WHITE);
+		Print("]: ");
+
+		textcolor(msg.color);
+		Print(msg.message);
+		Print("\n");
+	} else {
+		StreamLogWriter::WriteLogMessage(msg);
+	}
+	
+	fflush(stdout);
 }
 
-void StdioLogger::destroy()
-{
-	textcolor(DEFAULT);
-	delete this;
-}
-
-Logger* createStdioLogger()
+Logger::WriterPtr createStdioLogWriter()
 {
 #ifndef NOCOLOR
-	return new StdioLogger(true);
+	return Logger::WriterPtr(new StdioLogWriter(DEBUG, true));
 #else
-	return new StdioLogger(false);
+	return Logger::WriterPtr(new StdioLogWriter(DEBUG, false));
 #endif
 }
 

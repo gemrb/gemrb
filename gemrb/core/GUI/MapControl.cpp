@@ -19,7 +19,6 @@
 
 #include "GUI/MapControl.h"
 
-#include "win32def.h"
 #include "ie_cursors.h"
 
 #include "Game.h"

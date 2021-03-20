@@ -26,100 +26,76 @@
 #include "Interface.h"
 
 #include <cassert>
+#include <chrono>
 #include <climits>
 #include <cmath>
 #include <cstdio>
-
-#include <SDL.h>
 
 using namespace GemRB;
 
 // TODO: no more dependency on OpenAL, rename and move it?
 
-// legal nop if already reset
-void AmbientMgrAL::reset()
+AmbientMgrAL::AmbientMgrAL()
+: AmbientMgr()
 {
-	if (player) {
-		SDL_mutexP(mutex);
-	}
+	player = std::thread(&AmbientMgrAL::play, this);
+}
+
+AmbientMgrAL::~AmbientMgrAL()
+{
+	playing = false;
+	mutex.lock();
 	for (auto ambientSource : ambientSources) {
 		delete ambientSource;
 	}
 	ambientSources.clear();
 	AmbientMgr::reset();
-	if (player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-		SDL_WaitThread(player, NULL);
-		player = NULL;
-	}
+	mutex.unlock();
+	
+	cond.notify_all();
+	player.join();
 }
 
-void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
+void AmbientMgrAL::ambientsSet(const std::vector<Ambient *>& a)
 {
-	AmbientMgr::setAmbients(a);
-	assert(NULL == player);
-
-	ambientSources.reserve(a.size());
-	for (auto source : a) {
+	mutex.lock();
+	for (auto ambientSource : ambientSources) {
+		delete ambientSource;
+	}
+	ambientSources.resize(0);
+	for (auto& source : a) {
 		ambientSources.push_back(new AmbientSource(source));
 	}
+	mutex.unlock();
 	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
-
-#if	SDL_VERSION_ATLEAST(1, 3, 0)
-	/* as of changeset 3a041d215edc SDL_CreateThread has a 'name' parameter */
-	player = SDL_CreateThread(&play, "AmbientMgrAL", (void *) this);
-#else
-	player = SDL_CreateThread(&play, (void *) this);
-#endif
 }
 
 void AmbientMgrAL::activate(const std::string &name)
 {
-	if (player) {
-		SDL_mutexP(mutex);
-	}
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::activate(name);
-	if (player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
+	cond.notify_all();
 }
 
 void AmbientMgrAL::activate()
 {
-	if (player) {
-		SDL_mutexP(mutex);
-	}
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::activate();
-	if (player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
+	cond.notify_all();
 }
 
 void AmbientMgrAL::deactivate(const std::string &name)
 {
-	if (player) {
-		SDL_mutexP(mutex);
-	}
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::deactivate(name);
-	if (player) {
-		SDL_CondSignal(cond);
-		SDL_mutexV(mutex);
-	}
+	cond.notify_all();
 }
 
 void AmbientMgrAL::deactivate()
 {
-	if (player) {
-		SDL_mutexP(mutex);
-	}
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	AmbientMgr::deactivate();
 	hardStop();
-	if (player) {
-		SDL_mutexV(mutex);
-	}
 }
 
 void AmbientMgrAL::hardStop() const
@@ -129,23 +105,23 @@ void AmbientMgrAL::hardStop() const
 	}
 }
 
-int AmbientMgrAL::play(void *am)
+int AmbientMgrAL::play()
 {
-	AmbientMgrAL * ambim = (AmbientMgrAL *) am;
-	SDL_mutexP(ambim->mutex);
-	while (!ambim->ambientSources.empty()) {
-		if (!core->GetGame()) { // we don't have any game, and we need one
-			break;
-		}
-		unsigned int delay = ambim->tick(SDL_GetTicks());
+	while (playing) {
+		std::unique_lock<std::recursive_mutex> l(mutex);
+		using namespace std::chrono;
+		using Clock = high_resolution_clock;
+		high_resolution_clock::time_point time = Clock::now();
+		milliseconds ms = duration_cast<milliseconds>(time.time_since_epoch());
+		
+		unsigned int delay = tick(ms.count());
 		assert(delay > 0);
-		SDL_CondWaitTimeout(ambim->cond, ambim->mutex, delay);
+		cond.wait_for(l, milliseconds(delay));
 	}
-	SDL_mutexV(ambim->mutex);
 	return 0;
 }
 
-unsigned int AmbientMgrAL::tick(unsigned int ticks) const
+unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 {
 	unsigned int delay = 60000; // wait one minute if all sources are off
 
@@ -158,8 +134,13 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks) const
 	listener.x = (short) xpos;
 	listener.y = (short) ypos;
 
-	ieDword timeslice = SCHEDULE_MASK(core->GetGame()->GameTime);
+	const Game* game = core->GetGame();
+	ieDword timeslice = 0;
+	if (game) {
+		timeslice = SCHEDULE_MASK(game->GameTime);
+	}
 
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
 		unsigned int newdelay = source->tick(ticks, listener, timeslice);
 		if (newdelay < delay) delay = newdelay;
@@ -169,11 +150,10 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks) const
 
 void AmbientMgrAL::UpdateVolume(unsigned short volume)
 {
-	SDL_mutexP( mutex );
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
 		source->SetVolume(volume);
 	}
-	SDL_mutexV( mutex );
 }
 
 
@@ -190,7 +170,7 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 	}
 }
 
-unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listener, ieDword timeslice)
+unsigned int AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDword timeslice)
 {
 	/* if we are out of sounds do nothing */
 	if (ambient->sounds.empty()) {

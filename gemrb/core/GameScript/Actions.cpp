@@ -24,7 +24,6 @@
 #include "GameScript/Matching.h"
 
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "AmbientMgr.h"
 #include "CharAnimations.h"
@@ -1708,6 +1707,7 @@ void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* paramete
 	}
 }
 
+// TODO: fix these two actions — they actually take a point, not an object
 void GameScript::FloatMessageFixed(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
@@ -3604,7 +3604,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->SetPause(PAUSE_ON, 1);
+	core->SetPause(PAUSE_ON, PF_QUIET);
 	strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef)-1);
 	core->SetEventFlag(EF_TEXTSCREEN);
 }

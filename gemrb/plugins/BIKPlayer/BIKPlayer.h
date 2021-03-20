@@ -24,7 +24,6 @@
 #include "MoviePlayer.h"
 
 #include "globals.h"
-#include "win32def.h"
 
 #include "Interface.h"
 

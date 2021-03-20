@@ -23,7 +23,6 @@
 
 #include "Item.h"
 
-#include "win32def.h"
 #include "voodooconst.h"
 
 #include "Interface.h"
@@ -35,7 +34,7 @@ namespace GemRB {
 ITMExtHeader::ITMExtHeader(void)
 {
 	features = NULL;
-	Location = Range = Speed = unknown1 = RechargeFlags = IDReq = 0;
+	Location = Range = RechargeFlags = IDReq = 0;
 	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
 	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
 	ProjectileAnimation = ProjectileQualifier = FeatureCount = FeatureOffset = 0;
@@ -101,6 +100,11 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		} else {
 			fx->SourceFlags = 0;
 		}
+
+		if (fx->Target != FX_TARGET_PRESET && EffectQueue::OverrideTarget(fx)) {
+			fx->Target = FX_TARGET_PRESET;
+		}
+
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
 			fxqueue->AddEffect( fx );
@@ -122,21 +126,20 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 
 	//adding a pulse effect for weapons (PST)
 	//if it is an equipping effect block
-	if ((usage==-1) && (WieldColor!=0xffff)) {
-		if (Flags&IE_ITEM_PULSATING) {
-			Effect *tmp = BuildGlowEffect(WieldColor);
-			if (tmp) {
-				tmp->InventorySlot = invslot;
-				tmp->Projectile=pro;
-				fxqueue->AddEffect( tmp );
-				delete tmp;
-			}
+	if (usage == -1 && WieldColor != 0xffff && Flags & IE_ITEM_PULSATING) {
+		Effect *tmp = BuildGlowEffect(WieldColor);
+		if (tmp) {
+			tmp->InventorySlot = invslot;
+			tmp->Projectile=pro;
+			fxqueue->AddEffect( tmp );
+			delete tmp;
 		}
 	}
 	return fxqueue;
 }
 
 /** returns the average damage this weapon would cause */
+// there might not be any target, so we can't consider also AltDiceThrown ...
 int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 {
 	header = GetWeaponHeader(ranged);

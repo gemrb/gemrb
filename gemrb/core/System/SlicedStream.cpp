@@ -22,7 +22,6 @@
 
 #include "System/MemoryStream.h"
 
-#include "win32def.h"
 #include "errors.h"
 
 #include "Interface.h"

@@ -121,7 +121,7 @@ void GetBitContext::read_tree(Tree *tree)
 	        int size = 1 << i;
 	        for (t = 0; t < 16; t += size << 1)
 	            merge(out + t, in + t, size);
-	        FFSWAP(uint8_t*, in, out);
+	        std::swap(in, out);
 	    }
 	    memcpy(tree->syms, in, 16);
 	}

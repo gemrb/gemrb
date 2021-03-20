@@ -20,8 +20,6 @@
 
 #include "TLKImporter.h"
 
-#include "win32def.h"
-
 #include "Audio.h"
 #include "Calendar.h"
 #include "DialogHandler.h"
@@ -459,7 +457,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 13 );
-		sprintf( string2, "%u: %s", strref, string );
+		snprintf(string2, Length + 13, "%u: %s", strref, string);
 		free( string );
 		return string2;
 	}

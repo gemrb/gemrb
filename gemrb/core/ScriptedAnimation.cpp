@@ -23,8 +23,6 @@
 
 #include "ScriptedAnimation.h"
 
-#include "win32def.h"
-
 #include "Animation.h"
 #include "AnimationFactory.h"
 #include "Audio.h"
@@ -106,17 +104,14 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 {
 	int c = cycle;
 
-	switch (NumOrientations) {
-	case 5:
-		c = SixteenToFive[i];
-		break;
-	case 9:
-		c = SixteenToNine[i];
-		break;
-	default:
+	if (NumOrientations == 16 || OrientationFlags & IE_VVC_FACE_FIXED) {
 		if (af->GetCycleCount() > i) c = i;
-		break;
+	} else if (NumOrientations == 5) {
+		c = SixteenToFive[i];
+	} else if (NumOrientations == 9) {
+		c = SixteenToNine[i];
 	}
+
 	Animation *anim = af->GetCycle(c);
 	if (anim) {
 		if (Transparency & IE_VVC_MIRRORX) {
@@ -144,7 +139,12 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 	//special case, PST double animations
 
 	CopyResRef(ResName, af->ResRef);
-	unsigned int cCount = af->GetCycleCount();
+	// some anims like FIREL.BAM in IWD contain empty cycles
+	unsigned int cCount = 0;
+	for (unsigned int i = 0; i < af->GetCycleCount() && af->GetCycleSize(i) > 0; ++i) {
+		++cCount;
+	}
+
 	if (cCount >= MAX_CYCLE_TYPE) {
 		cCount = 1;
 	}

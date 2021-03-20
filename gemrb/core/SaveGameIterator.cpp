@@ -22,7 +22,6 @@
 
 #include "iless.h"
 #include "strrefs.h"
-#include "win32def.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h" // For ResourceHolder
@@ -37,9 +36,6 @@
 #include "Scriptable/Actor.h"
 #include "System/FileStream.h"
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 #ifndef R_OK
 #define R_OK 04
 #endif
@@ -145,7 +141,7 @@ Sprite2D* SaveGame::GetPortrait(int index) const
 		return NULL;
 	}
 	char nPath[_MAX_PATH];
-	sprintf( nPath, "PORTRT%d", index );
+	snprintf(nPath, _MAX_PATH, "PORTRT%d", index);
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(nPath, manager, true);
 	if (!im)
 		return NULL;
@@ -377,8 +373,9 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 
 void SaveGameIterator::PruneQuickSave(const char *folder)
 {
-	char from[_MAX_PATH+20];
-	char to[_MAX_PATH+20];
+	// FormatQuickSavePath needs: _MAX_PATH + 6 + 1 + 9 + 17
+	char from[_MAX_PATH + 40];
+	char to[_MAX_PATH + 40];
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;

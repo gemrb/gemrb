@@ -18,18 +18,12 @@
  *
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "globals.h"
 
 #include "InterfaceConfig.h"
 
 #include "System/FileStream.h"
-
-// needed for unused std::string version of GetValueForKey
-//#include <algorithm>
+#include "System/VFS.h"
 
 namespace GemRB {
 

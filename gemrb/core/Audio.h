@@ -24,7 +24,6 @@
 #include <vector>
 
 #include "globals.h"
-#include "win32def.h"
 
 #include "Plugin.h"
 #include "Holder.h"
@@ -81,7 +80,7 @@ public:
 class GEM_EXPORT Channel {
 public:
 	Channel(const char *label) : volume(100), reverb(0.0f)
-		{ strncpy(name, label, sizeof(name)-1); name[sizeof(name)-1] = '\0'; }
+		{ strlcpy(name, label, sizeof(name)); }
 	~Channel() {}
 
 	const char *getName() const { return name; }

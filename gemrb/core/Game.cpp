@@ -24,7 +24,6 @@
 
 #include "defsounds.h"
 #include "strrefs.h"
-#include "win32def.h"
 
 #include "DisplayMessage.h"
 #include "GameData.h"
@@ -2280,7 +2279,7 @@ void Game::dump() const
 		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
 	}
 	int hours = GameTime/core->Time.hour_size;
-	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime, hours/24, hours%24);
+	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime.load(), hours/24, hours%24);
 	buffer.appendFormatted("CombatCounter: %d\n", (int) CombatCounter);
 
 	buffer.appendFormatted("Party size: %d\n", (int) PCs.size());

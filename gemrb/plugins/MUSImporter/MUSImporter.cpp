@@ -20,8 +20,6 @@
 
 #include "MUSImporter.h"
 
-#include "win32def.h"
-
 #include "Audio.h"
 #include "GameData.h" // For ResourceHolder
 #include "Interface.h"
@@ -182,8 +180,7 @@ void MUSImporter::Start(bool lockAudioThread)
 {
 	if (!Playing) {
 		PLpos = 0;
-		if (playlist.size() == 0)
-			return;
+		if (playlist.empty()) return;
 		if (playlist[PLpos].PLLoop[0] != 0) {
 			for (unsigned int i = 0; i < playlist.size(); i++) {
 				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
@@ -206,8 +203,7 @@ void MUSImporter::Start(bool lockAudioThread)
 void MUSImporter::End()
 {
 	if (Playing) {
-		if (playlist.size() == 0)
-			return;
+		if (playlist.empty()) return;
 		if (playlist[PLpos].PLEnd[0] != 0) {
 			if (stricmp( playlist[PLpos].PLEnd, "end" ) != 0)
 				PlayMusic(playlist[PLpos].PLEnd, true);

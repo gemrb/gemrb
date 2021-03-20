@@ -44,8 +44,6 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
-#include "win32def.h"
-
 #include "Game.h"
 #include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"
@@ -644,7 +642,7 @@ static const ActionLink actionnames[] = {
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
 	{"exportparty", GameScript::ExportParty, 0},
-	{"face", GameScript::Face,AF_BLOCKING},
+	{"face", GameScript::Face, AF_BLOCKING|AF_ALIVE},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
 	{"fadefromblack", GameScript::FadeFromColor, AF_BLOCKING}, //probably the same
@@ -957,7 +955,7 @@ static const ActionLink actionnames[] = {
 	{"shout", GameScript::Shout, 0},
 	{"sinisterpoof", GameScript::CreateVisualEffect, 0},
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
-	{"smallwaitrandom", GameScript::SmallWaitRandom,AF_BLOCKING},
+	{"smallwaitrandom", GameScript::SmallWaitRandom, AF_BLOCKING|AF_ALIVE},
 	{"soundactivate", GameScript::SoundActivate, 0},
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
@@ -1044,7 +1042,7 @@ static const ActionLink actionnames[] = {
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
 	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},//iwd2
-	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING},
+	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING|AF_ALIVE},
 	{"weather", GameScript::Weather, 0},
 	{"xequipitem", GameScript::XEquipItem, 0},
 	{ NULL,NULL, 0}

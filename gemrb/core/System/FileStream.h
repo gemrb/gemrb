@@ -40,17 +40,72 @@ namespace GemRB {
  * Reads and writes data from/to files on a filesystem
  */
 
+struct File {
+private:
+	FILE* file = nullptr;
+public:
+	File(FILE* f) : file(f) {}
+	File() = default;
+	File(const File&) = delete;
+	File(File&& f) noexcept {
+		file = f.file;
+		f.file = nullptr;
+	}
+	~File() {
+		if (file) fclose(file);
+	}
+	
+	File& operator=(const File&) = delete;
+	File& operator=(File&& f) noexcept {
+		if (&f != this) {
+			std::swap(file, f.file);
+		}
+		return *this;
+	}
+
+	size_t Length() {
+		fseek(file, 0, SEEK_END);
+		size_t size = ftell(file);
+		fseek(file, 0, SEEK_SET);
+		return size;
+	}
+	bool OpenRO(const char *name) {
+		return (file = fopen(name, "rb"));
+	}
+	bool OpenRW(const char *name) {
+		return (file = fopen(name, "r+b"));
+	}
+	bool OpenNew(const char *name) {
+		return (file = fopen(name, "wb"));
+	}
+	size_t Read(void* ptr, size_t length) {
+		return fread(ptr, 1, length, file);
+	}
+	size_t Write(const void* ptr, size_t length) {
+		return fwrite(ptr, 1, length, file);
+	}
+	bool SeekStart(int offset)
+	{
+		return !fseek(file, offset, SEEK_SET);
+	}
+	bool SeekCurrent(int offset)
+	{
+		return !fseek(file, offset, SEEK_CUR);
+	}
+	bool SeekEnd(int offset)
+	{
+		return !fseek(file, offset, SEEK_END);
+	}
+};
+
 class GEM_EXPORT FileStream : public DataStream {
 private:
-#ifdef _DEBUG
-	static int FileStreamPtrCount;
-#endif
-	struct File;
-	File* str;
+	File str;
 	bool opened, created;
 public:
+	FileStream(File&&);
 	FileStream(void);
-	~FileStream(void);
+
 	DataStream* Clone();
 
 	bool Open(const char* filename);

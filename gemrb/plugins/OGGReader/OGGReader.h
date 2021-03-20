@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef ACMREADER_H
-#define ACMREADER_H
+#ifndef OGGREADER_H
+#define OGGREADER_H
 
 #include "SoundMgr.h"
 #include "System/DataStream.h"

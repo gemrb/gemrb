@@ -20,8 +20,6 @@
 
 #include "Font.h"
 
-#include "win32def.h"
-
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"

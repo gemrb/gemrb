@@ -23,8 +23,6 @@
 #include "GUI/EventMgr.h"
 #include "GUI/Window.h"
 
-#include "win32def.h"
-
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "ScriptEngine.h"

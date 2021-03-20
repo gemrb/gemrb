@@ -174,9 +174,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	music_memory = (short*) malloc(ACM_BUFFERSIZE);
 	MusicSource = num_streams = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
-	musicMutex = SDL_CreateMutex();
 	ambim = NULL;
-	musicThread = NULL;
 	stayAlive = false;
 	hasReverbProperties = false;
 #ifdef HAVE_OPENAL_EFX_H
@@ -242,12 +240,8 @@ bool OpenALAudioDriver::Init(void)
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
 
 	stayAlive = true;
-#if	SDL_VERSION_ATLEAST(1, 3, 0)
-	/* as of changeset 3a041d215edc SDL_CreateThread has a 'name' parameter */
-	musicThread = SDL_CreateThread( MusicManager, "OpenALAudio", this );
-#else
-	musicThread = SDL_CreateThread( MusicManager, this );
-#endif
+
+	musicThread = std::thread(&OpenALAudioDriver::MusicManager, this);
 
 	if (!InitEFX()) {
 		Log(MESSAGE, "OpenAL", "EFX not available.");
@@ -347,10 +341,9 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	}
 
 	stayAlive = false;
-// AmigaOS4 can't kill threads and would just wait forever
-#ifndef __amigaos4__
-	SDL_WaitThread(musicThread, NULL);
-#endif
+	
+	// AmigaOS4 should be built with -athread=native or this may not work
+	musicThread.join();
 
 	for(int i =0; i<num_streams; i++) {
 		streams[i].ForceClear();
@@ -376,9 +369,6 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		alcCloseDevice (device);
 	}
 	alutContext = NULL;
-
-	SDL_DestroyMutex(musicMutex);
-	musicMutex = NULL;
 
 	free(music_memory);
 
@@ -568,11 +558,11 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 	ieDword volume;
 
 	if (flags & GEM_SND_VOL_MUSIC) {
-		SDL_LockMutex(musicMutex);
+		musicMutex.lock();
 		core->GetDictionary()->Lookup("Volume Music", volume);
 		if (MusicSource && alIsSource(MusicSource))
 			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
-		SDL_UnlockMutex(musicMutex);
+		musicMutex.unlock();
 	}
 
 	if (flags & GEM_SND_VOL_AMBIENTS) {
@@ -588,7 +578,7 @@ bool OpenALAudioDriver::CanPlay()
 
 void OpenALAudioDriver::ResetMusics()
 {
-	SDL_LockMutex(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	MusicPlaying = false;
 	if (MusicSource && alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
@@ -603,24 +593,23 @@ void OpenALAudioDriver::ResetMusics()
 			}
 		}
 	}
-	SDL_UnlockMutex(musicMutex);
 }
 
 bool OpenALAudioDriver::Play()
 {
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	if (!MusicReader) return false;
 
-	if (!MusicPlaying)
-		MusicPlaying = true;
+	MusicPlaying = true;
 
 	return true;
 }
 
 bool OpenALAudioDriver::Stop()
 {
-	SDL_LockMutex(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
+	
 	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_UnlockMutex(musicMutex);
 		return false;
 	}
 	alSourceStop( MusicSource );
@@ -629,55 +618,41 @@ bool OpenALAudioDriver::Stop()
 	alDeleteSources( 1, &MusicSource );
 	checkALError("Unable to delete music source", WARNING);
 	MusicSource = 0;
-	SDL_UnlockMutex(musicMutex);
 	return true;
 }
 
 bool OpenALAudioDriver::Pause()
 {
-	SDL_LockMutex(musicMutex);
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_UnlockMutex( musicMutex );
 		return false;
 	}
 	alSourcePause(MusicSource);
 	checkALError("Unable to pause music source", WARNING);
 	MusicPlaying = false;
-	SDL_UnlockMutex(musicMutex);
 	((AmbientMgrAL*) ambim)->deactivate();
-#ifdef ANDROID
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
-	al_android_pause_playback(); //call AudioTrack.pause() from JNI
-#endif
-#endif
+
 	return true;
 }
 
 bool OpenALAudioDriver::Resume()
 {
-#ifdef ANDROID
-#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(1,3,0)
-	al_android_resume_playback(); //call AudioTrack.play() from JNI
-#endif
-#endif
-	SDL_LockMutex(musicMutex);
-	if (!MusicSource || !alIsSource( MusicSource )) {
-		SDL_UnlockMutex( musicMutex );
-		return false;
+	{
+		std::lock_guard<std::recursive_mutex> l(musicMutex);
+		if (!MusicSource || !alIsSource( MusicSource )) {
+			return false;
+		}
+		alSourcePlay(MusicSource);
+		checkALError("Unable to resume music source", WARNING);
+		MusicPlaying = true;
 	}
-	alSourcePlay(MusicSource);
-	checkALError("Unable to resume music source", WARNING);
-	MusicPlaying = true;
-	SDL_UnlockMutex(musicMutex);
 	((AmbientMgrAL*) ambim)->activate();
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThread)
+int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 {
-	if (lockAudioThread) {
-		SDL_LockMutex(musicMutex);
-	}
+	std::lock_guard<std::recursive_mutex> l(musicMutex);
 
 	// Free old MusicReader
 	MusicReader = newMusic;
@@ -688,9 +663,6 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThr
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 		if (checkALError("Unable to create music buffers", ERROR)) {
-			if (lockAudioThread) {
-				SDL_UnlockMutex(musicMutex);
-			}
 			return -1;
 		}
 	}
@@ -699,9 +671,6 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThr
 		alGenSources( 1, &MusicSource );
 		if (checkALError("Unable to create music source", ERROR)) {
 			alDeleteBuffers(MUSICBUFFERS, MusicBuffer);
-			if (lockAudioThread) {
-				SDL_UnlockMutex(musicMutex);
-			}
 			return -1;
 		}
 
@@ -721,10 +690,6 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic, bool lockAudioThr
 		alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
 		alSourcei( MusicSource, AL_LOOPING, 0 );
 		checkALError("Unable to set music parameters", WARNING);
-	}
-
-	if (lockAudioThread) {
-		SDL_UnlockMutex(musicMutex);
 	}
 
 	return 0;
@@ -926,8 +891,8 @@ int OpenALAudioDriver::MusicManager(void* arg)
 	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
-		SDL_Delay(30);
-		StackLock l(driver->musicMutex, "musicMutex in PlayListManager()");
+		std::this_thread::sleep_for(std::chrono::milliseconds(30));
+		std::lock_guard<std::recursive_mutex> l(driver->musicMutex);
 		if (driver->MusicPlaying) {
 			ALint state;
 			alGetSourcei( driver->MusicSource, AL_SOURCE_STATE, &state );

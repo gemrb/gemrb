@@ -20,8 +20,6 @@
 
 #include "ITMImporter.h"
 
-#include "win32def.h"
-
 #include "EffectMgr.h"
 #include "Interface.h"
 #include "PluginMgr.h"
@@ -324,7 +322,7 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->Read( &eh->AttackType,1 );
 	str->Read( &eh->IDReq,1 );
 	str->Read( &eh->Location,1 );
-	str->Read( &eh->unknown1,1 );
+	str->Read(&eh->AltDiceSides, 1);
 	str->ReadResRef( eh->UseIcon );
 	str->Read( &eh->Target,1 );
 	str->Read( &tmpByte,1 );
@@ -333,8 +331,10 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 	eh->TargetNumber = tmpByte;
 	str->ReadWord( &eh->Range );
-	str->ReadWord( &ProjectileType );
-	str->ReadWord( &eh->Speed );
+	str->Read(&ProjectileType, 1);
+	str->Read(&eh->AltDiceThrown, 1);
+	str->Read(&eh->Speed, 1);
+	str->Read(&eh->AltDamageBonus, 1);
 	str->ReadWord( &eh->THAC0Bonus );
 	str->ReadWord( &eh->DiceSides );
 	str->ReadWord( &eh->DiceThrown );

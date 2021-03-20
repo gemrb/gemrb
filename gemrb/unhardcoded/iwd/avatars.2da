@@ -262,7 +262,7 @@
 0xE0C0    MTSN      MTSN       MTSN       MTSN       9          2          1          *
 0xE0D0    MUMB      MUMB       MUMB       MUMB       9          2          1          *
 0xE0E0    MCOR      MCOR       MCOR       MCOR       9          3          1          *
-0xE0F0    MGIC      MGIC       MGIC       MGIC       9          2          1          *
+0xE0F0    MGIC      MGIC       MGIC       MGIC       9          3          1          *
 0xE0F1    MGLA      MGLA       MGLA       MGLA       9          2          1          *
 0xE108    MCYC      MCYC       MCYC       MCYC       9          4          1          *
 0xE118    METN      METN       METN       METN       9          4          1          *
@@ -272,7 +272,7 @@
 0xE218    MELE      MELE       MELE       MELE       9          4          1          *
 0xE228    MELF      MELF       MELF       MELF       9          4          1          *
 0xE238    MELW      MELW       MELW       MELW       9          4          1          *
-0xE249    MHAR      MHAR       MHAR       MHAR       9          2          1          *
+0xE249    MHAR      MHAR       MHAR       MHAR       9          3          1          *
 0xE252    MWWE      MWWE       MWWE       MWWE       9          2          1          *
 0xE269    MFEY      MFEY       MFEY       MFEY       9          2          1          *
 0xE278    MDTR      MDTR       MDTR       MDTR       9          3          1          *

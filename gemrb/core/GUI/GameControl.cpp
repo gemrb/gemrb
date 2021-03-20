@@ -20,7 +20,6 @@
 #include "GUI/GameControl.h"
 
 #include "strrefs.h"
-#include "win32def.h"
 
 #include "CharAnimations.h"
 #include "DialogHandler.h"
@@ -1606,7 +1605,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	action->pointParameter=tgt;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			sprintf(action->string0Parameter,"%.8s",spellName);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName);
 		} else {
 			CREMemorizedSpell *si;
 			//spell casting at target
@@ -1616,7 +1615,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 				delete action;
 				return;
 			}
-			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -1673,7 +1672,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	Action* action = GenerateActionDirect( Tmp, tgt);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			sprintf(action->string0Parameter,"%.8s",spellName);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName);
 		} else {
 			const CREMemorizedSpell *si;
 			//spell casting at target
@@ -1683,7 +1682,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 				delete action;
 				return;
 			}
-			sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -2040,7 +2039,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short B
 				&& (target_types&GA_POINT)) {
 				//the player is using an item or spell on the ground
 				TryToCast(pc, p);
-				goto formation_handling;
+				return;
 			}
 			doMove = (!actor && target_mode == TARGET_MODE_NONE);
 		} else if (Button & GEM_MB_MENU) {

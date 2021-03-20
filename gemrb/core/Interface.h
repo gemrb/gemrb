@@ -35,6 +35,7 @@
 #include "Holder.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
+#include "System/VFS.h"
 
 #include <map>
 #include <string>
@@ -825,7 +826,7 @@ public:
 	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
 	unsigned int FogOfWar;
-	bool CaseSensitive = true, SkipIntroVideos = false, DrawFPS = false, Logging = true;
+	bool CaseSensitive = true, SkipIntroVideos = false, DrawFPS = false;
 	bool TouchScrollAreas, UseSoftKeyboard;
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
