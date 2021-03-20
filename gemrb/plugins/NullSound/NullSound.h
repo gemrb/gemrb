@@ -32,7 +32,7 @@ public:
 	bool Init(void);
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0);
-	int CreateStream(Holder<SoundMgr>, bool lockAudioThread);
+	int CreateStream(Holder<SoundMgr>);
 	bool Play();
 	bool Stop();
 	bool Pause();

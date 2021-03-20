@@ -33,7 +33,7 @@ public:
 	virtual void End(void) = 0;
 	virtual void HardEnd(void) = 0;
 	/** Start the PlayList Music Execution */
-	virtual void Start(bool lockAudioThread) = 0;
+	virtual void Start(void) = 0;
 	/** Initializes the PlayList Manager */
 	virtual bool Init();
 	/** Loads a PlayList for playing */

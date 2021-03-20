@@ -54,8 +54,8 @@ private:
 	unsigned int lastSound;
 	ResourceManager manager;
 private:
-	void PlayMusic(int pos, bool lockAudioThread);
-	void PlayMusic(char* name, bool lockAudioThread);
+	void PlayMusic(int pos);
+	void PlayMusic(char* name);
 public:
 	MUSImporter();
 	~MUSImporter();
@@ -69,7 +69,7 @@ public:
 	void End();
 	void HardEnd();
 	/** Start the PlayList Music Execution */
-	void Start(bool lockAudioThread);
+	void Start();
 	/** Plays the Next Entry */
 	void PlayNext();
 	/** Returns whether music is currently playing */
