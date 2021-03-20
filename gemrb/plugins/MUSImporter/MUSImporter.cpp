@@ -240,7 +240,7 @@ int MUSImporter::SwitchPlayList(const char* name, bool Hard)
 		}
 	}
 
-	if (OpenPlaylist(name)) {
+	if (OpenPlaylist( name )) {
 		Start();
 		return 0;
 	}
