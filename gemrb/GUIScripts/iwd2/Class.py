@@ -63,6 +63,14 @@ def OnLoad():
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	ClassWindow = GemRB.LoadWindow(2, "GUICG")
 	CharOverview.PositionCharGenWin(ClassWindow)
+
+	DoneButton = ClassWindow.GetControl (0)
+	TextAreaControl = ClassWindow.GetControl (16)
+	BackButton = ClassWindow.GetControl (17)
+
+	SetupClassList ()
+
+def SetupClassList():
 	rid = CommonTables.Races.FindValue(3, GemRB.GetVar('BaseRace'))
 	RaceName = CommonTables.Races.GetRowName(rid)
 
@@ -71,7 +79,7 @@ def OnLoad():
 	for i in range(1,ClassCount):
 		ClassName = CommonTables.Classes.GetRowName(i-1)
 		Allowed = CommonTables.Classes.GetValue(ClassName, "CLASS")
-		if Allowed > 0:
+		if Allowed > 0: # skip subclasses
 			continue
 		Button = ClassWindow.GetControl(j+2)
 		j = j+1
@@ -97,17 +105,11 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS,  ClassPress)
 		Button.SetVarAssoc("Class", i)
 
-	BackButton = ClassWindow.GetControl(17)
 	BackButton.SetText(15416)
 	BackButton.MakeEscape()
 
-	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.MakeDefault()
-
-	ScrollBarControl = ClassWindow.GetControl(15)
-
-	TextAreaControl = ClassWindow.GetControl(16)
 
 	Class = GemRB.GetVar("Class")-1
 	if Class<0:
@@ -167,9 +169,7 @@ def ClassPress2():
 
 def BackPress2():
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	if ClassWindow:
-		ClassWindow.Unload()
-	OnLoad()
+	SetupClassList ()
 	return
 
 def BackPress():
