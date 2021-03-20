@@ -566,6 +566,10 @@ void Button::SetText(const String& string)
 /** Refresh a button from a given radio button group */
 void Button::UpdateState(unsigned int Sum)
 {
+	if (IsDisabled()) {
+		return;
+	}
+
 	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 		//radio button, exact value
 		ToggleState = ( Sum == GetValue() );
