@@ -438,7 +438,6 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
-//This one is used for movies and ambients.
 int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 			ieWord gain, bool point, int ambientRange)
 {
@@ -462,7 +461,6 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	MusicPlaying = false;
 	curr_buffer_offset = 0;
 	Mix_HookMusic((void (*)(void*, Uint8*, int))buffer_callback, this);
-
 	return 0;
 }
 

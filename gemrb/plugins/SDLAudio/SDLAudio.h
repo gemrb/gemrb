@@ -24,8 +24,8 @@
 #include "Audio.h"
 #include "LRUCache.h"
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
 #include <SDL_mixer.h>
 
