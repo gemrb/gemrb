@@ -64,7 +64,7 @@ def OnLoad():
 	RaceWindow = GemRB.LoadWindow(15, "GUICG")
 	CharGenCommon.PositionCharGenWin (RaceWindow)
 	RaceTable = GemRB.LoadTable(TableName)
-	RaceCount = RaceTable.GetRowCount()-LISTSIZE+1
+	RaceCount = RaceTable.GetRowCount()-LISTSIZE
 	if RaceCount<0:
 		RaceCount=0
 

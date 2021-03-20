@@ -22,6 +22,7 @@
 
 #include "Interface.h" // for LoadInitialValues
 #include "System/FileStream.h" // for LoadInitialValues
+#include "System/VFS.h"
 
 namespace GemRB {
 

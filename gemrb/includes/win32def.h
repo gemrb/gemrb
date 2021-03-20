@@ -18,52 +18,28 @@
  *
  */
 
-/**
- * @file win32def.h
- * Some global definitions, mostly for Un*x vs. MS Windows compatibility
- * @author The GemRB Project
- */
-
+// TODO: move this to platforms/windows
 
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
-#include "exports.h"
+#define WIN32_LEAN_AND_MEAN
 
-#include "System/String.h"
-
-#ifdef WIN32
-# define WIN32_LEAN_AND_MEAN
-
-# ifndef NOMINMAX
-# define NOMINMAX
-# endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 
 #define UNICODE
 #define _UNICODE
-
 #define NOCOLOR
 #define NOGDI
+#define _USE_MATH_DEFINES
 
-# include <windows.h>
-
-#else //WIN32
-# ifdef HAVE_CONFIG_H
-#  include <config.h>
-# endif
-# include <cstdio>
-# include <cstdlib>
-
-#endif //WIN32
-
-#include "System/VFS.h"
-
-#ifndef M_PI
-#define M_PI    3.14159265358979323846 // pi
+#ifdef _DEBUG
+#include <crtdbg.h>
 #endif
-#ifndef M_PI_2
-#define M_PI_2  1.57079632679489661923 // pi/2
-#endif
+
+#include <windows.h>
 #ifndef M_PI_4
 #define 	M_PI_4   0.78539816339744830962
 #endif
@@ -73,5 +49,4 @@
 #undef GetObject
 #endif
 
-#include "System/Logging.h"
 #endif  //! WIN32DEF_H

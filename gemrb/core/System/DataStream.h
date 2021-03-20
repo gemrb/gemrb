@@ -28,8 +28,7 @@
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
 
-#include "exports.h"
-#include "globals.h"
+#include "Platform.h"
 
 namespace GemRB {
 

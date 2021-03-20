@@ -45,10 +45,6 @@
 #include <cassert>
 #include <cstdio>
 
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
-
 using namespace GemRB;
 
 static const int ff_wma_critical_freqs[25] = {

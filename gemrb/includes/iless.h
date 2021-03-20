@@ -19,7 +19,7 @@
 #ifndef ILESS_H
 #define ILESS_H
 
-#include "win32def.h" //for stricmp
+#include "Platform.h" //for stricmp
 
 namespace GemRB {
 

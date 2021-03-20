@@ -24,7 +24,6 @@
 #include "MoviePlayer.h"
 
 #include "globals.h"
-#include "win32def.h"
 
 // FIXME: This has to be included last, since it defines int*_t, which causes
 // mingw g++ 4.5.0 to choke.

@@ -39,7 +39,7 @@
 
 #include "RGBAColor.h"
 #include "exports.h"
-#include "win32def.h"
+#include "globals.h"
 
 #include "Callback.h"
 #include "GUI/View.h"

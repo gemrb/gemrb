@@ -22,8 +22,6 @@
 
 #include "VEFObject.h"
 
-#include "win32def.h"
-
 #define YESNO(x) ( (x)?"Yes":"No")
 
 #include "Game.h"

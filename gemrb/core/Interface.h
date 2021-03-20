@@ -43,6 +43,7 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
+#include "System/VFS.h"
 
 #include <array>
 #include <map>

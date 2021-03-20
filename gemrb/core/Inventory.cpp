@@ -23,7 +23,6 @@
 
 #include "Inventory.h"
 
-#include "win32def.h"
 #include "strrefs.h"
 
 #include "CharAnimations.h"

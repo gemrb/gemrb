@@ -20,8 +20,6 @@
 
 #include "ImageMgr.h"
 
-#include "win32def.h"
-
 #include "ImageFactory.h"
 #include "Interface.h"
 

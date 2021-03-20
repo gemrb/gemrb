@@ -22,14 +22,12 @@
 // Python.h needs to be included first.
 #include "GUIScript.h"
 
-#include "win32def.h" // For Logging
-
-
 #include "Callback.h"
 #include "Interface.h"
 
 #include "GUI/Control.h"
 #include "GUI/GUIScriptInterface.h"
+#include "System/Logging.h"
 
 namespace GemRB {
 

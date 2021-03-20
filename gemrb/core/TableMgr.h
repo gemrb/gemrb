@@ -34,6 +34,8 @@
 
 namespace GemRB {
 
+class DataStream;
+
 /**
  * @class TableMgr
  * Abstract loader for Table objects (.2DA files)

@@ -20,8 +20,6 @@
 
 #include "ITMImporter.h"
 
-#include "win32def.h"
-
 #include "EffectMgr.h"
 #include "Interface.h"
 #include "PluginMgr.h"

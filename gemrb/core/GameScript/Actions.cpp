@@ -24,7 +24,6 @@
 #include "GameScript/Matching.h"
 
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "AmbientMgr.h"
 #include "CharAnimations.h"

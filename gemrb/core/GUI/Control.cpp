@@ -22,9 +22,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/Window.h"
 
-#include "win32def.h"
 #include "ie_cursors.h"
-
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "Sprite2D.h"

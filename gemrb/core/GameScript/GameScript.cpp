@@ -44,8 +44,6 @@
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h"
 
-#include "win32def.h"
-
 #include "Game.h"
 #include "GUI/GameControl.h" // just for DF_POSTPONE_SCRIPTS
 #include "GameData.h"

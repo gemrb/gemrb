@@ -26,10 +26,6 @@
 #include <cwctype>
 #include <string>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #ifndef WIN32
 # define stricmp strcasecmp
 # define strnicmp strncasecmp

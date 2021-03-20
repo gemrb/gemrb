@@ -23,7 +23,6 @@
 #include "Video.h"
 
 #include "globals.h"
-#include "win32def.h"
 
 namespace GemRB {
 

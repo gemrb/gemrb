@@ -1629,7 +1629,7 @@ def RacialEnemySelect():
 	GemRB.SetVar ("RacialEnemyIndex", 0)
 	GemRB.SetVar ("HatedRace", 0)
 	RacialEnemyScrollBar = RacialEnemyWindow.GetControl (1)
-	RacialEnemyScrollBar.SetVarAssoc ("RacialEnemyIndex", RacialEnemyCount - 5)
+	RacialEnemyScrollBar.SetVarAssoc ("RacialEnemyIndex", RacialEnemyCount - 6)
 	RacialEnemyScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRacialEnemies)
 
 	RacialEnemyTextArea = RacialEnemyWindow.GetControl (8)

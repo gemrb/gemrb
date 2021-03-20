@@ -21,7 +21,6 @@
 #include "Window.h"
 
 #include "GUI/GUIScriptInterface.h"
-
 #include "Interface.h"
 #include "ScrollBar.h"
 

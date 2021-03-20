@@ -20,8 +20,6 @@
 
 #include "WEDImporter.h"
 
-#include "win32def.h"
-
 #include "GameData.h"
 #include "Interface.h"
 #include "PluginMgr.h"
@@ -29,11 +27,6 @@
 
 #include <cmath>
 #include <iterator>
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#undef swab
-#endif
 
 #include "System/swab.h"
 

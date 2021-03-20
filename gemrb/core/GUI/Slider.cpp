@@ -20,8 +20,6 @@
 
 #include "GUI/Slider.h"
 
-#include "win32def.h"
-
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/Window.h"

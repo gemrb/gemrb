@@ -38,11 +38,6 @@
 #endif
 
 #ifdef WIN32
-#include "win32def.h"
-#ifdef _DEBUG
-#include <stdlib.h>
-#include <crtdbg.h>
-#endif
 
 BOOL WINAPI DllEntryPoint(HINSTANCE, DWORD, LPVOID);
 BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,

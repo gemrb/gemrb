@@ -21,7 +21,6 @@
 #include "MOSImporter.h"
 
 #include "RGBAColor.h"
-#include "win32def.h"
 
 #include "FileCache.h"
 #include "Interface.h"

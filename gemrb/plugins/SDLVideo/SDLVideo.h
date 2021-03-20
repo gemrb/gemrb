@@ -24,7 +24,6 @@
 #include "Video.h"
 
 #include "GUI/EventMgr.h"
-#include "win32def.h"
 
 #include "DPadSoftKeyboard.h"
 #include "SDLSurfaceDrawing.h"

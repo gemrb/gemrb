@@ -23,8 +23,6 @@
 
 #include "ScriptedAnimation.h"
 
-#include "win32def.h"
-
 #include "Animation.h"
 #include "AnimationFactory.h"
 #include "Audio.h"

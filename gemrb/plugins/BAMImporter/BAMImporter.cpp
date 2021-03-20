@@ -21,8 +21,6 @@
 
 #include "BAMImporter.h"
 
-#include "win32def.h"
-
 #include "FileCache.h"
 #include "GameData.h"
 #include "Interface.h"
@@ -30,11 +28,6 @@
 #include "BAMSprite2D.h"
 #include "Video.h"
 #include "System/FileStream.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#undef swab
-#endif
 
 #include "System/swab.h"
 

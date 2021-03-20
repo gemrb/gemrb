@@ -19,7 +19,6 @@
 #include "PluginLoader.h"
 
 #include "SClassID.h" // For PluginID
-#include "win32def.h"
 
 #include "Interface.h"
 #include "PluginMgr.h"

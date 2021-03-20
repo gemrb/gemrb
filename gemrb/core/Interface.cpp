@@ -18,17 +18,12 @@
 *
 */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
 #include "Interface.h"
 
 #include "defsounds.h" // for DS_TOOLTIP
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
-#include "win32def.h"
 #include "ie_cursors.h"
 
 #include "ActorMgr.h"
@@ -83,10 +78,6 @@
 #include "System/FileStream.h"
 #include "System/FileFilters.h"
 #include "System/StringBuffer.h"
-
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #include <vector>
 
@@ -321,8 +312,7 @@ Interface::~Interface(void)
 
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
-	// delete gamectrl;
-	delete game;
+	assert(game == nullptr);
 	delete calendar;
 	delete worldmap;
 	delete keymap;
@@ -982,6 +972,7 @@ void Interface::Main()
 			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
+	QuitGame(0);
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)

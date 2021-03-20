@@ -1,6 +1,5 @@
-
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2021 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,29 +14,46 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ *
+ *
  */
 
-#ifndef LOGGER_WIN32_H
-#define LOGGER_WIN32_H
+#ifndef PLATFORM_H
+#define PLATFORM_H
 
-#include "System/Logger/Stdio.h"
-
-#include <windows.h>
-
-namespace GemRB {
-
-class Win32ConsoleLogger : public StdioLogWriter {
-public:
-	Win32ConsoleLogger(log_level level, bool useColor);
-	~Win32ConsoleLogger();
-
-private:
-	HANDLE hConsole;
-	DWORD dwMode = 0;
-};
-
-Logger::WriterPtr createWin32ConsoleLogger();
-
-}
-
+#ifdef HAVE_CONFIG_H
+	#include <config.h>
+#else
+	// we need this fallback for Android and anyone else skipping
+	// cmake, where the proper sizes are checked for
+	#ifndef SIZEOF_INT
+	#define SIZEOF_INT 4
+	#endif
+	#ifndef SIZEOF_LONG_INT
+	#define SIZEOF_LONG_INT 4
+	#endif
 #endif
+
+#include "exports.h"
+
+#ifndef _MAX_PATH
+	#ifdef WIN32
+		#define _MAX_PATH 260
+	#else
+		#define _MAX_PATH FILENAME_MAX
+	#endif
+#endif
+
+#ifdef WIN32
+	#include "win32def.h"
+#elif defined(HAVE_UNISTD_H)
+	#include <unistd.h>
+#endif
+
+#include <cstdio>
+#include <cstdlib>
+
+#include "System/Logging.h"
+#include "System/String.h"
+
+#endif  //! PLATFORM_H

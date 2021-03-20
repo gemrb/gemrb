@@ -20,7 +20,6 @@
 #define PYTHON_CONVERSIONS_H
 
 // NOTE: Python.h has to be included first.
-
 #include "GUIScript.h"
 
 #include "Region.h"

@@ -29,7 +29,6 @@
 #include "strrefs.h"
 #include "opcode_params.h"
 #include "voodooconst.h"
-#include "win32def.h"
 
 #include "Bitmap.h"
 #include "DataFileMgr.h"

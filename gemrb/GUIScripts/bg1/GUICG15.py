@@ -61,7 +61,7 @@ def OnLoad():
 	
 	RaceWindow = GemRB.LoadWindow(15, "GUICG")
 	RacialEnemyTable = GemRB.LoadTable(TableName)
-	RaceCount = RacialEnemyTable.GetRowCount()-LISTSIZE+1
+	RaceCount = RacialEnemyTable.GetRowCount()-LISTSIZE
 	if RaceCount<0:
 		RaceCount=0
 

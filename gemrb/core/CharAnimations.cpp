@@ -20,8 +20,6 @@
 
 #include "CharAnimations.h"
 
-#include "win32def.h"
-
 #include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "Game.h"

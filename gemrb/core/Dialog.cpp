@@ -20,8 +20,6 @@
 
 #include "Dialog.h"
 
-#include "win32def.h"
-
 #include "GameScript/GameScript.h"
 #include "RNG.h"
 

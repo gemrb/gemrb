@@ -23,7 +23,6 @@
 
 #include "Item.h"
 
-#include "win32def.h"
 #include "voodooconst.h"
 
 #include "Interface.h"

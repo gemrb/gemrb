@@ -20,8 +20,6 @@
 
 #include "Animation.h"
 
-#include "win32def.h"
-
 #include "Game.h"
 #include "Interface.h"
 #include "Map.h"

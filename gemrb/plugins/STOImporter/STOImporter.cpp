@@ -20,8 +20,6 @@
 
 #include "STOImporter.h"
 
-#include "win32def.h"
-
 #include "DialogMgr.h"
 #include "GameData.h"
 #include "Interface.h"
