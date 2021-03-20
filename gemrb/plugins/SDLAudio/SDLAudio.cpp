@@ -106,7 +106,7 @@ bool SDLAudio::Init(void)
 	}
 
 	int result = Mix_AllocateChannels(MIXER_CHANNELS);
-	if( result < 0 ) {
+	if (result < 0) {
 		Log(ERROR, "SDLAudio", "Unable to allocate mixing channels: %s\n", SDL_GetError());
 		return false;
 	}
