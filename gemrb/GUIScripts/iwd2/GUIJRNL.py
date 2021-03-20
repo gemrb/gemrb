@@ -92,7 +92,7 @@ def JournalPrevSectionPress ():
 
 	if Chapter > 0:
 		Chapter = Chapter - 1
-		UpdateJournalWindow ()
+		UpdateJournalWindow (JournalWindow)
 
 
 ###################################################
@@ -102,7 +102,7 @@ def JournalNextSectionPress ():
 	#if GemRB.GetJournalSize (Chapter + 1) > 0:
 	if Chapter < GemRB.GetGameVar("chapter"):
 		Chapter = Chapter + 1
-		UpdateJournalWindow ()
+		UpdateJournalWindow (JournalWindow)
 
 
 ###################################################
