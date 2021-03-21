@@ -324,6 +324,7 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 			SDL_UpdateTexture(*texture, nullptr, temp->pixels, temp->pitch);
 			SDL_FreeSurface(temp);
 		}
+		staleTexture = false;
 	}
 	return *texture;
 }
