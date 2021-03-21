@@ -143,10 +143,10 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 	int mixerLen = len;
 
 	SDLAudio *driver = (SDLAudio *)udata;
-	driver->MusicMutex.lock();
 
 	do {
-		// TODO: conversion? mutexes? sanity checks? :)
+		std::lock_guard<std::recursive_mutex> l(driver->MusicMutex);
+
 		int num_samples = len / 2;
 		int cnt = driver->MusicReader->read_samples(( short* ) stream, num_samples);
 
@@ -169,7 +169,6 @@ void SDLAudio::music_callback(void *udata, uint8_t *stream, int len)
 		}
 	} while(true);
 
-	driver->MusicMutex.unlock();
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
@@ -362,6 +361,8 @@ bool SDLAudio::Stop()
 
 bool SDLAudio::Play()
 {
+	std::lock_guard<std::recursive_mutex> l(MusicMutex);
+
 	if (!MusicReader) {
 		return false;
 	}
@@ -409,9 +410,10 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 
 	SDLAudio *driver = (SDLAudio *)udata;
 	unsigned int remaining = len;
-	driver->MusicMutex.lock();
 
 	while (remaining && !driver->buffers.empty()) {
+		std::lock_guard<std::recursive_mutex> l(driver->MusicMutex);
+
 		unsigned int avail = driver->buffers[0].size - driver->curr_buffer_offset;
 		if (avail > remaining) {
 			// more data available in this buffer than we need
@@ -429,12 +431,11 @@ void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)
 		remaining -= avail;
 		stream = stream + avail;
 	}
+
 	if (remaining > 0) {
 		// underrun (out of buffers)
 		memset(stream, 0, remaining);
 	}
-
-	driver->MusicMutex.unlock();	
 	SetAudioStreamVolume(mixerStream, mixerLen, MIX_MAX_VOLUME * volume / 100);
 }
 
