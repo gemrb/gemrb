@@ -64,7 +64,8 @@ def UpdateJournalWindow (Window):
 	# text area
 	Text = Window.GetControl (1)
 	Text.Clear ()
-	
+
+	JournalText = ""
 	for i in range (GemRB.GetJournalSize (Chapter)):
 		je = GemRB.GetJournalEntry (Chapter, i)
 
@@ -79,7 +80,9 @@ def UpdateJournalWindow (Window):
 		GemRB.SetToken("HOUR",str(hours%24 ) )
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken("YEAR",year)
-		Text.Append ("[color=FFFF00]" + GemRB.GetString(15980) + "[/color]\n" + GemRB.GetString(je['Text']) + "\n\n")
+		JournalText = JournalText + "[color=FFFF00]" + GemRB.GetString(15980) + "[/color]\n"
+		JournalText = JournalText + GemRB.GetString(je['Text']) + "\n\n"
+	Text.Append (JournalText)
 
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateJournalWindow)
 OpenJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.OpenWindowOnce, InitJournalWindow, UpdateJournalWindow)
