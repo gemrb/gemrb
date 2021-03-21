@@ -152,9 +152,7 @@ def UpdateLogWindow (JournalWindow):
 		else:
 			JournalText = "\n" + je2[1] + "\n"
 
-		Text.Append (JournalTitle + GemRB.GetString(15980))
-		Text.Append (JournalText)
-
+		Text.Append (JournalTitle + GemRB.GetString(15980) + JournalText)
 	return
 
 ToggleJournalWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIJRNL", GUICommonWindows.ToggleWindow, InitJournalWindow, UpdateLogWindow)
