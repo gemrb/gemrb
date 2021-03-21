@@ -1995,11 +1995,6 @@ void CharAnimations::AddVHRSuffix(char *dest, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat(dest, "g16");
-			strcpy( EquipData->Suffix, "g1" );
-			Cycle += 54;
-			break;
-
 		case IE_ANI_TWITCH:
 			strcat(dest, "g16");
 			strcpy( EquipData->Suffix, "g1" );
