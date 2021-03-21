@@ -1386,7 +1386,8 @@ def CreateTopWinLoader(id, pack, loader, initer = None, selectionHandler = None,
 			window.SetAction(lambda: TopWindowClosed(window), ACTION_WINDOW_CLOSED)
 			if GameCheck.IsPST ():
 				import FloatMenuWindow
-				FloatMenuWindow.FloatMenuWindow.Close ()
+				if FloatMenuWindow.FloatMenuWindow:
+					FloatMenuWindow.FloatMenuWindow.Close ()
 
 			if pause:
 				CreateTopWinLoader.PauseState = GemRB.GamePause(3, 1)
