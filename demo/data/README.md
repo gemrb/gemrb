@@ -70,3 +70,6 @@ Button press sound by Kenney.nl (CC0), window open close sounds by rubberduck (C
 
 Footstep sounds and portal destruction sfx by Little Robot Sound Factory
 (www.littlerobotsoundfactory.com; CC-BY 3.0).
+
+Main music theme and area music licensed from Nicolas Jeudy of Dark
+Fantasy Studio. See https://github.com/gemrb/gemrb-assets/tree/master/demo/audio for the documents.

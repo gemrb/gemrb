@@ -29,6 +29,8 @@ def OnLoad():
 	NameEdit.SetText("Jora the Seeker")
 	NameEdit.Focus()
 
+	GemRB.LoadMusicPL ("theme.mus")
+
 def QuitPress():
 	global StartWindow
 
