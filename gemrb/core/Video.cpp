@@ -51,10 +51,13 @@ Video::Video(void)
 
 Video::~Video(void)
 {
-	VideoBuffers::iterator it;
-	it = buffers.begin();
-	for (; it != buffers.end(); ++it) {
-		delete *it;
+	DestroyBuffers();
+}
+
+void Video::DestroyBuffers()
+{
+	for (auto buffer : buffers) {
+		delete buffer;
 	}
 }
 

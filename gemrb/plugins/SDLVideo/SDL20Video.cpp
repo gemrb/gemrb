@@ -55,7 +55,7 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	// we must release all buffers before SDL_DestroyRenderer
 	// we cant rely on the base destructor here
 	scratchBuffer = nullptr;
-	buffers.clear();
+	DestroyBuffers();
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);

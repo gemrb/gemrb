@@ -141,6 +141,7 @@ protected:
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
 	virtual void Wait(unsigned long) = 0;
 	void DestroyBuffer(VideoBuffer*);
+	void DestroyBuffers();
 
 private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
