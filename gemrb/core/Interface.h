@@ -346,8 +346,6 @@ private:
 class GEM_EXPORT Interface
 {
 private:
-	Holder<Video> video;
-	Holder<Audio> AudioDriver;
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
@@ -418,6 +416,7 @@ private:
 	std::string Encoding;
 	Scriptable *CutSceneRunner;
 	int debugMode = 0;
+
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
@@ -846,6 +845,12 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
+	
+private:
+	// dirvers must be deallocated last
+	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
+	Holder<Video> video;
+	Holder<Audio> AudioDriver;
 };
 
 extern GEM_EXPORT Interface * core;

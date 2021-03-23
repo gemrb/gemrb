@@ -308,8 +308,6 @@ Interface::~Interface(void)
 
 	delete AreaAliasTable;
 
-	AudioDriver.release();
-
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
@@ -388,8 +386,6 @@ Interface::~Interface(void)
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
-
-	video.release();
 }
 
 GameControl* Interface::StartGameControl()
