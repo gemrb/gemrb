@@ -110,6 +110,8 @@ public:
 	SDLTextureSprite2D(const Region&, int Bpp,
 					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
 	Holder<Sprite2D> copy() const override;
+	
+	void UnlockSprite() const override;
 
 	using SDLSurfaceSprite2D::SetPalette;
 	void SetColorKey(ieDword pxvalue) override;

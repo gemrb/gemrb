@@ -328,6 +328,12 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 	}
 	return *texture;
 }
+	
+void SDLTextureSprite2D::UnlockSprite() const
+{
+	SDLSurfaceSprite2D::UnlockSprite();
+	staleTexture = true;
+}
 
 void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
 {
