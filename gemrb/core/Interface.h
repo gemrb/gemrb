@@ -346,6 +346,11 @@ private:
 class GEM_EXPORT Interface
 {
 private:
+	// dirvers must be deallocated last (keep them at the top)
+	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
+	Holder<Video> video;
+	Holder<Audio> AudioDriver;
+
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
@@ -845,12 +850,6 @@ public:
 	Audio* GetAudioDrv(void) const;
 
 	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
-	
-private:
-	// dirvers must be deallocated last
-	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	Holder<Video> video;
-	Holder<Audio> AudioDriver;
 };
 
 extern GEM_EXPORT Interface * core;
