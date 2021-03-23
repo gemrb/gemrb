@@ -85,7 +85,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		return false;
 	}
 	
-	ieByte* pixels = pageData;
+	ieByte* pixels = nullptr;
 	int glyphH = g.size.h + abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
@@ -102,14 +102,17 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		
 		assert(pageData);
 		SheetRegion.h = glyphH;
+		pixels = pageData;
 	} else if (Sheet) {
 		// we need to lock/unlock the sprite because we are updating its pixels
 		pixels = (ieByte*)Sheet->LockSprite();
 		assert(pixels == pageData);
+	} else {
+		pixels = pageData;
 	}
 
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
-	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pixels, SheetRegion.Dimensions());
+	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.Dimensions());
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
