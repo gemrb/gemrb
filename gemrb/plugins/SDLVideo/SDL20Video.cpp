@@ -51,6 +51,9 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 	if (SDL_GameControllerGetAttached(gameController)) {
 		SDL_GameControllerClose(gameController);
 	}
+	
+	scratchBuffer = nullptr;
+	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 
