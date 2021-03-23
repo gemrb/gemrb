@@ -52,7 +52,10 @@ SDL20VideoDriver::~SDL20VideoDriver(void)
 		SDL_GameControllerClose(gameController);
 	}
 	
+	// we must release all buffers before SDL_DestroyRenderer
+	// we cant rely on the base destructor here
 	scratchBuffer = nullptr;
+	buffers.clear();
 	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
