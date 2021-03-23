@@ -85,6 +85,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		return false;
 	}
 	
+	ieByte* pixels = pageData;
 	int glyphH = g.size.h + abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
@@ -101,6 +102,10 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		
 		assert(pageData);
 		SheetRegion.h = glyphH;
+	} else if (Sheet) {
+		// we need to lock/unlock the sprite because we are updating its pixels
+		pixels = (ieByte*)Sheet->LockSprite();
+		assert(pixels == pageData);
 	}
 
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
@@ -111,6 +116,11 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
 
 	pageXPos = newX;
+	
+	if (Sheet) {
+		Sheet->UnlockSprite();
+	}
+	
 	return true;
 }
 
