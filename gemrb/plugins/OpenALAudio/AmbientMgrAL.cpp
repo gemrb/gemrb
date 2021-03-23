@@ -58,7 +58,7 @@ AmbientMgrAL::~AmbientMgrAL()
 
 void AmbientMgrAL::ambientsSet(const std::vector<Ambient *>& a)
 {
-	mutex.lock();
+	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto ambientSource : ambientSources) {
 		delete ambientSource;
 	}
@@ -66,8 +66,6 @@ void AmbientMgrAL::ambientsSet(const std::vector<Ambient *>& a)
 	for (auto& source : a) {
 		ambientSources.push_back(new AmbientSource(source));
 	}
-	mutex.unlock();
-	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 }
 
 void AmbientMgrAL::activate(const std::string &name)
