@@ -1,8 +1,12 @@
 # downloads big audio and other non-essential files from gemrb-assets
 
-set(DL_FROM audio/themea.ogg)
-set(DL_TO music/theme/themea.ogg)
-file(MAKE_DIRECTORY music/theme)
+set(DL_FROM audio/themea.ogg
+	audio/whispers-seamless.ogg
+)
+set(DL_TO music/theme/themea.ogg
+	music/mx0100/mx0100a.ogg
+)
+file(MAKE_DIRECTORY music/theme music/mx0100)
 
 # NOTE: no need to edit anything below this line
 
