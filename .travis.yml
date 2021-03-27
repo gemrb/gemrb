@@ -60,7 +60,8 @@ script:
     make &&
     sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&
     gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample &&
-    make install
+    make install &&
+    if [[ -n $TRAVIS_TAG ]]; then make fetch-demo-data; fi
 
 deploy:
   provider: script

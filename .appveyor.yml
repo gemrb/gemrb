@@ -89,6 +89,10 @@ before_package:
       popd
       7z a -tzip $env:archive_path $env:archive_source
     }
+
+    if ($env:APPVEYOR_REPO_TAG) {
+      cmake --build . --target fetch-demo-data
+    }
 test_script:
 - cmd: |-
     cd C:/gemrb-win32*

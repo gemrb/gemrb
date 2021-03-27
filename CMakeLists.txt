@@ -564,6 +564,12 @@ add_custom_target( dist
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
+add_custom_target(fetch-demo-data
+	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/fetch_demo_data.cmake
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/demo
+)
+add_dependencies(dist fetch-demo-data)
+
 # pretty-print options macro
 # as of 2.8 cmake does not support anything like EVAL
 MACRO(PRINT_OPTION option)
