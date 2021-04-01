@@ -117,11 +117,6 @@ Tooltip::Tooltip(const String& s, Font* fnt, const Font::PrintColors& cols, Tool
 	SetText(s);
 }
 
-Tooltip::~Tooltip()
-{
-	delete background;
-}
-
 void Tooltip::SetText(const String& t)
 {
 	text = t;
