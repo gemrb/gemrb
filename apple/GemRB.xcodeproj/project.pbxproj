@@ -416,6 +416,9 @@
 		A2B67A6B16B1DFC100577415 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2B67A6816B1DF6500577415 /* CoreFoundation.framework */; };
 		A2BD125215A7EDFE000FAB95 /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2BD125A15A7EE61000FAB95 /* VLCPlayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BD125815A7EE61000FAB95 /* VLCPlayer.cpp */; };
+		A2C1DB4F261674490024D213 /* MappedFileMemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24B088D24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp */; };
+		A2C1DB82261674640024D213 /* PathFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */; };
+		A2C1DBE8261674790024D213 /* RNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F065246102D70073802C /* RNG.cpp */; };
 		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
@@ -5056,6 +5059,8 @@
 				A2FE2C8516F231ED00DDC6C7 /* NullSource.cpp in Sources */,
 				A2E27EFA16F109090079E104 /* InterfaceConfig.cpp in Sources */,
 				A29BF8A213A04A6F00C812DD /* ActorMgr.cpp in Sources */,
+				A2C1DB82261674640024D213 /* PathFinder.cpp in Sources */,
+				A2C1DBE8261674790024D213 /* RNG.cpp in Sources */,
 				A29BF8A313A04A6F00C812DD /* Ambient.cpp in Sources */,
 				A29BF8A413A04A6F00C812DD /* AmbientMgr.cpp in Sources */,
 				A29BF8A513A04A6F00C812DD /* Animation.cpp in Sources */,
@@ -5075,6 +5080,7 @@
 				A29BF8B313A04A6F00C812DD /* Dialog.cpp in Sources */,
 				A29BF8B413A04A6F00C812DD /* DialogHandler.cpp in Sources */,
 				A289588620D6D05B002F4A97 /* MapReverb.cpp in Sources */,
+				A2C1DB4F261674490024D213 /* MappedFileMemoryStream.cpp in Sources */,
 				A29BF8B513A04A6F00C812DD /* DialogMgr.cpp in Sources */,
 				A29BF8B613A04A6F00C812DD /* DisplayMessage.cpp in Sources */,
 				A29BF8B713A04A6F00C812DD /* EffectMgr.cpp in Sources */,

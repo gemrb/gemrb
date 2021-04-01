@@ -22,7 +22,6 @@
 #import "GEM_AppDelegate.h"
 #import "System/FileStream.h"
 #import "Interface.h"
-#import "System/Logger/File.h"
 
 using namespace GemRB;
 
@@ -131,7 +130,7 @@ using namespace GemRB;
 	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
 	FileStream *fs = new FileStream();
 	if (fs->Create(cLogFile)) {
-		AddLogger(createStreamLogWriter(fs));
+		AddLogWriter(createStreamLogWriter(fs));
 		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
 	} else {
 		delete fs;
