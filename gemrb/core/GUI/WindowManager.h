@@ -21,6 +21,7 @@
 
 #include "EventMgr.h"
 #include "Sprite2D.h"
+#include "Tooltip.h"
 #include "Video.h"
 
 #include <deque>
@@ -31,6 +32,17 @@ class Sprite2D;
 class Window;
 
 typedef std::deque<Window*> WindowList;
+
+struct ToolTipData
+{
+	Tooltip tt;
+	unsigned long time = 0;
+	Holder<SoundHandle> tooltip_sound;
+	bool reset = false;
+	
+	ToolTipData(Tooltip tt)
+	: tt(std::move(tt)) {}
+};
 
 class WindowManager {
 public:
@@ -82,6 +94,8 @@ private:
 	Holder<Video> video;
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
 	ModalShadow modalShadow = ShadowNone;
+	
+	mutable ToolTipData tooltip;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;

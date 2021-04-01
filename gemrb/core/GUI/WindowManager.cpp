@@ -21,7 +21,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "ImageMgr.h"
-#include "Tooltip.h"
 #include "Window.h"
 
 #include "defsounds.h"
@@ -43,6 +42,7 @@ void WindowManager::SetTooltipDelay(int delay)
 }
 
 WindowManager::WindowManager(Video* vid)
+: tooltip(core->CreateTooltip())
 {
 	assert(vid);
 
@@ -477,41 +477,36 @@ void WindowManager::DrawTooltip(Point pos) const
 		return;
 	}
 
-	static Tooltip tt = core->CreateTooltip();
-	static unsigned long time = 0;
-	static Holder<SoundHandle> tooltip_sound = NULL;
-	static bool reset = false;
-
 	if (trackingWin) // if the mouse is held down we dont want tooltips
 		TooltipTime = GetTickCount();
 
-	if (time != TooltipTime + ToolTipDelay) {
-		time = TooltipTime + ToolTipDelay;
-		reset = true;
+	if (tooltip.time != TooltipTime + ToolTipDelay) {
+		tooltip.time = TooltipTime + ToolTipDelay;
+		tooltip.reset = true;
 	}
 
-	if (hoverWin && TooltipTime && GetTickCount() >= time) {
-		if (reset) {
+	if (hoverWin && TooltipTime && GetTickCount() >= tooltip.time) {
+		if (tooltip.reset) {
 			// reset the tooltip and restart the sound
 			const String& text = hoverWin->TooltipText();
-			tt.SetText(text);
-			if (tooltip_sound) {
-				tooltip_sound->Stop();
-				tooltip_sound.release();
+			tooltip.tt.SetText(text);
+			if (tooltip.tooltip_sound) {
+				tooltip.tooltip_sound->Stop();
+				tooltip.tooltip_sound.release();
 			}
 			if (text.length()) {
-				tooltip_sound = core->PlaySound(DS_TOOLTIP, SFX_CHAN_GUI);
+				tooltip.tooltip_sound = core->PlaySound(DS_TOOLTIP, SFX_CHAN_GUI);
 			}
-			reset = false;
+			tooltip.reset = false;
 		}
 
 		// clamp pos so that the TT is all visible (TT draws centered at pos)
-		int halfW = tt.TextSize().w/2 + 16;
-		int halfH = tt.TextSize().h/2 + 11;
+		int halfW = tooltip.tt.TextSize().w/2 + 16;
+		int halfH = tooltip.tt.TextSize().h/2 + 11;
 		pos.x = Clamp<int>(pos.x, halfW, screen.w - halfW);
 		pos.y = Clamp<int>(pos.y, halfW, screen.h - halfH);
 
-		tt.Draw(pos);
+		tooltip.tt.Draw(pos);
 	}
 }
 
