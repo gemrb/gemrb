@@ -20,6 +20,7 @@
 #define __GemRB__WindowManager__
 
 #include "EventMgr.h"
+#include "Resource.h"
 #include "Sprite2D.h"
 #include "Tooltip.h"
 #include "Video.h"
@@ -95,7 +96,9 @@ private:
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
 	ModalShadow modalShadow = ShadowNone;
 	
+	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
 	mutable ToolTipData tooltip;
+	mutable std::map<ResRef, Holder<Sprite2D>> winframes;
 
 	static int ToolTipDelay;
 	static unsigned long TooltipTime;

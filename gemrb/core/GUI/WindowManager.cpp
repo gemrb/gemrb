@@ -699,19 +699,16 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 			break;
 	}
 
-	typedef Holder<Sprite2D> FrameImage;
-	static std::map<ResRef, FrameImage> frames;
-
 	ResRef ref = refstr.c_str();
 	Holder<Sprite2D> frame;
-	if (frames.find(ref) != frames.end()) {
-		frame = frames[ref];
+	if (winframes.find(ref) != winframes.end()) {
+		frame = winframes[ref];
 	} else {
 		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ref);
 		if (im) {
 			frame = im->GetSprite2D();
 		}
-		frames.insert(std::make_pair(ref, frame));
+		winframes.insert(std::make_pair(ref, frame));
 	}
 
 	return frame;
