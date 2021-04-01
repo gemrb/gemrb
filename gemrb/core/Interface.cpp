@@ -1505,13 +1505,6 @@ int Interface::Init(InterfaceConfig* config)
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
-	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
-
-	winmgr = new WindowManager(video.get());
-	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
-
 	// if unset, manually populate GameName (window title)
 	std::map<std::string, std::string> gameTypeNameMap;
 	gameTypeNameMap["auto"] = "";
@@ -1638,19 +1631,26 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
+	int ret = LoadSprites();
+	if (ret) return ret;
+
+	ret = LoadFonts();
+	if (ret) return ret;
+	
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
+
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
+	winmgr = new WindowManager(video.get());
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
+
 	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
 	}
 	guifact->SetWindowManager(*winmgr);
-
-	int ret = LoadSprites();
-	if (ret) return ret;
-
-	ret = LoadFonts();
-	if (ret) return ret;
 
 	QuitFlag = QF_CHANGESCRIPT;
 
