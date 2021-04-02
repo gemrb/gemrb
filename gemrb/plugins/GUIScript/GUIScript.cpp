@@ -1929,11 +1929,6 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 
-	/** setting the correct state for this control */
-	/** it is possible to set up a default value, if Lookup returns false, use it */
-	ieDword curVal = 0;
-	core->GetDictionary()->Lookup( VarName, curVal );
-
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
 	if (min) {
@@ -1941,7 +1936,10 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 
-	core->GetDictionary()->SetAt(VarName, curVal);
+	/* setting the correct state for this control */
+	/* it is possible to set up a default value, if Lookup returns false, use it */
+	ieDword curVal = 0;
+	core->GetDictionary()->Lookup(VarName, curVal);
 
 	Window* win = ctrl->GetWindow();
 	if (win) {
