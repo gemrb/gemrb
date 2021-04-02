@@ -339,7 +339,7 @@ void GameControl::DrawTargetReticle(Point p, int size, bool animate, bool flash,
 	if (animate) {
 		// generates "step" from sequence 3 2 1 0 1 2 3 4
 		// updated each 1/15 sec
-		++step = tp_steps [(GetTickCount() >> 6) & 7];
+		++step = tp_steps [(GetTicks() >> 6) & 7];
 	} else {
 		step = 3;
 	}

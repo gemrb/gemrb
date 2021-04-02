@@ -124,7 +124,7 @@ void Button::CloseUpColor()
 	//handle Game at this point
 	unsigned long newtime;
 
-	newtime = GetTickCount();
+	newtime = GetTicks();
 	if (newtime<starttime) {
 		return;
 	}
@@ -750,7 +750,7 @@ void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color
 		// (see Draw)
 		SourceRGB=src;
 		DestRGB=dest;
-		starttime = GetTickCount();
+		starttime = GetTicks();
 		starttime += 40;
 #else
 		SourceRGB = DestRGB = dest;

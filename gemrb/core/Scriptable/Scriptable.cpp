@@ -1764,7 +1764,7 @@ void Selectable::DrawCircle(const Region &vp)
 		//doing a time dependent flashing of colors
 		//if it is too fast, increase the 6 to 7
 		unsigned long step;
-		step = GetTickCount();
+		step = GetTicks();
 		step = tp_steps [(step >> 7) & 7]*2;
 		mix.a = overColor.a;
 		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;

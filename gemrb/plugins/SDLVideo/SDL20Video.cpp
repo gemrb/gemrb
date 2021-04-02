@@ -405,7 +405,7 @@ int SDL20VideoDriver::PollEvents()
 {
 	if (ignoreNextFingerUp <= 0
 		&& firstFingerDownTime
-		&& GetTickCount() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
+		&& GetTicks() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
 		// enough time has passed to transform firstTouch into a right click event
 
 		// store the finger coordinates before calling ProcessFirstTouch (they get cleared)
@@ -624,7 +624,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				}
 				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
 				firstFingerDown = event.tfinger;
-				firstFingerDownTime = GetTickCount();
+				firstFingerDownTime = GetTicks();
 				// ensure we get the coords for the actual first finger
 				if (finger0) {
 					firstFingerDown.x = ScaleCoordinateHorizontal(finger0->x);

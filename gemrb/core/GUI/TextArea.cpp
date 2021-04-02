@@ -112,7 +112,7 @@ void TextArea::DrawInternal(Region& clip)
 			ScrollToY(TextYPos); // reset animation values
 		} else {
 			// update animation for this next draw cycle
-			unsigned long curTime = GetTickCount();
+			unsigned long curTime = GetTicks();
 			if (animationEnd.time > curTime) {
 				//double animProgress = curTime / animationEnd;
 				int deltaY = animationEnd.y - animationBegin.y;
@@ -426,7 +426,7 @@ void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
 	if  (duration) {
 		// HACK: notice the values arent clamped here.
 		// this is sort of a hack we allow for chapter text so it can begin and end out of sight
-		unsigned long startTime = GetTickCount();
+		unsigned long startTime = GetTicks();
 		animationBegin = AnimationPoint(TextYPos, startTime);
 		animationEnd = AnimationPoint(y, startTime + duration);
 		return;
