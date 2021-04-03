@@ -161,7 +161,7 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 }
 
 /*
-static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
+static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true,true};
 
 static inline bool IsInstant(ieByte timingmode)
 {
@@ -169,7 +169,7 @@ static inline bool IsInstant(ieByte timingmode)
 	return fx_instant[timingmode];
 }*/
 
-static const bool fx_equipped[MAX_TIMING_MODE]={false,false,true,false,false,true,false,false,true,false,false};
+static const bool fx_equipped[MAX_TIMING_MODE] = { false, false, true, false, false, true, false, false, true, false, false, false };
 
 static inline bool IsEquipped(ieByte timingmode)
 {
@@ -177,8 +177,7 @@ static inline bool IsEquipped(ieByte timingmode)
 	return fx_equipped[timingmode];
 }
 
-//                                               0    1     2     3    4    5    6     7       8   9     10
-static const bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
+static const bool fx_relative[MAX_TIMING_MODE] = { true, false, false, true, true, true, false, false, false, false, true, false };
 
 static inline bool NeedPrepare(ieWord timingmode)
 {
@@ -192,7 +191,7 @@ static inline bool NeedPrepare(ieWord timingmode)
 #define DURATION  2
 
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
-DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};		//4-7
+DELAYED, DELAYED, DELAYED, DELAYED, PERMANENT, PERMANENT, DURATION, PERMANENT}; //4-11
 
 static inline int DelayType(ieByte timingmode)
 {
@@ -201,7 +200,7 @@ static inline int DelayType(ieByte timingmode)
 }
 
 //which effects are removable
-static const bool fx_removable[MAX_TIMING_MODE]={true,true,false,true,true,false,true,true,false,false,true};
+static const bool fx_removable[MAX_TIMING_MODE] = { true, true, false, true, true, false, true, true, false, false, true, true };
 
 static inline int IsRemovable(ieByte timingmode)
 {
@@ -214,7 +213,8 @@ static const ieByte fx_triggered[MAX_TIMING_MODE]={FX_DURATION_JUST_EXPIRED,FX_D
 FX_DURATION_INSTANT_WHILE_EQUIPPED,FX_DURATION_INSTANT_LIMITED,//2,3
 FX_DURATION_INSTANT_PERMANENT,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAVED,//6,8
-FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
+FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES, FX_DURATION_JUST_EXPIRED, //9,10
+FX_DURATION_JUST_EXPIRED}; //11
 
 static inline ieByte TriggeredEffect(ieByte timingmode)
 {
@@ -1263,12 +1263,20 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		if( NeedPrepare(fx->TimingMode) ) {
 			//save delay for later
 			fx->SecondaryDelay = fx->Duration;
-			if( fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
+			if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED) {
 				fx->TimingMode = FX_DURATION_ABSOLUTE;
+			}
+			bool inTicks = false;
+			if (fx->TimingMode == FX_DURATION_INSTANT_LIMITED_TICKS) {
+				fx->TimingMode = FX_DURATION_ABSOLUTE;
+				inTicks = true;
 			}
 			if (pstflags && !(fx->SourceFlags & SF_SIMPLIFIED_DURATION)) {
 				// pst stored the delay in ticks already, so we use a variant of PrepareDuration
 				// unless it's our unhardcoded spells which use iwd2-style simplified duration in rounds per level
+				inTicks = true;
+			}
+			if (inTicks) {
 				fx->Duration = (fx->Duration ? fx->Duration : 1) + GameTime;
 			} else {
 				PrepareDuration(fx);
@@ -1367,7 +1375,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 // useful for: remove projectile type
 #define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
 
-static const bool fx_live[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,false};
+static const bool fx_live[MAX_TIMING_MODE] = { true, true, true, false, false, false, false, false, true, true, true, false };
 static inline bool IsLive(ieByte timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
@@ -2153,6 +2161,7 @@ bool EffectQueue::HasDuration(const Effect *fx)
 	case FX_DURATION_INSTANT_LIMITED: //simple duration
 	case FX_DURATION_DELAY_LIMITED:   //delayed duration
 	case FX_DURATION_DELAY_PERMANENT: //simple delayed
+	// not supporting FX_DURATION_INSTANT_LIMITED_TICKS, since it's in ticks
 		return true;
 	}
 	return false;
