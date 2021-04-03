@@ -189,6 +189,11 @@ bool ScrollBar::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	// FIXME: this doesn't respect SLIDER_HORIZONTAL
 	Point p = ConvertPointFromScreen(me.Pos());
+	if (p.x < 0 || p.x > frame.w) {
+		// don't allow the scrollbar to engage when the mouse is outside
+		// this happens when a scrollbar is used as an event proxy for a windows
+		return false;
+	}
 	if (p.y <= GetFrameHeight(IMAGE_UP_UNPRESSED) ) {
 		State |= UP_PRESS;
 		ScrollUp();
