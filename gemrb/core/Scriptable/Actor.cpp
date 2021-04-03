@@ -4935,7 +4935,7 @@ void Actor::PlayWalkSound()
 	ieDword thisTime;
 	ieResRef Sound;
 
-	thisTime = GetTickCount();
+	thisTime = GetTicks();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;
@@ -8621,7 +8621,7 @@ void Actor::Draw(const Region &screen)
 	}
 
 	if (remainingTalkSoundTime > 0) {
-		unsigned int currentTick = GetTickCount();
+		unsigned int currentTick = GetTicks();
 		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
 		lastTalkTimeCheckAt = currentTick;
 
@@ -11443,7 +11443,7 @@ const char *Actor::GetKitName(ieDword kitID) const
 
 void Actor::SetAnimatedTalking (unsigned int length) {
 	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
-	lastTalkTimeCheckAt = GetTickCount();
+	lastTalkTimeCheckAt = GetTicks();
 }
 
 bool Actor::HasPlayerClass() const

@@ -262,7 +262,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 	Control *ctrl;
 	unsigned long thisTime;
 
-	thisTime = GetTickCount();
+	thisTime = GetTicks();
 	if (ClickMatch(x, y, thisTime)) {
 		Button |= GEM_MB_DOUBLECLICK;
 		dc_x = 0;
