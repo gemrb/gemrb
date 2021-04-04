@@ -3537,15 +3537,16 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 	// the only users with external plts are in bg2, but they don't match the bam:
 	//   lvl9 shapeshift targets: troll, golem, fire elemental, illithid, wolfwere
 	// 1pp deliberately breaks palettes for the bam to be used (so the original did support)
-	// TODO: if this turns out to be resiliently true, also remove-revert useCorrupt
-	//ResourceHolder<PalettedImageMgr> im(ResRef, false, true);
-
-//	if (im == NULL) {
+	// ... but also not all are identical and we'd be missing half-orcs
+	// so we need to prefer PLTs to BAMs, but avoid bad ones
+	ResourceHolder<PalettedImageMgr> im = GetResourceHolder<PalettedImageMgr>(ResRef, false, true);
+	if (!im) {
+		// the PLT doesn't exist or is bad, so try BAM
 		AnimationFactory* af = ( AnimationFactory* )
 			gamedata->GetFactoryResource( ResRef,
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
-			Log(WARNING, "GUISCript", "PLT/BAM not found for ref: %s", ResRef);
+			Log(WARNING, "GUISCript", "BAM/PLT not found for ref: %s", ResRef);
 			Py_RETURN_NONE;
 		}
 
@@ -3554,12 +3555,13 @@ static PyObject* GemRB_Button_SetPLT(PyObject* self, PyObject* args)
 			Log(ERROR, "Button_SetPLT", "Paperdoll picture == NULL (%s)", ResRef);
 			Py_RETURN_NONE;
 		}
-/*	} else {
+	} else {
+		// use PLT
 		Picture = im->GetSprite2D(type, col);
 		if (Picture == NULL) {
 			Log(ERROR, "Button_SetPLT", "Picture == NULL (%s)", ResRef);
 		}
-	}*/
+	}
 
 	if (type == 0)
 		btn->ClearPictureList();

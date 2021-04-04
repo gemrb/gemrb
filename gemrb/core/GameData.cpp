@@ -458,8 +458,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 		return factory->GetFactoryObject( fobjindex );
 
 	// empty resref
-	if (!strcmp(resname, ""))
-		return NULL;
+	if (!resname || !strcmp(resname, "")) return nullptr;
 
 	switch (type) {
 	case IE_BAM_CLASS_ID:

@@ -924,7 +924,7 @@ void Interface::Main()
 	fpsRgn.y = 0;
 
 	unsigned long frame = 0, time, timebase;
-	time = GetTickCount();
+	time = GetTicks();
 	timebase = time;
 	double frames = 0.0;
 
@@ -954,7 +954,7 @@ void Interface::Main()
 		// we can create a manager for them and everything can be updated at once
 		GlobalColorCycle.AdvanceTime(time);
 		winmgr->DrawWindows();
-		time = GetTickCount();
+		time = GetTicks();
 		if (DrawFPS) {
 			frame++;
 			if (time - timebase > 1000) {

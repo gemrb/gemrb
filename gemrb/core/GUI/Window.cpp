@@ -32,7 +32,7 @@ Window::Window(const Region& frame, WindowManager& mgr)
 	focusView = NULL;
 	trackingView = NULL;
 	hoverView = NULL;
-	lastMouseMoveTime = GetTickCount();
+	lastMouseMoveTime = GetTicks();
 
 	SetFlags(DestroyOnClose, OP_OR);
 	// default ingame windows to frameless

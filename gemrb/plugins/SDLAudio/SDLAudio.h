@@ -29,7 +29,8 @@
 
 #include <SDL_mixer.h>
 
-#define BUFFER_CACHE_SIZE 50
+#define MIXER_CHANNELS 16
+#define BUFFER_CACHE_SIZE 100
 #define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
 
 namespace GemRB {
@@ -107,7 +108,7 @@ private:
 	unsigned short audio_format;
 	int audio_channels;
 
-	std::recursive_mutex OurMutex;
+	std::recursive_mutex MusicMutex;
 	LRUCache buffercache;
 };
 

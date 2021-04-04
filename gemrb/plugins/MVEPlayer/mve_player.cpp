@@ -158,11 +158,11 @@ bool MVEPlayer::process_chunk() {
 	while (chunk_offset < chunk_size) {
 		chunk_offset += 4;
 		if (!request_data(4)) return false;
-		
+
 		unsigned int segment_size = GST_READ_UINT16_LE(buffer);
 		unsigned char segment_type = buffer[2];
 		unsigned char segment_version = buffer[3];
-		
+
 		chunk_offset += segment_size;
 		if (!process_segment(segment_size, segment_type, segment_version)) return false;
 	}
@@ -234,19 +234,10 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
  */
 
 static void get_current_time(long &sec, long &usec) {
-#ifdef _WIN32
-	DWORD time;
-	time = GetTickCount();
+	auto time = GetTicks();
 
 	sec = time / 1000;
 	usec = (time % 1000) * 1000;
-#else
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-
-	sec = tv.tv_sec;
-	usec = tv.tv_usec;
-#endif
 }
 
 void MVEPlayer::timer_start() {

@@ -40,7 +40,7 @@ private:
 
 private:
 	void NextFireDate() {
-		fireDate = GetTickCount() + interval;
+		fireDate = GetTicks() + interval;
 	}
 
 public:

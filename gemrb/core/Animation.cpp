@@ -110,7 +110,7 @@ Holder<Sprite2D> Animation::LastFrame(void)
 	if (gameAnimation) {
 		starttime = core->GetGame()->Ticks;
 	} else {
-		starttime = GetTickCount();
+		starttime = GetTicks();
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
@@ -130,7 +130,7 @@ Holder<Sprite2D> Animation::NextFrame(void)
 		if (gameAnimation) {
 			starttime = core->GetGame()->Ticks;
 		} else {
-			starttime = GetTickCount();
+			starttime = GetTicks();
 		}
 	}
 	Holder<Sprite2D> ret;
@@ -146,7 +146,7 @@ Holder<Sprite2D> Animation::NextFrame(void)
 	if (gameAnimation) {
 		time = core->GetGame()->Ticks;
 	} else {
-		time = GetTickCount();
+		time = GetTicks();
 	}
 
 	//it could be that we skip more than one frame in case of slow rendering

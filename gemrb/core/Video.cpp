@@ -149,14 +149,14 @@ int Video::SwapBuffers(unsigned int fpscap)
 
 	if (fpscap) {
 		unsigned int lim = 1000/fpscap;
-		unsigned long time = GetTickCount();
+		unsigned long time = GetTicks();
 		if (( time - lastTime ) < lim) {
 			Wait(lim - int(time - lastTime));
-			time = GetTickCount();
+			time = GetTicks();
 		}
 		lastTime = time;
 	} else {
-		lastTime = GetTickCount();
+		lastTime = GetTicks();
 	}
 
 	return PollEvents();

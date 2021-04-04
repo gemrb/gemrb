@@ -247,19 +247,10 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 
 //this code could be in the movieplayer parent class
 void static get_current_time(long &sec, long &usec) {
-#ifdef _WIN32
-	DWORD time;
-	time = GetTickCount();
+	auto time = GetTicks();
 
 	sec = time / 1000;
 	usec = (time % 1000) * 1000;
-#else
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-
-	sec = tv.tv_sec;
-	usec = tv.tv_usec;
-#endif
 }
 
 void BIKPlayer::timer_start()

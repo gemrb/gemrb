@@ -51,10 +51,7 @@
 #include "System/String.h"
 
 #include <algorithm>
-
-#ifndef WIN32
-# include <sys/time.h>
-#endif
+#include <chrono>
 
 #include "System/Logging.h"
 
@@ -211,14 +208,11 @@ GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
-#ifndef WIN32
-inline unsigned long GetTickCount()
+inline unsigned long GetTicks()
 {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return (tv.tv_usec/1000) + (tv.tv_sec*1000);
+	using namespace std::chrono;
+	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
-#endif
 
 inline bool valid_number(const char* string, long& val)
 {

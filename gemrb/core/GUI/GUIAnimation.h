@@ -34,7 +34,7 @@ protected:
 	
 public:
 	GUIAnimation() {
-		begintime = GetTickCount();
+		begintime = GetTicks();
 	}
 	
 	operator bool() const {
@@ -115,7 +115,7 @@ public:
 		this->begin.a = 0xff;
 		this->end.a = 0xff;
 
-		unsigned long time = GetTickCount();
+		unsigned long time = GetTicks();
 		timeOffset = (time >> 7) & 7; // we want to start at the frame that is 0
 	}
 

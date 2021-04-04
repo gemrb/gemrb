@@ -49,7 +49,7 @@ void GlobalTimer::Freeze()
 
 	UpdateAnimations(true);
 
-	thisTime = GetTickCount();
+	thisTime = GetTicks();
 	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
@@ -149,7 +149,7 @@ bool GlobalTimer::Update()
 	Map *map;
 	Game *game;
 	GameControl* gc;
-	unsigned long thisTime = GetTickCount();
+	unsigned long thisTime = GetTicks();
 
 	UpdateAnimations(false);
 
@@ -259,7 +259,7 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 	AnimationRef* anim;
 	unsigned long thisTime;
 
-	thisTime = GetTickCount();
+	thisTime = GetTicks();
 	time += thisTime;
 
 	// if there are no free animation reference objects,
@@ -303,7 +303,7 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 void GlobalTimer::UpdateAnimations(bool paused)
 {
 	unsigned long thisTime;
-	thisTime = GetTickCount();
+	thisTime = GetTicks();
 	while (animations.begin() + first_animation != animations.end()) {
 		AnimationRef* anim = animations[first_animation];
 		if (anim->ctlanim == NULL) {
