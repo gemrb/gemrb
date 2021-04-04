@@ -49,30 +49,34 @@ def CalcLimits(Abidx):
 	Minimum = 3
 	Maximum = 18
 
-	tmp = Abclasrq.GetValue(KitIndex, Abidx)
-	if tmp!=0 and tmp>Minimum:
-		Minimum = tmp
-
 	Race = Abracerq.GetRowIndex(RaceName)
 	tmp = Abracerq.GetValue(Race, Abidx*2)
-	if tmp!=0 and tmp>Minimum:
+	if tmp != 0:
 		Minimum = tmp
 
 	tmp = Abracerq.GetValue(Race, Abidx*2+1)
-	if tmp!=0 and tmp>Maximum:
+	if tmp != 0:
 		Maximum = tmp
 
+
 	Race = Abracead.GetRowIndex(RaceName)
+	Add = Abracead.GetValue(Race, Abidx)
+	Minimum += Add
+	Maximum += Add
+
 	if Abclsmod:
-		Add = Abracead.GetValue(Race, Abidx) + Abclsmod.GetValue(KitIndex, Abidx)
-	else:
-		Add = Abracead.GetValue(Race, Abidx)
-	Maximum = Maximum + Add
-	Minimum = Minimum + Add
-	if Minimum<1:
-		Minimum=1
-	if Maximum>25:
-		Maximum=25
+		tmp = Abclsmod.GetValue(KitIndex, Abidx)
+		Maximum += tmp
+		Add += tmp
+
+	tmp = Abclasrq.GetValue(KitIndex, Abidx)
+	if tmp != 0 and tmp > Minimum:
+		Minimum = tmp
+
+	if Minimum < 1:
+		Minimum = 1
+	if Maximum > 25:
+		Maximum = 25
 
 	return
 
