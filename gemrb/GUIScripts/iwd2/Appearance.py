@@ -119,6 +119,12 @@ def OnLoad():
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
+	RaceID = CommonTables.Races.GetValue (RaceName, "ID", GTV_INT)
+	# look up base race if needed
+	if RaceID > 1000:
+		 RaceID = RaceID >> 16
+		 Race = CommonTables.Races.FindValue ("ID", RaceID)
+		 RaceName = CommonTables.Races.GetRowName (Race)
 	AnimID = 0x6000 + table.GetValue (RaceName, "RACE")
 
 	table = GemRB.LoadTable ("avprefc")
