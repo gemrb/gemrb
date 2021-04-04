@@ -450,12 +450,14 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bi
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
+	unsigned int SRWidth = sr->GetWidth();
+	unsigned int y = sr->GetHeight();
+	assert(Width >= SRWidth && Height >= y);
 	//Internal Searchmap
-	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
-		int x=sr->GetWidth();
+		int x = SRWidth;
 		while(x--) {
 			unsigned short value = sr->GetAt(x,y) & PATH_MAP_AREAMASK;
 			size_t index = y * Width + x;
