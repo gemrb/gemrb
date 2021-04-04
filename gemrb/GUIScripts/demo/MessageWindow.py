@@ -33,6 +33,7 @@ def OnLoad():
 	MapButton = MessageWindow.GetControl (3)
 	MapButton.SetText ("M")
 	MapButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIMA.OpenMapWindow)
+	MapButton.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: GemRB.MoveToArea ("ar0110"))
 
 	CenterButton = MessageWindow.GetControl (4)
 	CenterButton.SetText ("C")
