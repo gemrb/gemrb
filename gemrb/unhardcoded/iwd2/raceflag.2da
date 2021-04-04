@@ -7,4 +7,4 @@ ELF_DROW       0x20000        0
 DWARF          0x20000        0
 GNOME          0x20000        0
 GNOME_DEEP	0x220000       4
-HALFORC        0x20000        0
+HALF_ORC       0x20000        0
