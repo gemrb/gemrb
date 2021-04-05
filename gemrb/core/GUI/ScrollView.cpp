@@ -107,16 +107,29 @@ ScrollView::ScrollView(const Region& frame)
 	View::AddSubviewInFrontOfView(&contentView);
 
 	ScrollBar* sbar = GetControl<ScrollBar>("SBGLOB", 0);
-	if (sbar == NULL) {
+	if (sbar == nullptr) {
 		// FIXME: this happens with the console window (non-issue, but causing noise)
 		Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
-		hscroll = NULL;
-		vscroll = NULL;
-	} else {
-		// TODO: add horizontal scrollbars
-		// this is a limitation in the Scrollbar class
-		hscroll = NULL;
-		
+	}
+	SetVScroll(sbar);
+	SetHScroll(nullptr); // TODO: add horizontal scrollbars
+
+	contentView.SetFrame(Region(Point(), frame.Dimensions()));
+	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
+	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
+}
+
+ScrollView::~ScrollView()
+{
+	View::RemoveSubview(&contentView); // no delete
+	
+	delete hscroll;
+	delete vscroll;
+}
+
+void ScrollView::SetVScroll(ScrollBar* sbar)
+{
+	if (sbar != nullptr) {
 		vscroll = new ScrollBar(*sbar);
 		
 		Region sbFrame = vscroll->Frame();
@@ -136,18 +149,12 @@ ScrollView::ScrollView(const Region& frame)
 		vscroll->SetAction(handler, Control::ValueChange);
 		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 	}
-
-	contentView.SetFrame(Region(Point(), frame.Dimensions()));
-	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
-	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
 }
 
-ScrollView::~ScrollView()
+void ScrollView::SetHScroll(ScrollBar*)
 {
-	View::RemoveSubview(&contentView); // no delete
-	
-	delete hscroll;
-	delete vscroll;
+	// TODO: add horizontal scrollbars
+	// this is currently a limitation in the Scrollbar class
 }
 
 void ScrollView::UpdateScrollbars()

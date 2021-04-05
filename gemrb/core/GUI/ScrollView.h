@@ -49,8 +49,8 @@ namespace GemRB {
 		
 		PointAnimation animation;
 
-		ScrollBar* hscroll;
-		ScrollBar* vscroll;
+		ScrollBar* hscroll = nullptr;
+		ScrollBar* vscroll = nullptr;
 
 		ContentView contentView;
 
@@ -71,6 +71,9 @@ namespace GemRB {
 	public:
 		ScrollView(const Region& frame);
 		~ScrollView() override;
+		
+		void SetVScroll(ScrollBar* sb);
+		void SetHScroll(ScrollBar* sb);
 		
 		bool IsAnimated() const override { return animation; }
 
