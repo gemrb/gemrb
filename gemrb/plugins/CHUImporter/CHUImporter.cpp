@@ -430,11 +430,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 						sb->SetFrameOrigin(origin);
 						ta->SetScrollbar(sb);
 					}
-				} else {
-					// no scrollbar means we will ignore events
-					// this facilitates ChapterText
-					// FIXME?: does this cause unforseen problems with other text areas?
-					ta->SetFlags(View::IgnoreEvents, OP_OR);
 				}
 				ctrl = ta;
 			}

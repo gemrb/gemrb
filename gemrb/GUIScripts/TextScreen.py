@@ -106,6 +106,7 @@ def StartTextScreen ():
 
 	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
 	TextArea = TextScreen.GetControl (2)
+	TextArea.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	GameWin = GemRB.GetView("GAMEWIN")
 	GameWin.SetDisabled(True)
