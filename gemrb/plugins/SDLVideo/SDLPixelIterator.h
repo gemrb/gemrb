@@ -259,6 +259,8 @@ public:
 		if(format->Amask) {
 			v = (pixel & format->Amask) >> format->Ashift;
 			a = (v << format->Aloss) + (v >> (8 - (format->Aloss << 1)));
+		} else if (colorKey != -1 && pixel == Uint32(colorKey)) {
+			a = SDL_ALPHA_TRANSPARENT;
 		} else {
 			a = SDL_ALPHA_OPAQUE;
 		}
