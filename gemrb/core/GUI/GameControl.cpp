@@ -90,7 +90,6 @@ GameControl::GameControl(const Region& frame)
 	lastCursor = IE_CURSOR_INVALID;
 	moveX = moveY = 0;
 	numScrollCursor = 0;
-	DebugFlags = 0;
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
