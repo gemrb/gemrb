@@ -127,6 +127,7 @@ public:
 	ieDword LineCount() const;
 	ieWord LineHeight() const;
 
+	void SetScrollbar(ScrollBar*);
 	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
 						  const Color* = nullptr, const Color* = &SelectOptionHover, const Color* = &SelectOptionSelected);
 	

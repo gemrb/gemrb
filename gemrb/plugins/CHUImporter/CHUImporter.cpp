@@ -39,7 +39,7 @@ using namespace GemRB;
 
 constexpr int MINIMUM_LEFT_MARGIN = 3;
 
-static void MergeTextAreaAndScrollbar(TextArea* ta, ScrollBar* sb)
+static void SetTextAreaMargins(TextArea* ta, ScrollBar* sb)
 {
 	// we assume the 2 dont overlap
 	Region sbr = sb->Frame();
@@ -425,8 +425,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					// TextAreas automatically produce their own in GemRB
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
-						MergeTextAreaAndScrollbar(ta, sb);
-						delete win->RemoveSubview(sb);
+						SetTextAreaMargins(ta, sb);
+						Point origin = ta->ConvertPointFromWindow(sb->Frame().Origin());
+						sb->SetFrameOrigin(origin);
+						ta->SetScrollbar(sb);
 					}
 				} else {
 					// no scrollbar means we will ignore events
@@ -521,8 +523,10 @@ endalign:
 				} else {
 					TextArea* ta = GetControl<TextArea>(TAID, win);
 					if (ta) {
-						MergeTextAreaAndScrollbar(ta, sb);
-						delete sb;
+						SetTextAreaMargins(ta, sb);
+						Point origin = ta->ConvertPointFromWindow(sb->Frame().Origin());
+						sb->SetFrameOrigin(origin);
+						ta->SetScrollbar(sb);
 					} else {
 						ctrl = sb;
 						// NOTE: we dont delete this, becuase there are at least a few instances

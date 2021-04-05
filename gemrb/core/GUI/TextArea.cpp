@@ -617,6 +617,11 @@ void TextArea::ClearSelectOptions()
 	}
 }
 
+void TextArea::SetScrollbar(ScrollBar* sb)
+{
+	scrollview.SetVScroll(sb);
+}
+
 void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
 								const Color* color, const Color* hiColor, const Color* selColor)
 {
