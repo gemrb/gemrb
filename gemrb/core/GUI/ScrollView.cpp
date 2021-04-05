@@ -110,6 +110,15 @@ ScrollView::ScrollView(const Region& frame)
 	if (sbar == nullptr) {
 		// FIXME: this happens with the console window (non-issue, but causing noise)
 		Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
+	} else {
+		sbar = new ScrollBar(*sbar);
+		
+		Region sbFrame = sbar->Frame();
+		sbFrame.x = frame.w - sbFrame.w;
+		sbFrame.y = 0;
+		sbFrame.h = frame.h;
+		
+		sbar->SetFrame(sbFrame);
 	}
 	SetVScroll(sbar);
 	SetHScroll(nullptr); // TODO: add horizontal scrollbars
@@ -129,16 +138,9 @@ ScrollView::~ScrollView()
 
 void ScrollView::SetVScroll(ScrollBar* sbar)
 {
+	delete View::RemoveSubview(vscroll);
 	if (sbar != nullptr) {
-		vscroll = new ScrollBar(*sbar);
-		
-		Region sbFrame = vscroll->Frame();
-		sbFrame.x = frame.w - sbFrame.w;
-		sbFrame.y = 0;
-		sbFrame.h = frame.h;
-		
-		vscroll->SetFrame(sbFrame);
-		
+		vscroll = sbar;
 		// ensure scrollbars are on top
 		View::AddSubviewInFrontOfView(vscroll, &contentView);
 
@@ -149,6 +151,7 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 		vscroll->SetAction(handler, Control::ValueChange);
 		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 	}
+	UpdateScrollbars();
 }
 
 void ScrollView::SetHScroll(ScrollBar*)
