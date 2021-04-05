@@ -37,43 +37,6 @@
 
 using namespace GemRB;
 
-constexpr int MINIMUM_LEFT_MARGIN = 3;
-
-static void SetTextAreaMargins(TextArea* ta, ScrollBar* sb)
-{
-	// we assume the 2 dont overlap
-	Region sbr = sb->Frame();
-	Region tar = ta->Frame();
-
-	ContentContainer::Margin margins = ta->GetMargins();
-
-	if (sbr.x > tar.x + tar.w) {
-		margins.right += sbr.x - (tar.x + tar.w);
-		tar.w += margins.right + sbr.w;
-	} else if (sbr.x < tar.x) {
-		margins.left += tar.x - sbr.x;
-		margins.right += sbr.w; // FIXME: this shouldn't be needed, but we dont support left sided scrollbars yet
-		tar.w += tar.x - sbr.x;
-		tar.x = sbr.x;
-	}
-
-	if (sbr.y < tar.y) {
-		margins.top += tar.y - sbr.y;
-		tar.y -= margins.top;
-		tar.h += margins.top;
-	}
-
-	if (sbr.y + sbr.h > tar.y + tar.h) {
-		margins.bottom += (sbr.y + sbr.h) - (tar.y + tar.h);
-		tar.h += margins.bottom;
-	}
-
-	if (!margins.left) margins.left += MINIMUM_LEFT_MARGIN;
-
-	ta->SetFrame(tar);
-	ta->SetMargins(margins);
-}
-
 CHUImporter::CHUImporter()
 {
 	str = NULL;
@@ -425,9 +388,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					// TextAreas automatically produce their own in GemRB
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
-						SetTextAreaMargins(ta, sb);
-						Point origin = ta->ConvertPointFromWindow(sb->Frame().Origin());
-						sb->SetFrameOrigin(origin);
 						ta->SetScrollbar(sb);
 					}
 				}
@@ -518,9 +478,6 @@ endalign:
 				} else {
 					TextArea* ta = GetControl<TextArea>(TAID, win);
 					if (ta) {
-						SetTextAreaMargins(ta, sb);
-						Point origin = ta->ConvertPointFromWindow(sb->Frame().Origin());
-						sb->SetFrameOrigin(origin);
 						ta->SetScrollbar(sb);
 					} else {
 						ctrl = sb;

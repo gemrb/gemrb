@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"
+#include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
 
 namespace GemRB {
@@ -619,6 +620,42 @@ void TextArea::ClearSelectOptions()
 
 void TextArea::SetScrollbar(ScrollBar* sb)
 {
+	// we assume the 2 dont overlap
+	Region sbr = sb->Frame();
+	Region tar = Frame();
+
+	ContentContainer::Margin margins = GetMargins();
+
+	if (sbr.x > tar.x + tar.w) {
+		margins.right += sbr.x - (tar.x + tar.w);
+		tar.w += margins.right + sbr.w;
+	} else if (sbr.x < tar.x) {
+		margins.left += tar.x - sbr.x;
+		margins.right += sbr.w; // FIXME: this shouldn't be needed, but we dont support left sided scrollbars yet
+		tar.w += tar.x - sbr.x;
+		tar.x = sbr.x;
+	}
+
+	if (sbr.y < tar.y) {
+		margins.top += tar.y - sbr.y;
+		tar.y -= margins.top;
+		tar.h += margins.top;
+	}
+
+	if (sbr.y + sbr.h > tar.y + tar.h) {
+		margins.bottom += (sbr.y + sbr.h) - (tar.y + tar.h);
+		tar.h += margins.bottom;
+	}
+
+	constexpr int MINIMUM_LEFT_MARGIN = 3;
+	if (!margins.left) margins.left += MINIMUM_LEFT_MARGIN;
+
+	SetFrame(tar);
+	SetMargins(margins);
+	
+	Point origin = ConvertPointFromWindow(sb->Frame().Origin());
+	sb->SetFrameOrigin(origin);
+
 	scrollview.SetVScroll(sb);
 }
 
