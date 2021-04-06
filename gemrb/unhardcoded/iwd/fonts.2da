@@ -12,7 +12,7 @@ NORMAL
 8	REALMS2			REALMS2		14			0		1
 9	STONEBIG		STONEBIG	14			0		0
 10	STONESM2		STONESM2	14			0		0
-11	STONESM3		STONESM3	14			0		0
+11	STONESM3		STONESM3	14			0		1
 12	STONESML		STONESML	14			0		0
 13	TOOLFONT		TOOLFONT	14			0		1
 # state "fonts" are the status icons. You probably don't want to edit these.
