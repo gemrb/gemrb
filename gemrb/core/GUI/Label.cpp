@@ -39,10 +39,6 @@ Label::Label(const Region& frame, Font* font, const String& string)
 	SetText(string);
 }
 
-Label::~Label()
-{
-}
-
 /** Draws the Control on the Output Display */
 void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {

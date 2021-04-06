@@ -57,7 +57,6 @@ public:
 	};
 
 	Label(const Region& frame, Font* font, const String& string);
-	~Label() override;
 
 	/** This function sets the actual Label Text */
 	using Control::SetText;
