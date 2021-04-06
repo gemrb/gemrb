@@ -303,7 +303,7 @@ void View::Draw()
 				r.w = metrics.size.w;
 				video->SetScreenClip(nullptr);
 				video->DrawRect(r, ColorBlack, true);
-				fnt->Print(r, string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT);
+				fnt->Print(r, string, IE_FONT_ALIGN_TOP|IE_FONT_ALIGN_LEFT, {ColorWhite, ColorBlack});
 			}
 		}
 	}
