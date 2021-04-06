@@ -32,6 +32,10 @@ def MoveToNewArea ():
 
 	hours = travel["Distance"]
 	GUICommonWindows.CloseTopWindow ()
+	if GemRB.GetView ("WIN_PSTWMAP"):
+		GemRB.GetView ("WIN_PSTWMAP").Close ()
+		GemRB.SetVar ("Travel", -1)
+		GemRB.GamePause (0, 0)
 
 	if travel["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return

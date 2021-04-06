@@ -2298,7 +2298,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
 		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
 		// DestEntryPoint is all zeroes, pst just didn't use it
-		direction = 0;
+		direction = 1;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );

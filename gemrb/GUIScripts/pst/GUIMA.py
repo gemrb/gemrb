@@ -90,17 +90,18 @@ def OpenTravelWindow ():
 	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
+	Window.AddAlias ("WIN_PSTWMAP")
 
 	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG")
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NORMAL, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_SELECTED, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff})
 	WMap.SetTextColor (IE_GUI_WMAP_COLOR_NOTVISITED, {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xa0})
 	WMap.SetAnimation ("WMPTY")
-	WMap.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
+	WMap.SetVarAssoc ("Travel", Travel)
 	#center on current area
 	WMap.Scroll (0,0)
 	WMap.Focus()
-	if Travel:
+	if Travel != -1:
 		WMap.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 	# Done
