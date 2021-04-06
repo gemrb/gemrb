@@ -51,9 +51,9 @@ def MoveToNewArea ():
 	if GameCheck.IsPST():
 		# GemRB.DisplayString can only deal with resrefs, so cheat until noticed
 		if hours > 1:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19313))
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + " " + GemRB.GetString (19313))
 		else:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19312))
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + " " + GemRB.GetString (19312))
 	else:
 		time = ""
 		GemRB.SetToken ("HOUR", str(hours))
