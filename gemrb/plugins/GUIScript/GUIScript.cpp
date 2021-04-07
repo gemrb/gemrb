@@ -1931,12 +1931,12 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 
 	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
 	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH-1 );
+	
+	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 	if (min) {
 		ctrl->SetValueRange(ieDword(PyLong_AsUnsignedLong(min)), ieDword(PyLong_AsUnsignedLong(max)));
 	}
-	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
-
-	/* setting the correct state for this control */
+	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
 	ieDword curVal = 0;
 	core->GetDictionary()->Lookup(VarName, curVal);
