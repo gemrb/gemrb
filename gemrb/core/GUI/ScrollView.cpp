@@ -106,22 +106,8 @@ ScrollView::ScrollView(const Region& frame)
 {
 	View::AddSubviewInFrontOfView(&contentView);
 
-	ScrollBar* sbar = GetControl<ScrollBar>("SBGLOB", 0);
-	if (sbar == nullptr) {
-		// FIXME: this happens with the console window (non-issue, but causing noise)
-		Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
-	} else {
-		sbar = new ScrollBar(*sbar);
-		
-		Region sbFrame = sbar->Frame();
-		sbFrame.x = frame.w - sbFrame.w;
-		sbFrame.y = 0;
-		sbFrame.h = frame.h;
-		
-		sbar->SetFrame(sbFrame);
-	}
-	SetVScroll(sbar);
-	SetHScroll(nullptr); // TODO: add horizontal scrollbars
+	SetVScroll(nullptr);
+	SetHScroll(nullptr);
 
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
@@ -150,6 +136,21 @@ void ScrollView::SetVScroll(ScrollBar* sbar)
 		
 		vscroll->SetAction(handler, Control::ValueChange);
 		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
+	} else {
+		sbar = GetControl<ScrollBar>("SBGLOB", 0);
+		if (sbar == nullptr) {
+			// FIXME: this happens with the console window (non-issue, but causing noise)
+			Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
+		} else {
+			vscroll = new ScrollBar(*sbar);
+			
+			Region sbFrame = vscroll->Frame();
+			sbFrame.x = frame.w - sbFrame.w;
+			sbFrame.y = 0;
+			sbFrame.h = frame.h;
+			
+			vscroll->SetFrame(sbFrame);
+		}
 	}
 	UpdateScrollbars();
 }
