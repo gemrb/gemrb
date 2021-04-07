@@ -1938,8 +1938,9 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	}
 	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
-	ieDword curVal = 0;
+	ieDword curVal = CTL_INVALID_VALUE;
 	core->GetDictionary()->Lookup(VarName, curVal);
+	assert(curVal == ctrl->GetValue());
 
 	Window* win = ctrl->GetWindow();
 	if (win) {

@@ -63,6 +63,8 @@ static_cast<Control::Action>(a)
 #define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
+#define CTL_INVALID_VALUE ieDword(-1)
+
 /**
  * @class Control
  * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
@@ -236,7 +238,7 @@ private:
 	Timer* actionTimer;
 
 	/** the value of the control to add to the variable */
-	ieDword Value;
+	ieDword Value = CTL_INVALID_VALUE;
 	ValueRange range;
 
 };

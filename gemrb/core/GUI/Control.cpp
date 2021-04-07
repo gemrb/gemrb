@@ -41,7 +41,6 @@ Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
 {
 	VarName[0] = 0;
-	Value = 0;
 	SetValueRange(MaxValueRange);
 
 	animation = NULL;
@@ -166,7 +165,9 @@ void Control::SetValue(ieDword val)
 void Control::SetValueRange(ValueRange r)
 {
 	range = r;
-	SetValue(Value); // update the value if it falls outside the range
+	if (Value != CTL_INVALID_VALUE) {
+		SetValue(Value); // update the value if it falls outside the range
+	}
 }
 
 void Control::SetValueRange(ieDword min, ieDword max)
