@@ -152,11 +152,15 @@ void Control::SetValue(ieDword val)
 {
 	ieDword oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
+	
+	if (VarName[0] != 0) {
+		// set this even when the value doesn't change
+		// if a radio is clicked, then one of its siblings, the siblings value wont change
+		// but we expect the dictionary to reflect the selected value
+		core->GetDictionary()->SetAt(VarName, Value);
+	}
 
 	if (oldVal != Value) {
-		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
-		}
 		PerformAction(ValueChange);
 		MarkDirty();
 	}
