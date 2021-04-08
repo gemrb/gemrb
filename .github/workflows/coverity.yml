@@ -12,7 +12,7 @@ jobs:
         run: |
           set -x
           sudo apt-get update
-          sudo apt-get install libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 libvlc-dev libvlccore-dev libvorbis-dev python-is-python2
+          sudo apt-get install libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0 libvlc-dev libvlccore-dev libvorbis-dev python-is-python2 libpython2.7-dev
 
       - uses: actions/checkout@v1
         with:
