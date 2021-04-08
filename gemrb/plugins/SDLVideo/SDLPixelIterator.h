@@ -57,9 +57,10 @@ static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
 struct SDLPixelIterator : IPixelIterator
 {
 private:
-	IPixelIterator* imp;
+	IPixelIterator* imp = nullptr;
 
 	void InitImp(void* pixel, int pitch, int bpp) {
+		delete imp;
 		switch (bpp) {
 			case 4:
 				imp = new PixelIterator<Uint32>(static_cast<Uint32*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
