@@ -194,9 +194,13 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
 	Uint32 format = SDLPixelFormatFromBufferFormat(fmt, renderer);
 	if (format == SDL_PIXELFORMAT_UNKNOWN)
-		return NULL;
+		return nullptr;
 	
 	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
+	if (tex == nullptr) {
+		Log(ERROR, "SDL 2", "%s", SDL_GetError());
+		return nullptr;
+	}
 	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
 }
 

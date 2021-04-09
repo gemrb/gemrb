@@ -115,6 +115,11 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 			buf = SDL_DisplayFormat(tmp);
 			SDL_FreeSurface(tmp);
 		}
+		
+		if (buf == nullptr) {
+			Log(ERROR, "SDL 1.2", "%s", SDL_GetError());
+			return nullptr;
+		}
 
 		return new SDLSurfaceVideoBuffer(buf, r.Origin());
 	}

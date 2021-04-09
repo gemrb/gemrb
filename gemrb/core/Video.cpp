@@ -96,11 +96,14 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 VideoBufferPtr Video::CreateBuffer(const Region& r, BufferFormat fmt)
 {
 	VideoBuffer* buf = NewVideoBuffer(r, fmt);
-	assert(buf); // FIXME: we should probably deal with this happening
-	buffers.push_back(buf);
-	return VideoBufferPtr(buffers.back(), [this](VideoBuffer* buffer) {
-		DestroyBuffer(buffer);
-	});
+	if (buf) {
+		buffers.push_back(buf);
+		return VideoBufferPtr(buffers.back(), [this](VideoBuffer* buffer) {
+			DestroyBuffer(buffer);
+		});
+	}
+	return nullptr;
+	//assert(buf); // FIXME: we should probably deal with this happening
 }
 
 void Video::DestroyBuffer(VideoBuffer* buffer)
