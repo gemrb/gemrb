@@ -620,37 +620,22 @@ void TextArea::ClearSelectOptions()
 
 void TextArea::SetScrollbar(ScrollBar* sb)
 {
-	// we assume the 2 dont overlap
-	Region sbr = sb->Frame();
-	Region tar = Frame();
-
+	const Region& sbr = sb->Frame();
+	const Region& tar = Frame();
+	
 	ContentContainer::Margin margins = GetMargins();
+	
+	Region combined = Region::RegionEnclosingRegions(sbr, tar);
+	margins.top += tar.y - combined.y;
+	margins.left += tar.x - combined.x;
+	margins.right += (combined.x + combined.w) - (tar.x + tar.w);
+	margins.bottom += (combined.y + combined.h) - (tar.y + tar.h);
 
-	if (sbr.x > tar.x + tar.w) {
-		margins.right += sbr.x - (tar.x + tar.w);
-		tar.w += margins.right + sbr.w;
-	} else if (sbr.x < tar.x) {
-		margins.left += tar.x - sbr.x;
-		margins.right += sbr.w; // FIXME: this shouldn't be needed, but we dont support left sided scrollbars yet
-		tar.w += tar.x - sbr.x;
-		tar.x = sbr.x;
-	}
+	constexpr uint8_t MINIMUM_H_MARGIN = 3;
+	margins.right = std::max(margins.right, MINIMUM_H_MARGIN);
+	margins.left = std::max(margins.left, MINIMUM_H_MARGIN);
 
-	if (sbr.y < tar.y) {
-		margins.top += tar.y - sbr.y;
-		tar.y -= margins.top;
-		tar.h += margins.top;
-	}
-
-	if (sbr.y + sbr.h > tar.y + tar.h) {
-		margins.bottom += (sbr.y + sbr.h) - (tar.y + tar.h);
-		tar.h += margins.bottom;
-	}
-
-	constexpr int MINIMUM_LEFT_MARGIN = 3;
-	if (!margins.left) margins.left += MINIMUM_LEFT_MARGIN;
-
-	SetFrame(tar);
+	SetFrame(combined);
 	SetMargins(margins);
 	
 	Point origin = ConvertPointFromWindow(sb->Frame().Origin());
