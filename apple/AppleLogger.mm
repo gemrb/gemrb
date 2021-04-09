@@ -40,6 +40,7 @@ AppleLogger::~AppleLogger()
 	
 void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
+	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
 	if (msg.level == FATAL) {
 		// display a GUI alert for FATAL errors
 		NSString* alertTitle = [NSString stringWithFormat:@"Fatal Error in %s", msg.owner.c_str()];
@@ -68,7 +69,6 @@ void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 		[alert release];
 #endif
 	}
-	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system
 }
 
 }
