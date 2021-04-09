@@ -484,6 +484,8 @@ endalign:
 						// set them invisible instead, we will unhide them in the scripts that need them
 						sb->SetVisible(false);
 					}
+					// we still allow GUIScripts to get ahold of it
+					RegisterScriptableControl(sb, ControlID);
 				}
 			}
 			break;

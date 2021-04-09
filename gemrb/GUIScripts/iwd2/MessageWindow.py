@@ -45,6 +45,9 @@ def OnLoad():
 	smallMTA.AddAlias("MTA_SM", 0, True)
 	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	smallID = smallMTA.ID
+	
+	sbar = OptionsWindow.GetControl(2)
+	sbar.SetResizeFlags(IE_GUI_VIEW_RESIZE_VERTICAL | IE_GUI_VIEW_RESIZE_RIGHT)
 
 	# remove the cheat input textedit
 	OptionsWindow.RemoveSubview(OptionsWindow.GetControl(3))
