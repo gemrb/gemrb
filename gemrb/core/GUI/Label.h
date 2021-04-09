@@ -38,9 +38,6 @@ namespace GemRB {
 class Palette;
 using PaletteHolder = Holder<Palette>;
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_LABEL_ON_PRESS      0x06000000
-
 /**
  * @class Label
  * Label widget for displaying static texts in the GUI
