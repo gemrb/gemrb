@@ -322,17 +322,14 @@ Region TextArea::UpdateTextFrame()
 
 void TextArea::UpdateScrollview()
 {
-	if (selectOptions) {
-		Region textFrame = UpdateTextFrame();
-		textFrame.y = textFrame.h;
-		textFrame.h = selectOptions->Frame().h;
-
-		selectOptions->SetFrame(textFrame);
-	}
-
 	if (Flags()&AutoScroll
 		&& dialogBeginNode) {
 		assert(textContainer && selectOptions);
+		
+		Region textFrame = UpdateTextFrame();
+		textFrame.y = textFrame.h;
+		textFrame.h = selectOptions->Frame().h;
+		selectOptions->SetFrame(textFrame);
 
 		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
 		int optH = OptionsHeight();
@@ -360,7 +357,13 @@ void TextArea::UpdateScrollview()
 	} else if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
 		scrollview.Update();
 	}
-	UpdateTextFrame();
+	
+	Region textFrame = UpdateTextFrame();
+	if (selectOptions) {
+		textFrame.y = textFrame.h;
+		textFrame.h = selectOptions->Frame().h;
+		selectOptions->SetFrame(textFrame);
+	}
 }
 
 void TextArea::FlagsChanged(unsigned int oldflags)
