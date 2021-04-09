@@ -73,10 +73,18 @@ void Logger::LogMsg(LogMessage&& msg)
 	if (msg.level < FATAL) {
 		msg.level = FATAL;
 	}
-
-	std::lock_guard<std::mutex> l(queueLock);
-	messageQueue.push_back(std::move(msg));
-	cv.notify_all();
+	
+	if (msg.level == FATAL) {
+		// fatal errors must happen now!
+		std::lock_guard<std::mutex> l(writerLock);
+		for (const auto& writer : writers) {
+			writer->WriteLogMessage(std::move(msg));
+		}
+	} else {
+		std::lock_guard<std::mutex> l(queueLock);
+		messageQueue.push_back(std::move(msg));
+		cv.notify_all();
+	}
 }
 
 const char* log_level_text[] = {
