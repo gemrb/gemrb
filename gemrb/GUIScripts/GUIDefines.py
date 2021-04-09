@@ -70,6 +70,9 @@ IE_GUI_BUTTON_NO_TOOLTIP      = 0x00800000 # disable the tooltip
 
 IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
 
+#label flags
+IE_GUI_LABEL_USE_COLOR = 1
+
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)
 
