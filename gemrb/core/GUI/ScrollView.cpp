@@ -105,13 +105,12 @@ ScrollView::ScrollView(const Region& frame)
 : View(frame), contentView(Region())
 {
 	View::AddSubviewInFrontOfView(&contentView);
-
-	SetVScroll(nullptr);
-	SetHScroll(nullptr);
-
 	contentView.SetFrame(Region(Point(), frame.Dimensions()));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
 	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
+
+	SetVScroll(nullptr);
+	SetHScroll(nullptr);
 }
 
 ScrollView::~ScrollView()
@@ -125,34 +124,38 @@ ScrollView::~ScrollView()
 void ScrollView::SetVScroll(ScrollBar* sbar)
 {
 	delete View::RemoveSubview(vscroll);
-	if (sbar != nullptr) {
-		vscroll = sbar;
-		// ensure scrollbars are on top
-		View::AddSubviewInFrontOfView(vscroll, &contentView);
-
-		ControlEventHandler handler = [this](Control* sb) {
-			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
-		};
-		
-		vscroll->SetAction(handler, Control::ValueChange);
-		vscroll->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
-	} else {
+	if (sbar == nullptr) {
 		sbar = GetControl<ScrollBar>("SBGLOB", 0);
 		if (sbar == nullptr) {
 			// FIXME: this happens with the console window (non-issue, but causing noise)
 			Log(ERROR, "ScrollView", "Unable to add scrollbars: missing default scrollbar template.");
 		} else {
-			vscroll = new ScrollBar(*sbar);
+			sbar = new ScrollBar(*sbar);
 			
-			Region sbFrame = vscroll->Frame();
+			Region sbFrame = sbar->Frame();
 			sbFrame.x = frame.w - sbFrame.w;
 			sbFrame.y = 0;
 			sbFrame.h = frame.h;
 			
-			vscroll->SetFrame(sbFrame);
+			sbar->SetFrame(sbFrame);
+			sbar->SetAutoResizeFlags(ResizeRight|ResizeTop|ResizeBottom, OP_SET);
 		}
 	}
+	
+	// this update must be done before binding an action
+	vscroll = sbar;
 	UpdateScrollbars();
+	
+	if (sbar) {
+		// ensure scrollbars are on top
+		View::AddSubviewInFrontOfView(sbar, &contentView);
+
+		ControlEventHandler handler = [this](Control* sb) {
+			ScrollbarValueChange(static_cast<ScrollBar*>(sb));
+		};
+		
+		sbar->SetAction(handler, Control::ValueChange);
+	}
 }
 
 void ScrollView::SetHScroll(ScrollBar*)
