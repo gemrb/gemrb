@@ -1691,9 +1691,13 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 		
 		if (stencil == nullptr) {
 			Region stencilRgn = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
-			stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
-			DrawStencil(stencil, objectRgn, walls.first);
-			objectStencils[object] = std::make_pair(stencil, objectRgn);
+			if (stencilRgn.Dimensions().IsEmpty()) {
+				stencil = wallStencil;
+			} else {
+				stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
+				DrawStencil(stencil, objectRgn, walls.first);
+				objectStencils[object] = std::make_pair(stencil, objectRgn);
+			}
 		} else {
 			// TODO: we only need to do this because a door might have changed state over us
 			// if we could detect that we could avoid doing this expensive operation
