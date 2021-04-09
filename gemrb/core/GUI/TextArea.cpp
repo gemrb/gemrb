@@ -299,9 +299,10 @@ ieDword TextArea::LineCount() const
 
 Region TextArea::UpdateTextFrame()
 {
+	const Region& cr = scrollview.ContentRegion();
 	if (textContainer) {
 		Region r = textContainer->Frame();
-		r.w = scrollview.ContentRegion().Dimensions().w;
+		r.w = cr.w + cr.x;
 		r.h = 0; // auto grow
 
 		if (AnimPicture) {
@@ -316,7 +317,7 @@ Region TextArea::UpdateTextFrame()
 		scrollview.Update();
 		return textContainer->Frame();
 	}
-	return Region(Point(0,0), Size(scrollview.ContentRegion().Dimensions().w, 0));
+	return Region(Point(0,0), Size(cr.w + cr.x, 0));
 }
 
 void TextArea::UpdateScrollview()

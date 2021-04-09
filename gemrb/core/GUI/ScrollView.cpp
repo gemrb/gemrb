@@ -228,7 +228,20 @@ Region ScrollView::ContentRegion() const
 		cr.h -= hscroll->Frame().h;
 	}
 	if (vscroll && vscroll->IsVisible()) {
-		cr.w -= vscroll->Frame().w;
+		const Region& sframe = vscroll->Frame();
+		
+		if (sframe.x == 0) {
+			// scrollbar is the leftmost view
+			cr.x += sframe.w;
+			cr.w -= sframe.w;
+		} else if (sframe.x == cr.w - sframe.w) {
+			// scrollbar is the rightmost view
+			cr.w -= sframe.w;
+		} else {
+			// if we have custom scrollbars in the middle of the content view
+			// its perfectly valid to just draw beneath them
+			// this happens sometimes (PST GUIREC)
+		}
 	}
 	return cr;
 }

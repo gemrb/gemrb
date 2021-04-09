@@ -384,8 +384,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 
 				TextArea* ta = new TextArea(ctrlFrame, fnt, ini, fore, init, back);
 				if (SBID != 0xffff) {
-					// we dont actually care about the scrollbar,
-					// TextAreas automatically produce their own in GemRB
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {
 						ta->SetScrollbar(sb);
