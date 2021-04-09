@@ -41,6 +41,9 @@ def OnLoad():
 	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
 	TMessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	TMessageTA.AddAlias("MsgSys", 0)
+	
+	sbar = MessageWindow.GetControl(2)
+	sbar.SetResizeFlags(IE_GUI_VIEW_RESIZE_VERTICAL)
 
 	ActionsWindow = GemRB.LoadWindow(3, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	GUICommonWindows.OpenActionsWindowControls (ActionsWindow)
