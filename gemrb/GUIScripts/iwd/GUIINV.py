@@ -117,7 +117,7 @@ def UpdateInventoryWindow (Window = None):
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", GemRB.GetVar ("TopIndex"), 0, Count - 1)
 	RefreshInventoryWindow (Window)
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]

@@ -76,13 +76,13 @@ def UpdateContainerWindow ():
 	LeftCount = Container['ItemCount']
 	ScrollBar = Window.GetControl (52)
 	Count = max (0, (LeftCount - ground_size + leftdiv - 1) / leftdiv)
-	ScrollBar.SetVarAssoc ("LeftTopIndex", Count)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", GemRB.GetVar ("LeftTopIndex"), 0, Count)
 
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControl (53)
 	Count = max (0, (RightCount - 4 + 1) / 2)
-	ScrollBar.SetVarAssoc ("RightTopIndex", Count)
+	ScrollBar.SetVarAssoc ("RightTopIndex", GemRB.GetVar ("RightTopIndex"), 0, Count)
 
 	RedrawContainerWindow ()
 
