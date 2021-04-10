@@ -25,6 +25,7 @@
 import GemRB
 import GameCheck
 import GUICommon
+import GUICommonWindows
 import LoadScreen
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
@@ -194,6 +195,7 @@ def ConfirmedSaveGame():
 	#LoadScreen.StartLoadScreen (LoadScreen.LS_TYPE_SAVING)
 
 	CloseSaveWindow ()
+	GUICommonWindows.CloseTopWindow ()
 
 	if Pos < len(Games):
 		GemRB.SaveGame (Games[Pos], Slotname, sav_version)
