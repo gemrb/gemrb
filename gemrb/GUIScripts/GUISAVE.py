@@ -174,10 +174,6 @@ def AbortedSaveGame():
 	CloseConfirmWindow ()
 	return
 
-def AbortedSaveGame():
-	CloseConfirmWindow ()
-	return
-
 # User entered save name and pressed save/overwrite.
 # Display progress bar screen and save the game, close the save windows
 def ConfirmedSaveGame():
