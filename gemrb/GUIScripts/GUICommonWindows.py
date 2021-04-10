@@ -1454,6 +1454,10 @@ def OpenWindowOnce(id, pack, pos=WINDOW_CENTER):
 		return GemRB.LoadWindow(id, pack, pos)
 
 def ToggleWindow(id, pack, pos=WINDOW_CENTER):
+	# do nothing while in a store
+	if GemRB.GetView ("WIN_STORE"):
+		return None
+
 	window = GemRB.GetView(pack, id)
 	if window:
 		window.Close()
