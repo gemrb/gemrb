@@ -1396,7 +1396,6 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	// an area animation with height > 0 even if the actors themselves are not
 	// hidden by it.
 
-	std::vector<Scriptable*> dithered;
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
