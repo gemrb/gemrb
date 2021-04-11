@@ -1945,6 +1945,16 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 }
 
+// a more thorough, but more expensive version for the cases when it matters
+unsigned int Map::GetBlocked(unsigned int x, unsigned int y, int size) const
+{
+	if (size == -1) {
+		return GetBlocked(x, y);
+	} else {
+		return GetBlockedInRadius(x * 16, y * 12, size);
+	}
+}
+
 unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
 {
 	return GetBlocked(x / 16, y / 12);
@@ -2394,7 +2404,7 @@ void Map::dump(bool show_actors) const
 	Log(DEBUG, "Map", buffer);
 }
 
-bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy) const
+bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy, int size) const
 {
 	unsigned int minx = 0;
 	if ((unsigned int) goal.x > radiusx)
@@ -2405,14 +2415,14 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 
 	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 		if ((unsigned int) goal.y >= radiusy) {
-			if (GetBlocked(scanx, goal.y - radiusy) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(scanx, goal.y - radiusy, size) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y - radiusy);
 				return true;
 			}
 		}
 		if (goal.y + radiusy < Height) {
-			if (GetBlocked(scanx, goal.y + radiusy) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(scanx, goal.y + radiusy, size) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y + radiusy);
 				return true;
@@ -2422,7 +2432,7 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const
+bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size) const
 {
 	unsigned int miny = 0;
 	if ((unsigned int) goal.y > radiusy)
@@ -2432,14 +2442,14 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 		maxy = Height;
 	for (unsigned int scany = miny; scany < maxy; scany++) {
 		if ((unsigned int) goal.x >= radiusx) {
-			if (GetBlocked(goal.x - radiusx, scany) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(goal.x - radiusx, scany, size) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) (goal.x - radiusx);
 				goal.y = (ieWord) scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < Width) {
-			if (GetBlocked(goal.x + radiusx, scany) & PATH_MAP_PASSABLE) {
+			if (GetBlocked(goal.x + radiusx, scany, size) & PATH_MAP_PASSABLE) {
 				goal.x = (ieWord) (goal.x + radiusx);
 				goal.y = (ieWord) scany;
 				return true;
@@ -2457,7 +2467,7 @@ void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned
 	goal.y = smptGoal.y * 12 + 6;
 }
 
-void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
+void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy, int size) const
 {
 	if ((unsigned int) goal.x > Width) {
 		goal.x = (ieWord) Width;
@@ -2469,17 +2479,17 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 	while(radiusx<Width || radiusy<Height) {
 		//lets make it slightly random where the actor will appear
 		if (RAND(0,1)) {
-			if (AdjustPositionX(goal, radiusx, radiusy)) {
+			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
 				return;
 			}
-			if (AdjustPositionY(goal, radiusx, radiusy)) {
+			if (AdjustPositionY(goal, radiusx, radiusy, size)) {
 				return;
 			}
 		} else {
-			if (AdjustPositionY(goal, radiusx, radiusy)) {
+			if (AdjustPositionY(goal, radiusx, radiusy, size)) {
 				return;
 			}
-			if (AdjustPositionX(goal, radiusx, radiusy)) {
+			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
 				return;
 			}
 		}

@@ -5220,7 +5220,7 @@ void Actor::SetMap(Map *map)
 }
 
 // Position should be a navmap point
-void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy)
+void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy, int size)
 {
 	ResetPathTries();
 	ClearPath(true);
@@ -5234,7 +5234,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
-		map->AdjustPosition( p, radiusx, radiusy );
+		map->AdjustPosition(p, radiusx, radiusy, size);
 	}
 	if (p==q) {
 		MoveTo(nmptTarget);
