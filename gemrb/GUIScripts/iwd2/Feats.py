@@ -409,6 +409,13 @@ def NextPress(save=1):
 	if CharGen:
 		GemRB.SetNextScript("Spells")
 	else:
+		# handle toughness first, since hp is tricky
+		ToughnessDiff = GemRB.GetVar ("Feat 69") - GemRB.GetVar ("BaseFeatValue 69")
+		if ToughnessDiff > 0:
+			pc = GemRB.GameGetSelectedPCSingle ()
+			GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS, 1) + ToughnessDiff * 3, 0)
+			GemRB.SetPlayerStat (pc, IE_HITPOINTS, GemRB.GetPlayerStat (pc, IE_HITPOINTS, 1) + ToughnessDiff * 3, 0)
+
 		# open up the next levelup window
 		import Spells
 		Spells.SetupSpellsWindow (0)

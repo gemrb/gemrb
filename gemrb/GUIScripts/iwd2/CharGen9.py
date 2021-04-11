@@ -19,6 +19,7 @@
 #character generation (GUICG 0)
 import GemRB
 from GUIDefines import *
+from ie_feats import FEAT_TOUGHNESS
 from ie_stats import *
 import GUICommon
 import CommonTables
@@ -179,8 +180,8 @@ def NextPress():
 	GemRB.SetEquippedQuickSlot (MyChar, 0)
 
 	# reset hitpoints
-	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, 0, 0)
-	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, 0, 0)
+	GemRB.SetPlayerStat (MyChar, IE_MAXHITPOINTS, GemRB.HasFeat (MyChar, FEAT_TOUGHNESS) * 3, 0)
+	GemRB.SetPlayerStat (MyChar, IE_HITPOINTS, GemRB.HasFeat (MyChar, FEAT_TOUGHNESS) * 3, 0)
 	LUCommon.SetupHP (MyChar)
 
 	t=GemRB.GetVar ("Alignment")
