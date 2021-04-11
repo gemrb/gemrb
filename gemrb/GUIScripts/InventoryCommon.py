@@ -45,7 +45,7 @@ def OnDragItemGround (btn, slot):
 	"""Drops and item to the ground."""
 	
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = slot + GemRB.GetVar ("TopIndex") - btn.ControlID
+	slot = slot + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
 
 	if GemRB.IsDraggingItem ()==0:
 		slot_item = GemRB.GetContainerItem (pc, slot)
@@ -455,7 +455,7 @@ def OpenGroundItemInfoWindow (btn, slot):
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = slot + GemRB.GetVar("TopIndex") - btn.ControlID
+	slot = slot + GemRB.GetVar ("TopIndex") - (47 if GameCheck.IsPST () else 68)
 	slot_item = GemRB.GetContainerItem (pc, slot)
 
 	#the ground items are only displayable
