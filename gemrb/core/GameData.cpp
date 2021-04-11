@@ -636,7 +636,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	}
 
 	// not all games have the table
-	if (!raceTHAC0Bonus) return 0;
+	if (!raceTHAC0Bonus || !raceName) return 0;
 
 	char profString[5];
 	snprintf(profString, sizeof(profString), "%u", proficiency);

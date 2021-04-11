@@ -958,6 +958,7 @@ public:
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
 	bool IsKitInactive() const;
+	const char* GetRaceName() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
