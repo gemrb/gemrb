@@ -352,8 +352,7 @@ def DisplayItem (slotItem, type):
 		elif GameCheck.IsBG2():
 			Button.SetText (44002) # open container
 		else:
-			# a fallback, since the originals have nothing appropriate
-			# FIXME: where do mods add the new string? This is untranslatable
+			# a fallback, since the originals have nothing appropriate from not having any bags
 			Button.SetText ("Open container")
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenItemWindow)
 	elif dialog:
