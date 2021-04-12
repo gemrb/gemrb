@@ -101,9 +101,7 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 	r.w = std::max(r.w - margin.left - margin.right, 0);
 	r.h = std::max(r.h - margin.top - margin.bottom, 0);
 
-	std::list<View*>::reverse_iterator it = subViews.rbegin();
-
-	for (; it != subViews.rend(); ++it) {
+	for (auto it = subViews.rbegin(); it != subViews.rend(); ++it) {
 		View* selOption = *it;
 
 		selOption->SetFrame(r);
