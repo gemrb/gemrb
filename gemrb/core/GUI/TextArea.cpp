@@ -41,6 +41,9 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 	SetMargin(m);
 
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
+	String format = L". - ";
+	int numWidth = int(ta.ftext->StringSizeWidth(L"0" + format, 0)) + 3; // good guess at max width
+	Size numFrame(numWidth, ta.ftext->LineHeight); // size for the numerical prefix so they stay aligned
 	Point origin(margin.left, margin.top);
 	Region r(origin, Dimensions());
 	r.w = std::max(r.w - margin.left - margin.right, 0);
@@ -54,11 +57,11 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 		selOption->SetAutoResizeFlags(ResizeHorizontal, OP_SET);
 
 		if (numbered) {
-			wchar_t optNum[6];
-			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", static_cast<int>(i+1));
 			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
 			// but that should probably actually be done by the dialog handler, not here.
-			selOption->AppendContent(new TextSpan(optNum, nullptr, selectedCol));
+			auto ts = new TextSpan(std::to_wstring(i + 1) + format, nullptr, selectedCol, &numFrame);
+			ts->Alignment = IE_FONT_ALIGN_RIGHT;
+			selOption->AppendContent(ts);
 		}
 		selOption->AppendContent(new TextSpan(*opts[i], nullptr, &flexFrame));
 		AddSubviewInFrontOfView(selOption);
