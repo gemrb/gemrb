@@ -42,7 +42,7 @@ TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const Strin
 
 	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
 	String format = L". - ";
-	int numWidth = int(ta.ftext->StringSizeWidth(L"0" + format, 0)) + 3; // good guess at max width
+	int numWidth = int(ta.ftext->StringSizeWidth(std::to_wstring(opts.size()) + format, 0)) + 3; // good guess at max width
 	Size numFrame(numWidth, ta.ftext->LineHeight); // size for the numerical prefix so they stay aligned
 	Point origin(margin.left, margin.top);
 	Region r(origin, Dimensions());
