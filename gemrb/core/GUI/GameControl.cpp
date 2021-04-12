@@ -493,12 +493,14 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	InfoPoint *i;
 	for (size_t idx = 0; (i = area->TMap->GetInfoPoint(idx)); idx++) {
 		i->Highlight = false;
-		if (overInfoPoint == i && target_mode) {
-			if (i->VisibleTrap(0)) {
+		if (i->VisibleTrap(0)) {
+			if (overInfoPoint == i && target_mode) {
 				i->outlineColor = ColorGreen;
-				i->Highlight = true;
-				continue;
+			} else {
+				i->outlineColor = ColorRed;
 			}
+			i->Highlight = true;
+			continue;
 		}
 	}
 
