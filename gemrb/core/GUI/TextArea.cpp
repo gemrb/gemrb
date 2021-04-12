@@ -96,23 +96,26 @@ void TextArea::SpanSelector::SizeChanged(const Size&)
 {
 	// NOTE: this wouldnt be needed if we used TextSpans (layout) for the options, but then we would have to
 	// write more complex code for the hover effects and selection
+	Point origin(margin.left, margin.top);
+	Region r(origin, Size(frame.w, 0));
+	r.w = std::max(r.w - margin.left - margin.right, 0);
+	r.h = std::max(r.h - margin.top - margin.bottom, 0);
 
 	std::list<View*>::reverse_iterator it = subViews.rbegin();
 
-	Point origin(margin.left, margin.top);
 	for (; it != subViews.rend(); ++it) {
 		View* selOption = *it;
 
-		selOption->SetFrameOrigin(origin);
+		selOption->SetFrame(r);
 
 		if (EventMgr::TouchInputEnabled) {
 			// keeping the options spaced out (for touch screens)
-			origin.y += ta.LineHeight();
+			r.y += ta.LineHeight();
 		}
-		origin.y += selOption->Dimensions().h;
+		r.y += selOption->Dimensions().h;
 	}
 	
-	frame.h = std::max(frame.h, origin.y + margin.bottom);
+	frame.h = std::max(frame.h, r.y + margin.bottom);
 }
 
 bool TextArea::SpanSelector::KeyEvent(const Event& event)
