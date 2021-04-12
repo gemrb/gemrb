@@ -1651,7 +1651,7 @@ WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, cons
 					continue;
 				}
 				
-				if (!wp->IntersectsRect(r)) {
+				if (!r.IntersectsRegion(wp->BBox)) {
 					continue;
 				}
 				
