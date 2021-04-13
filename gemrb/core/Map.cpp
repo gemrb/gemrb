@@ -1076,10 +1076,10 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	};
 	
 	auto FillExplored = [=](int x, int y) {
-		int dirs = !IsExplored(x, y - 1);
-		if (!IsExplored(x - 1, y)) dirs |= 2;
-		if (!IsExplored(x, y + 1)) dirs |= 4;
-		if (!IsExplored(x + 1, y )) dirs |= 8;
+		int dirs = !IsExplored(x, y - 1); // N
+		if (!IsExplored(x - 1, y)) dirs |= W;
+		if (!IsExplored(x, y + 1)) dirs |= S;
+		if (!IsExplored(x + 1, y )) dirs |= E;
 
 		if (dirs && !Fill(x, y, dirs, 0)) {
 			FillFog(x, y, 1);
@@ -1087,10 +1087,10 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	};
 	
 	auto FillVisible = [=](int x, int y) {
-		int dirs = !IsVisible( x, y - 1);
-		if (!IsVisible(x - 1, y)) dirs |= 2;
-		if (!IsVisible(x, y + 1)) dirs |= 4;
-		if (!IsVisible(x + 1, y)) dirs |= 8;
+		int dirs = !IsVisible( x, y - 1); // N
+		if (!IsVisible(x - 1, y)) dirs |= W;
+		if (!IsVisible(x, y + 1)) dirs |= S;
+		if (!IsVisible(x + 1, y)) dirs |= E;
 
 		if (dirs && !Fill(x, y, dirs, 16)) {
 			vid->BlitSprite(core->FogSprites[16], ConvertPointToScreen(x, y));
