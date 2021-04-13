@@ -239,7 +239,7 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 	// since the next stage is also public, we must readd the Pos becuase it will again be removed
 	fClip.x += spr->Frame.x;
 	fClip.y += spr->Frame.y;
-	BlitSprite(spr, src, fClip);
+	BlitSprite(spr, src, fClip, BLIT_BLENDED);
 }
 
 void Video::BlitTiled(Region rgn, const Holder<Sprite2D> img)

@@ -179,7 +179,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h);
 	video->DrawRect(drawRgn, ColorBlack, true);
 	video->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
-	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn);
+	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BLIT_BLENDED);
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)

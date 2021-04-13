@@ -294,14 +294,6 @@ void SDLVideoDriver::BlitTile(const Holder<Sprite2D> spr, const Point& p, const 
 	BlitSpriteClipped(spr, srect, fClip, flags, tint);
 }
 
-void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst)
-{
-	dst.x -= spr->Frame.x;
-	dst.y -= spr->Frame.y;
-	uint32_t flags = (spr->HasTransparency()) ? BLIT_BLENDED : BLIT_NO_FLAGS;
-	BlitSpriteClipped(spr, src, dst, flags);
-}
-
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
 								uint32_t flags, Color tint)
 {
@@ -598,6 +590,10 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 
 	if (spr->renderFlags&BLIT_MIRRORY) {
 		flags ^= BLIT_MIRRORY;
+	}
+	
+	if (!spr->HasTransparency()) {
+		flags &= ~BLIT_BLENDED;
 	}
 
 	if (spr->BAM) {
