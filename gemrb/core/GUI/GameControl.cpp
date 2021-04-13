@@ -1701,10 +1701,10 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		if (frame.h >= mapsize.h + mwinframe.h + 32) {
-			p.y = (mapsize.h - frame.h)/2;
+			p.y = (mapsize.h - frame.h)/2 + 50;
 			canMove = false;
 		} else if (p.y + frame.h >= mapsize.h + mwinframe.h + 32) {
-			p.y = mapsize.h - frame.h + mwinframe.h + 32;
+			p.y = mapsize.h - frame.h + mwinframe.h + 50;
 			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;
