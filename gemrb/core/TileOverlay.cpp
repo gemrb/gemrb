@@ -77,7 +77,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 
 			// this is the base terrain tile
 			Point p = Point(x * 64, y * 64) - viewport.Origin();
-			vid->BlitTile( anim->NextFrame(), p, NULL, flags, tintcol);
+			vid->BlitTile( anim->NextFrame(), p, flags, tintcol);
 
 			if (!tile->om || tile->tileIndex) {
 				continue;
@@ -93,7 +93,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 						uint32_t transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
 						// this is the water (or whatever)
 						vid->BlitTile( ovtile->anim[0]->NextFrame(), p,
-									   NULL, flags | transFlag, tintcol);
+									   flags | transFlag, tintcol);
 						
 						
 
@@ -101,12 +101,12 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 							if (tile->anim[1]) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1
 								vid->BlitTile(tile->anim[1]->NextFrame(), p,
-											  NULL, flags | BLIT_BLENDED, tintcol);
+											  flags | BLIT_BLENDED, tintcol);
 							}
 						} else {
 							// in BG 1 this is the mask to blend the terrain tile with the water
 							vid->BlitTile(tile->anim[0]->NextFrame(), p,
-										  NULL, flags | BLIT_BLENDED, tintcol);
+										  flags | BLIT_BLENDED, tintcol);
 						}
 					}
 				}

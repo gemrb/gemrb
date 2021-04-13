@@ -200,7 +200,7 @@ public:
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 
-	virtual void BlitTile(const Holder<Sprite2D> spr, const Point& p, const Region* clip,
+	virtual void BlitTile(const Holder<Sprite2D> spr, const Point& p,
 						  uint32_t flags, const Color* tint = NULL) = 0;
 	
 	void BlitSprite(const Holder<Sprite2D> spr, Point p,
