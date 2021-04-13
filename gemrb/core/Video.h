@@ -210,11 +210,10 @@ public:
 							uint32_t flags, Color tint = Color()) = 0;
 
 	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
-								uint32_t flags, Color tint,
-								const Region* clip = NULL) = 0;
+								uint32_t flags, Color tint) = 0;
 
 	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
-				   uint32_t flags, Color tint, const Region* clip = NULL);
+								   uint32_t flags, Color tint);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
 								 const Color* tint = nullptr, const Region* clip = nullptr) = 0;

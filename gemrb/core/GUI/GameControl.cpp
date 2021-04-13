@@ -376,7 +376,7 @@ void GameControl::DrawArrowMarker(Point p, const Color& color) const
 	if (arrow_orientations[draw]>=0) {
 		Video* video = core->GetVideoDriver();
 		Holder<Sprite2D> arrow = core->GetScrollCursorSprite(arrow_orientations[draw], 0);
-		video->BlitGameSprite(arrow, p - vpOrigin, BLIT_COLOR_MOD | BLIT_BLENDED, color, NULL);
+		video->BlitGameSprite(arrow, p - vpOrigin, BLIT_COLOR_MOD | BLIT_BLENDED, color);
 	}
 }
 

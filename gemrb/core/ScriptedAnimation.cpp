@@ -684,7 +684,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BLIT_BLENDED, tint);
 
 	if (light) {
-		video->BlitGameSprite(light, p, flags, tint, NULL);
+		video->BlitGameSprite(light, p, flags, tint);
 	}
 }
 

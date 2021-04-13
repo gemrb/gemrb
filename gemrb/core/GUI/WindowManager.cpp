@@ -464,7 +464,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 
 	if (hoverWin && hoverWin->IsDisabledCursor()) {
 		// draw greayed cursor
-		video->BlitGameSprite(cur, pos, BLIT_GREY|BLIT_BLENDED, ColorGray, NULL);
+		video->BlitGameSprite(cur, pos, BLIT_GREY|BLIT_BLENDED, ColorGray);
 	} else {
 		// draw normal cursor
 		video->BlitSprite(cur, pos);

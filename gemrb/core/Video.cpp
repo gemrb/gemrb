@@ -243,15 +243,15 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 }
 
 void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
-							   uint32_t flags, Color tint, const Region* clip)
+							   uint32_t flags, Color tint)
 {
 	if (pal) {
 		PaletteHolder oldpal = spr->GetPalette();
 		spr->SetPalette(pal);
-		BlitGameSprite(spr, p, flags, tint, clip);
+		BlitGameSprite(spr, p, flags, tint);
 		spr->SetPalette(oldpal);
 	} else {
-		BlitGameSprite(spr, p, flags, tint, clip);
+		BlitGameSprite(spr, p, flags, tint);
 	}
 }
 

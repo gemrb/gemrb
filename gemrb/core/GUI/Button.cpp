@@ -183,7 +183,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (overlayHeight) {
 				// TODO: Add an option to add BLIT_GREY to the flags
 				const Color& col = overlayAnim.Current();
-				video->BlitGameSprite(Picture, picPos, BLIT_COLOR_MOD, col, NULL);
+				video->BlitGameSprite(Picture, picPos, BLIT_COLOR_MOD, col);
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
