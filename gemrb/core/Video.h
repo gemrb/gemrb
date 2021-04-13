@@ -210,7 +210,7 @@ public:
 							uint32_t flags, Color tint = Color()) = 0;
 
 	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
-								uint32_t flags, Color tint) = 0;
+								uint32_t flags, Color tint = Color()) = 0;
 
 	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
 								   uint32_t flags, Color tint);

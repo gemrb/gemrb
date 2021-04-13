@@ -78,7 +78,7 @@ public:
 	void BlitTile(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, const Color* tint = NULL) override;
 	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
 						uint32_t flags, Color tint = Color()) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint) override;
+	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint = Color()) override;
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
