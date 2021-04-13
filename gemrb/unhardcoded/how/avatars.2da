@@ -276,10 +276,10 @@
 0xE130    MGFR      MGFR       MGFR       MGFR       9          4          1          *
 0xE140    MGVE      MGVE       MGVE       MGVE       9          3          1          *
 0xE150    MGFO      MGFO       MGFO       MGFO       9          3          1          *
-0xE200    MELA      MELA       MELA       MELA       9          4          1          *
-0xE210    MELE      MELE       MELE       MELE       9          4          1          *
-0xE220    MELF      MELF       MELF       MELF       9          4          1          *
-0xE230    MELW      MELW       MELW       MELW       9          4          1          *
+0xE200    MELA      MELA       MELA       MELA       9          3          1          *
+0xE210    MELE      MELE       MELE       MELE       9          3          1          *
+0xE220    MELF      MELF       MELF       MELF       9          3          1          *
+0xE230    MELW      MELW       MELW       MELW       9          3          1          *
 0xE240    MHAR      MHAR       MHAR       MHAR       9          3          1          *
 0xE250    MWWE      MWWE       MWWE       MWWE       9          2          1          *
 0xE260    MFEY      MFEY       MFEY       MFEY       9          2          1          *

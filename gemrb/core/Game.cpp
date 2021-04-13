@@ -2054,6 +2054,8 @@ void Game::Infravision()
 		if (actor->GetCurrentArea()!=map) continue;
 
 		bool hasInfravision = actor->GetStat(IE_STATE_ID) & STATE_INFRA;
+		// sigh, racial infravision wasn't stored as the state bit
+		hasInfravision |= gamedata->HasInfravision(actor->GetRaceName());
 		someoneWithInfravision |= hasInfravision;
 
 		someoneSelected |= actor->Selected;

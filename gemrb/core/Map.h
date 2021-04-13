@@ -477,6 +477,7 @@ public:
 	bool AnyEnemyNearPoint(const Point &p) const;
 	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
 	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
+	unsigned int GetBlocked(unsigned int x, unsigned int y, int size) const;
 	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;
 	unsigned int GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
@@ -564,7 +565,7 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, unsigned int radiusx=0, unsigned int radiusy=0) const;
+	void AdjustPosition(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0, int size = -1) const;
 	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0) const;
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
@@ -668,8 +669,8 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
-	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy) const;
+	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size = -1) const;
+	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
 	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;

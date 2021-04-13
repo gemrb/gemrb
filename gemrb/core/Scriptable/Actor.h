@@ -488,7 +488,7 @@ public:
 	/** places the actor on the map */
 	void SetMap(Map *map);
 	/** sets the actor's position, calculating with the nojump flag*/
-	void SetPosition(const Point &nmptTarget, int jump, int radiusx=0, int radiusy=0);
+	void SetPosition(const Point &nmptTarget, int jump, int radiusx = 0, int radiusy = 0, int size = -1);
 	/** you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
@@ -969,6 +969,7 @@ public:
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
 	bool IsKitInactive() const;
+	const char* GetRaceName() const;
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);

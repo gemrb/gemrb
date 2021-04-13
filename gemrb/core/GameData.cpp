@@ -616,25 +616,35 @@ int GameData::GetSwingCount(ieDword ItemType)
 	return ItemSounds[ItemType].size() - 2;
 }
 
-static bool loadedRacialTHAC0 = false;
 int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 {
+	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
 		raceTHAC0Bonus.load("racethac", true);
 		loadedRacialTHAC0 = true;
 	}
 
 	// not all games have the table
-	if (!raceTHAC0Bonus) return 0;
+	if (!raceTHAC0Bonus || !raceName) return 0;
 
 	char profString[5];
 	snprintf(profString, sizeof(profString), "%u", proficiency);
 	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
 }
 
-static bool loadedSpellAbilityDie = false;
+int GameData::HasInfravision(const char *raceName)
+{
+	if (!racialInfravision.ok()) {
+		racialInfravision.load("racefeat", true);
+	}
+	if (!raceName) return 0;
+
+	return atoi(racialInfravision->QueryField(raceName, "VALUE"));
+}
+
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
+	static bool loadedSpellAbilityDie = false;
 	if (!loadedSpellAbilityDie) {
 		if (!spellAbilityDie.load("clssplab", true)) {
 			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");

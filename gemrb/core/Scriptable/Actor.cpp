@@ -3415,11 +3415,6 @@ void Actor::RefreshHP() {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
 
-	if (third) {
-		//toughness feat bonus (could be unhardcoded as a max hp bonus based on level if you want)
-		bonus += Modified[IE_FEAT_TOUGHNESS]*3;
-	}
-
 	//we still apply the maximum bonus to dead characters, but don't apply
 	//to current HP, or we'd have dead characters showing as having hp
 	Modified[IE_MAXHITPOINTS]+=bonus;
@@ -5178,7 +5173,7 @@ void Actor::SetMap(Map *map)
 }
 
 // Position should be a navmap point
-void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy)
+void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radiusy, int size)
 {
 	ResetPathTries();
 	ClearPath(true);
@@ -5191,7 +5186,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
-		map->AdjustPosition( p, radiusx, radiusy );
+		map->AdjustPosition(p, radiusx, radiusy, size);
 	}
 	if (p==q) {
 		MoveTo(nmptTarget);
@@ -7083,10 +7078,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	}
 
 	// Elves get a racial THAC0 bonus with swords and bows, halflings with slings
-	if (raceID2Name.count(BaseStats[IE_RACE])) {
-		const char *raceName = raceID2Name[BaseStats[IE_RACE]];
-		prof += gamedata->GetRacialTHAC0Bonus(wi.prof, raceName);
-	}
+	prof += gamedata->GetRacialTHAC0Bonus(wi.prof, GetRaceName());
 
 	if (third) {
 		// iwd2 gives a dualwielding bonus when using a simple weapon in the offhand
@@ -11455,6 +11447,15 @@ bool Actor::ShouldModifyMorale() const
 {
 	// pst ignores it for pcs, treating it more like reputation
 	return !pstflags || Modified[IE_EA] != EA_PC;
+}
+
+const char* Actor::GetRaceName() const
+{
+	if (raceID2Name.count(BaseStats[IE_RACE])) {
+		return raceID2Name[BaseStats[IE_RACE]];
+	} else {
+		return nullptr;
+	}
 }
 
 }
