@@ -363,20 +363,15 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 	}
 }
 
-void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint, const Region* clip)
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint)
 {
 	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();
 	Point origin = r.Origin() + p;
 
-	if (clip) {
-		SDL_Rect drect = {origin.x, origin.y, clip->w, clip->h};
-		BlitSpriteNativeClipped(tex, RectFromRegion(*clip), drect, flags, reinterpret_cast<const SDL_Color*>(tint));
-	} else {
-		SDL_Rect srect = {0, 0, r.w, r.h};
-		SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
-		BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
-	}
+	SDL_Rect srect = {0, 0, r.w, r.h};
+	SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
+	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
 }
 
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
