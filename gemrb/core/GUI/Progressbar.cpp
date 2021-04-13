@@ -59,7 +59,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if((val >= 100) && KnobStepsCount && BackGround2) {
 		//animated progbar end stage
-		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin(), &rgn);
+		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin());
 		return; //done for animated progbar
 	}
 

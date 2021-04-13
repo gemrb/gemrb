@@ -147,9 +147,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.Origin(), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.Origin());
 	} else {
-		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.Origin(), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.Origin());
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
@@ -174,13 +174,13 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		Point p = drawFrame.Origin() + Frames[IMAGE_SLIDER]->Frame.Origin();
 		p.x += slx;
 		p.y += upMy + sly;
-		video->BlitSprite(Frames[IMAGE_SLIDER], p, &drawFrame);
+		video->BlitSprite(Frames[IMAGE_SLIDER], p);
 	}
 	//draw the down button
 	if (( State & DOWN_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_DOWN_PRESSED], Point(drawFrame.x, maxy));
 	} else {
-		video->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy), &drawFrame);
+		video->BlitSprite(Frames[IMAGE_DOWN_UNPRESSED], Point(drawFrame.x, maxy));
 	}
 }
 
