@@ -240,8 +240,6 @@ public:
 	/** Draws a line segment */
 	void DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags = 0);
 	void DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
-	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Holder<Sprite2D> img);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */

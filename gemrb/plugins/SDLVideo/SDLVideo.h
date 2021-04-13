@@ -82,9 +82,6 @@ public:
 	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint,
 								const Region* clip = NULL) override;
 
-	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Holder<Sprite2D> img);
-
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
 	typedef SDL_Texture vid_buf_t;
