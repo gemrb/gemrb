@@ -1062,27 +1062,6 @@ int Interface::LoadSprites()
 	FogSprites[12] = video->MirrorSprite( FogSprites[6], BLIT_MIRRORX, false );
 	assert(FogSprites[12]->renderFlags&BLIT_MIRRORX);
 
-	FogSprites[16] = anim->GetFrame( 3, 0 );
-	FogSprites[17] = anim->GetFrame( 4, 0 );
-	FogSprites[18] = anim->GetFrame( 5, 0 );
-	FogSprites[19] = anim->GetFrame( 6, 0 );
-
-	FogSprites[20] = video->MirrorSprite( FogSprites[17], BLIT_MIRRORY, false );
-	assert(FogSprites[20]->renderFlags&BLIT_MIRRORY);
-
-	FogSprites[24] = video->MirrorSprite( FogSprites[18], BLIT_MIRRORX, false );
-	assert(FogSprites[24]->renderFlags&BLIT_MIRRORX);
-
-	FogSprites[25] = anim->GetFrame( 7, 0 );
-
-	FogSprites[22] = video->MirrorSprite( FogSprites[25], BLIT_MIRRORX|BLIT_MIRRORY, false );
-	assert(FogSprites[22]->renderFlags&BLIT_MIRRORX);
-	assert(FogSprites[22]->renderFlags&BLIT_MIRRORY);
-
-	FogSprites[28] = video->MirrorSprite( FogSprites[19], BLIT_MIRRORX|BLIT_MIRRORY, false );
-	assert(FogSprites[28]->renderFlags&BLIT_MIRRORX);
-	assert(FogSprites[28]->renderFlags&BLIT_MIRRORY);
-
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {

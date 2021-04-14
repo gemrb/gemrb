@@ -439,7 +439,7 @@ public:
 	ResRef WorldMapName[2];
 	Variables * AreaAliasTable;
 	std::vector<Holder<Sprite2D> > Cursors;
-	Holder<Sprite2D> FogSprites[32] {};
+	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;

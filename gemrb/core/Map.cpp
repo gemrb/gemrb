@@ -1010,12 +1010,12 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		return Point(x, y);
 	};
 	
-	auto FillFog = [=](int x, int y, int count) {
+	auto FillFog = [=](int x, int y, int count, uint32_t flags) {
 		Region r(ConvertPointToScreen(x, y), Size(CELL_SIZE * count, CELL_SIZE));
-		vid->DrawRect(r, ColorBlack, true);
+		vid->DrawRect(r, ColorBlack, true, flags);
 	};
 	
-	auto Fill = [=](int x, int y, uint8_t dirs, uint8_t idxBase) {
+	auto Fill = [=](int x, int y, uint8_t dirs, uint32_t flags) {
 		// If an explored tile is adjacent to an
 		//   unexplored one, we draw border sprite
 		//   (gradient black <-> transparent)
@@ -1044,31 +1044,31 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			case E:
 			case NE:
 			case SE:
-				vid->BlitSprite(core->FogSprites[idxBase + dirs], p);
+				vid->BlitGameSprite(core->FogSprites[dirs], p, flags);
 				return true;
 			case N|S:
-				vid->BlitSprite(core->FogSprites[idxBase + N], p);
-				vid->BlitSprite(core->FogSprites[idxBase + S], p);
+				vid->BlitGameSprite(core->FogSprites[N], p, flags);
+				vid->BlitGameSprite(core->FogSprites[S], p, flags);
 				return true;
 			case NW|SW:
-				vid->BlitSprite(core->FogSprites[idxBase + NW], p);
-				vid->BlitSprite(core->FogSprites[idxBase + SW], p);
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
 				return true;
 			case W|E:
-				vid->BlitSprite(core->FogSprites[idxBase + W], p);
-				vid->BlitSprite(core->FogSprites[idxBase + E], p);
+				vid->BlitGameSprite(core->FogSprites[W], p, flags);
+				vid->BlitGameSprite(core->FogSprites[E], p, flags);
 				return true;
 			case NW|NE:
-				vid->BlitSprite(core->FogSprites[idxBase + NW], p);
-				vid->BlitSprite(core->FogSprites[idxBase + NE], p);
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
 				return true;
 			case NE|SE:
-				vid->BlitSprite(core->FogSprites[idxBase + NE], p);
-				vid->BlitSprite(core->FogSprites[idxBase + SE], p);
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
 				return true;
 			case SW|SE:
-				vid->BlitSprite(core->FogSprites[idxBase + SW], p);
-				vid->BlitSprite(core->FogSprites[idxBase + SE], p);
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
 				return true;
 			default: // a fully surrounded tile is filled
 				return false;
@@ -1076,41 +1076,51 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 	};
 	
 	auto FillExplored = [=](int x, int y) {
+		const static uint32_t flags = BLIT_BLENDED;
+		
 		int dirs = !IsExplored(x, y - 1); // N
 		if (!IsExplored(x - 1, y)) dirs |= W;
 		if (!IsExplored(x, y + 1)) dirs |= S;
 		if (!IsExplored(x + 1, y )) dirs |= E;
 
-		if (dirs && !Fill(x, y, dirs, 0)) {
-			FillFog(x, y, 1);
+		if (dirs && !Fill(x, y, dirs, flags)) {
+			FillFog(x, y, 1, BLIT_NO_FLAGS);
 		}
 	};
 	
 	auto FillVisible = [=](int x, int y) {
+		const static uint32_t flags = BLIT_HALFTRANS | BLIT_BLENDED;
+
 		int dirs = !IsVisible( x, y - 1); // N
 		if (!IsVisible(x - 1, y)) dirs |= W;
 		if (!IsVisible(x, y + 1)) dirs |= S;
 		if (!IsVisible(x + 1, y)) dirs |= E;
 
-		if (dirs && !Fill(x, y, dirs, 16)) {
-			vid->BlitSprite(core->FogSprites[16], ConvertPointToScreen(x, y));
+		if (dirs && !Fill(x, y, dirs, flags)) {
+			FillFog(x, y, 1, flags);
 		}
 	};
 
 	for (int y = start.y; y < end.y; y++) {
 		int unexploredQueue = 0;
+		int shroudedQueue = 0;
 		int x = start.x;
 		for (; x < end.x; x++) {
 			if (IsExplored(x, y)) {
 				if (unexploredQueue) {
-					FillFog(x - unexploredQueue, y, unexploredQueue);
+					FillFog(x - unexploredQueue, y, unexploredQueue, BLIT_NO_FLAGS);
 					unexploredQueue = 0;
 				}
 				
 				if (IsVisible(x, y)) {
+					if (shroudedQueue) {
+						FillFog(x - shroudedQueue, y, shroudedQueue, BLIT_HALFTRANS | BLIT_BLENDED);
+						shroudedQueue = 0;
+					}
 					FillVisible(x, y);
 				} else {
-					vid->BlitSprite(core->FogSprites[16], ConvertPointToScreen(x, y));
+					// coalese all horizontally adjacent shrouded cells
+					++shroudedQueue;
 				}
 				
 				FillExplored(x, y);
@@ -1121,7 +1131,9 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		}
 		
 		if (unexploredQueue) {
-			FillFog(x - unexploredQueue, y, unexploredQueue);
+			FillFog(x - unexploredQueue, y, unexploredQueue, BLIT_NO_FLAGS);
+		} else if (shroudedQueue) {
+			FillFog(x - shroudedQueue, y, shroudedQueue, BLIT_HALFTRANS | BLIT_BLENDED);
 		}
 	}
 }
