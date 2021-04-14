@@ -1075,29 +1075,28 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		}
 	};
 	
+	const static uint32_t opaque = BLIT_NO_FLAGS;
+	const static uint32_t trans = BLIT_HALFTRANS | BLIT_BLENDED;
+	
 	auto FillExplored = [=](int x, int y) {
-		const static uint32_t flags = BLIT_BLENDED;
-		
 		int dirs = !IsExplored(x, y - 1); // N
 		if (!IsExplored(x - 1, y)) dirs |= W;
 		if (!IsExplored(x, y + 1)) dirs |= S;
 		if (!IsExplored(x + 1, y )) dirs |= E;
 
-		if (dirs && !Fill(x, y, dirs, flags)) {
-			FillFog(x, y, 1, BLIT_NO_FLAGS);
+		if (dirs && !Fill(x, y, dirs, BLIT_BLENDED)) {
+			FillFog(x, y, 1, opaque);
 		}
 	};
 	
 	auto FillVisible = [=](int x, int y) {
-		const static uint32_t flags = BLIT_HALFTRANS | BLIT_BLENDED;
-
 		int dirs = !IsVisible( x, y - 1); // N
 		if (!IsVisible(x - 1, y)) dirs |= W;
 		if (!IsVisible(x, y + 1)) dirs |= S;
 		if (!IsVisible(x + 1, y)) dirs |= E;
 
-		if (dirs && !Fill(x, y, dirs, flags)) {
-			FillFog(x, y, 1, flags);
+		if (dirs && !Fill(x, y, dirs, trans)) {
+			FillFog(x, y, 1, trans);
 		}
 	};
 
@@ -1108,13 +1107,13 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		for (; x < end.x; x++) {
 			if (IsExplored(x, y)) {
 				if (unexploredQueue) {
-					FillFog(x - unexploredQueue, y, unexploredQueue, BLIT_NO_FLAGS);
+					FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
 					unexploredQueue = 0;
 				}
 				
 				if (IsVisible(x, y)) {
 					if (shroudedQueue) {
-						FillFog(x - shroudedQueue, y, shroudedQueue, BLIT_HALFTRANS | BLIT_BLENDED);
+						FillFog(x - shroudedQueue, y, shroudedQueue, trans);
 						shroudedQueue = 0;
 					}
 					FillVisible(x, y);
@@ -1131,9 +1130,9 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 		}
 		
 		if (unexploredQueue) {
-			FillFog(x - unexploredQueue, y, unexploredQueue, BLIT_NO_FLAGS);
+			FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
 		} else if (shroudedQueue) {
-			FillFog(x - shroudedQueue, y, shroudedQueue, BLIT_HALFTRANS | BLIT_BLENDED);
+			FillFog(x - shroudedQueue, y, shroudedQueue, trans);
 		}
 	}
 }
