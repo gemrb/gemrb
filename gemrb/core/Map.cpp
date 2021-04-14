@@ -1129,10 +1129,12 @@ void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region
 			}
 		}
 		
+		if (shroudedQueue) {
+			FillFog(x - (shroudedQueue + unexploredQueue), y, shroudedQueue, trans);
+		}
+		
 		if (unexploredQueue) {
 			FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
-		} else if (shroudedQueue) {
-			FillFog(x - shroudedQueue, y, shroudedQueue, trans);
 		}
 	}
 }
