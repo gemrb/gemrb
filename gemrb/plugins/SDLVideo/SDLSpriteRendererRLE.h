@@ -197,9 +197,7 @@ void SRBlender<Uint16, SRBlender_Alpha>::operator()(Uint16& pix, Uint8 r, Uint8 
 
 template<> // 32 bpp, 888
 void SRBlender<Uint32, SRBlender_NoAlpha>::operator()(Uint32& pix, Uint8 r, Uint8 g, Uint8 b, Uint8) const {
-	pix = (r << RSHIFT) |
-	(g << GSHIFT) |
-	(b << BSHIFT);
+	pix = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
 }
 
 template<> // 32 bpp, 888
@@ -216,9 +214,7 @@ void SRBlender<Uint32, SRBlender_Alpha>::operator()(Uint32& pix, Uint8 r, Uint8 
 	r = (dr + (dr>>8)) >> 8;
 	g = (dg + (dg>>8)) >> 8;
 	b = (db + (db>>8)) >> 8;
-	pix = (r << RSHIFT) |
-		  (g << GSHIFT) |
-		  (b << BSHIFT);
+	pix = (r << RSHIFT) | (g << GSHIFT) | (b << BSHIFT);
 }
 
 // these always change together
