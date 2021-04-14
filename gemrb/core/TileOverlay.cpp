@@ -58,10 +58,11 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 
 	Game* game = core->GetGame();
 	assert(game);
-	const Color* tintcol = game->GetGlobalTint();
-	if (tintcol) {
+	const Color* globalTint = game->GetGlobalTint();
+	if (globalTint) {
 		flags |= BLIT_COLOR_MOD;
 	}
+	const Color tintcol = (globalTint) ? * globalTint : Color();
 
 	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
@@ -77,7 +78,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 
 			// this is the base terrain tile
 			Point p = Point(x * 64, y * 64) - viewport.Origin();
-			vid->BlitTile( anim->NextFrame(), p, flags, tintcol);
+			vid->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
 
 			if (!tile->om || tile->tileIndex) {
 				continue;
@@ -92,21 +93,18 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 						//draw overlay tiles, they should be half transparent except for BG1
 						uint32_t transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
 						// this is the water (or whatever)
-						vid->BlitTile( ovtile->anim[0]->NextFrame(), p,
-									   flags | transFlag, tintcol);
-						
-						
+						vid->BlitGameSprite(ovtile->anim[0]->NextFrame(), p, flags | transFlag, tintcol);
 
 						if (core->HasFeature(GF_LAYERED_WATER_TILES)) {
 							if (tile->anim[1]) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1
-								vid->BlitTile(tile->anim[1]->NextFrame(), p,
-											  flags | BLIT_BLENDED, tintcol);
+								vid->BlitGameSprite(tile->anim[1]->NextFrame(), p,
+													flags | BLIT_BLENDED, tintcol);
 							}
 						} else {
 							// in BG 1 this is the mask to blend the terrain tile with the water
-							vid->BlitTile(tile->anim[0]->NextFrame(), p,
-										  flags | BLIT_BLENDED, tintcol);
+							vid->BlitGameSprite(tile->anim[0]->NextFrame(), p,
+												flags | BLIT_BLENDED, tintcol);
 						}
 					}
 				}

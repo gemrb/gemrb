@@ -282,18 +282,6 @@ Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp
 	return spr;
 }
 
-void SDLVideoDriver::BlitTile(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, const Color* tint)
-{
-	assert(spr->BAM == false);
-
-	Region fClip = ClippedDrawingRect(Region(p.x, p.y, 64, 64));
-	Region srect(0, 0, fClip.w, fClip.h);
-	srect.x -= p.x - fClip.x;
-	srect.y -= p.y - fClip.y;
-
-	BlitSpriteClipped(spr, srect, fClip, flags, tint);
-}
-
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
 								uint32_t flags, Color tint)
 {
