@@ -49,6 +49,7 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 
 	me.buttonStates = (down) ? GEM_MB_ACTION : 0;
 	me.button = GEM_MB_ACTION;
+	me.repeats = 1;
 
 	return me;
 }
