@@ -40,6 +40,7 @@ using namespace GemRB;
 // and our interface will be the wrong orientation and distorted
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+	[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
 	// Normally you would call super implemetation first, but don't!
 	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
 	ToggleLogging(true);
@@ -102,6 +103,7 @@ using namespace GemRB;
 		[confControl release];
 		[procArguments release];
 
+		[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
 		core = new Interface();
 		CFGConfig* config = new CFGConfig(argc, argv);
 		free(argv);
