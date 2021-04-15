@@ -171,15 +171,16 @@ enum ConfigTableSection {
 		return NO;
 	}
 
-	UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
+	__block UIProgressView* pv = nil;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
 
-	UIProgressView* pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
-	UIView* contentView = selectedCell.contentView;
-	CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
-	dispatch_async(dispatch_get_main_queue(), ^{
+		pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+		UIView* contentView = selectedCell.contentView;
+		CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
 		pv.frame = frame;
+		[contentView addSubview:pv];
 	});
-	[contentView addSubview:pv];
 
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
 	NSString* libDir = [[paths objectAtIndex:0] copy];
