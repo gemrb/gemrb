@@ -183,7 +183,7 @@ int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 	// function properly. eg iPhone and Android the requested size may be 640x480,
 	// but the window will always be the size of the screen
 	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
-	SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
+	//SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
 	SDL_StopTextInput(); // for some reason this is enabled from start
 
