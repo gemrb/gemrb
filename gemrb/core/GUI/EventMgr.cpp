@@ -90,7 +90,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 
 KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
 {
-	KeyboardEvent ke;
+	KeyboardEvent ke{};
 
 	// TODO: probably want more than the DPad
 	switch (ce.button) {

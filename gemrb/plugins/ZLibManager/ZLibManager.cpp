@@ -102,7 +102,7 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 {
 	unsigned char bufferin[INPUTSIZE], bufferout[OUTPUTSIZE];
-	z_stream stream;
+	z_stream stream{};
 	int result;
 
 	stream.zalloc = Z_NULL;

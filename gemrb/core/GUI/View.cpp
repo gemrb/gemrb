@@ -293,7 +293,7 @@ void View::Draw()
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
 				wchar_t string[256];
-				swprintf(string, sizeof(string) - 1, L"id: %lu  grp: %s  \nflgs: %u\ntype:%s",
+				swprintf(string, 255, L"id: %lu  grp: %s  \nflgs: %u\ntype:%s",
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 				Region r = drawFrame;
 				r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
