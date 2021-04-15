@@ -104,6 +104,8 @@ using namespace GemRB;
 		[procArguments release];
 
 		[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
+		setenv("PYTHONHOME", "Documents/python", 1);
+		setenv("PYTHONPATH", "Documents/python/lib/python27", 1);
 		core = new Interface();
 		CFGConfig* config = new CFGConfig(argc, argv);
 		free(argv);

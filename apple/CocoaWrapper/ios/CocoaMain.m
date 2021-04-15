@@ -43,8 +43,6 @@ int SDL_main (int __unused argc, char __unused **argv)
 
 	//do all the special plugin initializations here
 	Py_NoSiteFlag = 1;
-	//this mostly just supresses a benign console error
-	setenv("PYTHONHOME", "GUIScripts", 0);
 
 	return 0; //never actually returns.
 }
