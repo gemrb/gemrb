@@ -419,6 +419,8 @@
 		A2C1DB4F261674490024D213 /* MappedFileMemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A24B088D24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp */; };
 		A2C1DB82261674640024D213 /* PathFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */; };
 		A2C1DBE8261674790024D213 /* RNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F065246102D70073802C /* RNG.cpp */; };
+		A2C1E107262A2A930024D213 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C1E106262A2A920024D213 /* Metal.framework */; };
+		A2C1E13B262A2AA70024D213 /* CoreHaptics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */; };
 		A2C229C2150D89F300A0E3BE /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A2C66DB513A295DC00C0AA8E /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2830A0F13A05A64000A63FE /* OpenAL.framework */; };
 		A2C76D2A14F196E900961680 /* StringBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2C76D2814F196E900961680 /* StringBuffer.cpp */; };
@@ -1741,6 +1743,8 @@
 		A2BFA07D1395FF62006ADC12 /* WorldMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMap.h; sourceTree = "<group>"; };
 		A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapMgr.cpp; sourceTree = "<group>"; };
 		A2BFA07F1395FF62006ADC12 /* WorldMapMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMapMgr.h; sourceTree = "<group>"; };
+		A2C1E106262A2A920024D213 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
+		A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreHaptics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.4.sdk/System/Library/Frameworks/CoreHaptics.framework; sourceTree = DEVELOPER_DIR; };
 		A2C517AE1F9D1D7D005D74ED /* ViewInterfaces.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewInterfaces.h; sourceTree = "<group>"; };
 		A2C76D2814F196E900961680 /* StringBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuffer.cpp; sourceTree = "<group>"; };
 		A2C76D2914F196E900961680 /* StringBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringBuffer.h; sourceTree = "<group>"; };
@@ -2191,6 +2195,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A2C1E13B262A2AA70024D213 /* CoreHaptics.framework in Frameworks */,
+				A2C1E107262A2A930024D213 /* Metal.framework in Frameworks */,
 				A289588320D6CFCF002F4A97 /* AVFoundation.framework in Frameworks */,
 				A289587F20D6CFAE002F4A97 /* GameController.framework in Frameworks */,
 				A289587D20D6CF66002F4A97 /* libOpenSSL.a in Frameworks */,
@@ -3414,6 +3420,8 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */,
+				A2C1E106262A2A920024D213 /* Metal.framework */,
 				A2F5F06F246103B90073802C /* libiconv.tbd */,
 				A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */,
 				A289588220D6CFCF002F4A97 /* AVFoundation.framework */,
