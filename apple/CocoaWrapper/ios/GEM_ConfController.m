@@ -269,7 +269,7 @@ enum ConfigTableSection {
 		}
 
 		installName = [installName lastPathComponent];
-		NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+		NSString* gamePath = [NSString stringWithFormat:@"Library/%@/%@/", [archivePath pathExtension], installName];
 		// delete anything at gamePath. our install overwrites existing data.
 		[fm removeItemAtPath:gamePath error:nil];
 		if (archiveHasRootDir) {
@@ -282,11 +282,11 @@ enum ConfigTableSection {
 			[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 		}
 
-		NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@/", libDir, [archivePath pathExtension]];
+		NSString* savePath = [NSString stringWithFormat:@"Library/saves/%@/", [archivePath pathExtension]];
 		NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
 		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"Library/Caches/%@/", [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
 		NSLog(@"moving %@ to %@", oldSavePath, savePath);
 		NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
@@ -326,7 +326,7 @@ enum ConfigTableSection {
 			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
 			[newConfig appendFormat:@"\nGamePath = %@", gamePath];
 			// No need for CD paths
-			[newConfig appendFormat:@"\nCachePath = %@/Caches/%@/", libDir, [archivePath pathExtension]];
+			[newConfig appendFormat:@"\nCachePath = Library/Caches/%@/", [archivePath pathExtension]];
 			[newConfig appendFormat:@"\nSavePath = %@", savePath];
 
 			[newConfig appendFormat:@"\nCustomFontPath = %@", docDir];
