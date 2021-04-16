@@ -330,22 +330,11 @@ enum ConfigTableSection {
 			[newConfig appendFormat:@"\nSavePath = %@", savePath];
 
 			[newConfig appendFormat:@"\nCustomFontPath = %@", docDir];
-
-			NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
-			if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
-				// PST & BG1 & IWD are 640x480 without mod
-				[newConfig appendString:@"\nWidth = 640"];
-				[newConfig appendString:@"\nHeight = 480"];
-			} else {
-				if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-					[newConfig appendString:@"\nWidth = 1024"];
-					[newConfig appendString:@"\nHeight = 768"];
-				}else{
-					[newConfig appendString:@"\nWidth = 800"];
-					[newConfig appendString:@"\nHeight = 600"];
-				}
-			}
-
+			
+			CGRect screenRect = [[UIScreen mainScreen] bounds];
+			[newConfig appendFormat:@"\nWidth = %d", (int)screenRect.size.width];
+			[newConfig appendFormat:@"\nHeight = %d", (int)screenRect.size.height];
+			
 			NSError* err = nil;
 			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
 				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
