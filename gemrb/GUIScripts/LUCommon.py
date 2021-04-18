@@ -82,9 +82,7 @@ def GetLevelDiff (actor, Level):
 		LevelStat = [IE_LEVEL2, IE_LEVEL, IE_LEVEL3]
 
 	for i in range(len(Level)):
-		LevelDiff[i] = Level[i] - GemRB.GetPlayerStat (actor, LevelStat[i])
-
-	print Level, LevelDiff
+		LevelDiff[i] = max(0, Level[i] - GemRB.GetPlayerStat (actor, LevelStat[i]))
 
 	return LevelDiff
 
