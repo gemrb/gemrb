@@ -92,7 +92,7 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 		};
 
 		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]\n";
-		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 28; // 28 is for sizeof(colors[x]) * 2
+		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 2 * strlen(colors[0]);
 		wchar_t* text = (wchar_t*)malloc(len * sizeof(wchar_t));
 		swprintf(text, len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[msg.level]], msg.message.c_str());
 		ta->AppendText(text);
