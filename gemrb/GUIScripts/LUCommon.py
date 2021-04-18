@@ -47,14 +47,18 @@ def GetNextLevels (actor, Classes):
 
 	# Dual class character only care about the first class
 	# However the inactive class is needed to handle reactivation
-	if (GUICommon.IsDualClassed(actor, 0)):
+	if GUICommon.IsDualClassed (actor, False)[0]:
 		NumClasses = 1
 		if GUICommon.IsDualSwap(actor):
 			Level[1] = GemRB.GetPlayerStat (actor, IE_LEVEL)
 		else:
 			Level[1] = GemRB.GetPlayerStat (actor, IE_LEVEL2)
 	else:
-		NumClasses = len (Classes)
+		if GUICommon.IsNamelessOne (actor):
+			# no guaranteed class-getting order
+			NumClasses = 3
+		else:
+			NumClasses = len(filter(lambda x: x > 0, Classes))
 
 	for i in range(NumClasses):
 		# Get the next level we will use to look up new stats from the 2da tables
