@@ -1432,8 +1432,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 						actor->Draw(viewport, baseTint, tint, flags|BLIT_BLENDED);
 					}
 				}
-				
-				if (!visible) {
+
+				if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED|IF_ACTIVE)) == (IF_REALLYDIED|IF_ACTIVE)) {
 					actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
 					//turning actor inactive if there is no action next turn
 					actor->HibernateIfAble();
