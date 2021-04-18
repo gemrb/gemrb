@@ -105,6 +105,8 @@ public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 const Color& textcolor, const Color& initcolor, const Color& textBgColor);
+	
+	~TextArea();
 
 	bool IsOpaque() const override { return false; }
 
@@ -191,6 +193,7 @@ private: //internal functions
 
 	void TrimHistory(size_t lines);
 	void TextChanged(TextContainer& tc);
+	void ClearHistoryTimer();
 
 public: //Events
 	struct Action {

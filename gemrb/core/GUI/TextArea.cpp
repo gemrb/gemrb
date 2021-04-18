@@ -258,6 +258,11 @@ TextArea::TextArea(const Region& frame, Font* text, Font* caps,
 	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? OP_OR : OP_NAND);
 }
 
+TextArea::~TextArea()
+{
+	ClearHistoryTimer();
+}
+
 void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (AnimPicture) {
@@ -413,6 +418,14 @@ void TextArea::SetColor(const Color* color, COLOR_TYPE idx)
 	}
 }
 
+void TextArea::ClearHistoryTimer()
+{
+	if (historyTimer) {
+		historyTimer->Invalidate();
+		historyTimer = nullptr;
+	}
+}
+
 void TextArea::TrimHistory(size_t lines)
 {
 	if (dialogBeginNode) {
@@ -429,19 +442,13 @@ void TextArea::TrimHistory(size_t lines)
 	textContainer->DeleteContentsInRect(exclusion);
 	scrollview.Update();
 
-	if (historyTimer) {
-		historyTimer->Invalidate();
-		historyTimer = NULL;
-	}
+	ClearHistoryTimer();
 }
 
 void TextArea::AppendText(const String& text)
 {
 	if ((flags&ClearHistory)) {
-		if (historyTimer) {
-			historyTimer->Invalidate();
-			historyTimer = NULL;
-		}
+		ClearHistoryTimer();
 
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
 		int currHeight = ContentHeight();
