@@ -115,6 +115,7 @@ public:
 
 	void SetOrigin(const Point& p) { x = p.x; y = p.y; }
 	Point Origin() const { return Point(x, y); }
+	Point Center() const { return Point(x + w / 2, y + h / 2); }
 	Point Maximum() const { return Point(x + w, y + h); }
 	Size Dimensions() const { return Size(w, h); }
 	
