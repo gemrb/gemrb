@@ -1146,6 +1146,11 @@ void Map::DrawHighlightables(const Region& viewport)
 	Container *c;
 	while ((c = TMap->GetContainer(i++)) != NULL) {
 		if (c->Type != IE_CONTAINER_PILE) {
+			// don't highlight containers behind closed doors
+			// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
+			// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
+			const Door *door = TMap->GetDoor(c->BBox.Center());
+			if (door && !(door->Flags & (DOOR_OPEN|DOOR_TRANSPARENT))) continue;
 			if (c->Highlight) {
 				c->DrawOutline(viewport.Origin());
 			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
