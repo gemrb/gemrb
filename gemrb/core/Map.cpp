@@ -1160,13 +1160,11 @@ void Map::DrawHighlightables(const Region& viewport)
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
 		if (d->Highlight) {
 			d->DrawOutline(viewport.Origin());
-		} else if (debugFlags & (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET)) {
-			if ((debugFlags & DEBUG_SHOW_DOORS_SECRET) && (d->Flags & DOOR_SECRET)) {
-				d->outlineColor = ColorMagenta;
-			} else {
-				d->outlineColor = ColorCyan;
-			}
-
+		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
+			d->outlineColor = ColorCyan;
+			d->DrawOutline(viewport.Origin());
+		} else if (debugFlags & DEBUG_SHOW_DOORS_SECRET && d->Flags & DOOR_FOUND) {
+			d->outlineColor = ColorMagenta;
 			d->DrawOutline(viewport.Origin());
 		}
 	}
