@@ -1366,7 +1366,11 @@ void GameControl::UpdateCursor()
 	overDoor = area->TMap->GetDoor(gameMousePos);
 	// ignore infopoints and containers beneath doors
 	if (overDoor) {
-		nextCursor = GetCursorOverDoor(overDoor);
+		if (overDoor->Visible()) {
+			nextCursor = GetCursorOverDoor(overDoor);
+		} else {
+			overDoor = nullptr;
+		}
 	} else {
 		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, true);
 		if (overInfoPoint) {
