@@ -806,7 +806,6 @@ public:
 	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
-	int TouchInput;
 	int MaxPartySize;
 	bool KeepCache;
 	bool MultipleQuickSaves;

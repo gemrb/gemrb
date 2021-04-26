@@ -28,7 +28,7 @@ namespace GemRB {
 
 unsigned long EventMgr::DCDelay = 250;
 unsigned long EventMgr::DPDelay = 250;
-bool EventMgr::TouchInputEnabled = true;
+bool EventMgr::TouchInputEnabled = false;
 
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
 EventMgr::buttonbits EventMgr::modKeys;

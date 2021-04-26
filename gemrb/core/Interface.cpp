@@ -176,7 +176,6 @@ Interface::Interface()
 	NumFingKboard = 3;
 	NumFingScroll = 2;
 	MouseFeedback = 0;
-	TouchInput = -1;
 	IgnoreOriginalINI = 0;
 	Bpp = 32;
 	GUIScriptsPath[0] = 0;
@@ -1142,8 +1141,10 @@ int Interface::Init(InterfaceConfig* config)
 			var ( atoi( value ) ); \
 		value = NULL;
 
-	CONFIG_INT("MouseFeedback", MouseFeedback = );
-	CONFIG_INT("TouchInput", TouchInput =);
+	int touchInput = -1;
+	CONFIG_INT("TouchInput", touchInput =);
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
 
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
@@ -1157,6 +1158,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	MaxPartySize = std::min(std::max(1, MaxPartySize), 10);
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
+	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
@@ -1615,9 +1617,6 @@ int Interface::Init(InterfaceConfig* config)
 
 	ret = LoadFonts();
 	if (ret) return ret;
-	
-	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = TouchInput < 0 ? video->TouchInputEnabled() : TouchInput;
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
 	winmgr = new WindowManager(video.get());
