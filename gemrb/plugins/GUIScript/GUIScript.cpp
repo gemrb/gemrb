@@ -10034,13 +10034,13 @@ PyDoc_STRVAR( GemRB_ExploreArea__doc,
 
 static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 {
-	bool explored = true;
-	PARSE_ARGS( args,  "|p", &explored);
+	PyObject* explored = nullptr;
+	PARSE_ARGS( args,  "|O", &explored);
 	GET_GAME();
 
 	GET_MAP();
 
-	map->FillExplored(explored);
+	map->FillExplored(PyObject_IsTrue(explored));
 
 	Py_RETURN_NONE;
 }
