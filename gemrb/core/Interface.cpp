@@ -1141,11 +1141,6 @@ int Interface::Init(InterfaceConfig* config)
 			var ( atoi( value ) ); \
 		value = NULL;
 
-	int touchInput = -1;
-	CONFIG_INT("TouchInput", touchInput =);
-	// ask the driver if a touch device is in use
-	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
-
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
 	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
@@ -1164,6 +1159,8 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("DebugMode", debugMode = );
 	CONFIG_INT("TooltipDelay", WindowManager::SetTooltipDelay);
+	int touchInput = -1;
+	CONFIG_INT("TouchInput", touchInput =);
 	CONFIG_INT("Width", Width = );
 	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
 	CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
@@ -1359,6 +1356,10 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
+	
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
+	
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	vars->Lookup("Brightness Correction", brightness);
