@@ -4379,6 +4379,7 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 			sca->SetDefaultDuration(10000);
 		}
 		
+		sca->SequenceFlags |= IE_VVC_STATIC;
 		target->AddVVCell(sca);
 	} else {
 		//simulate sparkle casting glows

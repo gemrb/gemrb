@@ -8553,7 +8553,10 @@ bool Actor::UpdateDrawingState()
 {
 	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Pos = Pos;
+		if ((vvc->SequenceFlags & IE_VVC_STATIC) == 0) {
+			vvc->Pos = Pos;
+		}
+		
 		bool endReached = vvc->UpdateDrawingState(GetOrientation());
 		if (endReached) {
 			vfxDict.erase(vfxDict.find(vvc->ResName)); // make sure to delete only one element
@@ -9228,6 +9231,7 @@ ScriptedAnimation *Actor::FindOverlay(int index) const
 void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
 	assert(vvc);
+	vvc->Pos = Pos;
 	vfxDict.insert(std::make_pair(vvc->ResName, vvc));
 	vfxQueue.insert(vvc);
 	assert(vfxDict.size() == vfxQueue.size());

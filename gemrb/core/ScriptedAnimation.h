@@ -78,6 +78,7 @@ class Sprite2D;
 //#define IE_VVC_UNUSED           0xe0000000U
 //gemrb specific sequence flags
 #define IE_VVC_FREEZE     0x80000000
+#define IE_VVC_STATIC     0x40000000 // position doesnt update with actor movement
 
 //orientation flags
 #define IE_VVC_FACE_TARGET		0x00000001
