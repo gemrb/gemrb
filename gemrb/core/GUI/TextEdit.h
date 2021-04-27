@@ -54,6 +54,9 @@ private:
 	void OnTextInput(const TextEvent& /*te*/) override;
 
 	void TextChanged(TextContainer& tc);
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 
 public:
 	struct Action {

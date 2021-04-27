@@ -63,6 +63,16 @@ void TextEdit::SetFont(Font* f)
 	textContainer.SetFont(f);
 }
 
+void TextEdit::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
+}
+
+void TextEdit::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+}
+
 /** Key Press Event */
 bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
