@@ -161,10 +161,10 @@ void WorldMapControl::ScrollTo(const Point& pos)
 /** Mouse Over Event */
 bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
-	WorldMap* worldmap = core->GetWorldMap();
-	Point p = ConvertPointFromScreen(me.Pos());
-
-	if (GetValue()!=(ieDword) -1) {
+	if (GetValue() != ieDword(-1)) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
+		WorldMap* worldmap = core->GetWorldMap();
+		Point p = ConvertPointFromScreen(me.Pos());
 		Point mapOff = p + Pos;
 
 		WMPAreaEntry *oldArea = Area;
