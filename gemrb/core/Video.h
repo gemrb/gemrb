@@ -67,7 +67,7 @@ enum SpriteBlitFlags : uint32_t {
 	BLIT_STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
 
-#define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE)
+#define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE|BLIT_STENCIL_DITHER)
 
 // !!! Keep this synchronized with GUIDefines.py !!!
 // used for calculating the tooltip delay limit and the real tooltip delay

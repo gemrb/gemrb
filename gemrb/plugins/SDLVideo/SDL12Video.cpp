@@ -200,7 +200,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 	IAlphaIterator* maskit = StencilIterator(flags, drect);
 
 	// remove already handled flags and incompatible combinations
-	unsigned int remflags = flags & ~(BLIT_BLENDED | BLIT_MIRRORX | BLIT_MIRRORY);
+	unsigned int remflags = flags & ~(BLIT_BLENDED | BLIT_MIRRORX | BLIT_MIRRORY | BLIT_STENCIL_MASK);
 	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
