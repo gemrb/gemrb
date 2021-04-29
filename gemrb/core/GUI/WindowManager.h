@@ -158,7 +158,7 @@ public:
 	Window* GetGameWindow() const { return gameWin; }
 	Window* GetFocusWindow() const;
 
-	static void SetTooltipDelay(int);
+	GEM_EXPORT static void SetTooltipDelay(int);
 };
 
 
