@@ -308,6 +308,10 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
 
 		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BLIT_ALPHA_MOD|BLIT_HALFTRANS), tint);
+		
+		SDL_Rect stencilRect = drect;
+		stencilRect.x -= stencilBuffer->Origin().x;
+		stencilRect.y -= stencilBuffer->Origin().y;
 
 #if USE_OPENGL_BACKEND
 #if SDL_VERSION_ATLEAST(2, 0, 10)
@@ -338,16 +342,13 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		glActiveTexture(GL_TEXTURE0);
 		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
 
-		SDL_Rect stencilRect = drect;
-		stencilRect.x -= stencilBuffer->Origin().x;
-		stencilRect.y -= stencilBuffer->Origin().y;
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 
 		SDL_GL_UnbindTexture(stencilTex);
 		glUseProgram(previous_program);
 #else
 		// alpha masking only
-		SDL_RenderCopy(renderer, stencilTex, &drect, &drect);
+		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 #endif
 		if (flags & (BLIT_ALPHA_MOD | BLIT_HALFTRANS)) {
 			Uint8 alpha = SDL_ALPHA_OPAQUE;
