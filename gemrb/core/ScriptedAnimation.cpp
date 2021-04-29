@@ -668,7 +668,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 		flags |= BLIT_GREY;
 	}
 
-	if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
+	if (flags & BLIT_COLOR_MOD) {
 		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
