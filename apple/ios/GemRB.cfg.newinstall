@@ -88,9 +88,6 @@ Bpp=32
 #Fullscreen [Boolean]
 Fullscreen=1
 
-# Delay before tooltips appear [milliseconds]
-TooltipDelay=500
-
 #####################################################
 #  Paths                                            #
 #####################################################

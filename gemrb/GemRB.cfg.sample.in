@@ -81,9 +81,6 @@ Bpp=32
 #Fullscreen [Boolean]
 Fullscreen=0
 
-# Delay before tooltips appear [milliseconds]
-TooltipDelay=500
-
 #####################################################
 #  Audio Parameters                                 #
 #####################################################

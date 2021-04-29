@@ -148,14 +148,6 @@ Color depth of the game window (in bits per pixel).
 Whether the game should run in fullscreen mode.
 
 .TP
-.BR TooltipDelay =INT
-Delay (in milliseconds) before tooltips are displayed when the mouse is not moving.
-A reasonable number for this option is e.g.
-.IR 500 .
-The default is
-.IR 100 .
-
-.TP
 .BR SkipIntroVideos =(0|1)
 If set to
 .IR 1 ,

@@ -1158,7 +1158,6 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
 	CONFIG_INT("DebugMode", debugMode = );
-	CONFIG_INT("TooltipDelay", WindowManager::SetTooltipDelay);
 	int touchInput = -1;
 	CONFIG_INT("TouchInput", touchInput =);
 	CONFIG_INT("Width", Width = );
@@ -1537,6 +1536,11 @@ int Interface::Init(InterfaceConfig* config)
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
+
+	// set up the tooltip delay which we store in miliseconds
+	ieDword tooltipDelay = 0;
+	GetDictionary()->Lookup("Tooltips", tooltipDelay);
+	WindowManager::SetTooltipDelay(tooltipDelay * TOOLTIP_DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
