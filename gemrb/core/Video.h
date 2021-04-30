@@ -69,10 +69,6 @@ enum SpriteBlitFlags : uint32_t {
 
 #define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE|BLIT_STENCIL_DITHER)
 
-// !!! Keep this synchronized with GUIDefines.py !!!
-// used for calculating the tooltip delay limit and the real tooltip delay
-#define TOOLTIP_DELAY_FACTOR 250
-
 class GEM_EXPORT VideoBuffer {
 protected:
 	Region rect;

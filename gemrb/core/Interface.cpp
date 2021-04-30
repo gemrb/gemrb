@@ -1540,7 +1540,7 @@ int Interface::Init(InterfaceConfig* config)
 	// set up the tooltip delay which we store in miliseconds
 	ieDword tooltipDelay = 0;
 	GetDictionary()->Lookup("Tooltips", tooltipDelay);
-	WindowManager::SetTooltipDelay(tooltipDelay * TOOLTIP_DELAY_FACTOR / 10);
+	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
