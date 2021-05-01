@@ -2479,7 +2479,7 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
 	//this is used with special targeting mode (3)
 	if (dist>0xff000000) {
-		return dist;
+		return 0xffffffff;
 	}
 	return dist * VOODOO_SPL_RANGE_F;
 }
@@ -2501,7 +2501,7 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 	//make possible special return values (like 0xffffffff means the item doesn't need distance)
 	//this is used with special targeting mode (3)
 	if (dist>0xff000000) {
-		return dist;
+		return 0xffffffff;
 	}
 	return dist*VOODOO_ITM_RANGE_F;
 }
