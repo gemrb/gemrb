@@ -3523,9 +3523,15 @@ int GameScript::FallenRanger(Scriptable *Sender, const Trigger */*parameters*/)
 
 int GameScript::NightmareModeOn(Scriptable */*Sender*/, const Trigger */*parameters*/)
 {
-	ieDword diff;
+	ieDword diff = 0;
+	const Game *game = core->GetGame();
 
-	core->GetDictionary()->Lookup("Nightmare Mode", diff);
+	if (game->version == 11) { // GAM_VER_IWD
+		core->GetDictionary()->Lookup("Nightmare Mode", diff);
+	} else if (game->version == 22) { // GAM_VER_IWD2
+		diff = game->HOFMode;
+	}
+
 	if (diff) {
 		return 1;
 	}
