@@ -1852,10 +1852,13 @@ GEM_EXPORT void UpdateActorConfig()
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
+	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
 	GameDifficulty = 0;
 	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
-	if (GameDifficulty) {
+	Game *game = core->GetGame();
+	if (GameDifficulty || (game && game->HOFMode)) {
 		GameDifficulty = DIFF_INSANE;
+		if (game) game->HOFMode = true;
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);

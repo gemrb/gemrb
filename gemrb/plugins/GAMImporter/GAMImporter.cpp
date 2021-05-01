@@ -164,6 +164,12 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			str->ReadDword( &FamiliarsOffset );
 			str->ReadDword( &SavedLocOffset );
 			str->ReadDword( &SavedLocCount );
+
+			// iwd2 HoF mode was stored at the bg2 location of SavedLocOffset
+			if (version == GAM_VER_IWD2) {
+				newGame->HOFMode = SavedLocOffset == 1;
+			}
+
 			str->ReadDword( &newGame->RealTime);
 			str->ReadDword( &PPLocOffset );
 			str->ReadDword( &PPLocCount );
@@ -675,11 +681,14 @@ int GAMImporter::GetStoredFileSize(Game *game)
 		}
 	}
 
-	SavedLocOffset = headersize;
-	SavedLocCount = game->GetSavedLocationCount();
-	//there is an unknown dword at the end of iwd2 savegames
-	if (game->version==GAM_VER_IWD2) {
+	if (game->version == GAM_VER_IWD2) {
+		SavedLocOffset = game->HOFMode;
+		SavedLocCount = 0;
+		// there is an unknown dword at the end of iwd2 savegames (see PutSavedLocations)
 		headersize += 4;
+	} else {
+		SavedLocOffset = headersize;
+		SavedLocCount = game->GetSavedLocationCount();
 	}
 	headersize += SavedLocCount*12;
 
@@ -1281,8 +1290,8 @@ int GAMImporter::PutGame(DataStream *stream, Game *game)
 			return ret;
 		}
 	}
-	if (SavedLocOffset) {
-		ret = PutSavedLocations( stream, game);
+	if (SavedLocOffset || game->version == GAM_VER_IWD2) {
+		ret = PutSavedLocations(stream, game);
 		if (ret) {
 			return ret;
 		}
