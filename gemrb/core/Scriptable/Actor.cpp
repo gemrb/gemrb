@@ -11533,7 +11533,16 @@ void Actor::PlayArmorSound() const
 bool Actor::ShouldModifyMorale() const
 {
 	// pst ignores it for pcs, treating it more like reputation
-	return !pstflags || Modified[IE_EA] != EA_PC;
+	if (pstflags) {
+		return Modified[IE_EA] != EA_PC;
+	}
+
+	// in HoF, everyone else becomes immune to morale failure ("Mental Fortitude" in iwd2)
+	if (core->GetGame()->HOFMode) {
+		return Modified[IE_EA] == EA_PC;
+	}
+
+	return true;
 }
 
 const char* Actor::GetRaceName() const
