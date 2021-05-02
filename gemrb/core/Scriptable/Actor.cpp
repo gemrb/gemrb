@@ -10362,6 +10362,61 @@ void Actor::CreateDerivedStats()
 	} else {
 		CreateDerivedStatsBG();
 	}
+
+	// check for HoF upgrade
+	if (!InParty && core->GetGame()->HOFMode && !(BaseStats[IE_MC_FLAGS] & MC_HOF_UPGRADED)) {
+		BaseStats[IE_MC_FLAGS] |= MC_HOF_UPGRADED;
+
+		// our summons get less of an hp boost
+		if (BaseStats[IE_EA] <= EA_CONTROLLABLE) {
+			BaseStats[IE_MAXHITPOINTS] = 2 * BaseStats[IE_MAXHITPOINTS] + 20;
+			BaseStats[IE_HITPOINTS] = 2 * BaseStats[IE_HITPOINTS] + 20;
+		} else {
+			BaseStats[IE_MAXHITPOINTS] = 3 * BaseStats[IE_MAXHITPOINTS] + 80;
+			BaseStats[IE_HITPOINTS] = 3 * BaseStats[IE_HITPOINTS] + 80;
+		}
+
+		if (third) {
+			BaseStats[IE_CR] += 10;
+			BaseStats[IE_STR] += 10;
+			BaseStats[IE_DEX] += 10;
+			BaseStats[IE_CON] += 10;
+			BaseStats[IE_INT] += 10;
+			BaseStats[IE_WIS] += 10;
+			BaseStats[IE_CHR] += 10;
+			for (int i = 0; i < ISCLASSES; i++) {
+				int level = GetClassLevel(i);
+				if (!level) continue;
+				BaseStats[levelslotsiwd2[i]] += 12;
+			}
+			// NOTE: this is a guess, reports vary
+			// the attribute increase already contributes +5
+			for (int i = 0; i <= IE_SAVEWILL - IE_SAVEFORTITUDE; i++) {
+				BaseStats[savingthrows[i]] += 5;
+			}
+		} else {
+			BaseStats[IE_NUMBEROFATTACKS] += 2; // 1 more APR
+			ToHit.HandleFxBonus(5, true);
+			if (BaseStats[IE_XPVALUE]) {
+				BaseStats[IE_XPVALUE] = 2 * BaseStats[IE_XPVALUE] + 1000;
+			}
+			if (BaseStats[IE_GOLD]) {
+				BaseStats[IE_GOLD] += 75;
+			}
+			if (BaseStats[IE_LEVEL]) {
+				BaseStats[IE_LEVEL] += 12;
+			}
+			if (BaseStats[IE_LEVEL2]) {
+				BaseStats[IE_LEVEL2] += 12;
+			}
+			if (BaseStats[IE_LEVEL3]) {
+				BaseStats[IE_LEVEL3] += 12;
+			}
+			for (int i = 0; i < SAVECOUNT; i++) {
+				BaseStats[savingthrows[i]]++;
+			}
+		}
+	}
 }
 /* Checks if the actor is multiclassed (the MULTI column is positive) */
 bool Actor::IsMultiClassed() const
