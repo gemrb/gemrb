@@ -1859,6 +1859,8 @@ GEM_EXPORT void UpdateActorConfig()
 	if (GameDifficulty || (game && game->HOFMode)) {
 		GameDifficulty = DIFF_INSANE;
 		if (game) game->HOFMode = true;
+		// also set it for GUIOPT
+		core->GetDictionary()->SetAt("Difficulty Level", DIFF_INSANE - 1);
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
