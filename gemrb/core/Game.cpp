@@ -2090,7 +2090,6 @@ void Game::Infravision()
 static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
 static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
 static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
-static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
 const Color *Game::GetGlobalTint() const
 {
@@ -2112,8 +2111,9 @@ const Color *Game::GetGlobalTint() const
 	}
 	if ((map->AreaType&(AT_OUTDOOR|AT_WEATHER)) == (AT_OUTDOOR|AT_WEATHER)) {
 		//get weather tint
+		// bg1 and bg2 rain don't have one, but perhaps snow does?
 		if (WeatherBits&WB_RAIN) {
-			return &DarkTint;
+			return nullptr;
 		}
 	}
 
