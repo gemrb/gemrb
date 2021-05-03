@@ -1810,10 +1810,15 @@ GEM_EXPORT void UpdateActorConfig()
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
+	// iwd2 had it saved in the GAM, iwd1 only relied on the ini value
 	GameDifficulty = 0;
 	core->GetDictionary()->Lookup("Nightmare Mode", GameDifficulty);
-	if (GameDifficulty) {
+	Game *game = core->GetGame();
+	if (GameDifficulty || (game && game->HOFMode)) {
 		GameDifficulty = DIFF_INSANE;
+		if (game) game->HOFMode = true;
+		// also set it for GUIOPT
+		core->GetDictionary()->SetAt("Difficulty Level", DIFF_INSANE - 1);
 	} else {
 		GameDifficulty = 0;
 		core->GetDictionary()->Lookup("Difficulty Level", GameDifficulty);
@@ -10279,6 +10284,61 @@ void Actor::CreateDerivedStats()
 	} else {
 		CreateDerivedStatsBG();
 	}
+
+	// check for HoF upgrade
+	if (!InParty && core->GetGame()->HOFMode && !(BaseStats[IE_MC_FLAGS] & MC_HOF_UPGRADED)) {
+		BaseStats[IE_MC_FLAGS] |= MC_HOF_UPGRADED;
+
+		// our summons get less of an hp boost
+		if (BaseStats[IE_EA] <= EA_CONTROLLABLE) {
+			BaseStats[IE_MAXHITPOINTS] = 2 * BaseStats[IE_MAXHITPOINTS] + 20;
+			BaseStats[IE_HITPOINTS] = 2 * BaseStats[IE_HITPOINTS] + 20;
+		} else {
+			BaseStats[IE_MAXHITPOINTS] = 3 * BaseStats[IE_MAXHITPOINTS] + 80;
+			BaseStats[IE_HITPOINTS] = 3 * BaseStats[IE_HITPOINTS] + 80;
+		}
+
+		if (third) {
+			BaseStats[IE_CR] += 10;
+			BaseStats[IE_STR] += 10;
+			BaseStats[IE_DEX] += 10;
+			BaseStats[IE_CON] += 10;
+			BaseStats[IE_INT] += 10;
+			BaseStats[IE_WIS] += 10;
+			BaseStats[IE_CHR] += 10;
+			for (int i = 0; i < ISCLASSES; i++) {
+				int level = GetClassLevel(i);
+				if (!level) continue;
+				BaseStats[levelslotsiwd2[i]] += 12;
+			}
+			// NOTE: this is a guess, reports vary
+			// the attribute increase already contributes +5
+			for (int i = 0; i <= IE_SAVEWILL - IE_SAVEFORTITUDE; i++) {
+				BaseStats[savingthrows[i]] += 5;
+			}
+		} else {
+			BaseStats[IE_NUMBEROFATTACKS] += 2; // 1 more APR
+			ToHit.HandleFxBonus(5, true);
+			if (BaseStats[IE_XPVALUE]) {
+				BaseStats[IE_XPVALUE] = 2 * BaseStats[IE_XPVALUE] + 1000;
+			}
+			if (BaseStats[IE_GOLD]) {
+				BaseStats[IE_GOLD] += 75;
+			}
+			if (BaseStats[IE_LEVEL]) {
+				BaseStats[IE_LEVEL] += 12;
+			}
+			if (BaseStats[IE_LEVEL2]) {
+				BaseStats[IE_LEVEL2] += 12;
+			}
+			if (BaseStats[IE_LEVEL3]) {
+				BaseStats[IE_LEVEL3] += 12;
+			}
+			for (int i = 0; i < SAVECOUNT; i++) {
+				BaseStats[savingthrows[i]]++;
+			}
+		}
+	}
 }
 /* Checks if the actor is multiclassed (the MULTI column is positive) */
 bool Actor::IsMultiClassed() const
@@ -11450,7 +11510,16 @@ void Actor::PlayArmorSound() const
 bool Actor::ShouldModifyMorale() const
 {
 	// pst ignores it for pcs, treating it more like reputation
-	return !pstflags || Modified[IE_EA] != EA_PC;
+	if (pstflags) {
+		return Modified[IE_EA] != EA_PC;
+	}
+
+	// in HoF, everyone else becomes immune to morale failure ("Mental Fortitude" in iwd2)
+	if (core->GetGame()->HOFMode) {
+		return Modified[IE_EA] == EA_PC;
+	}
+
+	return true;
 }
 
 const char* Actor::GetRaceName() const

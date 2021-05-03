@@ -694,15 +694,16 @@ void Map::UpdateScripts()
 	// below starts a cutscene, hiding the mouse. - wjp, 20060805
 	if (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) return;
 
-	//Run actor scripts (only for 0 priority)
-	int q=Qcount[PR_SCRIPT];
-
 	Game *game = core->GetGame();
 	bool timestop = game->IsTimestopActive();
 	if (!timestop) {
 		game->SetTimestopOwner(NULL);
 	}
+	
+	ieDword time = game->Ticks; // make sure everything moves at the same time
 
+	//Run actor scripts (only for 0 priority)
+	int q = Qcount[PR_SCRIPT];
 	while (q--) {
 		Actor* actor = queue[PR_SCRIPT][q];
 		//actor just moved away, don't run its script from this side
@@ -747,43 +748,32 @@ void Map::UpdateScripts()
 		actor->Update();
 		actor->UpdateActorState();
 		actor->SetSpeed(false);
-	}
-
-	//clean up effects on dead actors too
-	q=Qcount[PR_DISPLAY];
-	while(q--) {
-		Actor* actor = queue[PR_DISPLAY][q];
-		actor->fxqueue.Cleanup();
-	}
-
-	ieDword time = game->Ticks; // make sure everything moves at the same time
-	// Make actors pathfind if there are others nearby
-	// in order to avoid bumping when possible
-	q = Qcount[PR_SCRIPT];
-	while (q--) {
-		Actor* actor = queue[PR_SCRIPT][q];
-		if (actor->GetRandomBackoff() || !actor->GetStep() || actor->GetSpeed() == 0) {
-			continue;
-		}
-		Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
-		if (nearActor && nearActor != actor) {
-			actor->NewPath();
-		}
-	}
-
-	q = Qcount[PR_SCRIPT];
-	while (q--) {
-		Actor* actor = queue[PR_SCRIPT][q];
+		
 		if (actor->GetRandomBackoff()) {
 			actor->DecreaseBackoff();
 			if (!actor->GetRandomBackoff() && actor->GetSpeed() > 0) {
 				actor->NewPath();
 			}
-			continue;
+		} else if (actor->GetStep() && actor->GetSpeed()) {
+			// Make actors pathfind if there are others nearby
+			// in order to avoid bumping when possible
+			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
+			if (nearActor && nearActor != actor) {
+				actor->NewPath();
+			} else {
+				DoStepForActor(actor, time);
+			}
+		} else {
+			DoStepForActor(actor, time);
 		}
-		DoStepForActor(actor, time);
 	}
 
+	//clean up effects on dead actors too
+	q = Qcount[PR_DISPLAY];
+	while(q--) {
+		Actor* actor = queue[PR_DISPLAY][q];
+		actor->fxqueue.Cleanup();
+	}
 
 	//Check if we need to start some door scripts
 	int doorCount = 0;
@@ -3307,6 +3297,11 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 		core->GetGame()->AdvanceTime(hours * core->Time.hour_size);
 		return 0;
 	}
+
+	// TODO: it appears there was a limit on how many rest encounters can
+	// be triggered in a row (or area?), since HOFMode should increase it
+	// by 1. It doesn't look like it was stored in the header, so perhaps
+	// it was just a hardcoded limit to make the game more forgiving
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;

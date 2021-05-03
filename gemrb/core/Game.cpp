@@ -119,6 +119,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	WhichFormation = 0;
 	CurrentLink = 0;
 	PartyAttack = false;
+	HOFMode = false;
 
 	//loading master areas
 	AutoTable table;

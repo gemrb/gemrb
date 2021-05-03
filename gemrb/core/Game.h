@@ -308,6 +308,7 @@ public:
 	bool hasInfra;
 	bool familiarBlock;
 	bool PartyAttack;
+	bool HOFMode;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();

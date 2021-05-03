@@ -214,9 +214,13 @@ namespace GemRB {
 #define MC_IGNORE_RETURN        0x100000 // iwd2, won't be moved to start position when party rests, TODO: ee, prevent chunking death
 #define MC_IGNORE_INHIBIT_AI    0x200000 // iwd2 version of IE_ENABLEOFFSCREENAI (guess), elsewhere unused
 #define MC_NO_NIGHTMARE_MODS    0x400000 // TODO: ee
+#define MC_NO_TOOLTIPS          0x800000 // bit 23, TODO: ee
+// the following bits are set in some files in iwd2 and iwd1
+// it's in the range of the bg2 randomwalk bits 24-30, so likely the same between all the games
 //#define                       0x4000000 // iwd2, unkown, probably irrelevant; set for 50wyv{,h,r}
 //#define                       0x20000000 // iwd2, unkown, probably irrelevant
 //#define                       0x40000000 // iwd2, unkown, probably irrelevant
+#define MC_HOF_UPGRADED         0x80000000 // last bit, was used in memory only; repurposed to show HoF state
 
 // specflag values
 #define SPECF_DRIVEN          1 // automatic concentration success, no morale failure
