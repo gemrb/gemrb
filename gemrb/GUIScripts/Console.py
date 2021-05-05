@@ -13,15 +13,17 @@ def OnLoad():
 	consoleWin.AddAlias("WIN_CON")
 	consoleWin.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})
 	
+	histLabel = consoleWin.GetControl(2)
+	histLabel.SetText ("History:")
 	hist = consoleWin.GetControl(3)
 	
 	console = consoleWin.GetControl(0)
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
-	#console.AddAlias("CONSOLE", 0)
 	
 	consoleWin.SetAction(lambda: console.Focus(), ACTION_WINDOW_FOCUS_GAINED)
 	
 	consoleOut = consoleWin.GetControl(1)
+	consoleOut.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	consoleOut.AddAlias("CONSOLE", 1);
 	
 def ToggleConsole():
