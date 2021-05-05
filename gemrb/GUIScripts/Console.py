@@ -25,6 +25,7 @@ def OnLoad():
 	consoleOut = consoleWin.GetControl(1)
 	consoleOut.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	consoleOut.AddAlias("CONSOLE", 1);
+	consoleOut.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})
 	
 def ToggleConsole():
 	consoleWin = GemRB.GetView("WIN_CON")
