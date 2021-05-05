@@ -768,7 +768,6 @@ private:
 	void HandleGUIBehaviour();
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
-	void CreateConsole();
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */

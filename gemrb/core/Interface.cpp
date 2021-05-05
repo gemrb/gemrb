@@ -399,26 +399,6 @@ GameControl* Interface::StartGameControl()
 	return gamectrl;
 }
 
-void Interface::CreateConsole()
-{
-	Region frame(0, 0, 640, 200);
-	
-	Window* consoleWin = winmgr->MakeWindow(frame);
-	TextArea* ta = new TextArea(frame, GetTextFont());
-	Console* console = new Console(frame, ta);
-
-	consoleWin->AddSubviewInFrontOfView(console);
-	consoleWin->SetFlags(Window::Borderless | View::Invisible | Window::AlphaChannel, OP_OR);
-	consoleWin->SetFlags(Window::DestroyOnClose, OP_NAND);
-	consoleWin->SetPosition(Window::PosHmid);
-	consoleWin->SetBackground(nullptr, &ColorBlack);
-	
-	console->AssignScriptingRef(0, "CONSOLE");
-	RegisterScriptableWindow(consoleWin, "WIN_CON", 0);
-	Window* conwin = GetWindow(0, "WIN_CON");
-	assert(conwin == consoleWin);
-}
-
 /* handle main loop events that might destroy or create windows
 thus cannot be called from DrawWindows directly
 these events are pending until conditions are right
@@ -563,7 +543,7 @@ void Interface::HandleFlags()
 			EventFlag|=EF_EXPANSION;
 
 			Log(MESSAGE, "Core", "Setting up the Console...");
-			CreateConsole();
+			guiscript->RunFunction("Console", "OnLoad");
 
 			winmgr->FadeColor = Color();
 
@@ -1829,6 +1809,15 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Close();
 	}
 	delete pathFile;
+	
+	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
+		if (e.type != Event::KeyDown) return false;
+
+		guiscript->RunFunction("Console", "ToggleConsole");
+		return true;
+	};
+	EventMgr::RegisterHotKeyCallback(ToggleConsole, ' ', GEM_MOD_CTRL);
+
 	return GEM_OK;
 }
 

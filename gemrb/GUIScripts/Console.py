@@ -6,6 +6,34 @@ from GUIDefines import *
 import GemRB
 from GemRB import * # we dont want to have to type 'GemRB.Command' instead of simply 'Command'
 
+def OnLoad():
+	consoleWin = GemRB.LoadWindow(0, "console", WINDOW_TOP|WINDOW_HCENTER)
+	consoleWin.SetFlags(IE_GUI_VIEW_INVISIBLE | WF_BORDERLESS | WF_ALPHA_CHANNEL, OP_OR)
+	consoleWin.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND);
+	consoleWin.AddAlias("WIN_CON")
+	consoleWin.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})
+	
+	hist = consoleWin.GetControl(3)
+	
+	console = consoleWin.GetControl(0)
+	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
+	#console.AddAlias("CONSOLE", 0)
+	
+	consoleWin.SetAction(lambda: console.Focus(), ACTION_WINDOW_FOCUS_GAINED)
+	
+	consoleOut = consoleWin.GetControl(1)
+	consoleOut.AddAlias("CONSOLE", 1);
+	
+def ToggleConsole():
+	consoleWin = GemRB.GetView("WIN_CON")
+	if consoleWin is None: # if outside of a game
+		return
+
+	if consoleWin.IsVisible():
+		consoleWin.Close()
+	else:
+		consoleWin.Focus()
+
 # /handy/ shorthand forms
 def gps(stat, base=0):
 	print (GemRB.GetPlayerStat(GemRB.GameGetFirstSelectedPC(), stat, base))

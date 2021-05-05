@@ -50,6 +50,7 @@
 #include "WorldMap.h"
 #include "GameScript/GSUtils.h" //checkvariable
 #include "GUI/Button.h"
+#include "GUI/Console.h"
 #include "GUI/EventMgr.h"
 #include "GUI/GameControl.h"
 #include "GUI/GUIScriptInterface.h"
@@ -2140,6 +2141,16 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 					view = new Button(rgn);
 					break;
 			}
+			break;
+		case IE_GUI_CONSOLE:
+		{
+			PyObject* pyta = NULL;
+			if (!PyArg_ParseTuple( constructArgs, "O", &pyta))
+			{
+				PyErr_Clear(); //clearing the exception
+			}
+			view = new Console(rgn, GetView<TextArea>(pyta));
+		}
 			break;
 		case IE_GUI_INVALID:
 			view = core->CreateWindow(id, rgn);

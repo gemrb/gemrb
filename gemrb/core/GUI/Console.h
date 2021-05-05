@@ -28,12 +28,10 @@
 #define CONSOLE_H
 
 #include "CircularBuffer.h"
-#include "GUI/Control.h"
 #include "GUI/TextArea.h"
+#include "GUI/TextEdit.h"
 
 namespace GemRB {
-
-class Palette;
 
 /**
  * @class Console
@@ -44,41 +42,27 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-class GEM_EXPORT Console : public View {
+class GEM_EXPORT Console : public TextEdit {
 private:
 	/** History Buffer */
 	CircularBuffer<SelectOption> History;
 	/** History Position and size */
-	size_t HistPos;
-
-	TextContainer textContainer;
-	TextArea feedback;
 	TextArea* textArea = nullptr;
+	size_t HistPos = 0;
 
 public:
 	Console(const Region& frame, TextArea* ta);
-	~Console() override;
-
-	/** Sets the Text of the current control */
-	void SetText(const String& string);
-	bool SetEvent(int eventType, ControlEventHandler handler);
 	bool Execute(const String&);
-
-	void DidFocus() override { textContainer.DidFocus(); }
-	void DidUnFocus() override { textContainer.DidUnFocus(); }
 
 private:
 	void UpdateTextArea();
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
-	bool HandleHotKey(const Event& e);
 	
 protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
-	void OnTextInput(const TextEvent& /*te*/) override;
 };
 
 }

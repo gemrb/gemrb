@@ -22,59 +22,22 @@
 
 #include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "ScriptEngine.h"
-#include "Sprite2D.h"
-#include "GUI/EventMgr.h"
-#include "GUI/Label.h"
-#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 
 constexpr size_t HistoryMaxSize = 5;
 
 Console::Console(const Region& frame, TextArea* ta)
-: View(frame), History(HistoryMaxSize),
-	textContainer(Region(0, 0, 0, 25), core->GetTextFont()),
-	feedback(Region(0, 25, frame.w, (frame.h - 37) / 2), core->GetTextFont())
+: TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
 {
-	// TODO: move all the control composition to Console.py
-	textContainer.SetColors(ColorWhite, ColorBlack);
+	ControlEventHandler OnReturn = [this](Control*) {
+		Execute(QueryText());
+	};
+	SetAction(OnReturn, TextEdit::Action::Done);
 
-	textArea = ta;
-	HistPos = 0;
-	uint8_t align = IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE;
-
-	EventMgr::EventCallback cb = METHOD_CALLBACK(&Console::HandleHotKey, this);
-	EventMgr::RegisterHotKeyCallback(cb, ' ', GEM_MOD_CTRL);
-	
-	AddSubviewInFrontOfView(&feedback);
-	feedback.AssignScriptingRef(1, "CONSOLE");
-	feedback.SetFlags(TextArea::AutoScroll | TextArea::ClearHistory, OP_OR);
-
-	textContainer.SetMargin(3);
-
-	textContainer.SetAlignment(align);
-	AddSubviewInFrontOfView(&textContainer);
-	
-	if (textArea) {
-		Region frame = feedback.Frame();
-		frame.y = frame.y + frame.h;
-		frame.h = 12;
-		
-		Label* label = new Label(frame, core->GetTextFont(), L"History:");
-
-		AddSubviewInFrontOfView(label);
-		label->SetAlignment(align);
-		label->SetColors(ColorWhite, ColorBlack);
-		label->SetFlags(Label::UseColor, OP_OR);
-		
-		frame.y = frame.y + frame.h;
-		frame.h = feedback.Frame().h;
-		
-		textArea->SetFrame(frame);
-		AddSubviewInFrontOfView(textArea);
-		
+	if (ta) {
+		textArea = ta;
 		ControlEventHandler handler = [this](Control* c) {
 			auto val = c->GetValue();
 			size_t histSize = History.Size();
@@ -92,52 +55,6 @@ Console::Console(const Region& frame, TextArea* ta)
 		};
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
-
-	static const Color trans(0, 0, 0, 128);
-	SetBackground(nullptr, &trans);
-}
-
-Console::~Console()
-{
-	RemoveSubview(&feedback);
-	RemoveSubview(&textContainer);
-}
-
-bool Console::HandleHotKey(const Event& e)
-{
-	if (e.type != Event::KeyDown) return false;
-
-	// the only hot key console registers is for hiding / showing itself
-	if (IsVisible()) {
-		window->Close();
-	} else {
-		window->Focus();
-		window->SetFocused(this);
-	}
-	return true;
-}
-
-bool Console::OnMouseDown(const MouseEvent& me, unsigned short mod)
-{
-	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
-	textContainer.MouseDown(me, mod);
-	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
-	return true;
-}
-
-void Console::OnTextInput(const TextEvent& te)
-{
-	textContainer.TextInput(te);
-}
-
-/** Sets the Text of the current control */
-void Console::SetText(const String& string)
-{
-	Region rect(Point(), Dimensions());
-	textContainer.DeleteContentsInRect(rect);
-	textContainer.AppendText(string);
-	textContainer.CursorEnd();
-	MarkDirty();
 }
 
 void Console::UpdateTextArea()
@@ -185,14 +102,8 @@ bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		case GEM_DOWN:
 			HistoryForward();
 			break;
-		case GEM_RETURN:
-			Execute(textContainer.Text());
-			break;
 		default:
-			if (textContainer.KeyPress(key, mod)) {
-				return true;
-			}
-			break;
+			return TextEdit::OnKeyPress(key, mod);
 	}
 	return false;
 }
@@ -229,17 +140,12 @@ void Console::HistoryForward()
 
 void Console::HistoryAdd(bool force)
 {
-	String text = textContainer.Text();
+	const String& text = QueryText();
 	if (force || text.length()) {
 		History.Append(std::make_pair(History.Size(), text), !force);
 		HistPos = 0;
 		UpdateTextArea();
 	}
-}
-
-bool Console::SetEvent(int /*eventType*/, ControlEventHandler /*handler*/)
-{
-	return false;
 }
 
 }

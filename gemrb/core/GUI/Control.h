@@ -35,6 +35,7 @@
 #define IE_GUI_SCROLLBAR	7
 #define IE_GUI_WORLDMAP         8 // gemrb extension
 #define IE_GUI_MAP              9 // gemrb extension
+#define IE_GUI_CONSOLE		10 // gemrb extension
 #define IE_GUI_INVALID          255
 
 #include "RGBAColor.h"

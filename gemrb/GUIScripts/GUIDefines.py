@@ -95,6 +95,7 @@ IE_GUI_LABEL = 6
 IE_GUI_SCROLLBAR = 7
 IE_GUI_WORLDMAP = 8
 IE_GUI_MAP = 9
+IE_GUI_CONSOLE = 10
 
 GEM_MB_ACTION               = 1
 GEM_MB_MENU                 = 4
