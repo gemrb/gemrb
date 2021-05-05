@@ -83,6 +83,8 @@ public:
 				return "Button";
 			case IE_GUI_LABEL:
 				return "Label";
+			case IE_GUI_EDIT:
+				return "TextEdit";
 			case IE_GUI_TEXTAREA:
 				return "TextArea";
 			case IE_GUI_SCROLLBAR:
