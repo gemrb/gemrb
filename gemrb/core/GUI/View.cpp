@@ -214,7 +214,8 @@ void View::DrawBackground(const Region* rgn) const
 			Point p = ConvertPointToWindow(rgn->Origin());
 			video->DrawRect(Region(p, rgn->Dimensions()), backgroundColor, true);
 		} else if (window) {
-			Point p = ConvertPointToWindow(frame.Origin());
+			assert(superView);
+			Point p = superView->ConvertPointToWindow(frame.Origin());
 			video->DrawRect(Region(p, Dimensions()), backgroundColor, true);
 		} else {
 			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
