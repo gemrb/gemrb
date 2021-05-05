@@ -45,6 +45,12 @@ private:
 	size_t max;
 
 private:
+	void TextChanged(TextContainer& tc);
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+
+protected:
 	// TextContainer can respond to keys by itself, but we want to interpose so we can capture return/esc
 	// we simply forward all other key presses. For this to work textContainer needs View::IgnoreEvents set
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
@@ -52,11 +58,6 @@ private:
 	// this forwards to textContainer. only needed because we set View::IgnoreEvents on textContainer in order to interpose key events
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
 	void OnTextInput(const TextEvent& /*te*/) override;
-
-	void TextChanged(TextContainer& tc);
-	
-	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
-	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 
 public:
 	struct Action {
