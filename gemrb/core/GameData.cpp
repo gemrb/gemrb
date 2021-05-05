@@ -637,7 +637,7 @@ int GameData::HasInfravision(const char *raceName)
 	if (!racialInfravision.ok()) {
 		racialInfravision.load("racefeat", true);
 	}
-	if (!raceName) return 0;
+	if (!raceName || !racialInfravision) return 0;
 
 	return atoi(racialInfravision->QueryField(raceName, "VALUE"));
 }
