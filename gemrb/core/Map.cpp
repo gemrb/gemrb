@@ -771,9 +771,8 @@ void Map::UpdateScripts()
 			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
 			if (nearActor && nearActor != actor) {
 				actor->NewPath();
-			} else {
-				DoStepForActor(actor, time);
 			}
+			DoStepForActor(actor, time);
 		} else {
 			DoStepForActor(actor, time);
 		}
