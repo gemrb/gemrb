@@ -175,7 +175,7 @@ TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
 	
 TextContainer* TextArea::SpanSelector::TextAtIndex(size_t idx)
 {
-	if (subViews.empty()|| idx > subViews.size() - 1) {
+	if (subViews.empty() || idx > subViews.size() - 1) {
 		return NULL;
 	}
 
@@ -555,10 +555,12 @@ void TextArea::UpdateState(unsigned int optIdx)
 	}
 	
 	if (optIdx >= selectOptions->NumOpts()) {
+		SetValue(-1);
 		selectOptions->MakeSelection(-1);
 		return;
 	}
 
+	assert(optIdx < values.size());
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
 	SetValue( values[optIdx] );
@@ -673,7 +675,7 @@ void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numb
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
 	}
 
-	values.reserve(opts.size());
+	values.resize(opts.size());
 	std::vector<const String*> strings(opts.size());
 	for (size_t i = 0; i < opts.size(); i++) {
 		values[i] = opts[i].first;
