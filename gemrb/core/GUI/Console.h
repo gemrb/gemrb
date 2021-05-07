@@ -48,6 +48,7 @@ private:
 	CircularBuffer<SelectOption> History;
 	/** History Position and size */
 	TextArea* textArea = nullptr;
+	// an index into Hiostory, except when > History.size() which indicates a new entry
 	size_t HistPos = 0;
 
 public:
@@ -59,6 +60,7 @@ private:
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
+	void HistorySetPos(size_t);
 	
 protected:
 	/** Key Press Event */

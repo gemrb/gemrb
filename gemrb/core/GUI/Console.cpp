@@ -42,16 +42,14 @@ Console::Console(const Region& frame, TextArea* ta)
 			auto val = c->GetValue();
 			size_t histSize = History.Size();
 			size_t selected = histSize - val;
-			if (selected <= histSize) {
-				if (EventMgr::ModState(GEM_MOD_ALT)) {
-					Execute(c->QueryText());
-					textArea->SelectAvailableOption(-1);
-				} else {
-					HistPos = selected;
-					SetText(c->QueryText());
-				}
+			if (EventMgr::ModState(GEM_MOD_ALT)) {
+				Execute(c->QueryText());
+				textArea->SelectAvailableOption(-1);
+			} else {
+				HistPos = selected;
+				SetText(c->QueryText());
 			}
-			this->window->SetFocused(this);
+			SetFocus();
 		};
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
@@ -61,18 +59,17 @@ void Console::UpdateTextArea()
 {
 	if (textArea) {
 		std::vector<SelectOption> options;
-		for (auto item : History) {
-			options.push_back(item);
+		for (size_t i = 0; i < History.Size(); ++i) {
+			options.push_back(History.Retrieve(i));
+			options.back().first = int(i) + 1;
 		}
+		
 		textArea->SetValue(-1);
 		textArea->SetSelectOptions(options, false);
-		//textArea->SelectAvailableOption(History.Size() - HistPos);
 		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
 		// then we can change the color to red for failed commands and green for successfull ones
 		// and the highlight can be just a darker shade of those
 	}
-	
-	MarkDirty();
 }
 
 bool Console::Execute(const String& text)
@@ -86,8 +83,6 @@ bool Console::Execute(const String& text)
 		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
 		free(cBuf);
 		HistoryAdd();
-
-		SetText(L"");
 	}
 	return ret;
 }
@@ -108,43 +103,43 @@ bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	return false;
 }
 
+void Console::HistorySetPos(size_t pos)
+{
+	HistPos = Clamp<size_t>(pos, 0, History.Size());
+
+	if (HistPos == History.Size()) {
+		SetText(L"");
+		if (textArea) {
+			textArea->SelectAvailableOption(-1);
+		}
+	} else if (textArea) {
+		textArea->SelectAvailableOption(History.Size() - HistPos - 1);
+	} else {
+		SetText(History.Retrieve(HistPos).second);
+	}
+}
+
 void Console::HistoryBack()
 {
-	if (HistPos < History.Size()) {
-		HistPos++;
-		if (textArea) {
-			textArea->SelectAvailableOption(History.Size() - HistPos);
-		} else {
-			SetText(History.Retrieve(HistPos - 1).second);
-		}
+	if (HistPos == History.Size()) {
+		HistorySetPos(0);
+	} else {
+		HistorySetPos(HistPos + 1);
 	}
 }
 
 void Console::HistoryForward()
 {
-	if (HistPos <= 1) {
-		SetText(L"");
-		HistPos = 0;
-		if (textArea) {
-			textArea->SelectAvailableOption(-1);
-		}
-	} else {
-		--HistPos;
-		if (textArea) {
-			textArea->SelectAvailableOption(History.Size() - HistPos);
-		} else {
-			SetText(History.Retrieve(HistPos - 1).second);
-		}
-	}
+	HistorySetPos(HistPos - 1);
 }
 
 void Console::HistoryAdd(bool force)
 {
 	const String& text = QueryText();
 	if (force || text.length()) {
-		History.Append(std::make_pair(History.Size(), text), !force);
-		HistPos = 0;
+		History.Append(std::make_pair(-1, text), !force);
 		UpdateTextArea();
+		HistorySetPos(History.Size());
 	}
 }
 
