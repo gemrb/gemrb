@@ -59,9 +59,9 @@ void Console::UpdateTextArea()
 {
 	if (textArea) {
 		std::vector<SelectOption> options;
-		for (size_t i = 0; i < History.Size(); ++i) {
-			options.push_back(History.Retrieve(i));
-			options.back().first = int(i) + 1;
+		for (size_t i = History.Size(); i > 0; --i) {
+			options.push_back(History.Retrieve(i - 1));
+			options.back().first = int(History.Size() - i) + 1;
 		}
 		
 		textArea->SetValue(-1);
