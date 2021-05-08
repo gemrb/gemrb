@@ -1377,7 +1377,7 @@ int Interface::Init(InterfaceConfig* config)
 	FixPath( CachePath, false );
 
 	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
-	CONFIG_PATH("GamePath", GamePath, "");
+	CONFIG_PATH("GamePath", GamePath, ".");
 
 	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
 	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);

@@ -160,7 +160,8 @@ GUIEnhancements = 15
 #  Remember, EE versions are not supported!         #
 #####################################################
 
-GamePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+#GamePath=/mnt/windows/Programmi/Black Isle/BGII - SoA/
+
 # only set these if the folders are not in your GamePath
 #CD1=/mnt/windows/Programmi/Black Isle/BGII - SoA/
 #CD2=/mnt/windows/Programmi/Black Isle/BGII - SoA/CD2/
