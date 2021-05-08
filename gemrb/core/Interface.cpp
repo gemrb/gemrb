@@ -197,7 +197,6 @@ Interface::Interface()
 	MouseFeedback = 0;
 	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
-	Bpp = 32;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
 	SavePath[0] = 0;
@@ -269,7 +268,7 @@ Interface::Interface()
 	TLKEncoding.multibyte = false;
 	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
-	VersionOverride = ItemTypes = SlotTypes = Width = Height = 0;
+	VersionOverride = ItemTypes = SlotTypes = 0;
 	MultipleQuickSaves = false;
 	MaxPartySize = 6;
 	FeedbackLevel = 0;
