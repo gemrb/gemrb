@@ -1606,8 +1606,8 @@ int Interface::Init(InterfaceConfig* config)
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
-	// fix the sample config default resolution for iwd2
-	if (stricmp(GameType, "iwd2") == 0 && Width == 640 && Height == 480) {
+	// fix the sample config default resolution for iwd2 and configless case also for the demo
+	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0) && Width == 640 && Height == 480) {
 		Width = 800;
 		Height = 600;
 	}
