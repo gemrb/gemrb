@@ -102,6 +102,10 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 				Log(FATAL, "Config", "Failed to open config file \"%s\".", filename);
 			}
 			isValid = InitWithINIData(config);
+		} else {
+			// assume a path was passed, soft force configless startup
+			SetKeyValuePair("GamePath", argv[i]);
+			isValid = true;
 		}
 	}
 	if (!isValid) {

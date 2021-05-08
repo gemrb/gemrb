@@ -12,6 +12,9 @@ GemRB
 [\-c
 .IR CONFIG-FILE ]
 .br
+.B gemrb
+.IR PATH-TO-GAME
+.br
 .B torment
 .br
 
