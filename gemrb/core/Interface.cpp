@@ -1378,6 +1378,18 @@ int Interface::Init(InterfaceConfig* config)
 
 	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
 	CONFIG_PATH("GamePath", GamePath, ".");
+	// guess a few paths in case this one is bad; two levels deep for the fhs layout
+	char testPath[_MAX_PATH];
+	if (!PathJoin(testPath, GamePath, "chitin.key", nullptr)) {
+		Log(WARNING, "Interface", "Invalid GamePath detected, guessing from the current dir!");
+		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
+			strlcpy(GamePath, "..", sizeof(GamePath));
+		} else {
+			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
+				strlcpy(GamePath, "../..", sizeof(GamePath));
+			}
+		}
+	}
 
 	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
 	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);
