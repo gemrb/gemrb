@@ -68,7 +68,7 @@ public:
 	Color FadeColor;
 
 	struct HUDLock {
-		WindowManager& wm;
+		const WindowManager& wm;
 
 		HUDLock(WindowManager& wm)
 		: wm(wm) {
