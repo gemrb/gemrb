@@ -305,7 +305,6 @@ def CancelPress():
 		#free up the slot before exiting
 		MyChar = GemRB.GetVar ("Slot")
 		GemRB.CreatePlayer ("", MyChar | 0x8000 )
-		GemRB.SetNextScript ("Start")
 	else:
 		GemRB.SetNextScript ("CharGen")
 		GemRB.SetToken ("LargePortrait", "")
@@ -332,11 +331,9 @@ def BackPress():
 		CharGenWindow.Unload ()
 
 	step = GemRB.GetVar ("Step")
-	if step == 1:
-		GemRB.SetNextScript ("Start")
-	elif step == 2:
+	if step == 2:
 		GemRB.SetNextScript ("CharGen")
-	else:
+	elif step != 1:
 		GemRB.SetNextScript ("CharGen" + str(step-1))
 	return
 

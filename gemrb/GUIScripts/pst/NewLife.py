@@ -29,7 +29,6 @@ import CommonTables
 CommonTables.Load()
 
 NewLifeWindow = 0
-QuitWindow = 0
 TextArea = 0
 
 TotLabel = 0
@@ -56,7 +55,7 @@ def OnLoad():
 	return
 
 def OpenLUStatsWindow(Type = 1):
-	global NewLifeWindow, QuitWindow, StatTable
+	global NewLifeWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
 	global TextArea, Stats, StatLabels, StatLowerLimit, StatLimit, LevelUp
@@ -72,12 +71,9 @@ def OpenLUStatsWindow(Type = 1):
 		GemRB.LoadGame(None)  #loading the base game
 
 	StatTable = GemRB.LoadTable("abcomm")
-	#setting up confirmation window
-	QuitWindow = GemRB.LoadWindow(1, "GUICG")
-	QuitWindow.SetVisible(False)
 
 	#setting up CG window
-	NewLifeWindow = GemRB.LoadWindow(0)
+	NewLifeWindow = GemRB.LoadWindow(0, "GUICG")
 
 	if LevelUp:
 		Str = GemRB.GetPlayerStat(1, IE_STR, 1)
@@ -214,7 +210,7 @@ def UpdateLabels():
 
 def AcceptPress():
 	if TotPoints:
-		# Setting up the error window
+		QuitWindow = GemRB.LoadWindow(1, "GUICG")
 		TextArea = QuitWindow.GetControl(0)
 		TextArea.SetText(46782)
 
@@ -274,15 +270,20 @@ def AcceptPress():
 	return
 
 def CancelPress():
-	# Setting up the confirmation window
+	QuitWindow = GemRB.LoadWindow(1, "GUICG")
+	
 	TextArea = QuitWindow.GetControl(0)
 	TextArea.SetText(19406)
+	
+	def confirm():
+		QuitWindow.Close()
+		NewLifeWindow.Close()
 
 	Button = QuitWindow.GetControl(1)
 	Button.SetText(23787)
 	Button.MakeDefault()
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, YesButton)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, confirm)
 
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
@@ -290,14 +291,6 @@ def CancelPress():
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 
 	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def YesButton():
-	if NewLifeWindow:
-		NewLifeWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return
 
 def StrPress():

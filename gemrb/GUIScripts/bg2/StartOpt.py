@@ -39,13 +39,7 @@ def OnLoad():
 	SoundButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenAudioOptionsWindow )
 	GameButton.SetEvent( IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenGameplayOptionsWindow)
 	GraphicButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenVideoOptionsWindow)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: OptionsWindow.Close())
 	BackButton.MakeEscape()
 	OptionsWindow.Focus()
-	return
-	
-def BackPress():
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return

@@ -45,7 +45,7 @@ def OnLoad():
 	DoneButton.SetText (11973)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MovieWindow.Close())
 	DoneButton.MakeEscape()
 	MovieWindow.Focus()
 	return
@@ -71,13 +71,4 @@ def CreditsPress():
 	else:
 		GemRB.PlayMovie ("CREDITS",1)
 
-	return
-
-def DonePress():
-	if MovieWindow:
-		MovieWindow.Unload ()
-	if GameCheck.HasTOB():
-		GemRB.SetNextScript ("Start2")
-	else:
-		GemRB.SetNextScript ("Start")
 	return

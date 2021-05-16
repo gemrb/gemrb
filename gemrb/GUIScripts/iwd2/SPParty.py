@@ -39,7 +39,7 @@ def OnLoad():
 	ModifyButton.SetText(10316)
 
 	CancelButton = PartySelectWindow.GetControl(11)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: PartySelectWindow.Close())
 	CancelButton.SetText(13727)
 	CancelButton.MakeEscape()
 
@@ -111,13 +111,6 @@ def DonePress():
 		#but gemrb engine limitations require us to
 		#return to the main engine (loadscreen)
 		GemRB.SetNextScript("SPParty2")
-	return	
-	
-def CancelPress():
-	global PartySelectWindow
-	if PartySelectWindow:
-		PartySelectWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return
 	
 def PartyButtonPress():

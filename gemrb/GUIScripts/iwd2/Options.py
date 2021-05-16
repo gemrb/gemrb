@@ -23,8 +23,6 @@ import GemRB
 import GUIOPT
 from GUIDefines import *
 
-OptionsWindow = 0
-
 def OnLoad():
 	global OptionsWindow
 
@@ -61,16 +59,9 @@ def OnLoad():
 	KeyboardButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenHotkeyOptionsWindow)
 
 	ReturnButton.SetText(10308)
-	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
+	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: OptionsWindow.Close())
 	ReturnButton.MakeEscape()
 
 	OptionsWindow.Focus()
 
-	return
-
-def ReturnPress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return

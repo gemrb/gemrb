@@ -20,9 +20,6 @@
 import GemRB
 import GameCheck
 
-StartWindow = 0
-TutorialWindow = 0
-QuitWindow = 0
 ExitButton = 0
 SinglePlayerButton = 0
 OptionsButton = 0
@@ -32,7 +29,6 @@ BackButton = 0
 skip_videos = None
 
 def OnLoad():
-	global StartWindow
 	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
 	global SinglePlayerButton, skip_videos
 
@@ -90,7 +86,7 @@ def OnLoad():
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Restart(StartWindow))
 	ExitButton.MakeEscape()
 	StartWindow.Focus ()
 	MusicTable = GemRB.LoadTable ("songlist")
@@ -148,12 +144,6 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	#do not start game after chargen
 	GemRB.SetVar("PlayMode",-1) #will allow export
 	GemRB.SetVar("Slot",1)
@@ -162,12 +152,6 @@ def PregenPress():
 	return
 
 def LoadSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
 	else:
@@ -177,12 +161,6 @@ def LoadSingle():
 	return
 
 def NewSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
 	else:
@@ -193,20 +171,12 @@ def NewSingle():
 	return
 
 def ImportGame():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	#now this is tricky, we need to load old games, but set up the expansion
 	GemRB.SetVar ("PlayMode", 0)
 	GemRB.SetNextScript ("GUILOAD")
 	return
 	
 def Tutorial():
-	global TutorialWindow
-
 	#tutorial subwindow
 	TutorialWindow = GemRB.LoadWindow (5)
 	TutorialWindow.ShowModal()
@@ -224,12 +194,6 @@ def Tutorial():
 	return
 
 def PlayPress():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetVar("PlayMode",1) #tutorial
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -237,8 +201,6 @@ def PlayPress():
 	return
 
 def ExitPress():
-	global QuitWindow
-
 	#quit subwindow
 	QuitWindow = GemRB.LoadWindow (3)
 	Pos = QuitWindow.GetPos ()
@@ -256,24 +218,10 @@ def ExitPress():
 	return
 
 def OptionsPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetNextScript ("StartOpt")
 	return
 
 def MoviesPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetNextScript ("GUIMOVIE")
 	return
 
@@ -303,14 +251,11 @@ def BackToMain():
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	StartWindow.Focus()
 	return
 
-def Restart():
-	StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	GemRB.SetNextScript ("Start")
+def Restart(win):
+	win.Close()
+	GemRB.LoadMusicPL("Cred.mus")
 	return
 
 

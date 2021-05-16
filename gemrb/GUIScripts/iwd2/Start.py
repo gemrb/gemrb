@@ -23,10 +23,8 @@ import LoadScreen
 from GUIDefines import *
 from datetime import datetime
 
-StartWindow = 0
-ProtocolWindow = 0
-QuitWindow = 0
 QuickLoadSlot = 0
+StartWindow = None;
 
 def OnLoad():
 	global StartWindow, QuickLoadSlot
@@ -104,13 +102,13 @@ def OnLoad():
 	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuickLoadPress)
 	StartWindow.Focus()
 	GemRB.LoadMusicPL("Theme.mus")
+	
+	StartWindow.SetAction(RefreshProtocol, ACTION_WINDOW_FOCUS_GAINED)
 
 	return
 
 def ProtocolPress():
-	global StartWindow, ProtocolWindow
-	#StartWindow.Unload()
-	ProtocolWindow = GemRB.LoadWindow(1)
+	ProtocolWindow = GemRB.LoadWindow(1, "GUICONN")
 
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl(2)
@@ -144,18 +142,14 @@ def ProtocolPress():
 
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ProtocolWindow.Close())
 	DoneButton.MakeEscape()
 
 	ProtocolWindow.Focus()
 	return
 
-def ProtocolDonePress():
-	global StartWindow, ProtocolWindow
-	if ProtocolWindow:
-		ProtocolWindow.Unload()
-
-	ProtocolButton = StartWindow.GetControl(0x00)
+def RefreshProtocol(win):
+	ProtocolButton = win.GetControl(0)
 
 	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
@@ -165,19 +159,14 @@ def ProtocolDonePress():
 	elif LastProtocol == 2:
 		ProtocolButton.SetText(13968)
 
-	StartWindow.Focus()
 	return
 
 def LoadPress():
-	global StartWindow
-
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def QuickLoadPress():
-	global StartWindow, QuickLoadSlot
+	global QuickLoadSlot
 
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(QuickLoadSlot) # load & start game
@@ -185,17 +174,13 @@ def QuickLoadPress():
 	return
 
 def OptionsPress():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
 
 def QuitPress():
-	global StartWindow, QuitWindow
 	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
@@ -210,15 +195,6 @@ def QuitPress():
 	return
 
 def NewGamePress():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload()
+	StartWindow.Close()
 	GemRB.SetNextScript("SPParty")
-	return
-
-def QuitCancelPress():
-	global StartWindow, QuitWindow
-	if QuitWindow:
-		QuitWindow.Unload()
-	StartWindow.Focus()
 	return

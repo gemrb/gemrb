@@ -25,12 +25,7 @@
 import GemRB
 from GUIDefines import *
 
-StartWindow = 0
-QuitWindow = 0
-
 def OnLoad():
-	global StartWindow, QuitWindow
-
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	if not skip_videos:
@@ -77,20 +72,12 @@ def QuitPress():
 	return
 	
 def NewLifePress():
-	if QuitWindow:
-		QuitWindow.Unload()
-	if StartWindow:
-		StartWindow.Unload()
 	#to make difference between ingame change and new life
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("NewLife")
 	return
 
 def ResumeLifePress():
-	if QuitWindow:
-		QuitWindow.Unload()
-	if StartWindow:
-		StartWindow.Unload()
 	#to make difference between ingame load and initial load
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("GUILOAD")

@@ -21,10 +21,8 @@ import GemRB
 import GameCheck
 from GUIDefines import SV_SAVEPATH
 
-StartWindow = 0
-
 def OnLoad():
-	global StartWindow, skip_videos
+	global skip_videos
 
 	# migrate mpsave saves if possible and needed
 	MigrateSaveDir ()
@@ -67,8 +65,6 @@ def OnLoad():
 	return
 	
 def SoAPress():
-	if StartWindow:
-		StartWindow.Close()
 	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
 	GemRB.SetNextScript("Start2")
@@ -77,8 +73,6 @@ def SoAPress():
 def ToBPress():
 	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetVar("oldgame",0)
-	if StartWindow:
-		StartWindow.Close()
 	GemRB.SetNextScript("Start2")
 	return
 

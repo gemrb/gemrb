@@ -20,15 +20,12 @@ import GemRB
 from GUIDefines import *
 from GameCheck import HasTOTSC
 
-StartWindow = 0
-QuitWindow = 0
 ExitButton = 0
 SinglePlayerButton = 0
 MultiPlayerButton = 0
 MoviesButton = 0
 
 def OnLoad():
-	global StartWindow
 	global ExitButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
@@ -90,8 +87,6 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -100,24 +95,18 @@ def PregenPress():
 	return
 
 def LoadSingle():
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MissionPack():
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetVar("PlayMode",1)
 	GemRB.SetToken ("SaveDir", "mpsave")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -125,16 +114,14 @@ def NewSingle():
 	return
 
 def ExitPress():
-	global QuitWindow
-
-	QuitWindow = GemRB.LoadWindow (3)
+	QuitWindow = GemRB.LoadWindow (3, "START")
 
 	QuitTextArea = QuitWindow.GetControl (0)
 	QuitTextArea.SetText (19532)
 
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	CancelButton.MakeEscape ()
 
 	ConfirmButton = QuitWindow.GetControl (1)
@@ -150,15 +137,7 @@ def ExitConfirmed():
 	return
 
 def MoviesPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetNextScript("GUIMOVIE")
-	return
-
-def ExitCancelled():
-	QuitWindow.Close ()
-	StartWindow.Focus()
 	return
 	
 def BackToMain():
@@ -178,5 +157,4 @@ def BackToMain():
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.MakeEscape()
 
-	StartWindow.Focus()
 	return

@@ -91,19 +91,10 @@ def ExitPress():
 
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ExitWindow.Close())
 	DoneButton.MakeDefault()
 
 	ExitWindow.Focus()
-	return
-
-def ExitDonePress():
-	global PartyFormationWindow, ExitWindow
-	if ExitWindow:
-		ExitWindow.Unload()
-	if PartyFormationWindow:
-		PartyFormationWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return
 
 def ExitCancelPress():
