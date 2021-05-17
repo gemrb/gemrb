@@ -2127,10 +2127,19 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			int recolor = 0;
 			char *fontname = nullptr;
 			int paletteOverride = false;
-			PARSE_ARGS(constructArgs, "|sii", &fontname, &recolor, &paletteOverride);
+			PyObject* pyColorNormal = nullptr;
+			PyObject* pyColorSelected = nullptr;
+			PyObject* pyColorNotVisited = nullptr;
+			PARSE_ARGS(constructArgs, "|siiOOO", &fontname, &recolor, &paletteOverride, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
 			
 			Font* font = (fontname) ? core->GetFont(fontname) : nullptr;
-			WorldMapControl* wmap = new WorldMapControl(rgn, font);
+			WorldMapControl* wmap = nullptr;
+			if (pyColorNormal) {
+				wmap = new WorldMapControl(rgn, font, ColorFromPy(pyColorNormal), ColorFromPy(pyColorSelected), ColorFromPy(pyColorNotVisited));
+			} else {
+				wmap = new WorldMapControl(rgn, font);
+			}
+			
 			wmap->SetOverrideIconPalette(paletteOverride);
 			view = wmap;
 		}
@@ -2957,43 +2966,6 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 
 	PyDict_SetItemString(dict, "Distance", DecRef(PyInt_FromLong, distance));
 	return dict;
-}
-
-PyDoc_STRVAR( GemRB_WorldMap_SetTextColor__doc,
-"===== WorldMap_SetTextColor =====\n\
-\n\
-**Prototype:** GemRB.SetWorldMapTextColor (WindowIndex, ControlIndex, which, red, green, blue)\n\
-\n\
-**Metaclass Prototype:** SetTextColor (which, red, green, blue)\n\
-\n\
-**Description:** Sets the label colors of a WorldMap Control. 'which' \n\
-selects the color affected.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex - the window control id\n\
-  * ControlID - the id of the target control\n\
-  * which - selects the color affected:\n\
-    * IE_GUI_WMAP_COLOR_NORMAL - main text color\n\
-    * IE_GUI_WMAP_COLOR_SELECTED - color of hovered on text\n\
-    * IE_GUI_WMAP_COLOR_NOTVISITED - color of unvisited entries\n\
-  * color - rgb dict\n\
-\n\
-**Return value:** N/A"
-);
-
-static PyObject* GemRB_WorldMap_SetTextColor(PyObject* self, PyObject* args)
-{
-	int which;
-	PyObject* pyColor;
-	PARSE_ARGS( args,  "OiO", &self, &which, &pyColor );
-
-	WorldMapControl* wmap = GetView<WorldMapControl>(self);
-	ABORT_IF_NULL(wmap);
-
-	const Color color = ColorFromPy(pyColor);
-	wmap->SetColor( which, color );
-
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_Label_SetFont__doc,
@@ -13376,7 +13348,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Window_SetupEquipmentIcons, METH_VARARGS),
 	METHOD(Window_ShowModal, METH_VARARGS),
 	METHOD(WorldMap_GetDestinationArea, METH_VARARGS),
-	METHOD(WorldMap_SetTextColor, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };

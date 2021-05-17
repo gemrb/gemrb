@@ -34,16 +34,8 @@
 namespace GemRB {
 
 class Font;
-class Palette;
 class WMPAreaEntry;
 class WorldMapControl;
-
-// !!! Keep these synchronized with GUIDefines.py !!!
-/** Which label color is set with SetColor() */
-#define IE_GUI_WMAP_COLOR_NORMAL      0
-#define IE_GUI_WMAP_COLOR_SELECTED    1
-#define IE_GUI_WMAP_COLOR_NOTVISITED  2
-
 
 /**
  * @class WorldMapControl
@@ -58,14 +50,14 @@ private:
 
 public:
 	WorldMapControl(const Region& frame, Font *font);
+	WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited);
 
 	/** Allows modification of the scrolling factor from outside */
 	void ScrollDelta(const Point& delta) override;
 	void ScrollTo(const Point& pos) override;
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
-	/** Set color for one type of area labels */
-	void SetColor(int which, Color color);
+
 	void SetOverrideIconPalette(bool ipOverride) { OverrideIconPalette = ipOverride; };
 	Point Pos;
 	/** pointer to last pointed area */
@@ -95,11 +87,11 @@ private:
 	bool OverrideIconPalette;
 	/** Label color of a visited area */
 
-	Color color_normal = Color(0xf0, 0xf0, 0xf0, 0xff);
+	Color color_normal;
 	/** Label color of a currently selected area */
-	Color color_selected = Color(0xf0, 0x80, 0x80, 0xff);
+	Color color_selected;
 	/** Label color of a not yet visited area */
-	Color color_notvisited = Color(0x80, 0x80, 0xf0, 0xff);
+	Color color_notvisited;
 
 };
 

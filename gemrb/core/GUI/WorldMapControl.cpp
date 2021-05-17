@@ -32,9 +32,13 @@
 
 namespace GemRB {
 
-WorldMapControl::WorldMapControl(const Region& frame, Font *font)
+WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited)
 	: Control(frame), ftext(font)
 {
+	color_normal = normal;
+	color_selected = selected;
+	color_notvisited = notvisited;
+	
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	OverrideIconPalette = false;
@@ -64,6 +68,13 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 	
 	SetAction(handler, Control::ValueChange);
 }
+
+WorldMapControl::WorldMapControl(const Region& frame, Font *font)
+: WorldMapControl(frame, font,
+				  Color(0xf0, 0xf0, 0xf0, 0xff),
+				  Color(0xf0, 0x80, 0x80, 0xff),
+				  Color(0x80, 0x80, 0xf0, 0xff))
+{}
 
 /** Draws the Control on the Output Display */
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
@@ -284,25 +295,6 @@ bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*
 			return false;
 	}
 	return true;
-}
-
-void WorldMapControl::SetColor(int which, Color color)
-{
-	switch (which) {
-	case IE_GUI_WMAP_COLOR_NORMAL:
-		color_normal = color;
-		break;
-	case IE_GUI_WMAP_COLOR_SELECTED:
-		color_selected = color;
-		break;
-	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		color_notvisited = color;
-		break;
-	default:
-		break;
-	}
-
-	MarkDirty();
 }
 
 }
