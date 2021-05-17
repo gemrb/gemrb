@@ -21,6 +21,34 @@ import GemRB
 import GameCheck
 from GUIDefines import SV_SAVEPATH
 
+skip_videos = False
+
+def RunStart2(isTOB):
+	global skip_videos
+	
+	if isTOB:
+		GemRB.SetMasterScript("BALDUR25","WORLDM25")
+		GemRB.SetVar("oldgame",0)
+		if not skip_videos and not skip_videos&2:
+			GemRB.PlayMovie ("INTRO", 1)
+			skip_videos |= 2
+	else:
+		GemRB.SetMasterScript("BALDUR","WORLDMAP")
+		GemRB.SetVar("oldgame",1)
+		if not skip_videos and not skip_videos&4:
+			GemRB.PlayMovie ("INTRO15F", 1)
+			skip_videos |= 4
+			
+	if GameCheck.IsBG2Demo():
+		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
+
+	GemRB.SetNextScript("Start2")
+	MusicTable = GemRB.LoadTable ("songlist")
+	# the table has useless rownames, so we can't search for BG2Theme
+	theme = MusicTable.GetValue ("33", "RESOURCE")
+	GemRB.LoadMusicPL (theme, 1)
+
+
 def OnLoad():
 	global skip_videos
 
@@ -37,9 +65,7 @@ def OnLoad():
 
 	#if not detected tob, we go right to the main menu
 	if not GameCheck.HasTOB():
-		GemRB.SetMasterScript("BALDUR","WORLDMAP")
-		GemRB.SetVar("oldgame",1)
-		GemRB.SetNextScript("Start2")
+		RunStart2(False)
 		return
 
 	StartWindow = GemRB.LoadWindow(7, "START")
@@ -57,23 +83,11 @@ def OnLoad():
 	ExitButton = StartWindow.GetControl(4)
 	ExitButton.SetText(13731)
 	ExitButton.MakeEscape()
-	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SoAPress)
-	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ToBPress)
+	SoAButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: RunStart2(False))
+	ToBButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: RunStart2(True))
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
 	StartWindow.Focus()
 	GemRB.LoadMusicPL("Cred.mus")
-	return
-	
-def SoAPress():
-	GemRB.SetMasterScript("BALDUR","WORLDMAP")
-	GemRB.SetVar("oldgame",1)
-	GemRB.SetNextScript("Start2")
-	return
-
-def ToBPress():
-	GemRB.SetMasterScript("BALDUR25","WORLDM25")
-	GemRB.SetVar("oldgame",0)
-	GemRB.SetNextScript("Start2")
 	return
 
 def MigrateSaveDir():
