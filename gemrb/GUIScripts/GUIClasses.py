@@ -356,8 +356,7 @@ class GButton(GControl):
 
 class GWorldMap(GControl, Scrollable):
 	methods = {
-		'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea,
-		'SetTextColor': _GemRB.WorldMap_SetTextColor
+		'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea
 	}
 
 class GSaveGame:
