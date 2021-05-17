@@ -72,7 +72,7 @@ def InitOptionsWindow (Window):
 	# Load Game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
 
 	# Save Game
 	Button = Window.GetControl (6)
@@ -487,50 +487,7 @@ def OpenSaveMsgWindow ():
 
 ###################################################
 
-def OpenLoadMsgWindow ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		return
-
-	LoadMsgWindow = Window = GemRB.LoadWindow (4, "GUIOPT")
-	Window.SetFlags (WF_BORDERLESS, OP_OR)
-
-	# Load
-	Button = Window.GetControl (0)
-	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
-	Button.MakeDefault()
-
-	# Cancel
-	Button = Window.GetControl (1)
-	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
-	Button.MakeEscape()
-
-	# Loading a game will destroy ...
-	Text = Window.GetControl (3)
-	Text.SetText (19531)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseLoadMsgWindow ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		LoadMsgWindow.Unload ()
-	LoadMsgWindow = None
-
-	return
-
 def LoadGamePress ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		LoadMsgWindow.Unload ()
-	LoadMsgWindow = None
-	GemRB.QuitGame ()
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
