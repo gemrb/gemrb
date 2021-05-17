@@ -41,9 +41,4 @@
 
 #include <windows.h>
 
- /* WinAPI collision. GetObject from wingdi.h conflicts with a type used in the GUIScript source (core\ScriptEngine.h) */
-#ifdef GetObject
-#undef GetObject
-#endif
-
 #endif  //! WIN32DEF_H
