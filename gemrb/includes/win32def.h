@@ -40,9 +40,6 @@
 #endif
 
 #include <windows.h>
-#ifndef M_PI_4
-#define 	M_PI_4   0.78539816339744830962
-#endif
 
  /* WinAPI collision. GetObject from wingdi.h conflicts with a type used in the GUIScript source (core\ScriptEngine.h) */
 #ifdef GetObject
