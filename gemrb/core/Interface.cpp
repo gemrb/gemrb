@@ -2178,7 +2178,7 @@ bool Interface::LoadGemRBINI()
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
 			// FIXME: this is an arbitrary heuristic and speed
-			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 5 : 0);
+			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 10 : 0);
 			TooltipBG->SetMargin(ttMargin);
 		}
 	}
