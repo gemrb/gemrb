@@ -57,12 +57,6 @@ def InitJournalWindow (JournalWindow):
 		UpdateLogWindow(JournalWindow)
 
 	GemRB.SetVar ("Section", Section)
-	# Quests
-	Button = JournalWindow.GetControl (6)
-	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetVarAssoc ("Section", 1)
-	Button.SetText (45485)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# Quests completed
 	Button = JournalWindow.GetControl (7)
@@ -83,6 +77,13 @@ def InitJournalWindow (JournalWindow):
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	Button.SetVarAssoc ("Section", 0)
 	Button.SetText (45487)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
+
+	# Quests
+	Button = JournalWindow.GetControl (6)
+	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
+	Button.SetVarAssoc ("Section", 1)
+	Button.SetText (45485)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Update)
 
 	# Order
