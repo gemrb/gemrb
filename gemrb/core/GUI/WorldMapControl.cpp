@@ -118,6 +118,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			continue;
 
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		if (!icon) continue;
 		const Region& icon_frame = icon->Frame;
 		Point p = m->pos - icon_frame.Origin();
 		Region r2 = Region(MapToScreen(p), icon_frame.Dimensions());
