@@ -22,8 +22,9 @@
 import GemRB
 import GameCheck
 import GUIClasses
+import collections
 import CommonTables
-from ie_restype import RES_CHU, RES_2DA, RES_BAM
+from ie_restype import RES_CHU, RES_2DA, RES_BAM, RES_WAV
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
@@ -838,6 +839,26 @@ def GetACStyleBonus (pc):
 	if cdet["Style"] % 1000 != IE_PROFICIENCYSINGLEWEAPON:
 		return 0
 	return WStyleTable.GetValue (str(stars), "AC")
+
+def AddDefaultVoiceSet (VoiceList, Voices):
+	if GameCheck.IsBG1 () or GameCheck.IsBG2 ():
+		Options = collections.OrderedDict(enumerate(Voices))
+		Options[-1] = "default"
+		Options = collections.OrderedDict(sorted(Options.items()))
+		VoiceList.SetOptions (Options.values())
+		return True
+	return False
+
+def OverrideDefaultVoiceSet (Gender, CharSound):
+	# handle "default" gendered voice
+	if CharSound == "default" and not GemRB.HasResource ("defaulta", RES_WAV):
+		if GameCheck.IsBG1 ():
+			Gender2Sound = [ "", "mainm", "mainf" ]
+			CharSound = Gender2Sound[Gender]
+		elif GameCheck.IsBG2 ():
+			Gender2Sound = [ "", "male005", "female4" ]
+			CharSound = Gender2Sound[Gender]
+	return CharSound
 
 class _stdioWrapper(object):
 	def __init__(self, log_level):

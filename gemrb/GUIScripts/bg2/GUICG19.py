@@ -17,10 +17,13 @@
 #
 #
 #character generation, sounds (GUICG19)
+import GemRB
+
+import CharGenCommon
+import GUICommon
 from ie_restype import *
 from ie_sounds import CHAN_CHAR1
-import GemRB
-import CharGenCommon
+from ie_stats import IE_SEX
 
 VoiceList = 0
 CharSoundWindow = 0
@@ -38,12 +41,9 @@ def OnLoad():
 	CharGenCommon.PositionCharGenWin(CharSoundWindow)
 
 	VoiceList = CharSoundWindow.GetControl (45)
-	VoiceList.ListResources(CHR_SOUNDS)
-	if GemRB.GetVar ("Gender")==1:
-		GemRB.SetVar ("Selected", 4)
-	else:
-		GemRB.SetVar ("Selected", 0)
-
+	Voices = VoiceList.ListResources (CHR_SOUNDS)
+	GUICommon.AddDefaultVoiceSet (VoiceList, Voices)
+	# preselect the default entry to avoid an infinite loop if Play is pressed immediately
 	VoiceList.SetVarAssoc ("Selected", 0)
 
 	PlayButton = CharSoundWindow.GetControl (47)
@@ -71,7 +71,10 @@ def PlayPress():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText()
-	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
+	MyChar = GemRB.GetVar ("Slot")
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
+
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
@@ -105,6 +108,8 @@ def NextPress():
 
 	CharSound = VoiceList.QueryText ()
 	MyChar = GemRB.GetVar ("Slot")
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	GemRB.SetPlayerSound (MyChar, CharSound)
 
 	if CharSoundWindow:

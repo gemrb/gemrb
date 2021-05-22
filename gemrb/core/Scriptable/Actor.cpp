@@ -8989,11 +8989,33 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
 		size_t len;
-		if (csound[index]) {
+
+		// handle nonstandard bg1 "default" soundsets first
+		if (!strnicmp(PCStats->SoundSet, "main", 4)) {
+			static const char *suffixes[] = { "03", "08", "09", "10", "11", "17", "18", "19", "20", "21", "22", "38", "39" };
+			static unsigned int VB2Suffix[] = { 9, 6, 7, 8, 20, 26, 27, 28, 32, 33, 34, 18, 19 };
+			bool found = false;
+
+			for (int i = 0; i < 13; i++) {
+				if (VB2Suffix[i] == index) {
+					index = i;
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Sound[0] = 0;
+				return;
+			}
+
+			snprintf(Sound, sizeof(ieResRef), "%.5s%.2s", PCStats->SoundSet, suffixes[index]);
+			return;
+		} else if (csound[index]) {
 			len = snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
 			if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 			return;
 		}
+
 		//icewind style
 		len = snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
 		if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);

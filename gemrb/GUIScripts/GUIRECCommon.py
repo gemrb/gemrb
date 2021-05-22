@@ -57,6 +57,8 @@ else:
 	SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
 		'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
 		'3', '4', '5', '6', '7', '8', '9']
+# two bg1 default soundsets and nothing else
+SoundSequence2 = [ "03", "08", "09", "10", "11", "17", "18", "19", "20", "21", "22", "38", "39" ]
 SoundIndex = 0
 VoiceList = None
 OldVoiceSet = None
@@ -298,7 +300,19 @@ def OpenSoundWindow ():
 	SubCustomizeWindow = GemRB.LoadWindow (20)
 
 	VoiceList = SubCustomizeWindow.GetControl (5)
-	VoiceList.ListResources(CHR_SOUNDS)
+	Voices = VoiceList.ListResources (CHR_SOUNDS)
+
+	# add "default" voice
+	# bg1: mainm and mainf
+	# bg2: last item in the list: female4/male005
+	# iwds: n/a
+	DefaultAdded = GUICommon.AddDefaultVoiceSet (VoiceList, Voices)
+
+	# find the index of the current voice and preselect it
+	if OldVoiceSet in Voices:
+		VoiceList.SetVarAssoc ("Selected", Voices.index(OldVoiceSet) + int(DefaultAdded))
+	else: # "default"
+		VoiceList.SetVarAssoc ("Selected", 0)
 
 	PlayButton = SubCustomizeWindow.GetControl (7)
 	PlayButton.SetText (17318)
@@ -330,6 +344,7 @@ def CloseSoundWindow ():
 def DoneSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	CharSound = VoiceList.QueryText ()
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	GemRB.SetPlayerSound (pc, CharSound)
 
 	CloseSubCustomizeWindow ()
@@ -339,20 +354,25 @@ def PlaySoundPressed():
 	global SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText ()
+	SoundSeq = SoundSequence
+	if CharSound == "default":
+		SoundSeq = SoundSequence2
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	pc = GemRB.GameGetSelectedPCSingle ()
+
 	if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 		GemRB.SetPlayerSound (pc, CharSound)
 		VoiceSet = GemRB.GetPlayerSound (pc, 1)
 	else:
 		VoiceSet = CharSound
 	tmp = SoundIndex
-	while (not GemRB.HasResource (VoiceSet + SoundSequence[SoundIndex], RES_WAV)):
+	while (not GemRB.HasResource (VoiceSet + SoundSeq[SoundIndex], RES_WAV)):
 		NextSound()
 		if SoundIndex == tmp:
 			break
 	else:
 		NextSound()
-	GemRB.PlaySound (VoiceSet + SoundSequence[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, 5)
+	GemRB.PlaySound (VoiceSet + SoundSeq[SoundIndex], "CHARACT" + str(pc - 1), 0, 0, 5)
 	return
 
 def NextSound():
