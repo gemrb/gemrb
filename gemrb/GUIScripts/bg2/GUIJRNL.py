@@ -124,6 +124,7 @@ def UpdateLogWindow (JournalWindow):
 	# CurrentChapter
 	Label = JournalWindow.GetControl (5)
 	Label.SetText (15873)
+	Label.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	print "Chapter ", Chapter, "Section ", Section
 
 	Text = JournalWindow.GetControl (1)
