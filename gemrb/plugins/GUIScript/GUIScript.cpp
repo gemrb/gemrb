@@ -4792,6 +4792,35 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	return MakePyList<const String&, PyString_FromStringObj>(strings);
 }
 
+PyDoc_STRVAR( GemRB_TextArea_SetColor__doc,
+"===== TextArea_SeColor =====\n\
+\n\
+**Prototype:** GemRB.SetColor (GTextArea, Color [, Index])\n\
+\n\
+**Metaclass Prototype:** SetColor (Options)\n\
+\n\
+**Description:** Set the color coresponding to the index for a TextArea\n\
+\n\
+**Parameters:** \n\
+  * GTextArea - the TextArea to set a color for\n\
+  * Color - Python dictionary of r,g,b,a color values\n\
+  * Index - the COLOR_TYPE\n\
+\n\
+**Return value:** N/A"
+);
+
+static PyObject* GemRB_TextArea_SetColor(PyObject* self, PyObject* args)
+{
+	PyObject* pycolor;
+	TextArea::COLOR_TYPE index = TextArea::COLOR_NORMAL;
+	PARSE_ARGS(args,  "OO|i", &self, &pycolor, &index);
+
+	TextArea* ta = GetView<TextArea>(self);
+	ABORT_IF_NULL(ta);
+	ta->SetColor(ColorFromPy(pycolor), index);
+
+	Py_RETURN_NONE;
+}
 
 PyDoc_STRVAR( GemRB_TextArea_SetOptions__doc,
 "===== TextArea_SetOptions =====\n\
@@ -13329,6 +13358,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Table_Unload, METH_VARARGS),
 	METHOD(TextArea_Append, METH_VARARGS),
 	METHOD(TextArea_ListResources, METH_VARARGS),
+	METHOD(TextArea_SetColor, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),

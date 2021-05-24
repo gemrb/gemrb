@@ -267,6 +267,8 @@ def DisplayItem (slotItem, type):
 
 	#textarea
 	Text = Window.GetControl (5)
+	if GameCheck.IsBG2(): # I believe only BG2 has special initials
+		Text.SetColor({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, 1)
 	if (type&2):
 		text = item["ItemDesc"]
 	else:

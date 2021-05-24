@@ -102,6 +102,17 @@ private:
 	};
 
 public:
+	enum COLOR_TYPE {
+		COLOR_NORMAL = 0,	// standard text color
+		COLOR_INITIALS,	// color for finit. used only is some cases.
+		COLOR_BACKGROUND, // the background color for all text
+		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
+		COLOR_HOVER,	// color for hovering options (dialog/listbox)
+		COLOR_SELECTED,	// selected list box/dialog option.
+		
+		COLOR_TYPE_COUNT
+	};
+
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps,
 			 const Color& textcolor, const Color& initcolor, const Color& textBgColor);
@@ -109,6 +120,8 @@ public:
 	~TextArea();
 
 	bool IsOpaque() const override { return false; }
+	
+	void SetColor(const Color&, COLOR_TYPE);
 
 	/** Sets the Actual Text */
 	void SetText(const String& text) override;
@@ -166,21 +179,10 @@ private: // Private attributes
 	GemMarkupParser parser;
 	ContentContainer::Margin textMargins;
 
-	enum COLOR_TYPE {
-		COLOR_NORMAL = 0,	// standard text color
-		COLOR_INITIALS,	// color for finit. used only is some cases.
-		COLOR_BACKGROUND, // the background color for all text
-		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
-		COLOR_HOVER,	// color for hovering options (dialog/listbox)
-		COLOR_SELECTED,	// selected list box/dialog option.
-		
-		COLOR_TYPE_COUNT
-	};
 	Color colors[COLOR_TYPE_COUNT];
 	PaletteHolder invertedText;
 
 private: //internal functions
-	void SetColor(const Color&, COLOR_TYPE);
 	void SetColor(const Color*, COLOR_TYPE);
 
 	void UpdateScrollview();
