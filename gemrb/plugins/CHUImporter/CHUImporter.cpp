@@ -382,7 +382,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				
 				fore.a = init.a = back.a = 0xff;
 
-				TextArea* ta = new TextArea(ctrlFrame, fnt, ini, fore, init, back);
+				TextArea* ta = new TextArea(ctrlFrame, fnt, ini);
+				ta->SetColor(fore, TextArea::COLOR_NORMAL);
+				ta->SetColor(init, TextArea::COLOR_INITIALS);
+				ta->SetColor(back, TextArea::COLOR_BACKGROUND);
 				if (SBID != 0xffff) {
 					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
 					if (sb) {

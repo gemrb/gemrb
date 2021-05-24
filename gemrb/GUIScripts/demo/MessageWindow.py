@@ -20,6 +20,8 @@ def OnLoad():
 	TMessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
 	TMessageTA.AddAlias("MsgSys", 0)
 	TMessageTA.AddAlias("MTA", 0)
+	TMessageTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, 3)
+	TMessageTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, 4)
 	
 	results = Tests.RunTests ()
 	TMessageTA.SetText ("[cap]D[/cap]emo " + "DEMO "*40 + "\n" + results)

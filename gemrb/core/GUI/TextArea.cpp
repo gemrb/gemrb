@@ -222,22 +222,18 @@ void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op
 }
 
 TextArea::TextArea(const Region& frame, Font* text)
-: TextArea(frame, text, text, ColorWhite, ColorWhite, ColorBlack)
+: TextArea(frame, text, text)
 {}
 
-TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   const Color& textcolor, const Color& initcolor, const Color& textBgColor)
+TextArea::TextArea(const Region& frame, Font* text, Font* caps)
 : Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), colors()
 {
-	colors[COLOR_NORMAL] = textcolor;
-	colors[COLOR_INITIALS] = initcolor;
-	colors[COLOR_BACKGROUND] = textBgColor;
+	colors[COLOR_HOVER] = SelectOptionHover;
+	colors[COLOR_SELECTED] = SelectOptionSelected;
 
 	// quick font optimization (prevents creating unnecessary cap spans)
 	finit = (caps && caps != ftext) ? caps : ftext;
 	assert(ftext && finit);
-
-	parser.ResetAttributes(text, {textcolor, textBgColor}, finit, {initcolor, textBgColor});
 
 	ControlType = IE_GUI_TEXTAREA;
 	strncpy(VarName, "Selected", sizeof(VarName));
@@ -662,13 +658,8 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 	scrollview.SetVScroll(sb);
 }
 
-void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
-								const Color* color, const Color* hiColor, const Color* selColor)
+void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered)
 {
-	SetColor(color, COLOR_OPTIONS);
-	SetColor(hiColor, COLOR_HOVER);
-	SetColor(selColor, COLOR_SELECTED);
-
 	ClearSelectOptions(); // deletes previous options
 
 	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();

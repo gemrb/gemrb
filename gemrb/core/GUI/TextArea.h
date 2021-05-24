@@ -114,8 +114,7 @@ public:
 	};
 
 	TextArea(const Region& frame, Font* text);
-	TextArea(const Region& frame, Font* text, Font* caps,
-			 const Color& textcolor, const Color& initcolor, const Color& textBgColor);
+	TextArea(const Region& frame, Font* text, Font* caps);
 	
 	~TextArea();
 
@@ -143,8 +142,7 @@ public:
 	ieWord LineHeight() const;
 
 	void SetScrollbar(ScrollBar*);
-	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color* = nullptr, const Color* = &SelectOptionHover, const Color* = &SelectOptionSelected);
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered);
 	
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
@@ -179,7 +177,7 @@ private: // Private attributes
 	GemMarkupParser parser;
 	ContentContainer::Margin textMargins;
 
-	Color colors[COLOR_TYPE_COUNT];
+	Color colors[COLOR_TYPE_COUNT] = {ColorWhite};
 	PaletteHolder invertedText;
 
 private: //internal functions
