@@ -1003,7 +1003,7 @@ def UpdateRecordsWindow (Window):
 
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
-	RecordsTextArea.SetColor({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, 1)
+	RecordsTextArea.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
 
 	DisplayCommon (pc)
 
