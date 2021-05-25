@@ -1373,7 +1373,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_PATH("GemRBPath", GemRBPath,
 				CopyGemDataPath(GemRBPath, _MAX_PATH));
 
-	CONFIG_PATH("CachePath", CachePath, "./Cache");
+	CONFIG_PATH("CachePath", CachePath, "./Cache2");
 	FixPath( CachePath, false );
 
 	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
