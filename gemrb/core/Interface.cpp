@@ -1379,10 +1379,12 @@ int Interface::Init(InterfaceConfig* config)
 	// AppImage doesn't support relative urls at all
 	// we set the path to the data dir to cover unhardcoded and co,
 	// while plugins are statically linked, so it doesn't matter for them
+#ifdef DATA_DIR
 	char* appDir = getenv("APPDIR");
 	if (appDir) {
 		PathJoin(GemRBPath, appDir, DATA_DIR, nullptr);
 	}
+#endif
 
 	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
 	CONFIG_PATH("GamePath", GamePath, ".");
