@@ -13,5 +13,5 @@ fi
 # there are no tags due to shallow clones, so improvise
 file=GemRB-$TRAVIS_BRANCH-$TRAVIS_COMMIT-x86_64.AppImage
 filepath="$filepath/$file"
-scp -i $sshid $file \
+scp -i $sshid ../../build/$file \
  gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath
