@@ -11,10 +11,10 @@ else
 fi
 
 # there are no tags due to shallow clones, so improvise
-filei=GemRB-$TRAVIS_BRANCH-$TRAVIS_COMMIT-x86_64.AppImage
+filei=GemRB-*-x86_64.AppImage
 fileo=GemRB-$TRAVIS_BRANCH-${TRAVIS_COMMIT:0:10}-x86_64.AppImage
 filepath="$filepath/$fileo"
 pwd
-ls -R
+ls *AppImage
 scp -i $sshid $filei \
  gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath
