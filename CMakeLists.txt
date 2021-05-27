@@ -6,6 +6,9 @@ endif(COMMAND cmake_policy)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# skip verbose make install output
+set(CMAKE_INSTALL_MESSAGE "NEVER")
+
 # prevent in-source builds
 IF(NOT INSOURCEBUILD AND (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
 	MESSAGE(FATAL_ERROR "
@@ -580,8 +583,6 @@ ENDIF()
 INSTALL( FILES README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
 INSTALL( FILES admin/extend2da.py DESTINATION ${BIN_DIR}
 		PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
-# skip verbose make install output
-set(CMAKE_INSTALL_MESSAGE NEVER)
 
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
@@ -593,11 +594,11 @@ ADD_CUSTOM_TARGET( uninstall
 	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
 
 add_custom_target(appimage
-    COMMAND rm -rf ./AppDir
+    COMMAND rm -rf ./AppDir GemRB-${TRAVIS_BRANCH}-${TRAVIS_COMMIT}-x86_64.AppImage
     COMMAND make install DESTDIR=./AppDir
-    COMMAND sed -i '$ a X-AppImage-Version='$TRAVIS_BRANCH-$TRAVIS_COMMIT ${CMAKE_SOURCE_DIR}/gemrb.desktop
+    COMMAND sed -i 's,X-AppImage-Version.*,X-AppImage-Version='${TRAVIS_BRANCH}-${TRAVIS_COMMIT}',' AppDir/usr/share/applications/gemrb.desktop
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
-    COMMAND mv GemRB-*.AppImage GemRB-$TRAVIS_BRANCH-$TRAVIS_COMMIT-x86_64.AppImage
+    COMMAND mv GemRB-*.AppImage GemRB-${TRAVIS_BRANCH}-${TRAVIS_COMMIT}-x86_64.AppImage
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
 

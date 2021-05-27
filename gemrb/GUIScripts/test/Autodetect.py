@@ -20,8 +20,10 @@ import GemRB
 from ie_restype import *
 from AutodetectCommon import CheckFiles
 
+# NB: python insists on at least two entries
 files = (
-	("palette0", "png", RES_PNG)
+	("PALETTE0", "PNG", RES_PNG),
+	("PALETTE0", "PNG", RES_PNG)
 )
 
 if CheckFiles (files):

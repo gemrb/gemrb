@@ -43,7 +43,7 @@ before_script:
 script:
   - |
     mkdir build && cd build &&
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_BUILD=1 -DAPPIMAGE=1 &&
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1 &&
     make &&
 
     sed -i '1 a \ AudioDriver = none' ../gemrb/GemRB.cfg.noinstall.sample &&

@@ -10,3 +10,4 @@ Exec=gemrb
 Categories=Game;RolePlaying;Emulator;
 Keywords=roleplay;rpg;adventure;game;2d;isometric;gemrb;infinity engine;black isle;
 X-AppImage-Name=GemRB
+X-AppImage-Version=-
