@@ -1592,8 +1592,11 @@ int Interface::Init(InterfaceConfig* config)
 		PathJoin(ChitinPath, GamePath, "chitin.key", nullptr);
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
-			Log(ERROR, "Core", "This means you set the GamePath config variable incorrectly or that the game is running (Windows only).");
-			Log(ERROR, "Core", "It must point to the game directory that holds a readable chitin.key");
+			Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
+- you passed a bad game path to GemRB on the command line,\n\
+- you are not running GemRB from within a game dir,\n\
+- or the game is running (Windows only).");
+			Log(ERROR, "Core", "The path must point to a game directory with a readable chitin.key file.");
 			return GEM_ERROR;
 		}
 	}
