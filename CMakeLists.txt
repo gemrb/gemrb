@@ -595,7 +595,7 @@ ADD_CUSTOM_TARGET( uninstall
 add_custom_target(appimage
     COMMAND rm -rf ./AppDir
     COMMAND make install DESTDIR=./AppDir
-    COMMAND sed -i '$ a X-AppImage-Version='$TRAVIS_BRANCH-$TRAVIS_COMMIT AppDir/gemrb.desktop
+    COMMAND sed -i '$ a X-AppImage-Version='$TRAVIS_BRANCH-$TRAVIS_COMMIT ${CMAKE_SOURCE_DIR}/gemrb.desktop
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
     COMMAND mv GemRB-*.AppImage GemRB-$TRAVIS_BRANCH-$TRAVIS_COMMIT-x86_64.AppImage
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
