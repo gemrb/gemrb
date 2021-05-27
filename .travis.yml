@@ -52,13 +52,13 @@ script:
     if [[ $CC == clang ]]; then
       # fetch appimage tools
       curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy &&
-#      curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint &&
-#      chmod +x linuxdeploy appimagelint &&
+      #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint &&
+      #chmod +x linuxdeploy appimagelint &&
       chmod +x linuxdeploy &&
 
       make appimage &&
       # check if it works on old systems and rerun our test
-#      ./appimagelint GemRB-*-x86_64.AppImage &&
+      #./appimagelint GemRB-*-x86_64.AppImage &&
       ./GemRB-*.AppImage -c ../gemrb/GemRB.cfg.noinstall.sample
     fi
 
