@@ -1376,6 +1376,14 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_PATH("CachePath", CachePath, "./Cache2");
 	FixPath( CachePath, false );
 
+	// AppImage doesn't support relative urls at all
+	// we set the path to the data dir to cover unhardcoded and co,
+	// while plugins are statically linked, so it doesn't matter for them
+	char* appDir = getenv("APPDIR");
+	if (appDir) {
+		PathJoin(GemRBPath, appDir, DATA_DIR, nullptr);
+	}
+
 	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
 	CONFIG_PATH("GamePath", GamePath, ".");
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout

@@ -167,6 +167,9 @@ endif (${LAYOUT} MATCHES "home")
 # convert the slashes for windows' users' convenience
 file(TO_NATIVE_PATH "${PLUGIN_DIR}" DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
+if(APPIMAGE)
+	file(RELATIVE_PATH DATA_DIR "/" "${DATA_DIR}")
+endif()
 
 # check if this is a release version
 SET(RC "")
@@ -586,6 +589,14 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET( uninstall
 	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
+
+add_custom_target(appimage
+    COMMAND rm -rf ./AppDir
+    COMMAND make install DESTDIR=./AppDir
+    COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
+    COMMAND mv GemRB-*.AppImage GemRB-$TRAVIS_BRANCH-$TRAVIS_COMMIT-x86_64.AppImage
+    WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
+)
 
 # make dist for a gzipped tarball of current HEAD
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
