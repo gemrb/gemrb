@@ -98,9 +98,8 @@ test_script:
     cp GemRB.cfg.sample GmRB.cfg.bots
     echo GamePath=minimal >> GemRB.cfg.bots
     echo GameType=test >> GemRB.cfg.bots
-    echo AudioDriver=none >> GemRB.cfg.bots
 
-    gemrb.exe -c GemRB.cfg.bots
+    gemrb.exe -q -c GemRB.cfg.bots
     rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip

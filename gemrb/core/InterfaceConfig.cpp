@@ -102,6 +102,9 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 				Log(FATAL, "Config", "Failed to open config file \"%s\".", filename);
 			}
 			isValid = InitWithINIData(config);
+		} else if (stricmp(argv[i], "-q") == 0) {
+			// quiet mode
+			SetKeyValuePair("AudioDriver", "none");
 		} else {
 			// assume a path was passed, soft force configless startup
 			SetKeyValuePair("GamePath", argv[i]);
