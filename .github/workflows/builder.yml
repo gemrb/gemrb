@@ -100,9 +100,9 @@ jobs:
         CXX: g++-7
         CC: gcc-7
       run: |
-        mkdir build && cd build &&
-        cmake --version &&
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1
+        mkdir build && cd build
+        cmake --version
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1 -DNOCOLOR=1
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v2
@@ -118,38 +118,35 @@ jobs:
 
     - name: Build
       run: |
-        cd build &&
+        cd build
         make
 
     - name: Test 1
-      shell: 'script -q -e -c "bash --noprofile --norc -o pipefail {0}"'
       run: |
-        cd build &&
-        # work around TERM=dumb https://github.com/actions/runner/issues/241
+        cd build
         gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
 
     - name: Prepare AppImage
       run: |
-        cd build &&
+        cd build
         # fetch appimage tools
-        curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy &&
-        #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint &&
-        #chmod +x linuxdeploy appimagelint &&
-        chmod +x linuxdeploy &&
+        curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy
+        #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint
+        #chmod +x linuxdeploy appimagelint
+        chmod +x linuxdeploy
 
         make appimage
         # check if it works on old systems
-        #./appimagelint GemRB-*-x86_64.AppImage &&
+        #./appimagelint GemRB-*.AppImage
 
     - name: Test 2
-      shell: 'script -q -e -c "bash --noprofile --norc -o pipefail {0}"'
       run: |
-        cd build &&
+        cd build
         ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
 
     - name: Show build cache stats
       run: |
-        command -v sccache &&
+        command -v sccache
         sccache -s
 
     - name: Set up SSH
