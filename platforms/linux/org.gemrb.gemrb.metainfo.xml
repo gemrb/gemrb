@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.gemrb.gemrb</id>
+  
+  <name>GemRB</name>
+  <summary>GemRB is a portable open-source implementation of Bioware’s Infinity Engine</summary>
+  
+  <metadata_license>CC-BY-SA-4.0</metadata_license>
+  <project_license>GPL-2.0-or-later</project_license>
+  
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+    <control>gamepad</control>
+  </recommends>
+  
+  <description>
+    <p>
+      The goal of the project is to make the Infinity Engine games available on a wide range of platforms forever, fix or avoid old bugs, add new features and provide a superb platform for mod development.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">gemrb.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://gemrb.org/assets/img/screenshots/iwd2_3.jpg</image>
+    </screenshot>
+    <screenshot>
+      <image>https://gemrb.org/assets/img/screenshots/10pp6.jpg</image>
+    </screenshot>
+  </screenshots>
+</component>
