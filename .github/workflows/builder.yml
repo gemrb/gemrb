@@ -133,7 +133,9 @@ jobs:
         #chmod +x linuxdeploy appimagelint
         chmod +x linuxdeploy
 
+        echo "::group::AppImage building"
         make appimage
+        echo "::endgroup::"
         # check if it works on old systems
         #./appimagelint GemRB-*.AppImage
 
@@ -158,10 +160,9 @@ jobs:
       if: github.event_name == 'push'
       run: |
         # NOTE: only do it on gcc builds if we ever add more compilers
-        ls
         filepath=Linux
         filei=build/GemRB-*-x86_64.AppImage
-        fileo=GemRB-$GITHUB_REF-${GITHUB_SHA:0:10}-x86_64.AppImage
+        fileo=GemRB-${GITHUB_REF##*/}-${GITHUB_SHA:0:10}-x86_64.AppImage
 
         filepath="$filepath/$fileo"
         scp $filei \
