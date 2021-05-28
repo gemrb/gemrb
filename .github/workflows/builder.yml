@@ -121,11 +121,10 @@ jobs:
         cd build
         make
 
-    - name: Test 1
-      run: |
-        cd build
-        echo Logging=0 >> ../gemrb/GemRB.cfg.noinstall.sample
-        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
+#    - name: Test 1
+#      run: |
+#        cd build
+#        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
 
     - name: Prepare AppImage
       run: |
@@ -140,10 +139,10 @@ jobs:
         # check if it works on old systems
         #./appimagelint GemRB-*.AppImage
 
-    - name: Test 2
-      run: |
-        cd build
-        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
+#    - name: Test 2
+#      run: |
+#        cd build
+#        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
 
     - name: Show build cache stats
       run: |
