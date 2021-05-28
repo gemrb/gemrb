@@ -65,16 +65,8 @@ jobs:
         OS: ${{ runner.os }}
       run: |
         # NOTE: only do it on clang builds if we ever add more compilers
-        if [[ $OS == macOS ]]; then
-          filepath=Apple/OSX
-          tarpath=/Applications/GemRB.app
-        elif [[ $OS == Linux ]]; then
-          filepath=Linux
-          tarpath=iprefix
-        else
-          echo "Unknown platform, exiting!"
-          exit 13
-        fi
+        filepath=Apple/OSX
+        tarpath=/Applications/GemRB.app
 
         # there are no tags, so improvise
         version=$({ date +%F; git describe --always; } | tr -d '\n') || exit 14
@@ -83,4 +75,82 @@ jobs:
 
         filepath="$filepath/$file"
         scp $file \
+        gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath
+
+  linux:
+    name: Linux AppImage build
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install zlib1g zlib1g-dev libsdl1.2debian libsdl1.2-dev libopenal1 libopenal-dev libsdl-mixer1.2 libsdl-mixer1.2-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev libpython2.7 python-dev
+
+    - name: Set up build
+      env:
+        CXX: g++-7
+        CC: gcc-7
+      run: |
+        mkdir build && cd build &&
+        cmake --version &&
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1 &&
+
+    - name: Compiler cache (sccache)
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/sccache
+          ~/Library/Caches/Mozilla.sccache
+        key: ${{ runner.os }}-sccache-v1-${{ github.ref }}-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-sccache-v1-${{ github.ref }}-
+          ${{ runner.os }}-sccache-v1-refs/heads/master-
+          ${{ runner.os }}-sccache-v1-
+
+    - name: Build
+      run: |
+        cd build &&
+        make &&
+
+        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &&
+
+        # fetch appimage tools
+        curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy &&
+        #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint &&
+        #chmod +x linuxdeploy appimagelint &&
+        chmod +x linuxdeploy &&
+
+        make appimage &&
+        # check if it works on old systems and rerun our test
+        #./appimagelint GemRB-*-x86_64.AppImage &&
+        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
+
+    - name: Show build cache stats
+      run: |
+        command -v sccache &&
+        sccache -s
+
+    - name: Set up SSH
+      uses: kielabokkie/ssh-key-and-known-hosts-action@v1
+      if: github.event_name == 'push'
+      with:
+        ssh-private-key: ${{ secrets.SSH_SF_PRIVATE_KEY }}
+        ssh-host: frs.sourceforge.net
+
+    - name: Upload
+      if: github.event_name == 'push'
+      env:
+        OS: ${{ runner.os }}
+      run: |
+        # NOTE: only do it on gcc builds if we ever add more compilers
+        filepath=Linux
+        filei=GemRB-*-x86_64.AppImage
+        fileo=GemRB-$GITHUB_REF-${GITHUB_SHA:0:10}-x86_64.AppImage
+
+        filepath="$filepath/$fileo"
+        scp $filei \
         gemrb-travisbot@frs.sourceforge.net:/home/frs/project/gemrb/Buildbot\\\ Binaries/$filepath

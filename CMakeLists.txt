@@ -602,7 +602,7 @@ add_custom_target(appimage
     COMMAND rm -rf ./AppDir GemRB-*-x86_64.AppImage
     COMMAND make install DESTDIR=./AppDir
     COMMAND mv AppDir/usr/usr/share/gemrb AppDir/usr/share/ || true # not always needed
-    COMMAND sed -i 's,X-AppImage-Version.*,X-AppImage-Version='$ENV{TRAVIS_BRANCH}-$ENV{TRAVIS_COMMIT}',' AppDir/usr/share/applications/gemrb.desktop
+    COMMAND sed -i 's,X-AppImage-Version.*,X-AppImage-Version='$ENV{GITHUB_REF}-$ENV{GITHUB_SHA}',' AppDir/usr/share/applications/gemrb.desktop
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
