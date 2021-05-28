@@ -116,30 +116,37 @@ jobs:
           ${{ runner.os }}-sccache-v1-
 
     - name: Build
+      run: |
+        cd build &&
+        make
+
+    - name: Test 1
       shell: bash --noprofile --norc -x -o pipefail {0}
       run: |
         cd build &&
-        make &&
-
         # work around TERM=dumb https://github.com/actions/runner/issues/241
-        echo Testing built binary &&
-        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &> /dev/null &&
-        echo Testing built binary: done &&
+        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &> /dev/null ||
+        { find -name GemRB.log -exec cat {} +; false; }
 
+    - name: Prepare AppImage
+      run: |
+        cd build &&
         # fetch appimage tools
         curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy &&
         #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint &&
         #chmod +x linuxdeploy appimagelint &&
         chmod +x linuxdeploy &&
 
-        make appimage &&
-        # check if it works on old systems and rerun our test
+        make appimage
+        # check if it works on old systems
         #./appimagelint GemRB-*-x86_64.AppImage &&
-        echo Testing with AppImage &&
-        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/ &> /dev/null ||
 
-        # part two of the silly workaround
-        { find -name GemRB.log -exec cat {} +; false }
+    - name: Test 2
+      shell: bash --noprofile --norc -x -o pipefail {0}
+      run: |
+        cd build &&
+        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/ &> /dev/null ||
+        { find -name GemRB.log -exec cat {} +; false; }
 
     - name: Show build cache stats
       run: |
