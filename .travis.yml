@@ -56,11 +56,10 @@ script:
       #chmod +x linuxdeploy appimagelint &&
       chmod +x linuxdeploy &&
 
-      make appimage #&&
+      make appimage &&
       # check if it works on old systems and rerun our test
       #./appimagelint GemRB-*-x86_64.AppImage &&
-      #./GemRB-*.AppImage -c ../gemrb/GemRB.cfg.noinstall.sample
-      #./GemRB-*.AppImage ../gemrb/tests/minimal/
+      ./GemRB-*.AppImage ../gemrb/tests/minimal/
     fi
 
 deploy:
