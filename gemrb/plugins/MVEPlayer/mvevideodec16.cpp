@@ -494,7 +494,7 @@ static int
 ipvideo_decode_0xa (const GstMveDemuxStream * s, unsigned short *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int x, y;
+	unsigned int x, y;
 	unsigned short P[16];
 	unsigned char B[16];
 	int flags = 0;
