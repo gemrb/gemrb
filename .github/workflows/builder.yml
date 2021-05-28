@@ -90,7 +90,7 @@ jobs:
         sudo apt-get update
         sudo apt-get install zlib1g zlib1g-dev libsdl1.2debian libsdl1.2-dev libopenal1 libopenal-dev libsdl-mixer1.2 libsdl-mixer1.2-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev libpython2.7 python-dev
 
-        SCCACHE_VERSION="0.2.15"
+        SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"
         curl -sSfL "https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/${SCCACHE_LINUX_PACKAGE}.tar.gz" | sudo tar zx --strip-component=1 -C /usr/bin/
 
