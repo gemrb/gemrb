@@ -100,7 +100,7 @@ jobs:
       run: |
         mkdir build && cd build
         cmake --version
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release -DSTATIC_LINK=1 -DAPPIMAGE=1
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v2
@@ -129,15 +129,18 @@ jobs:
         cd build
         # fetch appimage tools
         curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy
-        #curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint
-        #chmod +x linuxdeploy appimagelint
+        curl https://github.com/TheAssassin/appimagelint/releases/download/continuous/appimagelint-x86_64.AppImage -L -o appimagelint
+        chmod +x linuxdeploy appimagelint
         chmod +x linuxdeploy
 
         echo "::group::AppImage building"
         make appimage
         echo "::endgroup::"
+
         # check if it works on old systems
-        #./appimagelint GemRB-*.AppImage
+        echo "::group::AppImage conformance testing"
+        ./appimagelint GemRB-*.AppImage
+        echo "::endgroup::"
 
 #    - name: Test 2
 #      run: |
