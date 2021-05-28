@@ -122,12 +122,11 @@ jobs:
         make
 
     - name: Test 1
-      shell: bash --noprofile --norc -x -o pipefail {0}
+      shell: 'script -q -e -c "bash --noprofile --norc -o pipefail {0}"'
       run: |
         cd build &&
         # work around TERM=dumb https://github.com/actions/runner/issues/241
-        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &> /dev/null ||
-        { find -name GemRB.log -exec cat {} +; false; }
+        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
 
     - name: Prepare AppImage
       run: |
@@ -143,11 +142,10 @@ jobs:
         #./appimagelint GemRB-*-x86_64.AppImage &&
 
     - name: Test 2
-      shell: bash --noprofile --norc -x -o pipefail {0}
+      shell: 'script -q -e -c "bash --noprofile --norc -o pipefail {0}"'
       run: |
         cd build &&
-        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/ &> /dev/null ||
-        { find -name GemRB.log -exec cat {} +; false; }
+        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
 
     - name: Show build cache stats
       run: |
