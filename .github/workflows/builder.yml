@@ -116,7 +116,7 @@ jobs:
           ${{ runner.os }}-sccache-v1-
 
     - name: Build
-      shell: bash -x --noprofile --norc -o pipefail {0}
+      shell: bash --noprofile --norc -x -o pipefail {0}
       run: |
         cd build &&
         make &&
