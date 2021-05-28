@@ -102,7 +102,7 @@ jobs:
       run: |
         mkdir build && cd build
         cmake --version
-        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1 -DNOCOLOR=1
+        cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DSTATIC_LINK=1 -DAPPIMAGE=1
 
     - name: Compiler cache (sccache)
       uses: actions/cache@v2
@@ -124,6 +124,7 @@ jobs:
     - name: Test 1
       run: |
         cd build
+        echo Logging=0 >> ../gemrb/GemRB.cfg.noinstall.sample
         gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
 
     - name: Prepare AppImage
