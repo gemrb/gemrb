@@ -112,11 +112,13 @@ jobs:
           ${{ runner.os }}-sccache-v1-
 
     - name: Build
+      shell: bash --noprofile --norc -o pipefail {0}
       run: |
         cd build &&
         make &&
 
-        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &&
+        # work around TERM=dumb https://github.com/actions/runner/issues/241
+        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample &> /dev/null &&
 
         # fetch appimage tools
         curl https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -L -o linuxdeploy &&
@@ -127,7 +129,10 @@ jobs:
         make appimage &&
         # check if it works on old systems and rerun our test
         #./appimagelint GemRB-*-x86_64.AppImage &&
-        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
+        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/ &> /dev/null ||
+
+        # part two of the silly workaround
+        find -name GemRB.log -exec cat {} +
 
     - name: Show build cache stats
       run: |
