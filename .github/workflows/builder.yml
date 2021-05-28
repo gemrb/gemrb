@@ -61,8 +61,6 @@ jobs:
 
     - name: Upload
       if: github.event_name == 'push'
-      env:
-        OS: ${{ runner.os }}
       run: |
         # NOTE: only do it on clang builds if we ever add more compilers
         filepath=Apple/OSX
@@ -158,12 +156,11 @@ jobs:
 
     - name: Upload
       if: github.event_name == 'push'
-      env:
-        OS: ${{ runner.os }}
       run: |
         # NOTE: only do it on gcc builds if we ever add more compilers
+        ls
         filepath=Linux
-        filei=GemRB-*-x86_64.AppImage
+        filei=build/GemRB-*-x86_64.AppImage
         fileo=GemRB-$GITHUB_REF-${GITHUB_SHA:0:10}-x86_64.AppImage
 
         filepath="$filepath/$fileo"
