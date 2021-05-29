@@ -541,8 +541,8 @@ void EffectQueue::Cleanup()
 int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const
 {
 	int i;
-	Game *game;
-	Map *map;
+	const Game *game;
+	const Map *map;
 	int flg;
 	ieDword spec = 0;
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
@@ -562,7 +562,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	if (!fx->CasterLevel) {
 		// happens for effects that we apply directly from within, not through a spell/item
 		// for example through GemRB_ApplyEffect
-		Actor *caster = GetCasterObject();
+		const Actor *caster = GetCasterObject();
 		if (caster) {
 			// FIXME: guessing, will be fine most of the time
 			fx->CasterLevel = caster->GetAnyActiveCasterLevel();
@@ -1424,10 +1424,10 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	if (spell->ExtHeaderCount > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
-	SPLExtHeader *sph = spell->GetExtHeader(0);
+	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
 	for (int i=0; i < sph->FeatureCount; i++) {
-		Effect *origfx = sph->features+i;
+		const Effect *origfx = sph->features+i;
 
 		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
@@ -1652,18 +1652,17 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 
 void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
 {
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
-		if (*f == dispeller) continue;
+	for (Effect *fx : effects) {
+		if (fx == dispeller) continue;
 
 		// this should also ignore all equipping effects
-		if(!((*f)->Resistance & FX_CAN_DISPEL)) {
+		if(!(fx->Resistance & FX_CAN_DISPEL)) {
 			continue;
 		}
 
 		// 50% base chance of success; always at least 1% chance of failure or success
 		// positive level diff modifies the base chance by 5%, negative by -10%
-		int diff = level - (*f)->CasterLevel;
+		int diff = level - fx->CasterLevel;
 		if (diff > 0) {
 			diff *= 5;
 		} else if (diff < 0) {
@@ -1675,7 +1674,7 @@ void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
 		if (roll == 1) continue;
 		if (roll == 100 || roll < diff) {
 			// finally dispel
-			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
@@ -2087,9 +2086,8 @@ Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ieRe
 
 bool EffectQueue::HasAnyDispellableEffect() const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( (*f)->Resistance&FX_CAN_DISPEL) {
+	for (const Effect *fx : effects) {
+		if (fx->Resistance & FX_CAN_DISPEL) {
 			return true;
 		}
 	}
@@ -2107,16 +2105,12 @@ void EffectQueue::dump(StringBuffer& buffer) const
 {
 	buffer.append("EFFECT QUEUE:\n");
 	int i = 0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		Effect* fx = *f;
-		if( fx) {
-			char *Name = NULL;
-			if( fx->Opcode < MAX_EFFECTS)
-				Name = (char*) Opcodes[fx->Opcode].Name;
-
-			buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source);
+	for (const Effect *fx : effects) {
+		if (fx->Opcode >= MAX_EFFECTS) {
+			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
+			return;
 		}
+		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->Source);
 	}
 }
 /*
@@ -2183,7 +2177,7 @@ void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const
 {
 	while(f!=effects.end()) {
-		Effect *effect = *f;
+		const Effect *effect = *f;
 		f++;
 		if( Persistent(effect)) {
 			return effect;
@@ -2251,11 +2245,8 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		Effect* fx = *f;
-		if( Persistent(fx))
-			cnt++;
+	for (const Effect *fx : effects) {
+		if (Persistent(fx)) cnt++;
 	}
 	return cnt;
 }
@@ -2280,7 +2271,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	}
 
 	if (!effects.empty()) {
-		Effect* fx = *effects.begin();
+		const Effect* fx = *effects.begin();
 
 		//projectile immunity
 		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
@@ -2337,9 +2328,7 @@ bool EffectQueue::HasHostileEffects() const
 {
 	bool hostile = false;
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		Effect* fx = *f;
+	for (const Effect* fx : effects) {
 		if (fx->SourceFlags&SF_HOSTILE) {
 			hostile = true;
 			break;
