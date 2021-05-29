@@ -2380,7 +2380,7 @@ void Map::dump(bool show_actors) const
 	buffer.appendFormatted( "Extended night: %s\n", YESNO(AreaType & AT_EXTENDED_NIGHT ) );
 	buffer.appendFormatted( "Weather: %s\n", YESNO(AreaType & AT_WEATHER ) );
 	buffer.appendFormatted( "Area Type: %d\n", AreaType & (AT_CITY|AT_FOREST|AT_DUNGEON) );
-	buffer.appendFormatted( "Can rest: %s\n", YESNO(AreaType & AT_CAN_REST_INDOORS) );
+	buffer.appendFormatted("Can rest: %s\n", YESNO(!core->GetGame()->CanPartyRest(REST_AREA)));
 
 	if (show_actors) {
 		buffer.append("\n");
