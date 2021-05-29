@@ -1059,10 +1059,8 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 {
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
-	if (fx->CasterID == actor->GetGlobalID()) {
-		if (selective_mr) {
-			return 0;
-		}
+	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
+		return -1;
 	}
 
 	//magic immunity
@@ -1090,49 +1088,41 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
 		Log(MESSAGE, "EffectQueue", "effect resisted: %s", (char*) Opcodes[fx->Opcode].Name);
-		return 1;
+		return FX_NOT_APPLIED;
 	}
-	return 2;
+	return -1;
 }
 
 //check resistances, saving throws
-static bool check_resistance(Actor* actor, Effect* fx)
+static int check_resistance(Actor* actor, Effect* fx)
 {
-	Actor *caster;
-	Scriptable *cob;
+	if (!actor) return -1;
 
-	if( !actor) {
-		return false;
-	}
-
-	cob = GetCasterObject();
+	const Scriptable *cob = GetCasterObject();
+	const Actor *caster = nullptr;
 	if (cob && cob->Type==ST_ACTOR) {
-		caster = (Actor *) cob;
-	} else {
-		caster = 0;
+		caster = (const Actor *) cob;
 	}
 
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-		return true;
+		return FX_NOT_APPLIED;
 	}
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune2 to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-		return true;
+		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
+		return FX_ABORT;
 	}
 
 	//not resistable (but check saves - for chromatic orb instakill)
 	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
-		int magic = check_magic_res(actor, fx, caster);
-		if (magic < 2) {
-			return magic;
-		}
+		return check_magic_res(actor, fx, caster);
 	}
 
 	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & (STATE_ANTIMAGIC) ) ) {
-		return false;
+		return -1;
 	}
 
 	//saving throws, bonus can be improved by school specific bonus
@@ -1183,13 +1173,13 @@ static bool check_resistance(Actor* actor, Effect* fx)
 			// sadly there's no feat or stat for it
 			if (iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
 				fx->Parameter1 = 0;
-				return true;
+				return FX_NOT_APPLIED;
 			} else {
 				fx->Parameter1 /= 2;
 			}
 		} else {
 			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-			return true;
+			return FX_NOT_APPLIED;
 		}
 	} else {
 		// improved evasion: take only half damage even though we failed the save
@@ -1197,7 +1187,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 			fx->Parameter1 /= 2;
 		}
 	}
-	return false;
+	return -1;
 }
 
 // this function is called two different ways
@@ -1247,9 +1237,10 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			}
 
 			//the effect didn't pass the resistance check
-			if( check_resistance(target, fx) ) {
+			int resisted = check_resistance(target, fx);
+			if (resisted != -1) {
 				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				return FX_NOT_APPLIED;
+				return resisted;
 			}
 		}
 
