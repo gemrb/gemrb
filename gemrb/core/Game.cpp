@@ -1770,7 +1770,11 @@ int Game::CanPartyRest(int checks) const
 			}
 		} else {
 			// you may not rest here, find an inn
-			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
+			if (!(area->AreaType & (AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
+				// at least in iwd1, the outdoor bit is not enough
+				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
+					return 0;
+				}
 				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		}
