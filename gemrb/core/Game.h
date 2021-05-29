@@ -304,10 +304,10 @@ public:
 	Particles *weather;
 	int event_timer;
 	EventHandler event_handler;
-	bool hasInfra;
-	bool familiarBlock;
-	bool PartyAttack;
-	bool HOFMode;
+	bool hasInfra = false;
+	bool familiarBlock = false;
+	bool PartyAttack = false;
+	bool HOFMode = false;
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();

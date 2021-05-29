@@ -116,7 +116,7 @@ public:
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
-	int HasInfravision(const char *raceName);
+	bool HasInfravision(const char *raceName);
 	int GetSpellAbilityDie(const Actor *target, int which);
 	int GetTrapSaveBonus(ieDword level, int cls);
 	int GetTrapLimit(Scriptable *trapper);

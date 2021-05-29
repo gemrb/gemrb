@@ -116,8 +116,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LastScriptUpdate = 0;
 	WhichFormation = 0;
 	CurrentLink = 0;
-	PartyAttack = false;
-	HOFMode = false;
 
 	//loading master areas
 	AutoTable table;
@@ -172,8 +170,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LoadCRTable();
 
 	interval = 1000/AI_UPDATE_TIME;
-	hasInfra = false;
-	familiarBlock = false;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
 	bntchnc = NULL;

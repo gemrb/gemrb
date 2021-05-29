@@ -643,14 +643,14 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 	return atoi(raceTHAC0Bonus->QueryField(profString, raceName));
 }
 
-int GameData::HasInfravision(const char *raceName)
+bool GameData::HasInfravision(const char *raceName)
 {
 	if (!racialInfravision.ok()) {
 		racialInfravision.load("racefeat", true);
 	}
-	if (!raceName) return 0;
+	if (!raceName) return false;
 
-	return atoi(racialInfravision->QueryField(raceName, "VALUE"));
+	return atoi(racialInfravision->QueryField(raceName, "VALUE")) & 1;
 }
 
 int GameData::GetSpellAbilityDie(const Actor *target, int which)
