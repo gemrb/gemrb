@@ -62,6 +62,7 @@ static EffectRef fx_spell_focus_ref = { "SpellFocus", -1 };
 static EffectRef fx_spell_resistance_ref = { "SpellResistance", -1 };
 static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
+static EffectRef fx_activate_spell_sequencer_ref = { "Sequencer:Activate", -1 };
 
 // immunity effects (setters of IE_IMMUNITY)
 static EffectRef fx_level_immunity_ref = { "Protection:SpellLevel", -1 };
@@ -1101,7 +1102,8 @@ static int check_resistance(Actor* actor, Effect* fx)
 	}
 
 	//not resistable (but check saves - for chromatic orb instakill)
-	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
+	// bg2 sequencer trigger spells have bad resistance set, so ignore them
+	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
 		return check_magic_res(actor, fx, caster);
 	}
 
