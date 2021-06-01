@@ -993,36 +993,38 @@ bool Game::CheckForReplacementActor(int i)
 
 	const Actor *act = NPCs[i];
 	ieDword level = GetTotalPartyLevel(false) / GetPartySize(false);
-	if (!(act->Modified[IE_MC_FLAGS]&MC_BEENINPARTY) && !(act->Modified[IE_STATE_ID]&STATE_DEAD) && act->GetXPLevel(false) < level) {
-		ieResRef newcre = "****"; // default table value
-		for (auto nl : npclevels) {
-			if (!stricmp(nl[0], act->GetScriptName()) && (level > 2)) {
-				// the tables have entries only up to level 24
-				ieDword safeLevel = npclevels[0].size();
-				if (level < safeLevel) {
-					safeLevel = level;
-				}
-				CopyResRef(newcre, nl[safeLevel-2]);
-				break;
-			}
-		}
+	if ((act->Modified[IE_MC_FLAGS] & MC_BEENINPARTY) || (act->Modified[IE_STATE_ID] & STATE_DEAD) || act->GetXPLevel(false) >= level) {
+		return false;
+	}
 
-		if (stricmp(newcre, "****")) {
-			int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
-			if (pos < 0) {
-				error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");
+	ieResRef newcre = "****"; // default table value
+	for (auto nl : npclevels) {
+		if (!stricmp(nl[0], act->GetScriptName()) && (level > 2)) {
+			// the tables have entries only up to level 24
+			ieDword safeLevel = npclevels[0].size();
+			if (level < safeLevel) {
+				safeLevel = level;
+			}
+			CopyResRef(newcre, nl[safeLevel-2]);
+			break;
+		}
+	}
+
+	if (stricmp(newcre, "****")) {
+		int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
+		if (pos < 0) {
+			error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");
+		} else {
+			Actor *newact = GetNPC(pos);
+			if (!newact) {
+				error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
 			} else {
-				Actor *newact = GetNPC(pos);
-				if (!newact) {
-					error("Game::CheckForReplacementActor", "GetNPC failed: cannot find act!\n");
-				} else {
-					newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
-					newact->TalkCount = act->TalkCount;
-					newact->InteractCount = act->InteractCount;
-					CopyResRef(newact->Area, act->Area);
-					DelNPC(InStore(act), true);
-					return true;
-				}
+				newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
+				newact->TalkCount = act->TalkCount;
+				newact->InteractCount = act->InteractCount;
+				CopyResRef(newact->Area, act->Area);
+				DelNPC(InStore(act), true);
+				return true;
 			}
 		}
 	}
