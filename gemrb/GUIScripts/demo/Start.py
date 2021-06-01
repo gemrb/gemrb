@@ -1,16 +1,21 @@
 import GemRB
 from GUIDefines import *
 
-Name = ""
+Name = "Jora the Seeker"
 
 def OnLoad():
 	# shortcircuting support for easier development
 	if GemRB.GetVar ("SkipIntroVideos"):
-		NewGamePress("Jora the Seeker")
+		NewGame()
 		return
 
 	StartWindow = GemRB.LoadWindow(0, "START")
-
+	
+	def NewGamePress():
+		global Name
+		Name = StartWindow.GetControl(3).QueryText()
+		NewGame()
+		
 	NewGameButton = StartWindow.GetControl(0)
 	QuitGameButton = StartWindow.GetControl(1)
 	NewGameButton.SetText("New demo")
@@ -23,19 +28,12 @@ def OnLoad():
 	VersionLabel.SetText(GemRB.Version)
 
 	NameEdit = StartWindow.GetControl(3)
-	NameEdit.SetText("Jora the Seeker")
+	NameEdit.SetText(Name)
 	NameEdit.Focus()
 
 	GemRB.LoadMusicPL ("theme.mus")
 
-def NewGamePress(name = ""):
-	global Name
-
-	if name and isinstance(name, str):
-		Name = name
-	else:
-		Name = StartWindow.GetControl(3).QueryText()
-
+def NewGame():
 	GemRB.LoadGame(None)
 	# this is needed, so the game loop runs and the load happens
 	# before other code (eg. CreatePlayer) depending on it is run
