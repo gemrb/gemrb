@@ -149,31 +149,22 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		return AliasBlank(chr);
 	}
 
-	// we need 1px empty space on each side
-	sprSize.w += 2;
-
 	pixels = (uint8_t*)malloc(sprSize.w * sprSize.h);
 	uint8_t* dest = pixels;
 	uint8_t* src = bitmap->buffer;
 
 	for( int row = 0; row < sprSize.h; row++ ) {
 		// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
-
-		// add 1px left padding
-		memset(dest++, 0, 1);
-		// -2 to account for padding
-		memcpy(dest, src, sprSize.w - 2);
-		dest += sprSize.w - 2;
+		memcpy(dest, src, sprSize.w);
+		dest += sprSize.w;
 		src += bitmap->pitch;
-		// add 1px right padding
-		memset(dest++, 0, 1);
 	}
 	// assert that we fill the buffer exactly
 	assert((dest - pixels) == (sprSize.w * sprSize.h));
 
 	// TODO: do an underline if requested
 
-	Region r(0, FT_FLOOR(metrics->horiBearingY), sprSize.w, sprSize.h);
+	Region r(glyph->bitmap_left, glyph->bitmap_top, sprSize.w, sprSize.h);
 	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, 0);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
