@@ -9,8 +9,11 @@ GemRB
 .\"###################################################
 .SH SYNOPSIS
 .B gemrb
-[\-c
+[\-q] [\-c
 .IR CONFIG-FILE ]
+.br
+.B gemrb
+.IR PATH-TO-GAME
 .br
 .B torment
 .br
@@ -32,6 +35,10 @@ settings in the engine configuration file below. A full install is recommended.
 
 .\"###################################################
 .SH OPTIONS
+.TP
+.BI \-q
+Disable audio completely, regardless of supported audio plugins.
+
 .TP
 .BI \-c " FILE"
 Use the specified configuration file

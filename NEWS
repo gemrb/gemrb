@@ -1,14 +1,15 @@
-GemRB git (daffe8a2):
+GemRB git (09812b2276):
   New features:
     - 
+    - Heart of Fury support
     - gameplay content for the demo
-    - SDLAudio caching
+    - SDLAudio caching and volume control
     - PlayStation Vita port
 
   Improved features:
     - 
     - lightning bolts, iwd2 stealth, iwd effects, pst levelup
-    - scripting, audio backends, logging
+    - scripting, audio backends, logging, program invocation
     - build system, portability and performance improvements
     - externalized summoning limit, trap limit, narration text speed
     - bugfixes

@@ -49,6 +49,9 @@ def mta(area):
 
 def debug(level):
 	GemRB.ConsoleWindowLog (level)
+	
+def cast(spellRes):
+	GemRB.SpellCast (GemRB.GameGetFirstSelectedPC (), -3, 0, spellRes)
 
 def cc(cre, px=-1, py=-1):
 	GemRB.CreateCreature(GemRB.GameGetFirstSelectedPC(), cre, px, py)

@@ -948,7 +948,7 @@ void Projectile::NextTarget(const Point &p)
 	}
 
 	int flags = (ExtFlags&PEF_BOUNCE) ? GL_REBOUND : GL_PASS;
-	int stepping = (ExtFlags & PEF_BOUNCE) ? 1 : Speed;
+	int stepping = (ExtFlags & PEF_LINE) ? Speed : 1;
 	path = area->GetLine(Pos, Destination, stepping, Orientation, flags);
 }
 
@@ -1061,13 +1061,22 @@ int Projectile::CalculateTargetFlag() const
 		}
 	}
 
-	Scriptable *caster = area->GetScriptableByGlobalID(Caster);
-	if (caster && (!checkingEA || (caster->Type == ST_ACTOR && ((Actor *) caster)->GetStat(IE_EA) < EA_GOODCUTOFF))) {
+	const Scriptable *caster = area->GetScriptableByGlobalID(Caster);
+	const Actor *act = nullptr;
+	if (caster && caster->Type == ST_ACTOR) {
+		act = (const Actor *) caster;
+	}
+	if (caster && (!checkingEA || (act && act->GetStat(IE_EA) < EA_GOODCUTOFF))) {
 		return flags;
 	}
 	// iwd2 ar6050 has doors casting chain lightning :)
 	if (caster && caster->Type != ST_ACTOR && checkingEA) {
 		return flags;
+	}
+	// make everyone an enemy of neutrals
+	if (act && checkingEA && act->GetStat(IE_EA) > EA_GOODCUTOFF && act->GetStat(IE_EA) < EA_EVILCUTOFF) {
+		if ((Extension->AFlags & PAF_TARGET) == PAF_ENEMY) return GA_NO_NEUTRAL | (flags & GA_NO_LOS);
+		if ((Extension->AFlags & PAF_TARGET) == PAF_TARGET) return GA_NO_ALLY | GA_NO_ENEMY | (flags & GA_NO_LOS);
 	}
 
 	return flags^(GA_NO_ALLY|GA_NO_ENEMY);

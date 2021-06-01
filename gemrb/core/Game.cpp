@@ -118,8 +118,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LastScriptUpdate = 0;
 	WhichFormation = 0;
 	CurrentLink = 0;
-	PartyAttack = false;
-	HOFMode = false;
 
 	//loading master areas
 	AutoTable table;
@@ -171,8 +169,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LoadCRTable();
 
 	interval = 1000/AI_UPDATE_TIME;
-	hasInfra = false;
-	familiarBlock = false;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
 	bntchnc = NULL;
@@ -1758,7 +1754,11 @@ int Game::CanPartyRest(int checks) const
 			}
 		} else {
 			// you may not rest here, find an inn
-			if (!(area->AreaType & (AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
+			if (!(area->AreaType & (AT_FOREST|AT_DUNGEON|AT_CAN_REST_INDOORS))) {
+				// at least in iwd1, the outdoor bit is not enough
+				if (area->AreaType & AT_OUTDOOR && !core->HasFeature(GF_AREA_VISITED_VAR)) {
+					return 0;
+				}
 				return displaymsg->GetStringReference(STR_MAYNOTREST);
 			}
 		}

@@ -65,6 +65,9 @@ before_build:
     $find = '#PluginsPath=@DEFAULT_PLUGINS_DIR@'
     $replace = "PluginsPath=.\plugins"
     (Get-Content $file) -replace $find, $replace | Set-Content $file
+    $find = '#GemRBPath=.'
+    $replace = "GemRBPath=."
+    (Get-Content $file) -replace $find, $replace | Set-Content $file
 
     cmake -G "Visual Studio 15 2017" -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINSOURCEBUILD=1 -DWIN32_USE_STDIO=1 -DCMAKE_INSTALL_PREFIX="$env:archive_source" -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake .
 
@@ -99,9 +102,8 @@ test_script:
     cp GemRB.cfg.sample GmRB.cfg.bots
     echo GamePath=minimal >> GemRB.cfg.bots
     echo GameType=test >> GemRB.cfg.bots
-    echo AudioDriver=none >> GemRB.cfg.bots
 
-    gemrb.exe -c GemRB.cfg.bots
+    gemrb.exe -q -c GemRB.cfg.bots
     rm GemRB.cfg.bots
 artifacts:
 - path: gemrb*.zip

@@ -6,6 +6,9 @@ endif(COMMAND cmake_policy)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# skip verbose make install output
+set(CMAKE_INSTALL_MESSAGE "NEVER")
+
 # prevent in-source builds
 IF(NOT INSOURCEBUILD AND (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR}))
 	MESSAGE(FATAL_ERROR "
@@ -129,6 +132,7 @@ if (${LAYOUT} MATCHES "home")
 	SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX} )
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX} )
 	SET_PATH( EXAMPLE_CONF_DIR ${CMAKE_INSTALL_PREFIX} )
+	SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX} )
 elseif (${LAYOUT} MATCHES "fhs")
 	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX}/gemrb )
 	SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
@@ -147,6 +151,7 @@ elseif (${LAYOUT} MATCHES "fhs")
 	SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps )
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
+	SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo )
 elseif (${LAYOUT} MATCHES "opt")
 	SET_PATH( LIB_DIR ${CMAKE_INSTALL_PREFIX}/lib${LIBDIR_SUFFIX} )
 	SET_PATH( PLUGIN_DIR ${LIB_DIR}/plugins )
@@ -159,6 +164,7 @@ elseif (${LAYOUT} MATCHES "opt")
 	SET_PATH( SVG_DIR ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps )
 	SET_PATH( MENU_DIR ${CMAKE_INSTALL_PREFIX}/share/applications )
 	SET_PATH( EXAMPLE_CONF_DIR ${SYSCONF_DIR} )
+	SET_PATH( METAINFO_DIR ${CMAKE_INSTALL_PREFIX}/share/metainfo )
 else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET(CMAKE_INSTALL_RPATH @loader_path/../Frameworks)
 	SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) 
@@ -168,11 +174,15 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( PLUGIN_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Plugins" )
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
+	SET_PATH( METAINFO_DIR "" )
 endif (${LAYOUT} MATCHES "home")
 
 # convert the slashes for windows' users' convenience
-file(TO_NATIVE_PATH ${PLUGIN_DIR} DEFAULT_PLUGINS_DIR)
+file(TO_NATIVE_PATH "${PLUGIN_DIR}" DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
+if(APPIMAGE)
+	file(RELATIVE_PATH DATA_DIR "/" "${DATA_DIR}")
+endif()
 
 # check if this is a release version
 SET(RC "")
@@ -540,7 +550,8 @@ IF (NOT APPLE)
 	if (NOT HAIKU)
 		INSTALL( FILES artwork/gemrb-logo.png DESTINATION ${ICON_DIR} RENAME gemrb.png )
 		INSTALL( FILES artwork/logo04-rb_only.svg DESTINATION ${SVG_DIR} RENAME gemrb.svg )
-		INSTALL( FILES gemrb.desktop DESTINATION ${MENU_DIR} )
+		INSTALL( FILES platforms/linux/gemrb.desktop DESTINATION ${MENU_DIR} )
+		INSTALL( FILES platforms/linux/org.gemrb.gemrb.metainfo.xml DESTINATION ${METAINFO_DIR} )
 	ENDIF()
 ENDIF()
 INSTALL( FILES README.md INSTALL COPYING NEWS AUTHORS DESTINATION ${DOC_DIR} )
@@ -555,6 +566,15 @@ CONFIGURE_FILE(
 
 ADD_CUSTOM_TARGET( uninstall
 	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" )
+
+add_custom_target(appimage
+    COMMAND rm -rf ./AppDir GemRB-*-x86_64.AppImage
+    COMMAND make install DESTDIR=./AppDir
+    COMMAND mv AppDir/usr/usr/share/gemrb AppDir/usr/share/ || true # not always needed
+    COMMAND sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' AppDir/usr/share/applications/gemrb.desktop
+    COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
+    WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
+)
 
 # make dist for a gzipped tarball of current HEAD
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})

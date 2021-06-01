@@ -57,6 +57,7 @@ static EffectRef fx_spell_focus_ref = { "SpellFocus", -1 };
 static EffectRef fx_spell_resistance_ref = { "SpellResistance", -1 };
 static EffectRef fx_protection_from_display_string_ref = { "Protection:String", -1 };
 static EffectRef fx_variable_ref = { "Variable:StoreLocalVariable", -1 };
+static EffectRef fx_activate_spell_sequencer_ref = { "Sequencer:Activate", -1 };
 
 // immunity effects (setters of IE_IMMUNITY)
 static EffectRef fx_level_immunity_ref = { "Protection:SpellLevel", -1 };
@@ -533,8 +534,8 @@ void EffectQueue::Cleanup()
 int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const
 {
 	int i;
-	Game *game;
-	Map *map;
+	const Game *game;
+	const Map *map;
 	int flg;
 	ieDword spec = 0;
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
@@ -554,7 +555,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	if (!fx->CasterLevel) {
 		// happens for effects that we apply directly from within, not through a spell/item
 		// for example through GemRB_ApplyEffect
-		Actor *caster = GetCasterObject();
+		const Actor *caster = GetCasterObject();
 		if (caster) {
 			// FIXME: guessing, will be fine most of the time
 			fx->CasterLevel = caster->GetAnyActiveCasterLevel();
@@ -865,7 +866,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//spell level immunity
 	// but ignore it if we're casting beneficial stuff on ourselves
 	if(fx->Power && actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
-		Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
+		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
 		if (caster != actor || (fx->SourceFlags & SF_HOSTILE)) {
 			Log(DEBUG, "EffectQueue", "Resisted by level immunity");
 			return 0;
@@ -907,43 +908,35 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//decrementing level immunity
 	if (fx->Power) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_level_immunity_dec_ref, fx->Power);
-		if( efx ) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
-				return 0;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Resisted by level immunity (decrementing)");
+			return 0;
 		}
 	}
 
 	//decrementing spell immunity
 	if( fx->Source[0]) {
 		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
-				return 0;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
+			return 0;
 		}
 	}
 	//decrementing primary type immunity (school)
 	if( fx->PrimaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
-				return 0;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Resisted by school immunity (decrementing)");
+			return 0;
 		}
 	}
 
 	//decrementing secondary type immunity (usage)
 	if( fx->SecondaryType) {
 		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
-				return 0;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Resisted by usage/sectype immunity (decrementing)");
+			return 0;
 		}
 	}
 
@@ -1004,42 +997,34 @@ static int check_type(const Actor *actor, const Effect *fx)
 	if (fx->Power) {
 		if (bounce & BNC_LEVEL_DEC) {
 			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
-			if( efx) {
-				if (DecreaseEffect(efx)) {
-					Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
-					return -1;
-				}
+			if (efx && DecreaseEffect(efx)) {
+				Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
+				return -1;
 			}
 		}
 	}
 
 	if( fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
-				return -1;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
+			return -1;
 		}
 	}
 
 	if( fx->PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
-				return -1;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Bounced by school (decrementing)");
+			return -1;
 		}
 	}
 
 	if( fx->SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
 		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
-		if( efx) {
-			if (DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");
-				return -1;
-			}
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Bounced by usage (decrementing)");
+			return -1;
 		}
 	}
 
@@ -1051,10 +1036,8 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 {
 	//don't resist self
 	bool selective_mr = core->HasFeature(GF_SELECTIVE_MAGIC_RES);
-	if (fx->CasterID == actor->GetGlobalID()) {
-		if (selective_mr) {
-			return 0;
-		}
+	if (fx->CasterID == actor->GetGlobalID() && selective_mr) {
+		return -1;
 	}
 
 	//magic immunity
@@ -1082,49 +1065,42 @@ static inline int check_magic_res(const Actor *actor, const Effect *fx, const Ac
 		// we take care of irresistible spells a few checks above, so selective mr has no impact here anymore
 		displaymsg->DisplayConstantStringName(STR_MAGIC_RESISTED, DMC_WHITE, actor);
 		Log(MESSAGE, "EffectQueue", "effect resisted: %s", (char*) Opcodes[fx->Opcode].Name);
-		return 1;
+		return FX_NOT_APPLIED;
 	}
-	return 2;
+	return -1;
 }
 
 //check resistances, saving throws
-static bool check_resistance(Actor* actor, Effect* fx)
+static int check_resistance(Actor* actor, Effect* fx)
 {
-	Actor *caster;
-	Scriptable *cob;
+	if (!actor) return -1;
 
-	if( !actor) {
-		return false;
-	}
-
-	cob = GetCasterObject();
+	const Scriptable *cob = GetCasterObject();
+	const Actor *caster = nullptr;
 	if (cob && cob->Type==ST_ACTOR) {
-		caster = (Actor *) cob;
-	} else {
-		caster = 0;
+		caster = (const Actor *) cob;
 	}
 
 	//opcode immunity
 	// TODO: research, maybe the whole check_resistance should be skipped on caster != actor (selfapplication)
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-		return true;
+		return FX_NOT_APPLIED;
 	}
 	if (caster != actor && actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode)) {
 		Log(MESSAGE, "EffectQueue", "%s is immune2 to effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-		return true;
+		// totlm's spin166 should be wholly blocked by spwi210, but only blocks its third effect, so make it fatal
+		return FX_ABORT;
 	}
 
 	//not resistable (but check saves - for chromatic orb instakill)
-	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL) {
-		int magic = check_magic_res(actor, fx, caster);
-		if (magic < 2) {
-			return magic;
-		}
+	// bg2 sequencer trigger spells have bad resistance set, so ignore them
+	if (fx->Resistance == FX_CAN_RESIST_CAN_DISPEL && signed(fx->Opcode) != EffectQueue::ResolveEffect(fx_activate_spell_sequencer_ref)) {
+		return check_magic_res(actor, fx, caster);
 	}
 
 	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & (STATE_ANTIMAGIC) ) ) {
-		return false;
+		return -1;
 	}
 
 	//saving throws, bonus can be improved by school specific bonus
@@ -1175,13 +1151,13 @@ static bool check_resistance(Actor* actor, Effect* fx)
 			// sadly there's no feat or stat for it
 			if (iwd2fx && (actor->GetThiefLevel() > 1 || actor->GetMonkLevel())) {
 				fx->Parameter1 = 0;
-				return true;
+				return FX_NOT_APPLIED;
 			} else {
 				fx->Parameter1 /= 2;
 			}
 		} else {
 			Log(MESSAGE, "EffectQueue", "%s saved against effect: %s", actor->GetName(1), (char*) Opcodes[fx->Opcode].Name);
-			return true;
+			return FX_NOT_APPLIED;
 		}
 	} else {
 		// improved evasion: take only half damage even though we failed the save
@@ -1189,7 +1165,7 @@ static bool check_resistance(Actor* actor, Effect* fx)
 			fx->Parameter1 /= 2;
 		}
 	}
-	return false;
+	return -1;
 }
 
 // this function is called two different ways
@@ -1239,9 +1215,10 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 			}
 
 			//the effect didn't pass the resistance check
-			if( check_resistance(target, fx) ) {
+			int resisted = check_resistance(target, fx);
+			if (resisted != -1) {
 				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				return FX_NOT_APPLIED;
+				return resisted;
 			}
 		}
 
@@ -1439,10 +1416,10 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	if (spell->ExtHeaderCount > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", Removed);
 	}
-	SPLExtHeader *sph = spell->GetExtHeader(0);
+	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
 	for (int i=0; i < sph->FeatureCount; i++) {
-		Effect *origfx = sph->features+i;
+		const Effect *origfx = sph->features+i;
 
 		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
@@ -1667,18 +1644,17 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 
 void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
 {
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); f++) {
-		if (*f == dispeller) continue;
+	for (Effect *fx : effects) {
+		if (fx == dispeller) continue;
 
 		// this should also ignore all equipping effects
-		if(!((*f)->Resistance & FX_CAN_DISPEL)) {
+		if(!(fx->Resistance & FX_CAN_DISPEL)) {
 			continue;
 		}
 
 		// 50% base chance of success; always at least 1% chance of failure or success
 		// positive level diff modifies the base chance by 5%, negative by -10%
-		int diff = level - (*f)->CasterLevel;
+		int diff = level - fx->CasterLevel;
 		if (diff > 0) {
 			diff *= 5;
 		} else if (diff < 0) {
@@ -1690,7 +1666,7 @@ void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
 		if (roll == 1) continue;
 		if (roll == 100 || roll < diff) {
 			// finally dispel
-			(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 		}
 	}
 }
@@ -2102,9 +2078,8 @@ Effect *EffectQueue::HasEffectWithSource(EffectRef &effect_reference, const ieRe
 
 bool EffectQueue::HasAnyDispellableEffect() const
 {
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if( (*f)->Resistance&FX_CAN_DISPEL) {
+	for (const Effect *fx : effects) {
+		if (fx->Resistance & FX_CAN_DISPEL) {
 			return true;
 		}
 	}
@@ -2122,16 +2097,12 @@ void EffectQueue::dump(StringBuffer& buffer) const
 {
 	buffer.append("EFFECT QUEUE:\n");
 	int i = 0;
-	std::list< Effect* >::const_iterator f;
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		Effect* fx = *f;
-		if( fx) {
-			const char *Name = NULL;
-			if( fx->Opcode < MAX_EFFECTS)
-				Name = Opcodes[fx->Opcode].Name;
-
-			buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2, fx->Source);
+	for (const Effect *fx : effects) {
+		if (fx->Opcode >= MAX_EFFECTS) {
+			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
+			return;
 		}
+		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->Source);
 	}
 }
 /*
@@ -2198,7 +2169,7 @@ void EffectQueue::HackColorEffects(const Actor *Owner, Effect *fx)
 const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const
 {
 	while(f!=effects.end()) {
-		Effect *effect = *f;
+		const Effect *effect = *f;
 		f++;
 		if( Persistent(effect)) {
 			return effect;
@@ -2266,11 +2237,8 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		Effect* fx = *f;
-		if( Persistent(fx))
-			cnt++;
+	for (const Effect *fx : effects) {
+		if (Persistent(fx)) cnt++;
 	}
 	return cnt;
 }
@@ -2295,7 +2263,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 	}
 
 	if (!effects.empty()) {
-		Effect* fx = *effects.begin();
+		const Effect* fx = *effects.begin();
 
 		//projectile immunity
 		if( target->ImmuneToProjectile(fx->Projectile)) return 0;
@@ -2352,9 +2320,7 @@ bool EffectQueue::HasHostileEffects() const
 {
 	bool hostile = false;
 
-	std::list< Effect* >::const_iterator f;
-	for (f = effects.begin(); f != effects.end(); ++f) {
-		Effect* fx = *f;
+	for (const Effect* fx : effects) {
 		if (fx->SourceFlags&SF_HOSTILE) {
 			hostile = true;
 			break;
