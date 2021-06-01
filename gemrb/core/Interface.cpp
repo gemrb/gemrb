@@ -20,7 +20,6 @@
 
 #include "Interface.h"
 
-#include "defsounds.h" // for DS_TOOLTIP
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
