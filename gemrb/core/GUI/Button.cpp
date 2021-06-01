@@ -444,8 +444,10 @@ void Button::CompleteDragOperation(const DragOp& dop)
 
 Holder<Sprite2D> Button::DragCursor() const
 {
-	if (IS_PORTRAIT == false && Picture) {
+	if (IS_PORTRAIT) {
 		// TODO: would it be an enhancement to actually use the portrait for the drag icon?
+		return core->Cursors[IE_CURSOR_SWAP];
+	} else if (Picture) {
 		return Picture;
 	}
 	

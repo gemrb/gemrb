@@ -163,6 +163,14 @@ bool View::IsVisible() const
 	return isVisible;
 }
 
+bool View::IsDisabledCursor() const
+{
+	if (core->InDebugMode(ID_VIEWS)) {
+		return IsDisabled();
+	}
+	return false;
+}
+
 bool View::IsReceivingEvents() const
 {
 	bool getEvents = !(flags&(IgnoreEvents|Invisible|Disabled));

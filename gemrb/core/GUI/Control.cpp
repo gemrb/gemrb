@@ -253,7 +253,10 @@ bool Control::AcceptsDragOperation(const DragOp& dop) const
 
 Holder<Sprite2D> Control::DragCursor() const
 {
-	return core->Cursors[IE_CURSOR_SWAP];
+	if (core->InDebugMode(ID_VIEWS)) {
+		return core->Cursors[IE_CURSOR_SWAP];
+	}
+	return nullptr;
 }
 
 bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
