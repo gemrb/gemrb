@@ -99,8 +99,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
-	FT_Glyph_Metrics* metrics = &glyph->metrics;
 	/*
+	FT_Glyph_Metrics* metrics = &glyph->metrics;
 	//int maxx, yoffset;
 	if ( FT_IS_SCALABLE( face ) ) {
 		// Get the bounding box
