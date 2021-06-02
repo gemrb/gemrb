@@ -25,7 +25,7 @@ Release:
 - [ ] Amend Roadmap in contributing.md
 - [ ] Create the source tarball with `make dist`
   - [ ] Add any missing files to the cmake install targets and recreate the tarball
-  - [ ] Add any new extraneus files to `.gitattributes` and recreate
+  - [ ] Add any new extranoeus files to `.gitattributes` and recreate
   - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
 - [ ] Add a git tag and push it
     ```
@@ -36,12 +36,12 @@ Release:
 
 Deployment:
 - [ ] Promote the new tag to a release on GitHub
-- [ ] Write docs:
+- [ ] Write docs (a template is available in `admin/announcement.template`):
   - [ ] Forum announcements
   - [ ] Release notes if needed (configuration changes, notes for packagers)
 - [ ] SourceForge
   - [ ] Upload source package to SourceForge, maintaining the naming format under Releases
-    - [ ] Upload any release notes alongside
+    - [ ] Upload any release notes alongside as Readme.md
   - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
   - [ ] (optional) regenerate android build
   - [ ] Test downloads
@@ -50,12 +50,13 @@ Deployment:
   - [ ] homepage: _config (bump version), index, news, potentially features/status, install (recheck the new links)
   - [ ] Gibberlings3 forums
     - [ ] GemRB forum
-    - [ ] modding news (a template is available in `admin/announcement.template`)
-  - [ ] SourceForge project page news section
-  - [ ] #GemRB in channel and title; Discord channel only if it doesn't propagate there automatically
+    - [ ] modding news
+  - [ ] SourceForge project news section
+  - [ ] #GemRB in channel and title; Discord channel if it doesn't propagate there automatically
 
 Post-release:
 - [ ] Run `admin/guidoc_wikifier.sh` (no params needed) and upload the new docs
 - [ ] Update versions back to the `-git` suffix
 - [ ] Run `admin/restart_news.sh` to restart the NEWS cycle
 - [ ] If the manpage changed (`git log v0.8.6.. gemrb.6.in`), adapt the web copy (pandoc can convert it to markdown)
+- [ ] Close old milestone
