@@ -1991,7 +1991,8 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
-	if (actor == core->GetCutSceneRunner()) {
+	// needeed in pst #532, but softly breaks bg2 #1179
+	if (actor == core->GetCutSceneRunner() && core->HasFeature(GF_PST_STATE_FLAGS)) {
 		core->SetCutSceneMode(false);
 	}
 }

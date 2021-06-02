@@ -1,4 +1,4 @@
-******************* FORUM ***************************
+******************* WEBSITE NEWS ***************************
 GemRB 0.9.0 released!
 
 The [url=https://gemrb.org]GemRB[/url] team is proud to announce a new (minor) release.
@@ -14,7 +14,9 @@ NEWS entry
 
 Thanks to everyone that contributed their time, including:
 git shortlog -s $PREVIOUS_VERSION_TAG.. gets just the committers, so
-https://github.com/mntnr/name-your-contributors is preferred
+https://github.com/mntnr/name-your-contributors is preferred, eg.
+../node_modules/.bin/name-your-contributors -o gemrb -a 2021-06-02 | grep -B1 name
+and then prefer real names to nicks, clean up and dedupe the list, sort.
 
 export GITHUB_TOKEN=<get a token first>
 node_modules/.bin/name-your-contributors -o gemrb -a 2019-11-24 | grep -B1 name | sort -u
@@ -25,17 +27,35 @@ If you want to be notified of GemRB releases via email, subscribe to the
 [gemrb-release](https://sourceforge.net/projects/gemrb/lists/gemrb-release)
 mailing list.
 
+******************* FORUM ***************************
+
+Example: https://www.gibberlings3.net/forums/topic/32780-gemrb-088-released-the-calm-before-the-storm-edition/
+
 ******************* MODDING RING ********************
-For the modding news blurb, just skip the changelog digest and put a link
-to the main forum post. Also add a general intro, since this is syndicated:
-[url=https://gemrb.org]GemRB[/url] is a portable open-source implementation of Bioware's Infinity Engine. It was written to support pseudo-3D role playing games based on the Dungeons & Dragons ruleset (Baldur's Gate and Icewind Dale series, Planescape: Torment).
+For the modding news blurb, just
+- add the short description of major changes
+- link to the website news post
 
-(short description of major changes)
-
-For the details, try GemRB yourself or check the [url=]linked changelog[/url] for some highlights.
+Example: https://www.gibberlings3.net/forums/topic/32779-gemrb-v088-released/
 
 ******************* SOURCEFORGE *********************
-For SF, just remove all of the BBCode.
+For SF, just replace the code tags with ~~~.
 
 https://sourceforge.net/p/gemrb/news/new
+
+
+******************* gemrb-release *********************
+
+https://sourceforge.net/projects/gemrb/lists/gemrb-release
+
+Greetings!
+
+The GemRB team announces the availability of GemRB 0.8.8 ... short blurb
+
+(Note to packagers:)
+
+Read more about the release here:
+(link to news)
+
+Have a great day
 

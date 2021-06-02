@@ -1222,6 +1222,7 @@ int Interface::Init(InterfaceConfig* config)
 #ifdef DATA_DIR
 	const char* appDir = getenv("APPDIR");
 	if (appDir) {
+		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
 		PathJoin(GemRBPath, appDir, DATA_DIR, nullptr);
 	}
 #endif
