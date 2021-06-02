@@ -35,12 +35,12 @@ private:
 	DataStream* str;
 public:
 	SlicedStream(DataStream* cfs, int startpos, int size);
-	~SlicedStream();
-	DataStream* Clone();
+	~SlicedStream() override;
+	DataStream* Clone() override;
 
-	int Read(void* dest, unsigned int length);
-	int Write(const void* src, unsigned int length);
-	int Seek(int pos, int startpos);
+	int Read(void* dest, unsigned int length) override;
+	int Write(const void* src, unsigned int length) override;
+	int Seek(int pos, int startpos) override;
 };
 
 GEM_EXPORT DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos = false);

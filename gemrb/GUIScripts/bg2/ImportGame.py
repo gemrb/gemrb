@@ -18,6 +18,7 @@
 #
 #character generation, import  (GUICG24)
 import GemRB
+import CharGenCommon
 
 #import from a game 
 ImportWindow = 0
@@ -25,8 +26,8 @@ ImportWindow = 0
 def OnLoad():
 	global ImportWindow
 
-	GemRB.LoadWindowPack("GUICG",640,480)
-	ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindow(20, "GUICG")
+	CharGenCommon.PositionCharGenWin(ImportWindow)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(53774)
@@ -36,16 +37,16 @@ def OnLoad():
 
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(2610)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetDisabled(True)
+	DoneButton.MakeDefault()
 
 	CancelButton = ImportWindow.GetControl(1)
 	CancelButton.SetText(15416)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, Done1Press)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	ImportWindow.SetVisible(WINDOW_VISIBLE)
+	ImportWindow.Focus()
 	return
 
 def Done1Press():

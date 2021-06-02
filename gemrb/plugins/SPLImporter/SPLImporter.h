@@ -37,9 +37,9 @@ private:
 
 public:
 	SPLImporter(void);
-	~SPLImporter(void);
-	bool Open(DataStream* stream);
-	Spell* GetSpell(Spell *spl, bool silent=false);
+	~SPLImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Spell* GetSpell(Spell *spl, bool silent=false) override;
 private:
 	void GetExtHeader(Spell *s, SPLExtHeader* eh);
 	void GetFeature(Spell *s, Effect *f);

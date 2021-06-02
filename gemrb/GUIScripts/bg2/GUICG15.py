@@ -18,6 +18,7 @@
 #
 #character generation, racial enemy (GUICG15)
 import GemRB
+import CharGenCommon
 import CommonTables
 import GUICommon
 from GUIDefines import *
@@ -42,10 +43,10 @@ def DisplayRaces():
 		Val = RaceTable.GetValue(i+TopIndex,0)
 		if Val==0:
 			Button.SetText("")
-			Button.SetState(IE_GUI_BUTTON_DISABLED)
+			Button.SetDisabled(True)
 		else:
 			Button.SetText(Val)
-			Button.SetState(IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled(False)
 			Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RacePress)
 			Button.SetVarAssoc("HatedRace",RaceTable.GetValue(i+TopIndex,1) )
 	return
@@ -60,8 +61,8 @@ def OnLoad():
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG7")
 		return
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceWindow = GemRB.LoadWindow(15)
+	RaceWindow = GemRB.LoadWindow(15, "GUICG")
+	CharGenCommon.PositionCharGenWin (RaceWindow)
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = RaceTable.GetRowCount()-LISTSIZE
 	if RaceCount<0:
@@ -72,7 +73,7 @@ def OnLoad():
 	ScrollBarControl = RaceWindow.GetControl(1)
 	ScrollBarControl.SetVarAssoc("TopIndex", RaceCount)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
-	ScrollBarControl.SetDefaultScrollBar ()
+	RaceWindow.SetEventProxy(ScrollBarControl)
 
 	for i in range(LISTSIZE):
 		Button = RaceWindow.GetControl(i+6)
@@ -82,10 +83,10 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(4)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = RaceWindow.GetControl(5)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = RaceWindow.GetControl(2)
@@ -93,7 +94,7 @@ def OnLoad():
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	RaceWindow.SetVisible(WINDOW_VISIBLE)
+	RaceWindow.Focus()
 	DisplayRaces()
 	return
 

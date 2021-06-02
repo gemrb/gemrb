@@ -41,9 +41,9 @@ public:
 	static const TypeID ID;
 public:
 	ImageMgr(void);
-	virtual ~ImageMgr(void);
+	~ImageMgr(void) override;
 	/** Returns a \ref Sprite2D containing the image. */
-	virtual Sprite2D* GetSprite2D() = 0;
+	virtual Holder<Sprite2D> GetSprite2D() = 0;
 	virtual Image* GetImage();
 	virtual Bitmap* GetBitmap();
 	/**
@@ -54,7 +54,7 @@ public:
 	 *
 	 * This does nothing if there is no palette.
 	 */
-	virtual void GetPalette(int colors, Color* pal);
+	virtual int GetPalette(int colors, Color* pal);
 	/** Returns the width of the image */
 	virtual int GetWidth() = 0;
 	/** Returns the height of the image */

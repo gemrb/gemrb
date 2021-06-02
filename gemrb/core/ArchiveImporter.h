@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT ArchiveImporter : public Plugin {
 public:
 	ArchiveImporter(void);
-	virtual ~ArchiveImporter(void);
+	~ArchiveImporter(void) override;
 	virtual int CreateArchive(DataStream *stream) = 0;
 	//decompressing a .sav file similar to CBF
 	virtual int DecompressSaveGame(DataStream *compressed) = 0;

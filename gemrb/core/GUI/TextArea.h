@@ -22,7 +22,7 @@
 #define TEXTAREA_H
 
 #include "GUI/Control.h"
-#include "GUI/ScrollBar.h"
+#include "GUI/ScrollView.h"
 #include "GUI/TextSystem/Font.h"
 #include "GUI/TextSystem/GemMarkup.h"
 #include "GUI/TextSystem/TextContainer.h"
@@ -34,18 +34,10 @@
 
 namespace GemRB {
 
-// Keep these synchronized with GUIDefines.py
-// 0x05 is the control type of TextArea
-#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000 // text change event (keyboard, etc)
-#define IE_GUI_TEXTAREA_ON_SELECT	0x05000001 // selection event such as dialog or a listbox
-
-// TextArea flags, keep these in sync too
-// the control type is intentionally left out
-#define IE_GUI_TEXTAREA_AUTOSCROLL   1
-#define IE_GUI_TEXTAREA_HISTORY      2	// message window
-#define IE_GUI_TEXTAREA_EDITABLE     4
-
 typedef std::pair<int, String> SelectOption;
+
+static const Color SelectOptionHover(255, 180, 0, 255);  // default hover color for SelectOption
+static const Color SelectOptionSelected(55, 100, 0, 255);// default selected color for SelectOption
 
 /**
  * @class TextArea
@@ -53,125 +45,169 @@ typedef std::pair<int, String> SelectOption;
  * It is usually scrolled with a ScrollBar widget
  */
 
-class GEM_EXPORT TextArea : public Control {
-protected:
+class GEM_EXPORT TextArea : public Control, public View::Scrollable {
+private:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	
+	class SpanSelector : public ContentContainer {
+		struct OptSpan : public TextContainer {
+			OptSpan(const Region& frame, Font* font, const Color& fg, const Color& bg)
+			: TextContainer(frame, font)
+			{
+				SetColors(fg, bg);
+			}
+			
+			// forward OnMouseLeave to superview (SpanSelector) as a mouse over
+			void OnMouseLeave(const MouseEvent& me, const DragOp*) override {
+				assert(superView);
+				superView->MouseOver(me);
+			}
+
+			bool Editable() const override { return false; }
+		};
+	private:
+		TextArea& ta;
+		TextContainer* hoverSpan, *selectedSpan;
+		size_t size;
+		EventMgr::TapMonitorId id;
+
+	private:
+		void ClearHover();
+		TextContainer* TextAtPoint(const Point&);
+		TextContainer* TextAtIndex(size_t idx);
+
+		bool OnMouseOver(const MouseEvent& /*me*/) override;
+		bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
+		void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
+
+		bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+		bool KeyEvent(const Event& event);
+
+		void SizeChanged(const Size&) override;
+
+		bool Editable() const { return false; }
+
+	public:
+		// FIXME: we get messed up is SetMargin is called. there is no notification that they have changed and so our subviews are overflowing.
+		// working around that by passing them in the ctor, but its a poor fix.
+		SpanSelector(TextArea& ta, const std::vector<const String*>&, bool numbered, ContentContainer::Margin m = Margin());
+		~SpanSelector() override;
+
+		size_t NumOpts() const { return size;};
+		void MakeSelection(size_t idx);
+		TextContainer* Selection() const { return selectedSpan; }
+		
+		bool CanLockFocus() const override { return false; }
+	};
 
 public:
-	TextArea(const Region& frame, Font* text);
-	TextArea(const Region& frame, Font* text, Font* caps,
-			 Color hitextcolor, Color initcolor, Color lowtextcolor);
-	~TextArea(void);
+	enum COLOR_TYPE {
+		COLOR_NORMAL = 0,	// standard text color
+		COLOR_INITIALS,	// color for finit. used only is some cases.
+		COLOR_BACKGROUND, // the background color for all text
+		COLOR_OPTIONS,	// normal palette for selectable options (dialog/listbox)
+		COLOR_HOVER,	// color for hovering options (dialog/listbox)
+		COLOR_SELECTED,	// selected list box/dialog option.
+		
+		COLOR_TYPE_COUNT
+	};
 
-	bool NeedsDraw() const;
-	bool IsOpaque() const { return false; }
+	TextArea(const Region& frame, Font* text);
+	TextArea(const Region& frame, Font* text, Font* caps);
+	
+	~TextArea();
+
+	bool IsOpaque() const override { return false; }
+	
+	void SetColor(const Color&, COLOR_TYPE);
 
 	/** Sets the Actual Text */
-	void SetText(const String& text);
+	void SetText(const String& text) override;
 	/** Clears the textarea */
 	void ClearText();
-	void ClearHover();
+
 	/** Appends a String to the current Text */
 	void AppendText(const String& text);
 	/** Inserts a String into the current Text at pos */
 	// int InsertText(const char* text, int pos);
 
 	/** Per Pixel scrolling */
-	void ScrollToY(int y, Control* sender = NULL, ieDword duration = 0);
+	void ScrollDelta(const Point& p) override;
+	void ScrollTo(const Point& p) override;
+	void ScrollToY(int y, ieDword lineduration = 0);
+	int ContentHeight() const;
 
-	/** Returns total height of the text */
-	int GetRowHeight() const;
-	/** Set Starting Row */
-	void SetRow(int row);
-	int RowCount() { return rows; }
-	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered,
-						  const Color* color, const Color* hiColor, const Color* selColor);
+	ieDword LineCount() const;
+	ieWord LineHeight() const;
+
+	void SetScrollbar(ScrollBar*);
+	void SetSelectOptions(const std::vector<SelectOption>&, bool numbered);
+	
+	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	void SetAnimPicture(Sprite2D* Picture);
+	void SetAnimPicture(Holder<Sprite2D> Picture) override;
+
+	ContentContainer::Margin GetMargins() const;
+	void SetMargins(ContentContainer::Margin m);
 
 	/** Returns the selected text */
-	String QueryText() const;
+	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(unsigned int optIdx);
-	int SetScrollBar(Control *ptr);
+	void UpdateState(unsigned int optIdx) override;
+	void DidFocus() override;
+	void DidUnFocus() override;
+	
+	void AddSubviewInFrontOfView(View*, const View* = NULL) override;
+
 private: // Private attributes
 	// dialog and listbox handling
-	typedef std::pair<int, TextContainer*> OptionSpan;
-	std::vector<OptionSpan> OptSpans;
-	TextContainer* hoverSpan, *selectedSpan;
+	std::vector<ieDword> values;
 	const Content* dialogBeginNode;
 	// dialog options container
-	TextContainer* selectOptions;
+	SpanSelector* selectOptions;
 	// standard text display container
 	TextContainer* textContainer;
-	// wrapper containing both of the above
-	ContentContainer contentWrapper;
-
-	struct AnimationPoint {
-		// TODO: we cant currently scroll the x axis
-		// if that happens we should upgrade this to Point
-		int y;
-		unsigned long time;
-
-		AnimationPoint() : y(0), time(0) {}
-		AnimationPoint(int y, unsigned long t) : y(y), time(t) {}
-
-		operator bool() const {
-			return (time > 0);
-		}
-	};
-	AnimationPoint animationBegin, animationEnd;
-
-	int TextYPos;
-	int rows;
+	ScrollView scrollview;
+	Timer* historyTimer;
 
 	/** Fonts */
 	Font* finit, * ftext;
 	GemMarkupParser parser;
+	ContentContainer::Margin textMargins;
 
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler TextAreaOnChange;
-	ControlEventHandler TextAreaOnSelect;
-
-	enum PALETTE_TYPE {
-		PALETTE_NORMAL = 0,	// standard text color
-		PALETTE_OPTIONS,	// normal palette for selectable options (dialog/listbox)
-		PALETTE_HOVER,		// palette for hovering options (dialog/listbox)
-		PALETTE_SELECTED,	// selected list box/dialog option.
-		PALETTE_INITIALS,	// palette for finit. used only is some cases.
-
-		PALETTE_TYPE_COUNT
-	};
-	Palette* palettes[PALETTE_TYPE_COUNT];
-	Palette* palette; // shortcut for palettes[PALETTE_NORMAL]
+	Color colors[COLOR_TYPE_COUNT] = {ColorWhite};
+	PaletteHolder invertedText;
 
 private: //internal functions
-	void Init();
-	void SetPalette(const Color*, PALETTE_TYPE);
-	void UpdateScrollbar();
-	void UpdateRowCount(int h);
+	void SetColor(const Color*, COLOR_TYPE);
+
+	void UpdateScrollview();
+	Region UpdateTextFrame();
+	void SizeChanged(const Size&) override { UpdateScrollview(); }
+	void FlagsChanged(unsigned int /*oldflags*/) override;
+
+	int TextHeight() const;
+	int OptionsHeight() const;
+
+	void TrimHistory(size_t lines);
+	void TextChanged(TextContainer& tc);
+	void ClearHistoryTimer();
 
 public: //Events
-	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
-	/** Mousewheel scroll */
-	void OnMouseWheelScroll(short x, short y);
-	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y,
-				   unsigned short Button, unsigned short Mod);
-	/** Mouse button down*/
-	void OnMouseDown(unsigned short x, unsigned short y,
-					 unsigned short Button, unsigned short Mod);
-	void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
+		static const Control::Action Select = ACTION_CUSTOM(0); // selection event such as dialog or a listbox
+	};
+
+	enum TextAreaFlags {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		AutoScroll = 1,   // TextArea will automatically scroll when new text is appended
+		ClearHistory = 2, // TextArea will automatically purge old data as new data is added
+		Editable = 4      // TextArea text is editable
+	};
 
 	void ClearSelectOptions();
 };

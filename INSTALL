@@ -19,7 +19,8 @@ Optional dependencies:
   - FreeType (for the TTF fonts plugin)
   - ICONV (for the TTF fonts plugin and only needed when using a non unicode compatible TLK)
   - (lib)VLC 2.0+ (for movies in some mac distributions of the games)
-  - OpenGL drivers and GLEW
+  - OpenGL/OpenGLES drivers and libraries.
+  - GLEW libraries (Windows only, required for OpenGL support)
 
 When choosing SDL 1.2 or SDL 2.0.x, pass -DSDL_BACKEND=SDL (for 1.2) or
 -DSDL_BACKEND=SDL2 (for 2.0) to cmake invocation. You can also invoke cmake
@@ -59,7 +60,17 @@ also suggested if you're making a source package.
 If you want to build the OpenGL driver, first ensure you have a working SDL2
 install and using SDL2 backend. Then, if you want the standard driver, pass
 -DOPENGL_BACKEND=OpenGL and if you want the OpenGL ES driver, pass
--DOPENGL_BACKEND=GLES .
+-DOPENGL_BACKEND=GLES.
+
+Building on a Raspberry Pi is supported (tested under Raspbian/Raspberry Pi OS).
+The build system will automaticalluy add -DOPENGL_BACKEND=GLES, -DSDL_BACKEND=SDL2
+to the build options. By default, the build will try to use the legacy/Broadcom GLES libraries in /opt/vc.
+If your system is using the Mesa OpenGL driver with KMS support, pass -DDISABLE_VIDEOCORE
+to disable the usage of the legacy/Broadcom drivers and you can use either OpenGL or GLES
+for the OPENGL_BACKEND option.
+Note: the Pi4 does not support the legacy/Broadcom GLES drivers, so you'll have to explicitely
+pass -DDISABLE_VIDEOCORE to the 'cmake' build options.
+
 
 Please let us know if you encounter any problems while building.
 

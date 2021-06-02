@@ -27,8 +27,6 @@
 
 using namespace GemRB;
 
-static int pperm[8]={3,6,0,5,4,1,2,7};
-
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword blue_mask = 0x000000ff;
@@ -37,7 +35,7 @@ PLTImporter::PLTImporter(void)
 {
 	Width = Height = 0;
 	pixels = NULL;
-	if (DataStream::IsEndianSwitch()) {
+	if (DataStream::BigEndian()) {
 		red_mask = 0x0000ff00;
 		green_mask = 0x00ff0000;
 		blue_mask = 0xff000000;
@@ -77,11 +75,12 @@ bool PLTImporter::Open(DataStream* str)
 	return true;
 }
 
-Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
+Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 {
-	Color Palettes[8][256];
+	static int pperm[8]={3,6,0,5,4,1,2,7};
+	ColorPal<256> Palettes[8];
 	for (int i = 0; i < 8; i++) {
-		core->GetPalette( (paletteIndex[pperm[i]] >> (8*type)) & 0xFF, 256, Palettes[i] );
+		Palettes[i] = core->GetPalette256(paletteIndex[pperm[i]] >> (8*type));
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
@@ -100,11 +99,11 @@ Sprite2D* PLTImporter::GetSprite2D(unsigned int type, ieDword paletteIndex[8])
 				*dest++ = 0xff;
 		}
 	}
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
+	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
 		red_mask, green_mask, blue_mask, 0, p,
 		true, green_mask );
-	spr->XPos = 0;
-	spr->YPos = 0;
+	spr->Frame.x = 0;
+	spr->Frame.y = 0;
 	return spr;
 }
 

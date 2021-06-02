@@ -58,9 +58,7 @@ class CharGen:
 		if(self.window): 
 			CharGenWindow = self.window
 		else:
-			GemRB.LoadWindowPack ("GUICG", 640, 480)
-			CharGenWindow = GemRB.LoadWindow (0)
-			CharGenWindow.SetFrame ()
+			CharGenWindow = GemRB.LoadWindow (0, "GUICG")
 	
 		step = self.step
 		
@@ -68,7 +66,7 @@ class CharGen:
 		PortraitButton = CharGenWindow.GetControl (12)
 		PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 		PortraitName = GemRB.GetToken ("LargePortrait")
-		PortraitButton.SetPicture (PortraitName, "NOPORTMD")
+		PortraitButton.SetPicture (PortraitName, "NOPORTLG")
 		PortraitButton.SetState(IE_GUI_BUTTON_LOCKED)
 		
 		#set stage buttons
@@ -80,8 +78,8 @@ class CharGen:
 				button.SetText(text);
 				if i == step:
 					button.SetState(IE_GUI_BUTTON_ENABLED)
-					button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
+					button.MakeDefault()
+					button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.next())
 				else:
 					button.SetState(IE_GUI_BUTTON_DISABLED)
 			i = i + 1
@@ -93,8 +91,8 @@ class CharGen:
 			BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 		else:
 			BackButton.SetState(IE_GUI_BUTTON_DISABLED)
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
-		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.back())
+		BackButton.MakeEscape()
 
 		AcceptButton = CharGenWindow.GetControl (8)
 		playmode = GemRB.GetVar ("PlayMode")
@@ -105,13 +103,13 @@ class CharGen:
 
 		#set scrollbar
 		ScrollBar = CharGenWindow.GetControl (10)
-		ScrollBar.SetDefaultScrollBar()	
+		CharGenWindow.SetEventProxy(ScrollBar)
 		
 		#set import
 		ImportButton = CharGenWindow.GetControl (13)
 		ImportButton.SetText (13955)
 		ImportButton.SetState (IE_GUI_BUTTON_ENABLED)
-		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportPress)
+		ImportButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.imprt())
 
 		#set cancel and start over
 		CancelButton = CharGenWindow.GetControl (15)
@@ -120,7 +118,7 @@ class CharGen:
 		else:
 			CancelButton.SetText (8159) # Start over
 		CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
+		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: self.cancel())
 
 		#set and fill overview
 		TextAreaControl = CharGenWindow.GetControl (9)
@@ -135,8 +133,7 @@ class CharGen:
 					commentFn(TextAreaControl)
 		
 		#show
-		CharGenWindow.SetVisible(WINDOW_VISIBLE)
-		CharGenWindow.Invalidate()
+		CharGenWindow.Focus()
 		self.window = CharGenWindow
 	
 	def unset(self,stage):
@@ -185,7 +182,6 @@ class CharGen:
 
 	def back(self):
 		"""Moves to the previous step. Unsets last"""
-		GUICommon.CloseOtherWindow(None)
 		self.unset(self.step)
 		if len(self.stages[self.step]) == 3:
 			#short, return to other short
@@ -205,7 +201,6 @@ class CharGen:
 	
 	def next(self):
 		"""Calls the next setter."""
-		GUICommon.CloseOtherWindow(None)
 		self.step = self.step + 1
 		while(not self.setScript()):
 			self.step = self.step + 1
@@ -233,38 +228,18 @@ class CharGen:
 			return
 		else:
 			raise ValueError("bad arg type: "+str(type(to)) + " " + str(to))
-		GUICommon.CloseOtherWindow(None)
 		while(not self.setScript()):
 			self.step = self.step + 1
 					 	
 CharGenMaster = None
 
-def CancelPress():
-	"""Revert back to the first step; if there, free the actor."""
-	global CharGenMaster
-	CharGenMaster.cancel()
-
-def ImportPress():
-	"""Opens the character import window."""
-	global CharGenMaster
-	CharGenMaster.imprt()
-
-def BackPress():
-	"""Moves to the previous step."""
-	global CharGenMaster
-	print "back"
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	CharGenMaster.back()
-	
-def NextPress():
-	"""Moves to the next step."""
-	global CharGenMaster
-	CharGenMaster.next()
-
-def back():
+def back(Window=None):
 	"""Moves to the previous step."""
 	global CharGenMaster
 	CharGenMaster.back()
+
+	if (Window):
+		Window.Close()
 
 def next():
 	"""Moves to the next step."""

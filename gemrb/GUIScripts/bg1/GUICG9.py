@@ -39,10 +39,7 @@ def RedrawSkills():
 def OnLoad():
 	global SkillWindow, DoneButton
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindow(9)
-
-	GUICommon.CloseOtherWindow(SkillWindow.Unload)
+	SkillWindow = GemRB.LoadWindow(9, "GUICG")
 
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
@@ -51,12 +48,12 @@ def OnLoad():
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.MakeEscape()
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(SkillWindow))
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
@@ -64,6 +61,7 @@ def OnLoad():
 	return
 
 def NextPress():
+	SkillWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	LUProfsSelection.ProfsSave(MyChar, LUProfsSelection.LUPROFS_TYPE_CHARGEN)
 	CharGenCommon.next()

@@ -38,7 +38,7 @@ namespace GemRB {
 class GEM_EXPORT SymbolMgr : public Plugin {
 public:
 	SymbolMgr(void);
-	virtual ~SymbolMgr(void);
+	~SymbolMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	/// Returns -1 if string isn't found.
 	virtual int GetValue(const char* text) const = 0;

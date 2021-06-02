@@ -19,6 +19,7 @@
 #character generation, alignment (GUICG3)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 
 AlignmentWindow = 0
@@ -33,8 +34,8 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	AlignmentWindow = GemRB.LoadWindow(3)
+	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
+	CharOverview.PositionCharGenWin(AlignmentWindow)
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
@@ -48,11 +49,11 @@ def OnLoad():
 
 	BackButton = AlignmentWindow.GetControl(13)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = AlignmentWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
@@ -60,7 +61,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	AlignmentWindow.SetVisible(WINDOW_VISIBLE)
+	AlignmentWindow.Focus()
 	return
 
 def AlignmentPress():

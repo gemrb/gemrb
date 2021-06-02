@@ -21,6 +21,7 @@
 #include "OpenALAudio.h"
 
 #include "GameData.h"
+#include "Interface.h"
 
 #include <cassert>
 #include <cstdio>

@@ -106,7 +106,7 @@ int OGGReader::read_samples(short* buffer, int count)
 	int samples_got=0;
 	int samples_need=count;
 	while(samples_need) {
-		int rd=ov_read(&OggStream, (char *)buffer, samples_need<<1, str->IsEndianSwitch(), 2, 1, &whatisthis);
+		int rd=ov_read(&OggStream, (char *)buffer, samples_need<<1, str->BigEndian(), 2, 1, &whatisthis);
 		if(rd==OV_HOLE) {
 			continue;
 		}

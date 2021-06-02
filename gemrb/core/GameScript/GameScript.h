@@ -537,7 +537,6 @@ struct IDSLink {
 #define MAX_OBJECTS			256
 #define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
-extern void SetScriptDebugMode(int arg);
 extern void ScriptDebugLog(int bit, const char* message, ...);
 extern int RandomNumValue;
 
@@ -546,6 +545,7 @@ public:
 	GameScript(const ieResRef ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
+
 	bool dead = false;      // Script replaced itself with another and should be deleted when done running
 	bool running = false;   // Script is currently running so defer any deletion to caller
 

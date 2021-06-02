@@ -64,32 +64,32 @@ int fx_speak_with_dead (Scriptable* Owner, Actor* target, Effect* fx);//d4
 
 //the engine sorts these, feel free to use any order
 static EffectDesc effectnames[] = {
-	{ "Bless", fx_bless, 0, -1 },//82
-	{ "ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1 }, //c6
-	{ "Curse", fx_curse, 0, -1 },//cb
-	{ "DetectEvil", fx_detect_evil, 0, -1 }, //d2
-	{ "Embalm", fx_embalm, 0, -1 }, //0xce
-	{ "FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1 }, //c2
-	{ "HostileImage", fx_hostile_image, 0, -1 },//d1
-	{ "IronFist", fx_iron_fist, 0, -1 }, //d0
-	{ "JumbleCurse", fx_jumble_curse, 0, -1 }, //d3
-	{ "MoveView", fx_move_view, EFFECT_NO_ACTOR, -1 },//cd
-	{ "MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1 }, //c5
-	{ "Overlay", fx_overlay, 0, -1 }, //c9
-	{ "PlayBAM1", fx_play_bam_blended, 0, -1 }, //bb
-	{ "PlayBAM2", fx_play_bam_not_blended, 0, -1 },//bc
-	{ "PlayBAM3", fx_play_bam_not_blended, 0, -1 }, //bd
-	{ "PlayBAM4", fx_play_bam_not_blended, 0, -1 }, //be
-	{ "PlayBAM5", fx_play_bam_not_blended, 0, -1 }, //bf
-	{ "Prayer", fx_prayer, 0, -1 },//cc
-	{ "RetreatFrom", fx_retreat_from, 0, -1 },//6e
-	{ "SetStatus", fx_set_status, 0, -1 }, //ba
-	{ "SpeakWithDead", fx_speak_with_dead, 0, -1 }, //d4
-	{ "SpecialEffect", fx_special_effect, 0, -1 },//c4
-	{ "StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 }, //cf
-	{ "TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 }, //c3
-	{ "TransferHP", fx_transfer_hp, EFFECT_DICED, -1 }, //c0
-	{ NULL, NULL, 0, 0 },
+	EffectDesc("Bless", fx_bless, 0, -1 ),//82
+	EffectDesc("ChangeBackground", fx_change_background, EFFECT_NO_ACTOR, -1 ), //c6
+	EffectDesc("Curse", fx_curse, 0, -1 ),//cb
+	EffectDesc("DetectEvil", fx_detect_evil, 0, -1 ), //d2
+	EffectDesc("Embalm", fx_embalm, 0, -1 ), //0xce
+	EffectDesc("FlashScreen", fx_flash_screen, EFFECT_NO_ACTOR, -1 ), //c2
+	EffectDesc("HostileImage", fx_hostile_image, 0, -1 ),//d1
+	EffectDesc("IronFist", fx_iron_fist, 0, -1 ), //d0
+	EffectDesc("JumbleCurse", fx_jumble_curse, 0, -1 ), //d3
+	EffectDesc("MoveView", fx_move_view, EFFECT_NO_ACTOR, -1 ),//cd
+	EffectDesc("MultipleVVC", fx_multiple_vvc, EFFECT_NO_ACTOR, -1 ), //c5
+	EffectDesc("Overlay", fx_overlay, 0, -1 ), //c9
+	EffectDesc("PlayBAM1", fx_play_bam_blended, 0, -1 ), //bb
+	EffectDesc("PlayBAM2", fx_play_bam_not_blended, 0, -1 ),//bc
+	EffectDesc("PlayBAM3", fx_play_bam_not_blended, 0, -1 ), //bd
+	EffectDesc("PlayBAM4", fx_play_bam_not_blended, 0, -1 ), //be
+	EffectDesc("PlayBAM5", fx_play_bam_not_blended, 0, -1 ), //bf
+	EffectDesc("Prayer", fx_prayer, 0, -1 ),//cc
+	EffectDesc("RetreatFrom", fx_retreat_from, 0, -1 ),//6e
+	EffectDesc("SetStatus", fx_set_status, 0, -1 ), //ba
+	EffectDesc("SpeakWithDead", fx_speak_with_dead, 0, -1 ), //d4
+	EffectDesc("SpecialEffect", fx_special_effect, 0, -1 ),//c4
+	EffectDesc("StopAllAction", fx_stop_all_action, EFFECT_NO_ACTOR, -1 ), //cf
+	EffectDesc("TintScreen", fx_tint_screen, EFFECT_NO_ACTOR, -1 ), //c3
+	EffectDesc("TransferHP", fx_transfer_hp, EFFECT_DICED, -1 ), //c0
+	EffectDesc( NULL, NULL, 0, 0 ),
 };
 
 static void RegisterTormentOpcodes()
@@ -100,7 +100,7 @@ static void RegisterTormentOpcodes()
 //retreat_from (works only in PST) - forces target to run away/walk away from Owner
 int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_retreat_from(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_retreat_from(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	if (!Owner) {
 		return FX_NOT_APPLIED;
@@ -131,7 +131,7 @@ int fx_retreat_from (Scriptable* Owner, Actor* target, Effect* fx)
 //0xba fx_set_status
 int fx_set_status (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_set_status(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_set_status(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter1) {
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			BASE_STATE_SET (fx->Parameter2);
@@ -155,7 +155,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 
-	if(0) print("fx_play_bam_blended(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_play_bam_blended(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (!Owner)
 		Owner = target;
 	if (!Owner)
@@ -206,8 +206,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2&2) {
-		sca->XPos+=fx->PosX;
-		sca->YPos+=fx->PosY;
+		sca->Pos = Point(fx->PosX, fx->PosY);
 		area->AddVVCell( new VEFObject(sca));
 	} else {
 		assert(target);
@@ -233,7 +232,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	bool playonce;
 	bool doublehint;
 
-	if(0) print("fx_play_bam_not_blended(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_play_bam_not_blended(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (!Owner)
 		Owner = target;
 	if (!Owner)
@@ -286,20 +285,20 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	switch (fx->Parameter2&0x30000) {
 	case 0x20000://foreground
-		sca->ZPos+=9999;
-		sca->YPos+=9999;
+		sca->ZOffset += 9999;
+		sca->YOffset += 9999;
 		break;
 	case 0x30000: //both
-		sca->ZPos+=9999;
-		sca->YPos+=9999;
+		sca->ZOffset += 9999;
+		sca->YOffset += 9999;
 		if (sca->twin) {
-			sca->twin->ZPos-=9999;
-			sca->twin->YPos-=9999;
+			sca->twin->ZOffset -= 9999;
+			sca->twin->YOffset -= 9999;
 		}
 		break;
 	default: //background
-		sca->ZPos-=9999;
-		sca->YPos-=9999;
+		sca->ZOffset -= 9999;
+		sca->YOffset -= 9999;
 		break;
 	}
 	if (playonce) {
@@ -323,12 +322,15 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}
+		
+		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->XOffset -= x;
+		sca->YOffset -= y;
 
-		sca->XPos+=fx->PosX-x;
-		sca->YPos+=fx->PosY+sca->ZPos-y;
 		if (twin) {
-			twin->XPos+=fx->PosX-x;
-			twin->YPos+=fx->PosY+twin->ZPos-y;
+			twin->Pos = Point(fx->PosX, fx->PosY);
+			twin->XOffset -= x;
+			twin->YOffset -= y;
 			area->AddVVCell( new VEFObject(twin) );
 		}
 		area->AddVVCell( new VEFObject(sca) );
@@ -339,7 +341,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 //0xc0 fx_transfer_hp
 int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_transfer_hp(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_transfer_hp(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (Owner->Type!=ST_ACTOR) {
 		return FX_NOT_APPLIED;
 	}
@@ -390,10 +392,12 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 //0xc2 fx_flash_screen
 int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_flash_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	core->GetVideoDriver()->SetFadeColor(((unsigned char *) &fx->Parameter1)[0],((unsigned char *) &fx->Parameter1)[1],((unsigned char *) &fx->Parameter1)[2]);
+	// print("fx_flash_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	unsigned char* bytes = (unsigned char *)&fx->Parameter1;
+	Color c(bytes[0], bytes[1], bytes[2], 0xff);
+	core->GetWindowManager()->FadeColor = c;
 	//this needs to be at least 2 for any effect
-	core->timer->SetFadeFromColor(2);
+	core->timer.SetFadeFromColor(2);
 	return FX_NOT_APPLIED;
 }
 
@@ -403,7 +407,7 @@ int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 // timing is mostly 16, with one 8, one 48 and one 64
 int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_tint_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	// some effects contain garbage in DiceSides
 	// FIXME: should we really be just using DiceThrown?
 	int fromTime = fx->DiceThrown;
@@ -424,8 +428,8 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 */
 
 	// order matters here, as SetFadeToColor resets fadeFromCounter
-	core->timer->SetFadeToColor(toTime, 2);
-	core->timer->SetFadeFromColor(fromTime, 2);
+	core->timer.SetFadeToColor(toTime, 2);
+	core->timer.SetFadeFromColor(fromTime, 2);
 	return FX_NOT_APPLIED;
 }
 
@@ -433,7 +437,7 @@ int fx_tint_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 //it is a mystery, why they needed to make this effect
 int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_special_effect(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_special_effect(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	//param2 determines the effect's behaviour
 	//0 - adder's kiss projectile (0xcd)
 	//  adds play bam and damage opcodes to the projectile
@@ -468,7 +472,7 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 //it plays multiple vvc's with a given delay and duration
 int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_multiple_vvc(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_multiple_vvc(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 
 	Map *area = Owner->GetCurrentArea();
 	if (!area)
@@ -497,8 +501,8 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 		sca->SetBlend();
 		sca->SetDelay(AI_UPDATE_TIME*delay);
 		sca->SetDefaultDuration(AI_UPDATE_TIME*duration);
-		sca->XPos+=fx->PosX+offset.x;
-		sca->YPos+=fx->PosY+offset.y;
+		sca->Frame.x+=fx->PosX+offset.x;
+		sca->Frame.y+=fx->PosY+offset.y;
 		area->AddVVCell(sca);
 	}
 */
@@ -509,7 +513,7 @@ int fx_multiple_vvc (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 //GemRB specific, to support BMP area background changes (desert hell projectile)
 int fx_change_background (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_change_background(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_change_background(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
 		map->SetBackground(fx->Resource, fx->Duration);
@@ -577,7 +581,7 @@ static inline void ConvertTiming(Effect *fx, int Duration)
 
 int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_overlay(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_overlay(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (!target) {
 		return FX_NOT_APPLIED;
 	}
@@ -767,15 +771,13 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 
-	ScriptedAnimation *vvc = target->GetVVCCell(&target->vvcOverlays, fx->Resource);
-	if (vvc) {
-		vvc->active = true;
-		vvc = target->GetVVCCell(&target->vvcShields, fx->Resource);
-		if (vvc) {
-			vvc->active = true;
-		}
-	} else {
+	auto range = target->GetVVCCells(fx->Resource);
+	if (range.first == range.second) {
 		return FX_NOT_APPLIED;
+	}
+	
+	for (; range.first != range.second; ++range.first) {
+		range.first->second->active = true;
 	}
 
 	switch(fx->Parameter2) {
@@ -838,7 +840,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 //but i would rather use the IWD2 method
 int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
+	// print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	//this bit is the same as the invisibility bit in other games
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
@@ -861,7 +863,7 @@ int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xcb fx_curse
 int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
+	// print("fx_curse(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	//this bit is the same as the invisibility bit in other games
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
@@ -884,7 +886,7 @@ static EffectRef fx_bless_ref = { "Bless", -1 };
 
 int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_prayer(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
+	// print("fx_prayer(%2d): Par1: %d", fx->Opcode, fx->Parameter1);
 	int ea = target->GetStat(IE_EA);
 	int type;
 	if (ea>EA_EVILCUTOFF) type = 1;
@@ -915,10 +917,10 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 //0xcd fx_move_view
 int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
+	// print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
-		core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
+		core->timer.SetMoveViewPort( Point(fx->PosX, fx->PosY), fx->Parameter1, true);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -926,7 +928,7 @@ int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0xce fx_embalm
 int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_embalm(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_embalm(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (STATE_GET (STATE_EMBALM) ) //embalm is non cumulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_EMBALM );
@@ -949,7 +951,7 @@ int fx_embalm (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xcf fx_stop_all_action
 int fx_stop_all_action (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(0) print("fx_stop_all_action(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_stop_all_action(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter2) {
 		core->GetGame()->TimeStop(NULL, 0xffffffff);
 	} else {
@@ -964,7 +966,7 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword p1,p2;
 
-	if(0) print("fx_iron_fist(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_iron_fist(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	switch (fx->Parameter2)
 	{
 	case 0: p1 = 3; p2 = 6; break;
@@ -980,14 +982,14 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
 int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if(1) print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	if (1) print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
 //0xd2 fx_detect_evil
 int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	if(0) print("fx_detect_evil(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_detect_evil(%2d): Par1: %d Par2: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	ieDword type = fx->Parameter2;
 	//default is alignment/evil/speed 30/range 10
 	if (!type) type = 0x08031e0a;
@@ -1014,7 +1016,7 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 //0xd3 fx_jumble_curse
 int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_jumble_curse(%2d)", fx->Opcode);
+	// print("fx_jumble_curse(%2d)", fx->Opcode);
 
 	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
@@ -1044,9 +1046,9 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xd4 fx_speak_with_dead
 //This opcode is directly employed by the speak with dead projectile in the original engine
 //In GemRB it is used in a custom spell
-int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* fx)
+int fx_speak_with_dead (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
-	if(0) print("fx_speak_with_dead(%2d)", fx->Opcode);
+	// print("fx_speak_with_dead(%2d)", fx->Opcode);
 	if (!STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}

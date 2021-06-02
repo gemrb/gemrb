@@ -44,15 +44,13 @@ Bitmap* ImageMgr::GetBitmap()
 	Log(ERROR, "ImageMgr", "Don't know how to handle 24bit bitmap from %s...",
 		str->filename );
 
-	Sprite2D *spr = GetSprite2D();
+	Holder<Sprite2D> spr = GetSprite2D();
 
 	for (unsigned int y = 0; y < height; y++) {
 		for (unsigned int x = 0; x < width; x++) {
 			data->SetAt(x,y, spr->GetPixel(x,y).r);
 		}
 	}
-
-	spr->release();
 
 	return data;
 }
@@ -63,7 +61,7 @@ Image* ImageMgr::GetImage()
 	unsigned int width = GetWidth();
 	Image *data = new Image(width, height);
 
-	Sprite2D *spr = GetSprite2D();
+	Holder<Sprite2D> spr = GetSprite2D();
 
 	for (unsigned int y = 0; y < height; y++) {
 		for (unsigned int x = 0; x < width; x++) {
@@ -71,15 +69,12 @@ Image* ImageMgr::GetImage()
 		}
 	}
 
-	spr->release();
-
 	return data;
 }
 
-void ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
+int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 {
-	Log(ERROR, "ImageMgr", "Can't get non-existant palette from %s... ",
-		str->filename);
+	return -1;
 }
 
 ImageFactory* ImageMgr::GetImageFactory(const char* ResRef)

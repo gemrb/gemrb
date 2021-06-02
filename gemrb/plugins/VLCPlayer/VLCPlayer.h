@@ -23,9 +23,7 @@
 
 #include <vlc/vlc.h>
 
-#include "Interface.h"
 #include "MoviePlayer.h"
-#include "VideoContext.h"
 
 namespace GemRB {
 
@@ -45,27 +43,28 @@ namespace GemRB {
 
 class VLCPlayer : public MoviePlayer {
 private:
-	libvlc_instance_t *libvlc;
-	libvlc_media_t *media = nullptr;
-	libvlc_media_player_t *mediaPlayer = nullptr;
+	enum {Y, U, V};
+	char* planes[3];
 
-	VideoContext* ctx = nullptr;
+	libvlc_instance_t *libvlc;
+	libvlc_media_player_t *mediaPlayer;
 
 	// libvlc_video_set_callbacks
 	static void display(void *data, void *id);
-	static void unlock(void *data, void *id, void *const *planes);
 	static void* lock(void *data, void **planes);
 
 	// libvlc_video_set_format_callbacks
 	static unsigned setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines);
-	static void cleanup(void *opaque);
+
+private:
+	bool DecodeFrame(VideoBuffer&) override;
+	void DestroyPlayer();
+
 public:
-	VLCPlayer(void);
-	~VLCPlayer(void);
-	bool Open(DataStream* stream);
-	int Play();
-	void Stop();
-	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
+	VLCPlayer();
+	~VLCPlayer() override;
+
+	bool Open(DataStream* stream) override;
 };
 
 }

@@ -55,7 +55,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/plugins/IDSImporter/IDSImporter.cpp \
 		    main/gemrb/plugins/ZLibManager/ZLibManager.cpp \
 		    main/gemrb/plugins/DLGImporter/DLGImporter.cpp \
-		    main/gemrb/plugins/GUIScript/PythonHelpers.cpp \
 		    main/gemrb/plugins/GUIScript/GUIScript.cpp \
 		    main/gemrb/plugins/WAVReader/WAVReader.cpp \
 		    main/gemrb/plugins/STOImporter/STOImporter.cpp \
@@ -112,7 +111,6 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/Ambient.cpp \
 		    main/gemrb/core/TableMgr.cpp \
 		    main/gemrb/core/ScriptEngine.cpp \
-		    main/gemrb/core/WindowMgr.cpp \
 		    main/gemrb/core/Tile.cpp \
 		    main/gemrb/core/DisplayMessage.cpp \
 		    main/gemrb/core/Scriptable/InfoPoint.cpp \
@@ -200,6 +198,8 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/GameScript/Actions.cpp \
 		    main/gemrb/core/GameScript/Objects.cpp \
 		    main/gemrb/core/Polygon.cpp \
+		    main/gemrb/core/GUI/GUIScriptInterface.cpp \
+		    main/gemrb/core/GUI/GUIFactory.cpp \
 		    main/gemrb/core/GUI/MapControl.cpp \
 		    main/gemrb/core/GUI/Label.cpp \
 		    main/gemrb/core/GUI/ScrollBar.cpp \
@@ -213,6 +213,7 @@ LOCAL_SRC_FILES :=  main/gemrb/plugins/SAVImporter/SAVImporter.cpp \
 		    main/gemrb/core/GUI/TextSystem/Font.cpp \
 		    main/gemrb/core/GUI/TextSystem/GemMarkup.cpp \
 		    main/gemrb/core/GUI/TextSystem/TextContainer.cpp \
+		    main/gemrb/core/GUI/View.cpp \
 		    main/gemrb/core/GUI/EventMgr.cpp \
 		    main/gemrb/core/GUI/Progressbar.cpp \
 		    main/gemrb/core/GUI/Console.cpp \

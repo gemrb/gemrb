@@ -32,6 +32,11 @@
 
 #include "Resource.h"
 
+#include "GUI/TextSystem/Font.h"
+#include "GUI/Window.h"
+#include "System/String.h"
+#include "Video.h"
+
 namespace GemRB {
 
 /**
@@ -42,10 +47,92 @@ namespace GemRB {
 class GEM_EXPORT MoviePlayer : public Resource {
 public:
 	static const TypeID ID;
+
+	class SubtitleSet {
+		Color col;
+		Font* font;
+	
+	public:
+		SubtitleSet(Font* fnt, Color col = ColorWhite)
+		: col(col) {
+			font = fnt;
+			assert(font);
+		}
+		
+		virtual ~SubtitleSet() {}
+
+		virtual size_t NextSubtitleFrame() const = 0;
+		virtual const String& SubtitleAtFrame(size_t) const = 0;
+		
+		void RenderInBuffer(VideoBuffer& buffer, size_t frame) const {
+			if (frame >= NextSubtitleFrame()) {
+				buffer.Clear();
+				const String& str = SubtitleAtFrame(frame);
+				Region rect(Point(), buffer.Size());
+				font->Print(rect, str, IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE, {col, ColorBlack});
+			}
+		}
+	};
+
+private:
+	bool isPlaying;
+	bool showSubtitles;
+	SubtitleSet* subtitles;
+
+protected:
+	// NOTE: make sure any new movie plugins set these!
+	Video::BufferFormat movieFormat;
+	Size movieSize;
+	size_t framePos;
+
+protected:
+	void DisplaySubtitle(const String& sub);
+	void PresentMovie(const Region&, Video::BufferFormat fmt);
+
+	virtual bool DecodeFrame(VideoBuffer&) = 0;
+
+public:
 	MoviePlayer(void);
-	virtual ~MoviePlayer(void);
-	virtual int Play() = 0;
-	virtual void CallBackAtFrames(ieDword cnt, ieDword *frames, ieDword *strrefs) = 0;
+	~MoviePlayer(void) override;
+
+	Size Dimensions() { return movieSize; }
+	void Play(Window* win);
+	void Stop();
+
+	void SetSubtitles(SubtitleSet* subs);
+	void EnableSubtitles(bool set);
+	bool SubtitlesEnabled() const;
+};
+
+class MoviePlayerControls : public View {
+	MoviePlayer& player;
+
+private:
+	// currently dont have any real controls
+	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) override {}
+	
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override {
+		KeyboardKey keycode = Key.keycode;
+		switch (keycode) {
+			case 's':
+				player.EnableSubtitles(!player.SubtitlesEnabled());
+				break;
+			default:
+				player.Stop();
+				break;
+		}
+
+		return true;
+	}
+	
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override {
+		player.Stop();
+		return true;
+	}
+
+public:
+	MoviePlayerControls(MoviePlayer& player)
+	: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 
 }

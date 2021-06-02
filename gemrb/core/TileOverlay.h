@@ -29,8 +29,6 @@
 
 namespace GemRB {
 
-extern bool RedrawTile;
-
 class GEM_EXPORT TileOverlay {
 public:
 	int w, h;
@@ -41,8 +39,7 @@ public:
 	TileOverlay(int Width, int Height);
 	~TileOverlay(void);
 	void AddTile(Tile* tile);
-	void Draw(Region viewport, std::vector< TileOverlay*> &overlays, int flags);
-	void BumpViewport(const Region &viewport, Region &vp);
+	void Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags);
 };
 
 }

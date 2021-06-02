@@ -24,104 +24,40 @@
 
 import GemRB
 import GUICommon
+import GUICommonWindows
 import CommonTables
 import InventoryCommon
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
 
-InventoryWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
-
-def OpenInventoryWindowClick ():
-	tmp = GemRB.GetVar ("PressedPortrait")
-	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
-	OpenInventoryWindow ()
-	return
-
-def OpenInventoryWindow ():
+def InitInventoryWindow (Window):
 	"""Opens the inventory window."""
 
-	import GUICommonWindows
-
-	global InventoryWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem () == 1:
-			pc = GemRB.GameGetSelectedPCSingle ()
-			#store the item in the inventory before window is closed
-			GemRB.DropDraggedItem (pc, -3)
-			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem () == 1:
-				GemRB.DropDraggedItem (pc, -2)
-
-		InventoryCommon.CloseIdentifyItemWindow ()
-		InventoryCommon.CloseAbilitiesItemWindow ()
-		InventoryCommon.CancelColor()
-		if InventoryCommon.ItemInfoWindow:
-			InventoryCommon.ItemInfoWindow.Unload ()
-			InventoryCommon.ItemInfoWindow = None
-		if InventoryCommon.ItemAmountWindow:
-			InventoryCommon.ItemAmountWindow.Unload ()
-			InventoryCommon.ItemAmountWindow = None
-		if InventoryCommon.ErrorWindow:
-			InventoryCommon.ErrortWindow.Unload ()
-			InventoryCommon.ErrortWindow = None
-
-		if InventoryWindow:
-			InventoryWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		InventoryWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		GUICommonWindows.UpdatePortraitWindow ()
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIINV", 640, 480)
-	InventoryWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	GemRB.SetVar ("MessageLabel", Window.GetControl (0x1000003f).ID )
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenInventoryWindow)
-	OptionsWindow.SetFrame ()
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+	Window.AddAlias("WIN_INV")
+	Window.GetControl (0x1000003f).AddAlias("MsgSys", 1)
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
-	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshInventoryWindow)
+	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, lambda: RefreshInventoryWindow(Window))
 
 	#Ground Item
 	for i in range (5):
 		Button = Window.GetControl (i+68)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
-		Button.SetVarAssoc ("GroundItemButton", i)
+		Button.SetVarAssoc ("ItemButton", i + 68)
 		#This IS different from BG2
 		Button.SetSprites ("STONSLOT",0,0,1,2,3)
 		Button.SetFont ("NUMBER")
-		Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-		Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-		Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
+
+		color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+		Button.SetBorder (0, color, 0, 1)
+		color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
+		Button.SetBorder (1, color, 0, 0, Button.GetInsetFrame(2))
+		color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+		Button.SetBorder (2, color, 0, 1)
+
 		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#major & minor clothing color
@@ -139,15 +75,14 @@ def OpenInventoryWindow ():
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnAutoEquip)
+	Button.SetAction (InventoryCommon.OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	#encumbrance
 	Button = Window.GetControl (67)
-	r = Button.GetRect ()
-	Label = Window.CreateLabel (0x10000043, r["X"],r["Y"],r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-	Label = Window.CreateLabel (0x10000044, r["X"],r["Y"]+r["Height"]-20,r["Width"],20,
-		"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+	Label = Button.CreateLabel (0x10000043, "NUMBER", "0:",
+		IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+	Label = Button.CreateLabel (0x10000044, "NUMBER", "0:",
+		IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	# armor class
 	Label = Window.GetControl (0x10000038)
@@ -178,39 +113,33 @@ def OpenInventoryWindow ():
 			#This IS different from BG2
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 			Button.SetFont ("NUMBER")
-			Button.SetBorder (0,0,0,0,0,128,128,255,64,0,1)
-			Button.SetBorder (1,2,2,2,2,32,32,255,0,0,0)
-			Button.SetBorder (2,0,0,0,0,255,128,128,64,0,1)
 
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (999, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+			rect = Button.GetFrame()
+			color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
+			Button.SetBorder (0, color, 0, 1)
+			color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+			Button.SetBorder (2, color, 0, 1)
+			color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 0}
+			Button.SetBorder (1, color, 0, 0, Button.GetInsetFrame(2))
 
 	GemRB.SetVar ("TopIndex", 0)
-	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-	UpdateInventoryWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
 
 	# force unpause the game
 	GemRB.GamePause(0, 0)
 	return
 
-def UpdateInventoryWindow ():
+def UpdateInventoryWindow (Window = None):
 	"""Redraws the inventory window and resets TopIndex."""
 
-	Window = InventoryWindow
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
 	ScrollBar = Window.GetControl (66)
 	Count = max (0, Container['ItemCount'] - 5)
 	ScrollBar.SetVarAssoc ("TopIndex", Count)
-	RefreshInventoryWindow ()
+	RefreshInventoryWindow (Window)
 	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 
@@ -218,10 +147,13 @@ def UpdateInventoryWindow ():
 		InventoryCommon.UpdateSlot (pc, i)
 	return
 
-def RefreshInventoryWindow ():
-	"""Partial redraw without resetting TopIndex."""
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
 
-	Window = InventoryWindow
+InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
+
+def RefreshInventoryWindow (Window):
+	"""Partial redraw without resetting TopIndex."""
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -321,7 +253,7 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
+		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 
 		if Slot == None:
@@ -329,6 +261,7 @@ def RefreshInventoryWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
 		else:
+			Button.SetAction(InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_CRT)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, InventoryCommon.OnDragItemGround)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, InventoryCommon.OpenGroundItemInfoWindow)
 			Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, InventoryCommon.OpenGroundItemAmountWindow)

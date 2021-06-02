@@ -40,9 +40,9 @@ private:
 
 public:
 	ITMImporter(void);
-	~ITMImporter(void);
-	bool Open(DataStream* stream);
-	Item* GetItem(Item *s);
+	~ITMImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Item* GetItem(Item *s) override;
 private:
 	void GetExtHeader(Item *s, ITMExtHeader* eh);
 	void GetFeature(Effect *f, Item *s);

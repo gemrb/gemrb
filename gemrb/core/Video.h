@@ -33,53 +33,65 @@
 #include "Polygon.h"
 #include "ScriptedAnimation.h"
 
+#include <deque>
+#include <algorithm>
+
 namespace GemRB {
 
 class EventMgr;
-class Font;
 class Palette;
-class SpriteCover;
-
-// Note: not all these flags make sense together. Specifically:
-// NOSHADOW overrides TRANSSHADOW, and BLIT_GREY overrides BLIT_SEPIA
-enum SpriteBlitFlags {
+using PaletteHolder = Holder<Palette>;
+  
+// Note: not all these flags make sense together.
+// Specifically: BLIT_GREY overrides BLIT_SEPIA
+enum SpriteBlitFlags : uint32_t {
+	BLIT_NO_FLAGS = 0,
 	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
 	BLIT_BLENDED = IE_VVC_BLENDED, // 8; not implemented in SDLVideo yet
 	BLIT_MIRRORX = IE_VVC_MIRRORX, // 0x10
 	BLIT_MIRRORY = IE_VVC_MIRRORY, // 0x20
-	BLIT_NOSHADOW = 0x1000,
-	BLIT_TRANSSHADOW = 0x2000,
-	BLIT_TINTED = 0x00010000, // IE_VVC_TINT = 0x00030000
+	//BLIT_NOSHADOW = 0x1000, no longer used
+	//BLIT_TRANSSHADOW = 0x2000, no longer used
+	// IE_VVC_TINT = 0x00030000. which is (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)
+	BLIT_COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
+	BLIT_ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
 	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000; timestop palette
 	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
-	BLIT_DARK = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
-	BLIT_GLOW = IE_VVC_GLOWING // 0x00200000; not implemented in SDLVideo yet
-	// Note: bits 29,30,31 are used by SDLVideo internally
+	BLIT_MULTIPLY = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
+	BLIT_GLOW = IE_VVC_GLOWING, // 0x00200000; not implemented in SDLVideo yet
+	BLIT_ADD = 0x00400000,
+	BLIT_STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
+	BLIT_STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
+	BLIT_STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
+	BLIT_STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
+	BLIT_STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
 
-// TILE_GREY overrides TILE_SEPIA
-enum TileBlitFlags {
-	TILE_HALFTRANS = 1,
-	TILE_GREY = 2,
-	TILE_SEPIA = 4
+#define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE|BLIT_STENCIL_DITHER)
+
+class GEM_EXPORT VideoBuffer {
+protected:
+	Region rect;
+
+public:
+	VideoBuffer(const Region& r) : rect(r) {}
+	virtual ~VideoBuffer() {}
+	
+	::GemRB::Size Size() const { return rect.Dimensions(); }
+	Point Origin() const { return rect.Origin(); }
+	Region Rect() const  { return rect; }
+	
+	void SetOrigin(const Point& p) { rect.x = p.x, rect.y = p.y; }
+
+	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
+	virtual void Clear(const Region& rgn) = 0;
+	// CopyPixels takes at least one void* buffer with implied pitch of Region.w, otherwise alternating pairs of buffers and their coresponding pitches
+	virtual void CopyPixels(const Region& bufDest, const void* pixelBuf, const int* pitch = NULL, ...) = 0;
+	
+	virtual bool RenderOnDisplay(void* display) const = 0;
 };
 
-enum CursorType {
-	VID_CUR_UP = 0,
-	VID_CUR_DOWN = 1,
-	VID_CUR_DRAG = 2
-};
-
-//disable mouse flags
-const int MOUSE_GRAYED		= 1;
-const int MOUSE_DISABLED	= 2;
-//used (primarily with touchscreens) to control graphical feedback related to the mouse
-const int MOUSE_HIDDEN		= 4; // show cursor
-const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
-
-// !!! Keep this synchronized with GUIDefines.py !!!
-// used for calculating the tooltip delay limit and the real tooltip delay
-#define TOOLTIP_DELAY_FACTOR 250
+using VideoBufferPtr = std::shared_ptr<VideoBuffer>;
 
 /**
  * @class Video
@@ -89,168 +101,155 @@ const int MOUSE_NO_TOOLTIPS	= 8; // show tooltips
 class GEM_EXPORT Video : public Plugin {
 public:
 	static const TypeID ID;
+
+	enum BufferFormat {
+		DISPLAY, // whatever format the video driver thinks is best for the display
+		DISPLAY_ALPHA, // the same RGB format as DISPLAY, but forces an alpha if DISPLAY doesn't provide one
+		RGBPAL8,	// 8 bit palettized
+		RGB555, // 16 bit RGB (truecolor)
+		RGBA8888, // Standard 8 bits per channel with alpha
+		YV12    // YUV format for BIK videos
+	};
+
 protected:
-	int MouseFlags;
-	short xCorr, yCorr;
+	unsigned long lastTime;
 	EventMgr* EvntManager;
-	Region Viewport;
 	Region screenClip;
-	int width,height,bpp;
+	Size screenSize;
+	int bpp;
 	bool fullscreen;
-	Sprite2D* Cursor[3];// 0=up, 1=down, 2=drag
-	CursorType CursorIndex;
-	Point CursorPos;
 
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
-	//subtitle specific variables
-	Font *subtitlefont;
-	Palette *subtitlepal;
-	Region subtitleregion;
-	Color fadeColor;
-protected:
+
+	typedef std::deque<VideoBuffer*> VideoBuffers;
+
+	// collection of all existing video buffers
+	VideoBuffers buffers;
+	// collection built by calls to PushDrawingBuffer() and cleared after SwapBuffers()
+	// the collection is iterated and drawn in order during SwapBuffers()
+	// Note: we can add the same buffer more than once to drawingBuffers!
+	VideoBuffers drawingBuffers;
+	// the current top of drawingBuffers that draw operations occur on
+	VideoBuffer* drawingBuffer;
+	VideoBufferPtr stencilBuffer = nullptr;
+
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
+	virtual void Wait(unsigned long) = 0;
+	void DestroyBuffer(VideoBuffer*);
+	void DestroyBuffers();
+
+private:
+	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
+	virtual void SwapBuffers(VideoBuffers&)=0;
+	virtual int PollEvents() = 0;
+	virtual int CreateDriverDisplay(const char* title) = 0;
+
+	// the actual drawing implementations
+	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) = 0;
+	virtual void DrawPointImp(const Point&, const Color& color, uint32_t flags) = 0;
+	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) = 0;
+	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) = 0;
+	virtual void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+									   double anglefrom, double angleto, bool drawlines, uint32_t flags) = 0;
+	virtual void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags) = 0;
+	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) = 0;
+	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) = 0;
+	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)=0;
+
 public:
 	Video(void);
-	virtual ~Video(void) {};
+	~Video(void) override;
+
 	virtual int Init(void) = 0;
-	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen, const char* title) = 0;
+
+	int CreateDisplay(const Size&, int bpp, bool fullscreen, const char* title);
 	virtual void SetWindowTitle(const char *title) = 0;
+
 	/** Toggles GemRB between fullscreen and windowed mode. */
 	bool ToggleFullscreenMode();
 	virtual bool SetFullscreenMode(bool set) = 0;
+	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
-	virtual int SwapBuffers(void) = 0;
+	int SwapBuffers(unsigned int fpscap = 30);
+	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = DISPLAY);
+	void PushDrawingBuffer(const VideoBufferPtr&);
+	void PopDrawingBuffer();
+	void SetStencilBuffer(const VideoBufferPtr&);
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
-	virtual short GetWidth() = 0;
-	virtual short GetHeight() = 0;
-	/** Displays or hides a virtual (software) keyboard*/
-	virtual void ShowSoftKeyboard() = 0;
-	virtual void HideSoftKeyboard() = 0;
+	virtual void CaptureMouse(bool enabled) = 0;
+	const Size& GetScreenSize() { return screenSize; }
 
-	void InitSpriteCover(SpriteCover* sc, int flags);
-	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
-	void DestroySpriteCover(SpriteCover* sc);
+	virtual void StartTextInput() = 0;
+	virtual void StopTextInput() = 0;
+	virtual bool InTextInput() = 0;
 
-	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
+	virtual bool TouchInputEnabled() = 0;
+
+	virtual Holder<Sprite2D> CreateSprite(const Region&, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSprite8(int w, int h, void* pixels,
-									Palette* palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreatePalettedSprite(int w, int h, int bpp, void* pixels,
+	virtual Holder<Sprite2D> CreateSprite8(const Region&, void* pixels,
+									PaletteHolder palette, bool cK = false, int index = 0) = 0;
+	virtual Holder<Sprite2D> CreatePalettedSprite(const Region&, int bpp, void* pixels,
 										   Color* palette, bool cK = false, int index = 0) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
+	
+	void BlitSprite(const Holder<Sprite2D> spr, Point p,
+					const Region* clip = NULL);
+	
+	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+							uint32_t flags, Color tint = Color()) = 0;
 
-	virtual void BlitTile(const Sprite2D* spr, const Sprite2D* mask, int x, int y,
-						  const Region* clip, unsigned int flags) = 0;
-	virtual void BlitSprite(const Sprite2D* spr, int x, int y, bool anchor = false,
-							const Region* clip = NULL, Palette* palette = NULL) = 0;
-	virtual void BlitSprite(const Sprite2D* spr, const Region& src, const Region& dst,
-							Palette* pal = NULL) = 0;
+	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
+								uint32_t flags, Color tint = Color()) = 0;
 
-	// Note: Tint cannot be constified, because it is modified locally
-	// not a pretty interface :)
-	virtual void BlitGameSprite(const Sprite2D* spr, int x, int y,
-		unsigned int flags, Color tint,
-		SpriteCover* cover, Palette *palette = NULL,
-		const Region* clip = NULL, bool anchor = false) = 0;
+	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
+								   uint32_t flags, Color tint);
+
+	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
+								 const Color* tint = nullptr) = 0;
+
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
-	virtual Sprite2D* GetScreenshot( Region r ) = 0;
+	virtual Holder<Sprite2D> GetScreenshot(Region r, const VideoBufferPtr& buf = nullptr) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
-	/** this function draws a clipped sprite */
-	virtual void DrawRectSprite(const Region& rgn, const Color& color, const Sprite2D* sprite) = 0;
-	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
-	virtual void GetPixel(short x, short y, Color& color) = 0;
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
+
+	void DrawPoint(const Point&, const Color& color, uint32_t flags = 0);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
+
 	/** Draws a circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
+	void DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags = 0);
 	/** Draws an Ellipse Segment */
-	virtual void DrawEllipseSegment(short cx, short cy, unsigned short xr, unsigned short yr, const Color& color,
-		double anglefrom, double angleto, bool drawlines = true, bool clipped = true) = 0;
+	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+									double anglefrom, double angleto, bool drawlines = true, uint32_t flags = 0);
 	/** Draws an ellipse */
-	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
-		unsigned short yr, const Color& color, bool clipped = true) = 0;
+	void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags = 0);
 	/** Draws a polygon on the screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color,
-		bool fill = false) = 0;
+	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, uint32_t flags = 0);
 	/** Draws a line segment */
-	virtual void DrawLine(short x1, short y1, short x2, short y2,
-		const Color& color, bool clipped = false) = 0;
-	/** Blits a Sprite filling the Region */
-	void BlitTiled(Region rgn, const Sprite2D* img, bool anchor = false);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags = 0);
+	void DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Flips sprite vertically, returns new sprite */
-	Sprite2D *MirrorSpriteVertical(const Sprite2D *sprite, bool MirrorAnchor);
-	/** Flips sprite horizontally, returns new sprite */
-	Sprite2D *MirrorSpriteHorizontal(const Sprite2D *sprite, bool MirrorAnchor);
-	/** Duplicates and transforms sprite to have an alpha channel */
-	Sprite2D* CreateAlpha(const Sprite2D *sprite);
+	/** Flips sprite, returns new sprite */
+	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor);
 
-	/** Converts a Screen Coordinate to a Game Coordinate */
-	virtual void ConvertToGame(short& x, short& y) = 0;
-	/** Converts a Game Coordinate to a Screen Coordinate */
-	virtual void ConvertToScreen(short& x, short& y) = 0;
-	/** Sets the Fading Color */
-	virtual void SetFadeColor(int r, int g, int b) = 0;
-	/** Sets the Fading to Color Percentage */
-	virtual void SetFadePercent(int percent) = 0;
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
 	const Region& GetScreenClip() { return screenClip; }
-	/** returns the current mouse coordinates */
-	void GetMousePos(int &x, int &y);
-	/** clicks the mouse forcibly */
-	virtual void ClickMouse(unsigned int button) = 0;
-	/** moves the mouse forcibly */
-	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
-	/** is a touchscreen available or being used? */
-	virtual bool TouchInputEnabled() const = 0;
-	/** initializes the screen for movie */
-	virtual void InitMovieScreen(int &w, int &h, bool yuv=false) = 0;
-	/** called when a video player is done. clean up any video specific resources.  */
-	virtual void DestroyMovieScreen() = 0;
-	/** sets the font and color of the movie subtitles */
-	void SetMovieFont(Font *stfont, Palette *pal);
-	/** draws a movie frame */
-	virtual void showFrame(unsigned char* buf, unsigned int bufw,
-		unsigned int bufh, unsigned int sx, unsigned int sy,
-		unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty, int truecolor, unsigned char *palette,
-		ieDword titleref) = 0;
-	virtual void showYUVFrame(unsigned char** buf, unsigned int *strides,
-		unsigned int bufw, unsigned int bufh,
-		unsigned int w, unsigned int h,
-		unsigned int dstx, unsigned int dsty,
-		ieDword titleref) = 0;
-	virtual void DrawMovieSubtitle(ieStrRef text) = 0;
-	/** handles events during movie */
-	virtual int PollMovieEvents() = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
-	void SetMouseEnabled(int enabled);
-	void SetMouseGrayed(bool grayed);
-	bool GetFullscreenMode() const;
-	/** Sets the mouse cursor sprite to be used for mouseUp, mouseDown, and mouseDrag. See VID_CUR_* defines. */
-	void SetCursor(Sprite2D* cur, enum CursorType curIdx);
-
 	/** Scales down a sprite by a ratio */
-	Sprite2D* SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio );
+	Holder<Sprite2D> SpriteScaleDown(const Holder<Sprite2D> sprite, unsigned int ratio);
 	/** Creates an ellipse or circle shaped sprite with various intensity
 	 *  for projectile light spots */
-	Sprite2D* CreateLight(int radius, int intensity);
+	Holder<Sprite2D> CreateLight(int radius, int intensity);
 
-	Color SpriteGetPixelSum (const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
-	Region GetViewport(void) const;
-	void SetViewport(int x, int y, unsigned int w, unsigned int h);
-	void MoveViewportTo(int x, int y);
-
-	virtual void DrawBackgroundBuffer() = 0;
-	virtual void FreeBackgroundBuffer() = 0;
-	virtual void TakeBackgroundBuffer() = 0;
+	Color SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 };
 
 }

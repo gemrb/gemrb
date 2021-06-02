@@ -53,20 +53,13 @@ def DisplayRaces():
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RacialEnemyTable, RaceCount, TopIndex
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(RaceWindow):
-			RaceWindow.Unload()
-			RaceWindow = None
-		return
 	
 	GemRB.SetVar ("HatedRace",0)
 	
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceWindow = GemRB.LoadWindow(15)
+	RaceWindow = GemRB.LoadWindow(15, "GUICG")
 	RacialEnemyTable = GemRB.LoadTable(TableName)
 	RaceCount = RacialEnemyTable.GetRowCount()-LISTSIZE
 	if RaceCount<0:
@@ -81,7 +74,7 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = RaceWindow.GetControl(11)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = RaceWindow.GetControl(8)
@@ -93,7 +86,7 @@ def OnLoad():
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(RaceWindow))
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	DisplayRaces()
 	return
@@ -106,6 +99,7 @@ def RacePress():
 	return
 
 def NextPress():
+	RaceWindow.Close ()
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
 	CharGenCommon.next()

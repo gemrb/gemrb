@@ -30,6 +30,7 @@ import GUIRECCommon
 import IDLUCommon
 import LUCommon
 from GUIDefines import *
+from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
 from ie_stats import *
 from ie_restype import *
 from ie_feats import FEAT_ARMORED_ARCANA
@@ -41,13 +42,9 @@ DescTable = None
 RecordsWindow = None
 RecordsTextArea = None
 InformationWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
+
 BonusSpellTable = None
 HateRaceTable = None
-PauseState = None
 
 if not BonusSpellTable:
 	BonusSpellTable = GemRB.LoadTable ("mxsplbon")
@@ -64,57 +61,11 @@ def Exportable(pc):
 	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
 	return True
 
-def OpenRecordsWindow ():
-	global RecordsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow, SelectWindow
-	global BonusSpellTable, HateRaceTable, PauseState
+def InitRecordsWindow (Window):
+	global RecordsWindow, SelectWindow
+	global BonusSpellTable, HateRaceTable
 
-	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-
-		GUIRECCommon.CloseSubSubCustomizeWindow ()
-		GUIRECCommon.CloseSubCustomizeWindow ()
-		GUIRECCommon.CloseCustomizeWindow ()
-		GUIRECCommon.ExportCancelPress()
-		GUIRECCommon.CloseBiographyWindow ()
-		CloseHelpWindow ()
-
-		if RecordsWindow:
-			RecordsWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		RecordsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		GemRB.GamePause (PauseState, 3)
-		return
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIREC", 800, 600)
-	RecordsWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
-	Window.SetFrame ()
-
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
+	RecordsWindow = Window
 
 	#portrait icon
 	Button = Window.GetControl (2)
@@ -148,53 +99,53 @@ def OpenRecordsWindow ():
 	Button.SetTooltip (40316)
 	Button.SetVarAssoc ("SelectWindow", 1)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#weapons and armour
 	Button = Window.GetControl (61)
 	Button.SetTooltip (40317)
 	Button.SetVarAssoc ("SelectWindow", 2)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#skills and feats
 	Button = Window.GetControl (62)
 	Button.SetTooltip (40318)
 	Button.SetVarAssoc ("SelectWindow", 3)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#miscellaneous
 	Button = Window.GetControl (63)
 	Button.SetTooltip (33500)
 	Button.SetVarAssoc ("SelectWindow", 4)
 	Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateRecordsWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: UpdateRecordsWindow(Window))
 
 	#level up
 	Button = Window.GetControl (37)
 	Button.SetText (7175)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLevelUpWindow)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
-
-	UpdateRecordsWindow ()
 	return
 
 def ColorDiff (Window, Label, diff):
+	Color = {'r' : 0, 'g' : 0, 'b' : 0}
 	if diff>0:
-		Label.SetTextColor (0, 255, 0)
+		Color['g'] = 255
 	elif diff<0:
-		Label.SetTextColor (255, 0, 0)
+		Color['r'] = 255
 	else:
-		Label.SetTextColor (255, 255, 255)
+		Color = {'r' : 255, 'g' : 255, 'b' : 255}
+
+	Label.SetTextColor (Color)
 	return
 
 def ColorDiff2 (Window, Label, diff):
 	if diff:
-		Label.SetTextColor (255, 255, 0)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	else:
-		Label.SetTextColor (255, 255, 255)
+		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	return
 
 def GetBonusSpells (pc):
@@ -945,10 +896,8 @@ def DisplayMisc (pc):
 
 	return
 
-def UpdateRecordsWindow ():
+def UpdateRecordsWindow (Window):
 	global RecordsTextArea
-
-	Window = RecordsWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -958,7 +907,7 @@ def UpdateRecordsWindow ():
 
 	#portrait
 	Button = Window.GetControl (2)
-	Button.SetPicture (GemRB.GetPlayerPortrait (pc,0))
+	Button.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"])
 
 	# armorclass
 	Label = Window.GetControl (0x10000028)
@@ -1054,6 +1003,7 @@ def UpdateRecordsWindow ():
 
 	RecordsTextArea = Window.GetControl (45)
 	RecordsTextArea.SetText ("")
+	RecordsTextArea.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
 
 	DisplayCommon (pc)
 
@@ -1069,15 +1019,17 @@ def UpdateRecordsWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GUICommon.AdjustWindowVisibility (Window, pc, 0)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
+
 	return
+
+ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
 
 def CloseHelpWindow ():
 	global DescTable, InformationWindow
 
 	if InformationWindow:
-		InformationWindow.Unload ()
+		InformationWindow.Close ()
 		InformationWindow = None
 	if DescTable:
 		DescTable = None
@@ -1129,26 +1081,26 @@ def UpdateHelpWindow ():
 		#Button = Window.GetControl (i+27)
 		Label = Window.GetControl (i+0x10000004)
 		if Topic==i:
-			Label.SetTextColor (255,255,0)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor (255,255,255)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 	resource = HelpTable.GetValue (Topic, 1)
 	if DescTable:
 		DescTable = None
 
-	DescTable = GemRB.LoadTable (resource)
-
-	ScrollBar = Window.GetControl (4)
+	if resource:
+		DescTable = GemRB.LoadTable (resource)
 
 	startrow = HelpTable.GetValue (Topic, 4)
 	if startrow<0:
 		i=-startrow-10
-	else:
+	elif DescTable:
 		i = DescTable.GetRowCount ()-10-startrow
 
 	if i<1: i=1
 
+	ScrollBar = Window.GetControl (4)
 	ScrollBar.SetVarAssoc ("TopIndex", i)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RefreshHelpWindow)
 
@@ -1167,16 +1119,15 @@ def RefreshHelpWindow ():
 	if startrow<0: startrow = 0
 
 	for i in range(11):
-		title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
-
 		Button = Window.GetControl (i+71)
 		Label = Window.GetControl (i+0x10000030)
 
 		if i+TopIndex==Selected:
-			Label.SetTextColor (255,255,0)
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Label.SetTextColor (255,255,255)
-		if title>0:
+			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		if DescTable:
+			title = DescTable.GetValue (i+startrow+TopIndex, titlecol)
 			Label.SetText (title)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetVarAssoc ("Selected", i+TopIndex)
@@ -1185,7 +1136,7 @@ def RefreshHelpWindow ():
 			Label.SetText ("")
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 
-	if Selected<0:
+	if Selected<0 or DescTable == None:
 		desc=""
 	else:
 		desc = DescTable.GetValue (Selected+startrow, desccol)
@@ -1229,7 +1180,7 @@ def OpenLevelUpWindow ():
 	Button.SetText (36789)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLUKitWindow)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault ()
 
 	# static Class selection
 	#Label = Window.GetControl (0x10000000)
@@ -1273,7 +1224,6 @@ def OpenLevelUpWindow ():
 	Button = Window.GetControl (27)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLUWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
 
 	Window.ShowModal (MODAL_SHADOW_NONE)
 
@@ -1395,7 +1345,7 @@ def OpenLUKitWindow ():
 	Button.SetText (36789)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LUNextPress)
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault ()
 
 	# 1 does not exist, 2-10 are kit buttons
 	# 11 scrollbar, 12 back
@@ -1519,9 +1469,7 @@ def FinishLevelUp():
 	GemRB.SetVar ("LevelDiff", 0)
 	GemRB.SetVar ("LUClass", -1)
 	GemRB.SetVar ("LUKit", 0)
-	# DisplayGeneral (pc) is not enough for a refresh refresh
-	OpenRecordsWindow ()
-	OpenRecordsWindow ()
+
 
 ###################################################
 # End of file GUIREC.py

@@ -18,6 +18,7 @@
 #
 #character generation, spells (GUISPL2)
 import GemRB
+import CharOverview
 import CommonTables
 import GUICommon
 import LUSpellSelection

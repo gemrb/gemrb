@@ -37,9 +37,9 @@ private:
 
 public:
 	PROImporter(void);
-	~PROImporter(void);
-	bool Open(DataStream* stream);
-	Projectile* GetProjectile(Projectile *s);
+	~PROImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Projectile* GetProjectile(Projectile *s) override;
 private:
 	void GetAreaExtension(ProjectileExtension *s);
 };

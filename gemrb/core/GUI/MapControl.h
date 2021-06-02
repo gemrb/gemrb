@@ -26,18 +26,15 @@
 #ifndef MAPCONTROL_H
 #define MAPCONTROL_H
 
+#include "AnimationFactory.h"
 #include "GUI/Control.h"
 
 #include "exports.h"
-#include "Interface.h"
 
 namespace GemRB {
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_MAP_ON_PRESS     	0x09000000
-#define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000005
-#define IE_GUI_MAP_ON_DOUBLE_PRESS	0x09000008
-
+class Map;
+class MapNote;
 
 /**
  * @class MapControl
@@ -46,63 +43,55 @@ namespace GemRB {
  */
 
 class GEM_EXPORT MapControl : public Control {
-protected:
-	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
-	void DrawFog(const Region& rgn) const;
+private:
+	Region mosRgn;
+	Point notePos;
+
+	AnimationFactory* flags;
+	
 public:
-	int ScrollX, ScrollY;
-	int NotePosX, NotePosY;
-	unsigned short lastMouseX, lastMouseY;
-	bool mouseIsDown;
-	bool convertToGame;
 	// Small map bitmap
-	Sprite2D* MapMOS;
+	Holder<Sprite2D> MapMOS;
 	// current map
-	Map *MyMap;
-	// map flags
-	Sprite2D *Flag[8];
+	Map* MyMap = nullptr;
 	// The MapControl can set the text of this label directly
-	Control *LinkedLabel;
-	// Size of big map (area) in pixels
-	short MapWidth, MapHeight;
-	// Size of area viewport. FIXME: hack!
-	short ViewWidth, ViewHeight;
-	short XCenter, YCenter;
-	ControlEventHandler MapControlOnPress;
-	ControlEventHandler MapControlOnRightPress;
-	ControlEventHandler MapControlOnDoublePress;
+	Control* LinkedLabel = nullptr;
 
-	MapControl(const Region& frame);
-	~MapControl(void);
+	MapControl(const Region& frame, AnimationFactory* af);
 
-	bool NeedsDraw() const {return true;}
 	/** Refreshes the control after its associated variable has changed */
-	void UpdateState(unsigned int Sum);
-	/** Compute parameters after changes in control's or screen geometry */
-	void Realize();
+	void UpdateState(unsigned int Sum) override;
+	bool IsAnimated() const override { return true; } // map must constantly update actor positions
 
-	/** Key Press Event */
-	//void OnKeyPress(unsigned char Key, unsigned short Mod);
-	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Mouse Leave Event */
-	void OnMouseLeave(unsigned short x, unsigned short y);
-	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
 private:
 	/** Call event handler on click */
-	void ClickHandle(unsigned short Button);
+	void ClickHandle(const MouseEvent&);
 	/** Move viewport */
-	void ViewHandle(unsigned short x, unsigned short y);
+	void UpdateViewport(Point p);
+	void UpdateCursor();
+	void UpdateMap();
+
+	const MapNote* MapNoteAtPoint(const Point& p) const;
+
+	Region GetViewport() const;
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawFog(const Region& rgn) const;
+	
+	Point ConvertPointToGame(Point) const;
+	Point ConvertPointFromGame(Point) const;
+	
+protected:
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
+	/** Mouse Over Event */
+	bool OnMouseOver(const MouseEvent&) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 };
 
 }

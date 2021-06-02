@@ -36,8 +36,6 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
-#define PALSIZE 8
-static Color ActorColor[PALSIZE];
 static const wchar_t* DisplayFormatName = L"[color=%06X]%ls - [/color][p][color=%06X]%ls[/color][/p]";
 static const wchar_t* DisplayFormatAction = L"[color=%06X]%ls - [/color][p][color=%06X]%ls %ls[/color][/p]";
 static const wchar_t* DisplayFormat = L"[p][color=%06X]%ls[/color][/p]";
@@ -91,7 +89,7 @@ ieStrRef DisplayMessage::GetStringReference(size_t idx)
 
 bool DisplayMessage::HasStringReference(size_t idx)
 {
-	return DisplayMessage::SRefs[idx] != (ieStrRef)-1;
+	return DisplayMessage::SRefs[idx] != ieStrRef(-1);
 }
 
 
@@ -131,14 +129,16 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			string = StringFromCString(speaker->GetName(-1));
-			core->GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR) & 0xFF, PALSIZE, ActorColor );
-			// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
-			if (ActorColor[4].r + ActorColor[4].g + ActorColor[4].b < 75) {
-				ActorColor[4].r = 75;
-				ActorColor[4].g = 75;
-				ActorColor[4].b = 75;
+			{
+				auto pal16 = core->GetPalette16( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
+				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
+				if (pal16[4].r + pal16[4].g + pal16[4].b < 75) {
+					pal16[4].r = 75;
+					pal16[4].g = 75;
+					pal16[4].b = 75;
+				}
+				speaker_color = (pal16[4].r<<16) | (pal16[4].g<<8) | pal16[4].b;
 			}
-			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER:
 		case ST_PROXIMITY:
@@ -176,14 +176,14 @@ void DisplayMessage::DisplayString(int stridx, unsigned int color, ieDword flags
 
 }
 
-void DisplayMessage::DisplayString(const String& text, unsigned int color, Scriptable *target) const
+void DisplayMessage::DisplayString(const String& text, unsigned int pixel, Scriptable *target) const
 {
 	if (!text.length()) return;
 
 	Label *l = core->GetMessageLabel();
 	if (l) {
-		const Color fore = { (ieByte)((color >> 16) & 0xFF), (ieByte)((color >> 8) & 0xFF), (ieByte)(color & 0xFF), (ieByte)((color >> 24) & 0xFF)};
-		l->SetColor( fore, ColorBlack );
+		const Color color(ieByte((pixel >> 16) & 0xFF), ieByte((pixel >> 8) & 0xFF), ieByte(pixel & 0xFF), ieByte((pixel >> 24) & 0xFF));
+		l->SetColors(color, ColorBlack);
 		l->SetText(text);
 	}
 
@@ -191,7 +191,7 @@ void DisplayMessage::DisplayString(const String& text, unsigned int color, Scrip
 	if (ta) {
 		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );
-		swprintf(newstr, newlen, DisplayFormat, color, text.c_str());
+		swprintf(newstr, newlen, DisplayFormat, pixel, text.c_str());
 		DisplayMarkupString( newstr );
 		free( newstr );
 	}

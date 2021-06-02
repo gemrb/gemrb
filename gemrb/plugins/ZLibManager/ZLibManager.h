@@ -28,11 +28,11 @@ namespace GemRB {
 class ZLibManager : public Compressor {
 public:
 	ZLibManager(void);
-	~ZLibManager(void);
+	~ZLibManager(void) override;
 	// ZLib Decompression Routine
-	int Decompress(DataStream* dest, DataStream* source, unsigned int size_guess) const;
+	int Decompress(DataStream* dest, DataStream* source, unsigned int size_guess) const override;
 	// ZLib Compression
-	int Compress(DataStream* dest, DataStream* source) const;
+	int Compress(DataStream* dest, DataStream* source) const override;
 };
 
 }

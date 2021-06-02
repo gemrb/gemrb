@@ -20,9 +20,10 @@
 #include "GUI/WorldMapControl.h"
 
 #include "ie_cursors.h"
+#include "strrefs.h"
 
+#include "DisplayMessage.h"
 #include "Game.h"
-#include "GameData.h"
 #include "Interface.h"
 #include "WorldMap.h"
 #include "GUI/EventMgr.h"
@@ -31,20 +32,15 @@
 
 namespace GemRB {
 
-#define MAP_TO_SCREENX(x) XWin - ScrollX + (x)
-#define MAP_TO_SCREENY(y) YWin - ScrollY + (y)
-
-WorldMapControl::WorldMapControl(const Region& frame, const char *font, int direction)
-	: Control(frame)
+WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited)
+	: Control(frame), ftext(font)
 {
+	color_normal = normal;
+	color_selected = selected;
+	color_notvisited = notvisited;
+	
 	ControlType = IE_GUI_WORLDMAP;
-	ScrollX = 0;
-	ScrollY = 0;
-	MouseIsDown = false;
-	lastMouseX = lastMouseY = 0;
-	lastCursor = 0;
-	Area = NULL;
-	Value = direction;
+	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	OverrideIconPalette = false;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
@@ -56,171 +52,132 @@ WorldMapControl::WorldMapControl(const Region& frame, const char *font, int dire
 	}
 
 	//if there is no trivial area, look harder
-	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) && 
+	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) &&
 		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
 		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
 			CopyResRef(currentArea, m->AreaResRef);
 		}
 	}
-
-	//this also updates visible locations
-	worldmap->CalculateDistances(currentArea, Value);
+		
+	ControlEventHandler handler = [this](Control* /*this*/) {
+		//this also updates visible locations
+		WorldMap* worldmap = core->GetWorldMap();
+		worldmap->CalculateDistances(currentArea, GetValue());
+	};
 	
-	// alpha bit is unfortunately ignored
-	if (font[0]) {
-		ftext = core->GetFont(font);
-	} else {
-		ftext = NULL;
-	}
-
-	// initialize label colors
-	// NOTE: it would be better to initialize these colors from
-	//   some 2da file
-	Color normal = { 0xf0, 0xf0, 0xf0, 0xff };
-	Color selected = { 0xf0, 0x80, 0x80, 0xff };
-	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
-	Color black = { 0x00, 0x00, 0x00, 0x00 };
-
-	pal_normal = new Palette ( normal, black );
-	pal_selected = new Palette ( selected, black );
-	pal_notvisited = new Palette ( notvisited, black );
-
-
-	ResetEventHandler( WorldMapControlOnPress );
-	ResetEventHandler( WorldMapControlOnEnter );
+	SetAction(handler, Control::ValueChange);
 }
 
-WorldMapControl::~WorldMapControl(void)
-{
-	//Video *video = core->GetVideoDriver();
-
-	gamedata->FreePalette( pal_normal );
-	gamedata->FreePalette( pal_selected );
-	gamedata->FreePalette( pal_notvisited );
-}
+WorldMapControl::WorldMapControl(const Region& frame, Font *font)
+: WorldMapControl(frame, font,
+				  Color(0xf0, 0xf0, 0xf0, 0xff),
+				  Color(0xf0, 0x80, 0x80, 0xff),
+				  Color(0x80, 0x80, 0xf0, 0xff))
+{}
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::DrawInternal(Region& rgn)
+void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
+	auto MapToScreen = [&rgn, this](const Point& p) {
+		return rgn.Origin() - Pos + p;
+	};
+	
 	WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
-	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
+	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
 
-	unsigned int i;
 	unsigned int ec = worldmap->GetEntryCount();
-	for(i=0;i<ec;i++) {
+	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
-		int xOffs = MAP_TO_SCREENX(m->X);
-		int yOffs = MAP_TO_SCREENY(m->Y);
-		Sprite2D* icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
-		if( icon ) {
+		Point offset = MapToScreen(m->pos);
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
-				Palette *pal = icon->GetPalette();
-				icon->SetPalette(pal_selected);
-				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
-				icon->SetPalette(pal);
-				pal->release();
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD, color_selected);
 			} else {
-				video->BlitSprite( icon, xOffs, yOffs, true, &rgn );
+				video->BlitSprite( icon, offset);
 			}
-			Sprite2D::FreeSprite( icon );
 		}
 
 		if (AnimPicture && (!strnicmp(m->AreaResRef, currentArea, 8)
 			|| !strnicmp(m->AreaName, currentArea, 8))) {
-			video->BlitSprite( AnimPicture, xOffs, yOffs, true, &rgn );
+			video->BlitSprite(AnimPicture, offset);
 		}
 	}
 
-	// Draw WMP entry labels
-	if (ftext==NULL) {
-		return;
-	}
-	for(i=0;i<ec;i++) {
+	// draw labels in separate pass, so icons don't overlap them
+	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		Sprite2D *icon=m->GetMapIcon(worldmap->bam, OverrideIconPalette);
-		int h=0,w=0,xpos=0,ypos=0;
-		if (icon) {
-			h=icon->Height;
-			w=icon->Width;
-			xpos=icon->XPos;
-			ypos=icon->YPos;
-			Sprite2D::FreeSprite( icon );
-		}
-
-		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
-		if (!m->GetCaption())
+		const String* caption = m->GetCaption();
+		if (ftext == nullptr || caption == nullptr)
 			continue;
 
-		Palette* text_pal = pal_normal;
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		if (!icon) continue;
+		const Region& icon_frame = icon->Frame;
+		Point p = m->pos - icon_frame.Origin();
+		Region r2 = Region(MapToScreen(p), icon_frame.Dimensions());
 		
+		Font::PrintColors colors;
 		if (Area == m) {
-			text_pal = pal_selected;
+			colors.fg = color_selected;
+		} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+			colors.fg = color_notvisited;
 		} else {
-			if (! (m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				text_pal = pal_notvisited;
-			}
+			colors.fg = color_normal;
 		}
+		
+		colors.bg = ColorBlack;
 
-		Size ts = ftext->StringSize(*m->GetCaption());
+		Size ts = ftext->StringSize(*caption);
 		ts.w += 10;
-		ftext->Print( Region( Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts ),
-					 *m->GetCaption(), text_pal, 0 );
+		ftext->Print(Region(Point(r2.x + (r2.w - ts.w)/2, r2.y + r2.h), ts),
+					 *caption, 0, colors);
 	}
 }
 
-void WorldMapControl::AdjustScrolling(short x, short y)
+void WorldMapControl::ScrollDelta(const Point& delta)
 {
-	WorldMap* worldmap = core->GetWorldMap();
-	if (x || y) {
-		ScrollX += x;
-		ScrollY += y;
-	} else {
-		//center worldmap on current area
-		unsigned entry;
+	ScrollTo(Pos + delta);
+}
 
-		WMPAreaEntry *m = worldmap->GetArea(currentArea,entry);
-		if (m) {
-			ScrollX = m->X - Width/2;
-			ScrollY = m->Y - Height/2;
+void WorldMapControl::ScrollTo(const Point& pos)
+{
+	Pos = pos;
+	WorldMap* worldmap = core->GetWorldMap();
+	Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
+
+	if (pos.isnull()) {
+		// center worldmap on current area
+		unsigned entry;
+		const WMPAreaEntry *areaEntry = worldmap->GetArea(currentArea, entry);
+		if (areaEntry) {
+			Pos.x = areaEntry->pos.x - frame.w / 2;
+			Pos.y = areaEntry->pos.y - frame.h / 2;
 		}
 	}
-	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - Width)
-		ScrollX = MapMOS->Width - Width;
-	if (ScrollY > MapMOS->Height - Height)
-		ScrollY = MapMOS->Height - Height;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
+
+	int maxx = MapMOS->Frame.w - frame.w;
+	int maxy = MapMOS->Frame.h - frame.h;
+	Pos.x = Clamp<int>(Pos.x, 0, maxx);
+	Pos.y = Clamp<int>(Pos.y, 0, maxy);
+
 	MarkDirty();
-	Area = NULL;
 }
 
 /** Mouse Over Event */
-void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
+bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
-	WorldMap* worldmap = core->GetWorldMap();
-	lastCursor = IE_CURSOR_GRAB;
-
-	if (MouseIsDown) {
-		AdjustScrolling(lastMouseX-x, lastMouseY-y);
-	}
-
-	lastMouseX = x;
-	lastMouseY = y;
-
-	if (Value!=(ieDword) -1) {
-		x =(ieWord) (x + ScrollX);
-		y =(ieWord) (y + ScrollY);
+	if (GetValue() != ieDword(-1)) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
+		WorldMap* worldmap = core->GetWorldMap();
+		Point p = ConvertPointFromScreen(me.Pos());
+		Point mapOff = p + Pos;
 
 		WMPAreaEntry *oldArea = Area;
 		Area = NULL;
@@ -234,184 +191,111 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				continue; //invisible or inaccessible
 			}
 
-			Sprite2D *icon=ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
-			int h=0, w=0, iconx=0, icony=0;
+			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
+			Region rgn(ae->pos, Size());
 			if (icon) {
-				h=icon->Height;
-				w=icon->Width;
-				iconx = icon->XPos;
-				icony = icon->YPos;
-				Sprite2D::FreeSprite( icon );
+				rgn.x -= icon->Frame.x;
+				rgn.y -= icon->Frame.y;
+				rgn.w = icon->Frame.w;
+				rgn.h = icon->Frame.h;
 			}
 			if (ftext && ae->GetCaption()) {
 				Size ts = ftext->StringSize(*ae->GetCaption());
 				ts.w += 10;
-				if(h < ts.h)
-					h = ts.h;
-				if(w < ts.w)
-					w = ts.w;
+				if(rgn.h < ts.h)
+					rgn.h = ts.h;
+				if(rgn.w < ts.w)
+					rgn.w = ts.w;
 			}
-			if (ae->X - iconx > x) continue;
-			if (ae->X - iconx + w < x) continue;
-			if (ae->Y - icony > y) continue;
-			if (ae->Y - icony + h < y) continue;
-			lastCursor = IE_CURSOR_NORMAL;
+			if (!rgn.PointInside(mapOff)) continue;
+
+			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 			Area=ae;
 			if(oldArea!=ae) {
-				RunEventHandler(WorldMapControlOnEnter);
+				String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
+				int hours = worldmap->GetDistance(Area->AreaName);
+				if (str && !str->empty() && hours >= 0) {
+					wchar_t dist[10];
+					swprintf(dist, 10, L": %d", hours);
+					SetTooltip(*str + dist);
+					delete str;
+				}
 			}
 			break;
 		}
+		if (Area == NULL) {
+			SetTooltip(L"");
+		}
 	}
-
-	Owner->Cursor = lastCursor;
+	return true;
 }
 
-/** Sets the tooltip to be displayed on the screen now */
-void WorldMapControl::DisplayTooltip()
+bool WorldMapControl::OnMouseDrag(const MouseEvent& me)
 {
-	if (Area) {
-		int x = Owner->XPos+XPos+lastMouseX;
-		int y = Owner->YPos+YPos+lastMouseY-50;
-		core->DisplayTooltip( x, y, this );
-	} else {
-		core->DisplayTooltip( 0, 0, NULL );
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		ScrollDelta(me.Delta());
 	}
+	return true;
 }
 
 /** Mouse Leave Event */
-void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
+void WorldMapControl::OnMouseLeave(const MouseEvent& me, const DragOp* op)
 {
-	Owner->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;
+	Control::OnMouseLeave(me, op);
 }
 
 /** Mouse Button Down */
-void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short /*Mod*/)
+bool WorldMapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	switch(Button) {
-	case GEM_MB_ACTION:
-		MouseIsDown = true;
-		lastMouseX = x;
-		lastMouseY = y;
-		break;
-	case GEM_MB_SCRLUP:
-		OnSpecialKeyPress(GEM_UP);
-		break;
-	case GEM_MB_SCRLDOWN:
-		OnSpecialKeyPress(GEM_DOWN);
-		break;
+	if (me.button == GEM_MB_ACTION) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB+1]);
 	}
+	return true;
 }
+
 /** Mouse Button Up */
-void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned short Button, unsigned short /*Mod*/)
+bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
-	if (!(Button & GEM_MB_ACTION)) {
-		return;
+	if (me.button == GEM_MB_ACTION) {
+		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
+        Control::OnMouseUp(me, Mod);
 	}
-	MouseIsDown = false;
-	if (lastCursor==IE_CURSOR_NORMAL) {
-		RunEventHandler( WorldMapControlOnPress );
-	}
+	return true;
 }
 
 /** Mouse wheel scroll */
-void WorldMapControl::OnMouseWheelScroll(short x, short y)
+bool WorldMapControl::OnMouseWheelScroll(const Point& delta)
 {
-	ScrollX += x;
-	ScrollY += y;
-	
-	WorldMap* worldmap = core->GetWorldMap();
-	Sprite2D *MapMOS = worldmap->GetMapMOS();
-	if (ScrollX > MapMOS->Width - Width)
-		ScrollX = MapMOS->Width - Width;
-	if (ScrollY > MapMOS->Height - Height)
-		ScrollY = MapMOS->Height - Height;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
+	// Game coordinates start at the top left to the bottom right
+	// so we need to invert the 'y' axis
+	Point d = delta;
+	d.y *= -1;
+	ScrollDelta(d);
+	return true;
 }
 
-/** Special Key Press */
-bool WorldMapControl::OnSpecialKeyPress(unsigned char Key)
+bool WorldMapControl::OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/)
 {
 	ieDword keyScrollSpd = 64;
 	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
+	switch (Key.keycode) {
 		case GEM_LEFT:
-			OnMouseWheelScroll(keyScrollSpd * -1, 0);
+			OnMouseWheelScroll(Point(keyScrollSpd * -1, 0));
 			break;
 		case GEM_UP:
-			OnMouseWheelScroll(0, keyScrollSpd * -1);
+			OnMouseWheelScroll(Point(0, keyScrollSpd * -1));
 			break;
 		case GEM_RIGHT:
-			OnMouseWheelScroll(keyScrollSpd, 0);
+			OnMouseWheelScroll(Point(keyScrollSpd, 0));
 			break;
 		case GEM_DOWN:
-			OnMouseWheelScroll(0, keyScrollSpd);
+			OnMouseWheelScroll(Point(0, keyScrollSpd));
 			break;
 		default:
 			return false;
 	}
 	return true;
-}
-
-bool WorldMapControl::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_WORLDMAP_ON_PRESS:
-		WorldMapControlOnPress = handler;
-		break;
-	case IE_GUI_MOUSE_ENTER_WORLDMAP:
-		WorldMapControlOnEnter = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
-}
-
-void WorldMapControl::SetColor(int which, Color color)
-{
-	Palette* pal;
-	// FIXME: clearly it can cause palettes to be re-created several times,
-	//   because setting background color creates all palettes anew.
-	switch (which) {
-	case IE_GUI_WMAP_COLOR_BACKGROUND:
-		pal = new Palette( pal_normal->front, color );
-		gamedata->FreePalette( pal_normal );
-		pal_normal = pal;
-		pal = new Palette( pal_selected->front, color );
-		gamedata->FreePalette( pal_selected );
-		pal_selected = pal;
-		pal = new Palette( pal_notvisited->front, color );
-		gamedata->FreePalette( pal_notvisited );
-		pal_notvisited = pal;
-		break;
-	case IE_GUI_WMAP_COLOR_NORMAL:
-		pal = new Palette( color, pal_normal->back );
-		gamedata->FreePalette( pal_normal );
-		pal_normal = pal;
-		break;
-	case IE_GUI_WMAP_COLOR_SELECTED:
-		pal = new Palette( color, pal_selected->back );
-		gamedata->FreePalette( pal_selected );
-		pal_selected = pal;
-		break;
-	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		pal = new Palette( color, pal_notvisited->back );
-		gamedata->FreePalette( pal_notvisited );
-		pal_notvisited = pal;
-		break;
-	default:
-		break;
-	}
-
-	MarkDirty();
 }
 
 }

@@ -52,6 +52,22 @@ namespace GemRB {
 
 //// Globally used functions
 
+double AngleFromPoints(const Point& p1, const Point& p2)
+{
+	double xdiff = p1.x - p2.x;
+	double ydiff = p1.y - p2.y;
+
+	double angle = std::atan2(ydiff, xdiff);
+	return angle;
+}
+
+Point RotatePoint(const Point& p, double angle)
+{
+	int newx = p.x * std::cos(angle) - p.y * std::sin(angle);
+	int newy = p.x * std::sin(angle) + p.y * std::cos(angle);
+	return Point(newx, newy);
+}
+
 static const unsigned char orientations[25]={
 6,7,8,9,10,
 5,6,8,10,11,
@@ -318,13 +334,6 @@ int EARelation(const Scriptable* Owner, const Actor* target)
 bool Schedule(ieDword schedule, ieDword time)
 {
 	return (schedule & SCHEDULE_MASK(time)) != 0;
-}
-
-// safely copies a ResRef (ie. nulls out the unused buffer size)
-void CopyResRef(ieResRef d, const ieResRef s)
-{
-	strncpy(d, s, sizeof(ieResRef) - 1);
-	d[sizeof(ieResRef) - 1] = '\0';
 }
 
 }

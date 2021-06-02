@@ -25,7 +25,8 @@
 
 #include "Region.h"
 
-#include <list>
+#include <memory>
+#include <vector>
 
 namespace GemRB {
 
@@ -36,17 +37,25 @@ public:
 };
 
 class GEM_EXPORT Gem_Polygon {
+	std::vector<Trapezoid> ComputeTrapezoids() const;
+	void RecalcBBox();
+	void Rasterize();
+
 public:
-	Gem_Polygon(Point* points, unsigned int count, Region *bbox = NULL);
-	~Gem_Polygon(void);
+	using LineSegment = std::pair<Point, Point>;
+
+	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
+
 	Region BBox;
-	Point* points;
-	unsigned int count;
-	std::list<Trapezoid> trapezoids;
+	std::vector<Point> vertices;
+	std::vector<std::vector<LineSegment>> rasterData; // same as vertices, but relative to BBox
+
+	size_t Count() const {return vertices.size();}
+
 	bool PointIn(const Point &p) const;
 	bool PointIn(int x, int y) const;
-	void RecalcBBox();
-	void ComputeTrapezoids();
+
+	bool IntersectsRect(const Region&) const;
 };
 
 // wall polygons are used to render area wallgroups
@@ -56,7 +65,6 @@ public:
 //between first edge is base line/separate baseline
 //DITHER means the polygon only dithers what it covers
 
-#define WF_ALWAYSCOVER  0
 #define WF_BASELINE 1
 #define WF_DITHER 2
 //this is used only externally, but converted to baseline on load time
@@ -68,17 +76,24 @@ public:
 
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
-	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox) { wall_flag = 0; }
+	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
-	bool PointCovered(const Point &p) const;
-	bool PointCovered(int x, int y) const;
+	bool PointBehind(const Point &p) const;
+	bool PointBehind(int x, int y) const;
 	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);
+
+	void SetDisabled(bool disabled);
+	
 public:
-	ieDword wall_flag;
+	ieDword wall_flag = 0;
 	Point base0, base1;
 };
+
+using WallPolygonGroup = std::vector<std::shared_ptr<Wall_Polygon>>;
+// the first of the pair are the walls in front, the second are the walls behind
+using WallPolygonSet = std::pair<WallPolygonGroup, WallPolygonGroup>;
 
 }
 

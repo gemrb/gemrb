@@ -486,22 +486,22 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 
 void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeToColor( parameters->pointParameter.x );
+	core->timer.SetFadeToColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	core->timer.SetFadeFromColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
 
 void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
 {
-	core->timer->SetFadeToColor( parameters->pointParameter.x );
-	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	core->timer.SetFadeToColor( parameters->pointParameter.x );
+	core->timer.SetFadeFromColor( parameters->pointParameter.x );
 //	Sender->SetWait( parameters->pointParameter.x<<1 ); //multiply by 2
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -798,13 +798,12 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	int active = parameters->int0Parameter;
 
 	Game *game = core->GetGame();
+	game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
 	if (active) {
-		game->ControlStatus |= CS_HIDEGUI;
+		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
-		game->ControlStatus &= ~CS_HIDEGUI;
+		core->GetWindowManager()->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
 	}
-	core->SetEventFlag(EF_CONTROL);
-	core->GetVideoDriver()->SetMouseEnabled(!active);
 }
 
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1081,7 +1080,7 @@ void GameScript::MoveViewPoint(Scriptable* Sender, Action* parameters)
 	// disable centering if anything enabled it before us (eg. LeaveAreaLUA as in movie02a.bcs)
 	GameControl *gc = core->GetGameControl();
 	gc->SetScreenFlags(SF_CENTERONACTOR, OP_NAND);
-	core->timer->SetMoveViewPort( parameters->pointParameter.x, parameters->pointParameter.y, parameters->int0Parameter<<1, true );
+	core->timer.SetMoveViewPort( parameters->pointParameter, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1093,7 +1092,7 @@ void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	core->timer->SetMoveViewPort( scr->Pos.x, scr->Pos.y, parameters->int0Parameter<<1, true );
+	core->timer.SetMoveViewPort( scr->Pos, parameters->int0Parameter<<1, true );
 	Sender->SetWait(1); // todo, blocking?
 	Sender->ReleaseCurrentAction(); // todo, blocking?
 }
@@ -1473,7 +1472,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	Actor* actor = ( Actor* ) Sender;
 	Point p((short) (vp.x+vp.w/2), (short) (vp.y+vp.h/2) );
 	if (!actor->InMove() || actor->Destination != p) {
@@ -2001,11 +2000,10 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 {
 	if (parameters->int1Parameter) { //IWD2 has a different profile
-		core->timer->SetScreenShake( parameters->int1Parameter,
-			parameters->int2Parameter, parameters->int0Parameter );
+		Point p(parameters->int1Parameter, parameters->int2Parameter);
+		core->timer.SetScreenShake(p, parameters->int0Parameter);
 	} else {
-		core->timer->SetScreenShake( parameters->pointParameter.x,
-			parameters->pointParameter.y, parameters->int0Parameter );
+		core->timer.SetScreenShake(parameters->pointParameter, parameters->int0Parameter);
 	}
 	Sender->SetWait( parameters->int0Parameter );
 	Sender->ReleaseCurrentAction(); // todo, blocking?
@@ -2301,10 +2299,10 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
 		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
 		// DestEntryPoint is all zeroes, pst just didn't use it
-		direction = 0;
+		direction = 1;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
-	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenWorldMapWindow" );
+	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
 }
@@ -3712,7 +3710,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
 {
-	InDebug=parameters->int0Parameter;
+	core->SetDebugMode(parameters->int0Parameter);
 	Log(WARNING, "GameScript", "DEBUG: %s", parameters->string0Parameter);
 }
 
@@ -5218,12 +5216,12 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(-1);
+	Sender->GetCurrentArea()->FillExplored(true);
 }
 
 void GameScript::UndoExplore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(0);
+	Sender->GetCurrentArea()->FillExplored(false);
 }
 
 void GameScript::ExploreMapChunk( Scriptable* Sender, Action* parameters)
@@ -5521,7 +5519,8 @@ void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetGlobalTint(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetVideoDriver()->SetFadeColor(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+	Color c(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter, 0xff);
+	core->GetWindowManager()->FadeColor = c;
 }
 
 void GameScript::SetArmourLevel(Scriptable* Sender, Action* parameters)
@@ -5831,7 +5830,7 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* parameters)
 	actor->SetOrientation(RAND(0, MAX_ORIENT-1), true);
 	// the original waited more if the actor was offscreen, perhaps as an optimization
 	int diceSides = 40;
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	if (vp.PointInside(actor->Pos)) diceSides = 10;
 	actor->SetWait(AI_UPDATE_TIME * core->Roll(1, diceSides, 0));
 }
@@ -6420,9 +6419,11 @@ void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetVideoDriver()->MoveMouse(parameters->pointParameter.x, parameters->pointParameter.y);
+	// according to IESDP this does nothing...
+	// the other cursor actions we implement affect only GameControl
+	// in GemRB you wouldnt need to move the mouse before scripting a click etc, so this is probably not needed.
 }
 
 //false means, no talk
@@ -7002,34 +7003,22 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar|=FOG_DRAWFOG;
+	core->GetGameControl()->DebugFlags |= DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar&=~FOG_DRAWFOG;
-}
-
-static void DeleteAllSpriteCovers()
-{
-	Game *game = core->GetGame();
-	int i = game->GetPartySize(false);
-	while (i--) {
-		Selectable *tar = (Selectable *) game->GetPC(i, false);
-		tar->SetSpriteCover(NULL);
-	}
+	core->GetGameControl()->DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
 }
 
 void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar&=~FOG_DITHERSPRITES;
-	DeleteAllSpriteCovers();
+	core->DitherSprites = true;
 }
 
 void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar |= FOG_DITHERSPRITES;
-	DeleteAllSpriteCovers();
+	core->DitherSprites = false;
 }
 
 //the PST crew apparently loved hardcoding stuff
@@ -7046,7 +7035,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, 0);
 	if (vvc) {
 		//setting the height
-		vvc->ZPos=actor->size*20;
+		vvc->ZOffset = actor->size * 20;
 		vvc->PlayOnce();
 		//maybe this needs setting up some time
 		vvc->SetDefaultDuration(20);
@@ -7187,12 +7176,14 @@ void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_ACTION, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_ACTION, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -7202,12 +7193,14 @@ void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_MENU, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::ClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_MENU, true);
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters)
@@ -7217,12 +7210,16 @@ void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_ACTION, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_ACTION, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -7232,12 +7229,16 @@ void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters
 		Sender->ReleaseCurrentAction(); // this is blocking for some reason?
 		return;
 	}
-	ClickCore(Sender, tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(tar->Pos, GEM_MB_MENU, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	Event e = EventMgr::CreateMouseBtnEvent(parameters->pointParameter, GEM_MB_MENU, true);
+	e.mouse.repeats = 2;
+	ClickCore(Sender, e.mouse, parameters->int0Parameter);
 }
 
 //Picks 5 lines from wish.2da

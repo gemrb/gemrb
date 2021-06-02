@@ -18,450 +18,631 @@
  *
  */
 
-#include "GUI/Window.h"
+#include "Window.h"
 
-#include "GUI/Button.h"
-#include "GUI/MapControl.h"
-#include "GUI/ScrollBar.h"
-
-#include "ie_cursors.h"
+#include "GUI/GUIScriptInterface.h"
+#include "Interface.h"
+#include "ScrollBar.h"
 
 namespace GemRB {
 
-Window::Window(unsigned short WindowID, unsigned short XPos,
-	unsigned short YPos, unsigned short Width, unsigned short Height)
+Window::Window(const Region& frame, WindowManager& mgr)
+	: ScrollView(frame), manager(mgr)
 {
-	this->WindowID = WindowID;
-	this->XPos = XPos;
-	this->YPos = YPos;
-	this->Width = Width;
-	this->Height = Height;
-	this->BackGround = NULL;
-	lastC = NULL;
-	lastFocus = NULL;
-	lastMouseFocus = NULL;
-	lastOver = NULL;
-	Visible = WINDOW_INVISIBLE;
-	Flags = WF_CHANGED;
-	Cursor = IE_CURSOR_NORMAL;
-	DefaultControl[0] = -1;
-	DefaultControl[1] = -1;
-	ScrollControl = -1;
-	FunctionBar = false;
-	keyPressHandler = NULL;
+	focusView = NULL;
+	trackingView = NULL;
+	hoverView = NULL;
+	lastMouseMoveTime = GetTicks();
+
+	SetFlags(DestroyOnClose, OP_OR);
+	// default ingame windows to frameless
+	if (core->HasCurrentArea()) {
+		SetFlags(Borderless, OP_OR);
+	}
+	RecreateBuffer();
 }
 
-Window::~Window()
+void Window::Close()
 {
-	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
-		delete *m;
+	// fire the onclose handler prior to actually invalidating the window
+	if (eventHandlers[Closed]) {
+		eventHandlers[Closed](this);
 	}
-	Controls.clear();
-	Sprite2D::FreeSprite( BackGround );
-	BackGround = NULL;
-}
-/** Add a Control in the Window */
-void Window::AddControl(Control* ctrl)
-{
-	if (ctrl == NULL) {
-		return;
-	}
-	ctrl->Owner = this;
-	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m) {
-		if ((*m)->ControlID == ctrl->ControlID) {
-			ControlRemoved(*m);
-			delete *m;
-			*m = ctrl;
-			Invalidate();
-			return;
-		}
-	}
-	Controls.push_back( ctrl );
-	Invalidate();
-}
-/** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-void Window::SetBackGround(Sprite2D* img, bool clean)
-{
-	if (clean && BackGround) {
-		Sprite2D::FreeSprite( this->BackGround );
-	}
-	BackGround = img;
-	Invalidate();
-}
-/** This function Draws the Window on the Output Screen */
-void Window::DrawWindow()
-{
-	if (!Visible) return; // no point in drawing invisible windows
-	Video* video = core->GetVideoDriver();
-	Region clip( XPos, YPos, Width, Height );
-	//Frame && Changed
-	if ( (Flags & (WF_FRAME|WF_CHANGED) ) == (WF_FRAME|WF_CHANGED) ) {
-		Region screen( 0, 0, core->Width, core->Height );
-		video->SetScreenClip( NULL );
-		//removed this?
-		video->DrawRect( screen, ColorBlack );
-		if (core->WindowFrames[0])
-			video->BlitSprite( core->WindowFrames[0], 0, 0, true );
-		if (core->WindowFrames[1])
-			video->BlitSprite( core->WindowFrames[1], core->Width - core->WindowFrames[1]->Width, 0, true );
-		if (core->WindowFrames[2])
-			video->BlitSprite( core->WindowFrames[2], (core->Width - core->WindowFrames[2]->Width) / 2, 0, true );
-		if (core->WindowFrames[3])
-			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
-	}
-
-	video->SetScreenClip( &clip );
-	//Float || Changed
-	bool bgRefreshed = false;
-	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
-		DrawBackground(NULL);
-		bgRefreshed = true;
-	}
-
-	std::vector< Control*>::iterator m;
-	for (m = Controls.begin(); m != Controls.end(); ++m) {
-		Control* c = *m;
-		// FIXME: drawing BG in the same loop as controls can produce incorrect results with overlapping controls. the only case I know of this occuring it is ok due to no BG drawing
-		// furthermore, overlapping controls are still a problem when NeedsDraw() returns false for the top control, but true for the bottom (see the level up icon on char portraits)
-		// we will fix both issues later by refactoring with the concept of views and subviews
-		if (BackGround && !bgRefreshed && !c->IsOpaque() && c->NeedsDraw()) {
-			const Region& fromClip = c->ControlFrame();
-			DrawBackground(&fromClip);
-		}
-		if (Flags & (WF_FLOAT)) {
-			// FIXME: this is a total hack. Required for anything drawing over GameControl (nothing really at all to do with floating)
-			c->MarkDirty();
-		}
-		c->Draw( XPos, YPos );
-	}
-	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
-		Color black = { 0, 0, 0, 128 };
-		video->DrawRect(clip, black);
-	}
-	video->SetScreenClip( NULL );
-	Flags &= ~WF_CHANGED;
-}
-
-void Window::DrawBackground(const Region* rgn) const
-{
-	Video* video = core->GetVideoDriver();
-	if (rgn) {
-		Region toClip = *rgn;
-		toClip.x += XPos;
-		toClip.y += YPos;
-		video->BlitSprite( BackGround, *rgn, toClip);
+	
+	if (flags&DestroyOnClose) {
+		ClearScriptingRefs();
+		manager.CloseWindow(this);
 	} else {
-		video->BlitSprite( BackGround, XPos, YPos, true );
+		// somebody wants to keep a handle to this window around to display it later
+		manager.OrderBack(this);
+		SetVisible(false);
 	}
+
+	trackingView = NULL;
+	hoverView = NULL;
 }
 
-/** Set window frame used to fill screen on higher resolutions*/
-void Window::SetFrame()
+void Window::FocusLost()
 {
-	if ( (Width < core->Width) || (Height < core->Height) ) {
-		Flags|=WF_FRAME;
+	if (eventHandlers[LostFocus]) {
+		eventHandlers[LostFocus](this);
 	}
-	Invalidate();
 }
 
-Control* Window::GetFunctionControl(int x)
+void Window::FocusGained()
 {
-	if (!FunctionBar) {
-		return NULL;
+	if (eventHandlers[GainedFocus]) {
+		eventHandlers[GainedFocus](this);
 	}
-
-	std::vector< Control*>::const_iterator m;
-
-	for (m = Controls.begin(); m != Controls.end(); m++) {
-		Control *ctrl = *m;
-		if ( ctrl->GetFunctionNumber() == x ) return ctrl;
-	}
-	return NULL;
 }
 
-/** Returns the Control at X,Y Coordinates */
-Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
+bool Window::HasFocus() const
 {
-	Control* ctrl = NULL;
-
-	//Check if we are still on the last control
-	if (lastC) {
-		if (( XPos + lastC->XPos <= x ) 
-			&& ( YPos + lastC->YPos <= y )
-			&& ( XPos + lastC->XPos + lastC->Width >= x )
-			&& ( YPos + lastC->YPos + lastC->Height >= y )
-			&& ! lastC->IsPixelTransparent (x - XPos - lastC->XPos, y - YPos - lastC->YPos)) {
-			//Yes, we are on the last returned Control
-			return lastC;
-		}
-	}
-	std::vector< Control*>::const_iterator m;
-	for (m = Controls.begin(); m != Controls.end(); m++) {
-		if (ignore && (*m)->ControlID&IGNORE_CONTROL) {
-			continue;
-		}
-		if (( XPos + ( *m )->XPos <= x ) 
-			&& ( YPos + ( *m )->YPos <= y )
-			&& ( XPos + ( *m )->XPos + ( *m )->Width >= x ) 
-			&& ( YPos + ( *m )->YPos + ( *m )->Height >= y )
-			&& ! ( *m )->IsPixelTransparent (x - XPos - ( *m )->XPos, y - YPos - ( *m )->YPos)) {
-			ctrl = *m;
-			break;
-		}
-	}
-	lastC = ctrl;
-	return ctrl;
+	return manager.GetFocusWindow() == this;
 }
 
-Control* Window::GetOver() const
+bool Window::DisplayModal(WindowManager::ModalShadow shadow)
 {
-	return lastOver;
+	return manager.PresentModalWindow(this, shadow);
 }
 
-Control* Window::GetFocus() const
+/** Add a Control in the Window */
+void Window::SubviewAdded(View* view, View* /*parent*/)
 {
-	return lastFocus;
+	Control* ctrl = dynamic_cast<Control*>(view);
+	if (ctrl) {
+		Controls.insert(ctrl);
+	}
+
+	// MoviePlayer at least relies on this
+	if (focusView == NULL) {
+		TrySetFocus(view);
+	}
 }
 
-Control* Window::GetMouseFocus() const
+void Window::SubviewRemoved(View* subview, View* parent)
 {
-	return lastMouseFocus;
-}
+	Control* ctrl = dynamic_cast<Control*>(subview);
+	if (ctrl) {
+		Controls.erase(ctrl);
+	}
 
-/** Sets 'ctrl' as Focused */
-void Window::SetFocused(Control* ctrl)
-{
-	if (lastFocus != NULL) {
-		lastFocus->SetFocus(false);
+	if (subview->ContainsView(trackingView)) {
+		trackingView = NULL;
+		drag = NULL;
 	}
-	lastFocus = ctrl;
-	if (ctrl != NULL) {
-		lastFocus->SetFocus(true);
-	}
-}
 
-/** Sets 'ctrl' as Mouse Focused */
-void Window::SetMouseFocused(Control* ctrl)
-{
-	if (lastMouseFocus != NULL) {
-		lastMouseFocus->MarkDirty();
+	if (subview->ContainsView(hoverView)) {
+		hoverView = parent;
 	}
-	lastMouseFocus = ctrl;
-	if (ctrl != NULL) {
-		lastMouseFocus->MarkDirty();
-	}
-}
 
-unsigned int Window::GetControlCount() const
-{
-	return Controls.size();
-}
-
-Control* Window::GetControl(unsigned short i) const
-{
-	if (i < Controls.size()) {
-		return Controls[i];
-	}
-	return NULL;
-}
-
-int Window::GetControlIndex(ieDword id) const
-{
-	for (std::vector<Control*>::const_iterator m = Controls.begin(); m != Controls.end(); ++m) {
-		if ((*m)->ControlID == id) {
-			return m - Controls.begin();
-		}
-	}
-	return -1;
-}
-
-bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
-{
-	size_t i = Controls.size();
-	while (i--) {
-		if (Controls[i]==ctrl) {
-			return ctrl->ControlID==ID;
-		}
-	}
-	return false;
-}
-
-Control* Window::RemoveControl(unsigned short i)
-{
-	if (i < Controls.size() ) {
-		Control *ctrl = Controls[i];
-		const Region& frame = ctrl->ControlFrame();
-		DrawBackground(&frame); // paint over the spot the control occupied
-		Controls.erase(Controls.begin()+i);
-		ControlRemoved(ctrl);
-		return ctrl;
-	}
-	return NULL;
-}
-
-void Window::ControlRemoved(const Control *ctrl)
-{
-	if (ctrl == lastC) {
-		lastC = NULL;
-	}
-	if (ctrl == lastOver) {
-		lastOver = NULL;
-	}
-	if (ctrl == lastFocus) {
-		lastFocus = NULL;
-	}
-	if (ctrl == lastMouseFocus) {
-		lastMouseFocus = NULL;
-	}
-}
-
-Control* Window::GetDefaultControl(unsigned int ctrltype) const
-{
-	if (!Controls.size()) {
-		return NULL;
-	}
-	if (ctrltype>=2) {
-		return NULL;
-	}
-	return GetControl( (ieWord) DefaultControl[ctrltype] );
-}
-
-Control* Window::GetScrollControl() const
-{
-	if (!Controls.size()) {
-		return NULL;
-	}
-	return GetControl( (ieWord) ScrollControl );
-}
-
-void Window::SetKeyPressEvent(WindowKeyPressHandler handler) {
-	keyPressHandler = handler;
-}
-
-void Window::release(void)
-{
-	Visible = WINDOW_INVALID;
-	lastC = NULL;
-	lastFocus = NULL;
-	lastMouseFocus = NULL;
-	lastOver = NULL;
-}
-
-/** Redraw all the Window */
-void Window::Invalidate()
-{
-	DefaultControl[0] = -1;
-	DefaultControl[1] = -1;
-	ScrollControl = -1;
-	unsigned int i = 0;
-	for (std::vector<Control*>::iterator m = Controls.begin(); m != Controls.end(); ++m, ++i) {
-		Control *ctrl = *m;
-		ctrl->MarkDirty();
-		switch (ctrl->ControlType) {
-			case IE_GUI_SCROLLBAR:
-				if ((ScrollControl == -1) || (ctrl->Flags & IE_GUI_SCROLLBAR_DEFAULT))
-					ScrollControl = i;
+	if (subview->ContainsView(focusView)) {
+		focusView->DidUnFocus();
+		focusView = NULL;
+		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+			Control* ctrl = *c;
+			if (TrySetFocus(ctrl) == ctrl) {
 				break;
-			case IE_GUI_BUTTON:
-				if (ctrl->Flags & IE_GUI_BUTTON_DEFAULT) {
-					DefaultControl[0] = i;
-				}
-				if (ctrl->Flags & IE_GUI_BUTTON_CANCEL) {
-					DefaultControl[1] = i;
-				}
-				break;
-			case IE_GUI_GAMECONTROL:
-				DefaultControl[0] = DefaultControl[1] = i;
-				break;
-			default: ;
+			}
 		}
 	}
-	Flags |= WF_CHANGED;
+}
+
+void Window::SizeChanged(const Size& /*oldSize*/)
+{
+	RecreateBuffer();
+}
+
+void Window::FlagsChanged(unsigned int oldflags)
+{
+	if ((flags&AlphaChannel) != (oldflags&AlphaChannel)) {
+		RecreateBuffer();
+	}
+
+	if ((flags&View::Invisible) && focusView) {
+		focusView->DidUnFocus();
+	} else if ((oldflags&View::Invisible) && focusView) {
+		focusView->DidFocus();
+	}
+}
+
+void Window::RecreateBuffer()
+{
+	Video* video = core->GetVideoDriver();
+
+	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::DISPLAY_ALPHA : Video::DISPLAY;
+	backBuffer = video->CreateBuffer(frame, fmt);
+
+	// the entire window must be invalidated, because the new buffer is blank
+	// TODO: we *could* optimize this to instead blit the old buffer to the new one
+	MarkDirty();
+}
+
+const VideoBufferPtr& Window::DrawWithoutComposition()
+{
+	View::Draw();
+
+	core->GetVideoDriver()->PopDrawingBuffer();
+	return backBuffer;
+}
+
+void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	backBuffer->SetOrigin(frame.Origin());
+	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
+}
+
+void Window::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	if (!core->InDebugMode(ID_WINDOWS)) return;
+
+	Video* video = core->GetVideoDriver();
+	video->SetScreenClip(nullptr);
+	
+	auto lock = manager.DrawHUD();
+
+	if (focusView) {
+		Region r = focusView->ConvertRegionToScreen(Region(Point(), focusView->Dimensions()));
+		video->DrawRect(r, ColorWhite, false);
+	}
+	
+	if (hoverView) {
+		Region r = hoverView->ConvertRegionToScreen(Region(Point(), hoverView->Dimensions()));
+		r.ExpandAllSides(-5);
+		video->DrawRect(r, ColorBlue, false);
+	}
+	
+	if (trackingView) {
+		Region r = trackingView->ConvertRegionToScreen(Region(Point(), trackingView->Dimensions()));
+		r.ExpandAllSides(-10);
+		video->DrawRect(r, ColorRed, false);
+	}
+}
+
+void Window::Focus()
+{
+	manager.FocusWindow(this);
+}
+
+void Window::SetFocused(View* ctrl)
+{
+	TrySetFocus(ctrl);
+}
+
+String Window::TooltipText() const
+{
+	if (hoverView) {
+		return hoverView->TooltipText();
+	}
+	return ScrollView::TooltipText();
+}
+
+Holder<Sprite2D> Window::Cursor() const
+{
+	if (drag) {
+		return drag->cursor;
+	}
+	
+	Holder<Sprite2D> cursor = ScrollView::Cursor();
+	if (cursor == NULL && hoverView) {
+		cursor = hoverView->Cursor();
+	}
+	return cursor;
+}
+
+bool Window::IsDisabledCursor() const
+{
+	bool isDisabled = ScrollView::IsDisabledCursor();
+	if (hoverView) {
+		// if either the window or view is in a disabled state the cursor will be
+		isDisabled = isDisabled || hoverView->IsDisabledCursor();
+	}
+	return isDisabled;
+}
+
+void Window::SetPosition(WindowPosition pos)
+{
+	// start at top left
+	Region newFrame(Point(), frame.Dimensions());
+	Size screen = manager.ScreenSize();
+
+	// adjust horizontal
+	if ((pos&PosHmid) == PosHmid) {
+		newFrame.x = (screen.w / 2) - (newFrame.w) / 2;
+	} else if (pos&PosRight) {
+		newFrame.x = screen.w - newFrame.w;
+	}
+
+	// adjust vertical
+	if ((pos&PosVmid) == PosVmid) {
+		newFrame.y = (screen.h / 2) - (newFrame.h) / 2;
+	} else if (pos&PosBottom) {
+		newFrame.y = screen.h - newFrame.h;
+	}
+	SetFrame(newFrame);
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	for (std::vector<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		(*c)->UpdateState( VarName, Sum);
+	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+		Control* ctrl = *c;
+		ctrl->UpdateState( VarName, Sum);
 	}
 }
 
-/** Searches for a ScrollBar and a TextArea to link them */
-void Window::Link(unsigned short SBID, unsigned short TAID)
+View* Window::TrySetFocus(View* target)
 {
-	ScrollBar* sb = NULL;
-	TextArea* ta = NULL;
-	std::vector< Control*>::iterator m;
-	for (m = Controls.begin(); m != Controls.end(); ++m) {
-		if (( *m )->Owner != this)
-			continue;
-		if (( *m )->ControlType == IE_GUI_SCROLLBAR) {
-			if (( *m )->ControlID == SBID) {
-				sb = ( ScrollBar * ) ( *m );
-				if (ta != NULL)
-					break;
-			}
-		} else if (( *m )->ControlType == IE_GUI_TEXTAREA) {
-			if (( *m )->ControlID == TAID || TAID == (ieWord)-1) {
-				ta = ( TextArea * ) ( *m );
-				if (sb != NULL)
-					break;
+	View* newFocus = focusView;
+	if (target && !target->CanLockFocus()) {
+		// target wont accept focus so dont bother unfocusing current
+	} else if (focusView && !focusView->CanUnlockFocus()) {
+		// current focus unwilling to reliquish
+	} else {
+		if (focusView)
+			focusView->DidUnFocus();
+
+		newFocus = target;
+
+		if (newFocus)
+			newFocus->DidFocus();
+	}
+	focusView = newFocus;
+
+	return newFocus;
+}
+
+bool Window::IsDragable() const
+{
+	if (trackingView != this)
+	{
+		return false;
+	}
+
+	return (flags&Draggable) ||
+	       (EventMgr::ModState(GEM_MOD_CTRL) && EventMgr::MouseButtonState(GEM_MB_ACTION));
+}
+
+bool Window::HitTest(const Point& p) const
+{
+	bool hit = View::HitTest(p);
+	if (hit == false){
+		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
+		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+			Control* ctrl = *c;
+			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
+				hit = true;
+				break;
 			}
 		}
 	}
-	if (sb) {
-		sb->ta = ta;
-	}
-	if (ta) {
-		ta->SetScrollBar( sb );
-	}
+	return hit;
 }
 
-void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
+void Window::SetAction(Responder handler, const ActionKey& key)
 {
-	lastOver = ctrl;
-	if (!lastOver) {
-		return;
-	}
-	lastOver->OnMouseEnter( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	eventHandlers[key.Value()] = std::move(handler);
 }
 
-void Window::OnMouseLeave(unsigned short x, unsigned short y)
+bool Window::PerformAction(const ActionKey& key)
 {
-	if (!lastOver) {
-		return;
+	auto& handler = eventHandlers[key.Value()];
+	if (handler) {
+		(handler)(this);
+		return true;
 	}
-	lastOver->OnMouseLeave( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
-	lastOver = NULL;
+	return false;
 }
 
-void Window::OnMouseOver(unsigned short x, unsigned short y)
+bool Window::SupportsAction(const ActionKey& key)
 {
-	if (!lastOver) {
-		return;
-	}
-	short cx = x - XPos - lastOver->XPos;
-	short cy = y - YPos - lastOver->YPos;
-	if (cx < 0) {
-		cx = 0;
-	}
-	if (cy < 0) {
-		cy = 0;
-	}
-	lastOver->OnMouseOver(cx, cy);
+	return eventHandlers[key.Value()];
 }
 
-bool Window::OnKeyPress(unsigned char key, unsigned short mod) {
-	if(keyPressHandler) {
-		WindowKeyPress wkp;
-		wkp.windowID = this->WindowID;
-		wkp.key = key;
-		wkp.mod = mod;
+void Window::DispatchMouseMotion(View* target, const MouseEvent& me)
+{
+	if (hoverView && target != hoverView) {
+			hoverView->MouseLeave(me, drag.get());
+	}
+	
+	if (target && target != hoverView) {
+		// must create the drag event before calling MouseEnter
+		target->MouseEnter(me, drag.get());
+	}
+	
+	if (trackingView && Distance(dragOrigin, me.Pos()) > EventMgr::mouseDragRadius) {
+		// tracking will eat this event
+		if (me.buttonStates) {
+			trackingView->MouseDrag(me);
+			if (trackingView == target && drag == nullptr) {
+				drag = trackingView->DragOperation();
+			}
+		} else {
+			trackingView = NULL;
+		}
+	} else if (target) {
+		target->MouseOver(me);
+	}
+	hoverView = target;
+}
 
-		return keyPressHandler(&wkp);
-	} else {
+void Window::DispatchMouseDown(View* target, const MouseEvent& me, unsigned short mod)
+{
+	assert(target);
+	
+	if (me.button == GEM_MB_ACTION
+		&& !(Flags() & View::IgnoreEvents)
+	) {
+		Focus();
+	}
+
+	TrySetFocus(target);
+	target->MouseDown(me, mod);
+	trackingView = target; // all views track the mouse within their bounds
+	dragOrigin = me.Pos();
+	assert(me.buttonStates);
+}
+
+void Window::DispatchMouseUp(View* target, const MouseEvent& me, unsigned short mod)
+{
+	assert(target);
+	
+	if (drag && drag->dragView != target && target->AcceptsDragOperation(*drag)) {
+			drag->dropView = target;
+			target->CompleteDragOperation(*drag);
+	} else if (trackingView) {
+		if (trackingView == target || trackingView->TracksMouseDown()) {
+			trackingView->MouseUp(me, mod);
+		}
+	} else if (target) {
+		target->MouseUp(me, mod);
+	}
+	drag = NULL;
+	trackingView = NULL;
+}
+
+void Window::DispatchTouchDown(View* target, const TouchEvent& te, unsigned short mod)
+{
+	assert(target);
+
+	if (te.numFingers == 1
+		&& !(Flags() & View::IgnoreEvents)) {
+		Focus();
+	}
+
+	TrySetFocus(target);
+	target->TouchDown(te, mod);
+	trackingView = target; // all views track the mouse within their bounds
+}
+
+void Window::DispatchTouchUp(View* target, const TouchEvent& te, unsigned short mod)
+{
+	assert(target);
+
+	if (drag && te.numFingers == 1) {
+		if (target->AcceptsDragOperation(*drag) && drag->dragView != target) {
+			drag->dropView = target;
+			target->CompleteDragOperation(*drag);
+		}
+	} else if (trackingView) {
+		if (trackingView == target || trackingView->TracksMouseDown())
+			trackingView->TouchUp(te, mod);
+	} else if (target) {
+		target->TouchUp(te, mod);
+	}
+	drag = NULL;
+	trackingView = NULL;
+}
+
+void Window::DispatchTouchGesture(View* target, const GestureEvent& gesture)
+{
+	// FIXME: this is incomplete
+	// this should be a bit closer to DispatchMouseMotion
+	// drag and drop for example wont function
+
+	//trackingView = target;
+	target->TouchGesture(gesture);
+}
+
+bool Window::DispatchKey(View* keyView, const Event& event)
+{
+	// hotkeys first
+	std::map<KeyboardKey, EventMgr::EventCallback>::iterator it = HotKeys.find(event.keyboard.keycode);
+	if (it != HotKeys.end()) {
+		return (it->second)(event);
+	}
+
+	// try the keyView view first, if it fails have the window itself try
+	bool handled = false;
+	if (keyView) {
+		handled = (event.type == Event::KeyDown)
+		? keyView->KeyPress(event.keyboard, event.mod)
+		: keyView->KeyRelease(event.keyboard, event.mod);
+	}
+	
+	if (!handled) {
+		// FIXME: using OnKeyPress to avoid eventProxy from eating esc key
+		// would be better if we could delegate proxies for different event classes (keys, mouse, etc)
+		handled = (event.type == Event::KeyDown)
+		? OnKeyPress(event.keyboard, event.mod)
+		: OnKeyRelease(event.keyboard, event.mod);
+	}
+	return handled;
+}
+
+bool Window::DispatchEvent(const Event& event)
+{
+	View* target = NULL;
+
+	if (event.type == Event::TextInput) {
+		focusView->TextInput(event.text);
+		return true;
+	}
+
+	if (event.isScreen) {
+		if (event.type == Event::TouchGesture) {
+			if (trackingView) {
+				DispatchTouchGesture(trackingView, event.gesture);
+
+			}
+			return true;
+		}
+
+		Point screenPos = event.mouse.Pos();
+		if (!frame.PointInside(screenPos) && trackingView == NULL) {
+			// this can hapen if the window is modal since it will absorb all events
+			// the window manager maybe shouldnt dispatch the events in this case
+			// but this is a public function and its possible to post a phoney event from anywhere anyway
+			return true;
+		}
+
+		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+		assert(target == NULL || target->IsVisible());
+
+		if (IsDragable() && target == NULL) {
+			target = this;
+		}
+
+		// special event handling
+		switch (event.type) {
+			case Event::MouseScroll:
+				// retarget if NULL or disabled
+				{
+					Point delta = event.mouse.Delta();
+					if (target == NULL || target->IsDisabled()) {
+						target = this;
+					}
+
+					target->MouseWheelScroll(delta);
+					return true;
+				}
+			case Event::MouseMove:
+				// allows NULL and disabled targets
+				if (target == this) {
+					// skip the usual dispatch
+					// this is so that we can move windows that otherwise ignore events
+					OnMouseDrag(event.mouse);
+				} else {
+					DispatchMouseMotion(target, event.mouse);
+				}
+				return true;
+			default:
+				if (target == NULL) {
+					target = this;
+				} else if (target->IsDisabled()) {
+					return true; // we still absorb the event
+				}
+				break;
+		}
+
+		assert(target);
+		// basic event handling
+		switch (event.type) {
+			case Event::MouseDown:
+				DispatchMouseDown(target, event.mouse, event.mod);
+				break;
+			case Event::MouseUp:
+				DispatchMouseUp(target, event.mouse, event.mod);
+				break;
+			case Event::TouchDown:
+				DispatchTouchDown(target, event.touch, event.mod);
+				break;
+			case Event::TouchUp:
+				DispatchTouchUp(target, event.touch, event.mod);
+				break;
+			default:
+				assert(false); // others should be handled above
+		}
+		// absorb other screen events i guess
+		return true;
+	} else { // key events
+		return DispatchKey(focusView, event);
+	}
+	return false;
+}
+	
+bool Window::InActionHandler() const
+{
+	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
+		Control* ctrl = *c;
+		if (ctrl->IsExecutingResponseHandler()) {
+			return true;
+		}
+	}
+	
+	return executingResponseHandler;
+}
+
+bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+{
+	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
 	}
+
+	std::map<KeyboardKey, EventMgr::EventCallback>::iterator it;
+	it = HotKeys.find(key);
+	if (it != HotKeys.end()) {
+		// something already registered
+		HotKeys.erase(it);
+	}
+
+	HotKeys[key] = cb;
+	return true;
+}
+
+bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+{
+	KeyMap::iterator it = HotKeys.find(key);
+	if (it != HotKeys.end() && FunctionTargetsEqual(it->second, cb)) {
+		HotKeys.erase(it);
+		return true;
+	}
+	return false;
+}
+
+bool Window::OnMouseDrag(const MouseEvent& me)
+{
+	assert(me.buttonStates);
+	// dragging the window to a new position. only happens with left mouse.
+	if (IsDragable()) {
+		Point newOrigin = frame.Origin() - me.Delta();
+		SetFrameOrigin(newOrigin);
+	} else {
+		ScrollView::OnMouseDrag(me);
+	}
+	return true;
+}
+	
+void Window::OnMouseLeave(const MouseEvent& me, const DragOp*)
+{
+	DispatchMouseMotion(NULL, me);
+}
+
+bool Window::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
+{
+	if (Flags() & View::IgnoreEvents) {
+		return false;
+	}
+	switch (key.keycode) {
+		case GEM_ESCAPE:
+			Close();
+			return true;
+	}
+	return ScrollView::OnKeyPress(key, mod);
+}
+
+bool Window::OnControllerButtonDown(const ControllerEvent& ce)
+{
+	if (ce.button == CONTROLLER_BUTTON_BACK) {
+		Close();
+		return true;
+	}
+		
+	return View::OnControllerButtonDown(ce);
+}
+	
+ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
+{
+	return new WindowScriptingRef(this, id, group);
 }
 
 }

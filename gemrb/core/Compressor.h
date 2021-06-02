@@ -29,7 +29,7 @@ namespace GemRB {
 class GEM_EXPORT Compressor : public Plugin {
 public:
 	Compressor(void);
-	virtual ~Compressor(void);
+	~Compressor(void) override;
 	/** decompresses a datastream (memory or file) to a FILE * stream */
 	virtual int Decompress(DataStream* dest, DataStream* source, unsigned int size_guess = 0) const = 0;
 	/** compresses a datastream (memory or file) to another DataStream */

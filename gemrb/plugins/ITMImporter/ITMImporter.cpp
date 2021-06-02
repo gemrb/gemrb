@@ -267,7 +267,7 @@ Item* ITMImporter::GetItem(Item *s)
 		s->ItemExcl = 0;
 	}
 
-	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
+	s->ext_headers = new ITMExtHeader[s->ExtHeaderCount];
 
 	for (i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
@@ -290,7 +290,7 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	//48 is the size of the feature block
-	s->equipping_features = core->GetFeatures(s->EquippingFeatureCount + extraFeatureCount);
+	s->equipping_features = new Effect[s->EquippingFeatureCount + extraFeatureCount];
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
@@ -389,7 +389,7 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
-	eh->features = core->GetFeatures(eh->FeatureCount);
+	eh->features = new Effect[eh->FeatureCount];
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
 		GetFeature(eh->features+i, s);

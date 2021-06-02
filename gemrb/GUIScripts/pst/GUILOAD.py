@@ -35,12 +35,11 @@ ScrollBar = 0
 def OnLoad ():
 	global LoadWindow, TextAreaControl, Games, ScrollBar
 
-	GemRB.LoadWindowPack ("GUILOAD")
-	LoadWindow = GemRB.LoadWindow (0)
+	LoadWindow = GemRB.LoadWindow (0, "GUILOAD")
 	CancelButton=LoadWindow.GetControl (46)
 	CancelButton.SetText (4196)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: LoadWindow.Close())
+	CancelButton.MakeEscape()
 
 	GemRB.SetVar ("LoadIdx",0)
 
@@ -64,9 +63,9 @@ def OnLoad ():
 
 		#PC portraits
 		for j in range (min(6, MAX_PARTY_SIZE)):
-			if not LoadWindow.HasControl (22+i*min(6, MAX_PARTY_SIZE)+j):
-				continue
 			Button = LoadWindow.GetControl (22+i*min(6, MAX_PARTY_SIZE)+j)
+			if not Button:
+				continue
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
 
@@ -79,9 +78,11 @@ def OnLoad ():
 	else:
 		TopIndex = 0
 	GemRB.SetVar ("TopIndex",TopIndex)
-	ScrollBar.SetVarAssoc ("TopIndex", TopIndex)
+	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	ScrollBarPress ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+
+	LoadWindow.SetEventProxy(ScrollBar)
+	LoadWindow.Focus()
 	return
 
 def ScrollBarPress ():
@@ -117,15 +118,15 @@ def ScrollBarPress ():
 		if ActPos<len(Games):
 			Button.SetSprite2D(Games[ActPos].GetPreview())
 		else:
-			Button.SetPicture ("")
+			Button.SetPicture (None)
 		for j in range (min(6, MAX_PARTY_SIZE)):
-			if not LoadWindow.HasControl (22+i*min(6, MAX_PARTY_SIZE)+j):
+			Button = LoadWindow.GetControl (22+i*min(6, MAX_PARTY_SIZE)+j)
+			if not Button:
 				continue
-			Button=LoadWindow.GetControl (22+i*min(6, MAX_PARTY_SIZE)+j)
 			if ActPos<len(Games):
 				Button.SetSprite2D(Games[ActPos].GetPortrait(j))
 			else:
-				Button.SetPicture ("")
+				Button.SetPicture (None)
 	return
 
 def LoadGamePress ():
@@ -150,20 +151,20 @@ def DeleteGameConfirm ():
 	ScrollBarPress ()
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def DeleteGameCancel ():
 	if ConfirmWindow:
 		ConfirmWindow.Unload ()
-	LoadWindow.SetVisible (WINDOW_VISIBLE)
+	LoadWindow.Focus()
 	return
 
 def DeleteGamePress ():
 	global ConfirmWindow
 
-	LoadWindow.SetVisible (WINDOW_INVISIBLE)
 	ConfirmWindow=GemRB.LoadWindow (1)
+	ConfirmWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	Text=ConfirmWindow.GetControl (0)
 	Text.SetText (28639)
@@ -171,17 +172,11 @@ def DeleteGamePress ():
 	DeleteButton=ConfirmWindow.GetControl (1)
 	DeleteButton.SetText (28640)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameConfirm)
-	DeleteButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DeleteButton.MakeDefault()
 
 	CancelButton=ConfirmWindow.GetControl (2)
 	CancelButton.SetText (4196)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DeleteGameCancel)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
-	ConfirmWindow.SetVisible (WINDOW_VISIBLE)
-	return
-	
-def CancelPress ():
-	if LoadWindow:
-		LoadWindow.Unload ()
-	GemRB.SetNextScript ("Start")
+	CancelButton.MakeEscape()
+	ConfirmWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return

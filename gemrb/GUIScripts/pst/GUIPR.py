@@ -34,31 +34,11 @@ PriestWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
-PauseState = None
 
-def OpenPriestWindow ():
-	global PriestWindow, PauseState
 
-	if GUICommon.CloseOtherWindow (OpenPriestWindow):
-		GemRB.HideGUI ()
-		if PriestWindow:
-			PriestWindow.Unload ()
-		PriestWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GemRB.GamePause (PauseState, 3)
-		return	
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-		
-	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIPR")
-	PriestWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
+def InitPriestWindow (Window):
+	global PriestSpellWindow
+	PriestSpellWindow = Window
 
 	Button = Window.GetControl (0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
@@ -69,20 +49,20 @@ def OpenPriestWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0,  color,  0, 1)
 
+	return
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
-	GemRB.UnhideGUI ()
-	UpdatePriestWindow ()
-
-def UpdatePriestWindow ():
+def UpdatePriestWindow (Window=None):
 	global PriestMemorizedSpellList, PriestKnownSpellList
+
+	if Window == None:
+		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
 
-	Window = PriestWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
@@ -100,7 +80,8 @@ def UpdatePriestWindow ():
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		Icon.SetBorder (0,  0, 0, 0, 0,  0, 0, 0, 160,  0, 1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
+		Icon.SetBorder (0, color,  0, 1)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Icon.SetSpellIcon (ms['SpellResRef'])
@@ -152,6 +133,10 @@ def UpdatePriestWindow ():
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
+	return
+
+TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP|WINDOW_HCENTER)
+OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow, WINDOW_TOP|WINDOW_HCENTER)
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel
@@ -172,19 +157,14 @@ def PriestNextLevelPress ():
 def OpenPriestSpellInfoWindow ():
 	global PriestSpellInfoWindow
 
-	GemRB.HideGUI ()
-	
 	if PriestSpellInfoWindow != None:
 		if PriestSpellInfoWindow:
 			PriestSpellInfoWindow.Unload ()
 		PriestSpellInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
-		GemRB.UnhideGUI ()
+
 		return
-		
+
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", PriestSpellInfoWindow.ID)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
@@ -208,12 +188,10 @@ def OpenPriestSpellInfoWindow ():
 	Text.SetText (spell['SpellDesc'])
 
 	IconResRef = 'SPL' + spell['SpellbookIcon'][2:]
-	
+
 	Icon = Window.GetControl (5)
 	Icon.SetSprites (IconResRef, 0, 0, 0, 0, 0)
 
-
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
@@ -232,20 +210,15 @@ def OnPriestMemorizeSpell ():
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
-	
-	GemRB.HideGUI ()
-	
+
 	if PriestSpellUnmemorizeWindow != None:
 		if PriestSpellUnmemorizeWindow:
 			PriestSpellUnmemorizeWindow.Unload ()
 		PriestSpellUnmemorizeWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
-		GemRB.UnhideGUI ()
+
 		return
-		
+
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
-	GemRB.SetVar ("FloatWindow", PriestSpellUnmemorizeWindow.ID)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)
@@ -255,15 +228,14 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 

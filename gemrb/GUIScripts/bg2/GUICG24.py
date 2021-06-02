@@ -24,8 +24,8 @@ ImportWindow = 0
 def OnLoad():
 	global ImportWindow
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ImportWindow = GemRB.LoadWindow(24)
+	ImportWindow = GemRB.LoadWindow(24, "GUICG")
+	ImportWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
 
 	TextAreaControl = ImportWindow.GetControl(0)
 	TextAreaControl.SetText(53605)
@@ -38,7 +38,7 @@ def OnLoad():
 
 	CancelButton = ImportWindow.GetControl(3)
 	CancelButton.SetText(13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	FileButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, FilePress)
 	SavedGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GamePress)

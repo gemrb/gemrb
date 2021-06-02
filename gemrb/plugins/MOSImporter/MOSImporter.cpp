@@ -35,7 +35,7 @@ static ieDword blue_mask = 0x000000ff;
 MOSImporter::MOSImporter(void)
 {
 	Width = Height = Cols = Rows = BlockSize = PalOffset = 0;
-	if (DataStream::IsEndianSwitch()) {
+	if (DataStream::BigEndian()) {
 		red_mask = 0x0000ff00;
 		green_mask = 0x00ff0000;
 		blue_mask = 0xff000000;
@@ -72,9 +72,9 @@ bool MOSImporter::Open(DataStream* stream)
 	return true;
 }
 
-Sprite2D* MOSImporter::GetSprite2D()
+Holder<Sprite2D> MOSImporter::GetSprite2D()
 {
-	RevColor RevCol[256];
+	Color Col[256];
 	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * blockpixels = ( unsigned char * )
 		malloc( BlockSize * BlockSize );
@@ -89,7 +89,7 @@ Sprite2D* MOSImporter::GetSprite2D()
 				64;
 			str->Seek( PalOffset + ( y * Cols * 1024 ) +
 				( x * 1024 ), GEM_STREAM_START );
-			str->Read( &RevCol[0], 1024 );
+			str->Read( &Col[0], 1024 );
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( y * Cols * 4 ) + ( x * 4 ),
 				GEM_STREAM_START );
@@ -104,13 +104,13 @@ Sprite2D* MOSImporter::GetSprite2D()
 				( 4 * x * 64 );
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
-					*startpixel = RevCol[*bp].b;
+					*startpixel = Col[*bp].r;
 					startpixel++;
-					*startpixel = RevCol[*bp].g;
+					*startpixel = Col[*bp].g;
 					startpixel++;
-					*startpixel = RevCol[*bp].r;
+					*startpixel = Col[*bp].b;
 					startpixel++;
-					*startpixel = RevCol[*bp].a;
+					*startpixel = Col[*bp].a;
 					startpixel++;
 					bp++;
 				}
@@ -119,7 +119,7 @@ Sprite2D* MOSImporter::GetSprite2D()
 		}
 	}
 	free( blockpixels );
-	Sprite2D* ret = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
+	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
 		red_mask, green_mask, blue_mask, 0,
 		pixels, true, green_mask );
 	return ret;

@@ -34,54 +34,11 @@ from ie_restype import RES_BAM
 
 InventoryWindow = None
 
-def OpenInventoryWindowClick ():
-	tmp = GemRB.GetVar ("PressedPortrait")
-	GemRB.GameSelectPC (tmp, True, SELECT_REPLACE)
-	OpenInventoryWindow ()
-	return
-
-def OpenInventoryWindow ():
+def InitInventoryWindow (Window):
 	global InventoryWindow
 
-	if GUICommon.CloseOtherWindow (OpenInventoryWindow):
-		if GemRB.IsDraggingItem () == 1:
-			pc = GemRB.GameGetSelectedPCSingle ()
-			#store the item in the inventory before window is closed
-			GemRB.DropDraggedItem (pc, -3)
-			#dropping on ground if cannot store in inventory
-			if GemRB.IsDraggingItem () == 1:
-				GemRB.DropDraggedItem (pc, -2)
-
-		InventoryCommon.CloseIdentifyItemWindow ()
-		InventoryCommon.CloseAbilitiesItemWindow ()
-		InventoryCommon.CancelColor()
-		if InventoryCommon.ItemInfoWindow:
-			InventoryCommon.ItemInfoWindow.Unload ()
-			InventoryCommon.ItemInfoWindow = None
-		if InventoryCommon.ItemAmountWindow:
-			InventoryCommon.ItemAmountWindow.Unload ()
-			InventoryCommon.ItemAmountWindow = None
-		if InventoryCommon.ErrorWindow:
-			InventoryCommon.ErrortWindow.Unload ()
-			InventoryCommon.ErrortWindow = None
-
-		if InventoryWindow:
-			InventoryWindow.Unload ()
-
-		InventoryWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIINV", 800, 600)
-	InventoryWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", InventoryWindow.ID)
-	Window.SetFrame ()
+	Window.AddAlias("WIN_INV")
+	InventoryWindow = Window
 
 	#ground items scrollbar
 	ScrollBar = Window.GetControl (66)
@@ -92,12 +49,12 @@ def OpenInventoryWindow ():
 		Button = Window.GetControl (i+68)
 		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterGround)
 		Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveGround)
-		Button.SetVarAssoc ("GroundItemButton", i)
+		Button.SetVarAssoc ("Button", i + 68)
 		Button.SetFont ("NUMBER")
 
 	Button = Window.GetControl (81)
 	Button.SetTooltip (83)
-	Button.SetVarAssoc ("GroundItemButton", 6)
+	Button.SetVarAssoc ("ItemButton", 6 + 81)
 	Button.SetFont ("NUMBER")
 	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
@@ -127,12 +84,14 @@ def OpenInventoryWindow ():
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnAutoEquip)
+	Button.SetAction (InventoryCommon.OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	# portrait
 	Button = Window.GetControl (84)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.SetHotKey ('i')
 
 	# armor class
 	Label = Window.GetControl (0x10000038)
@@ -148,13 +107,13 @@ def OpenInventoryWindow ():
 
 	# info label, game paused, etc
 	Label = Window.GetControl (0x1000003f)
-	Label.SetText ("")
+	Window.RemoveSubview (Label, True)
 
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 	for slot in range (SlotCount):
 		SlotType = GemRB.GetSlotType (slot+1)
-		if SlotType["ID"] and Window.HasControl (SlotType["ID"]):
-			Button = Window.GetControl (SlotType["ID"])
+		Button = Window.GetControl (SlotType["ID"])
+		if SlotType["ID"] and Button:
 			Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, InventoryCommon.MouseEnterSlot)
 			Button.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, InventoryCommon.MouseLeaveSlot)
 			Button.SetVarAssoc ("ItemButton", slot+1)
@@ -168,16 +127,6 @@ def OpenInventoryWindow ():
 		Button.SetVarAssoc("Equipped", i/2)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (999, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenInventoryWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	GUICommonWindows.SetSelectionChangeHandler (UpdateInventoryWindow)
-
-	UpdateInventoryWindow ()
-	return
-
 def ChangeWeaponPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Equipped = GemRB.GetVar ("Equipped")
@@ -185,8 +134,9 @@ def ChangeWeaponPressed ():
 	return
 
 #complete update
-def UpdateInventoryWindow ():
-	Window = InventoryWindow
+def UpdateInventoryWindow (Window = None):
+	if Window == None:
+		Window = GemRB.GetView("WIN_INV")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Container = GemRB.GetContainer (pc, 1)
@@ -206,6 +156,11 @@ def UpdateInventoryWindow ():
 	for i in range (SlotCount):
 		InventoryCommon.UpdateSlot (pc, i)
 	return
+
+InventoryCommon.UpdateInventoryWindow = UpdateInventoryWindow
+
+ToggleInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.ToggleWindow, InitInventoryWindow, UpdateInventoryWindow)
+OpenInventoryWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIINV", GUICommonWindows.OpenWindowOnce, InitInventoryWindow, UpdateInventoryWindow)
 
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
@@ -293,7 +248,7 @@ def RefreshInventoryWindow ():
 			Button.SetState (IE_GUI_BUTTON_FAKEPRESSED)
 		else:
 			Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, InventoryCommon.OnDragItemGround)
+		Button.SetAction (InventoryCommon.OnDragItemGround, IE_ACT_DRAG_DROP_DST)
 
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if Slot == None:

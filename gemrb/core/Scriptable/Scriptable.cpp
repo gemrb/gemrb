@@ -30,7 +30,6 @@
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"
-#include "SpriteCover.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
@@ -219,7 +218,7 @@ void Scriptable::SetOverheadText(const String& text, bool display)
 
 bool Scriptable::DisplayOverheadText(bool show)
 {
-	if (show && !overheadTextDisplaying) {
+	if (show) {
 		overheadTextDisplaying = true;
 		timeStartDisplaying = core->GetGame()->Ticks;
 		return true;
@@ -238,13 +237,13 @@ void Scriptable::FixHeadTextPos()
 }
 
 #define MAX_DELAY  6000
-void Scriptable::DrawOverheadText(const Region &screen)
+void Scriptable::DrawOverheadText()
 {
 	if (!overheadTextDisplaying)
 		return;
 
 	unsigned long time = core->GetGame()->Ticks;
-	Palette *palette = NULL;
+	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
 
 	time -= timeStartDisplaying;
 	if (time >= MAX_DELAY) {
@@ -254,8 +253,7 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		time = (MAX_DELAY-time)/10;
 		if (time<256) {
 			ieByte time2 = time; // shut up narrowing warnings
-			const Color overHeadColor = {time2,time2,time2,time2};
-			palette = new Palette(overHeadColor, ColorBlack);
+			color.fg = Color(time2, time2, time2, time2);
 		}
 	}
 
@@ -264,26 +262,15 @@ void Scriptable::DrawOverheadText(const Region &screen)
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	short x, y;
-	if (overHeadTextPos.isempty()) {
-		x = Pos.x;
-		y = Pos.y;
-	} else {
-		x = overHeadTextPos.x;
-		y = overHeadTextPos.y;
-	}
+	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
+	Region vp = core->GetGameControl()->Viewport();
+	Region rgn(p - Point(100, cs) - vp.Origin(), Size(200, 400));
+	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
+}
 
-	if (!palette) {
-		palette = core->InfoTextPalette;
-		palette->acquire();
-	}
-
-	core->GetVideoDriver()->ConvertToScreen(x, y);
-	Region rgn( x-100+screen.x, y - cs + screen.y, 200, 400 );
-	core->GetTextFont()->Print( rgn, OverheadText, palette,
-							   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP );
-
-	palette->release();
+Region Scriptable::DrawingRegion() const
+{
+	return BBox;
 }
 
 void Scriptable::ImmediateEvent()
@@ -565,7 +552,6 @@ void Scriptable::ProcessActions()
 	}
 
 	int lastAction = -1;
-
 	while (true) {
 		CurrentActionInterruptable = true;
 		if (!CurrentAction) {
@@ -676,7 +662,7 @@ ieDword Scriptable::GetInternalFlag() const
 
 void Scriptable::SetInternalFlag(unsigned int value, int mode)
 {
-	core->SetBits(InternalFlags, value, mode);
+	SetBits(InternalFlags, value, mode);
 }
 
 void Scriptable::InitTriggers()
@@ -1430,7 +1416,7 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 			ieDword gender = actor->GetCGGender();
 			fxqueue->SetOwner(actor);
 			spl->AddCastingGlow(fxqueue, duration, gender);
-			fxqueue->AddAllEffects(actor, actor->Pos);
+			fxqueue->AddAllEffects(actor, Point());
 		}
 		delete fxqueue;
 
@@ -1716,22 +1702,10 @@ Selectable::Selectable(ScriptableType type)
 	Over = false;
 	size = 0;
 	sizeFactor = 1.0f;
-	cover = NULL;
 	circleBitmap[0] = NULL;
 	circleBitmap[1] = NULL;
 	selectedColor = ColorBlack;
 	overColor = ColorBlack;
-}
-
-void Selectable::SetSpriteCover(SpriteCover* c)
-{
-	delete cover;
-	cover = c;
-}
-
-Selectable::~Selectable(void)
-{
-	delete cover;
 }
 
 void Selectable::SetBBox(const Region &newBBox)
@@ -1739,7 +1713,7 @@ void Selectable::SetBBox(const Region &newBBox)
 	BBox = newBBox;
 }
 
-void Selectable::DrawCircle(const Region &vp)
+void Selectable::DrawCircle(const Point& p) const
 {
 	/* BG2 colours ground circles as follows:
 	dark green for unselected party members
@@ -1754,37 +1728,30 @@ void Selectable::DrawCircle(const Region &vp)
 	if (size<=0) {
 		return;
 	}
+
 	Color mix;
-	Color* col = &selectedColor;
-	Sprite2D* sprite = circleBitmap[0];
+	const Color* col = &selectedColor;
+	Holder<Sprite2D> sprite = circleBitmap[0];
 
 	if (Selected && !Over) {
 		sprite = circleBitmap[1];
 	} else if (Over) {
-		//doing a time dependent flashing of colors
-		//if it is too fast, increase the 6 to 7
-		unsigned long step;
-		step = GetTicks();
-		step = tp_steps [(step >> 7) & 7]*2;
-		mix.a = overColor.a;
-		mix.r = (overColor.r*step+selectedColor.r*(8-step))/8;
-		mix.g = (overColor.g*step+selectedColor.g*(8-step))/8;
-		mix.b = (overColor.b*step+selectedColor.b*(8-step))/8;
+		mix = GlobalColorCycle.Blend(overColor, selectedColor);
 		col = &mix;
 	} else if (IsPC()) {
 		col = &overColor;
 	}
 
 	if (sprite) {
-		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
+		core->GetVideoDriver()->BlitSprite(sprite, Pos - p);
 	} else {
 		// for size >= 2, radii are (size-1)*16, (size-1)*12
 		// for size == 1, radii are 12, 9
 		int csize = (size - 1) * 4;
 		if (csize < 4) csize = 3;
 
-		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
-		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col );
+		core->GetVideoDriver()->DrawEllipse( Pos - p,
+		(ieWord) (csize * 4 * sizeFactor), (ieWord) (csize * 3 * sizeFactor), *col);
 	}
 }
 
@@ -1824,11 +1791,9 @@ void Selectable::Select(int Value)
 	if (Selected!=0x80 || Value!=1) {
 		Selected = (ieWord) Value;
 	}
-	//forcing regeneration of the cover
-	SetSpriteCover(NULL);
 }
 
-void Selectable::SetCircle(int circlesize, float factor, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)
+void Selectable::SetCircle(int circlesize, float factor, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle)
 {
 	size = circlesize;
 	sizeFactor = factor;
@@ -1839,24 +1804,6 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Spr
 	overColor.a = color.a;
 	circleBitmap[0] = normal_circle;
 	circleBitmap[1] = selected_circle;
-}
-
-//used for creatures
-int Selectable::WantDither() const
-{
-	//if dithering is disabled globally, don't do it
-	if (core->FogOfWar&FOG_DITHERSPRITES) {
-		return 0;
-	}
-	//if actor is dead, dither it if polygon wants
-	if (Selected&0x80) {
-		return 1;
-	}
-	//if actor is selected dither it
-	if (Selected) {
-		return 2;
-	}
-	return 1;
 }
 
 /***********************
@@ -1875,11 +1822,6 @@ Highlightable::Highlightable(ScriptableType type)
 	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
 
-Highlightable::~Highlightable(void)
-{
-	delete( outline );
-}
-
 bool Highlightable::IsOver(const Point &Place) const
 {
 	if (!outline) {
@@ -1888,12 +1830,19 @@ bool Highlightable::IsOver(const Point &Place) const
 	return outline->PointIn(Place);
 }
 
-void Highlightable::DrawOutline() const
+void Highlightable::DrawOutline(Point origin) const
 {
 	if (!outline) {
 		return;
 	}
-	core->GetVideoDriver()->DrawPolyline( outline, outlineColor, true );
+	origin = outline->BBox.Origin() - origin;
+
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BLIT_MULTIPLY|BLIT_HALFTRANS );
+	} else {
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BLIT_BLENDED|BLIT_HALFTRANS );
+		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, false );
+	}
 }
 
 void Highlightable::SetCursor(unsigned char CursorIndex)
@@ -2010,7 +1959,6 @@ Movable::Movable(ScriptableType type)
 	path = NULL;
 	step = NULL;
 	timeStartStep = 0;
-	lastFrame = NULL;
 	Area[0] = 0;
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
@@ -2341,6 +2289,13 @@ void Movable::AddWayPoint(const Point &Des)
 	Point p(endNode->x, endNode->y);
 	area->ClearSearchMapFor(this);
 	PathNode *path2 = area->FindPath(p, Des, size);
+	// if the waypoint is too close to the current position, no path is generated
+	if (!path2) {
+		if (BlocksSearchMap()) {
+			area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+		}
+		return;
+	}
 	endNode->Next = path2;
 	//probably it is wise to connect it both ways?
 	path2->Parent = endNode;
@@ -2404,7 +2359,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	}
 	//if not continous random walk, then stops for a while
 	if (can_stop) {
-		Region vp = core->GetVideoDriver()->GetViewport();
+		Region vp = core->GetGameControl()->Viewport();
 		if (!vp.PointInside(Pos)) {
 			SetWait(AI_UPDATE_TIME * core->Roll(1, 40, 0));
 			return;

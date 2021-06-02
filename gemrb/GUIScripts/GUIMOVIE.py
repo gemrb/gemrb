@@ -32,9 +32,7 @@ MoviesTable = 0
 def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack ("GUIMOVIE", 640, 480)
-	MovieWindow = GemRB.LoadWindow (0)
-	MovieWindow.SetFrame ()
+	MovieWindow = GemRB.LoadWindow (0, "GUIMOVIE")
 	TextAreaControl = MovieWindow.GetControl (0)
 	PlayButton = MovieWindow.GetControl (2)
 	CreditsButton = MovieWindow.GetControl (3)
@@ -47,9 +45,9 @@ def OnLoad():
 	DoneButton.SetText (11973)
 	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	CreditsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreditsPress)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	MovieWindow.SetVisible (WINDOW_VISIBLE)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MovieWindow.Close())
+	DoneButton.MakeEscape()
+	MovieWindow.Focus()
 	return
 
 def PlayPress():
@@ -60,7 +58,6 @@ def PlayPress():
 			if s==0:
 				s = MoviesTable.GetRowName (i)
 				GemRB.PlayMovie (s, 1)
-				MovieWindow.Invalidate ()
 				return
 			s = s - 1
 	return
@@ -73,14 +70,5 @@ def CreditsPress():
 		GemRB.SetNextScript ("GUISONGS")
 	else:
 		GemRB.PlayMovie ("CREDITS",1)
-		MovieWindow.Invalidate ()
-	return
 
-def DonePress():
-	if MovieWindow:
-		MovieWindow.Unload ()
-	if GameCheck.HasTOB():
-		GemRB.SetNextScript ("Start2")
-	else:
-		GemRB.SetNextScript ("Start")
 	return

@@ -40,7 +40,6 @@ WMPAreaEntry::WMPAreaEntry()
 	LoadScreenResRef[0] = 0;
 	LocCaptionName = LocTooltipName = 0;
 	AreaLinksCount[0] = AreaLinksIndex[0] = 0;
-	X = Y = 0;
 	IconSeq = AreaStatus = 0;
 }
 
@@ -50,13 +49,12 @@ WMPAreaEntry::~WMPAreaEntry()
 	if (StrTooltip) {
 		core->FreeString(StrTooltip);
 	}
-	Sprite2D::FreeSprite(MapIcon);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 {
-	core->SetBits(AreaStatus, arg, op);
-	Sprite2D::FreeSprite(MapIcon);
+	SetBits(AreaStatus, arg, op);
+	MapIcon = nullptr;
 }
 
 const String* WMPAreaEntry::GetCaption()
@@ -77,15 +75,14 @@ const char* WMPAreaEntry::GetTooltip()
 
 static int gradients[5]={18,22,19,3,4};
 
-void WMPAreaEntry::SetPalette(int gradient, Sprite2D* MapIcon)
+void WMPAreaEntry::SetPalette(int gradient, Holder<Sprite2D> MapIcon)
 {
 	if (!MapIcon) return;
-	Palette *palette = new Palette;
-	core->GetPalette( gradient&255, 256, palette->col );
-	MapIcon->SetPalette(palette);
+	const auto& colors = core->GetPalette256(gradient);
+	MapIcon->SetPalette(new Palette(&colors[0], &colors[256]));
 }
 
-Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
+Holder<Sprite2D> WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
@@ -122,7 +119,6 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
 			SetPalette(color, MapIcon);
 		}
 	}
-	MapIcon->acquire();
 	return MapIcon;
 }
 
@@ -241,9 +237,6 @@ WorldMap::~WorldMap(void)
 	for (i = 0; i < area_links.size(); i++) {
 		delete( area_links[i] );
 	}
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
 	if (Distances) {
 		free(Distances);
 	}
@@ -258,11 +251,8 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 	bam = newicons;
 }
 
-void WorldMap::SetMapMOS(Sprite2D *newmos)
+void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 {
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
 	MapMOS = newmos;
 }
 
@@ -509,8 +499,8 @@ void WorldMap::SetEncounterArea(const ieResRef area, WMPAreaLink *link) {
 
 	WMPAreaEntry *src = area_entries[i];
 	WMPAreaEntry *dest = area_entries[link->AreaIndex];
-	ae->X = src->X + (int) (dest->X - src->X) / 2;
-	ae->Y = src->Y + (int) (dest->Y - src->Y) / 2;
+	ae->pos.x = src->pos.x + (dest->pos.x - src->pos.x) / 2;
+	ae->pos.y = src->pos.y + (dest->pos.y - src->pos.y) / 2;
 
 	//setup the area links
 	WMPAreaLink *ldest = new WMPAreaLink();

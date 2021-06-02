@@ -18,6 +18,7 @@
 #
 #character generation, gender (GUICG1)
 import GemRB
+import CharOverview
 from GUIDefines import *
 
 GenderWindow = 0
@@ -26,38 +27,17 @@ DoneButton = 0
 
 def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton
-	
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	#this hack will redraw the base CG window
-	GenderWindow = GemRB.LoadWindow(0)
-	GenderWindow.SetFrame( )
-	PortraitButton = GenderWindow.GetControl(12)
-	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	ImportButton = GenderWindow.GetControl(13)
-	ImportButton.SetText(13955)
-	ImportButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GenderWindow.GetControl(15)
-	CancelButton.SetText(13727)
-	CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	BiographyButton = GenderWindow.GetControl(16)
-	BiographyButton.SetText(18003)
-	BiographyButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.DrawWindows()
-	if GenderWindow:
-		GenderWindow.Unload()
-	GenderWindow = GemRB.LoadWindow(1)
+	GenderWindow = GemRB.LoadWindow(1, "GUICG", WINDOW_BOTTOM|WINDOW_CENTER)
+	CharOverview.PositionCharGenWin(GenderWindow)
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = GenderWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = GenderWindow.GetControl(5)
 	TextAreaControl.SetText(17236)
@@ -87,7 +67,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
+	GenderWindow.Focus()
 	return
 
 def ClickedMale():

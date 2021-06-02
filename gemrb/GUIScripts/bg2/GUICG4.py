@@ -24,6 +24,8 @@ from ie_stats import *
 from GUIDefines import *
 from ie_restype import RES_2DA
 
+import CharGenCommon
+
 AbilityWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -89,7 +91,6 @@ def RollPress():
 	PointsLeft = 0
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText("0")
-	SumLabel.SetUseRGB(1)
 
 	if HasStrExtra:
 		if AllPoints18:
@@ -122,7 +123,6 @@ def RollPress():
 				Label.SetText("18/"+str(e) )
 			else:
 				Label.SetText(str(v) )
-			Label.SetUseRGB(1)
 
 	# add a counter to the title
 	SumLabel = AbilityWindow.GetControl (0x10000000)
@@ -130,13 +130,11 @@ def RollPress():
 	AllPoints18 = 0
 	return
 
-def GiveAll18(wIdx, key, mod):
+def GiveAll18():
 	global AllPoints18
-	if mod == 2 and key == 127:
-		AllPoints18 = 1
-		RollPress()
-		return 1
-	return 0
+
+	AllPoints18 = 1
+	RollPress()
 
 def OnLoad():
 	global AbilityWindow, TextAreaControl, DoneButton
@@ -167,10 +165,13 @@ def OnLoad():
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindow(4)
-	AbilityWindow.SetKeyPressEvent (GiveAll18)
+	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
+	CharGenCommon.PositionCharGenWin(AbilityWindow)
+
+	Button = AbilityWindow.CreateButton (2000, 0, 0, 0, 0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GiveAll18)
+	Button.SetHotKey ("8", 3, True) # TODO: make defines for CTRL and SHIFT modifiers
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)
@@ -181,10 +182,10 @@ def OnLoad():
 
 	BackButton = AbilityWindow.GetControl(36)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
@@ -194,14 +195,21 @@ def OnLoad():
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, JustPress)
 		Button.SetEvent(IE_GUI_MOUSE_LEAVE_BUTTON, EmptyPress)
 		Button.SetVarAssoc("Ability", i)
+		# delete the labels and use the buttons instead
+		AbilityWindow.DeleteControl (i+0x10000009)
+		Button.SetText (AbilityTable.GetValue (i, 0))
+		Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT, OP_OR)
+		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
@@ -211,14 +219,12 @@ def OnLoad():
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	AbilityWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
+	AbilityWindow.Focus()
 	return
 
-def RightPress():
+def RightPress(btn, Abidx):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
@@ -239,7 +245,7 @@ def RightPress():
 		Label.SetText(str(Ability-1) )
 	return
 
-def JustPress():
+def JustPress(btn, Abidx):
 	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
@@ -248,10 +254,9 @@ def JustPress():
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
-def LeftPress():
+def LeftPress(btn, Abidx):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
@@ -315,7 +320,6 @@ def BackPress():
 	GemRB.SetVar("StrExtra",0)
 	for i in range(-1,6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def NextPress():
@@ -335,6 +339,5 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	GemRB.SetNextScript("CharGen6")
 	return

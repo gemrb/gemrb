@@ -18,24 +18,21 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
-from GUIDefines import *
-from ie_stats import *
+
 import GUICommon
+import CharGenCommon
 import CommonTables
 
-import CharGenCommon
+from GUIDefines import *
+from ie_stats import *
 
-ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 
 def OnLoad():
-	global ClassWindow, TextAreaControl, DoneButton
+	global TextAreaControl, DoneButton
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassWindow = GemRB.LoadWindow(10)
-
-	GUICommon.CloseOtherWindow (ClassWindow.Unload)
+	ClassWindow = GemRB.LoadWindow(10, "GUICG")
 
 	ClassCount = CommonTables.Classes.GetRowCount()+1
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
@@ -81,8 +78,8 @@ def OnLoad():
 	TextAreaControl = ClassWindow.GetControl(12)
 	TextAreaControl.SetText(17244)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: NextPress(ClassWindow))
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(ClassWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -93,7 +90,8 @@ def ClassPress():
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
-def NextPress():
+def NextPress(Window):
+	Window.Close()
 	#class	
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")

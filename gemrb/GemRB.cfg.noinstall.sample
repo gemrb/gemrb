@@ -74,9 +74,6 @@ Bpp=32
 #Fullscreen [Boolean]
 Fullscreen=0
 
-# Delay before tooltips appear [milliseconds]
-TooltipDelay=500
-
 #####################################################
 #  Audio Parameters                                 #
 #####################################################
@@ -132,12 +129,15 @@ GUIEnhancements = 15
 # Draw Frames per Second info [Boolean]
 #DrawFPS=1
 
-# Hide unexplored parts of a map
-#FogOfWar=1
+# Show unexplored parts of a map
+#GCDebug=1536
 
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt
 #   full listing
 #EnableCheatKeys=1
+
+# Developer debug mode toggle (see DebugModeBits enum)
+#DebugMode=0
 
 #####################################################
 #  Paths                                            #
@@ -289,6 +289,9 @@ PluginsPath=./gemrb/plugins/
 
 # default is 0
 #MouseFeedback=0
+
+# force enable touch input (in case autodetection fails or for hybrids)
+#TouchInput=1
 
 #####################################################
 #  Touch Gesture Input Parameters                   #

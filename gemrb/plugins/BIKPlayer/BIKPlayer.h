@@ -25,14 +25,14 @@
 
 #include "globals.h"
 
-#include "Interface.h"
-
 // FIXME: This has to be included last, since it defines int*_t, which causes
 // mingw g++ 4.5.0 to choke.
 #include "GetBitContext.h"
 #include "common.h"
 #include "dsputil.h"
 #include "rational.h"
+
+#include <vector>
 
 namespace GemRB {
 
@@ -82,7 +82,7 @@ enum Sources {
 	  BINK_SRC_COLORS,          ///< pixel values used for different block types
 	  BINK_SRC_PATTERN,         ///< 8-bit values for 2-colour pattern fill
 	  BINK_SRC_X_OFF,           ///< X components of motion value
-	  BINK_SRC_Y_OFF,           ///< Y components of motion value
+	  BINK_SRC_Y_OFF,           ///< Y scomponents of motion value
 	  BINK_SRC_INTRA_DC,        ///< DC values for intrablocks with DCT
 	  BINK_SRC_INTER_DC,        ///< DC values for intrablocks with DCT
 	  BINK_SRC_RUN,             ///< run lengths for special fill block
@@ -107,14 +107,50 @@ enum BlockTypes {
 };
  
 typedef struct AVFrame {
-	  /**
-	   * pointer to the picture planes.
-	   * This might be different from the first allocated byte
-	   * - encoding: 
-	   * - decoding: 
-	   */
-	  uint8_t *data[3];
-	  int linesize[3];
+	/**
+	* pointer to the picture planes.
+	* This might be different from the first allocated byte
+	* - encoding: 
+	* - decoding: 
+	*/
+	uint8_t *data[3];
+	int linesize[3];
+	
+	AVFrame() : data(), linesize() {}
+	
+	AVFrame(int width, int height)
+	: data(), linesize() {
+		get_buffer(width, height);
+	}
+	
+	~AVFrame() {
+		release_buffer();
+	}
+	
+	void ff_fill_linesize(int width)
+	{
+		int w2 = (width + (1 << 1) - 1) >> 1;
+		linesize[0] = width;
+		linesize[1] = w2;
+		linesize[2] = w2;
+	}
+	
+	void release_buffer()
+	{
+		for(int i=0;i<3;i++) {
+			av_free(data[i]);
+		}
+	}
+	
+	void get_buffer(int width, int height)
+	{
+		release_buffer();
+		
+		ff_fill_linesize(width);
+		for(int plane=0; plane<3; plane++) {
+			data[plane] = (uint8_t *) av_malloc(linesize[plane]*height);
+		}
+	}
 } AVFrame;
 
 typedef struct {
@@ -154,16 +190,10 @@ typedef struct Bundle {
 
 class BIKPlayer : public MoviePlayer {
 private:
-	Video *video;
 	bool validVideo;
 	binkheader header;
 	std::vector<binkframe> frames;
 	ieByte *inbuff;
-
-	//subtitle and frame counting
-	ieDword maxRow;
-	ieDword rowCount;
-	ieDword frameCount;
 	
 	//audio context (consider packing it in a struct)
 	unsigned int s_frame_len;
@@ -197,8 +227,6 @@ private:
 	unsigned int frame_wait;
 	bool video_rendered_frame;
 	unsigned int video_frameskip;
-	bool done;
-	int outputwidth, outputheight;
 	unsigned int video_skippedframes;
 	//bink specific
 	ScanTable c_scantable;
@@ -210,26 +238,23 @@ private:
 	VLC bink_trees[16];
 	int16_t table[16 * 128][2];
 	GetBitContext v_gb;
-	AVFrame c_pic, c_last;
+	
+	AVFrame c_frames[2];
+	AVFrame *c_pic, *c_last;
 
 private:
 	void timer_start();
 	void timer_wait();
 	void segment_video_play();
-	bool next_frame();
-	int doPlay();
 	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
-	void showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
-		unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty);
-	int pollEvents();
+
 	int setAudioStream();
 	void freeAudioStream(int stream);
 	void queueBuffer(int stream, unsigned short bits,
 		int channels, short* memory, int size, int samplerate);
 	int sound_init(bool need_init);
 	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable);
-	int video_init(int w, int h);
+	int video_init();
 	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
 	int ReadHeader();
 	void DecodeBlock(short *out);
@@ -246,15 +271,19 @@ private:
 	int get_vlc2(int16_t (*table)[2], int bits, int max_depth);
 	void read_bundle(int bundle_num);
 	void init_lengths(int width, int bw);
-	int DecodeVideoFrame(void *data, int data_size);
+	int DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf);
 	int EndAudio();
 	int EndVideo();
+
+protected:
+	bool DecodeFrame(VideoBuffer&) override;
+
 public:
 	BIKPlayer(void);
-	~BIKPlayer(void);
-	bool Open(DataStream* stream);
-	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
-	int Play();	
+	~BIKPlayer(void) override;
+	bool Open(DataStream* stream) override;
+
+	void Stop();
 };
 
 }

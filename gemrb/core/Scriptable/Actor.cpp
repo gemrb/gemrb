@@ -38,6 +38,7 @@
 #include "DisplayMessage.h"
 #include "GameData.h"
 #include "Image.h"
+#include "ImageMgr.h"
 #include "Item.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack
 #include "Projectile.h"
@@ -53,6 +54,7 @@
 #include "GUI/GameControl.h"
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
+#include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 #include "StringMgr.h"
 
@@ -62,25 +64,6 @@ namespace GemRB {
 
 //configurable?
 ieDword ref_lightness = 43;
-
-static const Color white = {
-	0xff, 0xff, 0xff, 0xff
-};
-static const Color green = {
-	0x00, 0xff, 0x00, 0xff
-};
-static const Color red = {
-	0xff, 0x00, 0x00, 0xff
-};
-static const Color yellow = {
-	0xff, 0xff, 0x00, 0xff
-};
-static const Color cyan = {
-	0x00, 0xff, 0xff, 0xff
-};
-static const Color magenta = {
-	0xff, 0x00, 0xff, 0xff
-};
 
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
@@ -128,7 +111,6 @@ static ieDword cmd_snd_freq = 0;
 static ieDword crit_hit_scr_shake = 1;
 static ieDword bored_time = 3000;
 static ieDword footsteps = 1;
-static ieDword always_dither = 1;
 static ieDword war_cries = 1;
 static ieDword GameDifficulty = DIFF_CORE;
 static ieDword NoExtraDifficultyDmg = 0;
@@ -312,7 +294,7 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	-1,-1,-1
 };
 
-static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
+static ResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
 static ieDword hc_locations = 0;
@@ -461,17 +443,14 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
-	shadowAnimations = NULL;
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
-	for (i = 0; i < EXTRA_ACTORCOVERS; ++i)
-		extraCovers[i] = NULL;
 
-	LongName = NULL;
-	ShortName = NULL;
-	LongStrRef = (ieStrRef) -1;
-	ShortStrRef = (ieStrRef) -1;
+	memset(ShortName, 0, sizeof(ShortName));
+	memset(LongName, 0, sizeof(LongName));
+	LongStrRef = ieStrRef(-1);
+	ShortStrRef = ieStrRef(-1);
 
 	playedCommandSound = false;
 
@@ -562,29 +541,12 @@ Actor::Actor()
 
 Actor::~Actor(void)
 {
-	unsigned int i;
-
 	delete anims;
-
-	core->FreeString( LongName );
-	core->FreeString( ShortName );
-
 	delete PCStats;
 
-	for (i = 0; i < vvcOverlays.size(); i++) {
-		if (vvcOverlays[i]) {
-			delete vvcOverlays[i];
-			vvcOverlays[i] = NULL;
-		}
+	for (ScriptedAnimation* vvc : vfxQueue) {
+		delete vvc;
 	}
-	for (i = 0; i < vvcShields.size(); i++) {
-		if (vvcShields[i]) {
-			delete vvcShields[i];
-			vvcShields[i] = NULL;
-		}
-	}
-	for (i = 0; i < EXTRA_ACTORCOVERS; i++)
-		delete extraCovers[i];
 
 	delete attackProjectile;
 	delete polymorphCache;
@@ -608,54 +570,54 @@ void Actor::SetDefaultActions(int qslot, ieByte slot1, ieByte slot2, ieByte slot
 
 void Actor::SetName(const char* ptr, unsigned char type)
 {
-	size_t len = strlen( ptr ) + 1;
-	//32 is the maximum possible length of the actor name in the original games
-	if (len>32) len=33;
-	if (type!=2) {
-		LongName = ( char * ) realloc( LongName, len );
-		memcpy( LongName, ptr, len );
-		LongName[len-1]=0;
-		core->StripLine( LongName, len );
+	char* name = NULL;
+	if (type == 1) {
+		name = LongName;
+	} else {
+		name = ShortName;
 	}
-	if (type!=1) {
-		ShortName = ( char * ) realloc( ShortName, len );
-		memcpy( ShortName, ptr, len );
-		ShortName[len-1]=0;
-		core->StripLine( ShortName, len );
+	// both LongName and ShortName are the same size...
+	strncpy(name, ptr, sizeof(LongName) - 1);
+	char* end = name + strlen(name) - 1;
+	while (end > name && isspace(*end)) end--;
+	*(end+1) = '\0'; // trim whitespace from the end
+
+	if (type == 0) {
+		SetName(ptr, 1);
 	}
 }
 
 void Actor::SetName(int strref, unsigned char type)
 {
-	if (type!=2) {
-		if (LongName) free(LongName);
-		LongName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
+	char* name = NULL;
+	if (type <= 1) {
+		name = core->GetCString( strref );
 		LongStrRef = strref;
-	}
-	if (type!=1) {
-		if (ShortName) free(ShortName);
-		ShortName = core->GetCString( strref, IE_STR_REMOVE_NEWLINE );
+		if (type == 0)
+			ShortStrRef = strref;
+	} else {
+		name = core->GetCString( strref );
 		ShortStrRef = strref;
 	}
+	SetName(name, type);
+	free(name);
 }
 
 void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
-	Palette *recover = NULL;
+	PaletteHolder recover = nullptr;
 	ieResRef paletteResRef;
 
 	if (anims) {
 		if (anims->lockPalette) {
-			recover = anims->palette[PAL_MAIN];
+			recover = anims->PartPalettes[PAL_MAIN];
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
 			CopyResRef(paletteResRef, anims->PaletteResRef[PAL_MAIN]);
 			if (recover->named) {
 				recover = gamedata->GetPalette(paletteResRef);
-			} else {
-				recover->acquire();
 			}
 		}
 		delete( anims );
@@ -681,8 +643,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims->SetWeaponRef(WeaponRef);
 
 	//if we have a recovery palette, then set it back
-	assert(anims->palette[PAL_MAIN] == 0);
-	anims->palette[PAL_MAIN] = recover;
+	assert(anims->PartPalettes[PAL_MAIN] == 0);
+	anims->PartPalettes[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
 		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);
@@ -753,7 +715,7 @@ ieDword Actor::GetSafeStat(unsigned int StatIndex) const
 
 void Actor::SetCircleSize()
 {
-	const Color *color;
+	Color color;
 	int color_index;
 
 	if (!anims)
@@ -763,16 +725,16 @@ void Actor::SetCircleSize()
 	float oscillationFactor = 1.0f;
 
 	if (UnselectableTimer) {
-		color = &magenta;
+		color = ColorMagenta;
 		color_index = 4;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
-		color = &yellow;
+		color = ColorYellow;
 		color_index = 5;
 	} else if (Modified[IE_CHECKFORBERSERK]) {
-		color = &yellow;
+		color = ColorYellow;
 		color_index = 5;
 	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {
-		color = &white;
+		color = ColorWhite;
 		color_index = 3; //?? made up
 
 		if (remainingTalkSoundTime > 0) {
@@ -791,21 +753,21 @@ void Actor::SetCircleSize()
 			case EA_CHARMED:
 			case EA_EVILBUTGREEN:
 			case EA_GOODCUTOFF:
-				color = &green;
+				color = ColorGreen;
 				color_index = 0;
 				break;
 			case EA_EVILCUTOFF:
-				color = &yellow;
+				color = ColorYellow;
 				color_index = 5;
 				break;
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
 			case EA_CHARMEDPC:
-				color = &red;
+				color = ColorRed;
 				color_index = 1;
 				break;
 			default:
-				color = &cyan;
+				color = ColorCyan;
 				color_index = 2;
 				break;
 		}
@@ -814,7 +776,7 @@ void Actor::SetCircleSize()
 	// circle size 0 won't display, so we can ignore it when clamping
 	int csize = Clamp(anims->GetCircleSize(), 1, MAX_CIRCLE_SIZE) - 1;
 
-	SetCircle( anims->GetCircleSize(), oscillationFactor, *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+	SetCircle( anims->GetCircleSize(), oscillationFactor, color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
@@ -1458,7 +1420,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	}
 
 	if (flag) {
-		sca->ZPos=-1;
+		sca->ZOffset = -1;
 	}
 	actor->AddVVCell(sca);
 }
@@ -1470,7 +1432,7 @@ static void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 		handle_overlay(actor, OV_ENTANGLE);
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_ENTANGLE], true);
+		actor->RemoveVVCells(hc_overlays[OV_ENTANGLE]);
 	}
 }
 
@@ -1488,7 +1450,7 @@ static void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 			if (newValue&mask) {
 				handle_overlay(actor, i);
 			} else if (oldValue&mask) {
-				actor->RemoveVVCell(hc_overlays[i], true);
+				actor->RemoveVVCells(hc_overlays[i]);
 			}
 		}
 		mask<<=1;
@@ -1503,7 +1465,7 @@ static void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_SHIELDGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_SHIELDGLOBE]);
 	}
 }
 
@@ -1515,7 +1477,7 @@ static void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_MINORGLOBE], true);
+		actor->RemoveVVCells(hc_overlays[OV_MINORGLOBE]);
 	}
 }
 
@@ -1527,7 +1489,7 @@ static void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_GREASE], true);
+		actor->RemoveVVCells(hc_overlays[OV_GREASE]);
 	}
 }
 
@@ -1540,7 +1502,7 @@ static void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(hc_overlays[OV_WEB], true);
+		actor->RemoveVVCells(hc_overlays[OV_WEB]);
 	}
 }
 
@@ -1552,8 +1514,7 @@ static void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 		return;
 	}
 	if (oldValue) {
-		//it seems we have to remove it abruptly
-		actor->RemoveVVCell(hc_overlays[OV_BOUNCE], false);
+		actor->RemoveVVCells(hc_overlays[OV_BOUNCE]);
 	}
 }
 
@@ -1846,9 +1807,6 @@ GEM_EXPORT void UpdateActorConfig()
 	if (!(tmp & FT_ACTIONS)) cmd_snd_freq = 0;
 	core->GetDictionary()->Lookup("Bored Timeout", bored_time);
 	core->GetDictionary()->Lookup("Footsteps", footsteps);
-	//FIXME: Drop all actors' SpriteCover.
-	//the actor will change dithering only after selected/moved (its spritecover was updated)
-	core->GetDictionary()->Lookup("Always Dither", always_dither);
 	core->GetDictionary()->Lookup("Attack Sounds", war_cries);
 
 	//Handle Game Difficulty and Nightmare Mode
@@ -2082,12 +2040,11 @@ static void InitActorTables()
 	if (tm) {
 		ieDword mask = 1;
 		for (i=0;i<OVERLAY_COUNT;i++) {
-			const char *tmp = tm->QueryField( i, 0 );
-			strnlwrcpy(hc_overlays[i], tmp, 8);
+			hc_overlays[i] = tm->QueryField(i, 0);
 			if (atoi(tm->QueryField( i, 1))) {
 				hc_locations|=mask;
 			}
-			tmp = tm->QueryField( i, 2 );
+			const char *tmp = tm->QueryField( i, 2 );
 			hc_flags[i] = atoi(tmp);
 			mask<<=1;
 		}
@@ -2359,7 +2316,7 @@ static void InitActorTables()
 
 			//we have to account for dual-swap in the multiclass field
 			ieDword numfound = 1;
-			ieDword tmpbits = core->CountBits (tmpclass);
+			size_t tmpbits = CountBits (tmpclass);
 
 			//we need all the classnames of the multi to compare with the order we load them in
 			//because the original game set the levels based on name order, not bit order
@@ -2804,7 +2761,7 @@ void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int 
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(resource, false);
 	if (!sca)
 		return;
-	sca->ZPos=height;
+	sca->ZOffset = height;
 	if (flags&AA_PLAYONCE) {
 		sca->PlayOnce();
 	}
@@ -3002,7 +2959,9 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 	if (previous!=Value) {
 		if (pcf) {
 			PostChangeFunctionType f = post_change_functions[StatIndex];
-			if (f) (*f)(this, previous, Value);
+			if (f) {
+				(*f)(this, previous, Value);
+			}
 		}
 	}
 	return true;
@@ -3227,14 +3186,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		//ToHit.ResetAll();
 	}
 
-	unsigned int i;
-
 	// some VVCs are controlled by stats (and so by PCFs), the rest have 'effect_owned' set
-	for (i = 0; i < vvcOverlays.size(); i++) {
-		if (vvcOverlays[i] && vvcOverlays[i]->effect_owned) vvcOverlays[i]->active = false;
-	}
-	for (i = 0; i < vvcShields.size(); i++) {
-		if (vvcShields[i] && vvcShields[i]->effect_owned) vvcShields[i]->active = false;
+	for (ScriptedAnimation* vvc : vfxQueue) {
+		if (vvc->effect_owned) vvc->active = false;
 	}
 
 	// apply palette changes not caused by persistent effects
@@ -3321,7 +3275,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		pcf_hitpoint(this, 0, BaseStats[IE_HITPOINTS]);
 	}
 
-	for (i=0;i<MAX_STATS;i++) {
+	for (int i=0; i < MAX_STATS; ++i) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
@@ -3340,7 +3294,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	if (mxsplwis) {
 		if (spellbook.IsIWDSpellBook()) {
 			// check each class separately for the casting stat and booktype (luckily there is no bonus for domain spells)
-			for (i=0; i < ISCLASSES; i++) {
+			for (int i = 0; i < ISCLASSES; ++i) {
 				int level = GetClassLevel(i);
 				int booktype = booksiwd2[i]; // ieIWD2SpellType
 				if (!level || booktype == -1) {
@@ -3573,8 +3527,10 @@ void Actor::RefreshPCStats() {
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
 			// eeeh, no token (Heal: 1)
 			if (Modified[IE_HITPOINTS] < Modified[IE_MAXHITPOINTS]) {
-				String text = *core->GetString(28895) + L"1"; // FIXME
-				if (core->HasFeedback(FT_STATES)) displaymsg->DisplayString(text, DMC_BG2XPGREEN, this);
+				String* text = core->GetString(28895);
+				text->push_back(L'1');
+				displaymsg->DisplayString(*text, DMC_BG2XPGREEN, this);
+				delete text;
 			}
 		} else{
 			NewBase(IE_HITPOINTS, 1, MOD_ADDITIVE);
@@ -3738,7 +3694,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
-			wchar_t tmp[4];
+			wchar_t tmp[20];
 			swprintf(tmp, sizeof(tmp)/sizeof(tmp[0]), L" %d", ret);
 			String msg = *str + tmp;
 			delete str;
@@ -3990,13 +3946,13 @@ void Actor::Interact(int type) const
 ieStrRef Actor::GetVerbalConstant(int index) const
 {
 	if (index<0 || index>=VCONST_COUNT) {
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 
 	int idx = VCMap[index];
 
 	if (idx<0 || idx>=VCONST_COUNT) {
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 	return StrRefs[idx];
 }
@@ -4034,7 +3990,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 			count--;
 			ResolveStringConstant(soundref, start+count);
 			GetSoundFolder(chrsound, 1, soundref);
-			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true)) {
+			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				found = true;
 				break;
@@ -4042,7 +3998,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		} while (count > 0);
 	} else { //If we are anyone else we have to check there is a corresponding strref
 		ieStrRef str = GetVerbalConstant(start, count);
-		if (str != (ieStrRef) -1) {
+		if (str != ieStrRef(-1)) {
 			DisplayStringCore((Scriptable *) this, str, flags);
 			found = true;
 		}
@@ -4512,7 +4468,7 @@ void Actor::Panic(const Scriptable *attacker, int panicmode)
 void Actor::SetMCFlag(ieDword arg, int op)
 {
 	ieDword tmp = BaseStats[IE_MC_FLAGS];
-	core->SetBits(tmp, arg, op);
+	SetBits(tmp, arg, op);
 	SetBase(IE_MC_FLAGS, tmp);
 }
 
@@ -5050,6 +5006,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 void Actor::PlaySwingSound(WeaponInfo &wi) const
 {
 	ieResRef sound;
+	ResRef sound2;
 	ieDword itemType = wi.itemtype;
 	int isCount = gamedata->GetSwingCount(itemType);
 
@@ -5058,14 +5015,15 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 		int stance = GetStance();
 		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
 			GetSoundFromFile(sound, 100+stance);
+			sound2 = sound;
 		}
 	} else {
 		// swing sounds start at column 3 (index 2)
 		int isChoice = core->Roll(1, isCount, -1) + 2;
-		if (!gamedata->GetItemSound(sound, itemType, NULL, isChoice)) return;
+		if (!gamedata->GetItemSound(sound2, itemType, NULL, isChoice)) return;
 	}
 
-	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos.x, Pos.y);
+	core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos.x, Pos.y);
 }
 
 //Just to quickly inspect debug maximum values
@@ -5229,7 +5187,6 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 	p.y = nmptTarget.y / 12;
 
 	q = p;
-	lastFrame = NULL;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
@@ -5259,7 +5216,7 @@ ieDword Actor::GetXPLevel(int modified) const
 		stats = BaseStats;
 	}
 
-	int clscount = 0;
+	size_t clscount = 0;
 	float average = 0;
 	if (iwd2class) {
 		// iwd2
@@ -5276,11 +5233,11 @@ ieDword Actor::GetXPLevel(int modified) const
 			}
 		}
 		else if (IsMultiClassed()) {
-				//clscount is the number of on bits in the MULTI field
-				clscount = core->CountBits (multiclass);
-				assert(clscount && clscount <= 3);
-				for (int i=1; i<clscount; i++)
-					average += levels[i];
+			//clscount is the number of on bits in the MULTI field
+			clscount = CountBits (multiclass);
+			assert(clscount && clscount <= 3);
+			for (size_t i=1; i<clscount; i++)
+				average += levels[i];
 		} //else single classed
 		average = average / (float) clscount + 0.5;
 	}
@@ -6561,6 +6518,12 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 void Actor::SetDialog(const ieResRef resref)
 {
 	CopyResRef(Dialog, resref);
+}
+
+Holder<Sprite2D> Actor::CopyPortrait(int which) const
+{
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(which ? SmallPortrait : LargePortrait, true);
+	return (im) ? im->GetSprite2D() : NULL;
 }
 
 const char *Actor::GetDialog(int flags) const
@@ -7871,7 +7834,88 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 	}
 }
 
-void Actor::UpdateActorState(ieDword gameTime) {
+void Actor::UpdateActorState()
+{
+	if (InTrap) {
+		area->ClearTrap(this, InTrap-1);
+	}
+
+	Game* game = core->GetGame();
+
+	//make actor unselectable and unselected when it is not moving
+	//dead, petrified, frozen, paralysed or unavailable to player
+	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
+		game->SelectActor(this, false, SELECT_NORMAL);
+	}
+
+	if (remainingTalkSoundTime > 0) {
+		unsigned int currentTick = GetTicks();
+		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
+		lastTalkTimeCheckAt = currentTick;
+
+		if (diffTime >= remainingTalkSoundTime) {
+			remainingTalkSoundTime = 0;
+		} else {
+			remainingTalkSoundTime -= diffTime;
+		}
+		SetCircleSize();
+	}
+
+	// display pc hitpoints if requested
+	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
+	ieDword tmp = 0;
+	core->GetDictionary()->Lookup("HP Over Head", tmp);
+	if (tmp && Persistent() && (game->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
+		DisplayHeadHPRatio();
+	}
+
+	const auto& anim = currentStance.anim;
+	if (attackProjectile) {
+		// default so that the projectile fires if we dont have an animation for some reason
+		unsigned int frameCount = anim.empty() ? 9 : anim[0].first->GetFrameCount();
+		unsigned int currentFrame = anim.empty() ? 8 : anim[0].first->GetCurrentFrameIndex();
+
+		//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
+		// however some critters don't have that long animations (eg. squirrel 0xC400)
+		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
+			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
+			attackProjectile = NULL;
+		}
+	}
+	
+	if (!anim.empty()) {
+		Animation* first = anim[0].first;
+		
+		if (first->endReached) {
+			// possible stance change
+			if (HandleActorStance()) {
+				// restart animation for next time it is needed
+				first->endReached = false;
+				first->SetPos(0);
+
+				Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+				if (firstShadow) {
+					firstShadow->endReached = false;
+					firstShadow->SetPos(0);
+				}
+			}
+		} else {
+			//check if walk sounds need to be played
+			//dialog, pause game
+			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
+				//footsteps option set, stance
+				if (footsteps && (GetStance() == IE_ANI_WALK)) {
+					PlayWalkSound();
+				}
+			}
+		}
+	}
+
+	UpdateModalState(game->GameTime);
+}
+
+void Actor::UpdateModalState(ieDword gameTime)
+{
 	if (Modal.LastApplyTime == gameTime) {
 		return;
 	}
@@ -7994,7 +8038,6 @@ void Actor::UpdateActorState(ieDword gameTime) {
 		// shut everyone up, so they don't whine if the actor is on a long hiding-in-shadows recon mission
 		core->GetGame()->ResetPartyCommentTimes();
 	}
-
 }
 
 void Actor::ApplyModal(ieResRef modalSpell)
@@ -8124,14 +8167,33 @@ void Actor::AddExperience(int exp, int combat)
 		bonus += adjustmentPercent;
 	}
 	bonus += GetFavoredPenalties();
-	exp = ((exp * (100 + bonus)) / 100) + BaseStats[IE_XP];
+
+	int xpStat = IE_XP;
+
+	// decide which particular XP stat to add to (only for TNO's switchable classes)
+	Game* game = core->GetGame();
+	if (pstflags && this == game->GetPC(0, false)) { // rule only applies to the protagonist
+		switch (BaseStats[IE_CLASS]) {
+			case 4:
+				xpStat = IE_XP_THIEF;
+				break;
+			case 1:
+				xpStat = IE_XP_MAGE;
+				break;
+			case 2:
+			default: //just in case the character was modified
+				break;
+		}
+	}
+
+	exp = ((exp * (100 + bonus)) / 100) + BaseStats[xpStat];
 	if (xpcap != NULL) {
 		int classid = GetActiveClass() - 1;
 		if (xpcap[classid] > 0 && exp > xpcap[classid]) {
 			exp = xpcap[classid];
 		}
 	}
-	SetBase(IE_XP, exp);
+	SetBase(xpStat, exp);
 }
 
 static bool is_zero(const int& value) {
@@ -8268,73 +8330,32 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-int Actor::WantDither() const
+void Actor::DrawActorSprite(const Point& p, uint32_t flags,
+							const std::vector<AnimationPart>& animParts, const Color& tint) const
 {
-	if (always_dither) return 2;
-	return Selectable::WantDither();
-}
-
-//there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint)
-{
-	Map* area = GetCurrentArea();
-
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
-		ScriptedAnimation* vvc = vvcCells[i];
-
-		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither(), GetOrientation(), BBox.h);
-		if (endReached) {
-			delete vvc;
-			vvcCells.erase(vvcCells.begin()+i);
-			continue;
-		}
-		if (!vvc->active) {
-			vvc->SetPhase(P_RELEASE);
-		}
+	if (tint.a == 0) return;
+	
+	if (!anims->lockPalette) {
+		flags |= BLIT_COLOR_MOD;
 	}
-}
-
-void Actor::DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
-			SpriteCover*& newsc, Animation** anims,
-			unsigned char Face, const Color& tint, bool useShadowPalette)
-{
-	CharAnimations* ca = GetAnims();
-	int PartCount = ca->GetTotalPartCount();
+	flags |= BLIT_ALPHA_MOD;
+	
 	Video* video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
-	ieDword flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
-	if (!ca->lockPalette) flags |= BLIT_TINTED;
-	const Game* game = core->GetGame();
-	// when time stops, almost everything turns dull grey, the caster and immune actors being the most notable exceptions
-	if (game->TimeStoppedFor(this)) {
-		flags |= BLIT_GREY;
-	}
 
-	// display current frames in the right order
-	const int* zOrder = ca->GetZOrder(Face);
-	for (int part = 0; part < PartCount; ++part) {
-		int partnum = part;
-		if (zOrder) partnum = zOrder[part];
-		Animation* anim = anims[partnum];
-		Sprite2D* nextFrame = 0;
-		if (anim)
-			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-		if (nextFrame && bbox.IntersectsRegion( vp ) ) {
-			if (!newsc || !newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
-				// the first anim contains the animarea for
-				// the entire multi-part animation
-				newsc = area->BuildSpriteCover(cx,
-					cy, -anims[0]->animArea.x,
-					-anims[0]->animArea.y,
-					anims[0]->animArea.w,
-					anims[0]->animArea.h, WantDither() );
+	for (const auto& part : animParts) {
+		Animation* anim = part.first;
+		PaletteHolder palette = part.second;
+
+		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
+		if (currentFrame) {
+			if (TranslucentShadows) {
+				ieByte tmpa = palette->col[1].a;
+				palette->col[1].a /= 2;
+				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
+				palette->col[1].a = tmpa;
+			} else {
+				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
 			}
-			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
-
-			Palette* palette = useShadowPalette ? ca->GetShadowPalette() : ca->GetPartPalette(partnum);
-			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				flags, tint, newsc, palette, &screen);
 		}
 	}
 }
@@ -8345,7 +8366,7 @@ static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0
 static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
 static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
-bool Actor::ShouldHibernate() const
+bool Actor::HibernateIfAble()
 {
 	//finding an excuse why we don't hybernate the actor
 	if (Modified[IE_ENABLEOFFSCREENAI])
@@ -8368,93 +8389,83 @@ bool Actor::ShouldHibernate() const
 		return false;
 	if (GetWait()) //would never stop waiting
 		return false;
+	
+	InternalFlags |= IF_IDLE;
 	return true;
 }
 
-void Actor::UpdateAnimations()
+bool Actor::AdvanceAnimations()
 {
-	// TODO: move this
-	if (InTrap) {
-		area->ClearTrap(this, InTrap-1);
-	}
-
-	//make actor unselectable and unselected when it is not moving
-	//dead, petrified, frozen, paralysed or unavailable to player
-	if (!ValidTarget(GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL)) {
-		core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-	}
-
-	CharAnimations* ca = GetAnims();
-	if (!ca) {
-		return;
-	}
-
-	ca->PulseRGBModifiers();
-
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetNextFace();
-	Animation** anims = ca->GetAnimation( StanceID, Face );
 	if (!anims) {
-		return;
+		return false;
 	}
-	Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
+	
+	anims->PulseRGBModifiers();
+	
+	ClearCurrentStanceAnims();
 
-	//If you find a better place for it, I'll really be glad to put it there
-	//IN BG1 and BG2, this is at the ninth frame... (depends on the combat bitmap, which we don't handle yet)
-	// however some critters don't have that long animations (eg. squirrel 0xC400)
-	if (attackProjectile) {
-		unsigned int frameCount = anims[0]->GetFrameCount();
-		unsigned int currentFrame = anims[0]->GetCurrentFrame();
-		if ((frameCount > 8 && currentFrame == 8) || (frameCount <= 8 && currentFrame == frameCount/2)) {
-			GetCurrentArea()->AddProjectile(attackProjectile, Pos, LastTarget, false);
-			attackProjectile = NULL;
+	unsigned char stanceID = GetStance();
+	unsigned char face = GetNextFace();
+	Animation** stanceAnim = anims->GetAnimation(stanceID, face);
+	
+	if (stanceAnim == nullptr) {
+		return false;
+	}
+	
+	Animation** shadows = anims->GetShadowAnimation(stanceID, face);
+	
+	const auto count = anims->GetTotalPartCount();
+	const auto zOrder = anims->GetZOrder(face);
+	
+	// display current frames in the right order
+	for (int part = 0; part < count; ++part) {
+		int partnum = part;
+		if (zOrder) partnum = zOrder[part];
+		Animation* anim = stanceAnim[partnum];
+		if (anim) {
+			currentStance.anim.emplace_back(anim, anims->GetPartPalette(partnum));
+		}
+		
+		if (shadows) {
+			Animation* anim = shadows[partnum];
+			if (anim) {
+				currentStance.shadow.emplace_back(anim, anims->GetShadowPalette());
+			}
 		}
 	}
-
+	
+	Animation* first = currentStance.anim[0].first;
+	Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+	
 	// advance first (main) animation by one frame (in sync)
 	if (Immobile()) {
 		// update animation, continue last-displayed frame
-		anims[0]->LastFrame();
-		if (shadowAnimations) {
-			shadowAnimations[0]->LastFrame();
+		first->LastFrame();
+		if (firstShadow) {
+			firstShadow->LastFrame();
 		}
 	} else {
 		// update animation, maybe advance a frame (if enough time has passed)
-		anims[0]->NextFrame();
-		if (shadowAnimations) {
-			shadowAnimations[0]->NextFrame();
+		first->NextFrame();
+		if (firstShadow) {
+			firstShadow->NextFrame();
 		}
 	}
 
 	// update all other animation parts, in sync with the first part
-	int PartCount = ca->GetTotalPartCount();
-	for (int part = 1; part < PartCount; ++part) {
-		if (anims[part])
-			anims[part]->GetSyncedNextFrame(anims[0]);
+	auto it = currentStance.anim.begin() + 1;
+	for (; it != currentStance.anim.end(); ++it) {
+		it->first->GetSyncedNextFrame(first);
 	}
-
-	if (anims[0]->endReached) {
-		if (HandleActorStance()) {
-			// restart animation
-			anims[0]->endReached = false;
-			anims[0]->SetPos(0);
-
-			if (shadowAnimations) {
-				shadowAnimations[0]->endReached = false;
-				shadowAnimations[0]->SetPos(0);
-			}
-		}
-	} else {
-		//check if walk sounds need to be played
-		//dialog, pause game
-		if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-			//footsteps option set, stance
-			if (footsteps && (GetStance() == IE_ANI_WALK)) {
-				// sound lengths ensure proper pacing; haste was ignored
-				PlayWalkSound();
-			}
+	
+	it = currentStance.shadow.begin();
+	if (it != currentStance.shadow.end()) {
+		for (++it; it != currentStance.shadow.end(); ++it) {
+			it->first->GetSyncedNextFrame(firstShadow);
 		}
 	}
+
+	return true;
 }
 
 bool Actor::IsDead() const
@@ -8465,10 +8476,6 @@ bool Actor::IsDead() const
 bool Actor::ShouldDrawCircle() const
 {
 	if (Modified[IE_NOCIRCLE]) {
-		return false;
-	}
-
-	if (Modified[IE_AVATARREMOVAL]) {
 		return false;
 	}
 
@@ -8484,125 +8491,22 @@ bool Actor::ShouldDrawCircle() const
 			return false;
 		}
 	}
-
-	return true;
-}
-
-bool Actor::HasBodyHeat() const
-{
-	if (Modified[IE_STATE_ID]&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) return false;
-	if (GetAnims()->GetFlags()&AV_NO_BODY_HEAT) return false;
-	return true;
-}
-
-void Actor::Draw(const Region &screen)
-{
-	const Map *area = GetCurrentArea();
-	if (!area) {
-		InternalFlags &= ~IF_TRIGGER_AP;
-		return;
-	}
-
-	int cx = Pos.x;
-	int cy = Pos.y;
-	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
-	//check the deactivation condition only if needed
-	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) && (InternalFlags&IF_ACTIVE) ) {
-		//turning actor inactive if there is no action next turn
-		if (ShouldHibernate()) {
-			InternalFlags|=IF_IDLE;
-		}
-		if (!(InternalFlags&IF_REALLYDIED)) {
-			// for a while this didn't return (disable drawing) if about to hibernate;
-			// Avenger said (aa10aaed) "we draw the actor now for the last time".
-			InternalFlags &= ~IF_TRIGGER_AP;
-			return;
-		}
-	}
-
-	// if an actor isn't visible, should we still draw video cells?
-	// let us assume not, for now..
-	if (!(InternalFlags & IF_VISIBLE)) {
-		InternalFlags &= ~IF_TRIGGER_AP;
-		return;
-	}
-
-	//iwd has this flag saved in the creature
-	if (Modified[IE_AVATARREMOVAL]) {
-		return;
-	}
-
-	//visual feedback
-	CharAnimations* ca = GetAnims();
-	if (!ca) {
-		InternalFlags &= ~IF_TRIGGER_AP;
-		return;
-	}
-
-	//explored or visibilitymap (bird animations are visible in fog)
-	//0 means opaque
-	int Trans = Modified[IE_TRANSLUCENT];
-
-	if (Trans>255) {
-		Trans=255;
-	}
-
-	int State = Modified[IE_STATE_ID];
-
-	//adjust invisibility for enemies
-	if (Modified[IE_EA]>EA_GOODCUTOFF) {
-		if (State&state_invisible) {
-			Trans = 255;
-		}
-	}
-
-	//can't move this, because there is permanent blur state where
-	//there is no effect (just state bit)
-	if ((State&STATE_BLUR) && Trans < 128) {
-		Trans = 128;
-	}
-	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
-	tint.a = (ieByte) (255-Trans);
-
-	unsigned char heightmapindex = area->HeightMap->GetAt( cx / 16, cy / 12);
-	if (heightmapindex > 15) {
-		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
-		// cannot work out how they work, so here is an incorrect
-		// hack (probably). please fix!
-		heightmapindex = 15;
-	}
-
-	//don't use cy for area map access beyond this point
-	cy -= heightmapindex;
-
-	//draw videocells under the actor
-	DrawVideocells(screen, vvcShields, tint);
-
-	Video* video = core->GetVideoDriver();
-	Region vp = video->GetViewport();
-
-	bool shoulddrawcircle = ShouldDrawCircle();
-	bool drawcircle = shoulddrawcircle;
-	const GameControl *gc = core->GetGameControl();
+	
+	const GameControl* gc = core->GetGameControl();
 	if (gc->GetScreenFlags()&SF_CUTSCENE) {
 		// ground circles are not drawn in cutscenes
-		drawcircle = false;
+		// except for the speaker
+		if (gc->dialoghandler->IsTarget(this) == false) {
+			return false;
+		}
 	}
-	// the speaker should get a circle even in cutscenes
-	if (shoulddrawcircle && (gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) {
-		drawcircle = true;
-	}
-	bool drawtarget = false;
-	// we always show circle/target on pause
-	if (drawcircle && !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
+	
+	bool drawcircle = true; // we always show circle/target on pause
+	if (!(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS)) {
 		// check marker feedback level
 		ieDword markerfeedback = 4;
 		core->GetDictionary()->Lookup("GUI Feedback Level", markerfeedback);
-		if (Over) {
-			// picked creature, should always be true
-			drawcircle = true;
-		} else if (Selected) {
+		if (Selected) {
 			// selected creature
 			drawcircle = markerfeedback >= 2;
 		} else if (IsPC()) {
@@ -8616,232 +8520,296 @@ void Actor::Draw(const Region &screen)
 			drawcircle = markerfeedback >= 5;
 		}
 	}
+	
+	return drawcircle;
+}
 
-	if (remainingTalkSoundTime > 0) {
-		unsigned int currentTick = GetTicks();
-		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
-		lastTalkTimeCheckAt = currentTick;
+bool Actor::ShouldDrawReticle() const
+{
+	if (ShouldDrawCircle()){
+		return (!(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
+	}
+	return false;
+}
 
-		if (diffTime >= remainingTalkSoundTime) {
-			remainingTalkSoundTime = 0;
-		} else {
-			remainingTalkSoundTime -= diffTime;
+bool Actor::HasBodyHeat() const
+{
+	if (Modified[IE_STATE_ID]&(STATE_DEAD|STATE_FROZEN|STATE_PETRIFIED) ) return false;
+	if (GetAnims()->GetFlags()&AV_NO_BODY_HEAT) return false;
+	return true;
+}
+
+uint8_t Actor::GetElevation() const
+{
+	uint8_t height = area->HeightMap->GetAt( Pos.x / 16, Pos.y / 12);
+	if (height > 15) {
+		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
+		// cannot work out how they work, so here is an incorrect
+		// hack (probably). please fix!
+		
+		// FIXME: is it possible that this is signed instead of unsigned?
+		// or just the 4 least significant bits? sign magnitude?
+		height = 15;
+	}
+	return height;
+}
+
+bool Actor::UpdateDrawingState()
+{
+	for (auto it = vfxQueue.cbegin(); it != vfxQueue.cend();) {
+		ScriptedAnimation* vvc = *it;
+		if ((vvc->SequenceFlags & IE_VVC_STATIC) == 0) {
+			vvc->Pos = Pos;
 		}
-		SetCircleSize();
-	}
-
-	if (drawcircle) {
-		DrawCircle(vp);
-		drawtarget = ((Selected || Over) && !(InternalFlags&IF_NORETICLE) && Modified[IE_EA] <= EA_CONTROLLABLE && Destination != Pos);
-	}
-	if (drawtarget) {
-		gc->DrawTargetReticle(Destination, (size - 1) * 4, true, Over, Selected); //we could set this to !paused if we wanted to only animate when not paused
-	}
-
-	unsigned char StanceID = GetStance();
-	unsigned char Face = GetNextFace();
-	Animation** anims = ca->GetAnimation( StanceID, Face );
-	if (anims) {
-		if (Immobile() || !shoulddrawcircle) {
-			//set the last frame if actor is died and deactivated
-			if (!(InternalFlags&(IF_ACTIVE|IF_IDLE)) && (StanceID==IE_ANI_TWITCH) ) {
-				anims[0]->SetPos(anims[0]->GetFrameCount()-1);
-			}
-		}
-
-		int PartCount = ca->GetTotalPartCount();
-		Sprite2D* nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
-
-		// update bounding box and such
-		if (nextFrame && lastFrame != nextFrame) {
-			Region newBBox;
-			if (PartCount == 1) {
-				newBBox.x = cx - nextFrame->XPos;
-				newBBox.w = nextFrame->Width;
-				newBBox.y = cy - nextFrame->YPos;
-				newBBox.h = nextFrame->Height;
-			} else {
-				// FIXME: currently using the animarea instead
-				// of the real bounding box of this (multi-part) frame.
-				// Shouldn't matter much, though. (wjp)
-				newBBox.x = cx + anims[0]->animArea.x;
-				newBBox.y = cy + anims[0]->animArea.y;
-				newBBox.w = anims[0]->animArea.w;
-				newBBox.h = anims[0]->animArea.h;
-			}
-			lastFrame = nextFrame;
-			SetBBox( newBBox );
+		
+		bool endReached = vvc->UpdateDrawingState(GetOrientation());
+		if (endReached) {
+			vfxDict.erase(vfxDict.find(vvc->ResName)); // make sure to delete only one element
+			it = vfxQueue.erase(it);
+			delete vvc;
+			continue;
 		}
 
+		if (!vvc->active) {
+			vvc->SetPhase(P_RELEASE);
+		}
+		
+		++it;
+	}
+	
+	if (!AdvanceAnimations()) {
+		return false;
+	}
+	
+	UpdateDrawingRegion();
+	return true;
+}
+
+void Actor::UpdateDrawingRegion()
+{
+	Region box(Pos, Size());
+	
+	auto ExpandBoxForAnimationParts = [&box, this](const std::vector<AnimationPart>& parts) {
+		for (const auto& part : parts) {
+			Animation* anim = part.first;
+			Holder<Sprite2D> animframe = anim->CurrentFrame();
+			assert(animframe);
+			Region partBBox = animframe->Frame;
+			partBBox.x = Pos.x - partBBox.x;
+			partBBox.y = Pos.y - partBBox.y;
+			box.ExpandToRegion(partBBox);
+			assert(box.RectInside(partBBox));
+		}
+	};
+	
+	ExpandBoxForAnimationParts(currentStance.anim);
+	ExpandBoxForAnimationParts(currentStance.shadow);
+			
+	box.y -= GetElevation();
+	
+	// BBox is the the box containing the actor and all its equipment, but nothing else
+	SetBBox(box);
+	
+	int mirrorimages = Modified[IE_MIRRORIMAGES];
+	for (int i = 0; i < mirrorimages; ++i) {
+		int dir = MirrorImageLocation[i];
+		
+		Region mirrorBox = BBox;
+		mirrorBox.x += 3 * OrientdX[dir];
+		mirrorBox.y += 3 * OrientdY[dir];
+		
+		box.ExpandToRegion(mirrorBox);
+	}
+	
+	if (Modified[IE_STATE_ID] & STATE_BLUR) {
+		int face = GetOrientation();
+		int blurx = (OrientdX[face] * (int)Modified[IE_MOVEMENTRATE])/20;
+		int blury = (OrientdY[face] * (int)Modified[IE_MOVEMENTRATE])/20;
+		
+		Region blurBox = BBox;
+		blurBox.x -= blurx * 3;
+		blurBox.y -= blury * 3;
+		
+		box.ExpandToRegion(blurBox);
+	}
+	
+	for (const auto& vvc : vfxQueue) {
+		Region r = vvc->DrawingRegion();
+		if (vvc->SequenceFlags & IE_VVC_HEIGHT) r.y -= BBox.h;
+		box.ExpandToRegion(r);
+		assert(r.w <= box.w && r.h <= box.h);
+	}
+
+	// drawingRegion is the the box containing all gfx attached to the actor
+	drawingRegion = box;
+}
+
+Region Actor::DrawingRegion() const
+{
+	return drawingRegion;
+}
+
+void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) const
+{
+	// if an actor isn't visible, should we still draw video cells?
+	// let us assume not, for now..
+	if (!(InternalFlags & IF_VISIBLE)) {
+		return;
+	}
+
+	//iwd has this flag saved in the creature
+	if (Modified[IE_AVATARREMOVAL]) {
+		return;
+	}
+
+	if (!DrawingRegion().IntersectsRegion(vp)) {
+		return;
+	}
+
+	//explored or visibilitymap (bird animations are visible in fog)
+	//0 means opaque
+	uint8_t trans = std::min<int>(Modified[IE_TRANSLUCENT], 255);
+
+	int State = Modified[IE_STATE_ID];
+
+	//adjust invisibility for enemies
+	if (Modified[IE_EA] > EA_GOODCUTOFF && (State & state_invisible)) {
+		trans = 255;
+	} else if (State & STATE_BLUR) {
+		//can't move this, because there is permanent blur state where
+		//there is no effect (just state bit)
+		trans = 128;
+	}
+
+	tint.a = 255 - trans;
+
+	//draw videocells under the actor
+	auto it = vfxQueue.cbegin();
+	for (; it != vfxQueue.cend(); ++it) {
+		ScriptedAnimation* vvc = *it;
+		if (vvc->YOffset >= 0) {
+			break;
+		}
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
+	}
+
+	if (ShouldDrawCircle()) {
+		DrawCircle(vp.Origin());
+	}
+
+	if (!currentStance.anim.empty()) {
+		unsigned char face = GetOrientation();
 		// Drawing the actor:
 		// * mirror images:
 		//     Drawn without transparency, unless fully invisible.
 		//     Order: W, E, N, S, NW, SE, NE, SW
-		//     Uses extraCovers 3-10
 		// * blurred copies (3 of them)
 		//     Drawn with transparency.
 		//     distance between copies depends on IE_MOVEMENTRATE
 		//     TODO: actually, the direction is the real movement direction,
 		//	not the (rounded) direction given Face
-		//     Uses extraCovers 0-2
 		// * actor itself
-		//     Uses main spritecover
 		//
 		//comments by Avenger:
 		// currently we don't have a real direction, but the orientation field
 		// could be used with higher granularity. When we need the face value
 		// it could be divided so it will become a 0-15 number.
 		//
+		
+		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
 
-		SpriteCover *sc = 0, *newsc = 0;
-		int blurx = cx;
-		int blury = cy;
-		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
-		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
-		Color mirrortint = tint;
-		//mirror images are also half transparent when invis
-		//if (mirrortint.a > 0) mirrortint.a = 255;
-
-		int i;
+		Point drawPos = Pos - vp.Origin();
+		drawPos.y -= GetElevation();
 
 		// mirror images behind the actor
-		for (i = 0; i < 4; ++i) {
+		for (int i = 0; i < 4; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
-				Region sbbox = BBox;
 				int dir = MirrorImageLocation[m];
-				int icx = cx + 3*OrientdX[dir];
-				int icy = cy + 3*OrientdY[dir];
+				int icx = drawPos.x + 3 * OrientdX[dir];
+				int icy = drawPos.y + 3 * OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					sbbox.x += 3*OrientdX[dir];
-					sbbox.y += 3*OrientdY[dir];
-					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(screen, icx, icy, sbbox, newsc,
-						anims, Face, mirrortint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[3+m] = newsc;
-					}
+				// FIXME: I don't know if GetBlocked() is good enough
+				// consider the possibility the mirror image is behind a wall (walls.second)
+				// GetBlocked might be false, but we still should not draw the image
+				// maybe the mirror image coordinates can never be beyond the width of a wall?
+				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
-			} else {
-				delete extraCovers[3+m];
-				extraCovers[3+m] = NULL;
 			}
 		}
 
 		// blur sprites behind the actor
+		int blurdx = (OrientdX[face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		int blurdy = (OrientdY[face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		Point blurPos = drawPos;
 		if (State & STATE_BLUR) {
-			if (Face < 4 || Face >= 12) {
-				Region sbbox = BBox;
-				sbbox.x -= 4*blurdx; sbbox.y -= 4*blurdy;
-				blurx -= 4*blurdx; blury -= 4*blurdy;
-				for (i = 0; i < 3; ++i) {
-					sbbox.x += blurdx; sbbox.y += blurdy;
-					blurx += blurdx; blury += blurdy;
-					newsc = sc = extraCovers[i];
-					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-						anims, Face, tint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[i] = newsc;
-					}
+			if (face < 4 || face >= 12) {
+				blurPos -= Point(4 * blurdx, 4 * blurdy);
+				for (int i = 0; i < 3; ++i) {
+					blurPos += Point(blurdx, blurdy);
+					// FIXME: I don't think we ought to draw blurs that are behind a wall that the actor is in front of
+					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 				}
 			}
 		}
 
-		const Game* game = core->GetGame();
-		ieDword flags = !ca->lockPalette ? BLIT_TINTED : 0;
-		game->ApplyGlobalTint(tint, flags);
+		if (!currentStance.shadow.empty()) {
+			Game* game = core->GetGame();
+			// infravision, independent of light map and global light
+			if (HasBodyHeat() &&
+				game->PartyHasInfravision() &&
+				!game->IsDay() &&
+				(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
+				Color irTint = Color(255, 120, 120, tint.a);
 
-		// infravision, independent of light map and global light
-		if ( HasBodyHeat() &&
-			game->PartyHasInfravision() &&
-			!game->IsDay() &&
-			(area->AreaType & AT_OUTDOOR) && !(area->AreaFlags & AF_DREAM)) {
-			tint.r = 255;
+				/* IWD2: infravision is white, not red. */
+				if(core->HasFeature(GF_3ED_RULES)) {
+					irTint = Color(255, 255, 255, tint.a);
+				}
 
-			/* IWD2: infravision is white, not red. */
-			if(core->HasFeature(GF_3ED_RULES)) {
-				tint.g = tint.b = 255;
+				DrawActorSprite(drawPos, flags, currentStance.shadow, irTint);
 			} else {
-				tint.g = tint.b = 120;
+				DrawActorSprite(drawPos, flags, currentStance.shadow, tint);
 			}
 		}
 
-		newsc = sc = GetSpriteCover();
-		Animation **shadowAnimations = ca->GetShadowAnimation(StanceID, Face);
-		if (shadowAnimations) {
-			DrawActorSprite(screen, cx, cy, BBox, newsc, shadowAnimations, Face, tint, true);
-		}
-
 		// actor itself
-		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
-		if (newsc != sc) SetSpriteCover(newsc);
+		DrawActorSprite(drawPos, flags, currentStance.anim, tint);
 
 		// blur sprites in front of the actor
 		if (State & STATE_BLUR) {
-			if (Face >= 4 && Face < 12) {
-				Region sbbox = BBox;
-				for (i = 0; i < 3; ++i) {
-					sbbox.x -= blurdx; sbbox.y -= blurdy;
-					blurx -= blurdx; blury -= blurdy;
-					newsc = sc = extraCovers[i];
-					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-						anims, Face, tint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[i] = newsc;
-					}
+			if (face >= 4 && face < 12) {
+				for (int i = 0; i < 3; ++i) {
+					blurPos -= Point(blurdx, blurdy);
+					DrawActorSprite(blurPos, flags, currentStance.anim, tint);
 				}
 			}
 		}
 
 		// mirror images in front of the actor
-		for (i = 4; i < 8; ++i) {
+		for (int i = 4; i < 8; ++i) {
 			unsigned int m = MirrorImageZOrder[i];
 			if (m < Modified[IE_MIRRORIMAGES]) {
-				Region sbbox = BBox;
 				int dir = MirrorImageLocation[m];
-				int icx = cx + 3*OrientdX[dir];
-				int icy = cy + 3*OrientdY[dir];
+				int icx = drawPos.x + 3 * OrientdX[dir];
+				int icy = drawPos.y + 3 * OrientdY[dir];
 				Point iPos(icx, icy);
-				if (area->GetBlocked(iPos.x / 16, iPos.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
-					sbbox.x += 3*OrientdX[dir];
-					sbbox.y += 3*OrientdY[dir];
-					newsc = sc = extraCovers[3+m];
-					DrawActorSprite(screen, icx, icy, sbbox, newsc,
-						anims, Face, mirrortint);
-					if (newsc != sc) {
-						delete sc;
-						extraCovers[3+m] = newsc;
-					}
+				// FIXME: I don't know if GetBlocked() is good enough
+				// consider the possibility the mirror image is in front of a wall (walls.first)
+				// GetBlocked might be false, but we still should not draw the image
+				// maybe the mirror image coordinates can never be beyond the width of a wall?
+				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
-			} else {
-				delete extraCovers[3+m];
-				extraCovers[3+m] = NULL;
 			}
 		}
 	}
 
 	//draw videocells over the actor
-	DrawVideocells(screen, vvcOverlays, tint);
-
-	// display pc hitpoints if requested
-	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
-	ieDword tmp = 0;
-	core->GetDictionary()->Lookup("HP Over Head", tmp);
-	if (tmp && Persistent() && (core->GetGame()->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
-		DisplayHeadHPRatio();
-	}
-
-	// trigger on-enemy-sighted autopause
-	if (!(InternalFlags & IF_TRIGGER_AP)) {
-		// always recheck in case of EA changes (npc going hostile)
-		if (Modified[IE_EA] > EA_EVILCUTOFF && !(InternalFlags & IF_STOPATTACK)) {
-			InternalFlags |= IF_TRIGGER_AP;
-			core->Autopause(AP_ENEMY, this);
-		}
+	for (; it != vfxQueue.cend(); ++it) {
+		ScriptedAnimation* vvc = *it;
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
 	}
 }
 
@@ -8877,7 +8845,7 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-bool Actor::GetSoundFromFile(ieResRef Sound, unsigned int index) const
+bool Actor::GetSoundFromFile(ieResRef &Sound, unsigned int index) const
 {
 	// only dying ignores the incapacity to vocalize
 	if (index != VB_DIE) {
@@ -8891,7 +8859,7 @@ bool Actor::GetSoundFromFile(ieResRef Sound, unsigned int index) const
 	}
 }
 
-bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
+bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
@@ -8948,7 +8916,7 @@ bool Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index) const
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
+bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -9016,16 +8984,38 @@ bool Actor::GetSoundFromINI(ieResRef Sound, unsigned int index) const
 	return true;
 }
 
-void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index) const
+void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 {
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
 		size_t len;
-		if (csound[index]) {
+
+		// handle nonstandard bg1 "default" soundsets first
+		if (!strnicmp(PCStats->SoundSet, "main", 4)) {
+			static const char *suffixes[] = { "03", "08", "09", "10", "11", "17", "18", "19", "20", "21", "22", "38", "39" };
+			static unsigned int VB2Suffix[] = { 9, 6, 7, 8, 20, 26, 27, 28, 32, 33, 34, 18, 19 };
+			bool found = false;
+
+			for (int i = 0; i < 13; i++) {
+				if (VB2Suffix[i] == index) {
+					index = i;
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				Sound[0] = 0;
+				return;
+			}
+
+			snprintf(Sound, sizeof(ieResRef), "%.5s%.2s", PCStats->SoundSet, suffixes[index]);
+			return;
+		} else if (csound[index]) {
 			len = snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
 			if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 			return;
 		}
+
 		//icewind style
 		len = snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
 		if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
@@ -9183,22 +9173,25 @@ void Actor::SetSoundFolder(const char *soundset)
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		char filepath[_MAX_PATH];
 
-		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
+		strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
 		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
-		char file[_MAX_PATH];
 
-		if (FileGlob(file, filepath, "??????01")) {
-			file[6] = '\0';
-		} else if (FileGlob(file, filepath, "?????01")) {
-			file[5] = '\0';
-		} else if (FileGlob(file, filepath, "????01")) {
-			file[4] = '\0';
-		} else {
-			return;
+		DirectoryIterator dirIt(filepath);
+		dirIt.SetFilterPredicate(new EndsWithFilter("01"));
+		dirIt.SetFlags(DirectoryIterator::Directories);
+		if (dirIt) {
+			do {
+				const char* name = dirIt.GetName();
+				const char* end = strchr(name, '.');
+				if (end != NULL) {
+					// need to truncate the "01" from the name
+					strnlwrcpy(PCStats->SoundSet, name, int(end - 2 - name));
+					break;
+				}
+			} while (++dirIt);
 		}
-		strnlwrcpy(PCStats->SoundSet, file, 8);
 	} else {
-		strnlwrcpy(PCStats->SoundSet, soundset, 8);
+		CopyResRef(PCStats->SoundSet, soundset);
 		PCStats->SoundFolder[0]=0;
 	}
 }
@@ -9224,55 +9217,31 @@ void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
 	}
 }
 
-bool Actor::HasVVCCell(const ieResRef resource) const
+bool Actor::HasVVCCell(const ResRef &resource) const
 {
-	return GetVVCCell(resource) != NULL;
+	return GetVVCCells(resource).first != vfxDict.end();
 }
 
-ScriptedAnimation *Actor::GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const
+bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
 {
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
-			return vvc;
+	return lhs->YOffset < rhs->YOffset;
+}
+
+std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
+Actor::GetVVCCells(const ResRef &resource) const
+{
+	return vfxDict.equal_range(resource);
+}
+
+void Actor::RemoveVVCells(const ResRef &resource)
+{
+	auto range = vfxDict.equal_range(resource);
+	if (range.first != vfxDict.end()) {
+		for (auto it = range.first; it != range.second; ++it) {
+			ScriptedAnimation *vvc = it->second;
+			vvc->SetPhase(P_RELEASE);
 		}
 	}
-	return NULL;
-}
-
-ScriptedAnimation *Actor::GetVVCCell(const ieResRef resource) const
-{
-	ScriptedAnimation *vvc = GetVVCCell(&vvcShields, resource);
-	if (vvc) return vvc;
-	return GetVVCCell(&vvcOverlays, resource);
-}
-
-void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
-{
-	bool j = true;
-	vvcVector *vvcCells=&vvcShields;
-retry:
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
-			if (graceful) {
-				vvc->SetPhase(P_RELEASE);
-			} else {
-				delete vvc;
-				vvcCells->erase(vvcCells->begin()+i);
-			}
-		}
-	}
-	vvcCells=&vvcOverlays;
-	if (j) { j = false; goto retry; }
 }
 
 //this is a faster version of hasvvccell, because it knows where to look
@@ -9280,49 +9249,19 @@ retry:
 //use this for the seven eyes overlay
 ScriptedAnimation *Actor::FindOverlay(int index) const
 {
-	const vvcVector *vvcCells;
-
 	if (index >= OVERLAY_COUNT) return NULL;
-
-	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
-	else vvcCells=&vvcOverlays;
-
-	const char *resRef = hc_overlays[index];
-
-	size_t i=vvcCells->size();
-	while (i--) {
-		ScriptedAnimation *vvc = (*vvcCells)[i];
-		if (vvc == NULL) {
-			continue;
-		}
-		if ( strnicmp(vvc->ResName, resRef, 8) == 0) {
-			return vvc;
-		}
-	}
-	return NULL;
+	
+	auto it = vfxDict.find(hc_overlays[index]);
+	return (it != vfxDict.end()) ? it->second : nullptr;
 }
 
 void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
-	vvcVector *vvcCells;
-
-	//if the vvc was not created, don't try to add it
-	if (!vvc) {
-		return;
-	}
-	if (vvc->YPos < 0) {
-		vvcCells=&vvcShields;
-	} else {
-		vvcCells=&vvcOverlays;
-	}
-	size_t i=vvcCells->size();
-	while (i--) {
-		if ((*vvcCells)[i] == NULL) {
-			(*vvcCells)[i] = vvc;
-			return;
-		}
-	}
-	vvcCells->push_back( vvc );
+	assert(vvc);
+	vvc->Pos = Pos;
+	vfxDict.insert(std::make_pair(vvc->ResName, vvc));
+	vfxQueue.insert(vvc);
+	assert(vfxDict.size() == vfxQueue.size());
 }
 
 //returns restored spell level
@@ -9526,8 +9465,8 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 			damage *= wi.critmulti;
 
 			// check if critical hit needs a screenshake
-			if (crit_hit_scr_shake && (InParty || target->InParty) && core->GetVideoDriver()->GetViewport().PointInside(Pos) ) {
-				core->timer->SetScreenShake(10,-10,AI_UPDATE_TIME);
+			if (crit_hit_scr_shake && (InParty || target->InParty) ) {
+				core->timer.SetScreenShake(Point(10, -10), AI_UPDATE_TIME);
 			}
 
 			//apply the dirty fighting spell
@@ -9792,17 +9731,8 @@ void Actor::SetFeat(unsigned int feat, int mode)
 	}
 	ieDword mask = 1<<(feat&31);
 	ieDword idx = feat>>5;
-	switch (mode) {
-		case OP_SET: case OP_OR:
-			BaseStats[IE_FEATS1+idx]|=mask;
-			break;
-		case OP_NAND:
-			BaseStats[IE_FEATS1+idx]&=~mask;
-			break;
-		case OP_XOR:
-			BaseStats[IE_FEATS1+idx]^=mask;
-			break;
-	}
+	
+	SetBits(BaseStats[IE_FEATS1+idx], mask, mode);
 }
 
 void Actor::SetFeatValue(unsigned int feat, int value, bool init)
@@ -9828,14 +9758,22 @@ void Actor::SetFeatValue(unsigned int feat, int value, bool init)
 	}
 }
 
+void Actor::ClearCurrentStanceAnims()
+{
+	currentStance.anim.clear();
+	currentStance.shadow.clear();
+}
+
 void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation, int wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	if (wt != -1) WeaponType = wt;
 	if (!anims)
 		return;
+		
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
+	ClearCurrentStanceAnims();
 	SetAttackMoveChances(MeleeAnimation);
 	if (InParty) {
 		//update the paperdoll weapon animation
@@ -9871,8 +9809,10 @@ void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
 
 	if (!anims)
 		return;
+	
 	anims->SetOffhandRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
+	ClearCurrentStanceAnims();
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
@@ -9884,7 +9824,9 @@ void Actor::SetUsedHelmet(const char (&AnimationType)[2])
 	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)
 		return;
+	
 	anims->SetHelmetRef(AnimationType);
+	ClearCurrentStanceAnims();
 	if (InParty) {
 		//update the paperdoll weapon animation
 		core->SetEventFlag(EF_UPDATEANIM);
@@ -10434,7 +10376,7 @@ bool Actor::IsDualClassed() const
 	if (!HasPlayerClass()) return false;
 
 	// make sure only one bit is set, as critters like kuo toa have garbage in the mc bits
-	return core->CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
+	return CountBits(Modified[IE_MC_FLAGS] & MC_WAS_ANY) == 1;
 }
 
 Actor *Actor::CopySelf(bool mislead) const
@@ -11101,7 +11043,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	int bonus = 0;
 	std::vector<std::vector<int> >::iterator it = skillrac.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
-	if (col < (*it).size()) {
+	if (col < it->size()) {
 		for ( ; it != skillrac.end(); it++) {
 			if ((*it)[0] == lookup) {
 				bonus = (*it)[col];
@@ -11114,7 +11056,7 @@ int Actor::GetSkillBonus(unsigned int col) const
 	lookup = Modified[IE_DEX];
 	it = skilldex.begin();
 	// make sure we have a column, since the games have different amounts of thieving skills
-	if (col < (*it).size()) {
+	if (col < it->size()) {
 		for ( ; it != skilldex.end(); it++) {
 			if ((*it)[0] == lookup) {
 				bonus += (*it)[col];
@@ -11329,8 +11271,8 @@ void Actor::DisplayHeadHPRatio()
 {
 	if (!HasVisibleHP()) return;
 
-	wchar_t tmpstr[10];
-	swprintf(tmpstr, 10, L"%d/%d\0", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
+	wchar_t tmpstr[20];
+	swprintf(tmpstr, 20, L"%d/%d", Modified[IE_HITPOINTS], Modified[IE_MAXHITPOINTS]);
 	SetOverheadText(tmpstr);
 }
 

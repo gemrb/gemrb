@@ -29,14 +29,20 @@ CharGenWindow = 0
 TextAreaControl = 0
 PortraitName = ""
 
+def PositionCharGenWin(window, offset = 0):
+	global CharGenWindow
+	
+	CGFrame = CharGenWindow.GetFrame()
+	WFrame = window.GetFrame()
+	window.SetPos(CGFrame['x'], offset + CGFrame['y'] + (CGFrame['h'] - WFrame['h']))
+
+
 def DisplayOverview(step):
 	"""Sets up the primary character generation window."""
 
 	global CharGenWindow, TextAreaControl, PortraitName
 
-	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	CharGenWindow = GemRB.LoadWindow (0)
-	CharGenWindow.SetFrame ()
+	CharGenWindow = GemRB.LoadWindow (0, "GUICG")
 	GemRB.SetVar ("Step", step)
 
 	###
@@ -45,7 +51,7 @@ def DisplayOverview(step):
 	PortraitButton = CharGenWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	PortraitName = GemRB.GetToken ("LargePortrait")
-	if PortraitName != "":
+	if PortraitName != None:
 		if GemRB.HasResource (PortraitName, RES_BMP, 1) or GemRB.HasResource ("NOPORTMD", RES_BMP, 1):
 			PortraitButton.SetPicture (PortraitName, "NOPORTMD")
 	PortraitButton.SetState (IE_GUI_BUTTON_LOCKED)
@@ -86,7 +92,7 @@ def DisplayOverview(step):
 	BackButton.SetText (15416)
 	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
 	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 
 	AcceptButton = CharGenWindow.GetControl (8)
 	playmode = GemRB.GetVar ("PlayMode")
@@ -95,11 +101,12 @@ def DisplayOverview(step):
 	else:
 		AcceptButton.SetText (13956)
 	SetButtonStateFromStep ("AcceptButton", AcceptButton, step)
-	#AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	#AcceptButton.MakeDefault()
 	AcceptButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 
-	ScrollBar = CharGenWindow.GetControl (10)
-	ScrollBar.SetDefaultScrollBar ()
+	# now automatically ignored and added instead
+	#ScrollBar = CharGenWindow.GetControl (10)
+	#ScrollBar.SetDefaultScrollBar ()
 
 	ImportButton = CharGenWindow.GetControl (13)
 	ImportButton.SetText (13955)
@@ -128,10 +135,11 @@ def DisplayOverview(step):
 	AbilityTable = GemRB.LoadTable ("ability")
 
 	MyChar = GemRB.GetVar ("Slot")
+	TextAreaControl= CharGenWindow.GetControl (9)
+	TextAreaControl.SetText ("")
 
 	for part in range(1, step+1):
 		if part == 1:
-			TextAreaControl= CharGenWindow.GetControl (9)
 			if step == 1:
 				TextAreaControl.SetText (GemRB.GetString(16575))
 			elif step == 9:
@@ -242,7 +250,7 @@ def DisplayOverview(step):
 		elif part == 8:
 			break
 
-	CharGenWindow.SetVisible (WINDOW_VISIBLE)
+	CharGenWindow.Focus()
 	return
 
 def SetButtonStateFromStep (buttonName, button, step):
@@ -281,7 +289,7 @@ def SetButtonStateFromStep (buttonName, button, step):
 	button.SetState (state)
 
 	if state == IE_GUI_BUTTON_ENABLED:
-		button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		button.Focus()
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	return
 
@@ -297,7 +305,6 @@ def CancelPress():
 		#free up the slot before exiting
 		MyChar = GemRB.GetVar ("Slot")
 		GemRB.CreatePlayer ("", MyChar | 0x8000 )
-		GemRB.SetNextScript ("Start")
 	else:
 		GemRB.SetNextScript ("CharGen")
 		GemRB.SetToken ("LargePortrait", "")
@@ -306,10 +313,6 @@ def CancelPress():
 
 def ImportPress():
 	"""Opens the character import window."""
-
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
 
 	step = GemRB.GetVar ("Step")
 	# TODO: check why this is handled differently
@@ -328,20 +331,14 @@ def BackPress():
 		CharGenWindow.Unload ()
 
 	step = GemRB.GetVar ("Step")
-	if step == 1:
-		GemRB.SetNextScript ("Start")
-	elif step == 2:
+	if step == 2:
 		GemRB.SetNextScript ("CharGen")
-	else:
+	elif step != 1:
 		GemRB.SetNextScript ("CharGen" + str(step-1))
 	return
 
 def NextPress():
 	"""Moves to the next step."""
-
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
 
 	step = GemRB.GetVar ("Step")
 	if step == 1:
@@ -362,7 +359,5 @@ def NextPress():
 
 def BiographyPress():
 	"""Opens the biography window."""
-	if CharGenWindow:
-		CharGenWindow.Unload()
 	GemRB.SetNextScript("GUICG23") #biography
 	return

@@ -30,11 +30,7 @@ TextAreaControl = 0
 def OnLoad():
 	global ExportWindow, TextAreaControl
 
-	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	ExportWindow = GemRB.LoadWindow (21)
-
-	if GameCheck.IsBG1():
-		GUICommon.CloseOtherWindow (ExportWindow.Unload)
+	ExportWindow = GemRB.LoadWindow (21, "GUICG")
 
 	TextAreaControl = ExportWindow.GetControl (4)
 	TextAreaControl.SetText (10962)
@@ -48,17 +44,17 @@ def OnLoad():
 	DoneButton = ExportWindow.GetControl (0)
 	DoneButton.SetText (11973)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = ExportWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	TextAreaControl.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SelectPress)
 	ExportWindow.ShowModal(MODAL_SHADOW_NONE)
-	FileNameEditBox.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	FileNameEditBox.Focus()
 	return
 
 def SelectPress ():
@@ -78,21 +74,21 @@ def DonePress ():
 	FileName = FileNameEditBox.QueryText ()
 	Slot = GemRB.GetVar ("Slot")
 	GemRB.SaveCharacter (Slot, FileName)
+
+	ExportWindow.Close()
+
 	if GameCheck.IsBG1():
-		GUICommon.CloseOtherWindow (None)
 		CharGenCommon.close()
 		GemRB.SetNextScript ("Start")
 	else:
-		if ExportWindow:
-			ExportWindow.Unload ()
 		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
 
 def CancelPress ():
+	ExportWindow.Close ()
+
 	if GameCheck.IsBG1():
 		CharGenCommon.jumpTo ("accept")
 	else:
-		if ExportWindow:
-			ExportWindow.Unload ()
 		GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return

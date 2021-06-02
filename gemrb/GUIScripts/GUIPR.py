@@ -25,63 +25,21 @@
 import GemRB
 import GameCheck
 import GUICommon
+import GUICommonWindows
 import CommonTables
 from GUIDefines import *
 from ie_stats import *
 from ie_action import ACT_CAST
 
-PriestWindow = None
+PriestSpellWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 
-def OpenPriestWindow ():
-	import GUICommonWindows
-	global PriestWindow, OptionsWindow, PortraitWindow, PriestSpellInfoWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenPriestWindow):
-		ClosePriestSpellUnmemorizeWindow ()
-		if PriestSpellInfoWindow:
-			PriestSpellInfoWindow.Unload ()
-			PriestSpellInfoWindow = None
-		if PriestWindow:
-			PriestWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		PriestWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIPR", 640, 480)
-	PriestWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", PriestWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenPriestWindow)
-	OptionsWindow.SetFrame ()
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
-
+def InitPriestWindow (Window):
+	global PriestSpellWindow
+	PriestSpellWindow = Window
+	
 	Button = Window.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PriestPrevLevelPress)
 
@@ -102,7 +60,8 @@ def OpenPriestWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = Window.GetControl (3 + i)
-		Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
+		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 64}
+		Button.SetBorder (0,color,0,1)
 		Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -113,17 +72,17 @@ def OpenPriestWindow ():
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	GUICommonWindows.SetSelectionChangeHandler (UpdatePriestWindow)
-	UpdatePriestWindow ()
 	return
 
-def UpdatePriestWindow ():
+def UpdatePriestWindow (Window=None):
 	global PriestMemorizedSpellList, PriestKnownSpellList
+	
+	if Window == None:
+		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
 
-	Window = PriestWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
@@ -202,11 +161,12 @@ def UpdatePriestWindow ():
 	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
 
 	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	#bringing window front
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+
+	Window.Focus()
 	return
+
+TogglePriestWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIPR", GUICommonWindows.ToggleWindow, InitPriestWindow, UpdatePriestWindow)
+OpenPriestWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIPR", GUICommonWindows.OpenWindowOnce, InitPriestWindow, UpdatePriestWindow)
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel
@@ -280,9 +240,9 @@ def OnPriestMemorizeSpell ():
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
 		GemRB.PlaySound ("GAM_24")
-		Button = PriestWindow.GetControl(index + 27)
+		Button = PriestSpellWindow.GetControl(index + 27)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-		Button2 = PriestWindow.GetControl(mem_cnt + 2)
+		Button2 = PriestSpellWindow.GetControl(mem_cnt + 2)
 		if GameCheck.IsBG2(): # no blending
 			Button.SetAnimation ("FLASH")
 			Button2.SetAnimation ("FLASH")
@@ -304,13 +264,13 @@ def OpenPriestSpellRemoveWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestRemoveSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClosePriestSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -336,13 +296,13 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClosePriestSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -360,7 +320,7 @@ def OnPriestUnmemorizeSpell ():
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
 		GemRB.PlaySound ("GAM_44")
-		Button = PriestWindow.GetControl(index + 3)
+		Button = PriestSpellWindow.GetControl(index + 3)
 		Button.SetAnimation ("FLASH", 0, GameCheck.IsBG2() is False) # no blending for bg2
 	return
 

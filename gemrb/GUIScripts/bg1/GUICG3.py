@@ -32,12 +32,6 @@ DoneButton = 0
 def OnLoad():
 	global AlignmentWindow, TextAreaControl, DoneButton
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AlignmentWindow):
-			AlignmentWindow.Unload()
-			AlignmentWindow = None
-		return
-
 	MyChar = GemRB.GetVar ("Slot")
 
 	GemRB.SetVar("Alignment",-1)
@@ -46,8 +40,7 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AlignmentWindow = GemRB.LoadWindow(3)
+	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
 
 	# This section enables or disables different alignment selections
 	# based on Class, and depends on the ALIGNMNT.2DA table
@@ -68,14 +61,14 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = AlignmentWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AlignmentWindow))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	AlignmentWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -88,6 +81,7 @@ def AlignmentPress():
 	return
 
 def NextPress():
+	AlignmentWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	Alignment = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, Alignment)

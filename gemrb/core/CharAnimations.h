@@ -170,9 +170,9 @@ public:
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[PAL_MAX];
-	Palette* palette[PAL_MAX];
-	Palette* modifiedPalette[PAL_MAX];
-	Palette* shadowPalette;
+	PaletteHolder PartPalettes[PAL_MAX];
+	PaletteHolder ModPartPalettes[PAL_MAX];
+	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
@@ -202,8 +202,8 @@ public:
 	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
 
 	// returns Palette for a given part (unlocked)
-	Palette* GetPartPalette(int part); // TODO: clean this up
-	Palette* GetShadowPalette() const;
+	PaletteHolder GetPartPalette(int part); // TODO: clean this up
+	PaletteHolder GetShadowPalette() const;
 
 public: //attribute functions
 	static int GetAvatarsCount();
@@ -224,54 +224,54 @@ private:
 	void DropAnims();
 	void InitAvatarsTable();
 	int GetActorPartCount() const;
-	void AddPSTSuffix(char* ResRef, unsigned char AnimID,
+	void AddPSTSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddFFSuffix(char* ResRef, unsigned char AnimID,
+	void AddFFSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddFF2Suffix(char* ResRef, unsigned char AnimID,
+	void AddFF2Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part) const;
-	void AddHLSuffix(char* ResRef, unsigned char AnimID,
+	void AddHLSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddNFSuffix(char* ResRef, unsigned char AnimID,
+	void AddNFSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
+	void AddVHR2Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
+	void AddVHRSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void AddVHR3Suffix(char* ResRef, unsigned char AnimID,
+	void AddVHR3Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void GetVHREquipmentRef(char* ResRef, unsigned char& Cycle,
+	void GetVHREquipmentRef(char *dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddSixSuffix(char* ResRef, unsigned char AnimID,
+	void AddSixSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoPieceSuffix(char* ResRef, unsigned char AnimID,
+	void AddTwoPieceSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
+	void AddMHRSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void GetMHREquipmentRef(char* ResRef, unsigned char& Cycle,
+	void GetMHREquipmentRef(char *dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddMMRSuffix(char* ResRef, unsigned char AnimID,
+	void AddMMRSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, bool mirror);
-	void AddMMR2Suffix(char* ResRef, unsigned char AnimID,
+	void AddMMR2Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
+	void AddTwoFileSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoFiles5Suffix(char* ResRef, unsigned char AnimID,
+	void AddTwoFiles5Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddLRSuffix(char* ResRef, unsigned char AnimID,
+	void AddLRSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void AddLRSuffix2( char* ResRef, unsigned char StanceID,
+	void AddLRSuffix2( char *dest, unsigned char StanceID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData);
-	void GetLREquipmentRef(char* ResRef, unsigned char& Cycle,
+	void GetLREquipmentRef(char *dest, unsigned char& Cycle,
 		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddLR2Suffix(char* ResRef, unsigned char AnimID,
+	void AddLR2Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
-	void AddLR3Suffix(char* ResRef, unsigned char AnimID,
+	void AddLR3Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
-		char* ResRef, unsigned char& Cycle, int Part, EquipResRefData*& equip);
+		char *dest, unsigned char& Cycle, int Part, EquipResRefData*& equip);
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
-		char* ResRef, unsigned char& Cycle, EquipResRefData* equip);
+		char *dest, unsigned char& Cycle, EquipResRefData* equip);
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
 	void MaybeUpdateMainPalette(Animation**);
 };

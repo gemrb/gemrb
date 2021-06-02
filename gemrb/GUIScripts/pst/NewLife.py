@@ -29,7 +29,6 @@ import CommonTables
 CommonTables.Load()
 
 NewLifeWindow = 0
-QuitWindow = 0
 TextArea = 0
 
 TotLabel = 0
@@ -56,37 +55,26 @@ def OnLoad():
 	return
 
 def OpenLUStatsWindow(Type = 1):
-	global NewLifeWindow, QuitWindow, StatTable
+	global NewLifeWindow, StatTable
 	global TotPoints, AcPoints, HpPoints
 	global TotLabel, AcLabel, HpLabel
 	global TextArea, Stats, StatLabels, StatLowerLimit, StatLimit, LevelUp
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_SET)
 	LevelUp = Type
 	if LevelUp:
-		import GUICommonWindows
-		import GUIREC
-		GUICommonWindows.OptionsWindow.SetVisible (WINDOW_INVISIBLE)
-		GUICommonWindows.PortraitWindow.SetVisible (WINDOW_INVISIBLE)
-		GUICommonWindows.ActionsWindow.SetVisible (WINDOW_INVISIBLE)
-		GUIREC.RecordsWindow.SetVisible (WINDOW_INVISIBLE)
 		# only TNO gets the main stat boosts
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 		if Specific != 2:
-			GUIREC.OpenLevelUpWindow ()
 			return
 	else:
 		GemRB.LoadGame(None)  #loading the base game
+
 	StatTable = GemRB.LoadTable("abcomm")
-	GemRB.LoadWindowPack("GUICG")
-	#setting up confirmation window
-	QuitWindow = GemRB.LoadWindow(1)
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
 
 	#setting up CG window
-	NewLifeWindow = GemRB.LoadWindow(0)
-	
+	NewLifeWindow = GemRB.LoadWindow(0, "GUICG")
+
 	if LevelUp:
 		Str = GemRB.GetPlayerStat(1, IE_STR, 1)
 		Dex = GemRB.GetPlayerStat(1, IE_DEX, 1)
@@ -102,7 +90,7 @@ def OpenLUStatsWindow(Type = 1):
 		Str = Dex = Con = Wis = Int = Cha = 9
 		TotPoints = 21
 		Stats = [ Str, Int, Wis, Dex, Con, Cha ]
-	
+
 	# stat label controls
 	for i in range(len(Stats)):
 		StatLabels[i] = NewLifeWindow.GetControl(0x10000018 + i)
@@ -111,74 +99,81 @@ def OpenLUStatsWindow(Type = 1):
 	for i in range(len(Stats)):
 		Button = NewLifeWindow.GetControl (i+2)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 
 	Button = NewLifeWindow.GetControl(8)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5025)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, AcPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, AcPress)
 
 	Button = NewLifeWindow.GetControl(9)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5026)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, HpPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, HpPress)
 
 	Button = NewLifeWindow.GetControl(10)
 	Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 	Button.SetState(IE_GUI_BUTTON_LOCKED)
 	Button.SetSprites("", 0, 0, 0, 0, 0)
 	Button.SetText(5027)
-	Button.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, PointPress)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, PointPress)
 
 	# stat +/- buttons
 	for i in range(len(StatPress)):
 		Button = NewLifeWindow.GetControl (11+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IncreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
-	
+		Button.SetActionInterval (200)
+
 		Button = NewLifeWindow.GetControl (12+2*i)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DecreasePress)
-		Button.SetEvent (IE_GUI_MOUSE_OVER_BUTTON, StatPress[i])
+		Button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, StatPress[i])
 		Button.SetVarAssoc ("Pressed", i)
-	
+		Button.SetActionInterval (200)
+
 	NewLifeLabel = NewLifeWindow.GetControl(0x10000023)
-	NewLifeLabel.SetText(1899)
-	
+	if LevelUp:
+		NewLifeLabel.SetText(19356)
+	else:
+		NewLifeLabel.SetText(1899)
+
 	TextArea = NewLifeWindow.GetControl(23)
 	TextArea.SetText(18495)
-	
+
 	TotLabel = NewLifeWindow.GetControl(0x10000020)
 	AcLabel = NewLifeWindow.GetControl(0x1000001E)
 	HpLabel = NewLifeWindow.GetControl(0x1000001F)
 
 	Label = NewLifeWindow.GetControl(0x10000021)
 	Label.SetText(254)
-	
+
 	PhotoButton = NewLifeWindow.GetControl(35)
 	PhotoButton.SetState(IE_GUI_BUTTON_LOCKED)
 	PhotoButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	PhotoButton.SetEvent(IE_GUI_MOUSE_OVER_BUTTON, OverPhoto)
+	PhotoButton.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, OverPhoto)
 	PhotoButton.SetPicture("STPNOC")
-	
+
 	AcceptButton = NewLifeWindow.GetControl(0)
 	AcceptButton.SetText(4192)
 	AcceptButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, AcceptPress)
-	AcceptButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	
+	AcceptButton.MakeDefault()
+
 	CancelButton = NewLifeWindow.GetControl(1)
-	CancelButton.SetText(4196)	
+	CancelButton.SetText(4196)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	
+	if LevelUp:
+		CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
+
 	UpdateLabels()
-	
-	NewLifeWindow.SetVisible(WINDOW_VISIBLE)
+
+	NewLifeWindow.Focus()
 	return
-	
+
 def UpdateLabels():
 	global AcPoints, HpPoints
 
@@ -212,16 +207,10 @@ def UpdateLabels():
 	AcLabel.SetText(str(AcPoints))
 	HpLabel.SetText(str(HpPoints))
 	return
-	
-
-def OkButton():
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	NewLifeWindow.SetVisible(WINDOW_VISIBLE)
-	return
 
 def AcceptPress():
 	if TotPoints:
-		# Setting up the error window
+		QuitWindow = GemRB.LoadWindow(1, "GUICG")
 		TextArea = QuitWindow.GetControl(0)
 		TextArea.SetText(46782)
 
@@ -231,16 +220,11 @@ def AcceptPress():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button = QuitWindow.GetControl(2)
 		Button.SetText(46783)
-		Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
-		NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
-		QuitWindow.SetVisible(WINDOW_VISIBLE)
+		Button.MakeDefault()
+		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+		QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 		return
 
-	if NewLifeWindow:
-		NewLifeWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	#set my character up
 	if not LevelUp:
 		MyChar = GemRB.CreatePlayer ("charbase", 1)
@@ -260,9 +244,8 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_CHR, Stats[5])
 
 	if LevelUp:
-		# hp is handled in GUIREC
-		import GUIREC
-		GUIREC.OpenLevelUpWindow ()
+		# Return to the RecordsWindow
+		NewLifeWindow.Close()
 		return
 
 	#don't add con bonus, it will be calculated by the game
@@ -282,38 +265,32 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_HITPOINTS, x)
 
 	GemRB.FillPlayerInfo(1) #does all the rest
-	#alter this if needed
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_SET)
 	#LETS PLAY!!
 	GemRB.EnterGame()
 	return
 
 def CancelPress():
-	# Setting up the confirmation window
+	QuitWindow = GemRB.LoadWindow(1, "GUICG")
+	
 	TextArea = QuitWindow.GetControl(0)
 	TextArea.SetText(19406)
+	
+	def confirm():
+		QuitWindow.Close()
+		NewLifeWindow.Close()
 
 	Button = QuitWindow.GetControl(1)
 	Button.SetText(23787)
-	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_SET)
+	Button.MakeDefault()
 	Button.SetState(IE_GUI_BUTTON_ENABLED)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, YesButton)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, confirm)
 
 	Button = QuitWindow.GetControl(2)
 	Button.SetText(23789)
-	Button.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, OkButton)
+	Button.MakeDefault()
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 
-	NewLifeWindow.SetVisible(WINDOW_GRAYED) #go dark
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
-	return
-
-def YesButton():
-	if NewLifeWindow:
-		NewLifeWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	GemRB.SetNextScript("Start")
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def StrPress():

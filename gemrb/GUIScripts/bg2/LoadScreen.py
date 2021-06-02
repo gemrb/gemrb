@@ -23,11 +23,9 @@
 
 import GemRB
 import GameCheck
-import MessageWindow
 from GUIDefines import *
 
 LoadScreen = None
-hide = None
 
 def SetLoadScreen ():
 	return
@@ -35,9 +33,9 @@ def SetLoadScreen ():
 def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("guils", 640, 480)
-	LoadScreen = GemRB.LoadWindow (0)
-	LoadScreen.SetFrame ()
+	LoadScreen = GemRB.LoadWindow (0, "guils")
+	LoadScreen.AddAlias("LOADWIN")
+	
 	Middle = LoadScreen.GetControl (3)
 	Progress = GemRB.GetVar ("Progress")
 
@@ -70,20 +68,20 @@ def StartLoadScreen ():
 
 	def EndLoadScreen ():
 		GemRB.SetVar ("Progress", 0)
-		MessageWindow.UpdateControlStatus()
-		MessageWindow.TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
+		TMessageTA = GemRB.GetView("MsgSys", 0)
+		TMessageTA.Append("[p][color=f1f28d]" + GemRB.GetString (HintStr) + "[/color][/p]\n")
 		
 		if GameCheck.IsBG2Demo():
 			Middle = LoadScreen.GetControl (3)
 			Middle.SetBAM ("COADCNTR", 1, 0)
 	
-		LoadScreen.SetVisible (WINDOW_VISIBLE)
-		LoadScreen.Unload()
+		LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
+		GemRB.SetTimer(LoadScreen.Close, 500, 0)
 		return
 
 	Bar = LoadScreen.GetControl (0)
 	Bar.SetVarAssoc ("Progress", Progress)
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
+	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 
 

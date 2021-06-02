@@ -48,7 +48,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	if (GemRB.GetVar("GUIEnhancements")&GE_SCROLLBARS):
 		EnhanceGUI = 1
 
-	# save our variables 
+	# save our variables
 	pc = actor
 	NumClasses = numclasses
 	Classes = classes
@@ -69,11 +69,11 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	HLADoneButton = HLAWindow.GetControl (28)
 	HLADoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, HLADonePress)
 	HLADoneButton.SetText(11973)
-	HLADoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	HLADoneButton.MakeDefault()
 	if HLACount:
-		HLADoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		HLADoneButton.SetDisabled(True)
 	else:
-		HLADoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		HLADoneButton.SetDisabled(False)
 
 	# setup our text area
 	HLATextArea = HLAWindow.GetControl(26)
@@ -88,12 +88,12 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 			# setup our scroll index
 			GemRB.SetVar("HLATopIndex", 0)
 			# setup scrollbar
-			HLAWindow.CreateScrollBar (1000, 290,142, 16,252, "GUISCRCW")
-			ScrollBar = HLAWindow.GetControl (1000)
+			ScrollBar = HLAWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252}, "GUISCRCW")
 			ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, HLAShowAbilities)
 			#with enhanced GUI we have 5 rows of 5 abilities (the last one is 'the extra slot')
-			ScrollBar.SetVarAssoc ("HLATopIndex", GUICommon.ceildiv ( ( len (HLAAbilities)-25 ) , 5 ) + 1 )
-			ScrollBar.SetDefaultScrollBar ()
+			count = GUICommon.ceildiv (len(HLAAbilities) - 25, 5) + 1
+			ScrollBar.SetVarAssoc ("HLATopIndex", count, 0, count)
+			HLAWindow.SetEventProxy(ScrollBar)
 
 	# draw our HLAs and show the window
 	HLAShowAbilities ()
@@ -141,9 +141,6 @@ def HLADonePress ():
 	# so redraw skills knows we're done
 	GemRB.SetVar ("HLACount", 0)
 
-	import LevelUp
-	LevelUp.LevelUpWindow.Invalidate ()
-
 	return
 
 def HLAShowAbilities ():
@@ -160,11 +157,11 @@ def HLAShowAbilities ():
 			break
 		SpellButton = HLAWindow.GetControl (i)
 		if i + j >= len (HLAAbilities):
-			SpellButton.SetState (IE_GUI_BUTTON_DISABLED)
+			SpellButton.SetDisabled(True)
 			SpellButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 		else:
-			SpellButton.SetState(IE_GUI_BUTTON_ENABLED)
+			SpellButton.SetDisabled(False)
 			SpellButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 		# fill in the button with the spell data
@@ -183,12 +180,13 @@ def HLAShowAbilities ():
 		if HLAAbilities[i+j][1] == 0:
 			SpellButton.SetState(IE_GUI_BUTTON_LOCKED)
 			# shade red
-			SpellButton.SetBorder (0, 0,0, 0,0, 200,0,0,100, 1,1)
+			color = {'r' : 200, 'g' : 0, 'b' : 0, 'a' : 100}
+			SpellButton.SetBorder (0, color, 1,1)
 		else:
 			SpellButton.SetState (IE_GUI_BUTTON_ENABLED)
 			# unset any borders on this button or an un-learnable from last level
 			# will still shade red even though it is clickable
-			SpellButton.SetBorder (0, 0,0, 0,0, 0,0,0,0, 0,0)
+			SpellButton.SetBorder (0, None, 0,0)
 
 	# show which spells are selected
 	HLAShowSelectedAbilities ()
@@ -227,7 +225,7 @@ def HLASelectPress ():
 			HLACount += 1
 			HLANewAbilities[i] = 0
 			HLAAbilities[i][2] -= 1 # internal counter
-			HLADoneButton.SetState (IE_GUI_BUTTON_DISABLED)
+			HLADoneButton.SetDisabled (True)
 		else: # selecting
 			# we don't have any picks left
 			if HLACount == 0:
@@ -239,7 +237,7 @@ def HLASelectPress ():
 			HLANewAbilities[i] = 1
 			HLAAbilities[i][2] += 1 # increment internal counter
 			if HLACount == 0:
-				HLADoneButton.SetState (IE_GUI_BUTTON_ENABLED)
+				HLADoneButton.SetDisabled (False)
 
 		# recheck internal exclusions and prereqs
 		HLARecheckPrereqs (i)
@@ -335,7 +333,7 @@ def GetHLAs ():
 			# make sure we have an ability here
 			if HLARef == "*":
 				print "\t\tEnd of HLAs"
-				break	
+				break
 
 			# [ref to hla, memorizable?, num memorized, pre-req ref, excluded ref]
 			SaveArray = [\
@@ -350,7 +348,7 @@ def GetHLAs ():
 				print "\t\tNot within parameters"
 				HLAAbilities.append(SaveArray)
 				continue
-		
+
 			# see if we're alignment restricted (we never get them)
 			HLAAlign = HLAClassTable.GetValue (j, 8, GTV_STR)
 			if HLAAlign == "ALL_EVIL" and GemRB.GetPlayerStat (pc, IE_ALIGNMENT) < 6:

@@ -13,6 +13,11 @@ using namespace GemRB;
 
 std::string GLSLProgram::errMessage;
 
+GLSLProgram::~GLSLProgram()
+{
+	if (program != 0) glDeleteProgram(program);
+}
+
 GLSLProgram* GLSLProgram::Create(std::string vertexSource, std::string fragmentSource)
 {
 	GLSLProgram* program = new GLSLProgram();
@@ -56,8 +61,8 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#ifdef USE_GL
-		// remove precisions
+#if USE_OPENGL_API
+		// remove precisions when using OpenGL and not GLES
 		if (line.find("precision") == 0) continue;
 #endif
         vertexContent.append(line + "\n");
@@ -89,7 +94,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	{
         std::getline(fileStream2, line);
 		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-#ifdef USE_GL
+#if USE_OPENGL_API
 		// remove precisions
 		if (line.find("precision") == 0) continue;
 #endif
@@ -99,12 +104,13 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	return GLSLProgram::Create(vertexContent, fragmentContent);
 }
 
-GLuint GLSLProgram::buildShader(GLenum type, const std::string source)
+GLuint GLSLProgram::buildShader(GLenum type, std::string shader_source)
 {
-	std::string shader_source = source;
-#ifdef USE_GL
+#if USE_OPENGL_API
+	// for GLSL 1.X (GL 2.0)
 	shader_source.insert(0, "#version 110\n");
 #else
+	// for GLSL ES 1.00 (GLES 2.0)
 	shader_source.insert(0, "#version 100\n");
 #endif
     GLuint id = glCreateShader(type);
@@ -124,7 +130,7 @@ GLuint GLSLProgram::buildShader(GLenum type, const std::string source)
     return id;
 }
 
-bool GLSLProgram::buildProgram(std::string vertexSource, std::string fragmentSource)
+bool GLSLProgram::buildProgram(std::string vertexSource, const std::string& fragmentSource)
 {
 	program = 0;
     program = glCreateProgram();
@@ -190,12 +196,6 @@ GLint GLSLProgram::getUniformLocation(std::string uniformName)
 		return -1;
 	}
 	return uniforms.at(uniformName);
-}
-
-void GLSLProgram::Release()
-{
-	if (program != 0) glDeleteProgram(program);
-	delete this;
 }
 
 const std::string GLSLProgram::GetLastError()

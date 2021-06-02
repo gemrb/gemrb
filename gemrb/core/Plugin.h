@@ -45,7 +45,7 @@ namespace GemRB {
 class GEM_EXPORT Plugin : public Held<Plugin> {
 public:
 	Plugin(void);
-	virtual ~Plugin(void);
+	~Plugin(void) override;
 };
 
 }

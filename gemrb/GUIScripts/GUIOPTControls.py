@@ -49,9 +49,11 @@ def OptSlider (winhelp, ctlhelp, help_ta, window, slider_id, label_id, label_str
 		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, action)
 	else:
 		# create an anonymous callback, so we don't need to create a separate function for each string
-		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, lambda s=ctlhelp, ta=help_ta: ta.SetText (s))
+		slider.SetEvent (IE_GUI_SLIDER_ON_CHANGE, lambda: help_ta.SetText (ctlhelp))
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
+	slider.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, lambda: help_ta.SetText (ctlhelp))
+	slider.SetEvent (IE_GUI_MOUSE_LEAVE_BUTTON, lambda: help_ta.SetText (winhelp))
 
 	return slider
 
@@ -88,9 +90,10 @@ def OptCheckbox (winhelp, ctlhelp, help_ta, window, button_id, label_id, label_s
 	if handler:
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, handler)
 	else:
-		# create an anonymous callback, so we don't need to create a separate function for each string
-		# FIXME: IE_GUI_MOUSE_ENTER_BUTTON would be more UX-sensible, but interferes with toggling
-		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda s=ctlhelp, ta=help_ta: ta.SetText (s))
+		def callback():
+			help_ta.SetText(ctlhelp)
+
+		button.SetEvent (IE_GUI_MOUSE_ENTER_BUTTON, callback)
 
 	OptBuddyLabel (window, label_id, label_strref, help_ta, ctlhelp, winhelp)
 
@@ -109,7 +112,7 @@ def OptDone (action, window, button_id):
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_DONE) # Done
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-	button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	button.MakeDefault()
 
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 0)
@@ -120,7 +123,7 @@ def OptCancel (action, window, button_id):
 	button = window.GetControl (button_id)
 	button.SetText (STR_OPT_CANCEL) # Cancel
 	button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)
-	button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	button.MakeEscape()
 
 	if GameCheck.IsPST():
 		button.SetVarAssoc ("Cancel", 1)

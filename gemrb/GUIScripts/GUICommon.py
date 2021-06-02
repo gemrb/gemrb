@@ -22,38 +22,14 @@
 import GemRB
 import GameCheck
 import GUIClasses
+import collections
 import CommonTables
-from ie_restype import RES_CHU, RES_2DA, RES_BAM
+from ie_restype import RES_CHU, RES_2DA, RES_BAM, RES_WAV
 from ie_spells import LS_MEMO
 from GUIDefines import *
 from ie_stats import *
 
-OtherWindowFn = None
-NextWindowFn = None
-
 CommonTables.Load ()
-
-def CloseOtherWindow (NewWindowFn):
-	global OtherWindowFn,NextWindowFn
-
-	GemRB.LeaveContainer()
-	if OtherWindowFn and OtherWindowFn != NewWindowFn:
-		# allow detection of 'next window'
-		NextWindowFn = NewWindowFn
-		# switching from a window to something else, call old function
-		OtherWindowFn ()
-		OtherWindowFn = NewWindowFn
-		return 0
-	elif OtherWindowFn:
-		# something is calling us with its own function, so
-		# it is closing down, return true
-		OtherWindowFn = None
-		return 1
-	else:
-		# new window, no need to do setup
-		OtherWindowFn = NewWindowFn
-		NextWindowFn = None
-		return 0
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)
@@ -69,29 +45,37 @@ def GetWindowPack():
 	if GemRB.HasResource (gui, RES_CHU, 1):
 		return gui
 
-	gui = None
-	if width == 640:
-		gui = default
-	elif width == 800:
-		gui = "GUIW08"
-	elif width == 1024:
-		gui = "GUIW10"
-	elif width == 1280:
-		gui = "GUIW12"
-	if gui:
-		if GemRB.HasResource (gui, RES_CHU, 1):
-			return gui
+	# select this based on height
+	# we do this because:
+	# 1. windows are never the entire width,
+	#    but the can be the entire height
+	# 2. the originals were for 4:3 screens,
+	#    but modern screens are usually a wider aspect
+	# 3. not all games have all the window packs
+	if height >= 960 and GemRB.HasResource ("GUIW12", RES_CHU, 1):
+		return "GUIW12"
+	elif height >= 768 and GemRB.HasResource ("GUIW10", RES_CHU, 1):
+		return "GUIW10"
+	elif height >= 600 and GemRB.HasResource ("GUIW08", RES_CHU, 1):
+		return "GUIW08"
 
 	# fallback to the smallest resolution
 	return default
 
 def LocationPressed ():
 	AreaInfo = GemRB.GetAreaInfo()
-	print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
+	TMessageTA = GemRB.GetView("MsgSys", 0)
+	if TMessageTA:
+		message = "[color=ff0000]Mouse:[/color] x={0}, y={1}\n[color=ff0000]Area:[/color] {2}\n"
+		message = message.format(AreaInfo["PositionX"], AreaInfo["PositionY"], AreaInfo["CurrentArea"])
+		TMessageTA.Append(message)
+	else:
+		print( "%s [%d.%d]\n"%(AreaInfo["CurrentArea"], AreaInfo["PositionX"], AreaInfo["PositionY"]) )
+
 	return
 
-def SelectFormation ():
-	GemRB.GameSetFormation (GemRB.GetVar ("Formation"))
+def SelectFormation (btn, val):
+	GemRB.GameSetFormation (val)
 	return
 
 def OpenFloatMenuWindow (x, y):
@@ -240,7 +224,7 @@ def MakeSpellCount (pc, spell, count):
 	import Spellbook
 	Spellbook.LearnSpell (pc, spell, IE_IWD2_SPELL_INNATE, 0, count-have, LS_MEMO)
 	return
-	
+
 # remove all class abilities up to the given level
 # for dual-classing mainly
 def RemoveClassAbilities (pc, table, Level):
@@ -280,7 +264,7 @@ def RemoveClassAbilities (pc, table, Level):
 					print "ERROR, unknown class ability (type): ", ab
 
 # PST uses a button, IWD2 two types, the rest are the same with two labels
-def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = False):
+def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 	"""Displays the encumbrance as a ratio of current to maximum."""
 
 	# encumbrance
@@ -289,7 +273,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 
 	Control = Window.GetControl (ControlID)
 	if GameCheck.IsPST():
-		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it 
+		# FIXME: there should be a space before LB symbol (':') - but there is no frame for it and our doesn't cut it
 		Control.SetText (str (encumbrance) + ":\n\n" + str (max_encumb) + ":")
 	elif GameCheck.IsIWD2() and not Control2ID:
 		Control.SetText (str (encumbrance) + "/" + str(max_encumb) + GemRB.GetString(39537))
@@ -304,23 +288,14 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 	ratio = (0.0 + encumbrance) / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
-			if invert_colors:
-				Control.SetTextColor (255, 0, 0, True)
-			else:
-				Control.SetTextColor (255, 0, 0)
+			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		elif ratio > 0.8:
-			if invert_colors:
-				Control.SetTextColor (255, 255, 0, True)
-			else:
-				Control.SetTextColor (255, 255, 0)
+			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			if invert_colors:
-				Control.SetTextColor (255, 255, 255, True)
-			else:
-				Control.SetTextColor (255, 255, 255)
+			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 		if Control2ID:
-			Control2.SetTextColor (255, 0, 0)
+			Control2.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
 
 	else:
 		if ratio > 1.0:
@@ -329,7 +304,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc, invert_colors = Fal
 			Control.SetFont ("NUMBER2");
 		else:
 			Control.SetFont ("NUMBER");
-		
+
 	return
 
 def GetActorClassTitle (actor):
@@ -578,6 +553,25 @@ def IsMultiClassed (actor, verbose):
 	# return the tuple
 	return (NumClasses, Classes[0], Classes[1], Classes[2])
 
+def IsNamelessOne (actor):
+	# A very simple test to identify the actor as TNO
+	if not GameCheck.IsPST():
+		return False
+
+	Specific = GemRB.GetPlayerStat (actor, IE_SPECIFIC)
+	if Specific == 2:
+		return True
+
+	return False
+
+def NamelessOneClass (actor):
+	# A shortcut function to determine the identity of the nameless one 
+	# and get his class if that is the case
+	if IsNamelessOne(actor):
+		return GetClassRowName(actor)
+
+	return None
+
 def CanDualClass(actor):
 	# race restriction (human)
 	RaceName = CommonTables.Races.FindValue ("ID", GemRB.GetPlayerStat (actor, IE_RACE, 1))
@@ -701,28 +695,31 @@ def SetupDamageInfo (pc, Button, Window):
 		ratio = (hp+0.0) / hp_max
 
 	if hp < 1 or (state & STATE_DEAD):
-		Button.SetOverlay (0, 64,64,64,200, 64,64,64,200)
+		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 255}
+		Button.SetOverlay (0, c, c)
 
 	if ratio == 1:
 		band = 0
-		color = (255, 255, 255)  # white
+		color = {'r' : 255, 'g' : 255, 'b' : 255}  # white
 	elif ratio >= 0.75:
 		band = 1
-		color = (0, 255, 0)  # green
+		color = {'r' : 0, 'g' : 255, 'b' : 0}  # green
 	elif ratio >= 0.50:
 		band = 2
-		color = (255, 255, 0)  # yellow
+		color = {'r' : 255, 'g' : 255, 'b' : 0}  # yellow
 	elif ratio >= 0.25:
 		band = 3
-		color = (255, 128, 0)  # orange
+		color = {'r' : 255, 'g' : 128, 'b' : 0}  # orange
 	else:
 		band = 4
-		color = (255, 0, 0)  # red
+		color = {'r' : 255, 'g' : 0, 'b' : 0}  # red
 
 	if GemRB.GetVar("Old Portrait Health") or not GameCheck.IsIWD2():
 		# draw the blood overlay
 		if hp >= 1 and not (state & STATE_DEAD):
-			Button.SetOverlay (ratio, 160,0,0,200, 60,0,0,190)
+			c1 = {'r' : 0x70, 'g' : 0, 'b' : 0, 'a' : 0xff}
+			c2 = {'r' : 0xf7, 'g' : 0, 'b' : 0, 'a' : 0xff}
+			Button.SetOverlay (ratio, c1, c2)
 	else:
 		# scale the hp bar under the portraits and recolor it
 		# GUIHITPT has 5 frames with different severity colors
@@ -787,16 +784,16 @@ def SetSaveDir():
 # The third parameter is another check which must be 0 to maintain window visibility
 def AdjustWindowVisibility (Window, pc, additionalCheck):
 	if not additionalCheck and GemRB.ValidTarget (pc, GA_SELECT|GA_NO_DEAD):
-		Window.SetVisible (WINDOW_VISIBLE)
+		Window.SetDisabled (False)
 	else:
-		Window.SetVisible (WINDOW_GRAYED)
+		Window.SetDisabled (True)
 	return
 
 def UsingTouchInput ():
 	return GemRB.GetSystemVariable (SV_TOUCH)
 
 # return ceil(n/d)
-# 
+#
 def ceildiv (n, d):
 	if d == 0:
 		raise ZeroDivisionError("ceildiv by zero")
@@ -820,6 +817,9 @@ def SafeStatEval (expression):
 
 	return eval(expression)
 
+GameWindow = GUIClasses.GWindow(ID=0, SCRIPT_GROUP="GAMEWIN")
+GameControl = GUIClasses.GView(ID=0, SCRIPT_GROUP="GC")
+
 def DisplayAC (pc, window, labelID):
 	AC = GemRB.GetPlayerStat (pc, IE_ARMORCLASS) + GetACStyleBonus (pc)
 	Label = window.GetControl (labelID)
@@ -840,8 +840,25 @@ def GetACStyleBonus (pc):
 		return 0
 	return WStyleTable.GetValue (str(stars), "AC")
 
-GameWindow = GUIClasses.GWindow(0)
-GameControl = GUIClasses.GControl(0,0)
+def AddDefaultVoiceSet (VoiceList, Voices):
+	if GameCheck.IsBG1 () or GameCheck.IsBG2 ():
+		Options = collections.OrderedDict(enumerate(Voices))
+		Options[-1] = "default"
+		Options = collections.OrderedDict(sorted(Options.items()))
+		VoiceList.SetOptions (Options.values())
+		return True
+	return False
+
+def OverrideDefaultVoiceSet (Gender, CharSound):
+	# handle "default" gendered voice
+	if CharSound == "default" and not GemRB.HasResource ("defaulta", RES_WAV):
+		if GameCheck.IsBG1 ():
+			Gender2Sound = [ "", "mainm", "mainf" ]
+			CharSound = Gender2Sound[Gender]
+		elif GameCheck.IsBG2 ():
+			Gender2Sound = [ "", "male005", "female4" ]
+			CharSound = Gender2Sound[Gender]
+	return CharSound
 
 class _stdioWrapper(object):
 	def __init__(self, log_level):

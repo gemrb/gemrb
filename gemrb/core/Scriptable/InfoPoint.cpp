@@ -169,13 +169,17 @@ bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 
 bool InfoPoint::Entered(Actor *actor)
 {
-	if (outline->PointIn( actor->Pos ) ) {
-		goto check;
+	if (outline) {
+		// be more lenient for travel regions, fixed iwd2 ar1100 to1101 region
+		if (Type == ST_TRAVEL && outline->BBox.PointInside(actor->Pos)) goto check;
+		if (outline->PointIn( actor->Pos)) goto check;
+	} else if (!BBox.Dimensions().IsEmpty()) {
+		if (BBox.PointInside(actor->Pos)) goto check;
+	} else {
+		// this is to trap possible bugs in our understanding of ARE polygons that arent actually polygons
+		assert(Type == ST_TRAVEL || Flags&TRAP_USEPOINT);
 	}
-	// be more lenient for travel regions, fixed iwd2 ar1100 to1101 region
-	if (Type == ST_TRAVEL && outline->BBox.PointInside(actor->Pos)) {
-		goto check;
-	}
+
 	// why is this here? actors which aren't *in* a trap get IF_INTRAP
 	// repeatedly unset, so this triggers again and again and again.
 	// i disabled it for ST_PROXIMITY for now..

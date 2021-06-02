@@ -83,11 +83,11 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	return new Tile( ani );
 }
 
-Sprite2D* TISImporter::GetTile(int index)
+Holder<Sprite2D> TISImporter::GetTile(int index)
 {
-	RevColor RevCol[256];
-	Color Palette[256];
-	void* pixels = malloc( 4096 );
+	Color Col[256];
+	Color Palette[256]{};
+	void* pixels = calloc(4096, 1);
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
@@ -98,22 +98,19 @@ Sprite2D* TISImporter::GetTile(int index)
 		}
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		memset(pixels, 0, 4096);
-		memset(Palette, 0, 256 * sizeof(Color));
 		Palette[0].g = 200;
-		Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette );
-		spr->XPos = spr->YPos = 0;
-		return spr;
+		return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette );
 	}
 	str->Seek( pos, GEM_STREAM_START );
-	str->Read( &RevCol, 1024 );
+	str->Read( &Col, 1024 );
 	int transindex = 0;
 	bool transparent = false;
 	for (int i = 0; i < 256; i++) {
-		Palette[i].r = RevCol[i].r;
-		Palette[i].g = RevCol[i].g;
-		Palette[i].b = RevCol[i].b;
-		Palette[i].a = RevCol[i].a;
+		// bgra format
+		Palette[i].r = Col[i].b;
+		Palette[i].g = Col[i].g;
+		Palette[i].b = Col[i].r;
+		Palette[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
 		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
 			if (transparent) {
 				Log(ERROR, "TISImporter", "Tile has two green (transparent) palette entries");
@@ -124,9 +121,7 @@ Sprite2D* TISImporter::GetTile(int index)
 		}
 	}
 	str->Read( pixels, 4096 );
-	Sprite2D* spr = core->GetVideoDriver()->CreatePalettedSprite( 64, 64, 8, pixels, Palette, transparent, transindex );
-	spr->XPos = spr->YPos = 0;
-	return spr;
+	return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette, transparent, transindex );
 }
 
 #include "plugindef.h"

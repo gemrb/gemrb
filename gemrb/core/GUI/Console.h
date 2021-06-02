@@ -28,11 +28,10 @@
 #define CONSOLE_H
 
 #include "CircularBuffer.h"
-#include "GUI/Control.h"
+#include "GUI/TextArea.h"
+#include "GUI/TextEdit.h"
 
 namespace GemRB {
-
-class Palette;
 
 /**
  * @class Console
@@ -43,51 +42,29 @@ class Palette;
  * from GUIScripts can be used.
  */
 
-class GEM_EXPORT Console : public Control {
-public:
-	Console(const Region& frame);
-	~Console(void);
-	/** Set Cursor */
-	void SetCursor(Sprite2D* cur);
-	/** Set BackGround */
-	void SetBackGround(Sprite2D* back);
-	/** Inserts text at the current cursor position */
-	void InsertText(const String&);
-	/** Sets the Text of the current control */
-	void SetText(const String& string);
-	/** Draws the Console on the Output Display */
-	void DrawInternal(Region& drawFrame);
-	// console always needs to redraw
-	bool NeedsDraw() const { return true; };
+class GEM_EXPORT Console : public TextEdit {
 private:
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-	/** Background */
-	Sprite2D* Back;
-	/** Max Edit Text Length */
-	unsigned short max;
-	/** Text Buffer */
-	String Buffer;
 	/** History Buffer */
-	CircularBuffer<String> History;
-	/** Cursor Position */
-	unsigned short CurPos;
+	CircularBuffer<SelectOption> History;
 	/** History Position and size */
-	int HistPos;
-	/** Color Palette */
-	Palette* palette;
+	TextArea* textArea = nullptr;
+	// an index into Hiostory, except when > History.size() which indicates a new entry
+	size_t HistPos = 0;
 
-public: //Events
-	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
-	void SetFocus(bool focus);
-	bool SetEvent(int eventType, ControlEventHandler handler);
+public:
+	Console(const Region& frame, TextArea* ta);
+	bool Execute(const String&);
+
 private:
+	void UpdateTextArea();
 	void HistoryBack();
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
+	void HistorySetPos(size_t);
+	
+protected:
+	/** Key Press Event */
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 };
 
 }

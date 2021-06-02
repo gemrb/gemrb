@@ -21,6 +21,8 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 GenderWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -29,36 +31,18 @@ MyChar = 0
 def OnLoad():
 	global GenderWindow, TextAreaControl, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MyChar = GemRB.GetVar ("Slot")
-	#this hack will redraw the base CG window
-	GenderWindow = GemRB.LoadWindow(0)
-	PortraitButton = GenderWindow.GetControl(12)
-	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	ImportButton = GenderWindow.GetControl(13)
-	ImportButton.SetText(13955)
-	ImportButton.SetState(IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GenderWindow.GetControl(15)
-	CancelButton.SetText(13727)
-	CancelButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	BiographyButton = GenderWindow.GetControl(16)
-	BiographyButton.SetText(18003)
-	BiographyButton.SetState(IE_GUI_BUTTON_DISABLED)
-
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.DrawWindows()
-	if GenderWindow:
-		GenderWindow.Unload()
-	GenderWindow = GemRB.LoadWindow(1)
+	GenderWindow = GemRB.LoadWindow(1, "GUICG")
+	GenderWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+	CharGenCommon.PositionCharGenWin(GenderWindow)
 
 	BackButton = GenderWindow.GetControl(6)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = GenderWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = GenderWindow.GetControl(5)
 	TextAreaControl.SetText(17236)
@@ -75,18 +59,18 @@ def OnLoad():
 	FemaleButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClickedFemale)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GenderWindow.SetVisible(WINDOW_VISIBLE)
+	DoneButton.SetDisabled(True)
+	GenderWindow.Focus()
 	return
 
 def ClickedMale():
 	TextAreaControl.SetText(13083)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def ClickedFemale():
 	TextAreaControl.SetText(13084)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():

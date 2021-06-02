@@ -114,6 +114,13 @@ def OnLoad():
 	if playmode >=0:
 		GemRB.SaveCharacter (MyChar, "gembak")
 		#LETS PLAY!!
+		import CharGenCommon, CommonWindow
+		CharGenCommon.CharGenWindow.Close ()
+
+		CommonWindow.SetGameGUIHidden(True)
+		# fade with some number longer than it takes to get everything setup and running
+		# eventually another fade call is executed which will cancel the remaining time
+		GemRB.ExecuteString ("FadeFromColor([1000.0],0)", MyChar)
 		GemRB.EnterGame()
 		GemRB.ExecuteString ("EquipMostDamagingMelee()", MyChar)
 		if GameCheck.IsTOB ():

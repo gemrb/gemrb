@@ -27,116 +27,80 @@
 
 namespace GemRB {
 
-Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear)
-	: Control(frame)
+Progressbar::Progressbar(const Region& frame, unsigned short KnobStepsCount)
+: Control(frame)
 {
 	ControlType = IE_GUI_PROGRESSBAR;
-	BackGround = NULL;
-	BackGround2 = NULL;
-	this->Clear = Clear;
+
 	this->KnobStepsCount = KnobStepsCount;
 	PBarAnim = NULL;
-	PBarCap = NULL;
-	KnobXPos = KnobYPos = 0;
-	CapXPos = CapYPos = 0;
-	ResetEventHandler( EndReached );
+
+	SetValueRange(0, 100);
 }
 
 Progressbar::~Progressbar()
 {
-	if (!Clear) {
-		return;
-	}
-	Sprite2D::FreeSprite( BackGround );
-	Sprite2D::FreeSprite( BackGround2 );
 	delete PBarAnim;
-	Sprite2D::FreeSprite( PBarCap );
+}
+
+bool Progressbar::IsOpaque() const
+{
+	bool isOpaque = Control::IsOpaque();
+	if (!isOpaque) {
+		isOpaque = BackGround2 && BackGround2->HasTransparency() == false;
+	}
+	return isOpaque;
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::DrawInternal(Region& rgn)
+void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	Sprite2D *bcksprite;
+	ieDword val = GetValue();
 
-	if((Value >= 100) && KnobStepsCount && BackGround2) {
-		bcksprite=BackGround2; //animated progbar end stage
-	}
-	else {
-		bcksprite=BackGround;
-	}
-	if (bcksprite) {
-		core->GetVideoDriver()->BlitSprite( bcksprite,
-			rgn.x, rgn.y, true, &rgn );
-		if( bcksprite==BackGround2) {
-			return; //done for animated progbar
-		}
+	if((val >= 100) && KnobStepsCount && BackGround2) {
+		//animated progbar end stage
+		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin());
+		return; //done for animated progbar
 	}
 
 	unsigned int Count;
 
 	if(!KnobStepsCount) {
 		//linear progressbar (pst, iwd)
-		int w = BackGround2->Width;
-		int h = BackGround2->Height;
+		const Size& size = BackGround2->Frame.Dimensions();
 		//this is the PST/IWD specific part
-		Count = Value*w/100;
-		Region r( rgn.x + KnobXPos, rgn.y + KnobYPos, Count, h );
-		core->GetVideoDriver()->BlitSprite( BackGround2, 
-			r.x, r.y, true, &r );
+		Count = val * size.w / 100;
+		Region r(rgn.Origin() + KnobPos, Size(Count, size.h));
+		core->GetVideoDriver()->BlitSprite(BackGround2, r.Origin(), &r);
 
-		core->GetVideoDriver()->BlitSprite( PBarCap,
-			rgn.x+CapXPos+Count-PBarCap->Width, rgn.y+CapYPos, true );
+		Point p = rgn.Origin() + CapPos;
+		p.x += Count - PBarCap->Frame.w;
+		core->GetVideoDriver()->BlitSprite(PBarCap, p);
 		return;
 	}
 
 	//animated progressbar (bg2)
-	Count=Value*KnobStepsCount/100;
+	Count=val*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
-		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, Owner->XPos, Owner->YPos, true );
+		Holder<Sprite2D> Knob = PBarAnim->GetFrame(i);
+		core->GetVideoDriver()->BlitSprite(Knob, Point());
 	}
-}
-
-/** Returns the actual Progressbar Position */
-unsigned int Progressbar::GetPosition()
-{
-	return Value;
-}
-
-/** Sets the actual Progressbar Position trimming to the Max and Min Values */
-void Progressbar::SetPosition(unsigned int pos)
-{
-	if(pos>100) pos=100;
-	if (Value == pos)
-		return;
-	Value = pos;
-	MarkDirty();
 }
 
 void Progressbar::UpdateState(unsigned int Sum)
 {
-	SetPosition(Sum);
-	MarkDirty();
-	if(Value==100)
-		RunEventHandler( EndReached );
+	SetValue(Sum);
+    if(GetValue() == 100) {
+        PerformAction(Action::EndReached);
+    }
 }
 
 /** Sets the selected image */
-void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
+void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 {
-	if (BackGround && Clear)
-		Sprite2D::FreeSprite( BackGround );
-	BackGround = img;
-	if (BackGround2 && Clear)
-		Sprite2D::FreeSprite( BackGround2 );
-	BackGround2 = img2;
+	BackGround2 = bg;
+	PBarCap = cap;
 	MarkDirty();
-}
-
-void Progressbar::SetBarCap(Sprite2D* img3)
-{
-	Sprite2D::FreeSprite( PBarCap );
-	PBarCap = img3;
 }
 
 void Progressbar::SetAnimation(Animation *arg)
@@ -145,25 +109,10 @@ void Progressbar::SetAnimation(Animation *arg)
 	PBarAnim = arg;
 }
 
-void Progressbar::SetSliderPos(int x, int y, int x2, int y2)
+void Progressbar::SetSliderPos(const Point& knob, const Point& cap)
 {
-	KnobXPos=x;
-	KnobYPos=y;
-	CapXPos=x2;
-	CapYPos=y2;
-}
-
-bool Progressbar::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_PROGRESS_END_REACHED:
-		EndReached = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
+	KnobPos = knob;
+	CapPos = cap;
 }
 
 }

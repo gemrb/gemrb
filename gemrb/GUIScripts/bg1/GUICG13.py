@@ -45,9 +45,7 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MinorColor, MajorColor
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ColorWindow=GemRB.LoadWindow(13)
-	GUICommon.CloseOtherWindow (ColorWindow.Unload)
+	ColorWindow=GemRB.LoadWindow(13, "GUICG")
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
@@ -94,10 +92,10 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = ColorWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(ColorWindow))
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
 	ColorWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -163,7 +161,7 @@ def GetColor():
 def HairPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 0
 	PickedColor = HairColor
 	GetColor()
@@ -172,7 +170,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 1
 	PickedColor = SkinColor
 	GetColor()
@@ -181,7 +179,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 2
 	PickedColor = MinorColor
 	GetColor()
@@ -190,7 +188,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 3
 	PickedColor = MajorColor
 	GetColor()
@@ -198,6 +196,7 @@ def MinorPress():
 
 
 def NextPress():
+	ColorWindow.Close()
 	MyChar = GemRB.GetVar ("Slot")
 	GUICommon.SetColorStat (MyChar, IE_HAIR_COLOR, HairColor )
 	GUICommon.SetColorStat (MyChar, IE_SKIN_COLOR, SkinColor )

@@ -42,13 +42,7 @@ def OnLoad():
 	global AppearanceWindow, PortraitButton, PortraitsTable, LastPortrait
 	global Gender
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AppearanceWindow):
-			AppearanceWindow.Unload()
-		return
-
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AppearanceWindow = GemRB.LoadWindow (11)
+	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
 	
 	#Load the Gender
 	MyChar = GemRB.GetVar ("Slot")
@@ -78,11 +72,11 @@ def OnLoad():
 
 	DoneButton = AppearanceWindow.GetControl (0)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AppearanceWindow))
 	CustomButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomPress)
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	
@@ -196,16 +190,14 @@ def CustomPress():
 
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
-	RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 1)
-	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
-	GemRB.SetVar ("Row1", RowCount1)
-	PortraitList1.SetVarAssoc ("Row1",RowCount1)
+	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
 
 	PortraitList2 = Window.GetControl (4)
-	RowCount2 = PortraitList2.ListResources (CHR_PORTRAITS, 0)
+	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
-	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
+	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
+	PortraitList1.SetVarAssoc ("Row1", RowCount1)
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
@@ -230,6 +222,7 @@ def CustomPress():
 	return
 
 def NextPress():
+	AppearanceWindow.Close()
 	PortraitTable = GemRB.LoadTable ("pictures")
 	PortraitName = PortraitTable.GetRowName (LastPortrait )
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")

@@ -22,20 +22,25 @@
 
 #include "Game.h"
 #include "Interface.h"
+#include "SDLPixelIterator.h"
+#include "SDLSurfaceSprite2D.h"
+#include "SDL12GamepadMappings.h"
+
+#include "SDLSpriteRendererRLE.h"
 
 using namespace GemRB;
 
 SDL12VideoDriver::SDL12VideoDriver(void)
 {
-	overlay = NULL;
+	disp = NULL;
+	inTextInput = false;
 }
 
-SDL12VideoDriver::~SDL12VideoDriver(void)
+SDL12VideoDriver::~SDL12VideoDriver()
 {
 	if (gameController != nullptr) {
  		SDL_JoystickClose(gameController);
 	}
-	DestroyMovieScreen();
 }
 
 int SDL12VideoDriver::Init(void)
@@ -50,6 +55,13 @@ int SDL12VideoDriver::Init(void)
 		// this may limit people actually using very old single button mice, but who cares :)
 		setenv("SDL_HAS3BUTTONMOUSE", "SDL_HAS3BUTTONMOUSE", 1);
 #endif
+		if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
+			Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+		} else {
+			if (SDL_NumJoysticks() > 0) {
+				gameController = SDL_JoystickOpen(0);
+			}
+		}
 	}
 
 	if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1) {
@@ -63,17 +75,13 @@ int SDL12VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* title)
+int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 {
-	bpp=b;
-	fullscreen=fs;
 	Log(MESSAGE, "SDL 1.2 Driver", "Creating display");
 	ieDword flags = SDL_SWSURFACE;
-	if (fullscreen) {
-		flags |= SDL_FULLSCREEN;
-	}
+
 	Log(MESSAGE, "SDL 1.2 Driver", "SDL_SetVideoMode...");
-	disp = SDL_SetVideoMode( w, h, bpp, flags );
+	disp = SDL_SetVideoMode(screenSize.w, screenSize.h, bpp, flags );
 	SDL_WM_SetCaption( title, 0 );
 	if (disp == NULL) {
 		Log(ERROR, "SDL 1.2 Driver", "%s", SDL_GetError());
@@ -85,127 +93,415 @@ int SDL12VideoDriver::CreateDisplay(int w, int h, int b, bool fs, const char* ti
 		Log(WARNING, "SDL 1.2 Driver", "No Hardware Acceleration available.");
 	}
 
-	width = disp->w;
-	height = disp->h;
-	Viewport.w = width;
-	Viewport.h = height;
-	SetScreenClip(NULL);
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Main Surface...");
-	SDL_Surface* tmp = SDL_CreateRGBSurface( SDL_SWSURFACE, width, height,
-						bpp, 0, 0, 0, 0 );
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Back Buffer...");
-	backBuf = SDL_DisplayFormat( tmp );
-	Log(MESSAGE, "SDL 1.2 Driver", "Creating Extra Buffer...");
-	extra = SDL_DisplayFormat( tmp );
-	SDL_LockSurface( extra );
-	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
-	SDL_FillRect( extra, NULL, val );
-	SDL_UnlockSurface( extra );
-	SDL_FreeSurface( tmp );
-
-#ifdef VITA
-	if (width != VITA_FULLSCREEN_WIDTH || height != VITA_FULLSCREEN_HEIGHT)	{
-		SDL_Rect vitaDestRect;
-		vitaDestRect.x = 0;
-		vitaDestRect.y = 0;
-		vitaDestRect.w = width;
-		vitaDestRect.h = height;
-
-		if (fullscreen) {
-			//resize to fullscreen
-			if (core->VitaKeepAspectRatio) {
-				if ((static_cast<float>(VITA_FULLSCREEN_WIDTH) / VITA_FULLSCREEN_HEIGHT) >= (static_cast<float>(width) / height)) {
-					float scale = static_cast<float>(VITA_FULLSCREEN_HEIGHT) / height;
-					vitaDestRect.w = width * scale;
-					vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
-					vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - vitaDestRect.w) / 2;
-				} else {
-					float scale = static_cast<float>(VITA_FULLSCREEN_WIDTH) / width;
-					vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
-					vitaDestRect.h = height * scale;
-					vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - vitaDestRect.h) / 2;
-				}
-			} else {
-				vitaDestRect.w = VITA_FULLSCREEN_WIDTH;
-				vitaDestRect.h = VITA_FULLSCREEN_HEIGHT;
-			}
-			
-			SDL_SetVideoModeBilinear(true);
-		} else {
-			//center game area
-			vitaDestRect.x = (VITA_FULLSCREEN_WIDTH - width) / 2;
-			vitaDestRect.y = (VITA_FULLSCREEN_HEIGHT - height) / 2;
-		}
-
-		SDL_SetVideoModeScaling(vitaDestRect.x, vitaDestRect.y, vitaDestRect.w, vitaDestRect.h);
-	}
-#endif
-
 	return GEM_OK;
 }
 
-void SDL12VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
+VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	if (yuv) {
-		if (overlay) {
-			SDL_FreeYUVOverlay(overlay);
-		}
-		// BIKPlayer outputs PIX_FMT_YUV420P which is YV12
-		overlay = SDL_CreateYUVOverlay(w, h, SDL_YV12_OVERLAY, disp);
-	}
-	SDL_FillRect(disp, NULL, 0);
-	SDL_Flip( disp );
-	w = disp->w;
-	h = disp->h;
-
-	//setting the subtitle region to the bottom 1/4th of the screen
-	subtitleregion.w = w;
-	subtitleregion.h = h/4;
-	subtitleregion.x = 0;
-	subtitleregion.y = h-h/4;
-}
-
-void SDL12VideoDriver::DestroyMovieScreen()
-{
-	if (overlay) {
-		SDL_FreeYUVOverlay(overlay);
-		overlay = NULL;
-	}
-}
-
-void SDL12VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
-							   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-							   unsigned int h, unsigned int dstx, unsigned int dsty,
-							   int g_truecolor, unsigned char *pal, ieDword titleref)
-{
-	int i;
-	SDL_Surface* sprite;
-
-	assert( bufw == w && bufh == h );
-
-	if (g_truecolor) {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
-										  0x7C00, 0x03E0, 0x001F, 0 );
+	if (fmt == YV12) {
+		return new SDLOverlayVideoBuffer(r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
 	} else {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0, 0, 0, 0 );
-		for (i = 0; i < 256; i++) {
-			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].unused = 0;
+		SDL_Surface* buf = NULL;
+		if (fmt == RGB555) {
+			buf = SDL_CreateRGBSurface(0, r.w, r.h, 16, 0x7C00, 0x03E0, 0x001F, 0);
+		} else if (fmt == RGBA8888) {
+			buf = SDL_CreateRGBSurface(0, r.w, r.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+		} else if (fmt == DISPLAY_ALPHA) {
+			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
+			buf = SDL_DisplayFormatAlpha(tmp);
+			SDL_FreeSurface(tmp);
+		} else {
+			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
+			buf = SDL_DisplayFormat(tmp);
+			SDL_FreeSurface(tmp);
+		}
+		
+		if (buf == nullptr) {
+			Log(ERROR, "SDL 1.2", "%s", SDL_GetError());
+			return nullptr;
+		}
+
+		return new SDLSurfaceVideoBuffer(buf, r.Origin());
+	}
+}
+
+IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskclip) const
+{
+	struct SurfaceAlphaIterator : RGBAChannelIterator {
+		SDLPixelIterator pixit;
+		
+		SurfaceAlphaIterator(SDL_Surface* surface, const SDL_Rect& clip, Uint32 mask, Uint8 shift,
+							 IPixelIterator::Direction x, IPixelIterator::Direction y)
+		: RGBAChannelIterator(&pixit, mask, shift), pixit(surface, x, y, clip) {}
+	} *maskit = nullptr;
+
+	if (flags&BLIT_STENCIL_MASK) {
+		SDL_Surface* maskSurf = CurrentStencilBuffer();
+		SDL_PixelFormat* fmt = maskSurf->format;
+
+		Uint32 mask = 0;
+		Uint8 shift = 0;
+		if (flags&BLIT_STENCIL_RED) {
+			mask = fmt->Rmask;
+			shift = fmt->Rshift;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			mask = fmt->Gmask;
+			shift = fmt->Gshift;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			mask = fmt->Bmask;
+			shift = fmt->Bshift;
+		} else {
+			mask = fmt->Amask;
+			shift = fmt->Ashift;
+		}
+		
+		const Point& stencilOrigin = stencilBuffer->Origin();
+		maskclip.x -= stencilOrigin.x;
+		maskclip.y -= stencilOrigin.y;
+		IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		maskit = new SurfaceAlphaIterator(maskSurf, maskclip, mask, shift, xdir, ydir);
+	}
+	
+	return maskit;
+}
+
+void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
+											uint32_t flags, const Color* t)
+{
+	Color tint(255,255,255,255);
+	if (t) {
+		tint = *t;
+	}
+
+	// global tint is handled by the callers
+
+	// flag combinations which are often used:
+	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
+
+	// most game sprites:
+	// covered, BLIT_COLOR_MOD
+
+	// area-animations?
+	// BLIT_COLOR_MOD
+
+	// (hopefully) most video overlays:
+	// BLIT_HALFTRANS
+	// covered, BLIT_HALFTRANS
+	// covered
+	// none
+
+	// other combinations use general case
+
+	PaletteHolder palette = spr->GetPalette();
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+
+	SDL_Rect drect = RectFromRegion(dst);
+	IAlphaIterator* maskit = StencilIterator(flags, drect);
+
+	// remove already handled flags and incompatible combinations
+	unsigned int remflags = flags & ~(BLIT_BLENDED | BLIT_MIRRORX | BLIT_MIRRORY | BLIT_STENCIL_MASK);
+	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
+
+	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
+
+	if (remflags == BLIT_COLOR_MOD && tint.a == 255) {
+		SRTinter_Tint<true, true> tinter(tint);
+		BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+	} else if (remflags == BLIT_HALFTRANS) {
+		SRTinter_NoTint<false> tinter;
+		BlitSpriteRLE<SRBlender_HalfAlpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+	} else if (remflags == 0 && palette->HasAlpha() == false) {
+		SRTinter_NoTint<false> tinter;
+		BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+	} else {
+		// handling the following effects with conditionals:
+		// halftrans
+		// grey (TODO)
+		// sepia (TODO)
+		// glow (not yet)
+		// blended (not yet)
+		// vflip
+
+		// handling the following effects by repeated calls:
+		// palettealpha
+		// tinted
+		// covered
+		// hflip
+
+		if (!(remflags & BLIT_COLOR_MOD)) tint.a = 255;
+
+		if (palette->HasAlpha()) {
+			if (remflags & BLIT_COLOR_MOD) {
+				SRTinter_Flags<true> tinter(tint);
+				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+			} else {
+				SRTinter_FlagsNoTint<true> tinter;
+				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+			}
+		} else {
+			if (remflags & BLIT_COLOR_MOD) {
+				SRTinter_Flags<false> tinter(tint);
+				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+			} else {
+				SRTinter_FlagsNoTint<false> tinter;
+				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
+			}
 		}
 	}
 
-	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_FillRect(disp, &rect, 0);
-	SDL_Surface* tmp = backBuf;
-	backBuf = disp;
-	BlitSurfaceClipped(sprite, Region(sx, sy, w, h), Region(dstx, dsty, w, h));
-	backBuf = tmp;
-	if (titleref>0)
-		DrawMovieSubtitle( titleref );
-	SDL_Flip( disp );
-	SDL_FreeSurface( sprite );
+	spr->UnlockSprite();
+	delete maskit;
+}
+
+void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
+{
+	const SDLSurfaceSprite2D *sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
+	SDL_Surface* surf = sdlspr->GetSurface();
+
+	Color c;
+	if (tint && (flags&BLIT_COLOR_MOD)){
+		c = Color(tint->r, tint->g, tint->b, tint->unused);
+	}
+
+	if (surf->format->BytesPerPixel == 1) {
+		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
+
+		if (flags&BLIT_COLOR_MOD) {
+			flags &= ~RenderSpriteVersion(sdlspr, flags, &c);
+		} else {
+			flags &= ~RenderSpriteVersion(sdlspr, flags);
+		}
+	}
+
+	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
+}
+
+void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, Color tint)
+{
+	// non-BAM Blitting
+
+	// handling the following effects with conditionals:
+	// halftrans
+	// grey
+	// sepia
+	// glow (not yet)
+	// blended (not yet)
+	// yflip
+
+	// handling the following effects by repeated inclusion:
+	// tinted
+	// covered
+	// xflip
+
+	// not handling the following effects at all:
+	// palettealpha
+
+	//		print("Unoptimized blit: %04X", flags);
+
+	// remove already handled flags and incompatible combinations
+	if (flags & BLIT_GREY) flags &= ~BLIT_SEPIA;
+
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+	IAlphaIterator* maskIt = StencilIterator(flags, drect);
+	
+	bool nativeBlit = (flags & ~(BLIT_HALFTRANS | BLIT_ALPHA_MOD | BLIT_BLENDED)) == 0
+						&& maskIt == nullptr && ((surf->flags & SDL_SRCCOLORKEY) != 0
+						|| (flags & BLIT_BLENDED) == 0);
+	if (nativeBlit) {
+		// must be checked afer palette versioning is done
+		
+		// the gamewin is an RGB surface (no alpha)
+		// RGBA->RGB with SDL_SRCALPHA
+		//     The source is alpha-blended with the destination, using the alpha channel. SDL_SRCCOLORKEY and the per-surface alpha are ignored.
+		// RGBA->RGB without SDL_SRCALPHA
+		//     The RGB data is copied from the source. The source alpha channel and the per-surface alpha value are ignored.
+		
+		Uint8 alpha = SDL_ALPHA_OPAQUE;
+		if (flags & BLIT_ALPHA_MOD) {
+			alpha = tint.a;
+		}
+		
+		if (flags & BLIT_HALFTRANS) {
+			alpha /= 2;
+		}
+		
+		if (flags & BLIT_BLENDED) {
+			SDL_SetAlpha(surf, SDL_SRCALPHA, alpha);
+		} else {
+			SDL_SetAlpha(surf, 0, alpha);
+		}
+
+		SDL_Rect s = srect;
+		SDL_Rect d = drect;
+		SDL_LowerBlit(surf, &s, currentBuf, &d);
+	} else {
+		bool halftrans = flags & BLIT_HALFTRANS;
+		if (halftrans && (flags ^ BLIT_HALFTRANS)) { // other flags are set too
+			// handle halftrans with 50% alpha tinting
+			// force use of RGBBlendingPipeline with tint parameter if we aren't already
+			if (!(flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD))) {
+				tint = ColorWhite;
+				flags |= BLIT_COLOR_MOD;
+			}
+			tint.a /= 2;
+		}
+
+		// FIXME: this always assumes some kind of blending if any "shader" flags are set
+		// we don't currently have a need for non blended sprites (we do for primitives, which is handled elsewhere)
+		// however, it could make things faster if we handled it
+		
+		void (*BlendFn)(const Color& src, Color& dst) = ShaderBlend<true>;
+		if (flags & BLIT_ADD) {
+			BlendFn = ShaderAdditive;
+		} else if (flags & BLIT_MULTIPLY) {
+			BlendFn = ShaderTint;
+		}
+
+		if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
+			if (flags&BLIT_GREY) {
+				RGBBlendingPipeline<GREYSCALE, true> blender(tint, BlendFn);
+				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			} else if (flags&BLIT_SEPIA) {
+				RGBBlendingPipeline<SEPIA, true> blender(tint, BlendFn);
+				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			} else {
+				RGBBlendingPipeline<TINT, true> blender(tint, BlendFn);
+				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			}
+		} else if (flags&BLIT_GREY) {
+			RGBBlendingPipeline<GREYSCALE, true> blender(BlendFn);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+		} else if (flags&BLIT_SEPIA) {
+			RGBBlendingPipeline<SEPIA, true> blender(BlendFn);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+		} else {
+			RGBBlendingPipeline<NONE, true> blender(BlendFn);
+			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+		}
+	}
+	
+	delete maskIt;
+}
+
+void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint)
+{
+	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
+	const Region& r = buf->Rect();
+	Point origin = r.Origin() + p;
+
+	Color c;
+	if (tint) {
+		c = *tint;
+	}
+
+	SDL_Rect srect = {0, 0, Uint16(r.w), Uint16(r.h)};
+	SDL_Rect drect = {origin.x, origin.y, Uint16(r.w), Uint16(r.h)};
+	BlitSpriteNativeClipped(surface, srect, drect, flags, c);
+}
+
+void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawPointSurface<BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawPointSurface<TINT>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+	} else {
+		DrawPointSurface<NONE>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+	}
+}
+
+void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawPointsSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else {
+		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	}
+}
+
+void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.unused < 0xff) {
+		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawPointsSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+	} else {
+		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+	}
+}
+
+void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawPolygonSurface<BLEND>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawPolygonSurface<TINT>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+	} else {
+		DrawPolygonSurface<NONE>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+	}
+}
+
+void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawLineSurface<BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawLineSurface<TINT>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+	} else {
+		DrawLineSurface<NONE>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+	}
+}
+
+void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawLinesSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawLinesSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else {
+		DrawLinesSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	}
+}
+
+/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
+void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+{
+	SDL_Surface* currentBuf = CurrentRenderBuffer();
+
+	if (fill) {
+		if (flags&BLIT_BLENDED && color.a < 0xff) {
+			assert(rgn.w > 0 && rgn.h > 0);
+			
+			const static OneMinusSrcA<false, false> blender;
+			
+			Region clippedrgn = ClippedDrawingRect(rgn);
+			SDLPixelIterator dstit(currentBuf, RectFromRegion(clippedrgn));
+			SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+			ColorFill(color, dstit, dstend, blender);
+		} else {
+			Uint32 val = SDL_MapRGBA( currentBuf->format, color.r, color.g, color.b, color.a );
+			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
+			SDL_FillRect( currentBuf, &drect, val );
+		}
+	} else if (flags&BLIT_BLENDED && color.a < 0xff) {
+		DrawHLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+	} else if (flags & BLIT_MULTIPLY) {
+		DrawHLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<TINT>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<TINT>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+	} else {
+		DrawHLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<NONE>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<NONE>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+	}
 }
 
 // sets brightness and contrast
@@ -219,40 +515,62 @@ void SDL12VideoDriver::SetGamma(int brightness, int /*contrast*/)
 bool SDL12VideoDriver::SetFullscreenMode(bool set)
 {
 	if (fullscreen != set) {
+		Uint32 flags = disp->flags;
+		flags ^= SDL_FULLSCREEN;
+		disp = SDL_SetVideoMode(disp->w, disp->h, disp->format->BitsPerPixel, flags | SDL_SWSURFACE | SDL_ANYFORMAT);
+
 		fullscreen=set;
-		// FIXME: SDL_WM_ToggleFullScreen only works on X11. use SDL_SetVideoMode()
-		SDL_WM_ToggleFullScreen( disp );
-		//readjust mouse to original position
-		MoveMouse(CursorPos.x, CursorPos.y);
-		//synchronise internal variable
-		core->GetDictionary()->SetAt( "Full Screen", (ieDword) fullscreen );
 		return true;
 	}
 	return false;
 }
 
-int SDL12VideoDriver::SwapBuffers(void)
+void SDL12VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
-	SDL_BlitSurface( backBuf, NULL, disp, NULL );
-	if (fadeColor.a) {
-		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
-		SDL_Rect src = {
-			0, 0, (Uint16)Viewport.w, (Uint16)Viewport.h
-		};
-		SDL_Rect dst = {
-			xCorr, yCorr, 0, 0
-		};
-		SDL_BlitSurface( extra, &src, disp, &dst );
+	VideoBuffers::iterator it;
+	it = buffers.begin();
+	bool flip = false;
+	for (; it != buffers.end(); ++it) {
+		flip = (*it)->RenderOnDisplay(disp) || flip;
+	}
+	
+	if (flip) SDL_Flip( disp );
+}
+
+SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::ScratchBuffer() const
+{
+	assert(scratchBuffer);
+	return std::static_pointer_cast<SDLSurfaceVideoBuffer>(scratchBuffer)->Surface();
+}
+
+SDL12VideoDriver::vid_buf_t* SDL12VideoDriver::CurrentRenderBuffer() const
+{
+	assert(drawingBuffer);
+	return static_cast<SDLSurfaceVideoBuffer*>(drawingBuffer)->Surface();
+}
+
+SDLVideoDriver::vid_buf_t* SDL12VideoDriver::CurrentStencilBuffer() const
+{
+	assert(stencilBuffer);
+	return std::static_pointer_cast<SDLSurfaceVideoBuffer>(stencilBuffer)->Surface();
+}
+
+Holder<Sprite2D> SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr& buf)
+{
+	unsigned int Width = r.w ? r.w : screenSize.w;
+	unsigned int Height = r.h ? r.h : screenSize.h;
+
+	SDLSurfaceSprite2D *screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
+															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	SDL_Rect src = RectFromRegion(r);
+	if (buf) {
+		auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
+		SDL_BlitSurface( surface, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
+	} else {
+		SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 	}
 
-	/** This causes the tooltips/cursors to be rendered directly to display */
-	SDL_Surface* tmp = backBuf;
-	backBuf = disp; // FIXME: UGLY HACK!
-	int ret = SDLVideoDriver::SwapBuffers();
-	backBuf = tmp;
-
-	SDL_Flip( disp );
-	return ret;
+	return screenshot;
 }
 
 bool SDL12VideoDriver::ToggleGrabInput()
@@ -263,111 +581,104 @@ bool SDL12VideoDriver::ToggleGrabInput()
 	}
 	else {
 		SDL_WM_GrabInput( SDL_GRAB_OFF );
-		MoveMouse(CursorPos.x, CursorPos.y);
 		return false;
 	}
 }
 
-/* no idea how elaborate this should be*/
-void SDL12VideoDriver::MoveMouse(unsigned int x, unsigned int y)
+int SDL12VideoDriver::ProcessEvent(const SDL_Event& event)
 {
-	SDL_WarpMouse(x,y);
-}
-
-void SDL12VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-								  unsigned int /*bufw*/, unsigned int bufh,
-								  unsigned int w, unsigned int h,
-								  unsigned int dstx, unsigned int dsty,
-								  ieDword titleref) {
-	assert( /* bufw == w && */ bufh == h );
-
-	SDL_Rect destRect;
-
-	SDL_LockYUVOverlay(overlay);
-	for (unsigned int plane = 0; plane < 3; plane++) {
-		unsigned char *data = buf[plane];
-		unsigned int size = overlay->pitches[plane];
-		if (strides[plane] < size) {
-			size = strides[plane];
+	if (event.type == SDL_ACTIVEEVENT) {
+		if (event.active.state == SDL_APPMOUSEFOCUS) {
+			// TODO: notify something (EventManager?) that we have lost focus
+			// focus = event.active.gain;
+		} else if (event.active.state == SDL_APPINPUTFOCUS) {
+			// TODO: notify something (EventManager?) that we have lost focus
+			// focus = event.active.gain;
 		}
-		unsigned int srcoffset = 0, destoffset = 0;
-		for (unsigned int i = 0; i < ((plane == 0) ? bufh : (bufh / 2)); i++) {
-			memcpy(overlay->pixels[plane] + destoffset,
-				   data + srcoffset, size);
-			srcoffset += strides[plane];
-			destoffset += overlay->pitches[plane];
+		return GEM_OK;
+	}
+
+	if ((SDL_EVENTMASK(event.type) & (SDL_MOUSEBUTTONDOWNMASK))
+		&& (event.button.button == SDL_BUTTON_WHEELUP || event.button.button == SDL_BUTTON_WHEELDOWN)) {
+		// remap these to mousewheel events
+		int speed = core->GetMouseScrollSpeed();
+		speed *= (event.button.button == SDL_BUTTON_WHEELUP) ? 1 : -1;
+		Event e;
+		if (SDL_GetModState() & KMOD_SHIFT) {
+			e = EventMgr::CreateMouseWheelEvent(Point(speed, 0));
+		} else{
+			e = EventMgr::CreateMouseWheelEvent(Point(0, speed));
+		}
+		EvntManager->DispatchEvent(std::move(e));
+		return GEM_OK;
+	}
+	
+	if (InTextInput()) {
+		if (event.type == SDL_KEYDOWN) {
+			int modstate = GetModState(SDL_GetModState());
+			Uint16 chr = event.key.keysym.unicode;
+
+			if (isprint(chr) && modstate <= GEM_MOD_SHIFT) {
+				char text[2] = { (char)chr, '\0' };
+				Event e = EventMgr::CreateTextEvent(text);
+				EvntManager->DispatchEvent(std::move(e));
+				return GEM_OK;
+			}
+		} else if (event.type == SDL_JOYBUTTONDOWN) {
+			Event bsp = EventMgr::CreateKeyEvent(GEM_BACKSP, true);
+			
+			switch(event.jbutton.button) {
+			case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
+				dPadSoftKeyboard.RemoveCharacter();
+				EvntManager->DispatchEvent(std::move(bsp));
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
+				dPadSoftKeyboard.AddCharacter();
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
+				dPadSoftKeyboard.NextCharacter();
+				EvntManager->DispatchEvent(std::move(bsp));
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_DPAD_UP:
+				dPadSoftKeyboard.PreviousCharacter();
+				EvntManager->DispatchEvent(std::move(bsp));
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
+			case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
+				dPadSoftKeyboard.ToggleUppercase();
+				EvntManager->DispatchEvent(std::move(bsp));
+				EvntManager->DispatchEvent(dPadSoftKeyboard.GetTextEvent());
+				return GEM_OK;
+			}
 		}
 	}
-	SDL_UnlockYUVOverlay(overlay);
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-	SDL_Rect rect = RectFromRegion(subtitleregion);
-	SDL_FillRect(disp, &rect, 0);
-	SDL_DisplayYUVOverlay(overlay, &destRect);
-	if (titleref>0)
-		DrawMovieSubtitle( titleref );
+
+	return SDLVideoDriver::ProcessEvent(event);
 }
 
-int SDL12VideoDriver::ProcessEvent(const SDL_Event & event)
+void SDL12VideoDriver::StartTextInput()
 {
-	switch (event.type) {
-		case SDL_ACTIVEEVENT:
-			if (core->ConsolePopped) {
-				break;
-			}
-			if (event.active.state == SDL_APPMOUSEFOCUS) {
-				if (!event.active.gain)
-					EvntManager->OnSpecialKeyPress( GEM_MOUSEOUT );
-			}
-			break;
-		case SDL_JOYAXISMOTION:
-			gamepadControl.HandleAxisEvent(event.jaxis.axis, event.jaxis.value);
-		break;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			HandleJoyButtonEvent(event.jbutton);
-			break;
-		default:
-			return SDLVideoDriver::ProcessEvent(event);
-	}
-	return GEM_OK;
-}
-
-void SDL12VideoDriver::ShowSoftKeyboard()
-{
-#ifdef VITA
+	inTextInput = true;
 	dPadSoftKeyboard.StartInput();
-#else
-	if(core->UseSoftKeyboard){
-		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
-	}
-#endif
 }
 
-void SDL12VideoDriver::HideSoftKeyboard()
+void SDL12VideoDriver::StopTextInput()
 {
-#ifdef VITA
+	inTextInput = false;
 	dPadSoftKeyboard.StopInput();
-#else
-	if(core->UseSoftKeyboard){
-		Log(WARNING, "SDL 1.2 Driver", "SDL 1.2 doesn't support a software keyboard");
-	}
-#endif
 }
 
-bool SDL12VideoDriver::TouchInputEnabled() const
+bool SDL12VideoDriver::InTextInput()
 {
-	// fallback for lack of better options
-	return MouseFlags & (MOUSE_GRAYED|MOUSE_DISABLED);
+	return inTextInput;
 }
 
-// Private methods
-
-bool SDL12VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
+bool SDL12VideoDriver::TouchInputEnabled()
 {
-	return (SDL_SetAlpha( surface, SDL_SRCALPHA | SDL_RLEACCEL, alpha ) == 0);
+    return false;
 }
 
 #include "plugindef.h"

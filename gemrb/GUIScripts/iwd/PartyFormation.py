@@ -35,12 +35,7 @@ ExitWindow = 0
 def OnLoad ():
 	global PartyFormationWindow
 
-	GUICommonWindows.PortraitWindow = None
-	GUICommonWindows.SelectionChangeHandler = None
-
-	GemRB.LoadWindowPack ("GUISP", 640, 480)
-	PartyFormationWindow = GemRB.LoadWindow (0)
-	PartyFormationWindow.SetFrame ()
+	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 
 	ModifyCharsButton = PartyFormationWindow.GetControl (43)
 	ModifyCharsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None) #TODO: ModifyPress
@@ -51,7 +46,7 @@ def OnLoad ():
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	ExitButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	ExitButton.SetText (13906)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
@@ -62,7 +57,7 @@ def OnLoad ():
 		#removing this label, it just disturbs us
 		Label.SetSize (0, 0)
 		Button = PartyFormationWindow.GetControl (i-12)
-		ResRef = GemRB.GetPlayerPortrait (i-17, 1)
+		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
 		if ResRef == "":
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
@@ -85,7 +80,7 @@ def OnLoad ():
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
 	if not GameCheck.HasHOW():
@@ -101,21 +96,20 @@ def OnLoad ():
 			GemRB.SetVar ("PlayMode",0) #using first row
 	GemRB.SetToken ("SaveDir", "mpsave")
 
-	LoadScreen.CloseLoadScreen()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	if LoadScreen.LoadScreen:
+		LoadScreen.LoadScreen.Close()
 	return
 
 def CreateCharPress ():
 	global PartyFormationWindow, CreateCharWindow
 
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
 	CreateCharWindow = GemRB.LoadWindow (3)
 
 	CreateButton = CreateCharWindow.GetControl (0)
 	CreateButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCreatePress)
 	CreateButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateButton.SetText (13954)
-	CreateButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CreateButton.MakeDefault()
 
 	DeleteButton = CreateCharWindow.GetControl (3)
 	DeleteButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharDeletePress)
@@ -126,9 +120,8 @@ def CreateCharPress ():
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreateCharCancelPress)
 	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
-	CreateCharWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
 def CreateCharCreatePress ():
@@ -149,13 +142,14 @@ def CreateCharCancelPress ():
 
 	if CreateCharWindow:
 		CreateCharWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def ModifyCharsPress ():
 	return
 
 def EnterGamePress ():
+	PartyFormationWindow.Close()
 	GemRB.HardEndPL ()
 	GemRB.EnterGame ()
 	return
@@ -163,23 +157,22 @@ def EnterGamePress ():
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
 
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
-	ExitWindow = GemRB.LoadWindow (7)
+	ExitWindow = GemRB.LoadWindow (7, "GUISP")
 
 	ExitButton = ExitWindow.GetControl (1)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitExitPress)
 	ExitButton.SetText (13906)
-	ExitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	ExitButton.MakeDefault()
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	TextArea = ExitWindow.GetControl (0)
 	TextArea.SetText (11329)
 
-	ExitWindow.SetVisible (WINDOW_VISIBLE)
+	ExitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ExitCancelPress ():
@@ -187,7 +180,7 @@ def ExitCancelPress ():
 
 	if ExitWindow:
 		ExitWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def ExitExitPress ():

@@ -28,10 +28,10 @@ namespace GemRB {
 class GEM_EXPORT ImageWriter : public Plugin {
 public:
 	ImageWriter(void);
-	~ImageWriter(void);
+	~ImageWriter(void) override;
 
 	/** Writes an Sprite2D to a stream and frees the sprite. */
-	virtual void PutImage(DataStream *output, Sprite2D *sprite) = 0;
+	virtual void PutImage(DataStream *output, Holder<Sprite2D> sprite) = 0;
 };
 
 }

@@ -20,52 +20,56 @@
 
 #include "SDL20Video.h"
 
-#include "Interface.h"
+#ifdef BAKE_ICON
+#include "gemrb-icon.h"
+#endif
 
-#include "GUI/Button.h"
-#include "GUI/Console.h"
-#include "GUI/GameControl.h" // for TargetMode (contextual information for touch inputs)
+#include "Interface.h"
 
 using namespace GemRB;
 
-//touch gestures
-#define MIN_GESTURE_DELTA_PIXELS 5
-#define TOUCH_RC_NUM_TICKS 500
-
 SDL20VideoDriver::SDL20VideoDriver(void)
 {
-	assert( core->NumFingScroll > 1 && core->NumFingKboard > 1 && core->NumFingInfo > 1);
-	assert( core->NumFingScroll < 5 && core->NumFingKboard < 5 && core->NumFingInfo < 5);
-	assert( core->NumFingScroll != core->NumFingKboard );
-
 	renderer = NULL;
 	window = NULL;
-	screenTexture = NULL;
 
-	// touch input
-	ignoreNextFingerUp = 0;
-	ClearFirstTouch();
-	EndMultiGesture();
+	stencilAlphaBlender = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ZERO, SDL_BLENDFACTOR_ONE,
+													 SDL_BLENDOPERATION_ADD, SDL_BLENDFACTOR_ZERO,
+													 SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_ADD);
+
+	// WARNING: do _not_ call opengl here
+	// all function pointers will be NULL
+	// until after SDL_CreateRenderer is called
+
+	SDL_version ver;
+	SDL_GetVersion(&ver);
+	sdl2_runtime_version = SDL_VERSIONNUM(ver.major, ver.minor, ver.patch);
 }
 
 SDL20VideoDriver::~SDL20VideoDriver(void)
 {
 	if (SDL_GameControllerGetAttached(gameController)) {
- 		SDL_GameControllerClose(gameController);
+		SDL_GameControllerClose(gameController);
 	}
-
-	// no need to call DestroyMovieScreen()
-	SDL_DestroyTexture(screenTexture);
+	
+	// we must release all buffers before SDL_DestroyRenderer
+	// we cant rely on the base destructor here
+	scratchBuffer = nullptr;
+	DestroyBuffers();
+	
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+
+	delete stencilShader;
+	delete spriteShader;
 }
 
-int SDL20VideoDriver::Init(void)
+int SDL20VideoDriver::Init()
 {
 	int ret = SDLVideoDriver::Init();
 
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
-		Log(ERROR, "SDLJoystick", "InitSubSystem failed: %s", SDL_GetError());
+		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
 	} else {
 		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
 			if (SDL_IsGameController(i)) {
@@ -80,446 +84,519 @@ int SDL20VideoDriver::Init(void)
 	return ret;
 }
 
-int SDL20VideoDriver::CreateDisplay(int w, int h, int bpp, bool fs, const char* title)
+static void SetWindowIcon(SDL_Window* window)
 {
-	fullscreen=fs;
-	width = w, height = h;
+	// gemrb_icon and gemrb_icon_size are generated in gemrb-icon.h
+	SDL_RWops* const iconStream = SDL_RWFromConstMem((void *) gemrb_icon, gemrb_icon_size);
+	if (!iconStream) {
+		Log(WARNING, "SDL 2 Driver", "Failed to create icon stream.");
+		return;
+	}
+	SDL_Surface* const windowIcon = SDL_LoadBMP_RW(iconStream, 1);
+	if (!windowIcon) {
+		Log(WARNING, "SDL 2 Driver", "Failed to read icon BMP from stream.");
+		return;
+	}
+	SDL_SetWindowIcon(window, windowIcon);
+	SDL_FreeSurface(windowIcon);
+}
 
+int SDL20VideoDriver::CreateSDLDisplay(const char* title)
+{
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
 	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE;
-#if TARGET_OS_IPHONE || ANDROID
-	// this allows the user to flip the device upsidedown if they wish and have the game rotate.
-	// it also for some unknown reason is required for retina displays
-	winFlags |= SDL_WINDOW_RESIZABLE;
-	// this hint is set in the wrapper for iPad at a higher priority. set it here for iPhone
-	// don't know if Android makes use of this.
-	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_DEFAULT);
+
+#if USE_OPENGL_BACKEND
+#if USE_OPENGL_API
+	const char* driverName = "opengl";
+#elif USE_GLES_API
+	const char* driverName = "opengles2";
 #endif
-	if (fullscreen) {
-		winFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		//This is needed to remove the status bar on Android/iOS.
-		//since we are in fullscreen this has no effect outside Android/iOS
-		winFlags |= SDL_WINDOW_BORDERLESS;
+	SDL_SetHint(SDL_HINT_RENDER_DRIVER, driverName);
+#endif
+
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	if (sdl2_runtime_version >= SDL_VERSIONNUM(2,0,10)) {
+		SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
 	}
-	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, winFlags);
+#endif
+
+	Uint32 winFlags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+#if USE_OPENGL_BACKEND
+	winFlags |= SDL_WINDOW_OPENGL;
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+#endif
+
+	window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenSize.w, screenSize.h, winFlags);
 	if (window == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create window:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, 0);
+#ifdef BAKE_ICON
+	SetWindowIcon(window);
+#endif
+
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+	SDL_RendererInfo info;
+	SDL_GetRendererInfo(renderer, &info);
+	Log(DEBUG, "SDL20Video", "Renderer: %s", info.name);
 
 	if (renderer == NULL) {
 		Log(ERROR, "SDL 2 Driver", "couldnt create renderer:%s", SDL_GetError());
 		return GEM_ERROR;
 	}
 
+#if USE_OPENGL_BACKEND
+	Log(MESSAGE, "SDL 2 GL Driver", "OpenGL version: %s, renderer: %s, vendor: %s", glGetString(GL_VERSION), glGetString(GL_RENDERER), glGetString(GL_VENDOR));
+	Log(MESSAGE, "SDL 2 GL Driver", "  GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+
+	if (strcmp(info.name, driverName) != 0) {
+		Log(FATAL, "SDL 2 GL Driver", "OpenGL backend must be used instead of %s", info.name);
+		return GEM_ERROR;
+	}
+
+#if defined(_WIN32) && defined(USE_OPENGL_API)
+	glewInit();
+#endif
+
+	// must follow SDL_CreateRenderer
+	stencilShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/StencilF.glsl");
+	if (!stencilShader)
+	{
+		std::string msg = GLSLProgram::GetLastError();
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		return GEM_ERROR;
+	}
+
+	spriteShader = GLSLProgram::CreateFromFiles("Shaders/SDLTextureV.glsl", "Shaders/GameSpriteF.glsl");
+	if (!spriteShader)
+	{
+		std::string msg = GLSLProgram::GetLastError();
+		Log(FATAL, "SDL 2 GL Driver", "Can't build shader program: %s", msg.c_str());
+		return GEM_ERROR;
+	}
+#endif
+
 	// we set logical size so that platforms where the window can be a diffrent size then requested
 	// function properly. eg iPhone and Android the requested size may be 640x480,
 	// but the window will always be the size of the screen
-	SDL_RenderSetLogicalSize(renderer, width, height);
+	SDL_RenderSetLogicalSize(renderer, screenSize.w, screenSize.h);
+	//SDL_GetRendererOutputSize(renderer, &screenSize.w, &screenSize.h);
 
-	Viewport.w = width;
-	Viewport.h = height;
-
-	SDL_RendererInfo info;
-	SDL_GetRendererInfo(renderer, &info);
-
-	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
-	// TODO: SDL forces SDL_PIXELFORMAT_ABGR8888 on OpenGLES2
-	// if we want to use this driver with other renderers we need to do some
-	// selection such as the commented out code below
-/*
-	for (Uint32 i=0; i<info.num_texture_formats; i++) {
-		// TODO: probably could be more educated about selecting the best format.
-		switch (bpp) {
-			case 16:
-				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED16) {
-					format = info.texture_formats[i];
-					goto doneFormat;
-				}
-				continue;
-			case 32:
-			default:
-				if (SDL_PIXELTYPE(info.texture_formats[i]) == SDL_PIXELTYPE_PACKED32) {
-					format = info.texture_formats[i];
-					goto doneFormat;
-				}
-				continue;
-		}
-	}
-
-doneFormat:
-	if (format == SDL_PIXELFORMAT_UNKNOWN) {
-		format = SDL_GetWindowPixelFormat(window);
-		// bpp will be set by SDL_PixelFormatEnumToMasks
-	}
-*/
-	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
-
-	int access;
-	SDL_QueryTexture(screenTexture,
-                     &format,
-                     &access,
-                     &width,
-                     &height);
-
-	Uint32 r, g, b, a;
-	SDL_PixelFormatEnumToMasks(format, &bpp, &r, &g, &b, &a);
-	a = 0; //force a to 0 or screenshots will be all black!
-
-	Log(MESSAGE, "SDL 2 Driver", "Creating Main Surface: w=%d h=%d fmt=%s",
-		width, height, SDL_GetPixelFormatName(format));
-	backBuf = SDL_CreateRGBSurface( 0, width, height,
-									bpp, r, g, b, a );
-	// tmpBuf is here as a truly ugly hack, so we can copy backBuf to tmpBuf before blitting cursors, and then back again after the screen is presented.
-	tmpBuf = SDL_CreateRGBSurface( 0, width, height, bpp, r, g, b, a );
-	this->bpp = bpp;
-
-	if (!backBuf) {
-		Log(ERROR, "SDL 2 Video", "Unable to create backbuffer of %s format: %s",
-			SDL_GetPixelFormatName(format), SDL_GetError());
-		return GEM_ERROR;
-	}
-	disp = backBuf;
+	SDL_StopTextInput(); // for some reason this is enabled from start
 
 	return GEM_OK;
 }
 
-void SDL20VideoDriver::InitMovieScreen(int &w, int &h, bool yuv)
+VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
-	SDL_RenderClear(renderer);
-
-	if (screenTexture) SDL_DestroyTexture(screenTexture);
-	if (yuv) {
-		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_IYUV, SDL_TEXTUREACCESS_STREAMING, w, h);
-	} else {
-		screenTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+	Uint32 format = SDLPixelFormatFromBufferFormat(fmt, renderer);
+	if (format == SDL_PIXELFORMAT_UNKNOWN)
+		return nullptr;
+	
+	SDL_Texture* tex = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_TARGET, r.w, r.h);
+	if (tex == nullptr) {
+		Log(ERROR, "SDL 2", "%s", SDL_GetError());
+		return nullptr;
 	}
-	if (!screenTexture) {
-		Log(ERROR, "SDL 2 Driver", "Unable to create texture for video playback: %s", SDL_GetError());
-	}
-	w = width;
-	h = height;
-	//setting the subtitle region to the bottom 1/4th of the screen
-	subtitleregion.w = w;
-	subtitleregion.h = h/4;
-	subtitleregion.x = 0;
-	subtitleregion.y = h-h/4;
+	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
 }
 
-void SDL20VideoDriver::DestroyMovieScreen()
+void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
 {
-	if (screenTexture) SDL_DestroyTexture(screenTexture);
-	// recreate the texture for gameplay
-	// temporarily hardcoding format: see 91becce77374e96da38eb0d9a45f119a74b07cd4
-	Uint32 format = SDL_PIXELFORMAT_ABGR8888;
-	//SDL_GetWindowPixelFormat(window);
-	screenTexture = SDL_CreateTexture(renderer, format, SDL_TEXTUREACCESS_STREAMING, width, height);
-	// destroy any events that took place during the movies
-	SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
-	SDL_RenderClear(renderer); // I guess the videos can potentially be a larger size then the game.
-}
-
-void SDL20VideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
-							   unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-							   unsigned int h, unsigned int dstx, unsigned int dsty,
-							   int g_truecolor, unsigned char *pal, ieDword titleref)
-{
-	assert( bufw == w && bufh == h );
-
-	SDL_Rect srcRect = {(int)sx, (int)sy, (int)w, (int)h};
-	SDL_Rect destRect = {(int)dstx, (int)dsty, (int)w, (int)h};
-
-	Uint32 *dst;
-	unsigned int row, col;
-	void *pixels;
-	int pitch;
-	SDL_Color color = {0, 0, 0, 0};
-
-	if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
-		return;
-	}
-	if (g_truecolor) {
-		Uint16 *src = (Uint16*)buf;
-		for (row = 0; row < bufh; ++row) {
-			dst = (Uint32*)((Uint8*)pixels + row * pitch);
-			for (col = 0; col < bufw; ++col) {
-				color.r = ((*src & 0x7C00) >> 7) | ((*src & 0x7C00) >> 12);
-				color.g = ((*src & 0x03E0) >> 2) | ((*src & 0x03E0) >> 8);
-				color.b = ((*src & 0x001F) << 3) | ((*src & 0x001F) >> 2);
-				// video player texture is of ARGB format. buf is RGB555
-				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
-				src++;
-			}
-		}
-	} else {
-		Uint8 *src = buf;
-		SDL_Palette* palette;
-		palette = SDL_AllocPalette(256);
-		for (int i = 0; i < 256; i++) {
-			palette->colors[i].r = ( *pal++ ) << 2;
-			palette->colors[i].g = ( *pal++ ) << 2;
-			palette->colors[i].b = ( *pal++ ) << 2;
-		}
-		for (row = 0; row < bufh; ++row) {
-			dst = (Uint32*)((Uint8*)pixels + row * pitch);
-			for (col = 0; col < bufw; ++col) {
-				color = palette->colors[*src++];
-				// video player texture is of ARGB format
-				*dst++ = (0xFF000000|(color.r << 16)|(color.g << 8)|(color.b));
-			}
-		}
-		SDL_FreePalette(palette);
-	}
-	SDL_UnlockTexture(screenTexture);
-
+	SDL_SetRenderTarget(renderer, NULL);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, screenTexture, &srcRect, &destRect);
 
-	if (titleref>0) {
-		SDL_Rect rect = RectFromRegion(subtitleregion);
-		SDL_RenderFillRect(renderer, &rect);
-		DrawMovieSubtitle( titleref );
+	VideoBuffers::iterator it;
+	it = buffers.begin();
+	for (; it != buffers.end(); ++it) {
+		(*it)->RenderOnDisplay(renderer);
 	}
 
-	SDL_RenderPresent(renderer);
-}
-
-void SDL20VideoDriver::showYUVFrame(unsigned char** buf, unsigned int *strides,
-				  unsigned int /*bufw*/, unsigned int /*bufh*/,
-				  unsigned int w, unsigned int h,
-				  unsigned int dstx, unsigned int dsty,
-				  ieDword /*titleref*/)
-{
-	SDL_Rect destRect;
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-/*
- // This is superseded by SDL_UpdateYUVTexture, but I havent throughly tested it.
- // Not that I expect it to perform worse than the manual code :)
-	Uint8 *pixels;
-	int pitch;
-	if(SDL_LockTexture(screenTexture, NULL, (void**)&pixels, &pitch) != GEM_OK) {
-		Log(ERROR, "SDL 2 driver", "Unable to lock video player: %s", SDL_GetError());
-		return;
-	}
-	pitch = w;
-	if((unsigned int)pitch == strides[0]) {
-		int size = pitch * bufh;
-		memcpy(pixels, buf[0], size);
-		memcpy(pixels + size, buf[2], size / 4);
-		memcpy(pixels + size * 5 / 4, buf[1], size / 4);
-	} else {
-		unsigned char *Y,*U,*V,*iY,*iU,*iV;
-		unsigned int i;
-		Y = pixels;
-		V = pixels + pitch * h;
-		U = pixels + pitch * h * 5 / 4;
-
-		iY = buf[0];
-		iU = buf[1];
-		iV = buf[2];
-
-		for (i = 0; i < (h/2); i++) {
-			memcpy(Y,iY,pitch);
-			iY += strides[0];
-			Y += pitch;
-
-			memcpy(Y,iY,pitch);
-			memcpy(U,iU,pitch / 2);
-			memcpy(V,iV,pitch / 2);
-
-			Y  += pitch;
-			U  += pitch / 2;
-			V  += pitch / 2;
-			iY += strides[0];
-			iU += strides[1];
-			iV += strides[2];
-		}
-	}
-	SDL_UnlockTexture(screenTexture);
- */
-	SDL_RenderClear(renderer);
-	// FIXME: why do we have to invert the last 2 channels? I dont think the data is in the format we claim...
-	SDL_UpdateYUVTexture(screenTexture, NULL, buf[0], strides[0], buf[2], strides[2], buf[1], strides[1]);
-	SDL_RenderCopy(renderer, screenTexture, NULL, &destRect);
-	SDL_RenderPresent(renderer);
-}
-
-int SDL20VideoDriver::SwapBuffers(void)
-{
-	//this is not pretty. We make a complete copy of the backBuf into tmpBuf, then copy it back after SDLVideoDriver::SwapBuffers has blitted cursors and tooltips, and SDL_UpdateTexture has copied it to the screentexture.
-	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
-		SDL_BlitSurface(backBuf, NULL, tmpBuf, NULL);
-	}
-	int ret = SDLVideoDriver::SwapBuffers();
-
-	SDL_UpdateTexture(screenTexture, NULL, backBuf->pixels, backBuf->pitch);
-	if (Cursor[CursorIndex] && !(MouseFlags & (MOUSE_DISABLED | MOUSE_HIDDEN))) {
-		SDL_BlitSurface(tmpBuf, NULL, backBuf, NULL);
-	}
-	/*
-	 Commenting this out because I get better performance (on iOS) with SDL_UpdateTexture
-	 Don't know how universal it is yet so leaving this in commented out just in case
-
-	 void *pixels;
-	 int pitch;
-	 if(SDL_LockTexture(screenTexture, NULL, &pixels, &pitch) != GEM_OK) {
-	 Log(ERROR, "SDL 2 driver", "Unable to lock screen texture: %s", SDL_GetError());
-	 return GEM_ERROR;
-	 }
-
-	 ieByte* src = (ieByte*)backBuf->pixels;
-	 ieByte* dest = (ieByte*)pixels;
-	 for( int row = 0; row < height; row++ ) {
-	 memcpy(dest, src, width * backBuf->format->BytesPerPixel);
-	 dest += pitch;
-	 src += backBuf->pitch;
-	 }
-	 SDL_UnlockTexture(screenTexture);
-	 */
-
-	/*
-	 if (fadeColor.a) {
-	 SDL_Rect dst = {
-	 xCorr, yCorr, Viewport.w, Viewport.h
-	 };
-	 SDL_SetRenderDrawColor(renderer, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a);
-	 SDL_RenderFillRect(renderer, &dst);
-	 }
-	 */
-	SDL_RenderClear(renderer);
-	SDL_RenderCopy(renderer, screenTexture, NULL, NULL);
 	SDL_RenderPresent( renderer );
-	return ret;
 }
 
-int SDL20VideoDriver::PollEvents()
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::ScratchBuffer() const
 {
-	if (ignoreNextFingerUp <= 0
-		&& firstFingerDownTime
-		&& GetTicks() - firstFingerDownTime >= TOUCH_RC_NUM_TICKS) {
-		// enough time has passed to transform firstTouch into a right click event
+	assert(scratchBuffer);
+	return std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->GetTexture();
+}
 
-		// store the finger coordinates before calling ProcessFirstTouch (they get cleared)
-		int x = firstFingerDown.x;
-		int y = firstFingerDown.y;
-		ProcessFirstTouch(GEM_MB_MENU);
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentRenderBuffer() const
+{
+	assert(drawingBuffer);
+	return static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+}
 
-		if (currentGesture.type == GESTURE_NONE) {
-			Control* focusCtrl = EvntManager->GetMouseFocusedControl();
-			if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL
-				&& ((GameControl*)focusCtrl)->GetTargetMode() == TARGET_MODE_NONE) {
+SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
+{
+	assert(stencilBuffer);
+	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
+}
 
-				BeginMultiGesture(GESTURE_FORMATION_ROTATION);
-			} else {
-				EvntManager->MouseUp(x, y, GEM_MB_MENU, GetModState());
-				ignoreNextFingerUp = 1;
+int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
+{
+	// TODO: add support for BLIT_HALFTRANS, BLIT_COLOR_MOD, and others (no use for them ATM)
+
+	SDL_Texture* target = CurrentRenderBuffer();
+
+	assert(target);
+	int ret = SDL_SetRenderTarget(renderer, target);
+	if (ret != 0) {
+		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+		return ret;
+	}
+
+	if (screenClip.Dimensions() == screenSize)
+	{
+		// Some SDL backends complain on having a clip rect of the entire renderer size
+		// I'm not sure if it is an SDL bug; possibly its just 0 based so it is out of bounds?
+		SDL_RenderSetClipRect(renderer, NULL);
+	} else {
+		SDL_RenderSetClipRect(renderer, reinterpret_cast<SDL_Rect*>(&screenClip));
+	}
+
+	if (color) {
+		if (flags & BLIT_BLENDED) {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+		} else if (flags & BLIT_MULTIPLY) {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
+		} else {
+			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+		}
+
+		return SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
+	}
+
+	return 0;
+}
+
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
+{
+	uint32_t version = 0;
+#if 1 // !USE_OPENGL_BACKEND
+	// we need to isolate flags that require software rendering to use as the "version"
+	version = (BLIT_GREY|BLIT_SEPIA) & flags;
+#endif
+	// WARNING: software fallback == slow
+	if (spr->Bpp == 8 && (flags & BLIT_ALPHA_MOD)) {
+		version |= BLIT_ALPHA_MOD;
+		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
+	} else {
+		flags &= ~RenderSpriteVersion(spr, version);
+	}
+
+	SDL_Texture* tex = spr->GetTexture(renderer);
+	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
+}
+
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
+{
+	int ret = 0;
+	if (flags&BLIT_STENCIL_MASK) {
+		// 1. clear scratchpad segment
+		// 2. blend stencil segment to scratchpad
+		// 3. blend texture to scratchpad
+		// 4. copy scratchpad segment to screen
+
+		SDL_Texture* stencilTex = CurrentStencilBuffer();
+		SDL_SetTextureBlendMode(stencilTex, stencilAlphaBlender);
+
+		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
+
+		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BLIT_ALPHA_MOD|BLIT_HALFTRANS), tint);
+		
+		SDL_Rect stencilRect = drect;
+		stencilRect.x -= stencilBuffer->Origin().x;
+		stencilRect.y -= stencilBuffer->Origin().y;
+
+#if USE_OPENGL_BACKEND
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+		SDL_RenderFlush(renderer);
+#endif
+
+		GLint previous_program;
+		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
+
+		GLint channel = 3;
+		if (flags&BLIT_STENCIL_RED) {
+			channel = 0;
+		} else if (flags&BLIT_STENCIL_GREEN) {
+			channel = 1;
+		} else if (flags&BLIT_STENCIL_BLUE) {
+			channel = 2;
+		}
+
+		stencilShader->Use();
+		stencilShader->SetUniformValue("u_channel", 1, channel);
+		if (flags & BLIT_STENCIL_DITHER) {
+			stencilShader->SetUniformValue("u_dither", 1, 1);
+		} else {
+			stencilShader->SetUniformValue("u_dither", 1, 0);
+		}
+		
+		stencilShader->SetUniformValue("s_stencil", 1, 0);
+		glActiveTexture(GL_TEXTURE0);
+		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
+
+		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
+
+		SDL_GL_UnbindTexture(stencilTex);
+		glUseProgram(previous_program);
+#else
+		// alpha masking only
+		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
+#endif
+		if (flags & (BLIT_ALPHA_MOD | BLIT_HALFTRANS)) {
+			Uint8 alpha = SDL_ALPHA_OPAQUE;
+			if (flags & BLIT_ALPHA_MOD) {
+				alpha = tint->a;
+			}
+			
+			if (flags & BLIT_HALFTRANS) {
+				alpha /= 2;
+			}
+			SDL_SetTextureAlphaMod(ScratchBuffer(), alpha);
+		}
+		SDL_SetRenderTarget(renderer, CurrentRenderBuffer());
+		SDL_SetTextureBlendMode(ScratchBuffer(), SDL_BLENDMODE_BLEND);
+		ret = SDL_RenderCopy(renderer, ScratchBuffer(), &drect, &drect);
+	} else {
+		UpdateRenderTarget();
+		ret = RenderCopyShaded(texSprite, &srect, &drect, flags, tint);
+	}
+
+	if (ret != 0) {
+		Log(ERROR, "SDLVideo", "%s", SDL_GetError());
+	}
+}
+
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint)
+{
+	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
+	const Region& r = buf->Rect();
+	Point origin = r.Origin() + p;
+
+	SDL_Rect srect = {0, 0, r.w, r.h};
+	SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
+	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+}
+
+int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
+									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
+{
+#if 0 // USE_OPENGL_BACKEND
+	GLint previous_program;
+	glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
+
+	spriteShader->Use();
+	if (flags&BLIT_GREY) {
+		spriteShader->SetUniformValue("u_greyMode", 1, 1);
+	} else if (flags&BLIT_SEPIA) {
+		spriteShader->SetUniformValue("u_greyMode", 1, 2);
+	} else {
+		spriteShader->SetUniformValue("u_greyMode", 1, 0);
+	}
+
+	spriteShader->SetUniformValue("s_sprite", 1, 0);
+#else
+	// "shaders" were already applied via software (RenderSpriteVersion)
+	// they had to be applied very first so we could create a texture from the software rendering
+#endif
+	Uint8 alpha = SDL_ALPHA_OPAQUE;
+	if (flags & BLIT_ALPHA_MOD) {
+		alpha = tint->a;
+	}
+	
+	if (flags & BLIT_HALFTRANS) {
+		alpha /= 2;
+	}
+	
+	SDL_SetTextureAlphaMod(texture, alpha);
+
+	if (flags & BLIT_COLOR_MOD) {
+		SDL_SetTextureColorMod(texture, tint->r, tint->g, tint->b);
+	} else {
+		SDL_SetTextureColorMod(texture, 0xff, 0xff, 0xff);
+	}
+	
+	if (flags & BLIT_ADD) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
+	} else if (flags & BLIT_MULTIPLY) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
+	} else if (flags & (BLIT_BLENDED | BLIT_HALFTRANS)) {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
+	} else {
+		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
+	}
+	
+	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+
+#if 0 // USE_OPENGL_BACKEND
+	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
+
+	return ret;
+#else
+	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
+#endif
+}
+
+void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawSDLPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+}
+
+void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+{
+	if (points.empty()) {
+		return;
+	}
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
+	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
+}
+
+void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
+{
+	UpdateRenderTarget(&color, flags);
+	SDL_RenderDrawPoint(renderer, p.x, p.y);
+}
+
+void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	// TODO: refactor Point to use int so this is not needed
+	std::vector<SDL_Point> sdlpoints;
+	sdlpoints.reserve(points.size());
+
+	for (size_t i = 0; i < points.size(); ++i) {
+		const Point& point = points[i];
+		SDL_Point sdlpoint = {point.x, point.y};
+		sdlpoints.push_back(sdlpoint);
+	}
+
+	DrawSDLLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+}
+
+void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+{
+	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
+	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
+}
+
+void SDL20VideoDriver::DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
+{
+	UpdateRenderTarget(&color, flags);
+	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
+}
+
+void SDL20VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+{
+	UpdateRenderTarget(&color, flags);
+	if (fill) {
+		SDL_RenderFillRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
+	} else {
+		SDL_RenderDrawRect(renderer, reinterpret_cast<const SDL_Rect*>(&rgn));
+	}
+}
+
+void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+{
+	if (fill) {
+		UpdateRenderTarget(&color, flags);
+
+		for (const auto& lineSegments : poly->rasterData)
+		{
+			for (const auto& segment : lineSegments) {
+				// SDL_RenderDrawLines actually is for drawing polygons so it is, ironically, not what we want
+				// when drawing the "rasterized" data. doing so would work ok most of the time, but other times
+				// the reconnection of the last to first point (done by SDL) will be visible
+				Point p1(segment.first + origin);
+				Point p2(segment.second + origin);
+				SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 			}
 		}
-	}
+	} else {
+		std::vector<SDL_Point> points(poly->Count() + 1);
+		size_t i = 0;
+		for (; i < poly->Count(); ++i) {
+			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			points[i].x = p.x;
+			points[i].y = p.y;
+		}
 
-	return SDLVideoDriver::PollEvents();
-}
+		// close the polygon with first point
+		points[i] = points[0];
 
-void SDL20VideoDriver::ClearFirstTouch()
-{
-	firstFingerDown = SDL_TouchFingerEvent();
-	firstFingerDown.fingerId = -1;
-	firstFingerDownTime = 0;
-}
-
-void SDL20VideoDriver::BeginMultiGesture(MultiGestureType type)
-{
-	assert(type != GESTURE_NONE);
-	assert(currentGesture.type == GESTURE_NONE);
-	// warning: we are assuming this is a "virgin" gesture initialized by EndGesture
-	currentGesture.type = type;
-	switch (type) {
-		case GESTURE_FORMATION_ROTATION:
-			currentGesture.endButton = GEM_MB_MENU;
-			break;
-		default:
-			currentGesture.endButton = GEM_MB_ACTION;
-			break;
+		DrawSDLLines(points, reinterpret_cast<const SDL_Color&>(color), flags);
 	}
 }
 
-void SDL20VideoDriver::EndMultiGesture(bool success)
+Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr& buf)
 {
-	if (success && currentGesture.type) {
-		if (!currentGesture.endPoint.isempty()) {
-			// dont send events for invalid coordinates
-			// we assume this means the gesture doesnt want an up event
-			EvntManager->MouseUp(currentGesture.endPoint.x,
-								 currentGesture.endPoint.y,
-								 currentGesture.endButton, GetModState());
+	SDL_Rect rect = RectFromRegion(r);
+
+	unsigned int Width = r.w ? r.w : screenSize.w;
+	unsigned int Height = r.h ? r.h : screenSize.h;
+
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
+															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+
+	SDL_Texture* target = SDL_GetRenderTarget(renderer);
+	if (buf) {
+		auto texture = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+		SDL_SetRenderTarget(renderer, texture);
+	} else {
+		SDL_SetRenderTarget(renderer, nullptr);
+	}
+
+	SDL_Surface* surface = screenshot->GetSurface();
+	SDL_RenderReadPixels(renderer, &rect, SDL_PIXELFORMAT_BGR24, surface->pixels, surface->pitch);
+
+	SDL_SetRenderTarget(renderer, target);
+
+	return screenshot;
+}
+
+int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const
+{
+	int numf = SDL_GetNumTouchFingers(device);
+
+	for (int i = 0; i < numf; ++i) {
+		SDL_Finger* finger = SDL_GetTouchFinger(device, i);
+		assert(finger);
+
+		fingers[i].id = finger->id;
+		fingers[i].x = finger->x * screenSize.w;
+		fingers[i].y = finger->y * screenSize.h;
+
+		const TouchEvent::Finger* current = EvntManager->FingerState(finger->id);
+		if (current) {
+			fingers[i].deltaX = fingers[i].x - current->x;
+			fingers[i].deltaY = fingers[i].y - current->y;
 		}
 	}
-	if (currentGesture.type) {
-		GameControl* gc = core->GetGameControl();
-		if (gc) {
-			// FIXME: should this always happen?
-			gc->ClearMouseState();
-		}
-	}
 
-	currentGesture = MultiGesture();
-	currentGesture.endPoint.empty();
-}
-
-bool SDL20VideoDriver::ProcessFirstTouch( int mouseButton )
-{
-	if (!(MouseFlags & MOUSE_DISABLED) && firstFingerDown.fingerId >= 0) {
-		// do an actual mouse move first! this is important for things such as ground piles to work!
-		// also ensure any referencing of the cursor is accurate
-		MouseMovement(firstFingerDown.x, firstFingerDown.y);
-
-		if (CursorIndex != VID_CUR_DRAG)
-			CursorIndex = VID_CUR_DOWN;
-
-		// no need to scale these coordinates. they were scaled previously for us.
-		EvntManager->MouseDown( firstFingerDown.x, firstFingerDown.y,
-								mouseButton, GetModState() );
-
-		ClearFirstTouch();
-		ignoreNextFingerUp--;
-		return true;
-	}
-	return false;
+	return numf;
 }
 
 int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 {
-	Control* focusCtrl = NULL; //used for contextual touch events.
-	static int numFingers = 0;
-	static bool continuingGesture = false; // resets when numFingers changes
+	int modstate = GetModState(SDL_GetModState());
+	Event e;
 
-	// beware that this may be removed before all events it created are processed!
-	SDL_Finger* finger0 = SDL_GetTouchFinger(event.tfinger.touchId, 0);
-
-	if (finger0) {
-		numFingers = SDL_GetNumTouchFingers(event.tfinger.touchId);
-	}
-	// need 2 separate tests.
-	// sometimes finger0 will become null while we are still processig its touches
-	if (numFingers) {
-		focusCtrl = EvntManager->GetMouseFocusedControl();
-	}
-
-	bool ConsolePopped = core->ConsolePopped;
-
-	// TODO: we need a method to process gestures when numFingers changes
-	// some gestures would want to continue while some would want to end/abort
-	// currently finger up clears the gesture and finger down does not
-	// this is due to GESTURE_FORMATION_ROTATION being the only gesture we have at this time
 	switch (event.type) {
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
@@ -531,206 +608,117 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			}
 			break;
 		case SDL_CONTROLLERDEVICEADDED:
+			// I guess we assume that if you plug in a device while play that is the one to use?
 			if (gameController == nullptr) {
 				gameController = SDL_GameControllerOpen(event.jdevice.which);
 			}
 			break;
 		case SDL_CONTROLLERAXISMOTION:
-			gamepadControl.HandleAxisEvent(event.caxis.axis, event.caxis.value);
-		break;
+			{
+				float pct = event.caxis.value / float(sizeof(Sint16));
+				bool xaxis = event.caxis.axis % 2;
+				// FIXME: I'm sure this delta needs to be scaled
+				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				InputAxis axis = InputAxis(event.caxis.axis);
+				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
+				EvntManager->DispatchEvent(std::move(e));
+			}
+			break;
 		case SDL_CONTROLLERBUTTONDOWN:
 		case SDL_CONTROLLERBUTTONUP:
-			HandleJoyButtonEvent(event.cbutton);
+			{
+				bool down = (event.type == SDL_JOYBUTTONDOWN) ? true : false;
+				EventButton btn = EventButton(event.cbutton.button);
+				e = EvntManager->CreateControllerButtonEvent(btn, down);
+				EvntManager->DispatchEvent(std::move(e));
+			}
+			break;
+		case SDL_FINGERDOWN: // fallthough
+		case SDL_FINGERUP:
+			{
+				TouchEvent::Finger fingers[1] = { };
+				fingers[0].x = event.tfinger.x * screenSize.w;
+				fingers[0].y = event.tfinger.y * screenSize.h;
+				fingers[0].deltaX = event.tfinger.dx * screenSize.w;
+				fingers[0].deltaY = event.tfinger.dy * screenSize.h;
+				fingers[0].id = event.tfinger.fingerId;
+
+				e = EvntManager->CreateTouchEvent(fingers, 1, event.type == SDL_FINGERDOWN, event.tfinger.pressure);
+				e.mod = modstate;
+				EvntManager->DispatchEvent(std::move(e));
+			}
 			break;
 		// For swipes only. gestures requireing pinch or rotate need to use SDL_MULTIGESTURE or SDL_DOLLARGESTURE
 		case SDL_FINGERMOTION:
-			if (currentGesture.type) {
-				continuingGesture = false;
-				break; // finger motion has no further power over multigestures
-			}
-			if (numFingers > 1) {
-				ignoreNextFingerUp = numFingers;
-			}
-
-			if (numFingers == core->NumFingScroll
-				|| (numFingers != core->NumFingKboard && (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA))) {
-				//any # of fingers != NumFingKBoard will scroll a text area
-				if (focusCtrl && focusCtrl->ControlType == IE_GUI_TEXTAREA) {
-					// if we are scrolling a text area we dont want the keyboard in the way
-					HideSoftKeyboard();
-				} else if (!focusCtrl || focusCtrl->ControlType == IE_GUI_BUTTON) {
-					// ensure the control we touched becomes focused before attempting to scroll it.
-					// we cannot safely call ProcessFirstTouch anymore because now we process mouse events
-					// this can result in a selection box being created
-
-					EvntManager->MouseDown(ScaleCoordinateHorizontal(event.tfinger.x),
-										   ScaleCoordinateVertical(event.tfinger.y),
-										   GEM_MB_ACTION, 0);
-					focusCtrl = EvntManager->GetMouseFocusedControl();
-					if (focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
-						((GameControl*)focusCtrl)->ClearMouseState();
-					}
-				}
-				// invert the coordinates such that dragging down scrolls up etc.
-				int scrollX = (event.tfinger.dx * width) * -1;
-				int scrollY = (event.tfinger.dy * height) * -1;
-
-				EvntManager->MouseWheelScroll( scrollX, scrollY );
-			} else if (numFingers == core->NumFingKboard && !continuingGesture) {
-				int delta = (int)(event.tfinger.dy * height) * -1;
-				if (delta >= MIN_GESTURE_DELTA_PIXELS){
-					// if the keyboard is already up interpret this gesture as console pop
-					if( SDL_IsScreenKeyboardShown(window) && !ConsolePopped ) core->PopupConsole();
-					else ShowSoftKeyboard();
-				} else if (delta <= -MIN_GESTURE_DELTA_PIXELS) {
-					HideSoftKeyboard();
-				}
-			} else if (numFingers == 1) { //click and drag
-				if (!continuingGesture) {
-					int x = event.tfinger.dx * width;
-					int y = event.tfinger.dy * height;
-					if ((x >= -MIN_GESTURE_DELTA_PIXELS
-						&& x <= MIN_GESTURE_DELTA_PIXELS)
-						||
-						(y >= -MIN_GESTURE_DELTA_PIXELS
-						&& y <= MIN_GESTURE_DELTA_PIXELS)) {
-						break;
-					} else /*if (focusCtrl && focusCtrl->ControlType != IE_GUI_GAMECONTROL)*/ {
-						//break;
-					}
-					ProcessFirstTouch(GEM_MB_ACTION);
-				}
-				CursorIndex = VID_CUR_DRAG;
-
-				// standard mouse movement
-				MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
-							  ScaleCoordinateVertical(event.tfinger.y));
-			}
-			// we set this on finger motion because simple up/down are not part of gestures
-			continuingGesture = true;
-			break;
-		case SDL_FINGERDOWN:
-			if (!finger0) numFingers++;
-			continuingGesture = false;
-
-			if (numFingers == 1
-				// this test is for when multiple fingers begin the first touch
-				// commented out because we dont care right now, but if we need it i want it documented
-				//|| (numFingers > 1 && firstFingerDown.fingerId < 0)
-				) {
-				lastMouseDownTime = EvntManager->GetRKDelay();
-				if (ignoreNextFingerUp <= 0 && lastMouseDownTime != (unsigned long) ~0) {
-					lastMouseDownTime += lastMouseDownTime + lastTime;
-				}
-				// do not send a mouseDown event. we delay firstTouch until we know more about the context.
-				firstFingerDown = event.tfinger;
-				firstFingerDownTime = GetTicks();
-				// ensure we get the coords for the actual first finger
-				if (finger0) {
-					firstFingerDown.x = ScaleCoordinateHorizontal(finger0->x);
-					firstFingerDown.y = ScaleCoordinateVertical(finger0->y);
-				} else {
-					// rare case where the touch has
-					// been removed before processing
-					firstFingerDown.x = ScaleCoordinateHorizontal(event.tfinger.x);
-					firstFingerDown.y = ScaleCoordinateVertical(event.tfinger.y);
-				}
-			} else if (currentGesture.type == GESTURE_NONE) {
-				if (EvntManager && numFingers == core->NumFingInfo) {
-					EvntManager->OnSpecialKeyPress( GEM_TAB );
-					EvntManager->OnSpecialKeyPress( GEM_ALT );
-				}
-				if ((numFingers == core->NumFingScroll || numFingers == core->NumFingKboard)
-					&& focusCtrl && focusCtrl->ControlType == IE_GUI_GAMECONTROL) {
-					// scrolling cancels previous action
-					((GameControl*)focusCtrl)->ClearMouseState();
-				}
-			}
-			break;
-		case SDL_FINGERUP:
 			{
-				if (numFingers) numFingers--;
+				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
 
-				// we need to get mouseButton before calling ProcessFirstTouch
-				int mouseButton = (firstFingerDown.fingerId >= 0 || continuingGesture == true) ? GEM_MB_ACTION : GEM_MB_MENU;
-				continuingGesture = false;
-				EndMultiGesture(true);
-
-				if (numFingers == 0) { // this event was the last finger that was in contact
-					ProcessFirstTouch(mouseButton);
-					if (ignoreNextFingerUp <= 0) {
-						ignoreNextFingerUp = 1; // set to one because we decrement unconditionally later
-						if (CursorIndex != VID_CUR_DRAG)
-							CursorIndex = VID_CUR_UP;
-						// move cursor to ensure any referencing of the cursor is accurate
-						MouseMovement(ScaleCoordinateHorizontal(event.tfinger.x),
-									  ScaleCoordinateVertical(event.tfinger.y));
-
-						EvntManager->MouseUp(ScaleCoordinateHorizontal(event.tfinger.x),
-											 ScaleCoordinateVertical(event.tfinger.y),
-											 mouseButton, GetModState());
-					} else {
-						focusCtrl = EvntManager->GetMouseFocusedControl();
-						if (focusCtrl && focusCtrl->ControlType == IE_GUI_BUTTON)
-							// these are repeat events so the control should stay pressed
-							((Button*)focusCtrl)->SetState(IE_GUI_BUTTON_UNPRESSED);
-					}
-				}
-				if (numFingers != core->NumFingInfo) {
-					// FIXME: this is "releasing" the ALT key even when it hadn't been previously "pushed"
-					// this isn't causing a problem currently
-					EvntManager->KeyRelease( GEM_ALT, 0 );
-				}
-				ignoreNextFingerUp--;
+				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, event.tfinger.pressure);
+				// TODO: it may make more sense to calculate a pinch/rotation from screen center?
+				e = EvntManager->CreateTouchGesture(touch.touch, 0.0, 0.0);
+				e.mod = modstate;
+				EvntManager->DispatchEvent(std::move(e));
 			}
+			break;
+		case SDL_DOLLARGESTURE:
+			// TODO: this could be useful for predefining gestures
+			// might work better than manually programming everything
 			break;
 		case SDL_MULTIGESTURE:// use this for pinch or rotate gestures. see also SDL_DOLLARGESTURE
 			{
-				/* formation rotation gesture:
-				first touch with a single finger to obtain the pivot
-				then touch and drag with a second finger (while maintaining contact with first)
-				to move the application point
-				*/
-				GameControl* gc = (GameControl*)focusCtrl;
-				switch (currentGesture.type) {
-					case GESTURE_FORMATION_ROTATION:
-					{
-						SDL_Finger* secondFinger = SDL_GetTouchFinger(event.mgesture.touchId, 1);
-						if (secondFinger && gc && gc->GetTargetMode() == TARGET_MODE_NONE) {
-							int x = ScaleCoordinateHorizontal(secondFinger->x);// + Viewport.x;
-							int y = ScaleCoordinateVertical(secondFinger->y);// + Viewport.y;
-							gc->OnMouseOver(x, y);
-							currentGesture.endPoint = Point(x, y);
-						}
-						break;
-					}
-					case GESTURE_NONE:
-					default:
-						break;
+				TouchEvent::Finger fingers[FINGER_MAX] = { }; // 0 init
+				int numf = GetTouchFingers(fingers, event.mgesture.touchId);
+
+				// TODO: it may make more sense to calculate the pressure as an avg?
+				Event touch = EvntManager->CreateTouchEvent(fingers, numf, true, 0.0);
+				e = EvntManager->CreateTouchGesture(touch.touch, event.mgesture.dTheta, event.mgesture.dDist);
+				if (e.gesture.deltaX != 0 || e.gesture.deltaY != 0)
+				{
+					e.mod = modstate;
+					EvntManager->DispatchEvent(std::move(e));
 				}
 			}
 			break;
 		case SDL_MOUSEWHEEL:
-			/*
-			 TODO: need a preference for inverting these
-			 sdl 2.0.4 autodetects (SDL_MOUSEWHEEL_FLIPPED in SDL_MouseWheelEvent)
-			 */
-			short scrollX;
-			scrollX= event.wheel.x * -1;
-			short scrollY;
-			scrollY= event.wheel.y * -1;
-			EvntManager->MouseWheelScroll( scrollX, scrollY );
-			break;
-		/* not user input events */
-		case SDL_TEXTINPUT:
-			for (size_t i=0; i < strlen(event.text.text); i++) {
-				if (core->ConsolePopped)
-					core->console->OnKeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
-				else
-					EvntManager->KeyPress( event.text.text[i], GetModState(event.key.keysym.mod));
+			{
+				if (SDL_TOUCH_MOUSEID == event.wheel.which) {
+					break;
+				}
+				
+				// HACK: some mouse devices report the delta in pixels, but others (like regular mouse wheels) are going to be in "clicks"
+				// there is no good way to find which is the case so heuristically we will just switch if we see a delta larger than one
+				// hopefully no devices will be merging several repeated whell clicks together
+				static bool unitIsPixels = false;
+				if (event.wheel.y > 1 || event.wheel.x > 1) {
+					unitIsPixels = true;
+				}
+				
+				int speed = (unitIsPixels) ? 1 : core->GetMouseScrollSpeed();
+				if (SDL_GetModState() & KMOD_SHIFT) {
+					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
+				} else {
+					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.x * speed, event.wheel.y * speed));
+				}
+				
+				EvntManager->DispatchEvent(std::move(e));
 			}
 			break;
 		/* not user input events */
+		case SDL_TEXTINPUT:
+			e = EvntManager->CreateTextEvent(event.text.text);
+			EvntManager->DispatchEvent(std::move(e));
+			break;
+		/* not user input events */
+
+		// TODO: these events will be sent by the D3D renderer and we will need to handle them
+		case SDL_RENDER_DEVICE_RESET:
+			// TODO: must destroy all SDLTextureSprite2D textures
+
+			// fallthough
+		case SDL_RENDER_TARGETS_RESET:
+			// TODO: must destroy all SDLTextureVideoBuffer textures
+			break;
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {
 				case SDL_WINDOWEVENT_MINIMIZED://SDL 1.3
@@ -741,21 +729,6 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					core->SetPause(PAUSE_ON);
 					break;
 				case SDL_WINDOWEVENT_RESTORED: //SDL 1.3
-					/*
-					 reset all input variables as if no events have happened yet
-					 restoring from "minimized state" should be a clean slate.
-					 */
-					ClearFirstTouch();
-					EndMultiGesture();
-					ignoreNextFingerUp = 0;
-					// should we reset the lastMouseTime vars?
-#if TARGET_OS_IPHONE
-					// FIXME:
-					// sleep for a short while to avoid some unknown Apple threading issue with OpenAL threads being suspended
-					// even using Apple examples of how to properly suspend an OpenAL context and resume on iOS are falling flat
-					// it could be this bug affects only the simulator.
-					sleep(1);
-#endif
 					core->GetAudioDrv()->Resume();//this is for ANDROID mostly
 					break;
 					/*
@@ -766,6 +739,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					 */
 			}
 			break;
+
 		// conditionally handle mouse events
 		// discard them if they are produced by touch events
 		// do NOT discard mouse wheel events
@@ -773,87 +747,84 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
 			if (event.button.which == SDL_TOUCH_MOUSEID) {
+				// ignoring mouse events from touch devices
+				// because we handle touch input at the view level
 				break;
-			}
-			else {
+			} else {
 				/**
 				 * As being SDL2-only, try to query the clipboard state to
 				 * paste when middle clicking the mouse.
 				 */
-				if (
-					   event.button.button == SDL_BUTTON_MIDDLE
+				
+				if (event.button.button == SDL_BUTTON_MIDDLE
 					&& event.type == SDL_MOUSEBUTTONDOWN
 					&& SDL_HasClipboardText()
 				) {
 					char *pasteValue = SDL_GetClipboardText();
 
 					if (pasteValue != NULL) {
-						String *pasteValueString = StringFromCString(pasteValue);
-						core->RequestPasting(*pasteValueString);
-						delete pasteValueString;
+						e = EvntManager->CreateTextEvent(pasteValue);
+						EvntManager->DispatchEvent(std::move(e));
 						SDL_free(pasteValue);
 					}
-
-					break;
-				} else {
-					// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
-					return SDLVideoDriver::ProcessEvent(event);
 				}
+				// we do not want these events to cascade down to SDL_KEYDOWN, so we return here instead of at default .
+				return SDLVideoDriver::ProcessEvent(event);
 			}
 		case SDL_KEYDOWN:
-			{
-				SDL_Keycode key = SDL_GetKeyFromScancode(event.key.keysym.scancode);
-				if (key == SDLK_SPACE && SDL_GetModState() & KMOD_CTRL) {
-					// special treatment: console popping is the only KEYDOWN event in SDLVideoDriver::ProcessEvent that uses a standard key (and therefore will never be hit). Therefore, implement this here also.
-					core->PopupConsole();
-					break;
-				}
-				if (key == SDLK_LSHIFT || key == SDLK_RSHIFT || key == SDLK_LCTRL || key == SDLK_RCTRL) {
-					// if key is literally just ctrl or shift -- skip it.
-					break;
-				}
-				if (SDL_GetModState() & KMOD_NUM && key >= SDLK_KP_DIVIDE && key <= SDLK_KP_EQUALS && key != SDLK_KP_ENTER) {
-					// ignore numpad keys (handled by SDL_TEXTINPUT) if KMOD_NUM. Never ignore numpad enter.
-					break;
-				}
-				if (key >= 32 && key < 127) {
-					// ignore keys that generate text (these are handeled by SDL_TEXTINPUT).
-					break;
+			if (SDL_GetModState() & KMOD_CTRL) {
+				switch (event.key.keysym.sym) {
+					case SDLK_v:
+						if (SDL_HasClipboardText()) {
+							char* text = SDL_GetClipboardText();
+							e = EvntManager->CreateTextEvent(text);
+							SDL_free(text);
+							EvntManager->DispatchEvent(std::move(e));
+							return GEM_OK;
+						}
+						break;
+					default:
+						break;
 				}
 			}
-			// fall through
-		case SDL_KEYUP: // we let SDL_KEYUP pass directly to SDLVideo below, since SDL_TEXTINPUT feeds input directly as if it were pressed/keydown.
+			return SDLVideoDriver::ProcessEvent(event);
 		default:
 			return SDLVideoDriver::ProcessEvent(event);
 	}
 	return GEM_OK;
 }
 
-/*
- This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
- */
-void SDL20VideoDriver::HideSoftKeyboard()
+void SDL20VideoDriver::StopTextInput()
 {
-	if(core->UseSoftKeyboard){
-		SDL_StopTextInput();
-		if(core->ConsolePopped) core->PopupConsole();
-	}
+	SDL_StopTextInput();
 }
 
-/*
- This method is intended for devices with no physical keyboard or with an optional soft keyboard (iOS/Android)
- */
-void SDL20VideoDriver::ShowSoftKeyboard()
+void SDL20VideoDriver::StartTextInput()
 {
-	if(core->UseSoftKeyboard){
+	// FIXME: we probably dont need this ANDROID code
+	// UseSoftKeyboard probably has no effect since SDL delegates SDL_StartTextInput to the OS
+	// on iOS this is going to be a user preference and depends on a physical keyboard presence
+#if ANDROID
+	if (core->UseSoftKeyboard){
 		SDL_StartTextInput();
+	} else {
+		Event e = EvntManager->CreateTextEvent(L"");
+		EvntManager->DispatchEvent(e);
 	}
+#else
+	SDL_StartTextInput();
+#endif
 }
 
-/* no idea how elaborate this should be*/
-void SDL20VideoDriver::MoveMouse(unsigned int x, unsigned int y)
+bool SDL20VideoDriver::InTextInput()
 {
-	SDL_WarpMouseInWindow(window, x, y);
+	return SDL_IsTextInputActive();
+}
+
+bool SDL20VideoDriver::TouchInputEnabled()
+{
+	// note from upstream: on some platforms a device may become seen only after use
+	return SDL_GetNumTouchDevices() > 0;
 }
 
 void SDL20VideoDriver::SetGamma(int brightness, int /*contrast*/)
@@ -867,7 +838,7 @@ bool SDL20VideoDriver::SetFullscreenMode(bool set)
 {
 	Uint32 flags = 0;
 	if (set) {
-	flags = SDL_WINDOW_FULLSCREEN_DESKTOP;
+		flags = SDL_WINDOW_FULLSCREEN_DESKTOP|SDL_WINDOW_BORDERLESS;
 	}
 	if (SDL_SetWindowFullscreen(window, flags) == GEM_OK) {
 		fullscreen = set;
@@ -883,64 +854,13 @@ bool SDL20VideoDriver::ToggleGrabInput()
 	return (isGrabbed != SDL_GetWindowGrab(window));
 }
 
-// Private methods
-
-bool SDL20VideoDriver::SetSurfaceAlpha(SDL_Surface* surface, unsigned short alpha)
+void SDL20VideoDriver::CaptureMouse(bool enabled)
 {
-	bool ret = SDL_SetSurfaceBlendMode(surface, SDL_BLENDMODE_BLEND);
-	if (ret == GEM_OK) {
-		ret = SDL_SetSurfaceAlphaMod(surface, alpha);
-	}
-	if (ret == GEM_OK) {
-		SDL_SetSurfaceRLE(surface, SDL_TRUE);
-	}
-	return ret;
+	SDL_CaptureMouse(SDL_bool(enabled));
 }
 
-float SDL20VideoDriver::ScaleCoordinateHorizontal(float x)
-{
-	float scaleX;
-	SDL_RenderGetScale(renderer, &scaleX, NULL);
-
-	int winW, winH;
-	float xoffset = 0.0;
-	SDL_GetWindowSize(window, &winW, &winH);
-	float winWf = winW, winHf = winH;
-	// only need to scale if they do not have the same ratio
-	if ((winWf / winHf) != ((float)width / height)) {
-		xoffset = ((winWf - (width * scaleX)) / 2) / winWf;
-		return ((x - xoffset) * (winWf / scaleX));
-	}
-	return x * width;
-}
-
-float SDL20VideoDriver::ScaleCoordinateVertical(float y)
-{
-	float scaleY;
-	SDL_RenderGetScale(renderer, NULL, &scaleY);
-
-	int winW, winH;
-	float yoffset = 0.0;
-	SDL_GetWindowSize(window, &winW, &winH);
-	float winWf = winW, winHf = winH;
-	// only need to scale if they do not have the same ratio
-	if ((winWf / winHf) != ((float)width / height)) {
-		yoffset = ((winHf - (height * scaleY)) / 2) / winHf;
-		return ((y - yoffset) * (winHf / scaleY));
-	}
-	return y * height;
-}
-
-// note from upstream: on some platforms a device may become seen only after use
-bool SDL20VideoDriver::TouchInputEnabled() const
-{
-	return SDL_GetNumTouchDevices() > 0;
-}
-
-#ifndef USE_OPENGL
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xDBAAB51, "SDL2 Video Driver")
 PLUGIN_DRIVER(SDL20VideoDriver, "sdl")
 END_PLUGIN()
-#endif

@@ -33,10 +33,10 @@ Image::~Image()
 	delete[] data;
 }
 
-Sprite2D* Image::GetSprite2D()
+Holder<Sprite2D> Image::GetSprite2D()
 {
 	union {
-		Color color;
+		unsigned char color[sizeof(ieDword)];
 		ieDword Mask;
 	} r = {{ 0xFF, 0x00, 0x00, 0x00 }},
 	  g = {{ 0x00, 0xFF, 0x00, 0x00 }},
@@ -44,7 +44,7 @@ Sprite2D* Image::GetSprite2D()
 	  a = {{ 0x00, 0x00, 0x00, 0xFF }};
 	void *pixels = malloc(sizeof(Color) * height*width);
 	memcpy(pixels, data, sizeof(Color)*height*width);
-	return core->GetVideoDriver()->CreateSprite(width, height, 32,
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, width, height), 32,
 			r.Mask, g.Mask, b.Mask, a.Mask, pixels);
 }
 

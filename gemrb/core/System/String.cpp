@@ -16,7 +16,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "System/Logging.h"
 #include "System/String.h"
 
 #include "exports.h"
@@ -144,6 +143,7 @@ char* ConvertCharEncoding(const char* string,
 }
 #endif
 
+
 String* StringFromCString(const char* string)
 {
 	// if multibyte is false this is basic expansion of cstring to wchar_t
@@ -175,28 +175,6 @@ char* MBCStringFromString(const String& string)
 
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
-
-void StringToLower(String& string)
-{
-	for (size_t i = 0; i < string.length(); i++) {
-		if (string[i] < 256) {
-			string[i] = pl_lowercase[string[i]];
-		} else {
-			string[i] = ::towlower(string[i]);
-		}
-	}
-}
-
-void StringToUpper(String& string)
-{
-	for (size_t i = 0; i < string.length(); i++) {
-		if (string[i] < 256) {
-			string[i] = pl_uppercase[string[i]];
-		} else {
-			string[i] = ::towupper(string[i]);
-		}
-	}
-}
 
 void TrimString(String& string)
 {

@@ -107,7 +107,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillLeftPress = SkillDecreasePress
 		SkillRightPress = SkillIncreasePress
 		#There is actually no hint text to describe the skills, so this is a dummy
-		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG", IE_FONT_ALIGN_LEFT)
+		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG")
 		SkillsTextArea =  SkillsWindow.GetControl (45)
 	elif type == LUSKILLS_TYPE_LEVELUP:
 		SkillsOffsetPress = -1
@@ -130,7 +130,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
-			ScrollBar.SetDefaultScrollBar ()
+			SkillsWindow.SetEventProxy(ScrollBar)
 	elif type == LUSKILLS_TYPE_CHARGEN:
 		SkillsOffsetPress = 21
 		SkillsOffsetButton1 = 11
@@ -142,7 +142,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea.SetText(17248)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
-			ScrollBar.SetDefaultScrollBar ()
+			SkillsWindow.SetEventProxy(ScrollBar)
 	else:
 		return
 
@@ -288,10 +288,12 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillLeftPress)
+		Button.SetActionInterval(20);
 
 		Button = SkillsWindow.GetControl(i*2+SkillsOffsetButton1+1)
 		Button.SetVarAssoc("Skill",SkillsIndices[i])
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, SkillRightPress)
+		Button.SetActionInterval(20);
 	
 	SkillsRedraw ()
 	return
@@ -338,24 +340,21 @@ def SkillsRedraw (direction=0):
 	#setup doublespeed
 	if SkillsOldDirection == direction:
 		SkillsClickCount = SkillsClickCount + 1
-		if SkillsClickCount>10:
-			GemRB.SetRepeatClickFlags(GEM_RK_QUADRUPLESPEED, OP_OR)
 		return
 
 	SkillsOldDirection = direction
 	SkillsClickCount = 0
-	GemRB.SetRepeatClickFlags(GEM_RK_QUADRUPLESPEED, OP_NAND)
 	return
 
-def SkillJustPress():
-	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
+def SkillJustPress(btn, val):
+	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	return
 
-def SkillDecreasePress():
+def SkillDecreasePress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
+	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 	BasePoint = GemRB.GetVar("SkillBase "+str(Pos) )
@@ -372,10 +371,10 @@ def SkillDecreasePress():
 	SkillsCallback ()
 	return
 
-def SkillIncreasePress():
+def SkillIncreasePress(btn, val):
 	global SkillPointsLeft, SkillsClickCount, SkillsOldPos
 
-	Pos = GemRB.GetVar("Skill")+SkillsTopIndex
+	Pos = val+SkillsTopIndex
 	SkillsTextArea.SetText (SkillsTable.GetValue (SkillsTable.GetRowName (Pos+2), "DESC_REF"))
 	if SkillPointsLeft == 0:
 		return

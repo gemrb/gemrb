@@ -30,35 +30,57 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
-Video::Video(void)
-	: Viewport(), CursorPos(), fadeColor()
-{
-	CursorIndex = VID_CUR_UP;
-	Cursor[VID_CUR_UP] = NULL;
-	Cursor[VID_CUR_DOWN] = NULL;
-	Cursor[VID_CUR_DRAG] = NULL;
+static Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags);
 
+Video::Video(void)
+{
+	drawingBuffer = NULL;
 	EvntManager = NULL;
-	// MOUSE_GRAYED and MOUSE_DISABLED are the first 2 bits so shift the config value away from those.
-	// we care only about 2 bits at the moment so mask out the remainder
-	MouseFlags = ((core->MouseFeedback & 0x3) << 2);
 
 	// Initialize gamma correction tables
 	for (int i = 0; i < 256; i++) {
-		Gamma22toGamma10[i] = (unsigned char)(0.5 + (std::pow (i/255.0, 2.2/1.0) * 255.0));
-		Gamma10toGamma22[i] = (unsigned char)(0.5 + (std::pow (i/255.0, 1.0/2.2) * 255.0));
+		Gamma22toGamma10[i] = (unsigned char)(0.5 + (pow (i/255.0, 2.2/1.0) * 255.0));
+		Gamma10toGamma22[i] = (unsigned char)(0.5 + (pow (i/255.0, 1.0/2.2) * 255.0));
 	}
 
 	// boring inits just to be extra clean
-	xCorr = yCorr = width = height = bpp = 0;
+	bpp = 0;
 	fullscreen = false;
-	subtitlefont = NULL;
-	subtitlepal = NULL;
+	lastTime = 0;
+}
+
+Video::~Video(void)
+{
+	DestroyBuffers();
+}
+
+void Video::DestroyBuffers()
+{
+	for (auto buffer : buffers) {
+		delete buffer;
+	}
+}
+
+int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title)
+{
+	bpp = bits;
+	screenSize = s;
+
+	int ret = CreateDriverDisplay(title);
+	if (ret == GEM_OK) {
+		SetScreenClip(NULL);
+		if (fs) {
+			ToggleFullscreenMode();
+		}
+	}
+	return ret;
 }
 
 Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 {
-	Region r = target.Intersect(screenClip);
+	// clip to both screen and the target buffer
+	Region bufRgn(Point(), drawingBuffer->Size());
+	Region r = target.Intersect(screenClip).Intersect(bufRgn);
 	if (clip) {
 		// Intersect clip with both screen and target rectangle
 		r = clip->Intersect(r);
@@ -71,9 +93,81 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 	return r;
 }
 
+VideoBufferPtr Video::CreateBuffer(const Region& r, BufferFormat fmt)
+{
+	VideoBuffer* buf = NewVideoBuffer(r, fmt);
+	if (buf) {
+		buffers.push_back(buf);
+		return VideoBufferPtr(buffers.back(), [this](VideoBuffer* buffer) {
+			DestroyBuffer(buffer);
+		});
+	}
+	return nullptr;
+	//assert(buf); // FIXME: we should probably deal with this happening
+}
+
+void Video::DestroyBuffer(VideoBuffer* buffer)
+{
+	// FIXME: this is poorly implemented
+	VideoBuffers::iterator it = std::find(drawingBuffers.begin(), drawingBuffers.end(), buffer);
+	if (it != drawingBuffers.end()) {
+		drawingBuffers.erase(it);
+	}
+
+	it = std::find(buffers.begin(), buffers.end(), buffer);
+	if (it != buffers.end()) {
+		buffers.erase(it);
+	}
+	delete buffer;
+}
+
+void Video::PushDrawingBuffer(const VideoBufferPtr& buf)
+{
+	assert(buf);
+	drawingBuffers.push_back(buf.get());
+	drawingBuffer = drawingBuffers.back();
+}
+
+void Video::PopDrawingBuffer()
+{
+	if (drawingBuffers.size() <= 1) {
+		// can't pop last buffer
+		return;
+	}
+	drawingBuffers.pop_back();
+	drawingBuffer = drawingBuffers.back();
+}
+
+void Video::SetStencilBuffer(const VideoBufferPtr& stencil)
+{
+	stencilBuffer = stencil;
+}
+
+int Video::SwapBuffers(unsigned int fpscap)
+{
+	SwapBuffers(drawingBuffers);
+	drawingBuffers.clear();
+	drawingBuffer = NULL;
+	SetScreenClip(NULL);
+
+	if (fpscap) {
+		unsigned int lim = 1000/fpscap;
+		unsigned long time = GetTicks();
+		if (( time - lastTime ) < lim) {
+			Wait(lim - int(time - lastTime));
+			time = GetTicks();
+		}
+		lastTime = time;
+	} else {
+		lastTime = GetTicks();
+	}
+
+	return PollEvents();
+}
+
 void Video::SetScreenClip(const Region* clip)
 {
-	screenClip = Region(0,0, width, height);
+	screenClip = Region(Point(), screenSize);
 	if (clip) {
 		screenClip = screenClip.Intersect(*clip);
 	}
@@ -91,120 +185,29 @@ void Video::SetEventMgr(EventMgr* evnt)
 	EvntManager = evnt;
 }
 
-// Flips given sprite vertically (up-down). If MirrorAnchor=true,
-// flips its anchor (i.e. origin//base point) as well
+// Flips given sprite according to the flags. If MirrorAnchor=true,
+// flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Sprite2D* Video::MirrorSpriteVertical(const Sprite2D* sprite, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
 
-	Sprite2D* dest = sprite->copy();
+	Holder<Sprite2D> dest = sprite->copy();
 
-	if (sprite->pixels != dest->pixels) {
-		assert(!sprite->BAM);
-		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
-		for (int x = 0; x < dest->Width; x++) {
-			unsigned char * dst = ( unsigned char * ) dest->pixels + x;
-			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
-			for (int y = 0; y < dest->Height / 2; y++) {
-				unsigned char swp = *dst;
-				*dst = *src;
-				*src = swp;
-				dst += dest->Width;
-				src -= dest->Width;
-			}
-		}
-	} else {
-		// if the pixel buffers are the same then either there are no pixels (NULL)
-		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		// toggle the bit because it could be a mirror of a mirror
-		dest->renderFlags ^= BLIT_MIRRORY;
-	}
-
-	dest->XPos = sprite->XPos;
-	if (MirrorAnchor)
-		dest->YPos = sprite->Height - sprite->YPos;
-	else
-		dest->YPos = sprite->YPos;
-
-	return dest;
-}
-
-// Flips given sprite horizontally (left-right). If MirrorAnchor=true,
-//   flips its anchor (i.e. origin//base point) as well
-Sprite2D* Video::MirrorSpriteHorizontal(const Sprite2D* sprite, bool MirrorAnchor)
-{
-	if (!sprite)
-		return NULL;
-
-	Sprite2D* dest = sprite->copy();
-
-	if (sprite->pixels != dest->pixels) {
-		assert(!sprite->BAM);
-		// if the sprite pixel buffers are not the same we need to manually mirror the pixels
-		for (int y = 0; y < dest->Height; y++) {
-			unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
-			unsigned char * src = dst + dest->Width - 1;
-			for (int x = 0; x < dest->Width / 2; x++) {
-				unsigned char swp=*dst;
-				*dst++ = *src;
-				*src-- = swp;
-			}
-		}
-	} else {
-		// if the pixel buffers are the same then either there are no pixels (NULL)
-		// or the sprites support sharing pixel data and we only need to set a render flag on the copy
-		// toggle the bit because it could be a mirror of a mirror
+	if (flags&BLIT_MIRRORX) {
 		dest->renderFlags ^= BLIT_MIRRORX;
+		if (MirrorAnchor)
+			dest->Frame.x = sprite->Frame.w - sprite->Frame.x;
 	}
 
-	if (MirrorAnchor)
-		dest->XPos = sprite->Width - sprite->XPos;
-	else
-		dest->XPos = sprite->XPos;
-	dest->YPos = sprite->YPos;
+	if (flags&BLIT_MIRRORY) {
+		dest->renderFlags ^= BLIT_MIRRORY;
+		if (MirrorAnchor)
+			dest->Frame.y = sprite->Frame.h - sprite->Frame.y;
+	}
 
 	return dest;
-}
-
-void Video::SetCursor(Sprite2D* cur, enum CursorType curIdx)
-{
-	if (cur) {
-		//cur will be assigned in the end, increase refcount
-		cur->acquire();
-		//setting a dragged sprite cursor, it will 'stick' until cleared
-		if (curIdx == VID_CUR_DRAG)
-			CursorIndex = VID_CUR_DRAG;
-	} else {
-		//clearing the dragged sprite cursor, replace it with the normal cursor
-		if (curIdx == VID_CUR_DRAG)
-			CursorIndex = VID_CUR_UP;
-	}
-	//decrease refcount of the previous cursor
-	if (Cursor[curIdx])
-		Sprite2D::FreeSprite(Cursor[curIdx]);
-	Cursor[curIdx] = cur;
-}
-
-/** Mouse is invisible and cannot interact */
-void Video::SetMouseEnabled(int enabled)
-{
-	if (enabled) {
-		MouseFlags &= ~MOUSE_DISABLED;
-	} else {
-		MouseFlags |= MOUSE_DISABLED;
-	}
-}
-
-/** Mouse cursor is grayed and doesn't click (but visible and movable) */
-void Video::SetMouseGrayed(bool grayed)
-{
-	if (grayed) {
-		MouseFlags |= MOUSE_GRAYED;
-	} else {
-		MouseFlags &= ~MOUSE_GRAYED;
-	}
 }
 
 /** Get the fullscreen mode */
@@ -213,78 +216,74 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitTiled(Region rgn, const Sprite2D* img, bool anchor)
+void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 {
-	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
-	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
-	for (int y = 0; y < yrep; y++) {
-		for (int x = 0; x < xrep; x++) {
-			BlitSprite(img, rgn.x + (x*img->Width),
-				 rgn.y + (y*img->Height), anchor, &rgn);
-		}
+	p -= spr->Frame.Origin();
+	Region dst(p, spr->Frame.Dimensions());
+	Region fClip = ClippedDrawingRect(dst, clip);
+
+	if (fClip.Dimensions().IsEmpty()) {
+		return; // already know blit fails
+	}
+
+	Region src(0, 0, spr->Frame.w, spr->Frame.h);
+	// adjust the src region to account for the clipping
+	src.x += fClip.x - dst.x; // the left edge
+	src.w -= dst.w - fClip.w; // the right edge
+	src.y += fClip.y - dst.y; // the top edge
+	src.h -= dst.h - fClip.h; // the bottom edge
+
+	assert(src.w == fClip.w && src.h == fClip.h);
+
+	// just pass fclip as dst
+	// since the next stage is also public, we must readd the Pos becuase it will again be removed
+	fClip.x += spr->Frame.x;
+	fClip.y += spr->Frame.y;
+	BlitSprite(spr, src, fClip, BLIT_BLENDED);
+}
+
+void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
+							   uint32_t flags, Color tint)
+{
+	if (pal) {
+		PaletteHolder oldpal = spr->GetPalette();
+		spr->SetPalette(pal);
+		BlitGameSprite(spr, p, flags, tint);
+		spr->SetPalette(oldpal);
+	} else {
+		BlitGameSprite(spr, p, flags, tint);
 	}
 }
 
-//Sprite conversion, creation
-Sprite2D* Video::CreateAlpha( const Sprite2D *sprite)
+Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned int ratio )
 {
-	if (!sprite)
-		return 0;
+	Region scaledFrame = sprite->Frame;
+	scaledFrame.w /= ratio;
+	scaledFrame.h /= ratio;
 
-	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
-	int i=0;
-	for (int y = 0; y < sprite->Height; y++) {
-		for (int x = 0; x < sprite->Width; x++) {
-			int sum = 0;
-			int cnt = 0;
-			for (int xx=x-3;xx<=x+3;xx++) {
-				for(int yy=y-3;yy<=y+3;yy++) {
-					if (((xx==x-3) || (xx==x+3)) &&
-					    ((yy==y-3) || (yy==y+3))) continue;
-					if (xx < 0 || xx >= sprite->Width) continue;
-					if (yy < 0 || yy >= sprite->Height) continue;
-					cnt++;
-					if (sprite->IsPixelTransparent(xx, yy))
-						sum++;
-				}
-			}
-			int tmp=255 - (sum * 255 / cnt);
-			tmp = tmp * tmp / 255;
-			pixels[i++]=tmp;
-		}
-	}
-	return CreateSprite( sprite->Width, sprite->Height, 32, 0xFF000000,
-		0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
-}
-
-Sprite2D* Video::SpriteScaleDown( const Sprite2D* sprite, unsigned int ratio )
-{
-	unsigned int Width = sprite->Width / ratio;
-	unsigned int Height = sprite->Height / ratio;
-
-	unsigned int* pixels = (unsigned int *) malloc( Width * Height * 4 );
+	unsigned int* pixels = (unsigned int *) malloc( scaledFrame.w * scaledFrame.h * 4 );
 	int i = 0;
 
-	for (unsigned int y = 0; y < Height; y++) {
-		for (unsigned int x = 0; x < Width; x++) {
+	for (int y = 0; y < scaledFrame.h; y++) {
+		for (int x = 0; x < scaledFrame.w; x++) {
 			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
 
 			*(pixels + i++) = c.r + (c.g << 8) + (c.b << 16) + (c.a << 24);
 		}
 	}
 
-	Sprite2D* small = CreateSprite( Width, Height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
+	Holder<Sprite2D> small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
 0xff000000, pixels, false, 0 );
 
-	small->XPos = sprite->XPos / ratio;
-	small->YPos = sprite->YPos / ratio;
+	small->Frame.x = sprite->Frame.x / ratio;
+	small->Frame.y = sprite->Frame.y / ratio;
 
 	return small;
 }
 
 //TODO light could be elliptical in the original engine
 //is it difficult?
-Sprite2D* Video::CreateLight(int radius, int intensity)
+Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 {
 	if(!radius) return NULL;
 	Point p, q;
@@ -303,16 +302,17 @@ Sprite2D* Video::CreateLight(int radius, int intensity)
 		}
 	}
 
-	Sprite2D* light = CreateSprite( radius*2, radius*2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
 
-	light->XPos = radius;
-	light->YPos = radius;
+	light->Frame.x = radius;
+	light->Frame.y = radius;
 
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
 {
+	// TODO: turn this into one of our software "shaders"
 	Color sum;
 	unsigned int count = ratio*ratio;
 	unsigned int r=0, g=0, b=0, a=0;
@@ -335,135 +335,87 @@ Color Video::SpriteGetPixelSum(const Sprite2D* sprite, unsigned short xbase, uns
 	return sum;
 }
 
-//Viewport specific
-Region Video::GetViewport() const
+Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
 {
-	return Viewport;
-}
-
-void Video::SetMovieFont(Font *stfont, Palette *pal)
-{
-	subtitlefont = stfont;
-	subtitlepal = pal;
-}
-
-void Video::SetViewport(int x, int y, unsigned int w, unsigned int h)
-{
-	if (x>width)
-		x=width;
-	xCorr = x;
-	if (y>height)
-		y=height;
-	yCorr = y;
-	if (w>(unsigned int) width)
-		w=0;
-	Viewport.w = w;
-	if (h>(unsigned int) height)
-		h=0;
-	Viewport.h = h;
-}
-
-void Video::MoveViewportTo(int x, int y)
-{
-	if (x != Viewport.x || y != Viewport.y) {
-		core->GetAudioDrv()->UpdateListenerPos( (x - xCorr) + width / 2, (y - yCorr)
-+ height / 2 );
-		Viewport.x = x;
-		Viewport.y = y;
+	Color outC = inCol;
+	if (flags & BLIT_HALFTRANS) {
+		// set exactly to 128 because it is an optimized value
+		// if we end up needing to do half of something already transparent we can change this
+		// or do the calculations before calling the video driver and dont pass BLIT_HALFTRANS
+		outC.a = 128;
 	}
-}
 
-void Video::InitSpriteCover(SpriteCover* sc, int flags)
-{
-	int i;
-	sc->flags = flags;
-	sc->pixels = new unsigned char[sc->Width * sc->Height];
-	for (i = 0; i < sc->Width*sc->Height; ++i)
-		sc->pixels[i] = 0;
-	
-}
+	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_COLOR_MOD?
+	// if so we should do that here instead of in the implementations
 
-// flags: 0 - never dither (full cover)
-//	1 - dither if polygon wants it
-//	2 - always dither
-void Video::AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly)
-{
-	
-	// possible TODO: change the cover to use a set of intervals per line?
-	// advantages: faster
-	// disadvantages: makes the blitter much more complex
-	
-	int xoff = sc->worldx - sc->XPos;
-	int yoff = sc->worldy - sc->YPos;
-	
-	std::list<Trapezoid>::iterator iter;
-	for (iter = poly->trapezoids.begin(); iter != poly->trapezoids.end();
-		 ++iter)
-	{
-		int y_top = iter->y1 - yoff; // inclusive
-		int y_bot = iter->y2 - yoff; // exclusive
-		
-		if (y_top < 0) y_top = 0;
-		if ( y_bot > sc->Height) y_bot = sc->Height;
-		if (y_top >= y_bot) continue; // clipped
-		
-		int ledge = iter->left_edge;
-		int redge = iter->right_edge;
-		Point& a = poly->points[ledge];
-		Point& b = poly->points[(ledge+1)%(poly->count)];
-		Point& c = poly->points[redge];
-		Point& d = poly->points[(redge+1)%(poly->count)];
-		
-		unsigned char* line = sc->pixels + (y_top)*sc->Width;
-		for (int sy = y_top; sy < y_bot; ++sy) {
-			int py = sy + yoff;
-			
-			// TODO: maybe use a 'real' line drawing algorithm to
-			// compute these values faster.
-			
-			int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
-			int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
-			
-			lt -= xoff;
-			rt -= xoff;
-			
-			if (lt < 0) lt = 0;
-			if (rt > sc->Width) rt = sc->Width;
-			if (lt >= rt) { line += sc->Width; continue; } // clipped
-			int dither;
-			
-			if (sc->flags == 1) {
-				dither = poly->wall_flag & WF_DITHER;
-			} else {
-				dither = sc->flags;
-			}
-			if (dither) {
-				unsigned char* pix = line + lt;
-				unsigned char* end = line + rt;
-				
-				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
-				for (; pix < end; pix += 2)
-					*pix = 1;
-			} else {
-				// we hope memset is faster
-				// condition: lt < rt is true
-				memset (line+lt, 1, rt-lt);
-			}
-			line += sc->Width;
-		}
+	if (flags & BLIT_GREY) {
+		//static RGBBlendingPipeline<GREYSCALE, true> blender;
+	} else if (flags & BLIT_SEPIA) {
+		//static RGBBlendingPipeline<SEPIA, true> blender;
 	}
+
+	if (flags & BLIT_COLOR_MOD) {
+		flags |= BLIT_MULTIPLY;
+	}
+
+	// clear handled flags
+	flags &= ~(BLIT_HALFTRANS|BLIT_GREY|BLIT_SEPIA|BLIT_COLOR_MOD);
+	return outC;
 }
 
-void Video::DestroySpriteCover(SpriteCover* sc)
+void Video::DrawRect(const Region& rgn, const Color& color, bool fill, uint32_t flags)
 {
-	delete[] sc->pixels;
-	sc->pixels = NULL;
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawRectImp(rgn, c, fill, flags);
 }
 
-void Video::GetMousePos(int &x, int &y)
+void Video::DrawPoint(const Point& p, const Color& color, uint32_t flags)
 {
-	x = CursorPos.x;
-	y = CursorPos.y;
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPointImp(p, c, flags);
+}
+
+void Video::DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPointsImp(points, c, flags);
+}
+
+void Video::DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawCircleImp(origin, r, c, flags);
+}
+
+void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
+								double anglefrom, double angleto, bool drawlines, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, anglefrom, angleto, drawlines, flags);
+}
+
+void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawEllipseImp(origin, xr, yr, c, flags);
+}
+
+void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawPolygonImp(poly, origin, c, fill, flags);
+}
+
+void Video::DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawLineImp(p1, p2, c, flags);
+}
+
+void Video::DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags)
+{
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawLinesImp(points, c, flags);
 }
 
 }

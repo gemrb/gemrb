@@ -25,16 +25,12 @@
 #include "PluginMgr.h"
 #include "TileSetMgr.h"
 
+#include <cmath>
+#include <iterator>
+
 #include "System/swab.h"
 
 using namespace GemRB;
-
-struct wed_polygon {
-	ieDword FirstVertex;
-	ieDword CountVertex;
-	ieWord Flags; // two bytes in the original: type and height with height currently unused
-	ieWord MinX, MaxX, MinY, MaxY;
-};
 
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
 #define WED_POLYGON_SIZE  0x12
@@ -89,12 +85,13 @@ bool WEDImporter::Open(DataStream* stream)
 	//Reading the Secondary Header
 	str->Seek( SecHeaderOffset, GEM_STREAM_START );
 	str->ReadDword( &WallPolygonsCount );
-	DoorPolygonsCount = 0;
 	str->ReadDword( &PolygonsOffset );
 	str->ReadDword( &VerticesOffset );
 	str->ReadDword( &WallGroupsOffset );
-	str->ReadDword( &PILTOffset );
+	str->ReadDword( &PLTOffset );
 	ExtendedNight = false;
+
+	ReadWallPolygons();
 	return true;
 }
 
@@ -148,7 +145,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 				GEM_STREAM_START );
 			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
 			str->Read( indices, count * sizeof(ieWord) );
-			if( DataStream::IsEndianSwitch()) {
+			if( DataStream::BigEndian()) {
 				swabs(indices, count * sizeof(ieWord));
 			}
 			Tile* tile;
@@ -229,16 +226,18 @@ void WEDImporter::GetDoorPolygonCount(ieWord count, ieDword offset)
 	}
 }
 
-void WEDImporter::SetupClosedDoor(unsigned int &index, unsigned int &count) const
+WallPolygonGroup WEDImporter::ClosedDoorPolygons() const
 {
-	index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
-	count = ClosedPolyCount;
+	size_t index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	size_t count = ClosedPolyCount;
+	return MakeGroupFromTableEntries(index, count);
 }
 
-void WEDImporter::SetupOpenDoor(unsigned int &index, unsigned int &count) const
+WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 {
-	index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
-	count = OpenPolyCount;
+	size_t index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	size_t count = OpenPolyCount;
+	return MakeGroupFromTableEntries(index, count);
 }
 
 ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
@@ -268,14 +267,11 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	str->ReadDword( &OpenPolyOffset );
 	str->ReadDword( &ClosedPolyOffset );
 
-	GetDoorPolygonCount(OpenPolyCount, OpenPolyOffset);
-	GetDoorPolygonCount(ClosedPolyCount, ClosedPolyOffset);
-
 	//Reading Door Tile Cells
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
 	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
 	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
-	if( DataStream::IsEndianSwitch()) {
+	if( DataStream::BigEndian()) {
 		swabs(DoorTiles, DoorTileCount * sizeof(ieWord));
 	}
 	*count = DoorTileCount;
@@ -283,12 +279,32 @@ ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	return DoorTiles;
 }
 
-Wall_Polygon **WEDImporter::GetWallGroups() const
+void WEDImporter::ReadWallPolygons()
 {
+	for (ieDword i = 0; i < DoorsCount; i++) {
+		constexpr uint8_t doorSize = 0x1A;
+		constexpr uint8_t polyOffset = 14;
+		str->Seek( DoorsOffset + polyOffset + ( i * doorSize ), GEM_STREAM_START );
+
+		str->ReadWord( &OpenPolyCount );
+		str->ReadWord( &ClosedPolyCount );
+		str->ReadDword( &OpenPolyOffset );
+		str->ReadDword( &ClosedPolyOffset );
+
+		GetDoorPolygonCount(OpenPolyCount, OpenPolyOffset);
+		GetDoorPolygonCount(ClosedPolyCount, ClosedPolyOffset);
+	}
+
 	ieDword polygonCount = WallPolygonsCount+DoorPolygonsCount;
 
-	Wall_Polygon **Polygons = (Wall_Polygon **) calloc( polygonCount, sizeof(Wall_Polygon *) );
+	struct wed_polygon {
+		ieDword FirstVertex;
+		ieDword CountVertex;
+		ieWord Flags; // two bytes in the original: type and height with height currently unused
+		ieWord MinX, MaxX, MinY, MaxY;
+	};
 
+	polygonTable.resize(polygonCount);
 	wed_polygon *PolygonHeaders = new wed_polygon[polygonCount];
 
 	str->Seek (PolygonsOffset, GEM_STREAM_START);
@@ -326,7 +342,7 @@ Wall_Polygon **WEDImporter::GetWallGroups() const
 		}
 		Point *points = new Point[count];
 		str->Read (points, count * sizeof (Point) );
-		if( DataStream::IsEndianSwitch()) {
+		if( DataStream::BigEndian()) {
 			swabs(points, count * sizeof (Point));
 		}
 
@@ -342,18 +358,68 @@ Wall_Polygon **WEDImporter::GetWallGroups() const
 		rgn.y = PolygonHeaders[i].MinY;
 		rgn.w = PolygonHeaders[i].MaxX - PolygonHeaders[i].MinX;
 		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
-		Polygons[i] = new Wall_Polygon(points, count, &rgn);
-		delete [] points;
-		if (flags&WF_BASELINE) {
-			Polygons[i]->SetBaseline(base0, base1);
+		
+		if (!rgn.Dimensions().IsEmpty()) { // PST AR0600 is known to have a polygon with 0 height
+			polygonTable[i] = std::make_shared<Wall_Polygon>(points, count, &rgn);
+			if (flags&WF_BASELINE) {
+				polygonTable[i]->SetBaseline(base0, base1);
+			}
+			if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+				flags |= WF_COVERANIMS;
+			}
+			polygonTable[i]->SetPolygonFlag(flags);
 		}
-		Polygons[i]->SetPolygonFlag(flags);
+		
+		delete [] points;
 	}
 	delete [] PolygonHeaders;
-
-	return Polygons;
 }
 
+WallPolygonGroup WEDImporter::MakeGroupFromTableEntries(size_t idx, size_t cnt) const
+{
+	auto begin = polygonTable.begin() + idx;
+	auto end = begin + cnt;
+	WallPolygonGroup grp;
+	std::copy_if(begin, end, std::back_inserter(grp), [](const std::shared_ptr<Wall_Polygon>& wp) {
+		return wp != nullptr;
+	});
+	return grp;
+}
+
+std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
+{
+	str->Seek (PLTOffset, GEM_STREAM_START);
+	size_t PLTSize = (VerticesOffset - PLTOffset) / 2;
+	std::vector<ieWord> PLT(PLTSize);
+
+	for (ieWord& idx : PLT) {
+		str->ReadWord (&idx);
+	}
+
+	size_t groupSize = ceilf(overlays[0].Width/10.0f) * ceilf(overlays[0].Height/7.5f);
+	std::vector<WallPolygonGroup> polygonGroups;
+	polygonGroups.reserve(groupSize);
+
+	str->Seek (WallGroupsOffset, GEM_STREAM_START);
+	for (size_t i = 0; i < groupSize; ++i) {
+		ieWord index, count;
+		str->ReadWord (&index);
+		str->ReadWord (&count);
+
+		polygonGroups.emplace_back(WallPolygonGroup());
+		WallPolygonGroup& group = polygonGroups.back();
+
+		for (ieWord i = index; i < index + count; ++i) {
+			ieWord polyIndex = PLT[i];
+			auto wp = polygonTable[polyIndex];
+			if (wp) {
+				group.push_back(wp);
+			}
+		}
+	}
+
+	return polygonGroups;
+}
 
 #include "plugindef.h"
 

@@ -28,22 +28,9 @@
 #define TEXTEDIT_H
 
 #include "GUI/Control.h"
-#include "GUI/TextSystem/Font.h"
-
-#include "RGBAColor.h"
-#include "exports.h"
+#include "GUI/TextSystem/TextContainer.h"
 
 namespace GemRB {
-
-class Palette;
-
-// !!! Keep these synchronized with GUIDefines.py
-#define IE_GUI_EDIT_ON_CHANGE      0x03000000
-#define IE_GUI_EDIT_ON_DONE        0x03000001
-#define IE_GUI_EDIT_ON_CANCEL      0x03000002
-
-//this is stored in 'Value' of Control class
-#define IE_GUI_EDIT_NUMBER         1
 
 /**
  * @class TextEdit
@@ -51,60 +38,58 @@ class Palette;
  */
 
 class GEM_EXPORT TextEdit : public Control {
+private:
+	TextContainer textContainer;
+
+	/** Max Edit Text Length */
+	size_t max;
+
+private:
+	void TextChanged(TextContainer& tc);
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+
 protected:
-	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	// TextContainer can respond to keys by itself, but we want to interpose so we can capture return/esc
+	// we simply forward all other key presses. For this to work textContainer needs View::IgnoreEvents set
+	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
+
+	// this forwards to textContainer. only needed because we set View::IgnoreEvents on textContainer in order to interpose key events
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
 public:
-	TextEdit(const Region& frame, unsigned short maxLength, unsigned short x, unsigned short y);
-	~TextEdit(void);
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action Change = Control::ValueChange; // text change event (keyboard, etc)
+		static const Control::Action Done = ACTION_CUSTOM(0);
+		static const Control::Action Cancel = ACTION_CUSTOM(1); // FIXME: unused, how do we cancel?
+	};
 
-	bool IsOpaque() const { return true; } // FIXME: hack for PST map notes... no matter, this will be fixed once the subviews branch is merged
-	/** Set Font */
+	enum TextEditFlags {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		Alpha = 1,		// TextEdit accepts alpha input
+		Numeric = 2 	// TextEdit accepts numeric input
+	};
+
+	TextEdit(const Region& frame, unsigned short maxLength, Point p);
+	~TextEdit() override;
+
+	// these all forward to the underlying TextContainer
 	void SetFont(Font* f);
-	Font *GetFont();
-	/** Set Cursor */
-	void SetCursor(Sprite2D* cur);
-	/** Set BackGround */
-	void SetBackGround(Sprite2D* back);
+
 	/** Sets the Text of the current control */
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Gets the Text of the current control */
-	String QueryText() const;
+	String QueryText() const override;
 	/** Sets the buffer length */
-	void SetBufferLength(ieWord buflen);
+	void SetBufferLength(size_t buflen);
 	/** Sets the alignment */
 	void SetAlignment(unsigned char Alignment);
-private:
-	/** Text Editing Cursor Sprite */
-	Sprite2D* Cursor;
-	/** Text Font */
-	Font* font;
-	unsigned char Alignment;
-	/** Background */
-	Sprite2D* Back;
-	/** Max Edit Text Length */
-	unsigned short max;
-	/** Client area position */
-	unsigned short FontPosX, FontPosY;
-	/** Text Buffer */
-	String Text;
-	/** Cursor Position */
-	unsigned short CurPos;
-	/** Color Palette */
-	Palette* palette;
-public: //Events
-	/** Key Press Event */
-	bool OnKeyPress(unsigned char Key, unsigned short Mod);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	void SetFocus(bool focus);
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler EditOnChange;
-	ControlEventHandler EditOnDone;
-	ControlEventHandler EditOnCancel;
+
+	void DidFocus() override { textContainer.DidFocus(); }
+	void DidUnFocus() override { textContainer.DidUnFocus(); }
 };
 
 }

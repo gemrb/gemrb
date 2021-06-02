@@ -30,6 +30,8 @@
 #include "gstmvedemux.h"
 #include "mve.h"
 
+#include "Interface.h"
+
 /* mvevideodec8.cpp */
 extern int ipvideo_decode_frame8 (const GstMveDemuxStream * s,
 	const unsigned char *data, unsigned short len);
@@ -62,10 +64,9 @@ MVEPlayer::MVEPlayer(class MVEPlay *file) {
 
 	audio_stream = -1;
 
-	playsound = true;
+	playsound = core->GetAudioDrv()->CanPlay();
 
 	buffersize = chunk_size = chunk_offset = timer_last_usec = 0;
-	outputwidth = outputheight = video_width = video_height = 0;
 	audio_num_channels = audio_sample_rate = audio_sample_size = 0;
 	truecolour = video_rendered_frame = audio_compressed = false;
 }
@@ -89,15 +90,6 @@ MVEPlayer::~MVEPlayer() {
 /*
  * high-level movie playback
  */
-
-void MVEPlayer::video_init(unsigned int w, unsigned int h) {
-	outputwidth = w;
-	outputheight = h;
-}
-
-void MVEPlayer::sound_init(bool play) {
-	playsound = play;
-}
 
 bool MVEPlayer::start_playback() {
 	if (!verify_header()) return false;
@@ -298,6 +290,7 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 	unsigned short temp = 0;
 	if (version > 1) temp = GST_READ_UINT16_LE(buffer + 6);
 	truecolour = !!temp;
+	host->movieFormat = (truecolour) ? Video::RGB555 : Video::RGBPAL8;
 
 	// some files have multiple initialisations
 	if (video_data) {
@@ -320,8 +313,9 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 }
 
 void MVEPlayer::segment_video_mode() {
-	video_width = GST_READ_UINT16_LE(buffer);
-	video_height = GST_READ_UINT16_LE(buffer + 2);
+	host->movieSize.w = GST_READ_UINT16_LE(buffer);
+	host->movieSize.h = GST_READ_UINT16_LE(buffer + 2);
+
 	unsigned short flags = GST_READ_UINT16_LE(buffer + 4);
 	(void)flags; /* unknown/unused */
 }
@@ -401,9 +395,7 @@ void MVEPlayer::segment_video_play() {
 		video_frameskip--;
 		video_skippedframes++;
 	} else {
-		unsigned int dest_x = (outputwidth - video_data->width) >> 1;
-		unsigned int dest_y = (outputheight - video_data->height) >> 1;
-		host->showFrame( (guint8 *) video_data->back_buf1, video_data->width, video_data->height, 0, 0, video_data->width, video_data->height, dest_x, dest_y);
+		host->showFrame( (guint8 *) video_data->back_buf1, video_data->width, video_data->height);
 	}
 
 	video_rendered_frame = true;

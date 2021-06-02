@@ -2581,7 +2581,7 @@ int GameScript::OpenState(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
 	if (!tar) {
-		if (InDebug&ID_TRIGGERS) {
+		if (core->InDebugMode(ID_TRIGGERS)) {
 			Log(ERROR, "GameScript", "Couldn't find door/container:%s",
 				parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
 			print("Sender: %s", Sender->GetScriptName());
@@ -3700,7 +3700,7 @@ int GameScript::PCInStore( Scriptable */*Sender*/, const Trigger */*parameters*/
 //behaviour?
 int GameScript::OnScreen( Scriptable *Sender, const Trigger */*parameters*/)
 {
-	Region vp = core->GetVideoDriver()->GetViewport();
+	Region vp = core->GetGameControl()->Viewport();
 	if (vp.PointInside(Sender->Pos) ) {
 		return 1;
 	}
@@ -3723,7 +3723,7 @@ int GameScript::IsPlayerNumber( Scriptable *Sender, const Trigger *parameters)
 int GameScript::PCCanSeePoint( Scriptable */*Sender*/, const Trigger *parameters)
 {
 	const Map *map = core->GetGame()->GetCurrentArea();
-	if (map->IsVisible(parameters->pointParameter, false) ) {
+	if (map->IsVisible(parameters->pointParameter) ) {
 		return 1;
 	}
 	return 0;
@@ -4273,7 +4273,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::IsTouchGUI(Scriptable */*Sender*/, const Trigger */*parameters*/)
 {
-	return core->GetVideoDriver()->TouchInputEnabled();
+	return EventMgr::TouchInputEnabled;
 }
 
 // always evaluates to true on Windows/OS X/Linux (there's no DLC); on other platforms it depends

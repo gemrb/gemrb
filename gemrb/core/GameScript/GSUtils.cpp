@@ -42,7 +42,6 @@
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
 #include "RNG.h"
@@ -81,7 +80,6 @@ bool HasKaputz = false;
 ieResRef *ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
-int InDebug = 0;
 int RandomNumValue;
 // reaction modifiers (by reputation and charisma)
 #define MAX_REP_COLUMN 20
@@ -186,23 +184,7 @@ int GetHPPercent(const Scriptable *Sender)
 
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 {
-	switch (opcode) {
-		case OP_AND:
-			value1 &= value2;
-			break;
-		case OP_OR:
-			value1 |= value2;
-			break;
-		case OP_XOR:
-			value1 ^= value2;
-			break;
-		case OP_NAND: //this is a GemRB extension
-			value1 &= ~value2;
-			break;
-		case OP_SET: //this is a GemRB extension
-			value1 = value2;
-			break;
-	}
+	SetBits(value1, value2, opcode);
 }
 
 // SPIT is not in the original engine spec, it is reserved for the
@@ -314,37 +296,34 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 	return true;
 }
 
-//don't pass this point by reference, it is subject to change
-void ClickCore(Scriptable *Sender, Point point, int type, int speed)
+void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 {
+	Point mp = me.Pos();
 	Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Point p=map->TMap->GetMapSize();
-	if (!p.PointInside(point)) {
+	Size size = map->TMap->GetMapSize();
+	Region r(Point(), size);
+	if (!r.PointInside(mp)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Video *video = core->GetVideoDriver();
-	GlobalTimer *timer = core->timer;
-	timer->SetMoveViewPort( point.x, point.y, speed, true );
-	timer->DoStep(0);
-	if (timer->ViewportIsMoving()) {
+	GlobalTimer& timer = core->timer;
+	timer.SetMoveViewPort( mp, speed, true );
+	timer.DoStep(0);
+	if (timer.ViewportIsMoving()) {
 		Sender->AddActionInFront( Sender->GetCurrentAction() );
 		Sender->SetWait(1);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
-	video->ConvertToScreen(point.x, point.y);
-	GameControl *win = core->GetGameControl();
+	GameControl* gc = core->GetGameControl();
+	gc->MouseDown(me, 0);
+	gc->MouseUp(me, 0);
 
-	point.x+=win->XPos;
-	point.y+=win->YPos;
-	video->MoveMouse(point.x, point.y);
-	video->ClickMouse(type);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -450,7 +429,7 @@ static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieR
 void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 {
 	//no one hears you when you are in the Limbo!
-	if (!Sender->GetCurrentArea()) {
+	if (!Sender || !Sender->GetCurrentArea()) {
 		return;
 	}
 
@@ -611,7 +590,7 @@ int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlos)
 	if (! parameters->int0Parameter) {
 		flags |= GA_NO_HIDDEN;
 	}
-	
+
 	//both are actors
 	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
@@ -768,7 +747,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		//creates creature just off the screen
 		case CC_OFFSCREEN:
 			{
-			Region vp = core->GetVideoDriver()->GetViewport();
+			Region vp = core->GetGameControl()->Viewport();
 			radius=vp.w/2;
 			//center of screen
 			pnt.x = vp.x+radius;
@@ -855,8 +834,7 @@ void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const cha
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
-		vvc->XPos +=position.x;
-		vvc->YPos +=position.y;
+		vvc->Pos = position;
 		Map *area = Sender->GetCurrentArea();
 		if (area) {
 			area->AddVVCell(new VEFObject(vvc));
@@ -2126,7 +2104,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( VarName, value, NoCreate);
-		} else if (InDebug & ID_VARIABLES) {
+		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
 				Context, VarName);
 		}
@@ -2166,7 +2144,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
-		} else if (InDebug & ID_VARIABLES) {
+		} else if (core->InDebugMode(ID_VARIABLES)) {
 			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
 				VarName);
 		}

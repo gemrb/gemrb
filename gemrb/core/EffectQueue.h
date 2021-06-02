@@ -33,6 +33,9 @@
 #include "Effect.h"
 #include "Region.h"
 
+#include "System/Logging.h"
+#include "System/StringBuffer.h"
+
 #include <cstdlib>
 #include <list>
 
@@ -147,13 +150,42 @@ struct EffectRef {
 };
 
 /** Links Effect name to a function implementing the effect */
-struct EffectDesc {
-	const char* Name;
+class EffectDesc {
 	EffectFunction Function;
-	int Flags;
-	int opcode;
-};
 
+public:
+	const char* Name; // FIXME: shouldn't we presume ownership of the name? original implementation didn't
+	int Flags;
+	
+	union {
+		int opcode;
+		int Strref;
+	};
+	
+	EffectDesc() {
+		Function = NULL;
+		Name = NULL;
+		Flags = 0;
+		opcode = -1;
+	}
+	
+	EffectDesc(const char* name, EffectFunction fn, int flags, int data) {
+		Function = fn;
+		Name = name;
+		Flags = flags;
+		opcode = data;
+	}
+	
+	operator bool() const {
+		return Function != NULL;
+	}
+	
+	int operator()(Scriptable* s, Actor* a, Effect* fx) const {
+		return Function(s, a, fx);
+	}
+
+};
+	
 enum EffectFlags {
 	EFFECT_NORMAL = 0,
 	EFFECT_DICED = 1,

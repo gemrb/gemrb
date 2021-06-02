@@ -24,14 +24,12 @@
 
 #include "Audio.h"
 #include "Palette.h"
-#include "SpriteCover.h"
 
 namespace GemRB {
 
 class Animation;
 class AnimationFactory;
 class DataStream;
-class Map;
 class Sprite2D;
 
 //scripted animation flags 
@@ -55,7 +53,7 @@ class Sprite2D;
 // start of Colour flags on iesdp (though same field in original bg2)
 // 0x10000 Not light source
 // 0x20000 Light source
-#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
+#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)
 // 0x40000 Internal brightness
 #define IE_VVC_GREYSCALE	0x00080000   //timestopped palette
 #define IE_VVC_DARKEN       0x00100000   // unused
@@ -80,6 +78,7 @@ class Sprite2D;
 //#define IE_VVC_UNUSED           0xe0000000U
 //gemrb specific sequence flags
 #define IE_VVC_FREEZE     0x80000000
+#define IE_VVC_STATIC     0x40000000 // position doesnt update with actor movement
 
 //orientation flags
 #define IE_VVC_FACE_TARGET		0x00000001
@@ -106,18 +105,17 @@ public:
 	//set to 5, 9, 16
 	Animation* anims[3*MAX_ORIENT];
 	//there is only one palette
-	Palette *palette;
+	Holder<Palette> palette;
 	ieResRef sounds[3];
-	ieResRef PaletteName;
-	Color Tint;
+	Color Tint = ColorWhite;
 	int Fade;
 	ieDword Transparency;
 	ieDword SequenceFlags;
 	int Dither;
-	//these are signed
-	int XPos, YPos, ZPos;
+	Point Pos; // position of the effect in game coordinates
+	int XOffset, YOffset, ZOffset; // orientation relative to Pos
 	ieDword LightX, LightY, LightZ;
-	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
+	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	ieDword FrameRate;
 	ieDword NumOrientations;
 	ieDword Orientation;
@@ -128,7 +126,6 @@ public:
 	ieResRef ResName;
 	int Phase;
 	int SoundPhase;
-	SpriteCover* cover;
 	ScriptedAnimation *twin;
 	bool active;
 	bool effect_owned;
@@ -136,7 +133,9 @@ public:
 	unsigned long starttime;
 public:
 	//draws the next frame of the videocell
-	bool Draw(const Region &screen, const Point &Pos, const Color &tint, Map *area, int dither, int orientation, int height);
+	bool UpdateDrawingState(int orientation);
+	void Draw(const Region &vp, Color tint, int height, uint32_t flags) const;
+	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
@@ -149,10 +148,6 @@ public:
 	void SetFullPalette(const ieResRef PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
-	//sets spritecover
-	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
-	/* get stored SpriteCover */
-	SpriteCover* GetSpriteCover() const { return cover; }
 	int GetCurrentFrame() const;
 	ieDword GetSequenceDuration(ieDword multiplier) const;
 	/* sets up a delay in the beginning of the vvc */
@@ -173,14 +168,13 @@ public:
 	ScriptedAnimation *DetachTwin();
 private:
 	Animation *PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop = false);
-	void PreparePalette();
-	bool HandlePhase(Sprite2D *&frame);
+	bool UpdatePhase();
 	void GetPaletteCopy();
 	void IncrementPhase();
 	/* stops any sound playing */
 	void StopSound();
 	/* updates the sound playing */
-	void UpdateSound(const Point &pos);
+	void UpdateSound();
 };
 
 }

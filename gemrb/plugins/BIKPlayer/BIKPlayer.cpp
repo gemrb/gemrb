@@ -38,6 +38,7 @@
 #include "ie_types.h"
 
 #include "Audio.h"
+#include "Interface.h"
 #include "Variables.h"
 #include "Video.h"
 
@@ -45,10 +46,6 @@
 #include <cstdio>
 
 using namespace GemRB;
-
-static int g_truecolor;
-static ieDword *cbAtFrame = NULL;
-static ieDword *strRef = NULL;
 
 static const int ff_wma_critical_freqs[25] = {
 	100,   200,  300, 400,   510,  630,  770,    920,
@@ -59,11 +56,9 @@ static const int ff_wma_critical_freqs[25] = {
 
 BIKPlayer::BIKPlayer(void)
 {
-	video = core->GetVideoDriver();
+	movieFormat = Video::YV12;
 	inbuff = NULL;
-	maxRow = 0;
-	rowCount = 0;
-	frameCount = 0;
+
 	//force initialisation of static tables
 	memset(bink_trees, 0, sizeof(bink_trees));
 	memset(table, 0, sizeof(table));
@@ -72,21 +67,20 @@ BIKPlayer::BIKPlayer(void)
 	memset(&c_scantable, 0, sizeof(c_scantable));
 	memset(&c_bundle, 0, sizeof(c_bundle));
 	memset(&c_col_high, 0, sizeof(c_col_high));
-	memset(&c_pic, 0, sizeof(c_pic));
-	memset(&c_last, 0, sizeof(c_last));
 	memset(&header, 0, sizeof(header));
 	memset(s_coeffs_ptr, 0, sizeof(s_coeffs_ptr));
 	timer_last_sec = timer_last_usec = frame_wait = c_col_lastval = 0;
-	outputwidth = outputheight = video_frameskip = video_skippedframes = 0;
+	video_frameskip = video_skippedframes = 0;
 	s_frame_len = s_overlap_len = s_num_bands = s_block_size = 0;
-	video_rendered_frame = done = validVideo = s_audio = false;
+	video_rendered_frame = validVideo = s_audio = false;
 	s_channels = s_first = s_stream = s_root = 0;
 	s_bands = NULL;
+	c_pic = c_last = NULL;
 }
 
 BIKPlayer::~BIKPlayer(void)
 {
-	av_freep((void **) &inbuff);
+	Stop();
 }
 
 void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
@@ -197,45 +191,58 @@ int BIKPlayer::ReadHeader()
 	}
 
 	str->Seek(4, GEM_CURRENT_POS);
+	
 	return 0;
 }
 
 bool BIKPlayer::Open(DataStream* stream)
 {
-	validVideo = false;
 	str = stream;
-
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
+
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
-		validVideo = ReadHeader()==0;
-		return validVideo;
+		validVideo = ReadHeader() == 0;
+		if (validVideo) {
+			movieSize.w = header.width;
+			movieSize.h = header.height;
+			framePos = 0;
+			sound_init( core->GetAudioDrv()->CanPlay());
+			return video_init() == 0;
+		}
 	}
 	return false;
 }
 
-void BIKPlayer::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
-{
-	maxRow = cnt;
-	frameCount = 0;
-	rowCount = 0;
-	cbAtFrame = arg;
-	strRef = arg2;
-}
-
-int BIKPlayer::Play()
+bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 {
 	if (!validVideo) {
-		return 0;
+		return false;
 	}
-	//Start Movie Playback
-	frameCount = 0;
-	int ret = doPlay( );
 
-	if (s_stream > -1)
-		EndAudio();
-	EndVideo();
-	av_freep((void **) &inbuff);
-	return ret;
+	if (timer_last_sec) {
+		timer_wait();
+	}
+	if(framePos >= header.framecount) {
+		return false;
+	}
+	binkframe frame = frames[framePos++];
+	str->Seek(frame.pos, GEM_STREAM_START);
+	ieDword audframesize;
+	str->ReadDword(&audframesize);
+	frame.size = str->Read( inbuff, frame.size - 4 );
+	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
+		//buggy frame, we stop immediately
+		//return false;
+	}
+	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize, buf)) {
+		//buggy frame, we stop immediately
+		return false;
+	}
+	if (!timer_last_sec) {
+		timer_start();
+	}
+
+	return true;
 }
 
 //this code could be in the movieplayer parent class
@@ -278,87 +285,20 @@ void BIKPlayer::timer_wait()
 	timer_start();
 }
 
-bool BIKPlayer::next_frame()
+void BIKPlayer::Stop()
 {
-	if (timer_last_sec) {
-		timer_wait();
-	}
-	if(frameCount>=header.framecount) {
-		return false;
-	}
-	binkframe frame = frames[frameCount++];
-	str->Seek(frame.pos, GEM_STREAM_START);
-	ieDword audframesize;
-	str->ReadDword(&audframesize);
-	frame.size = str->Read( inbuff, frame.size - 4 );
-	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
-		//buggy frame, we stop immediately
-		//return false;
-	}
-	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize)) {
-		//buggy frame, we stop immediately
-		return false;
-	}
-	if (!timer_last_sec) {
-		timer_start();
-	}
-	return true;
-}
+	if (s_stream > -1)
+		EndAudio();
+	EndVideo();
+	av_freep((void **) &inbuff);
 
-int BIKPlayer::doPlay()
-{
-	int done = 0;
-
-	//bink is always truecolor
-	g_truecolor = 1;
-
-	frame_wait = 0;
-	timer_last_sec = 0;
-	video_frameskip = 0;
-
-	if (sound_init( core->GetAudioDrv()->CanPlay())) {
-		//sound couldn't be initialized
-		return 1;
-	}
-
-	//last parameter is to enable YUV overlay
-	outputwidth = (int) header.width;
-	outputheight= (int) header.height;
-	video->InitMovieScreen(outputwidth,outputheight, true);
-
-	if (video_init(outputwidth,outputheight)) {
-		return 2;
-	}
-
-	while (!done && next_frame()) {
-		done = video->PollMovieEvents();
-	}
-
-	video->DestroyMovieScreen();
-	return 0;
+	MoviePlayer::Stop();
 }
 
 unsigned int BIKPlayer::fileRead(unsigned int pos, void* buf, unsigned int count)
 {
 	str->Seek(pos, GEM_STREAM_START);
 	return str->Read( buf, count );
-}
-
-void BIKPlayer::showFrame(unsigned char** buf, unsigned int *strides, unsigned int bufw,
-	unsigned int bufh, unsigned int w, unsigned int h, unsigned int dstx, unsigned int dsty)
-{
-	ieDword titleref = 0;
-
-	if (cbAtFrame && strRef) {
-		if ((rowCount<maxRow) && (frameCount >= cbAtFrame[rowCount]) ) {
-			rowCount++;
-		}
-		//draw subtitle here
-		if (rowCount) {
-			titleref = strRef[rowCount-1];
-		}
-	}
-	video->showYUVFrame(buf,strides,bufw,bufh,w,h,dstx,dsty, titleref);
 }
 
 int BIKPlayer::setAudioStream()
@@ -494,7 +434,7 @@ void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
 	}
 }
 
-int BIKPlayer::video_init(int w, int h)
+int BIKPlayer::video_init()
 {
 	int bw, bh, blocks;
 	int i;
@@ -508,14 +448,13 @@ int BIKPlayer::video_init(int w, int h)
 				bink_tree_bits[i], 1, 1, INIT_VLC_LE);
 		}
 	}
-
-	memset(&c_pic,0, sizeof(AVFrame));
-	memset(&c_last,0, sizeof(AVFrame));
-
-	if (w<(signed) header.width || h<(signed) header.height) {
-		//movie dimensions are higher than available screen
-		return 1;
-	}
+	
+	c_pic = &c_frames[0];
+	c_last = &c_frames[1];
+	
+	c_pic->get_buffer(header.width, header.height);
+	c_last->get_buffer(header.width, header.height);
+	
 
 	ff_init_scantable(&c_scantable, bink_scan);
 
@@ -527,7 +466,7 @@ int BIKPlayer::video_init(int w, int h)
 		c_bundle[i].data = (uint8_t *) av_malloc(blocks * 64);
 		//not enough memory
 		if(!c_bundle[i].data) {
-			return 2;
+			return 1;
 		}
 		c_bundle[i].data_end = c_bundle[i].data + blocks * 64;
 	}
@@ -546,42 +485,11 @@ int BIKPlayer::EndAudio()
 	return 0;
 }
 
-static inline void release_buffer(AVFrame *p)
-{
-	int i;
-
-	for(i=0;i<3;i++) {
-		av_freep((void **) &p->data[i]);
-	}
-}
-
-static inline void ff_fill_linesize(AVFrame *picture, int width)
-{
-	memset(picture->linesize, 0, sizeof(picture->linesize));
-	int w2 = (width + (1 << 1) - 1) >> 1;
-	picture->linesize[0] = width;
-	picture->linesize[1] = w2;
-	picture->linesize[2] = w2;
-}
-
-static inline void get_buffer(AVFrame *p, int width, int height)
-{
-	ff_fill_linesize(p, width);
-	for(int plane=0;plane<3;plane++) {
-		p->data[plane] = (uint8_t *) av_malloc(p->linesize[plane]*height);
-	}
-}
-
 int BIKPlayer::EndVideo()
 {
-	int i;
-
-	release_buffer(&c_pic);
-	release_buffer(&c_last);
-	for (i = 0; i < BINK_NB_SRC; i++) {
+	for (int i = 0; i < BINK_NB_SRC; i++) {
 		av_freep((void **) &c_bundle[i].data);
 	}
-	video->DrawMovieSubtitle(0);
 	return 0;
 }
 static const uint8_t rle_length_tab[16] = {
@@ -733,6 +641,8 @@ void BIKPlayer::DecodeBlock(short *out)
 //audio samples
 int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
 {
+	if (data_size == 0) return 0;
+	
 	int bits = data_size*8;
 	s_gb.init_get_bits((uint8_t *) data, bits);
 
@@ -790,7 +700,8 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 	mode_list[list_end++] = ( 3 << 2) | 3;
 
 	bits = v_gb.get_bits(4) - 1;
-	for (mask = 1 << bits; bits >= 0; mask >>= 1, bits--) {
+	while (bits >= 0) {
+		mask = 1 << bits;
 		list_pos = list_start;
 		while (list_pos < list_end) {
 			if (!mode_list[list_pos] || !v_gb.get_bits(1)) {
@@ -846,6 +757,7 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 				break;
 			}
 		}
+		bits--;
 	}
 
 	quant_idx = v_gb.get_bits(4);
@@ -1375,7 +1287,7 @@ static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 	add_pixels_nonclamped(block, dest, line_size);
 }
 
-int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
+int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 {
 	int blk, bw, bh;
 	int i, j, plane, bx, by;
@@ -1392,10 +1304,9 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 	//this is compatible only with the BIKi version
 	v_gb.skip_bits(32);
 
-	get_buffer(&c_pic, header.width, header.height);
 	//plane order is YUV
 	for (plane = 0; plane < 3; plane++) {
-		const int stride = c_pic.linesize[plane];
+		const int stride = c_pic->linesize[plane];
 
 		bw = plane ? (header.width  + 15) >> 4 : (header.width  + 7) >> 3;
 		bh = plane ? (header.height + 15) >> 4 : (header.height + 7) >> 3;
@@ -1429,12 +1340,8 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 			if (read_runs(&c_bundle[BINK_SRC_RUN]) < 0)
 				return -1;
 
-			//why is this here?
-			if (by == bh)
-				break;
-
-			dst = c_pic.data[plane] + 8*by*stride;
-			prev = c_last.data[plane] + 8*by*stride;
+			dst = c_pic->data[plane] + 8*by*stride;
+			prev = c_last->data[plane] + 8*by*stride;
 			for (bx = 0; bx < bw; bx++, dst += 8, prev += 8) {
 				blk = get_value(BINK_SRC_BLOCK_TYPES);
 				if ((by & 1) && (blk == SCALED_BLOCK) ) {
@@ -1604,15 +1511,17 @@ int BIKPlayer::DecodeVideoFrame(void *data, int data_size)
 		video_frameskip--;
 		video_skippedframes++;
 	} else {
-		unsigned int dest_x = (outputwidth - header.width) >> 1;
-		unsigned int dest_y = (outputheight - header.height) >> 1;
-		showFrame((ieByte **) c_pic.data, (unsigned int *) c_pic.linesize, header.width, header.height, header.width, header.height, dest_x, dest_y);
+		const Size& bufsize = buf.Size();
+		int dest_x = unsigned(bufsize.w - header.width) >> 1;
+		int dest_y = unsigned(bufsize.h - header.height) >> 1;
+
+		buf.CopyPixels(Region(dest_x, dest_y, header.width, header.height),
+					   c_pic->data[0], &c_pic->linesize[0], // Y
+					   c_pic->data[1], &c_pic->linesize[1], // U
+					   c_pic->data[2], &c_pic->linesize[2]);// V
 	}
 
-	//release the old frame even when frame is skipped
-	release_buffer(&c_last);
-	memcpy(&c_last, &c_pic, sizeof(AVFrame));
-	memset(&c_pic, 0, sizeof(AVFrame));
+	std::swap(c_pic, c_last);
 	return 0;
 }
 

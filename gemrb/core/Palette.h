@@ -23,8 +23,11 @@
 #include "RGBAColor.h"
 #include "exports.h"
 #include "ie_types.h"
+#include "Holder.h"
 
+#include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <cstring>
 
 namespace GemRB {
@@ -42,69 +45,53 @@ struct RGBModifier {
 	bool locked;
 };
 
+class Palette;
+using PaletteHolder = Holder<Palette>;
 
-class GEM_EXPORT Palette {
+class GEM_EXPORT Palette : public Held<Palette>
+{
 private:
-	~Palette() {}
+	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst);
+	void UpdateAlpha();
 public:
 	Palette(const Color &color, const Color &back);
 
-	Palette(const Color* colours, bool alpha_=false) {
-		for (int i = 0; i < 256; ++i) {
-			col[i] = colours[i];
-		}
-		alpha = alpha_;
-		refcount = 1;
-		named = false;
-		memset(&front, 0, sizeof(front));
-		memset(&back, 0, sizeof(back));
+	Palette(const Color* begin, const Color* end)
+	: Palette() {
+		std::copy(begin, end, col);
+		UpdateAlpha();
 	}
+
 	Palette() {
-		alpha = false;
-		refcount = 1;
 		named = false;
-		memset(&col, 0, sizeof(col));
-		memset(&front, 0, sizeof(front));
-		memset(&back, 0, sizeof(back));
+		version = 0;
 	}
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
-	bool alpha; //< true if this is a RGBA palette
 	bool named; //< true if the palette comes from a bmp and cached
-	Color front; // Original colors used by core->CreatePalette()
-	Color back;
 
-	void acquire() {
-		refcount++;
-	}
+	unsigned short GetVersion() const { return version; }
 
-	void release() {
-		assert(refcount > 0);
-		if (!--refcount)
-			delete this;
-	}
-
-	bool IsShared() const {
-		return (refcount > 1);
-	}
-
+	bool HasAlpha() const { return alpha; }
 	void CreateShadedAlphaChannel();
 	void Brighten();
-	void Darken();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
-	void SetupRGBModification(const Palette* src, const RGBModifier* mods,
+	void SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
 		unsigned int type);
-	void SetupGlobalRGBModification(const Palette* src,
+	void SetupGlobalRGBModification(const PaletteHolder src,
 		const RGBModifier& mod);
 
-	Palette* Copy();
+	PaletteHolder Copy() const;
 
+	void CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst);
 	bool operator==(const Palette&) const;
 	bool operator!=(const Palette&) const;
 private:
-	unsigned int refcount;
-
+	unsigned short version;
+	bool alpha = false; // true if any colors in the palette have an alpha < 255
+	// FIXME: version is not enough since `col` is public
+	// must make it private to fully capture changes to it
 };
 
 }

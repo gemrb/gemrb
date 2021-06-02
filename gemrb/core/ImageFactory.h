@@ -31,12 +31,11 @@ namespace GemRB {
 
 class GEM_EXPORT ImageFactory : public FactoryObject {
 private:
-	Sprite2D* bitmap;
+	Holder<Sprite2D> bitmap;
 public:
-	ImageFactory(const char* ResRef, Sprite2D* bitmap);
-	~ImageFactory(void);
+	ImageFactory(const char* ResRef, Holder<Sprite2D> bitmap);
 
-	Sprite2D* GetSprite2D() const;
+	Holder<Sprite2D> GetSprite2D() const { return bitmap; }
 };
 
 }

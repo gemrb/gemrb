@@ -20,6 +20,8 @@
 
 #include "DPadSoftKeyboard.h"
 
+using namespace GemRB;
+
 void DPadSoftKeyboard::StartInput()
 {
 	inputActive = true;
@@ -39,15 +41,16 @@ bool DPadSoftKeyboard::IsInputActive() const
 	return inputActive;
 }
 
-unsigned char DPadSoftKeyboard::GetCurrentKeyValue() const
+Event DPadSoftKeyboard::GetTextEvent() const
 {
-	unsigned char modKeyValue = dpadKeys[currentCharIndex];
+	char modKeyValue = dpadKeys[currentCharIndex];
 
 	if (currentUpper && dpadKeys[currentCharIndex] >= 97 && dpadKeys[currentCharIndex] <= 122) {
 		modKeyValue -= 32;
 	}
 
-	return modKeyValue;
+	char string[2] = { modKeyValue, '\0' };
+	return EventMgr::CreateTextEvent(string);
 }
 
 void DPadSoftKeyboard::ToggleUppercase()

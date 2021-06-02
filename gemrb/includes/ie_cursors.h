@@ -6,6 +6,7 @@ namespace GemRB {
 
 #define IE_CURSOR_INVALID -1
 #define IE_CURSOR_NORMAL  0
+#define IE_CURSOR_PRESSED 1
 #define IE_CURSOR_TAKE    2  //over pile type containers
 #define IE_CURSOR_WALK    4
 #define IE_CURSOR_BLOCKED 6

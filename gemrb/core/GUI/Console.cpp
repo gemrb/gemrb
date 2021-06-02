@@ -22,184 +22,125 @@
 
 #include "GameData.h"
 #include "Interface.h"
-#include "Palette.h"
 #include "ScriptEngine.h"
-#include "Sprite2D.h"
-#include "GUI/EventMgr.h"
-#include "GUI/TextSystem/Font.h"
 
 namespace GemRB {
 
-Console::Console(const Region& frame)
-	: Control(frame), History(5)
+constexpr size_t HistoryMaxSize = 5;
+
+Console::Console(const Region& frame, TextArea* ta)
+: TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
 {
-	Cursor = NULL;
-	Back = NULL;
-	max = 128;
-	Buffer.reserve(max);
-	CurPos = 0;
-	HistPos = 0;
-	palette = new Palette( ColorWhite, ColorBlack );
-}
+	ControlEventHandler OnReturn = [this](Control*) {
+		Execute(QueryText());
+	};
+	SetAction(OnReturn, TextEdit::Action::Done);
 
-Console::~Console(void)
-{
-	palette->release();
-	Sprite2D::FreeSprite( Cursor );
-}
-
-/** Draws the Console on the Output Display */
-void Console::DrawInternal(Region& drawFrame)
-{
-	if (Back) {
-		core->GetVideoDriver()->BlitSprite( Back, 0, drawFrame.y, true );
-	}
-	Font* font = core->GetTextFont();
-
-	Video* video = core->GetVideoDriver();
-	video->DrawRect( drawFrame, ColorBlack );
-	ieWord w = font->StringSize(Buffer.substr(0, CurPos)).w;
-	if (w + Cursor->Width > drawFrame.w) {
-		// shift left so the cursor remains visible
-		int shift = (w + Cursor->Width) - drawFrame.w;
-		drawFrame.x -= shift;
-		drawFrame.w += shift;
-	}
-	font->Print( drawFrame, Buffer, palette, IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE);
-
-	ieWord vcenter = (drawFrame.h / 2) + (Cursor->Height / 2);
-	video->BlitSprite(Cursor, w + drawFrame.x, vcenter + drawFrame.y, true);
-}
-
-/** Set Cursor */
-void Console::SetCursor(Sprite2D* cur)
-{
-	if (cur != NULL) {
-		Cursor = cur;
+	if (ta) {
+		textArea = ta;
+		ControlEventHandler handler = [this](Control* c) {
+			auto val = c->GetValue();
+			size_t histSize = History.Size();
+			size_t selected = histSize - val;
+			if (EventMgr::ModState(GEM_MOD_ALT)) {
+				Execute(c->QueryText());
+				textArea->SelectAvailableOption(-1);
+			} else {
+				HistPos = selected;
+				SetText(c->QueryText());
+			}
+			SetFocus();
+		};
+		textArea->SetAction(handler, TextArea::Action::Select);
 	}
 }
-/** Set BackGround */
-void Console::SetBackGround(Sprite2D* back)
+
+void Console::UpdateTextArea()
 {
-	//if 'back' is NULL then no BackGround will be drawn
-	Back = back;
+	if (textArea) {
+		std::vector<SelectOption> options;
+		for (size_t i = History.Size(); i > 0; --i) {
+			options.push_back(History.Retrieve(i - 1));
+			options.back().first = int(History.Size() - i) + 1;
+		}
+		
+		textArea->SetValue(-1);
+		textArea->SetSelectOptions(options, false);
+		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
+		// then we can change the color to red for failed commands and green for successfull ones
+		// and the highlight can be just a darker shade of those
+	}
 }
 
-/* Inserts the given text right behind the cursor position. */
-void Console::InsertText(const String& string)
+bool Console::Execute(const String& text)
 {
-	Buffer.insert(CurPos, string);
-	CurPos += string.size();
-}
-
-/** Sets the Text of the current control */
-void Console::SetText(const String& string)
-{
-	Buffer = string;
+	bool ret = false;
+	if (text.length()) {
+		char* cBuf = MBCStringFromString(text);
+		assert(cBuf);
+		ScriptEngine::FunctionParameters params;
+		params.push_back(ScriptEngine::Parameter(cBuf));
+		ret = core->GetGUIScriptEngine()->RunFunction("Console", "Exec", params);
+		free(cBuf);
+		HistoryAdd();
+	}
+	return ret;
 }
 
 /** Key Press Event */
-bool Console::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
+bool Console::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	if (Key >= 0x20) {
-		if (Buffer.length() < max) {
-			Buffer.insert(CurPos++, 1, Key);
-		}
-		return true;
-	}
-	return false;
-}
-/** Special Key Press */
-bool Console::OnSpecialKeyPress(unsigned char Key)
-{
-	switch (Key) {
-		case GEM_BACKSP:
-			if (CurPos != 0) {
-				Buffer.erase(--CurPos, 1);
-			}
-			break;
-		case GEM_HOME:
-			CurPos = 0;
-			break;
-		case GEM_END:
-			CurPos = Buffer.length();
-			break;
+	switch (key.keycode) {
 		case GEM_UP:
 			HistoryBack();
 			break;
 		case GEM_DOWN:
 			HistoryForward();
 			break;
-		case GEM_LEFT:
-			if (CurPos > 0)
-				CurPos--;
-			break;
-		case GEM_RIGHT:
-			if (CurPos < Buffer.length()) {
-				CurPos++;
-			}
-			break;
-		case GEM_DELETE:
-			if (CurPos < Buffer.length()) {
-				Buffer.erase(CurPos, 1);
-			}
-			break;			
-		case GEM_RETURN:
-			char* cBuf = MBCStringFromString(Buffer);
-			// FIXME: should prepend "# coding=<encoding name>" as per http://www.python.org/dev/peps/pep-0263/
-			core->GetGUIScriptEngine()->ExecString(cBuf, true);
-			free(cBuf);
-			HistoryAdd();
-			Buffer.erase();
-			CurPos = 0;
-			HistPos = 0;
-			break;
+		default:
+			return TextEdit::OnKeyPress(key, mod);
 	}
-	return true;
+	return false;
+}
+
+void Console::HistorySetPos(size_t pos)
+{
+	HistPos = Clamp<size_t>(pos, 0, History.Size());
+
+	if (HistPos == History.Size()) {
+		SetText(L"");
+		if (textArea) {
+			textArea->SelectAvailableOption(-1);
+		}
+	} else if (textArea) {
+		textArea->SelectAvailableOption(History.Size() - HistPos - 1);
+	} else {
+		SetText(History.Retrieve(HistPos).second);
+	}
 }
 
 void Console::HistoryBack()
 {
-	if (Buffer[0] && HistPos == 0 && History.Retrieve(HistPos) != Buffer) {
-		HistoryAdd();
-		HistPos++;
-	}
-	Buffer = History.Retrieve(HistPos);
-	CurPos = Buffer.length();
-	if (++HistPos >= (int)History.Size()) {
-		HistPos--;
+	if (HistPos == History.Size()) {
+		HistorySetPos(0);
+	} else {
+		HistorySetPos(HistPos + 1);
 	}
 }
 
 void Console::HistoryForward()
 {
-	if (--HistPos < 0) {
-		Buffer.erase();
-		HistPos++;
-	} else {
-		Buffer = History.Retrieve(HistPos);
-	}
-	CurPos = Buffer.length();
+	HistorySetPos(HistPos - 1);
 }
 
 void Console::HistoryAdd(bool force)
 {
-	if (force || Buffer.length()) {
-		History.Append(Buffer, !force);
+	const String& text = QueryText();
+	if (force || text.length()) {
+		History.Append(std::make_pair(-1, text), !force);
+		UpdateTextArea();
+		HistorySetPos(History.Size());
 	}
-}
-
-void Console::SetFocus(bool focus)
-{
-	Control::SetFocus(focus);
-	if (hasFocus) {
-		core->GetVideoDriver()->ShowSoftKeyboard();
-	}
-}
-
-bool Console::SetEvent(int /*eventType*/, ControlEventHandler /*handler*/)
-{
-	return false;
 }
 
 }

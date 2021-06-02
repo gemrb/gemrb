@@ -20,7 +20,7 @@
 
 /**
  * @file Window.h
- * Declares Window, class serving as a container for Control/widget objects 
+ * Declares Window, class serving as a container for Control/widget objects
  * and displaying windows in GUI
  * @author The GemRB Project
  */
@@ -28,157 +28,144 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "GUI/Control.h"
+#include "ScrollView.h"
+#include "WindowManager.h"
 
-#include "exports.h"
-
-#include <vector>
+#include <set>
 
 namespace GemRB {
 
+class Control;
 class Sprite2D;
-
-// Window Flags
-#define WF_CHANGED  1     //window changed
-#define WF_FRAME    2     //window has frame
-#define WF_FLOAT    4     //floating window
-#define WF_CHILD    8     //if invalidated, it invalidates all windows on top of it
-
-// Window position anchors (actually flags for WindowSetPos())
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define WINDOW_TOPLEFT       0x00
-#define WINDOW_CENTER        0x01
-#define WINDOW_ABSCENTER     0x02
-#define WINDOW_RELATIVE      0x04
-#define WINDOW_SCALE         0x08
-#define WINDOW_BOUNDED       0x10
-
-struct WindowKeyPress {
-	unsigned short windowID;
-	unsigned short key;
-	unsigned short mod;
-};
-
-class WindowKeyPressHandler : public Holder< Callback<WindowKeyPress*> > {
-public:
-	WindowKeyPressHandler(Callback<WindowKeyPress*>* ptr = NULL)
-	: Holder< Callback<WindowKeyPress*> >(ptr) {}
-
-	bool operator()(WindowKeyPress *wkp) {
-		return (*ptr)(wkp);
-	}
-};
-
 
 /**
  * @class Window
- * Class serving as a container for Control/widget objects 
+ * Class serving as a container for Control/widget objects
  * and displaying windows in GUI.
  */
 
-class GEM_EXPORT Window {
+using WindowActionResponder = View::ActionResponder<Window*>;
+
+class GEM_EXPORT Window : public ScrollView, public WindowActionResponder {
+public:
+	// !!! Keep these synchronized with GUIDefines.py !!!
+	enum WindowPosition {
+		PosTop = 1,		// top
+		PosBottom = 2,	// bottom
+		PosVmid = 3,	// top + bottom = vmid
+		PosLeft = 4,	// left
+		PosRight = 8,	// right
+		PosHmid = 12,	// left + right = hmid
+		PosCentered = 15// top + bottom + left + right = center
+	};
+
+	enum WindowFlags {
+		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
+		Borderless = 2,			// window will not draw the ornate borders (see WindowManager::DrawWindows)
+		DestroyOnClose = 4,		// window will be deleted on close rather then hidden and sent to the back
+		AlphaChannel = 8,		// Create window with RGBA buffer suitable for creating non rectangular windows
+		Modal = 16,
+		NoSounds = 32			// doesn't play the open/close sounds
+	};
+	
+	enum Action : WindowActionResponder::Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		Closed = 0,
+		GainedFocus = 1,
+		LostFocus = 2
+	};
+	
+	using WindowEventHandler = WindowActionResponder::Responder;
+
 private:
-	void DrawBackground(const Region* rgn) const;
-	void ControlRemoved(const Control *ctrl);
+	void RecreateBuffer();
 
-public: 
-	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
-		unsigned short Width, unsigned short Height);
-	~Window();
-	/** Set the Window's BackGround Image. 
-	 * If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
-	void SetBackGround(Sprite2D* img, bool clean = false);
-	/** Add a Control in the Window */
-	void AddControl(Control* ctrl);
-	/** This function Draws the Window on the Output Screen */
-	void DrawWindow();
-	/** Set window frame used to fill screen on higher resolutions*/
-	void SetFrame();
-	/** Returns the Control associated with the function key index, valid indices are 0-11 */
-	Control* GetFunctionControl(int x);
-	/** Returns the Control at X,Y Coordinates */
-	Control* GetControl(unsigned short x, unsigned short y, bool ignore=0);
-	/** Returns the Control by Index */
-	Control* GetControl(unsigned short i) const;
-	/** Returns the Control by Index */
-	int GetControlIndex(ieDword id) const;
-	/** Returns the number of Controls */
-	unsigned int GetControlCount() const;
-	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
-	bool IsValidControl(unsigned short ID, Control *ctrl) const;
-	/** Deletes the xth. Control */
-	Control* RemoveControl(unsigned short i);
-	/** Returns the Default Control which may be a button/gamecontrol atm */
-	Control* GetDefaultControl(unsigned int ctrltype) const;
-	/** Returns the Control which should get mouse scroll events */
-	Control* GetScrollControl() const;
-	/** Sets callback on catching a key press event. */
-	void SetKeyPressEvent(WindowKeyPressHandler handler);
-	/** Sets 'ctrl' as currently under mouse */
-	void SetOver(Control* ctrl);
-	/** Returns last control under mouse */
-	Control* GetOver() const;
-	/** Sets 'ctrl' as Focused */
-	void SetFocused(Control* ctrl);
-	/** Sets 'ctrl' as mouse event Focused */
-	void SetMouseFocused(Control* ctrl);
-	/** Returns last focused control */
-	Control* GetFocus() const;
-	/** Returns last mouse event focused control */
-	Control* GetMouseFocus() const;
-	/** Redraw all the Window */
-	void Invalidate();
-	/** Redraw controls of the same group */
-	void RedrawControls(const char* VarName, unsigned int Sum);
-	/** Links a scrollbar to a text area */
-	void Link(unsigned short SBID, unsigned short TAID);
-	/** Mouse entered a new control's rectangle */
-	void OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl);
-	/** Mouse left the current control */
-	void OnMouseLeave(unsigned short x, unsigned short y);
-	/** Mouse is over the current control */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Key has been pressed */
-	bool OnKeyPress(unsigned char key, unsigned short mod);
-public: //Public attributes
-	/** WinPack */
-	char WindowPack[10];
-	/** Window ID */
-	unsigned short WindowID;
-	/** X Position */
-	unsigned short XPos;
-	/** Y Position */
-	unsigned short YPos;
-	/** Width */
-	unsigned short Width;
-	/** Height */
-	unsigned short Height;
-	/** Visible value: deleted, invisible, visible, grayed */
-	signed char Visible;  //-1,0,1,2
-	/** Window flags: Changed, Floating, Framed, Child */
-	int Flags;
-	int Cursor;
-	int DefaultControl[2]; //default enter and cancel
-	int ScrollControl;
-	bool FunctionBar;
+	void SubviewAdded(View* view, View* parent) override;
+	void SubviewRemoved(View* view, View* parent) override;
 
-	WindowKeyPressHandler keyPressHandler;
-private: // Private attributes
-	/** BackGround Image. No BackGround if this variable is NULL. */
-	Sprite2D* BackGround;
-	/** Controls Array */
-	std::vector< Control*> Controls;
-	/** Last Control returned by GetControl */
-	Control* lastC;
-	/** Last Focused Control */
-	Control* lastFocus;
-	/** Last mouse event Focused Control */
-	Control* lastMouseFocus;
-	/** Last Control under mouse */
-	Control* lastOver;
+	void FlagsChanged(unsigned int /*oldflags*/) override;
+	void SizeChanged(const Size&) override;
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+
+	// attempt to set focus to view. return the focused view which is view if success or the currently focused view (if any) on failure
+	View* TrySetFocus(View* view);
+	bool IsDragable() const;
+
+	inline void DispatchMouseMotion(View*, const MouseEvent&);
+	inline void DispatchMouseDown(View*, const MouseEvent& me, unsigned short /*Mod*/);
+	inline void DispatchMouseUp(View*, const MouseEvent& me, unsigned short /*Mod*/);
+
+	inline void DispatchTouchDown(View*, const TouchEvent& te, unsigned short /*Mod*/);
+	inline void DispatchTouchUp(View*, const TouchEvent& te, unsigned short /*Mod*/);
+	inline void DispatchTouchGesture(View*, const GestureEvent& gesture);
+	
+	inline bool DispatchKey(View*, const Event&);
+	
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	
+	bool OnMouseDrag(const MouseEvent&) override;
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
+	
+	bool OnControllerButtonDown(const ControllerEvent& ce) override;
+	
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
 
 public:
-	void release(void);
+	Window(const Region& frame, WindowManager& mgr);
+
+	void Close();
+	void Focus();
+	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
+	
+	void FocusLost();
+	void FocusGained();
+	bool HasFocus() const;
+
+	/** Sets 'view' as Focused */
+	void SetFocused(View* view);
+	View* FocusedView() const { return focusView; }
+
+	void SetPosition(WindowPosition);
+	String TooltipText() const override;
+	Holder<Sprite2D> Cursor() const override;
+	bool IsDisabledCursor() const override;
+	bool IsReceivingEvents() const override { return true; }
+
+	const VideoBufferPtr& DrawWithoutComposition();
+	void RedrawControls(const char* VarName, unsigned int Sum);
+
+	bool DispatchEvent(const Event&);
+	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+	bool UnRegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+	
+	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
+	bool HitTest(const Point& p) const override;
+
+	bool InActionHandler() const;
+	void SetAction(Responder handler, const ActionKey& key) override;
+	bool PerformAction(const ActionKey& action) override;
+	bool SupportsAction(const ActionKey& action) override;
+	
+private: // Private attributes
+	typedef std::map<KeyboardKey, EventMgr::EventCallback> KeyMap;
+
+	std::set<Control*> Controls;
+	KeyMap HotKeys;
+
+	View* focusView; // keyboard focus
+	View* trackingView; // out of bounds mouse tracking
+	View* hoverView; // view the mouse was last over
+	
+	Point dragOrigin;
+	UniqueDragOp drag;
+	unsigned long lastMouseMoveTime;
+
+	VideoBufferPtr backBuffer = nullptr;
+	WindowManager& manager;
+	
+	WindowEventHandler eventHandlers[3];
 };
 
 }

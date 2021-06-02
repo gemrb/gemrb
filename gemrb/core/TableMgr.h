@@ -44,7 +44,7 @@ class DataStream;
 class GEM_EXPORT TableMgr : public Plugin {
 public: 
 	TableMgr();
-	virtual ~TableMgr();
+	~TableMgr() override;
 	/** Returns the actual number of Rows in the Table */
 	virtual ieDword GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */
@@ -53,7 +53,7 @@ public:
 	virtual ieDword GetColumnCount(unsigned int row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
-	virtual const char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;
+	virtual const char* QueryField(size_t row = 0, size_t column = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */

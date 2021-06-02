@@ -19,14 +19,14 @@ BMPWriter::~BMPWriter()
 {
 }
 
-void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
+void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
 
 	// FIXME
-	ieDword Width = spr->Width;
-	ieDword Height = spr->Height;
+	ieDword Width = spr->Frame.w;
+	ieDword Height = spr->Frame.h;
 	char filling[3] = {'B','M'};
 	ieDword PaddedRowLength = GET_SCANLINE_LENGTH(Width,24);
 	int stuff = (4-(PaddedRowLength&3))&3; // rounding it up to 4 bytes boundary
@@ -68,8 +68,6 @@ void BMPWriter::PutImage(DataStream *output, Sprite2D *spr)
 		}
 		output->Write( filling, stuff);
 	}
-
-	Sprite2D::FreeSprite(spr);
 }
 
 #include "plugindef.h"

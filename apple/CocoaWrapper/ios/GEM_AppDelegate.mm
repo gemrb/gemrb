@@ -22,7 +22,6 @@
 #import "GEM_AppDelegate.h"
 #import "System/FileStream.h"
 #import "Interface.h"
-#import "System/Logger/File.h"
 
 using namespace GemRB;
 
@@ -41,6 +40,7 @@ using namespace GemRB;
 // and our interface will be the wrong orientation and distorted
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+	[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
 	// Normally you would call super implemetation first, but don't!
 	AddLogWriter(Logger::WriterPtr(new AppleLogger()));
 	ToggleLogging(true);
@@ -103,6 +103,9 @@ using namespace GemRB;
 		[confControl release];
 		[procArguments release];
 
+		[[NSFileManager defaultManager] changeCurrentDirectoryPath:NSHomeDirectory()];
+		setenv("PYTHONHOME", "Documents/python", 1);
+		setenv("PYTHONPATH", "Documents/python/lib/python27", 1);
 		core = new Interface();
 		CFGConfig* config = new CFGConfig(argc, argv);
 		free(argv);
@@ -131,7 +134,7 @@ using namespace GemRB;
 	const char* cLogFile = [logFile cStringUsingEncoding:NSASCIIStringEncoding];
 	FileStream *fs = new FileStream();
 	if (fs->Create(cLogFile)) {
-		AddLogger(createStreamLogWriter(fs));
+		AddLogWriter(createStreamLogWriter(fs));
 		Log(MESSAGE, "Cocoa Wrapper", "Started a log file at %s", cLogFile);
 	} else {
 		delete fs;

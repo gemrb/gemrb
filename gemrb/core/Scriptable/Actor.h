@@ -32,7 +32,10 @@
 #include "CombatInfo.h"
 #include "EffectQueue.h"
 #include "Palette.h"
+#include "Polygon.h"
 
+#include <map>
+#include <set>
 #include <vector>
 
 namespace GemRB {
@@ -174,9 +177,6 @@ namespace GemRB {
 #define I_COMPL_RESP 5
 #define I_DIALOG     6
 
-// 3 for blur, 8 for mirror images
-#define EXTRA_ACTORCOVERS 11
-
 //flags for UseItem
 #define UI_SILENT    1       //no sound when used up
 #define UI_MISS      2       //ranged miss (projectile has no effects)
@@ -250,8 +250,6 @@ struct ActionButtonRow2 {
 	ieByte clss;
 };
 
-typedef std::vector< ScriptedAnimation*> vvcVector;
-
 struct WeaponInfo {
 	int slot;
 	ieDword enchantment;
@@ -296,6 +294,10 @@ struct ModalState {
 extern void ReleaseMemoryActor();
 GEM_EXPORT void UpdateActorConfig(); //call this from guiscripts when some variable has changed
 
+bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs);
+using vvcSet = std::multiset<ScriptedAnimation*, decltype(VVCSort)*>;
+using vvcDict = std::multimap<ResRef, ScriptedAnimation*>;
+
 class GEM_EXPORT Actor : public Movable {
 public:
 	//CRE DATA FIELDS
@@ -312,7 +314,8 @@ public:
 	ieResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	ieByte InParty;
-	char* LongName, * ShortName;
+	//32 is the maximum possible length of the actor name in the original games
+	char LongName[33], ShortName[33];
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[VCONST_COUNT];
 
@@ -357,8 +360,9 @@ public:
 	ieDword TargetDoor;
 
 	EffectQueue fxqueue;
-	vvcVector vvcOverlays;
-	vvcVector vvcShields;
+	
+	vvcDict vfxDict;
+	vvcSet vfxQueue = vvcSet(VVCSort); // sorted so we can distinguish effects infront and behind
 	ieDword *projectileImmunity; //classic bitfield
 	Holder<SoundHandle> casting_sound;
 	ieDword roundTime;           //these are timers for attack rounds
@@ -386,11 +390,18 @@ public:
 	 *   it periodically reduces brightness to ~50% and back to full
 	 */
 	ieByte pstColorBytes[10];
+	
+	Region drawingRegion;
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
-	CharAnimations *shadowAnimations;
-	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
+	
+	using AnimationPart = std::pair<Animation*, PaletteHolder>;
+	struct {
+		std::vector<AnimationPart> anim;
+		std::vector<AnimationPart> shadow;
+	} currentStance;
+
 	ieByte SavingThrow[5];
 	ieByte weapSlotCount;
 	int walkScale = 0;
@@ -414,9 +425,8 @@ private:
 	unsigned int remainingTalkSoundTime;
 	unsigned int lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
-	void DrawActorSprite(const Region &screen, int cx, int cy, const Region& bbox,
-				SpriteCover*& sc, Animation** anims,
-				unsigned char Face, const Color& tint, bool useShadowPalette = false);
+	void DrawActorSprite(const Point& p, uint32_t flags,
+						 const std::vector<AnimationPart>& anims, const Color& tint) const;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -439,7 +449,6 @@ private:
 	/** Re/Inits the Modified vector for PCs/NPCs */
 	void RefreshPCStats();
 	void RefreshHP();
-	bool ShouldHibernate() const;
 	bool ShouldDrawCircle() const;
 	bool HasBodyHeat() const;
 	void SetupFistData() const;
@@ -451,12 +460,19 @@ private:
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
 	const char* GetArmorSound() const;
+
+	bool AdvanceAnimations();
+	void UpdateDrawingRegion();
+	/* applies modal spell etc, if needed */
+	void UpdateModalState(ieDword gameTime);
+
 	int CalculateSpeedFromRate(bool feedback) const;
 	int CalculateSpeedFromINI(bool feedback) const;
 	ieDword IncrementDeathVariable(Variables *vars, const char *format, const char *name, ieDword start = 0) const;
+
 public:
 	Actor(void);
-	~Actor(void);
+	~Actor(void) override;
 	/** releases memory */
 	static void ReleaseMemory();
 	/** sets game specific parameter (which stat should determine the fist weapon type */
@@ -518,7 +534,7 @@ public:
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
-	char* GetName(int which) const override
+	const char* GetName(int which) const override
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
@@ -547,11 +563,8 @@ public:
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;
 	void SetDialog(const ieResRef resref);
-	/** Gets the Portrait ResRef */
-	const char* GetPortrait(int which) const
-	{
-		return which ? SmallPortrait : LargePortrait;
-	}
+	/** Gets the Portrait */
+	Holder<Sprite2D> CopyPortrait(int which) const;
 
 	/** Gets the attack projectile */
 	Projectile* GetAttackProjectile()
@@ -637,6 +650,7 @@ public:
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
+	bool IsRunning() const { return InternalFlags & IF_RUNFLAGS; }
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(bool remove, ieDword baseclass=0, int diff=0);
 	/* applies the class abilities*/
@@ -659,6 +673,7 @@ public:
 	void GetPrevAnimation();
 	/* debug function */
 	void GetNextStance();
+	void ClearCurrentStanceAnims();
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
@@ -714,8 +729,6 @@ public:
 	void ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool &critical);
 	/* adjusts damage dealt to this actor, handles mirror images  */
 	void ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int damagetype);
-	/* applies modal spell etc, if needed */
-	void UpdateActorState(ieDword gameTime);
 	/* returns the hp adjustment based on constitution */
 	int GetHpAdjustment(int multiplier, bool modified=true) const;
 	/* does all the housekeeping after loading the actor from file */
@@ -731,10 +744,10 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void ResolveStringConstant(ieResRef sound, unsigned int index) const;
-	bool GetSoundFromFile(ieResRef Sound, unsigned int index) const;
-	bool GetSoundFromINI(ieResRef Sound, unsigned int index) const;
-	bool GetSoundFrom2DA(ieResRef Sound, unsigned int index) const;
+	void ResolveStringConstant(ieResRef& sound, unsigned int index) const;
+	bool GetSoundFromFile(ieResRef &Sound, unsigned int index) const;
+	bool GetSoundFromINI(ieResRef &Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
@@ -754,29 +767,27 @@ public:
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
-
-	/* if necessary, advance animation */
-	void UpdateAnimations();
-	/* if necessary, draw actor */
-	void Draw(const Region &screen);
+	void UpdateActorState();
+	/* update internal per frame state and return true if state is suitable for drawing the actor */
+	bool UpdateDrawingState();
+	Region DrawingRegion() const override;
+	uint8_t GetElevation() const;
+	bool ShouldDrawReticle() const;
 	void DoStep(unsigned int walkScale, ieDword time = 0) override;
+	void Draw(const Region &screen, Color baseTint, Color tint, uint32_t flags) const;
 
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc);
 	/* remove a vvc from the list, graceful means animated removal */
-	void RemoveVVCell(const ieResRef vvcname, bool graceful);
+	void RemoveVVCells(const ResRef& vvcname);
 	/* returns true if actor already has the overlay (slow) */
-	bool HasVVCCell(const ieResRef resource) const;
-	/* returns overlay (or underlay) if actor already has it, faster */
-	ScriptedAnimation *GetVVCCell(const vvcVector *vvcCells, const ieResRef resource) const;
+	bool HasVVCCell(const ResRef& resource) const;
 	/* returns overlay if actor already has it (slow) */
-	ScriptedAnimation *GetVVCCell(const ieResRef resource) const;
+	std::pair<vvcDict::const_iterator, vvcDict::const_iterator>
+	GetVVCCells(const ResRef& resource) const;
 	/* returns the vvc pointer to a hardcoded overlay */
 	/* if it exists (faster than hasvvccell) */
 	ScriptedAnimation *FindOverlay(int index) const;
-	int WantDither() const;
-	/* draw videocells */
-	void DrawVideocells(const Region &screen, vvcVector &vvcCells, const Color &tint);
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
@@ -967,6 +978,7 @@ public:
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
 	bool ShouldModifyMorale() const;
+	bool HibernateIfAble();
 };
 }
 

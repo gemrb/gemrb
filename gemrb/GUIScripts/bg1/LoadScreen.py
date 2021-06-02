@@ -32,9 +32,9 @@ def SetLoadScreen ():
 def StartLoadScreen ():
 	global LoadScreen
 
-	GemRB.LoadWindowPack ("guils", 640, 480)
-	LoadScreen = GemRB.LoadWindow (0)
-	LoadScreen.SetFrame ()
+	LoadScreen = GemRB.LoadWindow (0, "guils")
+	LoadScreen.AddAlias("LOADWIN")
+
 	Middle = LoadScreen.GetControl (4)
 	#LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	#if LoadPic=="":
@@ -47,12 +47,16 @@ def StartLoadScreen ():
 	Bar.SetEvent (IE_GUI_PROGRESS_END_REACHED, EndLoadScreen)
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK")
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
+
+	LoadScreen.ReparentSubview(Skull, Bar)
+	LoadScreen.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def EndLoadScreen ():
 	Skull = LoadScreen.GetControl (3)
 	Skull.SetMOS ("GTRBPSK2")
-	LoadScreen.SetVisible (WINDOW_VISIBLE)
-	LoadScreen.Unload()
+
+	LoadScreen.SetAction(lambda win: GemRB.GamePause(0, 0), ACTION_WINDOW_CLOSED)
+	GemRB.SetTimer(LoadScreen.Close, 500, 0)
+
 	return

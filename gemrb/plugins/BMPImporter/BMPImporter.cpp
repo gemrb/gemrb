@@ -98,12 +98,13 @@ bool BMPImporter::Open(DataStream* stream)
 		else
 			NumColors = 16;
 		Palette = ( Color * ) malloc( 4 * NumColors );
-		memset(Palette, 0, 4 * NumColors);
+//		memset(Palette, 0, 4 * NumColors);
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read( &Palette[i].b, 1 );
 			str->Read( &Palette[i].g, 1 );
 			str->Read( &Palette[i].r, 1 );
 			str->Read( &Palette[i].a, 1 );
+			Palette[i].a = (Palette[i].a == 0) ? 0xff : Palette[i].a;
 		}
 	}
 	str->Seek( DataOffset, GEM_STREAM_START );
@@ -221,32 +222,31 @@ void BMPImporter::Read4To8(void *rpixels)
 	}
 }
 
-Sprite2D* BMPImporter::GetSprite2D()
+Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
-	Sprite2D* spr = NULL;
+	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
 		const ieDword red_mask = 0x000000ff;
 		const ieDword green_mask = 0x0000ff00;
 		const ieDword blue_mask = 0x00ff0000;
 		void* p = malloc( Width * Height * 4 );
 		memcpy( p, pixels, Width * Height * 4 );
-		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
 			red_mask, green_mask, blue_mask, 0x00000000, p,
 			true, green_mask|(0xff<<24) );
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Width, Height, NumColors == 16 ? 4 : 8,
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, Width, Height), NumColors == 16 ? 4 : 8,
 														   p, Palette, true, 0);
 	}
 	return spr;
 }
 
-void BMPImporter::GetPalette(int colors, Color* pal)
+int BMPImporter::GetPalette(int colors, Color* pal)
 {
 	if (BitCount > 8) {
-		ImageMgr::GetPalette(colors, pal);
-		return;
+		return ImageMgr::GetPalette(colors, pal);
 	}
 
 	for (int i = 0; i < colors; i++) {
@@ -255,6 +255,7 @@ void BMPImporter::GetPalette(int colors, Color* pal)
 		pal[i].b = Palette[i%NumColors].b;
 		pal[i].a = 0xff;
 	}
+	return -1;
 }
 
 Bitmap* BMPImporter::GetBitmap()
@@ -305,8 +306,7 @@ Image* BMPImporter::GetImage()
 		for (y = 0; y < Height; y++) {
 			for (unsigned int x = 0; x < Width; x++) {
 				unsigned int col = *p++;
-				Color c = { (unsigned char)col, (unsigned char)(col >> 8),
-				            (unsigned char)(col >> 16), 0xFF };
+				Color c(col, (col >> 8), (col >> 16), 0xFF);
 				data->SetPixel(x,y,c);
 			}
 		}

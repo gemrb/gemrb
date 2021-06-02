@@ -30,13 +30,6 @@
 
 namespace GemRB {
 
-//indebug flags
-#define ID_REFERENCE 1
-#define ID_CUTSCENE  2
-#define ID_VARIABLES 4
-#define ID_ACTIONS   8
-#define ID_TRIGGERS  16
-
 //whoseeswho for GetNearestEnemy:
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
@@ -63,7 +56,6 @@ extern bool HasKaputz;
 extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
-extern int InDebug;
 extern Gem_Polygon **polygons;
 
 #define MIC_INVALID -2
@@ -76,7 +68,7 @@ GEM_EXPORT int GetHappiness(const Scriptable *Sender, int reputation);
 int GetHPPercent(const Scriptable *Sender);
 bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname);
 bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags);
-void ClickCore(Scriptable *Sender, Point point, int type, int speed);
+void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed);
 void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);

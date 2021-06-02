@@ -26,7 +26,7 @@ namespace GemRB {
 class GEM_EXPORT AppleLogger : public Logger::LogWriter {
 public:
 	AppleLogger();
-	virtual ~AppleLogger();
+	~AppleLogger() override;
 
 protected:
 	void WriteLogMessage(const Logger::LogMessage& msg) override;

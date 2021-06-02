@@ -32,12 +32,6 @@ DoneButton = 0
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton
 
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(ClassWindow):
-			ClassWindow.Unload()
-			ClassWindow = None
-		return
-
 	MyChar = GemRB.GetVar ("Slot")
 	
 	GemRB.SetVar("Class",0)
@@ -45,9 +39,8 @@ def OnLoad():
 	GemRB.SetVar("Specialist",0)
 	GemRB.SetVar("Class Kit",0)
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	ClassCount = CommonTables.Classes.GetRowCount()+1
-	ClassWindow = GemRB.LoadWindow(2)
+	ClassWindow = GemRB.LoadWindow(2, "GUICG")
 	RaceRow = CommonTables.Races.FindValue(3,GemRB.GetPlayerStat (MyChar, IE_RACE))
 	RaceName = CommonTables.Races.GetRowName(RaceRow)
 
@@ -99,7 +92,7 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = ClassWindow.GetControl(13)
 
@@ -114,15 +107,17 @@ def OnLoad():
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
 	SpecialistButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, SpecialistPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(ClassWindow))
 	ClassWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
 def MultiClassPress():
+	ClassWindow.Close ()
 	GemRB.SetVar("Multi Class",1)
 	CharGenCommon.next()
 
 def SpecialistPress():
+	ClassWindow.Close ()
 	GemRB.SetVar("Specialist",1)
 
 	GemRB.SetVar("Class Kit", 0)
@@ -136,6 +131,7 @@ def ClassPress():
 	return
 
 def NextPress():
+	ClassWindow.Close()
 	# find the class from the class table
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")

@@ -23,22 +23,12 @@ import GemRB
 import GUIOPT
 from GUIDefines import *
 
-OptionsWindow = 0
-
 def OnLoad():
 	global OptionsWindow
-	GemRB.LoadWindowPack("GUIOPT", 800, 600)
 
-	MessageBarWindow = GemRB.LoadWindow(0)
-	MessageBarWindow.SetVisible(WINDOW_VISIBLE) #This will startup the window as grayed
+	MessageBarWindow = GemRB.LoadWindow(0, "GUIOPT")
 
 	CharactersBarWindow = GemRB.LoadWindow(1)
-	CharactersBarWindow.SetVisible(WINDOW_VISIBLE)
-
-	GemRB.DrawWindows()
-
-	MessageBarWindow.SetVisible(WINDOW_INVISIBLE)
-	CharactersBarWindow.SetVisible(WINDOW_INVISIBLE)
 
 	if MessageBarWindow:
 		MessageBarWindow.Unload()
@@ -46,7 +36,6 @@ def OnLoad():
 		CharactersBarWindow.Unload()
 
 	OptionsWindow = GemRB.LoadWindow(13)
-	OptionsWindow.SetFrame ()
 
 	VersionLabel = OptionsWindow.GetControl(0x1000000B)
 	VersionLabel.SetText(GemRB.Version)
@@ -70,16 +59,9 @@ def OnLoad():
 	KeyboardButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUIOPT.OpenHotkeyOptionsWindow)
 
 	ReturnButton.SetText(10308)
-	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ReturnPress)
-	ReturnButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ReturnButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: OptionsWindow.Close())
+	ReturnButton.MakeEscape()
 
-	OptionsWindow.SetVisible(WINDOW_VISIBLE)
+	OptionsWindow.Focus()
 
-	return
-
-def ReturnPress():
-	global OptionsWindow
-	if OptionsWindow:
-		OptionsWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return

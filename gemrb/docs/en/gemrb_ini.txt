@@ -139,6 +139,12 @@ Each pixel line in these files is for one base color. Pixels in the
 row then define the gradient of that color.
 
 
+TextScreenSpeed = <number>
+- - - - - - - - - - - -
+Controls the base narrated text scrolling speed. It's later adjusted by
+font size and text width.
+
+
 3EdRules = <bool>
 - - - - - - - - -
 Toggles whether the game (data) is using the 3rd edition rules. Blindly

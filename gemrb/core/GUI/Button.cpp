@@ -28,8 +28,13 @@
 #include "defsounds.h"
 #include "ie_cursors.h"
 
+#include "Game.h"
 #include "GameData.h"
 #include "Palette.h"
+
+#include <cmath>
+
+#define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
 
@@ -39,44 +44,43 @@ Button::Button(Region& frame)
 {
 	ControlType = IE_GUI_BUTTON;
 	State = IE_GUI_BUTTON_UNPRESSED;
-	ResetEventHandler( ButtonOnPress );
-	ResetEventHandler( ButtonOnDoublePress );
-	ResetEventHandler( ButtonOnShiftPress );
-	ResetEventHandler( ButtonOnRightPress );
-	ResetEventHandler( ButtonOnDragDrop );
-	ResetEventHandler( ButtonOnDrag );
-	ResetEventHandler( MouseEnterButton );
-	ResetEventHandler( MouseLeaveButton );
-	ResetEventHandler( MouseOverButton );
+	HotKeyCallback = METHOD_CALLBACK(&Button::HandleHotKey, this);
 
 	hasText = false;
-	normal_palette = NULL;
-	disabled_palette = NULL;
 	SetFont(core->GetButtonFont());
-	Flags = IE_GUI_BUTTON_NORMAL;
+	SetFlags(IE_GUI_BUTTON_NORMAL, OP_OR);
 	ToggleState = false;
+	pulseBorder = false;
 	Picture = NULL;
 	Clipping = 1.0;
-	memset(&SourceRGB,0,sizeof(SourceRGB));
-	memset(&DestRGB,0,sizeof(DestRGB));
-	memset( borders, 0, sizeof( borders ));
-	starttime = 0;
-	Anchor.null();
+
 	PushOffset = Point(2, 2);
 }
+
 Button::~Button()
 {
 	SetImage(BUTTON_IMAGE_NONE, NULL);
-	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 
-	gamedata->FreePalette( normal_palette);
-	gamedata->FreePalette( disabled_palette);
+	if (hotKey.global) {
+		UnregisterHotKey();
+	}
+}
+
+void Button::UnregisterHotKey()
+{
+	if (hotKey) {
+		if (hotKey.global) {
+			EventMgr::UnRegisterHotKeyCallback(HotKeyCallback, hotKey.key, hotKey.mod);
+		} else {
+			window->UnRegisterHotKeyCallback(HotKeyCallback, hotKey.key);
+		}
+	}
 }
 
 /** Sets the 'type' Image of the Button to 'img'.
  see 'BUTTON_IMAGE_TYPE' */
-void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
+void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 {
 	if (type >= BUTTON_IMAGE_TYPE_COUNT) {
 		Log(ERROR, "Button", "Trying to set a button image index out of range: %d", type);
@@ -84,14 +88,12 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 	}
 
 	if (type <= BUTTON_IMAGE_NONE) {
-		for (int i=0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			Sprite2D::FreeSprite(buttonImages[i]);
+		for (int i = 0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
+			buttonImages[i] = nullptr;
 		}
-		Flags &= IE_GUI_BUTTON_NO_IMAGE;
+		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		Sprite2D::FreeSprite(buttonImages[type]);
 		buttonImages[type] = img;
-		// FIXME: why do we not acquire the image here?!
 		/*
 		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
@@ -116,56 +118,21 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Sprite2D* img)
 	MarkDirty();
 }
 
-/** make SourceRGB go closer to DestRGB */
-void Button::CloseUpColor()
+void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	if (!starttime) return;
-	//using the realtime timer, because i don't want to
-	//handle Game at this point
-	unsigned long newtime;
-
-	newtime = GetTicks();
-	if (newtime<starttime) {
-		return;
+	if (overlayAnim) {
+		overlayAnim.Next(GetTicks());
 	}
-	MarkDirty();
-	Color nc;
-
-	nc.r = (SourceRGB.r + DestRGB.r) / 2;
-	nc.g = (SourceRGB.g + DestRGB.g) / 2;
-	nc.b = (SourceRGB.b + DestRGB.b) / 2;
-	nc.a = (SourceRGB.a + DestRGB.a) / 2;
-	if (SourceRGB.r == nc.r &&
-		SourceRGB.g == nc.g &&
-		SourceRGB.b == nc.b &&
-		SourceRGB.a == nc.a) {
-		SourceRGB = DestRGB;
-		starttime = 0;
-		return;
-	}
-
-	SourceRGB = nc;
-	starttime = newtime + 40;
-}
-
-bool Button::IsOpaque() const
-{
-	if (AnimPicture || (Picture && (Flags & IE_GUI_BUTTON_PICTURE)) || animation) {
-		// no good way of knowing if a button has transparancy :(
-		// TODO: maybe add something to Sprite2D for determining alpha status
-		return false;
-	}
-	return Control::IsOpaque();
 }
 
 /** Draws the Control on the Output Display */
-void Button::DrawInternal(Region& rgn)
+void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	Video * video = core->GetVideoDriver();
 
 	// Button image
-	if (!( Flags & IE_GUI_BUTTON_NO_IMAGE )) {
-		Sprite2D* Image = NULL;
+	if (!( flags & IE_GUI_BUTTON_NO_IMAGE )) {
+		Holder<Sprite2D> Image;
 
 		switch (State) {
 			case IE_GUI_BUTTON_FAKEPRESSED:
@@ -185,10 +152,8 @@ void Button::DrawInternal(Region& rgn)
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
-			int xOffs = ( Width / 2 ) - ( Image->Width / 2 );
-			int yOffs = ( Height / 2 ) - ( Image->Height / 2 );
-
-			video->BlitSprite( Image, rgn.x + xOffs, rgn.y + yOffs, true );
+			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
+			video->BlitSprite(Image, rgn.Origin() + offset);
 		}
 	}
 
@@ -199,131 +164,138 @@ void Button::DrawInternal(Region& rgn)
 	}
 
 	// Button picture
-	int picXPos = 0, picYPos = 0;
-	if (Picture && (Flags & IE_GUI_BUTTON_PICTURE) ) {
+	Point picPos;
+	if (Picture && (flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		picXPos = ( rgn.w / 2 ) - ( Picture->Width / 2 ) + rgn.x;
-		picYPos = ( rgn.h / 2 ) - ( Picture->Height / 2 ) + rgn.y;
-		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
-			picXPos += Picture->XPos;
-			picYPos += Picture->YPos;
+		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
+		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
+		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
+			picPos += Picture->Frame.Origin();
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
-			int overlayHeight = Picture->Height * (1.0 - Clipping);
+			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
 			if (overlayHeight < 0)
 				overlayHeight = 0;
-			if (overlayHeight >= Picture->Height)
-				overlayHeight = Picture->Height;
-			int buttonHeight = Picture->Height - overlayHeight;
+			if (overlayHeight >= Picture->Frame.h)
+				overlayHeight = Picture->Frame.h;
+			int buttonHeight = Picture->Frame.h - overlayHeight;
 
-			Region rb = Region(picXPos, picYPos, Picture->Width, buttonHeight);
-			Region ro = Region(picXPos, picYPos + buttonHeight, Picture->Width, overlayHeight);
+			if (overlayHeight) {
+				// TODO: Add an option to add BLIT_GREY to the flags
+				const Color& col = overlayAnim.Current();
+				video->BlitGameSprite(Picture, picPos, BLIT_COLOR_MOD, col);
+			}
 
-			video->BlitSprite( Picture, picXPos, picYPos, true, &rb );
-
-			// TODO: Add an option to add BLIT_GREY to the flags
-			video->BlitGameSprite( Picture, picXPos, picYPos, BLIT_TINTED, SourceRGB, 0, 0, &ro, true);
-
-			// do NOT uncomment this, you can't change Changed or invalidate things from
-			// the middle of Window::DrawWindow() -- it needs moving to somewhere else
-			// ^ We can now... should this be uncommented then?
-			//CloseUpColor();
-		}
-		else {
-			Region r( picXPos, picYPos, (int)(Picture->Width * Clipping), Picture->Height );
-			video->BlitSprite( Picture, picXPos + Picture->XPos, picYPos + Picture->YPos, true, &r );
+			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
+			video->BlitSprite( Picture, rb.Origin(), &rb );
+		} else {
+			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
+			video->BlitSprite(Picture, Picture->Frame.Origin() + r.Origin(), &r);
 		}
 	}
 
 	// Button animation
 	if (AnimPicture) {
-		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
-		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs + AnimPicture->XPos, rgn.y + yOffs + AnimPicture->YPos, true, &r );
+		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			video->BlitSprite( AnimPicture, r.Origin() + AnimPicture->Frame.Origin(), &r );
 		} else {
-			video->BlitSprite( AnimPicture, rgn.x + xOffs, rgn.y + yOffs, true, &r );
+			video->BlitSprite( AnimPicture, r.Origin(), &r );
 		}
 	}
 
 	// Composite pictures (paperdolls/description icons)
-	if (!PictureList.empty() && (Flags & IE_GUI_BUTTON_PICTURE) ) {
-		std::list<Sprite2D*>::iterator iter = PictureList.begin();
-		int xOffs = 0, yOffs = 0;
-		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+	if (!PictureList.empty() && (flags & IE_GUI_BUTTON_PICTURE) ) {
+		auto iter = PictureList.begin();
+		Point offset;
+		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			// Center the hotspots of all pictures
-			xOffs = Width/2;
-			yOffs = Height/2;
-		} else if (Flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
+			offset.x = frame.w / 2;
+			offset.y = frame.h / 2;
+		} else if (flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
 			// Display as-is
-			xOffs = 0;
-			yOffs = 0;
 		} else {
 			// Center the first picture, and align the rest to that
-			xOffs = Width/2 - (*iter)->Width/2 + (*iter)->XPos;
-			yOffs = Height/2 - (*iter)->Height/2 + (*iter)->YPos;
+			offset.x = frame.w / 2 - (*iter)->Frame.w/2 + (*iter)->Frame.x;
+			offset.y = frame.h / 2 - (*iter)->Frame.h/2 + (*iter)->Frame.y;
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite( *iter, rgn.x + xOffs, rgn.y + yOffs, true );
+			video->BlitSprite(*iter, rgn.Origin() + offset);
 		}
 	}
 
 	// Button label
-	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
-		Palette* ppoi = normal_palette;
-		ieByte align = 0;
-
-		if (State == IE_GUI_BUTTON_DISABLED)
-			ppoi = disabled_palette;
+	if (hasText && ! ( flags & IE_GUI_BUTTON_NO_TEXT )) {
 		// FIXME: hopefully there's no button which sinks when selected
 		//   AND has text label
 		//else if (State == IE_GUI_BUTTON_PRESSED || State == IE_GUI_BUTTON_SELECTED) {
 
-		if (Flags & IE_GUI_BUTTON_ALIGN_LEFT)
+		ieByte align = 0;
+		if (flags & IE_GUI_BUTTON_ALIGN_LEFT)
 			align |= IE_FONT_ALIGN_LEFT;
-		else if (Flags & IE_GUI_BUTTON_ALIGN_RIGHT)
+		else if (flags & IE_GUI_BUTTON_ALIGN_RIGHT)
 			align |= IE_FONT_ALIGN_RIGHT;
 		else
 			align |= IE_FONT_ALIGN_CENTER;
 
-		if (Flags & IE_GUI_BUTTON_ALIGN_TOP)
+		if (flags & IE_GUI_BUTTON_ALIGN_TOP)
 			align |= IE_FONT_ALIGN_TOP;
-		else if (Flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
+		else if (flags & IE_GUI_BUTTON_ALIGN_BOTTOM)
 			align |= IE_FONT_ALIGN_BOTTOM;
 		else
 			align |= IE_FONT_ALIGN_MIDDLE;
 
 		Region r = rgn;
-		if (Picture && (Flags & IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT) {
+		if (IS_PORTRAIT) {
 			// constrain the label (status icons) to the picture bounds
 			// FIXME: we have to do +1 because the images are 1 px too small to fit 3 icons...
-			r = Region(picXPos, picYPos, Picture->Width + 1, Picture->Height);
+			r = Region(picPos.x, picPos.y, Picture->Frame.w + 1, Picture->Frame.h);
+		} else if (flags&IE_GUI_BUTTON_ANCHOR) {
+			r.x += Anchor.x;
+			r.y += Anchor.y;
+			r.w -= Anchor.x;
+			r.h -= Anchor.y;
 		} else {
 			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
 			font->StringSize(Text, &metrics);
 
-			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & Flags)) {
+			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
 				// FIXME: I'm unsure when exactly this adjustment applies...
 				// we do know that if a button is multiline it should not have margins
 				// I'm actually wondering if we need this at all anymore
 				// I suspect its origins predate the fixing of font baseline alignment
-				r = Region( r.x + 5, r.y + 5, r.w - 10, r.h - 10);
+				r.ExpandAllSides(-5);
 			}
 		}
+		
+		Color c = textColor;
+		if (State == IE_GUI_BUTTON_DISABLED || IsDisabled()) {
+			c.r *= 0.66;
+			c.g *= 0.66;
+			c.b *= 0.66;
+		}
 
-		font->Print( r, Text, ppoi, align );
+		Font::PrintColors colors {c, ColorBlack};
+		font->Print(r, Text, align, colors);
 	}
 
-	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
+	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
 		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
 			ButtonBorder *fr = &borders[i];
 			if (! fr->enabled) continue;
 
-			Region r = Region( rgn.x + fr->dx1, rgn.y + fr->dy1, rgn.w - (fr->dx1 + fr->dx2 + 1), rgn.h - (fr->dy1 + fr->dy2 + 1) );
-			video->DrawRect( r, fr->color, fr->filled );
+			const Region& frRect = fr->rect;
+			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
+			if (pulseBorder && !fr->filled) {
+				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
+				video->DrawRect( r, mix, fr->filled, BLIT_BLENDED );
+			} else {
+				video->DrawRect( r, fr->color, fr->filled, BLIT_BLENDED );
+			}
 		}
 	}
 }
@@ -333,24 +305,44 @@ void Button::SetState(unsigned char state)
 	if (state > IE_GUI_BUTTON_LOCKED_PRESSED) {// If wrong value inserted
 		return;
 	}
+
+	// FIXME: we should properly consolidate IE_GUI_BUTTON_DISABLED with the view Disabled flag
+	SetDisabled(state == IE_GUI_BUTTON_DISABLED);
+
 	if (State != state) {
 		MarkDirty();
 		State = state;
 	}
 }
-void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
+
+bool Button::IsAnimated() const
+{
+	if (overlayAnim) {
+		return true;
+	}
+
+	if (pulseBorder) {
+		return true;
+	}
+
+	return Control::IsAnimated();
+}
+
+bool Button::IsOpaque() const
+{
+	return Picture != NULL
+		&& !(flags&IE_GUI_BUTTON_NO_IMAGE)
+		&& Picture->HasTransparency() == false;
+}
+
+void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
 		return;
 
-	ButtonBorder *fr = &borders[index];
-	fr->dx1 = dx1;
-	fr->dy1 = dy1;
-	fr->dx2 = dx2;
-	fr->dy2 = dy2;
-	fr->color = color;
-	fr->enabled = enabled;
-	fr->filled = filled;
+	ButtonBorder fr = { rgn, color, filled, enabled };
+	borders[index] = fr;
+
 	MarkDirty();
 }
 
@@ -368,105 +360,135 @@ void Button::EnableBorder(int index, bool enabled)
 void Button::SetFont(Font* newfont)
 {
 	font = newfont;
-	gamedata->FreePalette(disabled_palette);
-	disabled_palette = font->GetPalette()->Copy();
-	disabled_palette->Darken();
 }
 
-bool Button::WantsDragOperation()
+String Button::TooltipText() const
 {
-	return (State != IE_GUI_BUTTON_DISABLED && MouseLeaveButton !=0 && VarName[0] != 0);
-}
+	if (IsDisabled() || flags & IE_GUI_BUTTON_NO_TOOLTIP) {
+		return L"";
+	}
 
-/** Handling The default button (enter) */
-bool Button::OnSpecialKeyPress(unsigned char Key)
-{
-	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
-		if (Key == GEM_RETURN) {
-			if (Flags & IE_GUI_BUTTON_DEFAULT ) {
-				RunEventHandler( ButtonOnPress );
-				return true;
-			}
+	ieDword showHotkeys = 0;
+	core->GetDictionary()->Lookup("Hotkeys On Tooltips", showHotkeys);
+
+	if (showHotkeys && hotKey) {
+		String s;
+		switch (hotKey.key) {
+			// FIXME: these arent localized...
+			case GEM_ESCAPE:
+				s += L"Esc";
+				break;
+			case GEM_RETURN:
+				s += L"Enter";
+				break;
+			case GEM_PGUP:
+				s += L"PgUp";
+				break;
+			case GEM_PGDOWN:
+				s += L"PgDn";
+				break;
+			default:
+				// TODO: check if there are more possible keys
+				if (hotKey.key >= GEM_FUNCTIONX(1) && hotKey.key <= GEM_FUNCTIONX(16)) {
+					s.push_back(L'F');
+					int offset = hotKey.key - GEM_FUNCTIONX(0);
+					if (hotKey.key > GEM_FUNCTIONX(9)) {
+						s.push_back(L'1');
+						offset -= 10;
+					}
+					s.push_back(L'0' + offset);
+				} else {
+					s.push_back(toupper(hotKey.key));
+				}
+				break;
 		}
-		else if (Key == GEM_ESCAPE) {
-			if (Flags & IE_GUI_BUTTON_CANCEL ) {
-				RunEventHandler( ButtonOnPress );
-				return true;
-			}
+		String tt = ((tooltip.length()) ? tooltip : QueryText());
+		tt = (tt.length()) ? s + L": " + tt : s;
+		return tt;
+	}
+	return Control::TooltipText();
+}
+
+Holder<Sprite2D> Button::Cursor() const
+{
+	if (IS_PORTRAIT) {
+		GameControl* gc = core->GetGameControl();
+		if (gc) {
+			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
+			if (cur) return cur;
 		}
 	}
-	return Control::OnSpecialKeyPress(Key);
+	return Control::Cursor();
+}
+
+bool Button::AcceptsDragOperation(const DragOp& dop) const
+{
+	// FIXME: this implementation is obviously not future proof
+	// portrait buttons accept other portraits and dropped items
+	if (IS_PORTRAIT) {
+		return true;
+	}
+	
+	return Control::AcceptsDragOperation(dop);
+}
+
+void Button::CompleteDragOperation(const DragOp& dop)
+{
+	if (dop.dragView == this) {
+		// this was the dragged view
+		EnableBorder(1, false);
+	}
+	
+	Control::CompleteDragOperation(dop);
+}
+
+Holder<Sprite2D> Button::DragCursor() const
+{
+	if (IS_PORTRAIT) {
+		// TODO: would it be an enhancement to actually use the portrait for the drag icon?
+		return core->Cursors[IE_CURSOR_SWAP];
+	} else if (Picture) {
+		return Picture;
+	}
+	
+	return Control::DragCursor();
 }
 
 /** Mouse Button Down */
-void Button::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
+bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-
-	if (core->GetDraggedItem () && !ButtonOnDragDrop) {
-		Control::OnMouseDown(x,y,Button,Mod);
-		return;
-	}
-
-	ScrollBar* scrlbr = (ScrollBar*) sb;
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-
-	//Button == 1 means Left Mouse Button
-	switch(Button&GEM_MB_NORMAL) {
-	case GEM_MB_ACTION:
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		drag_start.x = Owner->XPos + XPos + x;
-		drag_start.y = Owner->YPos + YPos + y;
-
+	ActionKey key(Action::DragDropDest);
+    if (core->GetDraggedItem() && !SupportsAction(key)) {
+        return true;
+    }
+    
+	if (me.button == GEM_MB_ACTION) {
 		if (State == IE_GUI_BUTTON_LOCKED) {
 			SetState( IE_GUI_BUTTON_LOCKED_PRESSED );
-			return;
+			return true;
 		}
 		SetState( IE_GUI_BUTTON_PRESSED );
-		if (Flags & IE_GUI_BUTTON_SOUND) {
+		if (flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound(DS_BUTTON_PRESSED, SFX_CHAN_GUI);
 		}
-		if ((Button & GEM_MB_DOUBLECLICK) && ButtonOnDoublePress) {
-			RunEventHandler( ButtonOnDoublePress );
-		}
-		break;
-	case GEM_MB_SCRLUP:
-		if (scrlbr) {
-			scrlbr->ScrollUp();
-		}
-		break; 
-	case GEM_MB_SCRLDOWN:
-		if (scrlbr) {
-			scrlbr->ScrollDown();
-		}
-		break;
 	}
+	return Control::OnMouseDown(me, mod);
 }
+
 /** Mouse Button Up */
-void Button::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
+bool Button::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
+	bool drag = core->GetDraggedItem () != NULL;
+
+	if (drag && me.repeats == 1) {
+		ActionKey key(Action::DragDropDest);
+		if (SupportsAction(key)) {
+			return PerformAction(key);
+		} else {
+			//if something was dropped, but it isn't handled here: it didn't happen
+			return false;
+		}
 	}
-
-	//what was just dropped?
-	int dragtype = 0;
-	if (core->GetDraggedItem ()) dragtype=1;
-	if (core->GetDraggedPortrait ()) dragtype=2;
-
-	//if something was dropped, but it isn't handled here: it didn't happen
-	if (dragtype && !ButtonOnDragDrop)
-		return;
 
 	switch (State) {
 	case IE_GUI_BUTTON_PRESSED:
@@ -481,14 +503,95 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		break;
 	}
 
-	//in case of dragged/dropped portraits, allow the event to happen even
-	//when we are out of bound
-	if (dragtype!=2) {
-		if (( x >= Width ) || ( y >= Height )) {
-			return;
+	DoToggle();
+	return Control::OnMouseUp(me, mod);
+}
+
+bool Button::OnMouseOver(const MouseEvent& me)
+{
+	if (State == IE_GUI_BUTTON_LOCKED) {
+		return true;
+	}
+
+	return Control::OnMouseOver(me);
+}
+
+void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
+{
+	Control::OnMouseEnter(me, dop);
+
+	if (IsFocused() && me.ButtonState(GEM_MB_ACTION)) {
+		SetState( IE_GUI_BUTTON_PRESSED );
+	}
+
+	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
+		ButtonBorder *fr = &borders[i];
+		if (fr->enabled) {
+			pulseBorder = !fr->filled;
+			MarkDirty();
+			break;
 		}
 	}
-	if (Flags & IE_GUI_BUTTON_CHECKBOX) {
+}
+
+void Button::OnMouseLeave(const MouseEvent& me, const DragOp* dop)
+{
+	Control::OnMouseLeave(me, dop);
+
+	if (State == IE_GUI_BUTTON_PRESSED && (dop == nullptr || dop->dragView == this)) {
+		SetState( IE_GUI_BUTTON_UNPRESSED );
+	}
+
+	if (pulseBorder) {
+		pulseBorder = false;
+		MarkDirty();
+	}
+}
+
+/** Sets the Text of the current control */
+void Button::SetText(const String& string)
+{
+	Text = string;
+	if (string.length()) {
+		if (flags&IE_GUI_BUTTON_LOWERCASE)
+			StringToLower( Text );
+		else if (flags&IE_GUI_BUTTON_CAPS)
+			StringToUpper( Text );
+		hasText = true;
+	} else {
+		hasText = false;
+	}
+	MarkDirty();
+}
+
+/** Refresh a button from a given radio button group */
+void Button::UpdateState(unsigned int Sum)
+{
+	if (IsDisabled()) {
+		return;
+	}
+
+	if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
+		//radio button, exact value
+		ToggleState = ( Sum == GetValue() );
+	} else if (flags & IE_GUI_BUTTON_CHECKBOX) {
+		//checkbox, bitvalue
+		ToggleState = !!( Sum & GetValue() );
+	} else {
+		//other buttons, nothing to redraw
+		return;
+	}
+
+	if (ToggleState) {
+		SetState(IE_GUI_BUTTON_SELECTED);
+	} else {
+		SetState(IE_GUI_BUTTON_UNPRESSED);
+	}
+}
+
+void Button::DoToggle()
+{
+	if (flags & IE_GUI_BUTTON_CHECKBOX) {
 		//checkbox
 		ToggleState = !ToggleState;
 		if (ToggleState)
@@ -498,264 +601,88 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		if (VarName[0] != 0) {
 			ieDword tmp = 0;
 			core->GetDictionary()->Lookup( VarName, tmp );
-			tmp ^= Value;
+			tmp ^= GetValue();
 			core->GetDictionary()->SetAt( VarName, tmp );
-			Owner->RedrawControls( VarName, tmp );
+			window->RedrawControls( VarName, tmp );
 		}
 	} else {
-		if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
+		if (flags & IE_GUI_BUTTON_RADIOBUTTON) {
 			//radio button
 			ToggleState = true;
 			SetState( IE_GUI_BUTTON_SELECTED );
 		}
 		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
-			Owner->RedrawControls( VarName, Value );
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt( VarName, val );
+			window->RedrawControls( VarName, val );
 		}
 	}
-
-	switch (dragtype) {
-		case 1:
-			RunEventHandler( ButtonOnDragDrop );
-			return;
-		case 2:
-			RunEventHandler( ButtonOnDragDropPortrait );
-			return;
-	}
-
-	if (Button & GEM_MB_ACTION) {
-		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress)
-			RunEventHandler( ButtonOnShiftPress );
-		else
-			RunEventHandler( ButtonOnPress );
-	} else {
-		if (Button == GEM_MB_MENU && ButtonOnRightPress)
-			RunEventHandler( ButtonOnRightPress );
-	}
 }
 
-void Button::OnMouseWheelScroll(short x, short y)
-{
-	ScrollBar* scrlbr = (ScrollBar*) sb;
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-	
-	if (scrlbr) {
-		scrlbr->OnMouseWheelScroll(x, y);
-	}
-}
-
-void Button::OnMouseOver(unsigned short x, unsigned short y)
-{
-	Owner->Cursor = IE_CURSOR_NORMAL;
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-
-	if ( RunEventHandler( MouseOverButton )<0) {
-		//event handler destructed this object
-		return;
-	}
-
-	//well, no more flags for buttons, and the portraits we can perform action on
-	//are in fact 'draggable multiline pictures' (with image)
-	if ((Flags & IE_GUI_BUTTON_DISABLED_P) == IE_GUI_BUTTON_PORTRAIT) {
-		GameControl *gc = core->GetGameControl();
-		if (gc) {
-			Owner->Cursor = gc->GetDefaultCursor();
-		}
-	}
-
-	if (State == IE_GUI_BUTTON_LOCKED) {
-		return;
-	}
-
-	//portrait buttons are draggable and locked
-	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && 
-			      (State == IE_GUI_BUTTON_PRESSED || State ==IE_GUI_BUTTON_LOCKED_PRESSED)) {
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		int dx = Owner->XPos + XPos + x - drag_start.x;
-		int dy = Owner->YPos + YPos + y - drag_start.y;
-		core->GetDictionary()->SetAt( "DragX", dx );
-		core->GetDictionary()->SetAt( "DragY", dy );
-		drag_start.x = (ieWord) (drag_start.x + dx);
-		drag_start.y = (ieWord) (drag_start.y + dy);
-		RunEventHandler( ButtonOnDrag );
-	}
-}
-
-void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
-{
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-
-	if (MouseEnterButton !=0 && VarName[0] != 0) {
-		core->GetDictionary()->SetAt( VarName, Value );
-	}
-
-	RunEventHandler( MouseEnterButton );
-}
-
-void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
-{
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-	if (WantsDragOperation()) {
-		core->GetDictionary()->SetAt( VarName, Value );
-	}
-	RunEventHandler( MouseLeaveButton );
-}
-
-/** Sets the Text of the current control */
-void Button::SetText(const String& string)
-{
-	Text = string;
-	if (string.length()) {
-		if (Flags&IE_GUI_BUTTON_LOWERCASE)
-			StringToLower( Text );
-		else if (Flags&IE_GUI_BUTTON_CAPS)
-			StringToUpper( Text );
-		hasText = true;
-	} else {
-		hasText = false;
-	}
-	MarkDirty();
-}
-
-/** Set Event Handler */
-bool Button::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-		case IE_GUI_BUTTON_ON_PRESS:
-			ButtonOnPress = handler;
-			break;
-		case IE_GUI_MOUSE_OVER_BUTTON:
-			MouseOverButton = handler;
-			break;
-		case IE_GUI_MOUSE_ENTER_BUTTON:
-			MouseEnterButton = handler;
-			break;
-		case IE_GUI_MOUSE_LEAVE_BUTTON:
-			MouseLeaveButton = handler;
-			break;
-		case IE_GUI_BUTTON_ON_SHIFT_PRESS:
-			ButtonOnShiftPress = handler;
-			break;
-		case IE_GUI_BUTTON_ON_RIGHT_PRESS:
-			ButtonOnRightPress = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG_DROP:
-			ButtonOnDragDrop = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT:
-			ButtonOnDragDropPortrait = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DRAG:
-			ButtonOnDrag = handler;
-			break;
-		case IE_GUI_BUTTON_ON_DOUBLE_PRESS:
-			ButtonOnDoublePress = handler;
-			break;
-	default:
-		return false;
-	}
-	return true;
-}
-
-/** Refresh a button from a given radio button group */
-void Button::UpdateState(unsigned int Sum)
-{
-	if (State == IE_GUI_BUTTON_DISABLED) {
-		return;
-	}
-	if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
-		ToggleState = ( Sum == Value );
-	}   	//radio button, exact value
-	else if (Flags & IE_GUI_BUTTON_CHECKBOX) {
-		ToggleState = !!( Sum & Value );
-	} //checkbox, bitvalue
-	else {
-		return;
-	} //other buttons, nothing to redraw
-	if (ToggleState) {
-		SetState(IE_GUI_BUTTON_SELECTED);
-	} else {
-		SetState(IE_GUI_BUTTON_UNPRESSED);
-	}
-}
 /** Sets the Picture */
-void Button::SetPicture(Sprite2D* newpic)
+void Button::SetPicture(Holder<Sprite2D> newpic)
 {
-	Sprite2D::FreeSprite( Picture );
 	ClearPictureList();
 	Picture = newpic;
+	if (Picture) {
+		// try fitting to width if rescaling is possible, otherwise we automatically crop
+		unsigned int ratio = round((float) Picture->Frame.w / (float) frame.w);
+		if (ratio > 1) {
+			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
+			Picture = img;
+		}
+		flags |= IE_GUI_BUTTON_PICTURE;
+	} else {
+		flags &= ~IE_GUI_BUTTON_PICTURE;
+	}
 	MarkDirty();
-	Flags |= IE_GUI_BUTTON_PICTURE;
 }
 
 /** Clears the list of Pictures */
 void Button::ClearPictureList()
 {
-	for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
-		 iter != PictureList.end(); ++iter)
-		Sprite2D::FreeSprite( *iter );
 	PictureList.clear();
 	MarkDirty();
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(Sprite2D* Picture)
+void Button::StackPicture(Holder<Sprite2D> Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();
-	Flags |= IE_GUI_BUTTON_PICTURE;
+	flags |= IE_GUI_BUTTON_PICTURE;
 }
 
-bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
+bool Button::HitTest(const Point& p) const
 {
-	// some buttons have hollow Image frame filled w/ Picture
-	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
-	Sprite2D* Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
-	if (Picture || PictureList.size() || ! Unpressed) return false;
-	int xOffs = ( Width / 2 ) - ( Unpressed->Width / 2 );
-	int yOffs = ( Height / 2 ) - ( Unpressed->Height / 2 );
-	return Unpressed->IsPixelTransparent(x - xOffs, y - yOffs);
+	bool hit = Control::HitTest(p);
+	if (hit) {
+		// some buttons have hollow Image frame filled w/ Picture
+		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
+		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
+		if (Picture || PictureList.size() || !Unpressed) return true;
+
+		Point off;
+		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;
+		off.y = (frame.h / 2) - (Unpressed->Frame.h / 2) + Unpressed->Frame.y;
+		hit = !Unpressed->IsPixelTransparent(p - off);
+	}
+	return hit;
 }
 
 // Set palette used for drawing button label in normal state
-void Button::SetTextColor(const Color &fore, const Color &back)
+void Button::SetTextColor(const Color &color)
 {
-	gamedata->FreePalette( normal_palette );
-	gamedata->FreePalette(disabled_palette);
-
-	normal_palette = new Palette( fore, back );
-	disabled_palette = new Palette(fore, back);
-	disabled_palette->Darken();
+	textColor = color;
 	MarkDirty();
 }
 
-void Button::SetHorizontalOverlay(double clip, const Color &/*src*/, const Color &dest)
+void Button::SetHorizontalOverlay(double clip, const Color& src, const Color &dest)
 {
-	if ((Clipping>clip) || !(Flags&IE_GUI_BUTTON_HORIZONTAL) ) {
-		Flags |= IE_GUI_BUTTON_HORIZONTAL;
-#if 0
-		// FIXME: This doesn't work while CloseUpColor isn't being called
-		// (see Draw)
-		SourceRGB=src;
-		DestRGB=dest;
-		starttime = GetTicks();
-		starttime += 40;
-#else
-		SourceRGB = DestRGB = dest;
-		starttime = 0;
-#endif
+	if ((Clipping>clip) || !(flags&IE_GUI_BUTTON_HORIZONTAL) ) {
+		flags |= IE_GUI_BUTTON_HORIZONTAL;
+
+		overlayAnim = ColorAnimation(src, dest, false);
 	}
 	Clipping = clip;
 	MarkDirty();
@@ -769,6 +696,40 @@ void Button::SetAnchor(ieWord x, ieWord y)
 void Button::SetPushOffset(ieWord x, ieWord y)
 {
 	PushOffset = Point(x,y);
+}
+
+bool Button::SetHotKey(KeyboardKey key, short mod, bool global)
+{
+	UnregisterHotKey();
+	
+	if (key == 0) {
+		return true;
+	}
+
+	if (global) {
+		if (EventMgr::RegisterHotKeyCallback(HotKeyCallback, key, mod)) {
+			hotKey.key = key;
+			hotKey.mod = mod;
+			hotKey.global = true;
+			return true;
+		}
+	} else if (window->RegisterHotKeyCallback(HotKeyCallback, key)) { // FIXME: this doesnt respect mod param
+		hotKey.key = key;
+		hotKey.mod = mod;
+		return true;
+	}
+	return false;
+}
+
+bool Button::HandleHotKey(const Event& e)
+{
+	if (IsReceivingEvents() && e.type == Event::KeyDown) {
+		// only run once on keypress (or should it be KeyRelease?)
+		// we could support both; key down = left mouse down, key up = left mouse up
+		DoToggle();
+		return PerformAction();
+	}
+	return false;
 }
 
 }

@@ -26,7 +26,6 @@
 #include "GameData.h"
 #include "Item.h"
 #include "Sprite2D.h"
-#include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
 #include "GameScript/GSUtils.h"
@@ -48,22 +47,14 @@ Container::Container(void)
 	Trapped = 0;
 	TrapDetected = 0;
 	inventory.SetInventoryType(INVENTORY_HEAP);
-	// NULL should be 0 for this
-	memset (groundicons, 0, sizeof(groundicons) );
-	groundiconcover = 0;
 	OpenFail = 0;
 }
 
 void Container::FreeGroundIcons()
 {
-	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		if (groundicons[i]) {
-			Sprite2D::FreeSprite( groundicons[i] );
-			groundicons[i]=NULL;
-		}
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
+		groundicons[i] = nullptr;
 	}
-	delete groundiconcover;
-	groundiconcover = 0;
 }
 
 Container::~Container()
@@ -71,61 +62,40 @@ Container::~Container()
 	FreeGroundIcons();
 }
 
-void Container::DrawPile(bool highlight, Region screen, Color tint)
+Region Container::DrawingRegion() const
 {
-	Video* video = core->GetVideoDriver();
-	Game *game = core->GetGame();
-
-	//draw it with highlight
-	ieDword flags = BLIT_TINTED | (highlight ? 0 : BLIT_NOSHADOW);
-	if (game) game->ApplyGlobalTint(tint, flags);
-
-	CreateGroundIconCover();
-	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
-		if (groundicons[i]) {
-			video->BlitGameSprite(groundicons[i],
-				screen.x + Pos.x, screen.y + Pos.y,
-				flags, tint, groundiconcover);
+	Region r(Pos.x, Pos.y, 0, 0);
+	
+	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; ++i) {
+		const Holder<Sprite2D> icon = groundicons[i];
+		if (icon) {
+			Region frame = icon->Frame;
+			frame.x = frame.x * -1 + Pos.x;
+			frame.y = frame.y * -1 + Pos.y;
+			r.ExpandToRegion(frame);
 		}
 	}
+	
+	return r;
 }
 
-// create the SpriteCover for the groundicons
-void Container::CreateGroundIconCover()
+void Container::Draw(bool highlight, const Region& vp, Color tint, uint32_t flags) const
 {
-	int xpos = 0;
-	int ypos = 0;
-	int width = 0;
-	int height = 0;
+	Video* video = core->GetVideoDriver();
 
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
-		if (groundicons[i]) {
-			Sprite2D& spr = *groundicons[i];
-			if (xpos < spr.XPos) {
-				width += spr.XPos - xpos;
-				xpos = spr.XPos;
+	for (int i = 0;i<MAX_GROUND_ICON_DRAWN;i++) {
+		const Holder<Sprite2D> icon = groundicons[i];
+		if (icon) {
+			if (highlight) {
+				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+			} else {
+				const Color trans;
+				PaletteHolder p = icon->GetPalette();
+				Color tmpc = p->col[1];
+				p->CopyColorRange(&trans, &trans + 1, 1);
+				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 			}
-			if (ypos < spr.YPos) {
-				height += spr.YPos - ypos;
-				ypos = spr.YPos;
-			}
-			if (width-xpos < spr.Width-spr.XPos) {
-				width = spr.Width-spr.XPos+xpos;
-			}
-			if (height-ypos < spr.Height-spr.YPos) {
-				height = spr.Height-spr.YPos+ypos;
-			}
-		}
-	}
-
-	if (!groundiconcover ||
-		!groundiconcover->Covers(Pos.x, Pos.y, xpos, ypos, width, height))
-	{
-		delete groundiconcover;
-		groundiconcover = NULL;
-		if (width*height > 0) {
-			groundiconcover = GetCurrentArea()->BuildSpriteCover
-				(Pos.x, Pos.y, xpos, ypos, width, height, WantDither());
 		}
 	}
 }
@@ -189,17 +159,6 @@ void Container::RefreshGroundIcons()
 		groundicons[i] = gamedata->GetBAMSprite( itm->GroundIcon, 0, 0 );
 		gamedata->FreeItem( itm, slot->ItemResRef ); //decref
 	}
-}
-
-//used for ground piles
-int Container::WantDither()
-{
-	//if pile is highlighted, always dither it
-	if (Highlight) {
-		return 2; //dither me if you want
-	}
-	//if pile isn't highlighted, dither it if the polygon wants
-	return 1;
 }
 
 int Container::IsOpen() const
@@ -300,7 +259,6 @@ void Container::dump() const
 		name = Scripts[0]->GetName();
 	}
 	buffer.appendFormatted( "Script: %s, Key: %s\n", name, KeyResRef );
-	// FIXME: const_cast
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }

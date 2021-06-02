@@ -16,30 +16,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
+
 import GemRB
 import GameCheck
 import InventoryCommon
 from GUIDefines import GS_DIALOGMASK, OP_SET
 
-# message window expansion
-def OnIncreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand>2:
-		return
-	Expand = (Expand + 1)*2
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
+def SetGameGUIHidden(hide):
+	op = OP_OR if hide else OP_NAND
+	GemRB.GameSetScreenFlags(GS_HIDEGUI, op)
 
-# message window contraction
-def OnDecreaseSize():
-	GSFlags = GemRB.GetMessageWindowSize()
-	Expand = GSFlags&GS_DIALOGMASK
-	GSFlags = GSFlags-Expand
-	if Expand<2:
-		return
-	Expand = Expand/2 - 1 # 6->2, 2->0
-	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
+def IsGameGUIHidden():
+	return GemRB.GetGUIFlags() & GS_HIDEGUI
+
+# for keymap.2da
+def ToggleGUIHidden():
+	SetGameGUIHidden(not IsGameGUIHidden())
 
 
 ##################################################################
@@ -52,6 +44,7 @@ import GUIWORLD
 from ie_stats import *
 from GUIDefines import *
 
+HideOnClose = False
 ContainerWindow = None
 Container = None
 if GameCheck.IsIWD2():
@@ -71,9 +64,9 @@ def UpdateContainerWindow ():
 
 	pc = GemRB.GameGetFirstSelectedPC ()
 	if GameCheck.IsPST():
-		GUICommon.SetEncumbranceLabels (Window, 54, None, pc, True)
+		GUICommon.SetEncumbranceLabels (Window, 54, None, pc)
 	else:
-		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
+		GUICommon.SetEncumbranceLabels (Window, 0x10000045, 0x10000046, pc)
 
 	party_gold = GemRB.GameGetPartyGold ()
 	Text = Window.GetControl (0x10000036)
@@ -83,13 +76,13 @@ def UpdateContainerWindow ():
 	LeftCount = Container['ItemCount']
 	ScrollBar = Window.GetControl (52)
 	Count = max (0, (LeftCount - ground_size + leftdiv - 1) / leftdiv)
-	ScrollBar.SetVarAssoc ("LeftTopIndex", Count)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", GemRB.GetVar ("LeftTopIndex"), 0, Count)
 
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControl (53)
 	Count = max (0, (RightCount - 4 + 1) / 2)
-	ScrollBar.SetVarAssoc ("RightTopIndex", Count)
+	ScrollBar.SetVarAssoc ("RightTopIndex", GemRB.GetVar ("RightTopIndex"), 0, Count)
 
 	RedrawContainerWindow ()
 
@@ -143,8 +136,8 @@ def RedrawContainerWindow ():
 			InventoryCommon.UpdateInventorySlot (pc, Button, Slot, "inventory")
 
 	# shade the inventory icon if it is full
-	if Window.HasControl (54):
-		Button = Window.GetControl (54)
+	Button = Window.GetControl (54)
+	if Button:
 		free_slots = GemRB.GetSlots (pc, 0x8000, -1)
 		if free_slots == ():
 			Button.SetState (IE_GUI_BUTTON_PRESSED)
@@ -157,41 +150,53 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
-	hideflag = GemRB.HideGUI ()
+	global HideOnClose
+	HideOnClose = IsGameGUIHidden()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContainerWindow = Window = GemRB.LoadWindow (8)
+	if HideOnClose:
+		SetGameGUIHidden(False)
+		# must use a timed event because SetGameGUIHidden(False) sets a flag to unhide the gui next frame
+		# AFIK not needed, commented out in case it turns out there are conditions we will need it
+		# GemRB.SetTimedEvent (lambda: GemRB.GetView ("MSGWIN").SetVisible(False), 1)
+	else:
+		GemRB.GetView ("MSGWIN").SetVisible (False)
+		ActWin = GemRB.GetView ("ACTWIN")
+		if ActWin:
+			ActWin.SetVisible (False)
 
+	ContainerWindow = Window = GemRB.LoadWindow (8, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	# fix wrong height in the guiw10.chu and reposition
+	# that chu is also used as a base for some arbitrary resolutions
+	if GameCheck.IsBG2 () and GemRB.GetSystemVariable (SV_HEIGHT) >= 768:
+		Size = Window.GetSize ()
+		Pos = Window.GetPos ()
+		Window.SetSize (Size[0], 90)
+		Window.SetPos (Pos[0], GemRB.GetSystemVariable (SV_HEIGHT) - 90)
 
 	#stop gears from interfering
 	if GameCheck.IsPST():
-		GUIWORLD.OldPortraitWindow = GUIClasses.GWindow( GemRB.GetVar ("PortraitWindow") )
 		GUICommonWindows.DisableAnimatedWindows ()
-
-	if GameCheck.IsIWD2():
-		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("MessageWindow", Window.ID)
-	else:
-		GUIWORLD.OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-		GUIWORLD.OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-		GemRB.SetVar ("MessageWindow", -1)
-		GemRB.SetVar ("ActionsWindow", Window.ID)
+	elif not GameCheck.IsIWD2 () and not GameCheck.IsGemRBDemo ():
+		# container window shouldnt be in front
+		GemRB.GetView("OPTWIN").Focus()
+		GemRB.GetView("PORTWIN").Focus()
 
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
-	if GameCheck.IsBG2() and Window.HasControl (62):
+	if GameCheck.IsBG2():
 		Button = Window.GetControl (62)
-		Label = Button.CreateLabelOnButton (0x1000003e, "NORMAL", IE_FONT_SINGLE_LINE)
+		if Button: # the demo lacks this button
+			Label = Button.CreateLabel (0x10000047, "NORMAL", "", IE_FONT_SINGLE_LINE)
 
-		Label.SetAnimation ("CPEN")
-		Button.SetAnimation ("CGEAR")
-		Button.SetBAM ("CDIAL", 0, 0)
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-		GUICommon.SetGamedaysAndHourToken()
-		Button.SetTooltip(16041)
+			Label.SetAnimation ("CPEN")
+			Button.SetAnimation ("CGEAR")
+			Button.SetBAM ("CDIAL", 0, 0)
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+			GUICommon.SetGamedaysAndHourToken()
+			Button.SetTooltip(16041)
 
 	# 0-5 - Ground Item
 	for i in range (ground_size):
@@ -213,24 +218,26 @@ def OpenContainerWindow ():
 
 	# left scrollbar (container)
 	ScrollBar = Window.GetControl (52)
+	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 
 	# right scrollbar (inventory)
 	ScrollBar = Window.GetControl (53)
+	ScrollBar.SetVisible(True) # unhide because in PST it is linked to a TextArea
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, RedrawContainerWindow)
 
 	# encumbrance and inventory icon
 	# iwd has a handy button
-	if Window.HasControl (54):
-		Button = Window.GetControl (54)
+	Button = Window.GetControl (54)
+	if Button:
 		if GameCheck.IsPST():
 			Button.SetFont ("NUMBER")
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-		Button.CreateLabelOnButton (0x10000043, "NUMBER", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Button.CreateLabelOnButton (0x10000044, "NUMBER", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000045, "NUMBER", "", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Button.CreateLabel (0x10000046, "NUMBER", "", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 	else:
-		Label = Window.CreateLabel (0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = Window.CreateLabel (0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000045, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
+		Label = Window.CreateLabel (0x10000046, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
 
 	# container icon
 	Button = Window.GetControl (50)
@@ -254,14 +261,13 @@ def OpenContainerWindow ():
 		Button.SetText (1403)
 	else:
 		Button.SetText ("")
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+
+	Button.MakeEscape()
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeaveContainer)
 
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
-	if hideflag:
-		GemRB.UnhideGUI ()
 
 def CloseContainerWindow ():
 	global ContainerWindow
@@ -269,22 +275,15 @@ def CloseContainerWindow ():
 	if not ContainerWindow:
 		return
 
-	hideflag = GemRB.HideGUI ()
-
-	ContainerWindow.Unload ()
+	ContainerWindow.Close ()
+	ContainerWindow = None
+	GemRB.GetView ("MSGWIN").SetVisible (True)
+	if GemRB.GetView ("ACTWIN"):
+		GemRB.GetView ("ACTWIN").SetVisible (True)
+	SetGameGUIHidden(HideOnClose)
 
 	if GameCheck.IsPST():
-		GemRB.SetVar ("PortraitWindow", GUIWORLD.OldPortraitWindow.ID)
 		GUICommonWindows.EnableAnimatedWindows ()
-		 #PST needs a reminder to redraw the  clock for some reason
-		if GUICommonWindows.ActionsWindow:
-			GUICommonWindows.ActionsWindow.SetVisible(WINDOW_VISIBLE)
-		
-
-	GemRB.SetVar ("MessageWindow", GUIWORLD.OldMessageWindow.ID)
-	# iwd2 has no separate action window
-	if not GameCheck.IsIWD2():
-		GemRB.SetVar ("ActionsWindow", GUIWORLD.OldActionsWindow.ID)
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
@@ -292,11 +291,6 @@ def CloseContainerWindow ():
 	#play closing sound if applicable
 	if tmp!='*':
 		GemRB.PlaySound (tmp)
-
-	#it is enough to close here
-
-	if hideflag:
-		GemRB.UnhideGUI ()
 
 #doing this way it will inform the core system too, which in turn will call
 #CloseContainerWindow ()

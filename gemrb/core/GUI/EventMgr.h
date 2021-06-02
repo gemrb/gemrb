@@ -29,7 +29,17 @@
 #define EVENTMGR_H
 
 #include "exports.h"
+#include "ie_types.h"
 
+#include "Callback.h"
+#include "Region.h"
+#include "System/String.h"
+
+#include <bitset>
+#include <climits>
+#include <cstdint>
+#include <list>
+#include <map>
 #include <vector>
 
 namespace GemRB {
@@ -52,29 +62,186 @@ class Window;
 #define GEM_PGUP		0x8d
 #define GEM_PGDOWN		0x8e
 #define GEM_GRAB		0x8f
-#define GEM_FUNCTION1           0x90     //don't use anything between these two and keep a round number
-#define GEM_FUNCTION16          0x9f
+
+// 0x90 - 0x9f reserved for function keys (1-16)
+#define GEM_FUNCTIONX(x) \
+	(0x8F + x)
 
 #define GEM_MOD_SHIFT           1
 #define GEM_MOD_CTRL            2
 #define GEM_MOD_ALT             4
 
-#define GEM_MOUSEOUT	128
-
 // Mouse buttons
 #define GEM_MB_ACTION           1
+#define GEM_MB_MIDDLE           2
 #define GEM_MB_MENU             4
-#define GEM_MB_SCRLUP           8
-#define GEM_MB_SCRLDOWN         16
 
-#define GEM_MB_ONGOING_ACTION   33
+#define FINGER_MAX 5
 
-#define GEM_MB_NORMAL           255
-#define GEM_MB_DOUBLECLICK      256
+enum InputAxis : int8_t {
+	AXIS_INVALID = -1,
+	AXIS_LEFT_X,
+	AXIS_LEFT_Y,
+	AXIS_RIGHT_X,
+	AXIS_RIGHT_Y
+};
 
-#define GEM_RK_DOUBLESPEED      1
-#define GEM_RK_DISABLE          2
-#define GEM_RK_QUADRUPLESPEED   4
+enum ControllerButton : int8_t {
+	CONTROLLER_INVALID = -1,
+	CONTROLLER_BUTTON_A,
+	CONTROLLER_BUTTON_B,
+	CONTROLLER_BUTTON_X,
+	CONTROLLER_BUTTON_Y,
+	CONTROLLER_BUTTON_BACK,
+	CONTROLLER_BUTTON_GUIDE,
+	CONTROLLER_BUTTON_START,
+	CONTROLLER_BUTTON_LEFTSTICK,
+	CONTROLLER_BUTTON_RIGHTSTICK,
+	CONTROLLER_BUTTON_LEFTSHOULDER,
+	CONTROLLER_BUTTON_RIGHTSHOULDER,
+	CONTROLLER_BUTTON_DPAD_UP,
+	CONTROLLER_BUTTON_DPAD_DOWN,
+	CONTROLLER_BUTTON_DPAD_LEFT,
+	CONTROLLER_BUTTON_DPAD_RIGHT
+};
+
+typedef unsigned char EventButton;
+typedef unsigned short KeyboardKey;
+typedef unsigned short ButtonMask;
+
+struct EventBase {
+	unsigned short repeats; // number of times this event has been repeated (within the repeat time interval)
+};
+
+struct ScreenEvent : public EventBase {
+	// cant use Point due to non trival constructor
+	int x,y; // mouse position at time of event
+	int deltaX, deltaY; // the vector of motion/scroll
+
+	Point Pos() const { return Point(x,y); }
+	Point Delta() const { return Point(deltaX, deltaY); }
+};
+
+struct GEM_EXPORT MouseEvent : public ScreenEvent {
+	ButtonMask buttonStates;
+	EventButton button;
+
+	bool ButtonState(unsigned short btn) const {
+		return buttonStates & btn;
+	}
+};
+
+struct GEM_EXPORT KeyboardEvent : public EventBase {
+	KeyboardKey keycode; // raw keycode
+	KeyboardKey character; // the translated character
+};
+
+struct GEM_EXPORT TextEvent : public EventBase {
+	String text; // activate the soft keyboard and disable hot keys until next (non TextEvent) event
+};
+
+struct GEM_EXPORT ControllerEvent : public EventBase {
+	InputAxis axis;
+	float axisPct;
+	int axisDelta;
+	ButtonMask buttonStates;
+	EventButton button;
+};
+
+struct GEM_EXPORT TouchEvent : public ScreenEvent {
+	struct Finger : public ScreenEvent {
+		uint64_t id;
+	};
+
+	Finger fingers[FINGER_MAX];
+
+	int numFingers;
+	float pressure;
+};
+
+struct GEM_EXPORT GestureEvent : public TouchEvent {
+	float dTheta;
+	float dDist;
+};
+
+struct GEM_EXPORT Event {
+	enum EventType {
+		MouseMove = 0,
+		MouseUp,
+		MouseDown,
+		MouseScroll,
+
+		KeyUp,
+		KeyDown,
+
+		TouchGesture,
+		TouchUp,
+		TouchDown,
+
+		TextInput, // clipboard or faux event sent to signal the soft keyboard+temp disable hotkeys
+		
+		ControllerAxis,
+		ControllerButtonUp,
+		ControllerButtonDown
+
+		// leaving off types for unused events
+	};
+
+	enum EventTypeMask {
+		NoEventsMask = 0U,
+
+		MouseMoveMask = 1 << MouseMove,
+		MouseUpMask = 1 << MouseUp,
+		MouseDownMask = 1 << MouseDown,
+		MouseScrollMask = 1 << MouseScroll,
+
+		AllMouseMask = MouseMoveMask | MouseUpMask | MouseDownMask | MouseScrollMask,
+
+		KeyUpMask = 1 << KeyUp,
+		KeyDownMask = 1 << KeyDown,
+
+		AllKeyMask = KeyUpMask | KeyDownMask,
+
+		TouchGestureMask = 1 << TouchGesture,
+		TouchUpMask = 1 << TouchUp,
+		TouchDownMask = 1 << TouchDown,
+
+		AllTouchMask = TouchGestureMask | TouchUpMask | TouchDownMask,
+
+		TextInputMask = 1 << TextInput,
+		
+		ControllerAxisMask = 1 << ControllerAxis,
+		ControllerButtonUpMask = 1 << ControllerButtonUp,
+		ControllerButtonDownMask = 1 << ControllerButtonDown,
+		
+		AllControllerMask = ControllerAxisMask | ControllerButtonUpMask | ControllerButtonDownMask,
+
+		AllEventsMask = 0xffffffffU
+	};
+
+	static EventTypeMask EventMaskFromType (EventType type) { return static_cast<EventTypeMask>(1U << type); };
+
+	union {
+		MouseEvent mouse;
+		ControllerEvent controller;
+		KeyboardEvent keyboard;
+		TouchEvent touch;
+		GestureEvent gesture;
+	};
+
+	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
+    
+    typedef unsigned short EventMods;
+
+	EventType type;
+	unsigned long time;
+	EventMods mod; // modifier keys held during the event
+	bool isScreen; // event coresponsds to location on screen
+};
+
+MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down);
+MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down);
+KeyboardEvent KeyEventFromController(const ControllerEvent& ce);
 
 /**
  * @class EventMgr
@@ -83,73 +250,70 @@ class Window;
  */
 
 class GEM_EXPORT EventMgr {
-private:
-	Control* focusLock;
-	std::vector< Window*> windows;
-	std::vector< int> topwin;
-
-	unsigned short dc_x, dc_y;
-	unsigned long dc_time, dc_delay;
-	unsigned long rk_delay, rk_flags;
-
-	/** Function bar window containing function key buttons */
-	Window* function_bar;
-	/** Last Window focused */
-	Window* last_win_focused;
-	/** Last Window mouse event focused */
-	Window* last_win_mousefocused;
-	/** Last Window under Mouse Pointer*/
-	Window* last_win_over;
-	/** Sets a Window on the Top of the Window Queue */
 public:
-	EventMgr(void);
-	~EventMgr(void);
-	/** Adds a Window to the Event Manager */
-	void AddWindow(Window* win);
-	/** Removes a Window from the Event chain */
-	//void DelWindow(unsigned short WindowID, const char *WindowPack);
-	void DelWindow(Window* win);
-	/** Frees and Removes all the Windows in the Array */
-	void Clear();
-	/** Call this to change the cursor (moving over windows will change it back) */
-	void RefreshCursor(int idx);
-	/** Trigger a fake MouseMove event with current coordinates (typically used to refresh cursor) */
-	void FakeMouseMove();
-	/** BroadCast Mouse Move Event */
-	void MouseMove(unsigned short x, unsigned short y);
-	/** BroadCast Mouse Move Event */
-	void MouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** BroadCast Mouse Move Event */
-	void MouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** BroadCast Mouse Scroll Event */
-	void MouseWheelScroll( short x, short y);
-	/** BroadCast Mouse Idle Event */
-	void MouseIdle(unsigned long time);
-	/** BroadCast Key Press Event */
-	void KeyPress(unsigned char Key, unsigned short Mod);
-	/** BroadCast Key Release Event */
-	void KeyRelease(unsigned char Key, unsigned short Mod);
-	/** Special Ket Press Event */
-	void OnSpecialKeyPress(unsigned char Key);
-	/** Sets focus to the control of the window */
-	void SetFocused(Window *win, Control *ctrl);
-	/** Sets mouse event focus to the control of the window */
-	void SetMouseFocused(Window *win, Control *ctrl);
-	/** Sets the maximum accepted doubleclick delay */
-	void SetDCDelay(unsigned long t);
-	void SetRKDelay(unsigned long t);
-	unsigned long GetRKDelay();
-	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
-	void inline SetFunctionBar(Window *win) { function_bar = win; }
-	Control* GetMouseFocusedControl();
-	/** Mask of which Mouse Buttons are pressed */
-	unsigned char MButtons;
+	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
+	using EventCallback = Callback<bool, const Event&>;
+	typedef size_t TapMonitorId;
+	
+	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
+	static constexpr int mouseDragRadius = 10; // radius for drag events
+
+	static unsigned long DCDelay;
+	static unsigned long DPDelay;
+	static bool TouchInputEnabled;
+
+	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);
+	static Event CreateMouseMotionEvent(const Point& pos, int mod = 0);
+	static Event CreateMouseWheelEvent(const Point& vec, int mod = 0);
+
+	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
+
+	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
+	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
+
+	static Event CreateTextEvent(const char* text);
+	static Event CreateTextEvent(const String& text);
+	
+	static Event CreateControllerAxisEvent(InputAxis axis, int delta, float pct);
+	static Event CreateControllerButtonEvent(EventButton btn, bool down);
+
+	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
+	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
+	static TapMonitorId RegisterEventMonitor(EventCallback, Event::EventTypeMask mask = Event::AllEventsMask);
+	static void UnRegisterEventMonitor(TapMonitorId monitor);
+
 private:
-	void SetDefaultFocus(Window *win);
-	void SetOnTop(int Index);
-	bool ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime);
+	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
+	// currently the delays are static so it makes sense for now that the HotKeys are...
+	// map combination of keyboard key and modifier keys to a callback
+	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback> > EventTaps;
+	typedef std::map<int, std::list<EventCallback> > KeyMap;
+
+	static EventTaps Taps;
+	static KeyMap HotKeys;
+
+	static buttonbits mouseButtonFlags;
+	static buttonbits modKeys;
+	static Point mousePos;
+
+	static std::map<uint64_t, TouchEvent::Finger> fingerStates;
+	
+	static buttonbits controllerButtonStates;
+
+public:
+	void DispatchEvent(Event&& e);
+
+	static bool ModState(unsigned short mod);
+
+	static bool MouseButtonState(EventButton btn);
+	static bool MouseDown();
+	static Point MousePos() { return mousePos; }
+
+	static const TouchEvent::Finger* FingerState(uint64_t id) { return (fingerStates.count(id)) ? &fingerStates[id] : NULL; };
+	static bool FingerDown();
+	static ieByte NumFingersDown() { return fingerStates.size(); };
+	
+	static bool ControllerButtonState(EventButton btn);
 };
 
 }

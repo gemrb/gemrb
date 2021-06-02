@@ -17,7 +17,6 @@
 #cmakedefine DATA_DIR "${DATA_DIR}"
 #cmakedefine SYSCONF_DIR "${SYSCONF_DIR}"
 #cmakedefine NOCOLOR ${NOCOLOR}
-#cmakedefine USE_OPENGL ${USE_OPENGL}
 #cmakedefine OPENGL_BACKEND ${OPENGL_BACKEND}
 #cmakedefine NOFPSLIMIT ${NOFPSLIMIT}
 #cmakedefine HAVE_MALLOC_H 1
@@ -29,5 +28,5 @@
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
 #cmakedefine01 ICONV_ACCEPTS_NONCONST_INPUT
-
+#define BAKE_ICON 1
 #endif

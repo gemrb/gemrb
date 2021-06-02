@@ -20,21 +20,19 @@
 
 #include "TileOverlay.h"
 
-//#include "Game.h" // needed only for TILE_GREY below
+#include "Game.h" // for GetGlobalTint
 #include "GlobalTimer.h"
 #include "Interface.h"
 #include "Video.h"
 
 namespace GemRB {
 
-bool RedrawTile = false;
-
 TileOverlay::TileOverlay(int Width, int Height)
 {
 	w = Width;
 	h = Height;
 	count = 0;
-	tiles = ( Tile * * ) malloc( w * h * sizeof( Tile * ) );
+	tiles = ( Tile * * ) calloc( w * h, sizeof( Tile * ) );
 }
 
 TileOverlay::~TileOverlay(void)
@@ -50,48 +48,23 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::BumpViewport(const Region &viewport, Region &vp)
+void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags)
 {
-	bool bump = false;
-	vp.w = viewport.w;
-	vp.h = viewport.h;
-	int origW = vp.w;
-	int origH = vp.h;
-	if (( vp.x + vp.w ) > w * 64) {
-		vp.x = ( w * 64 - vp.w );
-		bump = true;
-	}
-	if (vp.x < 0) {
-		vp.x = 0;
-		bump = true;
-	}
-	if (( vp.y + vp.h ) > h * 64) {
-		vp.y = ( h * 64 - vp.h );
-		bump = true;
-	}
-	if (vp.y < 0) {
-		vp.y = 0;
-		bump = true;
-	}
-	// no need to do anything if we're in bounds, already changing or the call would have been a noop
-	if (bump && !(core->timer->ViewportIsMoving()) && (origW != vp.w || origH != vp.h)) {
-		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
-	}
-}
-
-void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, int flags)
-{
-	Video* vid = core->GetVideoDriver();
-	Region vp = vid->GetViewport();
-
-	// if the video's viewport is partially outside of the map, bump it back
-	BumpViewport(viewport, vp);
 	// determine which tiles are visible
-	int sx = vp.x / 64;
-	int sy = vp.y / 64;
-	int dx = ( vp.x + vp.w + 63 ) / 64;
-	int dy = ( vp.y + vp.h + 63 ) / 64;
+	int sx = std::max(viewport.x / 64, 0);
+	int sy = std::max(viewport.y / 64, 0);
+	int dx = ( std::max(viewport.x, 0) + viewport.w + 63 ) / 64;
+	int dy = ( std::max(viewport.y, 0) + viewport.h + 63 ) / 64;
 
+	Game* game = core->GetGame();
+	assert(game);
+	const Color* globalTint = game->GetGlobalTint();
+	if (globalTint) {
+		flags |= BLIT_COLOR_MOD;
+	}
+	const Color tintcol = (globalTint) ? * globalTint : Color();
+
+	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
@@ -102,34 +75,36 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays, in
 				anim = tile->anim[0];
 			}
 			assert(anim);
-			vid->BlitTile( anim->NextFrame(), 0, viewport.x + ( x * 64 ),
-				viewport.y + ( y * 64 ), &viewport, flags );
+
+			// this is the base terrain tile
+			Point p = Point(x * 64, y * 64) - viewport.Origin();
+			vid->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
+
 			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
 
-			//draw overlay tiles, they should be half transparent
 			int mask = 2;
 			for (size_t z = 1;z<overlays.size();z++) {
 				TileOverlay * ov = overlays[z];
 				if (ov && ov->count > 0) {
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
-						if (RedrawTile) {
-							vid->BlitTile( ovtile->anim[0]->NextFrame(),
-						                   tile->anim[0]->NextFrame(),
-							               viewport.x + ( x * 64 ),
-							               viewport.y + ( y * 64 ),
-							               &viewport, flags );
+						//draw overlay tiles, they should be half transparent except for BG1
+						uint32_t transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
+						// this is the water (or whatever)
+						vid->BlitGameSprite(ovtile->anim[0]->NextFrame(), p, flags | transFlag, tintcol);
+
+						if (core->HasFeature(GF_LAYERED_WATER_TILES)) {
+							if (tile->anim[1]) {
+								// this is the mask to blend the terrain tile with the water for everything but BG1
+								vid->BlitGameSprite(tile->anim[1]->NextFrame(), p,
+													flags | BLIT_BLENDED, tintcol);
+							}
 						} else {
-							Sprite2D* mask = 0;
-							if (tile->anim[1])
-								mask = tile->anim[1]->NextFrame();
-							vid->BlitTile( ovtile->anim[0]->NextFrame(),
-						                   mask,
-							               viewport.x + ( x * 64 ),
-							               viewport.y + ( y * 64 ),
-							               &viewport, TILE_HALFTRANS | flags );
+							// in BG 1 this is the mask to blend the terrain tile with the water
+							vid->BlitGameSprite(tile->anim[0]->NextFrame(), p,
+												flags | BLIT_BLENDED, tintcol);
 						}
 					}
 				}

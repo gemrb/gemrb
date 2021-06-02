@@ -24,11 +24,12 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import CommonWindow
 
 movies = [None,"T1DEATH","T1ABSORB","FINALE"]
 
 def OnLoad ():
-	GemRB.HideGUI ()
+	CommonWindow.SetGameGUIHidden(True)
 	which = movies[GemRB.GetVar ("QuitGame1")]
 	if which!=None:
 		GemRB.PlayMovie (which,1)
@@ -49,8 +50,7 @@ def DonePress ():
 def DeathWindowEnd ():
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (25)
+	Window = GemRB.LoadWindow (25, GUICommon.GetWindowPack())
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)
@@ -61,12 +61,8 @@ def DeathWindowEnd ():
 	Button = Window.GetControl (1)
 	Button.SetText (17237)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, DonePress)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeDefault()
 
-	GemRB.HideGUI ()
-	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("PortraitWindow", Window.ID)
-	GemRB.UnhideGUI ()
 	#making the playing field gray
-	GUICommon.GameWindow.SetVisible(WINDOW_GRAYED)
+	GUICommon.GameWindow.SetDisabled(True)
 	return

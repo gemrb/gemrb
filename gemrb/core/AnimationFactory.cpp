@@ -30,27 +30,18 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 {
 	FLTable = NULL;
 	FrameData = NULL;
-	datarefcount = 0;
 }
 
 AnimationFactory::~AnimationFactory(void)
 {
-	for (unsigned int i = 0; i < frames.size(); i++) {
-		frames[i]->release();
-	}
 	if (FLTable)
 		free( FLTable);
 
-	// FIXME: track down where sprites are being leaked
-	if (datarefcount) {
-		Log(ERROR, "AnimationFactory", "AnimationFactory %s has refcount %d", ResRef, datarefcount);
-		//assert(datarefcount == 0);
-	}
 	if (FrameData)
 		free( FrameData);
 }
 
-void AnimationFactory::AddFrame(Sprite2D* frame)
+void AnimationFactory::AddFrame(Holder<Sprite2D> frame)
 {
 	frames.push_back( frame );
 }
@@ -86,14 +77,13 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 	Animation* anim = new Animation( cycles[cycle].FramesCount );
 	int c = 0;
 	for (int i = ff; i < lf; i++) {
-		frames[FLTable[i]]->acquire();
-		anim->AddFrame( frames[FLTable[i]], c++ );
+		anim->AddFrame(frames[FLTable[i]], c++);
 	}
 	return anim;
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */
-Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
+Holder<Sprite2D> AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
 {
 	if (cycle >= cycles.size()) {
 		return NULL;
@@ -102,23 +92,19 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) 
 	if(index >= fc) {
 		return NULL;
 	}
-	Sprite2D* spr = frames[FLTable[ff+index]];
-	spr->acquire();
-	return spr;
+	return frames[FLTable[ff+index]];
 }
 
-Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
+Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
 {
 	if(index >= frames.size()) {
 		return NULL;
 	}
-	Sprite2D* spr = frames[index];
-	spr->acquire();
-	return spr;
+	return frames[index];
 }
 
-Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
-		Sprite2D *&Picture2, unsigned int type) const
+Holder<Sprite2D> AnimationFactory::GetPaperdollImage(ieDword *Colors,
+		Holder<Sprite2D> &Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {
 		return NULL;
@@ -145,38 +131,30 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		return NULL;
 	}
 	if (Colors) {
-		Palette* palette = Picture2->GetPalette();
+		PaletteHolder palette = Picture2->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		Picture2->SetPalette(palette);
-		palette->release();
 	}
 
-	Picture2->XPos = (short)frames[second]->XPos;
-	Picture2->YPos = (short)frames[second]->YPos - 80;
+	Picture2->Frame.x = (short)frames[second]->Frame.x;
+	Picture2->Frame.y = (short)frames[second]->Frame.y - 80;
 
-	Sprite2D* spr = frames[first]->copy();
+	Holder<Sprite2D> spr = frames[first]->copy();
 	if (Colors) {
-		Palette* palette = spr->GetPalette();
+		PaletteHolder palette = spr->GetPalette();
 		palette->SetupPaperdollColours(Colors, type);
-		spr->SetPalette(palette);
-		palette->release();
 	}
 
-	spr->XPos = (short)frames[first]->XPos;
-	spr->YPos = (short)frames[first]->YPos;
-
+	spr->Frame.x = (short)frames[first]->Frame.x;
+	spr->Frame.y = (short)frames[first]->Frame.y;
 	return spr;
 }
 
-void AnimationFactory::IncDataRefCount()
+int AnimationFactory::GetCycleSize(size_t idx) const
 {
-	++datarefcount;
-}
+	if (idx >= cycles.size())
+		return 0;
 
-void AnimationFactory::DecDataRefCount()
-{
-	assert(datarefcount > 0);
-	--datarefcount;
+	return cycles[idx].FramesCount;
 }
 
 }

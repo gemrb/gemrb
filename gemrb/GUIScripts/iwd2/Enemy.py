@@ -21,6 +21,7 @@
 # racial enemy), but that will only affect testers (6-10 level gain or more)
 import GemRB
 import GUICommon
+import CharOverview
 import CommonTables
 from GUIDefines import *
 from ie_stats import IE_CLASS, IE_LEVELRANGER, IE_HATEDRACE, IE_HATEDRACE2
@@ -69,13 +70,12 @@ def OpenEnemyWindow(chargen=0):
 
 	rankDiff = 0
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		RaceWindow = GemRB.LoadWindow (15)
+		RaceWindow = GemRB.LoadWindow (15, "GUICG")
+		CharOverview.PositionCharGenWin (RaceWindow)
 		pc = GemRB.GetVar ("Slot")
 		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		RaceWindow = GemRB.LoadWindow (16)
+		RaceWindow = GemRB.LoadWindow (16, "GUIREC")
 		pc = GemRB.GameGetSelectedPCSingle ()
 		Class = GemRB.GetVar ("LUClass") + 1
 		LevelDiff = GemRB.GetVar ("LevelDiff")
@@ -108,14 +108,14 @@ def OpenEnemyWindow(chargen=0):
 	if chargen:
 		BackButton = RaceWindow.GetControl (10)
 		BackButton.SetText (15416)
-		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+		BackButton.MakeEscape()
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
 	else:
 		RaceWindow.DeleteControl (10)
 
 	DoneButton = RaceWindow.GetControl(11)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = RaceWindow.GetControl(8)
@@ -127,9 +127,11 @@ def OpenEnemyWindow(chargen=0):
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, DisplayRaces)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	RaceWindow.SetVisible(WINDOW_VISIBLE)
+
 	if not chargen:
 		RaceWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		RaceWindow.Focus()
 	DisplayRaces()
 	return
 

@@ -27,13 +27,13 @@
 #include "ImageMgr.h"
 #include "Interface.h"
 #include "GUI/Button.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/Progressbar.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Slider.h"
 #include "GUI/TextArea.h"
 #include "GUI/TextEdit.h"
-#include "GUI/Window.h"
 
 using namespace GemRB;
 
@@ -69,7 +69,7 @@ bool CHUImporter::Open(DataStream* stream)
 }
 
 /** Returns the i-th window in the Previously Loaded Stream */
-Window* CHUImporter::GetWindow(unsigned int wid)
+Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
@@ -103,18 +103,22 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 	str->ReadResRef( MosFile );
 	str->ReadWord( &FirstControl );
 
-	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
+	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
+	Holder<Sprite2D> bg;
 	if (BackGround == 1) {
 		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MosFile);
-		if (mos != nullptr) {
-			win->SetBackGround( mos->GetSprite2D(), true );
+		if (mos) {
+			bg = mos->GetSprite2D();
 		}
 	}
+	win->SetBackground(bg);
+
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
 	}
 	for (i = 0; i < ControlsCount; i++) {
+		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
 		Region ctrlFrame;
@@ -139,7 +143,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 			{
 				//Button
 				Button* btn = new Button(ctrlFrame);
-				btn->ControlID = ControlID;
+				ctrl = btn;
 				ieResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
@@ -160,7 +164,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &DisabledIndex, 1 );
 				str->Read( &y2, 1 );
 
-				win->AddControl( btn );
+
 				/** Justification comes from the .chu, other bits are set by script */
 				if (!Width) {
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_OR);
@@ -190,21 +194,23 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					break;
 				}
 				/** Cycle is only a byte for buttons */
-				Sprite2D *tspr = bam->GetFrame(UnpressedIndex, Cycle);
+				Holder<Sprite2D> tspr = bam->GetFrame(UnpressedIndex, Cycle);
+
 				btn->SetImage( BUTTON_IMAGE_UNPRESSED, tspr );
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
-				//ignorebuttonframes is a terrible hack
-				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize(Cycle) == 4 )
-						SelectedIndex=2;
+				// work around several controls not setting all the indices
+				int cycleSize = bam->GetCycleSize(Cycle);
+				bool resetIndex = false;
+				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
+						resetIndex = true;
+				}
+				if (resetIndex) {
+						SelectedIndex = 2;
+						if (cycleSize == 4) DisabledIndex = 3;
 				}
 				tspr = bam->GetFrame(SelectedIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_SELECTED, tspr );
-				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize(Cycle) == 4)
-						DisabledIndex=3;
-				}
 				tspr = bam->GetFrame(DisabledIndex, Cycle);
 				btn->SetImage( BUTTON_IMAGE_DISABLED, tspr );
 			}
@@ -229,12 +235,13 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &CapXPos );
 				str->ReadWord( &CapYPos );
-				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount, true );
-				pbar->ControlID = ControlID;
-				pbar->SetSliderPos( KnobXPos, KnobYPos, CapXPos, CapYPos );
+				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
+				// TODO: fix this with #232
+				pbar->SetSliderPos(Point(KnobXPos, KnobYPos), Point(CapXPos, CapYPos));
 
-				Sprite2D* img = NULL;
-				Sprite2D* img2 = NULL;
+				Holder<Sprite2D> img;
+				Holder<Sprite2D> img2;
+				Holder<Sprite2D> img3;
 				if ( MOSFile[0] ) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
@@ -244,7 +251,6 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					img2 = mos->GetSprite2D();
 				}
 
-				pbar->SetImage( img, img2 );
 				if( KnobStepsCount ) {
 					/* getting the bam */
 					AnimationFactory *af = (AnimationFactory *)
@@ -258,10 +264,11 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				}
 				else {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BAMFile);
-					Sprite2D* img3 = mos->GetSprite2D();
-					pbar->SetBarCap( img3 );
+					img3 = mos->GetSprite2D();
 				}
-				win->AddControl( pbar );
+				pbar->SetBackground(img);
+				pbar->SetImages(img2, img3);
+				ctrl = pbar;
 			}
 			break;
 			case IE_GUI_SLIDER:
@@ -279,10 +286,9 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->ReadWord( &KnobYPos );
 				str->ReadWord( &KnobStep );
 				str->ReadWord( &KnobStepsCount );
-				Slider* sldr = new Slider( ctrlFrame, KnobXPos, KnobYPos, KnobStep, KnobStepsCount, true );
-				sldr->ControlID = ControlID;
+				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
-				Sprite2D* img = mos->GetSprite2D();
+				Holder<Sprite2D> img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
 				AnimationFactory* bam = ( AnimationFactory* )
@@ -297,7 +303,7 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				else {
 					sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
 				}
-				win->AddControl( sldr );
+				ctrl = sldr;
 			}
 			break;
 
@@ -338,25 +344,24 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 					gamedata->GetFactoryResource( CursorResRef,
 							IE_BAM_CLASS_ID,
 							IE_NORMAL );
-				Sprite2D *cursor = NULL;
+				Holder<Sprite2D> cursor;
 				if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
 				}
 
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(BGMos);
-				Sprite2D *img = NULL;
+				Holder<Sprite2D> img;
 				if(mos) {
 					img = mos->GetSprite2D();
 				}
 
-				TextEdit* te = new TextEdit( ctrlFrame, maxInput, PosX, PosY );
-				te->ControlID = ControlID;
+				TextEdit* te = new TextEdit( ctrlFrame, maxInput, Point(PosX, PosY) );
 				te->SetFont( fnt );
 				te->SetCursor( cursor );
-				te->SetBackGround( img );
+				te->SetBackground( img );
 				//The original engine always seems to ignore this textfield
 				//te->SetText (Initial );
-				win->AddControl( te );
+				ctrl = te;
 			}
 			break;
 
@@ -374,11 +379,20 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
 				str->ReadWord( &SBID );
-				TextArea* ta = new TextArea( ctrlFrame, fnt, ini, fore, init, back );
-				ta->ControlID = ControlID;
-				win->AddControl( ta );
-				if (SBID != 0xffff)
-					win->Link( SBID, ( unsigned short ) ControlID );
+				
+				fore.a = init.a = back.a = 0xff;
+
+				TextArea* ta = new TextArea(ctrlFrame, fnt, ini);
+				ta->SetColor(fore, TextArea::COLOR_NORMAL);
+				ta->SetColor(init, TextArea::COLOR_INITIALS);
+				ta->SetColor(back, TextArea::COLOR_BACKGROUND);
+				if (SBID != 0xffff) {
+					ScrollBar* sb = GetControl<ScrollBar>(SBID, win);
+					if (sb) {
+						ta->SetScrollbar(sb);
+					}
+				}
+				ctrl = ta;
 			}
 			break;
 
@@ -387,32 +401,26 @@ Window* CHUImporter::GetWindow(unsigned int wid)
 				//Label
 				ieResRef FontResRef;
 				ieStrRef StrRef;
-				RevColor fore, back;
 				ieWord alignment;
 				str->ReadDword( &StrRef );
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
-				str->Read( &fore, 4 );
-				str->Read( &back, 4 );
+
+				Color textCol, bgCol;
+				str->Read(&textCol, 4);
+				str->Read(&bgCol, 4);
+				
+				textCol.a = bgCol.a = 0xff;
+
 				str->ReadWord( &alignment );
 				String* str = core->GetString( StrRef );
-				Label* lab = new Label( ctrlFrame, fnt, *str );
+				Label* lab = new Label(ctrlFrame, fnt, *str);
 				delete str;
-				lab->ControlID = ControlID;
 
 				if (alignment & 1) {
-					lab->useRGB = true;
-					Color f, b;
-					f.r = fore.b;
-					f.g = fore.g;
-					f.b = fore.r;
-					f.a = 0;
-					b.r = back.b;
-					b.g = back.g;
-					b.b = back.r;
-					b.a = 0;
-					lab->SetColor( f, b );
+					lab->SetFlags(Label::UseColor, OP_OR);
 				}
+				lab->SetColors(textCol, bgCol);
 				int align = IE_FONT_ALIGN_CENTER;
 				if (( alignment & 0x10 ) != 0) {
 					align = IE_FONT_ALIGN_RIGHT;
@@ -437,7 +445,7 @@ endvertical:
 				}
 endalign:
 				lab->SetAlignment( align );
-				win->AddControl( lab );
+				ctrl = lab;
 			}
 			break;
 
@@ -456,24 +464,41 @@ endalign:
 					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
 					break;
 				}
-				Sprite2D* images[IE_SCROLLBAR_IMAGE_COUNT];
-				for (int i=0; i < IE_SCROLLBAR_IMAGE_COUNT; i++) {
-					str->ReadWord( &imgIdx );
-					images[i] = bam->GetFrame( imgIdx, Cycle );
+				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
+				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
+					str->ReadWord(&imgIdx);
+					images[i] = bam->GetFrame(imgIdx, Cycle);
 				}
 				str->ReadWord( &TAID );
 
-				ScrollBar* sbar = new ScrollBar(ctrlFrame, images);
-				sbar->ControlID = ControlID;
+				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
 
-				win->AddControl( sbar );
-				if (TAID != 0xffff)
-					win->Link( ( unsigned short ) ControlID, TAID );
+				if (TAID == 0xffff) {
+					// text areas produce their own scrollbars in GemRB
+					ctrl = sb;
+				} else {
+					TextArea* ta = GetControl<TextArea>(TAID, win);
+					if (ta) {
+						ta->SetScrollbar(sb);
+					} else {
+						ctrl = sb;
+						// NOTE: we dont delete this, becuase there are at least a few instances
+						// where the CHU has this assigned to a text area even tho there isnt one! (BG1 GUISTORE:RUMORS, PST ContainerWindow)
+						// set them invisible instead, we will unhide them in the scripts that need them
+						sb->SetVisible(false);
+					}
+					// we still allow GUIScripts to get ahold of it
+					RegisterScriptableControl(sb, ControlID);
+				}
 			}
 			break;
 
 			default:
 				Log(ERROR, "CHUImporter", "Control Not Supported");
+		}
+		if (ctrl) {
+			win->AddSubviewInFrontOfView( ctrl );
+			RegisterScriptableControl(ctrl, ControlID);
 		}
 	}
 	return win;
@@ -482,6 +507,27 @@ endalign:
 unsigned int CHUImporter::GetWindowsCount()
 {
 	return WindowCount;
+}
+
+/** Loads a WindowPack (CHUI file) in the Window Manager */
+bool CHUImporter::LoadWindowPack(const ResRef& ref)
+{
+	if (ref == winPack) {
+		return true; // already loaded
+	}
+
+	DataStream* stream = gamedata->GetResource( ref, IE_CHU_CLASS_ID );
+	if (stream == NULL) {
+		Log(ERROR, "CHUImporter", "Error: Cannot find %s.chu", ref.CString() );
+		return false;
+	}
+	if (!Open(stream)) {
+		Log(ERROR, "CHUImporter", "Error: Cannot Load %s.chu", ref.CString() );
+		return false;
+	}
+
+	winPack = ref;
+	return true;
 }
 
 #include "plugindef.h"

@@ -81,28 +81,26 @@ def DualClassWindow ():
 	DCMainDoneButton.SetText (11973)
 	DCMainDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainDonePress)
 	DCMainDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCMainDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# cancel button (on)
 	DCMainCancelButton = DCMainWindow.GetControl (1)
 	DCMainCancelButton.SetText (13727)
 	DCMainCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainCancelPress)
 	DCMainCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCMainCancelButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCMainCancelButton.MakeEscape ()
 
 	# class button (on)
 	DCMainClassButton = DCMainWindow.GetControl (3)
 	DCMainClassButton.SetText (11959)
 	DCMainClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainClassPress)
 	DCMainClassButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCMainClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCMainClassButton.MakeDefault()
 
 	# skills button (off)
 	DCMainSkillsButton = DCMainWindow.GetControl (4)
 	DCMainSkillsButton.SetText (17372)
 	DCMainSkillsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainSkillsPress)
 	DCMainSkillsButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCMainSkillsButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# back button (on)
 	DCMainBackButton = DCMainWindow.GetControl (5)
@@ -110,13 +108,12 @@ def DualClassWindow ():
 		DCMainBackButton.SetText (15416)
 	DCMainBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCMainBackPress)
 	DCMainBackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCMainBackButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 	# picture of character
 	DCMainPictureButton = DCMainWindow.GetControl (6)
 	DCMainPictureButton.SetState (IE_GUI_BUTTON_LOCKED)
 	DCMainPictureButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	DCMainPictureButton.SetPicture (GemRB.GetPlayerPortrait (pc, 0), "NOPORTMD")
+	DCMainPictureButton.SetPicture (GemRB.GetPlayerPortrait (pc, 0)["Sprite"], "NOPORTMD")
 
 	# text area warning
 	DCTextArea = DCMainWindow.GetControl (7)
@@ -262,7 +259,6 @@ def DCMainDonePress ():
 	# close our window
 	if DCMainWindow:
 		DCMainWindow.Unload ()
-	GUIREC.UpdateRecordsWindow()
 	return
 
 def DCMainCancelPress ():
@@ -332,7 +328,6 @@ def DCMainClassPress ():
 		DCClassButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassSelect)
 		DCClassButton.SetVarAssoc ("DCClass", i)
 		DCClassButton.SetText (DCClassStrings[i])
-		DCClassButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
 
 		# enable only if we can dual into the given class
 		if CanDualInto (i):
@@ -345,14 +340,14 @@ def DCMainClassPress ():
 	DCClassDoneButton.SetText (11973)
 	DCClassDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassDonePress)
 	DCClassDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCClassDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCClassDoneButton.MakeDefault()
 
 	# back button (on)
 	DCClassBackButton = DCClassWindow.GetControl (7)
 	DCClassBackButton.SetText (15416)
 	DCClassBackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCClassBackPress)
 	DCClassBackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCClassBackButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCClassBackButton.MakeEscape ()
 
 	# setup the text area with default text
 	DCClassTextArea = DCClassWindow.GetControl (9)
@@ -497,13 +492,13 @@ def DCOpenProfsWindow ():
 	DCProfsDoneButton.SetText (11973)
 	DCProfsDoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsDonePress)
 	DCProfsDoneButton.SetState (IE_GUI_BUTTON_DISABLED)
-	DCProfsDoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCProfsDoneButton.MakeDefault()
 
 	DCProfsCancelButton = DCProfsWindow.GetControl (77)
 	DCProfsCancelButton.SetText (13727)
 	DCProfsCancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, DCProfsCancelPress)
 	DCProfsCancelButton.SetState (IE_GUI_BUTTON_ENABLED)
-	DCProfsCancelButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DCProfsCancelButton.MakeEscape ()
 
 	# show the window and draw away
 	DCProfsWindow.ShowModal (MODAL_SHADOW_GRAY)
@@ -597,17 +592,18 @@ def OpenSkillsWindow ():
 
 	#just go back if we can't assign skills
 	if GemRB.GetVar ("SkillPointsLeft") <= 0:
+		DCSkillsWindow.Close ()
 		return
 
 	# setup the back and done buttons
 	BackButton = DCSkillsWindow.GetControl(24)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS,DCSkillsBackPress)
 
 	DCSkillsDoneButton = DCSkillsWindow.GetControl(25)
 	DCSkillsDoneButton.SetText(11973)
-	DCSkillsDoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DCSkillsDoneButton.MakeDefault()
 	DCSkillsDoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DCSkillsDonePress)
 	DCSkillsDoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
@@ -617,7 +613,6 @@ def OpenSkillsWindow ():
 
 	DCSkillsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	DCSkillsRedraw ()
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def DCSkillsRedraw ():
@@ -647,6 +642,4 @@ def DCSkillsDonePress ():
 
 	if DCSkillsWindow:
 		DCSkillsWindow.Unload ()
-	DCMainWindow.ShowModal (MODAL_SHADOW_GRAY)
-	GemRB.SetRepeatClickFlags (GEM_RK_DISABLE, OP_OR)
 	return

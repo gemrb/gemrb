@@ -19,6 +19,7 @@
 #character generation, ability (GUICG4)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 from ie_stats import IE_STR, IE_DEX, IE_CON, IE_INT, IE_WIS, IE_CHR
 
@@ -75,14 +76,20 @@ def CalcLimits(Abidx):
 
 	return
 
+def GetModColor(mod):
+	if mod < 0:
+		return {'r' : 255, 'g' : 0, 'b' : 0}
+	elif mod > 0:
+		return {'r' : 0, 'g' : 255, 'b' : 0}
+	else:
+		return {'r' : 255, 'g' : 255, 'b' : 255}
+
 def RollPress():
 	global Add
 
-	AbilityWindow.Invalidate()
 	GemRB.SetVar("Ability",0)
 	SumLabel = AbilityWindow.GetControl(0x10000002)
-	SumLabel.SetTextColor(255, 255, 0)
-	SumLabel.SetUseRGB(1)
+	SumLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	SumLabel.SetText(str(PointsLeft))
 
 	for i in range(0,6):
@@ -96,13 +103,7 @@ def RollPress():
 		Label.SetText(str(v) )
 
 		Label = AbilityWindow.GetControl(0x10000024+i)
-		Label.SetUseRGB(1)
-		if b<0:
-			Label.SetTextColor(255,0,0)
-		elif b>0:
-			Label.SetTextColor(0,255,0)
-		else:
-			Label.SetTextColor(255,255,255)
+		Label.SetTextColor (GetModColor (b))
 		Label.SetText("%+d"%(b))
 	return
 
@@ -118,8 +119,6 @@ def OpenAbilitiesWindow(chargen, points):
 	CharGen = chargen
 	PointsLeft = points
 
-	#enable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	AbilityTable = GemRB.LoadTable ("ability")
 	if chargen:
 		Kit = GemRB.GetVar("Class Kit")
@@ -135,11 +134,10 @@ def OpenAbilitiesWindow(chargen, points):
 
 	# in a fit of clarity, they used the same ids in both windowpacks
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		AbilityWindow = GemRB.LoadWindow (4)
+		AbilityWindow = GemRB.LoadWindow (4, "GUICG")
+		CharOverview.PositionCharGenWin (AbilityWindow)
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		AbilityWindow = GemRB.LoadWindow (7)
+		AbilityWindow = GemRB.LoadWindow (7, "GUIREC")
 
 	RollPress ()
 	for i in range(0,6):
@@ -150,38 +148,39 @@ def OpenAbilitiesWindow(chargen, points):
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 	if chargen:
 		BackButton = AbilityWindow.GetControl (36)
 		BackButton.SetText (15416)
-		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+		BackButton.MakeEscape()
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
 	else:
 		AbilityWindow.DeleteControl (36)
 
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
 
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	AbilityWindow.SetVisible(WINDOW_VISIBLE)
 	if not chargen:
 		AbilityWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		AbilityWindow.Focus()
 	return
 
-def RightPress():
+def RightPress(btn, Abidx):
 	global PointsLeft
 
-	AbilityWindow.Invalidate()
-	Abidx = GemRB.GetVar("Ability")
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
@@ -195,23 +194,17 @@ def RightPress():
 	PointsLeft = PointsLeft + 1
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText(str(PointsLeft) )
-	SumLabel.SetTextColor(255, 255, 0)
+	SumLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
 	Label.SetText(str(Ability) )
 	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
-	if b<0:
-		Label.SetTextColor(255,0,0)
-	elif b>0:
-		Label.SetTextColor(0,255,0)
-	else:
-		Label.SetTextColor(255,255,255)
+	Label.SetTextColor (GetModColor (b))
 	Label.SetText("%+d"%(b))
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	return
 
-def JustPress():
-	Abidx = GemRB.GetVar("Ability")
+def JustPress(btn, Abidx):
 	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
@@ -220,11 +213,9 @@ def JustPress():
 	TextAreaControl.SetText(AbilityTable.GetValue(Abidx, 1) )
 	return
 
-def LeftPress():
+def LeftPress(btn, Abidx):
 	global PointsLeft
 
-	Abidx = GemRB.GetVar("Ability")
-	AbilityWindow.Invalidate()
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )
@@ -239,26 +230,19 @@ def LeftPress():
 	PointsLeft = PointsLeft - 1
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	if PointsLeft == 0:
-		SumLabel.SetTextColor(255, 255, 255)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 	SumLabel.SetText(str(PointsLeft) )
 	Label = AbilityWindow.GetControl(0x10000003+Abidx)
 	Label.SetText(str(Ability) )
 	Label = AbilityWindow.GetControl(0x10000024+Abidx)
 	b = Ability // 2 - 5
-	if b<0:
-		Label.SetTextColor(255,0,0)
-	elif b>0:
-		Label.SetTextColor(0,255,0)
-	else:
-		Label.SetTextColor(255,255,255)
+	Label.SetTextColor (GetModColor (b))
 	Label.SetText("%+d"%(b))
 	if PointsLeft == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return
 
 def BackPress():
-	#disable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	if AbilityWindow:
 		AbilityWindow.Unload()
 	GemRB.SetNextScript("CharGen5")

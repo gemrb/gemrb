@@ -155,14 +155,6 @@ Color depth of the game window (in bits per pixel).
 Whether the game should run in fullscreen mode.
 
 .TP
-.BR TooltipDelay =INT
-Delay (in milliseconds) before tooltips are displayed when the mouse is not moving.
-A reasonable number for this option is e.g.
-.IR 500 .
-The default is
-.IR 100 .
-
-.TP
 .BR SkipIntroVideos =(0|1)
 If set to
 .IR 1 ,
@@ -170,10 +162,23 @@ the intro and logo videos are skipped to save developer's nerves. The default is
 .IR 0 .
 
 .TP
-.BR FogOfWar =(0|1)
-If set to
-.IR 1 ,
-the unexplored parts of an area are blacked out. It is enabled by default.
+.BR GCDebug =(0|2047)
+Bitfield with reserved bits for drawing Map debug layers.
+  No Debugging features = 0 (default)
+  DEBUG_SHOW_INFOPOINTS   		= 1
+  DEBUG_SHOW_CONTAINERS   		= 2
+  DEBUG_SHOW_DOORS				= 4
+  DEBUG_SHOW_DOORS_SECRET		= 8
+  DEBUG_SHOW_DOORS_DISABLED		= 16
+  DEBUG_SHOW_DOORS_ALL			= 28
+  DEBUG_SHOW_LIGHTMAP     		= 32
+  DEBUG_SHOW_WALLS				= 64
+  DEBUG_SHOW_WALLS_ANIM_COVER	= 128
+  DEBUG_SHOW_WALLS_ALL			= 192
+  DEBUG_SHOW_SEARCHMAP			= 256
+  DEBUG_SHOW_FOG_UNEXPLORED		= 512
+  DEBUG_SHOW_FOG_INVISIBLE		= 1024
+  DEBUG_SHOW_FOG_ALL			= 1536
 
 
 .\"###################################################
@@ -358,6 +363,13 @@ Bitfield with reserved bits for disabling the mouse.
   Hide tooltips       = 2
   Hide mouse+tooltips = 3
 
+.TP
+.BR TouchInput =(0-1)
+Override setting for when autodetection does not have satisfactory results.
+  Autodetect         = -1 (default)
+  Force disable      = 0
+  Enable             = 1
+
 .\"###################################################
 .SH Development parameters:
 
@@ -379,7 +391,7 @@ the current FPS (Frames per Second) value is drawn in the top left window corner
 .IR 0 .
 
 .TP
-.BR ScriptDebugMode =(n)
+.BR DebugMode =(n)
 This parameter is meant for developers. It is a combination of bit values
 
 .IR 1
@@ -395,7 +407,19 @@ This parameter is meant for developers. It is a combination of bit values
 - display action warnings,
 
 .IR 16
-- display trigger warnings.
+- display trigger warnings,
+
+.IR 32
+- enable views debug mode,
+
+.IR 64
+- enable window debug mode,
+
+.IR 128
+- enable font debug mode,
+
+.IR 256
+- enable text debug mode.
 
 The default is
 .IR 0 .

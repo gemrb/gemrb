@@ -24,28 +24,19 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(int Width, int Height, int Bpp, const void* pixels)
-	: Width(Width), Height(Height), Bpp(Bpp), pixels(pixels)
+Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
+	: pixels(pixels), Frame(rgn), Bpp(Bpp)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
-	RLE = false;
-	XPos = 0;
-	YPos = 0;
-	RefCount = 1;
 	renderFlags = 0;
 }
 
 Sprite2D::Sprite2D(const Sprite2D &obj)
 {
 	BAM = false;
-	RLE = false;
-	RefCount = 1;
 
-	XPos = obj.XPos;
-	YPos = obj.YPos;
-	Width = obj.Width;
-	Height = obj.Height;
+	Frame = obj.Frame;
 	Bpp = obj.Bpp;
 	renderFlags = obj.renderFlags;
 
@@ -56,23 +47,31 @@ Sprite2D::Sprite2D(const Sprite2D &obj)
 Sprite2D::~Sprite2D()
 {
 	if (freePixels) {
-		// FIXME: casting away const.
-		free((void*)pixels);
+		free(pixels);
 	}
 }
 
-bool Sprite2D::IsPixelTransparent(unsigned short x, unsigned short y) const
+Color Sprite2D::GetPixel(int x, int y) const
 {
-	// TODO: this wont work for non-bam sprites, but it isn't used for any currently.
-	return GetPixel(x, y).a == 0;
+	return GetPixel(Point(x, y));
 }
 
-void Sprite2D::release()
+bool Sprite2D::IsPixelTransparent(const Point& p) const
 {
-	assert(RefCount > 0);
-	if (--RefCount == 0) {
-		delete this;
-	}
+	return GetPixel(p).a == 0;
 }
+
+const void* Sprite2D::LockSprite() const
+{
+	return pixels;
+}
+
+void* Sprite2D::LockSprite()
+{
+	return pixels;
+}
+
+void Sprite2D::UnlockSprite() const
+{}
 
 }

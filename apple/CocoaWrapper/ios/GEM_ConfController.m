@@ -171,15 +171,16 @@ enum ConfigTableSection {
 		return NO;
 	}
 
-	UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
+	__block UIProgressView* pv = nil;
+	dispatch_sync(dispatch_get_main_queue(), ^{
+		UITableViewCell* selectedCell = [controlTable cellForRowAtIndexPath:indexPath];
 
-	UIProgressView* pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
-	UIView* contentView = selectedCell.contentView;
-	CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
-	dispatch_async(dispatch_get_main_queue(), ^{
+		pv = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleDefault];
+		UIView* contentView = selectedCell.contentView;
+		CGRect frame = CGRectMake(0.0, 0.0, contentView.frame.size.width, contentView.frame.size.height);
 		pv.frame = frame;
+		[contentView addSubview:pv];
 	});
-	[contentView addSubview:pv];
 
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES); 
 	NSString* libDir = [[paths objectAtIndex:0] copy];
@@ -268,7 +269,7 @@ enum ConfigTableSection {
 		}
 
 		installName = [installName lastPathComponent];
-		NSString* gamePath = [NSString stringWithFormat:@"%@/%@/%@/", libDir, [archivePath pathExtension], installName];
+		NSString* gamePath = [NSString stringWithFormat:@"Library/%@/%@/", [archivePath pathExtension], installName];
 		// delete anything at gamePath. our install overwrites existing data.
 		[fm removeItemAtPath:gamePath error:nil];
 		if (archiveHasRootDir) {
@@ -281,11 +282,11 @@ enum ConfigTableSection {
 			[fm moveItemAtPath:dstPath toPath:gamePath error:nil];
 		}
 
-		NSString* savePath = [NSString stringWithFormat:@"%@/saves/%@/", libDir, [archivePath pathExtension]];
+		NSString* savePath = [NSString stringWithFormat:@"Library/saves/%@/", [archivePath pathExtension]];
 		NSString* oldSavePath = [NSString stringWithFormat:@"%@save/", gamePath];
 		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@save/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
 		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@mpsave/", savePath] withIntermediateDirectories:YES attributes:nil error:nil];
-		[fm createDirectoryAtPath:[NSString stringWithFormat:@"%@/Caches/%@/", libDir, [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
+		[fm createDirectoryAtPath:[NSString stringWithFormat:@"Library/Caches/%@/", [archivePath pathExtension]] withIntermediateDirectories:YES attributes:nil error:nil];
 
 		NSLog(@"moving %@ to %@", oldSavePath, savePath);
 		NSArray* saves = [fm contentsOfDirectoryAtPath:oldSavePath error:nil];
@@ -323,28 +324,17 @@ enum ConfigTableSection {
 		}
 		if (newConfig) {
 			[newConfig appendFormat:@"\nGameType = %@", [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nGamePath = %@", [gamePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+			[newConfig appendFormat:@"\nGamePath = %@", gamePath];
 			// No need for CD paths
-			[newConfig appendFormat:@"\nCachePath = ../Library/Caches/%@/", [archivePath pathExtension]];
-			[newConfig appendFormat:@"\nSavePath = %@", [savePath stringByReplacingOccurrencesOfString:libDir withString:@"../Library"]];
+			[newConfig appendFormat:@"\nCachePath = Library/Caches/%@/", [archivePath pathExtension]];
+			[newConfig appendFormat:@"\nSavePath = %@", savePath];
 
-			[newConfig appendString:@"\nCustomFontPath = ../Documents/"];
-
-			NSArray* minResGames = [NSArray arrayWithObjects:@"bg1", @"pst", @"iwd", nil];
-			if ([[NSPredicate predicateWithFormat:@"description IN[c] %@", minResGames] evaluateWithObject:[archivePath pathExtension]]) {
-				// PST & BG1 & IWD are 640x480 without mod
-				[newConfig appendString:@"\nWidth = 640"];
-				[newConfig appendString:@"\nHeight = 480"];
-			} else {
-				if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-					[newConfig appendString:@"\nWidth = 1024"];
-					[newConfig appendString:@"\nHeight = 768"];
-				}else{
-					[newConfig appendString:@"\nWidth = 800"];
-					[newConfig appendString:@"\nHeight = 600"];
-				}
-			}
-
+			[newConfig appendFormat:@"\nCustomFontPath = %@", docDir];
+			
+			CGRect screenRect = [[UIScreen mainScreen] bounds];
+			[newConfig appendFormat:@"\nWidth = %d", (int)screenRect.size.width];
+			[newConfig appendFormat:@"\nHeight = %d", (int)screenRect.size.height];
+			
 			NSError* err = nil;
 			if (![newConfig writeToFile:newCfgPath atomically:YES encoding:NSUTF8StringEncoding error:&err]){
 				NSLog(@"Unable to write config file:%@\nError:%@", newCfgPath, [err localizedDescription]);
@@ -556,6 +546,9 @@ enum ConfigTableSection {
 	// SDL disables the event pump after SDL_main returns because normally SDL_main houses the application event loop
 	// GemRB is diffrent and our wrapper interface makes that impossible.
 	SDL_iPhoneSetEventPump(SDL_TRUE);
+
+	SDL_SetHintWithPriority(SDL_HINT_ORIENTATIONS, "LandscapeRight LandscapeLeft", SDL_HINT_OVERRIDE);
+	SDL_SetHintWithPriority(SDL_HINT_RENDER_DRIVER, "opengles", SDL_HINT_OVERRIDE);
 
 	// Note: use NSRunLoop over NSObject performSelector!
 	NSArray* modes = [NSArray arrayWithObject:NSDefaultRunLoopMode];

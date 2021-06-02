@@ -28,17 +28,13 @@ MyChar = 0
 
 def RedrawSkills():
 	ProfsPointsLeft = GemRB.GetVar ("ProfsPointsLeft")
-	if not ProfsPointsLeft:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(ProfsPointsLeft > 0)
 	return
 
 def OnLoad():
 	global SkillWindow, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindow(9)
+	SkillWindow = GemRB.LoadWindow(9, "GUICG")
 	MyChar = GemRB.GetVar ("Slot")
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), GemRB.GetPlayerStat (MyChar, IE_LEVEL2), \
 			GemRB.GetPlayerStat (MyChar, IE_LEVEL3)]
@@ -47,16 +43,16 @@ def OnLoad():
 
 	BackButton = SkillWindow.GetControl(77)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 
 	RedrawSkills()
-	SkillWindow.SetVisible(WINDOW_VISIBLE)
+	SkillWindow.Focus()
 	return
 
 def BackPress():

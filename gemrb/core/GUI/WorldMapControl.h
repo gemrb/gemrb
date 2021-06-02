@@ -31,22 +31,11 @@
 
 #include "exports.h"
 
-#include "Dialog.h"
-
 namespace GemRB {
 
 class Font;
-class Palette;
 class WMPAreaEntry;
 class WorldMapControl;
-
-// !!! Keep these synchronized with GUIDefines.py !!!
-/** Which label color is set with SetColor() */
-#define IE_GUI_WMAP_COLOR_BACKGROUND  0
-#define IE_GUI_WMAP_COLOR_NORMAL      1
-#define IE_GUI_WMAP_COLOR_SELECTED    2
-#define IE_GUI_WMAP_COLOR_NOTVISITED  3
-
 
 /**
  * @class WorldMapControl
@@ -54,67 +43,56 @@ class WorldMapControl;
  * allowing travelling between areas.
  */
 
-#define IE_GUI_WORLDMAP_ON_PRESS   0x08000000
-#define IE_GUI_MOUSE_ENTER_WORLDMAP  0x08000002
-
-class GEM_EXPORT WorldMapControl : public Control {
-protected:
+class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
+private:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region&) override;
+
 public:
-	WorldMapControl(const Region& frame, const char *fontname, int direction);
-	~WorldMapControl(void);
+	WorldMapControl(const Region& frame, Font *font);
+	WorldMapControl(const Region& frame, Font *font, const Color &normal, const Color &selected, const Color &notvisited);
 
 	/** Allows modification of the scrolling factor from outside */
-	void AdjustScrolling(short x, short y);
+	void ScrollDelta(const Point& delta) override;
+	void ScrollTo(const Point& pos) override;
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
-	/** Set color for one type of area labels */
-	void SetColor(int which, Color color);
+
 	void SetOverrideIconPalette(bool ipOverride) { OverrideIconPalette = ipOverride; };
-	int ScrollX, ScrollY;
-	unsigned short lastMouseX, lastMouseY;
-	bool MouseIsDown;
+	Point Pos;
 	/** pointer to last pointed area */
-	WMPAreaEntry *Area;
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
+	WMPAreaEntry *Area = nullptr;
+
+protected:
+	/** Mouse Over Event */
+	bool OnMouseOver(const MouseEvent& /*me*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	/** Mouse Leave Event */
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
+	/** Mouse Wheel Event */
+	bool OnMouseWheelScroll(const Point& delta) override;
+
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+
 private:
 	//font for printing area names
 	Font* ftext;
-	//mouse cursor
-	unsigned char lastCursor;
 	//current area
 	ieResRef currentArea;
 	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
 	bool OverrideIconPalette;
 	/** Label color of a visited area */
-	Palette *pal_normal;
-	/** Label color of a currently selected area */
-	Palette *pal_selected;
-	/** Label color of a not yet visited area */
-	Palette *pal_notvisited;
-	/** guiscript Event when button pressed */
-	ControlEventHandler WorldMapControlOnPress;
-	/** guiscript Event when mouse is over a reachable area */
-	ControlEventHandler WorldMapControlOnEnter;
 
-	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Mouse Leave Event */
-	void OnMouseLeave(unsigned short x, unsigned short y);
-	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Wheel Event */
-	void OnMouseWheelScroll(short x, short y);
-	/** Special Key Press */
-	bool OnSpecialKeyPress(unsigned char Key);
-	/** DisplayTooltip */
-	void DisplayTooltip();
+	Color color_normal;
+	/** Label color of a currently selected area */
+	Color color_selected;
+	/** Label color of a not yet visited area */
+	Color color_notvisited;
+
 };
 
 }

@@ -18,6 +18,8 @@
 #
 #character generation, import (GUICG20)
 import GemRB
+
+import CharOverview
 from GUIDefines import *
 
 #import from a character sheet
@@ -31,14 +33,13 @@ def OnLoad():
 	global MainWindow, PortraitButton
 	global ImportWindow, TextAreaControl, DoneButton
 
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	MainWindow = GemRB.LoadWindow(0)
-	MainWindow.SetFrame()
+	MainWindow = GemRB.LoadWindow(0, "GUICG")
 
 	PortraitButton = MainWindow.GetControl (12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
 	ImportWindow = GemRB.LoadWindow(20)
+	CharOverview.PositionCharGenWin (ImportWindow)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
@@ -52,7 +53,7 @@ def OnLoad():
 
 	CancelButton = ImportWindow.GetControl(1)
 	CancelButton.SetText(15416)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 	
 	# disable the three extraneous buttons in the bottom row
 	for i in [16, 13, 15]:
@@ -62,8 +63,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectFile)
-	MainWindow.SetVisible(WINDOW_VISIBLE)
-	ImportWindow.SetVisible(WINDOW_VISIBLE)
+	ImportWindow.Focus()
 	return
 
 def DonePress():
@@ -94,10 +94,11 @@ def SelectFile():
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
-	Portrait = GemRB.GetPlayerPortrait (Slot,0)
-	PortraitButton.SetPicture (Portrait, "NOPORTLG") 
-	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1))
-	GemRB.SetToken ("LargePortrait", Portrait)
-	ImportWindow.SetVisible(WINDOW_FRONT) #bring it to the front
+	Portrait = GemRB.GetPlayerPortrait (Slot, 0)
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1)["ResRef"])
+	GemRB.SetToken ("LargePortrait", Portrait["ResRef"])
+
+	PortraitButton.SetPicture (Portrait["Sprite"], "NOPORTLG")
+	ImportWindow.Focus() #bring it to the front
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	return

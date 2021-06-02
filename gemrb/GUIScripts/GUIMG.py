@@ -36,12 +36,9 @@ MageWindow = None
 MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
+
 # bg2 stuff for handling triggers and contingencies
-BookType = None
+Sorcerer = None
 OtherWindow = None
 Exclusions = None
 ContCond = None
@@ -49,127 +46,73 @@ ContTarg = None
 SpellType = None
 Level = 1
 
-def OpenMageWindow ():
-	global MageWindow, OptionsWindow, PortraitWindow, OtherWindow, MageSpellInfoWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenMageWindow):
-		CloseMageSpellUnmemorizeWindow ()
-		if MageSpellInfoWindow:
-			MageSpellInfoWindow.Unload ()
-			MageSpellInfoWindow = None
-		if OtherWindow:
-			OtherWindow.Unload ()
-			OtherWindow = None
-		if MageWindow:
-			MageWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MageWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMageWindow)
-	OptionsWindow.SetFrame ()
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
-
-	GUICommonWindows.SetSelectionChangeHandler (SetupMageWindow)
-	SetupMageWindow()
-	return
-
-def SetupMageWindow ():
-	global MageWindow
-	global BookType
-
-	pc = GemRB.GameGetSelectedPCSingle ()
-	BookType = 0
+def ToggleSpellWindow(btn, val):
+	global Sorcerer
 	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
-	if GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc):
-		BookType = 1
-
-	if MageWindow:
-		MageWindow.Unload()
-		MageWindow = None
-
-	if BookType:
-		MageWindow = Window = GemRB.LoadWindow (8)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+	
+	ToggleSpellWindow.Args = (btn, val)
+	
+	if Sorcerer:
+		ToggleSorcererWindow(btn, val)
 	else:
-		MageWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", MageWindow.ID)
+		ToggleMageWindow(btn, val)
 
-	Button = Window.GetControl (1)
+def InitMageWindow (window):
+	global MageWindow
+	MageWindow = window
+
+	Button = MageWindow.GetControl (1)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MagePrevLevelPress)
 
-	Button = Window.GetControl (2)
+	Button = MageWindow.GetControl (2)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MageNextLevelPress)
 
 	#unknown usage
-	if Window.HasControl (55):
-		Button = Window.GetControl (55)
+	Button = MageWindow.GetControl (55)
+	if Button:
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	#setup level buttons
 	if GameCheck.IsBG2():
 		for i in range (9):
-			Button = Window.GetControl (56 + i)
+			Button = MageWindow.GetControl (56 + i)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RefreshMageLevel)
 			Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 			Button.SetVarAssoc ("MageSpellLevel", i)
 
 	# Setup memorized spells buttons
-	if not BookType:
+	if not Sorcerer:
 		for i in range (12):
-			Button = Window.GetControl (3 + i)
-			Button.SetBorder (0,0,0,0,0,0,0,0,64,0,1)
+			Button = MageWindow.GetControl (3 + i)
+			color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 64}
+			Button.SetBorder (0,color,0,1)
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
-		Button = Window.GetControl (27 + i)
+		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
-	UpdateMageWindow ()
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
+	UpdateMageWindow (MageWindow)
 	return
 
-def UpdateMageWindow ():
+def UpdateMageWindow (MageWindow):
 	global MageMemorizedSpellList, MageKnownSpellList
 
 	MageMemorizedSpellList = []
 	MageKnownSpellList = []
 
-	Window = MageWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
 
-	Label = Window.GetControl (0x10000032)
+	Label = MageWindow.GetControl (0x10000032)
 	if GameCheck.IsBG2():
 		GemRB.SetToken ("SPELLLEVEL", str(level + 1))
 		Label.SetText (10345)
@@ -178,16 +121,17 @@ def UpdateMageWindow ():
 		Label.SetText (12137)
 
 	Name = GemRB.GetPlayerName (pc, 0)
-	Label = Window.GetControl (0x10000035)
+	Label = MageWindow.GetControl (0x10000035)
 	Label.SetText (Name)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
-	if not BookType:
+	if not Sorcerer:
 		for i in range (12):
-			Button = Window.GetControl (3 + i)
+			Button = MageWindow.GetControl (3 + i)
 			Button.SetAnimation ("")
+
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
@@ -216,7 +160,7 @@ def UpdateMageWindow ():
 				Button.SetTooltip ('')
 				Button.EnableBorder (0, 0)
 	else:
-		label = Window.GetControl (0x10000040)
+		label = MageWindow.GetControl (0x10000040)
 		if known_cnt:
 			# we give sorcerers all charges for all the spells, so some extra math is needed
 			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
@@ -224,8 +168,9 @@ def UpdateMageWindow ():
 			label.SetText ("")
 
 	for i in range (GUICommon.GetGUISpellButtonCount()):
-		Button = Window.GetControl (27 + i)
+		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")
+
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			Button.SetSpellIcon (ks['SpellResRef'], 0)
@@ -246,15 +191,35 @@ def UpdateMageWindow ():
 			Button.EnableBorder (0, 0)
 
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 	return
+
+def MageSelectionChanged (oldwin):
+	global Sorcerer
+	# added game check, since although sorcerers have almost no use for their spellbook, there's no other way to quickly check spell descriptions
+	
+	UpdateMageWindow(oldwin)
+	
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Sorcerer = GameCheck.IsBG2() and Spellbook.HasSorcererBook (pc)
+
+	if Sorcerer:
+		OpenSorcererWindow(*ToggleSpellWindow.Args)
+	else:
+		OpenMageWindow(*ToggleSpellWindow.Args)
+
+ToggleMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
+OpenMageWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
+
+ToggleSorcererWindow = GUICommonWindows.CreateTopWinLoader(8, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, MageSelectionChanged)
+OpenSorcererWindow = GUICommonWindows.CreateTopWinLoader(8, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, MageSelectionChanged)
 
 def MagePrevLevelPress ():
 	global MageSpellLevel
 
 	if MageSpellLevel > 0:
 		MageSpellLevel = MageSpellLevel - 1
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 	return
 
 def MageNextLevelPress ():
@@ -262,14 +227,14 @@ def MageNextLevelPress ():
 
 	if MageSpellLevel < 8:
 		MageSpellLevel = MageSpellLevel + 1
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 	return
 
 def RefreshMageLevel ():
 	global MageSpellLevel
 
 	MageSpellLevel = GemRB.GetVar ("MageSpellLevel")
-	UpdateMageWindow ()
+	UpdateMageWindow (MageWindow)
 	return
 
 def OpenMageSpellInfoWindow ():
@@ -290,8 +255,8 @@ def OpenMageSpellInfoWindow ():
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
-	if GameCheck.HasTOB() or Window.HasControl(6):
-		Button = Window.GetControl (6)
+	Button = Window.GetControl (6)
+	if Button:
 		if index < 100:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -328,7 +293,7 @@ def OnMageMemorizeSpell ():
 		blend = 0
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH", 0, blend)
@@ -352,6 +317,7 @@ def OpenMageSpellRemoveWindow ():
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
 	else:
 		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
+
 	Window = MageSpellUnmemorizeWindow
 
 	# "Are you sure you want to ....?"
@@ -362,13 +328,13 @@ def OpenMageSpellRemoveWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageRemoveSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -390,13 +356,13 @@ def OpenMageSpellUnmemorizeWindow ():
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -415,7 +381,7 @@ def OnMageUnmemorizeSpell ():
 		blend = 0
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
-		UpdateMageWindow ()
+		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
 		Button.SetAnimation ("FLASH", 0, blend)
@@ -433,7 +399,7 @@ def OnMageRemoveSpell ():
 
 	#remove spell from book
 	GemRB.RemoveSpell (pc, type, level, index)
-	UpdateMageWindow ()
+	UpdateMageWindow (MageWindow)
 	return
 
 def LoadCondition ():
@@ -489,10 +455,8 @@ def OpenSequencerWindow ():
 	if Count > 3:
 		Count = 3
 
-	GemRB.LoadWindowPack ("GUIMG", 640, 480)
-
 	#saving the original portrait window
-	OtherWindow = Window = GemRB.LoadWindow (6)
+	OtherWindow = Window = GemRB.LoadWindow (6, "GUIMG")
 
 	Title = Window.GetControl (0x0fffffff)
 
@@ -514,10 +478,6 @@ def OpenSequencerWindow ():
 		CondLabel.SetPos (-1,-1)
 		TargSelect.SetPos (-1,-1)
 		TargLabel.SetPos (-1,-1)
-		sb = Window.GetControl (5)
-		sb.SetPos (-1,-1)
-		sb = Window.GetControl (7)
-		sb.SetPos (-1,-1)
 	else:
 		CondSelect.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, ContingencyHelpCondition)
 		CondSelect.SetOptions ([elem[0] for elem in ContCond], "ContCond", 0)
@@ -540,12 +500,12 @@ def OpenSequencerWindow ():
 
 	OkButton = Window.GetControl (27)
 	OkButton.SetText (11973)
-	OkButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	OkButton.MakeDefault()
 	OkButton.SetState (IE_GUI_BUTTON_DISABLED)
 
 	CancelButton = Window.GetControl (29)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyOk)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ContingencyCancel)
@@ -691,7 +651,6 @@ def ContingencyOk ():
 	if GemRB.LearnSpell (pc, Source+"d", LS_MEMO):
 		print "EEEEK! Failed to learn sequencer/contingency!\n\n"
 	OtherWindow.Unload()
-	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyCancel ():
@@ -699,7 +658,6 @@ def ContingencyCancel ():
 
 	GemRB.SetPlayerStat (pc, IE_IDENTIFYMODE, 0)
 	OtherWindow.Unload()
-	GUICommon.GameWindow.SetVisible (WINDOW_VISIBLE) # restores focus
 	return
 
 def ContingencyHelpSpell ():

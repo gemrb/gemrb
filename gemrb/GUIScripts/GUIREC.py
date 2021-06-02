@@ -31,77 +31,21 @@ import GUIWORLD
 import DualClass
 import GUIRECCommon
 from GUIDefines import *
+from GUICommonWindows import CreateTopWinLoader, ToggleWindow, OpenWindowOnce, DefaultWinPos
 from ie_stats import *
 from ie_restype import *
 ###################################################
-RecordsWindow = None
 InformationWindow = None
-PortraitWindow = None
-OptionsWindow = None
-OldPortraitWindow = None
-OldOptionsWindow = None
 KitInfoWindow = None
 ColorTable = None
 ColorIndex = None
 ScriptTextArea = None
 SelectedTextArea = None
-PauseState = None
 
 ###################################################
-def OpenRecordsWindow ():
-	import GUICommonWindows
 
-	global RecordsWindow, OptionsWindow, PortraitWindow, PauseState
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenRecordsWindow):
-		if InformationWindow: OpenInformationWindow ()
-
-		GUIRECCommon.CloseSubSubCustomizeWindow ()
-		GUIRECCommon.CloseSubCustomizeWindow ()
-		GUIRECCommon.CloseCustomizeWindow ()
-		GUIRECCommon.ExportCancelPress()
-		GUIRECCommon.CloseBiographyWindow ()
-		KitDonePress ()
-		CloseInformationWindow ()
-
-		if RecordsWindow:
-			RecordsWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		RecordsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.UpdatePortraitWindow ()
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		GemRB.GamePause (PauseState, 3)
-		return
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIREC", 640, 480)
-	RecordsWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", RecordsWindow.ID)
-	# saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenRecordsWindow)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	OptionsWindow.SetFrame ()
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
+def InitRecordsWindow (Window):
+	"""Open Records Window"""
 
 	# dual class
 	Button = Window.GetControl (0)
@@ -139,41 +83,10 @@ def OpenRecordsWindow ():
 		Button.SetText (61265)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenKitInfoWindow)
 
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (99, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenRecordsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	GUICommonWindows.SetSelectionChangeHandler (UpdateRecordsWindow)
-	UpdateRecordsWindow ()
-
-	Window.SetKeyPressEvent (GUICommonWindows.SwitchPCByKey)
-
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
 	return
 
-#original returns to game before continuing...
-def OpenRecReformPartyWindow ():
-	OpenRecordsWindow ()
-	GemRB.SetTimedEvent (GUIWORLD.OpenReformPartyWindow, 1)
-	return
-
-#don't allow exporting polymorphed or dead characters
-def Exportable(pc):
-	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
-	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
-	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
-	return True
-
-def UpdateRecordsWindow ():
+def UpdateRecordsWindow (Window):
 	global alignment_help
-
-	Window = RecordsWindow
-	if not RecordsWindow:
-		print "SelectionChange handler points to non existing window\n"
-		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -213,10 +126,11 @@ def UpdateRecordsWindow ():
 	Button = Window.GetControl (2)
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	pic = GemRB.GetPlayerPortrait (pc, 0)["Sprite"]
 	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
-		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
+		Button.SetPicture (pic, "NOPORTMD")
 	else:
-		Button.SetPicture (GemRB.GetPlayerPortrait (pc,0), "NOPORTLG")
+		Button.SetPicture (pic, "NOPORTLG")
 
 	# armorclass
 	GUICommon.DisplayAC (pc, Window, 0x10000028)
@@ -253,27 +167,27 @@ def UpdateRecordsWindow ():
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (sstr)
-	Label.SetTextColor (cstr[0], cstr[1], cstr[2])
+	Label.SetTextColor (cstr)
 
 	Label = Window.GetControl (0x10000009)
 	Label.SetText (sdex)
-	Label.SetTextColor (cdex[0], cdex[1], cdex[2])
+	Label.SetTextColor (cdex)
 
 	Label = Window.GetControl (0x1000000a)
 	Label.SetText (scon)
-	Label.SetTextColor (ccon[0], ccon[1], ccon[2])
+	Label.SetTextColor (ccon)
 
 	Label = Window.GetControl (0x1000000b)
 	Label.SetText (sint)
-	Label.SetTextColor (cint[0], cint[1], cint[2])
+	Label.SetTextColor (cint)
 
 	Label = Window.GetControl (0x1000000c)
 	Label.SetText (swis)
-	Label.SetTextColor (cwis[0], cwis[1], cwis[2])
+	Label.SetTextColor (cwis)
 
 	Label = Window.GetControl (0x1000000d)
 	Label.SetText (schr)
-	Label.SetTextColor (cchr[0], cchr[1], cchr[2])
+	Label.SetTextColor (cchr)
 
 	# class
 	ClassTitle = GUICommon.GetActorClassTitle (pc)
@@ -301,19 +215,36 @@ def UpdateRecordsWindow ():
 
 	# help, info textarea
 	Text = Window.GetControl (45)
+	Text.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
 	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
-	Window.SetVisible (WINDOW_VISIBLE)
+
 	return
+
+ToggleRecordsWindow = CreateTopWinLoader(2, "GUIREC", ToggleWindow, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+OpenRecordsWindow = CreateTopWinLoader(2, "GUIREC", OpenWindowOnce, InitRecordsWindow, UpdateRecordsWindow, DefaultWinPos, True)
+
+#original returns to game before continuing...
+def OpenRecReformPartyWindow ():
+	ToggleRecordsWindow()
+	GUIWORLD.OpenReformPartyWindow()
+	return
+
+#don't allow exporting polymorphed or dead characters
+def Exportable(pc):
+	if not (GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE): return False
+	if GemRB.GetPlayerStat (pc, IE_POLYMORPHED): return False
+	if GemRB.GetPlayerStat (pc, IE_STATE_ID)&STATE_DEAD: return False
+	return True
 
 def GetStatColor (pc, stat):
 	a = GemRB.GetPlayerStat (pc, stat)
 	b = GemRB.GetPlayerStat (pc, stat, 1)
 	if a==b:
-		return (255,255,255)
+		return {'r' : 255, 'g' : 255, 'b' : 255}
 	if a<b:
-		return (255,255,0)
-	return (0,255,0)
+		return {'r' : 255, 'g' : 255, 'b' : 0}
+	return {'r' : 0, 'g' : 255, 'b' : 0}
 
 # GemRB.GetPlayerStat wrapper that only returns nonnegative values
 def GSNN (pc, stat):
@@ -876,11 +807,6 @@ def GetReputation (repvalue):
 def OpenInformationWindow ():
 	global InformationWindow
 
-	if InformationWindow != None:
-		GUIRECCommon.CloseBiographyWindow ()
-		CloseInformationWindow ()
-		return
-
 	InformationWindow = Window = GemRB.LoadWindow (4)
 
 	# Biography
@@ -891,8 +817,8 @@ def OpenInformationWindow ():
 	# Done
 	Button = Window.GetControl (24)
 	Button.SetText (11973)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseInformationWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InformationWindow.Close())
+	Button.MakeEscape()
 
 	TotalPartyExp = 0
 	ChapterPartyExp = 0
@@ -983,19 +909,6 @@ def OpenInformationWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def CloseInformationWindow ():
-	import GUICommonWindows
-	global InformationWindow
-
-	if InformationWindow:
-		InformationWindow.Unload ()
-	InformationWindow = None
-
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	RecordsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def OpenKitInfoWindow ():
 	global KitInfoWindow
 
@@ -1072,11 +985,11 @@ def OpenColorWindow ():
 
 	DoneButton = GUIRECCommon.SubCustomizeWindow.GetControl (12)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	CancelButton = GUIRECCommon.SubCustomizeWindow.GetControl (13)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	HairButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetHairColor)
 	SkinButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetSkinColor)

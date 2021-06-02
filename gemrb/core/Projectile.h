@@ -73,8 +73,10 @@ namespace GemRB {
 // bg2: 10 height
 #define PTF_SHADOW  32      //has shadow bam
 #define PTF_LIGHT   64      //has light shadow / glow
-#define PTF_BLEND   128     //blend colours (use alpha)
+#define PTF_TRANS   128     // glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE);
 #define PTF_BRIGHTEN 256    //brighten alpha; CPROJECTILEBAMFILEFORMAT_FLAGS_BRIGHTEST in bg2
+#define PTF_BLEND	512		// glBlendFunc(GL_DST_COLOR, GL_ONE);
+#define PTF_TRANS_BLEND (PTF_TRANS | PTF_BLEND) // glBlendFunc(GL_SRC_COLOR, GL_ONE); IWD only?
 // 0x100 and 0x200: FLAGS_BRIGHTESTIFFAST BRIGHTEST3DONLYOFF
 #define PTF_TIMELESS 0x4000 // GemRB extension to differentiate projectiles that ignore timestop
 
@@ -232,7 +234,7 @@ public:
 	//these are public but not in the .pro file
 	ProjectileExtension* Extension;
 	bool autofree;
-	Palette* palette;
+	PaletteHolder palette;
 	//internals
 protected:
 	ieResRef smokebam;
@@ -264,7 +266,7 @@ protected:
 	//special (not using char animations)
 	Animation* travel[MAX_ORIENT];
 	Animation* shadow[MAX_ORIENT];
-	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
+	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	EffectQueue* effects;
 	Projectile **children;
 	int child_size;
@@ -365,7 +367,7 @@ private:
 	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
 	//oriented animations (also simple ones)
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
-	void GetPaletteCopy(Animation *anim[], Palette *&pal);
+	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
@@ -408,7 +410,11 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
+	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
+
+private:
+	void Draw(Holder<Sprite2D> spr, const Point& p,
+			  unsigned int flags, Color tint) const;
 };
 
 }

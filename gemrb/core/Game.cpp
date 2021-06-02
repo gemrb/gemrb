@@ -36,7 +36,9 @@
 #include "ScriptEngine.h"
 #include "TableMgr.h"
 #include "GameScript/GameScript.h"
+#include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
+#include "Pixels.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 #include "Video.h"
@@ -153,15 +155,12 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int rows = table->GetRowCount();
 		npclevels.reserve(rows);
 		for (int i = 0; i < rows; i++) {
-			npclevels.push_back (std::vector<char *>(cols+1));
-			for (int j = -1; j < cols; j++) {
-				char *ref = new char[9];
+			npclevels.push_back (std::vector<ResRef>(cols+1));
+			for(int j = -1; j < cols; j++) {
 				if (j == -1) {
-					CopyResRef(ref, table->GetRowName(i));
-					npclevels[i][j+1] = ref;
+					npclevels[i][j+1] = table->GetRowName(i);
 				} else {
-					CopyResRef(ref, table->QueryField(i, j));
-					npclevels[i][j+1] = ref;
+					npclevels[i][j+1] = table->QueryField(i, j);
 				}
 			}
 		}
@@ -215,12 +214,6 @@ Game::~Game(void)
 
 	for (auto pp : planepositions) {
 		free(pp);
-	}
-
-	for (auto nl : npclevels) {
-		for (auto nll : nl) {
-			delete [] nll;
-		}
 	}
 }
 
@@ -667,6 +660,10 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		actor->Select( true );
 		assert(actor->IsSelected());
 		selected.push_back( actor );
+
+		if (!(flags&SELECT_QUIET)) {
+			actor->PlaySelectionSound();
+		}
 	} else {
 		if (!actor->IsSelected()) {
 			// already not selected
@@ -914,24 +911,17 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	unsigned int ret;
+	int ret = -1;
 	Map *newMap;
 	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
-
-	//this shouldn't happen
-	if (!mM) {
-		return -1;
-	}
 
 	int index = FindMap(ResRef);
 	if (index>=0) {
 		return index;
 	}
 
-	bool hide = false;
 	if (loadscreen && sE) {
-		hide = core->HideGCWindow();
 		sE->RunFunction("LoadScreen", "StartLoadScreen");
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
@@ -939,7 +929,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	if (!ds) {
 		goto failedload;
 	}
-	if(!mM->Open(ds)) {
+	if(!mM || !mM->Open(ds)) {
 		goto failedload;
 	}
 	newMap = mM->GetMap(ResRef, IsDay());
@@ -947,10 +937,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		goto failedload;
 	}
 
-	core->LoadProgress(100);
-
 	ret = AddMap( newMap );
-
 	//spawn creatures on a map already in the game
 	//this feature exists in all blackisle games but not in bioware games
 	if (core->HasFeature(GF_SPAWN_INI)) {
@@ -965,23 +952,15 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	PlacePersistents(newMap, ResRef);
-
-	if (hide) {
-		core->UnhideGCWindow();
-	}
 	newMap->InitActors();
 
 	if (newMap->reverb) {
 		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
 	}
 
-	return ret;
 failedload:
-	if (hide) {
-		core->UnhideGCWindow();
-	}
 	core->LoadProgress(100);
-	return -1;
+	return ret;
 }
 
 // check if the actor is in npclevel.2da and replace accordingly
@@ -1060,27 +1039,31 @@ Actor* Game::GetNPC(unsigned int Index) const
 	return NPCs[Index];
 }
 
-void Game::SwapPCs(unsigned int Index1, unsigned int Index2) const
+void Game::SwapPCs(unsigned int pc1, unsigned int pc2) const
 {
-	if (Index1 >= PCs.size()) {
+	int idx1 = FindPlayer(pc1);
+	int idx2 = FindPlayer(pc2);
+	if (idx1 < 0 || idx2 < 0) {
 		return;
 	}
 
-	if (Index2 >= PCs.size()) {
-		return;
-	}
-	int tmp = PCs[Index1]->InParty;
-	PCs[Index1]->InParty = PCs[Index2]->InParty;
-	PCs[Index2]->InParty = tmp;
+	int tmp = PCs[idx1]->InParty;
+	PCs[idx1]->InParty = PCs[idx2]->InParty;
+	PCs[idx2]->InParty = tmp;
 	//signal a change of the portrait window
 	core->SetEventFlag(EF_PORTRAIT | EF_SELECTION);
+
+	if (idx1==0 || idx2==0) {
+		//leader changed
+		DisplayStringCore( FindPC(1), VB_LEADER, DS_CONST);
+	}
 }
 
 void Game::DeleteJournalEntry(ieStrRef strref)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if ((Journals[i]->Text==strref) || (strref==(ieStrRef) -1) ) {
+		if ((Journals[i]->Text==strref) || (strref == ieStrRef(-1)) ) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
@@ -1416,10 +1399,13 @@ void Game::SetReputation(ieDword r)
 	}
 }
 
-void Game::SetControlStatus(unsigned int value, int mode)
+bool Game::SetControlStatus(unsigned int value, int mode)
 {
-	core->SetBits(ControlStatus, value, mode);
-	core->SetEventFlag(EF_CONTROL);
+	if (SetBits(ControlStatus, value, mode)) {
+		core->SetEventFlag(EF_CONTROL);
+		return true;
+	}
+	return false;
 }
 
 void Game::AddGold(int add)
@@ -1447,7 +1433,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 		//update clock display
-		core->GetGUIScriptEngine()->RunFunction("GUICommonWindows", "UpdateClock");
+		core->GetGUIScriptEngine()->RunFunction("Clock", "UpdateClock");
 	}
 
 	// emulate speeding through effects than need more than just an expiry check (eg. regeneration)
@@ -1624,6 +1610,8 @@ void Game::UpdateScripts()
 		//don't check it any more
 		protagonist = PM_NO;
 		core->GetGUIScriptEngine()->RunFunction("GUIWORLD", "DeathWindow");
+		// That's for BG as the action bars to the left and right remain visible.
+		core->ToggleViewsEnabled(false, "NOT_DLG");
 		return;
 	}
 
@@ -2089,9 +2077,9 @@ void Game::Infravision()
 //returns the colour which should be applied onto the whole game area viewport
 //this is based on timestop, dream area, weather, daytime
 
-static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
-static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
-static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
+static const Color DreamTint(0xf0,0xe0,0xd0,0x10);    //light brown scale
+static const Color NightTint(0x80,0x80,0xe0,0x40);    //dark, bluish
+static const Color DuskTint(0xe0,0x80,0x80,0x40);     //dark, reddish
 
 const Color *Game::GetGlobalTint() const
 {
@@ -2127,10 +2115,10 @@ void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
 {
 	const Color *globalTint = GetGlobalTint();
 	if (globalTint) {
-		if (flags & BLIT_TINTED) {
-			Color::MultiplyTint(tint, globalTint);
+		if (flags & BLIT_COLOR_MOD) {
+			ShaderTint(*globalTint, tint);
 		} else {
-			flags |= BLIT_TINTED;
+			flags |= BLIT_COLOR_MOD;
 			tint = *globalTint;
 			tint.a = 255;
 		}
@@ -2177,7 +2165,7 @@ void Game::ChangeSong(bool always, bool force) const
 /* this method redraws weather. If update is false,
 // then the weather particles won't change (game paused)
 */
-void Game::DrawWeather(const Region &screen, bool update)
+void Game::DrawWeather(bool update)
 {
 	if (!weather) {
 		return;
@@ -2186,7 +2174,8 @@ void Game::DrawWeather(const Region &screen, bool update)
 		return;
 	}
 
-	weather->Draw( screen );
+	// weather just needs to occur on screen. it doesnt actually require coordinates like a spell effect would.
+	weather->Draw(Point());
 	if (!update) {
 		return;
 	}

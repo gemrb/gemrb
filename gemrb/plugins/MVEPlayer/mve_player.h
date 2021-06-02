@@ -33,16 +33,11 @@ protected:
 	unsigned int chunk_size;
 	unsigned int chunk_offset;
 
-	unsigned int outputwidth;
-	unsigned int outputheight;
-
 	long timer_last_sec;
 	long timer_last_usec;
 	unsigned int frame_wait;
 
 	_GstMveDemuxStream *video_data;
-	unsigned short video_width;
-	unsigned short video_height;
 	unsigned short *video_back_buf;
 	bool truecolour;
 	bool video_rendered_frame;
@@ -84,9 +79,6 @@ protected:
 public:
 	MVEPlayer(class MVEPlay *file);
 	~MVEPlayer();
-
-	void sound_init(bool playsound);
-	void video_init(unsigned int width, unsigned int height);
 
 	bool start_playback();
 	bool next_frame();

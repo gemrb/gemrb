@@ -1,17 +1,17 @@
 2DA V1.0
 *
                       MODULE           FUNCTION                          GROUP
-Inventory             GUIINV           OpenInventoryWindow               0
-Character_Record      GUIREC           OpenRecordsWindow                 0
-Character_Stats       GUIREC           OpenRecordsWindow                 0
-Return_To_Game        GUICommonWindows ReturnToGame                      0
-Journal               GUIJRNL          OpenJournalWindow                 0
-Map                   GUIMA            OpenMapWindow                     0 
-Wizard_Spells         GUIMG            OpenMageWindow                    0
-Mage_Spells           GUIMG            OpenMageWindow                    0
-Priest_Spells         GUIPR            OpenPriestWindow                  0
-Spellbook             GUISPL           OpenSpellBookWindow               0
-Options               GUIOPT           OpenOptionsWindow                 0
+Inventory             GUIINV           ToggleInventoryWindow               0
+Character_Record      GUIREC           ToggleRecordsWindow                 0
+Character_Stats       GUIREC           ToggleRecordsWindow                 0
+Return_To_Game        GUICommonWindows CloseTopWindow                      0
+Journal               GUIJRNL          ToggleJournalWindow                 0
+Map                   GUIMA            ToggleMapWindow                     0
+Wizard_Spells         GUIMG            ToggleSpellWindow                   0
+Mage_Spells           GUIMG            ToggleSpellWindow                   0
+Priest_Spells         GUIPR            TogglePriestWindow                  0
+Spellbook             GUISPL           ToggleSpellBookWindow               0
+Options               GUIOPT           ToggleOptionsWindow                 0
 Character_Arbitration GUIMP            * 
 Guard_/_Protect       GUICommonWindows ActionDefendPressed               0
 Turn_Undead           GUICommonWindows ActionTurnPressed                 0
@@ -30,7 +30,7 @@ Equip_Range_Weapon    GUICommonWindows ActionRangePressed                0
 Quick_Load            GUILOAD          QuickLoadPressed                  0
 Quick_Save            GUISAVE          QuickSavePressed                  0
 Rest                  GUICommonWindows RestPress                         0
-Hide_Interface        GUICommonWindows HideInterface                     0
+Hide_Interface        CommonWindow     ToggleGUIHidden                   0
 Right_Interface       GUICommonWindows PortraitPress                     0
 Left_Interface        GUICommonWindows OptionsPress                      0
 Toggle_AI             GUICommonWindows AIPress                           0

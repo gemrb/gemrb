@@ -30,7 +30,7 @@ namespace GemRB {
 class GEM_EXPORT ProjectileMgr : public Plugin {
 public:
 	ProjectileMgr(void);
-	virtual ~ProjectileMgr(void);
+	~ProjectileMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Projectile* GetProjectile( Projectile *) = 0;
 };

@@ -35,24 +35,23 @@ static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7
 
 static void TranslateColor(const char *value, Color &color)
 {
-	int r = 0;
-	int g = 0;
-	int b = 0;
-
+	//if not RGB then try to interpret it as a dword
 	if (strnicmp(value,"RGB(",4)) {
-		//if not RGB then try to interpret it as a dword
-		r = strtol(value,NULL,0);
-		color.r = r&0xff;
-		color.g = (r>>8)&0xff;
-		color.b = (r>>16)&0xff;
-		color.a = (r>>24)&0xff;
+		long c = strtol(value,NULL,0);
+		color.r = c&0xff;
+		color.g = (c>>8)&0xff;
+		color.b = (c>>16)&0xff;
+		color.a = (c>>24)&0xff;
 	} else {
-		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
-	}
+		int r = 0;
+		int g = 0;
+		int b = 0;
 
-	color.r=r;
-	color.g=g;
-	color.b=b;
+		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
+		color.r=r;
+		color.g=g;
+		color.b=b;
+	}
 }
 
 static void InitSparks()
@@ -183,17 +182,14 @@ bool Particles::AddNew(const Point &point)
 	return true;
 }
 
-void Particles::Draw(const Region &screen)
+void Particles::Draw(Point p)
 {
-	int length; //used only for raindrops
-
 	Video *video=core->GetVideoDriver();
-	Region region = video->GetViewport();
 	Game *game = core->GetGame();
 
 	if (owner) {
-		region.x-=pos.x;
-		region.y-=pos.y;
+		p.x-=pos.x;
+		p.y-=pos.y;
 	}
 	int i = size;
 	while (i--) {
@@ -212,6 +208,7 @@ void Particles::Draw(const Region &screen)
 			break;
 		}
 
+		int length; //used only for raindrops
 		if (state>=MAX_SPARK_PHASE) {
 			constexpr int maxDropLength = 6;
 			length = maxDropLength - abs(state - MAX_SPARK_PHASE - maxDropLength);
@@ -225,7 +222,7 @@ void Particles::Draw(const Region &screen)
 		case SP_TYPE_BITMAP:
 			/*
 			if (bitmap[state]) {
-				Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
+				Holder<Sprite2D> frame = bitmap[state]->GetFrame(points[i].state&255);
 				video->BlitGameSprite(frame,
 					points[i].pos.x+screen.x,
 					points[i].pos.y+screen.y, 0, clr,
@@ -237,31 +234,27 @@ void Particles::Draw(const Region &screen)
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
 				if (anims) {
 					Animation* anim = anims[0];
-					Sprite2D* nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
 					ieDword flags = 0;
 					if (game) game->ApplyGlobalTint(clr, flags);
-					video->BlitGameSprite( nextFrame, points[i].pos.x - region.x, points[i].pos.y - region.y,
-						flags, clr, NULL, fragments->GetPartPalette(0), &screen);
+
+					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
+													 points[i].pos - p, flags, clr);
 				}
 			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos.x-region.x,
-				points[i].pos.y-region.y, 2, clr, true);
+			video->DrawCircle (points[i].pos - p, 2, clr);
 			break;
 		case SP_TYPE_POINT:
 		default:
-			video->SetPixel (points[i].pos.x-region.x,
-				points[i].pos.y-region.y, clr, true);
+			video->DrawPoint(points[i].pos - p, clr);
 			break;
 		// this is more like a raindrop
 		case SP_TYPE_LINE:
 			if (length) {
-				video->DrawLine (points[i].pos.x+region.x,
-					points[i].pos.y+region.y,
-					points[i].pos.x+region.x+(i&1),
-					points[i].pos.y+region.y+length, clr, true);
+				video->DrawLine (points[i].pos - p, points[i].pos - p + Point((i&1), length), clr);
 			}
 			break;
 		}

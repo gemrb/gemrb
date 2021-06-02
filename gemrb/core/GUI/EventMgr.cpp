@@ -19,500 +19,485 @@
  */
 
 #include "GUI/EventMgr.h"
-
-#include "GUI/GameControl.h"
-
-#include "ie_cursors.h"
-
-#include "Game.h"
 #include "Interface.h"
-#include "KeyMap.h"
 #include "Video.h"
-#include "GUI/Window.h"
+
+#include "globals.h"
 
 namespace GemRB {
 
-EventMgr::EventMgr(void)
+unsigned long EventMgr::DCDelay = 250;
+unsigned long EventMgr::DPDelay = 250;
+bool EventMgr::TouchInputEnabled = false;
+
+EventMgr::buttonbits EventMgr::mouseButtonFlags;
+EventMgr::buttonbits EventMgr::modKeys;
+Point EventMgr::mousePos;
+std::map<uint64_t, TouchEvent::Finger> EventMgr::fingerStates;
+EventMgr::buttonbits EventMgr::controllerButtonStates;
+
+EventMgr::KeyMap EventMgr::HotKeys = KeyMap();
+EventMgr::EventTaps EventMgr::Taps = EventTaps();
+
+MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 {
-	// Function bar window (for function keys)
-	function_bar = NULL;
-	// Last window focused for keyboard events
-	last_win_focused = NULL;
-	// Last window focused for mouse events (eg, with a click). Used to determine MouseUp events
-	last_win_mousefocused = NULL;
-	// Last window we were over. Used to determine MouseEnter and MouseLeave events
-	last_win_over = NULL;
-	MButtons = 0;
-	dc_x = 0;
-	dc_y = 0;
-	dc_time = 0;
-	dc_delay = 250;
-	rk_delay = 250;
-	rk_flags = GEM_RK_DISABLE;
-	focusLock = NULL;
+	MouseEvent me {};
+	me.x = te.x;
+	me.y = te.y;
+	me.deltaX = te.deltaX;
+	me.deltaY = te.deltaY;
+
+	me.buttonStates = (down) ? GEM_MB_ACTION : 0;
+	me.button = GEM_MB_ACTION;
+	me.repeats = 1;
+
+	return me;
 }
 
-EventMgr::~EventMgr(void)
+MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 {
-}
+	Point p = EventMgr::MousePos();
 
-void EventMgr::SetOnTop(int Index)
-{
-	std::vector< int>::iterator t;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		if (( *t ) == Index) {
-			topwin.erase( t );
-			break;
-		}
-	}
-	if (topwin.size() != 0) {
-			topwin.insert( topwin.begin(), Index );
+	MouseEvent me {};
+	me.x = p.x;
+	me.y = p.y;
+
+	if (ce.axis % 2) {
+		me.deltaX = ce.axisDelta;
+		me.deltaY = 0;
 	} else {
-		topwin.push_back( Index );
+		me.deltaX = 0;
+		me.deltaY = ce.axisDelta;
 	}
-}
 
-void EventMgr::SetDefaultFocus(Window *win)
-{
-	if (!last_win_focused) {
-		last_win_focused = win;
-		last_win_focused->SetFocused(last_win_focused->GetControl(0));
-	}
-	last_win_over = NULL;
-}
-
-/** Adds a Window to the Event Manager */
-void EventMgr::AddWindow(Window* win)
-{
-	unsigned int i;
-
-	if (win == NULL) {
-		return;
-	}
-	bool found = false;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == win) {
-			goto ok;
-		}
-		if(windows[i]==NULL) {
-			windows[i] = win;
-ok:
-			SetOnTop( i );
-			found = true;
+	EventButton btn = 0;
+	switch (ce.button) {
+		case CONTROLLER_BUTTON_A:
+			btn = GEM_MB_ACTION;
 			break;
-		}
-	}
-	if (!found) {
-		windows.push_back( win );
-		if (windows.size() == 1)
-			topwin.push_back( 0 );
-		else
-			SetOnTop( ( int ) windows.size() - 1 );
-	}
-	SetDefaultFocus(win);
-}
-/** Frees and Removes all the Windows in the Array */
-void EventMgr::Clear()
-{
-	topwin.clear();
-	windows.clear();
-	last_win_focused = NULL;
-	last_win_mousefocused = NULL;
-	last_win_over = NULL;
-	function_bar = NULL;
-}
-
-/** Remove a Window from the array */
-void EventMgr::DelWindow(Window *win)
-{
-	bool focused = (last_win_focused == win);
-	if (focused) {
-		last_win_focused = NULL;
-	}
-	if (last_win_mousefocused == win) {
-		last_win_mousefocused = NULL;
-	}
-	if (last_win_over == win) {
-		last_win_over = NULL;
-	}
-	if (function_bar == win) {
-		function_bar = NULL;
+		case CONTROLLER_BUTTON_B:
+			btn = GEM_MB_MENU;
+			break;
+		case CONTROLLER_BUTTON_LEFTSTICK:
+			btn = GEM_MB_MIDDLE;
+			break;
 	}
 
-	if (windows.size() == 0) {
+	me.buttonStates = (down) ? btn : 0;
+	me.button = btn;
+
+	return me;
+}
+
+KeyboardEvent KeyEventFromController(const ControllerEvent& ce)
+{
+	KeyboardEvent ke{};
+
+	// TODO: probably want more than the DPad
+	switch (ce.button) {
+		case CONTROLLER_BUTTON_DPAD_UP:
+			ke.keycode = GEM_UP;
+			break;
+		case CONTROLLER_BUTTON_DPAD_DOWN:
+			ke.keycode = GEM_DOWN;
+			break;
+		case CONTROLLER_BUTTON_DPAD_LEFT:
+			ke.keycode = GEM_LEFT;
+			break;
+		case CONTROLLER_BUTTON_DPAD_RIGHT:
+			ke.keycode = GEM_RIGHT;
+			break;
+		default:
+			ke.keycode = 0;
+			break;
+	}
+
+	return ke;
+}
+
+bool EventMgr::ModState(unsigned short mod)
+{
+	return (modKeys & buttonbits(mod)).any();
+}
+
+bool EventMgr::MouseButtonState(EventButton btn)
+{
+	return (mouseButtonFlags & buttonbits(btn)).any();
+}
+
+bool EventMgr::MouseDown()
+{
+	return mouseButtonFlags.any();
+}
+
+bool EventMgr::FingerDown()
+{
+	return fingerStates.size() > 0;
+}
+
+bool EventMgr::ControllerButtonState(EventButton btn)
+{
+	return (controllerButtonStates & buttonbits(btn)).any();
+}
+
+void EventMgr::DispatchEvent(Event&& e)
+{
+	if (TouchInputEnabled == false && e.EventMaskFromType(e.type) & Event::AllTouchMask) {
 		return;
 	}
 
-	int pos = -1;
-	std::vector< Window*>::iterator m;
-	for (m = windows.begin(); m != windows.end(); ++m) {
-		pos++;
-		if ( (*m) == win) {
-			(*m) = NULL;
-			std::vector< int>::iterator t;
-			for (t = topwin.begin(); t != topwin.end(); ++t) {
-				if ( (*t) == pos) {
-					topwin.erase( t );
-					if (focused && topwin.size() > 0) {
-						//revert focus to new top window
-						SetFocused(windows[topwin[0]], NULL);
-					}
-					return;
-				}
+	Video* video = core->GetVideoDriver();
+
+	e.time = GetTicks();
+
+	if (e.type == Event::TextInput) {
+		if (e.text.text.length() == 0) {
+			return;
+		}
+	} else if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
+		// first check for hot key listeners
+		static unsigned long lastKeyDown = 0;
+		static unsigned char repeatCount = 0;
+		static KeyboardKey repeatKey = 0;
+
+		if (e.type == Event::KeyDown) {
+			if (e.keyboard.keycode == repeatKey && e.time <= lastKeyDown + DPDelay) {
+				repeatCount++;
+			} else {
+				repeatCount = 1;
 			}
-			Log(WARNING, "EventManager", "Couldn't delete window!");
+			repeatKey = e.keyboard.keycode;
+			lastKeyDown = GetTicks();
 		}
-	}
-}
 
-/** BroadCast Mouse Move Event */
-void EventMgr::MouseMove(unsigned short x, unsigned short y)
-{
-	if (windows.size() == 0) {
-		return;
-	}
-	if (!last_win_focused) {
-		return;
-	}
+		e.keyboard.repeats = repeatCount;
 
-	GameControl *gc = core->GetGameControl();
-	if (gc && (!focusLock || focusLock == gc)) {
-		// for scrolling
-		gc->OnGlobalMouseMove(x, y);
-	}
-	if (last_win_mousefocused && focusLock) {
-		last_win_mousefocused->OnMouseOver(x, y);
-		RefreshCursor(last_win_mousefocused->Cursor);
-		return;
-	}
-	std::vector< int>::iterator t;
-	std::vector< Window*>::iterator m;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		m = windows.begin();
-		m += ( *t );
-		Window *win = *m;
-		if (win == NULL)
-			continue;
-		if (!win->Visible)
-			continue;
-		if (( win->XPos <= x ) && ( win->YPos <= y )) {
-			//Maybe we are on the window, let's check
-			if (( win->XPos + win->Width >= x ) &&
-				( win->YPos + win->Height >= y )) {
-				//Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = win->GetControl( x, y, true );
-				//look for the low priority flagged controls (mostly static labels)
-				if (ctrl == NULL) {
-					ctrl = win->GetControl( x, y, false );
-				}
-				if (win != last_win_over || ctrl != win->GetOver()) {
-					// Remove tooltip if mouse moved to different control
-					core->DisplayTooltip( 0, 0, NULL );
-					if (last_win_over) {
-						last_win_over->OnMouseLeave( x, y );
-					}
-					last_win_over = win;
-					win->OnMouseEnter( x, y, ctrl );
-				}
-				if (ctrl != NULL) {
-					win->OnMouseOver( x, y );
-				}
-				RefreshCursor(win->Cursor);
+		int flags = e.mod << 16;
+		flags |= e.keyboard.keycode;
+		modKeys = e.mod;
+
+		KeyMap::const_iterator hit = HotKeys.find(flags);
+		if (hit != HotKeys.end()) {
+			assert(hit->second.size() > 0);
+			KeyMap::value_type::second_type list = hit->second;
+			EventCallback cb = hit->second.front();
+			if (cb(e)) {
 				return;
 			}
 		}
-		//stop going further
-		if (( *m )->Visible == WINDOW_FRONT)
-			break;
-	}
-	core->DisplayTooltip( 0, 0, NULL );
-}
+	} else if (e.EventMaskFromType(e.type) & Event::ControllerAxisMask) {
+		// only the left stick moves the cursor
+		if (e.controller.axis == AXIS_LEFT_X) {
+			mousePos.x += e.controller.axisDelta;
+		} else if (e.controller.axis == AXIS_LEFT_Y) {
+			mousePos.y += e.controller.axisDelta;
+		}
+	} else if (e.EventMaskFromType(e.type) & (Event::ControllerButtonUpMask | Event::ControllerButtonDownMask)) {
+		controllerButtonStates = e.controller.buttonStates;
+	} else if (e.isScreen) {
+		if (e.EventMaskFromType(e.type) & (Event::MouseUpMask | Event::MouseDownMask
+									    | Event::TouchUpMask | Event::TouchDownMask)
+		) {
+			// WARNING: these are shared between mouse and touch
+			// it is assumed we wont be using both simultaniously
+			static unsigned long lastMouseDown = 0;
+			static unsigned char repeatCount = 0;
+			static EventButton repeatButton = 0;
+			static Point repeatPos;
 
-void EventMgr::RefreshCursor(int idx)
-{
-	assert(idx != IE_CURSOR_INVALID);
-	Video *video = core->GetVideoDriver();
-	if (idx&IE_CURSOR_GRAY) {
-		video->SetMouseGrayed(true);
+			ScreenEvent& se = (e.type == Event::MouseDown) ? static_cast<ScreenEvent&>(e.mouse) : static_cast<ScreenEvent&>(e.touch);
+			EventButton btn = (e.type == Event::MouseDown) ? e.mouse.button : 0;
+
+			if (e.type == Event::MouseDown || e.type == Event::TouchDown) {
+				core->GetVideoDriver()->CaptureMouse(true);
+				if (video->InTextInput())
+					video->StopTextInput();
+
+				if (btn == repeatButton
+					&& e.time <= lastMouseDown + DCDelay
+					&& repeatPos.isWithinRadius(mouseClickRadius, se.Pos())
+				) {
+					repeatCount++;
+				} else {
+					repeatCount = 1;
+				}
+				repeatPos = se.Pos();
+				repeatButton = btn;
+				lastMouseDown = GetTicks();
+			} else if (e.type == Event::MouseUp && e.mouse.buttonStates == 0) {
+				core->GetVideoDriver()->CaptureMouse(false);
+			}
+
+			se.repeats = repeatCount;
+		}
+
+		if (e.EventMaskFromType(e.type) & (Event::AllMouseMask)) {
+			// set/clear the appropriate buttons
+			mouseButtonFlags = e.mouse.buttonStates;
+			mousePos = e.mouse.Pos();
+		} else { // touch
+			TouchEvent& te = (e.type == Event::TouchGesture) ? static_cast<TouchEvent&>(e.gesture) : static_cast<TouchEvent&>(e.touch);
+			uint64_t id = te.fingers[0].id;
+
+			switch (e.type) {
+				case Event::TouchDown:
+					fingerStates[id] = te.fingers[0];
+					break;
+
+				case Event::TouchUp:
+					fingerStates.erase(id);
+					break;
+
+				case Event::TouchGesture:
+					fingerStates.clear();
+					for (int i = 0; i < te.numFingers; ++i) {
+						id = te.fingers[i].id;
+						fingerStates[id] = te.fingers[i];
+					}
+					break;
+
+				default:
+					break;
+			}
+
+			if (te.numFingers == 1) {
+				mousePos = e.touch.Pos();
+			}
+		}
 	} else {
-		video->SetMouseGrayed(false);
+		if (video->InTextInput())
+			video->StopTextInput();
 	}
-	idx &= IE_CURSOR_MASK;
-	video->SetCursor( core->Cursors[idx], VID_CUR_UP );
-	video->SetCursor( core->Cursors[idx ^ 1], VID_CUR_DOWN );
+
+	// no hot keys or their listeners refused the event...
+	EventTaps tapsCopy = Taps; // copy this because its possible things get unregistered as a result of the event
+	EventTaps::iterator it = tapsCopy.begin();
+	for (; it != tapsCopy.end(); ++it) {
+		const std::pair<Event::EventTypeMask, EventCallback>& pair = it->second;
+		if (pair.first & e.EventMaskFromType(e.type)) {
+			// all matching taps get a copy of the event
+			pair.second(e);
+		}
+	}
 }
 
-bool EventMgr::ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime)
+bool EventMgr::RegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
 {
-	if (dc_x+10<x) return false;
-	if (dc_x>x+10) return false;
-	if (dc_y+10<y) return false;
-	if (dc_y>y+10) return false;
-	if (dc_time<thisTime) return false;
+	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
+		return false;
+	}
+
+	int flags = mod << 16;
+	flags |= key;
+
+	KeyMap::iterator it = HotKeys.find(flags);
+	if (it != HotKeys.end()) {
+		it->second.push_front(cb);
+	} else {
+		HotKeys.insert(std::make_pair(flags, std::list<EventCallback>(1, cb)));
+	}
+
 	return true;
 }
 
-/** BroadCast Mouse Move Event */
-void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
+void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
 {
-	std::vector< int>::iterator t;
-	std::vector< Window*>::iterator m;
-	Control *ctrl;
-	unsigned long thisTime;
+	int flags = mod << 16;
+	flags |= key;
 
-	thisTime = GetTicks();
-	if (ClickMatch(x, y, thisTime)) {
-		Button |= GEM_MB_DOUBLECLICK;
-		dc_x = 0;
-		dc_y = 0;
-		dc_time = 0;
+	KeyMap::iterator it = HotKeys.find(flags);
+	if (it != HotKeys.end()) {
+		KeyMap::value_type::second_type::iterator cbit;
+		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](const decltype(cb)& item) {
+			return FunctionTargetsEqual(cb, item);
+		});
+		if (cbit != it->second.end()) {
+			it->second.erase(cbit);
+			if (it->second.empty()) {
+				HotKeys.erase(it);
+			}
+		}
+	}
+}
+
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback cb, Event::EventTypeMask mask)
+{
+	static size_t id = 0;
+	Taps[id] = std::make_pair(mask, cb);
+	// return the "id" of the inserted tap so it could be unregistered later on
+	return id++;
+}
+
+void EventMgr::UnRegisterEventMonitor(TapMonitorId monitor)
+{
+	Taps.erase(monitor);
+}
+
+Event EventMgr::CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod)
+{
+	assert(btn);
+
+	Event e = CreateMouseMotionEvent(pos, mod);
+
+	if (down) {
+		e.type = Event::MouseDown;
+		e.mouse.buttonStates |= btn;
 	} else {
-		dc_x = x;
-		dc_y = y;
-		dc_time = thisTime+dc_delay;
+		e.type = Event::MouseUp;
+		e.mouse.buttonStates &= ~btn;
 	}
-	MButtons |= Button;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		m = windows.begin();
-		m += ( *t );
-		if (( *m ) == NULL)
-			continue;
-		if (!( *m )->Visible)
-			continue;
-		if (( ( *m )->XPos <= x ) && ( ( *m )->YPos <= y )) {
-			//Maybe we are on the window, let's check
-			if (( ( *m )->XPos + ( *m )->Width >= x ) &&
-				( ( *m )->YPos + ( *m )->Height >= y )) {
-				//Yes, we are on the Window
-				//Let's check if we have a Control under the Mouse Pointer
-				ctrl = ( *m )->GetControl( x, y, true );
-				if (!ctrl) {
-					ctrl = ( *m )->GetControl( x, y, false);
-				}
-				last_win_mousefocused = *m;
-				if (ctrl != NULL) {
-					last_win_mousefocused->SetMouseFocused( ctrl );
-					ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos,
-									  Button, Mod );
-					if (!ctrl->WantsDragOperation()) {
-						focusLock = ctrl;
-					}
-					if (last_win_mousefocused) {
-						RefreshCursor(last_win_mousefocused->Cursor);
-					}
-					return;
-				}
+	e.mouse.button = btn;
+
+	return e;
+}
+
+Event EventMgr::CreateMouseMotionEvent(const Point& pos, int mod)
+{
+	Event e = {}; // initialize all members to 0
+	e.mod = mod;
+	e.type = Event::MouseMove;
+	e.mouse.buttonStates = mouseButtonFlags.to_ulong();
+
+	e.mouse.x = pos.x;
+	e.mouse.y = pos.y;
+
+	Point delta = MousePos() - pos;
+	e.mouse.deltaX = delta.x;
+	e.mouse.deltaY = delta.y;
+
+	e.isScreen = true;
+
+	return e;
+}
+
+Event EventMgr::CreateMouseWheelEvent(const Point& vec, int mod)
+{
+	Event e = CreateMouseMotionEvent(MousePos(), mod);
+	e.type = Event::MouseScroll;
+	e.mouse.deltaX = vec.x;
+	e.mouse.deltaY = vec.y;
+	return e;
+}
+
+Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
+{
+	Event e = {}; // initialize all members to 0
+	e.mod = mod;
+	e.type = (down) ? Event::KeyDown : Event::KeyUp;
+	e.keyboard.keycode = key;
+	e.isScreen = false;
+
+	KeyboardKey character = 0;
+	if (key >= ' ' && key < GEM_LEFT) { // if printable
+		// FIXME: need to translate the keycode for e.keyboard.character
+		// probably need to lookup what encoding we are currently using
+		character = key;
+		if (mod & GEM_MOD_SHIFT) {
+			character = toupper(character);
+		}
+	}
+	e.keyboard.character = character;
+	return e;
+}
+
+Event EventMgr::CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure)
+{
+	if (numFingers > FINGER_MAX) {
+		Log(ERROR, "EventManager", "cannot create a touch event with %d fingers; max is %d.", numFingers, FINGER_MAX);
+		return Event();
+	}
+
+	Event e = {};
+	e.isScreen = true;
+	e.mod = 0;
+	e.type = (down) ? Event::TouchDown : Event::TouchUp;
+
+	if (numFingers) {
+		for (int i = 0; i < numFingers; ++i) {
+			e.touch.x += fingers[i].x;
+			e.touch.y += fingers[i].y;
+			if (abs(fingers[i].deltaX) > abs(e.touch.deltaX)) {
+				e.touch.deltaX = fingers[i].deltaX;
 			}
-		}
-		if (( *m )->Visible == WINDOW_FRONT) //stop looking further
-			break;
-	}
-	
-	if ((Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) && last_win_mousefocused) {
-		ctrl = last_win_mousefocused->GetScrollControl();
-		if (ctrl) {
-			ctrl->OnMouseDown( x - last_win_mousefocused->XPos - ctrl->XPos, y - last_win_mousefocused->YPos - ctrl->YPos, Button, Mod );
-		}
-	}
-
-	if (last_win_mousefocused) {
-		last_win_mousefocused->SetMouseFocused(NULL);
-	}
-}
-
-/** BroadCast Mouse Up Event */
-void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short Mod)
-{
-	if ((Button & GEM_MB_ONGOING_ACTION) == GEM_MB_ACTION) {
-		focusLock = NULL;
-	}
-
-	MButtons &= ~Button;
-	Control *last_ctrl_mousefocused = GetMouseFocusedControl();
-	if (last_ctrl_mousefocused == NULL) return;
-	last_ctrl_mousefocused->OnMouseUp( x - last_win_mousefocused->XPos - last_ctrl_mousefocused->XPos,
-		y - last_win_mousefocused->YPos - last_ctrl_mousefocused->YPos, Button, Mod );
-}
-
-/** BroadCast Mouse ScrollWheel Event */
-void EventMgr::MouseWheelScroll( short x, short y)//these are signed!
-{
-	Control *ctrl = GetMouseFocusedControl();
-	if (ctrl) {
-		ctrl->OnMouseWheelScroll( x, y);
-	}
-}
-
-/** BroadCast Mouse Idle Event */
-void EventMgr::MouseIdle(unsigned long /*time*/)
-{
-	if (last_win_over == NULL) return;
-	Control *ctrl = last_win_over->GetOver();
-	if (ctrl == NULL) return;
-	ctrl->DisplayTooltip();
-}
-
-/** BroadCast Key Press Event */
-void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
-{
-	if (last_win_focused == NULL) return;
-	Control *ctrl = last_win_focused->GetFocus();
-	if (!ctrl || !ctrl->OnKeyPress( Key, Mod )) {
-		// FIXME: need a better way to determine when to call ResolveKey/SetHotKey
-		if (!last_win_focused->OnKeyPress(Key, Mod)
-			&& core->GetGameControl()
-			&& !MButtons // checking for drag actions
-			&& !core->IsPresentingModalWindow()
-			&& !core->InCutSceneMode()
-			&& !core->GetKeyMap()->ResolveKey(Key, 0)) {
-			core->GetGame()->SendHotKey(toupper(Key));
-		}
-		//this is to refresh changing mouse cursors should the focus change)
-		FakeMouseMove();
-	}
-}
-
-/** BroadCast Key Release Event */
-void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
-{
-	if (last_win_focused == NULL) return;
-	if (Key == GEM_GRAB) {
-		core->GetVideoDriver()->ToggleGrabInput();
-		return;
-	}
-	Control *ctrl = last_win_focused->GetFocus();
-	if (ctrl == NULL) return;
-	ctrl->OnKeyRelease( Key, Mod );
-}
-
-/** Special Key Press Event */
-void EventMgr::OnSpecialKeyPress(unsigned char Key)
-{
-	if (!last_win_focused) {
-		return;
-	}
-	Control *ctrl = NULL;
-
-	// tab shows tooltips
-	if (Key == GEM_TAB) {
-		if (last_win_over != NULL) {
-			Control *ctrl = last_win_over->GetOver();
-			if (ctrl != NULL) {
-				ctrl->DisplayTooltip();
+			if (abs(fingers[i].deltaY) > abs(e.touch.deltaY)) {
+				e.touch.deltaY = fingers[i].deltaY;
 			}
+			e.touch.fingers[i] = fingers[i];
 		}
-	}
-	//the default control will get only GEM_RETURN
-	else if (Key == GEM_RETURN) {
-		ctrl = last_win_focused->GetDefaultControl(0);
-	}
-	//the default cancel control will get only GEM_ESCAPE
-	else if (Key == GEM_ESCAPE) {
-		ctrl = last_win_focused->GetDefaultControl(1);
-	} else if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
-		if (function_bar) {
-			ctrl = function_bar->GetFunctionControl(Key-GEM_FUNCTION1);
-		} else {
-			ctrl = last_win_focused->GetFunctionControl(Key-GEM_FUNCTION1);
-		}
+
+		e.touch.x /= numFingers;
+		e.touch.y /= numFingers;
 	}
 
-	//if there was no default button set, then the current focus will get it (except function keys)
-	if (!ctrl) {
-		if (Key<GEM_FUNCTION1 || Key > GEM_FUNCTION16) {
-			ctrl = last_win_focused->GetFocus();
-		}
-	}
-	//if one is under focus, use the default scroll focus
-	if (!ctrl) {
-		if (Key == GEM_UP || Key == GEM_DOWN) {
-			ctrl = last_win_focused->GetScrollControl();
-		}
-	}
-	if (ctrl) {
-		switch (ctrl->ControlType) {
-			//scrollbars will receive only mousewheel events
-			case IE_GUI_SCROLLBAR:
-				if (Key != GEM_UP && Key != GEM_DOWN) {
-					return;
-				}
-				break;
-			//buttons will receive only GEM_RETURN
-			case IE_GUI_BUTTON:
-				if (Key >= GEM_FUNCTION1 && Key <= GEM_FUNCTION16) {
-					//fake mouse button
-					ctrl->OnMouseDown(0,0,GEM_MB_ACTION,0);
-					ctrl->OnMouseUp(0,0,GEM_MB_ACTION,0);
-					return;
-				}
-				if (Key != GEM_RETURN && Key!=GEM_ESCAPE) {
-					return;
-				}
-				break;
-				// shouldnt be any harm in sending these events to any control
-		}
-		ctrl->OnSpecialKeyPress( Key );
-	}
+	e.touch.numFingers = numFingers;
+	e.touch.pressure = pressure;
+
+	return e;
 }
 
-/** Trigger a fake MouseMove event with current coordinates (typically used to
- *  refresh the cursor without actual user input) */
-void EventMgr::FakeMouseMove()
+Event EventMgr::CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch)
 {
-	int x, y;
-	core->GetVideoDriver()->GetMousePos(x, y);
-	MouseMove((unsigned short) x, (unsigned short) y);
+	Event e = {};
+	e.isScreen = true;
+	e.mod = 0;
+	e.type = Event::TouchGesture;
+	e.touch = touch;
+	e.gesture.dTheta = rotation;
+	e.gesture.dDist = pinch;
+
+	return e;
 }
 
-void EventMgr::SetFocused(Window *win, Control *ctrl)
+Event EventMgr::CreateTextEvent(const char* text)
 {
-	last_win_focused = win;
-	last_win_focused->SetFocused(ctrl);
-	//this is to refresh changing mouse cursors should the focus change)
-	FakeMouseMove();
-}
+	Event e = {};
+	char *str = ConvertCharEncoding(text, "UTF-8", core->TLKEncoding.encoding.c_str());
+	String* string = StringFromCString(str);
 
-void EventMgr::SetDCDelay(unsigned long t)
-{
-	dc_delay = t;
-}
-
-void EventMgr::SetRKDelay(unsigned long t)
-{
-	rk_delay = t;
-}
-
-unsigned long EventMgr::GetRKDelay()
-{
-	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;
-	if (rk_flags&GEM_RK_DOUBLESPEED) return rk_delay/2;
-	if (rk_flags&GEM_RK_QUADRUPLESPEED) return rk_delay/4;
-	return rk_delay;
-}
-
-unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
-{
-	unsigned long tmp = rk_flags;
-	switch (op) {
-		case OP_SET: tmp = arg; break;
-		case OP_OR: tmp |= arg; break;
-		case OP_NAND: tmp &= ~arg; break;
-		case OP_XOR: tmp ^= arg; break;
-		case OP_AND: tmp &= arg; break;
-		default: tmp = 0; break;
+	if (string) {
+		e = EventMgr::CreateTextEvent(*string);
 	}
-	rk_flags=tmp;
-	return rk_flags;
+	delete string;
+	free(str);
+
+	return e;
 }
 
-Control* EventMgr::GetMouseFocusedControl()
+Event EventMgr::CreateTextEvent(const String& text)
 {
-	if (last_win_mousefocused) {
-		return last_win_mousefocused->GetMouseFocus();
-	}
-	return NULL;
+	Event e = {};
+	e.type = Event::TextInput;
+	e.text.text = text;
+
+	return e;
 }
+
+Event EventMgr::CreateControllerAxisEvent(InputAxis axis, int delta, float pct)
+{
+	Event e = {};
+	e.type = Event::ControllerAxis;
+	e.controller.axis = axis;
+	e.controller.axisPct = pct;
+	e.controller.axisDelta = delta;
+	e.isScreen = true;
+	return e;
+}
+
+Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
+{
+	Event e = {};
+	e.controller.buttonStates = controllerButtonStates.to_ulong();
+
+	if (down) {
+		e.type = Event::ControllerButtonDown;
+		e.controller.buttonStates |= btn;
+	} else {
+		e.type = Event::ControllerButtonUp;
+		e.controller.buttonStates &= ~btn;
+	}
+	e.controller.button = btn;
+
+	return e;
+}
+
 }

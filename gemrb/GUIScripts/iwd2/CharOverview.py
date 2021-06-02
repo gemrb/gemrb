@@ -31,7 +31,6 @@ from ie_stats import *
 
 CharGenWindow = 0
 TextAreaControl = 0
-StartOverWindow = 0
 PortraitButton = 0
 StepButtons = {}
 PersistButtons = {}
@@ -44,15 +43,23 @@ def AddText(strref, newlines=0):
 	TextAreaControl.Append ("\n" * newlines)
 ### End utility functions
 
+def PositionCharGenWin(window, offset = 0):
+	global CharGenWindow
+
+	CGFrame = CharGenWindow.GetFrame()
+	WFrame = window.GetFrame()
+	window.SetPos(CGFrame['x'] + CGFrame['w'] - WFrame['w'] - 18,
+				  offset + CGFrame['y'] + (CGFrame['h'] - WFrame['h'] - 24))
+
 def UpdateOverview(CurrentStep):
-	global CharGenWindow, TextAreaControl, StartOverWindow, PortraitButton
+	global CharGenWindow, TextAreaControl, PortraitButton
 	global StepButtons, Steps, PersistButtons, GlobalStep
 	
 	GlobalStep = CurrentStep
 	
-	GemRB.LoadWindowPack("GUICG", 800 ,600)
-	CharGenWindow = GemRB.LoadWindow(0)
-	CharGenWindow.SetFrame()
+	CharGenWindow = GemRB.LoadWindow(0, "GUICG")
+	CharGenWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
 	PortraitButton = CharGenWindow.GetControl(12)
 	PortraitButton.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 	
@@ -69,7 +76,7 @@ def UpdateOverview(CurrentStep):
 		State = IE_GUI_BUTTON_DISABLED
 		if CurrentStep - 1 == i:
 			State = IE_GUI_BUTTON_ENABLED
-			StepButtons[Step].SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+			StepButtons[Step].MakeDefault()
 			StepButtons[Step].SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 		StepButtons[Step].SetState(State)
 	
@@ -104,17 +111,17 @@ def UpdateOverview(CurrentStep):
 				State = States[0]
 				Event = None
 			else:
-				PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+				PersistButtons[Key].MakeEscape()
 		
 		if Key == 'Next' and CurrentStep == 9:
 			State = 1
 			Event = NextPress
-			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+			PersistButtons[Key].MakeDefault()
 		
 		if Key == 'Start' and CurrentStep == 1:
 			Text = 13727
 			Event = CancelPress
-			PersistButtons[Key].SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+			PersistButtons[Key].MakeEscape()
 		
 		PersistButtons[Key].SetText(Text)
 		PersistButtons[Key].SetState(State)
@@ -129,7 +136,8 @@ def UpdateOverview(CurrentStep):
 		Tables.append(GemRB.LoadTable(tbl))
 	
 	if GemRB.GetVar('Gender') > 0:
-		if GemRB.GetToken('CHARNAME') == '':
+		name = GemRB.GetToken('CHARNAME')
+		if not name:
 			TextAreaControl.SetText(12135)
 		else:
 			TextAreaControl.SetText(1047)
@@ -234,30 +242,12 @@ def UpdateOverview(CurrentStep):
 				AddText ('[/color]\n')
 				for ks in KnownSpells:
 					AddText (GemRB.GetString(ks['SpellName'])+"\n")
-
-	# Handle StartOverWindow
-	StartOverWindow = GemRB.LoadWindow(53)
-	
-	YesButton = StartOverWindow.GetControl(0)
-	YesButton.SetText(13912)
-	YesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RestartGen)
-	
-	NoButton = StartOverWindow.GetControl(1)
-	NoButton.SetText(13913)
-	NoButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NoExitPress)
-	
-	TextAreaControl = StartOverWindow.GetControl(2)
-	TextAreaControl.SetText(40275)
 	
 	# And we're done, w00t!
-	CharGenWindow.SetVisible(WINDOW_VISIBLE)
+	CharGenWindow.Focus()
 	return
 
 def NextPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
-	if StartOverWindow:
-		StartOverWindow.Unload()
 	if len(Steps) > GlobalStep - 1:
 		GemRB.SetNextScript(Steps[GlobalStep - 1])
 	else: #start the game
@@ -271,43 +261,36 @@ def CancelPress():
 	GemRB.CreatePlayer("", slot|0x8000)
 	if CharGenWindow:
 		CharGenWindow.Unload()
-	if StartOverWindow:
-		StartOverWindow.Unload()
 	GemRB.SetNextScript('SPPartyFormation')
 	return
 
 def StartOver():
-	StartOverWindow.SetVisible(WINDOW_VISIBLE)
-	return
-
-def NoExitPress():
-	StartOverWindow.SetVisible(WINDOW_INVISIBLE)
-	CharGenWindow.SetVisible(WINDOW_VISIBLE)
+	StartOverWindow = GemRB.LoadWindow(53)
+	
+	def RestartGen():
+		StartOverWindow.Close()
+		CharGenWindow.Close()
+		GemRB.SetNextScript('CharGen')
+		return
+	
+	YesButton = StartOverWindow.GetControl(0)
+	YesButton.SetText(13912)
+	YesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RestartGen)
+	
+	NoButton = StartOverWindow.GetControl(1)
+	NoButton.SetText(13913)
+	NoButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: StartOverWindow.Close())
+	
+	TextAreaControl = StartOverWindow.GetControl(2)
+	TextAreaControl.SetText(40275)
 	return
 
 def ImportPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
-	if StartOverWindow:
-		StartOverWindow.Unload()
 	GemRB.SetToken('NextScript', 'CharGen')
 	GemRB.SetNextScript('ImportFile')
 	return
 
-def RestartGen():
-	if CharGenWindow:
-		CharGenWindow.Unload()
-	if StartOverWindow:
-		StartOverWindow.Unload()
-	GemRB.SetNextScript('CharGen')
-	return
-
 def BackPress():
-	if CharGenWindow:
-		CharGenWindow.Unload()
-	if StartOverWindow:
-		StartOverWindow.Unload()
-	
 	# Need to clear relevant variables
 	if GlobalStep == 2: GemRB.SetVar('Gender', 0)
 	elif GlobalStep == 3: GemRB.SetVar('Race', 0)

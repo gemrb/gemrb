@@ -35,7 +35,7 @@
 #include "globals.h"
 #include "exports.h"
 
-#include "Sprite2D.h"
+#include "SpriteSheet.h"
 
 #include <deque>
 #include <map>
@@ -50,6 +50,7 @@ enum FontStyle {
 };
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 #define IE_FONT_ALIGN_LEFT   0x00
 #define IE_FONT_ALIGN_CENTER 0x01
@@ -78,8 +79,6 @@ struct Glyph {
  * Class for using and manipulating images serving as fonts
  */
 
-#define DEBUG_FONT 0
-
 class GEM_EXPORT Font {
 	/*
 	 we cannot assume direct pixel access to a Sprite2D (opengl, BAM, etc), but we need raw pixels for rendering text
@@ -95,6 +94,21 @@ class GEM_EXPORT Font {
 	 until either the page is full, or until a call to a print method is made.
 	 To avoid generating more than one partial page, subsequent calls to add new glyphs will destroy the partial Sprite (not the source pixels of course)
 	*/
+public:
+	struct PrintColors {
+		Color fg;
+		Color bg;
+	};
+	
+	struct StringSizeMetrics {
+		// specifiy behavior of StringSize based on values of struct
+		// StringSize will modify the struct with the results
+		Size size;		// maximum size allowed; updated with actual size <= initial value
+		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
+		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
+		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
+	};
+
 private:
 	class GlyphAtlasPage : public SpriteSheet<ieWord> {
 		private:
@@ -103,18 +117,11 @@ private:
 			ieByte* pageData; // current raw page being built
 			int pageXPos; // current position on building page
 			Font* font;
+			Holder<Sprite2D> invertedSheet;
 		public:
-			GlyphAtlasPage(Size pageSize, Font* font)
-			: SpriteSheet<ieWord>(), font(font)
-			{
-				pageXPos = 0;
-				SheetRegion.w = pageSize.w;
-				SheetRegion.h = pageSize.h;
+			GlyphAtlasPage(Size pageSize, Font* font);
 
-				pageData = (ieByte*)calloc(pageSize.h, pageSize.w);
-			}
-
-			~GlyphAtlasPage() {
+			~GlyphAtlasPage() override {
 				if (Sheet == NULL) {
 					free(pageData);
 				}
@@ -124,10 +131,8 @@ private:
 
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
-		void Draw(ieWord chr, const Region& dest, Palette* pal = NULL);
-#if DEBUG_FONT
+		void Draw(ieWord chr, const Region& dest, const PrintColors* colors);
 		void DumpToScreen(const Region&);
-#endif
 	};
 
 	struct GlyphIndexEntry {
@@ -149,7 +154,8 @@ private:
 	GlyphAtlas Atlas;
 
 protected:
-	Palette* palette;
+	PaletteHolder palette;
+	bool background = false;
 
 public:
 	const int LineHeight;
@@ -158,17 +164,19 @@ public:
 private:
 	void CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph*);
 	// Blit to the sprite or screen if canvas is NULL
-	size_t RenderText(const String&, Region&, Palette*, ieByte alignment,
+	size_t RenderText(const String&, Region&, ieByte alignment, const PrintColors*,
 					  Point* = NULL, ieByte** canvas = NULL, bool grow = false) const;
 	// render a single line of text. called by RenderText()
-	size_t RenderLine(const String& string, const Region& rgn, Palette* hicolor,
-					  Point& dp, ieByte** canvas = NULL) const;
+	size_t RenderLine(const String& string, const Region& rgn,
+					  Point& dp, const PrintColors*, ieByte** canvas = NULL) const;
+	
+	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
 
 public:
-	Font(Palette*, ieWord lineheight, ieWord baseline);
+	Font(PaletteHolder, ieWord lineheight, ieWord baseline, bool background);
 	virtual ~Font();
 
-	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Sprite2D*);
+	const Glyph& CreateGlyphForCharSprite(ieWord chr, Holder<Sprite2D>);
 	// BAM fonts use alisases a lot so this saves quite a bit of space
 	// Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 	void CreateAliasForChar(ieWord chr, ieWord alias);
@@ -176,30 +184,26 @@ public:
 	//allow reading but not setting glyphs
 	virtual const Glyph& GetGlyph(ieWord chr) const;
 
-	Palette* GetPalette() const;
-	void SetPalette(Palette* pal);
+	virtual int GetKerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
 
-	int KerningOffset(ieWord /*leftChr*/, ieWord /*rightChr*/) const {return 0;};
-
-	Sprite2D* RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
-								 Palette* pal = NULL, size_t* numPrinted = NULL, Point* = NULL) const;
+	Holder<Sprite2D> RenderTextAsSprite(const String& string, const Size& size, ieByte alignment,
+								 size_t* numPrinted = NULL, Point* = NULL) const;
 
 	// return the number of glyphs printed
 	// the "point" parameter can be passed with a start point for rendering
 	// it will be filled with the point inside 'rgn' where the string ends upon return
+	
+	size_t Print(const Region& rgn, const String& string, ieByte Alignment, Point* point = nullptr) const;
+	size_t Print(const Region& rgn, const String& string, ieByte Alignment, const PrintColors& colors, Point* point = nullptr) const;
+	
 	size_t Print(Region rgn, const String& string,
-				 Palette* hicolor, ieByte Alignment, Point* point = NULL) const;
+				 PaletteHolder hicolor, ieByte Alignment, Point* point = nullptr) const;
 
 	/** Returns size of the string rendered in this font in pixels */
-	struct StringSizeMetrics {
-		// specifiy behavior of StringSize based on values of struct
-		// StringSize will modify the struct with the results
-		Size size;		// maximum size allowed; updated with actual size <= initial value
-		size_t numChars; // maximum characters to size (0 implies no limit); updated with the count of characters that fit within size <= initial value
-		uint32_t numLines; // maximum number of lines to allow (use 0 for unlimited); updated with the actual number of lines that were used
-		bool forceBreak;// whether or not a break can occur without whitespace; updated to false if initially true and no force break occured
-	};
 	Size StringSize(const String&, StringSizeMetrics* metrics = NULL) const;
+
+	// like StringSize, but single line and doens't take whitespace into consideration
+	size_t StringSizeWidth(const String&, size_t width, size_t* numChars = NULL) const;
 };
 
 }

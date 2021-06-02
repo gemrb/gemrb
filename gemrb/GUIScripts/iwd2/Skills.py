@@ -19,6 +19,7 @@
 #character generation, skills (GUICG6)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 import IDLUCommon
 from ie_stats import IE_INT, IE_UNUSED_SKILLPTS, IE_CLASSLEVELSUM
@@ -42,9 +43,9 @@ def RedrawSkills():
 	SumLabel = SkillWindow.GetControl(0x1000000c)
 	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SumLabel.SetTextColor(255, 255, 255)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 	else:
-		SumLabel.SetTextColor(255, 255, 0)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 0})
 	SumLabel.SetText(str(PointsLeft) )
 
 	maxSkill = Level + 3
@@ -64,12 +65,12 @@ def RedrawSkills():
 			#we use this function to retrieve the string
 			t=GemRB.StatComment(SkillName,0,0)
 			Label.SetText("%s (%d)"%(t,Cost) )
-			Label.SetTextColor(255, 255, 255)
+			Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 			if PointsLeft < 1 or ActPoint * Cost >= maxSkill:
-				Label.SetTextColor(150, 150, 150)
+				Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
 			Label.SetText(SkillName)
-			Label.SetTextColor(150, 150, 150) # Grey
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150}) # Grey
 
 		Button1 = SkillWindow.GetControl(i*2+14)
 		Button2 = SkillWindow.GetControl(i*2+15)
@@ -88,11 +89,11 @@ def RedrawSkills():
 		Label = SkillWindow.GetControl(0x10000069+i)
 		Label.SetText(str(ActPoint) )
 		if ActPoint > StatLowerLimit[Pos]:
-			Label.SetTextColor(0,255,255)
+			Label.SetTextColor({'r' : 0, 'g' : 255, 'b' : 255})
 		elif Cost < 1 or PointsLeft < 1:
-			Label.SetTextColor(150, 150, 150)
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
-			Label.SetTextColor(255,255,255)
+			Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 
 	return
 
@@ -117,8 +118,6 @@ def OpenSkillsWindow(chargen, level=0):
 
 	CharGen = chargen
 
-	#enable repeated clicks
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	SkillPtsTable = GemRB.LoadTable ("skillpts")
 	if chargen:
 		pc = GemRB.GetVar ("Slot")
@@ -172,12 +171,11 @@ def OpenSkillsWindow(chargen, level=0):
 
 	GemRB.SetToken("number",str(PointsLeft) )
 	if CharGen:
-		GemRB.LoadWindowPack ("GUICG", 800 ,600)
-		SkillWindow = GemRB.LoadWindow (6)
+		SkillWindow = GemRB.LoadWindow (6, "GUICG")
 		ButtonCount = 10
+		CharOverview.PositionCharGenWin (SkillWindow)
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800 ,600)
-		SkillWindow = GemRB.LoadWindow (55)
+		SkillWindow = GemRB.LoadWindow (55, "GUIREC")
 		ButtonCount = 9
 
 	for i in range(ButtonCount):
@@ -188,29 +186,31 @@ def OpenSkillsWindow(chargen, level=0):
 		Button = SkillWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.SetActionInterval (200)
 
 		Button = SkillWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Skill",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.SetActionInterval (200)
 
 	if chargen:
 		BackButton = SkillWindow.GetControl (105)
 		BackButton.SetText (15416)
-		BackButton.SetFlags (IE_GUI_BUTTON_CANCEL,OP_OR)
+		BackButton.MakeEscape()
 		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackPress)
 	else:
 		SkillWindow.DeleteControl (105)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = SkillWindow.GetControl(92)
 	TextAreaControl.SetText(17248)
 
 	ScrollBarControl = SkillWindow.GetControl(104)
 	ScrollBarControl.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBarControl.SetDefaultScrollBar ()
+	SkillWindow.SetEventProxy(ScrollBarControl)
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
@@ -219,11 +219,13 @@ def OpenSkillsWindow(chargen, level=0):
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
-	SkillWindow.SetVisible(WINDOW_VISIBLE)
+
 	if not chargen:
 		SkillWindow.ShowModal (MODAL_SHADOW_GRAY)
-	return
+	else:
+		SkillWindow.Focus()
 
+	return
 
 def JustPress():
 	Pos = GemRB.GetVar("Skill")+TopIndex

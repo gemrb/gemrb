@@ -22,17 +22,22 @@
 
 namespace GemRB {
 
-struct RevColor {
-	unsigned char b,g,r,a;
-};
-
 struct Color {
 	unsigned char r,g,b,a;
 
-	static void MultiplyTint(Color& tint, const Color* tintMod) {
-		tint.r = (tint.r * tintMod->r) >> 8;
-		tint.g = (tint.g * tintMod->g) >> 8;
-		tint.b = (tint.b * tintMod->b) >> 8;
+	Color() {
+		r = g = b = a = 0;
+	}
+
+	Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+	: r(r), g(g), b(b), a(a) {}
+
+	bool operator==(const Color& rhs) const {
+		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
+	}
+	
+	bool operator!=(const Color& rhs) const {
+		return !operator==(rhs);
 	}
 }
 #ifdef __GNUC__
@@ -40,16 +45,21 @@ struct Color {
 #endif
 ; // close of Color struct
 
-static const Color ColorBlack = {0x00, 0x00, 0x00, 0xff};
+static const Color ColorBlack(0x00, 0x00, 0x00, 0xff);
 // FIXME: why does blue have an alpha of 0x80?
-static const Color ColorBlue = {0x00, 0x00, 0xff, 0x80};
-static const Color ColorCyan = {0x00, 0xff, 0xff, 0xff};
-static const Color ColorGray = {0x80, 0x80, 0x80, 0xff};
-static const Color ColorGreen = {0x00, 0xff, 0x00, 0xff};
-static const Color ColorGreenDark = {0x00, 0x78, 0x00, 0xff};
-static const Color ColorMagenta = {0xff, 0x00, 0xff, 0xff};
-static const Color ColorRed = {0xff, 0x00, 0x00, 0xff};
-static const Color ColorWhite = {0xff, 0xff, 0xff, 0xff};
+static const Color ColorBlue(0x00, 0x00, 0xff, 0xff);
+static const Color ColorBlueDark(0x00, 0x00, 0x80, 0xff);
+static const Color ColorCyan(0x00, 0xff, 0xff, 0xff);
+static const Color ColorGray(0x80, 0x80, 0x80, 0xff);
+static const Color ColorGreen(0x00, 0xff, 0x00, 0xff);
+static const Color ColorGreenDark(0x00, 0x78, 0x00, 0xff);
+static const Color ColorMagenta(0xff, 0x00, 0xff, 0xff);
+static const Color ColorOrange(0xff, 0xff, 0x00, 0xff);
+static const Color ColorRed(0xff, 0x00, 0x00, 0xff);
+static const Color ColorViolet(0xa0, 0x00, 0xa0, 0xff);
+static const Color ColorYellow(0xff, 0xff, 0x00, 0xff);
+static const Color ColorWhite(0xff, 0xff, 0xff, 0xff);
+
 }
 
 #endif

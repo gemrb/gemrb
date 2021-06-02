@@ -40,11 +40,24 @@ if(SCCACHE_PROGRAM)
 	set(CMAKE_CXX_COMPILER_LAUNCHER "${SCCACHE_PROGRAM}" CACHE STRING "" FORCE)
 endif()
 
+IF(APPLE)
+	# favor mac frameworks over unix libraries
+	set(CMAKE_FIND_FRAMEWORK FIRST)
+ENDIF()
+
 # check for RaspberryPi
 IF(UNIX)
-	SET(RPI_GLES_PATH "/opt/vc")
-	SET(RPI_GLES_PATH "/opt/vc" CACHE STRING "The Raspberry Pi GLES path. Defaults to /opt/vc")
-	FIND_FILE(RPI NAMES bcm_host.h PATHS "${RPI_GLES_PATH}/include")
+	FIND_FILE(RPI NAMES bcm_host.h PATHS "/opt/vc/include")
+	# By default, Pi0 to Pi3 models use the legacy (Broadcom) GLESv2 drivers, from /opt/vc.
+	# Newer models (Pi4) don't support it, using the open source MESA drivers.
+	# NOTE: the Pi3B(+) models can also run with open source MESA drivers, but support for it must be explicitely enabled
+	IF(RPI AND NOT DISABLE_VIDEOCORE)
+		SET(HINT_GLES_LIBNAME brcmGLESv2)
+		SET(HINT_GLES_INCDIR "/opt/vc/include")
+		SET(HINT_GLES_LIBDIR "/opt/vc/lib")
+		SET(OPENGL_BACKEND GLES)
+		SET(SDL_BACKEND SDL2)
+	ENDIF()
 ENDIF()
 
 # Options list
@@ -61,12 +74,6 @@ OPTION(USE_FREETYPE "Enable FreeType support" ON)
 OPTION(USE_PNG "Enable LibPNG support" ON)
 OPTION(USE_VORBIS "Enable Vorbis support" ON)
 OPTION(USE_ICONV "Enable Iconv support" ON)
-
-IF(RPI AND NOT OPENGL_BACKEND STREQUAL "None")
-	SET(OPENGL_BACKEND GLES)
-	SET(SDL_BACKEND SDL2)
-ENDIF()
-
 
 #VCPKG dll deployment is circumvented because it doesn't currently work for gemrb
 IF(WIN32 AND _VCPKG_INSTALLED_DIR)
@@ -99,8 +106,6 @@ if (NOT LAYOUT)
 		set(LAYOUT "home")
 	elseif (APPLE)
 		set(LAYOUT "bundle")
-		# favor mac frameworks over unix libraries
-		set(CMAKE_FIND_FRAMEWORK FIRST)
 	else (APPLE)
 		set(LAYOUT "fhs")
 	endif (WIN32)
@@ -171,6 +176,7 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 	SET_PATH( METAINFO_DIR "" )
 endif (${LAYOUT} MATCHES "home")
+
 # convert the slashes for windows' users' convenience
 file(TO_NATIVE_PATH "${PLUGIN_DIR}" DEFAULT_PLUGINS_DIR)
 file(TO_NATIVE_PATH ./Cache2/ DEFAULT_CACHE_DIR)
@@ -309,12 +315,13 @@ IF((SDL_BACKEND STREQUAL "SDL2") OR USE_SDL2)
 	ENDIF()
 ENDIF()
 
-# backward compatibility notice - remove USE_SDL2 and OPENGL_BACKEND in the future (added mid 2016)
+# backward compatibility notice - remove USE_SDL2 and USE_OPENGL in the future (added mid 2016)
 IF(USE_SDL2)
 	MESSAGE(WARNING "USE_SDL2 has been deprecated, use SDL_BACKEND instead: Auto, SDL, SDL2.")
 ENDIF()
 IF(USE_OPENGL)
-	MESSAGE(WARNING "USE_OPENGL has been deprecated, use OPENGL_BACKEND instead: None, OpenGL, GLES.")
+	MESSAGE(WARNING "USE_OPENGL has been dropped, use OPENGL_BACKEND instead: None, OpenGL, GLES")
+	SET(OPENGL_BACKEND "OpenGL")
 ENDIF()
 
 IF(SDL_FOUND)
@@ -334,72 +341,34 @@ ELSE()
 	MESSAGE(WARNING "Make sure you use a version compatible with the chosen SDL version.")
 ENDIF()
 
-IF((NOT OPENGL_BACKEND STREQUAL "None") OR USE_OPENGL)
+IF(NOT OPENGL_BACKEND STREQUAL "None")
+
 	IF(SDL_BACKEND STREQUAL "SDL")
-		MESSAGE(FATAL_ERROR "SDL2 is required for the OpenGL driver!")
+		MESSAGE(FATAL_ERROR "SDL2 is required for OpenGL backend support!")
 	ENDIF()
-	IF(RPI)
-		MESSAGE(STATUS "RPI_GLES_PATH: ${RPI_GLES_PATH}")
-		MESSAGE(STATUS "RPI: ${RPI}")
-		MESSAGE(STATUS "Setting _OPENGL_INCLUDE_PATH: ${RPI_GLES_PATH}/include")
-		MESSAGE(STATUS "Setting _OPENGL_LIB_PATH: ${RPI_GLES_PATH}/libs")                                                                                                         
-		SET(_OPENGL_INCLUDE_PATH ${RPI_GLES_PATH}/include)
-		SET(_OPENGL_LIB_PATH ${RPI_GLES_PATH}/lib)
-		# for newer cmake
-		MESSAGE(STATUS "Checking for ${RPI_GLES_PATH}/GLES2/GL2.h and ${RPI_GLES_PATH}/lib")
-		IF(EXISTS ${RPI_GLES_PATH}/include/GLES2/GL2.h AND EXISTS ${RPI_GLES_PATH}/lib)
-			MESSAGE(STATUS "Found ${RPI_GLES_PATH}/include/GLES2/GL2.h and ${RPI_GLES_PATH}/lib.")
-			MESSAGE(STATUS "Setting OPENGL_EGL_INCLUDE_DIRS ${RPI_GLES_PATH}/include/GLES2/GL2.h")
-			MESSAGE(STATUS "Setting OPENGL_LIBRARIES ${RPI_GLES_PATH}/lib")
-			SET(OpenGL_EGL_FOUND "True")
-			SET(OPENGL_EGL_INCLUDE_DIRS RPI_${RPI_GLES_PATH}/include)
-			SET(OPENGL_LIBRARIES ${RPI_GLES_PATH}/lib)
+
+	IF(OPENGL_BACKEND STREQUAL "OpenGL")
+		ADD_DEFINITIONS("-DUSE_OPENGL_API")
+		INCLUDE(FindOpenGL)
+		IF(NOT OPENGL_FOUND)
+			MESSAGE(FATAL_ERROR "OpenGL library not found!")
 		ENDIF()
-	ENDIF()
-		  
 
-	INCLUDE(FindOpenGL)
-	IF(NOT OPENGL_FOUND)
-		MESSAGE(FATAL_ERROR "OpenGL library not found!")
-	ENDIF()
-
-	IF((OPENGL_BACKEND STREQUAL "OpenGL") OR (USE_OPENGL EQUAL 1))
-		ADD_DEFINITIONS("-DUSE_GL")
-		# Don't delete this - there is code that relies on -DUSE_OPENGL=1
-		SET(USE_OPENGL 1)
-		IF(WIN32 AND _VCPKG_INSTALLED_DIR)
-			find_package(GLEW REQUIRED)
-			GET_TARGET_PROPERTY(GLEW_INCLUDE_DIR GLEW::GLEW INTERFACE_INCLUDE_DIRECTORIES)
-			GET_TARGET_PROPERTY(GLEW_LIBRARY_DEBUG GLEW::GLEW IMPORTED_IMPLIB_DEBUG)
-			GET_TARGET_PROPERTY(GLEW_LIBRARY_RELEASE GLEW::GLEW IMPORTED_IMPLIB_RELEASE)
-			SET(GLEW_LIBRARIES debug ${GLEW_LIBRARY_DEBUG} optimized ${GLEW_LIBRARY_RELEASE})
-		ELSE()
+		# GLEW is required only for Windows
+		IF (WIN32)
 			INCLUDE(FindGLEW)
+			IF(NOT GLEW_FOUND)
+				MESSAGE(FATAL "GLEW library not found!")
+			ENDIF()
 		ENDIF()
-		IF(GLEW_FOUND)
-			MESSAGE(STATUS "Looking for Glew: found")
-		ELSE()
-			MESSAGE(SEND_ERROR "Looking for Glew: not found!")
-			MESSAGE(FATAL_ERROR "Please install the Glew library and headers first!")
+
+	ELSEIF(OPENGL_BACKEND STREQUAL "GLES")
+		INCLUDE(FindOpenGLES2)
+		IF(NOT OPENGLES2_FOUND)
+			MESSAGE(FATAL_ERROR "OpenGLES2 library not found!")
 		ENDIF()
 	ENDIF()
 
-	IF((OPENGL_BACKEND STREQUAL "GLES") OR (USE_OPENGL EQUAL 2))
-		# Don't delete this - there is code that relies on -DUSE_OPENGL=2
-		SET(USE_OPENGL 2)
-		# use GLES instead of regular GL
-		SET(GLEW_LIBRARIES "")
-		find_path(GLES2_H gl2.h PATH_SUFFIXES GLES2)
-		IF(APPLE)
-			find_path(GLES2_H gl.h PATH_SUFFIXES OpenGLES/ES2)
-		ENDIF()
-		IF(GLES2_H)
-			MESSAGE(STATUS "Looking for GLES2: found")
-		ELSE()
-			MESSAGE(SEND_ERROR "Looking for GLES2: not found!")
-			MESSAGE(FATAL_ERROR "Please install the GLES2 library and headers first!")
-		ENDIF()
-	ENDIF()
 ENDIF()
 
 INCLUDE(FindZLIB)
@@ -614,6 +583,12 @@ add_custom_target( dist
 		| gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+
+add_custom_target(fetch-demo-data
+	COMMAND ${CMAKE_COMMAND} -P ${CMAKE_SOURCE_DIR}/cmake/fetch_demo_data.cmake
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/demo
+)
+add_dependencies(dist fetch-demo-data)
 
 # pretty-print options macro
 # as of 2.8 cmake does not support anything like EVAL

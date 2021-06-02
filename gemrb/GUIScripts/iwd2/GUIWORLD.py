@@ -26,6 +26,7 @@
 import GemRB
 from GUIDefines import *
 import GUICommon
+import GUICommonWindows
 import MessageWindow
 import CommonWindow
 
@@ -34,35 +35,35 @@ FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
 ReformPartyWindow = None
-OldMessageWindow = None
+
+def OpenDialogButton(id):
+	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	return window
 
 def DialogStarted ():
 	global ContinueWindow
 
-	# try to force-close anything which is open
-	GUICommon.CloseOtherWindow(None)
 	CommonWindow.CloseContainerWindow()
 
-	# we need GUI for dialogs
-	GemRB.UnhideGUI()
-
 	# opening control size to maximum, enabling dialog window
-	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+	
+	# disable the 1-6 hotkeys, so they'll work for choosing answers
+	GUICommonWindows.UpdatePortraitWindow ()
 
 	MessageWindow.UpdateControlStatus()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindow (9)
+	ContinueWindow = OpenDialogButton(9)
 
 def DialogEnded ():
 	global ContinueWindow
 
-	# TODO: why is this being called at game start?!
-	if not ContinueWindow:
-		return
+	GUICommonWindows.UpdateActionsWindow()
 
-	ContinueWindow.Unload ()
+	ContinueWindow.Close ()
 	ContinueWindow = None
 
 def CloseContinueWindow ():
@@ -73,46 +74,42 @@ def NextDialogState ():
 	if not ContinueWindow:
 		return
 
-	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
-
-	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	ContinueWindow.GetControl(0).SetVisible(False)
+	ContinueWindow.GetControl(0).SetDisabled(True)
 
 def OpenEndMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9371)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.MakeDefault(True)
+	ContinueWindow.Focus()
 
 def OpenContinueMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
 	#continue
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	Button.SetText (9372)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.MakeDefault(True)
+	ContinueWindow.Focus()
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	hideflag = GemRB.HideGUI ()
+	hideflag = CommonWindow.IsGameGUIHidden()
 
 	if ReformPartyWindow:
 		if ReformPartyWindow:
 			ReformPartyWindow.Unload ()
 		ReformPartyWindow = None
 
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.LoadWindowPack ("GUIREC", 800, 600)
-		if hideflag:
-			GemRB.UnhideGUI ()
+		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack())
 
 	# Remove
 	Button = Window.GetControl (15)
@@ -124,13 +121,13 @@ def OpenReformPartyWindow ():
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
-	if hideflag:
-		GemRB.UnhideGUI ()
+	
+	CommonWindow.SetGameGUIHidden(hideflag)
 
 def DeathWindowPlot():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
-	GemRB.HideGUI ()
+	CommonWindow.SetGameGUIHidden(True)
 	GemRB.SetVar("QuitGame1", 32848)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
@@ -138,7 +135,7 @@ def DeathWindowPlot():
 def DeathWindow():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
-	GemRB.HideGUI ()
+	CommonWindow.SetGameGUIHidden(True)
 	GemRB.SetVar("QuitGame1", 16498)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
@@ -146,8 +143,7 @@ def DeathWindow():
 def DeathWindowEnd ():
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (17)
+	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack())
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)
@@ -164,9 +160,6 @@ def DeathWindowEnd ():
 	Button.SetText (15417)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
 
-	GemRB.HideGUI ()
-	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

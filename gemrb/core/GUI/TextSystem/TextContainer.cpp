@@ -27,9 +27,6 @@
 #include <algorithm>
 #include <climits>
 
-#define CONTENT_MAX_SIZE (SHRT_MAX / 2) // just something larger than any screen height and small enough to not overflow
-#define DEBUG_TEXT 0
-
 namespace GemRB {
 
 Content::Content(const Size& size)
@@ -38,57 +35,44 @@ Content::Content(const Size& size)
 	parent = NULL;
 }
 
-Content::~Content()
-{}
-
-Regions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
+LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	Region layoutRgn = Region(rgn.Origin() + p, frame.Dimensions());
-
-	Regions rgns;
-	rgns.push_back(layoutRgn);
-	return rgns;
+	return { std::make_shared<LayoutRegion>(Region(rgn.Origin() + p, frame.Dimensions())) };
 }
 
-void Content::Draw(Point p) const
-{
-	Size s(frame.Dimensions());
-	s.h = (s.h <= 0) ? CONTENT_MAX_SIZE: s.h;
-	s.w = (s.w <= 0) ? CONTENT_MAX_SIZE: s.w;
-
-#if DEBUG_TEXT
-	Region drawRgn(p, s);
-	core->GetVideoDriver()->DrawRect(drawRgn, ColorGreen, true);
-#endif
-	// FIXME: passing around a screen offset is clumsy.
-	// there should be a way to have the video dirver draw relative to a given rect
-	// we *almost* have this functionality, but it is tied to the gamecontrol viewport at the moment
-
-	// this is the root of the drawing so region and point are both at 0,0
-	Point origin;
-	DrawContentsInRegions(LayoutForPointInRegion(origin, Region(origin, s)), p);
-}
-
-
-TextSpan::TextSpan(const String& string, const Font* fnt, Palette* pal, const Size* frame)
+TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
 	: Content((frame) ? *frame : Size()), text(string), font(fnt)
 {
-	palette = pal;
-	if (palette)
-		palette->acquire();
+	Alignment = IE_FONT_ALIGN_LEFT;
+}
+
+TextSpan::TextSpan(const String& string, const Font* fnt, Font::PrintColors cols, const Size* frame)
+	: Content((frame) ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
+{
+	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
 TextSpan::~TextSpan()
 {
-	if (palette)
-		palette->release();
+	delete colors;
+}
+
+void TextSpan::ClearColors()
+{
+	delete colors;
+}
+
+void TextSpan::SetColors(const Color& fg, const Color& bg)
+{
+	ClearColors();
+	colors = new Font::PrintColors {fg, bg};
 }
 
 inline const Font* TextSpan::LayoutFont() const
 {
 	if (font) return font;
 
-	TextContainer* container = dynamic_cast<TextContainer*>(parent);
+	TextContainer* container = static_cast<TextContainer*>(parent);
 	if (container) {
 		return container->TextFont();
 	}
@@ -122,9 +106,9 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 	return drawRegion;
 }
 
-Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
+LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
-	Regions layoutRegions;
+	LayoutRegions layoutRegions;
 	const Point& drawOrigin = rgn.Origin();
 	const Font* layoutFont = LayoutFont();
 	assert(layoutFont);
@@ -153,6 +137,9 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 				lineSegment = lineRgn;
 			}
+			
+			size_t begin = 0;
+			size_t end = 0;
 			do {
 				// process all overlaping exclusion zones until we trim down to the leftmost non conflicting region.
 				// check for intersections with other content
@@ -210,6 +197,9 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
+					
+					begin = numPrinted;
+					end = begin + numOnLine;
 
 					bool noFit = !metrics.forceBreak && numOnLine == 0;
 					bool lineFilled = lineSegment.x + lineSegment.w == lineRgn.w;
@@ -219,6 +209,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 						// saves looping again for the known to be useless segment
 						newline = true;
 						lineSegment.w = LINE_REMAINDER;
+						end--;
 					} else {
 						assert(printSize.w);
 						lineSegment.w = printSize.w;
@@ -235,7 +226,7 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 				// just because we didnt fit doesnt mean somethng else wont...
 				Region lineLayout = Region::RegionEnclosingRegions(lineExclusions);
 				assert(lineLayout.h % lineheight == 0);
-				layoutRegions.push_back(lineLayout);
+				layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(lineLayout, begin, end));
 				lineExclusions.clear();
 			}
 			// FIXME: infinite loop possibility.
@@ -251,58 +242,65 @@ Regions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) c
 
 		Region drawRegion = LayoutInFrameAtPoint(layoutPoint, rgn);
 		assert(drawRegion.h && drawRegion.w);
-		layoutRegions.push_back(drawRegion);
+		layoutRegions.emplace_back(std::make_shared<TextLayoutRegion>(drawRegion, 0, text.length()));
 	}
 	return layoutRegions;
 }
 
-void TextSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
+void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& offset) const
 {
 	size_t charsPrinted = 0;
-	Regions::const_iterator rit = rgns.begin();
-	for (; rit != rgns.end(); ++rit) {
-		Region drawRect = *rit;
+	for (const auto& lrgn : rgns) {
+		Region drawRect = lrgn->region;
 		drawRect.x += offset.x;
 		drawRect.y += offset.y;
-		const Font* printFont = font;
-		Palette* printPalette = palette;
-		TextContainer* container = dynamic_cast<TextContainer*>(parent);
-		if (printFont == NULL && container) {
-			printFont = container->TextFont();
+		const Font* printFont = LayoutFont();
+		const Font::PrintColors* pc = colors;
+		TextContainer* container = static_cast<TextContainer*>(parent);
+		if (!pc && container) {
+			pc = container->TextColors();
 		}
-		if (printPalette == NULL && container) {
-			printPalette = container->TextPalette();
-		}
-		assert(printFont && printPalette);
-#if (DEBUG_TEXT)
+		assert(printFont);
 		// FIXME: this shouldnt happen, but it does (BG2 belt03 unidentified).
-		// for now only assert when DEBUG_TEXT is set
+		// for now only assert when ID_TEXT is set
 		// the situation is benign and nothing even looks wrong because all that this means is that there was more space allocated than was actually needed
-		assert(charsPrinted < text.length());
-		core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
-#endif
-		charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), printPalette, IE_FONT_ALIGN_LEFT);
-#if (DEBUG_TEXT)
-		core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
-#endif
+		if (core->InDebugMode(ID_TEXT)) {
+			assert(charsPrinted < text.length());
+			core->GetVideoDriver()->DrawRect(drawRect, ColorRed, true);
+		}
+		// FIXME: layout assumes left alignment, so alignment is mostly broken
+		// we only use it for TextEdit tho which is single line and therefore works as long as the text ends in a newline
+		if (pc) {
+			charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), Alignment, *pc);
+		} else {
+			charsPrinted += printFont->Print(drawRect, text.substr(charsPrinted), Alignment);
+		}
+
+		if (core->InDebugMode(ID_TEXT)) {
+			core->GetVideoDriver()->DrawRect(drawRect, ColorWhite, false);
+		}
 	}
 }
 
-ImageSpan::ImageSpan(Sprite2D* im)
-	: Content(Size(im->Width, im->Height))
+ImageSpan::ImageSpan(Holder<Sprite2D> im)
+	: Content(im->Frame.Dimensions())
 {
-	assert(im);
-	im->acquire();
 	image = im;
 }
 
-void ImageSpan::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
+void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& offset) const
 {
 	// we only care about the first region... (should only be 1 anyway)
-	Region r = rgns.front();
+	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
-	core->GetVideoDriver()->BlitSprite(image, r.x, r.y, true, &r);
+	core->GetVideoDriver()->BlitSprite(image, r.Origin(), &r);
+}
+
+ContentContainer::ContentContainer(const Region& frame)
+: View(frame)
+{
+	SizeChanged(Size());
 }
 
 ContentContainer::~ContentContainer()
@@ -313,22 +311,81 @@ ContentContainer::~ContentContainer()
 	}
 }
 
-Size ContentContainer::ContentFrame() const
+void ContentContainer::SetMargin(Margin m)
 {
-	Size cf = Content::ContentFrame();
-	if (cf.w <= 0) {
-		cf.w = contentBounds.w;
+	margin = m;
+	LayoutContentsFrom(contents.begin());
+}
+
+void ContentContainer::SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left)
+{
+	SetMargin(Margin(top, right, bottom, left));
+}
+
+void ContentContainer::WillDraw(const Region& drawFrame, const Region& clip)
+{
+	Region sc = clip;
+	
+	int diff = clip.x - drawFrame.x;
+	if (diff < margin.left) {
+		sc.x += margin.left - diff;
+		sc.w -= margin.left - diff;
 	}
-	if (cf.h <= 0) {
-		cf.h = contentBounds.h;
+	
+	diff = (drawFrame.x + drawFrame.w) - (clip.x + clip.w);
+	if (diff < margin.right) {
+		sc.w += margin.right - diff;
 	}
-	return cf;
+	
+	// TODO: if we ever support horzontal scrollbars these will need to be fixed
+	sc.y += margin.top;
+	sc.h -= margin.top + margin.bottom;
+
+	core->GetVideoDriver()->SetScreenClip(&sc);
+}
+
+void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
+{
+	core->GetVideoDriver()->SetScreenClip(&clip);
+}
+
+void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+{
+	Video* video = core->GetVideoDriver();
+	if (core->InDebugMode(ID_TEXT)) {
+		Region r = clip;
+		video->DrawRect(r, ColorYellow, true);
+		
+		r.x += margin.left;
+		r.y += margin.top;
+		r.w -= margin.left + margin.right;
+		r.h -= margin.bottom + margin.top;
+		
+		video->DrawRect(r, ColorGreen, true);
+	}
+
+	// layout shouldn't be empty unless there is no content anyway...
+	if (layout.empty()) return;
+	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
+	
+	ContentLayout::const_iterator it = layout.begin();
+	for (; it != layout.end(); ++it) {
+		const Layout& l = *it;
+
+		// TODO: pass the clip rect so we can skip non-intersecting regions
+		DrawContents(l, dp);
+	}
+}
+
+void ContentContainer::DrawContents(const Layout& layout, Point point)
+{
+	layout.content->DrawContentsInRegions(layout.regions, point);
 }
 
 void ContentContainer::AppendContent(Content* content)
 {
 	if (contents.empty())
-		InsertContentAfter(content, 0);
+		InsertContentAfter(content, NULL);
 	else
 		InsertContentAfter(content, *(--contents.end()));
 }
@@ -344,6 +401,29 @@ void ContentContainer::InsertContentAfter(Content* newContent, const Content* ex
 		it = std::find(contents.begin(), contents.end(), existing);
 		contents.insert(++it, newContent);
 		LayoutContentsFrom(--it);
+	}
+}
+
+void ContentContainer::SizeChanged(const Size& /*oldSize*/)
+{
+	if (frame.w <= 0) {
+		SetFlags(RESIZE_WIDTH, OP_OR);
+	}
+	if (frame.h <= 0) {
+		SetFlags(RESIZE_HEIGHT, OP_OR);
+	}
+	LayoutContentsFrom(contents.begin());
+}
+
+void ContentContainer::SubviewAdded(View* view, View* parent)
+{
+	if (parent == this) {
+		// ContentContainer should grow to the size of its (immidiate) subviews automatically
+		const Region& subViewFrame = view->Frame();
+		Size s;
+		s.h = std::max(subViewFrame.y + subViewFrame.h, frame.h);
+		s.w = std::max(subViewFrame.x + subViewFrame.w, frame.w);
+		SetFrameSize(s);
 	}
 }
 
@@ -366,12 +446,47 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		if (doLayout) {
 			LayoutContentsFrom(it);
 		}
+
+		ContentRemoved(content);
 		return content;
 	}
 	return NULL;
 }
 
+ContentContainer::ContentList::iterator
+ContentContainer::EraseContent(ContentList::iterator it)
+{
+	Content* content = *it;
+	content->parent = NULL;
+	layout.erase(std::find(layout.begin(), layout.end(), content));
+	layoutPoint = Point(); // reset cached layoutPoint
+	ContentRemoved(content);
+	delete content;
+
+	return contents.erase(it);
+}
+
+ContentContainer::ContentList::iterator
+ContentContainer::EraseContent(ContentList::iterator beg, ContentList::iterator end)
+{
+	for (; beg != end;) {
+		beg = EraseContent(beg);
+	}
+	return end;
+}
+
 Content* ContentContainer::ContentAtPoint(const Point& p) const
+{
+	const Layout* layout = LayoutAtPoint(p);
+	if (layout) {
+		// i know we are casting away const.
+		// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
+		return (Content*)(layout->content);
+	}
+	return NULL;
+}
+
+const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) const
 {
 	// attempting to optimize the search by assuming content is evenly distributed vertically
 	// we are also assuming that layout regions are always contiguous and ordered ltr-ttb
@@ -383,10 +498,10 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 	while (count > 0) {
 		size_t step = count / 2;
 		std::advance(it, step);
-		if ((*it).PointInside(p)) {
+		if (it->PointInside(p)) {
 			// i know we are casting away const.
 			// we could return std::find(contents.begin(), contents.end(), *it) instead, but whats the point?
-			return (Content*)(*it).content;
+			return &(*it);
 		}
 		if (*it < p) {
 			++it;
@@ -401,7 +516,21 @@ Content* ContentContainer::ContentAtPoint(const Point& p) const
 
 Region ContentContainer::BoundingBoxForContent(const Content* c) const
 {
-	return Region::RegionEnclosingRegions(LayoutForContent(c).regions);
+	return BoundingBoxForLayout(LayoutForContent(c).regions);
+}
+
+Region ContentContainer::BoundingBoxForLayout(const LayoutRegions& layoutRgns) const
+{
+	auto it = layoutRgns.begin();
+	if (it != layoutRgns.end()) {
+		Region r = (*it++)->region;
+		for (; it != layoutRgns.end(); ++it) {
+			r.ExpandToRegion((*it)->region);
+		}
+		return r;
+	}
+	
+	return Region();
 }
 
 const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content* c) const
@@ -410,43 +539,21 @@ const ContentContainer::Layout& ContentContainer::LayoutForContent(const Content
 	if (it != layout.end()) {
 		return *it;
 	}
-	static Layout NullLayout(NULL, Regions());
+	static Layout NullLayout(nullptr, LayoutRegions());
 	return NullLayout;
 }
 
 const Region* ContentContainer::ContentRegionForRect(const Region& r) const
 {
-	ContentLayout::const_iterator it = layout.begin();
-	for (; it != layout.end(); ++it) {
-		const Regions& rgns = (*it).regions;
-		Regions::const_iterator rit = rgns.begin();
-		for (; rit != rgns.end(); ++rit) {
-			if ((*rit).IntersectsRegion(r)) {
-				return &(*rit);
+	for (const auto& layoutRgn : layout) {
+		for (const auto& lrgn : layoutRgn.regions) {
+			const Region& rect = lrgn->region;
+			if (rect.IntersectsRegion(r)) {
+				return &rect;
 			}
 		}
 	}
 	return NULL;
-}
-
-void ContentContainer::SetFrame(const Region& newFrame)
-{
-	if (newFrame.Dimensions() != frame.Dimensions()) {
-		frame = newFrame; // must assign new frame before calling LayoutContents
-		LayoutContentsFrom(contents.begin());
-	} else {
-		frame = newFrame;
-	}
-}
-
-Regions ContentContainer::LayoutForPointInRegion(Point p, const Region&) const
-{
-	Region layoutRgn(p, ContentFrame());
-	parentOffset = p;
-
-	Regions rgns;
-	rgns.push_back(layoutRgn);
-	return rgns;
 }
 
 void ContentContainer::LayoutContentsFrom(const Content* c)
@@ -462,38 +569,54 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 
 	const Content* exContent = NULL;
 	const Region* excluded = NULL;
-	contentBounds = Size();
 
 	if (it != contents.begin()) {
 		// relaying content some place in the middle of the container
 		exContent = *--it;
 		it++;
 	}
+
 	// clear the existing layout, but only for "it" and onward
 	ContentList::const_iterator clearit = it;
 	for (; clearit != contents.end(); ++clearit) {
 		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
 			layoutPoint = Point(); // reset cached layoutPoint
-			layout.erase(i);
+			// since 'layout' is sorted alongsize 'contents' we should be able clear everyting following 'i' and bail
+			layout.erase(i, layout.end());
+			break;
 		}
 	}
 
+	Size contentBounds = Dimensions();
+	Region layoutFrame = Region(Point(), contentBounds);
+	if (Flags()&RESIZE_WIDTH) {
+		layoutFrame.w = SHRT_MAX;
+	} else {
+		layoutFrame.w -= margin.left + margin.right;
+	}
+	if (Flags()&RESIZE_HEIGHT) {
+		layoutFrame.h = SHRT_MAX;
+	} else {
+		layoutFrame.h -= margin.top + margin.bottom;
+	}
+
+	assert(!layoutFrame.Dimensions().IsEmpty());
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
-			const Regions& rgns = LayoutForContent(exContent).regions;
-			Regions::const_iterator rit = rgns.begin();
-			for (; rit != rgns.end(); ++rit) {
-				if ((*rit).PointInside(layoutPoint)) {
-					excluded = &(*rit);
+			const LayoutRegions& rgns = LayoutForContent(exContent).regions;
+			for (const auto& lrgn : rgns) {
+				const Region& r = lrgn->region;
+				if (r.PointInside(layoutPoint)) {
+					excluded = &r;
 					break;
 				}
 			}
 			if (excluded) {
 				// we know that we have to move at least to the right
 				layoutPoint.x = excluded->x + excluded->w;
-				if (frame.w > 0 && layoutPoint.x >= frame.w) {
+				if (frame.w > 0 && layoutPoint.x >= layoutFrame.w) {
 					layoutPoint.x = 0;
 					assert(excluded->y + excluded->h >= layoutPoint.y);
 					layoutPoint.y = excluded->y + excluded->h;
@@ -502,47 +625,28 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			exContent = ContentAtPoint(layoutPoint);
 			assert(exContent != content);
 		}
-		const Regions& rgns = content->LayoutForPointInRegion(layoutPoint, frame);
+		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
 		layout.push_back(Layout(content, rgns));
-		const Region& bounds = Region::RegionEnclosingRegions(rgns);
-		contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
-		contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
 		exContent = content;
+
+		ieDword flags = Flags();
+		if (flags&(RESIZE_HEIGHT|RESIZE_WIDTH)) {
+			Region bounds = BoundingBoxForLayout(rgns);
+			bounds.w += margin.left + margin.right;
+			bounds.h += margin.top + margin.bottom;
+			
+			if (flags&RESIZE_HEIGHT)
+				contentBounds.h = (bounds.y + bounds.h > contentBounds.h) ? bounds.y + bounds.h : contentBounds.h;
+			if (flags&RESIZE_WIDTH)
+				contentBounds.w = (bounds.x + bounds.w > contentBounds.w) ? bounds.x + bounds.w : contentBounds.w;
+		}
 	}
-	if (parent) {
-		// the parent needs to update to compensate for changes in this container
-		parent->LayoutContentsFrom(this);
-	}
-}
 
-void ContentContainer::DrawContentsInRegions(const Regions& rgns, const Point& offset) const
-{
-	// layout shouldn't be empty unless there is no content anyway...
-	if (layout.empty()) return;
-
-	// should only have 1 region
-	const Region& rgn = rgns.front();
-
-	// TODO: intersect with the screen clip so we can bail out even earlier
-
-	const Point& drawOrigin = rgn.Origin();
-	Point drawPoint = drawOrigin;
-	ContentLayout::const_iterator it = layout.begin();
-
-#if (DEBUG_TEXT)
-	Region dr(parentOffset + offset, contentBounds);
-	core->GetVideoDriver()->DrawRect(dr, ColorRed, true);
-	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
-	dr = Region(parentOffset + offset, ContentFrame());
-	core->GetVideoDriver()->DrawRect(dr, ColorGreen, true);
-	core->GetVideoDriver()->DrawRect(dr, ColorWhite, false);
-#endif
-
-	for (; it != layout.end(); ++it) {
-		const Layout& l = *it;
-		assert(drawPoint.x <= drawOrigin.x + frame.w);
-		l.content->DrawContentsInRegions(l.regions, offset + parentOffset);
-	}
+	// avoid infinite layout recursion when calling SetFrameSize...
+	Size oldSize = Dimensions();
+	frame.w = contentBounds.w;
+	frame.h = contentBounds.h;
+	ResizeSubviews(oldSize);
 }
 
 void ContentContainer::DeleteContentsInRect(Region exclusion)
@@ -560,62 +664,393 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 		delete RemoveContent(content, false);
 	}
 
+	if (Flags()&RESIZE_HEIGHT) {
+		frame.h = 0;
+	}
+	if (Flags()&RESIZE_WIDTH) {
+		frame.w = 0;
+	}
 	// TODO: we could optimize this to only layout content after exclusion.y
 	LayoutContentsFrom(contents.begin());
 }
 
 
-TextContainer::TextContainer(const Size& frame, Font* fnt, Palette* pal)
+TextContainer::TextContainer(const Region& frame, Font* fnt)
 	: ContentContainer(frame), font(fnt)
 {
-	if (!pal) {
-		palette = font->GetPalette();
-	} else {
-		pal->acquire();
-		palette = pal;
-	}
+	alignment = IE_FONT_ALIGN_LEFT;
+	textLen = 0;
+	cursorPos = 0;
+	printPos = 0;
 }
 
 TextContainer::~TextContainer()
 {
-	palette->release();
+	delete colors;
 }
 
 void TextContainer::AppendText(const String& text)
 {
-	AppendText(text, NULL, NULL);
+	AppendText(text, nullptr, colors);
 }
 
-void TextContainer::AppendText(const String& text, Font* fnt, Palette* pal)
+void TextContainer::AppendText(const String& text, Font* fnt, const Font::PrintColors* cols)
 {
 	if (text.length()) {
-		AppendContent(new TextSpan(text, fnt, pal));
+		TextSpan* span = new TextSpan(text, fnt);
+		if (cols) {
+			span->SetColors(cols->fg, cols->bg);
+		}
+		span->Alignment = alignment;
+		AppendContent(span);
+		textLen += text.length();
+
+		MarkDirty();
 	}
 }
 
-void TextContainer::SetPalette(Palette* pal)
+void TextContainer::ContentRemoved(const Content* content)
 {
-	if (!pal) {
-		pal = font->GetPalette();
-	} else {
-		pal->acquire();
-	}
-	if (palette)
-		palette->release();
-	palette = pal;
+	const TextSpan* ts = static_cast<const TextSpan*>(content);
+	textLen -= ts->Text().length();
+}
+
+void TextContainer::ClearColors()
+{
+	delete colors;
+	MarkDirty();
+}
+
+void TextContainer::SetColors(const Color& fg, const Color& bg)
+{
+	ClearColors();
+	colors = new Font::PrintColors {fg, bg};
 }
 
 String TextContainer::Text() const
 {
+	return TextFrom(contents.begin());
+}
+
+String TextContainer::TextFrom(const Content* content) const
+{
+	return TextFrom(std::find(contents.begin(), contents.end(), content));
+}
+
+String TextContainer::TextFrom(ContentList::const_iterator it) const
+{
+	if (it == contents.end()) {
+		return L""; // must bail or things will get screwed up!
+	}
+
 	// iterate all the content and pick out the TextSpans and concatonate them into a single string
 	String text;
-	ContentList::const_iterator it = contents.begin();
 	for (; it != contents.end(); ++it) {
-		if (const TextSpan* textSpan = dynamic_cast<TextSpan*>(*it)) {
+		if (const TextSpan* textSpan = static_cast<TextSpan*>(*it)) {
 			text.append(textSpan->Text());
 		}
 	}
 	return text;
+}
+
+void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
+{
+	printPos = 0;
+	ContentContainer::DrawSelf(drawFrame, clip);
+
+	if (layout.empty() && Editable()) {
+		Holder<Sprite2D> cursor = core->GetCursorSprite();
+		Point p(drawFrame.x + margin.left, drawFrame.y + margin.top + cursor->Frame.y);
+		core->GetVideoDriver()->BlitSprite(cursor, p);
+	}
+}
+
+LayoutRegions::const_iterator
+TextContainer::FindCursorRegion(const Layout& layout)
+{
+	auto end = layout.regions.end();
+	for (auto it = layout.regions.begin(); it != end; ++it) {
+		const TextLayout& tlrgn = static_cast<const TextLayout&>(**it);
+		
+		if (tlrgn.beginCharIdx <= cursorPos && tlrgn.endCharIdx >= cursorPos) {
+			return it;
+		}
+	}
+	return end;
+}
+
+void TextContainer::DrawContents(const Layout& layout, Point dp)
+{	
+	ContentContainer::DrawContents(layout, dp);
+
+	const TextSpan* ts = (const TextSpan*)layout.content;
+	const String& text = ts->Text();
+	size_t textLen = ts->Text().length();
+
+	if (Editable() && printPos <= cursorPos && printPos + textLen >= cursorPos) {
+		const Font* printFont = ts->LayoutFont();
+		
+		auto it = FindCursorRegion(layout);
+		if (it != layout.regions.end()) {
+			auto cursorRegion = static_cast<const TextLayout&>(**it);
+			size_t begin = cursorRegion.beginCharIdx;
+			const Region& rect = cursorRegion.region;
+			cursorPoint = rect.Origin();
+			const String& substr = text.substr(begin, cursorPos - begin);
+			cursorPoint.x += printFont->StringSizeWidth(substr, 0);
+		}
+
+		Holder<Sprite2D> cursor = core->GetCursorSprite();
+		dp.y += cursor->Frame.y;
+		core->GetVideoDriver()->BlitSprite(cursor, cursorPoint + dp);
+	}
+	printPos += textLen;
+}
+
+void TextContainer::SizeChanged(const Size& oldSize)
+{
+	ContentContainer::SizeChanged(oldSize);
+	if (Editable() && frame.h == 0) {
+		// we need at least one line of height to draw the cursor
+		frame.h = font->LineHeight;
+	}
+}
+
+void TextContainer::MoveCursorToPoint(const Point& p)
+{
+	if (Editable() == false)
+		return;
+
+	const Layout* layout = LayoutAtPoint(p);
+
+	if (layout) {
+		TextSpan* ts = (TextSpan*)layout->content;
+		const String& text = ts->Text();
+		const Font* printFont = ts->LayoutFont();
+		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};
+		size_t numChars = 0;
+
+		for (const auto& lrgn : layout->regions) {
+			const Region& rect = lrgn->region;
+
+			if (rect.PointInside(p)) {
+				// find where inside
+				int lines = (p.y - rect.y) / printFont->LineHeight;
+				if (lines) {
+					metrics.size.w = rect.w;
+					metrics.size.h = lines * printFont->LineHeight;
+					printFont->StringSize(text.substr(numChars), &metrics);
+					numChars += metrics.numChars;
+				}
+				size_t len = 0;
+				printFont->StringSizeWidth(text.substr(numChars), p.x, &len);
+				cursorPos = numChars + len;
+				MarkDirty();
+				break;
+			} else {
+				// not in this one so we need to consume some text
+				// TODO: this could be faster if we stored it while calculating layout
+				metrics.size = rect.Dimensions();
+				printFont->StringSize(text.substr(numChars), &metrics);
+				numChars += metrics.numChars;
+			}
+		}
+	} else {
+		// FIXME: this isnt _always_ the end (it works out that way for left alignment tho)
+		CursorEnd();
+	}
+}
+
+void TextContainer::DidFocus()
+{
+	core->GetVideoDriver()->StartTextInput();
+}
+
+void TextContainer::DidUnFocus()
+{
+	core->GetVideoDriver()->StopTextInput();
+}
+
+bool TextContainer::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+	MoveCursorToPoint(p);
+	return true;
+}
+
+bool TextContainer::OnMouseDrag(const MouseEvent& me)
+{
+	// TODO: should be able to highlight a range
+	Point p = ConvertPointFromScreen(me.Pos());
+	MoveCursorToPoint(p);
+	return true;
+}
+
+bool TextContainer::OnKeyPress(const KeyboardEvent& key, unsigned short /*Mod*/)
+{
+	if (Editable() == false)
+		return false;
+
+	core->GetVideoDriver()->StartTextInput();
+
+	switch (key.keycode) {
+		case GEM_HOME:
+			CursorHome();
+			return true;
+		case GEM_END:
+			CursorEnd();
+			return true;
+		case GEM_LEFT:
+			AdvanceCursor(-1);
+			return true;
+		case GEM_RIGHT:
+			AdvanceCursor(1);
+			return true;
+		case GEM_UP:
+		case GEM_DOWN:
+			{
+				size_t offset = 0;
+				const Layout* layout = LayoutAtPoint(cursorPoint);
+				LayoutRegions::const_iterator it;
+				if (!layout && key.keycode == GEM_UP) {
+					// end of text workaround for GEM_UP to compute the proper cursor position to move to
+					layout = LayoutAtPoint(Point(cursorPoint.x - 1, cursorPoint.y));
+				}
+				if (layout) {
+					it = FindCursorRegion(*layout);
+					assert(it != layout->regions.end());
+					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					offset = cursorPos - cursorRegion.beginCharIdx;
+				} else { // cursor is at end of text
+					return true;
+				}
+				
+				if (key.keycode == GEM_UP) {
+					if (it == layout->regions.begin()) {
+						return true;
+					}
+					it--;
+				} else {
+					if (it == layout->regions.end()) {
+						return true;
+					}
+					it++;
+				}
+				
+				if (it != layout->regions.end()) {
+					auto cursorRegion = static_cast<const TextLayout&>(**it);
+					size_t length = cursorRegion.endCharIdx - cursorRegion.beginCharIdx;
+					cursorPos = cursorRegion.beginCharIdx + std::min(offset, length);
+					MarkDirty();
+				}
+			}
+			return true;
+		case GEM_DELETE:
+			if (cursorPos < textLen) {
+				AdvanceCursor(1);
+				DeleteText(1);
+			}
+			return true;
+		case GEM_BACKSP:
+			if (cursorPos > 0) {
+				DeleteText(1);
+			}
+			return true;
+		case GEM_RETURN:
+			InsertText(String(1, '\n'));
+			return true;
+		default:
+			return false;
+	}
+}
+
+void TextContainer::OnTextInput(const TextEvent& te)
+{
+	InsertText(te.text);
+	core->GetVideoDriver()->StartTextInput();
+}
+
+// move cursor to beginning of text
+void TextContainer::CursorHome()
+{
+	// top right of first region in first layout area
+	cursorPos = 0;
+	MarkDirty();
+}
+
+// move cursor to end of text
+void TextContainer::CursorEnd()
+{
+	// bottom left of last region in last layout area
+	cursorPos = textLen;
+	MarkDirty();
+}
+
+void TextContainer::AdvanceCursor(int delta)
+{
+	cursorPos += delta;
+	if (int(cursorPos) < 0) {
+		CursorHome();
+	} else if (cursorPos >= textLen) {
+		CursorEnd();
+	} else {
+		MarkDirty();
+	}
+}
+
+TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
+{
+	size_t charCount = 0;
+	ContentList::iterator it = contents.begin();
+	while (it != contents.end()) {
+		TextSpan* ts = static_cast<TextSpan*>(*it);
+		size_t textLen = ts->Text().length();
+		if (charCount + textLen >= idx) {
+			break;
+		}
+		charCount += textLen;
+		++it;
+	}
+	return std::make_pair(charCount, it);
+}
+
+void TextContainer::InsertText(const String& text)
+{
+	ContentIndex idx = FindContentForChar(cursorPos);
+	String newtext = TextFrom(idx.second);
+
+	if (cursorPos < textLen) {
+		size_t pos = cursorPos - idx.first;
+		newtext.insert(pos, text);
+	} else {
+		newtext.append(text);
+	}
+
+	EraseContent(idx.second, contents.end());
+	AppendText(newtext);
+	AdvanceCursor(int(text.length()));
+
+	if (callback) {
+		callback(*this);
+	}
+}
+
+void TextContainer::DeleteText(size_t len)
+{
+	ContentIndex idx = FindContentForChar(cursorPos);
+	String newtext = TextFrom(idx.second);
+
+	if (newtext.length()) {
+		newtext.erase(cursorPos - idx.first - 1, len);
+	}
+
+	EraseContent(idx.second, contents.end());
+	AppendText(newtext);
+	AdvanceCursor(-int(len));
+
+	if (callback) {
+		callback(*this);
+	}
 }
 
 }

@@ -35,158 +35,215 @@
 #define IE_GUI_SCROLLBAR	7
 #define IE_GUI_WORLDMAP         8 // gemrb extension
 #define IE_GUI_MAP              9 // gemrb extension
-#define IE_GUI_GAMECONTROL	128
+#define IE_GUI_CONSOLE		10 // gemrb extension
 #define IE_GUI_INVALID          255
-
-#define IE_GUI_CONTROL_FOCUSED  0x80
-
-//this is in the control ID
-#define IGNORE_CONTROL 0x10000000
 
 #include "RGBAColor.h"
 #include "exports.h"
 #include "globals.h"
-#include "ie_types.h"
 
 #include "Callback.h"
-#include "Region.h"
-#include "System/String.h"
+#include "GUI/View.h"
+#include "Timer.h"
+
+#include <limits>
+#include <map>
 
 namespace GemRB {
 
 class ControlAnimation;
-class ControlEventHandler;
+class Control;
 class Sprite2D;
-class Window;
+    
+#define ACTION_CAST(a) \
+static_cast<Control::Action>(a)
+	
+#define ACTION_IS_SCREEN(a) \
+(a <= Control::HoverEnd)
+    
+#define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
+#define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
+
+#define CTL_INVALID_VALUE ieDword(-1)
 
 /**
  * @class Control
  * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
- * Every GUI element except of a Window is a descendant of this class.
  */
 
-class GEM_EXPORT Control {
+using ControlActionResponder = View::ActionResponder<Control*>;
+using ControlEventHandler = ControlActionResponder::Responder;
+
+class GEM_EXPORT Control : public View, public ControlActionResponder {
 private:
-	/** If true, control is redrawn during next call to gc->DrawWindows.
-	 * Then it's set back to false. */
-	bool Changed;
-protected:
-	/** Focused Control */
-	bool hasFocus;
-	virtual void DrawInternal(Region& drawFrame)=0;
+	void ClearActionTimer();
+	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+
+	void HandleTouchActionTimer(Control*);
+    
+public: // Public attributes
+	enum Action : ControlActionResponder::Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		// screen events, send coords to callback
+		Click,
+		// avoid Drag and Hover if you can (will fire frequently). or throttle using SetActionInterval
+		Drag,
+		// "mouse" over, enter, leave
+		Hover,
+		HoverBegin,
+		HoverEnd,
+
+		// other events
+		ValueChange, // many times we only care that the value has changed, not about the event that changed it
+
+		DragDropCreate,
+		DragDropSource, // a DragOp was succesfully taken from here
+		DragDropDest, // a DragOp was successfully dropped here
+
+		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
+	};
+	
+	struct ControlDragOp : public DragOp {
+		ControlDragOp(Control* c)
+		: DragOp(c, c->DragCursor()){}
+		
+		Control* Source() const {
+			return static_cast<Control*>(dragView);
+		}
+		
+		Control* Destination() const {
+			return static_cast<Control*>(dropView);
+		}
+		
+		~ControlDragOp() override {
+			Control* src = Source();
+			ActionKey srckey(Action::DragDropSource);
+			
+			Control* dst = Destination();
+			ActionKey dstkey(Action::DragDropDest);
+			
+			if (dst) { // only send actions for successful drags
+				if (src->SupportsAction(srckey)) {
+					src->PerformAction(srckey);
+				}
+				
+				if (dst->SupportsAction(dstkey)) {
+					dst->PerformAction(dstkey);
+				}
+			}
+		}
+	};
+
+	/** Variable length is 40-1 (zero terminator) */
+	char VarName[MAX_VARIABLE_LENGTH];
+
+	ControlAnimation* animation;
+	Holder<Sprite2D> AnimPicture;
+
+	/** Defines the Control ID Number used for GUI Scripting */
+	ieDword ControlID;
+	/** Type of control */
+	ieByte ControlType;
+
+	static unsigned int ActionRepeatDelay;
+
 public:
 	Control(const Region& frame);
-	virtual ~Control();
-	Region ControlFrame() const;
-	void SetControlFrame(const Region&);
-	/** Draws the Control on the Output Display */
-	void Draw(unsigned short x, unsigned short y);
-	void MarkDirty() { Changed = true; }
-	virtual bool NeedsDraw() const { return Changed || animation; }
-	virtual bool IsOpaque() const { return true; }
+	~Control() override;
+
+	bool IsAnimated() const override { return animation && AnimPicture; }
+	bool IsOpaque() const override;
+
 	/** Sets the Text of the current control */
 	void SetText(const String*);
 	virtual void SetText(const String&) {};
-	/** Sets the Tooltip text of the current control */
-	int SetTooltip(const char* string);
-	/** Displays the tooltip text, Worldmap handles this differently */
-	virtual void DisplayTooltip();
+
 	/** Update the control if it's tied to a GUI variable */
 	void UpdateState(const char*, unsigned int);
 	virtual void UpdateState(unsigned int) {}
 
-	/** Variable length is 40-1 (zero terminator) */
-	char VarName[MAX_VARIABLE_LENGTH];
-	/** the value of the control to add to the variable */
-	ieDword Value;
-	/** various flags based on the control type */
-	ieDword Flags;
-	ControlAnimation* animation;
-	Sprite2D* AnimPicture;
-
-public: // Public attributes
-	/** Defines the Control ID Number used for GUI Scripting */
-	ieDword ControlID;
-	/** X position of control relative to containing window */
-	ieWord XPos;
-	/** Y position of control relative to containing window */
-	ieWord YPos;
-	/** Width of control */
-	ieWord Width;
-	/** Height of control */
-	ieWord Height;
-	/** Type of control */
-	ieByte ControlType;
-	/** Text to display as a tooltip when the mouse cursor hovers
-	 * for some time over the control */
-	String* Tooltip;
-	/** True if we are currently in an event handler */
-	bool InHandler;
-	/** Owner Window */
-	Window* Owner;
-	/** Attached Scroll Bar Pointer*/
-	Control* sb;
-	/** Associated function key index, 0 based, -1 is unassigned */
-	ieDword FunctionNumber;
-public: //Events
-	/** Reset/init event handler */
-	void ResetEventHandler(ControlEventHandler &handler);
 	/** Returns the Owner */
-	Window *GetOwner() const { return Owner; }
-	/** Set the Flags */
-	int SetFlags(int arg_flags, int opcode);
-	virtual void SetFocus(bool focus);
-	bool isFocused();
-	virtual bool WantsDragOperation() { return false; };
-	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, ControlEventHandler handler) = 0;
-	/** Run specified handler, it may return error code */
-	int RunEventHandler(ControlEventHandler handler);
-	/** Key Press Event */
-	virtual bool OnKeyPress(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	/** Key Release Event */
-	virtual bool OnKeyRelease(unsigned char /*Key*/, unsigned short /*Mod*/) { return false; };
-	/** Mouse Enter Event */
-	virtual void OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Leave Event */
-	virtual void OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Over Event */
-	virtual void OnMouseOver(unsigned short /*x*/, unsigned short /*y*/) {};
-	/** Mouse Button Down */
-	virtual void OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
-							 unsigned short /*Button*/, unsigned short /*Mod*/);
-	/** Mouse Button Up */
-	virtual void OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-						   unsigned short /*Button*/, unsigned short /*Mod*/);
-	/** Mouse wheel scroll */
-	virtual void OnMouseWheelScroll( short x, short y);
-	/** Special Key Press */
-	virtual bool OnSpecialKeyPress(unsigned char Key);
-	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {
-		return false;
-	}
+	virtual void SetFocus();
+	bool IsFocused();
+    
+	bool TracksMouseDown() const override { return bool(actionTimer); }
+	
+	UniqueDragOp DragOperation() override;
+	bool AcceptsDragOperation(const DragOp&) const override;
+	virtual Holder<Sprite2D> DragCursor() const;
+
+	//Events
+	void SetAction(Responder handler, Action type, EventButton button = 0,
+                   Event::EventMods mod = 0, short count = 0);
+	void SetAction(Responder handler, const ActionKey& key = ACTION_DEFAULT) override;
+	void SetActionInterval(unsigned int interval=ActionRepeatDelay);
+
+	bool PerformAction(); // perform default action (left mouse button up)
+	bool PerformAction(const ActionKey&) override;
+	bool SupportsAction(const ActionKey&) override;
+
 	virtual String QueryText() const { return String(); }
 	/** Sets the animation picture ref */
-	virtual void SetAnimPicture(Sprite2D* Picture);
-	/** Sets the Scroll Bar Pointer */
-	virtual int SetScrollBar(Control* ptr);
+	virtual void SetAnimPicture(Holder<Sprite2D> Picture);
 
-	/** Assigned function key */
-	void SetFunctionNumber(int x) { FunctionNumber = x; }
-	int GetFunctionNumber() { return FunctionNumber; }
+	typedef std::pair<ieDword, ieDword> ValueRange;
+	const static ValueRange MaxValueRange;
+	
+	ieDword GetValue() const { return Value; }
+	ValueRange GetValueRange() const { return range; }
+	
+	void SetValue(ieDword val);
+	void SetValueRange(ValueRange range = MaxValueRange);
+	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
+	
+	bool HitTest(const Point& p) const override;
+	
+protected:
+	using ActionKey = ControlActionResponder::ActionKey;
+	struct ControlActionKey : public ActionKey {		
+		static uint32_t BuildKeyValue(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0) {
+			// pack the parameters into the 32 bit key...
+			// we will only support the lower 8 bits for each, however. (more than enough for our purposes)
+			uint32_t key = 0;
+			uint32_t mask = 0x000000FF;
+			key |= type & mask;
+			key |= (mod & mask) << 8;
+			key |= (button & mask) << 16;
+			key |= (count & mask) << 24;
+			return key;
+		}
 
-	void SetControlID(int x) { ControlID = x; }
+		ControlActionKey(Control::Action type, Event::EventMods mod = 0, EventButton button = 0, short count = 0)
+		: ActionKey(BuildKeyValue(type, mod, button, count) ) {}
+	};
+
+	void FlagsChanged(unsigned int /*oldflags*/) override;
+	
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
+
+	bool OnTouchDown(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	bool OnTouchUp(const TouchEvent& /*te*/, unsigned short /*Mod*/) override;
+	
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+
+private:
+	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
+	// otherwise action fires on input release up only
+	unsigned int repeatDelay;
+	typedef std::map<ActionKey, ControlEventHandler>::iterator ActionIterator;
+	std::map<ActionKey, ControlEventHandler> actions;
+	Timer* actionTimer;
+
+	/** the value of the control to add to the variable */
+	ieDword Value = CTL_INVALID_VALUE;
+	ValueRange range;
+
 };
 
-class GEM_EXPORT ControlEventHandler : public Holder< Callback<Control*> > {
-public:
-	ControlEventHandler(Callback<Control*>* ptr = NULL)
-	: Holder< Callback<Control*> >(ptr) {}
-
-	bool operator()(Control* ctrl) {
-		return (*ptr)(ctrl);
-	}
-};
 
 }
 

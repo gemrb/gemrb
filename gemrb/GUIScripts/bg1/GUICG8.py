@@ -32,17 +32,10 @@ DoneButton = 0
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global RaceTable
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(RaceWindow):
-			RaceWindow.Unload()
-			RaceWindow = None
-		return
 	
 	GemRB.SetVar("Race",0) 
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceWindow = GemRB.LoadWindow(8)
+	RaceWindow = GemRB.LoadWindow(8, "GUICG")
 
 	RaceCount = CommonTables.Races.GetRowCount()
 
@@ -60,14 +53,14 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = RaceWindow.GetControl(8)
 	TextAreaControl.SetText(17237)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(RaceWindow))
 	RaceWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
 
@@ -78,6 +71,7 @@ def RacePress():
 	return
 
 def NextPress():
+	RaceWindow.Close()
 	Race = GemRB.GetVar ("Race") - 1
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_RACE, CommonTables.Races.GetValue (Race, 3))

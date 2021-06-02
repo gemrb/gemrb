@@ -38,7 +38,6 @@ BAMImporter::BAMImporter(void)
 	str = NULL;
 	frames = NULL;
 	cycles = NULL;
-	palette = NULL;
 	FramesCount = 0;
 	CyclesCount = 0;
 	CompressedColorIndex = DataStart = 0;
@@ -50,7 +49,6 @@ BAMImporter::~BAMImporter(void)
 	delete str;
 	delete[] frames;
 	delete[] cycles;
-	gamedata->FreePalette(palette);
 }
 
 bool BAMImporter::Open(DataStream* stream)
@@ -63,7 +61,9 @@ bool BAMImporter::Open(DataStream* stream)
 	delete str;
 	delete[] frames;
 	delete[] cycles;
-	gamedata->FreePalette(palette);
+	frames = nullptr;
+	cycles = nullptr;
+	palette = nullptr;
 
 	str = stream;
 	char Signature[8];
@@ -107,12 +107,15 @@ bool BAMImporter::Open(DataStream* stream)
 	palette = new Palette();
 	// no need to switch this
 	for (i = 0; i < 256; i++) {
-		RevColor rc;
-		str->Read( &rc, 4 );
-		palette->col[i].r = rc.r;
-		palette->col[i].g = rc.g;
-		palette->col[i].b = rc.b;
-		palette->col[i].a = rc.a;
+		// bgra format
+		str->Read( &palette->col[i].b, 1 );
+		str->Read( &palette->col[i].g, 1 );
+		str->Read( &palette->col[i].r, 1 );
+		unsigned char a;
+		str->Read( &a, 1 );
+
+		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
+		palette->col[i].a = (a) ? a : 255;
 	}
 	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
 	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
@@ -131,40 +134,30 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Sprite2D* BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-			bool BAMsprite, const unsigned char* data,
-			AnimationFactory* datasrc)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
+										bool RLESprite, unsigned char* data)
 {
-	Sprite2D* spr = 0;
+	Holder<Sprite2D> spr;
 
-	if (BAMsprite) {
-		bool RLECompressed = (frames[findex].FrameData & 0x80000000) == 0;
-
+	if (RLESprite) {
 		assert(data);
-		const unsigned char* framedata = data;
+		unsigned char* framedata = data;
 		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		spr = new BAMSprite2D (frames[findex].Width,
-							   frames[findex].Height,
-							   framedata,
-							   RLECompressed,
-							   datasrc,
-							   palette,
-							   CompressedColorIndex);
+		spr = new BAMSprite2D (Region(0,0, frames[findex].Width, frames[findex].Height),
+							   framedata, palette, CompressedColorIndex);
 	} else {
 		void* pixels = GetFramePixels(findex);
-		spr = core->GetVideoDriver()->CreateSprite8(
-			frames[findex].Width, frames[findex].Height,
-			pixels, palette, true, 0 );
+		Region r(0,0, frames[findex].Width, frames[findex].Height);
+		spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, CompressedColorIndex);
 	}
 
-	spr->XPos = (ieWordSigned)frames[findex].XPos;
-	spr->YPos = (ieWordSigned)frames[findex].YPos;
+	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
+	spr->Frame.y = (ieWordSigned)frames[findex].YPos;
 	if (mode == IE_SHADED) {
 		// CHECKME: is this ever used? Should we modify the sprite's palette
 		// without creating a local copy for this sprite?
-		Palette* pal = spr->GetPalette();
+		PaletteHolder pal = spr->GetPalette();
 		pal->CreateShadedAlphaChannel();
-		pal->release();
 	}
 	return spr;
 }
@@ -239,7 +232,7 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read( FLT, count * sizeof(ieWord) );
-	if( DataStream::IsEndianSwitch() ) {
+	if( DataStream::BigEndian() ) {
 		swabs(FLT, count * sizeof(ieWord));
 	}
 	return FLT;
@@ -265,8 +258,9 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		Sprite2D* frame = GetFrameInternal(i, mode, allowCompression, data, af);
-		assert(!allowCompression || frame->BAM);
+		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
+		Holder<Sprite2D> frame = GetFrameInternal(i, mode, RLECompressed, data);
+		assert(!RLECompressed || frame->BAM);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {
@@ -279,14 +273,14 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 If the Global Animation Palette is NULL, returns NULL. */
-Sprite2D* BAMImporter::GetPalette()
+Holder<Sprite2D> BAMImporter::GetPalette()
 {
 	unsigned char * pixels = ( unsigned char * ) malloc( 256 );
 	unsigned char * p = pixels;
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8( 16, 16, pixels, palette );
+	return core->GetVideoDriver()->CreateSprite8(Region(0,0,16,16), pixels, palette );
 }
 
 #include "BAMFontManager.h"

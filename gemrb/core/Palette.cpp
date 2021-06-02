@@ -28,49 +28,60 @@ namespace GemRB {
 #define MUL    2
 
 Palette::Palette(const Color &color, const Color &back)
+: Palette()
 {
-	alpha = false;
-	refcount = 1;
-	named = false;
-
-	front = color;
-	this->back = back;
-	col[0].r = 0;
-	col[0].g = 0xff;
-	col[0].b = 0;
-	col[0].a = 0;
+	col[0] = Color(0, 0xff, 0, 0);
 	for (int i = 1; i < 256; i++) {
-		col[i].r = back.r +
-		( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255 );
-		col[i].g = back.g +
-		( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255 );
-		col[i].b = back.b +
-		( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255 );
-		col[i].a = back.a +
-		( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255 );
+		float p = i / 255.0f;
+		col[i].r = std::min<int>(back.r * (1 - p) + color.r * p, 255);
+		col[i].g = std::min<int>(back.g * (1 - p) + color.g * p, 255);
+		col[i].b = std::min<int>(back.b * (1 - p) + color.b * p, 255);
+		// FIXME: alpha value changed to opaque to fix these palettes on SDL 2
+		// I'm not sure if the previous implementation had a purpose, but historically the alpha is ignored in IE
+		col[i].a = 0xff;
 	}
+}
+
+void Palette::UpdateAlpha()
+{
+	// skip index 0 which is always the color key
+	for (int i = 1; i < 256; ++i) {
+		if (col[i].a != 0xff) {
+			alpha = true;
+			return;
+		}
+	}
+	
+	alpha = false;
+}
+
+void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst)
+{
+	// no update to alpha or version, hence being private
+	std::copy(srcBeg, srcEnd, dst);
+}
+
+void Palette::CopyColorRange(const Color* srcBeg, const Color* srcEnd, uint8_t dst)
+{
+	CopyColorRangePrivate(srcBeg, srcEnd, &col[dst]);
+	UpdateAlpha();
+	version++;
 }
 
 void Palette::CreateShadedAlphaChannel()
 {
-	for (int i = 0; i < 256; ++i) {
-		unsigned int r = col[i].r;
-		unsigned int g = col[i].g;
-		unsigned int b = col[i].b;
-		unsigned int m = (r + g + b) / 3;
+	for (int i = 1; i < 256; ++i) {
+		Color& c = col[i];
+		unsigned int m = (c.r + c.g + c.b) / 3;
 		if (m > MINCOL) {
-			if (( r == 0 ) && ( g == 0xff ) && ( b == 0 )) {
-				col[i].a = 0xff;
-			} else {
-				int tmp = m * MUL;
-				col[i].a = ( tmp > 0xff ) ? 0xff : (unsigned char) tmp;
-			}
-		}
-		else {
-			col[i].a = 0;
+			int tmp = m * MUL;
+			c.a = std::min(tmp, 0xff);
+		} else {
+			c.a = 0;
 		}
 	}
 	alpha = true;
+	version++;
 }
 
 void Palette::Brighten()
@@ -79,44 +90,31 @@ void Palette::Brighten()
 		col[i].r = (col[i].r+256)/2;
 		col[i].g = (col[i].g+256)/2;
 		col[i].b = (col[i].b+256)/2;
-		col[i].a = (col[i].a+256)/2;
 	}
+	version++;
 }
 
-void Palette::Darken()
+PaletteHolder Palette::Copy() const
 {
-	for (int i = 0; i < 256; i++) {
-		col[i].r = (col[i].r * 2) / 3;
-		col[i].g = (col[i].g * 2) / 3;
-		col[i].b = (col[i].b * 2) / 3;
-		col[i].a = (col[i].a * 2) / 3;
-	}
-}
-
-Palette* Palette::Copy()
-{
-	Palette* pal = new Palette(col, alpha);
-	release();
-	return pal;
+	return new Palette(std::begin(col), std::end(col));
 }
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 {
 	unsigned int s = Clamp<ieDword>(8*type, 0, 8*sizeof(ieDword)-1);
-	//metal
-	core->GetPalette( (Colors[0]>>s)&0xFF, 12, &col[0x04]);
-	//minor
-	core->GetPalette( (Colors[1]>>s)&0xFF, 12, &col[0x10]);
-	//major
-	core->GetPalette( (Colors[2]>>s)&0xFF, 12, &col[0x1c]);
-	//skin
-	core->GetPalette( (Colors[3]>>s)&0xFF, 12, &col[0x28]);
-	//leather
-	core->GetPalette( (Colors[4]>>s)&0xFF, 12, &col[0x34]);
-	//armor
-	core->GetPalette( (Colors[5]>>s)&0xFF, 12, &col[0x40]);
-	//hair
-	core->GetPalette( (Colors[6]>>s)&0xFF, 12, &col[0x4c]);
+	constexpr uint8_t numCols = 12;
+
+	enum PALETTES : uint8_t
+	{
+		METAL = 0, MINOR, MAJOR, SKIN, LEATHER, ARMOR, HAIR,
+		END
+	};
+
+	for (uint8_t idx = METAL; idx < END; ++idx) {
+		const auto& pal16 = core->GetPalette16(Colors[idx]>>s);
+		Color* dest = &col[0x04 + (idx * 12)];
+		CopyColorRangePrivate(&pal16[0], &pal16[numCols], dest);
+	}
 	
 	//minor
 	memcpy( &col[0x58], &col[0x11], 8 * sizeof( Color ) );
@@ -144,6 +142,10 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 	for (i = 0xB8; i < 0xFF; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+	
+	col[1] = Color(0, 0, 0, 128); // shadows are always half trans black
+
+	version++;
 }
 
 
@@ -227,7 +229,7 @@ static inline void applyMod(const Color& src, Color& dest,
 	}
 }
 
-void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
+void Palette::SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
 	unsigned int type)
 {
 	const RGBModifier* tmods = mods+(8*type);
@@ -274,9 +276,11 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 		applyMod(src->col[0xB0+i],col[0xB0+i],tmods[3]);
 	for (i = 0; i < 72; ++i)
 		applyMod(src->col[0xB8+i],col[0xB8+i],tmods[4]);
+
+	version++;
 }
 
-void Palette::SetupGlobalRGBModification(const Palette* src,
+void Palette::SetupGlobalRGBModification(const PaletteHolder src,
 	const RGBModifier& mod)
 {
 	int i;
@@ -286,6 +290,8 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 
 	for (i = 2; i < 256; ++i)
 		applyMod(src->col[i],col[i],mod);
+
+	version++;
 }
 
 bool Palette::operator==(const Palette& other) const {

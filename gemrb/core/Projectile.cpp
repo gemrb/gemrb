@@ -39,9 +39,7 @@
 
 namespace GemRB {
 
-//to get gradient color
-//apparently pst doesn't have the small palette correctly
-#define PALSIZE 32
+constexpr uint8_t PALSIZE = 32;
 
 static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[MAX_ORIENT]={0,1,2,3,4,3,2,1,0,1,2,3,4,3,2,1};
@@ -84,7 +82,6 @@ Projectile::Projectile()
 	extension_explosioncount = extension_targetcount = 0;
 	Speed = 20;
 	SFlags = PSF_FLYING;
-	memset(&tint, 0, sizeof(tint));
 	if (!server)
 		server = core->GetProjectileServer();
 }
@@ -97,13 +94,6 @@ Projectile::~Projectile()
 		free(Extension);
 	}
 	delete effects;
-
-	if (TFlags&PTF_COLOUR) {
-		// unnamed palette, but PaletteRes may be set (eg. pshammb.pro of the Hammers mod)
-		gamedata->FreePalette(palette, NULL);
-	} else {
-		gamedata->FreePalette(palette, PaletteRes);
-	}
 
 	ClearPath();
 
@@ -119,7 +109,6 @@ Projectile::~Projectile()
 			if(shadow[i])
 				delete shadow[i];
 		}
-		Sprite2D::FreeSprite(light);
 	}
 
 	if(children) {
@@ -244,7 +233,7 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 }
 
 //apply gradient colors
-void Projectile::SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients)
+void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients)
 {
 	ieDword Colors[7];
 
@@ -257,13 +246,13 @@ void Projectile::SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gr
 	}
 }
 
-void Projectile::GetPaletteCopy(Animation *anim[], Palette *&pal)
+void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal)
 {
 	if (pal)
 		return;
 	for (unsigned int i=0;i<MAX_ORIENT;i++) {
 		if (anim[i]) {
-			Sprite2D* spr = anim[i]->GetFrame(0);
+			Holder<Sprite2D> spr = anim[i]->GetFrame(0);
 			if (spr) {
 				pal = spr->GetPalette()->Copy();
 				break;
@@ -277,7 +266,7 @@ void Projectile::SetBlend(int brighten)
 	GetPaletteCopy(travel, palette);
 	if (!palette)
 		return;
-	if (!palette->alpha) {
+	if (!palette->HasAlpha()) {
 		palette->CreateShadedAlphaChannel();
 	}
 	if (brighten) {
@@ -386,13 +375,13 @@ void Projectile::Setup()
 
 	//set any static tint
 	if(ExtFlags&PEF_TINT) {
-		Color tmpColor[PALSIZE];
-
-		core->GetPalette( Gradients[0], PALSIZE, tmpColor );
+		uint8_t idx = PALSIZE/2;
+		const auto& pal32 = core->GetPalette32(Gradients[0]);
+		const Color& tmpColor = pal32[idx];
 		// PALSIZE is usually 12, but pst has it at 32, which is now the default, so make sure we're not trying to read an empty (black) entry
-		unsigned int idx = PALSIZE/2;
-		if (tmpColor[idx].r + tmpColor[idx].g + tmpColor[idx].b == 0) idx = 6;
-		StaticTint(tmpColor[idx]);
+
+		if (tmpColor.r + tmpColor.g + tmpColor.b == 0) idx = 6;
+		StaticTint(pal32[idx]);
 	}
 
 	CreateAnimations(travel, BAMRes1, Seq1);
@@ -430,14 +419,13 @@ void Projectile::Setup()
 	if (TFlags&PTF_COLOUR) {
 		SetupPalette(travel, palette, Gradients);
 	} else {
-		gamedata->FreePalette(palette, PaletteRes);
-		palette=gamedata->GetPalette(PaletteRes);
+		palette = gamedata->GetPalette(PaletteRes);
 	}
 
 	if (TFlags&PTF_LIGHT) {
 		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 	}
-	if (TFlags&PTF_BLEND) {
+	if (TFlags&PTF_TRANS) {
 		SetBlend(TFlags&PTF_BRIGHTEN);
 	}
 	if (SFlags&PSF_FLYING) {
@@ -568,7 +556,7 @@ bool Projectile::FailedIDS(const Actor *target) const
 void Projectile::Payload()
 {
 	if(Shake) {
-		core->timer->SetScreenShake( Shake, Shake, Shake);
+		core->timer.SetScreenShake(Point(Shake, Shake), Shake);
 		Shake = 0;
 	}
 
@@ -792,11 +780,9 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 
 	if(pal) {
 		if (ExtFlags & PEF_TINT) {
-			Color tmpColor[PALSIZE];
-
-			core->GetPalette( pal[0], PALSIZE, tmpColor );
-			sca->Tint = tmpColor[PALSIZE/2];
-			sca->Transparency |= BLIT_TINTED;
+			const auto& pal32 = core->GetPalette32( pal[0] );
+			sca->Tint = pal32[PALSIZE/2];
+			sca->Transparency |= BLIT_COLOR_MOD;
 		} else {
 			for(int i=0;i<7;i++) {
 				sca->SetPalette(pal[i], 4+i*PALSIZE);
@@ -806,8 +792,7 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 	sca->SetOrientation(Orientation);
 	sca->PlayOnce();
 	sca->SetBlend();
-	sca->XPos += Pos.x;
-	sca->YPos += Pos.y;
+	sca->Pos = Pos;
 	area->AddVVCell(vef);
 	return sca->GetSequenceDuration(AI_UPDATE_TIME);
 }
@@ -1105,7 +1090,7 @@ void Projectile::CheckTrigger(unsigned int radius)
 		//passed a hardcoded sequence number
 		if (Extension->AFlags&PAF_TRIGGER_D) {
 			if (travel[Orientation]) {
-				int anim = travel[Orientation]->GetCurrentFrame();
+				int anim = travel[Orientation]->GetCurrentFrameIndex();
 				if (anim<30)
 					return;
 			}
@@ -1349,7 +1334,7 @@ int Projectile::Update()
 	return 1;
 }
 
-void Projectile::Draw(const Region &screen)
+void Projectile::Draw(const Region& viewport)
 {
 	switch (phase) {
 		case P_UNINITED:
@@ -1359,7 +1344,7 @@ void Projectile::Draw(const Region &screen)
 			//trigger/explosion time
 			if (Extension->AFlags&PAF_VISIBLE) {
 			//if (!Extension || (Extension->AFlags&PAF_VISIBLE)) {
-				DrawTravel(screen);
+				DrawTravel(viewport);
 			}
 			/*
 			if (!Extension) {
@@ -1367,20 +1352,20 @@ void Projectile::Draw(const Region &screen)
 			}*/
 			CheckTrigger(Extension->TriggerRadius);
 			if (phase == P_EXPLODING1 || phase == P_EXPLODING2) {
-				DrawExplosion(screen);
+				DrawExplosion(viewport);
 			}
 			break;
 		case P_TRAVEL: case P_TRAVEL2:
 			//There is no Extension for simple traveling projectiles!
-			DrawTravel(screen);
+			DrawTravel(viewport);
 			return;
 		default:
-			DrawExploded(screen);
+			DrawExploded(viewport);
 			return;
 	}
 }
 
-bool Projectile::DrawChildren(const Region &screen)
+bool Projectile::DrawChildren(const Region& vp)
 {
 	bool drawn = false;
 
@@ -1388,7 +1373,7 @@ bool Projectile::DrawChildren(const Region &screen)
 		for(int i=0;i<child_size;i++){
 			if(children[i]) {
 				if (children[i]->Update()) {
-					children[i]->DrawTravel(screen);
+					children[i]->DrawTravel(vp);
 					drawn = true;
 				} else {
 					delete children[i];
@@ -1402,9 +1387,9 @@ bool Projectile::DrawChildren(const Region &screen)
 }
 
 //draw until all children expire
-void Projectile::DrawExploded(const Region &screen)
+void Projectile::DrawExploded(const Region& viewport)
 {
-	if (DrawChildren(screen)) {
+	if (DrawChildren(viewport)) {
 		return;
 	}
 	phase = P_EXPIRED;
@@ -1426,7 +1411,7 @@ void Projectile::SpawnFragment(Point &dest)
 	}
 }
 
-void Projectile::DrawExplosion(const Region &screen)
+void Projectile::DrawExplosion(const Region& vp)
 {
 	//This seems to be a needless safeguard
 	if (!Extension) {
@@ -1435,7 +1420,7 @@ void Projectile::DrawExplosion(const Region &screen)
 	}
 
 	StopSound();
-	DrawChildren(screen);
+	DrawChildren(vp);
 
 	int pause = core->IsFreezed();
 	if (pause) {
@@ -1480,14 +1465,12 @@ void Projectile::DrawExplosion(const Region &screen)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
-		Point pos = Pos;
-		pos.x+=screen.x;
-		pos.y+=screen.y;
+		Point pos = Pos - vp.Origin();
 		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, GetZPos());
 	}
 
 	if(Shake) {
-		core->timer->SetScreenShake( Shake, Shake, Shake);
+		core->timer.SetScreenShake(Point(Shake, Shake), Shake);
 		Shake = 0;
 	}
 
@@ -1528,11 +1511,9 @@ void Projectile::DrawExplosion(const Region &screen)
 				if (apflags & APF_VVCPAL) {
 					//if the palette is used as tint (as opposed to clown colorset) tint the vvc
 					if (apflags & APF_TINT) {
-						Color tmpColor[PALSIZE];
-
-						core->GetPalette( Extension->ExplColor, PALSIZE, tmpColor );
-						vvc->Tint = tmpColor[PALSIZE/2];
-						vvc->Transparency |= BLIT_TINTED;
+						const auto& pal32 = core->GetPalette32(Extension->ExplColor);
+						vvc->Tint = pal32[PALSIZE/2];
+						vvc->Transparency |= BLIT_COLOR_MOD;
 					} else {
 						vvc->SetPalette(Extension->ExplColor);
 					}
@@ -1541,8 +1522,7 @@ void Projectile::DrawExplosion(const Region &screen)
 				if (ExtFlags&PEF_TRAIL) {
 					vvc->SetOrientation(Orientation);
 				}
-				vvc->XPos+=Pos.x;
-				vvc->YPos+=Pos.y;
+				vvc->Pos = Pos;
 				vvc->PlayOnce();
 				vvc->SetBlend();
 				//quick hack to use the single object envelope
@@ -1553,8 +1533,7 @@ void Projectile::DrawExplosion(const Region &screen)
 			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
 				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 				if (vvc) {
-					vvc->XPos += Pos.x;
-					vvc->YPos += Pos.y;
+					vvc->Pos = Pos;
 					vvc->PlayOnce();
 					vvc->SetBlend();
 					area->AddVVCell(new VEFObject(vvc));
@@ -1669,7 +1648,7 @@ void Projectile::DrawExplosion(const Region &screen)
 				pro->SetGradient(Extension->ExplColor, !(apflags&APF_PALETTE));
 			}
 			//i'm unsure if we need blending for all anims or just the tinted ones
-			pro->TFlags|=PTF_BLEND;
+			pro->TFlags|=PTF_TRANS;
 			//random frame is needed only for some of these, make it an areapro flag?
 			if( !(ExtFlags&PEF_CYCLE) || (ExtFlags&PEF_RANDOM) ) {
 				pro->ExtFlags|=PEF_RANDOM;
@@ -1700,7 +1679,7 @@ void Projectile::DrawExplosion(const Region &screen)
 int Projectile::GetTravelPos(int face) const
 {
 	if (travel[face]) {
-		return travel[face]->GetCurrentFrame();
+		return travel[face]->GetCurrentFrameIndex();
 	}
 	return 0;
 }
@@ -1708,7 +1687,7 @@ int Projectile::GetTravelPos(int face) const
 int Projectile::GetShadowPos(int face) const
 {
 	if (shadow[face]) {
-		return shadow[face]->GetCurrentFrame();
+		return shadow[face]->GetCurrentFrameIndex();
 	}
 	return 0;
 }
@@ -1737,12 +1716,11 @@ void Projectile::SetupWall()
 	SetTarget(p2);
 }
 
-void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
+void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 {
-	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 	PathNode *iter = path;
-	Sprite2D *frame;
+	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		frame = travel[face]->LastFrame();
 		flag |= BLIT_GREY;
@@ -1753,22 +1731,19 @@ void Projectile::DrawLine(const Region &screen, int face, ieDword flag)
 	Color tint2 = tint;
 	if (game) game->ApplyGlobalTint(tint2, flag);
 	while(iter) {
-		Point pos(iter->x, iter->y);
+		Point pos(iter->x - vp.x, iter->y - vp.y);
 
 		if (SFlags&PSF_FLYING) {
 			pos.y-=FLY_HEIGHT;
 		}
-		pos.x+=screen.x;
-		pos.y+=screen.y;
 
-		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint2, NULL, palette, &screen);
+		Draw(frame, pos, flag, tint2);
 		iter = iter->Next;
 	}
 }
 
-void Projectile::DrawTravel(const Region &screen)
+void Projectile::DrawTravel(const Region& viewport)
 {
-	Video *video = core->GetVideoDriver();
 	Game *game = core->GetGame();
 	ieDword flag;
 
@@ -1780,24 +1755,22 @@ void Projectile::DrawTravel(const Region &screen)
 
 	//static tint (use the tint field)
 	if(ExtFlags&PEF_TINT) {
-		flag|=BLIT_TINTED;
+		flag|=BLIT_COLOR_MOD;
 	}
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = 255;
-		flag |= BLIT_TINTED;
+		flag |= BLIT_COLOR_MOD;
 	}
 
 	unsigned int face = GetNextFace();
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
-	Point pos = Pos;
-	pos.x+=screen.x;
-	pos.y+=screen.y;
 
+	Point pos = Pos - viewport.Origin();
 	if(bend && phase == P_TRAVEL && Origin != Destination) {
 		double total_distance = Distance(Origin, Destination);
 		double travelled_distance = Distance(Origin, Pos);
@@ -1828,17 +1801,18 @@ void Projectile::DrawTravel(const Region &screen)
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
 	ieDword flags = flag;
-	if (TFlags&PTF_TINT) {
-		if (game) game->ApplyGlobalTint(tint2, flags);
+
+	if (TFlags&PTF_TINT && game) {
+		game->ApplyGlobalTint(tint2, flags);
 	}
 
 	if (light) {
-		video->BlitGameSprite(light, pos.x, pos.y, flags^flag, tint2, NULL, NULL, &screen);
+		Draw(light, pos, flags^flag, tint2);
 	}
 
 	if (ExtFlags&PEF_POP) {
 			//draw pop in/hold/pop out animation sequences
-			Sprite2D *frame;
+			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
 				flags |= BLIT_GREY;
@@ -1858,18 +1832,18 @@ void Projectile::DrawTravel(const Region &screen)
 					}
 				}
 			}
-			video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
+			Draw(frame, pos, flags, tint2);
 			return;
 	}
 	
 	if (ExtFlags&PEF_LINE) {
-		DrawLine(screen, face, flag);
+		DrawLine(viewport, face, flag);
 		return;
 	}
 	
 	if (shadow[face]) {
-		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite(frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
+		Holder<Sprite2D> frame = shadow[face]->NextFrame();
+		Draw(frame, pos, flags, tint2);
 	}
 
 	pos.y-=GetZPos();
@@ -1878,21 +1852,21 @@ void Projectile::DrawTravel(const Region &screen)
 		//draw all frames simultaneously on top of each other
 		for(int i=0;i<Aim;i++) {
 			if (travel[i]) {
-				Sprite2D *frame = travel[i]->NextFrame();
-				video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
-				pos.y-=frame->YPos;
+				Holder<Sprite2D> frame = travel[i]->NextFrame();
+				Draw(frame, pos, flags, tint2);
+				pos.y-=frame->Frame.y;
 			}
 		}
 	} else {
 		if (travel[face]) {
-			Sprite2D *frame;
+			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
 				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
 			} else {
 				frame = travel[face]->NextFrame();
 			}
-			video->BlitGameSprite( frame, pos.x, pos.y, flags, tint2, NULL, palette, &screen);
+			Draw(frame, pos, flags, tint2);
 		}
 	}
 
@@ -1963,5 +1937,16 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
+void Projectile::Draw(Holder<Sprite2D> spr, const Point& p,
+		  unsigned int flags, Color tint) const
+{
+	Video *video = core->GetVideoDriver();
+	PaletteHolder pal = (spr->Bpp == 8) ? palette : nullptr;
+	if (flags & BLIT_COLOR_MOD) {
+		// FIXME: this may not apply universally
+		flags |= BLIT_ALPHA_MOD;
+	}
+	video->BlitGameSpriteWithPalette(spr, pal, p, flags|BLIT_BLENDED, tint);
+}
 
 }

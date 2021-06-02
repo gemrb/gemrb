@@ -23,6 +23,8 @@ import CommonTables
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 AlignmentWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -42,8 +44,8 @@ def OnLoad():
 
 	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	AlignmentWindow = GemRB.LoadWindow(3)
+	AlignmentWindow = GemRB.LoadWindow(3, "GUICG")
+	CharGenCommon.PositionCharGenWin(AlignmentWindow)
 
 	for i in range(9):
 		Button = AlignmentWindow.GetControl(i+2)
@@ -58,24 +60,24 @@ def OnLoad():
 
 	BackButton = AlignmentWindow.GetControl(13)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = AlignmentWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = AlignmentWindow.GetControl(11)
 	TextAreaControl.SetText(9602)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	AlignmentWindow.SetVisible(WINDOW_VISIBLE)
+	DoneButton.SetDisabled(True)
+	AlignmentWindow.Focus()
 	return
 
 def AlignmentPress():
 	Alignment = GemRB.GetVar("Alignment")
 	TextAreaControl.SetText (CommonTables.Aligns.GetValue (Alignment, 1))
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	GemRB.SetVar ("Alignment", CommonTables.Aligns.GetValue (Alignment, 3))
 	return
 

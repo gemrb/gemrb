@@ -18,6 +18,7 @@
 #
 #character generation, multi-class (GUICG10)
 import GemRB
+import CharGenCommon
 import GUICommon
 import CommonTables
 from ie_stats import *
@@ -34,8 +35,8 @@ MCRowIndices = []
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, MyChar, ButtonCount, MCRowIndices
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassWindow = GemRB.LoadWindow(10)
+	ClassWindow = GemRB.LoadWindow(10, "GUICG")
+	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	ClassCount = CommonTables.Classes.GetRowCount()+1
@@ -54,42 +55,40 @@ def OnLoad():
 	ButtonCount = 10
 	if len(MCRowIndices) > 10:
 		# add another button, there's another slot left
-		ClassWindow.CreateButton (15, 18, 250, 271, 20)
-		extramc = ClassWindow.GetControl(15)
+		extramc = ClassWindow.CreateButton (15, 18, 250, 271, 20)
 		extramc.SetState(IE_GUI_BUTTON_DISABLED)
 		extramc.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		extramc.SetSprites("GUICGBC",0, 0,1,2,3)
 		ButtonCount = 11
 	if len(MCRowIndices) > 11:
 		# bah, also add a scrollbar
-		ClassWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
-		ScrollBar = ClassWindow.GetControl (1000)
-		ScrollBar.SetVarAssoc("TopIndex", len(MCRowIndices)-10)
+		ScrollBar = ClassWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
+		ScrollBar.SetVarAssoc("TopIndex", 0, 0, len(MCRowIndices) - 11)
 		ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawMCs)
-		ScrollBar.SetDefaultScrollBar()
+		ClassWindow.SetEventProxy(ScrollBar)
 
 	BackButton = ClassWindow.GetControl(14)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = ClassWindow.GetControl(12)
 	TextAreaControl.SetText(17244)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.SetDisabled(True)
 	RedrawMCs()
-	ClassWindow.SetVisible(WINDOW_VISIBLE)
+	ClassWindow.Focus()
 	return
 
 def ClassPress():
 	GUICG2.SetClass()
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():
@@ -112,7 +111,6 @@ def NextPress():
 	GemRB.SetNextScript("CharGen4") #alignment
 	return
 
-#TODO: deal with the potential scrollbar
 def RedrawMCs():
 	for i in range (2, 2+ButtonCount): # loop over the available buttons
 		if i == 12:
@@ -122,12 +120,13 @@ def RedrawMCs():
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 
-		t = GUICommon.GetClassRowName (MCRowIndices[i-2][0], "index")
+		offset = GemRB.GetVar ("TopIndex")
+		t = GUICommon.GetClassRowName (MCRowIndices[i - 2 + offset][0], "index")
 		t = CommonTables.Classes.GetValue(t, "NAME_REF")
 		Button.SetText(t )
-		if not MCRowIndices[i-2][1]:
+		if not MCRowIndices[i - 2 + offset][1]:
 			Button.SetState(IE_GUI_BUTTON_DISABLED)
 			continue
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ClassPress)
-		Button.SetVarAssoc("Class", MCRowIndices[i-2][0]+1) # multiclass, actually; just a weird system
+		Button.SetVarAssoc("Class", MCRowIndices[i - 2 + offset][0] + 1) # multiclass, actually; just a weird system

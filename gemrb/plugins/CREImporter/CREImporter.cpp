@@ -972,11 +972,11 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	str->ReadResRef( act->SmallPortrait );
 	if (act->SmallPortrait[0]==0) {
-		memcpy(act->SmallPortrait, "NONE\0\0\0\0", 8);
+		strncpy(act->SmallPortrait, "NONE", 8);
 	}
 	str->ReadResRef( act->LargePortrait );
 	if (act->LargePortrait[0]==0) {
-		memcpy(act->LargePortrait, "NONE\0\0\0\0", 8);
+		strncpy(act->LargePortrait, "NONE", 8);
 	}
 
 	unsigned int Inventory_Size;

@@ -21,7 +21,7 @@
 #ifndef CHUIMPORTER_H
 #define CHUIMPORTER_H
 
-#include "WindowMgr.h"
+#include "GUI/GUIFactory.h"
 
 #include "System/DataStream.h"
 
@@ -31,20 +31,21 @@ namespace GemRB {
   *@author GemRB Developement Team
   */
 
-class CHUImporter : public WindowMgr {
+class CHUImporter : public GUIFactory {
 private:
 	DataStream* str;
 //	bool autoFree;
 	ieDword WindowCount, CTOffset, WEOffset;
 public: 
 	CHUImporter();
-	~CHUImporter();
+	~CHUImporter() override;
 	/** Returns the number of available windows */
-	unsigned int GetWindowsCount();
+	unsigned int GetWindowsCount() override;
+	bool LoadWindowPack(const ResRef&) override;
 	/** Returns the i-th window in the Previously Loaded Stream */
-	Window* GetWindow(unsigned int i);
+	Window* GetWindow(ScriptingId) const override;
 	/** This function loads all available windows from the 'stream' parameter. */
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 };
 
 }

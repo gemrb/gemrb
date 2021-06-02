@@ -26,174 +26,129 @@ using namespace GemRB;
 VLCPlayer::VLCPlayer(void)
 {
 	libvlc = libvlc_new(0, NULL);
+	mediaPlayer = NULL;
+	planes[0] = NULL;
+	planes[1] = NULL;
+	planes[2] = NULL;
 }
 
 VLCPlayer::~VLCPlayer(void)
 {
-	if (ctx) {
-		Stop(); // this call will lead to the dallocation of ctx
-	}
+	DestroyPlayer();
+	libvlc_media_player_release(mediaPlayer);
 	libvlc_release(libvlc);
 }
 
 bool VLCPlayer::Open(DataStream* stream)
 {
-	if (mediaPlayer) {
-		Stop();
-	}
+	DestroyPlayer();
 	if (stream) {
 		// we don't actually need anything from the stream. libVLC will open and use the file internally
-		media = libvlc_media_new_path(libvlc, stream->originalfile);
+		libvlc_media_t* media = libvlc_media_new_path(libvlc, stream->originalfile);
 		mediaPlayer = libvlc_media_player_new_from_media(media);
 		libvlc_media_release(media); //player retains the media
 
-		libvlc_video_set_callbacks(mediaPlayer, lock, unlock, display, &ctx);
-		libvlc_video_set_format_callbacks(mediaPlayer, setup, cleanup);
+		libvlc_video_set_callbacks(mediaPlayer, lock, NULL, NULL, this);
+		libvlc_video_set_format_callbacks(mediaPlayer, setup, NULL);
 
-		return true;
+		bool success = libvlc_media_player_play(mediaPlayer) == 0;
+
+		// FIXME: this is technically a data race!
+		while (success && movieFormat == Video::DISPLAY);
+
+		return success;
 	}
 	return false;
 }
 
-void VLCPlayer::CallBackAtFrames(ieDword /*cnt*/, ieDword* /*arg*/, ieDword* /*arg2*/ )
+bool VLCPlayer::DecodeFrame(VideoBuffer& buf)
 {
-	// TODO: probably should do something here.
-	Log(MESSAGE, "VLCPlayer", "Unimplemented method: CallBackAtFrames");
-}
+	int pitches[3];
 
-void VLCPlayer::Stop()
-{
-	libvlc_media_player_stop(mediaPlayer);
-	libvlc_media_player_release(mediaPlayer);
-}
-
-int VLCPlayer::Play()
-{
-	int ret = GEM_ERROR;
-	Video* video = core->GetVideoDriver();
-	if (mediaPlayer && video) {
-		ret = libvlc_media_player_play(mediaPlayer);
-		if (ret == GEM_OK) {
-			// since ret is good we know that playback will start.
-			// wait here until it does
-
-			// FIXME: this is not very elegant and infinate loops are not a good thing :)
-			// maybe there is a function we can use to check the vlc player status instead of polling until our context is valid
-			while (!libvlc_media_player_is_playing(mediaPlayer) || ctx == NULL);
-
-			bool done = false;
-			while (!done && libvlc_media_player_is_playing(mediaPlayer)) {
-				ctx->Lock();
-				done = video->PollMovieEvents();
-
-				if (ctx->isYUV()) {
-					unsigned int strides[3];
-					strides[0] = ctx->GetStride(0);
-					strides[1] = ctx->GetStride(1);
-					strides[2] = ctx->GetStride(2);
-
-					void* planes[3];
-					planes[0] = ctx->GetPlane(0);
-					planes[1] = ctx->GetPlane(1);
-					planes[2] = ctx->GetPlane(2);
-
-					// TODO: center the video on the player.
-					video->showYUVFrame((unsigned char**)planes, strides, 
-										ctx->Width(), ctx->Height(),
-										ctx->Width(), ctx->Height(),
-										0, 0, 0);
-				} else {
-					video->showFrame((unsigned char*)ctx->GetPlane(0),
-									 ctx->Width(), ctx->Height(), 0, 0,
-									 ctx->Width(), ctx->Height(), 0, 0,
-									 true, NULL, 0);
-				}
-				ctx->Unlock();
-			}
-		}
-		Stop();
+	switch (movieFormat) {
+		case Video::RGB555:
+			pitches[0] = movieSize.w * 2;
+			break;
+		case Video::YV12:
+			pitches[Y] = movieSize.w;
+			pitches[U] = movieSize.w / 2;
+			pitches[V] = movieSize.w / 2;
+			break;
+		default: // 32 bit
+			pitches[0] = movieSize.w * 4;
+			break;
 	}
-	return ret;
+
+	buf.CopyPixels(Region(0, 0, movieSize.w, movieSize.h),
+				   planes[0], &pitches[0], // Y or RGB
+				   planes[1], &pitches[1], // U
+				   planes[2], &pitches[2]);// V
+	return true;
+}
+
+void VLCPlayer::DestroyPlayer()
+{
+	if (mediaPlayer) {
+		libvlc_media_player_stop(mediaPlayer);
+		libvlc_media_player_release(mediaPlayer);
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		delete[] planes[i];
+	}
 }
 
 // static vlc callbacks
 
-void VLCPlayer::display(void* /*data*/, void *id){
-	assert(id == NULL); // we are using a single buffer so id should always be NULL
-}
-
-void VLCPlayer::unlock(void *data, void *id, void *const * /*planes*/){
-	assert(id == NULL); // we are using a single buffer so id should always be NULL
-	VideoContext* context = *(VideoContext**)data;
-	context->Unlock();
-}
-
-void* VLCPlayer::lock(void *data, void **planes){
-	VideoContext* context = *(VideoContext**)data;
-	context->Lock();
-	planes[0] = context->GetPlane(0);
-	planes[1] = context->GetPlane(1);
-	planes[2] = context->GetPlane(2);
-	return NULL; // we are using a single buffer so return NULL
-}
-
-void VLCPlayer::cleanup(void *opaque)
+void* VLCPlayer::lock(void *data, void **planes)
 {
-	VideoContext* context = *(VideoContext**)opaque;
-	delete context;
-	context = NULL;
+	VLCPlayer* player = static_cast<VLCPlayer*>(data);
 
-	core->GetVideoDriver()->DestroyMovieScreen();
+	planes[0] = player->planes[0];
+	planes[1] = player->planes[1];
+	planes[2] = player->planes[2];
+
+	return NULL; // we are using a single buffer so return NULL
 }
 
 unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)
 {
-	Video* video = core->GetVideoDriver();
-	assert(video != NULL);
-
-	/*
-	 other player plugins assume video is made specifically for IE games (dimensions and chroma).
-	 we won't assume this here because this player is mostly for modders to use their own videos.
-	 
-	 we will need to make sure the video is scaled down if it is larger than the window and we will
-	 need to convert the chroma to one of the 2 formats the video driver is coded for.
-	 
-	 currently the video drivers expect RGB555 or IYUV, but the SDL 2.0 driver can actually handle ARGB as well.
-	 infact the texture is natively ARGB8888, and we are converting RGB555 data to ARGB which means here we may be
-	 converting like this ARGB -> RGB555 -> ARGB which is quite dumb :)
-	 
-	 TODO: figure out a way to support ARGB when using SDL 2
-	 */
-
-	bool yuv;
-	if (strcmp(chroma, "RV16") == 0) { // 16bit RGB
-		yuv = false;
-	} else {
-		yuv = true;
-		memcpy(chroma, "YV12", 4);
-	}
-
+	VLCPlayer* player = static_cast<VLCPlayer*>(*opaque);
 	int w = *width;
 	int h = *height;
-	video->InitMovieScreen(w, h, yuv); // may alter w and h
+	player->movieSize.w = w;
+	player->movieSize.h = h;
 
-	// TODO: proportionally scale the video to fit the player window
-	// for now we'll use the video native width and height.
-	w = *width;
-	h = *height;
+	if (strcmp(chroma, "RV16") == 0) { // 16bit RGB
+		player->movieFormat = Video::RGB555;
 
-	VideoContext* context = new VideoContext(w, h, yuv);
-	**(VideoContext***)opaque = context; // a bit of a hack, but we need to set the player object's context.
+		pitches[0] = w * 2;
+		lines[0] = h;
 
-	// being lazy and making VLC convert frame pitches and scan lines
-	// note that I assume that InitMovieScreen with force w and h into a multiple of 32
-	pitches[0] = w;
-	pitches[1] = w;
-	pitches[2] = w;
+		player->planes[0] = new char[pitches[0] * lines[0]];
+	} else if (strcmp(chroma, "YV12") == 0 || strcmp(chroma, "I420") == 0) {
+		player->movieFormat = Video::YV12;
+		memcpy(chroma, "YV12", 4); // we prefer this plane order
 
-	lines[0] = h;
-	lines[1] = h;
-	lines[2] = h;
+		pitches[Y] = w;
+		pitches[U] = w / 2;
+		pitches[V] = w / 2;
+		lines[Y] = h;
+		lines[U] = h / 2;
+		lines[V] = h / 2;
+
+		player->planes[Y] = new char[pitches[Y] * lines[Y]];
+		player->planes[U] = new char[pitches[U] * lines[U]];
+		player->planes[V] = new char[pitches[V] * lines[V]];
+	} else { // default to 32bit
+		player->movieFormat = Video::RGBA8888;
+		memcpy(chroma, "RV32", 4);
+
+		pitches[0] = w * 4;
+		lines[0] = h;
+
+		player->planes[0] = new char[pitches[0] * lines[0]];
+	}
 
 	return 1; // indicates the number of buffers allocated
 }
@@ -205,4 +160,5 @@ GEMRB_PLUGIN(0x218963DD, "VLC Video Player")
 // it seems silly to hardcode a single value or add formats piecemeal.
 // it would be a shame to force modders or new content creators to use a specific format
 PLUGIN_RESOURCE(VLCPlayer, "mov") // at least some mac ports used Quicktime MOV format
+PLUGIN_RESOURCE(VLCPlayer, "webm") // EE movies
 END_PLUGIN()

@@ -30,20 +30,17 @@ namespace GemRB {
 class GEM_EXPORT TileMapMgr : public Plugin {
 public:
 	TileMapMgr(void);
-	virtual ~TileMapMgr(void);
+	~TileMapMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
 		bool& BaseClosed) = 0;
-	virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) const = 0;
-	virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) const = 0;
+	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
+	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
 	virtual void SetExtendedNight(bool night) = 0;
 
-	virtual Wall_Polygon** GetWallGroups() const = 0;
-	//returns only the wall polygon counts
-	virtual ieDword GetWallPolygonsCount() const = 0;
-	//returns Wall + Door polygon counts
-	virtual ieDword GetPolygonsCount() const = 0;
+	virtual WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const = 0;
+	virtual std::vector<WallPolygonGroup> GetWallGroups() const = 0;
 };
 
 }

@@ -39,10 +39,11 @@ Portrait image "fan-art Boromir 'Lotr'" by Deevad (CC BY 3.0).
 All used OpenGameArt assets are collated in this collection:
 https://opengameart.org/content/gemrb-demo-assets
 
-Hand cursor icon was done by yd (CC0).
-
 Window and GUI design based on Lamoot's RPG GUI construction kit v1.0 (CC-BY)
 World map by Pepper Racoon (CC-BY).
+
+Main cursors are from Tempest in the Aether and Ryzom Core (CC-BY-SA 3.0).
+Scrolling cursors by marcintokarski (OGA-BY 3.0).
 
 Ruby image by rubberduck and Clint Bellanger, based on designs from Justin Nichol (CC-BY 4.0).
 
@@ -60,3 +61,6 @@ Button press sound by Kenney.nl (CC0), window open close sounds by rubberduck (C
 
 Footstep sounds and portal destruction sfx by Little Robot Sound Factory
 (www.littlerobotsoundfactory.com; CC-BY 3.0).
+
+Main music theme and area music licensed from Nicolas Jeudy of Dark
+Fantasy Studio. See https://github.com/gemrb/gemrb-assets/tree/master/demo/audio for the documents.

@@ -35,59 +35,47 @@
 
 namespace GemRB {
 
-// !!! Keep in sync with GUIDefines.py !!!
-#define IE_GUI_PROGRESS_END_REACHED  0x01000000
-
-
 /**
  * @class Progressbar
  * Widget for displaying progressbars, mainly on loading/saving screens
  */
 
 class GEM_EXPORT Progressbar : public Control  {
-protected:
+private:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 
-public: 
-	Progressbar(const Region& frame, unsigned short KnobStepsCount, bool Clear = false);
-	~Progressbar();
+public:
+	struct Action {
+		// !!! Keep these synchronized with GUIDefines.py !!!
+		static const Control::Action EndReached = ACTION_CUSTOM(0); // progress bar reaches 100%
+	};
 
-	bool IsOpaque() const { return BackGround; }
-	/** Returns the actual Progressbar Position */
-	unsigned int GetPosition();
-	/** Sets the actual Progressbar Position trimming to the Max and Min Values */
-	void SetPosition(unsigned int pos);
-	/** Sets the background images */
-	void SetImage(Sprite2D * img, Sprite2D * img2);
+	Progressbar(const Region& frame, unsigned short KnobStepsCount);
+	~Progressbar() override;
+
+	bool IsOpaque() const override;
+
+	void SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap);
 	/** Sets a bam resource for progressbar */
 	void SetAnimation(Animation *arg);
-	/** Sets a mos resource for progressbar cap */
-	void SetBarCap(Sprite2D *img3);
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
-	void SetSliderPos(int x, int y, int x2, int y2);
+	void SetSliderPos(const Point& knob, const Point& cap);
 	/** Refreshes a progressbar which is associated with VariableName */
-	void UpdateState(unsigned int Sum);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
+	void UpdateState(unsigned int Sum) override;
 
 private: // Private attributes
-	/** BackGround Images. If smaller than the Control Size, the image will be tiled. */
-	Sprite2D * BackGround;
-	Sprite2D * BackGround2; //mos resource for the filling of the bar 
+	Holder<Sprite2D> BackGround2; //mos resource for the filling of the bar
 	/** Knob Steps Count */
 	unsigned int KnobStepsCount;
-	int KnobXPos, KnobYPos; //relative coordinates for Background2
-	int CapXPos, CapYPos; //relative coordinates for PBarCap
-	/** If true, on deletion the Progressbar will destroy the associated images */
-	bool Clear;
+	Point KnobPos; //relative coordinates for Background2
+	Point CapPos; //relative coordinates for PBarCap
+
+	/** The mos for the progressbar cap (linear progressbar) */
+	Holder<Sprite2D> PBarCap;
 	/** The bam cycle whose frames work as a progressbar (animated progressbar) */
 	Animation *PBarAnim;
-	/** The most for the progressbar cap (linear progressbar) */
-	Sprite2D *PBarCap;
-public:
-	/** EndReached Scripted Event Function Name */
-	ControlEventHandler EndReached;
+
 };
 
 }

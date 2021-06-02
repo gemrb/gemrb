@@ -22,152 +22,86 @@
 ###################################################
 
 import GemRB
-import GUICommon
 import GUICommonWindows
 import GUIMACommon
 from GUIDefines import *
 
-MapWindow = None
-WorldMapWindow = None
 WorldMapControl = None
+AreaMapControl = None
 
-WIDTH = 800
-HEIGHT = 600
-
-def OpenMapWindow ():
-	global MapWindow
-
-	if GUICommon.CloseOtherWindow (OpenMapWindow):
-		if MapWindow:
-			MapWindow.Unload ()
-
-		MapWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIMAP", WIDTH, HEIGHT)
-	MapWindow = Window = GemRB.LoadWindow (0)
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
+def InitMapWindow (Window, WorldMap = False):
+	global WorldMapControl, AreaMapControl
 
 	Label = Window.GetControl (0)
-	Label.SetText ("Area map")
+	if WorldMap:
+		Label.SetText ("World map")
+	else:
+		Label.SetText ("Area map")
 
 	# World Map
 	Button = Window.GetControl (1)
-	Button.SetText ("WMAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
-
-	# Map Control
-	Window.CreateMapControl (2, 0, 0, 0, 0)
-	Map = Window.GetControl (2)
-	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
-
-	Button = Window.GetControl (3)
-	Button.SetText ("Close")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-
-	Window.SetVisible (WINDOW_VISIBLE)
-	Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
-
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (99, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	GUICommonWindows.SetSelectionChangeHandler(None)
-	return
-
-def LeftDoublePressMap ():
-	# close the map on doubleclick
-	OpenMapWindow()
-	return
-
-def OpenWorldMapWindowInside ():
-	global MapWindow
-
-	OpenMapWindow () #closes mapwindow
-	MapWindow = -1
-	WorldMapWindowCommon (-1)
-	return
-
-def OpenWorldMapWindow ():
-	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
-	return
-
-def ChangeTooltip ():
-	global WorldMapWindow, WorldMapControl
-
-	tt = ""
-	area = WorldMapControl.GetDestinationArea ()
-	if area and area["Distance"] >= 0:
-		str = GemRB.GetString(23084)
-		if (str):
-			tt = "%s: %d"%(str,area["Distance"])
-
-	WorldMapControl.SetTooltip (tt)
-	return
-
-def CloseWorldMapWindow ():
-	global WorldMapWindow, WorldMapControl
-
-	if WorldMapWindow:
-		WorldMapWindow.Unload ()
-	WorldMapWindow = None
-	WorldMapControl = None
-	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.UnhideGUI ()
-	return
-
-def WorldMapWindowCommon (Travel):
-	global WorldMapWindow, WorldMapControl
-
-	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
-		CloseWorldMapWindow ()
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIMAP", WIDTH, HEIGHT)
-	WorldMapWindow = Window = GemRB.LoadWindow (0)
-
-	Label = Window.GetControl (0)
-	Label.SetText ("World map")
-
-	Button = Window.GetControl (1)
-	Button.SetText ("MAP")
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-
-	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
-	Window.SetFrame ()
-
-	Window.CreateWorldMapControl (2, 0, 0, 0, 0, Travel, "floattxt")
-	WorldMapControl = Window.GetControl (2)
-	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
-	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
-	# center on current area
-	MapC()
-
-	Button = Window.GetControl (3)
-	Button.SetText ("Close")
-	if Travel >= 0:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
+	if WorldMap:
+		Button.SetText ("MAP")
 	else:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow) # TODO: change to CloseTopWindow
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		Button.SetText ("WMAP")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: InitMapWindow (Window, not WorldMap))
 
-	Window.SetVisible (WINDOW_VISIBLE)
-	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	# Map or World Map control
+	if WorldMap:
+		if AreaMapControl:
+			AreaMapControl.SetVisible (False)
+			AreaMapControl.SetDisabled (True)
+
+		if WorldMapControl:
+			WorldMapControl.SetVisible (True)
+			WorldMapControl.SetDisabled (False)
+		else:
+			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, "floattxt")
+			WorldMapControl.SetAnimation ("WMDAG")
+			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+
+		WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
+		# center on current area
+		WorldMapControl.Scroll (0, 0, False)
+		WorldMapControl.Focus ()
+	else:
+		if WorldMapControl:
+			WorldMapControl.SetVisible (False)
+			WorldMapControl.SetDisabled (True)
+
+		if AreaMapControl:
+			AreaMapControl.SetVisible (True)
+			AreaMapControl.SetDisabled (False)
+		else:
+			AreaMapControl = Window.ReplaceSubview (4, IE_GUI_MAP)
+			AreaMapControl.SetAction (CloseMapWindow, IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+		AreaMapControl.Focus ()
+
+	Button = Window.GetControl (3)
+	Button.SetText ("Close")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
+	Button.SetHotKey ('m')
+
+	# workaround for proper closure with ESC
+	Button = Window.GetControl (99)
+	if not Button:
+		Button = Window.CreateButton (99, 0, 0, 0, 0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMapWindow)
+	Button.MakeEscape ()
+
 	return
 
-def MapC():
-	WorldMapControl.AdjustScrolling (0, 0)
+def CloseMapWindow ():
+	global WorldMapControl, AreaMapControl
+
+	WorldMapControl = None
+	AreaMapControl = None
+	GUICommonWindows.CloseTopWindow ()
+
+ToggleMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
+OpenMapWindow = GUICommonWindows.CreateTopWinLoader (0, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
+
+def OpenTravelWindow ():
+	Window = OpenMapWindow ()
+	InitMapWindow (Window, True)
 	return

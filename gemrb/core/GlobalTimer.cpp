@@ -23,7 +23,6 @@
 #include "ControlAnimation.h"
 #include "Game.h"
 #include "Interface.h"
-#include "Video.h"
 #include "GUI/GameControl.h"
 #include "RNG.h"
 
@@ -33,7 +32,7 @@ GlobalTimer::GlobalTimer(void)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
-	Init();
+	ClearAnimations();
 }
 
 GlobalTimer::~GlobalTimer(void)
@@ -44,111 +43,105 @@ GlobalTimer::~GlobalTimer(void)
 	}
 }
 
-void GlobalTimer::Init()
-{
-	fadeToCounter = 0;
-	fadeFromCounter = 0;
-	fadeFromMax = 0;
-	fadeToMax = 0;
-	fadeToFactor = fadeFromFactor = 1;
-	shakeX = shakeY = 0;
-	shakeCounter = 0;
-	startTime = 0; //forcing an update
-	speed = 0;
-	ClearAnimations();
-}
-
 void GlobalTimer::Freeze()
 {
 	unsigned long thisTime;
-	unsigned long advance;
 
 	UpdateAnimations(true);
 
 	thisTime = GetTicks();
-	advance = thisTime - startTime;
-	if ( advance < interval) {
+	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
+
 	startTime = thisTime;
 	Game* game = core->GetGame();
 	if (!game) {
 		return;
 	}
 	game->RealTime++;
-
-	ieDword count = advance/interval;
-	// pst/bg2 do this, if you fix it for another game, wrap it in a check
-	DoFadeStep(count);
-
-	// show scrolling cursor while paused
-	GameControl* gc = core->GetGameControl();
-	if (gc)
-		gc->UpdateScrolling();
 }
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return (goal.x!=currentVP.x) || (goal.y!=currentVP.y);
+	return shakeCounter || (!goal.isempty() && goal != currentVP.Origin());
 }
 
-void GlobalTimer::SetMoveViewPort(ieDword x, ieDword y, int spd, bool center)
+void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
 {
-	speed=spd;
-	currentVP=core->GetVideoDriver()->GetViewport();
+	GameControl* gc = core->GetGameControl();
+	currentVP = gc->Viewport();
+
 	if (center) {
-		x-=currentVP.w/2;
-		y-=currentVP.h/2;
+		p.x -= currentVP.w / 2;
+		p.y -= currentVP.h / 2;
 	}
-	goal.x=(short) x;
-	goal.y=(short) y;
+	goal = p;
+	speed = spd;
+	if (speed == 0) {
+		// do this instantly, even if paused
+		gc->MoveViewportTo(goal, false);
+		currentVP = gc->Viewport();
+	}
 }
 
 void GlobalTimer::DoStep(int count)
 {
-	Video *video = core->GetVideoDriver();
+	if (!ViewportIsMoving()) {
+		goal = Point(-1,-1);
+		return;
+	}
 
-	int x = currentVP.x;
-	int y = currentVP.y;
-	if ( (x != goal.x) || (y != goal.y)) {
-		if (speed) {
-			if (x<goal.x) {
-				x+=speed*count;
-				if (x>goal.x) x=goal.x;
-			} else {
-				x-=speed*count;
-				if (x<goal.x) x=goal.x;
-			}
-			if (y<goal.y) {
-				y+=speed*count;
-				if (y>goal.y) y=goal.y;
-			} else {
-				y-=speed*count;
-				if (y<goal.y) y=goal.y;
-			}
+	GameControl* gc = core->GetGameControl();
+
+	Point p = currentVP.Origin();
+	if (p != goal && !goal.isempty()) {
+		int d = Distance(goal, p);
+		int magnitude = count * speed;
+		
+		if (d <= magnitude) {
+			p = goal;
 		} else {
-			x=goal.x;
-			y=goal.y;
+			magnitude = std::min(magnitude, d);
+			float r = magnitude / float(d);
+			p.x = (1 - r) * p.x + r * goal.x;
+			p.y = (1 - r) * p.y + r * goal.y;
 		}
-		currentVP.x=x;
-		currentVP.y=y;
+	}
+	
+	if (!gc->MoveViewportTo(p, false)) {
+		// we have moved as close to the goal as possible
+		// something must have set a goal beyond the map
+		// update the goal just in case we are in a shake
+		goal = gc->Viewport().Origin();
 	}
 
-	if (shakeCounter) {
-		shakeCounter-=count;
-		if (shakeCounter<0) {
-			shakeCounter=0;
-		}
+	// do a possible shake in addition to the standard pan
+	// this is separate because it is unbounded by the map boundaries
+	// and we assume it is possible to get a shake and pan simultaniously
+	if (shakeCounter > 0) {
+		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {
-			if (shakeX) {
-				x += RAND(0, shakeX-1);
-			}
-			if (shakeY) {
-				y += RAND(0, shakeY-1);
-			}
+			Point shakeP = gc->Viewport().Origin();
+			shakeP += RandomPoint(-shakeVec.x, shakeVec.x, -shakeVec.y, shakeVec.y);
+			gc->MoveViewportUnlockedTo(shakeP, false);
 		}
 	}
-	video->MoveViewportTo(x,y);
+	
+	currentVP = gc->Viewport();
+}
+
+bool GlobalTimer::UpdateViewport(unsigned long thisTime)
+{
+	unsigned long advance = thisTime - startTime;
+	if ( advance < interval) {
+		return false;
+	}
+
+	ieDword count = ieDword(advance/interval);
+	DoStep(count);
+	DoFadeStep(count);
+	return true;
 }
 
 bool GlobalTimer::Update()
@@ -156,32 +149,23 @@ bool GlobalTimer::Update()
 	Map *map;
 	Game *game;
 	GameControl* gc;
-	unsigned long thisTime;
-	unsigned long advance;
-
-	gc = core->GetGameControl();
-	if (gc)
-		gc->UpdateScrolling();
+	unsigned long thisTime = GetTicks();
 
 	UpdateAnimations(false);
 
-	thisTime = GetTicks();
-
 	if (!startTime) {
-		startTime = thisTime;
-		return false;
+		goto end;
 	}
 
-	advance = thisTime - startTime;
-	if ( advance < interval) {
-		return false;
-	}
-	ieDword count = advance/interval;
-	DoStep(count);
-	DoFadeStep(count);
+	gc = core->GetGameControl();
 	if (!gc) {
 		goto end;
 	}
+
+	if (UpdateViewport(thisTime) == false) {
+		return false;
+	}
+
 	game = core->GetGame();
 	if (!game) {
 		goto end;
@@ -211,14 +195,14 @@ end:
 
 
 void GlobalTimer::DoFadeStep(ieDword count) {
-	Video *video = core->GetVideoDriver();
+	WindowManager* wm = core->GetWindowManager();
 	if (fadeToCounter) {
 		fadeToCounter-=count;
 		if (fadeToCounter<0) {
 			fadeToCounter=0;
 			fadeToFactor = 1;
 		}
-		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax / fadeToFactor);
+		wm->FadeColor.a = 255 * (double( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 		//bug/patch #1837747 made this unneeded
 		//goto end; //hmm, freeze gametime?
 	}
@@ -237,13 +221,13 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 				fadeToCounter=fadeFromMax;
 				fadeToFactor = 1;
 			}
-			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax / fadeFromFactor);
+			wm->FadeColor.a = 255 * (double( fadeFromMax - fadeFromCounter ) / fadeFromMax / fadeFromFactor);
 			//bug/patch #1837747 made this unneeded
 			//goto end; //freeze gametime?
 		}
 	}
 	if (fadeFromCounter==fadeFromMax) {
-		video->SetFadePercent( 0 );
+		wm->FadeColor.a = 0;
 	}
 }
 
@@ -341,12 +325,18 @@ void GlobalTimer::ClearAnimations()
 	first_animation = (unsigned int) animations.size();
 }
 
-void GlobalTimer::SetScreenShake(int shakeX, int shakeY,
-	unsigned long Count)
+void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
-	this->shakeX = shakeX;
-	this->shakeY = shakeY;
-	shakeCounter = Count+1;
+	shakeVec.x = std::abs(shake.x);
+	shakeVec.y = std::abs(shake.y);
+	shakeCounter = count + 1;
+	
+	if (goal.isempty()) {
+		GameControl* gc = core->GetGameControl();
+		currentVP = gc->Viewport();
+		goal = currentVP.Origin();
+		speed = 1000;
+	}
 }
 
 }

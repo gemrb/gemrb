@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>gemrb.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>net.sourceforge.gemrb</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

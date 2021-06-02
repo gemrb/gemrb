@@ -39,14 +39,13 @@ public:
 /*
 Public methods
 */
-	~TTFFontManager(void);
+	~TTFFontManager(void) override;
 	TTFFontManager(void);
 
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 	void Close();
 
-	Font* GetFont(unsigned short pxSize,
-				  FontStyle style, Palette* pal = NULL);
+	Font* GetFont(unsigned short pxSize, FontStyle style, bool background) override;
 
 	// freetype "callbacks"
 	static unsigned long read( FT_Stream       stream,

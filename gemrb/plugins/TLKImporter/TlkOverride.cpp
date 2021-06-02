@@ -22,6 +22,8 @@
 
 #include "TlkOverride.h"
 
+#include "Interface.h"
+
 #include <algorithm>
 #include <cstdio>
 #include <cassert>

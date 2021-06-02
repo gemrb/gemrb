@@ -23,6 +23,8 @@ import CommonTables
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 KitWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -41,7 +43,6 @@ def OnLoad():
 	global SchoolList, ClassName
 	global RowCount, TopIndex, KitTable, Init, MyChar
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MyChar = GemRB.GetVar ("Slot")
 	Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
 	RaceName = CommonTables.Races.GetRowName(CommonTables.Races.FindValue (3, Race) )
@@ -56,7 +57,9 @@ def OnLoad():
 
 	#there is a specialist mage window, but it is easier to use
 	#the class kit window for both
-	KitWindow = GemRB.LoadWindow(22)
+	KitWindow = GemRB.LoadWindow(22, "GUICG")
+	CharGenCommon.PositionCharGenWin(KitWindow)
+	
 	if ClassName == "MAGE":
 		Label = KitWindow.GetControl(0xfffffff)
 		Label.SetText(595)
@@ -82,18 +85,18 @@ def OnLoad():
 	if EnhanceGUI:
 		tmpRowCount = RowCount
 		if RowCount>10: #create 11 kit button
-			KitWindow.CreateButton (15, 18, 250, 271, 20)
-			extrakit = KitWindow.GetControl(15)
+			extrakit = KitWindow.CreateButton (15, 18, 250, 271, 20)
 			extrakit.SetState(IE_GUI_BUTTON_DISABLED)
 			extrakit.SetFlags(IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_CAPS, OP_OR)
 			extrakit.SetSprites("GUICGBC",0, 0,1,2,3)
 			RowCount = 11
+
 		if tmpRowCount>11: #create scroll bar
-			KitWindow.CreateScrollBar(1000, 290, 50, 16, 220, "GUISCRCW")
-			ScrollBar = KitWindow.GetControl (1000)
-			ScrollBar.SetVarAssoc("TopIndex",tmpRowCount-10)
+			ScrollBar = KitWindow.CreateScrollBar(1000, {'x' : 290, 'y' : 50, 'w' : 16, 'h' : 220}, "GUISCRCW")
+			ScrollBar.SetVarAssoc ("TopIndex", tmpRowCount-10, 0, tmpRowCount-10)
 			ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, RedrawKits)
-			ScrollBar.SetDefaultScrollBar()
+			KitWindow.SetEventProxy(ScrollBar)
+
 	elif not EnhanceGUI and RowCount>10:
 		RowCount = 10
 
@@ -107,10 +110,10 @@ def OnLoad():
 
 	BackButton = KitWindow.GetControl(8)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = KitWindow.GetControl(7)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = KitWindow.GetControl(5)
 	TextAreaControl.SetText(17247)
@@ -120,7 +123,7 @@ def OnLoad():
 	Init = 1
 	RedrawKits()
 	KitPress()
-	KitWindow.SetVisible(WINDOW_VISIBLE)
+	KitWindow.Focus()
 	return
 
 def RedrawKits():

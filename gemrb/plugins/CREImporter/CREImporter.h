@@ -65,16 +65,16 @@ private:
 	int QITCount; //items
 public:
 	CREImporter(void);
-	~CREImporter(void);
-	bool Open(DataStream* stream);
-	Actor* GetActor(unsigned char is_in_party);
+	~CREImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Actor* GetActor(unsigned char is_in_party) override;
 
-	int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const;
+	int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const override;
 
 	//returns saved size, updates internal offsets before save
-	int GetStoredFileSize(Actor *ac);
+	int GetStoredFileSize(Actor *ac) override;
 	//saves file
-	int PutActor(DataStream *stream, Actor *actor, bool chr=false);
+	int PutActor(DataStream *stream, Actor *actor, bool chr=false) override;
 private:
 	/** sets up some variables based on creature version for serializing the object */
 	void SetupSlotCounts();

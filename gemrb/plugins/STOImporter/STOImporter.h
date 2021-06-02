@@ -37,14 +37,14 @@ private:
 
 public:
 	STOImporter(void);
-	~STOImporter(void);
-	bool Open(DataStream* stream);
-	Store* GetStore(Store *store);
+	~STOImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Store* GetStore(Store *store) override;
 
 	//returns saved size, updates internal offsets before save
 	void CalculateStoredFileSize(Store *st) const;
 	//saves file
-	bool PutStore(DataStream *stream, Store *store);
+	bool PutStore(DataStream *stream, Store *store) override;
 
 private:
 	void GetItem(STOItem *item, Store* s);

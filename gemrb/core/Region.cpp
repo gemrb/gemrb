@@ -48,6 +48,20 @@ Point Point::operator-(const Point& p) const
 	return Point(x - p.x, y - p.y);
 }
 
+Point& Point::operator+=(const Point& rhs)
+{
+	x += rhs.x;
+	y += rhs.y;
+	return *this;
+}
+
+Point& Point::operator-=(const Point& rhs)
+{
+	x -= rhs.x;
+	y -= rhs.y;
+	return *this;
+}
+
 Point::Point(short x, short y)
 {
 	this->x = x;
@@ -75,15 +89,11 @@ bool Point::isempty() const
 	return (x == -1) && (y == -1);
 }
 
-bool Point::PointInside(const Point &p) const
+bool Point::isWithinRadius(int r, const Point& p) const
 {
-	if (( p.x < 0 ) || ( p.x > x )) {
-		return false;
-	}
-	if (( p.y < 0 ) || ( p.y > y )) {
-		return false;
-	}
-	return true;
+	Point d = operator-(p);
+	// sqrt is slow, just check a^2 + b^2 = c^2 <= r^2
+	return (d.x * d.x) + (d.y * d.y) <= r * r;
 }
 
 Size::Size()
@@ -97,12 +107,12 @@ Size::Size(int w, int h)
 	this->h = h;
 }
 
-bool Size::operator==(const Size& size)
+bool Size::operator==(const Size& size) const
 {
 	return (w == size.w &&  h == size.h);
 }
 
-bool Size::operator!=(const Size& size)
+bool Size::operator!=(const Size& size) const
 {
 	return !(*this == size);
 }
@@ -113,12 +123,12 @@ Region::Region(void)
 	x = y = w = h = 0;
 }
 
-bool Region::operator==(const Region& rgn)
+bool Region::operator==(const Region& rgn) const
 {
 	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
 }
 
-bool Region::operator!=(const Region& rgn)
+bool Region::operator!=(const Region& rgn) const
 {
 	return !(*this == rgn);
 }
@@ -150,6 +160,17 @@ bool Region::PointInside(const Point &p) const
 	return true;
 }
 
+bool Region::RectInside(const Region& r) const
+{
+	// top-left not covered
+	if (r.x < x || r.y < y) return false;
+
+	// bottom-right not covered
+	if (r.x + r.w > x + w || r.y + r.h > y + h) return false;
+
+	return true;
+}
+
 bool Region::IntersectsRegion(const Region& rgn) const
 {
 	if (x >= ( rgn.x + rgn.w )) {
@@ -177,22 +198,37 @@ Region Region::Intersect(const Region& rgn) const
 	return Region(ix1, iy1, ix2 - ix1, iy2 - iy1);
 }
 
-void Region::Normalize()
+void Region::ExpandToPoint(const Point& p)
 {
-	if (x > w) {
-		int tmp = x;
-		x = w;
-		w = tmp - x;
-	} else {
-		w -= x;
+	if (p.x < x) {
+		w += x - p.x;
+		x = p.x;
+	} else if (p.x > x + w) {
+		w = p.x - x;
 	}
-	if (y > h) {
-		int tmp = y;
-		y = h;
-		h = tmp - y;
-	} else {
-		h -= y;
+	
+	if (p.y < y) {
+		h += y - p.y;
+		y = p.y;
+	} else if (p.y > y + h) {
+		h = p.y - y;
 	}
+}
+
+void Region::ExpandToRegion(const Region& r)
+{
+	ExpandToPoint(r.Origin());
+	ExpandToPoint(r.Origin() + Point(r.w, 0));
+	ExpandToPoint(r.Maximum());
+	ExpandToPoint(r.Maximum() - Point(r.w, 0));
+}
+
+void Region::ExpandAllSides(int amt)
+{
+	x -= amt;
+	w += amt * 2;
+	y -= amt;
+	h += amt * 2;
 }
 
 }

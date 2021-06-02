@@ -32,11 +32,20 @@
 #include "Audio.h" // needed for _MSC_VER and SoundHandle (everywhere)
 #include "Cache.h"
 #include "Callback.h"
+#include "GameData.h"
+#include "GlobalTimer.h"
+#include "GUI/Control.h"
+#include "GUI/Tooltip.h"
+#include "GUI/Window.h"
+#include "GUI/GUIFactory.h"
 #include "Holder.h"
+#include "ImageMgr.h"
 #include "InterfaceConfig.h"
 #include "Resource.h"
+#include "Timer.h"
 #include "System/VFS.h"
 
+#include <array>
 #include <map>
 #include <string>
 #include <vector>
@@ -50,7 +59,6 @@
 #include "StringMgr.h"
 #include "SymbolMgr.h"
 #include "Video.h"
-#include "WindowMgr.h"
 #endif
 
 namespace GemRB {
@@ -59,14 +67,11 @@ class Actor;
 class Audio;
 class CREItem;
 class Calendar;
-class Console;
 class Container;
-class Control;
 class DataFileMgr;
 struct Effect;
 class EffectQueue;
-struct EffectDesc;
-class EventMgr;
+class EffectDesc;
 class Factory;
 class Font;
 class Game;
@@ -80,6 +85,7 @@ class Label;
 class Map;
 class MusicMgr;
 class Palette;
+using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
 class Resource;
 class SPLExtHeader;
@@ -98,8 +104,7 @@ class TableMgr;
 class TextArea;
 class Variables;
 class Video;
-class Window;
-class WindowMgr;
+class WindowManager;
 class WorldMap;
 class WorldMapArray;
 
@@ -194,20 +199,6 @@ public:
 	}
 };
 
-// Colors of modal window shadow
-// !!! Keep these synchronized with GUIDefines.py !!!
-enum MODAL_SHADOW {
-	MODAL_SHADOW_NONE = 0,
-	MODAL_SHADOW_GRAY,
-	MODAL_SHADOW_BLACK
-};
-
-#define WINDOW_INVALID   -1
-#define WINDOW_INVISIBLE 0
-#define WINDOW_VISIBLE   1
-#define WINDOW_GRAYED    2
-#define WINDOW_FRONT     3
-
 //quitflags
 #define QF_NORMAL        0
 #define QF_QUITGAME      1
@@ -292,11 +283,6 @@ enum MODAL_SHADOW {
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
 #define SLOT_EFFECT_HEAD     7 //head slot
 
-//fog of war bits
-#define FOG_DRAWFOG       1
-#define FOG_DRAWSEARCHMAP 2
-#define FOG_DITHERSPRITES 4
-
 enum PluginFlagsType {
 	PLF_NORMAL,
 	PLF_SKIP,
@@ -325,6 +311,33 @@ enum FeedbackType {
 	FT_CASTING = 64
 };
 
+enum DebugModeBits {
+	ID_REFERENCE = 1,
+	ID_CUTSCENE = 2,
+	ID_VARIABLES = 4,
+	ID_ACTIONS = 8,
+	ID_TRIGGERS = 16,
+	ID_VIEWS = 32,
+	ID_WINDOWS = 64,
+	ID_FONTS = 128,
+	ID_TEXT = 256
+};
+
+template<int SIZE>
+using ColorPal = std::array<Color, SIZE>;
+
+// TODO: there is no reason why this can't be generated directly from
+// the inventory button drag event using the button value as the slot id
+// to get the appropriate CREItem
+struct ItemDragOp : public Control::ControlDragOp {
+	CREItem* item;
+
+	ItemDragOp(CREItem* item);
+	
+private:
+	static Control dragDummy;
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -333,22 +346,20 @@ enum FeedbackType {
 class GEM_EXPORT Interface
 {
 private:
+	// dirvers must be deallocated last (keep them at the top)
+	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
+
 	std::string VideoDriverName;
 	std::string AudioDriverName;
 	ProjectileServer * projserv;
 
-	EventMgr * evntmgr;
-	Holder<WindowMgr> windowmgr;
-	Window* ModalWindow;
-	MODAL_SHADOW modalShadow;
-	char WindowPack[10];
+	WindowManager* winmgr;
+	Holder<GUIFactory> guifact;
 	Holder<ScriptEngine> guiscript;
+	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator;
-	/** Windows Array */
-	std::vector<Window*> windows;
-	std::vector<int> topwin;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
@@ -374,31 +385,24 @@ private:
 	ResRef TextFontResRef;
 	ResRef TooltipFontResRef;
 
-	ResRef TooltipBackResRef;
+	TooltipBackground* TooltipBG;
 	ieResRef *DefSound; //default sounds
 	int DSCount;
-	int TooltipMargin;
 
-	Image * pal256;
-	Image * pal32;
-	Image * pal16;
 	ResRef Palette16;
 	ResRef Palette32;
 	ResRef Palette256;
+	std::vector<ColorPal<256>> palettes256;
+	std::vector<ColorPal<32>>  palettes32;
+	std::vector<ColorPal<16>>  palettes16;
 
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	SlotType* slottypes;
 	int ItemTypes;
-	int tooltip_x;
-	int tooltip_y;
-	int tooltip_currtextw;
-	Holder<SoundHandle> tooltip_sound;
-	// the control owning the tooltip
-	Control* tooltip_ctrl;
+
 	// Currently dragged item or NULL
-	CREItem* DraggedItem;
-	int DraggedPortrait;
+	std::unique_ptr<ItemDragOp> DraggedItem;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
@@ -409,36 +413,34 @@ private:
 	bool update_scripts;
 	/** Next Script Name */
 	char NextScript[64];
-	/** Function to call every main loop iteration */
-	EventHandler TickHook;
+
+	std::deque<Timer> timers;
 	int SpecialSpellsCount;
 	SpecialSpellType *SpecialSpells;
 	KeyMap *keymap;
 	std::string Encoding;
 	Scriptable *CutSceneRunner;
+	int debugMode = 0;
+
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
 	Holder<StringMgr> strings;
 	Holder<StringMgr> strings2;
-	GlobalTimer * timer;
-	Palette *InfoTextPalette;
+	GlobalTimer timer;
+	Color InfoTextColor;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;
 	Holder<SaveGame> LoadGameIndex;
 	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
-	ieResRef GlobalScript;
-	ieResRef WorldMapName[2];
+	ResRef GlobalScript;
+	ResRef WorldMapName[2];
 	Variables * AreaAliasTable;
-	Sprite2D **Cursors;
-	int CursorCount;
-	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
-	Sprite2D *FogSprites[32];
-	Sprite2D **TooltipBack;
-	Sprite2D *WindowFrames[4];
-	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
+	std::vector<Holder<Sprite2D> > Cursors;
+	Holder<Sprite2D> FogSprites[16] {};
+	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
 	TimeStruct Time;
@@ -446,6 +448,9 @@ public:
 public:
 	Interface();
 	~Interface(void);
+	
+	Interface(const Interface&) = delete;
+	
 	int Init(InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(int value, int position);
@@ -466,45 +471,30 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */
-	Color * GetPalette(unsigned index, int colors, Color *buffer) const;
+	const ColorPal<16>& GetPalette16(uint8_t idx) const { return (idx >= palettes16.size()) ? palettes16[0] : palettes16[idx]; }
+	const ColorPal<32>& GetPalette32(uint8_t idx) const { return (idx >= palettes32.size()) ? palettes32[0] : palettes32[idx]; }
+	const ColorPal<256>& GetPalette256(uint8_t idx) const { return (idx >= palettes256.size()) ? palettes256[0] : palettes256[idx]; }
 	/** Returns a preloaded Font */
 	Font* GetFont(const ResRef&) const;
 	Font* GetTextFont() const;
 	/** Returns the button font */
 	Font * GetButtonFont() const;
-	/** Returns the Event Manager */
-	EventMgr * GetEventMgr() const;
-	/** Returns the Window Manager */
-	WindowMgr * GetWindowMgr() const;
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
 	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod=1);
-	/** Loads a WindowPack (CHUI file) in the Window Manager */
-	bool LoadWindowPack(const char *name);
+	/** Get the Window Manager */
+	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
-	int LoadWindow(unsigned short WindowID);
+	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
-	bool IsPresentingModalWindow() {return (bool)(ModalWindow);};
-#ifdef WIN32
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-#endif
-	int CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background);
-	/** Sets a Window on the Top */
-	void SetOnTop(int Index);
-	/** Add a window to the Window List */
-	void AddWindow(Window * win);
-	/** Adjust the scrolling of the control (if applicable) */
-	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
-	/** Set the Tooltip text of a Control */
-	int SetTooltip(unsigned short WindowIndex, unsigned short ControlIndex, const char * string, int Function = 0);
-	/** sets tooltip to be displayed */
-	void DisplayTooltip(int x, int y, Control* ctrl);
-	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
-	void DrawTooltip();
+#undef CreateWindow // Win32 might define this, so nix it
+	Window* CreateWindow(unsigned short WindowID, const Region&);
+	void ToggleViewsVisible(bool visible, const ResRef& group);
+	void ToggleViewsEnabled(bool enabled, const ResRef& group);
+
+	Tooltip CreateTooltip();
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
@@ -512,30 +502,6 @@ public:
 	void SetFeedbackLevel(int level);
 	/** returns true if the passed feedback type is enabled */
 	bool HasFeedback(int type) const;
-	/** returns the Window Visible Flag */
-	int GetVisible(unsigned short WindowIndex) const;
-	/** Set a Window Visible Flag */
-	int SetVisible(unsigned short WindowIndex, int visible);
-	/** Show a Window in Modal Mode */
-	int ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow);
-	/** Set the Status of a Control in a Window */
-	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
-	/** Get a Window from the Loaded Window List */
-	Window * GetWindow(unsigned short WindowIndex) const;
-	/** Returns true if wnd is a valid window with WindowIndex */
-	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
-	/** Removes a Loaded Window */
-	int DelWindow(unsigned short WindowIndex);
-	/** Removes all Loaded Windows */
-	void DelAllWindows();
-	/** Redraws all window */
-	void RedrawAll();
-	/** Refreshes any control associated with the variable name with value*/
-	void RedrawControls(const char *varname, unsigned int value);
-	/** Attempts to paste text into the interface. */
-	void RequestPasting(const String&);
-	/** Popup the Console */
-	void PopupConsole();
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
@@ -603,12 +569,7 @@ public:
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
-	void SetWindowFrame(int i, Sprite2D *Picture);
-	/** hides the game control window (if it exists), and reports success */
-	bool HideGCWindow();
-	/** unhides the game control window, if it exists */
-	void UnhideGCWindow();
-	GameControl *GetGameControl() const;
+	GameControl *GetGameControl() const { return (game) ? gamectrl : NULL; }
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */
@@ -617,7 +578,7 @@ public:
 	to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
 	/** reloads the world map from a resource file */
-	void UpdateWorldMap(ieResRef wmResRef);
+	void UpdateWorldMap(ResRef wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
@@ -650,15 +611,15 @@ public:
 	bool ProtectedExtension(const char *filename);
 	/*returns true if the directory path isn't good as a Cache */
 	bool StupidityDetector(const char* Pt);
+	bool InDebugMode(int mode) const { return debugMode & mode; };
+	void SetDebugMode(int mode) { debugMode = mode; };
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
-	CREItem* GetDraggedItem() const { return DraggedItem; }
+	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
-	int GetDraggedPortrait() const { return DraggedPortrait; }
-	void SetDraggedPortrait(int dp, int cursor=-1);
 	CREItem *ReadItem(DataStream *str);
 	CREItem *ReadItem(DataStream *str, CREItem *itm);
 	void SanitizeItem(CREItem *item) const;
@@ -672,26 +633,21 @@ public:
 	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed();
-	// FIXME: due to Win32 we have to allocate/release all common
-	// memory from Interface. Yes, it is ugly.
-	ITMExtHeader *GetITMExt(int count);
-	SPLExtHeader *GetSPLExt(int count);
+
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
-	Effect *GetFeatures(int count);
-	void FreeITMExt(ITMExtHeader *p, Effect *e);
-	void FreeSPLExt(SPLExtHeader *p, Effect *e);
-	WorldMapArray *NewWorldMapArray(int count);
 	/** plays stock gui sound referenced by index */
-	void PlaySound(int idx, unsigned int channel);
+	Holder<SoundHandle> PlaySound(int idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
 	Actor *GetFirstSelectedActor();
+	/** is an area loaded? (prefer Game::GetCurrentArea if including Game.h makes sense) */
+	bool HasCurrentArea() const;
 	/** returns a cursor sprite (not cached) */
-	Sprite2D *GetCursorSprite();
+	Holder<Sprite2D> GetCursorSprite();
 	/** returns a scroll cursor sprite */
-	Sprite2D *GetScrollCursorSprite(int frameNum, int spriteNum);
+	Holder<Sprite2D> GetScrollCursorSprite(int frameNum, int spriteNum);
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;
@@ -754,8 +710,6 @@ public:
 	/** Returns the music playlist corresponding to the provided type */
 	/** it allows scrapping the entry, hence it isn't const */
 	char *GetMusicPlaylist(int SongType) const;
-	/** Removes the extraneus EOL newline and carriage return */
-	void StripLine(char * string, size_t size);
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
 	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
@@ -770,6 +724,28 @@ private:
 	bool LoadGemRBINI();
 	/** Load the encoding table selected in gemrb.cfg */
 	bool LoadEncoding();
+
+	template<int SIZE>
+	bool LoadPalette(ResRef resref, std::vector<ColorPal<SIZE>>& palettes)
+	{
+		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
+
+		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
+		if (palim) {
+			auto image = palim->GetImage();
+			int height = image->GetHeight();
+			palettes.resize(height);
+			for (int row = 0; row < height; ++row) {
+				for (int col = 0; col < SIZE; ++col) {
+					palettes[row][col] = image->GetPixel(col, row);
+				}
+			}
+			delete image;
+			return true;
+		}
+		return false;
+	}
+
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
@@ -796,6 +772,7 @@ private:
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
 	ieDword *GetListFrom2DAInternal(const ieResRef resref);
+
 public:
 	char GameDataPath[_MAX_PATH];
 	char GameOverridePath[_MAX_PATH];
@@ -812,7 +789,6 @@ public:
 	char GameName[_MAX_PATH];
 	char GameType[10];
 	int GamepadPointerSpeed = 10;
-	bool VitaKeepAspectRatio = true;
 	char GemRBPath[_MAX_PATH];
 	char PluginsPath[_MAX_PATH];
 	char CachePath[_MAX_PATH];
@@ -823,14 +799,12 @@ public:
 	std::vector<std::string> CD[MAX_CD];
 	std::vector<std::string> ModPath;
 	int Width = 640, Height = 480, Bpp = 32;
-	unsigned int TooltipDelay;
 	int IgnoreOriginalINI;
-	unsigned int FogOfWar;
-	bool CaseSensitive = true, SkipIntroVideos = false, DrawFPS = false;
-	bool TouchScrollAreas, UseSoftKeyboard;
+	bool DitherSprites = true;
+	bool CaseSensitive = true, DrawFPS = false;
+	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
 	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
 	int MouseFeedback;
-	int GUIEnhancements;
 	int MaxPartySize;
 	bool KeepCache;
 	bool MultipleQuickSaves;
@@ -842,8 +816,6 @@ public:
 	void Main(void);
 	/** returns true if the game is paused */
 	bool IsFreezed();
-	/** Draws the Visible windows in the Windows Array */
-	void DrawWindows(bool allow_delete = false);
 	void AskAndExit();
 	void ExitGemRB(void);
 	/** CheatKey support */
@@ -870,19 +842,12 @@ public:
 
 	/** Set Next Script */
 	void SetNextScript(const char *script);
-	/** Console is on Screen */
-	bool ConsolePopped;
 	/** Cheats enabled? */
 	bool CheatFlag;
-	/** The Console Object */
-	Console * console;
 
 	Audio* GetAudioDrv(void) const;
 
-	void SetTickHook(EventHandler);
-
-	void SetBits(unsigned int &flag, unsigned int value, int mode) const;
-	ieDword CountBits (ieDword n) const;
+	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
 };
 
 extern GEM_EXPORT Interface * core;

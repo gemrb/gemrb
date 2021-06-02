@@ -19,6 +19,7 @@
 # character generation, feats (GUICG6)
 import GemRB
 import GUICommon
+import CharOverview
 import CommonTables
 import IDLUCommon
 from GUIDefines import *
@@ -121,10 +122,10 @@ def RedrawFeats():
 	SumLabel = FeatWindow.GetControl(0x1000000c)
 	if PointsLeft == 0:
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SumLabel.SetTextColor(255, 255, 255)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 	else:
 		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-		SumLabel.SetTextColor(255, 255, 0)
+		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 0})
 
 	SumLabel.SetText(str(PointsLeft) )
 
@@ -144,17 +145,17 @@ def RedrawFeats():
 			# check if feat is usable - can be taken
 			if IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
-				Label.SetTextColor(255, 255, 255)
+				Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 			else:
 				ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-				Label.SetTextColor(150, 150, 150)
+				Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
 			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-			Label.SetTextColor(150, 150, 150)
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 			# check for maximum if there are more feat levels
 			if MultiLevelFeat(FeatName) > FeatValue and IsFeatUsable(FeatName):
 				ButtonPlus.SetState(IE_GUI_BUTTON_ENABLED)
-				Label.SetTextColor(255, 255, 255)
+				Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
 
 			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
 			if FeatValue > BaseValue:
@@ -164,7 +165,7 @@ def RedrawFeats():
 
 		if PointsLeft == 0:
 			ButtonPlus.SetState(IE_GUI_BUTTON_DISABLED)
-			Label.SetTextColor(150, 150, 150)
+			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
 
 		levels = FeatReqTable.GetValue(FeatName, "MAX_LEVEL")
 		FeatValueCounter = FeatValue
@@ -296,11 +297,10 @@ def OpenFeatsWindow(chargen=0):
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	if chargen:
-		GemRB.LoadWindowPack ("GUICG", 800, 600)
-		FeatWindow = GemRB.LoadWindow (55)
+		FeatWindow = GemRB.LoadWindow (55, "GUICG")
+		CharOverview.PositionCharGenWin (FeatWindow)
 	else:
-		GemRB.LoadWindowPack ("GUIREC", 800, 600)
-		FeatWindow = GemRB.LoadWindow (56)
+		FeatWindow = GemRB.LoadWindow (56, "GUIREC")
 
 	for i in range(ButtonCount):
 		Button = FeatWindow.GetControl(i+93)
@@ -310,10 +310,12 @@ def OpenFeatsWindow(chargen=0):
 		Button = FeatWindow.GetControl(i*2+14)
 		Button.SetVarAssoc("Feat",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
+		Button.SetActionInterval (200)
 
 		Button = FeatWindow.GetControl(i*2+15)
 		Button.SetVarAssoc("Feat",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
+		Button.SetActionInterval (200)
 		for j in range(5):
 			Star=FeatWindow.GetControl(i*5+j+36)
 			Star.SetState(IE_GUI_BUTTON_DISABLED)
@@ -322,13 +324,14 @@ def OpenFeatsWindow(chargen=0):
 	if chargen:
 		BackButton = FeatWindow.GetControl(105)
 		BackButton.SetText(15416)
-		BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+		BackButton.MakeEscape()
 		BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	else:
 		FeatWindow.DeleteControl (105)
+
 	DoneButton = FeatWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = FeatWindow.GetControl(92)
 	TextAreaControl.SetText(36476)
@@ -339,13 +342,15 @@ def OpenFeatsWindow(chargen=0):
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl.SetVarAssoc("TopIndex",RowCount-10)
-	ScrollBarControl.SetDefaultScrollBar ()
+	FeatWindow.SetEventProxy(ScrollBarControl)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	RedrawFeats()
-	FeatWindow.SetVisible(WINDOW_VISIBLE)
+
 	if not CharGen:
 		FeatWindow.ShowModal (MODAL_SHADOW_GRAY)
+	else:
+		FeatWindow.Focus()
 	return
 
 def JustPress():
@@ -392,7 +397,6 @@ def BackPress():
 	return
 
 def NextPress(save=1):
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	if FeatWindow:
 		FeatWindow.Unload()
 

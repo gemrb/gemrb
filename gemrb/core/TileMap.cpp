@@ -31,18 +31,16 @@ namespace GemRB {
 
 TileMap::TileMap(void)
 {
-	LargeMap = !core->HasFeature(GF_SMALL_FOG);
 }
 
 TileMap::~TileMap(void)
 {
 	ClearOverlays();
+
 	for (const InfoPoint *infoPoint : infoPoints) {
 		delete infoPoint;
 	}
-	for (const Container *container : containers) {
-		delete container;
-	}
+
 	for (const Door *door : doors) {
 		delete door;
 	}
@@ -85,15 +83,12 @@ TileObject* TileMap::GetTile(unsigned int idx)
 
 //doors
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indices, int count,
-	Gem_Polygon* open, Gem_Polygon* closed)
+	int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt)
 {
-	Door* door = new Door( overlays[0] );
+	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles( indices, count );
-	door->SetPolygon( false, closed );
-	door->SetPolygon( true, open );
 	door->SetName( ID );
 	door->SetScriptName( Name );
 	doors.push_back( door );
@@ -110,27 +105,8 @@ Door* TileMap::GetDoor(unsigned int idx) const
 
 Door* TileMap::GetDoor(const Point &p) const
 {
-	for (Door *door : doors) {
-		Gem_Polygon *doorpoly;
-
-		if (door->Flags&DOOR_HIDDEN) {
-			continue;
-		}
-		if (door->Flags&DOOR_OPEN)
-			doorpoly = door->open;
-		else
-			doorpoly = door->closed;
-
-		if (doorpoly->BBox.x > p.x)
-			continue;
-		if (doorpoly->BBox.y > p.y)
-			continue;
-		if (doorpoly->BBox.x + doorpoly->BBox.w < p.x)
-			continue;
-		if (doorpoly->BBox.y + doorpoly->BBox.h < p.y)
-			continue;
-		if (doorpoly->PointIn( p ))
-			return door;
+	for (Door* door : doors) {
+		if (door->HitTest(p)) return door;
 	}
 	return NULL;
 }
@@ -206,205 +182,9 @@ void TileMap::AddRainOverlay(TileOverlay* overlay)
 	rain_overlays.push_back( overlay );
 }
 
-void TileMap::DrawOverlays(Region screen, int rain, int flags)
+void TileMap::DrawOverlays(const Region& viewport, bool rain, int flags)
 {
-	overlays[0]->Draw(screen, rain ? rain_overlays : overlays, flags);
-}
-
-// Size of Fog-Of-War shadow tile (and bitmap)
-#define CELL_SIZE  32
-
-// Ratio of bg tile size and fog tile size
-#define CELL_RATIO 2
-
-// Returns 1 if map at (x;y) was explored, else 0. Points outside map are
-//   always considered as explored
-#define IS_EXPLORED( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (explored_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
-
-#define IS_VISIBLE( x, y )   (((x) < 0 || (x) >= w || (y) < 0 || (y) >= h) ? 1 : (visible_mask[(w * (y) + (x)) / 8] & (1 << ((w * (y) + (x)) % 8))))
-
-#define FOG(i)  vid->BlitSprite( core->FogSprites[i], r.x, r.y, true, &r )
-
-
-void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport)
-{
-	// viewport - pos & size of the control
-	int w = XCellCount * CELL_RATIO;
-	int h = YCellCount * CELL_RATIO;
-	if (LargeMap) {
-		w++;
-		h++;
-	}
-
-	Video* vid = core->GetVideoDriver();
-	Region vp = vid->GetViewport();
-
-	vp.w = viewport.w;
-	vp.h = viewport.h;
-	if (( vp.x + vp.w ) > w * CELL_SIZE) {
-		vp.x = ( w * CELL_SIZE - vp.w );
-	}
-	if (vp.x < 0) {
-		vp.x = 0;
-	}
-	if (( vp.y + vp.h ) > h * CELL_SIZE) {
-		vp.y = ( h * CELL_SIZE - vp.h );
-	}
-	if (vp.y < 0) {
-		vp.y = 0;
-	}
-	int sx = ( vp.x ) / CELL_SIZE;
-	int sy = ( vp.y ) / CELL_SIZE;
-	int dx = sx + vp.w / CELL_SIZE + 2;
-	int dy = sy + vp.h / CELL_SIZE + 2;
-	int x0 = sx * CELL_SIZE - vp.x;
-	int y0 = sy * CELL_SIZE - vp.y;
-	if (LargeMap) {
-		x0 -= CELL_SIZE / 2;
-		y0 -= CELL_SIZE / 2;
-		dx++;
-		dy++;
-	}
-	for (int y = sy; y < dy && y < h; y++) {
-		for (int x = sx; x < dx && x < w; x++) {
-			Region r = Region(x0 + viewport.x + ( (x - sx) * CELL_SIZE ), y0 + viewport.y + ( (y - sy) * CELL_SIZE ), CELL_SIZE, CELL_SIZE);
-			if (! IS_EXPLORED( x, y )) {
-				// Unexplored tiles are all black
-				vid->DrawRect(r, ColorBlack, true, true);
-				continue;  // Don't draw 'invisible' fog
-			}
-			else {
-				// If an explored tile is adjacent to an
-				//   unexplored one, we draw border sprite
-				//   (gradient black <-> transparent)
-				// Tiles in four cardinal directions have these
-				//   values.
-				//
-				//      1
-				//    2   8
-				//      4
-				//
-				// Values of those unexplored are
-				//   added together, the resulting number being
-				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by
-				//   drawing two or more tiles
-
-				int e = ! IS_EXPLORED( x, y - 1);
-				if (! IS_EXPLORED( x - 1, y )) e |= 2;
-				if (! IS_EXPLORED( x, y + 1 )) e |= 4;
-				if (! IS_EXPLORED( x + 1, y )) e |= 8;
-
-				switch (e) {
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 6:
-				case 8:
-				case 9:
-				case 12:
-					FOG( e );
-					break;
-				case 5:
-					FOG( 1 );
-					FOG( 4 );
-					break;
-				case 7:
-					FOG( 3 );
-					FOG( 6 );
-					break;
-				case 10:
-					FOG( 2 );
-					FOG( 8 );
-					break;
-				case 11:
-					FOG( 3 );
-					FOG( 9 );
-					break;
-				case 13:
-					FOG( 9 );
-					FOG( 12 );
-					break;
-				case 14:
-					FOG( 6 );
-					FOG( 12 );
-					break;
-				case 15: //this is black too
-					vid->DrawRect(r, ColorBlack, true, true);
-					break;
-				}
-			}
-
-			if (! IS_VISIBLE( x, y )) {
-				// Invisible tiles are all gray
-				FOG( 16 );
-				continue;  // Don't draw 'invisible' fog
-			}
-			else {
-				// If a visible tile is adjacent to an
-				//   invisible one, we draw border sprite
-				//   (gradient gray <-> transparent)
-				// Tiles in four cardinal directions have these
-				//   values.
-				//
-				//      1
-				//    2   8
-				//      4
-				//
-				// Values of those invisible are
-				//   added together, the resulting number being
-				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by
-				//   drawing two or more tiles
-
-				int e = ! IS_VISIBLE( x, y - 1);
-				if (! IS_VISIBLE( x - 1, y )) e |= 2;
-				if (! IS_VISIBLE( x, y + 1 )) e |= 4;
-				if (! IS_VISIBLE( x + 1, y )) e |= 8;
-
-				switch (e) {
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-				case 6:
-				case 8:
-				case 9:
-				case 12:
-					FOG( 16 + e );
-					break;
-				case 5:
-					FOG( 16 + 1 );
-					FOG( 16 + 4 );
-					break;
-				case 7:
-					FOG( 16 + 3 );
-					FOG( 16 + 6 );
-					break;
-				case 10:
-					FOG( 16 + 2 );
-					FOG( 16 + 8 );
-					break;
-				case 11:
-					FOG( 16 + 3 );
-					FOG( 16 + 9 );
-					break;
-				case 13:
-					FOG( 16 + 9 );
-					FOG( 16 + 12 );
-					break;
-				case 14:
-					FOG( 16 + 6 );
-					FOG( 16 + 12 );
-					break;
-				case 15: //this is unseen too
-					FOG( 16 );
-					break;
-				}
-			}
-		}
-	}
+	overlays[0]->Draw(viewport, rain ? rain_overlays : overlays, flags);
 }
 
 //containers
@@ -440,14 +220,8 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 		if (type != -1 && type != container->Type) {
 			continue;
 		}
-		if (container->outline->BBox.x > position.x)
-			continue;
-		if (container->outline->BBox.y > position.y)
-			continue;
-		if (container->outline->BBox.x + container->outline->BBox.w < position.x)
-			continue;
-		if (container->outline->BBox.y + container->outline->BBox.h < position.y)
-			continue;
+
+		if (!container->BBox.PointInside(position)) continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
 		if (container->Type == IE_CONTAINER_PILE) {
@@ -457,9 +231,9 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 				continue;
 			}
 			return container;
-		}
-		if (container->outline->PointIn(position))
+		} else if (container->outline->PointIn(position)) {
 			return container;
+		}
 	}
 	return NULL;
 }
@@ -509,8 +283,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
-	Gem_Polygon* outline)
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );
@@ -532,6 +305,8 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 			break;
 	}
 	ip->outline = outline;
+	if (ip->outline)
+		ip->BBox = outline->BBox;
 	//ip->Active = true; //set active on creation
 	infoPoints.push_back( ip );
 	return ip;
@@ -558,16 +333,14 @@ InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 
 		if (!(infoPoint->GetInternalFlag() & IF_ACTIVE))
 			continue;
-		if (infoPoint->outline->BBox.x > p.x)
-			continue;
-		if (infoPoint->outline->BBox.y > p.y)
-			continue;
-		if (infoPoint->outline->BBox.x + infoPoint->outline->BBox.w < p.x)
-			continue;
-		if (infoPoint->outline->BBox.y + infoPoint->outline->BBox.h < p.y)
-			continue;
-		if (infoPoint->outline->PointIn(p))
+
+		if (infoPoint->outline) {
+			if (infoPoint->outline->PointIn(p)) {
+				return infoPoint;
+			}
+		} else if (infoPoint->BBox.PointInside(p)) {
 			return infoPoint;
+		}
 	}
 	return NULL;
 }
@@ -622,9 +395,9 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	return best;
 }
 
-Point TileMap::GetMapSize()
+Size TileMap::GetMapSize()
 {
-	return Point((short) (XCellCount*64), (short) (YCellCount*64));
+	return Size((XCellCount*64), (YCellCount*64));
 }
 
 }

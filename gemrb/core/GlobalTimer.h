@@ -39,19 +39,19 @@ struct AnimationRef
 
 class GEM_EXPORT GlobalTimer {
 private:
-	unsigned long startTime;
+	unsigned long startTime = 0; //forcing an update;
 	unsigned long interval;
 
-	int fadeToCounter, fadeToMax;
-	int fadeFromCounter, fadeFromMax;
-	unsigned short fadeToFactor, fadeFromFactor;
-	int shakeCounter;
-	int shakeX, shakeY;
+	int fadeToCounter = 0, fadeToMax = 0;
+	int fadeFromCounter = 0, fadeFromMax = 0;
+	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
+	int shakeCounter = 0;
+	Point shakeVec;
 	unsigned int first_animation;
 	std::vector<AnimationRef*>  animations;
 	//move viewport to this coordinate
-	Point goal;
-	int speed;
+	Point goal = Point(-1, -1);
+	int speed = 0;
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
@@ -59,19 +59,24 @@ private:
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
+	
+	GlobalTimer(GlobalTimer&&) = default;
+	GlobalTimer& operator=(GlobalTimer&&) = default;
 public:
-	void Init();
 	void Freeze();
 	bool Update();
 	bool ViewportIsMoving();
 	void DoStep(int count);
-	void SetMoveViewPort(ieDword x, ieDword y, int spd, bool center);
+	void SetMoveViewPort(Point p, int spd, bool center);
 	void SetFadeToColor(unsigned long Count, unsigned short factor = 1);
 	void SetFadeFromColor(unsigned long Count, unsigned short factor = 1);
-	void SetScreenShake(int shakeX, int shakeY, unsigned long Count);
+	void SetScreenShake(const Point&, int Count);
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();
+
+private:
+	bool UpdateViewport(unsigned long time);
 };
 
 }

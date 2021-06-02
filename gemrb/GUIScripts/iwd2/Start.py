@@ -23,10 +23,8 @@ import LoadScreen
 from GUIDefines import *
 from datetime import datetime
 
-StartWindow = 0
-ProtocolWindow = 0
-QuitWindow = 0
 QuickLoadSlot = 0
+StartWindow = None;
 
 def OnLoad():
 	global StartWindow, QuickLoadSlot
@@ -39,21 +37,15 @@ def OnLoad():
 		GemRB.PlayMovie ('INTRO', 1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
-	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if screen_width == 1024:
-		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
-	GemRB.LoadWindowPack("GUICONN", 800, 600)
 #main window
-	StartWindow = GemRB.LoadWindow(0)
-	StartWindow.SetFrame ()
+	StartWindow = GemRB.LoadWindow(0, "GUICONN")
 	time = datetime.now()
 
 	# IWD2 has some nice background for the night
 	if time.hour >= 18 or time.hour <= 6:
-		StartWindow.SetPicture ("STARTN");
-		StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
-		AnimButton = StartWindow.GetControl (0xfff0001)
+		StartWindow.SetBackground ("STARTN");
+
+		AnimButton = StartWindow.CreateButton (0xfff0001, 57, 333, 100, 100);
 		AnimButton.SetAnimation ("MMTRCHB")
 		AnimButton.SetState (IE_GUI_BUTTON_LOCKED)
 		AnimButton.SetFlags (IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
@@ -65,8 +57,7 @@ def OnLoad():
 	JoinGameButton = StartWindow.GetControl(0x0B)
 	OptionsButton = StartWindow.GetControl(0x08)
 	QuitGameButton = StartWindow.GetControl(0x01)
-	StartWindow.CreateLabel(0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	VersionLabel = StartWindow.GetControl(0x0fff0000)
+	VersionLabel = StartWindow.CreateLabel(0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	VersionLabel.SetText(GemRB.Version)
 	ProtocolButton.SetStatus(IE_GUI_BUTTON_ENABLED)
 	NewGameButton.SetStatus(IE_GUI_BUTTON_ENABLED)
@@ -102,23 +93,22 @@ def OnLoad():
 	JoinGameButton.SetText(13964)
 	OptionsButton.SetText(13905)
 	QuitGameButton.SetText(13731)
-	QuitGameButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	QuitGameButton.MakeEscape()
 	NewGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewGamePress)
 	QuitGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
 	ProtocolButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
 	OptionsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, OptionsPress)
 	LoadGameButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadPress)
 	QuickLoadButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuickLoadPress)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	StartWindow.Focus()
 	GemRB.LoadMusicPL("Theme.mus")
+	
+	StartWindow.SetAction(RefreshProtocol, ACTION_WINDOW_FOCUS_GAINED)
 
 	return
 
 def ProtocolPress():
-	global StartWindow, ProtocolWindow
-	#StartWindow.Unload()
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
-	ProtocolWindow = GemRB.LoadWindow(1)
+	ProtocolWindow = GemRB.LoadWindow(1, "GUICONN")
 
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl(2)
@@ -152,18 +142,14 @@ def ProtocolPress():
 
 	DoneButton = ProtocolWindow.GetControl(6)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ProtocolWindow.Close())
+	DoneButton.MakeEscape()
 
-	ProtocolWindow.SetVisible(WINDOW_VISIBLE)
+	ProtocolWindow.Focus()
 	return
 
-def ProtocolDonePress():
-	global StartWindow, ProtocolWindow
-	if ProtocolWindow:
-		ProtocolWindow.Unload()
-
-	ProtocolButton = StartWindow.GetControl(0x00)
+def RefreshProtocol(win):
+	ProtocolButton = win.GetControl(0)
 
 	LastProtocol = GemRB.GetVar("Last Protocol Used")
 	if LastProtocol == 0:
@@ -173,19 +159,14 @@ def ProtocolDonePress():
 	elif LastProtocol == 2:
 		ProtocolButton.SetText(13968)
 
-	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return
 
 def LoadPress():
-	global StartWindow
-
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def QuickLoadPress():
-	global StartWindow, QuickLoadSlot
+	global QuickLoadSlot
 
 	LoadScreen.StartLoadScreen()
 	GemRB.LoadGame(QuickLoadSlot) # load & start game
@@ -193,45 +174,27 @@ def QuickLoadPress():
 	return
 
 def OptionsPress():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload()
 	GemRB.SetNextScript("Options")
 	return
 
 def QuitPress():
-	global StartWindow, QuitWindow
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
 	QuitWindow = GemRB.LoadWindow(22)
 	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl(1)
-	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitQuitPress)
-	QuitButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	QuitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, GemRB.Quit)
+	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl(0)
 	CancelButton.SetText(13727)
 	QuitButton.SetText(15417)
 	TextArea.SetText(19532)
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def NewGamePress():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload()
+	StartWindow.Close()
 	GemRB.SetNextScript("SPParty")
-	return
-
-def QuitCancelPress():
-	global StartWindow, QuitWindow
-	if QuitWindow:
-		QuitWindow.Unload()
-	StartWindow.SetVisible(WINDOW_VISIBLE)
-	return
-
-def QuitQuitPress():
-	GemRB.Quit()
 	return

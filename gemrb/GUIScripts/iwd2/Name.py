@@ -27,16 +27,16 @@ DoneButton = 0
 def OnLoad():
 	global NameWindow, NameField, DoneButton
 	
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	NameWindow = GemRB.LoadWindow(5)
+	NameWindow = GemRB.LoadWindow(5, "GUICG")
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	NameField = NameWindow.GetControl(2)
 	NameField.SetText (GemRB.GetToken ("CHARNAME"))
@@ -45,8 +45,8 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
-	NameWindow.SetVisible(WINDOW_VISIBLE)
-	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	NameWindow.Focus()
+	NameField.Focus()
 	return
 
 def BackPress():

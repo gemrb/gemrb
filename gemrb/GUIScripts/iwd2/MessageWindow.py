@@ -24,102 +24,117 @@ import GUIClasses
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
-MessageWindow = 0
-PortraitWindow = 0
-TMessageTA = 0 # for dialog code
+MTASize = GS_SMALLDIALOG
+smallID = -1
+largeID = -1
 
 def OnLoad():
-	global MessageWindow, PortraitWindow
-
-	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
-	GemRB.GameSetProtagonistMode(2)
-	GemRB.SetDefaultActions(1,14,16,17)
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
-	ActionsWindow = PortraitWindow = GUICommonWindows.OpenPortraitWindow()
-
-	GemRB.SetVar ("MessageWindow", MessageWindow.ID)
-	GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-	GemRB.SetVar ("ActionsWindow", 12345) # dummy so the EF_ACTION callback works
-	GemRB.SetVar ("TopWindow", -1)
-	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVar ("FloatWindow", -1)
-	GemRB.SetVar ("ActionsPosition", -1) #already handled in portraitwindow
-	GemRB.SetVar ("OptionsPosition", -1) #already handled in messagewindow
-	GemRB.SetVar ("MessagePosition", 4)
-	GemRB.SetVar ("PortraitPosition", 4)
-	GemRB.SetVar ("OtherPosition", 5) #Inactivating
-	GemRB.SetVar ("TopPosition", 5) #Inactivating
-
+	global smallID, largeID
+	OptionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	OptionsWindow.AddAlias("OPTWIN")
+	OptionsWindow.AddAlias("HIDE_CUT", 2)
+	OptionsWindow.AddAlias("NOT_DLG", 1)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 1, None)
 
-	MessageWindow.SetVisible(WINDOW_VISIBLE)
-	PortraitWindow.SetVisible(WINDOW_VISIBLE)
+	# this also has the small MTA window
+	OptionsWindow.AddAlias("MSGWIN")
+	# compensate for the bogus scrollbar on the CHU BG
+	smallMTA = OptionsWindow.GetControl(1)
+	smallMTA.AddAlias("MsgSys", 0)
+	smallMTA.AddAlias("MTA_SM", 0, True)
+	smallMTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	smallMTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, TA_COLOR_OPTIONS)
+	smallMTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, TA_COLOR_HOVER)
+	smallID = smallMTA.ID
+	
+	sbar = OptionsWindow.GetControl(2)
+	sbar.SetResizeFlags(IE_GUI_VIEW_RESIZE_VERTICAL | IE_GUI_VIEW_RESIZE_RIGHT)
+
+	# remove the cheat input textedit
+	OptionsWindow.RemoveSubview(OptionsWindow.GetControl(3))
+
+	ActionsWindow = GUICommonWindows.OpenPortraitWindow(0, WINDOW_BOTTOM|WINDOW_HCENTER)
+	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	ActionsWindow.AddAlias("ACTWIN")
+	ActionsWindow.AddAlias("HIDE_CUT", 1)
+	ActionsWindow.AddAlias("NOT_DLG", 0)
+
+	actframe = ActionsWindow.GetFrame()
+	optframe = OptionsWindow.GetFrame()
+
+	actframe['y'] -= optframe['h']
+	ActionsWindow.SetFrame(actframe)
+
+	DialogWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	DialogWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS|IE_GUI_VIEW_INVISIBLE, OP_OR)
+	DialogWindow.AddAlias("MSGWINLG")
+	DialogWindow.AddAlias("HIDE_CUT", 0)
+	DialogWindow.AddAlias("NOT_DLG", 2)
+
+	largeMTA = DialogWindow.GetControl(1)
+	largeMTA.AddAlias("MTA_LG", 0, True)
+	largeID = largeMTA.ID
+
 	return
 
 def UpdateControlStatus():
-	global MessageWindow,TMessageTA
+	global MTASize
 
-	TMessageWindow = 0
-	TMessageTA = 0
-	GSFlags = GemRB.GetMessageWindowSize()
+	GSFlags = GemRB.GetGUIFlags()
 	Expand = GSFlags&GS_DIALOGMASK
-	Override = GSFlags&GS_DIALOG
+	InDialog = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 
+	largeMW = GemRB.GetView("MSGWINLG")
+
 	#a dialogue is running, setting messagewindow size to maximum
-	if Override:
+	if InDialog:
 		Expand = GS_LARGEDIALOG
-
-	GemRB.LoadWindowPack(GUICommon.GetWindowPack())
-	hideflag = GemRB.HideGUI()
-	if Expand == GS_LARGEDIALOG:
-		GemRB.SetVar ("PortraitWindow", -1)
-		TMessageWindow = GemRB.LoadWindow(7)
-		TMessageTA = TMessageWindow.GetControl (1)
+		largeMW.SetVisible(True)
+		largeMW.SetDisabled(False)
 	else:
-		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-		TMessageWindow = GemRB.LoadWindow(0)
-		# cheat code editbox; only causes redraw issues if you click on the lower left
-		TMessageWindow.DeleteControl (3)
-		TMessageTA = TMessageWindow.GetControl (1)
-		GUICommonWindows.SetupMenuWindowControls (TMessageWindow, 1, None)
+		largeMW.SetVisible(False)
 
-	MessageWindow = GemRB.GetVar ("MessageWindow")
-	MessageTA = GUIClasses.GTextArea(MessageWindow, GemRB.GetVar ("MessageTextArea"))
-	if MessageWindow > 0 and MessageWindow != TMessageWindow.ID:
-		TMessageTA = MessageTA.SubstituteForControl(TMessageTA)
-		GUIClasses.GWindow(MessageWindow).Unload()
-		
-	TMessageTA.SetFlags(IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
-	GemRB.SetVar ("MessageWindow", TMessageWindow.ID)
-	GemRB.SetVar ("MessageTextArea", TMessageTA.ID)
+	if MTASize == Expand:
+		return
 
-	if Override:
-		TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	MTASize = Expand
+
+	smallMW = GemRB.GetView("MSGWIN")
+	smallMTA = GemRB.GetView("MTA_SM", 0)
+	smallFrame = smallMTA.GetFrame()
+
+	largeMTA = GemRB.GetView("MTA_LG", 0)
+	largeFrame = largeMTA.GetFrame()
+
+	# swap the 2 TextAreas
+	smallMTA = smallMW.RemoveSubview(smallMTA)
+	largeMTA = largeMW.RemoveSubview(largeMTA)
+
+	newLargeMTA = largeMW.AddSubview(smallMTA, None, largeID)
+	newLargeMTA.SetFrame(largeFrame)
+	newLargeMTA.AddAlias("MTA_LG", 0, True)
+
+	newSmallMTA = smallMW.AddSubview(largeMTA, None, smallID)
+	newSmallMTA.SetFrame(smallFrame)
+	newSmallMTA.AddAlias("MTA_SM", 0, True)
+	
+	if InDialog:
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
-			Portrait = GemRB.GetPlayerPortrait(pc,1)
+			Portrait = GemRB.GetPlayerPortrait(pc, 1)["Sprite"]
 		else:
 			Portrait = None
-		Button = TMessageWindow.GetControl(11)
+		Button = largeMW.GetControl(11)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		if not Portrait:
 			Button.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			Button.SetPicture(Portrait, "NOPORTSM")
 	else:
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
+		newSmallMTA.ScrollTo(0, -9999) # scroll to the bottom
 		
-	if hideflag:
-		GemRB.UnhideGUI()
-	return
-
-#upgrade savegame to next version
-def GameExpansion():
-	#the original savegames got 0, but the engine upgrades all saves to 3
-	#this is a good place to perform one-time adjustments if needed
-	GemRB.GameSetExpansion(3)
 	return
 

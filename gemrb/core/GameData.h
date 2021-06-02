@@ -28,10 +28,12 @@
 
 #include "Cache.h"
 #include "Holder.h"
+#include "Resource.h"
 #include "ResourceManager.h"
 #include "TableMgr.h"
 
 #include <map>
+#include <unordered_map>
 #include <vector>
 
 namespace GemRB {
@@ -41,8 +43,10 @@ static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spi
 class Actor;
 struct Effect;
 class Factory;
+class FactoryObject;
 class Item;
 class Palette;
+using PaletteHolder = Holder<Palette>;
 class ScriptedAnimation;
 class Spell;
 class Sprite2D;
@@ -78,13 +82,13 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	Holder<TableMgr> GetTable(unsigned int index) const;
+	Holder<TableMgr> GetTable(size_t index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
-	Palette* GetPalette(const ieResRef resname);
-	void FreePalette(Palette *&pal, const ieResRef name=NULL);
-	
+	PaletteHolder GetPalette(const ResRef resname);
+	void FreePalette(PaletteHolder &pal, const ieResRef name=NULL);
+
 	Item* GetItem(const ieResRef resname, bool silent=false);
 	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
 	Spell* GetSpell(const ieResRef resname, bool silent=false);
@@ -99,11 +103,16 @@ public:
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
+	Holder<Sprite2D> GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
+
+	/* returns a single BAM or static image sprite, checking in that order */
+	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	void* GetFactoryResource(const char* resname, SClass_ID type,
+	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL, bool silent=false);
+
+	void AddFactoryResource(FactoryObject* res);
 
 	Store* GetStore(const ieResRef ResRef);
 	/// Saves a store to the cache and frees it.
@@ -112,7 +121,7 @@ public:
 	void SaveAllStores();
 
 	// itemsnd.2da functions
-	bool GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
+	bool GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col);
 	int GetSwingCount(ieDword ItemType);
 
 	int GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName);
@@ -121,15 +130,18 @@ public:
 	int GetTrapSaveBonus(ieDword level, int cls);
 	int GetTrapLimit(Scriptable *trapper);
 	int GetSummoningLimit(ieDword sex);
+	const Color& GetColor(const char *row);
 	inline int GetStepTime() { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
+	inline int GetTextSpeed() const { return TextScreenSpeed; }
+	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
 private:
 	void ReadItemSounds();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	Cache PaletteCache;
+	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
 	typedef std::map<const char*, Store*, iless> StoreMap;
@@ -141,7 +153,9 @@ private:
 	AutoTable trapSaveBonus;
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
+	std::map<const char*, Color, iless> colors;
 	int stepTime = 0;
+	int TextScreenSpeed = 0;
 };
 
 extern GEM_EXPORT GameData * gamedata;

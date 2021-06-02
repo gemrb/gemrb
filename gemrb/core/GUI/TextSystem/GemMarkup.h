@@ -37,12 +37,12 @@ public:
 	};
 
 	GemMarkupParser();
-	GemMarkupParser(const Font* ftext, Palette* textPal = NULL,
-					const Font* finit = NULL, Palette* initPal = NULL);
+	GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
+					const Font* finit, Font::PrintColors initCols);
 	~GemMarkupParser() {};
 
-	void ResetAttributes(const Font* ftext = NULL, Palette* textPal = NULL,
-						 const Font* finit = NULL, Palette* initPal = NULL);
+	void ResetAttributes(const Font *ftext, Font::PrintColors textCols,
+						 const Font *finit, Font::PrintColors initCols);
 
 	void Reset();
 
@@ -52,82 +52,43 @@ public:
 private:
 	class TextAttributes {
 		private:
-		Palette* palette;
-		Palette* swapPalette;
+		Font::PrintColors textColor;
+		Font::PrintColors swapColor;
 
 		public:
 		const Font* TextFont;
 		const Font* SwapFont;
 
 		public:
-		TextAttributes(const Font* text, Palette* textPal = NULL,
-					   const Font* init = NULL, Palette* initPal = NULL)
+		TextAttributes(const Font *text, Font::PrintColors textColor,
+					   const Font *init, Font::PrintColors initColor)
+		: textColor(textColor), swapColor(initColor)
 		{
 			TextFont = text;
-			SwapFont = (init) ? init : TextFont;
-			assert(TextFont);
-			if (textPal) {
-				textPal->acquire();
-			}
-			if (initPal) {
-				initPal->acquire();
-			}
-
-			palette = textPal;
-			swapPalette = initPal;
+			SwapFont = init;
+			assert(TextFont && SwapFont);
 		}
 
-		TextAttributes(const TextAttributes& ta) {
-			this->operator=(ta);
-		}
-
-		TextAttributes& operator=(const TextAttributes& ta) {
-			if (&ta == this) return *this;
-			TextFont = ta.TextFont;
-			SwapFont = ta.SwapFont;
-			palette = ta.palette;
-			swapPalette = ta.swapPalette;
-			if (palette)
-				palette->acquire();
-			if (swapPalette)
-				swapPalette->acquire();
-			return *this;
-		}
-
-		~TextAttributes() {
-			if (palette)
-				palette->release();
-			if (swapPalette)
-				swapPalette->release();
-		}
+		TextAttributes(const TextAttributes& ta) = default;
+		TextAttributes& operator=(const TextAttributes& ta) = default;
 
 		void SwapFonts() {
 			std::swap(TextFont, SwapFont);
-			std::swap(palette, swapPalette);
+			std::swap(textColor, swapColor);
 		}
 
-		void SetTextPalette(Palette* pal) {
-			if (pal) pal->acquire();
-			if (palette) palette->release();
-			palette = pal;
+		void SetTextColor(Font::PrintColors c) {
+			textColor = std::move(c);
 		}
 
-		Palette* TextPalette() const {
-			if (palette) {
-				return palette;
-			}
-			Palette* pal = TextFont->GetPalette();
-			pal->release();
-			return pal;
+		const Font::PrintColors& TextColor() const {
+			return textColor;
 		}
 	};
 
-	static Palette* GetSharedPalette(const String& colorString);
-
-	typedef std::map<String, Holder<Palette> > PaletteCache;
-	static PaletteCache PalCache;
 	std::stack<TextAttributes> context;
 	ParseState state;
+	Color textBg;
 };
 
 }

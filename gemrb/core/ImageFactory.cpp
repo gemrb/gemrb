@@ -24,22 +24,10 @@
 
 namespace GemRB {
 
-ImageFactory::ImageFactory(const char* ResRef, Sprite2D* bitmap_)
+ImageFactory::ImageFactory(const char* ResRef, Holder<Sprite2D> bitmap_)
 	: FactoryObject( ResRef, IE_BMP_CLASS_ID ), bitmap(bitmap_)
 {
 
 }
-
-ImageFactory::~ImageFactory(void)
-{
-	bitmap->release();
-}
-
-Sprite2D* ImageFactory::GetSprite2D() const
-{
-	bitmap->acquire();
-	return bitmap;
-}
-
 
 }

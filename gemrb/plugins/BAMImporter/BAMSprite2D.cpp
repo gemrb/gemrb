@@ -21,93 +21,78 @@
 #include "BAMSprite2D.h"
 
 #include "AnimationFactory.h"
+#include "Video.h"
 
 namespace GemRB {
 
-BAMSprite2D::BAMSprite2D(int Width, int Height, const void* pixels,
-						 bool rle, AnimationFactory* datasrc,
-						 Palette* palette, ieDword ck)
-	: Sprite2D(Width, Height, 8, pixels)
+BAMSprite2D::BAMSprite2D(const Region& rgn, void* pixels,
+						 PaletteHolder palette, ieDword ck)
+	: Sprite2D(rgn, 8, pixels)
 {
-	palette->acquire();
 	pal = palette;
 	colorkey = ck;
-	RLE = rle;
-	source = datasrc;
-	datasrc->IncDataRefCount();
 	BAM = true;
-	freePixels = false; // managed by datasrc
+	freePixels = false; // managed by AnimationFactory
+
+	assert(pal);
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
 	: Sprite2D(obj)
 {
 	assert(obj.pal);
-	assert(obj.source);
 
 	pal = obj.pal;
-	pal->acquire();
 	colorkey = obj.GetColorKey();
-	RLE = obj.RLE;
-	source = obj.source;
-	source->IncDataRefCount();
+
 	BAM = true;
-	freePixels = false; // managed by datasrc
+	freePixels = false; // managed by AnimationFactory
 }
 
-BAMSprite2D* BAMSprite2D::copy() const
+Holder<Sprite2D> BAMSprite2D::copy() const
 {
 	return new BAMSprite2D(*this);
 }
 
-BAMSprite2D::~BAMSprite2D()
-{
-	pal->release();
-	source->DecDataRefCount();
-}
-
 /** Get the Palette of a Sprite */
-Palette* BAMSprite2D::GetPalette() const
+PaletteHolder BAMSprite2D::GetPalette() const
 {
-	pal->acquire();
 	return pal;
 }
 
-void BAMSprite2D::SetPalette(Palette* palette)
+void BAMSprite2D::SetPalette(PaletteHolder palette)
 {
-	if (palette) {
-		palette->acquire();
+	if (palette == NULL) {
+		Log(WARNING, "BAMSprite2D", "cannot set a NULL palette.");
+		return;
 	}
-	if (pal) {
-		pal->release();
-	}
+
 	pal = palette;
 }
 
-Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
+Color BAMSprite2D::GetPixel(const Point& p) const
 {
-	Color c = { 0, 0, 0, 0 };
-	if (x >= Width || y >= Height) return c;
+	Color c;
+
+	if (p.x < 0 || p.x >= Frame.w) return c;
+	if (p.y < 0 || p.y >= Frame.h) return c;
+
+	short x = p.x;
+	short y = p.y;
 
 	if (renderFlags&BLIT_MIRRORY)
-		y = Height - y - 1;
+		y = Frame.h - y - 1;
 	if (renderFlags&BLIT_MIRRORX)
-		x = Width - x - 1;
+		x = Frame.w - x - 1;
 
-	int skipcount = y * Width + x;
+	int skipcount = y * Frame.w + x;
 
 	const ieByte *rle = (const ieByte*)pixels;
-	if (RLE) {
-		while (skipcount > 0) {
-			if (*rle++ == colorkey)
-				skipcount -= (*rle++)+1;
-			else
-				skipcount--;
-		}
-	} else {
-		// uncompressed
-		rle += skipcount;
-		skipcount = 0;
+	while (skipcount > 0) {
+		if (*rle++ == colorkey)
+			skipcount -= (*rle++)+1;
+		else
+			skipcount--;
 	}
 
 	if (skipcount >= 0 && *rle != colorkey) {
@@ -115,6 +100,12 @@ Color BAMSprite2D::GetPixel(unsigned short x, unsigned short y) const
 		c.a = 0xff;
 	}
 	return c;
+}
+
+bool BAMSprite2D::HasTransparency() const
+{
+	// BAMs always use green for transparency and if colorkey > 0 it guarantees we have green
+	return colorkey > 0 || (pal->col[0].r == 0 && pal->col[0].g == 0xff && pal->col[0].b == 0);
 }
 
 }

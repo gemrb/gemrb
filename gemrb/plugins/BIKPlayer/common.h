@@ -30,6 +30,7 @@
 #include <cmath>
 #include <cstdint>
 #include <ctype.h>
+#include <cstdint>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

@@ -33,6 +33,7 @@
 #include "ie_types.h"
 
 #include "Callback.h"
+#include "Resource.h"
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
@@ -246,7 +247,7 @@ typedef int CRRow[MAX_CRLEVEL];
 class GEM_EXPORT Game : public Scriptable {
 public:
 	Game(void);
-	~Game(void);
+	~Game(void) override;
 private:
 	std::vector< Actor*> PCs;
 	std::vector< Actor*> NPCs;
@@ -255,7 +256,7 @@ private:
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector< char*> mastarea;
-	std::vector<std::vector<char *> > npclevels;
+	std::vector<std::vector<ResRef> > npclevels;
 	int *bntchnc;
 	int bntrows;
 	CRRow *crtable = nullptr;
@@ -381,7 +382,7 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index) const;
-	void SwapPCs(unsigned int Index1, unsigned int Index2) const;
+	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
 	bool IsDay() const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
 	bool CheckForReplacementActor(int i);
@@ -458,7 +459,7 @@ public:
 	/** Sets party reputation */
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
-	void SetControlStatus(unsigned int value, int operation);
+	bool SetControlStatus(unsigned int value, int operation);
 	/** Sets party size (1-32000) */
 	void SetPartySize(int value);
 	/** Sets a guiscript function to happen after x AI cycles have elapsed */
@@ -492,7 +493,7 @@ public:
 	/** returns true if party has infravision */
 	bool PartyHasInfravision() const { return hasInfra; }
 	/** draw weather */
-	void DrawWeather(const Region &screen, bool update);
+	void DrawWeather(bool update);
 	/** updates current area music */
 	void ChangeSong(bool always = true, bool force = true) const;
 	/** sets expansion mode */

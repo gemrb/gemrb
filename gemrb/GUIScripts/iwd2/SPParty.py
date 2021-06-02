@@ -28,30 +28,25 @@ ScrollBar = 0
 
 def OnLoad():
 	global PartySelectWindow, TextArea, PartyCount, ScrollBar
-	GemRB.LoadWindowPack("GUISP", 800, 600)
 	
 	PartyCount = GemRB.GetINIPartyCount()
 	
-	PartySelectWindow = GemRB.LoadWindow(10)
-	PartySelectWindow.SetFrame( )
+	PartySelectWindow = GemRB.LoadWindow(10, "GUISP")
 	TextArea = PartySelectWindow.GetControl(6)
-	ScrollBar = PartySelectWindow.GetControl(8)
-	ScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarPress)
-	ScrollBar.SetVarAssoc("TopIndex", PartyCount)
 	
 	ModifyButton = PartySelectWindow.GetControl(12)
 	ModifyButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ModifyPress)
 	ModifyButton.SetText(10316)
 
 	CancelButton = PartySelectWindow.GetControl(11)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: PartySelectWindow.Close())
 	CancelButton.SetText(13727)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton = PartySelectWindow.GetControl(10)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	
 	GemRB.SetVar("PartyIdx",0)
 	GemRB.SetVar("TopIndex",0)
@@ -64,7 +59,7 @@ def OnLoad():
 	ScrollBarPress()
 	PartyButtonPress()
 	
-	PartySelectWindow.SetVisible(WINDOW_VISIBLE)
+	PartySelectWindow.Focus()
 	
 	return
 
@@ -116,13 +111,6 @@ def DonePress():
 		#but gemrb engine limitations require us to
 		#return to the main engine (loadscreen)
 		GemRB.SetNextScript("SPParty2")
-	return	
-	
-def CancelPress():
-	global PartySelectWindow
-	if PartySelectWindow:
-		PartySelectWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return
 	
 def PartyButtonPress():

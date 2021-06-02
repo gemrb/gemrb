@@ -34,46 +34,41 @@
 # will then execute
 # GemRB.GetTableValue(5, "Row", "Col")
 
-def make_caller_lambda_ID(M):
-  return lambda self, *args: M(self.ID, *args)
-class metaIDWrapper(type):
-  def __new__(cls, classname, bases, classdict):
-    def __init__(self, ID):
-      self.ID = ID
-    newdict = { '__slots__':['ID'], '__init__':__init__, }
-    if len(bases) == 1:
-      def __subinit__(self, ID):
-        bases[0].__init__(self, ID)
-      newdict['__init__'] = __subinit__
-      newdict['__slots__'] = []
-    methods = classdict['methods']
-    for key in methods: 
-      newdict[key] = make_caller_lambda_ID(methods[key])
-    for key in classdict:
-      if key != 'methods':
-        newdict[key] = classdict[key]
-    return type.__new__(cls, classname, bases, newdict)
+from types import MethodType
 
+def MethodAttributeError(f):
+	def handler(*args, **kwargs):
+		try:
+			return f(*args, **kwargs)
+		except Exception as e:
+			raise type(e)(str(e) + "\nMethod Docs:\n" + str(f.__doc__))
+	return handler
 
-# metaControl has two extra arguments: WinID and ID
-def make_caller_lambda_Control(M):
-  return lambda self, *args: M(self.WinID, self.ID, *args)
-class metaControl(type):
-  def __new__(cls, classname, bases, classdict):
-    def __init__(self, WinID, ID):
-      self.WinID = WinID
-      self.ID = ID
-    newdict = { '__slots__':['WinID', 'ID'], '__init__':__init__, }
-    if len(bases) == 1:
-      def __subinit__(self, WinID, ID):
-        bases[0].__init__(self, WinID, ID)
-      newdict['__init__'] = __subinit__
-      newdict['__slots__'] = []
-    methods = classdict['methods']
-    for key in methods:
-      newdict[key] = make_caller_lambda_Control(methods[key])
-    for key in classdict:
-      if key != 'methods':
-        newdict[key] = classdict[key]
-    return type.__new__(cls, classname, bases, newdict)
+class metaIDWrapper(type):		
+	@classmethod
+	def InitMethod(cls, f = None):
+		def __init__(self, *args, **kwargs):
+			for k,v in kwargs.iteritems():
+				setattr(self, k, v)
 
+			#required attributes for bridging to C++
+			assert getattr(self, 'ID', None) is not None
+
+			if f:
+				f(self, *args)
+		return __init__
+	
+	def __new__(cls, classname, bases, classdict):
+		classdict['__slots__'] = classdict.get('__slots__', [])
+		classdict['__slots__'].append('ID')
+		
+		classdict['__init__'] = classdict.get('__init__', None)
+		classdict['__init__'] = cls.InitMethod(classdict['__init__'])
+
+		methods = classdict.pop('methods', {})
+		c = type.__new__(cls, classname, bases, classdict)
+		# we must bind the methods after the class is created (instead of adding to classdict)
+		# otherwise the methods would be class methods instead of instance methods
+		for key in methods:
+			setattr(c, key, MethodType(MethodAttributeError(methods[key]), None, c))
+		return c

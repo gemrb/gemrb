@@ -377,9 +377,7 @@ def setAccept():
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	GemRB.SetVar ("ImportedChar", 0)
-	
-	GUICommon.CloseOtherWindow(None)
-	
+		
 	if playmode >=0:
 		CharGenCommon.close()
 		GemRB.SaveCharacter (MyChar, "gembak")

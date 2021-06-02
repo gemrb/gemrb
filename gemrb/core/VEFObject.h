@@ -22,15 +22,16 @@
 
 #include "exports.h"
 #include "ie_types.h"
-#include <list>
 #include "Region.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
 
+#include <cstdint>
+#include <vector>
+
 namespace GemRB {
 
 class DataStream;
-class Map;
 class ScriptedAnimation;
 
 typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
@@ -47,18 +48,21 @@ struct ScheduleEntry {
 class GEM_EXPORT VEFObject {
 public:
 	ieResRef ResName;
-	int XPos, YPos, ZPos;
+	Point Pos; // position of the effect in game coordinates
+
 	VEFObject();
 	VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
-	std::list<ScheduleEntry> entries;
+	std::vector<ScheduleEntry> entries;
+	std::vector<ScheduleEntry> drawQueue;
 	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
 	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
-	bool Draw(const Region &screen, Point &position, const Color &p_tint, Map *area, int dither, int orientation, int height);
+	bool UpdateDrawingState(int orientation);
+	void Draw(const Region &screen, const Color &p_tint, int height, uint32_t flags) const;
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;

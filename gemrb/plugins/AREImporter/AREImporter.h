@@ -62,19 +62,20 @@ private:
 	ieByte AreaDifficulty;
 public:
 	AREImporter(void);
-	~AREImporter(void);
-	bool Open(DataStream* stream);
-	bool ChangeMap(Map *map, bool day_or_night);
-	Map* GetMap(const char* ResRef, bool day_or_night);
-	int GetStoredFileSize(Map *map);
+	~AREImporter(void) override;
+	bool Open(DataStream* stream) override;
+	bool ChangeMap(Map *map, bool day_or_night) override;
+	Map* GetMap(const char* ResRef, bool day_or_night) override;
+	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
-	int PutArea(DataStream *stream, Map *map);
+	int PutArea(DataStream *stream, Map *map) override;
 private:
 	void AdjustPSTFlags(AreaAnimation*);
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, const Map *map);
-	int PutPoints(DataStream *stream, const Point *p, unsigned int count);
+	int PutPoints(DataStream *stream, const std::vector<Point>&);
+	int PutPoints(DataStream *stream, const Point *p, size_t count);
 	int PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex);
 	int PutItems(DataStream *stream, const Map *map);
 	int PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex);
@@ -88,7 +89,7 @@ private:
 	int PutVariables(DataStream *stream, const Map *map);
 	int PutAmbients(DataStream *stream, const Map *map);
 	int PutMapnotes(DataStream *stream, const Map *map);
-	int PutEffects(DataStream *stream, const EffectQueue *fxqueue);
+	int PutEffects( DataStream *stream, const EffectQueue *fxqueue);
 	int PutTraps(DataStream *stream, const Map *map);
 	int PutExplored(DataStream *stream, const Map *map);
 	int PutTiles(DataStream *stream, const Map *map);

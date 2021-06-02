@@ -18,26 +18,25 @@
 #
 #character generation, biography (GUICG23)
 import GemRB
+import CharGenCommon
 
 BioWindow = 0
-EditControl = 0
 
 def OnLoad ():
-	global BioWindow, EditControl
+	global BioWindow
 
-	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	BioWindow = GemRB.LoadWindow (23)
+	BioWindow = GemRB.LoadWindow (23, "GUICG")
+	CharGenCommon.PositionCharGenWin(BioWindow)
 
-	EditControl = BioWindow.GetControl (3)
+	EditTextArea = BioWindow.ReplaceSubview(3, IE_GUI_TEXTAREA, "NORMAL")
 	BIO = GemRB.GetToken("BIO")
-	EditTextArea = BioWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
-	EditControl = EditTextArea.SubstituteForControl (EditControl)
-	EditControl.SetVarAssoc ("row", 0)
-	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	EditTextArea.AddAlias("BIO")
+	EditTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+
 	if BIO:
-		EditControl.SetText (BIO)
+		EditTextArea.SetText (BIO)
 	else:
-		EditControl.SetText (15882)
+		EditTextArea.SetText (15882)
 
 	# done
 	OkButton = BioWindow.GetControl (1)
@@ -49,45 +48,35 @@ def OnLoad ():
 	# back
 	CancelButton = BioWindow.GetControl (2)
 	CancelButton.SetText (12896)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	OkButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OkPress)
-	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearPress)
+	ClearButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ClearBiography)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	BioWindow.SetVisible (WINDOW_VISIBLE)
+	EditTextArea.Focus ()
 	return
 
+def ClearBiography():
+	EditTextArea = GemRB.GetView ("BIO")
+	EditTextArea.Clear ()
+	EditTextArea.Focus ()
+
 def OkPress ():
-	global BioWindow, EditControl
+	global BioWindow
 
 	row = 0
 	line = None
-	BioData = ""
-
-	#there is no way to get the entire TextArea content
-	#this hack retrieves the TextArea content row by row
-	#there is no way to know how much data is in the TextArea
-	while 1:
-		GemRB.SetVar ("row", row)
-		EditControl.SetVarAssoc ("row", row)
-		line = EditControl.QueryText ()
-		if len(line)<=0:
-			break
-		BioData += line+"\n"
-		row += 1
+	TA = GemRB.GetView("BIO")
+	BioData = TA.QueryText ()
+	GemRB.SetToken ("BIO", BioData)
 	
 	if BioWindow:
 		BioWindow.Unload ()
 	GemRB.SetNextScript ("CharGen9")
-	GemRB.SetToken ("BIO", BioData)
 	return
 	
 def CancelPress ():
 	if BioWindow:
 		BioWindow.Unload ()
 	GemRB.SetNextScript ("CharGen9")
-	return
-
-def ClearPress ():
-	EditControl.SetText ("")
 	return

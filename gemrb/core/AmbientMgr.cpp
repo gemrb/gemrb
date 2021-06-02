@@ -21,6 +21,7 @@
 #include "AmbientMgr.h"
 
 #include "Ambient.h"
+#include "Interface.h"
 
 namespace GemRB {
 
@@ -36,6 +37,8 @@ void AmbientMgr::setAmbients(const std::vector<Ambient *> &a)
 	std::lock_guard<std::mutex> l(ambientsMutex);
 	ambients = a;
 	ambientsSet(ambients);
+	
+	core->GetAudioDrv()->UpdateVolume(GEM_SND_VOL_AMBIENTS);
 	activate();
 }
  

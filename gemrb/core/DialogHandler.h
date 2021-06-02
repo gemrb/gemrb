@@ -46,7 +46,6 @@ public:
 	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref, ieDword si=-1);
 	void EndDialog(bool try_to_break=false);
 	bool DialogChoose(unsigned int choose);
-	bool DialogChoose(Control *ctrl);
 
 private:
 	/** this function safely retrieves an Actor by ID */
@@ -61,7 +60,7 @@ private:
 	ieDword originalTargetID;
 
 	int initialState;
-	int previousX, previousY;
+	Point prevViewPortLoc;
 };
 
 }

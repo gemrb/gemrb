@@ -23,7 +23,7 @@
 #include "Sprite2D.h"
 #include "Video.h"
 
-#define uint8_t unsigned char
+#include <cstdint>
 
 #if HAVE_ICONV
 #include <iconv.h>
@@ -99,8 +99,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	}
 
 	FT_GlyphSlot glyph = face->glyph;
-	FT_Glyph_Metrics* metrics = &glyph->metrics;
 	/*
+	FT_Glyph_Metrics* metrics = &glyph->metrics;
 	//int maxx, yoffset;
 	if ( FT_IS_SCALABLE( face ) ) {
 		// Get the bounding box
@@ -149,35 +149,25 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		return AliasBlank(chr);
 	}
 
-	// we need 1px empty space on each side
-	sprSize.w += 2;
-
 	pixels = (uint8_t*)malloc(sprSize.w * sprSize.h);
 	uint8_t* dest = pixels;
 	uint8_t* src = bitmap->buffer;
 
 	for( int row = 0; row < sprSize.h; row++ ) {
 		// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.
-
-		// add 1px left padding
-		memset(dest++, 0, 1);
-		// -2 to account for padding
-		memcpy(dest, src, sprSize.w - 2);
-		dest += sprSize.w - 2;
+		memcpy(dest, src, sprSize.w);
+		dest += sprSize.w;
 		src += bitmap->pitch;
-		// add 1px right padding
-		memset(dest++, 0, 1);
 	}
 	// assert that we fill the buffer exactly
 	assert((dest - pixels) == (sprSize.w * sprSize.h));
 
 	// TODO: do an underline if requested
 
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(sprSize.w, sprSize.h, pixels, palette, true, 0);
-	spr->YPos = FT_FLOOR(metrics->horiBearingY);
+	Region r(glyph->bitmap_left, glyph->bitmap_top, sprSize.w, sprSize.h);
+	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite8(r, pixels, palette, true, 0);
 	// FIXME: casting away const
 	const Glyph& ret = ((TTFFont*)this)->CreateGlyphForCharSprite(chr, spr);
-	spr->release();
 	return ret;
 }
 
@@ -196,23 +186,22 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 	return (int)(-kerning.x / 64);
 }
 
-TTFFont::TTFFont(Palette* pal, FT_Face face, int lineheight, int baseline)
-	: Font(pal, lineheight, baseline), face(face)
+TTFFont::TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline)
+: Font(pal, lineheight, baseline, false), face(face)
 {
 // on FT < 2.4.2 the manager will defer ownership to this object
 #if FREETYPE_VERSION_ATLEAST(2,4,2)
 	FT_Reference_Face(face); // retain the face or the font manager will destroy it
 #endif
 	// ttf fonts dont produce glyphs for whitespace
-	Sprite2D* blank = core->GetVideoDriver()->CreateSprite8(0, 0, NULL, palette);
+	Holder<Sprite2D> blank = core->GetVideoDriver()->CreateSprite8(Region(), NULL, palette);
 	// blank for returning when there is an error
 	// TODO: ttf fonts have a "box" glyph they use for this
 	CreateGlyphForCharSprite(0, blank);
-	blank->Width = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);
+	blank->Frame.w = core->TLKEncoding.zerospace ? 1 : (LineHeight * 0.25);
 	CreateGlyphForCharSprite(' ', blank);
-	blank->Width *= 4;
+	blank->Frame.w *= 4;
 	CreateGlyphForCharSprite('\t', blank);
-	blank->release();
 }
 
 TTFFont::~TTFFont()

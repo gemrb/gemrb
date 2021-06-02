@@ -43,8 +43,10 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ColorWindow=GemRB.LoadWindow(13)
+	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	ColorWindow.SetFlags (WF_ALPHA_CHANNEL, OP_OR)
+	import CharGenCommon
+	CharGenCommon.PositionCharGenWin (ColorWindow, -6)
 
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
@@ -89,15 +91,15 @@ def OnLoad():
 
 	BackButton = ColorWindow.GetControl(13)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = ColorWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	BGCommon.RefreshPDoll (PDollButton, MinorColor, MajorColor, SkinColor, HairColor)
-	ColorWindow.SetVisible(WINDOW_VISIBLE)
+	ColorWindow.Focus()
 	return
 
 def DonePress():
@@ -105,7 +107,7 @@ def DonePress():
 
 	if ColorPicker:
 		ColorPicker.Unload()
-	ColorWindow.SetVisible(WINDOW_VISIBLE)
+	ColorWindow.Focus()
 	PickedColor=ColorTable.GetValue(ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
 		HairColor=PickedColor
@@ -152,13 +154,13 @@ def GetColor():
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	
-	ColorPicker.SetVisible(WINDOW_VISIBLE)
+	ColorPicker.Focus()
 	return
 
 def HairPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 0
 	PickedColor = HairColor
 	GetColor()
@@ -167,7 +169,7 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 1
 	PickedColor = SkinColor
 	GetColor()
@@ -176,7 +178,7 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 2
 	PickedColor = MinorColor
 	GetColor()
@@ -185,7 +187,7 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
+	ColorWindow.SetVisible(False)
 	ColorIndex = 3
 	PickedColor = MajorColor
 	GetColor()

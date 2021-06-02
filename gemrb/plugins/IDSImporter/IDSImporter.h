@@ -39,16 +39,16 @@ private:
 
 public:
 	IDSImporter(void);
-	~IDSImporter(void);
-	bool Open(DataStream* stream);
-	int GetValue(const char* txt) const;
-	char* GetValue(int val) const;
-	char* GetStringIndex(unsigned int Index) const;
-	int GetValueIndex(unsigned int Index) const;
-	int FindString(char *str, int len) const;
-	int FindValue(int val) const;
-	int GetSize() const { return pairs.size(); }
-	int GetHighestValue() const;
+	~IDSImporter(void) override;
+	bool Open(DataStream* stream) override;
+	int GetValue(const char* txt) const override;
+	char* GetValue(int val) const override;
+	char* GetStringIndex(unsigned int Index) const override;
+	int GetValueIndex(unsigned int Index) const override;
+	int FindString(char *str, int len) const override;
+	int FindValue(int val) const override;
+	int GetSize() const override { return pairs.size(); }
+	int GetHighestValue() const override;
 };
 
 #endif

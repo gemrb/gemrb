@@ -21,6 +21,8 @@
 #ifndef CONTAINER_H
 #define CONTAINER_H
 
+#include <array>
+
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
 
@@ -37,7 +39,7 @@ namespace GemRB {
 class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
-	~Container(void);
+	~Container(void) override;
 	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();
@@ -46,20 +48,19 @@ public:
 	//adds an item to the container's inventory
 	int AddItem(CREItem *item);
 	//draws the ground icons
-	void DrawPile(bool highlight, Region screen, Color tint);
-	//returns dithering option
-	int WantDither();
+	Region DrawingRegion() const override;
+	void Draw(bool highlight, const Region &screen, Color tint, uint32_t flags) const;
+
 	int IsOpen() const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor *actor);
 	bool TryUnlock(Actor *actor);
 	void dump() const;
-	int TrapResets() const { return Flags & CONT_RESET; }
+	int TrapResets() const override { return Flags & CONT_RESET; }
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
 	void FreeGroundIcons();
-	void CreateGroundIconCover();
 public:
 	Point toOpen;
 	ieWord Type;
@@ -68,8 +69,7 @@ public:
 	Inventory inventory;
 	ieStrRef OpenFail;
 	//these are not saved
-	Sprite2D *groundicons[3];
-	SpriteCover *groundiconcover;
+	std::array<Holder<Sprite2D>, 3> groundicons;
 	//keyresref is stored in Highlightable
 };
 

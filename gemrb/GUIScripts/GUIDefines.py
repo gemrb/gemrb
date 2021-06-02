@@ -20,6 +20,24 @@
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
 
+# view flags
+IE_GUI_VIEW_RESIZE_NONW			= 0
+IE_GUI_VIEW_RESIZE_TOP			= 1 << 0 # keep my top relative to my super
+IE_GUI_VIEW_RESIZE_BOTTOM		= 1 << 1 # keep my bottom relative to my super
+IE_GUI_VIEW_RESIZE_VERTICAL		= IE_GUI_VIEW_RESIZE_TOP|IE_GUI_VIEW_RESIZE_BOTTOM # top+bottom effectively resizes me vertically
+IE_GUI_VIEW_RESIZE_LEFT			= 1 << 3 # keep my left relative to my super
+IE_GUI_VIEW_RESIZE_RIGHT		= 1 << 4 # keep my right relative to my super
+IE_GUI_VIEW_RESIZE_HORIZONTAL	= IE_GUI_VIEW_RESIZE_LEFT|IE_GUI_VIEW_RESIZE_RIGHT # top+bottom effectively resizes me horizontaly
+IE_GUI_VIEW_RESIZE_ALL			= IE_GUI_VIEW_RESIZE_VERTICAL|IE_GUI_VIEW_RESIZE_HORIZONTAL # resize me relative to my super
+
+# TODO: move these to TextContainer
+IE_GUI_VIEW_RESIZE_WIDTH	= 1 << 27	# resize the view horizontally if horizontal content exceeds width
+IE_GUI_VIEW_RESIZE_HEIGHT	= 1 << 26	# resize the view vertically if vertical content exceeds width
+
+IE_GUI_VIEW_INVISIBLE		= 1 << 30
+IE_GUI_VIEW_DISABLED		= 1 << 29
+IE_GUI_VIEW_IGNORE_EVENTS	= 1 << 28
+
 #button flags
 IE_GUI_BUTTON_NORMAL     = 0x00000004   #default button, doesn't stick
 IE_GUI_BUTTON_NO_IMAGE   = 0x00000001
@@ -28,7 +46,6 @@ IE_GUI_BUTTON_SOUND      = 0x00000004
 IE_GUI_BUTTON_CAPS       = 0x00000008   #capitalize all the text
 IE_GUI_BUTTON_CHECKBOX   = 0x00000010   #or radio button
 IE_GUI_BUTTON_RADIOBUTTON= 0x00000020   #sticks in a state
-IE_GUI_BUTTON_DEFAULT    = 0x00000040   #enter key triggers it
 IE_GUI_BUTTON_ANIMATED   = 0x00000080   # the button is animated
 
 #these bits are hardcoded in the .chu structure, don't move them
@@ -41,7 +58,6 @@ IE_GUI_BUTTON_LOWERCASE    = 0x00002000
 #IE_GUI_BUTTON_MULTILINE    = 0x00004000 # don't set the SINGLE_LINE font rendering flag
 #end of hardcoded section
 
-IE_GUI_BUTTON_DRAGGABLE    = 0x00008000
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
@@ -50,15 +66,32 @@ IE_GUI_BUTTON_PLAYALWAYS = 0x00080000   # animation will play when game is pause
 IE_GUI_BUTTON_CENTER_PICTURES = 0x00100000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00200000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00400000 # horizontal clipping of overlay
-IE_GUI_BUTTON_CANCEL          = 0x00800000 # escape key triggers it
+IE_GUI_BUTTON_NO_TOOLTIP      = 0x00800000 # disable the tooltip
+
+IE_GUI_BUTTON_PORTRAIT    = IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE
+
+#label flags
+IE_GUI_LABEL_USE_COLOR = 1
 
 #scrollbar flags
 IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   # mousewheel triggers it (same value as default button)
 
 #textarea flags
-IE_GUI_TEXTAREA_AUTOSCROLL = 0x05000001
-IE_GUI_TEXTAREA_HISTORY = 0x05000002
-IE_GUI_TEXTAREA_EDITABLE = 0x05000004
+IE_GUI_TEXTAREA_AUTOSCROLL = 1
+IE_GUI_TEXTAREA_HISTORY = 2
+IE_GUI_TEXTAREA_EDITABLE = 4
+
+# TextArea font colors, see TextArea.h
+TA_COLOR_NORMAL = 0
+TA_COLOR_INITIALS = 1
+TA_COLOR_BACKGROUND = 2
+TA_COLOR_OPTIONS = 3
+TA_COLOR_HOVER = 4
+TA_COLOR_SELECTED = 5
+
+#TextEdit
+IE_GUI_TEXTEDIT_ALPHACHARS = 1
+IE_GUI_TEXTEDIT_NUMERIC = 2
 
 #gui control types
 IE_GUI_BUTTON = 0
@@ -70,35 +103,41 @@ IE_GUI_LABEL = 6
 IE_GUI_SCROLLBAR = 7
 IE_GUI_WORLDMAP = 8
 IE_GUI_MAP = 9
+IE_GUI_CONSOLE = 10
+
+GEM_MB_ACTION               = 1
+GEM_MB_MENU                 = 4
+
+IE_ACT_MOUSE_PRESS   = 0
+IE_ACT_MOUSE_DRAG    = 1
+IE_ACT_MOUSE_OVER    = 2
+IE_ACT_MOUSE_ENTER   = 3
+IE_ACT_MOUSE_LEAVE   = 4
+IE_ACT_VALUE_CHANGE  = 5
+IE_ACT_DRAG_DROP_CRT = 6
+IE_ACT_DRAG_DROP_SRC = 7
+IE_ACT_DRAG_DROP_DST = 8
+IE_ACT_CUSTOM        = 9
 
 #events
 IE_GUI_BUTTON_ON_PRESS      = 0x00000000
-IE_GUI_MOUSE_OVER_BUTTON    = 0x00000001
-IE_GUI_MOUSE_ENTER_BUTTON   = 0x00000002
-IE_GUI_MOUSE_LEAVE_BUTTON   = 0x00000003
-IE_GUI_BUTTON_ON_SHIFT_PRESS= 0x00000004
-IE_GUI_BUTTON_ON_RIGHT_PRESS= 0x00000005
-IE_GUI_BUTTON_ON_DRAG_DROP  = 0x00000006
-IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT = 0x00000007
-IE_GUI_BUTTON_ON_DRAG       = 0x00000008
-IE_GUI_BUTTON_ON_DOUBLE_PRESS = 0x00000009
-IE_GUI_PROGRESS_END_REACHED = 0x01000000
+IE_GUI_MOUSE_ENTER_BUTTON   = 0x00000001
+IE_GUI_MOUSE_LEAVE_BUTTON   = 0x00000002
+IE_GUI_BUTTON_ON_SHIFT_PRESS= 0x00000003
+IE_GUI_BUTTON_ON_RIGHT_PRESS= 0x00000004
+IE_GUI_BUTTON_ON_DOUBLE_PRESS = 0x00000007
+IE_GUI_PROGRESS_END_REACHED = IE_ACT_CUSTOM
 IE_GUI_SLIDER_ON_CHANGE     = 0x02000000
 IE_GUI_EDIT_ON_CHANGE       = 0x03000000
 IE_GUI_EDIT_ON_DONE         = 0x03000001
 IE_GUI_EDIT_ON_CANCEL       = 0x03000002
-IE_GUI_TEXTAREA_ON_CHANGE   = 0x05000000
-IE_GUI_TEXTAREA_ON_SELECT   = 0x05000001
+IE_GUI_TEXTAREA_ON_CHANGE   = IE_ACT_VALUE_CHANGE
+IE_GUI_TEXTAREA_ON_SELECT   = IE_ACT_CUSTOM
 IE_GUI_LABEL_ON_PRESS       = 0x06000000
 IE_GUI_SCROLLBAR_ON_CHANGE  = 0x07000000
 IE_GUI_WORLDMAP_ON_PRESS    = 0x08000000
-IE_GUI_MOUSE_ENTER_WORLDMAP = 0x08000002
 IE_GUI_MAP_ON_PRESS         = 0x09000000
 IE_GUI_MAP_ON_RIGHT_PRESS   = 0x09000005
-IE_GUI_MAP_ON_DOUBLE_PRESS  = 0x09000008
-
-#common states
-IE_GUI_CONTROL_FOCUSED    = 0x7f000080
 
 #button states
 IE_GUI_BUTTON_ENABLED    = 0x00000000
@@ -113,29 +152,19 @@ IE_GUI_BUTTON_FAKEDISABLED    = 0x00000005
 # Draws PRESSED bitmap, but it isn't shifted
 IE_GUI_BUTTON_FAKEPRESSED   = 0x00000006
 
-#edit field states
-IE_GUI_EDIT_NUMBER    =  0x030000001
-
 #mapcontrol states (add 0x090000000 if used with SetControlStatus)
 IE_GUI_MAP_NO_NOTES   =  0
 IE_GUI_MAP_VIEW_NOTES =  1
 IE_GUI_MAP_SET_NOTE   =  2
 IE_GUI_MAP_REVEAL_MAP =  3
 
-# !!! Keep these synchronized with WorldMapControl.h !!!
-# WorldMap label colors
-IE_GUI_WMAP_COLOR_BACKGROUND = 0
-IE_GUI_WMAP_COLOR_NORMAL     = 1
-IE_GUI_WMAP_COLOR_SELECTED   = 2
-IE_GUI_WMAP_COLOR_NOTVISITED = 3
-
 # !!! Keep these synchronized with Font.h !!!
 IE_FONT_ALIGN_LEFT       = 0x00
 IE_FONT_ALIGN_CENTER     = 0x01
 IE_FONT_ALIGN_RIGHT      = 0x02
 IE_FONT_ALIGN_BOTTOM     = 0x04
-IE_FONT_ALIGN_TOP        = 0x10   # Single-Line and Multi-Line Text
-IE_FONT_ALIGN_MIDDLE     = 0x20   #Only for single line Text
+IE_FONT_ALIGN_TOP        = 0x10
+IE_FONT_ALIGN_MIDDLE     = 0x20
 IE_FONT_SINGLE_LINE      = 0x40
 
 OP_SET = 0
@@ -146,12 +175,22 @@ OP_NAND = 4
 
 # Window position anchors/alignments
 # !!! Keep these synchronized with Window.h !!!
-WINDOW_TOPLEFT       = 0x00
-WINDOW_CENTER        = 0x01
-WINDOW_ABSCENTER     = 0x02
-WINDOW_RELATIVE      = 0x04
-WINDOW_SCALE         = 0x08
-WINDOW_BOUNDED       = 0x10
+WF_DRAGGABLE		= 0x01
+WF_BORDERLESS		= 0x02
+WF_DESTROY_ON_CLOSE	= 0x04
+WF_ALPHA_CHANNEL	= 0x08
+
+WINDOW_TOP			 = 0x01
+WINDOW_BOTTOM        = 0x02
+WINDOW_VCENTER	     = 0x03
+WINDOW_LEFT			 = 0x04
+WINDOW_RIGHT         = 0x08
+WINDOW_HCENTER       = 0xC
+WINDOW_CENTER		 = 0xF
+
+ACTION_WINDOW_CLOSED		= 0
+ACTION_WINDOW_FOCUS_GAINED	= 1
+ACTION_WINDOW_FOCUS_LOST	= 2
 
 # GameScreen flags
 GS_PARTYAI           = 1
@@ -167,11 +206,8 @@ GS_MAPNOTE           = 128
 
 # GameControl screen flags
 # !!! Keep these synchronized with GameControl.h !!!
-SF_DISABLEMOUSE      = 1
-SF_CENTERONACTOR     = 2
-SF_ALWAYSCENTER      = 4
-SF_GUIENABLED        = 8
-SF_LOCKSCROLL        = 16
+SF_CENTERONACTOR     = 1
+SF_ALWAYSCENTER      = 2
 
 # GameControltarget modes
 # !!! Keep these synchronized with GameControl.h !!!
@@ -200,14 +236,6 @@ GF_ALL_STRINGS_TAGGED = 1
 MODAL_SHADOW_NONE = 0
 MODAL_SHADOW_GRAY = 1
 MODAL_SHADOW_BLACK = 2
-
-# Flags for SetVisible()
-# !!! Keep these synchronized with Interface.h !!!
-#WINDOW_INVALID = -1
-WINDOW_INVISIBLE = 0
-WINDOW_VISIBLE = 1
-WINDOW_GRAYED = 2
-WINDOW_FRONT = 3
 
 # character resource directories
 # !!! Keep these synchronized with Interface.h !!!
@@ -284,11 +312,6 @@ IE_INV_ITEM_COLDIRON      = 0x20000
 IE_INV_ITEM_STOLEN2       = 0x40000
 IE_INV_ITEM_CONVERSABLE   = 0x80000
 IE_INV_ITEM_PULSATING     = 0x100000
-
-#repeat key flags
-GEM_RK_DOUBLESPEED = 1
-GEM_RK_DISABLE = 2
-GEM_RK_QUADRUPLESPEED = 4
 
 # !!! Keep this synchronized with Store.h !!!
 SHOP_BUY    = 1

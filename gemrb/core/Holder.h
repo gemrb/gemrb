@@ -21,6 +21,7 @@
 #ifndef HOLDER_H
 #define HOLDER_H
 
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 
@@ -34,6 +35,7 @@ template <class T>
 class Held {
 public:
 	Held() : RefCount(0) {}
+	virtual ~Held() = default;
 	void acquire() { ++RefCount; }
 	void release() { assert(RefCount && "Broken Held usage.");
 		if (!--RefCount) delete static_cast<T*>(this); }
@@ -74,13 +76,10 @@ public:
 		if (ptr)
 			ptr->acquire();
 	}
-	Holder& operator=(const Holder& rhs)
+	
+	Holder& operator=(Holder rhs)
 	{
-		if (rhs.ptr)
-			rhs.ptr->acquire();
-		if (ptr)
-			ptr->release();
-		ptr = rhs.ptr;
+		std::swap(rhs.ptr, ptr);
 		return *this;
 	}
 	
@@ -105,9 +104,16 @@ public:
 			ptr->release();
 		ptr = NULL;
 	}
+
 protected:
 	T *ptr;
 };
+
+template<class T>
+inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
+{
+	return lhs.get() == rhs.get();
+}
 
 template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
@@ -122,6 +128,12 @@ inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
 }
 
 template<class T>
+inline bool operator!=(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
+{
+	return lhs.get() != rhs.get();
+}
+
+template<class T>
 inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
     return bool(lhs);
@@ -131,6 +143,13 @@ template<class T>
 inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
     return bool(rhs);
+}
+
+template<class T, typename... ARGS>
+inline Holder<T> MakeHolder(ARGS&&... args)
+{
+	Holder<T> holder(new T(std::forward<ARGS>(args)...));
+	return holder;
 }
 
 }

@@ -45,7 +45,7 @@
 #include <time.h>
 
 #ifdef VITA
-#include <psp2/kernel/iofilemgr.h> 
+#include <dirent.h>
 #endif
 
 namespace GemRB {
@@ -135,7 +135,7 @@ SaveGame::~SaveGame()
 {
 }
 
-Sprite2D* SaveGame::GetPortrait(int index) const
+Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 {
 	if (index > PortraitCount) {
 		return NULL;
@@ -148,7 +148,7 @@ Sprite2D* SaveGame::GetPortrait(int index) const
 	return im->GetSprite2D();
 }
 
-Sprite2D* SaveGame::GetPreview() const
+Holder<Sprite2D> SaveGame::GetPreview() const
 {
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(Prefix, manager, true);
 	if (!im)
@@ -271,7 +271,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 		return false;
 	}
 
-	if (core->WorldMapName[1][0]) {
+	if (core->WorldMapName[1]) {
 		PathJoinExt(ftmp, dtmp, core->WorldMapName[1], "wmp");
 		if (access(ftmp, R_OK)) {
 			Log(WARNING, "SaveGameIterator", "Ignoring slot %s because of no appropriate second worldmap!", dtmp);
@@ -304,9 +304,10 @@ bool SaveGameIterator::RescanSaveGames()
 	}
 
 	std::set<char*,iless> slots;
+	dir.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *name = dir.GetName();
-		if (dir.IsDirectory() && IsSaveGameSlot( Path, name )) {
+		if (IsSaveGameSlot( Path, name )) {
 			slots.insert(strdup(name));
 		}
 	} while (++dir);
@@ -402,11 +403,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		FormatQuickSavePath(from, myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
 		core->DelTree(from, false);
-#ifdef VITA
-		sceIoRemove(from);
-#else
 		rmdir(from);
-#endif
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
@@ -459,18 +456,29 @@ static bool DoSaveGame(const char *Path)
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Sprite2D* portrait = core->GetGameControl()->GetPortraitPreview( i );
+		Actor *actor = game->GetPC( i, false );
+		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
+
 		if (portrait) {
 			char FName[_MAX_PATH];
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
-			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
-			im->PutImage( &outfile, portrait );
+			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
+			// NOTE: we save the true portrait size, even tho the preview buttons arent (always) the same
+			// we do this because: 1. the GUI should be able to use whatever size it wants
+			// and 2. its more appropriate to have a flag on the buttons to do the scaling/cropping
+			im->PutImage(&outfile, portrait);
 		}
 	}
 
 	// Create area preview
-	Sprite2D* preview = core->GetGameControl()->GetPreview();
+	// FIXME: the preview should be passed in by the caller!
+
+	WindowManager* wm = core->GetWindowManager();
+	Holder<Sprite2D> preview = wm->GetScreenshot(wm->GetGameWindow());
+
+	// scale down to get more of the screen and reduce the size
+	preview = core->GetVideoDriver()->SpriteScaleDown(preview, 5);
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->PutImage( &outfile, preview );
@@ -533,12 +541,10 @@ static int CanSave()
 			displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 			return 6;
 		}
-
 		if (map->AnyEnemyNearPoint(actor->Pos)) {
 			displaymsg->DisplayConstantString( STR_CANTSAVEMONS, DMC_BG2XPGREEN );
 			return 7;
 		}
-
 	}
 
 	Point pc1 =  game->GetPC(0, true)->Pos;
@@ -705,11 +711,7 @@ void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
 	}
 
 	core->DelTree( game->GetPath(), false ); //remove all files from folder
-#ifdef VITA
-	sceIoRemove(game->GetPath());
-#else
 	rmdir( game->GetPath() );
-#endif
 }
 
 }

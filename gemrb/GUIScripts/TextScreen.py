@@ -22,7 +22,6 @@ import GemRB
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_GUI
 from GUIDefines import *
-import GUICommon
 import GameCheck
 
 TextScreen = None
@@ -87,11 +86,6 @@ def StartTextScreen ():
 	if Message != "*":
 		GemRB.DisplayString (Message, 0xff0000)
 
-	if GameCheck.IsIWD2 () or GameCheck.IsGemRBDemo ():
-		GemRB.LoadWindowPack ("GUICHAP", 800, 600)
-	else:
-		GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-
 	Table = GemRB.LoadTable (TableName)
 	if GameCheck.IsBG2():
 		LoadPic = Table.GetValue (-1, -1)
@@ -110,10 +104,12 @@ def StartTextScreen ():
 	else:
 		GemRB.HardEndPL ()
 
-	TextScreen = GemRB.LoadWindow (ID)
-	TextScreen.SetFrame ()
-
+	TextScreen = GemRB.LoadWindow (ID, "GUICHAP")
 	TextArea = TextScreen.GetControl (2)
+	TextArea.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	GameWin = GemRB.GetView("GAMEWIN")
+	GameWin.SetDisabled(True)
 
 	if GameCheck.IsBG1():
 		#these suckers couldn't use a fix row
@@ -127,15 +123,15 @@ def StartTextScreen ():
 				PicButton.SetPicture (LoadPic)
 				PicButton.SetState (IE_GUI_BUTTON_LOCKED)
 			else:
-				TextScreen.SetPicture (LoadPic)
+				TextScreen.SetBackground (LoadPic)
 	else:
 		Row = Chapter
 
 	#caption
 	Value = Table.GetValue (Row, 0)
 	#don't display the fake -1 string (No caption in toscst.2da)
-	if Value!="NONE" and Value>0 and TextScreen.HasControl(0x10000000):
-		Label=TextScreen.GetControl (0x10000000)
+	Label = TextScreen.GetControl (0x10000000)
+	if Label and Value!="NONE" and Value>0:
 		Label.SetText (Value)
 
 	#done
@@ -145,7 +141,7 @@ def StartTextScreen ():
 	else:
 		Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, EndTextScreen)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL,OP_OR)
+	Button.MakeDefault()
 
 	#replay
 	Button=TextScreen.GetControl (3)
@@ -156,10 +152,9 @@ def StartTextScreen ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReplayTextScreen)
 
 	#if this was opened from somewhere other than game control close that window
-	GUICommon.CloseOtherWindow(None)
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE) #removing the gamecontrol screen
-	TextScreen.SetVisible (WINDOW_VISIBLE)
+	import GUICommonWindows
+	GUICommonWindows.CloseTopWindow ()
+
 	TextScreen.ShowModal (MODAL_SHADOW_NONE)
 
 	ReplayTextScreen()
@@ -182,13 +177,12 @@ def EndTextScreen ():
 	global TextScreen, TableName
 
 	if TextScreen:
-		TextScreen.SetVisible (WINDOW_INVISIBLE)
 		TextScreen.Unload ()
 		GemRB.HardEndPL ()
 		GemRB.PlaySound(None, CHAN_GUI, 0, 0, 4)
 
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE) # enable the gamecontrol screen
-	GemRB.UnhideGUI ()
+	GameWin = GemRB.GetView("GAMEWIN")
+	GameWin.SetDisabled(False)
 	ToggleAmbients (1)
 	GemRB.GamePause (0, 3)
 

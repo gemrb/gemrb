@@ -25,6 +25,7 @@
 
 #include "ActorMgr.h"
 #include "Ambient.h"
+#include "AnimationFactory.h"
 #include "DataFileMgr.h"
 #include "DisplayMessage.h"
 #include "EffectMgr.h"
@@ -114,7 +115,7 @@ static int GetTrackString(const ieResRef areaName)
 			} else {
 				tracks[i].trackFlag=trackflag;
 			}
-			tracks[i].text=(ieStrRef) atoi(poi);
+			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty=atoi(tm->QueryField(i,1));
 			strnlwrcpy(tracks[i].areaName, tm->GetRowName(i), 8 );
 		}
@@ -428,7 +429,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (idx>=0) {
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
 	} else {
-		map->SetTrackString((ieStrRef) -1, false, 0);
+		map->SetTrackString(ieStrRef(-1), false, 0);
 	}
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
@@ -644,15 +645,49 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
 
+		InfoPoint* ip = nullptr;
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
-		for (x = 0; x < VertexCount; x++) {
-			str->ReadWord( (ieWord*) &points[x].x );
-			str->ReadWord( (ieWord*) &points[x].y );
+		if (VertexCount <= 1) {
+			// this is exactly the same as bbox.Origin()
+			if (VertexCount == 1) {
+				str->ReadWord( (ieWord*) &tmp );
+				assert(tmp == bbox.x);
+				str->ReadWord( (ieWord*) &tmp );
+				assert(tmp == bbox.y);
+			}
+
+			if (bbox.Dimensions().IsEmpty()) {
+				// we approximate a bounding box equivalent to a small radius
+				// we copied this from the Container code that seems to indicate
+				// this is how the originals behave. It is probably "good enough"
+				bbox.x = PosX - 7;
+				bbox.y = PosY - 5;
+				bbox.w = 16;
+				bbox.h = 12;
+			}
+
+			ip = tm->AddInfoPoint( Name, Type, nullptr );
+			ip->BBox = bbox;
+		} else if (VertexCount == 2) {
+#define MSG "Encounted a bogus polygon with 2 verticies"
+#if NDEBUG
+			Log(ERROR, "AREImporter", MSG);
+			continue;
+#else // make this fatal on debug builds
+			error("AREImporter", MSG);
+#endif
+#undef MSG
+		} else {
+			Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
+			for (x = 0; x < VertexCount; x++) {
+				str->ReadWord( (ieWord*) &points[x].x );
+				str->ReadWord( (ieWord*) &points[x].y );
+			}
+			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
+			free( points );
+			ip = tm->AddInfoPoint( Name, Type, poly );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
-		free( points );
-		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
+
 		ip->TrapDetectionDiff = TrapDetDiff;
 		ip->TrapRemovalDiff = TrapRemDiff;
 		ip->Trapped = Trapped;
@@ -753,26 +788,34 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword( &OpenFail );
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
-		for (x = 0; x < vertCount; x++) {
-			ieWord tmp;
-			str->ReadWord( &tmp );
-			points[x].x = tmp;
-			str->ReadWord( &tmp );
-			points[x].y = tmp;
-		}
-		if (vertCount == 0 && bbox.w == 0 && bbox.h == 0) {
+
+		Container* c = nullptr;
+		if (vertCount == 0) {
 			/* piles have no polygons and no bounding box in some areas,
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
-			bbox.x = XPos - 7;
-			bbox.y = YPos - 5;
-			bbox.w = 16;
-			bbox.h = 12;
+			if (bbox.Dimensions().IsEmpty()) {
+				bbox.x = XPos - 7;
+				bbox.y = YPos - 5;
+				bbox.w = 16;
+				bbox.h = 12;
+			}
+			c = map->AddContainer( Name, Type, nullptr );
+			c->BBox = bbox;
+		} else {
+			Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
+			for (x = 0; x < vertCount; x++) {
+				ieWord tmp;
+				str->ReadWord( &tmp );
+				points[x].x = tmp;
+				str->ReadWord( &tmp );
+				points[x].y = tmp;
+			}
+			auto poly = std::make_shared<Gem_Polygon>( points, vertCount, &bbox );
+			c = map->AddContainer( Name, Type, poly );
+			free( points );
 		}
-		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
-		free( points );
-		Container* c = map->AddContainer( Name, Type, poly );
+
 		//c->SetMap(map);
 		c->Pos.x = XPos;
 		c->Pos.y = YPos;
@@ -800,7 +843,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c->Scripts[0] = NULL;
 		}
 		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
-		if (!OpenFail) OpenFail = (ieStrRef)-1; // rewrite 0 to -1
+		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
 
@@ -900,30 +943,35 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 
 		//Reading Open Polygon
+		std::shared_ptr<Gem_Polygon> open = nullptr;
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* )
-			malloc( OpenVerticesCount*sizeof( Point ) );
-		for (x = 0; x < OpenVerticesCount; x++) {
-			str->ReadWord( &minX );
-			points[x].x = minX;
-			str->ReadWord( &minY );
-			points[x].y = minY;
+		if (OpenVerticesCount) {
+			Point* points = (Point*)malloc( OpenVerticesCount*sizeof( Point ) );
+			for (x = 0; x < OpenVerticesCount; x++) {
+				str->ReadWord( &minX );
+				points[x].x = minX;
+				str->ReadWord( &minY );
+				points[x].y = minY;
+			}
+			open = std::make_shared<Gem_Polygon>( points, OpenVerticesCount, &BBOpen );
+			free( points );
 		}
-		Gem_Polygon* open = new Gem_Polygon( points, OpenVerticesCount, &BBOpen );
-		free( points );
 
 		//Reading Closed Polygon
+		std::shared_ptr<Gem_Polygon> closed = nullptr;
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
-		points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
-		for (x = 0; x < ClosedVerticesCount; x++) {
-			str->ReadWord( &minX );
-			points[x].x = minX;
-			str->ReadWord( &minY );
-			points[x].y = minY;
+		if (ClosedVerticesCount) {
+			Point* points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
+			for (x = 0; x < ClosedVerticesCount; x++) {
+				str->ReadWord( &minX );
+				points[x].x = minX;
+				str->ReadWord( &minY );
+				points[x].y = minY;
+			}
+			closed = std::make_shared<Gem_Polygon>( points, ClosedVerticesCount, &BBClosed );
+			free( points );
 		}
-		Gem_Polygon* closed = new Gem_Polygon( points, ClosedVerticesCount, &BBClosed );
-		free( points );
 
 		//Getting Door Information from the WED File
 		bool BaseClosed;
@@ -932,17 +980,19 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			BaseClosed = !BaseClosed;
 		}
 
-		Door* door;
-		door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
-					indices, count, open, closed );
+		auto closedPolys = tmm->ClosedDoorPolygons();
+		auto openPolys = tmm->OpenDoorPolygons();
 
-		tmm->SetupClosedDoor(door->closed_wg_index, door->closed_wg_count);
-		tmm->SetupOpenDoor(door->open_wg_index, door->open_wg_count);
+		DoorTrigger dt(open, std::move(openPolys), closed, std::move(closedPolys));
+		Door* door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
+					indices, count, std::move(dt) );
+		door->OpenBBox = BBOpen;
+		door->ClosedBBox = BBClosed;
 
 		//Reading Open Impeded blocks
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
+		Point* points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
 		for (x = 0; x < OpenImpededCount; x++) {
 			str->ReadWord( &minX );
 			points[x].x = minX;
@@ -1004,7 +1054,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
-		if (!OpenStrRef) OpenStrRef = (ieStrRef)-1; // rewrite 0 to -1
+		if (!OpenStrRef) OpenStrRef = ieStrRef(-1); // rewrite 0 to -1
 		door->OpenStrRef=OpenStrRef;
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
@@ -1220,6 +1270,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			str->ReadDword( &anim->Flags );
 			anim->originalFlags = anim->Flags;
 			str->ReadWordSigned( &anim->height );
+			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && anim->height <= 0) {
+				anim->height = ANI_PRI_BACKGROUND;
+				anim->Flags |= A_ANI_NO_WALL;
+			}
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &startFrameRange );
 			str->Read( &anim->startchance,1 );
@@ -1322,50 +1376,80 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
 	Point point;
-	ieDword color = 0;
-
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	if (pst && !NoteCount) {
-		if( !INInote ) {
-			ReadAutonoteINI();
+
+	if (pst) {
+		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
+		if (flags == NULL) {
+			ResourceHolder<ImageMgr> roimg = GetResourceHolder<ImageMgr>("RONOTE");
+			ResourceHolder<ImageMgr> userimg = GetResourceHolder<ImageMgr>("USERNOTE");
+
+			CycleEntry rocycle = {1, 0};
+			flags = new AnimationFactory("FLAG1");
+			flags->AddCycle(rocycle);
+			flags->AddFrame(roimg->GetSprite2D());
+			CycleEntry usercycle = {1, 1};
+			flags->AddCycle(usercycle);
+			flags->AddFrame(userimg->GetSprite2D());
+
+			ieWord flt[2] = {0, 1};
+			flags->LoadFLT(flt, 2);
+			gamedata->AddFactoryResource(flags);
 		}
-		//add autonote.ini entries
-		if( INInote ) {
-			color = 1; //read only note
-			const char *scriptName = map->GetScriptName();
-			int count = INInote->GetKeyAsInt(scriptName, "count", 0);
-			while (count) {
-				char key[32];
-				int value;
-				snprintf(key, sizeof(key), "xPos%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				point.x = value;
-				snprintf(key, sizeof(key), "yPos%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				point.y = value;
-				snprintf(key, sizeof(key), "text%d",count);
-				value = INInote->GetKeyAsInt(scriptName, key, 0);
-				map->AddMapNote( point, color, value);
-				count--;
+
+		if (!NoteCount) {
+			if( !INInote ) {
+				ReadAutonoteINI();
+			}
+
+			//add autonote.ini entries
+			if( INInote ) {
+				const char *scriptName = map->GetScriptName();
+				int count = INInote->GetKeyAsInt(scriptName, "count", 0);
+				while (count) {
+					char key[32];
+					int value;
+					snprintf(key, sizeof(key), "xPos%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					point.x = value;
+					snprintf(key, sizeof(key), "yPos%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					point.y = value;
+					snprintf(key, sizeof(key), "text%d",count);
+					value = INInote->GetKeyAsInt(scriptName, key, 0);
+					map->AddMapNote(point, 0, value, true);
+					count--;
+				}
+			}
+		} else {
+			for (i = 0; i < NoteCount; i++) {
+				ieDword px,py;
+				str->ReadDword(&px);
+				str->ReadDword(&py);
+
+				// in PST the coordinates are stored in small map space
+				// our MapControl wants them in large map space so we must convert
+				// its what other games use and its what our custom map note code uses
+				const Size mapsize = map->GetSize();
+				point.x = px * double(mapsize.w) / map->SmallMap->Frame.w;
+				point.y = py * double(mapsize.h) / map->SmallMap->Frame.h;
+
+				char bytes[501]; // 500 + null
+				str->Read(bytes, 500 );
+				bytes[500] = '\0';
+				String* text = StringFromCString(bytes);
+				ieDword readonly;
+				str->ReadDword(&readonly); //readonly == 1
+				if (readonly) {
+					map->AddMapNote(point, 0, text, true);
+				} else {
+					map->AddMapNote(point, 1, text, false);
+				}
+				str->Seek(20, GEM_CURRENT_POS);
 			}
 		}
-	}
-	for (i = 0; i < NoteCount; i++) {
-		if (pst) {
-			ieDword px,py;
-			str->ReadDword(&px);
-			str->ReadDword(&py);
-			point.x=px;
-			point.y=py;
-
-			char bytes[501]; // 500 + null
-			str->Read(bytes, 500 );
-			bytes[500] = '\0';
-			String* text = StringFromCString(bytes);
-			str->ReadDword(&color); //readonly == 1
-			map->AddMapNote(point, color, text);
-			str->Seek(20, GEM_CURRENT_POS);
-		} else {
+	} else {
+		for (i = 0; i < NoteCount; i++) {
 			ieWord px,py;
 
 			str->ReadWord( &px );
@@ -1374,11 +1458,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			point.y=py;
 			ieStrRef strref = 0;
 			str->ReadDword( &strref );
-			str->ReadWord( &px );
-			str->ReadWord( &py );
-			color=py;
+			ieWord location; // (0=Extenal (TOH/TOT), 1=Internal (TLK)
+			str->ReadWord( &location );
+			ieWord color;
+			str->ReadWord( &color );
 			str->Seek( 40, GEM_CURRENT_POS );
-			map->AddMapNote( point, color, strref );
+			// FIXME: do any other games have read only notes?
+			// BG2 allows editing the builtin notes, PST does not, what about others?
+			map->AddMapNote(point, color, strref, false);
 		}
 	}
 
@@ -1422,7 +1509,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
 		ReadEffects(fs, fxqueue, TrapEffectCount);
-		Actor * caster = core->GetGame()->FindPC(Owner + 1);
+		Actor *caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
 			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
@@ -1481,7 +1568,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	map->VisibleBitmap = (ieByte *) calloc(i, 1);
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
-	map->SetWallGroups( tmm->GetPolygonsCount(),tmm->GetWallGroups() );
+	map->SetWallGroups(tmm->GetWallGroups());
 	//setting up doors
 	for (i=0;i<DoorsCount;i++) {
 		Door *door = tm->GetDoor(i);
@@ -1498,13 +1585,34 @@ void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
 	 * break things (like stopping early, hiding under FoW).
 	 *
 	 * So far, a better approximation towards handling animations is:
-	 * - always set A_ANI_BLEND, A_ANI_SYNC,
-	 * - unset A_ANI_PLAYONCE, A_ANI_NOT_IN_FOG, A_ANI_BACKGROUND.
+	 * - zero everything
+	 * - always set A_ANI_SYNC
+	 * - copy/map known flags (A_ANI_ACTIVE, A_ANI_NO_WALL, A_ANI_BLEND)
+	 *
+	 * Note that WF_COVERANIMS is enabled by default for PST, so ANI_NO_WALL
+	 *   is important.
 	 *
 	 * The actual use of bits in PST map anims isn't fully solved here.
 	 */
-	areaAnim->Flags |= (A_ANI_BLEND | A_ANI_SYNC);
-	areaAnim->Flags &= ~(A_ANI_PLAYONCE | A_ANI_NOT_IN_FOG | A_ANI_BACKGROUND);
+
+	#define PST_ANI_NO_WALL 0x0008  // A_ANI_PLAYONCE in other games
+	#define PST_ANI_BLEND 0x0100  // A_ANI_BACKGROUND in other games
+
+	areaAnim->Flags = 0;             // Clear everything
+
+	// Set default-on flags (currently only A_ANI_SYNC)
+	areaAnim->Flags |= A_ANI_SYNC;
+
+	// Copy still-relevant A_ANI_* flags
+	areaAnim->Flags |= areaAnim->originalFlags & A_ANI_ACTIVE;
+
+	// Map known flags
+	if (areaAnim->originalFlags & PST_ANI_BLEND) {
+		areaAnim->Flags |= A_ANI_BLEND;
+	}
+	if (areaAnim->originalFlags & PST_ANI_NO_WALL) {
+		areaAnim->Flags |= A_ANI_NO_WALL;
+	}
 }
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
@@ -1571,15 +1679,27 @@ int AREImporter::GetStoredFileSize(Map *map)
 	VerticesCount = 0;
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip=map->TMap->GetInfoPoint(i);
-		VerticesCount+=ip->outline->count;
+		if (ip->outline) {
+			VerticesCount+=ip->outline->Count();
+		} else {
+			VerticesCount++;
+		}
 	}
 	for(i=0;i<ContainersCount;i++) {
 		Container *c=map->TMap->GetContainer(i);
-		VerticesCount+=c->outline->count;
+		if (c->outline)
+			VerticesCount+=c->outline->Count();
 	}
 	for(i=0;i<DoorsCount;i++) {
 		Door *d=map->TMap->GetDoor(i);
-		VerticesCount+=d->open->count+d->closed->count+d->oibcount+d->cibcount;
+		auto open = d->OpenTriggerArea();
+		auto closed = d->ClosedTriggerArea();
+		if (open)
+			VerticesCount += open->Count();
+		if (closed)
+			VerticesCount += closed->Count();
+
+		VerticesCount += d->oibcount+d->cibcount;
 	}
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
@@ -1754,30 +1874,32 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		}
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
-		tmpWord = (ieWord) d->open->count;
+		auto open = d->OpenTriggerArea();
+		tmpWord = (open) ? open->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		VertIndex += tmpWord;
-		tmpWord = (ieWord) d->closed->count;
+		auto closed = d->ClosedTriggerArea();
+		tmpWord = (closed) ? closed->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
 		//open bounding box
-		tmpWord = (ieWord) d->open->BBox.x;
+		tmpWord = (ieWord) d->OpenBBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->open->BBox.y;
+		tmpWord = (ieWord) d->OpenBBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->open->BBox.x+d->open->BBox.w);
+		tmpWord = (ieWord) (d->OpenBBox.x+d->OpenBBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->open->BBox.y+d->open->BBox.h);
+		tmpWord = (ieWord) (d->OpenBBox.y+d->OpenBBox.h);
 		stream->WriteWord( &tmpWord);
 		//closed bounding box
-		tmpWord = (ieWord) d->closed->BBox.x;
+		tmpWord = (ieWord) d->ClosedBBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->closed->BBox.y;
+		tmpWord = (ieWord) d->ClosedBBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->closed->BBox.x+d->closed->BBox.w);
+		tmpWord = (ieWord) (d->ClosedBBox.x+d->ClosedBBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (d->closed->BBox.y+d->closed->BBox.h);
+		tmpWord = (ieWord) (d->ClosedBBox.y+d->ClosedBBox.h);
 		stream->WriteWord( &tmpWord);
 		//open and closed impeded blocks
 		stream->WriteDword( &VertIndex);
@@ -1835,12 +1957,16 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutPoints(DataStream *stream, const Point *p, unsigned int count)
+int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p)
+{
+	return PutPoints(stream, &p[0], p.size());
+}
+
+int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 {
 	ieWord tmpWord;
-	unsigned int j;
 
-	for(j=0;j<count;j++) {
+	for(size_t j=0;j<count;j++) {
 		tmpWord = p[j].x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = p[j].y;
@@ -1856,18 +1982,29 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 	//regions
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
-		PutPoints(stream, ip->outline->points, ip->outline->count);
+		if (ip->outline) {
+			PutPoints(stream, ip->outline->vertices);
+		} else {
+			Point origin = ip->BBox.Origin();
+			PutPoints(stream, &origin, 1);
+		}
 	}
 	//containers
 	for(i=0;i<ContainersCount;i++) {
 		const Container *c = map->TMap->GetContainer(i);
-		PutPoints(stream, c->outline->points, c->outline->count);
+		if (c->outline) {
+			PutPoints(stream, c->outline->vertices);
+		}
 	}
 	//doors
 	for(i=0;i<DoorsCount;i++) {
 		const Door *d = map->TMap->GetDoor(i);
-		PutPoints(stream, d->open->points, d->open->count);
-		PutPoints(stream, d->closed->points, d->closed->count);
+		auto open = d->OpenTriggerArea();
+		auto closed = d->ClosedTriggerArea();
+		if (open)
+			PutPoints(stream, open->vertices);
+		if (closed)
+			PutPoints(stream, closed->vertices);
 		PutPoints(stream, d->open_ib, d->oibcount);
 		PutPoints(stream, d->closed_ib, d->cibcount);
 	}
@@ -1922,13 +2059,13 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		tmpWord = (ieWord) c->TrapLaunch.y;
 		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpWord = (ieWord) c->outline->BBox.x;
+		tmpWord = (ieWord) c->BBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) c->outline->BBox.y;
+		tmpWord = (ieWord) c->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
+		tmpWord = (ieWord) (c->BBox.x + c->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (c->outline->BBox.y + c->outline->BBox.h);
+		tmpWord = (ieWord) (c->BBox.y + c->BBox.h);
 		stream->WriteWord( &tmpWord);
 		//item index and offset
 		tmpDword = c->inventory.GetSlotCount();
@@ -1942,7 +2079,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 			stream->Write( filling, 8);
 		}
 		//outline polygon index and count
-		tmpWord = c->outline->count;
+		tmpWord = (c->outline) ? c->outline->Count() : 0;
 		stream->WriteDword( &VertIndex);
 		stream->WriteWord( &tmpWord);
 		VertIndex +=tmpWord;
@@ -1975,15 +2112,15 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		tmpWord = ((ieWord) ip->Type) - 1;
 		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpWord = (ieWord) ip->outline->BBox.x;
+		tmpWord = (ieWord) ip->BBox.x;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->outline->BBox.y;
+		tmpWord = (ieWord) ip->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
+		tmpWord = (ieWord) (ip->BBox.x + ip->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (ip->outline->BBox.y + ip->outline->BBox.h);
+		tmpWord = (ieWord) (ip->BBox.y + ip->BBox.h);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) ip->outline->count;
+		tmpWord = (ip->outline) ? ip->outline->Count() : 1;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
@@ -2286,13 +2423,15 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
 		const MapNote& mn = map->GetMapNote(i);
-		int x;
 
 		if (pst) {
-			tmpDword = (ieDword) mn.Pos.x;
+			// in PST the coordinates are stored in small map space
+			const Size& mapsize = map->GetSize();
+			tmpDword = mn.Pos.x * double(map->SmallMap->Frame.w) / mapsize.w;
 			stream->WriteDword( &tmpDword );
-			tmpDword = (ieDword) mn.Pos.y;
+			tmpDword = mn.Pos.y * double(map->SmallMap->Frame.h) / mapsize.h;
 			stream->WriteDword( &tmpDword );
+
 			int len = 0;
 			if (mn.text) {
 				// limited to 500 *bytes* of text, convert to a multibyte encoding.
@@ -2301,7 +2440,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
 				if (mbstring) {
 					// only care about number of bytes before null so strlen is what we want despite being MB string
-					len = (std::min)(static_cast<int>(strlen(mbstring)), 500);
+					len = std::min(static_cast<int>(strlen(mbstring)), 500);
 					stream->Write( mbstring, len);
 					free(mbstring);
 				} else {
@@ -2310,7 +2449,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 			}
 
 			// pad the remaining space
-			x = 500 - len;
+			int x = 500 - len;
 			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}
@@ -2318,7 +2457,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 			if (x) {
 				stream->Write( filling, x);
 			}
-			tmpDword = (ieDword) mn.color;
+			tmpDword = (ieDword) mn.readonly;
 			stream->WriteDword(&tmpDword);
 			for (x=0;x<5;x++) { //5 empty dwords
 				stream->Write( filling, 4);
@@ -2333,7 +2472,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 			stream->WriteWord( &mn.color );
 			tmpDword = 1;
 			stream->WriteDword( &tmpDword );
-			for (x=0;x<9;x++) { //9 empty dwords
+			for (int x = 0; x < 9; ++x) { //9 empty dwords
 				stream->Write( filling, 4);
 			}
 		}

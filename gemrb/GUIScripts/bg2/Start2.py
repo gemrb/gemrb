@@ -20,78 +20,20 @@
 import GemRB
 import GameCheck
 
-StartWindow = 0
-TutorialWindow = 0
-QuitWindow = 0
-ExitButton = 0
-SinglePlayerButton = 0
-OptionsButton = 0
-MultiPlayerButton = 0
-MoviesButton = 0
-BackButton = 0
-skip_videos = None
-
 def OnLoad():
-	global StartWindow, TutorialWindow, QuitWindow
-	global ExitButton, OptionsButton, MultiPlayerButton, MoviesButton, SinglePlayerButton, BackButton
-	global SinglePlayerButton, skip_videos
+	StartWindow = GemRB.LoadWindow (0, "START")
+	StartWindow.AddAlias("START2")
+	
+	if GameCheck.HasTOB() and GemRB.GetVar("oldgame")==1:
+		StartWindow.SetBackground("STARTOLD")
 
-	if skip_videos is None:
-		skip_videos = GemRB.GetVar ("SkipIntroVideos")
-
-	GemRB.LoadWindowPack("START", 640, 480)
-#tutorial subwindow
-	if not GameCheck.IsBG2Demo():
-		TutorialWindow = GemRB.LoadWindow (5)
-		TextAreaControl = TutorialWindow.GetControl (1)
-		CancelButton = TutorialWindow.GetControl (11)
-		PlayButton = TutorialWindow.GetControl (10)
-		TextAreaControl.SetText (44200)
-		CancelButton.SetText (13727)
-		PlayButton.SetText (33093)
-		PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelTut)
-		PlayButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	else:
-		GemRB.SetFeature (GF_ALL_STRINGS_TAGGED, True)
-
-#quit subwindow
-	QuitWindow = GemRB.LoadWindow (3)
-	QuitTextArea = QuitWindow.GetControl (0)
-	CancelButton = QuitWindow.GetControl (2)
-	ConfirmButton = QuitWindow.GetControl (1)
-	QuitTextArea.SetText (19532)
-	CancelButton.SetText (13727)
-	ConfirmButton.SetText (15417)
-	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-#main window
-	StartWindow = GemRB.LoadWindow (0)
-	StartWindow.SetFrame ()
-	#this is the ToB specific part of Start.py
-	if GemRB.GetVar("oldgame")==1:
-		if GameCheck.HasTOB():
-			StartWindow.SetPicture("STARTOLD")
-		if not skip_videos and not skip_videos&4:
-			GemRB.PlayMovie ("INTRO15F", 1)
-			skip_videos |= 4
-	else:
-		if not skip_videos and not skip_videos&2:
-			GemRB.PlayMovie ("INTRO", 1)
-			skip_videos |= 2
-
-	#end ToB specific part
 	SinglePlayerButton = StartWindow.GetControl (0)
 	ExitButton = StartWindow.GetControl (3)
 	OptionsButton = StartWindow.GetControl (4)
 	MultiPlayerButton = StartWindow.GetControl (1)
 	MoviesButton = StartWindow.GetControl (2)
 	BackButton = StartWindow.GetControl (5)
-	StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	Label=StartWindow.GetControl (0x0fff0000)
+	Label = StartWindow.CreateLabel(0x0fff0000, 0,450,640,30, "REALMS", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText (GemRB.Version)
 	if GameCheck.HasTOB():
 		BackButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -119,42 +61,43 @@ def OnLoad():
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	if not GameCheck.IsBG2Demo():
-		TutorialWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	MusicTable = GemRB.LoadTable ("songlist")
-	# the table has useless rownames, so we can't search for BG2Theme
-	theme = MusicTable.GetValue ("33", "RESOURCE")
-	GemRB.LoadMusicPL (theme, 1)
+	BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: StartWindow.Close())
+	ExitButton.MakeEscape()
+	StartWindow.Focus ()
+	
 	GemRB.SetToken ("SaveDir", "save")
 	return
 
 def SinglePlayerPress():
-
+	StartWindow = GemRB.GetView("START2")
+	
+	SinglePlayerButton = StartWindow.GetControl (0)
 	SinglePlayerButton.SetText (13728)
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, NewSingle)
 	
+	MultiPlayerButton = StartWindow.GetControl (1)
 	MultiPlayerButton.SetText (13729)
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadSingle)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
 
 	if not GameCheck.IsBG2Demo():
+		Button = StartWindow.GetControl (2)
 		if GemRB.GetVar("oldgame")==1:
-			MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
-			MoviesButton.SetText (33093)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Tutorial)
+			Button.SetText (33093)
 		else:
-			MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
-			MoviesButton.SetText (71175)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ImportGame)
+			Button.SetText (71175)
 
+	ExitButton = StartWindow.GetControl (3)
 	ExitButton.SetText (15416)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackToMain)
+	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	
+	OptionsButton = StartWindow.GetControl (4)
 	OptionsButton.SetText ("")
 	OptionsButton.SetState (IE_GUI_BUTTON_DISABLED)
 	
+	BackButton = StartWindow.GetControl (5)
 	BackButton.SetText ("")
 	BackButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
@@ -169,7 +112,7 @@ def MultiPlayerPress():
 	MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ConnectPress)
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PregenPress)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, BackToMain)
+	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, Restart)
 	MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
 	OptionsButton.SetState (IE_GUI_BUTTON_DISABLED)
 	return
@@ -180,12 +123,6 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	#do not start game after chargen
 	GemRB.SetVar("PlayMode",-1) #will allow export
 	GemRB.SetVar("Slot",1)
@@ -194,12 +131,6 @@ def PregenPress():
 	return
 
 def LoadSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
 	else:
@@ -209,12 +140,6 @@ def LoadSingle():
 	return
 
 def NewSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	if GemRB.GetVar ("oldgame") == 0:
 		GemRB.SetVar ("PlayMode", 2)
 	else:
@@ -225,109 +150,62 @@ def NewSingle():
 	return
 
 def ImportGame():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	#now this is tricky, we need to load old games, but set up the expansion
 	GemRB.SetVar ("PlayMode", 0)
 	GemRB.SetNextScript ("GUILOAD")
 	return
 	
 def Tutorial():
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	TutorialWindow.SetVisible (WINDOW_VISIBLE)
+	#tutorial subwindow
+	TutorialWindow = GemRB.LoadWindow (5, "START")
+	TutorialWindow.ShowModal()
+	TextAreaControl = TutorialWindow.GetControl (1)
+	CancelButton = TutorialWindow.GetControl (11)
+	PlayButton = TutorialWindow.GetControl (10)
+	TextAreaControl.SetText (44200)
+	CancelButton.SetText (13727)
+	PlayButton.SetText (33093)
+	PlayButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, PlayPress)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: TutorialWindow.Close())
+	PlayButton.MakeDefault()
+	CancelButton.MakeEscape()		
+
 	return
 
 def PlayPress():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetVar("PlayMode",1) #tutorial
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("CharGen")
 	return
 
-def CancelTut():
-	TutorialWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def ExitPress():
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	QuitWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
-def ExitConfirmed():
-	GemRB.Quit()
+	#quit subwindow
+	QuitWindow = GemRB.LoadWindow (3, "START")
+	Pos = QuitWindow.GetPos ()
+	QuitWindow.SetPos (Pos[0] - 3, Pos[1] + 12)
+	QuitTextArea = QuitWindow.GetControl (0)
+	CancelButton = QuitWindow.GetControl (2)
+	ConfirmButton = QuitWindow.GetControl (1)
+	QuitTextArea.SetText (19532)
+	CancelButton.SetText (13727)
+	ConfirmButton.SetText (15417)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	ConfirmButton.MakeDefault()
+	CancelButton.MakeEscape()
 	return
 
 def OptionsPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetNextScript ("StartOpt")
 	return
 
 def MoviesPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
-	if TutorialWindow:
-		TutorialWindow.Unload()
 	GemRB.SetNextScript ("GUIMOVIE")
 	return
 
-def ExitCancelled():
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
-def BackToMain():
-	SinglePlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
-	OptionsButton.SetState (IE_GUI_BUTTON_ENABLED)
-	MultiPlayerButton.SetState (IE_GUI_BUTTON_ENABLED)
-	BackButton.SetState (IE_GUI_BUTTON_ENABLED)
-	SinglePlayerButton.SetText (15413)
-	ExitButton.SetText (15417)
-	OptionsButton.SetText (13905)
-	if GameCheck.IsBG2Demo():
-		MoviesButton.SetText ("")
-		BackButton.SetText ("")
-		BackButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		BackButton.SetState (IE_GUI_BUTTON_DISABLED)
-		MultiPlayerButton.SetText ("")
-		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-		MultiPlayerButton.SetState (IE_GUI_BUTTON_DISABLED)
-	else:
-		MultiPlayerButton.SetText (15414)
-		MultiPlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MultiPlayerPress)
-		MoviesButton.SetText (15415)
-		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
-		BackButton.SetText (15416)
-
-	SinglePlayerButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, SinglePlayerPress)
-	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	OptionsButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OptionsPress)
-	QuitWindow.SetVisible (WINDOW_INVISIBLE)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def Restart():
-	StartWindow.Unload()
-	QuitWindow.Unload()
-	GemRB.SetNextScript ("Start")
+	StartWindow = GemRB.GetView("START2")
+	StartWindow.Close()
+	GemRB.SetNextScript ("Start2") # can't just call OnLoad because that won't destroy the existing variables
 	return
-

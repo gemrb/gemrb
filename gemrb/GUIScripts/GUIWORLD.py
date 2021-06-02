@@ -26,11 +26,9 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
-import GUIClasses
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
-import MessageWindow
 import CommonWindow
 
 FRAME_PC_SELECTED = 0
@@ -38,60 +36,55 @@ FRAME_PC_TARGET   = 1
 
 ContinueWindow = None
 ReformPartyWindow = None
-OldActionsWindow = None
-OldMessageWindow = None
 
 removable_pcs = []
 
+def OpenDialogButton(id):
+	window = GemRB.LoadWindow (id, GUICommon.GetWindowPack())
+	window.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	MsgWin = GemRB.GetView("MSGWIN")
+
+	frame = MsgWin.GetFrame()
+	offset = 0
+	if GameCheck.IsGemRBDemo ():
+		offset = window.GetFrame()['h']
+	window.SetPos(frame['x'], frame['y'] + frame['h'] - offset)
+
+	# Dialog button shouldnt be in front
+	win = GemRB.GetView("OPTWIN")
+	if win:
+		win.Focus()
+	win = GemRB.GetView("PORTWIN")
+	if win:
+		win.Focus()
+
+	return window
+
 def DialogStarted ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
 	# try to force-close anything which is open
-	GUICommon.CloseOtherWindow(None)
+	GUICommonWindows.CloseTopWindow()
 	CommonWindow.CloseContainerWindow()
 
-	# we need GUI for dialogs
-	GemRB.UnhideGUI()
-
 	# opening control size to maximum, enabling dialog window
-	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
 
-	if GUICommonWindows.PortraitWindow:
+	# disable the 1-6 hotkeys, so they'll work for choosing answers
+	if GemRB.GetView ("PORTWIN"):
 		GUICommonWindows.UpdatePortraitWindow ()
 
-	# we want this to happen before we start fiddling with the GUI
-	MessageWindow.UpdateControlStatus()
-
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ContinueWindow = Window = GemRB.LoadWindow (9)
-
-	GUICommonWindows.EmptyControls()
-	OldActionsWindow = GUICommonWindows.ActionsWindow
-	#GUICommonWindows.ActionsWindow = None
-	if OldActionsWindow:
-		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
-	GemRB.SetVar ("ActionsWindow", -1)
+	ContinueWindow = OpenDialogButton(9)
 
 def DialogEnded ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
-	# TODO: why is this being called at game start?!
-	if not ContinueWindow:
-		return
-
-	#GUICommonWindows.ActionsWindow = OldActionsWindow
-	if OldActionsWindow:
-		OldActionsWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
 	GUICommonWindows.UpdateActionsWindow()
 
-	ContinueWindow.Unload ()
+	ContinueWindow.Close ()
 	ContinueWindow = None
-	OldActionsWindow = None
-
-	if GUICommonWindows.PortraitWindow:
-		GUICommonWindows.UpdatePortraitWindow ()
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open
@@ -101,38 +94,33 @@ def NextDialogState ():
 	if not ContinueWindow:
 		return
 
-	ContinueWindow.SetVisible(WINDOW_INVISIBLE)
-	if OldActionsWindow:
-		OldActionsWindow.SetVisible(WINDOW_VISIBLE)
-
-	MessageWindow.TMessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	ContinueWindow.GetControl(0).SetVisible(False)
+	ContinueWindow.GetControl(0).SetDisabled(True)
 
 def OpenEndMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	if OldActionsWindow:
-		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	EndDLGStrref = 9371
 	if GameCheck.IsGemRBDemo ():
 		EndDLGStrref = 67
 	Button.SetText (EndDLGStrref)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
+	Button.MakeDefault(True)
 
 def OpenContinueMessageWindow ():
-	ContinueWindow.SetVisible(WINDOW_VISIBLE)
-	if OldActionsWindow:
-		OldActionsWindow.SetVisible(WINDOW_INVISIBLE)
 	#continue
 	Button = ContinueWindow.GetControl (0)
+	Button.SetVisible(True)
+	Button.SetDisabled(False)
 	ContinueStrref = 9372
 	if GameCheck.IsGemRBDemo ():
 		ContinueStrref = 66
 	Button.SetText (ContinueStrref)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.SetFlags (IE_GUI_BUTTON_NO_TOOLTIP, OP_OR)
+	Button.MakeDefault(True)
 
 def UpdateReformWindow ():
 	Window = ReformPartyWindow
@@ -174,7 +162,7 @@ def UpdateReformWindow ():
 			continue # for saved games with higher party count than the current setup supports
 		Button = PortraitButtons[index]
 		Button.EnableBorder (FRAME_PC_SELECTED, select == i)
-		pic = GemRB.GetPlayerPortrait (i, 1)
+		pic = GemRB.GetPlayerPortrait (i, 1)["Sprite"]
 		if not pic:
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
@@ -188,16 +176,14 @@ def UpdateReformWindow ():
 def RemovePlayer ():
 	global ReformPartyWindow
 
-	hideflag = GemRB.HideGUI ()
+	hideflag = CommonWindow.IsGameGUIHidden()
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
 	wid = 25
 	if GameCheck.IsHOW ():
 		wid = 0 # at least in guiw08, this is the correct window
-	ReformPartyWindow = Window = GemRB.LoadWindow (wid)
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	ReformPartyWindow = Window = GemRB.LoadWindow (wid, GUICommon.GetWindowPack(), WINDOW_BOTTOM)
 
 	#are you sure
 	Label = Window.GetControl (0x0fffffff)
@@ -207,18 +193,15 @@ def RemovePlayer ():
 	Button = Window.GetControl (1)
 	Button.SetText (17507)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerConfirm)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	#cancel
 	Button = Window.GetControl (2)
 	Button.SetText (13727)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemovePlayerCancel)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.MakeEscape()
 
-	GemRB.SetVar ("OtherWindow", Window.ID)
-	GemRB.SetVar ("ActionsWindow", -1)
-	if hideflag:
-		GemRB.UnhideGUI ()
+	CommonWindow.SetGameGUIHidden(hideflag)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -241,31 +224,23 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
+	global ReformPartyWindow
 	global removable_pcs
 
 	GemRB.SetVar ("Selected", 0)
-	hideflag = GemRB.HideGUI ()
+	hideflag = CommonWindow.IsGameGUIHidden()
 
 	if ReformPartyWindow:
 		ReformPartyWindow.Unload ()
-		GemRB.SetVar ("ActionsWindow", OldActionsWindow.ID)
-		GemRB.SetVar ("MessageWindow", OldMessageWindow.ID)
-		GemRB.SetVar ("OtherWindow", -1)
-
-		OldActionsWindow = None
-		OldMessageWindow = None
 		ReformPartyWindow = None
-		if hideflag:
-			GemRB.UnhideGUI ()
+
+		CommonWindow.SetGameGUIHidden(hideflag)
 		#re-enabling party size control
 		GemRB.GameSetPartySize (MAX_PARTY_SIZE)
 		GUICommonWindows.UpdatePortraitWindow()
 		return
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_HCENTER|WINDOW_BOTTOM)
 
 	# skip exportable party members (usually only the protagonist)
 	removable_pcs = []
@@ -279,7 +254,8 @@ def OpenReformPartyWindow ():
 		Button = PortraitButtons[j]
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE,OP_SET)
-		Button.SetBorder (FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
+		color = {'r' : 0, 'g' : 255, 'b' : 0, 'a' : 255}
+		Button.SetBorder (FRAME_PC_SELECTED, color, 0, 0, Button.GetInsetFrame(1,1,2,2))
 		if j < len(removable_pcs):
 			Button.SetVarAssoc ("Selected", removable_pcs[j])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, UpdateReformWindow)
@@ -294,21 +270,15 @@ def OpenReformPartyWindow ():
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
 
-	OldActionsWindow = GUIClasses.GWindow( GemRB.GetVar ("ActionsWindow") )
-	OldMessageWindow = GUIClasses.GWindow( GemRB.GetVar ("MessageWindow") )
-	GemRB.SetVar ("ActionsWindow", -1)
-	GemRB.SetVar ("MessageWindow", -1)
-
 	# if nobody can be removed, just close the window
 	if not removable_pcs:
 		OpenReformPartyWindow ()
-		if hideflag:
-			GemRB.UnhideGUI ()
+		CommonWindow.SetGameGUIHidden(hideflag)
 		return
 
 	UpdateReformWindow ()
-	if hideflag:
-		GemRB.UnhideGUI ()
+	CommonWindow.SetGameGUIHidden(hideflag)
+
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
@@ -320,7 +290,7 @@ def DeathWindow ():
 	if GameCheck.IsIWD1():
 		#no death movie, but music is changed
 		GemRB.LoadMusicPL ("Theme.mus",1)
-	GemRB.HideGUI ()
+	CommonWindow.SetGameGUIHidden(True)
 	GemRB.SetTimedEvent (DeathWindowEnd, 10)
 	return
 
@@ -330,8 +300,7 @@ def DeathWindowEnd ():
 		GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,3)
 
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	Window = GemRB.LoadWindow (17)
+	Window = GemRB.LoadWindow (17, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 
 	#reason for death
 	Label = Window.GetControl (0x0fffffff)
@@ -347,9 +316,6 @@ def DeathWindowEnd ():
 	Button.SetText (15417)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
 
-	GemRB.HideGUI ()
-	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.UnhideGUI ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 

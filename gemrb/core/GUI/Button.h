@@ -28,17 +28,19 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include "GUI/GUIAnimation.h"
 #include "GUI/Control.h"
 #include "GUI/TextSystem/Font.h"
 #include "Sprite2D.h"
 
 #include "exports.h"
 
-#include <list>
+#include <vector>
 
 namespace GemRB {
 
 class Palette;
+using PaletteHolder = Holder<Palette>;
 
 // NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_UNPRESSED 0
@@ -58,7 +60,6 @@ class Palette;
 #define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
-#define IE_GUI_BUTTON_DEFAULT      0x00000040   // enter key triggers it
 #define IE_GUI_BUTTON_ANIMATED     0x00000080
 
 //these bits are hardcoded in the .chu structure
@@ -71,7 +72,6 @@ class Palette;
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
 //#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag
 //end of hardcoded part
-#define IE_GUI_BUTTON_DRAGGABLE    0x00008000
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
@@ -80,33 +80,15 @@ class Palette;
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00100000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00200000 // BG1-style paperdoll PictureList
 #define IE_GUI_BUTTON_HORIZONTAL      0x00400000 // horizontal clipping of overlay
-#define IE_GUI_BUTTON_CANCEL          0x00800000 // cancel key triggers it
-//WARNING: we cannot add any more flags here
-//the top 8 bits are reserved for the control ID (see setFlags)
+#define IE_GUI_BUTTON_NO_TOOLTIP      0x00800000
 
 //composite button flags
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
-#define IE_GUI_BUTTON_PORTRAIT     0x0000c002   // portrait
-#define IE_GUI_BUTTON_DISABLED_P   0x0000c003   // disabled portrait
-
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_BUTTON_ON_PRESS       0x00000000
-#define IE_GUI_MOUSE_OVER_BUTTON     0x00000001
-#define IE_GUI_MOUSE_ENTER_BUTTON    0x00000002
-#define IE_GUI_MOUSE_LEAVE_BUTTON    0x00000003
-#define IE_GUI_BUTTON_ON_SHIFT_PRESS 0x00000004
-#define IE_GUI_BUTTON_ON_RIGHT_PRESS 0x00000005
-#define IE_GUI_BUTTON_ON_DRAG_DROP   0x00000006
-#define IE_GUI_BUTTON_ON_DRAG_DROP_PORTRAIT   0x00000007
-#define IE_GUI_BUTTON_ON_DRAG        0x00000008
-#define IE_GUI_BUTTON_ON_DOUBLE_PRESS 0x00000009
+#define IE_GUI_BUTTON_PORTRAIT     (IE_GUI_BUTTON_PLAYONCE|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_PICTURE)   // portrait
 
 /** Border/frame settings for a button */
 struct ButtonBorder {
-	int dx1;
-	int dy1;
-	int dx2;
-	int dy2;
+	Region rect;
 	Color color;
 	bool filled;
 	bool enabled;
@@ -130,103 +112,115 @@ enum BUTTON_IMAGE_TYPE {
  */
 
 class GEM_EXPORT Button : public Control {
-protected:
-	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawRegion);
-public: 
+public:
 	Button(Region& frame);
-	~Button();
+	~Button() override;
 
-	bool IsOpaque() const;
+	bool IsAnimated() const override;
+	bool IsOpaque() const override;
 	/** Sets the 'type' Image of the Button to 'img'.
 	see 'BUTTON_IMAGE_TYPE' */
-	void SetImage(BUTTON_IMAGE_TYPE, Sprite2D* img);
+	void SetImage(BUTTON_IMAGE_TYPE, Holder<Sprite2D> img);
 	/** Sets the Button State */
 	void SetState(unsigned char state);
 	/** Sets the Text of the current control */
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Sets the Picture */
-	void SetPicture(Sprite2D* Picture);
+	void SetPicture(Holder<Sprite2D> Picture);
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
-	void StackPicture(Sprite2D* Picture);
+	void StackPicture(Holder<Sprite2D> Picture);
 	/** Sets border/frame parameters */
-	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled = false, bool filled = false);
+	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
 	void SetHorizontalOverlay(double clip, const Color &src, const Color &dest);
 	/** Sets font used for drawing button label */
 	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */
 	void EnableBorder(int index, bool enabled);
-public: // Public Events
-	bool WantsDragOperation();
-	/** Mouse Enter */
-	void OnMouseEnter(unsigned short x, unsigned short y);
-	/** Mouse Leave */
-	void OnMouseLeave(unsigned short x, unsigned short y);
-	/** Mouse Over */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-				   unsigned short Mod);  
-	/** Mouse wheel scroll */
-	void OnMouseWheelScroll(short x, short y);
-	/** A special key has been pressed */
-	bool OnSpecialKeyPress(unsigned char Key);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** Button Pressed Event Script Function Name */
-	ControlEventHandler ButtonOnPress;
-	ControlEventHandler ButtonOnShiftPress;
-	ControlEventHandler ButtonOnRightPress;
-	ControlEventHandler ButtonOnDoublePress;
-	ControlEventHandler ButtonOnDragDrop;
-	ControlEventHandler ButtonOnDragDropPortrait;
-	ControlEventHandler ButtonOnDrag;
-	ControlEventHandler MouseEnterButton;
-	ControlEventHandler MouseLeaveButton;
-	ControlEventHandler MouseOverButton;
+
+	String QueryText() const override { return Text; }
+	String TooltipText() const override;
+
+	bool AcceptsDragOperation(const DragOp&) const override;
+	void CompleteDragOperation(const DragOp&) override;
+	Holder<Sprite2D> DragCursor() const override;
+
+	Holder<Sprite2D> Cursor() const override;
+
 	/** Refreshes the button from a radio group */
-	void UpdateState(unsigned int Sum);
+	void UpdateState(unsigned int Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
-	void SetTextColor(const Color &fore, const Color &back);
+	void SetTextColor(const Color &color);
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; }
 	/** Set explicit anchor point for text */
 	void SetAnchor(ieWord x, ieWord y);
 	/** Set offset pictures and label move when button is pressed */
 	void SetPushOffset(ieWord x, ieWord y);
+
+	bool SetHotKey(KeyboardKey key, short mod = 0, bool global = false);
+	//KeyboardKey GetHotKey() { return hotKey.key; }
+
 private: // Private attributes
 	String Text;
 	bool hasText;
 	Font* font;
 	bool ToggleState;
-	Palette* normal_palette;
-	Palette* disabled_palette;
-	Sprite2D* buttonImages[BUTTON_IMAGE_TYPE_COUNT];
+	bool pulseBorder;
+	Color textColor = ColorWhite;
+
+	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
-	Sprite2D* Picture;
+	Holder<Sprite2D> Picture;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
-	std::list<Sprite2D*> PictureList;
+	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;
-	Point drag_start;
 	/** HP Bar over portraits */
-	unsigned long starttime;
-	Color SourceRGB, DestRGB;
+	ColorAnimation overlayAnim;
 	/** Explicit text anchor point if IE_GUI_BUTTON_ANCHOR is set */
 	Point Anchor;
 	/** Offset pictures and label move when the button is pressed. */
 	Point PushOffset;
 	/** frame settings */
-	ButtonBorder borders[MAX_NUM_BORDERS];
-	bool IsPixelTransparent (unsigned short x, unsigned short y);
-	void CloseUpColor();
+	ButtonBorder borders[MAX_NUM_BORDERS]{};
+
+	EventMgr::EventCallback HotKeyCallback;
+
+	struct HotKey {
+		KeyboardKey key = '\0';
+		short mod = 0;
+		bool global = false;
+
+		operator bool() const {
+			return key != '\0';
+		}
+	} hotKey;
+
+	void UnregisterHotKey();
+
+	bool HandleHotKey(const Event&);
+	bool HitTest (const Point&) const override;
+	void DoToggle();
+
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	/** Draws the Control on the Output Display */
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	
+protected:
+	/** Mouse Enter */
+	void OnMouseEnter(const MouseEvent& /*me*/, const DragOp*) override;
+	/** Mouse Leave */
+	void OnMouseLeave(const MouseEvent& /*me*/, const DragOp*) override;
+	/** Mouse Over */
+	bool OnMouseOver(const MouseEvent&) override;
+	/** Mouse Button Down */
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
+	/** Mouse Button Up */
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 };
 
 }

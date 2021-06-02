@@ -20,6 +20,8 @@
 import GemRB
 from ie_restype import RES_BMP
 
+import CharGenCommon
+
 AppearanceWindow = 0
 CustomWindow = 0
 PortraitButton = 0
@@ -40,8 +42,8 @@ def OnLoad():
 	
 	Gender=GemRB.GetVar ("Gender")
 
-	GemRB.LoadWindowPack ("GUICG", 640, 480)
-	AppearanceWindow = GemRB.LoadWindow (11)
+	AppearanceWindow = GemRB.LoadWindow (11, "GUICG")
+	CharGenCommon.PositionCharGenWin(AppearanceWindow, -6)
 
 	#Load the Portraits Table
 	PortraitsTable = GemRB.LoadTable ("PICTURES")
@@ -53,8 +55,8 @@ def OnLoad():
 		LastPortrait = GemRB.Roll (1, PortraitsTable.GetRowCount()-FemaleCount, 0)
 
 	#this control doesn't exist in the demo version (it is unused, so lets just skip it)
-	if AppearanceWindow.HasControl (7):
-		TextAreaControl = AppearanceWindow.GetControl (7)
+	TextAreaControl = AppearanceWindow.GetControl (7)
+	if TextAreaControl:
 		TextAreaControl.SetText ("")
 
 	PortraitButton = AppearanceWindow.GetControl (1)
@@ -66,14 +68,14 @@ def OnLoad():
 
 	BackButton = AppearanceWindow.GetControl (5)
 	BackButton.SetText (15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 
 	CustomButton = AppearanceWindow.GetControl (6)
 	CustomButton.SetText (17545)
 
 	DoneButton = AppearanceWindow.GetControl (0)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	RightButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, RightPress)
 	LeftButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LeftPress)
@@ -94,7 +96,7 @@ def OnLoad():
 				break
 			Flag = True
 
-	AppearanceWindow.SetVisible (WINDOW_VISIBLE)
+	AppearanceWindow.Focus()
 	return
 
 def RightPress():
@@ -158,10 +160,10 @@ def LargeCustomPortrait():
 	Button = Window.GetControl (6)
 	if Portrait=="":
 		Portrait = "NOPORTMD"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetDisabled (True)
 	else:
 		if PortraitList2.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled (False)
 
 	Button = Window.GetControl (0)
 	Button.SetPicture (Portrait, "NOPORTMD")
@@ -181,10 +183,10 @@ def SmallCustomPortrait():
 	Button = Window.GetControl (6)
 	if Portrait=="":
 		Portrait = "NOPORTSM"
-		Button.SetState (IE_GUI_BUTTON_DISABLED)
+		Button.SetDisabled (True)
 	else:
 		if PortraitList1.QueryText ()!="":
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
+			Button.SetDisabled (False)
 
 	Button = Window.GetControl (1)
 	Button.SetPicture (Portrait, "NOPORTSM")
@@ -197,21 +199,19 @@ def CustomPress():
 
 	CustomWindow = Window = GemRB.LoadWindow (18)
 	PortraitList1 = Window.GetControl (2)
-	RowCount1 = PortraitList1.ListResources (CHR_PORTRAITS, 1)
+	RowCount1 = len(PortraitList1.ListResources (CHR_PORTRAITS, 1))
 	PortraitList1.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, LargeCustomPortrait)
-	GemRB.SetVar ("Row1", RowCount1)
 	PortraitList1.SetVarAssoc ("Row1",RowCount1)
 
 	PortraitList2 = Window.GetControl (4)
-	RowCount2 = PortraitList2.ListResources (CHR_PORTRAITS, 0)
+	RowCount2 = len(PortraitList2.ListResources (CHR_PORTRAITS, 0))
 	PortraitList2.SetEvent (IE_GUI_TEXTAREA_ON_SELECT, SmallCustomPortrait)
-	GemRB.SetVar ("Row2", RowCount2)
 	PortraitList2.SetVarAssoc ("Row2",RowCount2)
 
 	Button = Window.GetControl (6)
 	Button.SetText (11973)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CustomDone)
-	Button.SetState (IE_GUI_BUTTON_DISABLED)
+	Button.SetDisabled (True)
 
 	Button = Window.GetControl (7)
 	Button.SetText (15416)

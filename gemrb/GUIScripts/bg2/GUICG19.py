@@ -17,9 +17,13 @@
 #
 #
 #character generation, sounds (GUICG19)
+import GemRB
+
+import CharGenCommon
+import GUICommon
 from ie_restype import *
 from ie_sounds import CHAN_CHAR1
-import GemRB
+from ie_stats import IE_SEX
 
 VoiceList = 0
 CharSoundWindow = 0
@@ -33,16 +37,13 @@ SoundIndex = 0
 def OnLoad():
 	global CharSoundWindow, VoiceList
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	CharSoundWindow=GemRB.LoadWindow(19)
+	CharSoundWindow=GemRB.LoadWindow(19, "GUICG")
+	CharGenCommon.PositionCharGenWin(CharSoundWindow)
 
 	VoiceList = CharSoundWindow.GetControl (45)
-	RowCount = VoiceList.ListResources(CHR_SOUNDS)
-	if GemRB.GetVar ("Gender")==1:
-		GemRB.SetVar ("Selected", 4)
-	else:
-		GemRB.SetVar ("Selected", 0)
-
+	Voices = VoiceList.ListResources (CHR_SOUNDS)
+	GUICommon.AddDefaultVoiceSet (VoiceList, Voices)
+	# preselect the default entry to avoid an infinite loop if Play is pressed immediately
 	VoiceList.SetVarAssoc ("Selected", 0)
 
 	PlayButton = CharSoundWindow.GetControl (47)
@@ -55,22 +56,25 @@ def OnLoad():
 
 	BackButton = CharSoundWindow.GetControl(10)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = CharSoundWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	VoiceList.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, ChangeVoice)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	CharSoundWindow.SetVisible(WINDOW_VISIBLE)
+	CharSoundWindow.Focus()
 	return
 
 def PlayPress():
 	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = VoiceList.QueryText()
-	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
+	MyChar = GemRB.GetVar ("Slot")
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
+
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], RES_WAV)):
 		NextSound()
 	# play the sound like it was a speech, so any previous yells are quieted
@@ -104,6 +108,8 @@ def NextPress():
 
 	CharSound = VoiceList.QueryText ()
 	MyChar = GemRB.GetVar ("Slot")
+	Gender = GemRB.GetPlayerStat (MyChar, IE_SEX)
+	CharSound = GUICommon.OverrideDefaultVoiceSet (Gender, CharSound)
 	GemRB.SetPlayerSound (MyChar, CharSound)
 
 	if CharSoundWindow:

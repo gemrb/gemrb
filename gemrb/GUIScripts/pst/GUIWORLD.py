@@ -34,72 +34,62 @@ FormationWindow = None
 ReformPartyWindow = None
 
 def DialogStarted ():
-	global ContinueWindow, OldActionsWindow
+	global ContinueWindow
 
-	# try to force-close anything which is open
-	GUICommon.CloseOtherWindow(None)
+	GUICommonWindows.CloseTopWindow()
 	CommonWindow.CloseContainerWindow()
 
-	# we need GUI for dialogs
-	GemRB.UnhideGUI()
-
 	# opening control size to maximum, enabling dialog window
-	GemRB.GameSetScreenFlags(GS_HIDEGUI, OP_NAND)
+	CommonWindow.SetGameGUIHidden(False)
 	GemRB.GameSetScreenFlags(GS_DIALOG, OP_OR)
+	
+	# disable the 1-6 hotkeys, so they'll work for choosing answers
+	GUICommonWindows.UpdatePortraitWindow ()
 
-	MessageWindow.UpdateControlStatus()
+	MWin = GemRB.GetView("MSGWIN")
+	CloseButton= MWin.GetControl (0)
+	CloseButton.SetText ("")
+	CloseButton.SetDisabled(True)
+	CloseButton.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 def DialogEnded ():
-	pass
+	Button = MessageWindow.MWindow.GetControl (0)
+	Button.MakeDefault(True)
+	Button.SetDisabled(False)
+	Button.SetText (28082)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 
 def CloseContinueWindow ():
 	# don't close the actual window now to avoid flickering: we might still want it open
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 
 def NextDialogState ():
-	if not MessageWindow.MessageWindow:
+	if not MessageWindow.MWindow:
 		return
 
-	Button = MessageWindow.MessageWindow.GetControl (0)
-	Button.SetText(28082)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-
-	MessageWindow.MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button = MessageWindow.MWindow.GetControl (0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.MWindow.Close())
 
 def OpenEndMessageWindow ():
-	Button = MessageWindow.MessageWindow.GetControl (0)
+	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34602)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.MakeDefault(True)
+	Button.SetDisabled(False)
 
 def OpenContinueMessageWindow ():
 	#continue
-	Button = MessageWindow.MessageWindow.GetControl (0)
+	Button = MessageWindow.MWindow.GetControl (0)
 	Button.SetText (34603)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseContinueWindow)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	Button.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Button.MakeDefault(True)
+	Button.SetDisabled(False)
 
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	if GUICommon.CloseOtherWindow(OpenReformPartyWindow):
-		GemRB.HideGUI ()
-		if ReformPartyWindow:
-			ReformPartyWindow.Unload ()
-		ReformPartyWindow = None
-
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.LoadWindowPack ("GUIREC")
-		GemRB.UnhideGUI ()
-		return
-
-	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	ReformPartyWindow = Window = GemRB.LoadWindow (24)
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	ReformPartyWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove
@@ -111,9 +101,7 @@ def OpenReformPartyWindow ():
 	# Done
 	Button = Window.GetControl (8)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenReformPartyWindow)
-
-	GemRB.UnhideGUI ()
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ReformPartyWindow.Close())
 
 
 last_formation = None
@@ -121,28 +109,14 @@ last_formation = None
 def OpenFormationWindow ():
 	global FormationWindow
 
-	if GUICommon.CloseOtherWindow(OpenFormationWindow):
-		GemRB.HideGUI ()
-		if FormationWindow:
-			FormationWindow.Unload ()
-		FormationWindow = None
-
-		GemRB.GameSetFormation (last_formation, 0)
-		GUICommonWindows.EnableAnimatedWindows ()
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.UnhideGUI ()
-		return
-
-	GemRB.HideGUI ()
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	FormationWindow = Window = GemRB.LoadWindow (27)
-	GemRB.SetVar ("OtherWindow", Window.ID)
+	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	FormationWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Done
 	Button = Window.GetControl (13)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenFormationWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: FormationWindow.Close())
 
 	tooltips = (
 		44957,  # Follow
@@ -168,8 +142,6 @@ def OpenFormationWindow ():
 
 	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
 	SelectFormation ()
-
-	GemRB.UnhideGUI ()
 
 def SelectFormation ():
 	global last_formation

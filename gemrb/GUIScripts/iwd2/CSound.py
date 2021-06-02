@@ -18,6 +18,8 @@
 #
 #character generation, sound (GUICG19)
 import GemRB
+
+import CharOverview
 from GUIDefines import *
 
 SoundWindow = 0
@@ -29,26 +31,28 @@ VerbalConstants = None
 def OnLoad():
 	global SoundWindow, TextAreaControl, DoneButton, VerbalConstants
 
-	GemRB.LoadWindowPack("GUICG", 800,  600)
 	#this hack will redraw the base CG window
-	SoundWindow = GemRB.LoadWindow(19)
+	SoundWindow = GemRB.LoadWindow(19, "GUICG")
+	CharOverview.PositionCharGenWin (SoundWindow)
+
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
 	VerbalConstants =  [CharSoundTable.GetRowName(i) for i in range(CharSoundTable.GetRowCount())]
 
 	BackButton = SoundWindow.GetControl(10)
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = SoundWindow.GetControl(0)
 	DoneButton.SetText(36789)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = SoundWindow.GetControl(50)
 	TextAreaControl.SetText(17236)
 
 	TextAreaControl = SoundWindow.GetControl(45)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
-	RowCount=TextAreaControl.ListResources(CHR_SOUNDS)
+
+	RowCount = TextAreaControl.ListResources(CHR_SOUNDS)
 	if GemRB.GetVar ("Gender") == 2:
 		GemRB.SetVar ("Sound", 0) #first female sound
 	else:
@@ -61,7 +65,7 @@ def OnLoad():
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
-	SoundWindow.SetVisible(WINDOW_VISIBLE)
+	SoundWindow.Focus()
 	return
 
 def BackPress():

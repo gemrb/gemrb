@@ -30,35 +30,30 @@ DoneButton = 0
 
 def OnLoad():
 	global NameWindow, NameField, DoneButton
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(NameWindow):
-			NameWindow.Unload()
-			NameWindow = None
-		return
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	NameWindow = GemRB.LoadWindow(5)
+	NameWindow = GemRB.LoadWindow(5, "GUICG")
 
 	BackButton = NameWindow.GetControl(3)
 	BackButton.SetText(15416)
 
 	DoneButton = NameWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
+	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
 
 	NameField = NameWindow.GetControl(2)
 	NameField.SetText (GemRB.GetToken ("CHARNAME"))
 	EditChange ()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(NameWindow))
 	NameField.SetEvent(IE_GUI_EDIT_ON_CHANGE, EditChange)
 	NameWindow.ShowModal(MODAL_SHADOW_NONE)
-	NameField.SetStatus(IE_GUI_CONTROL_FOCUSED)
+	NameField.Focus()
 	return
 
 def NextPress():
+	NameWindow.Close()
 	Name = NameField.QueryText()
 	#check length?
 	#seems like a good idea to store it here for the time being

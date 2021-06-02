@@ -33,7 +33,18 @@
 namespace GemRB {
 
 /** Resource reference */
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!
+ This type is deprecated
+ Use the ResRef class wrapper
+!!!!!!!!!!!!!!!!!!!!!!!!!!! */
 typedef char ieResRef[9];
+
+// safely copies a ResRef (ie. nulls out the unused buffer size)
+inline void CopyResRef(ieResRef& d, const ieResRef s)
+{
+	strncpy(d, s, sizeof(ieResRef) - 1);
+	d[sizeof(ieResRef) - 1] = '\0';
+}
 
 class DataStream;
 
@@ -54,28 +65,56 @@ public:
 		operator=(str);
 	};
 
+	ResRef(const ResRef& rhs) {
+		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+	}
+
+	ResRef& operator=(const ResRef& rhs) {
+		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+		return *this;
+	}
+	
+	ResRef& operator=(const char* str) {
+		if (str == NULL) {
+			Clear();
+		} else {
+			// using strnlwrcpy: this wrapper is case insensitive,
+			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
+			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
+			strnlwrcpy(ref, str, sizeof(ref)-1 );
+			ref[sizeof(ref)-1] = '\0';
+		}
+		
+		return *this;
+	}
+
+	struct Hash
+	{
+		size_t operator() (const ResRef &) const;
+	};
+	friend struct Hash;
+
 	bool IsEmpty() {
 		return (ref[0] == '\0');
 	}
+
 	const char* CString() const { return ref; }
+
 	operator const char*() const {
 		return (ref[0] == '\0') ? NULL : ref;
 	}
 
-	void operator=(const char* str) {
-		if (str == NULL) {
-			Clear();
-		} else {
-			strlcpy(ref, str, sizeof(ref));
-		}
-	}
-
+	// Case insensitive
 	bool operator<(const ResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
 	};
 
 	bool operator==(const ResRef& rhs) const {
 		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) == 0;
+	};
+	
+	bool operator==(const char* str) const {
+		return strnicmp(ref, str, sizeof(ref)-1) == 0;
 	};
 };
 
@@ -88,7 +127,7 @@ protected:
 	DataStream* str;
 public:
 	Resource();
-	virtual ~Resource();
+	~Resource() override;
 	/**
 	 * Reads the resource from the given stream.
 	 *

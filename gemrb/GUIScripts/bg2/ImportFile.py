@@ -18,6 +18,7 @@
 #
 #character generation, import (GUICG24)
 import GemRB
+import CharGenCommon
 
 #import from a character sheet
 ImportWindow = 0
@@ -26,8 +27,8 @@ TextAreaControl = 0
 def OnLoad():
 	global ImportWindow, TextAreaControl
 
-	GemRB.LoadWindowPack("GUICG",640,480)
-	ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindow(20, "GUICG")
+	CharGenCommon.PositionCharGenWin(ImportWindow)
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
@@ -37,22 +38,22 @@ def OnLoad():
  
 	DoneButton = ImportWindow.GetControl(0)
 	DoneButton.SetText(2610)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetDisabled(True)
+	DoneButton.MakeDefault()
 
 	CancelButton = ImportWindow.GetControl(1)
 	CancelButton.SetText(15416)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectPress)
-	ImportWindow.SetVisible(WINDOW_VISIBLE)
+	ImportWindow.Focus()
 	return
 
 def SelectPress():
 	DoneButton = ImportWindow.GetControl(0)
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def DonePress():
@@ -63,9 +64,10 @@ def DonePress():
 	if ImportWindow:
 		ImportWindow.Unload()
 	# the medium portrait isn't available, so we copy the original hack
-	MediumPortrait = GemRB.GetPlayerPortrait (Slot, 1)[0:-1] + "M"
-	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
-	GemRB.SetToken("LargePortrait", MediumPortrait )
+	SmallPortrait = GemRB.GetPlayerPortrait (Slot, 1)["ResRef"]
+	MediumPortrait = SmallPortrait[0:-1] + "M"
+	GemRB.SetToken ("SmallPortrait", SmallPortrait)
+	GemRB.SetToken ("LargePortrait", MediumPortrait)
 	GemRB.SetNextScript("CharGen7")
 	GemRB.SetVar ("ImportedChar", 1)
 	return

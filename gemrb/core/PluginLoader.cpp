@@ -20,24 +20,21 @@
 
 #include "SClassID.h" // For PluginID
 
-#include "Variables.h"
 #include "Interface.h"
 #include "PluginMgr.h"
+#include "System/FileFilters.h"
+#include "Variables.h"
 
 #include <cstdio>
 #include <cstdlib>
-#include <list>
 #include <set>
 
 #ifdef WIN32
-#include <io.h>
+#include <string.h>
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
 #else
-#include <sys/types.h>
-#include <dirent.h>
-#include <fnmatch.h>
 #include <dlfcn.h>
 #endif
 
@@ -95,165 +92,130 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #define GET_PLUGIN_SYMBOL( handle, name )  my_dlsym( handle, name )
 #endif
 
-/** Return names of all *.so or *.dll files in the given directory */
 #ifdef WIN32
-
-static bool FindFiles(TCHAR* path, std::list<TCHAR*> &files)
+static void PrintDLError()
 {
-	//The windows _findfirst/_findnext functions allow the use of wildcards so we'll use them :)
-	struct _tfinddata_t c_file;
-	intptr_t hFile;
-
-	StringCchCat(path, _MAX_PATH, TEXT("*.dll"));
-	if ((hFile = _tfindfirst(path, &c_file)) == -1L) {
-		//If there is no file matching our search
-		Log(ERROR, "PluginLoader", "Error looking up dlls.");
-		return false;
-	}
-
-	do {
-		files.push_back(_tcsdup(c_file.name));
-	} while (_tfindnext(hFile, &c_file) == 0);
-
-	_findclose( hFile );
-	return true;
+	Log(DEBUG, "PluginLoader", "Error code: %lu", GetLastError());
 }
-
-#else // ! WIN32
-
-static bool FindFiles(char* path, std::list<char*> &files)
+#else
+static void PrintDLError()
 {
-	DirectoryIterator dir(path);
-	if (!dir) //If we cannot open the Directory
-		return false;
-
-	do {
-		const char *name = dir.GetName();
-		if (fnmatch( "*.so", name, 0 ) != 0) //If the current file has no ".so" extension, skip it
-			continue;
-		files.push_back( strdup( name ));
-	} while (++dir);
-
-	return true;
+	Log(DEBUG, "PluginLoader", "Error: %s", dlerror());
 }
-#endif  // ! WIN32
+#endif
 
-void LoadPlugins(char* pluginpath)
+static bool LoadPlugin(const char* pluginpath)
 {
-	std::set<PluginID> libs;
-
-	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
-
 #ifdef WIN32
 	TCHAR path[_MAX_PATH];
 	TCHAR t_pluginpath[_MAX_PATH] = {0};
-	std::list<TCHAR*> files;
 
 	mbstowcs(t_pluginpath, pluginpath, _MAX_PATH - 1);
 	StringCbCopy(path, _MAX_PATH, t_pluginpath);
+
+	HMODULE hMod = LoadLibrary(path);
 #else
-	char path[_MAX_PATH];
-	std::list<char*> files;
-
-	strlcpy(path, pluginpath, _MAX_PATH);
+	// Note: the RTLD_GLOBAL is necessary to export symbols to modules
+	//       which python may have to dlopen (-wjp, 20060716)
+	// (to reproduce, try 'import bz2' or another .so module)
+	void* hMod = dlopen(pluginpath, RTLD_NOW | RTLD_GLOBAL);
 #endif
 
-	if (! FindFiles( path, files )) {
-#ifndef STATIC_LINK
-		Log(ERROR, "PluginLoader", "Cannot find any plugins!");
-#endif
+	if (hMod == NULL) {
+		Log(ERROR, "PluginLoader", "Cannot Load \"%s\", skipping...", pluginpath);
+		PrintDLError();
+		return false;
+	}
+
+	//using C bindings, so we don't need to jump through extra hoops
+	//with the symbol name
+	Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
+	if (LibVersion==NULL) {
+		Log(ERROR, "PluginLoader", "Skipping invalid plugin \"%s\".", pluginpath);
+		FREE_PLUGIN( hMod );
+		return false;
+	}
+	if (strcmp(LibVersion(), VERSION_GEMRB) ) {
+		Log(ERROR, "PluginLoader", "Skipping plugin \"%s\" with version mistmatch.", pluginpath);
+		FREE_PLUGIN( hMod );
+		return false;
+	}
+
+	Description_t Description = ( Description_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
+	ID_t ID = ( ID_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
+	Register_t Register = ( Register_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
+
+	static std::set<PluginID> libs;
+	PluginDesc desc = { hMod, ID(), Description(), Register };
+
+	if (libs.find(desc.ID) != libs.end()) {
+		Log(WARNING, "PluginLoader", "Plug-in \"%s\" already loaded!", pluginpath);
+		FREE_PLUGIN( hMod );
+		return false;
+	}
+	if (desc.Register != NULL) {
+		if (!desc.Register(PluginMgr::Get())) {
+			Log(WARNING, "PluginLoader", "Plugin Registration Failed! Perhaps a duplicate?");
+			FREE_PLUGIN( hMod );
+		}
+	}
+	libs.insert(desc.ID);
+	Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, pluginpath);
+	return true;
+}
+
+void LoadPlugins(const char* pluginpath)
+{
+	Log(MESSAGE, "PluginMgr", "Loading Plugins from %s", pluginpath);
+
+	DirectoryIterator dirIt(pluginpath);
+	if (!dirIt) {
+		Log(ERROR, "PluginMgr", "Plugin Directory (%s) does not exist!", pluginpath);
 		return;
 	}
 
-	//Iterate through all the available modules to load
-	int file_count = files.size (); // keeps track of first-pass files
-	while (! files.empty()) {
 #ifdef WIN32
-		TCHAR* t_file = files.front();
-		char file[_MAX_PATH] = {0};
-		wcstombs(file, t_file, _MAX_PATH);
+	const char* pluginExt = "dll";
 #else
-		char* file = files.front();
-		char* t_file = file;
-#endif
-		files.pop_front();
-		file_count--;
-
-#ifdef WIN32
-		StringCbPrintf(path, _MAX_PATH * sizeof(TCHAR), TEXT("%s/%s"), t_pluginpath, t_file);
-#else
-		PathJoin( path, pluginpath, file, NULL );
+	const char* pluginExt = "so";
 #endif
 
+	dirIt.SetFlags(DirectoryIterator::Files);
+	dirIt.SetFilterPredicate(new ExtFilter(pluginExt)); // rewinds
+
+	typedef std::set<std::string> PathSet;
+	PathSet delayedPlugins;
+
+	if (!dirIt) {
+		return;
+	}
+
+	char path[_MAX_PATH];
+	do {
+		const char *name = dirIt.GetName();
 		ieDword flags = 0;
-		core->plugin_flags->Lookup (file, flags);
+		core->plugin_flags->Lookup (name, flags);
 
 		// module is sent to the back
-		if ((flags == PLF_DELAY) && (file_count >= 0)) {
-			Log(MESSAGE, "PluginLoader", "Loading \"" TCHAR_FORMAT "\" delayed.", path);
-			files.push_back(t_file);
+		if (flags == PLF_DELAY) {
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", name);
+			delayedPlugins.insert( name );
 			continue;
 		}
 
 		// module is skipped
 		if (flags == PLF_SKIP) {
-			Log(MESSAGE, "PluginLoader", "Loading \"" TCHAR_FORMAT "\" skipped.", path);
+			Log(MESSAGE, "PluginLoader", "Loading \"%s\" skipped.", name);
 			continue;
 		}
 
+		PathJoin( path, pluginpath, name, NULL );
+		LoadPlugin(path);
+	} while (++dirIt);
 
-
-		// Try to load the Module
-#ifdef WIN32
-		HMODULE hMod = LoadLibrary( path );
-#else
-		// Note: the RTLD_GLOBAL is necessary to export symbols to modules
-		//       which python may have to dlopen (-wjp, 20060716)
-		// (to reproduce, try 'import bz2' or another .so module)
-		void* hMod = dlopen( path, RTLD_NOW | RTLD_GLOBAL );
-#endif
-		if (hMod == NULL) {
-			Log(ERROR, "PluginLoader", "Cannot Load \"" TCHAR_FORMAT "\", skipping...", path);
-			continue;
-		}
-
-		//using C bindings, so we don't need to jump through extra hoops
-		//with the symbol name
-		Version_t LibVersion = ( Version_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Version" );
-		Description_t Description = ( Description_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Description" );
-		ID_t ID = ( ID_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_ID" );
-		Register_t Register = ( Register_t ) (void*) GET_PLUGIN_SYMBOL( hMod, "GemRBPlugin_Register" );
-
-		if (LibVersion==NULL) {
-			Log(ERROR, "PluginLoader", "Skipping invalid plugin \"" TCHAR_FORMAT "\".", path);
-			FREE_PLUGIN( hMod );
-			continue;
-		}
-		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
-			Log(ERROR, "PluginLoader", "Skipping plugin \"" TCHAR_FORMAT "\" with version mistmatch.", path);
-			FREE_PLUGIN( hMod );
-			continue;
-		}
-
-		PluginDesc desc = { hMod, ID(), Description(), Register };
-
-		if (libs.find(desc.ID) != libs.end()) {
-			Log(WARNING, "PluginLoader", "Plug-in \"" TCHAR_FORMAT "\" already loaded!", path);
-			FREE_PLUGIN( hMod );
-			continue;
-		}
-		if (desc.Register != NULL) {
-			if (!desc.Register(PluginMgr::Get())) {
-				Log(WARNING, "PluginLoader", "Plugin Registration Failed! Perhaps a duplicate?");
-				FREE_PLUGIN( hMod );
-			}
-		}
-		libs.insert(desc.ID);
-
-		Log(MESSAGE, "PluginLoader", "Loaded plugin \"%s\" (%s).", desc.Description, file);
-
-		// We do not need the basename anymore now
-		free(t_file);
+	PathSet::iterator it = delayedPlugins.begin();
+	for (; it != delayedPlugins.end(); ++it) {
+		LoadPlugin(it->c_str());
 	}
 }
 

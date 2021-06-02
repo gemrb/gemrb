@@ -86,7 +86,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Variables.cpp
 	VEFObject.cpp
 	Video.cpp
-	WindowMgr.cpp
 	WorldMap.cpp
 	WorldMapMgr.cpp
 	GameScript/Actions.cpp
@@ -95,22 +94,29 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	GameScript/Matching.cpp
 	GameScript/Objects.cpp
 	GameScript/Triggers.cpp
+	GUI/GUIScriptInterface.cpp
 	GUI/Button.cpp
 	GUI/Console.cpp
 	GUI/Control.cpp
 	GUI/EventMgr.cpp
+	GUI/GUIAnimation.cpp
+	GUI/GUIFactory.cpp
 	GUI/GameControl.cpp
 	GUI/Label.cpp
 	GUI/MapControl.cpp
 	GUI/Progressbar.cpp
 	GUI/ScrollBar.cpp
+	GUI/ScrollView.cpp
 	GUI/Slider.cpp
 	GUI/TextArea.cpp
 	GUI/TextEdit.cpp
 	GUI/TextSystem/Font.cpp
 	GUI/TextSystem/GemMarkup.cpp
 	GUI/TextSystem/TextContainer.cpp
+	GUI/Tooltip.cpp
+	GUI/View.cpp
 	GUI/Window.cpp
+	GUI/WindowManager.cpp
 	GUI/WorldMapControl.cpp
 	RNG.cpp
 	Scriptable/Actor.cpp

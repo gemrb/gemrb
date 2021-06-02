@@ -21,13 +21,21 @@
 
 import GemRB
 import GameCheck
+import GUICommonWindows
 from GUIDefines import STR_AREANAME, LOG_MESSAGE
 
 def MoveToNewArea ():
 	import GUIMA
 	travel = GUIMA.WorldMapControl.GetDestinationArea (not GameCheck.IsPST()) # no random encounters in pst, AFAIR
+	if not travel:
+		return
+
 	hours = travel["Distance"]
-	GUIMA.OpenWorldMapWindow ()
+	GUICommonWindows.CloseTopWindow ()
+	if GemRB.GetView ("WIN_PSTWMAP"):
+		GemRB.GetView ("WIN_PSTWMAP").Close ()
+		GemRB.SetVar ("Travel", -1)
+		GemRB.GamePause (0, 0)
 
 	if travel["Destination"].lower() == GemRB.GetGameString(STR_AREANAME).lower():
 		return
@@ -47,9 +55,9 @@ def MoveToNewArea ():
 	if GameCheck.IsPST():
 		# GemRB.DisplayString can only deal with resrefs, so cheat until noticed
 		if hours > 1:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19313))
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + " " + GemRB.GetString (19313))
 		else:
-			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + GemRB.GetString (19312))
+			GemRB.Log (LOG_MESSAGE, "Actor", GemRB.GetString (19261) + str(hours) + " " + GemRB.GetString (19312))
 	else:
 		time = ""
 		GemRB.SetToken ("HOUR", str(hours))

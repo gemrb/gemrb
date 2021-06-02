@@ -35,12 +35,12 @@ private:
 	ResRef resRef;
 public:
 	/** public methods */
-	~BAMFontManager(void);
+	~BAMFontManager(void) override;
 	BAMFontManager();
 
-	bool Open(DataStream* stream);
+	bool Open(DataStream* stream) override;
 
-	Font* GetFont(ieWord pxSize, FontStyle style, Palette* pal = NULL);
+	Font* GetFont(ieWord pxSize, FontStyle style, bool background) override;
 };
 
 }

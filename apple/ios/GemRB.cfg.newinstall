@@ -27,8 +27,8 @@ GUIEnhancements = 1
 # Draw Frames per Second info [Boolean]
 #DrawFPS=1
 
-# Hide unexplored parts of a map
-#FogOfWar=1
+# Show unexplored parts of a map
+#GCDebug=1536
 
 # Enable debug and cheat keystrokes, see docs/en/CheatKeys.txt
 #   full listing
@@ -57,6 +57,7 @@ UseSoftKeyboard=1
 
 # default is 0
 MouseFeedback=3
+TouchInput=1
 
 #####################################################
 #  Touch Gesture Input Parameters                   #
@@ -86,9 +87,6 @@ Bpp=32
 
 #Fullscreen [Boolean]
 Fullscreen=1
-
-# Delay before tooltips appear [milliseconds]
-TooltipDelay=500
 
 #####################################################
 #  Paths                                            #

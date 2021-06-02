@@ -20,15 +20,12 @@ import GemRB
 from GUIDefines import *
 from GameCheck import HasTOTSC
 
-StartWindow = 0
-QuitWindow = 0
 ExitButton = 0
 SinglePlayerButton = 0
 MultiPlayerButton = 0
 MoviesButton = 0
 
 def OnLoad():
-	global StartWindow, QuitWindow
 	global ExitButton, MultiPlayerButton, MoviesButton, SinglePlayerButton
 
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
@@ -40,23 +37,8 @@ def OnLoad():
 		GemRB.PlayMovie ('INTRO',1)
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	GemRB.LoadWindowPack("START", 640, 480)
-
-	#quit subwindow
-	QuitWindow = GemRB.LoadWindow(3)
-	QuitTextArea = QuitWindow.GetControl(0)
-	CancelButton = QuitWindow.GetControl(2)
-	ConfirmButton = QuitWindow.GetControl(1)
-	QuitTextArea.SetText(19532)
-	CancelButton.SetText(13727)
-	ConfirmButton.SetText(15417)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	ConfirmButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
 	#main window
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow (0, "START")
 	SinglePlayerButton = StartWindow.GetControl(0)
 	MultiPlayerButton = StartWindow.GetControl(1)
 	MoviesButton = StartWindow.GetControl(2)
@@ -76,7 +58,7 @@ def SinglePlayerPress():
 	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, LoadSingle)
 	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewSingle)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
-	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 	if HasTOTSC():
 		MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MissionPack)
 	else:
@@ -94,7 +76,7 @@ def MultiPlayerPress():
 	SinglePlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PregenPress)
 	MultiPlayerButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ConnectPress)
 	MoviesButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackToMain)
-	MoviesButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	MoviesButton.MakeEscape()
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, None)
 	ExitButton.SetStatus(IE_GUI_BUTTON_DISABLED)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -105,10 +87,6 @@ def ConnectPress():
 	return
 
 def PregenPress():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -117,30 +95,18 @@ def PregenPress():
 	return
 
 def LoadSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetToken ("SaveDir", "save")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MissionPack():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",1)
 	GemRB.SetToken ("SaveDir", "mpsave")
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def NewSingle():
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(None)
@@ -148,8 +114,22 @@ def NewSingle():
 	return
 
 def ExitPress():
-	StartWindow.SetVisible(WINDOW_INVISIBLE)
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
+	QuitWindow = GemRB.LoadWindow (3, "START")
+
+	QuitTextArea = QuitWindow.GetControl (0)
+	QuitTextArea.SetText (19532)
+
+	CancelButton = QuitWindow.GetControl (2)
+	CancelButton.SetText (13727)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.MakeEscape ()
+
+	ConfirmButton = QuitWindow.GetControl (1)
+	ConfirmButton.SetText (15417)
+	ConfirmButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
+	ConfirmButton.MakeDefault ()
+
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 	
 def ExitConfirmed():
@@ -157,17 +137,7 @@ def ExitConfirmed():
 	return
 
 def MoviesPress():
-#apparently the order is important
-	if StartWindow:
-		StartWindow.Unload()
-	if QuitWindow:
-		QuitWindow.Unload()
 	GemRB.SetNextScript("GUIMOVIE")
-	return
-
-def ExitCancelled():
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return
 	
 def BackToMain():
@@ -185,8 +155,6 @@ def BackToMain():
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
 	MoviesButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	ExitButton.SetFlags(IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
 	return

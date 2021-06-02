@@ -28,79 +28,107 @@ import GUICommon
 import GUICommonWindows
 import CommonWindow
 import GUIWORLD
+import Clock
 from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 
-MessageWindow = 0
-ActionsWindow = 0
-PortraitWindow = 0
-OptionsWindow = 0
-MessageTA = 0
+MWindow = 0
 
 def OnLoad():
-	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
+	global MWindow
 
-	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
-	GemRB.GameSetProtagonistMode(0)
-	GemRB.LoadWindowPack (GUICommon.GetWindowPack())
-	GemRB.SetInfoTextColor(0,255,0,255)
-	ActionsWindow = GemRB.LoadWindow(0)
-	OptionsWindow = GemRB.LoadWindow(2)
-	MessageWindow = GemRB.LoadWindow(7)
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1)
+	# TODO: we can uncomment the "HIDE_CUT" lines below to hide the windows for cutscenes
+	# the original doesn't hide them and it looks like there is a map drawing bug at the bottom of the screen due to the bottom
+	# row of tiles getting squished for not fitting perfectly on screen (tho I havent seen this in BG2, but maybe wasnt paying attention)
 
-	MessageTA = MessageWindow.GetControl (1)
-	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	ActionsWindow = GemRB.LoadWindow(0, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_LEFT)
+	ActionsWindow.AddAlias("ACTWIN")
+	#ActionsWindow.AddAlias("HIDE_CUT", 1)
+	ActionsWindow.AddAlias("NOT_DLG", 0)
+	ActionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
-	GemRB.SetVar ("MessageTextArea", MessageTA.ID)
-	GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
-	GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-	GemRB.SetVar ("MessageWindow", -1)
-	GemRB.SetVar ("OtherWindow", -1)
-	GemRB.SetVar ("ActionsPosition", 1) #Bottom
-	GemRB.SetVar ("OptionsPosition", 1) #Bottom
-	GemRB.SetVar ("MessagePosition", 1) #Bottom
-	GemRB.SetVar ("OtherPosition", 0) #Left
+	OptionsWindow = GemRB.LoadWindow(2, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_RIGHT)
+	OptionsWindow.AddAlias("OPTWIN")
+	#OptionsWindow.AddAlias("HIDE_CUT", 2)
+	OptionsWindow.AddAlias("NOT_DLG", 1)
+	OptionsWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	GemRB.SetVar ("PortraitPosition", 1)
 
-	GemRB.GameSetScreenFlags (0, OP_SET)
-	
-	CloseButton= MessageWindow.GetControl (0)
+	MWindow = GemRB.LoadWindow(7, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
+	MWindow.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND)
+	MWindow.AddAlias("MSGWIN")
+	MWindow.AddAlias("HIDE_CUT", 0)
+	MWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	PortraitWindow = GUICommonWindows.OpenPortraitWindow (1, WINDOW_BOTTOM|WINDOW_HCENTER)
+	#PortraitWindow.AddAlias("HIDE_CUT", 3)
+	PortraitWindow.AddAlias("NOT_DLG", 2)
+	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+
+	pframe = PortraitWindow.GetFrame()
+	pframe['x'] -= 16
+	PortraitWindow.SetFrame(pframe)
+
+	MessageTA = MWindow.GetControl (1)
+	MessageTA.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_HISTORY)
+	MessageTA.SetResizeFlags(IE_GUI_VIEW_RESIZE_ALL)
+	MessageTA.AddAlias("MsgSys", 0)
+	MessageTA.SetColor({'r' : 255, 'g' : 0, 'b' : 0}, TA_COLOR_OPTIONS)
+	MessageTA.SetColor({'r' : 255, 'g' : 255, 'b' : 255}, TA_COLOR_HOVER)
+
+	CloseButton= MWindow.GetControl (0)
 	CloseButton.SetText(28082)
-	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnDecreaseSize)
-	CloseButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CloseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Close())
+	CloseButton.MakeDefault()
 	
 	OpenButton = OptionsWindow.GetControl (10)
-	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CommonWindow.OnIncreaseSize)
+	OpenButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MWindow.Focus())
 
-	GUICommonWindows.SetupClockWindowControls (ActionsWindow)
+	SetupClockWindowControls (ActionsWindow)
 	GUICommonWindows.SetupMenuWindowControls (OptionsWindow)
 
 	UpdateControlStatus ()
+	
+def SetupClockWindowControls (Window):
+	# time button
+	Button = Window.GetControl (0)
+	Button.SetAnimation ("WMTIME")
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, Clock.UpdateClock)
+	Clock.SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
+
+	# 41627 - Return to the Game World
+	Button = Window.GetControl (2)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+	Button.SetTooltip (41627)
+
+	# Select all characters
+	Button = Window.GetControl (1)
+	Button.SetTooltip (41659)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.SelectAllOnPress)
+
+	# Abort current action
+	Button = Window.GetControl (3)
+	Button.SetTooltip (41655)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.ActionStopPressed)
+
+	# Formations
+	import GUIWORLD
+	Button = Window.GetControl (4)
+	Button.SetTooltip (44945)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUIWORLD.OpenFormationWindow)
+
+	return
 
 def UpdateControlStatus ():
-	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow, MessageTA
-
-	Expand = GemRB.GetMessageWindowSize() & (GS_DIALOGMASK|GS_DIALOG)
-
-	hideflags = GemRB.HideGUI ()
-	if Expand:
-		GemRB.SetVar ("MessageWindow", MessageWindow.ID)
-		GemRB.SetVar ("PortraitWindow", -1)
-		GemRB.SetVar ("ActionsWindow", -1)
-		GemRB.SetVar ("OptionsWindow", -1)
-		MessageTA = GUIClasses.GTextArea(MessageWindow.ID, GemRB.GetVar ("MessageTextArea"))
-		MessageTA.SetStatus (IE_GUI_CONTROL_FOCUSED)
-		
-		Label = MessageWindow.GetControl (0x10000003)
+	if GemRB.GetGUIFlags() & (GS_DIALOGMASK|GS_DIALOG):
+		Label = MWindow.GetControl (0x10000003)
 		Label.SetText (str (GemRB.GameGetPartyGold ()))
-	else:
-		GemRB.SetVar ("MessageWindow", -1)
-		GemRB.SetVar ("PortraitWindow", PortraitWindow.ID)
-		GemRB.SetVar ("ActionsWindow", ActionsWindow.ID)
-		GemRB.SetVar ("OptionsWindow", OptionsWindow.ID)
-		GUICommon.GameControl.SetStatus(IE_GUI_CONTROL_FOCUSED)
 
-	if hideflags:
-		GemRB.UnhideGUI ()
+		MWindow.Focus()
+	elif MWindow:
+		MWindow.Close()
 

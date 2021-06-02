@@ -37,7 +37,7 @@ public:
 	static const TypeID ID;
 public:
 	SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID);
-	~SaveGame();
+	~SaveGame() override;
 	int GetPortraitCount() const
 	{
 		return PortraitCount;
@@ -68,8 +68,8 @@ public:
 		return SlotName;
 	}
 
-	Sprite2D* GetPortrait(int index) const;
-	Sprite2D* GetPreview() const;
+	Holder<Sprite2D> GetPortrait(int index) const;
+	Holder<Sprite2D> GetPreview() const;
 	DataStream* GetGame() const;
 	DataStream* GetWmap(int idx) const;
 	DataStream* GetSave() const;

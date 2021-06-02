@@ -155,6 +155,8 @@ using namespace GemRB;
 		[[NSRunLoop mainRunLoop] performSelector:@selector(launchGame:) target:self argument:nil order:0 modes:modes];
 		return;
 	}
+	
+	ToggleLogging(true);
 
 	core = new Interface();
 	InterfaceConfig* config = new InterfaceConfig(0, NULL);
@@ -189,7 +191,7 @@ using namespace GemRB;
 								[value cStringUsingEncoding:NSASCIIStringEncoding]);
 		}
 	}
-
+	
 	int status;
 	if ((status = core->Init(config)) == GEM_ERROR) {
 		delete config;

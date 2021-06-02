@@ -22,6 +22,8 @@ import CommonTables
 from ie_stats import IE_RACE
 from GUIDefines import *
 
+import CharGenCommon
+
 RaceWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -30,8 +32,8 @@ MyChar = 0
 def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	RaceWindow = GemRB.LoadWindow(8)
+	RaceWindow = GemRB.LoadWindow(8, "GUICG")
+	CharGenCommon.PositionCharGenWin(RaceWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	RaceCount = CommonTables.Races.GetRowCount()
@@ -39,10 +41,10 @@ def OnLoad():
 	for i in range(2,RaceCount+2):
 		#hack to stop if the race table has more entries than the gui resource
 		#this needs to be done because the race table has non-selectable entries
-		if not RaceWindow.HasControl(i):
+		Button = RaceWindow.GetControl(i)
+		if not Button:
 			RaceCount = i-2
 			break
-		Button = RaceWindow.GetControl(i)
 		Button.SetFlags(IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	GemRB.SetVar ("Race", -1)
@@ -55,24 +57,24 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(i+2)  #i=8 now (when race count is 7)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+	DoneButton.MakeDefault()
+	DoneButton.SetDisabled(True)
 
 	TextAreaControl = RaceWindow.GetControl(12)
 	TextAreaControl.SetText(17237)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	RaceWindow.SetVisible(WINDOW_VISIBLE)
+	RaceWindow.Focus()
 	return
 
 def RacePress():
 	Race = GemRB.GetVar("Race")
 	TextAreaControl.SetText(CommonTables.Races.GetValue(Race,1) )
-	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+	DoneButton.SetDisabled(False)
 	return
 
 def BackPress():

@@ -28,6 +28,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 
 namespace GemRB {
 
@@ -47,7 +48,6 @@ class Scriptable;
 class Selectable;
 class Spell;
 class Sprite2D;
-class SpriteCover;
 
 #define MAX_GROUND_ICON_DRAWN   3
 
@@ -252,6 +252,7 @@ protected: //let Actor access this
 	unsigned long timeStartDisplaying;
 	String OverheadText;
 public:
+	Region BBox;
 	// State relating to the currently-running action.
 	int CurrentActionState;
 	ieDword CurrentActionTarget;
@@ -367,7 +368,8 @@ public:
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry);
 	/* re/draws overhead text on the map screen */
-	void DrawOverheadText(const Region &screen);
+	void DrawOverheadText();
+	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
 	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
@@ -387,7 +389,7 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
-	virtual char* GetName(int /*which*/) const { return NULL; }
+	virtual const char* GetName(int /*which*/) const { return NULL; }
 	bool AuraPolluted();
 private:
 	/* used internally to handle start of spellcasting */
@@ -403,45 +405,32 @@ private:
 class GEM_EXPORT Selectable : public Scriptable {
 public:
 	Selectable(ScriptableType type);
-	virtual ~Selectable(void);
 public:
-	Region BBox;
 	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
 	Color selectedColor;
 	Color overColor;
-	Sprite2D *circleBitmap[2];
+	Holder<Sprite2D> circleBitmap[2];
 	int size;
 	float sizeFactor;
-private:
-	// current SpriteCover for wallgroups
-	SpriteCover* cover;
 public:
 	void SetBBox(const Region &newBBox);
-	void DrawCircle(const Region &vp);
+	void DrawCircle(const Point& p) const;
 	bool IsOver(const Point &Pos) const;
 	void SetOver(bool over);
 	bool IsSelected() const;
 	void Select(int Value);
-	void SetCircle(int size, float, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
-
-	/* store SpriteCover */
-	void SetSpriteCover(SpriteCover* c);
-	/* get stored SpriteCover */
-	SpriteCover* GetSpriteCover() const { return cover; }
-	/* want dithered SpriteCover */
-	int WantDither() const;
+	void SetCircle(int size, float, const Color &color, Holder<Sprite2D> normal_circle, Holder<Sprite2D> selected_circle);
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
 	Highlightable(ScriptableType type);
-	virtual ~Highlightable(void);
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
 public:
-	Gem_Polygon* outline;
+	std::shared_ptr<Gem_Polygon> outline;
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;
@@ -455,7 +444,7 @@ public:
 	ieResRef EnterWav;
 public:
 	bool IsOver(const Point &Place) const;
-	void DrawOutline() const;
+	void DrawOutline(Point origin) const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{
@@ -505,9 +494,8 @@ public:
 		randomBackoff--;
 	}
 	Movable(ScriptableType type);
-	virtual ~Movable(void);
+	~Movable(void) override;
 	Point Destination;
-	Sprite2D* lastFrame;
 	ieResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
@@ -556,7 +544,7 @@ public:
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
-	void Stop();
+	void Stop() override;
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */

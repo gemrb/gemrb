@@ -26,18 +26,18 @@
 #include "globals.h"
 
 #include "Region.h"
+#include "Holder.h"
+#include "Sprite2D.h"
 
 #include <vector>
 
 namespace GemRB {
 
-class Sprite2D;
-
 #define ANI_DEFAULT_FRAMERATE	15
 
 class GEM_EXPORT Animation {
 private:
-	Sprite2D **frames;
+	std::vector<Holder<Sprite2D>> frames;
 	unsigned int indicesCount;
 	unsigned long starttime;
 public:
@@ -49,15 +49,17 @@ public:
 	bool gameAnimation;
 	Region animArea;
 	ieDword Flags;
+
 	Animation(int count);
-	~Animation(void);
-	void AddFrame(Sprite2D* frame, unsigned int index);
-	Sprite2D* LastFrame(void);
-	Sprite2D* NextFrame(void);
-	Sprite2D* GetSyncedNextFrame(Animation* master);
+	~Animation();
+	void AddFrame(Holder<Sprite2D> frame, unsigned int index);
+	Holder<Sprite2D> CurrentFrame() const;
+	Holder<Sprite2D> LastFrame();
+	Holder<Sprite2D> NextFrame();
+	Holder<Sprite2D> GetSyncedNextFrame(Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
-	Sprite2D* GetFrame(unsigned int i);
+	Holder<Sprite2D> GetFrame(unsigned int i) const;
 	/** Mirrors all the frames vertically */
 	void MirrorAnimationVert();
 	/** Mirrors all the frames horizontally */
@@ -69,7 +71,7 @@ public:
 	/** returns the frame count */
 	unsigned int GetFrameCount() const { return indicesCount; }
 	/** returns the current frame's index */
-	unsigned int GetCurrentFrame() const;
+	unsigned int GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(Animation* slave);
 };

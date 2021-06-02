@@ -29,10 +29,7 @@ TextAreaControl = 0
 def OnLoad():
 	global ImportWindow, TextAreaControl
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ImportWindow = GemRB.LoadWindow(20)
-
-	GUICommon.CloseOtherWindow(ImportWindow.Unload)
+	ImportWindow = GemRB.LoadWindow(20, "GUICG")
 
 	TextAreaControl = ImportWindow.GetControl(4)
 	TextAreaControl.SetText(10963)
@@ -60,17 +57,20 @@ def SelectPress():
 	return
 
 def DonePress():
+	ImportWindow.Close()
 	FileName = TextAreaControl.QueryText()
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
+
 	GemRB.SetToken ("CHARNAME", GemRB.GetPlayerName (Slot))
-	GemRB.SetToken("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1) )
-	GemRB.SetToken("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0) )
+	GemRB.SetToken ("SmallPortrait", GemRB.GetPlayerPortrait (Slot, 1)["ResRef"])
+	GemRB.SetToken ("LargePortrait", GemRB.GetPlayerPortrait (Slot, 0)["ResRef"])
+
 	GemRB.SetVar ("ImportedChar", 1)
 	CharGenCommon.jumpTo("appearance")
 	return
 
 def CancelPress():
-	GUICommon.CloseOtherWindow(None)
+	ImportWindow.Close()
 	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return

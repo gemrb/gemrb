@@ -43,12 +43,7 @@
 
 namespace GemRB {
 
-static struct {
-	const char* Name;
-	EffectFunction Function;
-	int Strref;
-	int Flags;
-} Opcodes[MAX_EFFECTS];
+static EffectDesc Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
 static EffectDesc *effectnames = NULL;
@@ -225,12 +220,12 @@ static inline ieByte TriggeredEffect(ieByte timingmode)
 
 static int compare_effects(const void *a, const void *b)
 {
-	return stricmp(((EffectRef *) a)->Name,((EffectRef *) b)->Name);
+	return stricmp(((const EffectDesc *) a)->Name,((const EffectDesc *) b)->Name);
 }
 
 static int find_effect(const void *a, const void *b)
 {
-	return stricmp((const char *) a,((const EffectRef *) b)->Name);
+	return stricmp((const char *) a,((const EffectDesc *) b)->Name);
 }
 
 static EffectDesc* FindEffect(const char* effectname)
@@ -264,51 +259,47 @@ bool Init_EffectQueue()
 	}
 	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
-
-	memset( Opcodes, 0, sizeof( Opcodes ) );
-	for (size_t i = 0; i < MAX_EFFECTS; i++) {
-		Opcodes[i].Strref=-1;
-	}
-
 	initialized = 1;
 
 	AutoTable efftextTable("efftext");
 
 	int eT = core->LoadSymbol( "effects" );
-	if( eT < 0) {
+	if (eT < 0) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
 		return false;
 	}
 	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
-	if( !effectsTable) {
+	if (!effectsTable) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
 		return false;
 	}
 
 	for (long i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
-		if( efftextTable) {
-			int row = efftextTable->GetRowCount();
-			while (row--) {
-				const char* ret = efftextTable->GetRowName( row );
-				long val;
-				if( valid_number( ret, val ) && (i == val) ) {
-					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
-				}
-			}
-		}
 
 		EffectDesc* poi = FindEffect( effectname );
 		if( poi != NULL) {
-			Opcodes[i].Function = poi->Function;
-			Opcodes[i].Name = poi->Name;
-			Opcodes[i].Flags = poi->Flags;
+			Opcodes[i] = *poi;
+
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
 				error("EffectQueue", "Clashing Opcodes FN: %ld vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
+		}
+		
+		if (efftextTable) {
+			int row = efftextTable->GetRowCount();
+			while (row--) {
+				const char* ret = efftextTable->GetRowName( row );
+				long val;
+				if( valid_number( ret, val ) && (i == val) ) {
+					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
+				} else {
+					Opcodes[i].Strref = -1;
+				}
+			}
 		}
 	}
 	core->DelSymbol( eT );
@@ -333,9 +324,10 @@ void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
 	}
 
-	memcpy( effectnames + effectnames_count, opcodes, count * sizeof( EffectDesc ));
+	std::copy(opcodes, opcodes + count, effectnames + effectnames_count);
 	effectnames_count += count;
 	effectnames[effectnames_count].Name = NULL;
+
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
@@ -1289,56 +1281,54 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 		error("EffectQueue", "Unknown delay type: %d (from %d)\n", DelayType(fx->TimingMode&0xff), fx->TimingMode);
 	}
 
-	EffectFunction fn = 0;
+	int res = FX_ABORT;
 	if( fx->Opcode<MAX_EFFECTS) {
-		fn = Opcodes[fx->Opcode].Function;
 		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
 			Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
 			return FX_NOT_APPLIED;
 		}
-	}
-	int res = FX_ABORT;
-	if( fn) {
-		if( target && fx->FirstApply ) {
-			if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-				displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, DMC_WHITE,
-					target, IE_STR_SOUND);
+		
+		const EffectDesc& ed = Opcodes[fx->Opcode];
+		if (ed) {
+			if( target && fx->FirstApply ) {
+				if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
+					displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, DMC_WHITE,
+												  target, IE_STR_SOUND);
+				}
+			}
+			
+			res = ed(Owner, target, fx);
+			fx->FirstApply = 0;
+
+			switch(res) {
+				case FX_APPLIED:
+					//normal effect with duration
+					break;
+				case FX_ABORT:
+				case FX_NOT_APPLIED:
+					//instant effect, pending removal
+					//for example, a damage effect
+					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+					break;
+				case FX_INSERT:
+					//put this effect in the beginning of the queue
+					//all known insert effects are 'permanent' too
+					//that is the AC effect only
+					//actually, permanent effects seem to be
+					//inserted by the game engine too
+				case FX_PERMANENT:
+					//don't stick around if it was executed permanently
+					//for example, a permanent strength modifier effect
+					if(fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+						fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+					}
+					break;
+				default:
+					error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
 			}
 		}
-
-		res=fn( Owner, target, fx );
-		fx->FirstApply = 0;
-
-		switch( res ) {
-			case FX_APPLIED:
-				//normal effect with duration
-				break;
-			case FX_ABORT:
-			case FX_NOT_APPLIED:
-				//instant effect, pending removal
-				//for example, a damage effect
-				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				break;
-			case FX_INSERT:
-				//put this effect in the beginning of the queue
-				//all known insert effects are 'permanent' too
-				//that is the AC effect only
-				//actually, permanent effects seem to be
-				//inserted by the game engine too
-			case FX_PERMANENT:
-				//don't stick around if it was executed permanently
-				//for example, a permanent strength modifier effect
-				if( fx->TimingMode == FX_DURATION_INSTANT_PERMANENT ) {
-					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-				}
-				break;
-			default:
-				error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
-		}
-	} else {
-		//effect not found, it is going to be discarded
-		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
 	}
+	
 	return res;
 }
 

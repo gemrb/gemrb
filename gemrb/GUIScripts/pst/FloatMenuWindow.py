@@ -45,7 +45,7 @@ CID_WEAPONS = 2
 CID_SPELLS = 3
 CID_ITEMS = 4
 CID_ABILITIES = 5
-# FIXME: there are buttons 6-10 we hide completely. What are they?
+# buttons 6-10 are completely redundant
 CID_HANDLE1 = 11
 CID_HANDLE2 = 12
 CID_PREV = 13
@@ -101,7 +101,7 @@ def DoSingleAction ():
 		pc = GemRB.GameGetFirstSelectedPC ()
 		ClassName = GUICommon.GetClassRowName (pc)
 		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
-			GUIMG.OpenMageWindow ()
+			GUIMG.OpenSpellWindow ()
 		else:
 			GUIPR.OpenPriestWindow ()
 
@@ -109,17 +109,9 @@ def OpenFloatMenuWindow (x=0, y=0):
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index, float_menu_selected
 
-	GemRB.HideGUI ()
-
-	if FloatMenuWindow:
-		if FloatMenuWindow:
-			FloatMenuWindow.Unload ()
-		FloatMenuWindow = None
-
+	def OnClose():
 		GemRB.GamePause (False, 0)
-		GemRB.SetVar ("FloatWindow", -1)
 		GUICommonWindows.SetSelectionChangeMultiHandler (None)
-		GemRB.UnhideGUI ()
 
 		if float_menu_selected==None:
 			return
@@ -134,24 +126,23 @@ def OpenFloatMenuWindow (x=0, y=0):
 			UseSpell()
 		return
 
-	ActionLevel = 0
 	if not GemRB.GameGetFirstSelectedPC ():
-		GemRB.UnhideGUI ()
 		return
 
 	GemRB.GamePause (True, 0)
 	GemRB.GameControlSetTargetMode (TARGET_MODE_NONE)
 
-	GemRB.LoadWindowPack ("GUIWORLD")
-	FloatMenuWindow = Window = GemRB.LoadWindow (3)
-	GemRB.SetVar ("FloatWindow", Window.ID)
+	FloatMenuWindow = Window = GemRB.LoadWindow (3, "GUIWORLD")
 
-	Window.SetPos (x, y, WINDOW_CENTER | WINDOW_BOUNDED)
+	Window.SetFlags (WF_DRAGGABLE|WF_ALPHA_CHANNEL, OP_OR)
+	Window.SetPos (x, y)
+	Window.SetTooltip (8199)
+	Window.SetAction (OnClose, ACTION_WINDOW_CLOSED)
 
 	# portrait button
 	Button = Window.GetControl (CID_PORTRAIT)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuSelectNextPC)
-	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenFloatMenuWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, lambda: Window.Close ())
 
 	# Initiate Dialogue
 	Button = Window.GetControl (CID_DIALOG)
@@ -179,16 +170,11 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button.SetTooltip (8195)
 
 	# Menu Anchors/Handles
-	Button = Window.GetControl (CID_HANDLE1)
-	Button.SetTooltip (8199)
-	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
-
-	Button = Window.GetControl (CID_HANDLE2)
-	Button.SetTooltip (8199)
-	Button.SetFlags (IE_GUI_BUTTON_DRAGGABLE, OP_OR)
-	Button.SetEvent (IE_GUI_BUTTON_ON_DRAG, FloatMenuDrag)
-
+	Handle = Window.GetControl (CID_HANDLE1)
+	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	Handle = Window.GetControl (CID_HANDLE2)
+	Handle.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
+	
 	# Rotate Items left (to begin)
 	Button = Window.GetControl (CID_PREV)
 	Button.SetTooltip (8197)
@@ -200,9 +186,9 @@ def OpenFloatMenuWindow (x=0, y=0):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, FloatMenuNextItem)
 
 	# 6 - 10 - items/spells/other
-	for i in range (6, 11):
-		Button = Window.GetControl (i)
-		Button.SetPos (65535, 65535)
+	for i in range (CID_ABILITIES + 1, CID_HANDLE1):
+		if Window.GetControl (i):
+			Window.DeleteControl (i)
 
 	# 15 - 19 - empty item slot
 	for i in range (SLOT_COUNT):
@@ -252,7 +238,6 @@ def OpenFloatMenuWindow (x=0, y=0):
 	GUICommonWindows.SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
 	UpdateFloatMenuWindow ()
 
-	GemRB.UnhideGUI ()
 	return
 
 def UpdateFloatMenuWindow ():
@@ -332,7 +317,7 @@ def UpdateFloatMenuSingleAction (i):
 	Button = Window.GetControl (CID_SLOTS + i)
 
 	Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
-	Button.SetPicture('')
+	Button.SetPicture(None)
 	Button.SetTooltip (butts[i][1])
 	Button.SetText ('')
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
@@ -450,7 +435,7 @@ def UpdateFloatMenuSpell (pc, i):
 	if i == float_menu_selected:
 		Button.SetBAM ('AMHILITE', 0, 0)
 	else:
-		Button.SetPicture('')
+		Button.SetPicture(None)
 		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	if i + float_menu_index < len (spell_list):
@@ -476,9 +461,8 @@ def UpdateFloatMenuSpell (pc, i):
 def ClearSlot (i):
 	Button = FloatMenuWindow.GetControl (CID_SLOTS + i)
 	Button.SetSprites ('AMGENS', 0, 0, 1, 0, 0)
-	Button.SetPicture ('')
+	Button.SetPicture (None)
 	Button.SetText ('')
-	Button.SetTooltip ('')
 	Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 def FloatMenuSelectPreviousPC ():
@@ -601,11 +585,6 @@ def FloatMenuNextItem ():
 	if float_menu_selected!=None:
 		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()
-	return
-
-def FloatMenuDrag ():
-	dx, dy = GemRB.GetVar ("DragX"), GemRB.GetVar ("DragY")
-	FloatMenuWindow.SetPos (dx, dy, WINDOW_RELATIVE | WINDOW_BOUNDED)
 	return
 
 #############################

@@ -18,11 +18,14 @@
 #
 #character generation, color (GUICG13)
 import GemRB
+
+import CharOverview
 import CommonTables
 import GUICommon
 import IDLUCommon
 import Portrait
 from GUIDefines import *
+from ie_stats import IE_SEX, IE_CLASS
 
 ColorTable = 0
 HairTable = 0
@@ -48,9 +51,9 @@ def RefreshPDoll():
 	global Color1, Color2, Color3, Color4, PDollResRef
 
 	PDollButton.SetFlags(IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYALWAYS|IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
-	PDollButton.SetPLT(PDollResRef, 0, Color4, Color3, Color2, 0, 0, Color1, 0)
 	PDollButton.SetBAM("", 0, 0, 0) # just hide or there is a tiny artifact
 	PDollButton.SetAnimation(PDollResRef, 2)
+	PDollButton.SetAnimationPalette (0, Color4, Color3, Color2, 0, 0, Color1, 0)
 	return
 
 def OnLoad():
@@ -59,8 +62,8 @@ def OnLoad():
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global Color1, Color2, Color3, Color4, PDollResRef
 	
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	ColorWindow=GemRB.LoadWindow(13)
+	ColorWindow=GemRB.LoadWindow(13, "GUICG")
+	CharOverview.PositionCharGenWin(ColorWindow)
 
 	pc = GemRB.GetVar ("Slot")
 	Race = IDLUCommon.GetRace (pc)
@@ -72,7 +75,7 @@ def OnLoad():
 	#set these colors to some default
 	Gender = GemRB.GetPlayerStat (pc, IE_SEX)
 	Portrait.Init (Gender)
-	Portrait.Set (GemRB.GetPlayerPortrait (pc))
+	Portrait.Set (GemRB.GetPlayerPortrait (pc)["ResRef"])
 	PortraitName = Portrait.Name () # strips the last char like the table needs
 
 	PortraitTable = GemRB.LoadTable("pictures")
@@ -108,7 +111,7 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = ColorWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
@@ -116,6 +119,12 @@ def OnLoad():
 	# calculate the paperdoll animation id from the race, class and gender
 	PDollTable = GemRB.LoadTable ("avatars")
 	table = GemRB.LoadTable ("avprefr")
+	RaceID = CommonTables.Races.GetValue (RaceName, "ID", GTV_INT)
+	# look up base race if needed
+	if RaceID > 1000:
+		 RaceID = RaceID >> 16
+		 Race = CommonTables.Races.FindValue ("ID", RaceID)
+		 RaceName = CommonTables.Races.GetRowName (Race)
 	AnimID = 0x6000 + table.GetValue (RaceName, "RACE")
 
 	table = GemRB.LoadTable ("avprefc")
@@ -133,7 +142,7 @@ def OnLoad():
 		PDollResRef = "CEMB1G11"
 
 	RefreshPDoll()
-	ColorWindow.SetVisible(WINDOW_VISIBLE)
+	ColorWindow.Focus()
 	return
 
 def RandomDonePress():
@@ -145,7 +154,7 @@ def DonePress():
 	global Color1, Color2, Color3, Color4, ColorWindow, ColorIndex, PickedColor, ColorPicker
 	if ColorPicker:
 		ColorPicker.Unload()
-	ColorWindow.SetVisible(WINDOW_VISIBLE)
+	ColorWindow.Focus()
 	
 	if ColorIndex==0:
 		PickedColor=HairTable.GetValue(GemRB.GetVar("Selected"),0)
@@ -176,7 +185,7 @@ def CancelPress():
 	global ColorPicker, ColorWindow
 	if ColorPicker:
 		ColorPicker.Unload ()
-	ColorWindow.SetVisible (WINDOW_VISIBLE)
+	ColorWindow.Focus()
 
 def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
@@ -221,16 +230,14 @@ def GetColor():
 	CancelButton = ColorPicker.GetControl(35)
 	CancelButton.SetText(13727)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
-	ColorPicker.SetVisible(WINDOW_VISIBLE)
+	ColorPicker.Focus()
 	return
 
 def HairPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 0
 	PickedColor = Color1
 	GetColor()
@@ -239,8 +246,6 @@ def HairPress():
 def SkinPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 1
 	PickedColor = Color2
 	GetColor()
@@ -249,8 +254,6 @@ def SkinPress():
 def MajorPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 2
 	PickedColor = Color3
 	GetColor()
@@ -259,8 +262,6 @@ def MajorPress():
 def MinorPress():
 	global ColorIndex, PickedColor
 
-#	ColorWindow.Unload()
-	ColorWindow.SetVisible(WINDOW_INVISIBLE)
 	ColorIndex = 3
 	PickedColor = Color4
 	GetColor()

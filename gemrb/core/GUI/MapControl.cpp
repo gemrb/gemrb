@@ -25,8 +25,7 @@
 #include "GlobalTimer.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "GUI/EventMgr.h"
-#include "GUI/Window.h"
+#include "GUI/GameControl.h"
 #include "Scriptable/Actor.h"
 
 namespace GemRB {
@@ -35,456 +34,344 @@ namespace GemRB {
 #define MAP_VIEW_NOTES 1
 #define MAP_SET_NOTE   2
 #define MAP_REVEAL     3
+#define MAP_EDIT_NOTE  4
 
-// Ratio between pixel sizes of an Area (Big map) and a Small map
-
-static int MAP_DIV   = 3;
-static int MAP_MULT  = 32;
-
-typedef enum {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen} colorcode;
-
-Color colors[]={
- { 0x00, 0x00, 0x00, 0xff }, //black
- { 0x60, 0x60, 0x60, 0xff }, //gray
- { 0xa0, 0x00, 0xa0, 0xff }, //violet
- { 0x00, 0xff, 0x00, 0xff }, //green
- { 0xff, 0xff, 0x00, 0xff }, //orange
- { 0xff, 0x00, 0x00, 0xff }, //red
- { 0x00, 0x00, 0xff, 0xff }, //blue
- { 0x00, 0x00, 0x80, 0xff }, //darkblue
- { 0x00, 0x80, 0x00, 0xff }  //darkgreen
-};
-
-#define MAP_TO_SCREENX(x) (XWin + XCenter - ScrollX + (x))
-#define MAP_TO_SCREENY(y) (YWin + YCenter - ScrollY + (y))
-// Omit [XY]Pos, since these macros are used in OnMouseDown(x, y), and x, y is 
-//   already relative to control [XY]Pos there
-#define SCREEN_TO_MAPX(x) ((x) - XCenter + ScrollX)
-#define SCREEN_TO_MAPY(y) ((y) - YCenter + ScrollY)
-
-#define GAME_TO_SCREENX(x) MAP_TO_SCREENX((int)((x) * MAP_DIV / MAP_MULT))
-#define GAME_TO_SCREENY(y) MAP_TO_SCREENY((int)((y) * MAP_DIV / MAP_MULT))
-
-#define SCREEN_TO_GAMEX(x) (SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV)
-#define SCREEN_TO_GAMEY(y) (SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV)
-
-MapControl::MapControl(const Region& frame)
-	: Control(frame)
+MapControl::MapControl(const Region& frame, AnimationFactory* af)
+: Control(frame), flags(af)
 {
-	ControlType = IE_GUI_MAP;
-	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
-		MAP_DIV=4;
-		MAP_MULT=32;
-	} else {
-		MAP_DIV=3;
-		MAP_MULT=32;
-	}
-
-	LinkedLabel = NULL;
-	ScrollX = 0;
-	ScrollY = 0;
-	NotePosX = 0;
-	NotePosY = 0;
-	MapWidth = MapHeight = ViewWidth = ViewHeight = 0;
-	XCenter = YCenter = 0;
-	lastMouseX = lastMouseY = 0;
-	mouseIsDown = false;
-	MarkDirty();
-	convertToGame = true;
-	memset(Flag,0,sizeof(Flag) );
-
-	// initialize var and event callback to no-ops
-	VarName[0] = 0;
-	ResetEventHandler( MapControlOnPress );
-	ResetEventHandler( MapControlOnRightPress );
-	ResetEventHandler( MapControlOnDoublePress );
-
-	MyMap = core->GetGame()->GetCurrentArea();
-	if (MyMap && MyMap->SmallMap) {
-		MapMOS = MyMap->SmallMap;
-		MapMOS->acquire();
-	} else
-		MapMOS = NULL;
+	ControlType = IE_GUI_MAP;	
+	UpdateMap();
 }
 
-MapControl::~MapControl(void)
+void MapControl::UpdateMap()
 {
-	if (MapMOS) {
-		Sprite2D::FreeSprite(MapMOS);
-	}
-	for(int i=0;i<8;i++) {
-		if (Flag[i]) {
-			Sprite2D::FreeSprite(Flag[i]);
+	Map* newMap = core->GetGame()->GetCurrentArea();
+	if (newMap != MyMap) {
+		MyMap = newMap;
+		if (MyMap && MyMap->SmallMap) {
+			MapMOS = MyMap->SmallMap;
+		} else {
+			MapMOS = nullptr;
 		}
+
+		MarkDirty();
 	}
 }
 
 // Draw fog on the small bitmap
 void MapControl::DrawFog(const Region& rgn) const
 {
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
 	Video *video = core->GetVideoDriver();
+	const Size mapsize = MyMap->GetSize();
+	Point p;
+	Point gameP = p;
 
-	// FIXME: this is ugly, the knowledge of Map and ExploredMask
-	//   sizes should be in Map.cpp
-	int w = MyMap->GetWidth() / 2;
-	int h = MyMap->GetHeight() / 2;
+	std::vector<Point> points;
+	points.reserve(rgn.w * rgn.h);
 
-	for (int y = 0; y < h; y++) {
-		for (int x = 0; x < w; x++) {
-			Point p( (short) (MAP_MULT * x), (short) (MAP_MULT * y) );
-			bool visible = MyMap->IsVisible( p, true );
-			if (! visible) {
-				Region rgn = Region ( MAP_TO_SCREENX(MAP_DIV * x), MAP_TO_SCREENY(MAP_DIV * y), MAP_DIV, MAP_DIV );
-				video->DrawRect( rgn, colors[black] );
+	for (; p.y < rgn.h; ++p.y) {
+		gameP.y = p.y * double(mapsize.h) / mosRgn.h;
+
+		for (p.x = 0; p.x < rgn.w; ++p.x) {
+			gameP.x = p.x * double(mapsize.w) / mosRgn.w;
+			
+			bool visible = MyMap->IsExplored(gameP);
+			if (!visible) {
+				points.push_back(p + rgn.Origin());
 			}
 		}
 	}
-}
 
-// To be called after changes in control's or screen geometry
-void MapControl::Realize()
-{
-	// FIXME: ugly!! How to get area size in pixels?
-	//Map *map = core->GetGame()->GetCurrentMap();
-	//MapWidth = map->GetWidth();
-	//MapHeight = map->GetHeight();
-
-	if (MapMOS) {
-		MapWidth = (short) MapMOS->Width;
-		MapHeight = (short) MapMOS->Height;
-	} else {
-		MapWidth = 0;
-		MapHeight = 0;
-	}
-
-	// FIXME: ugly hack! What is the actual viewport size?
-	ViewWidth = (short) (core->Width * MAP_DIV / MAP_MULT);
-	ViewHeight = (short) (core->Height * MAP_DIV / MAP_MULT);
-
-	XCenter = (short) (Width - MapWidth ) / 2;
-	YCenter = (short) (Height - MapHeight ) / 2;
-	if (XCenter < 0) XCenter = 0;
-	if (YCenter < 0) YCenter = 0;
+	video->DrawPoints(points, ColorBlack);
 }
 
 void MapControl::UpdateState(unsigned int Sum)
 {
-	Value = Sum;
-	MarkDirty();
+	SetValue(Sum);
+}
+	
+Point MapControl::ConvertPointToGame(Point p) const
+{
+	const Size mapsize = MyMap->GetSize();
+	
+	// mos is centered... first convert p to mos coordinates
+	// mos is in win coordinates (to make things easy elsewhere)
+	p = ConvertPointToSuper(p) - mosRgn.Origin();
+	
+	p.x *= double(mapsize.w) / mosRgn.w;
+	p.y *= double(mapsize.h) / mosRgn.h;
+	
+	return p;
+}
+	
+Point MapControl::ConvertPointFromGame(Point p) const
+{
+	const Size mapsize = MyMap->GetSize();
+	
+	p.x *= double(mosRgn.w) / mapsize.w;
+	p.y *= double(mosRgn.h) / mapsize.h;
+	
+	// mos is centered... convert p from mos coordinates
+	return p + mosRgn.Origin();
+}
+	
+void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	UpdateMap();
+
+	if (LinkedLabel) {
+		if (GetValue() == MAP_EDIT_NOTE)
+		{
+			LinkedLabel->SetFlags(IgnoreEvents, OP_NAND);
+			LinkedLabel->SetFocus();
+		} else {
+			LinkedLabel->SetFlags(IgnoreEvents, OP_OR);
+		}
+	}
+
+	if (MapMOS) {
+		const Size& mosSize = MapMOS->Frame.Dimensions();
+		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
+		mosRgn = Region(Origin() + center, mosSize);
+	} else {
+		mosRgn = Region(Point(), Dimensions());
+	}
+}
+
+Region MapControl::GetViewport() const
+{
+	GameControl* gc = core->GetGameControl();
+	Region vp = gc->Viewport();
+	const Size& mapsize = MyMap->GetSize();
+
+	vp.x *= double(mosRgn.w) / mapsize.w;
+	vp.y *= double(mosRgn.h) / mapsize.h;
+	vp.w *= double(mosRgn.w) / mapsize.w;
+	vp.h *= double(mosRgn.h) / mapsize.h;
+
+	vp.x += mosRgn.x;
+	vp.y += mosRgn.y;
+	return vp;
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::DrawInternal(Region& rgn)
+void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	ieWord XWin = rgn.x;
-	ieWord YWin = rgn.y;
-
-	Realize();
-
-	// we're going to paint over labels/etc, so they need to repaint!
-	bool seen_this = false;
-	unsigned int i;
-	for (i = 0; i < Owner->GetControlCount(); i++) {
-		Control *ctrl = Owner->GetControl(i);
-		if (!ctrl) continue;
-
-		// we could try working out which controls overlap,
-		// but the later controls are cheap to paint..
-		if (ctrl == this) { seen_this = true; continue; }
-		if (!seen_this) continue;
-
-		ctrl->MarkDirty();
-	}
-
 	Video* video = core->GetVideoDriver();
-	if (MapMOS) {
-		video->BlitSprite( MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &rgn );
+	video->DrawRect(rgn, ColorBlack, true);
+		
+	if (MyMap == nullptr) {
+		return;
 	}
 
-	if (core->FogOfWar&FOG_DRAWFOG)
-		DrawFog(rgn);
+	if (MapMOS) {
+		video->BlitSprite(MapMOS, mosRgn.Origin());
+	}
 
-	Region vp = video->GetViewport();
+	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)
+		DrawFog(mosRgn);
 
-	vp.x = GAME_TO_SCREENX(vp.x);
-	vp.y = GAME_TO_SCREENY(vp.y);
-	vp.w = ViewWidth;
-	vp.h = ViewHeight;
-
-	if ((vp.x + vp.w) >= MAP_TO_SCREENX( Width ))
-		vp.w = MAP_TO_SCREENX( Width ) - vp.x;
-	if ((vp.y + vp.h) >= MAP_TO_SCREENY( Height ))
-		vp.h = MAP_TO_SCREENY( Height ) - vp.y;
-
-	video->DrawRect( vp, colors[green], false, false );
-
+	Region vp = GetViewport();
+	video->DrawRect(vp, ColorGreen, false );
+	
 	// Draw PCs' ellipses
 	Game *game = core->GetGame();
-	i = game->GetPartySize(true);
+	int i = game->GetPartySize(true);
 	while (i--) {
 		const Actor *actor = game->GetPC(i, true);
 		if (MyMap->HasActor(actor) ) {
-			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
+			Point pos = ConvertPointFromGame(actor->Pos);
+			video->DrawEllipse( pos, 3, 2, actor->Selected ? ColorGreen : ColorGreenDark );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
 	// we use the common control value to handle it, because then we
 	// don't need another interface
-	if (Value!=MAP_NO_NOTES) {
+	if (GetValue()!=MAP_NO_NOTES) {
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
-			Sprite2D *anim = Flag[mn.color&7];
-			Point pos = mn.Pos;
-			if (convertToGame) {
-				vp.x = GAME_TO_SCREENX(mn.Pos.x);
-				vp.y = GAME_TO_SCREENY(mn.Pos.y);
-			} else { //pst style
-				vp.x = MAP_TO_SCREENX(mn.Pos.x);
-				vp.y = MAP_TO_SCREENY(mn.Pos.y);
-				pos.x = pos.x * MAP_MULT / MAP_DIV;
-				pos.y = pos.y * MAP_MULT / MAP_DIV;
-			}
-
-			//Skip unexplored map notes
-			bool visible = MyMap->IsVisible( pos, true );
+			
+			// Skip unexplored map notes unless they are player added
+			// FIXME: PST should include user notes regardless (!mn.readonly)
+			bool visible = MyMap->IsExplored(mn.Pos);
 			if (!visible)
 				continue;
 
+			Point pos = ConvertPointFromGame(mn.Pos);
+
+			Holder<Sprite2D> anim = flags ? flags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
-				video->BlitSprite( anim, vp.x - anim->Width/2, vp.y - anim->Height/2, true, &rgn );
+				Point p(anim->Frame.w / 2, anim->Frame.h / 2);
+				video->BlitSprite(anim, pos - p);
 			} else {
-				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn.color&7], false );
+				video->DrawEllipse( pos, 6, 5, mn.GetColor() );
 			}
 		}
 	}
 }
 
-/** Mouse Over Event */
-void MapControl::OnMouseOver(unsigned short x, unsigned short y)
+void MapControl::ClickHandle(const MouseEvent&)
 {
-	if (mouseIsDown) {
-		MarkDirty();
-		ScrollX -= x - lastMouseX;
-		ScrollY -= y - lastMouseY;
+	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
+	core->GetDictionary()->SetAt( "MapControlY", notePos.y );
+}
 
-		if (ScrollX > MapWidth - Width)
-			ScrollX = MapWidth - Width;
-		if (ScrollY > MapHeight - Height)
-			ScrollY = MapHeight - Height;
-		if (ScrollX < 0)
-			ScrollX = 0;
-		if (ScrollY < 0)
-			ScrollY = 0;
-		ViewHandle(x,y);
-	}
+void MapControl::UpdateViewport(Point vp)
+{
+	Region vp2 = GetViewport();
+	vp.x -= vp2.w/2;
+	vp.y -= vp2.h/2;
+	vp = ConvertPointToGame(vp);
+	
+	// clear any previously scheduled moves and then do it asap, so it works while paused
+	core->timer.SetMoveViewPort( vp, 0, false );
 
-	lastMouseX = x;
-	lastMouseY = y;
+	MarkDirty();
+}
 
-	switch (Value) {
+void MapControl::UpdateCursor()
+{
+	ieDword val = GetValue();
+	switch (val) {
 		case MAP_REVEAL: //for farsee effect
-			Owner->Cursor = IE_CURSOR_CAST;
+			SetCursor(core->Cursors[IE_CURSOR_CAST]);
 			break;
 		case MAP_SET_NOTE:
-			Owner->Cursor = IE_CURSOR_GRAB;
+			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
-			Owner->Cursor = IE_CURSOR_NORMAL;
-			break;
-	}
-
-	if (Value == MAP_VIEW_NOTES || Value == MAP_SET_NOTE || Value == MAP_REVEAL) {
-		Point mp;
-		unsigned int dist;
-
-		if (convertToGame) {
-			mp.x = (short) SCREEN_TO_GAMEX(x);
-			mp.y = (short) SCREEN_TO_GAMEY(y);
-			dist = 100;
-		} else {
-			mp.x = (short) SCREEN_TO_MAPX(x);
-			mp.y = (short) SCREEN_TO_MAPY(y);
-			dist = 16;
-		}
-		int i = MyMap -> GetMapNoteCount();
-		while (i--) {
-			const MapNote& mn = MyMap -> GetMapNote(i);
-			if (Distance(mp, mn.Pos)<dist) {
-				if (LinkedLabel) {
-					LinkedLabel->SetText( mn.text );
-				}
-				NotePosX = mn.Pos.x;
-				NotePosY = mn.Pos.y;
-				return;
-			}
-		}
-		NotePosX = mp.x;
-		NotePosY = mp.y;
-	}
-	if (LinkedLabel) {
-		LinkedLabel->SetText( L"" );
-	}
-}
-
-/** Mouse Leave Event */
-void MapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
-{
-	Owner->Cursor = IE_CURSOR_NORMAL;
-}
-
-void MapControl::ClickHandle(unsigned short Button)
-{
-	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
-	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	switch(Button&GEM_MB_NORMAL) {
-		case GEM_MB_ACTION:
-			if (Button&GEM_MB_DOUBLECLICK) {
-				RunEventHandler( MapControlOnDoublePress );
-			} else {
-				RunEventHandler( MapControlOnPress );
-			}
-			break;
-		case GEM_MB_MENU:
-			RunEventHandler( MapControlOnRightPress );
-			break;
-		default:
+			Holder<Sprite2D> cursor = EventMgr::MouseButtonState(GEM_MB_ACTION) ? core->Cursors[IE_CURSOR_PRESSED] : nullptr;
+			SetCursor(cursor);
 			break;
 	}
 }
 
-void MapControl::ViewHandle(unsigned short x, unsigned short y)
+const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
 {
-	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
-	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
+	Point gamePoint = ConvertPointToGame(p);
+	Size mapsize = MyMap->GetSize();
 
-	if (xp + ViewWidth > MapWidth) xp = MapWidth - ViewWidth;
-	if (yp + ViewHeight > MapHeight) yp = MapHeight - ViewHeight;
-	if (xp < 0) xp = 0;
-	if (yp < 0) yp = 0;
+	float scalar = float(mapsize.w) / mosRgn.w;
+	unsigned int radius = (flags) ? (flags->GetFrame(0)->Frame.w / 2) * scalar : 5 * scalar;
 
-	// clear any previously scheduled moves and then do it asap, so it works while paused
-	unsigned int vpx = xp * MAP_MULT / MAP_DIV;
-	unsigned int vpy = yp * MAP_MULT / MAP_DIV;
-	core->timer->SetMoveViewPort( vpx, vpy, 0, false );
-	core->GetVideoDriver()->MoveViewportTo( vpx, vpy );
+	return MyMap->MapNoteAtPoint(gamePoint, radius);
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 {
-	switch((unsigned char) Button & GEM_MB_NORMAL) {
-		case GEM_MB_SCRLUP:
-			OnSpecialKeyPress(GEM_UP);
-			return;
-		case GEM_MB_SCRLDOWN:
-			OnSpecialKeyPress(GEM_DOWN);
-			return;
-		case GEM_MB_ACTION:
-			if (Button & GEM_MB_DOUBLECLICK) {
-				ClickHandle(Button);
+	if (MyMap == NULL)
+		return false;
+
+	if (me.ButtonState(GEM_MB_ACTION)) {
+		Point p = ConvertPointFromScreen(me.Pos());
+		if (GetValue() == MAP_VIEW_NOTES) {
+			const MapNote* mn = MapNoteAtPoint(p);
+			if (!mn || mn->readonly) {
+				UpdateViewport(p);
 			}
-			break;
-		default:
-			break;
+		} else {
+			UpdateViewport(p);
+		}
 	}
 
-	mouseIsDown = true;
-	Region vp = core->GetVideoDriver()->GetViewport();
-	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
-	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
-	ViewHandle(x,y);
-	lastMouseX = x;
-	lastMouseY = y;
+	UpdateCursor();
+	return true;
+}
+	
+/** Mouse Over Event */
+bool MapControl::OnMouseOver(const MouseEvent& me)
+{
+	if (MyMap == NULL)
+		return false;
+
+	ieDword val = GetValue();
+	if (val == MAP_VIEW_NOTES) {
+		Point p = ConvertPointFromScreen(me.Pos());
+
+		String* text = NULL;
+		const MapNote* mn = MapNoteAtPoint(p);
+		if (mn) {
+			text = mn->text;
+			notePos = mn->Pos;
+		}
+
+		if (LinkedLabel) {
+			LinkedLabel->SetText(text);
+		}
+	}
+
+	UpdateCursor();
+	return true;
+}
+	
+bool MapControl::OnMouseDrag(const MouseEvent& me)
+{
+	if (GetValue() == MAP_VIEW_NOTES) {
+		if (me.ButtonState(GEM_MB_ACTION)) {
+			UpdateViewport(ConvertPointFromScreen(me.Pos()));
+		}
+	}
+	return true;
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-	unsigned short /*Mod*/)
+bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 {
-	if (!mouseIsDown) {
-		return;
-	}
+	Point p = ConvertPointFromScreen(me.Pos());
 
-	MarkDirty();
-	mouseIsDown = false;
-	switch(Value) {
+	switch(GetValue()) {
+		case MAP_EDIT_NOTE:
+			SetValue(MAP_VIEW_NOTES);
+			break;
 		case MAP_REVEAL:
-			ViewHandle(x,y);
-			NotePosX = (short) SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV;
-			NotePosY = (short) SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV;
-			ClickHandle(Button);
-			return;
+			UpdateViewport(p);
+			notePos = ConvertPointToGame(p);
+			break;
+		case MAP_SET_NOTE:
+			notePos = ConvertPointToGame(p);
+			SetValue(MAP_EDIT_NOTE);
+			break;
 		case MAP_NO_NOTES:
-			ViewHandle(x,y);
-			return;
+			UpdateViewport(p);
+			break;
 		case MAP_VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
-			if (Button & GEM_MB_ACTION) {
-				ViewHandle(x,y);
+			if (me.ButtonState(GEM_MB_ACTION)) {
+				UpdateViewport(p);
+			} else {
+				const MapNote* mn = MapNoteAtPoint(p);
+				if (mn && !mn->readonly) {
+					notePos = mn->Pos;
+					SetValue(MAP_EDIT_NOTE);
+				} else {
+					notePos = ConvertPointToGame(p);
+				}
 			}
-			ClickHandle(Button);
-			return;
+			break;
 		default:
-			ClickHandle(Button);
-			return;
+			break;
 	}
+
+	ClickHandle(me);
+	Control::OnMouseUp(me, mod);
+	UpdateCursor();
+	return true;
 }
 
-/** Special Key Press */
-bool MapControl::OnSpecialKeyPress(unsigned char Key)
+bool MapControl::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
-	ieDword keyScrollSpd = 64;
-	core->GetDictionary()->Lookup("Keyboard Scroll Speed", keyScrollSpd);
-	switch (Key) {
+	switch (key.keycode) {
 		case GEM_LEFT:
-			ScrollX -= keyScrollSpd;
-			break;
-		case GEM_UP:
-			ScrollY -= keyScrollSpd;
-			break;
 		case GEM_RIGHT:
-			ScrollX += keyScrollSpd;
-			break;
+		case GEM_UP:
 		case GEM_DOWN:
-			ScrollY += keyScrollSpd;
-			break;
-		default:
-			return false;
+			GameControl* gc = core->GetGameControl();
+			gc->KeyPress(key, mod);
+			return true;
 	}
-
-	if (ScrollX > MapWidth - Width)
-		ScrollX = MapWidth - Width;
-	if (ScrollY > MapHeight - Height)
-		ScrollY = MapHeight - Height;
-	if (ScrollX < 0)
-		ScrollX = 0;
-	if (ScrollY < 0)
-		ScrollY = 0;
-	MarkDirty();
-	return true;
-}
-
-bool MapControl::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-		case IE_GUI_MAP_ON_PRESS:
-			MapControlOnPress = handler;
-			break;
-		case IE_GUI_MAP_ON_RIGHT_PRESS:
-			MapControlOnRightPress = handler;
-			break;
-		case IE_GUI_MAP_ON_DOUBLE_PRESS:
-			MapControlOnDoublePress = handler;
-			break;
-		default:
-			return false;
-	}
-
-	return true;
+	return Control::OnKeyPress(key, mod);
 }
 
 }

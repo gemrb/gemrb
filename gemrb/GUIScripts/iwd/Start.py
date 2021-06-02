@@ -27,16 +27,11 @@ import GameCheck
 from GUIDefines import *
 from ie_restype import *
 
-StartWindow = 0
+StartWindow = None
 JoinGameButton = 0
-ProtocolWindow = 0
-GameTypeWindow = 0
-GameType2Window = 0
-ExpansionGame = 0
-QuitWindow = 0
 
 def OnLoad ():
-	global StartWindow, JoinGameButton
+	global JoinGameButton
 
 	GemRB.SetVar("ExpansionGame", 0)
 
@@ -55,29 +50,18 @@ def OnLoad ():
 	else:
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 
-	# Find proper window border for higher resolutions
-	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
-	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
-	if GemRB.HasResource ("STON08L", RES_MOS):
-		if screen_width == 800:
-			GemRB.LoadWindowFrame ("STON08L", "STON08R", "STON08T", "STON08B")
-		elif screen_width == 1024:
-			GemRB.LoadWindowFrame ("STON10L", "STON10R", "STON10T", "STON10B")
-
-	GemRB.LoadWindowPack("GUICONN", 640, 480)
-
 #main window
-	StartWindow = GemRB.LoadWindow (0)
-	StartWindow.SetFrame ()
+	global StartWindow
+	StartWindow = GemRB.LoadWindow (0, "GUICONN")
 	ProtocolButton = StartWindow.GetControl (0x00)
 	CreateGameButton = StartWindow.GetControl (0x02)
 	LoadGameButton = StartWindow.GetControl (0x07)
 	JoinGameButton = StartWindow.GetControl (0x03)
 	MoviesButton = StartWindow.GetControl (0x08)
 	QuitGameButton = StartWindow.GetControl (0x01)
-	StartWindow.CreateLabel (0x0fff0000, 0,0,800,30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	VersionLabel = StartWindow.GetControl (0x0fff0000)
+	VersionLabel = StartWindow.CreateLabel (0x0fff0000, 0, 0, 640, 30, "REALMS2", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	VersionLabel.SetText (GemRB.Version)
+	VersionLabel.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	ProtocolButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CreateGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	LoadGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
@@ -99,18 +83,20 @@ def OnLoad ():
 	MoviesButton.SetText (15415)
 	QuitGameButton.SetText (13731)
 	QuitGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	QuitGameButton.MakeEscape ()
 	ProtocolButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolPress)
 	MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, MoviesPress)
 	LoadGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadPress)
 	CreateGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CreatePress)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
+	StartWindow.Focus ()
 	GemRB.LoadMusicPL("Theme.mus",1)
+	
+	StartWindow.SetAction(RefreshProtocol, ACTION_WINDOW_FOCUS_GAINED)
+	
 	return
 
 def ProtocolPress ():
-	global StartWindow, ProtocolWindow
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	ProtocolWindow = GemRB.LoadWindow (1)
+	ProtocolWindow = GemRB.LoadWindow (1, "GUICONN")
 	
 	#Disabling Unused Buttons in this Window
 	Button = ProtocolWindow.GetControl (2)
@@ -144,19 +130,14 @@ def ProtocolPress ():
 	
 	DoneButton = ProtocolWindow.GetControl (6)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ProtocolDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: ProtocolWindow.Close())
+	DoneButton.MakeEscape()
 	
 	ProtocolWindow.ShowModal (1)
 	return
 	
-def ProtocolDonePress ():
-	global StartWindow, ProtocolWindow, JoinGameButton
-	if ProtocolWindow:
-		ProtocolWindow.Unload ()
-		ProtocolWindow = None
-	
-	ProtocolButton = StartWindow.GetControl (0x00)
+def RefreshProtocol (win):
+	ProtocolButton = win.GetControl (0)
 	
 	LastProtocol = GemRB.GetVar ("Last Protocol Used")
 	if LastProtocol == 0:
@@ -168,66 +149,59 @@ def ProtocolDonePress ():
 	elif LastProtocol == 2:
 		ProtocolButton.SetText (13968)
 		JoinGameButton.SetStatus (IE_GUI_BUTTON_ENABLED)
-	
-	StartWindow.SetVisible (WINDOW_VISIBLE)
+
 	return
 	
 def CreatePress ():
-	global StartWindow, GameTypeWindow, ExpansionType
+	global GameTypeWindow, ExpansionType
 
 	if not GameCheck.HasHOW():
 		GameTypeReallyDonePress()
 
-	GameTypeWindow = GemRB.LoadWindow (24)
+	GameTypeWindow = GemRB.LoadWindow (24, "GUICONN")
 
 	CancelButton = GameTypeWindow.GetControl (1)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameTypeWindow.Close())
+	CancelButton.MakeEscape()
 
 	DoneButton = GameTypeWindow.GetControl (2)
 	DoneButton.SetText (11973)
-	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeDonePress)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameTypeDonePress(GameTypeWindow))
+	DoneButton.MakeDefault()
 
 	FullGameButton = GameTypeWindow.GetControl (4)
 	FullGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	FullGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeButtonPress)
+	FullGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeChange)
 	FullGameButton.SetText (24869)
+	FullGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
 	ExpansionGameButton = GameTypeWindow.GetControl (5)
 	ExpansionGameButton.SetFlags (IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-	ExpansionGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeButtonPress)
+	ExpansionGameButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeChange)
 	ExpansionGameButton.SetText (24871)
+	ExpansionGameButton.SetAction(GameTypeChange, IE_ACT_VALUE_CHANGE)
 
-	FullGameButton.SetVarAssoc ("ExpansionGame", 0)
 	ExpansionGameButton.SetVarAssoc ("ExpansionGame", 1)
-
-	GameTypeButtonPress()
+	FullGameButton.SetVarAssoc ("ExpansionGame", 0)
 
 	GameTypeWindow.ShowModal (1)
 	return
 
-def GameTypeButtonPress():
-	global GameTypeWindow, ExpansionGame
-
-	ExpansionGame=GemRB.GetVar("ExpansionGame")
+def GameTypeChange(btn, isExpansion):
 	GameTypeTextArea = GameTypeWindow.GetControl(3)
-	if ExpansionGame == 0:
-	      GameTypeTextArea.SetText (24870)
-	elif ExpansionGame == 1:
-	      GameTypeTextArea.SetText (24872)
+	if isExpansion:
+		GameTypeTextArea.SetText (24872)
+	else:
+		GameTypeTextArea.SetText (24870)
 	return
 
-def GameTypeDonePress():
+def GameTypeDonePress(win):
 	#todo: importing team members from final save (string 26317)?
-	global StartWindow, GameTypeWindow, GameType2Window
 
-	if GameTypeWindow:
-		GameTypeWindow.Unload()
-		GameTypeWindow = None
-
+	ExpansionGame = GemRB.GetVar("ExpansionGame")
 	if ExpansionGame == 0: #start in Easthaven
+		win.Close()
 		GameTypeReallyDonePress()
 	elif ExpansionGame == 1: #show a warning message first
 		GameType2Window = GemRB.LoadWindow (25)
@@ -235,90 +209,57 @@ def GameTypeDonePress():
 		TextArea = GameType2Window.GetControl(0)
 		TextArea.SetText(26318)
 
+		def confirm():
+			win.Close()
+			GameType2Window.Close()
+			GameTypeReallyDonePress()
+
 		YesButton = GameType2Window.GetControl (1)
 		YesButton.SetText (13912)
-		YesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, GameTypeReallyDonePress)
+		YesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, confirm)
 
 		NoButton = GameType2Window.GetControl (2)
 		NoButton.SetText (13913)
-		NoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-		NoButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		NoButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GameType2Window.Close())
+		NoButton.MakeEscape()
+
+		def cancel():
+			win.Close();
+			GameType2Window.Close()
 
 		CancelButton = GameType2Window.GetControl (3)
 		CancelButton.SetText (13727)
-		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGameTypePress)
-		CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+		CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, cancel)
+		CancelButton.MakeEscape()
 
 		GameType2Window.ShowModal(1)
 
 def GameTypeReallyDonePress():
-	global StartWindow, GameTypeWindow, GameType2Window
-
-	if GameType2Window:
-		GameType2Window.Unload()
-		GameType2Window = None
-	if StartWindow:
-		StartWindow.Unload ()
-		StartWindow = None
-
+	StartWindow.Close()
 	GemRB.LoadGame(None)
 	GemRB.SetNextScript ("PartyFormation")
 
-def QuitGameTypePress ():
-	global StartWindow, GameTypeWindow, GameType2Window
-	if GameType2Window:
-		GameType2Window.Unload ()
-		GameType2Window = None
-	if GameTypeWindow:
-		GameTypeWindow.Unload ()
-		GameTypeWindow = None
-	GemRB.SetVar("ExpansionGame", 0)
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
 def LoadPress ():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload ()
-		StartWindow = None
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
 def MoviesPress ():
-	global StartWindow
-	if StartWindow:
-		StartWindow.Unload ()
-		StartWindow = None
 	GemRB.SetNextScript ("GUIMOVIE")
 	return
 	
 def QuitPress ():
-	global StartWindow, QuitWindow
-	StartWindow.SetVisible (WINDOW_INVISIBLE)
-	QuitWindow = GemRB.LoadWindow (22)
+	QuitWindow = GemRB.LoadWindow (22, "GUICONN")
 	CancelButton = QuitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitCancelPress)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.MakeEscape()
 
 	QuitButton = QuitWindow.GetControl (1)
 	QuitButton.SetText (15417)
-	QuitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitQuitPress)
-	QuitButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	QuitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	QuitButton.MakeDefault()
 
 	TextArea = QuitWindow.GetControl (0)
 	TextArea.SetText (19532)
 	QuitWindow.ShowModal (1)
-	return
-	
-def QuitCancelPress ():
-	global StartWindow, QuitWindow
-	if QuitWindow:
-		QuitWindow.Unload ()
-		QuitWindow = None
-	StartWindow.SetVisible (WINDOW_VISIBLE)
-	return
-	
-def QuitQuitPress ():
-	GemRB.Quit ()
 	return

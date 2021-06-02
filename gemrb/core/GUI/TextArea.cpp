@@ -20,214 +20,376 @@
 
 #include "TextArea.h"
 
-#include "GameData.h"
 #include "Interface.h"
 #include "Variables.h"
 #include "GUI/EventMgr.h"
+#include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
 
-#define EDGE_PADDING 3
-
 namespace GemRB {
+	
+TextArea::SpanSelector::SpanSelector(TextArea& ta, const std::vector<const String*>& opts, bool numbered, Margin m)
+: ContentContainer(Region(0, 0, ta.Frame().w, 0)), ta(ta)
+{
+	SetFlags(RESIZE_WIDTH, OP_NAND);
+
+	selectedSpan = NULL;
+	hoverSpan = NULL;
+
+	size = opts.size();
+
+	SetMargin(m);
+
+	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
+	String format = L". - ";
+	int numWidth = int(ta.ftext->StringSizeWidth(std::to_wstring(opts.size()) + format, 0)) + 3; // good guess at max width
+	Size numFrame(numWidth, ta.ftext->LineHeight); // size for the numerical prefix so they stay aligned
+	Point origin(margin.left, margin.top);
+	Region r(origin, Dimensions());
+	r.w = std::max(r.w - margin.left - margin.right, 0);
+	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+	
+	Font::PrintColors colors {ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]};
+	Font::PrintColors selectedCol {ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]};
+
+	for (size_t i = 0; i < opts.size(); i++) {
+		TextContainer* selOption = new OptSpan(r, ta.ftext, colors.fg, colors.bg);
+		selOption->SetAutoResizeFlags(ResizeHorizontal, OP_SET);
+
+		if (numbered) {
+			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
+			// but that should probably actually be done by the dialog handler, not here.
+			auto ts = new TextSpan(std::to_wstring(i + 1) + format, nullptr, selectedCol, &numFrame);
+			ts->Alignment = IE_FONT_ALIGN_RIGHT;
+			selOption->AppendContent(ts);
+		}
+		selOption->AppendContent(new TextSpan(*opts[i], nullptr, &flexFrame));
+		AddSubviewInFrontOfView(selOption);
+
+		if (EventMgr::TouchInputEnabled) {
+			// keeping the options spaced out (for touch screens)
+			r.y += ta.LineHeight();
+		}
+		r.y += selOption->Dimensions().h;
+	}
+	
+	SetFrameSize(Size(r.w, r.y)); // r.y is not a typo, its the location where the next option would have been
+
+	if (numbered) {
+		// in a sane world we would simply focus the window and this View
+		// unfortunately, focusing the window makes it overlap with the portwin/optwin...
+		EventMgr::EventCallback cb = METHOD_CALLBACK( &SpanSelector::KeyEvent, this);
+		id = EventMgr::RegisterEventMonitor(cb, Event::KeyDownMask);
+	} else {
+		id = -1;
+	}
+
+	assert((Flags()&RESIZE_WIDTH) == 0);
+}
+	
+TextArea::SpanSelector::~SpanSelector()
+{
+	EventMgr::UnRegisterEventMonitor(id);
+}
+
+void TextArea::SpanSelector::SizeChanged(const Size&)
+{
+	// NOTE: this wouldnt be needed if we used TextSpans (layout) for the options, but then we would have to
+	// write more complex code for the hover effects and selection
+	Point origin(margin.left, margin.top);
+	Region r(origin, Size(frame.w, 0));
+	r.w = std::max(r.w - margin.left - margin.right, 0);
+	r.h = std::max(r.h - margin.top - margin.bottom, 0);
+
+	for (auto it = subViews.rbegin(); it != subViews.rend(); ++it) {
+		View* selOption = *it;
+
+		selOption->SetFrame(r);
+
+		if (EventMgr::TouchInputEnabled) {
+			// keeping the options spaced out (for touch screens)
+			r.y += ta.LineHeight();
+		}
+		r.y += selOption->Dimensions().h;
+	}
+	
+	frame.h = std::max(frame.h, r.y + margin.bottom);
+}
+
+bool TextArea::SpanSelector::KeyEvent(const Event& event)
+{
+	return OnKeyPress(event.keyboard, 0);
+}
+
+bool TextArea::SpanSelector::OnKeyPress(const KeyboardEvent& key, unsigned short /*mod*/)
+{
+	KeyboardKey chr = key.character;
+	if (chr < '1' || chr > '9')
+		return false;
+
+	unsigned int idx = chr - '1';
+	MakeSelection(idx);
+	return true;
+}
+
+void TextArea::SpanSelector::ClearHover()
+{
+	if (hoverSpan) {
+		if (hoverSpan == selectedSpan) {
+			hoverSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
+		} else {
+			// reset the old hover span
+			hoverSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
+		}
+		hoverSpan = NULL;
+	}
+}
+
+void TextArea::SpanSelector::MakeSelection(size_t idx)
+{
+	TextContainer* optspan = TextAtIndex(idx);
+
+	if (optspan == selectedSpan) {
+		return; // already selected
+	}
+
+	if (selectedSpan && selectedSpan != optspan) {
+		// reset the previous selection
+		selectedSpan->SetColors(ta.colors[COLOR_OPTIONS], ta.colors[COLOR_BACKGROUND]);
+	}
+	selectedSpan = optspan;
+	
+	if (selectedSpan) {
+		selectedSpan->SetColors(ta.colors[COLOR_SELECTED], ta.colors[COLOR_BACKGROUND]);
+	}
+
+	// beware, this will recursively call this function.
+	ta.UpdateState(static_cast<unsigned int>(idx));
+}
+	
+TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
+{
+	// container only has text, so...
+	return static_cast<TextContainer*>(SubviewAt(p, true, false));
+}
+	
+TextContainer* TextArea::SpanSelector::TextAtIndex(size_t idx)
+{
+	if (subViews.empty() || idx > subViews.size() - 1) {
+		return NULL;
+	}
+
+	std::list<View*>::reverse_iterator it = subViews.rbegin();
+	std::advance(it, idx);
+	return static_cast<TextContainer*>(*it);
+}
+
+bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+	TextContainer* span = TextAtPoint(p);
+	
+	if (hoverSpan || span)
+		MarkDirty();
+	
+	ClearHover();
+	if (span) {
+		hoverSpan = span;
+		hoverSpan->SetColors(ta.colors[COLOR_HOVER], ta.colors[COLOR_BACKGROUND]);
+	}
+	return true;
+}
+	
+bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
+{
+	Point p = ConvertPointFromScreen(me.Pos());
+	TextContainer* span = TextAtPoint(p);
+	
+	if (span) {
+		std::list<View*>::reverse_iterator it = subViews.rbegin();
+		unsigned int idx = 0;
+		while (*it++ != span) { ++idx; };
+		
+		MakeSelection(idx);
+	}
+	return true;
+}
+	
+void TextArea::SpanSelector::OnMouseLeave(const MouseEvent& me, const DragOp* op)
+{
+	ClearHover();
+	ContentContainer::OnMouseLeave(me, op);
+}
 
 TextArea::TextArea(const Region& frame, Font* text)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), parser(text), palettes()
-{
-	palette = text->GetPalette();
-	finit = ftext;
-	Init();
-}
+: TextArea(frame, text, text)
+{}
 
-TextArea::TextArea(const Region& frame, Font* text, Font* caps,
-				   Color textcolor, Color initcolor, Color lowtextcolor)
-	: Control(frame), contentWrapper(Size(frame.w, 0)), ftext(text), palettes()
+TextArea::TextArea(const Region& frame, Font* text, Font* caps)
+: Control(frame), scrollview(Region(Point(), Dimensions())), ftext(text), colors()
 {
-	palettes[PALETTE_NORMAL] = new Palette( textcolor, lowtextcolor );
-	palette = palettes[PALETTE_NORMAL];
+	colors[COLOR_HOVER] = SelectOptionHover;
+	colors[COLOR_SELECTED] = SelectOptionSelected;
 
 	// quick font optimization (prevents creating unnecessary cap spans)
-	finit = (caps != ftext) ? caps : ftext;
+	finit = (caps && caps != ftext) ? caps : ftext;
+	assert(ftext && finit);
 
-	// in case a bad or missing font was specified, use an obvious fallback
-	if (!finit) {
-		Log(ERROR, "TextArea", "Tried to use missing font, resorting to a fallback!");
-		finit = core->GetTextFont();
-		ftext = finit;
-	}
-
-	if (finit->Baseline < ftext->LineHeight) {
-		// FIXME: initcolor is only used for *some* initial fonts
-		// this is a hack to workaround the INITIALS font getting its palette set
-		// do we have another (more sane) way to tell if a font needs this palette? (something in the BAM?)
-		SetPalette(&initcolor, PALETTE_INITIALS);
-	} else {
-		palettes[PALETTE_INITIALS] = finit->GetPalette();
-	}
-
-	parser.ResetAttributes(text, palette, finit, palettes[PALETTE_INITIALS]);
-	Init();
-}
-
-void TextArea::Init()
-{
 	ControlType = IE_GUI_TEXTAREA;
-	rows = 0;
-	TextYPos = 0;
 	strncpy(VarName, "Selected", sizeof(VarName));
-
-	ResetEventHandler( TextAreaOnChange );
-	ResetEventHandler( TextAreaOnSelect );
 
 	selectOptions = NULL;
 	textContainer = NULL;
+	historyTimer = NULL;
+	
+	AddSubviewInFrontOfView(&scrollview);
 
 	// initialize the Text containers
-	SetScrollBar(NULL);
 	ClearSelectOptions();
 	ClearText();
 	SetAnimPicture(NULL);
+
+	scrollview.SetScrollIncrement(LineHeight());
+	scrollview.SetAutoResizeFlags(ResizeAll, OP_SET);
+	scrollview.SetFlags(View::IgnoreEvents, (Flags()&View::IgnoreEvents) ? OP_OR : OP_NAND);
 }
 
-TextArea::~TextArea(void)
+TextArea::~TextArea()
 {
-	for (int i=0; i < PALETTE_TYPE_COUNT; i++) {
-		gamedata->FreePalette( palettes[i] );
-	}
+	ClearHistoryTimer();
 }
 
-bool TextArea::NeedsDraw() const
+void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
-	if (animationEnd) {
-		return true;
-	}
-
-	return Control::NeedsDraw();
-}
-
-void TextArea::DrawInternal(Region& clip)
-{
-	if (animationEnd) {
-		if (TextYPos > textContainer->ContentFrame().h) {
-			// the text is offscreen, this happens with chapter text
-			ScrollToY(TextYPos); // reset animation values
-		} else {
-			// update animation for this next draw cycle
-			unsigned long curTime = GetTicks();
-			if (animationEnd.time > curTime) {
-				//double animProgress = curTime / animationEnd;
-				int deltaY = animationEnd.y - animationBegin.y;
-				unsigned long deltaT = animationEnd.time - animationBegin.time;
-				int y = deltaY * ((double)(curTime - animationBegin.time) / deltaT);
-				TextYPos = animationBegin.y + y;
-			} else {
-				UpdateScrollbar();
-				int tmp = animationEnd.y; // FIXME: sidestepping a rounding issue (probably in Scrollbar)
-				ScrollToY(animationEnd.y);
-				TextYPos = tmp;
-			}
-		}
-	}
-
 	if (AnimPicture) {
 		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, clip.x, clip.y + EDGE_PADDING, true);
-		clip.x += AnimPicture->Width + EDGE_PADDING;
-	}
-
-	clip.x += EDGE_PADDING;
-	clip.y -= TextYPos;
-	contentWrapper.Draw(clip.Origin());
-
-	if (selectOptions) {
-		// This hack is to refresh the mouse cursor so that option below cursor gets
-		// highlighted during a dialog
-		core->GetEventMgr()->FakeMouseMove();
+		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.Origin());
 	}
 }
 
-void TextArea::SetAnimPicture(Sprite2D* pic)
+void TextArea::SetAnimPicture(Holder<Sprite2D> pic)
 {
-	// FIXME: this behavior really needs to also happen when the TA dimensions change
-	// we currntly do that by setting *public* ivars in Control, instead of having a SetSize type method
-
-	// FIXME: we always have to accept NULL because sometimes the control size gets changed after this is called
-	// dialog is the only thing that uses an actual picture, so we can safely bail out in that case
-	if (pic == AnimPicture && pic != NULL) return;
-
-	Size frame(Width, 0);
-	// apply padding to the clip
-	frame.w -= (sb) ? EDGE_PADDING : EDGE_PADDING * 2;
-
-	if (pic) {
-		int offset = pic->Width + EDGE_PADDING;
-		// FIXME: in the original dialog is always indented (even without portrait), I doubt we care, but mentioning it here.
-		frame.w -= offset;
+	if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+		// FIXME: there isnt a specific reason why animatied dialog couldnt also use pics
+		// However, PST does not and the animation makes the picture spaz currently
+		return;
 	}
-	if (frame.w < 0) {
-		frame.w = 0;
-	}
-	// FIXME: content containers should support the "flexible" idiom so we can resize children by resizing parent
-	textContainer->SetFrame(Region(Point(), frame));
-	contentWrapper.SetFrame(Region(Point(), frame));
 
 	Control::SetAnimPicture(pic);
+
+	assert(textContainer);
+	UpdateTextFrame();
 }
 
-void TextArea::UpdateRowCount(int h)
+ContentContainer::Margin TextArea::GetMargins() const
 {
-	int rowHeight = GetRowHeight();
-	rows = (h + rowHeight - 1) / rowHeight; // round up
+	return textMargins;
 }
 
-void TextArea::UpdateScrollbar()
+void TextArea::SetMargins(ContentContainer::Margin m)
 {
-	if (sb == NULL) return;
+	textMargins = m;
+	if (textContainer)
+		textContainer->SetMargin(textMargins);
+}
 
-	int textHeight = contentWrapper.ContentFrame().h;
-	Region nodeBounds;
-	if (dialogBeginNode) {
-		// possibly add some phony height to allow dialogBeginNode to the top when the scrollbar is at the bottom
-		// add the height of a newline too so that there is a space
-		nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
-		Size selectFrame = selectOptions->ContentFrame();
-		// page = blank line + dialog node + blank line + select options, but the second blank line is part of selectFrame
-		int pageH = ftext->LineHeight + nodeBounds.h + selectFrame.h;
-		if (pageH < Height) {
-			// if the node isnt a full page by itself we need to fake it
-			textHeight += Height - pageH;
+ieDword TextArea::LineCount() const
+{
+	int rowHeight = LineHeight();
+	if (rowHeight > 0)
+		return (ContentHeight() + rowHeight - 1) / rowHeight; // round up
+	else
+		return 0;
+}
+
+Region TextArea::UpdateTextFrame()
+{
+	const Region& cr = scrollview.ContentRegion();
+	if (textContainer) {
+		Region r = textContainer->Frame();
+		r.w = cr.w + cr.x;
+		r.h = 0; // auto grow
+
+		if (AnimPicture) {
+			// shrink and shift the container to accommodate the image
+			r.x = AnimPicture->Frame.w + 5;
+			r.w -= r.x;
+		} else {
+			r.x = 0;
 		}
+
+		textContainer->SetFrame(r);
+		scrollview.Update();
+		return textContainer->Frame();
+	}
+	return Region(Point(0,0), Size(cr.w + cr.x, 0));
+}
+
+void TextArea::UpdateScrollview()
+{
+	if (Flags()&AutoScroll
+		&& dialogBeginNode) {
+		assert(textContainer && selectOptions);
+		
+		Region textFrame = UpdateTextFrame();
+		textFrame.y = textFrame.h;
+		textFrame.h = selectOptions->Frame().h;
+		selectOptions->SetFrame(textFrame);
+
+		Region nodeBounds = textContainer->BoundingBoxForContent(dialogBeginNode);
+		int optH = OptionsHeight();
+		ieDword anim = 0;
+		int y = 0;
+
+		if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+			anim = 500;
+			y = -9999999; // FIXME: properly calculate the "bottom"?
+		} else {
+			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
+			if (blankH > 0) {
+				optH += blankH;
+				int width = selectOptions->Frame().w;
+				selectOptions->SetFrameSize(Size(width, optH));
+			}
+
+			// now scroll dialogBeginNode to the top less a blank line
+			y = nodeBounds.y - LineHeight();
+		}
+
+		// FIXME: must update before the scroll, but this should be automaticly done as a reaction to changing sizes/origins of subviews
+		scrollview.Update();
+		scrollview.ScrollTo(Point(0, -y), anim);
+	} else if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
+		scrollview.Update();
 	}
 	
-	UpdateRowCount(textHeight);
-	ScrollBar* bar = ( ScrollBar* ) sb;
-	ieWord visibleRows = Height;
-	ieWord sbMax = (textHeight > visibleRows) ? (textHeight - visibleRows) : 0;
-	bar->SetMax(sbMax);
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL
-		&& dialogBeginNode) {
-		// now scroll dialogBeginNode to the top less a blank line
-		ScrollToY(nodeBounds.y - ftext->LineHeight);
+	Region textFrame = UpdateTextFrame();
+	if (selectOptions) {
+		textFrame.y = textFrame.h;
+		textFrame.h = selectOptions->Frame().h;
+		selectOptions->SetFrame(textFrame);
 	}
 }
 
-/** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
-	to this Text Area Control. */
-int TextArea::SetScrollBar(Control* ptr)
+void TextArea::FlagsChanged(unsigned int oldflags)
 {
-	Control::SetScrollBar(ptr);
-	if (ptr) ((ScrollBar *)ptr)->SetScrollAmount(GetRowHeight());
-	// we need to update the ScrollBar position based around TextYPos
-	UpdateScrollbar();
-	if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL) {
-		int bottom = contentWrapper.ContentFrame().h - Height;
-		if (bottom > 0)
-			ScrollToY(bottom); // no animation for this one
-	} else {
-		// seems silly to call ScrollToY() with the current position,
-		// but it is to update the scrollbar so not a mistake
-		ScrollToY(TextYPos);
+	if (Flags()&View::IgnoreEvents) {
+		scrollview.SetFlags(View::IgnoreEvents, OP_OR);
+	} else if (oldflags&View::IgnoreEvents) {
+		scrollview.SetFlags(View::IgnoreEvents, OP_NAND);
 	}
-	return (bool)sb;
+
+	if (Flags()&Editable) {
+		assert(textContainer);
+		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		textContainer->SetEventProxy(NULL);
+		SetEventProxy(textContainer);
+	} else if (oldflags&Editable) {
+		assert(textContainer);
+		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetEventProxy(&scrollview);
+		SetEventProxy(&scrollview);
+	}
 }
 
 /** Sets the Actual Text */
@@ -237,30 +399,64 @@ void TextArea::SetText(const String& text)
 	AppendText(text);
 }
 
-void TextArea::SetPalette(const Color* color, PALETTE_TYPE idx)
+void TextArea::SetColor(const Color& color, COLOR_TYPE idx)
 {
-	assert(idx < PALETTE_TYPE_COUNT);
+	assert(idx < COLOR_TYPE_COUNT);
+	colors[idx] = color;
+	parser.ResetAttributes(ftext, {colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]}, finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]});
+}
+
+void TextArea::SetColor(const Color* color, COLOR_TYPE idx)
+{
 	if (color) {
-		gamedata->FreePalette(palettes[idx]);
-		palettes[idx] = new Palette( *color, ColorBlack );
-	} else if (idx > PALETTE_NORMAL) {
-		// default to normal
-		gamedata->FreePalette(palettes[idx]);
-		palettes[idx] = palettes[PALETTE_NORMAL];
-		palettes[idx]->acquire();
+		SetColor(*color, idx);
+	} else {
+		SetColor(colors[COLOR_NORMAL], idx);
 	}
+}
+
+void TextArea::ClearHistoryTimer()
+{
+	if (historyTimer) {
+		historyTimer->Invalidate();
+		historyTimer = nullptr;
+	}
+}
+
+void TextArea::TrimHistory(size_t lines)
+{
+	if (dialogBeginNode) {
+		// we don't trim history in dialog
+		// this allows us to always reference the entire dialog no matter how long it is
+		// we would also have to reapply the selection options origin since it will often be changed by trimming
+		// e.g. selectOptions->SetFrameOrigin(Point(textFrame.x, textFrame.h));
+		return;
+	}
+
+	int height = int(LineHeight() * lines);
+	Region exclusion(Point(), Size(frame.w, height));
+	scrollview.ScrollDelta(Point(0, exclusion.h));
+	textContainer->DeleteContentsInRect(exclusion);
+	scrollview.Update();
+
+	ClearHistoryTimer();
 }
 
 void TextArea::AppendText(const String& text)
 {
-	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+	if ((flags&ClearHistory)) {
+		ClearHistoryTimer();
+
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
-		// start trimming content from the top until we are under the limit.
-		Size frame = textContainer->ContentFrame();
-		int currHeight = frame.h;
+		int currHeight = ContentHeight();
 		if (currHeight > heightLimit) {
-			Region exclusion(Point(), Size(frame.w, currHeight - heightLimit));
-			textContainer->DeleteContentsInRect(exclusion);
+			size_t lines = (currHeight - heightLimit) / LineHeight();
+
+			EventHandler h = [this, lines]() {
+				TrimHistory(lines);
+			};
+			assert(historyTimer == NULL);
+			historyTimer = &core->SetTimer(h, 500);
 		}
 	}
 
@@ -283,9 +479,9 @@ void TextArea::AppendText(const String& text)
 					// pad this only if it is "real" (it is higher than the other text).
 					// some text areas have a "cap" font assigned in the CHU that differs from ftext, but isnt meant to be a cap
 					// see BG2 chargen
-					s.w += EDGE_PADDING;
+					s.w += 3;
 				}
-				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, palettes[PALETTE_INITIALS], &s);
+				TextSpan* dc = new TextSpan(text.substr(textpos, 1), finit, {colors[COLOR_INITIALS], colors[COLOR_BACKGROUND]}, &s);
 				textContainer->AppendContent(dc);
 				textpos++;
 				// FIXME: assuming we have more text!
@@ -301,17 +497,14 @@ void TextArea::AppendText(const String& text)
 		}
 	}
 
-	if (sb) {
-		UpdateScrollbar();
-		if (Flags&IE_GUI_TEXTAREA_AUTOSCROLL && !selectOptions)
-		{
-			// scroll to the bottom
-			int bottom = contentWrapper.ContentFrame().h - Height;
-			if (bottom > 0)
-				ScrollToY(bottom, NULL, 500); // animated scroll
-		}
-	} else {
-		UpdateRowCount(contentWrapper.ContentFrame().h);
+	UpdateScrollview();
+
+	if (flags&AutoScroll && !selectOptions)
+	{
+		// scroll to the bottom
+		int bottom = ContentHeight() - frame.h;
+		if (bottom > 0)
+			ScrollToY(-bottom, 500);
 	}
 	MarkDirty();
 }
@@ -323,236 +516,30 @@ int TextArea::InsertText(const char* text, int pos)
 	return pos;
 }
 */
-/** Key Press Event */
-bool TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
-{
-	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
-		if (Key >= 0x20) {
-			MarkDirty();
 
-			// TODO: implement this! currently does nothing
-
-			RunEventHandler( TextAreaOnChange );
-		}
-		return true;
-	}
-
-	if (( Key < '1' ) || ( Key > '9' ))
-		return false;
-
-	MarkDirty();
-
-	unsigned int lookupIdx = Key - '1';
-	if (lookupIdx < OptSpans.size()) {
-		UpdateState(lookupIdx);
-	}
-	return true;
-}
-
-/** Special Key Press */
-bool TextArea::OnSpecialKeyPress(unsigned char Key)
-{
-	size_t len = 0;
-	size_t CurPos = 0;
-
-	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
-		return false;
-	}
-	MarkDirty();
-	// TODO: implement text editing. (going to be tricky...)
-	switch (Key) {
-		case GEM_HOME:
-			CurPos = 0;
-			break;
-		case GEM_UP:
-			break;
-		case GEM_DOWN:
-			break;
-		case GEM_END:
-			break;
-		case GEM_LEFT:
-			if (CurPos > 0) {
-				CurPos--;
-			} else {
-
-			}
-			break;
-		case GEM_RIGHT:
-			if (CurPos < len) {
-				CurPos++;
-			} else {
-
-			}
-			break;
-		case GEM_DELETE:
-			if (CurPos>=len) {
-				break;
-			}
-			break;
-		case GEM_BACKSP:
-			if (CurPos != 0) {
-				if (len<1) {
-					break;
-				}
-				CurPos--;
-			} else {
-
-			}
-			break;
-		 case GEM_RETURN:
-			//add an empty line after CurLine
-			// TODO: implement this
-			//copy the text after the cursor into the new line
-
-			//truncate the current line
-
-			//move cursor to next line beginning
-			CurPos=0;
-			break;
-	}
-	RunEventHandler( TextAreaOnChange );
-	return true;
-}
-
-int TextArea::GetRowHeight() const
+ieWord TextArea::LineHeight() const
 {
 	return ftext->LineHeight;
 }
 
-/** Will scroll y pixels. sender is the control requesting the scroll (ie the scrollbar) */
-void TextArea::ScrollToY(int y, Control* sender, ieDword duration)
+void TextArea::ScrollDelta(const Point& p)
 {
-	// set up animation if required
-	if  (duration) {
-		// HACK: notice the values arent clamped here.
-		// this is sort of a hack we allow for chapter text so it can begin and end out of sight
-		unsigned long startTime = GetTicks();
-		animationBegin = AnimationPoint(TextYPos, startTime);
-		animationEnd = AnimationPoint(y, startTime + duration);
-		return;
-	} else if (animationEnd) {
-		// cancel the existing animation (if any)
-		animationBegin = AnimationPoint();
-		animationEnd = AnimationPoint();
-	}
-
-	if (sb && sender != sb) {
-		((ScrollBar*)sb)->SetPos(y);
-		// sb->SetPos will recall this method so we dont need to do more... yet.
-	} else if (sb) {
-		// our scrollbar has set position for us
-		TextYPos = y;
-		MarkDirty();
-	} else {
-		// no scrollbar. need to call SetRow myself.
-		// SetRow will set TextYPos.
-		SetRow( y / ftext->LineHeight );
-	}
+	scrollview.ScrollTo(p);
 }
 
-/** Set Starting Row */
-void TextArea::SetRow(int row)
+void TextArea::ScrollTo(const Point& p)
 {
-	if (row <= rows) {
-		TextYPos = row * GetRowHeight();
-		MarkDirty();
-	}
+	scrollview.ScrollTo(p);
 }
 
-/** Mousewheel scroll */
-/** This method is key to touchscreen scrolling */
-void TextArea::OnMouseWheelScroll(short /*x*/, short y)
+/** Will scroll y pixels over duration */
+void TextArea::ScrollToY(int y, ieDword duration)
 {
-	// we allow scrolling to cancel the animation only if there is a scrollbar
-	// otherwise it is "Chapter Text" behavior
-	if (!animationEnd || sb){
-		unsigned long fauxY = TextYPos;
-		if ((long)fauxY + y <= 0) fauxY = 0;
-		else fauxY += y;
-		ScrollToY((int)fauxY);
-		core->GetEventMgr()->FakeMouseMove();
-	}
-}
-
-/** Mouse Over Event */
-void TextArea::OnMouseOver(unsigned short x, unsigned short y)
-{
-	if (!selectOptions)
-		return;
-
-	TextContainer* span = NULL;
-	if (selectOptions) {
-		Point p = Point(x, y);
-		p.x -= (AnimPicture) ? AnimPicture->Width + EDGE_PADDING : 0;
-		p.y -= textContainer->ContentFrame().h - TextYPos;
-		// container only has text, so...
-		span = dynamic_cast<TextContainer*>(selectOptions->ContentAtPoint(p));
-	}
-
-	if (hoverSpan || span)
-		MarkDirty();
-
-	ClearHover();
-	if (span) {
-		hoverSpan = span;
-		hoverSpan->SetPalette(palettes[PALETTE_HOVER]);
-	}
-}
-
-void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
-						   unsigned short /*Mod*/)
-{
-
-	ScrollBar* scrlbr = (ScrollBar*) sb;
-
-	if (!scrlbr) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
-			scrlbr = (ScrollBar *) ctrl;
-		}
-	}
-	if (scrlbr) {
-		switch(Button) {
-			case GEM_MB_SCRLUP:
-				scrlbr->ScrollUp();
-				break;
-			case GEM_MB_SCRLDOWN:
-				scrlbr->ScrollDown();
-				break;
-		}
-	}
-}
-
-/** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-						 unsigned short Button, unsigned short /*Mod*/)
-{
-	if (!(Button & (GEM_MB_ACTION|GEM_MB_MENU)) || !hoverSpan)
-		return;
-
-	if (hoverSpan) { // select the item under the mouse
-		int optIdx = 0;
-		std::vector<OptionSpan>::const_iterator it;
-		for (it = OptSpans.begin(); it != OptSpans.end(); ++it) {
-			if( (*it).second == hoverSpan ) {
-				break;
-			}
-			optIdx++;
-		}
-		UpdateState(optIdx);
-	}
-}
-
-void TextArea::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
-{
-	ClearHover();
+	scrollview.ScrollTo(Point(0, y), duration);
 }
 
 void TextArea::UpdateState(unsigned int optIdx)
 {
-	if (!VarName[0] || optIdx >= OptSpans.size()) {
-		return;
-	}
 	if (!selectOptions) {
 		// no selectable options present
 		// set state to safe and return
@@ -560,159 +547,187 @@ void TextArea::UpdateState(unsigned int optIdx)
 		return;
 	}
 
+	if (!VarName[0]) {
+		return;
+	}
+	
+	if (optIdx >= selectOptions->NumOpts()) {
+		SetValue(-1);
+		selectOptions->MakeSelection(-1);
+		return;
+	}
+
+	assert(optIdx < values.size());
 	// always run the TextAreaOnSelect handler even if the value hasnt changed
 	// the *context* of the value can change (dialog) and the handler will want to know 
-	Value = OptSpans[optIdx].first;
+	SetValue( values[optIdx] );
 
 	// this can be called from elsewhere (GUIScript), so we need to make sure we update the selected span
-	TextContainer* optspan = OptSpans[optIdx].second;
-	if (selectedSpan && selectedSpan != optspan) {
-		// reset the previous selection
-		selectedSpan->SetPalette(palettes[PALETTE_OPTIONS]);
-		MarkDirty();
-	}
-	selectedSpan = optspan;
-	selectedSpan->SetPalette(palettes[PALETTE_SELECTED]);
+	selectOptions->MakeSelection(optIdx);
 
-	core->GetDictionary()->SetAt( VarName, Value );
-	RunEventHandler(TextAreaOnSelect);
+	PerformAction(Action::Select);
+}
+
+void TextArea::DidFocus()
+{
+	if (Flags()&Editable) {
+		textContainer->DidFocus();
+	}
+}
+
+void TextArea::DidUnFocus()
+{
+	if (Flags()&Editable) {
+		textContainer->DidUnFocus();
+	}
+}
+
+void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
+{
+	// we dont have a way of retrieving a TextArea's scrollview so
+	// we have no direct way of placing subviews in front of it so we let NULL represent it
+	const View* target = (back) ? back : &scrollview;
+	View::AddSubviewInFrontOfView(front, target);
+}
+	
+int TextArea::TextHeight() const
+{
+	return (textContainer) ? textContainer->Dimensions().h : 0;
+}
+int TextArea::OptionsHeight() const
+{
+	return (selectOptions) ? selectOptions->Dimensions().h : 0;
+}
+
+int TextArea::ContentHeight() const
+{
+	return TextHeight() + OptionsHeight();
 }
 
 String TextArea::QueryText() const
 {
-	if (selectedSpan) {
-		return selectedSpan->Text();
-	} else if (OptSpans.size()) {
-		String options;
-		for (size_t i = 0; i < OptSpans.size(); i++) {
-			options.append(OptSpans[i].second->Text());
-			options.append(L"\n");
+	if (selectOptions) {
+		if (selectOptions->Selection()) {
+			return selectOptions->Selection()->Text();
+		} else {
+			Log(ERROR, "TextArea", "QueryText: No selection found!");
+			return String();
 		}
-		return options;
 	}
-	return textContainer->Text();
-}
-
-bool TextArea::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_TEXTAREA_ON_CHANGE:
-		TextAreaOnChange = handler;
-		break;
-	case IE_GUI_TEXTAREA_ON_SELECT:
-		TextAreaOnSelect = handler;
-		break;
-	default:
-		return false;
+	if (textContainer) {
+		return textContainer->Text();
 	}
-
-	return true;
+	return String();
 }
 
 void TextArea::ClearSelectOptions()
 {
-	OptSpans.clear();
-	contentWrapper.RemoveContent(selectOptions);
-	delete selectOptions;
+	values.clear();
+	delete scrollview.RemoveSubview(selectOptions);
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
-	selectedSpan = NULL;
-	hoverSpan = NULL;
-	// also set the value to "none"
-	Value = -1;
-	UpdateScrollbar();
+
+	if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
+		UpdateScrollview();
+	}
 }
 
-void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered,
-								const Color* color, const Color* hiColor, const Color* selColor)
+void TextArea::SetScrollbar(ScrollBar* sb)
 {
-	SetPalette(color, PALETTE_OPTIONS);
-	SetPalette(hiColor, PALETTE_HOVER);
-	SetPalette(selColor, PALETTE_SELECTED);
+	const Region& sbr = sb->Frame();
+	const Region& tar = Frame();
+	
+	ContentContainer::Margin margins = GetMargins();
+	
+	Region combined = Region::RegionEnclosingRegions(sbr, tar);
+	margins.top += tar.y - combined.y;
+	margins.left += tar.x - combined.x;
+	margins.right += (combined.x + combined.w) - (tar.x + tar.w);
+	margins.bottom += (combined.y + combined.h) - (tar.y + tar.h);
 
+	constexpr uint8_t MINIMUM_H_MARGIN = 3;
+	margins.right = std::max(margins.right, MINIMUM_H_MARGIN);
+	margins.left = std::max(margins.left, MINIMUM_H_MARGIN);
+
+	SetFrame(combined);
+	SetMargins(margins);
+	
+	Point origin = ConvertPointFromWindow(sb->Frame().Origin());
+	sb->SetFrameOrigin(origin);
+
+	scrollview.SetVScroll(sb);
+}
+
+void TextArea::SetSelectOptions(const std::vector<SelectOption>& opts, bool numbered)
+{
 	ClearSelectOptions(); // deletes previous options
-
-	Size optFrame(Width - (EDGE_PADDING * 2), 0);
-	optFrame.w -= (AnimPicture) ? AnimPicture->Width : 0;
-	Size flexFrame(-1, 0); // flex frame for hanging indent after optnum
-	selectOptions = new TextContainer(optFrame, ftext, palettes[PALETTE_SELECTED]);
 
 	ContentContainer::ContentList::const_reverse_iterator it = textContainer->Contents().rbegin();
 	if (it != textContainer->Contents().rend()) {
 		dialogBeginNode = *it; // need to get the last node *before* we append anything
-		selectOptions->AppendText(L"\n"); // always want a gap between text and select options for dialog
 	}
+
+	values.resize(opts.size());
+	std::vector<const String*> strings(opts.size());
 	for (size_t i = 0; i < opts.size(); i++) {
-		TextContainer* selOption = new TextContainer(optFrame, ftext, palettes[PALETTE_OPTIONS]);
-		if (numbered) {
-			wchar_t optNum[6];
-			swprintf(optNum, sizeof(optNum)/sizeof(optNum[0]), L"%d. - ", static_cast<int>(i+1));
-			// TODO: as per the original PALETTE_SELECTED should be updated to the PC color (same color their name is rendered in)
-			// but that should probably actually be done by the dialog handler, not here.
-			selOption->AppendContent(new TextSpan(optNum, NULL, palettes[PALETTE_SELECTED]));
-		}
-		selOption->AppendContent(new TextSpan(opts[i].second, NULL, NULL, &flexFrame));
-
-		OptSpans.push_back(std::make_pair(opts[i].first, selOption));
-
-		selectOptions->AppendContent(selOption); // container owns the option
-		if (core->GetVideoDriver()->TouchInputEnabled()) {
-			// now add a newline for keeping the options spaced out (for touch screens)
-			selectOptions->AppendText(L"\n");
-		}
+		values[i] = opts[i].first;
+		strings[i] = &(opts[i].second);
 	}
-	assert(textContainer);
 
-	contentWrapper.InsertContentAfter(selectOptions, textContainer);
-	UpdateScrollbar();
-	MarkDirty();
+	ContentContainer::Margin m;
+	size_t selectIdx = -1;
+	if (dialogBeginNode) {
+		if (AnimPicture)
+			m = ContentContainer::Margin(10, 20);
+		else
+			m = ContentContainer::Margin(LineHeight(), 40, 10);
+	} else if (LineCount() > 0) {
+		m = ContentContainer::Margin(0, 3);
+		selectIdx = GetValue();
+	} else {
+		m = textMargins;
+	}
+
+	selectOptions = new SpanSelector(*this, strings, numbered, m);
+	scrollview.AddSubviewInFrontOfView(selectOptions);
+	selectOptions->MakeSelection(selectIdx);
+
+	UpdateScrollview();
 }
 
-void TextArea::ClearHover()
+void TextArea::SelectAvailableOption(size_t idx)
 {
-	if (hoverSpan) {
-		if (hoverSpan == selectedSpan) {
-			hoverSpan->SetPalette(palettes[PALETTE_SELECTED]);
-		} else {
-			// reset the old hover span
-			hoverSpan->SetPalette(palettes[PALETTE_OPTIONS]);
-		}
-		hoverSpan = NULL;
+	if (selectOptions) {
+		selectOptions->MakeSelection(idx);
 	}
+}
+
+void TextArea::TextChanged(TextContainer& /*tc*/)
+{
+	PerformAction(Action::Change);
 }
 
 void TextArea::ClearText()
 {
-	ClearHover();
-	contentWrapper.RemoveContent(textContainer);
-	delete textContainer;
-
-	Size frame;
-	if (sb) {
-		// if we have a scrollbar we should grow as much as needed vertically
-		// pad only on left edge
-		frame.w = Width - EDGE_PADDING;
-	} else {
-		// otherwise limit the text to our frame
-		// pad on both edges
-		frame.w = Width - (EDGE_PADDING * 2);
-	}
+	delete scrollview.RemoveSubview(textContainer);
 
 	parser.Reset(); // reset in case any tags were left open from before
-	textContainer = new TextContainer(frame, ftext, palette);
-	contentWrapper.InsertContentAfter(textContainer, NULL); // make sure its at the top
-
-	// reset text position to top
-	ScrollToY(0);
-	UpdateScrollbar();
-}
-
-void TextArea::SetFocus(bool focus)
-{
-	Control::SetFocus(focus);
-	if (hasFocus && Flags & IE_GUI_TEXTAREA_EDITABLE) {
-		core->GetVideoDriver()->ShowSoftKeyboard();
+	textContainer = new TextContainer(Region(Point(), Dimensions()), ftext);
+	textContainer->SetColors(colors[COLOR_NORMAL], colors[COLOR_BACKGROUND]);
+	textContainer->SetMargin(textMargins);
+	textContainer->callback = METHOD_CALLBACK(&TextArea::TextChanged, this);
+	if (Flags()&Editable) {
+		textContainer->SetFlags(View::IgnoreEvents, OP_NAND);
+		SetEventProxy(textContainer);
+	} else {
+		textContainer->SetFlags(View::IgnoreEvents, OP_OR);
+		textContainer->SetEventProxy(&scrollview);
+		SetEventProxy(&scrollview);
 	}
+	scrollview.AddSubviewInFrontOfView(textContainer);
+
+	UpdateScrollview();
+	scrollview.ScrollTo(Point());
 }
 
 }

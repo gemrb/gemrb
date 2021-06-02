@@ -146,6 +146,7 @@ Store* STOImporter::GetStore(Store *s)
 			// all and avoid the need for custom parsing
 			PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
 			item->triggers = dm->GetCondition(TriggerCode);
+
 			core->FreeString(TriggerCode);
 
 			//if there are no triggers, GetRealStockSize is simpler

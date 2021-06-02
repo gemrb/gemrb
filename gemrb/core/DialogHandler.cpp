@@ -43,6 +43,9 @@ static const int *sectionMap;
 static const int bg2Sections[4] = {4,1,2,0};
 static const int noSections[4] = {0,0,0,0};
 
+// FIXME: arbitrary guess value
+#define DIALOG_MOVE_SPEED 75
+
 DialogHandler::DialogHandler(void)
 {
 	dlg = NULL;
@@ -50,7 +53,7 @@ DialogHandler::DialogHandler(void)
 	targetID = 0;
 	originalTargetID = 0;
 	speakerID = 0;
-	initialState = previousX = previousY = -1;
+	initialState = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
 		sectionMap = bg2Sections;
 	} else {
@@ -164,27 +167,9 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return false;
 	}
 
-	Video *video = core->GetVideoDriver();
-	if (previousX == -1) {
-		//save previous viewport so we can restore it at the end
-		Region vp = video->GetViewport();
-		previousX = vp.x;
-		previousY = vp.y;
-	}
-
-	//allow mouse selection from dialog (even though screen is locked)
-	video->SetMouseEnabled(true);
-	//TODO: this should not jump but scroll to the destination
-	gc->MoveViewportTo(tgt->Pos.x, tgt->Pos.y, true);
-
-	//check if we are already in dialog
-	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
-		return true;
-	}
-
-	//no exploring while in dialogue
-	gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_OR);
-	gc->SetDialogueFlags(DF_IN_DIALOG, OP_OR);
+	core->ToggleViewsEnabled(false, "NOT_DLG");
+	prevViewPortLoc = gc->Viewport().Origin();
+	gc->MoveViewportTo(tgt->Pos, true, DIALOG_MOVE_SPEED);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	// NOTE: besides marking pause/not pause, they determine what happens if
@@ -192,17 +177,19 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	//Bit 0: Enemy()
 	//Bit 1: EscapeArea()
 	//Bit 2: nothing (but since the action was hostile, it behaves similar to bit 0)
+	unsigned int flags = 0;
 	if (!(dlg->Flags&7) ) {
-		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, OP_OR);
+		flags |= DF_FREEZE_SCRIPTS;
 	}
+	gc->SetDialogueFlags(DF_IN_DIALOG|flags, OP_OR);
 	return true;
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
-	if (!dlg) {
-		return;
+	if (dlg == NULL) {
+		return; // no dialog, nothing to do.
 	}
 
 	// FIXME: is this useful for anything concrete? Currently never true, since nothing sets DF_UNBREAKABLE (unused since it was introduced)
@@ -235,23 +222,15 @@ void DialogHandler::EndDialog(bool try_to_break)
 	delete dlg;
 	dlg = NULL;
 
+	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
 	core->GetGUIScriptEngine()->RunFunction( "GUIWORLD", "DialogEnded" );
 	//restoring original size
 	core->GetGame()->SetControlStatus(CS_DIALOG, OP_NAND);
 	GameControl* gc = core->GetGameControl();
-	if ( !(gc->GetScreenFlags()&SF_CUTSCENE)) {
-		gc->SetScreenFlags(SF_DISABLEMOUSE|SF_LOCKSCROLL, OP_NAND);
-	}
 	gc->SetDialogueFlags(0, OP_SET);
-	gc->MoveViewportTo(previousX, previousY, false);
-	previousX = previousY = -1;
+	gc->MoveViewportTo(prevViewPortLoc, false, DIALOG_MOVE_SPEED);
 	core->SetEventFlag(EF_PORTRAIT);
-}
-
-bool DialogHandler::DialogChoose(Control* ctl)
-{
-	return DialogChoose(ctl->Value);
 }
 
 bool DialogHandler::DialogChoose(unsigned int choose)
@@ -444,35 +423,16 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		return false;
 	}
 
-	// displaying npc text and portrait
-	const char *portrait = NULL;
 	if (tgta) {
-		portrait = tgta->GetPortrait(1);
+		// displaying npc text and portrait
+		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
+		ta->SetAnimPicture(portrait);
+		ta->AppendText(L"\n");
+		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
-	if (portrait) {
-		// dialog speaker pic
-		ieResRef PortraitResRef;
-		strnlwrcpy(PortraitResRef, portrait, 8);
-		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(PortraitResRef, true);
-		Sprite2D* image = NULL;
-		if (im) {
-			// we set the anim picture for the speaker to always be on the side during dialogue,
-			// but also append the image to the TA so that it remains in the backlog.
-			image = im->GetSprite2D();
-
-			// TODO: I would like to actually append the image as content to the TA
-			// the TA supports this, but unfortunately we destroy the TA at the end of dialog
-			// the TA that replaces it is created via ta->QueryText() on the old one so images are lost!
-			//ta->AppendContent(new ImageSpan(image));
-		}
-		ta->SetAnimPicture(image);
-	}
-	ta->AppendText(L"\n");
-	displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 
 	int idx = 0;
 	std::vector<SelectOption> dialogOptions;
-	ControlEventHandler handler = NULL;
 	//first looking for a 'continue' opportunity, the order is descending (a la IE)
 	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
@@ -505,9 +465,11 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	}
 
 	std::reverse(dialogOptions.begin(), dialogOptions.end());
-	ta->SetSelectOptions(dialogOptions, true, &ColorRed, &ColorWhite, NULL);
-	handler = new MethodCallback<DialogHandler, Control*>(this, &DialogHandler::DialogChoose);
-	ta->SetEvent(IE_GUI_TEXTAREA_ON_SELECT, handler);
+	ta->SetSelectOptions(dialogOptions, true);
+	ControlEventHandler handler = [this](Control* c) {
+		DialogChoose(c->GetValue());
+	};
+	ta->SetAction(handler, TextArea::Action::Select);
 
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {

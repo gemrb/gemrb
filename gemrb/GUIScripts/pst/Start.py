@@ -25,12 +25,7 @@
 import GemRB
 from GUIDefines import *
 
-StartWindow = 0
-QuitWindow = 0
-
 def OnLoad():
-	global StartWindow, QuitWindow
-
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 
 	if not skip_videos:
@@ -40,70 +35,51 @@ def OnLoad():
 
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
-	GemRB.LoadWindowPack("START")
-#quit subwindow
-	QuitWindow = GemRB.LoadWindow(3)
-	QuitTextArea = QuitWindow.GetControl(0)
-	QuitTextArea.SetText(20582)
-	ConfirmButton = QuitWindow.GetControl(1)
-	ConfirmButton.SetText(23787)
-	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitConfirmed)
-	ConfirmButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
-	CancelButton = QuitWindow.GetControl(2)
-	CancelButton.SetText(23789)
-	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelled)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
-
-#main window
-	StartWindow = GemRB.LoadWindow(0)
+	StartWindow = GemRB.LoadWindow(0, "START")
 	NewLifeButton = StartWindow.GetControl(0)
 	ResumeLifeButton = StartWindow.GetControl(2)
 	ExitButton = StartWindow.GetControl(3)
 	NewLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NewLifePress)
 	ResumeLifeButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ResumeLifePress)
-	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, QuitPress)
+	ExitButton.MakeEscape()
 
-	StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
-	Label=StartWindow.GetControl(0x0fff0000)
+	Label = StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GemRB.Version)
-	
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
+	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+
+	StartWindow.Focus()
 
 	GemRB.LoadMusicPL("Main.mus")
 	return
 	
+def QuitPress():
+	QuitWindow = GemRB.LoadWindow(3, "START")
+	QuitTextArea = QuitWindow.GetControl(0)
+	QuitTextArea.SetText(20582)
+	
+	ConfirmButton = QuitWindow.GetControl(1)
+	ConfirmButton.SetText(23787)
+	ConfirmButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.Quit())
+	ConfirmButton.MakeDefault()
+
+	CancelButton = QuitWindow.GetControl(2)
+	CancelButton.SetText(23789)
+	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
+	CancelButton.MakeEscape()
+	
+	QuitWindow.ShowModal (MODAL_SHADOW_GRAY)
+	return
+	
 def NewLifePress():
-	if QuitWindow:
-		QuitWindow.Unload()
-	if StartWindow:
-		StartWindow.Unload()
 	#to make difference between ingame change and new life
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("NewLife")
 	return
 
 def ResumeLifePress():
-	if QuitWindow:
-		QuitWindow.Unload()
-	if StartWindow:
-		StartWindow.Unload()
 	#to make difference between ingame load and initial load
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("GUILOAD")
 	return
-
-def ExitPress():
-	StartWindow.SetVisible(WINDOW_GRAYED)
-	QuitWindow.SetVisible(WINDOW_VISIBLE)
-	return
 	
-def ExitConfirmed():
-	GemRB.Quit()
-	return
-
-def ExitCancelled():
-	QuitWindow.SetVisible(WINDOW_INVISIBLE)
-	StartWindow.SetVisible(WINDOW_VISIBLE)
-	return

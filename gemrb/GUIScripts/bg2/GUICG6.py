@@ -22,6 +22,8 @@ import LUSkillsSelection
 from GUIDefines import *
 from ie_stats import *
 
+import CharGenCommon
+
 SkillWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -30,16 +32,17 @@ MyChar = 0
 def RedrawSkills():
 	PointsLeft = GemRB.GetVar ("SkillPointsLeft")
 	if PointsLeft == 0:
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetDisabled(False)
 	else:
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetDisabled(True)
 	return
 
 def OnLoad():
 	global SkillWindow, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillWindow = GemRB.LoadWindow(6)
+	SkillWindow = GemRB.LoadWindow(6, "GUICG")
+	CharGenCommon.PositionCharGenWin(SkillWindow)
+	
 	MyChar = GemRB.GetVar ("Slot")
 
 	Levels = [GemRB.GetPlayerStat (MyChar, IE_LEVEL), \
@@ -48,31 +51,32 @@ def OnLoad():
 	LUSkillsSelection.SetupSkillsWindow (MyChar, \
 		LUSkillsSelection.LUSKILLS_TYPE_CHARGEN, SkillWindow, RedrawSkills, [0,0,0], Levels)
 
+	# can't be moved earlier as this var will be set in the setup call above
 	if not GemRB.GetVar ("SkillPointsLeft"): #skipping
+		if SkillWindow:
+			SkillWindow.Unload ()
 		GemRB.SetNextScript("GUICG9")
 		return
 	
 	BackButton = SkillWindow.GetControl(25)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
 
 	DoneButton = SkillWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
+	DoneButton.SetDisabled(True)
 
 	RedrawSkills ()
-	SkillWindow.SetVisible(WINDOW_VISIBLE)
+	SkillWindow.Focus()
 	return
 
 def BackPress():
 	if SkillWindow:
 		SkillWindow.Unload()
 	GemRB.SetNextScript("CharGen6")
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def NextPress():
@@ -82,6 +86,5 @@ def NextPress():
 
 	LUSkillsSelection.SkillsSave (MyChar)
 
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies
 	return

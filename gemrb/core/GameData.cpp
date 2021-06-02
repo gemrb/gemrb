@@ -64,14 +64,6 @@ static void ReleaseEffect(void *poi)
 	delete ((Effect *) poi);
 }
 
-static void ReleasePalette(void *poi)
-{
-	//we allow nulls, but we shouldn't release them
-	if (!poi) return;
-	//as long as palette has its own refcount, this should be Release
-	((Palette *) poi)->release();
-}
-
 GEM_EXPORT GameData* gamedata;
 
 GameData::GameData()
@@ -90,12 +82,15 @@ void GameData::ClearCaches()
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
-	PaletteCache.RemoveAll(ReleasePalette);
+	PaletteCache.clear ();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
 		stores.erase(stores.begin());
 		delete store;
+	}
+	for (auto& c : colors) {
+		free(const_cast<char*>(c.first));
 	}
 }
 
@@ -208,7 +203,7 @@ int GameData::GetTableIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-Holder<TableMgr> GameData::GetTable(unsigned int index) const
+Holder<TableMgr> GameData::GetTable(size_t index) const
 {
 	if (index >= tables.size()) {
 		return NULL;
@@ -239,56 +234,32 @@ bool GameData::DelTable(unsigned int index)
 	return true;
 }
 
-Palette *GameData::GetPalette(const ieResRef resname)
+PaletteHolder GameData::GetPalette(const ResRef resname)
 {
-	Palette *palette = (Palette *) PaletteCache.GetResource(resname);
-	if (palette) {
-		return palette;
-	}
-	//additional hack for allowing NULL's
-	if (PaletteCache.RefCount(resname)!=-1) {
-		return NULL;
-	}
+	auto iter = PaletteCache.find(resname);
+	if (iter != PaletteCache.end())
+		return iter->second;
+
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resname);
 	if (im == nullptr) {
-		PaletteCache.SetAt(resname, NULL);
+		PaletteCache[resname] = nullptr;
 		return NULL;
 	}
 
-	palette = new Palette();
+	PaletteHolder palette = new Palette();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
-	PaletteCache.SetAt(resname, (void *) palette);
+	PaletteCache[resname] = palette;
 	return palette;
 }
 
-void GameData::FreePalette(Palette *&pal, const ieResRef name)
+void GameData::FreePalette(PaletteHolder &pal, const ieResRef)
 {
-	int res;
-
-	if (!pal) {
-		return;
-	}
-	if (!name || !name[0]) {
-		if(pal->named) {
-			error("GameData", "Palette is supposed to be named, but got no name!\n");
-		} else {
-			pal->release();
-			pal=NULL;
-		}
-		return;
-	}
-	if (!pal->named) {
-		error("GameData", "Unnamed palette, it should be %s!\n", name);
-	}
-	res=PaletteCache.DecRef((void *) pal, name, true);
-	if (res<0) {
-		error("Core", "Corrupted Palette cache encountered (reference count went below zero), Palette name is: %.8s\n", name);
-	}
-	if (!res) {
-		pal->release();
-	}
-	pal = NULL;
+	// This was previously much hairier, trying to keep track of two different
+	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
+	// is freed, while not bothering about freeing named palettes from the
+	// map.
+	pal = nullptr;
 }
 
 Item* GameData::GetItem(const ieResRef resname, bool silent)
@@ -452,9 +423,9 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
 {
-	Sprite2D *tspr;
+	Holder<Sprite2D> tspr;
 	AnimationFactory* af = ( AnimationFactory* )
 		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL, silent );
 	if (!af) return 0;
@@ -465,7 +436,20 @@ Sprite2D* GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bo
 	return tspr;
 }
 
-void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
+Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame, bool silent)
+{
+	Holder<Sprite2D> img = gamedata->GetBAMSprite(resRef, cycle, frame, silent);
+	if (img) return img;
+
+	// try static image formats to support PNG
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resRef);
+	if (im) {
+		img = im->GetSprite2D();
+	}
+	return img;
+}
+
+FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode, bool silent)
 {
 	int fobjindex = factory->IsLoaded(resname,type);
@@ -508,6 +492,11 @@ void* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 			core->TypeExt(type));
 		return NULL;
 	}
+}
+
+void GameData::AddFactoryResource(FactoryObject* res)
+{
+	factory->AddFactoryObject(res);
 }
 
 Store* GameData::GetStore(const ieResRef ResRef)
@@ -592,9 +581,9 @@ void GameData::ReadItemSounds()
 	}
 }
 
-bool GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
+bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
-	Sound[0] = 0;
+	Sound = 0;
 
 	if (ItemSounds.empty()) {
 		ReadItemSounds();
@@ -613,7 +602,7 @@ bool GameData::GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, i
 	if (ItemType >= (ieDword) ItemSounds.size()) {
 		return false;
 	}
-	CopyResRef(Sound, ItemSounds[ItemType][Col]);
+	Sound = ItemSounds[ItemType][Col];
 	return true;
 }
 
@@ -722,6 +711,29 @@ int GameData::GetSummoningLimit(ieDword sex)
 			break;
 	}
 	return atoi(summoningLimit->QueryField(row, 0));
+}
+
+const Color& GameData::GetColor(const char *row)
+{
+	// preload converted colors
+	if (colors.empty()) {
+		AutoTable colorTable("colors", true);
+		Color color;
+		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
+			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
+			color.r = (ieByte)((c >> 24) & 0xFF);
+			color.g = (ieByte)((c >> 16) & 0xFF);
+			color.b = (ieByte)((c >> 8) & 0xFF);
+			color.a = (ieByte)(c & 0xFF);
+
+			colors[strdup(colorTable->GetRowName(r))] = color;
+		}
+	}
+	const auto it = colors.find(row);
+	if (it != colors.end()) {
+		return it->second;
+	}
+	return ColorRed;
 }
 
 }

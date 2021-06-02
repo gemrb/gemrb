@@ -52,7 +52,7 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 ControlAnimation::~ControlAnimation(void)
 {
 	//removing from timer first
-	core->timer->RemoveAnimation( this );
+	core->timer.RemoveAnimation( this );
 
 	bam = NULL;
 }
@@ -63,7 +63,7 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 	if (!bam) return false;
 	if (strnicmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
 	int c = cycle;
-	if (control->Flags&IE_GUI_BUTTON_PLAYRANDOM) {
+	if (control->Flags()&IE_GUI_BUTTON_PLAYRANDOM) {
 		c&=~1;
 	}
 	if (Cycle!=c) return false;
@@ -74,13 +74,13 @@ void ControlAnimation::UpdateAnimation(bool paused)
 {
 	unsigned long time;
 
-	if (paused && !(control->Flags & IE_GUI_BUTTON_PLAYALWAYS)) {
+	if (paused && !(control->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later
-		core->timer->AddAnimation( this, 1 );
+		core->timer.AddAnimation( this, 1 );
 		return;
 	}
 
-	if (control->Flags & IE_GUI_BUTTON_PLAYRANDOM) {
+	if (control->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
 		// simple Finite-State Machine
 		if (anim_phase == 0) {
 			frame = 0;
@@ -110,17 +110,17 @@ void ControlAnimation::UpdateAnimation(bool paused)
 	}
 
 	if (UpdateAnimationSprite()) {
-		core->timer->AddAnimation(this, time);
+		core->timer.AddAnimation(this, time);
 	}
 }
 
-bool ControlAnimation::UpdateAnimationSprite () {
-	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
+bool ControlAnimation::UpdateAnimationSprite() {
+	Holder<Sprite2D> pic = bam->GetFrame((unsigned short) frame, (unsigned char) cycle);
 
 	if (pic == NULL) {
 		//stopping at end frame
-		if (control->Flags & IE_GUI_BUTTON_PLAYONCE) {
-			core->timer->RemoveAnimation( this );
+		if (control->Flags() & IE_GUI_BUTTON_PLAYONCE) {
+			core->timer.RemoveAnimation( this );
 			control->SetAnimPicture( NULL );
 			return false;
 		}
@@ -134,19 +134,15 @@ bool ControlAnimation::UpdateAnimationSprite () {
 	}
 
 	if (has_palette) {
-		Palette* palette = pic->GetPalette();
+		PaletteHolder palette = pic->GetPalette();
 		palette->SetupPaperdollColours(colors, 0);
 		if (is_blended) {
 			palette->CreateShadedAlphaChannel();
 		}
-		pic->SetPalette(palette);
-		palette->release();
 	} else {
 		if (is_blended) {
-			Palette* palette = pic->GetPalette();
+			PaletteHolder palette = pic->GetPalette();
 			palette->CreateShadedAlphaChannel();
-			pic->SetPalette(palette);
-			palette->release();
 		}
 	}
 

@@ -106,16 +106,16 @@ public:
 	FileStream(File&&);
 	FileStream(void);
 
-	DataStream* Clone();
+	DataStream* Clone() override;
 
 	bool Open(const char* filename);
 	bool Modify(const char* filename);
 	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename);
-	int Read(void* dest, unsigned int length);
-	int Write(const void* src, unsigned int length);
-	int Seek(int pos, int startpos);
+	int Read(void* dest, unsigned int length) override;
+	int Write(const void* src, unsigned int length) override;
+	int Seek(int pos, int startpos) override;
 
 	void Close();
 public:

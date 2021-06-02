@@ -20,12 +20,11 @@
 #define TEXTCONTAINER_H
 
 #include "Font.h"
+#include "GUI/View.h"
 #include "Region.h"
 #include "System/String.h"
 
 #include <deque>
-#include <list>
-#include <vector>
 
 namespace GemRB {
 
@@ -35,9 +34,17 @@ class Sprite2D;
 class ContentContainer;
 class TextContainer;
 
-typedef std::vector<Region> Regions;
+struct LayoutRegion {
+	Region region;
+	
+	LayoutRegion(Region r)
+	: region(r) {}
+};
+
+using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
 
 // interface for both content and content containers
+// can instantiate to produce empty areas in layout
 class Content {
 friend class ContentContainer;
 protected:
@@ -48,38 +55,51 @@ protected:
 
 public:
 	Content(const Size& size);
-	virtual ~Content();
+	virtual ~Content() = default;
 
 	virtual Size ContentFrame() const { return frame.Dimensions(); };
 
-	virtual void Draw(Point p) const; // public drawing interface in screen coordinates.
-
 protected:
 	// point is relative to Region. Region is a screen region.
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const=0;
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	virtual void DrawContentsInRegions(const LayoutRegions&, const Point&) const {};
+	virtual LayoutRegions LayoutForPointInRegion(Point p, const Region&) const;
 };
 
 
 // Content classes
 class TextSpan : public Content
 {
+friend class TextContainer;
 private:
 	String text;
 	const Font* font;
-	Palette* palette;
+	Font::PrintColors* colors = nullptr;
+	
+	struct TextLayoutRegion : LayoutRegion {
+		size_t beginCharIdx;
+		size_t endCharIdx;
+		
+		TextLayoutRegion(Region r, size_t begin, size_t end)
+		: LayoutRegion(r), beginCharIdx(begin), endCharIdx(end) {}
+	};
 
 public:
 	// make a "block" of text that always occupies the area of "size", or autosizes if size in NULL
 	// TODO: we should probably be able to align the text in the frame
-	TextSpan(const String& string, const Font* font, Palette* pal = NULL, const Size* = NULL);
+	TextSpan(const String& string, const Font* font, const Size* = nullptr);
+	TextSpan(const String& string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
 	~TextSpan();
+	
+	void ClearColors();
+	void SetColors(const Color& fg, const Color& bg);
 
 	const String& Text() const { return text; };
 
+	unsigned char Alignment;
+
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
+	LayoutRegions LayoutForPointInRegion(Point p, const Region&) const override;
 
 private:
 	inline const Font* LayoutFont() const;
@@ -90,47 +110,68 @@ private:
 class ImageSpan : public Content
 {
 private:
-	Sprite2D* image;
+	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(Sprite2D* image);
+	ImageSpan(Holder<Sprite2D> image);
 
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
+	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
 };
 
 
 // Content container classes
-class ContentContainer : public Content
+class ContentContainer : public View
 {
 public:
 	typedef std::list<Content*> ContentList;
+
+	struct Margin {
+		ieByte top;
+		ieByte right;
+		ieByte bottom;
+		ieByte left;
+
+		Margin() : top(0), right(0), bottom(0), left(0) {}
+
+		Margin(ieByte top)
+		: top(top), right(top), bottom(top), left(top) {}
+
+		Margin(ieByte top, ieByte right)
+		: top(top), right(right), bottom(top), left(right) {}
+
+		Margin(ieByte top, ieByte right, ieByte bottom)
+		: top(top), right(right), bottom(bottom), left(right) {}
+
+		Margin(ieByte top, ieByte right, ieByte bottom, ieByte left)
+		: top(top), right(right), bottom(bottom), left(left) {}
+	};
+
 protected:
 	ContentList contents;
 
-	Size contentBounds;
-	mutable Point parentOffset;
-
 	struct Layout {
 		const Content* content;
-		Regions regions;
-
-		Layout(const Content* c, const Regions r)
-		: content(c), regions(r) {}
+		LayoutRegions regions;
+		
+		Layout(const Content* c, LayoutRegions rgns)
+		: content(c), regions(std::move(rgns)) {
+			assert(regions.size());
+		}
 
 		bool operator==(const Content* c) const {
 			return c == content;
 		}
 
 		bool operator<(const Point& p) const {
-			const Region& r = regions.back();
+			const Region& r = regions.back()->region;
 			return r.y < p.y || (r.x < p.x && r.y == p.y);
 		}
 
 		bool PointInside(const Point& p) const {
-			Regions::const_iterator rit = regions.begin();
-			for (; rit != regions.end(); ++rit) {
-				if ((*rit).PointInside(p)) {
+			for (const auto& layout : regions) {
+				const Region r = layout->region;
+				if (r.PointInside(p)) {
 					return true;
 				}
 			}
@@ -142,9 +183,11 @@ protected:
 	ContentLayout layout;
 	Point layoutPoint;
 
+	Margin margin;
+
 public:
-	ContentContainer(const Size& frame) : Content(frame) {};
-	virtual ~ContentContainer();
+	ContentContainer(const Region& frame);
+	~ContentContainer() override;
 
 	// append a container to the end of the container. The container takes ownership of the span.
 	virtual void AppendContent(Content* content);
@@ -160,37 +203,101 @@ public:
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;
-
-	Size ContentFrame() const;
-	void SetFrame(const Region&);
+	Region BoundingBoxForLayout(const LayoutRegions&) const;
+	
+	void SetMargin(Margin m);
+	void SetMargin(ieByte top, ieByte right, ieByte bottom, ieByte left);
+	inline void SetMargin(ieByte top, ieByte right, ieByte bottom) { SetMargin(top, right, bottom, right); }
+	inline void SetMargin(ieByte top, ieByte right) { SetMargin(top, right, top, right); }
+	inline void SetMargin(ieByte top) { SetMargin(top, top, top, top); }
 
 protected:
-	virtual void DrawContentsInRegions(const Regions&, const Point&) const;
-	virtual Regions LayoutForPointInRegion(Point p, const Region&) const;
+	void SubviewAdded(View* view, View* parent) override;
 	void LayoutContentsFrom(ContentList::const_iterator);
 	void LayoutContentsFrom(const Content*);
 	Content* RemoveContent(const Content* content, bool doLayout);
+	ContentList::iterator EraseContent(ContentList::iterator it);
+	ContentList::iterator EraseContent(ContentList::iterator beg, ContentList::iterator end);
+
 	const Layout& LayoutForContent(const Content*) const;
+	const Layout* LayoutAtPoint(const Point& p) const;
+
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	virtual void DrawContents(const Layout& layout, Point point);
+	
+	void SizeChanged(const Size& oldSize) override;
+
+private:
+	virtual void ContentRemoved(const Content* /*content*/) {};
+	
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 };
 
 // TextContainers can hold any content, but they represent a string of text that is divided into TextSpans
 class TextContainer : public ContentContainer {
 private:
+	using TextLayout = TextSpan::TextLayoutRegion;
 	// default font/palette for adding plain text
 	Font* font;
-	Palette* palette;
+	Font::PrintColors* colors = nullptr;
+	unsigned char alignment;
+
+	size_t textLen;
+	size_t cursorPos, printPos;
+	Point cursorPoint;
+
+private:
+	String TextFrom(ContentList::const_iterator) const;
+
+	void ContentRemoved(const Content* content) override;
+
+	void MoveCursorToPoint(const Point& p);
+	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
+
+	// relative to cursor pos
+	void InsertText(const String& text);
+	void DeleteText(size_t len);
+
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
+
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawContents(const Layout& layout, Point point) override;
+
+	virtual bool Editable() const { return IsReceivingEvents(); }
+	void SizeChanged(const Size& oldSize) override;
+
+	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
+	ContentIndex FindContentForChar(size_t idx);
 
 public:
-	TextContainer(const Size& frame, Font* font, Palette*);
+	TextContainer(const Region& frame, Font* font);
 	~TextContainer();
 
 	void AppendText(const String& text);
-	void AppendText(const String& text, Font* fnt, Palette* pal);
+	void AppendText(const String& text, Font* fnt, const Font::PrintColors* = nullptr);
+	String TextFrom(const Content*) const;
 	String Text() const;
 
-	void SetPalette(Palette* pal);
-	Palette* TextPalette() const { return palette; }
+	void DidFocus() override;
+	void DidUnFocus() override;
+
+	void ClearColors();
+	void SetColors(const Color& fg, const Color& bg);
+	const Font::PrintColors* TextColors() const { return colors; }
+	void SetFont(Font* fnt) { font = fnt; }
 	const Font* TextFont() const { return font; }
+	void SetAlignment(unsigned char align) { alignment = align; }
+
+	void CursorHome();
+	void CursorEnd();
+	void AdvanceCursor(int);
+
+	using EditCallback = Callback<void, TextContainer&>;
+	EditCallback callback;
 };
 
 }

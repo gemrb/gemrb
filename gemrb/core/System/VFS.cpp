@@ -42,11 +42,7 @@
 #include <cerrno>
 
 #ifndef WIN32
-#ifndef VITA
 #include <dirent.h>
-#else
-#include <psp2/kernel/iofilemgr.h>
-#endif
 #endif
 
 #ifdef HAVE_MMAP
@@ -131,62 +127,6 @@ static void closedir(DIR* dirp)
 }
 
 #endif // WIN32
-
-#ifdef VITA
-
-using namespace GemRB;
-
-struct DIR
-{
-	bool is_first;
-	SceUID descriptor;
-};
-
-struct dirent
-{
-	char d_name[_MAX_PATH];
-};
-
-// buffer which readdir returns
-static dirent de;
-
-static DIR* opendir(const char *filename)
-{
-	DIR *dirp = (DIR*) malloc(sizeof(DIR));
-	dirp->is_first = 1;
-	dirp->descriptor = sceIoDopen(filename);
-
-	if (dirp->descriptor <= 0) {
-		free(dirp);
-		return NULL;
-	}
-
-	return dirp;
-}
-
-static dirent* readdir(DIR *dirp)
-{
-	//vitasdk kind of skips current directory entry..
-	if (dirp->is_first) {
-		dirp->is_first = 0;
-		strncpy(de.d_name, ".", 1);
-	} else {
-		SceIoDirent dir;
-		if (sceIoDread(dirp->descriptor, &dir) <= 0)
-			return NULL;
-		strncpy(de.d_name, dir.d_name, 256);
-	}
-
-	return &de;
-}
-
-static void closedir(DIR *dirp)
-{
-	sceIoDclose(dirp->descriptor);
-	free(dirp);
-}
-
-#endif // VITA
 
 namespace GemRB {
 #if __APPLE__
@@ -391,38 +331,6 @@ void FixPath (char *path, bool needslash)
 	path[i] = 0;
 }
 
-static int strmatch(const char *string, const char *mask)
-{
-	while(*mask) {
-		if (*mask!='?') {
-			if (tolower(*mask)!=tolower(*string)) {
-				return 1;
-			}
-		}
-		mask++;
-		string++;
-	}
-	return 0;
-}
-
-bool FileGlob(char* target, const char* Dir, const char *glob)
-{
-	DirectoryIterator dir(Dir);
-	if (!dir) {
-		return false;
-	}
-
-	do {
-		const char *name = dir.GetName();
-		if (strmatch( name, glob ) == 0) {
-			strcpy( target, name );
-			return true;
-		}
-	} while (++dir);
-	return false;
-}
-
-
 #ifndef WIN32
 
 void ResolveFilePath(char* FilePath)
@@ -508,11 +416,6 @@ bool MakeDirectories(const char* path)
 
 bool MakeDirectory(const char* path)
 {
-#ifdef VITA
-	sceIoMkdir(path, 0777);
-	return true;
-#endif
-
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
@@ -627,6 +530,7 @@ void* readonly_mmap(void *vfd) {
 DirectoryIterator::DirectoryIterator(const char *path)
 	: predicate(NULL), Directory(NULL), Entry(NULL)
 {
+	SetFlags(Files|Directories);
 	Path = strdup(path);
 	Rewind();
 }
@@ -637,6 +541,13 @@ DirectoryIterator::~DirectoryIterator()
 		closedir(static_cast<DIR*>(Directory));
 	free(Path);
 	delete predicate;
+}
+
+void DirectoryIterator::SetFlags(int flags, bool reset)
+{
+	// store the inverse
+	entrySkipFlags = Flags(~flags);
+	if (reset) Rewind();
 }
 
 void DirectoryIterator::SetFilterPredicate(FileFilterPredicate* p, bool chain)
@@ -661,6 +572,7 @@ bool DirectoryIterator::IsDirectory()
 
 const char* DirectoryIterator::GetName()
 {
+	if (Entry == NULL) return NULL;
 	return static_cast<dirent*>(Entry)->d_name;
 }
 
@@ -671,9 +583,30 @@ void DirectoryIterator::GetFullPath(char *name)
 
 DirectoryIterator& DirectoryIterator::operator++()
 {
+	bool cont = false;
 	do {
+		errno = 0;
 		Entry = readdir(static_cast<DIR*>(Directory));
-	} while (predicate && Entry && !(*predicate)(GetName()));
+		cont = false;
+		if (Entry) {
+			const char* name = GetName();
+
+			if (entrySkipFlags&Directories) {
+				cont = IsDirectory();
+			}
+			if (cont == false && entrySkipFlags&Files) {
+				cont = !IsDirectory();
+			}
+			if (cont == false && entrySkipFlags&Hidden) {
+				cont = name[0] == '.';
+			}
+			if (cont == false && predicate) {
+				cont = !(*predicate)(name);
+			}
+		} else if (errno) {
+			//Log(WARNING, "DirectoryIterator", "Cannot readdir: %s\nError: %s", Path, strerror(errno));
+		}
+	} while (cont);
 
 	return *this;
 }
@@ -683,10 +616,12 @@ void DirectoryIterator::Rewind()
 	if (Directory)
 		closedir(static_cast<DIR*>(Directory));
 	Directory = opendir(Path);
-	if (Directory == NULL)
+	if (Directory == NULL) {
 		Entry = NULL;
-	else
+		//Log(WARNING, "DirectoryIterator", "Cannot open directory: %s\nError: %s", Path, strerror(errno));
+	} else {
 		this->operator++();
+	}
 }
 
 }

@@ -22,12 +22,32 @@
 
 namespace GemRB {
 
-ScriptEngine::ScriptEngine(void)
+ScriptEngine::ScriptingDict ScriptEngine::GUIDict;
+
+bool ScriptEngine::RegisterScriptingRef(const ScriptingRefBase* ref)
 {
+	if (ref == NULL) return false;
+
+	ScriptEngine::ScriptingDict::iterator it = GUIDict.find(ref->ScriptingGroup());
+	if (it != GUIDict.end()) {
+		if (it->second.count(ref->Id)) {
+			return false;
+		}
+	}
+
+	GUIDict[ref->ScriptingGroup()][ref->Id] = ref;
+	return true;
 }
 
-ScriptEngine::~ScriptEngine(void)
+bool ScriptEngine::UnregisterScriptingRef(const ScriptingRefBase* ref)
 {
+	if (ref == NULL) return false;
+
+	ScriptEngine::ScriptingDict::iterator it = GUIDict.find(ref->ScriptingGroup());
+	if (it == GUIDict.end()) {
+		return false;
+	}
+	return (it->second.erase(ref->Id) > 0) ? true : false;
 }
 
 }

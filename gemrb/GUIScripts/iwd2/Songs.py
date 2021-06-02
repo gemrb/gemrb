@@ -20,16 +20,12 @@
 import GemRB
 from GUIDefines import *
 
-MovieWindow = 0
-TextAreaControl = 0
 MoviesTable = 0
 
 def OnLoad():
 	global MovieWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	MovieWindow = GemRB.LoadWindow(2)
-	MovieWindow.SetFrame ()
+	MovieWindow = GemRB.LoadWindow(2, "GUIMOVIE")
 	TextAreaControl = MovieWindow.GetControl(0)
 	PlayButton = MovieWindow.GetControl(2)
 	CreditsButton = MovieWindow.GetControl(3)
@@ -39,12 +35,12 @@ def OnLoad():
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.MakeEscape()
 
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, PlayPress)
 	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CreditsPress)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)
-	MovieWindow.SetVisible(WINDOW_VISIBLE)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: MovieWindow.Close())
+	MovieWindow.Focus()
 	return
 	
 def PlayPress():
@@ -55,10 +51,4 @@ def PlayPress():
 
 def CreditsPress():
 	GemRB.PlayMovie("CREDITS")
-	return
-
-def DonePress():
-	if MovieWindow:
-		MovieWindow.Unload()
-	GemRB.SetNextScript("Start")
 	return

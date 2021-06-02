@@ -20,16 +20,102 @@
 
 #include "MoviePlayer.h"
 
+#include "GUI/Label.h"
+#include "Interface.h"
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
 
 MoviePlayer::MoviePlayer(void)
 {
+	framePos = 0;
+	subtitles = NULL;
+	isPlaying = false;
+	showSubtitles = false;
+	movieFormat = Video::DISPLAY;
 }
 
 MoviePlayer::~MoviePlayer(void)
 {
+	Stop();
+	delete subtitles;
+}
+
+void MoviePlayer::SetSubtitles(SubtitleSet* subs)
+{
+	delete subtitles;
+	subtitles = subs;
+}
+
+void MoviePlayer::EnableSubtitles(bool set)
+{
+	showSubtitles = set;
+}
+
+bool MoviePlayer::SubtitlesEnabled() const
+{
+	return showSubtitles && subtitles;
+}
+
+void MoviePlayer::Play(Window* win)
+{
+	assert(win);
+	Video* video = core->GetVideoDriver();
+
+	MoviePlayerControls* mpc = new MoviePlayerControls(*this);
+	mpc->SetFrameSize(win->Dimensions());
+	win->AddSubviewInFrontOfView(mpc);
+
+	// center over win
+	const Region& winFrame = win->Frame();
+	const Size& size = Dimensions();
+	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
+	center = center + winFrame.Origin();
+	VideoBufferPtr subBuf = nullptr, vb = video->CreateBuffer(Region(center, size), movieFormat);
+	
+	if (subtitles) {
+		// FIXME: arbitrary frame of my choosing, not sure there is a better method
+		// this hould probably at least be sized according to line height
+		int y = std::min<int>(winFrame.h - center.y, winFrame.h - 50.0);
+		Region subFrame(0, y, winFrame.w, 50.0);
+		subBuf = video->CreateBuffer(subFrame, Video::DISPLAY_ALPHA);
+	}
+
+	// currently, our MoviePlayer implementation takes over the entire screen
+	// not only that but the Play method blocks until movie is done/stopped.
+	win->Focus(); // we bypass the WindowManager for drawing, but for event handling we need this
+	isPlaying = true;
+	do {
+		// taking over the application runloop...
+		
+		// we could draw all the windows if we wanted to be able to have videos that aren't fullscreen
+		// However, since we completely block the normal game loop we will bypass WindowManager drawing
+		//WindowManager::DefaultWindowManager().DrawWindows();
+		
+		// first draw the window for play controls/subtitles
+		//win->Draw();
+		
+		video->PushDrawingBuffer(vb);
+		if (DecodeFrame(*vb) == false) {
+			Stop(); // error / end
+		}
+		
+		if (subtitles && showSubtitles) {
+			assert(subBuf);
+			// we purposely draw on the window, which may be larger than the video
+			video->PushDrawingBuffer(subBuf);
+			subtitles->RenderInBuffer(*subBuf, framePos);
+		}
+		// TODO: pass movie fps (and remove the cap from within the movie decoders)
+	} while ((video->SwapBuffers(0) == GEM_OK) && isPlaying);
+
+	delete win->View::RemoveSubview(mpc);
+}
+
+void MoviePlayer::Stop()
+{
+	isPlaying = false;
 }
 
 }

@@ -35,13 +35,6 @@ def OnLoad():
 	global KitWindow, TextAreaControl, DoneButton
 	global SchoolList, ClassName
 
-	if GUICommon.CloseOtherWindow(OnLoad):
-		if(KitWindow):
-			KitWindow.Unload()
-			KitWindow = None
-		return
-
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceName = CommonTables.Races.GetRowName(GemRB.GetVar("Race")-1 )
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	KitTable = GemRB.LoadTable("kittable")
@@ -51,7 +44,7 @@ def OnLoad():
 	SchoolList = GemRB.LoadTable("magesch")
 
 	#there is only a specialist mage window for bg1
-	KitWindow = GemRB.LoadWindow(12)
+	KitWindow = GemRB.LoadWindow(12, "GUICG")
 
 	for i in range(8):
 		Button = KitWindow.GetControl(i+2)
@@ -96,13 +89,13 @@ def OnLoad():
 	BackButton.SetText(15416)
 	DoneButton = KitWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = KitWindow.GetControl(11)
 	TextAreaControl.SetText(17245)
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CharGenCommon.BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(KitWindow))
 	#KitPress()
 	KitWindow.ShowModal(MODAL_SHADOW_NONE)
 	return
@@ -121,6 +114,7 @@ def KitPress():
 	return
 
 def NextPress():
+	KitWindow.Close ()
 	#class	
 	Class = CommonTables.Classes.GetValue (ClassName, "ID")
 	MyChar = GemRB.GetVar ("Slot")

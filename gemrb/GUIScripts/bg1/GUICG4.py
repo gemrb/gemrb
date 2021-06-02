@@ -81,7 +81,6 @@ def RollPress():
 	PointsLeft = 0
 	SumLabel = AbilityWindow.GetControl(0x10000002)
 	SumLabel.SetText("0")
-	SumLabel.SetUseRGB(1)
 
 	if HasStrExtra:
 		e = GemRB.Roll(1,100,0)
@@ -103,7 +102,6 @@ def RollPress():
 			Label.SetText("18/"+str(e) )
 		else:
 			Label.SetText(str(v) )
-		Label.SetUseRGB(1)
 	return
 
 def OnLoad():
@@ -111,12 +109,6 @@ def OnLoad():
 	global PointsLeft, HasStrExtra
 	global AbilityTable, Abclasrq, Abclsmod, Abracerq, Abracead
 	global KitIndex, Minimum, Maximum, MyChar
-
-	if GUICommon.CloseOtherWindow (OnLoad):
-		if(AbilityWindow):
-			AbilityWindow.Unload()
-			AbilityWindow = None
-		return
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
 	#Abclsmod = GemRB.LoadTable("ABCLSMOD")
@@ -137,9 +129,8 @@ def OnLoad():
 
 	KitIndex = Abclasrq.GetRowIndex(KitName)
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
-	AbilityWindow = GemRB.LoadWindow(4)
+	AbilityWindow = GemRB.LoadWindow(4, "GUICG")
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)
@@ -150,10 +141,10 @@ def OnLoad():
 
 	BackButton = AbilityWindow.GetControl(36)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = AbilityWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 
 	RollPress()
@@ -166,10 +157,12 @@ def OnLoad():
 		Button = AbilityWindow.GetControl(i*2+16)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, LeftPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 		Button = AbilityWindow.GetControl(i*2+17)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, RightPress)
 		Button.SetVarAssoc("Ability", i )
+		Button.SetActionInterval (200)
 
 	TextAreaControl = AbilityWindow.GetControl(29)
 	TextAreaControl.SetText(17247)
@@ -178,9 +171,8 @@ def OnLoad():
 	RecallButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RecallPress)
 	RerollButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, RollPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
-	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
+	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: CharGenCommon.back(AbilityWindow))
 	AbilityWindow.ShowModal(MODAL_SHADOW_NONE)
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def RightPress():
@@ -270,13 +262,8 @@ def RecallPress():
 	PointsLeft = GemRB.GetVar("Ability -1")
 	return
 
-def BackPress():
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	CharGenCommon.back()
-
 def NextPress():
-	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
-	
+	AbilityWindow.Close()
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 	
@@ -290,8 +277,6 @@ def NextPress():
 
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
-
-        GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 
 	CharGenCommon.next()
 

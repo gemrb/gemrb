@@ -72,26 +72,25 @@ public:
 	void SetAreaStatus(ieDword status, int op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
-	Sprite2D *GetMapIcon(AnimationFactory *bam, bool overridePalette);
+	Holder<Sprite2D> GetMapIcon(AnimationFactory *bam, bool overridePalette);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	const String* GetCaption();
 	const char* GetTooltip();
 private:
 	ieDword AreaStatus;
-	Sprite2D *MapIcon;
+	Holder<Sprite2D> MapIcon;
 	String* StrCaption;
 	char *StrTooltip;
 	bool SingleFrame;
 
-	void SetPalette(int gradient, Sprite2D *MapIcon);
+	void SetPalette(int gradient, Holder<Sprite2D> MapIcon);
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;
 	ieVariable AreaLongName;
 	ieDword IconSeq;
-	ieDword X;
-	ieDword Y;
+	Point pos;
 	ieStrRef LocCaptionName;
 	ieStrRef LocTooltipName;
 	ieResRef LoadScreenResRef;
@@ -136,7 +135,7 @@ public: //struct members
 
 	AnimationFactory *bam;
 private: //non-struct members
-	Sprite2D* MapMOS;
+	Holder<Sprite2D> MapMOS;
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
 	int *Distances;
@@ -144,8 +143,8 @@ private: //non-struct members
 	int encounterArea;
 public:
 	void SetMapIcons(AnimationFactory *bam);
-	Sprite2D* GetMapMOS() const { return MapMOS; }
-	void SetMapMOS(Sprite2D *newmos);
+	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
+	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }
 	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }

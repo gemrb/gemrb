@@ -74,6 +74,7 @@ def ClearPress():
 
 	GemRB.SetToken("BIO", "")
 	EditControl.SetText (GemRB.GetToken("BIO") )
+	EditControl.Focus ()
 	return
 
 def RevertPress():
@@ -127,7 +128,7 @@ def BioPress():
 	else:
 		EditControl.SetText (BioData )
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	EditControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	EditControl.Focus()
 	return
 
 def SaveBio():

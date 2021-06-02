@@ -69,7 +69,7 @@ static void PrintPossibleFiles(StringBuffer& buffer, const char* ResRef, const T
 
 bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) const 
 {
-	if (ResRef[0] == '\0')
+	if (!ResRef || ResRef[0] == '\0')
 		return false;
 	// TODO: check various caches
 	for (size_t i = 0; i < searchPath.size(); i++) {
@@ -109,7 +109,7 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 
 DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, bool silent) const
 {
-	if (ResRef[0] == '\0')
+	if (!ResRef || ResRef[0] == '\0')
 		return NULL;
 	for (size_t i = 0; i < searchPath.size(); i++) {
 		DataStream *ds = searchPath[i]->GetResource(ResRef, type);
@@ -130,7 +130,7 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 
 Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, bool silent, bool useCorrupt) const
 {
-	if (ResRef[0] == '\0')
+	if (!ResRef || ResRef[0] == '\0')
 		return NULL;
 	if (!silent) {
 		Log(MESSAGE, "ResourceManager", "Searching for '%s'...", ResRef);

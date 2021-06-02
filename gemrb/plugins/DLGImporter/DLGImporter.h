@@ -70,10 +70,10 @@ private:
 
 public:
 	DLGImporter(void);
-	~DLGImporter(void);
-	bool Open(DataStream* stream);
-	Dialog* GetDialog() const;
-	Condition* GetCondition(char *string) const;
+	~DLGImporter(void) override;
+	bool Open(DataStream* stream) override;
+	Dialog* GetDialog() const override;
+	Condition* GetCondition(char *string) const override;
 private:
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;

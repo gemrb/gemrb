@@ -24,102 +24,36 @@
 
 import GemRB
 import GameCheck
-import GUICommon
 import GUICommonWindows
 import GUIMACommon
 from GUIDefines import *
 
 MapWindow = None
-NoteWindow = None
-WorldMapWindow = None
 WorldMapControl = None
-PortraitWindow = None
-OldPortraitWindow = None
-OptionsWindow = None
-OldOptionsWindow = None
-
-if GameCheck.IsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
-else:
-	WIDTH = 640
-	HEIGHT = 480
 
 def RevealMap ():
 	global MapWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (ShowMap):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
 
 	GemRB.RevealArea (PosX, PosY, 30, 1)
 	GemRB.GamePause (0,0)
+	
+	MapWindow.Close()
 	return
 
 ###################################################
 # for farsight effect
 ###################################################
 def ShowMap ():
-	import GameCheck
-	import GUICommonWindows
-	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (ShowMap):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-	MapWindow = Window = GemRB.LoadWindow (2)
-	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
-	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, ShowMap)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OptionsWindow.SetFrame ()
+	Window = OpenMapWindow()
 
 	# World Map
 	Button = Window.GetControl (1)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
+
+	Map = Window.GetControl (2)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
@@ -128,82 +62,34 @@ def ShowMap ():
 
 		Label = Window.GetControl (0x10000003)
 		Label.SetText ("")
-
-	# Map Control
-	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
-	else:
-		Window.CreateMapControl (2, 0, 0, 0, 0)
-	Map = Window.GetControl (2)
-	if HasMapNotes ():
-		GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
+	
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
+
 	Map.SetEvent (IE_GUI_MAP_ON_PRESS, RevealMap)
-	Window.SetVisible (WINDOW_VISIBLE)
-	OptionsWindow.SetVisible (WINDOW_GRAYED)
-	PortraitWindow.SetVisible (WINDOW_GRAYED)
-	OptionsWindow.SetVisible (WINDOW_FRONT)
-	PortraitWindow.SetVisible (WINDOW_FRONT)
-	Window.SetVisible (WINDOW_FRONT)
-	if HasMapNotes ():
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED|IE_GUI_MAP_REVEAL_MAP)
-	else:
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
+
+	Window.ShowModal (MODAL_SHADOW_GRAY)
 	GemRB.GamePause (0,0)
 	return
 
 ###################################################
-def OpenMapWindow ():
-	import GameCheck
-	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
 
-	if GUICommon.CloseOtherWindow (OpenMapWindow):
-		if MapWindow:
-			MapWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-
-		MapWindow = None
-		#this window type should block the game
-		GemRB.SetVar ("OtherWindow", -1)
-		GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-		GUICommonWindows.SetSelectionChangeHandler (None)
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIMAP", WIDTH, HEIGHT)
-	MapWindow = Window = GemRB.LoadWindow (2)
-	#this window type blocks the game normally, but map window doesn't
-	GemRB.SetVar ("OtherWindow", MapWindow.ID)
-	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	GUICommonWindows.MarkMenuButton (OptionsWindow)
-	GUICommonWindows.SetupMenuWindowControls (OptionsWindow, GameCheck.IsIWD2(), OpenMapWindow)
-	OptionsWindow.SetFrame ()
+def InitMapWindow (Window):
+	global MapWindow
+	MapWindow = Window
 
 	# World Map
+	def OpenWorldMap():
+		GemRB.SetVar("Travel", -1)
+		OpenTravelWindow()
+
 	Button = Window.GetControl (1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindowInside)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMap)
 
 	# Hide or Show mapnotes
 	if HasMapNotes ():
 		Button = Window.GetControl (3)
 		Button.SetFlags (IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		# Is this an option?
-		GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Button.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 		Label = Window.GetControl (0x10000003)
@@ -211,95 +97,129 @@ def OpenMapWindow ():
 
 	# Map Control
 	if GameCheck.IsBG2() or GameCheck.IsIWD2():
-		Window.CreateMapControl (2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+		Map = Window.ReplaceSubview(2, IE_GUI_MAP, Label)
 	else:
-		Window.CreateMapControl (2, 0, 0, 0, 0)
-	Map = Window.GetControl (2)
+		Map = Window.ReplaceSubview(2, IE_GUI_MAP)
+
+	Map.SetAction(lambda: Window.Close(), IE_ACT_MOUSE_PRESS, GEM_MB_ACTION, 0, 2)
+
 	if HasMapNotes ():
 		Map.SetVarAssoc ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 		Map.SetEvent (IE_GUI_MAP_ON_RIGHT_PRESS, AddNoteWindow)
-	Map.SetEvent (IE_GUI_MAP_ON_DOUBLE_PRESS, LeftDoublePressMap)
+		Map.SetStatus (IE_GUI_MAP_VIEW_NOTES)
 
-	OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	PortraitWindow.SetVisible (WINDOW_VISIBLE)
-	Window.SetVisible (WINDOW_VISIBLE)
-	if HasMapNotes ():
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED | IE_GUI_MAP_VIEW_NOTES)
-	else:
-		Map.SetStatus (IE_GUI_CONTROL_FOCUSED)
+	Map.Focus()
 
-	# create a button so we can map it do ESC for quit exiting
-	Button = Window.CreateButton (99, 0, 0, 1, 1)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	GUICommonWindows.SetSelectionChangeHandler(None)
 	return
+	
+def InitWorldMapWindow (Window):
+	global WorldMapControl
+
+	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
+
+	if GameCheck.IsBG2():
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")
+	elif GameCheck.IsBG1():
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", 1, True)
+	else:
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont")
+
+	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
+	WorldMapControl.SetAnimation ("WMDAG")
+	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
+	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
+	# center on current area
+	MapC()
+
+	if not GameCheck.IsIWD2():
+		#north
+		Button = Window.GetControl (1)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
+		Button.SetActionInterval (200)
+
+		#south
+		Button = Window.GetControl (2)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
+		Button.SetActionInterval (200)
+
+	if GameCheck.IsBG2():
+		#northwest
+		Button = Window.GetControl (8)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
+		Button.SetActionInterval (200)
+
+		#northeast
+		Button = Window.GetControl (9)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
+		Button.SetActionInterval (200)
+
+		#west
+		Button = Window.GetControl (10)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
+		Button.SetActionInterval (200)
+
+		#center
+		Button = Window.GetControl (11)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
+		Button.SetActionInterval (200)
+
+		#east
+		Button = Window.GetControl (12)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
+		Button.SetActionInterval (200)
+
+		#southwest
+		Button = Window.GetControl (13)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
+		Button.SetActionInterval (200)
+
+		#southeast
+		Button = Window.GetControl (14)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
+		Button.SetActionInterval (200)
+
+	# Done
+	Button = Window.GetControl (0)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	Button.SetHotKey('m')
+
+	return
+
+ToggleMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.ToggleWindow, InitMapWindow)
+OpenMapWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIMAP", GUICommonWindows.OpenWindowOnce, InitMapWindow)
+
+WMWID = 2 if GameCheck.IsIWD2 () else 0
+OpenTravelWindow = GUICommonWindows.CreateTopWinLoader(WMWID, "GUIWMAP", GUICommonWindows.OpenWindowOnce, InitWorldMapWindow)
 
 def HasMapNotes ():
 	return GameCheck.IsBG2() or GameCheck.IsIWD2() or GameCheck.IsPST()
 
-def LeftDoublePressMap ():
-	#close the map on doubleclick
-	OpenMapWindow()
-	return
-
-def CloseNoteWindow ():
-	if NoteWindow:
-		NoteWindow.Unload ()
-	MapWindow.SetVisible (WINDOW_VISIBLE)
-	return
-
-def RemoveMapNote ():
-	PosX = GemRB.GetVar ("MapControlX")
-	PosY = GemRB.GetVar ("MapControlY")
-	GemRB.SetMapnote (PosX, PosY, 0, "")
-	CloseNoteWindow ()
-	return
-
-def QueryText ():
-	if not GameCheck.IsIWD2():
-		return  NoteLabel.QueryText ()
-
-	Data = ""
-	row = 0
-	while 1:
-		GemRB.SetVar ("row", row)
-		NoteLabel.SetVarAssoc ("row", row)
-		line = NoteLabel.QueryText ()
-		if len(line)<=0:
-			break
-		Data += line+"\n"
-		row += 1
-	return Data
-
-def SetMapNote ():
-	PosX = GemRB.GetVar ("MapControlX")
-	PosY = GemRB.GetVar ("MapControlY")
-	Text = QueryText ()
-	Color = GemRB.GetVar ("Color")
-	GemRB.SetMapnote (PosX, PosY, Color, Text)
-	CloseNoteWindow ()
-	return
-
-def SetFocusBack ():
-	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	return
-
 def AddNoteWindow ():
-	global NoteWindow, NoteLabel
+	global NoteLabel, MapWindow
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
-	NoteWindow = GemRB.LoadWindow (5)
-	NoteLabel = NoteWindow.GetControl (1)
+	if Text == "":
+		Text = "Note"
+
+	NoteWindow = GemRB.LoadWindow (5, "GUIMAP")
+	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources
-		#0 is the default Scrollbar ID
-		NoteTA = MapWindow.CreateTextArea(100, 0, 0, 0, 0, "NORMAL", IE_FONT_ALIGN_CENTER) # ID/position/size dont matter. we will substitute later
-		NoteLabel = NoteTA.SubstituteForControl(NoteLabel)
+		NoteLabel = NoteWindow.ReplaceSubview(1, IE_GUI_TEXTAREA, "NORMAL")
+		NoteLabel.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+
+		# center relative to map
+		mapframe = MapWindow.GetFrame()
+		noteframe = NoteWindow.GetFrame()
+		noteframe['x'] = mapframe['x'] + mapframe['w']/2 - noteframe['w']/2 - 60
+		noteframe['y'] = mapframe['y'] + mapframe['h']/2 - noteframe['h']/2
+		NoteWindow.SetFrame(noteframe)
 	else:
-		NoteLabel.SetBackground ("")
+		NoteLabel = NoteWindow.GetControl (1)
+		NoteLabel.SetBackground (None)
+
 	NoteLabel.SetText (Text)
 
 	for i in range(8):
@@ -308,44 +228,39 @@ def AddNoteWindow ():
 		Label.SetSprites ("FLAG1", i,0,1,2,0)
 		Label.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		Label.SetVarAssoc ("Color", i)
-		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetFocusBack)
+		Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteLabel.Focus())
+		
+	def SetMapNote (Text):
+		PosX = GemRB.GetVar ("MapControlX")
+		PosY = GemRB.GetVar ("MapControlY")
+		Color = GemRB.GetVar ("Color")
+		GemRB.SetMapnote (PosX, PosY, Color, Text)
+		NoteWindow.Close()
+		return
 
 	#set
 	Label = NoteWindow.GetControl (0)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, SetMapNote)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(NoteLabel.QueryText()))
 	Label.SetText (11973)
-	Label.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Label.MakeDefault()
 
 	#cancel
 	Label = NoteWindow.GetControl (2)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseNoteWindow)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: NoteWindow.Close())
 	Label.SetText (13727)
-	Label.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Label.MakeEscape()
 
 	#remove
 	Label = NoteWindow.GetControl (3)
-	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveMapNote)
+	Label.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: SetMapNote(""))
 	Label.SetText (13957)
 
 	NoteWindow.ShowModal (MODAL_SHADOW_GRAY)
-	NoteLabel.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	return
-
-def OpenWorldMapWindowInside ():
-	global MapWindow
-
-	OpenMapWindow () #closes mapwindow
-	MapWindow = -1
-	print "MapWindow=",MapWindow
-	WorldMapWindowCommon (-1)
-	return
-
-def OpenWorldMapWindow ():
-	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
+	NoteLabel.Focus()
 	return
 
 def ChangeTooltip ():
-	global WorldMapWindow, WorldMapControl
+	global WorldMapControl
 
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
@@ -357,158 +272,40 @@ def ChangeTooltip ():
 	WorldMapControl.SetTooltip (tt)
 	return
 
-def CloseWorldMapWindow ():
-	global WorldMapWindow, WorldMapControl
-	global OldPortraitWindow, OldOptionsWindow
-
-	if WorldMapWindow:
-		WorldMapWindow.Unload ()
-	WorldMapWindow = None
-	WorldMapControl = None
-	if GameCheck.IsIWD2():
-		if PortraitWindow:
-			PortraitWindow.Unload ()
-		if OptionsWindow:
-			OptionsWindow.Unload ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
-	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.UnhideGUI ()
-	return
-
-def WorldMapWindowCommon (Travel):
-	global WorldMapWindow, WorldMapControl
-	global OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (CloseWorldMapWindow):
-		CloseWorldMapWindow ()
-		return
-
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	if GameCheck.IsIWD2():
-		GemRB.LoadWindowPack ("GUIWMAP",800, 600)
-		WorldMapWindow = Window = GemRB.LoadWindow (2)
-	else:
-		GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
-		WorldMapWindow = Window = GemRB.LoadWindow (0)
-
-	#(fuzzie just copied this from the map window code..)
-	GemRB.SetVar ("OtherWindow", WorldMapWindow.ID)
-	Window.SetFrame ()
-	#saving the original portrait window
-	if GameCheck.IsIWD2():
-		OldPortraitWindow = GUICommonWindows.PortraitWindow
-		PortraitWindow = GUICommonWindows.OpenPortraitWindow ()
-		OldOptionsWindow = GUICommonWindows.OptionsWindow
-		OptionsWindow = GemRB.LoadWindow (0)
-		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenMapWindow)
-		OptionsWindow.SetFrame ()
-
-	if GameCheck.IsBG2():
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "floattxt")
-	elif GameCheck.IsBG1():
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "toolfont", 1)
-		WorldMapControl = Window.GetControl (4)
-		WorldMapControl.SetTextColor (IE_GUI_WMAP_COLOR_BACKGROUND, 0xa4, 0x6a, 0x4c, 0x00)
-	else:
-		Window.CreateWorldMapControl (4, 0, 62, 640, 418, Travel, "infofont")
-	WorldMapControl = Window.GetControl (4)
-	WorldMapControl.SetAnimation ("WMDAG")
-	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
-	WorldMapControl.SetEvent (IE_GUI_MOUSE_ENTER_WORLDMAP, ChangeTooltip)
-	# center on current area
-	MapC()
-
-	if not GameCheck.IsIWD2():
-		#north
-		Button = Window.GetControl (1)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapN)
-
-		#south
-		Button = Window.GetControl (2)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapS)
-
-	if GameCheck.IsBG2():
-		#northwest
-		Button = Window.GetControl (8)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNW)
-
-		#northeast
-		Button = Window.GetControl (9)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapNE)
-
-		#west
-		Button = Window.GetControl (10)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapW)
-
-		#center
-		Button = Window.GetControl (11)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapC)
-
-		#east
-		Button = Window.GetControl (12)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapE)
-
-		#southwest
-		Button = Window.GetControl (13)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSW)
-
-		#southeast
-		Button = Window.GetControl (14)
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, MapSE)
-
-	# Done
-	Button = Window.GetControl (0)
-	if Travel>=0:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenWorldMapWindow)
-	else:
-		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMapWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	Window.SetVisible (WINDOW_VISIBLE)
-	WorldMapControl.SetStatus (IE_GUI_CONTROL_FOCUSED)
-	return
-
 def MapN():
-	WorldMapControl.AdjustScrolling (0, -10)
+	WorldMapControl.Scroll (0, -10)
 	return
 
 def MapNE():
-	WorldMapControl.AdjustScrolling (10, -10)
+	WorldMapControl.Scroll (10, -10)
 	return
 
 def MapE():
-	WorldMapControl.AdjustScrolling (10, 0)
+	WorldMapControl.Scroll (10, 0)
 	return
 
 def MapSE():
-	WorldMapControl.AdjustScrolling (10, 10)
+	WorldMapControl.Scroll (10, 10)
 	return
 
 def MapS():
-	WorldMapControl.AdjustScrolling (0, 10)
+	WorldMapControl.Scroll (0, 10)
 	return
 
 def MapSW():
-	WorldMapControl.AdjustScrolling (-10, 10)
+	WorldMapControl.Scroll (-10, 10)
 	return
 
 def MapW():
-	WorldMapControl.AdjustScrolling (-10, 0)
+	WorldMapControl.Scroll (-10, 0)
 	return
 
 def MapNW():
-	WorldMapControl.AdjustScrolling (-10, -10)
+	WorldMapControl.Scroll (-10, -10)
 	return
 
 def MapC():
-	WorldMapControl.AdjustScrolling (0, 0)
+	WorldMapControl.Scroll (0, 0, False)
 	return
 
 ###################################################

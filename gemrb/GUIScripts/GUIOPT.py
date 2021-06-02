@@ -32,7 +32,6 @@
 import CommonWindow
 import GameCheck
 import GemRB
-import GUICommon
 import GUICommonWindows
 import GUISAVE
 import GUIOPTControls
@@ -40,12 +39,7 @@ from GUIDefines import *
 
 ###################################################
 GameOptionsWindow = None # not in PST
-PortraitWindow = None # not in BG1 or PST
-OldPortraitWindow = None #not in BG1 or PST
-OptionsWindow = None
-OldOptionsWindow = None
 HelpTextArea = None
-PauseState = None
 
 LoadMsgWindow = None
 QuitMsgWindow = None
@@ -58,81 +52,17 @@ else:
 	# just an alias to keep our logic from being plagued by too many GameCheck.IsBG1() checks
 	HelpTextArea2 = HelpTextArea
 
-if GameCheck.IsIWD2():
-	WIDTH = 800
-	HEIGHT = 600
-else:
-	WIDTH = 640
-	HEIGHT = 480
-
 ###################################################
-def CloseOptionsWindow ():
-	global GameOptionsWindow, OptionsWindow, PortraitWindow, PauseState
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GameOptionsWindow == None:
-		return
-
-	if GameOptionsWindow:
-		GameOptionsWindow.Unload ()
-	if OptionsWindow:
-		OptionsWindow.Unload ()
-	if PortraitWindow:
-		PortraitWindow.Unload ()
-
-	GameOptionsWindow = None
-	GemRB.SetVar ("OtherWindow", -1)
-	GUICommon.GameWindow.SetVisible(WINDOW_VISIBLE)
-	GemRB.UnhideGUI ()
-	GUICommonWindows.OptionsWindow = OldOptionsWindow
-	OldOptionsWindow = None
-	if not GameCheck.IsBG1():
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-
-	GemRB.GamePause (PauseState, 3)
-	return
-
-###################################################
-def OpenOptionsWindow ():
+def InitOptionsWindow (Window):
 	"""Open main options window"""
 
-	global GameOptionsWindow, OptionsWindow, PortraitWindow, PauseState
-	global OldPortraitWindow, OldOptionsWindow
-
-	if GUICommon.CloseOtherWindow (OpenOptionsWindow):
-		CloseOptionsWindow()
-		return
-
-	PauseState = GemRB.GamePause (3, 1)
-	GemRB.GamePause (1, 3)
-
 	CommonWindow.CloseContainerWindow ()
-	GemRB.HideGUI ()
-	GUICommon.GameWindow.SetVisible(WINDOW_INVISIBLE)
-
-	GemRB.LoadWindowPack ("GUIOPT", WIDTH, HEIGHT)
-	GameOptionsWindow = Window = GemRB.LoadWindow (2)
-	GemRB.SetVar ("OtherWindow", GameOptionsWindow.ID)
-
-	if OldOptionsWindow == None:
-		# OptionsWindow is the leftmost menu bar window present in most of the games
-		OldOptionsWindow = GUICommonWindows.OptionsWindow
-		OptionsWindow = GemRB.LoadWindow (0)
-		GUICommonWindows.MarkMenuButton (OptionsWindow)
-		GUICommonWindows.SetupMenuWindowControls (OptionsWindow, 0, OpenOptionsWindow)
-		OptionsWindow.SetFrame ()
-		if not GameCheck.IsBG1(): #not in PST either, but it has its own OpenOptionsWindow()
-			OptionsWindow.SetFrame ()
-			#saving the original portrait window
-			OldPortraitWindow = GUICommonWindows.PortraitWindow
-			PortraitWindow = GUICommonWindows.OpenPortraitWindow (0)
 
 	# Return to Game
 	Button = Window.GetControl (11)
 	Button.SetText (10308)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenOptionsWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
+	Button.MakeEscape()
 
 	# Quit Game
 	Button = Window.GetControl (10)
@@ -142,7 +72,7 @@ def OpenOptionsWindow ():
 	# Load Game
 	Button = Window.GetControl (5)
 	Button.SetText (13729)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
 
 	# Save Game
 	Button = Window.GetControl (6)
@@ -179,9 +109,10 @@ def OpenOptionsWindow ():
 		MoviesButton.SetText (15415)
 		MoviesButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMovieWindow)
 
-	RestoreWinVisibility ()
-
 	return
+
+ToggleOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.ToggleWindow, InitOptionsWindow)
+OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWindows.OpenWindowOnce, InitOptionsWindow)
 
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
@@ -200,7 +131,8 @@ def OpenVideoOptionsWindow ():
 	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('VideoOptions', Window, 33, 18038)
 
@@ -265,7 +197,8 @@ def OpenAudioOptionsWindow ():
 	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (7)
+	Window = GemRB.LoadWindow (7, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea = GUIOPTControls.OptHelpText ('AudioOptions', Window, 14, 18040)
 
 	GUIOPTControls.OptDone (CloseAudioOptionsWindow, Window, 24)
@@ -306,7 +239,8 @@ def OpenCharacterSoundsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (12)
+	Window = GemRB.LoadWindow (12, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('CharacterSounds', Window, 16, 18041)
 
 	GUIOPTControls.OptDone (CloseCharacterSoundsWindow, Window, 24)
@@ -350,7 +284,8 @@ def OpenGameplayOptionsWindow ():
 	CloseSubOptionsWindow ()
 
 	#gameplayoptions
-	Window = GemRB.LoadWindow (8)
+	Window = GemRB.LoadWindow (8, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	HelpTextArea = GUIOPTControls.OptHelpText ('GameplayOptions', Window, 40, 18042)
 
@@ -364,9 +299,8 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptSlider (18042, 18020, HelpTextArea, Window, 12, 24, 13911, 'Difficulty Level', None, 0)
 	if GemRB.GetVar ("Nightmare Mode") == 1:
 		# lock the slider
-#		Slider = Window.GetControl (12)
-#		Slider.SetDisabled (True)
-		pass
+		Slider = Window.GetControl (12)
+		Slider.SetDisabled (True)
 
 	GUIOPTControls.OptCheckbox (18042, 18021, HelpTextArea, Window, 14, 25, 13697, 'Always Dither')
 	GUIOPTControls.OptCheckbox (18042, 18023, HelpTextArea, Window, 19, 27, 17182, 'Gore')
@@ -374,7 +308,7 @@ def OpenGameplayOptionsWindow ():
 	GUIOPTControls.OptCheckbox (18042, 20619, HelpTextArea, Window, 47, 46, 20618, 'Weather')
 	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18042, 2242, HelpTextArea, Window, 50, 48, 2241, 'Heal Party on Rest')
-	elif GameCheck.IsIWD2() or GameCheck.IsIWD():
+	elif GameCheck.IsIWD2() or GameCheck.IsIWD1():
 		GUIOPTControls.OptCheckbox (18042, 15136, HelpTextArea, Window, 50, 49, 17378, 'Maximum HP')
 
 	GUIOPTControls.OptButton (OpenFeedbackOptionsWindow, Window, 5, 17163)
@@ -409,7 +343,9 @@ def OpenFeedbackOptionsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (9)
+	Window = GemRB.LoadWindow (9, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
+
 	# same as HelpTextArea if not BG1
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('FeedbackOptions', Window, 28, 18043)
 
@@ -457,7 +393,9 @@ def OpenAutopauseOptionsWindow ():
 	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
-	Window = GemRB.LoadWindow (10)
+	Window = GemRB.LoadWindow (10, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
+
 	HelpTextArea2 = GUIOPTControls.OptHelpText ('AutopauseOptions', Window, 15, 18044)
 
 	GUIOPTControls.OptDone (CloseAutopauseOptionsWindow, Window, 11)
@@ -476,7 +414,7 @@ def OpenAutopauseOptionsWindow ():
 		GUIOPTControls.OptCheckbox (18044, 18560, HelpTextArea2, Window, 26, 28, 16519, 'Auto Pause State', None, 256) # trap found
 		GUIOPTControls.OptCheckbox (18044, 26311, HelpTextArea2, Window, 36, 37, 26310, 'Auto Pause State', None, 512) # spell cast
 		GUIOPTControls.OptCheckbox (18044, 24888, HelpTextArea2, Window, 33, 34, 10574, 'Auto Pause Center', None, 1)
-	elif not GameCheck.IsIWD1() and Window.HasControl (26, IE_GUI_BUTTON):
+	elif not GameCheck.IsIWD1() and Window.GetControl (26):
 		GUIOPTControls.OptCheckbox (18044, 23514, HelpTextArea2, Window, 26, 27, 23516, 'Auto Pause State', None, 128) # enemy sighted
 	if GameCheck.IsBG2():
 		GUIOPTControls.OptCheckbox (18044, 58171, HelpTextArea2, Window, 31, 30, 31875, 'Auto Pause State', None, 512) # spell cast
@@ -493,23 +431,14 @@ def OpenAutopauseOptionsWindow ():
 def MoviePlayPress():
 	movie = MoviesTable.GetRowName (GemRB.GetVar ("MovieIndex"))
 	GemRB.PlayMovie (movie, 1)
-	SubOptionsWindow.Invalidate ()
-
-def MovieCreditsPress():
-	GemRB.PlayMovie("CREDITS")
-	SubOptionsWindow.Invalidate()
-	return
 
 # for iwd2 only, the rest use GUIMOVIE
 # TODO: investigate a merger, so it can get removed from GUIOPT
 def OpenMovieWindow ():
 	global SubOptionsWindow, TextAreaControl, MoviesTable
 
-	GemRB.LoadWindowPack("GUIMOVIE", 800, 600)
-	SubOptionsWindow = Window = GemRB.LoadWindow(2)
-	Window.SetFrame ()
-	#reloading the guiopt windowpack
-	GemRB.LoadWindowPack ("GUIOPT", 800, 600)
+	SubOptionsWindow = Window = GemRB.LoadWindow(2, "GUIMOVIE")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 	TextAreaControl = Window.GetControl(0)
 	PlayButton = Window.GetControl(2)
 	CreditsButton = Window.GetControl(3)
@@ -521,7 +450,7 @@ def OpenMovieWindow ():
 	CreditsButton.SetText(15591)
 	DoneButton.SetText(11973)
 	PlayButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MoviePlayPress)
-	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MovieCreditsPress)
+	CreditsButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.PlayMovie("CREDITS"))
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, CloseSubOptionsWindow)
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
@@ -548,14 +477,6 @@ def CloseSubSubOptionsWindow ():
 		SubOptionsWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def RestoreWinVisibility ():
-	if OptionsWindow:
-		OptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if GameOptionsWindow:
-		GameOptionsWindow.SetVisible (WINDOW_VISIBLE)
-	if PortraitWindow:
-		PortraitWindow.SetVisible (WINDOW_VISIBLE)
-
 ###################################################
 
 def OpenSaveMsgWindow ():
@@ -566,53 +487,7 @@ def OpenSaveMsgWindow ():
 
 ###################################################
 
-def OpenLoadMsgWindow ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		return
-
-	LoadMsgWindow = Window = GemRB.LoadWindow (4)
-
-	# Load
-	Button = Window.GetControl (0)
-	Button.SetText (15590)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, LoadGamePress)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-
-	# Cancel
-	Button = Window.GetControl (1)
-	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseLoadMsgWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
-
-	# Loading a game will destroy ...
-	Text = Window.GetControl (3)
-	Text.SetText (19531)
-
-	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CloseLoadMsgWindow ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		LoadMsgWindow.Unload ()
-	LoadMsgWindow = None
-
-	RestoreWinVisibility ()
-
-	return
-
 def LoadGamePress ():
-	global LoadMsgWindow
-
-	if LoadMsgWindow:
-		LoadMsgWindow.Unload ()
-	LoadMsgWindow = None
-	GemRB.QuitGame ()
-	GemRB.SetVar ("SelectedWindow", 0)
-	OpenOptionsWindow ()
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
@@ -621,7 +496,6 @@ def SaveGamePress ():
 	CloseQuitMsgWindow()
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
-	CloseOptionsWindow ()
 	GUISAVE.OpenSaveWindow ()
 	return
 
@@ -634,7 +508,6 @@ def QuitGamePress ():
 	CloseQuitMsgWindow()
 
 	GemRB.QuitGame ()
-	OpenOptionsWindow()
 	GemRB.SetNextScript ("Start")
 	return
 
@@ -646,37 +519,35 @@ def OpenQuitMsgWindow ():
 	if QuitMsgWindow:
 		return
 
-	QuitMsgWindow = Window = GemRB.LoadWindow (5)
+	QuitMsgWindow = Window = GemRB.LoadWindow (5, "GUIOPT")
+	Window.SetFlags (WF_BORDERLESS, OP_OR)
 
 	# Save
 	Button = Window.GetControl (0)
 	Button.SetText (15589)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, SaveGamePress)
+	if GemRB.GetView("GC") is not None:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
 
 	# Quit Game
 	Button = Window.GetControl (1)
 	Button.SetText (15417)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, QuitGamePress)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (2)
 	Button.SetText (GUIOPTControls.STR_OPT_CANCEL)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelQuitMsgWindow)
-	Button.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseQuitMsgWindow)
+	Button.MakeEscape()
 
 	# Do you wish to save the game ....
 	Text = Window.GetControl (3)
 	Text.SetText (16456)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
-	return
-
-def CancelQuitMsgWindow ():
-	CloseQuitMsgWindow()
-
-	RestoreWinVisibility ()
-
 	return
 
 def CloseQuitMsgWindow ():

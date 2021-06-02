@@ -33,30 +33,28 @@ Label::Label(const Region& frame, Font* font, const String& string)
 {
 	ControlType = IE_GUI_LABEL;
 	this->font = font;
-	useRGB = false;
-	ResetEventHandler( LabelOnPress );
-	palette = NULL;
 
 	SetAlignment(IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE);
+	SetFlags(IgnoreEvents, OP_OR);
 	SetText(string);
 }
 
-Label::~Label()
-{
-	gamedata->FreePalette( palette );
-}
 /** Draws the Control on the Output Display */
-void Label::DrawInternal(Region& rgn)
+void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
-		font->Print( rgn, Text, useRGB ? palette: NULL, Alignment);
+		if (flags & UseColor) {
+			font->Print(rgn, Text, Alignment, colors);
+		} else {
+			font->Print(rgn, Text, Alignment);
+		}
 	}
 
 	if (AnimPicture) {
-		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
-		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
-		core->GetVideoDriver()->BlitSprite( AnimPicture, r.x + xOffs, r.y + yOffs, true, &r );
+		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
+		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
+		Region r( rgn.x + xOffs, rgn.y + yOffs, (int)(AnimPicture->Frame.w), AnimPicture->Frame.h );
+		core->GetVideoDriver()->BlitSprite(AnimPicture, r.Origin(), &r );
 	}
 
 }
@@ -68,25 +66,22 @@ void Label::SetText(const String& string)
 		&& core->HasFeature( GF_LOWER_LABEL_TEXT )) {
 		StringToLower(Text);
 	}
-	if (!palette) {
-		SetColor(ColorWhite, ColorBlack);
-	}
 	MarkDirty();
 }
-/** Sets the Foreground Font Color */
-void Label::SetColor(Color col, Color bac)
+
+void Label::SetColors(const Color& col, const Color& bg)
 {
-	gamedata->FreePalette( palette );
-	palette = new Palette( col, bac );
+	colors.fg = col;
+	colors.bg = bg;
 	MarkDirty();
 }
 
 void Label::SetAlignment(unsigned char Alignment)
 {
-	if (!font || Height <= font->LineHeight) {
+	if (!font || frame.h <= font->LineHeight) {
 		// FIXME: is this a poor way of determinine if we are single line?
 		Alignment |= IE_FONT_SINGLE_LINE;
-	} else if (Height < font->LineHeight * 2) {
+	} else if (frame.h < font->LineHeight * 2) {
 		Alignment |= IE_FONT_NO_CALC;
 	}
 	this->Alignment = Alignment;
@@ -96,33 +91,6 @@ void Label::SetAlignment(unsigned char Alignment)
 		}
 	}
 	MarkDirty();
-}
-
-void Label::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned short /*Button*/, unsigned short /*Mod*/)
-{
-	//print("Label::OnMouseUp");
-	if (( x <= Width ) && ( y <= Height )) {
-		if (VarName[0] != 0) {
-			core->GetDictionary()->SetAt( VarName, Value );
-		}
-		if (LabelOnPress) {
-			RunEventHandler( LabelOnPress );
-		}
-	}
-}
-
-bool Label::SetEvent(int eventType, ControlEventHandler handler)
-{
-	switch (eventType) {
-	case IE_GUI_LABEL_ON_PRESS:
-		LabelOnPress = handler;
-		break;
-	default:
-		return false;
-	}
-
-	return true;
 }
 
 /** Simply returns the pointer to the text, don't modify it! */

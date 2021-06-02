@@ -30,18 +30,17 @@ Window = None
 def OnLoad ():
 	global Table, Picture, Window
 	
-	GemRB.LoadWindowPack("demoend", 640, 480)
-	Window = GemRB.LoadWindow(0)
-	Window.SetFrame()
+	Window = GemRB.LoadWindow(0, "demoend")
 	Picture = 0
 	Table = GemRB.LoadTable ("splashsc")
 	resref = Table.GetValue (Picture,0)
 	Button = Window.GetControl (0)
-	Button.SetFlags (IE_GUI_BUTTON_DEFAULT|IE_GUI_BUTTON_CANCEL|IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, OP_SET)
+	Button.MakeDefault()
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, NextPress)
 	Button.SetPicture (resref)
-	Window.SetVisible (WINDOW_VISIBLE)
+	Window.Focus()
 	return
 	
 def NextPress ():

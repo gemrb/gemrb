@@ -28,14 +28,12 @@ ReviewWindow = 0
 
 def OnLoad ():
 	global PartyFormationWindow
-	GemRB.LoadWindowPack ("GUISP", 800, 600)
 
-	PartyFormationWindow = GemRB.LoadWindow (0)
-	PartyFormationWindow.SetFrame ( )
+	PartyFormationWindow = GemRB.LoadWindow (0, "GUISP")
 	ExitButton = PartyFormationWindow.GetControl (30)
 	ExitButton.SetText (13906)
 	ExitButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	ExitButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	ModifyCharactersButton = PartyFormationWindow.GetControl (43)
 	ModifyCharactersButton.SetText (18816)
@@ -44,7 +42,7 @@ def OnLoad ():
 
 	DoneButton = PartyFormationWindow.GetControl (28)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	Portraits = 0
 
@@ -53,7 +51,7 @@ def OnLoad ():
 		#removing this label, it just disturbs us
 		Label.SetSize (0, 0)
 		Button = PartyFormationWindow.GetControl (i-12)
-		ResRef = GemRB.GetPlayerPortrait (i-17, 1)
+		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
 		if ResRef == "":
 			Button.SetFlags (IE_GUI_BUTTON_NORMAL,OP_SET)
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GeneratePress)
@@ -78,15 +76,14 @@ def OnLoad ():
 		DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	else:
 		DoneButton.SetState (IE_GUI_BUTTON_ENABLED)
-		DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+		DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.ShowModal (MODAL_SHADOW_NONE)
 	return
 
 def ExitPress ():
 	global PartyFormationWindow, ExitWindow
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
 	ExitWindow = GemRB.LoadWindow (7)
 
 	TextArea = ExitWindow.GetControl (0)
@@ -94,15 +91,15 @@ def ExitPress ():
 
 	CancelButton = ExitWindow.GetControl (2)
 	CancelButton.SetText (13727)
-	CancelButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
 
 	DoneButton = ExitWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
 
-	ExitWindow.SetVisible (WINDOW_VISIBLE)
+	ExitWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ExitDonePress ():
@@ -118,7 +115,7 @@ def ExitCancelPress ():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
 		ExitWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def GeneratePress ():
@@ -136,13 +133,12 @@ def EnterGamePress ():
 def ReviewPress ():
 	global PartyFormationWindow, ReviewWindow
 
-	PartyFormationWindow.SetVisible (WINDOW_INVISIBLE)
-	ReviewWindow = GemRB.LoadWindow (8)
+	ReviewWindow = GemRB.LoadWindow (8, "GUISP")
 
 	DoneButton = ReviewWindow.GetControl (1)
 	DoneButton.SetText (11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
-	DoneButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	DoneButton.MakeDefault()
+	DoneButton.MakeEscape()
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, ReviewDonePress)
 
 	LeftTextArea = ReviewWindow.GetControl (2)
@@ -153,7 +149,7 @@ def ReviewPress ():
 	GUIREC.DisplayGeneral (MyChar, LeftTextArea)
 	GUIREC.DisplaySkills (MyChar, RightTextArea)
 
-	ReviewWindow.SetVisible (WINDOW_VISIBLE)
+	ReviewWindow.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def ReviewDonePress ():
@@ -161,6 +157,6 @@ def ReviewDonePress ():
 
 	if ReviewWindow:
 		ReviewWindow.Unload ()
-	PartyFormationWindow.SetVisible (WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 

@@ -692,7 +692,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 	}
 
 	if (!(critter.Flags&CF_IGNORECANSEE)) {
-		if (map->IsVisible(critter.SpawnPoint, false) ) {
+		if (map->IsVisible(critter.SpawnPoint)) {
 			return;
 		}
 	}

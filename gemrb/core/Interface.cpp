@@ -20,7 +20,6 @@
 
 #include "Interface.h"
 
-#include "defsounds.h" // for DS_TOOLTIP
 #include "exports.h"
 #include "globals.h"
 #include "strrefs.h"
@@ -40,9 +39,7 @@
 #include "Factory.h"
 #include "FontManager.h"
 #include "Game.h"
-#include "GameData.h"
-#include "GlobalTimer.h"
-#include "ImageMgr.h"
+#include "GameScript/GameScript.h"
 #include "ItemMgr.h"
 #include "KeyMap.h"
 #include "MapMgr.h"
@@ -55,7 +52,6 @@
 #include "ProjectileServer.h"
 #include "SaveGameIterator.h"
 #include "SaveGameMgr.h"
-#include "ScriptEngine.h"
 #include "ScriptedAnimation.h"
 #include "SoundMgr.h"
 #include "SpellMgr.h"
@@ -65,22 +61,21 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 #include "Video.h"
-#include "WindowMgr.h"
 #include "WorldMapMgr.h"
-#include "GameScript/GameScript.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"
 #include "GUI/EventMgr.h"
 #include "GUI/GameControl.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Label.h"
 #include "GUI/MapControl.h"
 #include "GUI/TextArea.h"
-#include "GUI/Window.h"
+#include "GUI/WindowManager.h"
 #include "GUI/WorldMapControl.h"
 #include "RNG.h"
 #include "Scriptable/Container.h"
 #include "System/FileStream.h"
-#include "System/VFS.h"
+#include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 
 #include <vector>
@@ -116,29 +111,38 @@ static ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
 
-Interface::Interface()
-{
-	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
+// FIXME: DragOp should be initialized with the button we are dragging from
+// for now use a dummy until we truly implement this as a drag event
+Control ItemDragOp::dragDummy = Control(Region());
 
-	// default to the correct endianswitch
-	ieWord endiantest = 1;
-	if (((char *)&endiantest)[1] == 1) {
-		// big-endian
-		DataStream::SetEndianSwitch(true);
+ItemDragOp::ItemDragOp(CREItem* item)
+: ControlDragOp(&dragDummy), item(item) {
+	Item* i = gamedata->GetItem(item->ItemResRef);
+	assert(i);
+	Holder<Sprite2D> pic = gamedata->GetAnySprite(i->ItemIcon, -1, 1);
+	if (pic == nullptr) {
+		// use any / the smaller icon if the dragging one is unavailable
+		pic = gamedata->GetBAMSprite(i->ItemIcon, -1, 0);
 	}
 
+	cursor = pic;
+	
+	// FIXME: this VarName is not consistant
+	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
+}
+
+Interface::Interface()
+{
 	unsigned int i;
 	for(i=0;i<256;i++) {
 		pl_uppercase[i]=(ieByte) toupper(i);
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
+	winmgr = NULL;
 	projserv = NULL;
 	VideoDriverName = "sdl";
 	AudioDriverName = "openal";
-	vars = NULL;
-	tokens = NULL;
-	lists = NULL;
 	RtRows = NULL;
 	sgiterator = NULL;
 	game = NULL;
@@ -148,39 +152,16 @@ Interface::Interface()
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
 	UseContainer = false;
-	InfoTextPalette = NULL;
-	timer = NULL;
 	displaymsg = NULL;
-	evntmgr = NULL;
-	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
 
-	ModalWindow = NULL;
-	modalShadow = MODAL_SHADOW_NONE;
-
-	tooltip_x = 0;
-	tooltip_y = 0;
-	tooltip_currtextw = 0;
-	tooltip_ctrl = NULL;
-	plugin_flags = NULL;
-
-	pal16 = NULL;
-	pal32 = NULL;
-	pal256 = NULL;
-
-	GUIEnhancements = 0;
 	UseCorruptedHack = false;
-
-	CursorCount = 0;
-	Cursors = NULL;
 
 	mousescrollspd = 10;
 
 	GameType[0] = '\0';
-	ConsolePopped = false;
 	CheatFlag = false;
-	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
 	EventFlag = EF_CONTROL;
 #ifndef WIN32
@@ -188,14 +169,12 @@ Interface::Interface()
 #else
 	CaseSensitive = false;
 #endif
-	TouchScrollAreas = false;
 	UseSoftKeyboard = false;
 	KeepCache = false;
 	NumFingInfo = 2;
 	NumFingKboard = 3;
 	NumFingScroll = 2;
 	MouseFeedback = 0;
-	TooltipDelay = 100;
 	IgnoreOriginalINI = 0;
 	GUIScriptsPath[0] = 0;
 	GamePath[0] = 0;
@@ -216,28 +195,20 @@ Interface::Interface()
 
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 
-	CopyResRef( GlobalScript, "BALDUR" );
-	CopyResRef( WorldMapName[0], "WORLDMAP" );
-	CopyResRef( WorldMapName[1], "" );
+	GlobalScript = "BALDUR";
+	WorldMapName[0] = "WORLDMAP";
 
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		CopyResRef(GroundCircleBam[size], "");
 		GroundCircleScale[size] = 0;
 	}
 
-	TooltipMargin = 10;
-
-	TooltipBack = NULL;
-	DraggedItem = NULL;
-	DraggedPortrait = 0;
+	TooltipBG = NULL;
 	DefSound = NULL;
 	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
 	//GameFeatures2 = 0;
-	memset( WindowFrames, 0, sizeof( WindowFrames ));
-	memset( GroundCircles, 0, sizeof( GroundCircles ));
-	memset(FogSprites, 0, sizeof( FogSprites ));
 	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
@@ -278,12 +249,22 @@ Interface::Interface()
 	SaveAsOriginal = 1;
 
 	gamedata = new GameData();
-}
 
-//2da lists are ieDword lists allocated by malloc
-static void Release2daList(void *poi)
-{
-	free( (ieDword *) poi);
+	//once GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
+
+	plugin_flags = new Variables();
+	plugin_flags->SetType( GEM_VARIABLES_INT );
+
+	lists = new Variables();
+	lists->SetType( GEM_VARIABLES_POINTER );
+
+	vars = new Variables();
+	vars->SetType( GEM_VARIABLES_INT );
+	vars->ParseKey(true);
+
+	tokens = new Variables();
+	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
 static void ReleaseItemList(void *poi)
@@ -293,38 +274,18 @@ static void ReleaseItemList(void *poi)
 
 static void FreeAbilityTables()
 {
-	if (strmod) {
-		free(strmod);
-	}
-	strmod = NULL;
-	if (strmodex) {
-		free(strmodex);
-	}
-	strmodex = NULL;
-	if (intmod) {
-		free(intmod);
-	}
-	intmod = NULL;
-	if (dexmod) {
-		free(dexmod);
-	}
-	dexmod = NULL;
-	if (conmod) {
-		free(conmod);
-	}
-	conmod = NULL;
-	if (chrmod) {
-		free(chrmod);
-	}
-	chrmod = NULL;
-	if (lorebon) {
-		free(lorebon);
-	}
-	lorebon = NULL;
-	if (wisbon) {
-		free(wisbon);
-	}
-	wisbon = NULL;
+#define NULL_FREE(ptr)\
+	free(ptr); ptr = NULL;
+
+	NULL_FREE(strmod);
+	NULL_FREE(strmodex);
+	NULL_FREE(intmod);
+	NULL_FREE(dexmod);
+	NULL_FREE(conmod);
+	NULL_FREE(chrmod);
+	NULL_FREE(lorebon);
+	NULL_FREE(wisbon);
+#undef NULL_FREE
 }
 
 void Interface::FreeResRefTable(ieResRef *&table, int &count)
@@ -337,13 +298,16 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 Interface::~Interface(void)
 {
-	DragItem(NULL,NULL);
+	WindowManager::CursorMouseUp = NULL;
+	WindowManager::CursorMouseDown = NULL;
+
+	delete winmgr;
+
 	delete AreaAliasTable;
 
-	AudioDriver.release();
-
 	//destroy the highest objects in the hierarchy first!
-	assert (game == nullptr);
+	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
+	assert(game == nullptr);
 	delete calendar;
 	delete worldmap;
 	delete keymap;
@@ -384,17 +348,6 @@ Interface::~Interface(void)
 
 	delete sgiterator;
 
-	if (Cursors) {
-		for (int i = 0; i < CursorCount; i++) {
-			Sprite2D::FreeSprite( Cursors[i] );
-		}
-		delete[] Cursors;
-	}
-
-	std::vector<Window*>::iterator wit = windows.begin();
-	for (; wit != windows.end(); ++wit) \
-		delete *wit;
-
 	size_t i;
 	for (i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
@@ -406,53 +359,13 @@ Interface::~Interface(void)
 
 	delete projserv;
 
-	delete console;
-
-	delete pal256;
-	delete pal32;
-	delete pal16;
-
-	delete timer;
 	delete displaymsg;
-
-	if (video) {
-
-		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			Sprite2D::FreeSprite(FogSprites[i]);
-		}
-
-		for(i=0;i<4;i++) {
-			Sprite2D::FreeSprite(WindowFrames[i]);
-		}
-
-		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-			for(i=0;i<6;i++) {
-				Sprite2D::FreeSprite(GroundCircles[size][i]);
-			}
-		}
-
-		if (TooltipBack) {
-			for(i=0;i<3;i++) {
-				//freesprite checks for null pointer
-				Sprite2D::FreeSprite(TooltipBack[i]);
-			}
-			delete[] TooltipBack;
-		}
-		if (InfoTextPalette) {
-			gamedata->FreePalette(InfoTextPalette);
-		}
-
-		video->SetCursor(NULL, VID_CUR_DRAG);
-		video->SetCursor(NULL, VID_CUR_UP);
-		video->SetCursor(NULL, VID_CUR_DOWN);
-	}
-
-	delete evntmgr;
+	delete TooltipBG;
 
 	delete vars;
 	delete tokens;
 	if (lists) {
-		lists->RemoveAll(Release2daList);
+		lists->RemoveAll(free);
 		delete lists;
 	}
 
@@ -470,40 +383,18 @@ Interface::~Interface(void)
 
 	// Removing all stuff from Cache, except bifs
 	if (!KeepCache) DelTree((const char *) CachePath, true);
-
-	video.release();
-}
-
-void Interface::SetWindowFrame(int i, Sprite2D *Picture)
-{
-	Sprite2D::FreeSprite(WindowFrames[i]);
-	WindowFrames[i]=Picture;
 }
 
 GameControl* Interface::StartGameControl()
 {
-	//making sure that our window is the first one
-	if (ConsolePopped) {
-		PopupConsole();
-	}
-	DelAllWindows();//deleting ALL windows
-	gamedata->DelTable(0xffffu); //dropping ALL tables
-	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
-	gamewin->WindowPack[0]=0;
-	GameControl* gc = new GameControl(Region(0, 0, Width, Height));
-	gc->ControlID = 0x00000000;
-	gc->ControlType = IE_GUI_GAMECONTROL;
-	gamewin->AddControl( gc );
-	AddWindow( gamewin );
-	SetVisible( 0, WINDOW_VISIBLE );
-	//setting the focus to the game control
-	evntmgr->SetFocused(gamewin, gc);
-	if (guiscript->LoadScript( "MessageWindow" )) {
-		guiscript->RunFunction( "MessageWindow", "OnLoad" );
-		gc->SetGUIHidden(false);
-	}
+	assert(gamectrl == nullptr);
 
-	return gc;
+	gamedata->DelTable(0xffffu); //dropping ALL tables
+	Region screen(0,0, Width, Height);
+	gamectrl = new GameControl(screen);
+	gamectrl->AssignScriptingRef(0, "GC");
+
+	return gamectrl;
 }
 
 /* handle main loop events that might destroy or create windows
@@ -512,11 +403,6 @@ these events are pending until conditions are right
 */
 void Interface::HandleEvents()
 {
-	GameControl *gc = GetGameControl();
-	if (gc && (!gc->Owner || !gc->Owner->Visible)) {
-		gc=NULL;
-	}
-
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
 		guiscript->RunFunction( "GUICommonWindows", "SelectionChanged", false);
@@ -528,31 +414,34 @@ void Interface::HandleEvents()
 	}
 
 	if (EventFlag&EF_PORTRAIT) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "PortraitWindow", tmp );
-		if (tmp != (ieDword) ~0) {
-			EventFlag&=~EF_PORTRAIT;
+		EventFlag&=~EF_PORTRAIT;
+
+		Window* win = GetWindow(0, "PORTWIN");
+		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 		}
 	}
 
 	if (EventFlag&EF_ACTION) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "ActionsWindow", tmp );
-		if (tmp != (ieDword) ~0) {
-			EventFlag&=~EF_ACTION;
+		EventFlag&=~EF_ACTION;
+
+		Window* win = GetWindow(0, "ACTWIN");
+		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdateActionsWindow" );
 		}
 	}
 
-	if ((EventFlag&EF_CONTROL) && gc) {
+	if (EventFlag&EF_CONTROL) {
+		// handle this before clearing EF_CONTROL
+		// otherwise we do this every frame
+		ToggleViewsVisible(!(game->ControlStatus & CS_HIDEGUI), "HIDE_CUT");
+
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "MessageWindow", "UpdateControlStatus" );
-		//this is the only value we can use here
-		gc->SetGUIHidden(game->ControlStatus & CS_HIDEGUI);
+
 		return;
 	}
-	if ((EventFlag&EF_SHOWMAP) && gc) {
+	if (EventFlag&EF_SHOWMAP) {
 		ieDword tmp = (ieDword) ~0;
 		vars->Lookup( "OtherWindow", tmp );
 		if (tmp == (ieDword) ~0) {
@@ -582,7 +471,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_EXPANSION) {
 		EventFlag&=~EF_EXPANSION;
-		guiscript->RunFunction( "MessageWindow", "GameExpansion", false );
+		guiscript->RunFunction( "Game", "GameExpansion", false );
 		return;
 	}
 
@@ -592,22 +481,22 @@ void Interface::HandleEvents()
 		return;
 	}
 
-	if ((EventFlag&EF_RESETTARGET) && gc) {
+	if ((EventFlag&EF_RESETTARGET) && gamectrl) {
 		EventFlag&=~EF_RESETTARGET;
 		EventFlag|=EF_TARGETMODE;
-		gc->ResetTargetMode();
+		gamectrl->ResetTargetMode();
 		return;
 	}
 
-	if ((EventFlag&EF_TARGETMODE) && gc) {
+	if ((EventFlag&EF_TARGETMODE) && gamectrl) {
 		EventFlag&=~EF_TARGETMODE;
-		gc->UpdateTargetMode();
+		gamectrl->UpdateTargetMode();
 		return;
 	}
 
 	if (EventFlag&EF_TEXTSCREEN) {
 		EventFlag&=~EF_TEXTSCREEN;
-		video->SetMouseEnabled(true);
+		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
 		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
 		return;
 	}
@@ -620,8 +509,17 @@ void Interface::HandleFlags()
 {
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
+	
+	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
+		delete winmgr->GetGameWindow()->RemoveSubview(gamectrl);
+		gamectrl = nullptr;
+		winmgr->GetGameWindow()->SetVisible(false);
+		//clear cutscenes; clear fade/screenshake effects
+		timer = GlobalTimer();
+	}
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		winmgr->DestroyAllWindows();
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
@@ -630,18 +528,26 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
+		
 		LoadGame(LoadGameIndex.get(), VersionOverride );
 		LoadGameIndex.release();
 		//after loading a game, always check if the game needs to be upgraded
 	}
 
 	if (QuitFlag&QF_ENTERGAME) {
+		winmgr->DestroyAllWindows();
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			EventFlag|=EF_EXPANSION;
-			timer->Init();
+
+			Log(MESSAGE, "Core", "Setting up the Console...");
+			guiscript->RunFunction("Console", "OnLoad");
+
+			winmgr->FadeColor = Color();
 
 			GameControl* gc = StartGameControl();
+			guiscript->LoadScript( "Game" );
+			guiscript->RunFunction( "Game", "EnterGame" );
 
 			//switch map to protagonist
 			Actor* actor = GetFirstSelectedPC(true);
@@ -651,6 +557,12 @@ void Interface::HandleFlags()
 
 			//rearrange party slots
 			game->ConsolidateParty();
+
+			Window* gamewin = winmgr->GetGameWindow();
+			gamewin->AddSubviewInFrontOfView(gc);
+			gamewin->SetDisabled(false);
+			gamewin->SetVisible(true);
+			gamewin->Focus();
 		} else {
 			Log(ERROR, "Core", "No game to enter...");
 			QuitFlag = QF_QUITGAME;
@@ -979,52 +891,61 @@ void Interface::Main()
 
 	vars->Lookup("Mouse Scroll Speed", speed);
 	SetMouseScrollSpeed((int) speed);
-	if (vars->Lookup("Tooltips", TooltipDelay)) {
-		// the games store the slider position*10, not the actual delay
-		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
-	}
 
 	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
-	const Region fpsRgn( 0, Height - 30, 100, 30 );
+	Region fpsRgn( 0, Height - 30, 80, 30 );
 	wchar_t fpsstring[20] = {L"???.??? fps"};
+	// set for printing
+	fpsRgn.x = 5;
+	fpsRgn.y = 0;
 
 	unsigned long frame = 0, time, timebase;
-	timebase = GetTicks();
-	double frames;
-	Palette* palette = new Palette( ColorWhite, ColorBlack );
-	do {
-		//don't change script when quitting is pending
+	time = GetTicks();
+	timebase = time;
+	double frames = 0.0;
 
+	do {
+		std::deque<Timer>::iterator it;
+		for (it = timers.begin(); it != timers.end();) {
+			if (it->IsRunning()) {
+				it->Update(time);
+				++it;
+			} else {
+				it = timers.erase(it);
+			}
+		}
+
+		//don't change script when quitting is pending
 		while (QuitFlag && QuitFlag != QF_KILL) {
 			HandleFlags();
 		}
 		//eventflags are processed only when there is a game
-		if (EventFlag && game) {
+		if (EventFlag && gamectrl) {
 			HandleEvents();
 		}
 		HandleGUIBehaviour();
 
 		GameLoop();
-		DrawWindows(true);
+		// TODO: find other animations that need to be synchronized
+		// we can create a manager for them and everything can be updated at once
+		GlobalColorCycle.AdvanceTime(time);
+		winmgr->DrawWindows();
+		time = GetTicks();
 		if (DrawFPS) {
 			frame++;
-			time = GetTicks();
 			if (time - timebase > 1000) {
 				frames = ( frame * 1000.0 / ( time - timebase ) );
 				timebase = time;
 				frame = 0;
 				swprintf(fpsstring, sizeof(fpsstring)/sizeof(fpsstring[0]), L"%.3f fps", frames);
 			}
+			auto lock = winmgr->DrawHUD();
 			video->DrawRect( fpsRgn, ColorBlack );
-			fps->Print( fpsRgn, String(fpsstring), palette,
-					   IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE );
+			fps->Print(fpsRgn, String(fpsstring), IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, {ColorWhite, ColorBlack});
 		}
-		if (TickHook)
-			TickHook();
 	} while (video->SwapBuffers() == GEM_OK && !(QuitFlag&QF_KILL));
 	QuitGame(0);
-	gamedata->FreePalette( palette );
 }
 
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
@@ -1062,12 +983,24 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
-	if (anim)
-	{
+	int CursorCount = 0;
+	if (anim) {
 		CursorCount = anim->GetCycleCount();
-		Cursors = new Sprite2D * [CursorCount];
+		Cursors.reserve(CursorCount);
 		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetFrame( 0, (ieByte) i );
+			Cursors.push_back(anim->GetFrame(0, (ieByte) i));
+		}
+	} else {
+		// support non-BAM cursors
+		// load MainCursorsImage + XX until all images are exhausted
+		// same layout as in the originals, with odd indices having the pressed cursor image
+		char fileName[32];
+		while (CursorCount < 99) {
+			snprintf(fileName, sizeof(fileName), "%.29s%02d", MainCursorsImage.CString(), CursorCount);
+			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
+			if (!im) break;
+			Cursors.push_back(im->GetSprite2D());
+			CursorCount++;
 		}
 	}
 
@@ -1077,8 +1010,8 @@ int Interface::LoadSprites()
 				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
-	video->SetCursor( Cursors[0], VID_CUR_UP );
-	video->SetCursor( Cursors[1], VID_CUR_DOWN );
+	WindowManager::CursorMouseUp = Cursors[0];
+	WindowManager::CursorMouseDown = Cursors[1];
 
 	// Load fog-of-war bitmaps
 	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
@@ -1089,69 +1022,22 @@ int Interface::LoadSprites()
 		return GEM_ERROR;
 	}
 
-	FogSprites[0] = NULL;
 	FogSprites[1] = anim->GetFrame( 0, 0 );
 	FogSprites[2] = anim->GetFrame( 1, 0 );
 	FogSprites[3] = anim->GetFrame( 2, 0 );
 
-	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
+	FogSprites[4] = video->MirrorSprite( FogSprites[1], BLIT_MIRRORY, false );
 
-	FogSprites[5] = NULL;
+	assert(FogSprites[4]->renderFlags&BLIT_MIRRORY);
 
-	FogSprites[6] = video->MirrorSpriteVertical( FogSprites[3], false );
+	FogSprites[6] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORY, false );
 
-	FogSprites[7] = NULL;
+	FogSprites[8] = video->MirrorSprite( FogSprites[2], BLIT_MIRRORX, false );
+	assert(FogSprites[8]->renderFlags&BLIT_MIRRORX);
+	FogSprites[9] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORX, false );
 
-	FogSprites[8] = video->MirrorSpriteHorizontal( FogSprites[2], false );
-
-	FogSprites[9] = video->MirrorSpriteHorizontal( FogSprites[3], false );
-
-	FogSprites[10] = NULL;
-	FogSprites[11] = NULL;
-
-	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
-
-	FogSprites[16] = anim->GetFrame( 3, 0 );
-	FogSprites[17] = anim->GetFrame( 4, 0 );
-	FogSprites[18] = anim->GetFrame( 5, 0 );
-	FogSprites[19] = anim->GetFrame( 6, 0 );
-
-	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
-
-	FogSprites[21] = NULL;
-
-	FogSprites[23] = NULL;
-
-	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
-
-	FogSprites[25] = anim->GetFrame( 7, 0 );
-
-	{
-		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
-		FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		Sprite2D::FreeSprite( tmpsprite );
-	}
-
-	FogSprites[26] = NULL;
-	FogSprites[27] = NULL;
-
-	{
-		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
-		FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
-		Sprite2D::FreeSprite( tmpsprite );
-	}
-
-	ieDword i = 0;
-	vars->Lookup("3D Acceleration", i);
-	if (i) {
-		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			if (FogSprites[i]) {
-				Sprite2D* alphasprite = video->CreateAlpha( FogSprites[i] );
-				Sprite2D::FreeSprite ( FogSprites[i] );
-				FogSprites[i] = alphasprite;
-			}
-		}
-	}
+	FogSprites[12] = video->MirrorSprite( FogSprites[6], BLIT_MIRRORX, false );
+	assert(FogSprites[12]->renderFlags&BLIT_MIRRORX);
 
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
@@ -1165,29 +1051,12 @@ int Interface::LoadSprites()
 			}
 
 			for (int i = 0; i < 6; i++) {
-				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
+				Holder<Sprite2D> sprite = anim->GetFrame(0, (ieByte) i);
 				if (GroundCircleScale[size]) {
-					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
-					Sprite2D::FreeSprite( sprite );
-				} else {
-					GroundCircles[size][i] = sprite;
+					sprite = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
 				}
+				GroundCircles[size][i] = sprite;
 			}
-		}
-	}
-
-	if (!TooltipBackResRef.IsEmpty()) {
-		anim = (AnimationFactory*) gamedata->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
-		Log(MESSAGE, "Core", "Initializing Tooltips...");
-		if (!anim) {
-			Log(ERROR, "Core", "Failed to initialize tooltips.");
-			return GEM_ERROR;
-		}
-		TooltipBack = new Sprite2D * [3];
-		for (int i = 0; i < 3; i++) {
-			TooltipBack[i] = anim->GetFrame( 0, (ieByte) i );
-			TooltipBack[i]->XPos = 0;
-			TooltipBack[i]->YPos = 0;
 		}
 	}
 
@@ -1214,38 +1083,14 @@ int Interface::LoadFonts()
 		rowName = tab->GetRowName(row);
 
 		ResRef resref = tab->QueryField(rowName, "RESREF");
-		int needpalette = atoi(tab->QueryField(rowName, "NEED_PALETTE"));
 		const char* font_name = tab->QueryField( rowName, "FONT_NAME" );
 		ieWord font_size = atoi( tab->QueryField( rowName, "PX_SIZE" ) ); // not available in BAM fonts.
 		FontStyle font_style = (FontStyle)atoi( tab->QueryField( rowName, "STYLE" ) ); // not available in BAM fonts.
-
-		Palette* pal = NULL;
-		if (needpalette) {
-			Color fore = ColorWhite;
-			Color back = ColorBlack;
-			const char* colorString = tab->QueryField( rowName, "COLOR" );
-			if (colorString) {
-				ieDword c;
-				sscanf(colorString, "0x%x", &c);
-				fore.r = (ieByte)((c >> 24) & 0xFF);
-				fore.g = (ieByte)((c >> 16) & 0xFF);
-				fore.b = (ieByte)((c >> 8) & 0xFF);
-				fore.a = (ieByte)(c & 0xFF);
-			}
-			if (TooltipFontResRef == resref) {
-				if (fore.a != 0xff) {
-					// FIXME: should have an explaination
-					back = fore;
-					fore = ColorBlack;
-				}
-			}
-			pal = new Palette(fore, back);
-		}
+		bool background = atoi(tab->QueryField(rowName, "BACKGRND"));
 
 		Font* fnt = NULL;
 		ResourceHolder<FontManager> fntMgr = GetResourceHolder<FontManager>(font_name);
-		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, pal);
-		gamedata->FreePalette(pal);
+		if (fntMgr) fnt = fntMgr->GetFont(font_size, font_style, background);
 
 		if (!fnt) {
 			error("Core", "Unable to load font resource: %s for ResRef %s (check fonts.2da)", font_name, resref.CString());
@@ -1261,31 +1106,11 @@ int Interface::LoadFonts()
 
 int Interface::Init(InterfaceConfig* config)
 {
+	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 	if (!config) {
 		Log(FATAL, "Core", "No Configuration context.");
 		return GEM_ERROR;
 	}
-
-	plugin_flags = new Variables();
-	plugin_flags->SetType( GEM_VARIABLES_INT );
-
-	Log(MESSAGE, "Core", "Initializing the Event Manager...");
-	evntmgr = new EventMgr();
-
-	lists = new Variables();
-	if (!lists) {
-		Log(FATAL, "Core", "Failed to allocate Lists dictionary.");
-		return GEM_ERROR;
-	}
-	lists->SetType( GEM_VARIABLES_POINTER );
-
-	vars = new Variables();
-	if (!vars) {
-		Log(FATAL, "Core", "Failed to allocate Variables dictionary");
-		return GEM_ERROR;
-	}
-	vars->SetType( GEM_VARIABLES_INT );
-	vars->ParseKey(true);
 
 	const char* value = NULL;
 #define CONFIG_INT(key, var) \
@@ -1295,40 +1120,55 @@ int Interface::Init(InterfaceConfig* config)
 		value = NULL;
 
 	CONFIG_INT("Bpp", Bpp =);
-	vars->SetAt("BitsPerPixel", Bpp); //put into vars so that reading from game.ini wont overwrite
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
-	CONFIG_INT("DoubleClickDelay", evntmgr->SetDCDelay);
+	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
 	CONFIG_INT("DrawFPS", DrawFPS = );
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
-	CONFIG_INT("EndianSwitch", DataStream::SetEndianSwitch);
-	CONFIG_INT("FogOfWar", FogOfWar = );
-	ieDword FullScreen = 0;
-	CONFIG_INT("FullScreen", FullScreen = );
-	vars->SetAt("Full Screen", FullScreen); //put into vars so that reading from game.ini wont overwrite
-	CONFIG_INT("GUIEnhancements", GUIEnhancements = );
-	CONFIG_INT("TouchScrollAreas", TouchScrollAreas = );
+	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
+	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
 	CONFIG_INT("Height", Height = );
 	CONFIG_INT("KeepCache", KeepCache = );
 	CONFIG_INT("MaxPartySize", MaxPartySize = );
 	MaxPartySize = std::min(std::max(1, MaxPartySize), 10);
 	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
+	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
-	CONFIG_INT("RepeatKeyDelay", evntmgr->SetRKDelay);
+	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
 	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
-	CONFIG_INT("ScriptDebugMode", SetScriptDebugMode);
-	CONFIG_INT("SkipIntroVideos", SkipIntroVideos = );
-	CONFIG_INT("TooltipDelay", TooltipDelay = );
+	CONFIG_INT("DebugMode", debugMode = );
+	int touchInput = -1;
+	CONFIG_INT("TouchInput", touchInput =);
 	CONFIG_INT("Width", Width = );
 	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
 	CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
 	CONFIG_INT("NumFingScroll", NumFingScroll = );
 	CONFIG_INT("NumFingKboard", NumFingKboard = );
 	CONFIG_INT("NumFingInfo", NumFingInfo = );
-	CONFIG_INT("MouseFeedback", MouseFeedback = );
 	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
-	CONFIG_INT("VitaKeepAspectRatio", VitaKeepAspectRatio = );
 
 #undef CONFIG_INT
+
+// first param is the preference name, second is the key from gemrb.cfg.
+#define CONFIG_VARS_MAP(var, key) \
+		value = config->GetValueForKey(key); \
+		if (value) \
+			vars->SetAt(var, atoi(value)); \
+		value = NULL;
+
+#define CONFIG_VARS(key) \
+		CONFIG_VARS_MAP(key, key);
+
+	// using vars because my hope is to expose (some of) these in a customized GUIOPT
+	// map gemrb.cfg value to the value used by the options (usually an option from game.ini)
+	CONFIG_VARS("GUIEnhancements");
+	CONFIG_VARS("SkipIntroVideos");
+
+	//put into vars so that reading from game.ini wont overwrite
+	CONFIG_VARS_MAP("BitsPerPixel", "Bpp");
+	CONFIG_VARS_MAP("Full Screen", "Fullscreen");
+
+#undef CONFIG_VARS
+#undef CONFIG_VARS_MAP
 
 #define CONFIG_STRING(key, var, default) \
 		value = config->GetValueForKey(key); \
@@ -1516,14 +1356,16 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
+	
+	// ask the driver if a touch device is in use
+	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
+	
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
-	vars->Lookup("Full Screen", FullScreen);
 
-	Color defcolor={255,255,255,200};
-	SetInfoTextColor(defcolor);
+	SetInfoTextColor(ColorWhite);
 
 	{
 		Log(MESSAGE, "Core", "Initializing Search Path...");
@@ -1611,8 +1453,25 @@ int Interface::Init(InterfaceConfig* config)
 			return GEM_ERROR;
 		}
 	}
+	
+	// fix the sample config default resolution for iwd2 and configless case also for the demo
+	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0) && Width == 640 && Height == 480) {
+		Width = 800;
+		Height = 600;
+	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
+	SetNextScript("Start"); // Start is the first script executed
 	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == nullptr) {
 		Log(FATAL, "Core", "Missing GUI Script Engine.");
@@ -1622,7 +1481,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to initialize GUI Script.");
 		return GEM_ERROR;
 	}
-	strcpy( NextScript, "Start" );
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
 	char path[_MAX_PATH];
@@ -1631,20 +1489,6 @@ int Interface::Init(InterfaceConfig* config)
 	char unhardcodedTypePath[_MAX_PATH * 2];
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
-
-	// fix the sample config default resolution for iwd2 and configless case also for the demo
-	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0) && Width == 640 && Height == 480) {
-		Width = 800;
-		Height = 600;
-	}
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	if (video->CreateDisplay( Width, Height, Bpp, FullScreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-	video->SetGamma(brightness, contrast);
 
 	// if unset, manually populate GameName (window title)
 	std::map<std::string, std::string> gameTypeNameMap;
@@ -1696,6 +1540,11 @@ int Interface::Init(InterfaceConfig* config)
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
+
+	// set up the tooltip delay which we store in miliseconds
+	ieDword tooltipDelay = 0;
+	GetDictionary()->Lookup("Tooltips", tooltipDelay);
+	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
 
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
@@ -1754,19 +1603,9 @@ int Interface::Init(InterfaceConfig* config)
 
 	{
 		Log(MESSAGE, "Core", "Loading Palettes...");
-		ResourceHolder<ImageMgr> pal16im = GetResourceHolder<ImageMgr>(Palette16);
-		if (pal16im)
-			pal16 = pal16im->GetImage();
-		ResourceHolder<ImageMgr> pal32im = GetResourceHolder<ImageMgr>(Palette32);
-		if (pal32im)
-			pal32 = pal32im->GetImage();
-		ResourceHolder<ImageMgr> pal256im = GetResourceHolder<ImageMgr>(Palette256);
-		if (pal256im)
-			pal256 = pal256im->GetImage();
-		if (!pal16 || !pal32 || !pal256) {
-			Log(FATAL, "Core", "No palettes found.");
-			return GEM_ERROR;
-		}
+		LoadPalette<16>(Palette16, palettes16);
+		LoadPalette<32>(Palette32, palettes32);
+		LoadPalette<256>(Palette256, palettes256);
 		Log(MESSAGE, "Core", "Palettes Loaded");
 	}
 
@@ -1782,20 +1621,23 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
-	Log(MESSAGE, "Core", "Broadcasting Event Manager...");
-	video->SetEventMgr( evntmgr );
-	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	windowmgr = PluginHolder<WindowMgr>(IE_CHU_CLASS_ID);
-	if (windowmgr == nullptr) {
-		Log(FATAL, "Core", "Failed to load Window Manager.");
-		return GEM_ERROR;
-	}
-
 	int ret = LoadSprites();
 	if (ret) return ret;
 
 	ret = LoadFonts();
 	if (ret) return ret;
+
+	Log(MESSAGE, "Core", "Initializing Window Manager...");
+	winmgr = new WindowManager(video.get());
+	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
+
+	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
+	if (!guifact) {
+		Log(FATAL, "Core", "Failed to load Window Manager.");
+		return GEM_ERROR;
+	}
+	guifact->SetWindowManager(*winmgr);
 
 	QuitFlag = QF_CHANGESCRIPT;
 
@@ -1816,19 +1658,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Failed to allocate SaveGameIterator.");
 		return GEM_ERROR;
 	}
-
-	//no need of strdup, variables do copy the key!
-	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
-	vars->SetAt( "GUIEnhancements", (unsigned long)GUIEnhancements );
-	vars->SetAt( "TouchScrollAreas", (unsigned long)TouchScrollAreas );
-
-	Log(MESSAGE, "Core", "Initializing Token Dictionary...");
-	tokens = new Variables();
-	if (!tokens) {
-		Log(FATAL, "Core", "Failed to allocate Token dictionary.");
-		return GEM_ERROR;
-	}
-	tokens->SetType( GEM_VARIABLES_STRING );
 
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
 	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
@@ -1903,13 +1732,6 @@ int Interface::Init(InterfaceConfig* config)
 	game = NULL;
 	calendar = NULL;
 	keymap = NULL;
-
-	Log(MESSAGE, "Core", "Bringing up the Global Timer...");
-	timer = new GlobalTimer();
-	if (!timer) {
-		Log(FATAL, "Core", "Failed to create global timer.");
-		return GEM_ERROR;
-	}
 
 	Log(MESSAGE, "Core", "Initializing effects...");
 	ret = Init_EffectQueue();
@@ -1988,14 +1810,6 @@ int Interface::Init(InterfaceConfig* config)
 		Log(WARNING, "Core", "Failed to initialize keymaps.");
 	}
 
-	Log(MESSAGE, "Core", "Setting up the Console...");
-	console = new Console(Region(0, 0, Width, 25));
-	Sprite2D* cursor = GetCursorSprite();
-	if (!cursor) {
-		Log(ERROR, "Core", "Failed to load cursor sprite.");
-	} else
-		console->SetCursor (cursor);
-
 	Log(MESSAGE, "Core", "Core Initialization Complete!");
 
 	// dump the potentially changed unhardcoded path to a file that weidu looks at automatically to get our search paths
@@ -2019,6 +1833,15 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Close();
 	}
 	delete pathFile;
+	
+	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
+		if (e.type != Event::KeyDown) return false;
+
+		guiscript->RunFunction("Console", "ToggleConsole");
+		return true;
+	};
+	EventMgr::RegisterHotKeyCallback(ToggleConsole, ' ', GEM_MOD_CTRL);
+
 	return GEM_OK;
 }
 
@@ -2321,9 +2144,11 @@ static const char *game_flags[GF_COUNT+1]={
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
-		"FixedMoraleOpcode",  //78GF_FIXED_MORALE_OPCODE
-		"Happiness",          //79GF_HAPPINESS
-		"EfficientORTrigger", //80GF_EFFICIENT_OR
+		"AnimatedDialog",	  //78GF_ANIMATED_DIALOG
+		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
+		"Happiness",          //80GF_HAPPINESS
+		"EfficientORTrigger", //81GF_EFFICIENT_OR
+		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2345,6 +2170,7 @@ bool Interface::LoadGemRBINI()
 	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
+	ResRef tooltipBG;
 	const char *s;
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
@@ -2357,7 +2183,7 @@ bool Interface::LoadGemRBINI()
 	ASSIGN_RESREF(ButtonFontResRef, "ButtonFont");
 	ASSIGN_RESREF(TooltipFontResRef, "TooltipFont");
 	ASSIGN_RESREF(MovieFontResRef, "MovieFont");
-	ASSIGN_RESREF(TooltipBackResRef, "TooltipBack");
+	ASSIGN_RESREF(tooltipBG, "TooltipBack");
 	ASSIGN_RESREF(TextFontResRef, "TextFont");
 	ASSIGN_RESREF(Palette16, "Palette16");
 	ASSIGN_RESREF(Palette32, "Palette32");
@@ -2368,7 +2194,19 @@ bool Interface::LoadGemRBINI()
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
 
-	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
+	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
+
+	if (!tooltipBG.IsEmpty()) {
+		AnimationFactory* anim = (AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
+		Log(MESSAGE, "Core", "Initializing Tooltips...");
+		if (anim) {
+			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
+			// FIXME: this is an arbitrary heuristic and speed
+			TooltipBG->SetAnimationSpeed((ttMargin == 5) ? 10 : 0);
+			TooltipBG->SetMargin(ttMargin);
+		}
+	}
+
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
 	// the speeds from the original games.
@@ -2398,7 +2236,7 @@ bool Interface::LoadGemRBINI()
 
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
-	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
+	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
 
 	for (int i=0;i<GF_COUNT;i++) {
 		if (!game_flags[i]) {
@@ -2484,31 +2322,6 @@ bool Interface::LoadEncoding()
 	return true;
 }
 
-/** No descriptions */
-Color* Interface::GetPalette(unsigned index, int colors, Color *pal) const
-{
-	Image *img;
-	if (colors == 32) {
-		img = pal32;
-	} else if (colors <= 32) {
-		img = pal16;
-	} else if (colors == 256) {
-		img = pal256;
-	} else {
-		return pal;
-	}
-	if (index >= img->GetHeight()) {
-		index = 0;
-	}
-	int width = img->GetWidth();
-	for (int i = 0; i < colors; i++) {
-		if (i >= width) {
-			Log(WARNING, "Interface", "Trying to access invalid palette index (%d)! Using black instead", i);
-		}
-		pal[i] = img->GetPixel(i, index);
-	}
-	return pal;
-}
 /** Returns a preloaded Font */
 Font* Interface::GetFont(const ResRef& ResRef) const
 {
@@ -2527,18 +2340,6 @@ Font* Interface::GetTextFont() const
 Font* Interface::GetButtonFont() const
 {
 	return GetFont( ButtonFontResRef );
-}
-
-/** Returns the Event Manager */
-EventMgr* Interface::GetEventMgr() const
-{
-	return evntmgr;
-}
-
-/** Returns the Window Manager */
-WindowMgr* Interface::GetWindowMgr() const
-{
-	return windowmgr.get();
 }
 
 /** Get GUI Script Manager */
@@ -2666,8 +2467,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			if (vvc) {
 				//This is the final position of the summoned creature
 				//not the original target point
-				vvc->XPos += ab->Pos.x;
-				vvc->YPos += ab->Pos.y;
+				vvc->Pos = ab->Pos;
 				//force vvc to play only once
 				vvc->PlayOnce();
 				map->AddVVCell( new VEFObject(vvc) );
@@ -2700,357 +2500,55 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 	return ab;
 }
 
-void Interface::RedrawControls(const char *varname, unsigned int value)
-{
-	for (unsigned int i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win != NULL && win->Visible!=WINDOW_INVALID) {
-			win->RedrawControls(varname, value);
-		}
-	}
-}
-
-void Interface::RedrawAll()
-{
-	for (unsigned int i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win != NULL && win->Visible!=WINDOW_INVALID) {
-			win->Invalidate();
-		}
-	}
-}
-
-/** Loads a WindowPack (CHUI file) in the Window Manager */
-bool Interface::LoadWindowPack(const char* name)
-{
-	DataStream* stream = gamedata->GetResource( name, IE_CHU_CLASS_ID );
-	if (stream == NULL) {
-		Log(ERROR, "Interface", "Error: Cannot find %s.chu", name );
-		return false;
-	}
-	if (!GetWindowMgr()->Open(stream)) {
-		Log(ERROR, "Interface", "Error: Cannot Load %s.chu", name );
-		return false;
-	}
-
-	CopyResRef( WindowPack, name );
-	return true;
-}
-
 /** Loads a Window in the Window Manager */
-int Interface::LoadWindow(unsigned short WindowID)
+Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition pos)
 {
-	unsigned int i;
-	GameControl *gc = GetGameControl ();
+	if (ref) // is the winpack changing?
+		guifact->LoadWindowPack(ref);
 
-	for (i = 0; i < windows.size(); i++) {
-		Window *win = windows[i];
-		if (win == NULL)
-			continue;
-		if (win->Visible==WINDOW_INVALID) {
-			continue;
-		}
-		if (win->WindowID == WindowID &&
-			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
-			SetOnTop( i );
-			win->Invalidate();
-			if (gc)
-				gc->SetScrolling( false );
-			return i;
-		}
+	Window* win = GetWindow(WindowID, ref);
+	if (!win) {
+		win = guifact->GetWindow( WindowID );
 	}
-	Window* win = windowmgr->GetWindow( WindowID );
-	if (win == NULL) {
-		return -1;
+	if (win) {
+		assert(win->GetScriptingRef());
+		win->SetPosition(pos);
+		winmgr->FocusWindow( win );
 	}
-	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
-
-	int slot = -1;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL) {
-			slot = i;
-			break;
-		}
-	}
-	if (slot == -1) {
-		windows.push_back( win );
-		slot = ( int ) windows.size() - 1;
-	} else {
-		windows[slot] = win;
-	}
-	win->Invalidate();
-	if (gc)
-		gc->SetScrolling( false );
-	return slot;
+	return win;
 }
-// FIXME: it's a clone of LoadWindow
+
 /** Creates a Window in the Window Manager */
-int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
+Window* Interface::CreateWindow(unsigned short WindowID, const Region& frame)
 {
-	unsigned int i;
-
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL)
-			continue;
-		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
-			windows[i]->WindowPack )) {
-			SetOnTop( i );
-			windows[i]->Invalidate();
-			return i;
-		}
-	}
-
-	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
-	if (Background[0]) {
-		ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(Background);
-		if (mos != nullptr) {
-			win->SetBackGround( mos->GetSprite2D(), true );
-		}
-	}
-
-	strcpy( win->WindowPack, WindowPack );
-
-	int slot = -1;
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL) {
-			slot = i;
-			break;
-		}
-	}
-	if (slot == -1) {
-		windows.push_back( win );
-		slot = ( int ) windows.size() - 1;
-	} else {
-		windows[slot] = win;
-	}
-	win->Invalidate();
-	return slot;
+	// FIXME: this will create a window under the current "window pack"
+	// obviously its possible the id can conflict with an existing window
+	return guifact->CreateWindow(WindowID, frame);
 }
 
-/** Sets a Window on the Top */
-void Interface::SetOnTop(int Index)
+inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flags, int op)
 {
-	std::vector<int>::iterator t;
-	for(t = topwin.begin(); t != topwin.end(); ++t) {
-		if((*t) == Index) {
-			topwin.erase(t);
-			break;
-		}
+	std::vector<View*>::const_iterator it = views.begin();
+	for (; it != views.end(); ++it) {
+		View* view = *it;
+		view->SetFlags(flags, op);
 	}
-	if(topwin.size() != 0)
-		topwin.insert(topwin.begin(), Index);
-	else
-		topwin.push_back(Index);
-}
-/** Add a window to the Window List */
-void Interface::AddWindow(Window * win)
-{
-	int slot = -1;
-	for(unsigned int i = 0; i < windows.size(); i++) {
-		Window *w = windows[i];
-
-		if(w==NULL) {
-			slot = i;
-			break;
-		}
-	}
-	if(slot == -1) {
-		windows.push_back(win);
-	}
-	else
-		windows[slot] = win;
-	win->Invalidate();
 }
 
-/** Adjust the Scrolling factor of a control (worldmap atm) */
-int Interface::AdjustScrolling(unsigned short WindowIndex,
-		unsigned short ControlIndex, short x, short y)
+void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
+	if (game && group == ResRef("HIDE_CUT")) {
+		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
 	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
-	switch(ctrl->ControlType) {
-		case IE_GUI_WORLDMAP:
-			((WorldMapControl *) ctrl)->AdjustScrolling(x,y);
-			break;
-		default: //doesn't work for these
-			return -1;
-	}
-	return 0;
+
+	std::vector<View*> views = GetViews(group);
+	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
-/** Set the Tooltip text of a Control */
-int Interface::SetTooltip(unsigned short WindowIndex,
-		unsigned short ControlIndex, const char* string, int Function)
+void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
-
-	if (Function) {
-		win->FunctionBar = true;
-		evntmgr->SetFunctionBar(win);
-		ctrl->SetFunctionNumber(Function-1);
-	}
-	return ctrl->SetTooltip( string );
-}
-
-void Interface::DisplayTooltip(int x, int y, Control *ctrl)
-{
-	if (tooltip_ctrl && tooltip_ctrl == ctrl && tooltip_x == x && tooltip_y == y)
-		return;
-	tooltip_x = x;
-	tooltip_y = y;
-	tooltip_currtextw = 0;
-	if (x && y && tooltip_ctrl != ctrl) {
-		// use a sound handle so we can stop previous unroll sounds
-		if (tooltip_sound) {
-			tooltip_sound->Stop();
-			tooltip_sound.release();
-		}
-		// exactly like PlaySound(DS_TOOLTIP) but storing the handle
-		tooltip_sound = AudioDriver->Play(DefSound[DS_TOOLTIP], SFX_CHAN_GUI);
-	}
-	tooltip_ctrl = ctrl;
-}
-
-int Interface::GetVisible(unsigned short WindowIndex) const
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	return win->Visible;
-}
-/** Set a Window Visible Flag */
-int Interface::SetVisible(unsigned short WindowIndex, int visible)
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		return -1;
-	}
-	if (visible!=WINDOW_FRONT) {
-		win->Visible = (char) visible;
-	}
-	switch (visible) {
-		case WINDOW_GRAYED:
-			win->Invalidate();
-			win->DrawWindow();
-			// Intentional fallthrough
-		case WINDOW_INVISIBLE:
-			//hiding the viewport if the gamecontrol window was made invisible
-			if (win->WindowID==65535) {
-				video->SetViewport( 0,0,0,0 );
-			}
-			evntmgr->DelWindow( win );
-			break;
-
-		case WINDOW_VISIBLE:
-			if (win->WindowID==65535) {
-				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
-			}
-			// Intentional fallthrough
-		case WINDOW_FRONT:
-			if (win->Visible==WINDOW_VISIBLE) {
-				evntmgr->AddWindow( win );
-				if (win->FunctionBar) {
-					evntmgr->SetFunctionBar( win );
-				}
-			}
-			win->Invalidate();
-			SetOnTop( WindowIndex );
-			break;
-	}
-	return 0;
-}
-
-
-/** Set the Status of a Control in a Window */
-int Interface::SetControlStatus(unsigned short WindowIndex,
-		unsigned short ControlIndex, unsigned long Status)
-{
-	//don't set the status of an already invalidated window
-	Window* win = GetWindow(WindowIndex);
-	if (win == NULL) {
-		return -1;
-	}
-	Control* ctrl = win->GetControl( ControlIndex );
-	if (ctrl == NULL) {
-		return -1;
-	}
-	if (Status&IE_GUI_CONTROL_FOCUSED) {
-		evntmgr->SetFocused( win, ctrl);
-	}
-
-	//check if the status parameter was intended to use with this control
-	//Focus will sadly break this at the moment, because it is common for all control types
-	int check = (Status >> 24) & 0xff;
-	if ( (check!=0x7f) && (ctrl->ControlType != check) ) {
-		return -2;
-	}
-
-	switch (ctrl->ControlType) {
-		case IE_GUI_BUTTON:
-			//Button
-			{
-				Button* btn = ( Button* ) ctrl;
-				btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
-			}
-			break;
-		case IE_GUI_WORLDMAP:
-			break;
-		default:
-			ctrl->Value = Status & 0x7f;
-			break;
-	}
-	return 0;
-}
-
-/** Show a Window in Modal Mode */
-int Interface::ShowModal(unsigned short WindowIndex, MODAL_SHADOW Shadow)
-{
-	if (WindowIndex >= windows.size()) {
-		Log(ERROR, "Core", "Window not found");
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if (win == NULL) {
-		Log(ERROR, "Core", "Window already freed");
-		return -1;
-	}
-	win->Visible = WINDOW_FRONT;
-	//don't destroy the other window handlers
-	//evntmgr->Clear();
-	SetOnTop( WindowIndex );
-	evntmgr->AddWindow( win );
-	evntmgr->SetFocused( win, NULL );
-	win->Invalidate();
-
-	modalShadow = Shadow;
-	ModalWindow = win;
-	return 0;
+	std::vector<View*> views = GetViews(group);
+	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
 }
 
 bool Interface::IsFreezed()
@@ -3140,248 +2638,17 @@ void Interface::HandleGUIBehaviour(void)
 	}
 }
 
-void Interface::DrawWindows(bool allow_delete)
+Tooltip Interface::CreateTooltip()
 {
-	//here comes the REAL drawing of windows
-	static bool modalShield = false;
-	static size_t windowStackShield = 0;
+	Font::PrintColors colors;
+	colors.fg = gamedata->GetColor("TOOLTIP");
+	colors.bg = gamedata->GetColor("TOOLTIPBG");
 
-	if (ModalWindow) {
-		if (!modalShield) {
-			// only draw the shield layer once
-			Color shieldColor = Color(); // clear
-			if (modalShadow == MODAL_SHADOW_GRAY) {
-				shieldColor.a = 128;
-			} else if (modalShadow == MODAL_SHADOW_BLACK) {
-				shieldColor.a = 0xff;
-			}
-			video->DrawRect( Region( 0, 0, Width, Height ), shieldColor );
-			video->TakeBackgroundBuffer();
-			RedrawAll(); // wont actually have any effect until the modal window is dismissed.
-			modalShield = true;
-		} else {
-			video->DrawBackgroundBuffer();
-		}
-		ModalWindow->DrawWindow();
-		return;
+	TooltipBackground* bg = NULL;
+	if (TooltipBG) {
+		bg = new TooltipBackground(*TooltipBG);
 	}
-	modalShield = false;
-
-	size_t i = topwin.size();
-	bool backgroundRedrawn = false;
-
-	if (windowStackShield != i) {
-		if (i > 1) {
-			video->TakeBackgroundBuffer();
-		}
-		windowStackShield = i;
-	}
-
-	while(i--) {
-		unsigned int t = topwin[i];
-
-		if ( t >=windows.size() )
-			continue;
-
-		//visible ==1 or 2 will be drawn
-		Window* win = windows[t];
-		if (win != NULL) {
-			if (win->Visible == WINDOW_INVALID) {
-				if (allow_delete) {
-					topwin.erase(topwin.begin()+i);
-					evntmgr->DelWindow( win );
-					delete win;
-					windows[t]=NULL;
-				}
-			} else if (win->Visible) {
-				win->DrawWindow();
-			} else if (!win->Visible && !backgroundRedrawn) {
-				backgroundRedrawn = true;
-				video->DrawBackgroundBuffer();
-			}
-		}
-	}
-
-	// draw the console
-	if (ConsolePopped) {
-		console->Draw(0, 0);
-	}
-}
-
-void Interface::DrawTooltip ()
-{
-	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
-		return;
-
-	Font* fnt = GetFont( TooltipFontResRef );
-	if (!fnt) {
-		return;
-	}
-	String* tooltip_text = tooltip_ctrl->Tooltip;
-
-	int w1 = 0;
-	int w2 = 0;
-	int strw = fnt->StringSize( *tooltip_text ).w + 8;
-	int w = strw;
-	int h = fnt->LineHeight;
-
-	if (TooltipBack) {
-		// animate BG tooltips
-		// TODO: make tooltip animation an option instead
-		// of following hard-coded check!
-		if (TooltipMargin == 5) {
-			// TODO: make speed an option
-			int tooltip_anim_speed = 15;
-			if (tooltip_currtextw < strw) {
-				tooltip_currtextw += tooltip_anim_speed;
-			}
-			if (tooltip_currtextw > strw) {
-				tooltip_currtextw = strw;
-			}
-			w = tooltip_currtextw;
-		}
-
-		h = TooltipBack[0]->Height;
-		w1 = TooltipBack[1]->Width;
-		w2 = TooltipBack[2]->Width;
-		int margins = TooltipMargin*2;
-		w += margins;
-		strw += margins;
-		int strwmax = TooltipBack[0]->Width - margins;
-		//multiline in case of too much text
-		if (w > TooltipBack[0]->Width) {
-			w = TooltipBack[0]->Width;
-			strw = strwmax;
-		} else if (strw > strwmax)
-			strw = strwmax;
-	}
-
-	int strx = tooltip_x - strw / 2;
-	int y = tooltip_y - h / 2;
-	// Ensure placement within the screen
-	if (strx < 0) strx = 0;
-	else if (strx + strw + w1 + w2 > Width)
-		strx = Width - strw - w1 - w2;
-	if (y < 0) y = 0;
-	else if (y + h > Height)
-		y = Height - h;
-
-	int x = strx + ((strw - w) / 2);
-
-	Region clip = Region( x, y, w, h );
-	if (TooltipBack) {
-		video->BlitSprite( TooltipBack[0], x + TooltipMargin - (TooltipBack[0]->Width - w) / 2, y, true, &clip );
-		video->BlitSprite( TooltipBack[1], x, y, true );
-		video->BlitSprite( TooltipBack[2], x + w, y, true );
-	}
-
-	if (TooltipBack) {
-		clip.x += TooltipBack[1]->Width;
-		clip.w -= TooltipBack[2]->Width;
-		strx += TooltipMargin;
-	}
-	Region textr = Region( strx, y, strw, h );
-
-	// clip drawing to the control bounds, then restore after drawing
-	Region oldclip = video->GetScreenClip();
-	video->SetScreenClip(&clip);
-	fnt->Print( textr, *tooltip_text, NULL,
-			   IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE );
-	video->SetScreenClip(&oldclip);
-}
-
-//interface for higher level functions, if the window was
-//marked for deletion it is not returned
-Window* Interface::GetWindow(unsigned short WindowIndex) const
-{
-	if (WindowIndex < windows.size()) {
-		Window *win = windows[WindowIndex];
-		if (win && (win->Visible!=WINDOW_INVALID) ) {
-			return win;
-		}
-	}
-	return NULL;
-}
-
-// this function will determine if wnd is a valid window pointer
-// by checking if its WindowID is the same as the reference
-bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd) const
-{
-	size_t WindowIndex = windows.size();
-	while (WindowIndex--) {
-		if (windows[WindowIndex] == wnd) {
-			return wnd->WindowID == WindowID;
-		}
-	}
-	return false;
-}
-
-//this function won't delete the window, just mark it for deletion
-//it will be deleted in the next DrawWindows cycle
-//regardless, the window deleted is inaccessible for gui scripts and
-//other high level functions from now
-int Interface::DelWindow(unsigned short WindowIndex)
-{
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
-	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
-		Log(ERROR, "Core", "Window deleted again");
-		return -1;
-	}
-	if (win == ModalWindow) {
-		ModalWindow = NULL;
-	}
-	evntmgr->DelWindow( win );
-	win->release();
-	//re-capturing new (old) modal window if any
-	size_t tw = topwin.size();
-	for(size_t i=0;i<tw;i++) {
-		Window *tmp = windows[topwin[i]];
-		if (tmp->Visible==WINDOW_FRONT) {
-			ModalWindow = tmp;
-			break;
-		}
-	}
-	return 0;
-}
-
-void Interface::DelAllWindows()
-{
-	vars->SetAt("MessageWindow", (ieDword) ~0);
-	vars->SetAt("OptionsWindow", (ieDword) ~0);
-	vars->SetAt("PortraitWindow", (ieDword) ~0);
-	vars->SetAt("ActionsWindow", (ieDword) ~0);
-	vars->SetAt("TopWindow", (ieDword) ~0);
-	vars->SetAt("OtherWindow", (ieDword) ~0);
-	vars->SetAt("FloatWindow", (ieDword) ~0);
-	for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
-		Window* win = windows[WindowIndex];
-		delete win;
-	}
-	windows.clear();
-	topwin.clear();
-	evntmgr->Clear();
-	ModalWindow = NULL;
-}
-
-/**
- * Delegates a pasting request of text to a fitting consumer, e.g. console,
- * potentially text inputs, ...
- */
-void Interface::RequestPasting(const String & string)
-{
-	if (ConsolePopped) {
-		console->InsertText(string);
-	}
-}
-
-/** Popup the Console */
-void Interface::PopupConsole()
-{
-	ConsolePopped = !ConsolePopped;
-	RedrawAll();
+	return Tooltip(L"", GetFont(TooltipFontResRef), colors, bg);
 }
 
 /** Get the Sound Manager */
@@ -3396,13 +2663,10 @@ void Interface::AskAndExit()
 	ieDword askExit = 0;
 	vars->Lookup("AskAndExit", askExit);
 	if (game && !askExit) {
-		if (ConsolePopped) {
-			PopupConsole();
-		}
 		SetPause(PAUSE_ON);
 		vars->SetAt("AskAndExit", 1);
 
-		LoadWindowPack("GUIOPT");
+		guifact->LoadWindowPack("GUIOPT");
 		guiscript->RunFunction("GUIOPT", "OpenQuitMsgWindow");
 		Log(MESSAGE, "Info", "Press ctrl-c (or close the window) again to quit GemRB.\n");
 	} else {
@@ -3500,60 +2764,15 @@ bool Interface::DelSymbol(unsigned int index)
 	return true;
 }
 /** Plays a Movie */
-int Interface::PlayMovie(const char* ResRef)
+int Interface::PlayMovie(const char* resref)
 {
-	const char *realResRef = ResRef;
-	ieDword subtitles = 0;
-	Font *SubtitleFont = NULL;
-	Palette *palette = NULL;
-	ieDword *frames = NULL;
-	ieDword *strrefs = NULL;
-	int cnt = 0;
-	int offset = 0;
-
-	//one of these two should exist (they both mean the same thing)
-	vars->Lookup("Display Movie Subtitles", subtitles);
-	if (subtitles) {
-		//HoW flag
-		cnt=-3;
-		offset = 3;
-	} else {
-		//ToB flag
-		vars->Lookup("Display Subtitles", subtitles);
-	}
-	AutoTable sttable;
-	if (subtitles && sttable.load(ResRef)) {
-		cnt += sttable->GetRowCount();
-		if (cnt>0) {
-			frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
-			strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
-		} else {
-			cnt = 0;
-		}
-		if (frames && strrefs) {
-			for (int i=0;i<cnt;i++) {
-				frames[i] = atoi (sttable->QueryField(i+offset, 0) );
-				strrefs[i] = atoi (sttable->QueryField(i+offset, 1) );
-			}
-		}
-		int r = atoi(sttable->QueryField("red", "frame"));
-		int g = atoi(sttable->QueryField("green", "frame"));
-		int b = atoi(sttable->QueryField("blue", "frame"));
-		SubtitleFont = GetFont (MovieFontResRef); //will change
-		if (r || g || b) {
-			if (SubtitleFont) {
-				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
-				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = new Palette( fore, back );
-			}
-		}
-	}
+	const char *realResRef = resref;
 
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
 	AutoTable mvesnd;
 	if (mvesnd.load("mvesnd", true)) {
-		int row = mvesnd->GetRowIndex(ResRef);
+		int row = mvesnd->GetRowIndex(resref);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");
 			if (mvecol != -1) {
@@ -3568,10 +2787,80 @@ int Interface::PlayMovie(const char* ResRef)
 
 	ResourceHolder<MoviePlayer> mp = GetResourceHolder<MoviePlayer>(realResRef);
 	if (!mp) {
-		gamedata->FreePalette(palette);
-		free(frames);
-		free(strrefs);
 		return -1;
+	}
+
+	//one of these two should exist (they both mean the same thing)
+	ieDword subtitles = true;
+	vars->Lookup("Display Movie Subtitles", subtitles);
+	if (!subtitles) {
+		vars->Lookup("Display Subtitles", subtitles);
+	}
+
+	mp->EnableSubtitles(subtitles);
+
+	class IESubtitles : public MoviePlayer::SubtitleSet {
+		typedef std::map<size_t, ieStrRef> FrameMap;
+		FrameMap subs;
+		mutable size_t nextSubFrame;
+		mutable String* cachedSub;
+
+	public:
+		// default color taken from BGEE.lua
+		IESubtitles(class Font* fnt, ResRef resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
+		: MoviePlayer::SubtitleSet(fnt, col)
+		{
+			AutoTable sttable(resref);
+			cachedSub = NULL;
+			nextSubFrame = 0;
+
+			for (size_t i = 0; i < sttable->GetRowCount(); ++i) {
+				const char* frameField = sttable->QueryField(i, 0);
+				const char* strField = sttable->QueryField(i, 1);
+				if (frameField && strField) { // this skips the initial palette rows
+					subs[atoi(frameField)] = atoi(strField);
+				}
+			}
+		}
+
+		~IESubtitles() override {
+			delete cachedSub;
+		}
+
+		size_t NextSubtitleFrame() const override {
+			return nextSubFrame;
+		}
+
+		const String& SubtitleAtFrame(size_t frameNum) const override {
+			// FIXME: we cant go backwards now... we dont need to, but this is ugly
+			if (frameNum >= NextSubtitleFrame()) {
+				FrameMap::const_iterator it;
+				it = subs.upper_bound(frameNum);
+				nextSubFrame = it->first;
+				if (it != subs.begin()) {
+					--it;
+				}
+				delete cachedSub;
+				cachedSub = core->GetString(it->second);
+			}
+
+			assert(cachedSub);
+			return *cachedSub;
+		}
+	};
+
+	AutoTable sttable(resref);
+	Font* font = GetFont(MovieFontResRef);
+	if (sttable && font) {
+		int r = atoi(sttable->QueryField("red", "frame"));
+		int g = atoi(sttable->QueryField("green", "frame"));
+		int b = atoi(sttable->QueryField("blue", "frame"));
+
+		if (r || g || b) {
+			mp->SetSubtitles(new IESubtitles(font, resref, Color(r, g, b, 0xff)));
+		} else {
+			mp->SetSubtitles(new IESubtitles(font, resref));
+		}
 	}
 
 	//shutting down music and ambients before movie
@@ -3579,33 +2868,37 @@ int Interface::PlayMovie(const char* ResRef)
 		music->HardEnd();
 	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 	if (ambim) ambim->deactivate();
-	video->SetMovieFont(SubtitleFont, palette );
-	mp->CallBackAtFrames(cnt, frames, strrefs);
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
 		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
 	}
-	mp->Play();
+
+	// clear whatever is currently on screen
+	SetCutSceneMode(true);
+	Region screen(0,0, Width, Height);
+	Window* win = winmgr->MakeWindow(screen);
+	win->SetFlags(Window::Borderless|Window::NoSounds, OP_OR);
+	winmgr->PresentModalWindow(win);
+	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
+	winmgr->DrawWindows();
+
+	mp->Play(win);
+	win->Close();
+	winmgr->SetCursorFeedback(cur);
+	SetCutSceneMode(false);
 	if (sound_override) {
 		sound_override->Stop();
 		sound_override.release();
 	}
-	gamedata->FreePalette( palette );
-	if (frames)
-		free(frames);
-	if (strrefs)
-		free(strrefs);
+
 	//restarting music
 	if (music)
 		music->Start();
 	if (ambim) ambim->activate();
-	//this will fix redraw all windows as they looked like
-	//before the movie
-	RedrawAll();
 
 	//Setting the movie name to 1
-	vars->SetAt( ResRef, 1 );
+	vars->SetAt( resref, 1 );
 	return 0;
 }
 
@@ -3628,22 +2921,6 @@ int Interface::Roll(int dice, int size, int add) const
 
 DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 {
-	struct ExtFilter : DirectoryIterator::FileFilterPredicate {
-		char extension[9];
-		ExtFilter(const char* ext) {
-			strlcpy(extension, ext, sizeof(extension));
-		}
-
-		bool operator()(const char* fname) const {
-			const char* extpos = strrchr(fname, '.');
-			if (extpos) {
-				extpos++;
-				return stricmp(extpos, extension) == 0;
-			}
-			return false;
-		}
-	};
-
 	char Path[_MAX_PATH];
 	const char* resourcePath = NULL;
 	DirectoryIterator::FileFilterPredicate* filter = NULL;
@@ -3810,32 +3087,24 @@ void Interface::SetCutSceneRunner(Scriptable *runner) {
 void Interface::SetCutSceneMode(bool active)
 {
 	GameControl *gc = GetGameControl();
-
 	if (gc) {
-		// don't mess with controls/etc if we're already in a cutscene
-		if (active == (bool)(gc->GetScreenFlags()&SF_CUTSCENE))
-			return;
-
 		gc->SetCutSceneMode( active );
 	}
-	if (game) {
-		if (active) {
-			game->ControlStatus |= CS_HIDEGUI;
-		} else {
-			game->ControlStatus &= ~CS_HIDEGUI;
-		}
-		SetEventFlag(EF_CONTROL);
-	}
-	video->SetMouseEnabled(!active);
 
-	if (!active) SetCutSceneRunner(NULL);
+	ToggleViewsVisible(!active, "HIDE_CUT");
+
+	if (active) {
+		GetGUIScriptEngine()->RunFunction("GUICommonWindows", "CloseTopWindow");
+	} else {
+		SetCutSceneRunner(NULL);
+	}
 }
 
 /** returns true if in dialogue or cutscene */
 bool Interface::InCutSceneMode() const
 {
 	const GameControl *gc = GetGameControl();
-	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&(SF_DISABLEMOUSE|SF_CUTSCENE))) {
+	if (!gc || (gc->GetDialogueFlags()&DF_IN_DIALOG) || (gc->GetScreenFlags()&SF_CUTSCENE)) {
 		return true;
 	}
 	return false;
@@ -3845,10 +3114,10 @@ bool Interface::InCutSceneMode() const
 bool Interface::GSUpdate(bool update_scripts)
 {
 	if(update_scripts) {
-		return timer->Update();
+		return timer.Update();
 	}
 	else {
-		timer->Freeze();
+		timer.Freeze();
 		return false;
 	}
 }
@@ -3856,12 +3125,6 @@ bool Interface::GSUpdate(bool update_scripts)
 void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
-	//clear cutscenes
-	//clear fade/screenshake effects
-	timer->Init();
-	timer->SetFadeFromColor(0);
-
-	DelAllWindows(); //delete all windows, including GameControl
 
 	//shutting down ingame music
 	//(do it before deleting the game)
@@ -3884,8 +3147,7 @@ void Interface::QuitGame(int BackToMain)
 		worldmap=NULL;
 	}
 	if (BackToMain) {
-		strcpy(NextScript, "Start");
-		QuitFlag |= QF_CHANGESCRIPT;
+		SetNextScript("Start");
 	}
 	GSUpdate(true);
 }
@@ -3929,14 +3191,14 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
 		sav_str = NULL;
 		wmp_str1 = gamedata->GetResource( WorldMapName[0], IE_WMP_CLASS_ID );
-		if (WorldMapName[1][0]) {
+		if (!WorldMapName[1].IsEmpty()) {
 			wmp_str2 = gamedata->GetResource( WorldMapName[1], IE_WMP_CLASS_ID );
 		}
 	} else {
 		gam_str = sg->GetGame();
 		sav_str = sg->GetSave();
 		wmp_str1 = sg->GetWmap(0);
-		if (WorldMapName[1][0]) {
+		if (!WorldMapName[1].IsEmpty()) {
 			wmp_str2 = sg->GetWmap(1);
 			if (!wmp_str2) {
 				//upgrade an IWD game to HOW
@@ -4008,10 +3270,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
-
 	delete new_game;
 	delete new_worldmap;
-
 	delete gam_str;
 	delete wmp_str1;
 	delete wmp_str2;
@@ -4021,13 +3281,13 @@ cleanup:
 }
 
 /* replace the current world map but sync areas available in old and new */
-void Interface::UpdateWorldMap(ieResRef wmResRef)
+void Interface::UpdateWorldMap(ResRef wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
-		Log(ERROR, "Core", "Could not update world map %s", wmResRef);
+		Log(ERROR, "Core", "Could not update world map %s", wmResRef.CString());
 		return;
 	}
 
@@ -4048,7 +3308,7 @@ void Interface::UpdateWorldMap(ieResRef wmResRef)
 
 	delete worldmap;
 	worldmap = new_worldmap;
-	CopyResRef(WorldMapName[0], wmResRef);
+	WorldMapName[0] = wmResRef;
 }
 
 /* swapping out old resources */
@@ -4074,49 +3334,6 @@ void Interface::UpdateMasterScript()
 		delete worldmap;
 		worldmap = wmp_mgr->GetWorldMapArray();
 	}
-}
-
-bool Interface::HideGCWindow()
-{
-	Window *window = GetWindow( 0 );
-	// in the beginning, there's no window at all
-	if (! window)
-		return false;
-
-	Control* gc = window->GetControl(0);
-	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
-		return false;
-	}
-	SetVisible(0, WINDOW_INVISIBLE);
-	return true;
-}
-
-void Interface::UnhideGCWindow()
-{
-	Window *window = GetWindow( 0 );
-	if (!window)
-		return;
-	Control* gc = window->GetControl(0);
-	if (gc->ControlType!=IE_GUI_GAMECONTROL)
-		return;
-	SetVisible(0, WINDOW_VISIBLE);
-}
-
-GameControl *Interface::GetGameControl() const
-{
-	Window *window = GetWindow( 0 );
-	// in the beginning, there's no window at all
-	if (! window)
-		return NULL;
-
-	Control* gc = window->GetControl(0);
-	if (gc == NULL) {
-		return NULL;
-	}
-	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
-		return NULL;
-	}
-	return (GameControl *) gc;
 }
 
 bool Interface::InitItemTypes()
@@ -4455,40 +3672,14 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	return ret;
 }
 
-Label *Interface::GetMessageLabel() const
+Label* Interface::GetMessageLabel() const
 {
-	ieDword WinIndex = (ieDword) -1;
-	ieDword TAIndex = (ieDword) -1;
-
-	vars->Lookup( "OtherWindow", WinIndex );
-	if (( WinIndex != (ieDword) -1 ) &&
-		( vars->Lookup( "MessageLabel", TAIndex ) )) {
-		Window* win = GetWindow( (unsigned short) WinIndex );
-		if (win) {
-			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
-			if (ctrl && ctrl->ControlType==IE_GUI_LABEL)
-				return (Label *) ctrl;
-		}
-	}
-	return NULL;
+	return GetControl<Label>("MsgSys", 1);
 }
 
-TextArea *Interface::GetMessageTextArea() const
+TextArea* Interface::GetMessageTextArea() const
 {
-	ieDword WinIndex = (ieDword) -1;
-	ieDword TAIndex = (ieDword) -1;
-
-	vars->Lookup( "MessageWindow", WinIndex );
-	if (( WinIndex != (ieDword) -1 ) &&
-		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = GetWindow( (unsigned short) WinIndex );
-		if (win) {
-			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
-			if (ctrl && ctrl->ControlType==IE_GUI_TEXTAREA)
-				return (TextArea *) ctrl;
-		}
-	}
-	return NULL;
+	return GetControl<TextArea>("MsgSys", 0);
 }
 
 void Interface::SetFeedbackLevel(int level)
@@ -4560,6 +3751,9 @@ bool Interface::StupidityDetector(const char* Pt)
 		return true;
 	}
 	DirectoryIterator dir(Path);
+	// scan everything
+	dir.SetFlags(DirectoryIterator::All, true);
+
 	if (!dir) {
 		print("\n**cannot open**");
 		return true;
@@ -4595,16 +3789,12 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 		return;
 	}
 	DirectoryIterator dir(Path);
+	dir.SetFlags(DirectoryIterator::Files);
 	if (!dir) {
 		return;
 	}
 	do {
 		const char *name = dir.GetName();
-		if (dir.IsDirectory())
-			continue;
-		// FIXME: we need a more universal isHidden type method on DirectoryIterator
-		if (name[0] == '.')
-			continue;
 		if (!onlysave || SavedExtension(name) ) {
 			char dtmp[_MAX_PATH];
 			dir.GetFullPath(dtmp);
@@ -4616,51 +3806,41 @@ void Interface::DelTree(const char* Pt, bool onlysave)
 void Interface::LoadProgress(int percent)
 {
 	vars->SetAt("Progress", percent);
-	RedrawControls("Progress", percent);
-	RedrawAll();
-	DrawWindows();
+
+	WindowManager::CursorFeedback cur = winmgr->SetCursorFeedback(WindowManager::MOUSE_NONE);
+	winmgr->DrawWindows();
+	winmgr->SetCursorFeedback(cur);
+
+	Window* loadwin = GetWindow(0, "LOADWIN");
+	if (loadwin) {
+		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
+		loadwin->RedrawControls("Progress", percent);
+	}
+
 	video->SwapBuffers();
 }
 
 void Interface::ReleaseDraggedItem()
 {
-	DraggedItem=NULL; //shouldn't free this
-	video->SetCursor (NULL, VID_CUR_DRAG);
+	DraggedItem = nullptr;
+	winmgr->GetGameWindow()->SetCursor(nullptr);
 }
 
-void Interface::DragItem(CREItem *item, const ieResRef Picture)
+void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 {
 	//We should drop the dragged item and pick this up,
 	//we shouldn't have a valid DraggedItem at this point.
 	//Anyway, if there is still a dragged item, it will be destroyed.
 	if (DraggedItem) {
 		Log(WARNING, "Core", "Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!");
-		delete DraggedItem;
+		delete DraggedItem->item;
+		DraggedItem = nullptr;
 	}
-	DraggedItem = item;
-	if (video) {
-		Sprite2D* DraggedCursor = NULL;
-		if (item) {
-			DraggedCursor = gamedata->GetBAMSprite(Picture, 0, 0);
-			if (!DraggedCursor) {
-				// use any / the smaller icon if the dragging one is unavailable
-				DraggedCursor = gamedata->GetBAMSprite(Picture, -1, 0);
-			}
-		}
-		video->SetCursor (DraggedCursor, VID_CUR_DRAG);
-		if (DraggedCursor) DraggedCursor->release();
-	}
-}
-
-void Interface::SetDraggedPortrait(int dp, int idx)
-{
-	if (idx<0) idx=14;
-	DraggedPortrait = dp;
-	if (dp) {
-		video->SetCursor(Cursors[idx], VID_CUR_DRAG);
-	} else {
-		video->SetCursor(NULL, VID_CUR_DRAG);
-	}
+	
+	if (!item) return;
+	
+	DraggedItem.reset(new ItemDragOp(item));
+	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
@@ -4719,7 +3899,7 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	strnlwrcpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), 8);
+	strnlwrcpy( GoldResRef, tab->QueryField(size_t(0), size_t(0)), 8);
 	if ( GoldResRef[0]=='*' ) {
 		return false;
 	}
@@ -4894,19 +4074,6 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 	return false;
 }
 
-//now that we store spell name in spl, i guess, we shouldn't pass 'ieResRef name'
-//these functions are needed because Win32 doesn't allow freeing memory from
-//another dll. So we allocate all commonly used memories from core
-ITMExtHeader *Interface::GetITMExt(int count)
-{
-	return new ITMExtHeader[count];
-}
-
-SPLExtHeader *Interface::GetSPLExt(int count)
-{
-	return new SPLExtHeader[count];
-}
-
 Effect *Interface::GetEffect(ieDword opcode)
 {
 	if (opcode==0xffffffff) {
@@ -4919,16 +4086,6 @@ Effect *Interface::GetEffect(ieDword opcode)
 	memset(fx,0,sizeof(Effect));
 	fx->Opcode=opcode;
 	return fx;
-}
-
-Effect *Interface::GetFeatures(int count)
-{
-	return new Effect[count];
-}
-
-WorldMapArray *Interface::NewWorldMapArray(int count)
-{
-	return new WorldMapArray(count);
 }
 
 Container *Interface::GetCurrentContainer()
@@ -5007,13 +4164,14 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 
 	if (!dlg) {
 		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
-		return (ieStrRef) -1;
+		return ieStrRef(-1);
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
 
 	// forcefully rerandomize
 	RandomNumValue = RAND_ALL();
-	ieStrRef ret = (ieStrRef) -1;
+	ieStrRef ret = ieStrRef(-1);
+
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {
 		ret = dlg->GetState( i )->StrRef;
@@ -5023,11 +4181,12 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-void Interface::PlaySound(int index, unsigned int channel)
+Holder<SoundHandle> Interface::PlaySound(int index, unsigned int channel)
 {
 	if (index<=DSCount) {
-		AudioDriver->Play(DefSound[index], channel);
+		return AudioDriver->Play(DefSound[index], channel);
 	}
+	return NULL;
 }
 
 Actor *Interface::GetFirstSelectedPC(bool forced)
@@ -5060,22 +4219,28 @@ Actor *Interface::GetFirstSelectedActor()
 	return NULL;
 }
 
-//this is used only for the console
-Sprite2D *Interface::GetCursorSprite()
+bool Interface::HasCurrentArea() const
 {
-	Sprite2D *spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
+	if (!game) return false;
+	return game->GetCurrentArea() != nullptr;
+}
+
+//this is used only for the console
+Holder<Sprite2D> Interface::GetCursorSprite()
+{
+	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
 	if (spr)
 	{
 		if(HasFeature(GF_OVERRIDE_CURSORPOS))
 		{
-			spr->XPos=1;
-			spr->YPos=spr->Height-1;
+			spr->Frame.x=1;
+			spr->Frame.y=spr->Frame.h-1;
 		}
 	}
 	return spr;
 }
 
-Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
+Holder<Sprite2D> Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 {
 	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum, true);
 }
@@ -5294,7 +4459,7 @@ int Interface::WriteWorldMap(const char *folder)
 		return -1;
 	}
 
-	if (WorldMapName[1][0]) {
+	if (!WorldMapName[1].IsEmpty()) {
 		worldmap->SetSingle(false);
 	}
 
@@ -5340,15 +4505,12 @@ int Interface::CompressSave(const char *folder)
 	PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
+	dir.SetFlags(DirectoryIterator::Files);
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
 	int priority=2;
 	while(priority) {
 		do {
 			const char *name = dir.GetName();
-			if (dir.IsDirectory())
-				continue;
-			if (name[0] == '.')
-				continue;
 			if (SavedExtension(name)==priority) {
 				char dtmp[_MAX_PATH];
 				dir.GetFullPath(dtmp);
@@ -5530,9 +4692,9 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 			ieDword autopause_center = 0;
 			vars->Lookup("Auto Pause Center", autopause_center);
 			if (autopause_center && target) {
-				Point screenPos = target->Pos;
-				core->GetVideoDriver()->ConvertToScreen(screenPos.x, screenPos.y);
-				GetGameControl()->Center(screenPos.x, screenPos.y);
+				GameControl* gc = GetGameControl();
+				gc->MoveViewportTo(target->Pos, true);
+
 				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
 					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
 				}
@@ -5550,10 +4712,7 @@ void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
 
 void Interface::SetInfoTextColor(const Color &color)
 {
-	if (InfoTextPalette) {
-		gamedata->FreePalette(InfoTextPalette);
-	}
-	InfoTextPalette = new Palette(color, ColorBlack);
+	InfoTextColor = color;
 }
 
 //todo row?
@@ -5689,7 +4848,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
-		DrawWindows();
+		winmgr->DrawWindows();
 		for (size_t i=0;i<CD[disc_number-1].size();i++) {
 			char name[_MAX_PATH];
 
@@ -5703,19 +4862,10 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-// remove the extraneus EOL newline and carriage return
-void Interface::StripLine(char * string, size_t size) {
-	if (size >= 2 && string[size-2] == '\n') {
-		string[size-2] = '\0';
-	}
-	if (size >= 3 && string[size-3] == '\r') {
-		string[size-3] = '\0'; // remove the carriage return too
-	}
-}
-
-void Interface::SetTickHook(EventHandler hook)
+Timer& Interface::SetTimer(const EventHandler& handler, unsigned long interval, int repeats)
 {
-	TickHook = hook;
+	timers.push_back(Timer(interval, handler, repeats));
+	return timers.back();
 }
 
 void Interface::SetNextScript(const char *script)
@@ -5728,28 +4878,6 @@ void Interface::SanityCheck(const char *ver) {
 	if (strcmp(ver, VERSION_GEMRB)) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
-}
-
-void Interface::SetBits(unsigned int &flag, unsigned int value, int mode) const
-{
-	switch(mode) {
-		case OP_OR: flag |= value; break;
-		case OP_NAND: flag &= ~value; break;
-		case OP_SET: flag = value; break;
-		case OP_AND: flag &= value; break;
-		case OP_XOR: flag ^= value; break;
-	}
-}
-
-/* counts the on bits in a number */
-ieDword Interface::CountBits (ieDword n) const
-{
-	ieDword count = 0;
-	while (n) {
-		count += n & 0x1u;
-		n >>= 1;
-	}
-	return count;
 }
 
 }

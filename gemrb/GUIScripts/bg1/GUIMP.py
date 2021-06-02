@@ -25,14 +25,13 @@ ExitWindow = 0
 
 def OnLoad():
 	global PartyFormationWindow
-	GemRB.LoadWindowPack("GUIMP", 640, 480)
 
-	PartyFormationWindow = GemRB.LoadWindow(0)
+	PartyFormationWindow = GemRB.LoadWindow(0, "GUIMP")
 
 	ExitButton = PartyFormationWindow.GetControl(30)
 	ExitButton.SetText(13906)
 	ExitButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitPress)
-	ExitButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	ExitButton.MakeEscape()
 
 	ModifyCharactersButton = PartyFormationWindow.GetControl(43)
 	ModifyCharactersButton.SetText(18816)
@@ -49,7 +48,7 @@ def OnLoad():
 		#removing this label, it just disturbs us
 		Label.SetSize(0, 0)
 		Button = PartyFormationWindow.GetControl(i-12)
-		ResRef = GemRB.GetPlayerPortrait(i-17, 1)
+		ResRef = GemRB.GetPlayerPortrait (i-17, 1)["ResRef"]
 		if ResRef == "":
 			Button.SetFlags(IE_GUI_BUTTON_NORMAL,OP_SET)
 		else:
@@ -75,12 +74,11 @@ def OnLoad():
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, EnterGamePress)
 
-	PartyFormationWindow.SetVisible(WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def ExitPress():
 	global PartyFormationWindow, ExitWindow
-	PartyFormationWindow.SetVisible(WINDOW_INVISIBLE)
 	ExitWindow = GemRB.LoadWindow(7)
 
 	TextArea = ExitWindow.GetControl(0)
@@ -89,36 +87,27 @@ def ExitPress():
 	CancelButton = ExitWindow.GetControl(2)
 	CancelButton.SetText(13727)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitCancelPress)
-	CancelButton.SetFlags(IE_GUI_BUTTON_CANCEL, OP_OR)
+	CancelButton.MakeEscape()
 
 	DoneButton = ExitWindow.GetControl(1)
 	DoneButton.SetText(11973)
-	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, ExitDonePress)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: ExitWindow.Close())
+	DoneButton.MakeDefault()
 
-	ExitWindow.SetVisible(WINDOW_VISIBLE)
-	return
-
-def ExitDonePress():
-	global PartyFormationWindow, ExitWindow
-	if ExitWindow:
-		ExitWindow.Unload()
-	if PartyFormationWindow:
-		PartyFormationWindow.Unload()
-	GemRB.SetNextScript("Start")
+	ExitWindow.Focus()
 	return
 
 def ExitCancelPress():
 	global PartyFormationWindow, ExitWindow
 	if ExitWindow:
 		ExitWindow.Unload()
-	PartyFormationWindow.SetVisible(WINDOW_VISIBLE)
+	PartyFormationWindow.Focus()
 	return
 
 def GeneratePress():
 	global PartyFormationWindow
 	slot = GemRB.GetVar("Slot")
-	ResRef = GemRB.GetPlayerPortrait(slot, 0)
+	ResRef = GemRB.GetPlayerPortrait (slot, 0)["ResRef"]
 	if ResRef:
 		print "Already existing slot, we should drop it"
 	if PartyFormationWindow:

@@ -25,6 +25,8 @@ import LUCommon
 from ie_stats import *
 from GUIDefines import *
 
+import CharGenCommon
+
 ClassWindow = 0
 TextAreaControl = 0
 DoneButton = 0
@@ -33,8 +35,8 @@ MyChar = 0
 def OnLoad():
 	global ClassWindow, TextAreaControl, DoneButton, MyChar
 	
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ClassWindow = GemRB.LoadWindow(2)
+	ClassWindow = GemRB.LoadWindow(2, "GUICG")
+	CharGenCommon.PositionCharGenWin(ClassWindow)
 
 	MyChar = GemRB.GetVar ("Slot")
 	Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
@@ -89,25 +91,25 @@ def OnLoad():
 
 	BackButton = ClassWindow.GetControl(14)
 	BackButton.SetText(15416)
-	BackButton.SetFlags (IE_GUI_BUTTON_CANCEL, OP_OR)
+	BackButton.MakeEscape()
 	DoneButton = ClassWindow.GetControl(0)
 	DoneButton.SetText(11973)
-	DoneButton.SetFlags (IE_GUI_BUTTON_DEFAULT, OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = ClassWindow.GetControl(13)
 
 	ClassName = GUICommon.GetClassRowName (GemRB.GetVar ("Class")-1, "index")
 	if ClassName == "":
 		TextAreaControl.SetText(17242)
-		DoneButton.SetState(IE_GUI_BUTTON_DISABLED)
+		DoneButton.SetDisabled(True)
 	else:
 		TextAreaControl.SetText (CommonTables.Classes.GetValue (ClassName, "DESC_REF"))
-		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
+		DoneButton.SetDisabled(False)
 
 	MultiClassButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, MultiClassPress)
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	ClassWindow.SetVisible(WINDOW_VISIBLE)
+	ClassWindow.Focus()
 	return
 
 def BackPress():

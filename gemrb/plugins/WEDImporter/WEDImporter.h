@@ -21,7 +21,10 @@
 #ifndef WEDIMPORTER_H
 #define WEDIMPORTER_H
 
+#include "Polygon.h"
 #include "TileMapMgr.h"
+
+#include <vector>
 
 namespace GemRB {
 
@@ -39,32 +42,44 @@ class WEDImporter : public TileMapMgr {
 private:
 	std::vector<Overlay> overlays;
 	DataStream* str = nullptr;
-	ieDword OverlaysCount = 0, OverlaysOffset = 0;
-	ieDword DoorsCount = 0, DoorsOffset = 0, DoorTilesOffset = 0, DoorPolygonsCount = 0;
-	ieDword WallPolygonsCount = 0, WallGroupsOffset = 0;
-	ieDword PolygonsOffset = 0, VerticesOffset = 0;
-	ieDword SecHeaderOffset = 0, PILTOffset = 0;
+	ieDword OverlaysCount = 0;
+	ieDword DoorsCount = 0;
+	ieDword OverlaysOffset = 0;
+	ieDword SecHeaderOffset = 0;
+	ieDword DoorsOffset = 0;
+	ieDword DoorTilesOffset = 0;
+	ieDword WallPolygonsCount = 0;
+	ieDword PolygonsOffset = 0;
+	ieDword VerticesOffset = 0;
+	ieDword WallGroupsOffset = 0;
+	ieDword PLTOffset = 0;
+	ieDword DoorPolygonsCount = 0;
 	//these will change as doors are being read, so get them in time!
 	ieWord OpenPolyCount = 0, ClosedPolyCount = 0;
 	ieDword OpenPolyOffset = 0, ClosedPolyOffset = 0;
 	bool ExtendedNight = false;
 
+	WallPolygonGroup polygonTable;
+
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
 	int AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const;
+	void ReadWallPolygons();
+	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
+
 public:
 	WEDImporter(void);
-	~WEDImporter(void);
-	bool Open(DataStream* stream);
+	~WEDImporter(void) override;
+	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it
-	TileMap* GetTileMap(TileMap *tm) const;
-	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
-	Wall_Polygon **GetWallGroups() const;
-	ieDword GetWallPolygonsCount() const { return WallPolygonsCount; }
-	ieDword GetPolygonsCount() const { return WallPolygonsCount + DoorPolygonsCount; }
-	void SetupOpenDoor(unsigned int &index, unsigned int &count) const;
-	void SetupClosedDoor(unsigned int &index, unsigned int &count) const;
-	void SetExtendedNight(bool night) { ExtendedNight = night; }
+	TileMap* GetTileMap(TileMap *tm) const override;
+	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed) override;
+
+	std::vector<WallPolygonGroup> GetWallGroups() const override;
+
+	WallPolygonGroup OpenDoorPolygons() const override;
+	WallPolygonGroup ClosedDoorPolygons() const override;
+	void SetExtendedNight(bool night) override { ExtendedNight = night; }
 };
 
 }

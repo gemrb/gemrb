@@ -19,95 +19,47 @@
  */
 
 #include "GUI/Control.h"
-
-#include "GUI/EventMgr.h"
+#include "GUI/GUIScriptInterface.h"
 #include "GUI/Window.h"
 
+#include "ie_cursors.h"
 #include "ControlAnimation.h"
 #include "Interface.h"
-#include "ScriptEngine.h"
 #include "Sprite2D.h"
-
-#ifdef ANDROID
 #include "Variables.h"
-#endif
 
 #include <cstdio>
 #include <cstring>
 
 namespace GemRB {
 
-Control::Control(const Region& frame)
-{
-	hasFocus = false;
-	Changed = false; // no window to draw to yet.
-	InHandler = false;
-	VarName[0] = 0;
-	ControlID = 0;
-	Value = 0;
-	Flags = 0;
-	Tooltip = NULL;
-	Owner = NULL;
-	XPos = frame.x;
-	YPos = frame.y;
-	Width = frame.w;
-	Height = frame.h;
+unsigned int Control::ActionRepeatDelay = 250;
 
-	sb = NULL;
+const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
+
+Control::Control(const Region& frame)
+: View(frame) // dont pass superview to View constructor
+{
+	VarName[0] = 0;
+	SetValueRange(MaxValueRange);
+
 	animation = NULL;
-	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;
-	FunctionNumber = -1;
+
+	actionTimer = NULL;
+	repeatDelay = 0;
 }
 
 Control::~Control()
 {
-	if (InHandler) {
-		Log(ERROR, "Control", "Destroying control inside event handler, crash may occur!");
-	}
-	core->DisplayTooltip( 0, 0, NULL );
-	delete Tooltip;
+	ClearActionTimer();
+
 	delete animation;
-
-	Sprite2D::FreeSprite(AnimPicture);
 }
 
-Region Control::ControlFrame() const
+bool Control::IsOpaque() const
 {
-	return Region(XPos, YPos, Width, Height);
-}
-
-void Control::SetControlFrame(const Region& r)
-{
-	// TODO: we should actually represent these with a private Region
-	XPos = r.x;
-	YPos = r.y;
-	Width = r.w;
-	Height = r.h;
-}
-
-void Control::Draw(unsigned short x, unsigned short y)
-{
-	// FIXME: Draw shouldnt be getting called on controls that are offscreen...
-	if (XPos == 65535) {
-		return;
-	}
-	// no point in drawing something with a 0 w/h
-	if (!Width || !Height) {
-		return;
-	}
-	if (!NeedsDraw()) {
-		return;
-	}
-
-	Region drawFrame = Region(x + XPos, y + YPos, Width, Height);
-	Video* video = core->GetVideoDriver();
-	// clip drawing to the control bounds, then restore after drawing
-	Region clip = video->GetScreenClip();
-	video->SetScreenClip(&drawFrame);
-	DrawInternal(drawFrame);
-	video->SetScreenClip(&clip);
-	Changed = false; // set *after* calling DrawInternal
+	 return AnimPicture && AnimPicture->HasTransparency() == false;
 }
 
 void Control::SetText(const String* string)
@@ -115,65 +67,67 @@ void Control::SetText(const String* string)
 	SetText((string) ? *string : L"");
 }
 
-/** Sets the Tooltip text of the current control */
-int Control::SetTooltip(const char* string)
+void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
+						Event::EventMods mod, short count)
 {
-	delete Tooltip;
-	if ((string == NULL) || (string[0] == 0)) {
-		Tooltip = NULL;
-	} else {
-		Tooltip = StringFromCString(string);
-		TrimString(*Tooltip); // for proper vertical alaignment
-	}
-	Changed = true;
-	return 0;
+	ControlActionKey key(type, mod, button, count);
+	return SetAction(std::move(handler), key);
 }
 
-/** Sets the tooltip to be displayed on the screen now */
-void Control::DisplayTooltip()
+void Control::SetAction(Responder handler, const ActionKey& key)
 {
-	if (Tooltip)
-		core->DisplayTooltip( Owner->XPos + XPos + Width / 2, Owner->YPos + YPos + Height / 2, this );
-	else
-		core->DisplayTooltip( 0, 0, NULL );
-}
-
-void Control::ResetEventHandler(ControlEventHandler &handler)
-{
-	handler = NULL;
-}
-
-//return -1 if there is an error
-//return 1 if there is no handler (not an error)
-//return 0 if the handler ran as intended
-int Control::RunEventHandler(ControlEventHandler handler)
-{
-	if (InHandler) {
-		Log(WARNING, "Control", "Nested event handlers are not supported!");
-		return -1;
-	}
 	if (handler) {
-		Window *wnd = Owner;
-		if (!wnd) {
-			return -1;
+		actions[key] = handler;
+	} else {
+		// delete the entry if there is one instead of setting it to NULL
+		ActionIterator it = actions.find(key);
+		if (it != actions.end()) {
+			actions.erase(it);
 		}
-		unsigned short WID = wnd->WindowID;
-		unsigned short ID = (unsigned short) ControlID;
-		InHandler = true;
-		//TODO: detect caller errors, trap them???
-		handler(this);
-		InHandler = false;
-		if (!core->IsValidWindow(WID,wnd) ) {
-			Log(ERROR, "Control", "Owner window destructed!");
-			return -1;
-		}
-		if (!wnd->IsValidControl(ID,this) ) {
-			Log(ERROR, "Control", "Control destructed!");
-			return -1;
-		}
-		return 0;
 	}
-	return 1;
+}
+
+void Control::SetActionInterval(unsigned int interval)
+{
+	repeatDelay = interval;
+	if (actionTimer) {
+		actionTimer->SetInverval(repeatDelay);
+	}
+}
+
+bool Control::SupportsAction(const ActionKey& key)
+{
+	return actions.count(key);
+}
+
+bool Control::PerformAction()
+{
+	return PerformAction(ACTION_DEFAULT);
+}
+
+bool Control::PerformAction(const ActionKey& key)
+{
+	if (IsDisabled()) {
+		return false;
+	}
+	
+	ActionIterator it = actions.find(key);
+	if (it != actions.end()) {
+		if (!window) {
+			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");
+		}
+
+		(it->second)(this);
+		return true;
+	}
+	return false;
+}
+
+void Control::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (actionTimer && (flags&Disabled)) {
+		ClearActionTimer();
+	}
 }
 
 void Control::UpdateState(const char* varname, unsigned int val)
@@ -183,107 +137,208 @@ void Control::UpdateState(const char* varname, unsigned int val)
 	}
 }
 
-/** Mouse Button Down */
-void Control::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned short Button, unsigned short Mod)
+void Control::SetFocus()
 {
-	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl!=this)) {
-			ctrl->OnMouseDown(x,y,Button,Mod);
-		}
+	window->SetFocused(this);
+	MarkDirty();
+}
+
+bool Control::IsFocused()
+{
+	return window->FocusedView() == this;
+}
+
+void Control::SetValue(ieDword val)
+{
+	ieDword oldVal = Value;
+	Value = Clamp(val, range.first, range.second);
+	
+	if (VarName[0] != 0) {
+		// set this even when the value doesn't change
+		// if a radio is clicked, then one of its siblings, the siblings value wont change
+		// but we expect the dictionary to reflect the selected value
+		core->GetDictionary()->SetAt(VarName, Value);
+	}
+
+	if (oldVal != Value) {
+		PerformAction(ValueChange);
+		MarkDirty();
 	}
 }
 
-/** Mouse Button Up */
-void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned short /*Button*/, unsigned short /*Mod*/)
+void Control::SetValueRange(ValueRange r)
 {
-	//print("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd",(unsigned int) ControlID, x, y, Button, Mod);
-}
-
-/** Mouse scroll wheel */
-void Control::OnMouseWheelScroll( short x, short y)
-{
-	Control *ctrl = Owner->GetScrollControl();
-	if (ctrl && (ctrl!=this)) {
-		ctrl->OnMouseWheelScroll( x, y );
-	}	
-}
-
-/** Special Key Press */
-bool Control::OnSpecialKeyPress(unsigned char Key)
-{
-	if (Key == GEM_UP || Key == GEM_DOWN) {
-		Control *ctrl = Owner->GetScrollControl();
-		if (ctrl && (ctrl!=this)) {
-			return ctrl->OnSpecialKeyPress(Key);
-		}
+	range = r;
+	if (Value != CTL_INVALID_VALUE) {
+		SetValue(Value); // update the value if it falls outside the range
 	}
-	return false;
-}
-void Control::SetFocus(bool focus)
-{
-	hasFocus = focus;
-	Changed = true;
 }
 
-bool Control::isFocused()
+void Control::SetValueRange(ieDword min, ieDword max)
 {
-	return hasFocus;
-}
-/** Sets the Display Flags */
-int Control::SetFlags(int arg_flags, int opcode)
-{
-	if ((arg_flags >>24) != ControlType) {
-		Log(WARNING, "Control", "Trying to modify invalid flag %x on control %d (opcode %d)",
-			arg_flags, ControlID, opcode);
-		return -2;
-	}
-	ieDword newFlags = Flags;
-	switch (opcode) {
-		case OP_SET:
-			newFlags = arg_flags;  //set
-			break;
-		case OP_AND:
-			newFlags &= arg_flags;
-			break;
-		case OP_OR:
-			newFlags |= arg_flags; //turn on
-			break;
-		case OP_XOR:
-			newFlags ^= arg_flags;
-			break;
-		case OP_NAND:
-			newFlags &= ~arg_flags;//turn off
-			break;
-		default:
-			return -1;
-	}
-	Flags = newFlags;
-	Changed = true;
-	Owner->Invalidate();
-	return 0;
+	SetValueRange(ValueRange(min, max));
 }
 
-void Control::SetAnimPicture(Sprite2D* newpic)
+void Control::SetAnimPicture(Holder<Sprite2D> newpic)
 {
-	Sprite2D::FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	MarkDirty();
 }
 
-/** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
-	to this Control. */
-int Control::SetScrollBar(Control* ptr)
+void Control::ClearActionTimer()
 {
-	if (ptr && (ptr->ControlType!=IE_GUI_SCROLLBAR)) {
-		Log(WARNING, "Control", "Attached control is not a ScrollBar!");
-		return -1;
+	if (actionTimer) {
+		actionTimer->Invalidate();
+		actionTimer = NULL;
 	}
-	sb = ptr;
-	Changed = true;
-	return (bool)sb;
+}
+
+Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int delay)
+{
+	EventHandler h = [this, action] () {
+		// update the timer to use the actual repeatDelay
+		SetActionInterval(repeatDelay);
+
+		if (VarName[0] != 0) {
+			ieDword val = GetValue();
+			core->GetDictionary()->SetAt(VarName, val);
+			window->RedrawControls(VarName, val);
+		}
+
+		return action(this);
+	};
+	// always start the timer with ActionRepeatDelay
+	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
+	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
+}
+	
+bool Control::HitTest(const Point& p) const
+{
+	if (!(flags & (IgnoreEvents | Invisible))) {
+		return View::HitTest(p);
+	}
+	return false;
+}
+
+View::UniqueDragOp Control::DragOperation()
+{
+	if (actionTimer) {
+		return nullptr;
+	}
+	
+	ActionKey key(Action::DragDropCreate);
+	
+	if (SupportsAction(key)) {
+		// we have to use a timer so that the dragop is set before the callback is called
+		EventHandler h = [this, key] () {
+			return actions[key](this);
+		};
+
+		actionTimer = &core->SetTimer(h, 0, 0);
+	}
+	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+}
+
+bool Control::AcceptsDragOperation(const DragOp& dop) const
+{
+	const ControlDragOp* cdop = dynamic_cast<const ControlDragOp*>(&dop);
+	if (cdop) {
+		assert(cdop->dragView != this);
+		// if 2 controls share the same VarName we assume they are swappable...
+		return (strnicmp(VarName, cdop->Source()->VarName, MAX_VARIABLE_LENGTH-1) == 0);
+	}
+	
+	return View::AcceptsDragOperation(dop);
+}
+
+Holder<Sprite2D> Control::DragCursor() const
+{
+	if (core->InDebugMode(ID_VIEWS)) {
+		return core->Cursors[IE_CURSOR_SWAP];
+	}
+	return nullptr;
+}
+
+bool Control::OnMouseUp(const MouseEvent& me, unsigned short mod)
+{
+	ControlActionKey key(Click, mod, me.button, me.repeats);
+	if (SupportsAction(key)) {
+		PerformAction(key);
+		ClearActionTimer();
+	} else if (me.repeats > 1) {
+		// also try a single-click in case there is no doubleclick handler
+		// and there is never a triple+ click handler
+		MouseEvent me2(me);
+		me2.repeats = 1;
+		OnMouseUp(me2, mod);
+	}
+	return true; // always handled
+}
+
+bool Control::OnMouseDown(const MouseEvent& me, unsigned short mod)
+{
+	ControlActionKey key(Click, mod, me.button, me.repeats);
+	if (repeatDelay && SupportsAction(key)) {
+		actionTimer = StartActionTimer(actions[key]);
+	}
+	return true; // always handled
+}
+
+void Control::OnMouseEnter(const MouseEvent& /*me*/, const DragOp*)
+{
+	PerformAction(HoverBegin);
+}
+
+void Control::OnMouseLeave(const MouseEvent& /*me*/, const DragOp*)
+{
+	PerformAction(HoverEnd);
+}
+
+bool Control::OnTouchDown(const TouchEvent& /*te*/, unsigned short /*mod*/)
+{
+	ControlEventHandler cb = METHOD_CALLBACK(&Control::HandleTouchActionTimer, this);
+	actionTimer = StartActionTimer(cb, 500); // TODO: this time value should be configurable
+	return true; // always handled
+}
+
+bool Control::OnTouchUp(const TouchEvent& te, unsigned short mod)
+{
+	if (actionTimer) {
+		// touch up before timer triggered
+		// send the touch down+up events
+		ClearActionTimer();
+		View::OnTouchDown(te, mod);
+		View::OnTouchUp(te, mod);
+		return true;
+	}
+	return false; // touch was already handled as a long press
+}
+
+bool Control::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
+{
+	if (key.keycode == GEM_RETURN) {
+		return PerformAction();
+	}
+	
+	return View::OnKeyPress(key, mod);
+}
+
+void Control::HandleTouchActionTimer(Control* ctrl)
+{
+	assert(ctrl == this);
+	assert(actionTimer);
+
+	ClearActionTimer();
+
+	// long press action (GEM_MB_MENU)
+	// NOTE: we could save the mod value from OnTouchDown to support modifiers to the touch, but we don't have a use ATM
+	ControlActionKey key(Click, 0, GEM_MB_MENU, 1);
+	PerformAction(key);
+}
+
+ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
+{
+	return new ControlScriptingRef(this, id, group);
 }
 
 }

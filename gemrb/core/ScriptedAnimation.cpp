@@ -30,6 +30,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
+#include "Pixels.h"
 #include "Sprite2D.h"
 #include "Video.h"
 
@@ -68,17 +69,14 @@ ScriptedAnimation::ScriptedAnimation()
 
 void ScriptedAnimation::Init()
 {
-	cover = NULL;
 	memset(anims,0,sizeof(anims));
-	palette = NULL;
 	sounds[0][0] = 0;
 	sounds[1][0] = 0;
 	sounds[2][0] = 0;
-	memset(&Tint,0,sizeof(Tint));
 	Transparency = 0;
 	Fade = 0;
 	SequenceFlags = 0;
-	XPos = YPos = ZPos = 0;
+	XOffset = YOffset = ZOffset = 0;
 	FrameRate = ANI_DEFAULT_FRAMERATE;
 	NumOrientations = 0;
 	Orientation = 0;
@@ -86,7 +84,6 @@ void ScriptedAnimation::Init()
 	Dither = 0;
 	Duration = 0xffffffff;
 	justCreated = true;
-	PaletteName[0]=0;
 	twin = NULL;
 	Phase = P_NOTINITED;
 	SoundPhase = P_NOTINITED;
@@ -269,9 +266,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 	ieDword tmp;
 	stream->ReadDword( &tmp );
-	XPos = (signed) tmp;
+	XOffset = int(tmp);
 	stream->ReadDword( &tmp );  //this affects visibility
-	YPos = (signed) tmp;
+	YOffset = int(tmp);
 	stream->Seek( 4, GEM_CURRENT_POS ); // (offset) position flags in the original, "use orientation" on IESDP
 	stream->ReadDword( &FrameRate );
 
@@ -284,7 +281,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->Seek( 8, GEM_CURRENT_POS ); // CResRef m_cNewPaletteRef in the original
 
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	ZPos = (signed) tmp;
+	ZOffset = int(tmp);
 
 	stream->ReadDword( &LightX ); // and Lighting effect radius / width / glow
 	stream->ReadDword( &LightY );
@@ -350,7 +347,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 				anims[p_release] = PrepareAnimation(af, seq3, i);
 			}
 		}
-		PreparePalette();
+		if (Transparency&IE_VVC_BLENDED) {
+			GetPaletteCopy();
+		}
 	}
 
 	SetPhase(P_ONSET);
@@ -363,20 +362,11 @@ ScriptedAnimation::~ScriptedAnimation(void)
 	for (Animation *anim : anims) {
 		delete anim;
 	}
-	if (gamedata) { // avoid UBSAN warning; it's on exit, so we don't care about potential leaks
-		gamedata->FreePalette(palette, PaletteName);
-	}
 
-	if (cover) {
-		SetSpriteCover(NULL);
-	}
 	if (twin) {
 		delete twin;
 	}
 	StopSound();
-	if (light) {
-		Sprite2D::FreeSprite(light);
-	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
@@ -385,8 +375,9 @@ void ScriptedAnimation::SetPhase(int arg)
 		Phase = arg;
 		SoundPhase = arg;
 	}
+
 	StopSound();
-	SetSpriteCover(NULL);
+
 	if (twin) {
 		twin->SetPhase(Phase);
 	}
@@ -415,9 +406,7 @@ void ScriptedAnimation::PlayOnce()
 
 void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
 {
-	gamedata->FreePalette(palette, PaletteName);
-	palette=gamedata->GetPalette(PaletteResRef);
-	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
+	palette = gamedata->GetPalette(PaletteResRef);
 	if (twin) {
 		twin->SetFullPalette(PaletteResRef);
 	}
@@ -434,9 +423,6 @@ void ScriptedAnimation::SetFullPalette(int idx)
 	//no need to call twin
 }
 
-#define PALSIZE 12
-static Color NewPal[PALSIZE];
-
 void ScriptedAnimation::SetPalette(int gradient, int start)
 {
 	//get a palette
@@ -447,9 +433,11 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	if (start==-1) {
 		start=4;
 	}
-	core->GetPalette( gradient&255, PALSIZE, NewPal );
 
-	memcpy( &palette->col[start], NewPal, PALSIZE*sizeof( Color ) );
+	constexpr int PALSIZE = 12;
+	const auto& pal16 = core->GetPalette16(gradient);
+	palette->CopyColorRange(&pal16[0], &pal16[PALSIZE], start);
+
 	if (twin) {
 		twin->SetPalette(gradient, start);
 	}
@@ -459,7 +447,7 @@ int ScriptedAnimation::GetCurrentFrame() const
 {
 	Animation *anim = anims[P_HOLD*MAX_ORIENT];
 	if (anim) {
-		return anim->GetCurrentFrame();
+		return anim->GetCurrentFrameIndex();
 	}
 	return 0;
 }
@@ -508,7 +496,7 @@ void ScriptedAnimation::SetOrientation(int orientation)
 	}
 }
 
-bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
+bool ScriptedAnimation::UpdatePhase()
 {
 	Game *game = core->GetGame();
 
@@ -561,11 +549,10 @@ retry:
 	}
 
 	if (game->IsTimestopActive()) {
-		frame = anim->LastFrame();
 		return false;
-	} else {
-		frame = anim->NextFrame();
 	}
+	
+	auto frame = anim->NextFrame();
 
 	//explicit duration
 	if (Phase == P_HOLD && game->GameTime > Duration) {
@@ -600,7 +587,7 @@ void ScriptedAnimation::StopSound()
 	}
 }
 
-void ScriptedAnimation::UpdateSound(const Point &pos)
+void ScriptedAnimation::UpdateSound()
 {
 	if (Delay > 0 || SoundPhase > P_RELEASE) {
 		return;
@@ -612,12 +599,12 @@ void ScriptedAnimation::UpdateSound(const Point &pos)
 		}
 
 		if (SoundPhase <= P_RELEASE) {
-			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, XPos + pos.x, YPos + pos.y,
+			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, Pos.x + XOffset, Pos.y + YOffset,
 						   (SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP)) ? GEM_SND_LOOPING : 0);
 			SoundPhase++;
 		}
 	} else {
-		sound_handle->SetPos(XPos + pos.x, YPos + pos.y);
+		sound_handle->SetPos(Pos.x + XOffset, Pos.y + YOffset);
 	}
 }
 
@@ -630,24 +617,17 @@ void ScriptedAnimation::IncrementPhase()
 	Phase++;
 }
 
-//it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color &p_tint, Map *area, int dither, int orientation, int height)
+bool ScriptedAnimation::UpdateDrawingState(int orientation)
 {
 	if (!(OrientationFlags & IE_VVC_FACE_FIXED)) {
 		SetOrientation(orientation);
 	}
-
-	// not sure
+	
 	if (twin) {
-		twin->Draw(screen, Pos, p_tint, area, dither, -1, height);
+		twin->UpdateDrawingState(orientation);
 	}
-
-	Video *video = core->GetVideoDriver();
-	Game *game = core->GetGame();
-
-	Sprite2D* frame;
-
-	if (HandlePhase(frame)) {
+	
+	if (UpdatePhase()) {
 		//expired
 		return true;
 	}
@@ -657,72 +637,77 @@ bool ScriptedAnimation::Draw(const Region &screen, const Point &Pos, const Color
 		return false;
 	}
 
-	UpdateSound(Pos);
+	UpdateSound();
+	
+	return false;
+}
 
-	ieDword flag = BLIT_TRANSSHADOW;
-	//transferring flags to SDLdriver, this will have to be consolidated later
-
-	if (Transparency & IE_VVC_TRANSPARENT) {
-		flag |= BLIT_HALFTRANS;
+//it is not sure if we need tint at all
+void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t flags) const
+{
+	if (twin) {
+		twin->Draw(vp, tint, height, flags);
+	}
+	
+	//delayed
+	if (justCreated) {
+		return;
 	}
 
-	Color tint = Tint;
+	Video *video = core->GetVideoDriver();
+	
+	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
-
-	if ((Transparency & IE_VVC_GREYSCALE || game->IsTimestopActive()) && !(Transparency & IE_VVC_NO_TIMESTOP)) {
-		flag |= BLIT_GREY;
+	
+	if (Transparency & IE_VVC_NO_TIMESTOP) {
+		flags &= ~BLIT_GREY;
+	} else if (Transparency & IE_VVC_GREYSCALE) {
+		flags |= BLIT_GREY;
 	}
 
-	if (Transparency & IE_VVC_SEPIA) {
-		flag |= BLIT_SEPIA;
+	if (flags & BLIT_COLOR_MOD) {
+		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
-	if ((Transparency & IE_VVC_TINT) == IE_VVC_TINT) {
-		tint = p_tint;
-	}
-
-	ieDword flags = flag;
-	if (Transparency & BLIT_TINTED) {
-		flags |= BLIT_TINTED;
-		game->ApplyGlobalTint(tint, flags);
-	}
-
-	int cx = Pos.x + XPos;
-	int cy = Pos.y - ZPos + YPos;
-	if (SequenceFlags & IE_VVC_HEIGHT) cy -= height;
+	Point p(Pos.x - vp.x + XOffset, Pos.y - vp.y - ZOffset + YOffset);
+	if (SequenceFlags & IE_VVC_HEIGHT) p.y -= height;
 
 	if (SequenceFlags & IE_VVC_NOCOVER) {
-		if (cover) SetSpriteCover(NULL);
-	} else {
-		if (!cover || (Dither!=dither) || (!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height)) ) {
-			Dither = dither;
-			Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
-			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anim->animArea.x,
-				-anim->animArea.y, anim->animArea.w, anim->animArea.h, dither) );
-		}
-		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
+		flags &= ~BLIT_STENCIL_MASK;
 	}
 
-	video->BlitGameSprite(frame, cx + screen.x, cy + screen.y, flags, tint, cover, palette, &screen);
+	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
+	if (anim)
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BLIT_BLENDED, tint);
+
 	if (light) {
-		video->BlitGameSprite(light, cx + screen.x, cy + screen.y, flags^flag, tint, NULL, NULL, &screen);
+		video->BlitGameSprite(light, p, flags, tint);
 	}
-	return false;
 }
 
-void ScriptedAnimation::PreparePalette()
+Region ScriptedAnimation::DrawingRegion() const
 {
-	if (Transparency&IE_VVC_BLENDED) {
-		GetPaletteCopy();
-		if (!palette)
-			return;
-		if (!palette->alpha) {
-			palette->CreateShadedAlphaChannel();
-		}
+	Region r = (twin) ? twin->DrawingRegion() : Region(Pos, Size());
+
+	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
+	if (anim) {
+		Region animArea = anim->animArea;
+		animArea.x += XOffset + Pos.x;
+		animArea.y += (YOffset - ZOffset) + Pos.y;
+		r.ExpandToRegion(animArea);
 	}
+	
+	if (light) {
+		Region lightArea = light->Frame;
+		lightArea.x = XOffset - light->Frame.x;
+		lightArea.y = YOffset - ZOffset - light->Frame.y;
+		r.ExpandToRegion(lightArea);
+	}
+
+	return r;
 }
 
 void ScriptedAnimation::SetEffectOwned(bool flag)
@@ -735,20 +720,20 @@ void ScriptedAnimation::SetEffectOwned(bool flag)
 
 void ScriptedAnimation::SetBlend()
 {
-	Transparency |= IE_VVC_BLENDED;
-	PreparePalette();
-	if (twin)
-		twin->SetBlend();
+	if ((Transparency&IE_VVC_BLENDED) == 0) {
+		Transparency |= IE_VVC_BLENDED;
+		palette = nullptr;
+		GetPaletteCopy();
+		if (twin)
+			twin->SetBlend();
+	}
 }
 
 void ScriptedAnimation::SetFade(ieByte initial, int speed)
 {
-	Tint.r=255;
-	Tint.g=255;
-	Tint.b=255;
-	Tint.a=initial;
+	Tint = Color(255, 255, 255, initial);
 	Fade=speed;
-	Transparency|=BLIT_TINTED;
+	Transparency|=BLIT_COLOR_MOD;
 }
 
 void ScriptedAnimation::GetPaletteCopy()
@@ -759,9 +744,16 @@ void ScriptedAnimation::GetPaletteCopy()
 	//therefore the cycle
 	for (Animation *anim : anims) {
 		if (anim) {
-			Sprite2D* spr = anim->GetFrame(0);
+			Holder<Sprite2D> spr = anim->GetFrame(0);
 			if (spr) {
 				palette = spr->GetPalette()->Copy();
+				if ((Transparency&IE_VVC_BLENDED) && palette->HasAlpha() == false) {
+					palette->CreateShadedAlphaChannel();
+				} else {
+					Color shadowalpha = palette->col[1];
+					shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+					palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
+				}
 				//we need only one palette, so break here
 				break;
 			}
@@ -774,7 +766,7 @@ void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
 	GetPaletteCopy();
 	if (!palette)
 		return;
-	palette->SetupGlobalRGBModification(palette,mod);
+	palette->SetupGlobalRGBModification(palette, mod);
 	if (twin) {
 		twin->AlterPalette(mod);
 	}
@@ -786,9 +778,9 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 		return NULL;
 	}
 	ScriptedAnimation * ret = twin;
-	//ret->YPos+=ret->ZPos+1;
-	if (ret->ZPos>=0) {
-		ret->ZPos=-1;
+	//ret->Frame.y+=ret->ZPos+1;
+	if (ret->ZOffset >= 0) {
+		ret->ZOffset = -1;
 	}
 	twin=NULL;
 	return ret;

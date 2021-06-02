@@ -120,13 +120,12 @@ void CachedDirectoryImporter::Refresh()
 	cache.clear();
 
 	DirectoryIterator it(path);
+	it.SetFlags(DirectoryIterator::Files, true);
 	if (!it)
 		return;
 
 	unsigned int count = 0;
 	do {
-		if (it.IsDirectory())
-			continue;
 		count++;
 	} while (++it);
 
@@ -138,8 +137,6 @@ void CachedDirectoryImporter::Refresh()
 
 	char buf[_MAX_PATH];
 	do {
-		if (it.IsDirectory())
-			continue;
 		const char *name = it.GetName();
 		strnlwrcpy(buf, name, _MAX_PATH, false);
 		if (cache.set(buf, name)) {

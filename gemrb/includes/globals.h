@@ -29,6 +29,7 @@
 #define GLOBALS_H
 
 #include "ie_types.h"
+#include <type_traits>
 
 #define VERSION_GEMRB "0.8.8-git"
 
@@ -52,6 +53,11 @@
 #include <algorithm>
 #include <chrono>
 
+#include "System/Logging.h"
+
+#include <bitset>
+#include <climits>
+
 namespace GemRB {
 
 //Global Variables
@@ -64,7 +70,6 @@ namespace GemRB {
 #define IE_STR_SPEECH     4
 #define IE_STR_ALLOW_ZERO 8     //0 strref is allowed
 #define IE_STR_STRREFOFF  256
-#define IE_STR_REMOVE_NEWLINE  0x1000 // gemrb extension: remove extraneus ending newline
 
 // checked against the strref itself
 #define IE_STR_ALTREF 0x0100000 // use alternate tlk file: dialogf.tlk
@@ -156,12 +161,14 @@ namespace GemRB {
 #define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
 #define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
 #define  GF_RANDOM_BANTER_DIALOGS       77 // bg1
-#define  GF_FIXED_MORALE_OPCODE         78 // bg2
-#define  GF_HAPPINESS                   79 // all except pst and iwd2
-#define  GF_EFFICIENT_OR                80 // does the OR trigger shortcircuit on success or not? Only in iwd2
+#define  GF_ANIMATED_DIALOG             78 // pst
+#define  GF_FIXED_MORALE_OPCODE         79 // bg2
+#define  GF_HAPPINESS                   80 // all except pst and iwd2
+#define  GF_EFFICIENT_OR                81 // does the OR trigger shortcircuit on success or not? Only in iwd2
+#define  GF_LAYERED_WATER_TILES			82 // TileOverlay for water has an extra half transparent layer (all but BG1)
 
 //update this or bad things can happen
-#define GF_COUNT 81
+#define GF_COUNT 83
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
@@ -177,6 +184,8 @@ namespace GemRB {
 class Scriptable;
 class Actor;
 
+GEM_EXPORT double AngleFromPoints(const Point& p1, const Point& p2);
+GEM_EXPORT Point RotatePoint(const Point& p, double angle);
 GEM_EXPORT unsigned char GetOrient(const Point &s, const Point &d);
 GEM_EXPORT unsigned int Distance(const Point &pos, const Point &pos2);
 GEM_EXPORT unsigned int Distance(const Point &pos, const Scriptable *b);
@@ -196,7 +205,6 @@ GEM_EXPORT bool WithinRange(const Actor *actor, const Point &dest, int distance)
 GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance);
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
-GEM_EXPORT void CopyResRef(ieResRef d, const ieResRef s);
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
@@ -215,9 +223,75 @@ inline bool valid_number(const char* string, long& val)
 }
 
 template <typename T>
+inline bool SetBits(T& flag, const T& value, int mode)
+{
+	switch(mode) {
+		case OP_OR: flag |= value; break;
+		case OP_NAND: flag &= ~value; break;
+		case OP_SET: flag = value; break;
+		case OP_AND: flag &= value; break;
+		case OP_XOR: flag ^= value; break;
+		default:
+			Log(ERROR, "SetBits", "Unrecognized Bit Operation %i", mode);
+			return false;
+	}
+	return true;
+}
+
+template <typename T>
+inline size_t CountBits(const T& i)
+{
+	// using a bitset is guaranteed to be portable
+	// it is also usually much faster than a loop over the bits since it is often implemented with a CPU popcount instruction
+	static std::bitset<sizeof(T) * CHAR_BIT> bits;
+	bits = i;
+	return bits.count();
+}
+
+template <typename T>
 inline T Clamp(const T& n, const T& lower, const T& upper)
 {
 	return std::max(lower, std::min(n, upper));
+}
+
+template <>
+inline Point Clamp(const Point& p, const Point& lower, const Point& upper)
+{
+	Point ret;
+	ret.x = std::max(lower.x, std::min(p.x, upper.x));
+	ret.y = std::max(lower.y, std::min(p.y, upper.y));
+	return ret;
+}
+
+// WARNING: these are meant to be fast, if you are concerned with overflow/underflow don't use them
+template <typename T>
+inline T CeilDivUnsigned(T dividend, T divisor)
+{
+	//static_assert(std::is_unsigned<T>::value, "This quick round only works for positive values.");
+	return (dividend + divisor - 1) / divisor;
+}
+
+template <typename T>
+inline T CeilDivSlow(T dividend, T divisor)
+{
+	if (divisor < 0) {
+		return (dividend - divisor - 1) / divisor;
+	} else {
+		return (dividend + divisor - 1) / divisor;
+	}
+}
+
+template <typename T>
+inline T CeilDiv(T dividend, T divisor)
+{
+	static_assert(std::is_integral<T>::value, "Only integral types allowed");
+	// the compiler should be able to boil all this away (at least in release mode)
+	// and just inline the fastest version supported by T
+	if (std::is_unsigned<T>::value) {
+		return CeilDivUnsigned(dividend, divisor);
+	} else {
+		return CeilDivSlow(dividend, divisor);
+	}
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

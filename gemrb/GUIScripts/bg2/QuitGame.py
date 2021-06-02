@@ -24,7 +24,6 @@
 import GemRB
 
 def OnLoad ():
-	GemRB.HideGUI ()
 	GemRB.QuitGame ()
 	which = GemRB.GetVar ("QuitGame3")
 	if which==-1:

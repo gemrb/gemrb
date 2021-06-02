@@ -36,10 +36,6 @@
 
 namespace GemRB {
 
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_SLIDER_ON_CHANGE    0x02000000
-
-
 #define IE_GUI_SLIDER_KNOB        0
 #define IE_GUI_SLIDER_GRABBEDKNOB 1
 #define IE_GUI_SLIDER_BACKGROUND  2
@@ -51,60 +47,52 @@ namespace GemRB {
  */
 
 class GEM_EXPORT Slider : public Control  {
-protected:
+private:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
+	void DrawSelf(Region drawFrame, const Region& clip) override;
+	
+	// set postion pased on a point expressed in local (frame) coordinates
+	void SetPosition(const Point& p);
 
 public:
-	Slider(const Region& frame, short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
-	~Slider();
+	Slider(const Region& frame, Point KnobPos,
+		   short KnobStep, unsigned short KnobStepsCount);
 
-	bool IsOpaque() const {return BackGround;}
 	/** Returns the actual Slider Position */
 	unsigned int GetPosition();
 	/** Sets the actual Slider Position trimming to the Max and Min Values */
 	void SetPosition(unsigned int pos);
 	/** Sets the selected image */
-	void SetImage(unsigned char type, Sprite2D * img);
+	void SetImage(unsigned char type, Holder<Sprite2D> img);
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */
-	void UpdateState(unsigned int Sum);
+	void UpdateState(unsigned int Sum) override;
 
 private: // Private attributes
-	/** BackGround Image. If smaller than the Control Size, the image will be tiled. */
-	Sprite2D * BackGround;
 	/** Knob Image */
-	Sprite2D * Knob;
+	Holder<Sprite2D> Knob;
 	/** Grabbed Knob Image */
-	Sprite2D * GrabbedKnob;
-	/** Knob Starting X Position */
-	short KnobXPos;
-	/** Knob Starting Y Position */
-	short KnobYPos;
+	Holder<Sprite2D> GrabbedKnob;
+	/** Knob Starting Position */
+	Point KnobPos;
 	/** Knob Step Size */
 	short KnobStep;
 	/** Knob Steps Count */
 	unsigned short KnobStepsCount;
-	/** If true, on deletion the Slider will destroy the associated images */
-	bool Clear;
+
 	/** Actual Knob Status */
 	unsigned char State;
 	/** Slider Position Value */
 	unsigned int Pos;
-public: // Public Events
+
+protected:
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
+	bool OnMouseUp(const MouseEvent& /*me*/, unsigned short Mod) override;
 	/** Mouse Over Event */
-	void OnMouseOver(unsigned short x, unsigned short y);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** OnChange Scripted Event Function Name */
-	ControlEventHandler SliderOnChange;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
 };
 
 }

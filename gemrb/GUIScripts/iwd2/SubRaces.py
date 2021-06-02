@@ -19,6 +19,7 @@
 #character generation, SubRaces (GUICG54)
 import GemRB
 from GUIDefines import *
+import CharOverview
 import CommonTables
 
 RaceWindow = 0
@@ -30,8 +31,8 @@ def OnLoad():
 	global RaceWindow, TextAreaControl, DoneButton
 	global SubRacesTable
 	
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	RaceWindow = GemRB.LoadWindow(54)
+	RaceWindow = GemRB.LoadWindow(54, "GUICG")
+	CharOverview.PositionCharGenWin(RaceWindow)
 
 	RaceCount = CommonTables.Races.GetRowCount()
 	
@@ -74,19 +75,19 @@ def OnLoad():
 
 	BackButton = RaceWindow.GetControl(8) 
 	BackButton.SetText(15416)
-	BackButton.SetFlags(IE_GUI_BUTTON_CANCEL,OP_OR)
+	BackButton.MakeEscape()
 
 	DoneButton = RaceWindow.GetControl(0)
 	DoneButton.SetText(36789)
 	DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-	DoneButton.SetFlags(IE_GUI_BUTTON_DEFAULT,OP_OR)
+	DoneButton.MakeDefault()
 
 	TextAreaControl = RaceWindow.GetControl(6)
 	TextAreaControl.SetText(CommonTables.Races.GetValue(RaceName, "DESC_REF"))
 
 	DoneButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, NextPress)
 	BackButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, BackPress)
-	RaceWindow.SetVisible(WINDOW_VISIBLE)
+	RaceWindow.Focus()
 	return
 
 def SubRacePress():

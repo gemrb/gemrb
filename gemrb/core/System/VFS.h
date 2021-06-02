@@ -27,14 +27,16 @@
 #ifndef VFS_H
 #define VFS_H
 
+#include "config.h"
 #include "exports.h"
-#include "globals.h"
+#include "Platform.h"
 #include "Predicates.h"
 
 #include <string>
 #include <sys/stat.h>
 
 #ifdef WIN32
+#include "win32def.h"
 #include <direct.h>
 #include <io.h>
 #endif
@@ -54,7 +56,7 @@ enum BundleDirectory {
 	RESOURCES,
 	PLUGINS
 };
-GEM_EXPORT void CopyBundlePath(char* outPath, ieWord maxLen, BundleDirectory dir = BUNDLE);
+GEM_EXPORT void CopyBundlePath(char* outPath, unsigned short maxLen, BundleDirectory dir = BUNDLE);
 #endif
 
 /** Handle ~ -> $HOME mapping and do initial case-sensitity check */
@@ -73,15 +75,6 @@ const char PathListSeparator = ':';
 const char SPathDelimiter[] = { PathDelimiter, '\0' };
 const char SPathListSeparator[] = { PathListSeparator, '\0' };
 
-/**
- * Finds a file matching a glob.
- *
- * @param[out] target name of matching file
- * @param[in] Dir directory to look in
- * @param[in] glob pattern to match
- * @return true if match is found
- */
-GEM_EXPORT bool FileGlob(char *target, const char* Dir, const char* glob);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT bool file_exists(const char* path);
 
@@ -112,10 +105,10 @@ GEM_EXPORT char* PathAppend (char* target, const char* name);
 GEM_EXPORT bool MakeDirectories(const char* path) WARN_UNUSED;
 GEM_EXPORT bool MakeDirectory(const char* path) WARN_UNUSED;
 
-GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen);
+GEM_EXPORT char* CopyHomePath(char* outPath, unsigned short maxLen);
 
 // default directory housing GUIScripts/Override/Unhardcoded
-GEM_EXPORT char* CopyGemDataPath(char* outPath, ieWord maxLen);
+GEM_EXPORT char* CopyGemDataPath(char* outPath, unsigned short maxLen);
 
 #ifdef SUPPORTS_MEMSTREAM
 void* readonly_mmap(void *fd);
@@ -126,6 +119,13 @@ void munmap(void *start, size_t);
 
 class GEM_EXPORT DirectoryIterator {
 public:
+	enum Flags {
+		Files = 1,
+		Directories = 2,
+		Hidden = 4,
+		All = ~0
+	};
+
 	typedef Predicate<const char*> FileFilterPredicate;
 	/**
 	 * @param[in] path Path to directory to search.
@@ -138,6 +138,7 @@ public:
 
 	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);
 	bool IsDirectory();
+	void SetFlags(int flags, bool reset = false);
 	/**
 	 * Returns name of current entry.
 	 *
@@ -152,7 +153,8 @@ private:
 	FileFilterPredicate* predicate;
 	void* Directory;
 	void* Entry;
-	char *Path;
+	char* Path;
+	Flags entrySkipFlags;
 };
 
 }

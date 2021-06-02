@@ -22,47 +22,68 @@
 #define GUISCRIPT_H
 
 // NOTE: Python.h has to be included first.
-
 #include <Python.h>
+
+#if PY_MAJOR_VERSION >= 3
+// ints
+#define PyInt_FromLong PyLong_FromLong
+#define PyInt_AsLong PyLong_AsLong
+	
+// c objects
+#define PyCObject_FromVoidPtr(ptr, dtor) PyCapsule_New((void *)ptr, NULL, dtor)
+#define PyCObject_Check PyCapsule_CheckExact
+#define PyCObject_AsVoidPtr(capsule) PyCapsule_GetPointer(capsule, NULL)
+#define PyCObject_GetDesc PyCapsule_GetContext
+	
+//strings
+#define PyString_Type PyUnicode_Type
+#define PyString_Check PyUnicode_Check
+#endif
 
 #include "ScriptEngine.h"
 
 namespace GemRB {
 
+class Control;
+
 enum {
-	SV_BPP,
-	SV_WIDTH,
-	SV_HEIGHT,
-	SV_GAMEPATH,
-	SV_TOUCH,
-	SV_SAVEPATH
+   SV_BPP,
+   SV_WIDTH,
+   SV_HEIGHT,
+   SV_GAMEPATH,
+   SV_TOUCH,
+   SV_SAVEPATH
 };
 
 class GUIScript : public ScriptEngine {
-public:
+private:
 	PyObject* pModule, * pDict;
 	PyObject* pMainDic;
 	PyObject* pGUIClasses;
+
 public:
 	GUIScript(void);
-	~GUIScript(void);
+	~GUIScript(void) override;
 	/** Initialization Routine */
-	bool Init(void);
+	bool Init(void) override;
 	/** Autodetect GameType */
 	bool Autodetect(void);
 	/** Load Script */
-	bool LoadScript(const char* filename);
+	bool LoadScript(const char* filename) override;
 	/** Run Function */
-	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1);
-	bool RunFunction(const char *module, const char* fname, bool report_error, Point param);
+	bool RunFunction(const char* Modulename, const char* FunctionName, const FunctionParameters& params, bool report_error = true) override;
+	// TODO: eleminate these RunFunction variants.
+	bool RunFunction(const char *module, const char* fname, bool report_error=true, int intparam=-1) override;
+	bool RunFunction(const char *module, const char* fname, bool report_error, Point param) override;
 	/** Exec a single File */
-	void ExecFile(const char* file);
+	bool ExecFile(const char* file);
 	/** Exec a single String */
-	void ExecString(const char* string, bool feedback=false);
-	/** lets hope this one can be here without screwing up the general interface */
+	bool ExecString(const char* string, bool feedback=false) override;
 	PyObject *RunFunction(const char* moduleName, const char* fname, PyObject* pArgs, bool report_error = true);
-	PyObject* ConstructObject(const char* classname, int arg);
-	PyObject* ConstructObject(const char* classname, PyObject* pArgs);
+
+	PyObject* ConstructObjectForScriptable(const ScriptingRefBase*);
+	PyObject* ConstructObject(const char* pyclassname, ScriptingId id);
+	PyObject* ConstructObject(const char* pyclassname, PyObject* pArgs, PyObject* kwArgs = NULL);
 };
 
 extern GUIScript *gs;

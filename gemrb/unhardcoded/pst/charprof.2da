@@ -1,0 +1,44 @@
+2DA v1.0
+0
+        NAMELESS  DAKKON  MORTE  ANNAH  IGNUS  GRACE  NORDOM  VHAILOR
+1       4         1   	   2      1      1      1      2       2
+2       4         1       2      1      1      1      2       2
+3       5         1       2      1      1      1      2       2
+4       5         1       2      1      1      1      2       2
+5       5         2       3      2      1      1      2       2
+6       6         2       3      2      1      1      2       2
+7       6         2       3      2      1      1      2       2
+8       6         3       4      3      1      1      3       2
+9       7         3       4      3      1      1      3       2
+10      7         3       4      3      1      1      3       2
+11      7         4       4      4      1      1      4       3
+12      8         4       4      4      1      1      4       3
+13      8         4       4      4      1      1      5       4
+14      8         4       4      4      1      1      5       4
+15      9         4       4      4      1      1      5       4
+16      9         4       4      4      1      1      5       4
+17      9         4       4      4      1      1      5       5
+18      10        4       4      4      1      1      5       5
+19      10        4       4      4      1      1      5       5
+20      10        4       4      4      1      1      5       5
+
+# CHARPROF.2DA
+
+# Unhardcoded table to control the individual progression of weapon proficiency points in PST
+# This table defines the total points each character should have at each fighter level
+# 2e D&D rules are only loosely followed, as each character has limited weapon options.
+# The progression was judiciously spread out over the character levels you actually meet the NPCS
+
+# Values drawn up by testing the original game:
+
+# Dakkon and Annah get a point when their fighter level hits 5, 8, 11, capped at 4
+# Morte starts with 2 points, and also gets one at 5,8,11, capped at 5
+# Vhailor starts with 2 at level 9, gets a point at 11, 14 then 17 capped at 5
+# Then Nordom spoils the pattern by getting a point at lv 13 instead of 14
+
+# Grace and Ignus do not recieve proficiencies at all. This can be changed by modifiying the table.
+
+# TNO starts the game at level 3, with 2 spent and 3 unspent points,
+# then gains one at level 6 and every three fighter levels thereafter,
+# regardless of how many levels in other classes. This continues after level 20.
+# However his ability to spend proficiencies in a particular weapon is capped according to his class specialisation

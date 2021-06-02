@@ -36,9 +36,7 @@
 namespace GemRB {
 
 class Palette;
-
-// !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_LABEL_ON_PRESS      0x06000000
+using PaletteHolder = Holder<Palette>;
 
 /**
  * @class Label
@@ -46,42 +44,35 @@ class Palette;
  */
 
 class GEM_EXPORT Label : public Control {
-protected:
+private:
 	/** Draws the Control on the Output Display */
-	void DrawInternal(Region& drawFrame);
-public: 
-	Label(const Region& frame, Font* font, const String& string);
-	~Label();
+	void DrawSelf(Region drawFrame, const Region& clip) override;
 
-	bool IsOpaque() const { return AnimPicture; } // FIXME: this isnt really true, but the clock breaks with out this.
+public:
+	enum LabelFlags {
+		UseColor = 1 // when set the label is prented with the PrintColors
+	};
+
+	Label(const Region& frame, Font* font, const String& string);
+
 	/** This function sets the actual Label Text */
 	using Control::SetText;
-	void SetText(const String& string);
+	void SetText(const String& string) override;
 	/** Sets the Foreground Font Color */
-	void SetColor(Color col, Color bac);
+	void SetColors(const Color& col, const Color& bg);
 	/** Set the font being used */
 	void SetFont(Font *font) { this->font = font; }
 	/** Sets the Alignment of Text */
 	void SetAlignment(unsigned char Alignment);
 	/** Simply returns the pointer to the text, don't modify it! */
-	String QueryText() const;
+	String QueryText() const override;
 
-	/** Mouse Button Down */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
-		unsigned short Mod);
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, ControlEventHandler handler);
-	/** Use the RGB Color for the Font */
-	bool useRGB;
-	/** OnPress Scripted Event Function Name */
-	ControlEventHandler LabelOnPress;
 private: // Private attributes
 	/** Text String Buffer */
 	String Text;
 	/** Font for Text Writing */
 	Font* font;
-	/** Foreground & Background Colors */
-	Palette* palette;
+	Font::PrintColors colors;
 
 	/** Alignment Variable */
 	unsigned char Alignment;

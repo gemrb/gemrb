@@ -62,8 +62,6 @@ namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
-#define ANI_PRI_BACKGROUND	-9999
-
 // TODO: fix this hardcoded resource reference
 static ieResRef PortalResRef={"EF03TPR3"};
 static unsigned int PortalTime = 15;
@@ -79,9 +77,10 @@ static Point **VisibilityMasks=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
-static int LargeFog;
+static bool LargeFog;
 static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
+static ieDword oldGameTime = 0;
 
 static void ReleaseSpawnGroup(void *poi)
 {
@@ -133,7 +132,7 @@ static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimatio
 
 	int scah;
 	if (sca) {
-		scah = sca->YPos;//+sca->ZPos;
+		scah = sca->Pos.y;//+sca->ZPos;
 	} else {
 		scah = 0x7fffffff;
 	}
@@ -329,10 +328,7 @@ Map::Map(void)
 	TMap = NULL;
 	LightMap = NULL;
 	HeightMap = NULL;
-	SmallMap = NULL;
 	SrchMap = NULL;
-	Walls = NULL;
-	WallCount = 0;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
 	INISpawn = NULL;
@@ -367,6 +363,7 @@ Map::Map(void)
 	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
 	MaterialMap = NULL;
+	wallStencil = NULL;
 }
 
 Map::~Map(void)
@@ -401,7 +398,7 @@ Map::~Map(void)
 	}
 	delete LightMap;
 	delete HeightMap;
-	Sprite2D::FreeSprite( SmallMap );
+
 	for (int i = 0; i < QUEUE_COUNT; i++) {
 		free(queue[i]);
 		queue[i] = NULL;
@@ -432,19 +429,11 @@ Map::~Map(void)
 	//malloc-d in AREImp
 	free( ExploredBitmap );
 	free( VisibleBitmap );
-	if (Walls) {
-		for (unsigned int i = 0; i < WallCount; i++) {
-			delete Walls[i];
-		}
-		free( Walls );
-	}
-	WallCount=0;
 }
 
-void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
+void Map::ChangeTileMap(Image* lm, Holder<Sprite2D> sm)
 {
 	delete LightMap;
-	Sprite2D::FreeSprite(SmallMap);
 
 	LightMap = lm;
 	SmallMap = sm;
@@ -452,7 +441,7 @@ void Map::ChangeTileMap(Image* lm, Sprite2D* sm)
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* hm)
+void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
@@ -461,12 +450,14 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Sprite2D* sm, Bitmap* h
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
+	unsigned int SRWidth = sr->GetWidth();
+	unsigned int y = sr->GetHeight();
+	assert(Width >= SRWidth && Height >= y);
 	//Internal Searchmap
-	int y = sr->GetHeight();
 	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
-		int x=sr->GetWidth();
+		int x = SRWidth;
 		while(x--) {
 			unsigned short value = sr->GetAt(x,y) & PATH_MAP_AREAMASK;
 			size_t index = y * Width + x;
@@ -646,10 +637,9 @@ void Map::DrawPortal(InfoPoint *ip, int enable)
 			sca->SetBlend();
 			sca->PlayOnce();
 			//exact position, because HasVVCCell depends on the coordinates, PST had no coordinate offset anyway
-			sca->XPos = ip->Pos.x;
-			sca->YPos = ip->Pos.y;
+			sca->Pos = ip->Pos;
 			//this is actually ordered by time, not by height
-			sca->ZPos = gotportal;
+			sca->ZOffset = gotportal;
 			AddVVCell( new VEFObject(sca));
 		}
 		return;
@@ -756,8 +746,7 @@ void Map::UpdateScripts()
 		 * and we should probably be staggering the script executions anyway
 		 */
 		actor->Update();
-
-		actor->UpdateActorState(game->GameTime);
+		actor->UpdateActorState();
 		actor->SetSpeed(false);
 		
 		if (actor->GetRandomBackoff()) {
@@ -904,47 +893,292 @@ void Map::ClearSearchMapFor(const Movable *actor) {
 	}
 }
 
-void Map::DrawHighlightables() const
+Size Map::FogMapSize() const
+{
+	// Ratio of bg tile size and fog tile size
+	constexpr int CELL_RATIO = 2;
+	return Size(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+}
+
+bool Map::FogTileUncovered(const Point &p, uint8_t* mask) const
+{
+	// Returns true if map at (x;y) was explored, else false.
+	const Size fogSize = FogMapSize();
+	if (p.x < 0 || p.x >= fogSize.w || p.y < 0 || p.y >= fogSize.h) {
+		// out of bounds is always foggy
+		return false;
+	}
+	
+	if (mask == nullptr) return true;
+
+	div_t res = div(fogSize.w * p.y + p.x, 8);
+	return bool(mask[res.quot] & (1 << res.rem));
+}
+
+void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
+{
+	// Size of Fog-Of-War shadow tile (and bitmap)
+	constexpr int CELL_SIZE = 32;
+	
+	// the amount of fuzzing to apply to map edges wehn the viewport overscans
+	constexpr int FUZZ_AMT = 8;
+
+	// size for explored_mask and visible_mask
+	const Size fogSize = FogMapSize();
+
+	const Point start = Clamp(ConvertPointToFog(vp.Origin()), Point(), Point(fogSize.w, fogSize.h));
+	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + LargeFog, 2 + LargeFog), Point(), Point(fogSize.w, fogSize.h));
+	const int x0 = (start.x * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
+	const int y0 = (start.y * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+	
+	const Size mapSize = GetSize();
+	
+	enum Directions : uint8_t {
+		N = 1,
+		W = 2,
+		NW = N|W,
+		S = 4,
+		SW = S|W,
+		E = 8,
+		NE = N|E,
+		SE = S|E
+	};
+		
+	Video* vid = core->GetVideoDriver();
+	if (vp.y < 0) { // top border
+		Region r(0, 0, vp.w, -vp.y);
+		vid->DrawRect(r, ColorBlack, true);
+		r.y += r.h;
+		r.h = FUZZ_AMT;
+		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[N], Point(x, r.y), &r);
+		}
+	}
+	
+	if (vp.y + vp.h > mapSize.h) { // bottom border
+		Region r(0, mapSize.h - vp.y, vp.w, vp.y + vp.h - mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+		r.y -= FUZZ_AMT;
+		r.h = FUZZ_AMT;
+		for (int x = r.x + x0; x < r.w; x += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[S], Point(x, r.y), &r);
+		}
+	}
+	
+	if (vp.x < 0) { // left border
+		Region r(0, std::max(0, -vp.y), -vp.x, mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+		r.x += r.w;
+		r.w = FUZZ_AMT;
+		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[W], Point(r.x, y), &r);
+		}
+	}
+	
+	if (vp.x + vp.w > mapSize.w) { // right border
+		Region r(mapSize.w -vp.x, std::max(0, -vp.y), vp.x + vp.w - mapSize.w, mapSize.h);
+		vid->DrawRect(r, ColorBlack, true);
+		r.x -= FUZZ_AMT;
+		r.w = FUZZ_AMT;
+		for (int y = r.y + y0; y < r.h; y += CELL_SIZE) {
+			vid->BlitSprite(core->FogSprites[E], Point(r.x, y), &r);
+		}
+	}
+	
+	auto IsExplored = [=](int x, int y) {
+		return FogTileUncovered(Point(x, y), explored_mask);
+	};
+	
+	auto IsVisible = [=](int x, int y) {
+		return FogTileUncovered(Point(x, y), visible_mask);
+	};
+	
+	auto ConvertPointToScreen = [=](int x, int y) {
+		x = (x - start.x) * CELL_SIZE + x0;
+		y = (y - start.y) * CELL_SIZE + y0;
+		return Point(x, y);
+	};
+	
+	auto FillFog = [=](int x, int y, int count, uint32_t flags) {
+		Region r(ConvertPointToScreen(x, y), Size(CELL_SIZE * count, CELL_SIZE));
+		vid->DrawRect(r, ColorBlack, true, flags);
+	};
+	
+	auto Fill = [=](int x, int y, uint8_t dirs, uint32_t flags) {
+		// If an explored tile is adjacent to an
+		//   unexplored one, we draw border sprite
+		//   (gradient black <-> transparent)
+		// Tiles in four cardinal directions have these
+		//   values.
+		//
+		//      1
+		//    2   8
+		//      4
+		//
+		// Values of those unexplored are
+		//   added together, the resulting number being
+		//   an index of shadow sprite to use. For now,
+		//   some tiles are made 'on the fly' by
+		//   drawing two or more tiles
+
+		assert((dirs & 0xf0) == 0);
+
+		Point p = ConvertPointToScreen(x, y);
+		switch (dirs & 0x0f) {
+			case N:
+			case W:
+			case NW:
+			case S:
+			case SW:
+			case E:
+			case NE:
+			case SE:
+				vid->BlitGameSprite(core->FogSprites[dirs], p, flags);
+				return true;
+			case N|S:
+				vid->BlitGameSprite(core->FogSprites[N], p, flags);
+				vid->BlitGameSprite(core->FogSprites[S], p, flags);
+				return true;
+			case NW|SW:
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
+				return true;
+			case W|E:
+				vid->BlitGameSprite(core->FogSprites[W], p, flags);
+				vid->BlitGameSprite(core->FogSprites[E], p, flags);
+				return true;
+			case NW|NE:
+				vid->BlitGameSprite(core->FogSprites[NW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
+				return true;
+			case NE|SE:
+				vid->BlitGameSprite(core->FogSprites[NE], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
+				return true;
+			case SW|SE:
+				vid->BlitGameSprite(core->FogSprites[SW], p, flags);
+				vid->BlitGameSprite(core->FogSprites[SE], p, flags);
+				return true;
+			default: // a fully surrounded tile is filled
+				return false;
+		}
+	};
+	
+	const static uint32_t opaque = BLIT_NO_FLAGS;
+	const static uint32_t trans = BLIT_HALFTRANS | BLIT_BLENDED;
+	
+	auto FillExplored = [=](int x, int y) {
+		int dirs = !IsExplored(x, y - 1); // N
+		if (!IsExplored(x - 1, y)) dirs |= W;
+		if (!IsExplored(x, y + 1)) dirs |= S;
+		if (!IsExplored(x + 1, y )) dirs |= E;
+
+		if (dirs && !Fill(x, y, dirs, BLIT_BLENDED)) {
+			FillFog(x, y, 1, opaque);
+		}
+	};
+	
+	auto FillVisible = [=](int x, int y) {
+		int dirs = !IsVisible( x, y - 1); // N
+		if (!IsVisible(x - 1, y)) dirs |= W;
+		if (!IsVisible(x, y + 1)) dirs |= S;
+		if (!IsVisible(x + 1, y)) dirs |= E;
+
+		if (dirs && !Fill(x, y, dirs, trans)) {
+			FillFog(x, y, 1, trans);
+		}
+	};
+
+	for (int y = start.y; y < end.y; y++) {
+		int unexploredQueue = 0;
+		int shroudedQueue = 0;
+		int x = start.x;
+		for (; x < end.x; x++) {
+			if (IsExplored(x, y)) {
+				if (unexploredQueue) {
+					FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
+					unexploredQueue = 0;
+				}
+				
+				if (IsVisible(x, y)) {
+					if (shroudedQueue) {
+						FillFog(x - shroudedQueue, y, shroudedQueue, trans);
+						shroudedQueue = 0;
+					}
+					FillVisible(x, y);
+				} else {
+					// coalese all horizontally adjacent shrouded cells
+					++shroudedQueue;
+				}
+				
+				FillExplored(x, y);
+			} else {
+				// coalese all horizontally adjacent unexplored cells
+				++unexploredQueue;
+				if (shroudedQueue) {
+					FillFog(x - shroudedQueue, y, shroudedQueue, trans);
+					shroudedQueue = 0;
+				}
+			}
+		}
+		
+		if (shroudedQueue) {
+			FillFog(x - (shroudedQueue + unexploredQueue), y, shroudedQueue, trans);
+		}
+		
+		if (unexploredQueue) {
+			FillFog(x - unexploredQueue, y, unexploredQueue, opaque);
+		}
+	}
+}
+
+void Map::DrawHighlightables(const Region& viewport)
 {
 	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
-	const Container *c;
-
-	while ( (c = TMap->GetContainer(i++))!=NULL ) {
-		if (c->Highlight) {
-			if (c->Type != IE_CONTAINER_PILE) {
-				c->DrawOutline();
+	Container *c;
+	while ((c = TMap->GetContainer(i++)) != NULL) {
+		if (c->Type != IE_CONTAINER_PILE) {
+			// don't highlight containers behind closed doors
+			// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
+			// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
+			const Door *door = TMap->GetDoor(c->BBox.Center());
+			if (door && !(door->Flags & (DOOR_OPEN|DOOR_TRANSPARENT))) continue;
+			if (c->Highlight) {
+				c->DrawOutline(viewport.Origin());
+			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
+				c->outlineColor = ColorCyan;
+				c->DrawOutline(viewport.Origin());
 			}
 		}
 	}
 
-	const Door *d;
+	Door *d;
 	i = 0;
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
-		if (d->Highlight) d->DrawOutline();
+		if (d->Highlight) {
+			d->DrawOutline(viewport.Origin());
+		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
+			d->outlineColor = ColorCyan;
+			d->DrawOutline(viewport.Origin());
+		} else if (debugFlags & DEBUG_SHOW_DOORS_SECRET && d->Flags & DOOR_FOUND) {
+			d->outlineColor = ColorMagenta;
+			d->DrawOutline(viewport.Origin());
+		}
 	}
 
-	const InfoPoint *p;
+	InfoPoint *p;
 	i = 0;
 	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
-		if (p->Highlight) p->DrawOutline();
-	}
-}
-
-void Map::DrawPile(Region screen, int pileidx) const
-{
-	const Region vp = core->GetVideoDriver()->GetViewport();
-	Container *c = TMap->GetContainer(pileidx);
-	assert(c != NULL);
-
-	Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
-	tint.a = 255;
-
-	if (c->Highlight) {
-		c->DrawPile(true, screen, tint);
-	} else {
-		if (c->outline->BBox.IntersectsRegion(vp)) {
-			c->DrawPile(false, screen, tint);
+		if (p->Highlight) {
+			p->DrawOutline(viewport.Origin());
+		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
+			if (p->VisibleTrap(true)) {
+				p->outlineColor = ColorRed;
+			} else {
+				p->outlineColor = ColorBlue;
+			}
+			p->DrawOutline(viewport.Origin());
 		}
 	}
 }
@@ -992,9 +1226,10 @@ retry:
 	if (!a->Schedule(gametime) ) {
 		goto retry;
 	}
-	if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) ) {
+	if ((a->Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a->Pos) : !IsExplored(a->Pos)) {
 		goto retry;
 	}
+
 	return a;
 }
 
@@ -1056,53 +1291,97 @@ VEFObject *Map::GetNextScriptedAnimation(const scaIterator &iter) const
 	return *iter;
 }
 
-static ieDword oldgametime = 0;
-
 //Draw the game area (including overlays, actors, animations, weather)
-void Map::DrawMap(Region screen)
+void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 {
-	if (!TMap) {
-		return;
-	}
+	assert(TMap);
+	debugFlags = dFlags;
+
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
+	bool timestop = game->IsTimestopActive();
 
 	//area specific spawn.ini files (a PST feature)
 	if (INISpawn) {
 		INISpawn->CheckSpawn();
 	}
 
+	// Map Drawing Strategy
+	// 1. Draw background
+	// 2. Draw overlays (weather)
+	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
+	// 4. set the video stencil buffer to animWallStencil
+	// 5. Draw background animations (BLIT_STENCIL_GREEN)
+	// 6. set the video stencil buffer to wallStencil
+	// 7. draw scriptables (depending on scriptable->ForceDither() return value)
+	// 8. draw fog (BLIT_BLENDED)
+	// 9. draw text (BLIT_BLENDED)
+
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 	int bgoverride = false;
 
 	if (Background) {
-		if (BgDuration<gametime) {
-			Sprite2D::FreeSprite(Background);
+		if (BgDuration < gametime) {
+			Background = nullptr;
 		} else {
-			video->BlitSprite(Background,0,0,true);
+			video->BlitSprite(Background, Point());
 			bgoverride = true;
 		}
 	}
 
 	if (!bgoverride) {
-		int rain, flags;
+		int rain = 0;
+		int flags = 0;
 
-		if (game->IsTimestopActive()) {
-			flags = TILE_GREY;
+		if (timestop) {
+			flags = BLIT_GREY;
+		} else if (AreaFlags&AF_DREAM) {
+			flags = BLIT_SEPIA;
 		}
-		else if (AreaFlags&AF_DREAM) {
-			flags = TILE_SEPIA;
-		} else flags = 0;
 
 		if (HasWeather()) {
 			//zero when the weather particles are all gone
 			rain = game->weather->GetPhase()-P_EMPTY;
-		} else {
-			rain = 0;
 		}
 
-		TMap->DrawOverlays( screen, rain, flags );
+		TMap->DrawOverlays( viewport, rain, flags );
+	}
+
+	const auto& viewportWalls = WallsIntersectingRegion(viewport, false);
+	RedrawScreenStencil(viewport, viewportWalls.first);
+	video->SetStencilBuffer(wallStencil);
+	
+	//draw all background animations first
+	aniIterator aniidx = animations.begin();
+
+	auto DrawAreaAnimation = [&, this](AreaAnimation *a) {
+		uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
+		flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+		
+		if (timestop) {
+			flags |= BLIT_GREY;
+		}
+		
+		Color tint = ColorWhite;
+		if (a->Flags & A_ANI_NO_SHADOW) {
+			tint = LightMap->GetPixel(a->Pos.x / 16, a->Pos.y / 12);
+		}
+		
+		game->ApplyGlobalTint(tint, flags);
+
+		a->Draw(viewport, tint, flags);
+		return GetNextAreaAnimation(aniidx, gametime);
+	};
+	
+	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
+	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
+		a = DrawAreaAnimation(a);
+	}
+
+	if (!bgoverride) {
+		//Draw Outlines
+		DrawHighlightables(viewport);
 	}
 
 	//drawing queues 1 and 0
@@ -1111,28 +1390,16 @@ void Map::DrawMap(Region screen)
 	int q = PR_DISPLAY;
 	int index = Qcount[q];
 	Actor* actor = GetNextActor(q, index);
-	aniIterator aniidx = animations.begin();
+
 	scaIterator scaidx = vvcCells.begin();
 	proIterator proidx = projectiles.begin();
 	spaIterator spaidx = particles.begin();
 	int pileidx = 0;
 	Container *pile = GetNextPile(pileidx);
 
-	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	VEFObject *sca = GetNextScriptedAnimation(scaidx);
 	Projectile *pro = GetNextProjectile(proidx);
 	Particles *spark = GetNextSpark(spaidx);
-
-	//draw all background animations first
-	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
-		a->Draw(screen, this);
-		a = GetNextAreaAnimation(aniidx, gametime);
-	}
-
-	if (!bgoverride) {
-		//Draw Outlines
-		DrawHighlightables();
-	}
 
 	// TODO: In at least HOW/IWD2 actor ground circles will be hidden by
 	// an area animation with height > 0 even if the actors themselves are not
@@ -1141,34 +1408,85 @@ void Map::DrawMap(Region screen)
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
-			assert(actor != NULL);
-			actor->Draw( screen );
-			actor->UpdateAnimations();
-			actor = GetNextActor(q, index);
+			{
+				bool visible = false;
+				// always update the animations even if we arent visible
+				if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
+					// apparently birds and the dead are always visible?
+					visible = IsVisible(actor->Pos) || (actor->Modified[IE_DONOTJUMP] & DNJ_BIRD) || (actor->GetInternalFlag() & IF_REALLYDIED);
+					if (visible) {
+						uint32_t flags = SetDrawingStencilForScriptable(actor, viewport);
+						if (game->TimeStoppedFor(actor)) {
+							// when time stops, almost everything turns dull grey,
+							// the caster and immune actors being the most notable exceptions
+							flags |= BLIT_GREY;
+						}
+						
+						Color baseTint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
+						Color tint(baseTint);
+						game->ApplyGlobalTint(tint, flags);
+						actor->Draw(viewport, baseTint, tint, flags|BLIT_BLENDED);
+					}
+				}
+
+				if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED|IF_ACTIVE)) == (IF_REALLYDIED|IF_ACTIVE)) {
+					actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
+					//turning actor inactive if there is no action next turn
+					actor->HibernateIfAble();
+				}
+
+				actor = GetNextActor(q, index);
+			}
 			break;
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				DrawPile(screen, pileidx-1);
+				Container* c = TMap->GetContainer(pileidx-1);
+				
+				uint32_t flags = SetDrawingStencilForScriptable(c, viewport);
+				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+				
+				if (timestop) {
+					flags |= BLIT_GREY;
+				}
+				
+				Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
+				game->ApplyGlobalTint(tint, flags);
+
+				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
+					c->Draw(true, viewport, tint, flags);
+				} else {
+					c->Draw(false, viewport, tint, flags);
+				}
 				pile = GetNextPile(pileidx);
 			}
 			break;
 		case AOT_AREA:
-			//draw animation
-			a->Draw( screen, this );
-			a = GetNextAreaAnimation(aniidx,gametime);
+			{
+				a = DrawAreaAnimation(a);
+			}
 			break;
 		case AOT_SCRIPTED:
 			{
-				Point Pos(0,0);
-
-				Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
-				tint.a = 255;
-				bool endReached = sca->Draw(screen, Pos, tint, this, 0, -1, 0);
+				bool endReached = sca->UpdateDrawingState(-1);
 				if (endReached) {
-					delete( sca );
-					scaidx=vvcCells.erase(scaidx);
+					delete sca;
+					scaidx = vvcCells.erase(scaidx);
 				} else {
+					video->SetStencilBuffer(wallStencil);
+					Color tint = LightMap->GetPixel( sca->Pos.x / 16, sca->Pos.y / 12);
+					tint.a = 255;
+					
+					// FIXME: these should actually make use of SetDrawingStencilForObject too
+					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
+					
+					if (timestop) {
+						flags |= BLIT_GREY;
+					}
+
+					game->ApplyGlobalTint(tint, flags);
+
+					sca->Draw(viewport, tint, 0, flags);
 					scaidx++;
 				}
 			}
@@ -1177,16 +1495,16 @@ void Map::DrawMap(Region screen)
 		case AOT_PROJECTILE:
 			{
 				int drawn;
-				if (gametime>oldgametime) {
+				if (gametime > oldGameTime) {
 					drawn = pro->Update();
 				} else {
 					drawn = 1;
 				}
 				if (drawn) {
-					pro->Draw( screen );
+					pro->Draw( viewport );
 					proidx++;
 				} else {
-					delete( pro );
+					delete pro;
 					proidx = projectiles.erase(proidx);
 				}
 			}
@@ -1195,13 +1513,13 @@ void Map::DrawMap(Region screen)
 		case AOT_SPARK:
 			{
 				int drawn;
-				if (gametime>oldgametime) {
+				if (gametime > oldGameTime) {
 					drawn = spark->Update();
 				} else {
 					drawn = 1;
 				}
 				if (drawn) {
-					spark->Draw( screen );
+					spark->Draw(viewport.Origin());
 					spaidx++;
 				} else {
 					delete( spark );
@@ -1215,22 +1533,26 @@ void Map::DrawMap(Region screen)
 		}
 	}
 
-	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SrchMap) {
-		DrawSearchMap(screen);
-	} else {
-		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
-			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
-		}
+	video->SetStencilBuffer(NULL);
+	
+	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
+	game->DrawWeather(update_scripts);
+	
+	if ((dFlags & DEBUG_SHOW_SEARCHMAP)) {
+		DrawSearchMap(viewport);
 	}
+	
+	uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap;
+	uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap;
+	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
-		assert(TMap);
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		ip->DrawOverheadText(screen);
+		ip->DrawOverheadText();
 	}
 
 	int cnCount = 0;
@@ -1239,7 +1561,7 @@ void Map::DrawMap(Region screen)
 		Container* cn = TMap->GetContainer( cnCount++ );
 		if (!cn)
 			break;
-		cn->DrawOverheadText(screen);
+		cn->DrawOverheadText();
 	}
 
 	int drCount = 0;
@@ -1248,7 +1570,7 @@ void Map::DrawMap(Region screen)
 		Door* dr = TMap->GetDoor( drCount++ );
 		if (!dr)
 			break;
-		dr->DrawOverheadText(screen);
+		dr->DrawOverheadText();
 	}
 
 	size_t i = actors.size();
@@ -1257,39 +1579,264 @@ void Map::DrawMap(Region screen)
 		//This must go AFTER the fog!
 		//(maybe we should be using the queue?)
 		Actor* actor = actors[i];
-		actor->DrawOverheadText(screen);
+		actor->DrawOverheadText();
 	}
 
-	oldgametime=gametime;
+	oldGameTime = gametime;
+
+	// Show wallpolygons
+	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
+		const auto& viewportWalls = WallsIntersectingRegion(viewport, true);
+		for (const auto& poly : viewportWalls.first) {
+			const Point& origin = poly->BBox.Origin() - viewport.Origin();
+
+			if (poly->wall_flag&WF_DISABLED) {
+				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
+					video->DrawPolygon( poly.get(), origin, ColorGray, true, BLIT_BLENDED|BLIT_HALFTRANS);
+				}
+				continue;
+			}
+
+			if ((debugFlags & (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER)) == 0) {
+				continue;
+			}
+
+			Color c = ColorYellow;
+
+			if (debugFlags & DEBUG_SHOW_WALLS_ANIM_COVER) {
+				if (poly->wall_flag & WF_COVERANIMS) {
+					// darker yellow for walls with WF_COVERANIMS
+					c.r -= 0x80;
+					c.g -= 0x80;
+				}
+			} else if ((debugFlags & DEBUG_SHOW_WALLS) == 0) {
+				continue;
+			}
+
+			video->DrawPolygon( poly.get(), origin, c, true, BLIT_BLENDED|BLIT_HALFTRANS);
+			
+			if (poly->wall_flag & WF_BASELINE) {
+				video->DrawLine(poly->base0 - viewport.Origin(), poly->base1 - viewport.Origin(), ColorMagenta);
+			}
+		}
+	}
 }
 
-void Map::DrawSearchMap(const Region &screen) const
+WallPolygonSet Map::WallsIntersectingRegion(Region r, bool includeDisabled, const Point* loc) const
 {
-	Color inaccessible = { 128, 128, 128, 128 };
-	Color impassible = { 128, 64, 64, 128 }; // red-ish
-	Color sidewall = { 64, 64, 128, 128 }; // blue-ish
-	Color actor = { 128, 64, 128, 128 }; // purple-ish
-	Video *vid=core->GetVideoDriver();
-	Region rgn=vid->GetViewport();
-	Region block;
+	// WallGroups are collections that contain a reference to all wall polygons intersecting
+	// a 640x480 region moving from top left to bottom right of the map
 
-	block.w=16;
-	block.h=12;
-	int w = screen.w/16+2;
-	int h = screen.h/12+2;
+	constexpr uint32_t groupHeight = 480;
+	constexpr uint32_t groupWidth = 640;
+	
+	if (r.x < 0) {
+		r.w += r.x;
+		r.x = 0;
+	}
+	
+	if (r.y < 0) {
+		r.h += r.y;
+		r.y = 0;
+	}
+
+	uint32_t pitch = CeilDiv<uint32_t>(TMap->XCellCount * 64, groupWidth);
+	uint32_t ymin = r.y / groupHeight;
+	uint32_t maxHeight = CeilDiv<uint32_t>(TMap->YCellCount * 64, groupHeight);
+	uint32_t ymax = std::min(maxHeight, CeilDiv<uint32_t>(r.y + r.h, groupHeight));
+	uint32_t xmin = r.x / groupWidth;
+	uint32_t xmax = std::min(pitch, CeilDiv<uint32_t>(r.x + r.w, groupWidth));
+
+	WallPolygonSet set;
+	WallPolygonGroup& infront = set.first;
+	WallPolygonGroup& behind = set.second;
+
+	for (uint32_t y = ymin; y < ymax; ++y) {
+		for (uint32_t x = xmin; x < xmax; ++x) {
+			const auto& group = wallGroups[y * pitch + x];
+			
+			for (const auto& wp : group) {
+				if ((wp->wall_flag&WF_DISABLED) && includeDisabled == false) {
+					continue;
+				}
+				
+				if (!r.IntersectsRegion(wp->BBox)) {
+					continue;
+				}
+				
+				if (loc == nullptr || wp->PointBehind(*loc)) {
+					infront.push_back(wp);
+				} else {
+					behind.push_back(wp);
+				}
+			}
+		}
+	}
+
+	return set;
+}
+
+void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn, const WallPolygonSet& walls, const Point& viewPortOrigin)
+{
+	VideoBufferPtr stencil = nullptr;
+	Video* video = core->GetVideoDriver();
+	Color debugColor = ColorGray;
+	
+	const bool behindWall = walls.first.size();
+	const bool inFrontOfWall = walls.second.size();
+
+	if (behindWall && inFrontOfWall) {
+		// we need a custom stencil if both behind and in front of a wall
+		auto it = objectStencils.find(object);
+		if (it != objectStencils.end()) {
+			// we already made one
+			const auto& pair = it->second;
+			if (pair.second.RectInside(objectRgn)) {
+				// and it is still good
+				stencil = pair.first;
+			}
+		}
+		
+		if (stencil == nullptr) {
+			Region stencilRgn = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
+			if (stencilRgn.Dimensions().IsEmpty()) {
+				stencil = wallStencil;
+			} else {
+				stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
+				DrawStencil(stencil, objectRgn, walls.first);
+				objectStencils[object] = std::make_pair(stencil, objectRgn);
+			}
+		} else {
+			// TODO: we only need to do this because a door might have changed state over us
+			// if we could detect that we could avoid doing this expensive operation
+			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
+			stencil->Clear();
+			stencil->SetOrigin(objectRgn.Origin() - viewPortOrigin);
+			DrawStencil(stencil, objectRgn, walls.first);
+		}
+		
+		debugColor = ColorRed;
+	} else {
+		stencil = wallStencil;
+		
+		if (behindWall) {
+			debugColor = ColorBlue;
+		} else if (inFrontOfWall) {
+			debugColor = ColorMagenta;
+		}
+	}
+	
+	assert(stencil);
+	video->SetStencilBuffer(stencil);
+	
+	if (debugFlags & DEBUG_SHOW_WALLS) {
+		const Region& r = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
+		video->DrawRect(r, debugColor, false);
+	}
+}
+
+uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const Region& vp)
+{
+	if (scriptable->Type == ST_ACTOR) {
+		const Actor* actor = static_cast<const Actor*>(scriptable);
+		// birds are never occluded
+		if ((actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD)) {
+			return 0;
+		}
+	}
+	
+	const Region& bbox = scriptable->DrawingRegion();
+	if (bbox.IntersectsRegion(vp) == false) {
+		return 0;
+	}
+	
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
+	SetDrawingStencilForObject(scriptable, bbox, walls, vp.Origin());
+	
+	// check this after SetDrawingStencilForObject for debug drawing purposes
+	if (walls.first.empty()) {
+		return 0; // not behind a wall, no stencil required
+	}
+	
+	ieDword always_dither;
+	core->GetDictionary()->Lookup("Always Dither", always_dither);
+	
+	uint32_t flags = BLIT_STENCIL_DITHER; // TODO: make dithering configurable
+	if (always_dither) {
+		flags |= BLIT_STENCIL_ALPHA;
+	} else if (core->DitherSprites == false) {
+		// dithering is set to disabled
+		flags |= BLIT_STENCIL_BLUE;
+	} else if (scriptable->Type == ST_ACTOR) {
+		const Actor* a = static_cast<const Actor*>(scriptable);
+		if (a->IsSelected() || a->Over) {
+			flags |= BLIT_STENCIL_ALPHA;
+		} else {
+			flags |= BLIT_STENCIL_RED;
+		}
+	} else if (scriptable->Type == ST_CONTAINER) {
+		const Container* c = static_cast<const Container*>(scriptable);
+		if (c->Highlight) {
+			flags |= BLIT_STENCIL_ALPHA;
+		} else {
+			flags |= BLIT_STENCIL_RED;
+		}
+	}
+	
+	assert(flags & BLIT_STENCIL_MASK); // we needed a stencil so we must require a stencil flag
+	return flags;
+}
+
+uint32_t Map::SetDrawingStencilForAreaAnimation(AreaAnimation* anim, const Region& vp)
+{
+	const Region& bbox = anim->DrawingRegion();
+	if (bbox.IntersectsRegion(vp) == false) {
+		return 0;
+	}
+	
+	Point p = anim->Pos;
+	p.y += anim->height;
+
+	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
+	
+	SetDrawingStencilForObject(anim, bbox, walls, vp.Origin());
+	
+	// check this after SetDrawingStencilForObject for debug drawing purposes
+	if (walls.first.empty()) {
+		return 0; // not behind a wall, no stencil required
+	}
+
+	return (anim->Flags & A_ANI_NO_WALL) ? BLIT_NO_FLAGS : BLIT_STENCIL_GREEN;
+}
+
+void Map::DrawSearchMap(const Region &vp) const
+{
+	assert(SrchMap);
+
+	static const Color inaccessible = ColorGray;
+	static const Color impassible(128, 64, 64, 0xff); // red-ish
+	static const Color sidewall(64, 64, 128, 0xff); // blue-ish
+	static const Color actor(128, 64, 128, 128); // purple-ish
+	constexpr uint32_t flags = BLIT_BLENDED | BLIT_HALFTRANS;
+
+	Video *vid=core->GetVideoDriver();
+	Region block(0,0,16,12);
+
+	int w = vp.w/16+2;
+	int h = vp.h/12+2;
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x + rgn.x / 16, y + rgn.y / 12);
-			block.x = screen.x + x * 16 - (rgn.x % 16);
-			block.y = screen.y + y * 12 - (rgn.y % 12);
+			unsigned char blockvalue = GetBlocked(x + vp.x / 16, y + vp.y / 12);
+			block.x = x * 16 - (vp.x % 16);
+			block.y = y * 12 - (vp.y % 12);
 			if (!(blockvalue & PATH_MAP_PASSABLE)) {
 				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
-					vid->DrawRect(block,impassible);
+					vid->DrawRect(block, impassible, true, flags);
 				} else if (blockvalue & PATH_MAP_SIDEWALL) {
-					vid->DrawRect(block,sidewall);
+					vid->DrawRect(block, sidewall, true, flags);
 				} else if (!(blockvalue & PATH_MAP_ACTOR)){
-					vid->DrawRect(block,inaccessible);
+					vid->DrawRect(block, inaccessible, true, flags);
 				}
 			}
 			if (blockvalue & PATH_MAP_ACTOR) {
@@ -1304,13 +1851,13 @@ void Map::DrawSearchMap(const Region &screen) const
 	const PathNode *path = act->GetPath();
 	if (!path) return;
 	const PathNode *step = path->Next;
-	Color waypoint = {0, 64, 128, 128}; // darker blue-ish
+	Color waypoint(0, 64, 128, 128); // darker blue-ish
 	int i = 0;
 	block.w = 8;
 	block.h = 6;
 	while (step) {
-		block.x = (step->x+64) - rgn.x;
-		block.y = (step->y+6) - rgn.y;
+		block.x = (step->x+64) - vp.x;
+		block.y = (step->y+6) - vp.y;
 		print("Waypoint %d at (%d, %d)", i, step->x, step->y);
 		vid->DrawRect(block, waypoint);
 		step = step->Next;
@@ -1418,13 +1965,21 @@ void Map::ActorSpottedByPlayer(Actor *actor) const
 			core->GetGame()->SetBeastKnown(avatar->Bestiary);
 		}
 	}
+}
 
-	if (!(actor->GetInternalFlag()&IF_STOPATTACK) && !core->GetGame()->AnyPCInCombat()) {
-		if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_TRIGGER_AP)) {
-			actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+// Call this for any visible actor.  do_pause can be false if hostile
+// actors were already seen on the map.  We used to check AnyPCInCombat,
+// which is less reliable.  Returns true if this is a hostile enemy
+// that should trigger pause.
+bool Map::HandleAutopauseForVisible(Actor *actor, bool do_pause)
+{
+	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
+		if (do_pause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AP_ENEMY, actor);
-		}
+		actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
+		return true;
 	}
+	return false;
 }
 
 //call this once, after area was loaded
@@ -1443,13 +1998,6 @@ void Map::InitActors()
 
 void Map::InitActor(Actor *actor)
 {
-	//if a visible aggressive actor was put on the map, it is an autopause reason
-	//guess game is always loaded? if not, then we'll crash
-	ieDword gametime = core->GetGame()->GameTime;
-
-	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
-		ActorSpottedByPlayer(actor);
-	}
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
 		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName);
@@ -1478,7 +2026,7 @@ bool Map::AnyPCSeesEnemy() const
 	ieDword gametime = core->GetGame()->GameTime;
 	for (const Actor *actor : actors) {
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, true) ) {
+			if (IsVisible(actor->Pos) && actor->Schedule(gametime, true) ) {
 				return true;
 			}
 		}
@@ -1503,6 +2051,7 @@ void Map::DeleteActor(int i)
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
 		CopyResRef(actor->Area, "");
+		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
 		if (game->InStore(actor) < 0) {
@@ -1741,6 +2290,7 @@ void Map::PurgeArea(bool items)
 				}
 			}
 			TMap->CleanupContainer(c);
+			objectStencils.erase(c);
 		}
 	}
 	// 3. reset living neutral actors to their HomeLocation,
@@ -1869,24 +2419,17 @@ Actor *Map::GetActorByScriptName(const char *name) const
 	return NULL;
 }
 
-int Map::GetActorInRect(Actor**& actorlist, const Region& rgn, bool onlyparty) const
+int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags) const
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
 	for (auto actor : actors) {
-//use this function only for party?
-		if (onlyparty && actor->GetStat(IE_EA)>EA_CHARMED) {
+		if (!actor->ValidTarget(excludeFlags))
 			continue;
-		}
-		// this is called by non-selection code..
-		if (onlyparty && !actor->ValidTarget(GA_SELECT))
+		if (!rgn.PointInside(actor->Pos)
+			&& !actor->IsOver(rgn.Origin())) // imagine drawing a tiny box inside the circle, but not over the center
 			continue;
-		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED))
-			continue;
-		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
-			continue;
-		if ((actor->Pos.x>rgn.x+rgn.w) || (actor->Pos.y>rgn.y+rgn.h) )
-			continue;
+
 		actorlist[count++] = actor;
 	}
 	actorlist = ( Actor * * ) realloc( actorlist, count * sizeof( Actor * ) );
@@ -1947,6 +2490,11 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, int size) const
 unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
 {
 	return GetBlocked(x / 16, y / 12);
+}
+
+unsigned int Map::GetBlockedNavmap(const Point &c) const
+{
+	return GetBlockedNavmap(c.x, c.y);
 }
 
 // Args are in searchmap coordinates
@@ -2047,60 +2595,71 @@ bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, c
 	return ret & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
 }
 
-//flags:0 - never dither (full cover)
-//	1 - dither if polygon wants it
-//	2 - always dither
-
-SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-	unsigned int width, unsigned int height, int flags, bool areaanim)
+void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 {
-	SpriteCover* sc = new SpriteCover;
-	sc->worldx = x;
-	sc->worldy = y;
-	sc->XPos = xpos;
-	sc->YPos = ypos;
-	sc->Width = width;
-	sc->Height = height;
+	// FIXME: how do we know if a door changed state?
+	// we need to redraw the stencil when that happens
+	// see TODO in Map::SetDrawingStencilForScriptable for another example of something that could use this
 
-	Video* video = core->GetVideoDriver();
-	video->InitSpriteCover(sc, flags);
-
-	unsigned int wpcount = GetWallCount();
-	for (unsigned int i = 0; i < wpcount; ++i)
-	{
-		Wall_Polygon* wp = GetWallGroup(i);
-		if (!wp) continue;
-		if (!wp->PointCovered(x, y)) continue;
-		if (areaanim && !(wp->GetPolygonFlag() & WF_COVERANIMS)) continue;
-
-		video->AddPolygonToSpriteCover(sc, wp);
-	}
-
-	return sc;
-}
-
-void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg) const
-{
-	if (!Walls) {
+	if (stencilViewport == vp) {
+		assert(wallStencil);
 		return;
 	}
-	for (unsigned int i = baseindex; i < baseindex + count; ++i) {
-		Wall_Polygon* wp = GetWallGroup(i);
-		if (!wp)
-			continue;
-		ieDword value=wp->GetPolygonFlag();
-		if (flg)
-			value&=~WF_DISABLED;
-		else
-			value|=WF_DISABLED;
-		wp->SetPolygonFlag(value);
+
+	stencilViewport = vp;
+
+	if (wallStencil == NULL) {
+		// FIXME: this should be forced 8bit*4 color format
+		// but currently that is forcing some performance killing conversion issues on some platforms
+		// for now things will break if we use 16 bit color settings
+		Video* video = core->GetVideoDriver();
+		wallStencil = video->CreateBuffer(Region(Point(), vp.Dimensions()), Video::DISPLAY_ALPHA);
 	}
-	//all actors will have to generate a new spritecover
-	for (auto actor : actors) {
-		actor->SetSpriteCover(NULL);
-	}
+
+	wallStencil->Clear();
+
+	DrawStencil(wallStencil, vp, walls);
 }
 
+void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, const WallPolygonGroup& walls) const
+{
+	Video* video = core->GetVideoDriver();
+
+	// color is used as follows:
+	// the 'r' channel is for the native value for all walls
+	// the 'g' channel is for the native value for only WF_COVERANIMS walls
+	// the 'b' channel is for always opaque (always 0xff, 100% opaque)
+	// the 'a' channel is for always dithered (always 0x80, 50% transparent)
+	// IMPORTANT: 'a' channel must be always dithered because the "raw" SDL2 driver can only do one stencil and it must be 'a'
+	Color stencilcol(0, 0, 0xff, 0x80);
+	video->PushDrawingBuffer(stencilBuffer);
+
+	for (const auto& wp : walls) {
+		const Point& origin = wp->BBox.Origin() - vp.Origin();
+
+		if (wp->wall_flag & WF_DITHER) {
+			stencilcol.r = 0x80;
+		} else {
+			stencilcol.r = 0xff;
+		}
+
+		if (wp->wall_flag & WF_COVERANIMS) {
+			stencilcol.g = stencilcol.r;
+		} else {
+			stencilcol.g = 0;
+		}
+
+		video->DrawPolygon(wp.get(), origin, stencilcol, true);
+	}
+
+	video->PopDrawingBuffer();
+}
+
+bool Map::BehindWall(const Point& pos, const Region& r) const
+{
+	const auto& polys = WallsIntersectingRegion(r, false, &pos);
+	return polys.first.size();
+}
 
 //this function determines actor drawing order
 //it should be extended to wallgroups, animations, effects!
@@ -2122,6 +2681,7 @@ void Map::GenerateQueues()
 	}
 
 	ieDword gametime = core->GetGame()->GameTime;
+	bool hostiles_new = false;
 	while (i--) {
 		Actor* actor = actors[i];
 
@@ -2144,6 +2704,8 @@ void Map::GenerateQueues()
 					priority = PR_IGNORE; //don't run scripts for out of schedule actors
 				}
 			}
+			if (IsVisible(actor->Pos))
+				hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 		} else {
 			//dead actors are always visible on the map, but run no scripts
 			if ((stance == IE_ANI_TWITCH) || (stance == IE_ANI_DIE) ) {
@@ -2152,11 +2714,12 @@ void Map::GenerateQueues()
 				//isvisible flag is false (visibilitymap) here,
 				//coz we want to reactivate creatures that
 				//just became visible
-				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime, false) ) {
+				if (IsVisible(actor->Pos) && actor->Schedule(gametime, false) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					//more like activate!
 					actor->Activate();
 					ActorSpottedByPlayer(actor);
+					hostiles_new |= HandleAutopauseForVisible(actor, !hostiles_visible);
 				} else {
 					priority = PR_IGNORE;
 				}
@@ -2169,6 +2732,7 @@ void Map::GenerateQueues()
 		queue[priority][Qcount[priority]] = actor;
 		Qcount[priority]++;
 	}
+	hostiles_visible = hostiles_new;
 }
 
 //the original qsort implementation was flawed
@@ -2241,8 +2805,8 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p) const
 
 	for (const VEFObject *vvc: vvcCells) {
 		if (!p.isempty()) {
-			if (vvc->XPos!=p.x) continue;
-			if (vvc->YPos!=p.y) continue;
+			if (vvc->Pos.x != p.x) continue;
+			if (vvc->Pos.y != p.y) continue;
 		}
 		if (strnicmp(resource, vvc->ResName, sizeof(ieResRef))) continue;
 		const ScriptedAnimation *sca = vvc->GetSingleObject();
@@ -2263,7 +2827,7 @@ void Map::AddVVCell(VEFObject* vvc)
 {
 	scaIterator iter;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos<vvc->ZPos; iter++) ;
+	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->Pos.y < vvc->Pos.y; iter++) ;
 	vvcCells.insert(iter, vvc);
 }
 
@@ -2491,26 +3055,19 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 	}
 }
 
-//single point visible or not (visible/exploredbitmap)
-//if explored = true then explored otherwise currently visible
-bool Map::IsVisible(const Point &pos, int explored) const
+Point Map::ConvertPointToFog(const Point &p) const
 {
-	if (!VisibleBitmap)
-		return false;
-	int sX=pos.x/32;
-	int sY=pos.y/32;
-	if (sX<0) return false;
-	if (sY<0) return false;
-	int w = TMap->XCellCount * 2 + LargeFog;
-	int h = TMap->YCellCount * 2 + LargeFog;
-	if (sX>=w) return false;
-	if (sY>=h) return false;
-	int b0 = (sY * w) + sX;
-	int by = b0/8;
-	int bi = 1<<(b0%8);
+	return Point(p.x / 32, p.y / 32);
+}
 
-	if (explored) return (ExploredBitmap[by] & bi)!=0;
-	return (VisibleBitmap[by] & bi)!=0;
+bool Map::IsVisible(const Point &pos) const
+{
+	return FogTileUncovered(ConvertPointToFog(pos), VisibleBitmap);
+}
+
+bool Map::IsExplored(const Point &pos) const
+{
+	return FogTileUncovered(ConvertPointToFog(pos), ExploredBitmap);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
@@ -2560,14 +3117,14 @@ ieWord Map::GetAmbientCount(bool toSave) const
 
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(const Point &point, int color, String* text)
+void Map::AddMapNote(const Point& point, ieWord color, String* text, bool readonly)
 {
-	AddMapNote(point, MapNote(text, color));
+	AddMapNote(point, MapNote(text, color, readonly));
 }
 
-void Map::AddMapNote(const Point &point, int color, ieStrRef strref)
+void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly)
 {
-	AddMapNote(point, MapNote(strref, color));
+	AddMapNote(point, MapNote(strref, color, readonly));
 }
 
 void Map::AddMapNote(const Point &point, const MapNote& note)
@@ -2581,18 +3138,18 @@ void Map::RemoveMapNote(const Point &point)
 {
 	std::vector<MapNote>::iterator it = mapnotes.begin();
 	for (; it != mapnotes.end(); ++it) {
-		if (it->Pos == point) {
+		if (!it->readonly && it->Pos == point) {
 			mapnotes.erase(it);
 			break;
 		}
 	}
 }
 
-const MapNote *Map::MapNoteAtPoint(const Point &point) const
+const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius) const
 {
 	size_t i = mapnotes.size();
 	while (i--) {
-		if (Distance(point, mapnotes[i].Pos) < 10 ) {
+		if (Distance(point, mapnotes[i].Pos) < radius) {
 			return &mapnotes[i];
 		}
 	}
@@ -2716,7 +3273,7 @@ void Map::UpdateSpawns() const
 		if ((spawn->Method & (SPF_NOSPAWN|SPF_WAIT)) == (SPF_NOSPAWN|SPF_WAIT)) {
 			//only reactivate the spawn point if the party cannot currently see it;
 			//also make sure the party has moved away some
-			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos, false) &&
+			if (spawn->NextSpawn < time && !IsVisible(spawn->Pos) &&
 				!GetActorInRadius(spawn->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_UNSCHEDULED, SPAWN_RANGE * 2)) {
 				spawn->Method &= ~SPF_WAIT;
 			}
@@ -2773,48 +3330,36 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	}
 	return 0;
 }
+	
+Size Map::GetSize() const
+{
+	return TMap->GetMapSize();
+}
 
 //--------explored bitmap-----------
 int Map::GetExploredMapSize() const
 {
-	int x = TMap->XCellCount*2;
-	int y = TMap->YCellCount*2;
-	if (LargeFog) {
-		x++;
-		y++;
+	Size fogSize = FogMapSize();
+	return (fogSize.w * fogSize.h + 7) / 8;
+}
+
+void Map::FillExplored(bool explored)
+{
+	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), (explored) ? 0xff : 0x00);
+}
+
+void Map::ExploreTile(const Point &p)
+{
+	Point fogP = ConvertPointToFog(p);
+
+	const Size fogSize = FogMapSize();
+	if (fogP.x < 0 || fogP.x >= fogSize.w || fogP.y < 0 || fogP.y >= fogSize.h) {
+		return;
 	}
-	return (x*y+7)/8;
-}
-
-void Map::Explore(int setreset)
-{
-	memset (ExploredBitmap, setreset, GetExploredMapSize() );
-}
-
-void Map::SetMapVisibility(int setreset)
-{
-	memset( VisibleBitmap, setreset, GetExploredMapSize() );
-}
-
-// x, y are not in tile coordinates
-void Map::ExploreTile(const Point &pos)
-{
-	int h = TMap->YCellCount * 2 + LargeFog;
-	int y = pos.y/32;
-	if (y < 0 || y >= h)
-		return;
-
-	int w = TMap->XCellCount * 2 + LargeFog;
-	int x = pos.x/32;
-	if (x < 0 || x >= w)
-		return;
-
-	int b0 = (y * w) + x;
-	int by = b0/8;
-	int bi = 1<<(b0%8);
-
-	ExploredBitmap[by] |= bi;
-	VisibleBitmap[by] |= bi;
+	
+	div_t res = div(fogSize.w * fogP.y + fogP.x, 8);
+	ExploredBitmap[res.quot] |= (1 << res.rem);
+	VisibleBitmap[res.quot] |= (1 << res.rem);
 }
 
 void Map::ExploreMapChunk(const Point &Pos, int range, int los)
@@ -2857,23 +3402,19 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	if (!(core->FogOfWar&FOG_DRAWFOG) ) {
-		SetMapVisibility( -1 );
-		Explore(-1);
-	} else {
-		SetMapVisibility( 0 );
-	}
-
+	std::fill(VisibleBitmap, VisibleBitmap + GetExploredMapSize(), 0);
+	
 	for (size_t i = 0; i < actors.size(); i++) {
 		const Actor *actor = actors[i];
 		if (!actor->Modified[ IE_EXPLORE ] ) continue;
-		if (core->FogOfWar&FOG_DRAWFOG) {
-			int state = actor->Modified[IE_STATE_ID];
-			if (state & STATE_CANTSEE) continue;
-			int vis2 = actor->Modified[IE_VISUALRANGE];
-			if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
-			ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
-		}
+		
+		int state = actor->Modified[IE_STATE_ID];
+		if (state & STATE_CANTSEE) continue;
+		
+		int vis2 = actor->Modified[IE_VISUALRANGE];
+		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
+		ExploreMapChunk (actor->Pos, vis2+actor->GetAnims()->GetCircleSize(), 1);
+		
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);
@@ -2953,6 +3494,7 @@ int Map::ConsolidateContainers()
 		Container * c = TMap->GetContainer( containercount);
 
 		if (TMap->CleanupContainer(c) ) {
+			objectStencils.erase(c);
 			continue;
 		}
 		itemcount += c->inventory.GetSlotCount();
@@ -3037,7 +3579,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE && IsVisible(c->Pos, true)) {
+		if (c->Type==IE_CONTAINER_PILE && IsExplored(c->Pos)) {
 			//transfer the pile to the other container
 			MergePiles(c, othercontainer);
 		}
@@ -3068,7 +3610,6 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 Container *Map::GetPile(Point position)
 {
-	Point tmp[4];
 	char heapname[32];
 
 	//converting to search square
@@ -3080,18 +3621,10 @@ Container *Map::GetPile(Point position)
 	position.y=position.y*12+6;
 	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
 	if (!container) {
-		//bounding box covers the search square
-		tmp[0].x=position.x-8;
-		tmp[0].y=position.y-6;
-		tmp[1].x=position.x+8;
-		tmp[1].y=position.y-6;
-		tmp[2].x=position.x+8;
-		tmp[2].y=position.y+6;
-		tmp[3].x=position.x-8;
-		tmp[3].y=position.y+6;
-		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
+		container = AddContainer(heapname, IE_CONTAINER_PILE, nullptr);
 		container->Pos=position;
+		//bounding box covers the search square
+		container->BBox = Region::RegionFromPoints(Point(position.x-8, position.y-6), Point(position.x+8,position.y+6));
 	}
 	return container;
 }
@@ -3103,20 +3636,23 @@ void Map::AddItemToLocation(const Point &position, CREItem *item)
 }
 
 Container* Map::AddContainer(const char* Name, unsigned short Type,
-	Gem_Polygon* outline)
+							 std::shared_ptr<Gem_Polygon> outline)
 {
 	Container* c = new Container();
 	c->SetScriptName( Name );
 	c->Type = Type;
 	c->outline = outline;
 	c->SetMap(this);
+	if (outline) {
+		c->BBox = outline->BBox;
+	}
 	TMap->AddContainer( c );
 	return c;
 }
 
 int Map::GetCursor(const Point &p) const
 {
-	if (!IsVisible( p, true ) ) {
+	if (!IsExplored(p)) {
 		return IE_CURSOR_INVALID;
 	}
 	switch (GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL)) {
@@ -3298,8 +3834,6 @@ AreaAnimation::AreaAnimation()
 {
 	animation=NULL;
 	animcount=0;
-	palette=NULL;
-	covers=NULL;
 	appearance = sequence = frame = transparency = height = 0;
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
@@ -3330,9 +3864,7 @@ AreaAnimation::AreaAnimation(AreaAnimation *src)
 	memcpy(Name, src->Name, sizeof(ieVariable));
 	memcpy(BAM, src->BAM, sizeof(ieResRef));
 
-	palette = src->palette ? new Palette(src->palette->col, src->palette->alpha) : NULL;
-	// covers will get built once we try to draw it
-	covers = NULL;
+	palette = src->palette ? src->palette->Copy() : NULL;
 
 	// handles the rest: animation, resets animcount
 	InitAnimation();
@@ -3346,13 +3878,6 @@ AreaAnimation::~AreaAnimation()
 		}
 	}
 	free(animation);
-	gamedata->FreePalette(palette, PaletteRef);
-	if (covers) {
-		for(int i=0;i<animcount;i++) {
-			delete covers[i];
-		}
-		free (covers);
-	}
 }
 
 Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
@@ -3432,7 +3957,7 @@ void AreaAnimation::BlendAnimation()
 		// from first frame of first animation
 
 		if (animcount == 0 || !animation[0]) return;
-		Sprite2D* spr = animation[0]->GetFrame(0);
+		Holder<Sprite2D> spr = animation[0]->GetFrame(0);
 		if (!spr) return;
 		palette = spr->GetPalette()->Copy();
 		PaletteRef[0] = 0;
@@ -3452,55 +3977,41 @@ bool AreaAnimation::Schedule(ieDword gametime) const
 
 int AreaAnimation::GetHeight() const
 {
-	if (Flags&A_ANI_BACKGROUND) return ANI_PRI_BACKGROUND;
-	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
-		return ANI_PRI_BACKGROUND;
-	return Pos.y+height;
+	return (Flags&A_ANI_BACKGROUND) ? ANI_PRI_BACKGROUND : height;
 }
 
+Region AreaAnimation::DrawingRegion() const
+{
+	Region r(Pos, Size());
+	int ac = animcount;
+	while (ac--) {
+		Animation *anim = animation[ac];
+		Region animRgn = anim->animArea;
+		animRgn.x += Pos.x;
+		animRgn.y += Pos.y;
+		
+		r.ExpandToRegion(animRgn);
+	}
+	return r;
+}
 
-void AreaAnimation::Draw(const Region &screen, Map *area)
+void AreaAnimation::Draw(const Region &viewport, Color tint, uint32_t flags) const
 {
 	Video* video = core->GetVideoDriver();
-	Game *game = core->GetGame();
-
-	//always draw the animation tinted because tint is also used for
-	//transparency
-	ieByte inverseTransparency = 255-transparency;
-	Color tint = {255,255,255,inverseTransparency};
-	if (Flags & A_ANI_NO_SHADOW) {
-		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-		tint.a = inverseTransparency;
-	}
-	ieDword flags = BLIT_TINTED;
-	if (game) game->ApplyGlobalTint(tint, flags);
-	bool covered = true;
-
-	// TODO: This needs more testing. The HOW ar9101 roast seems to need it.
-	// The conditional on height<=0 is unverified.
-	if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && height <= 0)
-		covered = false;
-
-	if (Flags&A_ANI_NO_WALL)
-		covered = false;
-
-	if (covered && !covers) {
-		covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
+	
+	if (transparency) {
+		tint.a = 255 - transparency;
+		flags |= BLIT_ALPHA_MOD;
+	} else {
+		tint.a = 255;
 	}
 
 	int ac = animcount;
 	while (ac--) {
 		Animation *anim = animation[ac];
-		Sprite2D *frame = anim->NextFrame();
-		if(covers) {
-			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y + height, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
-				delete covers[ac];
-				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y + height, -anim->animArea.x,
-					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0, true);
-			}
-		}
-		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y,
-			flags, tint, covers?covers[ac]:0, palette, &screen );
+		Holder<Sprite2D> frame = anim->NextFrame();
+		
+		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.Origin(), flags, tint);
 	}
 }
 
@@ -3570,9 +4081,6 @@ void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
 {
 	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
 
-	if (Background) {
-		Sprite2D::FreeSprite(Background);
-	}
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
 }

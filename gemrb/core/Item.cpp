@@ -61,7 +61,6 @@ Item::Item(void)
 
 Item::~Item(void)
 {
-	//core->FreeITMExt( ext_headers, equipping_features );
 	delete [] ext_headers;
 	delete [] equipping_features;
 }
@@ -250,15 +249,13 @@ Projectile *Item::GetProjectile(Scriptable *self, int header, const Point &targe
 
 //this is the implementation of the weapon glow effect in PST
 static EffectRef glow_ref = { "Color:PulseRGB", -1 };
-//this type of colour uses PAL32, a PST specific palette
-#define PALSIZE 32
-static Color ActorColor[PALSIZE];
 
 Effect *Item::BuildGlowEffect(int gradient) const
 {
+	//this type of colour uses PAL32, a PST specific palette
 	//palette entry to to RGB conversion
-	core->GetPalette( gradient, PALSIZE, ActorColor );
-	ieDword rgb = (ActorColor[16].r<<16) | (ActorColor[16].g<<8) | ActorColor[16].b;
+	const auto& pal32 = core->GetPalette32( gradient );
+	ieDword rgb = (pal32[16].r<<16) | (pal32[16].g<<8) | pal32[16].b;
 	ieDword location = 0;
 	ieDword speed = 128;
 	Effect *fx = EffectQueue::CreateEffect(glow_ref, rgb, location|(speed<<16), FX_DURATION_INSTANT_WHILE_EQUIPPED);
