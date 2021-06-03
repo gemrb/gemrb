@@ -50,11 +50,11 @@ IF(APPLE) #application bundle generation
 	SET(PRODUCT_NAME "GemRB") # for info.plist
 	
 	ADD_EXECUTABLE(gemrb MACOSX_BUNDLE
-					../apple/CocoaWrapper/mac/CocoaWrapper.mm
-					../apple/AppleLogger.mm
-					../apple/EmptyStringTransformer.m
+					../platforms/apple/CocoaWrapper/mac/CocoaWrapper.mm
+					../platforms/apple/AppleLogger.mm
+					../platforms/apple/EmptyStringTransformer.m
 					../artwork/gemrb.icns
-					../apple/defaults.plist
+					../platforms/apple/defaults.plist
 					${RESOURCE_FILES})
 
 	# we already link to Cocoa and we need to modify this with the ‘dylib_file’ option for non-framework SDL builds
