@@ -37,7 +37,7 @@ namespace GemRB {
 #define MAP_EDIT_NOTE  4
 
 MapControl::MapControl(const Region& frame, AnimationFactory* af)
-: Control(frame), flags(af)
+: Control(frame), mapFlags(af)
 {
 	ControlType = IE_GUI_MAP;	
 	UpdateMap();
@@ -200,7 +200,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 
 			Point pos = ConvertPointFromGame(mn.Pos);
 
-			Holder<Sprite2D> anim = flags ? flags->GetFrame(0, mn.color) : nullptr;
+			Holder<Sprite2D> anim = mapFlags ? mapFlags->GetFrame(0, mn.color) : nullptr;
 			if (anim) {
 				Point p(anim->Frame.w / 2, anim->Frame.h / 2);
 				video->BlitSprite(anim, pos - p);
@@ -253,7 +253,7 @@ const MapNote* MapControl::MapNoteAtPoint(const Point& p) const
 	Size mapsize = MyMap->GetSize();
 
 	float scalar = float(mapsize.w) / mosRgn.w;
-	unsigned int radius = (flags) ? (flags->GetFrame(0)->Frame.w / 2) * scalar : 5 * scalar;
+	unsigned int radius = (mapFlags ? mapFlags->GetFrame(0)->Frame.w / 2 : 5) * scalar;
 
 	return MyMap->MapNoteAtPoint(gamePoint, radius);
 }

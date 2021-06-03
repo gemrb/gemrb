@@ -47,7 +47,7 @@ private:
 	Region mosRgn;
 	Point notePos;
 
-	AnimationFactory* flags;
+	AnimationFactory* mapFlags;
 	
 public:
 	// Small map bitmap
