@@ -120,7 +120,7 @@ ELSE(WIN32)
 	ADD_CUSTOM_COMMAND (TARGET gemrb POST_BUILD 
                       COMMAND ${IBTOOL} --errors --warnings --notices --output-format human-readable-text 
                               --compile ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources/GemRB.nib 
-                            ${CMAKE_CURRENT_SOURCE_DIR}/../apple/CocoaWrapper/mac/nibs/GemRB.xib
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../platforms/apple/CocoaWrapper/mac/nibs/GemRB.xib
                       COMMENT "Compiling GemRB.xib")
 
 	if (STATIC_LINK)

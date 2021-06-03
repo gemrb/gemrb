@@ -476,7 +476,7 @@ IF(APPLE)
 	ENDIF ()
 
 	ADD_DEFINITIONS("-x objective-c++")
-	INCLUDE_DIRECTORIES(apple)
+	INCLUDE_DIRECTORIES(platforms/apple)
 	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
 	FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
 	# for objective-c++
