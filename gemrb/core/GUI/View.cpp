@@ -916,6 +916,8 @@ const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, S
 		if (ScriptEngine::RegisterScriptingRef(newref)) {
 			*it = newref;
 			return newref;
+		} else {
+			delete newref;
 		}
 	}
 	return nullptr;
