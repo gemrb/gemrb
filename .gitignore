@@ -10,9 +10,9 @@ Makefile
 # Mac/Xcode junk
 DerivedData
 Payload
-apple/build
-apple/config.h
-apple/ios/lib
+platforms/apple/build
+platforms/apple/config.h
+platforms/apple/ios/lib
 .DS_Store
 xcuserdata
 *.pbxuser
