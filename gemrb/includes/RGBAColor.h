@@ -40,7 +40,7 @@ struct Color {
 		return !operator==(rhs);
 	}
 }
-#ifdef __GNUC__
+#if defined(__GNUC__) && defined(HAS_OBJALIGN4)
 	__attribute__((aligned(4)))
 #endif
 ; // close of Color struct
