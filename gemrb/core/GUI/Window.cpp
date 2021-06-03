@@ -478,86 +478,84 @@ bool Window::DispatchEvent(const Event& event)
 		return true;
 	}
 
-	if (event.isScreen) {
-		if (event.type == Event::TouchGesture) {
-			if (trackingView) {
-				DispatchTouchGesture(trackingView, event.gesture);
-
-			}
-			return true;
-		}
-
-		Point screenPos = event.mouse.Pos();
-		if (!frame.PointInside(screenPos) && trackingView == NULL) {
-			// this can hapen if the window is modal since it will absorb all events
-			// the window manager maybe shouldnt dispatch the events in this case
-			// but this is a public function and its possible to post a phoney event from anywhere anyway
-			return true;
-		}
-
-		target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
-		assert(target == NULL || target->IsVisible());
-
-		if (IsDragable() && target == NULL) {
-			target = this;
-		}
-
-		// special event handling
-		switch (event.type) {
-			case Event::MouseScroll:
-				// retarget if NULL or disabled
-				{
-					Point delta = event.mouse.Delta();
-					if (target == NULL || target->IsDisabled()) {
-						target = this;
-					}
-
-					target->MouseWheelScroll(delta);
-					return true;
-				}
-			case Event::MouseMove:
-				// allows NULL and disabled targets
-				if (target == this) {
-					// skip the usual dispatch
-					// this is so that we can move windows that otherwise ignore events
-					OnMouseDrag(event.mouse);
-				} else {
-					DispatchMouseMotion(target, event.mouse);
-				}
-				return true;
-			default:
-				if (target == NULL) {
-					target = this;
-				} else if (target->IsDisabled()) {
-					return true; // we still absorb the event
-				}
-				break;
-		}
-
-		assert(target);
-		// basic event handling
-		switch (event.type) {
-			case Event::MouseDown:
-				DispatchMouseDown(target, event.mouse, event.mod);
-				break;
-			case Event::MouseUp:
-				DispatchMouseUp(target, event.mouse, event.mod);
-				break;
-			case Event::TouchDown:
-				DispatchTouchDown(target, event.touch, event.mod);
-				break;
-			case Event::TouchUp:
-				DispatchTouchUp(target, event.touch, event.mod);
-				break;
-			default:
-				assert(false); // others should be handled above
-		}
-		// absorb other screen events i guess
-		return true;
-	} else { // key events
+	if (!event.isScreen) { // key events
 		return DispatchKey(focusView, event);
 	}
-	return false;
+
+	if (event.type == Event::TouchGesture) {
+		if (trackingView) {
+			DispatchTouchGesture(trackingView, event.gesture);
+		}
+		return true;
+	}
+
+	Point screenPos = event.mouse.Pos();
+	if (!frame.PointInside(screenPos) && trackingView == nullptr) {
+		// this can hapen if the window is modal since it will absorb all events
+		// the window manager maybe shouldnt dispatch the events in this case
+		// but this is a public function and its possible to post a phoney event from anywhere anyway
+		return true;
+	}
+
+	target = SubviewAt(ConvertPointFromScreen(screenPos), false, true);
+	assert(target == nullptr || target->IsVisible());
+
+	if (IsDragable() && target == nullptr) {
+		target = this;
+	}
+
+	// special event handling
+	switch (event.type) {
+		case Event::MouseScroll:
+			// retarget if NULL or disabled
+			{
+				Point delta = event.mouse.Delta();
+				if (target == nullptr || target->IsDisabled()) {
+					target = this;
+				}
+
+				target->MouseWheelScroll(delta);
+				return true;
+			}
+		case Event::MouseMove:
+			// allows NULL and disabled targets
+			if (target == this) {
+				// skip the usual dispatch
+				// this is so that we can move windows that otherwise ignore events
+				OnMouseDrag(event.mouse);
+			} else {
+				DispatchMouseMotion(target, event.mouse);
+			}
+			return true;
+		default:
+			if (target == NULL) {
+				target = this;
+			} else if (target->IsDisabled()) {
+				return true; // we still absorb the event
+			}
+			break;
+	}
+
+	assert(target);
+	// basic event handling
+	switch (event.type) {
+		case Event::MouseDown:
+			DispatchMouseDown(target, event.mouse, event.mod);
+			break;
+		case Event::MouseUp:
+			DispatchMouseUp(target, event.mouse, event.mod);
+			break;
+		case Event::TouchDown:
+			DispatchTouchDown(target, event.touch, event.mod);
+			break;
+		case Event::TouchUp:
+			DispatchTouchUp(target, event.touch, event.mod);
+			break;
+		default:
+			assert(false); // others should be handled above
+	}
+	// absorb other screen events i guess
+	return true;
 }
 	
 bool Window::InActionHandler() const
