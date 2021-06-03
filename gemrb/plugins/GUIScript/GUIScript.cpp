@@ -1172,34 +1172,44 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 
 	ScriptingId id = (pyid) ? (ScriptingId)PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
 
-	// FIXME: no promise that subView is a control (could be a plain view)
-	const ControlScriptingRef* ref = dynamic_cast<const ControlScriptingRef*>(GetScriptingRef(pySubview));
+	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
 
 	View* superView = GetView<View>(self);
 	View* subView = GetView(ref);
 	View* siblingView = GetView<View>(pySiblingView);
 	if (superView && subView) {
-		assert(ref);
 		PyObject* attr = PyObject_GetAttrString(pySubview, "SCRIPT_GROUP");
 
 		Window* oldwin = subView->GetWindow();
 		superView->AddSubviewInFrontOfView(subView, siblingView);
 		
+		const ControlScriptingRef* cref = dynamic_cast<const ControlScriptingRef*>(ref);
+		
 		char* grp = PyString_AsString(attr);
-		if (stricmp(grp, "__DEL__") == 0) {
+		if (cref == nullptr) {
+			// plain old view
+			if (id != ScriptingId(-1)) {
+				const ViewScriptingRef* newref = subView->AssignScriptingRef(id, "VIEW");
+				return ConstructObjectForScriptableView(newref);
+			}
+			// return the ref we already have
+			Py_IncRef(pySubview);
+			return pySubview;
+		} else if (stricmp(grp, "__DEL__") == 0) {
 			if (id == ScriptingId(-1)) {
 				return RuntimeError("Cannot add deleted view without a valid id parameter.");
 			}
 			// replace the ref with a new one and return it
-			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, ref);
+			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), id, cref);
 			return ConstructObjectForScriptableView(newref);
 		} else if (oldwin == NULL || id != ScriptingId(-1)) {
 			// create a new reference and return it
-			ScriptingId sid = (id == ScriptingId(-1)) ? ref->Id : id;
+			ScriptingId sid = (id == ScriptingId(-1)) ? cref->Id : id;
             const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
 			return ConstructObjectForScriptableView(newref);
 		} else {
 			// return the ref we already have
+			Py_IncRef(pySubview);
 			return pySubview;
 		}
 	}
@@ -2165,16 +2175,18 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			view = core->CreateWindow(id, rgn);
 			break;
 		default:
-			assert(type < IE_GUI_INVALID);
 			view = new View(rgn);
 			break;
 	}
 
 	assert(view);
 
-	if (type < IE_GUI_INVALID) {
+	if (type < IE_GUI_VIEW) {
 		// this is a control
 		RegisterScriptableControl(static_cast<Control*>(view), id);
+	} else {
+		// these are getting stuck in a global group instead of under the window group...
+		view->AssignScriptingRef(id, "VIEW");
 	}
 
 	return ConstructObjectForScriptableView(view->GetScriptingRef());
