@@ -82,7 +82,7 @@
 
 #ifdef WIN32
 #include "CodepageToIconv.h"
-#else
+#elif defined(HAVE_LANGINFO_H)
 #include <langinfo.h>
 #endif
 
@@ -228,10 +228,10 @@ Interface::Interface()
 #else // HAVE_ICONV
 	SystemEncoding = nullptr;
 #endif// HAVE_ICONV
-#elif defined(__MORPHOS__)
-	SystemEncoding = nullptr;
-#else // WIN32
+#elif defined(HAVE_LANGINFO_H)
 	SystemEncoding = nl_langinfo(CODESET);
+#else // WIN32
+	SystemEncoding = nullptr;
 #endif // WIN32
 
 	TLKEncoding.encoding = "ISO-8859-1";
