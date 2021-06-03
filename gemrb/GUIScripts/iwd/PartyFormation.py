@@ -26,7 +26,6 @@ import GemRB
 from GUIDefines import *
 import GameCheck
 import GUICommonWindows
-import LoadScreen
 
 PartyFormationWindow = 0
 CreateCharWindow = 0
@@ -95,9 +94,8 @@ def OnLoad ():
 		else:
 			GemRB.SetVar ("PlayMode",0) #using first row
 	GemRB.SetToken ("SaveDir", "mpsave")
+	PartyFormationWindow.ShowModal(MODAL_SHADOW_NONE)
 
-	if LoadScreen.LoadScreen:
-		LoadScreen.LoadScreen.Close()
 	return
 
 def CreateCharPress ():
