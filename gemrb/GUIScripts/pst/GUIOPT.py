@@ -429,7 +429,7 @@ def keys_setup_page (Window, pageno):
 
 
 last_key_action = None
-def OnActionLabelPress ():
+def OnActionLabelPress (Window):
 	global last_key_action
 	
 	i = GemRB.GetVar ("KeyAction")

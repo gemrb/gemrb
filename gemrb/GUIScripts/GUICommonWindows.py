@@ -240,7 +240,7 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
 			pos = Window.GetFrame()["h"] - 71
-			Window.CreateButton (OptionControl['Time'], 6-6, pos, 64, 71)
+			Window.CreateButton (OptionControl['Time'], 0, pos, 64, 71)
 
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:

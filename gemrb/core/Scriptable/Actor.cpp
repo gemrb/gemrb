@@ -1402,8 +1402,8 @@ static void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 
 static void handle_overlay(Actor *actor, ieDword idx)
 {
-	if (actor->FindOverlay(idx))
-		return;
+	if (idx >= OVERLAY_COUNT || actor->FindOverlay(idx)) return;
+
 	ieDword flag = hc_locations&(1<<idx);
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(hc_overlays[idx], false);
 	if (!sca) {

@@ -620,7 +620,7 @@ def InitStoreStealWindow (Window):
 	# Steal
 	LeftButton = Button = Window.GetControlAlias ('STEAL')
 	Button.SetText (strrefs["steal"])
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, StealPressed)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: StealPressed (Window))
 
 	Button = Window.GetControl (37)
 	if Button:
@@ -1610,7 +1610,7 @@ def InfoWindow (Slot, Item):
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def StealPressed ():
+def StealPressed (Window):
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#percentage skill check, if fails, trigger StealFailed
@@ -1621,7 +1621,7 @@ def StealPressed ():
 	if GUICommon.CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 		GemRB.PlaySound(DEF_STOLEN)
-		UpdateStoreStealWindow ()
+		UpdateStoreStealWindow (Window)
 	else:
 		GemRB.StealFailed ()
 		CloseStoreWindow ()

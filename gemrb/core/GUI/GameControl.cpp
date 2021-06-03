@@ -703,7 +703,6 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 				}
 				break;
 		}
-		return true;
 	} else {
 			switch (keycode) {
 				case GEM_UP:
@@ -773,9 +772,8 @@ bool GameControl::OnKeyPress(const KeyboardEvent& Key, unsigned short mod)
 					}
 					break;
 			}
-			return true;
 	}
-	return false;
+	return true;
 }
 
 //Select (or deselect) a new actor (or actors)

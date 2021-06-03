@@ -7525,9 +7525,9 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 				gamedata->GetItemSound(Sound2, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, itemResRef, 0);
-			if (Sound[0]) {
+			if (Sound2[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
-				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
+				core->GetAudioDrv()->Play(Sound2, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
 			}
 		}
 		res = ASI_SUCCESS;
