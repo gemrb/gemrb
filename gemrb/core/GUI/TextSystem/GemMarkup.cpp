@@ -18,6 +18,8 @@
 
 #include "GemMarkup.h"
 
+#include <cwchar>
+
 namespace GemRB {
 
 static Color ParseColor(const String& colorString)
