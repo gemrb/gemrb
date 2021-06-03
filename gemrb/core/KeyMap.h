@@ -30,7 +30,7 @@ class Variables;
 
 class Function {
 public:
-	ieVariable module;
+	ieVariable moduleName;
 	ieVariable function;
 	int group;
 	int key;

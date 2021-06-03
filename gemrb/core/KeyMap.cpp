@@ -30,8 +30,8 @@ namespace GemRB {
 
 Function::Function(const char *m, const char *f, int g, int k)
 {
-	//make sure the module an function names are no longer than 32 characters, or they will be truncated
-	strlcpy(module, m, sizeof(module));
+	// make sure the module and function names are no longer than 32 characters, or they will be truncated
+	strlcpy(moduleName, m, sizeof(moduleName));
 	strlcpy(function, f, sizeof(function));
 	group = g;
 	key = k;
@@ -110,21 +110,21 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			continue;
 		}
 
-		const char *module;
+		const char *moduleName;
 		const char *function;
 		const char *group;
 
 		if (kmtable->GetRowIndex(name)>=0 ) {
-			module = kmtable->QueryField(name, "MODULE");
+			moduleName = kmtable->QueryField(name, "MODULE");
 			function = kmtable->QueryField(name, "FUNCTION");
 			group = kmtable->QueryField(name, "GROUP");
 		} else {
-			module = kmtable->QueryField("Default","MODULE");
+			moduleName = kmtable->QueryField("Default","MODULE");
 			function = kmtable->QueryField("Default","FUNCTION");
 			group = kmtable->QueryField("Default","GROUP");
-			print("Adding key %s with function %s::%s", value, module, function);
+			print("Adding key %s with function %s::%s", value, moduleName, function);
 		}
-		fun = new Function(module, function, atoi(group), tolower(value[0]));
+		fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
 
 		// lookup by either key or name
 		keymap.SetAt(value, fun);
@@ -158,8 +158,8 @@ bool KeyMap::ResolveName(const char* name, int group)
 		return false;
 	}
 
-	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->module, fun->function);
-	core->GetGUIScriptEngine()->RunFunction(fun->module, fun->function);
+	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName, fun->function);
+	core->GetGUIScriptEngine()->RunFunction(fun->moduleName, fun->function);
 	return true;
 }
 

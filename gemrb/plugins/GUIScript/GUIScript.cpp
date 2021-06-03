@@ -3044,21 +3044,21 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		btn = GetView<Button>(self);
 		assert(btn);
 
-		PyObject* module = PyImport_ImportModule(func->module);
-		if (module == NULL) {
-			return RuntimeError("Hot key map referenced a module that doesnt exist.");
+		PyObject* moduleName = PyImport_ImportModule(func->moduleName);
+		if (moduleName == nullptr) {
+			return RuntimeError("Hot key map referenced a moduleName that doesnt exist.");
 		}
-		PyObject* dict = PyModule_GetDict(module);
+		PyObject* dict = PyModule_GetDict(moduleName);
 
 		PyObject* pFunc = PyDict_GetItemString(dict, func->function);
 		/* pFunc: Borrowed reference */
 		if (!PyCallable_Check(pFunc)) {
-			Py_DECREF(module);
+			Py_DECREF(moduleName);
 			return RuntimeError("Hot key map referenced a function that doesnt exist.");
 		}
 
 		btn->SetAction(PythonControlCallback(pFunc));
-		Py_DECREF(module);
+		Py_DECREF(moduleName);
 
 		hotkey = func->key;
 	}
@@ -13574,12 +13574,12 @@ bool GUIScript::Autodetect(void)
 	iter.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *dirent = iter.GetName();
-		char module[_MAX_PATH];
+		char moduleName[_MAX_PATH];
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(module, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
-		ExecFile(module);
+		PathJoin(moduleName, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
+		ExecFile(moduleName);
 		// Method2:
 		//strcpy( module, dirent );
 		//strcat( module, ".Autodetect");
@@ -13665,18 +13665,18 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 		return NULL;
 	}
 
-	PyObject *module;
+	PyObject *pyModule;
 	if (moduleName) {
-		module = PyImport_ImportModule(moduleName);
+		pyModule = PyImport_ImportModule(moduleName);
 	} else {
-		module = pModule;
-		Py_XINCREF(module);
+		pyModule = pModule;
+		Py_XINCREF(pyModule);
 	}
-	if (module == NULL) {
+	if (pyModule == NULL) {
 		PyErr_Print();
 		return NULL;
 	}
-	PyObject *dict = PyModule_GetDict(module);
+	PyObject *dict = PyModule_GetDict(pyModule);
 
 	PyObject *pFunc = PyDict_GetItemString(dict, functionName);
 	
@@ -13685,7 +13685,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 		if (report_error) {
 			Log(ERROR, "GUIScript", "Missing function: %s from %s", functionName, moduleName);
 		}
-		Py_DECREF(module);
+		Py_DECREF(pyModule);
 		return NULL;
 	}
 	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
@@ -13694,7 +13694,7 @@ PyObject *GUIScript::RunFunction(const char* moduleName, const char* functionNam
 			PyErr_Print();
 		}
 	}
-	Py_DECREF(module);
+	Py_DECREF(pyModule);
 	return pValue;
 }
 
