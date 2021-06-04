@@ -38,8 +38,11 @@ namespace GemRB {
 extern GEM_EXPORT unsigned char pl_uppercase[256];
 extern GEM_EXPORT unsigned char pl_lowercase[256];
 
-//typedef std::basic_string<ieWord> String;
+#ifdef HAS_WSTRING
 typedef std::wstring String;
+#else
+typedef std::basic_string<wchar_t> String;
+#endif
 
 // String creators
 GEM_EXPORT char* ConvertCharEncoding(const char * string, const char * from, const char* to);
