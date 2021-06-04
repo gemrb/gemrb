@@ -48,7 +48,8 @@ def InitMageWindow (Window):
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
-		Icon.SetBorder (0,  color,  0, 1)
+		Icon.SetBorder (0, color,  0, 1)
+		Icon.SetVarAssoc ("SpellButton", i)
 
 	return
 
@@ -76,8 +77,6 @@ def UpdateMageWindow (Window=None):
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
-		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
-		Icon.SetBorder (0, color,  0, 1)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			Icon.SetSpellIcon (ms['SpellResRef'])
@@ -90,7 +89,6 @@ def UpdateMageWindow (Window=None):
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
 			MageMemorizedSpellList.append (ms['SpellResRef'])
-			Icon.SetVarAssoc ("SpellButton", i)
 			Icon.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:

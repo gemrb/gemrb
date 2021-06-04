@@ -97,6 +97,11 @@ def InitMageWindow (window):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		
+	for i in range (12):
+		Button = MageWindow.GetControl (3 + i)
+		Button.SetAnimation ("")
+		Button.SetVarAssoc ("SpellButton", i)
 
 	UpdateMageWindow (MageWindow)
 	return
@@ -130,7 +135,6 @@ def UpdateMageWindow (MageWindow):
 	if not Sorcerer:
 		for i in range (12):
 			Button = MageWindow.GetControl (3 + i)
-			Button.SetAnimation ("")
 
 			if i < mem_cnt:
 				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
@@ -143,7 +147,6 @@ def UpdateMageWindow (MageWindow):
 					Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
 				Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
 				MageMemorizedSpellList.append (ms['SpellResRef'])
-				Button.SetVarAssoc ("SpellButton", i)
 				Button.EnableBorder (0, ms['Flags'] == 0)
 				spell = GemRB.GetSpell (ms['SpellResRef'])
 				if not spell:
