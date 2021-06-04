@@ -736,6 +736,8 @@
 		A2F5F06D246102D70073802C /* DialogResponder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F066246102D70073802C /* DialogResponder.cpp */; };
 		A2F5F06E246102D70073802C /* CodepageToIconvMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */; };
 		A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
+		A2F7538A266A1DA800C3A764 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; };
+		A2F7538B266A1DA800C3A764 /* SDL2_mixer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
 		A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
 		A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */; };
@@ -1239,6 +1241,17 @@
 				A2E9967A14DE05590052BABE /* SAVImporter.so in Copy Plugins */,
 			);
 			name = "Copy Plugins";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2F7538C266A1DA800C3A764 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A2F7538B266A1DA800C3A764 /* SDL2_mixer.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -3958,6 +3971,7 @@
 		A2F5F066246102D70073802C /* DialogResponder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DialogResponder.cpp; sourceTree = "<group>"; };
 		A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconvMap.cpp; sourceTree = "<group>"; };
 		A2F5F06F246103B90073802C /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
 		A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapReverb.cpp; sourceTree = "<group>"; };
 		A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapReverb.h; sourceTree = "<group>"; };
@@ -4211,6 +4225,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A276B54013A28D3500D41A8A /* libgemrb_core.dylib in Frameworks */,
+				A2F7538A266A1DA800C3A764 /* SDL2_mixer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7892,6 +7907,7 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */,
 				A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */,
 				A2C1E106262A2A920024D213 /* Metal.framework */,
 				A2F5F06F246103B90073802C /* libiconv.tbd */,
@@ -8604,6 +8620,7 @@
 			buildPhases = (
 				A276B47C13A28A8500D41A8A /* Sources */,
 				A276B47D13A28A8500D41A8A /* Frameworks */,
+				A2F7538C266A1DA800C3A764 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -9091,7 +9108,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 		A2BD125D15A8E32B000FAB95 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -11037,8 +11054,13 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/SDL.framework/Headers,
+					/Library/Frameworks/SDL2_mixer.framework/Headers,
+					/Library/Frameworks/SDL2.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
@@ -11055,8 +11077,13 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				HEADER_SEARCH_PATHS = (
-					/Library/Frameworks/SDL.framework/Headers,
+					/Library/Frameworks/SDL2_mixer.framework/Headers,
+					/Library/Frameworks/SDL2.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";

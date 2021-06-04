@@ -33,7 +33,8 @@ IF(HAVE_MMAP OR WIN32)
 	SET(SUPPORTS_MEMSTREAM 1)
 ENDIF()
 
-IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+	INCLUDE (CheckCXXSourceCompiles)
 	check_cxx_source_compiles("
 		struct Color {unsigned char r,g,b,a;}__attribute__((aligned(4)));
 		int main(void) {return 0;}" HAS_OBJALIGN4)
