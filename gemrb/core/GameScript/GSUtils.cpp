@@ -1624,9 +1624,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = (int) strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newAction->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = (int) strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -1972,9 +1972,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->pointParameter.x = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = (int) strtol( src, (char **) &src, 10 );
 				src++; //Skip .
-				newTrigger->pointParameter.y = (short) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = (int) strtol( src, (char **) &src, 10 );
 				src++; //Skip ]
 				break;
 
@@ -2125,6 +2125,11 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 	}
 }
 
+void SetPointVariable(Scriptable *Sender, const char *VarName, const Point &p, const char* Context)
+{
+	SetVariable(Sender, VarName, ((p.y & 0xFFFF) << 16) | (p.x & 0xFFFF), Context);
+}
+
 ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
 	char newVarName[8];
@@ -2176,6 +2181,12 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	}
 	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 	return value;
+}
+
+Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
+{
+	ieDword val = CheckVariable(Sender, VarName, Context, valid);
+	return Point(val & 0xFFFF, val >> 16);
 }
 
 // checks if a variable exists in any context

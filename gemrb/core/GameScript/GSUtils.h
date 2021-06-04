@@ -117,6 +117,7 @@ bool IsInObjectRect(const Point &pos, const Region &rect);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context = nullptr);
+GEM_EXPORT void SetPointVariable(Scriptable* Sender, const char* VarName, const Point &point, const char* Context = nullptr);
 Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int nodead);
@@ -126,6 +127,7 @@ GEM_EXPORT void DisplayStringCore(Scriptable* const Sender, int Strref, int flag
 bool CreateMovementEffect(Actor* actor, const char *area, const Point &position, int face);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
+GEM_EXPORT Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
 GEM_EXPORT bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context);
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
