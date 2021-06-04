@@ -222,7 +222,6 @@ def RefreshInventoryWindow (Window):
 	GUICommon.AdjustWindowVisibility (Window, pc, False)
 
 	# update ground inventory slots
-	Container = GemRB.GetContainer(pc, 1)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (10):
 		Button = Window.GetControl (i+47)

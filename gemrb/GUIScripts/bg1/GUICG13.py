@@ -139,7 +139,6 @@ def GetColor():
 		Button.SetState(IE_GUI_BUTTON_LOCKED)
 		Button.SetFlags(IE_GUI_BUTTON_PICTURE,OP_OR)
 
-	Selected = -1
 	for i in range(34):
 		MyColor = ColorTable.GetValue(ColorIndex, i)
 		if MyColor == "*":
@@ -150,7 +149,6 @@ def GetColor():
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar("Selected",i)
-			Selected = i
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)

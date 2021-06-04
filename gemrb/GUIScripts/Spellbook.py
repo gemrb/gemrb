@@ -436,7 +436,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 	v = CommonTables.Aligns.FindValue(3, Alignment)
 	#usability is the bitset we look for
 	Usability = CommonTables.Aligns.GetValue(v, 5)
-	SpellListTable = None
+
 	if GameCheck.IsIWD2():
 		row = CommonTables.ClassSkills.FindValue ("SPLTYPE", booktype)
 		rowName = CommonTables.ClassSkills.GetRowName (row)

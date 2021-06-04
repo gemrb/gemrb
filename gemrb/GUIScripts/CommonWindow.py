@@ -19,8 +19,12 @@
 
 import GemRB
 import GameCheck
+import GUIClasses
+import GUICommon
+import GUIWORLD
 import InventoryCommon
-from GUIDefines import GS_DIALOGMASK, OP_SET
+from ie_stats import *
+from GUIDefines import *
 
 def SetGameGUIHidden(hide):
 	op = OP_OR if hide else OP_NAND
@@ -37,12 +41,6 @@ def ToggleGUIHidden():
 ##################################################################
 # functions dealing with containers
 ##################################################################
-
-import GUICommon
-import GUIClasses
-import GUIWORLD
-from ie_stats import *
-from GUIDefines import *
 
 HideOnClose = False
 ContainerWindow = None
@@ -91,10 +89,7 @@ def RedrawContainerWindow ():
 
 	# scroll in multiples of the number of columns
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex") * leftdiv
-	LeftIndex = GemRB.GetVar ("LeftIndex")
 	RightTopIndex = GemRB.GetVar ("RightTopIndex") * 2
-	RightIndex = GemRB.GetVar ("RightIndex")
-	LeftCount = Container['ItemCount']
 	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)

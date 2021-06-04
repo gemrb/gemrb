@@ -91,11 +91,6 @@ def InitJournalWindow (JournalWindow):
 	Button.SetText (4627)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, ToggleOrderWindow)
 
-	# Done
-	#Button = JournalWindow.GetControl (3)
-	#Button.SetText (20636)
-	#Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenJournalWindow)
-
 	Chapter = GemRB.GetGameVar("chapter")
 	if Chapter>65535:
 		Chapter=0

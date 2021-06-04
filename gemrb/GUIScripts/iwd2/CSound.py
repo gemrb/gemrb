@@ -52,7 +52,7 @@ def OnLoad():
 	TextAreaControl = SoundWindow.GetControl(45)
 	TextAreaControl.SetEvent(IE_GUI_TEXTAREA_ON_SELECT, SelectSound)
 
-	RowCount = TextAreaControl.ListResources(CHR_SOUNDS)
+	TextAreaControl.ListResources (CHR_SOUNDS)
 	if GemRB.GetVar ("Gender") == 2:
 		GemRB.SetVar ("Sound", 0) #first female sound
 	else:

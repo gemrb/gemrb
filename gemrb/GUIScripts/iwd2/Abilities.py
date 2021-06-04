@@ -205,7 +205,6 @@ def RightPress(btn, Abidx):
 	return
 
 def JustPress(btn, Abidx):
-	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	#should be more elaborate
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )

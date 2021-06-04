@@ -44,7 +44,6 @@ for file in os.listdir (GamePath):
 def CheckFiles(files):
     for name, ext, type in files:
         res = (name+'.'+ext).upper() in fdict or GemRB.HasResource (name, type)
-        #print name+'.'+ext, res
         if not res:
             return False
 

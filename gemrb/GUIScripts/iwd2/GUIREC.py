@@ -847,8 +847,6 @@ def DelimitedText(strref, text, newlines=1, delimiter=": "):
 
 #character information
 def DisplayMisc (pc):
-	Window = RecordsWindow
-
 	TotalPartyExp = 0
 	TotalCount = 0
 	for i in range (1, GemRB.GetPartySize() + 1):

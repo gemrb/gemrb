@@ -24,12 +24,10 @@ def unsetPlayer():
 	return False
 
 def unsetGender():
-	#print "unset Gender"
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, 0)
 
 def unsetPortrait():
-	#print "unset Portrait"
 	GemRB.SetToken("SmallPortrait","")
 	GemRB.SetToken("LargePortrait","")
 
@@ -140,7 +138,6 @@ def getHatedRace(TextAreaControl):
 		Row = HateRaceTable.FindValue (1, Race)
 		info = HateRaceTable.GetValue (Row, 0, GTV_REF)
 		if info != "":
-			#TextAreaControl.Append("\n")
 			info = ": " + info + "\n"
 			TextAreaControl.Append(15982)
 			TextAreaControl.Append(info)
@@ -293,13 +290,10 @@ def setDivineSpells():
 	return False
 
 def learnDivine(MyChar,ClassFlag,TableName,AllignID):
-	#print ("CGG setDivineSpells: CP2",MyChar,ClassFlag,TableName,AllignID )
 	Spellbook.SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 	Learnable = Spellbook.GetLearnablePriestSpells( ClassFlag, AllignID, 1)
 	for i in range(len(Learnable) ):
-		#print ("CGG setDivineSpells: CP3",Learnable[i])
 		if -1 == Spellbook.HasSpell(MyChar,IE_SPELL_TYPE_PRIEST,1,Learnable[i]):
-			#print ("CGG setDivineSpells: CP4",Learnable[i])
 			GemRB.LearnSpell (MyChar, Learnable[i], 0)
 
 def unsetDivineSpells():

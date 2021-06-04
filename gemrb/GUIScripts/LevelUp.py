@@ -112,7 +112,6 @@ def OpenLevelUpWindow():
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	print "Class:",Class,"\tActor Class:",actor.classid
-	SkillTable = GemRB.LoadTable("skills")
 
 	# kit
 	ClassName = GUICommon.GetClassRowName (Class, "class")
@@ -180,8 +179,6 @@ def OpenLevelUpWindow():
 	Level = LUCommon.GetNextLevels(pc, Classes)
 	LevelDiff = LUCommon.GetLevelDiff(pc, Level)
 
-	hp = 0
-	HaveCleric = 0
 	# clear some globals, since we may get called multiple times with different classes
 	DeltaWSpells = 0
 	DeltaDSpells = 0
@@ -493,7 +490,6 @@ def LevelUpDonePress():
 	Closes the window when finished."""
 	import GUICommonWindows
 	import GUIREC
-	global SkillTable
 
 	# proficiencies
 	LUProfsSelection.ProfsSave (pc)
@@ -552,7 +548,6 @@ def ReactivateBaseClass ():
 
 	# we construct the Classes array, so that the active class is always first and the base is second
 	ClassName = GUICommon.GetClassRowName (Classes[1], "class")
-	KitIndex = GUICommon.GetKitIndex (pc)
 
 	# force reinitialization of the actionbar by forcing the PCF to run
 	ClassID = GemRB.GetPlayerStat (pc, IE_CLASS)

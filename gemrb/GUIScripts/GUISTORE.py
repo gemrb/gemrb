@@ -113,7 +113,7 @@ if ResolutionH < 600 or (GameCheck.IsIWD2 () and ResolutionH < 934):
 
 def CloseStoreWindow ():
 	import GUIINV
-	global StoreWindow
+	global StoreWindow, CureTable
 	
 	if StoreWindow:
 		StoreWindow.Close ()
@@ -633,9 +633,9 @@ def InitStoreStealWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		Button.SetFont ('NUMBER')
 	else:
-		Label = Button.CreateLabel (0x10000043, "NUMBER", "0:",
+		Button.CreateLabel (0x10000043, "NUMBER", "0:",
 			IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-		Label = Button.CreateLabel (0x10000044, "NUMBER", "0:",
+		Button.CreateLabel (0x10000044, "NUMBER", "0:",
 			IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	return
@@ -1415,7 +1415,6 @@ def ConfirmItemAmount (Number, store = STORE_MAIN):
 def RedrawStoreIdentifyWindow (Window):
 	UpdateStoreCommon (Window, "STOTITLE", "STONAME", "STOGOLD")
 	TopIndex = GemRB.GetVar ("TopIndex")
-	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Count = len(inventory_slots)
 	IDPrice = Store['IDPrice']
@@ -1814,7 +1813,6 @@ def GetRealPrice (pc, mode, Item, Slot):
 	if mode == "buy":
 		count = GemRB.FindStoreItem (Slot["ItemResRef"])
 		if count:
-			oc = count
 			# jewelry doesn't suffer from deprecation, at least in BG2
 			if Item['Type'] in [CommonTables.ItemType.GetRowIndex ("GEM"),
 			                    CommonTables.ItemType.GetRowIndex ("RING"),

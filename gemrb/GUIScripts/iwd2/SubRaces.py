@@ -34,8 +34,6 @@ def OnLoad():
 	RaceWindow = GemRB.LoadWindow(54, "GUICG")
 	CharOverview.PositionCharGenWin(RaceWindow)
 
-	RaceCount = CommonTables.Races.GetRowCount()
-	
 	SubRacesTable = GemRB.LoadTable("SUBRACES")
 
 	for i in range(1, 5):

@@ -243,7 +243,6 @@ def NextPress():
 
 	#save the kit
 	KitValue = (0x4000 + KitIndex)
-	KitName = CommonTables.KitList.GetValue (KitIndex, 0)
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
 	GemRB.SetNextScript("CharGen4") #abilities

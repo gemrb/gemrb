@@ -505,9 +505,6 @@ def OpenItemAmountWindow (btn, slot):
 		UpdateSlot (pc, UsedSlot-1)
 		return
 
-	ResRef = slot_item['ItemResRef']
-	item = GemRB.GetItem (ResRef)
-
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
 	Window.SetAction(ItemAmountWindowClosed, ACTION_WINDOW_CLOSED)
@@ -521,7 +518,7 @@ def OpenItemAmountWindow (btn, slot):
 	# item icon
 	Icon = Window.GetControl (0)
 	Icon.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	Icon.SetItemIcon (ResRef)
+	Icon.SetItemIcon (slot_item['ItemResRef'])
 
 	# item amount
 	Text = Window.GetControl (6)
@@ -791,7 +788,6 @@ def OpenErrorWindow (strref):
 	"""Opens the error window and displays the string."""
 
 	global ErrorWindow
-	pc = GemRB.GameGetSelectedPCSingle ()
 
 	ErrorWindow = Window = GemRB.LoadWindow (7)
 	Button = Window.GetControl (0)

@@ -197,7 +197,6 @@ def GetColor():
 		Button.SetState(IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	Selected = -1
 	m = 33
 	if ColorIndex==0:
 		m=HairTable.GetRowCount()
@@ -216,7 +215,6 @@ def GetColor():
 		Button.SetBAM("COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
 			GemRB.SetVar("Selected",i)
-			Selected = i
 		Button.SetState(IE_GUI_BUTTON_ENABLED)
 		Button.SetVarAssoc("Selected",i)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, DonePress)

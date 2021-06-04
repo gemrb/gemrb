@@ -137,6 +137,7 @@ def OpenAudioOptionsWindow ():
 	Window = GemRB.LoadWindow (5, "GUIOPT")
 
 	def OnClose(Window):
+		global AudioHelpText
 		# Restore values in case of cancel
 		if GemRB.GetVar ("Cancel") == 1:
 			for k, v in saved_audio_options.items ():

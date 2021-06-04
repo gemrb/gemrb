@@ -187,8 +187,8 @@ def NextPress():
 
 	t=GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, CommonTables.Aligns.GetValue (t, 3))
+
 	TmpTable=GemRB.LoadTable ("repstart")
-	#t=CommonTables.Aligns.FindValue (3,t)
 	t=TmpTable.GetValue (t,0)
 	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 	TmpTable=GemRB.LoadTable ("strtgold")

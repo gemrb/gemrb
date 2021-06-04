@@ -227,7 +227,7 @@ def AcceptPress():
 
 	#set my character up
 	if not LevelUp:
-		MyChar = GemRB.CreatePlayer ("charbase", 1)
+		GemRB.CreatePlayer ("charbase", 1)
 
 	Str = Stats[0]
 	if Str<=18:

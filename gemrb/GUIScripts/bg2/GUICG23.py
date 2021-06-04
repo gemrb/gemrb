@@ -64,8 +64,6 @@ def ClearBiography():
 def OkPress ():
 	global BioWindow
 
-	row = 0
-	line = None
 	TA = GemRB.GetView("BIO")
 	BioData = TA.QueryText ()
 	GemRB.SetToken ("BIO", BioData)

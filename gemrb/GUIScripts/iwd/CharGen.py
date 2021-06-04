@@ -1222,8 +1222,6 @@ def AbilitiesPress():
 	AbilitiesRaceReqTable = GemRB.LoadTable ("ABRACERQ")
 	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
 
-	PointsLeftLabel = AbilitiesWindow.GetControl (0x10000002)
-
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	HasStrExtra = CommonTables.Classes.GetValue (ClassName, "STREXTRA", GTV_INT)
 
@@ -1244,8 +1242,6 @@ def AbilitiesPress():
 		AbilitiesMinusButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, AbilitiesMinusPress)
 		AbilitiesMinusButton.SetVarAssoc ("AbilityIndex", i + 1)
 		AbilitiesMinusButton.SetActionInterval (200)
-
-		AbilityLabel = AbilitiesWindow.GetControl (0x10000003 + i)
 
 	AbilitiesStoreButton = AbilitiesWindow.GetControl (37)
 	AbilitiesStoreButton.SetState (IE_GUI_BUTTON_ENABLED)
@@ -2415,7 +2411,7 @@ def CharSoundSelect():
 	else:
 		GemRB.SetVar ("Selected", 15)
 	CharSoundVoiceList.SetVarAssoc ("Selected", 0)
-	RowCount = CharSoundVoiceList.ListResources (CHR_SOUNDS)
+	CharSoundVoiceList.ListResources (CHR_SOUNDS)
 
 	CharSoundPlayButton = CharSoundWindow.GetControl (47)
 	CharSoundPlayButton.SetState (IE_GUI_BUTTON_ENABLED)

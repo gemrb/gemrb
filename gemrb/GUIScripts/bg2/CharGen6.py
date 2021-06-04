@@ -41,8 +41,6 @@ def OnLoad():
 
 	# save our previous stats:
 	# 	abilities
-	AbilityTable = GemRB.LoadTable ("ability")
-	AbilityCount = AbilityTable.GetRowCount ()
 
 	# print our diagnostic as we loop (so as not to duplicate)
 	print "CharGen6 output:"

@@ -19,7 +19,6 @@
 # common character generation display code
 import GemRB
 import GUICommon
-#import GUIClasses
 from ie_stats import *
 from GUIDefines import *
 
@@ -137,14 +136,12 @@ class CharGen:
 		self.window = CharGenWindow
 	
 	def unset(self,stage):
-		#print "unset" , stage
 		if(len(self.stages[stage]) == 5):
 			(name,setFn,commentFn,unsetFn,guard) = self.stages[stage]
 			if(unsetFn != None):
 				unsetFn()
 	#set next script to for step, return false if the current step should be skipped
 	def setScript(self):
-		#print 'set',self.step
 		if(len(self.stages[self.step]) == 5): #long record: script of function
 			(name,setFn,commentFn,unsetFn,guardFn) = self.stages[self.step]
 			if(guardFn and not guardFn()):
@@ -159,9 +156,7 @@ class CharGen:
 		
 	def cancel(self):
 		"""Revert back to the first step; unset all actions."""
-		#if self.window:
-		#	self.window.Unload()
-		#reset
+
 		for i in range(self.step,-1,-1):
 			self.unset(i)
 

@@ -417,7 +417,6 @@ def UpdateFloatMenuItem (pc, i, weapons):
 def SelectItem ():
 	global float_menu_selected
 
-	Window = FloatMenuWindow
 	Button = GemRB.GetVar ('ItemButton')
 	#simulating radiobutton+checkbox hybrid
 	if float_menu_selected == Button:
@@ -499,7 +498,7 @@ def FloatMenuSelectAnotherPC ():
 	return
 
 def FloatMenuSelectDialog ():
-	global float_menu_mode, float_menu_selected
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_DIALOG
 	float_menu_index = 0
 	float_menu_selected = None

@@ -123,7 +123,6 @@ def OpenSkillsWindow(chargen, level=0):
 		pc = GemRB.GetVar ("Slot")
 		Level = level
 		LevelDiff = 1
-		Class = GemRB.GetVar ("Class") - 1
 		ClassColumn = GemRB.GetVar ("BaseClass") - 1
 	else:
 		pc = GemRB.GameGetSelectedPCSingle ()

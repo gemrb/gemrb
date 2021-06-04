@@ -228,7 +228,3 @@ def NextPress():
 	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
 	GemRB.SetToken ("LargePortrait", PortraitName+"L")
 	CharGenCommon.next()
-	#GemRB.SetVar("Step",1)
-	#GemRB.SetNextScript("CharGen")
-	#GemRB.SetNextScript ("CharGen2") #Before race
-	#return

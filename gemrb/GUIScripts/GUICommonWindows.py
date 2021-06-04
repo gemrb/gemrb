@@ -320,7 +320,6 @@ def AIPress (toggle=1):
 		PortraitWindow = GemRB.GetView("PORTWIN")
 		Button = PortraitWindow.GetControl (OptionControl['Toggle_AI'])
 
-	#print "AIPress: GS_PARTYAI was:", GemRB.GetGUIFlags () & GS_PARTYAI, "at toggle:", toggle
 	if toggle:
 		GemRB.GameSetScreenFlags (GS_PARTYAI, OP_XOR)
 
@@ -1518,7 +1517,6 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
 		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
 		maxHeight = windowHeight - buttonHeight*6 - buttonHeight/2
-		#print "GetPortraitButtonPairs:", ScreenHeight, windowHeight, maxHeight
 		if windowHeight != ScreenHeight:
 			maxHeight += buttonHeight/2
 		limit = maxHeight
@@ -1859,9 +1857,6 @@ def UpdateAnimatedPortrait (Window,i):
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)
 
-	#print "PORTRAIT DEBUG:"
-	#print "state: " + str(state) + " hp: " + str(hp) + " hp_max: " + str(hp_max) + "ratio: " + str(ratio) + " cycle: " + str(cycle) + " state: " + str(state)
-
 	if GemRB.GetVar('Health Bar Settings') & (1 << i):
 		op = OP_OR
 	else:
@@ -2018,11 +2013,10 @@ def OpenWaitForDiscWindow ():
 		DiscWindow = None
 		return
 
-	DiscWindow = Window = GemRB.LoadWindow (0, "GUIID")
+	DiscWindow = GemRB.LoadWindow (0, "GUIID")
 	label = DiscWindow.GetControl (0)
 
 	disc_num = GemRB.GetVar ("WaitForDisc")
-	#disc_path = GemRB.GetVar ("WaitForDiscPath")
 	disc_path = 'XX:'
 
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)

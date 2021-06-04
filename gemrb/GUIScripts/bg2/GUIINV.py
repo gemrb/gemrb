@@ -223,7 +223,6 @@ def RefreshInventoryWindow (Window):
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	Container = GemRB.GetContainer (pc, 1)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)

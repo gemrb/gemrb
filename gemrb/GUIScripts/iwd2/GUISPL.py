@@ -101,7 +101,6 @@ ToggleSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUIComm
 OpenSpellBookWindow = GUICommonWindows.CreateTopWinLoader(2, "GUISPL", GUICommonWindows.OpenWindowOnce, InitSpellBookWindow, SelectedNewPlayer)
 
 def ResetScrollBar ():
-	pc = GemRB.GameGetSelectedPCSingle ()
 	ScrollBar = SpellBookWindow.GetControl (54)
 	GemRB.SetVar ("SpellTopIndex",0)
 	ScrollBar.SetVarAssoc ("SpellTopIndex", len(KnownSpellList))
@@ -315,7 +314,6 @@ def OnSpellBookMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = SpellBookSpellLevel
 	BookType = GemRB.GetVar ("SelectedBook")
-	Window = SpellBookWindow
 
 	index = GemRB.GetVar ("SpellButton") - 100
 	SpellTopIndex = GemRB.GetVar ("SpellTopIndex")

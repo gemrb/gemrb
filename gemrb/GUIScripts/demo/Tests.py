@@ -68,7 +68,6 @@ fmline = "supercalifragilisticexpialidociousnessOFantidisestablishmentarianSesqu
 
 # TextArea family of tests
 def RunTextAreaTests():
-	MessageWindow = GemRB.GetView ("MSGWIN")
 	MessageTA = GemRB.GetView ("MTA")
 
 	tests = [ TA_SetEmpty, TA_SetNone, TA_SetSpaces, TA_SetSupercali, TA_SetSupercali2, TA_SetMonk ]

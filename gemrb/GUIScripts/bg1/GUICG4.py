@@ -111,7 +111,6 @@ def OnLoad():
 	global KitIndex, Minimum, Maximum, MyChar
 
 	Abracead = GemRB.LoadTable("ABRACEAD")
-	#Abclsmod = GemRB.LoadTable("ABCLSMOD")
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	Abracerq = GemRB.LoadTable("ABRACERQ")
 
@@ -201,7 +200,6 @@ def RightPress():
 
 def JustPress():
 	Abidx = GemRB.GetVar("Ability")
-	Ability = GemRB.GetVar("Ability "+str(Abidx) )
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )

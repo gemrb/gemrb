@@ -95,7 +95,7 @@ def CloseAll(win):
 def OpenQuestsWindow ():
 	global QuestsList, QuestDesc
 	
-	QuestsWindow = Window = GemRB.LoadWindow (1)
+	QuestsWindow = GemRB.LoadWindow (1)
 	
 	def OnJournalAssignedPress ():
 		global selected_quest_class
@@ -165,7 +165,6 @@ def PopulateQuestsList ():
 def EvaluateCondition (var, value, condition):
 	cur_value = int (GemRB.GetGameVar (var))
 
-	#print cur_value, condition, value
 	if condition == 'EQ':
 		return cur_value == int (value)
 	if condition == 'NE':
@@ -198,11 +197,9 @@ def EvaluateQuest (index):
 
 			completed = completed and EvaluateCondition (var, value, condition)
 
-			#print 'CC:', var, int (GemRB.GetGameVar (var)), condition, value, ': ', completed
 			if not completed: break
 
 		if completed:
-			#print "COMPLETED", suff
 			desc = GemRB.GetINIQuestsKey (tag, 'descCompleted' + suff, '0')
 			return (1, desc)
 
@@ -216,11 +213,9 @@ def EvaluateQuest (index):
 
 		assigned = assigned and EvaluateCondition (var, value, condition)
 
-		#print 'AC:', var, condition, value, ': ', assigned
 		if not assigned: break
 
 	if assigned:
-		#print "ASSIGNED"
 		desc = GemRB.GetINIQuestsKey (tag, 'descAssigned', '0')
 		return (0, desc)
 

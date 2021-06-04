@@ -114,7 +114,6 @@ def InitInventoryWindow (Window):
 			Button.SetSprites ("STONSLOT",0,0,1,2,3)
 			Button.SetFont ("NUMBER")
 
-			rect = Button.GetFrame()
 			color = {'r' : 128, 'g' : 128, 'b' : 255, 'a' : 64}
 			Button.SetBorder (0, color, 0, 1)
 			color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
@@ -245,7 +244,6 @@ def RefreshInventoryWindow (Window):
 	Button.SetBAM ("COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
-	Container = GemRB.GetContainer (pc, 1)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = Window.GetControl (i+68)
