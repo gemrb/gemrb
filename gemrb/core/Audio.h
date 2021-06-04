@@ -71,7 +71,7 @@ class MapReverb;
 class GEM_EXPORT SoundHandle : public Held<SoundHandle> {
 public:
 	virtual bool Playing() = 0;
-	virtual void SetPos(int XPos, int YPos) = 0;
+	virtual void SetPos(const Point&) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
 	~SoundHandle() override;
@@ -103,9 +103,9 @@ public:
 	~Audio() override;
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-				int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) = 0;
+	const Point&, unsigned int flags = 0, unsigned int *length = 0) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel, unsigned int *length = 0)
-			{ return Play(ResRef, channel, 0, 0, GEM_SND_RELATIVE, length); }
+			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
@@ -115,8 +115,8 @@ public:
 	virtual bool Pause() = 0;
 	virtual bool Resume() = 0;
 	virtual int CreateStream(Holder<SoundMgr>) = 0;
-	virtual void UpdateListenerPos(int XPos, int YPos ) = 0;
-	virtual void GetListenerPos(int &XPos, int &YPos ) = 0;
+	virtual void UpdateListenerPos(const Point&) = 0;
+	virtual Point GetListenerPos() = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
 	virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
 				ieWord gain, bool point, int ambientRange) = 0;

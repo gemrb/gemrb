@@ -4366,9 +4366,7 @@ void Actor::PlayExistenceSounds()
 	if (delay == (ieDword) -1) return;
 
 	Audio *audio = core->GetAudioDrv();
-	int xpos, ypos;
-	audio->GetListenerPos(xpos, ypos);
-	Point listener(xpos, ypos);
+	Point listener = audio->GetListenerPos();
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
@@ -4920,7 +4918,7 @@ void Actor::PlayWalkSound()
 
 	unsigned int len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
-	core->GetAudioDrv()->Play(Sound, channel, Pos.x, Pos.y, 0, &len);
+	core->GetAudioDrv()->Play(Sound, channel, Pos, 0, &len);
 	nextWalk = thisTime + len;
 }
 
@@ -4995,7 +4993,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 			snprintf(Sound, 9, "HIT_0%d%c", type, suffix?'1':0);
 		}
 	}
-	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos.x, Pos.y);
+	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos);
 }
 
 // Play swing sounds
@@ -5023,7 +5021,7 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 		if (!gamedata->GetItemSound(sound2, itemType, NULL, isChoice)) return;
 	}
 
-	core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos.x, Pos.y);
+	core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos);
 }
 
 //Just to quickly inspect debug maximum values
@@ -11525,7 +11523,7 @@ void Actor::PlayArmorSound() const
 
 	const char *armorSound = GetArmorSound();
 	if (armorSound[0]) {
-		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos);
 		delete[] armorSound;
 	}
 }

@@ -434,13 +434,6 @@ bool Wall_Polygon::PointBehind(const Point &p) const
 	return true;
 }
 
-bool Wall_Polygon::PointBehind(int tx, int ty) const
-{
-	Point p(tx, ty);
-	return PointBehind(p);
-}
-
-
 void Wall_Polygon::SetDisabled(bool disabled)
 {
 	if (disabled) {

@@ -941,7 +941,7 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
 {
 	core->GetAudioDrv()->Play(fx->Resource[0] ? fx->Resource : defsound,
-			SFX_CHAN_ACTIONS, target->Pos.x, target->Pos.y);
+			SFX_CHAN_ACTIONS, target->Pos);
 }
 
 //resurrect code used in many places
@@ -1431,7 +1431,7 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// Actor::CheckOnDeath handles the actual chunking
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// bg1 & iwds have this file, bg2 & pst none
-		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 16:
 		BASE_STATE_SET(STATE_PETRIFIED);
@@ -1445,12 +1445,12 @@ int fx_death (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_PETRIFIED);
 		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
 		// file only in iwds
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 128:
 		if (!target->GetStat(IE_DISABLECHUNKING)) BASE_STATE_SET(STATE_FROZEN);
 		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
-		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play("GORE2", SFX_CHAN_HITS, target->Pos);
 		break;
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
@@ -5054,7 +5054,7 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//this is probably inaccurate
 	if (target) {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos);
 	} else {
 		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
 	}
