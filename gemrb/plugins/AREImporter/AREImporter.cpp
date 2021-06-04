@@ -678,13 +678,13 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 #endif
 #undef MSG
 		} else {
-			Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
+			Point* points = new Point[VertexCount];
 			for (x = 0; x < VertexCount; x++) {
 				str->ReadWord( (ieWord*) &points[x].x );
 				str->ReadWord( (ieWord*) &points[x].y );
 			}
 			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
-			free( points );
+			delete[] points;
 			ip = tm->AddInfoPoint( Name, Type, poly );
 		}
 
@@ -803,7 +803,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c = map->AddContainer( Name, Type, nullptr );
 			c->BBox = bbox;
 		} else {
-			Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
+			Point* points = new Point[vertCount];
 			for (x = 0; x < vertCount; x++) {
 				ieWord tmp;
 				str->ReadWord( &tmp );
@@ -813,7 +813,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			}
 			auto poly = std::make_shared<Gem_Polygon>( points, vertCount, &bbox );
 			c = map->AddContainer( Name, Type, poly );
-			free( points );
+			delete[] points;
 		}
 
 		//c->SetMap(map);
@@ -946,7 +946,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		std::shared_ptr<Gem_Polygon> open = nullptr;
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		if (OpenVerticesCount) {
-			Point* points = (Point*)malloc( OpenVerticesCount*sizeof( Point ) );
+			Point* points = new Point[OpenVerticesCount];
 			for (x = 0; x < OpenVerticesCount; x++) {
 				str->ReadWord( &minX );
 				points[x].x = minX;
@@ -954,7 +954,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				points[x].y = minY;
 			}
 			open = std::make_shared<Gem_Polygon>( points, OpenVerticesCount, &BBOpen );
-			free( points );
+			delete[] points;
 		}
 
 		//Reading Closed Polygon
@@ -962,7 +962,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
 		if (ClosedVerticesCount) {
-			Point* points = ( Point * ) malloc( ClosedVerticesCount * sizeof( Point ) );
+			Point* points = new Point[ClosedVerticesCount];
 			for (x = 0; x < ClosedVerticesCount; x++) {
 				str->ReadWord( &minX );
 				points[x].x = minX;
@@ -970,7 +970,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				points[x].y = minY;
 			}
 			closed = std::make_shared<Gem_Polygon>( points, ClosedVerticesCount, &BBClosed );
-			free( points );
+			delete[] points;
 		}
 
 		//Getting Door Information from the WED File
@@ -992,7 +992,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//Reading Open Impeded blocks
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		Point* points = ( Point * ) malloc( OpenImpededCount * sizeof( Point ) );
+		Point* points = new Point[OpenImpededCount];
 		for (x = 0; x < OpenImpededCount; x++) {
 			str->ReadWord( &minX );
 			points[x].x = minX;
@@ -1005,7 +1005,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//Reading Closed Impeded blocks
 		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		points = ( Point * ) malloc( ClosedImpededCount * sizeof( Point ) );
+		points = new Point[ClosedImpededCount];
 		for (x = 0; x < ClosedImpededCount; x++) {
 			str->ReadWord( &minX );
 			points[x].x = minX;
