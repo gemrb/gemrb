@@ -2245,11 +2245,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		}
 			break;
 		case IE_GUI_BUTTON:
-			switch (type) {
-				case IE_GUI_BUTTON:
-					view = new Button(rgn);
-					break;
-			}
+			view = new Button(rgn);
 			break;
 		case IE_GUI_CONSOLE:
 		{
