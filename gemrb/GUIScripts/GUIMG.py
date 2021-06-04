@@ -91,17 +91,14 @@ def InitMageWindow (window):
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
+			Button.SetAnimation ("")
+			Button.SetVarAssoc ("SpellButton", i)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
-		
-	for i in range (12):
-		Button = MageWindow.GetControl (3 + i)
-		Button.SetAnimation ("")
-		Button.SetVarAssoc ("SpellButton", i)
 
 	UpdateMageWindow (MageWindow)
 	return
