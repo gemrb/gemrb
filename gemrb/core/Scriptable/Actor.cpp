@@ -201,10 +201,6 @@ static ieByte featstats[MAX_FEATS]={0
 static ieByte featmax[MAX_FEATS]={0
 };
 
-static int wspattack_rows = 0;
-static int wspattack_cols = 0;
-static int **wspattack = NULL;
-
 //holds the weapon style bonuses
 #define STYLE_MAX 3
 static int **wsdualwield = NULL;
@@ -1708,13 +1704,6 @@ void Actor::ReleaseMemory()
 			afcomments=NULL;
 		}
 
-		if (wspattack) {
-			for (int i = 0; i < wspattack_rows; i++) {
-				free(wspattack[i]);
-			}
-			free(wspattack);
-			wspattack=NULL;
-		}
 		if (wsdualwield) {
 			for (int i = 0; i<= STYLE_MAX; i++) {
 				free(wsdualwield[i]);
@@ -2440,31 +2429,6 @@ static void InitActorTables()
 
 	//pre-cache hit/damage/speed bonuses for weapons
 	wspecial.load("wspecial", true);
-
-	//pre-cache attack per round bonuses
-	tm.load("wspatck");
-	if (tm) {
-		wspattack_rows = tm->GetRowCount();
-		wspattack_cols = tm->GetColumnCount();
-		wspattack = (int **) calloc(wspattack_rows, sizeof(int *));
-
-		int tmp = 0;
-		for (i=0; i<wspattack_rows; i++) {
-			wspattack[i] = (int *) calloc(wspattack_cols, sizeof(int));
-			for (int j=0; j<wspattack_cols; j++) {
-				tmp = atoi(tm->QueryField(i, j));
-				//negative values relate to x/2, so we adjust them
-				//positive values relate to x, so we must times by 2
-				if (tmp<0) {
-					tmp  = -2*tmp-1;
-				}
-				else {
-					tmp *=  2;
-				}
-				wspattack[i][j] = tmp;
-			}
-		}
-	}
 
 	//dual-wielding table
 	tm.load("wstwowpn", true);
@@ -3469,21 +3433,10 @@ void Actor::RefreshPCStats() {
 	int dualwielding = IsDualWielding();
 	stars = GetProficiency(wi.prof)&PROFS_MASK;
 
-	//tenser's transformation makes the actor have at least proficient in any weapon
+	// tenser's transformation ensures the actor is at least proficient with any weapon
 	if (!stars && HasSpellState(SS_TENSER)) stars = 1;
 
 	if (header) {
-		if (stars >= (unsigned)wspattack_rows) {
-			stars = wspattack_rows-1;
-		}
-
-		int tmplevel = GetWarriorLevel();
-		if (tmplevel >= wspattack_cols) {
-			tmplevel = wspattack_cols-1;
-		} else if (tmplevel < 0) {
-			tmplevel = 0;
-		}
-
 		//wspattack appears to only effect warriors
 		int defaultattacks = 2 + 2*dualwielding;
 		if (stars) {
@@ -3495,16 +3448,18 @@ void Actor::RefreshPCStats() {
 			// instead of 4+[0-3] = 4-7
 			// For a master ranger at level 14, the difference ends up as 2 (1 apr).
 			// FIXME: but this isn't universally true or improved haste couldn't double the total apr! For the above case, we're half apr off.
-			if (tmplevel) {
+			ieDword warriorLevel = GetWarriorLevel();
+			if (warriorLevel) {
 				int mod = Modified[IE_NUMBEROFATTACKS] - BaseStats[IE_NUMBEROFATTACKS];
-				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks+wspattack[stars][tmplevel];
+				int bonus = gamedata->GetWeaponStyleAPRBonus(stars, warriorLevel - 1);
+				BaseStats[IE_NUMBEROFATTACKS] = defaultattacks + bonus;
 				if (GetAttackStyle() == WEAPON_RANGED) { // FIXME: should actually check if a set-apr opcode variant was used
-					Modified[IE_NUMBEROFATTACKS] += wspattack[stars][tmplevel]; // no default
+					Modified[IE_NUMBEROFATTACKS] += bonus; // no default
 				} else {
 					Modified[IE_NUMBEROFATTACKS] = BaseStats[IE_NUMBEROFATTACKS] + mod;
 				}
 			} else {
-				SetBase(IE_NUMBEROFATTACKS, defaultattacks + wspattack[stars][0]);
+				SetBase(IE_NUMBEROFATTACKS, defaultattacks + gamedata->GetWeaponStyleAPRBonus(stars, 0));
 			}
 		} else {
 			// unproficient user - force defaultattacks

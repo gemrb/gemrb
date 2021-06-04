@@ -131,6 +131,7 @@ public:
 	int GetTrapLimit(Scriptable *trapper);
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
+	int GetWeaponStyleAPRBonus(int row, int col);
 	inline int GetStepTime() { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
@@ -153,9 +154,11 @@ private:
 	AutoTable trapSaveBonus;
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
+	std::vector<int> weaponStyleAPRBonus;
 	std::map<const char*, Color, iless> colors;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
+	Size weaponStyleAPRBonusMax{};
 };
 
 extern GEM_EXPORT GameData * gamedata;

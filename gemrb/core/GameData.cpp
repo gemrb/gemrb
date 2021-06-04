@@ -736,4 +736,46 @@ const Color& GameData::GetColor(const char *row)
 	return ColorRed;
 }
 
+// wspatck bonus handling
+int GameData::GetWeaponStyleAPRBonus(int row, int col)
+{
+	// preload optimized version, since this gets called each tick several times
+	if (weaponStyleAPRBonusMax.IsZero()) {
+		AutoTable bonusTable("wspatck", true);
+		if (!bonusTable.ok()) {
+			weaponStyleAPRBonusMax.w = -1;
+			return 0;
+		}
+
+		int rows = bonusTable->GetRowCount();
+		int cols = bonusTable->GetColumnCount();
+		weaponStyleAPRBonusMax.h = rows;
+		weaponStyleAPRBonusMax.w = cols;
+		weaponStyleAPRBonus.resize(rows * cols);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				int tmp = atoi(bonusTable->QueryField(i, j));
+				// negative values relate to x/2, so we adjust them
+				// positive values relate to x, so we must times by 2
+				if (tmp < 0) {
+					tmp = -2 * tmp - 1;
+				} else {
+					tmp *= 2;
+				}
+				weaponStyleAPRBonus[i * cols + j] = tmp;
+			}
+		}
+	} else if (weaponStyleAPRBonusMax.w == -1) {
+		return 0;
+	}
+
+	if (row >= weaponStyleAPRBonusMax.h) {
+		row = weaponStyleAPRBonusMax.h - 1;
+	}
+	if (col >= weaponStyleAPRBonusMax.w) {
+		col = weaponStyleAPRBonusMax.w - 1;
+	}
+	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
+}
+
 }
