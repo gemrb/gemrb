@@ -1159,9 +1159,25 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_AddSubview__doc,
-			 "AddSubview(superview, subview [,siblingView=None, id=-1])\n\n"
-			 "Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any).\n"
-			 "You can pass id to assign a new id to the view. Do this if current id would conflict with an existing id in the new window.");
+"===== View_AddSubview =====\n\
+\n\
+**Prototype:** View_AddSubview (GView, subview [,siblingView=None, id=-1])\n\
+\n\
+**Metaclass Prototype:** AddSubview (subview[, siblingView=None, id=-1])\n\
+\n\
+**Description:** Adds a view to a new superview in front of siblingView (or the back if None), removing it from its previous superview (if any).\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's (superview's) reference\n\
+  * subview - View to add\n\
+  * siblingView - View to add\n\
+  * id - assign this numeric ID to the new view (useful if it's already taken)\n\
+\n\
+**Example:**\n\
+  RaceWindow.AddSubview (ScrollBarControl)\n\
+\n\
+**Return value:** the new View"
+);
 
 static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 {
@@ -1218,8 +1234,25 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_AddAlias__doc,
-			 "AddAlias(GView, AliasGroup, AliasID, Overwrite])\n\n"
-			 "Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the view, optionally overwriteing an existing entry." );
+"===== View_AddAlias =====\n\
+\n\
+**Prototype:** View_AddAlias (GView, AliasGroup[, AliasID, Overwrite])\n\
+\n\
+**Metaclass Prototype:** AddAlias (AliasGroup[, AliasID, Overwrite])\n\
+\n\
+**Description:** Adds an additional entry to the Scripting engine under AliasGroup with AliasID and binds it to the view, optionally overwriteing an existing entry.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * AliasGroup - View group\n\
+  * AliasID - force to this alias numeric ID\n\
+  * Overwrite - overwrite any existing alias\n\
+\n\
+**Example:**\n\
+  PortraitWindow.AddAlias ('HIDE_CUT', 3)\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 {
@@ -1245,9 +1278,22 @@ static PyObject* GemRB_View_AddAlias(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetView__doc,
-			 "GetView(GWindow|Alias, ID) => GView\n\n"
-			 "Lookup view from either a window or from an alias\n"
-			 "Returns a view as an object." );
+"===== GetView =====\n\
+\n\
+**Prototype:** GetView (GView[, ID])\n\
+\n\
+**Metaclass Prototype:** /\n\
+\n\
+**Description:** Lookup view from either a window or from an alias.\n\
+**Parameters:**\n\
+  * GView - the window's reference or a string with the alias\n\
+  * ID - look for a view with a specific numeric ID\n\
+\n\
+**Example:**\n\
+  GemRB.GetView ('ACTWIN')\n\
+\n\
+**Return value:** View"
+);
 
 static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 {
@@ -1276,9 +1322,25 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Scrollable_Scroll__doc,
-			 "===== Scrollable_Scroll =====\n\n"
-			 "Scroll(x, y) => None"
-			 );
+"===== Scrollable_Scroll =====\n\
+\n\
+**Prototype:** Scrollable_Scroll (GView, x, y[, relative])\n\
+\n\
+**Metaclass Prototype:** Scroll (x, y[, relative])\n\
+\n\
+**Description:** Scrolls a scrollable View.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * x - x coordinate of point to scroll to\n\
+  * y - y coordinate of point to scroll to\n\
+  * relative - optional, set if you don't want an absolute scroll\n\
+\n\
+**Example:**\n\
+  WorldMapControl.Scroll (0, 0, False)\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
 {
@@ -1965,8 +2027,19 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RemoveScriptingRef__doc,
-			 "RemoveScriptingRef(GView)\n\n"
-			 "Remove the decoded view reference from the scripting engine. You can use this to remove an alias or any other reference." );
+"===== View_RemoveScriptingRef =====\n\
+\n\
+**Prototype:** View_RemoveScriptingRef (GView)\n\
+\n\
+**Metaclass Prototype:** RemoveScriptingRef ()\n\
+\n\
+**Description:** Remove the decoded view reference from the scripting engine. You can use this to remove an alias or any other reference.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_RemoveScriptingRef(PyObject* self, PyObject* args)
 {
@@ -1980,8 +2053,20 @@ static PyObject* GemRB_RemoveScriptingRef(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RemoveView__doc,
-"RemoveView(GView [,delete])\n\n"
-"Remove a view from its superview and optionally delete it." );
+"===== View_RemoveView =====\n\
+\n\
+**Prototype:** View_RemoveView (GView[, delete])\n\
+\n\
+**Metaclass Prototype:** RemoveView ([delete])\n\
+\n\
+**Description:** Remove a View from its superview and optionally delete it.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * delete - set to non-zero to also delete the View\n\
+\n\
+**Return value:** None or a new reference to the View"
+);
 
 static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 {
@@ -2021,20 +2106,25 @@ static PyObject* GemRB_RemoveView(PyObject* /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateView__doc,
- "===== CreateView =====\n\
- \n\
- **Prototype:** GemRB.CreateWindow (WindowID, Rect)\n\
- \n\
- **Description:** Creates a new empty view and returns it.\n\
- \n\
- **Parameters:** \n\
- * WindowID - the window's ID\n\
- * Rect - the view's frame\n\
- \n\
- **Return value:** GView\n\
- \n\
- **See also:**"
- );
+"===== CreateView =====\n\
+\n\
+**Prototype:** GemRB.CreateWindow (ControlID, Type, FrameRect[, OtherArgs])\n\
+\n\
+**Description:** Creates a new empty view and returns it.\n\
+\n\
+**Parameters:** \n\
+  * ControlID - the window's ID\n\
+  * Type - the View's type\n\
+  * FrameRect - a dict with the View's frame (origin and size)\n\
+  * OtherArgs - further arguments depending on the View type\n\
+\n\
+**Example:**\n\
+  view = CreateView (control, IE_GUI_SCROLLBAR, frame, CreateScrollbarARGs(bam))\n\
+\n\
+**See also:** [[guiscript:RemoveView]], [[guiscript:AddSubview]], [[guiscript:GetFrame]]\n\
+\n\
+**Return value:** GView"
+);
 
 static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 {
@@ -2193,8 +2283,23 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetEventProxy__doc,
-			 "SetEventProxy(GView, GView)\n\n"
-			 "Set a proxy view that will receive events on behalf of the target." );
+"===== View_SetEventProxy =====\n\
+\n\
+**Prototype:** View_SetEventProxy (GView, ProxyView)\n\
+\n\
+**Metaclass Prototype:** SetEventProxy (ProxyView)\n\
+\n\
+**Description:** Set a proxy View that will receive events on behalf of the target View.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * ProxyView - another View\n\
+\n\
+**Example:**\n\
+  RaceWindow.SetEventProxy (ScrollBarControl)\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
 {
@@ -2214,8 +2319,23 @@ static PyObject* GemRB_View_SetEventProxy(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_GetFrame__doc,
-			 "GetFrame(GView)\n\n"
-			 "Returns a dictionary with members 'x', 'y', 'w', and 'h' representing the views frame rect." );
+"===== View_GetFrame =====\n\
+\n\
+**Prototype:** View_GetFrame (GView)\n\
+\n\
+**Metaclass Prototype:** GetFrame ()\n\
+\n\
+**Description:** Return the View's frame rect.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Example:**\n\
+  StartWindow.GetFrame ()\n\
+\n\
+**See also:** [[guiscript:SetFrame]]\n\
+\n\
+**Return value:** a dictionary with members 'x', 'y', 'w', and 'h' representing the View's frame rect"
+);
 
 static PyObject* GemRB_View_GetFrame(PyObject* self, PyObject* args)
 {
@@ -2228,8 +2348,25 @@ static PyObject* GemRB_View_GetFrame(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetFrame__doc,
-			 "SetFrame(GView, x, y, w, h)\n\n"
-			 "Set the views frame to the region created from x, y, w, and h." );
+"===== View_SetFrame =====\n\
+\n\
+**Prototype:** View_SetFrame (GView, frameRect)\n\
+\n\
+**Metaclass Prototype:** SetFrame (frameRect)\n\
+\n\
+**Description:** Set the View's frame to the specified region.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * frameRect - a dict with x, y, w, h keys denoting the frame origin and size\n\
+\n\
+**Example:**\n\
+  StartWindow.SetFrame ({ 'x': 0, 'y': 0, 'h': 300, 'w': 300 })\n\
+\n\
+**See also:** [[guiscript:GetFrame]]\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 {
@@ -2246,9 +2383,27 @@ static PyObject* GemRB_View_SetFrame(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetBackground__doc,
-			 "SetBackground(GView, ResRef|Color)\n\n"
-			 "Set the background image or color for the view to the image\n\n"
-			 "obtained by the ResRef or the passed color dict respectively." );
+"===== View_SetBackground =====\n\
+\n\
+**Prototype:** View_SetBackground (GView, ResRef|Color|None)\n\
+\n\
+**Metaclass Prototype:** SetBackground (ResRef|Color|None)\n\
+\n\
+**Description:** Set the background image or color for the View.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * ResRef - name of the image to use\n\
+  * Color - a dict with colors to use for a plain fill\n\
+  * None - if the None object is passed, the backgroud is cleared\n\
+\n\
+**Examples:**\n\
+  StartWindow.SetBackground ('STARTOLD')\n\
+  consoleOut.SetBackground ({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})\n\
+  NoteLabel.SetBackground (None)\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 {
@@ -2278,8 +2433,25 @@ static PyObject* GemRB_View_SetBackground(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetFlags__doc,
-			 "SetViewFlags(GView, Flags, Operation)\n\n"
-			 "Sets the Display Flags of a View. Operation defaults to OP_SET." );
+"===== View_SetFlags =====\n\
+\n\
+**Prototype:** View_SetFlags (GView, Flags[, Operation])\n\
+\n\
+**Metaclass Prototype:** SetFlags (Flags[, Operation])\n\
+\n\
+**Description:** Sets the general flags of a View.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * Flags - the bits to enable\n\
+  * Operation - the bit operation to use, defaults to OP_SET\n\
+\n\
+**Examples:**\n\
+  Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)\n\
+  Window.SetFlags (WF_ALPHA_CHANNEL, OP_NAND)\n\
+\n\
+**Return value:** boolean marking success or failure"
+);
 
 static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 {
@@ -2302,8 +2474,24 @@ static PyObject* GemRB_View_SetFlags(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_SetResizeFlags__doc,
-			 "SetViewFlags(GView, Flags, Operation)\n\n"
-			 "Sets the Display Flags of a View. Operation defaults to OP_SET." );
+"===== View_SetResizeFlags =====\n\
+\n\
+**Prototype:** View_SetResizeFlags (GView, Flags[, Operation])\n\
+\n\
+**Metaclass Prototype:** SetResizeFlags (Flags[, Operation])\n\
+\n\
+**Description:** Sets the resize flags of a View.\n\
+\n\
+**Parameters:**\n\
+  * GView - the control's reference\n\
+  * Flags - the bits to enable\n\
+  * Operation - the bit operation to use, defaults to OP_SET\n\
+\n\
+**Example:**\n\
+  TextArea.SetResizeFlags (IE_GUI_VIEW_RESIZE_ALL, OP_OR)\n\
+\n\
+**Return value:** boolean marking success or failure"
+);
 
 static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
 {
@@ -2317,8 +2505,18 @@ static PyObject* GemRB_View_SetResizeFlags(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_View_Focus__doc,
-			 "View.Focus()\n\n"
-			 "Focuses the view in it's window to direct keyboard and certain other events to the view." );
+"===== View_Focus =====\n\
+\n\
+**Prototype:** View_Focus ()\n\
+\n\
+**Metaclass Prototype:** Focus ()\n\
+\n\
+**Description:** Focuses the view in it's window to direct keyboard and certain other events to the view.\n\
+\n\
+**Parameters:** N/A\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 {
@@ -2335,21 +2533,20 @@ static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
- "===== Label_SetTextColor =====\n\
- \n\
- **Prototype:** GemRB.SetLabelTextColor (GLabel, color)\n\
- \n\
- **Metaclass Prototype:** SetTextColor (color)\n\
- \n\
- **Description:** Sets the Text Color of a Label Control.\n\
- \n\
- **Parameters:**\n\
- * GLabel - the control's reference\n\
- * color - the control's desired text color as a rgb dict\n\
- \n\
- **Return value:** N/A\n\
-"
- );
+"===== Label_SetTextColor =====\n\
+\n\
+**Prototype:** GemRB.SetLabelTextColor (GLabel, color)\n\
+\n\
+**Metaclass Prototype:** SetTextColor (color)\n\
+\n\
+**Description:** Sets the Text Color of a Label Control.\n\
+\n\
+**Parameters:**\n\
+  * GLabel - the control's reference\n\
+  * color - the control's desired text color as a rgb dict\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
 {
