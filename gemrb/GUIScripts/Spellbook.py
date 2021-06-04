@@ -465,9 +465,8 @@ def GetPriestSpellTable(tablename):
 	if GameCheck.IsIWD2():
 		return tablename # no need for this folly
 
-	if not GemRB.HasResource (tablename, RES_2DA):
-		if tablename == "MXSPLDRU":
-			return "MXSPLPRS"
+	if not GemRB.HasResource (tablename, RES_2DA) and tablename == "MXSPLDRU":
+		return "MXSPLPRS"
 	return tablename
 
 def SetupSpellLevels (pc, TableName, Type, Level):

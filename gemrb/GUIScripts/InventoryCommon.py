@@ -92,11 +92,9 @@ def OnDragItem (btn, slot):
 	else:
 		SlotType = GemRB.GetSlotType (slot, pc)
 		#special monk check
-		if GemRB.GetPlayerStat (pc, IE_CLASS)==0x14:
-			#offhand slot mark
-			if SlotType["Effects"]==TYPE_OFFHAND:
-				SlotType["ResRef"]=""
-				GemRB.DisplayString (61355, 0xffffff)
+		if GemRB.GetPlayerStat (pc, IE_CLASS) == 20 and SlotType["Effects"] == TYPE_OFFHAND:
+			SlotType["ResRef"] = ""
+			GemRB.DisplayString (61355, 0xffffff)
 
 		if SlotType["ResRef"]!="":
 			if slot_item:

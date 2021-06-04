@@ -1582,9 +1582,8 @@ def ButtonDragDestHandler(btn, pcID):
 	
 	# So far this is only used for portrait buttons
 	if DragButton: # DragButton will be none for item drags instantiated by clicking (not sragging) an inventory item
-		if DragButton.VarName == "portrait":
-			if btn.VarName == "portrait":
-				GemRB.GameSwapPCs(DragButton.Value, pcID)
+		if DragButton.VarName == "portrait" and btn.VarName == "portrait":
+			GemRB.GameSwapPCs (DragButton.Value, pcID)
 			
 	else: # TODO: something like this: DragButton.VarName.startswith("slot")
 		if btn.VarName == "portrait":
@@ -1767,9 +1766,9 @@ def UpdatePortraitWindow ():
 			talk = 154 # dialog icon
 			store = 155 # shopping icon
 
-			if pc == pcID:
-				if GemRB.GetStore()!=None:
-					flag = chr(store)
+			if pc == pcID and GemRB.GetStore() != None:
+				flag = chr(store)
+
 			# talk icon
 			if GemRB.GameGetSelectedPCSingle(1) == pcID:
 				flag = chr(talk)

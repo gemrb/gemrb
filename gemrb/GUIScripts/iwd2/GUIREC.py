@@ -491,9 +491,9 @@ def PlusMinusStat(value):
 def CascadeToHit(total, ac, apr, slot):
 	cascade = PlusMinusStat(total)
 	babDec = 5
-	if ac["Wisdom"]:
-		if slot == 10: # fist slot - nothing is equipped
-			babDec = 3
+	if ac["Wisdom"] and slot == 10: # fist slot - nothing is equipped
+		babDec = 3
+
 	for i in range(1, apr):
 		if total-i*babDec > 0: # skips negative ones, meaning a lower number of attacks can be displayed
 			cascade = cascade  + "/" + PlusMinusStat(total-i*babDec)
