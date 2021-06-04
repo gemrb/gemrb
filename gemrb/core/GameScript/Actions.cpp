@@ -537,7 +537,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
+	Point p(actor->GetStat(IE_SAVEDXPOS), actor->GetStat(IE_SAVEDYPOS));
 	actor->SetPosition(p, true );
 	actor->SetOrientation( actor->GetStat(IE_SAVEDFACE), false );
 }
@@ -1275,7 +1275,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS) );
 	if (p.isnull()) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1303,7 +1303,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
 	if (p.isnull()) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1331,7 +1331,7 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
 	actor->SetBase(IE_SAVEDXPOS,0);
 	actor->SetBase(IE_SAVEDYPOS,0);
 	if (p.isnull()) {
@@ -1470,7 +1470,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetGameControl()->Viewport();
 	Actor* actor = ( Actor* ) Sender;
-	Point p((short) (vp.x+vp.w/2), (short) (vp.y+vp.h/2) );
+	Point p((vp.x+vp.w/2), (vp.y+vp.h/2) );
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, IF_NOINT, 0 );
 	}
@@ -5943,7 +5943,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 	map->TMap->AdjustNearestTravel(p);
 
 	if (parameters->string0Parameter[0]) {
-		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
 	} else {
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, p, EA_DESTROY, parameters->int0Parameter );
@@ -5970,7 +5970,7 @@ void GameScript::EscapeAreaNoSee(Scriptable* Sender, Action* parameters)
 	map->TMap->AdjustNearestTravel(p);
 
 	if (parameters->string0Parameter[0]) {
-		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
 	} else {
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter );
@@ -6018,7 +6018,7 @@ void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 	}
 	Point p = tar->Pos;
 	if (parameters->string0Parameter[0]) {
-		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
 	} else {
 		EscapeAreaCore( Sender, p, 0, p, EA_DESTROY, parameters->int0Parameter );
@@ -6048,7 +6048,7 @@ void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 	Point p = tar->Pos;
 	Sender->SetWait(parameters->int0Parameter);
 	if (parameters->string0Parameter[0]) {
-		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
 		EscapeAreaCore( Sender, p, parameters->string0Parameter, q, 0, parameters->int2Parameter );
 	} else {
 		EscapeAreaCore( Sender, p, 0, p, EA_DESTROY|EA_NOSEE, parameters->int0Parameter );

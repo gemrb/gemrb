@@ -71,7 +71,7 @@ int ScrollBar::GetFrameHeight(int frame) const
 void ScrollBar::ScrollDelta(const Point& delta)
 {
 	Point p = Point(-delta.x, -delta.y);
-	short xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
+	int xy = *((State&SLIDER_HORIZONTAL) ? &p.x : &p.y);
 	if (xy == 0) return;
 
 	if (p.y > 0) {
@@ -99,7 +99,7 @@ Point ScrollBar::AxisPosFromValue() const
 	if (range.second <= range.first) return Point();
 	
 	Point p;
-	short xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
+	int xy = round((SliderPxRange() / double(range.second - range.first)) * GetValue());
 	if (State&SLIDER_HORIZONTAL) {
 		p.x = xy;
 	} else {
@@ -168,7 +168,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 			}
 		}
 		// draw the slider
-		short slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
+		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
 		// FIXME: doesnt respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
 		Point p = drawFrame.Origin() + Frames[IMAGE_SLIDER]->Frame.Origin();

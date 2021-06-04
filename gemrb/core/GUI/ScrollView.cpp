@@ -195,10 +195,10 @@ void ScrollView::ScrollbarValueChange(ScrollBar* sb)
 	const Point& origin = contentView.Origin();
 	
 	if (sb == hscroll) {
-		Point p(-short(sb->GetValue()), origin.y);
+		Point p(-sb->GetValue(), origin.y);
 		ScrollTo(p);
 	} else if (sb == vscroll) {
-		Point p(origin.x, -short(sb->GetValue()));
+		Point p(origin.x, -sb->GetValue());
 		ScrollTo(p);
 	} else {
 		Log(ERROR, "ScrollView", "ScrollbarValueChange for unknown scrollbar");
@@ -320,13 +320,13 @@ void ScrollView::ScrollTo(const Point& p)
 
 void ScrollView::ScrollTo(Point newP, ieDword duration)
 {
-	short maxx = frame.w - contentView.Dimensions().w;
-	short maxy = frame.h - contentView.Dimensions().h;
+	int maxx = frame.w - contentView.Dimensions().w;
+	int maxy = frame.h - contentView.Dimensions().h;
 	assert(maxx <= 0 && maxy <= 0);
 
 	// clamp values so we dont scroll beyond the content
-	newP.x = Clamp<short>(newP.x, maxx, 0);
-	newP.y = Clamp<short>(newP.y, maxy, 0);
+	newP.x = Clamp(newP.x, maxx, 0);
+	newP.y = Clamp(newP.y, maxy, 0);
 
 	Point current = (animation) ? animation.Current() : contentView.Origin();
 	contentView.SetFrameOrigin(newP);

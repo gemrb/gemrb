@@ -332,14 +332,14 @@ void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color
 	std::vector<SDL_Point> points;
 
 	while (x >= y) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) y, c.y + ( short ) x );
-		SetPixel( drawingBuffer, c.x - ( short ) y, c.y + ( short ) x );
-		SetPixel( drawingBuffer, c.x - ( short ) y, c.y - ( short ) x );
-		SetPixel( drawingBuffer, c.x + ( short ) y, c.y - ( short ) x );
+		SetPixel( drawingBuffer, c.x + x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y - y );
+		SetPixel( drawingBuffer, c.x + x, c.y - y );
+		SetPixel( drawingBuffer, c.x + y, c.y + x );
+		SetPixel( drawingBuffer, c.x - y, c.y + x );
+		SetPixel( drawingBuffer, c.x - y, c.y - x );
+		SetPixel( drawingBuffer, c.x + y, c.y - x );
 
 		y++;
 		re += yc;
@@ -411,13 +411,13 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 	while (sx >= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y + y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y + y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y - y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y - y );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -440,13 +440,13 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 	while (sx <= sy) {
 		if (x >= xfrom && x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y + y );
 		if (-x >= xfrom && -x <= xto && y >= yfrom && y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y + y );
 		if (-x >= xfrom && -x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x - x, c.y - y );
 		if (x >= xfrom && x <= xto && -y >= yfrom && -y <= yto)
-			SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+			SetPixel( drawingBuffer, c.x + x, c.y - y );
 		x++;
 		sx += tbs;
 		ee += xc;
@@ -485,10 +485,10 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 	std::vector<SDL_Point> points;
 
 	while (sx >= sy) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y - y );
+		SetPixel( drawingBuffer, c.x + x, c.y - y );
 		y++;
 		sy += tas;
 		ee += yc;
@@ -510,10 +510,10 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 	sy = tas * yrl;
 
 	while (sx <= sy) {
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y + ( short ) y );
-		SetPixel( drawingBuffer, c.x - ( short ) x, c.y - ( short ) y );
-		SetPixel( drawingBuffer, c.x + ( short ) x, c.y - ( short ) y );
+		SetPixel( drawingBuffer, c.x + x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y + y );
+		SetPixel( drawingBuffer, c.x - x, c.y - y );
+		SetPixel( drawingBuffer, c.x + x, c.y - y );
 		x++;
 		sx += tbs;
 		ee += xc;

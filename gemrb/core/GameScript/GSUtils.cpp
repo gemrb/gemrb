@@ -888,7 +888,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 		sprintf( Tmp, "DestroySelf()" );
 	} else {
 		// last parameter is 'face', which should be passed from relevant action parameter..
-		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%hd.%hd],%d)", area, enter.x, enter.y, 0 );
+		sprintf( Tmp, "MoveBetweenAreas(\"%s\",[%d.%d],%d)", area, enter.x, enter.y, 0 );
 	}
 	Log(MESSAGE, "GSUtils", "Executing %s in EscapeAreaCore", Tmp);
 	//drop this action, but add another (destroyself or movebetweenareas)
@@ -2379,11 +2379,7 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 		return p;
 	}
 	const char *tmpstr = tab->QueryField(areaname, entryname);
-	short x = -1;
-	short y = -1;
-	sscanf(tmpstr, "%hd.%hd", &x, &y);
-	p.x = x;
-	p.y = y;
+	sscanf(tmpstr, "%d.%d", &p.x, &p.y);
 	return p;
 }
 

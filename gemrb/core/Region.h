@@ -43,8 +43,8 @@ namespace GemRB {
 
 class GEM_EXPORT Point {
 public:
-	Point(void);
-	Point(short x, short y);
+	Point() = default;
+	Point(int x, int y);
 
 	bool operator==(const Point &pnt) const;
 	bool operator!=(const Point &pnt) const;
@@ -71,8 +71,8 @@ public:
 	// true if p is within the circle of radius r centered at p
 	bool isWithinRadius(int r, const Point& p) const;
 
-
-	short x,y;
+	int x = 0;
+	int y = 0;
 };
 
 class GEM_EXPORT Size {

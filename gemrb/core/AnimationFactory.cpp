@@ -135,8 +135,8 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->SetupPaperdollColours(Colors, type);
 	}
 
-	Picture2->Frame.x = (short)frames[second]->Frame.x;
-	Picture2->Frame.y = (short)frames[second]->Frame.y - 80;
+	Picture2->Frame.x = frames[second]->Frame.x;
+	Picture2->Frame.y = frames[second]->Frame.y - 80;
 
 	Holder<Sprite2D> spr = frames[first]->copy();
 	if (Colors) {
@@ -144,8 +144,8 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(ieDword *Colors,
 		palette->SetupPaperdollColours(Colors, type);
 	}
 
-	spr->Frame.x = (short)frames[first]->Frame.x;
-	spr->Frame.y = (short)frames[first]->Frame.y;
+	spr->Frame.x = frames[first]->Frame.x;
+	spr->Frame.y = frames[first]->Frame.y;
 	return spr;
 }
 

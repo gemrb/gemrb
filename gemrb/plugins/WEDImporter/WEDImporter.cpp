@@ -341,9 +341,11 @@ void WEDImporter::ReadWallPolygons()
 			flags |= WF_BASELINE;
 		}
 		Point *points = new Point[count];
-		str->Read (points, count * sizeof (Point) );
-		if( DataStream::BigEndian()) {
-			swabs(points, count * sizeof (Point));
+		for (size_t i = 0; i < count; ++i) {
+			ieWord x, y;
+			str->ReadWord(&x);
+			str->ReadWord(&y);
+			points[i] = Point(x, y);
 		}
 
 		if (!(flags&WF_BASELINE) ) {
