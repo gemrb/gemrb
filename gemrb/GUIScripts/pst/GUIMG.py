@@ -225,21 +225,19 @@ def OpenMageSpellUnmemorizeWindow ():
 
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellUnmemorizeWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellUnmemorizeWindow(None, GemRB.GetVar("SpellButton")))
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnMageUnmemorizeSpell ():
+def OnMageUnmemorizeSpell (btn, index):
 	if MageSpellUnmemorizeWindow:
 		OpenMageSpellUnmemorizeWindow ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	type = IE_SPELL_TYPE_WIZARD
-
-	index = GemRB.GetVar ("SpellButton")
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdateMageWindow ()
