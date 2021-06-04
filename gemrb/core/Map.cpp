@@ -277,8 +277,8 @@ static void AddLOS(int destx, int desty, int slot)
 			x += 16;
 			y += 12;
 		}
-		VisibilityMasks[i][slot].x=(short) x;
-		VisibilityMasks[i][slot].y=(short) y;
+		VisibilityMasks[i][slot].x = x;
+		VisibilityMasks[i][slot].y = y;
 	}
 }
 
@@ -3633,7 +3633,7 @@ Container *Map::GetPile(Point position)
 	//converting to search square
 	position.x=position.x/16;
 	position.y=position.y/12;
-	snprintf(heapname, sizeof(heapname), "heap_%hd.%hd", position.x, position.y);
+	snprintf(heapname, sizeof(heapname), "heap_%d.%d", position.x, position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;
 	position.y=position.y*12+6;

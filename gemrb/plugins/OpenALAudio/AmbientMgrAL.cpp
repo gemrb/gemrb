@@ -129,8 +129,8 @@ uint64_t AmbientMgrAL::tick(uint64_t ticks) const
 	int xpos, ypos;
 	core->GetAudioDrv()->GetListenerPos(xpos, ypos);
 	Point listener;
-	listener.x = (short) xpos;
-	listener.y = (short) ypos;
+	listener.x = xpos;
+	listener.y = ypos;
 
 	const Game* game = core->GetGame();
 	ieDword timeslice = 0;

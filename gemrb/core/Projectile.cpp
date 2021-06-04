@@ -902,17 +902,13 @@ void Projectile::DoStep(unsigned int walk_speed)
 	}
 
 	if (step->Next->x > step->x)
-		Pos.x += ( unsigned short )
-			( ( step->Next->x - Pos.x ) * ( time - timeStartStep ) / walk_speed );
+		Pos.x += ((step->Next->x - Pos.x) * (time - timeStartStep) / walk_speed);
 	else
-		Pos.x -= ( unsigned short )
-			( ( Pos.x - step->Next->x ) * ( time - timeStartStep ) / walk_speed );
+		Pos.x -= ((Pos.x - step->Next->x) * (time - timeStartStep) / walk_speed);
 	if (step->Next->y > step->y)
-		Pos.y += ( unsigned short )
-			( ( step->Next->y - Pos.y ) * ( time - timeStartStep ) / walk_speed );
+		Pos.y += ((step->Next->y - Pos.y) * (time - timeStartStep) / walk_speed);
 	else
-		Pos.y -= ( unsigned short )
-			( ( Pos.y - step->Next->y ) * ( time - timeStartStep ) / walk_speed );
+		Pos.y -= ((Pos.y - step->Next->y) * (time - timeStartStep) / walk_speed);
 
 }
 
@@ -1791,8 +1787,8 @@ void Projectile::DrawTravel(const Region& viewport)
 		double x_vector = (Destination.x - Origin.x) / total_distance,
 			y_vector = (Destination.y - Origin.y) / total_distance;
 		Point newpos = pos;
-		newpos.x += (short)(y_vector*length_of_normal);
-		newpos.y -= (short)(x_vector*length_of_normal);
+		newpos.x += y_vector * length_of_normal;
+		newpos.y -= x_vector * length_of_normal;
 		pos = newpos;
 	}
 

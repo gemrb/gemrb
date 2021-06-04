@@ -459,17 +459,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 
 void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints;
-	sdlpoints.reserve(points.size());
-
-	for (size_t i = 0; i < points.size(); ++i) {
-		const Point& point = points[i];
-		SDL_Point sdlpoint = {point.x, point.y};
-		sdlpoints.push_back(sdlpoint);
-	}
-
-	DrawSDLPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLPoints(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
@@ -489,17 +479,7 @@ void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlag
 
 void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	// TODO: refactor Point to use int so this is not needed
-	std::vector<SDL_Point> sdlpoints;
-	sdlpoints.reserve(points.size());
-
-	for (size_t i = 0; i < points.size(); ++i) {
-		const Point& point = points[i];
-		SDL_Point sdlpoint = {point.x, point.y};
-		sdlpoints.push_back(sdlpoint);
-	}
-
-	DrawSDLLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
+	DrawSDLLines(reinterpret_cast<const std::vector<SDL_Point>&>(points), reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
 void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)

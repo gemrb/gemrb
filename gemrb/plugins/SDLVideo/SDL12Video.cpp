@@ -396,7 +396,7 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	}
 
 	SDL_Rect srect = {0, 0, Uint16(r.w), Uint16(r.h)};
-	SDL_Rect drect = {origin.x, origin.y, Uint16(r.w), Uint16(r.h)};
+	SDL_Rect drect = {Sint16(origin.x), Sint16(origin.y), Uint16(r.w), Uint16(r.h)};
 	BlitSpriteNativeClipped(surface, srect, drect, flags, c);
 }
 

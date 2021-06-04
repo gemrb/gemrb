@@ -22,12 +22,6 @@
 
 namespace GemRB {
 
-/*************** point ****************************/
-Point::Point(void)
-{
-	x = y = 0;
-}
-
 bool Point::operator==(const Point& pnt) const
 {
 	return (x == pnt.x) && (y == pnt.y);
@@ -62,7 +56,7 @@ Point& Point::operator-=(const Point& rhs)
 	return *this;
 }
 
-Point::Point(short x, short y)
+Point::Point(int x, int y)
 {
 	this->x = x;
 	this->y = y;

@@ -1599,7 +1599,7 @@ int GameScript::NearLocation(Scriptable *Sender, const Trigger *parameters)
 		if (parameters->int0Parameter < 0) { // use Sender's position
 			distance = PersonalDistance(Sender, scr);
 		} else {
-			Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
+			Point p(parameters->int0Parameter, parameters->int1Parameter);
 			distance = PersonalDistance(p, scr);
 		}
 		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
@@ -1631,8 +1631,8 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 	if ((signed) actor->GetStat(IE_SAVEDXPOS) <= 0 && (signed) actor->GetStat(IE_SAVEDYPOS) <= 0) {
 		p = actor->HomeLocation;
 	} else {
-		p.x = (short) actor->GetStat(IE_SAVEDXPOS);
-		p.y = (short) actor->GetStat(IE_SAVEDYPOS);
+		p.x = actor->GetStat(IE_SAVEDXPOS);
+		p.y = actor->GetStat(IE_SAVEDYPOS);
 	}
 	// should this be PersonalDistance?
 	int distance = Distance(p, Sender);

@@ -77,8 +77,8 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 	if (p.x < 0 || p.x >= Frame.w) return c;
 	if (p.y < 0 || p.y >= Frame.h) return c;
 
-	short x = p.x;
-	short y = p.y;
+	int x = p.x;
+	int y = p.y;
 
 	if (renderFlags&BlitFlags::MIRRORY)
 		y = Frame.h - y - 1;
