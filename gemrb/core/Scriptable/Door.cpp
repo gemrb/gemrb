@@ -88,12 +88,8 @@ Door::~Door(void)
 	if (tiles) {
 		free( tiles );
 	}
-	if (open_ib) {
-		free( open_ib );
-	}
-	if (closed_ib) {
-		free( closed_ib );
-	}
+	delete[] open_ib;
+	delete[] closed_ib;
 }
 
 void Door::ImpedeBlocks(int count, Point *points, PathMapFlags value) const
