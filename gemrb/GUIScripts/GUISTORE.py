@@ -1862,15 +1862,15 @@ def DonateGold ():
 	feedbackSound = DEF_DONATE2
 	feedbackString = strrefs['donorfail']
 	if GemRB.IncreaseReputation (donation):
-		TextArea.Append (strrefs['donorgood'])
-		TextArea.Append ("\n\n")
-		GemRB.PlaySound (DEF_DONATE1)
-		UpdateStoreDonateWindow (Window)
-		return
+		feedbackSound = DEF_DONATE1
+		feedbackString = strrefs['donorgood']
 
-	TextArea.Append (strrefs['donorfail'])
+	TextArea.Append (feedbackString)
 	TextArea.Append ("\n\n")
-	GemRB.PlaySound (DEF_DONATE2)
+	if text > -1:
+		TextArea.Append (text)
+		TextArea.Append ("\n\n")
+	GemRB.PlaySound (feedbackSound)
 	UpdateStoreDonateWindow (Window)
 	return
 
