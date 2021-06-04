@@ -927,11 +927,10 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 //bg2 - variable
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
-	ieDword value = parameters->pointParameter.asDword();
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	SetVariable(Sender, parameters->string0Parameter, value);
+	SetPointVariable(Sender, parameters->string0Parameter, parameters->pointParameter);
 }
 
 //PST:has parameters, IWD2: no params
@@ -984,11 +983,10 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	ieDword value = tar->Pos.asDword();
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	SetVariable(Sender, parameters->string0Parameter, value);
+	SetPointVariable(Sender, parameters->string0Parameter, tar->Pos);
 }
 
 /** you may omit the string0Parameter, in this case this will be a */
@@ -1258,10 +1256,8 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Point p;
 	Actor* actor = ( Actor* ) tar;
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
-	p.fromDword(value);
+	Point p = CheckPointVariable(Sender, parameters->string0Parameter);
 	actor->SetPosition(p, true );
 	Sender->ReleaseCurrentAction();
 }
@@ -1842,13 +1838,10 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) target;
-	ieDword value;
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	value = CheckVariable(target, parameters->string0Parameter);
-	Point p;
-	p.fromDword(value);
+	Point p = CheckPointVariable(target, parameters->string0Parameter);
 
 	actor->SetOrientation ( GetOrient( p, actor->Pos ), false);
 	actor->SetWait( 1 );

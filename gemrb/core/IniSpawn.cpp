@@ -296,7 +296,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (s) {
 		switch (ps) {
 		case 'e':
-			critter.SpawnPoint.fromDword(CheckVariable(map, s+8,s));
+			critter.SpawnPoint = CheckPointVariable(map, s+8, s);
 			break;
 		default:
 			//see save_selected_point
@@ -322,9 +322,9 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
 	if (s) {
 		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, critter.SpawnPoint.asDword(), s);
+			SetPointVariable(map, s+8, critter.SpawnPoint, s);
 		} else {
-			SetVariable(map, s, critter.SpawnPoint.asDword(), "GLOBAL");
+			SetPointVariable(map, s, critter.SpawnPoint, "GLOBAL");
 		}
 	}
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
