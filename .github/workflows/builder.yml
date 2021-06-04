@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master, subviews ]
+    branches: [ master ]
 
 jobs:
   macos:
@@ -17,7 +17,7 @@ jobs:
 
     - name: Set up Homebrew
       run: |
-        brew install sdl openal-soft sdl_mixer libpng libvorbis sccache
+        brew install sdl2 openal-soft sdl2_mixer libpng libvorbis sccache
 
     - name: Set up build
       run: |
@@ -88,7 +88,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install zlib1g zlib1g-dev libsdl1.2debian libsdl1.2-dev libopenal1 libopenal-dev libsdl-mixer1.2 libsdl-mixer1.2-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev libpython2.7 python-dev
+        sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev libpython2.7 python-dev
 
         SCCACHE_VERSION="v0.2.15"
         SCCACHE_LINUX_PACKAGE="sccache-${SCCACHE_VERSION}-x86_64-unknown-linux-musl"

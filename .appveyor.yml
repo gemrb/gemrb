@@ -26,8 +26,8 @@ install:
     }
 
     vcpkg install zlib
-    vcpkg install sdl1
-    # sdl mixer: only available for sdl2, as sdl2-mixer
+    vcpkg install sdl2
+    vcpkg install sdl2-mixer
     vcpkg install python2
     vcpkg install openal-soft
     vcpkg install libpng
