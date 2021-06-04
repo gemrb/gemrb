@@ -466,6 +466,13 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} gemrb/includes gemrb/core)
 
 # generate config.h
 INCLUDE (config)
+IF(NOT STATIC_LINK AND NOT HAVE_DLFCN_H AND NOT WIN32)
+	MESSAGE(WARNING "Dynamic linking not supported by platform, switching to static!")
+	SET(STATIC_LINK)
+	ADD_DEFINITIONS("-DSTATIC_LINK")
+	# readd, previously removed
+	LIST(APPEND CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+ENDIF()
 
 IF(APPLE)
 	# Make sure we can find the 'ibtool' program. we need it to compile xibs

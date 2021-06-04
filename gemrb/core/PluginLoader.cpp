@@ -34,7 +34,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
-#else
+#elif defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif
 
