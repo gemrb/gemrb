@@ -506,7 +506,7 @@ int GameScript::BitCheck(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value & parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -515,7 +515,7 @@ int GameScript::BitCheckExact(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		ieDword tmp = (ieDword) parameters->int0Parameter ;
 		if ((value & tmp) == tmp) return 1;
@@ -529,7 +529,7 @@ int GameScript::BitGlobal_Trigger(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
 		if (value!=0) return 1;
@@ -541,10 +541,10 @@ int GameScript::GlobalOrGlobal_Trigger(Scriptable *Sender, const Trigger *parame
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid);
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		if (value1) return 1;
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid);
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value2) return 1;
 	}
 	return 0;
@@ -554,9 +554,9 @@ int GameScript::GlobalAndGlobal_Trigger(Scriptable *Sender, const Trigger *param
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value1) {
-		ieDword value2 = CheckVariable( Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value2) return 1;
 	}
 	return 0;
@@ -566,9 +566,9 @@ int GameScript::GlobalBAndGlobal_Trigger(Scriptable *Sender, const Trigger *para
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && (value1 & value2) != 0) return 1;
 	}
 	return 0;
@@ -578,9 +578,9 @@ int GameScript::GlobalBAndGlobalExact(Scriptable *Sender, const Trigger *paramet
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && (value1 & value2) == value2) return 1;
 	}
 	return 0;
@@ -590,9 +590,9 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable *Sender, const Trigger *param
 {
 	bool valid=true;
 
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid) {
 			HandleBitMod( value1, value2, parameters->int1Parameter);
 			if (value1!=0) return 1;
@@ -614,7 +614,7 @@ int GameScript::Xor(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && (value ^ parameters->int0Parameter) != 0) return 1;
 	return 0;
 }
@@ -674,7 +674,7 @@ int GameScript::Global(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
 		if ( value == parameters->int0Parameter ) return 1;
 	}
@@ -691,7 +691,7 @@ int GameScript::GlobalLT(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value < parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -706,7 +706,7 @@ int GameScript::GlobalGT(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid && value > parameters->int0Parameter) return 1;
 	return 0;
 }
@@ -715,9 +715,9 @@ int GameScript::GlobalLTGlobal(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value1 < value2) return 1;
 	}
 	return 0;
@@ -727,9 +727,9 @@ int GameScript::GlobalGTGlobal(Scriptable *Sender, const Trigger *parameters)
 {
 	bool valid=true;
 
-	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
 	if (valid) {
-		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, nullptr, &valid);
 		if (valid && value1 > value2) return 1;
 	}
 	return 0;

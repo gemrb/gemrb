@@ -322,17 +322,17 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
 	if (s) {
 		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
+			SetVariable(map, s+8, critter.SpawnPoint.asDword(), s);
 		} else {
-			SetVariable(map, s, "GLOBAL", critter.SpawnPoint.asDword());
+			SetVariable(map, s, critter.SpawnPoint.asDword(), "GLOBAL");
 		}
 	}
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
 	if (s) {
 		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, s, (ieDword) critter.Orientation);
+			SetVariable(map, s+8, critter.Orientation, s);
 		} else {
-			SetVariable(map, s, "GLOBAL", (ieDword) critter.Orientation);
+			SetVariable(map, s, critter.Orientation, "GLOBAL");
 		}
 	}
 
@@ -661,7 +661,7 @@ void IniSpawn::RespawnNameless()
 
 	//certain variables are set when nameless dies
 	for (i=0;i<namelessvarcount;i++) {
-		SetVariable(game, NamelessVar[i].Name,"GLOBAL", NamelessVar[i].Value);
+		SetVariable(game, NamelessVar[i].Name, NamelessVar[i].Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
@@ -752,7 +752,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 		return;
 	}
 
-	SetVariable(map, critter.SpecVar, critter.SpecContext, specvar+(ieDword) critter.SpecVarInc);
+	SetVariable(map, critter.SpecVar, specvar+(ieDword) critter.SpecVarInc, critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
@@ -859,7 +859,7 @@ void IniSpawn::InitialSpawn()
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
 	for (int i=0;i<localscount;i++) {
-		SetVariable(map, Locals[i].Name,"LOCALS", Locals[i].Value);
+		SetVariable(map, Locals[i].Name, Locals[i].Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed
