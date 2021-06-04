@@ -71,7 +71,7 @@ void MoviePlayer::Play(Window* win)
 	const Region& winFrame = win->Frame();
 	const Size& size = Dimensions();
 	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
-	center = center + winFrame.Origin();
+	center = center + winFrame.origin;
 	VideoBufferPtr subBuf = nullptr, vb = video->CreateBuffer(Region(center, size), movieFormat);
 	
 	if (subtitles) {

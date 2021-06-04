@@ -77,7 +77,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 			assert(anim);
 
 			// this is the base terrain tile
-			Point p = Point(x * 64, y * 64) - viewport.Origin();
+			Point p = Point(x * 64, y * 64) - viewport.origin;
 			vid->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
 
 			if (!tile->om || tile->tileIndex) {

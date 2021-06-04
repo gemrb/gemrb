@@ -361,17 +361,17 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 {
 	assert(spr->BAM);
 
-	if (srect.Dimensions().IsEmpty())
+	if (srect.size.IsEmpty())
 		return;
 
-	if (drect.Dimensions().IsEmpty())
+	if (drect.size.IsEmpty())
 		return;
 
 	PaletteHolder palette = spr->GetPalette();
 	const Uint8* rledata = (const Uint8*)spr->LockSprite();
 	uint8_t ck = spr->GetColorKey();
 
-	bool partial = spr->Frame.Dimensions() != srect.Dimensions();
+	bool partial = spr->Frame.size != srect.size;
 
 	IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 	IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;

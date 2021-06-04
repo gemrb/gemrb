@@ -37,7 +37,7 @@ Content::Content(const Size& size)
 
 LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 {
-	return { std::make_shared<LayoutRegion>(Region(rgn.Origin() + p, frame.Dimensions())) };
+	return { std::make_shared<LayoutRegion>(Region(rgn.origin + p, frame.size)) };
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
@@ -82,8 +82,8 @@ inline const Font* TextSpan::LayoutFont() const
 inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) const
 {
 	const Font* layoutFont = LayoutFont();
-	Size maxSize = frame.Dimensions();
-	Region drawRegion = Region(p + rgn.Origin(), maxSize);
+	Size maxSize = frame.size;
+	Region drawRegion = Region(p + rgn.origin, maxSize);
 	if (maxSize.w <= 0) {
 		if (maxSize.w == -1) {
 			// take remainder of parent width
@@ -109,11 +109,11 @@ inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) 
 LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& rgn) const
 {
 	LayoutRegions layoutRegions;
-	const Point& drawOrigin = rgn.Origin();
+	const Point& drawOrigin = rgn.origin;
 	const Font* layoutFont = LayoutFont();
 	assert(layoutFont);
 
-	if (frame.Dimensions().IsZero()) {
+	if (frame.size.IsZero()) {
 		// this means we get to wrap :)
 		// calculate each line and print line by line
 		int lineheight = layoutFont->LineHeight;
@@ -133,7 +133,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				lineRgn.x = drawOrigin.x;
 				lineRgn.y += lineheight;
 				lineRgn.w = rgn.w;
-				layoutPoint = lineRgn.Origin();
+				layoutPoint = lineRgn.origin;
 
 				lineSegment = lineRgn;
 			}
@@ -193,7 +193,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 						subLen = nextLine - numPrinted + 1; // +1 for the \n
 					}
 					const String& substr = text.substr(numPrinted, subLen);
-					Font::StringSizeMetrics metrics = {lineSegment.Dimensions(), 0, 0, lineSegment.w == lineRgn.w};
+					Font::StringSizeMetrics metrics = {lineSegment.size, 0, 0, lineSegment.w == lineRgn.w};
 					Size printSize = layoutFont->StringSize(substr, &metrics);
 					numOnLine = metrics.numChars;
 					assert(numOnLine || !metrics.forceBreak);
@@ -217,7 +217,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				}
 				numPrinted += numOnLine;
 			}
-			assert(!lineSegment.Dimensions().IsEmpty());
+			assert(!lineSegment.size.IsEmpty());
 			lineExclusions.push_back(lineSegment);
 
 		newline:
@@ -283,7 +283,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 }
 
 ImageSpan::ImageSpan(Holder<Sprite2D> im)
-	: Content(im->Frame.Dimensions())
+	: Content(im->Frame.size)
 {
 	image = im;
 }
@@ -294,7 +294,7 @@ void ImageSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& of
 	Region r = rgns.front()->region;
 	r.x += offset.x;
 	r.y += offset.y;
-	core->GetVideoDriver()->BlitSprite(image, r.Origin(), &r);
+	core->GetVideoDriver()->BlitSprite(image, r.origin, &r);
 }
 
 ContentContainer::ContentContainer(const Region& frame)
@@ -366,7 +366,7 @@ void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
 
 	// layout shouldn't be empty unless there is no content anyway...
 	if (layout.empty()) return;
-	Point dp = drawFrame.Origin() + Point(margin.left, margin.top);
+	Point dp = drawFrame.origin + Point(margin.left, margin.top);
 	
 	ContentLayout::const_iterator it = layout.begin();
 	for (; it != layout.end(); ++it) {
@@ -601,7 +601,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		layoutFrame.h -= margin.top + margin.bottom;
 	}
 
-	assert(!layoutFrame.Dimensions().IsEmpty());
+	assert(!layoutFrame.size.IsEmpty());
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {
@@ -655,7 +655,7 @@ void ContentContainer::DeleteContentsInRect(Region exclusion)
 	int bottom = top;
 	const Content* content;
 	while (const Region* rgn = ContentRegionForRect(exclusion)) {
-		content = ContentAtPoint(rgn->Origin());
+		content = ContentAtPoint(rgn->origin);
 		assert(content);
 
 		top = (rgn->y < top) ? rgn->y : top;
@@ -795,7 +795,7 @@ void TextContainer::DrawContents(const Layout& layout, Point dp)
 			auto cursorRegion = static_cast<const TextLayout&>(**it);
 			size_t begin = cursorRegion.beginCharIdx;
 			const Region& rect = cursorRegion.region;
-			cursorPoint = rect.Origin();
+			cursorPoint = rect.origin;
 			const String& substr = text.substr(begin, cursorPos - begin);
 			cursorPoint.x += printFont->StringSizeWidth(substr, 0);
 		}
@@ -850,7 +850,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 			} else {
 				// not in this one so we need to consume some text
 				// TODO: this could be faster if we stored it while calculating layout
-				metrics.size = rect.Dimensions();
+				metrics.size = rect.size;
 				printFont->StringSize(text.substr(numChars), &metrics);
 				numChars += metrics.numChars;
 			}

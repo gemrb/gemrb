@@ -86,7 +86,7 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 		r = clip->Intersect(r);
 	}
 	// the clip must be "safe". no negative values or crashy crashy
-	if (r.Dimensions().IsEmpty()) { // logically equivalent to no intersection
+	if (r.size.IsEmpty()) { // logically equivalent to no intersection
 		r.h = 0;
 		r.w = 0;
 	}
@@ -218,11 +218,11 @@ bool Video::GetFullscreenMode() const
 
 void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 {
-	p -= spr->Frame.Origin();
-	Region dst(p, spr->Frame.Dimensions());
+	p -= spr->Frame.origin;
+	Region dst(p, spr->Frame.size);
 	Region fClip = ClippedDrawingRect(dst, clip);
 
-	if (fClip.Dimensions().IsEmpty()) {
+	if (fClip.size.IsEmpty()) {
 		return; // already know blit fails
 	}
 

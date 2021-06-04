@@ -224,7 +224,7 @@ public:
 			}
 		}
 		SDL_UnlockYUVOverlay(overlay);
-		renderPos = bufDest.Origin();
+		renderPos = bufDest.origin;
 		changed = true;
 	}
 };

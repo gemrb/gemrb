@@ -59,7 +59,7 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if((val >= 100) && KnobStepsCount && BackGround2) {
 		//animated progbar end stage
-		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.Origin());
+		core->GetVideoDriver()->BlitSprite(BackGround2, rgn.origin);
 		return; //done for animated progbar
 	}
 
@@ -67,13 +67,13 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 	if(!KnobStepsCount) {
 		//linear progressbar (pst, iwd)
-		const Size& size = BackGround2->Frame.Dimensions();
+		const Size& size = BackGround2->Frame.size;
 		//this is the PST/IWD specific part
 		Count = val * size.w / 100;
-		Region r(rgn.Origin() + KnobPos, Size(Count, size.h));
-		core->GetVideoDriver()->BlitSprite(BackGround2, r.Origin(), &r);
+		Region r(rgn.origin + KnobPos, Size(Count, size.h));
+		core->GetVideoDriver()->BlitSprite(BackGround2, r.origin, &r);
 
-		Point p = rgn.Origin() + CapPos;
+		Point p = rgn.origin + CapPos;
 		p.x += Count - PBarCap->Frame.w;
 		core->GetVideoDriver()->BlitSprite(PBarCap, p);
 		return;

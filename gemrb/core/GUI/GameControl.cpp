@@ -1725,7 +1725,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 
 Region GameControl::Viewport()
 {
-	return Region(vpOrigin, frame.Dimensions());
+	return Region(vpOrigin, frame.size);
 }
 
 //generate action code for source actor to try to attack a target

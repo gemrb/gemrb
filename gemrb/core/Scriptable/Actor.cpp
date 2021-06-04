@@ -8694,7 +8694,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 	}
 
 	if (ShouldDrawCircle()) {
-		DrawCircle(vp.Origin());
+		DrawCircle(vp.origin);
 	}
 
 	if (!currentStance.anim.empty()) {
@@ -8718,7 +8718,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 		
 		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
 
-		Point drawPos = Pos - vp.Origin();
+		Point drawPos = Pos - vp.origin;
 		drawPos.y -= GetElevation();
 
 		// mirror images behind the actor
@@ -8733,7 +8733,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 				// consider the possibility the mirror image is behind a wall (walls.second)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if (area->GetBlockedNavmap(iPos + vp.origin) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
@@ -8799,7 +8799,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 				// consider the possibility the mirror image is in front of a wall (walls.first)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if (area->GetBlockedNavmap(iPos + vp.origin) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}

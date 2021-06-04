@@ -80,7 +80,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 {
 	auto MapToScreen = [&rgn, this](const Point& p) {
-		return rgn.Origin() - Pos + p;
+		return rgn.origin - Pos + p;
 	};
 	
 	WorldMap* worldmap = core->GetWorldMap();
@@ -120,8 +120,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
 		if (!icon) continue;
 		const Region& icon_frame = icon->Frame;
-		Point p = m->pos - icon_frame.Origin();
-		Region r2 = Region(MapToScreen(p), icon_frame.Dimensions());
+		Point p = m->pos - icon_frame.origin;
+		Region r2 = Region(MapToScreen(p), icon_frame.size);
 		
 		Font::PrintColors colors;
 		if (Area == m) {

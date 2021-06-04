@@ -87,13 +87,13 @@ void Container::Draw(bool highlight, const Region& vp, Color tint, uint32_t flag
 		const Holder<Sprite2D> icon = groundicons[i];
 		if (icon) {
 			if (highlight) {
-				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 			} else {
 				const Color trans;
 				PaletteHolder p = icon->GetPalette();
 				Color tmpc = p->col[1];
 				p->CopyColorRange(&trans, &trans + 1, 1);
-				video->BlitGameSprite(icon, Pos - vp.Origin(), flags, tint);
+				video->BlitGameSprite(icon, Pos - vp.origin, flags, tint);
 				p->CopyColorRange(&tmpc, &tmpc + 1, 1);
 			}
 		}

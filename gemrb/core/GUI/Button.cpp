@@ -153,7 +153,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (Image) {
 			// FIXME: maybe it's useless...
 			Point offset((frame.w / 2) - (Image->Frame.w / 2), (frame.h / 2) - (Image->Frame.h / 2));
-			video->BlitSprite(Image, rgn.Origin() + offset);
+			video->BlitSprite(Image, rgn.origin + offset);
 		}
 	}
 
@@ -170,7 +170,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		picPos.x = (rgn.w / 2) - (Picture->Frame.w / 2) + rgn.x;
 		picPos.y = (rgn.h / 2) - (Picture->Frame.h / 2) + rgn.y;
 		if (flags & IE_GUI_BUTTON_HORIZONTAL) {
-			picPos += Picture->Frame.Origin();
+			picPos += Picture->Frame.origin;
 
 			// Clipping: 0 = overlay over full button, 1 = no overlay
 			int overlayHeight = Picture->Frame.h * (1.0 - Clipping);
@@ -187,10 +187,10 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
-			video->BlitSprite( Picture, rb.Origin(), &rb );
+			video->BlitSprite( Picture, rb.origin, &rb );
 		} else {
 			Region r(picPos.x, picPos.y, (Picture->Frame.w * Clipping), Picture->Frame.h);
-			video->BlitSprite(Picture, Picture->Frame.Origin() + r.Origin(), &r);
+			video->BlitSprite(Picture, Picture->Frame.origin + r.origin, &r);
 		}
 	}
 
@@ -201,9 +201,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
 
 		if (flags & IE_GUI_BUTTON_CENTER_PICTURES) {
-			video->BlitSprite( AnimPicture, r.Origin() + AnimPicture->Frame.Origin(), &r );
+			video->BlitSprite( AnimPicture, r.origin + AnimPicture->Frame.origin, &r );
 		} else {
-			video->BlitSprite( AnimPicture, r.Origin(), &r );
+			video->BlitSprite( AnimPicture, r.origin, &r );
 		}
 	}
 
@@ -224,7 +224,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		for (; iter != PictureList.end(); ++iter) {
-			video->BlitSprite(*iter, rgn.Origin() + offset);
+			video->BlitSprite(*iter, rgn.origin + offset);
 		}
 	}
 
@@ -260,7 +260,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			r.w -= Anchor.x;
 			r.h -= Anchor.y;
 		} else {
-			Font::StringSizeMetrics metrics {r.Dimensions(), 0, 0, false};
+			Font::StringSizeMetrics metrics {r.size, 0, 0, false};
 			font->StringSize(Text, &metrics);
 
 			if (metrics.numLines == 1 && (IE_GUI_BUTTON_ALIGNMENT_FLAGS & flags)) {
@@ -289,7 +289,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			if (! fr->enabled) continue;
 
 			const Region& frRect = fr->rect;
-			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
+			Region r = Region( rgn.origin + frRect.origin, frRect.size );
 			if (pulseBorder && !fr->filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
 				video->DrawRect( r, mix, fr->filled, BLIT_BLENDED );

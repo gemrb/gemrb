@@ -263,7 +263,7 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 {
 	if (AnimPicture) {
 		// speaker portrait
-		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.Origin());
+		core->GetVideoDriver()->BlitSprite(AnimPicture, drawFrame.origin);
 	}
 }
 
@@ -652,7 +652,7 @@ void TextArea::SetScrollbar(ScrollBar* sb)
 	SetFrame(combined);
 	SetMargins(margins);
 	
-	Point origin = ConvertPointFromWindow(sb->Frame().Origin());
+	Point origin = ConvertPointFromWindow(sb->Frame().origin);
 	sb->SetFrameOrigin(origin);
 
 	scrollview.SetVScroll(sb);

@@ -99,7 +99,7 @@ int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
 	if (fmt == YV12) {
-		return new SDLOverlayVideoBuffer(r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
+		return new SDLOverlayVideoBuffer(r.origin, SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
 	} else {
 		SDL_Surface* buf = NULL;
 		if (fmt == RGB555) {
@@ -121,7 +121,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 			return nullptr;
 		}
 
-		return new SDLSurfaceVideoBuffer(buf, r.Origin());
+		return new SDLSurfaceVideoBuffer(buf, r.origin);
 	}
 }
 
@@ -388,7 +388,7 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 {
 	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 	const Region& r = buf->Rect();
-	Point origin = r.Origin() + p;
+	Point origin = r.origin + p;
 
 	Color c;
 	if (tint) {
@@ -487,18 +487,18 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			SDL_FillRect( currentBuf, &drect, val );
 		}
 	} else if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawHLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<BLEND>(currentBuf, rgn.origin, rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<BLEND>(currentBuf, rgn.origin, rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	} else if (flags & BLIT_MULTIPLY) {
-		DrawHLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<TINT>(currentBuf, rgn.origin, rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<TINT>(currentBuf, rgn.origin, rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<TINT>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<TINT>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	} else {
-		DrawHLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<NONE>(currentBuf, rgn.origin, rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<NONE>(currentBuf, rgn.origin, rgn.y + rgn.h - 1, screenClip, color);
 		DrawHLineSurface<NONE>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
 		DrawVLineSurface<NONE>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	}

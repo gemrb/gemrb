@@ -201,7 +201,7 @@ VideoBuffer* SDL20VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 		Log(ERROR, "SDL 2", "%s", SDL_GetError());
 		return nullptr;
 	}
-	return new SDLTextureVideoBuffer(r.Origin(), tex, fmt, renderer);
+	return new SDLTextureVideoBuffer(r.origin, tex, fmt, renderer);
 }
 
 void SDL20VideoDriver::SwapBuffers(VideoBuffers& buffers)
@@ -250,7 +250,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 		return ret;
 	}
 
-	if (screenClip.Dimensions() == screenSize)
+	if (screenClip.size == screenSize)
 	{
 		// Some SDL backends complain on having a clip rect of the entire renderer size
 		// I'm not sure if it is an SDL bug; possibly its just 0 based so it is out of bounds?
@@ -378,7 +378,7 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 {
 	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();
-	Point origin = r.Origin() + p;
+	Point origin = r.origin + p;
 
 	SDL_Rect srect = {0, 0, r.w, r.h};
 	SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
@@ -512,7 +512,7 @@ void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& orig
 		std::vector<SDL_Point> points(poly->Count() + 1);
 		size_t i = 0;
 		for (; i < poly->Count(); ++i) {
-			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			const Point& p = poly->vertices[i] - poly->BBox.origin + origin;
 			points[i].x = p.x;
 			points[i].y = p.y;
 		}

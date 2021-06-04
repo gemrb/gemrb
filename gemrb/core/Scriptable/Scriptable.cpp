@@ -264,7 +264,7 @@ void Scriptable::DrawOverheadText()
 
 	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
 	Region vp = core->GetGameControl()->Viewport();
-	Region rgn(p - Point(100, cs) - vp.Origin(), Size(200, 400));
+	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
 	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
 }
 
@@ -1835,7 +1835,7 @@ void Highlightable::DrawOutline(Point origin) const
 	if (!outline) {
 		return;
 	}
-	origin = outline->BBox.Origin() - origin;
+	origin = outline->BBox.origin - origin;
 
 	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 		core->GetVideoDriver()->DrawPolygon( outline.get(), origin, outlineColor, true, BLIT_MULTIPLY|BLIT_HALFTRANS );

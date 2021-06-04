@@ -293,8 +293,8 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 									uint32_t flags, Color tint)
 {
-	Region srect(Point(0, 0), spr->Frame.Dimensions());
-	Region drect = Region(p - spr->Frame.Origin(), spr->Frame.Dimensions());
+	Region srect(Point(0, 0), spr->Frame.size);
+	Region drect = Region(p - spr->Frame.origin, spr->Frame.size);
 	BlitSpriteClipped(spr, srect, drect, flags, &tint);
 }
 
@@ -561,7 +561,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		}
 	} // already have appropriate y for right clip
 
-	if (dclipped.Dimensions().IsEmpty() || src.Dimensions().IsEmpty()) {
+	if (dclipped.size.IsEmpty() || src.size.IsEmpty()) {
 		return;
 	}
 
