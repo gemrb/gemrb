@@ -68,17 +68,6 @@ Point::Point(short x, short y)
 	this->y = y;
 }
 
-ieDword Point::asDword() const
-{
-	return ((y & 0xFFFF) << 16) | (x & 0xFFFF);
-}
-
-void Point::fromDword(ieDword val)
-{
-	x = val & 0xFFFF;
-	y = val >> 16;
-}
-
 bool Point::isnull() const
 {
 	return (x == 0) && (y == 0);

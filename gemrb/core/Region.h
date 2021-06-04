@@ -71,8 +71,6 @@ public:
 	// true if p is within the circle of radius r centered at p
 	bool isWithinRadius(int r, const Point& p) const;
 
-	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
-	void fromDword(ieDword val); // extract coordinates from uint32
 
 	short x,y;
 };
