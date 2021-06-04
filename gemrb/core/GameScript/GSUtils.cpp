@@ -2106,9 +2106,6 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 	}
 	Game *game = core->GetGame();
 	if (HasKaputz && !strnicmp(newVarName, "KAPUTZ", 6)) {
-		// FIXME?: NoCreate used to ony be passed when Context was null
-		// It was changed during consolidation because I couldnt think of why that difference was purposeful
-		// it felt like a bug, but thats only a hunch
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
