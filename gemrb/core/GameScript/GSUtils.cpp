@@ -2171,164 +2171,100 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	return newTrigger;
 }
 
-void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value)
+void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const char* Context)
 {
 	char newVarName[8+33];
-
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
-
-	strlcpy( newVarName, Context, 7 );
-	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value, NoCreate );
-		return;
-	}
-	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
-		Sender->locals->SetAt( VarName, value, NoCreate );
-		return;
-	}
-	Game *game = core->GetGame();
-	if (HasKaputz && !strnicmp(newVarName,"KAPUTZ",6) ) {
-		game->kaputz->SetAt( VarName, value );
-		return;
-	}
-
-	if (strnicmp(newVarName,"GLOBAL",6) ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			map->locals->SetAt( VarName, value, NoCreate);
-		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
-				Context, VarName);
+	
+	const char *poi = VarName;
+	if (Context == nullptr) {
+		poi = &VarName[6];
+		//some HoW triggers use a : to separate the scope from the variable name
+		if (*poi==':') {
+			poi++;
 		}
+		strlcpy(newVarName, VarName, 7);
 	} else {
-		game->locals->SetAt(VarName, value, NoCreate);
+		strlcpy(newVarName, Context, 7);
 	}
-}
-
-void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
-{
-	char newVarName[8];
-	const char *poi;
-
-	poi = &VarName[6];
-	//some HoW triggers use a : to separate the scope from the variable name
-	if (*poi==':') {
-		poi++;
-	}
-
-	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s\", %d)", VarName, value);
-
-	strlcpy( newVarName, VarName, 7 );
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
+	ScriptDebugLog(ID_VARIABLES, "Setting variable(\"%s%s\", %d)", Context, VarName, value);
+	
+	if (strnicmp( newVarName, "MYAREA", 6) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
+	if (strnicmp( newVarName, "LOCALS", 6) == 0) {
 		Sender->locals->SetAt( poi, value, NoCreate );
 		return;
 	}
 	Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
+	if (HasKaputz && !strnicmp(newVarName, "KAPUTZ", 6)) {
+		// FIXME?: NoCreate used to ony be passed when Context was null
+		// It was changed during consolidation because I couldnt think of why that difference was purposeful
+		// it felt like a bug, but thats only a hunch
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (stricmp(newVarName,"GLOBAL") ) {
+	if (strnicmp(newVarName, "GLOBAL", 6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
 		} else if (core->InDebugMode(ID_VARIABLES)) {
-			Log(WARNING, "GameScript", "Invalid variable %s in setvariable",
-				VarName);
+			Log(WARNING, "GameScript", "Invalid variable %s %s in setvariable",
+				Context, VarName);
 		}
 	} else {
 		game->locals->SetAt(poi, value, NoCreate);
 	}
 }
 
-ieDword CheckVariable(const Scriptable *Sender, const char *VarName, bool *valid)
-{
-	char newVarName[8];
-	const char *poi;
-	ieDword value = 0;
-
-	strlcpy( newVarName, VarName, 7 );
-	poi = &VarName[6];
-	//some HoW triggers use a : to separate the scope from the variable name
-	if (*poi==':') {
-		poi++;
-	}
-
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
-		Sender->GetCurrentArea()->locals->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		Sender->locals->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	const Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
-		game->kaputz->Lookup( poi, value );
-		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-		return value;
-	}
-	if (stricmp(newVarName,"GLOBAL") ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			map->locals->Lookup( poi, value);
-		} else {
-			if (valid) {
-				*valid=false;
-			}
-			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s in CheckVariable", VarName);
-		}
-	} else {
-		game->locals->Lookup( poi, value );
-	}
-	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s: %d", VarName, value);
-	return value;
-}
-
 ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context, bool *valid)
 {
 	char newVarName[8];
+	const char *poi = VarName;
 	ieDword value = 0;
 
-	strlcpy(newVarName, Context, 7);
-	if (stricmp( newVarName, "MYAREA" ) == 0) {
-		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
+	if (Context == nullptr) {
+		strlcpy(newVarName, VarName, 7);
+		poi = &VarName[6];
+		//some HoW triggers use a : to separate the scope from the variable name
+		if (*poi==':') {
+			poi++;
+		}
+	} else {
+		strlcpy(newVarName, Context, 7);
+	}
+	
+	if (stricmp(newVarName, "MYAREA") == 0) {
+		Sender->GetCurrentArea()->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
+	
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		if (!Sender->locals->Lookup(VarName, value)) {
-			if (valid) {
-				*valid = false;
-			}
+		if (!Sender->locals->Lookup(poi, value)) {
+			*valid = false;
 		}
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
+	
 	const Game *game = core->GetGame();
-	if (HasKaputz && !stricmp(newVarName,"KAPUTZ") ) {
-		game->kaputz->Lookup( VarName, value );
+	if (HasKaputz && !stricmp(newVarName,"KAPUTZ")) {
+		game->kaputz->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
+	
 	if (stricmp(newVarName,"GLOBAL") ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->locals->Lookup( VarName, value);
+			map->locals->Lookup(poi, value);
 		} else {
-			if (valid) {
-				*valid=false;
-			}
+			*valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s %s in checkvariable", Context, VarName);
 		}
 	} else {
-		game->locals->Lookup( VarName, value );
+		game->locals->Lookup(poi, value);
 	}
 	ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 	return value;
@@ -2607,7 +2543,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	for(i=0;i<99;i++) {
 		snprintf(varname,32, "wishpower%02d", i);
 		if(CheckVariable(Sender, varname, "GLOBAL") ) {
-			SetVariable(Sender, varname, "GLOBAL", 0);
+			SetVariable(Sender, varname, 0, "GLOBAL");
 		}
 	}
 
@@ -2636,7 +2572,7 @@ retry:
 			continue;
 		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );
 		snprintf(varname,32,"wishpower%02d", spnum);
-		SetVariable(Sender, varname, "GLOBAL",1);
+		SetVariable(Sender, varname, 1, "GLOBAL");
 	}
 	free(selects);
 }
