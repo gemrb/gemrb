@@ -167,7 +167,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 }
 
 template<SHADER SHADE = SHADER::NONE>
-void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
+void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
 	assert(clip.y >= 0 && clip.h <= dst->h);
@@ -219,7 +219,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 }
 
 template<SHADER SHADE = SHADER::NONE>
-inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
+inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
 	assert(clip.y >= 0 && clip.h <= dst->h);

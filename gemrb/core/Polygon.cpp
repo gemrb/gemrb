@@ -221,8 +221,8 @@ static bool intersectSegments(const Point& a, const Point& b, const Point& c, co
 	int64_t A1 = area2(c, d, a);
 	int64_t A2 = area2(d, c, b);
 
-	s.x = (short) ((b.x*A1 + a.x*A2) / (A1 + A2));
-	s.y = (short) ((b.y*A1 + a.y*A2) / (A1 + A2));
+	s.x = ((b.x*A1 + a.x*A2) / (A1 + A2));
+	s.y = ((b.y*A1 + a.y*A2) / (A1 + A2));
 
 	return true;
 }
@@ -436,7 +436,7 @@ bool Wall_Polygon::PointBehind(const Point &p) const
 
 bool Wall_Polygon::PointBehind(int tx, int ty) const
 {
-	Point p((short) tx, (short) ty);
+	Point p(tx, ty);
 	return PointBehind(p);
 }
 

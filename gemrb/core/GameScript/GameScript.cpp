@@ -1994,7 +1994,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 	Trigger* tR = new Trigger();
 	//this exists only in PST?
 	if (HasTriggerPoint) {
-		sscanf( line, "%hu %d %d %d %d [%hd,%hd] \"%[^\"]\" \"%[^\"]\" OB",
+		sscanf( line, "%hu %d %d %d %d [%d,%d] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
 			&tR->pointParameter.y, tR->string0Parameter, tR->string1Parameter );
@@ -2257,7 +2257,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 				stream->ReadLine( line, 1024 );
 		}
 		stream->ReadLine( line, 1024 );
-		sscanf( line, "%d %hd %hd %d %d\"%[^\"]\" \"%[^\"]\" AC",
+		sscanf( line, "%d %d %d %d %d\"%[^\"]\" \"%[^\"]\" AC",
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
