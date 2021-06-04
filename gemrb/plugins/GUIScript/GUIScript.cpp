@@ -4276,7 +4276,7 @@ static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 		}
 	} // else GLOBAL, area name or KAPUTZ
 
-	SetVariable(Sender, Variable, Context, (ieDword) Value);
+	SetVariable(Sender, Variable, Value, Context);
 	Py_RETURN_NONE;
 }
 

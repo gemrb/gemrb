@@ -126,7 +126,7 @@ void GameScript::NoAction(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::SG(Scriptable* Sender, Action* parameters)
 {
-	SetVariable( Sender, parameters->string0Parameter, "GLOBAL", parameters->int0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter, "GLOBAL");
 }
 
 void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
@@ -262,7 +262,7 @@ void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 {
-	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
+	SetVariable(Sender, "APPEARANCE", parameters->int0Parameter, "GLOBAL");
 	core->SetEventFlag(EF_UPDATEANIM);
 }
 
@@ -3327,7 +3327,7 @@ void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 {
 	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, "GLOBAL");
 	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter, "GLOBAL");
-	SetVariable( Sender, parameters->string0Parameter, "GLOBAL", value1 + value2 );
+	SetVariable( Sender, parameters->string0Parameter, value1 + value2, "GLOBAL");
 }
 
 /* adding the second variable to the first, they could be area or locals */
@@ -5665,7 +5665,7 @@ void GameScript::SetMazeEasier(Scriptable* Sender, Action* /*parameters*/)
 {
 	int value = CheckVariable( Sender, "MAZEDIFFICULTY","GLOBAL");
 	if (value>0) {
-		SetVariable(Sender, "MAZEDIFFICULTY", "GLOBAL", value-1);
+		SetVariable(Sender, "MAZEDIFFICULTY", value-1, "GLOBAL");
 	}
 }
 
@@ -5673,7 +5673,7 @@ void GameScript::SetMazeHarder(Scriptable* Sender, Action* /*parameters*/)
 {
 	int value = CheckVariable( Sender, "MAZEDIFFICULTY","GLOBAL");
 	if (value<2) {
-		SetVariable(Sender, "MAZEDIFFICULTY", "GLOBAL", value+1);
+		SetVariable(Sender, "MAZEDIFFICULTY", value+1, "GLOBAL");
 	}
 }
 
@@ -5686,7 +5686,7 @@ void GameScript::FixEngineRoom(Scriptable* Sender, Action* /*parameters*/)
 {
 	int value = CheckVariable( Sender, "EnginInMaze","GLOBAL");
 	if (value) {
-		SetVariable(Sender, "EnginInMaze", "GLOBAL", 0);
+		SetVariable(Sender, "EnginInMaze", 0, "GLOBAL");
 		//this works only because the engine room exit depends only on the EnginInMaze variable
 		ScriptEngine *sE = core->GetGUIScriptEngine();
 		sE->RunFunction("Maze", "CustomizeArea");
@@ -7056,7 +7056,7 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
-	SetVariable( Sender, variable, "GLOBAL", value );
+	SetVariable(Sender, variable, value, "GLOBAL");
 }
 
 //this action uses the sceffect.ids (which should be covered by our cgtable.2da)
