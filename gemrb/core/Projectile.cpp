@@ -433,7 +433,7 @@ void Projectile::Setup()
 	}
 	phase = P_TRAVEL;
 	travel_handle = core->GetAudioDrv()->Play(FiringSound, SFX_CHAN_MISSILE,
-				Pos.x, Pos.y, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
+				Pos, (SFlags & PSF_LOOPING ? GEM_SND_LOOPING : 0));
 
 	//create more projectiles
 	if(ExtFlags&PEF_ITERATION) {
@@ -656,7 +656,7 @@ void Projectile::UpdateSound()
 	}
 	if (!travel_handle || !travel_handle->Playing()) {
 		travel_handle = core->GetAudioDrv()->Play(ArrivalSound, SFX_CHAN_MISSILE,
-				Pos.x, Pos.y, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
+				Pos, (SFlags & PSF_LOOPING2 ? GEM_SND_LOOPING : 0));
 		SFlags|=PSF_SOUND2;
 	}
 }
@@ -885,7 +885,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	Pos.x=step->x;
 	Pos.y=step->y;
 	if (travel_handle) {
-		travel_handle->SetPos(Pos.x, Pos.y);
+		travel_handle->SetPos(Pos);
 	}
 	if (!step->Next) {
 		ClearPath();
@@ -1496,7 +1496,7 @@ void Projectile::DrawExplosion(const Region& vp)
 	
 	//draw it only once, at the time of explosion
 	if (phase==P_EXPLODING1) {
-		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->SoundRes, SFX_CHAN_MISSILE, Pos);
 		//play VVC in center
 		//FIXME: make it possible to play VEF too?
 		if (aoeflags&PAF_VVC) {
@@ -1537,7 +1537,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		
 		phase=P_EXPLODING2;
 	} else {
-		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos.x, Pos.y);
+		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos);
 	}
 	
 	//the spreading animation is in the first column

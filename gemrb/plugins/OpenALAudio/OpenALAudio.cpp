@@ -68,11 +68,11 @@ static void showALCError(const char* msg, log_level level, ALCdevice *device) {
 	}
 }
 
-void OpenALSoundHandle::SetPos(int XPos, int YPos) {
+void OpenALSoundHandle::SetPos(const Point& p) {
 	if (!parent) return;
 
 	ALfloat SourcePos[] = {
-		(float) XPos, (float) YPos, 0.0f
+		float(p.x), float(p.y), 0.0f
 	};
 
 	alSourcefv(parent->Source, AL_POSITION, SourcePos);
@@ -438,7 +438,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	return Buffer;
 }
 
-Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, int XPos, int YPos,
+Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, const Point& p,
 	unsigned int flags, unsigned int *length)
 {
 	ALuint Buffer;
@@ -464,7 +464,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 	}
 
 	ALfloat SourcePos[] = {
-		(float) XPos, (float) YPos, 0.0f
+		float(p.x), float(p.y), 0.0f
 	};
 	ALfloat SourceVel[] = {
 		0.0f, 0.0f, 0.0f
@@ -534,7 +534,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 	ieDword efxSetting;
 	core->GetDictionary()->Lookup("Environmental Audio", efxSetting);
 
-	if (efxSetting && hasReverbProperties && ((0 != XPos && 0 != YPos) || (flags & GEM_SND_RELATIVE))) {
+	if (efxSetting && hasReverbProperties && (!p.isnull() || (flags & GEM_SND_RELATIVE))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
 	} else {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);
@@ -696,19 +696,18 @@ int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
 	return 0;
 }
 
-void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
+void OpenALAudioDriver::UpdateListenerPos(const Point& p)
 {
-	alListener3f( AL_POSITION, (float) XPos, (float) YPos, LISTENER_HEIGHT );
+	alListener3f(AL_POSITION, p.x, p.y, LISTENER_HEIGHT);
 	checkALError("Unable to update listener position.", WARNING);
 }
 
-void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
+Point OpenALAudioDriver::GetListenerPos()
 {
 	ALfloat listen[3];
 	alGetListenerfv( AL_POSITION, listen );
-	if (checkALError("Unable to get listener pos", ERROR)) return;
-	XPos = (int) listen[0];
-	YPos = (int) listen[1];
+	if (checkALError("Unable to get listener pos", ERROR)) return {};
+	return Point(listen[0], listen[1]);
 }
 
 bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)

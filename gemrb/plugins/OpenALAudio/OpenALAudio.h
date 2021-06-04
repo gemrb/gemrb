@@ -64,7 +64,7 @@ protected:
 public:
 	OpenALSoundHandle(AudioStream *p) : parent(p) { }
 	~OpenALSoundHandle() override { }
-	void SetPos(int XPos, int YPos) override;
+	void SetPos(const Point&) override;
 	bool Playing() override;
 	void Stop() override;
 	void StopLooping() override;
@@ -101,7 +101,7 @@ public:
 	void PrintDeviceList();
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-					int XPos, int YPos, unsigned int flags = 0,
+					const Point&, unsigned int flags = 0,
 					unsigned int *length = 0) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
@@ -111,8 +111,8 @@ public:
 	bool Pause() override;
 	bool Resume() override;
 	int CreateStream(Holder<SoundMgr>) override;
-	void UpdateListenerPos(int XPos, int YPos ) override;
-	void GetListenerPos( int &XPos, int &YPos ) override;
+	void UpdateListenerPos(const Point&) override;
+	Point GetListenerPos() override;
 	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
 					ieWord gain, bool point, int ambientRange) override;

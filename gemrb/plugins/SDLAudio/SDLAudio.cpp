@@ -44,15 +44,13 @@ static void SetChannelPosition(int listenerXPos, int listenerYPos, int XPos, int
 	Mix_SetPosition(channel, angle, distance);
 }
 
-void SDLAudioSoundHandle::SetPos(int XPos, int YPos)
+void SDLAudioSoundHandle::SetPos(const Point& p)
 {
 	if (sndRelative)
 		return;
 
-	int listenerXPos = 0;
-	int listenerYPos = 0;
-	core->GetAudioDrv()->GetListenerPos(listenerXPos, listenerYPos);
-	SetChannelPosition(listenerXPos, listenerYPos, XPos, YPos, chunkChannel);
+	Point pos = core->GetAudioDrv()->GetListenerPos();
+	SetChannelPosition(pos.x, pos.y, p.x, p.y, chunkChannel);
 }
 
 bool SDLAudioSoundHandle::Playing()
@@ -290,7 +288,7 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 }
 
 Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
-	int XPos, int YPos, unsigned int flags, unsigned int *length)
+	const Point& p, unsigned int flags, unsigned int *length)
 {
 	Mix_Chunk *chunk;
 	unsigned int time_length;
@@ -336,7 +334,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	}
 
 	if (!(flags & GEM_SND_RELATIVE)) {
-		SetChannelPosition(listenerPos.x, listenerPos.y, XPos, YPos, chan);
+		SetChannelPosition(listenerPos.x, listenerPos.y, p.x, p.y, chan);
 	}
 
 	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
@@ -382,16 +380,14 @@ bool SDLAudio::CanPlay()
 	return true;
 }
 
-void SDLAudio::UpdateListenerPos(int x, int y)
+void SDLAudio::UpdateListenerPos(const Point& p)
 {
-	listenerPos.x = x;
-	listenerPos.y = y;
+	listenerPos = p;
 }
 
-void SDLAudio::GetListenerPos(int& x, int& y)
+Point SDLAudio::GetListenerPos()
 {
-	x = listenerPos.x;
-	y = listenerPos.y;
+	return listenerPos;
 }
 
 void SDLAudio::buffer_callback(void *udata, uint8_t *stream, int len)

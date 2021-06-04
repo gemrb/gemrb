@@ -4042,7 +4042,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
 		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
 	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
-	core->GetAudioDrv()->Play(Sound, channel, 0, 0, GEM_SND_RELATIVE|GEM_SND_SPEECH);
+	core->GetAudioDrv()->Play(Sound, channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;
 }
 
@@ -4074,8 +4074,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char *ResRef;
 	char *channel_name = NULL;
-	int xpos = 0;
-	int ypos = 0;
+	Point pos;
 	unsigned int flags = GEM_SND_RELATIVE;
 	unsigned int channel = SFX_CHAN_GUI;
 	int index;
@@ -4087,7 +4086,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		core->PlaySound(index, channel);
 	} else {
 		PyErr_Clear(); //clearing the exception
-		if (!PyArg_ParseTuple(args, "z|ziii", &ResRef, &channel_name, &xpos, &ypos, &flags)) {
+		if (!PyArg_ParseTuple(args, "z|ziii", &ResRef, &channel_name, &pos.x, &pos.y, &flags)) {
 			return AttributeError( GemRB_PlaySound__doc );
 		}
 
@@ -4095,7 +4094,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 			channel = core->GetAudioDrv()->GetChannel(channel_name);
 		}
 
-		core->GetAudioDrv()->Play(ResRef, channel, xpos, ypos, flags);
+		core->GetAudioDrv()->Play(ResRef, channel, pos, flags);
 	}
 
 	Py_RETURN_NONE;
@@ -7726,7 +7725,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			gamedata->FreeItem(item, itemResRef, 0);
 			if (Sound2[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
-				core->GetAudioDrv()->Play(Sound2, SFX_CHAN_GUI, 0, 0, GEM_SND_SPEECH|GEM_SND_RELATIVE);
+				core->GetAudioDrv()->Play(Sound2, SFX_CHAN_GUI, Point(), GEM_SND_SPEECH|GEM_SND_RELATIVE);
 			}
 		}
 		res = ASI_SUCCESS;
