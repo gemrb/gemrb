@@ -519,7 +519,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
-		core->GetAudioDrv()->Play(Sound, channel, pos.x, pos.y, speech, &len);
+		core->GetAudioDrv()->Play(Sound, channel, pos, speech, &len);
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
@@ -1503,7 +1503,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 				if (!actor->InParty) {
 					ieResRef sound;
 					actor->GetSoundFromFile(sound, 200);
-					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos.x, actor->Pos.y);
+					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
 				}
 			}
 			//display attack message

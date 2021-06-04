@@ -1663,12 +1663,12 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 
 void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 {
+	Point half(frame.w / 2, frame.h / 2);
 	if (center) {
-		p.x -= frame.w / 2;
-		p.y -= frame.h / 2;
+		p -= half;
 	}
 	
-	core->GetAudioDrv()->UpdateListenerPos(p.x + frame.w / 2, p.y + frame.h / 2);
+	core->GetAudioDrv()->UpdateListenerPos(p + half);
 	vpOrigin = p;
 }
 

@@ -79,7 +79,6 @@ public:
 	using Gem_Polygon::Gem_Polygon;
 	//is the point above the baseline
 	bool PointBehind(const Point &p) const;
-	bool PointBehind(int x, int y) const;
 	ieDword GetPolygonFlag() const { return wall_flag; }
 	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
 	void SetBaseline(const Point &a, const Point &b);

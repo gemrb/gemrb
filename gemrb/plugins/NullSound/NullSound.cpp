@@ -27,8 +27,6 @@ using namespace GemRB;
 
 NullSound::NullSound(void)
 {
-	XPos = 0;
-	YPos = 0;
 	ambim = new AmbientMgr();
 }
 
@@ -42,7 +40,7 @@ bool NullSound::Init(void)
 	return true;
 }
 
-Holder<SoundHandle> NullSound::Play(const char*, unsigned int, int, int, unsigned int, unsigned int *len)
+Holder<SoundHandle> NullSound::Play(const char*, unsigned int, const Point&, unsigned int, unsigned int *len)
 {
 	if (len) *len = 1000; //Returning 1 Second Length
 	return Holder<SoundHandle>();
@@ -82,16 +80,14 @@ bool NullSound::CanPlay()
 	return false;
 }
 
-void NullSound::UpdateListenerPos(int x, int y)
+void NullSound::UpdateListenerPos(const Point& p)
 {
-	XPos = x;
-	YPos = y;
+	pos = p;
 }
 
-void NullSound::GetListenerPos(int& x, int& y)
+Point NullSound::GetListenerPos()
 {
-	x = XPos;
-	y = YPos;
+	return pos;
 }
 
 int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, int)

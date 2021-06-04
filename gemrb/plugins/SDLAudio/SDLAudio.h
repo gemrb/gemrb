@@ -40,7 +40,7 @@ class SDLAudioSoundHandle : public SoundHandle
 public:
 	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
 	virtual ~SDLAudioSoundHandle() { }
-	virtual void SetPos(int XPos, int YPos);
+	virtual void SetPos(const Point&);
 	virtual bool Playing();
 	virtual void Stop();
 	virtual void StopLooping();
@@ -67,7 +67,7 @@ public:
 	~SDLAudio(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-		int XPos, int YPos, unsigned int flags = 0, unsigned int *length = 0) override;
+		const Point&, unsigned int flags = 0, unsigned int *length = 0) override;
 	int CreateStream(Holder<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
@@ -75,8 +75,8 @@ public:
 	bool Resume() override { return true; } /*not implemented*/
 	bool CanPlay() override;
 	void ResetMusics() override;
-	void UpdateListenerPos(int XPos, int YPos) override;
-	void GetListenerPos(int& XPos, int& YPos) override;
+	void UpdateListenerPos(const Point&) override;
+	Point GetListenerPos() override;
 	void UpdateVolume(unsigned int) override {}
 
 	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;

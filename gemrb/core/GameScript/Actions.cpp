@@ -1926,21 +1926,20 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CHAR0, Sender->Pos.x,
-				Sender->Pos.y, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CHAR0, Sender->Pos, parameters->int0Parameter ? GEM_SND_SPEECH : 0);
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS,
-		parameters->pointParameter.x, parameters->pointParameter.y);
+		parameters->pointParameter);
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	Log(MESSAGE, "Actions", "PlaySound(%s)", parameters->string0Parameter);
-	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, 0, 0, GEM_SND_RELATIVE);
+	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_ACTIONS, Point(), GEM_SND_RELATIVE);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -7076,7 +7075,7 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	}
 
 	core->GetAudioDrv()->Play(parameters->string0Parameter, SFX_CHAN_CASTING,
-				Sender->Pos.x, Sender->Pos.y, 0);
+				Sender->Pos, 0);
 
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;

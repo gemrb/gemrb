@@ -453,7 +453,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 	if (type & 2 && flags & IE_STR_SOUND && SoundResRef[0] != 0) {
 		// GEM_SND_SPEECH will stop the previous sound source
 		unsigned int flag = GEM_SND_RELATIVE | (flags & (GEM_SND_SPEECH | GEM_SND_QUEUE));
-		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, 0, 0, flag);
+		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
 	}
 	if (flags & IE_STR_STRREFON) {
 		char* string2 = ( char* ) malloc( Length + 13 );

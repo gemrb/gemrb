@@ -592,18 +592,19 @@ void ScriptedAnimation::UpdateSound()
 		return;
 	}
 
+	Point soundpos(Pos.x + XOffset, Pos.y + YOffset);
 	if (!sound_handle || !sound_handle->Playing()) {
 		while (SoundPhase <= P_RELEASE && sounds[SoundPhase][0] == 0) {
 			SoundPhase++;
 		}
 
 		if (SoundPhase <= P_RELEASE) {
-			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, Pos.x + XOffset, Pos.y + YOffset,
+			sound_handle = core->GetAudioDrv()->Play(sounds[SoundPhase], SFX_CHAN_HITS, soundpos,
 						   (SoundPhase == P_HOLD && (SequenceFlags & IE_VVC_LOOP)) ? GEM_SND_LOOPING : 0);
 			SoundPhase++;
 		}
 	} else {
-		sound_handle->SetPos(Pos.x + XOffset, Pos.y + YOffset);
+		sound_handle->SetPos(soundpos);
 	}
 }
 
