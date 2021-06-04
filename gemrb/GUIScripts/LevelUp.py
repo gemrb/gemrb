@@ -89,6 +89,8 @@ def OpenLevelUpWindow():
 	DoneButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, LevelUpDonePress)
 	DoneButton.SetState (IE_GUI_BUTTON_DISABLED)
 	DoneButton.MakeDefault()
+	# also disable closing by ESC, so we don't stack upgrades
+	DoneButton.MakeEscape ()
 
 	# name
 	pc = GemRB.GameGetSelectedPCSingle ()
