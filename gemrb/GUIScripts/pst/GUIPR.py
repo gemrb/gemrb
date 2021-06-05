@@ -51,6 +51,7 @@ def InitPriestWindow (Window):
 		Icon = Window.GetControl (2 + i)
 		color = {'r' : 0, 'g' : 0, 'b' :0, 'a' : 160}
 		Icon.SetBorder (0,  color,  0, 1)
+		Icon.SetVarAssoc ("SpellButton", i)
 
 	return
 
@@ -94,7 +95,6 @@ def UpdatePriestWindow (Window=None):
 			spell = GemRB.GetSpell (ms['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
 			PriestMemorizedSpellList.append (ms['SpellResRef'])
-			Icon.SetVarAssoc ("SpellButton", i)
 			Icon.EnableBorder (0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
