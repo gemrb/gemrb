@@ -79,9 +79,9 @@ def InitInventoryWindow (Window):
 
 	#encumbrance
 	Button = Window.GetControl (67)
-	Label = Button.CreateLabel (0x10000043, "NUMBER", "0:",
+	Button.CreateLabel (0x10000043, "NUMBER", "0:",
 		IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP|IE_FONT_SINGLE_LINE)
-	Label = Button.CreateLabel (0x10000044, "NUMBER", "0:",
+	Button.CreateLabel (0x10000044, "NUMBER", "0:",
 		IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM|IE_FONT_SINGLE_LINE)
 
 	# armor class

@@ -435,7 +435,7 @@ def SetCharacterDescription():
 		TextArea.Append (1048)
 		TextArea.Append (": ")
 		Race = GemRB.GetPlayerStat (MyChar, IE_RACE)
-		Race = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE) )
+		Race = CommonTables.Races.FindValue (3, Race)
 		TextArea.Append (CommonTables.Races.GetValue (Race, 2) )
 		TextArea.Append ("\n")
 	if CharGenState > 3:

@@ -593,7 +593,6 @@ def UpdateSlot (pc, slot):
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
 		itemname = drag_item["ItemResRef"]
-		drag_item = GemRB.GetItem (itemname)
 	else:
 		itemname = ""
 

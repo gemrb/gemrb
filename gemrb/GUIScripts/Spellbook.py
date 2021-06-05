@@ -363,7 +363,6 @@ def GetIWD2Spells (kit, usability, level, baseClass = -1):
 
 def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 	MageSpells = []
-	SpellType = 99
 	v = CommonTables.Aligns.FindValue (3, Alignment)
 	Usability = Kit | CommonTables.Aligns.GetValue(v, 5)
 	WildMages = True
@@ -378,18 +377,17 @@ def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 		if ms == None:
 			continue
 
+		SpellType = 1
 		if Usability & ms['SpellExclusion']:
 			SpellType = 0
-		else:
-			SpellType = 1
-			if Kit & (1 << ms['SpellSchool']+5): # of matching specialist school
-				SpellType = 2
-			# Wild mage spells are of normal schools, so we have to find them
-			# separately. Generalists can learn any spell but the wild ones, so
-			# we check if the mage is wild and if a generalist wouldn't be able
-			# to learn the spell.
-			if WildMages and Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
-				SpellType = 2
+		elif Kit & (1 << ms['SpellSchool'] + 5): # of matching specialist school
+			SpellType = 2
+		# Wild mage spells are of normal schools, so we have to find them
+		# separately. Generalists can learn any spell but the wild ones, so
+		# we check if the mage is wild and if a generalist wouldn't be able
+		# to learn the spell.
+		elif WildMages and Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
+			SpellType = 2
 		MageSpells.append ([SpellName, SpellType])
 
 	return MageSpells

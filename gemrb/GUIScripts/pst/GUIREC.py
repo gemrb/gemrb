@@ -888,7 +888,6 @@ def OpenLevelUpWindow ():
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AcceptLevelUp)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	Class = CommonTables.Classes.GetRowName (GemRB.GetPlayerStat (pc, IE_CLASS) - 1)
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")

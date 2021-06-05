@@ -128,7 +128,6 @@ def OpenVideoOptionsWindow ():
 	"""Open video options window"""
 	global SubOptionsWindow, HelpTextArea
 
-	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
@@ -194,7 +193,6 @@ def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
 	global SubOptionsWindow, HelpTextArea
 
-	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (7, "GUIOPT")
@@ -236,7 +234,6 @@ def OpenCharacterSoundsWindow ():
 
 	global SubSubOptionsWindow, HelpTextArea2
 
-	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (12, "GUIOPT")
@@ -280,7 +277,6 @@ def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global SubOptionsWindow, HelpTextArea
 
-	Window = SubOptionsWindow
 	CloseSubOptionsWindow ()
 
 	#gameplayoptions
@@ -340,7 +336,6 @@ def OpenFeedbackOptionsWindow ():
 
 	global SubSubOptionsWindow, HelpTextArea2
 
-	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (9, "GUIOPT")
@@ -390,7 +385,6 @@ def OpenAutopauseOptionsWindow ():
 
 	global SubSubOptionsWindow, HelpTextArea2
 
-	Window = SubSubOptionsWindow
 	CloseSubSubOptionsWindow ()
 
 	Window = GemRB.LoadWindow (10, "GUIOPT")

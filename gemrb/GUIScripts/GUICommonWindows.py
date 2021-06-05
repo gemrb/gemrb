@@ -141,10 +141,11 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 	if iwd2: # IWD2 has one spellbook to rule them all
 		ActionBarControlOffset = 6 #portrait and action window were merged
 
-		Button = InitOptionButton(Window, MageSpellsKey)
+		InitOptionButton(Window, MageSpellsKey)
 
 		# AI
 		Button = InitOptionButton(Window, 'Toggle_AI')
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, AIPress)
 		AIPress (0) #this initialises the state and tooltip
 
 		# Select All
@@ -1486,7 +1487,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 		return pairs
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
-		Mode = "horizontal"
+		# set Mode = "horizontal" once we can create enough space
 		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
 		return pairs
 
@@ -1627,7 +1628,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 		Button = Window.GetControl (6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
 		Button.SetSprites ("GUIBTACT", 0, 46, 47, 48, 49)
-		Button = InitOptionButton(Window, 'Toggle_AI', AIPress)
+		InitOptionButton(Window, 'Toggle_AI', AIPress)
 		AIPress(0) #this initialises the state and tooltip
 
 		#Select All
