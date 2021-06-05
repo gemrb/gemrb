@@ -174,9 +174,9 @@ if (boolean) { \
 }
 
 static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
-    if (!obj || obj == Py_None) {
-        return NULL;
-    }
+	if (!obj || obj == Py_None) {
+		return NULL;
+	}
 
 	PyObject* attr = PyObject_GetAttrString(obj, "ID");
 	if (!attr) {
@@ -1221,7 +1221,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 		} else if (oldwin == NULL || id != ScriptingId(-1)) {
 			// create a new reference and return it
 			ScriptingId sid = (id == ScriptingId(-1)) ? cref->Id : id;
-            const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
+			const ControlScriptingRef* newref = RegisterScriptableControl(static_cast<Control*>(subView), sid);
 			return ConstructObjectForScriptableView(newref);
 		} else {
 			// return the ref we already have
@@ -1770,11 +1770,11 @@ static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 {
 	uint32_t key = -1;
 	PyObject* func = nullptr;
-    PARSE_ARGS(args, "OOk", &self, &func, &key);
-	
+	PARSE_ARGS(args, "OOk", &self, &func, &key);
+
 	Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
-	
+
 	Window::WindowEventHandler handler = nullptr;
 	if (PyCallable_Check(func)) {
 		handler = PythonWindowCallback(func);
@@ -1817,10 +1817,10 @@ The above example sets up the 'YesButton' function from the Buttons module to be
 
 static PyObject* GemRB_Control_SetAction(PyObject* self, PyObject* args)
 {
-    Control::Action type = Control::Click;
-    EventButton button = 0;
-    Event::EventMods mod = 0;
-    short count = 0;
+	Control::Action type = Control::Click;
+	EventButton button = 0;
+	Event::EventMods mod = 0;
+	short count = 0;
 	PyObject* func = NULL;
 	PARSE_ARGS(args, "OOi|bhh", &self, &func, &type, &button, &mod, &count);
 
@@ -7767,11 +7767,11 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 				return RuntimeError("Bag item not found!");
 			}
 			si->Flags ^= IE_INV_ITEM_SELECTED;
-                        if (si->Flags & IE_INV_ITEM_SELECTED) {
-                                si->PurchasedAmount=1;
-                        } else {
-                                si->PurchasedAmount=0;
-                        }
+			if (si->Flags & IE_INV_ITEM_SELECTED) {
+				si->PurchasedAmount = 1;
+			} else {
+				si->PurchasedAmount = 0;
+			}
 		}
 		res = ASI_SUCCESS;
 		break;
