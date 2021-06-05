@@ -1,0 +1,11 @@
+IF
+	Entered([ANYONE])
+THEN
+	RESPONSE #100
+		CutSceneId(Player1)
+		SetGlobal("completed","GLOBAL",1)
+		IncrementChapter("")
+		Wait(1)
+		EndCredits()
+		EndCutSceneMode()
+END

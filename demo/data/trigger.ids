@@ -1,4 +1,5 @@
 0x0036 OnCreation()
+0x004C Entered(O:Object*)
 0x400F Global(S:Name*,S:Area*,I:Value*)
 0x401C See(O:Object*)
 0x4023 True()

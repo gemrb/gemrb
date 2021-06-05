@@ -26,6 +26,7 @@
 161 IncrementChapter(S:RESREF*)
 177 TriggerActivation(O:Object*,I:State*Boolean)
 178 BreakInstants()
+186 EndCredits()
 200 RandomWalkContinuous()
 248 RunToPoint(P:Point*)
 254 ScreenShake(P:Point*,I:Duration*)

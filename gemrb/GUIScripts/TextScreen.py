@@ -45,7 +45,7 @@ def StartTextScreen ():
 	global TextScreen, TextArea, TableName, Row
 
 	# for easier development
-	if GameCheck.IsGemRBDemo () and GemRB.GetVar ("SkipIntroVideos"):
+	if GameCheck.IsGemRBDemo () and GemRB.GetVar ("SkipIntroVideos") and not GemRB.GetGameVar ("completed"):
 		GemRB.GamePause (0, 3)
 		return
 
