@@ -11,7 +11,7 @@ def OnLoad():
 	consoleWin.SetFlags(IE_GUI_VIEW_INVISIBLE | WF_BORDERLESS | WF_ALPHA_CHANNEL, OP_OR)
 	consoleWin.SetFlags(WF_DESTROY_ON_CLOSE, OP_NAND);
 	consoleWin.AddAlias("WIN_CON")
-	consoleWin.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})
+	consoleWin.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 200})
 	
 	histLabel = consoleWin.GetControl(2)
 	histLabel.SetText ("History:")
@@ -26,7 +26,7 @@ def OnLoad():
 	consoleOut = consoleWin.GetControl(1)
 	consoleOut.SetFlags (IE_GUI_TEXTAREA_AUTOSCROLL)
 	consoleOut.AddAlias("CONSOLE", 1);
-	consoleOut.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 128})
+	consoleOut.SetBackground({'r' : 0, 'g' : 0, 'b' : 0, 'a' : 200})
 	
 def ToggleConsole():
 	consoleWin = GemRB.GetView("WIN_CON")
