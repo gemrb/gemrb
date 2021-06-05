@@ -1231,6 +1231,7 @@ int Interface::Init(InterfaceConfig* config)
 	CONFIG_PATH("GamePath", GamePath, ".");
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout
 	char testPath[_MAX_PATH];
+	bool gameFound = true;
 	if (!PathJoin(testPath, GamePath, "chitin.key", nullptr)) {
 		Log(WARNING, "Interface", "Invalid GamePath detected, guessing from the current dir!");
 		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
@@ -1238,6 +1239,22 @@ int Interface::Init(InterfaceConfig* config)
 		} else {
 			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
 				strlcpy(GamePath, "../..", sizeof(GamePath));
+			} else {
+				gameFound = false;
+			}
+		}
+	}
+	// if nothing was found still, check for the internal demo
+	// it's generic, but not likely to work outside of AppImages and maybe apple bundles
+	if (!gameFound) {
+		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
+		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
+			PathJoin(GamePath, "..", "demo", nullptr);
+			strlcpy(GameType, "demo", sizeof(GameType));
+		} else {
+			if (PathJoin(testPath, GemRBPath, "demo", "chitin.key", nullptr)) {
+				PathJoin(GamePath, GemRBPath, "demo", nullptr);
+				strlcpy(GameType, "demo", sizeof(GameType));
 			}
 		}
 	}
