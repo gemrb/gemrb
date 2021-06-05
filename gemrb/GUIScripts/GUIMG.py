@@ -257,7 +257,7 @@ def OpenMageSpellInfoWindow ():
 	index = GemRB.GetVar ("SpellButton")
 	Button = Window.GetControl (6)
 	if Button:
-		if index < 100:
+		if index < 100 or Sorcerer:
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
