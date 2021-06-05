@@ -66,6 +66,9 @@ def cv(var, context="GLOBAL"):
 def ex(cmd):
 	GemRB.ExecuteString(cmd)
 
+def ev(trigger):
+	GemRB.EvaluateString(trigger)
+
 # the actual function that the GemRB::Console calls
 def Exec(cmd):
 	import sys
