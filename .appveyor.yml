@@ -86,15 +86,15 @@ before_package:
 - ps: |-
     pushd c:\projects\gemrb
 
+    if ($env:APPVEYOR_REPO_TAG) {
+      cmake --build . --target fetch-demo-data
+    }
+
     cmake --build . --target install --config Release
 
     if (-Not $env:APPVEYOR_PULL_REQUEST_NUMBER) {
       popd
       7z a -tzip $env:archive_path $env:archive_source
-    }
-
-    if ($env:APPVEYOR_REPO_TAG) {
-      cmake --build . --target fetch-demo-data
     }
 test_script:
 - cmd: |-
