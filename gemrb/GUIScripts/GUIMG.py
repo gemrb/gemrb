@@ -99,6 +99,7 @@ def InitMageWindow (window):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		Button.SetVarAssoc ("SpellButton", 100 + i)
 
 	UpdateMageWindow (MageWindow)
 	return
@@ -177,7 +178,6 @@ def UpdateMageWindow (MageWindow):
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
 			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
 			MageKnownSpellList.append (ks['SpellResRef'])
-			Button.SetVarAssoc ("SpellButton", 100 + i)
 			spell = GemRB.GetSpell (ks['SpellResRef'])
 			if not spell:
 				print "Missing known spell!", ms['SpellResRef']
