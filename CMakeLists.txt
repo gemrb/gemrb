@@ -173,6 +173,7 @@ else (${LAYOUT} MATCHES "bundle") # Mac or iOS
 	# TODO: these should be copied during build and not install.
 	SET_PATH( PLUGIN_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Plugins" )
 	SET_PATH( DOC_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
+	SET_PATH( DATA_DIR "${BIN_DIR}/${PROJECT_NAME}.app/Contents/Resources" )
 	SET_PATH( LIB_DIR @loader_path/../Frameworks )
 	SET_PATH( METAINFO_DIR "" )
 endif (${LAYOUT} MATCHES "home")
