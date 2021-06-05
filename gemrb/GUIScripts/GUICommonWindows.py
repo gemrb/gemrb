@@ -1728,17 +1728,19 @@ def UpdatePortraitWindow ():
 			UpdateAnimatedPortrait(Window, i)
 			continue
 
-		pic = GemRB.GetPlayerPortrait (pcID, 1)["Sprite"]
+		Portrait = GemRB.GetPlayerPortrait (pcID, 1)
+		pic = Portrait["Sprite"]
+		Hide = False
 		if Inventory and pc != pcID:
-			pic = None
+			Hide = True
 
 		if pic and GemRB.GetPlayerStat(pcID, IE_STATE_ID) & STATE_DEAD:
 			import GUISTORE
 			# dead pcs are hidden in all stores but temples
 			if GUISTORE.StoreWindow and not GUISTORE.StoreHealWindow:
-				pic = None
+				Hide = True
 
-		if not pic:
+		if Hide or (not pic and not Portrait["ResRef"]):
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			Button.SetState (IE_GUI_BUTTON_DISABLED)
 			Button.SetText ("")
