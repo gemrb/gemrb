@@ -293,10 +293,13 @@ class GTextArea(GControl, Scrollable):
 	methods = {
 		'ChapterText': _GemRB.TextArea_SetChapterText,
 		'Append': _GemRB.TextArea_Append,
-		'ListResources': _GemRB.TextArea_ListResources,
 		'SetColor': _GemRB.TextArea_SetColor
 	}
 	__slots__ = ['DefaultText']
+
+	def ListResources(self, what, opts=0):
+		_GemRB.TextArea_SetColor(self, {'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_OPTIONS)
+		return _GemRB.TextArea_ListResources(self, what, opts)
 
 	def Clear(self):
 		self.SetText("")
