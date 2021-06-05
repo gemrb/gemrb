@@ -246,7 +246,6 @@ def RightPress(btn, Abidx):
 	return
 
 def JustPress(btn, Abidx):
-	Abidx = GemRB.GetVar("Ability")
 	CalcLimits(Abidx)
 	GemRB.SetToken("MINIMUM",str(Minimum) )
 	GemRB.SetToken("MAXIMUM",str(Maximum) )

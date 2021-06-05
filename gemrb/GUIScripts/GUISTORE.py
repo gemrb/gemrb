@@ -1968,7 +1968,7 @@ def GulpDrink ():
 	UpdateStoreRumourWindow (Window)
 	return
 
-def RentConfirm (Window):
+def RentConfirm (Window0):
 	RentIndex = GemRB.GetVar ("RentIndex")
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()

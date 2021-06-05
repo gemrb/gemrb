@@ -147,21 +147,21 @@ class GView:
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
 
-	def CreateControl(self, id, type, x, y, w, h, *args): # backwards compatibility
+	def CreateControl(self, newID, type, x, y, w, h, *args): # backwards compatibility
 		frame = {"x" : x, "y" : y, "w" : w, "h" : h}
-		return self.CreateSubview(id, type, frame, *args)
+		return self.CreateSubview(newID, type, frame, *args)
 
 	def ReplaceSubview(self, subview, ctype, *args):
 		if isinstance(subview, int):
 			subview = self.GetControl (subview)
-		id = subview.ID & 0x00000000ffffffff
+		newID = subview.ID & 0x00000000ffffffff
 		frame = subview.GetFrame()
 		RemoveView(subview, True)
 
-		return self.CreateSubview(id, ctype, frame, args)
+		return self.CreateSubview(newID, ctype, frame, args)
 
-	def CreateSubview(self, id, type, frame, *args):
-		view = CreateView(id, type, frame, *args) # this will create an entry in the generic 'control' group
+	def CreateSubview(self, newID, type, frame, *args):
+		view = CreateView(newID, type, frame, *args) # this will create an entry in the generic 'control' group
 		created = self.AddSubview(view) # this will move the reference into the our window's group
 		RemoveScriptingRef(view) # destroy the old reference just in case something tries to recycle the id while 'created' is still valid
 		return created
@@ -207,8 +207,8 @@ class GWindow(GView, Scrollable):
 			view = self.GetControl (view)
 		RemoveView (view, True)
 
-	def GetControl(self, id): # backwards compatibility
-		return GetView(self, id)
+	def GetControl(self, newID): # backwards compatibility
+		return GetView(self, newID)
 
 	def AliasControls (self, map):
 		for alias, cid in map.iteritems():
@@ -223,7 +223,7 @@ class GWindow(GView, Scrollable):
 
 	def ReparentSubview(self, view, newparent):
 		# reparenting assumes within the same window
-		id = view.ID & 0x00000000ffffffff
+		newID = view.ID & 0x00000000ffffffff
 		view = self.RemoveSubview(view)
 
 		parentFrame = newparent.GetFrame()
@@ -231,7 +231,7 @@ class GWindow(GView, Scrollable):
 		frame['x'] -= parentFrame['x']
 		frame['y'] -= parentFrame['y']
 		view.SetFrame(frame)
-		return newparent.AddSubview(view, None, id)
+		return newparent.AddSubview(view, None, newID)
 
 	def Unload(self): # backwards compatibility
 		self.Close()
@@ -312,9 +312,9 @@ class GTextEdit(GControl):
 	}
 
 class GScrollBar(GControl, Scrollable):
-	def SetVarAssoc(self, varname, val, min=0, max=None):
-		max = val if max is None else max
-		super(GScrollBar, self).SetVarAssoc(varname, val, min, max)
+	def SetVarAssoc(self, varname, val, rangeMin = 0, rangeMax = None):
+		rangeMax = val if rangeMax is None else rangeMax
+		super(GScrollBar, self).SetVarAssoc(varname, val, rangeMin, rangeMax)
 
 class GButton(GControl):
 	methods = {
