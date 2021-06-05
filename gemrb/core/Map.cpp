@@ -77,7 +77,7 @@ static Point **VisibilityMasks=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
-static bool LargeFog;
+static int LargeFog;
 static TerrainSounds *terrainsounds=NULL;
 static int tsndcount = -1;
 static ieDword oldGameTime = 0;
