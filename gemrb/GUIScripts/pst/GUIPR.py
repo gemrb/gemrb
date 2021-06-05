@@ -208,7 +208,7 @@ def OnPriestMemorizeSpell ():
 	# FIXME: use FLASH.bam
 
 
-def OpenPriestSpellUnmemorizeWindow ():
+def OpenPriestSpellUnmemorizeWindow (btn, val):
 	global PriestSpellUnmemorizeWindow
 
 	if PriestSpellUnmemorizeWindow != None:
@@ -227,7 +227,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnPriestUnmemorizeSpell(btn, val))
 	Button.MakeDefault()
 
 	# Cancel
@@ -239,7 +239,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
-def OnPriestUnmemorizeSpell ():
+def OnPriestUnmemorizeSpell (btn, index):
 	if PriestSpellUnmemorizeWindow:
 		OpenPriestSpellUnmemorizeWindow ()
 

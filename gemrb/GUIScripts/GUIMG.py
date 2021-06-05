@@ -339,7 +339,7 @@ def OpenMageSpellRemoveWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OpenMageSpellUnmemorizeWindow ():
+def OpenMageSpellUnmemorizeWindow (btn, val):
 	global MageSpellUnmemorizeWindow
 
 	if GameCheck.IsBG2():
@@ -355,7 +355,7 @@ def OpenMageSpellUnmemorizeWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnMageUnmemorizeSpell(None, GemRB.GetVar ("SpellButton")))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnMageUnmemorizeSpell(btn, val))
 	Button.MakeDefault()
 
 	# Cancel

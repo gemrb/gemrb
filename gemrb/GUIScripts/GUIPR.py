@@ -283,7 +283,7 @@ def ClosePriestSpellUnmemorizeWindow ():
 	PriestSpellUnmemorizeWindow = None
 	return
 
-def OpenPriestSpellUnmemorizeWindow ():
+def OpenPriestSpellUnmemorizeWindow (btn, val):
 	global PriestSpellUnmemorizeWindow
 
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
@@ -295,7 +295,7 @@ def OpenPriestSpellUnmemorizeWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestUnmemorizeSpell)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnPriestUnmemorizeSpell(btn, val))
 	Button.MakeDefault()
 
 	# Cancel
@@ -307,15 +307,13 @@ def OpenPriestSpellUnmemorizeWindow ():
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
-def OnPriestUnmemorizeSpell ():
+def OnPriestUnmemorizeSpell (btn, index):
 	if PriestSpellUnmemorizeWindow:
 		ClosePriestSpellUnmemorizeWindow ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	type = IE_SPELL_TYPE_PRIEST
-
-	index = GemRB.GetVar ("SpellButton")
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()

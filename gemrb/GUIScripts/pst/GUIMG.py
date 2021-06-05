@@ -199,7 +199,7 @@ def OnMageMemorizeSpell ():
 	# FIXME: use FLASH.bam
 
 
-def OpenMageSpellUnmemorizeWindow ():
+def OpenMageSpellUnmemorizeWindow (btn, val):
 	global MageSpellUnmemorizeWindow
 
 	if MageSpellUnmemorizeWindow != None:
@@ -223,7 +223,7 @@ def OpenMageSpellUnmemorizeWindow ():
 
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellUnmemorizeWindow(None, GemRB.GetVar("SpellButton")))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellUnmemorizeWindow(btn, val))
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
