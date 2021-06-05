@@ -20,6 +20,7 @@
 import GemRB
 from ie_stats import *
 from GUIDefines import *
+import GameCheck
 import GUICommon
 import CommonTables
 import Spellbook
@@ -286,6 +287,8 @@ def SetButtonStateFromStep (buttonName, button, step):
 	elif buttonName == "AcceptButton":
 		if step == 9:
 			state = IE_GUI_BUTTON_ENABLED
+		elif GameCheck.IsBG2Demo ():
+			state = IE_GUI_BUTTON_LOCKED
 	button.SetState (state)
 
 	if state == IE_GUI_BUTTON_ENABLED:
