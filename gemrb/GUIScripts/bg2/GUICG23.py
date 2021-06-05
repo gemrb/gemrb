@@ -32,6 +32,7 @@ def OnLoad ():
 	BIO = GemRB.GetToken("BIO")
 	EditTextArea.AddAlias("BIO")
 	EditTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+	EditTextArea.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_NORMAL)
 
 	if BIO:
 		EditTextArea.SetText (BIO)
