@@ -707,6 +707,109 @@ void PolymorphCopyCore(Actor *src, Actor *tar)
 	//add more attribute copying
 }
 
+static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int currentStep, int offset)
+{
+	bool isPassable = false;
+	switch (currentStep) {
+		// Top-edge with random x offset
+		case 0:
+			if (offset < vp.w) {
+				walkableStartPoint.x = vp.x + offset;
+				walkableStartPoint.y = vp.y;
+				isPassable = true;
+			}
+			break;
+		// Bottom-edge with random x offset
+		case 1:
+			if (offset < vp.w) {
+				walkableStartPoint.x = vp.x + offset;
+				walkableStartPoint.y = vp.y + vp.h;
+				isPassable = true;
+			}
+			break;
+		// Left-edge with random y offset
+		case 2:
+			if (offset < vp.h) {
+				walkableStartPoint.x = vp.x;
+				walkableStartPoint.y = vp.y + offset;
+				isPassable = true;
+			}
+			break;
+		// Right-edge with random y offset
+		case 3:
+			if (offset < vp.h) {
+				walkableStartPoint.x = vp.x + vp.w;
+				walkableStartPoint.y = vp.y + offset;
+				isPassable = true;
+			}
+			break;
+	}
+	return isPassable;
+}
+
+// this complicated search has been reverse-engineered from the original
+static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatureSize, int phase)
+{
+	const Region vp = core->GetGameControl()->Viewport();
+	Point vpCenter = Point(vp.x + vp.w / 2, vp.y + vp.h / 2);
+	int maxRandExclusive = std::max(vp.w, vp.h);
+	int firstRandStep = RAND(0, maxRandExclusive);
+	int currentStep = RAND(0, 3);
+	int slowlyIncrements = 0;
+	bool foundValidPoint = false;
+
+	const Map *map = Sender->GetCurrentArea();
+	Point walkableStartPoint;
+	Point walkableGoal;
+	if (flags & CC_OBJECT) {
+		// the point of the target creature for CreateCreatureObjectOffscreen
+		walkableGoal = Sender->Pos;
+	} else {
+		// center of the viewport for CreateCreatureOffscreen
+		walkableGoal = vpCenter;
+	}
+
+	do {
+		if (foundValidPoint) break;
+
+		int finalRandStep = (firstRandStep + slowlyIncrements) % maxRandExclusive;
+
+		for (int switchAttemptCounter = 0; switchAttemptCounter < 4; ++switchAttemptCounter) {
+			bool isPassable = InspectEdges(walkableStartPoint, vp, currentStep, phase ? slowlyIncrements : finalRandStep);
+
+			++currentStep;
+			if (currentStep > 3) {
+				currentStep = 0;
+			}
+
+			if (isPassable) {
+				// Check if the search map allows a creature to be at walkableStartPoint (note: ignoring creatureSize)
+				isPassable = map->GetBlockedNavmap(walkableStartPoint) & PATH_MAP_PASSABLE;
+			}
+
+			// Check if walkableStartPoint can traverse to walkableGoal
+			bool isWalkable = map->FindPath(walkableStartPoint, walkableGoal, creatureSize) != nullptr;
+
+			if (isPassable && (!(flags & CC_OBJECT) || isWalkable)) {
+				// walkableStartPoint is the final point
+				foundValidPoint = true;
+				break;
+			}
+		}
+
+		slowlyIncrements += 10;
+	} while (slowlyIncrements < maxRandExclusive);
+
+	if (foundValidPoint) return walkableStartPoint;
+
+	if (phase) {
+		// fallback in case nothing was found even in the second try
+		return vpCenter;
+	} else {
+		return Point();
+	}
+}
+
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
 	Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
@@ -739,22 +842,19 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		ab->SetScriptName(parameters->string1Parameter);
 	}
 
-	int radius;
 	Point pnt;
+	const Scriptable *referer = Sender;
 
-	radius=0;
 	switch (flags & CC_MASK) {
 		//creates creature just off the screen
 		case CC_OFFSCREEN:
-			{
-			Region vp = core->GetGameControl()->Viewport();
-			radius=vp.w/2;
-			//center of screen
-			pnt.x = vp.x+radius;
-			pnt.y = vp.y+vp.h/2;
-			break;
+			// handle also the combo with CC_OBJECT, so we don't have fallthrough problems
+			if (flags & CC_OBJECT && tmp) referer = tmp;
+			pnt = FindOffScreenPoint(referer, flags, ab->size, 0);
+			if (pnt.isnull()) {
+				pnt = FindOffScreenPoint(referer, flags, ab->size, 1);
 			}
-			//fall through
+			break;
 		case CC_OBJECT://use object + offset
 			if (tmp) Sender=tmp;
 			//fall through
@@ -779,8 +879,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	Map *map = Sender->GetCurrentArea();
 	map->AddActor( ab, true );
-	//radius adjusted to tile size
-	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius/16, radius/12 );
+	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE, 0, 0);
 	ab->SetOrientation(parameters->int0Parameter, false );
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
