@@ -3588,7 +3588,7 @@ int Interface::GetCriticalRange(unsigned int itemtype) const
 
 // checks the itemtype vs. slottype, and also checks the usability flags
 // vs. Actor's stats (alignment, class, race, kit etc.)
-int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedback, bool equipped) const
+int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor, bool feedback, bool equipped) const
 {
 	//inventory is a special case, we allow any items to enter it
 	if ( slottype==-1 ) {

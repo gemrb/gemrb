@@ -698,7 +698,7 @@ public:
 	/* returns current attack style */
 	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
-	void AttackedBy(Actor *actor);
+	void AttackedBy(const Actor *actor);
 	/* reorients to face target (for immediate attack) */
 	void FaceTarget(Scriptable *actor);
 	/* returns the number of attacks (handles monk barehanded bonus) */
@@ -843,7 +843,7 @@ public:
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;
 	/* Returns strref if the item is unusable due to name/type restrictions */
-	ieStrRef Disabled(ieResRef name, ieDword type) const;
+	ieStrRef Disabled(const ieResRef name, ieDword type) const;
 	/* Returns constant string if the item is unusable */
 	int Unusable(const Item *item) const;
 	/* Sets all clown colour to the given gradient */

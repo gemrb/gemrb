@@ -6625,7 +6625,7 @@ int Actor::GetAttackStyle() const
 	return WEAPON_MELEE;
 }
 
-void Actor::AttackedBy( Actor *attacker)
+void Actor::AttackedBy(const Actor *attacker)
 {
 	AddTrigger(TriggerEntry(trigger_attackedby, attacker->GetGlobalID()));
 	if (attacker->GetStat(IE_EA) != EA_PC && Modified[IE_EA] != EA_PC) {
@@ -9931,7 +9931,7 @@ no_resolve:
 }
 
 //this one is the same, but returns strrefs based on effects
-ieStrRef Actor::Disabled(ieResRef name, ieDword type) const
+ieStrRef Actor::Disabled(const ieResRef name, ieDword type) const
 {
 	Effect *fx;
 

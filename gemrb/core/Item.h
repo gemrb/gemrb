@@ -291,7 +291,7 @@ public:
 	int GetEquipmentHeaderNumber(int cnt) const;
 	unsigned int GetCastingDistance(int header) const;
 	// returns  a vector with details about any extended headers containing fx_damage with a 100% probability
-	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(ITMExtHeader *header) const;
+	std::vector<DMGOpcodeInfo> GetDamageOpcodesDetails(const ITMExtHeader *header) const;
 private:
 };
 

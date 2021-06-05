@@ -275,7 +275,7 @@ unsigned int Item::GetCastingDistance(int idx) const
 
 static EffectRef fx_damage_ref = { "Damage", -1 };
 // returns a vector with details about any extended headers containing fx_damage
-std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(ITMExtHeader *header) const
+std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader *header) const
 {
 	ieDword damage_opcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	std::multimap<ieDword, DamageInfoStruct>::iterator it;

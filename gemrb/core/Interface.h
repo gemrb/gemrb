@@ -600,7 +600,7 @@ public:
 	int GetCriticalMultiplier(unsigned int itemtype) const;
 	int GetCriticalRange(unsigned int itemtype) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
-	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL, bool feedback=false, bool equipped=false) const;
+	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	/*removes single file from cache*/
 	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
 	/*removes all files from directory*/
