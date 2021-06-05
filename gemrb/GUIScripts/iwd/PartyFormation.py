@@ -119,6 +119,8 @@ def CreateCharPress ():
 	CancelButton.SetStatus (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetText (13727)
 	CancelButton.MakeEscape()
+	
+	CreateCharWindow.ShowModal(MODAL_SHADOW_NONE)
 
 	return
 
