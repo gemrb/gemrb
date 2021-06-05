@@ -16,6 +16,7 @@ def OnLoad():
 	histLabel = consoleWin.GetControl(2)
 	histLabel.SetText ("History:")
 	hist = consoleWin.GetControl(3)
+	hist.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_OPTIONS)
 	
 	console = consoleWin.GetControl(0)
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
@@ -82,7 +83,7 @@ def Exec(cmd):
 			if self.buffer.endswith("\n"):
 				out = self.buffer
 				if out:
-					con.Append(cmd + ": [color=00ff00]" + out + "[/color]\n")
+					con.Append("[color=ffffff]" + cmd + ": [/color][color=00ff00]" + out + "[/color]\n")
 				self.buffer = ""
 	
 	try:
@@ -94,7 +95,7 @@ def Exec(cmd):
 		return eval(cmd)
 	except (SyntaxError, NameError, TypeError, ZeroDivisionError) as error:
 		if con:
-			con.Append(cmd + ": [color=ff0000]" + str(error) + "[/color]\n")
+			con.Append("[color=ffffff]" + cmd + ": [/color][color=ff0000]" + str(error) + "[/color]\n")
 			
 		sys.stderr.write(error)
 	finally:
