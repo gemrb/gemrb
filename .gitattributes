@@ -12,4 +12,4 @@
 testing export-ignore
 .github export-ignore
 
-apple/GemRB.xcodeproj/* binary
+platforms/apple/GemRB.xcodeproj/* binary
