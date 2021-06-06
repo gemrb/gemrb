@@ -31,14 +31,14 @@ constexpr size_t HistoryMaxSize = 5;
 Console::Console(const Region& frame, TextArea* ta)
 : TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
 {
-	ControlEventHandler OnReturn = [this](Control*) {
+	ControlEventHandler OnReturn = [this](const Control*) {
 		Execute(QueryText());
 	};
 	SetAction(OnReturn, TextEdit::Action::Done);
 
 	if (ta) {
 		textArea = ta;
-		ControlEventHandler handler = [this](Control* c) {
+		ControlEventHandler handler = [this](const Control* c) {
 			auto val = c->GetValue();
 			size_t histSize = History.Size();
 			size_t selected = histSize - val;

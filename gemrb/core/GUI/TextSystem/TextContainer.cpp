@@ -694,7 +694,7 @@ void TextContainer::AppendText(const String& text)
 	AppendText(text, nullptr, colors);
 }
 
-void TextContainer::AppendText(const String& text, Font* fnt, const Font::PrintColors* cols)
+void TextContainer::AppendText(const String& text, const Font* fnt, const Font::PrintColors* cols)
 {
 	if (text.length()) {
 		TextSpan* span = new TextSpan(text, fnt);

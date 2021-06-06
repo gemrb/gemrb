@@ -900,7 +900,7 @@ Size Map::FogMapSize() const
 	return Size(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
 }
 
-bool Map::FogTileUncovered(const Point &p, uint8_t* mask) const
+bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
 {
 	// Returns true if map at (x;y) was explored, else false.
 	const Size fogSize = FogMapSize();
@@ -1787,7 +1787,7 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	return flags;
 }
 
-uint32_t Map::SetDrawingStencilForAreaAnimation(AreaAnimation* anim, const Region& vp)
+uint32_t Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, const Region& vp)
 {
 	const Region& bbox = anim->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
@@ -1951,7 +1951,7 @@ bool Map::AnyEnemyNearPoint(const Point &p) const
 	return false;
 }
 
-void Map::ActorSpottedByPlayer(Actor *actor) const
+void Map::ActorSpottedByPlayer(const Actor *actor) const
 {
 	unsigned int animid;
 
@@ -1996,7 +1996,7 @@ void Map::InitActors()
 	}
 }
 
-void Map::InitActor(Actor *actor)
+void Map::InitActor(const Actor *actor)
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];

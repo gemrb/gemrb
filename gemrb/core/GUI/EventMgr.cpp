@@ -400,7 +400,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 	return e;
 }
 
-Event EventMgr::CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure)
+Event EventMgr::CreateTouchEvent(const TouchEvent::Finger fingers[], int numFingers, bool down, float pressure)
 {
 	if (numFingers > FINGER_MAX) {
 		Log(ERROR, "EventManager", "cannot create a touch event with %d fingers; max is %d.", numFingers, FINGER_MAX);

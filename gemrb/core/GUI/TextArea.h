@@ -192,7 +192,7 @@ private: //internal functions
 	int OptionsHeight() const;
 
 	void TrimHistory(size_t lines);
-	void TextChanged(TextContainer& tc);
+	void TextChanged(const TextContainer& tc);
 	void ClearHistoryTimer();
 
 public: //Events

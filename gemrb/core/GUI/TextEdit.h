@@ -45,7 +45,7 @@ private:
 	size_t max;
 
 private:
-	void TextChanged(TextContainer& tc);
+	void TextChanged(const TextContainer& tc);
 	
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;

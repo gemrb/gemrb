@@ -466,7 +466,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 
 	std::reverse(dialogOptions.begin(), dialogOptions.end());
 	ta->SetSelectOptions(dialogOptions, true);
-	ControlEventHandler handler = [this](Control* c) {
+	ControlEventHandler handler = [this](const Control* c) {
 		DialogChoose(c->GetValue());
 	};
 	ta->SetAction(handler, TextArea::Action::Select);

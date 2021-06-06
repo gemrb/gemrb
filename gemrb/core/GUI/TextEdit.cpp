@@ -138,7 +138,7 @@ void TextEdit::SetBufferLength(size_t buflen)
 	}
 }
 
-void TextEdit::TextChanged(TextContainer& /*tc*/)
+void TextEdit::TextChanged(const TextContainer& /*tc*/)
 {
 	PerformAction(Action::Change);
 }

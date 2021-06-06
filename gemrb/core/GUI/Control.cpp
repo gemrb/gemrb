@@ -323,7 +323,7 @@ bool Control::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 	return View::OnKeyPress(key, mod);
 }
 
-void Control::HandleTouchActionTimer(Control* ctrl)
+void Control::HandleTouchActionTimer(const Control* ctrl)
 {
 	assert(ctrl == this);
 	assert(actionTimer);

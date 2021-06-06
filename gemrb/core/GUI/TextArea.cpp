@@ -702,7 +702,7 @@ void TextArea::SelectAvailableOption(size_t idx)
 	}
 }
 
-void TextArea::TextChanged(TextContainer& /*tc*/)
+void TextArea::TextChanged(const TextContainer& /*tc*/)
 {
 	PerformAction(Action::Change);
 }

@@ -42,7 +42,7 @@ private:
 	bool validVideo;
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);
-	void showFrame(unsigned char* buf, unsigned int bufw, unsigned int bufh);
+	void showFrame(const unsigned char* buf, unsigned int bufw, unsigned int bufh);
 	void setPalette(unsigned char* p, unsigned start, unsigned count);
 	int pollEvents();
 	int setAudioStream();

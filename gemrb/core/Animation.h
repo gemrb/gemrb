@@ -56,7 +56,7 @@ public:
 	Holder<Sprite2D> CurrentFrame() const;
 	Holder<Sprite2D> LastFrame();
 	Holder<Sprite2D> NextFrame();
-	Holder<Sprite2D> GetSyncedNextFrame(Animation* master);
+	Holder<Sprite2D> GetSyncedNextFrame(const Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
 	Holder<Sprite2D> GetFrame(unsigned int i) const;

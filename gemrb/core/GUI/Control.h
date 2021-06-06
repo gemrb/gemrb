@@ -81,7 +81,7 @@ private:
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
 	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
 
-	void HandleTouchActionTimer(Control*);
+	void HandleTouchActionTimer(const Control*);
     
 public: // Public attributes
 	enum Action : ControlActionResponder::Action {

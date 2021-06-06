@@ -6713,7 +6713,7 @@ static PyObject* GemRB_Button_SetSpellIcon(PyObject* self, PyObject* args)
 	return ret;
 }
 
-static Holder<Sprite2D> GetUsedWeaponIcon(Item *item, int which)
+static Holder<Sprite2D> GetUsedWeaponIcon(const Item *item, int which)
 {
 	const ITMExtHeader *ieh = item->GetWeaponHeader(false);
 	if (!ieh) {

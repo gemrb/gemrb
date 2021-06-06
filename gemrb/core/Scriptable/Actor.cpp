@@ -9177,7 +9177,7 @@ bool Actor::HasVVCCell(const ResRef &resource) const
 	return GetVVCCells(resource).first != vfxDict.end();
 }
 
-bool VVCSort(ScriptedAnimation* lhs, ScriptedAnimation* rhs)
+bool VVCSort(const ScriptedAnimation* lhs, const ScriptedAnimation* rhs)
 {
 	return lhs->YOffset < rhs->YOffset;
 }

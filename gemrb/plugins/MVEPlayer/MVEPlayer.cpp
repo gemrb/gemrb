@@ -86,7 +86,7 @@ unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 	return ( numread == count );
 }
 
-void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw, unsigned int bufh)
+void MVEPlay::showFrame(const unsigned char* buf, unsigned int bufw, unsigned int bufh)
 {
 	if (vidBuf == NULL) {
 		Log(WARNING, "MVEPlayer", "attempting to decode a frame without a video buffer (most likely during init).");

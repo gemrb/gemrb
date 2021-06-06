@@ -62,7 +62,7 @@ public:
 
 	int StepIncrement;
 
-	ScrollBar(const Region& frame, Holder<Sprite2D>[IMAGE_COUNT]);
+	ScrollBar(const Region& frame, const Holder<Sprite2D>[IMAGE_COUNT]);
 	ScrollBar(const ScrollBar& sb);
 	ScrollBar& operator=(const ScrollBar& sb);
 

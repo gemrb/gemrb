@@ -173,7 +173,7 @@ Holder<Sprite2D> Animation::NextFrame(void)
 	return ret;
 }
 
-Holder<Sprite2D> Animation::GetSyncedNextFrame(Animation* master)
+Holder<Sprite2D> Animation::GetSyncedNextFrame(const Animation* master)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");

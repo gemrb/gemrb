@@ -82,7 +82,7 @@ void WMPAreaEntry::SetPalette(int gradient, Holder<Sprite2D> MapIcon)
 	MapIcon->SetPalette(new Palette(&colors[0], &colors[256]));
 }
 
-Holder<Sprite2D> WMPAreaEntry::GetMapIcon(AnimationFactory *bam, bool overridePalette)
+Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam, bool overridePalette)
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;

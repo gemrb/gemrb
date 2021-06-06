@@ -51,7 +51,7 @@ public:
 	size_t GetCycleCount() const { return cycles.size(); }
 	size_t GetFrameCount() const { return frames.size(); }
 	int GetCycleSize(size_t idx) const;
-	Holder<Sprite2D> GetPaperdollImage(ieDword *Colors, Holder<Sprite2D> &Picture2,
+	Holder<Sprite2D> GetPaperdollImage(const ieDword *Colors, Holder<Sprite2D> &Picture2,
 		unsigned int type) const;
 
 };

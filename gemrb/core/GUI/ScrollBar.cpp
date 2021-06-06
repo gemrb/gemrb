@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-ScrollBar::ScrollBar(const Region& frame, Holder<Sprite2D> images[IMAGE_COUNT])
+ScrollBar::ScrollBar(const Region& frame, const Holder<Sprite2D> images[IMAGE_COUNT])
 : Control(frame)
 {
 	Init(images);

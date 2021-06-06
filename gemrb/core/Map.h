@@ -466,10 +466,10 @@ public:
 	}
 	bool BehindWall(const Point&, const Region&) const;
 	void Shout(Actor* actor, int shoutID, bool global);
-	void ActorSpottedByPlayer(Actor *actor) const;
+	void ActorSpottedByPlayer(const Actor *actor) const;
 	bool HandleAutopauseForVisible(Actor *actor, bool);
 	void InitActors();
-	void InitActor(Actor *actor);
+	void InitActor(const Actor *actor);
 	void AddActor(Actor* actor, bool init);
 	//counts the summons already in the area
 	int CountSummons(ieDword flag, ieDword sex) const;
@@ -652,14 +652,14 @@ private:
 	
 	void SetDrawingStencilForObject(const void*, const Region&, const WallPolygonSet&, const Point& viewPortOrigin);
 	uint32_t SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
-	uint32_t SetDrawingStencilForAreaAnimation(AreaAnimation*, const Region& viewPort);
+	uint32_t SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	
 	void DrawSearchMap(const Region &vp) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport);
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
 	Size FogMapSize() const;
-	bool FogTileUncovered(const Point &p, uint8_t*) const;
+	bool FogTileUncovered(const Point &p, const uint8_t*) const;
 	Point ConvertPointToFog(const Point &p) const;
 	
 	void GenerateQueues();

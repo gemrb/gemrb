@@ -103,7 +103,7 @@ Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(unsigned short index) co
 	return frames[index];
 }
 
-Holder<Sprite2D> AnimationFactory::GetPaperdollImage(ieDword *Colors,
+Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 		Holder<Sprite2D> &Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {

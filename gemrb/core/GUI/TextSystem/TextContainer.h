@@ -278,7 +278,7 @@ public:
 	~TextContainer();
 
 	void AppendText(const String& text);
-	void AppendText(const String& text, Font* fnt, const Font::PrintColors* = nullptr);
+	void AppendText(const String& text, const Font* fnt, const Font::PrintColors* = nullptr);
 	String TextFrom(const Content*) const;
 	String Text() const;
 

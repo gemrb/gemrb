@@ -268,7 +268,7 @@ public:
 
 	static Event CreateKeyEvent(KeyboardKey key, bool down, int mod = 0);
 
-	static Event CreateTouchEvent(TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
+	static Event CreateTouchEvent(const TouchEvent::Finger fingers[], int numFingers, bool down, float pressure = 0.0);
 	static Event CreateTouchGesture(const TouchEvent& touch, float rotation, float pinch);
 
 	static Event CreateTextEvent(const char* text);
