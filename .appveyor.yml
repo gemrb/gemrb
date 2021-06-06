@@ -12,7 +12,7 @@ only_commits:
   files:
     - gemrb/**/*
     - cmake/**/*
-    - windows/**/*
+    - platforms/windows/**/*
     - .appveyor.yml
 environment:
   SF_ACC:
@@ -86,8 +86,8 @@ before_package:
 - ps: |-
     pushd c:\projects\gemrb
 
-    if ($env:APPVEYOR_REPO_TAG) {
-      echo $env:APPVEYOR_REPO_TAG
+    if ($env:APPVEYOR_REPO_TAG_NAME) {
+      echo "Fetching heavy demo data!"
       cmake --build . --target fetch-demo-data
     }
 
