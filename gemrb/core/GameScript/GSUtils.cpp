@@ -750,7 +750,10 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 // this complicated search has been reverse-engineered from the original
 static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatureSize, int phase)
 {
-	const Region vp = core->GetGameControl()->Viewport();
+	Region vp = core->GetGameControl()->Viewport();
+	// go for 640x480, so large viewports are less likely to interfere with scripting
+	vp.w = 640;
+	vp.h = 480;
 	Point vpCenter = Point(vp.x + vp.w / 2, vp.y + vp.h / 2);
 	int maxRandExclusive = std::max(vp.w, vp.h);
 	int firstRandStep = RAND(0, maxRandExclusive);
