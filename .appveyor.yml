@@ -87,6 +87,7 @@ before_package:
     pushd c:\projects\gemrb
 
     if ($env:APPVEYOR_REPO_TAG) {
+      echo $env:APPVEYOR_REPO_TAG
       cmake --build . --target fetch-demo-data
     }
 
