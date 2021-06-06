@@ -291,6 +291,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 {
 	char Tmp[256];
 	Action *action = NULL;
+	tryToRun |= AlwaysRun;
 	
 	if (append) {
 		sprintf(Tmp, "AddWayPoint([%d.%d])", p.x, p.y);
@@ -298,7 +299,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 		assert(action);
 	} else {
 		//try running (in PST) only if not encumbered
-		if (tryToRun && ShouldRun(actor)) {
+		if (tryToRun && CanRun(actor)) {
 			sprintf( Tmp, "RunToPoint([%d.%d])", p.x, p.y );
 			action = GenerateAction( Tmp );
 		}
@@ -314,14 +315,19 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 	actor->Destination = p; // just to force target reticle drawing if paused
 }
 
-// were we instructed to run and can handle it (no movement impairments)?
-bool GameControl::ShouldRun(Actor *actor) const
+// can we handle it (no movement impairments)?
+bool GameControl::CanRun(const Actor *actor) const
 {
 	if (!actor) return false;
 	if (actor->GetEncumbranceFactor(true) != 1) {
 		return false;
 	}
-	return AlwaysRun;
+	return true;
+}
+
+bool GameControl::ShouldRun(const Actor *actor) const
+{
+	return CanRun(actor) && AlwaysRun;
 }
 
 // ArrowSprite cycles
