@@ -759,7 +759,6 @@ static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int c
 	int firstRandStep = RAND(0, maxRandExclusive);
 	int currentStep = RAND(0, 3);
 	int slowlyIncrements = 0;
-	bool foundValidPoint = false;
 
 	const Map *map = Sender->GetCurrentArea();
 	Point walkableStartPoint;
@@ -773,8 +772,6 @@ static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int c
 	}
 
 	do {
-		if (foundValidPoint) break;
-
 		int finalRandStep = (firstRandStep + slowlyIncrements) % maxRandExclusive;
 
 		for (int switchAttemptCounter = 0; switchAttemptCounter < 4; ++switchAttemptCounter) {
@@ -795,15 +792,12 @@ static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int c
 
 			if (isPassable && (!(flags & CC_OBJECT) || isWalkable)) {
 				// walkableStartPoint is the final point
-				foundValidPoint = true;
-				break;
+				return walkableStartPoint;
 			}
 		}
 
 		slowlyIncrements += 10;
 	} while (slowlyIncrements < maxRandExclusive);
-
-	if (foundValidPoint) return walkableStartPoint;
 
 	if (phase) {
 		// fallback in case nothing was found even in the second try
