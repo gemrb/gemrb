@@ -281,7 +281,7 @@ void Scriptable::ImmediateEvent()
 bool Scriptable::IsPC() const
 {
 	if (Type != ST_ACTOR) return false;
-	return ((Actor *) this)->GetStat(IE_EA) <= EA_CHARMED;
+	return ((const Actor *) this)->GetStat(IE_EA) <= EA_CHARMED;
 }
 
 void Scriptable::Update()

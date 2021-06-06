@@ -130,7 +130,7 @@ unsigned int DisplayMessage::GetSpeakerColor(String& name, const Scriptable *&sp
 		case ST_ACTOR:
 			string = StringFromCString(speaker->GetName(-1));
 			{
-				auto pal16 = core->GetPalette16( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
+				auto pal16 = core->GetPalette16(((const Actor *) speaker)->GetStat(IE_MAJOR_COLOR));
 				// cmleat4 from dark horizons sets all the colors to pitch black, so work around too dark results
 				if (pal16[4].r + pal16[4].g + pal16[4].b < 75) {
 					pal16[4].r = 75;

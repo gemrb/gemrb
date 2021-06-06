@@ -41,7 +41,7 @@ static String* StringFromEncodedData(const ieByte* string, const EncodingStruct&
 	// TODO: add support for other encodings?
 	assert(!convert || (encoded.widechar || encoded.encoding == "UTF-8"));
 
-	size_t len = strlen((char*)string);
+	size_t len = strlen((const char*) string);
 	String* dbString = new String();
 	dbString->reserve(len);
 	size_t dbLen = 0;

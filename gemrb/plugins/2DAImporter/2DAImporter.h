@@ -67,13 +67,13 @@ public:
 	inline const char* QueryField(size_t row = 0, size_t column = 0) const override
 	{
 		if (rows.size() <= row) {
-			return ( char * ) defVal;
+			return (const char *) defVal;
 		}
 		if (rows[row].size() <= column) {
-			return ( char * ) defVal;
+			return (const char *) defVal;
 		}
 		if (rows[row][column][0]=='*' && !rows[row][column][1]) {
-			return ( char * ) defVal;
+			return (const char *) defVal;
 		}
 		return rows[row][column];
 	}
@@ -86,13 +86,13 @@ public:
 		rowi = GetRowIndex(row);
 
 		if (rowi < 0) {
-			return ( char * ) defVal;
+			return (const char *) defVal;
 		}
 
 		coli = GetColumnIndex(column);
 		 
 		if (coli < 0) {
-			return ( char * ) defVal;
+			return (const char *) defVal;
 		}
 
 		return QueryField((unsigned int) rowi, (unsigned int) coli);

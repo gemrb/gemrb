@@ -824,7 +824,7 @@ void TextContainer::MoveCursorToPoint(const Point& p)
 	const Layout* layout = LayoutAtPoint(p);
 
 	if (layout) {
-		TextSpan* ts = (TextSpan*)layout->content;
+		const TextSpan* ts = (const TextSpan*) layout->content;
 		const String& text = ts->Text();
 		const Font* printFont = ts->LayoutFont();
 		Font::StringSizeMetrics metrics = {Size(0,0), 0, 0, true};

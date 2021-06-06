@@ -190,7 +190,7 @@ void OpenALAudioDriver::PrintDeviceList ()
 {
 	char *deviceList;
 
-	if (alcIsExtensionPresent(NULL, (ALchar*)"ALC_ENUMERATION_EXT") == AL_TRUE) { // try out enumeration extension
+	if (alcIsExtensionPresent(nullptr, (const ALchar*) "ALC_ENUMERATION_EXT") == AL_TRUE) { // try out enumeration extension
 		Log(MESSAGE, "OpenAL", "Usable audio output devices:");
 		deviceList = (char *)alcGetString(NULL, ALC_DEVICE_SPECIFIER);
 
