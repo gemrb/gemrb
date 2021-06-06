@@ -46,7 +46,9 @@
 #include "MoviePlayer.h"
 #include "MusicMgr.h"
 #include "Palette.h"
+#ifndef STATIC_LINK
 #include "PluginLoader.h"
+#endif
 #include "PluginMgr.h"
 #include "Predicates.h"
 #include "ProjectileServer.h"
