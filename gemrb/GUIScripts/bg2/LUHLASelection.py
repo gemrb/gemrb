@@ -78,7 +78,7 @@ def OpenHLAWindow (actor, numclasses, classes, levels):
 	# setup our text area
 	HLATextArea = HLAWindow.GetControl(26)
 
-	print "Number of HLAs:",len (HLAAbilities)
+	print("Number of HLAs:",len (HLAAbilities))
 
 	# create a scrollbar if need-be
 	if ( len (HLAAbilities) >= 25 ) and EnhanceGUI:
@@ -323,16 +323,16 @@ def GetHLAs ():
 
 		# actually load the table
 		HLAClassTable = GemRB.LoadTable (HLAClassTable)
-		print "HLA Class/Kit:",ClassName
+		print("HLA Class/Kit:", ClassName)
 
 		# save all our HLAs from this class
 		for j in range (HLAClassTable.GetRowCount ()):
 			HLARef = HLAClassTable.GetValue (j, 0, GTV_STR)
-			print "\tHLA",j,":",HLARef
+			print("\tHLA " + str(j) +  ": " + HLARef)
 
 			# make sure we have an ability here
 			if HLARef == "*":
-				print "\t\tEnd of HLAs"
+				print("\t\tEnd of HLAs")
 				break
 
 			# [ref to hla, memorizable?, num memorized, pre-req ref, excluded ref]
@@ -345,7 +345,7 @@ def GetHLAs ():
 
 			# make sure we fall within the min and max paramaters
 			if HLAClassTable.GetValue (j, 3) > CurrentLevel or HLAClassTable.GetValue (j, 4) < CurrentLevel:
-				print "\t\tNot within parameters"
+				print("\t\tNot within parameters")
 				HLAAbilities.append(SaveArray)
 				continue
 
@@ -353,41 +353,41 @@ def GetHLAs ():
 			HLAAlign = HLAClassTable.GetValue (j, 8, GTV_STR)
 			if HLAAlign == "ALL_EVIL" and GemRB.GetPlayerStat (pc, IE_ALIGNMENT) < 6:
 				# don't even save this one because we can never get it
-				print "\t\tNeeds ALL_EVIL"
+				print("\t\tNeeds ALL_EVIL")
 				continue
 			elif HLAAlign == "ALL_GOOD" and GemRB.GetPlayerStat (pc, IE_ALIGNMENT) > 2:
 				# ditto
-				print "\t\tNeeds ALL_GOOD"
+				print("\t\tNeeds ALL_GOOD")
 				continue
 
 			# make sure we haven't already surpassed the number of time memorizable
 			HLANumAllowed = HLAClassTable.GetValue (j, 5)
-			print "\t\tHLA count:",SaveArray[2]
+			print("\t\tHLA count: " + str(SaveArray[2]))
 			if SaveArray[2] >= HLANumAllowed:
-				print "\t\tOnly allowed to learn",HLANumAllowed,"times"
+				print("\t\tOnly allowed to learn " + str(HLANumAllowed) + " times")
 				HLAAbilities.append(SaveArray)
 				continue
 
 			# make sure we haven't learned an HLA that excludes this one
 			HLAMemorized = GemRB.CountEffects (pc, "HLA", -1, -1, SaveArray[4][3:])
-			print "\t\tHLAExcluded count:",HLAMemorized
+			print("\t\tHLAExcluded count: " + str(HLAMemorized))
 			if (SaveArray[4] != "*") and (HLAMemorized > 0):
-				print "\t\tExcluded by:",SaveArray[4]
+				print("\t\tExcluded by: " + str(SaveArray[4]))
 				HLAAbilities.append(SaveArray)
 				continue
 
 			# we meet the prereqs so we can learn the HLA
 			HLAMemorized = GemRB.CountEffects (pc, "HLA", -1, -1, SaveArray[3][3:])
-			print "\t\tHLAPre count:",HLAMemorized
+			print("\t\tHLAPre count: " + str(HLAMemorized))
 			if (SaveArray[3] == "*") or (HLAMemorized > 0):
-				print "\t\tWe can learn it!"
+				print("\t\tWe can learn it!")
 				MaxHLACount += 1
 				SaveArray[1] = 1
 				HLAAbilities.append (SaveArray)
 				continue
 
 			# we didn't meet prereqs :(
-			print "\t\tNeed pre-req:",SaveArray[3]
+			print("\t\tNeed pre-req: " + str(SaveArray[3]))
 			HLAAbilities.append (SaveArray)
 
 	# create an array to store our abilities as they are selected

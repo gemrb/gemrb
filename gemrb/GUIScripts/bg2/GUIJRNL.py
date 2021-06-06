@@ -121,7 +121,7 @@ def UpdateLogWindow (JournalWindow):
 	Label.SetText (15873)
 	Label.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
-	print "Chapter ", Chapter, "Section ", Section
+	print("Chapter ", Chapter, "Section ", Section)
 
 	Text = JournalWindow.GetControl (1)
 

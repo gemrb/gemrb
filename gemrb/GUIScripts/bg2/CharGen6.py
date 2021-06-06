@@ -39,12 +39,6 @@ def OnLoad():
 	# nully other variables
 	GemRB.SetVar ("HatedRace", 0)
 
-	# save our previous stats:
-	# 	abilities
-
-	# print our diagnostic as we loop (so as not to duplicate)
-	print "CharGen6 output:"
-
 	#remove all known spells and nullify the memorizable counts
 	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_WIZARD, 1,9, 1)
 	Spellbook.RemoveKnownSpells (MyChar, IE_SPELL_TYPE_PRIEST, 1,7, 1)

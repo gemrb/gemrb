@@ -108,10 +108,5 @@ def NextPress():
 	if MyChar == 1:
 		GemRB.GameSetReputation (Rep)
 
-	# diagnostic output
-	print "CharGen5 output:"
-	print "\tAlignment: ",Alignment
-	print "\tReputation: ",Rep
-
 	GemRB.SetNextScript("CharGen5") #appearance
 	return

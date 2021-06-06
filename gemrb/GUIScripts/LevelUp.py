@@ -108,16 +108,16 @@ def OpenLevelUpWindow():
 	# class
 	Label = LevelUpWindow.GetControl (0x10000000+106)
 	Label.SetText (GUICommon.GetActorClassTitle (pc))
-	print "Title:",GUICommon.GetActorClassTitle (pc),"\tActor Title:",actor.ClassTitle()
+	print("Title: " + GUICommon.GetActorClassTitle (pc) + "\tActor Title: " + actor.ClassTitle())
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-	print "Class:",Class,"\tActor Class:",actor.classid
+	print("Class: " + str(Class) + "\tActor Class: " + str(actor.classid))
 
 	# kit
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	Kit = GUICommon.GetKitIndex (pc)
-	print "Kit:", Kit, "\tActor Kit:",actor.KitIndex()
-	print "ClassName:",ClassName,"\tActor ClassNames:",actor.ClassNames()
+	print("Kit: " + str(Kit) + "\tActor Kit: " + str(actor.KitIndex()))
+	print("ClassName: " + ClassName + "\tActor ClassNames: " + str(actor.ClassNames()))
 
 	# need this for checking gnomes
 	RaceName = GemRB.GetPlayerStat (pc, IE_RACE, 1)
@@ -164,7 +164,7 @@ def OpenLevelUpWindow():
 		# store a boolean for IsDual
 		IsDual = IsDual[0] > 0
 
-	print "NumClasses:",NumClasses,"\tActor NumClasses:",actor.NumClasses()
+	print("NumClasses: " + str(NumClasses) + "\tActor NumClasses: " + str(actor.NumClasses()))
 
 	if IsDual:
 		# convert the classes from indicies to class id's
@@ -172,8 +172,8 @@ def OpenLevelUpWindow():
 		ClassName = GUICommon.GetClassRowName (Classes[0], "index")
 		KitName = ClassName # for simplicity throughout the code
 
-	print "Classes:",Classes,"\tActor Classes:",actor.Classes()
-	print "IsDual:",IsDual > 0,"\tActor IsDual",actor.isdual
+	print("Classes: " + str(Classes) + "\tActor Classes: " + str(actor.Classes()))
+	print("IsDual: " + str(IsDual > 0) + "\tActor IsDual: " + str(actor.isdual))
 
 	# get the next target levels and difference between levels
 	Level = LUCommon.GetNextLevels(pc, Classes)
@@ -201,9 +201,9 @@ def OpenLevelUpWindow():
 #		if ABTable != "*" and GemRB.HasResource (ABTable, RES_2DA, 1):
 #			GUICommon.AddClassAbilities (pc, ABTable, Level[i], LevelDiff[i])
 
-	print "Actor CurrentLevels:",actor.Levels()
-	print "Levels:",Level,"Actor NextLevels:",actor.NextLevels()
-	print "LevelDiffs:",LevelDiff,"Actor LevelDiffs:",actor.LevelDiffs()
+	print("Actor CurrentLevels:" + str(actor.Levels()))
+	print("Levels: " + str(Level) + "\tActor NextLevels: " + str(actor.NextLevels()))
+	print("LevelDiffs: " + str(LevelDiff) + "\tActor LevelDiffs: " + str(actor.LevelDiffs()))
 
 	#update our saves, thaco, hp and lore
 	LUCommon.SetupSavingThrows (pc, Level)
@@ -234,10 +234,10 @@ def OpenLevelUpWindow():
 		HLATable = GemRB.LoadTable("lunumab")
 		# we need to check each level against a multi value (this is kinda screwy)
 		if actor.multiclass:
-			print "Actor HLA Names:",["MULTI"+str(actor.NumClasses())+name \
-				for name in actor.ClassNames()]
+			print("Actor HLA Names: " + str(["MULTI" + str(actor.NumClasses()) + name \
+				for name in actor.ClassNames()]))
 		else:
-			print "Actor HLA Names:",actor.ClassNames()
+			print("Actor HLA Names: " + str(actor.ClassNames()))
 
 		for i in range (NumClasses):
 			if IsMulti:
@@ -506,7 +506,7 @@ def LevelUpDonePress():
 		GemRB.SetPlayerStat (pc, IE_LEVEL2, Level[1])
 	GemRB.SetPlayerStat (pc, IE_LEVEL3, Level[2])
 
-	print "Levels:",Level[0],"/",Level[1],"/",Level[2]
+	print("Levels:", Level[0], "/", Level[1], "/", Level[2])
 
 	# spells
 	SaveNewSpells()
@@ -516,9 +516,9 @@ def LevelUpDonePress():
 
 	# 5261 - Regained abilities from inactive class
 	if IsDual: # we're dual classed
-		print "activation?"
+		print("activation?")
 		if (Level[0] - LevelDiff[0]) <= Level[1] and Level[0] > Level[1]: # our new classes now surpasses our old class
-			print "reactivating base class"
+			print("reactivating base class")
 			ReactivateBaseClass ()
 
 	if LevelUpWindow:
@@ -569,7 +569,7 @@ def ReactivateBaseClass ():
 		NewProf = Value & 0x07
 		if OldProf > NewProf:
 			Value = (OldProf << 3) | OldProf
-			print "Value:",Value
+			print("Value:", Value)
 			if GameCheck.IsBG2():
 				GemRB.ApplyEffect (pc, "Proficiency", Value, ProfID )
 			else:

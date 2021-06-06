@@ -32,7 +32,7 @@ def Load():
 	global Pdolls, StrModEx, StrMod, SpellDisplay, Aligns
 	global ItemType, WeapProfs, CharProfs
 
-	print # so the following output isn't appended to an existing line
+	print() # so the following output isn't appended to an existing line
 	if not Classes:
 		Classes = GemRB.LoadTable ("classes")
 	if not KitList and GemRB.HasResource("kitlist", RES_2DA):

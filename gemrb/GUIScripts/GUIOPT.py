@@ -116,7 +116,7 @@ OpenOptionsWindow = GUICommonWindows.CreateTopWinLoader(2, "GUIOPT", GUICommonWi
 
 def TrySavingConfiguration():
 	if not GemRB.SaveConfig():
-		print "ARGH, could not write config to disk!!"
+		print("ARGH, could not write config to disk!!")
 
 ###################################################
 

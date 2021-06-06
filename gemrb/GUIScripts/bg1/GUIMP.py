@@ -109,7 +109,7 @@ def GeneratePress():
 	slot = GemRB.GetVar("Slot")
 	ResRef = GemRB.GetPlayerPortrait (slot, 0)["ResRef"]
 	if ResRef:
-		print "Already existing slot, we should drop it"
+		print("Already existing slot, we should drop it")
 	if PartyFormationWindow:
 		PartyFormationWindow.Unload()
 	GemRB.SetNextScript("CharGen")

@@ -216,7 +216,7 @@ class GWindow(GView, Scrollable):
 			if control:
 				control.AddAlias(alias, self.ID)
 			else:
-				print "no control with id=" + str(cid)
+				print("no control with id=" + str(cid))
 
 	def GetControlAlias(self, alias): # see AliasControls()
 		return GetView(alias, self.ID)

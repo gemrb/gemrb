@@ -47,8 +47,8 @@ def DisplayTestResult (name, actual, expected, intro=""):
 		msg = "%s:\t\t[color=00ff00]passed[/color]\n" %(name)
 	else:
 		msg = "%s:\t\t[color=ff0000]FAILURE![/color]\n" %(name)
-		print "Expected:+", repr(expected), "+"
-		print "Actual  :+", repr(actual), "+"
+		print("Expected:+" + repr(expected) + "+")
+		print("Actual  :+" + repr(actual) + "+")
 
 	return (status, intro+msg)
 

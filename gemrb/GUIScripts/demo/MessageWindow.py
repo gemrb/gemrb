@@ -25,7 +25,6 @@ def OnLoad():
 	
 	results = Tests.RunTests ()
 	TMessageTA.SetText ("[cap]D[/cap]emo " + "DEMO "*40 + "\n" + results)
-	print results
 
 	PauseButton = MessageWindow.GetControl (2)
 	PauseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))

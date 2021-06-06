@@ -71,7 +71,7 @@ type = None
 def UseSpell ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	slot = float_menu_selected+float_menu_index
-	print "spell", type, slot
+	print("spell", type, slot)
 	GemRB.SpellCast (pc, 1<<type, slot)
 	return
 
@@ -87,7 +87,6 @@ def UseWeapon ():
 
 def DoSingleAction ():
 	i = GemRB.GetVar ('ItemButton')
-	print i
 	OpenFloatMenuWindow ()
 	if i == 0:
 		GUIMA.OpenMapWindow ()

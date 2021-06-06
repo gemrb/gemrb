@@ -326,16 +326,13 @@ def NextPress():
 	AbilityTable = GemRB.LoadTable ("ability")
 	AbilityCount = AbilityTable.GetRowCount ()
 
-	# print our diagnostic as we loop (so as not to duplicate)
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
 		StatName = AbilityTable.GetRowName (i)
 		StatValue = GemRB.GetVar ("Ability "+str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
-		print "\t",StatName,":\t", StatValue
 
 	GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
-	print "\tSTREXTRA:\t",GemRB.GetVar ("StrExtra")
 
 	GemRB.SetNextScript("CharGen6")
 	return

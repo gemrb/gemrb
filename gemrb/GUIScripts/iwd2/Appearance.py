@@ -137,8 +137,8 @@ def OnLoad():
 
 	PDollResRef = PDollTable.GetValue (hex(AnimID), "AT_1") + "G11"
 	if PDollResRef == "*G11":
-		print "ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID)
-		print "Falling back to an elven paperdoll."
+		print("ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID))
+		print("Falling back to an elven paperdoll.")
 		PDollResRef = "CEMB1G11"
 
 	RefreshPDoll()

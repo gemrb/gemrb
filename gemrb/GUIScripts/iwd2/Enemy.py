@@ -85,13 +85,13 @@ def OpenEnemyWindow(chargen=0):
 	ClassName = GUICommon.GetClassRowName (Class, "class")
 	TableName = CommonTables.ClassSkills.GetValue(ClassName, "HATERACE")
 	if TableName == "*":
-		print "Skipping Racial enemies: chosen class doesn't know the concept!"
+		print("Skipping Racial enemies: chosen class doesn't know the concept!")
 		NextPress (0)
 		return
 	# at this point it is already guaranteed that we have a ranger
 	# but they get new racial enemies only at level 5 and each 5th level
 	if not chargen and rankDiff == 0:
-		print "Skipping Racial enemies: iwd2 gives them every 5th level!"
+		print("Skipping Racial enemies: iwd2 gives them every 5th level!")
 		NextPress (0)
 		return
 

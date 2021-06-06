@@ -47,6 +47,5 @@ def OnLoad():
 		GemRB.SetPlayerStat (MyChar, Classes[i], 0)
 
 	GemRB.SetPlayerStat (MyChar, Classes[Class-1], 1)
-	print "Set class stat ",Classes[Class-1], " to 1"
 	CharOverview.UpdateOverview(4)
 	return

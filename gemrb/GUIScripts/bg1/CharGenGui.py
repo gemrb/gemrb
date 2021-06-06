@@ -278,7 +278,6 @@ def setDivineSpells():
 	DruidTable = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
 	ClericTable = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
 	
-	print("CGG setDivineSpells: CP1", ClassName, DruidTable, ClericTable)
 	
 	AllignID = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
 	

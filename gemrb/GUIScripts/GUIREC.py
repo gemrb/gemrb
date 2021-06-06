@@ -312,7 +312,7 @@ def GetClassTitles (pc,LevelDiff):
 		stats.append ("\n")
 
 	if Multi[0] > 1: # we're multiclassed
-		print "\tMulticlassed"
+		print("\tMulticlassed")
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
 
 		stats.append ( (19721,1,'c') )
@@ -335,10 +335,10 @@ def GetClassTitles (pc,LevelDiff):
 				GemRB.SetToken ("NEXTLEVEL", str(LUCommon.GetNextLevelExp (Levels[i]+LevelDiff[i], Class)))
 				stats.append ( (GemRB.GetString (16480),"",'d') )
 			stats.append ("\n")
-			print "\t\tClass (Level):",Class,"(",Levels[i],")"
+			print("\t\tClass (Level): " + str(Class) + " (" + str(Levels[i]) + ")")
 
 	elif Dual[0] > 0: # dual classed; first show the new class
-		print "\tDual classed"
+		print("\tDual classed")
 		stats.append ( (19722,1,'c') )
 
 		Levels = [GemRB.GetPlayerStat (pc, IE_LEVEL), GemRB.GetPlayerStat (pc, IE_LEVEL2), GemRB.GetPlayerStat (pc, IE_LEVEL3)]
@@ -399,7 +399,7 @@ def GetClassTitles (pc,LevelDiff):
 			stats.append ( (19720,1,'c') )
 		stats.append ("\n")
 	else: # single classed
-		print "\tSingle classed"
+		print("\tSingle classed")
 		Level = GemRB.GetPlayerStat (pc, IE_LEVEL) + LevelDiff[0]
 		GemRB.SetToken ("LEVEL", str (Level-LevelDrain))
 		GemRB.SetToken ("EXPERIENCE", str (XP) )
@@ -410,7 +410,7 @@ def GetClassTitles (pc,LevelDiff):
 			GemRB.SetToken ("NEXTLEVEL", str(LUCommon.GetNextLevelExp (Level, Class)))
 			stats.append ( (16480,1,'c') )
 		stats.append ("\n")
-		print "\t\tClass (Level):",Class,"(",Level,")"
+		print("\t\tClass (Level): " + str(Class) + " (" + str(Level) + ")")
 	return TypeSetStats (stats, pc)
 
 ########################################################################

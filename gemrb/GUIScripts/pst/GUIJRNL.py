@@ -174,7 +174,7 @@ def EvaluateCondition (var, value, condition):
 	elif condition == 'LT':
 		return cur_value < int (value)
 	else:
-		print 'Unknown condition in quests.ini:', condition
+		print('Unknown condition in quests.ini:', condition)
 		return None
 
 def EvaluateQuest (index):

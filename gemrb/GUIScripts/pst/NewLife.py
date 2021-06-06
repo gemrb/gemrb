@@ -256,12 +256,12 @@ def AcceptPress():
 	else:
 		x = 20 + (Con-9)*2
 
-	print "Setting max hp to: ",x
+	print("Setting max hp to: ", x)
 	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
 	#adding the remaining constitution bonus to the current hp
 	#if Con>14:
 	#	x = x+(Con-14)*3
-	print "Setting current hp to: ",x
+	print("Setting current hp to: ", x)
 	GemRB.SetPlayerStat(1, IE_HITPOINTS, x)
 
 	GemRB.FillPlayerInfo(1) #does all the rest

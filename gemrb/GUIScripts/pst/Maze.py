@@ -147,7 +147,7 @@ def zeros (size):
 def PrintMaze():
 	header = GemRB.GetMazeHeader()
 	if header==None or header["Inited"]==0:
-		print "There is maze or it is not initialized!"
+		print("There is no maze or it is not initialized!")
 		return
 
 	MazeX = header["MazeX"]
@@ -158,7 +158,7 @@ def PrintMaze():
 	NordomY = header["Pos2Y"]
 	FoyerX = header["Pos3X"]
 
-	print "Maze size is "+str(MazeX)+"X"+str(MazeY)
+	print("Maze size is " + str(MazeX) + "X" + str(MazeY))
 	for y in range (MazeY):
 		line = ""
 		for x in range (MazeX):
@@ -168,7 +168,7 @@ def PrintMaze():
 				line = line + "+ "
 			else:
 				line = line + "+-"
-		print line+"+"
+		print(line + "+")
 		line = ""
 		for x in range (MazeX):
 			pos = MAZE_MAX_DIM*x+y
@@ -185,14 +185,14 @@ def PrintMaze():
 				line = line + chr(entry["Trapped"]+65)
 			else:
 				line = line + " "
-		print line+"|"
+		print(line + "|")
 	line = ""
 	for x in range (MazeX):
 		if FoyerX==x:
 			line = line + "+ "
 		else:
 			line = line + "+-"
-	print line+"+"
+	print(line + "+")
 	return
 
 def ConvertPos (pos):
@@ -295,7 +295,7 @@ def CreateMaze ():
 				elif newpos+MAZE_MAX_DIM == pos:
 					GemRB.SetMazeEntry(pos, ME_WALLS, WALL_WEST)
 				else:
-					print "Something went wrong at pos: ", pos, " newpos: ", newpos
+					print("Something went wrong at pos: ", pos, " newpos: ", newpos)
 				AddRoom(newpos)
 
 	#adding foyer coordinates

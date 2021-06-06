@@ -83,7 +83,7 @@ def SetupSavingThrows (pc, Class, Chargen=False):
 	SaveName = CommonTables.Classes.GetValue (RowName, "SAVE", GTV_STR)
 	ClassSaveTable = GemRB.LoadTable (SaveName)
 	if Level+1 > ClassSaveTable.GetRowCount():
-		print "SetupSavingThrows: too high level, ignoring!"
+		print("SetupSavingThrows: too high level, ignoring!")
 		return
 
 	# save the saves
@@ -155,7 +155,6 @@ def LearnAnySpells (pc, BaseClassName, chargen=1):
 		Spellbook.SetupSpellLevels (pc, table, booktype, level)
 
 		for slevel in range (9):
-			print 112, slevel, booktype, GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus)
 			if GemRB.GetMemorizableSpellsCount (pc, booktype, slevel, bonus) <= 0:
 				# actually checks level+1 (runs if level-1 has memorizations)
 				Spellbook.LearnPriestSpells (pc, slevel, booktype, BaseClassName)

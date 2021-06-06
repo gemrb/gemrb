@@ -115,6 +115,6 @@ def MigrateSaveDir():
 				newSave = os.path.join (saveDir, save + "- moved from ToB")
 			os.rename (os.path.join (mpSaveDir, save), newSave)
 
-		print "done."
+		print("done.")
 	except ImportError:
-		print "No os module, cannot migrate save dir"
+		print("No os module, cannot migrate save dir")

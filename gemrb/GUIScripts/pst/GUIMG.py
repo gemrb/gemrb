@@ -102,8 +102,8 @@ def UpdateMageWindow (Window=None):
 			Icon.EnableBorder (0, 0)
 
 	#--------------------------test-----------------------------#
-	print "max_mem_cnt is: ", max_mem_cnt
-	print "mem_cnt is:     ", mem_cnt
+	print("max_mem_cnt is: ", max_mem_cnt)
+	print("mem_cnt is:     ", mem_cnt)
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
 	for i in range (20):
 		Icon = Window.GetControl (14 + i)

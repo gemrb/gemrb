@@ -135,7 +135,6 @@ def LoadPartyCharacters():
 	for j in range(1, min(6, MAX_PARTY_SIZE)+1):
 		Key = "Char"+str(j)
 		CharName = GemRB.GetINIPartyKey(Tag, Key, "")
-		print Tag, Key, CharName
 		if CharName !="":
 			GemRB.CreatePlayer(CharName, j, 1)
 	return

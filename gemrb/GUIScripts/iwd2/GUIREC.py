@@ -551,7 +551,7 @@ def WeaponOfHand(pc, combatdet, dualwielding, left=0):
 	slot = combatdet["Slot"]
 	slot_item = GemRB.GetSlotItem (pc, slot, 1)
 	if not slot_item:
-		print "ARGHH, no slot item at slot %d, bailing out!" %(combatdet["Slot"])
+		print("ARGHH, no slot item at slot %d, bailing out!" %(combatdet["Slot"]))
 		return
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
@@ -1171,7 +1171,6 @@ def OpenLevelUpWindow ():
 	nextLevel = LUCommon.GetNextLevelFromExp (xp, 5)
 	levelSum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
 	LevelDiff = nextLevel - levelSum - GetECL(pc)
-	print 1111111, nextLevel, levelSum, GetECL(pc), LevelDiff
 
 	# next
 	Button = Window.GetControl (0)

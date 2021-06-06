@@ -61,7 +61,7 @@ def GetUsableMemorizedSpells(actor, BookType):
 			Spell['BookType'] = BookType # just another sorting key
 			Spell['SpellIndex'] = GemRB.GetSpelldataIndex (actor, Spell["SpellResRef"], 1<<BookType) # crucial!
 			if Spell['SpellIndex'] == -1:
-				print "Error, memorized spell not found!", Spell["SpellResRef"], 1<<BookType
+				GemRB.Log (LOG_ERROR, "GetUsableMemorizedSpells", "Memorized spell not found! " + Spell["SpellResRef"] + " of type " + 1<<BookType)
 			Spell['SpellIndex'] += 1000 * 1<<BookType
 			memorizedSpells.append (Spell)
 
@@ -313,7 +313,7 @@ def SetupSpellIcons(Window, BookType, Start=0, Offset=0):
 def GetIWD2Spells (kit, usability, level, baseClass = -1):
 	spells = []
 	if baseClass == -1:
-		print "Error, didn't pass a base class in iwd2!"
+		print("Error, didn't pass a base class in iwd2!")
 		return spells
 	# to use baseClass as a column index, we first need to convert it,
 	# since only casters are in the table. But only casters have spell stats too
@@ -413,7 +413,7 @@ def GetLearnableDomainSpells (pc, Level, baseClassName = -1):
 	# columns correspond to kits in the same order
 	KitIndex = GUICommonWindows.GetKitIndex (pc, BaseClassIndex)
 	if KitIndex == -1:
-		print "GetLearnableDomainSpells: couldn't determine the kit, bailing out!"
+		print("GetLearnableDomainSpells: couldn't determine the kit, bailing out!")
 		return Learnable
 	# calculate the offset from the first cleric kit
 	KitIndex -= CommonTables.Classes.FindValue ("CLASS", BaseClassIndex+1)

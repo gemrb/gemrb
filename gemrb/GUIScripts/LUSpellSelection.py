@@ -182,7 +182,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 	elif SpellLearnTable == "MXSPLWIZ":
 		SpellLearnTable = "SPLWIZKN"
 	else:
-		print "OpenSpellsWindow: unhandled spell learning type encountered, falling back to memo table:", table
+		print("OpenSpellsWindow: unhandled spell learning type encountered, falling back to memo table:", table)
 	SpellLearnTable = GemRB.LoadTable (SpellLearnTable)
 
 	CastingStatValue = 0
@@ -611,7 +611,7 @@ def SpellsCancelPress ():
 			SpellsWindow.Unload()
 		GemRB.SetNextScript("Feats")
 	else:
-		print "Uh-oh in SpellsCancelPress in", GemRB.GameType
+		print("Uh-oh in SpellsCancelPress in", GemRB.GameType)
 	return
 
 def SpellsPickPress ():

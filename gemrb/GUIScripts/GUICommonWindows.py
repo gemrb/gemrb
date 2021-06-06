@@ -107,7 +107,7 @@ else: # Baldurs Gate, Icewind Dale
 def InitOptionButton(Window, Index, HotKey=True):
 	Button = Window.GetControl (OptionControl[Index])
 	if not Button:
-		print "InitOptionButton cannot find the button: " + Index
+		print("InitOptionButton cannot find the button: " + Index)
 		return
 
 	Button.SetTooltip (OptionTip[Index])
@@ -718,7 +718,7 @@ def UpdateActionsWindow ():
 		GemRB.SetVar ("Type", type)
 		Spellbook.SetupSpellIcons (CurrentWindow, type, TopIndex, ActionBarControlOffset)
 	else:
-		print "Invalid action level:", level
+		print("Invalid action level:", level)
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
 	return
 
@@ -841,7 +841,7 @@ def ActionRightPressed ():
 	pc = GemRB.GameGetFirstSelectedActor ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
-	print "Type:", Type
+	print("Type:", Type)
 	#Type is a bitfield if there is no level given
 	#This is to make sure cleric/mages get all spells listed
 	if GemRB.GetVar ("ActionLevel") == UAW_ALLMAGE:
@@ -851,7 +851,7 @@ def ActionRightPressed ():
 			Max = GemRB.GetKnownSpellsCount (pc, Type, -1) # this can handle only one type at a time
 	else:
 		Max = GemRB.GetMemorizedSpellsCount(pc, Type, -1, 1)
-	print "Max:",Max
+	print("Max:", Max)
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -1084,7 +1084,7 @@ def SpellShiftPressed ():
 	if SponCastTableName != "*":
 		SponCastTable = GemRB.LoadTable (SponCastTableName, 1)
 		if not SponCastTable:
-			print "SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName
+			print("SpellShiftPressed: skipping, non-existent spontaneous casting table used! ResRef:", SponCastTableName)
 			SpellPressed ()
 			return
 
@@ -1327,7 +1327,7 @@ def TopWindowClosed(window):
 	if rtgbtn: # not in PST or IWD2
 		rtgbtn.SetState(IE_GUI_BUTTON_SELECTED)
 		
-	print "pause state " + str(CreateTopWinLoader.PauseState)
+	print("pause state " + str(CreateTopWinLoader.PauseState))
 	if CreateTopWinLoader.PauseState is not None:
 		GemRB.GamePause (CreateTopWinLoader.PauseState, 3)
 
@@ -1488,7 +1488,7 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 
 	if GameCheck.IsIWD2() or GameCheck.IsPST():
 		# set Mode = "horizontal" once we can create enough space
-		print "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ..."
+		GemRB.Log(LOG_ERROR, "GetPortraitButtonPairs", "Parties larger than 6 are currently not supported in IWD2 and PST! Using 6 ...")
 		return pairs
 
 	# GUIWORLD doesn't have a separate portraits window, so we need to skip
@@ -1602,7 +1602,6 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 	PortraitWindow.SetFlags(WF_BORDERLESS|IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
 
 	if needcontrols and not GameCheck.IsPST(): #not in pst
-		print "DEBUG:GUICommonWindows.OpenPortraitWindow:NEEDCONTROLS ON"
 		# 1280 and higher don't have this control
 		Button = Window.GetControl (8)
 		if Button:
