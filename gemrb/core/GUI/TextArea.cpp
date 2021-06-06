@@ -208,7 +208,7 @@ bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mo
 	if (span) {
 		std::list<View*>::reverse_iterator it = subViews.rbegin();
 		unsigned int idx = 0;
-		while (*it++ != span) { ++idx; };
+		while (*it++ != span) { ++idx; }
 		
 		MakeSelection(idx);
 	}

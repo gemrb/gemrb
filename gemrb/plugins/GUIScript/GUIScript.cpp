@@ -164,7 +164,7 @@ if (!PyArg_ParseTuple( args, fmt, __VA_ARGS__ )) { \
 }
 
 #define ABORT_IF_NULL(thing) \
-if (thing == NULL) return RuntimeError(#thing " cannot be null.");
+if (thing == nullptr) return RuntimeError(#thing " cannot be null.")
 
 #define RETURN_BOOL(boolean) \
 if (boolean) { \

@@ -275,7 +275,7 @@ static void ReleaseItemList(void *poi)
 static void FreeAbilityTables()
 {
 #define NULL_FREE(ptr)\
-	free(ptr); ptr = NULL;
+	free(ptr); ptr = nullptr
 
 	NULL_FREE(strmod);
 	NULL_FREE(strmodex);
@@ -1117,7 +1117,7 @@ int Interface::Init(InterfaceConfig* config)
 		value = config->GetValueForKey(key); \
 		if (value) \
 			var ( atoi( value ) ); \
-		value = NULL;
+		value = nullptr
 
 	CONFIG_INT("Bpp", Bpp =);
 	CONFIG_INT("CaseSensitive", CaseSensitive =);
@@ -1153,10 +1153,10 @@ int Interface::Init(InterfaceConfig* config)
 		value = config->GetValueForKey(key); \
 		if (value) \
 			vars->SetAt(var, atoi(value)); \
-		value = NULL;
+		value = nullptr
 
 #define CONFIG_VARS(key) \
-		CONFIG_VARS_MAP(key, key);
+		CONFIG_VARS_MAP(key, key)
 
 	// using vars because my hope is to expose (some of) these in a customized GUIOPT
 	// map gemrb.cfg value to the value used by the options (usually an option from game.ini)
@@ -1177,7 +1177,7 @@ int Interface::Init(InterfaceConfig* config)
 		} else if (default && default[0]) { \
 			strlcpy(var, default, sizeof(var)); \
 		} else var[0] = '\0'; \
-		value = NULL;
+		value = nullptr
 
 	CONFIG_STRING("GameName", GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
 	CONFIG_STRING("GameType", GameType, "auto");
@@ -1198,7 +1198,7 @@ int Interface::Init(InterfaceConfig* config)
 		} else if (default && default[0]) { \
 			strlcpy(var, default, sizeof(var)); \
 		} else var[0] = '\0'; \
-		value = NULL;
+		value = nullptr
 
 	// TODO: make CustomFontPath cross platform and possibly dynamic
 	CONFIG_PATH("CustomFontPath", CustomFontPath, "/usr/share/fonts/TTF");
@@ -1277,7 +1277,7 @@ int Interface::Init(InterfaceConfig* config)
 		value = config->GetValueForKey(key); \
 		if (value) \
 			var = value; \
-		value = NULL;
+		value = nullptr
 
 	CONFIG_STRING("AudioDriver", AudioDriverName);
 	CONFIG_STRING("VideoDriver", VideoDriverName);
@@ -2192,7 +2192,7 @@ bool Interface::LoadGemRBINI()
 	// Resrefs are already initialized in Interface::Interface()
 #define ASSIGN_RESREF(resref, name) \
 	s = ini->GetKeyAsString( "resources", name, NULL ); \
-	resref = s; s = NULL;
+	resref = s; s = nullptr
 
 	ASSIGN_RESREF(MainCursorsImage, "MainCursorsImage");
 	ASSIGN_RESREF(TextCursorBam, "TextCursorBAM"); //console cursor
