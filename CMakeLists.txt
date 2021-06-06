@@ -95,10 +95,7 @@ message(STATUS "Detected version: ${GEMRB_VERSION}")
 unset(GLOBALS)
 
 IF(PREFIX)
-	SET(CMAKE_INSTALL_PREFIX ${PREFIX})
-	# cmake 3 makes internal use of this variable ...
-	UNSET(PREFIX)
-	UNSET(PREFIX CACHE)
+	MESSAGE(FATAL_ERROR "CMake started using PREFIX internally, pass CMAKE_INSTALL_PREFIX instead!")
 ENDIF(PREFIX)
 
 if (NOT LAYOUT)
