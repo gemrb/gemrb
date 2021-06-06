@@ -1507,27 +1507,6 @@ int Interface::Init(InterfaceConfig* config)
 	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
-	// if unset, manually populate GameName (window title)
-	std::map<std::string, std::string> gameTypeNameMap;
-	gameTypeNameMap["auto"] = "";
-	gameTypeNameMap["bg1"] = "Baldur's Gate 1";
-	gameTypeNameMap["bg2"] = "Baldur's Gate 2";
-	gameTypeNameMap["iwd"] = "Icewind Dale (vanilla)";
-	gameTypeNameMap["how"] = "Icewind Dale: Heart of Winter";
-	gameTypeNameMap["iwd2"] = "Icewind Dale 2";
-	gameTypeNameMap["pst"] = "Planescape: Torment";
-	gameTypeNameMap["demo"] = "Internal demo";
-	gameTypeNameMap["test"] = "Tests";
-	if (!stricmp(GameName, GEMRB_STRING)) {
-		if (gameTypeNameMap.find(GameType) != gameTypeNameMap.end()) {
-			std::string prefix = GEMRB_STRING" running ";
-			strlcpy(GameName, gameTypeNameMap[GameType].insert(0, prefix).c_str(), sizeof(GameName));
-		} else {
-			strlcpy(GameName, "GemRB running unknown game", sizeof(GameName));
-		}
-		video->SetWindowTitle(GameName);
-	}
-
 	// Purposely add the font directory last since we will only ever need it at engine load time.
 	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
@@ -1535,6 +1514,17 @@ int Interface::Init(InterfaceConfig* config)
 	if (!LoadGemRBINI()) {
 		Log(FATAL, "Core", "Cannot Load INI.");
 		return GEM_ERROR;
+	}
+
+	// if unset, manually populate GameName (window title)
+	if (!stricmp(GameName, GEMRB_STRING)) {
+		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING)) {
+			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
+			strlcpy(GameName, title.c_str(), sizeof(GameName));
+		} else {
+			strlcpy(GameName, GEMRB_STRING" running unknown game", sizeof(GameName));
+		}
+		video->SetWindowTitle(GameName);
 	}
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
@@ -2223,6 +2213,8 @@ bool Interface::LoadGemRBINI()
 			TooltipBG->SetMargin(ttMargin);
 		}
 	}
+
+	DefaultWindowTitle = ini->GetKeyAsString("resources", "WindowTitle", GEMRB_STRING);
 
 	// These are values for how long a single step is, see Movable::DoStep.
 	// They were found via trial-and-error, trying to match
