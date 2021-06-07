@@ -246,8 +246,8 @@ def OpenSaveDetailWindow ():
 	from GameCheck import MAX_PARTY_SIZE
 	for j in range (MAX_PARTY_SIZE):
 		Button = Window.GetControl (6 + j)
-		Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
-
+		if Button:
+			Button.SetSprite2D (GemRB.GetPlayerPortrait (j)["Sprite"])
 
 	CheckSaveName ()
 	Window.ShowModal (MODAL_SHADOW_GRAY)
