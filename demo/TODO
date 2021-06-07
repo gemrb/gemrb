@@ -4,6 +4,3 @@ https://github.com/gemrb/gemrb/issues/313
 OLD NOTES
 fist.itm is missing some resources like icons
 chitin.key is not updated
-
-CONSIDER REMOVING:
-- the fonts, now included for easier testing (otherwise add all the needed boilerplate)
