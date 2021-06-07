@@ -748,7 +748,7 @@ static bool InspectEdges(Point& walkableStartPoint, const Region& vp, int curren
 }
 
 // this complicated search has been reverse-engineered from the original
-static const Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatureSize, int phase)
+static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatureSize, int phase)
 {
 	Region vp0 = core->GetGameControl()->Viewport();
 	// go for 640x480, so large viewports are less likely to interfere with scripting

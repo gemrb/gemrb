@@ -915,7 +915,7 @@ bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
 	return bool(mask[res.quot] & (1 << res.rem));
 }
 
-void Map::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& vp)
+void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, const Region& vp)
 {
 	// Size of Fog-Of-War shadow tile (and bitmap)
 	constexpr int CELL_SIZE = 32;
@@ -1355,7 +1355,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	//draw all background animations first
 	aniIterator aniidx = animations.begin();
 
-	auto DrawAreaAnimation = [&, this](AreaAnimation *a) {
+	auto DrawAreaAnimation = [&, this](const AreaAnimation *a) {
 		uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
 		flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
 		

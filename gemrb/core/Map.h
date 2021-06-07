@@ -657,7 +657,7 @@ private:
 	void DrawSearchMap(const Region &vp) const;
 	void DrawPortal(InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport);
-	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, const Region& viewport);
+	void DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, const Region& viewport);
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point &p, const uint8_t*) const;
 	Point ConvertPointToFog(const Point &p) const;

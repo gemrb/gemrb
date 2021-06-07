@@ -267,7 +267,6 @@ def NextPress():
 
 	for i in range (AbilityCount):
 		StatID = AbilityTable.GetValue (i, 3)
-		StatName = AbilityTable.GetRowName (i)
 		StatValue = GemRB.GetVar ("Ability "+str(i))
 		GemRB.SetPlayerStat (MyChar, StatID, StatValue)
 

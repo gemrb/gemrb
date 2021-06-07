@@ -6779,7 +6779,7 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 		//no incref here!
 		return Py_None;
 	}
-	Item* item = gamedata->GetItem(ItemResRef, true);
+	const Item* item = gamedata->GetItem(ItemResRef, true);
 	if (item == NULL) {
 		btn->SetPicture(NULL);
 		//no incref here!
