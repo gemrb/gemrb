@@ -51,6 +51,9 @@ def InitMageWindow (Window):
 		Icon.SetBorder (0, color,  0, 1)
 		Icon.SetVarAssoc ("SpellButton", i)
 
+	for i in range (20):
+		Icon = Window.GetControl (14 + i)
+		Icon.SetVarAssoc ("SpellButton", 100 + i)
 	return
 
 def UpdateMageWindow (Window=None):
@@ -116,7 +119,6 @@ def UpdateMageWindow (Window=None):
 			spell = GemRB.GetSpell (ks['SpellResRef'])
 			Icon.SetTooltip (spell['SpellName'])
 			MageKnownSpellList.append (ks['SpellResRef'])
-			Icon.SetVarAssoc ("SpellButton", 100 + i)
 		else:
 			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
@@ -203,10 +205,8 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	global MageSpellUnmemorizeWindow
 
 	if MageSpellUnmemorizeWindow != None:
-		if MageSpellUnmemorizeWindow:
-			MageSpellUnmemorizeWindow.Unload ()
+		MageSpellUnmemorizeWindow.Unload ()
 		MageSpellUnmemorizeWindow = None
-
 		return
 
 	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
@@ -231,8 +231,9 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 
 def OnMageUnmemorizeSpell (btn, index):
 	if MageSpellUnmemorizeWindow:
-		OpenMageSpellUnmemorizeWindow ()
+		OpenMageSpellUnmemorizeWindow (btn, index)
 
+	index = GemRB.GetVar ("SpellButton")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	type = IE_SPELL_TYPE_WIZARD

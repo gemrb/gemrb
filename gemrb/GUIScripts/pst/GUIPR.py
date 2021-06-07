@@ -212,10 +212,8 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 	global PriestSpellUnmemorizeWindow
 
 	if PriestSpellUnmemorizeWindow != None:
-		if PriestSpellUnmemorizeWindow:
-			PriestSpellUnmemorizeWindow.Unload ()
+		PriestSpellUnmemorizeWindow.Unload ()
 		PriestSpellUnmemorizeWindow = None
-
 		return
 
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
@@ -241,7 +239,7 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 
 def OnPriestUnmemorizeSpell (btn, index):
 	if PriestSpellUnmemorizeWindow:
-		OpenPriestSpellUnmemorizeWindow ()
+		OpenPriestSpellUnmemorizeWindow (btn, index)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
