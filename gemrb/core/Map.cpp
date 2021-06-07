@@ -112,7 +112,7 @@ void Map::ReleaseMemory()
 	}
 }
 
-static inline AnimationObjectType SelectObject(Actor *actor, int q, AreaAnimation *a, VEFObject *sca, Particles *spark, Projectile *pro, Container *pile)
+static inline AnimationObjectType SelectObject(Actor *actor, int q, const AreaAnimation *a, VEFObject *sca, Particles *spark, Projectile *pro, Container *pile)
 {
 	int actorh;
 	if (actor) {
@@ -1374,7 +1374,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		return GetNextAreaAnimation(aniidx, gametime);
 	};
 	
-	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
+	const AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	while (a && a->GetHeight() == ANI_PRI_BACKGROUND) {
 		a = DrawAreaAnimation(a);
 	}
@@ -1542,8 +1542,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		DrawSearchMap(viewport);
 	}
 	
-	uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap;
-	uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap;
+	const uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap;
+	const uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap;
 	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
