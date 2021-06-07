@@ -690,7 +690,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 
 Region ScriptedAnimation::DrawingRegion() const
 {
-	Region r = (twin) ? twin->DrawingRegion() : Region(Pos, Size());
+	Region r = twin ? twin->DrawingRegion() : Region(Pos, Size());
 
 	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
 	if (anim) {

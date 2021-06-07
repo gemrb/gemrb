@@ -163,7 +163,7 @@ public:
 
 			SDL_UpdateYUVTexture(texture, &dest, planes[Y], strides[Y], planes[V], strides[V], planes[U], strides[U]);
 		} else if (nativeFormat == inputFormat) {
-			SDL_UpdateTexture(texture, &dest, pixelBuf, (pitch) ? *pitch : sdlpitch);
+			SDL_UpdateTexture(texture, &dest, pixelBuf, pitch ? *pitch : sdlpitch);
 		} else if (inputFormat == SDL_PIXELFORMAT_INDEX8) {
 			// SDL_ConvertPixels doesn't support palettes... must do it ourselves
 			va_list args;
@@ -191,7 +191,7 @@ public:
 				Log(ERROR, "SDL20Video", "%s", SDL_GetError());
 			}
 		} else {
-			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, (pitch) ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
+			int ret = SDL_ConvertPixels(bufDest.w, bufDest.h, inputFormat, pixelBuf, pitch ? *pitch : sdlpitch, nativeFormat, conversionBuffer->pixels, sdlpitch);
 			if (ret == 0) {
 				ret = SDL_UpdateTexture(texture, &dest, conversionBuffer->pixels, sdlpitch);
 			}

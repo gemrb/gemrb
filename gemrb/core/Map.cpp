@@ -1538,7 +1538,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
 	
-	if ((dFlags & DEBUG_SHOW_SEARCHMAP)) {
+	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
 		DrawSearchMap(viewport);
 	}
 	
@@ -1740,7 +1740,7 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	if (scriptable->Type == ST_ACTOR) {
 		const Actor* actor = static_cast<const Actor*>(scriptable);
 		// birds are never occluded
-		if ((actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD)) {
+		if (actor->GetStat(IE_DONOTJUMP) & DNJ_BIRD) {
 			return 0;
 		}
 	}
@@ -3347,7 +3347,7 @@ int Map::GetExploredMapSize() const
 
 void Map::FillExplored(bool explored)
 {
-	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), (explored) ? 0xff : 0x00);
+	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), explored ? 0xff : 0x00);
 }
 
 void Map::ExploreTile(const Point &p)

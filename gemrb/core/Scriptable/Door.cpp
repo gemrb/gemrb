@@ -59,7 +59,7 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon() const
 
 std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 {
-	return (open) ? openTrigger : closedTrigger;
+	return open ? openTrigger : closedTrigger;
 }
 
 Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)

@@ -1099,7 +1099,7 @@ static int check_resistance(Actor* actor, Effect* fx)
 		return check_magic_res(actor, fx, caster);
 	}
 
-	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & (STATE_ANTIMAGIC) ) ) {
+	if (pstflags && (actor->GetSafeStat(IE_STATE_ID) & STATE_ANTIMAGIC)) {
 		return -1;
 	}
 

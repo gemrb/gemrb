@@ -570,7 +570,7 @@ public:
 
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
-	GameControl *GetGameControl() const { return (game) ? gamectrl : NULL; }
+	GameControl *GetGameControl() const { return game ? gamectrl : nullptr; }
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	/** sets up load game */

@@ -1186,7 +1186,7 @@ static PyObject* GemRB_View_AddSubview(PyObject* self, PyObject* args)
 	PyObject* pyid = NULL; // if we were moving a view from one window to another we may need to pass this to avoid conflicts
 	PARSE_ARGS(args, "OO|OO", &self, &pySubview, &pySiblingView, &pyid);
 
-	ScriptingId id = (pyid) ? (ScriptingId)PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
+	ScriptingId id = pyid ? (ScriptingId) PyLong_AsUnsignedLongLong(pyid) : ScriptingId(-1);
 
 	const ViewScriptingRef* ref = dynamic_cast<const ViewScriptingRef*>(GetScriptingRef(pySubview));
 
@@ -2233,7 +2233,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			PyObject* pyColorNotVisited = nullptr;
 			PARSE_ARGS(constructArgs, "|siiOOO", &fontname, &recolor, &paletteOverride, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
 			
-			Font* font = (fontname) ? core->GetFont(fontname) : nullptr;
+			Font* font = fontname ? core->GetFont(fontname) : nullptr;
 			WorldMapControl* wmap = nullptr;
 			if (pyColorNormal) {
 				wmap = new WorldMapControl(rgn, font, ColorFromPy(pyColorNormal), ColorFromPy(pyColorSelected), ColorFromPy(pyColorNotVisited));
@@ -4955,7 +4955,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	}
 
 	int itflags = DirectoryIterator::Files;
-	itflags |= (dirs) ? DirectoryIterator::Directories : 0;
+	itflags |= dirs ? DirectoryIterator::Directories : 0;
 	dirit.SetFlags(itflags, true);
 
 	std::vector<String> strings;

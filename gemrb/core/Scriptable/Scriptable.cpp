@@ -612,7 +612,7 @@ void Scriptable::LeftDialog()
 
 void Scriptable::Hide()
 {
-	InternalFlags &=~(IF_VISIBLE);
+	InternalFlags &= ~IF_VISIBLE;
 }
 
 void Scriptable::Unhide()

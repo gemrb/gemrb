@@ -1875,11 +1875,11 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
 		auto open = d->OpenTriggerArea();
-		tmpWord = (open) ? open->Count() : 0;
+		tmpWord = open ? open->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		VertIndex += tmpWord;
 		auto closed = d->ClosedTriggerArea();
-		tmpWord = (closed) ? closed->Count() : 0;
+		tmpWord = closed ? closed->Count() : 0;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;

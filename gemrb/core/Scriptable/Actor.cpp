@@ -4719,9 +4719,9 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 		PlayDamageAnimation(DL_FIRE + damagelevel);
 	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD)) {
 		PlayDamageAnimation(DL_COLD + damagelevel);
-	} else if (damagetype & (DAMAGE_ELECTRICITY)) {
+	} else if (damagetype & DAMAGE_ELECTRICITY) {
 		PlayDamageAnimation(DL_ELECTRICITY + damagelevel);
-	} else if (damagetype & (DAMAGE_ACID)) {
+	} else if (damagetype & DAMAGE_ACID) {
 		PlayDamageAnimation(DL_ACID + damagelevel);
 	} else if (damagetype & (DAMAGE_MAGIC|DAMAGE_DISINTEGRATE)) {
 		PlayDamageAnimation(DL_DISINTEGRATE + damagelevel);
@@ -6478,7 +6478,7 @@ void Actor::SetDialog(const ieResRef resref)
 Holder<Sprite2D> Actor::CopyPortrait(int which) const
 {
 	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(which ? SmallPortrait : LargePortrait, true);
-	return (im) ? im->GetSprite2D() : NULL;
+	return im ? im->GetSprite2D() : nullptr;
 }
 
 const char *Actor::GetDialog(int flags) const

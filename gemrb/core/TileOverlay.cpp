@@ -62,7 +62,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 	if (globalTint) {
 		flags |= BLIT_COLOR_MOD;
 	}
-	const Color tintcol = (globalTint) ? * globalTint : Color();
+	const Color tintcol = globalTint ? * globalTint : Color();
 
 	Video* vid = core->GetVideoDriver();
 	for (int y = sy; y < dy && y < h; y++) {
