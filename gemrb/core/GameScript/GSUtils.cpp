@@ -693,7 +693,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	return MIC_GOTITEM;
 }
 
-void PolymorphCopyCore(Actor *src, Actor *tar)
+void PolymorphCopyCore(const Actor *src, Actor *tar)
 {
 	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
 
@@ -808,19 +808,16 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
-	Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *tmp = GetActorFromObject(Sender, parameters->objects[1]);
 	//if there is nothing to copy, don't spawn anything
-	if (flags & CC_COPY) {
-		if (!tmp || tmp->Type != ST_ACTOR) {
-			return;
-		}
+	if (flags & CC_COPY && (!tmp || tmp->Type != ST_ACTOR)) {
+		return;
 	}
 
 	Actor* ab;
 	if (flags & CC_STRING1) {
 		ab = gamedata->GetCreature(parameters->string1Parameter);
-	}
-	else {
+	} else {
 		ab = gamedata->GetCreature(parameters->string0Parameter);
 	}
 
@@ -855,28 +852,28 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			if (tmp) Sender=tmp;
 			//fall through
 		case CC_OFFSET://use sender + offset
-			pnt.x = parameters->pointParameter.x+Sender->Pos.x;
-			pnt.y = parameters->pointParameter.y+Sender->Pos.y;
+			pnt.x = parameters->pointParameter.x + Sender->Pos.x;
+			pnt.y = parameters->pointParameter.y + Sender->Pos.y;
 			break;
 		default: //absolute point, but -1,-1 means AtFeet
 			pnt.x = parameters->pointParameter.x;
 			pnt.y = parameters->pointParameter.y;
-			if (pnt.isempty()) {
-				if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
-					pnt.x = ((InfoPoint *)Sender)->TrapLaunch.x;
-					pnt.y = ((InfoPoint *)Sender)->TrapLaunch.y;
-				} else {
-					pnt.x = Sender->Pos.x;
-					pnt.y = Sender->Pos.y;
-				}
+			if (!pnt.isempty()) break;
+
+			if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
+				pnt.x = ((InfoPoint *) Sender)->TrapLaunch.x;
+				pnt.y = ((InfoPoint *) Sender)->TrapLaunch.y;
+			} else {
+				pnt.x = Sender->Pos.x;
+				pnt.y = Sender->Pos.y;
 			}
 			break;
 	}
 
 	Map *map = Sender->GetCurrentArea();
-	map->AddActor( ab, true );
+	map->AddActor(ab, true);
 	ab->SetPosition(pnt, flags & CC_CHECK_IMPASSABLE, 0, 0);
-	ab->SetOrientation(parameters->int0Parameter, false );
+	ab->SetOrientation(parameters->int0Parameter, false);
 
 	// also set it as Sender's LastMarkedObject (fixes worg rider dismount killing players)
 	if (Sender->Type == ST_ACTOR) {
@@ -886,16 +883,14 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
-		CreateVisualEffectCore( ab, ab->Pos, parameters->string1Parameter, 1);
-	} else {
+		CreateVisualEffectCore(ab, ab->Pos, parameters->string1Parameter, 1);
+	} else if (parameters->string1Parameter[0]) {
 		//setting the deathvariable if it exists (iwd2)
-		if (parameters->string1Parameter[0]) {
-			ab->SetScriptName(parameters->string1Parameter);
-		}
+		ab->SetScriptName(parameters->string1Parameter);
 	}
 
 	if (flags & CC_COPY) {
-		PolymorphCopyCore ( (Actor *) tmp, ab);
+		PolymorphCopyCore((const Actor *) tmp, ab);
 	}
 }
 
