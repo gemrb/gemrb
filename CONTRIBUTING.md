@@ -30,7 +30,8 @@ Please stay friendly and constructive, we are not robots. I promise.
 If you don't trust your skills, take a look at the `good first issue` 
 [subset of reports](https://github.com/gemrb/gemrb/labels/good%20first%20issue), ranging from trivial to simple.
 
-Instructions on building and IDE setup can be found in INSTALL.
+Instructions on building and IDE setup can be found in INSTALL or the
+[online developer docs](https://gemrb.org/Dev-docs.html).
 
 If you don't know what to work on:
 - try playing a game with GemRB and make note of any bugs, annoyances
@@ -56,14 +57,15 @@ If you're a web developer, check the website [reports](https://github.com/gemrb/
 
 ### Modders, game designers and artists
 
-1. GemRB comes with a bundled demo, but it is trivial. The challenge is to enhance it, but
-a lot of (compatibly licensed) art is missing. See also the docs on
+1. GemRB comes with a bundled demo, but it is short. The challenge is to enhance it, but
+a lot of (compatibly licensed) art is missing. Check the current
+[progress tracker](https://github.com/gemrb/gemrb/issues/1210). See also the docs on
 [creating a new game](https://gemrb.org/New-game.html)
 
 2. Some GemRB mods are in the [gemrb-mods repo](https://github.com/lynxlynxlynx/gemrb-mods).
 The [mod idea page](https://gemrb.org/Modding.html) also lists
-several ideas from simple tweaks to more complex mods.  If you know WeiDU, a good task would be to add
-more of the documented tweaks (idea page) to the tweakpack.
+several ideas from simple tweaks to more complex mods. If you know WeiDU, a good task would be to add
+more of the documented tweaks (idea page) to gemrb-tweakpack.
 
 3. Modders can also contribute with research (see above), especially when it requires WeiDU test mods.
 
@@ -126,7 +128,7 @@ so we can improve our process and documentation!
 - [engine overview](https://gemrb.org/Engine-overview.html),
 - [GUIScript documentation](https://gemrb.org/GUIScript/Index.html),
 - [plaintext dumps](http://lynxlynx.info/ie/string-dumps.zip) of game strings with matching strrefs,
-- the buildbots are accessible through any PR or commit
+- the buildbots are accessible through any PR, commit or badges in the README
 - the tools mentioned in the README links section
 
 
@@ -163,6 +165,7 @@ to display diffs of included binary files (spells and other overrides).
 
 All of this makes reviewing and bisecting for regressions easier.
 
+
 ## For maintainers
 
 1. Squash merge only if the history is a mess or it makes more
@@ -197,6 +200,7 @@ incomplete OpenGL renderers and so on.
 Generally each release tackles at least one item from #2 and a bag-of-holding
 worth of #1.
 
+
 ### Roadmap
 
 As noted in the previous section, most releases don't have very specific goals.
@@ -204,12 +208,11 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.8.8 is to make the subviews branch ready for release.
-Once the branch is merged, we can also start working on the port to python3.
-Naturally the release will contain also other unrelated fixes, so just look at
-the tracker. The first priority is to fix the issues tagged with "subviews" and
-thoroughly test it out.
+The plan for 0.9.1 is to start working on the port to python3 and items that
+waited for the subviews merge. Porting to python3 is extremely important not
+just because python2 has been deprecated, but it's also the reason GemRB is
+not available in some major Linux distribtions like Debian any more.
 
-Due to the volume of changes and the merge&refactoring problems they introduce,
-making the subviews branch ready for prime time is the **single most important
-TODO item**. Any help in stabilising the branch is greatly appreciated!
+We're looking for ninjas to help with GLESv2 support (no hw, see
+[#938](https://github.com/gemrb/gemrb/issues/938)) and a full-fledged installer
+for windows [#612](https://github.com/gemrb/gemrb/issues/612).
