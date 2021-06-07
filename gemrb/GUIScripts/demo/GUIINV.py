@@ -93,6 +93,11 @@ def InitInventoryWindow (Window):
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
 	Button.SetHotKey ('i')
 
+	# eXit
+	Button = Window.GetControl (200)
+	Button.SetText ("X")
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommonWindows.CloseTopWindow)
+
 	# armor class
 	Label = Window.GetControl (0x10000038)
 	Label.SetTooltip ("Armor class")
