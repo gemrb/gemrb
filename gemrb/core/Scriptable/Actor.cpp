@@ -2160,7 +2160,7 @@ static void InitActorTables()
 		}
 	}
 
-	maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
+	if (classcount) maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
 	AutoTable xpcapt("xpcap");
 	std::map<std::string, int> className2ID;

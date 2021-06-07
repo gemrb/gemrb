@@ -2432,7 +2432,9 @@ int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags
 
 		actorlist[count++] = actor;
 	}
-	actorlist = ( Actor * * ) realloc( actorlist, count * sizeof( Actor * ) );
+	if (count) {
+		actorlist = (Actor **) realloc(actorlist, count * sizeof(Actor *));
+	}
 	return count;
 }
 
