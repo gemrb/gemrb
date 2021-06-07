@@ -33,10 +33,7 @@
 #define _UNICODE
 #define NOGDI
 #define _USE_MATH_DEFINES
-
-#ifndef NOCOLOR
 #define NOCOLOR
-#endif
 
 #ifdef _DEBUG
 #include <crtdbg.h>
