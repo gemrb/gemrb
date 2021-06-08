@@ -131,9 +131,11 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 char* PyString_AsString(PyObject* obj)
 {
 	char* str = nullptr;
+	const char* encoding;
+	strlcpy(encoding, core->SystemEncoding, sizeof(encoding));
+	if (!encoding) strlcpy(encoding, "UTF-8", sizeof(encoding));
 	if (PyUnicode_Check(obj)) {
-		// FIXME: encoding shoulxd come from our core encoding setting
-		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, "UTF-8", "strict"); // Owned reference
+		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
 		if (temp_bytes != NULL) {
 			str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
 			Py_DECREF(temp_bytes);
