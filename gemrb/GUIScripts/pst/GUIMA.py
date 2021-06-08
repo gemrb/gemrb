@@ -93,7 +93,7 @@ def OpenTravelWindow ():
 	cnormal = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff}
 	cselected = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff}
 	cnotvisited = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xa0}
-	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", cnormal, cselected, cnotvisited)
+	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", 0, 0, cnormal, cselected, cnotvisited)
 	WMap.SetAnimation ("WMPTY")
 	WMap.SetVarAssoc ("Travel", Travel)
 	#center on current area
