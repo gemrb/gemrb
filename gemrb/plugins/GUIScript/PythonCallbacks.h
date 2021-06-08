@@ -98,12 +98,11 @@ struct PythonComplexCallback : public PythonCallback {
 	PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
 	
 	PyObject* GetArgs(ARG_T arg) const {
+#if PY_MAJOR_VERSION >= 3
 		PyObject* func_code = PyObject_GetAttrString(Function, "__code__");
-		if (!func_code) {
-			// try Python 2
-			func_code = PyObject_GetAttrString(Function, "func_code");
-		}
-		
+#else
+		PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
+#endif
 		if (!func_code) return nullptr;
 		
 		PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
