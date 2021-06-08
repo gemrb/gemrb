@@ -58,7 +58,7 @@ def GetNextLevels (actor, Classes):
 			# no guaranteed class-getting order
 			NumClasses = 3
 		else:
-			NumClasses = len(filter(lambda x: x > 0, Classes))
+			NumClasses = len([x for x in Classes if x > 0])
 
 	for i in range(NumClasses):
 		# Get the next level we will use to look up new stats from the 2da tables

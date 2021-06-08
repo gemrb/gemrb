@@ -139,7 +139,7 @@ def OpenAudioOptionsWindow ():
 		global AudioHelpText
 		# Restore values in case of cancel
 		if GemRB.GetVar ("Cancel") == 1:
-			for k, v in saved_audio_options.items ():
+			for k, v in list(saved_audio_options.items ()):
 				GemRB.SetVar (k, v)
 			AudioHelpText = None
 			UpdateVolume (31210)

@@ -542,7 +542,7 @@ def UpdateSpellList ():
 
 	BuildSpellList(pc, Type, Level-1)
 
-	names = SpellList.keys()
+	names = list(SpellList.keys())
 	names.sort()
 
 	cnt = len(names)
@@ -662,7 +662,7 @@ def ContingencyCancel ():
 def ContingencyHelpSpell ():
 	global Spell1, Spell2, Spell3
 
-	names = SpellList.keys()
+	names = list(SpellList.keys())
 	names.sort()
 	i = GemRB.GetVar("PickedSpell")
 	spell = names[i]

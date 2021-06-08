@@ -846,7 +846,7 @@ def AddDefaultVoiceSet (VoiceList, Voices):
 		Options = collections.OrderedDict(enumerate(Voices))
 		Options[-1] = "default"
 		Options = collections.OrderedDict(sorted(Options.items()))
-		VoiceList.SetOptions (Options.values())
+		VoiceList.SetOptions (list(Options.values()))
 		return True
 	return False
 

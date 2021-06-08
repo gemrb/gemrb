@@ -434,7 +434,7 @@ def OpenScriptWindow ():
 				# none
 				idx = idx - 1
 
-	ScriptTextArea.SetOptions (options.values())
+	ScriptTextArea.SetOptions (list(options.values()))
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	script = GemRB.GetPlayerScript (pc)

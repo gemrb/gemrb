@@ -440,7 +440,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level, booktype=0):
 		rowName = CommonTables.ClassSkills.GetRowName (row)
 		Class = CommonTables.Classes.GetValue (rowName, "ID", GTV_INT)
 		spells = GetIWD2Spells (0, Usability, Level, Class)
-		spells = map(lambda e: e[0], spells) # ignore the second member
+		spells = [e[0] for e in spells] # ignore the second member
 		return spells
 
 	SpellsTable = GemRB.LoadTable ("spells")

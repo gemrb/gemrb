@@ -164,7 +164,7 @@ def UpdateInventoryWindow (Window = None):
 
 	# PST uses unhardcoded/avslots.2da to decide which slots do what per character
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	SlotMap = map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ','))
+	SlotMap = list(map (int, AvSlotsTable.GetValue (row, 1, GTV_STR).split( ',')))
 	InventoryCommon.SlotMap = SlotMap
 
 	# populate inventory slot controls

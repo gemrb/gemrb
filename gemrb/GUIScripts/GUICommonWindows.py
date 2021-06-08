@@ -534,11 +534,11 @@ def SetupItemAbilities(pc, slot, only):
 		rmax = min(len(Tips), 12-ammoSlotCount)
 
 		# for mixed items, only show headers if there is more than one appropriate one
-		weaps = sum(map(lambda i: i==ITEM_LOC_WEAPON, Locations))
+		weaps = sum([i == ITEM_LOC_WEAPON for i in Locations])
 		if only == UAW_QWEAPONS and weaps == 1 and ammoSlotCount <= 1:
 			rmax = 0
 			reset = True
-		abils = sum(map(lambda i: i==ITEM_LOC_EQUIPMENT, Locations))
+		abils = sum([i == ITEM_LOC_EQUIPMENT for i in Locations])
 		if only == UAW_QITEMS and abils == 1:
 			rmax = 0
 			reset = True

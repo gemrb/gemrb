@@ -1285,10 +1285,10 @@ def HandleSpecFlagExclusion(pc, lucls, lukit):
 			if lukit&kit:
 				return
 			else:
-				raise RuntimeError, "Picked second or non-existing kit (%d) of same class (%d)!?" %(lukit, lucls)
+				raise RuntimeError("Picked second or non-existing kit (%d) of same class (%d)!?" %(lukit, lucls))
 	else: # picked a new class
 		kitBits = [((kit >> x) & 1)<<x  for x in range(31, -1, -1)]
-		kitBits = filter(lambda v: v > 0, kitBits)
+		kitBits = [v for v in kitBits if v > 0]
 		# check all the current kits - kit bits
 		for k in kitBits:
 			if k not in orderFavs:
