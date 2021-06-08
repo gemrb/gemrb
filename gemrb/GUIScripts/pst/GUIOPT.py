@@ -48,8 +48,7 @@ def InitOptionsWindow (Window):
 	TrySavingConfiguration ()
 
 	CommonWindow.CloseContainerWindow ()
-	GUICommonWindows.DisableAnimatedWindows ()
-	
+
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)
 		button.SetEvent (IE_GUI_BUTTON_ON_PRESS, action)

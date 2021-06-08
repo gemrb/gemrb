@@ -58,8 +58,6 @@ def InitJournalWindow (JournalWindow):
 
 	Table = GemRB.LoadTable("YEARS")
 	StartTime = Table.GetValue("STARTTIME", "VALUE")
-		
-	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Quests
 	Button = JournalWindow.GetControl (0)

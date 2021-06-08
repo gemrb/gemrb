@@ -168,10 +168,7 @@ def OpenContainerWindow ():
 		Window.SetSize (Size[0], 90)
 		Window.SetPos (Pos[0], GemRB.GetSystemVariable (SV_HEIGHT) - 90)
 
-	#stop gears from interfering
-	if GameCheck.IsPST():
-		GUICommonWindows.DisableAnimatedWindows ()
-	elif not GameCheck.IsIWD2 () and not GameCheck.IsGemRBDemo ():
+	if not GameCheck.IsIWD2 () and not GameCheck.IsGemRBDemo () and not GameCheck.IsPST ():
 		# container window shouldnt be in front
 		GemRB.GetView("OPTWIN").Focus()
 		GemRB.GetView("PORTWIN").Focus()
@@ -276,9 +273,6 @@ def CloseContainerWindow ():
 	if GemRB.GetView ("ACTWIN"):
 		GemRB.GetView ("ACTWIN").SetVisible (True)
 	SetGameGUIHidden(HideOnClose)
-
-	if GameCheck.IsPST():
-		GUICommonWindows.EnableAnimatedWindows ()
 
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']

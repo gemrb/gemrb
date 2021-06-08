@@ -90,7 +90,6 @@ def OpenReformPartyWindow ():
 
 	ReformPartyWindow = Window = GemRB.LoadWindow (24, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	ReformPartyWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Remove
 	Button = Window.GetControl (15)
@@ -111,7 +110,6 @@ def OpenFormationWindow ():
 
 	FormationWindow = Window = GemRB.LoadWindow (27, GUICommon.GetWindowPack(), WINDOW_BOTTOM|WINDOW_HCENTER)
 	FormationWindow.SetFlags (IE_GUI_VIEW_IGNORE_EVENTS, OP_OR)
-	GUICommonWindows.DisableAnimatedWindows ()
 
 	# Done
 	Button = Window.GetControl (13)

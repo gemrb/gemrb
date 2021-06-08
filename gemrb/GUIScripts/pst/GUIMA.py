@@ -85,8 +85,6 @@ def InitMapWindow (Window):
 def OpenTravelWindow ():
 	global WorldMapControl
 
-	GUICommonWindows.DisableAnimatedWindows ()
-
 	Travel = GemRB.GetVar ("Travel")
 
 	Window = GemRB.LoadWindow (0, "GUIWMAP")

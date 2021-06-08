@@ -1958,14 +1958,6 @@ def ActionThievingPressed ():
 def MinimizePortraits(): #bg2
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
 
-def DisableAnimatedWindows (): #pst
-	# FIXME: this is just pausing the game. what is the actual intent here?
-	GemRB.GamePause (1,3)
-
-def EnableAnimatedWindows (): #pst
-	# FIXME: this is just unpausing the game. what is the actual intent here?
-	GemRB.GamePause (0,3)
-
 def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #relates to pst containers
 	if Slot != None:
 		Item = GemRB.GetItem (Slot['ItemResRef'])
@@ -2009,9 +2001,7 @@ def OpenWaitForDiscWindow ():
 	global DiscWindow
 
 	if DiscWindow:
-		if DiscWindow:
-			DiscWindow.Unload ()
-		EnableAnimatedWindows ()
+		DiscWindow.Unload ()
 		DiscWindow = None
 		return
 
@@ -2023,7 +2013,6 @@ def OpenWaitForDiscWindow ():
 
 	text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
 	label.SetText (text)
-	DisableAnimatedWindows ()
 	# 31483 - Please place PS:T disc number
 	# 31568 - Please place the PS:T DVD
 	# 31569 - in drive
