@@ -21,7 +21,7 @@ import _GemRB
 import GameCheck
 
 from GUIDefines import *
-from MetaClasses import metaIDWrapper
+from MetaClasses import metaIDWrapper, add_metaclass
 from GemRB import GetView, CreateView, RemoveView, RemoveScriptingRef
 
 def CreateScrollbarARGs(bam = None):
@@ -45,8 +45,8 @@ def CreateScrollbarARGs(bam = None):
 
 	return (bam, bamframes)
 
+@add_metaclass(metaIDWrapper)
 class GTable:
-	__metaclass__ = metaIDWrapper
 	methods = {
 		'GetValue': _GemRB.Table_GetValue,
 		'FindValue': _GemRB.Table_FindValue,
@@ -61,8 +61,8 @@ class GTable:
 	def __nonzero__(self):
 		return self.ID != -1
 
+@add_metaclass(metaIDWrapper)
 class GSymbol:
-	__metaclass__ = metaIDWrapper
 	methods = {
 		'GetValue': _GemRB.Symbol_GetValue,
 		'Unload': _GemRB.Symbol_Unload
@@ -78,8 +78,8 @@ class Scrollable(object):
 	def ScrollDelta(self, x, y):
 		self.Scroll(x, y, True)
 
+@add_metaclass(metaIDWrapper)
 class GView:
-	__metaclass__ = metaIDWrapper
 	methods = {
 	'AddAlias': _GemRB.View_AddAlias,
 	'AddSubview': _GemRB.View_AddSubview,
@@ -363,8 +363,8 @@ class GWorldMap(GControl, Scrollable):
 		'GetDestinationArea': _GemRB.WorldMap_GetDestinationArea
 	}
 
+@add_metaclass(metaIDWrapper)
 class GSaveGame:
-	__metaclass__ = metaIDWrapper
 	methods = {
 		'GetDate': _GemRB.SaveGame_GetDate,
 		'GetGameDate': _GemRB.SaveGame_GetGameDate,
@@ -374,6 +374,6 @@ class GSaveGame:
 		'GetSaveID': _GemRB.SaveGame_GetSaveID,
 	}
 
+@add_metaclass(metaIDWrapper)
 class GSprite2D:
-	__metaclass__ = metaIDWrapper
 	methods = {}
