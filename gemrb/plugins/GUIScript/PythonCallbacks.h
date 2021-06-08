@@ -98,8 +98,14 @@ struct PythonComplexCallback : public PythonCallback {
 	PythonComplexCallback(PyObject* fn) : PythonCallback(fn) {}
 	
 	PyObject* GetArgs(ARG_T arg) const {
-		PyObject* func_code = PyObject_GetAttrString(Function, "func_code");
+		PyObject* func_code = PyObject_GetAttrString(Function, "__code__");
+		if (!func_code) {
+			// try Python 2
+			func_code = PyObject_GetAttrString(Function, "func_code");
+		}
+		
 		if (!func_code) return nullptr;
+		
 		PyObject* co_argcount = PyObject_GetAttrString(func_code, "co_argcount");
 		const long count = PyInt_AsLong(co_argcount);
 		PyObject* args = nullptr;
