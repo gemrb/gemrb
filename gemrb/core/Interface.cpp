@@ -112,7 +112,7 @@ static ieWord IDT_CRITMULTI = 2;
 static ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
-static const char* DefaultSystemEncoding IGNORE_UNUSED = "UTF-8";
+static const char* DefaultSystemEncoding = "UTF-8";
 
 // FIXME: DragOp should be initialized with the button we are dragging from
 // for now use a dummy until we truly implement this as a drag event
@@ -219,8 +219,8 @@ Interface::Interface()
 	SpecialSpells = NULL;
 	Encoding = "default";
 
-#ifdef WIN32
-#ifdef HAVE_ICONV
+	SystemEncoding = DefaultSystemEncoding;
+#if defined(WIN32) && defined(HAVE_ICONV)
 	const uint32_t codepage = GetACP();
 	const char* iconvCode = GetIconvNameForCodepage(codepage);
 
@@ -228,14 +228,9 @@ Interface::Interface()
 		error("Interface", "Mapping of codepage %u unknown to iconv.", codepage);
 	}
 	SystemEncoding = iconvCode;
-#else // HAVE_ICONV
-	SystemEncoding = DefaultSystemEncoding;
-#endif// HAVE_ICONV
 #elif defined(HAVE_LANGINFO_H)
 	SystemEncoding = nl_langinfo(CODESET);
-#else // WIN32
-	SystemEncoding = DefaultSystemEncoding;
-#endif // WIN32
+#endif
 
 	TLKEncoding.encoding = "ISO-8859-1";
 	TLKEncoding.widechar = false;
