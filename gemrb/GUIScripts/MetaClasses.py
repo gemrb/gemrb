@@ -94,7 +94,7 @@ class metaIDWrapper(type):
 			e = MethodAttributeError(methods[key])
 			try:
 				mtype = MethodType(e, None, c)
+				setattr(c, key, mtype)
 			except TypeError: # Python 3
-				mtype = MethodType(e, None)
-			setattr(c, key, mtype)
+				setattr(c, key, e) # FIXME?: I dont actually know if this is correct, may have to circle back here after overcoming other errors
 		return c
