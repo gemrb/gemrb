@@ -89,32 +89,26 @@ def ScrollBarUpdated (sb, Pos):
 
 		Button1 = LoadWindow.GetControl (26+i)
 		Button2 = LoadWindow.GetControl (30+i)
-		if ActPos<len(Games):
+		PreviewButton = LoadWindow.GetControl (1+i)
+		SlotName = ""
+		SlotDate = ""
+		if ActPos < len(Games):
 			Button1.SetState (IE_GUI_BUTTON_ENABLED)
 			Button2.SetState (IE_GUI_BUTTON_ENABLED)
+			SlotName = Games[ActPos].GetName ()
+			SlotDate = Games[ActPos].GetGameDate ()
+			PreviewButton.SetSprite2D (Games[ActPos].GetPreview())
 		else:
 			Button1.SetState (IE_GUI_BUTTON_DISABLED)
 			Button2.SetState (IE_GUI_BUTTON_DISABLED)
+			PreviewButton.SetPicture (None)
 
-		if ActPos<len(Games):
-			Slotname = Games[ActPos].GetName()
-		else:
-			Slotname = ""
 		Label = LoadWindow.GetControl (0x10000008+i)
-		Label.SetText (Slotname)
+		Label.SetText (SlotName)
 
-		if ActPos<len(Games):
-			Slotname = Games[ActPos].GetGameDate()
-		else:
-			Slotname = ""
 		Label = LoadWindow.GetControl (0x10000010+i)
-		Label.SetText (Slotname)
+		Label.SetText (SlotDate)
 
-		Button=LoadWindow.GetControl (1+i)
-		if ActPos<len(Games):
-			Button.SetSprite2D(Games[ActPos].GetPreview())
-		else:
-			Button.SetPicture (None)
 		for j in range (min(6, MAX_PARTY_SIZE)):
 			Button = LoadWindow.GetControl (40 + i*min(6, MAX_PARTY_SIZE) + j)
 			if ActPos<len(Games):
