@@ -1,7 +1,8 @@
-GemRB git (b21e66d7):
+GemRB git (9a9c40c3):
   New features:
     - 
     - basic resolution independence
+    - start of python3 support
     - arbitrary window dragging support
     - improved debug console
     - subtitle support for BIK videos
@@ -10,7 +11,7 @@ GemRB git (b21e66d7):
     - 
     - window management, drawing and input handling
     - performance: SDL2 video playback, general and text rendering
-    - smoother movement animations
+    - smoother movement animations, demo
     - bugfixes
 
 GemRB v0.8.8 (2021-06-02):
