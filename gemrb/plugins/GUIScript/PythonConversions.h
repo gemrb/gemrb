@@ -37,7 +37,7 @@ public:
 	{
 		if (Holder<T>::ptr) {
 			Holder<T>::ptr->acquire();
-			PyObject *obj = PyCObject_FromVoidPtrAndDesc(Holder<T>::ptr,const_cast<TypeID*>(&T::ID),PyRelease);
+			PyObject *obj = PyCapsule_New(Holder<T>::ptr, T::ID.description, PyRelease);
 			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
 			PyObject *ret = gs->ConstructObject(T::ID.description, NULL, kwargs);
 			Py_DECREF(kwargs);
@@ -55,13 +55,13 @@ public:
 			obj = id;
 		else
 			PyErr_Clear();
-		if (!PyCObject_Check(obj) || PyCObject_GetDesc(obj) != const_cast<TypeID*>(&T::ID)) {
+
+		Holder<T>::ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
+		if (Holder<T>::ptr) {
+			Holder<T>::ptr->acquire();
+		} else {
 			Log(ERROR, "GUIScript", "Bad CObject extracted.");
-			Py_XDECREF(id);
-			return;
 		}
-		Holder<T>::ptr = static_cast<T*>(PyCObject_AsVoidPtr(obj));
-		Holder<T>::ptr->acquire();
 		Py_XDECREF(id);
 	}
 	CObject(const Holder<T>& ptr)
@@ -74,13 +74,10 @@ public:
 		return Holder<T>::ptr;
 	}
 private:
-	static void PyRelease(void *obj, void *desc)
+	static void PyRelease(PyObject *obj)
 	{
-		if (desc != const_cast<TypeID*>(&T::ID)) {
-			Log(ERROR, "GUIScript", "Bad CObject deleted.");
-			return;
-		}
-		static_cast<T*>(obj)->release();
+		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
+		static_cast<T*>(ptr)->release();
 	}
 };
 

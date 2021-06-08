@@ -29,12 +29,6 @@
 #define PyInt_FromLong PyLong_FromLong
 #define PyInt_AsLong PyLong_AsLong
 	
-// c objects
-#define PyCObject_FromVoidPtr(ptr, dtor) PyCapsule_New((void *)ptr, NULL, dtor)
-#define PyCObject_Check PyCapsule_CheckExact
-#define PyCObject_AsVoidPtr(capsule) PyCapsule_GetPointer(capsule, NULL)
-#define PyCObject_GetDesc PyCapsule_GetContext
-	
 //strings
 #define PyString_Type PyUnicode_Type
 #define PyString_Check PyUnicode_Check
