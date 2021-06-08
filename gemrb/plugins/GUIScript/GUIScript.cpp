@@ -13636,48 +13636,77 @@ PyDoc_STRVAR( GemRB_internal__doc,
 
 /** Initialization Routine */
 
-static PyObject* InitializeModule(const char* name, const char* doc, PyMethodDef* methods)
-{
 #if PY_MAJOR_VERSION >= 3
-	struct PyModuleDef moduledef = {
+
+PyMODINIT_FUNC
+PyInit__GemRB()
+{
+	static PyModuleDef moddef = {
 		PyModuleDef_HEAD_INIT,
-		name,     /* m_name */
-		doc,  /* m_doc */
+		"_GemRB",     /* m_name */
+		GemRB_internal__doc,  /* m_doc */
 		-1,                  /* m_size */
-		methods,    /* m_methods */
+		GemRBInternalMethods,    /* m_methods */
 		NULL,                /* m_reload */
 		NULL,                /* m_traverse */
 		NULL,                /* m_clear */
 		NULL,                /* m_free */
 	};
-	
-	return PyModule_Create(&moduledef);
-#else
-	return Py_InitModule3(name, methods, doc);
-#endif
+	return PyModule_Create(&moddef);
 }
+
+PyMODINIT_FUNC
+PyInit_GemRB()
+{
+	static PyModuleDef moddef = {
+		PyModuleDef_HEAD_INIT,
+		"GemRB",     /* m_name */
+		GemRB__doc,  /* m_doc */
+		-1,                  /* m_size */
+		GemRBMethods,    /* m_methods */
+		NULL,                /* m_reload */
+		NULL,                /* m_traverse */
+		NULL,                /* m_clear */
+		NULL,                /* m_free */
+	};
+	return PyModule_Create(&moddef);
+}
+#endif
 
 bool GUIScript::Init(void)
 {
+#if PY_MAJOR_VERSION >= 3
+	// Add built-in modules, before Py_Initialize
+	if (PyImport_AppendInittab("GemRB", PyInit_GemRB) == -1) {
+		return false;
+	}
+	if (PyImport_AppendInittab("_GemRB", PyInit__GemRB) == -1) {
+		return false;
+	}
+#endif
+	
 	Py_Initialize();
 	if (!Py_IsInitialized()) {
 		return false;
 	}
+	
+#if PY_MAJOR_VERSION >= 3
+	PyObject *pGemRB = PyImport_ImportModule("GemRB");
+#else
+	PyObject* pGemRB = Py_InitModule3("GemRB", GemRBMethods, GemRB__doc);
+	if (!pGemRB) {
+		return false;
+	}
+	const PyObject* p_GemRB = Py_InitModule3("_GemRB", GemRBInternalMethods, GemRB_internal__doc);
+	if (!p_GemRB) {
+		return false;
+	}
+#endif
 
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
 	/* pMainDic is a borrowed reference */
-
-	PyObject* pGemRB = InitializeModule("GemRB", GemRB__doc, GemRBMethods);
-	if (!pGemRB) {
-		return false;
-	}
-
-	const PyObject* p_GemRB = InitializeModule("_GemRB", GemRB_internal__doc, GemRBInternalMethods);
-	if (!p_GemRB) {
-		return false;
-	}
 
 	char path[_MAX_PATH];
 	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
