@@ -61,6 +61,7 @@ def UpdateJournalWindow (JournalWindow):
 
 	# Title
 	Title = JournalWindow.GetControl (5)
+	Title.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
 	Title.SetText (16202 + Chapter)
 
 	# text area
