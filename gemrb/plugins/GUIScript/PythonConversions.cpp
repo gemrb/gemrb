@@ -127,6 +127,22 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 	return pic;
 }
 
+#if PY_MAJOR_VERSION >= 3
+char* PyString_AsString(PyObject* obj)
+{
+	char* str = nullptr;
+	if (PyUnicode_Check(obj)) {
+		// FIXME: encoding shoulxd come from our core encoding setting
+		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, "UTF-8", "strict"); // Owned reference
+		if (temp_bytes != NULL) {
+			str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+			Py_DECREF(temp_bytes);
+		}
+	}
+	return str;
+}
+#endif
+
 // Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromResRef(const ieResRef& ResRef)
 {

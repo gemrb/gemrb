@@ -28,10 +28,16 @@
 // ints
 #define PyInt_FromLong PyLong_FromLong
 #define PyInt_AsLong PyLong_AsLong
+#define PyInt_Type PyLong_Type
+#define PyInt_Check PyLong_Check
+#define PyInt_AsUnsignedLongMask PyLong_AsUnsignedLongMask
 	
 //strings
 #define PyString_Type PyUnicode_Type
 #define PyString_Check PyUnicode_Check
+#define PyString_FromFormat PyUnicode_FromFormat
+#define PyString_FromString PyUnicode_FromString
+#define PyString_FromStringAndSize PyUnicode_FromStringAndSize
 #endif
 
 #include "ScriptEngine.h"
