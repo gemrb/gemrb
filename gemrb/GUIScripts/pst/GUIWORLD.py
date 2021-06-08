@@ -68,7 +68,7 @@ def NextDialogState ():
 		return
 
 	Button = MessageWindow.MWindow.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: MessageWindow.MWindow.Close())
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 
 def OpenEndMessageWindow ():
 	Button = MessageWindow.MWindow.GetControl (0)
