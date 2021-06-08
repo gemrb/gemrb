@@ -389,7 +389,7 @@ def GetClassRowName(value, which=-1):
 		elif which == "class":
 			Class = value
 		else:
-			raise RuntimeError, "Bad type parameter for GetClassRowName: ", which
+			raise RuntimeError("Bad type parameter for GetClassRowName: " + str(which))
 		ClassIndex = CommonTables.Classes.FindValue ("ID", Class)
 	ClassRowName = CommonTables.Classes.GetRowName (ClassIndex)
 	return ClassRowName
