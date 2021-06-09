@@ -135,7 +135,7 @@ const char* PyString_AsString(PyObject* obj)
 		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, core->SystemEncoding, "strict"); // Owned reference
 		if (temp_bytes != NULL) {
 			str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-			Py_DECREF(temp_bytes);
+			//Py_DECREF(temp_bytes);
 		} else { // raw data... probalby this if for our "state" font
 			PyErr_Clear();
 			str = PyUnicode_AS_DATA(obj);
