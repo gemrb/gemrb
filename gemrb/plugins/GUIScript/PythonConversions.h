@@ -85,7 +85,7 @@ private:
 // WARNING: dont use these for new code
 // they are temporary while we compete the transition to Python 3
 #if PY_MAJOR_VERSION >= 3
-char* PyString_AsString(PyObject* obj);
+const char* PyString_AsString(PyObject* obj);
 #endif
 
 /*
