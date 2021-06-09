@@ -90,10 +90,8 @@ def OpenTravelWindow ():
 	Window = GemRB.LoadWindow (0, "GUIWMAP")
 	Window.AddAlias ("WIN_PSTWMAP")
 
-	cnormal = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff}
-	cselected = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xff}
-	cnotvisited = {'r' : 0x20, 'g' : 0x20, 'b' : 0x00, 'a' : 0xa0}
-	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", cnormal, cselected, cnotvisited)
+	color = {'r' : 30, 'g' : 8, 'b' : 0, 'a' : 0xff}
+	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", color, color, color)
 	WMap.SetAnimation ("WMPTY")
 	WMap.SetVarAssoc ("Travel", Travel)
 	#center on current area

@@ -104,12 +104,13 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Point offset = MapToScreen(m->pos);
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (icon) {
+			uint32_t flags =  core->HasFeature(GF_AUTOMAP_INI) ? BLIT_BLENDED : (BLIT_BLENDED | BLIT_COLOR_MOD);
 			if (m == Area && m->HighlightSelected()) {
-				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, hoverAnim.Current());
+				video->BlitGameSprite(icon, offset, flags, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, color_notvisited);
+				video->BlitGameSprite(icon, offset, flags, color_notvisited);
 			} else {
-				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, gamedata->GetColor("MAPICNBG"));
+				video->BlitGameSprite(icon, offset, flags, gamedata->GetColor("MAPICNBG"));
 			}
 		}
 
