@@ -168,7 +168,7 @@ def AddScrollbarProxy(win, sbar, leftctl):
 	
 	scrollview = GemRB.CreateView(AddScrollbarProxy.proxyID, IE_GUI_VIEW, frame)
 	AddScrollbarProxy.proxyID += 1
-	scrollview = win.AddSubview(scrollview, win.GetControl(2)) # just something behind all the buttons and labels
+	scrollview = win.AddSubview(scrollview, win.GetControl(99)) # just something behind all the buttons and labels
 	scrollview.SetEventProxy(sbar)
 	
 AddScrollbarProxy.proxyID = 1000
