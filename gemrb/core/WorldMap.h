@@ -72,7 +72,7 @@ public:
 	void SetAreaStatus(ieDword status, int op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
-	Holder<Sprite2D> GetMapIcon(const AnimationFactory *bam, bool overridePalette);
+	Holder<Sprite2D> GetMapIcon(const AnimationFactory *bam);
 	// note that this is only valid after GetMapIcon has been called
 	bool HighlightSelected() const { return SingleFrame; }
 	const String* GetCaption();
@@ -84,7 +84,6 @@ private:
 	char *StrTooltip;
 	bool SingleFrame;
 
-	void SetPalette(int gradient, Holder<Sprite2D> MapIcon);
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;

@@ -58,7 +58,6 @@ public:
 	/** Sets the exit direction (we need this to calculate distances) */
 	void SetDirection(int direction);
 
-	void SetOverrideIconPalette(bool ipOverride) { OverrideIconPalette = ipOverride; };
 	Point Pos;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area = nullptr;
@@ -83,8 +82,7 @@ private:
 	Font* ftext;
 	//current area
 	ieResRef currentArea;
-	// bg1 needs entry icon recoloring, as the data palettes are a pure bw gradient
-	bool OverrideIconPalette;
+
 	/** Label color of a visited area */
 
 	Color color_normal;

@@ -41,7 +41,6 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-	OverrideIconPalette = false;
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
 	CopyResRef(currentArea, game->CurrentArea);
@@ -94,12 +93,14 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
 		Point offset = MapToScreen(m->pos);
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
-				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD, color_selected);
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, color_selected);
+			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, color_notvisited);
 			} else {
-				video->BlitSprite( icon, offset);
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, gamedata->GetColor("MAPICNBG"));
 			}
 		}
 
@@ -117,7 +118,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (ftext == nullptr || caption == nullptr)
 			continue;
 
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam, OverrideIconPalette);
+		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (!icon) continue;
 		const Region& icon_frame = icon->Frame;
 		Point p = m->pos - icon_frame.Origin();
@@ -132,7 +133,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			colors.fg = color_normal;
 		}
 		
-		colors.bg = ColorBlack;
+		colors.bg = gamedata->GetColor("MAPTXTBG");
 
 		Size ts = ftext->StringSize(*caption);
 		ts.w += 10;
@@ -191,7 +192,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 				continue; //invisible or inaccessible
 			}
 
-			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam, OverrideIconPalette);
+			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
 			Region rgn(ae->pos, Size());
 			if (icon) {
 				rgn.x -= icon->Frame.x;

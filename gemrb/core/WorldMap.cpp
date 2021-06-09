@@ -73,22 +73,12 @@ const char* WMPAreaEntry::GetTooltip()
 	return StrTooltip;
 }
 
-static int gradients[5]={18,22,19,3,4};
-
-void WMPAreaEntry::SetPalette(int gradient, Holder<Sprite2D> MapIcon)
-{
-	if (!MapIcon) return;
-	const auto& colors = core->GetPalette256(gradient);
-	MapIcon->SetPalette(new Palette(&colors[0], &colors[256]));
-}
-
-Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam, bool overridePalette)
+Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 {
 	if (!bam || IconSeq == (ieDword) -1) {
 		return NULL;
 	}
 	if (!MapIcon) {
-		int color = -1;
 		int frame = 0;
 		switch (AreaStatus&(WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED))
 		{
@@ -101,22 +91,12 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam, bool over
 		// iwd1, bg1 and pst all have this format
 		if (bam->GetCycleSize(IconSeq)<5) {
 			SingleFrame = true;
-			// ... but only bg1 needs recoloring
-			if (overridePalette) {
-				color = gradients[frame];
-			}
 			frame = 0;
 		}
 		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
 		if (!MapIcon) {
 			Log(ERROR, "WMPAreaEntry", "GetMapIcon failed for frame %d, seq %d", frame, IconSeq);
 			return NULL;
-		}
-		if (color>=0) {
-			// Note: should a game use the same map icon for two different
-			// map locations, we have to duplicate the MapIcon sprite here.
-			// This doesn't occur in BG1, so no need to do that for the moment.
-			SetPalette(color, MapIcon);
 		}
 	}
 	return MapIcon;
