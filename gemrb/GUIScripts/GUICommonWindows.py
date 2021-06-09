@@ -1647,7 +1647,7 @@ def OpenPortraitWindow (needcontrols=0, pos=WINDOW_RIGHT|WINDOW_VCENTER):
 				Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RestPress)
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.iteritems():
+	for i, Button in PortraitButtons.items():
 		pcID = i + 1
 		
 		Button.SetVarAssoc("portrait", pcID)
@@ -1713,7 +1713,7 @@ def UpdatePortraitWindow ():
 	indialog = GSFlags & GS_DIALOG
 
 	PortraitButtons = GetPortraitButtonPairs (Window)
-	for i, Button in PortraitButtons.iteritems():
+	for i, Button in PortraitButtons.items():
 		pcID = i + 1
 		if indialog:
 			Button.SetHotKey(None)
@@ -1915,7 +1915,7 @@ def SelectionChanged ():
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.iteritems():
+		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 		if SelectionChangeMultiHandler:
 			SelectionChangeMultiHandler ()
@@ -1930,7 +1930,7 @@ def SelectionChanged ():
 			GemRB.SetVar ("MAGESCHOOL", MageTable.FindValue (3, CommonTables.KitList.GetValue (Kit, 6) ) )
 
 		PortraitButtons = GetPortraitButtonPairs (PortraitWindow)
-		for i, Button in PortraitButtons.iteritems():
+		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 
 	CommonWindow.CloseContainerWindow()

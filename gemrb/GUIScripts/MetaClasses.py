@@ -65,12 +65,8 @@ class metaIDWrapper(type):
 	@classmethod
 	def InitMethod(cls, f = None):
 		def __init__(self, *args, **kwargs):
-			try:
-				for k,v in kwargs.iteritems():
-					setattr(self, k, v)
-			except AttributeError: # Python 3
-				for k,v in kwargs.items():
-					setattr(self, k, v)
+			for k,v in kwargs.items():
+				setattr(self, k, v)
 
 			#required attributes for bridging to C++
 			assert getattr(self, 'ID', None) is not None

@@ -211,7 +211,7 @@ class GWindow(GView, Scrollable):
 		return GetView(self, newID)
 
 	def AliasControls (self, map):
-		for alias, cid in map.iteritems():
+		for alias, cid in map.items():
 			control = self.GetControl(cid)
 			if control:
 				control.AddAlias(alias, self.ID)
