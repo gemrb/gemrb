@@ -228,7 +228,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
 #endif
 			if (ns) {
 				if (freePixels) {
-					free((void*)pixels);
+					free(pixels);
 				}
 				freePixels = false;
 				surface = new SurfaceHolder(ns);

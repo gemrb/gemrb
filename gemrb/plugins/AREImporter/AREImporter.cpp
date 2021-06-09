@@ -650,9 +650,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		if (VertexCount <= 1) {
 			// this is exactly the same as bbox.Origin()
 			if (VertexCount == 1) {
-				str->ReadWord( (ieWord*) &tmp );
+				str->ReadWord(&tmp);
 				assert(tmp == bbox.x);
-				str->ReadWord( (ieWord*) &tmp );
+				str->ReadWord(&tmp);
 				assert(tmp == bbox.y);
 			}
 
