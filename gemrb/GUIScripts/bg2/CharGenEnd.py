@@ -215,7 +215,7 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 					i = i + 1
 
 			GemRB.CreateItem(MyChar, item_resref, targetslot, count, 0, 0)
- 			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 			inventory_exclusion |= item['Exclusion']
 
 		return
