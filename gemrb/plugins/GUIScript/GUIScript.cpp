@@ -5704,7 +5704,12 @@ static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	return PyString_FromString((const char *) actor->GetStateString() );
+	const char* stats = (const char *)actor->GetStateString();
+#if PY_MAJOR_VERSION >= 3
+	return PyBytes_FromString(stats);
+#else
+	return PyString_FromString(stats);
+#endif
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
