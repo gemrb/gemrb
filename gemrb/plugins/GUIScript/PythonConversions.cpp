@@ -30,7 +30,7 @@ namespace GemRB {
 */
 
 Color ColorFromPy(PyObject* obj) {
-	if (PyDict_Check(obj)) {
+	if (obj && PyDict_Check(obj)) {
 		Color c;
 		// PyInt_AsLong may return -1 on error and we would like this to = 0
 		long pyVal = PyInt_AsLong(PyDict_GetItemString(obj, "r"));
