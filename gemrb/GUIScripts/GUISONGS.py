@@ -45,6 +45,7 @@ def OnLoad():
 		ColOffset = 0
 		CreditsRef = "endcrdit"
 	MoviesTable = GemRB.LoadTable (MoviesTableName)
+	TextAreaControl.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_OPTIONS)
 	TextAreaControl.SetOptions ([MoviesTable.GetValue (i, 0) for i in range(ColOffset, MoviesTable.GetRowCount())], "MovieIndex", 0)
 	PlayButton.SetText(17318)
 	CreditsButton.SetText(15591)
