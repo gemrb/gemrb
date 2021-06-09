@@ -3220,8 +3220,15 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 	if (arg1 == Py_None) {
 		btn = GetView<Button>(PyTuple_GetItem(args, 0));
 	} // work around a bug in cpython where PyArg_ParseTuple doesnt return as expected when 'c' format doesn't match
+#if PY_MAJOR_VERSION >= 3
+	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyUnicode_GetLength(arg1) == 1) {
+		int ch = 0;
+		PARSE_ARGS(args, "OC|Ii", &self, &ch, &mods, &global);
+		hotkey = ch;
+#else
 	else if (PyObject_TypeCheck(arg1, &PyString_Type) && PyString_Size(arg1) == 1) {
 		PARSE_ARGS(args, "Oc|Ii", &self, &hotkey, &mods, &global);
+#endif
 		btn = GetView<Button>(self);
 		assert(btn);
 	} else {
