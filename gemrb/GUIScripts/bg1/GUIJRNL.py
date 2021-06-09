@@ -76,7 +76,7 @@ def UpdateJournalWindow (JournalWindow):
 		hours = je['GameTime'] / 4500
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
-		dayandmonth = StartTime + days%365
+		dayandmonth = int(StartTime + days % 365)
 		GemRB.SetToken("GAMEDAY", str(days) )
 		GemRB.SetToken("HOUR",str(hours%24 ) )
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
