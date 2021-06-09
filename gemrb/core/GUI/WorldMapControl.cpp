@@ -39,6 +39,8 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	color_selected = selected;
 	color_notvisited = notvisited;
 	
+	hoverAnim = ColorAnimation(gamedata->GetColor("MAPICNBG"), color_selected, true);
+	
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	Game* game = core->GetGame();
@@ -71,9 +73,16 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 WorldMapControl::WorldMapControl(const Region& frame, Font *font)
 : WorldMapControl(frame, font,
 				  Color(0xf0, 0xf0, 0xf0, 0xff),
-				  Color(0xf0, 0x80, 0x80, 0xff),
+				  Color(0xff, 0, 0, 0xff),
 				  Color(0x80, 0x80, 0xf0, 0xff))
 {}
+
+void WorldMapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	if (hoverAnim) {
+		hoverAnim.Next(GetTicks());
+	}
+}
 
 /** Draws the Control on the Output Display */
 void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
@@ -96,7 +105,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (icon) {
 			if (m == Area && m->HighlightSelected()) {
-				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, color_selected);
+				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, hoverAnim.Current());
 			} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
 				video->BlitGameSprite(icon, offset, BLIT_COLOR_MOD | BLIT_BLENDED, color_notvisited);
 			} else {
@@ -126,7 +135,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		
 		Font::PrintColors colors;
 		if (Area == m) {
-			colors.fg = color_selected;
+			colors.fg = hoverAnim.Current();
 		} else if (!(m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
 			colors.fg = color_notvisited;
 		} else {

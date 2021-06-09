@@ -120,7 +120,10 @@ def InitWorldMapWindow (Window):
 	if GameCheck.IsBG2():
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")
 	elif GameCheck.IsBG1():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont")
+		cnormal = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 0xff}
+		cselected = {'r' : 0xff, 'g' : 0, 'b' : 0, 'a' : 0xff}
+		cnotvisited = {'r' : 0x80, 'g' : 0x80, 'b' : 0xf0, 'a' : 0xa0}
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", cnormal, cselected, cnotvisited)
 	else:
 		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont")
 

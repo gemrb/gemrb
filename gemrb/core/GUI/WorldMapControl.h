@@ -28,6 +28,7 @@
 #define WORLDMAPCONTROL_H
 
 #include "GUI/Control.h"
+#include "GUI/GUIAnimation.h"
 
 #include "exports.h"
 
@@ -46,6 +47,7 @@ class WorldMapControl;
 class GEM_EXPORT WorldMapControl : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
+	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DrawSelf(Region drawFrame, const Region&) override;
 
 public:
@@ -61,6 +63,7 @@ public:
 	Point Pos;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area = nullptr;
+	ColorAnimation hoverAnim;
 
 protected:
 	/** Mouse Over Event */
