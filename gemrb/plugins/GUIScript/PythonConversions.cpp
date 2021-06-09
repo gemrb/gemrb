@@ -131,7 +131,6 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 char* PyString_AsString(PyObject* obj)
 {
 	char* str = nullptr;
-	const char* encoding;
 	if (PyUnicode_Check(obj)) {
 		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, core->SystemEncoding, "strict"); // Owned reference
 		if (temp_bytes != NULL) {
