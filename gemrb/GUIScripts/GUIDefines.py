@@ -88,7 +88,7 @@ TA_COLOR_BACKGROUND = 2
 TA_COLOR_OPTIONS = 3
 TA_COLOR_HOVER = 4
 TA_COLOR_SELECTED = 5
-ColorWhitish = {'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}
+ColorWhitish = {'r' : 215, 'g' : 215, 'b' : 215, 'a' : 255}
 
 #TextEdit
 IE_GUI_TEXTEDIT_ALPHACHARS = 1
