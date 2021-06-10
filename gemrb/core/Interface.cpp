@@ -2244,7 +2244,7 @@ bool Interface::LoadGemRBINI()
 	NumRareSelectSounds = ini->GetKeyAsInt("resources", "NumRareSelectSounds", 2);
 	gamedata->SetTextSpeed(ini->GetKeyAsInt("resources", "TextScreenSpeed", 100));
 
-	for (int i=0;i<GF_COUNT;i++) {
+	for (uint32_t i = 0; i < GF_COUNT; i++) {
 		if (!game_flags[i]) {
 			error("Core", "Fix the game flags!\n");
 		}
