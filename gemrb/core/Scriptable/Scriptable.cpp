@@ -122,7 +122,7 @@ Scriptable::Scriptable(ScriptableType type)
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
-	InitTriggers();
+	ClearTriggers();
 	AddTrigger(TriggerEntry(trigger_oncreation));
 
 	startActive = core->HasFeature(GF_START_ACTIVE);
@@ -422,7 +422,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 	}
 
 	if (changed) {
-		InitTriggers();
+		ClearTriggers();
 	}
 
 	if (act) {
@@ -658,7 +658,7 @@ void Scriptable::SetInternalFlag(unsigned int value, int mode)
 	SetBits(InternalFlags, value, mode);
 }
 
-void Scriptable::InitTriggers()
+void Scriptable::ClearTriggers()
 {
 	triggers.clear();
 }

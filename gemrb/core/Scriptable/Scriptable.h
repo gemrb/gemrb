@@ -360,7 +360,7 @@ public:
 	void ProcessActions();
 	//these functions handle clearing of triggers that resulted a
 	//true condition (whole triggerblock returned true)
-	void InitTriggers();
+	void ClearTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	void SetLastTrigger(ieDword triggerID, ieDword globalID);
 	bool MatchTrigger(unsigned short id, ieDword param = 0);
