@@ -80,7 +80,7 @@ before_build:
     (Get-Content $file) -replace $find, $replace | Set-Content $file
 build_script:
 - cmd: cmake --build .
-before_package:
+after_build:
 - ps: |-
     pushd c:\projects\gemrb
 
