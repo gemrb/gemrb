@@ -83,92 +83,93 @@ namespace GemRB {
 #define OP_NAND 4 //gemrb extension
 
 /////feature flags
-#define  GF_HAS_KAPUTZ           	0 //pst
-#define  GF_ALL_STRINGS_TAGGED   	1 //bg1, pst, iwd1
-#define  GF_HAS_SONGLIST        	2 //bg2
-#define  GF_TEAM_MOVEMENT       	3 //pst
-#define  GF_UPPER_BUTTON_TEXT   	4 //bg2
-#define  GF_LOWER_LABEL_TEXT    	5 //bg2
-#define  GF_HAS_PARTY_INI       	6 //iwd2
-#define  GF_SOUNDFOLDERS        	7 //iwd2
-#define  GF_IGNORE_BUTTON_FRAMES	8 // all?
-#define  GF_ONE_BYTE_ANIMID     	9 // pst
-#define  GF_HAS_DPLAYER         	10 // not pst
-#define  GF_HAS_EXPTABLE        	11 // iwd, iwd2
-#define  GF_HAS_BEASTS_INI      	12 //pst; also for quests.ini
-#define  GF_HAS_DESC_ICON       	13 //bg
-#define  GF_HAS_PICK_SOUND      	14 //pst
-#define  GF_IWD_MAP_DIMENSIONS  	15 //iwd, iwd2
-#define  GF_AUTOMAP_INI         	16 //pst
-#define  GF_SMALL_FOG           	17 //bg1, pst
-#define  GF_REVERSE_DOOR        	18 //pst
-#define  GF_PROTAGONIST_TALKS   	19 //pst
-#define  GF_HAS_SPELLLIST       	20 //iwd2
-#define  GF_IWD2_SCRIPTNAME     	21 //iwd2, iwd, how
-#define  GF_DIALOGUE_SCROLLS    	22 //pst
-#define  GF_KNOW_WORLD          	23 //iwd2
-#define  GF_REVERSE_TOHIT       	24 //all except iwd2
-#define  GF_SAVE_FOR_HALF       	25 //pst
-#define  GF_CHARNAMEISGABBER   		26 //iwd2
-#define  GF_MAGICBIT            	27 //iwd, iwd2
-#define  GF_CHECK_ABILITIES     	28 //bg2 (others?)
-#define  GF_CHALLENGERATING     	29 //iwd2
-#define  GF_SPELLBOOKICONHACK   	30 //bg2
-#define  GF_ENHANCED_EFFECTS    	31 //iwd2 (maybe iwd/how too)
-#define  GF_DEATH_ON_ZERO_STAT  	32 //not in iwd2
-#define  GF_SPAWN_INI           	33 //pst, iwd, iwd2
-#define  GF_IWD2_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
-#define  GF_RESDATA_INI         	35 //pst
-#define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
-#define  GF_BREAKABLE_WEAPONS     	37 //only bg1
-#define  GF_3ED_RULES              	38 //iwd2
-#define  GF_LEVELSLOT_PER_CLASS    	39 //iwd2
-#define  GF_SELECTIVE_MAGIC_RES    	40 //bg2, iwd2, (how)
-#define  GF_HAS_HIDE_IN_SHADOWS    	41 // bg2, iwd2
-#define  GF_AREA_VISITED_VAR    	42 //iwd, iwd2
-#define  GF_PROPER_BACKSTAB     	43 //bg2, iwd2, how?
-#define  GF_ONSCREEN_TEXT       	44 //pst
-#define  GF_SPECIFIC_DMG_BONUS		45 //how, iwd2
-#define  GF_STRREF_SAVEGAME       	46 //iwd2
-#define  GF_SIMPLE_DISRUPTION      	47 // ToBEx: simplified disruption
-#define  GF_BIOGRAPHY_RES               48 //iwd branch
-#define  GF_NO_BIOGRAPHY                49 //pst
-#define  GF_STEAL_IS_ATTACK             50 //bg2 for sure
-#define  GF_CUTSCENE_AREASCRIPTS	51 //bg1, maybe more
-#define  GF_FLEXIBLE_WMAP               52 //iwd
-#define  GF_AUTOSEARCH_HIDDEN           53 //all except iwd2
-#define  GF_PST_STATE_FLAGS             54 //pst complicates this
-#define  GF_NO_DROP_CAN_MOVE            55 //bg1
-#define  GF_JOURNAL_HAS_SECTIONS        56 //bg2
-#define  GF_CASTING_SOUNDS              57 //all except pst and bg1
-#define  GF_CASTING_SOUNDS2             58 //bg2
-#define  GF_FORCE_AREA_SCRIPT           59 //how and iwd2 (maybe iwd1)
-#define  GF_AREA_OVERRIDE               60 //pst maze and other hardcode
-#define  GF_NO_NEW_VARIABLES            61 //pst
-#define  GF_SOUNDS_INI                  62 //iwd/how/iwd2
-#define  GF_USEPOINT_400                63 //all except pst and iwd2
-#define  GF_USEPOINT_200                64 //iwd2
-#define  GF_HAS_FLOAT_MENU              65 //pst
-#define  GF_RARE_ACTION_VB              66 //pst
-#define  GF_NO_UNDROPPABLE              67 //iwd,how
-#define  GF_START_ACTIVE                68 //bg1
-#define  GF_INFOPOINT_DIALOGS           69 //pst, but only bg1 has garbage there
-#define  GF_IMPLICIT_AREAANIM_BACKGROUND    70 //idw,how,iwd2
-#define  GF_HEAL_ON_100PLUS             71 //bg1, bg2, pst
-#define  GF_IN_PARTY_ALLOWS_DEAD	72 //all except bg2
-#define  GF_ZERO_TIMER_IS_VALID         73 // how, not bg2, other unknown
-#define  GF_SHOP_RECHARGE               74 // all?
-#define  GF_MELEEHEADER_USESPROJECTILE  75 // minimally bg2
-#define  GF_FORCE_DIALOGPAUSE           76 // all except if using v1.04 DLG files (bg2, special)
-#define  GF_RANDOM_BANTER_DIALOGS       77 // bg1
-#define  GF_ANIMATED_DIALOG             78 // pst
-#define  GF_FIXED_MORALE_OPCODE         79 // bg2
-#define  GF_HAPPINESS                   80 // all except pst and iwd2
-#define  GF_EFFICIENT_OR                81 // does the OR trigger shortcircuit on success or not? Only in iwd2
-#define  GF_LAYERED_WATER_TILES			82 // TileOverlay for water has an extra half transparent layer (all but BG1)
+enum GameFeatureFlags : uint32_t {
+	GF_HAS_KAPUTZ,          			//pst
+	GF_ALL_STRINGS_TAGGED,   			//bg1, pst, iwd1
+	GF_HAS_SONGLIST,        			//bg2
+	GF_TEAM_MOVEMENT,       			//pst
+	GF_UPPER_BUTTON_TEXT,   			//bg2
+	GF_LOWER_LABEL_TEXT,    			//bg2
+	GF_HAS_PARTY_INI,       			//iwd2
+	GF_SOUNDFOLDERS,        			//iwd2
+	GF_IGNORE_BUTTON_FRAMES,			// all?
+	GF_ONE_BYTE_ANIMID,     			// pst
+	GF_HAS_DPLAYER,         			// not pst
+	GF_HAS_EXPTABLE,        			// iwd, iwd2
+	GF_HAS_BEASTS_INI,      			//pst; also for quests.ini
+	GF_HAS_DESC_ICON,       			//bg
+	GF_HAS_PICK_SOUND,      			//pst
+	GF_IWD_MAP_DIMENSIONS,  			//iwd, iwd2
+	GF_AUTOMAP_INI,         			//pst
+	GF_SMALL_FOG,           			//bg1, pst
+	GF_REVERSE_DOOR,        			//pst
+	GF_PROTAGONIST_TALKS,   			//pst
+	GF_HAS_SPELLLIST,       			//iwd2
+	GF_IWD2_SCRIPTNAME,     			//iwd2, iwd, how
+	GF_DIALOGUE_SCROLLS,    			//pst
+	GF_KNOW_WORLD,          			//iwd2
+	GF_REVERSE_TOHIT,       			//all except iwd2
+	GF_SAVE_FOR_HALF,       			//pst
+	GF_CHARNAMEISGABBER,   				//iwd2
+	GF_MAGICBIT,            			//iwd, iwd2
+	GF_CHECK_ABILITIES,     			//bg2 (others?)
+	GF_CHALLENGERATING,     			//iwd2
+	GF_SPELLBOOKICONHACK,   			//bg2
+	GF_ENHANCED_EFFECTS,    			//iwd2 (maybe iwd/how too)
+	GF_DEATH_ON_ZERO_STAT,  			//not in iwd2
+	GF_SPAWN_INI,           			//pst, iwd, iwd2
+	GF_IWD2_DEATHVARFORMAT,  			//iwd branch (maybe pst)
+	GF_RESDATA_INI,         			//pst
+	GF_OVERRIDE_CURSORPOS,  			//pst, iwd2
+	GF_BREAKABLE_WEAPONS,     			//only bg1
+	GF_3ED_RULES,              			//iwd2
+	GF_LEVELSLOT_PER_CLASS,    			//iwd2
+	GF_SELECTIVE_MAGIC_RES,    			//bg2, iwd2, (how)
+	GF_HAS_HIDE_IN_SHADOWS,    			// bg2, iwd2
+	GF_AREA_VISITED_VAR,    			//iwd, iwd2
+	GF_PROPER_BACKSTAB,     			//bg2, iwd2, how?
+	GF_ONSCREEN_TEXT,       			//pst
+	GF_SPECIFIC_DMG_BONUS,				//how, iwd2
+	GF_STRREF_SAVEGAME,       			//iwd2
+	GF_SIMPLE_DISRUPTION,      			// ToBEx: simplified disruption
+	GF_BIOGRAPHY_RES,               	//iwd branch
+	GF_NO_BIOGRAPHY,                	//pst
+	GF_STEAL_IS_ATTACK,             	//bg2 for sure
+	GF_CUTSCENE_AREASCRIPTS,			//bg1, maybe more
+	GF_FLEXIBLE_WMAP,               	//iwd
+	GF_AUTOSEARCH_HIDDEN,           	//all except iwd2
+	GF_PST_STATE_FLAGS,             	//pst complicates this
+	GF_NO_DROP_CAN_MOVE,            	//bg1
+	GF_JOURNAL_HAS_SECTIONS,        	//bg2
+	GF_CASTING_SOUNDS,              	//all except pst and bg1
+	GF_CASTING_SOUNDS2,             	//bg2
+	GF_FORCE_AREA_SCRIPT,           	//how and iwd2 (maybe iwd1)
+	GF_AREA_OVERRIDE,               	//pst maze and other hardcode
+	GF_NO_NEW_VARIABLES,            	//pst
+	GF_SOUNDS_INI,                  	//iwd/how/iwd2
+	GF_USEPOINT_400,                	//all except pst and iwd2
+	GF_USEPOINT_200,                	//iwd2
+	GF_HAS_FLOAT_MENU,              	//pst
+	GF_RARE_ACTION_VB,              	//pst
+	GF_NO_UNDROPPABLE,              	//iwd,how
+	GF_START_ACTIVE,                	//bg1
+	GF_INFOPOINT_DIALOGS,           	//pst, but only bg1 has garbage there
+	GF_IMPLICIT_AREAANIM_BACKGROUND,	//idw,how,iwd2
+	GF_HEAL_ON_100PLUS,             	//bg1, bg2, pst
+	GF_IN_PARTY_ALLOWS_DEAD,			//all except bg2
+	GF_ZERO_TIMER_IS_VALID,         	// how, not bg2, other unknown
+	GF_SHOP_RECHARGE,               	// all?
+	GF_MELEEHEADER_USESPROJECTILE,  	// minimally bg2
+	GF_FORCE_DIALOGPAUSE,           	// all except if using v1.04 DLG files (bg2, special)
+	GF_RANDOM_BANTER_DIALOGS,       	// bg1
+	GF_ANIMATED_DIALOG,             	// pst
+	GF_FIXED_MORALE_OPCODE,         	// bg2
+	GF_HAPPINESS,                   	// all except pst and iwd2
+	GF_EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2
+	GF_LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
 
-//update this or bad things can happen
-#define GF_COUNT 83
+	GF_COUNT // sentinal count
+};
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
