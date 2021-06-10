@@ -162,7 +162,6 @@ enum GameFeatureFlags : uint32_t {
 	GF_MELEEHEADER_USESPROJECTILE,  	// minimally bg2
 	GF_FORCE_DIALOGPAUSE,           	// all except if using v1.04 DLG files (bg2, special)
 	GF_RANDOM_BANTER_DIALOGS,       	// bg1
-	GF_ANIMATED_DIALOG,             	// pst
 	GF_FIXED_MORALE_OPCODE,         	// bg2
 	GF_HAPPINESS,                   	// all except pst and iwd2
 	GF_EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2

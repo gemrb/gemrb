@@ -269,7 +269,7 @@ void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 void TextArea::SetAnimPicture(Holder<Sprite2D> pic)
 {
-	if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+	if (core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 		// FIXME: there isnt a specific reason why animatied dialog couldnt also use pics
 		// However, PST does not and the animation makes the picture spaz currently
 		return;
@@ -341,7 +341,7 @@ void TextArea::UpdateScrollview()
 		ieDword anim = 0;
 		int y = 0;
 
-		if (core->HasFeature(GF_ANIMATED_DIALOG)) {
+		if (core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 			anim = 500;
 			y = -9999999; // FIXME: properly calculate the "bottom"?
 		} else {
@@ -359,7 +359,7 @@ void TextArea::UpdateScrollview()
 		// FIXME: must update before the scroll, but this should be automaticly done as a reaction to changing sizes/origins of subviews
 		scrollview.Update();
 		scrollview.ScrollTo(Point(0, -y), anim);
-	} else if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
+	} else if (!core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 		scrollview.Update();
 	}
 	
@@ -627,7 +627,7 @@ void TextArea::ClearSelectOptions()
 	dialogBeginNode = NULL;
 	selectOptions = NULL;
 
-	if (!core->HasFeature(GF_ANIMATED_DIALOG)) {
+	if (!core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 		UpdateScrollview();
 	}
 }

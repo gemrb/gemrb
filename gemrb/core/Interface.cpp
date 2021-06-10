@@ -2149,7 +2149,6 @@ static const char *game_flags[GF_COUNT+1]={
 		"MeleeHeaderUsesProjectile", //75GF_MELEEHEADER_USESPROJECTILE
 		"ForceDialogPause",   //76GF_FORCE_DIALOGPAUSE
 		"RandomBanterDialogs",//77GF_RANDOM_BANTER_DIALOGS
-		"AnimatedDialog",	  //78GF_ANIMATED_DIALOG
 		"FixedMoraleOpcode",  //79GF_FIXED_MORALE_OPCODE
 		"Happiness",          //80GF_HAPPINESS
 		"EfficientORTrigger", //81GF_EFFICIENT_OR

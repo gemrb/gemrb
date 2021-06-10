@@ -300,8 +300,6 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			//allow_zero is for PST (deionarra's text)
 			ta->AppendText(L"\n");
 			displaymsg->DisplayStringName( tr->textStrRef, DMC_DIALOGPARTY, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
-			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
-			}
 		}
 		target->ImmediateEvent();
 		target->ProcessActions(); //run the action queue now
