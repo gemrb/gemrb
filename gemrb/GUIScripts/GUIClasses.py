@@ -298,7 +298,7 @@ class GTextArea(GControl, Scrollable):
 	__slots__ = ['DefaultText']
 
 	def ListResources(self, what, opts=0):
-		_GemRB.TextArea_SetColor(self, {'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_OPTIONS)
+		_GemRB.TextArea_SetColor(self, ColorWhitish, TA_COLOR_OPTIONS)
 		return _GemRB.TextArea_ListResources(self, what, opts)
 
 	def Clear(self):

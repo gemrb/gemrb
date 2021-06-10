@@ -2480,7 +2480,7 @@ def BiographyPress():
 	BiographyTextArea = BiographyWindow.ReplaceSubview(4, IE_GUI_TEXTAREA, "NORMAL")
 	BiographyTextArea.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
 	BiographyTextArea.Focus()
-	BiographyTextArea.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_NORMAL)
+	BiographyTextArea.SetColor (ColorWhitish, TA_COLOR_NORMAL)
 
 	BIO = GemRB.GetToken("Biography")
 	if BIO:

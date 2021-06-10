@@ -215,7 +215,7 @@ def UpdateRecordsWindow (Window):
 
 	# help, info textarea
 	Text = Window.GetControl (45)
-	Text.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_INITIALS)
+	Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
 	Text.SetText (GetStatOverview (pc))
 	#TODO: making window visible/shaded depending on the pc's state
 

@@ -16,7 +16,7 @@ def OnLoad():
 	histLabel = consoleWin.GetControl(2)
 	histLabel.SetText ("History:")
 	hist = consoleWin.GetControl(3)
-	hist.SetColor ({'r' : 255, 'g' : 255, 'b' : 255, 'a' : 255}, TA_COLOR_OPTIONS)
+	hist.SetColor (ColorWhitish, TA_COLOR_OPTIONS)
 	
 	console = consoleWin.GetControl(0)
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
