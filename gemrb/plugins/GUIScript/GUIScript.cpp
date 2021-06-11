@@ -5598,9 +5598,11 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 	if (!core->GetPartyINI()) {
 		return RuntimeError( "INI resource not found!\n" );
 	}
-	return PyString_FromString(
-			core->GetPartyINI()->GetKeyAsString( Tag, Key, Default ) );
-}
+	const char *desc = core->GetPartyINI()->GetKeyAsString(Tag, Key, Default);
+	// ensure it can be converted to unicode
+	// FIXME: English party.ini is encoded in cp-1252, not iso-8859-1, the tlk encoding
+	// but we don't display its 0x92 single quote / apostrophe correctly either way (see The Winter Rose description: father Di'Arnos)
+	return PyString_FromString(ConvertCharEncoding(desc, core->TLKEncoding.encoding.c_str(), "UTF-8"));}
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
 "===== CreatePlayer =====\n\
