@@ -13646,6 +13646,8 @@ PyDoc_STRVAR( GemRB_internal__doc,
 /** Initialization Routine */
 
 #if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__GemRB();
+PyMODINIT_FUNC PyInit_GemRB();
 
 PyMODINIT_FUNC
 PyInit__GemRB()
