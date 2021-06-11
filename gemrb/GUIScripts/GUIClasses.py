@@ -58,7 +58,7 @@ class GTable:
 		'GetColumnCount': _GemRB.Table_GetColumnCount
 	}
 
-	def __nonzero__(self):
+	def __bool__(self):
 		return self.ID != -1
 
 @add_metaclass(metaIDWrapper)
@@ -103,7 +103,7 @@ class GView:
 	def __hash__(self):
 		return self.SCRIPT_GROUP + str(self.ID)
 	
-	def __nonzero__(self):
+	def __bool__(self):
 		return self.ID != -1
 
 	def GetSize(self):
