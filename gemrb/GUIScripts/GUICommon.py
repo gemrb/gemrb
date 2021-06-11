@@ -872,6 +872,8 @@ class _stdioWrapper(object):
 			if out:
 				GemRB.Log(self.log_level, "Python", out)
 			self.buffer = ""
+	def flush(self):
+		pass
 
 def _wrapStdio():
 	import sys
