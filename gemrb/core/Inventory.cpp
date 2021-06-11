@@ -337,7 +337,7 @@ void Inventory::KillSlot(unsigned int index)
 		Slots.erase(Slots.begin()+index);
 		return;
 	}
-	CREItem *item = Slots[index];
+	const CREItem *item = Slots[index];
 	if (!item) {
 		return;
 	}
@@ -355,7 +355,7 @@ void Inventory::KillSlot(unsigned int index)
 		return;
 	}
 	RemoveSlotEffects( index );
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		error("Inventory", "Invalid item: %s!", item->ItemResRef);
@@ -366,14 +366,14 @@ void Inventory::KillSlot(unsigned int index)
 
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
-			UpdateShieldAnimation(0);
+			UpdateShieldAnimation(nullptr);
 			break;
 		case SLOT_EFFECT_MISSILE:
 			//getting a new projectile of the same type
 			if (eqslot == (int) index) {
 				if (Equipped < 0) {
 					//always get the projectile weapon header (this quiver was equipped)
-					ITMExtHeader *header = itm->GetWeaponHeader(true);
+					const ITMExtHeader *header = itm->GetWeaponHeader(true);
 					//remove potential launcher effects too
 					RemoveSlotEffects(FindTypedRangedWeapon(header->ProjectileQualifier));
 					equip = FindRangedProjectile(header->ProjectileQualifier);
@@ -393,7 +393,7 @@ void Inventory::KillSlot(unsigned int index)
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
 			} else if (Equipped < 0) {
 				//always get the projectile weapon header (this is a bow, because Equipped is negative)
-				ITMExtHeader *header = itm->GetWeaponHeader(true);
+				const ITMExtHeader *header = itm->GetWeaponHeader(true);
 				if (header) {
 					//find the equipped type
 					int type = header->ProjectileQualifier;
@@ -402,7 +402,7 @@ void Inventory::KillSlot(unsigned int index)
 					if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
 						EquipBestWeapon(EQUIP_MELEE);
 					} else if (item2) {
-						Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
+						const Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
 						if (itm2) {
 							if (type == header->ProjectileQualifier) {
 								equip = FindRangedProjectile(header->ProjectileQualifier);
@@ -665,7 +665,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 }
 
 /* could the source item be dropped on the target item to merge them */
-bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source) const
+bool Inventory::ItemsAreCompatible(const CREItem* target, const CREItem* source) const
 {
 	if (!target) {
 		//this isn't always ok, please check!
@@ -860,13 +860,13 @@ bool Inventory::ChangeItemFlag(ieDword slot, ieDword arg, int op)
 //all checks have been made previously
 bool Inventory::EquipItem(ieDword slot)
 {
-	ITMExtHeader *header;
+	const ITMExtHeader *header;
 
 	if (!Owner) {
 		//maybe assertion too?
 		return false;
 	}
-	CREItem *item = GetSlotItem(slot);
+	const CREItem *item = GetSlotItem(slot);
 	if (!item) {
 		return false;
 	}
@@ -875,7 +875,7 @@ bool Inventory::EquipItem(ieDword slot)
 
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) {
 		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
 		return false;
@@ -1655,7 +1655,7 @@ ieDword Inventory::GetEquipExclusion(int index) const
 	return ret;
 }
 
-void Inventory::UpdateShieldAnimation(Item *it)
+void Inventory::UpdateShieldAnimation(const Item *it)
 {
 	char AnimationType[2]={0,0};
 	int WeaponType;

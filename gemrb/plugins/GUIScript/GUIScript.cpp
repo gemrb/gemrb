@@ -6682,7 +6682,7 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 	else {
 		IconResRef = spell->SpellbookIcon;
 	}
-	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(IconResRef, IE_BAM_CLASS_ID, IE_NORMAL, 1);
+	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(IconResRef, IE_BAM_CLASS_ID, IE_NORMAL, true);
 	if (!af) {
 		char tmpstr[24];
 

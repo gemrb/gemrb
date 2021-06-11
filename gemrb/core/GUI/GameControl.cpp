@@ -1017,9 +1017,9 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				// mwahaha!
 				{
 				Effect *newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
-				int i = area->GetActorCount(0);
+				int i = area->GetActorCount(false);
 				while(i--) {
-					Actor *victim = area->GetActor(i, 0);
+					Actor *victim = area->GetActor(i, false);
 					if (victim->Modified[IE_EA] == EA_ENEMY) {
 						core->ApplyEffect(newfx, victim, victim);
 					}

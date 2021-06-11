@@ -81,7 +81,7 @@ public:
 	Point Origin() const { return rect.Origin(); }
 	Region Rect() const  { return rect; }
 	
-	void SetOrigin(const Point& p) { rect.x = p.x, rect.y = p.y; }
+	void SetOrigin(const Point& p) { rect.x = p.x; rect.y = p.y; }
 
 	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
 	virtual void Clear(const Region& rgn) = 0;

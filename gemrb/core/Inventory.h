@@ -275,7 +275,7 @@ public:
 	void SetSlotItem(CREItem* item, unsigned int slot);
 	int GetWeight() const {return Weight;}
 
-	bool ItemsAreCompatible(CREItem* target, CREItem* source) const;
+	bool ItemsAreCompatible(const CREItem* target, const CREItem* source) const;
 	//depletes charged items
 	int DepleteItem(ieDword flags);
 	//charges recharging items
@@ -378,7 +378,7 @@ private:
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
-	void UpdateShieldAnimation(Item *it);
+	void UpdateShieldAnimation(const Item *it);
 };
 
 }

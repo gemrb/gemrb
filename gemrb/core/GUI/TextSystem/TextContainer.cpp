@@ -469,7 +469,7 @@ ContentContainer::EraseContent(ContentList::iterator it)
 ContentContainer::ContentList::iterator
 ContentContainer::EraseContent(ContentList::iterator beg, ContentList::iterator end)
 {
-	for (; beg != end;) {
+	while (beg != end) {
 		beg = EraseContent(beg);
 	}
 	return end;

@@ -346,8 +346,7 @@ Interface::~Interface(void)
 
 	delete sgiterator;
 
-	size_t i;
-	for (i = 0; i < musiclist.size(); i++) {
+	for (size_t i = 0; i < musiclist.size(); i++) {
 		free((void *)musiclist[i]);
 	}
 
