@@ -575,6 +575,10 @@ add_custom_target(appimage
     COMMAND make install DESTDIR=./AppDir
     COMMAND mv AppDir/usr/usr/share/gemrb AppDir/usr/share/ || true # not always needed
     COMMAND sed -i 's,X-AppImage-Version.*,X-AppImage-Version='`date +%F`-$ENV{GITHUB_SHA}',' AppDir/usr/share/applications/gemrb.desktop
+    # bundle core python modules
+    # AppRun defaults PYTHONPATH to this destination
+    # source is probably available in Python3_STDLIB once we switch to newer cmake
+    COMMAND cp -r /usr/lib/python2.7 AppDir/usr/share/pyshared
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
