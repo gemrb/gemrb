@@ -781,7 +781,7 @@ def TypeSetStats(stats, pc=0):
 			else: #normal value + type character, for example percent sign
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 		except:
-			if isinstance(s, basestring):
+			if isinstance(s, str):
 				if s == len(s) * "\n": # check if the string is all newlines
 					# avoid "double" newlines (we use join later so we would get one more newline than is in s!)
 					if res:
