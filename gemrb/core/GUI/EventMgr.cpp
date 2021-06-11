@@ -132,7 +132,7 @@ bool EventMgr::MouseDown()
 
 bool EventMgr::FingerDown()
 {
-	return fingerStates.size() > 0;
+	return !fingerStates.empty();
 }
 
 bool EventMgr::ControllerButtonState(EventButton btn)

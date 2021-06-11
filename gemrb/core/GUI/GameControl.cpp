@@ -2065,7 +2065,7 @@ void GameControl::InitFormation(const Point &clickPoint)
 	// Of course single actors don't get rotated, but we need to ensure
 	// isFormationRotation is set in all cases where we initiate movement,
 	// since OnMouseUp tests for it.
-	if (isFormationRotation || core->GetGame()->selected.size() == 0) {
+	if (isFormationRotation || core->GetGame()->selected.empty()) {
 		return;
 	}
 
@@ -2507,7 +2507,7 @@ void GameControl::MakeSelection(bool extend)
 {
 	Game* game = core->GetGame();
 
-	if (!extend && highlighted.size() > 0) {
+	if (!extend && !highlighted.empty()) {
 		game->SelectActor( NULL, false, SELECT_NORMAL );
 	}
 
