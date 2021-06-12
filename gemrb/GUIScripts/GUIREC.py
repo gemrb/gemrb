@@ -426,7 +426,9 @@ def GetEffectIcons(pc,LevelDiff):
 		effects = GemRB.GetPlayerStates (pc)
 		if len (effects):
 			for c in effects:
-				tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION")
+				if not isinstance(c, int):
+					c = ord(c)
+				tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION")
 				stats.append ( (tmp,c,'a') )
 	return TypeSetStats (stats, pc)
 
@@ -481,7 +483,7 @@ def GetMagicResistance(pc):
 def GetPartyReputation(pc):
 	stats = []
 	# party's reputation
-	reptxt = GetReputation (GemRB.GameGetReputation ()/10)
+	reptxt = GetReputation (GemRB.GameGetReputation () // 10)
 	stats.append ( (9465, reptxt, '') )
 	return TypeSetStats (stats, pc)
 
@@ -713,11 +715,11 @@ def GetWeaponStyleBonuses(pc, cdet):
 		# Weapon Style bonuses
 		stats.append (32131)
 		wstyle = cdet["Style"] # equipped weapon style + 1000 * proficiency level
-		profcount = wstyle / 1000
+		profcount = wstyle // 1000
 		if profcount:
 			wstyletables = { IE_PROFICIENCY2WEAPON:"wstwowpn", IE_PROFICIENCY2HANDED:"wstwohnd", IE_PROFICIENCYSINGLEWEAPON:"wssingle", IE_PROFICIENCYSWORDANDSHIELD:"wsshield" }
 			bonusrefs = { "THAC0BONUSRIGHT":56911, "THAC0BONUSLEFT":56910, "DAMAGEBONUS":10336, "CRITICALHITBONUS":32140, "PHYSICALSPEED":32141, "AC":10339, "ACVSMISSLE":10340 }
-			WStyleTable = GemRB.LoadTable (wstyletables[wstyle%1000])
+			WStyleTable = GemRB.LoadTable (wstyletables[wstyle % 1000])
 			for col in range(WStyleTable.GetColumnCount()):
 				value = WStyleTable.GetValue (profcount, col)
 				stats.append ((bonusrefs[WStyleTable.GetColumnName(col)], value, ''))
@@ -768,7 +770,7 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				res.append ("[cap]" + str(val) + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif type == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
