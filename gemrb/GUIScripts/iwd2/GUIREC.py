@@ -341,8 +341,12 @@ def DisplayGeneral (pc, targetTextArea):
 		RecordsTextArea.Append ("\n[color=ffff00]" + GemRB.GetString(32052) + "[/color]\n")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			tmp = StateTable.GetValue (str(ord(c)-66), "DESCRIPTION", GTV_REF)
-			RecordsTextArea.Append ("[cap]"+c+"%[/cap][p]" + tmp + "[/p]")
+			c2 = str(c)
+			if isinstance(c, str):
+				c2 = c
+				c = ord(c)
+			tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION", GTV_REF)
+			RecordsTextArea.Append ("[cap]" + c2 + "%[/cap][p]" + tmp + "[/p]")
 
 	# TODO: Active Feats (eg. Power attack 4)
 
