@@ -7820,6 +7820,8 @@ void Actor::UpdateActorState()
 	// limit the invocation count to save resources (the text is drawn repeatedly anyway)
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("HP Over Head", tmp);
+	assert(game->GameTime);
+	assert(core->Time.round_size);
 	if (tmp && Persistent() && (game->GameTime % (core->Time.round_size/2) == 0)) { // smaller delta to skip fading
 		DisplayHeadHPRatio();
 	}
