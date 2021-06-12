@@ -1790,7 +1790,7 @@ def GetRealPrice (pc, mode, Item, Slot):
 	if Item['MaxStackAmount']>1:
 		price = price * Slot['Usages0']
 	elif Item['MaxCharge']>0:
-		price = price * Slot['Usages0'] / Item['MaxCharge']
+		price = price * Slot['Usages0'] // Item['MaxCharge']
 
 	# modifier from store properties (in percent)
 	if mode == "buy":
@@ -1827,9 +1827,9 @@ def GetRealPrice (pc, mode, Item, Slot):
 
 		# reputation modifier (in percent, but absolute)
 		if RepModTable and not (Store['StoreFlags'] & SHOP_NOREPADJ):
-			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation()/10 - 1) / 100
+			mod = mod * RepModTable.GetValue (0, GemRB.GameGetReputation() // 10 - 1) // 100
 
-	effprice = price * mod / 100
+	effprice = price * mod // 100
 	#in bg2 even 1gp items can be sold for at least 1gp
 	if effprice == 0 and Item['Price'] > 0:
 		effprice = 1
