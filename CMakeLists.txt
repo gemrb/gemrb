@@ -252,7 +252,10 @@ IF(NOT STATIC_LINK)
 ENDIF()
 
 # Check for all the required and optional dependencies
-FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
+FIND_PACKAGE(PythonLibs 2.3)
+IF(NOT PYTHONLIBS_FOUND)
+	FIND_PACKAGE(PythonLibs 3 REQUIRED)
+ENDIF()
 IF(PYTHONLIBS_FOUND)
 	MESSAGE(STATUS "Looking for Python libraries and headers: found")
 ELSE()
