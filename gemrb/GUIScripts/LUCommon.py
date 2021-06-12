@@ -67,7 +67,7 @@ def GetNextLevels (actor, Classes):
 			Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (actor, XPStat[i]), Classes[i])
 		else:
 			# In all other cases, XP cut exactly by number of classes
-			Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (actor, IE_XP)/NumClasses, Classes[i])
+			Level[i] = GetNextLevelFromExp (GemRB.GetPlayerStat (actor, IE_XP) // NumClasses, Classes[i])
 
 	return Level
 
@@ -128,7 +128,7 @@ def CanLevelUp(actor):
 		return 0
 
 	if Multi[0] > 1: # multiclassed
-		xp = xp/Multi[0] # divide the xp evenly between the classes
+		xp = xp // Multi[0] # divide the xp evenly between the classes
 		for i in range (Multi[0]):
 			# if any class can level, return 1
 			TmpClassName = GUICommon.GetClassRowName (Multi[i+1], "class")

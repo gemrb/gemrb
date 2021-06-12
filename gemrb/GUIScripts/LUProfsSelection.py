@@ -212,7 +212,7 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 	if IsMulti[0] > 1:
 		if sum (level1) == 0: #character is being generated (either chargen or dual)
 			# don't give too many points; exact formula unknown, but this works with f/m and f/m/t
-			ProfsPointsLeft += sum(level2)/IsMulti[0]/ProfsRate
+			ProfsPointsLeft += sum(level2) // IsMulti[0] // ProfsRate
 		else:
 			# just look at the fastest prof-gaining class in the bunch and consider their level
 			# eg. a m/t should get a point at 3/4 and 7/8 (rate of 4)
@@ -226,13 +226,13 @@ def SetupProfsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1]
 					BestRate = Rate
 					ProfIndex = IsMulti[1:].index(cls)
 
-			ProfsPointsLeft += level2[ProfIndex]/ProfsRate - level1[ProfIndex]/ProfsRate
+			ProfsPointsLeft += level2[ProfIndex] // ProfsRate - level1[ProfIndex] // ProfsRate
 	else:
 		if GUICommon.IsDualSwap (pc):
 			ProfIndex = 1
 
 		#we need these 2 number to floor before subtracting
-		ProfsPointsLeft += level2[ProfIndex]/ProfsRate - level1[ProfIndex]/ProfsRate
+		ProfsPointsLeft += level2[ProfIndex] // ProfsRate - level1[ProfIndex] // ProfsRate
 
 	#setup prof vars for passing between functions
 	ProfsTable = GemRB.LoadTable ("weapprof")

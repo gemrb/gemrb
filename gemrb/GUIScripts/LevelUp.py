@@ -260,7 +260,7 @@ def OpenLevelUpWindow():
 				HLACount += LevelDiff[i]
 
 		# set values required by the hla level up code
-		HLACount = HLACount / HLATable.GetValue (ClassName, "RATE", GTV_INT)
+		HLACount = HLACount // HLATable.GetValue (ClassName, "RATE", GTV_INT)
 		GemRB.SetVar ("HLACount", HLACount)
 	if GameCheck.IsBG2():
 		HLAButton = LevelUpWindow.GetControl (126)
