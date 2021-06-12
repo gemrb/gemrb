@@ -25,6 +25,7 @@ Release:
 - [ ] Amend Roadmap in contributing.md
 - [ ] Create the source tarball with `make dist`
   - [ ] Add any missing files to the cmake install targets and recreate the tarball
+  - [ ] Add any new files from fetch-demo-data to the cmake dist target
   - [ ] Add any new extranoeus files to `.gitattributes` and recreate
   - [ ] Build it and run the minimal test or more: `gemrb/gemrb -c ../gemrb/GemRB.cfg.noinstall.sample`
 - [ ] Add a git tag and push it

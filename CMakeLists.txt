@@ -590,10 +590,12 @@ add_custom_target(appimage
 )
 
 # make dist for a gzipped tarball of current HEAD
+# include fetch_demo_data files manually, since they're not part of the repo
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${GEMRB_VERSION})
 add_custom_target( dist
-	COMMAND git archive --worktree-attributes --prefix=${ARCHIVE_NAME}/ HEAD
-		| gzip --best > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
+	COMMAND git archive --worktree-attributes --prefix=${ARCHIVE_NAME}/ -o ${ARCHIVE_NAME}.tar HEAD
+	COMMAND tar --append -f ${ARCHIVE_NAME}.tar --transform="s,^,${ARCHIVE_NAME}/," demo/music
+	COMMAND gzip --best -c ${ARCHIVE_NAME}.tar > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.gz
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
 
