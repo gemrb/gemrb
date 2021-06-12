@@ -216,8 +216,8 @@ def AddNoteWindow ():
 		# center relative to map
 		mapframe = MapWindow.GetFrame()
 		noteframe = NoteWindow.GetFrame()
-		noteframe['x'] = mapframe['x'] + mapframe['w']/2 - noteframe['w']/2 - 60
-		noteframe['y'] = mapframe['y'] + mapframe['h']/2 - noteframe['h']/2
+		noteframe['x'] = mapframe['x'] + mapframe['w'] // 2 - noteframe['w'] // 2 - 60
+		noteframe['y'] = mapframe['y'] + mapframe['h'] // 2 - noteframe['h'] // 2
 		NoteWindow.SetFrame(noteframe)
 	else:
 		NoteLabel = NoteWindow.GetControl (1)

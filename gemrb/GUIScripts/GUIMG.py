@@ -164,7 +164,7 @@ def UpdateMageWindow (MageWindow):
 		label = MageWindow.GetControl (0x10000040)
 		if known_cnt:
 			# we give sorcerers all charges for all the spells, so some extra math is needed
-			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt/known_cnt) + "/" + str(max_mem_cnt))
+			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt // known_cnt) + "/" + str(max_mem_cnt))
 		else:
 			label.SetText ("")
 
