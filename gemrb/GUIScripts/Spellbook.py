@@ -103,7 +103,8 @@ def GetKnownSpellsDescription(actor, BookType):
 	info = ""
 	spells = GetKnownSpells (actor, BookType)
 	# reverse spells order grouped by SpellLevel
-	spells.sort (lambda fst, snd: -1 if fst['SpellLevel'] == snd['SpellLevel'] else 0)
+	spells.reverse ()
+	spells.sort (key = lambda spell: spell['SpellLevel'])
 	for spell in spells:
 		info += GemRB.GetString (spell['SpellName']) + "\n"
 	return info
