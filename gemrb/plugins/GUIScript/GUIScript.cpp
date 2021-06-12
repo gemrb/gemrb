@@ -10262,7 +10262,7 @@ static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 
 	GET_MAP();
 
-	map->FillExplored(PyObject_IsTrue(explored));
+	map->FillExplored(explored ? PyObject_IsTrue(explored) : false);
 
 	Py_RETURN_NONE;
 }
