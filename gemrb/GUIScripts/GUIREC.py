@@ -426,10 +426,12 @@ def GetEffectIcons(pc,LevelDiff):
 		effects = GemRB.GetPlayerStates (pc)
 		if len (effects):
 			for c in effects:
+				c2 = str(c)
 				if not isinstance(c, int):
+					c2 = c
 					c = ord(c)
 				tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION")
-				stats.append ( (tmp,c,'a') )
+				stats.append ((tmp, c2, 'a'))
 	return TypeSetStats (stats, pc)
 
 ########################################################################
@@ -770,7 +772,9 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				res.append ("[cap]" + str(val) + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				if isinstance(val, int):
+					val = str(val)
+				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif type == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
