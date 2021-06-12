@@ -208,7 +208,7 @@ def UpdateControlStatus(init = False):
 
 	def OnDecreaseSize():
 		GSFlags, Expand = GetGSFlags()
-		Expand = Expand/2 - 1 # next size down: 6->2, 2->0
+		Expand = Expand // 2 - 1 # next size down: 6->2, 2->0
 
 		SetMWSize(Expand, GSFlags)
 
