@@ -42,7 +42,19 @@ Deployment:
   - [ ] Release notes if needed (configuration changes, notes for packagers)
 - [ ] SourceForge
   - [ ] Upload source package to SourceForge, maintaining the naming format under Releases
-    - [ ] Upload any release notes alongside as Readme.md
+  - [ ] Upload any release notes alongside as Readme.md
+  - [ ] Copy generated release builds into Release:
+```sh
+# run in SourceForge shell
+version=0.9.0
+
+cd /home/frs/project/gemrb/Buildbot\ Binaries
+mkdir -p ../Releases/$version
+cp Windows/AppVeyor/$(ls Windows/AppVeyor/ -1rt | tail -n1) ../Releases/$version/gemrb-win32-v$version.zip
+cp Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n) ../Releases/$version/gemrb-macos-v$version.tar.bz2
+cp Linux/$(ls Linux/ -1rt | tail -n1) ../Releases/$version/gemrb-linux-v$version.AppImage
+```
+
   - [ ] Mark release builds as OS defaults on SourceForge as appropriate; mark the source for everyone else
   - [ ] (optional) regenerate android build
   - [ ] Test downloads
