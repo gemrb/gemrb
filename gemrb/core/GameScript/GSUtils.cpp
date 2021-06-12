@@ -511,7 +511,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			speech = GEM_SND_SPEECH;
 		}
 		// disable position, but only for party
-		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty) {
+		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty ||
+			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			speech |= GEM_SND_RELATIVE;
 			pos.x = pos.y = 0;
 		}
