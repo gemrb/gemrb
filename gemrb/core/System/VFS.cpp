@@ -281,7 +281,7 @@ bool PathJoin (char *target, const char *base, ...)
 				goto finish;
 			}
 			PathAppend(target, filename);
-			source = slash + 1;
+			if (slash) source = slash + 1;
 		} while (slash);
 	}
 
