@@ -580,6 +580,8 @@ add_custom_target(appimage
     # source is probably available in Python3_STDLIB once we switch to newer cmake
     COMMAND cp -r /usr/lib/python2.7 AppDir/usr/share/pyshared
     COMMAND cp /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py AppDir/usr/share/pyshared/
+    COMMAND rm -r AppDir/usr/share/pyshared/config-x86_64-linux-gnu
+    COMMAND rm -r AppDir/usr/share/pyshared/dist-packages
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
