@@ -780,8 +780,8 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 
 	const char* ret;
 	if (PyObject_TypeCheck( row, &PyString_Type )) {
-		const char* rows = PyString_AsString(row);
-		const char* cols = PyString_AsString(col);
+		const auto rows = PyString_AsString(row);
+		const auto cols = PyString_AsString(col);
 		ret = tm->QueryField( rows, cols );
 	} else {
 		size_t rowi = PyInt_AsLong( row );
