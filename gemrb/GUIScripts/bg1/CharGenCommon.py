@@ -225,7 +225,7 @@ class CharGen:
 			raise ValueError("bad arg type: "+str(type(to)) + " " + str(to))
 		while(not self.setScript()):
 			self.step = self.step + 1
-					 	
+
 CharGenMaster = None
 
 def back(Window=None):

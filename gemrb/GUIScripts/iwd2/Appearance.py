@@ -122,9 +122,9 @@ def OnLoad():
 	RaceID = CommonTables.Races.GetValue (RaceName, "ID", GTV_INT)
 	# look up base race if needed
 	if RaceID > 1000:
-		 RaceID = RaceID >> 16
-		 Race = CommonTables.Races.FindValue ("ID", RaceID)
-		 RaceName = CommonTables.Races.GetRowName (Race)
+		RaceID = RaceID >> 16
+		Race = CommonTables.Races.FindValue ("ID", RaceID)
+		RaceName = CommonTables.Races.GetRowName (Race)
 	AnimID = 0x6000 + table.GetValue (RaceName, "RACE")
 
 	table = GemRB.LoadTable ("avprefc")

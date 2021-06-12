@@ -2484,7 +2484,7 @@ def BiographyPress():
 
 	BIO = GemRB.GetToken("Biography")
 	if BIO:
- 		BiographyTextArea.SetText (BIO)
+		BiographyTextArea.SetText (BIO)
 	else:
 		BiographyTextArea.SetText (19423)
 

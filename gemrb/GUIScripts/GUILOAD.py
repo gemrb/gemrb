@@ -172,8 +172,8 @@ def GetQuickLoadSlot():
 		Slotname = Game.GetSaveID()
 		# quick save is 1
 		if Slotname == 1:
-		        QuickLoadSlot = Game
-		        break
+			QuickLoadSlot = Game
+			break
 	return QuickLoadSlot
 
 def QuickLoadPressed():
