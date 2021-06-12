@@ -1305,7 +1305,8 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 
 	const ScriptingRefBase* ref = NULL;
 	if (PyString_Check(lookup)) {
-		ref = ScriptEngine::GetScripingRef(PyString_AsString(lookup), id);
+		const char* group = PyString_AsString(lookup);
+		ref = ScriptEngine::GetScripingRef(group, id);
 	} else {
 		Window* win = GetView<Window>(lookup);
 		if (win) {

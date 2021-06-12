@@ -128,22 +128,22 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 }
 
 #if PY_MAJOR_VERSION >= 3
-const char* PyString_AsString(PyObject* obj)
+PyStringWrapper PyString_AsString(PyObject* obj)
 {
-	const char* str = nullptr;
+	PyStringWrapper wrap;
 	if (PyUnicode_Check(obj)) {
 		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, core->SystemEncoding, "strict"); // Owned reference
 		if (temp_bytes != NULL) {
-			str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-			//Py_DECREF(temp_bytes);
+			wrap.str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+			wrap.obj = temp_bytes; // needs to outlive our use of wrap.str
 		} else { // raw data... probalby this if for our "state" font
 			PyErr_Clear();
-			str = PyUnicode_AS_DATA(obj);
+			wrap.str = PyUnicode_AS_DATA(obj);
 		}
 	} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
-		str = PyBytes_AS_STRING(obj);
+		wrap.str = PyBytes_AS_STRING(obj);
 	}
-	return str;
+	return wrap;
 }
 #endif
 

@@ -85,7 +85,19 @@ private:
 // WARNING: dont use these for new code
 // they are temporary while we compete the transition to Python 3
 #if PY_MAJOR_VERSION >= 3
-const char* PyString_AsString(PyObject* obj);
+struct PyStringWrapper {
+	const char* str = nullptr;
+	PyObject* obj = nullptr;
+		
+	operator const char*() const {
+		return str;
+	}
+	
+	~PyStringWrapper() {
+		Py_XDECREF(obj);
+	}
+};
+PyStringWrapper PyString_AsString(PyObject* obj);
 #endif
 
 /*
