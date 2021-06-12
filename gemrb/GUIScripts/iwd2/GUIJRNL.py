@@ -39,7 +39,7 @@ def InitJournalWindow (Window):
 
 	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
-	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
+	StartTime = Table.GetValue("STARTTIME", "VALUE") // 4500
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 		

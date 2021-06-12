@@ -39,7 +39,7 @@ def InitJournalWindow (JournalWindow):
 		
 	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
-	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
+	StartTime = Table.GetValue("STARTTIME", "VALUE") // 4500
 	#StartYear is the year of the lowest ingame date to be printed
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
@@ -74,7 +74,7 @@ def UpdateJournalWindow (JournalWindow):
 		if je == None:
 			continue
 
-		hours = je['GameTime'] / 4500
+		hours = je['GameTime'] // 4500
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
 		dayandmonth = int(StartTime + days % 365)

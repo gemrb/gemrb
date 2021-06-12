@@ -42,7 +42,7 @@ def InitJournalWindow (JournalWindow):
 	JournalWindow.AddAlias("WIN_JRNL")
 		
 	Table = GemRB.LoadTable("YEARS")
-	StartTime = Table.GetValue("STARTTIME", "VALUE") / 4500
+	StartTime = Table.GetValue("STARTTIME", "VALUE") // 4500
 	StartYear = Table.GetValue("STARTYEAR", "VALUE")
 
 	# prev. chapter
@@ -131,7 +131,7 @@ def UpdateLogWindow (JournalWindow):
 
 		if je == None:
 			continue
-		hours = je['GameTime'] / 4500
+		hours = je['GameTime'] // 4500
 		days = int(hours/24)
 		year = str (StartYear + int(days/365))
 		dayandmonth = int(StartTime + days % 365)
