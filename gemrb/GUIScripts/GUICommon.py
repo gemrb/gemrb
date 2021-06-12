@@ -139,8 +139,8 @@ def GetGUISpellButtonCount ():
 
 def SetGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()
-	days = currentTime / 7200
-	hours = (currentTime % 7200) / 300
+	days = currentTime // 7200
+	hours = (currentTime % 7200) // 300
 	GemRB.SetToken ('GAMEDAY', str (days))
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
@@ -285,7 +285,7 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 		Control2 = Window.GetControl (Control2ID)
 		Control2.SetText (str (max_encumb) + ":")
 
-	ratio = (0.0 + encumbrance) / max_encumb
+	ratio = encumbrance / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
 			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
@@ -693,13 +693,13 @@ def SetupDamageInfo (pc, Button, Window):
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
-		ratio = (hp+0.0) / hp_max
+		ratio = hp / hp_max
 
 	if hp < 1 or (state & STATE_DEAD):
 		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 255}
 		Button.SetOverlay (0, c, c)
 
-	if ratio == 1:
+	if ratio == 1.0:
 		band = 0
 		color = {'r' : 255, 'g' : 255, 'b' : 255}  # white
 	elif ratio >= 0.75:
@@ -746,9 +746,9 @@ def SetCurrentDateTokens (stat, plural=False):
 	currentTime = GemRB.GetGameTime ()
 	joinTime = stat['JoinDate'] - stat['AwayTime']
 
-	party_time = currentTime - (joinTime / 15)
-	days = party_time / 7200
-	hours = (party_time % 7200) / 300
+	party_time = currentTime - (joinTime // 15)
+	days = party_time // 7200
+	hours = (party_time % 7200) // 300
 
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
@@ -799,9 +799,9 @@ def ceildiv (n, d):
 	if d == 0:
 		raise ZeroDivisionError("ceildiv by zero")
 	elif d < 0:
-		return (n+d+1)/d
+		return (n + d + 1) // d
 	else:
-		return (n+d-1)/d
+		return (n + d - 1) // d
 
 # a placeholder for unimplemented and hardcoded key actions
 def ResolveKey():

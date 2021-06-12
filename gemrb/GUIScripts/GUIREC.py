@@ -326,8 +326,8 @@ def GetClassTitles (pc,LevelDiff):
 			else:
 				ClassTitle = CommonTables.Classes.GetValue (Class, "CAP_REF", GTV_REF)
 			GemRB.SetToken ("CLASS", ClassTitle)
-			GemRB.SetToken ("LEVEL", str (Levels[i]+LevelDiff[i]-int(LevelDrain/Multi[0])) )
-			GemRB.SetToken ("EXPERIENCE", str (XP/Multi[0]) )
+			GemRB.SetToken ("LEVEL", str (Levels[i] + LevelDiff[i] - LevelDrain // Multi[0]))
+			GemRB.SetToken ("EXPERIENCE", str (XP // Multi[0]) )
 			if LevelDrain:
 				stats.append ( (GemRB.GetString (19720),1,'d') )
 				stats.append ( (GemRB.GetString (57435),1,'d') ) # LEVEL DRAINED
@@ -456,9 +456,9 @@ def GetProficiencies(pc, cdet):
 
 	tmp = cdet["APR"]
 	if (tmp&1):
-		tmp2 = str (tmp/2) + chr (189) #must use one higher than the frame count
+		tmp2 = str (tmp // 2) + chr (189) #must use one higher than the frame count
 	else:
-		tmp2 = str (tmp/2)
+		tmp2 = str (tmp // 2)
 	stats.append ( (9458, tmp2, '') )
 	return TypeSetStats (stats, pc)
 
