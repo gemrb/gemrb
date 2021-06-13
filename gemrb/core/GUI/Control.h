@@ -150,7 +150,7 @@ public: // Public attributes
 	static unsigned int ActionRepeatDelay;
 
 public:
-	Control(const Region& frame);
+	explicit Control(const Region& frame);
 	~Control() override;
 
 	bool IsAnimated() const override { return animation && AnimPicture; }

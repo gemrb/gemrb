@@ -162,7 +162,7 @@ public:
 
 	bool debuginfo = false;
 
-	View(const Region& frame);
+	explicit View(const Region& frame);
 	virtual ~View();
 
 	void Draw();
