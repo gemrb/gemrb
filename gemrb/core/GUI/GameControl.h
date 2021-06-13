@@ -186,7 +186,7 @@ public:
 	String TooltipText() const override;
 
 	void SetTargetMode(int mode);
-	int GetTargetMode() { return target_mode; }
+	int GetTargetMode() const { return target_mode; }
 	bool SetScreenFlags(unsigned int value, int mode);
 	void SetDialogueFlags(unsigned int value, int mode);
 	int GetScreenFlags() const { return ScreenFlags; }
@@ -198,7 +198,7 @@ public:
 
 	void MoveViewportUnlockedTo(Point, bool center);
 	bool MoveViewportTo(Point, bool center, int speed = 0);
-	Region Viewport();
+	Region Viewport() const;
 
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);

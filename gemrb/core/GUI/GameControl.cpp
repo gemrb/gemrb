@@ -1729,7 +1729,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 	return canMove;
 }
 
-Region GameControl::Viewport()
+Region GameControl::Viewport() const
 {
 	return Region(vpOrigin, frame.Dimensions());
 }
