@@ -88,7 +88,6 @@ GameControl::GameControl(const Region& frame)
 	overInfoPoint = NULL;
 	drawPath = NULL;
 	lastCursor = IE_CURSOR_INVALID;
-	moveX = moveY = 0;
 	numScrollCursor = 0;
 
 	ieDword tmp = 0;
@@ -431,24 +430,23 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
 		const Actor *star = core->GetFirstSelectedActor();
 		if (star) {
-			moveX = star->Pos.x - vpOrigin.x - frame.w/2;
-			moveY = star->Pos.y - vpOrigin.y - frame.h/2;
+			vpVector = star->Pos - vpOrigin - Point(frame.w / 2, frame.h / 2);
 		}
 	}
 
-	if (moveX || moveY) {
-		if (MoveViewportTo( vpOrigin + Point(moveX, moveY), false )) {
+	if (!vpVector.isnull()) {
+		if (MoveViewportTo(vpOrigin + vpVector, false)) {
 			if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
 				int cursorFrame = 0; // right
-				if (moveY < 0) {
+				if (vpVector.y < 0) {
 					cursorFrame = 2; // up
-					if (moveX > 0) cursorFrame--; // +right
-					else if (moveX < 0) cursorFrame++; // +left
-				} else if (moveY > 0) {
+					if (vpVector.x > 0) cursorFrame--; // +right
+					else if (vpVector.x < 0) cursorFrame++; // +left
+				} else if (vpVector.y > 0) {
 					cursorFrame = 6; // down
-					if (moveX > 0) cursorFrame++; // +right
-					else if (moveX < 0) cursorFrame--; // +left
-				} else if (moveX < 0) {
+					if (vpVector.x > 0) cursorFrame++; // +right
+					else if (vpVector.x < 0) cursorFrame--; // +left
+				} else if (vpVector.x < 0) {
 					cursorFrame = 4; // left
 				}
 
@@ -1618,8 +1616,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	
 	if (e.mouse.ButtonState(GEM_MB_MIDDLE)) {
 		// if we are panning the map don't scroll from being at the edge
-		moveX = 0;
-		moveY = 0;
+		vpVector = Point();
 		return false;
 	}
 	
@@ -1636,22 +1633,22 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	int mousescrollspd = core->GetMouseScrollSpeed();
 
 	if (mp.x < mask.x) {
-		moveX = -mousescrollspd;
+		vpVector.x = -mousescrollspd;
 	} else if (mp.x > mask.x + mask.w) {
-		moveX = mousescrollspd;
+		vpVector.x = mousescrollspd;
 	} else {
-		moveX = 0;
+		vpVector.x = 0;
 	}
 
 	if (mp.y < mask.y) {
-		moveY = -mousescrollspd;
+		vpVector.y = -mousescrollspd;
 	} else if (mp.y > mask.y + mask.h) {
-		moveY = mousescrollspd;
+		vpVector.y = mousescrollspd;
 	} else {
-		moveY = 0;
+		vpVector.y = 0;
 	}
 	
-	if (moveX || moveY) {
+	if (!vpVector.isnull()) {
 		// cancel any scripted moves
 		// we are not in dialog or cutscene mode anymore
 		// and the user is attempting to move the viewport
@@ -2524,8 +2521,7 @@ void GameControl::SetCutSceneMode(bool active)
 	WindowManager* wm = core->GetWindowManager();
 	if (active) {
 		ScreenFlags |= SF_CUTSCENE;
-		moveX = 0;
-		moveY = 0;
+		vpVector = Point();
 		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
 		ScreenFlags &= ~SF_CUTSCENE;
@@ -2596,8 +2592,7 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (Flags()&IgnoreEvents) {
 		ClearMouseState();
-		moveX = 0;
-		moveY = 0;
+		vpVector = Point();
 	}
 }
 

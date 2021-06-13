@@ -97,7 +97,7 @@ private:
 	// private to enforce proper cursor changes
 	int target_mode;
 	int lastCursor;
-	short moveX, moveY;
+	Point vpVector;
 	int numScrollCursor;
 	PathNode* drawPath;
 	unsigned int ScreenFlags;
@@ -106,7 +106,6 @@ private:
 	unsigned int DisplayTextTime;
 	bool AlwaysRun;
 	bool ShouldTriggerWorldMap(const Actor *pc) const;
-	void ExecuteMovement(Actor *actor, unsigned short x, unsigned short y, bool createWaypoint);
 	Actor *user; //the user of item or spell
 
 	Door* overDoor;
