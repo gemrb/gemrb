@@ -886,6 +886,10 @@ void CREImporter::SetupColor(ieDword &stat)
 
 	RandRows = randcolors[0].size();
 	stat -= 200;
+	// handle saves with 1pp on installs without it
+	if (stat >= RandRows) {
+		stat = RandRows - 1;
+	}
 	// assuming an ordered list, so looking in the middle first
 	for (int i = (int) stat; i >= 0; i--) {
 		if (randcolors[i][0] == stat) {
