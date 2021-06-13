@@ -65,37 +65,37 @@ enum BlitFlags : uint32_t {
 	STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
 
-inline constexpr BlitFlags operator |(BlitFlags a, BlitFlags b)
+inline BlitFlags operator |(BlitFlags a, BlitFlags b)
 {
 	return static_cast<BlitFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 }
 
-inline constexpr BlitFlags& operator |=(BlitFlags& a, BlitFlags b)
+inline BlitFlags& operator |=(BlitFlags& a, BlitFlags b)
 {
 	return a = a | b;
 }
 
-inline constexpr BlitFlags operator &(BlitFlags a, BlitFlags b)
+inline BlitFlags operator &(BlitFlags a, BlitFlags b)
 {
 	return static_cast<BlitFlags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
 }
 
-inline constexpr BlitFlags& operator &=(BlitFlags& a, BlitFlags b)
+inline BlitFlags& operator &=(BlitFlags& a, BlitFlags b)
 {
 	return a = a & b;
 }
 
-inline constexpr BlitFlags operator ^(BlitFlags a, BlitFlags b)
+inline BlitFlags operator ^(BlitFlags a, BlitFlags b)
 {
 	return static_cast<BlitFlags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
 }
 
-inline constexpr BlitFlags& operator ^=(BlitFlags& a, BlitFlags b)
+inline BlitFlags& operator ^=(BlitFlags& a, BlitFlags b)
 {
 	return a = a ^ b;
 }
 
-inline constexpr BlitFlags operator ~(BlitFlags a)
+inline BlitFlags operator ~(BlitFlags a)
 {
 	return static_cast<BlitFlags>(~static_cast<uint32_t>(a));
 }

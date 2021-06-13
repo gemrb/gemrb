@@ -1817,7 +1817,7 @@ void Map::DrawSearchMap(const Region &vp) const
 	static const Color impassible(128, 64, 64, 0xff); // red-ish
 	static const Color sidewall(64, 64, 128, 0xff); // blue-ish
 	static const Color actor(128, 64, 128, 128); // purple-ish
-	constexpr BlitFlags flags = BlitFlags::BLENDED | BlitFlags::HALFTRANS;
+	static const BlitFlags flags = BlitFlags::BLENDED | BlitFlags::HALFTRANS;
 
 	Video *vid=core->GetVideoDriver();
 	Region block(0,0,16,12);
