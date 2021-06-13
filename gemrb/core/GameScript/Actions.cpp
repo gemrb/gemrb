@@ -5437,14 +5437,14 @@ void GameScript::MarkSpellAndObject(Scriptable* Sender, Action* parameters)
 	if (!(flags & MSO_IGNORE_SEE) && actor && !CanSee(Sender, actor, true, 0) ) {
 		return;
 	}
-	int len = strlen(parameters->string0Parameter);
+	size_t len = strlen(parameters->string0Parameter);
 	//
 	if (len&3) {
 		return;
 	}
 	len/=4;
-	int max = len;
-	int pos;
+	size_t max = len;
+	size_t pos;
 	if (flags & MSO_RANDOM_SPELL) {
 		pos = core->Roll(1,len,0);
 	} else {

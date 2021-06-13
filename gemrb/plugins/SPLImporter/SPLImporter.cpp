@@ -112,7 +112,7 @@ bool SPLImporter::Open(DataStream* stream)
 
 Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
-	unsigned int i;
+	size_t i;
 
 	str->ReadDword( &s->SpellName );
 	str->ReadDword( &s->SpellNameIdentified );
@@ -177,7 +177,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 
 	s->ext_headers = new SPLExtHeader[s->ExtHeaderCount];
 
-	for (i = 0; i < s->ExtHeaderCount; i++) {
+	for (int i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
 		GetExtHeader( s, s->ext_headers+i );
 	}
@@ -185,7 +185,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	s->casting_features = new Effect[s->CastingFeatureCount];
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
-	for (i = 0; i < s->CastingFeatureCount; i++) {
+	for (int i = 0; i < s->CastingFeatureCount; i++) {
 		GetFeature(s, s->casting_features+i);
 	}
 

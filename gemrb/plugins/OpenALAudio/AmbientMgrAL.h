@@ -53,7 +53,7 @@ private:
 	public:
 		AmbientSource(const Ambient *a);
 		~AmbientSource();
-		unsigned int tick(uint64_t ticks, Point listener, ieDword timeslice);
+		uint64_t tick(uint64_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume);
 	private:
@@ -70,7 +70,7 @@ private:
 	std::vector<AmbientSource *> ambientSources;
 	
 	int play();
-	unsigned int tick(uint64_t ticks) const;
+	uint64_t tick(uint64_t ticks) const;
 	void hardStop() const;
 	
 	mutable std::recursive_mutex mutex;

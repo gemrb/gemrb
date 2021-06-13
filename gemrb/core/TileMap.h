@@ -53,7 +53,7 @@ public:
 	Door* GetDoor(const Point &position) const;
 	//gets door by activation position (spell target)
 	Door* GetDoorByPosition(const Point &position) const;
-	Door* GetDoor(unsigned int idx) const;
+	Door* GetDoor(size_t idx) const;
 	Door* GetDoor(const char* Name) const;
 	size_t GetDoorCount() { return doors.size(); }
 	//update doors for a new overlay

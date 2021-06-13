@@ -65,18 +65,18 @@ struct MapKey {
 template<>
 struct HashKey<MapKey> {
 	// hash without MapKey construction
-	static inline unsigned int hash(const ieResRef ref, SClass_ID type)
+	static inline uint32_t hash(const ieResRef ref, SClass_ID type)
 	{
-		unsigned int h = type;
+		unsigned long h = type;
 		const char *c = ref;
 
 		for (unsigned int i = 0; *c && i < sizeof(ieResRef); ++i)
 			h = (h << 5) + h + tolower(*c++);
 
-		return h;
+		return uint32_t(h);
 	}
 
-	static inline unsigned int hash(const MapKey &key)
+	static inline uint32_t hash(const MapKey &key)
 	{
 		return hash(key.ref, key.type);
 	}

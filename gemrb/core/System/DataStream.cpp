@@ -67,7 +67,7 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, unsigned int size)
+void DataStream::ReadDecrypted(void* buf, unsigned long size)
 {
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
@@ -191,7 +191,7 @@ int DataStream::WriteResRef(const ieResRef src)
 	return Write( src, 8);
 }
 
-int DataStream::ReadLine(void* buf, unsigned int maxlen)
+int DataStream::ReadLine(void* buf, unsigned long maxlen)
 {
 	// FIXME: eof?
 	if (!maxlen) {

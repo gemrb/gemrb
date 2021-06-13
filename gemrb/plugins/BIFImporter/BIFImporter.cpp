@@ -69,7 +69,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 		Log(ERROR, "BIFImporter", "Cannot write %s.", path);
 		return NULL;
 	}
-	ieDword finalsize = 0;
+	size_t finalsize = 0;
 	int laststep = 0;
 	while (finalsize < unCompBifSize) {
 		ieDword complen, declen;

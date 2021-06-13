@@ -47,7 +47,7 @@ public:
 	int GetValueIndex(unsigned int Index) const override;
 	int FindString(char *str, int len) const override;
 	int FindValue(int val) const override;
-	int GetSize() const override { return pairs.size(); }
+	size_t GetSize() const override { return pairs.size(); }
 	int GetHighestValue() const override;
 };
 

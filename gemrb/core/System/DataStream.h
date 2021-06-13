@@ -70,8 +70,8 @@ public:
 	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
-	void ReadDecrypted(void* buf, unsigned int size);
-	int ReadLine(void* buf, unsigned int maxlen);
+	void ReadDecrypted(void* buf, unsigned long size);
+	int ReadLine(void* buf, unsigned long maxlen);
 	/** Endian Switch setup */
 	static void SetBigEndian(bool be);
 	static bool BigEndian();

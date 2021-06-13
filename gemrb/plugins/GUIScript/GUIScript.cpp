@@ -587,9 +587,9 @@ The above example will display 'Level: 1' in the addressed label.\n\
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
-	long strref = -1;
+	ieStrRef strref = -1;
 	int flags = 0;
-	PARSE_ARGS(args, "l|i", &strref, &flags);
+	PARSE_ARGS(args, "i|i", &strref, &flags);
 	if (strref >= INT_MAX) return PyString_FromString("");
 
 	char *text = core->GetCString( strref, flags );

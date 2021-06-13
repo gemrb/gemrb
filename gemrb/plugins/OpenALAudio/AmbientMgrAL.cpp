@@ -112,16 +112,16 @@ int AmbientMgrAL::play()
 		high_resolution_clock::time_point time = Clock::now();
 		milliseconds ms = duration_cast<milliseconds>(time.time_since_epoch());
 		
-		unsigned int delay = tick(ms.count());
+		uint64_t delay = tick(ms.count());
 		assert(delay > 0);
 		cond.wait_for(l, milliseconds(delay));
 	}
 	return 0;
 }
 
-unsigned int AmbientMgrAL::tick(uint64_t ticks) const
+uint64_t AmbientMgrAL::tick(uint64_t ticks) const
 {
-	unsigned int delay = 60000; // wait one minute if all sources are off
+	uint64_t delay = 60000; // wait one minute if all sources are off
 
 	if (!active)
 		return delay;
@@ -140,7 +140,7 @@ unsigned int AmbientMgrAL::tick(uint64_t ticks) const
 
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
-		unsigned int newdelay = source->tick(ticks, listener, timeslice);
+		uint64_t newdelay = source->tick(ticks, listener, timeslice);
 		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
@@ -168,11 +168,11 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 	}
 }
 
-unsigned int AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDword timeslice)
+uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDword timeslice)
 {
 	/* if we are out of sounds do nothing */
 	if (ambient->sounds.empty()) {
-		return UINT_MAX;
+		return std::numeric_limits<uint64_t>::max();
 	}
 
 	if (!(ambient->getFlags() & IE_AMBI_ENABLED) || !(ambient->getAppearance() & timeslice)) {
@@ -183,7 +183,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, i
 			core->GetAudioDrv()->ReleaseStream(stream, false);
 			stream = -1;
 		}
-		return UINT_MAX;
+		return std::numeric_limits<uint64_t>::max();
 	}
 
 	ieDword interval = ambient->getInterval();
@@ -195,7 +195,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, i
 		}
 	}
 
-	int left = lastticks - ticks + nextdelay;
+	uint64_t left = lastticks - ticks + nextdelay;
 	if (left > 0) {	// keep waiting
 		return left;
 	}

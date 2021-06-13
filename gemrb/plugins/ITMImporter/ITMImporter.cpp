@@ -69,7 +69,7 @@ static void Initializer()
 	for (int i = 0; i < zzcount; i++) {
 		const char *rowname = tm2->GetRowName(i);
 		const char *field = tm2->QueryField(i, 0);
-		long val = atoi(field);
+		int val = atoi(field);
 		if (val == 0) {
 			// not numeric, do an IDS lookup
 			val = sm->GetValue(field);

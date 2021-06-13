@@ -101,7 +101,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 	int usedoverlays = 0;
 
 	memcpy(res, overlays->TilesetResRef, sizeof(ieResRef));
-	int len = strlen(res);
+	size_t len = strlen(res);
 	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
 		strcat(res, "N");

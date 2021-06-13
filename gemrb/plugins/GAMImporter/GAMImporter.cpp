@@ -470,7 +470,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->Read( &pcInfo.Name, 32 );
 	str->ReadDword( &pcInfo.TalkCount );
 
-	ieDword pos = str->GetPos();
+	size_t pos = str->GetPos();
 
 	Actor* actor = NULL;
 	tmpWord = is_in_party ? (pcInfo.PartyOrder + 1) : 0;

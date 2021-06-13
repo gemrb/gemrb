@@ -95,7 +95,7 @@ Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
 	return door;
 }
 
-Door* TileMap::GetDoor(unsigned int idx) const
+Door* TileMap::GetDoor(size_t idx) const
 {
 	if (idx >= doors.size()) {
 		return NULL;
