@@ -1469,7 +1469,8 @@ int Interface::Init(InterfaceConfig* config)
 	}
 	
 	// fix the sample config default resolution for iwd2 and configless case also for the demo
-	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0) && Width == 640 && Height == 480) {
+	// FIXME: move defaults to gemrb.ini? Needs video init to be moved after GUIScript init
+	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0 || stricmp(GameType, "test") == 0) && Width == 640 && Height == 480) {
 		Width = 800;
 		Height = 600;
 	}
