@@ -208,10 +208,9 @@ You can check what we're working towards in the current release by reading the
 NEWS file and, as far as bugtracker backlog goes, by looking at the version's
 [milestone](https://github.com/gemrb/gemrb/milestones).
 
-The plan for 0.9.1 is to start working on the port to python3 and items that
-waited for the subviews merge. Porting to python3 is extremely important not
-just because python2 has been deprecated, but it's also the reason GemRB is
-not available in some major Linux distribtions like Debian any more.
+The plan for 0.9.1 is to iron out any python3 port kinks, work on items that
+waited for the subviews merge, deal with some postponed issues, and whatever
+piques the contributor's fancy.
 
 We're looking for ninjas to help with GLESv2 support (no hw, see
 [#938](https://github.com/gemrb/gemrb/issues/938)) and a full-fledged installer
