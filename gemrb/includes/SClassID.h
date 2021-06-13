@@ -31,7 +31,7 @@
 namespace GemRB {
 
 /** Type of plugin ID numbers */
-typedef unsigned long SClass_ID;
+using SClass_ID = unsigned long;
 
 #define IE_2DA_CLASS_ID			0x000003F4
 #define IE_ACM_CLASS_ID			0x00010000
@@ -80,7 +80,7 @@ typedef unsigned long SClass_ID;
 // !!! Update the PLUGIN_BASE_VERSION, if the list below is reordered !!!
 // !!! or entries inserted in the middle.                             !!!
 const unsigned long PLUGIN_BASE_VERSION = 0x1000 * 0xABCE;
-typedef unsigned long PluginID;
+using PluginID = unsigned long;
 enum {
 	PLUGIN_OPCODES_CORE = PLUGIN_BASE_VERSION+1,
 	PLUGIN_OPCODES_ICEWIND,

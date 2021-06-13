@@ -51,8 +51,8 @@ struct PathNode {
 	unsigned int orient;
 };
 
-typedef Point NavmapPoint;
-typedef Point SearchmapPoint;
+using NavmapPoint = Point;
+using SearchmapPoint = Point;
 
 enum {
 	PF_SIGHT = 1,

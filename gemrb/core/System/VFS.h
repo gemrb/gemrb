@@ -126,7 +126,7 @@ public:
 		All = ~0
 	};
 
-	typedef Predicate<const char*> FileFilterPredicate;
+	using FileFilterPredicate = Predicate<const char*>;
 	/**
 	 * @param[in] path Path to directory to search.
 	 *

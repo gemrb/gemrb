@@ -2805,7 +2805,7 @@ int Interface::PlayMovie(const char* resref)
 	mp->EnableSubtitles(subtitles);
 
 	class IESubtitles : public MoviePlayer::SubtitleSet {
-		typedef std::map<size_t, ieStrRef> FrameMap;
+		using FrameMap = std::map<size_t, ieStrRef>;
 		FrameMap subs;
 		mutable size_t nextSubFrame;
 		mutable String* cachedSub;

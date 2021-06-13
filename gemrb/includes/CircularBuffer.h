@@ -31,7 +31,7 @@ class Palette;
 template <typename T>
 class CircularBuffer {
 private:
-	typedef typename std::deque<T>::iterator CacheIterator;
+	using CacheIterator = typename std::deque<T>::iterator;
 	std::deque<T> _cache;
 	size_t _maxSize;
 public:

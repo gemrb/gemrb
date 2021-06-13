@@ -32,7 +32,7 @@ namespace GemRB {
 class Sprite2D;
 class Window;
 
-typedef std::deque<Window*> WindowList;
+using WindowList = std::deque<Window*>;
 
 struct ToolTipData
 {

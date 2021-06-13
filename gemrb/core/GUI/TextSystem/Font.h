@@ -112,7 +112,7 @@ public:
 private:
 	class GlyphAtlasPage : public SpriteSheet<ieWord> {
 		private:
-			typedef std::map<ieWord, Glyph> GlyphMap;
+			using GlyphMap = std::map<ieWord, Glyph>;
 			GlyphMap glyphs;
 			ieByte* pageData; // current raw page being built
 			int pageXPos; // current position on building page
@@ -144,10 +144,10 @@ private:
 		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g) : chr(c), pageIdx(p), glyph(g) {}
 	};
 
-	typedef std::vector<GlyphIndexEntry> GlyphIndex;
+	using GlyphIndex = std::vector<GlyphIndexEntry>;
 	// TODO: Unfortunately, we have no smart pointer suitable for an STL container...
 	// if we ever transition to C++11 we can use one here
-	typedef std::deque<GlyphAtlasPage*> GlyphAtlas;
+	using GlyphAtlas = std::deque<GlyphAtlasPage*>;
 
 	GlyphAtlasPage* CurrentAtlasPage;
 	GlyphIndex AtlasIndex;

@@ -122,7 +122,7 @@ protected:
 	unsigned char Gamma10toGamma22[256];
 	unsigned char Gamma22toGamma10[256];
 
-	typedef std::deque<VideoBuffer*> VideoBuffers;
+	using VideoBuffers = std::deque<VideoBuffer*>;
 
 	// collection of all existing video buffers
 	VideoBuffers buffers;

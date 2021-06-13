@@ -30,7 +30,7 @@
 
 namespace GemRB {
 
-typedef std::vector< char*> RowEntry;
+using RowEntry = std::vector<char*>;
 
 class p2DAImporter : public TableMgr {
 private:

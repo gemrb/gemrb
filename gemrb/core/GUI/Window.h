@@ -149,7 +149,7 @@ public:
 	bool SupportsAction(const ActionKey& action) override;
 	
 private: // Private attributes
-	typedef std::map<KeyboardKey, EventMgr::EventCallback> KeyMap;
+	using KeyMap = std::map<KeyboardKey, EventMgr::EventCallback>;
 
 	std::set<Control*> Controls;
 	KeyMap HotKeys;

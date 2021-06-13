@@ -29,7 +29,7 @@ namespace GemRB {
 
 class GEM_EXPORT Timer {
 public:
-	typedef unsigned long TimeInterval;
+	using TimeInterval = unsigned long;
 
 private:
 	TimeInterval interval;

@@ -34,8 +34,8 @@ namespace GemRB {
 
 class Point;
 
-typedef uint64_t ScriptingId;
-typedef std::string ScriptingClassId;
+using ScriptingId = uint64_t;
+using ScriptingClassId = std::string;
 
 class ScriptingRefBase {
 public:
@@ -57,7 +57,7 @@ class ScriptingRef : public ScriptingRefBase {
 private:
 	T* ref;
 public:
-	typedef T* RefType;
+	using RefType = T*;
 	
 	ScriptingRef(T* ref, ScriptingId id)
 	: ScriptingRefBase(id), ref(ref) {}
@@ -68,10 +68,10 @@ public:
 
 class GEM_EXPORT ScriptEngine : public Plugin {
 public:
-	typedef std::map<ScriptingId, const ScriptingRefBase*> ScriptingDefinitions;
+	using ScriptingDefinitions = std::map<ScriptingId, const ScriptingRefBase*>;
 	
 private:
-	typedef std::map<ResRef, ScriptingDefinitions> ScriptingDict;
+	using ScriptingDict = std::map<ResRef, ScriptingDefinitions>;
 	static ScriptingDict GUIDict;
 
 public:
@@ -159,7 +159,7 @@ public:
 		}
 	};
 
-	typedef std::vector<Parameter> FunctionParameters;
+	using FunctionParameters = std::vector<Parameter>;
 
 	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
 

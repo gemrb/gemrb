@@ -161,7 +161,7 @@ public:
 	}
 };
 
-typedef std::vector<Region> Regions;
+using Regions = std::vector<Region>;
 
 }
 

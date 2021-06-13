@@ -34,7 +34,7 @@
 
 namespace GemRB {
 
-typedef std::pair<int, String> SelectOption;
+using SelectOption = std::pair<int, String>;
 
 static const Color SelectOptionHover(255, 180, 0, 255);  // default hover color for SelectOption
 static const Color SelectOptionSelected(55, 100, 0, 255);// default selected color for SelectOption

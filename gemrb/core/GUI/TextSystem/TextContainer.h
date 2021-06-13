@@ -124,7 +124,7 @@ protected:
 class ContentContainer : public View
 {
 public:
-	typedef std::list<Content*> ContentList;
+	using ContentList = std::list<Content*>;
 
 	struct Margin {
 		ieByte top;
@@ -179,7 +179,7 @@ protected:
 		}
 	};
 
-	typedef std::deque<Layout> ContentLayout;
+	using ContentLayout = std::deque<Layout>;
 	ContentLayout layout;
 	Point layoutPoint;
 
@@ -270,7 +270,7 @@ private:
 	virtual bool Editable() const { return IsReceivingEvents(); }
 	void SizeChanged(const Size& oldSize) override;
 
-	typedef std::pair<size_t, ContentList::iterator> ContentIndex;
+	using ContentIndex = std::pair<size_t, ContentList::iterator>;
 	ContentIndex FindContentForChar(size_t idx);
 
 public:

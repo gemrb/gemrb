@@ -49,7 +49,7 @@ namespace GemRB {
 #define SDLK_KP8 SDLK_KP_8
 #define SDLK_KP9 SDLK_KP_9
 #else
-	typedef Sint32 SDL_Keycode;
+	using SDL_Keycode = Sint32;
 #endif
 
 inline int GetModState(int modstate)
@@ -81,12 +81,12 @@ public:
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
-	typedef SDL_Texture vid_buf_t;
-	typedef SDLTextureSprite2D sprite_t;
+	using vid_buf_t = SDL_Texture;
+	using sprite_t = SDLTextureSprite2D;
 #else
-	typedef SDL_Surface vid_buf_t;
-	typedef SDLSurfaceSprite2D sprite_t;
-	typedef Point SDL_Point;
+	using vid_buf_t =SDL_Surface;
+	using sprite_t = SDLSurfaceSprite2D;
+	using SDL_Point = Point;
 #endif
 	VideoBufferPtr scratchBuffer; // a buffer that the driver can do with as it pleases for intermediate work
 

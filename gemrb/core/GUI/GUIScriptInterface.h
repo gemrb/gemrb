@@ -50,7 +50,7 @@ public:
 
 class WindowScriptingRef : public ViewScriptingRef {
 public:
-	typedef Window* RefType;
+	using RefType = Window*;
 	
 	WindowScriptingRef(Window* win, ScriptingId id, ResRef winpack)
 	: ViewScriptingRef(win, id, winpack) {}
@@ -68,7 +68,7 @@ public:
 
 class ControlScriptingRef : public ViewScriptingRef {
 public:
-	typedef Control* RefType;
+	using RefType = Control*;
 	
 	ControlScriptingRef(Control* ctrl, ScriptingId id, ResRef group)
 	: ViewScriptingRef(ctrl, id, group) {}
