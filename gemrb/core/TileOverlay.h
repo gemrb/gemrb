@@ -24,6 +24,7 @@
 #include "exports.h"
 
 #include "Tile.h"
+#include "Video.h"
 
 #include <vector>
 
@@ -39,7 +40,7 @@ public:
 	TileOverlay(int Width, int Height);
 	~TileOverlay(void);
 	void AddTile(Tile* tile);
-	void Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags);
+	void Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, BlitFlags flags);
 };
 
 }

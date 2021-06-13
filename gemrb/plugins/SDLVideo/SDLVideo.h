@@ -76,8 +76,8 @@ public:
 								   Color* palette, bool cK = false, int index = 0) override;
 
 	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
-						uint32_t flags, Color tint = Color()) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, uint32_t flags, Color tint = Color()) override;
+					BlitFlags flags, Color tint = Color()) override;
+	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -97,11 +97,11 @@ protected:
 	virtual inline vid_buf_t* CurrentStencilBuffer() const=0;
 	Region CurrentRenderClip() const;
 	
-	uint32_t RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* = NULL);
+	BlitFlags RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* = NULL);
 
-	virtual void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, uint32_t flags = 0, const Color* tint = NULL);
+	virtual void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
+	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL);
 
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
@@ -110,12 +110,12 @@ protected:
 
 private:
 	virtual int CreateSDLDisplay(const char* title) = 0;
-	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0)=0;
+	virtual void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE)=0;
 
-	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) override;
+	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) override;
 	void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-							   double anglefrom, double angleto, bool drawlines, uint32_t flags) override;
-	void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags) override;
+							   double anglefrom, double angleto, bool drawlines, BlitFlags flags) override;
+	void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags) override;
 
 public:
 	// static functions for manipulating surfaces

@@ -49,13 +49,13 @@ struct SRTinter_Flags {
 	SRTinter_Flags(const Color& t) : tint(t) { }
 
 	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int flags) const {
-		if (flags & BLIT_GREY) {
+		if (flags & BlitFlags::GREY) {
 			r = (tint.r * r) >> 10;
 			g = (tint.g * g) >> 10;
 			b = (tint.b * b) >> 10;
 			Uint8 avg = r + g + b;
 			r = g = b = avg;
-		} else if (flags & BLIT_SEPIA) {
+		} else if (flags & BlitFlags::SEPIA) {
 			r = (tint.r * r) >> 10;
 			g = (tint.g * g) >> 10;
 			b = (tint.b * b) >> 10;
@@ -84,13 +84,13 @@ struct SRTinter_FlagsNoTint {
 	SRTinter_FlagsNoTint() { }
 
 	void operator()(Uint8& r, Uint8& g, Uint8& b, Uint8& a, unsigned int flags) const {
-		if (flags & BLIT_GREY) {
+		if (flags & BlitFlags::GREY) {
 			r >>= 2;
 			g >>= 2;
 			b >>= 2;
 			Uint8 avg = r + g + b;
 			r = g = b = avg;
-		} else if (flags & BLIT_SEPIA) {
+		} else if (flags & BlitFlags::SEPIA) {
 			r >>= 2;
 			g >>= 2;
 			b >>= 2;
@@ -222,7 +222,7 @@ void SRBlender<Uint32, SRBlender_Alpha>::operator()(Uint32& pix, Uint8 r, Uint8 
 
 template<typename PTYPE, typename Tinter, typename Blender>
 void TintedBlend(SDLPixelIterator& dest, Uint8 alpha,
-				 Color col, uint32_t flags,
+				 Color col, BlitFlags flags,
 				 const Tinter& tint, const Blender& blend)
 {
 	PTYPE& pix = (PTYPE&)*dest;
@@ -237,11 +237,11 @@ void TintedBlend(SDLPixelIterator& dest, Uint8 alpha,
 
 template<typename PTYPE, typename Tinter, typename Blender>
 void MaskedTintedBlend(SDLPixelIterator& dest, Uint8 maskval,
-					   const Color& col, uint32_t flags,
+					   const Color& col, BlitFlags flags,
 					   const Tinter& tint, const Blender& blend)
 {
 	if (maskval < 0xff) {
-		if ((flags & BLIT_STENCIL_DITHER) && maskval == 128) {
+		if ((flags & BlitFlags::STENCIL_DITHER) && maskval == 128) {
 			const Point& pos = dest.Position();
 			if (pos.y % 2 == 0) {
 				maskval = (pos.x % 2) ? 0xC0 : 0x80;
@@ -259,7 +259,7 @@ template<typename PTYPE, typename Tinter, typename Blender>
 static void BlitSpriteRLE_Total(const Uint8* rledata,
 								const Color* pal, Uint8 transindex,
 								SDLPixelIterator& dest, IAlphaIterator& cover,
-								uint32_t flags, const Tinter& tint, const Blender& blend)
+								BlitFlags flags, const Tinter& tint, const Blender& blend)
 {
 	SDLPixelIterator end = SDLPixelIterator::end(dest);
 	while (dest != end) {
@@ -280,7 +280,7 @@ template<typename PTYPE, typename Tinter, typename Blender>
 static void BlitSpriteRLE_Partial(const Uint8* rledata, const int pitch, const Region& srect,
 								  const Color* pal, Uint8 transindex,
 								  SDLPixelIterator& dest, IAlphaIterator& cover,
-								  uint32_t flags, const Tinter& tint, const Blender& blend)
+								  BlitFlags flags, const Tinter& tint, const Blender& blend)
 {
 	int count = srect.y * pitch;
 	while (count > 0) {
@@ -357,7 +357,7 @@ template<typename Blender, typename Tinter>
 static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 						  SDL_Surface* dst, const Region& drect,
 						  IAlphaIterator* cover,
-						  uint32_t flags, const Tinter& tint)
+						  BlitFlags flags, const Tinter& tint)
 {
 	assert(spr->BAM);
 
@@ -373,8 +373,8 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 
 	bool partial = spr->Frame.Dimensions() != srect.Dimensions();
 
-	IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-	IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+	IPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+	IPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 
 	SDLPixelIterator dstit = SDLPixelIterator(dst, xdir, ydir, RectFromRegion(drect));
 

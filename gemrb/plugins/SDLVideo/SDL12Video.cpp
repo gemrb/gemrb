@@ -98,15 +98,15 @@ int SDL12VideoDriver::CreateSDLDisplay(const char* title)
 
 VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 {
-	if (fmt == YV12) {
+	if (fmt == BufferFormat::YV12) {
 		return new SDLOverlayVideoBuffer(r.Origin(), SDL_CreateYUVOverlay(r.w, r.h, SDL_YV12_OVERLAY, disp));
 	} else {
 		SDL_Surface* buf = NULL;
-		if (fmt == RGB555) {
+		if (fmt == BufferFormat::RGB555) {
 			buf = SDL_CreateRGBSurface(0, r.w, r.h, 16, 0x7C00, 0x03E0, 0x001F, 0);
-		} else if (fmt == RGBA8888) {
+		} else if (fmt == BufferFormat::RGBA8888) {
 			buf = SDL_CreateRGBSurface(0, r.w, r.h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-		} else if (fmt == DISPLAY_ALPHA) {
+		} else if (fmt == BufferFormat::DISPLAY_ALPHA) {
 			SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, r.w, r.h, bpp, 0, 0, 0, 0);
 			buf = SDL_DisplayFormatAlpha(tmp);
 			SDL_FreeSurface(tmp);
@@ -125,7 +125,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
-IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskclip) const
+IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, SDL_Rect maskclip) const
 {
 	struct SurfaceAlphaIterator : RGBAChannelIterator {
 		SDLPixelIterator pixit;
@@ -141,13 +141,13 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskc
 
 		Uint32 mask = 0;
 		Uint8 shift = 0;
-		if (flags&BLIT_STENCIL_RED) {
+		if (flags&BlitFlags::STENCIL_RED) {
 			mask = fmt->Rmask;
 			shift = fmt->Rshift;
-		} else if (flags&BLIT_STENCIL_GREEN) {
+		} else if (flags&BlitFlags::STENCIL_GREEN) {
 			mask = fmt->Gmask;
 			shift = fmt->Gshift;
-		} else if (flags&BLIT_STENCIL_BLUE) {
+		} else if (flags&BlitFlags::STENCIL_BLUE) {
 			mask = fmt->Bmask;
 			shift = fmt->Bshift;
 		} else {
@@ -158,8 +158,8 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskc
 		const Point& stencilOrigin = stencilBuffer->Origin();
 		maskclip.x -= stencilOrigin.x;
 		maskclip.y -= stencilOrigin.y;
-		IPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		IPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		IPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
+		IPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		maskit = new SurfaceAlphaIterator(maskSurf, maskclip, mask, shift, xdir, ydir);
 	}
 	
@@ -167,7 +167,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(uint32_t flags, SDL_Rect maskc
 }
 
 void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
-											uint32_t flags, const Color* t)
+											BlitFlags flags, const Color* t)
 {
 	Color tint(255,255,255,255);
 	if (t) {
@@ -180,14 +180,14 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 	// (ignoring MIRRORX/Y since those are always resp. never handled by templ.)
 
 	// most game sprites:
-	// covered, BLIT_COLOR_MOD
+	// covered, BlitFlags::COLOR_MOD
 
 	// area-animations?
-	// BLIT_COLOR_MOD
+	// BlitFlags::COLOR_MOD
 
 	// (hopefully) most video overlays:
-	// BLIT_HALFTRANS
-	// covered, BLIT_HALFTRANS
+	// BlitFlags::HALFTRANS
+	// covered, BlitFlags::HALFTRANS
 	// covered
 	// none
 
@@ -200,15 +200,15 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 	IAlphaIterator* maskit = StencilIterator(flags, drect);
 
 	// remove already handled flags and incompatible combinations
-	unsigned int remflags = flags & ~(BLIT_BLENDED | BLIT_MIRRORX | BLIT_MIRRORY | BLIT_STENCIL_MASK);
-	if (remflags & BLIT_GREY) remflags &= ~BLIT_SEPIA;
+	unsigned int remflags = flags & ~(BlitFlags::BLENDED | BlitFlags::MIRRORX | BlitFlags::MIRRORY | BLIT_STENCIL_MASK);
+	if (remflags & BlitFlags::GREY) remflags &= ~BlitFlags::SEPIA;
 
 	// TODO: we technically only need SRBlender_Alpha when there is a mask. Could boost performance noticably to account for that.
 
-	if (remflags == BLIT_COLOR_MOD && tint.a == 255) {
+	if (remflags == BlitFlags::COLOR_MOD && tint.a == 255) {
 		SRTinter_Tint<true, true> tinter(tint);
 		BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
-	} else if (remflags == BLIT_HALFTRANS) {
+	} else if (remflags == BlitFlags::HALFTRANS) {
 		SRTinter_NoTint<false> tinter;
 		BlitSpriteRLE<SRBlender_HalfAlpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 	} else if (remflags == 0 && palette->HasAlpha() == false) {
@@ -229,10 +229,10 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 		// covered
 		// hflip
 
-		if (!(remflags & BLIT_COLOR_MOD)) tint.a = 255;
+		if (!(remflags & BlitFlags::COLOR_MOD)) tint.a = 255;
 
 		if (palette->HasAlpha()) {
-			if (remflags & BLIT_COLOR_MOD) {
+			if (remflags & BlitFlags::COLOR_MOD) {
 				SRTinter_Flags<true> tinter(tint);
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			} else {
@@ -240,7 +240,7 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			}
 		} else {
-			if (remflags & BLIT_COLOR_MOD) {
+			if (remflags & BlitFlags::COLOR_MOD) {
 				SRTinter_Flags<false> tinter(tint);
 				BlitSpriteRLE<SRBlender_Alpha>(spr, src, currentBuf, dst, maskit, flags, tinter);
 			} else {
@@ -254,20 +254,20 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 	delete maskit;
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
 {
 	const SDLSurfaceSprite2D *sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
 	SDL_Surface* surf = sdlspr->GetSurface();
 
 	Color c;
-	if (tint && (flags&BLIT_COLOR_MOD)){
+	if (tint && (flags&BlitFlags::COLOR_MOD)){
 		c = Color(tint->r, tint->g, tint->b, tint->unused);
 	}
 
 	if (surf->format->BytesPerPixel == 1) {
 		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
 
-		if (flags&BLIT_COLOR_MOD) {
+		if (flags&BlitFlags::COLOR_MOD) {
 			flags &= ~RenderSpriteVersion(sdlspr, flags, &c);
 		} else {
 			flags &= ~RenderSpriteVersion(sdlspr, flags);
@@ -277,7 +277,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, Color tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, Color tint)
 {
 	// non-BAM Blitting
 
@@ -300,14 +300,14 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	//		print("Unoptimized blit: %04X", flags);
 
 	// remove already handled flags and incompatible combinations
-	if (flags & BLIT_GREY) flags &= ~BLIT_SEPIA;
+	if (flags & BlitFlags::GREY) flags &= ~BlitFlags::SEPIA;
 
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	IAlphaIterator* maskIt = StencilIterator(flags, drect);
 	
-	bool nativeBlit = (flags & ~(BLIT_HALFTRANS | BLIT_ALPHA_MOD | BLIT_BLENDED)) == 0
+	bool nativeBlit = (flags & ~(BlitFlags::HALFTRANS | BlitFlags::ALPHA_MOD | BlitFlags::BLENDED)) == 0
 						&& maskIt == nullptr && ((surf->flags & SDL_SRCCOLORKEY) != 0
-						|| (flags & BLIT_BLENDED) == 0);
+						|| (flags & BlitFlags::BLENDED) == 0);
 	if (nativeBlit) {
 		// must be checked afer palette versioning is done
 		
@@ -318,15 +318,15 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		//     The RGB data is copied from the source. The source alpha channel and the per-surface alpha value are ignored.
 		
 		Uint8 alpha = SDL_ALPHA_OPAQUE;
-		if (flags & BLIT_ALPHA_MOD) {
+		if (flags & BlitFlags::ALPHA_MOD) {
 			alpha = tint.a;
 		}
 		
-		if (flags & BLIT_HALFTRANS) {
+		if (flags & BlitFlags::HALFTRANS) {
 			alpha /= 2;
 		}
 		
-		if (flags & BLIT_BLENDED) {
+		if (flags & BlitFlags::BLENDED) {
 			SDL_SetAlpha(surf, SDL_SRCALPHA, alpha);
 		} else {
 			SDL_SetAlpha(surf, 0, alpha);
@@ -336,13 +336,13 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		SDL_Rect d = drect;
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
 	} else {
-		bool halftrans = flags & BLIT_HALFTRANS;
-		if (halftrans && (flags ^ BLIT_HALFTRANS)) { // other flags are set too
+		bool halftrans = flags & BlitFlags::HALFTRANS;
+		if (halftrans && (flags ^ BlitFlags::HALFTRANS)) { // other flags are set too
 			// handle halftrans with 50% alpha tinting
 			// force use of RGBBlendingPipeline with tint parameter if we aren't already
-			if (!(flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD))) {
+			if (!(flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD))) {
 				tint = ColorWhite;
-				flags |= BLIT_COLOR_MOD;
+				flags |= BlitFlags::COLOR_MOD;
 			}
 			tint.a /= 2;
 		}
@@ -352,31 +352,31 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		// however, it could make things faster if we handled it
 		
 		void (*BlendFn)(const Color& src, Color& dst) = ShaderBlend<true>;
-		if (flags & BLIT_ADD) {
+		if (flags & BlitFlags::ADD) {
 			BlendFn = ShaderAdditive;
-		} else if (flags & BLIT_MULTIPLY) {
+		} else if (flags & BlitFlags::MULTIPLY) {
 			BlendFn = ShaderTint;
 		}
 
-		if (flags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)) {
-			if (flags&BLIT_GREY) {
-				RGBBlendingPipeline<GREYSCALE, true> blender(tint, BlendFn);
+		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
+			if (flags&BlitFlags::GREY) {
+				RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
-			} else if (flags&BLIT_SEPIA) {
-				RGBBlendingPipeline<SEPIA, true> blender(tint, BlendFn);
+			} else if (flags&BlitFlags::SEPIA) {
+				RGBBlendingPipeline<SHADER::SEPIA, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 			} else {
-				RGBBlendingPipeline<TINT, true> blender(tint, BlendFn);
+				RGBBlendingPipeline<SHADER::TINT, true> blender(tint, BlendFn);
 				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 			}
-		} else if (flags&BLIT_GREY) {
-			RGBBlendingPipeline<GREYSCALE, true> blender(BlendFn);
+		} else if (flags&BlitFlags::GREY) {
+			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
-		} else if (flags&BLIT_SEPIA) {
-			RGBBlendingPipeline<SEPIA, true> blender(BlendFn);
+		} else if (flags&BlitFlags::SEPIA) {
+			RGBBlendingPipeline<SHADER::SEPIA, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		} else {
-			RGBBlendingPipeline<NONE, true> blender(BlendFn);
+			RGBBlendingPipeline<SHADER::NONE, true> blender(BlendFn);
 			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
 		}
 	}
@@ -384,7 +384,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	delete maskIt;
 }
 
-void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint)
+void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, const Color* tint)
 {
 	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 	const Region& r = buf->Rect();
@@ -400,79 +400,79 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	BlitSpriteNativeClipped(surface, srect, drect, flags, c);
 }
 
-void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
+void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointSurface<BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawPointSurface<TINT>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawPointSurface<SHADER::BLEND>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawPointSurface<SHADER::TINT>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	} else {
-		DrawPointSurface<NONE>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
+		DrawPointSurface<SHADER::NONE>(CurrentRenderBuffer(), p, CurrentRenderClip(), color);
 	}
 }
 
-void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void SDL12VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawPointsSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 
-void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+void SDL12VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.unused < 0xff) {
-		DrawPointsSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawPointsSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+	if (flags&BlitFlags::BLENDED && color.unused < 0xff) {
+		DrawPointsSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawPointsSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	} else {
-		DrawPointsSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
+		DrawPointsSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), reinterpret_cast<const Color&>(color));
 	}
 }
 
-void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+void SDL12VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawPolygonSurface<BLEND>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawPolygonSurface<TINT>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawPolygonSurface<SHADER::BLEND>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawPolygonSurface<SHADER::TINT>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	} else {
-		DrawPolygonSurface<NONE>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
+		DrawPolygonSurface<SHADER::NONE>(CurrentRenderBuffer(), poly, origin, CurrentRenderClip(), color, fill);
 	}
 }
 
-void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, uint32_t flags)
+void SDL12VideoDriver::DrawLineImp(const Point& start, const Point& end, const Color& color, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLineSurface<BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawLineSurface<TINT>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawLineSurface<SHADER::BLEND>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawLineSurface<SHADER::TINT>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	} else {
-		DrawLineSurface<NONE>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
+		DrawLineSurface<SHADER::NONE>(CurrentRenderBuffer(), start, end, CurrentRenderClip(), color);
 	}
 }
 
-void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void SDL12VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
-	if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawLinesSurface<BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawLinesSurface<TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawLinesSurface<SHADER::BLEND>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawLinesSurface<SHADER::TINT>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	} else {
-		DrawLinesSurface<NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
+		DrawLinesSurface<SHADER::NONE>(CurrentRenderBuffer(), points, CurrentRenderClip(), color);
 	}
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags)
 {
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
 	if (fill) {
-		if (flags&BLIT_BLENDED && color.a < 0xff) {
+		if (flags&BlitFlags::BLENDED && color.a < 0xff) {
 			assert(rgn.w > 0 && rgn.h > 0);
 			
 			const static OneMinusSrcA<false, false> blender;
@@ -486,21 +486,21 @@ void SDL12VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 			SDL_Rect drect = RectFromRegion(ClippedDrawingRect(rgn));
 			SDL_FillRect( currentBuf, &drect, val );
 		}
-	} else if (flags&BLIT_BLENDED && color.a < 0xff) {
-		DrawHLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<BLEND>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
-		DrawHLineSurface<BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
-	} else if (flags & BLIT_MULTIPLY) {
-		DrawHLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<TINT>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
-		DrawHLineSurface<TINT>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<TINT>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+	} else if (flags&BlitFlags::BLENDED && color.a < 0xff) {
+		DrawHLineSurface<SHADER::BLEND>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::BLEND>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<SHADER::BLEND>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::BLEND>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+	} else if (flags & BlitFlags::MULTIPLY) {
+		DrawHLineSurface<SHADER::TINT>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::TINT>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<SHADER::TINT>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::TINT>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	} else {
-		DrawHLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<NONE>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
-		DrawHLineSurface<NONE>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
-		DrawVLineSurface<NONE>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<SHADER::NONE>(currentBuf, rgn.Origin(), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::NONE>(currentBuf, rgn.Origin(), rgn.y + rgn.h - 1, screenClip, color);
+		DrawHLineSurface<SHADER::NONE>(currentBuf, Point(rgn.x, rgn.y + rgn.h - 1), rgn.x + rgn.w - 1, screenClip, color);
+		DrawVLineSurface<SHADER::NONE>(currentBuf, Point(rgn.x + rgn.w - 1, rgn.y), rgn.y + rgn.h - 1, screenClip, color);
 	}
 }
 

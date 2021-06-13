@@ -150,7 +150,7 @@ void Window::RecreateBuffer()
 {
 	Video* video = core->GetVideoDriver();
 
-	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::DISPLAY_ALPHA : Video::DISPLAY;
+	Video::BufferFormat fmt = (flags&AlphaChannel) ? Video::BufferFormat::DISPLAY_ALPHA : Video::BufferFormat::DISPLAY;
 	backBuffer = video->CreateBuffer(frame, fmt);
 
 	// the entire window must be invalidated, because the new buffer is blank

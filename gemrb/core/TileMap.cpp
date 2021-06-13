@@ -182,7 +182,7 @@ void TileMap::AddRainOverlay(TileOverlay* overlay)
 	rain_overlays.push_back( overlay );
 }
 
-void TileMap::DrawOverlays(const Region& viewport, bool rain, int flags)
+void TileMap::DrawOverlays(const Region& viewport, bool rain, BlitFlags flags)
 {
 	overlays[0]->Draw(viewport, rain ? rain_overlays : overlays, flags);
 }

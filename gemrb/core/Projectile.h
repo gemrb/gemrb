@@ -37,6 +37,7 @@
 #include "Palette.h"
 #include "PathFinder.h"
 #include "Audio.h"
+#include "Video.h"
 
 namespace GemRB {
 
@@ -392,7 +393,7 @@ private:
 	void CheckTrigger(unsigned int radius);
 	//calculate target and destination points for a firewall
 	void SetupWall();
-	void DrawLine(const Region &screen, int face, ieDword flag);
+	void DrawLine(const Region &screen, int face, BlitFlags flag);
 	void DrawTravel(const Region &screen);
 	bool DrawChildren(const Region &screen);
 	void DrawExplosion(const Region &screen);
@@ -414,7 +415,7 @@ private:
 
 private:
 	void Draw(Holder<Sprite2D> spr, const Point& p,
-			  unsigned int flags, Color tint) const;
+			  BlitFlags flags, Color tint) const;
 };
 
 }

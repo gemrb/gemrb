@@ -58,7 +58,7 @@ int SDLVideoDriver::Init(void)
 int SDLVideoDriver::CreateDriverDisplay(const char* title)
 {
 	int ret = CreateSDLDisplay(title);
-	scratchBuffer = CreateBuffer(Region(Point(), screenSize), DISPLAY_ALPHA);
+	scratchBuffer = CreateBuffer(Region(Point(), screenSize), BufferFormat::DISPLAY_ALPHA);
 	scratchBuffer->Clear();
 	return ret;
 }
@@ -283,7 +283,7 @@ Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp
 }
 
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
-								uint32_t flags, Color tint)
+								BlitFlags flags, Color tint)
 {
 	dst.x -= spr->Frame.x;
 	dst.y -= spr->Frame.y;
@@ -291,7 +291,7 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 }
 
 void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
-									uint32_t flags, Color tint)
+									BlitFlags flags, Color tint)
 {
 	Region srect(Point(0, 0), spr->Frame.Dimensions());
 	Region drect = Region(p - spr->Frame.Origin(), spr->Frame.Dimensions());
@@ -318,7 +318,7 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 #endif
 
 /** This functions Draws a Circle */
-void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, uint32_t flags)
+void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -363,7 +363,7 @@ static double ellipseradius(unsigned short xr, unsigned short yr, double angle) 
 
 /** This functions Draws an Ellipse Segment */
 void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
-	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, uint32_t flags)
+	unsigned short yr, const Color& color, double anglefrom, double angleto, bool drawlines, BlitFlags flags)
 {
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
@@ -465,7 +465,7 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
-									unsigned short yr, const Color& color, uint32_t flags)
+									unsigned short yr, const Color& color, BlitFlags flags)
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -531,10 +531,10 @@ void SDLVideoDriver::DrawEllipseImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, uint32_t flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BLIT_MIRRORX or BLIT_MIRRORY is set
+	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BlitFlags::MIRRORX or BlitFlags::MIRRORY is set
 	// instead of doing this and then reversing it in that case only for SDL to reverse it yet again
 	// lets just not worry about clipping on SDL2. the backends handle all of that for us unlike with SDL 1 where we
 	// might walk off a memory buffer; we have no danger of that in SDL 2.
@@ -572,16 +572,16 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 	src = originalSrc;
 #endif
 
-	if (spr->renderFlags&BLIT_MIRRORX) {
-		flags ^= BLIT_MIRRORX;
+	if (spr->renderFlags&BlitFlags::MIRRORX) {
+		flags ^= BlitFlags::MIRRORX;
 	}
 
-	if (spr->renderFlags&BLIT_MIRRORY) {
-		flags ^= BLIT_MIRRORY;
+	if (spr->renderFlags&BlitFlags::MIRRORY) {
+		flags ^= BlitFlags::MIRRORY;
 	}
 	
 	if (!spr->HasTransparency()) {
-		flags &= ~BLIT_BLENDED;
+		flags &= ~BlitFlags::BLENDED;
 	}
 
 	if (spr->BAM) {
@@ -594,15 +594,15 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 	}
 }
 
-uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint32_t renderflags, const Color* tint)
+BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint)
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
-	uint32_t ret = (BLIT_GREY | BLIT_SEPIA) & newVersion;
+	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
 	
 	if (spr->Bpp == 8) {
 		if (tint) {
-			assert(renderflags & (BLIT_COLOR_MOD | BLIT_ALPHA_MOD));
+			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
 			newVersion |= tintv << 32;
 		}
@@ -617,26 +617,26 @@ uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint
 			for (size_t i = 0; i < 256; ++i) {
 				Color& dstc = reinterpret_cast<Color&>(pal->colors[i]);
 
-				if (renderflags&BLIT_COLOR_MOD) {
+				if (renderflags&BlitFlags::COLOR_MOD) {
 					assert(tint);
 					ShaderTint(*tint, dstc);
-					ret |= BLIT_COLOR_MOD;
+					ret |= BlitFlags::COLOR_MOD;
 				}
 				
-				if (renderflags & BLIT_ALPHA_MOD) {
+				if (renderflags & BlitFlags::ALPHA_MOD) {
 					assert(tint);
 					dstc.a = tint->a;
-					ret |= BLIT_ALPHA_MOD;
+					ret |= BlitFlags::ALPHA_MOD;
 				}
 
-				if (renderflags&BLIT_GREY) {
+				if (renderflags&BlitFlags::GREY) {
 					ShaderGreyscale(dstc);
-				} else if (renderflags&BLIT_SEPIA) {
+				} else if (renderflags&BlitFlags::SEPIA) {
 					ShaderSepia(dstc);
 				}
 			}
 		} else {
-			ret |= (BLIT_COLOR_MOD | BLIT_ALPHA_MOD) & newVersion;
+			ret |= (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD) & newVersion;
 		}
 	} else if (oldVersion != newVersion) {
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
@@ -647,16 +647,16 @@ uint32_t SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, uint
 		SDLPixelIterator end = SDLPixelIterator::end(beg);
 		StaticAlphaIterator alpha(0xff);
 
-		if (renderflags & BLIT_GREY) {
-			RGBBlendingPipeline<GREYSCALE, true> blender;
+		if (renderflags & BlitFlags::GREY) {
+			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender;
 			Blit(beg, beg, end, alpha, blender);
-		} else if (renderflags & BLIT_SEPIA) {
-			RGBBlendingPipeline<SEPIA, true> blender;
+		} else if (renderflags & BlitFlags::SEPIA) {
+			RGBBlendingPipeline<SHADER::SEPIA, true> blender;
 			Blit(beg, beg, end, alpha, blender);
 		}
 		SDL_UnlockSurface(newV);
 	}
-	return ret;
+	return static_cast<BlitFlags>(ret);
 }
 
 // static class methods

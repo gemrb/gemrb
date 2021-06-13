@@ -48,6 +48,7 @@
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
+#include "ScriptedAnimation.h"
 
 namespace GemRB {
 

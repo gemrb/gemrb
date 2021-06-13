@@ -35,21 +35,21 @@ namespace GemRB {
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat, SDL_Renderer*);
 Uint32 SDLPixelFormatFromBufferFormat(Video::BufferFormat fmt, SDL_Renderer* renderer = NULL) {
 	switch (fmt) {
-		case Video::RGB555:
+		case Video::BufferFormat::RGB555:
 			return SDL_PIXELFORMAT_RGB555;
-		case Video::RGBA8888:
+		case Video::BufferFormat::RGBA8888:
 			return SDL_PIXELFORMAT_RGBA8888;
-		case Video::YV12:
+		case Video::BufferFormat::YV12:
 			return SDL_PIXELFORMAT_YV12;
-		case Video::RGBPAL8:
+		case Video::BufferFormat::RGBPAL8:
 			if (renderer == NULL) {
 				return SDL_PIXELFORMAT_INDEX8;
 			}
 			// the renderer will throw an error for such a format
 			// fall-through
-		case Video::DISPLAY:
+		case Video::BufferFormat::DISPLAY:
 			// fall-through
-		case Video::DISPLAY_ALPHA:
+		case Video::BufferFormat::DISPLAY_ALPHA:
 			if (renderer) {
 				// I looked at the SDL source code to determine that the format at index 0 is the default
 				SDL_RendererInfo info;
@@ -241,7 +241,7 @@ public:
 	
 	bool TouchInputEnabled() override;
 
-	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 						 const Color* tint = nullptr) override;
 
 private:
@@ -255,28 +255,28 @@ private:
 	SDLVideoDriver::vid_buf_t* ScratchBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
-	int UpdateRenderTarget(const Color* color = NULL, uint32_t flags = 0);
+	int UpdateRenderTarget(const Color* color = NULL, BlitFlags flags = BlitFlags::NONE);
 
-	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0) override;
-	void DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags = 0);
+	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE) override;
+	void DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE);
 
-	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) override;
-	void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) override;
+	void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
-	void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) override;
+	void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) override;
 
-	void DrawPointImp(const Point& p, const Color& color, uint32_t flags) override;
-	void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+	void DrawPointImp(const Point& p, const Color& color, BlitFlags flags) override;
+	void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
-	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) override;
+	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) override;
 
 	void BlitSpriteBAMClipped(const Holder<Sprite2D> /*spr*/, const Region& /*src*/, const Region& /*dst*/,
-					   unsigned int /*flags*/ = 0, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
+							  BlitFlags /*flags*/ = BlitFlags::NONE, const Color* /*tint*/ = NULL) override { assert(false); } // SDL2 does not support this
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
-								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags = 0, const SDL_Color* tint = NULL);
+								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
+	void BlitSpriteNativeClipped(SDL_Texture* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL);
 
-	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* = NULL);
+	int RenderCopyShaded(SDL_Texture*, const SDL_Rect* srcrect, const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* = NULL);
 
 	int GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const;
 };

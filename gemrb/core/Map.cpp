@@ -999,12 +999,12 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 		return Point(x, y);
 	};
 	
-	auto FillFog = [=](int x, int y, int count, uint32_t flags) {
+	auto FillFog = [=](int x, int y, int count, BlitFlags flags) {
 		Region r(ConvertPointToScreen(x, y), Size(CELL_SIZE * count, CELL_SIZE));
 		vid->DrawRect(r, ColorBlack, true, flags);
 	};
 	
-	auto Fill = [=](int x, int y, uint8_t dirs, uint32_t flags) {
+	auto Fill = [=](int x, int y, uint8_t dirs, BlitFlags flags) {
 		// If an explored tile is adjacent to an
 		//   unexplored one, we draw border sprite
 		//   (gradient black <-> transparent)
@@ -1064,8 +1064,8 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 		}
 	};
 	
-	const static uint32_t opaque = BLIT_NO_FLAGS;
-	const static uint32_t trans = BLIT_HALFTRANS | BLIT_BLENDED;
+	const static BlitFlags opaque = BlitFlags::NONE;
+	const static BlitFlags trans = BlitFlags::HALFTRANS | BlitFlags::BLENDED;
 	
 	auto FillExplored = [=](int x, int y) {
 		int dirs = !IsExplored(x, y - 1); // N
@@ -1073,7 +1073,7 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 		if (!IsExplored(x, y + 1)) dirs |= S;
 		if (!IsExplored(x + 1, y )) dirs |= E;
 
-		if (dirs && !Fill(x, y, dirs, BLIT_BLENDED)) {
+		if (dirs && !Fill(x, y, dirs, BlitFlags::BLENDED)) {
 			FillFog(x, y, 1, opaque);
 		}
 	};
@@ -1311,11 +1311,11 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	// 2. Draw overlays (weather)
 	// 3. Create a stencil set: a WF_COVERANIMS wall stencil and an opaque wall stencil
 	// 4. set the video stencil buffer to animWallStencil
-	// 5. Draw background animations (BLIT_STENCIL_GREEN)
+	// 5. Draw background animations (BlitFlags::STENCIL_GREEN)
 	// 6. set the video stencil buffer to wallStencil
 	// 7. draw scriptables (depending on scriptable->ForceDither() return value)
-	// 8. draw fog (BLIT_BLENDED)
-	// 9. draw text (BLIT_BLENDED)
+	// 8. draw fog (BlitFlags::BLENDED)
+	// 9. draw text (BlitFlags::BLENDED)
 
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
@@ -1332,12 +1332,12 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 
 	if (!bgoverride) {
 		int rain = 0;
-		int flags = 0;
+		BlitFlags flags = BlitFlags::NONE;
 
 		if (timestop) {
-			flags = BLIT_GREY;
+			flags = BlitFlags::GREY;
 		} else if (AreaFlags&AF_DREAM) {
-			flags = BLIT_SEPIA;
+			flags = BlitFlags::SEPIA;
 		}
 
 		if (HasWeather()) {
@@ -1356,11 +1356,11 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	aniIterator aniidx = animations.begin();
 
 	auto DrawAreaAnimation = [&, this](const AreaAnimation *a) {
-		uint32_t flags = SetDrawingStencilForAreaAnimation(a, viewport);
-		flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+		BlitFlags flags = SetDrawingStencilForAreaAnimation(a, viewport);
+		flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
 		
 		if (timestop) {
-			flags |= BLIT_GREY;
+			flags |= BlitFlags::GREY;
 		}
 		
 		Color tint = ColorWhite;
@@ -1415,17 +1415,17 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					// apparently birds and the dead are always visible?
 					visible = IsVisible(actor->Pos) || (actor->Modified[IE_DONOTJUMP] & DNJ_BIRD) || (actor->GetInternalFlag() & IF_REALLYDIED);
 					if (visible) {
-						uint32_t flags = SetDrawingStencilForScriptable(actor, viewport);
+						BlitFlags flags = SetDrawingStencilForScriptable(actor, viewport);
 						if (game->TimeStoppedFor(actor)) {
 							// when time stops, almost everything turns dull grey,
 							// the caster and immune actors being the most notable exceptions
-							flags |= BLIT_GREY;
+							flags |= BlitFlags::GREY;
 						}
 						
 						Color baseTint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
 						Color tint(baseTint);
 						game->ApplyGlobalTint(tint, flags);
-						actor->Draw(viewport, baseTint, tint, flags|BLIT_BLENDED);
+						actor->Draw(viewport, baseTint, tint, flags|BlitFlags::BLENDED);
 					}
 				}
 
@@ -1443,11 +1443,11 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			if (!bgoverride) {
 				Container* c = TMap->GetContainer(pileidx-1);
 				
-				uint32_t flags = SetDrawingStencilForScriptable(c, viewport);
-				flags |= BLIT_COLOR_MOD | BLIT_BLENDED;
+				BlitFlags flags = SetDrawingStencilForScriptable(c, viewport);
+				flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
 				
 				if (timestop) {
-					flags |= BLIT_GREY;
+					flags |= BlitFlags::GREY;
 				}
 				
 				Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
@@ -1478,10 +1478,10 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					tint.a = 255;
 					
 					// FIXME: these should actually make use of SetDrawingStencilForObject too
-					uint32_t flags = (core->DitherSprites) ? BLIT_STENCIL_BLUE : BLIT_STENCIL_RED;
+					BlitFlags flags = (core->DitherSprites) ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
 					
 					if (timestop) {
-						flags |= BLIT_GREY;
+						flags |= BlitFlags::GREY;
 					}
 
 					game->ApplyGlobalTint(tint, flags);
@@ -1592,7 +1592,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 
 			if (poly->wall_flag&WF_DISABLED) {
 				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
-					video->DrawPolygon( poly.get(), origin, ColorGray, true, BLIT_BLENDED|BLIT_HALFTRANS);
+					video->DrawPolygon( poly.get(), origin, ColorGray, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
 				}
 				continue;
 			}
@@ -1613,7 +1613,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 				continue;
 			}
 
-			video->DrawPolygon( poly.get(), origin, c, true, BLIT_BLENDED|BLIT_HALFTRANS);
+			video->DrawPolygon( poly.get(), origin, c, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
 			
 			if (poly->wall_flag & WF_BASELINE) {
 				video->DrawLine(poly->base0 - viewport.Origin(), poly->base1 - viewport.Origin(), ColorMagenta);
@@ -1702,7 +1702,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 			if (stencilRgn.Dimensions().IsEmpty()) {
 				stencil = wallStencil;
 			} else {
-				stencil = video->CreateBuffer(stencilRgn, Video::DISPLAY_ALPHA);
+				stencil = video->CreateBuffer(stencilRgn, Video::BufferFormat::DISPLAY_ALPHA);
 				DrawStencil(stencil, objectRgn, walls.first);
 				objectStencils[object] = std::make_pair(stencil, objectRgn);
 			}
@@ -1735,19 +1735,19 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	}
 }
 
-uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const Region& vp)
+BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const Region& vp)
 {
 	if (scriptable->Type == ST_ACTOR) {
 		const Actor* actor = static_cast<const Actor*>(scriptable);
 		// birds are never occluded
 		if (actor->GetStat(IE_DONOTJUMP) & DNJ_BIRD) {
-			return 0;
+			return BlitFlags::NONE;
 		}
 	}
 	
 	const Region& bbox = scriptable->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
-		return 0;
+		return BlitFlags::NONE;;
 	}
 	
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
@@ -1755,31 +1755,31 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
-		return 0; // not behind a wall, no stencil required
+		return BlitFlags::NONE;; // not behind a wall, no stencil required
 	}
 	
 	ieDword always_dither;
 	core->GetDictionary()->Lookup("Always Dither", always_dither);
 	
-	uint32_t flags = BLIT_STENCIL_DITHER; // TODO: make dithering configurable
+	BlitFlags flags = BlitFlags::STENCIL_DITHER; // TODO: make dithering configurable
 	if (always_dither) {
-		flags |= BLIT_STENCIL_ALPHA;
+		flags |= BlitFlags::STENCIL_ALPHA;
 	} else if (core->DitherSprites == false) {
 		// dithering is set to disabled
-		flags |= BLIT_STENCIL_BLUE;
+		flags |= BlitFlags::STENCIL_BLUE;
 	} else if (scriptable->Type == ST_ACTOR) {
 		const Actor* a = static_cast<const Actor*>(scriptable);
 		if (a->IsSelected() || a->Over) {
-			flags |= BLIT_STENCIL_ALPHA;
+			flags |= BlitFlags::STENCIL_ALPHA;
 		} else {
-			flags |= BLIT_STENCIL_RED;
+			flags |= BlitFlags::STENCIL_RED;
 		}
 	} else if (scriptable->Type == ST_CONTAINER) {
 		const Container* c = static_cast<const Container*>(scriptable);
 		if (c->Highlight) {
-			flags |= BLIT_STENCIL_ALPHA;
+			flags |= BlitFlags::STENCIL_ALPHA;
 		} else {
-			flags |= BLIT_STENCIL_RED;
+			flags |= BlitFlags::STENCIL_RED;
 		}
 	}
 	
@@ -1787,11 +1787,11 @@ uint32_t Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, const
 	return flags;
 }
 
-uint32_t Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, const Region& vp)
+BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, const Region& vp)
 {
 	const Region& bbox = anim->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
-		return 0;
+		return BlitFlags::NONE;
 	}
 	
 	Point p = anim->Pos;
@@ -1803,10 +1803,10 @@ uint32_t Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, const
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
-		return 0; // not behind a wall, no stencil required
+		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
 
-	return (anim->Flags & A_ANI_NO_WALL) ? BLIT_NO_FLAGS : BLIT_STENCIL_GREEN;
+	return (anim->Flags & A_ANI_NO_WALL) ? BlitFlags::NONE : BlitFlags::STENCIL_GREEN;
 }
 
 void Map::DrawSearchMap(const Region &vp) const
@@ -1817,7 +1817,7 @@ void Map::DrawSearchMap(const Region &vp) const
 	static const Color impassible(128, 64, 64, 0xff); // red-ish
 	static const Color sidewall(64, 64, 128, 0xff); // blue-ish
 	static const Color actor(128, 64, 128, 128); // purple-ish
-	constexpr uint32_t flags = BLIT_BLENDED | BLIT_HALFTRANS;
+	constexpr BlitFlags flags = BlitFlags::BLENDED | BlitFlags::HALFTRANS;
 
 	Video *vid=core->GetVideoDriver();
 	Region block(0,0,16,12);
@@ -2615,7 +2615,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 		// but currently that is forcing some performance killing conversion issues on some platforms
 		// for now things will break if we use 16 bit color settings
 		Video* video = core->GetVideoDriver();
-		wallStencil = video->CreateBuffer(Region(Point(), vp.Dimensions()), Video::DISPLAY_ALPHA);
+		wallStencil = video->CreateBuffer(Region(Point(), vp.Dimensions()), Video::BufferFormat::DISPLAY_ALPHA);
 	}
 
 	wallStencil->Clear();
@@ -3997,13 +3997,13 @@ Region AreaAnimation::DrawingRegion() const
 	return r;
 }
 
-void AreaAnimation::Draw(const Region &viewport, Color tint, uint32_t flags) const
+void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) const
 {
 	Video* video = core->GetVideoDriver();
 	
 	if (transparency) {
 		tint.a = 255 - transparency;
-		flags |= BLIT_ALPHA_MOD;
+		flags |= BlitFlags::ALPHA_MOD;
 	} else {
 		tint.a = 255;
 	}

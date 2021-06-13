@@ -33,7 +33,7 @@ MoviePlayer::MoviePlayer(void)
 	subtitles = NULL;
 	isPlaying = false;
 	showSubtitles = false;
-	movieFormat = Video::DISPLAY;
+	movieFormat = Video::BufferFormat::DISPLAY;
 }
 
 MoviePlayer::~MoviePlayer(void)
@@ -79,7 +79,7 @@ void MoviePlayer::Play(Window* win)
 		// this hould probably at least be sized according to line height
 		int y = std::min<int>(winFrame.h - center.y, winFrame.h - 50.0);
 		Region subFrame(0, y, winFrame.w, 50.0);
-		subBuf = video->CreateBuffer(subFrame, Video::DISPLAY_ALPHA);
+		subBuf = video->CreateBuffer(subFrame, Video::BufferFormat::DISPLAY_ALPHA);
 	}
 
 	// currently, our MoviePlayer implementation takes over the entire screen

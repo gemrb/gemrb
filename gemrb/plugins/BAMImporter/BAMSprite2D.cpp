@@ -80,9 +80,9 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 	short x = p.x;
 	short y = p.y;
 
-	if (renderFlags&BLIT_MIRRORY)
+	if (renderFlags&BlitFlags::MIRRORY)
 		y = Frame.h - y - 1;
-	if (renderFlags&BLIT_MIRRORX)
+	if (renderFlags&BlitFlags::MIRRORX)
 		x = Frame.w - x - 1;
 
 	int skipcount = y * Frame.w + x;

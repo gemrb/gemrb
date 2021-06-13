@@ -89,7 +89,7 @@ public:
 	void ClearOverlays();
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
-	void DrawOverlays(const Region& screen, bool rain, int flags);
+	void DrawOverlays(const Region& screen, bool rain, BlitFlags flags);
 	Size GetMapSize();
 public:
 	int XCellCount = 0, YCellCount = 0;

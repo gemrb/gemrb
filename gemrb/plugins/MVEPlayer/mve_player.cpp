@@ -290,7 +290,7 @@ void MVEPlayer::segment_video_init(unsigned char version) {
 	unsigned short temp = 0;
 	if (version > 1) temp = GST_READ_UINT16_LE(buffer + 6);
 	truecolour = !!temp;
-	host->movieFormat = truecolour ? Video::RGB555 : Video::RGBPAL8;
+	host->movieFormat = truecolour ? Video::BufferFormat::RGB555 : Video::BufferFormat::RGBPAL8;
 
 	// some files have multiple initialisations
 	if (video_data) {

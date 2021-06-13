@@ -105,7 +105,7 @@ struct SrcRGBA : RGBBlender {
 	}
 };
 
-enum SHADER {
+enum class SHADER {
 	NONE,
 	BLEND,
 	TINT,
@@ -125,7 +125,7 @@ public:
 	RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(1,1,1,0xff), blender(blender) {
 		shift = 0;
-		if (SHADE == GREYSCALE || SHADE == SEPIA) {
+		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
 			shift += 2;
 		}
 	}
@@ -133,7 +133,7 @@ public:
 	RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(tint), blender(blender) {
 		shift = 8; // we shift by 8 as a fast aproximation of dividing by 255
-		if (SHADE == GREYSCALE || SHADE == SEPIA) {
+		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
 			shift += 2;
 		}
 	}
@@ -148,13 +148,13 @@ public:
 
 		// first apply "shader"
 		switch (SHADE) {
-			case TINT:
+			case SHADER::TINT:
 				assert(shift);
 				c.r = (tint.r * c.r) >> shift;
 				c.g = (tint.g * c.g) >> shift;
 				c.b = (tint.b * c.b) >> shift;
 				break;
-			case GREYSCALE:
+			case SHADER::GREYSCALE:
 				{
 					c.r = (tint.r * c.r) >> shift;
 					c.g = (tint.g * c.g) >> shift;
@@ -163,7 +163,7 @@ public:
 					c.r = c.g = c.b = avg;
 				}
 				break;
-			case SEPIA:
+			case SHADER::SEPIA:
 				{
 					c.r = (tint.r * c.r) >> shift;
 					c.g = (tint.g * c.g) >> shift;
@@ -174,7 +174,7 @@ public:
 					c.b = avg < 32 ? 0 : avg - 32;
 				}
 				break;
-			case NONE:
+			case SHADER::NONE:
 				// fallthough
 			default:
 				break;

@@ -181,9 +181,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			int buttonHeight = Picture->Frame.h - overlayHeight;
 
 			if (overlayHeight) {
-				// TODO: Add an option to add BLIT_GREY to the flags
+				// TODO: Add an option to add BlitFlags::GREY to the flags
 				const Color& col = overlayAnim.Current();
-				video->BlitGameSprite(Picture, picPos, BLIT_COLOR_MOD, col);
+				video->BlitGameSprite(Picture, picPos, BlitFlags::COLOR_MOD, col);
 			}
 
 			Region rb = Region(picPos.x, picPos.y, Picture->Frame.w, buttonHeight);
@@ -292,9 +292,9 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 			Region r = Region( rgn.Origin() + frRect.Origin(), frRect.Dimensions() );
 			if (pulseBorder && !fr->filled) {
 				Color mix = GlobalColorCycle.Blend(ColorWhite, fr->color);
-				video->DrawRect( r, mix, fr->filled, BLIT_BLENDED );
+				video->DrawRect( r, mix, fr->filled, BlitFlags::BLENDED );
 			} else {
-				video->DrawRect( r, fr->color, fr->filled, BLIT_BLENDED );
+				video->DrawRect( r, fr->color, fr->filled, BlitFlags::BLENDED );
 			}
 		}
 	}

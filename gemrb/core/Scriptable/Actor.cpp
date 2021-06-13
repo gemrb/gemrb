@@ -47,13 +47,13 @@
 #include "Spell.h"
 #include "Sprite2D.h"
 #include "TableMgr.h"
-#include "Video.h"
 #include "damages.h"
 #include "GameScript/GSUtils.h" //needed for DisplayStringCore
 #include "GameScript/GameScript.h"
 #include "GUI/GameControl.h"
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
+#include "ScriptedAnimation.h"
 #include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 #include "StringMgr.h"
@@ -8287,15 +8287,15 @@ void Actor::WalkTo(const Point &Des, ieDword flags, int MinDistance)
 	Movable::WalkTo(Des, MinDistance);
 }
 
-void Actor::DrawActorSprite(const Point& p, uint32_t flags,
+void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 							const std::vector<AnimationPart>& animParts, const Color& tint) const
 {
 	if (tint.a == 0) return;
 	
 	if (!anims->lockPalette) {
-		flags |= BLIT_COLOR_MOD;
+		flags |= BlitFlags::COLOR_MOD;
 	}
-	flags |= BLIT_ALPHA_MOD;
+	flags |= BlitFlags::ALPHA_MOD;
 	
 	Video* video = core->GetVideoDriver();
 
@@ -8606,7 +8606,7 @@ Region Actor::DrawingRegion() const
 	return drawingRegion;
 }
 
-void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) const
+void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) const
 {
 	// if an actor isn't visible, should we still draw video cells?
 	// let us assume not, for now..
@@ -8647,7 +8647,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 		if (vvc->YOffset >= 0) {
 			break;
 		}
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 
 	if (ShouldDrawCircle()) {
@@ -8673,7 +8673,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 		// it could be divided so it will become a 0-15 number.
 		//
 		
-		if (AppearanceFlags & APP_HALFTRANS) flags |= BLIT_HALFTRANS;
+		if (AppearanceFlags & APP_HALFTRANS) flags |= BlitFlags::HALFTRANS;
 
 		Point drawPos = Pos - vp.Origin();
 		drawPos.y -= GetElevation();
@@ -8766,7 +8766,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, uint32_t flags) c
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
 		ScriptedAnimation* vvc = *it;
-		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BLIT_ALPHA_MOD));
+		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 }
 

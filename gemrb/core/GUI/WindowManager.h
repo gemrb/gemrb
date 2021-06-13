@@ -19,6 +19,7 @@
 #ifndef __GemRB__WindowManager__
 #define __GemRB__WindowManager__
 
+#include "Audio.h"
 #include "EventMgr.h"
 #include "Resource.h"
 #include "Sprite2D.h"
@@ -107,7 +108,7 @@ private:
 	bool IsOpenWindow(Window* win) const;
 	Holder<Sprite2D> WinFrameEdge(int edge) const;
 
-	inline void DrawWindowFrame(uint32_t flags) const;
+	inline void DrawWindowFrame(BlitFlags flags) const;
 	inline void DrawMouse() const;
 	// DrawMouse simply calls the following with some position calculations and buffer context changes
 	inline void DrawCursor(const Point& pos) const;

@@ -67,7 +67,7 @@ public:
 		return nullRgn;
 	}
 
-	void Draw(KeyType key, const Region& dest, uint32_t flags, const Color& tint) const {
+	void Draw(KeyType key, const Region& dest, BlitFlags flags, const Color& tint) const {
 		const auto& i = RegionMap.find(key);
 		if (i != RegionMap.end()) {
 			video->BlitSprite(Sheet, i->second, dest, flags, tint);

@@ -37,6 +37,7 @@
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
+#include "Video.h"
 
 #include <atomic>
 #include <vector>
@@ -486,7 +487,7 @@ public:
 	/** updates the infravision info */
 	void Infravision();
 	/** applies the global tint if it is needed */
-	void ApplyGlobalTint(Color &tint, ieDword &flags) const;
+	void ApplyGlobalTint(Color &tint, BlitFlags &flags) const;
 	/** gets the colour which should be applied over the game area,
 	may return NULL */
 	const Color *GetGlobalTint() const;

@@ -32,6 +32,7 @@
 #include "VEFObject.h"
 #include "Video.h" //for tints
 #include "Scriptable/Actor.h"
+#include "ScriptedAnimation.h"
 
 using namespace GemRB;
 

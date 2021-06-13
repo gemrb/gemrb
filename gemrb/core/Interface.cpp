@@ -1023,18 +1023,18 @@ int Interface::LoadSprites()
 	FogSprites[2] = anim->GetFrame( 1, 0 );
 	FogSprites[3] = anim->GetFrame( 2, 0 );
 
-	FogSprites[4] = video->MirrorSprite( FogSprites[1], BLIT_MIRRORY, false );
+	FogSprites[4] = video->MirrorSprite( FogSprites[1], BlitFlags::MIRRORY, false );
 
-	assert(FogSprites[4]->renderFlags&BLIT_MIRRORY);
+	assert(FogSprites[4]->renderFlags&BlitFlags::MIRRORY);
 
-	FogSprites[6] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORY, false );
+	FogSprites[6] = video->MirrorSprite( FogSprites[3], BlitFlags::MIRRORY, false );
 
-	FogSprites[8] = video->MirrorSprite( FogSprites[2], BLIT_MIRRORX, false );
-	assert(FogSprites[8]->renderFlags&BLIT_MIRRORX);
-	FogSprites[9] = video->MirrorSprite( FogSprites[3], BLIT_MIRRORX, false );
+	FogSprites[8] = video->MirrorSprite( FogSprites[2], BlitFlags::MIRRORX, false );
+	assert(FogSprites[8]->renderFlags&BlitFlags::MIRRORX);
+	FogSprites[9] = video->MirrorSprite( FogSprites[3], BlitFlags::MIRRORX, false );
 
-	FogSprites[12] = video->MirrorSprite( FogSprites[6], BLIT_MIRRORX, false );
-	assert(FogSprites[12]->renderFlags&BLIT_MIRRORX);
+	FogSprites[12] = video->MirrorSprite( FogSprites[6], BlitFlags::MIRRORX, false );
+	assert(FogSprites[12]->renderFlags&BlitFlags::MIRRORX);
 
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");

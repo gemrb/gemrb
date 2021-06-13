@@ -340,8 +340,8 @@ static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
 	assert(src && dst);
 	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
 
-	SDLPixelIterator::Direction xdir = (flags&BLIT_MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
-	SDLPixelIterator::Direction ydir = (flags&BLIT_MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+	SDLPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
+	SDLPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
 
 	SDLPixelIterator dstbeg(dst, SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn);
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);

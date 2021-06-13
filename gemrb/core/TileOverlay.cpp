@@ -23,7 +23,6 @@
 #include "Game.h" // for GetGlobalTint
 #include "GlobalTimer.h"
 #include "Interface.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -48,7 +47,7 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, int flags)
+void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, BlitFlags flags)
 {
 	// determine which tiles are visible
 	int sx = std::max(viewport.x / 64, 0);
@@ -60,7 +59,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 	assert(game);
 	const Color* globalTint = game->GetGlobalTint();
 	if (globalTint) {
-		flags |= BLIT_COLOR_MOD;
+		flags |= BlitFlags::COLOR_MOD;
 	}
 	const Color tintcol = globalTint ? * globalTint : Color();
 
@@ -91,7 +90,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
 						//draw overlay tiles, they should be half transparent except for BG1
-						uint32_t transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BLIT_HALFTRANS : BLIT_NO_FLAGS;
+						BlitFlags transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 						// this is the water (or whatever)
 						vid->BlitGameSprite(ovtile->anim[0]->NextFrame(), p, flags | transFlag, tintcol);
 
@@ -99,12 +98,12 @@ void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overl
 							if (tile->anim[1]) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1
 								vid->BlitGameSprite(tile->anim[1]->NextFrame(), p,
-													flags | BLIT_BLENDED, tintcol);
+													flags | BlitFlags::BLENDED, tintcol);
 							}
 						} else {
 							// in BG 1 this is the mask to blend the terrain tile with the water
 							vid->BlitGameSprite(tile->anim[0]->NextFrame(), p,
-												flags | BLIT_BLENDED, tintcol);
+												flags | BlitFlags::BLENDED, tintcol);
 						}
 					}
 				}

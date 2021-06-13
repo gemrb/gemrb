@@ -173,7 +173,7 @@ bool VEFObject::UpdateDrawingState(int orientation)
 	return false;
 }
 
-void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, uint32_t flags) const
+void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlags flags) const
 {
 	for (const auto& entry : drawQueue) {
 		switch (entry.type) {

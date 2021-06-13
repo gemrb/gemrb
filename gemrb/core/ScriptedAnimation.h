@@ -24,6 +24,7 @@
 
 #include "Audio.h"
 #include "Palette.h"
+#include "Video.h"
 
 namespace GemRB {
 
@@ -53,7 +54,7 @@ class Sprite2D;
 // start of Colour flags on iesdp (though same field in original bg2)
 // 0x10000 Not light source
 // 0x20000 Light source
-#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)
+#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)
 // 0x40000 Internal brightness
 #define IE_VVC_GREYSCALE	0x00080000   //timestopped palette
 #define IE_VVC_DARKEN       0x00100000   // unused
@@ -134,7 +135,7 @@ public:
 public:
 	//draws the next frame of the videocell
 	bool UpdateDrawingState(int orientation);
-	void Draw(const Region &vp, Color tint, int height, uint32_t flags) const;
+	void Draw(const Region &vp, Color tint, int height, BlitFlags flags) const;
 	Region DrawingRegion() const;
 	//sets phase (0-2)
 	void SetPhase(int arg);

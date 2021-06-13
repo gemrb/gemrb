@@ -54,7 +54,7 @@ bool VLCPlayer::Open(DataStream* stream)
 		bool success = libvlc_media_player_play(mediaPlayer) == 0;
 
 		// FIXME: this is technically a data race!
-		while (success && movieFormat == Video::DISPLAY);
+		while (success && movieFormat == Video::BufferFormat::DISPLAY);
 
 		return success;
 	}
@@ -66,10 +66,10 @@ bool VLCPlayer::DecodeFrame(VideoBuffer& buf)
 	int pitches[3];
 
 	switch (movieFormat) {
-		case Video::RGB555:
+		case Video::BufferFormat::RGB555:
 			pitches[0] = movieSize.w * 2;
 			break;
-		case Video::YV12:
+		case Video::BufferFormat::YV12:
 			pitches[Y] = movieSize.w;
 			pitches[U] = movieSize.w / 2;
 			pitches[V] = movieSize.w / 2;
@@ -120,14 +120,14 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 	player->movieSize.h = h;
 
 	if (strcmp(chroma, "RV16") == 0) { // 16bit RGB
-		player->movieFormat = Video::RGB555;
+		player->movieFormat = Video::BufferFormat::RGB555;
 
 		pitches[0] = w * 2;
 		lines[0] = h;
 
 		player->planes[0] = new char[pitches[0] * lines[0]];
 	} else if (strcmp(chroma, "YV12") == 0 || strcmp(chroma, "I420") == 0) {
-		player->movieFormat = Video::YV12;
+		player->movieFormat = Video::BufferFormat::YV12;
 		memcpy(chroma, "YV12", 4); // we prefer this plane order
 
 		pitches[Y] = w;
@@ -141,7 +141,7 @@ unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned
 		player->planes[U] = new char[pitches[U] * lines[U]];
 		player->planes[V] = new char[pitches[V] * lines[V]];
 	} else { // default to 32bit
-		player->movieFormat = Video::RGBA8888;
+		player->movieFormat = Video::BufferFormat::RGBA8888;
 		memcpy(chroma, "RV32", 4);
 
 		pitches[0] = w * 4;

@@ -236,7 +236,7 @@ void Particles::Draw(Point p)
 					Animation* anim = anims[0];
 					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
-					ieDword flags = 0;
+					BlitFlags flags = BlitFlags::NONE;
 					if (game) game->ApplyGlobalTint(clr, flags);
 
 					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),

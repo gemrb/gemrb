@@ -327,7 +327,7 @@ public:
 	void BlendAnimation();
 	bool Schedule(ieDword gametime) const;
 	Region DrawingRegion() const;
-	void Draw(const Region &screen, Color tint, uint32_t flags) const;
+	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
 	int GetHeight() const;
 private:
 	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
@@ -651,8 +651,8 @@ private:
 	WallPolygonSet WallsIntersectingRegion(Region, bool includeDisabled = false, const Point* loc = nullptr) const;
 	
 	void SetDrawingStencilForObject(const void*, const Region&, const WallPolygonSet&, const Point& viewPortOrigin);
-	uint32_t SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
-	uint32_t SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
+	BlitFlags SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
+	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	
 	void DrawSearchMap(const Region &vp) const;
 	void DrawPortal(InfoPoint *ip, int enable);

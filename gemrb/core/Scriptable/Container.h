@@ -25,6 +25,7 @@
 
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
+#include "Video.h"
 
 namespace GemRB {
 
@@ -49,7 +50,7 @@ public:
 	int AddItem(CREItem *item);
 	//draws the ground icons
 	Region DrawingRegion() const override;
-	void Draw(bool highlight, const Region &screen, Color tint, uint32_t flags) const;
+	void Draw(bool highlight, const Region &screen, Color tint, BlitFlags flags) const;
 
 	int IsOpen() const;
 	void TryPickLock(const Actor *actor);

@@ -41,7 +41,6 @@
 #include "Pixels.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
-#include "Video.h"
 #include "MapReverb.h"
 
 #include <algorithm>
@@ -2111,14 +2110,14 @@ const Color *Game::GetGlobalTint() const
 }
 
 // applies the global tint, if any
-void Game::ApplyGlobalTint(Color &tint, ieDword &flags) const
+void Game::ApplyGlobalTint(Color &tint, BlitFlags &flags) const
 {
 	const Color *globalTint = GetGlobalTint();
 	if (globalTint) {
-		if (flags & BLIT_COLOR_MOD) {
+		if (flags & BlitFlags::COLOR_MOD) {
 			ShaderTint(*globalTint, tint);
 		} else {
-			flags |= BLIT_COLOR_MOD;
+			flags |= BlitFlags::COLOR_MOD;
 			tint = *globalTint;
 			tint.a = 255;
 		}

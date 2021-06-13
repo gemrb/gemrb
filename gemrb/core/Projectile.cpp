@@ -30,9 +30,9 @@
 #include "ProjectileServer.h"
 #include "Sprite2D.h"
 #include "VEFObject.h"
-#include "Video.h"
 #include "RNG.h"
 #include "Scriptable/Actor.h"
+#include "ScriptedAnimation.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -782,7 +782,7 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 		if (ExtFlags & PEF_TINT) {
 			const auto& pal32 = core->GetPalette32( pal[0] );
 			sca->Tint = pal32[PALSIZE/2];
-			sca->Transparency |= BLIT_COLOR_MOD;
+			sca->Transparency |= BlitFlags::COLOR_MOD;
 		} else {
 			for(int i=0;i<7;i++) {
 				sca->SetPalette(pal[i], 4+i*PALSIZE);
@@ -1513,7 +1513,7 @@ void Projectile::DrawExplosion(const Region& vp)
 					if (apflags & APF_TINT) {
 						const auto& pal32 = core->GetPalette32(Extension->ExplColor);
 						vvc->Tint = pal32[PALSIZE/2];
-						vvc->Transparency |= BLIT_COLOR_MOD;
+						vvc->Transparency |= BlitFlags::COLOR_MOD;
 					} else {
 						vvc->SetPalette(Extension->ExplColor);
 					}
@@ -1716,14 +1716,14 @@ void Projectile::SetupWall()
 	SetTarget(p2);
 }
 
-void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
+void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 {
 	Game *game = core->GetGame();
 	PathNode *iter = path;
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 		frame = travel[face]->LastFrame();
-		flag |= BLIT_GREY;
+		flag |= BlitFlags::GREY;
 	} else {
 		frame = travel[face]->NextFrame();
 	}
@@ -1745,24 +1745,24 @@ void Projectile::DrawLine(const Region& vp, int face, ieDword flag)
 void Projectile::DrawTravel(const Region& viewport)
 {
 	Game *game = core->GetGame();
-	ieDword flag;
+	BlitFlags flag;
 
 	if(ExtFlags&PEF_HALFTRANS) {
-		flag=BLIT_HALFTRANS;
+		flag = BlitFlags::HALFTRANS;
 	} else {
-		flag = 0;
+		flag = BlitFlags::NONE;
 	}
 
 	//static tint (use the tint field)
 	if(ExtFlags&PEF_TINT) {
-		flag|=BLIT_COLOR_MOD;
+		flag |= BlitFlags::COLOR_MOD;
 	}
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
 		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = 255;
-		flag |= BLIT_COLOR_MOD;
+		flag |= BlitFlags::COLOR_MOD;
 	}
 
 	unsigned int face = GetNextFace();
@@ -1800,7 +1800,7 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	// set up the tint for the rest of the blits, but don't overwrite the saved one
 	Color tint2 = tint;
-	ieDword flags = flag;
+	BlitFlags flags = flag;
 
 	if (TFlags&PTF_TINT && game) {
 		game->ApplyGlobalTint(tint2, flags);
@@ -1815,7 +1815,7 @@ void Projectile::DrawTravel(const Region& viewport)
 			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
-				flags |= BLIT_GREY;
+				flags |= BlitFlags::GREY;
 			} else {
 				if (ExtFlags&PEF_UNPOP) {
 					frame = shadow[0]->NextFrame();
@@ -1862,7 +1862,7 @@ void Projectile::DrawTravel(const Region& viewport)
 			Holder<Sprite2D> frame;
 			if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
 				frame = travel[face]->LastFrame();
-				flags |= BLIT_GREY; // move higher if it interferes with other tints badly
+				flags |= BlitFlags::GREY; // move higher if it interferes with other tints badly
 			} else {
 				frame = travel[face]->NextFrame();
 			}
@@ -1937,16 +1937,15 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
-void Projectile::Draw(Holder<Sprite2D> spr, const Point& p,
-		  unsigned int flags, Color tint) const
+void Projectile::Draw(Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();
 	PaletteHolder pal = (spr->Bpp == 8) ? palette : nullptr;
-	if (flags & BLIT_COLOR_MOD) {
+	if (flags & BlitFlags::COLOR_MOD) {
 		// FIXME: this may not apply universally
-		flags |= BLIT_ALPHA_MOD;
+		flags |= BlitFlags::ALPHA_MOD;
 	}
-	video->BlitGameSpriteWithPalette(spr, pal, p, flags|BLIT_BLENDED, tint);
+	video->BlitGameSpriteWithPalette(spr, pal, p, flags|BlitFlags::BLENDED, tint);
 }
 
 }

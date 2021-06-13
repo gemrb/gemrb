@@ -56,7 +56,7 @@ static const int ff_wma_critical_freqs[25] = {
 
 BIKPlayer::BIKPlayer(void)
 {
-	movieFormat = Video::YV12;
+	movieFormat = Video::BufferFormat::YV12;
 	inbuff = NULL;
 
 	//force initialisation of static tables

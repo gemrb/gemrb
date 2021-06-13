@@ -25,6 +25,7 @@
 #include "Region.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
+#include "Video.h"
 
 #include <cstdint>
 #include <vector>
@@ -62,7 +63,7 @@ public:
 	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
 	bool UpdateDrawingState(int orientation);
-	void Draw(const Region &screen, const Color &p_tint, int height, uint32_t flags) const;
+	void Draw(const Region &screen, const Color &p_tint, int height, BlitFlags flags) const;
 	void Load2DA(const ieResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;

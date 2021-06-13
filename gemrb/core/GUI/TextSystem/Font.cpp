@@ -157,18 +157,18 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 	
 	if (colors) {
 		if (font->background) {
-			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->bg);
-			// no point in BLIT_ADD with black so let's optimize away some blits
+			SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::BLENDED | BlitFlags::COLOR_MOD, colors->bg);
+			// no point in BlitFlags::ADD with black so let's optimize away some blits
 			if (colors->fg != ColorBlack) {
 				std::swap(Sheet, invertedSheet);
-				SpriteSheet<ieWord>::Draw(chr, dest, BLIT_ADD | BLIT_COLOR_MOD, colors->fg);
+				SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::ADD | BlitFlags::COLOR_MOD, colors->fg);
 				std::swap(Sheet, invertedSheet);
 			}
 		} else {
-			SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED | BLIT_COLOR_MOD, colors->fg);
+			SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::BLENDED | BlitFlags::COLOR_MOD, colors->fg);
 		}
 	} else {
-		SpriteSheet<ieWord>::Draw(chr, dest, BLIT_BLENDED, ColorWhite);
+		SpriteSheet<ieWord>::Draw(chr, dest, BlitFlags::BLENDED, ColorWhite);
 	}
 }
 
@@ -179,7 +179,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 	Region drawRgn = Region(0, 0, 1024, Sheet->Frame.h);
 	video->DrawRect(drawRgn, ColorBlack, true);
 	video->DrawRect(Sheet->Frame.Intersect(r), ColorWhite, false);
-	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BLIT_BLENDED);
+	video->BlitSprite(Sheet, Sheet->Frame.Intersect(r), drawRgn, BlitFlags::BLENDED);
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)

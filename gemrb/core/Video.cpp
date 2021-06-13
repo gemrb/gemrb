@@ -30,7 +30,7 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
-static Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags);
+static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags);
 
 Video::Video(void)
 {
@@ -188,21 +188,21 @@ void Video::SetEventMgr(EventMgr* evnt)
 // Flips given sprite according to the flags. If MirrorAnchor=true,
 // flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, BlitFlags flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
 
 	Holder<Sprite2D> dest = sprite->copy();
 
-	if (flags&BLIT_MIRRORX) {
-		dest->renderFlags ^= BLIT_MIRRORX;
+	if (flags&BlitFlags::MIRRORX) {
+		dest->renderFlags ^= BlitFlags::MIRRORX;
 		if (MirrorAnchor)
 			dest->Frame.x = sprite->Frame.w - sprite->Frame.x;
 	}
 
-	if (flags&BLIT_MIRRORY) {
-		dest->renderFlags ^= BLIT_MIRRORY;
+	if (flags&BlitFlags::MIRRORY) {
+		dest->renderFlags ^= BlitFlags::MIRRORY;
 		if (MirrorAnchor)
 			dest->Frame.y = sprite->Frame.h - sprite->Frame.y;
 	}
@@ -239,11 +239,11 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 	// since the next stage is also public, we must readd the Pos becuase it will again be removed
 	fClip.x += spr->Frame.x;
 	fClip.y += spr->Frame.y;
-	BlitSprite(spr, src, fClip, BLIT_BLENDED);
+	BlitSprite(spr, src, fClip, BlitFlags::BLENDED);
 }
 
 void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
-							   uint32_t flags, Color tint)
+									  BlitFlags flags, Color tint)
 {
 	if (pal) {
 		PaletteHolder oldpal = spr->GetPalette();
@@ -335,84 +335,84 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xba
 	return sum;
 }
 
-Color ApplyFlagsForColor(const Color& inCol, uint32_t& flags)
+Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
 {
 	Color outC = inCol;
-	if (flags & BLIT_HALFTRANS) {
+	if (flags & BlitFlags::HALFTRANS) {
 		// set exactly to 128 because it is an optimized value
 		// if we end up needing to do half of something already transparent we can change this
-		// or do the calculations before calling the video driver and dont pass BLIT_HALFTRANS
+		// or do the calculations before calling the video driver and dont pass BlitFlags::HALFTRANS
 		outC.a = 128;
 	}
 
-	// TODO: do we need to handle BLIT_GREY, BLIT_SEPIA, or BLIT_COLOR_MOD?
+	// TODO: do we need to handle BlitFlags::GREY, BlitFlags::SEPIA, or BlitFlags::COLOR_MOD?
 	// if so we should do that here instead of in the implementations
 
-	if (flags & BLIT_GREY) {
+	if (flags & BlitFlags::GREY) {
 		//static RGBBlendingPipeline<GREYSCALE, true> blender;
-	} else if (flags & BLIT_SEPIA) {
+	} else if (flags & BlitFlags::SEPIA) {
 		//static RGBBlendingPipeline<SEPIA, true> blender;
 	}
 
-	if (flags & BLIT_COLOR_MOD) {
-		flags |= BLIT_MULTIPLY;
+	if (flags & BlitFlags::COLOR_MOD) {
+		flags |= BlitFlags::MULTIPLY;
 	}
 
 	// clear handled flags
-	flags &= ~(BLIT_HALFTRANS|BLIT_GREY|BLIT_SEPIA|BLIT_COLOR_MOD);
+	flags &= ~(BlitFlags::HALFTRANS|BlitFlags::GREY|BlitFlags::SEPIA|BlitFlags::COLOR_MOD);
 	return outC;
 }
 
-void Video::DrawRect(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+void Video::DrawRect(const Region& rgn, const Color& color, bool fill, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawRectImp(rgn, c, fill, flags);
 }
 
-void Video::DrawPoint(const Point& p, const Color& color, uint32_t flags)
+void Video::DrawPoint(const Point& p, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawPointImp(p, c, flags);
 }
 
-void Video::DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void Video::DrawPoints(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawPointsImp(points, c, flags);
 }
 
-void Video::DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags)
+void Video::DrawCircle(const Point& origin, unsigned short r, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawCircleImp(origin, r, c, flags);
 }
 
 void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-								double anglefrom, double angleto, bool drawlines, uint32_t flags)
+								double anglefrom, double angleto, bool drawlines, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawEllipseSegmentImp(origin, xr, yr, c, anglefrom, angleto, drawlines, flags);
 }
 
-void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags)
+void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawEllipseImp(origin, xr, yr, c, flags);
 }
 
-void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawPolygonImp(poly, origin, c, fill, flags);
 }
 
-void Video::DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
+void Video::DrawLine(const Point& p1, const Point& p2, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawLineImp(p1, p2, c, flags);
 }
 
-void Video::DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void Video::DrawLines(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
 	Color c = ApplyFlagsForColor(color, flags);
 	DrawLinesImp(points, c, flags);

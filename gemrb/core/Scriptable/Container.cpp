@@ -27,7 +27,6 @@
 #include "Item.h"
 #include "Sprite2D.h"
 #include "TileMap.h"
-#include "Video.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
 #include "System/StringBuffer.h"
@@ -79,7 +78,7 @@ Region Container::DrawingRegion() const
 	return r;
 }
 
-void Container::Draw(bool highlight, const Region& vp, Color tint, uint32_t flags) const
+void Container::Draw(bool highlight, const Region& vp, Color tint, BlitFlags flags) const
 {
 	Video* video = core->GetVideoDriver();
 

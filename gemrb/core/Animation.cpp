@@ -213,7 +213,7 @@ void Animation::MirrorAnimation()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BLIT_MIRRORX, true);
+		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORX, true);
 	}
 
 	// flip animArea horizontally as well
@@ -225,7 +225,7 @@ void Animation::MirrorAnimationVert()
 	Video *video = core->GetVideoDriver();
 
 	for (size_t i = 0; i < indicesCount; i++) {
-		frames[i] = video->MirrorSprite(frames[i], BLIT_MIRRORY, true);
+		frames[i] = video->MirrorSprite(frames[i], BlitFlags::MIRRORY, true);
 	}
 
 	// flip animArea vertically as well

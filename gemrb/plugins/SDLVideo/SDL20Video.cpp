@@ -237,9 +237,9 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
 }
 
-int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
+int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 {
-	// TODO: add support for BLIT_HALFTRANS, BLIT_COLOR_MOD, and others (no use for them ATM)
+	// TODO: add support for BlitFlags::HALFTRANS, BlitFlags::COLOR_MOD, and others (no use for them ATM)
 
 	SDL_Texture* target = CurrentRenderBuffer();
 
@@ -260,9 +260,9 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 	}
 
 	if (color) {
-		if (flags & BLIT_BLENDED) {
+		if (flags & BlitFlags::BLENDED) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-		} else if (flags & BLIT_MULTIPLY) {
+		} else if (flags & BlitFlags::MULTIPLY) {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_MOD);
 		} else {
 			SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
@@ -274,16 +274,16 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, uint32_t flags)
 	return 0;
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, const SDL_Color* tint)
 {
-	uint32_t version = 0;
+	BlitFlags version = BlitFlags::NONE;
 #if 1 // !USE_OPENGL_BACKEND
 	// we need to isolate flags that require software rendering to use as the "version"
-	version = (BLIT_GREY|BLIT_SEPIA) & flags;
+	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
 	// WARNING: software fallback == slow
-	if (spr->Bpp == 8 && (flags & BLIT_ALPHA_MOD)) {
-		version |= BLIT_ALPHA_MOD;
+	if (spr->Bpp == 8 && (flags & BlitFlags::ALPHA_MOD)) {
+		version |= BlitFlags::ALPHA_MOD;
 		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
 	} else {
 		flags &= ~RenderSpriteVersion(spr, version);
@@ -293,7 +293,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, uint32_t flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
 {
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
@@ -307,7 +307,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 
 		std::static_pointer_cast<SDLTextureVideoBuffer>(scratchBuffer)->Clear(drect); // sets the render target to the scratch buffer
 
-		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BLIT_ALPHA_MOD|BLIT_HALFTRANS), tint);
+		RenderCopyShaded(texSprite, &srect, &drect, flags & ~(BlitFlags::ALPHA_MOD|BlitFlags::HALFTRANS), tint);
 		
 		SDL_Rect stencilRect = drect;
 		stencilRect.x -= stencilBuffer->Origin().x;
@@ -322,17 +322,17 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
 		GLint channel = 3;
-		if (flags&BLIT_STENCIL_RED) {
+		if (flags&BlitFlags::STENCIL_RED) {
 			channel = 0;
-		} else if (flags&BLIT_STENCIL_GREEN) {
+		} else if (flags&BlitFlags::STENCIL_GREEN) {
 			channel = 1;
-		} else if (flags&BLIT_STENCIL_BLUE) {
+		} else if (flags&BlitFlags::STENCIL_BLUE) {
 			channel = 2;
 		}
 
 		stencilShader->Use();
 		stencilShader->SetUniformValue("u_channel", 1, channel);
-		if (flags & BLIT_STENCIL_DITHER) {
+		if (flags & BlitFlags::STENCIL_DITHER) {
 			stencilShader->SetUniformValue("u_dither", 1, 1);
 		} else {
 			stencilShader->SetUniformValue("u_dither", 1, 0);
@@ -350,13 +350,13 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		// alpha masking only
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 #endif
-		if (flags & (BLIT_ALPHA_MOD | BLIT_HALFTRANS)) {
+		if (flags & (BlitFlags::ALPHA_MOD | BlitFlags::HALFTRANS)) {
 			Uint8 alpha = SDL_ALPHA_OPAQUE;
-			if (flags & BLIT_ALPHA_MOD) {
+			if (flags & BlitFlags::ALPHA_MOD) {
 				alpha = tint->a;
 			}
 			
-			if (flags & BLIT_HALFTRANS) {
+			if (flags & BlitFlags::HALFTRANS) {
 				alpha /= 2;
 			}
 			SDL_SetTextureAlphaMod(ScratchBuffer(), alpha);
@@ -374,7 +374,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 	}
 }
 
-void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags, const Color* tint)
+void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, const Color* tint)
 {
 	auto tex = static_cast<SDLTextureVideoBuffer&>(*buf).GetTexture();
 	const Region& r = buf->Rect();
@@ -386,16 +386,16 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 }
 
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
-									   const SDL_Rect* dstrect, Uint32 flags, const SDL_Color* tint)
+									   const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
 {
 #if 0 // USE_OPENGL_BACKEND
 	GLint previous_program;
 	glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
 
 	spriteShader->Use();
-	if (flags&BLIT_GREY) {
+	if (flags&BlitFlags::GREY) {
 		spriteShader->SetUniformValue("u_greyMode", 1, 1);
-	} else if (flags&BLIT_SEPIA) {
+	} else if (flags&BlitFlags::SEPIA) {
 		spriteShader->SetUniformValue("u_greyMode", 1, 2);
 	} else {
 		spriteShader->SetUniformValue("u_greyMode", 1, 0);
@@ -407,34 +407,34 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	// they had to be applied very first so we could create a texture from the software rendering
 #endif
 	Uint8 alpha = SDL_ALPHA_OPAQUE;
-	if (flags & BLIT_ALPHA_MOD) {
+	if (flags & BlitFlags::ALPHA_MOD) {
 		alpha = tint->a;
 	}
 	
-	if (flags & BLIT_HALFTRANS) {
+	if (flags & BlitFlags::HALFTRANS) {
 		alpha /= 2;
 	}
 	
 	SDL_SetTextureAlphaMod(texture, alpha);
 
-	if (flags & BLIT_COLOR_MOD) {
+	if (flags & BlitFlags::COLOR_MOD) {
 		SDL_SetTextureColorMod(texture, tint->r, tint->g, tint->b);
 	} else {
 		SDL_SetTextureColorMod(texture, 0xff, 0xff, 0xff);
 	}
 	
-	if (flags & BLIT_ADD) {
+	if (flags & BlitFlags::ADD) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_ADD);
-	} else if (flags & BLIT_MULTIPLY) {
+	} else if (flags & BlitFlags::MULTIPLY) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_MOD);
-	} else if (flags & (BLIT_BLENDED | BLIT_HALFTRANS)) {
+	} else if (flags & (BlitFlags::BLENDED | BlitFlags::HALFTRANS)) {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 	} else {
 		SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_NONE);
 	}
 	
-	SDL_RendererFlip flipflags = (flags&BLIT_MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
-	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BLIT_MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
+	SDL_RendererFlip flipflags = (flags&BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
+	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
 #if 0 // USE_OPENGL_BACKEND
 	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
@@ -445,7 +445,7 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 #endif
 }
 
-void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -460,7 +460,7 @@ void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Col
 	DrawSDLPoints(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
 	if (points.empty()) {
 		return;
@@ -469,13 +469,13 @@ void SDL20VideoDriver::DrawSDLPoints(const std::vector<SDL_Point>& points, const
 	SDL_RenderDrawPoints(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlags flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawPoint(renderer, p.x, p.y);
 }
 
-void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
 {
 	// TODO: refactor Point to use int so this is not needed
 	std::vector<SDL_Point> sdlpoints;
@@ -490,19 +490,19 @@ void SDL20VideoDriver::DrawLinesImp(const std::vector<Point>& points, const Colo
 	DrawSDLLines(sdlpoints, reinterpret_cast<const SDL_Color&>(color), flags);
 }
 
-void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawSDLLines(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags)
 {
 	UpdateRenderTarget(reinterpret_cast<const Color*>(&color), flags);
 	SDL_RenderDrawLines(renderer, &points[0], int(points.size()));
 }
 
-void SDL20VideoDriver::DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags)
+void SDL20VideoDriver::DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags)
 {
 	UpdateRenderTarget(&color, flags);
 	SDL_RenderDrawLine(renderer, p1.x, p1.y, p2.x, p2.y);
 }
 
-void SDL20VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags)
+void SDL20VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags)
 {
 	UpdateRenderTarget(&color, flags);
 	if (fill) {
@@ -512,7 +512,7 @@ void SDL20VideoDriver::DrawRectImp(const Region& rgn, const Color& color, bool f
 	}
 }
 
-void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags)
+void SDL20VideoDriver::DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)
 {
 	if (fill) {
 		UpdateRenderTarget(&color, flags);

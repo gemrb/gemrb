@@ -32,7 +32,6 @@
 #include "Map.h"
 #include "Pixels.h"
 #include "Sprite2D.h"
-#include "Video.h"
 
 namespace GemRB {
 
@@ -643,7 +642,7 @@ bool ScriptedAnimation::UpdateDrawingState(int orientation)
 }
 
 //it is not sure if we need tint at all
-void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t flags) const
+void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags flags) const
 {
 	if (twin) {
 		twin->Draw(vp, tint, height, flags);
@@ -656,19 +655,19 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 
 	Video *video = core->GetVideoDriver();
 	
-	flags |= Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT);
+	flags |= static_cast<BlitFlags>(Transparency & (IE_VVC_TRANSPARENT | IE_VVC_SEPIA | IE_VVC_TINT));
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
 	//on the other hand
 	
 	if (Transparency & IE_VVC_NO_TIMESTOP) {
-		flags &= ~BLIT_GREY;
+		flags &= ~BlitFlags::GREY;
 	} else if (Transparency & IE_VVC_GREYSCALE) {
-		flags |= BLIT_GREY;
+		flags |= BlitFlags::GREY;
 	}
 
-	if (flags & BLIT_COLOR_MOD) {
+	if (flags & BlitFlags::COLOR_MOD) {
 		ShaderTint(Tint, tint); // this tint is expected to already have the global tint applied
 	}
 
@@ -681,7 +680,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, uint32_t 
 
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
-		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BLIT_BLENDED, tint);
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BlitFlags::BLENDED, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, p, flags, tint);
@@ -733,7 +732,7 @@ void ScriptedAnimation::SetFade(ieByte initial, int speed)
 {
 	Tint = Color(255, 255, 255, initial);
 	Fade=speed;
-	Transparency|=BLIT_COLOR_MOD;
+	Transparency|=BlitFlags::COLOR_MOD;
 }
 
 void ScriptedAnimation::GetPaletteCopy()

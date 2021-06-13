@@ -55,7 +55,7 @@ public:
 
 	bool SupportsBAMSprites() override { return true; }
 
-	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
+	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 						 const Color* tint = nullptr) override;
 
 private:
@@ -68,27 +68,27 @@ private:
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	
-	IAlphaIterator* StencilIterator(uint32_t flags, SDL_Rect dst) const;
+	IAlphaIterator* StencilIterator(BlitFlags flags, SDL_Rect dst) const;
 
 	int ProcessEvent(const SDL_Event & event) override;
 
 	void BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
-							  uint32_t flags = 0, const Color* tint = NULL) override;
+							  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
-								 uint32_t flags = 0, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, uint32_t flags, Color tint);
+								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
+	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, Color tint);
 
-	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, uint32_t flags) override;
+	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags) override;
 
-	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) override;
-	void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+	void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) override;
+	void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
-	void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) override;
+	void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) override;
 
-	void DrawPointImp(const Point& p, const Color& color, uint32_t flags) override;
-	void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) override;
+	void DrawPointImp(const Point& p, const Color& color, BlitFlags flags) override;
+	void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) override;
 
-	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) override;
+	void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) override;
 };
 
 class SDLSurfaceVideoBuffer : public VideoBuffer {

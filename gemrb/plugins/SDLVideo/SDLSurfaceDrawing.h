@@ -59,7 +59,7 @@ inline SDL_Rect RectFromRegion(const Region& rgn)
 }
 #endif
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color& color)
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
@@ -69,10 +69,10 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 
 	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
 
-	if (SHADE != NONE) {
+	if (SHADE != SHADER::NONE) {
 		Color dstc;
 		SDL_GetRGB( *px, dst->format, &dstc.r, &dstc.g, &dstc.b );
-		if (SHADE == TINT) {
+		if (SHADE == SHADER::TINT) {
 			ShaderTint(color, dstc);
 		} else {
 			ShaderBlend<false>(color, dstc);
@@ -83,7 +83,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 	}
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
 	SDL_PixelFormat* fmt = surface->format;
@@ -101,9 +101,9 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 		Color dstc;
 		switch (fmt->BytesPerPixel) {
 			case 1:
-				if (SHADE != NONE) {
+				if (SHADE != SHADER::NONE) {
 					SDL_GetRGB( *dst, surface->format, &dstc.r, &dstc.g, &dstc.b );
-					if (SHADE == TINT) {
+					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
 						ShaderBlend<false>(srcc, dstc);
@@ -114,9 +114,9 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				}
 				break;
 			case 2:
-				if (SHADE != NONE) {
+				if (SHADE != SHADER::NONE) {
 					SDL_GetRGB( *reinterpret_cast<Uint16*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
-					if (SHADE == TINT) {
+					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
 						ShaderBlend<false>(srcc, dstc);
@@ -145,9 +145,9 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 			}
 				break;
 			case 4:
-				if (SHADE != NONE) {
+				if (SHADE != SHADER::NONE) {
 					SDL_GetRGB( *reinterpret_cast<Uint32*>(dst), surface->format, &dstc.r, &dstc.g, &dstc.b );
-					if (SHADE == TINT) {
+					if (SHADE == SHADER::TINT) {
 						ShaderTint(srcc, dstc);
 					} else {
 						ShaderBlend<false>(srcc, dstc);
@@ -166,7 +166,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 	SDL_UnlockSurface( surface );
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
@@ -196,13 +196,13 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 		return;
 	}
 
-	if (SHADE != NONE) {
+	if (SHADE != SHADER::NONE) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
 		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 		
-		if (SHADE == TINT) {
+		if (SHADE == SHADER::TINT) {
 			const static TintDst<false> blender;
 			ColorFill(color, dstit, dstend, blender);
 		} else {
@@ -218,7 +218,7 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, short x2, const Region& clip, c
 	}
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& clip, const Color& color)
 {
 	assert(clip.x >= 0 && clip.w <= dst->w);
@@ -246,10 +246,10 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
 	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
 
-	if (SHADE == BLEND) {
+	if (SHADE == SHADER::BLEND) {
 		const static OneMinusSrcA<false, false> blender;
 		ColorFill(color, dstit, dstend, blender);
-	} else if (SHADE == TINT) {
+	} else if (SHADE == SHADER::TINT) {
 		const static TintDst<false> blender;
 		ColorFill(color, dstit, dstend, blender);
 	} else {
@@ -258,7 +258,7 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, short y2, const Region& 
 	}
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end, const Region& clip, const Color& color)
 {
 	if (start.y == end.y) return DrawHLineSurface<SHADE>(surface, start, end.x, clip, color);
@@ -343,7 +343,7 @@ void DrawLineSurface(SDL_Surface* surface, const Point& start, const Point& end,
 	DrawPointsSurface<SHADE>(surface, s_points, clip, color);
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawLinesSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& color)
 {
 	size_t count = points.size();
@@ -354,7 +354,7 @@ void DrawLinesSurface(SDL_Surface* surface, const std::vector<Point>& points, co
 	}
 }
 
-template<SHADER SHADE=NONE>
+template<SHADER SHADE = SHADER::NONE>
 void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Point& origin, const Region& clip, const Color& color, bool fill)
 {
 	if (fill) {

@@ -67,7 +67,7 @@ WindowManager::WindowManager(Video* vid)
 	gameWin->SetFlags(Window::Borderless|View::Invisible, OP_SET);
 	gameWin->SetFrame(screen);
 
-	HUDBuf = vid->CreateBuffer(screen, Video::DISPLAY_ALPHA);
+	HUDBuf = vid->CreateBuffer(screen, Video::BufferFormat::DISPLAY_ALPHA);
 
 	// set the buffer that always gets cleared just in case anything
 	// tries to draw
@@ -464,7 +464,7 @@ void WindowManager::DrawCursor(const Point& pos) const
 
 	if (hoverWin && hoverWin->IsDisabledCursor()) {
 		// draw greayed cursor
-		video->BlitGameSprite(cur, pos, BLIT_GREY|BLIT_BLENDED, ColorGray);
+		video->BlitGameSprite(cur, pos, BlitFlags::GREY|BlitFlags::BLENDED, ColorGray);
 	} else {
 		// draw normal cursor
 		video->BlitSprite(cur, pos);
@@ -510,7 +510,7 @@ void WindowManager::DrawTooltip(Point pos) const
 	}
 }
 
-void WindowManager::DrawWindowFrame(uint32_t flags) const
+void WindowManager::DrawWindowFrame(BlitFlags flags) const
 {
 	// the window buffers dont have room for the frame
 	// we also only need to draw the frame *once* (even if it applies to multiple windows)
@@ -603,7 +603,7 @@ void WindowManager::DrawWindows() const
 			// controls on greyed out windows shouldnt be updating anyway
 			win->Draw();
 			Region winrgn(Point(), win->Dimensions());
-			video->DrawRect(winrgn, ColorBlack, true, BLIT_HALFTRANS|BLIT_BLENDED);
+			video->DrawRect(winrgn, ColorBlack, true, BlitFlags::HALFTRANS|BlitFlags::BLENDED);
 		} else {
 			win->Draw();
 		}
@@ -611,16 +611,16 @@ void WindowManager::DrawWindows() const
 
 	video->PushDrawingBuffer(HUDBuf);
 
-	uint32_t frame_flags = BLIT_NO_FLAGS;
+	BlitFlags frame_flags = BlitFlags::NONE;
 	if (modalWin) {
 		if (modalShadow != ShadowNone) {
 			if (modalShadow == ShadowGray) {
-				frame_flags |= BLIT_HALFTRANS;
+				frame_flags |= BlitFlags::HALFTRANS;
 			}
 			video->DrawRect(screen, ColorBlack, true, frame_flags);
 		}
 		auto& modalBuffer = modalWin->DrawWithoutComposition();
-		video->BlitVideoBuffer(modalBuffer, Point(), BLIT_BLENDED);
+		video->BlitVideoBuffer(modalBuffer, Point(), BlitFlags::BLENDED);
 	}
 	
 	if (drawFrame) {

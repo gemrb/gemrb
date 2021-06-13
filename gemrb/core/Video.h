@@ -31,7 +31,7 @@
 
 #include "Plugin.h"
 #include "Polygon.h"
-#include "ScriptedAnimation.h"
+#include "Sprite2D.h"
 
 #include <deque>
 #include <algorithm>
@@ -43,31 +43,64 @@ class Palette;
 using PaletteHolder = Holder<Palette>;
   
 // Note: not all these flags make sense together.
-// Specifically: BLIT_GREY overrides BLIT_SEPIA
-enum SpriteBlitFlags : uint32_t {
-	BLIT_NO_FLAGS = 0,
-	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
-	BLIT_BLENDED = IE_VVC_BLENDED, // 8; not implemented in SDLVideo yet
-	BLIT_MIRRORX = IE_VVC_MIRRORX, // 0x10
-	BLIT_MIRRORY = IE_VVC_MIRRORY, // 0x20
-	//BLIT_NOSHADOW = 0x1000, no longer used
-	//BLIT_TRANSSHADOW = 0x2000, no longer used
-	// IE_VVC_TINT = 0x00030000. which is (BLIT_COLOR_MOD | BLIT_ALPHA_MOD)
-	BLIT_COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
-	BLIT_ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
-	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000; timestop palette
-	BLIT_SEPIA = IE_VVC_SEPIA, // 0x02000000; dream scene palette
-	BLIT_MULTIPLY = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
-	BLIT_GLOW = IE_VVC_GLOWING, // 0x00200000; not implemented in SDLVideo yet
-	BLIT_ADD = 0x00400000,
-	BLIT_STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
-	BLIT_STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
-	BLIT_STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
-	BLIT_STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
-	BLIT_STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
+// Specifically: BlitFlags::GREY overrides BlitFlags::SEPIA
+enum BlitFlags : uint32_t {
+	NONE = 0,
+	HALFTRANS = 2, // IE_VVC_TRANSPARENT
+	BLENDED = 8, // IE_VVC_BLENDED, not implemented in SDLVideo yet
+	MIRRORX = 0x10, // IE_VVC_MIRRORX
+	MIRRORY = 0x20, // IE_VVC_MIRRORY
+	// IE_VVC_TINT = 0x00030000. which is (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)
+	COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
+	ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
+	GREY = 0x80000, // IE_VVC_GREYSCALE, timestop palette
+	SEPIA = 0x02000000, // IE_VVC_SEPIA, dream scene palette
+	MULTIPLY = 0x00100000, // IE_VVC_DARKEN, not implemented in SDLVideo yet
+	GLOW = 0x00200000, // IE_VVC_GLOWING, not implemented in SDLVideo yet
+	ADD = 0x00400000,
+	STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
+	STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
+	STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
+	STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
+	STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
 
-#define BLIT_STENCIL_MASK (BLIT_STENCIL_ALPHA|BLIT_STENCIL_RED|BLIT_STENCIL_GREEN|BLIT_STENCIL_BLUE|BLIT_STENCIL_DITHER)
+inline constexpr BlitFlags operator |(BlitFlags a, BlitFlags b)
+{
+	return static_cast<BlitFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+}
+
+inline constexpr BlitFlags& operator |=(BlitFlags& a, BlitFlags b)
+{
+	return a = a | b;
+}
+
+inline constexpr BlitFlags operator &(BlitFlags a, BlitFlags b)
+{
+	return static_cast<BlitFlags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
+}
+
+inline constexpr BlitFlags& operator &=(BlitFlags& a, BlitFlags b)
+{
+	return a = a & b;
+}
+
+inline constexpr BlitFlags operator ^(BlitFlags a, BlitFlags b)
+{
+	return static_cast<BlitFlags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
+}
+
+inline constexpr BlitFlags& operator ^=(BlitFlags& a, BlitFlags b)
+{
+	return a = a ^ b;
+}
+
+inline constexpr BlitFlags operator ~(BlitFlags a)
+{
+	return static_cast<BlitFlags>(~static_cast<uint32_t>(a));
+}
+
+#define BLIT_STENCIL_MASK (BlitFlags::STENCIL_ALPHA|BlitFlags::STENCIL_RED|BlitFlags::STENCIL_GREEN|BlitFlags::STENCIL_BLUE|BlitFlags::STENCIL_DITHER)
 
 class GEM_EXPORT VideoBuffer {
 protected:
@@ -102,7 +135,7 @@ class GEM_EXPORT Video : public Plugin {
 public:
 	static const TypeID ID;
 
-	enum BufferFormat {
+	enum class BufferFormat {
 		DISPLAY, // whatever format the video driver thinks is best for the display
 		DISPLAY_ALPHA, // the same RGB format as DISPLAY, but forces an alpha if DISPLAY doesn't provide one
 		RGBPAL8,	// 8 bit palettized
@@ -146,16 +179,16 @@ private:
 	virtual int CreateDriverDisplay(const char* title) = 0;
 
 	// the actual drawing implementations
-	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, uint32_t flags) = 0;
-	virtual void DrawPointImp(const Point&, const Color& color, uint32_t flags) = 0;
-	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, uint32_t flags) = 0;
-	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, uint32_t flags) = 0;
+	virtual void DrawRectImp(const Region& rgn, const Color& color, bool fill, BlitFlags flags) = 0;
+	virtual void DrawPointImp(const Point&, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									   double anglefrom, double angleto, bool drawlines, uint32_t flags) = 0;
-	virtual void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags) = 0;
-	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, uint32_t flags) = 0;
-	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, uint32_t flags) = 0;
-	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, uint32_t flags)=0;
+									   double anglefrom, double angleto, bool drawlines, BlitFlags flags) = 0;
+	virtual void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) = 0;
+	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) = 0;
+	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)=0;
 
 public:
 	Video(void);
@@ -172,7 +205,7 @@ public:
 	bool GetFullscreenMode() const;
 	/** Swaps displayed and back buffers */
 	int SwapBuffers(unsigned int fpscap = 30);
-	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = DISPLAY);
+	VideoBufferPtr CreateBuffer(const Region&, BufferFormat = BufferFormat::DISPLAY);
 	void PushDrawingBuffer(const VideoBufferPtr&);
 	void PopDrawingBuffer();
 	void SetStencilBuffer(const VideoBufferPtr&);
@@ -200,42 +233,42 @@ public:
 					const Region* clip = NULL);
 	
 	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
-							uint32_t flags, Color tint = Color()) = 0;
+							BlitFlags flags, Color tint = Color()) = 0;
 
 	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
-								uint32_t flags, Color tint = Color()) = 0;
+								BlitFlags flags, Color tint = Color()) = 0;
 
 	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
-								   uint32_t flags, Color tint);
+								   BlitFlags flags, Color tint);
 
-	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, uint32_t flags,
+	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 								 const Color* tint = nullptr) = 0;
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
 	virtual Holder<Sprite2D> GetScreenshot(Region r, const VideoBufferPtr& buf = nullptr) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	void DrawRect(const Region& rgn, const Color& color, bool fill = true, uint32_t flags = 0);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, BlitFlags flags = BlitFlags::NONE);
 
-	void DrawPoint(const Point&, const Color& color, uint32_t flags = 0);
-	void DrawPoints(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
+	void DrawPoint(const Point&, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	void DrawPoints(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 
 	/** Draws a circle */
-	void DrawCircle(const Point& origin, unsigned short r, const Color& color, uint32_t flags = 0);
+	void DrawCircle(const Point& origin, unsigned short r, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Draws an Ellipse Segment */
 	void DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
-									double anglefrom, double angleto, bool drawlines = true, uint32_t flags = 0);
+									double anglefrom, double angleto, bool drawlines = true, BlitFlags flags = BlitFlags::NONE);
 	/** Draws an ellipse */
-	void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, uint32_t flags = 0);
+	void DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a polygon on the screen */
-	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, uint32_t flags = 0);
+	void DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill = false, BlitFlags flags = BlitFlags::NONE);
 	/** Draws a line segment */
-	void DrawLine(const Point& p1, const Point& p2, const Color& color, uint32_t flags = 0);
-	void DrawLines(const std::vector<Point>& points, const Color& color, uint32_t flags = 0);
+	void DrawLine(const Point& p1, const Point& p2, const Color& color, BlitFlags flags = BlitFlags::NONE);
+	void DrawLines(const std::vector<Point>& points, const Color& color, BlitFlags flags = BlitFlags::NONE);
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
-	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, uint32_t flags, bool MirrorAnchor);
+	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, BlitFlags flags, bool MirrorAnchor);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
