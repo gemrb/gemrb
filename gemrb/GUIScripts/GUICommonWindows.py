@@ -1517,16 +1517,16 @@ def GetPortraitButtonPairs (Window, ExtraSlots=0, Mode="vertical"):
 	else:
 		# reduce it by existing slots + 0 slots in framed views (eg. inventory) and
 		# 1 in main game control (for spacing and any other controls below (ai/select all in bg2))
-		maxHeight = windowHeight - buttonHeight*6 - buttonHeight/2
+		maxHeight = windowHeight - buttonHeight*6 - buttonHeight // 2
 		if windowHeight != ScreenHeight:
-			maxHeight += buttonHeight/2
+			maxHeight += buttonHeight // 2
 		limit = maxHeight
 		# for framed views, limited to 6, we downscale the buttons to fit, clipping their portraits
 		if maxHeight < buttonHeight:
 			unused = 20 # remaining unused space below the portraits
 			scale = 1
 			portraitGap = buttonHeight
-			buttonHeight = (buttonHeight*6 + unused) / PartySize
+			buttonHeight = (buttonHeight * 6 + unused) // PartySize
 			portraitGap = portraitGap - buttonHeight - 2 # 2 for a quasi border
 			limit = windowHeight - buttonHeight*6 + unused
 		limitStep = buttonHeight
@@ -1848,7 +1848,7 @@ def UpdateAnimatedPortrait (Window,i):
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
-		ratio = (hp + 0.0) / hp_max
+		ratio = hp / hp_max
 		if ratio > 1.0: ratio = 1.0
 
 	r = int (255 * (1.0 - ratio))

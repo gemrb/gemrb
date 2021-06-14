@@ -168,7 +168,7 @@ class Actor:
 		if self.__nextlevels != None:
 			return self.__nextlevels
 
-		xp = GemRB.GetPlayerStat (self.pc, IE_XP) / self.NumClasses()
+		xp = GemRB.GetPlayerStat (self.pc, IE_XP) // self.NumClasses()
 
 		self.__nextlevels = []
 		for name, level in zip(self.ClassNames(), self.Levels() ):
