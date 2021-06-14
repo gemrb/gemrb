@@ -124,7 +124,7 @@ def UpdatePriestWindow (Window):
 		PriestKnownSpellList.append (ks['SpellResRef'])
 		Icon.SetVarAssoc ("SpellButton", 100 + i)
 			
-	for i in range (btncount - known_cnt, btncount):
+	for i in range (i, btncount):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
