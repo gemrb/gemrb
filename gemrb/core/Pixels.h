@@ -27,6 +27,7 @@ namespace GemRB {
 
 struct RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, uint8_t mask) const=0;
+	virtual ~RGBBlender() = default;
 };
 
 inline void ShaderTint(const Color& tint, Color& c) {
@@ -201,7 +202,7 @@ struct IPixelIterator
 	IPixelIterator(void* px, int pitch, Direction x, Direction y)
 	: pixel(px), pitch(pitch), xdir(x), ydir(y) {}
 
-	virtual ~IPixelIterator() {};
+	virtual ~IPixelIterator() = default;
 
 	virtual IPixelIterator* Clone() const=0;
 	virtual void Advance(int)=0;
