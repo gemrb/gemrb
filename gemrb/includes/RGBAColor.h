@@ -37,11 +37,7 @@ struct Color {
 	constexpr bool operator!=(const Color& rhs) const {
 		return !operator==(rhs);
 	}
-}
-#if defined(__GNUC__) && defined(HAS_OBJALIGN4)
-	__attribute__((aligned(4)))
-#endif
-; // close of Color struct
+}; // close of Color struct
 
 static constexpr Color ColorBlack {0x00, 0x00, 0x00, 0xff};
 static constexpr Color ColorBlue {0x00, 0x00, 0xff, 0xff};
