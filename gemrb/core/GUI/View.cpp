@@ -283,7 +283,7 @@ void View::Draw()
 	dirty = false;
 
 	if (core->InDebugMode(ID_VIEWS)) {
-		Window* win = GetWindow();
+		const Window* win = GetWindow();
 		if (win == nullptr) {
 			video->DrawRect(drawFrame, ColorBlue, false);
 			debuginfo = EventMgr::ModState(GEM_MOD_SHIFT);

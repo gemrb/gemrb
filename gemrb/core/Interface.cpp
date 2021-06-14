@@ -413,7 +413,7 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_PORTRAIT) {
 		EventFlag&=~EF_PORTRAIT;
 
-		Window* win = GetWindow(0, "PORTWIN");
+		const Window* win = GetWindow(0, "PORTWIN");
 		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdatePortraitWindow" );
 		}
@@ -422,7 +422,7 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_ACTION) {
 		EventFlag&=~EF_ACTION;
 
-		Window* win = GetWindow(0, "ACTWIN");
+		const Window* win = GetWindow(0, "ACTWIN");
 		if (win) {
 			guiscript->RunFunction( "GUICommonWindows", "UpdateActionsWindow" );
 		}
