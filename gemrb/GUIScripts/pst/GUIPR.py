@@ -65,6 +65,11 @@ def UpdatePriestWindow (Window):
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	
+	ClassName = GUICommon.GetClassRowName (pc)
+	CantCast = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
+	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 	Name = GemRB.GetPlayerName (pc, 1)
 	Label = Window.GetControl (0x10000027)
@@ -106,29 +111,25 @@ def UpdatePriestWindow (Window):
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (20):
+	btncount = 20
+	for i in range (known_cnt):
 		Icon = Window.GetControl (14 + i)
-		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			Icon.SetSpellIcon (ks['SpellResRef'])
-			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
-			spell = GemRB.GetSpell (ks['SpellResRef'])
-			Icon.SetTooltip (spell['SpellName'])
-			PriestKnownSpellList.append (ks['SpellResRef'])
-			Icon.SetVarAssoc ("SpellButton", 100 + i)
-
-		else:
-			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Icon.SetTooltip ('')
-
-	ClassName = GUICommon.GetClassRowName (pc)
-	CantCast = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*"
-	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		Icon.SetSpellIcon (ks['SpellResRef'])
+		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
+		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Icon.SetTooltip (spell['SpellName'])
+		PriestKnownSpellList.append (ks['SpellResRef'])
+		Icon.SetVarAssoc ("SpellButton", 100 + i)
+			
+	for i in range (btncount - known_cnt, btncount):
+		Icon = Window.GetControl (14 + i)
+		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Icon.SetTooltip ('')
 
 	return
 

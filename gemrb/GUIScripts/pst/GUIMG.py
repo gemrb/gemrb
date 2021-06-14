@@ -69,6 +69,9 @@ def UpdateMageWindow (Window=None):
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	
+#	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
+#	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 	Name = GemRB.GetPlayerName (pc, 1)
 	Label = Window.GetControl (0x10000027)
@@ -108,25 +111,25 @@ def UpdateMageWindow (Window=None):
 	print("max_mem_cnt is: ", max_mem_cnt)
 	print("mem_cnt is:     ", mem_cnt)
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (20):
+	btncount = 20
+	for i in range (known_cnt):
 		Icon = Window.GetControl (14 + i)
-		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			Icon.SetSpellIcon (ks['SpellResRef'])
-			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
-			spell = GemRB.GetSpell (ks['SpellResRef'])
-			Icon.SetTooltip (spell['SpellName'])
-			MageKnownSpellList.append (ks['SpellResRef'])
-		else:
-			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Icon.SetTooltip ('')
-
-	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-#	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		Icon.SetSpellIcon (ks['SpellResRef'])
+		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
+		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Icon.SetTooltip (spell['SpellName'])
+		MageKnownSpellList.append (ks['SpellResRef'])
+			
+	for i in range (btncount - known_cnt, btncount):
+		Icon = Window.GetControl (14 + i)
+		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Icon.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Icon.SetTooltip ('')
+		
 
 ToggleSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.ToggleWindow, InitMageWindow, UpdateMageWindow, WINDOW_TOP|WINDOW_HCENTER)
 OpenSpellWindow = GUICommonWindows.CreateTopWinLoader(3, "GUIMG", GUICommonWindows.OpenWindowOnce, InitMageWindow, UpdateMageWindow, WINDOW_TOP|WINDOW_HCENTER)

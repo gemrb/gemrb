@@ -114,6 +114,9 @@ def UpdateMageWindow (MageWindow):
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
+	
+	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
+	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
 
 	Label = MageWindow.GetControl (0x10000032)
 	if GameCheck.IsBG2():
@@ -167,31 +170,34 @@ def UpdateMageWindow (MageWindow):
 			label.SetText (GemRB.GetString(61256) + " " + str(true_mem_cnt // known_cnt) + "/" + str(max_mem_cnt))
 		else:
 			label.SetText ("")
-
-	for i in range (GUICommon.GetGUISpellButtonCount()):
+	
+	btncount = GUICommon.GetGUISpellButtonCount()
+	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")
+		
+		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		Button.SetSpellIcon (ks['SpellResRef'], 0)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
+		MageKnownSpellList.append (ks['SpellResRef'])
+		spell = GemRB.GetSpell (ks['SpellResRef'])
+		if not spell:
+			print("Missing known spell!", ms['SpellResRef'])
+			continue
+		Button.SetTooltip (spell['SpellName'])
+	
+	for i in range (btncount - known_cnt, btncount):
+		Button = MageWindow.GetControl (27 + i)
+		Button.SetAnimation ("")
+		
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetTooltip ('')
+		Button.EnableBorder (0, 0)
 
-		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			Button.SetSpellIcon (ks['SpellResRef'], 0)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
-			MageKnownSpellList.append (ks['SpellResRef'])
-			spell = GemRB.GetSpell (ks['SpellResRef'])
-			if not spell:
-				print("Missing known spell!", ms['SpellResRef'])
-				continue
-			Button.SetTooltip (spell['SpellName'])
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetTooltip ('')
-			Button.EnableBorder (0, 0)
-
-	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
-	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
+	
 	return
 
 def MageSelectionChanged (oldwin):

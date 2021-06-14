@@ -86,6 +86,16 @@ def UpdatePriestWindow (Window):
 	type = IE_SPELL_TYPE_PRIEST
 	level = PriestSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	
+	ClassName = GUICommon.GetClassRowName (pc)
+	DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
+	if DivineCaster == "*":
+		# also check the DRUIDSPELL column
+		DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
+	CantCast = DivineCaster == "*"
+	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
+
+	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
 
 	Label = Window.GetControl (0x10000032)
 	# bg2 uses a shorthand form
@@ -128,36 +138,30 @@ def UpdatePriestWindow (Window):
 			Button.EnableBorder (0, 0)
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (GUICommon.GetGUISpellButtonCount()):
+	btncount = GUICommon.GetGUISpellButtonCount()
+	for i in range (known_cnt):
 		Button = Window.GetControl (27 + i)
 		Button.SetAnimation ("")
-		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			Button.SetSpellIcon (ks['SpellResRef'], 0)
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
-			spell = GemRB.GetSpell (ks['SpellResRef'])
-			Button.SetTooltip (spell['SpellName'])
-			PriestKnownSpellList.append (ks['SpellResRef'])
-			Button.SetVarAssoc ("SpellButton", 100 + i)
-		else:
-			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
-			Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-			Button.SetTooltip ('')
-			Button.EnableBorder (0, 0)
-
-	ClassName = GUICommon.GetClassRowName (pc)
-	DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL")
-	if DivineCaster == "*":
-		# also check the DRUIDSPELL column
-		DivineCaster = CommonTables.ClassSkills.GetValue (ClassName, "DRUIDSPELL")
-	CantCast = DivineCaster == "*"
-	CantCast += GemRB.GetPlayerStat(pc, IE_DISABLEDBUTTON)&(1<<ACT_CAST)
-
-	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
+		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		Button.SetSpellIcon (ks['SpellResRef'], 0)
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnPriestMemorizeSpell)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenPriestSpellInfoWindow)
+		spell = GemRB.GetSpell (ks['SpellResRef'])
+		Button.SetTooltip (spell['SpellName'])
+		PriestKnownSpellList.append (ks['SpellResRef'])
+		Button.SetVarAssoc ("SpellButton", 100 + i)
+			
+	for i in range (btncount - known_cnt, btncount):
+		Button = Window.GetControl (27 + i)
+		Button.SetAnimation ("")
+		
+		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
+		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
+		Button.SetTooltip ('')
+		Button.EnableBorder (0, 0)
 
 	Window.Focus()
 	return
