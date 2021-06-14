@@ -55,11 +55,8 @@ def InitPriestWindow (Window):
 
 	return
 
-def UpdatePriestWindow (Window=None):
+def UpdatePriestWindow (Window):
 	global PriestMemorizedSpellList, PriestKnownSpellList
-
-	if Window == None:
-		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
@@ -143,7 +140,7 @@ def PriestPrevLevelPress ():
 
 	if PriestSpellLevel > 0:
 		PriestSpellLevel = PriestSpellLevel - 1
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 
 
 def PriestNextLevelPress ():
@@ -151,7 +148,7 @@ def PriestNextLevelPress ():
 
 	if PriestSpellLevel < 5:
 		PriestSpellLevel = PriestSpellLevel + 1
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 
 
 def OpenPriestSpellInfoWindow ():
@@ -203,7 +200,7 @@ def OnPriestMemorizeSpell ():
 	index = GemRB.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 
 	# FIXME: use FLASH.bam
 
@@ -248,7 +245,7 @@ def OnPriestUnmemorizeSpell (btn, index):
 	index = GemRB.GetVar ("SpellButton")
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 
 
 ###################################################

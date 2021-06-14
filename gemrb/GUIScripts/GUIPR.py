@@ -76,11 +76,8 @@ def InitPriestWindow (Window):
 
 	return
 
-def UpdatePriestWindow (Window=None):
+def UpdatePriestWindow (Window):
 	global PriestMemorizedSpellList, PriestKnownSpellList
-	
-	if Window == None:
-		Window = PriestSpellWindow
 
 	PriestMemorizedSpellList = []
 	PriestKnownSpellList = []
@@ -173,7 +170,7 @@ def PriestPrevLevelPress ():
 
 	if PriestSpellLevel > 0:
 		PriestSpellLevel = PriestSpellLevel - 1
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 	return
 
 def PriestNextLevelPress ():
@@ -181,14 +178,14 @@ def PriestNextLevelPress ():
 
 	if PriestSpellLevel < 6:
 		PriestSpellLevel = PriestSpellLevel + 1
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 	return
 
 def RefreshPriestLevel ():
 	global PriestSpellLevel
 
 	PriestSpellLevel = GemRB.GetVar ("PriestSpellLevel")
-	UpdatePriestWindow ()
+	UpdatePriestWindow (PriestSpellWindow)
 	return
 
 def OpenPriestSpellInfoWindow ():
@@ -238,7 +235,7 @@ def OnPriestMemorizeSpell ():
 	index = GemRB.GetVar ("SpellButton") - 100
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = PriestSpellWindow.GetControl(index + 27)
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
@@ -316,7 +313,7 @@ def OnPriestUnmemorizeSpell (btn, index):
 	type = IE_SPELL_TYPE_PRIEST
 
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
-		UpdatePriestWindow ()
+		UpdatePriestWindow (PriestSpellWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = PriestSpellWindow.GetControl(index + 3)
 		Button.SetAnimation ("FLASH", 0, GameCheck.IsBG2() is False) # no blending for bg2
