@@ -222,16 +222,16 @@ public:
 		Uint32 pixel = 0;
 		switch (format->BytesPerPixel) {
 			case 4:
-				pixel = *reinterpret_cast<Uint32*>(imp->pixel);
+				pixel = *static_cast<Uint32*>(imp->pixel);
 				break;
 			case 3:
-				pixel = *reinterpret_cast<Pixel24Bit*>(imp->pixel);
+				pixel = *static_cast<Pixel24Bit*>(imp->pixel);
 				break;
 			case 2:
-				pixel = *reinterpret_cast<Uint16*>(imp->pixel);
+				pixel = *static_cast<Uint16*>(imp->pixel);
 				break;
 			case 1:
-				pixel = *reinterpret_cast<Uint8*>(imp->pixel);
+				pixel = *static_cast<Uint8*>(imp->pixel);
 				r = format->palette->colors[pixel].r;
 				g = format->palette->colors[pixel].g;
 				b = format->palette->colors[pixel].b;
@@ -270,7 +270,7 @@ public:
 	void WriteRGBA(Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
 		if (format->BytesPerPixel == 1) {
 			Uint32 pixel = SDL_MapRGBA(format, r, g, b, a);
-			*reinterpret_cast<Uint8*>(imp->pixel) = pixel;
+			*static_cast<Uint8*>(imp->pixel) = pixel;
 			return;
 		}
 
@@ -281,13 +281,13 @@ public:
 
 		switch (format->BytesPerPixel) {
 			case 4:
-				*reinterpret_cast<Uint32*>(imp->pixel) = pixel;
+				*static_cast<Uint32*>(imp->pixel) = pixel;
 				break;
 			case 3:
-				*reinterpret_cast<Pixel24Bit*>(imp->pixel) = pixel;
+				*static_cast<Pixel24Bit*>(imp->pixel) = pixel;
 				break;
 			case 2:
-				*reinterpret_cast<Uint16*>(imp->pixel) = pixel;
+				*static_cast<Uint16*>(imp->pixel) = pixel;
 				break;
 			default:
 				ERROR_UNKNOWN_BPP;

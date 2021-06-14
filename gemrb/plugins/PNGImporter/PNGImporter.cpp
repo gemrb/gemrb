@@ -36,7 +36,7 @@ static void DataStream_png_read_data(png_structp png_ptr,
 		 png_bytep data, png_size_t length)
 {
 	void *read_io_ptr = png_get_io_ptr(png_ptr);
-	DataStream* str = reinterpret_cast<DataStream*>(read_io_ptr);
+	DataStream* str = static_cast<DataStream*>(read_io_ptr);
 	str->Read(data, length);
 }
 
@@ -161,7 +161,7 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	png_bytep* row_pointers = new png_bytep[Height];
 	buffer = (unsigned char *) malloc((hasPalette?1:4)*Width*Height);
 	for (unsigned int i = 0; i < Height; ++i)
-		row_pointers[i] = reinterpret_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
+		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
 
 	if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;

@@ -512,7 +512,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			speech = GEM_SND_SPEECH;
 		}
 		// disable position, but only for party
-		if (Sender->Type != ST_ACTOR || reinterpret_cast<Actor*>(Sender)->InParty ||
+		if (Sender->Type != ST_ACTOR || static_cast<Actor*>(Sender)->InParty ||
 			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			speech |= GEM_SND_RELATIVE;
 			pos.x = pos.y = 0;
@@ -523,7 +523,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
-			reinterpret_cast<Actor*>(Sender)->SetAnimatedTalking(len);
+			static_cast<Actor*>(Sender)->SetAnimatedTalking(len);
 		}
 
 		if ((counter != 0) && (flags &DS_WAIT) )
