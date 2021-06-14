@@ -718,7 +718,6 @@ const Color& GameData::GetColor(const char *row)
 	// preload converted colors
 	if (colors.empty()) {
 		AutoTable colorTable("colors", true);
-		Color color;
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
 			colors[strdup(colorTable->GetRowName(r))] = Color(c);
