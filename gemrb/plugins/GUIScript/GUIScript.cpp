@@ -549,7 +549,7 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	char* newtext = ( char* ) malloc( bufflen );
 	//this could be DANGEROUS, not anymore (snprintf is your friend)
 	snprintf( newtext, bufflen, text, X, Y );
-	core->FreeString( text );
+	free(text);
 	ret = PyString_FromString( newtext );
 	free( newtext );
 	return ret;
@@ -11769,7 +11769,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	//cannot make this const, because it will be freed
 	char *tmp = core->GetCString(spelldata.strref);
 	print("Spellname: %s", tmp);
-	core->FreeString(tmp);
+	free(tmp);
 	print("Target: %d", spelldata.Target);
 	print("Range: %d", spelldata.Range);
 	if (type > 0 && !((1<<spelldata.type) & type)) {

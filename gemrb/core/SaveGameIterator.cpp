@@ -104,9 +104,9 @@ static void ParseGameDate(DataStream *ds, char *Date)
 		if (c)
 			strcat(Date, c);
 	}
-	core->FreeString(a);
-	core->FreeString(b);
-	core->FreeString(c);
+	free(a);
+	free(b);
+	free(c);
 }
 
 SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const char* slotname, int pCount, int saveID)

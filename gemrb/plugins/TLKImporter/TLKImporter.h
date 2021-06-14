@@ -54,7 +54,6 @@ public:
 	String* GetString(ieStrRef strref, ieDword flags = 0) override;
 	char* GetCString(ieStrRef strref, ieDword flags = 0) override;
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) override;
-	void FreeString(char *str);
 	bool HasAltTLK() const override;
 private:
 	/** resolves day and monthname tokens */

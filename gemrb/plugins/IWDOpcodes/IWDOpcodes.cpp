@@ -2254,7 +2254,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	if (spellname>=0) {
 		char *tmpstr = core->GetCString(spellname, 0);
 		core->GetTokenDictionary()->SetAtCopy("RESOURCE", tmpstr);
-		core->FreeString(tmpstr);
+		free(tmpstr);
 		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
 	}
 	//this has effect only on first apply, it will stop applying the spell

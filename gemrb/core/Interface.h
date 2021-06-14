@@ -467,8 +467,6 @@ public:
 	char* GetCString(ieStrRef strref, ieDword options = 0) const;
 	/* returns a newly created string */
 	String* GetString(ieStrRef strref, ieDword options = 0) const;
-	/* makes sure the string is freed in TLKImp */
-	void FreeString(char *&str) const;
 	/* sets the floattext color */
 	void SetInfoTextColor(const Color &color);
 	/** returns a gradient set */

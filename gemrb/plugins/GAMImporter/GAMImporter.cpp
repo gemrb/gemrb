@@ -1041,7 +1041,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	} else {
 		char *tmpstr = core->GetCString(ac->LongStrRef, IE_STR_STRREFOFF);
 		strncpy(filling, tmpstr, 32);
-		core->FreeString( tmpstr );
+		free(tmpstr);
 	}
 	stream->Write( filling, 32);
 	memset(filling,0,32);

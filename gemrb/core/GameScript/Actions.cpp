@@ -5919,7 +5919,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		char * str = core->GetCString( parameters->int0Parameter, IE_STR_STRREFOFF);
 		char FolderName[_MAX_PATH];
 		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
-		core->FreeString( str );
+		free(str);
 
 		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName);
 	} else {

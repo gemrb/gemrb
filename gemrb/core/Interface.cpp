@@ -2007,19 +2007,11 @@ const char* Interface::TypeExt(SClass_ID type) const
 	return NULL;
 }
 
-void Interface::FreeString(char *&str) const
-{
-	if (str) {
-		free(str);
-	}
-	str = NULL;
-}
-
 ieStrRef Interface::UpdateString(ieStrRef strref, const char *text) const
 {
 	char *current = GetCString(strref, 0);
 	bool changed = strcmp(text, current) != 0;
-	FreeString(current);
+	free(current);
 	if (changed) {
 		return strings->UpdateString( strref, text );
 	} else {

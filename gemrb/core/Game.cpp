@@ -1893,7 +1893,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	if (!tmpstr) return cutscene;
 
 	core->GetTokenDictionary()->SetAtCopy("DURATION", tmpstr);
-	core->FreeString(tmpstr);
+	free(tmpstr);
 	displaymsg->DisplayString(restindex, DMC_WHITE, 0);
 	return cutscene;
 }

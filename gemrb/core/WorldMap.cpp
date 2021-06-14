@@ -46,9 +46,7 @@ WMPAreaEntry::WMPAreaEntry()
 WMPAreaEntry::~WMPAreaEntry()
 {
 	delete StrCaption;
-	if (StrTooltip) {
-		core->FreeString(StrTooltip);
-	}
+	free(StrTooltip);
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
