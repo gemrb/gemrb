@@ -1470,7 +1470,7 @@ int Interface::Init(InterfaceConfig* config)
 	
 	// fix the sample config default resolution for iwd2 and configless case also for the demo
 	// FIXME: move defaults to gemrb.ini? Needs video init to be moved after GUIScript init
-	if ((stricmp(GameType, "iwd2") == 0 || stricmp(GameType, "demo") == 0 || stricmp(GameType, "test") == 0) && Width == 640 && Height == 480) {
+	if ((PathJoin(testPath, GamePath, "icewind2.ini", nullptr) || PathJoin(testPath, GamePath, "mapwinbg.png", nullptr)) && Width == 640 && Height == 480) {
 		Width = 800;
 		Height = 600;
 	}
