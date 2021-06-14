@@ -206,7 +206,7 @@ public:
 	ieDword SparkColor;
 	ieDword ExtFlags;
 	ieDword StrRef;
-	ieDword RGB;
+	Color RGB;
 	ieWord ColorSpeed;
 	ieWord Shake;
 	ieWord IDSType;

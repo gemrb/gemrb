@@ -738,8 +738,7 @@ public:
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */
 	void SetColorMod( ieDword location, RGBModifier::Type type, int speed,
-		unsigned char r, unsigned char g, unsigned char b,
-		int phase = -1) const;
+					 const Color&, int phase = -1) const;
 	bool Schedule(ieDword gametime, bool checkhide) const;
 	void NewPath();
 	/* overridden method, won't walk if dead */

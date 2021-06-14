@@ -271,10 +271,7 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 
 			rgb.speed=-1;
 			rgb.phase=0;
-			rgb.rgb.r=fx->Parameter1;
-			rgb.rgb.g=fx->Parameter1 >> 8;
-			rgb.rgb.b=fx->Parameter1 >> 16;
-			rgb.rgb.a=fx->Parameter1 >> 24;
+			rgb.rgb = Color::FromABGR(fx->Parameter1);
 			rgb.type=RGBModifier::TINT;
 			sca->AlterPalette(rgb);
 		}
@@ -747,10 +744,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 
 					rgb.speed=-1;
 					rgb.phase=0;
-					rgb.rgb.r=tint;
-					rgb.rgb.g=tint >> 8;
-					rgb.rgb.b=tint >> 16;
-					rgb.rgb.a=tint >> 24;
+					rgb.rgb = Color::FromABGR(tint);
 					rgb.type=RGBModifier::TINT;
 
 					sca->AlterPalette(rgb);
@@ -849,7 +843,7 @@ int fx_bless (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_BLESS) ) //curse is non-cumulative
 		return FX_NOT_APPLIED;
 
-	target->SetColorMod(255, RGBModifier::ADD, 0x18, 0xc8, 0xc8, 0xc8);
+	target->SetColorMod(255, RGBModifier::ADD, 0x18, Color(0xc8, 0xc8, 0xc8, 0));
 
 	STATE_SET( STATE_BLESS );
 	target->ToHit.HandleFxBonus(- signed(fx->Parameter1), fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);

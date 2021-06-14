@@ -721,12 +721,7 @@ const Color& GameData::GetColor(const char *row)
 		Color color;
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
-			color.r = (ieByte)((c >> 24) & 0xFF);
-			color.g = (ieByte)((c >> 16) & 0xFF);
-			color.b = (ieByte)((c >> 8) & 0xFF);
-			color.a = (ieByte)(c & 0xFF);
-
-			colors[strdup(colorTable->GetRowName(r))] = color;
+			colors[strdup(colorTable->GetRowName(r))] = Color(c);
 		}
 	}
 	const auto it = colors.find(row);

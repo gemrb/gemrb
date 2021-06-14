@@ -749,8 +749,7 @@ int fx_fade_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(0xff, RGBModifier::ADD, speed,
-				fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-				fx->Parameter1 >> 24, speed);
+						Color::FromBGRA(fx->Parameter1), speed);
 
 	return FX_NOT_APPLIED;
 }
@@ -1868,10 +1867,10 @@ int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	EXTSTATE_SET(EXTSTATE_SHROUD);
 	//directly modifying the color of the target
 	if (fx->Parameter2==1) {
-		target->SetColorMod(0xff, RGBModifier::ADD, -1, 0, 0, 0x96);
+		target->SetColorMod(0xff, RGBModifier::ADD, -1, Color(0, 0, 0x96, 0));
 	}
 	else {
-		target->SetColorMod(0xff, RGBModifier::ADD, -1, 0x96, 0, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, -1, Color(0x96, 0, 0, 0));
 	}
 
 	//timing
@@ -1924,7 +1923,7 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	EXTSTATE_SET(EXTSTATE_SHROUD); //just for compatibility
 
 	if(core->HasFeature(GF_ENHANCED_EFFECTS)) {
-		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xa0, 0, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 1, Color(0xa0, 0, 0, 0));
 	}
 
 	//timing
@@ -2660,7 +2659,7 @@ int fx_holy_power (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_HOLYPOWER);
-		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0x80, 0x80, 0x80);
+		target->SetColorMod(0xff, RGBModifier::ADD, 20, Color(0x80, 0x80, 0x80, 0));
 	}
 	STAT_ADD(IE_DAMAGEBONUS, 4);
 	return FX_APPLIED;
@@ -2682,7 +2681,7 @@ int fx_righteous_wrath (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_RIGHTEOUS);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xd7, 0xb6, 0 );
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xd7, 0xb6, 0, 0));
 	}
 	return FX_APPLIED;
 }
@@ -3004,7 +3003,7 @@ int fx_free_action_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 	// 0xb0 MovementRateModifier2   ok
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_FREEACTION);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x60, 0x60, 0));
 	}
 	return FX_APPLIED;
 }
@@ -3047,7 +3046,7 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->AddPortraitIcon(PI_ENTROPY);
 		//entropy shield overlay
 		target->SetOverlay(OV_ENTROPY);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x40, 0xc0, 0x40);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x40, 0xc0, 0x40, 0));
 	}
 	return FX_APPLIED;
 }
@@ -3082,7 +3081,7 @@ int fx_protection_from_elements (Scriptable* /*Owner*/, Actor* target, Effect* /
 	STAT_ADD(IE_RESISTMAGICCOLD, 15);
 
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
-		target->SetColorMod(0xff, RGBModifier::ADD, 0x4f, 0, 0, 0xc0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 0x4f, Color(0, 0, 0xc0, 0));
 	}
 	return FX_APPLIED;
 }
@@ -3133,7 +3132,7 @@ int fx_aegis (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_AEGIS);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x60, 0x60, 0));
 		target->SetGradient(14);
 	}
 
@@ -3558,7 +3557,7 @@ int fx_alicorn_lance (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	target->AC.HandleFxBonus(-2, fx->TimingMode==FX_DURATION_INSTANT_PERMANENT);
 	//color glow
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
-		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xb9, 0xb9, 0xb9);
+		target->SetColorMod(0xff, RGBModifier::ADD, 1, Color(0xb9, 0xb9, 0xb9, 0));
 	}
 	return FX_APPLIED;
 }
@@ -3730,7 +3729,7 @@ int fx_bane (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_bless_ref);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BANE);
-		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
+		target->SetColorMod(0xff, RGBModifier::ADD, 20, Color(0, 0, 0x80, 0));
 	}
 	int mod = signed(fx->Parameter1);
 	target->ToHit.HandleFxBonus(-mod, fx->TimingMode == FX_DURATION_INSTANT_PERMANENT);

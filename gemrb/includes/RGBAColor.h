@@ -46,6 +46,14 @@ struct Color {
 	constexpr uint32_t Packed() const {
 		return (r << 24) | (g << 16) | (b << 8) | a;
 	}
+	
+	constexpr static Color FromBGRA(uint32_t px) {
+		return Color(px >> 8, px >> 16, px >> 24, px);
+	}
+	
+	constexpr static Color FromABGR(uint32_t px) {
+		return Color(px, px >> 8, px >> 16, px >> 24);
+	}
 }; // close of Color struct
 
 static constexpr Color ColorBlack {0x00, 0x00, 0x00, 0xff};

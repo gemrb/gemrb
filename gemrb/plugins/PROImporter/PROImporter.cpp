@@ -71,7 +71,9 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left
 	str->ReadDword( &s->ExtFlags ) ; //gemrb extension flags
 	str->ReadDword( &s->StrRef );    //gemrb extension strref
-	str->ReadDword( &s->RGB );       //gemrb extension rgb pulse
+	ieDword c;
+	str->ReadDword(&c);       //gemrb extension rgb pulse
+	s->RGB = Color::FromABGR(c);
 	str->ReadWord( &s->ColorSpeed ); //gemrb extension rgb speed
 	str->ReadWord( &s->Shake );      //gemrb extension screen shake
 	str->ReadWord( &s->IDSValue);    //gemrb extension IDS targeting

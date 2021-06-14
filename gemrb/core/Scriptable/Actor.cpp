@@ -8056,9 +8056,8 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 	}
 }
 
-void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
-			unsigned char r, unsigned char g, unsigned char b,
-			int phase) const
+void Actor::SetColorMod(ieDword location, RGBModifier::Type type, int speed,
+						const Color &color, int phase) const
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
@@ -8068,10 +8067,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.locked = !phase;
 		ca->GlobalColorMod.type = type;
 		ca->GlobalColorMod.speed = speed;
-		ca->GlobalColorMod.rgb.r = r;
-		ca->GlobalColorMod.rgb.g = g;
-		ca->GlobalColorMod.rgb.b = b;
-		ca->GlobalColorMod.rgb.a = 0;
+		ca->GlobalColorMod.rgb = color;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
 		else {
@@ -8086,10 +8082,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 	if (phase && ca->ColorMods[location].locked) return;
 	ca->ColorMods[location].type = type;
 	ca->ColorMods[location].speed = speed;
-	ca->ColorMods[location].rgb.r = r;
-	ca->ColorMods[location].rgb.g = g;
-	ca->ColorMods[location].rgb.b = b;
-	ca->ColorMods[location].rgb.a = 0;
+	ca->ColorMods[location].rgb = color;
 	if (phase >= 0)
 		ca->ColorMods[location].phase = phase;
 	else {

@@ -75,7 +75,7 @@ Projectile::Projectile()
 	ZPos = 0;
 	extension_delay = 0;
 	Range = 0;
-	RGB = ColorSpeed = Shake = TFlags = Seq1 = Seq2 = ExtFlags = 0;
+	ColorSpeed = Shake = TFlags = Seq1 = Seq2 = ExtFlags = 0;
 	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
 	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
 	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
@@ -617,8 +617,7 @@ void Projectile::Payload()
 			}
 
 			if(ExtFlags&PEF_RGB) {
-				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-					RGB >> 8, RGB >> 16, RGB >> 24);
+				target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed, RGB);
 			}
 
 			if (effects) {
@@ -1171,8 +1170,7 @@ void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
 				EffectQueue *eff = effects->CopySelf();
 				eff->SetOwner(original);
 				if (ExtFlags & PEF_RGB) {
-					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed,
-						RGB >> 8, RGB >> 16, RGB >> 24);
+					target->SetColorMod(0xff, RGBModifier::ADD, ColorSpeed, RGB);
 				}
 
 				eff->AddAllEffects(target, target->Pos);

@@ -1111,7 +1111,7 @@ int fx_set_berserk_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//
 		target->SetSpellState(SS_BLOODRAGE);
 		target->SetSpellState(SS_NOHPINFO);
-		target->SetColorMod(0xff, RGBModifier::ADD, 15, 128, 0, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 15, Color(128, 0, 0, 0));
 		target->AddPortraitIcon(PI_BLOODRAGE);
 		break;
 	}
@@ -1289,8 +1289,7 @@ int fx_set_color_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_set_color_rgb(%2d): RGB: %x, Location: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
-	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
-			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+	target->SetColorMod(location, RGBModifier::ADD, -1, Color::FromBGRA(fx->Parameter1));
 
 	return FX_APPLIED;
 }
@@ -1299,8 +1298,7 @@ int fx_set_color_rgb_global (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_set_color_rgb_global(%2d): RGB: %x, Location: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
-	target->SetColorMod(0xff, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
-			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+	target->SetColorMod(0xff, RGBModifier::ADD, -1, Color::FromBGRA(fx->Parameter1));
 
 	return FX_APPLIED;
 }
@@ -1312,9 +1310,7 @@ int fx_set_color_pulse_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(location, RGBModifier::ADD, speed,
-			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-			fx->Parameter1 >> 24);
+	target->SetColorMod(location, RGBModifier::ADD, speed, Color::FromBGRA(fx->Parameter1));
 
 	return FX_APPLIED;
 }
@@ -1325,9 +1321,7 @@ int fx_set_color_pulse_rgb_global (Scriptable* /*Owner*/, Actor* target, Effect*
 	// print("fx_set_color_pulse_rgb_global(%2d): RGB: %x, Location: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(0xff, RGBModifier::ADD, speed,
-			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-			fx->Parameter1 >> 24);
+	target->SetColorMod(0xff, RGBModifier::ADD, speed, Color::FromBGRA(fx->Parameter1));
 
 	return FX_APPLIED;
 }
@@ -2358,8 +2352,7 @@ int fx_brief_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	int speed = (fx->Parameter2 >> 16) & 0xff;
 	target->SetColorMod(0xff, RGBModifier::ADD, speed,
-			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-			fx->Parameter1 >> 24, 0);
+						Color::FromBGRA(fx->Parameter1), 0);
 
 	return FX_NOT_APPLIED;
 }
@@ -2370,8 +2363,7 @@ int fx_darken_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_darken_rgb(%2d): RGB: %d, Location and speed: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
-	target->SetColorMod(location, RGBModifier::TINT, -1, fx->Parameter1 >> 8,
-			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+	target->SetColorMod(location, RGBModifier::TINT, -1, Color::FromBGRA(fx->Parameter1));
 	return FX_APPLIED;
 }
 
@@ -2382,8 +2374,7 @@ int fx_glow_rgb (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::BRIGHTEN, -1,
-			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-			fx->Parameter1 >> 24);
+						Color::FromBGRA(fx->Parameter1));
 
 	return FX_APPLIED;
 }
@@ -3610,37 +3601,37 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (color == ColorBlack) color = ColorRed;
 		displaymsg->DisplayConstantStringName(STR_EVIL, color, target);
 		//glow red
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0, 0, 0), 0);
 		break;
 	case AL_GOOD:
 		if (color == ColorBlack) color = ColorGreen;
 		displaymsg->DisplayConstantStringName(STR_GOOD, color, target);
 		//glow green
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0xff, 0, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0xff, 0, 0), 0);
 		break;
 	case AL_GE_NEUTRAL:
 		if (color == ColorBlack) color = ColorBlue;
 		displaymsg->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
 		//glow blue
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0, 0xff, 0), 0);
 		break;
 	case AL_CHAOTIC:
 		if (color == ColorBlack) color = ColorMagenta;
 		displaymsg->DisplayConstantStringName(STR_CHAOTIC, color, target);
 		//glow purple
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0xff, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0, 0xff, 0), 0);
 		break;
 	case AL_LAWFUL:
 		if (color == ColorBlack) color = ColorWhite;
 		displaymsg->DisplayConstantStringName(STR_LAWFUL, color, target);
 		//glow white
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0xff, 0xff, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xff, 0xff, 0xff, 0), 0);
 		break;
 	case AL_LC_NEUTRAL:
 		if (color == ColorBlack) color = ColorBlue;
 		displaymsg->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
 		//glow blue
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0, 0, 0xff, 0), 0);
 		break;
 	}
 	return FX_NOT_APPLIED;
@@ -4047,7 +4038,7 @@ int fx_set_aid_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_DAMAGEBONUS, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_AID);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 50, 50, 50);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(50, 50, 50, 0));
 	}
 	return FX_APPLIED;
 }
@@ -4072,7 +4063,7 @@ int fx_set_bless_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->ShouldModifyMorale()) STAT_ADD(IE_MORALE, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_BLESS);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xc0, 0x80, 0);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0xc0, 0x80, 0, 0));
 	}
 	return FX_APPLIED;
 }
@@ -4104,7 +4095,7 @@ int fx_set_holy_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_DEX, fx->Parameter1);
 	if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		target->AddPortraitIcon(PI_HOLY);
-		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x80, 0x80);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, Color(0x80, 0x80, 0x80, 0));
 	}
 	return FX_APPLIED;
 }
@@ -4332,7 +4323,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			fx->Parameter1 = rndstr->at(RAND(0, rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
-			*(ieDword *) &target->overColor=fx->Parameter2;
+			target->overColor = Color(fx->Parameter2);
 			return FX_NOT_APPLIED;
 		}
 
@@ -6036,8 +6027,7 @@ int fx_reveal_magic (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		int speed = (fx->Parameter2 >> 16) & 0xFF;
 		if (!speed) speed=30;
 		target->SetColorMod(0xff, RGBModifier::ADD, speed,
-			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-			fx->Parameter1 >> 24, 0);
+							Color::FromBGRA(fx->Parameter1), 0);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -7216,7 +7206,7 @@ int fx_teleport_to_target (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		delete tgts;
 		if (victim && PersonalDistance(victim, target)>20) {
 			target->SetPosition( victim->Pos, true, 0 );
-			target->SetColorMod(0xff, RGBModifier::ADD, 0x50, 0xff, 0xff, 0xff, 0);
+			target->SetColorMod(0xff, RGBModifier::ADD, 0x50, Color(0xff, 0xff, 0xff, 0), 0);
 		}
 	}
 	return FX_NOT_APPLIED;
