@@ -25,7 +25,7 @@ namespace GemRB {
 static Color ParseColor(const String& colorString)
 {
 	Color color = ColorWhite;
-	swscanf(colorString.c_str(), L"%02hhx%02hhx%02hhx", &color.r, &color.g, &color.b);
+	swscanf(colorString.c_str(), L"%02hhx%02hhx%02hhx%02hhx", &color.r, &color.g, &color.b, &color.a);
 	return color;
 }
 

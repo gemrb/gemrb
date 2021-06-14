@@ -3603,40 +3603,41 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	if (stat != msk) return FX_NOT_APPLIED;
 
-	ieDword color = fx->Parameter1;
+	Color color = Color(fx->Parameter1);
+	color.a = 0xff;
 	switch (msk) {
 	case AL_EVIL:
-		if (!color) color = 0xff0000;
+		if (color == ColorBlack) color = ColorRed;
 		displaymsg->DisplayConstantStringName(STR_EVIL, color, target);
 		//glow red
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0, 0);
 		break;
 	case AL_GOOD:
-		if (!color) color = 0xff00;
+		if (color == ColorBlack) color = ColorGreen;
 		displaymsg->DisplayConstantStringName(STR_GOOD, color, target);
 		//glow green
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0xff, 0, 0);
 		break;
 	case AL_GE_NEUTRAL:
-		if (!color) color = 0xff;
+		if (color == ColorBlack) color = ColorBlue;
 		displaymsg->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
 		break;
 	case AL_CHAOTIC:
-		if (!color) color = 0xff00ff;
+		if (color == ColorBlack) color = ColorMagenta;
 		displaymsg->DisplayConstantStringName(STR_CHAOTIC, color, target);
 		//glow purple
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0xff, 0);
 		break;
 	case AL_LAWFUL:
-		if (!color) color = 0xffffff;
+		if (color == ColorBlack) color = ColorWhite;
 		displaymsg->DisplayConstantStringName(STR_LAWFUL, color, target);
 		//glow white
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0xff, 0xff, 0);
 		break;
 	case AL_LC_NEUTRAL:
-		if (!color) color = 0xff;
+		if (color == ColorBlack) color = ColorBlue;
 		displaymsg->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
 		//glow blue
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);

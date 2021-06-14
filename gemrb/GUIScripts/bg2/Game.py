@@ -30,6 +30,8 @@ from GUIDefines import *
 from CharGenEnd import GiveEquipment
 from ie_stats import *
 
+RemoveColor = {'r' : 0xf5, 'g' : 0xf5, 'b' : 0x96, 'a' : 255}
+
 def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
@@ -37,14 +39,14 @@ def EnterGame():
 	MessageWindow.OnLoad()
 
 def RemoveYoshimo( idx):
-	GemRB.DisplayString(72046, 0xF5F596)
+	GemRB.DisplayString(72046, RemoveColor)
 	#WARNING:multiple strings are executed in reverse order
 	GemRB.ExecuteString('ApplySpellRES("destself",myself)', idx)
 	GemRB.ExecuteString('GivePartyAllEquipment()', idx)
 	return
 
 def RemoveImoen( idx):
-	GemRB.DisplayString(72047, 0xF5F596)
+	GemRB.DisplayString(72047, RemoveColor)
 	GemRB.ExecuteString('ApplySpellRES("destself",myself)', idx)
 	GemRB.ExecuteString('GivePartyAllEquipment()', idx)
 	return

@@ -94,7 +94,7 @@ def OnDragItem (btn, slot):
 		#special monk check
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 20 and SlotType["Effects"] == TYPE_OFFHAND:
 			SlotType["ResRef"] = ""
-			GemRB.DisplayString (61355, 0xffffff)
+			GemRB.DisplayString (61355, ColorWhite)
 
 		if SlotType["ResRef"]!="":
 			if slot_item:
@@ -116,7 +116,7 @@ def OnDragItem (btn, slot):
 								msg = 24893
 							elif GameCheck.HasTOB():
 								msg = 54692
-						GemRB.DisplayString(msg, 0xffffff)
+						GemRB.DisplayString(msg, ColorWhite)
 					#leave (save) store
 					GemRB.LeaveStore()
 

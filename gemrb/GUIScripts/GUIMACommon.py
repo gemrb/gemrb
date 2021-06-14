@@ -66,4 +66,4 @@ def MoveToNewArea ():
 		else:
 			time =  GemRB.GetString (10701)
 		GemRB.SetToken ("DURATION", time)
-		GemRB.DisplayString (10689, 0xffffff)
+		GemRB.DisplayString (10689, ColorWhite)

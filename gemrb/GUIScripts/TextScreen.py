@@ -84,7 +84,7 @@ def StartTextScreen ():
 				Message = TextTable.GetValue (TxtRow, 2)
 
 	if Message != "*":
-		GemRB.DisplayString (Message, 0xff0000)
+		GemRB.DisplayString (Message, ColorRed)
 
 	Table = GemRB.LoadTable (TableName)
 	if GameCheck.IsBG2():

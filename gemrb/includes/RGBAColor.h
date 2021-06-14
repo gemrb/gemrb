@@ -20,6 +20,8 @@
 #ifndef RGBACOLOR_H
 #define RGBACOLOR_H
 
+#include <cstdint>
+
 namespace GemRB {
 
 struct Color {
@@ -29,6 +31,9 @@ struct Color {
 
 	constexpr Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 	: r(r), g(g), b(b), a(a) {}
+	
+	constexpr explicit Color(uint32_t px)
+	: r(px >> 24), g(px >> 16), b(px >> 8), a(px) {}
 
 	constexpr bool operator==(const Color& rhs) const {
 		return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
@@ -36,6 +41,10 @@ struct Color {
 	
 	constexpr bool operator!=(const Color& rhs) const {
 		return !operator==(rhs);
+	}
+	
+	constexpr uint32_t Packed() const {
+		return (r << 24) | (g << 16) | (b << 8) | a;
 	}
 }; // close of Color struct
 

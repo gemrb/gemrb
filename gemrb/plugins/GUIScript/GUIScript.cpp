@@ -12523,16 +12523,17 @@ character whose name will be displayed (as saying the string).\n\
 
 static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
 {
-	int strref, color;
+	int strref = -1;
+	PyObject* pycol;
 	int globalID = 0;
-	PARSE_ARGS( args,  "ii|i", &strref, &color, &globalID);
+	PARSE_ARGS( args,  "iO|i", &strref, &pycol, &globalID);
 	if (globalID) {
 		GET_GAME();
 		GET_ACTOR_GLOBAL();
 
-		displaymsg->DisplayStringName(strref, (unsigned int) color, actor, IE_STR_SOUND);
+		displaymsg->DisplayStringName(strref, ColorFromPy(pycol), actor, IE_STR_SOUND);
 	} else {
-		displaymsg->DisplayString(strref, (unsigned int) color, IE_STR_SOUND);
+		displaymsg->DisplayString(strref, ColorFromPy(pycol), IE_STR_SOUND);
 	}
 	Py_RETURN_NONE;
 }

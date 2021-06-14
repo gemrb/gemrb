@@ -1118,7 +1118,7 @@ def SpellShiftPressed ():
 			SpellIndex = GemRB.PrepareSpontaneousCast (pc, Spell['SpellResRef'], Spell['BookType'], Level, ReplacementSpell)
 			GemRB.SetVar ("Spell", SpellIndex+1000*Type)
 			if GameCheck.IsIWD2():
-				GemRB.DisplayString (39742, 0xffffff, pc) # Spontaneous Casting
+				GemRB.DisplayString (39742, ColorWhite, pc) # Spontaneous Casting
 
 	# proceed as if nothing happened
 	SpellPressed ()
@@ -2052,7 +2052,7 @@ def RealRestPress ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close ())
 			Window.ShowModal (MODAL_SHADOW_GRAY)
 		else:
-			GemRB.DisplayString (info["ErrorMsg"], 0xff0000)
+			GemRB.DisplayString (info["ErrorMsg"], ColorRed)
 
 	return
 

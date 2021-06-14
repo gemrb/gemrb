@@ -147,7 +147,7 @@ def SetGamedaysAndHourToken ():
 
 def Gain(infostr, ability):
 	GemRB.SetToken ('SPECIALABILITYNAME', GemRB.GetString(int(ability) ) )
-	GemRB.DisplayString (infostr)
+	GemRB.DisplayString (infostr, ColorWhite) # FIXME: what color should this really be
 
 # chargen version of AddClassAbilities
 def ResolveClassAbilities (pc, ClassName):
