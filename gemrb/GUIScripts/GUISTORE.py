@@ -1679,7 +1679,7 @@ def RedrawStoreStealWindow (Window):
 		GUICommon.SetEncumbranceLabels (Window, 0x10000043, 0x10000044, pc)
 	return
 
-def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
+def SetupItems (pc, Slot, Button, Label, i, storetype, idx, steal=0):
 	if Slot == None:
 		Button.SetState (IE_GUI_BUTTON_DISABLED)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
@@ -1700,9 +1700,9 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 
-		if type == ITEM_STORE:
+		if storetype == ITEM_STORE:
 			Price = GetRealPrice (pc, "buy", Item, Slot)
-			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, type)
+			Flags = GemRB.IsValidStoreItem (pc, i+LeftTopIndex, storetype)
 
 			if GemRB.CanUseItemType (SLOT_ANY, Slot['ItemResRef'], pc):
 				Button.EnableBorder (1, 0)
@@ -1728,7 +1728,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			index = RightTopIndex + i
 			if not Bag:
 				index = inventory_slots[index]
-			Flags = GemRB.IsValidStoreItem (pc, index, type)
+			Flags = GemRB.IsValidStoreItem (pc, index, storetype)
 			if Flags & SHOP_STEAL:
 				if LeftIndex == LeftTopIndex + i:
 					Button.SetState (IE_GUI_BUTTON_SELECTED)
@@ -1756,14 +1756,14 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 		if Flags & SHOP_ID:
 			Name = GemRB.GetString (Item['ItemName'])
 			Button.EnableBorder (0, 1)
-			if not steal and type != ITEM_STORE:
+			if not steal and storetype != ITEM_STORE:
 				Price = 1
 		else:
 			Name = GemRB.GetString (Item['ItemNameIdentified'])
 			Button.EnableBorder (0, 0)
 
 		GemRB.SetToken ("ITEMNAME", Name)
-		if Inventory or (type == ITEM_STORE and steal):
+		if Inventory or (storetype == ITEM_STORE and steal):
 			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
 				LabelText = GemRB.GetString (24890)
 			elif GameCheck.IsBG2():
@@ -1777,7 +1777,7 @@ def SetupItems (pc, Slot, Button, Label, i, type, idx, steal=0):
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
 		if GameCheck.IsPST():
 			LabelText = GemRB.GetString (strrefs["itemnamecost"])
-		if (type == ITEM_STORE and not steal) or type == ITEM_BAG:
+		if (storetype == ITEM_STORE and not steal) or storetype == ITEM_BAG:
 			if Slot["Amount"] != -1:
 				LabelText = LabelText + " (" + str(Slot["Amount"]) + ")"
 		Label.SetText (LabelText)

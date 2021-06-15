@@ -651,17 +651,17 @@ def GetStatOverview (pc):
 	lines = 0
 	for s in stats:
 		try:
-			strref, val, type = s
-			if val == 0 and type != '0':
+			strref, val, stattype = s
+			if val == 0 and stattype != '0':
 				continue
-			if type == '+':
+			if stattype == '+':
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
-			elif type == 'd': #strref is an already resolved string
+			elif stattype == 'd': #strref is an already resolved string
 				res.append (strref)
-			elif type == 'x':
+			elif stattype == 'x':
 				res.append (GemRB.GetString (strref) + ': x' + str (val))
 			else:
-				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
 
 			lines = 1
 		except:

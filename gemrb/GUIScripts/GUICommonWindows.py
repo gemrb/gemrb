@@ -671,18 +671,18 @@ def UpdateActionsWindow ():
 				return
 			# otherwise just throw everything in a single list
 			# everything but innates, songs and shapes
-			type = (1<<IE_IWD2_SPELL_INNATE) - 1
+			spelltype = (1<<IE_IWD2_SPELL_INNATE) - 1
 		else:
-			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+			spelltype = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_INNATES: #innates
 		if GameCheck.IsIWD2():
-			type = (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
+			spelltype = (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
 		else:
-			type = 1<<IE_SPELL_TYPE_INNATE
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+			spelltype = 1<<IE_SPELL_TYPE_INNATE
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QWEAPONS or level == UAW_QITEMS: #quick weapon or quick item ability selection
 		SetupItemAbilities(pc, GemRB.GetVar("Slot"), level)
 	elif level == UAW_ALLMAGE: #all known mage spells
@@ -692,31 +692,31 @@ def UpdateActionsWindow ():
 		SetupSkillSelection()
 	elif level == UAW_QSPELLS: # quickspells, but with innates too
 		if GameCheck.IsIWD2():
-			type = (1<<IE_IWD2_SPELL_INNATE) - 1
-			type += (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
+			spelltype = (1<<IE_IWD2_SPELL_INNATE) - 1
+			spelltype += (1<<IE_IWD2_SPELL_INNATE) + (1<<IE_IWD2_SPELL_SHAPE)
 		else:
-			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD) + (1<<IE_SPELL_TYPE_INNATE)
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+			spelltype = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD) + (1<<IE_SPELL_TYPE_INNATE)
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QSHAPES: # shapes selection
-		type = 1<<IE_IWD2_SPELL_SHAPE
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		spelltype = 1<<IE_IWD2_SPELL_SHAPE
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_QSONGS: # songs selection
-		type = 1<<IE_IWD2_SPELL_SONG
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		spelltype = 1<<IE_IWD2_SPELL_SONG
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_BOOK: # spellbook selection
-		type = GemRB.GetVar ("Type")
-		Spellbook.SetupSpellIcons(CurrentWindow, type, TopIndex, ActionBarControlOffset)
+		spelltype = GemRB.GetVar ("Type")
+		Spellbook.SetupSpellIcons(CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	elif level == UAW_2DASPELLS: # spells from a 2da (fx_select_spell)
 		if GameCheck.IsIWD2():
 			# everything but innates, songs and shapes
-			type = (1<<IE_IWD2_SPELL_INNATE) - 1
+			spelltype = (1<<IE_IWD2_SPELL_INNATE) - 1
 		else:
-			type = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
-		GemRB.SetVar ("Type", type)
-		Spellbook.SetupSpellIcons (CurrentWindow, type, TopIndex, ActionBarControlOffset)
+			spelltype = (1<<IE_SPELL_TYPE_PRIEST) + (1<<IE_SPELL_TYPE_WIZARD)
+		GemRB.SetVar ("Type", spelltype)
+		Spellbook.SetupSpellIcons (CurrentWindow, spelltype, TopIndex, ActionBarControlOffset)
 	else:
 		print("Invalid action level:", level)
 		GemRB.SetVar ("ActionLevel", UAW_STANDARD)
@@ -1030,8 +1030,8 @@ def ActionSkillsPressed ():
 	UpdateActionsWindow ()
 	return
 
-def TypeSpellPressed (type):
-	GemRB.SetVar ("Type", 1<<type)
+def TypeSpellPressed (spelltype):
+	GemRB.SetVar ("Type", 1 << spelltype)
 	GemRB.SetVar ("ActionLevel", UAW_BOOK)
 	UpdateActionsWindow ()
 	return

@@ -147,9 +147,9 @@ class GView:
 	def SetDisabled(self, disable):
 		self.SetFlags(IE_GUI_VIEW_DISABLED, OP_OR if disable else OP_NAND)
 
-	def CreateControl(self, newID, type, x, y, w, h, *args): # backwards compatibility
+	def CreateControl(self, newID, ctype, x, y, w, h, *args): # backwards compatibility
 		frame = {"x" : x, "y" : y, "w" : w, "h" : h}
-		return self.CreateSubview(newID, type, frame, *args)
+		return self.CreateSubview(newID, ctype, frame, *args)
 
 	def ReplaceSubview(self, subview, ctype, *args):
 		if isinstance(subview, int):
@@ -160,8 +160,8 @@ class GView:
 
 		return self.CreateSubview(newID, ctype, frame, args)
 
-	def CreateSubview(self, newID, type, frame, *args):
-		view = CreateView(newID, type, frame, *args) # this will create an entry in the generic 'control' group
+	def CreateSubview(self, newID, ctype, frame, *args):
+		view = CreateView(newID, ctype, frame, *args) # this will create an entry in the generic 'control' group
 		created = self.AddSubview(view) # this will move the reference into the our window's group
 		RemoveScriptingRef(view) # destroy the old reference just in case something tries to recycle the id while 'created' is still valid
 		return created

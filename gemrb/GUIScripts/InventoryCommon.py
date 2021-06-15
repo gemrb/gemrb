@@ -217,7 +217,7 @@ def CloseItemInfoWindow ():
 	UpdateInventoryWindow ()
 	return
 
-def DisplayItem (slotItem, type):
+def DisplayItem (slotItem, itemtype):
 	global ItemInfoWindow
 
 	item = GemRB.GetItem (slotItem["ItemResRef"])
@@ -241,7 +241,7 @@ def DisplayItem (slotItem, type):
 
 	# item name
 	Label = Window.GetControl (0x10000000)
-	if (type&2):
+	if (itemtype & 2):
 		text = item["ItemName"]
 	else:
 		text = item["ItemNameIdentified"]
@@ -267,7 +267,7 @@ def DisplayItem (slotItem, type):
 	Text = Window.GetControl (5)
 	if GameCheck.IsBG2(): # I believe only BG2 has special initials
 		Text.SetColor (ColorWhitish, TA_COLOR_INITIALS)
-	if (type&2):
+	if (itemtype & 2):
 		text = item["ItemDesc"]
 	else:
 		text = item["ItemDescIdentified"]
@@ -279,9 +279,9 @@ def DisplayItem (slotItem, type):
 
 	#left button
 	Button = Window.GetControl(8)
-	select = (type&1) and (item["Function"]&ITM_F_ABILITIES)
+	select = (itemtype & 1) and (item["Function"]&ITM_F_ABILITIES)
 
-	if type&2:
+	if itemtype & 2:
 		Button.SetText (strrefs[1])
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, IdentifyItemWindow)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
@@ -308,15 +308,15 @@ def DisplayItem (slotItem, type):
 	#right button
 	Button = Window.GetControl(9)
 	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
-	drink = (type&1) and (item["Function"]&ITM_F_DRINK)
-	read = (type&1) and (item["Function"]&ITM_F_READ)
+	drink = (itemtype & 1) and (item["Function"]&ITM_F_DRINK)
+	read = (itemtype & 1) and (item["Function"]&ITM_F_READ)
 	# sorcerers cannot learn spells
 	pc = GemRB.GameGetSelectedPCSingle ()
 	if Spellbook.HasSorcererBook (pc):
 		read = 0
-	container = (type&1) and (item["Function"]&ITM_F_CONTAINER)
-	dialog = (type&1) and (item["Dialog"]!="" and item["Dialog"]!="*")
-	familiar = (type&1) and (item["Type"] == 38)
+	container = (itemtype & 1) and (item["Function"]&ITM_F_CONTAINER)
+	dialog = (itemtype & 1) and (item["Dialog"]!="" and item["Dialog"]!="*")
+	familiar = (itemtype & 1) and (item["Type"] == 38)
 
 	# The "conversable" bit in PST actually means "usable", eg clot charm
 	# unlike BG2 (which only has the bit set on SW2H14 Lilarcor)
@@ -376,7 +376,7 @@ def DisplayItem (slotItem, type):
 
 	Label = Window.GetControl(0x1000000b)
 	if Label:
-		if (type&2):
+		if (itemtype & 2):
 			# NOT IDENTIFIED
 			Label.SetText (strrefs[6])
 		else:

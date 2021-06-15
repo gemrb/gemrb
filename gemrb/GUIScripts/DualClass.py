@@ -146,8 +146,8 @@ def DumpUnusableItems (pc):
 	"""Dumps everything in the inventory that is now unusable."""
 
 	SlotTypes = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, SLOT_BELT, SLOT_ITEM, SLOT_WEAPON, SLOT_QUIVER ]
-	for type in SlotTypes:
-		Slots = GemRB.GetSlots (pc, type)
+	for stype in SlotTypes:
+		Slots = GemRB.GetSlots (pc, stype)
 		if not len(Slots):
 			# nothing there
 			continue

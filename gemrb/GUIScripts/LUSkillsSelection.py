@@ -61,7 +61,7 @@ SkillsAssignable = 0
 
 #WARNING: This WILL NOT show the window, only access it. To see the return, call GemRB.GetVar ("SkillPointsLeft").
 # If nothing can be assigned, it will return 0 prior to accessing any of the window methods.
-def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
+def SetupSkillsWindow (pc, skilltype, window, callback, level1=[0,0,0], level2=[1,1,1], classid=0, scroll=True):
 	global SkillsWindow, SkillsCallback, SkillsOffsetPress, SkillsOffsetButton1, SkillsOffsetName
 	global SkillsOffsetPoints, SkillsOffsetSum, SkillsIndices, SkillPointsLeft, SkillsTopIndex
 	global SkillsTable, SkillsOldPos, SkillsClickCount, SkillsOldDirection, SkillsNumButtons
@@ -86,7 +86,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		return
 
 	#setup the offsets
-	if type == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2():
+	if skilltype == LUSKILLS_TYPE_LEVELUP and GameCheck.IsBG2():
 		SkillsOffsetPress = 120
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
@@ -95,7 +95,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsNumButtons = 4
 		SkillsTextArea = SkillsWindow.GetControl (110)
 		ScrollBar = SkillsWindow.GetControl (109)
-	elif type == LUSKILLS_TYPE_LEVELUP and GameCheck.IsPST():
+	elif skilltype == LUSKILLS_TYPE_LEVELUP and GameCheck.IsPST():
 		SkillsOffsetPress = -1
 		SkillsOffsetButton1 = 16
 		SkillsOffsetSum = 6
@@ -109,7 +109,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		#There is actually no hint text to describe the skills, so this is a dummy
 		SkillsWindow.CreateTextArea (45, 1, 1, 1, 1, "FONTDLG")
 		SkillsTextArea =  SkillsWindow.GetControl (45)
-	elif type == LUSKILLS_TYPE_LEVELUP:
+	elif skilltype == LUSKILLS_TYPE_LEVELUP:
 		SkillsOffsetPress = -1
 		SkillsOffsetButton1 = 17
 		SkillsOffsetSum = 37
@@ -119,7 +119,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		SkillsTextArea = SkillsWindow.GetControl (42)
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (109)
-	elif type == LUSKILLS_TYPE_DUALCLASS:
+	elif skilltype == LUSKILLS_TYPE_DUALCLASS:
 		SkillsOffsetPress = 5
 		SkillsOffsetButton1 = 14
 		SkillsOffsetSum = 8
@@ -131,7 +131,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 		if (scroll):
 			ScrollBar = SkillsWindow.GetControl (26)
 			SkillsWindow.SetEventProxy(ScrollBar)
-	elif type == LUSKILLS_TYPE_CHARGEN:
+	elif skilltype == LUSKILLS_TYPE_CHARGEN:
 		SkillsOffsetPress = 21
 		SkillsOffsetButton1 = 11
 		SkillsOffsetSum = 5
@@ -171,7 +171,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 	#figure out the kitname if we need it
 	#protect against kitted multiclasses
 	Kit = GUICommon.GetKitIndex (pc)
-	if not Kit or type == LUSKILLS_TYPE_DUALCLASS or IsDual[0] in [1, 2] or IsMulti[0]>1:
+	if not Kit or skilltype == LUSKILLS_TYPE_DUALCLASS or IsDual[0] in [1, 2] or IsMulti[0]>1:
 		SkillsKitName = ClassName
 	else:
 		SkillsKitName = CommonTables.KitList.GetValue (Kit, 0, GTV_STR)
@@ -259,7 +259,7 @@ def SetupSkillsWindow (pc, type, window, callback, level1=[0,0,0], level2=[1,1,1
 
 	#we didn't find anything, so don't continue (will show as a return of 0)
 	#or don't display if we aren't leveling and have a bard/ranger
-	if not len (SkillsIndices) or (not SkillPointsLeft and type != LUSKILLS_TYPE_LEVELUP):
+	if not len (SkillsIndices) or (not SkillPointsLeft and skilltype != LUSKILLS_TYPE_LEVELUP):
 		SkillSumLabel = SkillsWindow.GetControl(0x10000000+SkillsOffsetSum)
 		SkillSumLabel.SetText("")
 		return

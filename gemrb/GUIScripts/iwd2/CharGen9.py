@@ -30,7 +30,7 @@ import IDLUCommon
 BioWindow = 0
 BioData = 0
 BioStrRef = 0
-EditControl = 0
+EditControl = None
 PortraitName = ""
 
 def OnLoad():
@@ -84,7 +84,7 @@ def RevertPress():
 	ClassName = GUICommon.GetClassRowName (MyChar)
 	BioStrRef = BioTable.GetValue (ClassName, "BIO")
 	GemRB.SetToken ("BIO", GemRB.GetString(BioStrRef) )
-	if type (EditControl) != type (7350): # just some int
+	if EditControl: # just some int
 		EditControl.SetText (GemRB.GetToken("BIO") )
 	return
 

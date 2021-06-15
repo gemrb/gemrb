@@ -602,7 +602,7 @@ def LearnPriestSpells (pc, level, mask, baseClassName = -1):
 	return
 
 
-def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
+def RemoveKnownSpells (pc, spelltype, level1=1, level2=1, noslots=0, kit=0):
 	"""Removes all known spells of a given type between two spell levels.
 
 	If noslots is true, all memorization counts are set to 0.
@@ -610,9 +610,9 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 	this is only used when removing spells in a dualclass."""
 
 	# choose the correct limit based upon class type
-	if type == IE_SPELL_TYPE_WIZARD or GameCheck.IsIWD2():
+	if spelltype == IE_SPELL_TYPE_WIZARD or GameCheck.IsIWD2():
 		limit = 9
-	elif type == IE_SPELL_TYPE_PRIEST:
+	elif spelltype == IE_SPELL_TYPE_PRIEST:
 		limit = 7
 
 		# make sure that we get the original kit, if we have one
@@ -638,7 +638,7 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 			# don't know how this would happen, but better to be safe
 			if originalkit == kit:
 				originalkit = 0
-	elif type == IE_SPELL_TYPE_INNATE:
+	elif spelltype == IE_SPELL_TYPE_INNATE:
 		limit = 1
 	else: # can't do anything if an improper spell type is sent
 		return 0
@@ -653,14 +653,14 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 	# remove all spells for each level
 	for level in range (level1-1, level2):
 		# we need the count because we remove each spell in reverse order
-		count = GemRB.GetKnownSpellsCount (pc, type, level)
+		count = GemRB.GetKnownSpellsCount (pc, spelltype, level)
 		mod = count-1
 
 		for spell in range (count):
 			# see if we need to check for kit
-			if type == IE_SPELL_TYPE_PRIEST and kit:
+			if spelltype == IE_SPELL_TYPE_PRIEST and kit:
 				# get the spell's ref data
-				ref = GemRB.GetKnownSpell (pc, type, level, mod-spell)
+				ref = GemRB.GetKnownSpell (pc, spelltype, level, mod-spell)
 				ref = GemRB.GetSpell (ref['SpellResRef'], 1)
 
 				# we have to look at the originalkit as well specifically for ranger/cleric dual-classes
@@ -670,11 +670,11 @@ def RemoveKnownSpells (pc, type, level1=1, level2=1, noslots=0, kit=0):
 					continue
 
 			# remove the spell
-			GemRB.RemoveSpell (pc, type, level, mod-spell)
+			GemRB.RemoveSpell (pc, spelltype, level, mod-spell)
 
 		# remove memorization counts if desired
 		if noslots:
-			GemRB.SetMemorizableSpellsCount (pc, 0, type, level)
+			GemRB.SetMemorizableSpellsCount (pc, 0, spelltype, level)
 
 	# return success
 	return 1

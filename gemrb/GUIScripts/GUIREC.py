@@ -744,24 +744,24 @@ def TypeSetStats(stats, pc=0):
 	noP = False
 	for s in stats:
 		try:
-			strref, val, type = s
-			if val == 0 and type != '0':
+			strref, val, stattype = s
+			if val == 0 and stattype != '0':
 				continue
 			if val == None:
 				val = str_None
-			if type == '+': #pluses
+			if stattype == '+': #pluses
 				res.append (strref + ' ' + '+' * val)
-			elif type == 'p': #a plus prefix if positive
+			elif stattype == 'p': #a plus prefix if positive
 				if val > 0:
 					res.append (GemRB.GetString (strref) + ' +' + str (val) )
 				else:
 					res.append (GemRB.GetString (strref) + ' ' + str (val) )
-			elif type == 'r': #a plus prefix if positive, strref is an already resolved string
+			elif stattype == 'r': #a plus prefix if positive, strref is an already resolved string
 				if val > 0:
 					res.append (strref + ' +' + str (val) )
 				else:
 					res.append (strref + ' ' + str (val) )
-			elif type == 's': #both base and (modified) stat, but only if they differ
+			elif stattype == 's': #both base and (modified) stat, but only if they differ
 				base = GB (pc, val)
 				stat = GS (pc, val)
 				base_str = GemRB.GetString (strref) + ': ' + str(stat)
@@ -769,22 +769,22 @@ def TypeSetStats(stats, pc=0):
 					res.append (base_str)
 				else:
 					res.append (base_str + " (" + str(stat-base) + ")")
-			elif type == 'x': #x character before value
+			elif stattype == 'x': #x character before value
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
-			elif type == 'a': #value (portrait icon) + string
+			elif stattype == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
 				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
-			elif type == 'b': #strref is an already resolved string
+			elif stattype == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
-			elif type == 'c': #normal string
+			elif stattype == 'c': #normal string
 				res.append (GemRB.GetString (strref))
-			elif type == 'd': #strref is an already resolved string
+			elif stattype == 'd': #strref is an already resolved string
 				res.append (strref)
-			elif type == '0': #normal value
+			elif stattype == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val))
 			else: #normal value + type character, for example percent sign
-				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + stattype)
 		except:
 			if isinstance(s, str):
 				if s == len(s) * "\n": # check if the string is all newlines

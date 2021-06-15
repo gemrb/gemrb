@@ -66,9 +66,9 @@ def UpdateMageWindow (Window=None):
 	MageKnownSpellList = []
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
-	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level)
 	
 #	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 #	GUICommon.AdjustWindowVisibility (Window, pc, CantCast)
@@ -80,11 +80,11 @@ def UpdateMageWindow (Window=None):
 	Label = Window.GetControl (0x10000026)
 	GemRB.SetToken ('LEVEL', str (level + 1))
 	Label.SetText (19672)
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 	for i in range (12):
 		Icon = Window.GetControl (2 + i)
 		if i < mem_cnt:
-			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+			ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 			Icon.SetSpellIcon (ms['SpellResRef'])
 			Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			if ms['Flags']:
@@ -110,11 +110,11 @@ def UpdateMageWindow (Window=None):
 	#--------------------------test-----------------------------#
 	print("max_mem_cnt is: ", max_mem_cnt)
 	print("mem_cnt is:     ", mem_cnt)
-	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
+	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
 	btncount = 20
 	for i in range (known_cnt):
 		Icon = Window.GetControl (14 + i)
-		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Icon.SetSpellIcon (ks['SpellResRef'])
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
@@ -194,11 +194,11 @@ def OpenMageSpellInfoWindow ():
 def OnMageMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton") - 100
 
-	if GemRB.MemorizeSpell (pc, type, level, index):
+	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow ()
 
 	# FIXME: use FLASH.bam
@@ -239,9 +239,9 @@ def OnMageUnmemorizeSpell (btn, index):
 	index = GemRB.GetVar ("SpellButton")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 
-	if GemRB.UnmemorizeSpell (pc, type, level, index):
+	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow ()
 
 ###################################################

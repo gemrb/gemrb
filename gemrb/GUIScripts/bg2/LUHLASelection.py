@@ -276,16 +276,16 @@ def HLAMarkButton (i, select):
 	j = ( GemRB.GetVar("HLATopIndex") + 1 ) * 5 - 5
 
 	if select:
-		type = IE_GUI_BUTTON_SELECTED
+		state = IE_GUI_BUTTON_SELECTED
 	else:
 		if HLAAbilities[i][1]:
-			type = IE_GUI_BUTTON_ENABLED
+			state = IE_GUI_BUTTON_ENABLED
 		else: # can't learn
-			type = IE_GUI_BUTTON_LOCKED
+			state = IE_GUI_BUTTON_LOCKED
 
 	# we have to use the index on the actual grid
 	SpellButton = HLAWindow.GetControl(i-j)
-	SpellButton.SetState(type)
+	SpellButton.SetState(state)
 	return
 
 def GetHLAs ():

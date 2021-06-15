@@ -555,19 +555,19 @@ def MarkButton (i, select):
 	j = RowIndex()
 
 	if select:
-		type = IE_GUI_BUTTON_SELECTED
+		state = IE_GUI_BUTTON_SELECTED
 	else:
 		if Spells[SpellLevel][i][1] == 1:
-			type = IE_GUI_BUTTON_ENABLED
+			state = IE_GUI_BUTTON_ENABLED
 		elif Spells[SpellLevel][i][1] == 2:
 			# specialist spell
-			type = IE_GUI_BUTTON_FAKEDISABLED
+			state = IE_GUI_BUTTON_FAKEDISABLED
 		else: # can't learn
-			type = IE_GUI_BUTTON_LOCKED
+			state = IE_GUI_BUTTON_LOCKED
 
 	# we have to use the index on the actual grid
 	SpellButton = SpellsWindow.GetControl(i+SpellStart-j)
-	SpellButton.SetState(type)
+	SpellButton.SetState(state)
 	return
 
 def ShowSelectedSpells ():

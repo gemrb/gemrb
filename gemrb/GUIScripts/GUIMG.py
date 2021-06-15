@@ -111,9 +111,9 @@ def UpdateMageWindow (MageWindow):
 	MageKnownSpellList = []
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
-	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, spelltype, level, 1)
 	
 	CantCast = CommonTables.ClassSkills.GetValue (GUICommon.GetClassRowName (pc), "MAGESPELL") == "*"
 	GUICommon.AdjustWindowVisibility (MageWindow, pc, CantCast)
@@ -130,15 +130,15 @@ def UpdateMageWindow (MageWindow):
 	Label = MageWindow.GetControl (0x10000035)
 	Label.SetText (Name)
 
-	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
-	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, True)
+	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
+	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
+	true_mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, True)
 	if not Sorcerer:
 		for i in range (12):
 			Button = MageWindow.GetControl (3 + i)
 
 			if i < mem_cnt:
-				ms = GemRB.GetMemorizedSpell (pc, type, level, i)
+				ms = GemRB.GetMemorizedSpell (pc, spelltype, level, i)
 				Button.SetSpellIcon (ms['SpellResRef'], 0)
 				Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 				Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
@@ -176,7 +176,7 @@ def UpdateMageWindow (MageWindow):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")
 		
-		ks = GemRB.GetKnownSpell (pc, type, level, i)
+		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageMemorizeSpell)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, OpenMageSpellInfoWindow)
@@ -291,19 +291,19 @@ def OpenMageSpellInfoWindow ():
 def OnMageMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton") - 100
 	blend = 1
 	if GameCheck.IsBG2():
 		blend = 0
 
-	if GemRB.MemorizeSpell (pc, type, level, index):
+	if GemRB.MemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_24")
 		Button = MageWindow.GetControl(index + 27)
 		Button.SetAnimation ("FLASH", 0, blend)
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level, False)
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, spelltype, level, False)
 		Button = MageWindow.GetControl(mem_cnt + 2)
 		Button.SetAnimation ("FLASH", 0, blend)
 	return
@@ -379,13 +379,13 @@ def OnMageUnmemorizeSpell (btn, index):
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 
 	blend = 1
 	if GameCheck.IsBG2():
 		blend = 0
 
-	if GemRB.UnmemorizeSpell (pc, type, level, index):
+	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
 		UpdateMageWindow (MageWindow)
 		GemRB.PlaySound ("GAM_44")
 		Button = MageWindow.GetControl(index + 3)
@@ -398,12 +398,12 @@ def OnMageRemoveSpell ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
-	type = IE_SPELL_TYPE_WIZARD
+	spelltype = IE_SPELL_TYPE_WIZARD
 
 	index = GemRB.GetVar ("SpellButton")-100
 
 	#remove spell from book
-	GemRB.RemoveSpell (pc, type, level, index)
+	GemRB.RemoveSpell (pc, spelltype, level, index)
 	UpdateMageWindow (MageWindow)
 	return
 
@@ -585,7 +585,7 @@ def UpdateSpellList ():
 		OkButton.SetState (IE_GUI_BUTTON_ENABLED)
 	return
 
-def BuildSpellList (pc, type, level):
+def BuildSpellList (pc, spelltype, level):
 	global SpellList
 
 	import Spellbook
@@ -594,7 +594,7 @@ def BuildSpellList (pc, type, level):
 		LoadExclusions()
 
 	SpellList = {}
-	memoedSpells = Spellbook.GetMemorizedSpells (pc, type, level)
+	memoedSpells = Spellbook.GetMemorizedSpells (pc, spelltype, level)
 
 	# are we a sorcerer-style?
 	SorcererBook = Spellbook.HasSorcererBook (pc)

@@ -66,12 +66,12 @@ MENU_MODE_DIALOG = 6
 float_menu_mode = MENU_MODE_SINGLE
 float_menu_index = 0
 float_menu_selected = None
-type = None
+spelltype = None
 
 def UseSpell ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	slot = float_menu_selected+float_menu_index
-	print("spell", type, slot)
+	print("spell", spelltype, slot)
 	GemRB.SpellCast (pc, 1<<type, slot)
 	return
 
@@ -348,21 +348,21 @@ def RefreshSpellList(pc, innate):
 	global spell_list, type
 
 	if innate:
-		type = IE_SPELL_TYPE_INNATE
+		spelltype = IE_SPELL_TYPE_INNATE
 	else:
 		ClassName = GUICommon.GetClassRowName (pc)
 		if CommonTables.ClassSkills.GetValue (ClassName, "CLERICSPELL") == "*":
-			type = IE_SPELL_TYPE_WIZARD
+			spelltype = IE_SPELL_TYPE_WIZARD
 		else:
-			type = IE_SPELL_TYPE_PRIEST
+			spelltype = IE_SPELL_TYPE_PRIEST
 
-	type = 1<<type
+	spelltype = 1 << spelltype
 	spell_list = []
 	for i in range(16):
-		if type & (1<<i):
+		if spelltype & (1<<i):
 			spell_list += Spellbook.GetUsableMemorizedSpells (pc, i)
 
-	GemRB.SetVar ("Type", type)
+	GemRB.SetVar ("Type", spelltype)
 	GemRB.SetVar ("QSpell", -1)
 	return
 
