@@ -4,7 +4,7 @@
 .\"###################################################
 .SH NAME
 GemRB
-\- emulator for Infinity Engine-based games
+\- a reimplementation of the Infinity Engine
 
 .\"###################################################
 .SH SYNOPSIS
@@ -21,8 +21,8 @@ GemRB
 .\"###################################################
 .SH DESCRIPTION
 .B GemRB
-is an emulator for Infinity Engine-based games, fine RPGs like Baldur's Gate,
-Icewind Dale and Planescape: Torment.
+a portable open-source implementation of Bioware’s Infinity Engine, which runs 
+fine RPGs like Baldur's Gate, Icewind Dale and Planescape: Torment.
 
 .B GemRB
 reimplements only the game engine. To actually play anything, you have to have
@@ -528,7 +528,7 @@ The GemRB Project development team at https://gemrb.org
 
 .\"###################################################
 .SH COPYING
-Copyright (C) 2003-2020 The GemRB Project
+Copyright (C) 2003-2021 The GemRB Project
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
