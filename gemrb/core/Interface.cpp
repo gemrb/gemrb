@@ -506,6 +506,13 @@ void Interface::HandleFlags()
 {
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
+
+	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		winmgr->DestroyAllWindows();
+		// when reaching this, quitflag should be 1 or 2
+		// if Exitgame was set, we'll set Start.py too
+		QuitGame (QuitFlag&QF_EXITGAME);
+	}
 	
 	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
 		delete winmgr->GetGameWindow()->RemoveSubview(gamectrl);
@@ -513,13 +520,6 @@ void Interface::HandleFlags()
 		winmgr->GetGameWindow()->SetVisible(false);
 		//clear cutscenes; clear fade/screenshake effects
 		timer = GlobalTimer();
-	}
-
-	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
-		winmgr->DestroyAllWindows();
-		// when reaching this, quitflag should be 1 or 2
-		// if Exitgame was set, we'll set Start.py too
-		QuitGame (QuitFlag&QF_EXITGAME);
 		QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
 	}
 
