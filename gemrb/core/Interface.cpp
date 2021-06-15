@@ -508,6 +508,9 @@ void Interface::HandleFlags()
 	EventFlag = EF_CONTROL;
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		// closing windows must come before tearing anything else down
+		// some window close handlers expect game/gamecontrol to be valid
+		// let them run, then start tearing things down
 		winmgr->DestroyAllWindows();
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
