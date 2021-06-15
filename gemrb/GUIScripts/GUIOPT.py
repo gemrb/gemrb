@@ -501,6 +501,7 @@ def QuitGamePress ():
 	GemRB.SetVar ("SelectedWindow", 0)
 	CloseQuitMsgWindow()
 
+	GUICommonWindows.CloseTopWindow ()
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ("Start")
 	return
