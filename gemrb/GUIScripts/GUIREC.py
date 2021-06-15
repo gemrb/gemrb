@@ -424,9 +424,10 @@ def GetEffectIcons(pc,LevelDiff):
 	# but don't display them in levelup stat view
 	if sum (LevelDiff) == 0:
 		effects = GemRB.GetPlayerStates (pc)
+		print(222, effects)
 		if len (effects):
 			for c in effects:
-				c2 = str(c)
+				c2 = "".join(chr(x) for x in bytes([c]))
 				if not isinstance(c, int):
 					c2 = c
 					c = ord(c)
@@ -772,8 +773,6 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif type == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				if isinstance(val, int):
-					val = str(val)
 				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif type == 'b': #strref is an already resolved string
