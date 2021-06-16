@@ -1848,7 +1848,7 @@ def UpdateAnimatedPortrait (Window,i):
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
-		ratio = hp / hp_max
+		ratio = hp / float(hp_max)
 		if ratio > 1.0: ratio = 1.0
 
 	r = int (255 * (1.0 - ratio))

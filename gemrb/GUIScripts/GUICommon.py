@@ -693,7 +693,7 @@ def SetupDamageInfo (pc, Button, Window):
 	if hp_max < 1 or hp == "?":
 		ratio = 0.0
 	else:
-		ratio = hp / hp_max
+		ratio = hp / float(hp_max)
 
 	if hp < 1 or (state & STATE_DEAD):
 		c = {'r' : 64, 'g' : 64, 'b' : 64, 'a' : 255}
