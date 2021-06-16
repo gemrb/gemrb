@@ -459,7 +459,7 @@ def ProfsLeftPress(btn, val):
 	ProfsCallback ()
 	return
 
-def ProfsSave (pc, type=LUPROFS_TYPE_LEVELUP):
+def ProfsSave (pc, proftype = LUPROFS_TYPE_LEVELUP):
 	"""Updates the actor with the new proficiencies."""
 
 	ProfCount = ProfsTable.GetRowCount () - ProfsTableOffset
