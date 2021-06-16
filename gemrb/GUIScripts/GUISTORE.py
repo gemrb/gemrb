@@ -1805,7 +1805,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 	# depreciation works like this:
 	# - if you sell the item the first time, SellMarkup is used;
 	# - if you sell the item the second time, SellMarkup-DepreciationRate is used;
-	# - if you sell the item any more times, SellMarkup-2*DepreciationRate is used.
+	# - if you sell the item any more times (N), SellMarkup-N*DepreciationRate is used.
+	# NB: there is a minimal price of 20 %, regardless of the amount of depreciation
 	# If the storekeep has an infinite amount of the item, only SellMarkup is used.
 	# The amount of items sold at the same time doesn't matter! Selling three bows
 	# separately will produce less gold then selling them at the same time.
@@ -1818,9 +1819,11 @@ def GetRealPrice (pc, mode, Item, Slot):
 			                    CommonTables.ItemType.GetRowIndex ("RING"),
 			                    CommonTables.ItemType.GetRowIndex ("AMULET")]:
 				count = 0
-			if count > 2:
-				count = 2
-			mod -= count * Store['Depreciation']
+			# give at least 20 %
+			if count * Store['Depreciation'] > 80:
+				mod = 20
+			else:
+				mod -= count * Store['Depreciation']
 	else:
 		# charisma modifier (in percent)
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
