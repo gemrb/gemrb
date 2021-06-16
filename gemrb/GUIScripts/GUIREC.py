@@ -427,9 +427,10 @@ def GetEffectIcons(pc,LevelDiff):
 		print(222, effects)
 		if len (effects):
 			for c in effects:
-				c2 = "".join(chr(x) for x in bytes([c]))
-				if not isinstance(c, int):
-					c2 = c
+				c2 = c
+				if isinstance(c, int):
+					c2 = "".join(chr(x) for x in bytes([c]))
+				else:
 					c = ord(c)
 				tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION")
 				stats.append ((tmp, c2, 'a'))
