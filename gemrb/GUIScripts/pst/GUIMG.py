@@ -112,6 +112,7 @@ def UpdateMageWindow (Window=None):
 	print("mem_cnt is:     ", mem_cnt)
 	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
 	btncount = 20
+	i = 0
 	for i in range (known_cnt):
 		Icon = Window.GetControl (14 + i)
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
@@ -122,7 +123,8 @@ def UpdateMageWindow (Window=None):
 		spell = GemRB.GetSpell (ks['SpellResRef'])
 		Icon.SetTooltip (spell['SpellName'])
 		MageKnownSpellList.append (ks['SpellResRef'])
-			
+
+	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)

@@ -172,6 +172,7 @@ def UpdateMageWindow (MageWindow):
 			label.SetText ("")
 	
 	btncount = GUICommon.GetGUISpellButtonCount()
+	i = 0
 	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")
@@ -187,6 +188,7 @@ def UpdateMageWindow (MageWindow):
 			continue
 		Button.SetTooltip (spell['SpellName'])
 
+	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")

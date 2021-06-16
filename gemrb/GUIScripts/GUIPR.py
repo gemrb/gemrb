@@ -139,6 +139,7 @@ def UpdatePriestWindow (Window):
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, spelltype, level)
 	btncount = GUICommon.GetGUISpellButtonCount()
+	i = 0
 	for i in range (known_cnt):
 		Button = Window.GetControl (27 + i)
 		Button.SetAnimation ("")
@@ -151,7 +152,8 @@ def UpdatePriestWindow (Window):
 		Button.SetTooltip (spell['SpellName'])
 		PriestKnownSpellList.append (ks['SpellResRef'])
 		Button.SetVarAssoc ("SpellButton", 100 + i)
-			
+
+	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Button = Window.GetControl (27 + i)
 		Button.SetAnimation ("")
