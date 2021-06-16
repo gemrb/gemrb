@@ -152,7 +152,7 @@ def UpdatePriestWindow (Window):
 		PriestKnownSpellList.append (ks['SpellResRef'])
 		Button.SetVarAssoc ("SpellButton", 100 + i)
 			
-	for i in range (i, btncount):
+	for i in range (i + 1, btncount):
 		Button = Window.GetControl (27 + i)
 		Button.SetAnimation ("")
 		

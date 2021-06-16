@@ -123,7 +123,7 @@ def UpdateMageWindow (Window=None):
 		Icon.SetTooltip (spell['SpellName'])
 		MageKnownSpellList.append (ks['SpellResRef'])
 			
-	for i in range (i, btncount):
+	for i in range (i + 1, btncount):
 		Icon = Window.GetControl (14 + i)
 		Icon.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Icon.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)

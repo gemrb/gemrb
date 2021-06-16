@@ -186,8 +186,8 @@ def UpdateMageWindow (MageWindow):
 			print("Missing known spell!", ms['SpellResRef'])
 			continue
 		Button.SetTooltip (spell['SpellName'])
-	
-	for i in range (i, btncount):
+
+	for i in range (i + 1, btncount):
 		Button = MageWindow.GetControl (27 + i)
 		Button.SetAnimation ("")
 		
