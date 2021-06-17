@@ -237,6 +237,15 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
 }
 
+void SDL20VideoDriver::RefreshSDLRenderState()
+{
+	// there is no direct way to do this, but drawing a primitive will change the shader
+	// changing the renderer blendmode will force that update too
+	// there are other things we would need to reset if changed, but these 2 are the ones we cahnge behind its back currently
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+	SDL_RenderDrawPoint(renderer, -1, -1);
+}
+
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 {
 	// TODO: add support for BlitFlags::HALFTRANS, BlitFlags::COLOR_MOD, and others (no use for them ATM)
@@ -317,10 +326,6 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 #if SDL_VERSION_ATLEAST(2, 0, 10)
 		SDL_RenderFlush(renderer);
 #endif
-
-		GLint previous_program;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
-
 		GLint channel = 3;
 		if (flags&BlitFlags::STENCIL_RED) {
 			channel = 0;
@@ -345,7 +350,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 
 		SDL_GL_UnbindTexture(stencilTex);
-		glUseProgram(previous_program);
+		RefreshSDLRenderState();
 #else
 		// alpha masking only
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
