@@ -2198,19 +2198,11 @@ void CharAnimations::AddMHRSuffix(char *dest, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_PST_START:
+		case IE_ANI_EMERGE: // I cannot find an emerge animation... Maybe it is Die reversed
 			strcat(dest, "g1");
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 48 + Orient;
 			break;
-
-			//I cannot find an emerge animation...
-			//Maybe is Die reversed
-		case IE_ANI_EMERGE:
-			strcat(dest, "g1");
-			strcpy( EquipData->Suffix, "g1" );
-			Cycle = 48 + Orient;
-			break;
-
 		case IE_ANI_HEAD_TURN:
 			strcat(dest, "g1");
 			strcpy( EquipData->Suffix, "g1" );
@@ -2602,12 +2594,9 @@ void CharAnimations::AddLR3Suffix( char *dest, unsigned char StanceID,
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_JAB: //there is no third attack animation
 			strcat(dest, "g2");
 			Cycle = 8 + Orient / 2;
-			break;
-		case IE_ANI_ATTACK_JAB:
-			strcat(dest, "g2");
-			Cycle = 8 + Orient / 2;  //there is no third attack animation
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
