@@ -203,13 +203,13 @@ public:
 	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
 	void SetCutSceneMode(bool active);
-	void TryToAttack(Actor *source, const Actor *target);
+	void TryToAttack(Actor *source, const Actor *target) const;
 	void TryToCast(Actor *source, const Point &p);
 	void TryToCast(Actor *source, const Actor *target);
-	void TryToDefend(Actor *source, const Actor *target);
-	void TryToTalk(Actor *source, const Actor *target);
-	void TryToPick(Actor *source, const Scriptable *tgt);
-	void TryToDisarm(Actor *source, const InfoPoint *tgt);
+	void TryToDefend(Actor *source, const Actor *target) const;
+	void TryToTalk(Actor *source, const Actor *target) const;
+	void TryToPick(Actor *source, const Scriptable *tgt) const;
+	void TryToDisarm(Actor *source, const InfoPoint *tgt) const;
 	void PerformActionOn(Actor *actor);
 	void ResetTargetMode();
 	void UpdateTargetMode();
@@ -222,14 +222,14 @@ public:
 
 	void MakeSelection(bool extend = false);
 	void InitFormation(const Point &);
-	Point GetFormationOffset(ieDword formation, ieDword pos);
+	Point GetFormationOffset(ieDword formation, ieDword pos) const;
 	/** calls MoveToPoint or RunToPoint */
-	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false);
+	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false) const;
 	/** checks if the actor should be running instead of walking */
 	bool CanRun(const Actor *actor) const;
 	bool ShouldRun(const Actor *actor) const;
 	/** Displays a string over an object */
-	void DisplayString(Scriptable* target);
+	void DisplayString(const Scriptable* target) const;
 	/** Displays a string on screen */
 	void DisplayString(const Point &p, const char *Text);
 	Actor *GetLastActor();
@@ -257,7 +257,7 @@ protected:
 	bool OnTouchGesture(const GestureEvent& gesture) override;
 
 	/** Currently only deals with the GEM_TAB exception */
-	bool DispatchEvent(const Event& event);
+	bool DispatchEvent(const Event& event) const;
 	
 	/** Mouse Button Down */
 	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short Mod) override;

@@ -337,7 +337,7 @@ public:
 	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetOverheadText(const String& text, bool display = true);
-	const String& GetOverheadText() { return OverheadText; };
+	const String& GetOverheadText() const { return OverheadText; };
 	bool DisplayOverheadText(bool);
 	bool OverheadTextIsDisplaying() const { return overheadTextDisplaying; }
 	void FixHeadTextPos();

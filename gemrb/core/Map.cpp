@@ -112,7 +112,7 @@ void Map::ReleaseMemory()
 	}
 }
 
-static inline AnimationObjectType SelectObject(Actor *actor, int q, const AreaAnimation *a, VEFObject *sca, Particles *spark, Projectile *pro, Container *pile)
+static inline AnimationObjectType SelectObject(const Actor *actor, int q, const AreaAnimation *a, const VEFObject *sca, const Particles *spark, const Projectile *pro, const Container *pile)
 {
 	int actorh;
 	if (actor) {
@@ -372,7 +372,7 @@ Map::~Map(void)
 	free( MaterialMap );
 
 	//close the current container if it was owned by this map, this avoids a crash
-	Container *c = core->GetCurrentContainer();
+	const Container *c = core->GetCurrentContainer();
 	if (c && c->GetCurrentArea()==this) {
 		core->CloseCurrentContainer();
 	}
@@ -474,7 +474,7 @@ void Map::AutoLockDoors() const
 	GetTileMap()->AutoLockDoors();
 }
 
-void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor)
+void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const
 {
 	char command[256];
 
@@ -487,7 +487,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 		//copy the area name if it exists on the worldmap
 		unsigned int index;
 
-		WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area, index);
+		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area, index);
 		if (entry) {
 			memcpy (game->PreviousArea, entry->AreaName, 8);
 		}
@@ -590,7 +590,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)
 {
-	Game *game=core->GetGame();
+	const Game *game = core->GetGame();
 
 	int EveryOne = ip->CheckTravel(actor);
 	switch(EveryOne) {
@@ -626,7 +626,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 //Draw two overlapped animations to achieve the original effect
 //PlayOnce makes sure that if we stop drawing them, they will go away
-void Map::DrawPortal(InfoPoint *ip, int enable)
+void Map::DrawPortal(const InfoPoint *ip, int enable)
 {
 	ieDword gotportal = HasVVCCell(PortalResRef, ip->Pos);
 
@@ -757,7 +757,7 @@ void Map::UpdateScripts()
 		} else if (actor->GetStep() && actor->GetSpeed()) {
 			// Make actors pathfind if there are others nearby
 			// in order to avoid bumping when possible
-			Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
+			const Actor* nearActor = GetActorInRadius(actor->Pos, GA_NO_DEAD|GA_NO_UNSCHEDULED, actor->GetAnims()->GetCircleSize());
 			if (nearActor && nearActor != actor) {
 				actor->NewPath();
 			}
@@ -854,7 +854,7 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-void Map::ResolveTerrainSound(ieResRef &sound, Point &Pos) const
+void Map::ResolveTerrainSound(ieResRef &sound, const Point &Pos) const
 {
 	for(int i=0;i<tsndcount;i++) {
 		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
@@ -1132,7 +1132,7 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 	}
 }
 
-void Map::DrawHighlightables(const Region& viewport)
+void Map::DrawHighlightables(const Region& viewport) const
 {
 	// NOTE: piles are drawn in the main queue
 	unsigned int i = 0;
@@ -1441,7 +1441,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		case AOT_PILE:
 			// draw piles
 			if (!bgoverride) {
-				Container* c = TMap->GetContainer(pileidx-1);
+				const Container* c = TMap->GetContainer(pileidx - 1);
 				
 				BlitFlags flags = SetDrawingStencilForScriptable(c, viewport);
 				flags |= BlitFlags::COLOR_MOD | BlitFlags::BLENDED;
@@ -1888,7 +1888,7 @@ void Map::UpdateEffects()
 	}
 }
 
-void Map::Shout(Actor* actor, int shoutID, bool global)
+void Map::Shout(const Actor* actor, int shoutID, bool global) const
 {
 	for (auto listener : actors) {
 		// skip the shouter, so gpshout's InMyGroup(LastHeardBy(Myself)) can get two distinct actors
@@ -1971,10 +1971,10 @@ void Map::ActorSpottedByPlayer(const Actor *actor) const
 // actors were already seen on the map.  We used to check AnyPCInCombat,
 // which is less reliable.  Returns true if this is a hostile enemy
 // that should trigger pause.
-bool Map::HandleAutopauseForVisible(Actor *actor, bool do_pause)
+bool Map::HandleAutopauseForVisible(Actor *actor, bool doPause) const
 {
 	if (actor->Modified[IE_EA] > EA_EVILCUTOFF && !(actor->GetInternalFlag() & IF_STOPATTACK)) {
-		if (do_pause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
+		if (doPause && !(actor->GetInternalFlag() & IF_TRIGGER_AP))
 			core->Autopause(AP_ENEMY, actor);
 		actor->SetInternalFlag(IF_TRIGGER_AP, OP_OR);
 		return true;
@@ -2284,7 +2284,7 @@ void Map::PurgeArea(bool items)
 			Container *c = TMap->GetContainer(i);
 			unsigned int j=c->inventory.GetSlotCount();
 			while (j--) {
-				CREItem *itemslot = c->inventory.GetSlotItem(j);
+				const CREItem *itemslot = c->inventory.GetSlotItem(j);
 				if (itemslot->Flags&IE_INV_ITEM_CRITICAL) {
 					continue;
 				}
@@ -2738,7 +2738,7 @@ void Map::GenerateQueues()
 }
 
 //the original qsort implementation was flawed
-void Map::SortQueues()
+void Map::SortQueues() const
 {
 	for (int q=0;q<QUEUE_COUNT;q++) {
 		Actor **baseline=queue[q];
@@ -2861,7 +2861,7 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 	return sp;
 }
 
-void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
+void Map::AddEntrance(const char* Name, int XPos, int YPos, short Face)
 {
 	Entrance* ent = new Entrance();
 	strlcpy( ent->Name, Name, sizeof(ent->Name) );
@@ -2883,7 +2883,7 @@ Entrance *Map::GetEntrance(const char *Name) const
 
 bool Map::HasActor(const Actor *actor) const
 {
-	for (Actor *act : actors) {
+	for (const Actor *act : actors) {
 		if (act == actor) {
 			return true;
 		}
@@ -3098,7 +3098,7 @@ int Map::WhichEdge(const Point &s) const
 }
 
 //--------ambients----------------
-void Map::SetupAmbients()
+void Map::SetupAmbients() const
 {
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 	if (!ambim) return;
@@ -3173,7 +3173,7 @@ void Map::LoadIniSpawn()
 bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, int radiusy, ieWord rwdist, int *difficulty, unsigned int *creCount)
 {
 	bool spawned = false;
-	SpawnGroup *sg = NULL;
+	const SpawnGroup *sg = nullptr;
 	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
@@ -3313,7 +3313,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	for (int i=0;i<hours;i++) {
 		if (interrupt) {
 			int idx = RAND(0, RestHeader.CreatureNum-1);
-			Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
+			const Actor *creature = gamedata->GetCreature(RestHeader.CreResRef[idx]);
 			if (!creature) {
 				core->GetGame()->AdvanceTime(core->Time.hour_size);
 				continue;
@@ -3506,7 +3506,7 @@ int Map::ConsolidateContainers()
 
 //Pos could be [-1,-1] in which case it copies the ground piles to their
 //original position in the second area
-void Map::CopyGroundPiles(Map *othermap, const Point &Pos)
+void Map::CopyGroundPiles(Map *othermap, const Point &Pos) const
 {
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
@@ -3551,7 +3551,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 				skipped--;
 				continue;
 			}
-			CREItem *otheritem = pile->inventory.GetSlotItem(slot);
+			const CREItem *otheritem = pile->inventory.GetSlotItem(slot);
 			if (otheritem->Usages[0] == otheritem->MaxStackAmount) {
 				// already full (or nonstackable), nothing to do here
 				skipped--;
@@ -3596,7 +3596,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 
 	// sort by removing all items that have copies and readding them at the end
 	while (i--) {
-		CREItem *item = othercontainer->inventory.GetSlotItem(i);
+		const CREItem *item = othercontainer->inventory.GetSlotItem(i);
 		int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
 		if (count == 1) continue;
 
@@ -3692,7 +3692,7 @@ int Map::GetWeather() const
 	return WB_NORMAL;
 }
 
-void Map::FadeSparkle(const Point &pos, bool forced)
+void Map::FadeSparkle(const Point &pos, bool forced) const
 {
 	for (auto particle : particles) {
 		if (particle->MatchPos(pos)) {
@@ -3768,9 +3768,9 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 }
 
 //remove flags from actor if it has left the trigger area it had last entered
-void Map::ClearTrap(Actor *actor, ieDword InTrap)
+void Map::ClearTrap(Actor *actor, ieDword InTrap) const
 {
-	InfoPoint *trap = TMap->GetInfoPoint(InTrap);
+	const InfoPoint *trap = TMap->GetInfoPoint(InTrap);
 	if (!trap) {
 		actor->SetInTrap(0);
 	} else {
@@ -3844,7 +3844,7 @@ AreaAnimation::AreaAnimation()
 	PaletteRef[0] = 0;
 }
 
-AreaAnimation::AreaAnimation(AreaAnimation *src)
+AreaAnimation::AreaAnimation(const AreaAnimation *src)
 {
 	animcount = src->animcount;
 	sequence = src->sequence;
@@ -3987,7 +3987,7 @@ Region AreaAnimation::DrawingRegion() const
 	Region r(Pos, Size());
 	int ac = animcount;
 	while (ac--) {
-		Animation *anim = animation[ac];
+		const Animation *anim = animation[ac];
 		Region animRgn = anim->animArea;
 		animRgn.x += Pos.x;
 		animRgn.y += Pos.y;

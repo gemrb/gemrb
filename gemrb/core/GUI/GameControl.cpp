@@ -160,7 +160,7 @@ void GameControl::ReadFormations() const
 //returns a single point offset for a formation
 //formation: the formation type
 //pos: the actor's slot ID
-Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
+Point GameControl::GetFormationOffset(ieDword formation, ieDword pos) const
 {
 	if (formation>=formationcount) formation = 0;
 	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
@@ -171,7 +171,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 {
 	Point vec;
 	
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 	assert(area);
 
@@ -287,7 +287,7 @@ void GameControl::ClearMouseState()
 
 // generate an action to do the actual movement
 // only PST supports RunToPoint
-void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun)
+void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool tryToRun) const
 {
 	char Tmp[256];
 	Action *action = NULL;
@@ -429,7 +429,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	
 	// handle keeping the actor in the spotlight, but only when unpaused
 	if ((ScreenFlags & SF_ALWAYSCENTER) && update_scripts) {
-		Actor *star = core->GetFirstSelectedActor();
+		const Actor *star = core->GetFirstSelectedActor();
 		if (star) {
 			moveX = star->Pos.x - vpOrigin.x - frame.w/2;
 			moveY = star->Pos.y - vpOrigin.y - frame.h/2;
@@ -466,7 +466,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		window->SetCursor(NULL);
 	}
 
-	Map* area = CurrentArea();
+	const Map* area = CurrentArea();
 	assert(area);
 
 	Actor **ab;
@@ -491,7 +491,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 /** Draws the Control on the Output Display */
 void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 {
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();
 
 	// FIXME: some of this should happen during mouse events
@@ -577,7 +577,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	area->DrawMap(Viewport(), DebugFlags);
 
 	if (trackerID) {
-		Actor *actor = area->GetActorByGlobalID(trackerID);
+		const Actor *actor = area->GetActorByGlobalID(trackerID);
 
 		if (actor) {
 			std::vector<Actor*> monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, distance);
@@ -592,7 +592,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	}
 
 	if (lastActorID) {
-		Actor* actor = GetLastActor();
+		const Actor* actor = GetLastActor();
 		if (actor) {
 			DrawArrowMarker(actor->Pos, ColorGreen);
 		}
@@ -618,7 +618,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 	} else {
 		int max = game->GetPartySize(false);
 		for (int idx = 1; idx <= max; idx++) {
-			Actor* actor = game->FindPC(idx);
+			const Actor* actor = game->FindPC(idx);
 			assert(actor);
 			if (actor->ShouldDrawReticle()) {
 				DrawTargetReticle(actor, actor->Destination - vpOrigin);
@@ -668,9 +668,9 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 // this existly only so tab can be handled
 // it's used both for tooltips everywhere and hp display on game control
-bool GameControl::DispatchEvent(const Event& event)
+bool GameControl::DispatchEvent(const Event& event) const
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) return false;
 
 	if (event.keyboard.keycode == GEM_TAB) {
@@ -921,7 +921,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					// so if we don't have an actor, we make really really sure by checking manually
 					unsigned int count = area->GetActorCount(true);
 					while (count--) {
-						Actor *actor = area->GetActor(count, true);
+						const Actor *actor = area->GetActor(count, true);
 						if (actor->IsOver(gameMousePos)) {
 							actor->GetAnims()->DebugDump();
 						}
@@ -941,7 +941,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					// so if we don't have an actor, we make really really sure by checking manually
 					unsigned int count = area->GetActorCount(true);
 					while (count--) {
-						Actor *actor = area->GetActor(count, true);
+						const Actor *actor = area->GetActor(count, true);
 						if (actor->IsOver(gameMousePos)) {
 							actor->dump();
 						}
@@ -1112,7 +1112,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 		}
 		return true; //return from cheatkeys
 	}
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	switch (Key.keycode) {
 //FIXME: move these to guiscript
 		case ' ': //soft pause
@@ -1138,7 +1138,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 }
 
 String GameControl::TooltipText() const {
-	Map* area = CurrentArea();
+	const Map* area = CurrentArea();
 	if (area == NULL) {
 		return View::TooltipText();
 	}
@@ -1148,7 +1148,7 @@ String GameControl::TooltipText() const {
 		return View::TooltipText();
 	}
 
-	Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+	const Actor* actor = area->GetActor(gameMousePos, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 	if (actor == NULL) {
 		return View::TooltipText();
 	}
@@ -1314,7 +1314,7 @@ Holder<Sprite2D> GameControl::Cursor() const
 /** Mouse Over Event */
 bool GameControl::OnMouseOver(const MouseEvent& /*me*/)
 {
-	Map* area = CurrentArea();
+	const Map* area = CurrentArea();
 	if (area == NULL) {
 		return false;
 	}
@@ -1405,7 +1405,7 @@ void GameControl::UpdateCursor()
 		return;
 	}
 
-	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
+	const Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 	if (lastActor) {
 		// don't change the cursor for birds
 		if (lastActor->GetStat(IE_DONOTJUMP) == DNJ_BIRD) return;
@@ -1674,7 +1674,7 @@ void GameControl::MoveViewportUnlockedTo(Point p, bool center)
 
 bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 {
-	Map* area = CurrentArea();
+	const Map* area = CurrentArea();
 	bool canMove = area != NULL;
 
 	if (updateVPTimer && speed) {
@@ -1703,7 +1703,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		Region mwinframe;
-		TextArea* mta = core->GetMessageTextArea();
+		const TextArea* mta = core->GetMessageTextArea();
 		if (mta) {
 			mwinframe = mta->GetWindow()->Frame();
 		}
@@ -1735,14 +1735,14 @@ Region GameControl::Viewport() const
 }
 
 //generate action code for source actor to try to attack a target
-void GameControl::TryToAttack(Actor *source, const Actor *tgt)
+void GameControl::TryToAttack(Actor *source, const Actor *tgt) const
 {
 	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	source->CommandActor(GenerateActionDirect( "NIDSpecial3()", tgt));
 }
 
 //generate action code for source actor to try to defend a target
-void GameControl::TryToDefend(Actor *source, const Actor *tgt)
+void GameControl::TryToDefend(Actor *source, const Actor *tgt) const
 {
 	source->SetModal(MS_NONE);
 	source->CommandActor(GenerateActionDirect( "NIDSpecial4()", tgt));
@@ -1751,7 +1751,7 @@ void GameControl::TryToDefend(Actor *source, const Actor *tgt)
 // generate action code for source actor to try to pick pockets of a target (if an actor)
 // else if door/container try to pick a lock/disable trap
 // The -1 flag is a placeholder for dynamic target IDs
-void GameControl::TryToPick(Actor *source, const Scriptable *tgt)
+void GameControl::TryToPick(Actor *source, const Scriptable *tgt) const
 {
 	source->SetModal(MS_NONE);
 	const char* cmdString = NULL;
@@ -1775,7 +1775,7 @@ void GameControl::TryToPick(Actor *source, const Scriptable *tgt)
 }
 
 //generate action code for source actor to try to disable trap (only trap type active regions)
-void GameControl::TryToDisarm(Actor *source, const InfoPoint *tgt)
+void GameControl::TryToDisarm(Actor *source, const InfoPoint *tgt) const
 {
 	if (tgt->Type!=ST_PROXIMITY) return;
 
@@ -1911,7 +1911,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 }
 
 //generate action code for source actor to use talk to target actor
-void GameControl::TryToTalk(Actor *source, const Actor *tgt)
+void GameControl::TryToTalk(Actor *source, const Actor *tgt) const
 {
 	if (source->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	//Nidspecial1 is just an unused action existing in all games
@@ -1964,8 +1964,8 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
-		Point *p = door->toOpen;
-		Point *otherp = door->toOpen+1;
+		const Point *p = door->toOpen;
+		const Point *otherp = door->toOpen+1;
 		if (Distance(*p,actor)>Distance(*otherp,actor)) {
 			p=otherp;
 		}
@@ -2069,8 +2069,8 @@ void GameControl::InitFormation(const Point &clickPoint)
 		return;
 	}
 
-	Game *game = core->GetGame();
-	Actor *selectedActor = core->GetFirstSelectedPC(false);
+	const Game *game = core->GetGame();
+	const Actor *selectedActor = core->GetFirstSelectedPC(false);
 	if (!selectedActor) {
 		selectedActor = game->selected[0];
 	}
@@ -2245,8 +2245,8 @@ void GameControl::PerformSelectedAction(const Point& p)
 	// TODO: consolidate the 'over' members into a single Scriptable*
 	// then we simply switch on its type
 
-	Game* game = core->GetGame();
-	Map* area = game->GetCurrentArea();
+	const Game* game = core->GetGame();
+	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
 
 	Actor* selectedActor = core->GetFirstSelectedPC(false);
@@ -2381,7 +2381,7 @@ void GameControl::Scroll(const Point& amt)
 
 void GameControl::PerformActionOn(Actor *actor)
 {
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 
 	//determining the type of the clicked actor
 	ieDword type = actor->GetStat(IE_EA);
@@ -2536,7 +2536,7 @@ void GameControl::SetCutSceneMode(bool active)
 
 //Create an overhead text over a scriptable target
 //Multiple texts are possible, as this code copies the text to a new object
-void GameControl::DisplayString(Scriptable* target)
+void GameControl::DisplayString(const Scriptable* target) const
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
 	scr->SetOverheadText(target->GetOverheadText());
@@ -2614,7 +2614,7 @@ void GameControl::SetDialogueFlags(unsigned int value, int mode)
 
 Map* GameControl::CurrentArea() const
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (game) {
 		return game->GetCurrentArea();
 	}
@@ -2624,7 +2624,7 @@ Map* GameControl::CurrentArea() const
 Actor *GameControl::GetLastActor()
 {
 	Actor* actor = NULL;
-	Map* area = CurrentArea();
+	const Map* area = CurrentArea();
 	if (area) {
 		actor = area->GetActorByGlobalID(lastActorID);
 	}
@@ -2634,7 +2634,7 @@ Actor *GameControl::GetLastActor()
 void GameControl::SetLastActor(Actor* lastActor)
 {
 	if (lastActorID) {
-		Map* area = CurrentArea();
+		const Map* area = CurrentArea();
 		if (area == NULL) {
 			return;
 		}

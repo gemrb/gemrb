@@ -320,7 +320,7 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
-	AreaAnimation(AreaAnimation *src);
+	AreaAnimation(const AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(ieResRef PaletteRef);
@@ -436,13 +436,13 @@ public:
 	void AddTileMap(TileMap *tm, Image *lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
 	void AutoLockDoors() const;
 	void UpdateScripts();
-	void ResolveTerrainSound(ieResRef &sound, Point &pos) const;
+	void ResolveTerrainSound(ieResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
 	int ConsolidateContainers();
 	/* transfers all piles (loose items) to another map */
-	void CopyGroundPiles(Map *othermap, const Point &Pos);
+	void CopyGroundPiles(Map *othermap, const Point &Pos) const;
 	/* transfers all ever visible piles (loose items) to the specified position */
 	void MoveVisibleGroundPiles(const Point &Pos);
 
@@ -465,9 +465,9 @@ public:
 		wallGroups = std::move(walls);
 	}
 	bool BehindWall(const Point&, const Region&) const;
-	void Shout(Actor* actor, int shoutID, bool global);
+	void Shout(const Actor* actor, int shoutID, bool global) const;
 	void ActorSpottedByPlayer(const Actor *actor) const;
-	bool HandleAutopauseForVisible(Actor *actor, bool);
+	bool HandleAutopauseForVisible(Actor *actor, bool) const;
 	void InitActors();
 	void InitActor(const Actor *actor);
 	void AddActor(Actor* actor, bool init);
@@ -534,10 +534,10 @@ public:
 	//fragment animation
 	void Sparkle(ieDword duration, ieDword color, ieDword type, const Point &pos, unsigned int FragAnimID = 0, int Zpos = 0);
 	//removes or fades the sparkle puff at a point
-	void FadeSparkle(const Point &pos, bool forced);
+	void FadeSparkle(const Point &pos, bool forced) const;
 
 	//entrances
-	void AddEntrance(char* Name, int XPos, int YPos, short Face);
+	void AddEntrance(const char* Name, int XPos, int YPos, short Face);
 	Entrance *GetEntrance(const char *Name) const;
 	Entrance *GetEntrance(int i) const { return entrances[i]; }
 	int GetEntranceCount() const { return (int) entrances.size(); }
@@ -592,7 +592,7 @@ public:
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
-	void SetupAmbients();
+	void SetupAmbients() const;
 	Ambient *GetAmbient(int i) const { return ambients[i]; }
 	ieWord GetAmbientCount(bool toSave = false) const;
 
@@ -623,10 +623,10 @@ public:
 	void TriggerSpawn(Spawn *spawn);
 
 	//move some or all players to a new area
-	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor);
+	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
 	bool HasWeather() const;
 	int GetWeather() const;
-	void ClearTrap(Actor *actor, ieDword InTrap);
+	void ClearTrap(Actor *actor, ieDword InTrap) const;
 
 	//tracking stuff
 	void SetTrackString(ieStrRef strref, int flg, int difficulty);
@@ -655,15 +655,15 @@ private:
 	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	
 	void DrawSearchMap(const Region &vp) const;
-	void DrawPortal(InfoPoint *ip, int enable);
-	void DrawHighlightables(const Region& viewport);
+	void DrawPortal(const InfoPoint *ip, int enable);
+	void DrawHighlightables(const Region& viewport) const;
 	void DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, const Region& viewport);
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point &p, const uint8_t*) const;
 	Point ConvertPointToFog(const Point &p) const;
 	
 	void GenerateQueues();
-	void SortQueues();
+	void SortQueues() const;
 	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
 	//actor uses travel region

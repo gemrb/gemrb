@@ -9111,12 +9111,12 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	if (!ItemName[0]) {
 		return PyInt_FromLong(0);
 	}
-	Item *item = gamedata->GetItem(ItemName, true);
+	const Item *item = gamedata->GetItem(ItemName, true);
 	if (!item) {
 		Log(MESSAGE, "GUIScript", "Cannot find item %s to check!", ItemName);
 		return PyInt_FromLong(0);
 	}
-	Actor* actor = NULL;
+	const Actor* actor = nullptr;
 	if (globalID) {
 		GET_GAME();
 
@@ -9286,7 +9286,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
 	int PartyID = 0;
-	Actor *actor = NULL;
+	const Actor *actor = nullptr;
 	PARSE_ARGS( args,  "s|i", &ResRef, &PartyID);
 	//it isn't a problem if actor not found
 	const Game *game = core->GetGame();
@@ -9297,7 +9297,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		actor = game->FindPC( PartyID );
 	}
 
-	Item* item = gamedata->GetItem(ResRef, true);
+	const Item* item = gamedata->GetItem(ResRef, true);
 	if (item == NULL) {
 		Log(MESSAGE, "GUIScript", "Cannot get item %s!", ResRef);
 		Py_RETURN_NONE;
@@ -11839,7 +11839,7 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	Actor *caster = NULL;
-	Map *map = game->GetCurrentArea();
+	const Map *map = game->GetCurrentArea();
 	if (map) caster = map->GetActorByGlobalID(casterID);
 	if (!caster) caster = game->GetActorByGlobalID(casterID);
 	if (!caster) caster = actor;
