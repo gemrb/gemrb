@@ -2239,7 +2239,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	stream->ReadLine( line, 1024 );
 	char *poi;
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
-	if (!strncmp(poi, "AC", 2)) {
+	if (strncmp(poi, "AC", 2) != 0) {
 		free(line);
 		return rE;
 	}
