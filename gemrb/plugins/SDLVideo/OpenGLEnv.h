@@ -24,7 +24,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 
 #ifdef __APPLE__
-	#include <OpenGL/gl3.h>
+	#include <OpenGL/gl.h>
 #else
 	#ifdef USE_OPENGL_API
 		#ifdef _WIN32
