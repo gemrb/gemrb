@@ -3605,7 +3605,12 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->SetPause(PAUSE_ON, PF_QUIET);
-	strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef)-1);
+	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
+	// so we make sure they don't cancel out
+	if (parameters->string0Parameter[0]) {
+		strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef) - 1);
+	}
+
 	core->SetEventFlag(EF_TEXTSCREEN);
 }
 
