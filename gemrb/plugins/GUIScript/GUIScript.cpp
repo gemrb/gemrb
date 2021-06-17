@@ -1696,8 +1696,9 @@ static PyObject* GemRB_Window_ShowModal(PyObject* self, PyObject* args)
 	PARSE_ARGS( args, "O|i", &self, &Shadow );
 
 	Window* win = GetView<Window>(self);
-	if (!win || !win->DisplayModal(Shadow)) {
-		return NULL;
+	ABORT_IF_NULL(win);
+	if (!win->DisplayModal(Shadow)) {
+		return RuntimeError("Couldn't display modal window. Window already closed.");
 	}
 
 	Py_RETURN_NONE;
