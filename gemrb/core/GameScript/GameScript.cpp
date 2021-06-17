@@ -2239,7 +2239,11 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	stream->ReadLine( line, 1024 );
 	char *poi;
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
-	if (strncmp(poi,"AC",2)==0)
+	if (!strncmp(poi, "AC", 2)) {
+		free(line);
+		return rE;
+	}
+
 	while (true) {
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
