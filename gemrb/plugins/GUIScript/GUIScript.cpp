@@ -7359,7 +7359,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	int i;
 	int j=1;
-	int k;
+	uint32_t k;
 	for (i = 0; i < 4; i++) {
 		if (store->AvailableRooms&j) {
 			k = store->RoomPrices[i];

@@ -43,7 +43,7 @@ class Condition;
 typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
 STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
 
-typedef enum StoreActionType { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
+typedef enum StoreActionType : uint8_t { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
 STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
 
 #define IE_STORE_BUY      1
