@@ -4841,10 +4841,9 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 void Actor::PlayWalkSound()
 {
-	ieDword thisTime;
 	ieResRef Sound;
 
-	thisTime = GetTicks();
+	auto thisTime = GetTicks();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;

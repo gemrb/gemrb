@@ -221,8 +221,8 @@ static bool intersectSegments(const Point& a, const Point& b, const Point& c, co
 	int64_t A1 = area2(c, d, a);
 	int64_t A2 = area2(d, c, b);
 
-	s.x = ((b.x*A1 + a.x*A2) / (A1 + A2));
-	s.y = ((b.y*A1 + a.y*A2) / (A1 + A2));
+	s.x = int((b.x*A1 + a.x*A2) / (A1 + A2));
+	s.y = int((b.y*A1 + a.y*A2) / (A1 + A2));
 
 	return true;
 }

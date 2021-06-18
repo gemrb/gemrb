@@ -156,7 +156,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 	}
 
 	// FIXME: newvalue could be a multibyte string in an encoding incompatible with ASCII
-	ieDword length = strlen(newvalue);
+	size_t length = strlen(newvalue);
 	if(length>65535) length=65535;
 	length++;
 
@@ -168,7 +168,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 		//fill the backpointer
 		tot_str->Seek(offset + 4, GEM_STREAM_START);
 		tot_str->WriteDword(&backp);
-		ieDword seglen = std::min<ieDword>(SEGMENT_SIZE, length);
+		size_t seglen = std::min<size_t>(SEGMENT_SIZE, length);
 		tot_str->Write(newvalue + memoffset, seglen);
 		length -= seglen;
 		memoffset += seglen;

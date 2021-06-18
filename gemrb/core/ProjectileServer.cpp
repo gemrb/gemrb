@@ -103,7 +103,7 @@ Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 	Projectile *old = projectiles[idx].projectile;
 	//int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
 	//memcpy(&pro->Type, &old->Type, strlength );
-	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
+	ptrdiff_t strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
 	memcpy(&pro->Speed, &old->Speed, strlength );
 	//FIXME: copy extension data too, or don't alter the extension
 	if (old->Extension) {
