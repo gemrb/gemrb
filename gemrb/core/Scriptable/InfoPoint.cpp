@@ -48,7 +48,6 @@ InfoPoint::InfoPoint(void)
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
-	TrapLaunch.empty();
 	if (!inited) {
 		inited = true;
 		//TRAP_USEPOINT may have three values
@@ -60,8 +59,6 @@ InfoPoint::InfoPoint(void)
 		else TRAP_USEPOINT = 0;
 	}
 	StrRef = 0;
-	UsePoint.empty();
-	TalkPos.empty();
 }
 
 InfoPoint::~InfoPoint(void)

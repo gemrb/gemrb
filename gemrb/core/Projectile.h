@@ -246,7 +246,7 @@ protected:
 	PathNode* step; //actual step
 	//similar to normal actors
 	Map *area;
-	Point Pos;
+	Point Pos = Point(-1, -1);
 	int ZPos;
 	Point Destination;
 	Point Origin;

@@ -247,7 +247,7 @@ protected: //let Actor access this
 	Action* CurrentAction;
 
 	// Variables for overhead text.
-	Point overHeadTextPos;
+	Point overHeadTextPos = Point(-1, -1);
 	bool overheadTextDisplaying;
 	unsigned long timeStartDisplaying;
 	String OverheadText;
@@ -434,7 +434,7 @@ public:
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;
-	Point TrapLaunch;
+	Point TrapLaunch = Point(-1, -1);
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
 	ieWord Trapped;

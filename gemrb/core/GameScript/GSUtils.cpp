@@ -860,7 +860,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		default: //absolute point, but -1,-1 means AtFeet
 			pnt.x = parameters->pointParameter.x;
 			pnt.y = parameters->pointParameter.y;
-			if (!pnt.isempty()) break;
+			if (pnt != InvalidPoint) break;
 
 			if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
 				pnt.x = ((InfoPoint *) Sender)->TrapLaunch.x;
@@ -962,7 +962,7 @@ void EscapeAreaCore(Scriptable* Sender, const Point &p, const char* area, const 
 	char Tmp[256];
 
 	if (Sender->CurrentActionTicks<100) {
-		if ( !p.isempty() && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
+		if (p != InvalidPoint && PersonalDistance(p, Sender)>MAX_OPERATING_DISTANCE) {
 			//MoveNearerTo will return 0, if the actor is in move
 			//it will return 1 (the fourth parameter) if the target is unreachable
 			if (!MoveNearerTo(Sender, p, MAX_OPERATING_DISTANCE,1) ) {
@@ -2818,7 +2818,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if (Sender->LastSpellTarget) {
 		//if target was set, fire spell
 		Sender->CastSpellEnd(level, flags&SC_INSTANT);
-	} else if(!Sender->LastTargetPos.isempty()) {
+	} else if(Sender->LastTargetPos != InvalidPoint) {
 		//the target was converted to a point
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {
@@ -2916,7 +2916,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	if(!Sender->LastTargetPos.isempty()) {
+	if(Sender->LastTargetPos != InvalidPoint) {
 		//if target was set, fire spell
 		Sender->CastSpellPointEnd(level, flags&SC_INSTANT);
 	} else {

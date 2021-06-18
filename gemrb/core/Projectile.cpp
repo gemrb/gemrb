@@ -52,7 +52,6 @@ Projectile::Projectile()
 	Extension = NULL;
 	area = NULL;
 	palette = NULL;
-	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
 	NewOrientation = 0;

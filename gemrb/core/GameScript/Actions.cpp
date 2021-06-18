@@ -3156,7 +3156,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
-	if (p.isempty()) {
+	if (p == InvalidPoint) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -6807,7 +6807,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetGlobalID();
-	scr->FollowOffset.empty();
+	scr->FollowOffset = Point(-1, -1);
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, 0, 1);
 	}
@@ -6828,7 +6828,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetGlobalID();
-	scr->FollowOffset.empty();
+	scr->FollowOffset = Point(-1, -1);
 	if (!scr->InMove() || scr->Destination != actor->Pos) {
 		scr->WalkTo(actor->Pos, IF_RUNNING, 1);
 	}

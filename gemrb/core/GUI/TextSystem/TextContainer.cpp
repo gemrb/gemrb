@@ -442,7 +442,7 @@ Content* ContentContainer::RemoveContent(const Content* span, bool doLayout)
 		content->parent = NULL;
 		layout.erase(std::find(layout.begin(), layout.end(), content));
 
-		layoutPoint = Point(); // reset cached layoutPoint
+		layoutPoint.reset(); // reset cached layoutPoint
 		if (doLayout) {
 			LayoutContentsFrom(it);
 		}
@@ -459,7 +459,7 @@ ContentContainer::EraseContent(ContentList::iterator it)
 	Content* content = *it;
 	content->parent = NULL;
 	layout.erase(std::find(layout.begin(), layout.end(), content));
-	layoutPoint = Point(); // reset cached layoutPoint
+	layoutPoint.reset(); // reset cached layoutPoint
 	ContentRemoved(content);
 	delete content;
 
@@ -581,7 +581,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	for (; clearit != contents.end(); ++clearit) {
 		ContentLayout::iterator i = std::find(layout.begin(), layout.end(), *clearit);
 		if (i != layout.end()) {
-			layoutPoint = Point(); // reset cached layoutPoint
+			layoutPoint.reset(); // reset cached layoutPoint
 			// since 'layout' is sorted alongsize 'contents' we should be able clear everyting following 'i' and bail
 			layout.erase(i, layout.end());
 			break;

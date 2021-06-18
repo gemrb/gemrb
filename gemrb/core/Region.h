@@ -55,17 +55,11 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
-	/** if it is [-1.-1] */
-	bool isempty() const;
 	/** if it is [0.0] */
 	bool isnull() const;
-	inline void empty() {
-		x=-1;
-		y=-1;
-	}
-	inline void null() {
-		x=0;
-		y=0;
+
+	inline void reset() {
+		x = y = 0;
 	}
 
 	// true if p is within the circle of radius r centered at p
@@ -74,6 +68,10 @@ public:
 	int x = 0;
 	int y = 0;
 };
+
+// this is not a member function because -1, -1 is a perfectly valid point
+// unless the coordinate system only allows positive
+GEM_EXPORT const Point InvalidPoint = Point(-1, -1);
 
 class GEM_EXPORT Size {
 public:

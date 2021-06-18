@@ -50,8 +50,8 @@ public:
 	ieDword Flags;
 	//overheadtext contains the string, but we have to save this
 	ieStrRef StrRef;
-	Point UsePoint;
-	Point TalkPos;
+	Point UsePoint = Point(-1, -1);
+	Point TalkPos = Point(-1, -1);
 };
 
 }

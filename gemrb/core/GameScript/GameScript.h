@@ -235,7 +235,7 @@ public:
 		int0Parameter = 0;
 		int1Parameter = 0;
 		int2Parameter = 0;
-		pointParameter.null();
+		pointParameter.reset();
 	}
 	~Trigger()
 	{
@@ -296,7 +296,7 @@ public:
 		memset(string0Parameter, 0, 65);
 		memset(string1Parameter, 0, 65);
 		int0Parameter = 0;
-		pointParameter.null();
+		pointParameter.reset();
 		int1Parameter = 0;
 		int2Parameter = 0;
 		//changed now

@@ -4308,8 +4308,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 
 int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster)
 {
-	Point p;
-	p.empty(); //the effect should have all its coordinates already set
+	Point p(-1, -1); //the effect should have all its coordinates already set
 	return ApplyEffectQueue(fxqueue, actor, caster, p);
 }
 

@@ -1616,7 +1616,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 	
 	if (e.mouse.ButtonState(GEM_MB_MIDDLE)) {
 		// if we are panning the map don't scroll from being at the edge
-		vpVector = Point();
+		vpVector.reset();
 		return false;
 	}
 	
@@ -2521,7 +2521,7 @@ void GameControl::SetCutSceneMode(bool active)
 	WindowManager* wm = core->GetWindowManager();
 	if (active) {
 		ScreenFlags |= SF_CUTSCENE;
-		vpVector = Point();
+		vpVector.reset();
 		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
 		ScreenFlags &= ~SF_CUTSCENE;
@@ -2592,7 +2592,7 @@ void GameControl::FlagsChanged(unsigned int /*oldflags*/)
 {
 	if (Flags()&IgnoreEvents) {
 		ClearMouseState();
-		vpVector = Point();
+		vpVector.reset();
 	}
 }
 
