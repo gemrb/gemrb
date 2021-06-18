@@ -195,6 +195,5 @@ def QuitPress():
 	return
 
 def NewGamePress():
-	StartWindow.Close()
 	GemRB.SetNextScript("SPParty")
 	return
