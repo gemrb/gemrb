@@ -59,7 +59,7 @@ class GEM_EXPORT RNG {
 			max = -max;
 		} else if (min > max) {
 			// makes no sense, but also gives unexpected results
-			GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
+			assert(false);
 		}
 
 		std::uniform_int_distribution<NUM_T> distribution(min, max);
