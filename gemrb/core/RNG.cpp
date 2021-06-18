@@ -58,30 +58,4 @@ RNG& RNG::getInstance() {
 	return instance;
 }
 
-/**
- * It is possible to generate random numbers from [-min, +/-max].
- * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
- * that someone wants something like rand() % -foo.
- */
-int32_t RNG::rand(int32_t min, int32_t max) {
-	int32_t signum = 1;
-	if (min == max) {
-		// For complete fairness and equal timing, this should be a roll, but let's skip it anyway
-		return max;
-	} else if (min == 0 && max < 0) {
-		// Someone wants rand() % -foo, so we compute -rand(0, +foo)
-		// This is the only time where min > max is (sort of) legal.
-		// Not handling this will cause the application to crash.
-		signum = -1;
-		max = -max;
-	} else if (min > max) {
-		// makes no sense, but also gives unexpected results
-		GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
-	}
-
-	std::uniform_int_distribution<int32_t> distribution(min, max);
-	int32_t randomNum = distribution(engine);
-	return signum * randomNum;
-}
-
 }

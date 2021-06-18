@@ -199,7 +199,7 @@ uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDwo
 	lastticks = ticks;
 
 	if (ambient->getFlags() & IE_AMBI_RANDOM) {
-		nextref = RAND(0, ambient->sounds.size() - 1);
+		nextref = RAND<size_t>(0, ambient->sounds.size() - 1);
 	} else if (++nextref >= ambient->sounds.size()) {
 		nextref = 0;
 	}

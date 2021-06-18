@@ -1728,7 +1728,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
-	DisplayStringCore(target, rndstr->at(RAND(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
+	DisplayStringCore(target, rndstr->at(RAND<size_t>(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
@@ -1745,7 +1745,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
-	DisplayStringCore(target, rndstr->at(RAND(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
+	DisplayStringCore(target, rndstr->at(RAND<size_t>(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 

@@ -86,7 +86,7 @@ int Dialog::FindRandomState(Scriptable* target)
 {
 	unsigned int max = TopLevelCount;
 	if (!max) return -1;
-	unsigned int pick = RAND(0, max-1);
+	unsigned int pick = RAND(0u, max-1);
 	for (unsigned int i = pick; i < max; i++) {
 		const Condition *cond = GetState(i)->condition;
 		if (cond && cond->Evaluate(target)) {

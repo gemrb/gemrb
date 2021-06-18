@@ -25,23 +25,53 @@
 
 #include "Region.h"
 
-#include <climits>
+#include <limits>
 #include <random>
 
-#define RAND(min, max) RNG::getInstance().rand(min, max)
-#define RAND_ALL() RNG::getInstance().rand()
+#define RAND_ALL() RAND()
 
 namespace GemRB {
 
 class GEM_EXPORT RNG {
 	private:
-		RNG();
+	RNG();
 
-		std::mt19937_64 engine;
+	std::mt19937_64 engine;
 	public:
-		static RNG& getInstance();
-		int32_t rand(int32_t min = 0, int32_t max = INT_MAX-1);
+	static RNG& getInstance();
+	
+	/**
+	 * It is possible to generate random numbers from [-min, +/-max].
+	 * It is only necessary that the upper bound is larger or equal to the lower bound - with the exception
+	 * that someone wants something like rand() % -foo.
+	 */
+	template<typename NUM_T = int32_t>
+	NUM_T rand(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+		NUM_T signum = 1;
+		if (min == max) {
+			// For complete fairness and equal timing, this should be a roll, but let's skip it anyway
+			return max;
+		} else if (min == 0 && max < 0) {
+			// Someone wants rand() % -foo, so we compute -rand(0, +foo)
+			// This is the only time where min > max is (sort of) legal.
+			// Not handling this will cause the application to crash.
+			signum = -1;
+			max = -max;
+		} else if (min > max) {
+			// makes no sense, but also gives unexpected results
+			GemRB::error("RNG", "Invalid bounds for RNG! Got min %d, max %d\n", min, max);
+		}
+
+		std::uniform_int_distribution<NUM_T> distribution(min, max);
+		NUM_T randomNum = distribution(engine);
+		return signum * randomNum;
+	}
 };
+
+template<typename NUM_T = int32_t>
+static NUM_T RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() - 1) noexcept {
+	return RNG::getInstance().rand(min, max);
+}
 
 inline Point RandomPoint(int xmin = 0, int xmax = INT_MAX - 1,
 						 int ymin = 0, int ymax = INT_MAX - 1)

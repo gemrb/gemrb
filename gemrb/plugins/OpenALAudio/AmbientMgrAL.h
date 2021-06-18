@@ -61,7 +61,7 @@ private:
 		const Ambient* ambient;
 		uint64_t lastticks;
 		unsigned int nextdelay;
-		unsigned int nextref;
+		size_t nextref;
 		unsigned int totalgain;
 
 		bool isHeard(const Point &listener) const;
