@@ -74,8 +74,8 @@ static NUM_T RAND(NUM_T min = 0, NUM_T max = std::numeric_limits<NUM_T>::max() -
 	return RNG::getInstance().rand(min, max);
 }
 
-inline Point RandomPoint(int xmin = 0, int xmax = INT_MAX - 1,
-						 int ymin = 0, int ymax = INT_MAX - 1)
+inline Point RandomPoint(int xmin = 0, int xmax = std::numeric_limits<int>::max() - 1,
+						 int ymin = 0, int ymax = std::numeric_limits<int>::max() - 1)
 {
 	auto x = RAND(xmin, xmax);
 	auto y = RAND(ymin, ymax);
