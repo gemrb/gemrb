@@ -58,7 +58,6 @@ Scriptable::Scriptable(ScriptableType type)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
-	overHeadTextPos.empty();
 	overheadTextDisplaying = 0;
 	timeStartDisplaying = 0;
 
@@ -207,7 +206,7 @@ void Scriptable::SetSpellResRef(ieResRef resref) {
 
 void Scriptable::SetOverheadText(const String& text, bool display)
 {
-	overHeadTextPos.empty();
+	overHeadTextPos = Point(-1, -1);
 	if (!text.empty()) {
 		OverheadText = text;
 		DisplayOverheadText(display);
@@ -262,7 +261,7 @@ void Scriptable::DrawOverheadText()
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	Point p = (overHeadTextPos.isempty()) ? Pos : overHeadTextPos;
+	Point p = (overHeadTextPos == InvalidPoint) ? Pos : overHeadTextPos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
 	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
@@ -508,7 +507,7 @@ void Scriptable::ClearActions()
 	}
 	WaitCounter = 0;
 	LastTarget = 0;
-	LastTargetPos.empty();
+	LastTargetPos = Point(-1, -1);
 	// intentionally not resetting LastTargetPersistent
 	LastSpellTarget = 0;
 
@@ -950,7 +949,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 inline void Scriptable::ResetCastingState(Actor *caster) {
 	SpellHeader = -1;
 	SpellResRef[0] = 0;
-	LastTargetPos.empty();
+	LastTargetPos = Point(-1, -1);
 	LastSpellTarget = 0;
 	if (caster) {
 		memset(&(caster->wildSurgeMods), 0, sizeof(caster->wildSurgeMods));
@@ -983,11 +982,11 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 	}
 
 	if (SpellHeader == -1) {
-		LastTargetPos.empty();
+		LastTargetPos = Point(-1, -1);
 		return;
 	}
 
-	if (LastTargetPos.isempty()) {
+	if (LastTargetPos == InvalidPoint) {
 		SpellHeader = -1;
 		return;
 	}
@@ -1287,7 +1286,7 @@ void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int le
 int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastSpellTarget = 0;
-	LastTargetPos.empty();
+	LastTargetPos = Point(-1, -1);
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
@@ -1322,7 +1321,7 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool nointerrupt )
 {
 	LastSpellTarget = 0;
-	LastTargetPos.empty();
+	LastTargetPos = Point(-1, -1);
 	Actor *actor = NULL;
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
@@ -1557,7 +1556,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					target = core->GetGame()->GetActorByGlobalID(LastSpellTarget);
 				}
 			}
-			if (!LastTargetPos.isempty()) {
+			if (LastTargetPos == InvalidPoint) {
 				targetpos = LastTargetPos;
 			} else if (target) {
 				targetpos = target->Pos;

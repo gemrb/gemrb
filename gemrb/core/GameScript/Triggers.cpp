@@ -2236,10 +2236,10 @@ int GameScript::SetSpellTarget(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		// we got called with Nothing to invalidate the target
 		scr->LastSpellTarget = 0;
-		scr->LastTargetPos.empty();
+		scr->LastTargetPos = Point(-1, -1);
 		return 1;
 	}
-	scr->LastTargetPos.empty();
+	scr->LastTargetPos = Point(-1, -1);
 	scr->LastSpellTarget = tar->GetGlobalID();
 	return 1;
 }

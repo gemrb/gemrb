@@ -2314,7 +2314,7 @@ void Map::PurgeArea(bool items)
 		if (!actor->GetRandomWalkCounter()) continue;
 		if (actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) continue;
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
-		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.isempty() && actor->Pos != actor->HomeLocation) {
+		if (!actor->HomeLocation.isnull() && actor->HomeLocation != InvalidPoint && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
 	}
@@ -2822,7 +2822,7 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p) const
 	ieDword ret = 0;
 
 	for (const VEFObject *vvc: vvcCells) {
-		if (!p.isempty()) {
+		if (p != InvalidPoint) {
 			if (vvc->Pos.x != p.x) continue;
 			if (vvc->Pos.y != p.y) continue;
 		}
@@ -3530,7 +3530,7 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos) const
 		if (c->Type==IE_CONTAINER_PILE) {
 			//creating (or grabbing) the container in the other map at the given position
 			Container *othercontainer;
-			if (Pos.isempty()) {
+			if (Pos == InvalidPoint) {
 				othercontainer = othermap->GetPile(c->Pos);
 			} else {
 				othercontainer = othermap->GetPile(Pos);

@@ -2608,7 +2608,7 @@ Action *GenerateActionDirect(const char *String, const Scriptable *object)
 	if (tmp && tmp->objectFields[0]==-1) {
 		tmp->objectFields[1] = object->GetGlobalID();
 	}
-	action->pointParameter.empty();
+	action->pointParameter = Point(-1, -1);
 	return action;
 }
 

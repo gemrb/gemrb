@@ -11374,7 +11374,7 @@ static PyObject* GemRB_ClearActions(PyObject * /*self*/, PyObject* args)
 		Log(MESSAGE, "GuiScript","Cannot break action!");
 		Py_RETURN_NONE;
 	}
-	if (!(actor->GetStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos.isempty() && !actor->LastSpellTarget) {
+	if (!(actor->GetStep()) && !actor->Modal.State && !actor->LastTarget && actor->LastTargetPos == InvalidPoint && !actor->LastSpellTarget) {
 		Log(MESSAGE, "GuiScript","No breakable action!");
 		Py_RETURN_NONE;
 	}

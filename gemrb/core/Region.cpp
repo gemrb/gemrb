@@ -67,11 +67,6 @@ bool Point::isnull() const
 	return (x == 0) && (y == 0);
 }
 
-bool Point::isempty() const
-{
-	return (x == -1) && (y == -1);
-}
-
 bool Point::isWithinRadius(int r, const Point& p) const
 {
 	Point d = operator-(p);
