@@ -111,7 +111,7 @@ public:
 	};
 
 protected:
-	unsigned long lastTime;
+	tick_t lastTime;
 	EventMgr* EvntManager;
 	Region screenClip;
 	Size screenSize;

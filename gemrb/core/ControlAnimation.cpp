@@ -72,7 +72,7 @@ bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 
 void ControlAnimation::UpdateAnimation(bool paused)
 {
-	unsigned long time;
+	tick_t time = 0;
 
 	if (paused && !(control->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later

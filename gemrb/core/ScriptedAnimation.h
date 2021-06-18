@@ -131,7 +131,7 @@ public:
 	bool active;
 	bool effect_owned;
 	Holder<SoundHandle> sound_handle;
-	unsigned long starttime;
+	tick_t starttime;
 public:
 	//draws the next frame of the videocell
 	bool UpdateDrawingState(int orientation);

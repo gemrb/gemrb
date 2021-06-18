@@ -38,7 +38,7 @@ using WindowList = std::deque<Window*>;
 struct ToolTipData
 {
 	Tooltip tt;
-	unsigned long time = 0;
+	tick_t time = 0;
 	Holder<SoundHandle> tooltip_sound;
 	bool reset = false;
 	
@@ -101,8 +101,8 @@ private:
 	mutable ToolTipData tooltip;
 	mutable std::map<ResRef, Holder<Sprite2D>> winframes;
 
-	static int ToolTipDelay;
-	static unsigned long TooltipTime;
+	static tick_t ToolTipDelay;
+	static tick_t TooltipTime;
 
 private:
 	bool IsOpenWindow(Window* win) const;

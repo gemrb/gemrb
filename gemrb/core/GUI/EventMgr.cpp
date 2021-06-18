@@ -26,8 +26,8 @@
 
 namespace GemRB {
 
-unsigned long EventMgr::DCDelay = 250;
-unsigned long EventMgr::DPDelay = 250;
+tick_t EventMgr::DCDelay = 250;
+tick_t EventMgr::DPDelay = 250;
 bool EventMgr::TouchInputEnabled = false;
 
 EventMgr::buttonbits EventMgr::mouseButtonFlags;
@@ -156,7 +156,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		}
 	} else if (e.EventMaskFromType(e.type) & Event::AllKeyMask) {
 		// first check for hot key listeners
-		static unsigned long lastKeyDown = 0;
+		static tick_t lastKeyDown = 0;
 		static unsigned char repeatCount = 0;
 		static KeyboardKey repeatKey = 0;
 
@@ -200,7 +200,7 @@ void EventMgr::DispatchEvent(Event&& e)
 		) {
 			// WARNING: these are shared between mouse and touch
 			// it is assumed we wont be using both simultaniously
-			static unsigned long lastMouseDown = 0;
+			static tick_t lastMouseDown = 0;
 			static unsigned char repeatCount = 0;
 			static EventButton repeatButton = 0;
 			static Point repeatPos;

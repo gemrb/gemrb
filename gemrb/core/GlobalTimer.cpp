@@ -45,11 +45,9 @@ GlobalTimer::~GlobalTimer(void)
 
 void GlobalTimer::Freeze()
 {
-	unsigned long thisTime;
-
 	UpdateAnimations(true);
 
-	thisTime = GetTicks();
+	tick_t thisTime = GetTicks();
 	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
@@ -131,9 +129,9 @@ void GlobalTimer::DoStep(int count)
 	currentVP = gc->Viewport();
 }
 
-bool GlobalTimer::UpdateViewport(unsigned long thisTime)
+bool GlobalTimer::UpdateViewport(tick_t thisTime)
 {
-	unsigned long advance = thisTime - startTime;
+	tick_t advance = thisTime - startTime;
 	if ( advance < interval) {
 		return false;
 	}
@@ -149,7 +147,7 @@ bool GlobalTimer::Update()
 	Map *map;
 	Game *game;
 	GameControl* gc;
-	unsigned long thisTime = GetTicks();
+	tick_t thisTime = GetTicks();
 
 	UpdateAnimations(false);
 
@@ -231,7 +229,7 @@ void GlobalTimer::DoFadeStep(ieDword count) {
 	}
 }
 
-void GlobalTimer::SetFadeToColor(unsigned long Count, unsigned short factor)
+void GlobalTimer::SetFadeToColor(tick_t Count, unsigned short factor)
 {
 	if(!Count) {
 		Count = 64;
@@ -244,7 +242,7 @@ void GlobalTimer::SetFadeToColor(unsigned long Count, unsigned short factor)
 	fadeToFactor = factor;
 }
 
-void GlobalTimer::SetFadeFromColor(unsigned long Count, unsigned short factor)
+void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 {
 	if(!Count) {
 		Count = 64;
@@ -254,12 +252,11 @@ void GlobalTimer::SetFadeFromColor(unsigned long Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
+void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, tick_t time)
 {
 	AnimationRef* anim;
-	unsigned long thisTime;
 
-	thisTime = GetTicks();
+	tick_t thisTime = GetTicks();
 	time += thisTime;
 
 	// if there are no free animation reference objects,
@@ -302,8 +299,7 @@ void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 
 void GlobalTimer::UpdateAnimations(bool paused)
 {
-	unsigned long thisTime;
-	thisTime = GetTicks();
+	tick_t thisTime = GetTicks();
 	while (animations.begin() + first_animation != animations.end()) {
 		AnimationRef* anim = animations[first_animation];
 		if (anim->ctlanim == NULL) {

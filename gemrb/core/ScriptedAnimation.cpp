@@ -504,12 +504,12 @@ bool ScriptedAnimation::UpdatePhase()
 			Log(ERROR, "ScriptedAnimation", "Not fully initialised VVC!");
 			return true;
 		}
-		unsigned long time = game->Ticks;
+		tick_t time = game->Ticks;
 		if (starttime == 0) {
 			starttime = time;
 		}
 		unsigned int inc = 0;
-		if ((time - starttime) >= (unsigned long) (1000 / FrameRate)) {
+		if ((time - starttime) >= tick_t(1000 / FrameRate)) {
 			inc = (time - starttime) * FrameRate / 1000;
 			starttime += inc * 1000 / FrameRate;
 		}

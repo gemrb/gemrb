@@ -151,8 +151,8 @@ int Video::SwapBuffers(unsigned int fpscap)
 	SetScreenClip(NULL);
 
 	if (fpscap) {
-		unsigned int lim = 1000/fpscap;
-		unsigned long time = GetTicks();
+		tick_t lim = 1000/fpscap;
+		tick_t time = GetTicks();
 		if (( time - lastTime ) < lim) {
 			Wait(lim - int(time - lastTime));
 			time = GetTicks();

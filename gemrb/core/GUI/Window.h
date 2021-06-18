@@ -160,7 +160,7 @@ private: // Private attributes
 	
 	Point dragOrigin;
 	UniqueDragOp drag;
-	unsigned long lastMouseMoveTime;
+	tick_t lastMouseMoveTime;
 
 	VideoBufferPtr backBuffer = nullptr;
 	WindowManager& manager;

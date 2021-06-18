@@ -39,7 +39,7 @@ class GEM_EXPORT Animation {
 private:
 	std::vector<Holder<Sprite2D>> frames;
 	unsigned int indicesCount;
-	unsigned long starttime;
+	tick_t starttime;
 public:
 	bool endReached;
 	unsigned int pos;

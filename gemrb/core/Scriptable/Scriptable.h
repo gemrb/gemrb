@@ -234,7 +234,7 @@ public:
 	Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
-	unsigned long WaitCounter;
+	tick_t WaitCounter;
 	std::map<ieDword,ieDword> script_timers;
 	ieDword globalID;
 protected: //let Actor access this
@@ -249,7 +249,7 @@ protected: //let Actor access this
 	// Variables for overhead text.
 	Point overHeadTextPos = Point(-1, -1);
 	bool overheadTextDisplaying;
-	unsigned long timeStartDisplaying;
+	tick_t timeStartDisplaying;
 	String OverheadText;
 public:
 	Region BBox;
@@ -321,8 +321,8 @@ public:
 	void SetFloatingText(char*);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetSpellResRef(ieResRef resref);
-	void SetWait(unsigned long time);
-	unsigned long GetWait() const;
+	void SetWait(tick_t time);
+	tick_t GetWait() const;
 	void LeftDialog();
 	void Interrupt();
 	void NoInterrupt();

@@ -21,6 +21,7 @@
 #define GLOBALTIMER_H
 
 #include "exports.h"
+#include "globals.h"
 
 #include "Region.h"
 
@@ -33,17 +34,17 @@ class ControlAnimation;
 struct AnimationRef
 {
 	ControlAnimation *ctlanim;
-	unsigned long  time;
+	tick_t  time;
 };
 
 
 class GEM_EXPORT GlobalTimer {
 private:
-	unsigned long startTime = 0; //forcing an update;
-	unsigned long interval;
+	tick_t startTime = 0; //forcing an update;
+	tick_t interval;
 
-	int fadeToCounter = 0, fadeToMax = 0;
-	int fadeFromCounter = 0, fadeFromMax = 0;
+	tick_t fadeToCounter = 0, fadeToMax = 0;
+	tick_t fadeFromCounter = 0, fadeFromMax = 0;
 	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
 	int shakeCounter = 0;
 	Point shakeVec;
@@ -68,15 +69,15 @@ public:
 	bool ViewportIsMoving();
 	void DoStep(int count);
 	void SetMoveViewPort(Point p, int spd, bool center);
-	void SetFadeToColor(unsigned long Count, unsigned short factor = 1);
-	void SetFadeFromColor(unsigned long Count, unsigned short factor = 1);
+	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
+	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
+	void AddAnimation(ControlAnimation* ctlanim, tick_t time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();
 
 private:
-	bool UpdateViewport(unsigned long time);
+	bool UpdateViewport(tick_t time);
 };
 
 }

@@ -29,7 +29,7 @@ namespace GemRB {
 template <class T>
 class GUIAnimation {
 protected:
-	unsigned long begintime;
+	tick_t begintime;
 	T current;
 	
 public:
@@ -41,7 +41,7 @@ public:
 		return !HasEnded();
 	}
 
-	T Next(unsigned long time) {
+	T Next(tick_t time) {
 		if (HasEnded() == false) {
 			current = GenerateNext(time);
 		}
@@ -53,25 +53,25 @@ public:
 	}
 
 private:
-	virtual T GenerateNext(unsigned long time)=0;
+	virtual T GenerateNext(tick_t time)=0;
 	virtual bool HasEnded() const=0;
 };
 
 class PointAnimation : public GUIAnimation<Point> {
 public:
 	Point begin, end;
-	unsigned long endtime;
+	tick_t endtime;
 	
 public:
 	PointAnimation() : GUIAnimation(), endtime(0) {}
 	
-	PointAnimation(const Point& begin, const Point& end, unsigned long duration)
+	PointAnimation(const Point& begin, const Point& end, tick_t duration)
 	: GUIAnimation(), begin(begin), end(end), endtime(begintime + duration) {
 		Next(begintime);
 	}
 
 private:
-	Point GenerateNext(unsigned long time) override;
+	Point GenerateNext(tick_t time) override;
 	bool HasEnded() const override;
 };
 
@@ -82,7 +82,7 @@ class ColorCycle {
 public:
 	ColorCycle(uint8_t speed) : step(0), speed(speed) {}
 
-	void AdvanceTime(unsigned long time);
+	void AdvanceTime(tick_t time);
 	Color Blend(const Color& c1, const Color& c2) const;
 
 	uint8_t Step() const {
@@ -115,12 +115,12 @@ public:
 		this->begin.a = 0xff;
 		this->end.a = 0xff;
 
-		unsigned long time = GetTicks();
+		tick_t time = GetTicks();
 		timeOffset = (time >> 7) & 7; // we want to start at the frame that is 0
 	}
 
 private:
-	Color GenerateNext(unsigned long time) override;
+	Color GenerateNext(tick_t time) override;
 	bool HasEnded() const override;
 };
 

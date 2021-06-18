@@ -30,8 +30,8 @@ std::find(windows.begin(), windows.end(), w)
 
 namespace GemRB {
 
-int WindowManager::ToolTipDelay = 500;
-unsigned long WindowManager::TooltipTime = 0;
+tick_t WindowManager::ToolTipDelay = 500;
+tick_t WindowManager::TooltipTime = 0;
 
 Holder<Sprite2D> WindowManager::CursorMouseUp;
 Holder<Sprite2D> WindowManager::CursorMouseDown;

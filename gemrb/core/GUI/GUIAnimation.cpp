@@ -25,7 +25,7 @@ namespace GemRB {
 static const unsigned long ColorCycleSteps[] = {6,4,2,0,2,4,6,8};
 ColorCycle GlobalColorCycle(7);
 
-void ColorCycle::AdvanceTime(unsigned long time)
+void ColorCycle::AdvanceTime(tick_t time)
 {
 	step = ColorCycleSteps[(time >> speed) & 7];
 }
@@ -46,7 +46,7 @@ bool PointAnimation::HasEnded() const
 	return current == end;
 }
 	
-Point PointAnimation::GenerateNext(unsigned long curTime)
+Point PointAnimation::GenerateNext(tick_t curTime)
 {
 	if (curTime < endtime) {
 		int deltax = end.x - begin.x;
@@ -62,7 +62,7 @@ Point PointAnimation::GenerateNext(unsigned long curTime)
 	}
 }
 
-Color ColorAnimation::GenerateNext(unsigned long time)
+Color ColorAnimation::GenerateNext(tick_t time)
 {
 	cycle.AdvanceTime(time - timeOffset);
 	return cycle.Blend(end, begin);

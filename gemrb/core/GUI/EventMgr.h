@@ -30,6 +30,7 @@
 
 #include "exports.h"
 #include "ie_types.h"
+#include "globals.h"
 
 #include "Callback.h"
 #include "Region.h"
@@ -234,7 +235,7 @@ struct GEM_EXPORT Event {
     typedef unsigned short EventMods;
 
 	EventType type;
-	unsigned long time;
+	tick_t time;
 	EventMods mod; // modifier keys held during the event
 	bool isScreen; // event coresponsds to location on screen
 };
@@ -258,8 +259,8 @@ public:
 	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
 	static constexpr int mouseDragRadius = 10; // radius for drag events
 
-	static unsigned long DCDelay;
-	static unsigned long DPDelay;
+	static tick_t DCDelay;
+	static tick_t DPDelay;
 	static bool TouchInputEnabled;
 
 	static Event CreateMouseBtnEvent(const Point& pos, EventButton btn, bool down, int mod = 0);

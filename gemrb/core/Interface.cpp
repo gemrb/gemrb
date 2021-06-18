@@ -900,7 +900,7 @@ void Interface::Main()
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
 
-	unsigned long frame = 0, time, timebase;
+	tick_t frame = 0, time, timebase;
 	time = GetTicks();
 	timebase = time;
 	double frames = 0.0;
@@ -4862,7 +4862,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	} while (video->SwapBuffers() == GEM_OK);
 }
 
-Timer& Interface::SetTimer(const EventHandler& handler, unsigned long interval, int repeats)
+Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int repeats)
 {
 	timers.push_back(Timer(interval, handler, repeats));
 	return timers.back();

@@ -846,7 +846,7 @@ public:
 
 	Audio* GetAudioDrv(void) const;
 
-	Timer& SetTimer(const EventHandler&, unsigned long interval, int repeats = -1);
+	Timer& SetTimer(const EventHandler&, tick_t interval, int repeats = -1);
 };
 
 extern GEM_EXPORT Interface * core;

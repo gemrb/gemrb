@@ -166,7 +166,7 @@ private:
 public:
 	const ieDword *Colors; //these are the custom color indices
 	RGBModifier ColorMods[PAL_MAX*8]; // color modification effects
-	unsigned long lastModUpdate;
+	tick_t lastModUpdate;
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[PAL_MAX];

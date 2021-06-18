@@ -241,7 +241,7 @@ void Scriptable::DrawOverheadText()
 	if (!overheadTextDisplaying)
 		return;
 
-	unsigned long time = core->GetGame()->Ticks;
+	tick_t time = core->GetGame()->Ticks;
 	Font::PrintColors color = {core->InfoTextColor, ColorBlack};
 
 	time -= timeStartDisplaying;
@@ -591,12 +591,12 @@ bool Scriptable::InMove() const
 	return me->GetStep() != NULL;
 }
 
-void Scriptable::SetWait(unsigned long time)
+void Scriptable::SetWait(tick_t time)
 {
 	WaitCounter = time;
 }
 
-unsigned long Scriptable::GetWait() const
+tick_t Scriptable::GetWait() const
 {
 	return WaitCounter;
 }

@@ -423,8 +423,8 @@ private:
 	Projectile* attackProjectile ;
 	ieDword TicksLastRested;
 	ieDword LastFatigueCheck;
-	unsigned int remainingTalkSoundTime;
-	unsigned int lastTalkTimeCheckAt;
+	tick_t remainingTalkSoundTime;
+	tick_t lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(const Point& p, BlitFlags flags,
 						 const std::vector<AnimationPart>& anims, const Color& tint) const;
@@ -973,8 +973,8 @@ public:
 	unsigned int GetSubRace() const;
 	std::list<int> ListLevels() const;
 	void ChangeSorcererType (ieDword classIdx);
-	unsigned int GetAdjustedTime(unsigned int time) const;
-	void SetAnimatedTalking(unsigned int);
+	tick_t GetAdjustedTime(tick_t time) const;
+	void SetAnimatedTalking(tick_t);
 	bool HasPlayerClass() const;
 	void PlayArmorSound() const;
 	bool ShouldModifyMorale() const;

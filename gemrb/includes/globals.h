@@ -208,7 +208,8 @@ GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
-inline unsigned long GetTicks()
+using tick_t = unsigned long;
+inline tick_t GetTicks()
 {
 	using namespace std::chrono;
 	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
@@ -217,9 +218,8 @@ inline unsigned long GetTicks()
 inline bool valid_number(const char* string, long& val)
 {
 	char* endpr;
-
-	val = (long) strtoul( string, &endpr, 0 );
-	return ( const char * ) endpr != string;
+	val = strtol(string, &endpr, 0);
+	return endpr != string;
 }
 
 template <typename T>

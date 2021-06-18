@@ -4843,7 +4843,7 @@ void Actor::PlayWalkSound()
 {
 	ieResRef Sound;
 
-	auto thisTime = GetTicks();
+	tick_t thisTime = GetTicks();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;
@@ -7801,8 +7801,8 @@ void Actor::UpdateActorState()
 	}
 
 	if (remainingTalkSoundTime > 0) {
-		unsigned int currentTick = GetTicks();
-		unsigned int diffTime = currentTick - lastTalkTimeCheckAt;
+		tick_t currentTick = GetTicks();
+		tick_t diffTime = currentTick - lastTalkTimeCheckAt;
 		lastTalkTimeCheckAt = currentTick;
 
 		if (diffTime >= remainingTalkSoundTime) {
@@ -11346,7 +11346,7 @@ bool Actor::IsKitInactive() const
 
 // account for haste/slow affecting the metabolism (regeneration etc.)
 // handled by AdjustedTicks in the original
-unsigned int Actor::GetAdjustedTime(unsigned int time) const
+tick_t Actor::GetAdjustedTime(tick_t time) const
 {
 	// haste mode 2 (walk speed) has no effect and we have to check the opcode indirectly
 	// otherwise it wouldn't work if the haste/slow effect is later in the queue
@@ -11383,7 +11383,7 @@ const char *Actor::GetKitName(ieDword kitID) const
 	return "";
 }
 
-void Actor::SetAnimatedTalking (unsigned int length) {
+void Actor::SetAnimatedTalking (tick_t length) {
 	remainingTalkSoundTime = std::max(remainingTalkSoundTime, length);
 	lastTalkTimeCheckAt = GetTicks();
 }
