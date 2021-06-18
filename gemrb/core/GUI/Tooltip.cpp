@@ -78,7 +78,7 @@ void TooltipBackground::Draw(Region rgn) const
 	rgn.w += margin * 2;
 	rgn.x -= margin;
 
-	Point dp = rgn.Origin();
+	Point dp = rgn.origin;
 	dp.x += (rgn.w / 2);
 	dp.x -= (animationPos / 2); // start @ left curl pos
 

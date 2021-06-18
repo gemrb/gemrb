@@ -112,7 +112,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	}
 
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
-	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.Dimensions());
+	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.size);
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
 	ieByte* pageLoc = pageData + pageXPos;
@@ -313,8 +313,8 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 		dp.x = 0;
 		size_t lineLen = line.length();
 		if (lineLen) {
-			const Region lineRgn(dp + rgn.Origin(), Size(rgn.w, LineHeight));
-			StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, 0, true};
+			const Region lineRgn(dp + rgn.origin, Size(rgn.w, LineHeight));
+			StringSizeMetrics metrics = {lineRgn.size, 0, 0, true};
 			const Size lineSize = StringSize(line, &metrics);
 			size_t linePos = metrics.numChars;
 			Point linePoint;
@@ -357,7 +357,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 				}
 				if (core->InDebugMode(ID_FONTS)) {
 					core->GetVideoDriver()->DrawRect(lineRgn, ColorGreen, false);
-					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.Origin(),
+					core->GetVideoDriver()->DrawRect(Region(linePoint + lineRgn.origin,
 												 Size(lineSize.w, LineHeight)), ColorWhite, false);
 				}
 				linePos = RenderLine(line, lineRgn, linePoint, colors, canvas);
@@ -439,7 +439,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			word = line.substr(linePos, wordBreak - linePos);
 		}
 
-		StringSizeMetrics metrics = {lineRgn.Dimensions(), 0, 0, true};
+		StringSizeMetrics metrics = {lineRgn.size, 0, 0, true};
 		int wordW = StringSize(word, &metrics).w;
 		if (dp.x == 0 && metrics.forceBreak) {
 			done = true;
@@ -464,7 +464,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			}
 
 			const Glyph& curGlyph = GetGlyph(currChar);
-			Point blitPoint = dp + lineRgn.Origin() + curGlyph.pos;
+			Point blitPoint = dp + lineRgn.origin + curGlyph.pos;
 			// use intersection because some rare glyphs can sometimes overlap lines
 			if (!lineRgn.IntersectsRegion(Region(blitPoint, curGlyph.size))) {
 				if (core->InDebugMode(ID_FONTS)) {
@@ -476,7 +476,7 @@ size_t Font::RenderLine(const String& line, const Region& lineRgn,
 			}
 
 			if (canvas) {
-				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.Dimensions());
+				BlitGlyphToCanvas(curGlyph, blitPoint, *canvas, lineRgn.size);
 			} else {
 				size_t pageIdx = AtlasIndex[currChar].pageIdx;
 				GlyphAtlasPage* page = Atlas[pageIdx];
@@ -580,7 +580,7 @@ size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, co
 
 size_t Font::Print(Region rgn, const String& string, ieByte alignment, const PrintColors* colors, Point* point) const
 {
-	if (rgn.Dimensions().IsEmpty()) return 0;
+	if (rgn.size.IsEmpty()) return 0;
 
 	Point p = (point) ? *point : Point();
 	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
@@ -590,7 +590,7 @@ size_t Font::Print(Region rgn, const String& string, ieByte alignment, const Pri
 			// we can optimize single lines without StringSize()
 			stringSize.h = LineHeight;
 		} else {
-			stringSize = rgn.Dimensions();
+			stringSize = rgn.size;
 			StringSizeMetrics metrics = {stringSize, 0, 0, true};
 			stringSize = StringSize(string, &metrics);
 			if (alignment&IE_FONT_NO_CALC && metrics.numChars < string.length()) {

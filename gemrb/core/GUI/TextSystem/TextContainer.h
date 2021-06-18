@@ -57,7 +57,7 @@ public:
 	Content(const Size& size);
 	virtual ~Content() = default;
 
-	virtual Size ContentFrame() const { return frame.Dimensions(); };
+	virtual Size ContentFrame() const { return frame.size; };
 
 protected:
 	// point is relative to Region. Region is a screen region.

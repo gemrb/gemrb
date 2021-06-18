@@ -64,7 +64,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 {
 	assert(dst->format->BitsPerPixel == 32); // we could easily support others if we have to
 
-	p = Clamp(p, clip.Origin(), clip.Maximum());
+	p = Clamp(p, clip.origin, clip.Maximum());
 	if (PointClipped(dst, p)) return;
 
 	Uint32* px = ((Uint32*)dst->pixels) + (p.y * dst->pitch/4) + p.x;
@@ -374,14 +374,14 @@ void DrawPolygonSurface(SDL_Surface* surface, const Gem_Polygon* poly, const Poi
 		s_points.clear();
 		s_points.resize(poly->Count()*2); // resize, not reserve! (it wont shrink the capacity FYI)
 
-		const Point& p = poly->vertices[0] - poly->BBox.Origin() + origin;
+		const Point& p = poly->vertices[0] - poly->BBox.origin + origin;
 		s_points[0].x = p.x;
 		s_points[0].y = p.y;
 
 		size_t j = 1;
 		for (size_t i = 1; i < poly->Count(); ++i, j+=2) {
 			// this is not a typo. one point ends the previous line, the next begins the next line
-			const Point& p = poly->vertices[i] - poly->BBox.Origin() + origin;
+			const Point& p = poly->vertices[i] - poly->BBox.origin + origin;
 			s_points[j].x = p.x;
 			s_points[j].y = p.y;
 			s_points[j+1] = s_points[j];

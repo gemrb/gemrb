@@ -153,7 +153,7 @@ public:
 	*/
 	void DrawWindows() const;
 
-	Size ScreenSize() const { return screen.Dimensions(); }
+	Size ScreenSize() const { return screen.size; }
 
 	Holder<Sprite2D> GetScreenshot(Window* win);
 	Window* GetGameWindow() const { return gameWin; }

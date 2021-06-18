@@ -45,7 +45,7 @@ Slider::Slider(const Region& frame, Point pos,
 /** Draws the Control on the Output Display */
 void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 {
-	Point p = rgn.Origin() + KnobPos;
+	Point p = rgn.origin + KnobPos;
 	p.x += Pos * KnobStep;
 
 	switch (State) {

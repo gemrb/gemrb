@@ -168,7 +168,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	}
 
 	core->ToggleViewsEnabled(false, "NOT_DLG");
-	prevViewPortLoc = gc->Viewport().Origin();
+	prevViewPortLoc = gc->Viewport().origin;
 	gc->MoveViewportTo(tgt->Pos, true, DIALOG_MOVE_SPEED);
 
 	//there are 3 bits, if they are all unset, the dialog freezes scripts

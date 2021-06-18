@@ -56,7 +56,7 @@ public:
 	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
 	const Region& MapSheetSegment(KeyType key, Region rgn) {
 		Region intersection = rgn.Intersect(SheetRegion);
-		if (!intersection.Dimensions().IsEmpty()) {
+		if (!intersection.size.IsEmpty()) {
 			if (RegionMap.insert(std::make_pair(key, intersection)).second) {
 				return RegionMap[key];
 			}

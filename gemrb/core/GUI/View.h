@@ -187,8 +187,8 @@ public:
 	virtual bool IsReceivingEvents() const;
 
 	Region Frame() const { return frame; }
-	Point Origin() const { return frame.Origin(); }
-	Size Dimensions() const { return frame.Dimensions(); }
+	Point Origin() const { return frame.origin; }
+	Size Dimensions() const { return frame.size; }
 	void SetFrame(const Region& r);
 	void SetFrameOrigin(const Point&);
 	void SetFrameSize(const Size&);

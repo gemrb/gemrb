@@ -76,11 +76,11 @@ public:
 	VideoBuffer(const Region& r) : rect(r) {}
 	virtual ~VideoBuffer() {}
 	
-	::GemRB::Size Size() const { return rect.Dimensions(); }
-	Point Origin() const { return rect.Origin(); }
+	::GemRB::Size Size() const { return rect.size; }
+	Point Origin() const { return rect.origin; }
 	Region Rect() const  { return rect; }
 	
-	void SetOrigin(const Point& p) { rect.x = p.x; rect.y = p.y; }
+	void SetOrigin(const Point& p) { rect.origin = p; }
 
 	virtual void Clear() { Clear({0, 0, rect.w, rect.h}); };
 	virtual void Clear(const Region& rgn) = 0;

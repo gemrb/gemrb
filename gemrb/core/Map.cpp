@@ -941,7 +941,7 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 	// size for explored_mask and visible_mask
 	const Size fogSize = FogMapSize();
 
-	const Point start = Clamp(ConvertPointToFog(vp.Origin()), Point(), Point(fogSize.w, fogSize.h));
+	const Point start = Clamp(ConvertPointToFog(vp.origin), Point(), Point(fogSize.w, fogSize.h));
 	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + LargeFog, 2 + LargeFog), Point(), Point(fogSize.w, fogSize.h));
 	const int x0 = (start.x * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
 	const int y0 = (start.y * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
@@ -1160,10 +1160,10 @@ void Map::DrawHighlightables(const Region& viewport) const
 			const Door *door = TMap->GetDoor(c->BBox.Center());
 			if (door && !(door->Flags & (DOOR_OPEN|DOOR_TRANSPARENT))) continue;
 			if (c->Highlight) {
-				c->DrawOutline(viewport.Origin());
+				c->DrawOutline(viewport.origin);
 			} else if (debugFlags & DEBUG_SHOW_CONTAINERS) {
 				c->outlineColor = ColorCyan;
-				c->DrawOutline(viewport.Origin());
+				c->DrawOutline(viewport.origin);
 			}
 		}
 	}
@@ -1172,13 +1172,13 @@ void Map::DrawHighlightables(const Region& viewport) const
 	i = 0;
 	while ( (d = TMap->GetDoor(i++))!=NULL ) {
 		if (d->Highlight) {
-			d->DrawOutline(viewport.Origin());
+			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
 			d->outlineColor = ColorCyan;
-			d->DrawOutline(viewport.Origin());
+			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS_SECRET && d->Flags & DOOR_FOUND) {
 			d->outlineColor = ColorMagenta;
-			d->DrawOutline(viewport.Origin());
+			d->DrawOutline(viewport.origin);
 		}
 	}
 
@@ -1186,14 +1186,14 @@ void Map::DrawHighlightables(const Region& viewport) const
 	i = 0;
 	while ( (p = TMap->GetInfoPoint(i++))!=NULL ) {
 		if (p->Highlight) {
-			p->DrawOutline(viewport.Origin());
+			p->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_INFOPOINTS) {
 			if (p->VisibleTrap(true)) {
 				p->outlineColor = ColorRed;
 			} else {
 				p->outlineColor = ColorBlue;
 			}
-			p->DrawOutline(viewport.Origin());
+			p->DrawOutline(viewport.origin);
 		}
 	}
 }
@@ -1534,7 +1534,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					drawn = 1;
 				}
 				if (drawn) {
-					spark->Draw(viewport.Origin());
+					spark->Draw(viewport.origin);
 					spaidx++;
 				} else {
 					delete( spark );
@@ -1603,7 +1603,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	if (debugFlags & (DEBUG_SHOW_WALLS_ALL|DEBUG_SHOW_DOORS_DISABLED)) {
 		const auto& viewportWalls = WallsIntersectingRegion(viewport, true);
 		for (const auto& poly : viewportWalls.first) {
-			const Point& origin = poly->BBox.Origin() - viewport.Origin();
+			const Point& origin = poly->BBox.origin - viewport.origin;
 
 			if (poly->wall_flag&WF_DISABLED) {
 				if (debugFlags & DEBUG_SHOW_DOORS_DISABLED) {
@@ -1631,7 +1631,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			video->DrawPolygon( poly.get(), origin, c, true, BlitFlags::BLENDED|BlitFlags::HALFTRANS);
 			
 			if (poly->wall_flag & WF_BASELINE) {
-				video->DrawLine(poly->base0 - viewport.Origin(), poly->base1 - viewport.Origin(), ColorMagenta);
+				video->DrawLine(poly->base0 - viewport.origin, poly->base1 - viewport.origin, ColorMagenta);
 			}
 		}
 	}
@@ -1713,8 +1713,8 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 		}
 		
 		if (stencil == nullptr) {
-			Region stencilRgn = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
-			if (stencilRgn.Dimensions().IsEmpty()) {
+			Region stencilRgn = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
+			if (stencilRgn.size.IsEmpty()) {
 				stencil = wallStencil;
 			} else {
 				stencil = video->CreateBuffer(stencilRgn, Video::BufferFormat::DISPLAY_ALPHA);
@@ -1726,7 +1726,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 			// if we could detect that we could avoid doing this expensive operation
 			// we could add another wall flag to mark doors and then we only need to do this if one of the "walls" over us has that flag set
 			stencil->Clear();
-			stencil->SetOrigin(objectRgn.Origin() - viewPortOrigin);
+			stencil->SetOrigin(objectRgn.origin - viewPortOrigin);
 			DrawStencil(stencil, objectRgn, walls.first);
 		}
 		
@@ -1745,7 +1745,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	video->SetStencilBuffer(stencil);
 	
 	if (debugFlags & DEBUG_SHOW_WALLS) {
-		const Region& r = Region(objectRgn.Origin() - viewPortOrigin, objectRgn.Dimensions());
+		const Region& r = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
 		video->DrawRect(r, debugColor, false);
 	}
 }
@@ -1766,7 +1766,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	}
 	
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
-	SetDrawingStencilForObject(scriptable, bbox, walls, vp.Origin());
+	SetDrawingStencilForObject(scriptable, bbox, walls, vp.origin);
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
@@ -1814,7 +1814,7 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &p);
 	
-	SetDrawingStencilForObject(anim, bbox, walls, vp.Origin());
+	SetDrawingStencilForObject(anim, bbox, walls, vp.origin);
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
@@ -2442,7 +2442,7 @@ int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags
 		if (!actor->ValidTarget(excludeFlags))
 			continue;
 		if (!rgn.PointInside(actor->Pos)
-			&& !actor->IsOver(rgn.Origin())) // imagine drawing a tiny box inside the circle, but not over the center
+			&& !actor->IsOver(rgn.origin)) // imagine drawing a tiny box inside the circle, but not over the center
 			continue;
 
 		actorlist[count++] = actor;
@@ -2631,7 +2631,7 @@ void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
 		// but currently that is forcing some performance killing conversion issues on some platforms
 		// for now things will break if we use 16 bit color settings
 		Video* video = core->GetVideoDriver();
-		wallStencil = video->CreateBuffer(Region(Point(), vp.Dimensions()), Video::BufferFormat::DISPLAY_ALPHA);
+		wallStencil = video->CreateBuffer(Region(Point(), vp.size), Video::BufferFormat::DISPLAY_ALPHA);
 	}
 
 	wallStencil->Clear();
@@ -2653,7 +2653,7 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 	video->PushDrawingBuffer(stencilBuffer);
 
 	for (const auto& wp : walls) {
-		const Point& origin = wp->BBox.Origin() - vp.Origin();
+		const Point& origin = wp->BBox.origin - vp.origin;
 
 		if (wp->wall_flag & WF_DITHER) {
 			stencilcol.r = 0x80;
@@ -4034,7 +4034,7 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 		Animation *anim = animation[ac];
 		Holder<Sprite2D> frame = anim->NextFrame();
 		
-		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.Origin(), flags, tint);
+		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.origin, flags, tint);
 	}
 }
 

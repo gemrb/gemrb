@@ -84,12 +84,12 @@ void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region
 	ScrollView* parent = static_cast<ScrollView*>(superView);
 	
 	Region clipArea = parent->ContentRegion();
-	Point origin = parent->ConvertPointToWindow(clipArea.Origin());
+	Point origin = parent->ConvertPointToWindow(clipArea.origin);
 	clipArea.x = origin.x;
 	clipArea.y = origin.y;
 	
 	const Region intersect = clip.Intersect(clipArea);
-	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsEmpty()) return; // outside the window/screen
 	
 	// clip drawing to the ContentRegion, then restore after drawing
 	Video* video = core->GetVideoDriver();
@@ -105,7 +105,7 @@ ScrollView::ScrollView(const Region& frame)
 : View(frame), contentView(Region())
 {
 	View::AddSubviewInFrontOfView(&contentView);
-	contentView.SetFrame(Region(Point(), frame.Dimensions()));
+	contentView.SetFrame(Region(Point(), frame.size));
 	contentView.SetFlags(RESIZE_WIDTH|RESIZE_HEIGHT, OP_OR);
 	contentView.SetAutoResizeFlags(ResizeAll, OP_SET);
 
@@ -167,14 +167,14 @@ void ScrollView::SetHScroll(ScrollBar*)
 void ScrollView::UpdateScrollbars()
 {
 	// FIXME: this is assuming an origin of 0,0
-	const Size& mySize = ContentRegion().Dimensions();
+	const Size& mySize = ContentRegion().size;
 	const Region& contentFrame = contentView.Frame();
 
 	if (hscroll && contentFrame.w > mySize.w) {
 		// assert(hscroll);
 		// TODO: add horizontal scrollbars
 		// this is a limitation in the Scrollbar class
-		hscroll->SetValue(-contentFrame.Origin().x);
+		hscroll->SetValue(-contentFrame.origin.x);
 	}
 	if (vscroll) {
 		if (contentFrame.h > mySize.h) {
@@ -186,7 +186,7 @@ void ScrollView::UpdateScrollbars()
 		} else {
 			vscroll->SetVisible(false);
 		}
-		vscroll->SetValue(-contentFrame.Origin().y);
+		vscroll->SetValue(-contentFrame.origin.y);
 	}
 }
 	
@@ -283,7 +283,7 @@ void ScrollView::Update()
 
 bool ScrollView::CanScroll(const Point& p) const
 {
-	const Size& mySize = ContentRegion().Dimensions();
+	const Size& mySize = ContentRegion().size;
 	const Size& contentSize = contentView.Dimensions();
 	return contentSize.h > mySize.h + p.y && contentSize.w > mySize.w + p.x;
 }
