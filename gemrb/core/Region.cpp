@@ -100,12 +100,6 @@ bool Size::operator!=(const Size& size) const
 	return !(*this == size);
 }
 
-/*************** region ****************************/
-Region::Region(void)
-{
-	x = y = w = h = 0;
-}
-
 bool Region::operator==(const Region& rgn) const
 {
 	return (x == rgn.x) && (y == rgn.y) && (w == rgn.w) && (h == rgn.h);
@@ -126,10 +120,25 @@ Region::Region(int x, int y, int w, int h)
 
 Region::Region(const Point &p, const Size& s)
 {
-	this->x = p.x;
-	this->y = p.y;
-	this->w = s.w;
-	this->h = s.h;
+	origin = p;
+	size = s;
+}
+
+Region::Region(const Region &r)
+: origin(r.origin), size(r.size)
+{}
+
+Region::Region(Region&& r)
+: origin(r.origin), size(r.size)
+{}
+
+Region& Region::operator=(const Region &rhs)
+{
+	if (&rhs != this) {
+		origin = rhs.origin;
+		size = rhs.size;
+	}
+	return *this;
 }
 
 bool Region::PointInside(const Point &p) const
@@ -200,8 +209,8 @@ void Region::ExpandToPoint(const Point& p)
 
 void Region::ExpandToRegion(const Region& r)
 {
-	ExpandToPoint(r.Origin());
-	ExpandToPoint(r.Origin() + Point(r.w, 0));
+	ExpandToPoint(r.origin);
+	ExpandToPoint(r.origin + Point(r.w, 0));
 	ExpandToPoint(r.Maximum());
 	ExpandToPoint(r.Maximum() - Point(r.w, 0));
 }

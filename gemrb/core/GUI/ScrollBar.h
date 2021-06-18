@@ -90,7 +90,7 @@ private:
 		ControlType = IE_GUI_SCROLLBAR;
 		State = 0;
 		StepIncrement = 1;
-		Size s = frame.Dimensions();
+		Size s = frame.size;
 
 		for(int i=0; i < IMAGE_COUNT; i++) {
 			Frames[i] = images[i];

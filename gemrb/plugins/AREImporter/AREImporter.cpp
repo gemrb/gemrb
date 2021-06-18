@@ -648,7 +648,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		InfoPoint* ip = nullptr;
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
 		if (VertexCount <= 1) {
-			// this is exactly the same as bbox.Origin()
+			// this is exactly the same as bbox.origin
 			if (VertexCount == 1) {
 				str->ReadWord(&tmp);
 				assert(tmp == bbox.x);
@@ -656,7 +656,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				assert(tmp == bbox.y);
 			}
 
-			if (bbox.Dimensions().IsEmpty()) {
+			if (bbox.size.IsEmpty()) {
 				// we approximate a bounding box equivalent to a small radius
 				// we copied this from the Container code that seems to indicate
 				// this is how the originals behave. It is probably "good enough"
@@ -794,7 +794,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			/* piles have no polygons and no bounding box in some areas,
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
-			if (bbox.Dimensions().IsEmpty()) {
+			if (bbox.size.IsEmpty()) {
 				bbox.x = XPos - 7;
 				bbox.y = YPos - 5;
 				bbox.w = 16;
@@ -1985,7 +1985,7 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 		if (ip->outline) {
 			PutPoints(stream, ip->outline->vertices);
 		} else {
-			Point origin = ip->BBox.Origin();
+			Point origin = ip->BBox.origin;
 			PutPoints(stream, &origin, 1);
 		}
 	}

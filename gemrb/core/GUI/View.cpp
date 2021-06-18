@@ -107,9 +107,9 @@ void View::MarkDirty(const Region* rgn)
 			View* view = *it;
 			if (rgn) {
 				Region intersect = view->frame.Intersect(*rgn);
-				const Size& idims = intersect.Dimensions();
+				const Size& idims = intersect.size;
 				if (!idims.IsEmpty()) {
-					Point p = view->ConvertPointFromSuper(intersect.Origin());
+					Point p = view->ConvertPointFromSuper(intersect.origin);
 					Region r = Region(p, idims);
 					view->MarkDirty(&r);
 				}
@@ -130,7 +130,7 @@ void View::MarkDirty()
 bool View::NeedsDraw() const
 {
 	// cull anything that can't be seen
-	if (frame.Dimensions().IsEmpty() || (flags&Invisible)) return false;
+	if (frame.size.IsEmpty() || (flags&Invisible)) return false;
 
 	// check ourselves
 	if (dirty || IsAnimated()) {
@@ -184,7 +184,7 @@ void View::DirtyBGRect(const Region& r)
 {
 	// no need to draw the parent BG for opaque views
 	if (superView && !IsOpaque()) {
-		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.Origin()), r.Dimensions()));
+		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.origin), r.size));
 		superView->DirtyBGRect(rgn);
 	}
 
@@ -219,11 +219,11 @@ void View::DrawBackground(const Region* rgn) const
 	Video* video = core->GetVideoDriver();
 	if (backgroundColor.a > 0) {
 		if (rgn) {
-			Point p = ConvertPointToWindow(rgn->Origin());
-			video->DrawRect(Region(p, rgn->Dimensions()), backgroundColor, true);
+			Point p = ConvertPointToWindow(rgn->origin);
+			video->DrawRect(Region(p, rgn->size), backgroundColor, true);
 		} else if (window) {
 			assert(superView);
-			Point p = superView->ConvertPointToWindow(frame.Origin());
+			Point p = superView->ConvertPointToWindow(frame.origin);
 			video->DrawRect(Region(p, Dimensions()), backgroundColor, true);
 		} else {
 			// FIXME: this is a Window and we need this hack becasue Window::WillDraw() changed the coordinate system
@@ -238,8 +238,8 @@ void View::DrawBackground(const Region* rgn) const
 	if (background) {
 		if (rgn) {
 			Region intersect = rgn->Intersect(background->Frame);
-			Point screenPt = ConvertPointToWindow(intersect.Origin());
-			Region toClip(screenPt, intersect.Dimensions());
+			Point screenPt = ConvertPointToWindow(intersect.origin);
+			Region toClip(screenPt, intersect.size);
 			video->BlitSprite(background, intersect, toClip, BlitFlags::BLENDED);
 		} else {
 			Point dp = ConvertPointToWindow(Point(background->Frame.x, background->Frame.y));
@@ -256,7 +256,7 @@ void View::Draw()
 	const Region clip = video->GetScreenClip();
 	const Region& drawFrame = DrawingFrame();
 	const Region& intersect = clip.Intersect(drawFrame);
-	if (intersect.Dimensions().IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsEmpty()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);
@@ -306,7 +306,7 @@ void View::Draw()
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 				Region r = drawFrame;
 				r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
-				Font::StringSizeMetrics metrics = {r.Dimensions(), 0, 0, true};
+				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
 				fnt->StringSize(string, &metrics);
 				r.h = metrics.size.h;
 				r.w = metrics.size.w;
@@ -371,37 +371,37 @@ Point View::ConvertPointFromScreen(const Point& p) const
 
 Region View::ConvertRegionToSuper(Region r) const
 {
-	r.SetOrigin(ConvertPointToSuper(r.Origin()));
+	r.origin = ConvertPointToSuper(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromSuper(Region r) const
 {
-	r.SetOrigin(ConvertPointFromSuper(r.Origin()));
+	r.origin = ConvertPointFromSuper(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionToWindow(Region r) const
 {
-	r.SetOrigin(ConvertPointToWindow(r.Origin()));
+	r.origin = ConvertPointToWindow(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromWindow(Region r) const
 {
-	r.SetOrigin(ConvertPointFromWindow(r.Origin()));
+	r.origin = ConvertPointFromWindow(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionToScreen(Region r) const
 {
-	r.SetOrigin(ConvertPointToScreen(r.Origin()));
+	r.origin = ConvertPointToScreen(r.origin);
 	return r;
 }
 
 Region View::ConvertRegionFromScreen(Region r) const
 {
-	r.SetOrigin(ConvertPointFromScreen(r.Origin()));
+	r.origin = ConvertPointFromScreen(r.origin);
 	return r;
 }
 
@@ -616,25 +616,24 @@ void View::ResizeSubviews(const Size& oldSize)
 
 void View::SetFrame(const Region& r)
 {
-	SetFrameOrigin(r.Origin());
-	SetFrameSize(r.Dimensions());
+	SetFrameOrigin(r.origin);
+	SetFrameSize(r.size);
 }
 
 void View::SetFrameOrigin(const Point& p)
 {
-	Point oldP = frame.Origin();
+	Point oldP = frame.origin;
 	if (oldP == p) return;
 	
 	MarkDirty(); // refresh the old position in the superview
-	frame.x = p.x;
-	frame.y = p.y;
+	frame.origin = p;
 	
 	OriginChanged(oldP);
 }
 
 void View::SetFrameSize(const Size& s)
 {
-	const Size oldSize = frame.Dimensions();
+	const Size oldSize = frame.size;
 	if (oldSize == s) return;
 
 	MarkDirty(); // refresh the old position in the superview

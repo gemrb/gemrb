@@ -69,24 +69,11 @@ void Animation::AddFrame(Holder<Sprite2D> frame, unsigned int index)
 	}
 	frames[index] = frame;
 
-	int x = -frame->Frame.x;
-	int y = -frame->Frame.y;
-	int w = frame->Frame.w;
-	int h = frame->Frame.h;
-	if (x < animArea.x) {
-		animArea.w += (animArea.x - x);
-		animArea.x = x;
-	}
-	if (y < animArea.y) {
-		animArea.h += (animArea.y - y);
-		animArea.y = y;
-	}
-	if (x+w > animArea.x+animArea.w) {
-		animArea.w = x+w-animArea.x;
-	}
-	if (y+h > animArea.y+animArea.h) {
-		animArea.h = y+h-animArea.y;
-	}
+	Region r = frame->Frame;
+	r.x = -r.x;
+	r.y = -r.y;
+	
+	animArea.ExpandToRegion(r);
 }
 
 unsigned int Animation::GetCurrentFrameIndex() const
@@ -234,24 +221,7 @@ void Animation::MirrorAnimationVert()
 
 void Animation::AddAnimArea(Animation* slave)
 {
-	int x = slave->animArea.x;
-	int y = slave->animArea.y;
-	int w = slave->animArea.w;
-	int h = slave->animArea.h;
-	if (x < animArea.x) {
-		animArea.w += (animArea.x - x);
-		animArea.x = x;
-	}
-	if (y < animArea.y) {
-		animArea.h += (animArea.y - y);
-		animArea.y = y;
-	}
-	if (x+w > animArea.x+animArea.w) {
-		animArea.w = x+w-animArea.x;
-	}
-	if (y+h > animArea.y+animArea.h) {
-		animArea.h = y+h-animArea.y;
-	}
+	animArea.ExpandToRegion(slave->animArea);
 }
 
 }

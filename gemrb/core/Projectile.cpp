@@ -1459,7 +1459,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		//Extension->ExplColor fake color for single shades (blue,green,red flames)
 		//Extension->FragAnimID the animation id for the character animation
 		//This color is not used in the original game
-		Point pos = Pos - vp.Origin();
+		Point pos = Pos - vp.origin;
 		area->Sparkle(0, Extension->ExplColor, SPARKLE_EXPLOSION, pos, Extension->FragAnimID, GetZPos());
 	}
 
@@ -1764,7 +1764,7 @@ void Projectile::DrawTravel(const Region& viewport)
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
 
-	Point pos = Pos - viewport.Origin();
+	Point pos = Pos - viewport.origin;
 	if(bend && phase == P_TRAVEL && Origin != Destination) {
 		double total_distance = Distance(Origin, Destination);
 		double travelled_distance = Distance(Origin, Pos);

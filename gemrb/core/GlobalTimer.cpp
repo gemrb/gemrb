@@ -64,7 +64,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return shakeCounter || (!goal.isempty() && goal != currentVP.Origin());
+	return shakeCounter || (!goal.isempty() && goal != currentVP.origin);
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -94,7 +94,7 @@ void GlobalTimer::DoStep(int count)
 
 	GameControl* gc = core->GetGameControl();
 
-	Point p = currentVP.Origin();
+	Point p = currentVP.origin;
 	if (p != goal && !goal.isempty()) {
 		int d = Distance(goal, p);
 		int magnitude = count * speed;
@@ -113,7 +113,7 @@ void GlobalTimer::DoStep(int count)
 		// we have moved as close to the goal as possible
 		// something must have set a goal beyond the map
 		// update the goal just in case we are in a shake
-		goal = gc->Viewport().Origin();
+		goal = gc->Viewport().origin;
 	}
 
 	// do a possible shake in addition to the standard pan
@@ -122,7 +122,7 @@ void GlobalTimer::DoStep(int count)
 	if (shakeCounter > 0) {
 		shakeCounter = std::max(0, shakeCounter - count);
 		if (shakeCounter) {
-			Point shakeP = gc->Viewport().Origin();
+			Point shakeP = gc->Viewport().origin;
 			shakeP += RandomPoint(-shakeVec.x, shakeVec.x, -shakeVec.y, shakeVec.y);
 			gc->MoveViewportUnlockedTo(shakeP, false);
 		}
@@ -334,7 +334,7 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 	if (goal.isempty()) {
 		GameControl* gc = core->GetGameControl();
 		currentVP = gc->Viewport();
-		goal = currentVP.Origin();
+		goal = currentVP.origin;
 		speed = 1000;
 	}
 }

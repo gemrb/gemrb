@@ -77,7 +77,7 @@ void MapControl::DrawFog(const Region& rgn) const
 			
 			bool visible = MyMap->IsExplored(gameP);
 			if (!visible) {
-				points.push_back(p + rgn.Origin());
+				points.push_back(p + rgn.origin);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ Point MapControl::ConvertPointToGame(Point p) const
 	
 	// mos is centered... first convert p to mos coordinates
 	// mos is in win coordinates (to make things easy elsewhere)
-	p = ConvertPointToSuper(p) - mosRgn.Origin();
+	p = ConvertPointToSuper(p) - mosRgn.origin;
 	
 	p.x *= double(mapsize.w) / mosRgn.w;
 	p.y *= double(mapsize.h) / mosRgn.h;
@@ -112,7 +112,7 @@ Point MapControl::ConvertPointFromGame(Point p) const
 	p.y *= double(mosRgn.h) / mapsize.h;
 	
 	// mos is centered... convert p from mos coordinates
-	return p + mosRgn.Origin();
+	return p + mosRgn.origin;
 }
 	
 void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
@@ -130,7 +130,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	if (MapMOS) {
-		const Size& mosSize = MapMOS->Frame.Dimensions();
+		const Size& mosSize = MapMOS->Frame.size;
 		const Point center(frame.w/2 - mosSize.w/2, frame.h/2 - mosSize.h/2);
 		mosRgn = Region(Origin() + center, mosSize);
 	} else {
@@ -165,7 +165,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (MapMOS) {
-		video->BlitSprite(MapMOS, mosRgn.Origin());
+		video->BlitSprite(MapMOS, mosRgn.origin);
 	}
 
 	if ((core->GetGameControl()->DebugFlags & DEBUG_SHOW_FOG_UNEXPLORED) == 0)

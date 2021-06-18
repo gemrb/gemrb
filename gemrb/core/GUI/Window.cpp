@@ -168,7 +168,7 @@ const VideoBufferPtr& Window::DrawWithoutComposition()
 
 void Window::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
-	backBuffer->SetOrigin(frame.Origin());
+	backBuffer->SetOrigin(frame.origin);
 	core->GetVideoDriver()->PushDrawingBuffer(backBuffer);
 }
 
@@ -243,7 +243,7 @@ bool Window::IsDisabledCursor() const
 void Window::SetPosition(WindowPosition pos)
 {
 	// start at top left
-	Region newFrame(Point(), frame.Dimensions());
+	Region newFrame(Point(), frame.size);
 	Size screen = manager.ScreenSize();
 
 	// adjust horizontal
@@ -602,7 +602,7 @@ bool Window::OnMouseDrag(const MouseEvent& me)
 	assert(me.buttonStates);
 	// dragging the window to a new position. only happens with left mouse.
 	if (IsDragable()) {
-		Point newOrigin = frame.Origin() - me.Delta();
+		Point newOrigin = frame.origin - me.Delta();
 		SetFrameOrigin(newOrigin);
 	} else {
 		ScrollView::OnMouseDrag(me);

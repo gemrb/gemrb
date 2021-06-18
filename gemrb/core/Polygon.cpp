@@ -35,7 +35,7 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
 	
-	assert(!BBox.Dimensions().IsEmpty());
+	assert(!BBox.size.IsEmpty());
 	
 	Rasterize();
 }
@@ -127,7 +127,7 @@ void Gem_Polygon::RecalcBBox()
 
 bool Gem_Polygon::PointIn(const Point& p) const
 {
-	Point relative = p - BBox.Origin();
+	Point relative = p - BBox.origin;
 
 	if (relative.y < 0 || relative.y >= int(rasterData.size())) {
 		return false;
@@ -153,7 +153,7 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 	// most ot the time an intersection would contain one
 	// and we can avoid a more expensive search
 
-	if (PointIn(rect.Origin()) ||
+	if (PointIn(rect.origin) ||
 		PointIn(rect.x + rect.w, rect.y) ||
 		PointIn(rect.x, rect.y + rect.h) ||
 		PointIn(rect.Maximum()))
@@ -161,7 +161,7 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 		return true;
 	}
 
-	Point relative = rect.Origin() - BBox.Origin();
+	Point relative = rect.origin - BBox.origin;
 	if (relative.y < 0 || relative.y + rect.h >= int(rasterData.size())) {
 		return false;
 	}

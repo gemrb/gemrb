@@ -147,9 +147,9 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 
 	//draw the up button
 	if (( State & UP_PRESS ) != 0) {
-		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.Origin());
+		video->BlitSprite(Frames[IMAGE_UP_PRESSED], drawFrame.origin);
 	} else {
-		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.Origin());
+		video->BlitSprite(Frames[IMAGE_UP_UNPRESSED], drawFrame.origin);
 	}
 	int maxy = drawFrame.y + drawFrame.h - GetFrameHeight(IMAGE_DOWN_UNPRESSED);
 	int stepy = GetFrameHeight(IMAGE_TROUGH);
@@ -161,7 +161,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 			Region rgn( drawFrame.x, drawFrame.y + upMy, drawFrame.w, domy - upMy);
 			for (int dy = drawFrame.y + upMy; dy < maxy; dy += stepy) {
 				//TROUGH surely exists if it has a nonzero height
-				Point p = Frames[IMAGE_TROUGH]->Frame.Origin();
+				Point p = Frames[IMAGE_TROUGH]->Frame.origin;
 				p.x += ((frame.w - Frames[IMAGE_TROUGH]->Frame.w - 1) / 2) + drawFrame.x;
 				p.y += dy;
 				video->BlitSprite(Frames[IMAGE_TROUGH], p, &rgn);
@@ -171,7 +171,7 @@ void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
 		int slx = ((frame.w - Frames[IMAGE_SLIDER]->Frame.w - 1) / 2 );
 		// FIXME: doesnt respect SLIDER_HORIZONTAL
 		int sly = AxisPosFromValue().y;
-		Point p = drawFrame.Origin() + Frames[IMAGE_SLIDER]->Frame.Origin();
+		Point p = drawFrame.origin + Frames[IMAGE_SLIDER]->Frame.origin;
 		p.x += slx;
 		p.y += upMy + sly;
 		video->BlitSprite(Frames[IMAGE_SLIDER], p);

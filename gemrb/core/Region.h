@@ -95,12 +95,24 @@ public:
 
 class GEM_EXPORT Region {
 public:
-	int x, y;
-	int w, h;
+	// WARNING: we reinterpret_cast this struct!
+	// Point and Size must be first and in this order
+	Point origin;
+	Size size;
+	
+	// unfortunatly anonymous structs are an extenison in C++...
+	int& x = origin.x;
+	int& y = origin.y;
+	int& w = size.w;
+	int& h = size.h;
 
-	Region(void);
+	Region() = default;
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
+	Region(const Region&);
+	Region(Region&&);
+	
+	Region& operator=(const Region&);
 
 	bool operator==(const Region& rgn) const;
 	bool operator!=(const Region& rgn) const;
@@ -111,11 +123,8 @@ public:
 	bool IntersectsRegion(const Region& rgn) const;
 	Region Intersect(const Region& rgn) const;
 
-	void SetOrigin(const Point& p) { x = p.x; y = p.y; }
-	Point Origin() const { return Point(x, y); }
 	Point Center() const { return Point(x + w / 2, y + h / 2); }
 	Point Maximum() const { return Point(x + w, y + h); }
-	Size Dimensions() const { return Size(w, h); }
 	
 	void ExpandToPoint(const Point& p);
 	void ExpandToRegion(const Region& r);
