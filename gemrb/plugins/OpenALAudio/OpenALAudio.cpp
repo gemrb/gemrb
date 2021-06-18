@@ -534,7 +534,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 	ieDword efxSetting;
 	core->GetDictionary()->Lookup("Environmental Audio", efxSetting);
 
-	if (efxSetting && hasReverbProperties && (!p.isnull() || (flags & GEM_SND_RELATIVE))) {
+	if (efxSetting && hasReverbProperties && (!p.IsZero() || (flags & GEM_SND_RELATIVE))) {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, efxEffectSlot, 0, 0);
 	} else {
 		alSource3i(Source, AL_AUXILIARY_SEND_FILTER, 0, 0, 0);

@@ -62,7 +62,7 @@ Point::Point(int x, int y)
 	this->y = y;
 }
 
-bool Point::isnull() const
+bool Point::IsZero() const
 {
 	return (x == 0) && (y == 0);
 }
