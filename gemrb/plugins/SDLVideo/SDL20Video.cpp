@@ -359,12 +359,8 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		}
 		
 		stencilShader->SetUniformValue("s_stencil", 1, 0);
-		glActiveTexture(GL_TEXTURE0);
-		SDL_GL_BindTexture(stencilTex, nullptr, nullptr);
 
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
-
-		SDL_GL_UnbindTexture(stencilTex);
 		EndCustomRendering();
 #else
 		// alpha masking only
