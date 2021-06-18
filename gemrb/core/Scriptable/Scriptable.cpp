@@ -261,7 +261,7 @@ void Scriptable::DrawOverheadText()
 		cs = ((Selectable *) this)->size*50;
 	}
 
-	Point p = (overHeadTextPos == InvalidPoint) ? Pos : overHeadTextPos;
+	Point p = (overHeadTextPos.IsInvalid()) ? Pos : overHeadTextPos;
 	Region vp = core->GetGameControl()->Viewport();
 	Region rgn(p - Point(100, cs) - vp.origin, Size(200, 400));
 	core->GetTextFont()->Print(rgn, OverheadText, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, color);
@@ -986,7 +986,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 
-	if (LastTargetPos == InvalidPoint) {
+	if (LastTargetPos.IsInvalid()) {
 		SpellHeader = -1;
 		return;
 	}
@@ -1556,7 +1556,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					target = core->GetGame()->GetActorByGlobalID(LastSpellTarget);
 				}
 			}
-			if (LastTargetPos == InvalidPoint) {
+			if (LastTargetPos.IsInvalid()) {
 				targetpos = LastTargetPos;
 			} else if (target) {
 				targetpos = target->Pos;

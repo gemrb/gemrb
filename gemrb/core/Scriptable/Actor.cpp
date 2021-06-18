@@ -4476,7 +4476,7 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 		return true;
 	}
 
-	if (!LastSpellTarget && LastTargetPos == InvalidPoint) {
+	if (!LastSpellTarget && LastTargetPos.IsInvalid()) {
 		// not casting, nothing to do
 		return false;
 	}
@@ -8321,7 +8321,7 @@ bool Actor::HibernateIfAble()
 		return false;
 	if (LastTarget) //currently attacking someone
 		return false;
-	if (LastTargetPos != InvalidPoint) //currently casting at the ground
+	if (!LastTargetPos.IsInvalid()) //currently casting at the ground
 		return false;
 	if (LastSpellTarget) //currently casting at someone
 		return false;

@@ -64,7 +64,7 @@ void GlobalTimer::Freeze()
 
 bool GlobalTimer::ViewportIsMoving()
 {
-	return shakeCounter || (goal != InvalidPoint && goal != currentVP.origin);
+	return shakeCounter || (!goal.IsInvalid() && goal != currentVP.origin);
 }
 
 void GlobalTimer::SetMoveViewPort(Point p, int spd, bool center)
@@ -95,7 +95,7 @@ void GlobalTimer::DoStep(int count)
 	GameControl* gc = core->GetGameControl();
 
 	Point p = currentVP.origin;
-	if (p != goal && goal != InvalidPoint) {
+	if (p != goal && !goal.IsInvalid()) {
 		int d = Distance(goal, p);
 		int magnitude = count * speed;
 		
@@ -331,7 +331,7 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 	shakeVec.y = std::abs(shake.y);
 	shakeCounter = count + 1;
 	
-	if (goal == InvalidPoint) {
+	if (goal.IsInvalid()) {
 		GameControl* gc = core->GetGameControl();
 		currentVP = gc->Viewport();
 		goal = currentVP.origin;
