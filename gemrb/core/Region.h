@@ -71,7 +71,7 @@ public:
 
 // this is not a member function because -1, -1 is a perfectly valid point
 // unless the coordinate system only allows positive
-GEM_EXPORT const Point InvalidPoint = Point(-1, -1);
+const Point InvalidPoint = Point(-1, -1);
 
 class GEM_EXPORT Size {
 public:
