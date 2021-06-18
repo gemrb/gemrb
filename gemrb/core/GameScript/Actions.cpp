@@ -3156,7 +3156,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
-	if (p == InvalidPoint) {
+	if (p.IsInvalid()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}

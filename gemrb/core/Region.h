@@ -55,8 +55,8 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
-	/** if it is [0.0] */
-	bool isnull() const;
+	bool isnull() const; // (0, 0)
+	bool IsInvalid() const; // (-1, -1)
 
 	inline void reset() {
 		x = y = 0;
@@ -68,10 +68,6 @@ public:
 	int x = 0;
 	int y = 0;
 };
-
-// this is not a member function because -1, -1 is a perfectly valid point
-// unless the coordinate system only allows positive
-const Point InvalidPoint = Point(-1, -1);
 
 class GEM_EXPORT Size {
 public:
