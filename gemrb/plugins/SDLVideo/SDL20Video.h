@@ -256,7 +256,8 @@ private:
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	
-	void RefreshSDLRenderState();
+	void BeginCustomRendering();
+	void EndCustomRendering();
 	int UpdateRenderTarget(const Color* color = NULL, BlitFlags flags = BlitFlags::NONE);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags = BlitFlags::NONE) override;

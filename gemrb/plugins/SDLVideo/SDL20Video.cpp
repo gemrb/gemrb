@@ -237,13 +237,30 @@ SDLVideoDriver::vid_buf_t* SDL20VideoDriver::CurrentStencilBuffer() const
 	return std::static_pointer_cast<SDLTextureVideoBuffer>(stencilBuffer)->GetTexture();
 }
 
-void SDL20VideoDriver::RefreshSDLRenderState()
+// WARNING: these are necissary hacks to combine SDL_Renderer with OpenGL (or other) native calls
+void SDL20VideoDriver::BeginCustomRendering()
 {
-	// there is no direct way to do this, but drawing a primitive will change the shader
-	// changing the renderer blendmode will force that update too
-	// there are other things we would need to reset if changed, but these 2 are the ones we cahnge behind its back currently
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+	// To start we need to make sure SDL thinks it is using its texture shader
+	// so that we can change the program without it knowing
+	static const SDL_Rect r = {0, 0, 1, 1};
+	SDL_RenderCopy(renderer, ScratchBuffer(), &r, &r);
+	// if we ever call more than glUseProgram (and associates) then we will need to do more here
+	// we may want to add a 'flags' parameter to conditionally clear the other states
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	SDL_RenderFlush(renderer);
+#endif
+}
+
+void SDL20VideoDriver::EndCustomRendering()
+{
+	// to end we need SDL to "reset" the render state to restore the textrue shader
+	// we do this by changing the state to the primitive "solid" shader
 	SDL_RenderDrawPoint(renderer, -1, -1);
+	// if we ever call more than glUseProgram (and associates) then we will need to do more here
+	// we may want to add a 'flags' parameter to conditionally clear the other states
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+	SDL_RenderFlush(renderer);
+#endif
 }
 
 int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
@@ -286,7 +303,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, const SDL_Color* tint)
 {
 	BlitFlags version = BlitFlags::NONE;
-#if 1 // !USE_OPENGL_BACKEND
+#if !USE_OPENGL_BACKEND
 	// we need to isolate flags that require software rendering to use as the "version"
 	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
@@ -323,9 +340,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		stencilRect.y -= stencilBuffer->Origin().y;
 
 #if USE_OPENGL_BACKEND
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-		SDL_RenderFlush(renderer);
-#endif
+		BeginCustomRendering();
 		GLint channel = 3;
 		if (flags&BlitFlags::STENCIL_RED) {
 			channel = 0;
@@ -350,7 +365,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
 
 		SDL_GL_UnbindTexture(stencilTex);
-		RefreshSDLRenderState();
+		EndCustomRendering();
 #else
 		// alpha masking only
 		SDL_RenderCopy(renderer, stencilTex, &stencilRect, &drect);
@@ -393,10 +408,8 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* srcrect,
 									   const SDL_Rect* dstrect, BlitFlags flags, const SDL_Color* tint)
 {
-#if 0 // USE_OPENGL_BACKEND
-	GLint previous_program;
-	glGetIntegerv(GL_CURRENT_PROGRAM, &previous_program);
-
+#if USE_OPENGL_BACKEND
+	BeginCustomRendering();
 	spriteShader->Use();
 	if (flags&BlitFlags::GREY) {
 		spriteShader->SetUniformValue("u_greyMode", 1, 1);
@@ -441,13 +454,11 @@ int SDL20VideoDriver::RenderCopyShaded(SDL_Texture* texture, const SDL_Rect* src
 	SDL_RendererFlip flipflags = (flags&BlitFlags::MIRRORY) ? SDL_FLIP_VERTICAL : SDL_FLIP_NONE;
 	flipflags = static_cast<SDL_RendererFlip>(flipflags | ((flags&BlitFlags::MIRRORX) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE));
 
-#if 0 // USE_OPENGL_BACKEND
 	int ret = SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
-
-	return ret;
-#else
-	return SDL_RenderCopyEx(renderer, texture, srcrect, dstrect, 0.0, NULL, flipflags);
+#if USE_OPENGL_BACKEND
+	EndCustomRendering();
 #endif
+	return ret;
 }
 
 void SDL20VideoDriver::DrawPointsImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)
