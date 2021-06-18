@@ -1276,7 +1276,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS) );
+	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
 	if (p.isnull()) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1471,7 +1471,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetGameControl()->Viewport();
 	Actor* actor = ( Actor* ) Sender;
-	Point p((vp.x+vp.w/2), (vp.y+vp.h/2) );
+	Point p(vp.x + vp.w / 2, vp.y + vp.h / 2);
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, IF_NOINT, 0 );
 	}

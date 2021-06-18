@@ -278,15 +278,13 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			}
 		}
 		//parse the selected spawnpoint
-		int x, y;
+		Point p;
 		int o;
-		if (sscanf(s, "[%d%*[,.]%d:%d]", &x, &y, &o) == 3) {
-			critter.SpawnPoint.x = x;
-			critter.SpawnPoint.y = y;
+		if (sscanf(s, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) == 3) {
+			critter.SpawnPoint = p;
 			critter.Orientation = o;
-		} else if (sscanf(s, "[%d%*[,.]%d]", &x, &y) == 2) {
-			critter.SpawnPoint.x = x;
-			critter.SpawnPoint.y = y;
+		} else if (sscanf(s, "[%d%*[,.]%d]", &p.x, &p.y) == 2) {
+			critter.SpawnPoint = p;
 			critter.Orientation = core->Roll(1, 16, -1);
 		}
 	}
