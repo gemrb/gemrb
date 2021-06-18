@@ -89,7 +89,7 @@ void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region
 	clipArea.y = origin.y;
 	
 	const Region intersect = clip.Intersect(clipArea);
-	if (intersect.size.IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsInvalid()) return; // outside the window/screen
 	
 	// clip drawing to the ContentRegion, then restore after drawing
 	Video* video = core->GetVideoDriver();

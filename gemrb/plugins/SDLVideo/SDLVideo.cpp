@@ -561,7 +561,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		}
 	} // already have appropriate y for right clip
 
-	if (dclipped.size.IsEmpty() || src.size.IsEmpty()) {
+	if (dclipped.size.IsInvalid() || src.size.IsInvalid()) {
 		return;
 	}
 

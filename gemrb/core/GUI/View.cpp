@@ -108,7 +108,7 @@ void View::MarkDirty(const Region* rgn)
 			if (rgn) {
 				Region intersect = view->frame.Intersect(*rgn);
 				const Size& idims = intersect.size;
-				if (!idims.IsEmpty()) {
+				if (!idims.IsInvalid()) {
 					Point p = view->ConvertPointFromSuper(intersect.origin);
 					Region r = Region(p, idims);
 					view->MarkDirty(&r);
@@ -130,7 +130,7 @@ void View::MarkDirty()
 bool View::NeedsDraw() const
 {
 	// cull anything that can't be seen
-	if (frame.size.IsEmpty() || (flags&Invisible)) return false;
+	if (frame.size.IsInvalid() || (flags&Invisible)) return false;
 
 	// check ourselves
 	if (dirty || IsAnimated()) {
@@ -256,7 +256,7 @@ void View::Draw()
 	const Region clip = video->GetScreenClip();
 	const Region& drawFrame = DrawingFrame();
 	const Region& intersect = clip.Intersect(drawFrame);
-	if (intersect.size.IsEmpty()) return; // outside the window/screen
+	if (intersect.size.IsInvalid()) return; // outside the window/screen
 
 	// clip drawing to the view bounds, then restore after drawing
 	video->SetScreenClip(&intersect);

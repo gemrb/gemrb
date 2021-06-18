@@ -217,7 +217,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 				}
 				numPrinted += numOnLine;
 			}
-			assert(!lineSegment.size.IsEmpty());
+			assert(!lineSegment.size.IsInvalid());
 			lineExclusions.push_back(lineSegment);
 
 		newline:
@@ -601,7 +601,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 		layoutFrame.h -= margin.top + margin.bottom;
 	}
 
-	assert(!layoutFrame.size.IsEmpty());
+	assert(!layoutFrame.size.IsInvalid());
 	while (it != contents.end()) {
 		const Content* content = *it++;
 		while (exContent) {

@@ -361,10 +361,10 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 {
 	assert(spr->BAM);
 
-	if (srect.size.IsEmpty())
+	if (srect.size.IsInvalid())
 		return;
 
-	if (drect.size.IsEmpty())
+	if (drect.size.IsInvalid())
 		return;
 
 	PaletteHolder palette = spr->GetPalette();

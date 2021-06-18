@@ -656,7 +656,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				assert(tmp == bbox.y);
 			}
 
-			if (bbox.size.IsEmpty()) {
+			if (bbox.size.IsInvalid()) {
 				// we approximate a bounding box equivalent to a small radius
 				// we copied this from the Container code that seems to indicate
 				// this is how the originals behave. It is probably "good enough"
@@ -794,7 +794,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			/* piles have no polygons and no bounding box in some areas,
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
-			if (bbox.size.IsEmpty()) {
+			if (bbox.size.IsInvalid()) {
 				bbox.x = XPos - 7;
 				bbox.y = YPos - 5;
 				bbox.w = 16;

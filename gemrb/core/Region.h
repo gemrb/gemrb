@@ -75,15 +75,19 @@ GEM_EXPORT const Point InvalidPoint = Point(-1, -1);
 
 class GEM_EXPORT Size {
 public:
-	int w, h;
-	Size();
+	int w = 0, h = 0;
+	Size() = default;
 	Size(int, int);
+	
+	inline void reset() {
+		w = h = 0;
+	}
 
 	bool operator==(const Size& size) const;
 	bool operator!=(const Size& size) const;
 	int Area() const { return w * h; }
 	bool IsZero() const { return w == 0 && h == 0; }
-	bool IsEmpty() const { return w <= 0 || h <= 0; }
+	bool IsInvalid() const { return w <= 0 || h <= 0; }
 };
 
 /**

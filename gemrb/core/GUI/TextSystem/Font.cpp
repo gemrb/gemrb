@@ -580,7 +580,7 @@ size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, co
 
 size_t Font::Print(Region rgn, const String& string, ieByte alignment, const PrintColors* colors, Point* point) const
 {
-	if (rgn.size.IsEmpty()) return 0;
+	if (rgn.size.IsInvalid()) return 0;
 
 	Point p = (point) ? *point : Point();
 	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
