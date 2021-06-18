@@ -2936,6 +2936,11 @@ bool Map::CanFree()
 		if (actor->GetInternalFlag()&IF_USEEXIT) {
 			return false;
 		}
+
+		const Action *current = actor->GetCurrentAction();
+		if (current && actionflags[current->actionID] & AF_CHASE) {
+			return false;
+		}
 	}
 	//we expect the area to be swapped out, so we simply remove the corpses now
 	PurgeArea(false);
