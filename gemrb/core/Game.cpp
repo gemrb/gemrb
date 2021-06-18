@@ -461,10 +461,9 @@ void Game::InitActorPos(Actor *actor) const
 	const char *area = start->QueryField(mode[playmode],"AREA");
 	const char *rot = start->QueryField(mode[playmode],"ROT");
 
-	actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( strta->GetRowIndex(xpos), ip ));
-	actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( strta->GetRowIndex(ypos), ip ));
-	actor->HomeLocation.x = actor->Pos.x;
-	actor->HomeLocation.y = actor->Pos.y;
+	actor->Pos.x = actor->Destination.x = atoi(strta->QueryField(strta->GetRowIndex(xpos), ip));
+	actor->Pos.y = actor->Destination.y = atoi(strta->QueryField(strta->GetRowIndex(ypos), ip));
+	actor->HomeLocation = actor->Pos;
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
 	if (strta.load("startare")) {

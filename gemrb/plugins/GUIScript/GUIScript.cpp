@@ -9977,7 +9977,6 @@ PyDoc_STRVAR( GemRB_SetMapAnimation__doc,
 
 static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 {
-	int x,y;
 	const char *ResRef;
 	int Cycle = 0;
 	int Flags = 0x19;
@@ -9985,15 +9984,13 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	//the animation is cloned by AddAnimation, so we can keep the original on
 	//the stack
 	AreaAnimation anim;
-	PARSE_ARGS( args,  "iis|iii", &x, &y, &ResRef, &Flags, &Cycle, &Height);
+	PARSE_ARGS( args,  "iis|iii", &anim.Pos.x, &anim.Pos.y, &ResRef, &Flags, &Cycle, &Height);
 
 	GET_GAME();
 
 	GET_MAP();
 
 	anim.appearance=0xffffffff; //scheduled for every hour
-	anim.Pos.x = x;
-	anim.Pos.y = y;
 	strnlwrcpy(anim.Name, ResRef, 8);
 	strnlwrcpy(anim.BAM, ResRef, 8);
 	anim.Flags=Flags;

@@ -2461,13 +2461,12 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 
 Point GetEntryPoint(const char *areaname, const char *entryname)
 {
-	Point p;
-
 	AutoTable tab("entries");
 	if (!tab) {
-		return p;
+		return {};
 	}
 	const char *tmpstr = tab->QueryField(areaname, entryname);
+	Point p;
 	sscanf(tmpstr, "%d.%d", &p.x, &p.y);
 	return p;
 }
