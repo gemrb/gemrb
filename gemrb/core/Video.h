@@ -29,6 +29,7 @@
 
 #include "globals.h"
 
+#include "EnumFlags.h"
 #include "Plugin.h"
 #include "Polygon.h"
 #include "Sprite2D.h"
@@ -64,41 +65,6 @@ enum BlitFlags : uint32_t {
 	STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
 	STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
 };
-
-inline BlitFlags operator |(BlitFlags a, BlitFlags b)
-{
-	return static_cast<BlitFlags>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
-}
-
-inline BlitFlags& operator |=(BlitFlags& a, BlitFlags b)
-{
-	return a = a | b;
-}
-
-inline BlitFlags operator &(BlitFlags a, BlitFlags b)
-{
-	return static_cast<BlitFlags>(static_cast<uint32_t>(a) & static_cast<uint32_t>(b));
-}
-
-inline BlitFlags& operator &=(BlitFlags& a, BlitFlags b)
-{
-	return a = a & b;
-}
-
-inline BlitFlags operator ^(BlitFlags a, BlitFlags b)
-{
-	return static_cast<BlitFlags>(static_cast<uint32_t>(a) ^ static_cast<uint32_t>(b));
-}
-
-inline BlitFlags& operator ^=(BlitFlags& a, BlitFlags b)
-{
-	return a = a ^ b;
-}
-
-inline BlitFlags operator ~(BlitFlags a)
-{
-	return static_cast<BlitFlags>(~static_cast<uint32_t>(a));
-}
 
 #define BLIT_STENCIL_MASK (BlitFlags::STENCIL_ALPHA|BlitFlags::STENCIL_RED|BlitFlags::STENCIL_GREEN|BlitFlags::STENCIL_BLUE|BlitFlags::STENCIL_DITHER)
 
