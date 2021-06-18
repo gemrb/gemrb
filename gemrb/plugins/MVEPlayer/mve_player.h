@@ -68,7 +68,6 @@ protected:
 	void segment_video_init(unsigned char version);
 	void segment_video_mode();
 	void segment_video_palette();
-	void segment_video_compressedpalette();
 	void segment_video_codemap(unsigned short size);
 	void segment_video_data(unsigned short size);
 	void segment_video_play();

@@ -202,7 +202,7 @@ bool MVEPlayer::process_segment(unsigned short len, unsigned char type, unsigned
 			segment_video_palette();
 			break;
 		case MVE_OC_PALETTE_COMPRESSED:
-			segment_video_compressedpalette();
+			error("MVEPlayer", "MVE_OC_PALETTE_COMPRESSED encountered, which video was playing?");
 			break;
 		case MVE_OC_CODE_MAP:
 			segment_video_codemap(len);
@@ -327,31 +327,6 @@ void MVEPlayer::segment_video_palette() {
 	char *palette = buffer + 4;
 
 	host->setPalette((unsigned char *)palette - (3 * palette_start), palette_start, palette_count);
-}
-
-//appears to be unused
-void MVEPlayer::segment_video_compressedpalette() {
-#if 0
-	char *data = buffer;
-
-	for (unsigned int i = 0; i < 32; ++i) {
-		unsigned char mask = *data;
-		data++;
-
-		if (mask) {
-			for (unsigned int j = 0; j < 8; ++j) {
-				unsigned char r, g, b;
-				r = (*data) << 2;
-				++data;
-				g = (*data) << 2;
-				++data;
-				b = (*data) << 2;
-				++data;
-				/* TODO: set palette position (i * 8) + j */
-			}
-		}
-	}
-#endif
 }
 
 void MVEPlayer::segment_video_codemap(unsigned short size) {
