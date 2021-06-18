@@ -1714,7 +1714,7 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 		
 		if (stencil == nullptr) {
 			Region stencilRgn = Region(objectRgn.origin - viewPortOrigin, objectRgn.size);
-			if (stencilRgn.size.IsEmpty()) {
+			if (stencilRgn.size.IsInvalid()) {
 				stencil = wallStencil;
 			} else {
 				stencil = video->CreateBuffer(stencilRgn, Video::BufferFormat::DISPLAY_ALPHA);

@@ -74,11 +74,6 @@ bool Point::isWithinRadius(int r, const Point& p) const
 	return (d.x * d.x) + (d.y * d.y) <= r * r;
 }
 
-Size::Size()
-{
-	w = h = 0;
-}
-
 Size::Size(int w, int h)
 {
 	this->w = w;

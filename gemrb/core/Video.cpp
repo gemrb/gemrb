@@ -86,7 +86,7 @@ Region Video::ClippedDrawingRect(const Region& target, const Region* clip) const
 		r = clip->Intersect(r);
 	}
 	// the clip must be "safe". no negative values or crashy crashy
-	if (r.size.IsEmpty()) { // logically equivalent to no intersection
+	if (r.size.IsInvalid()) { // logically equivalent to no intersection
 		r.h = 0;
 		r.w = 0;
 	}
@@ -222,7 +222,7 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 	Region dst(p, spr->Frame.size);
 	Region fClip = ClippedDrawingRect(dst, clip);
 
-	if (fClip.size.IsEmpty()) {
+	if (fClip.size.IsInvalid()) {
 		return; // already know blit fails
 	}
 

@@ -145,7 +145,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		sprSize.w = maxx;
 	}*/
 
-	if (sprSize.IsEmpty()) {
+	if (sprSize.IsInvalid()) {
 		return AliasBlank(chr);
 	}
 

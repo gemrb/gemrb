@@ -256,7 +256,7 @@ struct PixelIterator : IPixelIterator
 	}
 
 	void Advance(int dx) override {
-		if (dx == 0 || size.IsEmpty()) return;
+		if (dx == 0 || size.IsInvalid()) return;
 
 		uint8_t* ptr = static_cast<uint8_t*>(pixel);
 		

@@ -170,7 +170,7 @@ bool InfoPoint::Entered(Actor *actor)
 		// be more lenient for travel regions, fixed iwd2 ar1100 to1101 region
 		if (Type == ST_TRAVEL && outline->BBox.PointInside(actor->Pos)) goto check;
 		if (outline->PointIn( actor->Pos)) goto check;
-	} else if (!BBox.size.IsEmpty()) {
+	} else if (!BBox.size.IsInvalid()) {
 		if (BBox.PointInside(actor->Pos)) goto check;
 	} else {
 		// this is to trap possible bugs in our understanding of ARE polygons that arent actually polygons

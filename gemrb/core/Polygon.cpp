@@ -35,7 +35,7 @@ Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
 	
-	assert(!BBox.size.IsEmpty());
+	assert(!BBox.size.IsInvalid());
 	
 	Rasterize();
 }
