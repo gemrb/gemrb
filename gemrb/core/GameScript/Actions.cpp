@@ -1471,7 +1471,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetGameControl()->Viewport();
 	Actor* actor = ( Actor* ) Sender;
-	Point p(vp.x + vp.w / 2, vp.y + vp.h / 2);
+	Point p = vp.Center();
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, IF_NOINT, 0 );
 	}
