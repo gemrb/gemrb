@@ -632,7 +632,7 @@ void IniSpawn::RespawnNameless()
 		return;
 	}
 
-	if (NamelessSpawnPoint.isnull()) {
+	if (NamelessSpawnPoint.IsZero()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
 		strnuprcpy(NamelessSpawnArea, nameless->Area, 8);
@@ -861,7 +861,7 @@ void IniSpawn::InitialSpawn()
 	}
 
 	// move the rest of the party if needed
-	if (!PartySpawnPoint.isnull()) {
+	if (!PartySpawnPoint.IsZero()) {
 		Game *game = core->GetGame();
 		while (game->GetPartySize(false) > 1) {
 			Actor *pc = game->GetPC(1, false); // skip TNO

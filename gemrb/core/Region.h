@@ -55,7 +55,7 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
-	bool isnull() const; // (0, 0)
+	bool IsZero() const; // (0, 0)
 	bool IsInvalid() const; // (-1, -1)
 
 	inline void reset() {

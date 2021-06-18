@@ -360,7 +360,7 @@ bool ScrollView::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 			scroll.x = -amount;
 			break;
 	}
-	if (!scroll.isnull() && CanScroll(scroll)) {
+	if (!scroll.IsZero() && CanScroll(scroll)) {
 		ScrollDelta(scroll);
 		return true;
 	}

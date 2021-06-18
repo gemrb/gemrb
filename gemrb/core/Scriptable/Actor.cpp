@@ -5439,7 +5439,7 @@ void Actor::Resurrect(const Point &destPoint)
 	SetBaseBit(IE_STATE_ID, STATE_DEAD, false);
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_AVATARREMOVAL, 0);
-	if (!destPoint.isnull()) {
+	if (!destPoint.IsZero()) {
 		SetPosition(destPoint, CC_CHECK_IMPASSABLE, 0);
 	}
 	if (ShouldModifyMorale()) SetBase(IE_MORALE, 10);

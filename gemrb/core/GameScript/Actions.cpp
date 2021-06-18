@@ -941,7 +941,7 @@ void GameScript::SetSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	//iwd2
-	if (parameters->pointParameter.isnull()) {
+	if (parameters->pointParameter.IsZero()) {
 		actor->SetBase(IE_SAVEDXPOS, actor->Pos.x);
 		actor->SetBase(IE_SAVEDYPOS, actor->Pos.y);
 		actor->SetBase(IE_SAVEDFACE, actor->GetOrientation());
@@ -1277,7 +1277,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 
 	Actor* actor = ( Actor* ) tar;
 	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
-	if (p.isnull()) {
+	if (p.IsZero()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1305,7 +1305,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 
 	Actor* actor = ( Actor* ) tar;
 	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
-	if (p.isnull()) {
+	if (p.IsZero()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1335,7 +1335,7 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	Point p(actor->GetBase(IE_SAVEDXPOS), actor->GetBase(IE_SAVEDYPOS));
 	actor->SetBase(IE_SAVEDXPOS,0);
 	actor->SetBase(IE_SAVEDYPOS,0);
-	if (p.isnull()) {
+	if (p.IsZero()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1363,7 +1363,7 @@ void GameScript::ReturnToStartLocation(Scriptable* Sender, Action* parameters)
 
 	Actor* actor = (Actor *) tar;
 	Point p = actor->HomeLocation;
-	if (p.isnull()) {
+	if (p.IsZero()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}

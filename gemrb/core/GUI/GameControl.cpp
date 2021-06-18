@@ -434,7 +434,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		}
 	}
 
-	if (!vpVector.isnull()) {
+	if (!vpVector.IsZero()) {
 		if (MoveViewportTo(vpOrigin + vpVector, false)) {
 			if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
 				int cursorFrame = 0; // right
@@ -1648,7 +1648,7 @@ bool GameControl::OnGlobalMouseMove(const Event& e)
 		vpVector.y = 0;
 	}
 	
-	if (!vpVector.isnull()) {
+	if (!vpVector.IsZero()) {
 		// cancel any scripted moves
 		// we are not in dialog or cutscene mode anymore
 		// and the user is attempting to move the viewport

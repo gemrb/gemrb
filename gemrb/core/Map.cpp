@@ -2314,7 +2314,7 @@ void Map::PurgeArea(bool items)
 		if (!actor->GetRandomWalkCounter()) continue;
 		if (actor->GetStat(IE_MC_FLAGS) & MC_IGNORE_RETURN) continue;
 		if (!actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ALLY|GA_NO_ENEMY)) continue;
-		if (!actor->HomeLocation.isnull() && !actor->HomeLocation.IsInvalid() && actor->Pos != actor->HomeLocation) {
+		if (!actor->HomeLocation.IsZero() && !actor->HomeLocation.IsInvalid() && actor->Pos != actor->HomeLocation) {
 			actor->Pos = actor->HomeLocation;
 		}
 	}

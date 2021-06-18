@@ -163,7 +163,7 @@ void WorldMapControl::ScrollTo(const Point& pos)
 	WorldMap* worldmap = core->GetWorldMap();
 	Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
 
-	if (pos.isnull()) {
+	if (pos.IsZero()) {
 		// center worldmap on current area
 		unsigned entry;
 		const WMPAreaEntry *areaEntry = worldmap->GetArea(currentArea, entry);

@@ -1594,7 +1594,7 @@ int GameScript::NearLocation(Scriptable *Sender, const Trigger *parameters)
 	if (!scr) {
 		return 0;
 	}
-	if (parameters->pointParameter.isnull()) {
+	if (parameters->pointParameter.IsZero()) {
 		int distance;
 		if (parameters->int0Parameter < 0) { // use Sender's position
 			distance = PersonalDistance(Sender, scr);

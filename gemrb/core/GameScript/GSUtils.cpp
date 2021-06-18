@@ -846,7 +846,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			// handle also the combo with CC_OBJECT, so we don't have fallthrough problems
 			if (flags & CC_OBJECT && tmp) referer = tmp;
 			pnt = FindOffScreenPoint(referer, flags, ab->size, 0);
-			if (pnt.isnull()) {
+			if (pnt.IsZero()) {
 				pnt = FindOffScreenPoint(referer, flags, ab->size, 1);
 			}
 			break;
