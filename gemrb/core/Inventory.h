@@ -81,7 +81,7 @@ typedef enum ieInventoryType {
 } ieInventoryType;
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieCREItemFlagBits {
+typedef enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
@@ -172,7 +172,7 @@ public:
 	//for days effect. This field shows the expiration in gametime hours
 	ieWord Expired;
 	ieWord Usages[CHARGE_COUNTERS];
-	ieDword Flags;
+	uint32_t Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	/** Weight of each item in the stack */
 	int Weight;
