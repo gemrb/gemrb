@@ -395,7 +395,7 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	unsigned short* SrchMap; //internal searchmap
+	PathMapFlags* SrchMap; //internal searchmap
 	unsigned short* MaterialMap;
 	unsigned int Width, Height;
 	std::list< AreaAnimation*> animations;
@@ -475,11 +475,11 @@ public:
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
-	unsigned int GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y) const;
-	unsigned int GetBlocked(unsigned int x, unsigned int y, int size) const;
-	unsigned int GetBlockedNavmap(unsigned int x, unsigned int y) const;
-	unsigned int GetBlockedNavmap(const Point &c) const;
+	PathMapFlags GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlocked(unsigned int x, unsigned int y) const;
+	PathMapFlags GetBlocked(unsigned int x, unsigned int y, int size) const;
+	PathMapFlags GetBlockedNavmap(unsigned int x, unsigned int y) const;
+	PathMapFlags GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID) const;
 	Container *GetContainerByGlobalID(ieDword objectID) const;
@@ -559,7 +559,7 @@ public:
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
-	void BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value);
+	void BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value);
 	void ClearSearchMapFor(const Movable *actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
@@ -634,8 +634,8 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	unsigned short GetInternalSearchMap(int x, int y) const;
-	void SetInternalSearchMap(int x, int y, int value);
+	PathMapFlags GetInternalSearchMap(int x, int y) const;
+	void SetInternalSearchMap(int x, int y, PathMapFlags value);
 	void SetBackground(const ieResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
 
@@ -673,7 +673,7 @@ private:
 	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
-	unsigned int GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
+	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 
 };
 

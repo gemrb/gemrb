@@ -2135,11 +2135,11 @@ void Movable::BumpBack()
 	if (Type != ST_ACTOR) return;
 	Actor *actor = (Actor*)this;
 	area->ClearSearchMapFor(this);
-	unsigned oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y);
-	if (!(oldPosBlockStatus & PATH_MAP_PASSABLE)) {
+	PathMapFlags oldPosBlockStatus = area->GetBlockedNavmap(oldPos.x, oldPos.y);
+	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
 		// Do bump back if the actor is "blocking" itself
-		if (!(oldPosBlockStatus & PATH_MAP_ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
-			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+		if (!((oldPosBlockStatus & PathMapFlags::ACTOR) == PathMapFlags::ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
+			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
 			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
 				bumpBackTries++;
 				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
@@ -2227,7 +2227,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (BlocksSearchMap() && area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PATH_MAP_SIDEWALL) {
+		if (BlocksSearchMap() && bool(area->GetBlockedNavmap(Pos.x + dx, Pos.y + dy) & PathMapFlags::SIDEWALL)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
@@ -2243,7 +2243,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.y += dy;
 		oldPos = Pos;
 		if (actor && BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
 		}
 
 		SetOrientation(step->orient, false);
@@ -2285,7 +2285,7 @@ void Movable::AddWayPoint(const Point &Des)
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+			area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
 		}
 		return;
 	}
@@ -2333,7 +2333,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}  else {
 		pathfindingDistance = std::max(size, distance);
 		if (BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+			area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
 		}
 	}
 }
@@ -2404,7 +2404,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	//0 - back away, 1 - face direction
 	path = area->RandomWalk(Pos, size, maxWalkDistance ? maxWalkDistance : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
 	if (BlocksSearchMap()) {
-		area->BlockSearchMap(Pos, size, IsPC() ? PATH_MAP_PC : PATH_MAP_NPC);
+		area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
 	}
 	if (path) {
 		Destination = Point(path->x, path->y);
@@ -2423,7 +2423,7 @@ void Movable::MoveTo(const Point &Des)
 	oldPos = Des;
 	Destination = Des;
 	if (BlocksSearchMap()) {
-		area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
+		area->BlockSearchMap( Pos, size, IsPC()?PathMapFlags::PC:PathMapFlags::NPC);
 	}
 }
 

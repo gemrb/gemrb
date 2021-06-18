@@ -79,4 +79,12 @@ operator ~(ENUM_FLAGS a) noexcept
 	return static_cast<ENUM_FLAGS>(~static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a));
 }
 
+template<typename ENUM_FLAGS>
+inline constexpr
+typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, bool>::type
+operator !(ENUM_FLAGS a) noexcept
+{
+	return !static_cast<typename std::underlying_type<ENUM_FLAGS>::type>(a);
+}
+
 #endif /* EnumFlags_h */

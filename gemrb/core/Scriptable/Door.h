@@ -21,6 +21,7 @@
 #ifndef DOOR_H
 #define DOOR_H
 
+#include "PathFinder.h"
 #include "Polygon.h"
 #include "Scriptable/Scriptable.h"
 
@@ -99,7 +100,7 @@ public:
 	ieStrRef NameStrRef;
 	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
-	void ImpedeBlocks(int count, Point *points, unsigned char value) const;
+	void ImpedeBlocks(int count, Point *points, PathMapFlags value) const;
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:

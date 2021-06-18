@@ -70,8 +70,23 @@ static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
 static int AdditionalCost = 4;
-static unsigned char Passable[16] = {
-	4, 1, 1, 1, 1, 1, 1, 1, 0, 1, 8, 0, 0, 0, 3, 1
+static PathMapFlags Passable[16] = {
+	PathMapFlags::NO_SEE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::IMPASSABLE,
+	PathMapFlags::PASSABLE,
+	PathMapFlags::SIDEWALL,
+	PathMapFlags::IMPASSABLE,
+	PathMapFlags::IMPASSABLE,
+	PathMapFlags::IMPASSABLE,
+	PathMapFlags::PASSABLE | PathMapFlags::TRAVEL,
+	PathMapFlags::PASSABLE
 };
 static Point **VisibilityMasks=NULL;
 
@@ -232,7 +247,7 @@ static void InitPathFinder()
 	for (int i = 0; i < 16; i++) {
 		poi = tm->QueryField( 0, i );
 		if (*poi != '*')
-			Passable[i] = atoi( poi );
+			Passable[i] = PathMapFlags(atoi(poi));
 	}
 	poi = tm->QueryField( 1, 0 );
 	if (*poi != '*')
@@ -454,12 +469,12 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bi
 	unsigned int y = sr->GetHeight();
 	assert(Width >= SRWidth && Height >= y);
 	//Internal Searchmap
-	SrchMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
+	SrchMap = (PathMapFlags *) calloc(Width * Height, sizeof(PathMapFlags));
 	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
 	while(y--) {
 		int x = SRWidth;
 		while(x--) {
-			unsigned short value = sr->GetAt(x,y) & PATH_MAP_AREAMASK;
+			uint8_t value = uint8_t(PathMapFlags(sr->GetAt(x,y)) & PathMapFlags::AREAMASK);
 			size_t index = y * Width + x;
 			SrchMap[index] = Passable[value];
 			MaterialMap[index] = value;
@@ -881,14 +896,14 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 
 void Map::ClearSearchMapFor(const Movable *actor) {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
-	BlockSearchMap(actor->Pos, actor->size, PATH_MAP_UNMARKED);
+	BlockSearchMap(actor->Pos, actor->size, PathMapFlags::UNMARKED);
 
 	// Restore the searchmap areas of any nearby actors that could
-	// have been cleared by this BlockSearchMap(..., PATH_MAP_UNMARKED).
+	// have been cleared by this BlockSearchMap(..., PathMapFlags::UNMARKED).
 	// (Necessary since blocked areas of actors may overlap.)
 	for (const Actor *neighbour : nearActors) {
 		if (neighbour->BlocksSearchMap()) {
-			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
 		}
 	}
 }
@@ -1827,19 +1842,19 @@ void Map::DrawSearchMap(const Region &vp) const
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			unsigned char blockvalue = GetBlocked(x + vp.x / 16, y + vp.y / 12);
+			PathMapFlags blockvalue = GetBlocked(x + vp.x / 16, y + vp.y / 12);
 			block.x = x * 16 - (vp.x % 16);
 			block.y = y * 12 - (vp.y % 12);
-			if (!(blockvalue & PATH_MAP_PASSABLE)) {
-				if (blockvalue == PATH_MAP_IMPASSABLE) { // 0
+			if (!(blockvalue & PathMapFlags::PASSABLE)) {
+				if (blockvalue == PathMapFlags::IMPASSABLE) { // 0
 					vid->DrawRect(block, impassible, true, flags);
-				} else if (blockvalue & PATH_MAP_SIDEWALL) {
+				} else if (bool(blockvalue & PathMapFlags::SIDEWALL)) {
 					vid->DrawRect(block, sidewall, true, flags);
-				} else if (!(blockvalue & PATH_MAP_ACTOR)){
+				} else if (!(blockvalue & PathMapFlags::ACTOR)){
 					vid->DrawRect(block, inaccessible, true, flags);
 				}
 			}
-			if (blockvalue & PATH_MAP_ACTOR) {
+			if (bool(blockvalue & PathMapFlags::ACTOR)) {
 				vid->DrawRect(block, actor);
 			}
 		}
@@ -2480,7 +2495,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 }
 
 // a more thorough, but more expensive version for the cases when it matters
-unsigned int Map::GetBlocked(unsigned int x, unsigned int y, int size) const
+PathMapFlags Map::GetBlocked(unsigned int x, unsigned int y, int size) const
 {
 	if (size == -1) {
 		return GetBlocked(x, y);
@@ -2489,36 +2504,36 @@ unsigned int Map::GetBlocked(unsigned int x, unsigned int y, int size) const
 	}
 }
 
-unsigned int Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
+PathMapFlags Map::GetBlockedNavmap(unsigned int x, unsigned int y) const
 {
 	return GetBlocked(x / 16, y / 12);
 }
 
-unsigned int Map::GetBlockedNavmap(const Point &c) const
+PathMapFlags Map::GetBlockedNavmap(const Point &c) const
 {
 	return GetBlockedNavmap(c.x, c.y);
 }
 
 // Args are in searchmap coordinates
 // The default behavior is for actors to be blocking
-// If they shouldn't be, the caller should check for PATH_MAP_PASSABLE | PATH_MAP_ACTOR
-unsigned int Map::GetBlocked(unsigned int x, unsigned int y) const
+// If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
+PathMapFlags Map::GetBlocked(unsigned int x, unsigned int y) const
 {
 	if (y>=Height || x>=Width) {
-		return PATH_MAP_IMPASSABLE;
+		return PathMapFlags::IMPASSABLE;
 	}
-	unsigned int ret = SrchMap[y*Width+x];
-	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR)) {
-		ret &= ~PATH_MAP_PASSABLE;
+	PathMapFlags ret = SrchMap[y*Width+x];
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
+		ret &= ~PathMapFlags::PASSABLE;
 	}
-	if (ret & PATH_MAP_DOOR_OPAQUE) {
-		ret = PATH_MAP_SIDEWALL;
+	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
+		ret = PathMapFlags::SIDEWALL;
 	}
 	return ret;
 }
 
 // Args are in navmap coordinates
-unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable) const
+PathMapFlags Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable) const
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -2526,39 +2541,39 @@ unsigned int Map::GetBlockedInRadius(unsigned int px, unsigned int py, unsigned 
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 2) size = 2;
-	unsigned int ret = 0;
+	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 
 	unsigned int r = (size - 2) * (size - 2) + 1;
 	if (size == 2) r = 0;
 	for (unsigned int i = 0; i < size - 1; i++) {
 		for (unsigned int j = 0; j < size - 1; j++) {
 			if (i * i + j * j <= r) {
-				unsigned int retBotRight = GetBlockedNavmap(px + i * 16, py + j * 12);
-				unsigned int retTopRight = GetBlockedNavmap(px + i * 16, py - j * 12);
-				unsigned int retBotLeft = GetBlockedNavmap(px - i * 16, py + j * 12);
-				unsigned int retTopLeft = GetBlockedNavmap(px - i * 16, py - j * 12);
+				PathMapFlags retBotRight = GetBlockedNavmap(px + i * 16, py + j * 12);
+				PathMapFlags retTopRight = GetBlockedNavmap(px + i * 16, py - j * 12);
+				PathMapFlags retBotLeft = GetBlockedNavmap(px - i * 16, py + j * 12);
+				PathMapFlags retTopLeft = GetBlockedNavmap(px - i * 16, py - j * 12);
 				if (stopOnImpassable) {
-					if (retBotRight == PATH_MAP_IMPASSABLE || retBotLeft == PATH_MAP_IMPASSABLE || retTopRight == PATH_MAP_IMPASSABLE || retTopLeft == PATH_MAP_IMPASSABLE) {
-						return PATH_MAP_IMPASSABLE;
+					if (retBotRight == PathMapFlags::IMPASSABLE || retBotLeft == PathMapFlags::IMPASSABLE || retTopRight == PathMapFlags::IMPASSABLE || retTopLeft == PathMapFlags::IMPASSABLE) {
+						return PathMapFlags::IMPASSABLE;
 					}
 				}
 				ret |= (retBotRight | retTopRight | retBotLeft | retTopLeft);
 			}
 		}
 	}
-	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR|PATH_MAP_SIDEWALL)) {
-		ret &= ~PATH_MAP_PASSABLE;
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
+		ret &= ~PathMapFlags::PASSABLE;
 	}
-	if (ret & PATH_MAP_DOOR_OPAQUE) {
-		ret = PATH_MAP_SIDEWALL;
+	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
+		ret = PathMapFlags::SIDEWALL;
 	}
 
 	return ret;
 }
 
-unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller) const
+PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller) const
 {
-	unsigned int ret = 0;
+	PathMapFlags ret = PathMapFlags::IMPASSABLE;
 	Point p = s;
 	while (p != d) {
 		double dx = d.x - p.x;
@@ -2567,34 +2582,35 @@ unsigned int Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		int blockStatus = GetBlockedNavmap(p.x, p.y);
-		if (stopOnImpassable && blockStatus == PATH_MAP_IMPASSABLE) {
-			return PATH_MAP_IMPASSABLE;
+		PathMapFlags blockStatus = GetBlockedNavmap(p.x, p.y);
+		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
+			return PathMapFlags::IMPASSABLE;
 		}
 		ret |= blockStatus;
 	}
-	if (ret & (PATH_MAP_DOOR_IMPASSABLE|PATH_MAP_ACTOR|PATH_MAP_SIDEWALL)) {
-		ret &= ~PATH_MAP_PASSABLE;
+	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR|PathMapFlags::SIDEWALL))) {
+		ret &= ~PathMapFlags::PASSABLE;
 	}
-	if (ret & PATH_MAP_DOOR_OPAQUE) {
-		ret = PATH_MAP_SIDEWALL;
+	if (bool(ret & PathMapFlags::DOOR_OPAQUE)) {
+		ret = PathMapFlags::SIDEWALL;
 	}
 
 	return ret;
 }
 
-// PATH_MAP_SIDEWALL obstructs LOS, while PATH_MAP_IMPASSABLE doesn't
+// PathMapFlags::SIDEWALL obstructs LOS, while PathMapFlags::IMPASSABLE doesn't
 bool Map::IsVisibleLOS(const Point &s, const Point &d, const Actor *caller) const
 {
-	unsigned ret = GetBlockedInLine(s, d, false, caller);
-	return !(ret & PATH_MAP_SIDEWALL);
+	PathMapFlags ret = GetBlockedInLine(s, d, false, caller);
+	return !bool(ret & PathMapFlags::SIDEWALL);
 }
 
-// Used by the pathfinder, so PATH_MAP_IMPASSABLE obstructs walkability
+// Used by the pathfinder, so PathMapFlags::IMPASSABLE obstructs walkability
 bool Map::IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const
 {
-	unsigned ret = GetBlockedInLine(s, d, true, caller);
-	return ret & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL | (actorsAreBlocking ? 0 : PATH_MAP_ACTOR));
+	PathMapFlags ret = GetBlockedInLine(s, d, true, caller);
+	PathMapFlags mask = PathMapFlags::PASSABLE | PathMapFlags::TRAVEL | (actorsAreBlocking ? PathMapFlags::UNMARKED : PathMapFlags::ACTOR);
+	return bool(ret & mask);
 }
 
 void Map::RedrawScreenStencil(const Region& vp, const WallPolygonGroup& walls)
@@ -2970,14 +2986,14 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 
 	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 		if ((unsigned int) goal.y >= radiusy) {
-			if (GetBlocked(scanx, goal.y - radiusy, size) & PATH_MAP_PASSABLE) {
+			if (bool(GetBlocked(scanx, goal.y - radiusy, size) & PathMapFlags::PASSABLE)) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y - radiusy);
 				return true;
 			}
 		}
 		if (goal.y + radiusy < Height) {
-			if (GetBlocked(scanx, goal.y + radiusy, size) & PATH_MAP_PASSABLE) {
+			if (bool(GetBlocked(scanx, goal.y + radiusy, size) & PathMapFlags::PASSABLE)) {
 				goal.x = (ieWord) scanx;
 				goal.y = (ieWord) (goal.y + radiusy);
 				return true;
@@ -2997,14 +3013,14 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 		maxy = Height;
 	for (unsigned int scany = miny; scany < maxy; scany++) {
 		if ((unsigned int) goal.x >= radiusx) {
-			if (GetBlocked(goal.x - radiusx, scany, size) & PATH_MAP_PASSABLE) {
+			if (bool(GetBlocked(goal.x - radiusx, scany, size) & PathMapFlags::PASSABLE)) {
 				goal.x = (ieWord) (goal.x - radiusx);
 				goal.y = (ieWord) scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < Width) {
-			if (GetBlocked(goal.x + radiusx, scany, size) & PATH_MAP_PASSABLE) {
+			if (bool(GetBlocked(goal.x + radiusx, scany, size) & PathMapFlags::PASSABLE)) {
 				goal.x = (ieWord) (goal.x + radiusx);
 				goal.y = (ieWord) scany;
 				return true;
@@ -3077,7 +3093,7 @@ int Map::WhichEdge(const Point &s) const
 {
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
-	if (!(GetBlocked(sX, sY) & PATH_MAP_TRAVEL)) {
+	if (!(GetBlocked(sX, sY) & PathMapFlags::TRAVEL)) {
 		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
 			sX, sY);
 		return -1;
@@ -3382,10 +3398,10 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 			if (los) {
 				if (!block) {
-					int type = GetBlocked(Tile.x / 16, Tile.y / 12);
-					if (type & PATH_MAP_NO_SEE) {
+					PathMapFlags type = GetBlocked(Tile.x / 16, Tile.y / 12);
+					if (bool(type & PathMapFlags::NO_SEE)) {
 						block=true;
-					} else if (type & PATH_MAP_SIDEWALL) {
+					} else if (bool(type & PathMapFlags::SIDEWALL)) {
 						sidewall = true;
 					} else if (sidewall)
 					{
@@ -3424,8 +3440,8 @@ void Map::UpdateFog()
 	}
 }
 
-// Valid values are - PATH_MAP_UNMARKED, PATH_MAP_PC, PATH_MAP_NPC
-void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value)
+// Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
+void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value)
 {
 	// We block a circle of radius size-1 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -3448,20 +3464,20 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, unsigned int value
 				unsigned int ppxmi = ppx-i;
 				unsigned int ppymj = ppy-j;
 				unsigned int pos = ppypj * Width + ppxpi;
-				if (ppxpi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
+				if (ppxpi < Width && ppypj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
 				pos = ppymj * Width + ppxpi;
-				if (ppxpi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
+				if (ppxpi < Width && ppymj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
 				pos = ppypj * Width + ppxmi;
-				if (ppxmi < Width && ppypj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
+				if (ppxmi < Width && ppypj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
 				pos = ppymj * Width + ppxmi;
-				if (ppxmi < Width && ppymj < Height && SrchMap[pos] != PATH_MAP_IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PATH_MAP_NOTACTOR) | value;
+				if (ppxmi < Width && ppymj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
 			}
 		}
@@ -3657,10 +3673,10 @@ int Map::GetCursor(const Point &p) const
 	if (!IsExplored(p)) {
 		return IE_CURSOR_INVALID;
 	}
-	switch (GetBlocked(p.x / 16, p.y / 12) & (PATH_MAP_PASSABLE | PATH_MAP_TRAVEL)) {
-		case 0:
+	switch (GetBlocked(p.x / 16, p.y / 12) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL)) {
+		case PathMapFlags::IMPASSABLE:
 			return IE_CURSOR_BLOCKED;
-		case PATH_MAP_PASSABLE:
+		case PathMapFlags::PASSABLE:
 			return IE_CURSOR_WALK;
 		default:
 			return IE_CURSOR_TRAVEL;
@@ -4063,15 +4079,15 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 	}
 }
 
-short unsigned int Map::GetInternalSearchMap(int x, int y) const
+PathMapFlags Map::GetInternalSearchMap(int x, int y) const
 {
 	if ((unsigned)x >= Width || (unsigned)y >= Height) {
-		return 0;
+		return PathMapFlags::UNMARKED;
 	}
 	return SrchMap[x+y*Width];
 }
 
-void Map::SetInternalSearchMap(int x, int y, int value)
+void Map::SetInternalSearchMap(int x, int y, PathMapFlags value)
 {
 	if ((unsigned)x >= Width || (unsigned)y >= Height) {
 		return;

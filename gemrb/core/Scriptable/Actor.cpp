@@ -1523,7 +1523,7 @@ static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newVal
 {
 	Map *map = actor->GetCurrentArea();
 	if (!map) return;
-	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PATH_MAP_UNMARKED : PATH_MAP_NPC);
+	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PathMapFlags::UNMARKED : PathMapFlags::NPC);
 }
 
 //spell casting or other buttons disabled/reenabled
@@ -5129,7 +5129,7 @@ void Actor::SetMap(Map *map)
 		inventory.EquipItem(inventory.GetEquippedSlot());
 		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
-	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PATH_MAP_PC : PATH_MAP_NPC);
+	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
 }
 
 // Position should be a navmap point
@@ -8683,7 +8683,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 				// consider the possibility the mirror image is behind a wall (walls.second)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if ((area->GetBlockedNavmap(iPos + vp.Origin()) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
@@ -8749,7 +8749,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 				// consider the possibility the mirror image is in front of a wall (walls.first)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if (area->GetBlockedNavmap(iPos + vp.Origin()) & (PATH_MAP_PASSABLE | PATH_MAP_ACTOR)) {
+				if ((area->GetBlockedNavmap(iPos + vp.Origin()) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}

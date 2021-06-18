@@ -96,10 +96,10 @@ Door::~Door(void)
 	}
 }
 
-void Door::ImpedeBlocks(int count, Point *points, unsigned char value) const
+void Door::ImpedeBlocks(int count, Point *points, PathMapFlags value) const
 {
 	for(int i = 0;i<count;i++) {
-		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_NOTDOOR;
+		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::NOTDOOR;
 		area->SetInternalSearchMap(points[i].x, points[i].y, tmp|value);
 	}
 }
@@ -115,21 +115,21 @@ void Door::UpdateDoor()
 		Pos.y = outline->BBox.y + outline->BBox.h/2;
 	}
 
-	unsigned char pmdflags;
+	PathMapFlags pmdflags;
 
 	if (Flags & DOOR_TRANSPARENT) {
-		pmdflags = PATH_MAP_DOOR_IMPASSABLE;
+		pmdflags = PathMapFlags::DOOR_IMPASSABLE;
 	} else {
 		//both door flags are needed here, one for transparency the other
 		//is for passability
-		pmdflags = PATH_MAP_DOOR_OPAQUE|PATH_MAP_DOOR_IMPASSABLE;
+		pmdflags = PathMapFlags::DOOR_OPAQUE|PathMapFlags::DOOR_IMPASSABLE;
 	}
 	if (Flags &DOOR_OPEN) {
-		ImpedeBlocks(cibcount, closed_ib, 0);
+		ImpedeBlocks(cibcount, closed_ib, PathMapFlags::IMPASSABLE);
 		ImpedeBlocks(oibcount, open_ib, pmdflags);
 	}
 	else {
-		ImpedeBlocks(oibcount, open_ib, 0);
+		ImpedeBlocks(oibcount, open_ib, PathMapFlags::IMPASSABLE);
 		ImpedeBlocks(cibcount, closed_ib, pmdflags);
 	}
 
@@ -262,8 +262,8 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 		Actor** ab;
 		rgn.x = points[i].x*16;
 		rgn.y = points[i].y*12;
-		unsigned char tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PATH_MAP_ACTOR;
-		if (tmp) {
+		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::ACTOR;
+		if (tmp != PathMapFlags::IMPASSABLE) {
 			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			while(ac--) {
 				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
