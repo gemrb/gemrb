@@ -51,7 +51,7 @@ version=0.9.0
 cd /home/frs/project/gemrb/Buildbot\ Binaries
 mkdir -p ../Releases/$version
 cp Windows/AppVeyor/$(ls Windows/AppVeyor/ -1rt | tail -n1) ../Releases/$version/gemrb-win32-v$version.zip
-cp Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n) ../Releases/$version/gemrb-macos-v$version.tar.bz2
+cp Apple/OSX/$(ls Apple/OSX/ -1rt | tail -n1) ../Releases/$version/gemrb-macos-v$version.tar.bz2
 cp Linux/$(ls Linux/ -1rt | tail -n1) ../Releases/$version/gemrb-linux-v$version.AppImage
 ```
 
