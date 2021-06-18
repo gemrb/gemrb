@@ -334,13 +334,12 @@ void MVEPlayer::segment_video_compressedpalette() {
 #if 0
 	char *data = buffer;
 
-	unsigned int i, j;
-	for (i = 0; i < 32; ++i) {
+	for (unsigned int i = 0; i < 32; ++i) {
 		unsigned char mask = *data;
 		data++;
 
 		if (mask) {
-			for (j = 0; j < 8; ++j) {
+			for (unsigned int j = 0; j < 8; ++j) {
 				unsigned char r, g, b;
 				r = (*data) << 2;
 				++data;

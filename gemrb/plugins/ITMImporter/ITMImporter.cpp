@@ -170,7 +170,6 @@ static void AddZZFeatures(Item *s)
 
 Item* ITMImporter::GetItem(Item *s)
 {
-	unsigned int i;
 	ieByte k1,k2,k3,k4;
 
 	if( !s) {
@@ -183,7 +182,7 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord( &s->ItemType );
 	str->ReadDword( &s->UsabilityBitmask );
 	str->Read( s->AnimationType,2 ); //intentionally not reading word!
-	for (i=0;i<2;i++) {
+	for (unsigned int i = 0; i < 2; i++) {
 		if (s->AnimationType[i]==' ') {
 			s->AnimationType[i]=0;
 		}
@@ -269,7 +268,7 @@ Item* ITMImporter::GetItem(Item *s)
 
 	s->ext_headers = new ITMExtHeader[s->ExtHeaderCount];
 
-	for (i = 0; i < s->ExtHeaderCount; i++) {
+	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
 		ITMExtHeader* eh = &s->ext_headers[i];
 		GetExtHeader( s, eh );
@@ -294,7 +293,7 @@ Item* ITMImporter::GetItem(Item *s)
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
-	for (i = 0; i < s->EquippingFeatureCount; i++) {
+	for (unsigned int i = 0; i < s->EquippingFeatureCount; i++) {
 		GetFeature(s->equipping_features+i, s);
 	}
 

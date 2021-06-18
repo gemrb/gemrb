@@ -631,18 +631,16 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			break;
 		case 8: //antimagic shell
 			{
-				int i;
-
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
 				newfx->Power = 10;
 				core->ApplyEffect(newfx, target, Owner);
 				delete newfx;
 
-				for (i=0;i<2;i++) {
+				for (int i = 0; i < 2; i++) {
 					target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
 				}
 
-				for (i=1;i<10;i++) {
+				for (int i = 1; i < 10; i++) {
 					target->ApplyEffectCopy(fx, fx_protection_ref, Owner, i, 0);
 				}
 				target->ApplyEffectCopy(fx, fx_magicdamage_ref, Owner, 100, 0);

@@ -118,7 +118,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
 	}
-	unsigned int i;
+
 	// NOTE: Interface::Init has already resolved resfile.
 	Log(MESSAGE, "KEYImporter", "Opening %s...", resfile);
 	FileStream* f = FileStream::OpenFile(resfile);
@@ -155,7 +155,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 	ieDword BifLen, ASCIIZOffset;
 	ieWord ASCIIZLen;
-	for (i = 0; i < BifCount; i++) {
+	for (unsigned int i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
 		f->ReadDword( &BifLen );
@@ -182,7 +182,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	// only ~1% of the bg2 entries are of bucket lenght >4
 	resources.init(ResCount > 32 * 1024 ? 32 * 1024 : ResCount, ResCount);
 
-	for (i = 0; i < ResCount; i++) {
+	for (unsigned int i = 0; i < ResCount; i++) {
 		f->ReadResRef(key.ref);
 		f->ReadWord(&key.type);
 		f->ReadDword(&ResLocator);

@@ -54,11 +54,11 @@ void
 ipaudio_uncompress (short *buffer, unsigned short buf_len,
     const unsigned char *data, unsigned char channels)
 {
-  int i, out = 0;
+  int out = 0;
   int predictor[2] = {};
   int channel_number = 0;
 
-  for (i = 0; i < channels; ++i) {
+  for (int i = 0; i < channels; ++i) {
     predictor[i] = GST_READ_UINT16_LE (data);
     data += 2;
     if (predictor[i] & 0x8000)

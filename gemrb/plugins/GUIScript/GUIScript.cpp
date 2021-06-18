@@ -7357,10 +7357,9 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StoreOwner", DecRef(PyInt_FromLong, store->GetOwnerID() ));
 	PyObject* p = PyTuple_New( 4 );
 
-	int i;
 	int j=1;
 	uint32_t k;
-	for (i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++) {
 		if (store->AvailableRooms&j) {
 			k = store->RoomPrices[i];
 		}
@@ -7372,7 +7371,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 	p = PyTuple_New( STOREBUTTON_COUNT );
 	j=0;
-	for (i = 0; i < STOREBUTTON_COUNT; i++) {
+	for (int i = 0; i < STOREBUTTON_COUNT; i++) {
 		k = storebuttons[store->Type][i];
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;
@@ -7971,8 +7970,6 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 
 static void ReadUsedItems()
 {
-	int i;
-
 	UsedItemsCount = 0;
 	int table = gamedata->LoadTable("item_use");
 	if (table>=0) {
@@ -7980,7 +7977,7 @@ static void ReadUsedItems()
 		if (!tab) goto table_loaded;
 		UsedItemsCount = tab->GetRowCount();
 		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
-		for (i=0;i<UsedItemsCount;i++) {
+		for (int i = 0; i < UsedItemsCount; i++) {
 			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
 			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
 			if (UsedItems[i].username[0]=='*') {
@@ -8002,8 +7999,6 @@ table_loaded:
 
 static void ReadSpecialItems()
 {
-	int i;
-
 	SpecialItemsCount = 0;
 	int table = gamedata->LoadTable("itemspec");
 	if (table>=0) {
@@ -8011,7 +8006,7 @@ static void ReadSpecialItems()
 		if (!tab) goto table_loaded;
 		SpecialItemsCount = tab->GetRowCount();
 		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
-		for (i=0;i<SpecialItemsCount;i++) {
+		for (int i = 0; i < SpecialItemsCount; i++) {
 			strnlwrcpy(SpecialItems[i].resref, tab->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
 			SpecialItems[i].value = atoi(tab->QueryField(i,0) );
@@ -8023,8 +8018,6 @@ table_loaded:
 
 static ieStrRef GetSpellDesc(const ieResRef CureResRef)
 {
-	int i;
-
 	if (StoreSpellsCount==-1) {
 		StoreSpellsCount = 0;
 		int table = gamedata->LoadTable("speldesc");
@@ -8033,7 +8026,7 @@ static ieStrRef GetSpellDesc(const ieResRef CureResRef)
 			if (!tab) goto table_loaded;
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
-			for (i=0;i<StoreSpellsCount;i++) {
+			for (int i = 0; i < StoreSpellsCount; i++) {
 				strnlwrcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
 				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
 			}
@@ -8050,7 +8043,7 @@ table_loaded:
 		gamedata->FreeSpell(spell, CureResRef, false);
 		return ret;
 	}
-	for (i=0;i<StoreSpellsCount;i++) {
+	for (int i = 0; i < StoreSpellsCount; i++) {
 		if (!strnicmp(StoreSpells[i].resref, CureResRef, 8) ) {
 			return StoreSpells[i].value;
 		}
@@ -8687,10 +8680,9 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	SpellExtHeader spelldata;
-	int i = 0;
 	int count = actor->spellbook.GetSpellInfoSize(type);
 	PyObject* spell_list = PyTuple_New(count);
-	for (i=0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
 		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellname));
 	}
@@ -9169,9 +9161,8 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	MaxCount = core->SlotTypes;
-	int i;
 	Count = 0;
-	for (i=0;i<MaxCount;i++) {
+	for (int i = 0; i < MaxCount; i++) {
 		int id = core->QuerySlot(i);
 		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
@@ -9186,7 +9177,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 
 	PyObject* tuple = PyTuple_New( Count );
 	Count = 0;
-	for (i=0;i<MaxCount;i++) {
+	for (int i = 0; i < MaxCount; i++) {
 		int id = core->QuerySlot(i);
 		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
@@ -10369,11 +10360,10 @@ operator is >=.\n\
 
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 {
-	int i;
 	const char *callback = NULL;
 	PyObject* p[13];
 	int v[13];
-	for(i=9;i<13;i++) {
+	for (int i = 9; i < 13; i++) {
 		p[i]=NULL;
 		v[i]=GREATER_OR_EQUALS;
 	}
@@ -10400,7 +10390,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 	v[0]=PyInt_AsLong( p[0] );
 
-	for(i=2;i<9;i++) {
+	for (int i = 2; i < 9; i++) {
 		if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
 			return NULL;
 		}
@@ -10408,7 +10398,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (p[9]) {
-		for(i=9;i<13;i++) {
+		for (int i = 9; i < 13; i++) {
 			if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
 				return NULL;
 			}
@@ -10430,7 +10420,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		snprintf(fname, 32, "Check_%s", callback);
 		PyObject* param = PyTuple_New( 11 );
 		PyTuple_SetItem( param, 0, PyInt_FromLong(v[0]) );
-		for (i = 3;i<13;i++) {
+		for (int i = 3; i < 13; i++) {
 			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
 		}
 
@@ -10667,8 +10657,6 @@ typedef union pack {
 
 static void ReadActionButtons()
 {
-	unsigned int i;
-
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
 	memset(GUIResRef, 0, sizeof(GUIResRef));
@@ -10678,7 +10666,7 @@ static void ReadActionButtons()
 		return;
 	}
 	Holder<TableMgr> tab = gamedata->GetTable( table );
-	for (i = 0; i < MAX_ACT_COUNT; i++) {
+	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
 		row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
@@ -12649,8 +12637,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	// create a tuple with all the 100% probable damage opcodes' stats
 	std::vector<DMGOpcodeInfo> damage_opcodes = item->GetDamageOpcodesDetails(header) ;
 	PyObject *alldos = PyTuple_New(damage_opcodes.size());
-	unsigned int i;
-	for (i = 0; i < damage_opcodes.size(); i++) {
+	for (unsigned int i = 0; i < damage_opcodes.size(); i++) {
 		PyObject *dos = PyDict_New();
 		PyDict_SetItemString(dos, "TypeName", PyString_FromString (damage_opcodes[i].TypeName));
 		PyDict_SetItemString(dos, "NumDice", PyInt_FromLong (damage_opcodes[i].DiceThrown));

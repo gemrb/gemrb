@@ -39,10 +39,7 @@ static int
 ipvideo_copy_block (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char *src, int offset)
 {
-	int i;
-	long frame_offset;
-
-	frame_offset = frame - (guint8 *) s->back_buf1 + offset;
+	long frame_offset = frame - (guint8 *) s->back_buf1 + offset;
 
 	if (G_UNLIKELY (frame_offset < 0)) {
 		GST_ERROR ("frame offset < 0 (%ld)", frame_offset);
@@ -53,7 +50,7 @@ ipvideo_copy_block (const GstMveDemuxStream * s, unsigned char *frame,
 		return -1;
 	}
 
-	for (i = 0; i < 8; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		memcpy (frame, src, 8);
 		frame += s->width;
 		src += s->width;
