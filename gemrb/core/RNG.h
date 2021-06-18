@@ -25,6 +25,7 @@
 
 #include "Region.h"
 
+#include <cassert>
 #include <limits>
 #include <random>
 
