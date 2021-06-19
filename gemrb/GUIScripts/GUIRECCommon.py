@@ -294,7 +294,6 @@ def SmallCustomPortrait ():
 
 def OpenSoundWindow ():
 	global VoiceList, OldVoiceSet
-	global SubCustomizeWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	OldVoiceSet = GemRB.GetPlayerSound (pc)
@@ -394,7 +393,6 @@ def FindScriptFile(selected):
 
 options = {}
 def OpenScriptWindow ():
-	global SubCustomizeWindow
 	global ScriptTextArea, SelectedTextArea
 	global options
 

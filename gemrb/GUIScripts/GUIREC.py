@@ -968,7 +968,6 @@ def KitDonePress():
 	return
 
 def OpenColorWindow ():
-	global PortraitWindow
 	global PaperdollButton
 	global HairButton, SkinButton, MajorButton, MinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
