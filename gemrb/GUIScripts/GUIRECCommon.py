@@ -339,7 +339,7 @@ def OpenSoundWindow ():
 def CloseSoundWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	GemRB.SetPlayerSound (pc, OldVoiceSet)
-	CloseSubCustomizeWindow ()
+	GemRB.GetView("SUB_WIN", 0).Close()
 	return
 
 def DoneSoundWindow ():
