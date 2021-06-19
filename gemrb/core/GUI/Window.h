@@ -58,6 +58,15 @@ public:
 		PosHmid = 12,	// left + right = hmid
 		PosCentered = 15// top + bottom + left + right = center
 	};
+	
+	// Colors of modal window shadow
+	// !!! Keep these synchronized with GUIDefines.py !!!
+	enum class ModalShadow {
+		None = 0,
+		Gray,
+		Black
+	};
+	ModalShadow modalShadow = ModalShadow::None;
 
 	enum WindowFlags {
 		Draggable = 1,			// window can be dragged (by clicking anywhere in its frame) a la PST radial menu
@@ -117,7 +126,7 @@ public:
 
 	void Close();
 	void Focus();
-	bool DisplayModal(WindowManager::ModalShadow = WindowManager::ShadowNone);
+	bool DisplayModal(ModalShadow = ModalShadow::None);
 	
 	void FocusLost();
 	void FocusGained();

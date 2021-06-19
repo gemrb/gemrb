@@ -49,7 +49,6 @@ WindowManager::WindowManager(Video* vid)
 	cursorFeedback = MOUSE_ALL;
 
 	hoverWin = NULL;
-	modalWin = NULL;
 	trackingWin = NULL;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&WindowManager::DispatchEvent, this);
@@ -109,21 +108,20 @@ bool WindowManager::IsOpenWindow(Window* win) const
 	return it != windows.end();
 }
 
-bool WindowManager::IsPresentingModalWindow() const
+Window* WindowManager::ModalWindow() const
 {
-	return modalWin != NULL;
+	Window* fwin = windows.front();
+	return fwin->Flags() & Window::Modal ? fwin : nullptr;
 }
 
 /** Show a Window in Modal Mode */
-bool WindowManager::PresentModalWindow(Window* win, ModalShadow shadow)
+bool WindowManager::PresentModalWindow(Window* win)
 {
 	if (!IsOpenWindow( win )) return false;
 
 	OrderFront(win);
 	win->SetDisabled(false);
 	win->SetFlags(Window::Modal, OP_OR);
-	modalWin = win;
-	modalShadow = shadow;
 
 	if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 		core->PlaySound(DS_WINDOW_OPEN, SFX_CHAN_GUI);
@@ -141,7 +139,17 @@ WindowManager::CursorFeedback WindowManager::SetCursorFeedback(CursorFeedback fe
 /** Sets a Window on the Top */
 bool WindowManager::FocusWindow(Window* win)
 {
-	if (!IsPresentingModalWindow() && OrderFront(win)) {
+	// we can only focus the window if it is above the topmost modal window
+	const Window* modalWin = ModalWindow();
+	if (modalWin && win != modalWin) {
+		auto modalIt = WIN_IT(modalWin);
+		auto winIt = std::find(modalIt, windows.end(), win);
+		if (winIt == windows.end()) {
+			return false;
+		}
+	}
+	
+	if (OrderFront(win)) {
 		if (gameWin == win) {
 			core->SetEventFlag(EF_CONTROL);
 		}
@@ -234,22 +242,12 @@ void WindowManager::CloseWindow(Window* win)
 	WindowList::iterator it = WIN_IT(win);
 	if (it == windows.end()) return;
 
-	if (win == modalWin) {
+	if (win == ModalWindow()) {
 		if (win->Flags() & Window::Borderless && !(win->Flags() & Window::NoSounds)) {
 			core->PlaySound(DS_WINDOW_CLOSE, SFX_CHAN_GUI);
 		}
 
-		WindowList::iterator mit = it;
 		win->SetFlags(Window::Modal, OP_NAND);
-		// find the next modal window
-		modalWin = NULL;
-		while (++mit != windows.end()) {
-			if ((*mit)->Flags() & Window::Modal) {
-				modalWin = *mit;
-				modalWin->FocusGained();
-				break;
-			}
-		}
 	}
 
 	if (win == hoverWin) {
@@ -309,8 +307,8 @@ bool WindowManager::HotKey(const Event& event)
 
 Window* WindowManager::GetFocusWindow() const
 {
-	if (IsPresentingModalWindow()) {
-		return modalWin;
+	if (Window* mwin = ModalWindow()) {
+		return mwin;
 	}
 
 	for (Window* win : windows) {
@@ -334,14 +332,14 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 		return NULL;
 	}
 
-	if (IsPresentingModalWindow()) {
+	if (Window* mwin = ModalWindow()) {
 		// modal win is always the target for all events no matter what
 		// if the window shouldnt handle sreen events outside its bounds (ie negative coords etc)
 		// then the Window class should be responsible for bounds checking
 
 		// the NULL return is so that if this is called again after returning modalWindow there is no NextTarget
 		current = windows.end(); // invalidate the iterator, no other target is possible.
-		return modalWin;
+		return mwin;
 	}
 	
 	if (event.isScreen) {
@@ -567,6 +565,7 @@ void WindowManager::DrawWindows() const
 
 	bool drawFrame = false;
 	Window* frontWin = windows.front();
+	Window* modalWin = ModalWindow();
 	const Region& frontWinFrame = frontWin->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last
 	WindowList::const_reverse_iterator rit = windows.rbegin();
@@ -613,8 +612,8 @@ void WindowManager::DrawWindows() const
 
 	BlitFlags frame_flags = BlitFlags::NONE;
 	if (modalWin) {
-		if (modalShadow != ShadowNone) {
-			if (modalShadow == ShadowGray) {
+		if (modalWin->modalShadow != Window::ModalShadow::None) {
+			if (modalWin->modalShadow == Window::ModalShadow::Gray) {
 				frame_flags |= BlitFlags::HALFTRANS;
 			}
 			video->DrawRect(screen, ColorBlack, true, frame_flags);

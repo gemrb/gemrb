@@ -180,7 +180,7 @@ def UpdateVolume (volume_ref):
 
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
-	global SubOptionsWindow, GameplayHelpText
+	global GameplayHelpText
 
 	Window = GemRB.LoadWindow (6, "GUIOPT")
 

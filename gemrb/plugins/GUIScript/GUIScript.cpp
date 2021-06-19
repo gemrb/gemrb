@@ -1692,7 +1692,7 @@ MODAL_SHADOW_BLACK, they are blacked out.\n\
 
 static PyObject* GemRB_Window_ShowModal(PyObject* self, PyObject* args)
 {
-	WindowManager::ModalShadow Shadow = WindowManager::ShadowNone;
+	Window::ModalShadow Shadow = Window::ModalShadow::None;
 	PARSE_ARGS( args, "O|i", &self, &Shadow );
 
 	Window* win = GetView<Window>(self);

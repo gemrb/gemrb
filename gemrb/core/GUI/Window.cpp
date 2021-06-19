@@ -81,9 +81,10 @@ bool Window::HasFocus() const
 	return manager.GetFocusWindow() == this;
 }
 
-bool Window::DisplayModal(WindowManager::ModalShadow shadow)
+bool Window::DisplayModal(ModalShadow shadow)
 {
-	return manager.PresentModalWindow(this, shadow);
+	modalShadow = shadow;
+	return manager.PresentModalWindow(this);
 }
 
 /** Add a Control in the Window */

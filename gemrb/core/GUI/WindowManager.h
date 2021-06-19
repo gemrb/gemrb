@@ -48,14 +48,6 @@ struct ToolTipData
 
 class WindowManager {
 public:
-	// Colors of modal window shadow
-	// !!! Keep these synchronized with GUIDefines.py !!!
-	enum ModalShadow {
-		ShadowNone = 0,
-		ShadowGray,
-		ShadowBlack
-	};
-
 	enum CursorFeedback {
 		MOUSE_ALL			= 0,
 		MOUSE_NO_CURSOR		= 1,
@@ -86,7 +78,6 @@ private:
 	WindowList closedWindows; // windows that have been closed. kept around temporarily in case they get reopened
 
 	Region screen; // only a Region for convinience. we dont use x,y
-	Window* modalWin;
 	Window* gameWin;
 	Window* hoverWin;
 	Window* trackingWin;
@@ -95,7 +86,6 @@ private:
 
 	Holder<Video> video;
 	VideoBufferPtr HUDBuf = nullptr; // heads up display layer. Contains cursors/tooltips/borders and whatever gets drawn via DrawHUD()
-	ModalShadow modalShadow = ShadowNone;
 	
 	// these are mutable instead of statice because Sprite2Ds must be released before the video driver is unloaded
 	mutable ToolTipData tooltip;
@@ -135,8 +125,8 @@ public:
 	bool OrderRelativeTo(Window* win, Window* win2, bool front);
 
 	bool FocusWindow(Window* win);
-	bool IsPresentingModalWindow() const;
-	bool PresentModalWindow(Window* win, ModalShadow Shadow = ShadowNone);
+	Window* ModalWindow() const;
+	bool PresentModalWindow(Window* win);
 
 	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
 
