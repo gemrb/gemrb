@@ -145,9 +145,9 @@ void CachedDirectoryImporter::Refresh()
 	} while (++it);
 }
 
-static const char *ConstructFilename(const char* resname, const char* ext)
+static std::string ConstructFilename(const char* resname, const char* ext)
 {
-	static char buf[_MAX_PATH];
+	char buf[_MAX_PATH];
 	assert(strnlen(ext, 5) < 5);
 	strnlwrcpy(buf, resname, _MAX_PATH-6, false);
 	strcat(buf, ".");
@@ -157,20 +157,20 @@ static const char *ConstructFilename(const char* resname, const char* ext)
 
 bool CachedDirectoryImporter::HasResource(const char* resname, SClass_ID type)
 {
-	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	return cache.has(filename);
+	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	return cache.has(filename.c_str());
 }
 
 bool CachedDirectoryImporter::HasResource(const char* resname, const ResourceDesc &type)
 {
-	const char* filename = ConstructFilename(resname, type.GetExt());
-	return cache.has(filename);
+	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	return cache.has(filename.c_str());
 }
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID type)
 {
-	const char* filename = ConstructFilename(resname, core->TypeExt(type));
-	const std::string *s = cache.get(filename);
+	const std::string& filename = ConstructFilename(resname, core->TypeExt(type));
+	const std::string *s = cache.get(filename.c_str());
 	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];
@@ -181,8 +181,8 @@ DataStream* CachedDirectoryImporter::GetResource(const char* resname, SClass_ID 
 
 DataStream* CachedDirectoryImporter::GetResource(const char* resname, const ResourceDesc &type)
 {
-	const char* filename = ConstructFilename(resname, type.GetExt());
-	const std::string *s = cache.get(filename);
+	const std::string& filename = ConstructFilename(resname, type.GetExt());
+	const std::string *s = cache.get(filename.c_str());
 	if (!s)
 		return NULL;
 	char buf[_MAX_PATH];
