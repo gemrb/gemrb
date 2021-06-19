@@ -44,7 +44,7 @@ RNG::RNG() {
 	 * time_t value into a compatible integer, will work.
 	 */
 	for (size_t i = 0; i < sizeof(now); ++i) {
-		seed = seed * (UCHAR_MAX + 2u) + ptr[i];
+		seed = seed * (std::numeric_limits<unsigned char>::max() + 2u) + ptr[i];
 	}
 
 	engine.seed(seed);
