@@ -52,7 +52,7 @@ See the INSTALL [file](https://github.com/gemrb/gemrb/blob/master/INSTALL).
 There are several ways you can get in touch:
 * [Homepage](https://gemrb.org)
 * [GemRB forum](https://www.gibberlings3.net/forums/forum/91-gemrb/)
-* [IRC channel](http://webchat.freenode.net/?channels=GemRB), #GemRB on the FreeNode IRC network
+* [IRC channel](https://webchat.freenode.net/?channels=GemRB), #GemRB on the FreeNode IRC network
 * [Discord channel](https://discord.gg/64rEVAk) (Gibberlings3 server)
 * [Bug tracker](https://github.com/gemrb/gemrb/issues/new/choose)
 
@@ -66,5 +66,5 @@ Original engine research and data manipulation software:
 * [iesh](https://github.com/gemrb/iesh), IE python library and shell (for exploring data files)
 
 Tools that can help with data installation:
-* [WINE](http://www.winehq.org), Open Source implementation of the Windows API, useful for installing the games
+* [WINE](https://www.winehq.org), Open Source implementation of the Windows API, useful for installing the games
 * [Unshield](http://synce.sourceforge.net/synce/unshield.php), extractor for .CAB files created by InstallShield
