@@ -195,11 +195,14 @@ end:
 void GlobalTimer::DoFadeStep(ieDword count) {
 	WindowManager* wm = core->GetWindowManager();
 	if (fadeToCounter) {
-		fadeToCounter-=count;
-		if (fadeToCounter<0) {
-			fadeToCounter=0;
+		
+		if (count > fadeToCounter) {
+			fadeToCounter = 0;
 			fadeToFactor = 1;
+		} else {
+			fadeToCounter -= count;
 		}
+
 		wm->FadeColor.a = 255 * (double( fadeToMax - fadeToCounter ) / fadeToMax / fadeToFactor);
 		//bug/patch #1837747 made this unneeded
 		//goto end; //hmm, freeze gametime?
