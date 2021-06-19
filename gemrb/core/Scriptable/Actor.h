@@ -421,8 +421,8 @@ private:
 	char AttackStance;
 	/*The projectile bringing the current attack*/
 	Projectile* attackProjectile ;
-	ieDword TicksLastRested;
-	ieDword LastFatigueCheck;
+	tick_t TicksLastRested;
+	tick_t LastFatigueCheck;
 	tick_t remainingTalkSoundTime;
 	tick_t lastTalkTimeCheckAt;
 	/** paint the actor itself. Called internally by Draw() */
@@ -964,7 +964,7 @@ public:
 	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
-	ieDword GetLastRested() { return TicksLastRested; }
+	tick_t GetLastRested() { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;
