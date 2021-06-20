@@ -60,6 +60,7 @@ public:
 	int ReadWordSigned (ieWordSigned* dest);
 	int ReadDword(ieDword* dest);
 	int ReadResRef(ieResRef dest);
+	int ReadResRef(ResRef& dest);
 	virtual int Write(const void* src, unsigned int len) = 0;
 	int WriteWord(const ieWord* src);
 	int WriteDword(const ieDword* src);

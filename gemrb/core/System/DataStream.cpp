@@ -186,6 +186,14 @@ int DataStream::ReadResRef(ieResRef dest)
 	return len;
 }
 
+int DataStream::ReadResRef(ResRef& dest)
+{
+	ieResRef ref;
+	int len = ReadResRef(ref);
+	dest = ref;
+	return len;
+}
+
 int DataStream::WriteResRef(const ieResRef src)
 {
 	return Write( src, 8);
