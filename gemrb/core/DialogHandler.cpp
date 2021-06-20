@@ -122,7 +122,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return false;
 	}
 
-	strnlwrcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
+	dlg->ResRef = ResRef::MakeLowerCase(dlgref); //this isn't handled by GetDialog???
 
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
@@ -404,8 +404,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			target = tgt;
 
 			// we have to make a backup, tr->Dialog is freed
-			ieResRef tmpresref;
-			strnlwrcpy(tmpresref,tr->Dialog, 8);
+			ResRef tmpresref = tr->Dialog;
 			if (!InitDialog(speaker, target, tmpresref, si)) {
 				// error was displayed by InitDialog
 				EndDialog();

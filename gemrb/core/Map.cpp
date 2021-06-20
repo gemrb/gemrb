@@ -2375,13 +2375,13 @@ Scriptable *Map::GetActorByDialog(const char *resref) const
 // currently only looks at the party, since it is enough for the only known user
 // relies on an override item we create, with the resref matching the dialog one!
 // currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
-Scriptable *Map::GetItemByDialog(ieResRef resref) const
+Scriptable *Map::GetItemByDialog(ResRef resref) const
 {
 	const Game *game = core->GetGame();
 	ieResRef itemref;
 	// choose the owner of the dialog via passed dialog ref
-	if (strnicmp(resref, "dmhead", 8)) {
-		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? %s", resref);
+	if (resref != ResRef("dmhead")) {
+		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? %s", resref.CString());
 		return NULL;
 	}
 	CopyResRef(itemref, "mertwyn");
@@ -2395,13 +2395,13 @@ Scriptable *Map::GetItemByDialog(ieResRef resref) const
 		if (!citem) continue;
 		const Item *item = gamedata->GetItem(citem->ItemResRef);
 		if (!item) continue;
-		if (strnicmp(item->Dialog, resref, 8)) continue;
+		if (item->Dialog != resref) continue;
 
 		// finally, spawn (dmhead.cre) from our override as a substitute talker
 		// the cre file is set up to be invisible, invincible and immune to several things
 		Actor *surrogate = gamedata->GetCreature(resref);
 		if (!surrogate) {
-			error("Map", "GetItemByDialog found the right item, but creature is missing: %s!", resref);
+			error("Map", "GetItemByDialog found the right item, but creature is missing: %s!", resref.CString());
 			// error is fatal
 		}
 		Map *map = pc->GetCurrentArea();

@@ -52,7 +52,7 @@ struct DialogTransition {
 	ieStrRef journalStrRef;
 	Condition* condition;
 	std::vector<Action*> actions;
-	ieResRef Dialog;
+	ResRef Dialog;
 	ieDword stateIndex;
 };
 
@@ -81,7 +81,7 @@ public:
 		delete this;
 	}
 public:
-	ieResRef ResRef;
+	ResRef ResRef;
 	ieDword Flags; //freeze flags (bg2)
 	unsigned int TopLevelCount;
 	ieDword* Order;
