@@ -52,7 +52,7 @@ See the INSTALL [file](https://github.com/gemrb/gemrb/blob/master/INSTALL).
 There are several ways you can get in touch:
 * [Homepage](https://gemrb.org)
 * [GemRB forum](https://www.gibberlings3.net/forums/forum/91-gemrb/)
-* [IRC channel](https://webchat.freenode.net/?channels=GemRB), #GemRB on the FreeNode IRC network
+* [IRC channel](https://web.libera.chat/#GemRB), #GemRB on the Libera.Chat IRC network
 * [Discord channel](https://discord.gg/64rEVAk) (Gibberlings3 server)
 * [Bug tracker](https://github.com/gemrb/gemrb/issues/new/choose)
 
