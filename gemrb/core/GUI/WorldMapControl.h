@@ -84,7 +84,7 @@ private:
 	//font for printing area names
 	Font* ftext;
 	//current area
-	ieResRef currentArea;
+	ResRef currentArea;
 
 	/** Label color of a visited area */
 

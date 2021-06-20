@@ -45,11 +45,11 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 	Game* game = core->GetGame();
 	WorldMap* worldmap = core->GetWorldMap();
-	CopyResRef(currentArea, game->CurrentArea);
+	currentArea = game->CurrentArea;
 	int entry = core->GetAreaAlias(currentArea);
 	if (entry >= 0) {
 		WMPAreaEntry *m = worldmap->GetEntry(entry);
-		CopyResRef(currentArea, m->AreaResRef);
+		currentArea = m->AreaResRef;
 	}
 
 	//if there is no trivial area, look harder
@@ -57,7 +57,7 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
 		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
-			CopyResRef(currentArea, m->AreaResRef);
+			currentArea = m->AreaResRef;
 		}
 	}
 		
