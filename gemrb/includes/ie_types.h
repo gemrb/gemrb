@@ -49,10 +49,8 @@ typedef signed long int ieDwordSigned;
 #endif
 
 /** string reference into TLK file */
-typedef ieDword ieStrRef; 
+typedef ieDword ieStrRef;
 
-/** Resource reference */
-typedef char ieResRef[9];
 typedef char ieVariable[33];
 
 }

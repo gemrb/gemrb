@@ -29,6 +29,7 @@
 #define DATASTREAM_H
 
 #include "Platform.h"
+#include "Resource.h"
 
 namespace GemRB {
 
