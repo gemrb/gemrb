@@ -51,15 +51,13 @@ class DataStream;
 /* Hopefully we can slowly replace the char array version with this struct... */
 struct ResRef {
 private:
-	char ref[9];
+	char ref[9] = {'\0'};
 private:
 	void Clear() {
 		memset(ref, 0, sizeof(ref));
 	}
 public:
-	ResRef() {
-		Clear();
-	}
+	ResRef() = default;
 
 	ResRef(const char* str) {
 		operator=(str);
@@ -67,6 +65,21 @@ public:
 
 	ResRef(const ResRef& rhs) {
 		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+	}
+	
+	// ResRef is case insensitive, but the originals weren't always
+	// in some cases we need lower/upper case for save compatibility with originals
+	// so we provide factories the create ResRef with the required case
+	static ResRef MakeLowerCase(const char* str) {
+		ieResRef ref;
+		strnlwrcpy(ref, str, sizeof(ref) - 1);
+		return ref;
+	}
+	
+	static ResRef MakeUpperCase(const char* str) {
+		ieResRef ref;
+		strnuprcpy(ref, str, sizeof(ref) - 1);
+		return ref;
 	}
 
 	ResRef& operator=(const ResRef& rhs) {
@@ -81,7 +94,7 @@ public:
 			// using strnlwrcpy: this wrapper is case insensitive,
 			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
 			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
-			strnlwrcpy(ref, str, sizeof(ref)-1 );
+			strncpy(ref, str, sizeof(ref) - 1);
 			ref[sizeof(ref)-1] = '\0';
 		}
 		
