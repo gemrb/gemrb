@@ -52,10 +52,6 @@ class DataStream;
 struct ResRef {
 private:
 	char ref[9] = {'\0'};
-private:
-	void Clear() {
-		memset(ref, 0, sizeof(ref));
-	}
 public:
 	ResRef() = default;
 
@@ -65,6 +61,10 @@ public:
 
 	ResRef(const ResRef& rhs) {
 		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
+	}
+	
+	void Reset() {
+		memset(ref, 0, sizeof(ref));
 	}
 	
 	// ResRef is case insensitive, but the originals weren't always
@@ -89,7 +89,7 @@ public:
 	
 	ResRef& operator=(const char* str) {
 		if (str == NULL) {
-			Clear();
+			Reset();
 		} else {
 			// using strnlwrcpy: this wrapper is case insensitive,
 			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
