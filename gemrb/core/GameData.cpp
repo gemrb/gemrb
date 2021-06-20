@@ -393,7 +393,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		}
 	}
 	if (ret) {
-		strnlwrcpy(ret->ResName, effect, 8);
+		ret->ResName = ResRef::MakeLowerCase(effect);
 	}
 	return ret;
 }

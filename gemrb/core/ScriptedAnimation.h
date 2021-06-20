@@ -107,7 +107,7 @@ public:
 	Animation* anims[3*MAX_ORIENT];
 	//there is only one palette
 	Holder<Palette> palette;
-	ieResRef sounds[3];
+	ResRef sounds[3];
 	Color Tint = ColorWhite;
 	int Fade;
 	ieDword Transparency;
@@ -124,7 +124,7 @@ public:
 	ieDword Duration;
 	ieDword Delay;
 	bool justCreated;
-	ieResRef ResName;
+	ResRef ResName;
 	int Phase;
 	int SoundPhase;
 	ScriptedAnimation *twin;
@@ -140,13 +140,13 @@ public:
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
-	void SetSound(int arg, const ieResRef sound);
+	void SetSound(int arg, const ResRef sound);
 	//sets the animation to play only once
 	void PlayOnce();
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
 	//sets complete palette to ResRef
-	void SetFullPalette(const ieResRef PaletteResRef);
+	void SetFullPalette(const ResRef PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
 	int GetCurrentFrame() const;

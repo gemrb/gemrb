@@ -69,9 +69,6 @@ ScriptedAnimation::ScriptedAnimation()
 void ScriptedAnimation::Init()
 {
 	memset(anims,0,sizeof(anims));
-	sounds[0][0] = 0;
-	sounds[1][0] = 0;
-	sounds[2][0] = 0;
 	Transparency = 0;
 	Fade = 0;
 	SequenceFlags = 0;
@@ -134,7 +131,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 	//getcycle returns NULL if there is no such cycle
 	//special case, PST double animations
 
-	CopyResRef(ResName, af->ResRef);
+	ResName = af->ResRef;
 	// some anims like FIREL.BAM in IWD contain empty cycles
 	unsigned int cCount = 0;
 	for (unsigned int i = 0; i < af->GetCycleCount() && af->GetCycleSize(i) > 0; ++i) {
@@ -253,7 +250,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 		delete stream;
 		return;
 	}
-	ieResRef Anim1ResRef;
+	ResRef Anim1ResRef;
 	int seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	// unused second resref; m_cShadowVidCellRef in the original
@@ -320,15 +317,15 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	}
 
 	if (sounds[P_HOLD][0] == 0 && sounds[P_RELEASE][0] == 0 && (SequenceFlags & IE_VVC_LOOP)) {
-		CopyResRef(sounds[P_HOLD], sounds[P_ONSET]);
-		sounds[P_ONSET][0] = 0;
+		sounds[P_HOLD] = sounds[P_ONSET];
+		sounds[P_ONSET].Reset();
 	}
 
 	if (SequenceFlags & IE_VVC_BAM) {
 		AnimationFactory *af = (AnimationFactory *)
 			gamedata->GetFactoryResource(Anim1ResRef, IE_BAM_CLASS_ID);
 		if (!af) {
-			Log(ERROR, "ScriptedAnimation", "Failed to load animation: %s!", Anim1ResRef);
+			Log(ERROR, "ScriptedAnimation", "Failed to load animation: %s!", Anim1ResRef.CString());
 			return;
 		}
 		for (unsigned int i = 0; i < MAX_ORIENT; i++) {
@@ -382,10 +379,10 @@ void ScriptedAnimation::SetPhase(int arg)
 	}
 }
 
-void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
+void ScriptedAnimation::SetSound(int arg, const ResRef sound)
 {
 	if (arg >= P_ONSET && arg <= P_RELEASE) {
-		CopyResRef(sounds[arg], sound);
+		sounds[arg] = sound;
 	}
 	//no need to call the twin
 }
@@ -403,7 +400,7 @@ void ScriptedAnimation::PlayOnce()
 	}
 }
 
-void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
+void ScriptedAnimation::SetFullPalette(const ResRef PaletteResRef)
 {
 	palette = gamedata->GetPalette(PaletteResRef);
 	if (twin) {
@@ -416,7 +413,7 @@ void ScriptedAnimation::SetFullPalette(int idx)
 	ieResRef PaletteResRef;
 
 	//make sure this field is zero terminated, or strlwr will run rampant!!!
-	snprintf(PaletteResRef, sizeof(PaletteResRef), "%.7s%d", ResName, idx);
+	snprintf(PaletteResRef, sizeof(PaletteResRef), "%.7s%d", ResName.CString(), idx);
 	strnlwrcpy(PaletteResRef, PaletteResRef, 8);
 	SetFullPalette(PaletteResRef);
 	//no need to call twin
