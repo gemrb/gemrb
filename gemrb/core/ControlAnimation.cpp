@@ -29,7 +29,7 @@
 
 namespace GemRB {
 
-ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
+ControlAnimation::ControlAnimation(Control* ctl, const ResRef ResRef, int Cycle)
 {
 	control = NULL;
 	cycle = Cycle;
@@ -57,11 +57,11 @@ ControlAnimation::~ControlAnimation(void)
 	bam = NULL;
 }
 
-bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
+bool ControlAnimation::SameResource(const ResRef resRef, int Cycle)
 {
 	if (!control ) return false;
 	if (!bam) return false;
-	if (strnicmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
+	if (resRef != bam->ResRef) return false;
 	int c = cycle;
 	if (control->Flags()&IE_GUI_BUTTON_PLAYRANDOM) {
 		c&=~1;
