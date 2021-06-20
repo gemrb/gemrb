@@ -10902,9 +10902,9 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable(ieResRef spellRef) const
+bool Actor::Untargetable(ResRef spellRef) const
 {
-	if (spellRef[0]) {
+	if (!spellRef.IsEmpty()) {
 		Spell *spl = gamedata->GetSpell(spellRef, true);
 		if (spl && (spl->Flags&SF_TARGETS_INVISIBLE)) {
 			gamedata->FreeSpell(spl, spellRef, false);

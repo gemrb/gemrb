@@ -53,7 +53,7 @@ namespace GemRB {
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
-static ieResRef TestSpell="SPWI207";
+static ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
 
@@ -78,7 +78,6 @@ GameControl::GameControl(const Region& frame)
 	//maybe we don't even need it
 	spellCount = spellIndex = spellOrItem = spellSlot = 0;
 	spellUser = NULL;
-	spellName[0] = 0;
 	user = NULL;
 	lastActorID = 0;
 	trackerID = 0;
@@ -1810,7 +1809,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 	action->pointParameter=tgt;
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
 		} else {
 			CREMemorizedSpell *si;
 			//spell casting at target
@@ -1877,7 +1876,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 	Action* action = GenerateActionDirect( Tmp, tgt);
 	if (spellOrItem>=0) {
 		if (spellIndex<0) {
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
 		} else {
 			const CREMemorizedSpell *si;
 			//spell casting at target
@@ -2654,7 +2653,7 @@ void GameControl::SetLastActor(Actor* lastActor)
 //cnt is the number of different targets (usually 1)
 void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, int cnt)
 {
-	memset(spellName, 0, sizeof(ieResRef));
+	spellName.Reset();
 	spellOrItem = -1;
 	spellUser = u;
 	spellSlot = slot;
@@ -2672,9 +2671,9 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 //u is the caster
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupCasting(ieResRef spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
+void GameControl::SetupCasting(ResRef spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
 {
-	memcpy(spellName, spellname, sizeof(ieResRef));
+	spellName = spellname;
 	spellOrItem = type;
 	spellUser = u;
 	spellSlot = level;

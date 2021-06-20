@@ -309,7 +309,7 @@ public:
 	ieDword LastTargetPersistent; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
 	Point LastTargetPos;
 	int SpellHeader;
-	ieResRef SpellResRef;
+	ResRef SpellResRef;
 	bool InterruptCasting;
 public:
 	/** Gets the Dialog ResRef */
@@ -320,7 +320,7 @@ public:
 	void SetDialog(const char *resref);
 	void SetFloatingText(char*);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
-	void SetSpellResRef(ieResRef resref);
+	void SetSpellResRef(ResRef resref);
 	void SetWait(tick_t time);
 	tick_t GetWait() const;
 	void LeftDialog();

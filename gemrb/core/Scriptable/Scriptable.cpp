@@ -200,8 +200,8 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	}
 }
 
-void Scriptable::SetSpellResRef(ieResRef resref) {
-	strnuprcpy(SpellResRef, resref, 8);
+void Scriptable::SetSpellResRef(ResRef resref) {
+	SpellResRef = resref;
 }
 
 void Scriptable::SetOverheadText(const String& text, bool display)
@@ -948,7 +948,7 @@ void Scriptable::SendTriggerToAll(TriggerEntry entry)
 
 inline void Scriptable::ResetCastingState(Actor *caster) {
 	SpellHeader = -1;
-	SpellResRef[0] = 0;
+	SpellResRef.Reset();
 	LastTargetPos = Point(-1, -1);
 	LastSpellTarget = 0;
 	if (caster) {
@@ -995,7 +995,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 		return;
 	}
 	if (!area) {
-		Log(ERROR, "Scriptable", "CastSpellPointEnd: lost area, skipping %s!", SpellResRef);
+		Log(ERROR, "Scriptable", "CastSpellPointEnd: lost area, skipping %s!", SpellResRef.CString());
 		ResetCastingState(caster);
 		return;
 	}
@@ -1072,7 +1072,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 		return;
 	}
 	if (!area) {
-		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping %s!", SpellResRef);
+		Log(ERROR, "Scriptable", "CastSpellEnd: lost area, skipping %s!", SpellResRef.CString());
 		ResetCastingState(caster);
 		return;
 	}
@@ -1291,12 +1291,12 @@ int Scriptable::CastSpellPoint( const Point &target, bool deplete, bool instant,
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
 			return -1;
 		}
 	}
 	if(!nointerrupt && !CanCast(SpellResRef)) {
-		SpellResRef[0] = 0;
+		SpellResRef.Reset();
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
@@ -1326,7 +1326,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	if (Type == ST_ACTOR) {
 		actor = (Actor *) this;
 		if (actor->HandleCastingStance(SpellResRef, deplete, instant) ) {
-			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef);
+			Log(ERROR, "Scriptable", "Spell %s not known or memorized, aborting cast!", SpellResRef.CString());
 			return -1;
 		}
 	}
@@ -1334,7 +1334,7 @@ int Scriptable::CastSpell( Scriptable* target, bool deplete, bool instant, bool 
 	assert(target);
 
 	if(!nointerrupt && !CanCast(SpellResRef)) {
-		SpellResRef[0] = 0;
+		SpellResRef.Reset();
 		if (actor) {
 			actor->SetStance(IE_ANI_READY);
 		}
@@ -1500,7 +1500,7 @@ int Scriptable::CheckWildSurge()
 			} else {
 				// finally change the spell
 				// the hardcoded bunch does it on its own when needed
-				CopyResRef(SpellResRef, surgeSpellRef);
+				SpellResRef = surgeSpellRef;
 			}
 		}
 
@@ -1576,7 +1576,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 					caster->CastSpellPointEnd(level, 1);
 				}
 				// reset the ref, since CastSpell*End destroyed it
-				CopyResRef(SpellResRef, newspl);
+				SpellResRef = newspl;
 			}
 			caster->Modified[IE_FORCESURGE] = tmp;
 			break;
@@ -1602,7 +1602,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				int id = core->Roll(1, spellCount, -1);
 				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
 				if (ck) {
-					CopyResRef(SpellResRef, ck->SpellResRef);
+					SpellResRef = ck->SpellResRef;
 					break;
 				}
 			}
@@ -1614,7 +1614,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		default:
 			SpellHeader = -1;
-			SpellResRef[0] = 0;
+			SpellResRef.Reset();
 			Log(ERROR, "Scriptable", "New spell not found, aborting cast mid-surge!");
 			caster->SetStance(IE_ANI_READY);
 			return false;

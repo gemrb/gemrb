@@ -106,9 +106,9 @@ public:
 	ieDword   KillsChapterCount;
 	ieDword   KillsTotalXP;
 	ieDword   KillsTotalCount;
-	ieResRef  FavouriteSpells[MAX_FAVOURITES];
+	ResRef  FavouriteSpells[MAX_FAVOURITES];
 	ieWord    FavouriteSpellsCount[MAX_FAVOURITES];
-	ieResRef  FavouriteWeapons[MAX_FAVOURITES];
+	ResRef  FavouriteWeapons[MAX_FAVOURITES];
 	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
 	ieResRef  SoundSet;
 	char      SoundFolder[SOUNDFOLDERSIZE];
@@ -141,7 +141,7 @@ public:
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
-	void RegisterFavourite(ieResRef fav, int what);
+	void RegisterFavourite(ResRef fav, int what);
 	void UpdateClassLevels(const std::list<int> &levels);
 };
 }

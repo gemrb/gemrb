@@ -278,9 +278,9 @@ int PCStatsStruct::GetHeaderForSlot(int slot)
 //but also swap it with a previous slot if its usage count is now better, so the last slot is always the weakest
 //finally if it was not found anywhere, register it as the new candidate with 1 usage
 
-void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
+void PCStatsStruct::RegisterFavourite(ResRef fav, int what)
 {
-	ieResRef *respoi;
+	ResRef *respoi;
 	ieWord *cntpoi;
 
 	switch (what) {
@@ -301,7 +301,7 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 	int mincnt = cntpoi[0];
 	int pos = 0;
 	for (pos = 0; pos<MAX_FAVOURITES-1; pos++) {
-		if (!strnicmp(fav, respoi[pos], 8) ) {
+		if (fav == respoi[pos]) {
 			//found an old favourite, just increase its usage count and done
 			if (cntpoi[pos]<0xffff) {
 				if (cntpoi[pos] == mincnt) {
@@ -322,10 +322,9 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 	}
 
 	//pos is always MAX_FAVOURITES-1 here
-	if (strnicmp(fav, respoi[pos], 8) ) {
+	if (fav != respoi[pos]) {
 		//new favourite candidate, scrapping the old one
 		cntpoi[pos] = 1;
-		strnuprcpy(respoi[pos], fav, 8);
 		return;
 	}
 	//increase the favourite candidate
@@ -334,9 +333,9 @@ void PCStatsStruct::RegisterFavourite(ieResRef fav, int what)
 		//if it is now exceeding an old favourite, swap them
 
 		//move the old resref to the last position
-		memcpy(respoi[pos], respoi[minpos], sizeof(ieResRef) );
+		respoi[pos] = respoi[minpos];
 		//store the new resref into the new position
-		strnuprcpy(respoi[minpos], fav, 8);
+		respoi[minpos] = fav;
 		//store the new count to the new position
 		cntpoi[minpos] = cntpoi[pos];
 		//store the old count to the last position
