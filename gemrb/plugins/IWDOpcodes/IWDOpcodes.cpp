@@ -474,8 +474,8 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		ieDword stat = core->TranslateStat(tab->QueryField(i,0) );
 		spellres[i].stat = (ieWord) stat;
 
-		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
-		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
+		spellres[i].value = (ieDword) std::stoi(tab->QueryField(i,1), nullptr,0 );
+		spellres[i].relation = (ieWord) std::stoi(tab->QueryField(i,2), nullptr,0 );
 	}
 }
 
@@ -1502,7 +1502,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	const char *resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
 	for (int i=0;i<cnt;i++) {
-		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
+		Point p(std::stoi(tab->QueryField(i+1,0), nullptr,0), std::stoi(tab->QueryField(i+1,1), nullptr, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
 			target, p, EAM_DEFAULT, 0, NULL, 0);
 	}

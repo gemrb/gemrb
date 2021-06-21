@@ -1528,23 +1528,23 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '0': // cast spell param1 times
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.num_castings = count;
 			break;
 		case '1': // change projectile (id) to param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.projectile_id = count;
 			break;
 		case '2': // also target target type param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_ADDTYPE;
 			break;
 		case '3': // (wild surge) roll param1 more times
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			// force surge and then cast
 			// force the surge roll to be < 100, so we cast a spell from the surge table
 			tmp = caster->Modified[IE_FORCESURGE];
@@ -1582,7 +1582,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '4': // change the target type to param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_SETTYPE;
 			break;
@@ -1591,7 +1591,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '6': // change saving throw (+param1)
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.saving_throw_mod = count;
 			break;
 		case '7': // random spell of the same level (FIXME: make an effect out of this?)
@@ -1609,7 +1609,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '8': // set projectile speed to param1 %
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = std::stoi(strtok(nullptr,"."), nullptr, 0);
 			caster->wildSurgeMods.projectile_speed_mod = count;
 			break;
 		default:

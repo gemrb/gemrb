@@ -2358,10 +2358,10 @@ static void InitActorTables()
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						if (strcmp(classnames[0], currentname) == 0) {
-							dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
+							dualswap[tmpindex] = std::stoi(tm->QueryField(currentname, "MC_WAS_ID"), nullptr, 0);
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
-						dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
+						dualswap[tmpindex] = std::stoi(tm->QueryField(currentname, "MC_WAS_ID"), nullptr, 0);
 					}
 					numfound++;
 				}
@@ -2507,7 +2507,7 @@ static void InitActorTables()
 			for(j=0;j<MAX_LEVEL;j++) {
 				int row = maxrow;
 				if (j<row) row=j;
-				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
+				wmlevels[i][j] = std::stoi(tm->QueryField(row,i), nullptr, 0);
 			}
 		}
 	}
@@ -2563,7 +2563,7 @@ static void InitActorTables()
 			while(rowcount--) {
 				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
 				for(i=0;i<3;i++) {
-					afcomments[rowcount][i] = strtol(tm->QueryField(rowcount,i), NULL, 0);
+					afcomments[rowcount][i] = std::stoi(tm->QueryField(rowcount,i), nullptr, 0);
 				}
 			}
 		}
@@ -2653,10 +2653,10 @@ static void InitActorTables()
 		if (count> 0 && count<8) {
 			avCount = count-1;
 			avPrefix = new avType[count];
-			avBase = strtoul(tm->QueryField(0),NULL, 0);
+			avBase = std::stoi(tm->QueryField(0), nullptr, 0);
 			const char *poi = tm->QueryField(0,1);
 			if (*poi!='*') {
-				avStance = strtoul(tm->QueryField(0,1),NULL, 0);
+				avStance = std::stoi(tm->QueryField(0,1), nullptr, 0);
 			} else {
 				avStance = -1;
 			}
@@ -2678,8 +2678,8 @@ static void InitActorTables()
 		int racesNRows = tm->GetRowCount();
 
 		for (i = 0; i < racesNRows; i++) {
-			int raceID = strtol(tm->QueryField(i, 3), NULL, 0);
-			int favClass = strtol(tm->QueryField(i, 8), NULL, 0);
+			int raceID = std::stoi(tm->QueryField(i, 3), nullptr, 0);
+			int favClass = std::stoi(tm->QueryField(i, 8), nullptr, 0);
 			const char *raceName = tm->GetRowName(i);
 			favoredMap.insert(std::make_pair(raceID, favClass));
 			raceID2Name.insert(std::make_pair(raceID, raceName));

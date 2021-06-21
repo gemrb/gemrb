@@ -509,7 +509,7 @@ void CharAnimations::InitAvatarsTable()
 	int i=AvatarsCount;
 	DataFileMgr *resdata = core->GetResDataINI();
 	while(i--) {
-		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
+		AvatarTable[i].AnimID=(unsigned int) std::stoi(Avatars->GetRowName(i), nullptr,0);
 		strnlwrcpy(AvatarTable[i].Prefixes[0],Avatars->QueryField(i,AV_PREFIX1),8);
 		strnlwrcpy(AvatarTable[i].Prefixes[1],Avatars->QueryField(i,AV_PREFIX2),8);
 		strnlwrcpy(AvatarTable[i].Prefixes[2],Avatars->QueryField(i,AV_PREFIX3),8);
