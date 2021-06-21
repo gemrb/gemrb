@@ -591,7 +591,7 @@ void ScriptedAnimation::UpdateSound()
 
 	Point soundpos(Pos.x + XOffset, Pos.y + YOffset);
 	if (!sound_handle || !sound_handle->Playing()) {
-		while (SoundPhase <= P_RELEASE && sounds[SoundPhase][0] == 0) {
+		while (SoundPhase <= P_RELEASE && sounds[SoundPhase].IsEmpty()) {
 			SoundPhase++;
 		}
 
