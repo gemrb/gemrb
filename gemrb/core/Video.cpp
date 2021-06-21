@@ -396,10 +396,11 @@ void Video::DrawEllipseSegment(const Point& origin, unsigned short xr, unsigned 
 
 void Video::DrawEllipse(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags)
 {
-	DrawEllipseSegment(origin, xr, yr, color, 0, M_PI_2, false, flags);
-	DrawEllipseSegment(origin, xr, yr, color, M_PI_2, M_PI, false, flags);
-	DrawEllipseSegment(origin, xr, yr, color, M_PI, M_PI + M_PI_2, false, flags);
-	DrawEllipseSegment(origin, xr, yr, color, M_PI + M_PI_2, 2 * M_PI, false, flags);
+	Color c = ApplyFlagsForColor(color, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, 0, M_PI_2, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI_2, M_PI, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI, M_PI + M_PI_2, false, flags);
+	DrawEllipseSegmentImp(origin, xr, yr, c, M_PI + M_PI_2, 2 * M_PI, false, flags);
 }
 
 void Video::DrawPolygon(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags)
