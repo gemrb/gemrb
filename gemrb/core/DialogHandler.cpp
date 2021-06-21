@@ -200,7 +200,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		// reset the TA
-		ta->SetAnimPicture(NULL);
+		ta->SetSpeakerPicture(NULL);
 		ta->ClearSelectOptions();
 	}
 
@@ -423,7 +423,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	if (tgta) {
 		// displaying npc text and portrait
 		Holder<Sprite2D> portrait = tgta->CopyPortrait(1);
-		ta->SetAnimPicture(portrait);
+		ta->SetSpeakerPicture(portrait);
 		ta->AppendText(L"\n");
 		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}

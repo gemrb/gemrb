@@ -147,7 +147,7 @@ public:
 	void SelectAvailableOption(size_t idx);
 	/** Set Selectable */
 	void SetSelectable(bool val);
-	void SetAnimPicture(Holder<Sprite2D> Picture) override;
+	void SetSpeakerPicture(Holder<Sprite2D> Picture);
 
 	ContentContainer::Margin GetMargins() const;
 	void SetMargins(ContentContainer::Margin m);
@@ -165,6 +165,7 @@ private: // Private attributes
 	// dialog and listbox handling
 	std::vector<ieDword> values;
 	const Content* dialogBeginNode;
+	Holder<Sprite2D> speakerPic;
 	// dialog options container
 	SpanSelector* selectOptions;
 	// standard text display container
