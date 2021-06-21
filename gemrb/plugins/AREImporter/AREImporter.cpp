@@ -276,7 +276,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	if (day_or_night) {
 		memcpy( TmpResRef, map->WEDResRef, 9);
 	} else {
-		snprintf( TmpResRef, 9, "%.7sN", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.7sN", map->WEDResRef.CString());
 	}
 	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
@@ -312,9 +312,9 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//get the lightmap name
 	if (day_or_night) {
-		snprintf( TmpResRef, 9, "%.6sLM", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLM", map->WEDResRef.CString());
 	} else {
-		snprintf( TmpResRef, 9, "%.6sLN", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%.6sLN", map->WEDResRef.CString());
 	}
 
 	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
@@ -365,17 +365,17 @@ inline ieDword FixIWD2DoorFlags(ieDword Flags, bool reverse)
 }
 
 static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
-	ieResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
-	ieResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
+	ResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
+	ResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
 	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
 	ieResRef mainAmbient = "";
-	if (*main1[day_or_night][0]) {
+	if (!main1[day_or_night]->IsEmpty()) {
 		CopyResRef(mainAmbient, *main1[day_or_night]);
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
-	if (*main2[day_or_night][0]) {
+	if (!main2[day_or_night]->IsEmpty()) {
 		CopyResRef(mainAmbient, *main2[day_or_night]);
 	}
 	if (!mainAmbient[0]) return NULL;
@@ -418,9 +418,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	map->AreaType = AreaType;
 	map->DayNight = day_or_night;
 	map->AreaDifficulty = AreaDifficulty;
-	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
-	strnlwrcpy( map->Dream[0], Dream1, 8);
-	strnlwrcpy( map->Dream[1], Dream2, 8);
+	map->WEDResRef = WEDResRef;
+	map->Dream[0] = Dream1;
+	map->Dream[1] = Dream2;
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
@@ -1069,7 +1069,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord XPos, YPos;
 		ieWord Count, Difficulty, Frequency, Method;
 		ieWord Maximum, Enabled;
-		ieResRef creatures[MAX_RESCOUNT];
+		struct ResRef creatures[MAX_RESCOUNT];
 		ieWord DayChance, NightChance;
 		ieDword Schedule;
 		ieDword sduration;

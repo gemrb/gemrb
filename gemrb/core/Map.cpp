@@ -63,7 +63,7 @@ namespace GemRB {
 #define YESNO(x) ( (x)?"Yes":"No")
 
 // TODO: fix this hardcoded resource reference
-static ieResRef PortalResRef={"EF03TPR3"};
+static ResRef PortalResRef = "EF03TPR3";
 static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
 static int MaxVisibility = 30;
@@ -201,7 +201,7 @@ static inline bool MustSave(const Actor *actor)
 //Preload spawn group entries (creature resrefs that reference groups of creatures)
 static void InitSpawnGroups()
 {
-	ieResRef GroupName;
+	ResRef GroupName;
 
 	AutoTable tab("spawngrp", true);
 
@@ -223,9 +223,9 @@ static void InitSpawnGroups()
 			//difficulty
 			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
 			for (;j;j--) {
-				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), 8 );
+				creatures->ResRefs[j-1] = ResRef::MakeLowerCase(tab->QueryField(j, i));
 			}
-			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8 );
+			GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
 			Spawns.SetAt( GroupName, (void*) creatures );
 		}
 	}
@@ -260,9 +260,9 @@ static void InitPathFinder()
 		terrainsounds = new TerrainSounds[rc];
 		tsndcount = rc;
 		while(rc--) {
-			strnuprcpy(terrainsounds[rc].Group,tm->GetRowName(rc+2), sizeof(ieResRef)-1 );
+			terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
 			for(int i = 0; i<16;i++) {
-				strnuprcpy(terrainsounds[rc].Sounds[i], tm->QueryField(rc+2, i), sizeof(ieResRef)-1 );
+				terrainsounds[rc].Sounds[i] = ResRef::MakeUpperCase(tm->QueryField(rc+2, i));
 			}
 		}
 	}
@@ -2817,7 +2817,7 @@ void Map::AddProjectile(Projectile* pro, const Point &source, const Point &dest)
 
 //returns the longest duration of the VVC cell named 'resource' (if it exists)
 //if P is empty, the position won't be checked
-ieDword Map::HasVVCCell(const ieResRef resource, const Point &p) const
+ieDword Map::HasVVCCell(const ResRef &resource, const Point &p) const
 {
 	ieDword ret = 0;
 
@@ -2826,7 +2826,7 @@ ieDword Map::HasVVCCell(const ieResRef resource, const Point &p) const
 			if (vvc->Pos.x != p.x) continue;
 			if (vvc->Pos.y != p.y) continue;
 		}
-		if (strnicmp(resource, vvc->ResName, sizeof(ieResRef))) continue;
+		if (resource != vvc->ResName) continue;
 		const ScriptedAnimation *sca = vvc->GetSingleObject();
 		if (sca) {
 			ieDword tmp = sca->GetSequenceDuration(AI_UPDATE_TIME)-sca->GetCurrentFrame();
@@ -2859,7 +2859,7 @@ AreaAnimation *Map::GetAnimation(const char *Name) const
 	return NULL;
 }
 
-Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count)
+Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ResRef *creatures, unsigned int count)
 {
 	Spawn* sp = new Spawn();
 	strnspccpy(sp->Name, Name, 32);
@@ -2869,9 +2869,9 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 	sp->Pos.x = (ieWord) XPos;
 	sp->Pos.y = (ieWord) YPos;
 	sp->Count = count;
-	sp->Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
+	sp->Creatures = new ResRef[count];
 	for( unsigned int i=0;i<count;i++) {
-		strnlwrcpy(sp->Creatures[i],creatures[i],8);
+		sp->Creatures[i] = creatures[i];
 	}
 	spawns.push_back( sp );
 	return sp;
@@ -3210,7 +3210,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	}
 
 	while (count--) {
-		Actor *creature = gamedata->GetCreature(sg ? sg->ResRefs[count] : creResRef);
+		Actor *creature = gamedata->GetCreature(sg ? sg->ResRefs[count].CString() : creResRef);
 		if (creature) {
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
@@ -3861,8 +3861,6 @@ AreaAnimation::AreaAnimation()
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
 	Name[0] = 0;
-	BAM[0] = 0;
-	PaletteRef[0] = 0;
 }
 
 AreaAnimation::AreaAnimation(const AreaAnimation *src)
@@ -3883,9 +3881,9 @@ AreaAnimation::AreaAnimation(const AreaAnimation *src)
 	startchance = src->startchance;
 	unknown48 = 0;
 
-	memcpy(PaletteRef, src->PaletteRef, sizeof(PaletteRef));
+	PaletteRef = src->PaletteRef;
 	memcpy(Name, src->Name, sizeof(ieVariable));
-	memcpy(BAM, src->BAM, sizeof(ieResRef));
+	BAM = src->BAM;
 
 	palette = src->palette ? src->palette->Copy() : NULL;
 
@@ -3909,7 +3907,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	if (!anim)
 		anim = af->GetCycle( 0 );
 	if (!anim) {
-		print("Cannot load animation: %s", BAM);
+		print("Cannot load animation: %s", BAM.CString());
 		return NULL;
 	}
 	//this will make the animation stop when the game is stopped
@@ -3931,7 +3929,7 @@ void AreaAnimation::InitAnimation()
 	AnimationFactory* af = ( AnimationFactory* )
 		gamedata->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 	if (!af) {
-		print("Cannot load animation: %s", BAM);
+		print("Cannot load animation: %s", BAM.CString());
 		return;
 	}
 
@@ -3960,11 +3958,11 @@ void AreaAnimation::InitAnimation()
 	}
 }
 
-void AreaAnimation::SetPalette(ieResRef Pal)
+void AreaAnimation::SetPalette(const ResRef &pal)
 {
 	Flags |= A_ANI_PALETTE;
 	gamedata->FreePalette(palette, PaletteRef);
-	strnlwrcpy(PaletteRef, Pal, 8);
+	PaletteRef = pal;
 	palette = gamedata->GetPalette(PaletteRef);
 	if (Flags&A_ANI_BLEND) {
 		//re-blending after palette change
@@ -3983,7 +3981,7 @@ void AreaAnimation::BlendAnimation()
 		Holder<Sprite2D> spr = animation[0]->GetFrame(0);
 		if (!spr) return;
 		palette = spr->GetPalette()->Copy();
-		PaletteRef[0] = 0;
+		PaletteRef.Reset();
 	}
 	palette->CreateShadedAlphaChannel();
 }
@@ -4100,7 +4098,7 @@ void Map::SetInternalSearchMap(int x, int y, PathMapFlags value)
 	SrchMap[x+y*Width] = value;
 }
 
-void Map::SetBackground(const ieResRef &bgResRef, ieDword duration)
+void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
 {
 	ResourceHolder<ImageMgr> bmp = GetResourceHolder<ImageMgr>(bgResRef);
 

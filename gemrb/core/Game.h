@@ -261,9 +261,9 @@ private:
 	int *bntchnc;
 	int bntrows;
 	CRRow *crtable = nullptr;
-	ieResRef restmovies[8];
-	ieResRef daymovies[8];
-	ieResRef nightmovies[8];
+	ResRef restmovies[8];
+	ResRef daymovies[8];
+	ResRef nightmovies[8];
 	int MapIndex;
 public:
 	std::vector< Actor*> selected;
@@ -518,7 +518,7 @@ public:
 	bool OnlyNPCsSelected() const;
 private:
 	bool DetermineStartPosType(const TableMgr *strta) const;
-	ieResRef *GetDream(Map *area);
+	ResRef *GetDream(Map *area);
 	void CastOnRest() const;
 	void PlayerDream();
 	void TextDream();

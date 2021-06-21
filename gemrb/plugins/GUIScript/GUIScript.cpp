@@ -9983,7 +9983,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 
 	anim.appearance=0xffffffff; //scheduled for every hour
 	strnlwrcpy(anim.Name, ResRef, 8);
-	strnlwrcpy(anim.BAM, ResRef, 8);
+	anim.BAM = ResRef;
 	anim.Flags=Flags;
 	anim.sequence=Cycle;
 	anim.height=Height;

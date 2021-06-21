@@ -136,9 +136,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	memset(nightmovies,'*',sizeof(nightmovies));
 	if (table.load("restmov")) {
 		for(int i=0;i<8;i++) {
-			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
-			strnuprcpy(daymovies[i],table->QueryField(i,1),8);
-			strnuprcpy(nightmovies[i],table->QueryField(i,2),8);
+			restmovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 0));
+			daymovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 1));
+			nightmovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 2));
 		}
 	}
 
@@ -1476,7 +1476,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		// ... but don't do it for a scripted DayNight change
 		if (!fatigue) return;
 		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
-		ieResRef *res;
+		ResRef *res;
 
 		if (IsDay()) {
 			res=&nightmovies[areatype];
@@ -1641,7 +1641,7 @@ void Game::SetPartySize(int size)
 }
 
 //Get the area dependent rest movie
-ieResRef *Game::GetDream(Map *area)
+ResRef *Game::GetDream(Map *area)
 {
 	//select dream based on area
 	int daynight = IsDay();
@@ -1860,7 +1860,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 		}
 
 		//select dream based on area
-		ieResRef *movie;
+		ResRef *movie;
 		if (dream==0 || dream>7) {
 			movie = GetDream(area);
 		} else {

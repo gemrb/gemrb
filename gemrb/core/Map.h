@@ -143,18 +143,18 @@ struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
 	// used in bg1, set for a few copied areas in bg2 (but no files!)
 	// everyone else uses the normal ARE ambients instead
-	ieResRef MainDayAmbient1;
-	ieResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
+	ResRef MainDayAmbient1;
+	ResRef MainDayAmbient2; // except for one case, all Ambient2 are longer versions
 	ieDword MainDayAmbientVol;
-	ieResRef MainNightAmbient1;
-	ieResRef MainNightAmbient2;
+	ResRef MainNightAmbient1;
+	ResRef MainNightAmbient2;
 	ieDword MainNightAmbientVol;
 	ieDword reverbID;
 };
 
 struct RestHeaderType {
 	ieDword Strref[MAX_RESCOUNT];
-	ieResRef CreResRef[MAX_RESCOUNT];
+	ResRef CreResRef[MAX_RESCOUNT];
 	ieWord Difficulty;
 	ieWord CreatureNum;
 	ieWord Maximum;
@@ -249,7 +249,7 @@ class Spawn {
 public:
 	ieVariable Name;
 	Point Pos;
-	ieResRef *Creatures;
+	ResRef *Creatures;
 	unsigned int Count;
 	ieWord Difficulty;
 	ieWord Frequency;
@@ -264,30 +264,30 @@ public:
 	ieDword NextSpawn;
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 	Spawn();
-	~Spawn() { if(Creatures) free(Creatures); }
+	~Spawn() { delete[] Creatures; }
 	unsigned int GetCreatureCount() const { return Count; }
 };
 
 class TerrainSounds {
 public:
-	ieResRef Group;
-	ieResRef Sounds[16];
+	ResRef Group;
+	ResRef Sounds[16];
 };
 
 class SpawnGroup {
 public:
-	ieResRef *ResRefs;
+	ResRef *ResRefs;
 	unsigned int Count;
 	unsigned int Level;
 
 	SpawnGroup(unsigned int size) {
-		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
+		ResRefs = new ResRef[size];
 		Count = size;
 		Level = 0;
 	}
 	~SpawnGroup() {
 		if (ResRefs) {
-			free(ResRefs);
+			delete[] ResRefs;
 		}
 	}
 };
@@ -315,15 +315,15 @@ public:
 	ieDword unknown48;
 	//string values, not in any particular order
 	ieVariable Name;
-	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
-	ieResRef PaletteRef;
+	ResRef BAM; //not only for saving back (StaticSequence depends on this)
+	ResRef PaletteRef;
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
 	AreaAnimation(const AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
-	void SetPalette(ieResRef PaletteRef);
+	void SetPalette(const ResRef &PaletteRef);
 	void BlendAnimation();
 	bool Schedule(ieDword gametime) const;
 	Region DrawingRegion() const;
@@ -379,12 +379,12 @@ public:
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
 	int version;
-	ieResRef WEDResRef;
+	ResRef WEDResRef;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
 	bool DayNight;
 	//movies for day/night (only in ToB)
-	ieResRef Dream[2];
+	ResRef Dream[2];
 	Holder<Sprite2D> Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
@@ -525,7 +525,7 @@ public:
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
 
 	//returns the duration of a VVC cell set in the area (point may be set to empty)
-	ieDword HasVVCCell(const ieResRef resource, const Point &p) const;
+	ieDword HasVVCCell(const ResRef &resource, const Point &p) const;
 	void AddVVCell(VEFObject* vvc);
 	bool CanFree();
 	int GetCursor(const Point &p) const;
@@ -612,7 +612,7 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count);
+	Spawn *AddSpawn(char* Name, int XPos, int YPos, ResRef *creatures, unsigned int count);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name) const;
@@ -636,7 +636,7 @@ public:
 	unsigned int GetLightLevel(const Point &Pos) const;
 	PathMapFlags GetInternalSearchMap(int x, int y) const;
 	void SetInternalSearchMap(int x, int y, PathMapFlags value);
-	void SetBackground(const ieResRef &bgResref, ieDword duration);
+	void SetBackground(const ResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
 
 private:
