@@ -134,7 +134,7 @@ protected:
 	VideoBufferPtr stencilBuffer = nullptr;
 
 	Region ClippedDrawingRect(const Region& target, const Region* clip = NULL) const;
-	virtual void Wait(unsigned long) = 0;
+	virtual void Wait(uint32_t) = 0;
 	void DestroyBuffer(VideoBuffer*);
 	void DestroyBuffers();
 

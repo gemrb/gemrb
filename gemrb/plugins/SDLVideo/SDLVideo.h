@@ -106,7 +106,7 @@ protected:
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/
 	virtual int ProcessEvent(const SDL_Event & event);
-	void Wait(unsigned long w) override { SDL_Delay(w); }
+	void Wait(uint32_t w) override { SDL_Delay(w); }
 
 private:
 	virtual int CreateSDLDisplay(const char* title) = 0;
