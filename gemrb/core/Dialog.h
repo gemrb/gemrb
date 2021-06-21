@@ -81,7 +81,7 @@ public:
 		delete this;
 	}
 public:
-	ResRef ResRef;
+	ResRef resRef;
 	ieDword Flags; //freeze flags (bg2)
 	unsigned int TopLevelCount;
 	ieDword* Order;

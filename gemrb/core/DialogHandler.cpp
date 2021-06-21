@@ -122,7 +122,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 		return false;
 	}
 
-	dlg->ResRef = ResRef::MakeLowerCase(dlgref); //this isn't handled by GetDialog???
+	dlg->resRef = ResRef::MakeLowerCase(dlgref); //this isn't handled by GetDialog???
 
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
@@ -338,7 +338,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		//displaying dialog for selected option
 		si = tr->stateIndex;
 		//follow external linkage, if required
-		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
+		if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
 			//target should be recalculated!
 			target->LeftDialog();
 			tgt = NULL;
