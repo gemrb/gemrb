@@ -63,6 +63,7 @@ public:
 	Point Pos;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area = nullptr;
+	Holder<Sprite2D> areaIndicator;
 	ColorAnimation hoverAnim;
 
 protected:

@@ -114,8 +114,8 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			}
 		}
 
-		if (AnimPicture && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
-			video->BlitSprite(AnimPicture, offset);
+		if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
+			video->BlitSprite(areaIndicator, offset);
 		}
 	}
 
