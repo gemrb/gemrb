@@ -133,8 +133,8 @@ Holder<Sprite2D> Animation::NextFrame(void)
 
 	//it could be that we skip more than one frame in case of slow rendering
 	//large, composite animations (dragons, multi-part area anims) require synchronisation
-	if (( time - starttime ) >= ( unsigned long ) ( 1000 / fps )) {
-		int inc = (time-starttime)*fps/1000;
+	if ((time - starttime) >= tick_t(1000 / fps)) {
+		tick_t inc = (time-starttime) * fps / 1000;
 		pos += inc;
 		starttime += inc*1000/fps;
 	}
