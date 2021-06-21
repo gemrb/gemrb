@@ -242,8 +242,6 @@ class GWindow(GView, Scrollable):
 class GControl(GView):
 	methods = {
 		'SetVarAssoc': _GemRB.Control_SetVarAssoc,
-		'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,
-		'SetAnimation': _GemRB.Control_SetAnimation,
 		'QueryText': _GemRB.Control_QueryText,
 		'SetText': _GemRB.Control_SetText,
 		'SetAction': _GemRB.Control_SetAction,
@@ -336,7 +334,9 @@ class GButton(GControl):
 		'SetBAM': _GemRB.Button_SetBAM,
 		'SetSpellIcon': _GemRB.Button_SetSpellIcon,
 		'SetItemIcon': _GemRB.Button_SetItemIcon,
-		'SetActionIcon': _GemRB.Button_SetActionIcon
+		'SetActionIcon': _GemRB.Button_SetActionIcon,
+		'SetAnimation': _GemRB.Button_SetAnimation,
+		'SetAnimationPalette': _GemRB.Button_SetAnimationPalette,
 	}
 
 	def MakeDefault(self, glob=False):
