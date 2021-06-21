@@ -85,14 +85,14 @@ private:
 	bool SingleFrame;
 
 public:
-	ieResRef AreaName;
-	ieResRef AreaResRef;
+	ResRef AreaName;
+	ResRef AreaResRef;
 	ieVariable AreaLongName;
 	ieDword IconSeq;
 	Point pos;
 	ieStrRef LocCaptionName;
 	ieStrRef LocTooltipName;
-	ieResRef LoadScreenResRef;
+	ResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
 };
@@ -107,7 +107,7 @@ struct WMPAreaLink {
 	ieVariable DestEntryPoint;
 	ieDword DistanceScale;
 	ieDword DirectionFlags; //where will the player appear on dest. area
-	ieResRef EncounterAreaResRef[5];
+	ResRef EncounterAreaResRef[5];
 	ieDword EncounterChance;
 };
 
@@ -129,7 +129,7 @@ public: //struct members
 	ieStrRef AreaName;
 	ieDword unknown1;
 	ieDword unknown2;
-	ieResRef MapIconResRef;
+	ResRef MapIconResRef;
 	ieDword Flags;
 
 	AnimationFactory *bam;
@@ -155,26 +155,26 @@ public:
 	void AddAreaEntry(WMPAreaEntry *ae);
 	void AddAreaLink(WMPAreaLink *al);
 	/** Calculates the distances from A, call this when first on an area */
-	int CalculateDistances(const ieResRef A, int direction);
+	int CalculateDistances(const ResRef& A, int direction);
 	/** Returns the precalculated distance to area B */
-	int GetDistance(const ieResRef A) const;
+	int GetDistance(const ResRef& A) const;
 	/** Returns the link between area A and area B */
-	WMPAreaLink *GetLink(const ieResRef A, const ieResRef B) const;
+	WMPAreaLink *GetLink(const ResRef& A, const ResRef& B) const;
 	/** Returns the area link we will fall into if we head in B direction */
 	/** If the area name differs it means we are in a random encounter */
-	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter) const;
+	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter) const;
 	/** Sets area status */
-	void SetAreaStatus(const ieResRef, int Bits, int Op);
+	void SetAreaStatus(const ResRef&, int Bits, int Op);
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
-	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i) const;
+	WMPAreaEntry* GetArea(const ResRef& AreaName, unsigned int &i) const;
 	/** Finds an area name closest to the given area */
-	WMPAreaEntry* FindNearestEntry(const ieResRef AreaName, unsigned int &i) const;
-	void SetEncounterArea(const ieResRef area, WMPAreaLink *link);
+	WMPAreaEntry* FindNearestEntry(const ResRef& AreaName, unsigned int &i) const;
+	void SetEncounterArea(const ResRef& area, WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */
-	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
+	void UpdateAreaVisibility(const ResRef& AreaName, int direction);
 	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index) const;
@@ -202,7 +202,7 @@ public:
 	WorldMap *GetCurrentMap() const { return all_maps[CurrentMap]; }
 	void SetWorldMap(unsigned int index);
 	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
-	unsigned int FindAndSetCurrentMap(const ieResRef area);
+	unsigned int FindAndSetCurrentMap(const ResRef& area);
 };
 
 }

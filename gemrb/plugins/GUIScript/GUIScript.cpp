@@ -2931,8 +2931,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 
 		WMPAreaEntry *entry = wmap->GetNewAreaEntry();
-		strnuprcpy(entry->AreaName, area, 8);
-		strnuprcpy(entry->AreaResRef, area, 8);
+		entry->AreaName = ResRef::MakeUpperCase(area);
+		entry->AreaResRef = ResRef::MakeUpperCase(area);
 		strnuprcpy(entry->AreaLongName, script, 32);
 		entry->SetAreaStatus(flags, OP_SET);
 		entry->IconSeq = icon;
@@ -2940,7 +2940,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		entry->pos.y = locy;
 		entry->LocCaptionName = label;
 		entry->LocTooltipName = name;
-		memset(entry->LoadScreenResRef, 0, sizeof(ieResRef));
+		entry->LoadScreenResRef.Reset();
 		memcpy(entry->AreaLinksIndex, indices, sizeof(entry->AreaLinksIndex) );
 		memcpy(entry->AreaLinksCount, links, sizeof(entry->AreaLinksCount) );
 
@@ -2970,9 +2970,9 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			link->EncounterChance = encprob;
 			for(k=0;k<5;k++) {
 				if (enc[k][0]=='*') {
-					memset(link->EncounterAreaResRef[k],0,sizeof(ieResRef));
+					link->EncounterAreaResRef[k].Reset();
 				} else {
-					strnuprcpy(link->EncounterAreaResRef[k], enc[k], 8);
+					link->EncounterAreaResRef[k] = ResRef::MakeUpperCase(enc[k]);
 				}
 			}
 
@@ -3105,7 +3105,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	}
 	WorldMap *wm = core->GetWorldMap();
 	//the area the user clicked on
-	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName, "Destination", wmc->Area->AreaName);
+	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName.CString(), "Destination", wmc->Area->AreaName.CString());
 
 	if (!strnicmp(wmc->Area->AreaName, core->GetGame()->CurrentArea, 8)) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
