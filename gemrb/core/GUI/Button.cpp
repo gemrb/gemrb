@@ -59,6 +59,7 @@ Button::Button(Region& frame)
 
 Button::~Button()
 {
+	delete animation;
 	SetImage(BUTTON_IMAGE_NONE, NULL);
 	ClearPictureList();
 
@@ -317,6 +318,10 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
+	if (animation) {
+		return true;
+	}
+
 	if (overlayAnim) {
 		return true;
 	}
@@ -325,14 +330,21 @@ bool Button::IsAnimated() const
 		return true;
 	}
 
-	return Control::IsAnimated();
+	return false;
 }
 
 bool Button::IsOpaque() const
 {
-	return Picture != NULL
-		&& !(flags&IE_GUI_BUTTON_NO_IMAGE)
-		&& Picture->HasTransparency() == false;
+	bool opaque = View::IsOpaque();
+	if (!opaque && AnimPicture) {
+		opaque = !AnimPicture->HasTransparency();
+	}
+	
+	if (!opaque && Picture) {
+		opaque = !(flags&IE_GUI_BUTTON_NO_IMAGE) && !Picture->HasTransparency();
+	}
+	
+	return opaque;
 }
 
 void Button::SetBorder(int index, const Region& rgn, const Color &color, bool enabled, bool filled)
@@ -635,6 +647,12 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	} else {
 		flags &= ~IE_GUI_BUTTON_PICTURE;
 	}
+	MarkDirty();
+}
+
+void Button::SetAnimPicture(Holder<Sprite2D> newpic)
+{
+	AnimPicture = newpic;
 	MarkDirty();
 }
 

@@ -23,7 +23,6 @@
 #include "GUI/Window.h"
 
 #include "ie_cursors.h"
-#include "ControlAnimation.h"
 #include "Interface.h"
 #include "Sprite2D.h"
 #include "Variables.h"
@@ -43,7 +42,6 @@ Control::Control(const Region& frame)
 	VarName[0] = 0;
 	SetValueRange(MaxValueRange);
 
-	animation = NULL;
 	ControlType = IE_GUI_INVALID;
 
 	actionTimer = NULL;
@@ -53,13 +51,6 @@ Control::Control(const Region& frame)
 Control::~Control()
 {
 	ClearActionTimer();
-
-	delete animation;
-}
-
-bool Control::IsOpaque() const
-{
-	 return AnimPicture && AnimPicture->HasTransparency() == false;
 }
 
 void Control::SetText(const String* string)
@@ -177,12 +168,6 @@ void Control::SetValueRange(ValueRange r)
 void Control::SetValueRange(ieDword min, ieDword max)
 {
 	SetValueRange(ValueRange(min, max));
-}
-
-void Control::SetAnimPicture(Holder<Sprite2D> newpic)
-{
-	AnimPicture = newpic;
-	MarkDirty();
 }
 
 void Control::ClearActionTimer()

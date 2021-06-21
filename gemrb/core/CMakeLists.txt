@@ -14,7 +14,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Calendar.cpp
 	CharAnimations.cpp
 	Compressor.cpp
-	ControlAnimation.cpp
 	Core.cpp
 	DataFileMgr.cpp
 	Dialog.cpp

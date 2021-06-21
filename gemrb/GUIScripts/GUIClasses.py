@@ -241,7 +241,6 @@ class GWindow(GView, Scrollable):
 
 class GControl(GView):
 	methods = {
-		'HasAnimation': _GemRB.Control_HasAnimation,
 		'SetVarAssoc': _GemRB.Control_SetVarAssoc,
 		'SetAnimationPalette': _GemRB.Control_SetAnimationPalette,
 		'SetAnimation': _GemRB.Control_SetAnimation,

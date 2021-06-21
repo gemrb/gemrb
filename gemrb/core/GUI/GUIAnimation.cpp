@@ -19,6 +19,11 @@
 
 #include "GUIAnimation.h"
 
+#include "AnimationFactory.h"
+#include "GUI/Button.h"
+#include "Interface.h"
+#include "RNG.h"
+
 namespace GemRB {
 
 // so far everything we need uses this cycle
@@ -71,6 +76,132 @@ Color ColorAnimation::GenerateNext(tick_t time)
 bool ColorAnimation::HasEnded() const
 {
 	return (repeat) ? false : current == end;
+}
+
+ButtonAnimation::ButtonAnimation(Button* btn, const ResRef& ResRef, int Cycle)
+{
+	cycle = Cycle;
+
+	bam = ( AnimationFactory* ) gamedata->GetFactoryResource( ResRef,
+		IE_BAM_CLASS_ID, IE_NORMAL );
+
+	if (! bam)
+		return;
+
+	button = btn;
+	button->animation = this;
+}
+
+//freeing the bitmaps only once, but using an intelligent algorithm
+ButtonAnimation::~ButtonAnimation()
+{
+	//removing from timer first
+	core->timer.RemoveAnimation(this);
+}
+
+bool ButtonAnimation::SameResource(const ResRef& resRef, int Cycle)
+{
+	if (!button) return false;
+	if (!bam) return false;
+	if (resRef != bam->ResRef) return false;
+	int c = cycle;
+	if (button->Flags()&IE_GUI_BUTTON_PLAYRANDOM) {
+		c&=~1;
+	}
+	if (Cycle!=c) return false;
+	return true;
+}
+
+void ButtonAnimation::UpdateAnimation(bool paused)
+{
+	tick_t time = 0;
+
+	if (paused && !(button->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
+		// try again later
+		core->timer.AddAnimation( this, 1 );
+		return;
+	}
+
+	if (button->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
+		// simple Finite-State Machine
+		if (anim_phase == 0) {
+			frame = 0;
+			anim_phase = 1;
+			// note: the granularity of time should be
+			// one of twenty values from [500, 10000]
+			// but not the full range.
+			time = 500 + 500 * RAND(0, 19);
+			cycle&=~1;
+		} else if (anim_phase == 1) {
+			if (!RAND(0,29)) {
+				cycle|=1;
+			}
+			anim_phase = 2;
+			time = 100;
+		} else {
+			frame++;
+			time = 100;
+		}
+	} else {
+		frame ++;
+		if (has_palette) {
+			time = 100;  //hack for slower movement
+		} else {
+			time = 15;
+		}
+	}
+
+	if (UpdateAnimationSprite()) {
+		core->timer.AddAnimation(this, time);
+	}
+}
+
+bool ButtonAnimation::UpdateAnimationSprite() {
+	Holder<Sprite2D> pic = bam->GetFrame((unsigned short) frame, (unsigned char) cycle);
+
+	if (pic == NULL) {
+		//stopping at end frame
+		if (button->Flags() & IE_GUI_BUTTON_PLAYONCE) {
+			core->timer.RemoveAnimation( this );
+			button->SetAnimPicture( NULL );
+			return false;
+		}
+		anim_phase = 0;
+		frame = 0;
+		pic = bam->GetFrame( 0, (unsigned char) cycle );
+	}
+
+	if (pic == NULL) {
+		return true;
+	}
+
+	if (has_palette) {
+		PaletteHolder palette = pic->GetPalette();
+		palette->SetupPaperdollColours(colors, 0);
+		if (is_blended) {
+			palette->CreateShadedAlphaChannel();
+		}
+	} else {
+		if (is_blended) {
+			PaletteHolder palette = pic->GetPalette();
+			palette->CreateShadedAlphaChannel();
+		}
+	}
+
+	button->SetAnimPicture( pic );
+	return true;
+}
+
+void ButtonAnimation::SetPaletteGradients(ieDword *col)
+{
+	memcpy(colors, col, 8*sizeof(ieDword));
+	has_palette = true;
+	UpdateAnimationSprite();
+}
+
+void ButtonAnimation::SetBlend(bool b)
+{
+	is_blended = b;
 }
 
 }

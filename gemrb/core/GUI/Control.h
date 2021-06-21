@@ -52,7 +52,6 @@
 
 namespace GemRB {
 
-class ControlAnimation;
 class Control;
 class Sprite2D;
     
@@ -139,9 +138,6 @@ public: // Public attributes
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
 
-	ControlAnimation* animation;
-	Holder<Sprite2D> AnimPicture;
-
 	/** Defines the Control ID Number used for GUI Scripting */
 	ieDword ControlID;
 	/** Type of control */
@@ -152,9 +148,6 @@ public: // Public attributes
 public:
 	explicit Control(const Region& frame);
 	~Control() override;
-
-	bool IsAnimated() const override { return animation && AnimPicture; }
-	bool IsOpaque() const override;
 
 	/** Sets the Text of the current control */
 	void SetText(const String*);
@@ -185,8 +178,6 @@ public:
 	bool SupportsAction(const ActionKey&) override;
 
 	virtual String QueryText() const { return String(); }
-	/** Sets the animation picture ref */
-	virtual void SetAnimPicture(Holder<Sprite2D> Picture);
 
 	typedef std::pair<ieDword, ieDword> ValueRange;
 	const static ValueRange MaxValueRange;

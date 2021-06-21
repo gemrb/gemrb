@@ -29,11 +29,11 @@
 
 namespace GemRB {
 
-class ControlAnimation;
+class ButtonAnimation;
 
 struct AnimationRef
 {
-	ControlAnimation *ctlanim;
+	ButtonAnimation *ctlanim;
 	tick_t  time;
 };
 
@@ -72,8 +72,8 @@ public:
 	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
 	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(ControlAnimation* ctlanim, tick_t time);
-	void RemoveAnimation(ControlAnimation* ctlanim);
+	void AddAnimation(ButtonAnimation* ctlanim, tick_t time);
+	void RemoveAnimation(ButtonAnimation* ctlanim);
 	void ClearAnimations();
 
 private:

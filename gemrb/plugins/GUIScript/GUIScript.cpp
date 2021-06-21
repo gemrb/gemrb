@@ -26,7 +26,6 @@
 
 #include "Audio.h"
 #include "CharAnimations.h"
-#include "ControlAnimation.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h"
 #include "DisplayMessage.h"
@@ -3845,8 +3844,8 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 	return ret;
 }
 
-PyDoc_STRVAR( GemRB_Control_SetAnimationPalette__doc,
-"===== Control_SetAnimationPalette =====\n\
+PyDoc_STRVAR( GemRB_Button_SetAnimationPalette__doc,
+"===== Button_SetAnimationPalette =====\n\
 \n\
 **Prototype:** GemRB.SetAnimationPalette (WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7, col8)\n\
 \n\
@@ -3861,10 +3860,10 @@ PyDoc_STRVAR( GemRB_Control_SetAnimationPalette__doc,
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:Control_SetAnimation]]"
+**See also:** [[guiscript:Button_SetAnimation]]"
 );
 
-static PyObject* GemRB_Control_SetAnimationPalette(PyObject* self, PyObject* args)
+static PyObject* GemRB_Button_SetAnimationPalette(PyObject* self, PyObject* args)
 {
 	ieDword col[8];
 
@@ -3875,10 +3874,10 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject* self, PyObject* arg
 		return NULL;
 	}
 
-	Control* ctl = GetView<Control>(self);
-	ABORT_IF_NULL(ctl);
+	Button* btn = GetView<Button>(self);
+	ABORT_IF_NULL(btn);
 
-	ControlAnimation* anim = ctl->animation;
+	ButtonAnimation* anim = btn->animation;
 	if (!anim) {
 		return RuntimeError("No animation!");
 	}
@@ -3887,39 +3886,8 @@ static PyObject* GemRB_Control_SetAnimationPalette(PyObject* self, PyObject* arg
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Control_HasAnimation__doc,
-"===== Control_HasAnimation =====\n\
-\n\
-**Prototype:** GemRB.HasAnimation (WindowIndex, ControlIndex, BAMResRef[, Cycle])\n\
-\n\
-**Metaclass Prototype:** HasAnimation (BAMResRef[, Cycle])\n\
-\n\
-**Description:** Checks whether a Control (usually a Button) has a given animation set.\n\
-\n\
-**Parameters:** \n\
-  * WindowIndex, ControlIndex - control IDs\n\
-  * BAMResRef - animation file to search for\n\
-  * Cycle - require a certain bam cycle to be used\n\
-\n\
-**Return value:** integer, 0 if false"
-);
-
-static PyObject* GemRB_Control_HasAnimation(PyObject* self, PyObject* args)
-{
-	char *ResRef;
-	int Cycle = 0;
-	PARSE_ARGS( args,  "Os|i", &self, &ResRef, &Cycle );
-
-	Control* ctl = GetView<Control>(self);
-	if (ctl && ctl->animation) {
-		return PyBool_FromLong(ctl->animation->SameResource(ResRef, Cycle));
-	}
-
-	return PyBool_FromLong(0);
-}
-
-PyDoc_STRVAR( GemRB_Control_SetAnimation__doc,
-"===== Control_SetAnimation =====\n\
+PyDoc_STRVAR( GemRB_Button_SetAnimation__doc,
+"===== Button_SetAnimation =====\n\
 \n\
 **Prototype:** GemRB.SetAnimation (WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend])\n\
 \n\
@@ -3940,34 +3908,34 @@ a BAM file. Optionally an animation cycle could be set too.\n\
 **See also:** [[guiscript:Control_SetAnimationPalette]]"
 );
 
-static PyObject* GemRB_Control_SetAnimation(PyObject* self, PyObject* args)
+static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 {
 	char *ResRef;
 	int Cycle = 0;
 	int Blend = 0;
 	PARSE_ARGS( args,  "Os|ii", &self, &ResRef, &Cycle, &Blend );
 
-	Control* ctl = GetView<Control>(self);
-	ABORT_IF_NULL(ctl);
+	Button* btn = GetView<Button>(self);
+	ABORT_IF_NULL(btn);
 
 	//who knows, there might have been an active animation lurking
-	if (ctl->animation) {
+	if (btn->animation) {
 		//if this control says the resource is the same
 		//we wanted to set, we don't reset it
 		//but we must reinitialize it, if it was play once
-		if(ctl->animation->SameResource(ResRef, Cycle) && !(ctl->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
+		if(btn->animation->SameResource(ResRef, Cycle) && !(btn->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
 			Py_RETURN_NONE;
 		}
-		delete ctl->animation;
-		ctl->animation = NULL;
+		delete btn->animation;
+		btn->animation = NULL;
 	}
 
 	if (ResRef[0] == 0) {
-		ctl->SetAnimPicture( NULL );
+		btn->SetAnimPicture(nullptr);
 		Py_RETURN_NONE;
 	}
 
-	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
+	ButtonAnimation* anim = new ButtonAnimation(btn, ResRef, Cycle);
 	if (!anim->HasControl()) {
 		delete anim;
 		Py_RETURN_NONE;
@@ -13514,6 +13482,8 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetFont, METH_VARARGS),
 	METHOD(Button_SetHotKey, METH_VARARGS),
 	METHOD(Button_SetAnchor, METH_VARARGS),
+	METHOD(Button_SetAnimation, METH_VARARGS),
+	METHOD(Button_SetAnimationPalette, METH_VARARGS),
 	METHOD(Button_SetPushOffset, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
@@ -13524,10 +13494,7 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
 	METHOD(Button_SetTextColor, METH_VARARGS),
-	METHOD(Control_HasAnimation, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
-	METHOD(Control_SetAnimation, METH_VARARGS),
-	METHOD(Control_SetAnimationPalette, METH_VARARGS),
 	METHOD(Control_SetAction, METH_VARARGS),
 	METHOD(Control_SetActionInterval, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),

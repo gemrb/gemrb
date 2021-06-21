@@ -124,6 +124,32 @@ private:
 	bool HasEnded() const override;
 };
 
+class AnimationFactory;
+class Button;
+
+class GEM_EXPORT ButtonAnimation {
+private:
+	AnimationFactory* bam = nullptr;
+	Button* button = nullptr;
+	unsigned int cycle = 0;
+	unsigned int frame = 0;
+	unsigned int anim_phase = 0;
+	bool has_palette = false;
+	bool is_blended = false;
+	ieDword colors[8] {};
+
+	bool UpdateAnimationSprite();
+public:
+	ButtonAnimation(Button* ctl, const ResRef& ResRef, int Cycle = 0);
+	~ButtonAnimation(void);
+	void UpdateAnimation(bool paused);
+	//report if the current resource is the same as descripted by the params
+	bool SameResource(const ResRef& ResRef, int Cycle);
+	void SetPaletteGradients(ieDword *col);
+	void SetBlend(bool b);
+	bool HasControl() const { return button != nullptr; };
+};
+
 }
 	
 #endif /* Animations_h */

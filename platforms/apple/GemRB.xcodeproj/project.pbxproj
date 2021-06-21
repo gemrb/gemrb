@@ -292,7 +292,6 @@
 		A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA21395FF61006ADC12 /* Calendar.cpp */; };
 		A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */; };
 		A29BF8AF13A04A6F00C812DD /* Compressor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA91395FF61006ADC12 /* Compressor.cpp */; };
-		A29BF8B013A04A6F00C812DD /* ControlAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */; };
 		A29BF8B113A04A6F00C812DD /* Core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAD1395FF61006ADC12 /* Core.cpp */; };
 		A29BF8B213A04A6F00C812DD /* DataFileMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAF1395FF61006ADC12 /* DataFileMgr.cpp */; };
 		A29BF8B313A04A6F00C812DD /* Dialog.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FB11395FF61006ADC12 /* Dialog.cpp */; };
@@ -471,8 +470,6 @@
 		A2E66368139E883100310FC8 /* CharAnimations.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA71395FF61006ADC12 /* CharAnimations.h */; };
 		A2E66369139E883100310FC8 /* Compressor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA91395FF61006ADC12 /* Compressor.cpp */; };
 		A2E6636A139E883100310FC8 /* Compressor.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FAA1395FF61006ADC12 /* Compressor.h */; };
-		A2E6636B139E883100310FC8 /* ControlAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */; };
-		A2E6636C139E883100310FC8 /* ControlAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FAC1395FF61006ADC12 /* ControlAnimation.h */; };
 		A2E6636D139E883100310FC8 /* Core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAD1395FF61006ADC12 /* Core.cpp */; };
 		A2E6636E139E883100310FC8 /* damages.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FAE1395FF61006ADC12 /* damages.h */; };
 		A2E6636F139E883100310FC8 /* DataFileMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FAF1395FF61006ADC12 /* DataFileMgr.cpp */; };
@@ -1563,8 +1560,6 @@
 		A2BF9FA71395FF61006ADC12 /* CharAnimations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CharAnimations.h; sourceTree = "<group>"; };
 		A2BF9FA91395FF61006ADC12 /* Compressor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Compressor.cpp; sourceTree = "<group>"; };
 		A2BF9FAA1395FF61006ADC12 /* Compressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Compressor.h; sourceTree = "<group>"; };
-		A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControlAnimation.cpp; sourceTree = "<group>"; };
-		A2BF9FAC1395FF61006ADC12 /* ControlAnimation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControlAnimation.h; sourceTree = "<group>"; };
 		A2BF9FAD1395FF61006ADC12 /* Core.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Core.cpp; sourceTree = "<group>"; };
 		A2BF9FAE1395FF61006ADC12 /* damages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = damages.h; sourceTree = "<group>"; };
 		A2BF9FAF1395FF61006ADC12 /* DataFileMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataFileMgr.cpp; sourceTree = "<group>"; };
@@ -5178,8 +5173,6 @@
 				A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */,
 				A2BF9FA91395FF61006ADC12 /* Compressor.cpp */,
 				A2BF9FAA1395FF61006ADC12 /* Compressor.h */,
-				A2BF9FAB1395FF61006ADC12 /* ControlAnimation.cpp */,
-				A2BF9FAC1395FF61006ADC12 /* ControlAnimation.h */,
 				A2BF9FAD1395FF61006ADC12 /* Core.cpp */,
 				A2BF9FAE1395FF61006ADC12 /* damages.h */,
 				A2BF9FAF1395FF61006ADC12 /* DataFileMgr.cpp */,
@@ -7958,7 +7951,6 @@
 				A2E66366139E883100310FC8 /* Callback.h in Headers */,
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
 				A2E6636A139E883100310FC8 /* Compressor.h in Headers */,
-				A2E6636C139E883100310FC8 /* ControlAnimation.h in Headers */,
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
@@ -9554,7 +9546,6 @@
 				A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */,
 				A289588520D6D047002F4A97 /* GUIAnimation.cpp in Sources */,
 				A29BF8AF13A04A6F00C812DD /* Compressor.cpp in Sources */,
-				A29BF8B013A04A6F00C812DD /* ControlAnimation.cpp in Sources */,
 				A29BF8B113A04A6F00C812DD /* Core.cpp in Sources */,
 				A29BF8B213A04A6F00C812DD /* DataFileMgr.cpp in Sources */,
 				A29BF8B313A04A6F00C812DD /* Dialog.cpp in Sources */,
@@ -9774,7 +9765,6 @@
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
 				A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */,
 				A2E66369139E883100310FC8 /* Compressor.cpp in Sources */,
-				A2E6636B139E883100310FC8 /* ControlAnimation.cpp in Sources */,
 				A2E6636D139E883100310FC8 /* Core.cpp in Sources */,
 				A24B088F24A1DBEF00CA2649 /* MappedFileMemoryStream.cpp in Sources */,
 				A2E6636F139E883100310FC8 /* DataFileMgr.cpp in Sources */,

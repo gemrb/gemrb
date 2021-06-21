@@ -49,14 +49,6 @@ void Label::DrawSelf(Region rgn, const Region& /*clip*/)
 			font->Print(rgn, Text, Alignment);
 		}
 	}
-
-	if (AnimPicture) {
-		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
-		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
-		Region r(rgn.x + xOffs, rgn.y + yOffs, AnimPicture->Frame.w, AnimPicture->Frame.h);
-		core->GetVideoDriver()->BlitSprite(AnimPicture, r.origin, &r );
-	}
-
 }
 /** This function sets the actual Label Text */
 void Label::SetText(const String& string)

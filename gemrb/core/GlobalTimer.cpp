@@ -20,9 +20,9 @@
 
 #include "GlobalTimer.h"
 
-#include "ControlAnimation.h"
 #include "Game.h"
 #include "Interface.h"
+#include "GUI/GUIAnimation.h"
 #include "GUI/GameControl.h"
 #include "RNG.h"
 
@@ -255,7 +255,7 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, tick_t time)
+void GlobalTimer::AddAnimation(ButtonAnimation* ctlanim, tick_t time)
 {
 	AnimationRef* anim;
 
@@ -288,7 +288,7 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, tick_t time)
 		animations.push_back( anim );
 }
 
-void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
+void GlobalTimer::RemoveAnimation(ButtonAnimation* ctlanim)
 {
 	// Animation refs for given control are not physically removed,
 	// but just marked by erasing ptr to the control. They will be
