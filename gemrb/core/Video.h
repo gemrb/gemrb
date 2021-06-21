@@ -151,7 +151,6 @@ private:
 	virtual void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
 									   double anglefrom, double angleto, bool drawlines, BlitFlags flags) = 0;
-	virtual void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawPolygonImp(const Gem_Polygon* poly, const Point& origin, const Color& color, bool fill, BlitFlags flags) = 0;
 	virtual void DrawLineImp(const Point& p1, const Point& p2, const Color& color, BlitFlags flags) = 0;
 	virtual void DrawLinesImp(const std::vector<Point>& points, const Color& color, BlitFlags flags)=0;

@@ -115,8 +115,6 @@ private:
 	void DrawCircleImp(const Point& origin, unsigned short r, const Color& color, BlitFlags flags) override;
 	void DrawEllipseSegmentImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color,
 							   double anglefrom, double angleto, bool drawlines, BlitFlags flags) override;
-	void DrawEllipseImp(const Point& origin, unsigned short xr, unsigned short yr, const Color& color, BlitFlags flags) override;
-
 public:
 	// static functions for manipulating surfaces
 	static int SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
