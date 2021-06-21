@@ -92,13 +92,7 @@ def OnLoad():
 def SetupClockWindowControls (Window):
 	# time button
 	Button = Window.GetControl (0)
-	Button.SetAnimation ("WMTIME")
-	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, Clock.UpdateClock)
-	Clock.SetPSTGamedaysAndHourToken ()
-	Button.SetTooltip (GemRB.GetString(65027))
+	Clock.CreateClockButton(Button)
 
 	# 41627 - Return to the Game World
 	Button = Window.GetControl (2)

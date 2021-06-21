@@ -102,10 +102,6 @@ def GetActorPaperDoll (actor):
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 
-def GearsClicked ():
-	#GemRB.SetPlayerStat(GemRB.GameGetFirstSelectedPC (),44,249990)
-	GemRB.GamePause (2, 0)
-
 def GetAbilityBonus (Actor, Stat):
 	Ability = GemRB.GetPlayerStat (Actor, Stat)
 	return Ability//2-5

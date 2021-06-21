@@ -177,18 +177,8 @@ def OpenContainerWindow ():
 
 	# Gears (time) when options pane is down
 	if GameCheck.IsBG2():
-		Button = Window.GetControl (62)
-		if Button: # the demo lacks this button
-			Label = Button.CreateLabel (0x10000047, "NORMAL", "", IE_FONT_SINGLE_LINE)
-
-			Label.SetAnimation ("CPEN")
-			Button.SetAnimation ("CGEAR")
-			Button.SetBAM ("CDIAL", 0, 0)
-			Button.SetState (IE_GUI_BUTTON_ENABLED)
-			Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
-			GUICommon.SetGamedaysAndHourToken()
-			Button.SetTooltip(16041)
+		import Clock
+		Clock.CreateClockButton(Window.GetControl (62))
 
 	# 0-5 - Ground Item
 	for i in range (ground_size):

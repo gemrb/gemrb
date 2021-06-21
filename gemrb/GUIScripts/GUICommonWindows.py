@@ -31,7 +31,7 @@ from ie_slots import SLOT_QUIVER
 from ie_restype import RES_2DA
 from ie_sounds import CHAN_HITS
 from GameCheck import MAX_PARTY_SIZE
-from Clock import UpdateClock
+from Clock import UpdateClock, CreateClockButton
 import GameCheck
 import GUICommon
 import CommonTables
@@ -237,33 +237,17 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 
 	# pause button
 	if Gears:
-		# Pendulum, gears, sun/moon dial (time)
-		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		if how: # how doesn't have this in the right place
 			pos = Window.GetFrame()["h"] - 71
 			Window.CreateButton (OptionControl['Time'], 0, pos, 64, 71)
+		CreateClockButton(Window.GetControl(OptionControl['Time']))
 
-		flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
-		Button = Window.GetControl (OptionControl['Time'])
-		if bg2:
-			pen = Button.CreateButton (0x10000009)
-			pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
-			pen.SetAnimation ("CPEN")
-
-		Button.SetAnimation ("CGEAR")
-		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetFlags (flags, OP_SET)
-		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 		if iwd2:
-			Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
 			rb = OptionControl['Rest']
 		else:
 			rb = 11
-		UpdateClock ()
 	else:
 		rb = OptionControl['Rest']
-		if iwd2:
-			UpdateClock ()
 
 	# BG1 doesn't have a rest button on the main window, so this creates one
 	# from what would be the multiplayer arbitration control
@@ -418,22 +402,7 @@ def GroupControls ():
 	return
 
 def OpenActionsWindowControls (Window):
-	# 1280 and higher don't have this control
-	if not Window.GetControl (62):
-		UpdateActionsWindow ()
-		return
-	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
-	# Gears (time) when options pane is down
-	Button = Window.GetControl (62)
-	pen = Button.CreateButton (0x1000003e)
-	pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
-	
-	# FIXME: display all animations
-	pen.SetAnimation ("CPEN")
-	Button.SetAnimation ("CGEAR")
-	Button.SetState (IE_GUI_BUTTON_ENABLED)
-	Button.SetFlags (flags, OP_SET)
-	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
+	CreateClockButton(Window.GetControl (62))
 	UpdateActionsWindow ()
 	return
 

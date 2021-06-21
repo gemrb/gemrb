@@ -20,6 +20,27 @@
 import GemRB
 import GUICommon
 import GameCheck
+from GUIDefines import *
+
+def CreateClockButton(Button):
+	if Button is None:
+		return
+
+	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
+
+	# FIXME: display all animations: CPEN, CGEAR, CDIAL
+	Button.SetAnimation ("CGEAR")
+	Button.SetState (IE_GUI_BUTTON_ENABLED)
+	Button.SetFlags (flags, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
+	if GameCheck.IsIWD2():
+		Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
+	elif GameCheck.IsBG2():
+		pen = Button.CreateButton (0x10000009)
+		pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
+		pen.SetAnimation ("CPEN")
+		
+	UpdateClock()
 
 def UpdateClock ():
 	OptionsWindow = GemRB.GetView("OPTWIN")
@@ -38,7 +59,7 @@ def UpdateClock ():
 	if Clock is None and ActionsWindow:
 		Clock = ActionsWindow.GetControl (62)
 	
-	if Clock and (Clock.HasAnimation("CGEAR") or GameCheck.IsIWD2()):
+	if Clock:
 		Hours = (GemRB.GetGameTime () % 7200) // 300
 		GUICommon.SetGamedaysAndHourToken ()
 		Clock.SetBAM ("CDIAL", 0, int((Hours + 12) % 24))

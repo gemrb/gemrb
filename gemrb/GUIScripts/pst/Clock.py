@@ -21,6 +21,17 @@ import GemRB
 import GUICommon
 from GUIDefines import *
 
+def CreateClockButton(Button):
+	Button.SetAnimation ("WMTIME")
+	Button.SetState (IE_GUI_BUTTON_LOCKED)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
+	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, Clock.UpdateClock)
+	Clock.SetPSTGamedaysAndHourToken ()
+	Button.SetTooltip (GemRB.GetString(65027))
+	
+	UpdateClock()
+
 def SetPSTGamedaysAndHourToken ():
 	currentTime = GemRB.GetGameTime()
 	hours = (currentTime % 7200) / 300
