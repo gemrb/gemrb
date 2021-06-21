@@ -60,7 +60,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
     while (!fileStream.eof()) 
 	{
         std::getline(fileStream, line);
-		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+		line.erase(0, line.find_first_not_of("\n\t\r "));
 #if USE_OPENGL_API
 		// remove precisions when using OpenGL and not GLES
 		if (line.find("precision") == 0) continue;
@@ -93,7 +93,7 @@ GLSLProgram* GLSLProgram::CreateFromFiles(std::string vertexSourceFileName, std:
 	while (!fileStream2.eof()) 
 	{
         std::getline(fileStream2, line);
-		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+		line.erase(0, line.find_first_not_of("\n\t\r "));
 #if USE_OPENGL_API
 		// remove precisions
 		if (line.find("precision") == 0) continue;
