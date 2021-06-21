@@ -36,14 +36,13 @@ namespace GemRB {
 
 VEFObject::VEFObject()
 {
-	ResName[0]=0;
 	SingleObject=false;
 }
 
 VEFObject::VEFObject(ScriptedAnimation *sca)
 {
 	Pos = sca->Pos;
-	strnlwrcpy(ResName, sca->ResName, 8);
+	ResName = sca->ResName;
 	SingleObject=true;
 	ScheduleEntry entry;
 	entry.start = core->GetGame()->GameTime;
@@ -52,7 +51,7 @@ VEFObject::VEFObject(ScriptedAnimation *sca)
 	entry.offset = Point(0,0);
 	entry.type = VEF_VVC;
 	entry.ptr = sca;
-	memcpy(entry.resourceName, sca->ResName, sizeof(ieResRef) );
+	entry.resourceName = sca->ResName;
 	entries.push_back(entry);
 }
 
@@ -79,11 +78,11 @@ void VEFObject::Init()
 	}
 }
 
-void VEFObject::AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
+void VEFObject::AddEntry(const ResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
-	memcpy(entry.resourceName, res, sizeof(ieResRef) );
+	entry.resourceName = res;
 	entry.start = gtime+st;
 	if (len!=0xffffffff) len+=entry.start;
 	entry.length = len;
@@ -93,7 +92,7 @@ void VEFObject::AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos,
 	entries.push_back(entry);
 }
 
-ScriptedAnimation *VEFObject::CreateCell(const ieResRef res, ieDword start, ieDword end)
+ScriptedAnimation *VEFObject::CreateCell(const ResRef res, ieDword start, ieDword end)
 {
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
 	if (sca && end!=0xffffffff) {
@@ -102,7 +101,7 @@ ScriptedAnimation *VEFObject::CreateCell(const ieResRef res, ieDword start, ieDw
 	return sca;
 }
 
-VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
+VEFObject *VEFObject::CreateObject(const ResRef res, SClass_ID id)
 {
 	if (gamedata->Exists( res, id, true) ) {
 		VEFObject *obj = new VEFObject();
@@ -111,7 +110,7 @@ VEFObject *VEFObject::CreateObject(const ieResRef res, SClass_ID id)
 			obj->Load2DA(res);
 		} else {
 			DataStream* stream = gamedata->GetResource(res, id);
-			strnlwrcpy(obj->ResName, res, 8);
+			obj->ResName = res;
 			obj->LoadVEF(stream);
 		}
 		return obj;
@@ -189,7 +188,7 @@ void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlag
 	}
 }
 
-void VEFObject::Load2DA(const ieResRef resource)
+void VEFObject::Load2DA(const ResRef resource)
 {
 	Init();
 	AutoTable tab(resource);
@@ -198,19 +197,19 @@ void VEFObject::Load2DA(const ieResRef resource)
 		return;
 	}
 	SingleObject = false;
-	strnlwrcpy(ResName, resource, 8);
+	ResName = resource;
 	ieDword GameTime = core->GetGame()->GameTime;
 	int rows = tab->GetRowCount();
 	while(rows--) {
 		Point offset;
 		int delay, duration;
-		ieResRef resource;
+		ResRef resource;
 
 		offset.x=atoi(tab->QueryField(rows,0));
 		offset.y=atoi(tab->QueryField(rows,1));
 		delay = atoi(tab->QueryField(rows,3));
 		duration = atoi(tab->QueryField(rows,4));
-		strnuprcpy(resource, tab->QueryField(rows,2), 8);
+		resource = ResRef::MakeUpperCase(tab->QueryField(rows,2));
 		AddEntry(resource, delay, duration, offset, VEF_VVC, GameTime);
 	}
 }
@@ -220,7 +219,7 @@ void VEFObject::ReadEntry(DataStream *stream)
 	ieDword start;
 	ieDword tmp;
 	ieDword length;
-	ieResRef resource;
+	ResRef resource;
 	ieDword type;
 	ieDword continuous;
 	Point position;
@@ -247,13 +246,13 @@ void VEFObject::LoadVEF(DataStream *stream)
 		return;
 	}
 	ieDword i;
-	ieResRef Signature;
+	ResRef Signature;
 	ieDword offset1, offset2;
 	ieDword count1, count2;
 
 	stream->ReadResRef( Signature);
 	if (strncmp( Signature, "VEF V1.0", 8 ) != 0) {
-		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName);
+		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName.CString());
 		delete stream;
 		return;
 	}

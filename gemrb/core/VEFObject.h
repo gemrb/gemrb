@@ -38,7 +38,7 @@ class ScriptedAnimation;
 typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
 
 struct ScheduleEntry {
-	ieResRef resourceName;
+	ResRef resourceName;
 	ieDword start;
 	ieDword length;
 	Point offset;
@@ -48,7 +48,7 @@ struct ScheduleEntry {
 
 class GEM_EXPORT VEFObject {
 public:
-	ieResRef ResName;
+	ResRef ResName;
 	Point Pos; // position of the effect in game coordinates
 
 	VEFObject();
@@ -60,20 +60,20 @@ private:
 	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
-	void AddEntry(const ieResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
+	void AddEntry(const ResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
 	//renders the object
 	bool UpdateDrawingState(int orientation);
 	void Draw(const Region &screen, const Color &p_tint, int height, BlitFlags flags) const;
-	void Load2DA(const ieResRef resource);
+	void Load2DA(const ResRef resource);
 	void LoadVEF(DataStream *stream);
 	ScriptedAnimation *GetSingleObject() const;
 private:
 	//clears the schedule, used internally
 	void Init();
 	//load a 2DA/VEF resource into the object
-	VEFObject *CreateObject(const ieResRef res, SClass_ID id);
+	VEFObject *CreateObject(const ResRef res, SClass_ID id);
 	//load a BAM/VVC resource into the object
-	ScriptedAnimation *CreateCell(const ieResRef res, ieDword start, ieDword end);
+	ScriptedAnimation *CreateCell(const ResRef res, ieDword start, ieDword end);
 	//load a single entry from stream
 	void ReadEntry(DataStream *stream);
 };
