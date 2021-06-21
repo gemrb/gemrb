@@ -24,14 +24,7 @@
 #include "Palette.h"
 #include "SDLPixelIterator.h"
 
-#if defined(__sgi)
-#  include <math.h>
-#  ifdef __cplusplus
-extern "C" double round(double);
-#  endif
-#else
-#  include <cmath>
-#endif
+#include <cmath>
 
 using namespace GemRB;
 

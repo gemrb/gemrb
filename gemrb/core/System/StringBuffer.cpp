@@ -19,11 +19,7 @@
 #include "System/StringBuffer.h"
 
 #include <cstdio>
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 
 namespace GemRB {
 
@@ -36,17 +32,9 @@ StringBuffer::~StringBuffer()
 void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;
-
-#if defined(_MSC_VER) || defined(__sgi)
-	// Don't try to be smart.
-	// Assume this is long enough. If not, message will be truncated.
-	// MSVC6 has old vsnprintf that doesn't give length
-	const size_t len = 4095;
-#else
 	va_start(ap, message);
 	const size_t len = vsnprintf(NULL, 0, message, ap);
 	va_end(ap);
-#endif
 
 #if defined(__GNUC__)
 	__extension__ // Variable-length arrays

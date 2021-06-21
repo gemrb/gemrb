@@ -26,11 +26,7 @@
 #include "GUI/TextArea.h"
 #include "Scriptable/Actor.h"
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 
 namespace GemRB {
 

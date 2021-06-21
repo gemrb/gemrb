@@ -25,11 +25,7 @@
 #include "GUI/GUIScriptInterface.h"
 #include "GUI/TextArea.h"
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
+#include <cstdarg>
 #include <memory>
 #include <vector>
 

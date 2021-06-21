@@ -50,17 +50,6 @@
 #include <string>
 #include <vector>
 
-// No SFINAE
-#if defined(_MSC_VER) || defined(__sgi)
-#include "DataFileMgr.h"
-#include "MusicMgr.h"
-#include "SaveGame.h"
-#include "ScriptEngine.h"
-#include "StringMgr.h"
-#include "SymbolMgr.h"
-#include "Video.h"
-#endif
-
 namespace GemRB {
 
 class Actor;
@@ -97,10 +86,8 @@ class Spell;
 class Sprite2D;
 class Store;
 class StringMgr;
-#ifndef __sgi
 class SymbolMgr;
 class TableMgr;
-#endif
 class TextArea;
 class Variables;
 class Video;

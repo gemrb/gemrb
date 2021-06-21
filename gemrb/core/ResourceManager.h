@@ -28,19 +28,13 @@
 
 #include <vector>
 
-#if defined(_MSC_VER) || defined(__sgi) // No SFINAE
-#include "ResourceSource.h"
-#endif
-
 namespace GemRB {
 
 #define RM_REPLACE_SAME_SOURCE 1
 
 class DataStream;
 class Resource;
-#ifndef __sgi
 class ResourceSource;
-#endif
 class TypeID;
 
 class GEM_EXPORT ResourceManager {

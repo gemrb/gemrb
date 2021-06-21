@@ -32,12 +32,7 @@
 #define R_OK 04
 #endif
 
-#if defined(__sgi)
-#  include <stdarg.h>
-#else
-#  include <cstdarg>
-#endif
-
+#include <cstdarg>
 #include <cstring>
 #include <cerrno>
 

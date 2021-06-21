@@ -33,9 +33,7 @@
 #include <cmath>
 #include <ctype.h>
 
-#if defined(__sgi)
 #include <iostream>
-#endif
 
 #ifdef WIN32
 
