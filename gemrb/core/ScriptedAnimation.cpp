@@ -379,7 +379,7 @@ void ScriptedAnimation::SetPhase(int arg)
 	}
 }
 
-void ScriptedAnimation::SetSound(int arg, const ResRef sound)
+void ScriptedAnimation::SetSound(int arg, const ResRef &sound)
 {
 	if (arg >= P_ONSET && arg <= P_RELEASE) {
 		sounds[arg] = sound;
@@ -400,7 +400,7 @@ void ScriptedAnimation::PlayOnce()
 	}
 }
 
-void ScriptedAnimation::SetFullPalette(const ResRef PaletteResRef)
+void ScriptedAnimation::SetFullPalette(const ResRef &PaletteResRef)
 {
 	palette = gamedata->GetPalette(PaletteResRef);
 	if (twin) {

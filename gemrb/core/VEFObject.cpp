@@ -78,7 +78,7 @@ void VEFObject::Init()
 	}
 }
 
-void VEFObject::AddEntry(const ResRef res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
+void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
@@ -92,7 +92,7 @@ void VEFObject::AddEntry(const ResRef res, ieDword st, ieDword len, Point pos, i
 	entries.push_back(entry);
 }
 
-ScriptedAnimation *VEFObject::CreateCell(const ResRef res, ieDword start, ieDword end)
+ScriptedAnimation *VEFObject::CreateCell(const ResRef &res, ieDword start, ieDword end)
 {
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
 	if (sca && end!=0xffffffff) {
@@ -101,7 +101,7 @@ ScriptedAnimation *VEFObject::CreateCell(const ResRef res, ieDword start, ieDwor
 	return sca;
 }
 
-VEFObject *VEFObject::CreateObject(const ResRef res, SClass_ID id)
+VEFObject *VEFObject::CreateObject(const ResRef &res, SClass_ID id)
 {
 	if (gamedata->Exists( res, id, true) ) {
 		VEFObject *obj = new VEFObject();
@@ -188,7 +188,7 @@ void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlag
 	}
 }
 
-void VEFObject::Load2DA(const ResRef resource)
+void VEFObject::Load2DA(const ResRef &resource)
 {
 	Init();
 	AutoTable tab(resource);

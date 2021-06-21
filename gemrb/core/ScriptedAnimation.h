@@ -140,13 +140,13 @@ public:
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
-	void SetSound(int arg, const ResRef sound);
+	void SetSound(int arg, const ResRef &sound);
 	//sets the animation to play only once
 	void PlayOnce();
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
 	//sets complete palette to ResRef
-	void SetFullPalette(const ResRef PaletteResRef);
+	void SetFullPalette(const ResRef &PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
 	int GetCurrentFrame() const;

@@ -122,7 +122,7 @@ public:
 	WorldMap();
 	~WorldMap();
 public: //struct members
-	ieResRef MapResRef;
+	ResRef MapResRef;
 	ieDword Width;
 	ieDword Height;
 	ieDword MapNumber;

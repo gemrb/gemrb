@@ -29,7 +29,7 @@
 
 namespace GemRB {
 
-ControlAnimation::ControlAnimation(Control* ctl, const ResRef ResRef, int Cycle)
+ControlAnimation::ControlAnimation(Control* ctl, const ResRef& ResRef, int Cycle)
 {
 	control = NULL;
 	cycle = Cycle;
@@ -57,7 +57,7 @@ ControlAnimation::~ControlAnimation(void)
 	bam = NULL;
 }
 
-bool ControlAnimation::SameResource(const ResRef resRef, int Cycle)
+bool ControlAnimation::SameResource(const ResRef& resRef, int Cycle)
 {
 	if (!control ) return false;
 	if (!bam) return false;

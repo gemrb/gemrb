@@ -234,7 +234,7 @@ bool GameData::DelTable(unsigned int index)
 	return true;
 }
 
-PaletteHolder GameData::GetPalette(const ResRef resname)
+PaletteHolder GameData::GetPalette(const ResRef& resname)
 {
 	auto iter = PaletteCache.find(resname);
 	if (iter != PaletteCache.end())

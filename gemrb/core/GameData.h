@@ -86,7 +86,7 @@ public:
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
-	PaletteHolder GetPalette(const ResRef resname);
+	PaletteHolder GetPalette(const ResRef& resname);
 	void FreePalette(PaletteHolder &pal, const ieResRef name=NULL);
 
 	Item* GetItem(const ieResRef resname, bool silent=false);

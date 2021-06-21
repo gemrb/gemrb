@@ -45,11 +45,11 @@ private:
 
 	bool UpdateAnimationSprite();
 public:
-	ControlAnimation(Control* ctl, const ResRef ResRef, int Cycle = 0);
+	ControlAnimation(Control* ctl, const ResRef& ResRef, int Cycle = 0);
 	~ControlAnimation(void);
 	void UpdateAnimation(bool paused);
 	//report if the current resource is the same as descripted by the params
-	bool SameResource(const ResRef ResRef, int Cycle);
+	bool SameResource(const ResRef& ResRef, int Cycle);
 	void SetPaletteGradients(ieDword *col);
 	void SetBlend(bool b);
 	bool HasControl() const { return control != NULL; };
