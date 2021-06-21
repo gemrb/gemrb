@@ -131,9 +131,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	}
 
 	//loading rest/daylight switching movies (only bg2 has them)
-	memset(restmovies,'*',sizeof(restmovies));
-	memset(daymovies,'*',sizeof(daymovies));
-	memset(nightmovies,'*',sizeof(nightmovies));
+	std::fill(std::begin(restmovies), std::end(restmovies), ResRef("********"));
+	std::fill(std::begin(daymovies), std::end(daymovies), ResRef("********"));
+	std::fill(std::begin(nightmovies), std::end(nightmovies), ResRef("********"));
 	if (table.load("restmov")) {
 		for(int i=0;i<8;i++) {
 			restmovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 0));
