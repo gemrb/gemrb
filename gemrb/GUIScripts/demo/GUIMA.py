@@ -56,8 +56,7 @@ def InitMapWindow (Window, WorldMap = False):
 			WorldMapControl.SetVisible (True)
 			WorldMapControl.SetDisabled (False)
 		else:
-			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, "floattxt")
-			WorldMapControl.SetAnimation ("WMDAG")
+			WorldMapControl = Window.ReplaceSubview (2, IE_GUI_WORLDMAP, "floattxt", "WMDAG")
 			WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 
 		WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))

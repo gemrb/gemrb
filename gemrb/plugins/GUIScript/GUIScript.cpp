@@ -2228,10 +2228,11 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 		case IE_GUI_WORLDMAP:
 		{
 			char *fontname = nullptr;
+			char *anim = nullptr;
 			PyObject* pyColorNormal = nullptr;
 			PyObject* pyColorSelected = nullptr;
 			PyObject* pyColorNotVisited = nullptr;
-			PARSE_ARGS(constructArgs, "|sOOO", &fontname, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
+			PARSE_ARGS(constructArgs, "|ssOOO", &fontname, &anim, &pyColorNormal, &pyColorSelected, &pyColorNotVisited);
 			
 			Font* font = fontname ? core->GetFont(fontname) : nullptr;
 			WorldMapControl* wmap = nullptr;
@@ -2240,6 +2241,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			} else {
 				wmap = new WorldMapControl(rgn, font);
 			}
+			
+			AnimationFactory* bam = (AnimationFactory*)gamedata->GetFactoryResource(anim, IE_BAM_CLASS_ID, IE_NORMAL);
+			wmap->AnimPicture = bam->GetFrame(0, 0);
 			
 			view = wmap;
 		}

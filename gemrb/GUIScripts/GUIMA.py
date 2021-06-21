@@ -118,17 +118,16 @@ def InitWorldMapWindow (Window):
 	Window.SetFlags(WF_ALPHA_CHANNEL, OP_NAND)
 
 	if GameCheck.IsBG2():
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "floattxt", "WMDAG")
 	elif GameCheck.IsBG1():
 		cnormal = {'r' : 0, 'g' : 0, 'b' : 0, 'a' : 0xff}
 		cselected = {'r' : 0xff, 'g' : 0, 'b' : 0, 'a' : 0xff}
 		cnotvisited = {'r' : 0x80, 'g' : 0x80, 'b' : 0xf0, 'a' : 0xa0}
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", cnormal, cselected, cnotvisited)
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "toolfont", "WMDAG", cnormal, cselected, cnotvisited)
 	else:
-		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont")
+		WorldMapControl = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "infofont", "WMDAG")
 
 	WorldMapControl.SetVarAssoc("Travel", GemRB.GetVar("Travel"))
-	WorldMapControl.SetAnimation ("WMDAG")
 	WorldMapControl.SetEvent (IE_GUI_WORLDMAP_ON_PRESS, GUIMACommon.MoveToNewArea)
 	WorldMapControl.SetAction(ChangeTooltip, IE_ACT_MOUSE_ENTER)
 	# center on current area

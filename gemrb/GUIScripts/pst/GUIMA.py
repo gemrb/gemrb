@@ -91,8 +91,7 @@ def OpenTravelWindow ():
 	Window.AddAlias ("WIN_PSTWMAP")
 
 	color = {'r' : 30, 'g' : 8, 'b' : 0, 'a' : 0xff}
-	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", color, color, color)
-	WMap.SetAnimation ("WMPTY")
+	WorldMapControl = WMap = Window.ReplaceSubview (4, IE_GUI_WORLDMAP, "FONTDLG", "WMPTY", color, color, color)
 	WMap.SetVarAssoc ("Travel", Travel)
 	#center on current area
 	WMap.Scroll (0,0)
