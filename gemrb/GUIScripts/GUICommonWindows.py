@@ -243,14 +243,16 @@ def SetupMenuWindowControls (Window, Gears=None, CloseWindowCallback=None):
 			pos = Window.GetFrame()["h"] - 71
 			Window.CreateButton (OptionControl['Time'], 0, pos, 64, 71)
 
+		flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
 		Button = Window.GetControl (OptionControl['Time'])
 		if bg2:
-			Label = Button.CreateLabel (0x10000009, "NORMAL", "", IE_FONT_SINGLE_LINE)
-			Label.SetAnimation ("CPEN")
+			pen = Button.CreateButton (0x10000009)
+			pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
+			pen.SetAnimation ("CPEN")
 
 		Button.SetAnimation ("CGEAR")
 		Button.SetState (IE_GUI_BUTTON_ENABLED)
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+		Button.SetFlags (flags, OP_SET)
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 		if iwd2:
 			Button.SetState (IE_GUI_BUTTON_LOCKED) #no button depression, timer is an inset stone planet
@@ -420,15 +422,17 @@ def OpenActionsWindowControls (Window):
 	if not Window.GetControl (62):
 		UpdateActionsWindow ()
 		return
+	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
 	# Gears (time) when options pane is down
 	Button = Window.GetControl (62)
-	Label = Button.CreateLabel (0x1000003e, "NORMAL", "", IE_FONT_SINGLE_LINE)
-
+	pen = Button.CreateButton (0x1000003e)
+	pen.SetFlags (flags | IE_GUI_VIEW_IGNORE_EVENTS, OP_SET)
+	
 	# FIXME: display all animations
-	Label.SetAnimation ("CPEN")
+	pen.SetAnimation ("CPEN")
 	Button.SetAnimation ("CGEAR")
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+	Button.SetFlags (flags, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, GUICommon.GearsClicked)
 	UpdateActionsWindow ()
 	return

@@ -357,6 +357,10 @@ class GButton(GControl):
 	def CreateLabel(self, labelid, *args):
 		frame = self.GetFrame()
 		return self.CreateControl(labelid, IE_GUI_LABEL, 0, 0, frame['w'], frame['h'], args)
+		
+	def CreateButton(self, btnid):
+		frame = self.GetFrame()
+		return self.CreateControl(btnid, IE_GUI_BUTTON, 0, 0, frame['w'], frame['h'])
 
 class GWorldMap(GControl, Scrollable):
 	methods = {
