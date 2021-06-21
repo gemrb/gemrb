@@ -38,19 +38,9 @@ static void TranslateColor(const char *value, Color &color)
 	//if not RGB then try to interpret it as a dword
 	if (strnicmp(value,"RGB(",4)) {
 		long c = strtol(value,NULL,0);
-		color.r = c&0xff;
-		color.g = (c>>8)&0xff;
-		color.b = (c>>16)&0xff;
-		color.a = (c>>24)&0xff;
+		color = Color::FromABGR(c);
 	} else {
-		int r = 0;
-		int g = 0;
-		int b = 0;
-
-		sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
-		color.r=r;
-		color.g=g;
-		color.b=b;
+		sscanf(value+4,"%hhu,%hhu,%hhu)", &color.r, &color.g, &color.b);
 	}
 }
 
