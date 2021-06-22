@@ -148,6 +148,8 @@ public:
 	void SetPaletteGradients(ieDword *col);
 	void SetBlend(bool b);
 	bool HasControl() const { return button != nullptr; };
+	
+	tick_t time = 0;
 };
 
 }

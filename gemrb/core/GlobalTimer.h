@@ -31,12 +31,6 @@ namespace GemRB {
 
 class ButtonAnimation;
 
-struct AnimationRef
-{
-	ButtonAnimation *ctlanim;
-	tick_t  time;
-};
-
 
 class GEM_EXPORT GlobalTimer {
 private:
@@ -49,7 +43,7 @@ private:
 	int shakeCounter = 0;
 	Point shakeVec;
 	unsigned int first_animation;
-	std::vector<AnimationRef*>  animations;
+	std::vector<ButtonAnimation*> animations;
 	//move viewport to this coordinate
 	Point goal = Point(-1, -1);
 	int speed = 0;

@@ -37,9 +37,8 @@ GlobalTimer::GlobalTimer(void)
 
 GlobalTimer::~GlobalTimer(void)
 {
-	std::vector<AnimationRef *>::iterator i;
-	for(i = animations.begin(); i != animations.end(); ++i) {
-		delete (*i);
+	for (auto anim : animations) {
+		delete anim;
 	}
 }
 
@@ -255,47 +254,41 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ButtonAnimation* ctlanim, tick_t time)
+void GlobalTimer::AddAnimation(ButtonAnimation* anim, tick_t time)
 {
-	AnimationRef* anim;
-
 	tick_t thisTime = GetTicks();
 	time += thisTime;
 
 	// if there are no free animation reference objects,
 	// alloc one, else take the first free one
-	if (first_animation == 0)
-		anim = new AnimationRef;
-	else {
-		anim = animations.front ();
+	if (first_animation != 0) {
 		animations.erase (animations.begin());
 		first_animation--;
 	}
 
 	// fill in data
 	anim->time = time;
-	anim->ctlanim = ctlanim;
 
 	// and insert it into list of other anim refs, sorted by time
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
+	auto it = animations.begin() + first_animation;
+	for (; it != animations.end (); ++it) {
 		if ((*it)->time > time) {
-			animations.insert( it, anim );
-			anim = NULL;
+			animations.insert(it, anim);
 			break;
 		}
 	}
-	if (anim)
-		animations.push_back( anim );
+	if (it == animations.end())
+		animations.push_back(anim);
 }
 
-void GlobalTimer::RemoveAnimation(ButtonAnimation* ctlanim)
+void GlobalTimer::RemoveAnimation(ButtonAnimation* anim)
 {
 	// Animation refs for given control are not physically removed,
 	// but just marked by erasing ptr to the control. They will be
 	// collected when they get to the front of the vector
-	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); ++it) {
-		if ((*it)->ctlanim == ctlanim) {
-			(*it)->ctlanim = NULL;
+	for (auto it = animations.begin() + first_animation; it != animations.end (); ++it) {
+		if (*it == anim) {
+			*it = nullptr;
 		}
 	}
 }
@@ -303,14 +296,14 @@ void GlobalTimer::RemoveAnimation(ButtonAnimation* ctlanim)
 void GlobalTimer::UpdateAnimations(bool paused, tick_t thisTime)
 {
 	while (animations.begin() + first_animation != animations.end()) {
-		AnimationRef* anim = animations[first_animation];
-		if (anim->ctlanim == NULL) {
+		ButtonAnimation* anim = animations[first_animation];
+		if (anim == nullptr) {
 			first_animation++;
 			continue;
 		}
 
 		if (anim->time <= thisTime) {
-			anim->ctlanim->UpdateAnimation(paused);
+			anim->UpdateAnimation(paused);
 			first_animation++;
 			continue;
 		}
