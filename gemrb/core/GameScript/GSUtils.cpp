@@ -2243,7 +2243,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	}
 	
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		if (!Sender->locals->Lookup(poi, value)) {
+		if (!Sender->locals->Lookup(poi, value) && valid) {
 			*valid = false;
 		}
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
@@ -2262,7 +2262,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 		if (map) {
 			map->locals->Lookup(poi, value);
 		} else {
-			*valid = false;
+			if (valid) *valid = false;
 			ScriptDebugLog(ID_VARIABLES, "Invalid variable %s %s in checkvariable", Context, VarName);
 		}
 	} else {
