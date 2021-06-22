@@ -4814,8 +4814,8 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 	// tables for additive modifiers of bonus type
 	for (int i = 0; i < count; i++) {
 		tablename = mtm->GetRowName(i);
-		int checkcol = std::stoi(mtm->QueryField(i,1), nullptr, 0);
-		unsigned int readcol = std::stoi(mtm->QueryField(i,2), nullptr, 0);
+		int checkcol = strtol(mtm->QueryField(i,1), nullptr, 0);
+		unsigned int readcol = strtol(mtm->QueryField(i,2), nullptr, 0);
 		int stat = TranslateStat(mtm->QueryField(i,0) );
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
