@@ -78,19 +78,10 @@ bool ColorAnimation::HasEnded() const
 	return (repeat) ? false : current == end;
 }
 
-ButtonAnimation::ButtonAnimation(Button* btn, const ResRef& ResRef, int Cycle)
+ButtonAnimation::ButtonAnimation(Button* btn, AnimationFactory* af, int cycle)
+: bam(af), button(btn), cycle(cycle)
 {
-	cycle = Cycle;
-
-	bam = ( AnimationFactory* ) gamedata->GetFactoryResource( ResRef,
-		IE_BAM_CLASS_ID, IE_NORMAL );
-
-	if (! bam)
-		return;
-
-	button = btn;
-	button->animation = this;
-	time = GetTicks();
+	assert(bam);
 	UpdateAnimation(false);
 }
 
@@ -101,16 +92,14 @@ ButtonAnimation::~ButtonAnimation()
 	core->timer.RemoveAnimation(this);
 }
 
-bool ButtonAnimation::SameResource(const ResRef& resRef, int Cycle)
+bool ButtonAnimation::SameResource(const ButtonAnimation *anim) const
 {
-	if (!button) return false;
-	if (!bam) return false;
-	if (resRef != bam->ResRef) return false;
-	int c = cycle;
-	if (button->Flags()&IE_GUI_BUTTON_PLAYRANDOM) {
+	if (!anim || anim->bam->ResRef != bam->ResRef) return false;
+	unsigned int c = cycle;
+	if (button->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
 		c&=~1;
 	}
-	if (Cycle!=c) return false;
+	if (anim->cycle != c) return false;
 	return true;
 }
 

@@ -3919,13 +3919,15 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
+	
+	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID, IE_NORMAL);
+	ABORT_IF_NULL(af);
+	ButtonAnimation* anim = new ButtonAnimation(btn, af, Cycle);
 
 	//who knows, there might have been an active animation lurking
 	if (btn->animation) {
-		//if this control says the resource is the same
-		//we wanted to set, we don't reset it
-		//but we must reinitialize it, if it was play once
-		if(btn->animation->SameResource(ResRef, Cycle) && !(btn->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
+		if (btn->animation->SameResource(anim) && !(btn->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
+			delete anim;
 			Py_RETURN_NONE;
 		}
 		delete btn->animation;
@@ -3934,12 +3936,6 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		btn->SetAnimPicture(nullptr);
-		Py_RETURN_NONE;
-	}
-
-	ButtonAnimation* anim = new ButtonAnimation(btn, ResRef, Cycle);
-	if (!anim->HasControl()) {
-		delete anim;
 		Py_RETURN_NONE;
 	}
 

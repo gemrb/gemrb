@@ -140,12 +140,12 @@ private:
 
 	bool UpdateAnimationSprite();
 public:
-	ButtonAnimation(Button* ctl, const ResRef& ResRef, int Cycle = 0);
+	ButtonAnimation(Button* btn, AnimationFactory* af, int Cycle = 0);
 	~ButtonAnimation(void);
 	void UpdateAnimation(bool paused);
 	//report if the current resource is the same as descripted by the params
-	bool SameResource(const ResRef& ResRef, int Cycle);
 	void SetPaletteGradients(ieDword *col);
+	bool SameResource(const ButtonAnimation*) const;
 	void SetBlend(bool b);
 	bool HasControl() const { return button != nullptr; };
 	
