@@ -862,7 +862,7 @@ void CREImporter::SetupColor(ieDword &stat)
 	if (stat < 200 || RandColor == 0) return;
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
-	size_t RandRows = 0;
+	ieDword RandRows = 0;
 	if (randcolors.empty()) {
 		AutoTable rndcol("randcolr", true);
 		if (rndcol) {
@@ -893,13 +893,13 @@ void CREImporter::SetupColor(ieDword &stat)
 	// assuming an ordered list, so looking in the middle first
 	for (int i = (int) stat; i >= 0; i--) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
 			return;
 		}
 	}
 	for (unsigned int i = stat + 1; i < RandColor; i++) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
 			return;
 		}
 	}
