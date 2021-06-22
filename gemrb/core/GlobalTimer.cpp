@@ -37,7 +37,10 @@ GlobalTimer::GlobalTimer(void)
 
 GlobalTimer::~GlobalTimer(void)
 {
-	for (auto anim : animations) {
+	auto it = animations.begin();
+	while (it != animations.end ()) {
+		SpriteAnimation* anim = *it;
+		it = animations.erase(it);
 		delete anim;
 	}
 }
