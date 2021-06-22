@@ -33,9 +33,9 @@ void PCStatsStruct::Init(bool all)
 	KillsChapterCount = 0;
 	KillsTotalXP = 0;
 	KillsTotalCount = 0;
-	memset( FavouriteSpells, 0, sizeof(FavouriteSpells) );
+	std::fill(std::begin(FavouriteSpells), std::end(FavouriteSpells), ResRef());
 	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
-	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
+	std::fill(std::begin(FavouriteWeapons), std::end(FavouriteWeapons), ResRef());
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
 	memset(QSlots, 0, sizeof(QSlots));
 	QSlots[0]=0xff;
@@ -84,9 +84,9 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	KillsChapterCount = source.KillsChapterCount;
 	KillsTotalXP = source.KillsTotalXP;
 	KillsTotalCount = source.KillsTotalCount;
-	memcpy(FavouriteSpells, source.FavouriteSpells, sizeof(FavouriteSpells));
+	std::copy(std::begin(source.FavouriteSpells), std::end(source.FavouriteSpells), std::begin(FavouriteSpells));
 	memcpy(FavouriteSpellsCount, source.FavouriteSpellsCount, sizeof(FavouriteSpellsCount));
-	memcpy(FavouriteWeapons, source.FavouriteWeapons, sizeof(FavouriteWeapons));
+	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
 	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
 	memcpy(QSlots, source.QSlots, sizeof(QSlots));
 	memcpy(QuickSpells, source.QuickSpells, sizeof(QuickSpells));

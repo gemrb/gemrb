@@ -161,8 +161,7 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLin
 	unsigned int pos;
 	WMPAreaEntry *ae;
 
-	WMPAreaLink *al = new WMPAreaLink();
-	memcpy(al, arealink, sizeof(WMPAreaLink) );
+	WMPAreaLink *al = new WMPAreaLink(*arealink);
 	unsigned int idx = area_entries[areaidx]->AreaLinksIndex[dir];
 	area_links.insert(area_links.begin()+idx,al);
 
@@ -183,10 +182,7 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLin
 
 void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
 {
-	WMPAreaLink *al =new WMPAreaLink();
-
-	//change this to similar code as above if WMPAreaLink gets non-struct members
-	memcpy( al,arealink,sizeof(WMPAreaLink) );
+	WMPAreaLink *al = new WMPAreaLink(*arealink);
 
 	//if index is too large, we break
 	if (x>area_links.size()) {
@@ -480,8 +476,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
 	ae->pos.y = src->pos.y + (dest->pos.y - src->pos.y) / 2;
 
 	//setup the area links
-	WMPAreaLink *ldest = new WMPAreaLink();
-	memcpy(ldest, link, sizeof(WMPAreaLink));
+	WMPAreaLink *ldest = new WMPAreaLink(*link);
 	ldest->DistanceScale /= 2;
 	ldest->EncounterChance = 0;
 
@@ -494,8 +489,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
 		return;
 	}
 
-	WMPAreaLink *lsrc = new WMPAreaLink();
-	memcpy(lsrc, link, sizeof(WMPAreaLink));
+	WMPAreaLink *lsrc = new WMPAreaLink(*link);
 	lsrc->DistanceScale /= 2;
 	lsrc->EncounterChance = 0;
 
