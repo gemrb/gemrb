@@ -178,14 +178,11 @@ bool ButtonAnimation::UpdateAnimationSprite() {
 	if (has_palette) {
 		PaletteHolder palette = pic->GetPalette();
 		palette->SetupPaperdollColours(colors, 0);
-		if (is_blended) {
-			palette->CreateShadedAlphaChannel();
-		}
-	} else {
-		if (is_blended) {
-			PaletteHolder palette = pic->GetPalette();
-			palette->CreateShadedAlphaChannel();
-		}
+	}
+	
+	if (is_blended) {
+		PaletteHolder palette = pic->GetPalette();
+		palette->CreateShadedAlphaChannel();
 	}
 
 	button->SetAnimPicture( pic );
