@@ -45,7 +45,6 @@
 #include "Timer.h"
 #include "System/VFS.h"
 
-#include <array>
 #include <map>
 #include <string>
 #include <vector>
@@ -309,9 +308,6 @@ enum DebugModeBits {
 	ID_FONTS = 128,
 	ID_TEXT = 256
 };
-
-template<int SIZE>
-using ColorPal = std::array<Color, SIZE>;
 
 // TODO: there is no reason why this can't be generated directly from
 // the inventory button drag event using the button value as the slot id
