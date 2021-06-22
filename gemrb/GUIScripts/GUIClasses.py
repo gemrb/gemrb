@@ -336,7 +336,6 @@ class GButton(GControl):
 		'SetItemIcon': _GemRB.Button_SetItemIcon,
 		'SetActionIcon': _GemRB.Button_SetActionIcon,
 		'SetAnimation': _GemRB.Button_SetAnimation,
-		'SetAnimationPalette': _GemRB.Button_SetAnimationPalette,
 	}
 
 	def MakeDefault(self, glob=False):

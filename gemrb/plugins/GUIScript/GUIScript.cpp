@@ -3846,52 +3846,10 @@ static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 	return ret;
 }
 
-PyDoc_STRVAR( GemRB_Button_SetAnimationPalette__doc,
-"===== Button_SetAnimationPalette =====\n\
-\n\
-**Prototype:** GemRB.SetAnimationPalette (WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7, col8)\n\
-\n\
-**Metaclass Prototype:** SetAnimationPalette (col1, col2, col3, col4, col5, col6, col7, col8)\n\
-\n\
-**Description:** Sets the palette of an animation already assigned to the control.\n\
-\n\
-**Parameters:** \n\
-  * WindowIndex - the window control id\n\
-  * ControlID - the id of the target control\n\
-  * col1 - col8 - colors for the palette\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Button_SetAnimation]]"
-);
-
-static PyObject* GemRB_Button_SetAnimationPalette(PyObject* self, PyObject* args)
-{
-	ieDword col[8];
-
-	memset(col,-1,sizeof(col));
-	if (!PyArg_ParseTuple( args, "Oiiiiiiii", &self,
-			&(col[0]), &(col[1]), &(col[2]), &(col[3]),
-			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
-		return NULL;
-	}
-
-	Button* btn = GetView<Button>(self);
-	ABORT_IF_NULL(btn);
-
-	ButtonAnimation* anim = btn->animation;
-	if (!anim) {
-		return RuntimeError("No animation!");
-	}
-
-	anim->SetPaletteGradients(col);
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Button_SetAnimation__doc,
 "===== Button_SetAnimation =====\n\
 \n\
-**Prototype:** GemRB.SetAnimation (WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend])\n\
+**Prototype:** GemRB.SetAnimation (WindowIndex, ControlIndex, BAMResRef[, Cycle, Blend, Cols])\n\
 \n\
 **Metaclass Prototype:** SetAnimation (BAMResRef[, Cycle, Blend])\n\
 \n\
@@ -3904,10 +3862,9 @@ a BAM file. Optionally an animation cycle could be set too.\n\
   * BAMResRef - resref of the animation\
   * Cycle - (optional) number of the cycle to use\n\
   * Blend - (optional) toggle use of blending\n\
+  * Cols - (optional) a list of Colors to apply as the palette\n\
 \n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Control_SetAnimationPalette]]"
+**Return value:** N/A\n"
 );
 
 static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
@@ -3915,10 +3872,15 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	char *ResRef;
 	int Cycle = 0;
 	int Blend = 0;
-	PARSE_ARGS( args,  "Os|ii", &self, &ResRef, &Cycle, &Blend );
+	PyObject* cols = nullptr;
+	PARSE_ARGS(args,  "Os|iiO", &self, &ResRef, &Cycle, &Blend, &cols);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
+	
+	if (cols && !PyList_Check(cols)) {
+		return RuntimeError("Invalid argument for 'cols'");
+	}
 	
 	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID, IE_NORMAL);
 	ABORT_IF_NULL(af);
@@ -3941,6 +3903,16 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 
 	if (Blend) {
 		anim->SetBlend(true);
+	}
+	
+	if (cols) {
+		ieDword indicies[8];
+		Py_ssize_t min = std::min<Py_ssize_t>(8, PyList_Size(cols));
+		for (Py_ssize_t i = 0; i < min; i++) {
+			PyObject* item = PyList_GetItem(cols, i);
+			PyInt_AsLong(item);
+		}
+		anim->SetPaletteGradients(indicies);
 	}
 
 	Py_RETURN_NONE;
@@ -13480,7 +13452,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetHotKey, METH_VARARGS),
 	METHOD(Button_SetAnchor, METH_VARARGS),
 	METHOD(Button_SetAnimation, METH_VARARGS),
-	METHOD(Button_SetAnimationPalette, METH_VARARGS),
 	METHOD(Button_SetPushOffset, METH_VARARGS),
 	METHOD(Button_SetItemIcon, METH_VARARGS),
 	METHOD(Button_SetOverlay, METH_VARARGS),
