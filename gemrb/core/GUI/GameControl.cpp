@@ -2533,10 +2533,6 @@ void GameControl::SetCutSceneMode(bool active)
 //Multiple texts are possible, as this code copies the text to a new object
 void GameControl::DisplayString(const Scriptable* target) const
 {
-	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	scr->SetOverheadText(target->GetOverheadText());
-	scr->Pos = target->Pos;
-
 	// add as a "subtitle" to the main message window
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Duplicate Floating Text", tmp);

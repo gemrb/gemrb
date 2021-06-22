@@ -2242,7 +2242,9 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 			}
 			
 			AnimationFactory* bam = (AnimationFactory*)gamedata->GetFactoryResource(anim, IE_BAM_CLASS_ID, IE_NORMAL);
-			wmap->areaIndicator = bam->GetFrame(0, 0);
+			if (bam) {
+				wmap->areaIndicator = bam->GetFrame(0, 0);
+			}
 			
 			view = wmap;
 		}

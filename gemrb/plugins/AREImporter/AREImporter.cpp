@@ -680,8 +680,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		} else {
 			Point* points = new Point[VertexCount];
 			for (x = 0; x < VertexCount; x++) {
-				str->ReadWord( (ieWord*) &points[x].x );
-				str->ReadWord( (ieWord*) &points[x].y );
+				ieWord coord;
+				str->ReadWord(&coord);
+				points[x].x = coord;
+				str->ReadWord(&coord);
+				points[x].y = coord;
 			}
 			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
 			delete[] points;
