@@ -254,11 +254,8 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ButtonAnimation* anim, tick_t time)
+void GlobalTimer::AddAnimation(ButtonAnimation* anim)
 {
-	tick_t thisTime = GetTicks();
-	time += thisTime;
-
 	// if there are no free animation reference objects,
 	// alloc one, else take the first free one
 	if (first_animation != 0) {
@@ -266,13 +263,10 @@ void GlobalTimer::AddAnimation(ButtonAnimation* anim, tick_t time)
 		first_animation--;
 	}
 
-	// fill in data
-	anim->time = time;
-
 	// and insert it into list of other anim refs, sorted by time
 	auto it = animations.begin() + first_animation;
 	for (; it != animations.end (); ++it) {
-		if ((*it)->time > time) {
+		if ((*it)->time > anim->time) {
 			animations.insert(it, anim);
 			break;
 		}

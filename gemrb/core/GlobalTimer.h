@@ -66,7 +66,7 @@ public:
 	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
 	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(ButtonAnimation* ctlanim, tick_t time);
+	void AddAnimation(ButtonAnimation* ctlanim);
 	void RemoveAnimation(ButtonAnimation* ctlanim);
 	void ClearAnimations();
 

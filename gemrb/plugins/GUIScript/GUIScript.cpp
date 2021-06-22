@@ -3946,7 +3946,6 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	if (Blend) {
 		anim->SetBlend(true);
 	}
-	anim->UpdateAnimation(false);
 
 	Py_RETURN_NONE;
 }

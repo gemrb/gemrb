@@ -90,6 +90,8 @@ ButtonAnimation::ButtonAnimation(Button* btn, const ResRef& ResRef, int Cycle)
 
 	button = btn;
 	button->animation = this;
+	time = GetTicks();
+	UpdateAnimation(false);
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
@@ -114,14 +116,14 @@ bool ButtonAnimation::SameResource(const ResRef& resRef, int Cycle)
 
 void ButtonAnimation::UpdateAnimation(bool paused)
 {
-	tick_t time = 0;
-
 	if (paused && !(button->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
 		// try again later
-		core->timer.AddAnimation( this, 1 );
+		time = GetTicks() + 1;
+		core->timer.AddAnimation(this);
 		return;
 	}
 
+	tick_t delta = 0;
 	if (button->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
 		// simple Finite-State Machine
 		if (anim_phase == 0) {
@@ -130,29 +132,30 @@ void ButtonAnimation::UpdateAnimation(bool paused)
 			// note: the granularity of time should be
 			// one of twenty values from [500, 10000]
 			// but not the full range.
-			time = 500 + 500 * RAND(0, 19);
+			delta = 500 + 500 * RAND(0, 19);
 			cycle&=~1;
 		} else if (anim_phase == 1) {
 			if (!RAND(0,29)) {
 				cycle|=1;
 			}
 			anim_phase = 2;
-			time = 100;
+			delta = 100;
 		} else {
 			frame++;
-			time = 100;
+			delta = 100;
 		}
 	} else {
 		frame ++;
 		if (has_palette) {
-			time = 100;  //hack for slower movement
+			delta = 100;  //hack for slower movement
 		} else {
-			time = 15;
+			delta = 15;
 		}
 	}
 
 	if (UpdateAnimationSprite()) {
-		core->timer.AddAnimation(this, time);
+		time = GetTicks() + delta;
+		core->timer.AddAnimation(this);
 	}
 }
 
