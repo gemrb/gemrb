@@ -197,6 +197,12 @@ ACTION_WINDOW_CLOSED		= 0
 ACTION_WINDOW_FOCUS_GAINED	= 1
 ACTION_WINDOW_FOCUS_LOST	= 2
 
+# animation flags
+ANIM_PLAY_NORMAL		= 0,
+ANIM_PLAY_RANDOM		= 1, # the button animation is random
+ANIM_PLAY_ONCE			= 2, # the button animation won't restart
+ANIM_PLAY_ALWAYS		= 4  # animation will play when game is paused
+
 # GameScreen flags
 GS_PARTYAI           = 1
 GS_SMALLDIALOG       = 0

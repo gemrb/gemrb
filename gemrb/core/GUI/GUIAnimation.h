@@ -37,6 +37,8 @@ public:
 		begintime = GetTicks();
 	}
 	
+	virtual ~GUIAnimation() = default;
+	
 	operator bool() const {
 		return !HasEnded();
 	}
@@ -125,31 +127,38 @@ private:
 };
 
 class AnimationFactory;
-class Button;
+class Sprite2D;
 
-class GEM_EXPORT ButtonAnimation {
+class GEM_EXPORT SpriteAnimation : public GUIAnimation<Holder<Sprite2D>> {
 private:
 	AnimationFactory* bam = nullptr;
-	Button* button = nullptr;
-	unsigned int cycle = 0;
-	unsigned int frame = 0;
+	uint8_t cycle = 0;
+	uint8_t frame = 0;
 	unsigned int anim_phase = 0;
 	bool has_palette = false;
 	bool is_blended = false;
 	ieDword colors[8] {};
+	tick_t nextFrameTime = 0;
 
-	bool UpdateAnimationSprite();
+	Holder<Sprite2D> GenerateNext(tick_t time);
 public:
-	ButtonAnimation(Button* btn, AnimationFactory* af, int Cycle = 0);
-	~ButtonAnimation(void);
-	void UpdateAnimation(bool paused);
+	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
+	~SpriteAnimation();
+	void UpdateAnimation(bool paused, tick_t time);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(ieDword *col);
-	bool SameResource(const ButtonAnimation*) const;
+	bool SameResource(const SpriteAnimation*) const;
 	void SetBlend(bool b);
-	bool HasControl() const { return button != nullptr; };
+	bool HasEnded() const;
+
+	tick_t Time() const { return nextFrameTime; }
 	
-	tick_t time = 0;
+	enum RepeatFlags : uint8_t {
+		PLAY_NORMAL		= 0,
+		PLAY_RANDOM		= 1,
+		PLAY_ONCE		= 2,
+		PLAY_ALWAYS		= 4   // play even when game is paused
+	} flags = PLAY_NORMAL;
 };
 
 }

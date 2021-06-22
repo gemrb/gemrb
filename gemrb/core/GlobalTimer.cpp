@@ -254,7 +254,7 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(ButtonAnimation* anim)
+void GlobalTimer::AddAnimation(SpriteAnimation* anim)
 {
 	// if there are no free animation reference objects,
 	// alloc one, else take the first free one
@@ -266,7 +266,7 @@ void GlobalTimer::AddAnimation(ButtonAnimation* anim)
 	// and insert it into list of other anim refs, sorted by time
 	auto it = animations.begin() + first_animation;
 	for (; it != animations.end (); ++it) {
-		if ((*it)->time > anim->time) {
+		if ((*it)->Time() > anim->Time()) {
 			animations.insert(it, anim);
 			break;
 		}
@@ -275,7 +275,7 @@ void GlobalTimer::AddAnimation(ButtonAnimation* anim)
 		animations.push_back(anim);
 }
 
-void GlobalTimer::RemoveAnimation(ButtonAnimation* anim)
+void GlobalTimer::RemoveAnimation(SpriteAnimation* anim)
 {
 	// Animation refs for given control are not physically removed,
 	// but just marked by erasing ptr to the control. They will be
@@ -290,14 +290,14 @@ void GlobalTimer::RemoveAnimation(ButtonAnimation* anim)
 void GlobalTimer::UpdateAnimations(bool paused, tick_t thisTime)
 {
 	while (animations.begin() + first_animation != animations.end()) {
-		ButtonAnimation* anim = animations[first_animation];
+		SpriteAnimation* anim = animations[first_animation];
 		if (anim == nullptr) {
 			first_animation++;
 			continue;
 		}
 
-		if (anim->time <= thisTime) {
-			anim->UpdateAnimation(paused);
+		if (anim->Time() <= thisTime) {
+			anim->UpdateAnimation(paused, thisTime);
 			first_animation++;
 			continue;
 		}

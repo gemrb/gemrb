@@ -3884,20 +3884,10 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	
 	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID, IE_NORMAL);
 	ABORT_IF_NULL(af);
-	ButtonAnimation* anim = new ButtonAnimation(btn, af, Cycle);
-
-	//who knows, there might have been an active animation lurking
-	if (btn->animation) {
-		if (btn->animation->SameResource(anim) && !(btn->Flags()&IE_GUI_BUTTON_PLAYONCE)) {
-			delete anim;
-			Py_RETURN_NONE;
-		}
-		delete btn->animation;
-		btn->animation = NULL;
-	}
+	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
 
 	if (ResRef[0] == 0) {
-		btn->SetAnimPicture(nullptr);
+		btn->SetAnimation(nullptr);
 		Py_RETURN_NONE;
 	}
 
@@ -3914,6 +3904,8 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		}
 		anim->SetPaletteGradients(indicies);
 	}
+	
+	btn->SetAnimation(anim);
 
 	Py_RETURN_NONE;
 }

@@ -39,7 +39,7 @@
 
 namespace GemRB {
 
-class ButtonAnimation;
+class SpriteAnimation;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 
@@ -128,7 +128,7 @@ public:
 	void SetText(const String& string) override;
 	/** Sets the Picture */
 	void SetPicture(Holder<Sprite2D> Picture);
-	void SetAnimPicture(Holder<Sprite2D> Picture);
+	void SetAnimation(SpriteAnimation* anim);
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
@@ -164,8 +164,6 @@ public:
 
 	bool SetHotKey(KeyboardKey key, short mod = 0, bool global = false);
 	//KeyboardKey GetHotKey() { return hotKey.key; }
-	
-	ButtonAnimation* animation = nullptr;
 
 private: // Private attributes
 	String Text;
@@ -178,7 +176,7 @@ private: // Private attributes
 	Holder<Sprite2D> buttonImages[BUTTON_IMAGE_TYPE_COUNT];
 	/** Pictures to Apply when the hasPicture flag is set */
 	Holder<Sprite2D> Picture;
-	Holder<Sprite2D> AnimPicture;
+	SpriteAnimation* animation = nullptr;
 	/** If non-empty, list of Pictures to draw when hasPicture is set */
 	std::vector<Holder<Sprite2D>> PictureList;
 	/** The current state of the Button */
@@ -214,6 +212,7 @@ private: // Private attributes
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
 protected:
 	/** Mouse Enter */

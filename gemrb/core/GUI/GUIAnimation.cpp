@@ -78,42 +78,64 @@ bool ColorAnimation::HasEnded() const
 	return (repeat) ? false : current == end;
 }
 
-ButtonAnimation::ButtonAnimation(Button* btn, AnimationFactory* af, int cycle)
-: bam(af), button(btn), cycle(cycle)
+SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)
+: bam(af), cycle(cycle)
 {
 	assert(bam);
-	UpdateAnimation(false);
+	UpdateAnimation(false, begintime);
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
-ButtonAnimation::~ButtonAnimation()
+SpriteAnimation::~SpriteAnimation()
 {
 	//removing from timer first
 	core->timer.RemoveAnimation(this);
 }
 
-bool ButtonAnimation::SameResource(const ButtonAnimation *anim) const
+bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
 {
 	if (!anim || anim->bam->ResRef != bam->ResRef) return false;
-	unsigned int c = cycle;
-	if (button->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
-		c&=~1;
+	uint8_t c = cycle;
+	if (flags & PLAY_RANDOM) {
+		c &= ~1;
 	}
 	if (anim->cycle != c) return false;
 	return true;
 }
 
-void ButtonAnimation::UpdateAnimation(bool paused)
+void SpriteAnimation::UpdateAnimation(bool paused, tick_t time)
 {
-	if (paused && !(button->Flags() & IE_GUI_BUTTON_PLAYALWAYS)) {
+	if (paused && !(flags & PLAY_ALWAYS)) {
 		// try again later
-		time = GetTicks() + 1;
+		nextFrameTime = time + 1;
 		core->timer.AddAnimation(this);
 		return;
 	}
+	
+	current = GenerateNext(time);
+	if (current) {
+		core->timer.AddAnimation(this);
+	} else {
+		// an error occured so just end the animation
+		nextFrameTime = 0;
+	}
+}
 
+void SpriteAnimation::SetPaletteGradients(ieDword *col)
+{
+	memcpy(colors, col, 8*sizeof(ieDword));
+	has_palette = true;
+}
+
+void SpriteAnimation::SetBlend(bool b)
+{
+	is_blended = b;
+}
+
+Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
+{
 	tick_t delta = 0;
-	if (button->Flags() & IE_GUI_BUTTON_PLAYRANDOM) {
+	if (flags & PLAY_RANDOM) {
 		// simple Finite-State Machine
 		if (anim_phase == 0) {
 			frame = 0;
@@ -122,10 +144,10 @@ void ButtonAnimation::UpdateAnimation(bool paused)
 			// one of twenty values from [500, 10000]
 			// but not the full range.
 			delta = 500 + 500 * RAND(0, 19);
-			cycle&=~1;
+			cycle &= ~1;
 		} else if (anim_phase == 1) {
 			if (!RAND(0,29)) {
-				cycle|=1;
+				cycle |= 1;
 			}
 			anim_phase = 2;
 			delta = 100;
@@ -134,37 +156,34 @@ void ButtonAnimation::UpdateAnimation(bool paused)
 			delta = 100;
 		}
 	} else {
-		frame ++;
+		frame++;
 		if (has_palette) {
 			delta = 100;  //hack for slower movement
 		} else {
 			delta = 15;
 		}
 	}
+	nextFrameTime = time + delta;
+	assert(nextFrameTime);
+	
+	Holder<Sprite2D> pic = bam->GetFrame(frame, cycle);
 
-	if (UpdateAnimationSprite()) {
-		time = GetTicks() + delta;
-		core->timer.AddAnimation(this);
-	}
-}
-
-bool ButtonAnimation::UpdateAnimationSprite() {
-	Holder<Sprite2D> pic = bam->GetFrame((unsigned short) frame, (unsigned char) cycle);
-
-	if (pic == NULL) {
+	if (pic == nullptr) {
 		//stopping at end frame
-		if (button->Flags() & IE_GUI_BUTTON_PLAYONCE) {
-			core->timer.RemoveAnimation( this );
-			button->SetAnimPicture( NULL );
-			return false;
+		if (flags & PLAY_ONCE) {
+			nextFrameTime = 0;
+			core->timer.RemoveAnimation(this);
+			return current;
 		}
 		anim_phase = 0;
 		frame = 0;
-		pic = bam->GetFrame( 0, (unsigned char) cycle );
+		pic = bam->GetFrame(0, cycle);
 	}
 
-	if (pic == NULL) {
-		return true;
+	if (pic == nullptr) {
+		// I guess we just return the existing frame...
+		// we already did the palette manipulation (probably)
+		return current;
 	}
 
 	if (has_palette) {
@@ -177,20 +196,12 @@ bool ButtonAnimation::UpdateAnimationSprite() {
 		palette->CreateShadedAlphaChannel();
 	}
 
-	button->SetAnimPicture( pic );
-	return true;
+	return pic;
 }
 
-void ButtonAnimation::SetPaletteGradients(ieDword *col)
+bool SpriteAnimation::HasEnded() const
 {
-	memcpy(colors, col, 8*sizeof(ieDword));
-	has_palette = true;
-	UpdateAnimationSprite();
-}
-
-void ButtonAnimation::SetBlend(bool b)
-{
-	is_blended = b;
+	return nextFrameTime == 0;
 }
 
 }

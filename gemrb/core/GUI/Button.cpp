@@ -196,7 +196,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	// Button animation
-	if (AnimPicture) {
+	if (animation) {
+		auto AnimPicture = animation->Current();
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
 		Region r( rgn.x + xOffs, rgn.y + yOffs, int(AnimPicture->Frame.w * Clipping), AnimPicture->Frame.h );
@@ -300,6 +301,23 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 	}
 }
+
+void Button::FlagsChanged(unsigned int /*oldflags*/)
+{
+	if (animation) {
+		animation->flags = SpriteAnimation::PLAY_NORMAL;
+		if (flags & IE_GUI_BUTTON_PLAYRANDOM) {
+			animation->flags |= SpriteAnimation::PLAY_RANDOM;
+		}
+		if (flags & IE_GUI_BUTTON_PLAYONCE) {
+			animation->flags |= SpriteAnimation::PLAY_ONCE;
+		}
+		if (flags & IE_GUI_BUTTON_PLAYALWAYS) {
+			animation->flags |= SpriteAnimation::PLAY_ALWAYS;
+		}
+	}
+}
+
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
@@ -318,7 +336,7 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
-	if (animation) {
+	if (animation && !animation->HasEnded()) {
 		return true;
 	}
 
@@ -335,11 +353,14 @@ bool Button::IsAnimated() const
 
 bool Button::IsOpaque() const
 {
-	bool opaque = View::IsOpaque();
-	if (!opaque && AnimPicture) {
-		opaque = !AnimPicture->HasTransparency();
+	if (animation) {
+		// we are dirty every frame anyway
+		// so no need to get fancy
+		// just redraw everything
+		return false;
 	}
-	
+
+	bool opaque = View::IsOpaque();
 	if (!opaque && Picture) {
 		opaque = !(flags&IE_GUI_BUTTON_NO_IMAGE) && !Picture->HasTransparency();
 	}
@@ -650,9 +671,19 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	MarkDirty();
 }
 
-void Button::SetAnimPicture(Holder<Sprite2D> newpic)
+void Button::SetAnimation(SpriteAnimation* anim)
 {
-	AnimPicture = newpic;
+	// if this button says the resource is the same
+	// we wanted to set, we don't reset it
+	// but we must reinitialize it, if it was play once
+	if (animation && animation->SameResource(anim) && !(animation->flags & SpriteAnimation::PLAY_ONCE)) {
+		delete anim;
+		return;
+	} else {
+		delete animation;
+		animation = anim;
+	}
+	
 	MarkDirty();
 }
 

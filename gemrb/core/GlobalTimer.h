@@ -29,8 +29,7 @@
 
 namespace GemRB {
 
-class ButtonAnimation;
-
+class SpriteAnimation;
 
 class GEM_EXPORT GlobalTimer {
 private:
@@ -43,7 +42,7 @@ private:
 	int shakeCounter = 0;
 	Point shakeVec;
 	unsigned int first_animation;
-	std::vector<ButtonAnimation*> animations;
+	std::vector<SpriteAnimation*> animations;
 	//move viewport to this coordinate
 	Point goal = Point(-1, -1);
 	int speed = 0;
@@ -66,8 +65,8 @@ public:
 	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
 	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(ButtonAnimation* ctlanim);
-	void RemoveAnimation(ButtonAnimation* ctlanim);
+	void AddAnimation(SpriteAnimation* anim);
+	void RemoveAnimation(SpriteAnimation* anim);
 	void ClearAnimations();
 
 private:
