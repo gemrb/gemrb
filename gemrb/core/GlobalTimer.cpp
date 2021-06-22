@@ -45,9 +45,9 @@ GlobalTimer::~GlobalTimer(void)
 
 void GlobalTimer::Freeze()
 {
-	UpdateAnimations(true);
-
 	tick_t thisTime = GetTicks();
+	UpdateAnimations(true, thisTime);
+
 	if (UpdateViewport(thisTime) == false) {
 		return;
 	}
@@ -149,7 +149,7 @@ bool GlobalTimer::Update()
 	GameControl* gc;
 	tick_t thisTime = GetTicks();
 
-	UpdateAnimations(false);
+	UpdateAnimations(false, thisTime);
 
 	if (!startTime) {
 		goto end;
@@ -300,9 +300,8 @@ void GlobalTimer::RemoveAnimation(ButtonAnimation* ctlanim)
 	}
 }
 
-void GlobalTimer::UpdateAnimations(bool paused)
+void GlobalTimer::UpdateAnimations(bool paused, tick_t thisTime)
 {
-	tick_t thisTime = GetTicks();
 	while (animations.begin() + first_animation != animations.end()) {
 		AnimationRef* anim = animations[first_animation];
 		if (anim->ctlanim == NULL) {

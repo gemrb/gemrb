@@ -56,7 +56,7 @@ private:
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
-	void UpdateAnimations(bool paused);
+	void UpdateAnimations(bool paused, tick_t time);
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
