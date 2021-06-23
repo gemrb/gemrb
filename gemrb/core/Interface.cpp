@@ -719,7 +719,7 @@ bool Interface::ReadSpecialSpells()
 		SurgeSpell ss;
 		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
 			CopyResRef(ss.spell, table->QueryField(i, 0));
-			ss.message = std::stoi(table->QueryField(i, 1), nullptr, 0);
+			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
 			// comment ignored
 			SurgeSpells.push_back(ss);
 		}
@@ -3415,7 +3415,7 @@ bool Interface::InitItemTypes()
 		memset(slottypes, -1, SlotTypes * sizeof(SlotType) );
 		for (unsigned int row = 0; row < SlotTypes; row++) {
 			bool alias;
-			unsigned int i = std::stoi(st->GetRowName(row), nullptr, 0);
+			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
 			if (i>=SlotTypes) continue;
 			if (slottypes[i].sloteffects!=0xffffffffu) {
 				slottypes[row].slot = i;
@@ -3425,16 +3425,16 @@ bool Interface::InitItemTypes()
 				slottypes[row].slot = i;
 				alias = false;
 			}
-			slottypes[i].slottype = std::stoi(st->QueryField(row,0), nullptr, 0);
-			slottypes[i].slotid = std::stoi(st->QueryField(row,1), nullptr, 0);
+			slottypes[i].slottype = (ieDword) strtol(st->QueryField(row,0),NULL,0 );
+			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
 			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
-			slottypes[i].slottip = std::stoi(st->QueryField(row,3), nullptr, 0);
-			slottypes[i].slotflags = std::stoi(st->QueryField(row,5), nullptr, 0);
+			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
+			slottypes[i].slotflags = (ieDword) strtol(st->QueryField(row,5),NULL,0 );
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
 			}
-			slottypes[i].sloteffects = std::stoi(st->QueryField(row,4), nullptr, 0);
+			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
 			//setting special slots
 			if (slottypes[i].slottype&SLOT_ITEM) {
 				if (slottypes[i].slottype&SLOT_INVENTORY) {
@@ -4049,7 +4049,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		char *p = strchr(NewItem, '*');
 		if (p) {
 			*p=0; //doing this so endptr is ok
-			k = std::stoi(p+1, nullptr, 10);
+			k=strtol(p+1,NULL,10);
 		} else {
 			k=1;
 		}
@@ -4750,7 +4750,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
 		ret[0]=cnt;
 		while(cnt) {
-			ret[cnt] = std::stoi(tab->QueryField(cnt-1, 0), nullptr, 0);
+			ret[cnt]=strtol(tab->QueryField(cnt-1, 0),NULL, 0);
 			cnt--;
 		}
 		return ret;
@@ -4836,7 +4836,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			row = tm->FindTableValue(checkcol, value, 0);
 		}
 		if (row>=0) {
-			ret += std::stoi(tm->QueryField(row, readcol), nullptr, 0);
+			ret += strtol(tm->QueryField(row, readcol), NULL, 0);
 		}
 	}
 	return ret;
