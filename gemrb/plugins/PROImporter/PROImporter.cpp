@@ -61,49 +61,49 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	}
 	ieWord AreaExtension;
 
-	str->ReadWord( &AreaExtension );
-	str->ReadWord( &s->Speed );
-	str->ReadDword( &s->SFlags ); //spark, ignore center, looping sound etc
+	str->ReadWord(AreaExtension);
+	str->ReadWord(s->Speed);
+	str->ReadDword(s->SFlags); //spark, ignore center, looping sound etc
 	str->ReadResRef( s->FiringSound );
 	str->ReadResRef( s->ArrivalSound );
 	str->ReadResRef( s->TravelVVC ); //no original game data uses this feature
-	str->ReadDword( &s->SparkColor );//enabled by PSF_SPARK
+	str->ReadDword(s->SparkColor);//enabled by PSF_SPARK
 	// in the original bg2, there was just a 2 byte padding and 212 byte reserve left
-	str->ReadDword( &s->ExtFlags ) ; //gemrb extension flags
-	str->ReadDword( &s->StrRef );    //gemrb extension strref
+	str->ReadDword(s->ExtFlags) ; //gemrb extension flags
+	str->ReadDword(s->StrRef);    //gemrb extension strref
 	ieDword c;
-	str->ReadDword(&c);       //gemrb extension rgb pulse
+	str->ReadDword(c);       //gemrb extension rgb pulse
 	s->RGB = Color::FromABGR(c);
-	str->ReadWord( &s->ColorSpeed ); //gemrb extension rgb speed
-	str->ReadWord( &s->Shake );      //gemrb extension screen shake
-	str->ReadWord( &s->IDSValue);    //gemrb extension IDS targeting
-	str->ReadWord( &s->IDSType);     //gemrb extension IDS targeting
-	str->ReadWord( &s->IDSValue2);   //gemrb extension IDS targeting
-	str->ReadWord( &s->IDSType2);    //gemrb extension IDS targeting
+	str->ReadWord(s->ColorSpeed); //gemrb extension rgb speed
+	str->ReadWord(s->Shake);      //gemrb extension screen shake
+	str->ReadWord(s->IDSValue);    //gemrb extension IDS targeting
+	str->ReadWord(s->IDSType);     //gemrb extension IDS targeting
+	str->ReadWord(s->IDSValue2);   //gemrb extension IDS targeting
+	str->ReadWord(s->IDSType2);    //gemrb extension IDS targeting
 	str->ReadResRef( s->FailSpell);  //gemrb extension fail effect
 	str->ReadResRef( s->SuccSpell);  //gemrb extension implicit effect
 	str->Seek(172, GEM_CURRENT_POS); // skipping unused bytes
 	//we should stand at offset 0x100 now
-	str->ReadDword( &s->TFlags ); //other projectile flags
+	str->ReadDword(s->TFlags); //other projectile flags
 	str->ReadResRef( s->BAMRes1 );
 	str->ReadResRef( s->BAMRes2 );
 	str->Read( &s->Seq1,1 );
 	str->Read( &s->Seq2,1 );
-	str->ReadWord( &s->LightZ );
-	str->ReadWord( &s->LightX );
-	str->ReadWord( &s->LightY );
+	str->ReadWord(s->LightZ);
+	str->ReadWord(s->LightX);
+	str->ReadWord(s->LightY);
 	str->ReadResRef( s->PaletteRes );
 	str->Read( s->Gradients, 7);
 	str->Read( &s->SmokeSpeed, 1);
 	str->Read( s->SmokeGrad, 7);
 	str->Read( &s->Aim, 1);
-	str->ReadWord( &s->SmokeAnimID);
+	str->ReadWord(s->SmokeAnimID);
 	str->ReadResRef( s->TrailBAM[0] );
 	str->ReadResRef( s->TrailBAM[1] );
 	str->ReadResRef( s->TrailBAM[2] );
-	str->ReadWord( &s->TrailSpeed[0] );
-	str->ReadWord( &s->TrailSpeed[1] );
-	str->ReadWord( &s->TrailSpeed[2] );
+	str->ReadWord(s->TrailSpeed[0]);
+	str->ReadWord(s->TrailSpeed[1]);
+	str->ReadWord(s->TrailSpeed[2]);
 	// TODO: check if this was used
 	// IESDP: 0 - puff at target, 1 - puff at source
 	// original bg2: DWORD  m_dwPuffFlags and then just reserved space
@@ -120,46 +120,46 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 {
 	ieWord tmp;
 
-	str->ReadDword( &e->AFlags );
-	str->ReadWord( &e->TriggerRadius );
-	str->ReadWord( &e->ExplosionRadius );
+	str->ReadDword(e->AFlags);
+	str->ReadWord(e->TriggerRadius);
+	str->ReadWord(e->ExplosionRadius);
 	str->ReadResRef( e->SoundRes ); //explosion sound
-	str->ReadWord( &e->Delay );
-	str->ReadWord( &e->FragAnimID );
+	str->ReadWord(e->Delay);
+	str->ReadWord(e->FragAnimID);
 	//this projectile index shouldn't be adjusted like the others!!!
-	str->ReadWord( &e->FragProjIdx );
+	str->ReadWord(e->FragProjIdx);
 	str->Read( &e->ExplosionCount,1 );
 	//the area puff type (flames, puffs, clouds) fireball.ids
 	//gemrb uses areapro.2da for this
 	//It overrides Spread, VVCRes, Secondary, SoundRes, AreaSound, APFlags
 	str->Read( &e->ExplType,1 );
-	str->ReadWord( &e->ExplColor );
+	str->ReadWord(e->ExplColor);
 	//this index is off by one in the .pro files, consolidating it here
-	str->ReadWord( &tmp);
+	str->ReadWord(tmp);
 	if (tmp) {
 		tmp--;
 	}
 	e->ExplProjIdx = tmp;
 
 	str->ReadResRef( e->VVCRes );
-	str->ReadWord( &tmp);
+	str->ReadWord(tmp);
 	//limit the cone width to 359 degrees (for full compatibility)
 	if (tmp>359) {
 		tmp=359;
 	}
 	e->ConeWidth = tmp;
-	str->ReadWord(&tmp); // padding
+	str->ReadWord(tmp); // padding
 
 	//These are GemRB specific, not used in the original engine
 	// bg2 has 216 bytes of reserved space here instead
 	str->ReadResRef( e->Spread );
 	str->ReadResRef( e->Secondary );
 	str->ReadResRef( e->AreaSound );
-	str->ReadDword( &e->APFlags );
-	str->ReadWord( &e->DiceCount );
-	str->ReadWord( &e->DiceSize );
-	str->ReadWord( &e->TileX );
-	str->ReadWord( &e->TileY );
+	str->ReadDword(e->APFlags);
+	str->ReadWord(e->DiceCount);
+	str->ReadWord(e->DiceSize);
+	str->ReadWord(e->TileX);
+	str->ReadWord(e->TileY);
 
 	if (!e->TileX) {
 		e->TileX=64;

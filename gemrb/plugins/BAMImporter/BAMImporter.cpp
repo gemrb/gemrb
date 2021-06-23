@@ -80,28 +80,28 @@ bool BAMImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord( &FramesCount );
+	str->ReadWord(FramesCount);
 	str->Read( &CyclesCount, 1 );
 	str->Read( &CompressedColorIndex, 1 );
-	str->ReadDword( &FramesOffset );
-	str->ReadDword( &PaletteOffset );
-	str->ReadDword( &FLTOffset );
+	str->ReadDword(FramesOffset);
+	str->ReadDword(PaletteOffset);
+	str->ReadDword(FLTOffset);
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
 	DataStart = str->Size();
 	for (i = 0; i < FramesCount; i++) {
-		str->ReadWord( &frames[i].Width );
-		str->ReadWord( &frames[i].Height );
-		str->ReadWord( &frames[i].XPos );
-		str->ReadWord( &frames[i].YPos );
-		str->ReadDword( &frames[i].FrameData );
+		str->ReadWord(frames[i].Width);
+		str->ReadWord(frames[i].Height);
+		str->ReadWord(frames[i].XPos);
+		str->ReadWord(frames[i].YPos);
+		str->ReadDword(frames[i].FrameData);
 		if ((frames[i].FrameData & 0x7FFFFFFF) < DataStart)
 			DataStart = (frames[i].FrameData & 0x7FFFFFFF);
 	}
 	cycles = new CycleEntry[CyclesCount];
 	for (i = 0; i < CyclesCount; i++) {
-		str->ReadWord( &cycles[i].FramesCount );
-		str->ReadWord( &cycles[i].FirstFrame );
+		str->ReadWord(cycles[i].FramesCount);
+		str->ReadWord(cycles[i].FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = new Palette();

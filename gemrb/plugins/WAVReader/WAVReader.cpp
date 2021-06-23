@@ -127,7 +127,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &r_hdr, sizeof( r_hdr ) );
 	//don't swap this
 	str->Read(&r_hdr.fourcc, 4);
-	str->ReadDword(&r_hdr.length);
+	str->ReadDword(r_hdr.length);
 	//don't swap this
 	str->Read( &wave, 4 );
 	if (memcmp(&r_hdr.fourcc, RIFF_4cc, 4) != 0 ||
@@ -138,7 +138,7 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &fmt_hdr, sizeof( fmt_hdr ) );
 	//don't swap this
 	str->Read(&fmt_hdr.fourcc,4);
-	str->ReadDword(&fmt_hdr.length);
+	str->ReadDword(fmt_hdr.length);
 	if (memcmp(&fmt_hdr.fourcc, fmt_4cc, 4) != 0 ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return false;
@@ -166,13 +166,13 @@ bool WavPCMReader::Open(DataStream* stream)
 	//str->Read( &data_hdr, sizeof( data_hdr ) );
 	//don't swap this
 	str->Read(&data_hdr.fourcc,4);
-	str->ReadDword(&data_hdr.length);
+	str->ReadDword(data_hdr.length);
 
 	if (memcmp(&data_hdr.fourcc, fact_4cc, 4) == 0) {
 		str->Seek( data_hdr.length, GEM_CURRENT_POS );
 		//str->Read( &data_hdr, sizeof( data_hdr ) );
-		str->ReadDword(&data_hdr.fourcc);
-		str->ReadDword(&data_hdr.length);
+		str->ReadDword(data_hdr.fourcc);
+		str->ReadDword(data_hdr.length);
 	}
 	if (memcmp(&data_hdr.fourcc, data_4cc, 4) != 0) {
 		return false;

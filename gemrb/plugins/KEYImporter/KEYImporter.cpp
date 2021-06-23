@@ -143,10 +143,10 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	}
 	Log(MESSAGE, "KEYImporter", "Reading Resources...");
 	ieDword BifCount, ResCount, BifOffset, ResOffset;
-	f->ReadDword( &BifCount );
-	f->ReadDword( &ResCount );
-	f->ReadDword( &BifOffset );
-	f->ReadDword( &ResOffset );
+	f->ReadDword(BifCount);
+	f->ReadDword(ResCount);
+	f->ReadDword(BifOffset);
+	f->ReadDword(ResOffset);
 	Log(MESSAGE, "KEYImporter", "BIF Files Count: %d (Starting at %d Bytes)",
 			BifCount, BifOffset );
 	Log(MESSAGE, "KEYImporter", "RES Count: %d (Starting at %d Bytes)",
@@ -158,10 +158,10 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	for (unsigned int i = 0; i < BifCount; i++) {
 		BIFEntry be;
 		f->Seek( BifOffset + ( 12 * i ), GEM_STREAM_START );
-		f->ReadDword( &BifLen );
-		f->ReadDword( &ASCIIZOffset );
-		f->ReadWord( &ASCIIZLen );
-		f->ReadWord( &be.BIFLocator );
+		f->ReadDword(BifLen);
+		f->ReadDword(ASCIIZOffset);
+		f->ReadWord(ASCIIZLen);
+		f->ReadWord(be.BIFLocator);
 		be.name = ( char * ) malloc( ASCIIZLen );
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
 		f->Read( be.name, ASCIIZLen );
@@ -184,8 +184,8 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 	for (unsigned int i = 0; i < ResCount; i++) {
 		f->ReadResRef(key.ref);
-		f->ReadWord(&key.type);
-		f->ReadDword(&ResLocator);
+		f->ReadWord(key.type);
+		f->ReadDword(ResLocator);
 
 		// seems to be always the last entry?
 		if (key.ref[0] != 0)

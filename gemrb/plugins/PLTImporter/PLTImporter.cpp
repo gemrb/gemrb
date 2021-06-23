@@ -66,8 +66,8 @@ bool PLTImporter::Open(DataStream* str)
 	}
 
 	str->Read( unknown, 8 );
-	str->ReadDword( &Width );
-	str->ReadDword( &Height );
+	str->ReadDword(Width);
+	str->ReadDword(Height);
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );

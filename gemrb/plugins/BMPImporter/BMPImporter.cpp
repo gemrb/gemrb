@@ -61,31 +61,31 @@ bool BMPImporter::Open(DataStream* stream)
 		Log(ERROR, "BMPImporter", "Not a valid BMP File.");
 		return false;
 	}
-	str->ReadDword( &FileSize );
+	str->ReadDword(FileSize);
 	str->Seek( 4, GEM_CURRENT_POS );
-	str->ReadDword( &DataOffset );
+	str->ReadDword(DataOffset);
 
 	//BITMAPINFOHEADER
 
-	str->ReadDword( &Size );
+	str->ReadDword(Size);
 	//some IE palettes are of a different format (OS/2 BMP)!
 	if (Size < 24) {
 		Log(ERROR, "BMPImporter", "OS/2 Bitmap, not supported.");
 		return false;
 	}
-	str->ReadDword( &Width );
-	str->ReadDword( &Height );
-	str->ReadWord( &Planes );
-	str->ReadWord( &BitCount );
-	str->ReadDword( &Compression );
-	str->ReadDword( &ImageSize );
+	str->ReadDword(Width);
+	str->ReadDword(Height);
+	str->ReadWord(Planes);
+	str->ReadWord(BitCount);
+	str->ReadDword(Compression);
+	str->ReadDword(ImageSize);
 	//24 = the already read bytes 3x4+2x2+2x4
 	//this is normally 16
 	str->Seek( Size-24, GEM_CURRENT_POS );
-	//str->ReadDword(&Hres );
-	//str->ReadDword(&Vres );
-	//str->ReadDword(&ColorsUsed );
-	//str->ReadDword(&ColorsImportant );
+	//str->ReadDword(Hres);
+	//str->ReadDword(Vres);
+	//str->ReadDword(ColorsUsed);
+	//str->ReadDword(ColorsImportant);
 	if (Compression != 0) {
 		Log(ERROR, "BMPImporter", "Compressed %d-bits Image, not supported.", BitCount);
 		return false;

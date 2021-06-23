@@ -175,12 +175,12 @@ Item* ITMImporter::GetItem(Item *s)
 	if( !s) {
 		return NULL;
 	}
-	str->ReadDword( &s->ItemName );
-	str->ReadDword( &s->ItemNameIdentified );
+	str->ReadDword(s->ItemName);
+	str->ReadDword(s->ItemNameIdentified);
 	str->ReadResRef( s->ReplacementItem );
-	str->ReadDword( &s->Flags );
-	str->ReadWord( &s->ItemType );
-	str->ReadDword( &s->UsabilityBitmask );
+	str->ReadDword(s->Flags);
+	str->ReadWord(s->ItemType);
+	str->ReadDword(s->UsabilityBitmask);
 	str->Read( s->AnimationType,2 ); //intentionally not reading word!
 	for (unsigned int i = 0; i < 2; i++) {
 		if (s->AnimationType[i]==' ') {
@@ -210,8 +210,8 @@ Item* ITMImporter::GetItem(Item *s)
 
 	str->Read( &s->MinCharisma, 1 );
 	str->Read( &s->unknown3, 1 );
-	str->ReadDword( &s->Price );
-	str->ReadWord( &s->MaxStackAmount );
+	str->ReadDword(s->Price);
+	str->ReadWord(s->MaxStackAmount);
 
 	//hack for non stacked items, so MaxStackAmount could be used as a boolean
 	if (s->MaxStackAmount==1) {
@@ -219,18 +219,18 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	str->ReadResRef( s->ItemIcon );
-	str->ReadWord( &s->LoreToID );
+	str->ReadWord(s->LoreToID);
 	str->ReadResRef( s->GroundIcon );
-	str->ReadDword( &s->Weight );
-	str->ReadDword( &s->ItemDesc );
-	str->ReadDword( &s->ItemDescIdentified );
+	str->ReadDword(s->Weight);
+	str->ReadDword(s->ItemDesc);
+	str->ReadDword(s->ItemDescIdentified);
 	str->ReadResRef( s->DescriptionIcon );
-	str->ReadDword( &s->Enchantment );
-	str->ReadDword( &s->ExtHeaderOffset );
-	str->ReadWord( &s->ExtHeaderCount );
-	str->ReadDword( &s->FeatureBlockOffset );
-	str->ReadWord( &s->EquippingFeatureOffset );
-	str->ReadWord( &s->EquippingFeatureCount );
+	str->ReadDword(s->Enchantment);
+	str->ReadDword(s->ExtHeaderOffset);
+	str->ReadWord(s->ExtHeaderCount);
+	str->ReadDword(s->FeatureBlockOffset);
+	str->ReadWord(s->EquippingFeatureOffset);
+	str->ReadWord(s->EquippingFeatureCount);
 
 	s->WieldColor = 0xffff;
 	memset( s->unknown, 0, 26 );
@@ -242,9 +242,9 @@ Item* ITMImporter::GetItem(Item *s)
 	if (version == ITM_VER_PST) {
 		//pst data
 		str->ReadResRef( s->Dialog );
-		str->ReadDword( &s->DialogName );
+		str->ReadDword(s->DialogName);
 		ieWord WieldColor;
-		str->ReadWord( &WieldColor );
+		str->ReadWord(WieldColor);
 		if (s->AnimationType[0]) {
 			s->WieldColor = WieldColor;
 		}
@@ -329,27 +329,26 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 		tmpByte = 1;
 	}
 	eh->TargetNumber = tmpByte;
-	str->ReadWord( &eh->Range );
+	str->ReadWord(eh->Range);
 	str->Read(&ProjectileType, 1);
 	str->Read(&eh->AltDiceThrown, 1);
 	str->Read(&eh->Speed, 1);
 	str->Read(&eh->AltDamageBonus, 1);
-	str->ReadWord( &eh->THAC0Bonus );
-	str->ReadWord( &eh->DiceSides );
-	str->ReadWord( &eh->DiceThrown );
-	//if your compiler doesn't like this, then we need a ReadWordSigned
-	str->ReadWord( (ieWord *) &eh->DamageBonus );
-	str->ReadWord( &eh->DamageType );
-	str->ReadWord( &eh->FeatureCount );
-	str->ReadWord( &eh->FeatureOffset );
-	str->ReadWord( &eh->Charges );
-	str->ReadWord( &eh->ChargeDepletion );
-	str->ReadDword( &eh->RechargeFlags );
+	str->ReadWord(eh->THAC0Bonus);
+	str->ReadWord(eh->DiceSides);
+	str->ReadWord(eh->DiceThrown);
+	str->ReadScalar<ieWordSigned>(eh->DamageBonus);
+	str->ReadWord(eh->DamageType);
+	str->ReadWord(eh->FeatureCount);
+	str->ReadWord(eh->FeatureOffset);
+	str->ReadWord(eh->Charges);
+	str->ReadWord(eh->ChargeDepletion);
+	str->ReadDword(eh->RechargeFlags);
 
 	//hack for default weapon finesse
 	if (s->ItemType==IT_DAGGER || s->ItemType==IT_SHORTSWORD) eh->RechargeFlags^=IE_ITEM_USEDEXTERITY;
 
-	str->ReadWord( &eh->ProjectileAnimation );
+	str->ReadWord(eh->ProjectileAnimation);
 	//for some odd reasons 0 and 1 are the same
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
@@ -361,16 +360,16 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 
 	for (unsigned int i = 0; i < 3; i++) {
-		str->ReadWord( &eh->MeleeAnimation[i] );
+		str->ReadWord(eh->MeleeAnimation[i]);
 	}
 
 	ieWord tmp;
 	ieDword pq = 0;
-	str->ReadWord( &tmp ); //arrow
+	str->ReadWord(tmp); //arrow
 	if (tmp) pq |= PROJ_ARROW;
-	str->ReadWord( &tmp ); //xbow
+	str->ReadWord(tmp); //xbow
 	if (tmp) pq |= PROJ_BOLT;
-	str->ReadWord( &tmp ); //bullet
+	str->ReadWord(tmp); //bullet
 	if (tmp) pq |= PROJ_BULLET;
 	//this hack is required for Nordom's crossbow in PST
 	if (!pq && (eh->AttackType == ITEM_AT_BOW)) {

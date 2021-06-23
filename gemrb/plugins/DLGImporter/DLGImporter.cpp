@@ -53,8 +53,8 @@ bool DLGImporter::Open(DataStream* stream)
 		Version = 0;
 		return false;
 	}
-	str->ReadDword( &StatesCount );
-	str->ReadDword( &StatesOffset );
+	str->ReadDword(StatesCount);
+	str->ReadDword(StatesOffset);
 	// bg2
 	if (StatesOffset == 0x34 ) {
 		Version = 104;
@@ -62,16 +62,16 @@ bool DLGImporter::Open(DataStream* stream)
 	else {
 		Version = 100;
 	}
-	str->ReadDword( &TransitionsCount );
-	str->ReadDword( &TransitionsOffset );
-	str->ReadDword( &StateTriggersOffset );
-	str->ReadDword( &StateTriggersCount );
-	str->ReadDword( &TransitionTriggersOffset );
-	str->ReadDword( &TransitionTriggersCount );
-	str->ReadDword( &ActionsOffset );
-	str->ReadDword( &ActionsCount );
+	str->ReadDword(TransitionsCount);
+	str->ReadDword(TransitionsOffset);
+	str->ReadDword(StateTriggersOffset);
+	str->ReadDword(StateTriggersCount);
+	str->ReadDword(TransitionTriggersOffset);
+	str->ReadDword(TransitionTriggersCount);
+	str->ReadDword(ActionsOffset);
+	str->ReadDword(ActionsCount);
 	if (Version == 104) {
-		str->ReadDword( &Flags );
+		str->ReadDword(Flags);
 	}
 	else {
 		// only bg2 has the Flags field in the disk format
@@ -107,10 +107,10 @@ DialogState* DLGImporter::GetDialogState(Dialog *d, unsigned int index) const
 	str->Seek( StatesOffset + ( index * 16 ), GEM_STREAM_START );
 	ieDword  FirstTransitionIndex;
 	ieDword  TriggerIndex;
-	str->ReadDword( &ds->StrRef );
-	str->ReadDword( &FirstTransitionIndex );
-	str->ReadDword( &ds->transitionsCount );
-	str->ReadDword( &TriggerIndex );
+	str->ReadDword(ds->StrRef);
+	str->ReadDword(FirstTransitionIndex);
+	str->ReadDword(ds->transitionsCount);
+	str->ReadDword(TriggerIndex);
 	ds->condition = GetStateTrigger( TriggerIndex );
 	ds->transitions = GetTransitions( FirstTransitionIndex, ds->transitionsCount );
 	if (TriggerIndex<StatesCount)
@@ -136,21 +136,21 @@ DialogTransition* DLGImporter::GetTransition(unsigned int index) const
 	//32 = sizeof(Transition)
 	str->Seek( TransitionsOffset + ( index * 32 ), GEM_STREAM_START );
 	DialogTransition* dt = new DialogTransition();
-	str->ReadDword( &dt->Flags );
-	str->ReadDword( &dt->textStrRef );
+	str->ReadDword(dt->Flags);
+	str->ReadDword(dt->textStrRef);
 	if (!(dt->Flags & IE_DLG_TR_TEXT)) {
 		dt->textStrRef = 0xffffffff;
 	}
-	str->ReadDword( &dt->journalStrRef );
+	str->ReadDword(dt->journalStrRef);
 	if (!(dt->Flags & IE_DLG_TR_JOURNAL)) {
 		dt->journalStrRef = 0xffffffff;
 	}
 	ieDword TriggerIndex;
 	ieDword ActionIndex;
-	str->ReadDword( &TriggerIndex );
-	str->ReadDword( &ActionIndex );
+	str->ReadDword(TriggerIndex);
+	str->ReadDword(ActionIndex);
 	str->ReadResRef( dt->Dialog );
-	str->ReadDword( &dt->stateIndex );
+	str->ReadDword(dt->stateIndex);
 	if (dt->Flags &IE_DLG_TR_TRIGGER) {
 		dt->condition = GetTransitionTrigger( TriggerIndex );
 	}
@@ -192,8 +192,8 @@ Condition* DLGImporter::GetStateTrigger(unsigned int index) const
 	//8 = sizeof(VarOffset)
 	str->Seek( StateTriggersOffset + ( index * 8 ), GEM_STREAM_START );
 	ieDword Offset, Length;
-	str->ReadDword( &Offset );
-	str->ReadDword( &Length );
+	str->ReadDword(Offset);
+	str->ReadDword(Length);
 	//a zero length trigger counts as no trigger
 	//a // comment counts as true(), so we simply ignore zero
 	//length trigger text like it isn't there
@@ -216,8 +216,8 @@ Condition* DLGImporter::GetTransitionTrigger(unsigned int index) const
 	}
 	str->Seek( TransitionTriggersOffset + ( index * 8 ), GEM_STREAM_START );
 	ieDword Offset, Length;
-	str->ReadDword( &Offset );
-	str->ReadDword( &Length );
+	str->ReadDword(Offset);
+	str->ReadDword(Length);
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
 	str->Read( string, Length );
@@ -234,8 +234,8 @@ std::vector<Action*> DLGImporter::GetAction(unsigned int index) const
 	}
 	str->Seek( ActionsOffset + ( index * 8 ), GEM_STREAM_START );
 	ieDword Offset, Length;
-	str->ReadDword( &Offset );
-	str->ReadDword( &Length );
+	str->ReadDword(Offset);
+	str->ReadDword(Length);
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
 	str->Read( string, Length );

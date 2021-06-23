@@ -255,39 +255,39 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 	stream->ReadResRef( Anim1ResRef );
 	// unused second resref; m_cShadowVidCellRef in the original
 	stream->Seek( 8, GEM_CURRENT_POS );
-	stream->ReadDword( &Transparency );
+	stream->ReadDword(Transparency);
 	stream->Seek( 4, GEM_CURRENT_POS ); // unused in the original: m_bltInfo
-	stream->ReadDword( &SequenceFlags );
+	stream->ReadDword(SequenceFlags);
 	stream->Seek( 4, GEM_CURRENT_POS ); // unused in the original: m_bltInfoExtra
 
 	ieDword tmp;
-	stream->ReadDword( &tmp );
+	stream->ReadDword(tmp);
 	XOffset = int(tmp);
-	stream->ReadDword( &tmp );  //this affects visibility
+	stream->ReadDword(tmp);  //this affects visibility
 	YOffset = int(tmp);
 	stream->Seek( 4, GEM_CURRENT_POS ); // (offset) position flags in the original, "use orientation" on IESDP
-	stream->ReadDword( &FrameRate );
+	stream->ReadDword(FrameRate);
 
 	if (!FrameRate) FrameRate = ANI_DEFAULT_FRAMERATE;
 	else if (FrameRate > 30) FrameRate = 30;
 
-	stream->ReadDword( &NumOrientations );
-	stream->ReadDword( &Orientation );
-	stream->ReadDword( &OrientationFlags );
+	stream->ReadDword(NumOrientations);
+	stream->ReadDword(Orientation);
+	stream->ReadDword(OrientationFlags);
 	stream->Seek( 8, GEM_CURRENT_POS ); // CResRef m_cNewPaletteRef in the original
 
-	stream->ReadDword( &tmp );  //this doesn't affect visibility
+	stream->ReadDword(tmp);  //this doesn't affect visibility
 	ZOffset = int(tmp);
 
-	stream->ReadDword( &LightX ); // and Lighting effect radius / width / glow
-	stream->ReadDword( &LightY );
-	stream->ReadDword( &LightZ ); // glow intensity / brightness
-	stream->ReadDword( &Duration );
+	stream->ReadDword(LightX); // and Lighting effect radius / width / glow
+	stream->ReadDword(LightY);
+	stream->ReadDword(LightZ); // glow intensity / brightness
+	stream->ReadDword(Duration);
 	// m_cVVCResRes in the original, supposedly a self-reference
 	stream->Seek( 8, GEM_CURRENT_POS );
-	stream->ReadDword( &tmp ); // 1 indexed, m_nStartSequence
+	stream->ReadDword(tmp); // 1 indexed, m_nStartSequence
 	seq1 = ((signed) tmp) - 1;
-	stream->ReadDword( &tmp ); // 1 indexed; 0 or less for none, m_nLoopSequence
+	stream->ReadDword(tmp); // 1 indexed; 0 or less for none, m_nLoopSequence
 	seq2 = ((signed) tmp) - 1;
 	// original
 	//   LONG    m_nCurrentSequence; //1 indexed
@@ -298,7 +298,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 
 	// original: CResRef   m_cAlphaBamRef;
 	stream->Seek( 8, GEM_CURRENT_POS );
-	stream->ReadDword( &tmp ); // m_nEndSequence
+	stream->ReadDword(tmp); // m_nEndSequence
 	seq3 = ((signed) tmp) - 1;
 	stream->ReadResRef( sounds[P_RELEASE] );
 	// original bg2 has 4*84 of reserved space here

@@ -60,7 +60,7 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	char Signature[8];
 	ieDword GameTime;
 	ds->Read(Signature, 8);
-	ds->ReadDword(&GameTime);
+	ds->ReadDword(GameTime);
 	delete ds;
 	if (memcmp(Signature,"GAME",4) ) {
 		strcpy(Date, "ERROR");

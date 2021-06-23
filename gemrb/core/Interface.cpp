@@ -3931,11 +3931,11 @@ CREItem *Interface::ReadItem(DataStream *str)
 CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
 {
 	str->ReadResRef( itm->ItemResRef );
-	str->ReadWord( &itm->Expired );
-	str->ReadWord( &itm->Usages[0] );
-	str->ReadWord( &itm->Usages[1] );
-	str->ReadWord( &itm->Usages[2] );
-	str->ReadDword( &itm->Flags );
+	str->ReadWord(itm->Expired);
+	str->ReadWord(itm->Usages[0]);
+	str->ReadWord(itm->Usages[1]);
+	str->ReadWord(itm->Usages[2]);
+	str->ReadDword(itm->Flags);
 	if (ResolveRandomItem(itm)) {
 		SanitizeItem(itm);
 		return itm;

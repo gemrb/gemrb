@@ -109,9 +109,9 @@ bool TLKImporter::Open(DataStream* stream)
 		Log(ERROR, "TLKImporter", "Not a valid TLK File.");
 		return false;
 	}
-	str->ReadWord( &Language ); // English is 0
-	str->ReadDword( &StrRefCount );
-	str->ReadDword( &Offset );
+	str->ReadWord(Language); // English is 0
+	str->ReadDword(StrRefCount);
+	str->ReadDword(Offset);
 	if (StrRefCount >= STRREF_START) {
 		Log(ERROR, "TLKImporter", "Too many strings (%d), increase STRREF_START.", StrRefCount);
 		return false;
@@ -412,13 +412,13 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 		if (str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START ) == GEM_ERROR) {
 			return strdup("");
 		}
-		str->ReadWord( &type );
+		str->ReadWord(type);
 		str->ReadResRef( SoundResRef );
 		// volume and pitch variance fields are known to be unused at minimum in bg1
-		str->ReadDword( &Volume );
-		str->ReadDword( &Pitch );
-		str->ReadDword( &StrOffset );
-		str->ReadDword( &l );
+		str->ReadDword(Volume);
+		str->ReadDword(Pitch);
+		str->ReadDword(StrOffset);
+		str->ReadDword(l);
 		if (l > 65535) {
 			Length = 65535; //safety limit, it could be a dword actually
 		}
@@ -479,7 +479,7 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 	}
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
-	str->ReadWord( &type );
+	str->ReadWord(type);
 	ieResRef soundRef;
 	str->ReadResRef( soundRef );
 	return StringBlock(GetString( strref, flags ), soundRef);

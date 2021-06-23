@@ -52,10 +52,10 @@ bool TISImporter::Open(DataStream* stream)
 			Log(ERROR, "TISImporter", "Not a Valid TIS file!");
 			return false;
 		}
-		str->ReadDword( &TilesCount );
-		str->ReadDword( &TilesSectionLen );
-		str->ReadDword( &headerShift );
-		str->ReadDword( &TileSize );
+		str->ReadDword(TilesCount);
+		str->ReadDword(TilesSectionLen);
+		str->ReadDword(headerShift);
+		str->ReadDword(TileSize);
 	} else {
 		str->Seek( -8, GEM_CURRENT_POS );
 	}

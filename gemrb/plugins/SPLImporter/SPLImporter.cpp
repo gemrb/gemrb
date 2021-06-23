@@ -114,23 +114,23 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
 	size_t i;
 
-	str->ReadDword( &s->SpellName );
-	str->ReadDword( &s->SpellNameIdentified );
+	str->ReadDword(s->SpellName);
+	str->ReadDword(s->SpellNameIdentified);
 	str->ReadResRef( s->CompletionSound );
-	str->ReadDword( &s->Flags );
-	str->ReadWord( &s->SpellType );
-	str->ReadWord( &s->ExclusionSchool );
-	str->ReadWord( &s->PriestType );
-	str->ReadWord( &s->CastingGraphics );
+	str->ReadDword(s->Flags);
+	str->ReadWord(s->SpellType);
+	str->ReadWord(s->ExclusionSchool);
+	str->ReadWord(s->PriestType);
+	str->ReadWord(s->CastingGraphics);
 	s->CastingSound = GetCGSound(s->CastingGraphics);
 	str->Read( &s->unknown1, 1 );
-	str->ReadWord( &s->PrimaryType );
+	str->ReadWord(s->PrimaryType);
 	str->Read( &s->SecondaryType, 1 );
-	str->ReadDword( &s->unknown2 );
-	str->ReadDword( &s->unknown3 );
-	str->ReadDword( &s->unknown4 );
-	str->ReadDword( &s->SpellLevel );
-	str->ReadWord( &s->unknown5 );
+	str->ReadDword(s->unknown2);
+	str->ReadDword(s->unknown3);
+	str->ReadDword(s->unknown4);
+	str->ReadDword(s->SpellLevel);
+	str->ReadWord(s->unknown5);
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
 	if (s->SpellbookIcon[0] && core->HasFeature(GF_SPELLBOOKICONHACK)) {
@@ -138,20 +138,20 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		if (i) s->SpellbookIcon[i-1]='c';
 	}
 
-	str->ReadWord( &s->unknown6 );
-	str->ReadDword( &s->unknown7 );
-	str->ReadDword( &s->unknown8 );
-	str->ReadDword( &s->unknown9 );
-	str->ReadDword( &s->SpellDesc );
-	str->ReadDword( &s->SpellDescIdentified );
-	str->ReadDword( &s->unknown10 );
-	str->ReadDword( &s->unknown11 );
-	str->ReadDword( &s->unknown12 );
-	str->ReadDword( &s->ExtHeaderOffset );
-	str->ReadWord( &s->ExtHeaderCount );
-	str->ReadDword( &s->FeatureBlockOffset );
-	str->ReadWord( &s->CastingFeatureOffset );
-	str->ReadWord( &s->CastingFeatureCount );
+	str->ReadWord(s->unknown6);
+	str->ReadDword(s->unknown7);
+	str->ReadDword(s->unknown8);
+	str->ReadDword(s->unknown9);
+	str->ReadDword(s->SpellDesc);
+	str->ReadDword(s->SpellDescIdentified);
+	str->ReadDword(s->unknown10);
+	str->ReadDword(s->unknown11);
+	str->ReadDword(s->unknown12);
+	str->ReadDword(s->ExtHeaderOffset);
+	str->ReadWord(s->ExtHeaderCount);
+	str->ReadDword(s->FeatureBlockOffset);
+	str->ReadWord(s->CastingFeatureOffset);
+	str->ReadWord(s->CastingFeatureCount);
 
 	memset( s->unknown13, 0, 14 );
 	if (version == 20) {
@@ -215,18 +215,18 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 		tmpByte = 1;
 	}
 	eh->TargetNumber = tmpByte;
-	str->ReadWord( &eh->Range );
-	str->ReadWord( &eh->RequiredLevel );
-	str->ReadDword( &eh->CastingTime );
-	str->ReadWord( &eh->DiceSides );
-	str->ReadWord( &eh->DiceThrown );
-	str->ReadWord( &eh->DamageBonus );
-	str->ReadWord( &eh->DamageType );
-	str->ReadWord( &eh->FeatureCount );
-	str->ReadWord( &eh->FeatureOffset );
-	str->ReadWord( &eh->Charges );
-	str->ReadWord( &eh->ChargeDepletion );
-	str->ReadWord( &eh->ProjectileAnimation );
+	str->ReadWord(eh->Range);
+	str->ReadWord(eh->RequiredLevel);
+	str->ReadDword(eh->CastingTime);
+	str->ReadWord(eh->DiceSides);
+	str->ReadWord(eh->DiceThrown);
+	str->ReadWord(eh->DamageBonus);
+	str->ReadWord(eh->DamageType);
+	str->ReadWord(eh->FeatureCount);
+	str->ReadWord(eh->FeatureOffset);
+	str->ReadWord(eh->Charges);
+	str->ReadWord(eh->ChargeDepletion);
+	str->ReadWord(eh->ProjectileAnimation);
 
 	//for some odd reasons 0 and 1 are the same
 	if (eh->ProjectileAnimation) {

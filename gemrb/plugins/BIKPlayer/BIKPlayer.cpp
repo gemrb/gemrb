@@ -98,28 +98,28 @@ int BIKPlayer::ReadHeader()
 {
 	str->Seek(0,GEM_STREAM_START);
 	str->Read( header.signature, BIK_SIGNATURE_LEN );
-	str->ReadDword(&header.filesize);
+	str->ReadDword(header.filesize);
 	header.filesize += 8;
-	str->ReadDword(&header.framecount);
+	str->ReadDword(header.framecount);
 
 	if (header.framecount > 1000000) {
 		return -1;
 	}
 
-	str->ReadDword(&header.maxframesize);
+	str->ReadDword(header.maxframesize);
 	if (header.maxframesize > header.filesize) {
 		return -1;
 	}
 
 	str->Seek(4,GEM_CURRENT_POS);
 
-	str->ReadDword(&header.width);
-	str->ReadDword(&header.height);
+	str->ReadDword(header.width);
+	str->ReadDword(header.height);
 
 	ieDword fps_num, fps_den;
 
-	str->ReadDword(&fps_num);
-	str->ReadDword(&fps_den);
+	str->ReadDword(fps_num);
+	str->ReadDword(fps_den);
 
 	if (fps_num == 0 || fps_den == 0) {
 		//av_log(s, AV_LOG_ERROR, "invalid header: invalid fps (%d/%d)\n", fps_num, fps_den);
@@ -129,7 +129,7 @@ int BIKPlayer::ReadHeader()
 	av_set_pts_info(v_timebase, fps_den, fps_num);
 
 	str->Seek(4,GEM_CURRENT_POS);
-	str->ReadDword(&header.tracks);
+	str->ReadDword(header.tracks);
 
 	//we handle only single tracks, is this a problem with multi language iwd2?
 	if (header.tracks > 1) {
@@ -141,10 +141,10 @@ int BIKPlayer::ReadHeader()
 		//make sure we use one track, if more needed, rewrite this part
 		assert(header.tracks==1);
 
-		str->ReadWord(&header.samplerate);
+		str->ReadWord(header.samplerate);
 		//also sets pts_wrap_bits to 64
 		//av_set_pts_info(s_timebase, 1, header.samplerate);  //unused, we simply use header.samplerate
-		str->ReadWord(&header.audioflag);
+		str->ReadWord(header.audioflag);
 
 		str->Seek(4 * header.tracks,GEM_CURRENT_POS);
 	}
@@ -153,7 +153,7 @@ int BIKPlayer::ReadHeader()
 	ieDword pos, next_pos;
 	int keyframe;
 
-	str->ReadDword(&pos);
+	str->ReadDword(pos);
 	keyframe = pos & 1;
 	pos &= ~1;
 
@@ -162,7 +162,7 @@ int BIKPlayer::ReadHeader()
 	if (i == header.framecount - 1) {
 		next_pos = header.filesize;
 	} else {
-		str->ReadDword(&next_pos);
+		str->ReadDword(next_pos);
 	}
 	if (next_pos <= pos) {
 		// av_log(s, AV_LOG_ERROR, "invalid frame index table\n");
@@ -228,7 +228,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 	binkframe frame = frames[framePos++];
 	str->Seek(frame.pos, GEM_STREAM_START);
 	ieDword audframesize;
-	str->ReadDword(&audframesize);
+	str->ReadDword(audframesize);
 	frame.size = str->Read( inbuff, frame.size - 4 );
 	if (s_stream > -1 && DecodeAudioFrame(inbuff, audframesize)) {
 		//buggy frame, we stop immediately

@@ -30,6 +30,7 @@
 
 #include "Platform.h"
 #include "Resource.h"
+#include "System/swab.h"
 
 namespace GemRB {
 
@@ -41,6 +42,11 @@ namespace GemRB {
  * @class DataStream
  * Abstract base for streams, classes for reading and writing data.
  */
+
+#define ReadWord ReadScalar<ieWord>
+#define ReadDword ReadScalar<ieDword>
+#define WriteWord WriteScalar<ieWord>
+#define WriteDword WriteScalar<ieDword>
 
 class GEM_EXPORT DataStream {
 protected:
@@ -56,14 +62,33 @@ public:
 	DataStream(void);
 	virtual ~DataStream(void);
 	virtual int Read(void* dest, unsigned int len) = 0;
-	int ReadWord(ieWord* dest);
-	int ReadWordSigned (ieWordSigned* dest);
-	int ReadDword(ieDword* dest);
+	virtual int Write(const void* src, unsigned int len) = 0;
+	
+	template <typename T>
+	int ReadScalar(T& dest) {
+		int len = Read(&dest, sizeof(T));
+		if (IsBigEndian) {
+			swabs(&dest, sizeof(T));
+		}
+		return len;
+	}
+	
+	template <typename T>
+	int WriteScalar(const T& src) {
+		int len;
+		if (IsBigEndian) {
+			T tmp;
+			swab(&src, &tmp, sizeof(T));
+			len = Write(&tmp, sizeof(T));
+		} else {
+			len = Write(&src, sizeof(T));
+		}
+		return len;
+	}
+
 	int ReadResRef(ieResRef dest);
 	int ReadResRef(ResRef& dest);
-	virtual int Write(const void* src, unsigned int len) = 0;
-	int WriteWord(const ieWord* src);
-	int WriteDword(const ieDword* src);
+	
 	int WriteResRef(const ieResRef src);
 	int WriteResRef(const ResRef& src);
 	virtual int Seek(int pos, int startpos) = 0;

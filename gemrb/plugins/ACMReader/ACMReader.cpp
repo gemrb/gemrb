@@ -33,7 +33,7 @@ bool ACMReader::Open(DataStream* stream)
 	ieDword SignatureDword;
 	stream->Read( Signature, 4 );
 	stream->Seek( 0, GEM_STREAM_START );
-	stream->ReadDword( &SignatureDword );
+	stream->ReadDword(SignatureDword);
 	if (!memcmp( Signature, "WAVC", 4 )) {
 		str->Seek( 28, GEM_STREAM_START );
 	} else if (SignatureDword == IP_ACM_SIG) {
@@ -42,12 +42,12 @@ bool ACMReader::Open(DataStream* stream)
 		return false;
 	}
 
-	str->ReadDword( &hdr.signature );
-	str->ReadDword( &hdr.samples );
-	str->ReadWord( &hdr.channels );
-	str->ReadWord( &hdr.rate );
+	str->ReadDword(hdr.signature);
+	str->ReadDword(hdr.samples);
+	str->ReadWord(hdr.channels);
+	str->ReadWord(hdr.rate);
 	ieWord tmpword;
-	str->ReadWord( &tmpword );
+	str->ReadWord(tmpword);
 	subblocks = tmpword >> 4;
 	levels = tmpword & 15;
 

@@ -63,12 +63,12 @@ bool MOSImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord( &Width );
-	str->ReadWord( &Height );
-	str->ReadWord( &Cols );
-	str->ReadWord( &Rows );
-	str->ReadDword( &BlockSize );
-	str->ReadDword( &PalOffset );
+	str->ReadWord(Width);
+	str->ReadWord(Height);
+	str->ReadWord(Cols);
+	str->ReadWord(Rows);
+	str->ReadDword(BlockSize);
+	str->ReadDword(PalOffset);
 	return true;
 }
 
@@ -93,7 +93,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( y * Cols * 4 ) + ( x * 4 ),
 				GEM_STREAM_START );
-			str->ReadDword( &blockoffset );
+			str->ReadDword(blockoffset);
 			str->Seek( PalOffset + ( Rows * Cols * 1024 ) +
 				( Rows * Cols * 4 ) + blockoffset,
 				GEM_STREAM_START );

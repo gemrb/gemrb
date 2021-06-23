@@ -36,26 +36,26 @@ void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 	//always save in truecolor (24 bit), no palette
 	output->Write( filling, 2);
 	tmpDword = fullsize+BMP_HEADER_SIZE;  // FileSize
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
 	tmpDword = 0;
-	output->WriteDword( &tmpDword);       // ??
+	output->WriteDword(tmpDword);       // ??
 	tmpDword = BMP_HEADER_SIZE;           // DataOffset
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
 	tmpDword = 40;                        // Size
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &Width);
-	output->WriteDword( &Height);
+	output->WriteDword(tmpDword);
+	output->WriteDword(Width);
+	output->WriteDword(Height);
 	tmpWord = 1;                          // Planes
-	output->WriteWord( &tmpWord);
+	output->WriteWord(tmpWord);
 	tmpWord = 24; //24 bits               // BitCount
-	output->WriteWord( &tmpWord);
+	output->WriteWord(tmpWord);
 	tmpDword = 0;                         // Compression
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);       // ImageSize
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
-	output->WriteDword( &tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);       // ImageSize
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
+	output->WriteDword(tmpDword);
 
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {

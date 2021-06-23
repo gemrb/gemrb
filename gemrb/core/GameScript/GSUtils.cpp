@@ -1969,14 +1969,14 @@ SrcVector *LoadSrc(const ieResRef resname)
 		return NULL;
 	}
 	ieDword size=0;
-	str->ReadDword(&size);
+	str->ReadDword(size);
 	src = new SrcVector(size);
 	SrcCache.SetAt( resname, (void *) src );
 	while (size--) {
 		ieDword tmp;
-		str->ReadDword(&tmp);
+		str->ReadDword(tmp);
 		src->at(size)=tmp;
-		str->ReadDword(&tmp);
+		str->ReadDword(tmp);
 	}
 	delete ( str );
 	return src;

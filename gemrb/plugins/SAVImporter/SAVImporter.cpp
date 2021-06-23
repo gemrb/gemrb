@@ -46,7 +46,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed)
 	if (!All) return GEM_ERROR;
 	do {
 		ieDword fnlen, complen, declen;
-		compressed->ReadDword( &fnlen );
+		compressed->ReadDword(fnlen);
 		if (!fnlen) {
 			Log(ERROR, "SAVImporter", "Corrupt Save Detected");
 			return GEM_ERROR;
@@ -54,8 +54,8 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed)
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		strlwr(fname);
-		compressed->ReadDword( &declen );
-		compressed->ReadDword( &complen );
+		compressed->ReadDword(declen);
+		compressed->ReadDword(complen);
 		print("Decompressing %s", fname);
 		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
 		free( fname );
@@ -94,14 +94,14 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 
 	fnlen = strlen(uncompressed->filename)+1;
 	declen = uncompressed->Size();
-	str->WriteDword( &fnlen);
+	str->WriteDword(fnlen);
 	str->Write( uncompressed->filename, fnlen);
-	str->WriteDword( &declen);
+	str->WriteDword(declen);
 	//baaah, we dump output right in the stream, we get the compressed length
 	//only after the compressed data was written
 	complen = 0xcdcdcdcd; //placeholder
 	unsigned long Pos = str->GetPos(); //storing the stream position
-	str->WriteDword( &complen);
+	str->WriteDword(complen);
 
 	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
 	comp->Compress( str, uncompressed );
@@ -110,7 +110,7 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	unsigned long Pos2 = str->GetPos();
 	complen = Pos2-Pos-sizeof(ieDword); //calculating the compressed stream size
 	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
-	str->WriteDword( &complen);       //updating size
+	str->WriteDword(complen);       //updating size
 	str->Seek(Pos2, GEM_STREAM_START);//resuming work
 	return GEM_OK;
 }

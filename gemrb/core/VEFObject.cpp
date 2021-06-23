@@ -224,14 +224,14 @@ void VEFObject::ReadEntry(DataStream *stream)
 	ieDword continuous;
 	Point position;
 
-	stream->ReadDword( &start);
+	stream->ReadDword(start);
 	position.x = 0;
 	position.y = 0;
-	stream->ReadDword( &tmp); //unknown field (could be position?)
-	stream->ReadDword( &length);
-	stream->ReadDword( &type);
+	stream->ReadDword(tmp); //unknown field (could be position?)
+	stream->ReadDword(length);
+	stream->ReadDword(type);
 	stream->ReadResRef( resource);
-	stream->ReadDword( &continuous);
+	stream->ReadDword(continuous);
 	stream->Seek( 49*4, GEM_CURRENT_POS); //skip empty fields
 
 	if (continuous) length = -1;
@@ -257,10 +257,10 @@ void VEFObject::LoadVEF(DataStream *stream)
 		return;
 	}
 	SingleObject = false;
-	stream->ReadDword( &offset1);
-	stream->ReadDword( &count1);
-	stream->ReadDword( &offset2);
-	stream->ReadDword( &count2);
+	stream->ReadDword(offset1);
+	stream->ReadDword(count1);
+	stream->ReadDword(offset2);
+	stream->ReadDword(count2);
 
 	stream->Seek(offset1, GEM_STREAM_START);
 	for (i=0;i<count1;i++) {

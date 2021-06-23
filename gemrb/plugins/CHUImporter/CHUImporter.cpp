@@ -62,9 +62,9 @@ bool CHUImporter::Open(DataStream* stream)
 		Log(ERROR, "CHUImporter", "Not a Valid CHU File");
 		return false;
 	}
-	str->ReadDword( &WindowCount );
-	str->ReadDword( &CTOffset );
-	str->ReadDword( &WEOffset );
+	str->ReadDword(WindowCount);
+	str->ReadDword(CTOffset);
+	str->ReadDword(WEOffset);
 	return true;
 }
 
@@ -84,7 +84,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	bool found = false;
 	for (unsigned int c = 0; c < WindowCount; c++) {
 		str->Seek( WEOffset + ( 0x1c * c ), GEM_STREAM_START );
-		str->ReadWord( &WindowID );
+		str->ReadWord(WindowID);
 		if (WindowID == wid) {
 			found = true;
 			break;
@@ -94,14 +94,14 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		return NULL;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
-	str->ReadWord( &XPos );
-	str->ReadWord( &YPos );
-	str->ReadWord( &Width );
-	str->ReadWord( &Height );
-	str->ReadWord( &BackGround );
-	str->ReadWord( &ControlsCount );
+	str->ReadWord(XPos);
+	str->ReadWord(YPos);
+	str->ReadWord(Width);
+	str->ReadWord(Height);
+	str->ReadWord(BackGround);
+	str->ReadWord(ControlsCount);
 	str->ReadResRef( MosFile );
-	str->ReadWord( &FirstControl );
+	str->ReadWord(FirstControl);
 
 	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
 	Holder<Sprite2D> bg;
@@ -124,17 +124,17 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		Region ctrlFrame;
 		ieWord tmp;
 		ieByte ControlType, temp;
-		str->ReadDword( &COffset );
-		str->ReadDword( &CLength );
+		str->ReadDword(COffset);
+		str->ReadDword(CLength);
 		str->Seek( COffset, GEM_STREAM_START );
-		str->ReadDword( &ControlID );
-		str->ReadWord( &tmp );
+		str->ReadDword(ControlID);
+		str->ReadWord(tmp);
 		ctrlFrame.x = tmp;
-		str->ReadWord( &tmp);
+		str->ReadWord(tmp);
 		ctrlFrame.y = tmp;
-		str->ReadWord( &tmp );
+		str->ReadWord(tmp);
 		ctrlFrame.w = tmp;
-		str->ReadWord( &tmp );
+		str->ReadWord(tmp);
 		ctrlFrame.h = tmp;
 		str->Read( &ControlType, 1 );
 		str->Read( &temp, 1 );
@@ -229,12 +229,12 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadResRef( MOSFile );
 				str->ReadResRef( MOSFile2 );
 				str->ReadResRef( BAMFile );
-				str->ReadWord( &KnobStepsCount );
-				str->ReadWord( &Cycle );
-				str->ReadWord( &KnobXPos );
-				str->ReadWord( &KnobYPos );
-				str->ReadWord( &CapXPos );
-				str->ReadWord( &CapYPos );
+				str->ReadWord(KnobStepsCount);
+				str->ReadWord(Cycle);
+				str->ReadWord(KnobXPos);
+				str->ReadWord(KnobYPos);
+				str->ReadWord(CapXPos);
+				str->ReadWord(CapYPos);
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
 				// TODO: fix this with #232
 				pbar->SetSliderPos(Point(KnobXPos, KnobYPos), Point(CapXPos, CapYPos));
@@ -279,13 +279,13 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
 				str->ReadResRef( MOSFile );
 				str->ReadResRef( BAMFile );
-				str->ReadWord( &Cycle );
-				str->ReadWord( &Knob );
-				str->ReadWord( &GrabbedKnob );
-				str->ReadWord( &KnobXPos );
-				str->ReadWord( &KnobYPos );
-				str->ReadWord( &KnobStep );
-				str->ReadWord( &KnobStepsCount );
+				str->ReadWord(Cycle);
+				str->ReadWord(Knob);
+				str->ReadWord(GrabbedKnob);
+				str->ReadWord(KnobXPos);
+				str->ReadWord(KnobYPos);
+				str->ReadWord(KnobStep);
+				str->ReadWord(KnobStepsCount);
 				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 				Holder<Sprite2D> img = mos->GetSprite2D();
@@ -322,14 +322,14 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				//These are two more MOS resrefs, probably unused
 				str->Seek( 16, GEM_CURRENT_POS );
 				str->ReadResRef( CursorResRef );
-				str->ReadWord( &CurCycle );
-				str->ReadWord( &CurFrame );
-				str->ReadWord( &PosX );
-				str->ReadWord( &PosY );
+				str->ReadWord(CurCycle);
+				str->ReadWord(CurFrame);
+				str->ReadWord(PosX);
+				str->ReadWord(PosY);
 				//FIXME: I still don't know what to do with this point
 				//Contrary to forum posts, it is definitely not a scrollbar ID
-				str->ReadWord( &Pos2X );
-				str->ReadWord( &Pos2Y );
+				str->ReadWord(Pos2X);
+				str->ReadWord(Pos2Y);
 				str->ReadResRef( FontResRef );
 				//this field is still unknown or unused
 				str->Seek( 2, GEM_CURRENT_POS );
@@ -337,7 +337,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				//always writes it over, and never uses it
 				str->Read( Initial, 32 );
 				Initial[32]=0;
-				str->ReadWord( &maxInput );
+				str->ReadWord(maxInput);
 				Font* fnt = core->GetFont( FontResRef );
 
 				AnimationFactory* bam = ( AnimationFactory* )
@@ -378,7 +378,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Read( &fore, 4 );
 				str->Read( &init, 4 );
 				str->Read( &back, 4 );
-				str->ReadWord( &SBID );
+				str->ReadWord(SBID);
 				
 				fore.a = init.a = back.a = 0xff;
 
@@ -402,7 +402,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ieResRef FontResRef;
 				ieStrRef StrRef;
 				ieWord alignment;
-				str->ReadDword( &StrRef );
+				str->ReadDword(StrRef);
 				str->ReadResRef( FontResRef );
 				Font* fnt = core->GetFont( FontResRef );
 
@@ -412,7 +412,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				
 				textCol.a = bgCol.a = 0xff;
 
-				str->ReadWord( &alignment );
+				str->ReadWord(alignment);
 				String* str = core->GetString( StrRef );
 				Label* lab = new Label(ctrlFrame, fnt, *str);
 				delete str;
@@ -455,7 +455,7 @@ endalign:
 				ieResRef BAMResRef;
 				ieWord Cycle, TAID, imgIdx;
 				str->ReadResRef( BAMResRef );
-				str->ReadWord( &Cycle );
+				str->ReadWord(Cycle);
 
 				AnimationFactory* bam = ( AnimationFactory* )
 				gamedata->GetFactoryResource( BAMResRef,
@@ -466,10 +466,10 @@ endalign:
 				}
 				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
 				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
-					str->ReadWord(&imgIdx);
+					str->ReadWord(imgIdx);
 					images[i] = bam->GetFrame(imgIdx, Cycle);
 				}
-				str->ReadWord( &TAID );
+				str->ReadWord(TAID);
 
 				ScrollBar* sb = new ScrollBar(ctrlFrame, images);
 
