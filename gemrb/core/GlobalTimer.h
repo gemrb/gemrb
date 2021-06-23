@@ -52,7 +52,6 @@ private:
 	void UpdateAnimations(bool paused, tick_t time);
 public:
 	GlobalTimer(void);
-	~GlobalTimer(void);
 	
 	GlobalTimer(GlobalTimer&&) = default;
 	GlobalTimer& operator=(GlobalTimer&&) = default;

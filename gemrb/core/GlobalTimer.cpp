@@ -35,16 +35,6 @@ GlobalTimer::GlobalTimer(void)
 	ClearAnimations();
 }
 
-GlobalTimer::~GlobalTimer(void)
-{
-	auto it = animations.begin();
-	while (it != animations.end ()) {
-		SpriteAnimation* anim = *it;
-		it = animations.erase(it);
-		delete anim;
-	}
-}
-
 void GlobalTimer::Freeze()
 {
 	tick_t thisTime = GetTicks();
