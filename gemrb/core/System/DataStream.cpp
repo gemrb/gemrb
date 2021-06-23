@@ -199,6 +199,11 @@ int DataStream::WriteResRef(const ieResRef src)
 	return Write( src, 8);
 }
 
+int DataStream::WriteResRef(const ResRef& src)
+{
+	return Write(src.CString(), 8);
+}
+
 int DataStream::ReadLine(void* buf, unsigned long maxlen)
 {
 	// FIXME: eof?

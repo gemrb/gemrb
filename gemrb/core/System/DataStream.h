@@ -65,6 +65,7 @@ public:
 	int WriteWord(const ieWord* src);
 	int WriteDword(const ieDword* src);
 	int WriteResRef(const ieResRef src);
+	int WriteResRef(const ResRef& src);
 	virtual int Seek(int pos, int startpos) = 0;
 	unsigned long Remains() const;
 	unsigned long Size() const;
