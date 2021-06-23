@@ -178,7 +178,7 @@ def OptionsPress():
 	return
 
 def QuitPress():
-	QuitWindow = GemRB.LoadWindow(22)
+	QuitWindow = GemRB.LoadWindow(22, "GUICONN")
 	CancelButton = QuitWindow.GetControl(2)
 	CancelButton.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: QuitWindow.Close())
 	CancelButton.MakeEscape()
