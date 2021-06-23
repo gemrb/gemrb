@@ -233,7 +233,7 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& AreaName, unsigned int &i) const
 {
 	i=(unsigned int) area_entries.size();
 	while (i--) {
-		if (!strnicmp(AreaName, area_entries[i]->AreaName,8)) {
+		if (AreaName == area_entries[i]->AreaName) {
 			return area_entries[i];
 		}
 	}
