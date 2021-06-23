@@ -98,7 +98,7 @@ void InitScriptTables()
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation] = std::stoi(tab->QueryField(reputation, alignment), nullptr, 0);
+				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 			}
 		}
 	}
@@ -108,7 +108,7 @@ void InitScriptTables()
 	AutoTable rmr("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
-			rmodrep[reputation] = std::stoi(rmr->QueryField(0, reputation), nullptr, 0);
+			rmodrep[reputation] = strtol(rmr->QueryField(0, reputation), NULL, 0);
 		}
 	}
 
@@ -116,7 +116,7 @@ void InitScriptTables()
 	AutoTable rmc("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
-			rmodchr[charisma] = std::stoi(rmc->QueryField(0, charisma), nullptr, 0);
+			rmodchr[charisma] = strtol(rmc->QueryField(0, charisma), NULL, 0);
 		}
 	}
 
