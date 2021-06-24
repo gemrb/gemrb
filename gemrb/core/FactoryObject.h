@@ -29,8 +29,8 @@ namespace GemRB {
 class GEM_EXPORT FactoryObject {
 public:
 	SClass_ID SuperClassID;
-	ieResRef ResRef;
-	FactoryObject(const char* ResRef, SClass_ID SuperClassID);
+	ResRef resRef;
+	FactoryObject(const ResRef &resRef, SClass_ID SuperClassID);
 	virtual ~FactoryObject(void);
 };
 

@@ -24,9 +24,9 @@
 
 namespace GemRB {
 
-FactoryObject::FactoryObject(const char* name, SClass_ID SuperClassID)
+FactoryObject::FactoryObject(const ResRef &name, SClass_ID SuperClassID)
+: resRef(name)
 {
-	strnlwrcpy( ResRef, name, 8 );
 	this->SuperClassID = SuperClassID;
 }
 

@@ -95,7 +95,7 @@ SpriteAnimation::~SpriteAnimation()
 
 bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
 {
-	if (!anim || anim->bam->ResRef != bam->ResRef) return false;
+	if (!anim || anim->bam->resRef != bam->resRef) return false;
 	uint8_t c = cycle;
 	if (flags & PLAY_RANDOM) {
 		c &= ~1;

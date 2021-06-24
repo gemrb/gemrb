@@ -38,15 +38,15 @@ void Factory::AddFactoryObject(FactoryObject* fobject)
 	fobjects.push_back( fobject );
 }
 
-int Factory::IsLoaded(const char* ResRef, SClass_ID type) const
+int Factory::IsLoaded(const ResRef& resref, SClass_ID type) const
 {
-	if (ResRef == nullptr) {
+	if (resref.IsEmpty()) {
 		return -1;
 	}
 
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		if (fobjects[i]->SuperClassID == type) {
-			if (strnicmp( fobjects[i]->ResRef, ResRef, 8 ) == 0) {
+			if (fobjects[i]->resRef == resref) {
 				return i;
 			}
 		}

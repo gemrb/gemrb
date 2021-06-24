@@ -107,7 +107,7 @@ public:
 	};
 	friend struct Hash;
 
-	bool IsEmpty() {
+	bool IsEmpty() const {
 		return (ref[0] == '\0');
 	}
 

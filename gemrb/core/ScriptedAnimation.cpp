@@ -131,7 +131,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 	//getcycle returns NULL if there is no such cycle
 	//special case, PST double animations
 
-	ResName = af->ResRef;
+	ResName = af->resRef;
 	// some anims like FIREL.BAM in IWD contain empty cycles
 	unsigned int cCount = 0;
 	for (unsigned int i = 0; i < af->GetCycleCount() && af->GetCycleSize(i) > 0; ++i) {
