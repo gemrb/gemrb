@@ -3877,7 +3877,12 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
-	
+
+	if (ResRef[0] == 0) {
+		btn->SetAnimation(nullptr);
+		Py_RETURN_NONE;
+	}
+
 	if (cols && !PyList_Check(cols)) {
 		return RuntimeError("Invalid argument for 'cols'");
 	}
@@ -3885,11 +3890,6 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID, IE_NORMAL);
 	ABORT_IF_NULL(af);
 	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
-
-	if (ResRef[0] == 0) {
-		btn->SetAnimation(nullptr);
-		Py_RETURN_NONE;
-	}
 
 	if (Blend) {
 		anim->SetBlend(true);
