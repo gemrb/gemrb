@@ -41,17 +41,16 @@ namespace GemRB {
 class GEM_EXPORT Ambient {
 public:
 	Ambient();
-	~Ambient();
 	
 	const char *getName() const { return name; }
 	const Point &getOrigin() const { return origin; }
 	ieWord getRadius() const { return radius; }
 	ieWord getGain() const { return gain; }
 	ieWord getTotalGain() const;
-	char *getSound(ieDword i) const
+	ResRef getSound(size_t i) const
 	{
-		if(i<sounds.size()) return sounds[i];
-		return NULL;
+		if (i < sounds.size()) return sounds[i];
+		return nullptr;
 	}
 	ieDword getInterval() const { return interval; }
 	ieDword getIntervalVariance() const { return intervalVariance; }
@@ -66,7 +65,7 @@ public:
 public:
 	char name[32];
 	Point origin;
-	std::vector<char *> sounds;
+	std::vector<ResRef> sounds;
 	ieWord radius;
 	ieWord gain;	// percent
 	ieWord gainVariance;

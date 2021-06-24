@@ -1334,7 +1334,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (i = 0; i < AmbiCount; i++) {
 		int j;
-		ieResRef sounds[MAX_RESCOUNT];
+		struct ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
 		Ambient *ambi = new Ambient();
@@ -1364,9 +1364,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			tmpWord=MAX_RESCOUNT;
 		}
 		for (j = 0; j < tmpWord; j++) {
-			char *sound = (char *) malloc(9);
-			memcpy(sound, sounds[j], 9);
-			ambi->sounds.push_back(sound);
+			ambi->sounds.emplace_back(sounds[j]);
 		}
 		map->AddAmbient(ambi);
 	}

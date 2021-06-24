@@ -33,14 +33,6 @@ Ambient::Ambient()
 	pitchVariance = appearance = flags = 0;
 }
 
-Ambient::~Ambient()
-{
-	unsigned int i=sounds.size();
-	while(i--) {
-		free(sounds[i]);
-	}
-}
-
 ieWord Ambient::getTotalGain() const
 {
 	ieWord g = gain;
