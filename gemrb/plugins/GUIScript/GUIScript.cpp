@@ -10039,7 +10039,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 		//activate entrance
 		ip->Flags&=~TRAP_DEACTIVATED;
 		//set destination area
-		strnuprcpy(ip->Destination, NewArea, sizeof(ieResRef)-1 );
+		ip->Destination = ResRef::MakeUpperCase(NewArea);
 		//change entrance only if supplied
 		if (NewEntrance) {
 			strnuprcpy(ip->EntranceName, NewEntrance, sizeof(ieVariable)-1 );

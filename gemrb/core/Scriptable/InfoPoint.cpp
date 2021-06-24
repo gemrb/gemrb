@@ -42,7 +42,6 @@ static bool inited = false;
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
-	Destination[0] = 0;
 	EntranceName[0] = 0;
 	Flags = 0;
 	TrapDetectionDiff = 0;
@@ -249,7 +248,7 @@ void InfoPoint::dump() const
 	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
-		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination, EntranceName);
+		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName);
 		break;
 	case ST_PROXIMITY:
 		buffer.appendFormatted( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));

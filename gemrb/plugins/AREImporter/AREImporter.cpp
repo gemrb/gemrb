@@ -578,7 +578,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord PosX, PosY;
 		ieWord TalkX, TalkY;
 		ieVariable Name, Entrance;
-		ieResRef Script, KeyResRef, Destination;
+		ieResRef Script, KeyResRef;
+		struct ResRef Destination;
 		ieResRef DialogResRef, WavResRef; //adopted pst specific fields
 		ieStrRef DialogName;
 		str->Read( Name, 32 );
@@ -710,7 +711,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ip->Pos.x = bbox.x + ( bbox.w / 2 );
 			ip->Pos.y = bbox.y + ( bbox.h / 2 );
 		}
-		memcpy( ip->Destination, Destination, sizeof(Destination) );
+		ip->Destination = Destination;
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
 		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
 

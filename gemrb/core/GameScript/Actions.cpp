@@ -6408,7 +6408,7 @@ void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	if (ip && (ip->Type==ST_TRAVEL) ) {
 		//alter the destination area, don't touch the entrance variable link
-		strnlwrcpy(ip->Destination, parameters->string0Parameter, sizeof(ieResRef)-1 );
+		ip->Destination = ResRef::MakeLowerCase(parameters->string0Parameter);
 	}
 }
 

@@ -45,7 +45,7 @@ public:
 	bool IsPortal() const;
 
 public:
-	ieResRef Destination;
+	ResRef Destination;
 	ieVariable EntranceName;
 	ieDword Flags;
 	//overheadtext contains the string, but we have to save this
