@@ -414,7 +414,7 @@ bool MakeDirectory(const char* path)
 #ifdef WIN32
 #define mkdir(path, mode) _mkdir(path)
 #endif
-	if (mkdir(path, S_IREAD|S_IWRITE|S_IEXEC) < 0) {
+	if (mkdir(path, S_IRWXU) < 0) {
 		if (errno != EEXIST) {
 			return false;
 		}
