@@ -25,7 +25,7 @@
 
 #include "Region.h"
 
-#include <vector>
+#include <set>
 
 namespace GemRB {
 
@@ -41,8 +41,10 @@ private:
 	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
 	int shakeCounter = 0;
 	Point shakeVec;
-	unsigned int first_animation;
-	std::vector<SpriteAnimation*> animations;
+
+	static bool animationComparator (const SpriteAnimation*, const SpriteAnimation*);
+	std::multiset<SpriteAnimation*, decltype(animationComparator)*> animations;
+
 	//move viewport to this coordinate
 	Point goal = Point(-1, -1);
 	int speed = 0;

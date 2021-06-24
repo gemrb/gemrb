@@ -29,6 +29,7 @@
 namespace GemRB {
 
 GlobalTimer::GlobalTimer(void)
+  : animations(animationComparator)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
@@ -249,58 +250,35 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 
 void GlobalTimer::AddAnimation(SpriteAnimation* anim)
 {
-	// if there are no free animation reference objects,
-	// alloc one, else take the first free one
-	if (first_animation != 0) {
-		animations.erase (animations.begin());
-		first_animation--;
-	}
-
-	// and insert it into list of other anim refs, sorted by time
-	auto it = animations.begin() + first_animation;
-	for (; it != animations.end (); ++it) {
-		if ((*it)->Time() > anim->Time()) {
-			animations.insert(it, anim);
-			break;
-		}
-	}
-	if (it == animations.end())
-		animations.push_back(anim);
+	animations.insert(anim);
 }
 
 void GlobalTimer::RemoveAnimation(SpriteAnimation* anim)
 {
-	// Animation refs for given control are not physically removed,
-	// but just marked by erasing ptr to the control. They will be
-	// collected when they get to the front of the vector
-	for (auto it = animations.begin() + first_animation; it != animations.end (); ++it) {
+	for (auto it = animations.lower_bound(anim); it != animations.end() && (*it)->Time() == anim->Time(); ++it) {
 		if (*it == anim) {
-			*it = nullptr;
+			animations.erase(it);
+			break;
 		}
 	}
 }
 
 void GlobalTimer::UpdateAnimations(bool paused, tick_t thisTime)
 {
-	while (animations.begin() + first_animation != animations.end()) {
-		SpriteAnimation* anim = animations[first_animation];
-		if (anim == nullptr) {
-			first_animation++;
-			continue;
-		}
+	for (auto it = animations.begin(); it != animations.end() && (*it)->Time() <= thisTime;) {
+		auto animation = *it;
+		it = animations.erase(it);
+		animation->UpdateAnimation(paused, thisTime);
 
-		if (anim->Time() <= thisTime) {
-			anim->UpdateAnimation(paused, thisTime);
-			first_animation++;
-			continue;
+		if (!animation->HasEnded()) {
+			animations.insert(animation);
 		}
-		break;
 	}
 }
 
 void GlobalTimer::ClearAnimations()
 {
-	first_animation = (unsigned int) animations.size();
+	animations.clear();
 }
 
 void GlobalTimer::SetScreenShake(const Point &shake, int count)
@@ -315,6 +293,10 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 		goal = currentVP.origin;
 		speed = 1000;
 	}
+}
+
+bool GlobalTimer::animationComparator (const SpriteAnimation *a, const SpriteAnimation *b) {
+	return a->Time() < b->Time();
 }
 
 }
