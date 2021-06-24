@@ -83,6 +83,7 @@ SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)
 {
 	assert(bam);
 	UpdateAnimation(false, begintime);
+	core->timer.AddAnimation(this);
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
@@ -108,14 +109,11 @@ void SpriteAnimation::UpdateAnimation(bool paused, tick_t time)
 	if (paused && !(flags & PLAY_ALWAYS)) {
 		// try again later
 		nextFrameTime = time + 1;
-		core->timer.AddAnimation(this);
 		return;
 	}
 	
 	current = GenerateNext(time);
-	if (current) {
-		core->timer.AddAnimation(this);
-	} else {
+	if (!current) {
 		// an error occured so just end the animation
 		nextFrameTime = 0;
 	}
