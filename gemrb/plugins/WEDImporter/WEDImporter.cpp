@@ -240,16 +240,16 @@ WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 	return MakeGroupFromTableEntries(index, count);
 }
 
-ieWord* WEDImporter::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
+ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& BaseClosed)
 {
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
-	ieResRef Name;
+	ResRef Name;
 	unsigned int i;
 
 	for (i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0x1A ), GEM_STREAM_START );
 		str->ReadResRef( Name );
-		if (strnicmp( Name, ResRef, 8 ) == 0)
+		if (Name == resref)
 			break;
 	}
 	//The door has no representation in the WED file

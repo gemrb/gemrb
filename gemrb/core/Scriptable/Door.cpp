@@ -72,10 +72,6 @@ Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
 	oibcount = 0;
 	closed_ib = NULL;
 	cibcount = 0;
-	OpenSound[0] = 0;
-	CloseSound[0] = 0;
-	LockSound[0] = 0;
-	UnLockSound[0] = 0;
 	overlay = Overlay;
 	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
@@ -159,9 +155,9 @@ void Door::ToggleTiles(int State, int playsound)
 }
 
 //this is the short name (not the scripting name)
-void Door::SetName(const char* name)
+void Door::SetName(const ResRef &name)
 {
-	strnlwrcpy( ID, name, 8 );
+	ID = name;
 }
 
 void Door::SetTiles(unsigned short* Tiles, int cnt)

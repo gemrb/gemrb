@@ -73,7 +73,7 @@ public:
 	~Door(void) override;
 public:
 	ieVariable LinkedInfo;
-	ieResRef ID; //WED ID
+	ResRef ID; //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	int tilecount;
@@ -90,10 +90,10 @@ public:
 	int cibcount;
 
 	Point toOpen[2];
-	ieResRef OpenSound;
-	ieResRef CloseSound;
-	ieResRef LockSound;
-	ieResRef UnLockSound;
+	ResRef OpenSound;
+	ResRef CloseSound;
+	ResRef LockSound;
+	ResRef UnLockSound;
 	ieDword DiscoveryDiff;
 	ieDword LockDifficulty; //this is a dword?
 	ieStrRef OpenStrRef;
@@ -105,7 +105,7 @@ private:
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
 	void ToggleTiles(int State, int playsound = false);
-	void SetName(const char* Name); // sets door ID
+	void SetName(const ResRef &Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
 	bool CanDetectTrap() const override;
 	void SetDoorLocked(int Locked, int playsound);

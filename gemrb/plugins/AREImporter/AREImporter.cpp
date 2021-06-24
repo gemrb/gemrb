@@ -856,7 +856,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord OpenVerticesCount, ClosedVerticesCount;
 		ieWord OpenImpededCount, ClosedImpededCount;
 		ieVariable LongName, LinkedInfo;
-		ieResRef ShortName;
+		struct ResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
 		ieResRef KeyResRef, Script;
@@ -904,7 +904,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword(ClosedFirstImpeded);
 		str->ReadWord(hp); // hitpoints
 		str->ReadWord(ac); // AND armorclass, according to IE dev info
-		ieResRef OpenResRef, CloseResRef;
+		struct ResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
 		str->ReadDword(cursor);
@@ -1035,21 +1035,21 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		door->toOpen[0] = toOpen[0];
 		door->toOpen[1] = toOpen[1];
 		//Leave the default sound untouched
-		if (OpenResRef[0])
-			memcpy( door->OpenSound, OpenResRef, sizeof(OpenResRef) );
+		if (!OpenResRef.IsEmpty())
+			door->OpenSound = OpenResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				memcpy( door->OpenSound, Sounds[DEF_HOPEN], 9 );
+				door->OpenSound = Sounds[DEF_HOPEN];
 			else
-				memcpy( door->OpenSound, Sounds[DEF_OPEN], 9 );
+				door->OpenSound = Sounds[DEF_OPEN];
 		}
-		if (CloseResRef[0])
-			memcpy( door->CloseSound, CloseResRef, sizeof(CloseResRef) );
+		if (!CloseResRef.IsEmpty())
+			door->CloseSound = CloseResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				memcpy( door->CloseSound, Sounds[DEF_HCLOSE], 9 );
+				door->CloseSound = Sounds[DEF_HCLOSE];
 			else
-				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
+				door->CloseSound = Sounds[DEF_CLOSE];
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;

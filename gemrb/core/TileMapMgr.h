@@ -33,7 +33,7 @@ public:
 	~TileMapMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
-	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
+	virtual ieWord* GetDoorIndices(const ResRef&, int* count,
 		bool& BaseClosed) = 0;
 	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
 	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
