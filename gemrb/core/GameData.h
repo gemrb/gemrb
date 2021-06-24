@@ -38,7 +38,7 @@
 
 namespace GemRB {
 
-static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
+static const ResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
 class Actor;
 struct Effect;
@@ -56,7 +56,7 @@ class VEFObject;
 
 struct Table {
 	Holder<TableMgr> tm;
-	ieResRef ResRef;
+	ResRef ResRef;
 	unsigned int refcount;
 };
 
@@ -78,7 +78,7 @@ public:
 	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const ieResRef ResRef, bool silent=false);
+	int LoadTable(const ResRef &ResRef, bool silent=false);
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
@@ -87,14 +87,14 @@ public:
 	bool DelTable(unsigned int index);
 
 	PaletteHolder GetPalette(const ResRef& resname);
-	void FreePalette(PaletteHolder &pal, const ieResRef name=NULL);
+	void FreePalette(PaletteHolder &pal, const ResRef &name = nullptr);
 
-	Item* GetItem(const ieResRef resname, bool silent=false);
-	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
-	Spell* GetSpell(const ieResRef resname, bool silent=false);
-	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
-	Effect* GetEffect(const ieResRef resname);
-	void FreeEffect(Effect *eff, const ieResRef name, bool free=false);
+	Item* GetItem(const ResRef &resname, bool silent=false);
+	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
+	Spell* GetSpell(const ResRef &resname, bool silent=false);
+	void FreeSpell(Spell *spl, const ResRef &name, bool free=false);
+	Effect* GetEffect(const ResRef &resname);
+	void FreeEffect(Effect *eff, const ResRef &name, bool free=false);
 
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
@@ -103,7 +103,7 @@ public:
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
 
 	/** returns a single sprite (not cached) from a BAM resource */
-	Holder<Sprite2D> GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent=false);
+	Holder<Sprite2D> GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent=false);
 
 	/* returns a single BAM or static image sprite, checking in that order */
 	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
@@ -114,7 +114,7 @@ public:
 
 	void AddFactoryResource(FactoryObject* res);
 
-	Store* GetStore(const ieResRef ResRef);
+	Store* GetStore(const ResRef &resRef);
 	/// Saves a store to the cache and frees it.
 	void SaveStore(Store* store);
 	/// Saves all stores in the cache

@@ -153,15 +153,15 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const ieResRef ResRef, bool silent)
+int GameData::LoadTable(const ResRef &resRef, bool silent)
 {
-	int ind = GetTableIndex( ResRef );
+	int ind = GetTableIndex(resRef);
 	if (ind != -1) {
 		tables[ind].refcount++;
 		return ind;
 	}
 	//print("(%s) Table not found... Loading from file", ResRef);
-	DataStream* str = GetResource( ResRef, IE_2DA_CLASS_ID, silent );
+	DataStream* str = GetResource(resRef, IE_2DA_CLASS_ID, silent);
 	if (!str) {
 		return -1;
 	}
@@ -175,7 +175,7 @@ int GameData::LoadTable(const ieResRef ResRef, bool silent)
 	}
 	Table t;
 	t.refcount = 1;
-	CopyResRef(t.ResRef, ResRef);
+	t.ResRef = resRef;
 	t.tm = tm;
 	ind = -1;
 	for (size_t i = 0; i < tables.size(); i++) {
@@ -253,7 +253,7 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 	return palette;
 }
 
-void GameData::FreePalette(PaletteHolder &pal, const ieResRef)
+void GameData::FreePalette(PaletteHolder &pal, const ResRef&)
 {
 	// This was previously much hairier, trying to keep track of two different
 	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
@@ -262,7 +262,7 @@ void GameData::FreePalette(PaletteHolder &pal, const ieResRef)
 	pal = nullptr;
 }
 
-Item* GameData::GetItem(const ieResRef resname, bool silent)
+Item* GameData::GetItem(const ResRef &resname, bool silent)
 {
 	Item *item = (Item *) ItemCache.GetResource(resname);
 	if (item) {
@@ -288,19 +288,19 @@ Item* GameData::GetItem(const ieResRef resname, bool silent)
 }
 
 //you can supply name for faster access
-void GameData::FreeItem(Item const *itm, const ieResRef name, bool free)
+void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
 {
 	int res;
 
 	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name);
+		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name.CString());
 	}
 	if (res) return;
 	if (free) delete itm;
 }
 
-Spell* GameData::GetSpell(const ieResRef resname, bool silent)
+Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 {
 	Spell *spell = (Spell *) SpellCache.GetResource(resname);
 	if (spell) {
@@ -325,20 +325,20 @@ Spell* GameData::GetSpell(const ieResRef resname, bool silent)
 	return spell;
 }
 
-void GameData::FreeSpell(Spell *spl, const ieResRef name, bool free)
+void GameData::FreeSpell(Spell *spl, const ResRef &name, bool free)
 {
 	int res;
 
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
-			name, spl->Name);
+			name.CString(), spl->Name);
 	}
 	if (res) return;
 	if (free) delete spl;
 }
 
-Effect* GameData::GetEffect(const ieResRef resname)
+Effect* GameData::GetEffect(const ResRef &resname)
 {
 	Effect *effect = (Effect *) EffectCache.GetResource(resname);
 	if (effect) {
@@ -363,13 +363,13 @@ Effect* GameData::GetEffect(const ieResRef resname)
 	return effect;
 }
 
-void GameData::FreeEffect(Effect *eff, const ieResRef name, bool free)
+void GameData::FreeEffect(Effect *eff, const ResRef &name, bool free)
 {
 	int res;
 
 	res=EffectCache.DecRef((void *) eff, name, free);
 	if (res<0) {
-		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name);
+		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name.CString());
 	}
 	if (res) return;
 	if (free) delete eff;
@@ -423,11 +423,11 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Holder<Sprite2D> GameData::GetBAMSprite(const ieResRef ResRef, int cycle, int frame, bool silent)
+Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
 	AnimationFactory* af = ( AnimationFactory* )
-		GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL, silent );
+		GetFactoryResource(resRef, IE_BAM_CLASS_ID, IE_NORMAL, silent);
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
@@ -499,14 +499,14 @@ void GameData::AddFactoryResource(FactoryObject* res)
 	factory->AddFactoryObject(res);
 }
 
-Store* GameData::GetStore(const ieResRef ResRef)
+Store* GameData::GetStore(const ResRef &resRef)
 {
-	StoreMap::iterator it = stores.find(ResRef);
+	StoreMap::iterator it = stores.find(resRef);
 	if (it != stores.end()) {
 		return it->second;
 	}
 
-	DataStream* str = gamedata->GetResource(ResRef, IE_STO_CLASS_ID);
+	DataStream* str = gamedata->GetResource(resRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		delete ( str );
@@ -520,7 +520,8 @@ Store* GameData::GetStore(const ieResRef ResRef)
 	if (store == NULL) {
 		return NULL;
 	}
-	strnlwrcpy(store->Name, ResRef, 8);
+	
+	strnlwrcpy(store->Name, resRef, 8);
 	// The key needs to last as long as the store,
 	// so use the one we just copied.
 	stores[store->Name] = store;
@@ -573,9 +574,8 @@ void GameData::ReadItemSounds()
 	for (int i = 0; i < rowCount; i++) {
 		ItemSounds[i] = std::vector<const char*>();
 		for (int j = 0; j < colCount; j++) {
-			ieResRef snd;
-			strnlwrcpy(snd, itemsnd->QueryField(i, j), 8);
-			if (!strcmp(snd, "*")) break;
+			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j));
+			if (snd == ResRef("*")) break;
 			ItemSounds[i].push_back(strdup(snd));
 		}
 	}
