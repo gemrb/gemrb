@@ -3869,16 +3869,16 @@ a BAM file. Optionally an animation cycle could be set too.\n\
 
 static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 {
-	char *ResRef;
+	PyObject *ResRef;
 	int Cycle = 0;
 	int Blend = 0;
 	PyObject* cols = nullptr;
-	PARSE_ARGS(args,  "Os|iiO", &self, &ResRef, &Cycle, &Blend, &cols);
+	PARSE_ARGS(args,  "OO|iiO", &self, &ResRef, &Cycle, &Blend, &cols);
 
 	Button* btn = GetView<Button>(self);
 	ABORT_IF_NULL(btn);
 
-	if (ResRef[0] == 0) {
+	if (ResRef == Py_None) {
 		btn->SetAnimation(nullptr);
 		Py_RETURN_NONE;
 	}
@@ -3887,7 +3887,7 @@ static PyObject* GemRB_Button_SetAnimation(PyObject* self, PyObject* args)
 		return RuntimeError("Invalid argument for 'cols'");
 	}
 	
-	auto af = (AnimationFactory*)gamedata->GetFactoryResource(ResRef, IE_BAM_CLASS_ID, IE_NORMAL);
+	auto af = (AnimationFactory*)gamedata->GetFactoryResource(PyString_AsString(ResRef), IE_BAM_CLASS_ID, IE_NORMAL);
 	ABORT_IF_NULL(af);
 	SpriteAnimation* anim = new SpriteAnimation(af, Cycle);
 

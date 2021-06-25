@@ -66,7 +66,7 @@ def InitPriestWindow (Window):
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 		Button.SetVarAssoc ("SpellButton", i)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 
 	# Setup book spells buttons
 	for i in range (GUICommon.GetGUISpellButtonCount()):
@@ -142,7 +142,7 @@ def UpdatePriestWindow (Window):
 	i = 0
 	for i in range (known_cnt):
 		Button = Window.GetControl (27 + i)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -156,7 +156,7 @@ def UpdatePriestWindow (Window):
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Button = Window.GetControl (27 + i)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 		
 		Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)

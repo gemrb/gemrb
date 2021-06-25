@@ -91,7 +91,7 @@ def InitMageWindow (window):
 			Button.SetSprites ("SPELFRAM",0,0,0,0,0)
 			Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_PLAYONCE | IE_GUI_BUTTON_PLAYALWAYS, OP_OR)
 			Button.SetState (IE_GUI_BUTTON_LOCKED)
-			Button.SetAnimation ("")
+			Button.SetAnimation (None)
 			Button.SetVarAssoc ("SpellButton", i)
 
 	# Setup book spells buttons
@@ -175,7 +175,7 @@ def UpdateMageWindow (MageWindow):
 	i = 0
 	for i in range (known_cnt):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 		
 		ks = GemRB.GetKnownSpell (pc, spelltype, level, i)
 		Button.SetSpellIcon (ks['SpellResRef'], 0)
@@ -191,7 +191,7 @@ def UpdateMageWindow (MageWindow):
 	if known_cnt == 0: i = -1
 	for i in range (i + 1, btncount):
 		Button = MageWindow.GetControl (27 + i)
-		Button.SetAnimation ("")
+		Button.SetAnimation (None)
 		
 		Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_NAND)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
