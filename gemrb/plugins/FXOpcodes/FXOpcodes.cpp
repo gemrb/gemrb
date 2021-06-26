@@ -4533,8 +4533,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 	}
 	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	ResRef OldSpellResRef(Owner->SpellResRef);
 	// flags: no deplete, instant, no interrupt
 	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false);
 	Owner->SetSpellResRef(OldSpellResRef);
@@ -4560,8 +4559,7 @@ int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_cast_spell_point(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	ResRef OldSpellResRef(Owner->SpellResRef);
 	Point p(fx->PosX, fx->PosY);
 	Owner->DirectlyCastSpellPoint(p, fx->Resource, fx->Parameter1, true, false);
 	Owner->SetSpellResRef(OldSpellResRef);
@@ -6325,8 +6323,8 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		CopyResRef(refs[2], fx->Resource3);
 		CopyResRef(refs[3], fx->Resource4);
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
-		ieResRef OldSpellResRef;
-		memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+		ResRef OldSpellResRef(Owner->SpellResRef);
+
 		for (i=0; i < 4; i++) {
 			if (!refs[i][0]) {
 				continue;
@@ -6778,8 +6776,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	displaymsg->DisplayConstantStringName(STR_SNARESUCCEED, DMC_WHITE, target);
 	target->VerbalConstant(VB_TRAP_SET);
 	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ieResRef OldSpellResRef;
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
+	ResRef OldSpellResRef(Owner->SpellResRef);
 	Owner->DirectlyCastSpellPoint(Point(fx->PosX, fx->PosY), fx->Resource, level, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
 	return FX_NOT_APPLIED;
