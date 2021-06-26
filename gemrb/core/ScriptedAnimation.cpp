@@ -316,7 +316,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream)
 		}
 	}
 
-	if (sounds[P_HOLD][0] == 0 && sounds[P_RELEASE][0] == 0 && (SequenceFlags & IE_VVC_LOOP)) {
+	if (sounds[P_HOLD].IsEmpty() && sounds[P_RELEASE].IsEmpty() && (SequenceFlags & IE_VVC_LOOP)) {
 		sounds[P_HOLD] = sounds[P_ONSET];
 		sounds[P_ONSET].Reset();
 	}
