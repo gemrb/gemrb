@@ -2714,11 +2714,12 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
+		ResRef spellResRef(spellres);
+		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
-			Sender->SetSpellResRef(spellres);
+			Sender->SetSpellResRef(spellResRef);
 		}
 	}
 	if (!Sender->CurrentActionTicks) {
@@ -2840,11 +2841,12 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		if (!Sender->SpellResRef[0] || stricmp(Sender->SpellResRef, spellres)) {
+		ResRef spellResRef(spellres);
+		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", parameters->actionID);
 			}
-			Sender->SetSpellResRef(spellres);
+			Sender->SetSpellResRef(spellResRef);
 		}
 	}
 	if (!Sender->CurrentActionTicks) {
