@@ -48,8 +48,6 @@ static ProjectileServer *server = NULL;
 
 Projectile::Projectile()
 {
-	autofree = false;
-	Extension = NULL;
 	area = NULL;
 	palette = NULL;
 	Destination = Pos;
@@ -89,9 +87,6 @@ Projectile::~Projectile()
 {
 	int i;
 
-	if (autofree) {
-		free(Extension);
-	}
 	delete effects;
 
 	ClearPath();
@@ -115,14 +110,6 @@ Projectile::~Projectile()
 			delete children[i];
 		}
 		free (children);
-	}
-}
-
-void Projectile::InitExtension()
-{
-	autofree = false;
-	if (!Extension) {
-		Extension = (ProjectileExtension *) calloc( 1, sizeof(ProjectileExtension));
 	}
 }
 
@@ -1634,7 +1621,6 @@ void Projectile::DrawExplosion(const Region& vp)
 				pro->MoveTo(area, Pos);
 			}
 			pro->SetTarget(newdest);
-			pro->autofree=true;
 			
 			//sets up the gradient color for the explosion animation
 			if (apflags&(APF_PALETTE|APF_TINT) ) {

@@ -111,14 +111,14 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 	if (AreaExtension!=3) {
 		return s;
 	}
-	s->InitExtension();
-	GetAreaExtension(s->Extension);
+	s->Extension = GetAreaExtension();
 	return s;
 }
 
-void PROImporter::GetAreaExtension(ProjectileExtension *e)
+Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 {
 	ieWord tmp;
+	Holder<ProjectileExtension> e;
 
 	str->ReadDword(e->AFlags);
 	str->ReadWord(e->TriggerRadius);
@@ -170,6 +170,7 @@ void PROImporter::GetAreaExtension(ProjectileExtension *e)
 
 	//we skip the rest
 	str->Seek(180, GEM_CURRENT_POS);
+	return e;
 }
 
 #include "plugindef.h"

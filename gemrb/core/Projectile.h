@@ -164,7 +164,7 @@ namespace GemRB {
 #define APF_TILED 4096
 #define APF_PLAYONCE 8192
 
-struct ProjectileExtension
+struct ProjectileExtension : Held<ProjectileExtension>
 {
 	ieDword AFlags;
 	ieWord TriggerRadius;
@@ -196,7 +196,6 @@ class GEM_EXPORT Projectile
 public:
 	Projectile();
 	~Projectile();
-	void InitExtension();
 
 	ieWord Speed;
 	ieDword SFlags;
@@ -233,8 +232,7 @@ public:
 	ieWord TrailSpeed[3];
 	unsigned int Range;
 	//these are public but not in the .pro file
-	ProjectileExtension* Extension;
-	bool autofree;
+	Holder<ProjectileExtension> Extension;
 	PaletteHolder palette;
 	//internals
 protected:

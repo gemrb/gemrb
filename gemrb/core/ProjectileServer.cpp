@@ -169,7 +169,6 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		pro->Extension->APFlags = GetExplosionFlags(Type);
 	}
 
-	pro->autofree = true;
 	return ReturnCopy(idx);
 }
 

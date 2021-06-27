@@ -41,7 +41,7 @@ public:
 	bool Open(DataStream* stream) override;
 	Projectile* GetProjectile(Projectile *s) override;
 private:
-	void GetAreaExtension(ProjectileExtension *s);
+	Holder<ProjectileExtension> GetAreaExtension();
 };
 
 
