@@ -99,17 +99,9 @@ Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
 
 Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 {
-	Projectile *pro = new Projectile();
-	Projectile *old = projectiles[idx].projectile;
-	//int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
-	//memcpy(&pro->Type, &old->Type, strlength );
-	ptrdiff_t strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
-	memcpy(&pro->Speed, &old->Speed, strlength );
-	//FIXME: copy extension data too, or don't alter the extension
-	if (old->Extension) {
-		pro->Extension = old->Extension;
-	}
-	pro->SetIdentifiers(projectiles[idx].resname, idx);
+	const ProjectileEntry& old = projectiles[idx];
+	Projectile *pro = new Projectile(*old.projectile);
+	pro->SetIdentifiers(old.resname, idx);
 	return pro;
 }
 
