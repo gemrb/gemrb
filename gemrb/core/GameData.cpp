@@ -175,7 +175,7 @@ int GameData::LoadTable(const ResRef &resRef, bool silent)
 	}
 	Table t;
 	t.refcount = 1;
-	t.ResRef = resRef;
+	t.resRef = resRef;
 	t.tm = tm;
 	ind = -1;
 	for (size_t i = 0; i < tables.size(); i++) {
@@ -192,12 +192,12 @@ int GameData::LoadTable(const ResRef &resRef, bool silent)
 	return ( int ) tables.size() - 1;
 }
 /** Gets the index of a loaded table, returns -1 on error */
-int GameData::GetTableIndex(const char* ResRef) const
+int GameData::GetTableIndex(const ResRef &resRef) const
 {
 	for (size_t i = 0; i < tables.size(); i++) {
 		if (tables[i].refcount == 0)
 			continue;
-		if (strnicmp( tables[i].ResRef, ResRef, 8 ) == 0)
+		if (tables[i].resRef == resRef)
 			return ( int ) i;
 	}
 	return -1;

@@ -56,7 +56,7 @@ class VEFObject;
 
 struct Table {
 	Holder<TableMgr> tm;
-	ResRef ResRef;
+	ResRef resRef;
 	unsigned int refcount;
 };
 
@@ -80,7 +80,7 @@ public:
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	int LoadTable(const ResRef &ResRef, bool silent=false);
 	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const char * ResRef) const;
+	int GetTableIndex(const ResRef& resRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
 	Holder<TableMgr> GetTable(size_t index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
