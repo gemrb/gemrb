@@ -4674,7 +4674,7 @@ static PyObject* GemRB_SaveGame_GetName(PyObject * /*self*/, PyObject* args)
 	PyObject* Slot;
 	PARSE_ARGS( args,  "O", &Slot );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return PyString_FromString(save->GetName());
 }
 
@@ -4697,7 +4697,7 @@ static PyObject* GemRB_SaveGame_GetDate(PyObject * /*self*/, PyObject* args)
 	PyObject* Slot;
 	PARSE_ARGS( args, "O", &Slot );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return PyString_FromString(save->GetDate());
 }
 
@@ -4720,7 +4720,7 @@ static PyObject* GemRB_SaveGame_GetGameDate(PyObject * /*self*/, PyObject* args)
 	PyObject* Slot;
 	PARSE_ARGS( args,  "O", &Slot );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return PyString_FromString(save->GetGameDate());
 }
 
@@ -4743,7 +4743,7 @@ static PyObject* GemRB_SaveGame_GetSaveID(PyObject * /*self*/, PyObject* args)
 	PyObject* Slot;
 	PARSE_ARGS( args,  "O", &Slot );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return PyInt_FromLong(save->GetSaveID());
 }
 
@@ -4766,7 +4766,7 @@ static PyObject* GemRB_SaveGame_GetPreview(PyObject * /*self*/, PyObject* args)
 	PyObject* Slot;
 	PARSE_ARGS( args,  "O", &Slot );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return CObject<Sprite2D>(save->GetPreview());
 }
 
@@ -4794,7 +4794,7 @@ static PyObject* GemRB_SaveGame_GetPortrait(PyObject * /*self*/, PyObject* args)
 	int index;
 	PARSE_ARGS( args,  "Oi", &Slot, &index );
 
-	CObject<SaveGame> save(Slot);
+	Holder<SaveGame> save = CObject<SaveGame>(Slot);
 	return CObject<Sprite2D>(save->GetPortrait(index));
 }
 

@@ -31,13 +31,13 @@
 namespace GemRB {
 
 template <typename T>
-class CObject : public Holder<T> {
+class CObject final {
 public:
 	operator PyObject* () const
 	{
-		if (Holder<T>::ptr) {
-			Holder<T>::ptr->acquire();
-			PyObject *obj = PyCapsule_New(Holder<T>::ptr, T::ID.description, PyRelease);
+		if (ptr) {
+			ptr->acquire();
+			PyObject *obj = PyCapsule_New(ptr.get(), T::ID.description, PyRelease);
 			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
 			PyObject *ret = gs->ConstructObject(T::ID.description, NULL, kwargs);
 			Py_DECREF(kwargs);
@@ -46,6 +46,12 @@ public:
 			Py_RETURN_NONE;
 		}
 	}
+	
+	operator Holder<T> () const
+	{
+		return ptr;
+	}
+
 	CObject(PyObject *obj)
 	{
 		if (obj == Py_None)
@@ -56,22 +62,22 @@ public:
 		else
 			PyErr_Clear();
 
-		Holder<T>::ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
-		if (Holder<T>::ptr) {
-			Holder<T>::ptr->acquire();
+		ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
+		if (ptr) {
+			ptr->acquire();
 		} else {
 			Log(ERROR, "GUIScript", "Bad CObject extracted.");
 		}
 		Py_XDECREF(id);
 	}
+
 	CObject(const Holder<T>& ptr)
-	: Holder<T>(ptr)
-	{
-	}
-	// This is here because of lookup order issues.
+	: ptr(ptr)
+	{}
+
 	operator bool () const
 	{
-		return Holder<T>::ptr;
+		return ptr != nullptr;
 	}
 private:
 	static void PyRelease(PyObject *obj)
@@ -79,6 +85,8 @@ private:
 		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
 		static_cast<T*>(ptr)->release();
 	}
+	
+	Holder<T> ptr;
 };
 
 // Python 3 forward compatibility
