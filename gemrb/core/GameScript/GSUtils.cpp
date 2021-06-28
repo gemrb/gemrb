@@ -507,7 +507,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 	}
 	if (Sound[0] && !(flags&DS_SILENT) ) {
 		ieDword speech = 0;
-		Point pos(Sender->Pos.x, Sender->Pos.y);
+		Point pos = Sender->Pos;
 		if (flags&DS_SPEECH) {
 			speech = GEM_SND_SPEECH;
 		}
@@ -515,7 +515,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		if (Sender->Type != ST_ACTOR || static_cast<Actor*>(Sender)->InParty ||
 			core->InCutSceneMode() || core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			speech |= GEM_SND_RELATIVE;
-			pos.x = pos.y = 0;
+			pos.reset();
 		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
 		unsigned int len = 0;
@@ -755,7 +755,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 	Region vp0 = core->GetGameControl()->Viewport();
 	// go for 640x480, so large viewports are less likely to interfere with scripting
 	Region vp(vp0.x + (vp0.w - 640) / 2, vp0.y + (vp0.h - 480) / 2, 640, 480);
-	Point vpCenter = Point(vp.x + vp.w / 2, vp.y + vp.h / 2);
+	Point vpCenter = vp.Center();
 	int maxRandExclusive = std::max(vp.w, vp.h);
 	int firstRandStep = RAND(0, maxRandExclusive);
 	int currentStep = RAND(0, 3);
@@ -854,20 +854,16 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			if (tmp) Sender=tmp;
 			//fall through
 		case CC_OFFSET://use sender + offset
-			pnt.x = parameters->pointParameter.x + Sender->Pos.x;
-			pnt.y = parameters->pointParameter.y + Sender->Pos.y;
+			pnt = parameters->pointParameter + Sender->Pos;
 			break;
 		default: //absolute point, but -1,-1 means AtFeet
-			pnt.x = parameters->pointParameter.x;
-			pnt.y = parameters->pointParameter.y;
+			pnt = parameters->pointParameter;
 			if (!pnt.IsInvalid()) break;
 
 			if (Sender->Type == ST_PROXIMITY || Sender->Type == ST_TRIGGER) {
-				pnt.x = ((InfoPoint *) Sender)->TrapLaunch.x;
-				pnt.y = ((InfoPoint *) Sender)->TrapLaunch.y;
+				pnt = static_cast<InfoPoint*>(Sender)->TrapLaunch;
 			} else {
-				pnt.x = Sender->Pos.x;
-				pnt.y = Sender->Pos.y;
+				pnt = Sender->Pos;
 			}
 			break;
 	}

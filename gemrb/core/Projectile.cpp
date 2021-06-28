@@ -1689,8 +1689,7 @@ void Projectile::SetupWall()
 	p1.x=(Pos.x+Destination.x)/2;
 	p1.y=(Pos.y+Destination.y)/2;
 
-	p2.x=p1.x+(Pos.y-Destination.y);
-	p2.y=p1.y+(Pos.x-Destination.x);
+	p2 = p1 + (Pos - Destination);
 	Pos=p1;
 	SetTarget(p2);
 }
