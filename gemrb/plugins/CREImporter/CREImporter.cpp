@@ -32,7 +32,6 @@
 #include "GameScript/GameScript.h"
 
 #include <cassert>
-#include <cmath>
 
 using namespace GemRB;
 

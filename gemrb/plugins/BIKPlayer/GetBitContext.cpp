@@ -24,7 +24,6 @@
 // Copyright (c) 2007-2009 Peter Ross (pross@xvid.org)
 // Copyright (c) 2009 Daniel Verkamp (daniel@drv.nu) 
 
-#include <math.h>
 #include "GetBitContext.h"
 #include "System/Logging.h"
 

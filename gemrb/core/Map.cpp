@@ -54,7 +54,6 @@
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 
-#include <cmath>
 #include <cassert>
 #include <limits>
 

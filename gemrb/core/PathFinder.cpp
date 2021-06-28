@@ -42,7 +42,6 @@
 #include "Scriptable/Actor.h"
 
 #include <array>
-#include <cmath>
 #include <limits>
 
 namespace GemRB {

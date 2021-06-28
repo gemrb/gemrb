@@ -24,8 +24,6 @@
 #include "Palette.h"
 #include "SDLPixelIterator.h"
 
-#include <cmath>
-
 using namespace GemRB;
 
 SDLVideoDriver::SDLVideoDriver(void)

@@ -32,8 +32,6 @@
 #include "GameData.h"
 #include "Palette.h"
 
-#include <cmath>
-
 #define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {

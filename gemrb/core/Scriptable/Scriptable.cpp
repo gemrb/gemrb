@@ -38,8 +38,6 @@
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
 
-#include <cmath>
-
 namespace GemRB {
 
 // we start this at a non-zero value to make debugging easier

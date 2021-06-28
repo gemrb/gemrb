@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Scriptable/Actor.h"
 
-#include <cmath>
 #include <ctype.h>
 
 #include <iostream>

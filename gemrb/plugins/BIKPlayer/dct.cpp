@@ -26,7 +26,6 @@
 
 #define _USE_MATH_DEFINES
 
-#include <math.h>
 #include "dsputil.h"
 
 av_cold int ff_dct_init(DCTContext *s, int nbits, int inverse)

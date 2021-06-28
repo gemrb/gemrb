@@ -58,8 +58,6 @@
 #include "System/StringBuffer.h"
 #include "StringMgr.h"
 
-#include <cmath>
-
 namespace GemRB {
 
 //configurable?

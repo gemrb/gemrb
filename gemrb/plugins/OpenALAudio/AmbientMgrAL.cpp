@@ -28,7 +28,6 @@
 #include <cassert>
 #include <chrono>
 #include <climits>
-#include <cmath>
 #include <cstdio>
 
 using namespace GemRB;

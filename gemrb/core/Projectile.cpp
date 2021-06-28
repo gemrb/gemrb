@@ -34,7 +34,6 @@
 #include "Scriptable/Actor.h"
 #include "ScriptedAnimation.h"
 
-#include <cmath>
 #include <cstdlib>
 
 namespace GemRB {

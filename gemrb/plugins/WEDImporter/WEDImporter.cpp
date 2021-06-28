@@ -25,7 +25,6 @@
 #include "PluginMgr.h"
 #include "TileSetMgr.h"
 
-#include <cmath>
 #include <iterator>
 
 #include "System/swab.h"

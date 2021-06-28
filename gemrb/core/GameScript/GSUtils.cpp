@@ -51,7 +51,6 @@
 #include "ScriptedAnimation.h"
 #include "System/StringBuffer.h"
 
-#include <cmath>
 #include <cstdio>
 
 namespace GemRB {

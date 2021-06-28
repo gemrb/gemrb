@@ -25,8 +25,8 @@
  * @file libavcodec/fft.c
  * FFT/IFFT transforms.
  */
-
-#include <math.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include "dsputil.h"
 
 /* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
