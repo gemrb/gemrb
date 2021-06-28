@@ -34,12 +34,13 @@ namespace GemRB {
 template <class T>
 class Held {
 public:
-	Held() : RefCount(0) {}
-	virtual ~Held() = default;
-	void acquire() { ++RefCount; }
-	void release() { assert(RefCount && "Broken Held usage.");
-		if (!--RefCount) delete static_cast<T*>(this); }
-	size_t GetRefCount() { return RefCount; }
+	Held() noexcept : RefCount(0) {}
+	virtual ~Held() noexcept = default;
+	void acquire() noexcept { ++RefCount; }
+	void release() noexcept {
+		assert(RefCount && "Broken Held usage.");
+		if (--RefCount == 0) delete static_cast<T*>(this);
+	}
 private:
 	size_t RefCount;
 };
@@ -59,25 +60,27 @@ private:
 template <class T>
 class Holder {
 public:
-	Holder(T* ptr = NULL)
-		: ptr(ptr)
+	Holder(T* ptr = nullptr) noexcept
+	: ptr(ptr)
 	{
 		if (ptr)
 			ptr->acquire();
 	}
-	~Holder()
-	{
-		if (ptr)
-			ptr->release();
-	}
-	Holder(const Holder& rhs)
-		: ptr(rhs.ptr)
+
+	Holder(const Holder& rhs) noexcept
+	: ptr(rhs.ptr)
 	{
 		if (ptr)
 			ptr->acquire();
 	}
 	
-	Holder& operator=(Holder rhs)
+	~Holder() noexcept
+	{
+		if (ptr)
+			ptr->release();
+	}
+	
+	Holder& operator=(Holder rhs) noexcept
 	{
 		std::swap(rhs.ptr, ptr);
 		return *this;
@@ -99,14 +102,14 @@ public:
 		return ptr;
 	}
 
-	void release() {
+	void release() noexcept {
 		if (ptr)
 			ptr->release();
-		ptr = NULL;
+		ptr = nullptr;
 	}
 
 protected:
-	T *ptr;
+	T *ptr = nullptr;
 };
 
 template<class T>
@@ -146,7 +149,7 @@ inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 }
 
 template<class T, typename... ARGS>
-inline Holder<T> MakeHolder(ARGS&&... args)
+inline Holder<T> MakeHolder(ARGS&&... args) noexcept
 {
 	Holder<T> holder(new T(std::forward<ARGS>(args)...));
 	return holder;
