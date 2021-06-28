@@ -34,6 +34,11 @@
 	#endif
 #endif
 
+#ifndef HAVE_SIZEOF_SSIZE_T
+# define HAVE_SIZEOF_SSIZE_T
+using ssize_t = long int;
+#endif
+
 #include "exports.h"
 
 #ifndef _MAX_PATH

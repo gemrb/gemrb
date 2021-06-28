@@ -359,7 +359,7 @@
 		A29BF8F513A04A6F00C812DD /* DataStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA05C1395FF62006ADC12 /* DataStream.cpp */; };
 		A29BF8F613A04A6F00C812DD /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA05E1395FF62006ADC12 /* FileStream.cpp */; };
 		A29BF8F713A04A6F00C812DD /* MemoryStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0601395FF62006ADC12 /* MemoryStream.cpp */; };
-		A29BF8F913A04A6F00C812DD /* swab.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0641395FF62006ADC12 /* swab.c */; };
+		A29BF8F913A04A6F00C812DD /* swab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0641395FF62006ADC12 /* swab.cpp */; };
 		A29BF8FA13A04A6F00C812DD /* VFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0661395FF62006ADC12 /* VFS.cpp */; };
 		A29BF8FB13A04A6F00C812DD /* Actor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0331395FF62006ADC12 /* Actor.cpp */; };
 		A29BF8FC13A04A6F00C812DD /* Container.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0351395FF62006ADC12 /* Container.cpp */; };
@@ -609,7 +609,7 @@
 		A2E663FE139E885300310FC8 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA05E1395FF62006ADC12 /* FileStream.cpp */; };
 		A2E663FF139E885300310FC8 /* FileStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA05F1395FF62006ADC12 /* FileStream.h */; };
 		A2E66401139E885300310FC8 /* MemoryStream.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0611395FF62006ADC12 /* MemoryStream.h */; };
-		A2E66404139E885300310FC8 /* swab.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0641395FF62006ADC12 /* swab.c */; };
+		A2E66404139E885300310FC8 /* swab.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0641395FF62006ADC12 /* swab.cpp */; };
 		A2E66405139E885300310FC8 /* swab.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0651395FF62006ADC12 /* swab.h */; };
 		A2E66406139E885300310FC8 /* VFS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0661395FF62006ADC12 /* VFS.cpp */; };
 		A2E66407139E885300310FC8 /* VFS.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0671395FF62006ADC12 /* VFS.h */; };
@@ -1727,7 +1727,7 @@
 		A2BFA05F1395FF62006ADC12 /* FileStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileStream.h; sourceTree = "<group>"; };
 		A2BFA0601395FF62006ADC12 /* MemoryStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryStream.cpp; sourceTree = "<group>"; };
 		A2BFA0611395FF62006ADC12 /* MemoryStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MemoryStream.h; sourceTree = "<group>"; };
-		A2BFA0641395FF62006ADC12 /* swab.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = swab.c; sourceTree = "<group>"; };
+		A2BFA0641395FF62006ADC12 /* swab.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = swab.cpp; sourceTree = "<group>"; };
 		A2BFA0651395FF62006ADC12 /* swab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = swab.h; sourceTree = "<group>"; };
 		A2BFA0661395FF62006ADC12 /* VFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VFS.cpp; sourceTree = "<group>"; };
 		A2BFA0671395FF62006ADC12 /* VFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFS.h; sourceTree = "<group>"; };
@@ -5453,7 +5453,7 @@
 				A22A6B171994390D00488985 /* String.h */,
 				A2C76D2814F196E900961680 /* StringBuffer.cpp */,
 				A2C76D2914F196E900961680 /* StringBuffer.h */,
-				A2BFA0641395FF62006ADC12 /* swab.c */,
+				A2BFA0641395FF62006ADC12 /* swab.cpp */,
 				A2BFA0651395FF62006ADC12 /* swab.h */,
 				A2BFA0661395FF62006ADC12 /* VFS.cpp */,
 				A2BFA0671395FF62006ADC12 /* VFS.h */,
@@ -9614,7 +9614,7 @@
 				A29BF8F513A04A6F00C812DD /* DataStream.cpp in Sources */,
 				A29BF8F613A04A6F00C812DD /* FileStream.cpp in Sources */,
 				A29BF8F713A04A6F00C812DD /* MemoryStream.cpp in Sources */,
-				A29BF8F913A04A6F00C812DD /* swab.c in Sources */,
+				A29BF8F913A04A6F00C812DD /* swab.cpp in Sources */,
 				A29BF8FA13A04A6F00C812DD /* VFS.cpp in Sources */,
 				A29BF8FB13A04A6F00C812DD /* Actor.cpp in Sources */,
 				A29BF8FC13A04A6F00C812DD /* Container.cpp in Sources */,
@@ -9841,7 +9841,7 @@
 				A2E663F8139E884B00310FC8 /* WorldMapMgr.cpp in Sources */,
 				A2E663FC139E885300310FC8 /* DataStream.cpp in Sources */,
 				A2E663FE139E885300310FC8 /* FileStream.cpp in Sources */,
-				A2E66404139E885300310FC8 /* swab.c in Sources */,
+				A2E66404139E885300310FC8 /* swab.cpp in Sources */,
 				A2E66406139E885300310FC8 /* VFS.cpp in Sources */,
 				A2E66408139E885A00310FC8 /* Actor.cpp in Sources */,
 				A2E6640A139E885A00310FC8 /* Container.cpp in Sources */,
