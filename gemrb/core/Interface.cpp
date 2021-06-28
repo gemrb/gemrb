@@ -3284,7 +3284,7 @@ cleanup:
 void Interface::UpdateWorldMap(ResRef wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
-	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);(IE_WMP_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
 		Log(ERROR, "Core", "Could not update world map %s", wmResRef.CString());
