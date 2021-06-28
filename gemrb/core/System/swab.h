@@ -29,7 +29,9 @@ extern "C" {
  typedef long int ssize_t;
 #endif
 
+#ifndef HAVE_SWAB
 GEM_EXPORT void swab(const void *bfrom, void *bto, ssize_t n);
+#endif
 GEM_EXPORT void swabs(void *buf, ssize_t n);
 
 #if defined(__cplusplus)
