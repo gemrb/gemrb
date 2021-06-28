@@ -22,9 +22,6 @@
 #define _ACM_LAB_SUBBAND_DECODER_H
 
 #include <cstdlib>
-#if defined(sgi)
-#include <iostream>
-#endif
 
 class CSubbandDecoder {
 private:
