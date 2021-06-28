@@ -25,6 +25,7 @@
 #include "exports.h"
 
 #include "Holder.h"
+#include "ResourceSource.h"
 
 #include <vector>
 

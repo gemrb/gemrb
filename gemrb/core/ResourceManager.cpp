@@ -24,7 +24,6 @@
 #include "PluginMgr.h"
 #include "Resource.h"
 #include "ResourceDesc.h"
-#include "ResourceSource.h"
 #include "System/StringBuffer.h"
 
 namespace GemRB {
