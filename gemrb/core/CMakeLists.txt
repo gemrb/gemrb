@@ -61,7 +61,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Resource.cpp
 	ResourceDesc.cpp
 	ResourceManager.cpp
-	ResourceSource.cpp
 	SaveGameIterator.cpp
 	SaveGameMgr.cpp
 	ScriptEngine.cpp

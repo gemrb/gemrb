@@ -333,7 +333,6 @@
 		A29BF8D713A04A6F00C812DD /* Resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0251395FF62006ADC12 /* Resource.cpp */; };
 		A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0271395FF62006ADC12 /* ResourceDesc.cpp */; };
 		A29BF8D913A04A6F00C812DD /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0291395FF62006ADC12 /* ResourceManager.cpp */; };
-		A29BF8DA13A04A6F00C812DD /* ResourceSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */; };
 		A29BF8DB13A04A6F00C812DD /* SaveGameIterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */; };
 		A29BF8DC13A04A6F00C812DD /* SaveGameMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0301395FF62006ADC12 /* SaveGameMgr.cpp */; };
 		A29BF8DD13A04A6F00C812DD /* ScriptedAnimation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA03F1395FF62006ADC12 /* ScriptedAnimation.cpp */; };
@@ -556,7 +555,6 @@
 		A2E663C0139E883E00310FC8 /* ResourceDesc.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0281395FF62006ADC12 /* ResourceDesc.h */; };
 		A2E663C1139E883E00310FC8 /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0291395FF62006ADC12 /* ResourceManager.cpp */; };
 		A2E663C2139E883E00310FC8 /* ResourceManager.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA02A1395FF62006ADC12 /* ResourceManager.h */; };
-		A2E663C3139E883E00310FC8 /* ResourceSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */; };
 		A2E663C4139E883E00310FC8 /* ResourceSource.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA02C1395FF62006ADC12 /* ResourceSource.h */; };
 		A2E663C5139E883E00310FC8 /* SaveGame.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA02D1395FF62006ADC12 /* SaveGame.h */; };
 		A2E663C6139E883E00310FC8 /* SaveGameIterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */; };
@@ -1683,7 +1681,6 @@
 		A2BFA0281395FF62006ADC12 /* ResourceDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceDesc.h; sourceTree = "<group>"; };
 		A2BFA0291395FF62006ADC12 /* ResourceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceManager.cpp; sourceTree = "<group>"; };
 		A2BFA02A1395FF62006ADC12 /* ResourceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceManager.h; sourceTree = "<group>"; };
-		A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceSource.cpp; sourceTree = "<group>"; };
 		A2BFA02C1395FF62006ADC12 /* ResourceSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceSource.h; sourceTree = "<group>"; };
 		A2BFA02D1395FF62006ADC12 /* SaveGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveGame.h; sourceTree = "<group>"; };
 		A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SaveGameIterator.cpp; sourceTree = "<group>"; };
@@ -5278,7 +5275,6 @@
 				A2BFA0281395FF62006ADC12 /* ResourceDesc.h */,
 				A2BFA0291395FF62006ADC12 /* ResourceManager.cpp */,
 				A2BFA02A1395FF62006ADC12 /* ResourceManager.h */,
-				A2BFA02B1395FF62006ADC12 /* ResourceSource.cpp */,
 				A2BFA02C1395FF62006ADC12 /* ResourceSource.h */,
 				A2F5F065246102D70073802C /* RNG.cpp */,
 				A2F5F064246102D70073802C /* RNG.h */,
@@ -9592,7 +9588,6 @@
 				A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */,
 				A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */,
 				A29BF8D913A04A6F00C812DD /* ResourceManager.cpp in Sources */,
-				A29BF8DA13A04A6F00C812DD /* ResourceSource.cpp in Sources */,
 				A29BF8DB13A04A6F00C812DD /* SaveGameIterator.cpp in Sources */,
 				A29BF8DC13A04A6F00C812DD /* SaveGameMgr.cpp in Sources */,
 				A29BF8DD13A04A6F00C812DD /* ScriptedAnimation.cpp in Sources */,
@@ -9817,7 +9812,6 @@
 				A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */,
 				A2E663C1139E883E00310FC8 /* ResourceManager.cpp in Sources */,
 				A2F5F06C246102D70073802C /* RNG.cpp in Sources */,
-				A2E663C3139E883E00310FC8 /* ResourceSource.cpp in Sources */,
 				A2E663C6139E883E00310FC8 /* SaveGameIterator.cpp in Sources */,
 				A2E7E1972668977F0064423F /* IndexedArchive.cpp in Sources */,
 				A2E663C8139E883E00310FC8 /* SaveGameMgr.cpp in Sources */,
