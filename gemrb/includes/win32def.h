@@ -32,7 +32,6 @@
 #define UNICODE
 #define _UNICODE
 #define NOGDI
-#define _USE_MATH_DEFINES
 #define NOCOLOR
 
 #ifdef _DEBUG
