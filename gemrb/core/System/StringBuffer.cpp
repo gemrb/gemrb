@@ -36,12 +36,9 @@ void StringBuffer::appendFormatted(const char* message, ...)
 	const size_t len = vsnprintf(NULL, 0, message, ap);
 	va_end(ap);
 
-#if defined(__GNUC__)
-	__extension__ // Variable-length arrays
-#endif
-	char buf[len+1];
+	std::string buf(len + 1, '\0');
 	va_start(ap, message);
-	vsnprintf(buf, len + 1, message, ap);
+	vsnprintf(&buf[0], len + 1, message, ap);
 	va_end(ap);
 
 	// TODO: If we manage the string ourselves, we can avoid this extra copy.
