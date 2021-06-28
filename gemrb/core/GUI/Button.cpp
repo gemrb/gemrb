@@ -657,7 +657,7 @@ void Button::SetPicture(Holder<Sprite2D> newpic)
 	Picture = newpic;
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
-		unsigned int ratio = round((float) Picture->Frame.w / (float) frame.w);
+		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
 		if (ratio > 1) {
 			Holder<Sprite2D> img = core->GetVideoDriver()->SpriteScaleDown(Picture, ratio);
 			Picture = img;
