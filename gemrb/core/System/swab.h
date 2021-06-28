@@ -30,7 +30,13 @@ extern "C" {
 #endif
 
 #ifndef HAVE_SWAB
+
+#ifdef HAVE_CSWAB
+#define swab(a,b,c)  swab((char*)(a), (char*)(b), (c))
+#else
 GEM_EXPORT void swab(const void *bfrom, void *bto, ssize_t n);
+#endif
+
 #endif
 GEM_EXPORT void swabs(void *buf, ssize_t n);
 

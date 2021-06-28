@@ -31,6 +31,7 @@
 #cmakedefine RPI 1
 #cmakedefine HAVE_MMAP ${HAVE_MMAP}
 #cmakedefine HAVE_SWAB 1
+#cmakedefine HAVE_CSWAB 1
 #cmakedefine SUPPORTS_MEMSTREAM ${SUPPORTS_MEMSTREAM}
 #cmakedefine01 ICONV_ACCEPTS_NONCONST_INPUT
 #define BAKE_ICON 1
