@@ -118,7 +118,7 @@ Projectile* PROImporter::GetProjectile(Projectile *s)
 Holder<ProjectileExtension> PROImporter::GetAreaExtension()
 {
 	ieWord tmp;
-	Holder<ProjectileExtension> e;
+	Holder<ProjectileExtension> e = MakeHolder<ProjectileExtension>();
 
 	str->ReadDword(e->AFlags);
 	str->ReadWord(e->TriggerRadius);
