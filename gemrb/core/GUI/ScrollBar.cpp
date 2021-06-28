@@ -26,9 +26,6 @@
 #include "GUI/TextArea.h"
 #include "GUI/Window.h"
 
-#define _USE_MATH_DEFINES
-#include <cmath>
-
 namespace GemRB {
 
 ScrollBar::ScrollBar(const Region& frame, const Holder<Sprite2D> images[IMAGE_COUNT])
