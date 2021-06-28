@@ -29,6 +29,7 @@
 #define DATASTREAM_H
 
 #include "Platform.h"
+#include "Region.h"
 #include "Resource.h"
 #include "System/swab.h"
 
@@ -91,6 +92,10 @@ public:
 	
 	int WriteResRef(const ieResRef src);
 	int WriteResRef(const ResRef& src);
+	
+	int ReadPoint(Point&);
+	int WritePoint(const Point&);
+	
 	virtual int Seek(int pos, int startpos) = 0;
 	unsigned long Remains() const;
 	unsigned long Size() const;

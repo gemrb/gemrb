@@ -133,6 +133,27 @@ int DataStream::WriteResRef(const ResRef& src)
 	return Write(src.CString(), 8);
 }
 
+int DataStream::ReadPoint(Point &p)
+{
+	// in the data files Points are 16bit per coord as opposed to our 32ish
+	ieWord coord;
+	int ret = ReadScalar(coord);
+	p.x = coord;
+	ret += ReadScalar(coord);
+	p.y = coord;
+	return ret;
+}
+
+int DataStream::WritePoint(const Point &p)
+{
+	// in the data files Points are 16bit per coord as opposed to our 32ish
+	ieWord coord = p.x;
+	int ret = WriteScalar(coord);
+	coord = p.y;
+	ret += WriteScalar(coord);
+	return ret;
+}
+
 int DataStream::ReadLine(void* buf, unsigned long maxlen)
 {
 	// FIXME: eof?
