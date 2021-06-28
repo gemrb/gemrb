@@ -575,8 +575,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieDword FirstVertex, Cursor, Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
-		ieWord PosX, PosY;
-		ieWord TalkX, TalkY;
+		Point pos;
+		Point talkPos;
 		ieVariable Name, Entrance;
 		ieResRef Script, KeyResRef;
 		struct ResRef Destination;
@@ -614,29 +614,24 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord(LaunchY);
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef( Script );
-		str->ReadWord(PosX);
-		str->ReadWord(PosY);
-		/* ARE 9.1: 4B per position after that, but let's just try the lower two ones. */
+		/* ARE 9.1: 4B per position after that. */
 		if (16 == map->version) {
-			str->ReadWord(PosX);
-			str->Seek(2, GEM_CURRENT_POS);
-			str->ReadWord(PosY);
+			str->ReadScalar(pos.x);
+			str->ReadScalar(pos.y);
 			str->Seek(30, GEM_CURRENT_POS);
 		} else {
+			str->ReadPoint(pos);
 			//maybe we have to store this
 			str->Seek( 36, GEM_CURRENT_POS );
 		}
 
 		if (core->HasFeature(GF_INFOPOINT_DIALOGS)) {
 			str->ReadResRef( WavResRef );
-			str->ReadWord(TalkX);
-			str->ReadWord(TalkY);
+			str->ReadPoint(talkPos);
 			str->ReadDword(DialogName);
 			str->ReadResRef( DialogResRef );
 		} else {
 			memset(WavResRef, 0, sizeof(WavResRef));
-			TalkX = 0;
-			TalkY = 0;
 			DialogName = -1;
 			memset(DialogResRef, 0, sizeof(DialogResRef));
 		}
@@ -656,8 +651,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				// we approximate a bounding box equivalent to a small radius
 				// we copied this from the Container code that seems to indicate
 				// this is how the originals behave. It is probably "good enough"
-				bbox.x = PosX - 7;
-				bbox.y = PosY - 5;
+				bbox.x = pos.x - 7;
+				bbox.y = pos.y - 5;
 				bbox.w = 16;
 				bbox.h = 12;
 			}
@@ -676,11 +671,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		} else {
 			Point* points = new Point[VertexCount];
 			for (x = 0; x < VertexCount; x++) {
-				ieWord coord;
-				str->ReadWord(coord);
-				points[x].x = coord;
-				str->ReadWord(coord);
-				points[x].y = coord;
+				str->ReadPoint(points[x]);
 			}
 			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
 			delete[] points;
@@ -702,14 +693,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ip->StrRef = StrRef; //we need this when saving area
 		ip->SetMap(map);
 		ip->Flags = Flags;
-		ip->UsePoint.x = PosX;
-		ip->UsePoint.y = PosY;
+		ip->UsePoint = pos;
 		//FIXME: PST doesn't use this field
 		if (ip->GetUsePoint()) {
 			ip->Pos = ip->UsePoint;
 		} else {
-			ip->Pos.x = bbox.x + ( bbox.w / 2 );
-			ip->Pos.y = bbox.y + ( bbox.h / 2 );
+			ip->Pos = bbox.Center();
 		}
 		ip->Destination = Destination;
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
@@ -718,11 +707,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		//these appear only in PST, but we could support them everywhere
 		// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
 		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-			TalkX = ip->Pos.x;
-			TalkY = ip->Pos.y;
+			talkPos = ip->Pos;
 		}
-		ip->TalkPos.x=TalkX;
-		ip->TalkPos.y=TalkY;
+		ip->TalkPos = talkPos;
 		ip->DialogName=DialogName;
 		ip->SetDialog(DialogResRef);
 		ip->SetEnter(WavResRef);
@@ -741,16 +728,15 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		ieWord Type, LockDiff;
 		ieDword Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		ieWord XPos, YPos;
-		ieWord LaunchX, LaunchY;
+		Point pos;
+		Point launchPos;
 		ieDword ItemIndex, ItemCount;
 		ieResRef KeyResRef;
 		ieStrRef OpenFail;
 
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->ReadWord(XPos);
-		str->ReadWord(YPos);
+		str->ReadPoint(pos);
 		str->ReadWord(Type);
 		str->ReadWord(LockDiff);
 		str->ReadDword(Flags);
@@ -758,8 +744,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord(TrapRemDiff);
 		str->ReadWord(Trapped);
 		str->ReadWord(TrapDetected);
-		str->ReadWord(LaunchX);
-		str->ReadWord(LaunchY);
+		str->ReadPoint(launchPos);
 		Region bbox;
 		ieWord tmp;
 		str->ReadWord(tmp);
@@ -794,8 +779,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			 * but bg2 gives them this bounding box at first load,
 			 * should we specifically check for Type==IE_CONTAINER_PILE? */
 			if (bbox.size.IsInvalid()) {
-				bbox.x = XPos - 7;
-				bbox.y = YPos - 5;
+				bbox.x = pos.x - 7;
+				bbox.y = pos.y - 5;
 				bbox.w = 16;
 				bbox.h = 12;
 			}
@@ -816,16 +801,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		}
 
 		//c->SetMap(map);
-		c->Pos.x = XPos;
-		c->Pos.y = YPos;
+		c->Pos = pos;
 		c->LockDifficulty = LockDiff;
 		c->Flags = Flags;
 		c->TrapDetectionDiff = TrapDetDiff;
 		c->TrapRemovalDiff = TrapRemDiff;
 		c->Trapped = Trapped;
 		c->TrapDetected = TrapDetected;
-		c->TrapLaunch.x = LaunchX;
-		c->TrapLaunch.y = LaunchY;
+		c->TrapLaunch = launchPos;
 		//reading items into a container
 		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
 		while(ItemCount--) {
@@ -1127,7 +1110,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule, RemovalTime;
-			ieWord XPos, YPos, XDes, YDes, MaxDistance, Spawned;
+			Point pos;
+			Point des;
+			ieWord MaxDistance, Spawned;
 			ieResRef Dialog;
 			ieResRef Scripts[8]; //the original order is shown in scrlev.ids
 			ieDword Flags;
@@ -1135,10 +1120,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 			str->Read( DefaultName, 32);
 			DefaultName[32]=0;
-			str->ReadWord(XPos);
-			str->ReadWord(YPos);
-			str->ReadWord(XDes);
-			str->ReadWord(YDes);
+			str->ReadPoint(pos);
+			str->ReadPoint(des);
 			str->ReadDword(Flags);
 			str->ReadWord(Spawned);
 			str->Seek( 1, GEM_CURRENT_POS ); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
@@ -1194,12 +1177,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				continue;
 			}
 			map->AddActor(ab, false);
-			ab->Pos.x = XPos;
-			ab->Pos.y = YPos;
-			ab->Destination.x = XPos;
-			ab->Destination.y = YPos;
-			ab->HomeLocation.x = XDes;
-			ab->HomeLocation.y = YDes;
+			ab->Pos = pos;
+			ab->Destination = des;
+			ab->HomeLocation = des;
 			ab->maxWalkDistance = MaxDistance;
 			ab->Spawned = Spawned;
 			ab->appearance = Schedule;
@@ -1960,13 +1940,8 @@ int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p)
 
 int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 {
-	ieWord tmpWord;
-
 	for(size_t j=0;j<count;j++) {
-		tmpWord = p[j].x;
-		stream->WriteWord(tmpWord);
-		tmpWord = p[j].y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(p[j]);
 	}
 	return 0;
 }
