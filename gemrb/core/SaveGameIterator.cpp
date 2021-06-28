@@ -448,7 +448,7 @@ static bool DoSaveGame(const char *Path)
 		return false;
 	}
 
-	PluginHolder<ImageWriter> im(PLUGIN_IMAGE_WRITER_BMP);
+	PluginHolder<ImageWriter> im = MakePluginHolder<ImageWriter>(PLUGIN_IMAGE_WRITER_BMP);
 	if (!im) {
 		Log(ERROR, "SaveGameIterator", "Couldn't create the BMPWriter!");
 		return false;

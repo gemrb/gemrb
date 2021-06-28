@@ -1376,7 +1376,7 @@ void CREImporter::ReadEffects(Actor *act)
 
 void CREImporter::GetEffect(Effect *fx)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 
 	eM->Open( str, false );
 	if (TotSCEFF) {
@@ -2983,7 +2983,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor)
 
 int CREImporter::PutEffects( DataStream *stream, const Actor *actor)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
 
 	std::list< Effect* >::const_iterator f=actor->fxqueue.GetFirstEffect();

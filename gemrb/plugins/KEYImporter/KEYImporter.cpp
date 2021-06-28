@@ -224,7 +224,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 		return NULL;
 	}
 
-	PluginHolder<IndexedArchive> ai(IE_BIF_CLASS_ID);
+	PluginHolder<IndexedArchive> ai = MakePluginHolder<IndexedArchive>(IE_BIF_CLASS_ID);
 	if (ai->OpenArchive( biffiles[bifnum].path ) == GEM_ERROR) {
 		print("Cannot open archive %s", biffiles[bifnum].path);
 		return NULL;

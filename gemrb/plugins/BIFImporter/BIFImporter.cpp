@@ -58,7 +58,7 @@ DataStream* BIFImporter::DecompressBIFC(DataStream* compressed, const char* path
 	print("Decompressing");
 	if (!core->IsAvailable( PLUGIN_COMPRESSION_ZLIB ))
 		return NULL;
-	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
+	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 	ieDword unCompBifSize;
 	compressed->ReadDword(unCompBifSize);
 #if !defined(SUPPORTS_MEMSTREAM)

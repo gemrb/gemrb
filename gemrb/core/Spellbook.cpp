@@ -524,7 +524,7 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 	CopyResRef(spl->SpellResRef, spell->Name);
 	spl->Level = 0;
 	if (IWD2Style) {
-		PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
+		PluginHolder<ActorMgr> gm = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 		// is there an override (domain spells)?
 		if (level == -1) {
 			level = spell->SpellLevel-1;

@@ -911,7 +911,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
 	int ret = -1;
 	Map *newMap;
-	PluginHolder<MapMgr> mM(IE_ARE_CLASS_ID);
+	PluginHolder<MapMgr> mM = MakePluginHolder<MapMgr>(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
 
 	int index = FindMap(ResRef);

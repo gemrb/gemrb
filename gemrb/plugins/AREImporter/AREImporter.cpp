@@ -84,7 +84,7 @@ static void ReleaseMemory()
 
 static void ReadAutonoteINI()
 {
-	INInote = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+	INInote = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	char tINInote[_MAX_PATH];
 	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
 	FileStream* fs = FileStream::OpenFile( tINInote );
@@ -273,7 +273,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	} else {
 		snprintf( TmpResRef, 9, "%.7sN", map->WEDResRef.CString());
 	}
-	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
+	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 	tmm->SetExtendedNight( !day_or_night );
@@ -440,7 +440,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		snprintf( TmpResRef, 9, "%.7sN", WEDResRef);
 	}
 
-	PluginHolder<TileMapMgr> tmm(IE_WED_CLASS_ID);
+	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
 
@@ -1121,7 +1121,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (!core->IsAvailable( IE_CRE_CLASS_ID )) {
 		Log(WARNING, "AREImporter", "No Actor Manager Available, skipping actors");
 	} else {
-		PluginHolder<ActorMgr> actmgr(IE_CRE_CLASS_ID);
+		PluginHolder<ActorMgr> actmgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 		for (i = 0; i < ActorCount; i++) {
 			ieVariable DefaultName;
 			ieResRef CreResRef;
@@ -1615,7 +1615,7 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 {
 	unsigned int i;
 
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(ds);
 
 	for (i = 0; i < EffectsCount; i++) {
@@ -1638,7 +1638,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	ActorCount = (ieWord) map->GetActorCount(false);
 	headersize += ActorCount * 0x110;
 
-	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
+	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	EmbeddedCreOffset = headersize;
 
 	for (i=0;i<ActorCount;i++) {
@@ -2227,7 +2227,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	char filling[120];
 	unsigned int i;
 
-	PluginHolder<ActorMgr> am(IE_CRE_CLASS_ID);
+	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
 	for (i=0;i<ActorCount;i++) {
 		Actor *ac = map->GetActor(i, false);
@@ -2478,7 +2478,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
 
 int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
 
 	std::list< Effect* >::const_iterator f=fxqueue->GetFirstEffect();

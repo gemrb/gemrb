@@ -48,7 +48,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 			return NULL;
 		}
 
-		PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
+		PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 		if (comp->Decompress(&out, stream, length) != GEM_OK)
 			return NULL;
 	} else {

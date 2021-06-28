@@ -91,7 +91,7 @@ static Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
 		return NULL;
 	}
 
-	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 	return ini;
 }

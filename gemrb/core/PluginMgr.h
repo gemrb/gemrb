@@ -136,20 +136,13 @@ public:
 	Plugin* GetDriver(const TypeID* type, const char* name);
 };
 
-template <class T>
-class PluginHolder : public Holder<T> {
-public:
-	PluginHolder()
-	{
-	}
-	PluginHolder(PluginID id)
-		: Holder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)))
-	{
-	}
-	~PluginHolder()
-	{
-	}
-};
+template <typename T>
+using PluginHolder = Holder<T>;
+
+template <typename T>
+PluginHolder<T> MakePluginHolder(PluginID id) {
+	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
+}
 
 }
 

@@ -122,7 +122,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 	if (!tisfile) {
 		return -1;
 	}
-	PluginHolder<TileSetMgr> tis(IE_TIS_CLASS_ID);
+	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
 	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
 	for (int y = 0; y < overlays->Height; y++) {

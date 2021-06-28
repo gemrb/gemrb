@@ -396,7 +396,7 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 
 void ITMImporter::GetFeature(Effect *fx, Item *s)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
 	CopyResRef(fx->Source, s->Name);

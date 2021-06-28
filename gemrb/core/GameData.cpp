@@ -100,7 +100,7 @@ Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 	if (!ds)
 		return 0;
 
-	PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
+	PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	if (!actormgr->Open(ds)) {
 		return 0;
 	}
@@ -118,7 +118,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin( nPath, core->GamePath, "characters", fName, NULL );
 		stream = FileStream::OpenFile(nPath);
-		PluginHolder<ActorMgr> actormgr(IE_CRE_CLASS_ID);
+		PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 		if (!actormgr->Open(stream)) {
 			return -1;
 		}
@@ -165,7 +165,7 @@ int GameData::LoadTable(const ResRef &resRef, bool silent)
 	if (!str) {
 		return -1;
 	}
-	PluginHolder<TableMgr> tm(IE_2DA_CLASS_ID);
+	PluginHolder<TableMgr> tm = MakePluginHolder<TableMgr>(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
 		return -1;
@@ -269,7 +269,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 		return item;
 	}
 	DataStream* str = GetResource(resname, IE_ITM_CLASS_ID, silent);
-	PluginHolder<ItemMgr> sm(IE_ITM_CLASS_ID);
+	PluginHolder<ItemMgr> sm = MakePluginHolder<ItemMgr>(IE_ITM_CLASS_ID);
 	if (!sm) {
 		delete ( str );
 		return NULL;
@@ -307,7 +307,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 		return spell;
 	}
 	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
-	PluginHolder<SpellMgr> sm(IE_SPL_CLASS_ID);
+	PluginHolder<SpellMgr> sm = MakePluginHolder<SpellMgr>(IE_SPL_CLASS_ID);
 	if (!sm) {
 		delete ( str );
 		return NULL;
@@ -345,7 +345,7 @@ Effect* GameData::GetEffect(const ResRef &resname)
 		return effect;
 	}
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
-	PluginHolder<EffectMgr> em(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	if (!em) {
 		delete ( str );
 		return NULL;
@@ -465,7 +465,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	{
 		DataStream* ret = GetResource( resname, type, silent );
 		if (ret) {
-			PluginHolder<AnimationMgr> ani(IE_BAM_CLASS_ID);
+			PluginHolder<AnimationMgr> ani = MakePluginHolder<AnimationMgr>(IE_BAM_CLASS_ID);
 			if (!ani)
 				return NULL;
 			if (!ani->Open(ret))
@@ -507,7 +507,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 	}
 
 	DataStream* str = gamedata->GetResource(resRef, IE_STO_CLASS_ID);
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		delete ( str );
 		return NULL;
@@ -537,7 +537,7 @@ void GameData::SaveStore(Store* store)
 		error("GameData", "Saving a store that wasn't cached.");
 	}
 
-	PluginHolder<StoreMgr> sm(IE_STO_CLASS_ID);
+	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
 		error("GameData", "Can't save store to cache.");
 	}

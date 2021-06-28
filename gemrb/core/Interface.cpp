@@ -1489,7 +1489,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
-	guiscript = PluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
+	guiscript = MakePluginHolder<ScriptEngine>(IE_GUI_SCRIPT_CLASS_ID);
 	if (guiscript == nullptr) {
 		Log(FATAL, "Core", "Missing GUI Script Engine.");
 		return GEM_ERROR;
@@ -1581,7 +1581,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "No TLK Importer Available.");
 		return GEM_ERROR;
 	}
-	strings = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
 	PathJoin(strpath, GamePath, "dialog.tlk", nullptr);
@@ -1594,7 +1594,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	// does the language use an extra tlk?
 	if (strings->HasAltTLK()) {
-		strings2 = PluginHolder<StringMgr>(IE_TLK_CLASS_ID);
+		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
 		char strpath[_MAX_PATH];
 		PathJoin(strpath, GamePath, "dialogf.tlk", nullptr);
@@ -1639,7 +1639,7 @@ int Interface::Init(InterfaceConfig* config)
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
 	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
 
-	guifact = PluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
+	guifact = MakePluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
@@ -1667,7 +1667,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing Music Manager...");
-	music = PluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
+	music = MakePluginHolder<MusicMgr>(IE_MUS_CLASS_ID);
 	if (!music) {
 		Log(FATAL, "Core", "Failed to load Music Manager.");
 		return GEM_ERROR;
@@ -1689,7 +1689,7 @@ int Interface::Init(InterfaceConfig* config)
 	int resdata = HasFeature( GF_RESDATA_INI );
 	if (resdata || HasFeature(GF_SOUNDS_INI) ) {
 		Log(MESSAGE, "Core", "Loading resource data File...");
-		INIresdata = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		INIresdata = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		DataStream* ds = gamedata->GetResource(resdata? "resdata":"sounds", IE_INI_CLASS_ID);
 		if (!INIresdata->Open(ds)) {
 			Log(WARNING, "Core", "Failed to load resource data.");
@@ -1704,7 +1704,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	if (HasFeature( GF_HAS_PARTY_INI )) {
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
-		INIparty = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
 		PathJoin(tINIparty, GamePath, "Party.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIparty );
@@ -1719,7 +1719,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
-		INIbeasts = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
 		PathJoin(tINIbeasts, GamePath, "beast.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
@@ -1728,7 +1728,7 @@ int Interface::Init(InterfaceConfig* config)
 		}
 
 		Log(MESSAGE, "Core", "Loading quests definition File...");
-		INIquests = PluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
+		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
 		PathJoin(tINIquests, GamePath, "quests.ini", nullptr);
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
@@ -2165,7 +2165,7 @@ bool Interface::LoadGemRBINI()
 		Log(ERROR, "Core", "No INI Importer Available.");
 		return false;
 	}
-	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
 	ResRef tooltipBG;
@@ -2261,7 +2261,7 @@ bool Interface::LoadEncoding()
 	Log(MESSAGE, "Core", "Loading encoding definition for %s: '%s'", Encoding.c_str(),
 		inifile->originalfile);
 
-	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
@@ -2704,7 +2704,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!str) {
 		return -1;
 	}
-	PluginHolder<SymbolMgr> sm(IE_IDS_CLASS_ID);
+	PluginHolder<SymbolMgr> sm = MakePluginHolder<SymbolMgr>(IE_IDS_CLASS_ID);
 	if (!sm) {
 		delete str;
 		return -1;
@@ -2965,7 +2965,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	DataFileMgr* defaults = NULL;
 	DataFileMgr* overrides = NULL;
 
-	PluginHolder<DataFileMgr> ini(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
 	// if filename is not set we assume we are creating defaults without an INI
 	bool opened = ini->Open(iniStream);
@@ -2978,7 +2978,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		delete iniStream; // Open deletes it itself on success
 	}
 
-	PluginHolder<DataFileMgr> gemINI(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> gemINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	DataStream* gemINIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
 
 	if (!gemINIStream || !gemINI->Open(gemINIStream)) {
@@ -3049,7 +3049,7 @@ bool Interface::SaveConfig()
 		}
 	}
 
-	PluginHolder<DataFileMgr> defaultsINI(IE_INI_CLASS_ID);
+	PluginHolder<DataFileMgr> defaultsINI = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	DataStream* INIStream = gamedata->GetResource( "defaults", IE_INI_CLASS_ID );
 
 	if (INIStream && defaultsINI->Open(INIStream)) {
@@ -3208,8 +3208,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	}
 
 	// These are here because of the goto
-	PluginHolder<SaveGameMgr> gam_mgr(IE_GAM_CLASS_ID);
-	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+	PluginHolder<SaveGameMgr> gam_mgr = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 
 	if (!gam_str || !(wmp_str1 || wmp_str2) )
@@ -3243,7 +3243,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	LoadProgress(20);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
-		PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
+		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 		if (ai) {
 			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
 				goto cleanup;
@@ -3284,7 +3284,7 @@ cleanup:
 void Interface::UpdateWorldMap(ResRef wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
-	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);(IE_WMP_CLASS_ID);
 
 	if (!wmp_str || !wmp_mgr || !wmp_mgr->Open(wmp_str, NULL)) {
 		Log(ERROR, "Core", "Could not update world map %s", wmResRef.CString());
@@ -3318,7 +3318,7 @@ void Interface::UpdateMasterScript()
 		game->SetScript( GlobalScript, 0 );
 	}
 
-	PluginHolder<WorldMapMgr> wmp_mgr(IE_WMP_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	if (! wmp_mgr)
 		return;
 
@@ -4158,7 +4158,7 @@ int Interface::GetMouseScrollSpeed() {
 
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
-	PluginHolder<DialogMgr> dm(IE_DLG_CLASS_ID);
+	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
@@ -4362,7 +4362,7 @@ int Interface::SwapoutArea(Map *map)
 		return 0;
 	}
 
-	PluginHolder<MapMgr> mm(IE_ARE_CLASS_ID);
+	PluginHolder<MapMgr> mm = MakePluginHolder<MapMgr>(IE_ARE_CLASS_ID);
 	if (mm == nullptr) {
 		return -1;
 	}
@@ -4396,7 +4396,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (!actor) {
 		return -1;
 	}
-	PluginHolder<ActorMgr> gm(IE_CRE_CLASS_ID);
+	PluginHolder<ActorMgr> gm = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}
@@ -4427,7 +4427,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 int Interface::WriteGame(const char *folder)
 {
-	PluginHolder<SaveGameMgr> gm(IE_GAM_CLASS_ID);
+	PluginHolder<SaveGameMgr> gm = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}
@@ -4453,7 +4453,7 @@ int Interface::WriteGame(const char *folder)
 
 int Interface::WriteWorldMap(const char *folder)
 {
-	PluginHolder<WorldMapMgr> wmm(IE_WMP_CLASS_ID);
+	PluginHolder<WorldMapMgr> wmm = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	if (wmm == nullptr) {
 		return -1;
 	}
@@ -4501,7 +4501,7 @@ int Interface::CompressSave(const char *folder)
 	if (!dir) {
 		return -1;
 	}
-	PluginHolder<ArchiveImporter> ai(IE_SAV_CLASS_ID);
+	PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
 	dir.SetFlags(DirectoryIterator::Files);

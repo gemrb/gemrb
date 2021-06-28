@@ -103,7 +103,7 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	unsigned long Pos = str->GetPos(); //storing the stream position
 	str->WriteDword(complen);
 
-	PluginHolder<Compressor> comp(PLUGIN_COMPRESSION_ZLIB);
+	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 	comp->Compress( str, uncompressed );
 
 	//writing compressed length (calculated)

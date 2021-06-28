@@ -241,7 +241,7 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 
 void SPLImporter::GetFeature(Spell *s, Effect *fx)
 {
-	PluginHolder<EffectMgr> eM(IE_EFF_CLASS_ID);
+	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
 	memcpy(fx->Source, s->Name, 9);
