@@ -2859,15 +2859,14 @@ AreaAnimation *Map::GetAnimation(const char *Name) const
 	return NULL;
 }
 
-Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ResRef *creatures, unsigned int count)
+Spawn *Map::AddSpawn(char* Name, const Point &p, ResRef *creatures, unsigned int count)
 {
 	Spawn* sp = new Spawn();
 	strnspccpy(sp->Name, Name, 32);
 	if (count>MAX_RESCOUNT) {
 		count=MAX_RESCOUNT;
 	}
-	sp->Pos.x = (ieWord) XPos;
-	sp->Pos.y = (ieWord) YPos;
+	sp->Pos = p;
 	sp->Count = count;
 	sp->Creatures = new ResRef[count];
 	for( unsigned int i=0;i<count;i++) {
@@ -2877,12 +2876,11 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ResRef *creatures, unsigned
 	return sp;
 }
 
-void Map::AddEntrance(const char* Name, int XPos, int YPos, short Face)
+void Map::AddEntrance(const char* Name, const Point &p, short Face)
 {
 	Entrance* ent = new Entrance();
 	strlcpy( ent->Name, Name, sizeof(ent->Name) );
-	ent->Pos.x = (ieWord) XPos;
-	ent->Pos.y = (ieWord) YPos;
+	ent->Pos = p;
 	ent->Face = (ieWord) Face;
 	entrances.push_back( ent );
 }

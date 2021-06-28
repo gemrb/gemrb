@@ -1065,7 +1065,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	for (i = 0; i < SpawnCount; i++) {
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		ieVariable Name;
-		ieWord XPos, YPos;
+		Point Pos;
 		ieWord Count, Difficulty, Frequency, Method;
 		ieWord Maximum, Enabled;
 		struct ResRef creatures[MAX_RESCOUNT];
@@ -1076,8 +1076,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->ReadWord(XPos);
-		str->ReadWord(YPos);
+		str->ReadPoint(Pos);
 		for (unsigned int j = 0;j < MAX_RESCOUNT; j++) {
 			str->ReadResRef( creatures[j] );
 		}
@@ -1094,7 +1093,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadWord(DayChance);
 		str->ReadWord(NightChance);
 
-		Spawn *sp = map->AddSpawn(Name, XPos, YPos, creatures, Count);
+		Spawn *sp = map->AddSpawn(Name, Pos, creatures, Count);
 		sp->Difficulty = Difficulty;
 		//this value is used in a division, better make it nonzero now
 		//this will fix any old gemrb saves vs. the original engine
@@ -1306,14 +1305,14 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (i = 0; i < EntrancesCount; i++) {
 		ieVariable Name;
-		ieWord XPos, YPos, Face;
+		Point Pos;
+		ieWord Face;
 		str->Read( Name, 32 );
 		Name[32] = 0;
-		str->ReadWord(XPos);
-		str->ReadWord(YPos);
+		str->ReadPoint(Pos);
 		str->ReadWord(Face);
 		str->Seek( 66, GEM_CURRENT_POS );
-		map->AddEntrance( Name, XPos, YPos, Face );
+		map->AddEntrance(Name, Pos, Face);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading variables");

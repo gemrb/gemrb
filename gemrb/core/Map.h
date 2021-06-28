@@ -537,7 +537,7 @@ public:
 	void FadeSparkle(const Point &pos, bool forced) const;
 
 	//entrances
-	void AddEntrance(const char* Name, int XPos, int YPos, short Face);
+	void AddEntrance(const char* Name, const Point &, short Face);
 	Entrance *GetEntrance(const char *Name) const;
 	Entrance *GetEntrance(int i) const { return entrances[i]; }
 	int GetEntranceCount() const { return (int) entrances.size(); }
@@ -612,7 +612,7 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(char* Name, int XPos, int YPos, ResRef *creatures, unsigned int count);
+	Spawn *AddSpawn(char* Name, const Point &, ResRef *creatures, unsigned int count);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name) const;
