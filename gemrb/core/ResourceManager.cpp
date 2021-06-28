@@ -28,15 +28,6 @@
 
 namespace GemRB {
 
-ResourceManager::ResourceManager()
-{
-}
-
-
-ResourceManager::~ResourceManager()
-{
-}
-
 bool ResourceManager::AddSource(const char *path, const char *description, PluginID type, int flags)
 {
 	PluginHolder<ResourceSource> source = MakePluginHolder<ResourceSource>(type);

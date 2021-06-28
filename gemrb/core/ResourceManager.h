@@ -40,9 +40,6 @@ class TypeID;
 
 class GEM_EXPORT ResourceManager {
 public:
-	ResourceManager();
-	~ResourceManager();
-
 	/**
 	 * Add ResourceSource to search path
 	 * @param[in] path Path to be used for source.
