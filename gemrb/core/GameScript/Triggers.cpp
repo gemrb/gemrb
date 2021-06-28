@@ -38,6 +38,9 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 namespace GemRB {
 
 //-------------------------------------------------------------
