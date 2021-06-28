@@ -26,6 +26,11 @@
 #include <cassert>
 #include <cstdio>
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 using namespace GemRB;
 
 template <typename TO, typename FROM>
@@ -1098,6 +1103,10 @@ void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 #else
 void OpenALAudioDriver::UpdateMapAmbient(MapReverb&) {
 }
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
 #endif
 
 #include "plugindef.h"
