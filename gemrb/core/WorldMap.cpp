@@ -249,7 +249,7 @@ WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& AreaName, unsigned int &i
 	int value = 0;
 	ieResRef tmp;
 
-	sscanf(&AreaName[2],"%4d", &value);
+	sscanf(AreaName.CString() + 2,"%4d", &value);
 	do {
 		snprintf(tmp, 9, "%.2s%04d", AreaName.CString(), value);
 		WMPAreaEntry* ret = GetArea(tmp, i);

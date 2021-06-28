@@ -139,11 +139,11 @@ void Door::ToggleTiles(int State, int playsound)
 
 	if (State) {
 		state = !closedIndex;
-		if (playsound && ( OpenSound[0] != '\0' ))
+		if (playsound && !OpenSound.IsEmpty())
 			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS);
 	} else {
 		state = closedIndex;
-		if (playsound && ( CloseSound[0] != '\0' ))
+		if (playsound && !CloseSound.IsEmpty())
 			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
 	}
 	for (i = 0; i < tilecount; i++) {
@@ -183,13 +183,13 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		Flags|=DOOR_LOCKED;
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
-		if (playsound && ( LockSound[0] != '\0' ))
+		if (playsound && !LockSound.IsEmpty())
 			core->GetAudioDrv()->Play(LockSound, SFX_CHAN_ACTIONS);
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
-		if (playsound && ( UnLockSound[0] != '\0' ))
+		if (playsound && !UnLockSound.IsEmpty())
 			core->GetAudioDrv()->Play(UnLockSound, SFX_CHAN_ACTIONS);
 	}
 }

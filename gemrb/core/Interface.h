@@ -677,7 +677,7 @@ public:
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
 	/** Returns the virtual worldmap entry of a sub-area */
-	int GetAreaAlias(const ieResRef areaname) const;
+	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);

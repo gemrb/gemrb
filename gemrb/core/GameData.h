@@ -178,6 +178,18 @@ inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceMa
 	return Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
 }
 
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, bool silent = false, bool useCorrupt = false)
+{
+	return Holder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
+}
+
+template <class T>
+inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, const ResourceManager& manager, bool silent = false)
+{
+	return Holder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
+}
+
 }
 
 #endif

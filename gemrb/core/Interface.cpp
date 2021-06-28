@@ -797,8 +797,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 	return true;
 }
 
-//this isn't const
-int Interface::GetAreaAlias(const ieResRef areaname) const
+int Interface::GetAreaAlias(const ResRef &areaname) const
 {
 	ieDword value;
 
