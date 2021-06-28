@@ -176,6 +176,8 @@ else (STATIC_LINK)
 	ENDIF(WIN32)
 endif (STATIC_LINK)
 
+target_compile_definitions(gemrb_core PRIVATE _USE_MATH_DEFINES)
+
 # make lintian happy
 SET_TARGET_PROPERTIES(gemrb_core PROPERTIES
 	VERSION "${GEMRB_VERSION}"

@@ -24,8 +24,6 @@
  * (Inverse) Discrete Cosine Transforms
  */
 
-#define _USE_MATH_DEFINES
-
 #include "dsputil.h"
 
 av_cold int ff_dct_init(DCTContext *s, int nbits, int inverse)

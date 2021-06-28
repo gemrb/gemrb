@@ -31,7 +31,6 @@
 #include "ie_types.h"
 #include <type_traits>
 
-#define _USE_MATH_DEFINES
 #include <cmath>
 
 #define VERSION_GEMRB "0.9.0-git"

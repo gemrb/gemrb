@@ -25,8 +25,6 @@
 
 #include "globals.h"
 
-#define _USE_MATH_DEFINES
-
 #include <cmath>
 #include <cstdint>
 #include <ctype.h>

@@ -30,7 +30,6 @@
 #include "Interface.h"
 #include "Scriptable/Actor.h"
 
-#define _USE_MATH_DEFINES
 #include <cmath>
 #include <cctype>
 
