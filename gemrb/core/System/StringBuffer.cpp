@@ -36,7 +36,8 @@ void StringBuffer::appendFormatted(const char* message, ...)
 	const size_t len = vsnprintf(NULL, 0, message, ap);
 	va_end(ap);
 
-	std::string buf(len + 1, '\0');
+	thread_local std::string buf;
+	buf.resize(len + 1, '\0');
 	va_start(ap, message);
 	vsnprintf(&buf[0], len + 1, message, ap);
 	va_end(ap);
