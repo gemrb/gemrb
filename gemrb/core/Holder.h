@@ -48,13 +48,10 @@ private:
  * The class T must have member function acquire and release, such that
  * acquire increases the refcount, and release decreses the refcount and
  * frees the object if needed.
- *
- * Derived class of Holder shouldn't add member variables. That way,
- * they can freely converted to Holder without slicing.
  */
 
 template <class T>
-class Holder {
+class Holder final {
 public:
 	Holder(T* ptr = nullptr) noexcept
 	: ptr(ptr)
