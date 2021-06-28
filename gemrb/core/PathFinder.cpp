@@ -195,8 +195,8 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 	int Max = Distance(start, dest);
 	for (int Steps = 0; Steps < Max; Steps++) {
 		Point p;
-		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
-		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
+		p.x = start.x + ((dest.x - start.x) * Steps / Max);
+		p.y = start.y + ((dest.y - start.y) * Steps / Max);
 
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix

@@ -2992,15 +2992,15 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 		if ((unsigned int) goal.y >= radiusy) {
 			if (bool(GetBlocked(scanx, goal.y - radiusy, size) & PathMapFlags::PASSABLE)) {
-				goal.x = (ieWord) scanx;
-				goal.y = (ieWord) (goal.y - radiusy);
+				goal.x = scanx;
+				goal.y = goal.y - radiusy;
 				return true;
 			}
 		}
 		if (goal.y + radiusy < Height) {
 			if (bool(GetBlocked(scanx, goal.y + radiusy, size) & PathMapFlags::PASSABLE)) {
-				goal.x = (ieWord) scanx;
-				goal.y = (ieWord) (goal.y + radiusy);
+				goal.x = scanx;
+				goal.y = goal.y + radiusy;
 				return true;
 			}
 		}
@@ -3019,15 +3019,15 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	for (unsigned int scany = miny; scany < maxy; scany++) {
 		if ((unsigned int) goal.x >= radiusx) {
 			if (bool(GetBlocked(goal.x - radiusx, scany, size) & PathMapFlags::PASSABLE)) {
-				goal.x = (ieWord) (goal.x - radiusx);
-				goal.y = (ieWord) scany;
+				goal.x = goal.x - radiusx;
+				goal.y = scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < Width) {
 			if (bool(GetBlocked(goal.x + radiusx, scany, size) & PathMapFlags::PASSABLE)) {
-				goal.x = (ieWord) (goal.x + radiusx);
-				goal.y = (ieWord) scany;
+				goal.x = goal.x + radiusx;
+				goal.y = scany;
 				return true;
 			}
 		}
@@ -3046,10 +3046,10 @@ void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned
 void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy, int size) const
 {
 	if ((unsigned int) goal.x > Width) {
-		goal.x = (ieWord) Width;
+		goal.x = Width;
 	}
 	if ((unsigned int) goal.y > Height) {
-		goal.y = (ieWord) Height;
+		goal.y = Height;
 	}
 
 	while(radiusx<Width || radiusy<Height) {

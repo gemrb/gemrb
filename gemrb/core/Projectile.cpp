@@ -1125,8 +1125,8 @@ void Projectile::LineTarget(const PathNode *beg, const PathNode *end) const
 			iter = iter->Next;
 		}
 
-		const Point s(short(first->x), short(first->y));
-		const Point d(short(last->x), short(last->y));
+		const Point s(first->x, first->y);
+		const Point d(last->x, last->y);
 		const std::vector<Actor *> &actors = area->GetAllActors();
 
 		for (Actor *target : actors) {
