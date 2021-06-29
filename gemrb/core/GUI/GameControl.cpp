@@ -435,31 +435,27 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 		}
 	}
 
-	if (!vpVector.IsZero()) {
-		if (MoveViewportTo(vpOrigin + vpVector, false)) {
-			if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
-				int cursorFrame = 0; // right
-				if (vpVector.y < 0) {
-					cursorFrame = 2; // up
-					if (vpVector.x > 0) cursorFrame--; // +right
-					else if (vpVector.x < 0) cursorFrame++; // +left
-				} else if (vpVector.y > 0) {
-					cursorFrame = 6; // down
-					if (vpVector.x > 0) cursorFrame++; // +right
-					else if (vpVector.x < 0) cursorFrame--; // +left
-				} else if (vpVector.x < 0) {
-					cursorFrame = 4; // left
-				}
-
-				if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
-					// set these cursors on game window so they are universal
-					window->SetCursor(core->GetScrollCursorSprite(cursorFrame, numScrollCursor));
-
-					numScrollCursor = (numScrollCursor+1) % 15;
-				}
+	if (!vpVector.IsZero() && MoveViewportTo(vpOrigin + vpVector, false)) {
+		if ((Flags() & IgnoreEvents) == 0 && core->GetMouseScrollSpeed()) {
+			int cursorFrame = 0; // right
+			if (vpVector.y < 0) {
+				cursorFrame = 2; // up
+				if (vpVector.x > 0) cursorFrame--; // +right
+				else if (vpVector.x < 0) cursorFrame++; // +left
+			} else if (vpVector.y > 0) {
+				cursorFrame = 6; // down
+				if (vpVector.x > 0) cursorFrame++; // +right
+				else if (vpVector.x < 0) cursorFrame--; // +left
+			} else if (vpVector.x < 0) {
+				cursorFrame = 4; // left
 			}
-		} else {
-			window->SetCursor(NULL);
+
+			if ((ScreenFlags & SF_ALWAYSCENTER) == 0) {
+				// set these cursors on game window so they are universal
+				window->SetCursor(core->GetScrollCursorSprite(cursorFrame, numScrollCursor));
+
+				numScrollCursor = (numScrollCursor+1) % 15;
+			}
 		}
 	} else if (!window->IsDisabled()) {
 		window->SetCursor(NULL);
