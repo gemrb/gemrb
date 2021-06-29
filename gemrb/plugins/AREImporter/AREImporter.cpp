@@ -363,26 +363,24 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	ResRef *main1[2] = { &map->SongHeader.MainNightAmbient1, &map->SongHeader.MainDayAmbient1 };
 	ResRef *main2[2] = { &map->SongHeader.MainNightAmbient2, &map->SongHeader.MainDayAmbient2 };
 	ieDword vol[2] = { map->SongHeader.MainNightAmbientVol, map->SongHeader.MainDayAmbientVol };
-	ieResRef mainAmbient = "";
+	ResRef mainAmbient;
 	if (!main1[day_or_night]->IsEmpty()) {
-		CopyResRef(mainAmbient, *main1[day_or_night]);
+		mainAmbient = *main1[day_or_night];
 	}
 	// the second ambient is always longer, was meant as a memory optimisation w/ IE_AMBI_HIMEM
 	// however that was implemented only for the normal ambients
 	// nowadays we can just skip the first
 	if (!main2[day_or_night]->IsEmpty()) {
-		CopyResRef(mainAmbient, *main2[day_or_night]);
+		mainAmbient = *main2[day_or_night];
 	}
-	if (!mainAmbient[0]) return NULL;
+	if (mainAmbient.IsEmpty()) return nullptr;
 
 	Ambient *ambi = new Ambient();
 	ambi->flags = IE_AMBI_ENABLED | IE_AMBI_LOOPING | IE_AMBI_MAIN | IE_AMBI_NOSAVE;
 	ambi->gain = vol[day_or_night];
 	// sounds and name
-	char *sound = (char *) malloc(9);
-	memcpy(sound, mainAmbient, 9);
-	ambi->sounds.push_back(sound);
-	memcpy(ambi->name, sound, 9);
+	ambi->sounds.emplace_back(mainAmbient);
+	memcpy(ambi->name, mainAmbient, 9);
 	ambi->appearance = (1<<25) - 1; // default to all 24 bits enabled, one per hour
 	ambi->radius = 50; // REFERENCE_DISTANCE
 	return ambi;
