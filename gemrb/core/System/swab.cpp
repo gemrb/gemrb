@@ -19,7 +19,7 @@
 #include "swab.h"
 
 // we use this because it works with overlapping buffers (undefined in POSIX)
-static inline void swab_private (const void *bfrom, void *bto, ssize_t n)
+void swab_const (const void *bfrom, void *bto, ssize_t n)
 {
   const char *from = (const char *) bfrom;
   char *to = (char *) bto;
@@ -33,14 +33,7 @@ static inline void swab_private (const void *bfrom, void *bto, ssize_t n)
     }
 }
 
-#ifndef HAVE_SWAB
-void swab (const void *bfrom, void *bto, ssize_t n)
-{
-	swab_private(bfrom, bto, n);
-}
-#endif
-
 void swabs (void *buf, ssize_t n)
 {
-	swab_private(buf, buf, n);
+	swab_const(buf, buf, n);
 }

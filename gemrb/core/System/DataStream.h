@@ -79,7 +79,7 @@ public:
 		int len;
 		if (IsBigEndian) {
 			T tmp;
-			swab(&src, &tmp, sizeof(T));
+			swab_const(&src, &tmp, sizeof(T));
 			len = Write(&tmp, sizeof(T));
 		} else {
 			len = Write(&src, sizeof(T));
