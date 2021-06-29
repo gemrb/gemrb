@@ -33,12 +33,9 @@ def EnterGame():
 #upgrade savegame to next version
 #this is not necessary if TotSC was already installed before starting the game
 def GameExpansion():
-	if not HasTOTSC():
-		return
-
-	#reload world map if it doesn't have AR1000
-	GemRB.UpdateWorldMap("WORLDMAP", "AR1000")
-	return
+	if HasTOTSC():
+		#reload world map if it doesn't have AR1000
+		GemRB.UpdateWorldMap("WORLDMAP", "AR1000")
 
 def HasTOTSC ():
 	return GemRB.HasResource ("toscst", RES_2DA)
