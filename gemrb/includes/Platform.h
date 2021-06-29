@@ -34,11 +34,6 @@
 	#endif
 #endif
 
-#ifndef HAVE_SIZEOF_SSIZE_T
-# define HAVE_SIZEOF_SSIZE_T
-using ssize_t = long int;
-#endif
-
 #include "exports.h"
 
 #ifndef _MAX_PATH
@@ -53,6 +48,15 @@ using ssize_t = long int;
 	#include "win32def.h"
 #elif defined(HAVE_UNISTD_H)
 	#include <unistd.h>
+#endif
+
+#ifndef HAVE_SIZEOF_SSIZE_T
+#define HAVE_SIZEOF_SSIZE_T
+#ifdef WIN32
+using ssize_t = SSIZE_T;
+#else
+using ssize_t = long int;
+#endif
 #endif
 
 #include <cstdio>
