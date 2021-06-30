@@ -76,7 +76,9 @@ void ScrollView::ContentView::ResizeToSubviews()
 	frame.h = newSize.h;
 
 	ScrollView* sv = static_cast<ScrollView*>(superView);
-	sv->UpdateScrollbars();
+	if (!sv->animation) {
+		sv->UpdateScrollbars();
+	}
 }
 	
 void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& clip)
