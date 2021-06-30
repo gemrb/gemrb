@@ -283,7 +283,7 @@ bool WithinRange(const Actor *actor, const Point &dest, int distance)
 
 bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance)
 {
-	double angle = AngleFromPoints(actor->Pos, dest);
+	double angle = AngleFromPoints(actor->Pos, dest->Pos);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
