@@ -342,7 +342,7 @@ void TextArea::UpdateScrollview()
 
 		if (core->HasFeature(GF_DIALOGUE_SCROLLS)) {
 			anim = 500;
-			y = -9999999; // FIXME: properly calculate the "bottom"?
+			y = 9999999; // FIXME: properly calculate the "bottom"?
 		} else {
 			int blankH = frame.h - LineHeight() - nodeBounds.h - optH;
 			if (blankH > 0) {
