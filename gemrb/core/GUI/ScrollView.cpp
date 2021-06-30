@@ -278,7 +278,6 @@ View* ScrollView::SubviewAt(const Point& p, bool ignoreTransparency, bool recurs
 void ScrollView::Update()
 {
 	contentView.ResizeToSubviews();
-	UpdateScrollbars();
 }
 
 bool ScrollView::CanScroll(const Point& p) const
