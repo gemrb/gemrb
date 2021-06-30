@@ -1851,8 +1851,8 @@ int fx_set_poisoned_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_POISONED );
 
 	ieDword damage = 0;
-	int tmp = fx->Parameter1;
-	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t tmp = fx->Parameter1;
+	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	HandlePercentageDamage(fx, target);
 	Scriptable *caster = GetCasterObject();

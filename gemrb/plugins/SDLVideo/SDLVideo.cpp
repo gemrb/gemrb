@@ -312,7 +312,8 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
 {
 	//Uses the Breshenham's Circle Algorithm
-	long x, y, xc, yc, re;
+	long xc, yc, re;
+	int x, y;
 
 	x = r;
 	y = 0;
@@ -359,12 +360,12 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	/* beware, dragons and clockwise angles be here! */
 	double radiusfrom = ellipseradius(xr, yr, anglefrom);
 	double radiusto = ellipseradius(xr, yr, angleto);
-	long xfrom = (long)round(radiusfrom * cos(anglefrom));
-	long yfrom = (long)round(radiusfrom * sin(anglefrom));
-	long xto = (long)round(radiusto * cos(angleto));
-	long yto = (long)round(radiusto * sin(angleto));
-	long xrl = (long) xr;
-	long yrl = (long) yr;
+	int xfrom = round(radiusfrom * cos(anglefrom));
+	int yfrom = round(radiusfrom * sin(anglefrom));
+	int xto = round(radiusto * cos(angleto));
+	int yto = round(radiusto * sin(angleto));
+	int xrl = xr;
+	int yrl = yr;
 
 	if (drawlines) {
 		DrawLine(c, Point(c.x + xfrom, c.y + yfrom), color, flags);
@@ -375,10 +376,10 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	// TODO: this doesn't work very well - you can't actually bound many
 	// arcs this way (imagine a segment with a small piece cut out).
 	if (xfrom > xto) {
-		long tmp = xfrom; xfrom = xto; xto = tmp;
+		int tmp = xfrom; xfrom = xto; xto = tmp;
 	}
 	if (yfrom > yto) {
-		long tmp = yfrom; yfrom = yto; yto = tmp;
+		int tmp = yfrom; yfrom = yto; yto = tmp;
 	}
 	if (xfrom >= 0 && yto >= 0) xto = xr;
 	if (xto <= 0 && yto >= 0) xfrom = -xr;
@@ -386,7 +387,8 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 	if (yto <= 0 && xto >= 0) yfrom = -yr;
 
 	//Uses Bresenham's Ellipse Algorithm
-	long x, y, xc, yc, ee, tas, tbs, sx, sy;
+	long xc, yc, ee, tas, tbs, sx, sy;
+	int x, y;
 
 	tas = 2 * xrl * xrl;
 	tbs = 2 * yrl * yrl;
