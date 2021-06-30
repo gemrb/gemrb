@@ -33,15 +33,13 @@ using namespace GemRB;
 
 static void SetChannelPosition(const Point &listenerPos, const Point &p, int channel)
 {
-	int x = listenerXPos - XPos;
-	int y = listenerYPos - YPos;
 	int16_t angle = AngleFromPoints(listenerPos, p) * 180 / M_PI - 90;
 	if (angle < 0) {
 		angle += 360;
 	}
 	
 	constexpr float AUDIO_DISTANCE_ROLLOFF_MOD (1.3 * 1.3); // squared to save a sqrt
-	uint8_t distance = std::min(SquaredDistance(listenerPos, p) / AUDIO_DISTANCE_ROLLOFF_MOD), 255);
+	uint8_t distance = std::min<uint8_t>((SquaredDistance(listenerPos, p) / AUDIO_DISTANCE_ROLLOFF_MOD), 255u);
 	Mix_SetPosition(channel, angle, distance);
 }
 
