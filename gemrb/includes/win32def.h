@@ -40,10 +40,4 @@
 
 #include <windows.h>
 
-#if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
-using ssize_t = SSIZE_T;
-#define _SSIZE_T_
-#define _SSIZE_T_DEFINED
-#endif
-
 #endif  //! WIN32DEF_H

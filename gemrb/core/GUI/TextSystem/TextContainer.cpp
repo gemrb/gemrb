@@ -496,7 +496,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 	ContentLayout::const_iterator it = layout.begin();
 	size_t count = layout.size();
 	while (count > 0) {
-		ssize_t step = count / 2;
+		size_t step = count / 2;
 		std::advance(it, step);
 		if (it->PointInside(p)) {
 			// i know we are casting away const.
@@ -507,7 +507,7 @@ const ContentContainer::Layout* ContentContainer::LayoutAtPoint(const Point& p) 
 			++it;
 			count -= step + 1;
 		} else {
-			std::advance(it, -step);
+			std::advance(it, -std::make_signed<size_t>::type(step));
 			count = step;
 		}
 	}

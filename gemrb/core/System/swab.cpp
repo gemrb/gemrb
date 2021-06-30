@@ -19,12 +19,12 @@
 #include "swab.h"
 
 // we use this because it works with overlapping buffers (undefined in POSIX)
-void swab_const (const void *bfrom, void *bto, ssize_t n)
+void swab_const (const void *bfrom, void *bto, long n)
 {
   const char *from = (const char *) bfrom;
   char *to = (char *) bto;
 
-  n &= ~((ssize_t) 1);
+  n &= ~((long) 1);
   while (n > 1)
     {
       const char b0 = from[--n], b1 = from[--n];
@@ -33,7 +33,7 @@ void swab_const (const void *bfrom, void *bto, ssize_t n)
     }
 }
 
-void swabs (void *buf, ssize_t n)
+void swabs (void *buf, long n)
 {
 	swab_const(buf, buf, n);
 }

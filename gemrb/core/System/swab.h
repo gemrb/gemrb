@@ -24,8 +24,8 @@
 extern "C" {
 #endif
 
-GEM_EXPORT void swab_const(const void *bfrom, void *bto, ssize_t n);
-GEM_EXPORT void swabs(void *buf, ssize_t n);
+GEM_EXPORT void swab_const(const void *bfrom, void *bto, long n);
+GEM_EXPORT void swabs(void *buf, long n);
 
 #if defined(__cplusplus)
 }  /* extern "C" */
