@@ -31,7 +31,6 @@
 
 #define MIXER_CHANNELS 16
 #define BUFFER_CACHE_SIZE 100
-#define AUDIO_DISTANCE_ROLLOFF_MOD 1.3
 
 namespace GemRB {
 

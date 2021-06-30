@@ -277,13 +277,13 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 
 bool WithinRange(const Actor *actor, const Point &dest, int distance)
 {
-	double angle = atan2(actor->Pos.y - dest.y, actor->Pos.x - dest.x);
+	double angle = AngleFromPoints(actor->Pos, dest);
 	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
 bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance)
 {
-	double angle = atan2(actor->Pos.y - dest->Pos.y, actor->Pos.x - dest->Pos.x);
+	double angle = AngleFromPoints(actor->Pos, dest);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 

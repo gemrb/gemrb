@@ -1508,7 +1508,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		}
 	}
 
-	double angle = atan2(actor->Pos.y - target->Pos.y, actor->Pos.x - target->Pos.x);
+	double angle = AngleFromPoints(actor->Pos, target->Pos);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
 		!WithinPersonalRange(actor, target, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
