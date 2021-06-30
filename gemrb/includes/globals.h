@@ -58,9 +58,6 @@ namespace GemRB {
 
 //Global Variables
 
-#define IE_NORMAL 0
-#define IE_SHADED 1
-
 #define IE_STR_STRREFON   1
 #define IE_STR_SOUND      2
 #define IE_STR_SPEECH     4

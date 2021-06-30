@@ -109,8 +109,7 @@ public:
 	Holder<Sprite2D> GetAnySprite(const char *resRef, int cycle, int frame, bool silent = true);
 
 	/** returns factory resource, currently works only with animations */
-	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type,
-		unsigned char mode = IE_NORMAL, bool silent=false);
+	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);
 
 	void AddFactoryResource(FactoryObject* res);
 

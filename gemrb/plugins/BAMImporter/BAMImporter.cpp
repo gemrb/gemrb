@@ -134,8 +134,7 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, unsigned char mode,
-										bool RLESprite, unsigned char* data)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, bool RLESprite, unsigned char* data)
 {
 	Holder<Sprite2D> spr;
 
@@ -153,12 +152,6 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, unsigned c
 
 	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
 	spr->Frame.y = (ieWordSigned)frames[findex].YPos;
-	if (mode == IE_SHADED) {
-		// CHECKME: is this ever used? Should we modify the sprite's palette
-		// without creating a local copy for this sprite?
-		PaletteHolder pal = spr->GetPalette();
-		pal->CreateShadedAlphaChannel();
-	}
 	return spr;
 }
 
@@ -238,7 +231,7 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 	return FLT;
 }
 
-AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned char mode, bool allowCompression)
+AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allowCompression)
 {
 	unsigned int i, count;
 	AnimationFactory* af = new AnimationFactory( ResRef );
@@ -259,7 +252,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, unsigned 
 
 	for (i = 0; i < FramesCount; ++i) {
 		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
-		Holder<Sprite2D> frame = GetFrameInternal(i, mode, RLECompressed, data);
+		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, data);
 		assert(!RLECompressed || frame->BAM);
 		af->AddFrame(frame);
 	}

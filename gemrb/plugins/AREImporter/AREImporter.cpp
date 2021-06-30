@@ -1353,7 +1353,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 
 	if (pst) {
-		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID, IE_NORMAL);
+		AnimationFactory* flags = (AnimationFactory*)gamedata->GetFactoryResource("FLAG1", IE_BAM_CLASS_ID);
 		if (flags == NULL) {
 			ResourceHolder<ImageMgr> roimg = GetResourceHolder<ImageMgr>("RONOTE");
 			ResourceHolder<ImageMgr> userimg = GetResourceHolder<ImageMgr>("USERNOTE");

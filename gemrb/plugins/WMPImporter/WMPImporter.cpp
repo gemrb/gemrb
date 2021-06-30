@@ -147,7 +147,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index)
 		Log(ERROR, "WMPImporter", "No BAM Importer Available.");
 	} else {
 		AnimationFactory* af = ( AnimationFactory* )
-			gamedata->GetFactoryResource( m->MapIconResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource(m->MapIconResRef, IE_BAM_CLASS_ID);
 		if (af)
 			m->SetMapIcons( af );
 	}

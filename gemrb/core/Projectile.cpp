@@ -115,8 +115,7 @@ Projectile::~Projectile()
 void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
-		gamedata->GetFactoryResource( bamres,
-				IE_BAM_CLASS_ID, IE_NORMAL );
+		gamedata->GetFactoryResource(bamres, IE_BAM_CLASS_ID);
 
 	if (!af) {
 		return;

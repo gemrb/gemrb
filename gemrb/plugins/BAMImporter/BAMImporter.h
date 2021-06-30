@@ -52,8 +52,8 @@ private:
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	unsigned long DataStart;
 private:
-	Holder<Sprite2D> GetFrameInternal(unsigned short findex, unsigned char mode,
-							   bool RLESprite, unsigned char* data);
+	Holder<Sprite2D> GetFrameInternal(unsigned short findex,
+									  bool RLESprite, unsigned char* data);
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:
@@ -61,8 +61,7 @@ public:
 	~BAMImporter(void) override;
 	bool Open(DataStream* stream) override;
 	int GetCycleSize(unsigned char Cycle) override;
-	AnimationFactory* GetAnimationFactory(const char* ResRef,
-		unsigned char mode = IE_NORMAL, bool allowCompression = true) override;
+	AnimationFactory* GetAnimationFactory(const char* ResRef, bool allowCompression = true) override;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Holder<Sprite2D> GetPalette() override;

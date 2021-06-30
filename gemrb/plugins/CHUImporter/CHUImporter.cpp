@@ -185,8 +185,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					}
 				}
 				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( BAMFile,
-							IE_BAM_CLASS_ID, IE_NORMAL );
+					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if (!bam ) {
 					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
@@ -292,8 +291,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
 				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( BAMFile,
-							IE_BAM_CLASS_ID, IE_NORMAL );
+					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
@@ -341,9 +339,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				Font* fnt = core->GetFont( FontResRef );
 
 				AnimationFactory* bam = ( AnimationFactory* )
-					gamedata->GetFactoryResource( CursorResRef,
-							IE_BAM_CLASS_ID,
-							IE_NORMAL );
+					gamedata->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
 				Holder<Sprite2D> cursor;
 				if (bam) {
 					cursor = bam->GetFrame( CurCycle, CurFrame );
@@ -458,8 +454,7 @@ endalign:
 				str->ReadWord(Cycle);
 
 				AnimationFactory* bam = ( AnimationFactory* )
-				gamedata->GetFactoryResource( BAMResRef,
-											 IE_BAM_CLASS_ID, IE_NORMAL );
+				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
 					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
 					break;

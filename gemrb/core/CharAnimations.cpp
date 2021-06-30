@@ -1077,8 +1077,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		NewResRef[8]=0; //cutting right to size
 
 		AnimationFactory* af = ( AnimationFactory* )
-			gamedata->GetFactoryResource( NewResRef,
-					IE_BAM_CLASS_ID, IE_NORMAL );
+			gamedata->GetFactoryResource(NewResRef, IE_BAM_CLASS_ID);
 
 		if (!af) {
 			if (part < actorPartCount) {
@@ -1331,7 +1330,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		shadowName[8] = 0;
 
 		AnimationFactory* af = static_cast<AnimationFactory*>(
-			gamedata->GetFactoryResource(shadowName, IE_BAM_CLASS_ID, IE_NORMAL));
+			gamedata->GetFactoryResource(shadowName, IE_BAM_CLASS_ID));
 
 		if (!af) {
 			delete[] animations;

@@ -386,7 +386,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		ret = new ScriptedAnimation(ds);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
-			GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+			GetFactoryResource(effect, IE_BAM_CLASS_ID);
 		if (af) {
 			ret = new ScriptedAnimation();
 			ret->LoadAnimationFactory( af, doublehint?2:0);
@@ -427,7 +427,7 @@ Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int fra
 {
 	Holder<Sprite2D> tspr;
 	AnimationFactory* af = ( AnimationFactory* )
-		GetFactoryResource(resRef, IE_BAM_CLASS_ID, IE_NORMAL, silent);
+		GetFactoryResource(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
@@ -449,8 +449,7 @@ Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame
 	return img;
 }
 
-FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
-	unsigned char mode, bool silent)
+FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
 {
 	int fobjindex = factory->IsLoaded(resname,type);
 	// already cached
@@ -470,7 +469,7 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 				return NULL;
 			if (!ani->Open(ret))
 				return NULL;
-			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
+			AnimationFactory* af = ani->GetAnimationFactory(resname);
 			factory->AddFactoryObject( af );
 			return af;
 		}
