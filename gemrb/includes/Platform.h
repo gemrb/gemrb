@@ -52,11 +52,7 @@
 
 #ifndef HAVE_SIZEOF_SSIZE_T
 #define HAVE_SIZEOF_SSIZE_T
-#ifdef WIN32
-using ssize_t = SSIZE_T;
-#else
 using ssize_t = long int;
-#endif
 #endif
 
 #include <cstdio>
