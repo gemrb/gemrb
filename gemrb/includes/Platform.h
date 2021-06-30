@@ -48,9 +48,7 @@
 	#include "win32def.h"
 #elif defined(HAVE_UNISTD_H)
 	#include <unistd.h>
-#endif
-
-#ifndef HAVE_SIZEOF_SSIZE_T
+#elif !defined(HAVE_SIZEOF_SSIZE_T)
 #define HAVE_SIZEOF_SSIZE_T
 using ssize_t = long int;
 #endif
