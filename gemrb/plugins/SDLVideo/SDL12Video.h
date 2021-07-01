@@ -56,7 +56,7 @@ public:
 	bool SupportsBAMSprites() override { return true; }
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-						 const Color* tint = nullptr) override;
+						 Color tint = Color()) override;
 
 private:
 	VideoBuffer* NewVideoBuffer(const Region& rgn, BufferFormat fmt) override;

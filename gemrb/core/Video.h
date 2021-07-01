@@ -207,7 +207,7 @@ public:
 								   BlitFlags flags, Color tint);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-								 const Color* tint = nullptr) = 0;
+								 Color tint = Color()) = 0;
 
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */

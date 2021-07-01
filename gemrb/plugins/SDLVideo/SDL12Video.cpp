@@ -384,20 +384,15 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 	delete maskIt;
 }
 
-void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, const Color* tint)
+void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags, Color tint)
 {
 	auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();
 	const Region& r = buf->Rect();
 	Point origin = r.origin + p;
 
-	Color c;
-	if (tint) {
-		c = *tint;
-	}
-
 	SDL_Rect srect = {0, 0, Uint16(r.w), Uint16(r.h)};
 	SDL_Rect drect = {Sint16(origin.x), Sint16(origin.y), Uint16(r.w), Uint16(r.h)};
-	BlitSpriteNativeClipped(surface, srect, drect, flags, c);
+	BlitSpriteNativeClipped(surface, srect, drect, flags, tint);
 }
 
 void SDL12VideoDriver::DrawPointImp(const Point& p, const Color& color, BlitFlags flags)

@@ -242,7 +242,7 @@ public:
 	bool TouchInputEnabled() override;
 
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
-						 const Color* tint = nullptr) override;
+						 Color tint = Color()) override;
 
 private:
 	VideoBuffer* NewVideoBuffer(const Region&, BufferFormat) override;
