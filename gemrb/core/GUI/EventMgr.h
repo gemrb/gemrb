@@ -165,6 +165,9 @@ struct GEM_EXPORT GestureEvent : public TouchEvent {
 	float dDist;
 };
 
+struct GEM_EXPORT ApplicationEvent : public EventBase {
+};
+
 struct GEM_EXPORT Event {
 	enum EventType {
 		MouseMove = 0,
@@ -183,8 +186,10 @@ struct GEM_EXPORT Event {
 		
 		ControllerAxis,
 		ControllerButtonUp,
-		ControllerButtonDown
+		ControllerButtonDown,
 
+		// Something wants the whole screen to be refreshed (SDL backend, OS, ...)
+		RedrawRequest
 		// leaving off types for unused events
 	};
 
@@ -217,6 +222,9 @@ struct GEM_EXPORT Event {
 		
 		AllControllerMask = ControllerAxisMask | ControllerButtonUpMask | ControllerButtonDownMask,
 
+		RedrawRequestMask = 1 << RedrawRequest,
+		AllApplicationMask = RedrawRequestMask,
+
 		AllEventsMask = 0xffffffffU
 	};
 
@@ -228,6 +236,7 @@ struct GEM_EXPORT Event {
 		KeyboardEvent keyboard;
 		TouchEvent touch;
 		GestureEvent gesture;
+		ApplicationEvent application;
 	};
 
 	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
@@ -277,6 +286,8 @@ public:
 	
 	static Event CreateControllerAxisEvent(InputAxis axis, int delta, float pct);
 	static Event CreateControllerButtonEvent(EventButton btn, bool down);
+
+	static Event CreateRedrawRequestEvent();
 
 	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
 	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
