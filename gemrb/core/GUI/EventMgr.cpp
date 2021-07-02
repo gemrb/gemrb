@@ -500,4 +500,11 @@ Event EventMgr::CreateControllerButtonEvent(EventButton btn, bool down)
 	return e;
 }
 
+Event EventMgr::CreateRedrawRequestEvent() {
+	Event e = {};
+	e.type = Event::RedrawRequest;
+
+	return e;
+}
+
 }
