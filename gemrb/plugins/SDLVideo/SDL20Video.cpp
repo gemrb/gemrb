@@ -708,8 +708,10 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 			// TODO: must destroy all SDLTextureSprite2D textures
 
 			// fallthough
+		case SDL_APP_DIDENTERFOREGROUND:
 		case SDL_RENDER_TARGETS_RESET:
-			// TODO: must destroy all SDLTextureVideoBuffer textures
+			e = EventMgr::CreateRedrawRequestEvent();
+			EvntManager->DispatchEvent(std::move(e));
 			break;
 		case SDL_WINDOWEVENT://SDL 1.2
 			switch (event.window.event) {
