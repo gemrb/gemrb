@@ -369,6 +369,11 @@ Window* WindowManager::NextEventWindow(const Event& event, WindowList::const_ite
 
 bool WindowManager::DispatchEvent(const Event& event)
 {
+	if (event.type == Event::EventType::RedrawRequest) {
+		MarkAllDirty();
+		return true;
+	}
+
 	if (eventMgr.MouseDown() == false && eventMgr.FingerDown() == false) {
 		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
 			if (trackingWin) {
