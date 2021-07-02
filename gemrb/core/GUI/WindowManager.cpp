@@ -76,6 +76,12 @@ WindowManager::WindowManager(Video* vid)
 	// TODO: how do we get notified if the Video driver changes size?
 }
 
+void WindowManager::MarkAllDirty() {
+	for (auto it = windows.begin(); it != windows.end(); ++it) {
+		(*it)->MarkDirty();
+	}
+}
+
 WindowManager::~WindowManager()
 {
 	DestroyWindows(closedWindows);
