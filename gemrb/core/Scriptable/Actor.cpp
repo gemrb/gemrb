@@ -8488,7 +8488,7 @@ bool Actor::HasBodyHeat() const
 
 uint8_t Actor::GetElevation() const
 {
-	uint8_t height = area ? area->HeightMap->GetAt(Pos.x / 16, Pos.y / 12) : 0;
+	uint8_t height = area ? area->HeightMap->GetAt(Map::ConvertCoordToTile(Pos)) : 0;
 	if (height > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
 		// cannot work out how they work, so here is an incorrect

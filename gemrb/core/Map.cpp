@@ -335,6 +335,11 @@ static void InitExplore()
 	}
 }
 
+Point Map::ConvertCoordToTile(const Point& p)
+{
+	return Point(p.x / 16, p.y / 12);
+}
+
 Map::Map(void)
 	: Scriptable( ST_AREA )
 {
@@ -464,16 +469,14 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bi
 	SmallMap = sm;
 	Width = (unsigned int) (TMap->XCellCount * 4);
 	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
-	unsigned int SRWidth = sr->GetWidth();
-	unsigned int y = sr->GetHeight();
-	assert(Width >= SRWidth && Height >= y);
+	Size size = sr->GetSize();
+	assert(Width >= size.w && Height >= size.h);
 	//Internal Searchmap
 	SrchMap = (PathMapFlags *) calloc(Width * Height, sizeof(PathMapFlags));
 	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
-	while(y--) {
-		int x = SRWidth;
-		while(x--) {
-			uint8_t value = uint8_t(PathMapFlags(sr->GetAt(x,y)) & PathMapFlags::AREAMASK);
+	for (int y = 0; y < size.h; ++y) {
+		for (int x = 0; x < size.w; ++x) {
+			uint8_t value = uint8_t(PathMapFlags(sr->GetAt(Point(x,y))) & PathMapFlags::AREAMASK);
 			size_t index = y * Width + x;
 			SrchMap[index] = Passable[value];
 			MaterialMap[index] = value;
@@ -1379,7 +1382,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		
 		Color tint = ColorWhite;
 		if (a->Flags & A_ANI_NO_SHADOW) {
-			tint = LightMap->GetPixel(a->Pos.x / 16, a->Pos.y / 12);
+			tint = LightMap->GetPixel(Map::ConvertCoordToTile(a->Pos));
 		}
 		
 		game->ApplyGlobalTint(tint, flags);
@@ -1436,7 +1439,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 							flags |= BlitFlags::GREY;
 						}
 						
-						Color baseTint = area->LightMap->GetPixel(actor->Pos.x / 16, actor->Pos.y / 12);
+						Color baseTint = area->LightMap->GetPixel(Map::ConvertCoordToTile(actor->Pos));
 						Color tint(baseTint);
 						game->ApplyGlobalTint(tint, flags);
 						actor->Draw(viewport, baseTint, tint, flags|BlitFlags::BLENDED);
@@ -1464,7 +1467,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					flags |= BlitFlags::GREY;
 				}
 				
-				Color tint = LightMap->GetPixel(c->Pos.x / 16, c->Pos.y / 12);
+				Color tint = LightMap->GetPixel(Map::ConvertCoordToTile(c->Pos));
 				game->ApplyGlobalTint(tint, flags);
 
 				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
@@ -1488,7 +1491,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					scaidx = vvcCells.erase(scaidx);
 				} else {
 					video->SetStencilBuffer(wallStencil);
-					Color tint = LightMap->GetPixel( sca->Pos.x / 16, sca->Pos.y / 12);
+					Color tint = LightMap->GetPixel(Map::ConvertCoordToTile(sca->Pos));
 					tint.a = 255;
 					
 					// FIXME: these should actually make use of SetDrawingStencilForObject too
@@ -3838,7 +3841,7 @@ bool Map::DisplayTrackString(const Actor *target) const
 // since the lightmap is much smaller than the area, we need to interpolate
 unsigned int Map::GetLightLevel(const Point &Pos) const
 {
-	Color c = LightMap->GetPixel(Pos.x/16, Pos.y/12);
+	Color c = LightMap->GetPixel(Map::ConvertCoordToTile(Pos));
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
 	const Color *tint = core->GetGame()->GetGlobalTint();
 	if (tint) {

@@ -58,7 +58,6 @@ PNGImporter::PNGImporter(void)
 	inf->png_ptr = 0;
 	inf->info_ptr = 0;
 	inf->end_info = 0;
-	Width = Height = 0;
 	hasPalette = false;
 }
 
@@ -145,9 +144,7 @@ bool PNGImporter::Open(DataStream* stream)
 
 	png_read_update_info(inf->png_ptr, inf->info_ptr);
 
-
-	Width = width;
-	Height = height;
+	size = Size(width, height);
 
 	hasPalette = (color_type == PNG_COLOR_TYPE_PALETTE);
 
@@ -158,10 +155,10 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	unsigned char* buffer = 0;
-	png_bytep* row_pointers = new png_bytep[Height];
-	buffer = (unsigned char *) malloc((hasPalette?1:4)*Width*Height);
-	for (unsigned int i = 0; i < Height; ++i)
-		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
+	png_bytep* row_pointers = new png_bytep[size.h];
+	buffer = (unsigned char *) malloc((hasPalette?1:4) * size.Area());
+	for (int i = 0; i < size.h; ++i)
+		row_pointers[i] = static_cast<png_bytep>(&buffer[(hasPalette?1:4) * i * size.w]);
 
 	if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;
@@ -181,9 +178,9 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	if (hasPalette) {
 		Color pal[256];
 		int ck = GetPalette(256, pal);
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, Width, Height), 8, buffer, pal, (ck >= 0), ck);
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, size.w, size.h), 8, buffer, pal, (ck >= 0), ck);
 	} else {
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
 												   red_mask, green_mask,
 												   blue_mask, alpha_mask,
 												   buffer, false, 0);

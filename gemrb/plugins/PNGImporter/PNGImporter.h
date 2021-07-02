@@ -31,7 +31,6 @@ class PNGImporter : public ImageMgr {
 private:
 	PNGInternal* inf;
 
-	ieDword Width, Height;
 	bool hasPalette;
 public:
 	PNGImporter(void);
@@ -40,8 +39,6 @@ public:
 	bool Open(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	int GetPalette(int colors, Color* pal) override;
-	int GetWidth() override { return (int) Width; }
-	int GetHeight() override { return (int) Height; }
 };
 
 }

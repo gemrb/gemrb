@@ -22,8 +22,8 @@
 
 namespace GemRB {
 
-Bitmap::Bitmap(unsigned int w, unsigned int h)
-	: height(h), width(w), data(new unsigned char[height*width])
+Bitmap::Bitmap(const Size& size)
+: size(size), data(new unsigned char[size.Area()])
 {
 }
 
@@ -35,10 +35,10 @@ Bitmap::~Bitmap()
 void Bitmap::dump() const
 {
 	StringBuffer lines;
-	lines.appendFormatted("height: %d, width: %d\n", height, width);
-	for (unsigned int y=0; y<height; y++) {
-		for (unsigned int x=0; x<width; x++) {
-			lines.appendFormatted("%d ", data[width*y+x]);
+	lines.appendFormatted("height: %d, width: %d\n", size.h, size.w);
+	for (int y = 0; y < size.h; ++y) {
+		for (int x = 0; x < size.w; ++x) {
+			lines.appendFormatted("%d ", data[size.w * y + x]);
 		}
 		lines.append("\n");
 	}

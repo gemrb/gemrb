@@ -37,18 +37,18 @@ ImageMgr::~ImageMgr(void)
 
 Bitmap* ImageMgr::GetBitmap()
 {
-	unsigned int height = GetHeight();
-	unsigned int width = GetWidth();
-	Bitmap *data = new Bitmap(width, height);
+	const Size size = GetSize();
+	Bitmap *data = new Bitmap(size);
 
 	Log(ERROR, "ImageMgr", "Don't know how to handle 24bit bitmap from %s...",
 		str->filename );
 
 	Holder<Sprite2D> spr = GetSprite2D();
 
-	for (unsigned int y = 0; y < height; y++) {
-		for (unsigned int x = 0; x < width; x++) {
-			data->SetAt(x,y, spr->GetPixel(x,y).r);
+	for (int y = 0; y < size.h; y++) {
+		for (int x = 0; x < size.w; x++) {
+			const Point p(x, y);
+			data->SetAt(p, spr->GetPixel(p).r);
 		}
 	}
 
@@ -57,15 +57,15 @@ Bitmap* ImageMgr::GetBitmap()
 
 Image* ImageMgr::GetImage()
 {
-	unsigned int height = GetHeight();
-	unsigned int width = GetWidth();
-	Image *data = new Image(width, height);
+	const Size size = GetSize();
+	Image *data = new Image(size);
 
 	Holder<Sprite2D> spr = GetSprite2D();
 
-	for (unsigned int y = 0; y < height; y++) {
-		for (unsigned int x = 0; x < width; x++) {
-			data->SetPixel(x,y, spr->GetPixel(x,y));
+	for (int y = 0; y < size.h; y++) {
+		for (int x = 0; x < size.w; x++) {
+			const Point p(x, y);
+			data->SetPixel(p, spr->GetPixel(p));
 		}
 	}
 

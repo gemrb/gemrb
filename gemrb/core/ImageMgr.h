@@ -55,16 +55,17 @@ public:
 	 * This does nothing if there is no palette.
 	 */
 	virtual int GetPalette(int colors, Color* pal);
-	/** Returns the width of the image */
-	virtual int GetWidth() = 0;
-	/** Returns the height of the image */
-	virtual int GetHeight() = 0;
+	
+	Size GetSize() { return size; }
+
 	/**
 	 * Returns a \ref ImageFactory for the current image.
 	 *
 	 * @param[in] ResRef name of image represented by factory.
 	 */
 	ImageFactory* GetImageFactory(const char* ResRef);
+protected:
+	Size size;
 };
 
 }

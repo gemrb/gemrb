@@ -423,6 +423,7 @@ public:
 	~Map(void) override;
 	static void ReleaseMemory();
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
+	static Point ConvertCoordToTile(const Point&);
 
 	/** prints useful information on console */
 	void dump(bool show_actors=0) const;

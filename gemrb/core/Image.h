@@ -23,6 +23,7 @@
 #include "exports.h"
 
 #include "Holder.h"
+#include "Region.h"
 
 namespace GemRB {
 
@@ -30,34 +31,32 @@ class Sprite2D;
 
 class GEM_EXPORT Image {
 public:
-	Image(unsigned int height, unsigned int width);
+	Image(const Size& size);
 	~Image();
-	Color GetPixel(unsigned int x, unsigned int y) const
+	Color GetPixel(const Point& p) const
 	{
-		if (x >= width || y >= height) {
+		if (p.x >= size.w || p.y >= size.h) {
 			return ColorBlack;
 		}
-		return data[width*y+x];
+		return data[size.w * p.y + p.x];
 
 	}
-	void SetPixel(unsigned int x, unsigned int y, Color idx)
+	void SetPixel(const Point& p, Color idx)
 	{
-		if (x >= width || y >= height)
+		if (p.x >= size.w || p.y >= size.h)
 			return;
-		data[width*y+x] = idx;
+		data[size.w * p.y + p.x] = idx;
 
 	}
-	unsigned int GetHeight() const
+
+	Size GetSize() const
 	{
-		return height;
+		return size;
 	}
-	unsigned int GetWidth() const
-	{
-		return width;
-	}
+
 	Holder<Sprite2D> GetSprite2D();
 private:
-	unsigned int height, width;
+	Size size;
 	Color *data;
 };
 

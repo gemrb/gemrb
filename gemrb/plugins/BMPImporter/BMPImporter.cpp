@@ -33,7 +33,7 @@ BMPImporter::BMPImporter(void)
 {
 	Palette = NULL;
 	pixels = NULL;
-	Size = Width = Height = Compression = ImageSize = Planes = 0;
+	Size = Compression = ImageSize = Planes = 0;
 	BitCount = PaddedRowLength = NumColors = 0;
 }
 
@@ -73,8 +73,11 @@ bool BMPImporter::Open(DataStream* stream)
 		Log(ERROR, "BMPImporter", "OS/2 Bitmap, not supported.");
 		return false;
 	}
-	str->ReadDword(Width);
-	str->ReadDword(Height);
+	ieDword tmp;
+	str->ReadDword(tmp);
+	size.w = tmp;
+	str->ReadDword(tmp);
+	size.h = tmp;
 	str->ReadWord(Planes);
 	str->ReadWord(BitCount);
 	str->ReadDword(Compression);
@@ -112,23 +115,23 @@ bool BMPImporter::Open(DataStream* stream)
 	//RASTERDATA
 	switch (BitCount) {
 		case 32:
-			PaddedRowLength = Width * 4;
+			PaddedRowLength = size.w * 4;
 			break;
 
 		case 24:
-			PaddedRowLength = Width * 3;
+			PaddedRowLength = size.w * 3;
 			break;
 
 		case 16:
-			PaddedRowLength = Width * 2;
+			PaddedRowLength = size.w * 2;
 			break;
 
 		case 8:
-			PaddedRowLength = Width;
+			PaddedRowLength = size.w;
 			break;
 
 		case 4:
-			PaddedRowLength = ( Width >> 1 );
+			PaddedRowLength = (size.w >> 1);
 			break;
 		default:
 			Log(ERROR, "BMPImporter", "BitCount %d is not supported.", BitCount);
@@ -140,46 +143,46 @@ bool BMPImporter::Open(DataStream* stream)
 		PaddedRowLength += 4 - ( PaddedRowLength & 3 );
 	}
 	//}
-	void* rpixels = malloc( PaddedRowLength* Height );
-	str->Read( rpixels, PaddedRowLength * Height );
+	void* rpixels = malloc(PaddedRowLength * size.h);
+	str->Read(rpixels, PaddedRowLength * size.h);
 	if (BitCount == 32) {
-		int size = Width * Height * 4;
-		pixels = malloc( size );
+		int numbytes = size.Area() * 4;
+		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
-		dest += Width * Height;
+		dest += size.Area();
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height; i; i--) {
-			dest -= Width;
+		for (int i = size.h; i; i--) {
+			dest -= size.w;
 			// BGRX
-			for (unsigned int j=0;j<Width;j++)
+			for (int j=0; j < size.w; ++j)
 				dest[j] = (0xFF << 24) | (src[j*4+0] << 16) |
 				          (src[j*4+1] << 8) | (src[j*4+2]);
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 24) {
 		//convert to 32 bits on the fly
-		int size = Width * Height * 4;
-		pixels = malloc( size );
+		int numbytes = size.Area() * 4;
+		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
-		dest += Width * Height;
+		dest += size.Area();
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height; i; i--) {
-			dest -= Width;
+		for (int i = size.h; i; i--) {
+			dest -= size.w;
 			// BGR
-			for (unsigned int j=0;j<Width;j++)
+			for (int j = 0; j < size.w; ++j)
 				dest[j] = (0xFF << 24) | (src[j*3+0] << 16) |
 				          (src[j*3+1] << 8) | (src[j*3+2]);
 			src += PaddedRowLength;
 		}
 		BitCount = 32;
 	} else if (BitCount == 8) {
-		pixels = malloc( Width * Height );
+		pixels = malloc(size.Area());
 		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += Height * Width;
+		dest += size.Area();
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height; i; i--) {
-			dest -= Width;
-			memcpy( dest, src, Width );
+		for (int i = size.h; i; i--) {
+			dest -= size.w;
+			memcpy(dest, src, size.w);
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 4) {
@@ -191,13 +194,13 @@ bool BMPImporter::Open(DataStream* stream)
 
 void BMPImporter::Read8To8(void *rpixels)
 {
-	pixels = malloc( Width * Height );
+	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
-	dest += Height * Width;
+	dest += size.Area();
 	unsigned char * src = ( unsigned char * ) rpixels;
-	for (int i = Height; i; i--) {
-		dest -= Width;
-		memcpy( dest, src, Width );
+	for (int i = size.h; i; i--) {
+		dest -= size.w;
+		memcpy(dest, src, size.w);
 		src += PaddedRowLength;
 	}
 }
@@ -205,13 +208,13 @@ void BMPImporter::Read8To8(void *rpixels)
 void BMPImporter::Read4To8(void *rpixels)
 {
 	BitCount = 8;
-	pixels = malloc( Width * Height );
+	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
-	dest += Height * Width;
+	dest += size.Area();
 	unsigned char * src = ( unsigned char * ) rpixels;
-	for (int i = Height; i; i--) {
-		dest -= Width;
-		for (unsigned int j=0;j<Width;j++) {
+	for (int i = size.h; i; i--) {
+		dest -= size.w;
+		for (int j = 0; j < size.w; ++j) {
 			if (!(j&1)) {
 				dest[j] = ((unsigned) src[j/2])>>4;
 			} else {
@@ -229,15 +232,15 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		const ieDword red_mask = 0x000000ff;
 		const ieDword green_mask = 0x0000ff00;
 		const ieDword blue_mask = 0x00ff0000;
-		void* p = malloc( Width * Height * 4 );
-		memcpy( p, pixels, Width * Height * 4 );
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
+		void* p = malloc(size.Area() * 4 );
+		memcpy( p, pixels, size.Area() * 4 );
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
 			red_mask, green_mask, blue_mask, 0x00000000, p,
 			true, green_mask|(0xff<<24) );
 	} else if (BitCount == 8) {
-		void* p = malloc( Width* Height );
-		memcpy( p, pixels, Width * Height );
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, Width, Height), NumColors == 16 ? 4 : 8,
+		void* p = malloc(size.Area());
+		memcpy(p, pixels, size.Area());
+		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, size.w, size.h), NumColors == 16 ? 4 : 8,
 														   p, Palette, true, 0);
 	}
 	return spr;
@@ -260,23 +263,22 @@ int BMPImporter::GetPalette(int colors, Color* pal)
 
 Bitmap* BMPImporter::GetBitmap()
 {
-	Bitmap *data = new Bitmap(Width,Height);
+	Bitmap *data = new Bitmap(size);
 
 	unsigned char *p = ( unsigned char * ) pixels;
 	switch (BitCount) {
 	case 8:
-		unsigned int y;
-		for (y = 0; y < Height; y++) {
-			for (unsigned int x = 0; x < Width; x++) {
-				data->SetAt(x,y,p[y*Width + x]);
+		for (int y = 0; y < size.h; ++y) {
+			for (int x = 0; x < size.w; ++x) {
+				data->SetAt(Point(x, y), p[y * size.w + x]);
 			}
 		}
 		break;
 	case 32:
 		Log(ERROR, "BMPImporter", "Don't know how to handle 32bpp bitmap from %s...", str->filename);
-		for (y = 0; y < Height; y++) {
-			for (unsigned int x = 0; x < Width; x++) {
-				data->SetAt(x,y,p[4*(y*Width + x)]);
+		for (int y = 0; y < size.h; ++y) {
+			for (int x = 0; x < size.w; ++x) {
+				data->SetAt(Point(x, y), p[4 * (y * size.w + x)]);
 			}
 		}
 		break;
@@ -287,27 +289,25 @@ Bitmap* BMPImporter::GetBitmap()
 
 Image* BMPImporter::GetImage()
 {
-	Image *data = new Image(Width,Height);
+	Image *data = new Image(size);
 
 	switch (BitCount) {
 	case 8: {
 		unsigned char *p = ( unsigned char * ) pixels;
-		unsigned int y;
-		for (y = 0; y < Height; y++) {
-			for (unsigned int x = 0; x < Width; x++) {
-				data->SetPixel(x,y,Palette[p[y*Width + x]%NumColors]);
+		for (int y = 0; y < size.h; y++) {
+			for (int x = 0; x < size.w; x++) {
+				data->SetPixel(Point(x,y), Palette[p[y * size.w + x] % NumColors]);
 			}
 		}
 		break;
 	}
 	case 32: {
 		unsigned int *p = ( unsigned int * ) pixels;
-		unsigned int y;
-		for (y = 0; y < Height; y++) {
-			for (unsigned int x = 0; x < Width; x++) {
+		for (int y = 0; y < size.h; ++y) {
+			for (int x = 0; x < size.w; ++x) {
 				unsigned int col = *p++;
 				Color c(col, (col >> 8), (col >> 16), 0xFF);
-				data->SetPixel(x,y,c);
+				data->SetPixel(Point(x, y), c);
 			}
 		}
 		break;

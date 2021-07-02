@@ -19,39 +19,37 @@
 #ifndef BITMAP_H
 #define BITMAP_H
 
-#include "exports.h"
+#include "Region.h"
 
 namespace GemRB {
 
 class GEM_EXPORT Bitmap {
 public:
-	Bitmap(unsigned int height, unsigned int width);
+	Bitmap(const Size& size);
 	~Bitmap();
-	unsigned char GetAt(unsigned int x, unsigned int y) const
+	unsigned char GetAt(const Point& p) const
 	{
-		if (x >= width || y >= height)
+		if (p.x >= size.w || p.y >= size.h)
 			return 0;
-		return data[width*y+x];
+		return data[size.w * p.y + p.x];
 
 	}
-	void SetAt(unsigned int x, unsigned int y, unsigned char idx)
+	void SetAt(const Point& p, unsigned char idx)
 	{
-		if (x >= width || y >= height)
+		if (p.x >= size.w || p.y >= size.h)
 			return;
-		data[width*y+x] = idx;
+		data[size.w * p.y + p.x] = idx;
 
 	}
-	unsigned int GetHeight() const
+	
+	Size GetSize() const
 	{
-		return height;
+		return size;
 	}
-	unsigned int GetWidth() const
-	{
-		return width;
-	}
+
 	void dump() const;
 private:
-	unsigned int height, width;
+	Size size;
 	unsigned char *data;
 };
 

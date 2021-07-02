@@ -28,7 +28,7 @@ namespace GemRB {
 class BMPImporter : public ImageMgr {
 private:
 	//BITMAPINFOHEADER
-	ieDword Size, Width, Height, Compression, ImageSize/*, ColorsUsed, ColorsImportant*/;
+	ieDword Size, Compression, ImageSize/*, ColorsUsed, ColorsImportant*/;
 	ieWord Planes, BitCount;
 
 	//COLORTABLE
@@ -49,8 +49,6 @@ public:
 	Image* GetImage() override;
 	int GetPalette(int colors, Color* pal) override;
 
-	int GetWidth() override { return (int) Width; }
-	int GetHeight() override { return (int) Height; }
 private:
 	void Read8To8(void *rpixels);
 	void Read4To8(void *rpixels);

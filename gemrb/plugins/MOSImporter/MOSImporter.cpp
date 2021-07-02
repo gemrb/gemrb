@@ -34,7 +34,7 @@ static ieDword blue_mask = 0x000000ff;
 
 MOSImporter::MOSImporter(void)
 {
-	Width = Height = Cols = Rows = BlockSize = PalOffset = 0;
+	Cols = Rows = BlockSize = PalOffset = 0;
 	if (DataStream::BigEndian()) {
 		red_mask = 0x0000ff00;
 		green_mask = 0x00ff0000;
@@ -63,8 +63,11 @@ bool MOSImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord(Width);
-	str->ReadWord(Height);
+	ieWord tmp;
+	str->ReadWord(tmp);
+	size.w = tmp;
+	str->ReadWord(tmp);
+	size.h = tmp;
 	str->ReadWord(Cols);
 	str->ReadWord(Rows);
 	str->ReadDword(BlockSize);
@@ -75,17 +78,17 @@ bool MOSImporter::Open(DataStream* stream)
 Holder<Sprite2D> MOSImporter::GetSprite2D()
 {
 	Color Col[256];
-	unsigned char * pixels = ( unsigned char * ) malloc( Width * Height * 4 );
+	unsigned char * pixels = ( unsigned char * ) malloc(size.Area() * 4);
 	unsigned char * blockpixels = ( unsigned char * )
 		malloc( BlockSize * BlockSize );
 	ieDword blockoffset;
 	for (int y = 0; y < Rows; y++) {
 		int bh = ( y == Rows - 1 ) ?
-			( ( Height % 64 ) == 0 ? 64 : Height % 64 ) :
+			( ( size.h % 64 ) == 0 ? 64 : size.h % 64 ) :
 			64;
 		for (int x = 0; x < Cols; x++) {
 			int bw = ( x == Cols - 1 ) ?
-				( ( Width % 64 ) == 0 ? 64 : Width % 64 ) :
+				( ( size.w % 64 ) == 0 ? 64 : size.w % 64 ) :
 				64;
 			str->Seek( PalOffset + ( y * Cols * 1024 ) +
 				( x * 1024 ), GEM_STREAM_START );
@@ -100,7 +103,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 			str->Read( blockpixels, bw * bh );
 			unsigned char * bp = blockpixels;
 			unsigned char * startpixel = pixels +
-				( ( Width * 4 * y ) * 64 ) +
+				( ( size.w * 4 * y ) * 64 ) +
 				( 4 * x * 64 );
 			for (int h = 0; h < bh; h++) {
 				for (int w = 0; w < bw; w++) {
@@ -114,12 +117,12 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 					startpixel++;
 					bp++;
 				}
-				startpixel = startpixel + ( Width * 4 ) - ( 4 * bw );
+				startpixel = startpixel + ( size.w * 4 ) - ( 4 * bw );
 			}
 		}
 	}
 	free( blockpixels );
-	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, Width, Height), 32,
+	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
 		red_mask, green_mask, blue_mask, 0,
 		pixels, true, green_mask );
 	return ret;

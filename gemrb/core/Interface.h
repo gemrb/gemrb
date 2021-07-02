@@ -715,11 +715,11 @@ private:
 		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
 			auto image = palim->GetImage();
-			int height = image->GetHeight();
+			int height = image->GetSize().h;
 			palettes.resize(height);
 			for (int row = 0; row < height; ++row) {
 				for (int col = 0; col < SIZE; ++col) {
-					palettes[row][col] = image->GetPixel(col, row);
+					palettes[row][col] = image->GetPixel(Point(col, row));
 				}
 			}
 			delete image;

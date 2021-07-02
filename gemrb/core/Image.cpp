@@ -23,8 +23,8 @@
 
 namespace GemRB {
 
-Image::Image(unsigned int w, unsigned int h)
-	: height(h), width(w), data(new Color[height*width])
+Image::Image(const Size& size)
+: size(size), data(new Color[size.h * size.w])
 {
 }
 
@@ -42,9 +42,9 @@ Holder<Sprite2D> Image::GetSprite2D()
 	  g = {{ 0x00, 0xFF, 0x00, 0x00 }},
 	  b = {{ 0x00, 0x00, 0xFF, 0x00 }},
 	  a = {{ 0x00, 0x00, 0x00, 0xFF }};
-	void *pixels = malloc(sizeof(Color) * height*width);
-	memcpy(pixels, data, sizeof(Color)*height*width);
-	return core->GetVideoDriver()->CreateSprite(Region(0,0, width, height), 32,
+	void *pixels = malloc(sizeof(Color) * size.h * size.w);
+	memcpy(pixels, data, sizeof(Color) * size.h * size.w);
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
 			r.Mask, g.Mask, b.Mask, a.Mask, pixels);
 }
 
