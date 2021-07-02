@@ -118,6 +118,7 @@ public:
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);
+	void MarkAllDirty();
 	void DestroyAllWindows();
 
 	bool OrderFront(Window* win);
