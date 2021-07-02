@@ -38,15 +38,31 @@
 
 namespace GemRB {
 
-class AnimationFactory;
+// Note: not all these flags make sense together.
+// Specifically: BlitFlags::GREY overrides BlitFlags::SEPIA
+enum BlitFlags : uint32_t {
+	NONE = 0,
+	HALFTRANS = 2, // IE_VVC_TRANSPARENT
+	BLENDED = 8, // IE_VVC_BLENDED, not implemented in SDLVideo yet
+	MIRRORX = 0x10, // IE_VVC_MIRRORX
+	MIRRORY = 0x20, // IE_VVC_MIRRORY
+	// IE_VVC_TINT = 0x00030000. which is (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)
+	COLOR_MOD = 0x00010000, // srcC = srcC * (color / 255)
+	ALPHA_MOD = 0x00020000, // srcA = srcA * (alpha / 255)
+	GREY = 0x80000, // IE_VVC_GREYSCALE, timestop palette
+	SEPIA = 0x02000000, // IE_VVC_SEPIA, dream scene palette
+	MULTIPLY = 0x00100000, // IE_VVC_DARKEN, not implemented in SDLVideo yet
+	GLOW = 0x00200000, // IE_VVC_GLOWING, not implemented in SDLVideo yet
+	ADD = 0x00400000,
+	STENCIL_ALPHA = 0x00800000, // blend with the stencil buffer using the stencil's alpha channel as the stencil
+	STENCIL_RED = 0x01000000, // blend with the stencil buffer using the stencil's r channel as the stencil
+	STENCIL_GREEN = 0x08000000, // blend with the stencil buffer using the stencil's g channel as the stencil
+	STENCIL_BLUE = 0x20000000, // blend with the stencil buffer using the stencil's b channel as the stencil
+	STENCIL_DITHER = 0x10000000 // use dithering instead of transpanency. only affects stencil values of 128.
+};
 
-/**
- * @class Sprite2D
- * Class representing bitmap data.
- * Objects of this class are usually created by Video driver.
- */
+#define BLIT_STENCIL_MASK (BlitFlags::STENCIL_ALPHA|BlitFlags::STENCIL_RED|BlitFlags::STENCIL_GREEN|BlitFlags::STENCIL_BLUE|BlitFlags::STENCIL_DITHER)
 
-class Sprite2D;
 class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
@@ -59,7 +75,7 @@ public:
 	int Bpp;
 
 	bool BAM;
-	ieDword renderFlags;
+	BlitFlags renderFlags = BlitFlags::NONE;
 
 	Sprite2D(const Region&, int Bpp, void* pixels);
 	Sprite2D(const Sprite2D &obj);

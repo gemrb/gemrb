@@ -29,7 +29,6 @@ Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
 {
 	freePixels = (pixels != NULL);
 	BAM = false;
-	renderFlags = 0;
 }
 
 Sprite2D::Sprite2D(const Sprite2D &obj)
