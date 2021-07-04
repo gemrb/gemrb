@@ -35,6 +35,7 @@ public:
 	~SAVImporter(void) override;
 	int DecompressSaveGame(DataStream *compressed) override;
 	int AddToSaveGame(DataStream *str, DataStream *uncompressed) override;
+	int AddToSaveGameCompressed(DataStream *str, DataStream *compressed) override;
 	int CreateArchive(DataStream *compressed) override;
 };
 

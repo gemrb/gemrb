@@ -115,6 +115,21 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	return GEM_OK;
 }
 
+int SAVImporter::AddToSaveGameCompressed(DataStream *str, DataStream *compressed) {
+	using BufferT = std::array<uint8_t, 4096>;
+	BufferT buffer{};
+
+	BufferT::size_type remaining = compressed->Size();
+	while (remaining > 0) {
+		auto copySize = std::min(buffer.size(), remaining);
+		compressed->Read(buffer.data(), copySize);
+		str->Write(buffer.data(), copySize);
+		remaining -= copySize;
+	}
+
+	return GEM_OK;
+}
+
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xCDF132C, "SAV File Importer")
