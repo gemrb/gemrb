@@ -33,7 +33,7 @@ SAVImporter::~SAVImporter()
 {
 }
 
-int SAVImporter::DecompressSaveGame(DataStream *compressed)
+int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor& areExtractor)
 {
 	char Signature[8];
 	compressed->Read( Signature, 8 );
@@ -54,14 +54,23 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed)
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		strlwr(fname);
+		auto position = compressed->GetPos();
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
-		print("Decompressing %s", fname);
-		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
-		free( fname );
-		if (!cached)
-			return GEM_ERROR;
-		delete cached;
+
+		auto areExt = strstr(fname, ".are");
+		if (areExt != nullptr && fname + fnlen - 5 == areExt) {
+			areExtractor.registerLocation(fname, position);
+			compressed->Seek(complen, GEM_CURRENT_POS);
+		} else {
+			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname);
+			DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
+			free( fname );
+			if (!cached)
+				return GEM_ERROR;
+			delete cached;
+		}
+
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
 		percent = (20 + (All - Current) * 50 / All);

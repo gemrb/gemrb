@@ -129,7 +129,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	}
 
 	cursor = pic;
-	
+
 	// FIXME: this VarName is not consistant
 	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
 }
@@ -516,7 +516,7 @@ void Interface::HandleFlags()
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
 	}
-	
+
 	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
 		delete winmgr->GetGameWindow()->RemoveSubview(gamectrl);
 		gamectrl = nullptr;
@@ -528,7 +528,7 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
-		
+
 		LoadGame(LoadGameIndex.get(), VersionOverride );
 		LoadGameIndex.release();
 		//after loading a game, always check if the game needs to be upgraded
@@ -1335,7 +1335,7 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 	if (!KeepCache) DelTree((const char *) CachePath, false);
-	
+
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
 	value = config->GetValueForKey("Logging");
 	if (value) ToggleLogging(atoi(value));
@@ -1375,10 +1375,10 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
-	
+
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
-	
+
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	vars->Lookup("Brightness Correction", brightness);
@@ -1836,7 +1836,7 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Close();
 	}
 	delete pathFile;
-	
+
 	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
 		if (e.type != Event::KeyDown) return false;
 
@@ -3183,6 +3183,8 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!KeepCache) DelTree((const char *) CachePath, true);
 	LoadProgress(15);
 
+	saveGameAREExtractor.changeSaveGame(sg);
+
 	if (sg == NULL) {
 		//Load the Default Game
 		gam_str = gamedata->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -3242,7 +3244,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (sav_str) {
 		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 		if (ai) {
-			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
+			if (ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
 				goto cleanup;
 			}
 		}
@@ -3690,8 +3692,8 @@ bool Interface::HasFeedback(int type) const
 	return FeedbackLevel & type;
 }
 
-static const char *saved_extensions[]={".are",".sto",0};
-static const char *saved_extensions_last[]={".tot",".toh",0};
+static const char *saved_extensions[] = {".are", ".sto", ".blb", 0};
+static const char *saved_extensions_last[] = {".tot", ".toh", 0};
 
 //returns the priority of the file to be saved
 //2 - save
@@ -3833,9 +3835,9 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 		delete DraggedItem->item;
 		DraggedItem = nullptr;
 	}
-	
+
 	if (!item) return;
-	
+
 	DraggedItem.reset(new ItemDragOp(item));
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
@@ -4489,17 +4491,34 @@ int Interface::WriteWorldMap(const char *folder)
 	return 0;
 }
 
-int Interface::CompressSave(const char *folder)
+static bool IsBlobSaveItem(const char *path) {
+	if (path == nullptr) {
+		return false;
+	}
+
+	auto areExt = strstr(path, ".blb");
+	auto pathLength = strlen(path);
+	return areExt != nullptr && path + pathLength - 4 == areExt;
+}
+
+int Interface::CompressSave(const char *folder, bool overrideRunning)
 {
 	FileStream str;
 
 	str.Create( folder, GameNameResRef, IE_SAV_CLASS_ID );
 	DirectoryIterator dir(CachePath);
 	if (!dir) {
-		return -1;
+		return GEM_ERROR;
 	}
 	PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
+
+	// If we override the savegame we are running to fetch AREs from, it has already dumped
+	// itself as "ares.blb" into the cache folder. Otherwise, just copy directly.
+	if (!overrideRunning && saveGameAREExtractor.copyRetainedAREs(&str) == GEM_ERROR) {
+		Log(ERROR, "Interface", "Failed to copy ARE files into new save game.");
+		return GEM_ERROR;
+	}
 
 	dir.SetFlags(DirectoryIterator::Files);
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
@@ -4514,7 +4533,15 @@ int Interface::CompressSave(const char *folder)
 				if (!fs.Open(dtmp)) {
 					Log(ERROR, "Interface", "Failed to open \"%s\".", dtmp);
 				}
-				ai->AddToSaveGame(&str, &fs);
+
+				if (IsBlobSaveItem(dtmp)) {
+					if (overrideRunning) {
+						saveGameAREExtractor.updateSaveGame(str.GetPos());
+						ai->AddToSaveGameCompressed(&str, &fs);
+					}
+				} else {
+					ai->AddToSaveGame(&str, &fs);
+				}
 			}
 		} while (++dir);
 		//reopen list for the second round
@@ -4523,7 +4550,7 @@ int Interface::CompressSave(const char *folder)
 			dir.Rewind();
 		}
 	}
-	return 0;
+	return GEM_OK;
 }
 
 int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }

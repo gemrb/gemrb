@@ -33,7 +33,7 @@ class SAVImporter : public ArchiveImporter {
 public:
 	SAVImporter(void);
 	~SAVImporter(void) override;
-	int DecompressSaveGame(DataStream *compressed) override;
+	int DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor&) override;
 	int AddToSaveGame(DataStream *str, DataStream *uncompressed) override;
 	int AddToSaveGameCompressed(DataStream *str, DataStream *compressed) override;
 	int CreateArchive(DataStream *compressed) override;

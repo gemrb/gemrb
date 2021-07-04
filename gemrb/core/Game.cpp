@@ -923,7 +923,13 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		sE->RunFunction("LoadScreen", "StartLoadScreen");
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
-	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
+
+	DataStream* ds = nullptr;
+	if (core->saveGameAREExtractor.extractARE(ResRef) != GEM_OK) {
+		goto failedload;
+	}
+
+	ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
 	if (!ds) {
 		goto failedload;
 	}

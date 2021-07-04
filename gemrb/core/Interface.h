@@ -43,6 +43,7 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
+#include "SaveGameAREExtractor.h"
 #include "System/VFS.h"
 
 #include <map>
@@ -417,6 +418,7 @@ public:
 	int QuitFlag;
 	int EventFlag;
 	Holder<SaveGame> LoadGameIndex;
+	SaveGameAREExtractor saveGameAREExtractor;
 	int VersionOverride;
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ResRef GlobalScript;
@@ -663,7 +665,7 @@ public:
 	/** saves the worldmap object to the destination folder */
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
-	int CompressSave(const char *folder);
+	int CompressSave(const char *folder, bool overrideRunning);
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
 	PauseSetting TogglePause();
 	/** returns true the passed pause setting was applied. false otherwise. */
