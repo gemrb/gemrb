@@ -2244,7 +2244,7 @@ def AppearancePress():
 
 	AppearanceAvatarButton = AppearanceWindow.GetControl (1)
 	AppearanceAvatarButton.SetState (IE_GUI_BUTTON_LOCKED)
-	AppearanceAvatarButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED, OP_OR)
+	AppearanceAvatarButton.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
 	DrawAvatar()
 
 	AppearanceHairButton = AppearanceWindow.GetControl (2)

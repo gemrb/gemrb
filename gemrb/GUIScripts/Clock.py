@@ -26,7 +26,7 @@ def CreateClockButton(Button):
 	if Button is None:
 		return
 
-	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_NORMAL
+	flags = IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NORMAL
 
 	# FIXME: display all animations: CPEN, CGEAR, CDIAL
 	Button.SetAnimation ("CGEAR")

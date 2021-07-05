@@ -1811,7 +1811,7 @@ def UpdateAnimatedPortrait (Window,i):
 	else:
 		cycle = 0
 
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	if cycle<6:
 		Button.SetFlags (IE_GUI_BUTTON_PLAYRANDOM, OP_OR)
 

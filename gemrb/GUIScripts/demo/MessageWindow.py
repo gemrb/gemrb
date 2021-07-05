@@ -29,7 +29,7 @@ def OnLoad():
 	PauseButton = MessageWindow.GetControl (2)
 	PauseButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
 	PauseButton.SetAnimation ("loading")
-	PauseButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+	PauseButton.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NORMAL, OP_SET)
 
 	MapButton = MessageWindow.GetControl (3)
 	MapButton.SetText ("M")

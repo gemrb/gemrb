@@ -83,7 +83,7 @@ def InitInventoryWindow (Window):
 	# paperdoll
 	Button = Window.GetControl (50)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetAction (InventoryCommon.OnAutoEquip, IE_ACT_DRAG_DROP_DST)
 
 	# portrait

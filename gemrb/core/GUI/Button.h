@@ -61,7 +61,6 @@ using PaletteHolder = Holder<Palette>;
 #define IE_GUI_BUTTON_CAPS         0x00000008   // convert text to uppercase
 #define IE_GUI_BUTTON_CHECKBOX     0x00000010   // or radio button
 #define IE_GUI_BUTTON_RADIOBUTTON  0x00000020   // sticks in a state
-#define IE_GUI_BUTTON_ANIMATED     0x00000080
 
 //these bits are hardcoded in the .chu structure
 #define IE_GUI_BUTTON_ALIGN_LEFT   0x00000100

@@ -24,7 +24,7 @@ from GUIDefines import *
 def CreateClockButton(Button):
 	Button.SetAnimation ("WMTIME")
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
-	Button.SetFlags (IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+	Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, lambda: GemRB.GamePause (2, 0))
 	Button.SetEvent(IE_GUI_MOUSE_ENTER_BUTTON, UpdateClock)
 	SetPSTGamedaysAndHourToken ()

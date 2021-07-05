@@ -680,7 +680,7 @@ def InitStoreDonateWindow (Window):
 	# graphics
 	Button = Window.GetControl (10)
 	if Button:
-		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_PLAYONCE, OP_OR)
+		Button.SetFlags (IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_PLAYONCE, OP_OR)
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
 
 	# Donate
