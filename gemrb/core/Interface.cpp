@@ -4513,6 +4513,7 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 	PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
 
+	tick_t startTime = GetTicks();
 	// If we override the savegame we are running to fetch AREs from, it has already dumped
 	// itself as "ares.blb" into the cache folder. Otherwise, just copy directly.
 	if (!overrideRunning && saveGameAREExtractor.copyRetainedAREs(&str) == GEM_ERROR) {
@@ -4550,6 +4551,9 @@ int Interface::CompressSave(const char *folder, bool overrideRunning)
 			dir.Rewind();
 		}
 	}
+
+	tick_t endTime = GetTicks();
+	Log(WARNING, "Core", "%lu ms (compressing SAV file)", endTime - startTime);
 	return GEM_OK;
 }
 
