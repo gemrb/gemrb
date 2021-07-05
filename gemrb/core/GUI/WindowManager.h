@@ -109,6 +109,7 @@ private:
 	bool HotKey(const Event&);
 
 	inline void DestroyWindows(WindowList& list);
+	void MarkAllDirty();
 
 public:
 	WindowManager(Video* vid);
@@ -118,7 +119,6 @@ public:
 
 	Window* MakeWindow(const Region& rgn);
 	void CloseWindow(Window* win);
-	void MarkAllDirty();
 	void DestroyAllWindows();
 
 	bool OrderFront(Window* win);
