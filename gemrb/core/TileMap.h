@@ -75,7 +75,7 @@ public:
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const char* Name) const;
-	InfoPoint* GetInfoPoint(unsigned int idx) const;
+	InfoPoint* GetInfoPoint(size_t idx) const;
 	InfoPoint* GetTravelTo(const char* Destination) const;
 	InfoPoint* AdjustNearestTravel(Point &p);
 	size_t GetInfoPointCount() const { return infoPoints.size(); }

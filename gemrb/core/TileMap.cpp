@@ -355,7 +355,7 @@ InfoPoint* TileMap::GetInfoPoint(const char* Name) const
 	return NULL;
 }
 
-InfoPoint* TileMap::GetInfoPoint(unsigned int idx) const
+InfoPoint* TileMap::GetInfoPoint(size_t idx) const
 {
 	if (idx >= infoPoints.size()) {
 		return NULL;

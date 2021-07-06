@@ -2358,7 +2358,7 @@ Scriptable *Map::GetActorByDialog(const char *resref) const
 	}
 
 	// pst has plenty of talking infopoints, eg. in ar0508 (Lothar's cabinet)
-	unsigned int i = TMap->GetInfoPointCount();
+	size_t i = TMap->GetInfoPointCount();
 	while (i--) {
 		InfoPoint* ip = TMap->GetInfoPoint(i);
 		if (strnicmp(ip->GetDialog(), resref, 8) == 0) {
