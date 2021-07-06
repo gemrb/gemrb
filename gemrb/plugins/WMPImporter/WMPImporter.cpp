@@ -180,7 +180,6 @@ WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str, WMPAreaEntry* ae)
 	str->ReadDword(ae->IconSeq);
 	//this should be set after iconseq is known
 	ae->SetAreaStatus(tmpDword, OP_SET);
-	// TODO: fix this with #232
 	ieDword coord;
 	str->ReadDword(coord);
 	ae->pos.x = coord;
@@ -317,7 +316,6 @@ int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
 		tmpDword = ae->GetAreaStatus();
 		stream->WriteDword(tmpDword);
 		stream->WriteDword(ae->IconSeq);
-		// TODO: fix this with #232
 		ieDword coord = ae->pos.x;
 		stream->WriteDword(coord);
 		coord = ae->pos.y;

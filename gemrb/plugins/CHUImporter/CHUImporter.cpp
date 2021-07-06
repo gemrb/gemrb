@@ -220,8 +220,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				//GemRB specific, progressbar
 				ieResRef MOSFile, MOSFile2;
 				ieResRef BAMFile;
-				ieWord KnobXPos, KnobYPos;
-				ieWord CapXPos, CapYPos;
+				Point knobP;
+				Point capP;
 				ieWord KnobStepsCount;
 				ieWord Cycle;
 
@@ -230,13 +230,10 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadResRef( BAMFile );
 				str->ReadWord(KnobStepsCount);
 				str->ReadWord(Cycle);
-				str->ReadWord(KnobXPos);
-				str->ReadWord(KnobYPos);
-				str->ReadWord(CapXPos);
-				str->ReadWord(CapYPos);
+				str->ReadPoint(knobP);
+				str->ReadPoint(capP);
 				Progressbar* pbar = new Progressbar(ctrlFrame, KnobStepsCount);
-				// TODO: fix this with #232
-				pbar->SetSliderPos(Point(KnobXPos, KnobYPos), Point(CapXPos, CapYPos));
+				pbar->SetSliderPos(knobP, capP);
 
 				Holder<Sprite2D> img;
 				Holder<Sprite2D> img2;
