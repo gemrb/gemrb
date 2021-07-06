@@ -883,7 +883,7 @@ void CREImporter::SetupColor(ieDword &stat)
 		}
 	}
 
-	RandRows = randcolors[0].size();
+	RandRows = ieDword(randcolors[0].size());
 	stat -= 200;
 	// handle saves with 1pp on installs without it
 	if (stat >= RandRows) {
@@ -3064,8 +3064,7 @@ int CREImporter::PutVariables(DataStream *stream, const Actor *actor)
 ieDword CREImporter::GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const
 {
 	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
-	ieDword cnt = sm->known_spells.size();
-	return cnt;
+	return ieDword(sm->known_spells.size());
 }
 
 int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level)
