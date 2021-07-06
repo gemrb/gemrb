@@ -49,6 +49,9 @@ protected:
 	mutable Holder<SurfaceHolder> surface;
 	mutable version_t version = 0;
 	mutable version_t palVersion = 0;
+	
+	void SetPaletteFromSurface() const noexcept;
+	int SetPaletteColors(const Color* pal) const noexcept;
 
 public:
 	SDLSurfaceSprite2D(const Region&, int Bpp, void* pixels,
@@ -62,8 +65,7 @@ public:
 	void* LockSprite() override;
 	void UnlockSprite() const override;
 
-	PaletteHolder GetPalette() const override;
-	int SetPalette(const Color* pal) const;
+	PaletteHolder GetPalette() const override { return surface->palette; }
 	void SetPalette(PaletteHolder pal) override;
 	int32_t GetColorKey() const override;
 	void SetColorKey(ieDword pxvalue) override;
