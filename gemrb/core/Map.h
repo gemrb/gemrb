@@ -397,7 +397,7 @@ private:
 	ieWord trackDiff;
 	PathMapFlags* SrchMap; //internal searchmap
 	unsigned short* MaterialMap;
-	unsigned int Width, Height;
+	Size mapSize;
 	std::list< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
 	std::vector<WallPolygonGroup> wallGroups;
@@ -550,8 +550,8 @@ public:
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);
 
-	int GetWidth() const { return Width; }
-	int GetHeight() const { return Height; }
+	int GetWidth() const { return mapSize.w; }
+	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
 	int GetExploredMapSize() const;
 	void FillExplored(bool explored);
@@ -566,8 +566,8 @@ public:
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
-	void AdjustPosition(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0, int size = -1) const;
-	void AdjustPositionNavmap(Point &goal, unsigned int radiusx = 0, unsigned int radiusy = 0) const;
+	void AdjustPosition(Point &goal, int radiusx = 0, int radiusy = 0, int size = -1) const;
+	void AdjustPositionNavmap(Point &goal, int radiusx = 0, int radiusy = 0) const;
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const;
 	PathNode* RandomWalk(const Point &s, int size, int radius, const Actor *caller) const;
@@ -670,8 +670,8 @@ private:
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised
-	bool AdjustPositionX(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size = -1) const;
-	bool AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size = -1) const;
+	bool AdjustPositionX(Point &goal, int radiusx, int radiusy, int size = -1) const;
+	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;

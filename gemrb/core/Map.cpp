@@ -381,7 +381,6 @@ Map::Map(void)
 	AreaFlags = AreaType = AreaDifficulty = 0;
 	Rain = Snow = Fog = Lightning = DayNight = 0;
 	trackString = trackFlag = trackDiff = 0;
-	Width = Height = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
 	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
@@ -472,17 +471,17 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bi
 	LightMap = lm;
 	HeightMap = hm;
 	SmallMap = sm;
-	Width = (unsigned int) (TMap->XCellCount * 4);
-	Height = (unsigned int) (( TMap->YCellCount * 64 + 63) / 12);
+	mapSize.w = TMap->XCellCount * 4;
+	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
 	Size size = sr->GetSize();
-	assert(Width >= size.w && Height >= size.h);
+	assert(mapSize.w >= size.w && mapSize.h >= size.h);
 	//Internal Searchmap
-	SrchMap = (PathMapFlags *) calloc(Width * Height, sizeof(PathMapFlags));
-	MaterialMap = (unsigned short *) calloc(Width * Height, sizeof(unsigned short));
+	SrchMap = (PathMapFlags *) calloc(mapSize.Area(), sizeof(PathMapFlags));
+	MaterialMap = (unsigned short *) calloc(mapSize.Area(), sizeof(unsigned short));
 	for (int y = 0; y < size.h; ++y) {
 		for (int x = 0; x < size.w; ++x) {
 			uint8_t value = uint8_t(PathMapFlags(sr->GetAt(Point(x,y))) & PathMapFlags::AREAMASK);
-			size_t index = y * Width + x;
+			size_t index = y * mapSize.w + x;
 			SrchMap[index] = Passable[value];
 			MaterialMap[index] = value;
 		}
@@ -880,7 +879,7 @@ void Map::ResolveTerrainSound(ieResRef &sound, const Point &Pos) const
 {
 	for(int i=0;i<tsndcount;i++) {
 		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
-			int type = MaterialMap[Pos.x/16 + Pos.y/12 * Width];
+			int type = MaterialMap[Pos.x/16 + Pos.y/12 * mapSize.w];
 			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
 			return;
 		}
@@ -2521,10 +2520,10 @@ PathMapFlags Map::GetBlockedNavmap(const Point &c) const
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
 PathMapFlags Map::GetBlocked(const Point &p) const
 {
-	if (p.y >= Height || p.x >= Width) {
+	if (p.y >= mapSize.h || p.x >= mapSize.w) {
 		return PathMapFlags::IMPASSABLE;
 	}
-	PathMapFlags ret = SrchMap[p.y * Width + p.x];
+	PathMapFlags ret = SrchMap[p.y * mapSize.w + p.x];
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
@@ -2980,24 +2979,24 @@ void Map::dump(bool show_actors) const
 	Log(DEBUG, "Map", buffer);
 }
 
-bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radiusy, int size) const
+bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 {
-	unsigned int minx = 0;
-	if ((unsigned int) goal.x > radiusx)
+	int minx = 0;
+	if (goal.x > radiusx)
 		minx = goal.x - radiusx;
-	unsigned int maxx = goal.x + radiusx + 1;
-	if (maxx > Width)
-		maxx = Width;
+	int maxx = goal.x + radiusx + 1;
+	if (maxx > mapSize.w)
+		maxx = mapSize.w;
 
-	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
-		if ((unsigned int) goal.y >= radiusy) {
+	for (int scanx = minx; scanx < maxx; scanx++) {
+		if (goal.y >= radiusy) {
 			if (bool(GetBlocked(Point(scanx, goal.y - radiusy), size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y - radiusy;
 				return true;
 			}
 		}
-		if (goal.y + radiusy < Height) {
+		if (goal.y + radiusy < mapSize.h) {
 			if (bool(GetBlocked(Point(scanx, goal.y + radiusy), size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y + radiusy;
@@ -3008,23 +3007,23 @@ bool Map::AdjustPositionX(Point &goal, unsigned int radiusx, unsigned int radius
 	return false;
 }
 
-bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiusy, int size) const
+bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 {
-	unsigned int miny = 0;
-	if ((unsigned int) goal.y > radiusy)
+	int miny = 0;
+	if (goal.y > radiusy)
 		miny = goal.y - radiusy;
-	unsigned int maxy = goal.y + radiusy + 1;
-	if (maxy > Height)
-		maxy = Height;
-	for (unsigned int scany = miny; scany < maxy; scany++) {
-		if ((unsigned int) goal.x >= radiusx) {
+	int maxy = goal.y + radiusy + 1;
+	if (maxy > mapSize.h)
+		maxy = mapSize.h;
+	for (int scany = miny; scany < maxy; scany++) {
+		if (goal.x >= radiusx) {
 			if (bool(GetBlocked(Point(goal.x - radiusx, scany), size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x - radiusx;
 				goal.y = scany;
 				return true;
 			}
 		}
-		if (goal.x + radiusx < Width) {
+		if (goal.x + radiusx < mapSize.w) {
 			if (bool(GetBlocked(Point(goal.x + radiusx, scany), size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x + radiusx;
 				goal.y = scany;
@@ -3035,7 +3034,7 @@ bool Map::AdjustPositionY(Point &goal, unsigned int radiusx,  unsigned int radiu
 	return false;
 }
 
-void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned int radiusy) const
+void Map::AdjustPositionNavmap(NavmapPoint &goal, int radiusx, int radiusy) const
 {
 	NavmapPoint smptGoal(goal.x / 16, goal.y / 12);
 	AdjustPosition(smptGoal, radiusx, radiusy);
@@ -3043,16 +3042,16 @@ void Map::AdjustPositionNavmap(NavmapPoint &goal, unsigned int radiusx, unsigned
 	goal.y = smptGoal.y * 12 + 6;
 }
 
-void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned int radiusy, int size) const
+void Map::AdjustPosition(SearchmapPoint &goal, int radiusx, int radiusy, int size) const
 {
-	if ((unsigned int) goal.x > Width) {
-		goal.x = Width;
+	if (goal.x > mapSize.w) {
+		goal.x = mapSize.w;
 	}
-	if ((unsigned int) goal.y > Height) {
-		goal.y = Height;
+	if (goal.y > mapSize.h) {
+		goal.y = mapSize.h;
 	}
 
-	while(radiusx<Width || radiusy<Height) {
+	while(radiusx < mapSize.w || radiusy < mapSize.h) {
 		//lets make it slightly random where the actor will appear
 		if (RAND(0,1)) {
 			if (AdjustPositionX(goal, radiusx, radiusy, size)) {
@@ -3069,10 +3068,10 @@ void Map::AdjustPosition(SearchmapPoint &goal, unsigned int radiusx, unsigned in
 				return;
 			}
 		}
-		if (radiusx<Width) {
+		if (radiusx < mapSize.w) {
 			radiusx++;
 		}
-		if (radiusy<Height) {
+		if (radiusy < mapSize.h) {
 			radiusy++;
 		}
 	}
@@ -3103,16 +3102,16 @@ int Map::WhichEdge(const Point &s) const
 		return -1;
 	}
 	// FIXME: is this backwards?
-	tileP.x *= Height;
-	tileP.y *= Width;
+	tileP.x *= mapSize.h;
+	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
-		if (Width * Height > tileP.x + tileP.y) { //
+		if (mapSize.w * mapSize.h > tileP.x + tileP.y) { //
 			return WMP_NORTH;
 		}
 		return WMP_EAST;
 	}
 	//south or west
-	if (Width*Height < tileP.x + tileP.y) { //
+	if (mapSize.w * mapSize.h < tileP.x + tileP.y) { //
 		return WMP_SOUTH;
 	}
 	return WMP_WEST;
@@ -3458,8 +3457,8 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 1) size = 1;
-	unsigned int ppx = Pos.x/16;
-	unsigned int ppy = Pos.y/12;
+	int ppx = Pos.x/16;
+	int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
@@ -3468,20 +3467,20 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value
 				unsigned int ppypj = ppy+j;
 				unsigned int ppxmi = ppx-i;
 				unsigned int ppymj = ppy-j;
-				unsigned int pos = ppypj * Width + ppxpi;
-				if (ppxpi < Width && ppypj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+				unsigned int pos = ppypj * mapSize.w + ppxpi;
+				if (ppxpi < (unsigned)mapSize.w && ppypj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
 					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
-				pos = ppymj * Width + ppxpi;
-				if (ppxpi < Width && ppymj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+				pos = ppymj * mapSize.w + ppxpi;
+				if (ppxpi < (unsigned)mapSize.w && ppymj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
 					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
-				pos = ppypj * Width + ppxmi;
-				if (ppxmi < Width && ppypj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+				pos = ppypj * mapSize.w + ppxmi;
+				if (ppxmi < (unsigned)mapSize.w && ppypj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
 					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
-				pos = ppymj * Width + ppxmi;
-				if (ppxmi < Width && ppymj < Height && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
+				pos = ppymj * mapSize.w + ppxmi;
+				if (ppxmi < (unsigned)mapSize.w && ppymj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
 					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
 				}
 			}
@@ -4084,18 +4083,18 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 
 PathMapFlags Map::GetInternalSearchMap(int x, int y) const
 {
-	if ((unsigned)x >= Width || (unsigned)y >= Height) {
+	if (x >= mapSize.w || y >= mapSize.h) {
 		return PathMapFlags::UNMARKED;
 	}
-	return SrchMap[x+y*Width];
+	return SrchMap[x + y * mapSize.w];
 }
 
 void Map::SetInternalSearchMap(int x, int y, PathMapFlags value)
 {
-	if ((unsigned)x >= Width || (unsigned)y >= Height) {
+	if (x >= mapSize.w || y >= mapSize.h) {
 		return;
 	}
-	SrchMap[x+y*Width] = value;
+	SrchMap[x + y * mapSize.w] = value;
 }
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
