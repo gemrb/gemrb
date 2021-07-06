@@ -280,6 +280,11 @@ void View::Draw()
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
+	if (superView && IsAnimated() && !IsOpaque()) {
+		// TODO: this should actually be superView->MarkDirty(frame) but we dont handle partial redraws so I'm avoiding the extra work...
+		// change it if we encounter an animated transparent subview overlapping with the parents drawing (or better yet implement partial redraws)
+		superView->DirtyBGRect(frame);
+	}
 	dirty = false;
 
 	if (core->InDebugMode(ID_VIEWS)) {
