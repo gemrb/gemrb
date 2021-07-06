@@ -105,6 +105,8 @@
 		A22DCCDF14A8FE0F0067D6D1 /* ios/Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCDE14A8FE0F0067D6D1 /* ios/Icon.png */; };
 		A22DCCE114A8FE120067D6D1 /* ios/Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE014A8FE120067D6D1 /* ios/Icon@2x.png */; };
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
+		A22E6D6E2694A74D000675E4 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
+		A22E6D6F2694A74D000675E4 /* SDL2.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
@@ -421,7 +423,6 @@
 		A2CD07B21CE2E0AB008CE1D0 /* ScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2CD07B01CE2E0AB008CE1D0 /* ScrollView.h */; };
 		A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2CD07AF1CE2E0AB008CE1D0 /* ScrollView.cpp */; };
 		A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2D0505214D0B09F00D8CD77 /* SDL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2D0505014D0B06C00D8CD77 /* SDL.framework */; };
 		A2D33FEB24C203110081AC31 /* FibonacciHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D33FEA24C203110081AC31 /* FibonacciHeap.h */; };
 		A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */; };
@@ -1167,8 +1168,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A2D0505114D0B06C00D8CD77 /* SDL.framework in Copy Frameworks into .app bundle */,
 				A2D0504F14D0AFCA00D8CD77 /* libgemrb_core.dylib in Copy Frameworks into .app bundle */,
+				A22E6D6F2694A74D000675E4 /* SDL2.framework in Copy Frameworks into .app bundle */,
 			);
 			name = "Copy Frameworks into .app bundle";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3980,6 +3981,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A22E6D6E2694A74D000675E4 /* SDL2.framework in Frameworks */,
 				A2E66486139E907000310FC8 /* libgemrb_core.dylib in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 			);
@@ -11783,11 +11785,14 @@
 					/Library/Frameworks,
 					/System/Library/Frameworks,
 					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
+				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -11803,11 +11808,14 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					/System/Library/Frameworks,
 					"$(FRAMEWORK_SEARCH_PATHS)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				INFOPLIST_FILE = osx/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = net.sourceforge.gemrb;
 				PRODUCT_NAME = GemRB;
+				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				WRAPPER_EXTENSION = app;
@@ -11895,12 +11903,11 @@
 					"-Wno-long-long",
 					"-DTARGET_OS_MAC=1",
 				);
-				SDKROOT = "";
-				"SDKROOT[arch=*]" = "";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = debugging;
 				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
 				USE_HEADERMAP = NO;
+				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Debug;
@@ -11979,10 +11986,9 @@
 					"-Wno-long-long",
 					"-DTARGET_OS_MAC=1",
 				);
-				SDKROOT = "";
-				"SDKROOT[arch=*]" = "";
 				USER_HEADER_SEARCH_PATHS = "./ ../../gemrb/ ../../gemrb/core/ ../../gemrb/includes/";
 				USE_HEADERMAP = NO;
+				VALIDATE_WORKSPACE_SKIPPED_SDK_FRAMEWORKS = OpenGL;
 				VALID_ARCHS = "i386 x86_64";
 			};
 			name = Release;
