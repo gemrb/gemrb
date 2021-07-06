@@ -680,6 +680,7 @@ void Button::SetAnimation(SpriteAnimation* anim)
 	} else {
 		delete animation;
 		animation = anim;
+		FlagsChanged(flags); // sync animation flags
 	}
 	
 	MarkDirty();
