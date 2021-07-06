@@ -919,11 +919,14 @@ void Interface::Main()
 		while (QuitFlag && QuitFlag != QF_KILL) {
 			HandleFlags();
 		}
-		//eventflags are processed only when there is a game
-		if (EventFlag && gamectrl) {
-			HandleEvents();
+		
+		if (gamectrl) {
+			//eventflags are processed only when there is a game
+			if (EventFlag) {
+				HandleEvents();
+			}
+			HandleGUIBehaviour(gamectrl);
 		}
-		HandleGUIBehaviour();
 
 		GameLoop();
 		// TODO: find other animations that need to be synchronized
@@ -2579,63 +2582,60 @@ void Interface::GameLoop(void)
 }
 
 /** handles hardcoded gui behaviour */
-void Interface::HandleGUIBehaviour(void)
+void Interface::HandleGUIBehaviour(GameControl* gc)
 {
-	GameControl *gc = GetGameControl();
-	if (gc) {
-		//this variable is used all over in the following hacks
-		int flg = gc->GetDialogueFlags();
+	//this variable is used all over in the following hacks
+	int flg = gc->GetDialogueFlags();
 
-		//the following part is a series of hardcoded gui behaviour
+	//the following part is a series of hardcoded gui behaviour
 
-		//initiating dialog
-		if (flg & DF_IN_DIALOG) {
-			// -3 noaction
-			// -2 close
-			// -1 open
-			// choose option
-			ieDword var = (ieDword) -3;
-			vars->Lookup("DialogChoose", var);
-			if ((int) var == -2) {
-				// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
-				gc->dialoghandler->EndDialog();
-			} else if ( (int)var !=-3) {
-				if ( (int) var == -1) {
-					guiscript->RunFunction( "GUIWORLD", "DialogStarted" );
-				}
-				gc->dialoghandler->DialogChoose(var);
-				if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
-					guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
-
-				// the last node of a dialog can have a new-dialog action! don't interfere in that case
-				ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
-				if (var == (ieDword) -1 || newvar != (ieDword) -1) {
-					vars->SetAt("DialogChoose", (ieDword) -3);
-				}
+	//initiating dialog
+	if (flg & DF_IN_DIALOG) {
+		// -3 noaction
+		// -2 close
+		// -1 open
+		// choose option
+		ieDword var = (ieDword) -3;
+		vars->Lookup("DialogChoose", var);
+		if ((int) var == -2) {
+			// TODO: this seems to never be called? (EndDialog is called from elsewhere instead)
+			gc->dialoghandler->EndDialog();
+		} else if ( (int)var !=-3) {
+			if ( (int) var == -1) {
+				guiscript->RunFunction( "GUIWORLD", "DialogStarted" );
 			}
-			if (flg & DF_OPENCONTINUEWINDOW) {
-				guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
-			} else if (flg & DF_OPENENDWINDOW) {
-				guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
-				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
+			gc->dialoghandler->DialogChoose(var);
+			if (!(gc->GetDialogueFlags() & (DF_OPENCONTINUEWINDOW | DF_OPENENDWINDOW)))
+				guiscript->RunFunction( "GUIWORLD", "NextDialogState" );
+
+			// the last node of a dialog can have a new-dialog action! don't interfere in that case
+			ieDword newvar = 0; vars->Lookup("DialogChoose", newvar);
+			if (var == (ieDword) -1 || newvar != (ieDword) -1) {
+				vars->SetAt("DialogChoose", (ieDword) -3);
 			}
 		}
-
-		//handling container
-		if (CurrentContainer && UseContainer) {
-			if (!(flg & DF_IN_CONTAINER) ) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
-				guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
-			}
-		} else {
-			if (flg & DF_IN_CONTAINER) {
-				gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
-				guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
-			}
+		if (flg & DF_OPENCONTINUEWINDOW) {
+			guiscript->RunFunction( "GUIWORLD", "OpenContinueMessageWindow" );
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
+		} else if (flg & DF_OPENENDWINDOW) {
+			guiscript->RunFunction( "GUIWORLD", "OpenEndMessageWindow" );
+			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, OP_NAND);
 		}
-		//end of gui hacks
 	}
+
+	//handling container
+	if (CurrentContainer && UseContainer) {
+		if (!(flg & DF_IN_CONTAINER) ) {
+			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
+			guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
+		}
+	} else {
+		if (flg & DF_IN_CONTAINER) {
+			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
+			guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
+		}
+	}
+	//end of gui hacks
 }
 
 Tooltip Interface::CreateTooltip()

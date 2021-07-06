@@ -747,7 +747,7 @@ private:
 	/** handles the EventFlag bits (conditional events) */
 	void HandleEvents();
 	/** handles hardcoded gui behaviour */
-	void HandleGUIBehaviour();
+	void HandleGUIBehaviour(GameControl*);
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
 	/** Executes everything (non graphical) in the main game loop */
