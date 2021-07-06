@@ -500,7 +500,7 @@ void Door::dump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog );
+	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
 
 	Log(DEBUG, "Door", buffer);
 }

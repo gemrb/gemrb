@@ -563,7 +563,7 @@ public:
 
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(int flags=GD_NORMAL) const;
-	void SetDialog(const ieResRef resref);
+	void SetDialog(const ResRef &resref);
 	/** Gets the Portrait */
 	Holder<Sprite2D> CopyPortrait(int which) const;
 

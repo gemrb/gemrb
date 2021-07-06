@@ -242,7 +242,7 @@ protected: //let Actor access this
 	Map *area;
 	ieVariable scriptName;
 	ieDword InternalFlags; //for triggers
-	ieResRef Dialog;
+	ResRef Dialog;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 
@@ -313,11 +313,11 @@ public:
 	bool InterruptCasting;
 public:
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(void) const
+	ResRef GetDialog() const
 	{
 		return Dialog;
 	}
-	void SetDialog(const char *resref);
+	void SetDialog(const ResRef &resref);
 	void SetFloatingText(char*);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetSpellResRef(ResRef resref);

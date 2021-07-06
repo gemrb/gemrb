@@ -91,7 +91,6 @@ Scriptable::Scriptable(ScriptableType type)
 	IdleTicks = 0;
 	AuraTicks = 100;
 	TriggerCountdown = 0;
-	Dialog[0] = 0;
 
 	globalID = ++globalActorCounter;
 	if (globalActorCounter == 0) {
@@ -155,9 +154,9 @@ const char* Scriptable::GetScriptName(void) const
 	return scriptName;
 }
 
-void Scriptable::SetDialog(const char *resref) {
+void Scriptable::SetDialog(const ResRef &resref) {
 	if (gamedata->Exists(resref, IE_DLG_CLASS_ID) ) {
-		strnuprcpy(Dialog, resref, 8);
+		Dialog = resref;
 	}
 }
 

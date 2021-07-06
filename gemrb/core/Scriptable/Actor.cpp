@@ -5013,7 +5013,7 @@ void Actor::dump(StringBuffer& buffer) const
 	}
 	buffer.append("\n");
 	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area, Pos.x, Pos.y);
-	buffer.appendFormatted("Dialog:     %.8s    TalkCount:  %d\n", Dialog, TalkCount);
+	buffer.appendFormatted("Dialog:     %.8s    TalkCount:  %d\n", Dialog.CString(), TalkCount);
 	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
 	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
 	buffer.appendFormatted("Int. Flags: 0x%x    ", InternalFlags);
@@ -6467,9 +6467,9 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int
 	return LSR_OK;
 }
 
-void Actor::SetDialog(const ieResRef resref)
+void Actor::SetDialog(const ResRef &resref)
 {
-	CopyResRef(Dialog, resref);
+	Dialog = resref;
 }
 
 Holder<Sprite2D> Actor::CopyPortrait(int which) const

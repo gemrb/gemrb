@@ -2343,12 +2343,12 @@ Actor* Map::GetActor(int index, bool any) const
 	return NULL;
 }
 
-Scriptable *Map::GetActorByDialog(const char *resref) const
+Scriptable *Map::GetActorByDialog(const ResRef &resref) const
 {
 	for (auto actor : actors) {
 		//if a busy or hostile actor shouldn't be found
 		//set this to GD_CHECK
-		if (strnicmp( actor->GetDialog(GD_NORMAL), resref, 8 ) == 0) {
+		if (actor->GetDialog(GD_NORMAL) == resref) {
 			return actor;
 		}
 	}
@@ -2361,7 +2361,7 @@ Scriptable *Map::GetActorByDialog(const char *resref) const
 	size_t i = TMap->GetInfoPointCount();
 	while (i--) {
 		InfoPoint* ip = TMap->GetInfoPoint(i);
-		if (strnicmp(ip->GetDialog(), resref, 8) == 0) {
+		if (ip->GetDialog() == resref) {
 			return ip;
 		}
 	}
@@ -2370,7 +2370,7 @@ Scriptable *Map::GetActorByDialog(const char *resref) const
 	i = TMap->GetDoorCount();
 	while (i--) {
 		Door* door = TMap->GetDoor(i);
-		if (strnicmp(door->GetDialog(), resref, 8) == 0) {
+		if (door->GetDialog() == resref) {
 			return door;
 		}
 	}
@@ -2381,16 +2381,15 @@ Scriptable *Map::GetActorByDialog(const char *resref) const
 // currently only looks at the party, since it is enough for the only known user
 // relies on an override item we create, with the resref matching the dialog one!
 // currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
-Scriptable *Map::GetItemByDialog(ResRef resref) const
+Scriptable *Map::GetItemByDialog(const ResRef &resref) const
 {
 	const Game *game = core->GetGame();
-	ieResRef itemref;
 	// choose the owner of the dialog via passed dialog ref
 	if (resref != ResRef("dmhead")) {
 		Log(WARNING, "Map", "Encountered new candidate item for GetItemByDialog? %s", resref.CString());
 		return NULL;
 	}
-	CopyResRef(itemref, "mertwyn");
+	ResRef itemref = "mertwyn";
 
 	int i = game->GetPartySize(true);
 	while (i--) {
