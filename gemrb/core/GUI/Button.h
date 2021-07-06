@@ -209,6 +209,7 @@ private: // Private attributes
 	void DoToggle();
 
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
+	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
 	void DrawSelf(Region drawFrame, const Region& clip) override;
 	void FlagsChanged(unsigned int /*oldflags*/) override;

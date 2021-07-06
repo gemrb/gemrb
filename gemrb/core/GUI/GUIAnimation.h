@@ -140,11 +140,10 @@ private:
 	ieDword colors[8] {};
 	tick_t nextFrameTime = 0;
 
+	tick_t CalculateNextFrameDelta();
 	Holder<Sprite2D> GenerateNext(tick_t time);
 public:
 	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
-	~SpriteAnimation();
-	void UpdateAnimation(bool paused, tick_t time);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;
@@ -154,9 +153,9 @@ public:
 	tick_t Time() const { return nextFrameTime; }
 	
 	enum RepeatFlags : uint8_t {
-		PLAY_NORMAL		= 0,
+		PLAY_NORMAL		= 0,  // play in a loop
 		PLAY_RANDOM		= 1,
-		PLAY_ONCE		= 2,
+		PLAY_ONCE		= 2,  // play and stop at end
 		PLAY_ALWAYS		= 4   // play even when game is paused
 	} flags = PLAY_NORMAL;
 };

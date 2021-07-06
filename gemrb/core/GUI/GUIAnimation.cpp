@@ -82,15 +82,7 @@ SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)
 : bam(af), cycle(cycle)
 {
 	assert(bam);
-	UpdateAnimation(false, begintime);
-	core->timer.AddAnimation(this);
-}
-
-//freeing the bitmaps only once, but using an intelligent algorithm
-SpriteAnimation::~SpriteAnimation()
-{
-	//removing from timer first
-	core->timer.RemoveAnimation(this);
+	nextFrameTime = begintime + CalculateNextFrameDelta();
 }
 
 bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
@@ -104,21 +96,6 @@ bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
 	return true;
 }
 
-void SpriteAnimation::UpdateAnimation(bool paused, tick_t time)
-{
-	if (paused && !(flags & PLAY_ALWAYS)) {
-		// try again later
-		nextFrameTime = time + 1;
-		return;
-	}
-	
-	current = GenerateNext(time);
-	if (!current) {
-		// an error occured so just end the animation
-		nextFrameTime = 0;
-	}
-}
-
 void SpriteAnimation::SetPaletteGradients(ieDword *col)
 {
 	memcpy(colors, col, 8*sizeof(ieDword));
@@ -130,7 +107,7 @@ void SpriteAnimation::SetBlend(bool b)
 	is_blended = b;
 }
 
-Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
+tick_t SpriteAnimation::CalculateNextFrameDelta()
 {
 	tick_t delta = 0;
 	if (flags & PLAY_RANDOM) {
@@ -161,7 +138,18 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 			delta = 15;
 		}
 	}
-	nextFrameTime = time + delta;
+	return delta;
+}
+
+Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
+{
+	// even if we are paused we need to generate the first frame
+	if (current && !(flags & PLAY_ALWAYS) && core->IsFreezed()) {
+		nextFrameTime = time + 1;
+		return current;
+	}
+
+	nextFrameTime = time + CalculateNextFrameDelta();
 	assert(nextFrameTime);
 	
 	Holder<Sprite2D> pic = bam->GetFrame(frame, cycle);
@@ -170,7 +158,6 @@ Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 		//stopping at end frame
 		if (flags & PLAY_ONCE) {
 			nextFrameTime = 0;
-			core->timer.RemoveAnimation(this);
 			return current;
 		}
 		anim_phase = 0;

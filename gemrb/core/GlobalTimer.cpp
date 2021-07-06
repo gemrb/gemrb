@@ -29,17 +29,14 @@
 namespace GemRB {
 
 GlobalTimer::GlobalTimer(void)
-  : animations(animationComparator)
 {
 	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
-	ClearAnimations();
 }
 
 void GlobalTimer::Freeze()
 {
 	tick_t thisTime = GetTicks();
-	UpdateAnimations(true, thisTime);
 
 	if (UpdateViewport(thisTime) == false) {
 		return;
@@ -141,8 +138,6 @@ bool GlobalTimer::Update()
 	Game *game;
 	GameControl* gc;
 	tick_t thisTime = GetTicks();
-
-	UpdateAnimations(false, thisTime);
 
 	if (!startTime) {
 		goto end;
@@ -248,39 +243,6 @@ void GlobalTimer::SetFadeFromColor(tick_t Count, unsigned short factor)
 	fadeFromFactor = factor;
 }
 
-void GlobalTimer::AddAnimation(SpriteAnimation* anim)
-{
-	animations.insert(anim);
-}
-
-void GlobalTimer::RemoveAnimation(SpriteAnimation* anim)
-{
-	for (auto it = animations.lower_bound(anim); it != animations.end() && (*it)->Time() == anim->Time(); ++it) {
-		if (*it == anim) {
-			animations.erase(it);
-			break;
-		}
-	}
-}
-
-void GlobalTimer::UpdateAnimations(bool paused, tick_t thisTime)
-{
-	for (auto it = animations.begin(); it != animations.end() && (*it)->Time() <= thisTime;) {
-		auto animation = *it;
-		it = animations.erase(it);
-		animation->UpdateAnimation(paused, thisTime);
-
-		if (!animation->HasEnded()) {
-			animations.insert(animation);
-		}
-	}
-}
-
-void GlobalTimer::ClearAnimations()
-{
-	animations.clear();
-}
-
 void GlobalTimer::SetScreenShake(const Point &shake, int count)
 {
 	shakeVec.x = std::abs(shake.x);
@@ -293,10 +255,6 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 		goal = currentVP.origin;
 		speed = 1000;
 	}
-}
-
-bool GlobalTimer::animationComparator (const SpriteAnimation *a, const SpriteAnimation *b) {
-	return a->Time() < b->Time();
 }
 
 }

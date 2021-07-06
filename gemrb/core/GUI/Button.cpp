@@ -119,8 +119,20 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 
 void Button::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 {
+	tick_t time = GetTicks();
 	if (overlayAnim) {
-		overlayAnim.Next(GetTicks());
+		overlayAnim.Next(time);
+	}
+	if (animation) {
+		animation->Next(time);
+	}
+}
+
+void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
+{
+	if (animation && animation->HasEnded()) {
+		delete animation;
+		animation = nullptr;
 	}
 }
 
@@ -194,7 +206,7 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	// Button animation
-	if (animation) {
+	if (animation && animation->Current()) {
 		auto AnimPicture = animation->Current();
 		int xOffs = ( frame.w / 2 ) - ( AnimPicture->Frame.w / 2 );
 		int yOffs = ( frame.h / 2 ) - ( AnimPicture->Frame.h / 2 );
@@ -334,7 +346,7 @@ void Button::SetState(unsigned char state)
 
 bool Button::IsAnimated() const
 {
-	if (animation && !animation->HasEnded()) {
+	if (animation) {
 		return true;
 	}
 

@@ -25,11 +25,7 @@
 
 #include "Region.h"
 
-#include <set>
-
 namespace GemRB {
-
-class SpriteAnimation;
 
 class GEM_EXPORT GlobalTimer {
 private:
@@ -42,22 +38,19 @@ private:
 	int shakeCounter = 0;
 	Point shakeVec;
 
-	static bool animationComparator (const SpriteAnimation*, const SpriteAnimation*);
-	std::multiset<SpriteAnimation*, decltype(animationComparator)*> animations;
-
 	//move viewport to this coordinate
 	Point goal = Point(-1, -1);
 	int speed = 0;
 	Region currentVP;
 
 	void DoFadeStep(ieDword count);
-	void UpdateAnimations(bool paused, tick_t time);
+	bool UpdateViewport(tick_t time);
 public:
 	GlobalTimer(void);
 	
 	GlobalTimer(GlobalTimer&&) = default;
 	GlobalTimer& operator=(GlobalTimer&&) = default;
-public:
+
 	void Freeze();
 	bool Update();
 	bool ViewportIsMoving();
@@ -66,12 +59,6 @@ public:
 	void SetFadeToColor(tick_t Count, unsigned short factor = 1);
 	void SetFadeFromColor(tick_t Count, unsigned short factor = 1);
 	void SetScreenShake(const Point&, int Count);
-	void AddAnimation(SpriteAnimation* anim);
-	void RemoveAnimation(SpriteAnimation* anim);
-	void ClearAnimations();
-
-private:
-	bool UpdateViewport(tick_t time);
 };
 
 }
