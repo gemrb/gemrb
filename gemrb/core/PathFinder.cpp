@@ -68,7 +68,8 @@ PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int ma
 	size_t tries = 0;
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	while (SquaredDistance(p, s) < unsigned(maxPathLength * maxPathLength * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy), size) & PathMapFlags::PASSABLE)) {
+		Point rad(std::lround(p.x + 3 * xSign * dx), std::lround(p.y + 3 * ySign * dy));
+		if (!(GetBlockedInRadius(rad, size) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up and call the pathfinder if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) break;
@@ -96,7 +97,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 	NormalizeDeltas(dx, dy, double(gamedata->GetStepTime()) / caller->GetSpeed());
 	size_t tries = 0;
 	while (SquaredDistance(p, s) < unsigned(radius * radius * SEARCHMAP_SQUARE_DIAGONAL * SEARCHMAP_SQUARE_DIAGONAL)) {
-		if (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & PathMapFlags::PASSABLE)) {
+		if (!(GetBlockedInRadius(p + Point(dx, dy), size) & PathMapFlags::PASSABLE)) {
 			tries++;
 			// Give up if backed into a corner
 			if (tries > RAND_DEGREES_OF_FREEDOM) {
@@ -113,8 +114,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 			p.y += dy;
 		}
 	}
-	while (!(GetBlockedInRadius(p.x + dx, p.y + dx, size) & (PathMapFlags::PASSABLE|PathMapFlags::ACTOR))) {
-
+	while (!(GetBlockedInRadius(p + Point(dx, dy), size) & (PathMapFlags::PASSABLE|PathMapFlags::ACTOR))) {
 		p.x -= dx;
 		p.y -= dy;
 	}
@@ -220,7 +220,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = bool(GetBlocked(p.x / 16, p.y / 12) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
+		bool wall = bool(GetBlocked(ConvertCoordToTile(p)) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) & 15;
@@ -256,14 +256,14 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	Log(DEBUG, "FindPath", "s = (%d, %d), d = (%d, %d), caller = %s, dist = %d, size = %d", s.x, s.y, d.x, d.y, caller ? caller->GetName(0) : "nullptr", minDistance, size);
 	NavmapPoint nmptDest = d;
 	NavmapPoint nmptSource = s;
-	if (!(GetBlockedInRadius(d.x, d.y, size) & PathMapFlags::PASSABLE)) {
+	if (!(GetBlockedInRadius(d, size) & PathMapFlags::PASSABLE)) {
 		// If the desired target is blocked, find the path
 		// to the nearest reachable point.
 		// Also avoid bumping a still actor out of its position,
 		// but stop just before it
 		AdjustPositionNavmap(nmptDest);
 	}
-	if (minDistance < size && !(GetBlockedInRadius(nmptDest.x, nmptDest.y, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
+	if (minDistance < size && !(GetBlockedInRadius(nmptDest, size) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR))) {
 		Log(DEBUG, "FindPath", "%s can't fit in destination", caller ? caller->GetName(0) : "nullptr");
 		return nullptr;
 	}
@@ -319,7 +319,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 
-			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild.x, nmptChild.y, size);
+			PathMapFlags childBlockStatus = GetBlockedInRadius(nmptChild, size);
 			bool childBlocked = !(childBlockStatus & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR | PathMapFlags::TRAVEL));
 			if (childBlocked) continue;
 

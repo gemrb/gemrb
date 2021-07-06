@@ -424,6 +424,7 @@ public:
 	static void ReleaseMemory();
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
+	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */
 	void dump(bool show_actors=0) const;
@@ -476,10 +477,9 @@ public:
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
-	PathMapFlags GetBlockedInRadius(unsigned int px, unsigned int py, unsigned int size, bool stopOnImpassable = true) const;
-	PathMapFlags GetBlocked(unsigned int x, unsigned int y) const;
-	PathMapFlags GetBlocked(unsigned int x, unsigned int y, int size) const;
-	PathMapFlags GetBlockedNavmap(unsigned int x, unsigned int y) const;
+	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
+	PathMapFlags GetBlocked(const Point&) const;
+	PathMapFlags GetBlocked(const Point&, int size) const;
 	PathMapFlags GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID) const;
