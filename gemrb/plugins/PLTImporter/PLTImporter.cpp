@@ -27,19 +27,10 @@
 
 using namespace GemRB;
 
-static ieDword red_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword blue_mask = 0x000000ff;
-
 PLTImporter::PLTImporter(void)
 {
 	Width = Height = 0;
 	pixels = NULL;
-	if (DataStream::BigEndian()) {
-		red_mask = 0x0000ff00;
-		green_mask = 0x00ff0000;
-		blue_mask = 0xff000000;
-	}
 }
 
 PLTImporter::~PLTImporter(void)
@@ -99,9 +90,14 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 				*dest++ = 0xff;
 		}
 	}
-	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite( Region(0,0,Width,Height), 32,
-		red_mask, green_mask, blue_mask, 0, p,
-		true, green_mask );
+	constexpr uint32_t red_mask = 0x00ff0000;
+	constexpr uint32_t green_mask = 0x0000ff00;
+	constexpr uint32_t blue_mask = 0x000000ff;
+	PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+	fmt.HasColorKey = true;
+	fmt.ColorKey = green_mask;
+
+	Holder<Sprite2D> spr = core->GetVideoDriver()->CreateSprite(Region(0,0,Width,Height), p, fmt);
 	spr->Frame.x = 0;
 	spr->Frame.y = 0;
 	return spr;

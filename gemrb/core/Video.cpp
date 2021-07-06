@@ -272,8 +272,8 @@ Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned
 		}
 	}
 
-	Holder<Sprite2D> small = CreateSprite(scaledFrame, 32, 0x000000ff, 0x0000ff00, 0x00ff0000,
-0xff000000, pixels, false, 0 );
+	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	Holder<Sprite2D> small = CreateSprite(scaledFrame, pixels, fmt);
 
 	small->Frame.x = sprite->Frame.x / ratio;
 	small->Frame.y = sprite->Frame.y / ratio;
@@ -302,7 +302,8 @@ Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 		}
 	}
 
-	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+	static const PixelFormat fmt(4, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000);
+	Holder<Sprite2D> light = CreateSprite(Region(0,0, radius*2, radius*2), pixels, fmt);
 
 	light->Frame.x = radius;
 	light->Frame.y = radius;

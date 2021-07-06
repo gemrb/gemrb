@@ -33,7 +33,7 @@ private:
 
 	//COLORTABLE
 	ieDword NumColors;
-	Color* Palette;
+	Color* PaletteColors = nullptr;
 
 	//RASTERDATA
 	void* pixels;

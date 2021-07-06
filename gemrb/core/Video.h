@@ -30,6 +30,7 @@
 #include "globals.h"
 
 #include "EnumFlags.h"
+#include "Pixels.h"
 #include "Plugin.h"
 #include "Polygon.h"
 #include "Sprite2D.h"
@@ -160,13 +161,7 @@ public:
 
 	virtual bool TouchInputEnabled() = 0;
 
-	virtual Holder<Sprite2D> CreateSprite(const Region&, int bpp, ieDword rMask,
-		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
-		bool cK = false, int index = 0) = 0;
-	virtual Holder<Sprite2D> CreateSprite8(const Region&, void* pixels,
-									PaletteHolder palette, bool cK = false, int index = 0) = 0;
-	virtual Holder<Sprite2D> CreatePalettedSprite(const Region&, int bpp, void* pixels,
-										   Color* palette, bool cK = false, int index = 0) = 0;
+	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
 	virtual bool SupportsBAMSprites() { return false; }
 	
 	void BlitSprite(const Holder<Sprite2D> spr, Point p,

@@ -31,7 +31,6 @@ using namespace GemRB;
 
 BMPImporter::BMPImporter(void)
 {
-	Palette = NULL;
 	pixels = NULL;
 	Size = Compression = ImageSize = Planes = 0;
 	BitCount = PaddedRowLength = NumColors = 0;
@@ -39,7 +38,7 @@ BMPImporter::BMPImporter(void)
 
 BMPImporter::~BMPImporter(void)
 {
-	free( Palette );
+	free(PaletteColors);
 	free( pixels );
 }
 
@@ -49,8 +48,8 @@ bool BMPImporter::Open(DataStream* stream)
 	//we release the previous pixel data
 	free( pixels );
 	pixels = NULL;
-	free( Palette );
-	Palette = NULL;
+	free(PaletteColors);
+	PaletteColors = nullptr;
 
 	//BITMAPFILEHEADER
 	char Signature[2];
@@ -94,20 +93,19 @@ bool BMPImporter::Open(DataStream* stream)
 		return false;
 	}
 	//COLORTABLE
-	Palette = NULL;
 	if (BitCount <= 8) {
 		if (BitCount == 8)
 			NumColors = 256;
 		else
 			NumColors = 16;
-		Palette = ( Color * ) malloc( 4 * NumColors );
+		PaletteColors = (Color *)malloc(4 * NumColors);
 //		memset(Palette, 0, 4 * NumColors);
 		for (unsigned int i = 0; i < NumColors; i++) {
-			str->Read( &Palette[i].b, 1 );
-			str->Read( &Palette[i].g, 1 );
-			str->Read( &Palette[i].r, 1 );
-			str->Read( &Palette[i].a, 1 );
-			Palette[i].a = (Palette[i].a == 0) ? 0xff : Palette[i].a;
+			str->Read(&PaletteColors[i].b, 1);
+			str->Read(&PaletteColors[i].g, 1);
+			str->Read(&PaletteColors[i].r, 1);
+			str->Read(&PaletteColors[i].a, 1);
+			PaletteColors[i].a = (PaletteColors[i].a == 0) ? 0xff : PaletteColors[i].a;
 		}
 	}
 	str->Seek( DataOffset, GEM_STREAM_START );
@@ -229,19 +227,24 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
-		const ieDword red_mask = 0x000000ff;
-		const ieDword green_mask = 0x0000ff00;
-		const ieDword blue_mask = 0x00ff0000;
 		void* p = malloc(size.Area() * 4 );
 		memcpy( p, pixels, size.Area() * 4 );
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
-			red_mask, green_mask, blue_mask, 0x00000000, p,
-			true, green_mask|(0xff<<24) );
+		
+		constexpr uint32_t red_mask = 0x000000ff;
+		constexpr uint32_t green_mask = 0x0000ff00;
+		constexpr uint32_t blue_mask = 0x00ff0000;
+		PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+		fmt.HasColorKey = true;
+		fmt.ColorKey = green_mask | (0xff << 24);
+
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
 	} else if (BitCount == 8) {
 		void* p = malloc(size.Area());
 		memcpy(p, pixels, size.Area());
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, size.w, size.h), NumColors == 16 ? 4 : 8,
-														   p, Palette, true, 0);
+		PaletteHolder pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
+		fmt.Depth = NumColors == 16 ? 4 : 8;
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
 	}
 	return spr;
 }
@@ -253,9 +256,9 @@ int BMPImporter::GetPalette(int colors, Color* pal)
 	}
 
 	for (int i = 0; i < colors; i++) {
-		pal[i].r = Palette[i%NumColors].r;
-		pal[i].g = Palette[i%NumColors].g;
-		pal[i].b = Palette[i%NumColors].b;
+		pal[i].r = PaletteColors[i % NumColors].r;
+		pal[i].g = PaletteColors[i % NumColors].g;
+		pal[i].b = PaletteColors[i % NumColors].b;
 		pal[i].a = 0xff;
 	}
 	return -1;
@@ -296,7 +299,7 @@ Image* BMPImporter::GetImage()
 		unsigned char *p = ( unsigned char * ) pixels;
 		for (int y = 0; y < size.h; y++) {
 			for (int x = 0; x < size.w; x++) {
-				data->SetPixel(Point(x,y), Palette[p[y * size.w + x] % NumColors]);
+				data->SetPixel(Point(x,y), PaletteColors[p[y * size.w + x] % NumColors]);
 			}
 		}
 		break;

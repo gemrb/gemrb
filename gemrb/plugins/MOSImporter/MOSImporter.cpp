@@ -28,18 +28,9 @@
 
 using namespace GemRB;
 
-static ieDword red_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword blue_mask = 0x000000ff;
-
 MOSImporter::MOSImporter(void)
 {
 	Cols = Rows = BlockSize = PalOffset = 0;
-	if (DataStream::BigEndian()) {
-		red_mask = 0x0000ff00;
-		green_mask = 0x00ff0000;
-		blue_mask = 0xff000000;
-	}
 }
 
 MOSImporter::~MOSImporter(void)
@@ -122,10 +113,15 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 		}
 	}
 	free( blockpixels );
-	Holder<Sprite2D> ret = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
-		red_mask, green_mask, blue_mask, 0,
-		pixels, true, green_mask );
-	return ret;
+	
+	constexpr uint32_t red_mask = 0x00ff0000;
+	constexpr uint32_t green_mask = 0x0000ff00;
+	constexpr uint32_t blue_mask = 0x000000ff;
+	PixelFormat fmt(4, red_mask, green_mask, blue_mask, 0);
+	fmt.HasColorKey = true;
+	fmt.ColorKey = green_mask;
+	
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), pixels,fmt);
 }
 
 #include "plugindef.h"

@@ -67,13 +67,7 @@ public:
 	~SDLVideoDriver(void) override;
 	int Init(void) override;
 
-	Holder<Sprite2D> CreateSprite(const Region& rgn, int bpp, ieDword rMask,
-		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
-		bool cK = false, int index = 0) override;
-	Holder<Sprite2D> CreateSprite8(const Region& rgn, void* pixels,
-							PaletteHolder palette, bool cK, int index) override;
-	Holder<Sprite2D> CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
-								   Color* palette, bool cK = false, int index = 0) override;
+	Holder<Sprite2D> CreateSprite(const Region& rgn, void* pixels, const PixelFormat&) override;
 
 	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
 					BlitFlags flags, Color tint = Color()) override;

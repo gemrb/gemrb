@@ -27,33 +27,6 @@
 
 namespace GemRB {
 
-#pragma pack(push,1)
-struct Pixel24Bit {
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
-#else
-	uint8_t b;
-	uint8_t g;
-	uint8_t r;
-#endif
-	
-	Pixel24Bit& operator=(Uint32 pixel) {
-		r = pixel & 0xff000000;
-		g = pixel & 0x00ff0000;
-		b = pixel & 0x0000ff00;
-		return *this;
-	}
-	
-	operator Uint32() {
-		return r + ((Uint32)g << 8) + ((Uint32)b << 16);
-	}
-};
-#pragma pack(pop)
-
-static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
-
 struct SDLPixelIterator : IPixelIterator
 {
 private:

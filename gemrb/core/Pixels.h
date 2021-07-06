@@ -21,9 +21,102 @@
 #ifndef PIXELS_H
 #define PIXELS_H
 
-#include "Video.h"
+#include "Region.h"
+#include "Palette.h"
+
+#define ERROR_UNKNOWN_BPP error("SDLVideo", "Invalid bpp.")
 
 namespace GemRB {
+
+using colorkey_t = uint32_t;
+
+struct PixelFormat {
+	uint8_t  Rloss = 0;
+	uint8_t  Gloss = 0;
+	uint8_t  Bloss = 0;
+	uint8_t  Aloss = 0;
+	uint8_t  Rshift = 0;
+	uint8_t  Gshift = 0;
+	uint8_t  Bshift = 0;
+	uint8_t  Ashift = 0;
+	uint32_t Rmask = 0;
+	uint32_t Gmask = 0;
+	uint32_t Bmask = 0;
+	uint32_t Amask = 0;
+	
+	uint8_t Bpp = 0; // bytes per pixel
+	uint8_t Depth = 0;
+	colorkey_t ColorKey = 0;
+	bool HasColorKey = false;
+	bool RLE = false;
+	PaletteHolder palette;
+	
+	PixelFormat() noexcept = default;
+	PixelFormat(uint8_t bpp, uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask) noexcept
+	: Rmask(rmask), Gmask(gmask), Bmask(bmask), Amask(amask), Bpp(bpp), Depth(bpp * 8)
+	{}
+	
+	// we wouldnt need this monster in C++14...
+	PixelFormat(uint8_t rloss, uint8_t gloss, uint8_t bloss, uint8_t aloss,
+				uint8_t rshift, uint8_t gshift, uint8_t bshift, uint8_t ashift,
+				uint32_t rmask, uint32_t gmask, uint32_t bmask, uint32_t amask,
+				uint8_t bpp, uint8_t depth,
+				colorkey_t ck, bool hasCk, bool rle, PaletteHolder pal) noexcept
+	: Rloss(rloss), Gloss(gloss), Bloss(bloss), Aloss(aloss),
+	Rshift(rshift), Gshift(gshift), Bshift(bshift), Ashift(ashift),
+	Rmask(rmask), Gmask(gmask), Bmask(bmask), Amask(amask),
+	Bpp(bpp), Depth(depth), ColorKey(ck), HasColorKey(hasCk),
+	RLE(rle), palette(pal)
+	{}
+	
+	static PixelFormat Paletted8Bit(PaletteHolder pal, bool hasColorKey = false, colorkey_t key = 0) {
+		return PixelFormat {
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			1, 8,
+			key, hasColorKey,
+			false, pal
+		};
+	}
+	
+	static PixelFormat RLE8Bit(PaletteHolder pal, colorkey_t key) {
+		return PixelFormat {
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			0, 0, 0, 0,
+			1, 8,
+			key, true,
+			true, pal
+		};
+	}
+};
+
+#pragma pack(push,1)
+struct Pixel24Bit {
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+#else
+	uint8_t b;
+	uint8_t g;
+	uint8_t r;
+#endif
+	
+	Pixel24Bit& operator=(uint32_t pixel) {
+		r = pixel & 0xff000000;
+		g = pixel & 0x00ff0000;
+		b = pixel & 0x0000ff00;
+		return *this;
+	}
+	
+	operator uint32_t() {
+		return r + ((uint32_t)g << 8) + ((uint32_t)b << 16);
+	}
+};
+#pragma pack(pop)
+static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
 
 struct RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, uint8_t mask) const=0;

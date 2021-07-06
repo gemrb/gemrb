@@ -142,7 +142,8 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 	// ensure that we have a sprite!
 	if (Sheet == NULL) {
 		//Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion.w, SheetRegion.h, pageData, pal, true, 0);
-		Sheet = core->GetVideoDriver()->CreateSprite8(SheetRegion, pageData, font->palette, true, 0);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(font->palette, true, 0);
+		Sheet = core->GetVideoDriver()->CreateSprite(SheetRegion, pageData, fmt);
 		if (font->background) {
 			invertedSheet = Sheet->copy();
 			auto invertedPalette = font->palette->Copy();
@@ -563,9 +564,8 @@ Holder<Sprite2D> Font::RenderTextAsSprite(const String& string, const Size& size
 	} else if (alignment&IE_FONT_ALIGN_BOTTOM) {
 		rgn.y = -(size.h - rgn.h);
 	}
-	Holder<Sprite2D> canvas = core->GetVideoDriver()->CreateSprite8(rgn, canvasPx, palette, true, 0);
-
-	return canvas;
+	PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, 0);
+	return core->GetVideoDriver()->CreateSprite(rgn, canvasPx, fmt);
 }
 
 size_t Font::Print(const Region& rgn, const String& string, ieByte alignment, Point* point) const

@@ -236,39 +236,14 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 	return GEM_OK;
 }
 
-Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, int bpp, ieDword rMask,
-	ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK, int index)
+Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
-	sprite_t* spr = new sprite_t(rgn, bpp, pixels, rMask, gMask, bMask, aMask);
-
-	if (cK) {
-		spr->SetColorKey(index);
+	Holder<Sprite2D> spr = new sprite_t(rgn, fmt.Depth, pixels, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
+	if (fmt.palette) {
+		spr->SetPalette(fmt.palette);
 	}
-	/*
-	 there is at least one place (BlitGameSprite) that requires 8 or 32bpp sprites
-	 untill we support 16bpp fully we cannot do this
-
-	// make sure colorkey is set prior to conversion
-	SDL_PixelFormat* fmt = backBuf->format;
-	spr->ConvertFormatTo(fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
-	*/
-	return spr;
-}
-
-Holder<Sprite2D> SDLVideoDriver::CreateSprite8(const Region& rgn, void* pixels,
-										PaletteHolder palette, bool cK, int index)
-{
-	return CreatePalettedSprite(rgn, 8, pixels, palette->col, cK, index);
-}
-
-Holder<Sprite2D> SDLVideoDriver::CreatePalettedSprite(const Region& rgn, int bpp, void* pixels,
-											   Color* palette, bool cK, int index)
-{
-	sprite_t* spr = new sprite_t(rgn, bpp, pixels, 0, 0, 0, 0);
-
-	spr->SetPalette(palette);
-	if (cK) {
-		spr->SetColorKey(index);
+	if (fmt.HasColorKey) {
+		spr->SetColorKey(fmt.ColorKey);
 	}
 	return spr;
 }

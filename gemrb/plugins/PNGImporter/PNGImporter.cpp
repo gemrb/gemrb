@@ -46,12 +46,6 @@ struct GemRB::PNGInternal {
 	png_infop end_info;
 };
 
-
-static ieDword blue_mask = 0x00ff0000;
-static ieDword green_mask = 0x0000ff00;
-static ieDword red_mask = 0x000000ff;
-static ieDword alpha_mask = 0xff000000;
-
 PNGImporter::PNGImporter(void)
 {
 	inf = new PNGInternal();
@@ -176,14 +170,18 @@ Holder<Sprite2D> PNGImporter::GetSprite2D()
 	png_read_end(inf->png_ptr, inf->end_info);
 
 	if (hasPalette) {
-		Color pal[256];
-		int ck = GetPalette(256, pal);
-		spr = core->GetVideoDriver()->CreatePalettedSprite(Region(0,0, size.w, size.h), 8, buffer, pal, (ck >= 0), ck);
+		PaletteHolder pal = MakeHolder<Palette>();
+		int ck = GetPalette(256, pal->col);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, (ck >= 0), ck);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), buffer, fmt);
 	} else {
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
-												   red_mask, green_mask,
-												   blue_mask, alpha_mask,
-												   buffer, false, 0);
+		constexpr ieDword blue_mask = 0x00ff0000;
+		constexpr ieDword green_mask = 0x0000ff00;
+		constexpr ieDword red_mask = 0x000000ff;
+		constexpr ieDword alpha_mask = 0xff000000;
+		static const PixelFormat fmt(4, red_mask, green_mask, blue_mask, alpha_mask);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h),
+												   buffer, fmt);
 	}
 
 	png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);

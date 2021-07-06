@@ -85,8 +85,9 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 
 Holder<Sprite2D> TISImporter::GetTile(int index)
 {
-	Color Col[256];
-	Color Palette[256]{};
+	PaletteHolder pal = MakeHolder<Palette>();
+	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+	
 	void* pixels = calloc(4096, 1);
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
@@ -98,30 +99,26 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 		}
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		Palette[0].g = 200;
-		return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette );
+		pal->col[0].g = 200;
+		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
 	}
 	str->Seek( pos, GEM_STREAM_START );
-	str->Read( &Col, 1024 );
-	int transindex = 0;
-	bool transparent = false;
+	Color Col[256];
+	str->Read(&Col, 1024 );
+
 	for (int i = 0; i < 256; i++) {
 		// bgra format
-		Palette[i].r = Col[i].b;
-		Palette[i].g = Col[i].g;
-		Palette[i].b = Col[i].r;
-		Palette[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
-		if (Palette[i].g==255 && !Palette[i].r && !Palette[i].b) {
-			if (transparent) {
-				Log(ERROR, "TISImporter", "Tile has two green (transparent) palette entries");
-			} else {
-				transparent = true;
-				transindex = i;
-			}
+		pal->col[i].r = Col[i].b;
+		pal->col[i].g = Col[i].g;
+		pal->col[i].b = Col[i].r;
+		pal->col[i].a = (Col[i].a) ? Col[i].a : 255; // alpha is unused by the originals but SDL will happily use it
+		if (pal->col[i].g==255 && !pal->col[i].r && !pal->col[i].b) {
+			fmt.HasColorKey = true;
+			fmt.ColorKey = i;
 		}
 	}
 	str->Read( pixels, 4096 );
-	return core->GetVideoDriver()->CreatePalettedSprite( Region(0,0,64,64), 8, pixels, Palette, transparent, transindex );
+	return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
 }
 
 #include "plugindef.h"

@@ -35,17 +35,10 @@ Image::~Image()
 
 Holder<Sprite2D> Image::GetSprite2D()
 {
-	union {
-		unsigned char color[sizeof(ieDword)];
-		ieDword Mask;
-	} r = {{ 0xFF, 0x00, 0x00, 0x00 }},
-	  g = {{ 0x00, 0xFF, 0x00, 0x00 }},
-	  b = {{ 0x00, 0x00, 0xFF, 0x00 }},
-	  a = {{ 0x00, 0x00, 0x00, 0xFF }};
+	static const PixelFormat fmt(4, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
 	void *pixels = malloc(sizeof(Color) * size.h * size.w);
 	memcpy(pixels, data, sizeof(Color) * size.h * size.w);
-	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), 32,
-			r.Mask, g.Mask, b.Mask, a.Mask, pixels);
+	return core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), pixels, fmt);
 }
 
 }
