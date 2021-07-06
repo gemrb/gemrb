@@ -133,28 +133,23 @@ bool SDLSurfaceSprite2D::IsPaletteStale() const
 
 void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
 {
-	PaletteHolder palette = surface->palette;
-
 	// we don't use shared palettes because it is a performance bottleneck on SDL2
-	assert(pal != palette);
-
-	if (palette) {
-		palette = nullptr;
-	}
+	assert(pal != surface->palette);
 
 	if (version == 0) {
-		original->palette = palette;
+		original->palette = nullptr;
 	} else {
 		Restore();
 	}
 
 	ieDword ck = GetColorKey();
 	if (pal && SetPalette(pal->col) == 0) {
-		palette = pal->Copy();
+		surface->palette = pal->Copy();
 		// must reset the color key or SDL 2 wont render properly
 		SetColorKey(ck);
+	} else {
+		surface->palette = nullptr;
 	}
-	surface->palette = palette;
 }
 
 int SDLSurfaceSprite2D::SetPalette(const Color* pal) const
