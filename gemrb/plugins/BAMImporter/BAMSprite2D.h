@@ -36,12 +36,8 @@ public:
 	BAMSprite2D(const BAMSprite2D &obj);
 	Holder<Sprite2D> copy() const override;
 
-	PaletteHolder GetPalette() const override;
-	void SetPalette(PaletteHolder pal) override;
-	Color GetPixel(const Point&) const override;
-	int32_t GetColorKey() const override { return format.ColorKey; };
-	void SetColorKey(ieDword ck) override { format.ColorKey = (ieByte)ck; };
-	bool HasTransparency() const override;
+	Color GetPixel(const Point&) const noexcept override;
+	bool HasTransparency() const noexcept override;
 };
 
 }

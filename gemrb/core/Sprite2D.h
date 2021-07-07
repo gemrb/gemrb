@@ -73,6 +73,9 @@ protected:
 	
 	PixelFormat format;
 	uint16_t pitch;
+	
+	virtual void UpdatePalette(PaletteHolder) noexcept {};
+	virtual void UpdateColorKey(colorkey_t) noexcept {};
 
 public:
 	Region Frame;
@@ -86,22 +89,23 @@ public:
 
 	virtual Holder<Sprite2D> copy() const = 0;
 
-	bool IsPixelTransparent(const Point& p) const;
+	virtual bool HasTransparency() const noexcept;
+	bool IsPixelTransparent(const Point& p) const noexcept;
 
 	virtual const void* LockSprite() const;
 	virtual void* LockSprite();
-	virtual void UnlockSprite() const;
+	virtual void UnlockSprite() const {};
 
 	const PixelFormat& Format() const noexcept { return format; }
-	virtual PaletteHolder GetPalette() const = 0;
-	virtual void SetPalette(PaletteHolder pal) = 0;
-	virtual Color GetPixel(const Point&) const = 0;
-	Color GetPixel(int x, int y) const;
-	virtual bool HasTransparency() const = 0;
+	virtual Color GetPixel(const Point&) const noexcept = 0;
+	PaletteHolder GetPalette() const noexcept { return format.palette; }
+	void SetPalette(PaletteHolder pal);
+	
 	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
-	virtual int32_t GetColorKey() const = 0;
-	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
-	virtual void SetColorKey(ieDword) = 0;
+	colorkey_t GetColorKey() const noexcept { return format.ColorKey; }
+	/* SetColorKey: either a px value or a palete index if sprite has a palette. */
+	void SetColorKey(colorkey_t);
+
 	virtual bool ConvertFormatTo(const PixelFormat&) noexcept { return false; }; // not pure virtual!
 };
 

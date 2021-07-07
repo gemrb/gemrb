@@ -41,6 +41,10 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* pixels, const P
 
 	assert(*surface);
 	original = surface;
+	
+	if (format.palette)
+		UpdatePalette(format.palette);
+	UpdateColorKey(format.ColorKey);
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fmt) noexcept
@@ -129,7 +133,7 @@ bool SDLSurfaceSprite2D::IsPaletteStale() const
 	return pal && pal->GetVersion() != palVersion;
 }
 
-void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
+void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 {
 	// we don't use shared palettes because it is a performance bottleneck on SDL2
 	assert(pal != surface->palette);
@@ -142,7 +146,7 @@ void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
 
 	colorkey_t ck = GetColorKey();
 	if (pal && SetPaletteColors(pal->col) == 0) {
-		surface->palette = pal->Copy();
+		surface->palette = pal;
 		// must reset the color key or SDL 2 wont render properly
 		SetColorKey(ck);
 	} else {
@@ -150,35 +154,19 @@ void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
 	}
 }
 
-int32_t SDLSurfaceSprite2D::GetColorKey() const
+void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	Uint32 ck = -1;
-	int ret = SDL_GetColorKey(*surface, &ck);
-	if (ret == 0) {
-		return ck;
-	}
-#else
-	if ((*surface)->flags & SDL_SRCCOLORKEY) {
-		return (*surface)->format->colorkey;
-	}
-#endif
-	return -1;
-}
-
-void SDLSurfaceSprite2D::SetColorKey(ieDword ck)
-{
-#if SDL_VERSION_ATLEAST(1,3,0)
-	SDL_SetColorKey(*surface, SDL_TRUE, ck);
+	int ret = SDL_SetColorKey(*surface, SDL_TRUE, ck);
 	// don't RLE with SDL 2
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
-	//SDL_SetSurfaceRLE(surface, SDL_TRUE);
 #else
-	SDL_SetColorKey(*surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
+	int ret = SDL_SetColorKey(*surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
 #endif
+	assert(ret == 0);
 }
 
-bool SDLSurfaceSprite2D::HasTransparency() const
+bool SDLSurfaceSprite2D::HasTransparency() const noexcept
 {
 	SDL_PixelFormat* fmt = (*surface)->format;
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -188,7 +176,7 @@ bool SDLSurfaceSprite2D::HasTransparency() const
 #endif
 }
 
-Color SDLSurfaceSprite2D::GetPixel(const Point& p) const
+Color SDLSurfaceSprite2D::GetPixel(const Point& p) const noexcept
 {
 	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
 		IPixelIterator::Direction xdir = (renderFlags & BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
@@ -318,10 +306,16 @@ void SDLTextureSprite2D::UnlockSprite() const
 	staleTexture = true;
 }
 
-void SDLTextureSprite2D::SetColorKey(ieDword pxvalue)
+void SDLTextureSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 {
+	SDLSurfaceSprite2D::UpdatePalette(pal);
 	staleTexture = true;
-	SDLSurfaceSprite2D::SetColorKey(pxvalue);
+}
+
+void SDLTextureSprite2D::UpdateColorKey(colorkey_t key) noexcept
+{
+	SDLSurfaceSprite2D::UpdateColorKey(key);
+	staleTexture = true;
 }
 
 void* SDLTextureSprite2D::NewVersion(version_t version) const

@@ -320,7 +320,8 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xba
 
 	for (unsigned int x = 0; x < ratio; x++) {
 		for (unsigned int y = 0; y < ratio; y++) {
-			Color c = sprite->GetPixel( xbase*ratio+x, ybase*ratio+y );
+			const Point p(xbase * ratio + x, ybase * ratio + y);
+			Color c = sprite->GetPixel(p);
 			r += Gamma22toGamma10[c.r];
 			g += Gamma22toGamma10[c.g];
 			b += Gamma22toGamma10[c.b];

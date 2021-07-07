@@ -45,23 +45,7 @@ Holder<Sprite2D> BAMSprite2D::copy() const
 	return new BAMSprite2D(*this);
 }
 
-/** Get the Palette of a Sprite */
-PaletteHolder BAMSprite2D::GetPalette() const
-{
-	return format.palette;
-}
-
-void BAMSprite2D::SetPalette(PaletteHolder palette)
-{
-	if (palette == NULL) {
-		Log(WARNING, "BAMSprite2D", "cannot set a NULL palette.");
-		return;
-	}
-
-	format.palette = palette;
-}
-
-Color BAMSprite2D::GetPixel(const Point& p) const
+Color BAMSprite2D::GetPixel(const Point& p) const noexcept
 {
 	Color c;
 
@@ -93,7 +77,7 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 	return c;
 }
 
-bool BAMSprite2D::HasTransparency() const
+bool BAMSprite2D::HasTransparency() const noexcept
 {
 	// BAMs always use green for transparency and if colorkey > 0 it guarantees we have green
 	return format.ColorKey > 0 || (format.palette->col[0].r == 0 && format.palette->col[0].g == 0xff && format.palette->col[0].b == 0);

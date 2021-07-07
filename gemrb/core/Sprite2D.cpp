@@ -33,13 +33,16 @@ Sprite2D::Sprite2D(const Region& frame, void* pixels, const PixelFormat& fmt) no
 {}
 
 Sprite2D::Sprite2D(const Sprite2D &obj) noexcept
+: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
 {
-	format = obj.format;
-	Frame = obj.Frame;
 	renderFlags = obj.renderFlags;
-
-	pixels = obj.pixels;
 	freePixels = false;
+}
+
+Sprite2D::Sprite2D(Sprite2D&& obj) noexcept
+: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
+{
+	renderFlags = obj.renderFlags;
 }
 
 Sprite2D::~Sprite2D() noexcept
@@ -49,14 +52,17 @@ Sprite2D::~Sprite2D() noexcept
 	}
 }
 
-Color Sprite2D::GetPixel(int x, int y) const
+bool Sprite2D::HasTransparency() const noexcept
 {
-	return GetPixel(Point(x, y));
+	return format.HasColorKey || format.Amask;
 }
 
-bool Sprite2D::IsPixelTransparent(const Point& p) const
+bool Sprite2D::IsPixelTransparent(const Point& p) const noexcept
 {
-	return GetPixel(p).a == 0;
+	if (HasTransparency()) {
+		return GetPixel(p).a == 0;
+	}
+	return false;
 }
 
 const void* Sprite2D::LockSprite() const
@@ -69,7 +75,27 @@ void* Sprite2D::LockSprite()
 	return pixels;
 }
 
-void Sprite2D::UnlockSprite() const
-{}
+void Sprite2D::SetPalette(PaletteHolder pal)
+{
+	assert(format.Bpp == 1);
+	assert(pal != nullptr);
+
+	if (pal == format.palette) return;
+	
+	if (format.RLE) {
+		format.palette = pal;
+	} else {
+		// we don't use shared palettes because it is a performance bottleneck on SDL2
+		format.palette = pal->Copy();
+	}
+	
+	UpdatePalette(format.palette);
+}
+
+void Sprite2D::SetColorKey(colorkey_t key)
+{
+	format.ColorKey = key;
+	UpdateColorKey(key);
+}
 
 }
