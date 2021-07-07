@@ -521,7 +521,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (ambi) {
 		// schedule for day/night
 		// if the two ambients are the same, just add one, so there's no restart
-		if (memcmp(map->SongHeader.MainDayAmbient2, map->SongHeader.MainNightAmbient2, 8)) {
+		if (map->SongHeader.MainDayAmbient2 != map->SongHeader.MainNightAmbient2) {
 			ambi->appearance = DAY_BITS;
 			map->AddAmbient(ambi);
 			// night
