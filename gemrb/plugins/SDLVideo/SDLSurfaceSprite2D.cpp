@@ -54,7 +54,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fm
 SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 : Sprite2D(obj)
 {
-	SDL_PixelFormat* fmt = (*obj.surface)->format;
 	pixels = (*obj.surface)->pixels;
 
 	surface = new SurfaceHolder(
@@ -64,16 +63,16 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 				Frame.h,
 				format.Depth,
 				Frame.w * format.Bpp,
-				fmt->Rmask,
-				fmt->Gmask,
-				fmt->Bmask,
-				fmt->Amask
+				format.Rmask,
+				format.Gmask,
+				format.Bmask,
+				format.Amask
 			)
 		);
 
 	original = surface;
 	if (format.Depth <= 8) {
-		SetPaletteColors(reinterpret_cast<const Color*>(fmt->palette->colors));
+		SetPaletteColors(format.palette->col);
 	}
 	SetColorKey(obj.GetColorKey());
 }
