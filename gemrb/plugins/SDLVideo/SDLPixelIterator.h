@@ -162,7 +162,7 @@ public:
 		return static_cast<Uint8*>(imp->pixel);
 	}
 
-	Uint8 Channel(Uint32 mask, Uint8 shift) const override {
+	Uint8 Channel(Uint32 mask, Uint8 shift) const noexcept override {
 		switch (format->BytesPerPixel) {
 			case 1:
 				return static_cast<PixelIterator<Uint8>*>(imp)->Channel(mask, shift);
@@ -177,11 +177,11 @@ public:
 		}
 	}
 
-	IPixelIterator* Clone() const override {
+	IPixelIterator* Clone() const noexcept override {
 		return new SDLPixelIterator(*this);
 	}
 
-	void Advance(int amt) override {
+	void Advance(int amt) noexcept override {
 		imp->Advance(amt);
 	}
 	
@@ -191,7 +191,7 @@ public:
 		return c;
 	}
 
-	void ReadRGBA(Uint8& r, Uint8& g, Uint8& b, Uint8& a) const {
+	void ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const {
 		Uint32 pixel = 0;
 		switch (format->BytesPerPixel) {
 			case 4:
@@ -267,7 +267,7 @@ public:
 		}
 	}
 	
-	const Point& Position() const override {
+	const Point& Position() const noexcept override {
 		return imp->Position();
 	}
 };

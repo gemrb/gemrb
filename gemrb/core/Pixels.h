@@ -292,22 +292,22 @@ struct IPixelIterator
 	Direction xdir;
 	Direction ydir;
 
-	IPixelIterator(void* px, int pitch, Direction x, Direction y)
+	IPixelIterator(void* px, int pitch, Direction x, Direction y) noexcept
 	: pixel(px), pitch(pitch), xdir(x), ydir(y) {}
 
-	virtual ~IPixelIterator() = default;
+	virtual ~IPixelIterator() noexcept = default;
 
-	virtual IPixelIterator* Clone() const=0;
-	virtual void Advance(int)=0;
-	virtual uint8_t Channel(uint32_t mask, uint8_t shift) const=0;
-	virtual const Point& Position() const=0;
+	virtual IPixelIterator* Clone() const noexcept=0;
+	virtual void Advance(int) noexcept=0;
+	virtual uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept=0;
+	virtual const Point& Position() const noexcept=0;
 
-	IPixelIterator& operator++() {
+	IPixelIterator& operator++() noexcept {
 		Advance(1);
 		return *this;
 	}
 
-	bool operator!=(const IPixelIterator& rhs) const {
+	bool operator!=(const IPixelIterator& rhs) const noexcept {
 		return pixel != rhs.pixel;
 	}
 };
@@ -340,15 +340,15 @@ struct PixelIterator : IPixelIterator
 		return static_cast<PIXEL*>(pixel);
 	}
 
-	uint8_t Channel(uint32_t mask, uint8_t shift) const override {
+	uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override {
 		return ((*static_cast<PIXEL*>(pixel))&mask) >> shift;
 	}
 
-	IPixelIterator* Clone() const override {
+	IPixelIterator* Clone() const noexcept override {
 		return new PixelIterator<PIXEL>(*this);
 	}
 
-	void Advance(int dx) override {
+	void Advance(int dx) noexcept override {
 		if (dx == 0 || size.IsInvalid()) return;
 
 		uint8_t* ptr = static_cast<uint8_t*>(pixel);
@@ -383,7 +383,7 @@ struct PixelIterator : IPixelIterator
 		pixel = ptr;
 	}
 	
-	const Point& Position() const override {
+	const Point& Position() const noexcept override {
 		return pos;
 	}
 };
