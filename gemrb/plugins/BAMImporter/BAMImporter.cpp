@@ -85,17 +85,37 @@ bool BAMImporter::Open(DataStream* stream)
 	str->ReadDword(PaletteOffset);
 	str->ReadDword(FLTOffset);
 	str->Seek( FramesOffset, GEM_STREAM_START );
+	
 	frames = new FrameEntry[FramesCount];
 	DataStart = str->Size();
-	for (unsigned int i = 0; i < FramesCount; i++) {
-		str->ReadWord(frames[i].Width);
-		str->ReadWord(frames[i].Height);
-		str->ReadWord(frames[i].XPos);
-		str->ReadWord(frames[i].YPos);
-		str->ReadDword(frames[i].FrameData);
-		if ((frames[i].FrameData & 0x7FFFFFFF) < DataStart)
-			DataStart = (frames[i].FrameData & 0x7FFFFFFF);
+	for (i = 0; i < FramesCount; i++) {
+		ieWord w, h;
+		ieWordSigned x , y;
+		str->ReadScalar(w);
+		frames[i].bounds.w = w;
+		str->ReadScalar(h);
+		frames[i].bounds.h = h;
+		str->ReadScalar(x);
+		frames[i].bounds.x = x;
+		str->ReadScalar(y);
+		frames[i].bounds.y = y;
+		ieDword offset;
+		str->ReadScalar(offset);
+		frames[i].RLE = (offset & 0x80000000) == 0;
+		frames[i].dataOffset = offset & 0x7FFFFFFF;
+		DataStart = std::min(DataStart, frames[i].dataOffset);
+		
+		if (!frames[i].RLE) {
+			frames[i].dataLength = w * h;
+		} else if (i > 0) {
+			assert(frames[i].dataOffset > frames[i - 1].dataOffset);
+			frames[i - 1].dataLength = frames[i].dataOffset - frames[i - 1].dataOffset;
+		}
 	}
+	
+	if (frames[FramesCount - 1].RLE)
+		frames[FramesCount - 1].dataLength = str->Size() - frames[FramesCount - 1].dataOffset;
+	
 	cycles = new CycleEntry[CyclesCount];
 	for (unsigned int i = 0; i < CyclesCount; i++) {
 		str->ReadWord(cycles[i].FramesCount);
@@ -132,25 +152,26 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, bool RLESprite, unsigned char* data)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, bool RLESprite,
+											   uint8_t* data, uint8_t*)
 {
 	Holder<Sprite2D> spr;
 
 	if (RLESprite) {
 		assert(data);
 		unsigned char* framedata = data;
-		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-		spr = new BAMSprite2D (Region(0,0, frames[findex].Width, frames[findex].Height),
+		framedata += frames[findex].dataOffset - DataStart;
+		spr = new BAMSprite2D (Region(0,0, frames[findex].bounds.w, frames[findex].bounds.h),
 							   framedata, palette, CompressedColorIndex);
 	} else {
 		void* pixels = GetFramePixels(findex);
-		Region r(0,0, frames[findex].Width, frames[findex].Height);
+		Region r(0,0, frames[findex].bounds.w, frames[findex].bounds.h);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
 		spr = core->GetVideoDriver()->CreateSprite(r, pixels, fmt);
 	}
 
-	spr->Frame.x = (ieWordSigned)frames[findex].XPos;
-	spr->Frame.y = (ieWordSigned)frames[findex].YPos;
+	spr->Frame.x = (ieWordSigned)frames[findex].bounds.x;
+	spr->Frame.y = (ieWordSigned)frames[findex].bounds.y;
 	return spr;
 }
 
@@ -159,15 +180,14 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
 	}
-	str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
-	unsigned long pixelcount = frames[findex].Height * frames[findex].Width;
+	str->Seek(frames[findex].dataOffset, GEM_STREAM_START );
+	unsigned long pixelcount = frames[findex].bounds.h * frames[findex].bounds.w;
 	void* pixels = malloc( pixelcount );
-	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
-	if (RLECompressed) {
+	if (frames[findex].RLE) {
 		//if RLE Compressed
 		unsigned long RLESize;
 		RLESize = ( unsigned long )
-			( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
+			( frames[findex].bounds.w * frames[findex].bounds.h * 3 ) / 2 + 1;
 		//without partial reads, we should be careful
 		unsigned long remains = str->Remains();
 		if (RLESize > remains) {
@@ -250,8 +270,8 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
-		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, data);
+		bool RLECompressed = allowCompression && frames[i].RLE;
+		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, data, data + frames[i].dataLength);
 		assert(!RLECompressed || frame->Format().RLE);
 		af->AddFrame(frame);
 	}

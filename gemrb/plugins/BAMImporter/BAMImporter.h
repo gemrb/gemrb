@@ -30,11 +30,10 @@
 namespace GemRB {
 
 struct FrameEntry {
-	ieWord Width;
-	ieWord  Height;
-	ieWord  XPos;
-	ieWord  YPos;
-	ieDword FrameData;
+	Region bounds;
+	bool RLE = false;
+	int dataOffset = 0;
+	int dataLength = 0;
 };
 
 class Palette;
@@ -50,10 +49,10 @@ private:
 	PaletteHolder palette;
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
-	unsigned long DataStart;
+	int DataStart;
 private:
 	Holder<Sprite2D> GetFrameInternal(unsigned short findex,
-									  bool RLESprite, unsigned char* data);
+									  bool RLESprite, uint8_t* data, uint8_t* dataEnd);
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:
