@@ -6478,7 +6478,7 @@ Holder<Sprite2D> Actor::CopyPortrait(int which) const
 	return im ? im->GetSprite2D() : nullptr;
 }
 
-const char *Actor::GetDialog(int flags) const
+ResRef Actor::GetDialog(int flags) const
 {
 	if (!flags) {
 		return Dialog;

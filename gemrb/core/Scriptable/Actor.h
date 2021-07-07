@@ -562,7 +562,7 @@ public:
 	int CastingLevelBonus(int level, int type);
 
 	/** Gets the Dialog ResRef */
-	const char* GetDialog(int flags=GD_NORMAL) const;
+	ResRef GetDialog(int flags=GD_NORMAL) const;
 	void SetDialog(const ResRef &resref);
 	/** Gets the Portrait */
 	Holder<Sprite2D> CopyPortrait(int which) const;
