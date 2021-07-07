@@ -359,7 +359,7 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 						  IAlphaIterator* cover,
 						  BlitFlags flags, const Tinter& tint)
 {
-	assert(spr->BAM);
+	assert(spr && spr->Format().RLE);
 
 	if (srect.size.IsInvalid())
 		return;

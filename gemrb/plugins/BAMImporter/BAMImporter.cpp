@@ -252,7 +252,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 	for (i = 0; i < FramesCount; ++i) {
 		bool RLECompressed = allowCompression && (frames[i].FrameData & 0x80000000) == 0;
 		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, data);
-		assert(!RLECompressed || frame->BAM);
+		assert(!RLECompressed || frame->Format().RLE);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {

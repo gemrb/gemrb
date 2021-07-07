@@ -166,7 +166,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, SDL_Rect mask
 	return maskit;
 }
 
-void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
+void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
 											BlitFlags flags, const Color* t)
 {
 	Color tint(255,255,255,255);
@@ -250,7 +250,6 @@ void SDL12VideoDriver::BlitSpriteBAMClipped(const Holder<Sprite2D> spr, const Re
 		}
 	}
 
-	spr->UnlockSprite();
 	delete maskit;
 }
 
@@ -555,8 +554,8 @@ Holder<Sprite2D> SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLSurfaceSprite2D *screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), 24,
-															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	SDLSurfaceSprite2D *screenshot = new SDLSurfaceSprite2D(Region(0,0, Width, Height), fmt);
 	SDL_Rect src = RectFromRegion(r);
 	if (buf) {
 		auto surface = static_cast<SDLSurfaceVideoBuffer&>(*buf).Surface();

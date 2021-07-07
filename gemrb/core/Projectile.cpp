@@ -1903,7 +1903,7 @@ void Projectile::Cleanup()
 void Projectile::Draw(Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();
-	PaletteHolder pal = (spr->Bpp == 8) ? palette : nullptr;
+	PaletteHolder pal = (spr->Format().Bpp == 1) ? palette : nullptr;
 	if (flags & BlitFlags::COLOR_MOD) {
 		// FIXME: this may not apply universally
 		flags |= BlitFlags::ALPHA_MOD;

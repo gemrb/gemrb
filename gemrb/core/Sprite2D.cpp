@@ -24,26 +24,25 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
-	: pixels(pixels), Frame(rgn), Bpp(Bpp)
-{
-	freePixels = (pixels != NULL);
-	BAM = false;
-}
+Sprite2D::Sprite2D(const Region& rgn, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept
+: pixels(pixels), freePixels(pixels), format(fmt), pitch(pitch), Frame(rgn)
+{}
 
-Sprite2D::Sprite2D(const Sprite2D &obj)
-{
-	BAM = false;
+Sprite2D::Sprite2D(const Region& frame, void* pixels, const PixelFormat& fmt) noexcept
+: Sprite2D(frame, pixels, fmt, frame.w)
+{}
 
+Sprite2D::Sprite2D(const Sprite2D &obj) noexcept
+{
+	format = obj.format;
 	Frame = obj.Frame;
-	Bpp = obj.Bpp;
 	renderFlags = obj.renderFlags;
 
 	pixels = obj.pixels;
 	freePixels = false;
 }
 
-Sprite2D::~Sprite2D()
+Sprite2D::~Sprite2D() noexcept
 {
 	if (freePixels) {
 		free(pixels);

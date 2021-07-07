@@ -54,11 +54,9 @@ protected:
 	int SetPaletteColors(const Color* pal) const noexcept;
 
 public:
-	SDLSurfaceSprite2D(const Region&, int Bpp, void* pixels,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLSurfaceSprite2D(const Region&, int Bpp,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj);
+	SDLSurfaceSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	SDLSurfaceSprite2D(const Region&, const PixelFormat& fmt) noexcept;
+	SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept;
 	Holder<Sprite2D> copy() const override;
 
 	const void* LockSprite() const override;
@@ -71,8 +69,7 @@ public:
 	void SetColorKey(ieDword pxvalue) override;
 	bool HasTransparency() const override;
 	Color GetPixel(const Point&) const override;
-	bool ConvertFormatTo(int bpp, ieDword rmask, ieDword gmask,
-						 ieDword bmask, ieDword amask) override;
+	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
 	SDL_Surface* GetSurface() const { return *surface; };
 
@@ -107,10 +104,8 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	mutable bool staleTexture = false;
 	
 public:
-	SDLTextureSprite2D(const Region&, int Bpp, void* pixels,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
-	SDLTextureSprite2D(const Region&, int Bpp,
-					   ieDword rmask, ieDword gmask, ieDword bmask, ieDword amask);
+	SDLTextureSprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	SDLTextureSprite2D(const Region&, const PixelFormat& fmt) noexcept;
 	Holder<Sprite2D> copy() const override;
 	
 	void UnlockSprite() const override;

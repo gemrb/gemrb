@@ -308,7 +308,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
 	// WARNING: software fallback == slow
-	if (spr->Bpp == 8 && (flags & BlitFlags::ALPHA_MOD)) {
+	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
 		version |= BlitFlags::ALPHA_MOD;
 		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
 	} else {
@@ -543,8 +543,8 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
-															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), fmt);
 
 	SDL_Texture* target = SDL_GetRenderTarget(renderer);
 	if (buf) {

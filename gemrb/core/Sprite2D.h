@@ -33,6 +33,7 @@
 #include "exports.h"
 
 #include "Palette.h"
+#include "Pixels.h"
 #include "Region.h"
 #include "TypeID.h"
 
@@ -67,20 +68,23 @@ class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
 protected:
-	bool freePixels;
-	void* pixels;
+	void* pixels = nullptr;
+	bool freePixels = true;
+	
+	PixelFormat format;
+	uint16_t pitch;
 
 public:
 	Region Frame;
-	int Bpp;
-
-	bool BAM;
 	BlitFlags renderFlags = BlitFlags::NONE;
 
-	Sprite2D(const Region&, int Bpp, void* pixels);
-	Sprite2D(const Sprite2D &obj);
+	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept;
+	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	Sprite2D(const Sprite2D &obj) noexcept;
+	Sprite2D(Sprite2D&&) noexcept;
+	~Sprite2D() noexcept override;
+
 	virtual Holder<Sprite2D> copy() const = 0;
-	~Sprite2D() override;
 
 	bool IsPixelTransparent(const Point& p) const;
 
@@ -88,6 +92,7 @@ public:
 	virtual void* LockSprite();
 	virtual void UnlockSprite() const;
 
+	const PixelFormat& Format() const noexcept { return format; }
 	virtual PaletteHolder GetPalette() const = 0;
 	virtual void SetPalette(PaletteHolder pal) = 0;
 	virtual Color GetPixel(const Point&) const = 0;
@@ -97,8 +102,7 @@ public:
 	virtual int32_t GetColorKey() const = 0;
 	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
 	virtual void SetColorKey(ieDword) = 0;
-	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
-							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
+	virtual bool ConvertFormatTo(const PixelFormat&) noexcept { return false; }; // not pure virtual!
 };
 
 }

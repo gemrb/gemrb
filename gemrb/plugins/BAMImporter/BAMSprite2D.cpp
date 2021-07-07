@@ -27,25 +27,16 @@ namespace GemRB {
 
 BAMSprite2D::BAMSprite2D(const Region& rgn, void* pixels,
 						 PaletteHolder palette, ieDword ck)
-	: Sprite2D(rgn, 8, pixels)
+: Sprite2D(rgn, pixels, PixelFormat::RLE8Bit(palette, ck))
 {
-	pal = palette;
-	colorkey = ck;
-	BAM = true;
 	freePixels = false; // managed by AnimationFactory
 
-	assert(pal);
+	assert(format.palette);
 }
 
 BAMSprite2D::BAMSprite2D(const BAMSprite2D &obj)
-	: Sprite2D(obj)
+: Sprite2D(obj)
 {
-	assert(obj.pal);
-
-	pal = obj.pal;
-	colorkey = obj.GetColorKey();
-
-	BAM = true;
 	freePixels = false; // managed by AnimationFactory
 }
 
@@ -57,7 +48,7 @@ Holder<Sprite2D> BAMSprite2D::copy() const
 /** Get the Palette of a Sprite */
 PaletteHolder BAMSprite2D::GetPalette() const
 {
-	return pal;
+	return format.palette;
 }
 
 void BAMSprite2D::SetPalette(PaletteHolder palette)
@@ -67,7 +58,7 @@ void BAMSprite2D::SetPalette(PaletteHolder palette)
 		return;
 	}
 
-	pal = palette;
+	format.palette = palette;
 }
 
 Color BAMSprite2D::GetPixel(const Point& p) const
@@ -89,14 +80,14 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 
 	const ieByte *rle = (const ieByte*)pixels;
 	while (skipcount > 0) {
-		if (*rle++ == colorkey)
+		if (*rle++ == format.ColorKey)
 			skipcount -= (*rle++)+1;
 		else
 			skipcount--;
 	}
 
-	if (skipcount >= 0 && *rle != colorkey) {
-		c = pal->col[*rle];
+	if (skipcount >= 0 && *rle != format.ColorKey) {
+		c = format.palette->col[*rle];
 		c.a = 0xff;
 	}
 	return c;
@@ -105,7 +96,7 @@ Color BAMSprite2D::GetPixel(const Point& p) const
 bool BAMSprite2D::HasTransparency() const
 {
 	// BAMs always use green for transparency and if colorkey > 0 it guarantees we have green
-	return colorkey > 0 || (pal->col[0].r == 0 && pal->col[0].g == 0xff && pal->col[0].b == 0);
+	return format.ColorKey > 0 || (format.palette->col[0].r == 0 && format.palette->col[0].g == 0xff && format.palette->col[0].b == 0);
 }
 
 }

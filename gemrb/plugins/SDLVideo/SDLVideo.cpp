@@ -238,7 +238,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
-	Holder<Sprite2D> spr = new sprite_t(rgn, fmt.Depth, pixels, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
+	Holder<Sprite2D> spr = new sprite_t(rgn, pixels, fmt);
 	if (fmt.palette) {
 		spr->SetPalette(fmt.palette);
 	}
@@ -482,8 +482,8 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		flags &= ~BlitFlags::BLENDED;
 	}
 
-	if (spr->BAM) {
-		BlitSpriteBAMClipped(spr, src, dclipped, flags, tint);
+	if (spr->Format().RLE) {
+		BlitSpriteRLEClipped(spr, src, dclipped, flags, tint);
 	} else {
 		SDL_Rect srect = RectFromRegion(src);
 		SDL_Rect drect = RectFromRegion(dclipped);
@@ -498,7 +498,7 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
 	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
 	
-	if (spr->Bpp == 8) {
+	if (spr->Format().Bpp == 1) {
 		if (tint) {
 			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);

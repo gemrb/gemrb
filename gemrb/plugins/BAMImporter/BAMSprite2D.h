@@ -28,10 +28,6 @@ namespace GemRB {
 class AnimationFactory;
 
 class BAMSprite2D : public Sprite2D {
-private:
-	PaletteHolder pal;
-	ieByte colorkey;
-
 public:
 	// all BAMs have a palette and colorkey so force them at construction
 	// for BAMs the actual colorkey is always green (RGB(0,255,0)) so use colorkey to store the transparency index
@@ -43,8 +39,8 @@ public:
 	PaletteHolder GetPalette() const override;
 	void SetPalette(PaletteHolder pal) override;
 	Color GetPixel(const Point&) const override;
-	int32_t GetColorKey() const override { return colorkey; };
-	void SetColorKey(ieDword ck) override { colorkey = (ieByte)ck; };
+	int32_t GetColorKey() const override { return format.ColorKey; };
+	void SetColorKey(ieDword ck) override { format.ColorKey = (ieByte)ck; };
 	bool HasTransparency() const override;
 };
 
