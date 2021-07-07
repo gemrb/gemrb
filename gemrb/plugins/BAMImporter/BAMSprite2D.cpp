@@ -77,10 +77,4 @@ Color BAMSprite2D::GetPixel(const Point& p) const noexcept
 	return c;
 }
 
-bool BAMSprite2D::HasTransparency() const noexcept
-{
-	// BAMs always use green for transparency and if colorkey > 0 it guarantees we have green
-	return format.ColorKey > 0 || (format.palette->col[0].r == 0 && format.palette->col[0].g == 0xff && format.palette->col[0].b == 0);
-}
-
 }

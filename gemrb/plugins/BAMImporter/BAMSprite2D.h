@@ -37,7 +37,6 @@ public:
 	Holder<Sprite2D> copy() const override;
 
 	Color GetPixel(const Point&) const noexcept override;
-	bool HasTransparency() const noexcept override;
 };
 
 }
