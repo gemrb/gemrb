@@ -67,6 +67,53 @@ enum BlitFlags : uint32_t {
 class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
+	
+	class Iterator : public IPixelIterator
+	{
+	private:
+		IPixelIterator* imp = nullptr;
+
+		void InitImp(void* pixel, int pitch) noexcept;
+
+		static uint8_t* FindStart(uint8_t* pixels, uint16_t pitch, uint8_t bpp, const Region& clip, Direction xdir, Direction ydir) noexcept;
+
+	public:
+		PixelFormat* format;
+		Region clip;
+
+		Iterator(Sprite2D& spr) noexcept;
+		Iterator(Sprite2D& spr, const Region& clip) noexcept;
+		Iterator(Sprite2D& spr, Direction x, Direction y) noexcept;
+		Iterator(Sprite2D& spr, Direction x, Direction y, const Region& clip) noexcept;
+		Iterator(const Iterator& orig) noexcept;
+
+		~Iterator() noexcept override;
+
+		static Iterator end(const Iterator& beg) noexcept;
+
+		Iterator& operator++() noexcept;
+
+		bool operator!=(const Iterator& rhs) const noexcept;
+
+		uint8_t& operator*() const noexcept;
+
+		uint8_t* operator->() const noexcept;
+
+		uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override;
+
+		IPixelIterator* Clone() const noexcept override;
+
+		void Advance(int amt) noexcept override;
+		
+		Color ReadRGBA() const noexcept;
+
+		void ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
+
+		void WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
+		
+		const Point& Position() const noexcept override;
+	};
+
 protected:
 	void* pixels = nullptr;
 	bool freePixels = true;
@@ -87,7 +134,7 @@ public:
 	Sprite2D(Sprite2D&&) noexcept;
 	~Sprite2D() noexcept override;
 
-	virtual Holder<Sprite2D> copy() const = 0;
+	virtual Holder<Sprite2D> copy() const { return new Sprite2D(*this); };
 
 	virtual bool HasTransparency() const noexcept;
 	bool IsPixelTransparent(const Point& p) const noexcept;
@@ -97,7 +144,7 @@ public:
 	virtual void UnlockSprite() const {};
 
 	const PixelFormat& Format() const noexcept { return format; }
-	virtual Color GetPixel(const Point&) const noexcept = 0;
+	Color GetPixel(const Point&) const noexcept;
 	PaletteHolder GetPalette() const noexcept { return format.palette; }
 	void SetPalette(PaletteHolder pal);
 	
@@ -106,7 +153,7 @@ public:
 	/* SetColorKey: either a px value or a palete index if sprite has a palette. */
 	void SetColorKey(colorkey_t);
 
-	virtual bool ConvertFormatTo(const PixelFormat&) noexcept { return false; }; // not pure virtual!
+	virtual bool ConvertFormatTo(const PixelFormat&) noexcept;
 };
 
 }

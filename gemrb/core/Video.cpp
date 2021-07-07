@@ -61,26 +61,6 @@ void Video::DestroyBuffers()
 	}
 }
 
-uint8_t* Video::DecodeRLEData(const void* data, const Size& size, uint8_t colorKey)
-{
-	size_t pixelCount = size.w * size.h;
-	uint8_t* buffer = (uint8_t*)malloc(pixelCount);
-	const uint8_t* p = static_cast<const uint8_t*>(data);
-
-	for (size_t i = 0; i < pixelCount; ++i, ++p) {
-		if (*p == colorKey) {
-			p++;
-			uint8_t cnt = std::min<uint8_t>(*p + 1, pixelCount - i); // believe it or not this happens
-			std::fill(&buffer[i], &buffer[i + cnt], colorKey);
-			i += *p;
-		} else {
-			buffer[i] = *p;
-		}
-	}
-	
-	return buffer;
-}
-
 int Video::CreateDisplay(const Size& s, int bits, bool fs, const char* title)
 {
 	bpp = bits;

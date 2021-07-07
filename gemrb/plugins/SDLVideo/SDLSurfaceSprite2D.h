@@ -66,7 +66,6 @@ public:
 	void UnlockSprite() const override;
 
 	bool HasTransparency() const noexcept override;
-	Color GetPixel(const Point&) const noexcept override;
 	bool ConvertFormatTo(const PixelFormat& tofmt) noexcept override;
 
 	SDL_Surface* GetSurface() const { return *surface; };

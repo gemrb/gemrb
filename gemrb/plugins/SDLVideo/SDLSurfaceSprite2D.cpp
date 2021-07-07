@@ -175,18 +175,6 @@ bool SDLSurfaceSprite2D::HasTransparency() const noexcept
 #endif
 }
 
-Color SDLSurfaceSprite2D::GetPixel(const Point& p) const noexcept
-{
-	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
-		IPixelIterator::Direction xdir = (renderFlags & BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		IPixelIterator::Direction ydir = (renderFlags & BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		SDLPixelIterator it(*surface, xdir, ydir);
-		it.Advance(p.y * Frame.w + p.x);
-		return it.ReadRGBA();
-	}
-	return Color();
-}
-
 bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 {
 	if (tofmt.Bpp >= 1) {

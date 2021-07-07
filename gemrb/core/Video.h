@@ -113,8 +113,6 @@ protected:
 	virtual void Wait(uint32_t) = 0;
 	void DestroyBuffer(VideoBuffer*);
 	void DestroyBuffers();
-	
-	uint8_t* DecodeRLEData(const void* data, const Size&, uint8_t colorKey);
 
 private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
