@@ -29,16 +29,12 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
 {
 	FLTable = NULL;
-	FrameData = NULL;
 }
 
 AnimationFactory::~AnimationFactory(void)
 {
 	if (FLTable)
 		free( FLTable);
-
-	if (FrameData)
-		free( FrameData);
 }
 
 void AnimationFactory::AddFrame(Holder<Sprite2D> frame)
@@ -60,12 +56,6 @@ void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
 	FLTable = (unsigned short *) malloc(count * sizeof( unsigned short ) );
 	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
 }
-
-void AnimationFactory::SetFrameData(unsigned char* FrameData)
-{
-	this->FrameData = FrameData;
-}
-
 
 Animation* AnimationFactory::GetCycle(unsigned char cycle)
 {

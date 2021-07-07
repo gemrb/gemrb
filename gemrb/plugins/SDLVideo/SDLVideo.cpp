@@ -238,14 +238,17 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
-	Holder<Sprite2D> spr = new sprite_t(rgn, pixels, fmt);
-	if (fmt.palette) {
-		spr->SetPalette(fmt.palette);
+#if SDL_VERSION_ATLEAST(1,3,0)
+	// SDL2 should not allow RLE sprites so just decode to non RLE and make a regular sprite
+	if (fmt.RLE) {
+		uint8_t* decoded = DecodeRLEData(pixels, rgn.size, fmt.ColorKey);
+		free(pixels);
+		PixelFormat newfmt = fmt;
+		newfmt.RLE = false;
+		return new sprite_t(rgn, decoded, newfmt);
 	}
-	if (fmt.HasColorKey) {
-		spr->SetColorKey(fmt.ColorKey);
-	}
-	return spr;
+#endif
+	return new sprite_t(rgn, pixels, fmt);
 }
 
 void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,

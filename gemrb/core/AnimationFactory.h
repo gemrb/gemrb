@@ -43,7 +43,6 @@ public:
 	void AddFrame(Holder<Sprite2D> frame);
 	void AddCycle(CycleEntry cycle);
 	void LoadFLT(unsigned short* buffer, int count);
-	void SetFrameData(unsigned char* FrameData);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
 	Holder<Sprite2D> GetFrame(unsigned short index, unsigned char cycle=0) const;

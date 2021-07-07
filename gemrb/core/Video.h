@@ -113,6 +113,8 @@ protected:
 	virtual void Wait(uint32_t) = 0;
 	void DestroyBuffer(VideoBuffer*);
 	void DestroyBuffers();
+	
+	uint8_t* DecodeRLEData(const void* data, const Size&, uint8_t colorKey);
 
 private:
 	virtual VideoBuffer* NewVideoBuffer(const Region&, BufferFormat)=0;
@@ -162,7 +164,6 @@ public:
 	virtual bool TouchInputEnabled() = 0;
 
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
-	virtual bool SupportsBAMSprites() { return false; }
 	
 	void BlitSprite(const Holder<Sprite2D> spr, Point p,
 					const Region* clip = NULL);

@@ -25,7 +25,6 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "BAMSprite2D.h"
 #include "Video.h"
 #include "System/FileStream.h"
 
@@ -153,21 +152,24 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 }
 
 Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, bool RLESprite,
-											   uint8_t* data, uint8_t*)
+											   uint8_t* data, uint8_t* end)
 {
 	Holder<Sprite2D> spr;
+	Video* video = core->GetVideoDriver();
+	Region r(0,0, frames[findex].bounds.w, frames[findex].bounds.h);
+	ptrdiff_t dataLen = end - data;
 
-	if (RLESprite) {
+	if (RLESprite && dataLen) {
 		assert(data);
 		unsigned char* framedata = data;
 		framedata += frames[findex].dataOffset - DataStart;
-		spr = new BAMSprite2D (Region(0,0, frames[findex].bounds.w, frames[findex].bounds.h),
-							   framedata, palette, CompressedColorIndex);
+		void* pixels = malloc(dataLen);
+		memcpy(pixels, data, dataLen);
+		spr = video->CreateSprite(r, pixels, PixelFormat::RLE8Bit(palette, CompressedColorIndex));
 	} else {
 		void* pixels = GetFramePixels(findex);
-		Region r(0,0, frames[findex].bounds.w, frames[findex].bounds.h);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
-		spr = core->GetVideoDriver()->CreateSprite(r, pixels, fmt);
+		spr = video->CreateSprite(r, pixels, fmt);
 	}
 
 	spr->Frame.x = (ieWordSigned)frames[findex].bounds.x;
@@ -180,6 +182,9 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
 	}
+	
+	//const FrameEntry& frameInfo = frames[findex];
+	
 	str->Seek(frames[findex].dataOffset, GEM_STREAM_START );
 	unsigned long pixelcount = frames[findex].bounds.h * frames[findex].bounds.w;
 	void* pixels = malloc( pixelcount );
@@ -256,23 +261,20 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
 
-	allowCompression = allowCompression && core->GetVideoDriver()->SupportsBAMSprites();
 	unsigned char* data = NULL;
 
-	if (allowCompression) {
-		str->Seek( DataStart, GEM_STREAM_START );
-		unsigned long length = str->Remains();
-		if (length == 0) return af;
-		//data = new unsigned char[length];
-		data = (unsigned char *) malloc(length);
-		str->Read( data, length );
-		af->SetFrameData(data);
-	}
+	str->Seek( DataStart, GEM_STREAM_START );
+	unsigned long length = str->Remains();
+	if (length == 0) return af;
+	//data = new unsigned char[length];
+	data = (unsigned char *) malloc(length);
+	str->Read( data, length );
 
 	for (i = 0; i < FramesCount; ++i) {
-		bool RLECompressed = allowCompression && frames[i].RLE;
-		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, data, data + frames[i].dataLength);
-		assert(!RLECompressed || frame->Format().RLE);
+		const FrameEntry& frameInfo = frames[i];
+		bool RLECompressed = allowCompression && frameInfo.RLE;
+		uint8_t* frameData = data + frameInfo.dataOffset - DataStart;
+		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, frameData, frameData + frameInfo.dataLength);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {

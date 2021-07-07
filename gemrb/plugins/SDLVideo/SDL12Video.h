@@ -53,8 +53,6 @@ public:
 	bool TouchInputEnabled() override;
 	void SetGamma(int brightness, int contrast) override;
 
-	bool SupportsBAMSprites() override { return true; }
-
 	void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
 						 Color tint = Color()) override;
 

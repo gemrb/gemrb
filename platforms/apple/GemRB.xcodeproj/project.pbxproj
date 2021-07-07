@@ -107,6 +107,7 @@
 		A22DCCE314A8FE870067D6D1 /* ios/Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = A22DCCE214A8FE870067D6D1 /* ios/Icon-72.png */; };
 		A22E6D6E2694A74D000675E4 /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; };
 		A22E6D6F2694A74D000675E4 /* SDL2.framework in Copy Frameworks into .app bundle */ = {isa = PBXBuildFile; fileRef = A20574F919994967007FF22C /* SDL2.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A22E6D702694BEC7000675E4 /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A22EBDCE14FF18030029C9C1 /* AppleLogger.mm in Sources */ = {isa = PBXBuildFile; fileRef = A22EBDCD14FF18030029C9C1 /* AppleLogger.mm */; };
 		A231678023AA071E00D04811 /* GameSpriteF.glsl in Resources */ = {isa = PBXBuildFile; fileRef = A231677E23AA071E00D04811 /* GameSpriteF.glsl */; };
 		A232B0FD1A15B6E600E5342E /* GemMarkup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A232B0FB1A15B6E600E5342E /* GemMarkup.cpp */; };
@@ -276,7 +277,6 @@
 		A298DD2214EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A298DD2314EB61D300F59F56 /* Stdio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A298DD2114EB61D300F59F56 /* Stdio.cpp */; };
 		A29BF81313A03C2600C812DD /* AREImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86A8139F0A7D0002DC13 /* AREImporter.cpp */; };
-		A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */; };
 		A29BF85213A0420300C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85513A0420A00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A29BF85613A0420F00C812DD /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
@@ -710,8 +710,6 @@
 		A2E9967814DE05590052BABE /* ZLibManager.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A276B4AF13A28AEE00D41A8A /* ZLibManager.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2E9967914DE05590052BABE /* STOImporter.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A276B4F413A28C0400D41A8A /* STOImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2E9967A14DE05590052BABE /* SAVImporter.so in Copy Plugins */ = {isa = PBXBuildFile; fileRef = A2F0505113ABB80B0023B7EB /* SAVImporter.so */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
-		A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
-		A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */; };
 		A2EC2F94176BD44C00FD960E /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2EC2F95176BD44D00FD960E /* SDLSurfaceSprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */; };
 		A2EC8059145F9E6E0033754A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8058145F9E6E0033754A /* Foundation.framework */; };
@@ -3942,8 +3940,6 @@
 		A2E7EA19266946AA0064423F /* StencilF.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = StencilF.glsl; sourceTree = "<group>"; };
 		A2E7EA1A266946AA0064423F /* GameSpriteF.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = GameSpriteF.glsl; sourceTree = "<group>"; };
 		A2E7EA1B266946AA0064423F /* SDLTextureV.glsl */ = {isa = PBXFileReference; lastKnownFileType = text; path = SDLTextureV.glsl; sourceTree = "<group>"; };
-		A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMSprite2D.cpp; sourceTree = "<group>"; };
-		A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMSprite2D.h; sourceTree = "<group>"; };
 		A2EC2F92176BD44C00FD960E /* SDLSurfaceSprite2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SDLSurfaceSprite2D.cpp; sourceTree = "<group>"; };
 		A2EC2F93176BD44C00FD960E /* SDLSurfaceSprite2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLSurfaceSprite2D.h; sourceTree = "<group>"; };
 		A2EC8058145F9E6E0033754A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS5.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -4687,8 +4683,6 @@
 				A28D24A3143C24E500A27897 /* BAMFontManager.h */,
 				A27B86AD139F0A7D0002DC13 /* BAMImporter.cpp */,
 				A27B86AE139F0A7D0002DC13 /* BAMImporter.h */,
-				A2EC2F8E176BD28E00FD960E /* BAMSprite2D.cpp */,
-				A2EC2F8F176BD28E00FD960E /* BAMSprite2D.h */,
 			);
 			path = BAMImporter;
 			sourceTree = "<group>";
@@ -9098,7 +9092,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 		A2BD125D15A8E32B000FAB95 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9515,9 +9509,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A22E6D702694BEC7000675E4 /* BAMImporter.cpp in Sources */,
 				A2B0CCD61486FF780074E54B /* BAMFontManager.cpp in Sources */,
-				A29BF82B13A03DFC00C812DD /* BAMImporter.cpp in Sources */,
-				A2EC2F91176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -9726,7 +9719,6 @@
 				A2969F10168CDC0D00D9C6FC /* CombatInfo.cpp in Sources */,
 				A2A2EA3416A5EB630092B903 /* TTFFont.cpp in Sources */,
 				A2A2EA3816A5FC860092B903 /* Freetype.cpp in Sources */,
-				A2EC2F90176BD28E00FD960E /* BAMSprite2D.cpp in Sources */,
 				A2EC2F94176BD44C00FD960E /* SDLSurfaceSprite2D.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
