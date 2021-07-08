@@ -24,7 +24,7 @@
 #include "Region.h"
 #include "Palette.h"
 
-#define ERROR_UNKNOWN_BPP error("SDLVideo", "Invalid bpp.")
+#define ERROR_UNKNOWN_BPP error("Video", "Invalid bpp.")
 
 namespace GemRB {
 

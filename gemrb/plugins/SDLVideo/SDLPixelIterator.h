@@ -23,8 +23,6 @@
 
 #include "Pixels.h"
 
-#define ERROR_UNKNOWN_BPP error("SDLVideo", "Invalid bpp.")
-
 namespace GemRB {
 
 struct SDLPixelIterator : IPixelIterator
