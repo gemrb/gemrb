@@ -112,8 +112,6 @@ bool SPLImporter::Open(DataStream* stream)
 
 Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 {
-	size_t i;
-
 	str->ReadDword(s->SpellName);
 	str->ReadDword(s->SpellNameIdentified);
 	str->ReadResRef( s->CompletionSound );
@@ -134,7 +132,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
 	if (s->SpellbookIcon[0] && core->HasFeature(GF_SPELLBOOKICONHACK)) {
-		i=strlen(s->SpellbookIcon);
+		size_t i = strlen(s->SpellbookIcon);
 		if (i) s->SpellbookIcon[i-1]='c';
 	}
 

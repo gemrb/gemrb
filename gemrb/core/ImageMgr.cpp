@@ -37,7 +37,6 @@ ImageMgr::~ImageMgr(void)
 
 Bitmap* ImageMgr::GetBitmap()
 {
-	const Size size = GetSize();
 	Bitmap *data = new Bitmap(size);
 
 	Log(ERROR, "ImageMgr", "Don't know how to handle 24bit bitmap from %s...",
@@ -57,7 +56,6 @@ Bitmap* ImageMgr::GetBitmap()
 
 Image* ImageMgr::GetImage()
 {
-	const Size size = GetSize();
 	Image *data = new Image(size);
 
 	Holder<Sprite2D> spr = GetSprite2D();

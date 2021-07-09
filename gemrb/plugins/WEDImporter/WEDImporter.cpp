@@ -340,11 +340,11 @@ void WEDImporter::ReadWallPolygons()
 			flags |= WF_BASELINE;
 		}
 		Point *points = new Point[count];
-		for (size_t i = 0; i < count; ++i) {
+		for (size_t j = 0; j < count; ++j) {
 			ieWord x, y;
 			str->ReadWord(x);
 			str->ReadWord(y);
-			points[i] = Point(x, y);
+			points[j] = Point(x, y);
 		}
 
 		if (!(flags&WF_BASELINE) ) {

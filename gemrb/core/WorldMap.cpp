@@ -229,11 +229,11 @@ void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 	MapMOS = newmos;
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ResRef& AreaName, unsigned int &i) const
+WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
 {
 	i=(unsigned int) area_entries.size();
 	while (i--) {
-		if (AreaName == area_entries[i]->AreaName) {
+		if (areaName == area_entries[i]->AreaName) {
 			return area_entries[i];
 		}
 	}
@@ -244,14 +244,14 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& AreaName, unsigned int &i) const
 //Counting backwards, stop at 1000 boundaries.
 //It is not possible to simply round to 1000, because there are 
 //WMP entries like AR8001, and we need to find the best match
-WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& AreaName, unsigned int &i) const
+WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i) const
 {
 	int value = 0;
 	ieResRef tmp;
 
-	sscanf(AreaName.CString() + 2,"%4d", &value);
+	sscanf(areaName.CString() + 2, "%4d", &value);
 	do {
-		snprintf(tmp, 9, "%.2s%04d", AreaName.CString(), value);
+		snprintf(tmp, 9, "%.2s%04d", areaName.CString(), value);
 		WMPAreaEntry* ret = GetArea(tmp, i);
 		if (ret) {
 			return ret;
@@ -266,23 +266,23 @@ WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& AreaName, unsigned int &i
 
 //this is a pathfinding algorithm
 //you have to find the optimal path
-int WorldMap::CalculateDistances(const ResRef& AreaName, int direction)
+int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 {
 	//first, update reachable/visible areas by worlde.2da if exists
 	UpdateReachableAreas();
-	UpdateAreaVisibility(AreaName, direction);
+	UpdateAreaVisibility(areaName, direction);
 	if (direction==-1) {
 		return 0;
 	}
 
 	if (direction<0 || direction>3) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: %s", AreaName.CString());
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: %s", areaName.CString());
 		return -1;
 	}
 
 	unsigned int i;
-	if (!GetArea(AreaName, i)) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: %s", AreaName.CString());
+	if (!GetArea(areaName, i)) {
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: %s", areaName.CString());
 		return -1;
 	}
 	if (Distances) {
@@ -292,7 +292,7 @@ int WorldMap::CalculateDistances(const ResRef& AreaName, int direction)
 		free(GotHereFrom);
 	}
 
-	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: %s", AreaName.CString());
+	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: %s", areaName.CString());
 
 	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -397,19 +397,19 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 //call this function to find out which area we fall into
 //not necessarily the target area
 //if it isn't the same, then a random encounter happened!
-WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& AreaName, bool &encounter) const
+WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter) const
 {
 	if (!GotHereFrom) {
 		return NULL;
 	}
 	unsigned int i;
-	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
+	WMPAreaEntry *ae=GetArea( areaName, i ); //target area
 	if (!ae) {
-		Log(ERROR, "WorldMap", "No such area: %s", AreaName.CString());
+		Log(ERROR, "WorldMap", "No such area: %s", areaName.CString());
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;
-	Log(DEBUG, "WorldMap", "Gathering path information for: %s", AreaName.CString());
+	Log(DEBUG, "WorldMap", "Gathering path information for: %s", areaName.CString());
 	while (GotHereFrom[i]!=-1) {
 		Log(DEBUG, "WorldMap", "Adding path to %d", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
@@ -530,27 +530,27 @@ void WorldMap::ClearEncounterArea()
 	encounterArea = -1;
 }
 
-int WorldMap::GetDistance(const ResRef& AreaName) const
+int WorldMap::GetDistance(const ResRef& areaName) const
 {
 	if (!Distances) {
 		return -1;
 	}
 	unsigned int i;
-	if (GetArea( AreaName, i )) {
+	if (GetArea(areaName, i)) {
 		return Distances[i];
 	}
 	return -1;
 }
 
-void WorldMap::UpdateAreaVisibility(const ResRef& AreaName, int direction)
+void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 {
 	unsigned int i;
 
-	WMPAreaEntry* ae=GetArea(AreaName,i);
+	WMPAreaEntry* ae = GetArea(areaName, i);
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
-	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", AreaName.CString());
+	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", areaName.CString());
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 	if (direction<0 || direction>3)
@@ -566,10 +566,10 @@ void WorldMap::UpdateAreaVisibility(const ResRef& AreaName, int direction)
 	}
 }
 
-void WorldMap::SetAreaStatus(const ResRef& AreaName, int Bits, int Op)
+void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op)
 {
 	unsigned int i;
-	WMPAreaEntry* ae=GetArea(AreaName,i);
+	WMPAreaEntry* ae = GetArea(areaName, i);
 	if (!ae)
 		return;
 	ae->SetAreaStatus(Bits, Op);
