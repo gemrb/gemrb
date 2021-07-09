@@ -1498,6 +1498,16 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
+	
 	// if unset, manually populate GameName (window title)
 	if (!stricmp(GameName, GEMRB_STRING)) {
 		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING) != 0) {
@@ -1508,16 +1518,6 @@ int Interface::Init(InterfaceConfig* config)
 		}
 		video->SetWindowTitle(GameName);
 	}
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = 0;
-	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-	video->SetGamma(brightness, contrast);
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
