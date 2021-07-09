@@ -1768,7 +1768,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	
 	const Region& bbox = scriptable->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
-		return BlitFlags::NONE;;
+		return BlitFlags::NONE;
 	}
 	
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
@@ -1776,7 +1776,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
-		return BlitFlags::NONE;; // not behind a wall, no stencil required
+		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
 	
 	ieDword always_dither;
