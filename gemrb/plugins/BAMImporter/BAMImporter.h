@@ -51,9 +51,8 @@ private:
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	int DataStart;
 private:
-	Holder<Sprite2D> GetFrameInternal(unsigned short findex,
-									  bool RLESprite, uint8_t* data, uint8_t* dataEnd);
-	void* GetFramePixels(unsigned short findex);
+	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
+	void* GetFramePixels(const FrameEntry& frames);
 	ieWord * CacheFLT(unsigned int &count);
 public:
 	BAMImporter(void);

@@ -146,48 +146,38 @@ int BAMImporter::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Holder<Sprite2D> BAMImporter::GetFrameInternal(unsigned short findex, bool RLESprite,
-											   uint8_t* data, uint8_t* end)
+Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data)
 {
 	Holder<Sprite2D> spr;
 	Video* video = core->GetVideoDriver();
-	Region r(0,0, frames[findex].bounds.w, frames[findex].bounds.h);
-	ptrdiff_t dataLen = end - data;
+	
+	uint8_t* frameBegin = data + frameInfo.dataOffset;
+	uint8_t* frameEnd = frameBegin + frameInfo.dataLength;
+	ptrdiff_t dataLen = frameEnd - frameBegin;
 
 	if (RLESprite && dataLen) {
-		assert(data);
-		unsigned char* framedata = data;
-		framedata += frames[findex].dataOffset - DataStart;
 		void* pixels = malloc(dataLen);
-		memcpy(pixels, data, dataLen);
-		spr = video->CreateSprite(r, pixels, PixelFormat::RLE8Bit(palette, CompressedColorIndex));
+		memcpy(pixels, frameBegin, dataLen);
+		spr = video->CreateSprite(frameInfo.bounds, pixels, PixelFormat::RLE8Bit(palette, CompressedColorIndex));
 	} else {
-		void* pixels = GetFramePixels(findex);
+		void* pixels = GetFramePixels(frameInfo);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
-		spr = video->CreateSprite(r, pixels, fmt);
+		spr = video->CreateSprite(frameInfo.bounds, pixels, fmt);
 	}
 
-	spr->Frame.x = (ieWordSigned)frames[findex].bounds.x;
-	spr->Frame.y = (ieWordSigned)frames[findex].bounds.y;
 	return spr;
 }
 
-void* BAMImporter::GetFramePixels(unsigned short findex)
+void* BAMImporter::GetFramePixels(const FrameEntry& frame)
 {
-	if (findex >= FramesCount) {
-		findex = cycles[0].FirstFrame;
-	}
-	
-	//const FrameEntry& frameInfo = frames[findex];
-	
-	str->Seek(frames[findex].dataOffset, GEM_STREAM_START );
-	unsigned long pixelcount = frames[findex].bounds.h * frames[findex].bounds.w;
+	str->Seek(frame.dataOffset, GEM_STREAM_START );
+	unsigned long pixelcount = frame.bounds.h * frame.bounds.w;
 	void* pixels = malloc( pixelcount );
-	if (frames[findex].RLE) {
+	if (frame.RLE) {
 		//if RLE Compressed
 		unsigned long RLESize;
 		RLESize = ( unsigned long )
-			( frames[findex].bounds.w * frames[findex].bounds.h * 3 ) / 2 + 1;
+			(frame.bounds.w * frame.bounds.h * 3) / 2 + 1;
 		//without partial reads, we should be careful
 		unsigned long remains = str->Remains();
 		if (RLESize > remains) {
@@ -213,7 +203,6 @@ void* BAMImporter::GetFramePixels(unsigned short findex)
 				// into override/ dir?
 				if (i + ( *p ) + 1 > pixelcount) {
 					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-					print("Broken frame %d", findex);
 				} else {
 					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
 				}
@@ -256,20 +245,16 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
 
-	unsigned char* data = NULL;
-
 	str->Seek( DataStart, GEM_STREAM_START );
 	unsigned long length = str->Remains();
 	if (length == 0) return af;
-	//data = new unsigned char[length];
-	data = (unsigned char *) malloc(length);
-	str->Read( data, length );
+	uint8_t *data = (uint8_t*)malloc(length);
+	str->Read(data, length);
 
 	for (i = 0; i < FramesCount; ++i) {
 		const FrameEntry& frameInfo = frames[i];
 		bool RLECompressed = allowCompression && frameInfo.RLE;
-		uint8_t* frameData = data + frameInfo.dataOffset - DataStart;
-		Holder<Sprite2D> frame = GetFrameInternal(i, RLECompressed, frameData, frameData + frameInfo.dataLength);
+		Holder<Sprite2D> frame = GetFrameInternal(frameInfo, RLECompressed, data - DataStart);
 		af->AddFrame(frame);
 	}
 	for (i = 0; i < CyclesCount; ++i) {
