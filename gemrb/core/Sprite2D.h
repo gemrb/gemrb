@@ -75,8 +75,6 @@ public:
 
 		void InitImp(void* pixel, int pitch) noexcept;
 
-		static uint8_t* FindStart(uint8_t* pixels, uint16_t pitch, uint8_t bpp, const Region& clip, Direction xdir, Direction ydir) noexcept;
-
 	public:
 		PixelFormat* format;
 		Region clip;

@@ -110,40 +110,58 @@ public:
 void Sprite2D::Iterator::InitImp(void* pixel, int pitch) noexcept
 {
 	delete imp;
+
 	if (format->RLE) {
+		pixel = [this, pitch](uint8_t* rledata) {
+			int x = 0;
+			int y = 0;
+
+			if (ydir == Reverse)
+				y = clip.h - 1;
+			if (xdir == Reverse)
+				x = clip.w - 1;
+
+			int skipcount = y * pitch + x;
+			while (skipcount > 0) {
+				if (*rledata++ == format->ColorKey)
+					skipcount -= (*rledata++)+1;
+				else
+					skipcount--;
+			}
+
+			return rledata;
+		} (static_cast<uint8_t*>(pixel));
 		imp = new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format->ColorKey);
-		return;
-	}
-	
-	switch (format->Bpp) {
-		case 4:
-			imp = new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			break;
-		case 3:
-			imp = new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			break;
-		case 2:
-			imp = new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			break;
-		case 1:
-			imp = new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			break;
-		default:
-			ERROR_UNKNOWN_BPP;
-	}
-}
+	} else {
+		pixel = [this, pitch](uint8_t* pixels) {
+			if (xdir == Reverse) {
+				pixels += format->Bpp * (clip.w - 1);
+			}
+			if (ydir == Reverse) {
+				pixels += pitch * (clip.h - 1);
+			}
 
-uint8_t* Sprite2D::Iterator::FindStart(uint8_t* pixels, uint16_t pitch, uint8_t bpp, const Region& clip, Direction xdir, Direction ydir) noexcept
-{
-	if (xdir == Reverse) {
-		pixels += bpp * (clip.w-1);
+			pixels += (clip.y * pitch) + (clip.x * format->Bpp);
+			return pixels;
+		} (static_cast<uint8_t*>(pixel));
+		
+		switch (format->Bpp) {
+			case 4:
+				imp = new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				break;
+			case 3:
+				imp = new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				break;
+			case 2:
+				imp = new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				break;
+			case 1:
+				imp = new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
+				break;
+			default:
+				ERROR_UNKNOWN_BPP;
+		}
 	}
-	if (ydir == Reverse) {
-		pixels += pitch * (clip.h-1);
-	}
-
-	pixels += (clip.y * pitch) + (clip.x * bpp);
-	return pixels;
 }
 
 Sprite2D::Iterator::Iterator(Sprite2D& spr) noexcept
@@ -161,11 +179,7 @@ Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y) noexcept
 Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y, const Region& clip) noexcept
 : IPixelIterator(nullptr, spr.pitch, x, y), imp(nullptr), format(&spr.format), clip(clip)
 {
-	uint8_t* pixels = static_cast<uint8_t*>(spr.pixels);
-	pixels = FindStart(pixels, spr.pitch, format->Bpp, clip, xdir, ydir);
-
-	InitImp(pixels, spr.pitch);
-
+	InitImp(spr.pixels, spr.pitch);
 	pixel = spr.pixels; // always here regardless of direction
 }
 
@@ -192,13 +206,15 @@ Sprite2D::Iterator Sprite2D::Iterator::end(const Iterator& beg) noexcept
 	Direction xdir = (beg.xdir == Forward) ? Reverse : Forward;
 	Direction ydir = (beg.ydir == Forward) ? Reverse : Forward;
 	Iterator it(beg);
-
-	uint8_t* pixels = static_cast<uint8_t*>(it.pixel);
-	pixels = FindStart(pixels, beg.pitch, beg.format->Bpp, beg.clip, xdir, ydir);
-	it.xdir = xdir; // hack for InitImp
-	it.InitImp(pixels, beg.pitch);
-	it.xdir = beg.xdir; // reset for Advance
+	// hack for InitImp
+	it.ydir = ydir;
+	it.xdir = xdir;
+	it.InitImp(it.pixel, beg.pitch);
+	// reset for Advance
+	it.xdir = beg.xdir;
+	it.ydir = beg.ydir;
 	it.imp->xdir = beg.xdir;
+	it.imp->ydir = beg.ydir;
 
 	// 'end' iterators are one past the end
 	it.Advance(1);
