@@ -329,22 +329,16 @@ void WEDImporter::ReadWallPolygons()
 		ieDword flags = PolygonHeaders[i].Flags&~(WF_BASELINE|WF_HOVER);
 		Point base0, base1;
 		if (PolygonHeaders[i].Flags&WF_HOVER) {
-			count-=2;
-			ieWord x,y;
-			str->ReadWord(x);
-			str->ReadWord(y);
-			base0 = Point(x,y);
-			str->ReadWord(x);
-			str->ReadWord(y);
-			base1 = Point(x,y);
+			count -= 2;
+			str->ReadPoint(base0);
+			str->ReadPoint(base1);
 			flags |= WF_BASELINE;
 		}
 		Point *points = new Point[count];
 		for (size_t j = 0; j < count; ++j) {
-			ieWord x, y;
-			str->ReadWord(x);
-			str->ReadWord(y);
-			points[j] = Point(x, y);
+			Point vertex;
+			str->ReadPoint(vertex);
+			points[j] = vertex;
 		}
 
 		if (!(flags&WF_BASELINE) ) {
