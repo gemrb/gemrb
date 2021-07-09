@@ -107,8 +107,6 @@ Scriptable::Scriptable(ScriptableType type)
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
 	area = 0;
-	Pos.x = 0;
-	Pos.y = 0;
 
 	LastTarget = 0;
 	LastTargetPersistent = 0;
@@ -1952,8 +1950,6 @@ Movable::Movable(ScriptableType type)
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
 	AttackMovements[2] = 0;
-	HomeLocation.x = 0;
-	HomeLocation.y = 0;
 	maxWalkDistance = 0;
 	prevTicks = 0;
 	pathTries = 0;

@@ -1304,7 +1304,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
-		actor->GetName(0), area,position.x,position.y, face);
+		actor->GetName(0), area, position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
@@ -1985,7 +1985,7 @@ bool IsInObjectRect(const Point &pos, const Region &rect)
 	if (rect.w <= 0 || rect.h <= 0) return true;
 
 	// iwd2: testing shows the first point must be 0.0 for matching to work
-	if (core->HasFeature(GF_3ED_RULES) && (rect.x != 0 || rect.y != 0)) {
+	if (core->HasFeature(GF_3ED_RULES) && !rect.origin.IsZero()) {
 		return false;
 	}
 

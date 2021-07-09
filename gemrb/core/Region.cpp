@@ -56,6 +56,13 @@ Point& Point::operator-=(const Point& rhs)
 	return *this;
 }
 
+Point& Point::operator/(int div)
+{
+	x /= div;
+	y /= div;
+	return *this;
+}
+
 Point::Point(int x, int y)
 {
 	this->x = x;

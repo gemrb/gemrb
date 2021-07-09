@@ -55,6 +55,8 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
+	Point& operator/(int div);
+
 	bool IsZero() const; // (0, 0)
 	bool IsInvalid() const; // (-1, -1)
 

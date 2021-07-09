@@ -317,18 +317,16 @@ void Projectile::Setup()
 	//falling = vertical
 	//incoming = right side
 	//both = left side
-	if(ExtFlags&(PEF_FALLING|PEF_INCOMING) ) {
+	if (ExtFlags & (PEF_FALLING|PEF_INCOMING)) {
+		Pos.x = Destination.x;
 		if (ExtFlags&PEF_INCOMING) {
 			if (ExtFlags&PEF_FALLING) {
-				Pos.x=Destination.x-200;
+				Pos.x -= 200;
 			} else {
-				Pos.x=Destination.x+200;
+				Pos.x += 200;
 			}
 		}
-		else {
-			Pos.x=Destination.x;
-		}
-		Pos.y=Destination.y-200;
+		Pos.y = Destination.y - 200;
 		NextTarget(Destination);
 	}
 
@@ -958,7 +956,7 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 	if (ExtFlags&PEF_CONTINUE) {
 		const Point& A = Origin;
 		const Point& B = target->Pos;
-		double angle = atan2(B.y - A.y, B.x - A.x);
+		double angle = AngleFromPoints(B, A);
 		double adjustedRange = Feet2Pixels(Range, angle);
 		Point C(A.x + adjustedRange * cos(angle), A.y + adjustedRange * sin(angle));
 		SetTarget(C);
@@ -1609,10 +1607,9 @@ void Projectile::DrawExplosion(const Region& vp)
 				//}
 				pro->SetDelay(delay);
 			}
-			
-			newdest.x+=Destination.x;
-			newdest.y+=Destination.y;
-			
+
+			newdest += Destination;
+
 			if (apflags&APF_SCATTER) {
 				pro->MoveTo(area, newdest);
 			} else {
@@ -1682,13 +1679,9 @@ void Projectile::SetPos(int face, int frame1, int frame2)
 //recalculate target and source points (perpendicular bisector)
 void Projectile::SetupWall()
 {
-	Point p1, p2;
-
-	p1.x=(Pos.x+Destination.x)/2;
-	p1.y=(Pos.y+Destination.y)/2;
-
-	p2 = p1 + (Pos - Destination);
-	Pos=p1;
+	Point p1 = (Pos + Destination) / 2;
+	Point p2 = p1 + (Pos - Destination);
+	Pos = p1;
 	SetTarget(p2);
 }
 
@@ -1871,12 +1864,11 @@ bool Projectile::PointInRadius(const Point &p) const
 		case P_EXPIRED:
 		case P_UNINITED: return false;
 		case P_TRAVEL:
-			if(p.x==Pos.x && p.y==Pos.y) return true;
-			return false;
+			return p == Pos;
 		default:
-			if(p.x==Pos.x && p.y==Pos.y) return true;
+			if (p == Pos) return true;
 			if (!Extension) return false;
-			if (Distance(p,Pos)<Extension->ExplosionRadius) return true;
+			if (Distance(p, Pos) < Extension->ExplosionRadius) return true;
 	}
 	return false;
 }

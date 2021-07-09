@@ -6460,7 +6460,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	newpos.y += coords[dir][1]*(signed) fx->Parameter1*ticks/12;///AI_UPDATE_TIME;
 
 	//change is minimal, lets try later
-	if (newpos.x==target->Pos.x && newpos.y==target->Pos.y)
+	if (newpos == target->Pos)
 		return FX_APPLIED;
 
 	target->SetPosition(newpos, true, 0);

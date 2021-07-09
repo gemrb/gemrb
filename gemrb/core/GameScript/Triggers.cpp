@@ -1579,8 +1579,8 @@ int GameScript::AtLocation( Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	if ( (tar->Pos.x==parameters->pointParameter.x) &&
-		(tar->Pos.y==parameters->pointParameter.y) ) {
+	// NOTE: this is very strict — keep it in mind if any script has problem with this action
+	if (tar->Pos == parameters->pointParameter) {
 		return 1;
 	}
 	return 0;
