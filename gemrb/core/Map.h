@@ -330,7 +330,7 @@ public:
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
 	int GetHeight() const;
 private:
-	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
+	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle) const;
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
@@ -554,7 +554,7 @@ public:
 	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
 	int GetExploredMapSize() const;
-	void FillExplored(bool explored);
+	void FillExplored(bool explored) const;
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */

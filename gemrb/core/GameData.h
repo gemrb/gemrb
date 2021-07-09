@@ -131,7 +131,7 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
-	inline int GetStepTime() { return stepTime; }
+	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
 	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }

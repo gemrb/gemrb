@@ -492,7 +492,7 @@ Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
 	return area->GetActorByGlobalID(ID);
 }
 
-Scriptable *DialogHandler::GetTarget()
+Scriptable *DialogHandler::GetTarget() const
 {
 	Game *game = core->GetGame();
 	if (!game) return NULL;

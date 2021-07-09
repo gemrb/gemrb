@@ -301,7 +301,7 @@ public:
 	ieDword GetItemFlag(unsigned int slot) const;
 	/** Changes the inventory flags */
 	/** flags: see ieCREItemFlagBits */
-	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
+	bool ChangeItemFlag(ieDword slot, ieDword value, int mode) const;
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);
 	bool UnEquipItem(ieDword slot, bool removecurse) const;

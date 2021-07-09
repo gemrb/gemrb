@@ -1725,7 +1725,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	return headersize;
 }
 
-int AREImporter::PutHeader(DataStream *stream, const Map *map)
+int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 {
 	char Signature[56];
 	ieDword tmpDword = 0;
@@ -1832,7 +1832,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex)
+int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
 	char filling[8];
 	ieWord tmpWord = 0;
@@ -1980,7 +1980,7 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutItems(DataStream *stream, const Map *map)
+int AREImporter::PutItems(DataStream *stream, const Map *map) const
 {
 	for (unsigned int i=0;i<ContainersCount;i++) {
 		const Container *c = map->TMap->GetContainer(i);
@@ -1999,7 +1999,7 @@ int AREImporter::PutItems(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex)
+int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
 	char filling[56];
 	ieDword ItemIndex = 0;
@@ -2064,7 +2064,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 	return 0;
 }
 
-int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex)
+int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex) const
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -2139,7 +2139,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 	return 0;
 }
 
-int AREImporter::PutSpawns(DataStream *stream, const Map *map)
+int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
 	char filling[56];
@@ -2298,7 +2298,7 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutEntrances(DataStream *stream, const Map *map)
+int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
 	char filling[66];
@@ -2319,7 +2319,7 @@ int AREImporter::PutEntrances(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutVariables(DataStream *stream, const Map *map)
+int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 {
 	char filling[40];
 	Variables::iterator pos=NULL;
@@ -2380,7 +2380,7 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutMapnotes(DataStream *stream, const Map *map)
+int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 {
 	char filling[8];
 	ieDword tmpDword;
@@ -2520,13 +2520,13 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutExplored(DataStream *stream, const Map *map)
+int AREImporter::PutExplored(DataStream *stream, const Map *map) const
 {
 	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
 	return 0;
 }
 
-int AREImporter::PutTiles(DataStream *stream, const Map *map)
+int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 {
 	char filling[48];
 	ieDword tmpDword = 0;

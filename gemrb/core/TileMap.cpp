@@ -395,7 +395,7 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	return best;
 }
 
-Size TileMap::GetMapSize()
+Size TileMap::GetMapSize() const
 {
 	return Size((XCellCount*64), (YCellCount*64));
 }

@@ -129,7 +129,7 @@ struct TimeStruct {
 	unsigned int day_sec;
 	unsigned int day_size;
 
-	int GetHour(unsigned int time) { return (time/AI_UPDATE_TIME)%day_sec/hour_sec; }
+	int GetHour(unsigned int time) const { return (time / AI_UPDATE_TIME ) % day_sec / hour_sec; }
 };
 
 struct EncodingStruct
@@ -614,7 +614,7 @@ public:
 	void CloseCurrentStore();
 	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
-	int GetMouseScrollSpeed();
+	int GetMouseScrollSpeed() const;
 
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
@@ -667,7 +667,7 @@ public:
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
 	PauseSetting TogglePause();
 	/** returns true the passed pause setting was applied. false otherwise. */
-	bool SetPause(PauseSetting pause, int flags = 0);
+	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
 	bool Autopause(ieDword flag, Scriptable *target);
 	/** registers engine opcodes */
@@ -680,7 +680,7 @@ public:
 	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
-	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
+	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = nullptr, ieResRef resource3 = nullptr) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
 	ieDword *GetListFrom2DA(const ieResRef resref);
 	/** translates a stat symbol to numeric value */
@@ -696,7 +696,7 @@ public:
 	static const char *GetDeathVarFormat();
 	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
 	int GetSpecialSpell(const ieResRef resref);
-	int GetSpecialSpellsCount() { return SpecialSpellsCount; }
+	int GetSpecialSpellsCount() const { return SpecialSpellsCount; }
 	SpecialSpellType *GetSpecialSpells() { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();
@@ -731,7 +731,7 @@ private:
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ieResRef item, const char *Prefix);
+	bool ReadItemTable(const ieResRef item, const char *Prefix) const;
 	bool ReadAbilityTables();
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	bool ReadMusicTable(const ieResRef name, int col);
@@ -797,7 +797,7 @@ public:
 	/** The Main program loop */
 	void Main(void);
 	/** returns true if the game is paused */
-	bool IsFreezed();
+	bool IsFreezed() const;
 	void AskAndExit();
 	void ExitGemRB(void);
 	/** CheatKey support */
@@ -806,7 +806,7 @@ public:
 		CheatFlag=(Flag > 0);
 	}
 
-	inline bool CheatEnabled()
+	inline bool CheatEnabled() const
 	{
 		return CheatFlag;
 	}

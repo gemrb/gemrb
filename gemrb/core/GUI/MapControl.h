@@ -65,7 +65,7 @@ public:
 
 private:
 	/** Call event handler on click */
-	void ClickHandle(const MouseEvent&);
+	void ClickHandle(const MouseEvent&) const;
 	/** Move viewport */
 	void UpdateViewport(Point p);
 	void UpdateCursor();

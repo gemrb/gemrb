@@ -111,7 +111,7 @@ struct Pixel24Bit {
 		return *this;
 	}
 	
-	operator uint32_t() {
+	operator uint32_t() const {
 		return r + ((uint32_t)g << 8) + ((uint32_t)b << 16);
 	}
 };

@@ -46,7 +46,7 @@ Dialog::~Dialog(void)
 	if (Order) free(Order);
 }
 
-DialogState* Dialog::GetState(unsigned int index)
+DialogState* Dialog::GetState(unsigned int index) const
 {
 	if (index >= TopLevelCount) {
 		return NULL;

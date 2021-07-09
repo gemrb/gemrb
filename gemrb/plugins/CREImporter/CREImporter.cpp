@@ -2359,7 +2359,7 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 	return 0;
 }
 
-int CREImporter::PutHeader(DataStream *stream, const Actor *actor)
+int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 {
 	char Signature[8];
 	ieByte tmpByte;
@@ -2980,7 +2980,7 @@ int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutEffects( DataStream *stream, const Actor *actor)
+int CREImporter::PutEffects( DataStream *stream, const Actor *actor) const
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -3030,7 +3030,7 @@ int CREImporter::PutEffects( DataStream *stream, const Actor *actor)
 }
 
 //add as effect!
-int CREImporter::PutVariables(DataStream *stream, const Actor *actor)
+int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 {
 	char filling[104];
 	Variables::iterator pos=NULL;

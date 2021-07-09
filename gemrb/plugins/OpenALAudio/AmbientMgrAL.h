@@ -55,7 +55,7 @@ private:
 		~AmbientSource();
 		uint64_t tick(uint64_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
-		void SetVolume(unsigned short volume);
+		void SetVolume(unsigned short volume) const;
 	private:
 		int stream;
 		const Ambient* ambient;

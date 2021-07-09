@@ -82,7 +82,7 @@ public:
 	bool start_playback();
 	bool next_frame();
 	
-	bool is_truecolour() { return truecolour; }
+	bool is_truecolour() const { return truecolour; }
 };
 
 }

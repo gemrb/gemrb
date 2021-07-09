@@ -272,7 +272,7 @@ void AmbientMgrAL::AmbientSource::hardStop()
 /* sets the overall volume (in percent)
  * the final volume is affected by the specific ambient gain
  */
-void AmbientMgrAL::AmbientSource::SetVolume(unsigned short vol)
+void AmbientMgrAL::AmbientSource::SetVolume(unsigned short vol) const
 {
 	if (stream >= 0) {
 		int v = vol * totalgain / 100;

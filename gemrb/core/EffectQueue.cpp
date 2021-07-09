@@ -2286,7 +2286,7 @@ int EffectQueue::CheckImmunity(Actor *target) const
 }
 
 void EffectQueue::AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue,
-		unsigned int range, const Actor *except)
+		unsigned int range, const Actor *except) const
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {

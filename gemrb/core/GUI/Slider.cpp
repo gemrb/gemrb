@@ -58,7 +58,7 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 }
 
 /** Returns the actual Slider Position */
-unsigned int Slider::GetPosition()
+unsigned int Slider::GetPosition() const
 {
 	return Pos;
 }

@@ -340,7 +340,7 @@ bool GLSLProgram::SetUniformValue(std::string uniformName, const unsigned char s
 	}
 }
 
-void GLSLProgram::Use()
+void GLSLProgram::Use() const
 {
 	glUseProgram(program);
 }
@@ -350,7 +350,7 @@ void GLSLProgram::UnUse()
 	glUseProgram(0);
 }
 
-GLint GLSLProgram::GetAttribLocation(std::string attribName)
+GLint GLSLProgram::GetAttribLocation(std::string attribName) const
 {
 	return glGetAttribLocation(program, attribName.c_str());
 }

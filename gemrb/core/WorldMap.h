@@ -68,7 +68,7 @@ class GEM_EXPORT WMPAreaEntry {
 public:
 	WMPAreaEntry();
 	~WMPAreaEntry();
-	ieDword GetAreaStatus();
+	ieDword GetAreaStatus() const;
 	void SetAreaStatus(ieDword status, int op);
 
 	//! return the map icon of this location. Free the sprite afterwards.
@@ -164,7 +164,7 @@ public:
 	/** If the area name differs it means we are in a random encounter */
 	WMPAreaLink *GetEncounterLink(const ResRef& B, bool &encounter) const;
 	/** Sets area status */
-	void SetAreaStatus(const ResRef&, int Bits, int Op);
+	void SetAreaStatus(const ResRef&, int Bits, int Op) const;
 	/** Gets area pointer and index from area name.
 	 * also called from WorldMapArray to find the right map	*/
 	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;

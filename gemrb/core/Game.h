@@ -424,7 +424,7 @@ public:
 		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) {
+	void SetBeastKnown(unsigned int Index) const {
 		if (!beasts) {
 			return;
 		}
@@ -520,7 +520,7 @@ private:
 	bool DetermineStartPosType(const TableMgr *strta) const;
 	ResRef *GetDream(Map *area);
 	void CastOnRest() const;
-	void PlayerDream();
+	void PlayerDream() const;
 	void TextDream();
 };
 

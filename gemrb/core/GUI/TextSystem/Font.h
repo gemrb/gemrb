@@ -70,7 +70,7 @@ struct Glyph {
 	const ieWord pitch;
 	const ieByte* pixels;
 
-	Glyph(const Size& size, Point pos, ieByte* pixels, ieWord pitch)
+	Glyph(const Size& size, Point pos, const ieByte* pixels, ieWord pitch)
 	: size(size), pos(pos), pitch(pitch), pixels(pixels) {};
 };
 

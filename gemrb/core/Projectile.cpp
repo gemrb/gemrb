@@ -143,7 +143,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 
 //Seq is the first cycle to use in the composite
 //Aim is the number of cycles
-void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq)
+void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const
 {
 	for (int Cycle = 0; Cycle<Aim; Cycle++) {
 		int c = Cycle+Seq;
@@ -163,7 +163,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 //Seq is the cycle to use in case of single orientations
 //Aim is the number of Orientations
 // FIXME: seems inefficient that we load up MAX_ORIENT animations even for those with a single orientation (default case)
-void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq)
+void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const
 {
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
 		bool mirror = false, mirrorvert = false;

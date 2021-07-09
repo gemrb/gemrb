@@ -169,7 +169,7 @@ public: //queries
 	/** Evaluates item availability triggers */
 	int GetRealStockSize();
 	/** Recharges item */
-	void RechargeItem(CREItem *item);
+	void RechargeItem(CREItem *item) const;
 	/** Identifies item according to store lore */
 	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */

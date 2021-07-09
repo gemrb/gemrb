@@ -83,7 +83,7 @@ struct AudioStream {
 	bool delete_buffers;
 
 	void ClearIfStopped();
-	void ClearProcessedBuffers();
+	void ClearProcessedBuffers() const;
 	void ForceClear();
 
 	Holder<OpenALSoundHandle> handle;

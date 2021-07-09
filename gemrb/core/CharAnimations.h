@@ -198,7 +198,7 @@ public:
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
 	int GetTotalPartCount() const;
-	const int* GetZOrder(unsigned char Orient);
+	const int* GetZOrder(unsigned char Orient) const;
 	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
 
 	// returns Palette for a given part (unlocked)
@@ -219,7 +219,7 @@ public: //attribute functions
 	int GetWalkSoundCount() const;
 	const ieResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
-	void DebugDump();
+	void DebugDump() const;
 private:
 	void DropAnims();
 	void InitAvatarsTable();
@@ -237,19 +237,19 @@ private:
 	void AddVHR2Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
 	void AddVHR3Suffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetVHREquipmentRef(char *dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip);
+		const char* equipRef, bool offhand, EquipResRefData* equip) const;
 	void AddSixSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddTwoPieceSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part);
 	void AddMHRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
 	void GetMHREquipmentRef(char *dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip);
+		const char* equipRef, bool offhand, EquipResRefData* equip) const;
 	void AddMMRSuffix(char *dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, bool mirror);
 	void AddMMR2Suffix(char *dest, unsigned char AnimID,

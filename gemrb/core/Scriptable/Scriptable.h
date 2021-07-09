@@ -460,7 +460,7 @@ public:
 	bool VisibleTrap(int only_detected) const;
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
-	bool TryUnlock(Actor *actor, bool removekey);
+	bool TryUnlock(Actor *actor, bool removekey) const;
 };
 
 class GEM_EXPORT Movable : public Selectable {
@@ -535,7 +535,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetOrientation(int value, bool slow);
-	void SetAttackMoveChances(ieWord *amc);
+	void SetAttackMoveChances(const ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);

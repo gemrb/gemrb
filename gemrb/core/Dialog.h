@@ -72,7 +72,7 @@ private:
 	void FreeDialogState(DialogState* ds);
 public:
 	void AddState(DialogState* ds);
-	DialogState* GetState(unsigned int index);
+	DialogState* GetState(unsigned int index) const;
 	int FindFirstState(Scriptable* target);
 	int FindRandomState(Scriptable* target);
 

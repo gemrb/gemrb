@@ -1653,7 +1653,7 @@ ResRef *Game::GetDream(Map *area)
 }
 
 //Start dream cutscenes for player1
-void Game::PlayerDream()
+void Game::PlayerDream() const
 {
 	Scriptable *Sender = GetPC(0,true);
 	if (!Sender) return;

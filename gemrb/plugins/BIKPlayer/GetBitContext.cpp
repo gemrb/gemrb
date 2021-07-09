@@ -37,7 +37,7 @@ unsigned int GetBitContext::get_bits(int n) {
 }
 
 //peek at the next <25 bits (without bumping the bit counter)
-unsigned int GetBitContext::peek_bits(int n) {
+unsigned int GetBitContext::peek_bits(int n) const {
 	unsigned int tmp;
 
 	tmp = AV_RL32(buffer+(index>>3))>>(index&7);
@@ -156,7 +156,7 @@ void GetBitContext::merge( uint8_t *dst, uint8_t *src, int size)
 }
 
 
-void GetBitContext::debug(const char *prefix)
+void GetBitContext::debug(const char *prefix) const
 {
 	GemRB::print("%s: %d", prefix, index);
 }

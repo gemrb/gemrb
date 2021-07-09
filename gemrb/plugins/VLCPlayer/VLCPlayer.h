@@ -54,7 +54,7 @@ private:
 	static void* lock(void *data, void **planes);
 
 	// libvlc_video_set_format_callbacks
-	static unsigned setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines);
+	static unsigned setup(void **opaque, char *chroma, const unsigned *width, const unsigned *height, unsigned *pitches, unsigned *lines);
 
 private:
 	bool DecodeFrame(VideoBuffer&) override;

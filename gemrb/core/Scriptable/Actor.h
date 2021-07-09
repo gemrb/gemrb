@@ -531,7 +531,7 @@ public:
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
-	void SetSoundFolder(const char *soundset);
+	void SetSoundFolder(const char *soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
 	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
 	/** Gets the Character Long Name/Short Name */
@@ -642,7 +642,7 @@ public:
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
 	/* returns item information in quickitem slot */
-	void GetItemSlotInfo(ItemExtHeader *item, int which, int header);
+	void GetItemSlotInfo(ItemExtHeader *item, int which, int header) const;
 	/* returns spell information in quickspell slot */
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
@@ -657,7 +657,7 @@ public:
 	/* applies the class abilities*/
 	void ApplyClab(const char *clab, ieDword max, int remove, int diff);
 	/* calls InitQuickSlot in PCStatStruct */
-	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
+	void SetupQuickSlot(unsigned int which, int slot, int headerindex) const;
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent() const;
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
@@ -757,7 +757,7 @@ public:
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */
-	void SetActionButtonRow(ActionButtonRow &ar);
+	void SetActionButtonRow(ActionButtonRow &ar) const;
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
@@ -811,9 +811,9 @@ public:
 	/* returns the portrait icons list */
 	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
-	void AddPortraitIcon(ieByte icon);
+	void AddPortraitIcon(ieByte icon) const;
 	/* disables a state icon in the list, doesn't remove it! */
-	void DisablePortraitIcon(ieByte icon);
+	void DisablePortraitIcon(ieByte icon) const;
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot) const;
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
@@ -851,7 +851,7 @@ public:
 	/* Enables an overlay */
 	void SetOverlay(unsigned int overlay);
 	/* Checks and sets a spellstate if it wasn't set yet */
-	bool SetSpellState(unsigned int spellstate);
+	bool SetSpellState(unsigned int spellstate) const;
 	/* Checks a spellstate */
 	bool HasSpellState(unsigned int spellstate) const;
 	/* Checks a feat */
@@ -859,7 +859,7 @@ public:
 	/* Reports projectile immunity, nonzero if immune */
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
-	void AddProjectileImmunity(ieDword projectile);
+	void AddProjectileImmunity(ieDword projectile) const;
 	/* Apply feats */
 	void ApplyFeats();
 	/* reapply modal feat spells */
@@ -964,7 +964,7 @@ public:
 	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
-	tick_t GetLastRested() { return TicksLastRested; }
+	tick_t GetLastRested() const { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;

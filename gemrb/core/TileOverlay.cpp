@@ -47,7 +47,7 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::Draw(const Region& viewport, std::vector< TileOverlay*> &overlays, BlitFlags flags)
+void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const
 {
 	// determine which tiles are visible
 	int sx = std::max(viewport.x / 64, 0);

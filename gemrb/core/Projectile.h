@@ -363,9 +363,9 @@ private:
 	void CreateIteration();
 	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
 	//pillar type animations
-	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
+	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
-	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
+	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const;
 	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
 	void GetSmokeAnim();
 	void SetBlend(int brighten);

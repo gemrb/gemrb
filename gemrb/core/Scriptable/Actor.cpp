@@ -3020,7 +3020,7 @@ const unsigned char *Actor::GetStateString() const
 	return tmp;
 }
 
-void Actor::AddPortraitIcon(ieByte icon)
+void Actor::AddPortraitIcon(ieByte icon) const
 {
 	if (!PCStats) {
 		return;
@@ -3038,7 +3038,7 @@ void Actor::AddPortraitIcon(ieByte icon)
 	}
 }
 
-void Actor::DisablePortraitIcon(ieByte icon)
+void Actor::DisablePortraitIcon(ieByte icon) const
 {
 	if (!PCStats) {
 		return;
@@ -5884,7 +5884,7 @@ void Actor::DropItem(int slot , unsigned int flags)
 /** if header==-1 which is a 'use quickitem' action */
 /** if header is set, then which is the absolute slot index, */
 /** and header is the header index */
-void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
+void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 {
 	ieWord idx;
 	ieWord headerindex;
@@ -6146,7 +6146,7 @@ void Actor::ApplyExtraSettings()
 	}
 }
 
-void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
+void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex) const
 {
 	if (!PCStats) return;
 	PCStats->InitQuickSlot(which, slot, headerindex);
@@ -8982,7 +8982,7 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 	else if(!strncmp(Sound,"nosound",8) ) Sound[0]=0;
 }
 
-void Actor::SetActionButtonRow(ActionButtonRow &ar)
+void Actor::SetActionButtonRow(ActionButtonRow &ar) const
 {
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		PCStats->QSlots[i] = ar[i];
@@ -9115,7 +9115,7 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 	}
 }
 
-void Actor::SetSoundFolder(const char *soundset)
+void Actor::SetSoundFolder(const char *soundset) const
 {
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		char filepath[_MAX_PATH];
@@ -10008,7 +10008,7 @@ void Actor::SetOverlay(unsigned int overlay)
 }
 
 //returns true if spell state is already set or illegal
-bool Actor::SetSpellState(unsigned int spellstate)
+bool Actor::SetSpellState(unsigned int spellstate) const
 {
 	if (spellstate >= SpellStatesSize << 5) return true;
 	unsigned int pos = spellstate >> 5;
@@ -10113,7 +10113,7 @@ ieDword Actor::ImmuneToProjectile(ieDword projectile) const
 	return projectileImmunity[idx]&(1<<(projectile&31));
 }
 
-void Actor::AddProjectileImmunity(ieDword projectile)
+void Actor::AddProjectileImmunity(ieDword projectile) const
 {
 	projectileImmunity[projectile/32]|=1<<(projectile&31);
 }

@@ -253,7 +253,7 @@ private:
 	void ContentRemoved(const Content* content) override;
 
 	void MoveCursorToPoint(const Point& p);
-	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
+	LayoutRegions::const_iterator FindCursorRegion(const Layout&) const;
 
 	// relative to cursor pos
 	void InsertText(const String& text);

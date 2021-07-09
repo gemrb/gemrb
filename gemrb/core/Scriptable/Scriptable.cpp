@@ -1860,7 +1860,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	return true;
 }
 
-bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
+bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 	const char *Key = GetKey();
 	Actor *haskey = NULL;
 
@@ -2066,7 +2066,7 @@ void Movable::SetOrientation(int value, bool slow) {
 	}
 }
 
-void Movable::SetAttackMoveChances(ieWord *amc)
+void Movable::SetAttackMoveChances(const ieWord *amc)
 {
 	AttackMovements[0]=amc[0];
 	AttackMovements[1]=amc[1];

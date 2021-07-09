@@ -41,8 +41,8 @@ protected:
 		SurfaceHolder(SDL_Surface* surf) : surface(surf), palette(NULL) {}
 		~SurfaceHolder() override { SDL_FreeSurface(surface); }
 
-		SDL_Surface* operator->() { return surface; }
-		operator SDL_Surface* () { return surface; }
+		SDL_Surface* operator->() const { return surface; }
+		operator SDL_Surface* () const { return surface; }
 	};
 
 	Holder<SurfaceHolder> original;
@@ -98,8 +98,8 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 		TextureHolder(SDL_Texture* tex) : texture(tex) {}
 		~TextureHolder() { SDL_DestroyTexture(texture); }
 
-		SDL_Texture* operator->() { return texture; }
-		operator SDL_Texture* () { return texture; }
+		SDL_Texture* operator->() const { return texture; }
+		operator SDL_Texture* () const { return texture; }
 	};
 
 	mutable Uint32 texFormat = SDL_PIXELFORMAT_UNKNOWN;

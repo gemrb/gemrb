@@ -3364,7 +3364,7 @@ int Map::GetExploredMapSize() const
 	return (fogSize.w * fogSize.h + 7) / 8;
 }
 
-void Map::FillExplored(bool explored)
+void Map::FillExplored(bool explored) const
 {
 	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), explored ? 0xff : 0x00);
 }
@@ -3899,7 +3899,7 @@ AreaAnimation::~AreaAnimation()
 	free(animation);
 }
 
-Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
+Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle) const
 {
 	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
 	if (!anim)

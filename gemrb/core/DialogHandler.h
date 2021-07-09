@@ -35,7 +35,7 @@ public:
 	DialogHandler();
 	~DialogHandler();
 
-	Scriptable *GetTarget();
+	Scriptable *GetTarget() const;
 	Actor *GetSpeaker();
 	bool InDialog(const Scriptable *scr) const { return IsSpeaker(scr) || IsTarget(scr); }
 	bool IsSpeaker(const Scriptable *scr) const { return scr->GetGlobalID() == speakerID; }

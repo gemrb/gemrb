@@ -99,7 +99,7 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 	return MapIcon;
 }
 
-ieDword WMPAreaEntry::GetAreaStatus()
+ieDword WMPAreaEntry::GetAreaStatus() const
 {
 	ieDword tmp = AreaStatus;
 	if (core->HasFeature(GF_KNOW_WORLD) ) {
@@ -566,7 +566,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 	}
 }
 
-void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op)
+void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op) const
 {
 	unsigned int i;
 	WMPAreaEntry* ae = GetArea(areaName, i);

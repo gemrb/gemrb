@@ -93,7 +93,7 @@ void ScriptedAnimation::Init()
 	starttime = 0;
 }
 
-Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop)
+Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
 {
 	int c = cycle;
 

@@ -253,7 +253,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 
 //some stores can recharge items - in original engine apparently all stores
 //did this. In gemrb there is a flag.
-void Store::RechargeItem(CREItem *item)
+void Store::RechargeItem(CREItem *item) const
 {
 	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {

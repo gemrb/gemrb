@@ -104,7 +104,7 @@ void OpenALSoundHandle::StopLooping() {
 	checkALError("Unable to stop audio loop", WARNING);
 }
 
-void AudioStream::ClearProcessedBuffers()
+void AudioStream::ClearProcessedBuffers() const
 {
 	ALint processed = 0;
 	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );

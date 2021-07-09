@@ -692,7 +692,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	return headersize + PPLocCount * 12;
 }
 
-int GAMImporter::PutJournals(DataStream *stream, const Game *game)
+int GAMImporter::PutJournals(DataStream *stream, const Game *game) const
 {
 	for (unsigned int i=0;i<JournalCount;i++) {
 		const GAMJournalEntry *j = game->GetJournalEntry(i);
@@ -710,7 +710,7 @@ int GAMImporter::PutJournals(DataStream *stream, const Game *game)
 }
 
 //only in ToB (and iwd2)
-int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
+int GAMImporter::PutSavedLocations(DataStream *stream, Game *game) const
 {
 	ieWord tmpWord;
 	ieDword filling = 0;
@@ -735,7 +735,7 @@ int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
+int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 {
 	ieWord tmpWord;
 
@@ -752,7 +752,7 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
 }
 
 //only in PST
-int GAMImporter::PutKillVars(DataStream *stream, const Game *game)
+int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -774,7 +774,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutVariables(DataStream *stream, const Game *game)
+int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -809,7 +809,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutHeader(DataStream *stream, Game *game)
+int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 {
 	char Signature[10];
 	ieDword tmpDword;
@@ -1200,7 +1200,7 @@ int GAMImporter::PutMaze(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutFamiliars(DataStream *stream, Game *game)
+int GAMImporter::PutFamiliars(DataStream *stream, Game *game) const
 {
 	int len = 0;
 	if (core->GetBeastsINI()) {

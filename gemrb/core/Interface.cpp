@@ -2551,7 +2551,7 @@ void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
 	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
 }
 
-bool Interface::IsFreezed()
+bool Interface::IsFreezed() const
 {
 	return !update_scripts;
 }
@@ -3840,7 +3840,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
+bool Interface::ReadItemTable(const ieResRef TableName, const char *Prefix) const
 {
 	ieResRef ItemName;
 	int i,j;
@@ -4149,7 +4149,7 @@ void Interface::SetMouseScrollSpeed(int speed) {
 	mousescrollspd = (speed+1)*2;
 }
 
-int Interface::GetMouseScrollSpeed() {
+int Interface::GetMouseScrollSpeed() const {
 	return mousescrollspd;
 }
 
@@ -4651,7 +4651,7 @@ PauseSetting Interface::TogglePause()
 	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 }
 
-bool Interface::SetPause(PauseSetting pause, int flags)
+bool Interface::SetPause(PauseSetting pause, int flags) const
 {
 	GameControl *gc = GetGameControl();
 
@@ -4712,7 +4712,7 @@ void Interface::SetInfoTextColor(const Color &color)
 }
 
 //todo row?
-void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3)
+void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3) const
 {
 	if (!resource1) {
 		return;

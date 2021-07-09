@@ -111,10 +111,10 @@ private:
 	int PutKnownSpells(DataStream *stream, const Actor *actor);
 	int PutSpellPages(DataStream *stream, const Actor *actor);
 	int PutMemorizedSpells(DataStream *stream, const Actor *actor);
-	int PutEffects(DataStream *stream, const Actor *actor);
-	int PutVariables(DataStream *stream, const Actor *actor);
+	int PutEffects(DataStream *stream, const Actor *actor) const;
+	int PutVariables(DataStream *stream, const Actor *actor) const;
 	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size);
-	int PutHeader(DataStream *stream, const Actor *actor);
+	int PutHeader(DataStream *stream, const Actor *actor) const;
 };
 
 }

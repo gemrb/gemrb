@@ -1521,7 +1521,7 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 	}
 }
 
-const int* CharAnimations::GetZOrder(unsigned char Orient)
+const int* CharAnimations::GetZOrder(unsigned char Orient) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_CODE_MIRROR:
@@ -1902,7 +1902,7 @@ static const char *RangedPrefix[]={"sa","sx","ss"};
 static const char *RangedPrefixOld[]={"sa","sx","a1"};
 
 void CharAnimations::AddVHRSuffix(char *dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData)
+	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData) const
 {
 	Cycle = SixteenToNine[Orient];
 	EquipData = new EquipResRefData;
@@ -2013,7 +2013,7 @@ void CharAnimations::AddVHRSuffix(char *dest, unsigned char StanceID,
 
 void CharAnimations::GetVHREquipmentRef(char *dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			EquipResRefData* equip)
+			EquipResRefData* equip) const
 {
 	Cycle = equip->Cycle;
 	if (offhand) {
@@ -2140,7 +2140,7 @@ void CharAnimations::AddLR2Suffix(char *dest, unsigned char StanceID,
 }
 
 void CharAnimations::AddMHRSuffix(char *dest, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData)
+	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData) const
 {
 	Orient /= 2;
 	EquipData = new EquipResRefData;
@@ -2258,7 +2258,7 @@ void CharAnimations::AddMHRSuffix(char *dest, unsigned char StanceID,
 
 void CharAnimations::GetMHREquipmentRef(char *dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			EquipResRefData* equip)
+			EquipResRefData* equip) const
 {
 	Cycle = equip->Cycle;
 	if (offhand) {
@@ -2902,7 +2902,7 @@ void CharAnimations::PulseRGBModifiers()
 	lastModUpdate += inc*40;
 }
 
-void CharAnimations::DebugDump()
+void CharAnimations::DebugDump() const
 {
 	Log (DEBUG, "CharAnimations", "Anim ID   : %04x", GetAnimationID() );
 	Log (DEBUG, "CharAnimations", "BloodColor: %d", GetBloodColor() );

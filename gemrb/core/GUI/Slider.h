@@ -59,7 +59,7 @@ public:
 		   short KnobStep, unsigned short KnobStepsCount);
 
 	/** Returns the actual Slider Position */
-	unsigned int GetPosition();
+	unsigned int GetPosition() const;
 	/** Sets the actual Slider Position trimming to the Max and Min Values */
 	void SetPosition(unsigned int pos);
 	/** Sets the selected image */

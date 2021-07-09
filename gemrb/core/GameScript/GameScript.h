@@ -329,7 +329,7 @@ public:
 private:
 	int RefCount;
 public:
-	int GetRef() {
+	int GetRef() const {
 		return RefCount;
 	}
 

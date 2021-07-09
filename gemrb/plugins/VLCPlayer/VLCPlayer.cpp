@@ -111,7 +111,7 @@ void* VLCPlayer::lock(void *data, void **planes)
 	return NULL; // we are using a single buffer so return NULL
 }
 
-unsigned VLCPlayer::setup(void **opaque, char *chroma, unsigned *width, unsigned *height, unsigned *pitches, unsigned *lines)
+unsigned VLCPlayer::setup(void **opaque, char *chroma, const unsigned *width, const unsigned *height, unsigned *pitches, unsigned *lines)
 {
 	VLCPlayer* player = static_cast<VLCPlayer*>(*opaque);
 	int w = *width;

@@ -324,7 +324,7 @@ public:
 	int CheckImmunity(Actor *target) const;
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
-	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except);
+	void AffectAllInRange(const Map *map, const Point &pos, int idstype, int idsvalue, unsigned int range, const Actor *except) const;
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump() const;
 	void dump(StringBuffer&) const;

@@ -211,7 +211,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 }
 
-void MapControl::ClickHandle(const MouseEvent&)
+void MapControl::ClickHandle(const MouseEvent&) const
 {
 	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
 	core->GetDictionary()->SetAt( "MapControlY", notePos.y );

@@ -90,7 +90,7 @@ public:
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(const Region& screen, bool rain, BlitFlags flags);
-	Size GetMapSize();
+	Size GetMapSize() const;
 public:
 	int XCellCount = 0, YCellCount = 0;
 };

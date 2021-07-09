@@ -766,7 +766,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 }
 
 LayoutRegions::const_iterator
-TextContainer::FindCursorRegion(const Layout& layout)
+TextContainer::FindCursorRegion(const Layout& layout) const
 {
 	auto end = layout.regions.end();
 	for (auto it = layout.regions.begin(); it != end; ++it) {
