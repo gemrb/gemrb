@@ -134,11 +134,6 @@ bool BAMImporter::Open(DataStream* stream)
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
 		color.a = a ? a : 255;
 	}
-	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
-	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {
-		palette->col[1].r = palette->col[1].g = palette->col[1].b = 35;
-		palette->col[1].a = 200;
-	}
 
 	return true;
 }
