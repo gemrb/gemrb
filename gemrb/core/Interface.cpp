@@ -1472,23 +1472,6 @@ int Interface::Init(InterfaceConfig* config)
 			return GEM_ERROR;
 		}
 	}
-	
-	// fix the sample config default resolution for iwd2 and configless case also for the demo
-	// FIXME: move defaults to gemrb.ini? Needs video init to be moved after GUIScript init
-	if ((PathJoin(testPath, GamePath, "icewind2.ini", nullptr) || PathJoin(testPath, GamePath, "mapwinbg.png", nullptr)) && Width == 640 && Height == 480) {
-		Width = 800;
-		Height = 600;
-	}
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = 0;
-	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-	video->SetGamma(brightness, contrast);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
@@ -1529,6 +1512,16 @@ int Interface::Init(InterfaceConfig* config)
 		}
 		video->SetWindowTitle(GameName);
 	}
+
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
 	// read from our version of the config if it is present
@@ -2249,6 +2242,10 @@ bool Interface::LoadGemRBINI()
 		//printMessage("Option", "", GREEN);
 		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
+
+	// fix the resolution default if needed
+	Width = std::max(Width, ini->GetKeyAsInt("resources", "MinWidth", 800));
+	Height = std::max(Height, ini->GetKeyAsInt("resources", "MinHeight", 600));
 
 	return true;
 }
