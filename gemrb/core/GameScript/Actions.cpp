@@ -1490,7 +1490,7 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	Point p(Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y);
+	Point p = Sender->Pos + parameters->pointParameter;
 	if (!actor->InMove() || actor->Destination != p) {
 		actor->WalkTo( p, 0, 0 );
 	}
@@ -4365,8 +4365,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 
 	// iwd2 has two uses with [-1.-1]
 	if (parameters->pointParameter.x == -1) {
-		parameters->pointParameter.x = Sender->Pos.x;
-		parameters->pointParameter.y = Sender->Pos.y;
+		parameters->pointParameter = Sender->Pos;
 	}
 
 	if (Distance(parameters->pointParameter, Sender) > 10) {
@@ -6925,9 +6924,7 @@ void GameScript::Formation(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
-	Point FollowOffset = gc->GetFormationOffset(formation, pos);
-	FollowOffset.x+=tar->Pos.x;
-	FollowOffset.y+=tar->Pos.y;
+	Point FollowOffset = gc->GetFormationOffset(formation, pos) + tar->Pos;
 	if (!scr->InMove() || scr->Destination != FollowOffset) {
 		scr->WalkTo( FollowOffset, 0, 1 );
 	}
