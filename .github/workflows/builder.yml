@@ -87,6 +87,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        sudo add-apt-repository -y ppa:cybermax-dexter/sdl2-backport
         sudo apt-get update
         sudo apt-get install zlib1g zlib1g-dev libsdl2-2.0-0 libsdl2-dev libopenal1 libopenal-dev libsdl2-mixer-dev libfreetype6 libfreetype6-dev libvlc-dev libvlccore-dev libpng16-16 libpng-dev libvorbis0a libvorbis-dev libpython2.7 python-dev
 
