@@ -96,7 +96,7 @@ bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
 	return true;
 }
 
-void SpriteAnimation::SetPaletteGradients(ieDword *col)
+void SpriteAnimation::SetPaletteGradients(const ieDword *col)
 {
 	memcpy(colors, col, 8*sizeof(ieDword));
 	has_palette = true;

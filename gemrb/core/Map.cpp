@@ -1887,7 +1887,7 @@ void Map::DrawSearchMap(const Region &vp) const
 }
 
 //adding animation in order, based on its height parameter
-void Map::AddAnimation(AreaAnimation* panim)
+void Map::AddAnimation(const AreaAnimation* panim)
 {
 	//copy external memory to core memory for msvc's sake
 	AreaAnimation *anim = new AreaAnimation(panim);
@@ -2859,7 +2859,7 @@ AreaAnimation *Map::GetAnimation(const char *Name) const
 	return NULL;
 }
 
-Spawn *Map::AddSpawn(char* Name, const Point &p, ResRef *creatures, unsigned int count)
+Spawn *Map::AddSpawn(const char* Name, const Point &p, const ResRef *creatures, unsigned int count)
 {
 	Spawn* sp = new Spawn();
 	strnspccpy(sp->Name, Name, 32);

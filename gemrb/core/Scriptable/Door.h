@@ -100,7 +100,7 @@ public:
 	ieStrRef NameStrRef;
 	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
-	void ImpedeBlocks(int count, Point *points, PathMapFlags value) const;
+	void ImpedeBlocks(int count, const Point *points, PathMapFlags value) const;
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:

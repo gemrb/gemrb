@@ -450,7 +450,7 @@ public:
 
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
-	void AddAnimation(AreaAnimation* anim);
+	void AddAnimation(const AreaAnimation* anim);
 	aniIterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
@@ -613,7 +613,7 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(char* Name, const Point &, ResRef *creatures, unsigned int count);
+	Spawn *AddSpawn(const char* Name, const Point &, const ResRef *creatures, unsigned int count);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name) const;

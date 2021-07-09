@@ -145,7 +145,7 @@ private:
 public:
 	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
-	void SetPaletteGradients(ieDword *col);
+	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;
 	void SetBlend(bool b);
 	bool HasEnded() const;

@@ -88,7 +88,7 @@ Door::~Door(void)
 	delete[] closed_ib;
 }
 
-void Door::ImpedeBlocks(int count, Point *points, PathMapFlags value) const
+void Door::ImpedeBlocks(int count, const Point *points, PathMapFlags value) const
 {
 	for(int i = 0;i<count;i++) {
 		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::NOTDOOR;

@@ -4963,11 +4963,11 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	//according to IESDP silenced creatures cannot use shout
 	// neither do dead ones or the paladin ogres turn Garren hostile
-	Actor *actor = (Actor *) Sender;
+	const Actor *actor = (Actor *) Sender;
 	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
 		return;
 	}
-	Map *map=Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	map->Shout(actor, parameters->int0Parameter, false);
 }
 
@@ -4977,11 +4977,11 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//according to IESDP silenced creatures cannot use shout
-	Actor *actor = (Actor *) Sender;
+	const Actor *actor = (Actor *) Sender;
 	if (actor->GetStat(IE_STATE_ID) & (STATE_SILENCED|STATE_DEAD)) {
 		return;
 	}
-	Map *map=Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	// true means global, unlimited, shout distance
 	map->Shout(actor, parameters->int0Parameter, true);
 }
@@ -4992,7 +4992,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	//TODO: add state limiting like in Shout?
-	Map *map=Sender->GetCurrentArea();
+	const Map *map=Sender->GetCurrentArea();
 	map->Shout((Actor *) Sender, 0, false);
 }
 
@@ -5712,7 +5712,7 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	Map *othermap = core->GetGame()->GetMap( parameters->string0Parameter, false );
 	if (!othermap) {
 		return;
@@ -6878,7 +6878,7 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 //keeps following the object in formation
 void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 {
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6888,13 +6888,13 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type!=ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
-	Actor *actor = (Actor *)tar;
+	const Actor *actor = (Actor *) tar;
 	scr->LastFollowed = actor->GetGlobalID();
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
@@ -6908,7 +6908,7 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 //walks to a specific offset of target (quite like movetoobject)
 void GameScript::Formation(Scriptable* Sender, Action* parameters)
 {
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (!gc) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -6917,7 +6917,7 @@ void GameScript::Formation(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;

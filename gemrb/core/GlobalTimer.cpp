@@ -250,7 +250,7 @@ void GlobalTimer::SetScreenShake(const Point &shake, int count)
 	shakeCounter = count + 1;
 	
 	if (goal.IsInvalid()) {
-		GameControl* gc = core->GetGameControl();
+		const GameControl* gc = core->GetGameControl();
 		currentVP = gc->Viewport();
 		goal = currentVP.origin;
 		speed = 1000;

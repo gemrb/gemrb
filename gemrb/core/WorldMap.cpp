@@ -441,7 +441,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 //adds a temporary AreaEntry to the world map
 //this entry has two links for each direction, leading to the two areas
 //we were travelling between when using the supplied link
-void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
+void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	unsigned int i;
 	if (GetArea(area, i)) {
 		return;

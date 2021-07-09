@@ -170,7 +170,7 @@ public:
 	WMPAreaEntry* GetArea(const ResRef& areaName, unsigned int &i) const;
 	/** Finds an area name closest to the given area */
 	WMPAreaEntry* FindNearestEntry(const ResRef& areaName, unsigned int &i) const;
-	void SetEncounterArea(const ResRef& area, WMPAreaLink *link);
+	void SetEncounterArea(const ResRef& area, const WMPAreaLink *link);
 	void ClearEncounterArea();
 private:
 	/** updates visibility of adjacent areas, called from CalculateDistances */

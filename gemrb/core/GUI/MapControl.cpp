@@ -140,7 +140,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 Region MapControl::GetViewport() const
 {
-	GameControl* gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	Region vp = gc->Viewport();
 	const Size& mapsize = MyMap->GetSize();
 

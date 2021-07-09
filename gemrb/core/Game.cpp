@@ -1476,7 +1476,7 @@ void Game::AdvanceTime(ieDword add, bool fatigue)
 		// ... but don't do it for a scripted DayNight change
 		if (!fatigue) return;
 		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
-		ResRef *res;
+		const ResRef *res;
 
 		if (IsDay()) {
 			res=&nightmovies[areatype];
@@ -1860,7 +1860,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 		}
 
 		//select dream based on area
-		ResRef *movie;
+		const ResRef *movie;
 		if (dream==0 || dream>7) {
 			movie = GetDream(area);
 		} else {
