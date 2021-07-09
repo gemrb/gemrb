@@ -49,7 +49,7 @@ class StringBuffer;
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512
 
-///** if the effect returns this, stop adding any other effect */
+/** if the effect returns this, stop adding any other effect */
 #define FX_ABORT 0
 /** these effects don't stick around if used as permanent,
  * in that case they modify a base stat like charisma modifier */
@@ -58,7 +58,7 @@ class StringBuffer;
 #define FX_NOT_APPLIED 3
 /** these effects always stick around when applied as permanent or duration */
 #define FX_APPLIED 1	
-///** insert the effect instead of push back */
+/** insert the effect instead of push back */
 #define FX_INSERT 4
 
 //remove level effects flags

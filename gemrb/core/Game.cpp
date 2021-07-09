@@ -2160,9 +2160,8 @@ void Game::ChangeSong(bool always, bool force) const
 	}
 }
 
-/* this method redraws weather. If update is false,
+// this method redraws weather. If update is false,
 // then the weather particles won't change (game paused)
-*/
 void Game::DrawWeather(bool update)
 {
 	if (!weather) {
