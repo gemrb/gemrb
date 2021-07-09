@@ -935,7 +935,6 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 	}
 	fx->Parameter1 = 0;
 	fx->Parameter3 = bonus;
-	return;
 }
 
 static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)

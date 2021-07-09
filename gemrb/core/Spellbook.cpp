@@ -70,7 +70,6 @@ void Spellbook::InitializeSpellbook()
 			IWD2Style = false;
 		}
 	}
-	return;
 }
 
 void Spellbook::ReleaseMemory()

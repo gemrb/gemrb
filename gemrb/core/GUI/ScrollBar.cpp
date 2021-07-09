@@ -77,7 +77,6 @@ void ScrollBar::ScrollDelta(const Point& delta)
 		p.y += GetFrameHeight(IMAGE_SLIDER);
 	}
 	ScrollTo(p + AxisPosFromValue());
-	return;
 }
 
 // FIXME: horizontal broken

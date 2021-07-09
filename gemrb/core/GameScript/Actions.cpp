@@ -5497,7 +5497,6 @@ void GameScript::SetMarkedSpell(Scriptable* Sender, Action* parameters)
 	}
 
 	actor->LastMarkedSpell = parameters->int0Parameter;
-	return;
 }
 
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
