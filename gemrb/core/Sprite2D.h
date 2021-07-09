@@ -72,8 +72,7 @@ public:
 	{
 	private:
 		IPixelIterator* imp = nullptr;
-
-		void InitImp(void* pixel, int pitch) noexcept;
+		IPixelIterator* InitImp(void* pixel, int pitch) const noexcept;
 
 	public:
 		PixelFormat* format;

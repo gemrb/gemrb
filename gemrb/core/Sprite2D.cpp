@@ -107,10 +107,8 @@ public:
 	}
 };
 
-void Sprite2D::Iterator::InitImp(void* pixel, int pitch) noexcept
+IPixelIterator* Sprite2D::Iterator::InitImp(void* pixel, int pitch) const noexcept
 {
-	delete imp;
-
 	if (format->RLE) {
 		pixel = [this, pitch](uint8_t* rledata) {
 			int x = 0;
@@ -131,7 +129,7 @@ void Sprite2D::Iterator::InitImp(void* pixel, int pitch) noexcept
 
 			return rledata;
 		} (static_cast<uint8_t*>(pixel));
-		imp = new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format->ColorKey);
+		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format->ColorKey);
 	} else {
 		pixel = [this, pitch](uint8_t* pixels) {
 			if (xdir == Reverse) {
@@ -147,17 +145,13 @@ void Sprite2D::Iterator::InitImp(void* pixel, int pitch) noexcept
 		
 		switch (format->Bpp) {
 			case 4:
-				imp = new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-				break;
+				return new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 			case 3:
-				imp = new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-				break;
+				return new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 			case 2:
-				imp = new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-				break;
+				return new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 			case 1:
-				imp = new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-				break;
+				return new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
 			default:
 				ERROR_UNKNOWN_BPP;
 		}
@@ -179,7 +173,7 @@ Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y) noexcept
 Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y, const Region& clip) noexcept
 : IPixelIterator(nullptr, spr.pitch, x, y), imp(nullptr), format(&spr.format), clip(clip)
 {
-	InitImp(spr.pixels, spr.pitch);
+	imp = InitImp(spr.pixels, spr.pitch);
 	pixel = spr.pixels; // always here regardless of direction
 }
 
@@ -209,7 +203,8 @@ Sprite2D::Iterator Sprite2D::Iterator::end(const Iterator& beg) noexcept
 	// hack for InitImp
 	it.ydir = ydir;
 	it.xdir = xdir;
-	it.InitImp(it.pixel, beg.pitch);
+	delete it.imp;
+	it.imp = it.InitImp(it.pixel, beg.pitch);
 	// reset for Advance
 	it.xdir = beg.xdir;
 	it.ydir = beg.ydir;
