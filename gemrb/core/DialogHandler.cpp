@@ -456,7 +456,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			break;
 		} else {
 			String* string = core->GetString( ds->transitions[x]->textStrRef );
-			dialogOptions.push_back(std::make_pair(x, *string));
+			dialogOptions.emplace_back(x, *string);
 			delete string;
 		}
 	}

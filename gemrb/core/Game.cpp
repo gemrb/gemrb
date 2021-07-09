@@ -154,7 +154,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int rows = table->GetRowCount();
 		npclevels.reserve(rows);
 		for (int i = 0; i < rows; i++) {
-			npclevels.push_back (std::vector<ResRef>(cols+1));
+			npclevels.emplace_back(cols + 1);
 			for(int j = -1; j < cols; j++) {
 				if (j == -1) {
 					npclevels[i][j+1] = table->GetRowName(i);

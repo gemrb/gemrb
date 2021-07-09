@@ -4923,7 +4923,7 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	std::vector<SelectOption> TAOptions;
 	std::sort(strings.begin(), strings.end());
 	for (size_t i =0; i < strings.size(); i++) {
-		TAOptions.push_back(std::make_pair(i, strings[i]));
+		TAOptions.emplace_back(i, strings[i]);
 	}
 	ta->SetSelectOptions(TAOptions, false);
 
@@ -5004,7 +5004,7 @@ static PyObject* GemRB_TextArea_SetOptions(PyObject* self, PyObject* args)
 		} else {
 			string = StringFromCString(PyString_AsString(item));
 		}
-		TAOptions.push_back(std::make_pair(i, *string));
+		TAOptions.emplace_back(i, *string);
 		delete string;
 	}
 	ta->SetSelectOptions(TAOptions, false);

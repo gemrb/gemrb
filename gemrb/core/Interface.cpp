@@ -1291,7 +1291,7 @@ int Interface::Init(InterfaceConfig* config)
 		for (char *path = strtok((char*)value,SPathListSeparator);
 			 path;
 			 path = strtok(NULL,SPathListSeparator)) {
-			ModPath.push_back(path);
+			ModPath.emplace_back(path);
 			ResolveFilePath(ModPath.back());
 		}
 	}
@@ -1312,7 +1312,7 @@ int Interface::Init(InterfaceConfig* config)
 			for(char *path = strtok((char*)value, SPathListSeparator);
 				path;
 				path = strtok(NULL,SPathListSeparator)) {
-				CD[i].push_back(path);
+				CD[i].emplace_back(path);
 				ResolveFilePath(CD[i].back());
 			}
 		} else {
@@ -1320,9 +1320,9 @@ int Interface::Init(InterfaceConfig* config)
 			char name[_MAX_PATH];
 
 			PathJoin(name, GamePath, keyname, nullptr);
-			CD[i].push_back(name);
+			CD[i].emplace_back(name);
 			PathJoin(name, GamePath, GameDataPath, keyname, nullptr);
-			CD[i].push_back(name);
+			CD[i].emplace_back(name);
 		}
 	}
 
@@ -3371,7 +3371,7 @@ bool Interface::InitItemTypes()
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
 	for (i=0;i<ItemTypes;i++) {
-		itemtypedata.push_back(std::vector<int>(4));
+		itemtypedata.emplace_back(4);
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
 			itemtypedata[i][IDT_FAILURE] = 0; // armor malus
@@ -4860,7 +4860,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int repeats)
 {
-	timers.push_back(Timer(interval, handler, repeats));
+	timers.emplace_back(interval, handler, repeats);
 	return timers.back();
 }
 

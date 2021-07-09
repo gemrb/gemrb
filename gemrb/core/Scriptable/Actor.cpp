@@ -2577,7 +2577,7 @@ static void InitActorTables()
 		skilldex.reserve(skilldexNRows);
 
 		for (i = 0; i < skilldexNRows; i++) {
-			skilldex.push_back (std::vector<int>());
+			skilldex.emplace_back();
 			skilldex[i].reserve(skilldexNCols+1);
 			for(j = -1; j < skilldexNCols; j++) {
 				if (j == -1) {
@@ -2608,7 +2608,7 @@ static void InitActorTables()
 		skillrac.reserve(rows);
 
 		for (i = 0; i < rows; i++) {
-			skillrac.push_back (std::vector<int>());
+			skillrac.emplace_back();
 			skillrac[i].reserve(cols+1);
 			for(j = -1; j < cols; j++) {
 				if (j == -1) {
