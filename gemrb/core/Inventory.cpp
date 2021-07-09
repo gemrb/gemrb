@@ -248,7 +248,7 @@ void Inventory::SetInventoryType(int arg)
 
 void Inventory::SetSlotCount(unsigned int size)
 {
-	if (Slots.size()) {
+	if (!Slots.empty()) {
 		error("Core", "Inventory size changed???\n");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here

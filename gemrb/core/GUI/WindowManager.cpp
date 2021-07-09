@@ -167,14 +167,14 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
-	assert(windows.size()); // win should be contained in windows
+	assert(!windows.empty()); // win should be contained in windows
 	win->SetVisible(true);
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
 bool WindowManager::OrderBack(Window* win)
 {
-	assert(windows.size()); // win should be contained in windows
+	assert(!windows.empty()); // win should be contained in windows
 	return OrderRelativeTo(win, windows.back(), false);
 }
 
@@ -559,7 +559,7 @@ void WindowManager::DrawWindows() const
 {
 	HUDBuf->Clear();
 
-	if (!windows.size()) {
+	if (windows.empty()) {
 		return;
 	}
 

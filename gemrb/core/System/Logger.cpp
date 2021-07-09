@@ -55,7 +55,7 @@ void Logger::AddLogWriter(WriterPtr writer)
 void Logger::ProcessMessages(QueueType queue)
 {
 	std::lock_guard<std::mutex> l(writerLock);
-	while (queue.size()) {
+	while (!queue.empty()) {
 		for (const auto& writer : writers) {
 			writer->WriteLogMessage(queue.front());
 		}

@@ -156,7 +156,7 @@ protected:
 		
 		Layout(const Content* c, LayoutRegions rgns)
 		: content(c), regions(std::move(rgns)) {
-			assert(regions.size());
+			assert(!regions.empty());
 		}
 
 		bool operator==(const Content* c) const {

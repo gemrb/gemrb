@@ -2162,9 +2162,9 @@ void GameScript::EvaluateAllBlocks()
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		ResponseSet * rS = rB->responseSet;
-		if (rS->responses.size()) {
+		if (!rS->responses.empty()) {
 			Response *response = rS->responses[0];
-			if (response->actions.size()) {
+			if (!response->actions.empty()) {
 				Action *action = response->actions[0];
 				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
 				if (target) {

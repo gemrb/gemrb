@@ -720,7 +720,7 @@ bool Button::HitTest(const Point& p) const
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
-		if (Picture || PictureList.size() || !Unpressed) return true;
+		if (Picture || !PictureList.empty() || !Unpressed) return true;
 
 		Point off;
 		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;

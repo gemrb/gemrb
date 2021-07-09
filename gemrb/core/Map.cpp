@@ -691,7 +691,7 @@ void Map::UpdateScripts()
 	// to work ok anyway in my testing - if you change it you probably
 	// also want to change the actor updating code below so it doesn't
 	// add new actions while we are trying to get rid of the area!)
-	if (!has_pcs && !(MasterArea && actors.size()) /*&& !CanFree()*/) {
+	if (!has_pcs && !(MasterArea && !actors.empty()) /*&& !CanFree()*/) {
 		return;
 	}
 
@@ -1703,8 +1703,8 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	Video* video = core->GetVideoDriver();
 	Color debugColor = ColorGray;
 	
-	const bool behindWall = walls.first.size();
-	const bool inFrontOfWall = walls.second.size();
+	const bool behindWall = !walls.first.empty();
+	const bool inFrontOfWall = !walls.second.empty();
 
 	if (behindWall && inFrontOfWall) {
 		// we need a custom stencil if both behind and in front of a wall
@@ -2676,7 +2676,7 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
 	const auto& polys = WallsIntersectingRegion(r, false, &pos);
-	return polys.first.size();
+	return !polys.first.empty();
 }
 
 //this function determines actor drawing order

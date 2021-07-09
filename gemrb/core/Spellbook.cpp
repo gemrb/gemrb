@@ -1198,7 +1198,7 @@ void Spellbook::dump(StringBuffer& buffer) const
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
 
-			if (sm->known_spells.size())
+			if (!sm->known_spells.empty())
 				buffer.append( " Known spells:\n" );
 			for (k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* spl = sm->known_spells[k];
@@ -1207,7 +1207,7 @@ void Spellbook::dump(StringBuffer& buffer) const
 				buffer.appendFormatted ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
 			}
 
-			if (sm->memorized_spells.size())
+			if (!sm->memorized_spells.empty())
 				buffer.append( " Memorized spells:\n" );
 			for (k = 0; k < sm->memorized_spells.size (); k++) {
 				CREMemorizedSpell* spl = sm->memorized_spells[k];

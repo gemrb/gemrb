@@ -836,7 +836,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
 				//target is the door/actor currently under the pointer
-				if (game->selected.size() > 0) {
+				if (!game->selected.empty()) {
 					Actor *src = game->selected[0];
 					Scriptable *target = lastActor;
 					if (overDoor) {
@@ -2430,7 +2430,7 @@ void GameControl::PerformActionOn(Actor *actor)
 			}
 
 			//talk (first selected talks)
-			if (game->selected.size()) {
+			if (!game->selected.empty()) {
 				//if we are in PST modify this to NO!
 				Actor *source;
 				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {

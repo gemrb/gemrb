@@ -278,7 +278,7 @@ ScriptedAnimation *VEFObject::GetSingleObject() const
 	ScriptedAnimation *sca = NULL;
 
 	if (SingleObject) {
-		if (entries.size()) {
+		if (!entries.empty()) {
 			const ScheduleEntry& entry = entries[0];
 			if (entry.type==VEF_VVC || entry.type==VEF_BAM) {
 				sca = (ScriptedAnimation *)entry.ptr;

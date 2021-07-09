@@ -178,7 +178,7 @@ void EventMgr::DispatchEvent(Event&& e)
 
 		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
-			assert(hit->second.size() > 0);
+			assert(!hit->second.empty());
 			KeyMap::value_type::second_type list = hit->second;
 			EventCallback cb = hit->second.front();
 			if (cb(e)) {

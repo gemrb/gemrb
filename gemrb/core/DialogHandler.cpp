@@ -304,7 +304,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		target->ImmediateEvent();
 		target->ProcessActions(); //run the action queue now
 
-		if (tr->actions.size()) {
+		if (!tr->actions.empty()) {
 			if (!(target->GetInternalFlag() & IF_NOINT)) {
 				target->ReleaseCurrentAction();
 			}
@@ -325,7 +325,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			if (tr->actions.size()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
+			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
 			EndDialog();
 			ta->AppendText(L"\n");
 			return false;

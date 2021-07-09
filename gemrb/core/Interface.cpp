@@ -4210,7 +4210,7 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 
 Actor *Interface::GetFirstSelectedActor()
 {
-	if (game->selected.size()) {
+	if (!game->selected.empty()) {
 		return game->selected[0];
 	}
 	return NULL;

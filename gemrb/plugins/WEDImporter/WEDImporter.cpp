@@ -176,7 +176,7 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm) const
 	int usedoverlays;
 	bool freenew = false;
 
-	if (!overlays.size()) {
+	if (overlays.empty()) {
 		return NULL;
 	}
 

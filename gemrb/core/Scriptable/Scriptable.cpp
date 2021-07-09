@@ -338,7 +338,7 @@ void Scriptable::TickScripting()
 		return;
 	}
 
-	if (triggers.size())
+	if (!triggers.empty())
 		TriggerCountdown = 5;
 	IdleTicks = 0;
 	InternalFlags &= ~IF_JUSTDIED;

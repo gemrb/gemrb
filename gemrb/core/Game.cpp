@@ -1519,7 +1519,7 @@ bool Game::AnyPCInCombat() const
 bool Game::EveryoneDead() const
 {
 	//if there are no PCs, then we assume everyone dead
-	if (!PCs.size() ) {
+	if (PCs.empty()) {
 		return true;
 	}
 	if (protagonist==PM_NO) {
