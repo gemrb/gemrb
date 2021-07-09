@@ -56,7 +56,7 @@ Scriptable::Scriptable(ScriptableType type)
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		Scripts[i] = NULL;
 	}
-	overheadTextDisplaying = 0;
+	overheadTextDisplaying = false;
 	timeStartDisplaying = 0;
 
 	scriptName[0] = 0;

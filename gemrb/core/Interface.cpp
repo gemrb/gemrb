@@ -2265,7 +2265,7 @@ bool Interface::LoadEncoding()
 	ini->Open(inifile);
 
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
-	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
+	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
 
 	//TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 

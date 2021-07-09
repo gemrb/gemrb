@@ -973,9 +973,9 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
-int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {
-	if (1) print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 

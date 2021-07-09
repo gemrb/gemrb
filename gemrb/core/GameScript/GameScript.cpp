@@ -2327,7 +2327,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 			if (ORcount) {
 				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 				if (!subresult) {
-					return 0;
+					return false;
 				}
 			}
 			ORcount = result;
@@ -2342,14 +2342,14 @@ bool Condition::Evaluate(Scriptable *Sender) const
 			result = subresult;
 		}
 		if (!result) {
-			return 0;
+			return false;
 		}
 	}
 	if (ORcount) {
 		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 		return subresult;
 	}
-	return 1;
+	return true;
 }
 
 /* this may return more than a boolean, in case of Or(x) */

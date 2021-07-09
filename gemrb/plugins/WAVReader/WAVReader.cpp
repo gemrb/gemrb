@@ -65,7 +65,7 @@ bool RawPCMReader::Open(DataStream* stream)
 		samples >>= 1; // each sample has 16 bit
 	}
 	samples_left = samples;
-	return 1;
+	return true;
 }
 
 inline void fix_endian(ieDword &dest)

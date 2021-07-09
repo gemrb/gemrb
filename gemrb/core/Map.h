@@ -427,7 +427,7 @@ public:
 	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */
-	void dump(bool show_actors=0) const;
+	void dump(bool show_actors = false) const;
 	TileMap *GetTileMap() const { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);

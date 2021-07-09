@@ -3554,7 +3554,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 	unsigned int i = donorPile->inventory.GetSlotCount();
 	while (i--) {
 		CREItem *item = donorPile->RemoveItem(i, 0);
-		int count = pile->inventory.CountItems(item->ItemResRef, 0);
+		int count = pile->inventory.CountItems(item->ItemResRef, false);
 		if (count == 0) {
 			pile->AddItem(item);
 			continue;
@@ -3616,7 +3616,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	// sort by removing all items that have copies and readding them at the end
 	while (i--) {
 		const CREItem *item = othercontainer->inventory.GetSlotItem(i);
-		int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
+		int count = othercontainer->inventory.CountItems(item->ItemResRef, false);
 		if (count == 1) continue;
 
 		while (count) {
@@ -4050,7 +4050,7 @@ bool Map::ChangeMap(bool day_or_night)
 	//it loads the lightmap and the minimap too, besides swapping the tileset
 	if (!mM->ChangeMap(this, day_or_night) && !day_or_night) {
 		Log(WARNING, "Map", "Invalid night lightmap, falling back to day lightmap.");
-		mM->ChangeMap(this, 1);
+		mM->ChangeMap(this, true);
 		DayNight = day_or_night;
 	}
 	return true;

@@ -259,7 +259,7 @@ WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i
 		if (value%1000 == 0) break;
 		value--;
 	}
-	while(1); //value%1000 should protect us from infinite loops
+	while (true); //value%1000 should protect us from infinite loops
 	i = -1;
 	return NULL;
 }

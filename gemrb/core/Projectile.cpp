@@ -755,7 +755,7 @@ int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
 	ScriptedAnimation *sca=vef->GetSingleObject();
 	if (!sca) return 0;
 */
-	ScriptedAnimation* sca=gamedata->GetScriptedAnimation(BAM,0);
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(BAM, false);
 	if (!sca) return 0;
 	VEFObject *vef = new VEFObject(sca);
 

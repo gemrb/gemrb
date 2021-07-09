@@ -5031,7 +5031,7 @@ static PyObject* GemRB_GetPartySize(PyObject * /*self*/, PyObject * /*args*/)
 {
 	GET_GAME();
 
-	return PyInt_FromLong( game->GetPartySize(0) );
+	return PyInt_FromLong(game->GetPartySize(false));
 }
 
 PyDoc_STRVAR( GemRB_GetGameTime__doc,
@@ -6547,7 +6547,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	}
 
 	//set up animation ID
-	switch(actor->UpdateAnimationID(0)) {
+	switch(actor->UpdateAnimationID(false)) {
 	case -1: return RuntimeError("avprefix table contains no entries." );
 	case -2: return RuntimeError("Couldn't load avprefix table.");
 	case -3: return RuntimeError("Couldn't load an avprefix subtable.");
@@ -6602,7 +6602,7 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 		return Py_None;
 	}
 
-	Spell* spell = gamedata->GetSpell( SpellResRef, 1 );
+	Spell* spell = gamedata->GetSpell(SpellResRef, true);
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
 		Log(ERROR, "GUIScript", "Spell not found :%.8s",
@@ -7161,7 +7161,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			gamedata->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef, false);
 		}
 		if (res!=-1) { //it is gold!
 			game->PartyGold += res;
@@ -7191,7 +7191,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
-			gamedata->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef, false);
 		}
 		actor->ReinitQuickSlots();
 
@@ -7420,7 +7420,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 	//buying into bags respects bags' limitations
 	if (rhstore && type != 0) {
-		int accept = rhstore->AcceptableItemType(item->ItemType, Flags, 1);
+		int accept = rhstore->AcceptableItemType(item->ItemType, Flags, true);
 		if (!(accept & IE_STORE_SELL)) {
 			ret &= ~IE_STORE_BUY;
 		}
@@ -7654,7 +7654,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			} else {
 				gamedata->GetItemSound(Sound2, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			gamedata->FreeItem(item, itemResRef, 0);
+			gamedata->FreeItem(item, itemResRef, false);
 			if (Sound2[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
 				core->GetAudioDrv()->Play(Sound2, SFX_CHAN_GUI, Point(), GEM_SND_SPEECH|GEM_SND_RELATIVE);
@@ -8268,7 +8268,7 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 	GET_ACTOR_GLOBAL();
 
 	//the bonus increased value (with wisdom too) is handled by the core
-	actor->spellbook.SetMemorizableSpellsCount( Value, (ieSpellType) SpellType, Level, 0 );
+	actor->spellbook.SetMemorizableSpellsCount(Value, (ieSpellType) SpellType, Level, false);
 
 	Py_RETURN_NONE;
 }
@@ -9513,7 +9513,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
-		gamedata->FreeItem(item, si->ItemResRef,0);
+		gamedata->FreeItem(item, si->ItemResRef, false);
 	}
 	if (Sound && Sound[0]) {
 		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
@@ -9597,7 +9597,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			gamedata->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef, false);
 			if (Sound && Sound[0]) {
 				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
 			}
@@ -11568,7 +11568,7 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->SetModal( (ieDword) state, 0);
+	actor->SetModal((ieDword) state, false);
 	actor->SetModalSpell(state, spell);
 	if (actor->ModalSpellSkillCheck()) {
 		actor->ApplyModal(actor->Modal.Spell); // force immediate effect
@@ -12010,7 +12010,7 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 				} else {
 					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
 				}
-				GameScript* restscript = new GameScript(resref, tar, 0, 0);
+				GameScript* restscript = new GameScript(resref, tar, 0, false);
 				if (restscript->Update()) {
 					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
 					dreamed = 1;

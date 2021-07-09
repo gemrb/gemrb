@@ -1946,7 +1946,7 @@ bool EffectQueue::WeaponImmunity(int enchantment, ieDword weapontype) const
 {
 	ResolveEffectRef(fx_weapon_immunity_ref);
 	if (fx_weapon_immunity_ref.opcode < 0) {
-		return 0;
+		return false;
 	}
 	return WeaponImmunity(fx_weapon_immunity_ref.opcode, enchantment, weapontype);
 }

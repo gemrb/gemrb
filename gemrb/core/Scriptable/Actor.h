@@ -691,7 +691,7 @@ public:
 	/* Calculate experience bonus */
 	int CalculateExperience(int type, int level) const;
 	/* Sets the modal state after checks */
-	void SetModal(ieDword newstate, bool force=1);
+	void SetModal(ieDword newstate, bool force = true);
 	/* Sets the modal spell after checks */
 	void SetModalSpell(ieDword state, const char *spell);
 	/* casts the modal spell if any */

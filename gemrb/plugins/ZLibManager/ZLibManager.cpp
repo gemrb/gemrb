@@ -56,7 +56,7 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 	}
 
 	stream.avail_in = 0;
-	while (1) {
+	while (true) {
 		stream.next_out = bufferout;
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {
@@ -116,7 +116,7 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 	}
 
 	stream.avail_in = 0;
-	while (1) {
+	while (true) {
 		stream.next_out = bufferout;
 		stream.avail_out = OUTPUTSIZE;
 		if (stream.avail_in == 0) {

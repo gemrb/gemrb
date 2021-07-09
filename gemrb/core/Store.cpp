@@ -277,7 +277,7 @@ void Store::RechargeItem(CREItem *item) const
 				item->Usages[i] = h->Charges;
 		}
 	}
-	gamedata->FreeItem(itm, item->ItemResRef, 0);
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
 void Store::IdentifyItem(CREItem *item) const
@@ -294,7 +294,7 @@ void Store::IdentifyItem(CREItem *item) const
 	if (itm->LoreToID <= Lore) {
 		item->Flags |= IE_INV_ITEM_IDENTIFIED;
 	}
-	gamedata->FreeItem(itm, item->ItemResRef, 0);
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
 void Store::AddItem(CREItem *item)

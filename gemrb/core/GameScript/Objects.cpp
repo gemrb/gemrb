@@ -1126,9 +1126,9 @@ int GameScript::ID_Class(const Actor *actor, int parameter)
 {
 	if (core->HasFeature(GF_3ED_RULES)) {
 		//iwd2 has different values, see also the note for AVClass
-		return idclass(actor, parameter, 1);
+		return idclass(actor, parameter, true);
 	}
-	return idclass(actor, parameter, 0);
+	return idclass(actor, parameter, false);
 }
 
 // IE_CLASS holds only one class, not a bitmask like with iwd2 kits. The ids values
@@ -1151,7 +1151,7 @@ int GameScript::ID_ClassMask(const Actor *actor, int parameter)
 // iwd2's class.ids is different than the rest, while class20 is identical (remnant)
 int GameScript::ID_AVClass(const Actor *actor, int parameter)
 {
-	return idclass(actor, parameter, 0);
+	return idclass(actor, parameter, false);
 }
 
 int GameScript::ID_Race(const Actor *actor, int parameter)

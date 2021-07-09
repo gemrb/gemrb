@@ -2840,7 +2840,7 @@ int fx_damage_bonus_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // only the special type of 0 means a flat bonus
 int fx_damage_bonus_modifier2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_damage_bonus_modifier2(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	switch (fx->Parameter2) {
 		case 0:
@@ -4699,7 +4699,7 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 	//create replacement; should we be passing the target instead of NULL?
 	//noooo, don't unsummon replacement creatures! - fuzzie
 	//Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, EAM_DEFAULT,-1, NULL, 0);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, nullptr, p, EAM_DEFAULT, -1, nullptr, false);
 	//delete newfx;
 	return FX_NOT_APPLIED;
 }

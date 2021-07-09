@@ -455,7 +455,7 @@ Actor::Actor()
 	LastDamageType = 0;
 	LastExit = 0;
 	attackcount = 0;
-	secondround = 0;
+	secondround = false;
 	//AttackStance = IE_ANI_ATTACK;
 	attacksperround = 0;
 	nextattack = 0;
@@ -513,7 +513,7 @@ Actor::Actor()
 	Modal.LingeringSpell[0] = '*';
 	Modal.LastApplyTime = 0;
 	Modal.LingeringCount = 0;
-	Modal.FirstApply = 1;
+	Modal.FirstApply = true;
 	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
@@ -6544,7 +6544,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 
 	if (Modal.State != newstate) {
-		Modal.FirstApply = 1;
+		Modal.FirstApply = true;
 	}
 
 	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
@@ -6644,7 +6644,7 @@ void Actor::StopAttack()
 {
 	SetStance(IE_ANI_READY);
 	lastattack = 0;
-	secondround = 0;
+	secondround = false;
 	//InternalFlags|=IF_TARGETGONE; //this is for the trigger!
 	if (InParty) {
 		core->Autopause(AP_NOTARGET, this);
@@ -7746,7 +7746,7 @@ void Actor::ModifyDamage(Scriptable *hitter, int &damage, int &resisted, int dam
 				// for actors we need special care for damage reduction - traps (...) don't have enchanted weapons
 				if (attacker && it->second.reduction) {
 					WeaponInfo wi;
-					attacker->GetWeapon(wi, 0); // FIXME: use a cheaper way to share the weaponEnchantment + this might have been the left hand
+					attacker->GetWeapon(wi, false); // FIXME: use a cheaper way to share the weaponEnchantment + this might have been the left hand
 					ieDword weaponEnchantment = wi.enchantment;
 					// disregard other resistance boni when checking whether to skip reduction
 					resisted = GetDamageReduction(it->second.resist_stat, weaponEnchantment);
@@ -7977,7 +7977,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 
 				// some modals notify each round, some only initially
 				bool feedback = ModalStates[Modal.State].repeat_msg || Modal.FirstApply;
-				Modal.FirstApply = 0;
+				Modal.FirstApply = false;
 				if (InParty && feedback && core->HasFeedback(FT_MISC)) {
 					displaymsg->DisplayStringName(ModalStates[Modal.State].entering_str, DMC_WHITE, this, IE_STR_SOUND|IE_STR_SPEECH);
 				}
@@ -10437,7 +10437,7 @@ ieDword Actor::GetClassLevel(const ieDword isclass) const
 
 bool Actor::IsDualInactive() const
 {
-	if (!IsDualClassed()) return 0;
+	if (!IsDualClassed()) return false;
 
 	//we assume the old class is in IE_LEVEL2, unless swapped
 	ieDword oldlevel = IsDualSwap() ? BaseStats[IE_LEVEL] : BaseStats[IE_LEVEL2];

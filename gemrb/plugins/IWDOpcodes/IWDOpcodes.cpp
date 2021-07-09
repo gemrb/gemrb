@@ -1503,7 +1503,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
-			target, p, EAM_DEFAULT, 0, NULL, 0);
+			target, p, EAM_DEFAULT, 0, NULL, false);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2243,11 +2243,11 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID) ) {
 		Item *poi = gamedata->GetItem(fx->Resource);
 		spellname = poi->ItemName;
-		gamedata->FreeItem(poi, fx->Resource, 0);
+		gamedata->FreeItem(poi, fx->Resource, false);
 	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID) ) {
 		Spell *poi = gamedata->GetSpell(fx->Resource, true);
 		spellname = poi->SpellName;
-		gamedata->FreeSpell(poi, fx->Resource, 0);
+		gamedata->FreeSpell(poi, fx->Resource, false);
 	}
 
 	if (spellname>=0) {
@@ -2801,7 +2801,7 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // modelled on fx_visual_effect_iwd2
 int fx_overlay_iwd (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	if(0) print("fx_overlay_iwd(%2d) Type: %d", fx->Opcode, fx->Parameter2);
+	// print("fx_overlay_iwd(%2d) Type: %d", fx->Opcode, fx->Parameter2);
 	unsigned int type = fx->Parameter2;
 	switch(type) {
 		case 0:

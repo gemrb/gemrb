@@ -1658,7 +1658,7 @@ void Game::PlayerDream() const
 	Scriptable *Sender = GetPC(0,true);
 	if (!Sender) return;
 
-	GameScript* gs = new GameScript( "player1d", Sender,0,0 );
+	GameScript* gs = new GameScript("player1d", Sender, 0, false);
 	gs->Update();
 	delete( gs );
 }
@@ -1816,7 +1816,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	while (i--) {
 		Actor *tar = GetPC(i, true);
 		tar->ClearPath();
-		tar->SetModal(MS_NONE, 0);
+		tar->SetModal(MS_NONE, false);
 		//if hp = 0, then healing will be complete
 		tar->Heal(hp);
 		// auto-cast memorized healing spells if requested and available
@@ -1834,7 +1834,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 	for (auto tar : NPCs) {
 		if (tar->GetBase(IE_EA) == EA_FAMILIAR) {
 			tar->ClearPath();
-			tar->SetModal(MS_NONE, 0);
+			tar->SetModal(MS_NONE, false);
 			tar->Heal(hp);
 			tar->Rest(hours);
 			if (!hoursLeft) tar->PartyRested();

@@ -1041,7 +1041,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						delete newfx;
 					}
 				} else if (overContainer) {
-					overContainer->SetContainerLocked(0);
+					overContainer->SetContainerLocked(false);
 				} else if (overDoor) {
 					overDoor->SetDoorLocked(0,0);
 				}

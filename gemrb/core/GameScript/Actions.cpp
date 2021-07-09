@@ -1909,7 +1909,7 @@ void GameScript::StartCombatCounter(Scriptable* Sender, Action* /*parameters*/)
 {
 	const Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->PlayAreaSong(3, 1, 1);
+	map->PlayAreaSong(3, true, true);
 }
 
 /*iwd2 can set an areasong slot*/
@@ -5843,7 +5843,7 @@ void GameScript::ChangeAnimation(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,1);
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter, true);
 }
 
 void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
@@ -5851,7 +5851,7 @@ void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,0);
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter, false);
 }
 
 void GameScript::Polymorph(Scriptable* Sender, Action* parameters)
@@ -7022,7 +7022,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *)tar;
 	RebusResRef[5]=(char) core->Roll(1,5,'0');
-	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, 0);
+	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
 	if (vvc) {
 		//setting the height
 		vvc->ZOffset = actor->size * 20;

@@ -1896,7 +1896,7 @@ void MoveNearerTo(Scriptable *Sender, const Scriptable *target, int distance, in
 	// we deliberately don't try GetLikelyPosition here for now,
 	// maybe a future idea if we have a better implementation
 	// (the old code used it - by passing true not 0 below - when target was a movable)
-	GetPositionFromScriptable(target, p, 0);
+	GetPositionFromScriptable(target, p, false);
 
 	// account for PersonalDistance (which caller uses, but pathfinder doesn't)
 	if (distance && Sender->Type == ST_ACTOR) {

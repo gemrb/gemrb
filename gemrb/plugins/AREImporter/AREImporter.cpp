@@ -1218,7 +1218,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 					ab->SetScript(Scripts[j],j);
 				}
 			}
-			ab->SetOrientation( Orientation,0 );
+			ab->SetOrientation(Orientation, false);
 			ab->TalkCount = TalkCount;
 			ab->RemovalTime = RemovalTime;
 			ab->RefreshEffects(NULL);
