@@ -38,7 +38,6 @@ public:
 	void AddFactoryObject(FactoryObject* fobject);
 	int IsLoaded(const ResRef& resRef, SClass_ID type) const;
 	FactoryObject* GetFactoryObject(int pos) const;
-	void FreeObjects(void);
 };
 
 }

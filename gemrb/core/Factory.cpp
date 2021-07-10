@@ -59,11 +59,4 @@ FactoryObject* Factory::GetFactoryObject(int pos) const
 	return fobjects[pos];
 }
 
-void Factory::FreeObjects(void)
-{
-	for (unsigned int i = 0; i < fobjects.size(); i++) {
-		delete( fobjects[i] );
-	}
-}
-
 }
