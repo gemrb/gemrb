@@ -117,6 +117,19 @@ inline uint8_t* DecodeRLEData(const void* data, const Size& size, uint8_t colorK
 	return buffer;
 }
 
+inline uint8_t* FindRLEPos(uint8_t* rledata, int pitch, const Point& p, colorkey_t ck)
+{
+	int skipcount = p.y * pitch + p.x;
+	while (skipcount > 0) {
+		if (*rledata++ == ck)
+			skipcount -= (*rledata++) + 1;
+		else
+			skipcount--;
+	}
+
+	return rledata;
+}
+
 #pragma pack(push,1)
 struct Pixel24Bit {
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN

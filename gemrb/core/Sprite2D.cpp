@@ -111,23 +111,14 @@ IPixelIterator* Sprite2D::Iterator::InitImp(void* pixel, int pitch) const noexce
 {
 	if (format->RLE) {
 		pixel = [this, pitch](uint8_t* rledata) {
-			int x = 0;
-			int y = 0;
+			Point p;
 
 			if (ydir == Reverse)
-				y = clip.h - 1;
+				p.y = clip.h - 1;
 			if (xdir == Reverse)
-				x = clip.w - 1;
-
-			int skipcount = y * pitch + x;
-			while (skipcount > 0) {
-				if (*rledata++ == format->ColorKey)
-					skipcount -= (*rledata++)+1;
-				else
-					skipcount--;
-			}
-
-			return rledata;
+				p.x = clip.w - 1;
+			
+			return FindRLEPos(rledata, pitch, p, format->ColorKey);
 		} (static_cast<uint8_t*>(pixel));
 		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format->ColorKey);
 	} else {
