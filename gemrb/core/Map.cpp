@@ -1159,7 +1159,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 	unsigned int i = 0;
 	Container *c;
 	while ((c = TMap->GetContainer(i++)) != NULL) {
-		if (c->Type != IE_CONTAINER_PILE) {
+		if (c->containerType != IE_CONTAINER_PILE) {
 			// don't highlight containers behind closed doors
 			// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
 			// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
@@ -1209,7 +1209,7 @@ Container *Map::GetNextPile(int &index) const
 	Container *c = TMap->GetContainer(index++);
 
 	while (c) {
-		if (c->Type == IE_CONTAINER_PILE) {
+		if (c->containerType == IE_CONTAINER_PILE) {
 			return c;
 		}
 		c = TMap->GetContainer(index++);
@@ -3529,7 +3529,7 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos) const
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE) {
+		if (c->containerType == IE_CONTAINER_PILE) {
 			//creating (or grabbing) the container in the other map at the given position
 			Container *othercontainer;
 			if (Pos.IsInvalid()) {
@@ -3599,7 +3599,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE && IsExplored(c->Pos)) {
+		if (c->containerType == IE_CONTAINER_PILE && IsExplored(c->Pos)) {
 			//transfer the pile to the other container
 			MergePiles(c, othercontainer);
 		}
@@ -3660,7 +3660,7 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 {
 	Container* c = new Container();
 	c->SetScriptName( Name );
-	c->Type = Type;
+	c->containerType = Type;
 	c->outline = outline;
 	c->SetMap(this);
 	if (outline) {

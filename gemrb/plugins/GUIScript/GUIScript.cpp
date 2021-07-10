@@ -6988,7 +6988,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 
-	return Py_BuildValue("{s:i,s:i}", "Type", container->Type, "ItemCount", container->inventory.GetSlotCount());
+	return Py_BuildValue("{s:i,s:i}", "Type", container->containerType, "ItemCount", container->inventory.GetSlotCount());
 }
 
 PyDoc_STRVAR( GemRB_GetContainerItem__doc,

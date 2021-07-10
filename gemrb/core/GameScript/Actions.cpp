@@ -5611,7 +5611,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* parameters)
 			parameters->int1Parameter = distance;
 		}
 	}
-	if (container->Type==IE_CONTAINER_PILE && parameters->int2Parameter < 10) {
+	if (container->containerType == IE_CONTAINER_PILE && parameters->int2Parameter < 10) {
 		needed = 0; // less than a search square (width)
 	}
 	if (distance<=needed)

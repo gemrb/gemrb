@@ -2016,7 +2016,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) c->Pos.y;
 		stream->WriteWord(tmpWord);
-		stream->WriteWord(c->Type);
+		stream->WriteWord(c->containerType);
 		stream->WriteWord(c->LockDifficulty);
 		stream->WriteDword(c->Flags);
 		stream->WriteWord(c->TrapDetectionDiff);

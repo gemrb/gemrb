@@ -38,7 +38,7 @@ namespace GemRB {
 Container::Container(void)
 	: Highlightable( ST_CONTAINER )
 {
-	Type = 0;
+	containerType = 0;
 	LockDifficulty = 0;
 	Flags = 0;
 	TrapDetectionDiff = 0;
@@ -113,9 +113,9 @@ void Container::SetContainerLocked(bool lock)
 void Container::DestroyContainer()
 {
 	//it is already a groundpile?
-	if (Type == IE_CONTAINER_PILE)
+	if (containerType == IE_CONTAINER_PILE)
 		return;
-	Type = IE_CONTAINER_PILE;
+	containerType = IE_CONTAINER_PILE;
 	RefreshGroundIcons();
 	//probably we should stop the script or trigger it, whatever
 }
@@ -125,7 +125,7 @@ CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
 	CREItem *ret = inventory.RemoveItem(idx, count);
 	//if we just took one of the first few items, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (idx<MAX_GROUND_ICON_DRAWN)) {
+	if (containerType == IE_CONTAINER_PILE && idx < MAX_GROUND_ICON_DRAWN) {
 		RefreshGroundIcons();
 	}
 	return ret;
@@ -137,7 +137,7 @@ int Container::AddItem(CREItem *item)
 {
 	inventory.AddItem(item);
 	//we just added a 3. or less item, groundpile changed
-	if ((Type == IE_CONTAINER_PILE) && (inventory.GetSlotCount()<=MAX_GROUND_ICON_DRAWN)) {
+	if (containerType == IE_CONTAINER_PILE && inventory.GetSlotCount() <= MAX_GROUND_ICON_DRAWN) {
 		RefreshGroundIcons();
 	}
 	return 2;
@@ -249,7 +249,7 @@ void Container::dump() const
 	buffer.appendFormatted( "Debugdump of Container %s\n", GetScriptName() );
 	buffer.appendFormatted( "Container Global ID: %d\n", GetGlobalID());
 	buffer.appendFormatted( "Position: %d.%d\n", Pos.x, Pos.y);
-	buffer.appendFormatted( "Type: %d, Locked: %s, LockDifficulty: %d\n", Type, YESNO(Flags&CONT_LOCKED), LockDifficulty );
+	buffer.appendFormatted("Type: %d, Locked: %s, LockDifficulty: %d\n", containerType, YESNO(Flags&CONT_LOCKED), LockDifficulty);
 	buffer.appendFormatted( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );

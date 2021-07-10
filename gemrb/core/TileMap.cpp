@@ -217,14 +217,14 @@ Container* TileMap::GetContainer(const char* Name) const
 Container* TileMap::GetContainer(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
 		if (!container->BBox.PointInside(position)) continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
@@ -241,7 +241,7 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
@@ -250,7 +250,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 		}
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
@@ -265,7 +265,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 
 int TileMap::CleanupContainer(Container *container)
 {
-	if (container->Type!=IE_CONTAINER_PILE)
+	if (container->containerType != IE_CONTAINER_PILE)
 		return 0;
 	if (container->inventory.GetSlotCount())
 		return 0;

@@ -64,7 +64,7 @@ private:
 	void FreeGroundIcons();
 public:
 	Point toOpen;
-	ieWord Type;
+	ieWord containerType;
 	ieDword Flags;
 	ieWord LockDifficulty;
 	Inventory inventory;
