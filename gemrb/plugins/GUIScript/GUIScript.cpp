@@ -9332,11 +9332,11 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 	unsigned int i=UsedItemsCount;
 
 	while(i--) {
-		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
+		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) != 0) {
 			continue;
 		}
 		//true if names don't match
-		int nomatch = (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) );
+		int nomatch = (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) != 0);
 
 		switch(action) {
 		//the named actor cannot remove it
@@ -9382,7 +9382,7 @@ static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	unsigned int i=UsedItemsCount;
 
 	while(i--) {
-		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, NewItem->ItemResRef, 8)) {
+		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, NewItem->ItemResRef, 8) != 0) {
 			continue;
 		}
 

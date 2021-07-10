@@ -37,7 +37,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 {
 	char Signature[8];
 	compressed->Read( Signature, 8 );
-	if (strncmp( Signature, "SAV V1.0", 8 ) ) {
+	if (strncmp(Signature, "SAV V1.0", 8) != 0) {
 		return GEM_ERROR;
 	}
 	int All = compressed->Remains();
@@ -94,9 +94,9 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 	if (!compressed) {
 		return GEM_ERROR;
 	}
-	char Signature[8];
 
-	memcpy(Signature,"SAV V1.0",8);
+	char Signature[9];
+	strlcpy(Signature, "SAV V1.0", 9);
 	compressed->Write(Signature, 8);
 
 	return GEM_OK;

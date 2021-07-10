@@ -2213,7 +2213,7 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource))) {
+	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -2234,7 +2234,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	//in case it lingers
 	fx->Opcode=EffectQueue::ResolveEffect(fx_resist_spell_ref);
 
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
 		return FX_APPLIED;
 	}
 	//display message too

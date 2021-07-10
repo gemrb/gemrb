@@ -1503,7 +1503,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	// if unset, manually populate GameName (window title)
 	if (!stricmp(GameName, GEMRB_STRING)) {
-		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING)) {
+		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING) != 0) {
 			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
 			strlcpy(GameName, title.c_str(), sizeof(GameName));
 		} else {
@@ -3032,7 +3032,7 @@ bool Interface::SaveConfig()
 {
 	char ini_path[_MAX_PATH] = { '\0' };
 	char gemrbINI[_MAX_PATH+4] = { '\0' };
-	if (strncmp(INIConfig, "gem-", 4)) {
+	if (strncmp(INIConfig, "gem-", 4) != 0) {
 		snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	}
 	PathJoin(ini_path, GamePath, gemrbINI, nullptr);
@@ -4244,7 +4244,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
-	if (strnicmp(item->ItemResRef, GoldResRef, 8 ) )
+	if (strnicmp(item->ItemResRef, GoldResRef, 8) != 0)
 		return -1;
 	//gold, returns the gold value (stack size)
 	return item->Usages[0];
@@ -4893,7 +4893,7 @@ void Interface::SetNextScript(const char *script)
 }
 
 void Interface::SanityCheck(const char *ver) {
-	if (strcmp(ver, VERSION_GEMRB)) {
+	if (strcmp(ver, VERSION_GEMRB) != 0) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
 }

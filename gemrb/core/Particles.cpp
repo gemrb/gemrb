@@ -36,7 +36,7 @@ static const int spark_color_indices[MAX_SPARK_COLOR] = {12, 5, 0, 6, 1, 8, 2, 7
 static void TranslateColor(const char *value, Color &color)
 {
 	//if not RGB then try to interpret it as a dword
-	if (strnicmp(value,"RGB(",4)) {
+	if (strnicmp(value, "RGB(", 4) != 0) {
 		long c = strtol(value,NULL,0);
 		color = Color::FromABGR(c);
 	} else {

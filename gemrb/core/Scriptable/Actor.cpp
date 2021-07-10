@@ -3280,7 +3280,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	// check if any new portrait icon was removed or added
 	if (PCStats) {
-		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons))) {
+		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons)) != 0) {
 			core->SetEventFlag(EF_PORTRAIT);
 			memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
 		}
@@ -3689,7 +3689,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	if (savingthrows[type] == IE_SAVEWILL) {
 		// aura of courage
-		if (Modified[IE_EA] < EA_GOODCUTOFF && stricmp(fx->Source, "SPWI420")) {
+		if (Modified[IE_EA] < EA_GOODCUTOFF && stricmp(fx->Source, "SPWI420") != 0) {
 			// look if an ally paladin of at least level 2 is near
 			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
 			for (const Actor *ally : neighbours) {
@@ -3726,7 +3726,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	// handle animal taming last
 	// must roll a Will Save of 5 + player's total skill or higher to save
-	if (stricmp(fx->Source, "SPIN108") && fx->Opcode == 5) {
+	if (stricmp(fx->Source, "SPIN108") != 0 && fx->Opcode == 5) {
 		saveDC = 5;
 		const Actor *caster = core->GetGame()->GetActorByGlobalID(fx->CasterID);
 		if (caster) {
@@ -4198,7 +4198,7 @@ bool Actor::PlayWarCry(int range) const
 //call this when a PC receives a command from GUI
 void Actor::CommandActor(Action* action, bool clearPath)
 {
-	Scriptable::Stop(); // stop what you were doing
+	Movable::Stop(); // stop what you were doing
 	if (clearPath) ClearPath(true);
 	AddAction(action); // now do this new thing
 
@@ -8973,8 +8973,11 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 	}
 
 	//Empty resrefs
-	if (Sound[0]=='*') Sound[0]=0;
-	else if(!strncmp(Sound,"nosound",8) ) Sound[0]=0;
+	if (Sound[0] == '*') {
+		Sound[0] = 0;
+	} else if (!strncmp(Sound, "nosound", 7)) {
+		Sound[0] = 0;
+	}
 }
 
 void Actor::SetActionButtonRow(ActionButtonRow &ar) const
@@ -9446,7 +9449,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 				// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
 				// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
 				if (BackstabResRef[0]!='*') {
-					if (stricmp(BackstabResRef, resref_arterial)) {
+					if (stricmp(BackstabResRef, resref_arterial) != 0) {
 						// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 						multiplier -= 2;
 						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
@@ -9819,7 +9822,7 @@ void Actor::SetupFist()
 		}
 	}
 	CREItem *currentFist = inventory.GetSlotItem(slot);
-	if (!currentFist || stricmp(currentFist->ItemResRef, ItemResRef)) {
+	if (!currentFist || stricmp(currentFist->ItemResRef, ItemResRef) != 0) {
 		inventory.SetSlotItemRes(ItemResRef, slot);
 	}
 }

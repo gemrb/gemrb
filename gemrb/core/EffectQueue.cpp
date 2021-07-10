@@ -795,7 +795,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
 		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
-			if( memcmp(fx->Resource,"NEG",4) ) {
+			if (strnicmp(fx->Resource, "NEG", 4) != 0) {
 				fx->IsSaveForHalfDamage=1;
 			}
 		} else {
@@ -881,7 +881,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-			if (strnicmp(fx->Source, "detect", 6)) { // our secret door pervasive effect
+			if (strnicmp(fx->Source, "detect", 6) != 0) { // our secret door pervasive effect
 				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->Source);
 			}
 			return 0;

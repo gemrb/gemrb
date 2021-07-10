@@ -230,7 +230,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 		}
 		STOItem *temp = items[i];
 
-		if (strnicmp(item->ItemResRef, temp->ItemResRef, 8) ) {
+		if (strnicmp(item->ItemResRef, temp->ItemResRef, 8) != 0) {
 			continue;
 		}
 		if (exact) {
@@ -239,7 +239,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 				return temp;
 			}
 			// Check if we have a non-stackable item with a different number of charges.
-			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
+			if (!item->MaxStackAmount && memcmp(temp->Usages, item->Usages, sizeof(item->Usages)) != 0) {
 				continue;
 			}
 		}

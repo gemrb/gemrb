@@ -353,8 +353,7 @@ retry:
 	}
 	if (create) {
 		fs->Create( "default", IE_TOH_CLASS_ID);
-		memset(Signature,0,sizeof(Signature));
-		memcpy(Signature,"TLK ",4);
+		strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
 		fs->Write(Signature, sizeof(Signature));
 		create = false;
 		goto retry;

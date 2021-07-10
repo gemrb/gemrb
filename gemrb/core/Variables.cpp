@@ -500,7 +500,7 @@ void Variables::LoadInitialValues(const char* name)
 		if (!fs.Read(buffer, 40)) return;
 		if (fs.ReadDword(value) != 4) return;
 		// is it the type we want? if not, skip
-		if (strnicmp(buffer, name, 6)) continue;
+		if (strnicmp(buffer, name, 6) != 0) continue;
 		// copy variable (types got 2 extra spaces, and the name is padded too)
 		// (true = uppercase, needed for original engine save compat, see 315b8f2e)
 		strnspccpy(varname,buffer+8,32, true);

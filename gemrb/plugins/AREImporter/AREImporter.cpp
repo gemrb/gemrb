@@ -1732,7 +1732,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
-	memcpy( Signature, "AREAV1.0", 8);
+	strlcpy(Signature, "AREAV1.0", 9);
 	if (map->version==16) {
 		Signature[5]='9';
 		Signature[7]='1';

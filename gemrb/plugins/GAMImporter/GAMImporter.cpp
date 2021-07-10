@@ -811,7 +811,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 	char Signature[10];
 	ieDword tmpDword;
 
-	memcpy( Signature, "GAMEV0.0", 8);
+	strlcpy(Signature, "GAMEV0.0", 9);
 	Signature[5]+=game->version/10;
 	if (game->version==GAM_VER_PST || game->version==GAM_VER_BG) { //pst/bg1 saved version
 		Signature[7]+=1;

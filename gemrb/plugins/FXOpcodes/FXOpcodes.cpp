@@ -1935,7 +1935,7 @@ int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		while(i--) {
 			//does this slot need unequipping
 			if (core->QuerySlotEffects(i) ) {
-				if (fx->Resource[0] && strnicmp(inv->GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
+				if (fx->Resource[0] && strnicmp(inv->GetSlotItem(i)->ItemResRef, fx->Resource, 8) != 0) {
 					continue;
 				}
 				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
@@ -4214,7 +4214,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		cached = false;
 		target->polymorphCache = new PolymorphCache();
 	}
-	if (!cached || strnicmp(fx->Resource,target->polymorphCache->Resource,sizeof(fx->Resource))) {
+	if (!cached || strnicmp(fx->Resource, target->polymorphCache->Resource, sizeof(fx->Resource)) != 0) {
 		Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
 
 		//I don't know how could this happen, existance of the resource was already checked
@@ -5197,7 +5197,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//remove actor from current map, and set destination map
 	if (fx->FirstApply) {
 		//if current area is different from target area
-		if (strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+		if (strnicmp(game->CurrentArea, fx->Resource, 8) != 0) {
 			//make global
 			game->AddNPC( target );
 			//remove from current area
@@ -5594,7 +5594,7 @@ int fx_protection_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect *
 int fx_resist_spell (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 {
 	// print("fx_resist_spell(%2d): Resource: %s", fx->Opcode, fx->Resource);
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
 		return FX_APPLIED;
 	}
@@ -5613,7 +5613,7 @@ int fx_resist_spell_dec (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE_DEC);
 		return FX_APPLIED;
 	}

@@ -187,7 +187,7 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
-	if (aScript[0] && stricmp(aScript, "NONE")) {
+	if (aScript[0] && stricmp(aScript, "NONE") != 0) {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
 		Scripts[idx] = new GameScript( aScript, this, idx, ai );
 	}

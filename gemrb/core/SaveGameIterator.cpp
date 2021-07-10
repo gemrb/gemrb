@@ -62,7 +62,7 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	ds->Read(Signature, 8);
 	ds->ReadDword(GameTime);
 	delete ds;
-	if (memcmp(Signature,"GAME",4) ) {
+	if (memcmp(Signature, "GAME", 4) != 0) {
 		strcpy(Date, "ERROR");
 		return;
 	}
@@ -227,7 +227,7 @@ static int IsQuickSaveSlot(const char* match, const char* slotname)
 	if (cnt != 2) {
 		return 0;
 	}
-	if (stricmp(savegameName, match) )
+	if (stricmp(savegameName, match) != 0)
 	{
 		return 0;
 	}

@@ -3213,7 +3213,7 @@ int GameScript::CalledByName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) tar;
-	if (stricmp(actor->GetScriptName(), parameters->string0Parameter) ) {
+	if (stricmp(actor->GetScriptName(), parameters->string0Parameter) != 0) {
 		return 0;
 	}
 	return 1;
@@ -4260,11 +4260,11 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 	int count = tm->GetRowCount();
 	for (int i=0;i<count;i++) {
 		const char *area = tm->QueryField( i, 0 );
-		if (strnicmp(actor->LastArea, area, 8) ) {
+		if (strnicmp(actor->LastArea, area, 8) != 0) {
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(actor->UsedExit, exit, 32) ) {
+		if (strnicmp(actor->UsedExit, exit, 32) != 0) {
 			continue;
 		}
 		return 1;

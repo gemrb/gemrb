@@ -281,11 +281,11 @@ void STOImporter::PutPurchasedCategories(DataStream *stream, const Store* s) con
 
 void STOImporter::PutHeader(DataStream *stream, const Store *s)
 {
-	char Signature[8];
+	char Signature[9];
 	ieWord tmpWord;
 
 	version = s->version;
-	memcpy( Signature, "STORV0.0", 8);
+	strlcpy(Signature, "STORV0.0", 9);
 	Signature[5]+=version/10;
 	Signature[7]+=version%10;
 	stream->Write( Signature, 8);

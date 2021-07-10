@@ -215,7 +215,7 @@ static void InitSpawnGroups()
 		int j=tab->GetRowCount();
 		while (j--) {
 			const char *crename = tab->QueryField( j,i );
-			if (strcmp(crename, tab->QueryDefault())) break;
+			if (strcmp(crename, tab->QueryDefault()) != 0) break;
 		}
 		if (j>0) {
 			SpawnGroup *creatures = new SpawnGroup(j);

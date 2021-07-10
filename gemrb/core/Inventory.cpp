@@ -294,7 +294,7 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 			continue;
 		}
 		if (resref && resref[0]) {
-			if (strnicmp(resref, item->ItemResRef, 8) )
+			if (strnicmp(resref, item->ItemResRef, 8) != 0)
 				continue;
 		}
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
@@ -322,7 +322,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags) const
 		if ( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref,8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
 			continue;
 		}
 		return true;
@@ -456,7 +456,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if ( (flags&item->Flags)!=flags) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
@@ -533,7 +533,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!flags && (mask&item->Flags)!=0) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
 			continue;
 		}
 		*res_item=RemoveItem( (unsigned int) slot, count);
@@ -736,7 +736,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags, unsigned int ski
 		if ( mask & item->Flags ) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
 			continue;
 		}
 		if (skip) {
@@ -798,7 +798,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
+		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
 			continue;
 		}
 		// mark it as unequipped, so it doesn't cause problems in stores

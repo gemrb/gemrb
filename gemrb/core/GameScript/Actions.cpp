@@ -642,7 +642,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		//if the actor isn't in the source area, we don't care
-		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
+		if (strnicmp(tar->Area, parameters->string0Parameter, 8) != 0) {
 			continue;
 		}
 		// no need of CreateMovementEffect, party members are always moved immediately
@@ -653,7 +653,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
 		//if the actor isn't in the source area, we don't care
-		if (strnicmp(tar->Area, parameters->string0Parameter, 8) ) {
+		if (strnicmp(tar->Area, parameters->string0Parameter, 8) != 0) {
 			continue;
 		}
 		//if the actor is currently in a loaded area, remove it from there
@@ -6109,7 +6109,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	if (!store) {
 		store = core->SetCurrentStore(parameters->string0Parameter, 0);
 	} else {
-		if (strnicmp(store->Name, parameters->string0Parameter, sizeof(ieResRef)-1) ) {
+		if (strnicmp(store->Name, parameters->string0Parameter, 8) != 0) {
 			//not the current store, we need some dirty hack
 			has_current = true;
 			strnlwrcpy(current, store->Name, sizeof(ieResRef)-1);

@@ -362,7 +362,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 		if (!item) {
 			continue;
 		}
-		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) ) {
+		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) != 0) {
 			continue;
 		}
 		actor->inventory.SetSlotItemRes(parameters->string1Parameter,i,parameters->int0Parameter,parameters->int1Parameter,parameters->int2Parameter);
@@ -1307,7 +1307,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 	Map* map2;
 	Game* game = core->GetGame();
 	bool newSong = false;
-	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()))) { //do we need to switch area?
+	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()) != 0)) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
@@ -2194,7 +2194,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value, const c
 		game->kaputz->SetAt( poi, value, NoCreate );
 		return;
 	}
-	if (strnicmp(newVarName, "GLOBAL", 6) ) {
+	if (strnicmp(newVarName, "GLOBAL", 6) != 0) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->SetAt( poi, value, NoCreate);
@@ -2250,8 +2250,8 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 		return value;
 	}
 	
-	if (stricmp(newVarName,"GLOBAL") ) {
-		Map *map=game->GetMap(game->FindMap(newVarName));
+	if (stricmp(newVarName, "GLOBAL") != 0) {
+		const Map *map = game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup(poi, value);
 		} else {

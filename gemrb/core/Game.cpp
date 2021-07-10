@@ -980,7 +980,7 @@ bool Game::CheckForReplacementActor(int i)
 		return false;
 	}
 
-	ieResRef newcre = "****"; // default table value
+	ResRef newcre = "****"; // default table value
 	for (auto nl : npclevels) {
 		if (!stricmp(nl[0], act->GetScriptName()) && (level > 2)) {
 			// the tables have entries only up to level 24
@@ -988,12 +988,12 @@ bool Game::CheckForReplacementActor(int i)
 			if (level < safeLevel) {
 				safeLevel = level;
 			}
-			CopyResRef(newcre, nl[safeLevel-2]);
+			newcre = nl[safeLevel - 2];
 			break;
 		}
 	}
 
-	if (stricmp(newcre, "****")) {
+	if (newcre == "****") {
 		int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
 		if (pos < 0) {
 			error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");

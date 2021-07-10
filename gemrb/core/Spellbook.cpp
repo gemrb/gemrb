@@ -250,7 +250,7 @@ int Spellbook::CountSpells(const char *resref, unsigned int type, int flag) cons
 	while(i < max) {
 		for (const auto spellMemo : spells[i]) {
 			for (const auto spell : spellMemo->memorized_spells) {
-				if (stricmp(spell->SpellResRef, resref)) continue;
+				if (stricmp(spell->SpellResRef, resref) != 0) continue;
 
 				if (flag || spell->Flags) {
 					count++;
@@ -303,7 +303,7 @@ bool Spellbook::KnowSpell(const char *resref) const
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (const auto spellMemo : spells[i]) {
 			for (const auto knownSpell : spellMemo->known_spells) {
-				if (resref[0] && stricmp(knownSpell->SpellResRef, resref)) {
+				if (resref[0] && stricmp(knownSpell->SpellResRef, resref) != 0) {
 					continue;
 				}
 				return true;
@@ -323,7 +323,7 @@ bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 				CREMemorizedSpell* ms = sm->memorized_spells[k];
 
 				if (!ms->Flags) continue;
-				if (resref[0] && stricmp(ms->SpellResRef, resref)) {
+				if (resref[0] && stricmp(ms->SpellResRef, resref) != 0) {
 					continue;
 				}
 
@@ -403,7 +403,7 @@ void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResR
 	std::vector< CREMemorizedSpell* >::iterator ms;
 
 	for (ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ++ms) {
-		if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ieResRef) ) ) {
+		if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ieResRef)) != 0) {
 			continue;
 		}
 		delete *ms;
@@ -488,7 +488,7 @@ void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 			std::vector< CREKnownSpell* >::iterator ks;
 
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
-				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) ) ) {
+				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ieResRef)) != 0) {
 					continue;
 				}
 				delete *ks;
@@ -638,7 +638,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(const ieResRef name, int type, b
 			while(i--) {
 				CREMemorizedSpell *cms = spells[t][level]->memorized_spells[i];
 
-				if (strnicmp(cms->SpellResRef, name, sizeof(ieResRef) ) ) continue;
+				if (strnicmp(cms->SpellResRef, name, sizeof(ieResRef)) != 0) continue;
 				if (!real || cms->Flags) j++;
 			}
 		}
@@ -817,7 +817,7 @@ bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete, bool onlyde
 		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
 			std::vector< CREMemorizedSpell* >::iterator s;
 			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
-				if (strnicmp(ResRef, (*s)->SpellResRef, sizeof(ieResRef) ) ) {
+				if (strnicmp(ResRef, (*s)->SpellResRef, sizeof(ieResRef)) != 0) {
 					continue;
 				}
 				if (onlydepleted && (*s)->Flags != 0) {
@@ -932,7 +932,7 @@ void Spellbook::DepleteLevel(CRESpellMemorization* sm, const ieResRef except)
 	for (size_t i = 0; i < cnt && cnt>0; i++) {
 		CREMemorizedSpell *cms = sm->memorized_spells[i];
 		//sorcerer spells are created in orderly manner
-		if (cms->Flags && strncmp(last,cms->SpellResRef,8) && strncmp(except,cms->SpellResRef,8)) {
+		if (cms->Flags && strncmp(last, cms->SpellResRef, 8) != 0 && strncmp(except, cms->SpellResRef, 8) != 0) {
 			memcpy(last, cms->SpellResRef, sizeof(ieResRef) );
 			cms->Flags=0;
 /*
@@ -1056,7 +1056,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 			offset++;
 			continue;
 		}
-		if (strnicmp(spellinfo[i]->spellname, spellname, sizeof(ieResRef) ) ) continue;
+		if (strnicmp(spellinfo[i]->spellname, spellname, sizeof(ieResRef)) != 0) continue;
 		memcpy(array, spellinfo[i], sizeof(SpellExtHeader));
 		return i-offset+1;
 	}
