@@ -84,7 +84,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	TileSetMgr.cpp
 	Variables.cpp
 	VEFObject.cpp
-	Video.cpp
 	WorldMap.cpp
 	WorldMapMgr.cpp
 	GameScript/Actions.cpp
@@ -136,6 +135,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/StringBuffer.cpp
 	System/swab.cpp
 	System/VFS.cpp
+	Video/Video.cpp
 	)
 
 IF(SUPPORTS_MEMSTREAM)

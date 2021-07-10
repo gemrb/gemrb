@@ -37,7 +37,7 @@
 #include "Palette.h"
 #include "PathFinder.h"
 #include "Audio.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 

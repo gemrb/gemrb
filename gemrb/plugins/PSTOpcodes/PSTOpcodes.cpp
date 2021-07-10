@@ -30,7 +30,7 @@
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h" //for tints
+#include "Video/Video.h" //for tints
 #include "Scriptable/Actor.h"
 #include "ScriptedAnimation.h"
 

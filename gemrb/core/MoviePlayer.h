@@ -35,7 +35,7 @@
 #include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 

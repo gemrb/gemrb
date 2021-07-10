@@ -21,7 +21,7 @@
 #define __GemRB__Tooltip__
 
 #include "Region.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "GUI/TextSystem/Font.h"
 

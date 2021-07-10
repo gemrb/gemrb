@@ -19,93 +19,11 @@
  */
 
 #include "Sprite2D.h"
+#include "Video/RLE.h"
 
 namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
-
-class RLEIterator : public PixelIterator<uint8_t>
-{
-	uint8_t* dataPos = nullptr;
-	uint8_t colorkey = 0;
-	uint16_t transQueue = 0;
-public:
-	RLEIterator(uint8_t* p, Size s, colorkey_t ck)
-	: RLEIterator(p, Forward, Forward, s, ck)
-	{}
-
-	RLEIterator(uint8_t* p, Direction x, Direction y, Size s, colorkey_t ck)
-	: PixelIterator(p, x, y, s, s.w), dataPos(p), colorkey(ck)
-	{}
-
-	IPixelIterator* Clone() const noexcept override {
-		return new RLEIterator(*this);
-	}
-
-	void Advance(int dx) noexcept override {
-		if (dx == 0 || size.IsInvalid()) return;
-		
-		int pixelsToAdvance = xdir * dx;
-		int rowsToAdvance = std::abs(pixelsToAdvance / size.w);
-		int xToAdvance = pixelsToAdvance % size.w;
-		int tmpx = pos.x + xToAdvance;
-		
-		if (tmpx < 0) {
-			++rowsToAdvance;
-			tmpx = size.w + tmpx;
-			xToAdvance = tmpx - pos.x;
-		} else if (tmpx >= size.w) {
-			++rowsToAdvance;
-			tmpx = tmpx - size.w;
-			xToAdvance = tmpx - pos.x;
-		}
-		
-		if (dx < 0) {
-			pos.y -= rowsToAdvance;
-		} else {
-			pos.y += rowsToAdvance;
-		}
-
-		pos.x = tmpx;
-		assert(pos.x >= 0 && pos.x < size.w);
-		
-		while (pixelsToAdvance) {
-			if (transQueue) {
-				// dataPos is pointing to a "count" field
-				// transQueue is the remaining number of pixels we must move "right" to increment dataPos
-				// *dataPos - transQueue is the number of pixels we must move "left" to decrement dataPos
-				if (pixelsToAdvance > 0) {
-					// moving to the right
-					if (transQueue < pixelsToAdvance) {
-						pixelsToAdvance -= transQueue;
-						transQueue = 0;
-					} else {
-						pixelsToAdvance = 0;
-					}
-				} else {
-					// moving to the left
-					if (*dataPos - transQueue < -pixelsToAdvance) {
-						pixelsToAdvance += *dataPos - transQueue;
-						transQueue = 0;
-					} else {
-						pixelsToAdvance = 0;
-					}
-				}
-			} else {
-				// dataPos is pointing to a pixel
-				pixel = dataPos;
-				if (*dataPos == colorkey) {
-					transQueue = *++dataPos;
-				}
-				--pixelsToAdvance;
-			}
-		}
-	}
-	
-	const Point& Position() const noexcept override {
-		return pos;
-	}
-};
 
 IPixelIterator* Sprite2D::Iterator::InitImp(void* pixel, int pitch) const noexcept
 {

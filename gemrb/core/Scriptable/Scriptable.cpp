@@ -30,7 +30,7 @@
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"

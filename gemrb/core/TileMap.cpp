@@ -21,7 +21,7 @@
 #include "TileMap.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

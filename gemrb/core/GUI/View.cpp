@@ -24,7 +24,7 @@
 #include "GUI/TextSystem/Font.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <typeinfo>
 

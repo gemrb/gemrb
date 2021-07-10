@@ -29,7 +29,7 @@
 #include "Interface.h"
 #include "ScriptedAnimation.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "System/DataStream.h"
 
 namespace GemRB {

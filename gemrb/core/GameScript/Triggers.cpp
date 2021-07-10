@@ -32,7 +32,7 @@
 #include "GameData.h"
 #include "Polygon.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GUI/GameControl.h"
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"

@@ -34,7 +34,7 @@
 #include "PathFinder.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "damages.h"
 #include "ie_cursors.h"
 #include "opcode_params.h"

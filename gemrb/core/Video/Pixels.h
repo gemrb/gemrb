@@ -92,43 +92,6 @@ struct PixelFormat {
 	}
 };
 
-inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t colorKey)
-{
-	size_t pixelCount = size.w * size.h;
-	uint8_t* buffer = (uint8_t*)malloc(pixelCount);
-
-	size_t transQueue = 0;
-	for (size_t i = 0; i < pixelCount;) {
-		if (transQueue) {
-			std::fill(&buffer[i], &buffer[i + transQueue], colorKey);
-			i += transQueue;
-			transQueue = 0;
-		} else {
-			uint8_t px = *p++;
-			if (px == colorKey) {
-				transQueue = std::min<size_t>(1 + *p++, pixelCount - i);
-			} else {
-				buffer[i++] = px;
-			}
-		}
-	}
-	
-	return buffer;
-}
-
-inline uint8_t* FindRLEPos(uint8_t* rledata, int pitch, const Point& p, colorkey_t ck)
-{
-	int skipcount = p.y * pitch + p.x;
-	while (skipcount > 0) {
-		if (*rledata++ == ck)
-			skipcount -= (*rledata++) + 1;
-		else
-			skipcount--;
-	}
-
-	return rledata;
-}
-
 #pragma pack(push,1)
 struct Pixel24Bit {
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN

@@ -22,7 +22,7 @@
 #include "Palette.h"
 #include "Sprite2D.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <algorithm>
 #include <climits>

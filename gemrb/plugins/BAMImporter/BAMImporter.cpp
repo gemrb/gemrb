@@ -25,7 +25,8 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "Video.h"
+#include "Video/Video.h"
+#include "Video/RLE.h"
 #include "System/FileStream.h"
 
 #include "System/swab.h"

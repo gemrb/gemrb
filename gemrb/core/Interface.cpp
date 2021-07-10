@@ -62,7 +62,7 @@
 #include "SymbolMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMapMgr.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"

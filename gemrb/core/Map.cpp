@@ -41,7 +41,7 @@
 #include "ScriptedAnimation.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMap.h"
 #include "strrefs.h"
 #include "ie_cursors.h"

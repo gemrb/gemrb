@@ -36,7 +36,7 @@
 #include "Palette.h"
 #include "Polygon.h"
 #include "Spellbook.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <map>
 #include <set>

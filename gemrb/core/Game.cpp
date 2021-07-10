@@ -38,7 +38,7 @@
 #include "GameScript/GameScript.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
-#include "Pixels.h"
+#include "Video/Pixels.h"
 #include "System/DataStream.h"
 #include "System/StringBuffer.h"
 #include "MapReverb.h"

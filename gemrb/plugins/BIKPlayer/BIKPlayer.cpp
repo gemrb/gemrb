@@ -40,7 +40,7 @@
 #include "Audio.h"
 #include "Interface.h"
 #include "Variables.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cassert>
 #include <cstdio>

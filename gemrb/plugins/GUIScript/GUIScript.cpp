@@ -45,7 +45,7 @@
 #include "SaveGameIterator.h"
 #include "Spell.h"
 #include "TileMap.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMap.h"
 #include "GameScript/GSUtils.h" //checkvariable
 #include "GUI/Button.h"

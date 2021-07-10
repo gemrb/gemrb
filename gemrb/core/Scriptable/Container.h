@@ -25,7 +25,7 @@
 
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 

@@ -30,7 +30,7 @@
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GameScript/GameScript.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"

@@ -40,7 +40,7 @@
 #include "SaveGameIterator.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMap.h"
 #include "GUI/GameControl.h"
 #include "GUI/EventMgr.h"

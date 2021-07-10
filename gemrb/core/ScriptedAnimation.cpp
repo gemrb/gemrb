@@ -30,7 +30,7 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
-#include "Pixels.h"
+#include "Video/Pixels.h"
 #include "Sprite2D.h"
 
 namespace GemRB {

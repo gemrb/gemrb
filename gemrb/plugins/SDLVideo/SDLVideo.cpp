@@ -21,7 +21,7 @@
 #include "SDLVideo.h"
 
 #include "Interface.h"
-#include "Palette.h"
+#include "Video/RLE.h"
 #include "SDLPixelIterator.h"
 
 using namespace GemRB;

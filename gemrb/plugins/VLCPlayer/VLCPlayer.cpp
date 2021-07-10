@@ -19,7 +19,7 @@
  */
 
 #include "VLCPlayer.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 

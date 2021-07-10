@@ -125,6 +125,11 @@
 		A24C80AF232C9DC2004CB41A /* libvlccore.9.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */; };
 		A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9E1884CA8600431DEE /* CircularBuffer.h */; };
 		A24E7BA11884CA8600431DEE /* ie_cursors.h in Headers */ = {isa = PBXBuildFile; fileRef = A24E7B9F1884CA8600431DEE /* ie_cursors.h */; };
+		A25F91E9269931220045F07A /* RLE.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E5269931220045F07A /* RLE.h */; };
+		A25F91EA269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
+		A25F91EB269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
+		A25F91EC269931220045F07A /* Video.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E7269931220045F07A /* Video.h */; };
+		A25F91ED269931220045F07A /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E8269931220045F07A /* Pixels.h */; };
 		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
 		A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
 		A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
@@ -244,7 +249,6 @@
 		A28062861878D1BC009E577D /* TextContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = A28062831878D1BC009E577D /* TextContainer.h */; };
 		A2806287187B7C89009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
 		A2806288187B7C8A009E577D /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28062821878D1BC009E577D /* TextContainer.cpp */; };
-		A281CDDB256F119D00058D76 /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A281CDDA256F119C00058D76 /* Pixels.h */; };
 		A281CE0F256F11BA00058D76 /* SDLPixelIterator.h in Headers */ = {isa = PBXBuildFile; fileRef = A281CE0E256F11B900058D76 /* SDLPixelIterator.h */; };
 		A286361C2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
 		A286361D2559D9F800E5730C /* DPadSoftKeyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A28636192559D9F800E5730C /* DPadSoftKeyboard.cpp */; };
@@ -355,7 +359,6 @@
 		A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */; };
 		A29BF8EE13A04A6F00C812DD /* TileSetMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0721395FF62006ADC12 /* TileSetMgr.cpp */; };
 		A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0751395FF62006ADC12 /* Variables.cpp */; };
-		A29BF8F013A04A6F00C812DD /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0771395FF62006ADC12 /* Video.cpp */; };
 		A29BF8F213A04A6F00C812DD /* WorldMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA07C1395FF62006ADC12 /* WorldMap.cpp */; };
 		A29BF8F313A04A6F00C812DD /* WorldMapMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */; };
 		A29BF8F513A04A6F00C812DD /* DataStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA05C1395FF62006ADC12 /* DataStream.cpp */; };
@@ -599,8 +602,6 @@
 		A2E663EE139E884B00310FC8 /* TypeID.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0741395FF62006ADC12 /* TypeID.h */; };
 		A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0751395FF62006ADC12 /* Variables.cpp */; };
 		A2E663F0139E884B00310FC8 /* Variables.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0761395FF62006ADC12 /* Variables.h */; };
-		A2E663F1139E884B00310FC8 /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0771395FF62006ADC12 /* Video.cpp */; };
-		A2E663F2139E884B00310FC8 /* Video.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0781395FF62006ADC12 /* Video.h */; };
 		A2E663F6139E884B00310FC8 /* WorldMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA07C1395FF62006ADC12 /* WorldMap.cpp */; };
 		A2E663F7139E884B00310FC8 /* WorldMap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA07D1395FF62006ADC12 /* WorldMap.h */; };
 		A2E663F8139E884B00310FC8 /* WorldMapMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */; };
@@ -1297,6 +1298,10 @@
 		A24C80AE232C9DC2004CB41A /* libvlccore.9.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvlccore.9.dylib; path = ../../../../../Applications/VLC.app/Contents/MacOS/lib/libvlccore.9.dylib; sourceTree = "<group>"; };
 		A24E7B9E1884CA8600431DEE /* CircularBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularBuffer.h; sourceTree = "<group>"; };
 		A24E7B9F1884CA8600431DEE /* ie_cursors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_cursors.h; sourceTree = "<group>"; };
+		A25F91E5269931220045F07A /* RLE.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLE.h; sourceTree = "<group>"; };
+		A25F91E6269931220045F07A /* Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Video.cpp; sourceTree = "<group>"; };
+		A25F91E7269931220045F07A /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
+		A25F91E8269931220045F07A /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
 		A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScriptInterface.cpp; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
@@ -1471,7 +1476,6 @@
 		A27E830A13A0358200B41410 /* 2DAImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = 2DAImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A28062821878D1BC009E577D /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextContainer.cpp; sourceTree = "<group>"; };
 		A28062831878D1BC009E577D /* TextContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextContainer.h; sourceTree = "<group>"; };
-		A281CDDA256F119C00058D76 /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A281CE0E256F11B900058D76 /* SDLPixelIterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDLPixelIterator.h; sourceTree = "<group>"; };
 		A2830A0F13A05A64000A63FE /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
 		A2830A3913A05B5F000A63FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -1745,8 +1749,6 @@
 		A2BFA0741395FF62006ADC12 /* TypeID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypeID.h; sourceTree = "<group>"; };
 		A2BFA0751395FF62006ADC12 /* Variables.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Variables.cpp; sourceTree = "<group>"; };
 		A2BFA0761395FF62006ADC12 /* Variables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Variables.h; sourceTree = "<group>"; };
-		A2BFA0771395FF62006ADC12 /* Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Video.cpp; sourceTree = "<group>"; };
-		A2BFA0781395FF62006ADC12 /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
 		A2BFA07C1395FF62006ADC12 /* WorldMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMap.cpp; sourceTree = "<group>"; };
 		A2BFA07D1395FF62006ADC12 /* WorldMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMap.h; sourceTree = "<group>"; };
 		A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapMgr.cpp; sourceTree = "<group>"; };
@@ -4582,6 +4584,17 @@
 			path = TextSystem;
 			sourceTree = "<group>";
 		};
+		A25F91E4269931220045F07A /* Video */ = {
+			isa = PBXGroup;
+			children = (
+				A25F91E5269931220045F07A /* RLE.h */,
+				A25F91E6269931220045F07A /* Video.cpp */,
+				A25F91E7269931220045F07A /* Video.h */,
+				A25F91E8269931220045F07A /* Pixels.h */,
+			);
+			path = Video;
+			sourceTree = "<group>";
+		};
 		A27979A913ABA4F7009A6FEF /* SAVImporter */ = {
 			isa = PBXGroup;
 			children = (
@@ -5247,7 +5260,6 @@
 				A2BFA0141395FF62006ADC12 /* Particles.h */,
 				A2D33FEC24C2035A0081AC31 /* PathFinder.cpp */,
 				A2BFA0151395FF62006ADC12 /* PathFinder.h */,
-				A281CDDA256F119C00058D76 /* Pixels.h */,
 				A2BFA0161395FF62006ADC12 /* Plugin.cpp */,
 				A2BFA0171395FF62006ADC12 /* Plugin.h */,
 				A2E7E1962668977F0064423F /* PluginLoader.cpp */,
@@ -5322,8 +5334,7 @@
 				A2BFA0761395FF62006ADC12 /* Variables.h */,
 				A27E5D5C18106384009434E5 /* VEFObject.cpp */,
 				A27E5D5D18106384009434E5 /* VEFObject.h */,
-				A2BFA0771395FF62006ADC12 /* Video.cpp */,
-				A2BFA0781395FF62006ADC12 /* Video.h */,
+				A25F91E4269931220045F07A /* Video */,
 				A2BFA07C1395FF62006ADC12 /* WorldMap.cpp */,
 				A2BFA07D1395FF62006ADC12 /* WorldMap.h */,
 				A2BFA07E1395FF62006ADC12 /* WorldMapMgr.cpp */,
@@ -7943,6 +7954,7 @@
 				A2E66366139E883100310FC8 /* Callback.h in Headers */,
 				A2E66368139E883100310FC8 /* CharAnimations.h in Headers */,
 				A2E6636A139E883100310FC8 /* Compressor.h in Headers */,
+				A25F91E9269931220045F07A /* RLE.h in Headers */,
 				A2E6636E139E883100310FC8 /* damages.h in Headers */,
 				A2E66370139E883100310FC8 /* DataFileMgr.h in Headers */,
 				A2E66372139E883100310FC8 /* Dialog.h in Headers */,
@@ -7980,6 +7992,7 @@
 				A2E663A0139E883E00310FC8 /* Map.h in Headers */,
 				A2E663A2139E883E00310FC8 /* MapMgr.h in Headers */,
 				A2E663A4139E883E00310FC8 /* MoviePlayer.h in Headers */,
+				A25F91EC269931220045F07A /* Video.h in Headers */,
 				A2E663A6139E883E00310FC8 /* MusicMgr.h in Headers */,
 				A2E663A8139E883E00310FC8 /* Palette.h in Headers */,
 				A2E663AA139E883E00310FC8 /* PalettedImageMgr.h in Headers */,
@@ -8030,7 +8043,6 @@
 				A2D672E31B30F40C00264D16 /* WindowManager.h in Headers */,
 				A2E663EE139E884B00310FC8 /* TypeID.h in Headers */,
 				A2E663F0139E884B00310FC8 /* Variables.h in Headers */,
-				A2E663F2139E884B00310FC8 /* Video.h in Headers */,
 				A2E663F7139E884B00310FC8 /* WorldMap.h in Headers */,
 				A2E663F9139E884B00310FC8 /* WorldMapMgr.h in Headers */,
 				A20A278D1A71E3200077077C /* View.h in Headers */,
@@ -8040,7 +8052,6 @@
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
 				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
 				A2E66407139E885300310FC8 /* VFS.h in Headers */,
-				A281CDDB256F119D00058D76 /* Pixels.h in Headers */,
 				A2E66409139E885A00310FC8 /* Actor.h in Headers */,
 				A2E6640B139E885A00310FC8 /* Container.h in Headers */,
 				A2E6640D139E885A00310FC8 /* Door.h in Headers */,
@@ -8054,6 +8065,7 @@
 				A2E66415139E886100310FC8 /* Button.h in Headers */,
 				A24454821F09BFF8008D5B5E /* GUIAnimation.h in Headers */,
 				A2E66417139E886100310FC8 /* Console.h in Headers */,
+				A25F91ED269931220045F07A /* Pixels.h in Headers */,
 				A2E6641A139E886100310FC8 /* Control.h in Headers */,
 				A2E6641C139E886100310FC8 /* EventMgr.h in Headers */,
 				A2E6641E139E886100310FC8 /* GameControl.h in Headers */,
@@ -9559,6 +9571,7 @@
 				A29BF8C213A04A6F00C812DD /* ImageWriter.cpp in Sources */,
 				A29BF8C313A04A6F00C812DD /* IniSpawn.cpp in Sources */,
 				A29BF8C413A04A6F00C812DD /* Interface.cpp in Sources */,
+				A25F91EB269931220045F07A /* Video.cpp in Sources */,
 				A29BF8C513A04A6F00C812DD /* Inventory.cpp in Sources */,
 				A29BF8C613A04A6F00C812DD /* Item.cpp in Sources */,
 				A29BF8C713A04A6F00C812DD /* ItemMgr.cpp in Sources */,
@@ -9603,7 +9616,6 @@
 				A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */,
 				A29BF8EE13A04A6F00C812DD /* TileSetMgr.cpp in Sources */,
 				A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */,
-				A29BF8F013A04A6F00C812DD /* Video.cpp in Sources */,
 				A29BF8F213A04A6F00C812DD /* WorldMap.cpp in Sources */,
 				A29BF8F313A04A6F00C812DD /* WorldMapMgr.cpp in Sources */,
 				A29BF8F513A04A6F00C812DD /* DataStream.cpp in Sources */,
@@ -9818,6 +9830,7 @@
 				A2E663D6139E884500310FC8 /* Sprite2D.cpp in Sources */,
 				A2E663DA139E884500310FC8 /* Store.cpp in Sources */,
 				A2E663DC139E884500310FC8 /* StoreMgr.cpp in Sources */,
+				A25F91EA269931220045F07A /* Video.cpp in Sources */,
 				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
 				A2E663DE139E884500310FC8 /* StringMgr.cpp in Sources */,
 				A2E663E0139E884500310FC8 /* SymbolMgr.cpp in Sources */,
@@ -9830,7 +9843,6 @@
 				A2E663EC139E884B00310FC8 /* TileSetMgr.cpp in Sources */,
 				A2D672DD1B30F24400264D16 /* GUIFactory.cpp in Sources */,
 				A2E663EF139E884B00310FC8 /* Variables.cpp in Sources */,
-				A2E663F1139E884B00310FC8 /* Video.cpp in Sources */,
 				A2E663F6139E884B00310FC8 /* WorldMap.cpp in Sources */,
 				A2E663F8139E884B00310FC8 /* WorldMapMgr.cpp in Sources */,
 				A2E663FC139E885300310FC8 /* DataStream.cpp in Sources */,

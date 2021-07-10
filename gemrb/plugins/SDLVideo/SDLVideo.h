@@ -21,7 +21,7 @@
 #ifndef SDLVIDEODRIVER_H
 #define SDLVIDEODRIVER_H
 
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "GUI/EventMgr.h"
 

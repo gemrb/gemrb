@@ -33,7 +33,7 @@
 #include "exports.h"
 
 #include "Palette.h"
-#include "Pixels.h"
+#include "Video/Pixels.h"
 #include "Region.h"
 #include "TypeID.h"
 
