@@ -300,7 +300,7 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 	if (Decoded) {
 		size_t TokenLength = strlen(Decoded);
 		if (dest) {
-			strlcpy(dest, Decoded, sizeof(dest));
+			memcpy(dest, Decoded, TokenLength);
 		}
 		//Decoded is always a copy
 		free( Decoded );
