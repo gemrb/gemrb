@@ -33,7 +33,6 @@ struct FrameEntry {
 	Region bounds;
 	bool RLE = false;
 	int dataOffset = 0;
-	int dataLength = 0;
 };
 
 class Palette;
@@ -42,7 +41,7 @@ using PaletteHolder = Holder<Palette>;
 class BAMImporter : public AnimationMgr {
 private:
 	DataStream* str;
-	FrameEntry* frames;
+	std::vector<FrameEntry> frames;
 	CycleEntry* cycles;
 	ieWord FramesCount;
 	ieByte CyclesCount;
@@ -52,7 +51,6 @@ private:
 	int DataStart;
 private:
 	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
-	void* GetFramePixels(const FrameEntry& frames);
 	ieWord * CacheFLT(unsigned int &count);
 public:
 	BAMImporter(void);

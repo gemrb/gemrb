@@ -35,7 +35,6 @@ using namespace GemRB;
 BAMImporter::BAMImporter(void)
 {
 	str = NULL;
-	frames = NULL;
 	cycles = NULL;
 	FramesCount = 0;
 	CyclesCount = 0;
@@ -46,7 +45,6 @@ BAMImporter::BAMImporter(void)
 BAMImporter::~BAMImporter(void)
 {
 	delete str;
-	delete[] frames;
 	delete[] cycles;
 }
 
@@ -56,9 +54,8 @@ bool BAMImporter::Open(DataStream* stream)
 		return false;
 	}
 	delete str;
-	delete[] frames;
 	delete[] cycles;
-	frames = nullptr;
+	frames.clear();
 	cycles = nullptr;
 	palette = nullptr;
 
@@ -85,35 +82,25 @@ bool BAMImporter::Open(DataStream* stream)
 	str->ReadDword(FLTOffset);
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	
-	frames = new FrameEntry[FramesCount];
+	frames.resize(FramesCount);
 	DataStart = str->Size();
-	for (i = 0; i < FramesCount; i++) {
+	for (auto& frame : frames) {
 		ieWord w, h;
 		ieWordSigned x , y;
 		str->ReadScalar(w);
-		frames[i].bounds.w = w;
+		frame.bounds.w = w;
 		str->ReadScalar(h);
-		frames[i].bounds.h = h;
+		frame.bounds.h = h;
 		str->ReadScalar(x);
-		frames[i].bounds.x = x;
+		frame.bounds.x = x;
 		str->ReadScalar(y);
-		frames[i].bounds.y = y;
+		frame.bounds.y = y;
 		ieDword offset;
 		str->ReadScalar(offset);
-		frames[i].RLE = (offset & 0x80000000) == 0;
-		frames[i].dataOffset = offset & 0x7FFFFFFF;
-		DataStart = std::min(DataStart, frames[i].dataOffset);
-		
-		if (!frames[i].RLE) {
-			frames[i].dataLength = w * h;
-		} else if (i > 0) {
-			assert(frames[i].dataOffset > frames[i - 1].dataOffset);
-			frames[i - 1].dataLength = frames[i].dataOffset - frames[i - 1].dataOffset;
-		}
+		frame.RLE = (offset & 0x80000000) == 0;
+		frame.dataOffset = offset & 0x7FFFFFFF;
+		DataStart = std::min(DataStart, frame.dataOffset);
 	}
-	
-	if (frames[FramesCount - 1].RLE)
-		frames[FramesCount - 1].dataLength = str->Size() - frames[FramesCount - 1].dataOffset;
 	
 	cycles = new CycleEntry[CyclesCount];
 	for (unsigned int i = 0; i < CyclesCount; i++) {
@@ -150,73 +137,29 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 {
 	Holder<Sprite2D> spr;
 	Video* video = core->GetVideoDriver();
+	const Region& rgn = frameInfo.bounds;
+	uint8_t* dataBegin = data + frameInfo.dataOffset;
 	
-	uint8_t* frameBegin = data + frameInfo.dataOffset;
-	uint8_t* frameEnd = frameBegin + frameInfo.dataLength;
-	ptrdiff_t dataLen = frameEnd - frameBegin;
-
-	if (RLESprite && dataLen) {
+	if (RLESprite) {
+		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
+		uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
+		ptrdiff_t dataLen = dataEnd - dataBegin;
 		void* pixels = malloc(dataLen);
-		memcpy(pixels, frameBegin, dataLen);
-		spr = video->CreateSprite(frameInfo.bounds, pixels, PixelFormat::RLE8Bit(palette, CompressedColorIndex));
+		memcpy(pixels, dataBegin, dataLen);
+		spr = video->CreateSprite(rgn, pixels, fmt);
 	} else {
-		void* pixels = GetFramePixels(frameInfo);
+		void* pixels = nullptr;
+		if (frameInfo.RLE) {
+			pixels = DecodeRLEData(dataBegin, rgn.size, CompressedColorIndex);
+		} else {
+			pixels = malloc(rgn.w * rgn.h);
+			memcpy(pixels, dataBegin, rgn.w * rgn.h);
+		}
 		PixelFormat fmt = PixelFormat::Paletted8Bit(palette, true, CompressedColorIndex);
-		spr = video->CreateSprite(frameInfo.bounds, pixels, fmt);
+		spr = video->CreateSprite(rgn, pixels, fmt);
 	}
 
 	return spr;
-}
-
-void* BAMImporter::GetFramePixels(const FrameEntry& frame)
-{
-	str->Seek(frame.dataOffset, GEM_STREAM_START );
-	unsigned long pixelcount = frame.bounds.h * frame.bounds.w;
-	void* pixels = malloc( pixelcount );
-	if (frame.RLE) {
-		//if RLE Compressed
-		unsigned long RLESize;
-		RLESize = ( unsigned long )
-			(frame.bounds.w * frame.bounds.h * 3) / 2 + 1;
-		//without partial reads, we should be careful
-		unsigned long remains = str->Remains();
-		if (RLESize > remains) {
-			RLESize = remains;
-		}
-		unsigned char* inpix;
-		inpix = (unsigned char*)malloc( RLESize );
-		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
-			free( pixels );
-			free( inpix );
-			return NULL;
-		}
-		unsigned char * p = inpix;
-		unsigned char * Buffer = (unsigned char*)pixels;
-		unsigned int i = 0;
-		while (i < pixelcount) {
-			if (*p == CompressedColorIndex) {
-				p++;
-				// FIXME: Czech HOW has apparently broken frame
-				// #141 in REALMS.BAM. Maybe we should put
-				// this condition to #ifdef BROKEN_xx ?
-				// Or maybe rather put correct REALMS.BAM
-				// into override/ dir?
-				if (i + ( *p ) + 1 > pixelcount) {
-					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-				} else {
-					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
-				}
-				i += *p;
-			} else 
-				Buffer[i] = *p;
-			p++;
-			i++;
-		}
-		free( inpix );
-	} else {
-		str->Read( pixels, pixelcount );
-	}
-	return pixels;
 }
 
 ieWord * BAMImporter::CacheFLT(unsigned int &count)
@@ -261,6 +204,7 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 		af->AddCycle( cycles[i] );
 	}
 	af->LoadFLT ( FLT, count );
+	free(data);
 	free (FLT);
 	return af;
 }
