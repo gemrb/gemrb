@@ -1651,7 +1651,7 @@ ResRef *Game::GetDream(Map *area)
 {
 	//select dream based on area
 	int daynight = IsDay();
-	if (area->Dream[daynight][0]) {
+	if (!area->Dream[daynight].IsEmpty()) {
 		return area->Dream+daynight;
 	}
 	int dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
