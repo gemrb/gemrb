@@ -179,7 +179,7 @@ private:
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index) const;
 	/** update reachable areas from worlde.2da */
-	void UpdateReachableAreas();
+	void UpdateReachableAreas() const;
 };
 
 class GEM_EXPORT WorldMapArray {

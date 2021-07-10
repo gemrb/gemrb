@@ -144,7 +144,8 @@ int32_t SaveGameAREExtractor::extractByEntry(const std::string& key, RegistryT::
 	return returnValue;
 }
 
-bool SaveGameAREExtractor::isRunningSaveGame(const SaveGame& otherGame) {
+bool SaveGameAREExtractor::isRunningSaveGame(const SaveGame& otherGame) const
+{
 	if (saveGame == nullptr) {
 		return false;
 	}

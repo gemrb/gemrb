@@ -4673,7 +4673,7 @@ int Interface::GetReputationMod(int column) const
 	return reputationmod[reputation][column];
 }
 
-PauseSetting Interface::TogglePause()
+PauseSetting Interface::TogglePause() const
 {
 	const GameControl *gc = GetGameControl();
 	if (!gc) return PAUSE_OFF;
@@ -4869,7 +4869,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 	return ret;
 }
 
-void Interface::WaitForDisc(int disc_number, const char* path)
+void Interface::WaitForDisc(int disc_number, const char* path) const
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 

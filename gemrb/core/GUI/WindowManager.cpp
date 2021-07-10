@@ -76,7 +76,8 @@ WindowManager::WindowManager(Video* vid)
 	// TODO: how do we get notified if the Video driver changes size?
 }
 
-void WindowManager::MarkAllDirty() {
+void WindowManager::MarkAllDirty() const
+{
 	for (auto& window : windows) {
 		window->MarkDirty();
 	}

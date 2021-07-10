@@ -47,7 +47,7 @@ public:
 private:
 	bool RescanSaveGames();
 	static Holder<SaveGame> BuildSaveGame(const char *slotname);
-	void PruneQuickSave(const char *folder);
+	void PruneQuickSave(const char *folder) const;
 };
 
 }

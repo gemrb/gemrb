@@ -287,7 +287,7 @@ bool Spellbook::KnowSpell(int spellid) const
 bool Spellbook::KnowSpell(int spellid, int type) const
 {
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
-		CRESpellMemorization* sm = spells[type][j];
+		const CRESpellMemorization* sm = spells[type][j];
 		for (const auto knownSpell : sm->known_spells) {
 			if (atoi(knownSpell->SpellResRef + 4) == spellid) {
 				return true;
@@ -858,9 +858,8 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 			}
 
 			for (auto spell : spellMemo->memorized_spells) {
-				if (spell->Flags == 0) {
-					return spell;
-				}
+				if (spell->Flags != 0) continue;
+				return spell;
 			}
 		}
 	}
@@ -877,7 +876,7 @@ void Spellbook::CreateSorcererMemory(int type)
 		}
 		spellMemo->memorized_spells.clear();
 		for (unsigned int k = 0; k < spellMemo->known_spells.size(); k++) {
-			CREKnownSpell *ck = spellMemo->known_spells[k];
+			const CREKnownSpell *ck = spellMemo->known_spells[k];
 			cnt = spellMemo->SlotCountWithBonus;
 			while(cnt--) {
 				MemorizeSpell(ck, true);
@@ -1158,7 +1157,7 @@ void Spellbook::GenerateSpellInfo()
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (const auto spellMemo : spells[i]) {
 			for (unsigned int k = 0; k < spellMemo->memorized_spells.size(); k++) {
-				CREMemorizedSpell* slot = spellMemo->memorized_spells[k];
+				const CREMemorizedSpell* slot = spellMemo->memorized_spells[k];
 				if (!slot)
 					continue;
 				if (!slot->Flags)

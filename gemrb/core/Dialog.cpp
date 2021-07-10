@@ -72,7 +72,7 @@ void Dialog::FreeDialogState(DialogState* ds)
 	delete( ds );
 }
 
-int Dialog::FindFirstState(Scriptable* target)
+int Dialog::FindFirstState(Scriptable* target) const
 {
 	for (unsigned int i = 0; i < TopLevelCount; i++) {
 		const Condition *cond = GetState(Order[i])->condition;
@@ -83,7 +83,7 @@ int Dialog::FindFirstState(Scriptable* target)
 	return -1;
 }
 
-int Dialog::FindRandomState(Scriptable* target)
+int Dialog::FindRandomState(Scriptable* target) const
 {
 	unsigned int max = TopLevelCount;
 	if (!max) return -1;

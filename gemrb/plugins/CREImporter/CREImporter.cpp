@@ -3071,7 +3071,7 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellT
 {
 	ieDword max, known;
 
-	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
+	const CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
 	for (auto knownSpell : sm->known_spells) {
 		ieDword ID = ResolveSpellName(knownSpell->SpellResRef, level, type);
 		stream->WriteDword(ID);

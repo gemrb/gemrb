@@ -277,9 +277,9 @@ public:
 
 	bool ItemsAreCompatible(const CREItem* target, const CREItem* source) const;
 	//depletes charged items
-	int DepleteItem(ieDword flags);
+	int DepleteItem(ieDword flags) const;
 	//charges recharging items
-	void ChargeAllItems(int hours);
+	void ChargeAllItems(int hours) const;
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
 	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);

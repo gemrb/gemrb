@@ -120,8 +120,8 @@ void Window::SubviewRemoved(View* subview, View* parent)
 	if (subview->ContainsView(focusView)) {
 		focusView->DidUnFocus();
 		focusView = NULL;
-		for (auto ctrl : Controls) {
-			if (TrySetFocus(ctrl) == ctrl) {
+		for (auto control : Controls) {
+			if (TrySetFocus(control) == control) {
 				break;
 			}
 		}

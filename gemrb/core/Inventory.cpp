@@ -684,7 +684,7 @@ bool Inventory::ItemsAreCompatible(const CREItem* target, const CREItem* source)
 
 //depletes a magical item
 //if flags==0 then magical weapons are not harmed
-int Inventory::DepleteItem(ieDword flags)
+int Inventory::DepleteItem(ieDword flags) const
 {
 	for (auto item : Slots) {
 		if (!item) {
@@ -1803,7 +1803,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 //recharge items on rest, if rest was partial, recharge only 'hours'
 //if this latter functionality is unwanted, then simply don't recharge if
 //hours != 0
-void Inventory::ChargeAllItems(int hours)
+void Inventory::ChargeAllItems(int hours) const
 {
 	//this loop is going from start
 	for (auto item : Slots) {

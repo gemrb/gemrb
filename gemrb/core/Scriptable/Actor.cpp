@@ -9647,7 +9647,7 @@ int Actor::IsReverseToHit()
 	return ReverseToHit;
 }
 
-void Actor::InitButtons(ieDword cls, bool forced)
+void Actor::InitButtons(ieDword cls, bool forced) const
 {
 	if (!PCStats) {
 		return;

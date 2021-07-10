@@ -37,9 +37,9 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 	}
 
 	if (flags & RM_REPLACE_SAME_SOURCE) {
-		for (auto& path : searchPath) {
-			if (!stricmp(description, path->GetDescription())) {
-				path = source;
+		for (auto& path2 : searchPath) {
+			if (!stricmp(description, path2->GetDescription())) {
+				path2 = source;
 				break;
 			}
 		}
@@ -52,8 +52,8 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 static void PrintPossibleFiles(StringBuffer& buffer, const char* ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
-	for (const auto& type : types) {
-		buffer.appendFormatted("%s.%s ", ResRef, type.GetExt());
+	for (const auto& type2 : types) {
+		buffer.appendFormatted("%s.%s ", ResRef, type2.GetExt());
 	}
 }
 
@@ -80,9 +80,9 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 		return false;
 	// TODO: check various caches
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
-	for (const auto& type : types) {
+	for (const auto& type2 : types) {
 		for (const auto& path : searchPath) {
-			if (path->HasResource(ResRef, type)) {
+			if (path->HasResource(ResRef, type2)) {
 				return true;
 			}
 		}
@@ -126,9 +126,9 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		Log(MESSAGE, "ResourceManager", "Searching for '%s'...", ResRef);
 	}
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
-	for (const auto& type : types) {
+	for (const auto& type2 : types) {
 		for (const auto& path : searchPath) {
-			DataStream *str = path->GetResource(ResRef, type);
+			DataStream *str = path->GetResource(ResRef, type2);
 			if (!str && useCorrupt && core->UseCorruptedHack) {
 				// don't look at other paths if requested
 				core->UseCorruptedHack = false;
@@ -136,11 +136,11 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 			}
 			core->UseCorruptedHack = false;
 			if (str) {
-				Resource *res = type.Create(str);
+				Resource *res = type2.Create(str);
 				if (res) {
 					if (!silent) {
 						Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-							ResRef, type.GetExt(), path->GetDescription());
+							ResRef, type2.GetExt(), path->GetDescription());
 					}
 					return res;
 				}

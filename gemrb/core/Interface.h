@@ -667,7 +667,7 @@ public:
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder, bool overrideRunning);
 	/** toggles the pause. returns either PAUSE_ON or PAUSE_OFF to reflect the script state after toggling. */
-	PauseSetting TogglePause();
+	PauseSetting TogglePause() const;
 	/** returns true the passed pause setting was applied. false otherwise. */
 	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
@@ -690,7 +690,7 @@ public:
 	/** resolves a stat bonus based on multiple stats */
 	int ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
-	void WaitForDisc(int disc_number, const char* path);
+	void WaitForDisc(int disc_number, const char* path) const;
 	/** Returns the music playlist corresponding to the provided type */
 	/** it allows scrapping the entry, hence it isn't const */
 	char *GetMusicPlaylist(int SongType) const;

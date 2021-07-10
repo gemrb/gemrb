@@ -331,7 +331,7 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
 {
 	RescanSaveGames();
 
-	for (auto& saveSlot : save_slots) {
+	for (const auto& saveSlot : save_slots) {
 		if (strcmp(name, saveSlot->GetName()) == 0)
 			return saveSlot;
 	}
@@ -372,7 +372,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	return sg;
 }
 
-void SaveGameIterator::PruneQuickSave(const char *folder)
+void SaveGameIterator::PruneQuickSave(const char *folder) const
 {
 	// FormatQuickSavePath needs: _MAX_PATH + 6 + 1 + 9 + 17
 	char from[_MAX_PATH + 40];
@@ -610,17 +610,17 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	bool overrideRunning = false;
 	//if index is not an existing savegame, we create a unique slotname
 	for (auto save : save_slots) {
-		if (save->GetSaveID() == index) {
-			if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
-				overrideRunning = true;
-				if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
-					return GEM_ERROR;
-				}
-			}
+		if (save->GetSaveID() != index) continue;
 
-			DeleteSaveGame(save);
-			break;
+		if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
+			overrideRunning = true;
+			if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
+				return GEM_ERROR;
+			}
 		}
+
+		DeleteSaveGame(save);
+		break;
 	}
 	char Path[_MAX_PATH];
 	GameControl *gc = core->GetGameControl();
@@ -686,9 +686,9 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		//probably the hardcoded slot names should be read by this object
 		//in that case 7 == size of hardcoded slot names array (savegame.2da)
 		index = 7;
-		for (auto save : save_slots) {
-			if (save->GetSaveID() >= index) {
-				index = save->GetSaveID() + 1;
+		for (const auto& save2 : save_slots) {
+			if (save2->GetSaveID() >= index) {
+				index = save2->GetSaveID() + 1;
 			}
 		}
 	}

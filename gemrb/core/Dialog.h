@@ -73,8 +73,8 @@ private:
 public:
 	void AddState(DialogState* ds);
 	DialogState* GetState(unsigned int index) const;
-	int FindFirstState(Scriptable* target);
-	int FindRandomState(Scriptable* target);
+	int FindFirstState(Scriptable* target) const;
+	int FindRandomState(Scriptable* target) const;
 
 	void Release()
 	{

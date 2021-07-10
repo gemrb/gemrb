@@ -109,7 +109,7 @@ private:
 	bool HotKey(const Event&);
 
 	inline void DestroyWindows(WindowList& list);
-	void MarkAllDirty();
+	void MarkAllDirty() const;
 
 public:
 	WindowManager(Video* vid);

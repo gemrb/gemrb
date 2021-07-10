@@ -680,7 +680,8 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 	}
 }
 
-bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
+bool Scriptable::MatchTrigger(unsigned short id, ieDword param) const
+{
 	for (const auto& trigger : triggers) {
 		if (trigger.triggerID != id)
 			continue;

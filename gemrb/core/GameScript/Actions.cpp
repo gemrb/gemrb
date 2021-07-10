@@ -6892,7 +6892,7 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
-	const Actor *actor = (Actor *) tar;
+	const Actor *actor = (const Actor *) tar;
 	scr->LastFollowed = actor->GetGlobalID();
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
