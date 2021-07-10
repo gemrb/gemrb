@@ -162,15 +162,15 @@ void SDLSurfaceSprite2D::SetPalette(PaletteHolder pal)
 int32_t SDLSurfaceSprite2D::GetColorKey() const
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-    Uint32 ck = -1;
+	Uint32 ck = -1;
 	int ret = SDL_GetColorKey(*surface, &ck);
-    if (ret == 0) {
-        return ck;
-    }
+	if (ret == 0) {
+		return ck;
+	}
 #else
-    if ((*surface)->flags & SDL_SRCCOLORKEY) {
-        return (*surface)->format->colorkey;
-    }
+	if ((*surface)->flags & SDL_SRCCOLORKEY) {
+		return (*surface)->format->colorkey;
+	}
 #endif
 	return -1;
 }

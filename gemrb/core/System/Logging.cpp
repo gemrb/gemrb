@@ -127,10 +127,10 @@ void AddLogWriter(Logger::WriterPtr&& writer)
 
 static void vLog(log_level level, const char* owner, const char* message, log_color color, va_list ap)
 {
-    va_list ap_copy;
-    va_copy(ap_copy, ap);
-    const size_t len = vsnprintf(NULL, 0, message, ap_copy);
-    va_end(ap_copy);
+	va_list ap_copy;
+	va_copy(ap_copy, ap);
+	const size_t len = vsnprintf(nullptr, 0, message, ap_copy);
+	va_end(ap_copy);
 
 	char *buf = new char[len+1];
 	vsnprintf(buf, len + 1, message, ap);

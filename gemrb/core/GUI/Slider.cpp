@@ -74,29 +74,28 @@ void Slider::SetPosition(unsigned int pos)
 	}
 	MarkDirty();
 }
-    
+
 void Slider::SetPosition(const Point& p)
 {
-    int mx = KnobPos.x;
-    int xmx = p.x - mx;
+	int mx = KnobPos.x;
+	int xmx = p.x - mx;
 	unsigned int oldPos = Pos;
 	
-    if (p.x < mx) {
-        SetPosition( 0 );
-    } else {
-        int befst = xmx / KnobStep;
-        if (befst >= KnobStepsCount) {
-            SetPosition( KnobStepsCount - 1 );
-        } else {
-            short aftst = befst + KnobStep;
-            if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
-                SetPosition( befst );
-            } else {
-                SetPosition( aftst );
-            }
-            
-        }
-    }
+	if (p.x < mx) {
+		SetPosition(0);
+	} else {
+		int befst = xmx / KnobStep;
+		if (befst >= KnobStepsCount) {
+			SetPosition(KnobStepsCount - 1);
+		} else {
+			short aftst = befst + KnobStep;
+			if ((xmx - befst * KnobStep) < (aftst * KnobStep - xmx)) {
+				SetPosition(befst);
+			} else {
+				SetPosition(aftst);
+			}
+		}
+	}
 
 	if (oldPos != Pos) {
 		PerformAction(Control::ValueChange);
@@ -146,7 +145,7 @@ bool Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (( p.x >= mx ) && ( p.y >= my )) {
 		if (( p.x <= Mx ) && ( p.y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
-            return true;
+			return true;
 		}
 	}
 

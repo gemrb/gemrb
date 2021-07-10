@@ -86,7 +86,7 @@ const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId 
 	if (!ctrl) return NULL;
 
 	ResRef group = "Control";
-    Window* win = ctrl->GetWindow();
+	Window* win = ctrl->GetWindow();
 	if (win) {
 		const WindowScriptingRef* winref = static_cast<const WindowScriptingRef*>(win->GetScriptingRef());
 		if (winref) {

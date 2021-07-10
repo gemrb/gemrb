@@ -268,7 +268,7 @@ bool WorldMapControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 {
 	if (me.button == GEM_MB_ACTION) {
 		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-        Control::OnMouseUp(me, Mod);
+		Control::OnMouseUp(me, Mod);
 	}
 	return true;
 }

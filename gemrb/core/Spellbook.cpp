@@ -750,11 +750,11 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 		if (!Value) {
 			Value=sm->SlotCountWithBonus;
 		}
-                //if can't cast w/o bonus then can't cast at all!
-                if (sm->SlotCount)
-                    sm->SlotCountWithBonus=(ieWord) (sm->SlotCountWithBonus+Value);
-	}
-	else {
+		// if can't cast w/o a bonus then can't cast at all!
+		if (sm->SlotCount) {
+			sm->SlotCountWithBonus = (ieWord) (sm->SlotCountWithBonus + Value);
+		}
+	} else {
 		diff=sm->SlotCountWithBonus-sm->SlotCount;
 		sm->SlotCount=(ieWord) Value;
 		sm->SlotCountWithBonus=(ieWord) (Value+diff);

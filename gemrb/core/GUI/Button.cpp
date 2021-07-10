@@ -501,9 +501,9 @@ Holder<Sprite2D> Button::DragCursor() const
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Action::DragDropDest);
-    if (core->GetDraggedItem() && !SupportsAction(key)) {
-        return true;
-    }
+	if (core->GetDraggedItem() && !SupportsAction(key)) {
+		return true;
+	}
     
 	if (me.button == GEM_MB_ACTION) {
 		if (State == IE_GUI_BUTTON_LOCKED) {

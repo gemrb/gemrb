@@ -114,13 +114,13 @@ inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return !bool(lhs);
+	return !bool(lhs);
 }
 
 template<class T>
 inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return !bool(rhs);
+	return !bool(rhs);
 }
 
 template<class T>
@@ -132,13 +132,13 @@ inline bool operator!=(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return bool(lhs);
+	return bool(lhs);
 }
 
 template<class T>
 inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return bool(rhs);
+	return bool(rhs);
 }
 
 template<class T, typename... ARGS>

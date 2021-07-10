@@ -34,8 +34,7 @@ public:
 	bool TriggerTrap(int skill, ieDword ID) override;
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);
-  //returns true if
-  ieDword GetUsePoint() const;
+	ieDword GetUsePoint() const;
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor) const;
 	void dump() const;

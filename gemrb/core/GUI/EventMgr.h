@@ -240,8 +240,8 @@ struct GEM_EXPORT Event {
 	};
 
 	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
-    
-    typedef unsigned short EventMods;
+
+	typedef unsigned short EventMods;
 
 	EventType type;
 	tick_t time;

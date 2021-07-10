@@ -673,7 +673,7 @@ bool SDL12VideoDriver::InTextInput()
 
 bool SDL12VideoDriver::TouchInputEnabled()
 {
-    return false;
+	return false;
 }
 
 #include "plugindef.h"

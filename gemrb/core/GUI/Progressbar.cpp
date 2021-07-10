@@ -90,9 +90,9 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 void Progressbar::UpdateState(unsigned int Sum)
 {
 	SetValue(Sum);
-    if(GetValue() == 100) {
-        PerformAction(Action::EndReached);
-    }
+	if (GetValue() == 100) {
+		PerformAction(Action::EndReached);
+	}
 }
 
 /** Sets the selected image */
