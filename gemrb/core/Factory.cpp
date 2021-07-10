@@ -28,8 +28,8 @@ Factory::Factory(void)
 
 Factory::~Factory(void)
 {
-	for (unsigned int i = 0; i < fobjects.size(); i++) {
-		delete( fobjects[i] );
+	for (auto& fObject : fobjects) {
+		delete fObject;
 	}
 }
 

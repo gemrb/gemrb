@@ -34,8 +34,8 @@ IDSImporter::IDSImporter(void)
 
 IDSImporter::~IDSImporter(void)
 {
-	for (unsigned int i = 0; i < ptrs.size(); i++) {
-		free( ptrs[i] );
+	for (auto& ptr : ptrs) {
+		free(ptr);
 	}
 }
 
@@ -85,9 +85,9 @@ bool IDSImporter::Open(DataStream* str)
 
 int IDSImporter::GetValue(const char* txt) const
 {
-	for (unsigned int i = 0; i < pairs.size(); i++) {
-		if (stricmp( pairs[i].str, txt ) == 0) {
-			return pairs[i].val;
+	for (const auto pair : pairs) {
+		if (stricmp(pair.str, txt) == 0) {
+			return pair.val;
 		}
 	}
 	return -1;
@@ -95,9 +95,9 @@ int IDSImporter::GetValue(const char* txt) const
 
 char* IDSImporter::GetValue(int val) const
 {
-	for (unsigned int i = 0; i < pairs.size(); i++) {
-		if (pairs[i].val == val) {
-			return pairs[i].str;
+	for (const auto pair : pairs) {
+		if (pair.val == val) {
+			return pair.str;
 		}
 	}
 	return NULL;

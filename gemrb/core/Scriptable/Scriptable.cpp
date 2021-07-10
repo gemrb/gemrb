@@ -53,9 +53,7 @@ static unsigned short ClearActionsID = 133; // same for all games
 Scriptable::Scriptable(ScriptableType type)
 {
 	Type = type;
-	for (int i = 0; i < MAX_SCRIPTS; i++) {
-		Scripts[i] = NULL;
-	}
+
 	overheadTextDisplaying = false;
 	timeStartDisplaying = 0;
 
@@ -130,8 +128,8 @@ Scriptable::~Scriptable(void)
 		ReleaseCurrentAction();
 	}
 	ClearActions();
-	for (int i = 0; i < MAX_SCRIPTS; i++) {
-		delete Scripts[i];
+	for (auto& script : Scripts) {
+		delete script;
 	}
 
 	delete( locals );
@@ -683,8 +681,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 }
 
 bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
-		TriggerEntry &trigger = *m;
+	for (const auto& trigger : triggers) {
 		if (trigger.triggerID != id)
 			continue;
 		if (param && trigger.param1 != param)

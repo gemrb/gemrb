@@ -95,8 +95,8 @@ Store* STOImporter::GetStore(Store *s)
 	str->ReadDword(s->DrinksCount);
 	str->ReadResRef( s->RumoursTemple );
 	str->ReadDword(s->AvailableRooms);
-	for (size_t i = 0; i < 4; i++) {
-		str->ReadDword(s->RoomPrices[i]);
+	for (unsigned int& roomPrice : s->RoomPrices) {
+		str->ReadDword(roomPrice);
 	}
 	str->ReadDword(s->CuresOffset);
 	str->ReadDword(s->CuresCount);
@@ -319,8 +319,8 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 	stream->WriteDword(s->DrinksCount);
 	stream->WriteResRef( s->RumoursTemple);
 	stream->WriteDword(s->AvailableRooms);
-	for (int i=0;i<4;i++) {
-		stream->WriteDword(s->RoomPrices[i]);
+	for (unsigned int roomPrice : s->RoomPrices) {
+		stream->WriteDword(roomPrice);
 	}
 	stream->WriteDword(s->CuresOffset);
 	stream->WriteDword(s->CuresCount);
@@ -337,8 +337,8 @@ void STOImporter::PutItems(DataStream *stream, const Store *store) const
 	for (const STOItem *it : store->items) {
 		stream->WriteResRef( it->ItemResRef);
 		stream->WriteWord(it->PurchasedAmount);
-		for (unsigned int i=0;i<CHARGE_COUNTERS;i++) {
-			stream->WriteWord(it->Usages[i]);
+		for (unsigned short usage : it->Usages) {
+			stream->WriteWord(usage);
 		}
 		stream->WriteDword(it->Flags);
 		stream->WriteDword(it->AmountInStock);

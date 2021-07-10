@@ -137,8 +137,8 @@ typedef struct AVFrame {
 	
 	void release_buffer()
 	{
-		for(int i=0;i<3;i++) {
-			av_free(data[i]);
+		for (auto& i : data) {
+			av_free(i);
 		}
 	}
 	

@@ -37,8 +37,8 @@ KEYImporter::KEYImporter(void)
 KEYImporter::~KEYImporter(void)
 {
 	free(description);
-	for (unsigned int i = 0; i < biffiles.size(); i++) {
-		free( biffiles[i].name );
+	for (auto& bifFile : biffiles) {
+		free(bifFile.name);
 	}
 }
 

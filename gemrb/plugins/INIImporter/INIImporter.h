@@ -49,9 +49,9 @@ public:
 	~INITag()
 	{
 		free( TagName );
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			free( pairs[i].Name );
-			free( pairs[i].Value );
+		for (auto& pair : pairs) {
+			free(pair.Name);
+			free(pair.Value);
 		}
 	}
 
@@ -123,9 +123,9 @@ public:
 
 	const char* GetKeyAsString(const char* Key, const char* Default) const
 	{
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				return pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				return pair.Value;
 			}
 		}
 		return Default;
@@ -134,9 +134,9 @@ public:
 	int GetKeyAsInt(const char* Key, const int Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}
@@ -149,9 +149,9 @@ public:
 	float GetKeyAsFloat(const char* Key, const float Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}
@@ -164,9 +164,9 @@ public:
 	bool GetKeyAsBool(const char* Key, const bool Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}

@@ -34,7 +34,6 @@ namespace GemRB {
 STOItem::STOItem() {
 	ItemResRef[0] = 0;
 	PurchasedAmount = Flags = Weight = MaxStackAmount = AmountInStock = InfiniteSupply = 0;
-	for (int i=0; i<CHARGE_COUNTERS; i++) Usages[i] = 0;
 	triggers = NULL;
 }
 

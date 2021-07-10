@@ -269,10 +269,10 @@ class GEM_EXPORT Condition : protected Canary {
 public:
 	~Condition()
 	{
-		for (size_t c = 0; c < triggers.size(); ++c) {
-			if (triggers[c]) {
-				triggers[c]->Release();
-				triggers[c] = NULL;
+		for (auto& trigger : triggers) {
+			if (trigger) {
+				trigger->Release();
+				trigger = nullptr;
 			}
 		}
 	}
@@ -309,10 +309,10 @@ public:
 	}
 	~Action()
 	{
-		for (int c = 0; c < 3; c++) {
-			if (objects[c]) {
-				objects[c]->Release();
-				objects[c] = NULL;
+		for (auto& object : objects) {
+			if (object) {
+				object->Release();
+				object = nullptr;
 			}
 		}
 	}
@@ -367,13 +367,13 @@ public:
 	}
 	~Response()
 	{
-		for (size_t c = 0; c < actions.size(); c++) {
-			if (actions[c]) {
-				if (actions[c]->GetRef()>2) {
-					print("Residue action %d with refcount %d", actions[c]->actionID, actions[c]->GetRef());
+		for (auto& action : actions) {
+			if (action) {
+				if (action->GetRef() > 2) {
+					print("Residue action %d with refcount %d", action->actionID, action->GetRef());
 				}
-				actions[c]->Release();
-				actions[c] = NULL;
+				action->Release();
+				action = nullptr;
 			}
 		}
 	}
@@ -391,9 +391,9 @@ class GEM_EXPORT ResponseSet : protected Canary {
 public:
 	~ResponseSet()
 	{
-		for (size_t b = 0; b < responses.size(); b++) {
-			responses[b]->Release();
-			responses[b] = NULL;
+		for (auto& response : responses) {
+			response->Release();
+			response = nullptr;
 		}
 	}
 	void Release()
@@ -436,10 +436,10 @@ class GEM_EXPORT Script : protected Canary {
 public:
 	~Script()
 	{
-		for (unsigned int i = 0; i < responseBlocks.size(); i++) {
-			if (responseBlocks[i]) {
-				responseBlocks[i]->Release();
-				responseBlocks[i] = NULL;
+		for (auto& responseBlock : responseBlocks) {
+			if (responseBlock) {
+				responseBlock->Release();
+				responseBlock = nullptr;
 			}
 		}
 	}

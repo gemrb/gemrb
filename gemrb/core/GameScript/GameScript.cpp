@@ -1943,8 +1943,8 @@ static Object* DecodeObject(const char* line)
 	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
 		int tmp[4];
-		for (int i = 0; i < 4; i++) {
-			tmp[i] = ParseInt(line);
+		for (int& i : tmp) {
+			i = ParseInt(line);
 		}
 		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
 		if (*line == ' ')
@@ -2159,9 +2159,8 @@ void GameScript::EvaluateAllBlocks()
 	// cutscenes don't evaluate conditions - they just choose the
 	// first response, take the object from the first action,
 	// and then add the actions to that object's queue.
-	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
-		ResponseBlock* rB = script->responseBlocks[a];
-		ResponseSet * rS = rB->responseSet;
+	for (const auto rB : script->responseBlocks) {
+		const ResponseSet *rS = rB->responseSet;
 		if (!rS->responses.empty()) {
 			Response *response = rS->responses[0];
 			if (!response->actions.empty()) {

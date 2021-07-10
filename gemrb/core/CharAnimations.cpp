@@ -327,8 +327,8 @@ void CharAnimations::CheckColorMod()
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			GlobalColorMod.type = RGBModifier::NONE;
 			GlobalColorMod.speed = 0;
-			for (int i = 0; i < PAL_MAX; ++i) {
-				change[i] = true;
+			for (bool& c : change) {
+				c = true;
 			}
 		}
 	}
@@ -662,8 +662,8 @@ void CharAnimations::InitAvatarsTable()
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
-	for (size_t i = 0; i < PAL_MAX; ++i) {
-		change[i] = true;
+	for (bool& c : change) {
+		c = true;
 	}
 	previousStanceID = nextStanceID = 0;
 	StanceID = 0;
@@ -682,9 +682,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	ArmorType = 0;
 	RangedType = 0;
 	WeaponType = 0;
-	for (size_t i = 0; i < 5; ++i) {
-		PaletteResRef[i][0] = 0;
-	}
 	WeaponRef[0] = 0;
 	HelmetRef[0] = 0;
 	OffhandRef[0] = 0;
@@ -1248,9 +1245,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			}
 			break;
 		case IE_ANI_TWO_FILES_4:
-			for (int i = 0; i < MAX_ANIMS; ++i) {
+			for (auto& anim : Anims) {
 				for (int j = 0; j < MAX_ORIENT; ++j) {
-					Anims[i][j] = anims;
+					anim[j] = anims;
 				}
 			}
 			break; 
@@ -2864,8 +2861,8 @@ void CharAnimations::PulseRGBModifiers()
 		GlobalColorMod.speed > 0)
 	{
 		GlobalColorMod.phase += inc;
-		for (size_t i = 0; i < PAL_MAX; ++i) {
-			change[i] = true;
+		for (bool& c : change) {
+			c = true;
 		}
 
 		// reset if done

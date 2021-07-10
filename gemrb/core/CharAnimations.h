@@ -176,7 +176,7 @@ public:
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
-	ieResRef PaletteResRef[5];
+	ieResRef PaletteResRef[5] = {};
 	unsigned char previousStanceID, nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;

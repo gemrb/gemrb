@@ -30,8 +30,9 @@ INIImporter::INIImporter(void)
 
 INIImporter::~INIImporter(void)
 {
-	for (unsigned int i = 0; i < tags.size(); i++)
-		delete( tags[i] );
+	for (auto& tag : tags) {
+		delete tag;
+	}
 }
 
 bool INIImporter::Open(DataStream* str)
@@ -81,10 +82,10 @@ bool INIImporter::Open(DataStream* str)
 
 int INIImporter::GetKeysCount(const char* Tag) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyCount();
+			return tag->GetKeyCount();
 		}
 	}
 	return 0;
@@ -92,10 +93,10 @@ int INIImporter::GetKeysCount(const char* Tag) const
 
 const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyNameByIndex(index);
+			return tag->GetKeyNameByIndex(index);
 		}
 	}
 	return NULL;
@@ -104,10 +105,10 @@ const char* INIImporter::GetKeyNameByIndex(const char* Tag, int index) const
 const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
 	const char* Default) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyAsString( Key, Default );
+			return tag->GetKeyAsString(Key, Default);
 		}
 	}
 	return Default;
@@ -116,10 +117,10 @@ const char* INIImporter::GetKeyAsString(const char* Tag, const char* Key,
 int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
 	const int Default) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyAsInt( Key, Default );
+			return tag->GetKeyAsInt(Key, Default);
 		}
 	}
 	return Default;
@@ -128,10 +129,10 @@ int INIImporter::GetKeyAsInt(const char* Tag, const char* Key,
 float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
 	const float Default) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyAsFloat( Key, Default );
+			return tag->GetKeyAsFloat(Key, Default);
 		}
 	}
 	return Default;
@@ -140,10 +141,10 @@ float INIImporter::GetKeyAsFloat(const char* Tag, const char* Key,
 bool INIImporter::GetKeyAsBool(const char* Tag, const char* Key,
 	const bool Default) const
 {
-	for (unsigned int i = 0; i < tags.size(); i++) {
-		const char* TagName = tags[i]->GetTagName();
+	for (const auto tag : tags) {
+		const char* TagName = tag->GetTagName();
 		if (stricmp( TagName, Tag ) == 0) {
-			return tags[i]->GetKeyAsBool( Key, Default );
+			return tag->GetKeyAsBool(Key, Default);
 		}
 	}
 	return Default;

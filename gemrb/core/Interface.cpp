@@ -346,8 +346,8 @@ Interface::~Interface(void)
 
 	delete sgiterator;
 
-	for (size_t i = 0; i < musiclist.size(); i++) {
-		free((void *)musiclist[i]);
+	for (auto& track : musiclist) {
+		free((void *) track);
 	}
 
 	DamageInfoMap.clear();
@@ -4876,10 +4876,10 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
 		winmgr->DrawWindows();
-		for (size_t i=0;i<CD[disc_number-1].size();i++) {
+		for (const auto& cd : CD[disc_number - 1]) {
 			char name[_MAX_PATH];
 
-			PathJoin(name, CD[disc_number-1][i].c_str(), path, nullptr);
+			PathJoin(name, cd.c_str(), path, nullptr);
 			if (file_exists (name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;

@@ -312,9 +312,9 @@ bool SaveGameIterator::RescanSaveGames()
 		}
 	} while (++dir);
 
-	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); ++i) {
-		save_slots.push_back(BuildSaveGame(*i));
-		free(*i);
+	for (auto slot : slots) {
+		save_slots.push_back(BuildSaveGame(slot));
+		free(slot);
 	}
 
 	return true;
@@ -331,9 +331,9 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
 {
 	RescanSaveGames();
 
-	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); ++i) {
-		if (strcmp(name, (*i)->GetName()) == 0)
-			return *i;
+	for (auto& saveSlot : save_slots) {
+		if (strcmp(name, saveSlot->GetName()) == 0)
+			return saveSlot;
 	}
 	return NULL;
 }
@@ -380,8 +380,8 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
-	for (charlist::iterator m = save_slots.begin(); m != save_slots.end(); ++m) {
-		int tmp = IsQuickSaveSlot(folder, (*m)->GetSlotName() );
+	for (const auto& saveSlot : save_slots) {
+		int tmp = IsQuickSaveSlot(folder, saveSlot->GetSlotName());
 		if (tmp) {
 			size_t pos = myslots.size();
 			while(pos-- && myslots[pos]>tmp) ;
@@ -609,8 +609,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 
 	bool overrideRunning = false;
 	//if index is not an existing savegame, we create a unique slotname
-	for (size_t i = 0; i < save_slots.size(); ++i) {
-		Holder<SaveGame> save = save_slots[i];
+	for (auto save : save_slots) {
 		if (save->GetSaveID() == index) {
 			if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
 				overrideRunning = true;
@@ -687,8 +686,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		//probably the hardcoded slot names should be read by this object
 		//in that case 7 == size of hardcoded slot names array (savegame.2da)
 		index = 7;
-		for (size_t i = 0; i < save_slots.size(); ++i) {
-			Holder<SaveGame> save = save_slots[i];
+		for (auto save : save_slots) {
 			if (save->GetSaveID() >= index) {
 				index = save->GetSaveID() + 1;
 			}

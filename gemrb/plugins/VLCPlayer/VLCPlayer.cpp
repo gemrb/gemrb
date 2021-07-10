@@ -93,8 +93,8 @@ void VLCPlayer::DestroyPlayer()
 		libvlc_media_player_release(mediaPlayer);
 	}
 
-	for (int i = 0; i < 3; ++i) {
-		delete[] planes[i];
+	for (auto& plane : planes) {
+		delete[] plane;
 	}
 }
 

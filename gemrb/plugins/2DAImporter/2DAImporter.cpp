@@ -38,8 +38,8 @@ p2DAImporter::p2DAImporter(void)
 
 p2DAImporter::~p2DAImporter(void)
 {
-	for (unsigned int i = 0; i < ptrs.size(); i++) {
-		free( ptrs[i] );
+	for (auto& ptr : ptrs) {
+		free(ptr);
 	}
 }
 

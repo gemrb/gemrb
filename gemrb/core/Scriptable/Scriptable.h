@@ -278,7 +278,7 @@ public:
 
 	ieStrRef DialogName;
 
-	GameScript* Scripts[MAX_SCRIPTS];
+	GameScript* Scripts[MAX_SCRIPTS] = {};
 	int scriptlevel;
 
 	ieDword UnselectableTimer;

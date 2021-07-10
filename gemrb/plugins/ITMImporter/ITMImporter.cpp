@@ -182,9 +182,9 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadWord(s->ItemType);
 	str->ReadDword(s->UsabilityBitmask);
 	str->Read( s->AnimationType,2 ); //intentionally not reading word!
-	for (unsigned int i = 0; i < 2; i++) {
-		if (s->AnimationType[i]==' ') {
-			s->AnimationType[i]=0;
+	for (char& c : s->AnimationType) {
+		if (c == ' ') {
+			c = 0;
 		}
 	}
 	str->Read( &s->MinLevel, 1 );
@@ -359,8 +359,8 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 		eh->ProjectileAnimation = 78;
 	}
 
-	for (unsigned int i = 0; i < 3; i++) {
-		str->ReadWord(eh->MeleeAnimation[i]);
+	for (unsigned short& i : eh->MeleeAnimation) {
+		str->ReadWord(i);
 	}
 
 	ieWord tmp;

@@ -125,8 +125,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	newGame->GameTime = GameTime*AI_UPDATE_TIME;
 
 	str->ReadWord(newGame->WhichFormation);
-	for (unsigned int i = 0; i < 5; i++) {
-		str->ReadWord(newGame->Formations[i]);
+	for (unsigned short& formation : newGame->Formations) {
+		str->ReadWord(formation);
 	}
 	//hack for PST
 	if (version==GAM_VER_PST) {
@@ -360,8 +360,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->ReadWord(pcInfo.ViewYPos);
 	str->ReadWord(pcInfo.ModalState); //see Modal.ids
 	str->ReadScalar<ieWordSigned>(pcInfo.Happiness);
-	for (unsigned int i = 0; i < MAX_INTERACT; i++) {
-		str->ReadDword(pcInfo.Interact[i]); //interact counters
+	for (unsigned int& interact : pcInfo.Interact) {
+		str->ReadDword(interact); //interact counters
 	}
 
 	bool extended = version==GAM_VER_GEMRB || version==GAM_VER_IWD2;
@@ -380,8 +380,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			SanityCheck( pcInfo.QuickWeaponSlot[i+4], tmpWord, "weapon");
 			pcInfo.QuickWeaponHeader[i+4]=tmpWord;
 		}
-		for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
+		for (auto& spell : pcInfo.QuickSpellResRef) {
+			str->Read(&spell, 8);
 		}
 		str->Read( &pcInfo.QuickSpellClass, MAX_QSLOTS ); //9 bytes
 
@@ -442,8 +442,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
 		}
 		if (version==GAM_VER_PST) { //Torment
-			for (unsigned int i = 0; i < 5; i++) {
-				str->ReadWord(pcInfo.QuickItemSlot[i]);
+			for (unsigned short& slot : pcInfo.QuickItemSlot) {
+				str->ReadWord(slot);
 			}
 			for (unsigned int i = 0; i < 5; i++) {
 				str->ReadWord(tmpWord);
@@ -564,8 +564,8 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 		//5 - arterial strike
 		//6 - hamstring
 		//7 - rapid shot
-		for (int i = 0; i < 16; i++) {
-			str->ReadDword(ps->ExtraSettings[i]);
+		for (unsigned int& extraSetting : ps->ExtraSettings) {
+			str->ReadDword(extraSetting);
 		}
 	}
 }
@@ -833,8 +833,8 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 		stream->Write( Signature, 10);
 	} else {
 		stream->WriteWord(game->WhichFormation);
-		for (int i = 0; i < 5; i++) {
-			stream->WriteWord(game->Formations[i]);
+		for (unsigned short& formation : game->Formations) {
+			stream->WriteWord(formation);
 		}
 	}
 	stream->WriteDword(game->PartyGold);
@@ -936,8 +936,8 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	tmpWord = ac->PCStats->Happiness;
 	stream->WriteWord(tmpWord);
 	//interact counters
-	for (int i = 0; i < MAX_INTERACT; i++) {
-		stream->WriteDword(ac->PCStats->Interact[i]);
+	for (unsigned int& interact : ac->PCStats->Interact) {
+		stream->WriteDword(interact);
 	}
 
 	//quickweapons
@@ -989,11 +989,11 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	//quick items
 	switch (version) {
 	case GAM_VER_PST: case GAM_VER_GEMRB:
-		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-			stream->WriteWord(ac->PCStats->QuickItemSlots[i]);
+		for (unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
+			stream->WriteWord(quickItemSlot);
 		}
-		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-			stream->WriteWord(ac->PCStats->QuickItemHeaders[i]);
+		for (unsigned short& quickItemHeader : ac->PCStats->QuickItemHeaders) {
+			stream->WriteWord(quickItemHeader);
 		}
 		break;
 	default:
@@ -1047,17 +1047,17 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	stream->WriteDword(ac->PCStats->KillsChapterCount);
 	stream->WriteDword(ac->PCStats->KillsTotalXP);
 	stream->WriteDword(ac->PCStats->KillsTotalCount);
-	for (int i = 0; i < 4; i++) {
-		stream->WriteResRef( ac->PCStats->FavouriteSpells[i]);
+	for (const auto& favouriteSpell : ac->PCStats->FavouriteSpells) {
+		stream->WriteResRef(favouriteSpell);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteWord(ac->PCStats->FavouriteSpellsCount[i]);
+	for (unsigned short& favCount : ac->PCStats->FavouriteSpellsCount) {
+		stream->WriteWord(favCount);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteResRef( ac->PCStats->FavouriteWeapons[i]);
+	for (const auto& favouriteWeapon : ac->PCStats->FavouriteWeapons) {
+		stream->WriteResRef(favouriteWeapon);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteWord(ac->PCStats->FavouriteWeaponsCount[i]);
+	for (unsigned short& favCount : ac->PCStats->FavouriteWeaponsCount) {
+		stream->WriteWord(favCount);
 	}
 	stream->Write( ac->PCStats->SoundSet, 8); //soundset
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
@@ -1066,8 +1066,8 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
 		//but we got at least 8 (and only 5 of those are actually used)
-		for (int i = 0; i < 16; i++) {
-			stream->WriteDword(ac->PCStats->ExtraSettings[i]);
+		for (unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
+			stream->WriteDword(extraSetting);
 		}
 		stream->Write(filling, 130);
 	}

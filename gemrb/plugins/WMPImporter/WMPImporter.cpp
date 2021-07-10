@@ -205,8 +205,8 @@ WMPAreaLink* WMPImporter::GetAreaLink(DataStream *str, WMPAreaLink* al)
 	al->DestEntryPoint[32]=0;
 	str->ReadDword(al->DistanceScale);
 	str->ReadDword(al->DirectionFlags);
-	for (unsigned k = 0; k < 5; k++) {
-		str->ReadResRef( al->EncounterAreaResRef[k] );
+	for (auto& ref : al->EncounterAreaResRef) {
+		str->ReadResRef(ref);
 	}
 	str->ReadDword(al->EncounterChance);
 	str->Seek( 128, GEM_CURRENT_POS );
@@ -291,8 +291,8 @@ int WMPImporter::PutLinks(DataStream *stream, WorldMap *wmap)
 		stream->Write( al->DestEntryPoint, 32 );
 		stream->WriteDword(al->DistanceScale);
 		stream->WriteDword(al->DirectionFlags);
-		for (unsigned k = 0; k < 5; k++) {
-			stream->WriteResRef( al->EncounterAreaResRef[k] );
+		for (const auto& ref : al->EncounterAreaResRef) {
+			stream->WriteResRef(ref);
 		}
 		stream->WriteDword(al->EncounterChance);
 		stream->Write(filling,128);

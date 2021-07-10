@@ -1058,8 +1058,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadPoint(Pos);
-		for (unsigned int j = 0;j < MAX_RESCOUNT; j++) {
-			str->ReadResRef( creatures[j] );
+		for (auto& creature : creatures) {
+			str->ReadResRef(creature);
 		}
 		str->ReadWord(Count);
 		str->ReadWord(Difficulty);

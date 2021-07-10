@@ -80,10 +80,10 @@ void Spellbook::ReleaseMemory()
 Spellbook::~Spellbook()
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			if (spells[i][j]) {
-				FreeSpellPage( spells[i][j] );
-				spells[i][j] = NULL;
+		for (auto& page : spells[i]) {
+			if (page) {
+				FreeSpellPage(page);
+				page = nullptr;
 			}
 		}
 	}
@@ -113,10 +113,10 @@ void Spellbook::CopyFrom(const Actor *source)
 
 	// clear it first
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			if (spells[i][j]) {
-				FreeSpellPage( spells[i][j] );
-				spells[i][j] = NULL;
+		for (auto& page : spells[i]) {
+			if (page) {
+				FreeSpellPage(page);
+				page = nullptr;
 			}
 		}
 		spells[i].clear();
@@ -246,12 +246,10 @@ int Spellbook::CountSpells(const char *resref, unsigned int type, int flag) cons
 	}
 
 	while(i < max) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-				CREMemorizedSpell* ms = sm->memorized_spells[k];
-				if (resref[0] && !stricmp(ms->SpellResRef, resref) ) {
-					if (flag || ms->Flags) {
+		for (const auto spellMemo : spells[i]) {
+			for (const auto spell : spellMemo->memorized_spells) {
+				if (resref[0] && !stricmp(spell->SpellResRef, resref)) {
+					if (flag || spell->Flags) {
 						count++;
 					}
 				}
@@ -288,9 +286,8 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 {
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		CRESpellMemorization* sm = spells[type][j];
-		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-			CREKnownSpell* ks = sm->known_spells[k];
-			if (atoi(ks->SpellResRef+4)==spellid) {
+		for (const auto knownSpell : sm->known_spells) {
+			if (atoi(knownSpell->SpellResRef + 4) == spellid) {
 				return true;
 			}
 		}
@@ -302,11 +299,9 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 bool Spellbook::KnowSpell(const char *resref) const
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-			for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-				CREKnownSpell* ks = sm->known_spells[k];
-				if (resref[0] && stricmp(ks->SpellResRef, resref) ) {
+		for (const auto spellMemo : spells[i]) {
+			for (const auto knownSpell : spellMemo->known_spells) {
+				if (resref[0] && stricmp(knownSpell->SpellResRef, resref)) {
 					continue;
 				}
 				return true;
@@ -855,16 +850,14 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 			continue;
 		}
 		mask<<=1;
-		for (unsigned int j = 0; j<spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-			if (level && (sm->Level!=level-1)) {
+		for (const auto spellMemo : spells[i]) {
+			if (level && (spellMemo->Level != level - 1)) {
 				continue;
 			}
 
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-				CREMemorizedSpell *ret = sm->memorized_spells[k];
-				if (ret->Flags == 0) {
-					return ret;
+			for (auto spell : spellMemo->memorized_spells) {
+				if (spell->Flags == 0) {
+					return spell;
 				}
 			}
 		}
@@ -875,17 +868,15 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level) const
 //creates sorcerer style memory for the given spell type
 void Spellbook::CreateSorcererMemory(int type)
 {
-	for (size_t j = 0; j < spells[type].size(); j++) {
-		CRESpellMemorization* sm = spells[type][j];
-
-		size_t cnt = sm->memorized_spells.size();
+	for (auto spellMemo : spells[type]) {
+		size_t cnt = spellMemo->memorized_spells.size();
 		while(cnt--) {
-			delete sm->memorized_spells[cnt];
+			delete spellMemo->memorized_spells[cnt];
 		}
-		sm->memorized_spells.clear();
-		for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-			CREKnownSpell *ck = sm->known_spells[k];
-			cnt = sm->SlotCountWithBonus;
+		spellMemo->memorized_spells.clear();
+		for (unsigned int k = 0; k < spellMemo->known_spells.size(); k++) {
+			CREKnownSpell *ck = spellMemo->known_spells[k];
+			cnt = spellMemo->SlotCountWithBonus;
 			while(cnt--) {
 				MemorizeSpell(ck, true);
 			}
@@ -903,11 +894,10 @@ void Spellbook::ChargeAllSpells()
 			continue;
 		}
 
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++)
-				ChargeSpell( sm->memorized_spells[k] );
+		for (const auto spellMemo : spells[i]) {
+			for (auto& memorizedSpell : spellMemo->memorized_spells) {
+				ChargeSpell(memorizedSpell);
+			}
 		}
 	}
 }
@@ -1014,8 +1004,8 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 	}
 	int actual = 0;
 	bool ret = false;
-	for (unsigned int i = 0; i<spellinfo.size(); i++) {
-		if ( !(type & (1<<spellinfo[i]->type)) ) {
+	for (const auto& extHeader : spellinfo) {
+		if (!(type & (1 << extHeader->type))) {
 			continue;
 		}
 		if (startindex>0) {
@@ -1026,7 +1016,7 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 			ret = true;
 			break;
 		}
-		memcpy(array+actual, spellinfo[i], sizeof(SpellExtHeader));
+		memcpy(array + actual, extHeader, sizeof(SpellExtHeader));
 		actual++;
 	}
 	return ret;
@@ -1144,17 +1134,14 @@ void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int typ
 	//if data is not set, use the known spells list to set up the spellinfo list
 	for(int i = 0; i<NUM_BOOK_TYPES; i++) {
 		if ((1<<i)&type) {
-			for(unsigned int j = 0; j<spells[i].size(); j++) {
-				CRESpellMemorization* sm = spells[i][j];
-
-				for(unsigned int k=0;k<sm->known_spells.size(); k++) {
-					CREKnownSpell* slot = sm->known_spells[k];
+			for (const auto spellMemo : spells[i]) {
+				for (const auto slot : spellMemo->known_spells) {
 					if (!slot)
 						continue;
 					//skip the spell itself
 					if (spell && !strnicmp(slot->SpellResRef, spell, sizeof(ieResRef)))
 						continue;
-					AddSpellInfo(sm->Level, sm->Type, slot->SpellResRef, -1);
+					AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
 				}
 			}
 		}
@@ -1166,16 +1153,14 @@ void Spellbook::GenerateSpellInfo()
 {
 	ClearSpellInfo(); //just in case
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-				CREMemorizedSpell* slot = sm->memorized_spells[k];
+		for (const auto spellMemo : spells[i]) {
+			for (unsigned int k = 0; k < spellMemo->memorized_spells.size(); k++) {
+				CREMemorizedSpell* slot = spellMemo->memorized_spells[k];
 				if (!slot)
 					continue;
 				if (!slot->Flags)
 					continue;
-				AddSpellInfo(sm->Level, sm->Type, slot->SpellResRef, k);
+				AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, k);
 			}
 		}
 	}
@@ -1190,29 +1175,26 @@ void Spellbook::dump() const
 
 void Spellbook::dump(StringBuffer& buffer) const
 {
-	unsigned int k;
-
 	buffer.append( "SPELLBOOK:\n" );
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-
-			if (!sm->known_spells.empty())
-				buffer.append( " Known spells:\n" );
-			for (k = 0; k < sm->known_spells.size(); k++) {
-				CREKnownSpell* spl = sm->known_spells[k];
-				if (!spl) continue;
-
-				buffer.appendFormatted ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
+		for (const auto spellMemo : spells[i]) {
+			if (!spellMemo->known_spells.empty()) {
+				buffer.append(" Known spells:\n");
+			}
+			int idx = 0;
+			for (const auto& knownSpell : spellMemo->known_spells) {
+				if (!knownSpell) continue;
+				buffer.appendFormatted(" %2d: %8s L: %d T: %d\n", idx, knownSpell->SpellResRef, knownSpell->Level, knownSpell->Type);
+				idx++;
 			}
 
-			if (!sm->memorized_spells.empty())
+			if (!spellMemo->memorized_spells.empty())
 				buffer.append( " Memorized spells:\n" );
-			for (k = 0; k < sm->memorized_spells.size (); k++) {
-				CREMemorizedSpell* spl = sm->memorized_spells[k];
-				if (!spl) continue;
-
-				buffer.appendFormatted ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
+			idx = 0;
+			for (const auto& memorizedSpell : spellMemo->memorized_spells) {
+				if (!memorizedSpell) continue;
+				buffer.appendFormatted(" %2u: %8s %x\n", idx, memorizedSpell->SpellResRef, memorizedSpell->Flags);
+				idx++;
 			}
 		}
 	}

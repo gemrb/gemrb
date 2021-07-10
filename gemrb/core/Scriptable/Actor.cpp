@@ -3184,11 +3184,11 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	//move this further down if needed
 	PrevStats = NULL;
 
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); m++) {
-		m->flags |= TEF_PROCESSED_EFFECTS;
+	for (auto& trigger : triggers) {
+		trigger.flags |= TEF_PROCESSED_EFFECTS;
 
 		// snap out of charm if the charmer hurt us
-		if (m->triggerID == trigger_attackedby) {
+		if (trigger.triggerID == trigger_attackedby) {
 			Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
 			if (attacker) {
 				int revertToEA = 0;
@@ -5004,10 +5004,10 @@ void Actor::dump(StringBuffer& buffer) const
 {
 	buffer.appendFormatted( "Debugdump of Actor %s (%s, %s):\n", LongName, ShortName, GetName(-1) );
 	buffer.append("Scripts:");
-	for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
+	for (const auto script : Scripts) {
 		const char* poi = "<none>";
-		if (Scripts[i]) {
-			poi = Scripts[i]->GetName();
+		if (script) {
+			poi = script->GetName();
 		}
 		buffer.appendFormatted( " %.8s", poi );
 	}
@@ -10304,8 +10304,8 @@ void Actor::CreateDerivedStats()
 			if (BaseStats[IE_LEVEL3]) {
 				BaseStats[IE_LEVEL3] += 12;
 			}
-			for (int i = 0; i < SAVECOUNT; i++) {
-				BaseStats[savingthrows[i]]++;
+			for (int savingthrow : savingthrows) {
+				BaseStats[savingthrow]++;
 			}
 		}
 	}
@@ -10468,9 +10468,9 @@ ieDword Actor::GetWarriorLevel() const
 	};
 
 	ieDword highest = 0;
-	for (int i=0; i<4; i++) {
-		if (warriorlevels[i] > highest) {
-			highest = warriorlevels[i];
+	for (unsigned int warriorLevel : warriorlevels) {
+		if (warriorLevel > highest) {
+			highest = warriorLevel;
 		}
 	}
 

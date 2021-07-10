@@ -120,8 +120,8 @@ GameControl::GameControl(const Region& frame)
 
 GameControl::~GameControl()
 {
-	for (size_t i = 0; i < 2; ++i) {
-		EventMgr::UnRegisterEventMonitor(eventMonitors[i]);
+	for (unsigned long eventMonitor : eventMonitors) {
+		EventMgr::UnRegisterEventMonitor(eventMonitor);
 	}
 
 	if (formations)	{

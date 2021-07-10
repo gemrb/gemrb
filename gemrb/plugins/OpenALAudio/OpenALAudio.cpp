@@ -917,9 +917,9 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					// ensure that MusicSource has no buffers attached by passing "NULL" buffer
 					alSourcei(driver->MusicSource, AL_BUFFER, 0);
 					checkALError("Unable to detach buffers from music source.", WARNING);
-					for (int i = 0; i < MUSICBUFFERS; i++) {
+					for (unsigned int buffer : driver->MusicBuffer) {
 						driver->MusicReader->read_samples( driver->music_memory, ACM_BUFFERSIZE >> 1 );
-						alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
+						alBufferData(buffer, AL_FORMAT_STEREO16,
 							driver->music_memory, ACM_BUFFERSIZE,
 							driver->MusicReader->get_samplerate() );
 					}

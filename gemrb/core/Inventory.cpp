@@ -103,9 +103,9 @@ Inventory::Inventory()
 
 Inventory::~Inventory()
 {
-	for (size_t i = 0; i < Slots.size(); i++) {
-		delete Slots[i];
-		Slots[i] = NULL;
+	for (auto& slot : Slots) {
+		delete slot;
+		slot = nullptr;
 	}
 }
 
@@ -162,8 +162,7 @@ void Inventory::AddItem(CREItem *item)
 void Inventory::CalculateWeight()
 {
 	Weight = 0;
-	for (size_t i = 0; i < Slots.size(); i++) {
-		CREItem *slot = Slots[i];
+	for (const auto slot : Slots) {
 		if (!slot) {
 			continue;
 		}
@@ -687,8 +686,7 @@ bool Inventory::ItemsAreCompatible(const CREItem* target, const CREItem* source)
 //if flags==0 then magical weapons are not harmed
 int Inventory::DepleteItem(ieDword flags)
 {
-	for (size_t i = 0; i < Slots.size(); i++) {
-		CREItem *item = Slots[i];
+	for (auto item : Slots) {
 		if (!item) {
 			continue;
 		}
@@ -1808,8 +1806,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded, bool ranged) const
 void Inventory::ChargeAllItems(int hours)
 {
 	//this loop is going from start
-	for (size_t i = 0; i < Slots.size(); i++) {
-		CREItem *item = Slots[i];
+	for (auto item : Slots) {
 		if (!item) {
 			continue;
 		}

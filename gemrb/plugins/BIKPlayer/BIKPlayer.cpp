@@ -487,8 +487,8 @@ int BIKPlayer::EndAudio()
 
 int BIKPlayer::EndVideo()
 {
-	for (int i = 0; i < BINK_NB_SRC; i++) {
-		av_freep((void **) &c_bundle[i].data);
+	for (auto& bundle : c_bundle) {
+		av_freep((void **) &bundle.data);
 	}
 	return 0;
 }

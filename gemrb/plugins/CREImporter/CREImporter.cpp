@@ -1466,8 +1466,8 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	//these could be used to save iwd2 skills
 	//TODO: gemrb format
 	act->BaseStats[IE_TRACKING]=tmpByte;
-	for (int i=0; i<VCONST_COUNT; i++) {
-		str->ReadDword(act->StrRefs[i]);
+	for (unsigned int& StrRef : act->StrRefs) {
+		str->ReadDword(StrRef);
 	}
 	return 0;
 }
@@ -3069,15 +3069,14 @@ ieDword CREImporter::GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, in
 
 int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level)
 {
-	ieDword ID, max, known;
+	ieDword max, known;
 
 	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
-	for (unsigned int k = 0; k < sm->known_spells.size(); k++) {
-		const CREKnownSpell *ck = sm->known_spells[k];
-		ID = ResolveSpellName(ck->SpellResRef, level, type);
+	for (auto knownSpell : sm->known_spells) {
+		ieDword ID = ResolveSpellName(knownSpell->SpellResRef, level, type);
 		stream->WriteDword(ID);
-		max = actor->spellbook.CountSpells(ck->SpellResRef, type, 1);
-		known = actor->spellbook.CountSpells(ck->SpellResRef, type, 0);
+		max = actor->spellbook.CountSpells(knownSpell->SpellResRef, type, 1);
+		known = actor->spellbook.CountSpells(knownSpell->SpellResRef, type, 0);
 		stream->WriteDword(max);
 		stream->WriteDword(known);
 		//unknown field (always 0)

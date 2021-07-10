@@ -120,8 +120,7 @@ void Window::SubviewRemoved(View* subview, View* parent)
 	if (subview->ContainsView(focusView)) {
 		focusView->DidUnFocus();
 		focusView = NULL;
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
+		for (auto ctrl : Controls) {
 			if (TrySetFocus(ctrl) == ctrl) {
 				break;
 			}
@@ -265,9 +264,8 @@ void Window::SetPosition(WindowPosition pos)
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
-		ctrl->UpdateState( VarName, Sum);
+	for (auto ctrl : Controls) {
+		ctrl->UpdateState(VarName, Sum);
 	}
 }
 
@@ -308,8 +306,7 @@ bool Window::HitTest(const Point& p) const
 	bool hit = View::HitTest(p);
 	if (hit == false){
 		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
+		for (const auto ctrl : Controls) {
 			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
 				hit = true;
 				break;
@@ -561,8 +558,7 @@ bool Window::DispatchEvent(const Event& event)
 	
 bool Window::InActionHandler() const
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
+	for (const auto ctrl : Controls) {
 		if (ctrl->IsExecutingResponseHandler()) {
 			return true;
 		}

@@ -375,10 +375,10 @@ void Game::ConsolidateParty() const
 			}
 		} else i++;
 	}
-	for (auto m = PCs.begin(); m != PCs.end(); ++m) {
-		(*m)->RefreshEffects(NULL);
+	for (auto pc : PCs) {
+		pc->RefreshEffects(nullptr);
 		//TODO: how to set up bardsongs
-		(*m)->SetModalSpell((*m)->Modal.State, 0);
+		pc->SetModalSpell(pc->Modal.State, 0);
 	}
 }
 

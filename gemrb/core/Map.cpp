@@ -422,9 +422,9 @@ Map::~Map(void)
 	delete LightMap;
 	delete HeightMap;
 
-	for (int i = 0; i < QUEUE_COUNT; i++) {
-		free(queue[i]);
-		queue[i] = NULL;
+	for (auto& q : queue) {
+		free(q);
+		q = nullptr;
 	}
 
 	for (auto projectile : projectiles) {
@@ -2951,10 +2951,10 @@ void Map::dump(bool show_actors) const
 	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName );
 	buffer.append("Scripts:");
 
-	for (size_t i = 0; i < MAX_SCRIPTS; i++) {
+	for (const auto script : Scripts) {
 		const char* poi = "<none>";
-		if (Scripts[i]) {
-			poi = Scripts[i]->GetName();
+		if (script) {
+			poi = script->GetName();
 		}
 		buffer.appendFormatted( " %.8s", poi );
 	}
@@ -2969,7 +2969,7 @@ void Map::dump(bool show_actors) const
 
 	if (show_actors) {
 		buffer.append("\n");
-		for (auto actor : actors) {
+		for (const auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actor->GetName(1), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
@@ -3425,10 +3425,9 @@ void Map::UpdateFog()
 {
 	std::fill(VisibleBitmap, VisibleBitmap + GetExploredMapSize(), 0);
 	
-	for (size_t i = 0; i < actors.size(); i++) {
-		const Actor *actor = actors[i];
-		if (!actor->Modified[ IE_EXPLORE ] ) continue;
-		
+	for (const auto actor : actors) {
+		if (!actor->Modified[IE_EXPLORE]) continue;
+
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 		

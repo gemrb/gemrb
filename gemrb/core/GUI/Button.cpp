@@ -87,8 +87,8 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 	}
 
 	if (type <= BUTTON_IMAGE_NONE) {
-		for (int i = 0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			buttonImages[i] = nullptr;
+		for (auto& buttonImage : buttonImages) {
+			buttonImage = nullptr;
 		}
 		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
@@ -296,8 +296,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
-		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-			ButtonBorder *fr = &borders[i];
+		for (const auto& border : borders) {
+			const ButtonBorder *fr = &border;
 			if (! fr->enabled) continue;
 
 			const Region& frRect = fr->rect;
@@ -567,8 +567,8 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
-	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-		ButtonBorder *fr = &borders[i];
+	for (const auto& border : borders) {
+		const ButtonBorder *fr = &border;
 		if (fr->enabled) {
 			pulseBorder = !fr->filled;
 			MarkDirty();

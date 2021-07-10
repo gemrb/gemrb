@@ -457,9 +457,9 @@ endalign:
 					break;
 				}
 				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
-				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
+				for (auto& image : images) {
 					str->ReadWord(imgIdx);
-					images[i] = bam->GetFrame(imgIdx, Cycle);
+					image = bam->GetFrame(imgIdx, Cycle);
 				}
 				str->ReadWord(TAID);
 

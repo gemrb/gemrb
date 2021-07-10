@@ -37,9 +37,9 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 	}
 
 	if (flags & RM_REPLACE_SAME_SOURCE) {
-		for (size_t i = 0; i < searchPath.size(); i++) {
-			if (!stricmp(description, searchPath[i]->GetDescription())) {
-				searchPath[i] = source;
+		for (auto& path : searchPath) {
+			if (!stricmp(description, path->GetDescription())) {
+				path = source;
 				break;
 			}
 		}
@@ -52,8 +52,8 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 static void PrintPossibleFiles(StringBuffer& buffer, const char* ResRef, const TypeID *type)
 {
 	const std::vector<ResourceDesc>& types = PluginMgr::Get()->GetResourceDesc(type);
-	for (size_t j = 0; j < types.size(); j++) {
-		buffer.appendFormatted("%s.%s ", ResRef, types[j].GetExt());
+	for (const auto& type : types) {
+		buffer.appendFormatted("%s.%s ", ResRef, type.GetExt());
 	}
 }
 
@@ -62,8 +62,8 @@ bool ResourceManager::Exists(const char *ResRef, SClass_ID type, bool silent) co
 	if (!ResRef || ResRef[0] == '\0')
 		return false;
 	// TODO: check various caches
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		if (searchPath[i]->HasResource( ResRef, type )) {
+	for (const auto& path : searchPath) {
+		if (path->HasResource(ResRef, type)) {
 			return true;
 		}
 	}
@@ -80,9 +80,9 @@ bool ResourceManager::Exists(const char *ResRef, const TypeID *type, bool silent
 		return false;
 	// TODO: check various caches
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
-	for (size_t j = 0; j < types.size(); j++) {
-		for (size_t i = 0; i < searchPath.size(); i++) {
-			if (searchPath[i]->HasResource(ResRef, types[j])) {
+	for (const auto& type : types) {
+		for (const auto& path : searchPath) {
+			if (path->HasResource(ResRef, type)) {
 				return true;
 			}
 		}
@@ -101,12 +101,12 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 {
 	if (!ResRef || ResRef[0] == '\0')
 		return NULL;
-	for (size_t i = 0; i < searchPath.size(); i++) {
-		DataStream *ds = searchPath[i]->GetResource(ResRef, type);
+	for (const auto& path : searchPath) {
+		DataStream *ds = path->GetResource(ResRef, type);
 		if (ds) {
 			if (!silent) {
 				Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-					ResRef, core->TypeExt(type), searchPath[i]->GetDescription());
+					ResRef, core->TypeExt(type), path->GetDescription());
 			}
 			return ds;
 		}
@@ -126,9 +126,9 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 		Log(MESSAGE, "ResourceManager", "Searching for '%s'...", ResRef);
 	}
 	const std::vector<ResourceDesc> &types = PluginMgr::Get()->GetResourceDesc(type);
-	for (size_t j = 0; j < types.size(); j++) {
-		for (size_t i = 0; i < searchPath.size(); i++) {
-			DataStream *str = searchPath[i]->GetResource(ResRef, types[j]);
+	for (const auto& type : types) {
+		for (const auto& path : searchPath) {
+			DataStream *str = path->GetResource(ResRef, type);
 			if (!str && useCorrupt && core->UseCorruptedHack) {
 				// don't look at other paths if requested
 				core->UseCorruptedHack = false;
@@ -136,11 +136,11 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 			}
 			core->UseCorruptedHack = false;
 			if (str) {
-				Resource *res = types[j].Create(str);
+				Resource *res = type.Create(str);
 				if (res) {
 					if (!silent) {
 						Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-							ResRef, types[j].GetExt(), searchPath[i]->GetDescription());
+							ResRef, type.GetExt(), path->GetDescription());
 					}
 					return res;
 				}

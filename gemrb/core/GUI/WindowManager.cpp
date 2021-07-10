@@ -77,8 +77,8 @@ WindowManager::WindowManager(Video* vid)
 }
 
 void WindowManager::MarkAllDirty() {
-	for (auto it = windows.begin(); it != windows.end(); ++it) {
-		(*it)->MarkDirty();
+	for (auto& window : windows) {
+		window->MarkDirty();
 	}
 }
 

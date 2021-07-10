@@ -1634,8 +1634,8 @@ void Projectile::DrawExplosion(const Region& vp)
 			// TODO: original behaviour was: play once, wait in final frame, hide, wait, repeat
 			if (pro->travel[0] && Extension->APFlags & APF_PLAYONCE) {
 				// set on all orients while we don't force one for single-orientation animations (see CreateOrientedAnimations)
-				for (int i=0; i<MAX_ORIENT; i++) {
-					if (pro->travel[i]) pro->travel[i]->Flags |= A_ANI_PLAYONCE;
+				for (auto& anim : pro->travel) {
+					if (anim) anim->Flags |= A_ANI_PLAYONCE;
 				}
 			}
 
