@@ -2161,26 +2161,24 @@ void GameScript::EvaluateAllBlocks()
 	// and then add the actions to that object's queue.
 	for (const auto rB : script->responseBlocks) {
 		const ResponseSet *rS = rB->responseSet;
-		if (!rS->responses.empty()) {
-			Response *response = rS->responses[0];
-			if (!response->actions.empty()) {
-				Action *action = response->actions[0];
-				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
-				if (target) {
-					// save the target in case it selfdestructs and we need to manually exit the cutscene
-					core->SetCutSceneRunner(target);
-					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
-					rS->responses[0]->Execute(target);
-					// NOTE: this will break blocking instants, if there are any
-					target->ReleaseCurrentAction();
-				} else {
-					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
-					if (core->InDebugMode(ID_CUTSCENE)) {
-						if (action->objects[1]) {
-							action->objects[1]->dump();
-						}
-					}
-				}
+		if (rS->responses.empty()) continue;
+
+		const Response *response = rS->responses[0];
+		if (response->actions.empty()) continue;
+
+		const Action *action = response->actions[0];
+		Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
+		if (target) {
+			// save the target in case it selfdestructs and we need to manually exit the cutscene
+			core->SetCutSceneRunner(target);
+			// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
+			rS->responses[0]->Execute(target);
+			// NOTE: this will break blocking instants, if there are any
+			target->ReleaseCurrentAction();
+		} else {
+			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
+			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
+				action->objects[1]->dump();
 			}
 		}
 	}
