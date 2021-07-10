@@ -45,7 +45,7 @@ void GemMarkupParser::ResetAttributes(const Font* ftext, Font::PrintColors textC
 {
 	while(!context.empty()) context.pop();
 	textBg = textCols.bg;
-	context.push(TextAttributes(ftext, textCols, finit, initCols));
+	context.emplace(ftext, textCols, finit, initCols);
 }
 
 void GemMarkupParser::Reset()
@@ -144,7 +144,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						context.push(TextAttributes(attributes));
+						context.emplace(attributes);
 						context.top().SetTextColor({ParseColor(token), textBg});
 						state = TEXT;
 						token.clear();

@@ -66,7 +66,7 @@ bool PluginMgr::RegisterPlugin(SClass_ID id, PluginFunc create)
 
 void PluginMgr::RegisterResource(const TypeID* type, ResourceFunc create, const char *ext, ieWord keyType)
 {
-	resources[type].push_back(ResourceDesc(type,create,ext,keyType));
+	resources[type].emplace_back(type, create, ext, keyType);
 }
 
 void PluginMgr::RegisterInitializer(void (*func)(void))

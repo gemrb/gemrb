@@ -626,7 +626,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			assert(exContent != content);
 		}
 		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
-		layout.push_back(Layout(content, rgns));
+		layout.emplace_back(content, rgns);
 		exContent = content;
 
 		ieDword flags = Flags();
