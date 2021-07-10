@@ -234,24 +234,26 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 //returns count of memorized spells of a given name/type
 int Spellbook::CountSpells(const char *resref, unsigned int type, int flag) const
 {
-	int i, max;
+	int i = type;
+	int max = i + 1;
 	int count = 0;
 
-	if (type==0xffffffff) {
-		i=0;
+	if (!resref[0]) {
+		return 0;
+	}
+
+	if (type == 0xffffffff) {
+		i = 0;
 		max = NUM_BOOK_TYPES;
-	} else {
-		i = type;
-		max = i+1;
 	}
 
 	while(i < max) {
 		for (const auto spellMemo : spells[i]) {
 			for (const auto spell : spellMemo->memorized_spells) {
-				if (resref[0] && !stricmp(spell->SpellResRef, resref)) {
-					if (flag || spell->Flags) {
-						count++;
-					}
+				if (stricmp(spell->SpellResRef, resref)) continue;
+
+				if (flag || spell->Flags) {
+					count++;
 				}
 			}
 		}
