@@ -134,7 +134,6 @@ void Door::UpdateDoor()
 
 void Door::ToggleTiles(int State, int playsound)
 {
-	int i;
 	int state;
 
 	if (State) {
@@ -146,7 +145,7 @@ void Door::ToggleTiles(int State, int playsound)
 		if (playsound && !CloseSound.IsEmpty())
 			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
 	}
-	for (i = 0; i < tilecount; i++) {
+	for (int i = 0; i < tilecount; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
 	}
 

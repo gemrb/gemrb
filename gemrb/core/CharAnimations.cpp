@@ -332,9 +332,8 @@ void CharAnimations::CheckColorMod()
 			}
 		}
 	}
-	unsigned int location;
 
-	for (location = 0; location < PAL_MAX * 8; ++location) {
+	for (unsigned int location = 0; location < PAL_MAX * 8; ++location) {
 		if (!ColorMods[location].phase) {
 		  if (ColorMods[location].type != RGBModifier::NONE) {
 				ColorMods[location].type = RGBModifier::NONE;

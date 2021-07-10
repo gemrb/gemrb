@@ -136,8 +136,7 @@ ItemDragOp::ItemDragOp(CREItem* item)
 
 Interface::Interface()
 {
-	unsigned int i;
-	for(i=0;i<256;i++) {
+	for (unsigned int i = 0; i < 256; i++) {
 		pl_uppercase[i]=(ieByte) toupper(i);
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
@@ -3294,10 +3293,10 @@ void Interface::UpdateWorldMap(ResRef wmResRef)
 	WorldMap *wm = worldmap->GetWorldMap(0);
 	WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
-	unsigned int i, ni;
+	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
 	//update status of the previously existing areas
-	for(i=0;i<ec;i++) {
+	for (unsigned int i = 0; i < ec; i++) {
 		WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
@@ -3337,8 +3336,6 @@ void Interface::UpdateMasterScript()
 
 bool Interface::InitItemTypes()
 {
-	int i;
-
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
@@ -3356,7 +3353,7 @@ bool Interface::InitItemTypes()
 		}
 		//make sure unsigned int is 32 bits
 		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
-		for (i=0;i<ItemTypes;i++) {
+		for (int i = 0; i < ItemTypes; i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;
 			for (int j=0;j<InvSlotTypes;j++) {
@@ -3372,7 +3369,7 @@ bool Interface::InitItemTypes()
 
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
-	for (i=0;i<ItemTypes;i++) {
+	for (int i = 0; i < ItemTypes; i++) {
 		itemtypedata.emplace_back(4);
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
@@ -3386,12 +3383,11 @@ bool Interface::InitItemTypes()
 	if (af) {
 		int armcount = af->GetRowCount();
 		int colcount = af->GetColumnCount();
-		int j;
-		for (i = 0; i < armcount; i++) {
+		for (int i = 0; i < armcount; i++) {
 			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
 			if (itemtype<ItemTypes) {
 				// we don't need the itemtype column, since it is equal to the position
-				for (j=0; j < colcount-1; j++) {
+				for (int j = 0; j < colcount - 1; j++) {
 					itemtypedata[itemtype][j] = atoi(af->QueryField(i, j+1));
 				}
 			}
@@ -3465,14 +3461,12 @@ bool Interface::InitItemTypes()
 
 ieDword Interface::FindSlot(unsigned int idx) const
 {
-	ieDword i;
-
-	for (i=0;i<SlotTypes;i++) {
-		if (idx==slottypes[i].slot) {
-			break;
+	for (ieDword i = 0; i < SlotTypes; i++) {
+		if (idx == slottypes[i].slot) {
+			return i;
 		}
 	}
-	return i;
+	return 0;
 }
 
 ieDword Interface::QuerySlot(unsigned int idx) const
@@ -3844,15 +3838,14 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char *Prefix) const
 {
-	ieResRef ItemName;
-	int i,j;
-
 	AutoTable tab(TableName);
 	if (!tab) {
 		return false;
 	}
-	i=tab->GetRowCount();
-	for(j=0;j<i;j++) {
+
+	int i = tab->GetRowCount();
+	for (int j = 0; j < i; j++) {
+		ieResRef ItemName;
 		if (Prefix) {
 			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, (j+1)%100);
 		} else {
@@ -3874,9 +3867,6 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char *Prefix) cons
 
 bool Interface::ReadRandomItems()
 {
-	ieResRef RtResRef;
-	int i;
-
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
 	if (RtRows) {
@@ -3902,8 +3892,9 @@ bool Interface::ReadRandomItems()
 	if ( GoldResRef[0]=='*' ) {
 		return false;
 	}
+	ieResRef RtResRef;
 	strnlwrcpy( RtResRef, tab->QueryField( 1, difflev ), 8);
-	i=atoi( RtResRef );
+	int i = atoi(RtResRef);
 	if (i<1) {
 		ReadItemTable( RtResRef, 0 ); //reading the table itself
 		return true;

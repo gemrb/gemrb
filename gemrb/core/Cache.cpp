@@ -73,9 +73,9 @@ void Cache::RemoveAll(ReleaseFun fun)
 	if (m_pHashTable) {
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++)
 		{
-			MyAssoc* pAssoc, *pAssocTmp;
-			for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; )
-			{
+			MyAssoc* pAssoc = m_pHashTable[nHash];
+			MyAssoc* pAssocTmp;
+			while (pAssoc != nullptr) {
 				if (fun)
 					fun(pAssoc->data);
 				pAssocTmp = pAssoc->pNext;
@@ -194,10 +194,7 @@ Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
 	unsigned int nHash = MyHashKey( key );
 
 	// see if it exists
-	Cache::MyAssoc* pAssoc;
-	for (pAssoc = m_pHashTable[nHash];
-		pAssoc != NULL;
-		pAssoc = pAssoc->pNext) {
+	 for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 		if (!strnicmp( pAssoc->key, key, KEYSIZE )) {
 			return pAssoc;
 		}

@@ -283,9 +283,8 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l)
 
 char* strlwr(char* string)
 {
-	char* s;
 	if (string) {
-		for (s = string; *s; ++s)
+		for (char* s = string; *s; ++s)
 			*s = tolower( *s );
 	}
 	return string;

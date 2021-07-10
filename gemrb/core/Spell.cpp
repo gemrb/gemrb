@@ -119,10 +119,10 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 	if (Flags & SF_SIMPLIFIED_DURATION) {
 		return level;
 	}
-	int block_index;
-	for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
-		if (ext_headers[block_index+1].RequiredLevel>level) {
-			return block_index;
+
+	for (int headerIndex = 0; headerIndex < ExtHeaderCount - 1; headerIndex++) {
+		if (ext_headers[headerIndex + 1].RequiredLevel > level) {
+			return headerIndex;
 		}
 	}
 	return ExtHeaderCount-1;

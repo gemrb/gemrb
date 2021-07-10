@@ -192,9 +192,8 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 		WMPAreaEntry *oldArea = Area;
 		Area = NULL;
 
-		unsigned int i;
 		unsigned int ec = worldmap->GetEntryCount();
-		for (i=0;i<ec;i++) {
+		for (unsigned int i = 0; i < ec; i++) {
 			WMPAreaEntry *ae = worldmap->GetEntry(i);
 
 			if ( (ae->GetAreaStatus() & WMP_ENTRY_WALKABLE)!=WMP_ENTRY_WALKABLE) {

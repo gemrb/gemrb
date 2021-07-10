@@ -158,15 +158,13 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 
 void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLink *arealink)
 {
-	unsigned int pos;
-	WMPAreaEntry *ae;
-
 	WMPAreaLink *al = new WMPAreaLink(*arealink);
 	unsigned int idx = area_entries[areaidx]->AreaLinksIndex[dir];
 	area_links.insert(area_links.begin()+idx,al);
 
+	WMPAreaEntry *ae;
 	unsigned int max = area_entries.size();
-	for(pos = 0; pos<max; pos++) {
+	for (unsigned int pos = 0; pos < max; pos++) {
 		ae = area_entries[pos];
 		for (unsigned int k=0;k<4;k++) {
 			if ((pos==areaidx) && (k==dir)) {
@@ -202,13 +200,11 @@ void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
 
 WorldMap::~WorldMap(void)
 {
-	unsigned int i;
-
-	for (i = 0; i < area_entries.size(); i++) {
-		delete( area_entries[i] );
+	for (auto entry : area_entries) {
+		delete entry;
 	}
-	for (i = 0; i < area_links.size(); i++) {
-		delete( area_links[i] );
+	for (auto link : area_links) {
+		delete link;
 	}
 	if (Distances) {
 		free(Distances);
@@ -372,16 +368,16 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 
 WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 {
-	unsigned int i,j,k;
-
+	unsigned int i;
 	WMPAreaEntry *ae=GetArea( A, i );
 	if (!ae) {
 		return NULL;
 	}
+
 	//looking for destination area, returning the first link found
-	for (i=0;i<4;i++) {
-		j=ae->AreaLinksCount[i];
-		k=ae->AreaLinksIndex[i];
+	for (unsigned int i = 0; i < 4; i++) {
+		unsigned int j = ae->AreaLinksCount[i];
+		unsigned int k = ae->AreaLinksIndex[i];
 		while(j--) {
 			WMPAreaLink *al = area_links[k++];
 			WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
@@ -609,27 +605,23 @@ WorldMapArray::WorldMapArray(unsigned int count)
 
 WorldMapArray::~WorldMapArray()
 {
-	unsigned int i;
-
-	for (i = 0; i<MapCount; i++) {
-		if (all_maps[i]) {
-			delete all_maps[i];
-		}
+	for (unsigned int i = 0; i < MapCount; i++) {
+		delete all_maps[i];
 	}
 	free( all_maps );
 }
 
 unsigned int WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 {
-	unsigned int i, idx;
+	unsigned int idx;
 
-	for (i = CurrentMap; i<MapCount; i++) {
+	for (unsigned int i = CurrentMap; i < MapCount; i++) {
 		if (all_maps[i]->GetArea (area, idx) ) {
 			CurrentMap = i;
 			return i;
 		}
 	}
-	for (i = 0; i<CurrentMap; i++) {
+	for (unsigned int i = 0; i < CurrentMap; i++) {
 		if (all_maps[i]->GetArea (area, idx) ) {
 			CurrentMap = i;
 			return i;

@@ -2213,11 +2213,11 @@ static void InitActorTables()
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for %s does not exist!", classname);
 				}
-				ieDword row;
+
 				BABTable bt;
 				std::vector<BABTable> btv;
 				btv.reserve(tht->GetRowCount());
-				for (row = 0; row < tht->GetRowCount(); row++) {
+				for (ieDword row = 0; row < tht->GetRowCount(); row++) {
 					bt.level = atoi(tht->GetRowName(row));
 					bt.bab = atoi(tht->QueryField(row, 0));
 					bt.apr = atoi(tht->QueryField(row, 1));
@@ -2537,8 +2537,8 @@ static void InitActorTables()
 		int colcount = tm->GetColumnCount();
 		for (i = 0; i < rowcount; i++) {
 			skillstats[i] = std::vector<int>();
-			int j, val;
-			for(j = 0; j < colcount; j++) {
+			for (int j = 0; j < colcount; j++) {
+				int val;
 				// the stat and ability columns need conversion into numbers
 				if (j < 2) {
 					val = core->TranslateStat(tm->QueryField(i, j));
@@ -3044,9 +3044,8 @@ void Actor::DisablePortraitIcon(ieByte icon) const
 		return;
 	}
 	ieWord *Icons = PCStats->PortraitIcons;
-	int i;
 
-	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
+	for (int i = 0; i < MAX_PORTRAIT_ICONS; i++) {
 		if (icon == (Icons[i]&0xff)) {
 			Icons[i]=0xff00|icon;
 			return;
@@ -6722,14 +6721,13 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 	int pBABDecrement = BaseAttackBonusDecrement;
 	ieDword MonkLevel = 0;
 	ieDword LevelSum = 0;
-	int i;
 
 	if (!third) {
 		ToHit.SetBase(BaseStats[IE_TOHIT]);
 		return 0;
 	}
 
-	for (i = 0; i<ISCLASSES; i++) {
+	for (int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
 		if (level) {
 			// silly monks, always wanting to be special
@@ -10193,8 +10191,6 @@ void Actor::CreateDerivedStatsBG()
 //3rd edition rules
 void Actor::CreateDerivedStatsIWD2()
 {
-	int i;
-	int turnundeadlevel = 0;
 	int classid = BaseStats[IE_CLASS];
 
 	// this works only for PC classes
@@ -10211,7 +10207,8 @@ void Actor::CreateDerivedStatsIWD2()
 		backstabdamagemultiplier = (level + 1) / 2;
 	}
 
-	for (i=0;i<ISCLASSES;i++) {
+	int turnundeadlevel = 0;
+	for (int i = 0; i < ISCLASSES; i++) {
 		int tmp;
 
 		if (classesiwd2[i]>=(ieDword) classcount) continue;

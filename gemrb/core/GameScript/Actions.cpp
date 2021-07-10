@@ -7255,20 +7255,17 @@ void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 //the row label column sets the token names
 void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	int count;
-	int i,j;
-	ieVariable tokenname;
-
 	AutoTable tm(parameters->string0Parameter);
 	if (!tm) {
 		Log(ERROR, "Actions", "Cannot find %s.2da.", parameters->string0Parameter);
 		return;
 	}
 
-	count = tm->GetRowCount();
-	for(i=0;i<count;i++) {
+	ieVariable tokenname;
+	int count = tm->GetRowCount();
+	for (int i = 0; i < count; i++) {
 		//roll a random number between 0 and column #
-		j = core->Roll(1,tm->GetColumnCount(i),-1);
+		int j = core->Roll(1, tm->GetColumnCount(i), -1);
 		strnuprcpy(tokenname, tm->GetRowName(i), 32);
 		core->GetTokenDictionary()->SetAtCopy( tokenname, tm->QueryField(i, j) );
 	}

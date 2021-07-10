@@ -1457,11 +1457,10 @@ void Projectile::DrawExplosion(const Region& vp)
   //remove PAF_SECONDARY if it is buggy, but that will break the 'HOLD' projectile
 	if ((Extension->AFlags&PAF_SECONDARY) && Extension->FragProjIdx) {
 		if (apflags&APF_TILED) {
-			int i,j;
 			int radius = Extension->ExplosionRadius;
 
-			for (i=-radius;i<radius;i+=Extension->TileX) {
-				for(j=-radius;j<radius;j+=Extension->TileY) {
+			for (int i = -radius; i < radius; i += Extension->TileX) {
+				for (int j = -radius; j < radius; j += Extension->TileY) {
 					if (i*i+j*j<radius*radius) {
 						Point p(Pos.x+i, Pos.y+j);
 						SpawnFragment(p);

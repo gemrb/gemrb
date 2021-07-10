@@ -70,10 +70,8 @@ Store::Store(void)
 
 Store::~Store(void)
 {
-	unsigned int i;
-
-	for (i = 0; i < items.size(); i++) {
-		delete( items[i] );
+	for (auto item : items) {
+		delete item;
 	}
 	if(drinks)
 		free(drinks);

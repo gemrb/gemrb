@@ -73,10 +73,8 @@ static bool PathExists(BIFEntry *entry, const char *path)
 
 static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
 {
-	size_t i;
-	
-	for(i=0;i<pathlist.size();i++) {
-		if (PathExists(entry, pathlist[i].c_str() )) {
+	for (const auto& path : pathlist) {
+		if (PathExists(entry, path.c_str())) {
 			return true;
 		}
 	}

@@ -397,7 +397,6 @@ void SaveGameIterator::PruneQuickSave(const char *folder) const
 
 	int n=myslots[size-1];
 	size_t hole = GetHole(n);
-	size_t i;
 	if (hole<size) {
 		//prune second path
 		FormatQuickSavePath(from, myslots[hole]);
@@ -407,7 +406,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder) const
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
-	for(i=size;i--;) {
+	for (size_t i = size; i > 0; i--) {
 		FormatQuickSavePath(from, myslots[i]);
 		FormatQuickSavePath(to, myslots[i]+1);
 		int errnum = rename(from, to);

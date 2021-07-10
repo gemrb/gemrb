@@ -223,9 +223,7 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 
 ieDword ResolveSpellNumber(const ieResRef spellres)
 {
-	int i;
-
-	for(i=0;i<5;i++) {
+	for (int i = 0; i < 5; i++) {
 		if(!strnicmp(spellres, spell_suffices[i], 4)) {
 			int n = -1;
 			sscanf(spellres+4,"%d", &n);
@@ -2513,11 +2511,6 @@ unsigned int GetItemDistance(const ieResRef itemres, int header)
 //read the wish 2da
 void SetupWishCore(Scriptable *Sender, int column, int picks)
 {
-	int count;
-	ieVariable varname;
-	int *selects;
-	int i,j;
-
 	// in the original, picks was at first the number of wish choices to set up,
 	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
@@ -2528,8 +2521,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		return;
 	}
 
-	selects = (int *) malloc(picks*sizeof(int));
-	count = tm->GetRowCount();
+	int *selects = (int *) malloc(picks*sizeof(int));
+	int count = tm->GetRowCount();
 	// handle the unused SetupWishObject, which passes WIS instead of a column
 	// just cutting the 1-25 range into four pieces (roughly how the djinn dialog works)
 	int cols = tm->GetColumnCount();
@@ -2538,7 +2531,8 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 		if (column == 4) column = RAND(0, 3);
 	}
 
-	for(i=0;i<99;i++) {
+	ieVariable varname;
+	for (int i = 0; i < 99; i++) {
 		snprintf(varname,32, "wishpower%02d", i);
 		if(CheckVariable(Sender, varname, "GLOBAL") ) {
 			SetVariable(Sender, varname, 0, "GLOBAL");
@@ -2546,17 +2540,18 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	}
 
 	if (count<picks) {
-		for(i=0;i<count;i++) {
+		int i;
+		for (i = 0; i < count; i++) {
 			selects[i]=i;
 		}
 		while(i++<picks) {
 			selects[i]=-1;
 		}
 	} else {
-		for(i=0;i<picks;i++) {
+		for (int i = 0; i < picks; i++) {
 			selects[i]=RAND(0, count-1);
 retry:
-			for(j=0;j<i;j++) {
+			for (int j = 0; j < i; j++) {
 				if(selects[i]==selects[j]) {
 					selects[i]++;
 					goto retry;
@@ -2565,7 +2560,7 @@ retry:
 		}
 	}
 
-	for (i = 0; i < picks; i++) {
+	for (int i = 0; i < picks; i++) {
 		if (selects[i]<0)
 			continue;
 		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );

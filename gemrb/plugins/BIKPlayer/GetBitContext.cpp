@@ -94,31 +94,30 @@ void GetBitContext::init_get_bits(const uint8_t *b, int bit_size)
 void GetBitContext::read_tree(Tree *tree)
 {
 	uint8_t tmp1[16], tmp2[16], *in = tmp1, *out = tmp2;
-	int i, t, len;
 
 	tree->vlc_num = get_bits(4);
 	if (!tree->vlc_num) {
-	    for (i = 0; i < 16; i++)
+	    for (int i = 0; i < 16; i++)
 	        tree->syms[i] = i;
 	    return;
 	}
 	if (get_bits(1)) {
-	    len = get_bits(3);
+	    int len = get_bits(3);
 	    memset(tmp1, 0, sizeof(tmp1));
-	    for (i = 0; i <= len; i++) {
+	    for (int i = 0; i <= len; i++) {
 	        tree->syms[i] = get_bits(4);
 	        tmp1[tree->syms[i]] = 1;
 	    }
-	    for (i = 0; i < 16; i++)
+	    for (int i = 0; i < 16; i++)
 	        if (!tmp1[i])
 	            tree->syms[++len] = i;
 	} else {
-	    len = get_bits(2);
-	    for (i = 0; i < 16; i++)
+	    int len = get_bits(2);
+	    for (int i = 0; i < 16; i++)
 	        in[i] = i;
-	    for (i = 0; i <= len; i++) {
+	    for (int i = 0; i <= len; i++) {
 	        int size = 1 << i;
-	        for (t = 0; t < 16; t += size << 1)
+	        for (int t = 0; t < 16; t += size << 1)
 	            merge(out + t, in + t, size);
 	        std::swap(in, out);
 	    }
@@ -166,8 +165,7 @@ void GetBitContext::debug(const char *prefix) const
 
 int VLC::alloc_table(int size)
 {
-	int index;
-	index = table_size;
+	int index = table_size;
 	table_size += size;
 	if (table_size > table_allocated) {
 	        abort(); //cant do anything, init_vlc() is used with too little memory
@@ -180,30 +178,30 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	             const void *codes, int codes_wrap, int codes_size,
 	             uint32_t code_prefix, int n_prefix, int flags)
 {
-	int i, j, k, n, table_size, table_index, nb, n1, index, symbol;
+	int n;
 	uint32_t code_prefix2;
 	uint32_t code;
 	int16_t (*p_table)[2];
 
-	table_size = 1 << table_nb_bits;
-	table_index = alloc_table(table_size);
+	int table_size = 1 << table_nb_bits;
+	int table_index = alloc_table(table_size);
 	if (table_index < 0 || table_nb_bits > 30 || n_prefix > 31)
 	    return -1;
 	p_table = &table[table_index];
 
-	for(i=0;i<table_size;i++) {
+	for (int i = 0; i < table_size; i++) {
 	    p_table[i][1] = 0; //bits
 	    p_table[i][0] = -1; //codes
 	}
 
 	/* first pass: map codes and compute auxillary table sizes */
-	for(i=0;i<nb_codes;i++) {
+	for (int i = 0; i < nb_codes; i++) {
 	    GET_DATA(n, bits, i, bits_wrap, bits_size);
 	    GET_DATA(code, codes, i, codes_wrap, codes_size);
 	    /* we accept tables with holes */
 	    if (n <= 0)
 	        continue;
-	    symbol = i;
+	    int symbol = i;
 	    /* if code matches the prefix, it is in the table */
 	    n -= n_prefix;
 	    if(flags & INIT_VLC_LE)
@@ -213,9 +211,9 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	    if (n > 0 && code_prefix2 == code_prefix) {
 	        if (n <= table_nb_bits) {
 	            /* no need to add another table */
-	            j = (code << (table_nb_bits - n)) & (table_size - 1);
-	            nb = 1 << (table_nb_bits - n);
-	            for(k=0;k<nb;k++) {
+	            int j = (code << (table_nb_bits - n)) & (table_size - 1);
+	            int nb = 1 << (table_nb_bits - n);
+	            for (int k = 0; k < nb; k++) {
 	                if(flags & INIT_VLC_LE)
 	                    j = (code >> n_prefix) + (k<<n);
 	                if (p_table[j][1] /*bits*/ != 0) {
@@ -228,9 +226,9 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	            }
 	        } else {
 	            n -= table_nb_bits;
-	            j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
+	            int j = (code >> ((flags & INIT_VLC_LE) ? n_prefix : n)) & ((1 << table_nb_bits) - 1);
 	            /* compute table size */
-	            n1 = -p_table[j][1]; //bits
+	            int n1 = -p_table[j][1]; //bits
 	            if (n > n1)
 	                n1 = n;
 	            p_table[j][1] = -n1; //bits
@@ -239,7 +237,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	}
 
 	/* second pass : fill auxillary tables recursively */
-	for(i=0;i<table_size;i++) {
+	for (int i = 0; i < table_size; i++) {
 	    n = p_table[i][1]; //bits
 	    if (n < 0) {
 	        n = -n;
@@ -247,7 +245,7 @@ int VLC::build_table(int table_nb_bits, int nb_codes,
 	            n = table_nb_bits;
 	            p_table[i][1] = -n; //bits
 	        }
-	        index = build_table(n, nb_codes,
+	        int index = build_table(n, nb_codes,
 	                            bits, bits_wrap, bits_size,
 	                            codes, codes_wrap, codes_size,
 	                            (flags & INIT_VLC_LE) ? (code_prefix | (i << n_prefix)) : ((code_prefix << table_nb_bits) | i),

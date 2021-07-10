@@ -1361,11 +1361,9 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 void CREImporter::ReadEffects(Actor *act)
 {
-	unsigned int i;
-
 	str->Seek( EffectsOffset+CREOffset, GEM_STREAM_START );
 
-	for (i = 0; i < EffectsCount; i++) {
+	for (unsigned int i = 0; i < EffectsCount; i++) {
 		Effect fx;
 		GetEffect( &fx );
 		// NOTE: AddEffect() allocates a new effect
@@ -2205,7 +2203,6 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 {
 	int headersize;
 	unsigned int Inventory_Size;
-	unsigned int i;
 
 	CREVersion = actor->version;
 	switch (CREVersion) {
@@ -2247,15 +2244,15 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	KnownSpellsOffset = headersize;
 
 	if (actor->version==IE_CRE_V2_2) { //iwd2
-		int type, level;
-
-		for (type=IE_IWD2_SPELL_BARD;type<IE_IWD2_SPELL_DOMAIN;type++) for(level=0;level<9;level++) {
-			headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level)*16+8;
+		for (int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			for (int level = 0; level < 9; level++) {
+				headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, level) * 16 + 8;
+			}
 		}
-		for(level=0;level<9;level++) {
+		for (int level = 0; level < 9; level++) {
 			headersize += GetIWD2SpellpageSize(actor, IE_IWD2_SPELL_DOMAIN, level)*16+8;
 		}
-		for (type=IE_IWD2_SPELL_INNATE;type<NUM_IWD2_SPELLTYPES;type++) {
+		for (int type = IE_IWD2_SPELL_INNATE; type < NUM_IWD2_SPELLTYPES; type++) {
 			headersize += GetIWD2SpellpageSize(actor, (ieIWD2SpellType) type, 0)*16+8;
 		}
 	} else {//others
@@ -2280,7 +2277,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 
 	//counting items (calculating item storage)
 	ItemsCount = 0;
-	for (i=0;i<Inventory_Size;i++) {
+	for (unsigned int i = 0; i < Inventory_Size; i++) {
 		unsigned int j = core->QuerySlot(i+1);
 		const CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
@@ -2809,7 +2806,6 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
-	int i;
 	char filling[52];
 
 	memset(filling,0,sizeof(filling));
@@ -2818,7 +2814,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 	stream->Write( &actor->SetDeathVar, 1);
 	stream->Write( &actor->IncKillCount, 1);
 	stream->Write( &actor->UnknownField, 1); //unknown
-	for (i=0;i<5;i++) {
+	for (int i = 0; i < 5; i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}
@@ -2858,7 +2854,6 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 	ieByte tmpByte;
 	ieWord tmpWord;
 	ieDword tmpDword;
-	int i;
 	char filling[124];
 
 	memset(filling,0,sizeof(filling));
@@ -2867,7 +2862,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 	stream->Write( &actor->SetDeathVar, 1);
 	stream->Write( &actor->IncKillCount, 1);
 	stream->Write( &actor->UnknownField, 1); //unknown
-	for (i=0;i<5;i++) {
+	for (int i = 0; i < 5; i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}

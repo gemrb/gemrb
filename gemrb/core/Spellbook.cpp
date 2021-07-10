@@ -703,9 +703,7 @@ void Spellbook::BonusSpells(int type, int count, const int *bonuses)
 //TODO:add in wisdom bonus here
 void Spellbook::ClearBonus()
 {
-	int type;
-
-	for (type = 0; type < NUM_BOOK_TYPES; type++) {
+	for (int type = 0; type < NUM_BOOK_TYPES; type++) {
 		int level = GetSpellLevelCount(type);
 		for (int i = 0; i < level; i++) {
 			CRESpellMemorization* sm = GetSpellMemorization(type, i);

@@ -152,10 +152,7 @@ void Variables::RemoveAll(ReleaseFun fun)
 	if (m_pHashTable != NULL) {
 		// destroy elements (values and keys)
 		for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
-			Variables::MyAssoc* pAssoc;
-			for (pAssoc = m_pHashTable[nHash];
-				pAssoc != NULL;
-				pAssoc = pAssoc->pNext) {
+			for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 				if (fun) {
 					fun((void *) pAssoc->Value.sValue);
 				}
@@ -263,10 +260,7 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 	}
 
 	// see if it exists
-	Variables::MyAssoc* pAssoc;
-	for (pAssoc = m_pHashTable[nHash];
-		pAssoc != NULL;
-		pAssoc = pAssoc->pNext) {
+	for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 		if (m_lParseKey) {
 			if (!MyCompareKey( pAssoc->key, key) ) {
 				return pAssoc;
@@ -535,8 +529,7 @@ void Variables::DebugDump()
 	Log (DEBUG, "Variables", "Item count: %d", m_nCount);
 	Log (DEBUG, "Variables", "HashTableSize: %d\n", m_nHashTableSize);
 	for (unsigned int nHash = 0; nHash < m_nHashTableSize; nHash++) {
-		Variables::MyAssoc* pAssoc;
-		for (pAssoc = m_pHashTable[nHash]; pAssoc != NULL; pAssoc = pAssoc->pNext) {
+		for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
 			switch(m_type) {
 			case GEM_VARIABLES_STRING:
 				Log (DEBUG, "Variables", "%s = %s", pAssoc->key, pAssoc->Value.sValue);

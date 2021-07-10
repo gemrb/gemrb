@@ -6315,7 +6315,6 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
 		// TODO: fail remaining spells if an earlier one fails?
-		unsigned int i, dist;
 		ieResRef refs[4];
 		CopyResRef(refs[0], fx->Resource);
 		CopyResRef(refs[1], fx->Resource2);
@@ -6324,13 +6323,13 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
 		ResRef OldSpellResRef(Owner->SpellResRef);
 
-		for (i=0; i < 4; i++) {
+		for (unsigned int i = 0; i < 4; i++) {
 			if (!refs[i][0]) {
 				continue;
 			}
 			// Actually, atleast fire shields also have a range check
 			if (fx->Parameter2 == COND_GOTHIT) {
-				dist = GetSpellDistance(refs[i], target);
+				unsigned int dist = GetSpellDistance(refs[i], target);
 				if (!dist) {
 					displaymsg->DisplayConstantStringName(STR_CONTFAIL, DMC_RED, target);
 					continue;
