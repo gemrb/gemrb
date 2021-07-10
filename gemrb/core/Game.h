@@ -284,7 +284,6 @@ public:
 	int protagonist;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize;
-	ieDword Ticks;
 	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
 	std::atomic_uint32_t GameTime {0};
 	ieDword LastScriptUpdate; // GameTime at which UpdateScripts last ran
