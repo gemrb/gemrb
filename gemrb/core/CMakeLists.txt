@@ -135,6 +135,7 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	System/StringBuffer.cpp
 	System/swab.cpp
 	System/VFS.cpp
+	Video/Pixels.cpp
 	Video/Video.cpp
 	)
 

@@ -25,240 +25,26 @@ namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-IPixelIterator* Sprite2D::Iterator::InitImp(void* pixel, int pitch) const noexcept
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir)
 {
-	if (format->RLE) {
-		pixel = [this, pitch](uint8_t* rledata) {
-			Point p;
-
-			if (ydir == Reverse)
-				p.y = clip.h - 1;
-			if (xdir == Reverse)
-				p.x = clip.w - 1;
-			
-			return FindRLEPos(rledata, pitch, p, format->ColorKey);
-		} (static_cast<uint8_t*>(pixel));
-		return new RLEIterator(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), format->ColorKey);
-	} else {
-		pixel = [this, pitch](uint8_t* pixels) {
-			if (xdir == Reverse) {
-				pixels += format->Bpp * (clip.w - 1);
-			}
-			if (ydir == Reverse) {
-				pixels += pitch * (clip.h - 1);
-			}
-
-			pixels += (clip.y * pitch) + (clip.x * format->Bpp);
-			return pixels;
-		} (static_cast<uint8_t*>(pixel));
-		
-		switch (format->Bpp) {
-			case 4:
-				return new PixelIterator<uint32_t>(static_cast<uint32_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			case 3:
-				return new PixelIterator<Pixel24Bit>(static_cast<Pixel24Bit*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			case 2:
-				return new PixelIterator<uint16_t>(static_cast<uint16_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			case 1:
-				return new PixelIterator<uint8_t>(static_cast<uint8_t*>(pixel), xdir, ydir, Size(clip.w, clip.h), pitch);
-			default:
-				ERROR_UNKNOWN_BPP;
-		}
-	}
+	return Iterator(pixels, pitch, format, xdir, ydir, Region(Point(), Frame.size));
 }
 
-Sprite2D::Iterator::Iterator(Sprite2D& spr) noexcept
-: Iterator(spr, spr.Frame)
-{}
-
-Sprite2D::Iterator::Iterator(Sprite2D& spr, const Region& clip) noexcept
-: Iterator(spr, Forward, Forward, clip)
-{}
-
-Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y) noexcept
-: Iterator(spr, x, y, spr.Frame)
-{}
-
-Sprite2D::Iterator::Iterator(Sprite2D& spr, Direction x, Direction y, const Region& clip) noexcept
-: IPixelIterator(nullptr, spr.pitch, x, y), imp(nullptr), format(&spr.format), clip(clip)
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
+										 const Region& clip)
 {
-	imp = InitImp(spr.pixels, spr.pitch);
-	pixel = spr.pixels; // always here regardless of direction
+	return Iterator(pixels, pitch, format, xdir, ydir, clip);
 }
 
-Sprite2D::Iterator::Iterator(const Iterator& orig) noexcept
-: IPixelIterator(orig)
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir) const
 {
-	clip = orig.clip;
-	format = orig.format;
-	imp = orig.imp->Clone();
+	return Iterator(pixels, pitch, format, xdir, ydir, Region(Point(), Frame.size));
 }
 
-Sprite2D::Iterator::~Iterator() noexcept
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
+										 const Region& clip) const
 {
-	delete imp;
-}
-
-Sprite2D::Iterator Sprite2D::Iterator::end(const Iterator& beg) noexcept
-{
-	if (beg.clip.w == 0 || beg.clip.h == 0) {
-		// already at the end
-		return Iterator(beg);
-	}
-	
-	Direction xdir = (beg.xdir == Forward) ? Reverse : Forward;
-	Direction ydir = (beg.ydir == Forward) ? Reverse : Forward;
-	Iterator it(beg);
-	// hack for InitImp
-	it.ydir = ydir;
-	it.xdir = xdir;
-	delete it.imp;
-	it.imp = it.InitImp(it.pixel, beg.pitch);
-	// reset for Advance
-	it.xdir = beg.xdir;
-	it.ydir = beg.ydir;
-	it.imp->xdir = beg.xdir;
-	it.imp->ydir = beg.ydir;
-
-	// 'end' iterators are one past the end
-	it.Advance(1);
-	return it;
-}
-
-Sprite2D::Iterator& Sprite2D::Iterator::operator++() noexcept
-{
-	imp->Advance(1);
-	return *this;
-}
-
-bool Sprite2D::Iterator::operator!=(const Iterator& rhs) const noexcept
-{
-	return imp->pixel != rhs.imp->pixel;
-}
-
-uint8_t& Sprite2D::Iterator::operator*() const noexcept
-{
-	return *static_cast<uint8_t*>(imp->pixel);
-}
-
-uint8_t* Sprite2D::Iterator::operator->() const noexcept
-{
-	return static_cast<uint8_t*>(imp->pixel);
-}
-
-uint8_t Sprite2D::Iterator::Channel(uint32_t mask, uint8_t shift) const noexcept
-{
-	switch (format->Bpp) {
-		case 1:
-			return static_cast<PixelIterator<uint8_t>*>(imp)->Channel(mask, shift);
-		case 2:
-			return static_cast<PixelIterator<uint16_t>*>(imp)->Channel(mask, shift);
-		case 3:
-			return static_cast<PixelIterator<Pixel24Bit>*>(imp)->Channel(mask, shift);
-		case 4:
-			return static_cast<PixelIterator<uint32_t>*>(imp)->Channel(mask, shift);
-		default:
-			ERROR_UNKNOWN_BPP;
-	}
-}
-
-IPixelIterator* Sprite2D::Iterator::Clone() const noexcept
-{
-	return new Iterator(*this);
-}
-
-void Sprite2D::Iterator::Advance(int amt) noexcept
-{
-	imp->Advance(amt);
-}
-
-Color Sprite2D::Iterator::ReadRGBA() const noexcept
-{
-	Color c;
-	ReadRGBA(c.r, c.g, c.b, c.a);
-	return c;
-}
-
-void Sprite2D::Iterator::ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept
-{
-	uint32_t pixel = 0;
-	switch (format->Bpp) {
-		case 4:
-			pixel = *static_cast<uint32_t*>(imp->pixel);
-			break;
-		case 3:
-			pixel = *static_cast<Pixel24Bit*>(imp->pixel);
-			break;
-		case 2:
-			pixel = *static_cast<uint16_t*>(imp->pixel);
-			break;
-		case 1:
-			pixel = *static_cast<uint8_t*>(imp->pixel);
-			r = format->palette->col[pixel].r;
-			g = format->palette->col[pixel].g;
-			b = format->palette->col[pixel].b;
-
-			if (format->HasColorKey && pixel == format->ColorKey) {
-				a = 0;
-			} else {
-				a = format->palette->col[pixel].a;
-			}
-			return;
-		default:
-			ERROR_UNKNOWN_BPP;
-	}
-
-	unsigned v;
-	v = (pixel & format->Rmask) >> format->Rshift;
-	r = (v << format->Rloss) + (v >> (8 - (format->Rloss << 1)));
-	v = (pixel & format->Gmask) >> format->Gshift;
-	g = (v << format->Gloss) + (v >> (8 - (format->Gloss << 1)));
-	v = (pixel & format->Bmask) >> format->Bshift;
-	b = (v << format->Bloss) + (v >> (8 - (format->Bloss << 1)));
-	if(format->Amask) {
-		v = (pixel & format->Amask) >> format->Ashift;
-		a = (v << format->Aloss) + (v >> (8 - (format->Aloss << 1)));
-	} else if (format->HasColorKey && pixel == format->ColorKey) {
-		a = 0;
-	} else {
-		a = 255;
-	}
-}
-
-void Sprite2D::Iterator::WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept
-{
-	if (format->Bpp == 1) {
-		assert(false);
-		// FIXME: if we want to be able to write back to paletted sprites we need
-		// to implement a way to map the color to the palette
-		//uint32_t pixel = format->palette->FindColor(Color(r, g, b, a));
-		//*static_cast<uint8_t*>(imp->pixel) = pixel;
-		return;
-	}
-
-	uint32_t pixel = (r >> format->Rloss) << format->Rshift
-	| (g >> format->Gloss) << format->Gshift
-	| (b >> format->Bloss) << format->Bshift
-	| ((a >> format->Aloss) << format->Ashift & format->Amask);
-
-	switch (format->Bpp) {
-		case 4:
-			*static_cast<uint32_t*>(imp->pixel) = pixel;
-			break;
-		case 3:
-			*static_cast<Pixel24Bit*>(imp->pixel) = pixel;
-			break;
-		case 2:
-			*static_cast<uint16_t*>(imp->pixel) = pixel;
-			break;
-		default:
-			ERROR_UNKNOWN_BPP;
-	}
-}
-
-const Point& Sprite2D::Iterator::Position() const noexcept
-{
-	return imp->Position();
+	return Iterator(pixels, pitch, format, xdir, ydir, clip);
 }
 
 Sprite2D::Sprite2D(const Region& rgn, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept
@@ -294,9 +80,7 @@ Color Sprite2D::GetPixel(const Point& p) const noexcept
 	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
 		IPixelIterator::Direction xdir = (renderFlags & BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		IPixelIterator::Direction ydir = (renderFlags & BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		// I simply dont want to bother writing const overloads for everything in Iterator
-		// this is a private method so im being lazy and using const_cast, we clearly dont alter it
-		Iterator it = Iterator(*const_cast<Sprite2D*>(this), xdir, ydir);
+		Iterator it = GetIterator(xdir, ydir);
 		it.Advance(p.y * Frame.w + p.x);
 		return it.ReadRGBA();
 	}

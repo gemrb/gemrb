@@ -130,6 +130,8 @@
 		A25F91EB269931220045F07A /* Video.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91E6269931220045F07A /* Video.cpp */; };
 		A25F91EC269931220045F07A /* Video.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E7269931220045F07A /* Video.h */; };
 		A25F91ED269931220045F07A /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E8269931220045F07A /* Pixels.h */; };
+		A25F91EF269936A10045F07A /* Pixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91EE269936A10045F07A /* Pixels.cpp */; };
+		A25F91F0269936A10045F07A /* Pixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91EE269936A10045F07A /* Pixels.cpp */; };
 		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
 		A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
 		A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
@@ -1302,6 +1304,7 @@
 		A25F91E6269931220045F07A /* Video.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Video.cpp; sourceTree = "<group>"; };
 		A25F91E7269931220045F07A /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
 		A25F91E8269931220045F07A /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
+		A25F91EE269936A10045F07A /* Pixels.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Pixels.cpp; sourceTree = "<group>"; };
 		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
 		A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScriptInterface.cpp; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
@@ -4587,10 +4590,11 @@
 		A25F91E4269931220045F07A /* Video */ = {
 			isa = PBXGroup;
 			children = (
+				A25F91EE269936A10045F07A /* Pixels.cpp */,
+				A25F91E8269931220045F07A /* Pixels.h */,
 				A25F91E5269931220045F07A /* RLE.h */,
 				A25F91E6269931220045F07A /* Video.cpp */,
 				A25F91E7269931220045F07A /* Video.h */,
-				A25F91E8269931220045F07A /* Pixels.h */,
 			);
 			path = Video;
 			sourceTree = "<group>";
@@ -9650,6 +9654,7 @@
 				A29BF91013A04A6F00C812DD /* GameScript.cpp in Sources */,
 				A29BF91113A04A6F00C812DD /* GSUtils.cpp in Sources */,
 				A29BF91213A04A6F00C812DD /* Matching.cpp in Sources */,
+				A25F91F0269936A10045F07A /* Pixels.cpp in Sources */,
 				A29BF91313A04A6F00C812DD /* Objects.cpp in Sources */,
 				A29BF91413A04A6F00C812DD /* Triggers.cpp in Sources */,
 				A226F41013A119D8009CE75E /* 2DAImporter.cpp in Sources */,
@@ -9809,6 +9814,7 @@
 				A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */,
 				A2E663B0139E883E00310FC8 /* PluginMgr.cpp in Sources */,
 				A2E663B2139E883E00310FC8 /* Polygon.cpp in Sources */,
+				A25F91EF269936A10045F07A /* Pixels.cpp in Sources */,
 				A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,
 				A2E663B5139E883E00310FC8 /* Projectile.cpp in Sources */,
 				A2E663B7139E883E00310FC8 /* ProjectileMgr.cpp in Sources */,

@@ -390,6 +390,47 @@ public:
 	}
 };
 
+class PixelFormatIterator : public IPixelIterator
+{
+private:
+	IPixelIterator* imp = nullptr;
+	IPixelIterator* InitImp(void* pixel, int pitch) const noexcept;
+
+public:
+	const PixelFormat& format;
+	Region clip;
+
+	PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, const Region& clip) noexcept;
+	PixelFormatIterator(void* pixels, int pitch, const PixelFormat& fmt, Direction x, Direction y, const Region& clip) noexcept;
+	PixelFormatIterator(const PixelFormatIterator& orig) noexcept;
+
+	~PixelFormatIterator() noexcept override;
+
+	static PixelFormatIterator end(const PixelFormatIterator& beg) noexcept;
+
+	PixelFormatIterator& operator++() noexcept;
+
+	bool operator!=(const PixelFormatIterator& rhs) const noexcept;
+
+	uint8_t& operator*() const noexcept;
+
+	uint8_t* operator->() const noexcept;
+
+	uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override;
+
+	IPixelIterator* Clone() const noexcept override;
+
+	void Advance(int amt) noexcept override;
+	
+	Color ReadRGBA() const noexcept;
+
+	void ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
+
+	void WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
+	
+	const Point& Position() const noexcept override;
+};
+
 struct IAlphaIterator
 {
 	virtual ~IAlphaIterator() = default;

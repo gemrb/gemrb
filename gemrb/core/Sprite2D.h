@@ -68,48 +68,20 @@ class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
 	
-	class Iterator : public IPixelIterator
-	{
-	private:
-		IPixelIterator* imp = nullptr;
-		IPixelIterator* InitImp(void* pixel, int pitch) const noexcept;
+	using Iterator = PixelFormatIterator;
+	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
+						 IPixelIterator::Direction ydir = IPixelIterator::Forward);
 
-	public:
-		PixelFormat* format;
-		Region clip;
+	Iterator GetIterator(IPixelIterator::Direction xdir,
+						 IPixelIterator::Direction ydir,
+						 const Region& clip);
+	
+	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
+						 IPixelIterator::Direction ydir = IPixelIterator::Forward) const;
 
-		Iterator(Sprite2D& spr) noexcept;
-		Iterator(Sprite2D& spr, const Region& clip) noexcept;
-		Iterator(Sprite2D& spr, Direction x, Direction y) noexcept;
-		Iterator(Sprite2D& spr, Direction x, Direction y, const Region& clip) noexcept;
-		Iterator(const Iterator& orig) noexcept;
-
-		~Iterator() noexcept override;
-
-		static Iterator end(const Iterator& beg) noexcept;
-
-		Iterator& operator++() noexcept;
-
-		bool operator!=(const Iterator& rhs) const noexcept;
-
-		uint8_t& operator*() const noexcept;
-
-		uint8_t* operator->() const noexcept;
-
-		uint8_t Channel(uint32_t mask, uint8_t shift) const noexcept override;
-
-		IPixelIterator* Clone() const noexcept override;
-
-		void Advance(int amt) noexcept override;
-		
-		Color ReadRGBA() const noexcept;
-
-		void ReadRGBA(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const noexcept;
-
-		void WriteRGBA(uint8_t r, uint8_t g, uint8_t b, uint8_t a) noexcept;
-		
-		const Point& Position() const noexcept override;
-	};
+	Iterator GetIterator(IPixelIterator::Direction xdir,
+						 IPixelIterator::Direction ydir,
+						 const Region& clip) const;
 
 protected:
 	void* pixels = nullptr;
