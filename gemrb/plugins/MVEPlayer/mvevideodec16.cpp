@@ -141,7 +141,7 @@ ipvideo_decode_0x5 (const GstMveDemuxStream * s, unsigned short *frame,
 	offset = y * s->width + x;
 
 	return ipvideo_copy_block (s, frame, frame +
-			((unsigned short *) s->back_buf2 - (unsigned short *) s->back_buf1) +
+			(s->back_buf2 - s->back_buf1) +
 			offset, offset);
 }
 

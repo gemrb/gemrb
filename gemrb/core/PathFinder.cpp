@@ -200,7 +200,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix
 		//the crash in projectiles
-		if ((signed) p.x < 0 || (signed) p.y < 0) {
+		if (p.x < 0 || p.y < 0) {
 			return Return;
 		}
 		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
