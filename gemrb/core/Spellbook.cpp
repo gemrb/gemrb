@@ -1133,16 +1133,17 @@ void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int typ
 
 	//if data is not set, use the known spells list to set up the spellinfo list
 	for(int i = 0; i<NUM_BOOK_TYPES; i++) {
-		if ((1<<i)&type) {
-			for (const auto spellMemo : spells[i]) {
-				for (const auto slot : spellMemo->known_spells) {
-					if (!slot)
-						continue;
-					//skip the spell itself
-					if (spell && !strnicmp(slot->SpellResRef, spell, sizeof(ieResRef)))
-						continue;
-					AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
+		if (!((1 << i) & type)) continue;
+
+		for (const auto spellMemo : spells[i]) {
+			for (const auto slot : spellMemo->known_spells) {
+				if (!slot) continue;
+
+				// skip the spell itself
+				if (spell && !strnicmp(slot->SpellResRef, spell, sizeof(ieResRef))) {
+					continue;
 				}
+				AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
 			}
 		}
 	}
