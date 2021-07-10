@@ -1069,14 +1069,14 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname) const
 {
 	size_t i = spellinfo.size();
-	while(i--) {
-		if ( (spellinfo[i]->level==level) &&
-			(spellinfo[i]->type==type) &&
-			!strnicmp(spellinfo[i]->spellname, spellname, 8)) {
-				return spellinfo[i];
+	while (i--) {
+		if (spellinfo[i]->level != level) continue;
+		if (spellinfo[i]->type != type) continue;
+		if (!strnicmp(spellinfo[i]->spellname, spellname, 8)) {
+			return spellinfo[i];
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const ieResRef spellname, unsigned int idx)
