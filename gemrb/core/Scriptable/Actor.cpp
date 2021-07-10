@@ -723,10 +723,7 @@ void Actor::SetCircleSize()
 	if (UnselectableTimer) {
 		color = ColorMagenta;
 		color_index = 4;
-	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
-		color = ColorYellow;
-		color_index = 5;
-	} else if (Modified[IE_CHECKFORBERSERK]) {
+	} else if (Modified[IE_STATE_ID] & STATE_PANIC || Modified[IE_CHECKFORBERSERK]) {
 		color = ColorYellow;
 		color_index = 5;
 	} else if (gc && (((gc->GetDialogueFlags()&DF_IN_DIALOG) && gc->dialoghandler->IsTarget(this)) || remainingTalkSoundTime > 0)) {

@@ -1006,11 +1006,11 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 		}
 	}
 	
-	auto IsExplored = [=](int x, int y) {
+	auto IsExplored = [=, &explored_mask](int x, int y) {
 		return FogTileUncovered(Point(x, y), explored_mask);
 	};
 	
-	auto IsVisible = [=](int x, int y) {
+	auto IsVisible = [=, &visible_mask](int x, int y) {
 		return FogTileUncovered(Point(x, y), visible_mask);
 	};
 	

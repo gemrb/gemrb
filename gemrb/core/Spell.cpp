@@ -157,10 +157,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 			}
 		} else {
 			//how style, no pure background sound
-
-			switch(gender) {
-			default: g = 'm'; break;
-			case SEX_FEMALE: g = 'f'; break;
+			if (gender == SEX_FEMALE) {
+				g = 'f';
+			} else {
+				g = 'm';
 			}
 		}
 		if (SpellType==IE_SPL_PRIEST) {

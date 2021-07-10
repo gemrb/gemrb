@@ -205,7 +205,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	double stepAngle = 0.0;
 	const Point& start = vec;
 	
-	auto NextDest = [&]() -> Point {
+	auto NextDest = [&]() {
 		// adjust the point if the actor cant get to `dest`
 		// we do this by sweeping an M_PI arc a `radius` (stepVec) away from the point
 		// and oriented according to `direction`

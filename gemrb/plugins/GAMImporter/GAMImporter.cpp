@@ -598,10 +598,6 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	}
 	switch(game->version)
 	{
-	case GAM_VER_GEMRB:
-		headersize = 0xb4;
-		PCSize = 0x160;
-		break;
 	case GAM_VER_IWD:
 		headersize = 0xb4;
 		PCSize = 0x180;
@@ -609,6 +605,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	case GAM_VER_BG:
 	case GAM_VER_BG2:
 	case GAM_VER_TOB:
+	case GAM_VER_GEMRB:
 		headersize = 0xb4;
 		PCSize = 0x160;
 		break;

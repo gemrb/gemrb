@@ -97,7 +97,7 @@ WindowManager::~WindowManager()
 void WindowManager::DestroyWindows(WindowList& list)
 {
 	WindowList::iterator it = list.begin();
-	for (; it != list.end();) {
+	while (it != list.end()) {
 		Window* win = *it;
 		// IMPORTANT: ensure the window (a control subview) isnt executing a callback before deleting it
 		if (win->InActionHandler() == false) {

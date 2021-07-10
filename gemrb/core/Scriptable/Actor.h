@@ -26,13 +26,16 @@
 #include "Scriptable/PCStatStruct.h"
 
 #include "exports.h"
+#include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
 
 #include "Audio.h"
 #include "CombatInfo.h"
 #include "EffectQueue.h"
+#include "Inventory.h"
 #include "Palette.h"
 #include "Polygon.h"
+#include "Spellbook.h"
 #include "Video.h"
 
 #include <map>
@@ -52,12 +55,6 @@ class ToHitStats;
 struct PolymorphCache;
 
 }
-
-/** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
-#include "ie_stats.h"
-
-#include "Inventory.h"
-#include "Spellbook.h"
 
 namespace GemRB {
 
