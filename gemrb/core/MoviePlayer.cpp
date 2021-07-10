@@ -23,6 +23,9 @@
 #include "GUI/Label.h"
 #include "Interface.h"
 
+#include <chrono>
+#include <thread>
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
@@ -147,11 +150,7 @@ void MoviePlayer::timer_wait(unsigned int frame_wait)
 	}
 
 	long to_sleep = frame_wait - (usec - timer_last_usec);
-#ifdef _WIN32
-	Sleep(to_sleep / 1000);
-#else
-	usleep(to_sleep);
-#endif
+	std::this_thread::sleep_for(std::chrono::microseconds(to_sleep));
 
 	timer_start();
 }
