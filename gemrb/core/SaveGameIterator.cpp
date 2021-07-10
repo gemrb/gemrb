@@ -418,7 +418,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 }
 
 /** Save game to given directory */
-static bool DoSaveGame(const char *Path)
+static bool DoSaveGame(const char *Path, bool overrideRunning)
 {
 	Game *game = core->GetGame();
 	//saving areas to cache currently in memory
@@ -434,7 +434,7 @@ static bool DoSaveGame(const char *Path)
 
 	//compress files in cache named: .STO and .ARE
 	//no .CRE would be saved in cache
-	if (core->CompressSave(Path)) {
+	if (core->CompressSave(Path, overrideRunning)) {
 		return false;
 	}
 
@@ -607,10 +607,18 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	if (int cansave = CanSave())
 		return cansave;
 
+	bool overrideRunning = false;
 	//if index is not an existing savegame, we create a unique slotname
 	for (size_t i = 0; i < save_slots.size(); ++i) {
 		Holder<SaveGame> save = save_slots[i];
 		if (save->GetSaveID() == index) {
+			if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
+				overrideRunning = true;
+				if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
+					return GEM_ERROR;
+				}
+			}
+
 			DeleteSaveGame(save);
 			break;
 		}
@@ -623,15 +631,15 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
-		return -1;
+		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
-		return -1;
+		return GEM_ERROR;
 	}
 
 	// Save successful / Quick-save successful
@@ -646,13 +654,13 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 			gc->SetDisplayText(STR_SAVESUCCEED, 30);
 		}
 	}
-	return 0;
+	return GEM_OK;
 }
 
 int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname)
 {
 	if (!slotname) {
-		return -1;
+		return GEM_ERROR;
 	}
 
 	if (int cansave = CanSave())
@@ -660,9 +668,17 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 
 	GameControl *gc = core->GetGameControl();
 	int index;
+	bool overrideRunning = false;
 
 	if (save) {
 		index = save->GetSaveID();
+		if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
+			overrideRunning = true;
+
+			if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
+				return GEM_ERROR;
+			}
+		}
 
 		DeleteSaveGame(save);
 		save.release();
@@ -685,15 +701,15 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
-		return -1;
+		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		if (gc) {
 			gc->SetDisplayText(STR_CANTSAVE, 30);
 		}
-		return -1;
+		return GEM_ERROR;
 	}
 
 	// Save successful
@@ -701,7 +717,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	if (gc) {
 		gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	}
-	return 0;
+	return GEM_OK;
 }
 
 void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
