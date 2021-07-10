@@ -92,11 +92,10 @@ struct PixelFormat {
 	}
 };
 
-inline uint8_t* DecodeRLEData(const void* data, const Size& size, uint8_t colorKey)
+inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t colorKey)
 {
 	size_t pixelCount = size.w * size.h;
 	uint8_t* buffer = (uint8_t*)malloc(pixelCount);
-	const uint8_t* p = static_cast<const uint8_t*>(data);
 
 	size_t transQueue = 0;
 	for (size_t i = 0; i < pixelCount;) {
