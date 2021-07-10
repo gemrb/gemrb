@@ -85,9 +85,19 @@ protected:
 	Size movieSize;
 	size_t framePos;
 
+	long timer_last_sec = 0;
+	long timer_last_usec = 0;
+	unsigned int frame_wait = 0;
+	unsigned int video_frameskip = 0;
+	unsigned int video_skippedframes = 0;
+
 protected:
 	void DisplaySubtitle(const String& sub);
 	void PresentMovie(const Region&, Video::BufferFormat fmt);
+
+	void get_current_time(long &sec, long &usec) const;
+	void timer_start();
+	void timer_wait(unsigned int frame_wait);
 
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 

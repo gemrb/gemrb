@@ -69,8 +69,7 @@ BIKPlayer::BIKPlayer(void)
 	memset(&c_col_high, 0, sizeof(c_col_high));
 	memset(&header, 0, sizeof(header));
 	memset(s_coeffs_ptr, 0, sizeof(s_coeffs_ptr));
-	timer_last_sec = timer_last_usec = frame_wait = c_col_lastval = 0;
-	video_frameskip = video_skippedframes = 0;
+	c_col_lastval = 0;
 	s_frame_len = s_overlap_len = s_num_bands = s_block_size = 0;
 	video_rendered_frame = validVideo = s_audio = false;
 	s_channels = s_first = s_stream = s_root = 0;
@@ -220,7 +219,8 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 	}
 
 	if (timer_last_sec) {
-		timer_wait();
+		// quick hack, we should rather use the rational time base as ffmpeg
+		timer_wait(v_timebase.num * 1000000 / v_timebase.den);
 	}
 	if(framePos >= header.framecount) {
 		return false;
@@ -243,46 +243,6 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 	}
 
 	return true;
-}
-
-//this code could be in the movieplayer parent class
-void static get_current_time(long &sec, long &usec) {
-	auto time = GetTicks();
-
-	sec = time / 1000;
-	usec = (time % 1000) * 1000;
-}
-
-void BIKPlayer::timer_start()
-{
-	get_current_time(timer_last_sec, timer_last_usec);
-}
-
-void BIKPlayer::timer_wait()
-{
-	long sec, usec;
-	get_current_time(sec, usec);
-
-	while (sec > timer_last_sec) {
-		usec += 1000000;
-		timer_last_sec++;
-	}
-
-	//quick hack, we should rather use the rational time base as ffmpeg
-	frame_wait = v_timebase.num*1000000/v_timebase.den;
-	while (usec - timer_last_usec > (long)frame_wait) {
-		usec -= frame_wait;
-		video_frameskip++;
-	}
-
-	long to_sleep = frame_wait - (usec - timer_last_usec);
-#ifdef _WIN32
-	Sleep(to_sleep / 1000);
-#else
-	usleep(to_sleep);
-#endif
-
-	timer_start();
 }
 
 void BIKPlayer::Stop()
