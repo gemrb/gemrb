@@ -342,11 +342,10 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 
 Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 {
-	PCStruct pcInfo;
+	PCStruct pcInfo{};
 	ieDword tmpDword;
 	ieWord tmpWord;
 
-	memset( &pcInfo,0,sizeof(pcInfo) );
 	str->ReadWord(pcInfo.Selected);
 	str->ReadWord(pcInfo.PartyOrder);
 	str->ReadDword(pcInfo.OffsetToCRE);

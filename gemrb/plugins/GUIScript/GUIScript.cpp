@@ -8580,7 +8580,7 @@ static PyObject* GemRB_GetSpelldataIndex(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	SpellExtHeader spelldata;
+	SpellExtHeader spelldata{};
 	int ret = actor->spellbook.FindSpellInfo(&spelldata, spellResRef, type);
 	return PyInt_FromLong( ret-1 );
 }
@@ -8609,7 +8609,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	SpellExtHeader spelldata;
+	SpellExtHeader spelldata{};
 	int count = actor->spellbook.GetSpellInfoSize(type);
 	PyObject* spell_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
@@ -11348,7 +11348,7 @@ target type of the selected spell.\n\
 
 static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 {
-	SpellExtHeader spelldata;
+	SpellExtHeader spelldata{};
 	int globalID, which, slot, type;
 	PARSE_ARGS( args,  "iiii", &globalID, &slot, &which, &type);
 
@@ -11607,7 +11607,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	actor->spellbook.UnmemorizeSpell(spell, true);
 	// set spellinfo to all known spells of desired type
 	actor->spellbook.SetCustomSpellInfo(NULL, NULL, 1<<type);
-	SpellExtHeader spelldata;
+	SpellExtHeader spelldata{};
 	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1<<type);
 
 	return PyInt_FromLong(idx-1);
@@ -11654,7 +11654,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	SpellExtHeader spelldata; // = SpellArray[spell];
+	SpellExtHeader spelldata{};
 	if (type == -3) {
 		actor->spellbook.SetCustomSpellInfo(resRef, nullptr, 1);
 		actor->spellbook.GetSpellInfo(&spelldata, 255, 0, 1);

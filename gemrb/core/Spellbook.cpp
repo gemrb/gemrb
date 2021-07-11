@@ -143,7 +143,7 @@ void Spellbook::CopyFrom(const Actor *source)
 			for (k = 0; k < wm->memorized_spells.size(); k++) {
 				CREMemorizedSpell *tmp_mem = new CREMemorizedSpell();
 				sm->memorized_spells.push_back(tmp_mem);
-				memcpy(tmp_mem, wm->memorized_spells[k], sizeof(CREMemorizedSpell));
+				*tmp_mem = *wm->memorized_spells[k];
 			}
 		}
 	}
@@ -997,7 +997,6 @@ void Spellbook::ClearSpellInfo()
 
 bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
 {
-	memset(array, 0, count * sizeof(SpellExtHeader) );
 	if (spellinfo.empty()) {
 		GenerateSpellInfo();
 	}
@@ -1015,7 +1014,7 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 			ret = true;
 			break;
 		}
-		memcpy(array + actual, extHeader, sizeof(SpellExtHeader));
+		*(array + actual) = *extHeader;
 		actual++;
 	}
 	return ret;
@@ -1045,7 +1044,6 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 //type = 0 means any type
 int Spellbook::FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type)
 {
-	memset(array, 0, sizeof(SpellExtHeader) );
 	if (spellinfo.empty()) {
 		GenerateSpellInfo();
 	}
@@ -1057,7 +1055,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, uns
 			continue;
 		}
 		if (spellName != spellinfo[i]->spellName) continue;
-		memcpy(array, spellinfo[i], sizeof(SpellExtHeader));
+		*array = *spellinfo[i];
 		return i-offset+1;
 	}
 	return 0;
