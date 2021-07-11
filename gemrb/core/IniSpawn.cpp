@@ -651,14 +651,13 @@ void IniSpawn::RespawnNameless()
 	if (NamelessState==36) {
 		nameless->SetStance(IE_ANI_PST_START);
 	}
-	int i;
 
-	for (i=0;i<game->GetPartySize(false);i++) {
+	for (int i = 0; i < game->GetPartySize(false); i++) {
 		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
 	}
 
 	//certain variables are set when nameless dies
-	for (i=0;i<namelessvarcount;i++) {
+	for (int i = 0; i < namelessvarcount; i++) {
 		SetVariable(game, NamelessVar[i].Name, NamelessVar[i].Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);

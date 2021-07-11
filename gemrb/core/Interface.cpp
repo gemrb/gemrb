@@ -695,14 +695,13 @@ bool Interface::ReadGameTimeTable()
 
 bool Interface::ReadSpecialSpells()
 {
-	int i;
 	bool result = true;
 
 	AutoTable table("splspec");
 	if (table) {
 		SpecialSpellsCount = table->GetRowCount();
 		SpecialSpells = (SpecialSpellType *) malloc( sizeof(SpecialSpellType) * SpecialSpellsCount);
-		for (i=0;i<SpecialSpellsCount;i++) {
+		for (int i = 0; i < SpecialSpellsCount; i++) {
 			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
@@ -716,7 +715,7 @@ bool Interface::ReadSpecialSpells()
 	table.load("wildmag");
 	if (table) {
 		SurgeSpell ss;
-		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
+		for (int i = 0; (unsigned) i < table->GetRowCount(); i++) {
 			CopyResRef(ss.spell, table->QueryField(i, 0));
 			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
 			// comment ignored
@@ -1303,8 +1302,7 @@ int Interface::Init(InterfaceConfig* config)
 		plugin_flags->SetAt( value, PLF_DELAY );
 	}
 
-	int i = 0;
-	for(i = 0; i < MAX_CD; i++) {
+	for (int i = 0; i < MAX_CD; i++) {
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
 		value = config->GetValueForKey(keyname);
 		if (value) {
@@ -1553,12 +1551,14 @@ int Interface::Init(InterfaceConfig* config)
 		strlcpy(INIConfig, tmp, sizeof(INIConfig));
 	}
 
-	for (i = 0; i < 8; i++) {
-		if (INIConfig[i] == '.')
+	for (int i = 0; i < 8; i++) {
+		if (INIConfig[i] == '.') {
+			GameNameResRef[i] = 0;
 			break;
+		}
 		GameNameResRef[i] = INIConfig[i];
 	}
-	GameNameResRef[i] = 0;
+	GameNameResRef[8] = 0;
 
 	Log(MESSAGE, "Core", "Reading Encoding Table...");
 	if (!LoadEncoding()) {
@@ -3697,15 +3697,12 @@ int Interface::SavedExtension(const char *filename)
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return 0;
-	int i=0;
-	while(saved_extensions[i]) {
-		if (!stricmp(saved_extensions[i], str) ) return 2;
-		i++;
+
+	for (const auto ext : saved_extensions) {
+		if (ext && !stricmp(ext, str)) return 2;
 	}
-	i=0;
-	while(saved_extensions_last[i]) {
-		if (!stricmp(saved_extensions_last[i], str) ) return 1;
-		i++;
+	for (const auto ext : saved_extensions_last) {
+		if (ext && !stricmp(ext, str)) return 1;
 	}
 	return 0;
 }
@@ -4015,7 +4012,6 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 {
 	if (!RtRows) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
-		int i,j,k;
 		char *endptr;
 		ieResRef NewItem;
 
@@ -4028,6 +4024,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			return true;
 		}
 		ItemList *itemlist = (ItemList*)lookup;
+		int i;
 		if (itemlist->WeightOdds) {
 			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
 			i=Roll(2,(itemlist->Count+1)/2,-2);
@@ -4036,15 +4033,16 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		}
 		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
 		char *p = strchr(NewItem, '*');
+		int diceSides;
 		if (p) {
 			*p=0; //doing this so endptr is ok
-			k=strtol(p+1,NULL,10);
+			diceSides = strtol(p + 1, nullptr, 10);
 		} else {
-			k=1;
+			diceSides = 1;
 		}
-		j=strtol(NewItem,&endptr,10);
-		if (j<1) {
-			j=1;
+		int diceThrows = strtol(NewItem, &endptr, 10);
+		if (diceThrows <1) {
+			diceThrows = 1;
 		}
 		if (*endptr) {
 			strnlwrcpy(itm->ItemResRef, NewItem, 8);
@@ -4057,7 +4055,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		if (!itm->ItemResRef[0]) {
 			return false;
 		}
-		itm->Usages[0]=(ieWord) Roll(j,k,0);
+		itm->Usages[0] = (ieWord) Roll(diceThrows, diceSides, 0);
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item:%s",
 		itm->ItemResRef);

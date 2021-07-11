@@ -6734,14 +6734,13 @@ static PyObject *SetItemIcon(Button* btn, const char *ItemResRef, int Which, int
 	btn->SetFlags(IE_GUI_BUTTON_PICTURE, OP_OR);
 	Holder<Sprite2D> Picture;
 	bool setpicture = true;
-	int i;
 	switch (Which) {
 		case 0: case 1:
 			Picture = gamedata->GetAnySprite(item->ItemIcon, -1, Which);
 			break;
 		case 2:
 			btn->SetPicture( NULL ); // also calls ClearPictureList
-			for (i=0;i<4;i++) {
+			for (int i = 0; i < 4; i++) {
 				Picture = gamedata->GetAnySprite(item->DescriptionIcon, -1, i);
 				if (Picture)
 					btn->StackPicture(Picture);

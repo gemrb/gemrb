@@ -132,13 +132,13 @@ int CValueUnpacker::get_one_block(int* block)
 	block_ptr = block;
 	int pwr = get_bits( 4 ) & 0xF, val = get_bits( 16 ) & 0xFFFF,
 		count = 1 << pwr, v = 0;
-	int i;
-	for (i = 0; i < count; i++) {
+
+	for (int i = 0; i < count; i++) {
 		buff_middle[i] = ( short ) v;
 		v += val;
 	}
 	v = -val;
-	for (i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		buff_middle[-i - 1] = ( short ) v;
 		v -= val;
 	}

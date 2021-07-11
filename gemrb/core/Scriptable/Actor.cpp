@@ -428,9 +428,7 @@ void ReleaseMemoryActor()
 Actor::Actor()
 	: Movable( ST_ACTOR )
 {
-	int i;
-
-	for (i = 0; i < MAX_STATS; i++) {
+	for (int i = 0; i < MAX_STATS; i++) {
 		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
@@ -503,7 +501,7 @@ Actor::Actor()
 	Spawned = false;
 	version = 0;
 	//these are used only in iwd2 so we have to default them
-	for(i=0;i<7;i++) {
+	for (int i = 0; i < 7; i++) {
 		BaseStats[IE_HATEDRACE2+i]=0xff;
 	}
 	//this one is saved only for PC's
@@ -1836,8 +1834,6 @@ static void ReadModalStates()
 
 static void InitActorTables()
 {
-	int i, j;
-
 	UpdateActorConfig();
 	pstflags = core->HasFeature(GF_PST_STATE_FLAGS) != 0;
 	nocreate = core->HasFeature(GF_NO_NEW_VARIABLES) != 0;
@@ -1876,8 +1872,8 @@ static void InitActorTables()
 		} else {
 			xpbonuslevels = tm->GetColumnCount(0);
 			xpbonus = (int *) calloc(xpbonuslevels*xpbonustypes, sizeof(int));
-			for (i = 0; i<xpbonustypes; i++) {
-				for(j = 0; j<xpbonuslevels; j++) {
+			for (int i = 0; i < xpbonustypes; i++) {
+				for (int j = 0; j < xpbonuslevels; j++) {
 					xpbonus[i*xpbonuslevels+j] = atoi(tm->QueryField(i,j));
 				}
 			}
@@ -1903,7 +1899,7 @@ static void InitActorTables()
 
 		ieDword bitmask = 1;
 
-		for(i = 0; i<classcount; i++) {
+		for (int i = 0;  i < classcount; i++) {
 			const char *field;
 			const char *rowname = tm->GetRowName(i);
 
@@ -1988,13 +1984,13 @@ static void InitActorTables()
 		classcount = 0; //well
 	}
 
-	i = core->GetMaximumAbility();
-	maximum_values[IE_STR]=i;
-	maximum_values[IE_INT]=i;
-	maximum_values[IE_DEX]=i;
-	maximum_values[IE_CON]=i;
-	maximum_values[IE_CHR]=i;
-	maximum_values[IE_WIS]=i;
+	int abilityMax = core->GetMaximumAbility();
+	maximum_values[IE_STR] = abilityMax;
+	maximum_values[IE_INT] = abilityMax;
+	maximum_values[IE_DEX] = abilityMax;
+	maximum_values[IE_CON] = abilityMax;
+	maximum_values[IE_CHR] = abilityMax;
+	maximum_values[IE_WIS] = abilityMax;
 	if (ReverseToHit) {
 		//all games except iwd2
 		maximum_values[IE_ARMORCLASS]=20;
@@ -2006,7 +2002,7 @@ static void InitActorTables()
 	//initializing the vvc resource references
 	tm.load("damage");
 	if (tm) {
-		for (i=0;i<DAMAGE_LEVELS;i++) {
+		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
 			strnlwrcpy(d_main[i], tmp, 8);
 			if (d_main[i][0]=='*') {
@@ -2025,7 +2021,7 @@ static void InitActorTables()
 	tm.load("overlay");
 	if (tm) {
 		ieDword mask = 1;
-		for (i=0;i<OVERLAY_COUNT;i++) {
+		for (int i =  0; i < OVERLAY_COUNT; i++) {
 			hc_overlays[i] = tm->QueryField(i, 0);
 			if (atoi(tm->QueryField( i, 1))) {
 				hc_locations|=mask;
@@ -2041,7 +2037,7 @@ static void InitActorTables()
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
 		tm.load("csound");
 		if (tm) {
-			for(i=0;i<VCONST_COUNT;i++) {
+			for (int i = 0; i < VCONST_COUNT; i++) {
 				const char *tmp = tm->QueryField( i, 0 );
 				switch(tmp[0]) {
 					case '*': break;
@@ -2057,10 +2053,10 @@ static void InitActorTables()
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
 
 	//leave room for default row at 0
-	for (i = 0; i <= classcount; i++) {
+	for (int i = 0; i <= classcount; i++) {
 		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
 		if (tm && i) {
-			for (int j=0;j<MAX_QSLOTS;j++) {
+			for (int j = 0; j < MAX_QSLOTS; j++) {
 				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i-1,j) );
 			}
 		}
@@ -2071,12 +2067,12 @@ static void InitActorTables()
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
 
-		for (i=0; i<extraslots; i++) {
+		for (int i = 0; i < extraslots; i++) {
 			long tmp = 0;
 			valid_number( tm->QueryField(i,0), tmp );
 			OtherGUIButtons[i].clss = (ieByte) tmp;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
-			for (int j=0;j<GUIBT_COUNT;j++) {
+			for (int j = 0; j < GUIBT_COUNT; j++) {
 				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
 			}
 		}
@@ -2084,7 +2080,7 @@ static void InitActorTables()
 
 	tm.load("mdfeats", true);
 	if (tm) {
-		for (i=0; i<ES_COUNT; i++) {
+		for (int i = 0; i < ES_COUNT; i++) {
 			strnuprcpy(featspells[i], tm->QueryField(i,0), sizeof(ieResRef)-1 );
 		}
 	}
@@ -2093,7 +2089,7 @@ static void InitActorTables()
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
-		for (i = 0; i < usecount; i++) {
+		for (int i = 0; i < usecount; i++) {
 			itemuse[i].stat = (ieByte) core->TranslateStat( tm->QueryField(i,0) );
 			strnlwrcpy(itemuse[i].table, tm->QueryField(i,1),8 );
 			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
@@ -2110,7 +2106,7 @@ static void InitActorTables()
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
-		for (i = 0; i < animcount; i++) {
+		for (int i = 0; i < animcount; i++) {
 			strnlwrcpy(itemanim[i].itemname, tm->QueryField(i,0),8 );
 			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
@@ -2127,8 +2123,8 @@ static void InitActorTables()
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
 		mxsplwis = (int *) calloc(max*spllevels, sizeof(int));
-		for (i = 0; i < spllevels; i++) {
-			for(int j = 0; j < max; j++) {
+		for (int i = 0; i < spllevels; i++) {
+			for (int j = 0; j < max; j++) {
 				int k = atoi(tm->GetRowName(j))-1;
 				if (k>=0 && k<max) {
 					mxsplwis[k*spllevels+i]=atoi(tm->QueryField(j,i));
@@ -2141,7 +2137,7 @@ static void InitActorTables()
 	if (tm) {
 		unsigned int stat, max;
 
-		for(i=0;i<MAX_FEATS;i++) {
+		for (int i = 0; i < MAX_FEATS; i++) {
 			//we need the MULTIPLE and MAX_LEVEL columns
 			//MULTIPLE: the FEAT_* stat index
 			//MAX_LEVEL: how many times it could be taken
@@ -2170,7 +2166,7 @@ static void InitActorTables()
 		// we need to set up much less here due to a saner class/level system in 3ed
 		Log(MESSAGE, "Actor", "Examining IWD2-style classes.2da");
 		AutoTable tht;
-		for (i=0; i<(int)tm->GetRowCount(); i++) {
+		for (int i = 0; i < (int) tm->GetRowCount(); i++) {
 			const char *classname = tm->GetRowName(i);
 			int classis = IsClassFromName(classname);
 			ieDword classID = atoi(tm->QueryField(classname, "ID"));
@@ -2244,7 +2240,7 @@ static void InitActorTables()
 		multi = (int *) calloc(classcount, sizeof(int));
 		ieDword tmpindex;
 
-		for (i=0; i<classcount; i++) {
+		for (int i = 0; i < classcount; i++) {
 			const char* classname = tm->GetRowName(i);
 			//make sure we have a valid classid, then decrement
 			//it to get the correct array index
@@ -2313,7 +2309,7 @@ static void InitActorTables()
 			}
 			numfound = 0;
 			bool foundwarrior = false;
-			for (j=0; j<classcount; j++) {
+			for (int j = 0; j < classcount; j++) {
 				//no sense continuing if we've found all to be found
 				if (numfound==tmpbits)
 					break;
@@ -2364,7 +2360,7 @@ static void InitActorTables()
 				}
 			}
 
-			for (j=0; j<(signed)tmpbits; j++) {
+			for (int j = 0; j < (signed) tmpbits; j++) {
 				if (classnames[j]) {
 					free(classnames[j]);
 				}
@@ -2391,7 +2387,7 @@ static void InitActorTables()
 		tm.load("numwslot", true);
 		if (tm) {
 			int rowcount = tm->GetRowCount();
-			for (i = 0; i < rowcount; i++) {
+			for (int i = 0; i < rowcount; i++) {
 				const char* cls = tm->GetRowName(i);
 				auto it = className2ID.find(cls);
 				int id = 0;
@@ -2432,7 +2428,7 @@ static void InitActorTables()
 	if (tm) {
 		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
-		for (i=0; i<=STYLE_MAX; i++) {
+		for (int i = 0; i <= STYLE_MAX; i++) {
 			wsdualwield[i] = (int *) calloc(cols, sizeof(int));
 			for (int j=0; j<cols; j++) {
 				wsdualwield[i][j] = atoi(tm->QueryField(i, j));
@@ -2445,9 +2441,9 @@ static void InitActorTables()
 	if (tm) {
 		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
-		for (i=0; i<=STYLE_MAX; i++) {
+		for (int i = 0; i <= STYLE_MAX; i++) {
 			wstwohanded[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
+			for (int j = 0; j < cols; j++) {
 				wstwohanded[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
@@ -2458,9 +2454,9 @@ static void InitActorTables()
 	if (tm) {
 		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
-		for (i=0; i<=STYLE_MAX; i++) {
+		for (int i = 0; i <= STYLE_MAX; i++) {
 			wsswordshield[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
+			for (int j = 0; j < cols; j++) {
 				wsswordshield[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
@@ -2471,9 +2467,9 @@ static void InitActorTables()
 	if (tm) {
 		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
-		for (i=0; i<=STYLE_MAX; i++) {
+		for (int i = 0; i <= STYLE_MAX; i++) {
 			wssingle[i] = (int *) calloc(cols, sizeof(int));
-			for (int j=0; j<cols; j++) {
+			for (int j = 0; j < cols; j++) {
 				wssingle[i][j] = atoi(tm->QueryField(i, j));
 			}
 		}
@@ -2494,14 +2490,14 @@ static void InitActorTables()
 	}
 
 	//wild magic level modifiers
-	for(i=0;i<20;i++) {
+	for (int i = 0; i < 20; i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
 	}
 	tm.load("lvlmodwm", true);
 	if (tm) {
 		int maxrow = tm->GetRowCount();
-		for (i=0;i<20;i++) {
-			for(j=0;j<MAX_LEVEL;j++) {
+		for (int i = 0; i < 20; i++) {
+			for (int j = 0; j < MAX_LEVEL; j++) {
 				int row = maxrow;
 				if (j<row) row=j;
 				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
@@ -2511,14 +2507,14 @@ static void InitActorTables()
 
 	// verbal constant remapping, if omitted, it is an 1-1 mapping
 	// TODO: allow disabled VC slots
-	for (i=0;i<VCONST_COUNT;i++) {
+	for (int i = 0; i < VCONST_COUNT; i++) {
 		VCMap[i]=i;
 	}
 	tm.load("vcremap");
 	if (tm) {
 		int rows = tm->GetRowCount();
 
-		for (i=0;i<rows;i++) {
+		for (int i = 0; i < rows; i++) {
 			int row = atoi(tm->QueryField(i,0));
 			if (row<0 || row>=VCONST_COUNT) continue;
 			int value = atoi(tm->QueryField(i,1));
@@ -2532,7 +2528,7 @@ static void InitActorTables()
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		int colcount = tm->GetColumnCount();
-		for (i = 0; i < rowcount; i++) {
+		for (int i = 0; i < rowcount; i++) {
 			skillstats[i] = std::vector<int>();
 			for (int j = 0; j < colcount; j++) {
 				int val;
@@ -2559,7 +2555,7 @@ static void InitActorTables()
 			afcomments = (int **) calloc(rowcount, sizeof(int *) );
 			while(rowcount--) {
 				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
-				for(i=0;i<3;i++) {
+				for (int i = 0; i < 3; i++) {
 					afcomments[rowcount][i] = strtol(tm->QueryField(rowcount,i), NULL, 0);
 				}
 			}
@@ -2573,10 +2569,10 @@ static void InitActorTables()
 		int skilldexNRows = tm->GetRowCount();
 		skilldex.reserve(skilldexNRows);
 
-		for (i = 0; i < skilldexNRows; i++) {
+		for (int i = 0; i < skilldexNRows; i++) {
 			skilldex.emplace_back();
 			skilldex[i].reserve(skilldexNCols+1);
-			for(j = -1; j < skilldexNCols; j++) {
+			for (int j = -1; j < skilldexNCols; j++) {
 				if (j == -1) {
 					skilldex[i].push_back (atoi(tm->GetRowName(i)));
 				} else {
@@ -2604,10 +2600,10 @@ static void InitActorTables()
 		int rows = tm->GetRowCount();
 		skillrac.reserve(rows);
 
-		for (i = 0; i < rows; i++) {
+		for (int i = 0; i < rows; i++) {
 			skillrac.emplace_back();
 			skillrac[i].reserve(cols+1);
-			for(j = -1; j < cols; j++) {
+			for (int j = -1; j < cols; j++) {
 				if (j == -1) {
 					// figure out the value from the race name
 					if (racetable == -1) {
@@ -2633,7 +2629,7 @@ static void InitActorTables()
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
 		memset(luckadjustments, 0, sizeof(luckadjustments) );
-		for (i=0; i<6; i++) {
+		for (int i = 0; i < 6; i++) {
 			dmgadjustments[i] = atoi(tm->QueryField(0, i) );
 			xpadjustments[i] = atoi(tm->QueryField(1, i) );
 			luckadjustments[i] = atoi(tm->QueryField(2, i) );
@@ -2657,7 +2653,7 @@ static void InitActorTables()
 			} else {
 				avStance = -1;
 			}
-			for (i=0;i<avCount;i++) {
+			for (int i = 0; i < avCount; i++) {
 				strnuprcpy(avPrefix[i].avresref, tm->QueryField(i+1), 8);
 				avPrefix[i].avtable.load(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
@@ -2674,7 +2670,7 @@ static void InitActorTables()
 	if (tm && !pstflags) {
 		int racesNRows = tm->GetRowCount();
 
-		for (i = 0; i < racesNRows; i++) {
+		for (int i = 0; i < racesNRows; i++) {
 			int raceID = strtol(tm->QueryField(i, 3), NULL, 0);
 			int favClass = strtol(tm->QueryField(i, 8), NULL, 0);
 			const char *raceName = tm->GetRowName(i);
@@ -9087,8 +9083,6 @@ void Actor::dumpQSlots() const
 
 void Actor::SetPortrait(const char* ResRef, int Which)
 {
-	int i;
-
 	if (ResRef == NULL) {
 		return;
 	}
@@ -9103,6 +9097,7 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 		CopyResRef( LargePortrait, ResRef );
 	}
 	if(!Which) {
+		int i;
 		for (i = 0; i < 8 && ResRef[i]; i++) {};
 		if (SmallPortrait[i-1] != 'S' && SmallPortrait[i-1] != 's') {
 			SmallPortrait[i] = 'S';

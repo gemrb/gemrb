@@ -287,14 +287,11 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
 {
 	//Uses the Breshenham's Circle Algorithm
-	long xc, yc, re;
-	int x, y;
-
-	x = r;
-	y = 0;
-	xc = 1 - ( 2 * r );
-	yc = 1;
-	re = 0;
+	int x = r;
+	int y = 0;
+	long xc = 1 - ( 2 * r );
+	long yc = 1;
+	long re = 0;
 
 	std::vector<SDL_Point> points;
 

@@ -30,10 +30,10 @@ namespace GemRB {
 // private inlines 
 inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 {
-	int i, j;
+	int j = 0;
 
 	//use j
-	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++)
+	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++)
 		if (key[i] != ' ') {
 			j++;
 		}
@@ -41,7 +41,8 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 	if (!dest) {
 		return false;
 	}
-	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
+	j = 0;
+	for (int i = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
 		if (key[i] != ' ') {
 			dest[j++] = (char) tolower( key[i] );
 		}

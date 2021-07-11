@@ -84,8 +84,6 @@ Projectile::Projectile()
 
 Projectile::~Projectile()
 {
-	int i;
-
 	delete effects;
 
 	ClearPath();
@@ -96,16 +94,14 @@ Projectile::~Projectile()
 	}
 
 	if (phase != P_UNINITED) {
-		for (i = 0; i < MAX_ORIENT; ++i) {
-			if(travel[i])
-				delete travel[i];
-			if(shadow[i])
-				delete shadow[i];
+		for (int i = 0; i < MAX_ORIENT; ++i) {
+			delete travel[i];
+			delete shadow[i];
 		}
 	}
 
 	if(children) {
-		for(i=0;i<child_size;i++) {
+		for (int i = 0; i < child_size; i++) {
 			delete children[i];
 		}
 		free (children);

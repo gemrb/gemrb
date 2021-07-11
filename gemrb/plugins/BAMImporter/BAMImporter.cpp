@@ -53,8 +53,6 @@ BAMImporter::~BAMImporter(void)
 
 bool BAMImporter::Open(DataStream* stream)
 {
-	unsigned int i;
-
 	if (stream == NULL) {
 		return false;
 	}
@@ -89,7 +87,7 @@ bool BAMImporter::Open(DataStream* stream)
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
 	DataStart = str->Size();
-	for (i = 0; i < FramesCount; i++) {
+	for (unsigned int i = 0; i < FramesCount; i++) {
 		str->ReadWord(frames[i].Width);
 		str->ReadWord(frames[i].Height);
 		str->ReadWord(frames[i].XPos);
@@ -99,14 +97,14 @@ bool BAMImporter::Open(DataStream* stream)
 			DataStart = (frames[i].FrameData & 0x7FFFFFFF);
 	}
 	cycles = new CycleEntry[CyclesCount];
-	for (i = 0; i < CyclesCount; i++) {
+	for (unsigned int i = 0; i < CyclesCount; i++) {
 		str->ReadWord(cycles[i].FramesCount);
 		str->ReadWord(cycles[i].FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = new Palette();
 	// no need to switch this
-	for (i = 0; i < 256; i++) {
+	for (unsigned int i = 0; i < 256; i++) {
 		// bgra format
 		str->Read( &palette->col[i].b, 1 );
 		str->Read( &palette->col[i].g, 1 );

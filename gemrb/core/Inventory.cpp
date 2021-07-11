@@ -1485,7 +1485,6 @@ void Inventory::dump(StringBuffer& buffer) const
 
 void Inventory::EquipBestWeapon(int flags)
 {
-	int i;
 	int damage = -1;
 	ieDword best_slot = SLOT_FIST;
 	ITMExtHeader *header;
@@ -1499,7 +1498,7 @@ void Inventory::EquipBestWeapon(int flags)
 	}
 
 	if (flags&EQUIP_RANGED) {
-		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
+		for (int i = SLOT_RANGED; i < LAST_RANGED; i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//cannot change equipment when holding a cursed weapon
@@ -1518,7 +1517,7 @@ void Inventory::EquipBestWeapon(int flags)
 		}
 
 		//ranged melee weapons like throwing daggers (not bows!)
-		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
+		for (int i = SLOT_MELEE; i <= LAST_MELEE; i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//cannot change equipment when holding a cursed weapon
@@ -1538,7 +1537,7 @@ void Inventory::EquipBestWeapon(int flags)
 	}
 
 	if (flags&EQUIP_MELEE) {
-		for(i=SLOT_MELEE;i<=LAST_MELEE;i++) {
+		for (int i = SLOT_MELEE; i <= LAST_MELEE; i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//cannot change equipment when holding a cursed weapon

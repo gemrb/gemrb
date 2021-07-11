@@ -4162,8 +4162,6 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 // 0x87 Polymorph
 static void CopyPolymorphStats(Actor *source, Actor *target)
 {
-	int i;
-
 	if(!polymorph_stats) {
 		AutoTable tab("polystat");
 		if (!tab) {
@@ -4173,7 +4171,7 @@ static void CopyPolymorphStats(Actor *source, Actor *target)
 		}
 		polystatcount = tab->GetRowCount();
 		polymorph_stats=(int *) malloc(sizeof(int)*polystatcount);
-		for (i=0;i<polystatcount;i++) {
+		for (int i = 0; i < polystatcount; i++) {
 			polymorph_stats[i]=core->TranslateStat(tab->QueryField(i,0));
 		}
 	}
@@ -4184,7 +4182,7 @@ static void CopyPolymorphStats(Actor *source, Actor *target)
 		target->polymorphCache->stats = new ieDword[polystatcount];
 	}
 
-	for(i=0;i<polystatcount;i++) {
+	for (int i = 0; i < polystatcount; i++) {
 		target->polymorphCache->stats[i] = source->Modified[polymorph_stats[i]];
 	}
 }
@@ -7442,7 +7440,6 @@ int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //runs a predetermined script in cutscene mode
 int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	int i;
 	Game *game;
 	ieResRef resref;
 
@@ -7454,7 +7451,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	switch(fx->Parameter1) {
 	case 1://simple party locations
 		game->ClearSavedLocations();
-		for (i = 0; i < game->GetPartySize(false); i++) {
+		for (int i = 0; i < game->GetPartySize(false); i++) {
 			Actor* act = game->GetPC( i, false );
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			if (act && gle) {
@@ -7467,7 +7464,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 		break;
 	default://original plane locations
 		game->ClearPlaneLocations();
-		for (i = 0; i < game->GetPartySize(false); i++) {
+		for (int i = 0; i < game->GetPartySize(false); i++) {
 			Actor* act = game->GetPC( i, false );
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			if (act && gle) {

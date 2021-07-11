@@ -596,13 +596,12 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* parameters)
 //add some animation effects too?
 void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	int i, cnt;
 	Point pos;
 	ieResRef area;
 
 	Game *game = core->GetGame();
-	cnt = game->GetPartySize(false);
-	for (i = 0; i < cnt; i++) {
+	int cnt = game->GetPartySize(false);
+	for (int i = 0; i < cnt; i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
 			GAMLocationEntry *gle;
@@ -625,7 +624,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	
 	// move familiars
 	cnt = game->GetNPCCount();
-	for (i = 0; i < cnt; i++) {
+	for (int i = 0; i < cnt; i++) {
 		Actor* act = game->GetNPC( i );
 		if (act->GetBase(IE_EA)==EA_FAMILIAR) {
 			MoveBetweenAreasCore(act, area, pos, -1, true);
@@ -2241,13 +2240,13 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Game *game=core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game->EveryoneStopped() ) {
 		//wait for a while
 		Sender->SetWait( 1 * AI_UPDATE_TIME );
 		return;
 	}
-	Actor *actor = (Actor *) Sender;
+	const Actor *actor = (const Actor *) Sender;
 	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 		//we abort the command, everyone should be here
 		Sender->ReleaseCurrentAction();
@@ -2260,8 +2259,8 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	//this is notoriously flaky
 	//if it doesn't work for the sender try other party members, too
 	if (direction == -1) {
-		int i, best, directions[4] = { -1, -1, -1, -1 };
-		for (i = 0; i < game->GetPartySize(false); i++) {
+		int directions[4] = { -1, -1, -1, -1 };
+		for (int i = 0; i < game->GetPartySize(false); i++) {
 			actor = game->GetPC(i, false);
 			if (actor != Sender) {
 				int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
@@ -2270,8 +2269,8 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 				}
 			}
 		}
-		best = 0;
-		for (i = 1; i < 4; ++i) {
+		int best = 0;
+		for (int i = 1; i < 4; ++i) {
 			if (directions[i] > directions[best]) {
 				best = i;
 			}
@@ -4051,7 +4050,7 @@ void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 //getting one single item
 void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
 {
-	Game *game=core->GetGame();
+	const Game *game = core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
 		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,IE_INV_ITEM_UNDROPPABLE,IE_INV_ITEM_UNSTEALABLE);
@@ -4656,7 +4655,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 	if (!tab) {
 		return;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int rows = tab->GetRowCount();
 	int count = parameters->int0Parameter;
 	for (int i=0;i<rows;i++) {
@@ -6723,7 +6722,7 @@ void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	Object *ob = parameters->objects[1];
+	const Object *ob = parameters->objects[1];
 	if (!ob) {
 		return;
 	}

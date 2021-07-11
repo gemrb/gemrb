@@ -146,16 +146,14 @@ void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!which) {
-		int i;
-
-		for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 			if (slot==QuickItemSlots[i]) {
 				QuickItemHeaders[i]=headerindex;
 				return;
 			}
 		}
 
-		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 			if (slot==QuickWeaponSlots[i]) {
 				QuickWeaponHeaders[i]=headerindex;
 				return;
@@ -257,13 +255,11 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 //only quickslots have this assignment, equipment items got all abilities available
 int PCStatsStruct::GetHeaderForSlot(int slot)
 {
-	int i;
-
-	for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
 	}
 
-	for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
 	}
 	return -1;

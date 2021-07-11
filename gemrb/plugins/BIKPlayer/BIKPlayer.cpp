@@ -293,7 +293,6 @@ int BIKPlayer::sound_init(bool need_init)
 {
 	int sample_rate = header.samplerate;
 	int sample_rate_half;
-	unsigned int i;
 	int frame_len_bits;
 	int ret;
 
@@ -358,13 +357,14 @@ int BIKPlayer::sound_init(bool need_init)
 
 	/* populate bands data */
 	s_bands[0] = 1;
-	for (i = 1; i < s_num_bands; i++)
-	s_bands[i] = ff_wma_critical_freqs[i - 1] * (s_frame_len / 2) / sample_rate_half;
+	for (unsigned int i = 1; i < s_num_bands; i++) {
+		s_bands[i] = ff_wma_critical_freqs[i - 1] * (s_frame_len / 2) / sample_rate_half;
+	}
 	s_bands[s_num_bands] = s_frame_len / 2;
 
 	s_first = 1;
 
-	for (i = 0; i < s_channels; i++)
+	for (unsigned int i = 0; i < s_channels; i++)
 		s_coeffs_ptr[i] = s_coeffs + i * s_frame_len;
 
 	if (header.audioflag&BINK_AUD_USEDCT)
@@ -376,19 +376,16 @@ int BIKPlayer::sound_init(bool need_init)
 }
 
 void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
-	int i,j;
-	int end;
-
 	st->scantable= src_scantable;
 
-	for(i=0; i<64; i++){
-		j = src_scantable[i];
+	for (int i = 0; i < 64; i++){
+		int j = src_scantable[i];
 		st->permutated[i] = j;
 	}
 
-	end=-1;
-	for(i=0; i<64; i++){
-		j = st->permutated[i];
+	int end = -1;
+	for (int i = 0; i < 64; i++){
+		int j = st->permutated[i];
 		if(j>end) end=j;
 		st->raster_end[i]= end;
 	}
@@ -396,11 +393,8 @@ void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
 
 int BIKPlayer::video_init()
 {
-	int bw, bh, blocks;
-	int i;
-
 	if (!bink_trees[15].table) {
-		for (i = 0; i < 16; i++) {
+		for (int i = 0; i < 16; i++) {
 			const int maxbits = bink_tree_lens[i][15];
 			bink_trees[i].table = table + i*128;
 			bink_trees[i].table_allocated = 1 << maxbits;
@@ -418,11 +412,11 @@ int BIKPlayer::video_init()
 
 	ff_init_scantable(&c_scantable, bink_scan);
 
-	bw = (header.width  + 7) >> 3;
-	bh = (header.height + 7) >> 3;
-	blocks = bw * bh;
+	int bw = (header.width  + 7) >> 3;
+	int bh = (header.height + 7) >> 3;
+	int blocks = bw * bh;
 
-	for (i = 0; i < BINK_NB_SRC; i++) {
+	for (int i = 0; i < BINK_NB_SRC; i++) {
 		c_bundle[i].data = (uint8_t *) av_malloc(blocks * 64);
 		//not enough memory
 		if(!c_bundle[i].data) {
@@ -494,16 +488,15 @@ static inline int float_to_int16_one(const float *src){
 }
 
 static void ff_float_to_int16_interleave_c(int16_t *dst, const float **src, long len, int channels){
-	int i;
 	if(channels==2) {
-		for(i=0; i<len; i++) {
+		for (int i = 0; i < len; i++) {
 			dst[2*i]   = float_to_int16_one(src[0]+i);
 			dst[2*i+1] = float_to_int16_one(src[1]+i);
 		}
 		return;
 	}
 	//one channel
-	for(i=0; i<len; i++) {
+	for (int i = 0; i < len; i++) {
 		dst[i] = float_to_int16_one(src[0]+i);
 	}
 }
@@ -645,7 +638,7 @@ int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
 int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_intra)
 {
 	int mode_list[128];
-	int i, t, mask, bits, ccoef, mode;
+	int mask, ccoef, mode;
 	int list_start = 64, list_end = 64, list_pos;
 	int coef_count = 0;
 	int coef_idx[64];
@@ -659,7 +652,7 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 	mode_list[list_end++] = ( 2 << 2) | 3;
 	mode_list[list_end++] = ( 3 << 2) | 3;
 
-	bits = v_gb.get_bits(4) - 1;
+	int bits = v_gb.get_bits(4) - 1;
 	while (bits >= 0) {
 		mask = 1 << bits;
 		list_pos = list_start;
@@ -678,7 +671,7 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 				} else {
 					mode_list[list_pos++] = 0;
 				}
-				for (i = 0; i < 4; i++, ccoef++) {
+				for (int i = 0; i < 4; i++, ccoef++) {
 					if (v_gb.get_bits(1)) {
 						mode_list[--list_start] = (ccoef << 2) | 3;
 					} else {
@@ -698,12 +691,13 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 				break;
 			case 1:
 				mode_list[list_pos] = (ccoef << 2) | 2;
-				for (i = 0; i < 3; i++) {
+				for (int i = 0; i < 3; i++) {
 					ccoef += 4;
 					mode_list[list_end++] = (ccoef << 2) | 2;
 				}
 				break;
 			case 3:
+				int t;
 				if (!bits) {
 					t = v_gb.get_bits(1) ? -1 : 1;
 				} else {
@@ -724,7 +718,7 @@ int BIKPlayer::read_dct_coeffs(DCTELEM block[64], const uint8_t *scan, bool is_i
 	quant = is_intra ? bink_intra_quant[quant_idx]
 	                 : bink_inter_quant[quant_idx];
 	block[0] = (block[0] * quant[0]) >> 11;
-	for (i = 0; i < coef_count; i++) {
+	for (int i = 0; i < coef_count; i++) {
 		int idx = coef_idx[i];
 		block[scan[idx]] = (block[scan[idx]] * quant[idx]) >> 11;
 	}

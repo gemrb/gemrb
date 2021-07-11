@@ -93,7 +93,6 @@ static void ReadAutonoteINI()
 
 static int GetTrackString(const ieResRef areaName)
 {
-	int i;
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
 	if (!tracks) {
@@ -102,7 +101,7 @@ static int GetTrackString(const ieResRef areaName)
 			return -1;
 		trackcount = tm->GetRowCount();
 		tracks = new ResRefToStrRef[trackcount];
-		for (i=0;i<trackcount;i++) {
+		for (int i = 0; i < trackcount; i++) {
 			const char *poi = tm->QueryField(i,0);
 			if (poi[0]=='O' && poi[1]=='_') {
 				tracks[i].trackFlag=false;
@@ -116,7 +115,7 @@ static int GetTrackString(const ieResRef areaName)
 		}
 	}
 
-	for (i=0;i<trackcount;i++) {
+	for (int i = 0; i < trackcount; i++) {
 		if (!strnicmp(tracks[i].areaName, areaName, 8)) {
 			return i;
 		}
@@ -388,8 +387,6 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 
 Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 {
-	unsigned int i,x;
-
 	// if this area does not have extended night, force it to day mode
 	if (!(AreaFlags & AT_EXTENDED_NIGHT))
 		day_or_night = true;
@@ -503,7 +500,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (i = 0; i < MAX_RESCOUNT; i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword(map->SongHeader.SongList[i]);
 	}
 
@@ -545,10 +542,10 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	map->SetupReverbInfo();
 
 	str->Seek( RestHeader + 32, GEM_STREAM_START );
-	for (i = 0; i < MAX_RESCOUNT; i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword(map->RestHeader.Strref[i]);
 	}
-	for (i = 0; i < MAX_RESCOUNT; i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadResRef( map->RestHeader.CreResRef[i] );
 	}
 	str->ReadWord(map->RestHeader.CreatureNum);
@@ -567,7 +564,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading regions");
 	core->LoadProgress(70);
 	//Loading InfoPoints
-	for (i = 0; i < InfoPointsCount; i++) {
+	for (int i = 0; i < InfoPointsCount; i++) {
 		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
 		ieWord Type, VertexCount;
 		ieDword FirstVertex, Cursor, Flags;
@@ -668,7 +665,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 #undef MSG
 		} else {
 			Point* points = new Point[VertexCount];
-			for (x = 0; x < VertexCount; x++) {
+			for (int x = 0; x < VertexCount; x++) {
 				str->ReadPoint(points[x]);
 			}
 			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
@@ -720,7 +717,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading containers");
-	for (i = 0; i < ContainersCount; i++) {
+	for (int i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
 		ieVariable Name;
 		ieWord Type, LockDiff;
@@ -786,7 +783,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c->BBox = bbox;
 		} else {
 			Point* points = new Point[vertCount];
-			for (x = 0; x < vertCount; x++) {
+			for (int x = 0; x < vertCount; x++) {
 				ieWord tmp;
 				str->ReadWord(tmp);
 				points[x].x = tmp;
@@ -828,7 +825,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading doors");
-	for (i = 0; i < DoorsCount; i++) {
+	for (ieDword i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
 		int count;
 		ieDword Flags;
@@ -927,7 +924,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		if (OpenVerticesCount) {
 			Point* points = new Point[OpenVerticesCount];
-			for (x = 0; x < OpenVerticesCount; x++) {
+			for (int x = 0; x < OpenVerticesCount; x++) {
 				str->ReadWord(minX);
 				points[x].x = minX;
 				str->ReadWord(minY);
@@ -943,7 +940,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				GEM_STREAM_START );
 		if (ClosedVerticesCount) {
 			Point* points = new Point[ClosedVerticesCount];
-			for (x = 0; x < ClosedVerticesCount; x++) {
+			for (int x = 0; x < ClosedVerticesCount; x++) {
 				str->ReadWord(minX);
 				points[x].x = minX;
 				str->ReadWord(minY);
@@ -973,7 +970,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
 				GEM_STREAM_START );
 		Point* points = new Point[OpenImpededCount];
-		for (x = 0; x < OpenImpededCount; x++) {
+		for (int x = 0; x < OpenImpededCount; x++) {
 			str->ReadWord(minX);
 			points[x].x = minX;
 			str->ReadWord(minY);
@@ -986,7 +983,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
 				GEM_STREAM_START );
 		points = new Point[ClosedImpededCount];
-		for (x = 0; x < ClosedImpededCount; x++) {
+		for (int x = 0; x < ClosedImpededCount; x++) {
 			str->ReadWord(minX);
 			points[x].x = minX;
 			str->ReadWord(minY);
@@ -1043,7 +1040,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading spawnpoints");
-	for (i = 0; i < SpawnCount; i++) {
+	for (ieDword i = 0; i < SpawnCount; i++) {
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		ieVariable Name;
 		Point Pos;
@@ -1103,7 +1100,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Log(WARNING, "AREImporter", "No Actor Manager Available, skipping actors");
 	} else {
 		PluginHolder<ActorMgr> actmgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
-		for (i = 0; i < ActorCount; i++) {
+		for (int i = 0; i < ActorCount; i++) {
 			ieVariable DefaultName;
 			ieResRef CreResRef;
 			ieDword TalkCount;
@@ -1231,7 +1228,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		Log(WARNING, "AREImporter", "No Animation Manager Available, skipping animations");
 	} else {
-		for (i = 0; i < AnimCount; i++) {
+		for (ieDword i = 0; i < AnimCount; i++) {
 			AreaAnimation* anim = new AreaAnimation();
 			str->Read(anim->Name, 32);
 			ieWord animX, animY, startFrameRange;
@@ -1281,7 +1278,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading entrances");
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
-	for (i = 0; i < EntrancesCount; i++) {
+	for (ieDword i = 0; i < EntrancesCount; i++) {
 		ieVariable Name;
 		Point Pos;
 		ieWord Face;
@@ -1296,7 +1293,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading variables");
 	map->locals->LoadInitialValues(ResRef);
 	str->Seek( VariablesOffset, GEM_STREAM_START );
-	for (i = 0; i < VariablesCount; i++) {
+	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
 		ieDword Value;
 		str->Read( Name, 32 );
@@ -1309,8 +1306,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	Log(DEBUG, "AREImporter", "Loading ambients");
 	str->Seek( AmbiOffset, GEM_STREAM_START );
-	for (i = 0; i < AmbiCount; i++) {
-		int j;
+	for (int i = 0; i < AmbiCount; i++) {
 		struct ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
@@ -1325,7 +1321,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword(ambi->pitchVariance);
 		str->ReadWord(ambi->gainVariance);
 		str->ReadWord(ambi->gain);
-		for (j = 0;j < MAX_RESCOUNT; j++) {
+		for (int j = 0;j < MAX_RESCOUNT; j++) {
 			str->ReadResRef( sounds[j] );
 		}
 		str->ReadWord(tmpWord);
@@ -1340,7 +1336,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		if (tmpWord>MAX_RESCOUNT) {
 			tmpWord=MAX_RESCOUNT;
 		}
-		for (j = 0; j < tmpWord; j++) {
+		for (int j = 0; j < tmpWord; j++) {
 			ambi->sounds.emplace_back(sounds[j]);
 		}
 		map->AddAmbient(ambi);
@@ -1396,7 +1392,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 				}
 			}
 		} else {
-			for (i = 0; i < NoteCount; i++) {
+			for (ieDword i = 0; i < NoteCount; i++) {
 				ieDword px,py;
 				str->ReadDword(px);
 				str->ReadDword(py);
@@ -1423,7 +1419,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			}
 		}
 	} else {
-		for (i = 0; i < NoteCount; i++) {
+		for (ieDword i = 0; i < NoteCount; i++) {
 			ieWord px,py;
 
 			str->ReadWord(px);
@@ -1445,7 +1441,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	//this is a ToB feature (saves the unexploded projectiles)
 	Log(DEBUG, "AREImporter", "Loading traps");
-	for (i = 0; i < TrapCount; i++) {
+	for (ieDword i = 0; i < TrapCount; i++) {
 		ieResRef TrapResRef;
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
@@ -1500,7 +1496,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading tiles");
 	//Loading Tiled objects (if any)
 	str->Seek( TileOffset, GEM_STREAM_START );
-	for (i = 0; i < TileCount; i++) {
+	for (ieDword i = 0; i < TileCount; i++) {
 		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
@@ -1525,26 +1521,26 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading explored bitmap");
-	i = map->GetExploredMapSize();
-	if (ExploredBitmapSize==i) {
-		map->ExploredBitmap = (ieByte *) malloc(i);
+	unsigned int mapSize = map->GetExploredMapSize();
+	if (ExploredBitmapSize == mapSize) {
+		map->ExploredBitmap = (ieByte *) malloc(mapSize);
 		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-		str->Read( map->ExploredBitmap, i );
+		str->Read(map->ExploredBitmap, mapSize);
 	}
 	else {
 		if( ExploredBitmapSize ) {
 			Log(ERROR, "AREImporter", "ExploredBitmapSize in game: %d != %d. Clearing it",
-				ExploredBitmapSize, i);
+				ExploredBitmapSize, mapSize);
 		}
-		ExploredBitmapSize = i;
-		map->ExploredBitmap = (ieByte *) calloc(i, 1);
+		ExploredBitmapSize = mapSize;
+		map->ExploredBitmap = (ieByte *) calloc(mapSize, 1);
 	}
-	map->VisibleBitmap = (ieByte *) calloc(i, 1);
+	map->VisibleBitmap = (ieByte *) calloc(mapSize, 1);
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
 	//setting up doors
-	for (i=0;i<DoorsCount;i++) {
+	for (ieDword i = 0; i < DoorsCount; i++) {
 		Door *door = tm->GetDoor(i);
 		door->SetDoorOpen(door->IsOpen(), false, 0);
 	}
@@ -1591,12 +1587,10 @@ void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
 
 void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
 {
-	unsigned int i;
-
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(ds);
 
-	for (i = 0; i < EffectsCount; i++) {
+	for (unsigned int i = 0; i < EffectsCount; i++) {
 		Effect fx;
 
 		eM->GetEffectV20( &fx );
@@ -1607,7 +1601,6 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 
 int AREImporter::GetStoredFileSize(Map *map)
 {
-	unsigned int i;
 	int headersize = map->version+0x11c;
 	ActorOffset = headersize;
 
@@ -1619,7 +1612,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	EmbeddedCreOffset = headersize;
 
-	for (i=0;i<ActorCount;i++) {
+	for (unsigned int i = 0; i < ActorCount; i++) {
 		headersize += am->GetStoredFileSize(map->GetActor(i, false) );
 	}
 
@@ -1651,7 +1644,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	VerticesOffset = headersize;
 
 	VerticesCount = 0;
-	for(i=0;i<InfoPointsCount;i++) {
+	for (unsigned int i = 0; i < InfoPointsCount; i++) {
 		InfoPoint *ip=map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
 			VerticesCount+=ip->outline->Count();
@@ -1659,12 +1652,12 @@ int AREImporter::GetStoredFileSize(Map *map)
 			VerticesCount++;
 		}
 	}
-	for(i=0;i<ContainersCount;i++) {
+	for (unsigned int i = 0; i < ContainersCount; i++) {
 		Container *c=map->TMap->GetContainer(i);
 		if (c->outline)
 			VerticesCount+=c->outline->Count();
 	}
-	for(i=0;i<DoorsCount;i++) {
+	for (unsigned int i = 0; i < DoorsCount; i++) {
 		Door *d=map->TMap->GetDoor(i);
 		auto open = d->OpenTriggerArea();
 		auto closed = d->ClosedTriggerArea();
@@ -1699,7 +1692,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	EffectOffset = headersize;
 
 	TrapCount = (ieDword) map->GetTrapCount(piter);
-	for(i=0;i<TrapCount;i++) {
+	for (unsigned int i = 0; i < TrapCount; i++) {
 		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			EffectQueue *fxqueue = pro->GetEffects();
@@ -1946,10 +1939,8 @@ int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 
 int AREImporter::PutVertices(DataStream *stream, const Map *map)
 {
-	unsigned int i;
-
 	//regions
-	for(i=0;i<InfoPointsCount;i++) {
+	for (unsigned int i = 0; i < InfoPointsCount; i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
 			PutPoints(stream, ip->outline->vertices);
@@ -1959,14 +1950,14 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 		}
 	}
 	//containers
-	for(i=0;i<ContainersCount;i++) {
+	for (unsigned int i = 0; i < ContainersCount; i++) {
 		const Container *c = map->TMap->GetContainer(i);
 		if (c->outline) {
 			PutPoints(stream, c->outline->vertices);
 		}
 	}
 	//doors
-	for(i=0;i<DoorsCount;i++) {
+	for (unsigned int i = 0; i < DoorsCount; i++) {
 		const Door *d = map->TMap->GetDoor(i);
 		auto open = d->OpenTriggerArea();
 		auto closed = d->ClosedTriggerArea();
@@ -2198,11 +2189,10 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	ieByte tmpByte;
 	ieDword CreatureOffset = EmbeddedCreOffset;
 	char filling[120];
-	unsigned int i;
 
 	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
-	for (i=0;i<ActorCount;i++) {
+	for (unsigned int i = 0; i < ActorCount; i++) {
 		Actor *ac = map->GetActor(i, false);
 
 		stream->Write( ac->GetScriptName(), 32);
@@ -2250,7 +2240,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	}
 
 	CreatureOffset = EmbeddedCreOffset;
-	for (i=0;i<ActorCount;i++) {
+	for (unsigned int i = 0; i < ActorCount; i++) {
 		assert(stream->GetPos() == CreatureOffset);
 		Actor *ac = map->GetActor(i, false);
 
@@ -2550,12 +2540,11 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 
 int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 {
-	int i;
 	char filling[8];
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
-	for(i=0;i<MAX_RESCOUNT;i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		stream->WriteDword(map->SongHeader.SongList[i]);
 	}
 	//day
@@ -2569,7 +2558,7 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 	//song flag
 	stream->WriteDword(map->SongHeader.reverbID);
 	//lots of empty crap (15x4)
-	for(i=0;i<15;i++) {
+	for (int i = 0; i < 15; i++) {
 		stream->WriteDword(tmpDword);
 	}
 	return 0;
@@ -2577,16 +2566,15 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 
 int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 {
-	int i;
 	ieDword tmpDword = 0;
 
 	char filling[32];
 	memset(filling,0,sizeof(filling) );
 	stream->Write( filling, 32); //empty label
-	for(i=0;i<MAX_RESCOUNT;i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		stream->WriteDword(map->RestHeader.Strref[i]);
 	}
-	for(i=0;i<MAX_RESCOUNT;i++) {
+	for (int i = 0; i < MAX_RESCOUNT; i++) {
 		stream->WriteResRef( map->RestHeader.CreResRef[i]);
 	}
 	stream->WriteWord(map->RestHeader.CreatureNum);
@@ -2598,7 +2586,7 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 	stream->WriteWord(map->RestHeader.Enabled);
 	stream->WriteWord(map->RestHeader.DayChance);
 	stream->WriteWord(map->RestHeader.NightChance);
-	for(i=0;i<14;i++) {
+	for (int i = 0; i < 14; i++) {
 		stream->WriteDword(tmpDword);
 	}
 	return 0;

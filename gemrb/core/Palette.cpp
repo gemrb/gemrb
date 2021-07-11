@@ -131,17 +131,18 @@ void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 	//minor
 	memcpy( &col[0x88], &col[0x11], 8 * sizeof( Color ) );
 
-	int i;
-	for (i = 0x90; i < 0xA8; i += 0x08)
+	for (int i = 0x90; i < 0xA8; i += 0x08) {
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+	}
 
 	//skin
 	memcpy( &col[0xB0], &col[0x29], 8 * sizeof( Color ) );
 
-	for (i = 0xB8; i < 0xFF; i += 0x08)
+	for (int i = 0xB8; i < 0xFF; i += 0x08) {
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+	}
 	
 	col[1] = Color(0, 0, 0, 128); // shadows are always half trans black
 
@@ -283,13 +284,14 @@ void Palette::SetupRGBModification(const PaletteHolder src, const RGBModifier* m
 void Palette::SetupGlobalRGBModification(const PaletteHolder src,
 	const RGBModifier& mod)
 {
-	int i;
 	// don't modify the transparency and shadow colour
-	for (i = 0; i < 2; ++i)
+	for (int i = 0; i < 2; ++i) {
 		col[i] = src->col[i];
+	}
 
-	for (i = 2; i < 256; ++i)
+	for (int i = 2; i < 256; ++i) {
 		applyMod(src->col[i],col[i],mod);
+	}
 
 	version++;
 }

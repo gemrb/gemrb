@@ -62,10 +62,9 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
 	int blocks)
 {
 	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
-	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 2) {
-		for (i = 0; i < sb_size; i++) {
+		for (int i = 0; i < sb_size; i++) {
 			row_0 = buffer[0];
 			row_1 = buffer[sb_size];
 			buffer[0] = buffer[0] + memory[0] + 2 * memory[1];
@@ -77,7 +76,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
 			buffer++;
 		}
 	} else if (blocks == 4) {
-		for (i = 0; i < sb_size; i++) {
+		for (int i = 0; i < sb_size; i++) {
 			row_0 = buffer[0];
 			row_1 = buffer[sb_size];
 			row_2 = buffer[sb_size_2];
@@ -95,7 +94,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
 			buffer++;
 		}
 	} else {
-		for (i = 0; i < sb_size; i++) {
+		for (int i = 0; i < sb_size; i++) {
 			int* buff_ptr = buffer;
 			if (( blocks >> 1 ) & 1) {
 				row_0 = buff_ptr[0];
@@ -133,10 +132,9 @@ void CSubbandDecoder::sub_4d420c(int* memory, int* buffer, int sb_size,
 	int blocks)
 {
 	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
-	int i;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
 	if (blocks == 4) {
-		for (i = 0; i < sb_size; i++) {
+		for (int i = 0; i < sb_size; i++) {
 			row_0 = buffer[0];
 			row_1 = buffer[sb_size];
 			row_2 = buffer[sb_size_2];
@@ -154,7 +152,7 @@ void CSubbandDecoder::sub_4d420c(int* memory, int* buffer, int sb_size,
 			buffer++;
 		}
 	} else {
-		for (i = 0; i < sb_size; i++) {
+		for (int i = 0; i < sb_size; i++) {
 			int* buff_ptr = buffer;
 			db_0 = memory[0]; db_1 = memory[1];
 			for (int j = 0; j < blocks >> 2; j++) {

@@ -2586,15 +2586,15 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		}
 		return;
 	}
-	int i;
+
 	if (flag) {
 		anim->Flags |= A_ANI_ACTIVE;
-		for (i=0; i<anim->animcount; i++) {
+		for (int i = 0; i < anim->animcount; i++) {
 			anim->animation[i]->Flags |= A_ANI_ACTIVE;
 		}
 	} else {
 		anim->Flags &= ~A_ANI_ACTIVE;
-		for (i=0; i<anim->animcount; i++) {
+		for (int i = 0; i < anim->animcount; i++) {
 			anim->animation[i]->Flags &= ~A_ANI_ACTIVE;
 		}
 	}

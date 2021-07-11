@@ -74,7 +74,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
 	ieResRef MosFile;
-	unsigned int i;
 
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
@@ -117,7 +116,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
 	}
-	for (i = 0; i < ControlsCount; i++) {
+	for (unsigned int i = 0; i < ControlsCount; i++) {
 		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
