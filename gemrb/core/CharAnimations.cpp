@@ -1483,7 +1483,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_PST_STAND:
-			sprintf(NewResRef, "%cSTD%4s", ResRefBase.CString()[0], ResRefBase.CString() + 1);
+			sprintf(NewResRef, "%cSTD%.4s", ResRefBase.CString()[0], ResRefBase.CString() + 1);
 			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
@@ -1572,13 +1572,13 @@ void CharAnimations::AddPSTSuffix(char *dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			if (RAND(0,1)) {
 				Prefix="sf2";
-				sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
+				sprintf(dest, "%c%.3s%.4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 				if (gamedata->Exists(dest, IE_BAM_CLASS_ID) ) {
 					return;
 				}
 			}
 			Prefix="sf1";
-			sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
+			sprintf(dest, "%c%.3s%.4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 			if (gamedata->Exists(dest, IE_BAM_CLASS_ID) ) {
 				return;
 			}
@@ -1591,7 +1591,7 @@ void CharAnimations::AddPSTSuffix(char *dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			Prefix="stc"; break;
 	}
-	sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
+	sprintf(dest, "%c%.3s%.4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 }
 
 void CharAnimations::AddVHR2Suffix(char *dest, unsigned char StanceID,
@@ -2573,7 +2573,7 @@ void CharAnimations::GetLREquipmentRef(char *dest, unsigned char& Cycle,
 {
 	Cycle = equip->Cycle;
 	//hackhackhack
-	sprintf(dest, "%4s%c%s", ResRefBase.CString(), equipRef[0], equip->Suffix);
+	sprintf(dest, "%.4s%c%s", ResRefBase.CString(), equipRef[0], equip->Suffix);
 }
 
 //Only for the ogre animation (MOGR)
