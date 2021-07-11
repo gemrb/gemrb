@@ -148,10 +148,11 @@ jobs:
         ./appimagelint GemRB-*.AppImage
         echo "::endgroup::"
 
-#    - name: Test 2
-#      run: |
-#        cd build
-#        ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
+    - name: Test 2
+      uses: GabrielBB/xvfb-action@v1
+      with:
+        run: ./GemRB-*.AppImage -q ../gemrb/tests/minimal/
+        working-directory: build
 
     - name: Show build cache stats
       run: |
