@@ -37,6 +37,10 @@ SaveGameAREExtractor::~SaveGameAREExtractor() {
 }
 
 int32_t SaveGameAREExtractor::copyRetainedAREs(DataStream *destStream, bool trackLocations) {
+	if (saveGame == nullptr) {
+		return GEM_OK;
+	}
+
 	auto saveGameStream = saveGame->GetSave();
 	if (saveGameStream == nullptr) {
 		return GEM_ERROR;
