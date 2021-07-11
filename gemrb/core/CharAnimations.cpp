@@ -147,7 +147,7 @@ void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*PartPalettes[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
 			gamedata->FreePalette(PartPalettes[PAL_MAIN], PaletteResRef[PAL_MAIN]);
-			PaletteResRef[PAL_MAIN][0] = 0;
+			PaletteResRef[PAL_MAIN].Reset();
 
 			PartPalettes[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
 			SetupColors(PAL_MAIN);
@@ -228,7 +228,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
 		ArmourLevel = 0;
 	}
-	CopyResRef(ResRefBase, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel].CString());
+	ResRefBase = AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel];
 	DropAnims();
 }
 
@@ -408,24 +408,24 @@ void CharAnimations::SetupColors(PaletteType type)
 	} else if (PType && (type <= PAL_MAIN_5)) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
-			ieResRef oldResRef;
-			CopyResRef(oldResRef, PaletteResRef[type]);
+			ieResRef newResRef;
+			ResRef oldResRef = PaletteResRef[type];
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				snprintf(PaletteResRef[type], 9, "%.4s_%-.2s%c", ResRefBase, (char *) &PType, '1' + type);
+				snprintf(newResRef, 9, "%.4s_%-.2s%c", ResRefBase.CString(), (char *) &PType, '1' + type);
 			} else {
-				if (!stricmp(ResRefBase, "MFIE")) { // hack for magic golems
-					snprintf(PaletteResRef[type], 9, "%.4s%-.2sB", ResRefBase, (char *) &PType);
+				if (ResRefBase == "MFIE") { // hack for magic golems
+					snprintf(newResRef, 9, "%.4s%-.2sB", ResRefBase.CString(), (char *) &PType);
 				} else {
-					snprintf(PaletteResRef[type], 9, "%.4s_%-.2s", ResRefBase, (char *) &PType);
+					snprintf(newResRef, 9, "%.4s_%-.2s", ResRefBase.CString(), (char *) &PType);
 				}
 			}
-			strlwr(PaletteResRef[type]);
+			PaletteResRef[type] = ResRef::MakeLowerCase(newResRef);
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
 				gamedata->FreePalette(PartPalettes[type], oldResRef);
 				PartPalettes[type] = tmppal;
 			} else {
-				PaletteResRef[type][0]=0;
+				PaletteResRef[type].Reset();
 			}
 		}
 		bool needmod = GlobalColorMod.type != RGBModifier::NONE;
@@ -713,7 +713,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 			return;
 		}
 	}
-	ResRefBase[0] = 0;
 	Log(ERROR, "CharAnimations", "Invalid or nonexistent avatar entry:%04X", AnimID);
 }
 
@@ -1041,7 +1040,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			if (equipdat) delete equipdat;
 
 			//we need this long for special anims
-			strlcpy(NewResRef, ResRefBase, sizeof(ieResRef));
+			strlcpy(NewResRef, ResRefBase.CString(), sizeof(ieResRef));
 			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part, equipdat);
 		} else {
 			// Equipment animation parts
@@ -1485,7 +1484,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_PST_STAND:
-			sprintf(NewResRef, "%cSTD%4s", ResRefBase[0], ResRefBase + 1);
+			sprintf(NewResRef, "%cSTD%4s", ResRefBase.CString()[0], ResRefBase.CString() + 1);
 			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
@@ -1574,13 +1573,13 @@ void CharAnimations::AddPSTSuffix(char *dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			if (RAND(0,1)) {
 				Prefix="sf2";
-				sprintf(dest, "%c%3s%4s", ResRefBase[0], Prefix, ResRefBase +1);
+				sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 				if (gamedata->Exists(dest, IE_BAM_CLASS_ID) ) {
 					return;
 				}
 			}
 			Prefix="sf1";
-			sprintf(dest, "%c%3s%4s", ResRefBase[0], Prefix, ResRefBase +1);
+			sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 			if (gamedata->Exists(dest, IE_BAM_CLASS_ID) ) {
 				return;
 			}
@@ -1593,7 +1592,7 @@ void CharAnimations::AddPSTSuffix(char *dest, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			Prefix="stc"; break;
 	}
-	sprintf(dest, "%c%3s%4s", ResRefBase[0], Prefix, ResRefBase + 1);
+	sprintf(dest, "%c%3s%4s", ResRefBase.CString()[0], Prefix, ResRefBase.CString() + 1);
 }
 
 void CharAnimations::AddVHR2Suffix(char *dest, unsigned char StanceID,
@@ -2575,7 +2574,7 @@ void CharAnimations::GetLREquipmentRef(char *dest, unsigned char& Cycle,
 {
 	Cycle = equip->Cycle;
 	//hackhackhack
-	sprintf(dest, "%4s%c%s", ResRefBase, equipRef[0], equip->Suffix);
+	sprintf(dest, "%4s%c%s", ResRefBase.CString(), equipRef[0], equip->Suffix);
 }
 
 //Only for the ogre animation (MOGR)

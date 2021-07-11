@@ -175,8 +175,8 @@ public:
 	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
-	ieResRef ResRefBase;
-	ieResRef PaletteResRef[5] = {};
+	ResRef ResRefBase;
+	ResRef PaletteResRef[5] = {};
 	unsigned char previousStanceID, nextStanceID, StanceID;
 	bool autoSwitchOnEnd;
 	bool lockPalette;

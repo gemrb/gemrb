@@ -601,7 +601,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 {
 	//if the palette is locked, then it will be transferred to the new animation
 	PaletteHolder recover = nullptr;
-	ieResRef paletteResRef;
+	ResRef paletteResRef;
 
 	if (anims) {
 		if (anims->lockPalette) {
@@ -609,7 +609,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 		// Take ownership so the palette won't be deleted
 		if (recover) {
-			CopyResRef(paletteResRef, anims->PaletteResRef[PAL_MAIN]);
+			paletteResRef = anims->PaletteResRef[PAL_MAIN];
 			if (recover->named) {
 				recover = gamedata->GetPalette(paletteResRef);
 			}
@@ -626,7 +626,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		}
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
-	if (anims->ResRefBase[0] == 0) {
+	if (anims->ResRefBase.IsEmpty()) {
 		delete anims;
 		anims = NULL;
 		Log(ERROR, "Actor", "Missing animation for %s", LongName);
@@ -641,7 +641,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims->PartPalettes[PAL_MAIN] = recover;
 	if (recover) {
 		anims->lockPalette = true;
-		CopyResRef(anims->PaletteResRef[PAL_MAIN], paletteResRef);
+		anims->PaletteResRef[PAL_MAIN] = paletteResRef;
 	}
 	//bird animations are not hindered by searchmap
 	//only animations with a space of 0 in avatars.2da files use this feature
@@ -5034,7 +5034,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("\n");
 
 	buffer.appendFormatted("current HP:%d\n", BaseStats[IE_HITPOINTS] );
-	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s Stance: %d\n", Modified[IE_ANIMATION_ID], anims->ResRefBase, GetStance() );
+	buffer.appendFormatted("Mod[IE_ANIMATION_ID]: 0x%04X ResRef:%.8s Stance: %d\n", Modified[IE_ANIMATION_ID], anims->ResRefBase.CString(), GetStance());
 	buffer.appendFormatted("TURNUNDEADLEVEL: %d current: %d\n", BaseStats[IE_TURNUNDEADLEVEL], Modified[IE_TURNUNDEADLEVEL]);
 	buffer.appendFormatted("Colors:    ");
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
@@ -8802,7 +8802,7 @@ bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
-	AutoTable tab(anims->ResRefBase);
+	AutoTable tab(anims->ResRefBase.CString());
 	if (!tab) return false;
 
 	switch (index) {
@@ -8847,7 +8847,7 @@ bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 			return false;
 	}
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
-		anims->ResRefBase, tab->GetRowName(index));
+		anims->ResRefBase.CString(), tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
 	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
 	return true;
