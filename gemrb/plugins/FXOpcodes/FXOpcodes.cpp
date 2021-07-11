@@ -7456,7 +7456,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				memcpy(gle->AreaResRef, act->Area, 9);
+				gle->AreaResRef = act->Area;
 			}
 		}
 		break;
@@ -7469,7 +7469,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
-				memcpy(gle->AreaResRef, act->Area, 9);
+				gle->AreaResRef = act->Area;
 			}
 		}
 	}

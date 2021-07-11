@@ -341,11 +341,11 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 		}
 		switch(Index&15) {
 		case 0: // STR_LOADMOS
-			return PyString_FromString( game->LoadMos );
+			return PyString_FromResRef(game->LoadMos);
 		case 1: // STR_AREANAME
 			return PyString_FromString( game->CurrentArea );
 		case 2: // STR_TEXTSCREEN
-			return PyString_FromString( game->TextScreen );
+			return PyString_FromResRef(game->TextScreen);
 		}
 	}
 

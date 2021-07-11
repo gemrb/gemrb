@@ -597,7 +597,7 @@ void GameScript::MoveToExpansion(Scriptable* Sender, Action* parameters)
 void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Point pos;
-	ieResRef area;
+	ResRef area;
 
 	Game *game = core->GetGame();
 	int cnt = game->GetPartySize(false);
@@ -616,7 +616,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 			// save player1 location for familiar movement
 			if (!i) {
 				pos = gle->Pos;
-				memcpy(area, gle->AreaResRef, sizeof(area) );
+				area = gle->AreaResRef;
 			}
 			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
 		}
@@ -627,7 +627,7 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	for (int i = 0; i < cnt; i++) {
 		Actor* act = game->GetNPC( i );
 		if (act->GetBase(IE_EA)==EA_FAMILIAR) {
-			MoveBetweenAreasCore(act, area, pos, -1, true);
+			MoveBetweenAreasCore(act, area.CString(), pos, -1, true);
 		}
 	}
 	// don't clear locations!
@@ -1435,7 +1435,7 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 		GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 		if (act && gle) {
 			gle->Pos = act->Pos;
-			memcpy(gle->AreaResRef, act->Area, 9);
+			gle->AreaResRef = act->Area;
 		}
 	}
 }
@@ -1454,7 +1454,7 @@ void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*paramete
 			} else {
 				gle = game->GetSavedLocationEntry(i);
 			}
-			MoveBetweenAreasCore(act, gle->AreaResRef, gle->Pos, -1, true);
+			MoveBetweenAreasCore(act, gle->AreaResRef.CString(), gle->Pos, -1, true);
 		}
 	}
 
@@ -3061,15 +3061,15 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	AutoTable pdtable("pdialog");
 	if (pdtable) {
 		const char* scriptname = act->GetScriptName();
-		ieResRef resref;
+		ResRef resRef;
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != -1) {
 			if (game->Expansion==5) {
-				strnlwrcpy(resref, pdtable->QueryField( scriptname, "25JOIN_DIALOG_FILE"), sizeof(ieResRef)-1);
+				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
 			} else {
-				strnlwrcpy(resref, pdtable->QueryField( scriptname, "JOIN_DIALOG_FILE"), sizeof(ieResRef)-1);
+				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
 			}
-			act->SetDialog( resref );
+			act->SetDialog(resRef);
 		}
 	}
 	game->JoinParty( act, JP_JOIN );
@@ -3121,7 +3121,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
+		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3136,7 +3136,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
+		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3152,7 +3152,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	}
 	Game *game = core->GetGame();
 	if (parameters->string1Parameter[0]) {
-		strnlwrcpy(game->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
+		game->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.IsInvalid()) {
@@ -3174,7 +3174,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->string1Parameter[0]) {
-		strnlwrcpy(core->GetGame()->LoadMos, parameters->string1Parameter, sizeof(ieResRef)-1);
+		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
 	}
 }
 
@@ -3582,14 +3582,14 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	Actor* act = ( Actor* ) Sender;
 	const char* scriptname = act->GetScriptName();
 	if (pdtable->GetRowIndex( scriptname ) != -1) {
-		ieResRef resref;
+		ResRef resRef;
 
 		if (core->GetGame()->Expansion==5) {
-			strnlwrcpy(resref, pdtable->QueryField( scriptname, "25POST_DIALOG_FILE" ), sizeof(ieResRef)-1 );
+			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
 		} else {
-			strnlwrcpy(resref, pdtable->QueryField( scriptname, "POST_DIALOG_FILE" ), sizeof(ieResRef)-1 );
+			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));
 		}
-		act->SetDialog(resref);
+		act->SetDialog(resRef);
 	}
 }
 
@@ -3599,7 +3599,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
 	// so we make sure they don't cancel out
 	if (parameters->string0Parameter[0]) {
-		strnlwrcpy(core->GetGame()->TextScreen, parameters->string0Parameter, sizeof(ieResRef) - 1);
+		core->GetGame()->TextScreen = ResRef::MakeLowerCase(parameters->string0Parameter);
 	}
 
 	core->SetEventFlag(EF_TEXTSCREEN);

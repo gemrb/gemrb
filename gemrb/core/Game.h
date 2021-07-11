@@ -174,7 +174,7 @@ struct GAMJournalEntry {
 
 // Saved location of party member.
 struct GAMLocationEntry {
-	ieResRef AreaResRef;
+	ResRef AreaResRef;
 	Point Pos;
 };
 
@@ -300,8 +300,8 @@ public:
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
 	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
-	ieResRef LoadMos;
-	ieResRef TextScreen;
+	ResRef LoadMos;
+	ResRef TextScreen;
 	Particles *weather;
 	int event_timer;
 	EventHandler event_handler;
