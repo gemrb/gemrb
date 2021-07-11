@@ -130,10 +130,10 @@ Holder<Sprite2D> SpriteFromPy(PyObject* obj);
  Conversions to PyObject
 */
 
-// Like PyString_FromString(), but for ResRef
-PyObject* PyString_FromResRef(const ieResRef& ResRef);
+// Like PyString_FromString(), but for (ie)ResRef
+PyObject* PyString_FromIEResRef(const ieResRef& ResRef);
+PyObject* PyString_FromResRef(const ResRef& resRef);
 
-// Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromAnimID(const char* AnimID);
 	
 PyObject* PyString_FromStringObj(const std::string&);

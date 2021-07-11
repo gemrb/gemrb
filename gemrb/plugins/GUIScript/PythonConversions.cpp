@@ -147,14 +147,20 @@ PyStringWrapper PyString_AsString(PyObject* obj)
 }
 #endif
 
-// Like PyString_FromString(), but for ResRef
-PyObject* PyString_FromResRef(const ieResRef& ResRef)
+// Like PyString_FromString(), but for ieResRef
+PyObject* PyString_FromIEResRef(const ieResRef& ResRef)
 {
 	size_t i = strnlen(ResRef,sizeof(ieResRef));
 	return PyString_FromStringAndSize( ResRef, i );
 }
 
 // Like PyString_FromString(), but for ResRef
+PyObject* PyString_FromResRef(const ResRef& resRef)
+{
+	size_t i = strnlen(resRef.CString(), sizeof(ieResRef));
+	return PyString_FromStringAndSize(resRef.CString(), i);
+}
+
 PyObject* PyString_FromAnimID(const char* AnimID)
 {
 	unsigned int i = strnlen(AnimID,2);
