@@ -586,17 +586,17 @@ void CharAnimations::InitAvatarsTable()
 	if (walk) {
 		int rows = walk->GetRowCount();
 		for(int i=0;i<rows;i++) {
-			ieResRef value;
+			ResRef value;
 			unsigned long rmin = 0;
 			unsigned long rmax = 0xffff;
 			unsigned long range = 0;
 
-			strnuprcpy(value, walk->QueryField(i,0), 8);
+			value = ResRef::MakeUpperCase(walk->QueryField(i, 0));
 			valid_number(walk->QueryField(i,1), (long &)rmin);
 			valid_number(walk->QueryField(i,2), (long &)rmax);
 			valid_number(walk->QueryField(i,3), (long &)range);
-			if (value[0]=='*') {
-				value[0]=0;
+			if (value.IsStar()) {
+				value.Reset();
 				range = 0;
 			}
 			if (range>255 || rmin>rmax || rmax>0xffff) {
