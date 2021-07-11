@@ -62,7 +62,6 @@ public:
 	static PluginMgr* Get();
 private:
 	PluginMgr();
-public: // HACK: MSVC6 is buggy.
 	~PluginMgr();
 private:
 	std::map< SClass_ID, PluginFunc> plugins;
