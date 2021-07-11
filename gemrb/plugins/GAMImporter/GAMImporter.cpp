@@ -366,7 +366,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 
 	bool extended = version==GAM_VER_GEMRB || version==GAM_VER_IWD2;
 	if (extended) {
-		ieResRef tmp;
+		ResRef tmp;
 
 		for (unsigned int i = 0; i < 4; i++) {
 			str->ReadWord(pcInfo.QuickWeaponSlot[i]);
@@ -381,7 +381,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			pcInfo.QuickWeaponHeader[i+4]=tmpWord;
 		}
 		for (auto& spell : pcInfo.QuickSpellResRef) {
-			str->Read(&spell, 8);
+			str->ReadResRef(spell);
 		}
 		str->Read( &pcInfo.QuickSpellClass, MAX_QSLOTS ); //9 bytes
 
@@ -402,18 +402,18 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			//this may be slightly buggy because IWD2 doesn't clear the
 			//fields, but QuickSpellClass is set correctly
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
-					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+				str->ReadResRef(tmp);
+				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
+					pcInfo.QuickSpellResRef[i] = tmp;
 					//innates
 					pcInfo.QuickSpellClass[i]=0xff;
 				}
 			}
 			//recently discovered fields (bard songs)
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
-					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+				str->ReadResRef(tmp);
+				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
+					pcInfo.QuickSpellResRef[i] = tmp;
 					//bardsongs
 					pcInfo.QuickSpellClass[i]=0xfe;
 				}
@@ -439,7 +439,7 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			pcInfo.QuickWeaponHeader[i]=tmpWord;
 		}
 		for (unsigned int i = 0; i < 3; i++) {
-			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
+			str->ReadResRef(pcInfo.QuickSpellResRef[i]);
 		}
 		if (version==GAM_VER_PST) { //Torment
 			for (unsigned short& slot : pcInfo.QuickItemSlot) {
@@ -505,7 +505,9 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	PCStatsStruct *ps = actor->PCStats;
 	GetPCStats(ps, extended);
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
-	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, MAX_QSLOTS*sizeof(ieResRef) );
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		ps->QuickSpells[i] = pcInfo.QuickSpellResRef[i];
+	}
 	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, MAX_QSLOTS );
 	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
 	memcpy(ps->QuickWeaponHeaders, pcInfo.QuickWeaponHeader, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );

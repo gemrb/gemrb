@@ -199,7 +199,7 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	str->Read( &eh->Hostile, 1 );
 	str->Read( &eh->Location, 1 );
 	str->Read( &eh->unknown2, 1 );
-	str->ReadResRef( eh->MemorisedIcon );
+	str->ReadResRef(eh->memorisedIcon);
 	str->Read( &eh->Target, 1 );
 
 	//this hack is to let gemrb target dead actors by some spells

@@ -116,14 +116,14 @@ struct SpellExtHeader {
 	ieDword slot;
 	//these come from the header
 	ieByte SpellForm;
-	ieResRef MemorisedIcon;
+	ResRef memorisedIcon;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
 	ieWord Projectile;
 	ieWord CastingTime;
 	//other data
-	ieResRef spellname;
+	ResRef spellName;
 	ieDword strref; //the spell's name
 };
 
@@ -251,7 +251,7 @@ public:
 	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
 
 	/** find the first spell matching resref (returns index+1) */
-	int FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type);
+	int FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type);
 
 	/** Dumps spellbook to stdout for debugging */
 	void dump() const;

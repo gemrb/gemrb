@@ -144,6 +144,10 @@ public:
 	bool operator==(const char* str) const {
 		return strnicmp(ref, str, sizeof(ref)-1) == 0;
 	};
+
+	bool operator!=(const char* str) const {
+		return !operator==(str);
+	};
 };
 
 /**

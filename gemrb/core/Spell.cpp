@@ -79,7 +79,6 @@ SPLExtHeader::SPLExtHeader(void)
 	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
 	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
 	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
-	MemorisedIcon[0] = 0;
 }
 
 SPLExtHeader::~SPLExtHeader(void)

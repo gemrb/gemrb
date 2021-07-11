@@ -84,7 +84,7 @@ public:
 	ieByte Hostile;
 	ieByte Location;
 	ieByte unknown2;
-	ieResRef MemorisedIcon;
+	ResRef memorisedIcon;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;

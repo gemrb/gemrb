@@ -39,7 +39,6 @@ void PCStatsStruct::Init(bool all)
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
 	memset(QSlots, 0, sizeof(QSlots));
 	QSlots[0]=0xff;
-	memset( QuickSpells, 0, sizeof(QuickSpells) );
 	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
 	memset( QuickItemSlots, -1, sizeof(QuickItemSlots) );
 	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
@@ -89,7 +88,9 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
 	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
 	memcpy(QSlots, source.QSlots, sizeof(QSlots));
-	memcpy(QuickSpells, source.QuickSpells, sizeof(QuickSpells));
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		QuickSpells[i] = source.QuickSpells[i];
+	}
 	memcpy(QuickSpellClass, source.QuickSpellClass, sizeof(QuickSpellClass));
 	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
 	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));

@@ -6592,11 +6592,11 @@ Spellbook Icon\
 **See also:** [[guiscript:Button_SetItemIcon]]"
 );
 
-static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type, int tooltip, int Function)
+static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, int tooltip, int Function)
 {
 	ABORT_IF_NULL(btn);
 
-	if (!SpellResRef[0]) {
+	if (SpellResRef.IsEmpty()) {
 		btn->SetPicture( NULL );
 		//no incref here!
 		return Py_None;
@@ -6605,24 +6605,23 @@ static PyObject *SetSpellIcon(Button* btn, const ieResRef SpellResRef, int type,
 	Spell* spell = gamedata->GetSpell(SpellResRef, true);
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
-		Log(ERROR, "GUIScript", "Spell not found :%.8s",
-			SpellResRef);
+		Log(ERROR, "GUIScript", "Spell not found :%.8s", SpellResRef.CString());
 		//no incref here!
 		return Py_None;
 	}
 
-	const char* IconResRef;
+	ResRef iconResRef;
 	if (type) {
-		IconResRef = spell->ext_headers[0].MemorisedIcon;
+		iconResRef = spell->ext_headers[0].memorisedIcon;
 	}
 	else {
-		IconResRef = spell->SpellbookIcon;
+		iconResRef = spell->SpellbookIcon;
 	}
-	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(IconResRef, IE_BAM_CLASS_ID, true);
+	const AnimationFactory* af = (AnimationFactory*) gamedata->GetFactoryResource(iconResRef, IE_BAM_CLASS_ID, true);
 	if (!af) {
 		char tmpstr[24];
 
-		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", IconResRef);
+		snprintf(tmpstr, sizeof(tmpstr), "%s BAM not found", iconResRef.CString());
 		return RuntimeError( tmpstr );
 	}
 	//small difference between pst and others
@@ -8615,7 +8614,7 @@ static PyObject* GemRB_GetSpelldata(PyObject * /*self*/, PyObject* args)
 	PyObject* spell_list = PyTuple_New(count);
 	for (int i = 0; i < count; i++) {
 		actor->spellbook.GetSpellInfo(&spelldata, type, i, 1);
-		PyTuple_SetItem(spell_list, i, PyString_FromIEResRef(spelldata.spellname));
+		PyTuple_SetItem(spell_list, i, PyString_FromResRef(spelldata.spellName));
 	}
 	return spell_list;
 }
@@ -11183,9 +11182,9 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			tmp = action-ACT_QSPELL1;
 jump_label2:
 		{
-			ieResRef *poi = &actor->PCStats->QuickSpells[tmp];
-			if ((*poi)[0]) {
-				SetSpellIcon(btn, *poi, 1, 1, i+1);
+			ResRef poi = actor->PCStats->QuickSpells[tmp];
+			if (!poi.IsEmpty()) {
+				SetSpellIcon(btn, poi, 1, 1, i+1);
 				int mem = actor->spellbook.GetMemorizedSpellsCount(*poi, -1, true);
 				if (!mem) {
 					state = IE_GUI_BUTTON_FAKEDISABLED;
@@ -11363,11 +11362,11 @@ static PyObject* GemRB_SetupQuickSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	actor->spellbook.GetSpellInfo(&spelldata, type, which, 1);
-	if (!spelldata.spellname[0]) {
+	if (spelldata.spellName.IsEmpty()) {
 		return RuntimeError( "Invalid parameter! Spell not found!\n" );
 	}
 
-	memcpy(actor->PCStats->QuickSpells[slot], spelldata.spellname, sizeof(ieResRef) );
+	actor->PCStats->QuickSpells[slot] = spelldata.spellName;
 	actor->PCStats->QuickSpellClass[slot] = type;
 
 	return PyInt_FromLong( spelldata.Target );
@@ -11597,9 +11596,9 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	int globalID, type, level;
 	const char *spell = NULL;
 	const char *spell2 = NULL;
-	ieResRef replacementSpell;
+
 	PARSE_ARGS( args,  "isiis", &globalID, &spell, &type, &level, &spell2);
-	strnlwrcpy(replacementSpell, spell2, 8);
+	ResRef replacementSpell = ResRef::MakeLowerCase(spell2);
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -11677,7 +11676,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}
 
-	print("Cast spell: %s", spelldata.spellname);
+	print("Cast spell: %s", spelldata.spellName.CString());
 	print("Slot: %d", spelldata.slot);
 	print("Type: %d (%d vs %d)", spelldata.type, 1<<spelldata.type, type);
 	//cannot make this const, because it will be freed
@@ -11695,23 +11694,23 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	switch (spelldata.Target) {
 		case TARGET_SELF:
 			// FIXME: GA_NO_DEAD and such are not actually used by SetupCasting
-			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
 			//reset the cursor
 			gc->ResetTargetMode();
 			//this is always instant casting without spending the spell
-			core->ApplySpell(spelldata.spellname, actor, actor, 0);
+			core->ApplySpell(spelldata.spellName, actor, actor, 0);
 			break;
 		case TARGET_AREA:
-			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			gc->SetupCasting(spelldata.spellname, spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.spellName, spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
 			break;
 		case TARGET_INV:
 			//bring up inventory in the end???

@@ -757,24 +757,24 @@ void CREImporter::ReadChrHeader(Actor *act)
 		act->PCStats->QuickItemHeaders[i]=tmpWord;
 	}
 
+	ResRef spell;
 	//here comes the version specific read
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
 		//gemrb format doesn't save these redundantly
-		ieResRef spell;
 		for (int i = 0; i < QSPCount; i++) {
 			str->ReadResRef(spell);
 			// FIXME: why is this needed or why do we overwrite it immediately after?
-			if (spell[0]) {
+			if (!spell.IsEmpty()) {
 				act->PCStats->QuickSpellClass[i]=0xff;
-				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
+				act->PCStats->QuickSpells[i] = spell;
 			}
 		}
 		for (int i = 0; i < QSPCount; i++) {
 			str->ReadResRef(spell);
-			if (spell[0]) {
+			if (!spell.IsEmpty()) {
 				act->PCStats->QuickSpellClass[i]=0xfe;
-				memcpy(act->PCStats->QuickSpells[i], spell, sizeof(ieResRef));
+				act->PCStats->QuickSpells[i] = spell;
 			}
 		}
 		//fallthrough

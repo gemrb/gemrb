@@ -1043,7 +1043,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 }
 
 //type = 0 means any type
-int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, unsigned int type)
+int Spellbook::FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, unsigned int type)
 {
 	memset(array, 0, sizeof(SpellExtHeader) );
 	if (spellinfo.empty()) {
@@ -1056,7 +1056,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ieResRef spellname, un
 			offset++;
 			continue;
 		}
-		if (strnicmp(spellinfo[i]->spellname, spellname, sizeof(ieResRef)) != 0) continue;
+		if (spellName != spellinfo[i]->spellName) continue;
 		memcpy(array, spellinfo[i], sizeof(SpellExtHeader));
 		return i-offset+1;
 	}
@@ -1069,7 +1069,7 @@ SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, 
 	while (i--) {
 		if (spellinfo[i]->level != level) continue;
 		if (spellinfo[i]->type != type) continue;
-		if (!strnicmp(spellinfo[i]->spellname, spellname, 8)) {
+		if (spellinfo[i]->spellName == spellname) {
 			return spellinfo[i];
 		}
 	}
@@ -1094,7 +1094,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	seh = new SpellExtHeader;
 	spellinfo.push_back( seh );
 
-	memcpy(seh->spellname, spellname, sizeof(ieResRef) );
+	seh->spellName = spellname;
 	int ehc;
 
 	for (ehc = 0; ehc < spl->ExtHeaderCount-1; ehc++) {
@@ -1110,7 +1110,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	seh->slot = idx;
 	seh->count = 1;
 	seh->SpellForm = ext_header->SpellForm;
-	memcpy(seh->MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
+	seh->memorisedIcon = ext_header->memorisedIcon;
 	seh->Target = ext_header->Target;
 	seh->TargetNumber = ext_header->TargetNumber;
 	seh->Range = ext_header->Range;

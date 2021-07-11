@@ -144,7 +144,7 @@ struct PCStruct {
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
-	ieResRef QuickSpellResRef[MAX_QSLOTS];
+	ResRef QuickSpellResRef[MAX_QSLOTS];
 	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
 	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
 	char Name[32];
