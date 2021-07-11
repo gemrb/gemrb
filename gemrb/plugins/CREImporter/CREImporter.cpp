@@ -39,12 +39,10 @@ static unsigned int RandColor = 1;
 std::vector<std::vector<unsigned char>> randcolors; // it's likely not important enough, so perhaps we should just store the Autotable directly
 
 //one column, these don't have a level
-static ieResRef* innlist;   //IE_IWD2_SPELL_INNATE
-static int inncount=-1;     
-static ieResRef* snglist;   //IE_IWD2_SPELL_SONG
-static int sngcount=-1;
-static ieResRef* shplist;   //IE_IWD2_SPELL_SHAPE
-static int shpcount=-1;
+static std::vector<ResRef> innlist; //IE_IWD2_SPELL_INNATE
+static std::vector<ResRef> snglist; //IE_IWD2_SPELL_SONG
+static std::vector<ResRef> shplist; //IE_IWD2_SPELL_SHAPE
+static constexpr ResRef EmptyResRef = {};
 
 struct LevelAndKit
 {
@@ -57,14 +55,14 @@ class SpellEntry
 public:
 	~SpellEntry();
 	SpellEntry();
-	const ieResRef *GetSpell() const;
-	const ieResRef *FindSpell(unsigned int level, unsigned int kit) const;
+	const ResRef& GetSpell() const;
+	const ResRef& FindSpell(unsigned int level, unsigned int kit) const;
 	int FindSpell(unsigned int kit) const;
 	bool Equals(const char *spl) const;
 	void SetSpell(const char *spl);
 	void AddLevel(unsigned int level, unsigned int kit);
 private:
-	ieResRef spell;
+	ResRef spell;
 	LevelAndKit *levels;
 	int count;
 };
@@ -72,7 +70,6 @@ private:
 SpellEntry::SpellEntry()
 {
 	levels = NULL;
-	spell[0]=0;
 	count = 0;
 }
 
@@ -82,20 +79,20 @@ SpellEntry::~SpellEntry()
 	levels = NULL;
 }
 
-const ieResRef *SpellEntry::GetSpell() const
+const ResRef& SpellEntry::GetSpell() const
 {
-	return &spell;
+	return spell;
 }
 
-const ieResRef *SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
+const ResRef& SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 {
 	int i = count;
 	while(i--) {
 		if (levels[i].level==level && levels[i].kit==kit) {
-			return &spell;
+			return spell;
 		}
 	}
-	return NULL;
+	return EmptyResRef;
 }
 
 int SpellEntry::FindSpell(unsigned int kit) const
@@ -109,7 +106,7 @@ int SpellEntry::FindSpell(unsigned int kit) const
 	return -1;
 }
 
-static int FindSpell(ieResRef spellref, SpellEntry* list, int listsize)
+static int FindSpell(ResRef spellref, SpellEntry* list, int listsize)
 {
 	int i = listsize;
 	while (i--) {
@@ -122,12 +119,12 @@ static int FindSpell(ieResRef spellref, SpellEntry* list, int listsize)
 
 bool SpellEntry::Equals(const char *spl) const
 {
-	return !strnicmp(spell, spl, sizeof(ieResRef));
+	return spell == spl;
 }
 
 void SpellEntry::SetSpell(const char *spl)
 {
-	strnlwrcpy(spell, spl, 8);
+	spell = ResRef::MakeLowerCase(spl);
 }
 
 void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
@@ -139,7 +136,7 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 	level--; // convert to 0-based for internal use
 	for(int i=0;i<count;i++) {
 		if(levels[i].kit==kit && levels[i].level==level) {
-			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: %s", spell);
+			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: %s", spell.CString());
 			return;
 		}
 	}
@@ -149,30 +146,33 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 	count++;
 }
 
-static int IsInnate(ieResRef name)
+static int IsInnate(const ResRef& name)
 {
-	for(int i=0;i<inncount;i++) {
-		if(!strnicmp(name, innlist[i], 8) ) {
+	int innateCount = innlist.size();
+	for (int i = 0; i < innateCount; i++) {
+		if (name == innlist[i]) {
 			return i;
 		}
 	}
 	return -1;
 }
 
-static int IsSong(ieResRef name)
+static int IsSong(const ResRef& name)
 {
-	for(int i=0;i<sngcount;i++) {
-		if(!strnicmp(name, snglist[i], 8) ) {
+	int sngCount = snglist.size();
+	for (int i = 0; i < sngCount; i++) {
+		if (name == snglist[i]) {
 			return i;
 		}
 	}
 	return -1;
 }
 
-static int IsShape(ieResRef name)
+static int IsShape(const ResRef& name)
 {
-	for(int i=0;i<shpcount;i++) {
-		if(!strnicmp(name, shplist[i], 8) ) {
+	int shpCount = shplist.size();
+	for (int i = 0; i < shpCount; i++) {
+		if (name == shplist[i]) {
 			return i;
 		}
 	}
@@ -186,7 +186,7 @@ static int domcount=-1;
 static SpellEntry* maglist=NULL;
 static int magcount=-1;
 
-static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
+static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<splcount;i++) {
 		if (domlist[i].Equals(name) ) {
@@ -210,7 +210,7 @@ static int IsDomain(ieResRef name, unsigned short &level, unsigned int kit)
 	return -1;
 }*/
 
-int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const
+int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const
 {
 	level = 0;
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
@@ -233,10 +233,10 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 		if (spllist[i].Equals(name) ) {
 			// iterate over table columns ("kits" - book types)
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
-				if (clsmsk & (1<<type)) {
+				if (clsMask & (1 << type)) {
 					int level2 = spllist[i].FindSpell(type);
 					if (level2 == -1) {
-						Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name, type);
+						Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
 						level2 = 0; // internal 0-indexed level
 					}
 					level = level2;
@@ -247,7 +247,7 @@ int CREImporter::FindSpellType(char *name, unsigned short &level, unsigned int c
 		}
 	}
 
-	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name, clsmsk, kit);
+	Log(ERROR, "CREImporter", "Could not find spell (%s) booktype! %d, %d!", name.CString(), clsMask, kit);
 	// pseudorandom fallback
 	return IE_IWD2_SPELL_WIZARD;
 }
@@ -259,28 +259,20 @@ static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type
 		return -1;
 	}
 
+	int ret;
 	switch(type)
 	{
 	case IE_IWD2_SPELL_INNATE:
-		for (int i = 0; i < inncount; i++) {
-			if(!strnicmp(name, innlist[i], 8) ) {
-				return i;
-			}
-		}
+		ret = IsInnate(name);
+		if (ret != -1) return ret;
 		break;
 	case IE_IWD2_SPELL_SONG:
-		for (int i = 0; i < sngcount; i++) {
-			if(!strnicmp(name, snglist[i], 8) ) {
-				return i;
-			}
-		}
+		ret = IsSong(name);
+		if (ret != -1) return ret;
 		break;
 	case IE_IWD2_SPELL_SHAPE:
-		for (int i = 0; i < shpcount; i++) {
-			if(!strnicmp(name, shplist[i], 8) ) {
-				return i;
-			}
-		}
+		ret = IsShape(name);
+		if (ret != -1) return ret;
 		break;
 	case IE_IWD2_SPELL_DOMAIN:
 	default:
@@ -292,41 +284,40 @@ static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type
 }
 
 //input: index, level, type, kit
-static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
+static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType type, int kit)
 {
-	const ieResRef *ret;
-
 	if (level>=MAX_SPELL_LEVEL) {
-		return NULL;
+		return EmptyResRef;
 	}
 
-	switch(type)
-	{
+	switch (type) {
 	case IE_IWD2_SPELL_INNATE:
-		if (index>=inncount) {
-			return NULL;
+		if (index >= static_cast<int>(innlist.size())) {
+			return EmptyResRef;
 		}
-		return &innlist[index];
+		return innlist[index];
 	case IE_IWD2_SPELL_SONG:
-		if (index>=sngcount) {
-			return NULL;
+		if (index >= static_cast<int>(snglist.size())) {
+			return EmptyResRef;
 		}
-		return &snglist[index];
+		return snglist[index];
 	case IE_IWD2_SPELL_SHAPE:
-		if (index>=shpcount) {
-			return NULL;
+		if (index >= static_cast<int>(shplist.size())) {
+			return EmptyResRef;
 		}
-		return &shplist[index];
+		return shplist[index];
 	case IE_IWD2_SPELL_DOMAIN:
 		if (index>=splcount) {
-			return NULL;
+			return EmptyResRef;
 		}
 		// translate the actual kit to a column index to make them comparable
 		// luckily they are in order
 		kit = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
-		ret = domlist[index].FindSpell(level, kit);
-		if (ret) {
-			return ret;
+		{
+			const ResRef& ret = domlist[index].FindSpell(level, kit);
+			if (!ret.IsEmpty()) {
+				return ret;
+			}
 		}
 		// sigh, retry with wizard spells, since the table does not cover everything npcs have
 		kit = -1;
@@ -339,9 +330,11 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 		// translate the actual kit to a column index to make them comparable
 		kit = std::log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
-		ret = maglist[index].FindSpell(level, kit);
-		if ( ret) {
-			return ret;
+		{
+			const ResRef& ret = maglist[index].FindSpell(level, kit);
+			if (!ret.IsEmpty()) {
+				return ret;
+			}
 		}
 		//fall through
 	default:
@@ -351,8 +344,8 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 	}
 
 	// type matches the table columns (0-bard to 6-wizard)
-	ret = spllist[index].FindSpell(level, type);
-	if (!ret) {
+	const ResRef& ret = spllist[index].FindSpell(level, type);
+	if (ret.IsEmpty()) {
 		// some npcs have spells at odd levels, so the lookup just failed
 		// eg. slayer knights of xvim with sppr325 at level 2 instead of 3
 		Log(ERROR, "CREImporter", "Spell (%d of type %d) found at unexpected level (%d)!", index, type, level);
@@ -362,10 +355,13 @@ static const ieResRef *ResolveSpellIndex(int index, int level, ieIWD2SpellType t
 			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
 			return spllist[index].GetSpell();
 		}
-		ret = spllist[index].FindSpell(level2, type);
-		if (ret) Log(DEBUG, "CREImporter", "The spell was found at level %d!", level2);
+		const ResRef& ret = spllist[index].FindSpell(level2, type);
+		if (!ret.IsEmpty()) {
+			Log(DEBUG, "CREImporter", "The spell was found at level %d!", level2);
+			return ret;
+		}
 	}
-	if (ret || (kit==-1) ) {
+	if (!ret.IsEmpty() || kit == -1) {
 		return ret;
 	}
 
@@ -393,44 +389,24 @@ static void ReleaseMemoryCRE()
 		maglist = NULL;
 	}
 	magcount = -1;
-
-	if (innlist) {
-		free(innlist);
-		innlist = NULL;
-	}
-	inncount = -1;
-
-	if(snglist) {
-		free(snglist);
-		snglist = NULL;
-	}
-	sngcount = -1;
-
-	if(shplist) {
-		free(shplist);
-		shplist = NULL;
-	}
-	shpcount = -1;
+	innlist.clear();
+	snglist.clear();
+	shplist.clear();
 }
 
-static ieResRef *GetSpellTable(const ieResRef tableresref, int &count)
+static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 {
-	count = 0;
-	AutoTable tab(tableresref);
-	if (!tab)
-		return 0;
+	AutoTable tab(tableRef);
+	if (!tab) return;
 
-	int column = tab->GetColumnCount()-1;
-	if (column<0) {
-		return 0;
-	}
+	int column = tab->GetColumnCount() - 1;
+	if (column < 0) return;
 
-	count = tab->GetRowCount();
-	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
-	for(int i = 0; i<count;i++) {
-		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
+	int count = tab->GetRowCount();
+	list.resize(count);
+	for (int i = 0; i < count; i++) {
+		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column));
 	}
-	return reslist;
 }
 
 // different tables, but all use listspll.2da for the spell indices
@@ -461,13 +437,13 @@ static SpellEntry *GetKitSpell(const ieResRef tableresref, int &count)
 			index = i;
 		} else {
 			// find the correct index in listspll.2da
-			ieResRef spellref;
-			strnlwrcpy(spellref, tab->QueryField(i, lastCol), 8);
+			ResRef spellRef;
+			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol));
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
-			if (spellref[0] == '*') {
+			if (spellRef.IsStar()) {
 				continue;
 			}
-			index = FindSpell(spellref, spllist, splcount);
+			index = FindSpell(spellRef, spllist, splcount);
 			assert (index != -1);
 		}
 		reslist[index].SetSpell(tab->QueryField(i, lastCol));
@@ -485,9 +461,9 @@ static void InitSpellbook()
 	}
 
 	if (core->HasFeature(GF_HAS_SPELLLIST)) {
-		innlist = GetSpellTable("listinnt", inncount);
-		snglist = GetSpellTable("listsong", sngcount);
-		shplist = GetSpellTable("listshap", shpcount);
+		GetSpellTable("listinnt", innlist);
+		GetSpellTable("listsong", snglist);
+		GetSpellTable("listshap", shplist);
 		spllist = GetKitSpell("listspll", splcount); // need to init this one first, since the other two rely on it
 		maglist = GetKitSpell("listmage", magcount);
 		domlist = GetKitSpell("listdomn", domcount);
@@ -1348,7 +1324,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	while(i--) {
 		if (memorized_spells[i]) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
-				memorized_spells[i]->SpellResRef);
+				memorized_spells[i]->SpellResRef.CString());
 			delete memorized_spells[i];
 		}
 	}
@@ -1653,8 +1629,8 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		str->ReadDword(memocount);
 		str->ReadDword(tmpDword);
 		check+=totalcount;
-		const ieResRef *tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
-		if (!tmp) {
+		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
+		if (tmp.IsEmpty()) {
 			error("CREImporter", "Unresolved spell index: %d level:%d, type: %d",
 				spellindex, level+1, type);
 		}
@@ -1662,7 +1638,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		CREKnownSpell *known = new CREKnownSpell;
 		known->Level = level;
 		known->Type = type;
-		strnlwrcpy(known->SpellResRef, *tmp, 8);
+		strnlwrcpy(known->SpellResRef, tmp.CString(), 8);
 		sm->known_spells.push_back(known);
 		while (memocount--) {
 			if (totalcount) {
@@ -1673,13 +1649,13 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 			}
 			CREMemorizedSpell *memory = new CREMemorizedSpell;
 			memory->Flags = 1;
-			strnlwrcpy(memory->SpellResRef, *tmp, 8);
+			memory->SpellResRef = ResRef::MakeLowerCase(tmp);
 			sm->memorized_spells.push_back(memory);
 		}
 		while(totalcount--) {
 			CREMemorizedSpell *memory = new CREMemorizedSpell;
 			memory->Flags = 0;
-			strnlwrcpy(memory->SpellResRef, *tmp, 8);
+			memory->SpellResRef = ResRef::MakeLowerCase(tmp);
 			sm->memorized_spells.push_back(memory);
 		}
 	}

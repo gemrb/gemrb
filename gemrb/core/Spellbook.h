@@ -94,7 +94,7 @@ struct CREKnownSpell {
 };
 
 struct CREMemorizedSpell {
-	ieResRef SpellResRef;
+	ResRef SpellResRef;
 	ieDword Flags;
 };
 
@@ -142,7 +142,7 @@ private:
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 	/** Depletes a sorcerer type spellpage by one */
-	void DepleteLevel(CRESpellMemorization* sm, const ieResRef except);
+	void DepleteLevel(CRESpellMemorization* sm, const ResRef& except);
 	/** Adds a single spell to the spell info list */
 	void AddSpellInfo(unsigned int level, unsigned int type, const ieResRef name, unsigned int idx);
 	/** regenerates the spellinfo list */
@@ -150,7 +150,7 @@ private:
 	/** looks up the spellinfo list for an element */
 	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name) const;
 	/** removes all instances of a spell from a given page */
-	void RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef);
+	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
 	bool AddKnownSpell(CREKnownSpell *spl, int memo);
 	/** Adds a new CRESpellMemorization, to the *end* only */

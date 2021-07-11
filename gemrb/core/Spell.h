@@ -117,10 +117,10 @@ public:
 	Effect* casting_features;
 
 	/** Resref of the spell itself */
-	ieResRef Name;
+	ResRef Name;
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
-	ieResRef CompletionSound;
+	ResRef CompletionSound;
 	ieDword Flags;
 	ieWord SpellType;
 	ieWord ExclusionSchool;
@@ -134,7 +134,7 @@ public:
 	ieDword unknown4;
 	ieDword SpellLevel;
 	ieWord unknown5;
-	ieResRef SpellbookIcon;
+	ResRef SpellbookIcon;
 	ieWord unknown6;
 	ieDword unknown7;
 	ieDword unknown8;

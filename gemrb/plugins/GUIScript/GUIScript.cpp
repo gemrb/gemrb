@@ -8448,7 +8448,7 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	return Py_BuildValue("{s:s,s:i}", "SpellResRef", ms->SpellResRef, "Flags", ms->Flags);
+	return Py_BuildValue("{s:s,s:i}", "SpellResRef", ms->SpellResRef.CString(), "Flags", ms->Flags);
 }
 
 
@@ -8503,17 +8503,17 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SpellType));
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong ((signed) spell->SpellName));
 	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong ((signed) spell->SpellDesc));
-	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromIEResRef (spell->SpellbookIcon));
+	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef(spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellExclusion", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
 	PyDict_SetItemString(dict, "SpellSecondary", PyInt_FromLong (spell->SecondaryType));
 	PyDict_SetItemString(dict, "SpellLevel", PyInt_FromLong (spell->SpellLevel));
-	PyDict_SetItemString(dict, "Completion", PyString_FromIEResRef (spell->CompletionSound));
+	PyDict_SetItemString(dict, "Completion", PyString_FromResRef(spell->CompletionSound));
 	PyDict_SetItemString(dict, "SpellTargetType", PyInt_FromLong (spell->GetExtHeader(0)->Target));
 	PyDict_SetItemString(dict, "HeaderFlags", PyInt_FromLong (spell->Flags));
 	PyDict_SetItemString(dict, "NonHostile", PyInt_FromLong (!(spell->Flags&SF_HOSTILE) && !spell->ContainsDamageOpcode()));
-	PyDict_SetItemString(dict, "SpellResRef", PyString_FromIEResRef (spell->Name));
+	PyDict_SetItemString(dict, "SpellResRef", PyString_FromResRef(spell->Name));
 	gamedata->FreeSpell( spell, ResRef, false );
 	return dict;
 }

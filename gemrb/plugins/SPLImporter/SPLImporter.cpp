@@ -131,9 +131,12 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadWord(s->unknown5);
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
-	if (s->SpellbookIcon[0] && core->HasFeature(GF_SPELLBOOKICONHACK)) {
+	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
 		size_t i = strlen(s->SpellbookIcon);
-		if (i) s->SpellbookIcon[i-1]='c';
+		ieResRef tmp;
+		CopyResRef(tmp, s->SpellbookIcon);
+		if (i) tmp[i-1]='c';
+		s->SpellbookIcon = tmp;
 	}
 
 	str->ReadWord(s->unknown6);
@@ -242,7 +245,7 @@ void SPLImporter::GetFeature(Spell *s, Effect *fx)
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	eM->GetEffect( fx );
-	memcpy(fx->Source, s->Name, 9);
+	memcpy(fx->Source, s->Name.CString(), 9);
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
 }

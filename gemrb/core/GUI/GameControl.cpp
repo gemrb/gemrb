@@ -1817,7 +1817,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -1884,7 +1884,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
 		}
 	} else {
 		action->int0Parameter = spellSlot;

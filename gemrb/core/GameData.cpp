@@ -318,7 +318,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 
 	spell = new Spell();
 	//this is required for storing the 'source'
-	strnlwrcpy(spell->Name, resname, 8);
+	spell->Name = ResRef::MakeLowerCase(resname);
 	sm->GetSpell( spell, silent );
 
 	SpellCache.SetAt(resname, (void *) spell);
@@ -332,7 +332,7 @@ void GameData::FreeSpell(Spell *spl, const ResRef &name, bool free)
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
-			name.CString(), spl->Name);
+			name.CString(), spl->Name.CString());
 	}
 	if (res) return;
 	if (free) delete spl;
