@@ -127,7 +127,8 @@ jobs:
     - name: Test 1
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: cd build && gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
+        run: gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
+        working-directory: build
 
     - name: Prepare AppImage
       run: |
