@@ -62,24 +62,7 @@ const char* InterfaceConfig::GetValueForKey(const char* key) const
 	}
 	return value;
 }
-/*
-Currently unused. does not compile under MSVC.
 
-FIXME: if we need this we should consider having one version of GetValueForKey call the other
-
-const std::string* InterfaceConfig::GetValueForKey(std::string* key) const
-{
-	const std::string* value = NULL;
-	if (key) {
-		std::string* keyCopy = key;
-		std::transform(keyCopy->begin(), keyCopy->end(), keyCopy->begin(),
-					   (int(*)(int)) std::tolower);
-		value = configVars->get(keyCopy->c_str());
-		delete keyCopy;
-	}
-	return value;
-}
-*/	
 CFGConfig::CFGConfig(int argc, char *argv[])
 	: InterfaceConfig(argc, argv)
 {
