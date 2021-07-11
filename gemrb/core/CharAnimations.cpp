@@ -408,18 +408,17 @@ void CharAnimations::SetupColors(PaletteType type)
 	} else if (PType && (type <= PAL_MAIN_5)) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
-			ieResRef newResRef;
 			ResRef oldResRef = PaletteResRef[type];
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
-				snprintf(newResRef, 9, "%.4s_%-.2s%c", ResRefBase.CString(), (char *) &PType, '1' + type);
+				PaletteResRef[type].SNPrintF("%.4s_%-.2s%c", ResRefBase.CString(), (char *) &PType, '1' + type);
 			} else {
 				if (ResRefBase == "MFIE") { // hack for magic golems
-					snprintf(newResRef, 9, "%.4s%-.2sB", ResRefBase.CString(), (char *) &PType);
+					PaletteResRef[type].SNPrintF("%.4s%-.2sB", ResRefBase.CString(), (char *) &PType);
 				} else {
-					snprintf(newResRef, 9, "%.4s_%-.2s", ResRefBase.CString(), (char *) &PType);
+					PaletteResRef[type].SNPrintF("%.4s_%-.2s", ResRefBase.CString(), (char *) &PType);
 				}
 			}
-			PaletteResRef[type] = ResRef::MakeLowerCase(newResRef);
+			PaletteResRef[type] = ResRef::MakeLowerCase(PaletteResRef[type]);
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
 				gamedata->FreePalette(PartPalettes[type], oldResRef);

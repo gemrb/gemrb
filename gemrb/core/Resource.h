@@ -82,6 +82,13 @@ public:
 		return ref;
 	}
 
+	void SNPrintF(const char* format, ...) {
+		va_list args;
+		va_start(args, format);
+		snprintf(ref, sizeof(ref), format, args);
+		va_end(args);
+	}
+
 	ResRef& operator=(const ResRef& rhs) {
 		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
 		return *this;
