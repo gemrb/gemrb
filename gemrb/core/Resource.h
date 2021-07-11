@@ -111,6 +111,10 @@ public:
 		return (ref[0] == '\0');
 	}
 
+	bool IsStar() const {
+		return (ref[0] == '*');
+	}
+
 	const char* CString() const { return ref; }
 
 	operator const char*() const {
