@@ -104,7 +104,7 @@ void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
 	delete sm;
 }
 
-// FIXME: exclude slayer, all bhaal innates?
+// TODO: exclude slayer, pocket plane, perhaps also bhaal innates?
 void Spellbook::CopyFrom(const Actor *source)
 {
 	if (!source) {
