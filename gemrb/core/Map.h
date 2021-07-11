@@ -438,7 +438,7 @@ public:
 	void AddTileMap(TileMap *tm, Image *lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
 	void AutoLockDoors() const;
 	void UpdateScripts();
-	void ResolveTerrainSound(ieResRef &sound, const Point &pos) const;
+	void ResolveTerrainSound(ResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */

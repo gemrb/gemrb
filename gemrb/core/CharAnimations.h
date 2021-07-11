@@ -130,7 +130,7 @@ struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
 	unsigned int PaletteType;
-	ieResRef Prefixes[4];
+	ResRef Prefixes[4];
 	unsigned char AnimationType;
 	unsigned char CircleSize;
 	char Size;
@@ -145,13 +145,13 @@ struct AvatarStruct {
 	int Bestiary;
 
 	/* comes from walksnd.2da */
-	ieResRef WalkSound;
+	ResRef WalkSound;
 	ieByte WalkSoundCount;
 
 	/* comes from stances.2da */
 	unsigned char StanceOverride[MAX_ANIMS];
 
-	ieResRef ShadowAnimation;
+	ResRef ShadowAnimation;
 };
 
 struct EquipResRefData;
@@ -215,9 +215,9 @@ public: //attribute functions
 	int GetSize() const;
 	int GetBloodColor() const;
 	unsigned int GetFlags() const;
-	const ieResRef &GetWalkSound() const;
+	const ResRef &GetWalkSound() const;
 	int GetWalkSoundCount() const;
-	const ieResRef &GetArmourLevel(int ArmourLevel) const;
+	const ResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
 	void DebugDump() const;
 private:

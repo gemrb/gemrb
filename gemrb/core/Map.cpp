@@ -875,12 +875,12 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-void Map::ResolveTerrainSound(ieResRef &sound, const Point &Pos) const
+void Map::ResolveTerrainSound(ResRef &sound, const Point &Pos) const
 {
 	for(int i=0;i<tsndcount;i++) {
-		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
+		if (sound == terrainsounds[i].Group) {
 			int type = MaterialMap[Pos.x/16 + Pos.y/12 * mapSize.w];
-			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
+			sound = terrainsounds[i].Sounds[type];
 			return;
 		}
 	}

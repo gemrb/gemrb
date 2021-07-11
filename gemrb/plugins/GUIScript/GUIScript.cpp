@@ -9874,9 +9874,7 @@ static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	ieResRef prefix;
-	strnuprcpy(prefix, actor->GetAnims()->GetArmourLevel(col), sizeof(ieResRef)-1);
-
+	ResRef prefix = ResRef::MakeUpperCase(actor->GetAnims()->GetArmourLevel(col));
 	return PyString_FromResRef(prefix);
 }
 

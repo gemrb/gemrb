@@ -4833,34 +4833,35 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 void Actor::PlayWalkSound()
 {
-	ieResRef Sound;
-
 	tick_t thisTime = GetTicks();
 	if (thisTime<nextWalk) return;
 	int cnt = anims->GetWalkSoundCount();
 	if (!cnt) return;
 
 	cnt=core->Roll(1,cnt,-1);
-	strnuprcpy(Sound, anims->GetWalkSound(), sizeof(ieResRef)-1 );
+	ResRef Sound = ResRef::MakeUpperCase(anims->GetWalkSound());
 	area->ResolveTerrainSound(Sound, Pos);
 
-	if (Sound[0] == '*') return;
+	if (Sound.IsStar()) return;
 
 	int l = strlen(Sound);
+	ieResRef Sound2; // bleh
+	CopyResRef(Sound2, Sound.CString());
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
 		if (l < 8) {
-			Sound[l] = cnt + 0x31;
-			Sound[l+1] = 0;
+			Sound2[l] = cnt + 0x31;
+			Sound2[l+1] = 0;
 		}
 	} else {
 		if (cnt) {
 			if (l < 8) {
-				Sound[l] = cnt + 0x60; // append 'a'-'g'
-				Sound[l+1] = 0;
+				Sound2[l] = cnt + 0x60; // append 'a'-'g'
+				Sound2[l+1] = 0;
 			}
 		}
 	}
+	Sound = Sound2;
 
 	unsigned int len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;

@@ -284,7 +284,7 @@ void Projectile::GetSmokeAnim()
 	for(int i=0;i<AvatarsRowNum;i++) {
 		AvatarStruct *as = CharAnimations::GetAvatarStruct(i);
 		if (as->AnimID==SmokeAnimID) {
-			memcpy(smokebam, as->Prefixes, sizeof(ieResRef) );
+			memcpy(smokebam, as->Prefixes[0].CString(), sizeof(ieResRef));
 			return;
 		}
 	}

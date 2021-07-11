@@ -155,9 +155,9 @@ void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 	}
 }
 
-static ieResRef EmptySound={0};
+static constexpr ResRef EmptySound = {};
 
-const ieResRef &CharAnimations::GetWalkSound() const
+const ResRef &CharAnimations::GetWalkSound() const
 {
 	if(AvatarsRowNum==~0u) return EmptySound;
 	return AvatarTable[AvatarsRowNum].WalkSound;
@@ -181,13 +181,13 @@ int CharAnimations::GetActorPartCount() const
 	case IE_ANI_TWO_PIECE:   //ankheg animations
 		return 2;
 	case IE_ANI_PST_GHOST:   //special pst anims
-		if (AvatarTable[AvatarsRowNum].Prefixes[1][0]=='*') {
+		if (AvatarTable[AvatarsRowNum].Prefixes[1].IsStar()) {
 			return 1;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[2][0]=='*') {
+		if (AvatarTable[AvatarsRowNum].Prefixes[2].IsStar()) {
 			return 2;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[3][0]=='*') {
+		if (AvatarTable[AvatarsRowNum].Prefixes[3].IsStar()) {
 			return 3;
 		}
 		return 4;
@@ -212,7 +212,7 @@ int CharAnimations::GetTotalPartCount() const
 	}
 }
 
-const ieResRef& CharAnimations::GetArmourLevel(int ArmourLevel) const
+const ResRef& CharAnimations::GetArmourLevel(int ArmourLevel) const
 {
 	//ignore ArmourLevel for the static pst anims (all sprites are displayed)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
@@ -228,7 +228,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
 		ArmourLevel = 0;
 	}
-	CopyResRef(ResRefBase, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel]);
+	CopyResRef(ResRefBase, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel].CString());
 	DropAnims();
 }
 
@@ -509,10 +509,10 @@ void CharAnimations::InitAvatarsTable()
 	DataFileMgr *resdata = core->GetResDataINI();
 	while(i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
-		strnlwrcpy(AvatarTable[i].Prefixes[0],Avatars->QueryField(i,AV_PREFIX1),8);
-		strnlwrcpy(AvatarTable[i].Prefixes[1],Avatars->QueryField(i,AV_PREFIX2),8);
-		strnlwrcpy(AvatarTable[i].Prefixes[2],Avatars->QueryField(i,AV_PREFIX3),8);
-		strnlwrcpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
+		AvatarTable[i].Prefixes[0] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX1));
+		AvatarTable[i].Prefixes[1] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX2));
+		AvatarTable[i].Prefixes[2] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX3));
+		AvatarTable[i].Prefixes[3] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX4));
 		AvatarTable[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
 		AvatarTable[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
 		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
@@ -607,7 +607,7 @@ void CharAnimations::InitAvatarsTable()
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
-				memcpy(AvatarTable[j].WalkSound, value, sizeof(ieResRef) );
+				AvatarTable[j].WalkSound = value;
 				AvatarTable[j].WalkSoundCount = (unsigned int) range;
 			}
 		}
@@ -650,7 +650,7 @@ void CharAnimations::InitAvatarsTable()
 					break;
 				}
 				if (AvatarTable[j].AnimID == id) {
-					strnlwrcpy(AvatarTable[j].ShadowAnimation, avatarShadows->QueryField(i, 0), 4);
+					AvatarTable[j].ShadowAnimation = ResRef::MakeLowerCase(avatarShadows->QueryField(i, 0));
 					break;
 				}
 			}
@@ -1308,12 +1308,12 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 
 	Animation** animations = NULL;
 
-	if (AvatarTable[AvatarsRowNum].ShadowAnimation[0]) {
+	if (!AvatarTable[AvatarsRowNum].ShadowAnimation.IsEmpty()) {
 		int partCount = GetTotalPartCount();
 		animations = new Animation*[partCount];
 
 		char shadowName[12] = {0};
-		memcpy(shadowName, AvatarTable[AvatarsRowNum].ShadowAnimation, 4);
+		memcpy(shadowName, AvatarTable[AvatarsRowNum].ShadowAnimation.CString(), 4);
 
 		for (int i = 0; i < partCount; ++i) {
 			animations[i] = NULL;
@@ -1491,7 +1491,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 		case IE_ANI_PST_GHOST: // pst static animations
 			//still doesn't handle the second cycle of the golem anim
 			Cycle = 0;
-			strnlwrcpy(NewResRef, AvatarTable[AvatarsRowNum].Prefixes[Part], 8);
+			strnlwrcpy(NewResRef, AvatarTable[AvatarsRowNum].Prefixes[Part].CString(), 8);
 			break;
 		default:
 			error("CharAnimations", "Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
