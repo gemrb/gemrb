@@ -2614,7 +2614,7 @@ void Object::dump() const
 
 void Object::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	if(objectName[0]) {
 		buffer.appendFormatted("Object: %s\n",objectName);
 		return;
@@ -2657,7 +2657,7 @@ void Trigger::dump() const
 
 void Trigger::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Trigger: %d\n", triggerID);
 	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
@@ -2680,7 +2680,7 @@ void Action::dump() const
 
 void Action::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);

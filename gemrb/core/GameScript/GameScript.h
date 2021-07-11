@@ -31,13 +31,6 @@
 #include <cstdio>
 #include <vector>
 
-// absent from msvc6
-#ifdef _MSC_VER
-#ifndef __FUNCTION__
-#define __FUNCTION__ "no message"
-#endif
-#endif
-
 namespace GemRB {
 
 class Action;
@@ -338,7 +331,7 @@ public:
 
 	void Release()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		if (!RefCount) {
 			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__);
@@ -350,7 +343,7 @@ public:
 	}
 	void IncRef()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		RefCount++;
 		if (RefCount >= 65536) {
 			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
