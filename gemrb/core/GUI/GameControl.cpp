@@ -2011,7 +2011,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			return false;
 		case ST_TRIGGER:
 			// pst, eg. ar1500
-			if (trap->GetDialog()[0]) {
+			if (!trap->GetDialog().IsEmpty()) {
 				trap->AddAction(GenerateAction("Dialogue([PC])"));
 				return true;
 			}
