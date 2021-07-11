@@ -124,10 +124,11 @@ jobs:
         # install big demo data only on tag pushes
         if grep -q '^v[01]\.[0-9].[0-9]' <<< "${GITHUB_REF}"; then make fetch-demo-data; fi
 
-#    - name: Test 1
-#      run: |
-#        cd build
-#        gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
+    - name: Test 1
+      uses: Yuri6037/Action-FakeTTY@v1
+      run: |
+        cd build
+        faketty gemrb/gemrb -q -c ../gemrb/GemRB.cfg.noinstall.sample
 
     - name: Prepare AppImage
       run: |
