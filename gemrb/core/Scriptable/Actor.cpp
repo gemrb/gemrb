@@ -5103,6 +5103,7 @@ void Actor::SetMap(Map *map)
 			case SLOT_EFFECT_FIST:
 			case SLOT_EFFECT_MELEE:
 			case SLOT_EFFECT_MISSILE:
+			// TODO: is SLOT_EFFECT_ALIAS missing here — at least for pst aliased weapon slots?
 				break;
 			default:
 				inventory.EquipItem( Slot );

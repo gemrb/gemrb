@@ -155,7 +155,6 @@ Interface::Interface()
 	CurrentContainer = NULL;
 	UseContainer = false;
 	displaymsg = NULL;
-	slottypes = NULL;
 	slotmatrix = NULL;
 
 	UseCorruptedHack = false;
@@ -339,7 +338,7 @@ Interface::~Interface(void)
 
 	FreeResRefTable(DefSound, DSCount);
 
-	free( slottypes );
+	slotTypes.clear();
 	free( slotmatrix );
 	itemtypedata.clear();
 
@@ -3395,47 +3394,42 @@ bool Interface::InitItemTypes()
 	//slottype describes the inventory structure
 	Inventory::Init();
 	AutoTable st("slottype");
-	if (slottypes) {
-		free(slottypes);
-		slottypes = NULL;
-	}
 	SlotTypes = 0;
 	if (st) {
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
-		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
-		memset(slottypes, -1, SlotTypes * sizeof(SlotType) );
+		slotTypes.resize(SlotTypes);
 		for (unsigned int row = 0; row < SlotTypes; row++) {
 			bool alias;
 			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
 			if (i>=SlotTypes) continue;
-			if (slottypes[i].sloteffects!=0xffffffffu) {
-				slottypes[row].slot = i;
+			if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
+				slotTypes[row].slot = i;
 				i=row;
 				alias = true;
 			} else {
-				slottypes[row].slot = i;
+				slotTypes[row].slot = i;
 				alias = false;
 			}
-			slottypes[i].slottype = (ieDword) strtol(st->QueryField(row,0),NULL,0 );
-			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
-			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
-			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
-			slottypes[i].slotflags = (ieDword) strtol(st->QueryField(row,5),NULL,0 );
+			slotTypes[i].slotType = (ieDword) strtol(st->QueryField(row, 0), nullptr, 0);
+			slotTypes[i].slotID = (ieDword) strtol(st->QueryField(row, 1), nullptr, 0);
+			slotTypes[i].slotResRef = st->QueryField(row, 2);
+			slotTypes[i].slotTip = (ieDword) strtol(st->QueryField(row, 3), nullptr, 0);
+			slotTypes[i].slotFlags = (ieDword) strtol(st->QueryField(row, 5), nullptr, 0);
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
 			}
-			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
+			slotTypes[i].slotEffects = (ieDword) strtol(st->QueryField(row, 4), nullptr, 0);
 			//setting special slots
-			if (slottypes[i].slottype&SLOT_ITEM) {
-				if (slottypes[i].slottype&SLOT_INVENTORY) {
+			if (slotTypes[i].slotType & SLOT_ITEM) {
+				if (slotTypes[i].slotType & SLOT_INVENTORY) {
 					Inventory::SetInventorySlot(i);
 				} else {
 					Inventory::SetQuickSlot(i);
 				}
 			}
-			switch (slottypes[i].sloteffects) {
+			switch (slotTypes[i].slotEffects) {
 				//fist slot, not saved, default weapon
 			case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
 				//magic weapon slot, overrides all weapons
@@ -3460,7 +3454,7 @@ bool Interface::InitItemTypes()
 ieDword Interface::FindSlot(unsigned int idx) const
 {
 	for (ieDword i = 0; i < SlotTypes; i++) {
-		if (idx == slottypes[i].slot) {
+		if (idx == slotTypes[i].slot) {
 			return i;
 		}
 	}
@@ -3472,7 +3466,7 @@ ieDword Interface::QuerySlot(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slot;
+	return slotTypes[idx].slot;
 }
 
 ieDword Interface::QuerySlotType(unsigned int idx) const
@@ -3480,7 +3474,7 @@ ieDword Interface::QuerySlotType(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slottype;
+	return slotTypes[idx].slotType;
 }
 
 ieDword Interface::QuerySlotID(unsigned int idx) const
@@ -3488,7 +3482,7 @@ ieDword Interface::QuerySlotID(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slotid;
+	return slotTypes[idx].slotID;
 }
 
 ieDword Interface::QuerySlottip(unsigned int idx) const
@@ -3496,7 +3490,7 @@ ieDword Interface::QuerySlottip(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slottip;
+	return slotTypes[idx].slotTip;
 }
 
 ieDword Interface::QuerySlotEffects(unsigned int idx) const
@@ -3504,7 +3498,7 @@ ieDword Interface::QuerySlotEffects(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].sloteffects;
+	return slotTypes[idx].slotEffects;
 }
 
 ieDword Interface::QuerySlotFlags(unsigned int idx) const
@@ -3512,7 +3506,7 @@ ieDword Interface::QuerySlotFlags(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slotflags;
+	return slotTypes[idx].slotFlags;
 }
 
 const char *Interface::QuerySlotResRef(unsigned int idx) const
@@ -3520,7 +3514,7 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return "";
 	}
-	return slottypes[idx].slotresref;
+	return slotTypes[idx].slotResRef;
 }
 
 int Interface::GetArmorFailure(unsigned int itemtype) const

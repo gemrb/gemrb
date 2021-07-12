@@ -5871,7 +5871,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		return dict;
 	}
 	int tmp = core->QuerySlot(idx);
-	if (core->QuerySlotEffects(idx)==0xffffffffu) {
+	if (core->QuerySlotEffects(idx) == SLOT_EFFECT_ALIAS) {
 		tmp=idx;
 	}
 

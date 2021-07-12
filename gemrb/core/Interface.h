@@ -102,12 +102,12 @@ struct Symbol {
 
 struct SlotType {
 	ieDword slot;
-	ieDword slottype;
-	ieDword slottip;
-	ieDword slotid;
-	ieDword sloteffects;
-	ieDword slotflags;
-	ieResRef slotresref;
+	ieDword slotType;
+	ieDword slotTip;
+	ieDword slotID;
+	ieDword slotEffects = 100; // SLOT_EFFECT_ALIAS
+	ieDword slotFlags;
+	ResRef slotResRef;
 };
 
 struct DamageInfoStruct {
@@ -264,6 +264,7 @@ public:
 #define SLOT_EFFECT_MISSILE  5 //quiver slots
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
 #define SLOT_EFFECT_HEAD     7 //head slot
+#define SLOT_EFFECT_ALIAS    100 // marker for aliased slots
 
 enum PluginFlagsType {
 	PLF_NORMAL,
@@ -378,7 +379,7 @@ private:
 
 	ieDword* slotmatrix; //itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
-	SlotType* slottypes;
+	std::vector<SlotType> slotTypes;
 	int ItemTypes;
 
 	// Currently dragged item or NULL
