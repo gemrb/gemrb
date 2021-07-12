@@ -42,7 +42,7 @@ std::vector<std::vector<unsigned char>> randcolors; // it's likely not important
 static std::vector<ResRef> innlist; //IE_IWD2_SPELL_INNATE
 static std::vector<ResRef> snglist; //IE_IWD2_SPELL_SONG
 static std::vector<ResRef> shplist; //IE_IWD2_SPELL_SHAPE
-static constexpr ResRef EmptyResRef = {};
+static const ResRef EmptyResRef;
 
 struct LevelAndKit
 {
