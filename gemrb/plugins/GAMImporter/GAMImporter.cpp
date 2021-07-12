@@ -963,7 +963,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
 				stream->Write(filling,8);
 			} else {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			}
 		}
 		//quick spell classes, clear the field for iwd2 if it is
@@ -980,7 +980,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 		memset(filling,0,sizeof(filling) );
 	} else {
 		for (int i = 0; i < 3; i++) {
-			stream->Write(ac->PCStats->QuickSpells[i],8);
+			stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 		}
 	}
 
@@ -1008,14 +1008,14 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->Write(filling,8);
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xfe) {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->Write(filling,8);
 			}
