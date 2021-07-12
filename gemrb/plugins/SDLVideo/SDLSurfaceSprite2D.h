@@ -51,7 +51,7 @@ protected:
 	mutable version_t palVersion = 0;
 	
 	void SetPaletteFromSurface() const noexcept;
-	int SetPaletteColors(const Color* pal) const noexcept;
+	bool SetPaletteColors(const Color* pal) const noexcept;
 	void UpdatePalette(PaletteHolder) noexcept override;
 	void UpdateColorKey(colorkey_t key) noexcept override;
 

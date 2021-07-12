@@ -564,11 +564,11 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 
 // static class methods
 
-int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
+bool SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
 {
 	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-		return SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		return SDL_SetPaletteColors(surf->format->palette, pal, 0, numcolors) == 0;
 #else
 		// const_cast because SDL doesnt alter this and we want our interface to be const correct
 		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );

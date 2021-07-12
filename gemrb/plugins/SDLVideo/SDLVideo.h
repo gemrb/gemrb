@@ -111,7 +111,7 @@ private:
 							   double anglefrom, double angleto, bool drawlines, BlitFlags flags) override;
 public:
 	// static functions for manipulating surfaces
-	static int SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
+	static bool SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors = 256);
 };
 
 }
