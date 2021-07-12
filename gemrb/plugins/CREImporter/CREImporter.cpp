@@ -1203,17 +1203,17 @@ void CREImporter::GetActorPST(Actor *act)
 
 void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
-	ieWord *indices = (ieWord *) calloc(Inventory_Size, sizeof(ieWord));
-	ieWordSigned eqslot;
-	ieWord eqheader;
-
-	act->inventory.SetSlotCount(Inventory_Size+1);
-	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
+	act->inventory.SetSlotCount(Inventory_Size + 1);
+	str->Seek(ItemSlotsOffset + CREOffset, GEM_STREAM_START);
 
 	//first read the indices
-	for (unsigned int i = 0; i < Inventory_Size; i++) {
-		str->ReadWord(indices[i]);
+	std::vector<ieWord> indices(Inventory_Size);
+	for (auto& idx : indices) {
+		str->ReadWord(idx);
 	}
+
+	ieWordSigned eqslot;
+	ieWord eqheader;
 	//this word contains the equipping info (which slot is selected)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
@@ -1231,12 +1231,12 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		//the index was intentionally increased here, the fist slot isn't saved
 		ieWord index = indices[i++];
 		if (index != 0xffff) {
-			if (index>=ItemsCount) {
+			if (index >= ItemsCount) {
 				Log(ERROR, "CREImporter", "Invalid item index (%d) in creature!", index);
 				continue;
 			}
 			//20 is the size of CREItem on disc (8+2+3x2+4)
-			str->Seek( ItemsOffset+index*20 + CREOffset, GEM_STREAM_START );
+			str->Seek(ItemsOffset + index * 20 + CREOffset, GEM_STREAM_START);
 			//the core allocates this item data
 			CREItem *item = core->ReadItem(str);
 			int Slot = core->QuerySlot(i);
@@ -1255,69 +1255,68 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		act->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
 
-	free (indices);
+	indices.clear();
 
 	// Reading spellbook
-	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );//
-	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREMemorizedSpell *) );
+	std::vector<CREKnownSpell*> knownSpells;
+	std::vector<CREMemorizedSpell*> memorizedSpells;
+	knownSpells.resize(KnownSpellsCount);
+	memorizedSpells.resize(MemorizedSpellsCount);
 
-	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < KnownSpellsCount; i++) {
-		known_spells[i]=GetKnownSpell();
+	str->Seek(KnownSpellsOffset + CREOffset, GEM_STREAM_START);
+	for (auto& knownSpell : knownSpells) {
+		knownSpell = GetKnownSpell();
 	}
 
-	str->Seek( MemorizedSpellsOffset+CREOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < MemorizedSpellsCount; i++) {
-		memorized_spells[i]=GetMemorizedSpell();
+	str->Seek(MemorizedSpellsOffset + CREOffset, GEM_STREAM_START);
+	for (auto& memorizedSpell : memorizedSpells) {
+		memorizedSpell = GetMemorizedSpell();
 	}
 
-	str->Seek( SpellMemorizationOffset+CREOffset, GEM_STREAM_START );
+	str->Seek(SpellMemorizationOffset + CREOffset, GEM_STREAM_START);
 	for (unsigned int i = 0; i < SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization(act);
 
 		unsigned int j = KnownSpellsCount;
-		while(j--) {
-			CREKnownSpell* spl = known_spells[j];
+		while (j--) {
+			CREKnownSpell* spl = knownSpells[j];
 			if (!spl) {
 				continue;
 			}
-			if ((spl->Type == sm->Type) && (spl->Level == sm->Level)) {
-				sm->known_spells.push_back( spl );
-				known_spells[j] = NULL;
-				continue;
+			if (spl->Type == sm->Type && spl->Level == sm->Level) {
+				sm->known_spells.push_back(spl);
+				knownSpells[j] = nullptr;
 			}
 		}
-		for (j = 0; j < MemorizedCount; j++) {
+		for (unsigned int j = 0; j < MemorizedCount; j++) {
 			unsigned int k = MemorizedIndex + j;
 			assert(k < MemorizedSpellsCount);
-			if (memorized_spells[k]) {
-				sm->memorized_spells.push_back( memorized_spells[k]);
-				memorized_spells[k] = NULL;
+			if (memorizedSpells[k]) {
+				sm->memorized_spells.push_back(memorizedSpells[k]);
+				memorizedSpells[k] = nullptr;
 				continue;
 			}
 			Log(WARNING, "CREImporter", "Duplicate memorized spell(%d) in creature!", k);
 		}
 	}
 
-	unsigned int i = KnownSpellsCount;
-	while(i--) {
-		if (known_spells[i]) {
-			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
-				known_spells[i]->SpellResRef.CString());
-			delete known_spells[i];
+	for (auto knownSpell : knownSpells) {
+		if (knownSpell) {
+			Log(WARNING, "CREImporter", "Dangling known spell in creature: %s!",
+				knownSpell->SpellResRef.CString());
+			delete knownSpell;
 		}
 	}
-	free(known_spells);
+	knownSpells.clear();
 
-	i=MemorizedSpellsCount;
-	while(i--) {
-		if (memorized_spells[i]) {
+	for (auto memorizedSpell : memorizedSpells) {
+		if (memorizedSpell) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
-				memorized_spells[i]->SpellResRef.CString());
-			delete memorized_spells[i];
+				memorizedSpell->SpellResRef.CString());
+			delete memorizedSpell;
 		}
 	}
-	free(memorized_spells);
+	memorizedSpells.clear();
 }
 
 void CREImporter::ReadEffects(Actor *act)
