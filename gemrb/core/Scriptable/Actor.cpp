@@ -11405,7 +11405,7 @@ char Actor::GetArmorCode() const
 	return item->AnimationType[0];
 }
 
-const char* Actor::GetArmorSound() const
+ResRef Actor::GetArmorSound() const
 {
 	// Character has mage animation or is a non-mage wearing mage robes
 	if ((BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200) return "";
@@ -11414,7 +11414,7 @@ const char* Actor::GetArmorSound() const
 		return "";
 	}
 
-	char *sound = new char[9];
+	char sound[9] = {'\0'};
 	int maxChar = 6;
 	if (armorCode == '4') maxChar = 8;
 	if (IWDSound) {
@@ -11424,15 +11424,12 @@ const char* Actor::GetArmorSound() const
 		if (armorCode == '2') {
 			strcpy(sound, "A_LTHR");
 			sound[6] = suffixes[idx];
-			sound[7] = '\0';
 		} else if (armorCode == '3') {
 			strcpy(sound, "A_CHAIN");
 			sound[7] = suffixes[idx];
-			sound[8] = '\0';
 		} else { // 4
 			strcpy(sound, "A_PLATE");
 			sound[7] = suffixes[idx];
-			sound[8] = '\0';
 		}
 	} else {
 		// generate a 1 letter suffix or emulate an empty string
@@ -11445,9 +11442,8 @@ const char* Actor::GetArmorSound() const
 		strcpy(sound, "ARM_0");
 		sound[5] = armorCode;
 		sound[6] = randomASCII;
-		sound[7] = '\0';
 	}
-	return sound;
+	return ResRef(sound);
 }
 
 void Actor::PlayArmorSound() const
@@ -11464,10 +11460,9 @@ void Actor::PlayArmorSound() const
 	if (!game) return;
 	if (game->CombatCounter) return;
 
-	const char *armorSound = GetArmorSound();
-	if (armorSound[0]) {
+	ResRef armorSound = GetArmorSound();
+	if (!armorSound.IsEmpty()) {
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos);
-		delete[] armorSound;
 	}
 }
 

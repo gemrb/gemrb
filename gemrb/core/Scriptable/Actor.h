@@ -457,7 +457,7 @@ private:
 	void PlayExistenceSounds();
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
-	const char* GetArmorSound() const;
+	ResRef GetArmorSound() const;
 
 	bool AdvanceAnimations();
 	void UpdateDrawingRegion();
