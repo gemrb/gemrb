@@ -121,7 +121,7 @@ static void Blit(SDLPixelIterator src,
 
 template <typename BLENDER>
 static void BlitBlendedRect(SDLPixelIterator& src, SDLPixelIterator& dst,
-							BLENDER blender, Uint32 flags, IAlphaIterator* maskIt)
+							BLENDER blender, IAlphaIterator* maskIt)
 {
 	SDLPixelIterator dstend = SDLPixelIterator::end(dst);
 

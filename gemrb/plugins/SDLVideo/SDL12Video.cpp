@@ -374,23 +374,23 @@ void SDL12VideoDriver::BlitWithPipeline(SDLPixelIterator& src, SDLPixelIterator&
 	if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 		if (flags&BlitFlags::GREY) {
 			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(tint, BlendFn);
-			BlitBlendedRect(src, dst, blender, flags, maskIt);
+			BlitBlendedRect(src, dst, blender, maskIt);
 		} else if (flags&BlitFlags::SEPIA) {
 			RGBBlendingPipeline<SHADER::SEPIA, true> blender(tint, BlendFn);
-			BlitBlendedRect(src, dst, blender, flags, maskIt);
+			BlitBlendedRect(src, dst, blender, maskIt);
 		} else {
 			RGBBlendingPipeline<SHADER::TINT, true> blender(tint, BlendFn);
-			BlitBlendedRect(src, dst, blender, flags, maskIt);
+			BlitBlendedRect(src, dst, blender, maskIt);
 		}
 	} else if (flags&BlitFlags::GREY) {
 		RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(BlendFn);
-		BlitBlendedRect(src, dst, blender, flags, maskIt);
+		BlitBlendedRect(src, dst, blender, maskIt);
 	} else if (flags&BlitFlags::SEPIA) {
 		RGBBlendingPipeline<SHADER::SEPIA, true> blender(BlendFn);
-		BlitBlendedRect(src, dst, blender, flags, maskIt);
+		BlitBlendedRect(src, dst, blender, maskIt);
 	} else {
 		RGBBlendingPipeline<SHADER::NONE, true> blender(BlendFn);
-		BlitBlendedRect(src, dst, blender, flags, maskIt);
+		BlitBlendedRect(src, dst, blender, maskIt);
 	}
 }
 
