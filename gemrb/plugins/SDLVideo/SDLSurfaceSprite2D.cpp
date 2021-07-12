@@ -41,13 +41,14 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* pixels, const P
 
 	pitch = (*surface)->pitch;
 	assert(*surface);
-	original = surface;
 	
 	if (format.palette)
-		UpdatePalette(format.palette);
+		SetPaletteColors(format.palette->col);
 	UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, format.palette);
+	
+	original = surface;
 	
 	if (format.palette){
 		assert(*format.palette == *surface->palette);
@@ -77,14 +78,21 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 				format.Amask
 			)
 		);
-
-	original = surface;
-	if (format.Depth <= 8) {
+	
+	if (format.palette) {
 		SetPaletteColors(format.palette->col);
 	}
 	SetColorKey(obj.GetColorKey());
 	
+
 	format = PixelFormatForSurface(*surface, obj.format.palette);
+	
+	original = surface;
+	
+	if (format.palette){
+		assert(*format.palette == *surface->palette);
+		assert(*format.palette == *original->palette);
+	}
 }
 
 void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept

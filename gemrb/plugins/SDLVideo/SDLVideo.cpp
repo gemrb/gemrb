@@ -543,8 +543,8 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
 
-		SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
-		SDLPixelIterator beg(newV, r);
+		const Region& r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
 		SDLPixelIterator end = SDLPixelIterator::end(beg);
 		StaticAlphaIterator alpha(0xff);
 

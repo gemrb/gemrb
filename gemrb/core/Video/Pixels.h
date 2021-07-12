@@ -462,18 +462,18 @@ struct RGBAChannelIterator : public IAlphaIterator
 {
 	uint32_t mask;
 	uint8_t shift;
-	IPixelIterator* pixelIt;
+	IPixelIterator& pixelIt;
 
-	RGBAChannelIterator(IPixelIterator* it, uint32_t mask, uint8_t shift)
+	RGBAChannelIterator(IPixelIterator& it, uint32_t mask, uint8_t shift)
 	: mask(mask), shift(shift), pixelIt(it)
 	{}
 
 	uint8_t operator*() const override {
-		return pixelIt->Channel(mask, shift);
+		return pixelIt.Channel(mask, shift);
 	}
 	
 	void Advance(int amt) override {
-		pixelIt->Advance(amt);
+		pixelIt.Advance(amt);
 	}
 };
 
