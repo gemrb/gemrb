@@ -49,11 +49,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* pixels, const P
 	format = PixelFormatForSurface(*surface, format.palette);
 	
 	original = surface;
-	
-	if (format.palette){
-		assert(*format.palette == *surface->palette);
-		assert(*format.palette == *original->palette);
-	}
 }
 
 SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, const PixelFormat& fmt) noexcept
@@ -88,11 +83,6 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 	format = PixelFormatForSurface(*surface, obj.format.palette);
 	
 	original = surface;
-	
-	if (format.palette){
-		assert(*format.palette == *surface->palette);
-		assert(*format.palette == *original->palette);
-	}
 }
 
 void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
