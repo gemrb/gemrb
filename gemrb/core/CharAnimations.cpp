@@ -155,7 +155,7 @@ void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 	}
 }
 
-static constexpr ResRef EmptySound = {};
+static const ResRef EmptySound;
 
 const ResRef &CharAnimations::GetWalkSound() const
 {
