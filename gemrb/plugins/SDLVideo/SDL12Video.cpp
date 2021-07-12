@@ -255,24 +255,21 @@ void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Re
 
 void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
 {
-	const SDLSurfaceSprite2D *sdlspr = static_cast<const SDLSurfaceSprite2D*>(spr);
-	SDL_Surface* surf = sdlspr->GetSurface();
-
 	Color c;
-	if (tint && (flags&BlitFlags::COLOR_MOD)){
+	if (tint && (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD))){
 		c = Color(tint->r, tint->g, tint->b, tint->unused);
 	}
 
-	if (surf->format->BytesPerPixel == 1) {
-		c.a = SDL_ALPHA_OPAQUE; // FIXME: this is probably actually contigent on something else...
-
-		if (flags&BlitFlags::COLOR_MOD) {
-			flags &= ~RenderSpriteVersion(sdlspr, flags, &c);
+	if (spr->Format().Bpp == 1) {
+		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
+			c.a = (BlitFlags::ALPHA_MOD) ? c.a : SDL_ALPHA_OPAQUE;
+			flags &= ~RenderSpriteVersion(spr, flags, &c);
 		} else {
-			flags &= ~RenderSpriteVersion(sdlspr, flags);
+			flags &= ~RenderSpriteVersion(spr, flags);
 		}
 	}
 
+	SDL_Surface* surf = spr->GetSurface();
 	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
 }
 
