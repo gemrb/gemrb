@@ -35,7 +35,6 @@ private:
 	std::vector<Holder<Sprite2D>> frames;
 	std::vector<CycleEntry> cycles;
 	unsigned short* FLTable;	// Frame Lookup Table
-	unsigned char* FrameData;
 
 public:
 	AnimationFactory(const char* ResRef);
