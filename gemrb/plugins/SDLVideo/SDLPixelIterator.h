@@ -331,25 +331,16 @@ static void Blit(SDLPixelIterator src,
 }
 
 template <typename BLENDER>
-static void BlitBlendedRect(SDL_Surface* src, SDL_Surface* dst,
-							const SDL_Rect& srcrgn, const SDL_Rect& dstrgn,
+static void BlitBlendedRect(SDLPixelIterator& src, SDLPixelIterator& dst,
 							BLENDER blender, Uint32 flags, IAlphaIterator* maskIt)
 {
-	assert(src && dst);
-	assert(srcrgn.h == dstrgn.h && srcrgn.w == dstrgn.w);
-
-	SDLPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
-	SDLPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? SDLPixelIterator::Reverse : SDLPixelIterator::Forward;
-
-	SDLPixelIterator dstbeg(dst, SDLPixelIterator::Forward, SDLPixelIterator::Forward, dstrgn);
-	SDLPixelIterator dstend = SDLPixelIterator::end(dstbeg);
-	SDLPixelIterator srcbeg(src, xdir, ydir, srcrgn);
+	SDLPixelIterator dstend = SDLPixelIterator::end(dst);
 
 	if (maskIt) {
-		Blit(srcbeg, dstbeg, dstend, *maskIt, blender);
+		Blit(src, dst, dstend, *maskIt, blender);
 	} else {
 		StaticAlphaIterator alpha(0);
-		Blit(srcbeg, dstbeg, dstend, alpha, blender);
+		Blit(src, dst, dstend, alpha, blender);
 	}
 }
 

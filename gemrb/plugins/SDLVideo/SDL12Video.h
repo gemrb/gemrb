@@ -74,7 +74,10 @@ private:
 							  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
 								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Surface* surf, const Region& src, const Region& dst, BlitFlags flags, Color tint);
+
+	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags, Color tint);
+	void BlitSpriteNativeClipped(SDL_Surface* surf, SDL_Rect* src, SDL_Rect* dst, BlitFlags flags, Color tint);
+	void BlitWithPipeline(SDLPixelIterator& src, SDLPixelIterator& dst, IAlphaIterator* maskit, BlitFlags flags, Color tint);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags) override;
 
