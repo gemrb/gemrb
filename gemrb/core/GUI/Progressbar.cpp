@@ -89,6 +89,8 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 void Progressbar::UpdateState(unsigned int Sum)
 {
+	if (Sum == CTL_INVALID_VALUE) return;
+
 	SetValue(Sum);
 	if (GetValue() == 100) {
 		PerformAction(Action::EndReached);
