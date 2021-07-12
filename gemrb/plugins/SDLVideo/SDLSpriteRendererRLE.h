@@ -111,17 +111,17 @@ struct SRBlender_Alpha { };
 
 template<typename PTYPE, typename BLENDER>
 struct SRBlender {
-	SRBlender(PixelFormat format);
+	SRBlender(const PixelFormat& format);
 
 	void operator()(PTYPE& /*pix*/, Uint8 /*r*/, Uint8 /*g*/, Uint8 /*b*/, Uint8 /*a*/) const;
 };
 
 template<typename BLENDER>
 struct SRBlender<Uint16, BLENDER> {
-	PixelFormat fmt;
+	const PixelFormat& fmt;
 	Uint16 halfmask;
 
-	SRBlender(PixelFormat fmt)
+	SRBlender(const PixelFormat& fmt)
 	: fmt(fmt)
 	{
 		halfmask = ((0xFFU >> (fmt.Rloss + 1)) << fmt.Rshift) | ((0xFFU >> (fmt.Gloss + 1)) << fmt.Gshift) | ((0xFFU >> (fmt.Bloss + 1)) << fmt.Bshift);
@@ -132,10 +132,10 @@ struct SRBlender<Uint16, BLENDER> {
 
 template<typename BLENDER>
 struct SRBlender<Uint32, BLENDER> {
-	PixelFormat fmt;
+	const PixelFormat& fmt;
 	Uint32 halfmask;
 
-	SRBlender(PixelFormat fmt)
+	SRBlender(const PixelFormat& fmt)
 	: fmt(fmt)
 	{
 		halfmask = ((0xFFU >> 1) << fmt.Rshift) | ((0xFFU >> 1) << fmt.Gshift) | ((0xFFU >> 1) << fmt.Bshift);
@@ -359,10 +359,10 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 		cover = &nomask;
 	}
 
-	switch (dstit.format->BytesPerPixel) {
+	switch (dstit.format.Bpp) {
 		case 4:
 		{
-			SRBlender<Uint32, Blender> blend(PixelFormatForSurface(dst));
+			SRBlender<Uint32, Blender> blend(dstit.format);
 			if (partial) {
 				BlitSpriteRLE_Partial<Uint32>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
 			} else {
@@ -372,7 +372,7 @@ static void BlitSpriteRLE(Holder<Sprite2D> spr, const Region& srect,
 		}
 		case 2:
 		{
-			SRBlender<Uint16, Blender> blend(PixelFormatForSurface(dst));
+			SRBlender<Uint16, Blender> blend(dstit.format);
 			if (partial) {
 				BlitSpriteRLE_Partial<Uint16>(rledata, spr->Frame.w, srect, palette->col, ck, dstit, *cover, flags, tint, blend);
 			} else {
