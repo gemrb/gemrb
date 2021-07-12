@@ -125,7 +125,7 @@ VideoBuffer* SDL12VideoDriver::NewVideoBuffer(const Region& r, BufferFormat fmt)
 	}
 }
 
-IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, SDL_Rect maskclip) const
+IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, const Region& maskclip) const
 {
 	struct SurfaceAlphaIterator : RGBAChannelIterator {
 		SDLPixelIterator pixit;
@@ -160,7 +160,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, SDL_Rect mask
 		maskclip.y -= stencilOrigin.y;
 		IPixelIterator::Direction xdir = (flags&BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
 		IPixelIterator::Direction ydir = (flags&BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		maskit = new SurfaceAlphaIterator(maskSurf, maskclip, mask, shift, xdir, ydir);
+		maskit = new SurfaceAlphaIterator(maskSurf, RectFromRegion(maskclip), mask, shift, xdir, ydir);
 	}
 	
 	return maskit;
@@ -196,8 +196,7 @@ void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Re
 	PaletteHolder palette = spr->GetPalette();
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 
-	SDL_Rect drect = RectFromRegion(dst);
-	IAlphaIterator* maskit = StencilIterator(flags, drect);
+	IAlphaIterator* maskit = StencilIterator(flags, dst);
 
 	// remove already handled flags and incompatible combinations
 	unsigned int remflags = flags & ~(BlitFlags::BLENDED | BlitFlags::MIRRORX | BlitFlags::MIRRORY | BLIT_STENCIL_MASK);
@@ -253,7 +252,7 @@ void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Re
 	delete maskit;
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const Region& srect, const Region& drect, BlitFlags flags, const SDL_Color* tint)
 {
 	Color c;
 	if (tint && (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD))){
@@ -273,7 +272,7 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Re
 	BlitSpriteNativeClipped(surf, srect, drect, flags, c);
 }
 
-void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, Color tint)
+void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const Region& srect, const Region& drect, BlitFlags flags, Color tint)
 {
 	// non-BAM Blitting
 
@@ -300,6 +299,9 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 
 	SDL_Surface* currentBuf = CurrentRenderBuffer();
 	IAlphaIterator* maskIt = StencilIterator(flags, drect);
+	
+	SDL_Rect s = RectFromRegion(srect);
+	SDL_Rect d = RectFromRegion(drect);
 	
 	bool nativeBlit = (flags & ~(BlitFlags::HALFTRANS | BlitFlags::ALPHA_MOD | BlitFlags::BLENDED)) == 0
 						&& maskIt == nullptr && ((surf->flags & SDL_SRCCOLORKEY) != 0
@@ -328,8 +330,6 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 			SDL_SetAlpha(surf, 0, alpha);
 		}
 
-		SDL_Rect s = srect;
-		SDL_Rect d = drect;
 		SDL_LowerBlit(surf, &s, currentBuf, &d);
 	} else {
 		bool halftrans = flags & BlitFlags::HALFTRANS;
@@ -357,23 +357,23 @@ void SDL12VideoDriver::BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect
 		if (flags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD)) {
 			if (flags&BlitFlags::GREY) {
 				RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(tint, BlendFn);
-				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+				BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 			} else if (flags&BlitFlags::SEPIA) {
 				RGBBlendingPipeline<SHADER::SEPIA, true> blender(tint, BlendFn);
-				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+				BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 			} else {
 				RGBBlendingPipeline<SHADER::TINT, true> blender(tint, BlendFn);
-				BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+				BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 			}
 		} else if (flags&BlitFlags::GREY) {
 			RGBBlendingPipeline<SHADER::GREYSCALE, true> blender(BlendFn);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 		} else if (flags&BlitFlags::SEPIA) {
 			RGBBlendingPipeline<SHADER::SEPIA, true> blender(BlendFn);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 		} else {
 			RGBBlendingPipeline<SHADER::NONE, true> blender(BlendFn);
-			BlitBlendedRect(surf, currentBuf, srect, drect, blender, flags, maskIt);
+			BlitBlendedRect(surf, currentBuf, s, d, blender, flags, maskIt);
 		}
 	}
 	
@@ -386,8 +386,8 @@ void SDL12VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	const Region& r = buf->Rect();
 	Point origin = r.origin + p;
 
-	SDL_Rect srect = {0, 0, Uint16(r.w), Uint16(r.h)};
-	SDL_Rect drect = {Sint16(origin.x), Sint16(origin.y), Uint16(r.w), Uint16(r.h)};
+	const Region& srect {Point(), r.size};
+	const Region& drect {origin, r.size};
 	BlitSpriteNativeClipped(surface, srect, drect, flags, tint);
 }
 

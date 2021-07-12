@@ -94,7 +94,7 @@ protected:
 	BlitFlags RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* = NULL);
 
 	virtual void BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
-	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
+	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL);
 
 	int PollEvents() override;

@@ -66,15 +66,15 @@ private:
 	SDLVideoDriver::vid_buf_t* CurrentRenderBuffer() const override;
 	SDLVideoDriver::vid_buf_t* CurrentStencilBuffer() const override;
 	
-	IAlphaIterator* StencilIterator(BlitFlags flags, SDL_Rect dst) const;
+	IAlphaIterator* StencilIterator(BlitFlags flags, const Region& dst) const;
 
 	int ProcessEvent(const SDL_Event & event) override;
 
 	void BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
 							  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(const sprite_t* spr, const SDL_Rect& src, const SDL_Rect& dst,
+	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
 								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;
-	void BlitSpriteNativeClipped(SDL_Surface* surf, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, Color tint);
+	void BlitSpriteNativeClipped(SDL_Surface* surf, const Region& src, const Region& dst, BlitFlags flags, Color tint);
 
 	void DrawSDLPoints(const std::vector<SDL_Point>& points, const SDL_Color& color, BlitFlags flags) override;
 
