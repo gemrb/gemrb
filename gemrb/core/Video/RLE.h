@@ -65,7 +65,7 @@ inline uint8_t* FindRLEPos(uint8_t* rledata, int pitch, const Point& p, colorkey
 class RLEIterator : public PixelIterator<uint8_t>
 {
 	uint8_t* dataPos = nullptr;
-	uint8_t colorkey = 0;
+	colorkey_t colorkey = 0;
 	uint16_t transQueue = 0;
 public:
 	RLEIterator(uint8_t* p, Size s, colorkey_t ck)
@@ -85,17 +85,14 @@ public:
 		
 		int pixelsToAdvance = xdir * dx;
 		int rowsToAdvance = std::abs(pixelsToAdvance / size.w);
-		int xToAdvance = pixelsToAdvance % size.w;
-		int tmpx = pos.x + xToAdvance;
+		int tmpx = pos.x + pixelsToAdvance % size.w;
 		
 		if (tmpx < 0) {
 			++rowsToAdvance;
 			tmpx = size.w + tmpx;
-			xToAdvance = tmpx - pos.x;
 		} else if (tmpx >= size.w) {
 			++rowsToAdvance;
 			tmpx = tmpx - size.w;
-			xToAdvance = tmpx - pos.x;
 		}
 		
 		if (dx < 0) {

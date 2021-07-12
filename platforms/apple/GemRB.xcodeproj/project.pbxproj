@@ -135,6 +135,7 @@
 		A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */; };
 		A25F91F9269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */; };
 		A25F91FA269BBF290045F07A /* SaveGameAREExtractor.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91F7269BBF290045F07A /* SaveGameAREExtractor.h */; };
+		A25F91FC269CE6440045F07A /* EnumFlags.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91FB269CE6440045F07A /* EnumFlags.h */; };
 		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
 		A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
 		A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
@@ -1310,6 +1311,7 @@
 		A25F91EE269936A10045F07A /* Pixels.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Pixels.cpp; sourceTree = "<group>"; };
 		A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SaveGameAREExtractor.cpp; sourceTree = "<group>"; };
 		A25F91F7269BBF290045F07A /* SaveGameAREExtractor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveGameAREExtractor.h; sourceTree = "<group>"; };
+		A25F91FB269CE6440045F07A /* EnumFlags.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumFlags.h; sourceTree = "<group>"; };
 		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
 		A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScriptInterface.cpp; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
@@ -5207,6 +5209,7 @@
 				A2BF9FBB1395FF61006ADC12 /* EffectMgr.h */,
 				A2BF9FBC1395FF61006ADC12 /* EffectQueue.cpp */,
 				A2BF9FBD1395FF61006ADC12 /* EffectQueue.h */,
+				A25F91FB269CE6440045F07A /* EnumFlags.h */,
 				A2BF9FBE1395FF61006ADC12 /* Factory.cpp */,
 				A2BF9FBF1395FF61006ADC12 /* Factory.h */,
 				A2BF9FC01395FF61006ADC12 /* FactoryObject.cpp */,
@@ -7974,6 +7977,7 @@
 				A27E5D5E18106384009434E5 /* IndexedArchive.h in Headers */,
 				A2D72B191B671329009F4D33 /* SpriteSheet.h in Headers */,
 				A2E66378139E883100310FC8 /* DisplayMessage.h in Headers */,
+				A25F91FC269CE6440045F07A /* EnumFlags.h in Headers */,
 				A2E66379139E883100310FC8 /* Effect.h in Headers */,
 				A2111CCA1D0A49650044939E /* Timer.h in Headers */,
 				A27E5D6018106384009434E5 /* PluginLoader.h in Headers */,

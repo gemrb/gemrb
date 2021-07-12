@@ -141,14 +141,14 @@ private:
 	tick_t nextFrameTime = 0;
 
 	tick_t CalculateNextFrameDelta();
-	Holder<Sprite2D> GenerateNext(tick_t time);
+	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
 	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;
 	void SetBlend(bool b);
-	bool HasEnded() const;
+	bool HasEnded() const override;
 
 	tick_t Time() const { return nextFrameTime; }
 	

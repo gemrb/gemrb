@@ -24,7 +24,7 @@
 #include <type_traits>
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator |(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
@@ -32,7 +32,7 @@ operator |(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
 operator |=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
@@ -40,7 +40,7 @@ operator |=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator &(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
@@ -48,7 +48,7 @@ operator &(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
 operator &=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
@@ -56,7 +56,7 @@ operator &=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator ^(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 {
@@ -64,7 +64,7 @@ operator ^(ENUM_FLAGS a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS&>::type
 operator ^=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 {
@@ -72,7 +72,7 @@ operator ^=(ENUM_FLAGS& a, ENUM_FLAGS b) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, ENUM_FLAGS>::type
 operator ~(ENUM_FLAGS a) noexcept
 {
@@ -80,7 +80,7 @@ operator ~(ENUM_FLAGS a) noexcept
 }
 
 template<typename ENUM_FLAGS>
-inline constexpr
+constexpr
 typename std::enable_if<std::is_enum<ENUM_FLAGS>::value, bool>::type
 operator !(ENUM_FLAGS a) noexcept
 {
