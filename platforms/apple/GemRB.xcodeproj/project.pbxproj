@@ -132,6 +132,9 @@
 		A25F91ED269931220045F07A /* Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91E8269931220045F07A /* Pixels.h */; };
 		A25F91EF269936A10045F07A /* Pixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91EE269936A10045F07A /* Pixels.cpp */; };
 		A25F91F0269936A10045F07A /* Pixels.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91EE269936A10045F07A /* Pixels.cpp */; };
+		A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */; };
+		A25F91F9269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */; };
+		A25F91FA269BBF290045F07A /* SaveGameAREExtractor.h in Headers */ = {isa = PBXBuildFile; fileRef = A25F91F7269BBF290045F07A /* SaveGameAREExtractor.h */; };
 		A2648B8B1B28D23B00725526 /* GUIScriptInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */; };
 		A2648B8D1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
 		A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */; };
@@ -1305,6 +1308,8 @@
 		A25F91E7269931220045F07A /* Video.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Video.h; sourceTree = "<group>"; };
 		A25F91E8269931220045F07A /* Pixels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pixels.h; sourceTree = "<group>"; };
 		A25F91EE269936A10045F07A /* Pixels.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Pixels.cpp; sourceTree = "<group>"; };
+		A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SaveGameAREExtractor.cpp; sourceTree = "<group>"; };
+		A25F91F7269BBF290045F07A /* SaveGameAREExtractor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaveGameAREExtractor.h; sourceTree = "<group>"; };
 		A2648B8A1B28D23B00725526 /* GUIScriptInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GUIScriptInterface.h; sourceTree = "<group>"; };
 		A2648B8C1B28F89700725526 /* GUIScriptInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GUIScriptInterface.cpp; sourceTree = "<group>"; };
 		A265ECD813A8661600C6DF12 /* FileCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FileCache.cpp; path = ../gemrb/core/FileCache.cpp; sourceTree = SOURCE_ROOT; };
@@ -5291,6 +5296,8 @@
 				A2F5F065246102D70073802C /* RNG.cpp */,
 				A2F5F064246102D70073802C /* RNG.h */,
 				A2BFA02D1395FF62006ADC12 /* SaveGame.h */,
+				A25F91F6269BBF280045F07A /* SaveGameAREExtractor.cpp */,
+				A25F91F7269BBF290045F07A /* SaveGameAREExtractor.h */,
 				A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */,
 				A2BFA02F1395FF62006ADC12 /* SaveGameIterator.h */,
 				A2BFA0301395FF62006ADC12 /* SaveGameMgr.cpp */,
@@ -8053,6 +8060,7 @@
 				A2E663FD139E885300310FC8 /* DataStream.h in Headers */,
 				A2E663FF139E885300310FC8 /* FileStream.h in Headers */,
 				A2E66401139E885300310FC8 /* MemoryStream.h in Headers */,
+				A25F91FA269BBF290045F07A /* SaveGameAREExtractor.h in Headers */,
 				A2E66405139E885300310FC8 /* swab.h in Headers */,
 				A24E7BA01884CA8600431DEE /* CircularBuffer.h in Headers */,
 				A2E66407139E885300310FC8 /* VFS.h in Headers */,
@@ -9108,7 +9116,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDL2Video -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
+			shellScript = "#build the SDLVideo driver. we cannot have it as a target dependency because we use \"bundle loader\"\nxcodebuild -project GemRB.xcodeproj -target SDLVideo -configuration $CONFIGURATION SYMROOT=\"$SYMROOT\" || exit 1\ncp \"$BUILT_PRODUCTS_DIR\"/SDLVideo.so \"$BUILT_PRODUCTS_DIR/$PLUGINS_FOLDER_PATH\"/SDLVideo.so\n\n#copy GUIScripts to bundle\ncp -r ../../gemrb/GUIScripts/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/GUIScripts\n#copy Override to bundle\ncp -r ../../gemrb/override/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/override\n#copy Unhardcoded to bundle\ncp -r ../../gemrb/unhardcoded/ \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/unhardcoded\n\n#clear the cmake files and make files\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name CMakeLists.txt | xargs -I{} rm {}\nfind \"$BUILT_PRODUCTS_DIR/$CONTENTS_FOLDER_PATH\"/Resources/ -name Makefile.am | xargs -I{} rm {}\n\n#increment the version number for the build\nREV=`git log --pretty=format:'' | wc -l | sed 's/\\ //g'`\nVERSION=`git describe --tags --dirty=-patched`\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $REV\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n/usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $VERSION\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n";
 		};
 		A2BD125D15A8E32B000FAB95 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -9712,6 +9720,7 @@
 				A265ECDC13A8661600C6DF12 /* FileCache.cpp in Sources */,
 				A265ECDD13A8661600C6DF12 /* IndexedArchive.cpp in Sources */,
 				A265ECDE13A8661600C6DF12 /* KeyMap.cpp in Sources */,
+				A25F91F9269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A265ECDF13A8661600C6DF12 /* PluginLoader.cpp in Sources */,
 				A265ECED13A8669700C6DF12 /* Logging.cpp in Sources */,
 				A265ECEE13A8669700C6DF12 /* SlicedStream.cpp in Sources */,
@@ -9790,6 +9799,7 @@
 				A2E66388139E883700310FC8 /* GlobalTimer.cpp in Sources */,
 				A2E6638B139E883E00310FC8 /* Image.cpp in Sources */,
 				A2E6638D139E883E00310FC8 /* ImageFactory.cpp in Sources */,
+				A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A2E6638F139E883E00310FC8 /* ImageMgr.cpp in Sources */,
 				A2E66391139E883E00310FC8 /* ImageWriter.cpp in Sources */,
 				A2E66393139E883E00310FC8 /* IniSpawn.cpp in Sources */,
