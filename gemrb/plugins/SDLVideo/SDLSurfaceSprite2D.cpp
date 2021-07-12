@@ -28,19 +28,20 @@
 
 namespace GemRB {
 
-SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* pixels, const PixelFormat& fmt) noexcept
-: Sprite2D(rgn, pixels, fmt)
+SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const PixelFormat& fmt) noexcept
+: Sprite2D(rgn, px, fmt)
 {
-	if (pixels) {
-		surface = new SurfaceHolder(SDL_CreateRGBSurfaceFrom(pixels, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
+	if (px) {
+		surface = new SurfaceHolder(SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
 															 fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 	} else {
 		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 		SDL_FillRect(*surface, NULL, 0);
+		pixels = (*surface)->pixels;
 	}
 
-	pitch = (*surface)->pitch;
 	assert(*surface);
+	pitch = (*surface)->pitch;
 	
 	if (format.palette)
 		SetPaletteColors(format.palette->col);
@@ -79,8 +80,10 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 	}
 	SetColorKey(obj.GetColorKey());
 	
-
 	format = PixelFormatForSurface(*surface, obj.format.palette);
+	if (pixels == nullptr) {
+		pixels = (*surface)->pixels;
+	}
 	
 	original = surface;
 }
