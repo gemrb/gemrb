@@ -106,12 +106,12 @@ int SpellEntry::FindSpell(unsigned int kit) const
 	return -1;
 }
 
-static size_t FindSpell(ResRef spellref, std::vector<SpellEntry*>& list)
+static int FindSpell(ResRef spellref, std::vector<SpellEntry*>& list)
 {
 	size_t i = list.size();
 	while (i--) {
 		if (list[i]->Equals(spellref)) {
-			return i;
+			return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -183,7 +183,7 @@ static std::vector<SpellEntry*> splList;
 static std::vector<SpellEntry*> domList;
 static std::vector<SpellEntry*> magList;
 
-static size_t IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
+static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
 	size_t splCount = splList.size();
 	for (size_t i = 0; i < splCount; i++) {
@@ -276,7 +276,7 @@ static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type
 	case IE_IWD2_SPELL_DOMAIN:
 	default:
 		for (size_t i = 0; i < splCount; i++) {
-			if (splList[i]->Equals(name)) return i;
+			if (splList[i]->Equals(name)) return static_cast<int>(i);
 		}
 	}
 	return -1;
