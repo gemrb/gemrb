@@ -141,6 +141,7 @@ jobs:
 
         echo "::group::AppImage building"
         make appimage
+        ln -s GemRB-*.AppImage grrr.AppImage # workaround for xvfb
         echo "::endgroup::"
 
         # check if it works on old systems
@@ -151,7 +152,7 @@ jobs:
     - name: Test 2
       uses: GabrielBB/xvfb-action@v1
       with:
-        run: ./GemRB-${GITHUB_SHA:0:7}-x86_64.AppImage -q ../gemrb/tests/minimal/
+        run: ./grrr.AppImage -q ../gemrb/tests/minimal/
         working-directory: build
 
     - name: Show build cache stats
