@@ -2418,37 +2418,21 @@ int GameScript::NumCreaturesGTMyLevel(Scriptable *Sender, const Trigger *paramet
 
 int GameScript::NumCreatureVsParty(Scriptable *Sender, const Trigger *parameters)
 {
-	//creating object on the spot
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyGT(Scriptable *Sender, const Trigger *parameters)
 {
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyLT(Scriptable *Sender, const Trigger *parameters)
 {
-	Object *obj = parameters->objectParameter;
-	if (!obj) {
-		obj = new Object();
-	}
-	int value = GetObjectCount(Sender, obj);
-	if (!obj->isNull()) obj->Release();
+	int value = GetObjectCount(Sender, parameters->objectParameter);
 	value -= core->GetGame()->GetPartySize(true);
 	return value < parameters->int0Parameter;
 }
