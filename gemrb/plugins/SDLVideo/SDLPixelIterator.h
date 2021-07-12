@@ -25,6 +25,32 @@
 
 namespace GemRB {
 
+inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, PaletteHolder pal = nullptr)
+{
+	SDL_PixelFormat* fmt = surf->format;
+	if (fmt->palette && pal == nullptr) {
+		assert(fmt->palette->ncolors <= 256);
+		const Color* begin = reinterpret_cast<const Color*>(fmt->palette->colors);
+		const Color* end = begin + fmt->palette->ncolors;
+		
+		pal = MakeHolder<Palette>(begin, end);
+	}
+	return PixelFormat {
+		fmt->Rloss, fmt->Gloss, fmt->Bloss, fmt->Aloss,
+		fmt->Rshift, fmt->Gshift, fmt->Bshift, fmt->Ashift,
+		fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask,
+		fmt->BytesPerPixel, fmt->BitsPerPixel,
+#if SDL_VERSION_ATLEAST(1,3,0)
+		[surf]() { Uint32 ck; SDL_GetColorKey(surf, &ck); return ck; }(),
+		bool(SDL_HasColorKey(surf)),
+#else
+		fmt->colorkey,
+		bool(surf->flags & SDL_SRCCOLORKEY),
+#endif
+		false, pal
+	};
+}
+
 struct SDLPixelIterator : IPixelIterator
 {
 private:
