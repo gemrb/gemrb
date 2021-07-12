@@ -12160,13 +12160,13 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	int i = core->GetSpecialSpellsCount();
-	if (i == -1) {
+	if (i == 0) {
 		return RuntimeError( "Game has no splspec.2da table!" );
 	}
-	const SpecialSpellType *special_spells = core->GetSpecialSpells();
+	const auto& special_spells = core->GetSpecialSpells();
 	while(i--) {
 		if (specialtype & special_spells[i].flags) {
-			if (actor->spellbook.HaveSpell(special_spells[i].resref,useup)) {
+			if (actor->spellbook.HaveSpell(special_spells[i].resref, useup)) {
 				if (useup) {
 					//actor->SpellCast(SpecialSpells[i].resref, actor);
 				}

@@ -149,7 +149,7 @@ struct SpellDescType {
 };
 
 struct SpecialSpellType {
-	ieResRef resref;
+	ResRef resref;
 	int flags;
 	int amount;
 	int bonus_limit;
@@ -398,8 +398,7 @@ private:
 	char NextScript[64];
 
 	std::deque<Timer> timers;
-	int SpecialSpellsCount;
-	SpecialSpellType *SpecialSpells;
+	std::vector<SpecialSpellType> SpecialSpells;
 	KeyMap *keymap;
 	std::string Encoding;
 	Scriptable *CutSceneRunner;
@@ -694,10 +693,10 @@ public:
 	char *GetMusicPlaylist(int SongType) const;
 	/** Returns the DeathVarFormat of the day */
 	static const char *GetDeathVarFormat();
-	int CheckSpecialSpell(const ieResRef resref, Actor *actor);
-	int GetSpecialSpell(const ieResRef resref);
-	int GetSpecialSpellsCount() const { return SpecialSpellsCount; }
-	SpecialSpellType *GetSpecialSpells() { return SpecialSpells; }
+	int CheckSpecialSpell(const ieResRef resref, const Actor *actor) const;
+	int GetSpecialSpell(const ResRef& resref) const;
+	int GetSpecialSpellsCount() const { return SpecialSpells.size(); }
+	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();
 private:

@@ -50,20 +50,15 @@
 namespace GemRB {
 
 struct HealingResource {
-	ieResRef resref;
-	Actor *caster;
-	ieWord amounthealed;
-	ieWord amount;
-	HealingResource(ieResRef ref, Actor *cha, ieWord ah, ieWord a)
+	ResRef resRef;
+	Actor *caster = nullptr;
+	ieWord amounthealed = 0;
+	ieWord amount = 0;
+	HealingResource(const ResRef& ref, Actor *cha, ieWord ah, ieWord a)
 		: caster(cha), amounthealed(ah), amount(a) {
-		CopyResRef(resref, ref);
+		resRef = ref;
 	}
-	HealingResource() {
-		CopyResRef(resref, "");
-		amount = 0;
-		amounthealed = 0;
-		caster = NULL;
-	}
+	HealingResource() = default;
 	bool operator < (const HealingResource &str) const {
 		return (amounthealed < str.amounthealed);
 	}
@@ -1903,7 +1898,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 }
 
 // calculate an estimate of spell's healing power
-inline static int CastOnRestHealingAmount(Actor *caster, SpecialSpellType &specialSpell)
+inline static int CastOnRestHealingAmount(Actor *caster, const SpecialSpellType &specialSpell)
 {
 	int healing = specialSpell.amount;
 	if (specialSpell.bonus_limit > 0) {
@@ -1924,7 +1919,7 @@ void Game::CastOnRest() const
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
 	int specialCount = core->GetSpecialSpellsCount();
-	if (!tmp || specialCount == -1) {
+	if (!tmp || !specialCount) {
 		return;
 	}
 
@@ -1944,12 +1939,12 @@ void Game::CastOnRest() const
 	// - cast party members' all heal-all spells
 	// - repeat:
 	//       cast the most potent healing spell on the most injured member
-	SpecialSpellType *special_spells = core->GetSpecialSpells();
+	const auto& special_spells = core->GetSpecialSpells();
 	std::sort(wholeparty.begin(), wholeparty.end());
 	RestSpells healingspells;
 	RestSpells nonhealingspells;
 	while (specialCount--) {
-		SpecialSpellType &specialSpell = special_spells[specialCount];
+		const SpecialSpellType &specialSpell = special_spells[specialCount];
 		// Cast multi-target healing spells
 		if ((specialSpell.flags & (SP_REST|SP_HEAL_ALL)) == (SP_REST|SP_HEAL_ALL)) {
 			while (ps-- && wholeparty.back().hpneeded > 0) {
@@ -1970,7 +1965,7 @@ void Game::CastOnRest() const
 				if (tar && tar->spellbook.HaveSpell(specialSpell.resref, 0)) {
 					HealingResource resource;
 					resource.caster = tar;
-					CopyResRef(resource.resref, specialSpell.resref);
+					resource.resRef = specialSpell.resref;
 					resource.amount = 0;
 					resource.amounthealed = CastOnRestHealingAmount(tar, specialSpell);
 					// guess the booktype; one will definitely match due to HaveSpell above
@@ -1996,7 +1991,7 @@ void Game::CastOnRest() const
 	while (!healingspells.empty() && wholeparty.back().hpneeded > 0) {
 		Injured &mostInjured = wholeparty.back();
 		HealingResource &mostHealing = healingspells.back();
-		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resref, 0, 1, true);
+		mostHealing.caster->DirectlyCastSpell(mostInjured.character, mostHealing.resRef, 0, 1, true);
 		mostHealing.amount--;
 		mostInjured.hpneeded -= mostHealing.amounthealed;
 		std::sort(wholeparty.begin(), wholeparty.end());
@@ -2010,7 +2005,7 @@ void Game::CastOnRest() const
 	ieWord spelltarget = 0;
 	while (!nonhealingspells.empty()) {
 		HealingResource &restingSpell = nonhealingspells.back();
-		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resref, 0, 1, true);
+		restingSpell.caster->DirectlyCastSpell(wholeparty.at(spelltarget).character, restingSpell.resRef, 0, 1, true);
 		restingSpell.amount--;
 		if (restingSpell.amount == 0) {
 			nonhealingspells.pop_back();

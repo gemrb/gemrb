@@ -213,8 +213,6 @@ Interface::Interface()
 	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
-	SpecialSpellsCount = -1;
-	SpecialSpells = NULL;
 	Encoding = "default";
 
 	SystemEncoding = DefaultSystemEncoding;
@@ -320,9 +318,7 @@ Interface::~Interface(void)
 		reputationmod=NULL;
 	}
 
-	if (SpecialSpells) {
-		free(SpecialSpells);
-	}
+	SpecialSpells.clear();
 	SurgeSpells.clear();
 
 	std::map<ResRef, Font*>::iterator fit = fonts.begin();
@@ -698,10 +694,10 @@ bool Interface::ReadSpecialSpells()
 
 	AutoTable table("splspec");
 	if (table) {
-		SpecialSpellsCount = table->GetRowCount();
-		SpecialSpells = (SpecialSpellType *) malloc( sizeof(SpecialSpellType) * SpecialSpellsCount);
-		for (int i = 0; i < SpecialSpellsCount; i++) {
-			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
+		ieDword SpecialSpellsCount = table->GetRowCount();
+		SpecialSpells.resize(SpecialSpellsCount);
+		for (ieDword i = 0; i < SpecialSpellsCount; i++) {
+			SpecialSpells[i].resref = ResRef::MakeLowerCase(table->GetRowName(i));
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
 			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
@@ -727,18 +723,18 @@ bool Interface::ReadSpecialSpells()
 	return result;
 }
 
-int Interface::GetSpecialSpell(const ieResRef resref)
+int Interface::GetSpecialSpell(const ResRef& resref) const
 {
-	for (int i=0;i<SpecialSpellsCount;i++) {
-		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
-			return SpecialSpells[i].flags;
+	for (const auto& spell : SpecialSpells) {
+		if (resref == spell.resref) {
+			return spell.flags;
 		}
 	}
 	return 0;
 }
 
 //disable spells based on some circumstances
-int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
+int Interface::CheckSpecialSpell(const ieResRef resref, const Actor *actor) const
 {
 	int sp = GetSpecialSpell(resref);
 

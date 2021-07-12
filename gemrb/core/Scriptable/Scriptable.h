@@ -376,8 +376,8 @@ public:
 	int CheckWildSurge();
 	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
 	/* internal spellcasting shortcuts */
-	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
-	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpellPoint(const Point &target, ResRef spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpell(Scriptable *target, ResRef spellref, int level, int no_stance, bool deplete);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );

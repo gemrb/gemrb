@@ -1231,7 +1231,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 
 // shortcut for internal use when there is no wait
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpellPoint(const Point &target, ResRef spellref, int level, int no_stance, bool deplete)
 {
 	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
 		return;
@@ -1253,7 +1253,7 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, 
 
 // shortcut for internal use
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpell(Scriptable *target, ResRef spellref, int level, int no_stance, bool deplete)
 {
 	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
 		return;
