@@ -138,7 +138,7 @@ void Spellbook::CopyFrom(const Actor *source)
 			for (k = 0; k < wm->known_spells.size(); k++) {
 				CREKnownSpell *tmp_known = new CREKnownSpell();
 				sm->known_spells.push_back(tmp_known);
-				memcpy(tmp_known, wm->known_spells[k], sizeof(CREKnownSpell));
+				*tmp_known = *wm->known_spells[k];
 			}
 			for (k = 0; k < wm->memorized_spells.size(); k++) {
 				CREMemorizedSpell *tmp_mem = new CREMemorizedSpell();
@@ -289,7 +289,7 @@ bool Spellbook::KnowSpell(int spellid, int type) const
 	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
 		const CRESpellMemorization* sm = spells[type][j];
 		for (const auto knownSpell : sm->known_spells) {
-			if (atoi(knownSpell->SpellResRef + 4) == spellid) {
+			if (atoi(knownSpell->SpellResRef.CString() + 4) == spellid) {
 				return true;
 			}
 		}
@@ -303,7 +303,7 @@ bool Spellbook::KnowSpell(const char *resref) const
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (const auto spellMemo : spells[i]) {
 			for (const auto knownSpell : spellMemo->known_spells) {
-				if (resref[0] && stricmp(knownSpell->SpellResRef, resref) != 0) {
+				if (resref[0] && knownSpell->SpellResRef != resref) {
 					continue;
 				}
 				return true;
@@ -421,9 +421,7 @@ bool Spellbook::RemoveSpell(const CREKnownSpell* spell)
 			std::vector< CREKnownSpell* >::iterator ks;
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
 				if (*ks == spell) {
-					ResRef resRef;
-
-					resRef = (*ks)->SpellResRef;
+					ResRef resRef = (*ks)->SpellResRef;
 					delete *ks;
 					(*sm)->known_spells.erase(ks);
 					RemoveMemorization(*sm, resRef);
@@ -465,10 +463,8 @@ void Spellbook::RemoveSpell(int spellid, int type)
 		std::vector< CREKnownSpell* >::iterator ks;
 
 		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
-			if (atoi((*ks)->SpellResRef+4)==spellid) {
-				ResRef resRef;
-
-				resRef = (*ks)->SpellResRef;
+			if (atoi((*ks)->SpellResRef.CString() + 4) == spellid) {
+				ResRef resRef = (*ks)->SpellResRef;
 				delete *ks;
 				ks = (*sm)->known_spells.erase(ks);
 				RemoveMemorization(*sm, resRef);
@@ -480,7 +476,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 }
 
 //removes spell from both memorized/book
-void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
+void Spellbook::RemoveSpell(const ieResRef resRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -488,12 +484,12 @@ void Spellbook::RemoveSpell(const ieResRef ResRef, bool onlyknown)
 			std::vector< CREKnownSpell* >::iterator ks;
 
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ++ks) {
-				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ieResRef)) != 0) {
+				if ((*ks)->SpellResRef != resRef) {
 					continue;
 				}
 				delete *ks;
 				ks = (*sm)->known_spells.erase(ks);
-				if (!onlyknown) RemoveMemorization(*sm, ResRef);
+				if (!onlyknown) RemoveMemorization(*sm, resRef);
 				--ks;
 				ClearSpellInfo();
 			}
@@ -517,7 +513,7 @@ void Spellbook::SetBookType(int bt)
 int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned int kit, int level)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
-	CopyResRef(spl->SpellResRef, spell->Name);
+	spl->SpellResRef = spell->Name;
 	spl->Level = 0;
 	if (IWD2Style) {
 		PluginHolder<ActorMgr> gm = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
@@ -1137,7 +1133,7 @@ void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int typ
 				if (!slot) continue;
 
 				// skip the spell itself
-				if (spell && !strnicmp(slot->SpellResRef, spell, sizeof(ieResRef))) {
+				if (spell && slot->SpellResRef == spell) {
 					continue;
 				}
 				AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
@@ -1182,7 +1178,7 @@ void Spellbook::dump(StringBuffer& buffer) const
 			int idx = 0;
 			for (const auto& knownSpell : spellMemo->known_spells) {
 				if (!knownSpell) continue;
-				buffer.appendFormatted(" %2d: %8s L: %d T: %d\n", idx, knownSpell->SpellResRef, knownSpell->Level, knownSpell->Type);
+				buffer.appendFormatted(" %2d: %8s L: %d T: %d\n", idx, knownSpell->SpellResRef.CString(), knownSpell->Level, knownSpell->Type);
 				idx++;
 			}
 

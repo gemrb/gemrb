@@ -88,7 +88,7 @@ typedef enum ieIWD2SpellType {
 #define NUM_IWD2_SPELLTYPES 11
 
 struct CREKnownSpell {
-	ieResRef SpellResRef;
+	ResRef SpellResRef;
 	ieWord Level;
 	ieWord Type;
 };
@@ -193,7 +193,7 @@ public:
 	/** removes a spell from memory/book */
 	bool RemoveSpell(const CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
-	void RemoveSpell(const ieResRef ResRef, bool onlyknown=false);
+	void RemoveSpell(const ieResRef resRef, bool onlyknown = false);
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 

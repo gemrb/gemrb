@@ -8372,7 +8372,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Spell not found!" );
 	}
 
-	return Py_BuildValue("{s:s}", "SpellResRef", ks->SpellResRef);
+	return Py_BuildValue("{s:s}", "SpellResRef", ks->SpellResRef.CString());
 }
 
 

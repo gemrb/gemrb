@@ -251,7 +251,6 @@ int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsign
 	return IE_IWD2_SPELL_WIZARD;
 }
 
-//int CREImporter::ResolveSpellName(ieResRef name, int level, ieIWD2SpellType type) const
 static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type)
 {
 	if (level>=MAX_SPELL_LEVEL) {
@@ -786,7 +785,7 @@ CREKnownSpell* CREImporter::GetKnownSpell()
 {
 	CREKnownSpell* spl = new CREKnownSpell();
 
-	str->ReadResRef( spl->SpellResRef );
+	str->ReadResRef(spl->SpellResRef);
 	str->ReadWord(spl->Level);
 	str->ReadWord(spl->Type);
 
@@ -1259,7 +1258,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	free (indices);
 
 	// Reading spellbook
-	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
+	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );//
 	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREMemorizedSpell *) );
 
 	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
@@ -1304,7 +1303,7 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	while(i--) {
 		if (known_spells[i]) {
 			Log(WARNING, "CREImporter", "Dangling spell in creature: %s!",
-				known_spells[i]->SpellResRef);
+				known_spells[i]->SpellResRef.CString());
 			delete known_spells[i];
 		}
 	}
@@ -1628,7 +1627,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		CREKnownSpell *known = new CREKnownSpell;
 		known->Level = level;
 		known->Type = type;
-		strnlwrcpy(known->SpellResRef, tmp.CString(), 8);
+		known->SpellResRef = ResRef::MakeLowerCase(tmp);
 		sm->known_spells.push_back(known);
 		while (memocount--) {
 			if (totalcount) {
