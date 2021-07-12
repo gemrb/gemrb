@@ -981,6 +981,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
+	ReadSpellbook(act);
 
 	if (IsCharacter) {
 		ReadChrHeader(act);
@@ -1256,7 +1257,10 @@ void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	}
 
 	indices.clear();
+}
 
+void CREImporter::ReadSpellbook(Actor *act)
+{
 	// Reading spellbook
 	std::vector<CREKnownSpell*> knownSpells;
 	std::vector<CREMemorizedSpell*> memorizedSpells;
