@@ -145,7 +145,7 @@ struct EncodingStruct
 struct SpellDescType {
 	ResRef resref;
 	ieStrRef value;
-	// TODO: pst also has a SOUND_EFFECT resref column — research if it was used
+	// pst also has a SOUND_EFFECT column, but we use it from GUISTORE.py directly
 };
 
 struct SpecialSpellType {
