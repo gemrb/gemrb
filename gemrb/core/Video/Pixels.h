@@ -30,7 +30,7 @@ namespace GemRB {
 
 using colorkey_t = uint32_t;
 
-struct PixelFormat {
+struct GEM_EXPORT PixelFormat {
 	uint8_t  Rloss = 0;
 	uint8_t  Gloss = 0;
 	uint8_t  Bloss = 0;
@@ -93,7 +93,7 @@ struct PixelFormat {
 };
 
 #pragma pack(push,1)
-struct Pixel24Bit {
+struct GEM_EXPORT Pixel24Bit {
 #if SDL_BYTEORDER == SDL_LIL_ENDIAN
 	uint8_t r;
 	uint8_t g;
@@ -118,7 +118,7 @@ struct Pixel24Bit {
 #pragma pack(pop)
 static_assert(sizeof(Pixel24Bit) == 3, "24bit pixel should be 3 bytes.");
 
-struct RGBBlender {
+struct GEM_EXPORT RGBBlender {
 	virtual void operator()(const Color& src, Color& dst, uint8_t mask) const=0;
 	virtual ~RGBBlender() = default;
 };
@@ -278,7 +278,7 @@ public:
 	}
 };
 
-struct IPixelIterator
+struct GEM_EXPORT IPixelIterator
 {
 	enum Direction {
 		Reverse = -1,
@@ -390,7 +390,7 @@ public:
 	}
 };
 
-class PixelFormatIterator : public IPixelIterator
+class GEM_EXPORT PixelFormatIterator : public IPixelIterator
 {
 private:
 	IPixelIterator* imp = nullptr;
@@ -431,7 +431,7 @@ public:
 	const Point& Position() const noexcept override;
 };
 
-struct IAlphaIterator
+struct GEM_EXPORT IAlphaIterator
 {
 	virtual ~IAlphaIterator() = default;
 	
@@ -445,7 +445,7 @@ struct IAlphaIterator
 };
 
 // an endless iterator that always returns 'alpha' when dereferenced
-struct StaticAlphaIterator : public IAlphaIterator
+struct GEM_EXPORT StaticAlphaIterator : public IAlphaIterator
 {
 	uint8_t alpha;
 
@@ -458,7 +458,7 @@ struct StaticAlphaIterator : public IAlphaIterator
 	void Advance(int) override {}
 };
 
-struct RGBAChannelIterator : public IAlphaIterator
+struct GEM_EXPORT RGBAChannelIterator : public IAlphaIterator
 {
 	uint32_t mask;
 	uint8_t shift;
