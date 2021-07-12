@@ -71,7 +71,7 @@ struct PythonCallback {
 	: Function(fn)
 	{
 		assert(Py_IsInitialized());
-		if (PyCallable_Check(Function)) {
+		if (Function && PyCallable_Check(Function)) {
 			Py_INCREF(Function);
 		} else {
 			Function = NULL;

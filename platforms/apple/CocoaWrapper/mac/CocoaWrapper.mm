@@ -192,8 +192,7 @@ using namespace GemRB;
 		}
 	}
 	
-	int status;
-	if ((status = core->Init(config)) == GEM_ERROR) {
+	if (core->Init(config) == GEM_ERROR) {
 		delete config;
 		delete( core );
 		core = NULL;
