@@ -97,7 +97,7 @@ class WorldMapArray;
 
 struct Symbol {
 	Holder<SymbolMgr> sm;
-	char ResRef[8];
+	ResRef symbolName;
 };
 
 struct SlotType {
@@ -165,13 +165,13 @@ struct SurgeSpell {
 
 class ItemList {
 public:
-	ieResRef *ResRefs;
+	std::vector<ResRef> ResRefs;
 	unsigned int Count;
 	//if count is odd and the column titles start with 2, the random roll should be 2d((c+1)/2)-1
 	bool WeightOdds;
 
 	ItemList(unsigned int size, int label) {
-		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
+		ResRefs.resize(size);
 		Count = size;
 		if ((size&1) && (label==2)) {
 			WeightOdds=true;
@@ -180,9 +180,7 @@ public:
 		}
 	}
 	~ItemList() {
-		if (ResRefs) {
-			free(ResRefs);
-		}
+		ResRefs.clear();
 	}
 };
 

@@ -2708,9 +2708,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!sm->Open(str)) {
 		return -1;
 	}
-	Symbol s;
-	strlcpy(s.ResRef, ResRef, sizeof(s.ResRef));
-	s.sm = sm;
+	Symbol s = { sm, ResRef };
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm) {
@@ -2731,7 +2729,7 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm)
 			continue;
-		if (strnicmp( symbols[i].ResRef, ResRef, 8 ) == 0)
+		if (symbols[i].symbolName == ResRef)
 			return ( int ) i;
 	}
 	return -1;
@@ -3855,7 +3853,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char *Prefix) cons
 		int cl = atoi(tab->GetColumnName(0));
 		ItemList *itemlist = new ItemList(l, cl);
 		for(int k=0;k<l;k++) {
-			strnlwrcpy(itemlist->ResRefs[k],tab->QueryField(j,k), 8);
+			itemlist->ResRefs[k] = ResRef::MakeLowerCase(tab->QueryField(j, k));
 		}
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
