@@ -141,9 +141,11 @@ struct EncodingStruct
 	bool zerospace;
 };
 
+// cache of speldesc.2da entries
 struct SpellDescType {
-	ieResRef resref;
+	ResRef resref;
 	ieStrRef value;
+	// TODO: pst also has a SOUND_EFFECT resref column — research if it was used
 };
 
 struct SpecialSpellType {

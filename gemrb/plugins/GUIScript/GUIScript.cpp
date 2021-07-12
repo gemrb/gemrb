@@ -78,8 +78,6 @@ GUIScript *GemRB::gs = NULL;
 // a shorthand for declaring methods in method table
 #define METHOD(name, args) {#name, GemRB_ ## name, args, GemRB_ ## name ## __doc}
 
-static int SpecialItemsCount = -1;
-static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 
 //Check removal/equip/swap of item based on item name and actor's scriptname
@@ -108,9 +106,9 @@ typedef char EventNameType[17];
 
 #define UNINIT_IEDWORD 0xcccccccc
 
-static SpellDescType *SpecialItems = NULL;
+static std::vector<SpellDescType> SpecialItems;
+static std::vector<SpellDescType> StoreSpells;
 
-static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
@@ -7929,53 +7927,35 @@ table_loaded:
 
 static void ReadSpecialItems()
 {
-	SpecialItemsCount = 0;
-	int table = gamedata->LoadTable("itemspec");
-	if (table>=0) {
-		Holder<TableMgr> tab = gamedata->GetTable(table);
-		if (!tab) goto table_loaded;
-		SpecialItemsCount = tab->GetRowCount();
-		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
-		for (int i = 0; i < SpecialItemsCount; i++) {
-			strnlwrcpy(SpecialItems[i].resref, tab->GetRowName(i),8 );
+	AutoTable tab("itemspec");
+	if (tab) {
+		ieDword SpecialItemsCount = tab->GetRowCount();
+		SpecialItems.resize(SpecialItemsCount);
+		for (ieDword i = 0; i < SpecialItemsCount; i++) {
+			SpecialItems[i].resref = ResRef::MakeLowerCase(tab->GetRowName(i));
 			//if there are more flags, compose this value into a bitfield
-			SpecialItems[i].value = atoi(tab->QueryField(i,0) );
+			SpecialItems[i].value = atoi(tab->QueryField(i, 0));
 		}
-table_loaded:
-		gamedata->DelTable(table);
 	}
 }
 
 static ieStrRef GetSpellDesc(const ieResRef CureResRef)
 {
-	if (StoreSpellsCount==-1) {
-		StoreSpellsCount = 0;
-		int table = gamedata->LoadTable("speldesc");
-		if (table>=0) {
-			Holder<TableMgr> tab = gamedata->GetTable(table);
-			if (!tab) goto table_loaded;
-			StoreSpellsCount = tab->GetRowCount();
-			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
-			for (int i = 0; i < StoreSpellsCount; i++) {
-				strnlwrcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
-				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
+	if (StoreSpells.empty()) {
+		AutoTable tab("speldesc");
+		if (tab) {
+			ieDword StoreSpellsCount = tab->GetRowCount();
+			StoreSpells.resize(StoreSpellsCount);
+			for (ieDword i = 0; i < StoreSpellsCount; i++) {
+				StoreSpells[i].resref = ResRef::MakeLowerCase(tab->GetRowName(i));
+				StoreSpells[i].value = atoi(tab->QueryField(i, 0));
 			}
-table_loaded:
-			gamedata->DelTable(table);
 		}
 	}
-	if (StoreSpellsCount==0) {
-		Spell *spell = gamedata->GetSpell(CureResRef);
-		if (!spell) {
-			return 0;
-		}
-		int ret = spell->SpellDescIdentified;
-		gamedata->FreeSpell(spell, CureResRef, false);
-		return ret;
-	}
-	for (int i = 0; i < StoreSpellsCount; i++) {
-		if (!strnicmp(StoreSpells[i].resref, CureResRef, 8) ) {
-			return StoreSpells[i].value;
+
+	for (const auto& spell : StoreSpells) {
+		if (spell.resref == CureResRef) {
+			return spell.value;
 		}
 	}
 	return 0;
@@ -12121,18 +12101,18 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 {
 	int globalID, itemtype, useup;
 	PARSE_ARGS( args,  "iii", &globalID, &itemtype, &useup);
-	if (SpecialItemsCount==-1) {
+	if (SpecialItems.empty()) {
 		ReadSpecialItems();
 	}
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int i = SpecialItemsCount;
+	size_t i = SpecialItems.size();
 	int slot = -1;
 	while(i--) {
 		if (itemtype&SpecialItems[i].value) {
-			slot = actor->inventory.FindItem(SpecialItems[i].resref,0);
+			slot = actor->inventory.FindItem(SpecialItems[i].resref, 0);
 			if (slot>=0) {
 				break;
 			}
@@ -13526,21 +13506,13 @@ GUIScript::~GUIScript(void)
 		free(SpellArray);
 		SpellArray=NULL;
 	}
-	if (StoreSpells) {
-		free(StoreSpells);
-		StoreSpells=NULL;
-	}
-	if (SpecialItems) {
-		free(SpecialItems);
-		SpecialItems=NULL;
-	}
+	StoreSpells.clear();
+	SpecialItems.clear();
 	if (UsedItems) {
 		free(UsedItems);
 		UsedItems=NULL;
 	}
 
-	StoreSpellsCount = -1;
-	SpecialItemsCount = -1;
 	UsedItemsCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
