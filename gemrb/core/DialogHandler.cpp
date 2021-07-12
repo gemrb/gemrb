@@ -66,7 +66,7 @@ DialogHandler::~DialogHandler(void)
 	delete dlg;
 }
 
-void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
+void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr)
 {
 	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
 

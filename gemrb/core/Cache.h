@@ -66,7 +66,7 @@ public:
 	bool SetAt(const ieResRef key, void *rValue);
 	// decreases refcount or drops data
 	//if name is supplied it is faster, it will use rValue to validate the request
-	int DecRef(void *rValue, const ieResRef name, bool free);
+	int DecRef(const void *rValue, const ieResRef name, bool free);
 	int RefCount(const ieResRef key) const;
 	void RemoveAll(ReleaseFun fun);//removes all refcounts
 	void Cleanup();  //removes only zero refcounts

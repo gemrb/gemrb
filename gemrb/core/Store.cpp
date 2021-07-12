@@ -37,7 +37,7 @@ STOItem::STOItem() {
 	triggers = NULL;
 }
 
-STOItem::STOItem(CREItem *item) {
+STOItem::STOItem(const CREItem *item) {
 	CopyResRef(ItemResRef, item->ItemResRef);
 	PurchasedAmount = 0; // Expired in STOItem
 	memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
@@ -214,7 +214,7 @@ unsigned int Store::FindItem(const ieResRef itemname, bool usetrigger) const
 				continue;
 			}
 		}
-		STOItem *temp = items[i];
+		const STOItem *temp = items[i];
 		if (!strnicmp(itemname, temp->ItemResRef, 8) ) {
 			return i;
 		}
@@ -222,7 +222,7 @@ unsigned int Store::FindItem(const ieResRef itemname, bool usetrigger) const
 	return (unsigned int) -1;
 }
 
-STOItem *Store::FindItem(CREItem *item, bool exact)
+STOItem *Store::FindItem(const CREItem *item, bool exact)
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (!IsItemAvailable(i) ) {
@@ -252,7 +252,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 //did this. In gemrb there is a flag.
 void Store::RechargeItem(CREItem *item) const
 {
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+	const Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
 	}
@@ -264,7 +264,7 @@ void Store::RechargeItem(CREItem *item) const
 	if (IsBag() != !(Flags&IE_STORE_RECHARGE)) {
 		bool feature = core->HasFeature(GF_SHOP_RECHARGE);
 		for (int i=0;i<CHARGE_COUNTERS;i++) {
-			ITMExtHeader *h = itm->GetExtHeader(i);
+			const ITMExtHeader *h = itm->GetExtHeader(i);
 			if (!h) {
 				item->Usages[i] = 0;
 				continue;
@@ -283,7 +283,7 @@ void Store::IdentifyItem(CREItem *item) const
 		return;
 	}
 
-	Item *itm = gamedata->GetItem(item->ItemResRef);
+	const Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
 	}
@@ -333,7 +333,7 @@ void Store::AddItem(CREItem *item)
 	ItemsCount++;
 }
 
-void Store::RemoveItem( STOItem *itm )
+void Store::RemoveItem(const STOItem *itm)
 {
 	size_t i = items.size();
 	while(i--) {

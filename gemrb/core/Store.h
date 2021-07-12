@@ -83,7 +83,7 @@ struct GEM_EXPORT STOItem {
 	char unknown2[56];
 
 	STOItem();
-	STOItem(CREItem *item);
+	STOItem(const CREItem *item);
 	~STOItem();
 };
 
@@ -174,7 +174,7 @@ public: //queries
 	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
-	void RemoveItem( STOItem *itm);
+	void RemoveItem(const STOItem *itm);
 	/** Returns index of item */
 	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
 	const char *GetOwner() const;
@@ -183,7 +183,7 @@ public: //queries
 	bool IsBag() const;
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
-	STOItem *FindItem(CREItem *item, bool exact);
+	STOItem *FindItem(const CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;
 };
 

@@ -47,7 +47,7 @@ void AnimationFactory::AddCycle(CycleEntry cycle)
 	cycles.push_back( cycle );
 }
 
-void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
+void AnimationFactory::LoadFLT(const unsigned short* buffer, int count)
 {
 	if (FLTable) {
 		free( FLTable );

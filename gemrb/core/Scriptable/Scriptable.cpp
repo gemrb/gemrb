@@ -898,7 +898,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
-void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
+void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 {
 	if (!core->HasFeedback(FT_CASTING)) return;
 
@@ -912,12 +912,12 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 		}
 	}
 
-	String* spell = core->GetString(spl->SpellName);
+	const String* spell = core->GetString(spl->SpellName);
 	if (spell->length() && Type == ST_ACTOR) {
 		wchar_t str[256];
 
 		if (target) {
-			String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			const String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
 			delete msg;
 		} else {
@@ -1504,7 +1504,7 @@ int Scriptable::CheckWildSurge()
 	return 1;
 }
 
-bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster)
+bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, Actor *caster)
 {
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
@@ -1593,7 +1593,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
 				if (!spellCount) continue;
 				int id = core->Roll(1, spellCount, -1);
-				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
+				const CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
 				if (ck) {
 					SpellResRef = ck->SpellResRef;
 					break;

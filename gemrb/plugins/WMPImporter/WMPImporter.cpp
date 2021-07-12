@@ -275,7 +275,7 @@ int WMPImporter::PutWorldMap(DataStream *stream1, DataStream *stream2, WorldMapA
 	return PutMaps( stream1, stream2, wmap);
 }
 
-int WMPImporter::PutLinks(DataStream *stream, WorldMap *wmap)
+int WMPImporter::PutLinks(DataStream *stream, const WorldMap *wmap)
 {
 	char filling[128];
 
@@ -297,7 +297,7 @@ int WMPImporter::PutLinks(DataStream *stream, WorldMap *wmap)
 	return 0;
 }
 
-int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
+int WMPImporter::PutAreas(DataStream *stream, const WorldMap *wmap)
 {
 	char filling[128];
 	ieDword tmpDword;
@@ -330,7 +330,7 @@ int WMPImporter::PutAreas(DataStream *stream, WorldMap *wmap)
 	return 0;
 }
 
-int WMPImporter::PutMaps(DataStream *stream1, DataStream *stream2, WorldMapArray *wmap)
+int WMPImporter::PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap)
 {
 	int ret = PutMap(stream1, wmap, 0);
 	if (ret) return ret;
@@ -341,7 +341,7 @@ int WMPImporter::PutMaps(DataStream *stream1, DataStream *stream2, WorldMapArray
 	return ret;
 }
 
-int WMPImporter::PutMap(DataStream *stream, WorldMapArray *wmap, unsigned int index)
+int WMPImporter::PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index)
 {
 	unsigned int WorldMapsOffset;
 	unsigned int count;

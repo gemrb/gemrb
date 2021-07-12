@@ -143,7 +143,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 	
 	if (RLESprite) {
 		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
-		uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
+		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
 		ptrdiff_t dataLen = dataEnd - dataBegin;
 		void* pixels = malloc(dataLen);
 		memcpy(pixels, dataBegin, dataLen);

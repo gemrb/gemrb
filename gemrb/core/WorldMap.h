@@ -145,13 +145,13 @@ public:
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
 	void SetMapMOS(Holder<Sprite2D> newmos);
 	int GetEntryCount() const { return (int) area_entries.size(); }
-	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
+	WMPAreaEntry *GetEntry(unsigned int index) const { return area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
 	WMPAreaEntry *GetNewAreaEntry() const;
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
-	void InsertAreaLink(unsigned int idx, unsigned int dir, WMPAreaLink *arealink);
-	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
+	void InsertAreaLink(unsigned int idx, unsigned int dir, const WMPAreaLink *arealink);
+	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);
 	void AddAreaLink(WMPAreaLink *al);
 	/** Calculates the distances from A, call this when first on an area */

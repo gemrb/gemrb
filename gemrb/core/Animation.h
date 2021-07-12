@@ -73,7 +73,7 @@ public:
 	/** returns the current frame's index */
 	unsigned int GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
-	void AddAnimArea(Animation* slave);
+	void AddAnimArea(const Animation* slave);
 };
 
 }

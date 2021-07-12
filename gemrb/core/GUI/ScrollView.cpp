@@ -192,7 +192,7 @@ void ScrollView::UpdateScrollbars()
 	}
 }
 	
-void ScrollView::ScrollbarValueChange(ScrollBar* sb)
+void ScrollView::ScrollbarValueChange(const ScrollBar* sb)
 {
 	const Point& origin = contentView.Origin();
 	

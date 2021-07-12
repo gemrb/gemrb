@@ -695,7 +695,7 @@ public:
 	static const char *GetDeathVarFormat();
 	int CheckSpecialSpell(const ieResRef resref, const Actor *actor) const;
 	int GetSpecialSpell(const ResRef& resref) const;
-	int GetSpecialSpellsCount() const { return SpecialSpells.size(); }
+	size_t GetSpecialSpellsCount() const { return SpecialSpells.size(); }
 	const std::vector<SpecialSpellType>& GetSpecialSpells() const { return SpecialSpells; }
 	/** Saves config variables to a file */
 	bool SaveConfig();

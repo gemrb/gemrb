@@ -214,7 +214,7 @@ void Animation::MirrorAnimationVert()
 	animArea.y = -animArea.h - animArea.y;
 }
 
-void Animation::AddAnimArea(Animation* slave)
+void Animation::AddAnimArea(const Animation* slave)
 {
 	animArea.ExpandToRegion(slave->animArea);
 }

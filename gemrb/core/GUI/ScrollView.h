@@ -56,7 +56,7 @@ namespace GemRB {
 
 	private:
 		void UpdateScrollbars();
-		void ScrollbarValueChange(ScrollBar*);
+		void ScrollbarValueChange(const ScrollBar*);
 		
 		void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;

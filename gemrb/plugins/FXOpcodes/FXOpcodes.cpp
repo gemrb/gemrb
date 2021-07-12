@@ -901,7 +901,7 @@ EffectRef mainStatRefs[] = { fx_str_ref, fx_str_ref, fx_int_ref, fx_wis_ref, fx_
 
 // handle 3ed's effect exclusion for main stats, where only the highest bonus counts
 // NOTE: handles only additive bonuses, since others aren't present and would only muddy matters
-static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
+static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx)
 {
 	int bonus = fx->Parameter1;
 	if (!core->HasFeature(GF_3ED_RULES) || fx->Parameter2 != MOD_ADDITIVE) return;
@@ -937,20 +937,20 @@ static inline void HandleMainStatBonus(Actor *target, int stat, Effect *fx)
 	fx->Parameter3 = bonus;
 }
 
-static inline void PlayRemoveEffect(const char *defsound, Actor *target, Effect* fx)
+static inline void PlayRemoveEffect(const char *defsound, const Actor *target, const Effect* fx)
 {
 	core->GetAudioDrv()->Play(fx->Resource[0] ? fx->Resource : defsound,
 			SFX_CHAN_ACTIONS, target->Pos);
 }
 
 //resurrect code used in many places
-static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
+static void Resurrect(const Scriptable *Owner, Actor *target, const Effect *fx, const Point &p)
 {
-	Scriptable *caster = GetCasterObject();
+	const Scriptable *caster = GetCasterObject();
 	if (!caster) {
 		caster = Owner;
 	}
-	Map *area = caster->GetCurrentArea();
+	const Map *area = caster->GetCurrentArea();
 
 	if (area && target->GetCurrentArea()!=area) {
 		MoveBetweenAreasCore(target, area->GetScriptName(), p, fx->Parameter2, true);
@@ -960,7 +960,7 @@ static void Resurrect(Scriptable *Owner, Actor *target, Effect *fx, Point &p)
 
 
 // handles the percentage damage spread over time by converting it to absolute damage
-inline void HandlePercentageDamage(Effect *fx, Actor *target) {
+inline void HandlePercentageDamage(Effect *fx, const Actor *target) {
 	if (fx->Parameter2 == RPD_PERCENT && fx->FirstApply) {
 		// distribute the damage to one second intervals
 		int seconds = (fx->Duration - core->GetGame()->GameTime) / AI_UPDATE_TIME;

@@ -1918,7 +1918,7 @@ void Game::CastOnRest() const
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
-	int specialCount = core->GetSpecialSpellsCount();
+	size_t specialCount = core->GetSpecialSpellsCount();
 	if (!tmp || !specialCount) {
 		return;
 	}

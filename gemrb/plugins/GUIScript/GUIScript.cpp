@@ -2239,7 +2239,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 				wmap = new WorldMapControl(rgn, font);
 			}
 			
-			AnimationFactory* bam = (AnimationFactory*)gamedata->GetFactoryResource(anim, IE_BAM_CLASS_ID);
+			const AnimationFactory* bam = (AnimationFactory*) gamedata->GetFactoryResource(anim, IE_BAM_CLASS_ID);
 			if (bam) {
 				wmap->areaIndicator = bam->GetFrame(0, 0);
 			}
@@ -3100,7 +3100,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	int eval = 0;
 	PARSE_ARGS( args, "O|i", &self, &eval);
 
-	WorldMapControl* wmc = GetView<WorldMapControl>(self);
+	const WorldMapControl* wmc = GetView<WorldMapControl>(self);
 	ABORT_IF_NULL(wmc);
 	//no area was pointed on
 	if (!wmc->Area) {
@@ -7235,25 +7235,25 @@ returns it in a dictionary.\n\
 
 #define STOREBUTTON_COUNT 7
 #define STORETYPE_COUNT 7
-static int storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT]={
-//store
-{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
-//tavern
-{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
-//inn
-{STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
-//temple
-{STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_ROOMRENT|STA_OPTIONAL},
-//iwd container
-{STA_BUYSELL,-1,-1,-1,-1,-1,-1},
-//no need to steal from your own container (original engine had STEAL instead of DRINK)
-{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_CURE|STA_OPTIONAL,-1,-1,-1},
-//gemrb specific store type: (temple 2), added steal, removed identify
-{STA_BUYSELL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL} };
+static const int storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT] = {
+	//store
+	{ STA_BUYSELL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL },
+	// tavern
+	{ STA_DRINK, STA_BUYSELL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL},
+	// inn
+	{ STA_ROOMRENT, STA_BUYSELL | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL},
+	// temple
+	{ STA_CURE,  STA_DONATE | STA_OPTIONAL, STA_BUYSELL | STA_OPTIONAL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL},
+	// iwd container
+	{ STA_BUYSELL, -1, -1, -1, -1, -1, -1},
+	// no need to steal from your own container (original engine had STEAL instead of DRINK)
+	{ STA_BUYSELL, STA_IDENTIFY | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, -1, -1, -1},
+	// gemrb specific store type: (temple 2), added steal, removed identify
+	{ STA_BUYSELL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL} };
 
 //buy/sell, identify, steal, cure, donate, drink, rent
-static int storebits[7]={IE_STORE_BUY|IE_STORE_SELL,IE_STORE_ID,IE_STORE_STEAL,
-IE_STORE_CURE,IE_STORE_DONATE,IE_STORE_DRINK,IE_STORE_RENT};
+static const int storeBits[7] = { IE_STORE_BUY | IE_STORE_SELL, IE_STORE_ID, IE_STORE_STEAL,
+	IE_STORE_CURE, IE_STORE_DONATE, IE_STORE_DRINK, IE_STORE_RENT };
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 {
@@ -7304,7 +7304,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;
 			//check if the type was disabled
-			if (!(store->Flags & storebits[k]) ) {
+			if (!(store->Flags & storeBits[k])) {
 				continue;
 			}
 		}
@@ -8525,7 +8525,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 	PARSE_ARGS( args,  "is", &globalID, &SpellResRef);
 	GET_GAME();
 
-	Actor* actor = game->GetActorByGlobalID( globalID );
+	const Actor* actor = game->GetActorByGlobalID(globalID);
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -10313,7 +10313,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 
 	GET_GAME();
 
-	Actor *actor = game->FindPC(v[0]);
+	const Actor *actor = game->FindPC(v[0]);
 	if (!actor) {
 		return RuntimeError( "Actor not found!\n" );
 	}
@@ -12159,7 +12159,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int i = core->GetSpecialSpellsCount();
+	size_t i = core->GetSpecialSpellsCount();
 	if (i == 0) {
 		return RuntimeError( "Game has no splspec.2da table!" );
 	}

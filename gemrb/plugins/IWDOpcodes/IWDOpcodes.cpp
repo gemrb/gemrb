@@ -599,7 +599,7 @@ static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value,
 //would probably not hurt anyone, because it is not using personaldistance
 //but a short range area projectile
 
-static void ApplyDamageNearby(Scriptable* Owner, Actor* target, Effect *fx, ieDword damagetype)
+static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effect *fx, ieDword damagetype)
 {
 	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype<<16, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target = FX_TARGET_PRESET;

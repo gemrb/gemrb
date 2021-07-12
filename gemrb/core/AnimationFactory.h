@@ -41,7 +41,7 @@ public:
 	~AnimationFactory(void) override;
 	void AddFrame(Holder<Sprite2D> frame);
 	void AddCycle(CycleEntry cycle);
-	void LoadFLT(unsigned short* buffer, int count);
+	void LoadFLT(const unsigned short* buffer, int count);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
 	Holder<Sprite2D> GetFrame(unsigned short index, unsigned char cycle=0) const;

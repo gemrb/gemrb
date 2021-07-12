@@ -397,9 +397,9 @@ private:
 	/* also part of the spellcasting process, creating the projectile */
 	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
-	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
+	bool HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
-	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);
+	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

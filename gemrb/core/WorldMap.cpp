@@ -156,7 +156,7 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 	area_entries.push_back(ae);
 }
 
-void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLink *arealink)
+void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, const WMPAreaLink *arealink)
 {
 	WMPAreaLink *al = new WMPAreaLink(*arealink);
 	unsigned int idx = area_entries[areaidx]->AreaLinksIndex[dir];
@@ -178,7 +178,7 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLin
 	}
 }
 
-void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
+void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 {
 	WMPAreaLink *al = new WMPAreaLink(*arealink);
 

@@ -258,7 +258,7 @@ int Cache::RefCount(const ieResRef key) const
 	return -1;
 }
 
-int Cache::DecRef(void *data, const ieResRef key, bool remove)
+int Cache::DecRef(const void *data, const ieResRef key, bool remove)
 {
 	Cache::MyAssoc* pAssoc;
 

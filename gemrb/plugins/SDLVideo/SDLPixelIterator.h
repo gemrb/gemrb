@@ -29,7 +29,7 @@ using SDLPixelIterator = PixelFormatIterator;
 
 inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, PaletteHolder pal = nullptr)
 {
-	SDL_PixelFormat* fmt = surf->format;
+	const SDL_PixelFormat* fmt = surf->format;
 	if (fmt->palette && pal == nullptr) {
 		assert(fmt->palette->ncolors <= 256);
 		const Color* begin = reinterpret_cast<const Color*>(fmt->palette->colors);
@@ -53,7 +53,7 @@ inline PixelFormat PixelFormatForSurface(SDL_Surface* surf, PaletteHolder pal = 
 	};
 }
 
-inline Region SurfaceRect(SDL_Surface* surf) {
+inline Region SurfaceRect(const SDL_Surface* surf) {
 	return Region(0, 0, surf->w, surf->h);
 }
 
