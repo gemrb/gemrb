@@ -106,7 +106,7 @@ void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
 	const Color* end = begin + fmt->palette->ncolors;
 	
 	if (surface->palette == nullptr) {
-		surface->palette = new Palette(begin, end);
+		surface->palette = MakeHolder<Palette>(begin, end);
 	} else {
 		surface->palette->CopyColorRange(begin, end, 0);
 	}

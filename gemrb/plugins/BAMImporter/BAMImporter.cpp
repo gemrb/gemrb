@@ -109,7 +109,7 @@ bool BAMImporter::Open(DataStream* stream)
 		str->ReadWord(cycles[i].FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
-	palette = new Palette();
+	palette = MakeHolder<Palette>();
 	// no need to switch this
 	for (auto& color : palette->col) {
 		// bgra format

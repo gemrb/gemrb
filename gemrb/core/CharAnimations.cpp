@@ -400,7 +400,7 @@ void CharAnimations::SetupColors(PaletteType type)
 
 		if (needmod) {
 			if (!ModPartPalettes[PAL_MAIN])
-				ModPartPalettes[PAL_MAIN] = new Palette();
+				ModPartPalettes[PAL_MAIN] = MakeHolder<Palette>();
 			ModPartPalettes[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
 		} else {
 			gamedata->FreePalette(ModPartPalettes[PAL_MAIN], 0);
@@ -430,7 +430,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		bool needmod = GlobalColorMod.type != RGBModifier::NONE;
 		if (needmod) {
 			if (!ModPartPalettes[type])
-				ModPartPalettes[type] = new Palette();
+				ModPartPalettes[type] = MakeHolder<Palette>();
 			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
 			gamedata->FreePalette(ModPartPalettes[type], 0);
@@ -454,7 +454,7 @@ void CharAnimations::SetupColors(PaletteType type)
 
 		if (needmod) {
 			if (!ModPartPalettes[type])
-				ModPartPalettes[type] = new Palette();
+				ModPartPalettes[type] = MakeHolder<Palette>();
 
 			if (GlobalColorMod.type != RGBModifier::NONE) {
 				ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);

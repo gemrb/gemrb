@@ -96,7 +96,7 @@ void Palette::Brighten()
 
 PaletteHolder Palette::Copy() const
 {
-	return new Palette(std::begin(col), std::end(col));
+	return MakeHolder<Palette>(std::begin(col), std::end(col));
 }
 
 void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)

@@ -246,7 +246,7 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 		return NULL;
 	}
 
-	PaletteHolder palette = new Palette();
+	PaletteHolder palette = MakeHolder<Palette>();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
 	PaletteCache[resname] = palette;

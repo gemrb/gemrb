@@ -42,7 +42,7 @@ MVEPlay::MVEPlay(void)
 	video = core->GetVideoDriver();
 	validVideo = false;
 	vidBuf = NULL;
-	g_palette = new Palette();
+	g_palette = MakeHolder<Palette>();
 
 	// these colors don't change
 	g_palette->col[0] = ColorBlack;
