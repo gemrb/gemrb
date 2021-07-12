@@ -28,8 +28,8 @@ Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
 {
 	loggingThread = std::thread([this] {
-		QueueType queue;
 		while (running) {
+			QueueType queue;
 			std::unique_lock<std::mutex> lk(queueLock);
 			cv.wait(lk, [this]() { return !messageQueue.empty() || !running; });
 			queue.swap(messageQueue);
