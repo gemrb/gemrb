@@ -67,15 +67,32 @@ public:
 			ptr->acquire();
 	}
 	
+	Holder(Holder&& rhs) noexcept
+	{
+		std::swap(rhs.ptr, ptr);
+	}
+	
 	~Holder() noexcept
 	{
 		if (ptr)
 			ptr->release();
 	}
 	
-	Holder& operator=(Holder rhs) noexcept
+	Holder& operator=(const Holder& rhs) noexcept
 	{
-		std::swap(rhs.ptr, ptr);
+		if (&rhs != this) {
+			ptr = rhs.ptr;
+			if (ptr)
+				ptr->acquire();
+		}
+		return *this;
+	}
+	
+	Holder& operator=(Holder&& rhs) noexcept
+	{
+		if (&rhs != this) {
+			std::swap(rhs.ptr, ptr);
+		}
 		return *this;
 	}
 	
@@ -144,8 +161,7 @@ inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 template<class T, typename... ARGS>
 inline Holder<T> MakeHolder(ARGS&&... args) noexcept
 {
-	Holder<T> holder(new T(std::forward<ARGS>(args)...));
-	return holder;
+	return Holder<T>(new T(std::forward<ARGS>(args)...));
 }
 
 }
