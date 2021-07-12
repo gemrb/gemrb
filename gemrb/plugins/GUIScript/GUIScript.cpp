@@ -8367,7 +8367,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
+	const CREKnownSpell* ks = actor->spellbook.GetKnownSpell(SpellType, Level, Index);
 	if (! ks) {
 		return RuntimeError( "Spell not found!" );
 	}
@@ -8443,7 +8443,7 @@ static PyObject* GemRB_GetMemorizedSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell( SpellType, Level, Index );
+	const CREMemorizedSpell* ms = actor->spellbook.GetMemorizedSpell(SpellType, Level, Index);
 	if (! ms) {
 		return RuntimeError( "Spell not found!" );
 	}

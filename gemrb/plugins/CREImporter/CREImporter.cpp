@@ -106,9 +106,9 @@ int SpellEntry::FindSpell(unsigned int kit) const
 	return -1;
 }
 
-static int FindSpell(ResRef spellref, std::vector<SpellEntry*>& list)
+static size_t FindSpell(ResRef spellref, std::vector<SpellEntry*>& list)
 {
-	int i = list.size();
+	size_t i = list.size();
 	while (i--) {
 		if (list[i]->Equals(spellref)) {
 			return i;
@@ -183,10 +183,10 @@ static std::vector<SpellEntry*> splList;
 static std::vector<SpellEntry*> domList;
 static std::vector<SpellEntry*> magList;
 
-static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
+static size_t IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
-	int splCount = splList.size();
-	for (int i = 0; i < splCount; i++) {
+	size_t splCount = splList.size();
+	for (size_t i = 0; i < splCount; i++) {
 		if (domList[i]->Equals(name)) {
 			int lev = domList[i]->FindSpell(kit);
 			if (lev == -1) return -1;
@@ -227,8 +227,8 @@ int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsign
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
-	int splCount = splList.size();
-	for (int i = 0; i < splCount; i++) {
+	size_t splCount = splList.size();
+	for (size_t i = 0; i < splCount; i++) {
 		if (splList[i]->Equals(name) ) {
 			// iterate over table columns ("kits" - book types)
 			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
@@ -258,7 +258,7 @@ static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type
 	}
 
 	int ret;
-	int splCount = splList.size();
+	size_t splCount = splList.size();
 	switch(type)
 	{
 	case IE_IWD2_SPELL_INNATE:
@@ -275,7 +275,7 @@ static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type
 		break;
 	case IE_IWD2_SPELL_DOMAIN:
 	default:
-		for (int i = 0; i < splCount; i++) {
+		for (size_t i = 0; i < splCount; i++) {
 			if (splList[i]->Equals(name)) return i;
 		}
 	}
@@ -354,10 +354,10 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 			Log(DEBUG, "CREImporter", "Spell entry (%d) without any levels set!", index);
 			return splList[index]->GetSpell();
 		}
-		const ResRef& ret = splList[index]->FindSpell(level2, type);
-		if (!ret.IsEmpty()) {
+		const ResRef& ret2 = splList[index]->FindSpell(level2, type);
+		if (!ret2.IsEmpty()) {
 			Log(DEBUG, "CREImporter", "The spell was found at level %d!", level2);
-			return ret;
+			return ret2;
 		}
 	}
 	if (!ret.IsEmpty() || kit == -1) {
@@ -663,9 +663,8 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 		}
 		stream->Write( act->PCStats->SoundFolder, 32);
 		stream->Write( act->PCStats->SoundSet, 8);
-		for (int i = 0; i < ES_COUNT; i++) {
-			tmpDword = act->PCStats->ExtraSettings[i];
-			stream->WriteDword(tmpDword);
+		for (const auto& setting : act->PCStats->ExtraSettings) {
+			stream->WriteDword(setting);
 		}
 		//Reserved
 		tmpDword = 0;
@@ -751,8 +750,8 @@ void CREImporter::ReadChrHeader(Actor *act)
 		str->Seek(26, GEM_CURRENT_POS);
 		str->Read( act->PCStats->SoundFolder, 32);
 		str->Read( act->PCStats->SoundSet, 8);
-		for (int i = 0; i < ES_COUNT; i++) {
-			str->ReadDword(act->PCStats->ExtraSettings[i]);
+		for (auto& setting : act->PCStats->ExtraSettings) {
+			str->ReadDword(setting);
 		}
 		//Reserved
 		str->Seek(64, GEM_CURRENT_POS);
@@ -1081,8 +1080,8 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	//scriptname of tracked creature (according to IE dev info)
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (int i = 0; i < VCONST_COUNT; i++) {
-		str->ReadDword(act->StrRefs[i]);
+	for (auto& ref : act->StrRefs) {
+		str->ReadDword(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -1136,9 +1135,9 @@ void CREImporter::GetActorPST(Actor *act)
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	//good, law, lady, murder
-	for (int i = 0; i < 4; i++) {
+	for (auto& counter : act->DeathCounters) {
 		str->Read( &tmpByte, 1);
-		act->DeathCounters[i]=(ieByteSigned) tmpByte;
+		counter = (ieByteSigned) tmpByte;
 	}
 	ieVariable KillVar; //use this as needed
 	str->Read(KillVar,32);
@@ -1292,8 +1291,8 @@ void CREImporter::ReadSpellbook(Actor *act)
 				knownSpells[j] = nullptr;
 			}
 		}
-		for (unsigned int j = 0; j < MemorizedCount; j++) {
-			unsigned int k = MemorizedIndex + j;
+		for (unsigned int idx = 0; idx < MemorizedCount; idx++) {
+			unsigned int k = MemorizedIndex + idx;
 			assert(k < MemorizedSpellsCount);
 			if (memorizedSpells[k]) {
 				sm->memorized_spells.push_back(memorizedSpells[k]);
@@ -1521,8 +1520,8 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (int i = 0; i < VCONST_COUNT; i++) {
-		str->ReadDword(act->StrRefs[i]);
+	for (auto& ref : act->StrRefs) {
+		str->ReadDword(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -2052,8 +2051,8 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for (int i = 0; i < VCONST_COUNT; i++) {
-		str->ReadDword(act->StrRefs[i]);
+	for (auto& ref : act->StrRefs) {
+		str->ReadDword(ref);
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL]=tmpByte;
@@ -2601,8 +2600,8 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 32);
-		for (int i = 0; i < VCONST_COUNT; i++) {
-			stream->WriteDword(actor->StrRefs[i]);
+		for (const auto& ref : actor->StrRefs) {
+			stream->WriteDword(ref);
 		}
 		tmpByte = actor->BaseStats[IE_LEVEL];
 		stream->Write( &tmpByte, 1);
@@ -2717,8 +2716,8 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0];
 		stream->WriteWord(tmpWord);
 	}
-	for (int i = 0; i < 4; i++) {
-		tmpByte = (ieByte) (actor->DeathCounters[i]);
+	for (const auto& counter : actor->DeathCounters) {
+		tmpByte = (ieByte) counter;
 		stream->Write( &tmpByte, 1);
 	}
 	stream->Write( actor->KillVar, 32);

@@ -500,8 +500,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		str->ReadDword(map->SongHeader.SongList[i]);
+	for (auto& list : map->SongHeader.SongList) {
+		str->ReadDword(list);
 	}
 
 	str->ReadResRef(map->SongHeader.MainDayAmbient1);
@@ -542,11 +542,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	map->SetupReverbInfo();
 
 	str->Seek( RestHeader + 32, GEM_STREAM_START );
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		str->ReadDword(map->RestHeader.Strref[i]);
+	for (auto& ref : map->RestHeader.Strref) {
+		str->ReadDword(ref);
 	}
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		str->ReadResRef( map->RestHeader.CreResRef[i] );
+	for (auto& ref : map->RestHeader.CreResRef) {
+		str->ReadResRef(ref);
 	}
 	str->ReadWord(map->RestHeader.CreatureNum);
 	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
@@ -1321,8 +1321,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		str->ReadDword(ambi->pitchVariance);
 		str->ReadWord(ambi->gainVariance);
 		str->ReadWord(ambi->gain);
-		for (int j = 0;j < MAX_RESCOUNT; j++) {
-			str->ReadResRef( sounds[j] );
+		for (auto& sound : sounds) {
+			str->ReadResRef(sound);
 		}
 		str->ReadWord(tmpWord);
 		str->Seek( 2, GEM_CURRENT_POS );
@@ -2544,8 +2544,8 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		stream->WriteDword(map->SongHeader.SongList[i]);
+	for (const auto& list : map->SongHeader.SongList) {
+		stream->WriteDword(list);
 	}
 	//day
 	stream->WriteResRef(map->SongHeader.MainDayAmbient1);
@@ -2571,11 +2571,11 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 	char filling[32];
 	memset(filling,0,sizeof(filling) );
 	stream->Write( filling, 32); //empty label
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		stream->WriteDword(map->RestHeader.Strref[i]);
+	for (const auto& ref : map->RestHeader.Strref) {
+		stream->WriteDword(ref);
 	}
-	for (int i = 0; i < MAX_RESCOUNT; i++) {
-		stream->WriteResRef( map->RestHeader.CreResRef[i]);
+	for (const auto& ref : map->RestHeader.CreResRef) {
+		stream->WriteResRef(ref);
 	}
 	stream->WriteWord(map->RestHeader.CreatureNum);
 	stream->WriteWord(map->RestHeader.Difficulty);

@@ -1131,11 +1131,9 @@ void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int typ
 		for (const auto spellMemo : spells[i]) {
 			for (const auto slot : spellMemo->known_spells) {
 				if (!slot) continue;
-
 				// skip the spell itself
-				if (spell && slot->SpellResRef == spell) {
-					continue;
-				}
+				if (spell && slot->SpellResRef == spell) continue;
+
 				AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
 			}
 		}

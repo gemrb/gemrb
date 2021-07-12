@@ -104,16 +104,16 @@ bool BAMImporter::Open(DataStream* stream)
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = new Palette();
 	// no need to switch this
-	for (unsigned int i = 0; i < 256; i++) {
+	for (auto& color : palette->col) {
 		// bgra format
-		str->Read( &palette->col[i].b, 1 );
-		str->Read( &palette->col[i].g, 1 );
-		str->Read( &palette->col[i].r, 1 );
+		str->Read(&color.b, 1);
+		str->Read(&color.g, 1);
+		str->Read(&color.r, 1);
 		unsigned char a;
 		str->Read( &a, 1 );
 
 		// BAM v2 (EEs) supports alpha, but for backwards compatibility an alpha of 0 is still 255
-		palette->col[i].a = a ? a : 255;
+		color.a = a ? a : 255;
 	}
 	// old bamworkshop semicorrupted shadow entry: recreate a plausible one instead of pink
 	if (palette->col[1].r == 255 && palette->col[1].g == 101 && palette->col[1].b == 151) {

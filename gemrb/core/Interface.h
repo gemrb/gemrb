@@ -179,9 +179,6 @@ public:
 			WeightOdds=false;
 		}
 	}
-	~ItemList() {
-		ResRefs.clear();
-	}
 };
 
 //quitflags

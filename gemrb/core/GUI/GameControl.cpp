@@ -1809,7 +1809,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		if (spellIndex<0) {
 			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
 		} else {
-			CREMemorizedSpell *si;
+			const CREMemorizedSpell *si;
 			//spell casting at target
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
