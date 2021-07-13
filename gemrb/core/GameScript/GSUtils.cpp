@@ -1409,10 +1409,10 @@ bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 		return false;
 	if (a==-1) {
 		//use the default charge counts of the item
-		Item *origitem = gamedata->GetItem(item->ItemResRef);
+		const Item *origitem = gamedata->GetItem(item->ItemResRef);
 		if (origitem) {
 			for(int i=0;i<3;i++) {
-				ITMExtHeader *e = origitem->GetExtHeader(i);
+				const ITMExtHeader *e = origitem->GetExtHeader(i);
 				item->Usages[i]=e?e->Charges:0;
 			}
 			gamedata->FreeItem(origitem, item->ItemResRef, false);

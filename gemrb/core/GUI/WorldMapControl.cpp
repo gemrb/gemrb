@@ -43,19 +43,19 @@ WorldMapControl::WorldMapControl(const Region& frame, Font *font, const Color &n
 	
 	ControlType = IE_GUI_WORLDMAP;
 	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-	Game* game = core->GetGame();
-	WorldMap* worldmap = core->GetWorldMap();
+	const Game* game = core->GetGame();
+	const WorldMap* worldmap = core->GetWorldMap();
 	currentArea = game->CurrentArea;
 	int entry = core->GetAreaAlias(currentArea);
 	if (entry >= 0) {
-		WMPAreaEntry *m = worldmap->GetEntry(entry);
+		const WMPAreaEntry *m = worldmap->GetEntry(entry);
 		currentArea = m->AreaResRef;
 	}
 
 	//if there is no trivial area, look harder
 	if (!worldmap->GetArea(currentArea, (unsigned int &) entry) &&
 		core->HasFeature(GF_FLEXIBLE_WMAP) ) {
-		WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
+		const WMPAreaEntry *m = worldmap->FindNearestEntry(currentArea, (unsigned int &) entry);
 		if (m) {
 			currentArea = m->AreaResRef;
 		}
@@ -91,7 +91,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		return rgn.origin - Pos + p;
 	};
 	
-	WorldMap* worldmap = core->GetWorldMap();
+	const WorldMap* worldmap = core->GetWorldMap();
 
 	Video* video = core->GetVideoDriver();
 	video->BlitSprite( worldmap->GetMapMOS(), MapToScreen(Point()));
@@ -127,7 +127,7 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		if (ftext == nullptr || caption == nullptr)
 			continue;
 
-		Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
+		const Holder<Sprite2D> icon = m->GetMapIcon(worldmap->bam);
 		if (!icon) continue;
 		const Region& icon_frame = icon->Frame;
 		Point p = m->pos - icon_frame.origin;
@@ -159,8 +159,8 @@ void WorldMapControl::ScrollDelta(const Point& delta)
 void WorldMapControl::ScrollTo(const Point& pos)
 {
 	Pos = pos;
-	WorldMap* worldmap = core->GetWorldMap();
-	Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
+	const WorldMap* worldmap = core->GetWorldMap();
+	const Holder<Sprite2D> MapMOS = worldmap->GetMapMOS();
 
 	if (pos.IsZero()) {
 		// center worldmap on current area
@@ -185,11 +185,11 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
 	if (GetValue() != ieDword(-1)) {
 		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-		WorldMap* worldmap = core->GetWorldMap();
+		const WorldMap* worldmap = core->GetWorldMap();
 		Point p = ConvertPointFromScreen(me.Pos());
 		Point mapOff = p + Pos;
 
-		WMPAreaEntry *oldArea = Area;
+		const WMPAreaEntry *oldArea = Area;
 		Area = NULL;
 
 		unsigned int ec = worldmap->GetEntryCount();
@@ -200,7 +200,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 				continue; //invisible or inaccessible
 			}
 
-			Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
+			const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
 			Region rgn(ae->pos, Size());
 			if (icon) {
 				rgn.x -= icon->Frame.x;
@@ -221,7 +221,7 @@ bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
 			Area=ae;
 			if(oldArea!=ae) {
-				String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
+				const String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
 				int hours = worldmap->GetDistance(Area->AreaName);
 				if (str && !str->empty() && hours >= 0) {
 					wchar_t dist[10];

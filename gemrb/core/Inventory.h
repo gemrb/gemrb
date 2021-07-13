@@ -344,7 +344,7 @@ public:
 	/** returns a slot that has a stealable item */
 	int FindStealableItem();
 	/** checks if any equipped item provides critical hit aversion */
-	bool ProvidesCriticalAversion();
+	bool ProvidesCriticalAversion() const;
 	/** tries to merge the passed item with the one in the passed slot */
 	int MergeItems(int slot, CREItem *item);
 	bool FistsEquipped() const;

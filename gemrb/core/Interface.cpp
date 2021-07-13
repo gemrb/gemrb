@@ -3281,14 +3281,14 @@ void Interface::UpdateWorldMap(ResRef wmResRef)
 	}
 
 	WorldMapArray *new_worldmap = wmp_mgr->GetWorldMapArray();
-	WorldMap *wm = worldmap->GetWorldMap(0);
-	WorldMap *nwm = new_worldmap->GetWorldMap(0);
+	const WorldMap *wm = worldmap->GetWorldMap(0);
+	const WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
 	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
 	//update status of the previously existing areas
 	for (unsigned int i = 0; i < ec; i++) {
-		WMPAreaEntry *ae = wm->GetEntry(i);
+		const WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
 			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
@@ -3892,7 +3892,7 @@ bool Interface::ReadRandomItems()
 	return true;
 }
 
-CREItem *Interface::ReadItem(DataStream *str)
+CREItem *Interface::ReadItem(DataStream *str) const
 {
 	CREItem *itm = new CREItem();
 	if (ReadItem(str, itm)) return itm;
@@ -3900,7 +3900,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 	return NULL;
 }
 
-CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
+CREItem *Interface::ReadItem(DataStream *str, CREItem *itm) const
 {
 	str->ReadResRef( itm->ItemResRef );
 	str->ReadWord(itm->Expired);
@@ -3994,7 +3994,7 @@ void Interface::SanitizeItem(CREItem *item) const
 
 //This function generates random items based on the randitem.2da file
 //there could be a loop, but we don't want to freeze, so there is a limit
-bool Interface::ResolveRandomItem(CREItem *itm)
+bool Interface::ResolveRandomItem(CREItem *itm) const
 {
 	if (!RtRows) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {

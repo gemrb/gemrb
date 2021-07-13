@@ -601,10 +601,10 @@ public:
 	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
-	CREItem *ReadItem(DataStream *str);
-	CREItem *ReadItem(DataStream *str, CREItem *itm);
+	CREItem *ReadItem(DataStream *str) const;
+	CREItem *ReadItem(DataStream *str, CREItem *itm) const;
 	void SanitizeItem(CREItem *item) const;
-	bool ResolveRandomItem(CREItem *itm);
+	bool ResolveRandomItem(CREItem *itm) const;
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();

@@ -56,7 +56,7 @@ public:
 	 */
 	virtual int GetPalette(int colors, Color* pal);
 	
-	Size GetSize() { return size; }
+	Size GetSize() const { return size; }
 
 	/**
 	 * Returns a \ref ImageFactory for the current image.

@@ -120,7 +120,8 @@ void Inventory::CopyFrom(const Actor *source)
 	SetSlotCount(source->inventory.GetSlotCount());
 
 	// allocate the items and mark them undroppable
-	CREItem *tmp, *item;
+	CREItem *tmp;
+	const CREItem *item;
 	for (size_t i = 0; i < source->inventory.Slots.size(); i++) {
 		item = source->inventory.Slots[i];
 		if (item) {
@@ -167,7 +168,7 @@ void Inventory::CalculateWeight()
 			continue;
 		}
 		if (slot->Weight == -1) {
-			Item *itm = gamedata->GetItem(slot->ItemResRef, true);
+			const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 			if (itm) {
 				slot->Weight = itm->Weight;
 				gamedata->FreeItem( itm, slot->ItemResRef, false );
@@ -397,7 +398,7 @@ void Inventory::KillSlot(unsigned int index)
 					//find the equipped type
 					int type = header->ProjectileQualifier;
 					int weaponslot = FindTypedRangedWeapon(type);
-					CREItem *item2 = Slots[weaponslot];
+					const CREItem *item2 = Slots[weaponslot];
 					if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
 						EquipBestWeapon(EQUIP_MELEE);
 					} else if (item2) {
@@ -522,7 +523,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		mask &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 	while(slot--) {
-		CREItem *item = Slots[slot];
+		const CREItem *item = Slots[slot];
 		if (!item) {
 			continue;
 		}
@@ -700,7 +701,7 @@ int Inventory::DepleteItem(ieDword flags) const
 
 		//if flags = 0 then weapons are not depleted
 		if (!flags) {
-			Item *itm = gamedata->GetItem(item->ItemResRef, true);
+			const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 			if (!itm) {
 				Log(WARNING, "Inventory", "Invalid item to deplete: %s!", item->ItemResRef);
 				continue;
@@ -991,7 +992,7 @@ int Inventory::FindRangedProjectile(unsigned int type) const
 
 		const Item *itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
-		ITMExtHeader *ext_header = itm->GetExtHeader(0);
+		const ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		unsigned int weapontype = 0;
 		if (ext_header) {
 			weapontype = ext_header->ProjectileQualifier;
@@ -1016,11 +1017,11 @@ int Inventory::FindSlotRangedWeapon(ieDword slot) const
 {
 	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
 	CREItem *Slot;
-	Item *itm = GetItemPointer(slot, Slot);
+	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
 
 	//always look for a ranged header when looking for a projectile/projector
-	ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
+	const ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 	unsigned int type = 0;
 	if (ext_header) {
 		type = ext_header->ProjectileQualifier;
@@ -1042,7 +1043,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		const Item *itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
 		//always look for a ranged header when looking for a projectile/projector
-		ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
+		const ITMExtHeader *ext_header = itm->GetWeaponHeader(true);
 		int weapontype = 0;
 		if (ext_header && (ext_header->AttackType == ITEM_AT_BOW)) {
 			weapontype = ext_header->ProjectileQualifier;
@@ -1267,9 +1268,9 @@ int Inventory::GetEquippedHeader() const
 ITMExtHeader *Inventory::GetEquippedExtHeader(int header) const
 {
 	int slot; // Equipped holds the projectile, not the weapon
-	CREItem *itm = GetUsedWeapon(false, slot); // check the main hand only
+	const CREItem *itm = GetUsedWeapon(false, slot); // check the main hand only
 	if (!itm) return NULL;
-	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	const Item *item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return NULL;
 	return item->GetExtHeader(header);
 }
@@ -1348,7 +1349,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 			continue;
 		}
 
-		CREItem *item = Slots[i];
+		const CREItem *item = Slots[i];
 
 		if (!item) {
 			return (int) i; //this is a good empty slot
@@ -1584,7 +1585,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 			continue;
 		}
 		for(int ehc=0;ehc<itm->ExtHeaderCount;ehc++) {
-			ITMExtHeader *ext_header = itm->ext_headers+ehc;
+			const ITMExtHeader *ext_header = itm->ext_headers + ehc;
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;
 			}
@@ -1699,12 +1700,12 @@ void Inventory::UpdateWeaponAnimation()
 			// TODO: for consistency, use same Item* access method as above
 			bool twoweapon = false;
 			int slot = GetShieldSlot();
-			CREItem* si = NULL;
+			const CREItem* si = nullptr;
 			if (slot>0) {
 				si = GetSlotItem( (ieDword) slot );
 			}
 			if (si) {
-				Item* it = gamedata->GetItem(si->ItemResRef, true);
+				const Item* it = gamedata->GetItem(si->ItemResRef, true);
 				assert(it);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
@@ -1741,9 +1742,7 @@ bool Inventory::IsSlotBlocked(int slot) const
 
 inline bool Inventory::TwoHandedInSlot(int slot) const
 {
-	CREItem *item;
-
-	item = GetSlotItem(slot);
+	const CREItem *item = GetSlotItem(slot);
 	if (!item) return false;
 	if (item->Flags&IE_INV_ITEM_TWOHANDED) {
 		return true;
@@ -1810,11 +1809,11 @@ void Inventory::ChargeAllItems(int hours) const
 			continue;
 		}
 
-		Item *itm = gamedata->GetItem(item->ItemResRef, true);
+		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		if (!itm)
 			continue;
 		for(int h=0;h<CHARGE_COUNTERS;h++) {
-			ITMExtHeader *header = itm->GetExtHeader(h);
+			const ITMExtHeader *header = itm->GetExtHeader(h);
 			if (header && (header->RechargeFlags&IE_ITEM_RECHARGE)) {
 				unsigned short add = header->Charges;
 				if (hours && add>hours) add=hours;
@@ -1837,7 +1836,7 @@ int Inventory::FindStealableItem()
 	Log(DEBUG, "Inventory", "Start Slot: %d, increment: %d", start, inc);
 	for (unsigned int i = 0; i < slotcnt; ++i) {
 		int slot = (slotcnt - 1 + start + i * inc) % slotcnt;
-		CREItem *item = Slots[slot];
+		const CREItem *item = Slots[slot];
 		//can't steal empty slot
 		if (!item) continue;
 		//bit 1 is stealable slot
@@ -1856,11 +1855,11 @@ int Inventory::FindStealableItem()
 // extension to allow more or less than head gear to avert critical hits:
 // If an item with bit 25 set is equipped in a non-helmet slot, aversion is enabled
 // If an item with bit 25 set is equipped in a helmet slot, aversion is disabled
-bool Inventory::ProvidesCriticalAversion()
+bool Inventory::ProvidesCriticalAversion() const
 {
 	int maxSlot = (int) Slots.size();
 	for (int i = 0; i < maxSlot; i++) {
-		CREItem *item = Slots[i];
+		const CREItem *item = Slots[i];
 		if (!item || ((i>=SLOT_INV) && (i<=LAST_INV))) { // ignore items in the backpack
 			continue;
 		}
@@ -1869,7 +1868,7 @@ bool Inventory::ProvidesCriticalAversion()
 			continue;
 		}
 
-		Item *itm = gamedata->GetItem(item->ItemResRef, true);
+		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 		if (!itm) {
 			continue;
 		}

@@ -1898,7 +1898,7 @@ bool Game::RestParty(int checks, int dream, int hp)
 }
 
 // calculate an estimate of spell's healing power
-inline static int CastOnRestHealingAmount(Actor *caster, const SpecialSpellType &specialSpell)
+inline static int CastOnRestHealingAmount(const Actor *caster, const SpecialSpellType &specialSpell)
 {
 	int healing = specialSpell.amount;
 	if (specialSpell.bonus_limit > 0) {
