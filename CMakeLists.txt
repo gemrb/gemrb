@@ -303,6 +303,8 @@ IF(SDL_BACKEND STREQUAL "SDL2")
 		INCLUDE(FindSDL2)
 	ENDIF()
 	# unify SDL variables, so we don't have to differentiate later
+	UNSET(SDL_INCLUDE_DIR CACHE)
+	UNSET(SDL_LIBRARY CACHE)
 	SET(SDL_INCLUDE_DIR ${SDL2_INCLUDE_DIR})
 	SET(SDL_LIBRARY ${SDL2_LIBRARY})
 	SET(SDL_FOUND ${SDL2_FOUND})
@@ -324,7 +326,6 @@ ENDIF()
 
 IF(SDL_FOUND)
 	MESSAGE(STATUS "Looking for SDL: found")
-	# unify SDL variables, so we don't have to differentiate later
 	MESSAGE(STATUS "Looking for libSDL: found")
 ELSE()
 	MESSAGE(WARNING "Looking for SDL: not found!")
