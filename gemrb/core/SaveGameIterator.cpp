@@ -368,8 +368,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 			prtrt++;
 	} while (++dir);
 
-	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber );
-	return sg;
+	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber);
 }
 
 void SaveGameIterator::PruneQuickSave(const char *folder) const

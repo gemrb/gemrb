@@ -591,7 +591,7 @@ Holder<Sprite2D> SDL12VideoDriver::GetScreenshot(Region r,  const VideoBufferPtr
 		SDL_BlitSurface( disp, (r.w && r.h) ? &src : NULL, screenshot->GetSurface(), NULL);
 	}
 
-	return screenshot;
+	return Holder<Sprite2D>(screenshot);
 }
 
 bool SDL12VideoDriver::ToggleGrabInput()

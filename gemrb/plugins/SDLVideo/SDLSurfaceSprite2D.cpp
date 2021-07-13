@@ -32,10 +32,10 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 : Sprite2D(rgn, px, fmt)
 {
 	if (px) {
-		surface = new SurfaceHolder(SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
+		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
 															 fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 	} else {
-		surface = new SurfaceHolder(SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
+		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 		SDL_FillRect(*surface, NULL, 0);
 		pixels = (*surface)->pixels;
 	}
@@ -62,7 +62,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 {
 	pixels = (*obj.surface)->pixels;
 
-	surface = new SurfaceHolder(
+	surface = MakeHolder<SurfaceHolder>(
 			SDL_CreateRGBSurfaceFrom(
 				pixels,
 				Frame.w,
@@ -118,7 +118,7 @@ bool SDLSurfaceSprite2D::SetPaletteColors(const Color* pal) const noexcept
 
 Holder<Sprite2D> SDLSurfaceSprite2D::copy() const
 {
-	return new SDLSurfaceSprite2D(*this);
+	return Holder<Sprite2D>(new SDLSurfaceSprite2D(*this));
 }
 
 const void* SDLSurfaceSprite2D::LockSprite() const
@@ -205,7 +205,7 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 					free(pixels);
 				}
 				freePixels = false;
-				surface = new SurfaceHolder(ns);
+				surface = MakeHolder<SurfaceHolder>(ns);
 				format.Bpp = tofmt.Bpp;
 				return true;
 			} else {
@@ -251,7 +251,7 @@ void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
 
 	if (version != newversion) {
 		SDL_Surface* newVersion = SDL_ConvertSurface(*original, (*original)->format, 0);
-		surface = new SurfaceHolder(newVersion);
+		surface = MakeHolder<SurfaceHolder>(newVersion);
 
 		return newVersion;
 	} else {
@@ -270,7 +270,7 @@ SDLTextureSprite2D::SDLTextureSprite2D(const Region& rgn, const PixelFormat& fmt
 
 Holder<Sprite2D> SDLTextureSprite2D::copy() const
 {
-	return new SDLTextureSprite2D(*this);
+	return Holder<Sprite2D>(new SDLTextureSprite2D(*this));
 }
 
 SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
@@ -278,7 +278,7 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 	if (texture == nullptr) {
 		SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, GetSurface());
 		SDL_QueryTexture(tex, &texFormat, nullptr, nullptr, nullptr);
-		texture = new TextureHolder(tex);
+		texture = MakeHolder<TextureHolder>(tex);
 	} else if (staleTexture) {
 		SDL_Surface *surface = GetSurface();
 		if (texFormat == surface->format->format) {

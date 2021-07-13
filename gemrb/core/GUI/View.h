@@ -42,7 +42,7 @@ public:
 		View* dragView = nullptr;
 		View* dropView = nullptr;
 		
-		Holder<Sprite2D> cursor = nullptr;
+		Holder<Sprite2D> cursor;
 		
 		DragOp(View* v, Holder<Sprite2D> cursor);
 		virtual ~DragOp();

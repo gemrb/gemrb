@@ -103,7 +103,7 @@ public:
 	Sprite2D(Sprite2D&&) noexcept;
 	~Sprite2D() noexcept override;
 
-	virtual Holder<Sprite2D> copy() const { return new Sprite2D(*this); };
+	virtual Holder<Sprite2D> copy() const { return MakeHolder<Sprite2D>(*this); };
 
 	virtual bool HasTransparency() const noexcept;
 	bool IsPixelTransparent(const Point& p) const noexcept;

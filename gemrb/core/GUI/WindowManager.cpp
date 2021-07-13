@@ -41,7 +41,7 @@ void WindowManager::SetTooltipDelay(int delay)
 	ToolTipDelay = delay;
 }
 
-WindowManager::WindowManager(Video* vid)
+WindowManager::WindowManager(Holder<Video> vid)
 : tooltip(core->CreateTooltip())
 {
 	assert(vid);

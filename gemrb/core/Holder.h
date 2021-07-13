@@ -30,7 +30,7 @@ namespace GemRB {
 template <class T>
 class Held {
 public:
-	Held() noexcept : RefCount(0) {}
+	Held() noexcept = default;
 	virtual ~Held() noexcept = default;
 	void acquire() noexcept { ++RefCount; }
 	void release() noexcept {
@@ -38,7 +38,7 @@ public:
 		if (--RefCount == 0) delete static_cast<T*>(this);
 	}
 private:
-	size_t RefCount;
+	size_t RefCount = 0;
 };
 
 /**
@@ -53,7 +53,15 @@ private:
 template <class T>
 class Holder final {
 public:
-	Holder(T* ptr = nullptr) noexcept
+	Holder() noexcept
+	: ptr(nullptr)
+	{}
+
+	Holder(std::nullptr_t) noexcept
+	: ptr(nullptr)
+	{}
+
+	explicit Holder(T* ptr) noexcept
 	: ptr(ptr)
 	{
 		if (ptr)
@@ -96,6 +104,13 @@ public:
 		return *this;
 	}
 	
+	Holder& operator=(std::nullptr_t) noexcept
+	{
+		if (ptr) ptr->release();
+		ptr = nullptr;
+		return *this;
+	}
+	
 	T &operator*() const noexcept {
 		return *ptr;
 	}
@@ -118,7 +133,7 @@ public:
 		ptr = nullptr;
 	}
 
-protected:
+private:
 	T *ptr = nullptr;
 };
 

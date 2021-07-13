@@ -678,7 +678,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
-		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BlitFlags::BLENDED, tint);
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, p, flags, tint);

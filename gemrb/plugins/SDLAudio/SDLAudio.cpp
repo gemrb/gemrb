@@ -336,7 +336,8 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		SetChannelPosition(listenerPos, p, chan);
 	}
 
-	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
+	// TODO: we need something like static_ptr_cast
+	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE));
 }
 
 int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)

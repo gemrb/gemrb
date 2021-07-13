@@ -562,7 +562,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 
 	SDL_SetRenderTarget(renderer, target);
 
-	return screenshot;
+	return Holder<Sprite2D>(screenshot);
 }
 
 int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const

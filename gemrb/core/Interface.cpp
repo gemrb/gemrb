@@ -1359,7 +1359,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
+	video = Holder<Video>(( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str()));
 	if (!video) {
 		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
@@ -1622,7 +1622,7 @@ int Interface::Init(InterfaceConfig* config)
 	if (ret) return ret;
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(video.get());
+	winmgr = new WindowManager(video);
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
 	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
 
@@ -1636,7 +1636,7 @@ int Interface::Init(InterfaceConfig* config)
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
+	AudioDriver = Holder<Audio>((Audio*)PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str()));
 	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;

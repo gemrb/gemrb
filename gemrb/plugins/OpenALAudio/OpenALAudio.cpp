@@ -555,8 +555,8 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 		return Holder<SoundHandle>();
 	}
 
-	stream->handle = new OpenALSoundHandle(stream);
-	return stream->handle.get();
+	stream->handle = MakeHolder<OpenALSoundHandle>(stream);
+	return Holder<SoundHandle>(stream->handle.get()); // TODO: we need something like static_ptr_cast
 }
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)

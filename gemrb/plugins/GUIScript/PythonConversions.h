@@ -62,7 +62,7 @@ public:
 		else
 			PyErr_Clear();
 
-		ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
+		ptr = Holder<T>(static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description)));
 		if (ptr) {
 			ptr->acquire();
 		} else {

@@ -34,15 +34,15 @@ protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
-	SpriteSheet(Holder<Video> video)
+	SpriteSheet(Video* video)
 	: video(video) {};
 
 public:
 	Holder<Sprite2D> Sheet;
-	Holder<Video> video;
+	Video* video;
 
 public:
-	SpriteSheet(Holder<Video> video, Holder<Sprite2D> sheet)
+	SpriteSheet(Video* video, Holder<Sprite2D> sheet)
 	: Sheet(sheet), video(video) {
 		SheetRegion = Sheet->Frame;
 	};
