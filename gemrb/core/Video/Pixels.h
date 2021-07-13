@@ -105,9 +105,9 @@ struct GEM_EXPORT Pixel24Bit {
 #endif
 	
 	Pixel24Bit& operator=(uint32_t pixel) {
-		r = pixel & 0xff000000;
-		g = pixel & 0x00ff0000;
-		b = pixel & 0x0000ff00;
+		r = (pixel & 0xff000000) >> 24;
+		g = (pixel & 0x00ff0000) >> 16;
+		b = (pixel & 0x0000ff00) >> 8;
 		return *this;
 	}
 	
@@ -449,7 +449,7 @@ struct GEM_EXPORT StaticAlphaIterator : public IAlphaIterator
 {
 	uint8_t alpha;
 
-	StaticAlphaIterator(uint8_t a) : alpha(a) {}
+	explicit StaticAlphaIterator(uint8_t a) : alpha(a) {}
 
 	uint8_t operator*() const override {
 		return alpha;
