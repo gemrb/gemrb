@@ -41,7 +41,8 @@ inline uint8_t* DecodeRLEData(const uint8_t* p, const Size& size, colorkey_t col
 			if (px == colorKey) {
 				transQueue = std::min<size_t>(1 + *p++, pixelCount - i);
 			} else {
-				buffer[i++] = px;
+				buffer[i] = px;
+				++i;
 			}
 		}
 	}
