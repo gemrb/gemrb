@@ -987,7 +987,7 @@ bool Game::CheckForReplacementActor(int i)
 		}
 	}
 
-	if (newcre == "****") {
+	if (newcre != "****") {
 		int pos = gamedata->LoadCreature(newcre, 0, false, act->version);
 		if (pos < 0) {
 			error("Game::CheckForReplacementActor", "LoadCreature failed: pos is negative!\n");
