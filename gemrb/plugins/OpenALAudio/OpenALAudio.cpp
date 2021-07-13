@@ -893,7 +893,6 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits) const
 int OpenALAudioDriver::MusicManager(void* arg)
 {
 	OpenALAudioDriver* driver = (OpenALAudioDriver*) arg;
-	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(30));
@@ -956,7 +955,6 @@ int OpenALAudioDriver::MusicManager(void* arg)
 				return -1;
 			}
 			if (processed > 0) {
-				buffersreturned += processed;
 				while (processed) {
 					ALuint BufferID;
 					alSourceUnqueueBuffers( driver->MusicSource, 1, &BufferID );

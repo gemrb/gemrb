@@ -1611,7 +1611,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	ieDword memocount;
 	ieDword tmpDword;
 
-	int check = 0, i = count;
+	int i = count;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
 	assert(sm && sm->SlotCount == 0 && sm->SlotCountWithBonus == 0); // unused
 	while(i--) {
@@ -1619,7 +1619,6 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		str->ReadDword(totalcount);
 		str->ReadDword(memocount);
 		str->ReadDword(tmpDword);
-		check+=totalcount;
 		const ResRef& tmp = ResolveSpellIndex(spellindex, level, type, act->BaseStats[IE_KIT]);
 		if (tmp.IsEmpty()) {
 			error("CREImporter", "Unresolved spell index: %d level:%d, type: %d",
