@@ -3206,10 +3206,24 @@ static PyObject* GemRB_Label_SetFont(PyObject* self, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_Button_SetHotKey__doc,
-			 "Button.SetHotKey(char or keymaping, [int modifiers=0, bool global=False])\n\n"
-			 "Binds a keyboard key to trigger the control event when its window is focused.\n"
-			 "If global is set the hot key works even if the window does not have focus.\n"
-			 "If None is passed as the key, any existing hotkey binding is cleared.");
+"===== Button_SetHotKey =====\n\
+\n\
+**Prototype:** _GemRB.Button_SetHotKey(char or keymaping[, modifiers=0, global=False])\n\
+\n\
+**Description:** Binds a keyboard key to trigger the control event when its window is focused.\n\
+If global is set, the hot key works even if the window does not have focus.\n\
+If None is passed as the key, any existing hotkey binding is cleared.\n\
+\n\
+**Parameters:**\n\
+ * char - key to bind\n\
+ * modifiers - bitfield denoting if modifier keys need to be pressed\n\
+   * GEM_MOD_SHIFT (1) - shift\n\
+   * GEM_MOD_CTRL (2) - control\n\
+   * GEM_MOD_ALT (4) - alt\n\
+ * global - boolean toggling focus requirement\n\
+\n\
+**Return value:** N/A"
+);
 
 static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 {
