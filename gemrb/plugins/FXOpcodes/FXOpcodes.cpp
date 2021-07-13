@@ -2455,9 +2455,9 @@ int fx_kill_creature_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 1 - switch good and evil
 // 2 - switch lawful and chaotic
 
-static int al_switch_both[12]={0,0x33,0x32,0x31,0,0x23,0x22,0x21,0,0x13,0x12,0x11};
-static int al_switch_law[12]={0,0x31,0x32,0x33,0,0x21,0x22,0x23,0,0x11,0x12,0x13};
-static int al_switch_good[12]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x31};
+static const int al_switch_both[12] = { 0, 0x33, 0x32, 0x31, 0, 0x23, 0x22, 0x21, 0, 0x13, 0x12, 0x11 };
+static const int al_switch_law[12] = { 0, 0x31, 0x32, 0x33, 0, 0x21, 0x22, 0x23, 0, 0x11, 0x12, 0x13 };
+static const int al_switch_good[12] = { 0, 0x13, 0x12, 0x11, 0, 0x23, 0x22, 0x21, 0, 0x33, 0x32, 0x31 };
 int fx_alignment_invert (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_alignment_invert(%2d)", fx->Opcode);
@@ -2690,7 +2690,7 @@ int fx_transparency_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x43 SummonCreature
 
-static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
+static const int eamods[] = { EAM_ALLY, EAM_ALLY, EAM_DEFAULT, EAM_ALLY, EAM_DEFAULT, EAM_ENEMY, EAM_ALLY };
 
 int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -4473,8 +4473,8 @@ int fx_disable_button (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 16 - class (SPCL)
 */
 
-static ieDword dsc_bits_iwd2[7]={1, 14, 6, 2, 4, 8, 16};
-static ieDword dsc_bits_bg2[7]={1, 4, 2, 8, 16, 14, 6};
+static const ieDword dsc_bits_iwd2[7] = { 1, 14, 6, 2, 4, 8, 16 };
+static const ieDword dsc_bits_bg2[7] = { 1, 4, 2, 8, 16, 14, 6 };
 int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_disable_spellcasting(%2d): Button: %d", fx->Opcode, fx->Parameter2);
@@ -6402,8 +6402,8 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define WB_OWNDIR 6
 #define WB_AWAYOWNDIR 7
 
-static int coords[16][2]={ {0,12},{-4,9},{-8,6},{-12,3},{-16,0},{-12,-3},{-8,-6},{-4,-9},
-{0,-12},{4,-9},{8,-6},{12,-3},{16,0},{12,3},{8,6},{4,9},};
+static const int coords[16][2]={ {0, 12}, {-4, 9}, {-8, 6}, {-12, 3}, {-16, 0}, {-12, -3}, {-8, -6}, {-4, -9},
+{0, -12}, {4, -9}, {8, -6}, {12, -3}, {16, 0}, {12, 3}, {8, 6}, {4, 9}, };
 
 // 0xeb WingBuffet
 int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -7794,7 +7794,7 @@ int fx_uncanny_dodge (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 we allow also setting the normal stats, below index 256
 */
 static EffectRef fx_damage_bonus_modifier2_ref = { "DamageBonusModifier2", -1 };
-static int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
+static const int damage_mod_map[] = { 4, 2, 9, 3, 1, 8, 6, 5, 10, 7, 11, 12, 13 };
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	ieWord stat = fx->Parameter2 & 0x0000ffff;

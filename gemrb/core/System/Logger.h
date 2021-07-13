@@ -117,7 +117,7 @@ public:
 	void LogMsg(LogMessage&& msg);
 };
 
-extern const char* log_level_text[];
+extern const char* const log_level_text[];
 
 }
 

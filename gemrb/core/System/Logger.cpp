@@ -87,7 +87,7 @@ void Logger::LogMsg(LogMessage&& msg)
 	}
 }
 
-const char* log_level_text[] = {
+const char* const log_level_text[] = {
 	"FATAL",
 	"ERROR",
 	"WARNING",

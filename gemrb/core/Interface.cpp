@@ -107,10 +107,10 @@ static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static int NumRareSelectSounds = 2;
 
-static ieWord IDT_FAILURE = 0;
-static ieWord IDT_CRITRANGE = 1;
-static ieWord IDT_CRITMULTI = 2;
-static ieWord IDT_SKILLPENALTY = 3;
+static const ieWord IDT_FAILURE = 0;
+static const ieWord IDT_CRITRANGE = 1;
+static const ieWord IDT_CRITMULTI = 2;
+static const ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
 static const char* DefaultSystemEncoding = "UTF-8";
@@ -2051,7 +2051,7 @@ ieDword Interface::HasFeature(int position) const
 	return GameFeatures[position>>5] & (1<<(position&31));
 }
 
-static const char *game_flags[GF_COUNT+1]={
+static const char* const game_flags[GF_COUNT + 1]={
 		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 		"HasSongList",        //2 GF_HAS_SONGLIST
@@ -3673,8 +3673,8 @@ bool Interface::HasFeedback(int type) const
 	return FeedbackLevel & type;
 }
 
-static const char *saved_extensions[] = {".are", ".sto", ".blb", 0};
-static const char *saved_extensions_last[] = {".tot", ".toh", 0};
+static const char* const saved_extensions[] = { ".are", ".sto", ".blb", nullptr };
+static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 
 //returns the priority of the file to be saved
 //2 - save
@@ -3694,7 +3694,7 @@ int Interface::SavedExtension(const char *filename)
 	return 0;
 }
 
-static const char *protected_extensions[]={".exe",".dll",".so",0};
+static const char* const protected_extensions[] = { ".exe", ".dll", ".so", nullptr };
 
 //returns true if file should be saved
 bool Interface::ProtectedExtension(const char *filename)

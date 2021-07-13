@@ -152,12 +152,12 @@ void Spellbook::CopyFrom(const Actor *source)
 }
 
 //ITEM, SPPR, SPWI, SPIN, SPCL
-int sections[]={3,0,1,2,2};
+const int sections[] = { 3, 0, 1, 2, 2 };
 // domain spells are of all types, so look them up in all cases
 // ignore songs and shapes altogether
-int arcanetypes[] = {IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_SORCERER, IE_IWD2_SPELL_WIZARD, IE_IWD2_SPELL_DOMAIN};
-int divinetypes[] = {IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_DOMAIN};
-int *alltypes[2] = {divinetypes, arcanetypes};
+const int arcanetypes[] = { IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_SORCERER, IE_IWD2_SPELL_WIZARD, IE_IWD2_SPELL_DOMAIN };
+const int divinetypes[] = { IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_DOMAIN };
+const int *alltypes[2] = { divinetypes, arcanetypes };
 
 int inline GetType(int spellid, unsigned int &bookcount, int &idx)
 {

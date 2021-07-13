@@ -63,7 +63,7 @@
 namespace GemRB {
 
 //configurable?
-ieDword ref_lightness = 43;
+const ieDword ref_lightness = 43;
 
 static int sharexp = SX_DIVIDE|SX_COMBAT;
 static int classcount = -1;
@@ -88,7 +88,7 @@ static std::map<int, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
-static ieVariable CounterNames[4]={"GOOD","LAW","LADY","MURDER"};
+static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 //I keep the zero index the same as core rules (default setting)
 static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
 //XP adjustments on easy setting (need research on the amount)
@@ -367,9 +367,9 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 
 //used by iwd2
-static ieResRef resref_cripstr={"cripstr"};
-static ieResRef resref_dirty={"dirty"};
-static ieResRef resref_arterial={"artstr"};
+static const ieResRef resref_cripstr = { "cripstr" };
+static const ieResRef resref_dirty = { "dirty" };
+static const ieResRef resref_arterial = { "artstr" };
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
@@ -1572,7 +1572,7 @@ MAX_LEVEL,MAX_LEVEL,0,0,0,0,0,0//ff
 };
 
 typedef void (*PostChangeFunctionType)(Actor *actor, ieDword oldValue, ieDword newValue);
-static PostChangeFunctionType post_change_functions[MAX_STATS]={
+static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -3619,7 +3619,7 @@ void Actor::RollSaves()
 // in 3ed, the stat is added to the roll and boni (not negated), then compared to some predefined value (DC)
 
 #define SAVECOUNT 5
-static int savingthrows[SAVECOUNT]={IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY};
+static const int savingthrows[SAVECOUNT] = { IE_SAVEVSSPELL, IE_SAVEVSBREATH, IE_SAVEVSDEATH, IE_SAVEVSWANDS, IE_SAVEVSPOLY };
 
 /** returns true if actor made the save against saving throw type */
 bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
@@ -4870,8 +4870,8 @@ void Actor::PlayWalkSound()
 }
 
 // guesses from audio:               bone  chain studd leather splint none other plate
-static const char *armor_types[8] = { "BN", "CH", "CL", "LR", "ML", "MM", "MS", "PT" };
-static const char *dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
+static const char* const armor_types[8] = { "BN", "CH", "CL", "LR", "ML", "MM", "MS", "PT" };
+static const char* const dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
 
 //Play hit sounds (HIT_0<dtype><armor>)
 //IWDs have H_<dmgtype>_<armor> (including level from 1 to max 5), eg H_ML_MM3

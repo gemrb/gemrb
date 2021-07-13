@@ -55,7 +55,7 @@ namespace GemRB {
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
-static ResRef TestSpell = "SPWI207";
+static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
 
@@ -2099,7 +2099,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 }
 
 // list of allowed area and exit combinations in pst that trigger worldmap travel
-static std::map<std::string, std::vector<std::string>> pstWMapExits {
+static const std::map<std::string, std::vector<std::string>> pstWMapExits {
 	{"ar0100", {"to0300", "to0200", "to0101"}},
 	{"ar0101", {"to0100"}},
 	{"ar0200", {"to0100", "to0301", "to0400"}},

@@ -189,8 +189,8 @@ void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 
 // SPIT is not in the original engine spec, it is reserved for the
 // enchantable items feature
-//                                        0       1       2       3       4
-static const char *spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SPCL" };
+//                                              0       1       2       3       4
+static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "SPCL" };
 
 //this function handles the polymorphism of Spell[RES] actions
 //it returns spellres

@@ -47,7 +47,7 @@ static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
 static bool pst_flags = false;
-static unsigned short ClearActionsID = 133; // same for all games
+static const unsigned short ClearActionsID = 133; // same for all games
 
 /***********************
  *  Scriptable Class   *

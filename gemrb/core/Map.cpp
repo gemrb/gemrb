@@ -64,7 +64,7 @@ namespace GemRB {
 #define YESNO(x) ( (x)?"Yes":"No")
 
 // TODO: fix this hardcoded resource reference
-static ResRef PortalResRef = "EF03TPR3";
+static const ResRef PortalResRef = "EF03TPR3";
 static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
 static int MaxVisibility = 30;

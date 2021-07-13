@@ -896,9 +896,9 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define IWD_MSC 13
 
 //this requires the FXOpcode package
-ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
- "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","GINSECT","CDOOM",
- "MSUMMOM"};
+const ieResRef iwd_monster_2da[IWD_MSC] = { "MSUMMO1", "MSUMMO2", "MSUMMO3", "MSUMMO4",
+ "MSUMMO5", "MSUMMO6", "MSUMMO7", "ASUMMO1", "ASUMMO2", "ASUMMO3", "GINSECT", "CDOOM",
+ "MSUMMOM" };
 
 //0xf0 IWDMonsterSummoning
 int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
@@ -953,7 +953,7 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 #define IWD_AD 2
-ieResRef animate_dead_2da[IWD_AD]={"ADEAD","ADEADL"};
+const ieResRef animate_dead_2da[IWD_AD] = { "ADEAD", "ADEADL" };
 
 //0xf3 AnimateDead
 int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
@@ -1023,8 +1023,8 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0xf6 SummonMonster2
 #define IWD_SM2 11
-ieResRef summon_monster_2da[IWD_SM2]={"SLIZARD","STROLLS","SSHADOW","ISTALKE",
- "CFELEMW","CEELEMW","CWELEMW","CFELEMP","CEELEMP","CWELEMP","CEELEMM"};
+const ieResRef summon_monster_2da[IWD_SM2] = { "SLIZARD", "STROLLS", "SSHADOW", "ISTALKE", 
+ "CFELEMW", "CEELEMW", "CWELEMW", "CFELEMP", "CEELEMP", "CWELEMP", "CEELEMM" };
 
 int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1104,7 +1104,7 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 //0xf8 SummonShadowMonster
 
 #define IWD_SSM 3
-ieResRef summon_shadow_monster_2da[IWD_SM2]={"SMONSTE","DSMONST","SHADES" };
+const ieResRef summon_shadow_monster_2da[IWD_SM2] = { "SMONSTE", "DSMONST", "SHADES" };
 
 int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1421,7 +1421,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 //0x103 SummonCreature2
 
-static int eamods[]={EAM_DEFAULT,EAM_SOURCEALLY,EAM_SOURCEENEMY};
+static const int eamods[] = { EAM_DEFAULT, EAM_SOURCEALLY, EAM_SOURCEENEMY };
 
 int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
@@ -1903,8 +1903,8 @@ int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //apply effsof1 on target
 //apply effsof2 on nearby
-static ieResRef resref_sof1={"effsof1"};
-static ieResRef resref_sof2={"effsof2"};
+static const ieResRef resref_sof1 = { "effsof1" };
+static const ieResRef resref_sof2 = { "effsof2" };
 
 //0x116 ShroudOfFlame (iwd2)
 int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -3413,7 +3413,7 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //440 BarbarianRage
 // both normal and greater rage bonuses are handled by the innate itself
 // we use this effect to add the fatigue maluses that follow afterwards
-static ieResRef FatigueRef = {"FATIGUE"};
+static const ieResRef FatigueRef = { "FATIGUE" };
 int fx_barbarian_rage (Scriptable* /*Owner*/, Actor *target, Effect* fx)
 {
 	// print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
