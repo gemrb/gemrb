@@ -34,7 +34,7 @@ protected:
 	Region SheetRegion; // FIXME: this is only needed because of a subclass
 	std::map<KeyType, Region> RegionMap;
 
-	SpriteSheet(Video* video)
+	explicit SpriteSheet(Video* video)
 	: video(video) {};
 
 public:

@@ -216,7 +216,7 @@ class RGBBlendingPipeline : RGBBlender {
 	void (*blender)(const Color& src, Color& dst);
 
 public:
-	RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	explicit RGBBlendingPipeline(void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(1,1,1,0xff), blender(blender) {
 		shift = 0;
 		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {
@@ -224,7 +224,7 @@ public:
 		}
 	}
 
-	RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
+	explicit RGBBlendingPipeline(const Color& tint, void (*blender)(const Color& src, Color& dst) = ShaderBlend<SRCALPHA>)
 	: tint(tint), blender(blender) {
 		shift = 8; // we shift by 8 as a fast aproximation of dividing by 255
 		if (SHADE == SHADER::GREYSCALE || SHADE == SHADER::SEPIA) {

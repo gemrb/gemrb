@@ -39,7 +39,7 @@ private:
 	std::vector< INIPair> pairs;
 	char* TagName;
 public:
-	INITag(const char* Name)
+	explicit INITag(const char* Name)
 	{
 		int len = ( int ) strlen( Name ) + 1;
 		TagName = ( char * ) malloc( len );

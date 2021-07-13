@@ -42,7 +42,7 @@ struct ToolTipData
 	Holder<SoundHandle> tooltip_sound;
 	bool reset = false;
 	
-	ToolTipData(Tooltip tt)
+	explicit ToolTipData(Tooltip tt)
 	: tt(std::move(tt)) {}
 };
 
@@ -63,7 +63,7 @@ public:
 	struct HUDLock {
 		const WindowManager& wm;
 
-		HUDLock(WindowManager& wm)
+		explicit HUDLock(WindowManager& wm)
 		: wm(wm) {
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
@@ -112,7 +112,7 @@ private:
 	void MarkAllDirty() const;
 
 public:
-	WindowManager(Holder<Video> vid);
+	explicit WindowManager(Holder<Video> vid);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;

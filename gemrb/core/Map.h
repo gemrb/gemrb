@@ -280,7 +280,7 @@ public:
 	unsigned int Count;
 	unsigned int Level;
 
-	SpawnGroup(unsigned int size) {
+	explicit SpawnGroup(unsigned int size) {
 		ResRefs = new ResRef[size];
 		Count = size;
 		Level = 0;
@@ -320,7 +320,7 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
-	AreaAnimation(const AreaAnimation *src);
+	explicit AreaAnimation(const AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);

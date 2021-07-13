@@ -314,7 +314,7 @@ enum DebugModeBits {
 struct ItemDragOp : public Control::ControlDragOp {
 	CREItem* item;
 
-	ItemDragOp(CREItem* item);
+	explicit ItemDragOp(CREItem* item);
 	
 private:
 	static Control dragDummy;

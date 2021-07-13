@@ -280,7 +280,7 @@ public:
 
 class GEM_EXPORT Action : protected Canary {
 public:
-	Action(bool autoFree)
+	explicit Action(bool autoFree)
 	{
 		actionID = 0;
 		objects[0] = NULL;

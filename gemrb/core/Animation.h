@@ -50,7 +50,7 @@ public:
 	Region animArea;
 	ieDword Flags;
 
-	Animation(int count);
+	explicit Animation(int count);
 	void AddFrame(const Holder<Sprite2D>& frame, unsigned int index);
 	Holder<Sprite2D> CurrentFrame() const;
 	Holder<Sprite2D> LastFrame();

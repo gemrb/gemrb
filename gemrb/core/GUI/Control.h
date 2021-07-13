@@ -105,7 +105,7 @@ public: // Public attributes
 	};
 	
 	struct ControlDragOp : public DragOp {
-		ControlDragOp(Control* c)
+		explicit ControlDragOp(Control* c)
 		: DragOp(c, c->DragCursor()){}
 		
 		Control* Source() const {

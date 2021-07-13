@@ -52,7 +52,7 @@ public:
 	Point Pos; // position of the effect in game coordinates
 
 	VEFObject();
-	VEFObject(ScriptedAnimation *sca);
+	explicit VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
 	std::vector<ScheduleEntry> entries;

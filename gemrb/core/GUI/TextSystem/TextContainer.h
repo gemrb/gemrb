@@ -37,7 +37,7 @@ class TextContainer;
 struct LayoutRegion {
 	Region region;
 	
-	LayoutRegion(Region r)
+	explicit LayoutRegion(Region r)
 	: region(r) {}
 };
 
@@ -54,7 +54,7 @@ protected:
 	ContentContainer* parent;
 
 public:
-	Content(const Size& size);
+	explicit Content(const Size& size);
 	virtual ~Content() = default;
 
 	virtual Size ContentFrame() const { return frame.size; };
@@ -113,7 +113,7 @@ private:
 	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(const Holder<Sprite2D>& image);
+	explicit ImageSpan(const Holder<Sprite2D>& image);
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
@@ -134,7 +134,7 @@ public:
 
 		Margin() : top(0), right(0), bottom(0), left(0) {}
 
-		Margin(ieByte top)
+		explicit Margin(ieByte top)
 		: top(top), right(top), bottom(top), left(top) {}
 
 		Margin(ieByte top, ieByte right)
@@ -186,7 +186,7 @@ protected:
 	Margin margin;
 
 public:
-	ContentContainer(const Region& frame);
+	explicit ContentContainer(const Region& frame);
 	~ContentContainer() override;
 
 	// append a container to the end of the container. The container takes ownership of the span.

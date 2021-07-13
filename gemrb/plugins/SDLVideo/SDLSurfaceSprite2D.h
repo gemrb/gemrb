@@ -38,7 +38,7 @@ protected:
 		SDL_Surface* surface;
 		PaletteHolder palette; // simply a cache for comparing against calls to SetPalette for performance reasons.
 
-		SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
+		explicit SurfaceHolder(SDL_Surface* surf) : surface(surf) {}
 		~SurfaceHolder() override { SDL_FreeSurface(surface); }
 
 		SDL_Surface* operator->() const { return surface; }
@@ -89,7 +89,7 @@ class SDLTextureSprite2D : public SDLSurfaceSprite2D {
 	{
 		SDL_Texture* texture;
 
-		TextureHolder(SDL_Texture* tex) : texture(tex) {}
+		explicit TextureHolder(SDL_Texture* tex) : texture(tex) {}
 		~TextureHolder() { SDL_DestroyTexture(texture); }
 
 		SDL_Texture* operator->() const { return texture; }

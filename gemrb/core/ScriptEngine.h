@@ -41,7 +41,7 @@ class ScriptingRefBase {
 public:
 	const ScriptingId Id; // unique id for each object in a ScriptingGroup
 
-	ScriptingRefBase(ScriptingId id)
+	explicit ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
 	virtual ~ScriptingRefBase() = default;
@@ -103,7 +103,7 @@ public:
 		template <typename T>
 		struct ConcreteType : public TypeInterface {
 			T value;
-			ConcreteType(T value) : value(value) {}
+			explicit ConcreteType(T value) : value(value) {}
 
 			TypeInterface *Clone() const override
 			{
@@ -119,7 +119,7 @@ public:
 
 	public:
 		template <typename T>
-		Parameter(T value) {
+		explicit Parameter(T value) {
 			ptr = new ConcreteType<T>(value);
 		}
 

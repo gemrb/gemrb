@@ -41,7 +41,7 @@ class GEM_EXPORT SaveGameAREExtractor {
 		RegistryT newAreLocations;
 
 	public:
-		SaveGameAREExtractor(SaveGame *saveGame = nullptr);
+		explicit SaveGameAREExtractor(SaveGame *saveGame = nullptr);
 		SaveGameAREExtractor(const SaveGameAREExtractor&) = delete;
 		SaveGameAREExtractor(SaveGameAREExtractor&&) = delete;
 		~SaveGameAREExtractor();

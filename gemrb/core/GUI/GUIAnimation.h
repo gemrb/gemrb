@@ -82,7 +82,7 @@ class ColorCycle {
 	uint8_t speed;
 
 public:
-	ColorCycle(uint8_t speed) : step(0), speed(speed) {}
+	explicit ColorCycle(uint8_t speed) : step(0), speed(speed) {}
 
 	void AdvanceTime(tick_t time);
 	Color Blend(const Color& c1, const Color& c2) const;
@@ -143,7 +143,7 @@ private:
 	tick_t CalculateNextFrameDelta();
 	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
+	explicit SpriteAnimation(AnimationFactory* af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
 	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;

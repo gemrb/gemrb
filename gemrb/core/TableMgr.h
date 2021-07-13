@@ -81,7 +81,7 @@ class GEM_EXPORT AutoTable
 {
 public:
 	AutoTable();
-	AutoTable(const char* ResRef, bool silent=false);
+	explicit AutoTable(const char* ResRef, bool silent = false);
 	~AutoTable();
 	AutoTable(const AutoTable &);
 	AutoTable& operator=(const AutoTable&);
@@ -89,7 +89,7 @@ public:
 	bool load(const char* ResRef, bool silent=false);
 	void release();
 	bool ok() const noexcept { return table != nullptr; }
-	operator bool() const noexcept { return table != nullptr; }
+	explicit operator bool() const noexcept { return table != nullptr; }
 
 	const TableMgr& operator*() const { return *table; }
 	const TableMgr* operator->() const { return &*table; }

@@ -52,7 +52,7 @@ public:
 		return ptr;
 	}
 
-	CObject(PyObject *obj)
+	explicit CObject(PyObject *obj)
 	{
 		if (obj == Py_None)
 			return;
@@ -71,11 +71,11 @@ public:
 		Py_XDECREF(id);
 	}
 
-	CObject(const Holder<T>& ptr)
+	explicit CObject(const Holder<T>& ptr)
 	: ptr(ptr)
 	{}
 
-	operator bool () const
+	explicit operator bool () const
 	{
 		return ptr != nullptr;
 	}
@@ -176,7 +176,7 @@ class DecRef
 	PyObject* obj = nullptr;
 public:
 	template<typename FUNC, typename... ARGS>
-	DecRef(FUNC fn, ARGS&&... args) {
+	explicit DecRef(FUNC fn, ARGS&&... args) {
 		obj = fn(std::forward<ARGS>(args)...);
 	}
 	

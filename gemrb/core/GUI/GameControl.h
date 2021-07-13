@@ -169,7 +169,7 @@ private:
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 
 public:
-	GameControl(const Region& frame);
+	explicit GameControl(const Region& frame);
 	~GameControl(void) override;
 
 	// GameControl always needs to redraw unless we arent in a game (disabled)

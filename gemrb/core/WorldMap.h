@@ -184,7 +184,7 @@ private:
 
 class GEM_EXPORT WorldMapArray {
 public:
-	WorldMapArray(unsigned int count);
+	explicit WorldMapArray(unsigned int count);
 	~WorldMapArray();
 	void SetWorldMap(WorldMap *m, unsigned int index);
 private:

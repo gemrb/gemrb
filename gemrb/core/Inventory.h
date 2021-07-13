@@ -186,7 +186,7 @@ public:
 		Flags = 0;
 		Expired = 0;
 	};
-	CREItem(STOItem *item)
+	explicit CREItem(STOItem *item)
 	{
 		CopySTOItem(item);
 	};

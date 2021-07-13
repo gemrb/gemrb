@@ -62,7 +62,7 @@ protected:
 	struct AudioStream *parent;
 
 public:
-	OpenALSoundHandle(AudioStream *p) : parent(p) { }
+	explicit OpenALSoundHandle(AudioStream *p) : parent(p) { }
 	~OpenALSoundHandle() override { }
 	void SetPos(const Point&) override;
 	bool Playing() override;

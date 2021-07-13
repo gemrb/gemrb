@@ -53,7 +53,7 @@ public:
 		Font* font;
 	
 	public:
-		SubtitleSet(Font* fnt, Color col = ColorWhite)
+		explicit SubtitleSet(Font* fnt, Color col = ColorWhite)
 		: col(col) {
 			font = fnt;
 			assert(font);
@@ -141,7 +141,7 @@ private:
 	}
 
 public:
-	MoviePlayerControls(MoviePlayer& player)
+	explicit MoviePlayerControls(MoviePlayer& player)
 	: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 

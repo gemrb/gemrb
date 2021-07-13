@@ -79,7 +79,7 @@ public:
 
 class GEM_EXPORT Channel {
 public:
-	Channel(const char *label) : volume(100), reverb(0.0f)
+	explicit Channel(const char *label) : volume(100), reverb(0.0f)
 		{ strlcpy(name, label, sizeof(name)); }
 	~Channel() {}
 

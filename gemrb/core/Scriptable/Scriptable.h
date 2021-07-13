@@ -214,7 +214,7 @@ enum {
 };
 
 struct TriggerEntry {
-	TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
+	explicit TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2), flags(0) { }
 
@@ -231,7 +231,7 @@ struct TriggerEntry {
 
 class GEM_EXPORT Scriptable {
 public:
-	Scriptable(ScriptableType type);
+	explicit Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
 	tick_t WaitCounter;
@@ -404,7 +404,7 @@ private:
 
 class GEM_EXPORT Selectable : public Scriptable {
 public:
-	Selectable(ScriptableType type);
+	explicit Selectable(ScriptableType type);
 public:
 	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
@@ -425,7 +425,7 @@ public:
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
-	Highlightable(ScriptableType type);
+	explicit Highlightable(ScriptableType type);
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
@@ -493,7 +493,7 @@ public:
 	{
 		randomBackoff--;
 	}
-	Movable(ScriptableType type);
+	explicit Movable(ScriptableType type);
 	~Movable(void) override;
 	Point Destination;
 	ieResRef Area;

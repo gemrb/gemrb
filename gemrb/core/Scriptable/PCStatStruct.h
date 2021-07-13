@@ -132,7 +132,7 @@ private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
-	PCStatsStruct(const std::list<int>& levels);
+	explicit PCStatsStruct(const std::list<int>& levels);
 	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void Init(bool all=true);
 	void IncrementChapter();

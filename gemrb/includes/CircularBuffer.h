@@ -35,7 +35,7 @@ private:
 	std::deque<T> _cache;
 	size_t _maxSize;
 public:
-	CircularBuffer(size_t max)
+	explicit CircularBuffer(size_t max)
 	{
 		_maxSize = max;
 	};

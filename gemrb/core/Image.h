@@ -31,7 +31,7 @@ class Sprite2D;
 
 class GEM_EXPORT Image {
 public:
-	Image(const Size& size);
+	explicit Image(const Size& size);
 	~Image();
 	Color GetPixel(const Point& p) const
 	{

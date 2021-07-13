@@ -48,7 +48,7 @@ protected:
 
 public:
 	// Construction
-	Cache(int nBlockSize = 10, int nHashTableSize = 129);
+	explicit Cache(int nBlockSize = 10, int nHashTableSize = 129);
 
 	// Attributes
 	// number of elements

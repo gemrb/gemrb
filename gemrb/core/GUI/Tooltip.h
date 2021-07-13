@@ -37,7 +37,7 @@ class TooltipBackground {
 	Holder<Sprite2D> rightbg;
 
 public:
-	TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = nullptr, Holder<Sprite2D> right = nullptr);
+	explicit TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> = nullptr, Holder<Sprite2D> right = nullptr);
 	TooltipBackground(const TooltipBackground&);
 
 	void Draw(Region rgn) const;

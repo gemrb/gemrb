@@ -146,7 +146,7 @@ struct VariableSpec {
 
 class GEM_EXPORT IniSpawn {
 public:
-	IniSpawn(Map *owner);
+	explicit IniSpawn(Map *owner);
 	~IniSpawn();
 
 private:

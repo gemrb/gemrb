@@ -90,7 +90,7 @@ struct Element {
 
 class GEM_EXPORT Particles {
 public:
-	Particles(int s);
+	explicit Particles(int s);
 	~Particles();
 
 	void SetBitmap(unsigned int FragAnimID);

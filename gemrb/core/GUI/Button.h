@@ -113,7 +113,7 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
-	Button(Region& frame);
+	explicit Button(Region& frame);
 	~Button() override;
 
 	bool IsAnimated() const override;
@@ -197,7 +197,7 @@ private: // Private attributes
 		short mod = 0;
 		bool global = false;
 
-		operator bool() const {
+		explicit operator bool() const {
 			return key != '\0';
 		}
 	} hotKey;

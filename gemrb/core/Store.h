@@ -83,7 +83,7 @@ struct GEM_EXPORT STOItem {
 	char unknown2[56];
 
 	STOItem();
-	STOItem(const CREItem *item);
+	explicit STOItem(const CREItem *item);
 	~STOItem();
 };
 

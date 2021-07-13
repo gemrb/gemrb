@@ -97,7 +97,7 @@ class GEM_EXPORT ScriptedAnimation {
 public:
 	ScriptedAnimation();
 	~ScriptedAnimation(void);
-	ScriptedAnimation(DataStream* stream);
+	explicit ScriptedAnimation(DataStream* stream);
 	void Init();
 	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
 	//there are 3 phases: start, hold, release

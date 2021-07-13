@@ -44,7 +44,7 @@ struct File {
 private:
 	FILE* file = nullptr;
 public:
-	File(FILE* f) : file(f) {}
+	explicit File(FILE* f) : file(f) {}
 	File() = default;
 	File(const File&) = delete;
 	File(File&& f) noexcept {
@@ -103,7 +103,7 @@ private:
 	File str;
 	bool opened, created;
 public:
-	FileStream(File&&);
+	explicit FileStream(File&&);
 	FileStream(void);
 
 	DataStream* Clone() override;

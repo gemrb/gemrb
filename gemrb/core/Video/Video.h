@@ -49,7 +49,7 @@ protected:
 	Region rect;
 
 public:
-	VideoBuffer(const Region& r) : rect(r) {}
+	explicit VideoBuffer(const Region& r) : rect(r) {}
 	virtual ~VideoBuffer() = default;
 	
 	::GemRB::Size Size() const { return rect.size; }

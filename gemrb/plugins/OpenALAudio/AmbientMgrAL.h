@@ -51,7 +51,7 @@ private:
 	
 	class AmbientSource {
 	public:
-		AmbientSource(const Ambient *a);
+		explicit AmbientSource(const Ambient *a);
 		~AmbientSource();
 		uint64_t tick(uint64_t ticks, Point listener, ieDword timeslice);
 		void hardStop();

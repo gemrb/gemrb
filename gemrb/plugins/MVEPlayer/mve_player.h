@@ -68,7 +68,7 @@ protected:
 	void segment_audio_data(bool silent);
 
 public:
-	MVEPlayer(class MVEPlay *file);
+	explicit MVEPlayer(class MVEPlay *file);
 	~MVEPlayer();
 
 	bool start_playback();
