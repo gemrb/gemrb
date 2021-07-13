@@ -12175,9 +12175,6 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	if (i<0) {
-		return PyInt_FromLong( 0 );
-	}
 	return PyInt_FromLong( 1 );
 }
 
