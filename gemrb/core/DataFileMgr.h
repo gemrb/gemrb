@@ -40,8 +40,6 @@ namespace GemRB {
 
 class GEM_EXPORT DataFileMgr : public Plugin {
 public:
-	DataFileMgr(void);
-	~DataFileMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetTagsCount() const = 0;
 	virtual const char* GetTagNameByIndex(int index) const = 0;

@@ -26,16 +26,14 @@
 namespace GemRB {
 
 class GEM_EXPORT MusicMgr : public Plugin {
-public: 
-	MusicMgr();
-	~MusicMgr() override;
+public:
 	/** Ends the Current PlayList Execution */
 	virtual void End(void) = 0;
 	virtual void HardEnd(void) = 0;
 	/** Start the PlayList Music Execution */
 	virtual void Start(void) = 0;
 	/** Initializes the PlayList Manager */
-	virtual bool Init();
+	virtual bool Init() = 0;
 	/** Loads a PlayList for playing */
 	virtual bool OpenPlaylist(const char* name) = 0;
 	/** Switches the current PlayList while playing the current one, return nonzero on error */

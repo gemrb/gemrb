@@ -29,8 +29,6 @@ namespace GemRB {
 
 class GEM_EXPORT IndexedArchive : public Plugin {
 public:
-	IndexedArchive(void);
-	~IndexedArchive(void) override;
 	virtual int OpenArchive(const char* filename) = 0;
 	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;
 };

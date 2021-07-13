@@ -60,8 +60,6 @@ struct StringBlock {
 
 class GEM_EXPORT StringMgr : public Plugin {
 public:
-	StringMgr(void);
-	~StringMgr(void) override;
 	virtual void OpenAux() = 0;
 	virtual void CloseAux() = 0;
 	virtual bool Open(DataStream* stream) = 0;

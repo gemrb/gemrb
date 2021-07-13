@@ -5,20 +5,15 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	AmbientMgr.cpp
 	Animation.cpp
 	AnimationFactory.cpp
-	ArchiveImporter.cpp
 	Audio.cpp
 	Bitmap.cpp
 	Cache.cpp
 	Calendar.cpp
 	CharAnimations.cpp
-	Compressor.cpp
 	Core.cpp
-	DataFileMgr.cpp
 	Dialog.cpp
 	DialogHandler.cpp
-	DialogMgr.cpp
 	DisplayMessage.cpp
-	EffectMgr.cpp
 	EffectQueue.cpp
 	Factory.cpp
 	FactoryObject.cpp
@@ -30,8 +25,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Image.cpp
 	ImageFactory.cpp
 	ImageMgr.cpp
-	ImageWriter.cpp
-	IndexedArchive.cpp
 	IniSpawn.cpp
 	Interface.cpp
 	InterfaceConfig.cpp
@@ -41,19 +34,15 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	KeyMap.cpp
 	LRUCache.cpp
 	Map.cpp
-	MapMgr.cpp
 	MapReverb.cpp
 	MoviePlayer.cpp
-	MusicMgr.cpp
 	Palette.cpp
 	PalettedImageMgr.cpp
 	Particles.cpp
 	PathFinder.cpp
-	Plugin.cpp
 	PluginMgr.cpp
 	Polygon.cpp
 	Projectile.cpp
-	ProjectileMgr.cpp
 	ProjectileServer.cpp
 	Region.cpp
 	Resource.cpp
@@ -61,7 +50,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	ResourceManager.cpp
 	SaveGameAREExtractor.cpp
 	SaveGameIterator.cpp
-	SaveGameMgr.cpp
 	ScriptEngine.cpp
 	ScriptedAnimation.cpp
 	SoundMgr.cpp
@@ -70,8 +58,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Sprite2D.cpp
 	SpriteCover.cpp
 	Store.cpp
-	StringMgr.cpp
-	SymbolMgr.cpp
 	TableMgr.cpp
 	Tile.cpp
 	TileMap.cpp

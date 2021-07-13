@@ -42,11 +42,8 @@ namespace GemRB {
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin : public Held<Plugin> {
-public:
-	Plugin(void);
-	~Plugin(void) override;
-};
+class GEM_EXPORT Plugin : public Held<Plugin>
+{};
 
 }
 
