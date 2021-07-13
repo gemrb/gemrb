@@ -177,7 +177,9 @@ public:
 	unsigned char ArmorType, WeaponType, RangedType;
 	ResRef ResRefBase;
 	ResRef PaletteResRef[5] = {};
-	unsigned char previousStanceID, nextStanceID, StanceID;
+	unsigned char previousStanceID = 0;
+	unsigned char nextStanceID = 0;
+	unsigned char stanceID = 0;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
 public:

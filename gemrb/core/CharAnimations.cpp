@@ -143,7 +143,7 @@ unsigned char CharAnimations::MaybeOverrideStance(unsigned char stance) const
  * different palette to use. Presumably, this is relevant for PAL_MAIN only.
  */
 void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
-	if (previousStanceID != StanceID) {
+	if (previousStanceID != stanceID) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*PartPalettes[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
 			gamedata->FreePalette(PartPalettes[PAL_MAIN], PaletteResRef[PAL_MAIN]);
@@ -473,7 +473,7 @@ PaletteHolder CharAnimations::GetPartPalette(int part) const
 	PaletteType type = PAL_MAIN;
 	if (GetAnimType() == IE_ANI_NINE_FRAMES) {
 		//these animations use several palettes
-		type = NINE_FRAMES_PALETTE(StanceID);
+		type = NINE_FRAMES_PALETTE(stanceID);
 	}
 	else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2) return NULL;
 	// always use unmodified BAM palette for the supporting part
@@ -504,9 +504,8 @@ void CharAnimations::InitAvatarsTable() const
 		error("CharAnimations", "A critical animation file is missing!\n");
 	}
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
-	int i=AvatarsCount;
 	const DataFileMgr *resdata = core->GetResDataINI();
-	while(i--) {
+	for (int i = AvatarsCount; i > 0; i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
 		AvatarTable[i].Prefixes[0] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX1));
 		AvatarTable[i].Prefixes[1] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX2));
@@ -663,8 +662,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	for (bool& c : change) {
 		c = true;
 	}
-	previousStanceID = nextStanceID = 0;
-	StanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
 	if (!AvatarsCount) {
@@ -927,7 +924,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	}
 
 	//for paletted dragon animations, we need the stance id
-	StanceID = nextStanceID = Stance;
+	stanceID = nextStanceID = Stance;
 	int AnimType = GetAnimType();
 
 	//alter stance here if it is missing and you know a substitute
@@ -937,20 +934,20 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			return NULL;
 
 		case IE_ANI_PST_STAND:
-			StanceID = IE_ANI_AWAKE;
+			stanceID = IE_ANI_AWAKE;
 			break;
 		case IE_ANI_PST_GHOST:
-			StanceID = IE_ANI_AWAKE;
+			stanceID = IE_ANI_AWAKE;
 			Orient = 0;
 			break;
 		case IE_ANI_PST_ANIMATION_3: //stc->std
-			if (StanceID == IE_ANI_READY) {
-				StanceID = IE_ANI_AWAKE;
+			if (stanceID == IE_ANI_READY) {
+				stanceID = IE_ANI_AWAKE;
 			}
 			break;
 		case IE_ANI_PST_ANIMATION_2: //std->stc
-			if (StanceID == IE_ANI_AWAKE) {
-				StanceID = IE_ANI_READY;
+			if (stanceID == IE_ANI_AWAKE) {
+				stanceID = IE_ANI_READY;
 			}
 			break;
 	}
@@ -958,7 +955,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	//TODO: Implement Auto Resource Loading
 	//setting up the sequencing of animation cycles
 	autoSwitchOnEnd = false;
-	switch (StanceID) {
+	switch (stanceID) {
 		case IE_ANI_DAMAGE:
 			nextStanceID = IE_ANI_READY;
 			autoSwitchOnEnd = true;
@@ -992,24 +989,24 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			autoSwitchOnEnd = true;
 			break;
 		default:
-			Log(MESSAGE, "CharAnimation", "Invalid Stance: %d", StanceID);
+			Log(MESSAGE, "CharAnimation", "Invalid Stance: %d", stanceID);
 			break;
 	}
 
-	StanceID = MaybeOverrideStance(StanceID);
+	stanceID = MaybeOverrideStance(stanceID);
 
 	bool lastFrameOnly = false;
 	//pst (and some other) animations don't have separate animations for sleep/die
 	if (Stance == IE_ANI_TWITCH &&
-		(AnimType >= IE_ANI_PST_ANIMATION_1 || MaybeOverrideStance(IE_ANI_DIE) == StanceID))
+		(AnimType >= IE_ANI_PST_ANIMATION_1 || MaybeOverrideStance(IE_ANI_DIE) == stanceID))
 	{
 		lastFrameOnly = true;
 	}
 
-	Animation** anims = Anims[StanceID][Orient];
+	Animation** anims = Anims[stanceID][Orient];
 	if (anims) {
 		MaybeUpdateMainPalette(anims);
-		previousStanceID = StanceID;
+		previousStanceID = stanceID;
 
 		if (lastFrameOnly) {
 			anims[0]->SetPos(anims[0]->GetFrameCount() - 1);
@@ -1039,7 +1036,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 			//we need this long for special anims
 			NewResRef = ResRefBase;
-			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part, equipdat);
+			GetAnimResRef(stanceID, Orient, NewResRef, Cycle, part, equipdat);
 		} else {
 			// Equipment animation parts
 
@@ -1114,7 +1111,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			PaletteType ptype = PAL_MAIN;
 			if (AnimType == IE_ANI_NINE_FRAMES) {
 				//these animations use several palettes
-				ptype = NINE_FRAMES_PALETTE(StanceID);
+				ptype = NINE_FRAMES_PALETTE(stanceID);
 			}
 
 			//if you need to revert this change, consider true paletted
@@ -1156,7 +1153,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		}
 
 		//setting up the sequencing of animation cycles
-		switch (StanceID) {
+		switch (stanceID) {
 			case IE_ANI_DAMAGE:
 			case IE_ANI_SLEEP:
 			case IE_ANI_TWITCH:
@@ -1217,7 +1214,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
 		case IE_ANI_CODE_MIRROR_3:
 		case IE_ANI_PST_GHOST:
-			Anims[StanceID][Orient] = anims;
+			Anims[stanceID][Orient] = anims;
 			break;
 		case IE_ANI_TWO_FILES:
 		case IE_ANI_TWENTYTWO:
@@ -1232,17 +1229,17 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_FRAGMENT:
 		case IE_ANI_PST_STAND:
 			Orient&=~1;
-			Anims[StanceID][Orient] = anims;
-			Anims[StanceID][Orient + 1] = anims;
+			Anims[stanceID][Orient] = anims;
+			Anims[stanceID][Orient + 1] = anims;
 			break;
 		case IE_ANI_FOUR_FILES_3:
 			//only 8 orientations for WALK
-			if (StanceID == IE_ANI_WALK) {
+			if (stanceID == IE_ANI_WALK) {
 				Orient&=~1;
-				Anims[StanceID][Orient] = anims;
-				Anims[StanceID][Orient + 1] = anims;
+				Anims[stanceID][Orient] = anims;
+				Anims[stanceID][Orient + 1] = anims;
 			} else {
-				Anims[StanceID][Orient] = anims;
+				Anims[stanceID][Orient] = anims;
 			}
 			break;
 		case IE_ANI_TWO_FILES_4:
@@ -1256,16 +1253,16 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		case IE_ANI_PST_ANIMATION_3: //no stc just std
 		case IE_ANI_PST_ANIMATION_2: //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
-			switch (StanceID) {
+			switch (stanceID) {
 				case IE_ANI_WALK:
 				case IE_ANI_RUN:
 				case IE_ANI_PST_START:
-					Anims[StanceID][Orient] = anims;
+					Anims[stanceID][Orient] = anims;
 					break;
 				default:
 					Orient &=~1;
-					Anims[StanceID][Orient] = anims;
-					Anims[StanceID][Orient + 1] = anims;
+					Anims[stanceID][Orient] = anims;
+					Anims[stanceID][Orient + 1] = anims;
 					break;
 			}
 			break;
@@ -1273,9 +1270,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			error("CharAnimations", "Unknown animation type\n");
 	}
 	delete equipdat;
-	previousStanceID = StanceID;
+	previousStanceID = stanceID;
 
-	return Anims[StanceID][Orient];
+	return Anims[stanceID][Orient];
 }
 
 Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned char orientation) {
@@ -1345,7 +1342,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 			shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
 		}
 
-		switch (StanceID) {
+		switch (stanceID) {
 			case IE_ANI_DAMAGE:
 			case IE_ANI_TWITCH:
 			case IE_ANI_DIE:
