@@ -12164,18 +12164,17 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Game has no splspec.2da table!" );
 	}
 	const auto& special_spells = core->GetSpecialSpells();
+	bool found = false;
 	while(i--) {
 		if (specialtype & special_spells[i].flags) {
 			if (actor->spellbook.HaveSpell(special_spells[i].resref, useup)) {
-				if (useup) {
-					//actor->SpellCast(SpecialSpells[i].resref, actor);
-				}
+				found = true;
 				break;
 			}
 		}
 	}
 
-	return PyInt_FromLong( 1 );
+	return PyInt_FromLong(found);
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
