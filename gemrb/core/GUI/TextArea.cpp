@@ -22,9 +22,12 @@
 
 #include "Interface.h"
 #include "Variables.h"
+
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
+
+#include <utility>
 
 namespace GemRB {
 	
@@ -273,7 +276,7 @@ void TextArea::SetSpeakerPicture(Holder<Sprite2D> pic)
 		return;
 	}
 
-	speakerPic = pic;
+	speakerPic = std::move(pic);
 	MarkDirty();
 
 	assert(textContainer);

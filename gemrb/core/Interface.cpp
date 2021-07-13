@@ -80,6 +80,7 @@
 #include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 
+#include <utility>
 #include <vector>
 
 #ifdef WIN32
@@ -3141,7 +3142,7 @@ void Interface::QuitGame(int BackToMain)
 
 void Interface::SetupLoadGame(Holder<SaveGame> sg, int ver_override)
 {
-	LoadGameIndex = sg;
+	LoadGameIndex = std::move(sg);
 	VersionOverride = ver_override;
 	QuitFlag |= QF_LOADGAME;
 }

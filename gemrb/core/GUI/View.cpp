@@ -27,11 +27,13 @@
 #include "Video/Video.h"
 
 #include <typeinfo>
+#include <utility>
+
 
 namespace GemRB {
 
 View::DragOp::DragOp(View* v, Holder<Sprite2D> cursor)
-: dragView(v), cursor(cursor)
+: dragView(v), cursor(std::move(cursor))
 {}
 
 View::DragOp::~DragOp() {
@@ -67,7 +69,7 @@ View::~View()
 
 void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 {
-	background = bg;
+	background = std::move(bg);
 	if (c) backgroundColor = *c;
 
 	MarkDirty();
@@ -75,7 +77,7 @@ void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 
 void View::SetCursor(Holder<Sprite2D> c)
 {
-	cursor = c;
+	cursor = std::move(c);
 }
 
 void View::SetEventProxy(View* proxy)

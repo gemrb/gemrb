@@ -27,6 +27,8 @@
 #include "RNG.h"
 
 #include <list>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -222,7 +224,7 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 
 void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 {
-	MapMOS = newmos;
+	MapMOS = std::move(newmos);
 }
 
 WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const

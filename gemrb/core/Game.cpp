@@ -45,6 +45,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <utility>
 #include <vector>
 
 namespace GemRB {
@@ -1622,7 +1623,7 @@ void Game::UpdateScripts()
 void Game::SetTimedEvent(EventHandler func, int count)
 {
 	event_timer = count;
-	event_handler = func;
+	event_handler = std::move(func);
 }
 
 void Game::SetProtagonistMode(int mode)

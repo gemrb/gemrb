@@ -56,6 +56,8 @@
 
 #include <cassert>
 #include <limits>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -459,7 +461,7 @@ void Map::ChangeTileMap(Image* lm, Holder<Sprite2D> sm)
 	delete LightMap;
 
 	LightMap = lm;
-	SmallMap = sm;
+	SmallMap = std::move(sm);
 
 	TMap->UpdateDoors();
 }
@@ -470,7 +472,7 @@ void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bi
 	TMap = tm;
 	LightMap = lm;
 	HeightMap = hm;
-	SmallMap = sm;
+	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
 	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
 	Size size = sr->GetSize();

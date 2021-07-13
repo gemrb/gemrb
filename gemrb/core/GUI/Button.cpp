@@ -32,6 +32,8 @@
 #include "GameData.h"
 #include "Palette.h"
 
+#include <utility>
+
 #define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
@@ -92,7 +94,7 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 		}
 		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		buttonImages[type] = img;
+		buttonImages[type] = std::move(img);
 		/*
 		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
@@ -666,7 +668,7 @@ void Button::DoToggle()
 void Button::SetPicture(Holder<Sprite2D> newpic)
 {
 	ClearPictureList();
-	Picture = newpic;
+	Picture = std::move(newpic);
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
 		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);

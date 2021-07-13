@@ -37,6 +37,8 @@
 #include "GUI/TextSystem/Font.h"
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
+ 
+#include <utility>
 
 namespace GemRB {
 
@@ -1787,8 +1789,8 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Hol
 	overColor.g = color.g >> 1;
 	overColor.b = color.b >> 1;
 	overColor.a = color.a;
-	circleBitmap[0] = normal_circle;
-	circleBitmap[1] = selected_circle;
+	circleBitmap[0] = std::move(normal_circle);
+	circleBitmap[1] = std::move(selected_circle);
 }
 
 /***********************

@@ -20,9 +20,12 @@
 
 #include "Window.h"
 
-#include "GUI/GUIScriptInterface.h"
 #include "Interface.h"
 #include "ScrollBar.h"
+
+#include "GUI/GUIScriptInterface.h"
+
+#include <utility>
 
 namespace GemRB {
 
@@ -580,7 +583,7 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 		HotKeys.erase(it);
 	}
 
-	HotKeys[key] = cb;
+	HotKeys[key] = std::move(cb);
 	return true;
 }
 

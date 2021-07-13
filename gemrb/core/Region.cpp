@@ -130,7 +130,7 @@ Region::Region(const Region &r)
 : origin(r.origin), size(r.size)
 {}
 
-Region::Region(Region&& r)
+Region::Region(Region&& r) noexcept
 : origin(r.origin), size(r.size)
 {}
 

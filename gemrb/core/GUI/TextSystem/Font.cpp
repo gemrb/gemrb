@@ -23,9 +23,12 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
+
 #include "Video/Video.h"
 
 #include <cwctype>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -184,7 +187,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
-: palette(pal), LineHeight(lineheight), Baseline(baseline)
+: palette(std::move(pal)), LineHeight(lineheight), Baseline(baseline)
 {
 	CurrentAtlasPage = NULL;
 	background = bg;

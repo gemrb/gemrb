@@ -21,9 +21,12 @@
 #include "GUI/Progressbar.h"
 
 #include "Interface.h"
+
 #include "GUI/Window.h"
 
 #include <cstring>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -100,8 +103,8 @@ void Progressbar::UpdateState(unsigned int Sum)
 /** Sets the selected image */
 void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 {
-	BackGround2 = bg;
-	PBarCap = cap;
+	BackGround2 = std::move(bg);
+	PBarCap = std::move(cap);
 	MarkDirty();
 }
 

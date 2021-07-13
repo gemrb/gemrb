@@ -110,7 +110,7 @@ public:
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
 	Region(const Region&);
-	Region(Region&&);
+	Region(Region&&) noexcept;
 	
 	Region& operator=(const Region&);
 
