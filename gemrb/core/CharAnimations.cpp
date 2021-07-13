@@ -497,7 +497,7 @@ static inline int compare_avatars(const void *a, const void *b)
 	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
 }
 
-void CharAnimations::InitAvatarsTable()
+void CharAnimations::InitAvatarsTable() const
 {
 	AutoTable Avatars("avatars");
 	if (!Avatars) {
@@ -505,7 +505,7 @@ void CharAnimations::InitAvatarsTable()
 	}
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
 	int i=AvatarsCount;
-	DataFileMgr *resdata = core->GetResDataINI();
+	const DataFileMgr *resdata = core->GetResDataINI();
 	while(i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
 		AvatarTable[i].Prefixes[0] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX1));
@@ -1897,11 +1897,11 @@ void CharAnimations::AddNFSuffix(std::string& dest, unsigned char StanceID,
 //static const char *SlashPrefix[]={"a1","a4","a7"};
 //static const char *BackPrefix[]={"a2","a5","a8"};
 //static const char *JabPrefix[]={"a3","a6","a9"};
-static const char *SlashPrefix[]={"a1","a2","a7"};
-static const char *BackPrefix[]={"a3","a4","a8"};
-static const char *JabPrefix[]={"a5","a6","a9"};
-static const char *RangedPrefix[]={"sa","sx","ss"};
-static const char *RangedPrefixOld[]={"sa","sx","a1"};
+static const char* const SlashPrefix[] = { "a1", "a2", "a7" };
+static const char* const BackPrefix[] = { "a3", "a4", "a8" };
+static const char* const JabPrefix[] = { "a5", "a6", "a9" };
+static const char* const RangedPrefix[] = { "sa", "sx", "ss" };
+static const char* const RangedPrefixOld[] = { "sa", "sx", "a1" };
 
 void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData) const

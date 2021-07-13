@@ -222,7 +222,7 @@ public: //attribute functions
 	void DebugDump() const;
 private:
 	void DropAnims();
-	void InitAvatarsTable();
+	void InitAvatarsTable() const;
 	int GetActorPartCount() const;
 	void AddPSTSuffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient) const;
