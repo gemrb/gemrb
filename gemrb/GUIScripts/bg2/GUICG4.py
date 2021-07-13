@@ -171,7 +171,7 @@ def OnLoad():
 
 	Button = AbilityWindow.CreateButton (2000, 0, 0, 0, 0)
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, GiveAll18)
-	Button.SetHotKey ("8", 2, True) # TODO: make defines for CTRL and SHIFT modifiers
+	Button.SetHotKey ("8", GEM_MOD_CTRL, True)
 
 	RerollButton = AbilityWindow.GetControl(2)
 	RerollButton.SetText(11982)
