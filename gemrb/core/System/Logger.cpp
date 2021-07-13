@@ -78,7 +78,7 @@ void Logger::LogMsg(LogMessage&& msg)
 		// fatal errors must happen now!
 		std::lock_guard<std::mutex> l(writerLock);
 		for (const auto& writer : writers) {
-			writer->WriteLogMessage(std::move(msg));
+			writer->WriteLogMessage(msg);
 		}
 	} else {
 		std::lock_guard<std::mutex> l(queueLock);
