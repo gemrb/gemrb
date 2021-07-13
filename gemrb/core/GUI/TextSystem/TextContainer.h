@@ -255,15 +255,6 @@ private:
 	void MoveCursorToPoint(const Point& p);
 	LayoutRegions::const_iterator FindCursorRegion(const Layout&) const;
 
-	// relative to cursor pos
-	void InsertText(const String& text);
-	void DeleteText(size_t len);
-
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
-	bool OnMouseDrag(const MouseEvent& /*me*/) override;
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
-	void OnTextInput(const TextEvent& /*te*/) override;
-
 	void DrawSelf(Region drawFrame, const Region& clip) override;
 	void DrawContents(const Layout& layout, Point point) override;
 
@@ -276,6 +267,10 @@ private:
 public:
 	TextContainer(const Region& frame, Font* font);
 	~TextContainer();
+	
+	// relative to cursor pos
+	void InsertText(const String& text);
+	void DeleteText(size_t len);
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, const Font* fnt, const Font::PrintColors* = nullptr);
@@ -295,6 +290,11 @@ public:
 	void CursorHome();
 	void CursorEnd();
 	void AdvanceCursor(int);
+	
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
 	using EditCallback = Callback<void, TextContainer&>;
 	EditCallback callback;
