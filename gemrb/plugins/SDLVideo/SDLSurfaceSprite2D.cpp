@@ -45,7 +45,8 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 	
 	if (format.palette)
 		SetPaletteColors(format.palette->col);
-	UpdateColorKey(format.ColorKey);
+	if (format.HasColorKey)
+		UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, format.palette);
 	
