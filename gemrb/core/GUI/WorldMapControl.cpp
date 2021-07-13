@@ -183,59 +183,62 @@ void WorldMapControl::ScrollTo(const Point& pos)
 /** Mouse Over Event */
 bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
-	if (GetValue() != ieDword(-1)) {
-		SetCursor(core->Cursors[IE_CURSOR_GRAB]);
-		const WorldMap* worldmap = core->GetWorldMap();
-		Point p = ConvertPointFromScreen(me.Pos());
-		Point mapOff = p + Pos;
-
-		const WMPAreaEntry *oldArea = Area;
-		Area = NULL;
-
-		unsigned int ec = worldmap->GetEntryCount();
-		for (unsigned int i = 0; i < ec; i++) {
-			WMPAreaEntry *ae = worldmap->GetEntry(i);
-
-			if ( (ae->GetAreaStatus() & WMP_ENTRY_WALKABLE)!=WMP_ENTRY_WALKABLE) {
-				continue; //invisible or inaccessible
-			}
-
-			const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
-			Region rgn(ae->pos, Size());
-			if (icon) {
-				rgn.x -= icon->Frame.x;
-				rgn.y -= icon->Frame.y;
-				rgn.w = icon->Frame.w;
-				rgn.h = icon->Frame.h;
-			}
-			if (ftext && ae->GetCaption()) {
-				Size ts = ftext->StringSize(*ae->GetCaption());
-				ts.w += 10;
-				if(rgn.h < ts.h)
-					rgn.h = ts.h;
-				if(rgn.w < ts.w)
-					rgn.w = ts.w;
-			}
-			if (!rgn.PointInside(mapOff)) continue;
-
-			SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
-			Area=ae;
-			if(oldArea!=ae) {
-				const String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
-				int hours = worldmap->GetDistance(Area->AreaName);
-				if (str && !str->empty() && hours >= 0) {
-					wchar_t dist[10];
-					swprintf(dist, 10, L": %d", hours);
-					SetTooltip(*str + dist);
-					delete str;
-				}
-			}
-			break;
-		}
-		if (Area == NULL) {
-			SetTooltip(L"");
-		}
+	if (GetValue() == CTL_INVALID_VALUE) {
+		return true;
 	}
+
+	SetCursor(core->Cursors[IE_CURSOR_GRAB]);
+	const WorldMap* worldmap = core->GetWorldMap();
+	Point p = ConvertPointFromScreen(me.Pos());
+	Point mapOff = p + Pos;
+
+	const WMPAreaEntry *oldArea = Area;
+	Area = nullptr;
+
+	unsigned int ec = worldmap->GetEntryCount();
+	for (unsigned int i = 0; i < ec; i++) {
+		WMPAreaEntry *ae = worldmap->GetEntry(i);
+
+		if ((ae->GetAreaStatus() & WMP_ENTRY_WALKABLE) != WMP_ENTRY_WALKABLE) {
+			continue; //invisible or inaccessible
+		}
+
+		const Holder<Sprite2D> icon = ae->GetMapIcon(worldmap->bam);
+		Region rgn(ae->pos, Size());
+		if (icon) {
+			rgn.x -= icon->Frame.x;
+			rgn.y -= icon->Frame.y;
+			rgn.w = icon->Frame.w;
+			rgn.h = icon->Frame.h;
+		}
+		if (ftext && ae->GetCaption()) {
+			Size ts = ftext->StringSize(*ae->GetCaption());
+			ts.w += 10;
+			if (rgn.h < ts.h)
+				rgn.h = ts.h;
+			if (rgn.w < ts.w)
+				rgn.w = ts.w;
+		}
+		if (!rgn.PointInside(mapOff)) continue;
+
+		SetCursor(core->Cursors[IE_CURSOR_NORMAL]);
+		Area = ae;
+		if (oldArea != ae) {
+			const String* str = core->GetString(DisplayMessage::GetStringReference(STR_TRAVEL_TIME));
+			int hours = worldmap->GetDistance(Area->AreaName);
+			if (str && !str->empty() && hours >= 0) {
+				wchar_t dist[10];
+				swprintf(dist, 10, L": %d", hours);
+				SetTooltip(*str + dist);
+				delete str;
+			}
+		}
+		break;
+	}
+	if (Area == nullptr) {
+		SetTooltip(L"");
+	}
+
 	return true;
 }
 
