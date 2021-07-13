@@ -161,7 +161,7 @@ struct SpecialSpellType {
 #define SP_HEAL_ALL  16     //any healing spell that is cast upon rest at more than one target (healing circle, mass cure)
 
 struct SurgeSpell {
-	ieResRef spell;
+	ResRef spell;
 	ieStrRef message;
 };
 
@@ -358,7 +358,7 @@ private:
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
-	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
+	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
 
 	std::map<ResRef, Font*> fonts;
@@ -583,7 +583,7 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	/*removes single file from cache*/
-	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
+	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID);
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
 	/*returns 0,1,2 based on how the file should be saved */
@@ -730,17 +730,17 @@ private:
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ieResRef item, const char *Prefix) const;
+	bool ReadItemTable(const ResRef& item, const char *Prefix) const;
 	bool ReadAbilityTables();
-	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
-	bool ReadMusicTable(const ieResRef name, int col);
+	bool ReadAbilityTable(const ResRef& name, ieWordSigned *mem, int cols, int rows);
+	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadReputationModTable();
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
 	bool ReadSoundChannelsTable();
 	/** Reads table of area name mappings for WorldMap (PST only) */
-	bool ReadAreaAliasTable(const ieResRef name);
+	bool ReadAreaAliasTable(const ResRef& name);
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** handles the EventFlag bits (conditional events) */
@@ -763,8 +763,8 @@ public:
 	char GameCharactersPath[_MAX_PATH];
 	char GemRBOverridePath[_MAX_PATH];
 	char GemRBUnhardcodedPath[_MAX_PATH];
-	ieResRef GameNameResRef;
-	ieResRef GoldResRef; //MISC07.itm
+	ResRef GameNameResRef;
+	ResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
 	char CustomFontPath[_MAX_PATH];
 	char GameName[_MAX_PATH];

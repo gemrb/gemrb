@@ -4596,7 +4596,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		CREItem *item = new CREItem();
 		if (!CreateItemCore(item, core->GoldResRef, money, 0, 0)) {
-			error("GameScript", "Failed to create pick-pocketed gold '%s' %dg.\n", core->GoldResRef, money);
+			error("GameScript", "Failed to create pick-pocketed gold '%s' %dg.\n", core->GoldResRef.CString(), money);
 		}
 		scr->SetBase(IE_GOLD, scr->GetBase(IE_GOLD) - money);
 		if (ASI_SUCCESS != snd->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY)) {

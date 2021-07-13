@@ -200,7 +200,7 @@ Interface::Interface()
 	WorldMapName[0] = "WORLDMAP";
 
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		CopyResRef(GroundCircleBam[size], "");
+		GroundCircleBam[size].Reset();
 		GroundCircleScale[size] = 0;
 	}
 
@@ -603,7 +603,7 @@ static bool GenerateAbilityTables()
 	return true;
 }
 
-bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, int columns, int rows)
+bool Interface::ReadAbilityTable(const ResRef& tablename, ieWordSigned *mem, int columns, int rows)
 {
 	AutoTable tab(tablename);
 	if (!tab) {
@@ -711,7 +711,7 @@ bool Interface::ReadSpecialSpells()
 	if (table) {
 		SurgeSpell ss;
 		for (int i = 0; (unsigned) i < table->GetRowCount(); i++) {
-			CopyResRef(ss.spell, table->QueryField(i, 0));
+			ss.spell = table->QueryField(i, 0);
 			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
 			// comment ignored
 			SurgeSpells.push_back(ss);
@@ -764,7 +764,7 @@ const char *Interface::GetDeathVarFormat()
 	return DeathVarFormat;
 }
 
-bool Interface::ReadAreaAliasTable(const ieResRef tablename)
+bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 {
 	if (AreaAliasTable) {
 		AreaAliasTable->RemoveAll(NULL);
@@ -800,7 +800,7 @@ int Interface::GetAreaAlias(const ResRef &areaname) const
 	return -1;
 }
 
-bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
+bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 	AutoTable tm(tablename);
 	if (!tm)
 		return false;
@@ -1037,7 +1037,7 @@ int Interface::LoadSprites()
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		if (GroundCircleBam[size][0]) {
+		if (!GroundCircleBam[size].IsEmpty()) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
@@ -1544,16 +1544,12 @@ int Interface::Init(InterfaceConfig* config)
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
 		strlcpy(INIConfig, tmp, sizeof(INIConfig));
+	} else {
+		strlcpy(tmp, INIConfig, sizeof(tmp));
 	}
-
-	for (int i = 0; i < 8; i++) {
-		if (INIConfig[i] == '.') {
-			GameNameResRef[i] = 0;
-			break;
-		}
-		GameNameResRef[i] = INIConfig[i];
-	}
-	GameNameResRef[8] = 0;
+	// also store it for base GAM and SAV files
+	strtok(tmp, ".");
+	GameNameResRef = tmp;
 
 	Log(MESSAGE, "Core", "Reading Encoding Table...");
 	if (!LoadEncoding()) {
@@ -2213,9 +2209,11 @@ bool Interface::LoadGemRBINI()
 			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
-				strlcpy( GroundCircleBam[size], s, pos - s + 1 );
+				ieResRef tmp;
+				strlcpy(tmp, s, pos - s + 1);
+				GroundCircleBam[size] = tmp;
 			} else {
-				CopyResRef(GroundCircleBam[size], s);
+				GroundCircleBam[size] = s;
 			}
 		}
 	}
@@ -3710,7 +3708,7 @@ bool Interface::ProtectedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
+void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
 
@@ -3821,7 +3819,7 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ieResRef TableName, const char *Prefix) const
+bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 {
 	AutoTable tab(TableName);
 	if (!tab) {
@@ -3873,23 +3871,23 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	strnlwrcpy( GoldResRef, tab->QueryField(size_t(0), size_t(0)), 8);
-	if ( GoldResRef[0]=='*' ) {
+	GoldResRef = ResRef::MakeLowerCase(tab->QueryField(size_t(0), size_t(0)));
+	if (GoldResRef.IsStar()) {
 		return false;
 	}
-	ieResRef RtResRef;
-	strnlwrcpy( RtResRef, tab->QueryField( 1, difflev ), 8);
-	int i = atoi(RtResRef);
+	ResRef randTreasureRef;
+	randTreasureRef = ResRef::MakeLowerCase(tab->QueryField(1, difflev));
+	int i = atoi(randTreasureRef);
 	if (i<1) {
-		ReadItemTable( RtResRef, 0 ); //reading the table itself
+		ReadItemTable(randTreasureRef, 0); //reading the table itself
 		return true;
 	}
 	if (i>5) {
 		i=5;
 	}
 	while(i--) {
-		strnlwrcpy( RtResRef, tab->QueryField(2+i,difflev), 8);
-		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
+		randTreasureRef = ResRef::MakeLowerCase(tab->QueryField(2 + i, difflev));
+		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
 	}
 	return true;
 }
@@ -4230,8 +4228,9 @@ int Interface::CanMoveItem(const CREItem *item) const
 	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
-	if (strnicmp(item->ItemResRef, GoldResRef, 8) != 0)
+	if (item->ItemResRef != GoldResRef) {
 		return -1;
+	}
 	//gold, returns the gold value (stack size)
 	return item->Usages[0];
 }
