@@ -28,6 +28,8 @@
 
 #include "dsputil.h"
 
+#include <cmath>
+
 /* cos(2*pi*x/n) for 0<=x<=n/4, followed by its reverse */
 COSTABLE(16);
 COSTABLE(32);
@@ -67,7 +69,7 @@ av_cold void ff_init_ff_cos_tabs(int index)
     double freq = 2*M_PI/m;
     FFTSample *tab = ff_cos_tabs[index];
     for(i=0; i<=m/4; i++)
-        tab[i] = (float) cos(i*freq);
+        tab[i] = (float) std::cos(i * freq);
     for(i=1; i<m/4; i++)
         tab[m/2-i] = tab[i];
 }
@@ -114,8 +116,8 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     } else {
         for (int i = 0; i < n / 2; i++) {
             float alpha = (float) (2 * M_PI * (float) i / (float) n);
-            float c1 = cos(alpha);
-            float s1 = sin(alpha) * s2;
+            float c1 = std::cos(alpha);
+            float s1 = std::sin(alpha) * s2;
             s->exptab[i].re = c1;
             s->exptab[i].im = s1;
         }
