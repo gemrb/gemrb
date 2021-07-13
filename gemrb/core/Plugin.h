@@ -43,7 +43,12 @@ namespace GemRB {
  */
 
 class GEM_EXPORT Plugin : public Held<Plugin>
-{};
+{
+public:
+	// declaring these here so we dont have to GEM_EXPORT every Held<T> for MSVC to be happy
+	Plugin() = default;
+	~Plugin() = default;
+};
 
 }
 
