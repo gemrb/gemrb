@@ -608,7 +608,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 
 	bool overrideRunning = false;
 	//if index is not an existing savegame, we create a unique slotname
-	for (auto save : save_slots) {
+	for (const auto& save : save_slots) {
 		if (save->GetSaveID() != index) continue;
 
 		if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
@@ -717,7 +717,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	return GEM_OK;
 }
 
-void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
+void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game)
 {
 	if (!game) {
 		return;

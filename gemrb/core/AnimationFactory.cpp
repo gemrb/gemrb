@@ -37,7 +37,7 @@ AnimationFactory::~AnimationFactory(void)
 		free( FLTable);
 }
 
-void AnimationFactory::AddFrame(Holder<Sprite2D> frame)
+void AnimationFactory::AddFrame(const Holder<Sprite2D>& frame)
 {
 	frames.push_back( frame );
 }

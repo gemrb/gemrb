@@ -113,7 +113,7 @@ private:
 	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(Holder<Sprite2D> image);
+	ImageSpan(const Holder<Sprite2D>& image);
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;

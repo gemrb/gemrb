@@ -257,8 +257,8 @@ public:
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting
-	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
-	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group);
+	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, const ResRef& group);
+	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ResRef& group);
 	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
 	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ResRef group) const;

@@ -77,9 +77,9 @@ public:
 	void Brighten();
 
 	void SetupPaperdollColours(const ieDword* Colors, unsigned int type);
-	void SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
+	void SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
 		unsigned int type);
-	void SetupGlobalRGBModification(const PaletteHolder src,
+	void SetupGlobalRGBModification(const PaletteHolder& src,
 		const RGBModifier& mod);
 
 	PaletteHolder Copy() const;

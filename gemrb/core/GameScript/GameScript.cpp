@@ -1397,7 +1397,7 @@ static void CleanupIEScript()
 	ObjectIDSTableNames = NULL;
 }
 
-static void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
+static void printFunction(StringBuffer& buffer, const Holder<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);

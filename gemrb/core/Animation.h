@@ -51,7 +51,7 @@ public:
 	ieDword Flags;
 
 	Animation(int count);
-	void AddFrame(Holder<Sprite2D> frame, unsigned int index);
+	void AddFrame(const Holder<Sprite2D>& frame, unsigned int index);
 	Holder<Sprite2D> CurrentFrame() const;
 	Holder<Sprite2D> LastFrame();
 	Holder<Sprite2D> NextFrame();

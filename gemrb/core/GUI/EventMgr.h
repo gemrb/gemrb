@@ -289,9 +289,9 @@ public:
 
 	static Event CreateRedrawRequestEvent();
 
-	static bool RegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
+	static bool RegisterHotKeyCallback(const EventCallback&, KeyboardKey key, short mod = 0);
 	static void UnRegisterHotKeyCallback(EventCallback, KeyboardKey key, short mod = 0);
-	static TapMonitorId RegisterEventMonitor(EventCallback, Event::EventTypeMask mask = Event::AllEventsMask);
+	static TapMonitorId RegisterEventMonitor(const EventCallback&, Event::EventTypeMask mask = Event::AllEventsMask);
 	static void UnRegisterEventMonitor(TapMonitorId monitor);
 
 private:

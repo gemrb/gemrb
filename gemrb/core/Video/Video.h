@@ -163,7 +163,7 @@ public:
 
 	virtual Holder<Sprite2D> CreateSprite(const Region&, void* pixels, const PixelFormat&) = 0;
 	
-	void BlitSprite(const Holder<Sprite2D> spr, Point p,
+	void BlitSprite(const Holder<Sprite2D>& spr, Point p,
 					const Region* clip = NULL);
 	
 	virtual void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
@@ -172,7 +172,7 @@ public:
 	virtual void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
 								BlitFlags flags, Color tint = Color()) = 0;
 
-	void BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
+	void BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,
 								   BlitFlags flags, Color tint);
 
 	virtual void BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p, BlitFlags flags,
@@ -202,7 +202,7 @@ public:
 	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
 	/** Flips sprite, returns new sprite */
-	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D> sprite, BlitFlags flags, bool MirrorAnchor);
+	Holder<Sprite2D> MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor);
 
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
@@ -211,12 +211,12 @@ public:
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */
-	Holder<Sprite2D> SpriteScaleDown(const Holder<Sprite2D> sprite, unsigned int ratio);
+	Holder<Sprite2D> SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned int ratio);
 	/** Creates an ellipse or circle shaped sprite with various intensity
 	 *  for projectile light spots */
 	Holder<Sprite2D> CreateLight(int radius, int intensity);
 
-	Color SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
+	Color SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 };
 
 }

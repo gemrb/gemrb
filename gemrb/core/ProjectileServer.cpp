@@ -204,7 +204,7 @@ int ProjectileServer::InitExplosion()
 	return explosioncount;
 }
 
-unsigned int ProjectileServer::PrepareSymbols(Holder<SymbolMgr> projlist) {
+unsigned int ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) {
 	unsigned int count = 0;
 
 	unsigned int rows = (unsigned int) projlist->GetSize();
@@ -223,7 +223,7 @@ unsigned int ProjectileServer::PrepareSymbols(Holder<SymbolMgr> projlist) {
 	return count;
 }
 
-void ProjectileServer::AddSymbols(Holder<SymbolMgr> projlist) {
+void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
 	unsigned int rows = (unsigned int) projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);

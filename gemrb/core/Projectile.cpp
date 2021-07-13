@@ -1900,7 +1900,7 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
-void Projectile::Draw(Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint) const
+void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color tint) const
 {
 	Video *video = core->GetVideoDriver();
 	PaletteHolder pal = (spr->Format().Bpp == 1) ? palette : nullptr;

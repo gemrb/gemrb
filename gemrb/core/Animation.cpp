@@ -56,7 +56,7 @@ void Animation::SetPos(unsigned int index)
 }
 
 /* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(Holder<Sprite2D> frame, unsigned int index)
+void Animation::AddFrame(const Holder<Sprite2D>& frame, unsigned int index)
 {
 	if (index>=indicesCount) {
 		error("Animation", "You tried to write past a buffer in animation, BAD!\n");

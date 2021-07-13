@@ -176,7 +176,7 @@ public:
 	Font(PaletteHolder, ieWord lineheight, ieWord baseline, bool background);
 	virtual ~Font();
 
-	const Glyph& CreateGlyphForCharSprite(ieWord chr, Holder<Sprite2D>);
+	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);
 	// BAM fonts use alisases a lot so this saves quite a bit of space
 	// Aliases are 2 glyphs that share identical frames such as 'ā' and 'a'
 	void CreateAliasForChar(ieWord chr, ieWord alias);

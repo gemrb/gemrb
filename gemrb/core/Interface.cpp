@@ -2794,7 +2794,7 @@ int Interface::PlayMovie(const char* resref)
 
 	public:
 		// default color taken from BGEE.lua
-		IESubtitles(class Font* fnt, ResRef resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
+		IESubtitles(class Font* fnt, const ResRef& resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			AutoTable sttable(resref);
@@ -3270,7 +3270,7 @@ cleanup:
 }
 
 /* replace the current world map but sync areas available in old and new */
-void Interface::UpdateWorldMap(ResRef wmResRef)
+void Interface::UpdateWorldMap(const ResRef& wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);

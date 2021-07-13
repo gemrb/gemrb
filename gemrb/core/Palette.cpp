@@ -230,7 +230,7 @@ static inline void applyMod(const Color& src, Color& dest,
 	}
 }
 
-void Palette::SetupRGBModification(const PaletteHolder src, const RGBModifier* mods,
+void Palette::SetupRGBModification(const PaletteHolder& src, const RGBModifier* mods,
 	unsigned int type)
 {
 	const RGBModifier* tmods = mods+(8*type);
@@ -281,7 +281,7 @@ void Palette::SetupRGBModification(const PaletteHolder src, const RGBModifier* m
 	version++;
 }
 
-void Palette::SetupGlobalRGBModification(const PaletteHolder src,
+void Palette::SetupGlobalRGBModification(const PaletteHolder& src,
 	const RGBModifier& mod)
 {
 	// don't modify the transparency and shadow colour

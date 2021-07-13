@@ -340,7 +340,7 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 	}
 }
 
-Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
+Actor* GAMImporter::GetActor(const Holder<ActorMgr>& aM, bool is_in_party)
 {
 	PCStruct pcInfo{};
 	ieDword tmpDword;

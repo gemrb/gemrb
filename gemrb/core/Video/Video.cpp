@@ -188,7 +188,7 @@ void Video::SetEventMgr(EventMgr* evnt)
 // Flips given sprite according to the flags. If MirrorAnchor=true,
 // flips its anchor (i.e. origin/base point) as well
 // returns new sprite
-Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D> sprite, BlitFlags flags, bool MirrorAnchor)
+Holder<Sprite2D> Video::MirrorSprite(const Holder<Sprite2D>& sprite, BlitFlags flags, bool MirrorAnchor)
 {
 	if (!sprite)
 		return NULL;
@@ -216,7 +216,7 @@ bool Video::GetFullscreenMode() const
 	return fullscreen;
 }
 
-void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
+void Video::BlitSprite(const Holder<Sprite2D>& spr, Point p, const Region* clip)
 {
 	p -= spr->Frame.origin;
 	Region dst(p, spr->Frame.size);
@@ -242,7 +242,7 @@ void Video::BlitSprite(const Holder<Sprite2D> spr, Point p, const Region* clip)
 	BlitSprite(spr, src, fClip, BlitFlags::BLENDED);
 }
 
-void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, const Point& p,
+void Video::BlitGameSpriteWithPalette(const Holder<Sprite2D>& spr, const PaletteHolder& pal, const Point& p,
 									  BlitFlags flags, Color tint)
 {
 	if (pal) {
@@ -255,7 +255,7 @@ void Video::BlitGameSpriteWithPalette(Holder<Sprite2D> spr, PaletteHolder pal, c
 	}
 }
 
-Holder<Sprite2D> Video::SpriteScaleDown( const Holder<Sprite2D> sprite, unsigned int ratio )
+Holder<Sprite2D> Video::SpriteScaleDown(const Holder<Sprite2D>& sprite, unsigned int ratio)
 {
 	Region scaledFrame = sprite->Frame;
 	scaledFrame.w /= ratio;
@@ -311,7 +311,7 @@ Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(const Holder<Sprite2D> sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
 {
 	// TODO: turn this into one of our software "shaders"
 	Color sum;

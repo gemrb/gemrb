@@ -584,7 +584,7 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 	return true;
 }
 
-bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+bool Window::UnRegisterHotKeyCallback(const EventMgr::EventCallback& cb, KeyboardKey key)
 {
 	KeyMap::iterator it = HotKeys.find(key);
 	if (it != HotKeys.end() && FunctionTargetsEqual(it->second, cb)) {

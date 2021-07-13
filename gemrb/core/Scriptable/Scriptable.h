@@ -320,7 +320,7 @@ public:
 	void SetDialog(const ResRef &resref);
 	void SetFloatingText(char*);
 	void SetScript(const ieResRef aScript, int idx, bool ai=false);
-	void SetSpellResRef(ResRef resref);
+	void SetSpellResRef(const ResRef& resref);
 	void SetWait(tick_t time);
 	tick_t GetWait() const;
 	void LeftDialog();
@@ -376,8 +376,8 @@ public:
 	int CheckWildSurge();
 	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
 	/* internal spellcasting shortcuts */
-	void DirectlyCastSpellPoint(const Point &target, ResRef spellref, int level, int no_stance, bool deplete);
-	void DirectlyCastSpell(Scriptable *target, ResRef spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );

@@ -132,7 +132,7 @@ private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
-	PCStatsStruct(std::list<int> levels);
+	PCStatsStruct(const std::list<int>& levels);
 	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void Init(bool all=true);
 	void IncrementChapter();
@@ -141,7 +141,7 @@ public:
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
-	void RegisterFavourite(ResRef fav, int what);
+	void RegisterFavourite(const ResRef& fav, int what);
 	void UpdateClassLevels(const std::list<int> &levels);
 };
 }

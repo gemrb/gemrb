@@ -85,9 +85,9 @@ private:
 	ExplosionEntry *explosions;   //this is the list of explosion resources
 	int explosioncount;
 	// internal function: what is max valid projectile id?
-	unsigned int PrepareSymbols(Holder<SymbolMgr> projlist);
+	unsigned int PrepareSymbols(const Holder<SymbolMgr>& projlist);
 	// internal function: read projectiles
-	void AddSymbols(Holder<SymbolMgr> projlist);
+	void AddSymbols(const Holder<SymbolMgr>& projlist);
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
 	//creates a clone from the cached projectiles

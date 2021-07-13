@@ -67,7 +67,7 @@ PCStatsStruct::PCStatsStruct()
 	Init();
 }
 
-PCStatsStruct::PCStatsStruct(std::list<int> levels)
+PCStatsStruct::PCStatsStruct(const std::list<int>& levels)
 {
 	Init();
 	UpdateClassLevels(levels);
@@ -275,7 +275,7 @@ int PCStatsStruct::GetHeaderForSlot(int slot)
 //but also swap it with a previous slot if its usage count is now better, so the last slot is always the weakest
 //finally if it was not found anywhere, register it as the new candidate with 1 usage
 
-void PCStatsStruct::RegisterFavourite(ResRef fav, int what)
+void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 {
 	ResRef *respoi;
 	ieWord *cntpoi;

@@ -282,7 +282,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	}
 }
 
-ImageSpan::ImageSpan(Holder<Sprite2D> im)
+ImageSpan::ImageSpan(const Holder<Sprite2D>& im)
 	: Content(im->Frame.size)
 {
 	image = im;

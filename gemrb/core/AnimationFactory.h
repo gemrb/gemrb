@@ -39,7 +39,7 @@ private:
 public:
 	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void) override;
-	void AddFrame(Holder<Sprite2D> frame);
+	void AddFrame(const Holder<Sprite2D>& frame);
 	void AddCycle(CycleEntry cycle);
 	void LoadFLT(const unsigned short* buffer, int count);
 	Animation* GetCycle(unsigned char cycle);

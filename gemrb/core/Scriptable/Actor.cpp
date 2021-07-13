@@ -1743,7 +1743,7 @@ void Actor::ReleaseMemory()
 		IWD2HitTable.clear();
 		BABClassMap.clear();
 		ModalStates.clear();
-		for (auto clskit : class2kits) {
+		for (const auto& clskit : class2kits) {
 			free(clskit.second.clab);
 			free(clskit.second.className);
 			for (auto kit : clskit.second.clabs) {
@@ -10896,7 +10896,7 @@ bool Actor::TryToHideIWD2()
 }
 
 //cannot target actor (used by GUI)
-bool Actor::Untargetable(ResRef spellRef) const
+bool Actor::Untargetable(const ResRef& spellRef) const
 {
 	if (!spellRef.IsEmpty()) {
 		Spell *spl = gamedata->GetSpell(spellRef, true);

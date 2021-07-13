@@ -95,7 +95,7 @@ protected:
 
 	virtual void BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
-	void BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL);
+	void BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = nullptr);
 
 	int PollEvents() override;
 	/* used to process the SDL events dequeued by PollEvents or an arbitraty event from another source.*/

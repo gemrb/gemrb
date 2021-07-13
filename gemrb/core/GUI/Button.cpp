@@ -706,7 +706,7 @@ void Button::ClearPictureList()
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(Holder<Sprite2D> Picture)
+void Button::StackPicture(const Holder<Sprite2D>& Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();

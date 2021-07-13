@@ -113,7 +113,7 @@ void Slider::UpdateState(unsigned int Sum)
 }
 
 /** Sets the selected image */
-void Slider::SetImage(unsigned char type, Holder<Sprite2D> img)
+void Slider::SetImage(unsigned char type, const Holder<Sprite2D>& img)
 {
 	switch (type) {
 		case IE_GUI_SLIDER_KNOB:

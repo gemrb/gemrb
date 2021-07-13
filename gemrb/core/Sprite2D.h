@@ -115,7 +115,7 @@ public:
 	const PixelFormat& Format() const noexcept { return format; }
 	Color GetPixel(const Point&) const noexcept;
 	PaletteHolder GetPalette() const noexcept { return format.palette; }
-	void SetPalette(PaletteHolder pal);
+	void SetPalette(const PaletteHolder& pal);
 	
 	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
 	colorkey_t GetColorKey() const noexcept { return format.ColorKey; }

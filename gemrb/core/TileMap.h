@@ -72,7 +72,7 @@ public:
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline);
+	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const char* Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;

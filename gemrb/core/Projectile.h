@@ -412,7 +412,7 @@ private:
 	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
 
 private:
-	void Draw(Holder<Sprite2D> spr, const Point& p,
+	void Draw(const Holder<Sprite2D>& spr, const Point& p,
 			  BlitFlags flags, Color tint) const;
 };
 

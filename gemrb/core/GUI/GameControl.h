@@ -238,7 +238,7 @@ public:
 	/** Sets up targeting with spells or items */
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */
-	void SetupCasting(ResRef spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
+	void SetupCasting(const ResRef& spellname, int type, int level, int slot, Actor *actor, int targettype, int cnt);
 	void ToggleAlwaysRun();
 	
 protected:

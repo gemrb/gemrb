@@ -110,7 +110,7 @@ void* Sprite2D::LockSprite()
 	return pixels;
 }
 
-void Sprite2D::SetPalette(PaletteHolder pal)
+void Sprite2D::SetPalette(const PaletteHolder& pal)
 {
 	assert(format.Bpp == 1);
 	assert(pal != nullptr);

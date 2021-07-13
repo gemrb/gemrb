@@ -209,7 +209,7 @@ void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
 	AtlasIndex[chr] = GlyphIndexEntry(chr, pageIdx, g);
 }
 
-const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D> spr)
+const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& spr)
 {
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);

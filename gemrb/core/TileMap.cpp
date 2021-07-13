@@ -279,7 +279,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline)
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );

@@ -3656,7 +3656,7 @@ void Map::AddItemToLocation(const Point &position, CREItem *item)
 }
 
 Container* Map::AddContainer(const char* Name, unsigned short Type,
-							 std::shared_ptr<Gem_Polygon> outline)
+							 const std::shared_ptr<Gem_Polygon>& outline)
 {
 	Container* c = new Container();
 	c->SetScriptName( Name );

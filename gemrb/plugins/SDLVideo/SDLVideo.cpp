@@ -434,7 +434,7 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BlitFlags::MIRRORX or BlitFlags::MIRRORY is set

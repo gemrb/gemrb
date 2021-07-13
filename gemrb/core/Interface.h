@@ -559,7 +559,7 @@ public:
 	to override the saved game's version */
 	void LoadGame(SaveGame *save, int ver_override);
 	/** reloads the world map from a resource file */
-	void UpdateWorldMap(ResRef wmResRef);
+	void UpdateWorldMap(const ResRef& wmResRef);
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 

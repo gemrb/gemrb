@@ -2126,7 +2126,7 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 	teamMoved = false;
 	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
 	if (wmapExits != pstWMapExits.end()) {
-		for (std::string exit : wmapExits->second) {
+		for (const std::string& exit : wmapExits->second) {
 			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
 				teamMoved = true;
 				break;
@@ -2665,7 +2665,7 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 //u is the caster
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupCasting(ResRef spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
+void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
 {
 	spellName = spellname;
 	spellOrItem = type;

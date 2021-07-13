@@ -106,7 +106,7 @@ int SpellEntry::FindSpell(unsigned int kit) const
 	return -1;
 }
 
-static int FindSpell(ResRef spellref, std::vector<SpellEntry*>& list)
+static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
 {
 	size_t i = list.size();
 	while (i--) {
