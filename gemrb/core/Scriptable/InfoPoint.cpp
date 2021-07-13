@@ -60,10 +60,6 @@ InfoPoint::InfoPoint(void)
 	StrRef = 0;
 }
 
-InfoPoint::~InfoPoint(void)
-{
-}
-
 void InfoPoint::SetEnter(const char *resref)
 {
 	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {

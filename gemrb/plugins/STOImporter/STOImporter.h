@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	STOImporter(void);
+	STOImporter() = default;
 	~STOImporter(void) override;
 	bool Open(DataStream* stream) override;
 	Store* GetStore(Store *store) override;

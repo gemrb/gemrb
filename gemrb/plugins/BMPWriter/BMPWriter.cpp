@@ -11,14 +11,6 @@ using namespace GemRB;
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
 
-BMPWriter::BMPWriter()
-{
-}
-
-BMPWriter::~BMPWriter()
-{
-}
-
 void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
 	ieDword tmpDword;

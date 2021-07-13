@@ -33,10 +33,6 @@ MOSImporter::MOSImporter(void)
 	Cols = Rows = BlockSize = PalOffset = 0;
 }
 
-MOSImporter::~MOSImporter(void)
-{
-}
-
 bool MOSImporter::Open(DataStream* stream)
 {
 	str = stream;

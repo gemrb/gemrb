@@ -23,12 +23,6 @@
 
 namespace GemRB {
 
-StringBuffer::StringBuffer()
-{}
-
-StringBuffer::~StringBuffer()
-{}
-
 void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;

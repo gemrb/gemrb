@@ -28,7 +28,6 @@ namespace GemRB {
 class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
-	~InfoPoint(void) override;
 	//returns true if trap has been triggered, tumble skill???
 	void SetEnter(const char *resref);
 	bool TriggerTrap(int skill, ieDword ID) override;

@@ -25,14 +25,6 @@
 
 using namespace GemRB;
 
-SAVImporter::SAVImporter()
-{
-}
-
-SAVImporter::~SAVImporter()
-{
-}
-
 int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor& areExtractor)
 {
 	char Signature[8];

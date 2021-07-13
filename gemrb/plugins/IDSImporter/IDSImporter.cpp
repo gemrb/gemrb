@@ -28,10 +28,6 @@
 
 using namespace GemRB;
 
-IDSImporter::IDSImporter(void)
-{
-}
-
 IDSImporter::~IDSImporter(void)
 {
 	for (auto& ptr : ptrs) {

@@ -44,7 +44,7 @@ public:
 	ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
-	virtual ~ScriptingRefBase() {};
+	virtual ~ScriptingRefBase() = default;
 
 	// key to separate groups of objects for faster searching and id collision prevention
 	virtual const ResRef& ScriptingGroup() const=0;
@@ -95,7 +95,7 @@ public:
 
 	class Parameter {
 		struct TypeInterface {
-			virtual ~TypeInterface() {};
+			virtual ~TypeInterface() = default;
 			virtual TypeInterface* Clone() const = 0;
 			virtual const std::type_info& Type() const = 0;
 		};
@@ -164,8 +164,7 @@ public:
 	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
 
 public:
-	ScriptEngine(void) {};
-	~ScriptEngine(void) override {};
+	ScriptEngine() = default;
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */

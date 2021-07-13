@@ -61,7 +61,7 @@ public:
 	char originalfile[_MAX_PATH];
 public:
 	DataStream(void);
-	virtual ~DataStream(void);
+	virtual ~DataStream() = default;
 	virtual int Read(void* dest, unsigned int len) = 0;
 	virtual int Write(const void* src, unsigned int len) = 0;
 	

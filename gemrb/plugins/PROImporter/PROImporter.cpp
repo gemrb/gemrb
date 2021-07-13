@@ -25,10 +25,6 @@
 
 using namespace GemRB;
 
-PROImporter::PROImporter(void)
-{
-}
-
 PROImporter::~PROImporter(void)
 {
 	delete str;

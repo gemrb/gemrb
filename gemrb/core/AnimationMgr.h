@@ -33,8 +33,6 @@ class Font;
 
 class GEM_EXPORT AnimationMgr : public Plugin {
 public:
-	AnimationMgr(void);
-	~AnimationMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetCycleSize(unsigned char Cycle) = 0;
 	virtual AnimationFactory* GetAnimationFactory(const char* ResRef, bool allowCompression = true) = 0;

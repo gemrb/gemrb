@@ -38,7 +38,7 @@ private:
 	std::vector< char*> ptrs;
 
 public:
-	IDSImporter(void);
+	IDSImporter() = default;
 	~IDSImporter(void) override;
 	bool Open(DataStream* stream) override;
 	int GetValue(const char* txt) const override;

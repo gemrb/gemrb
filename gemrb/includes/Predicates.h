@@ -34,7 +34,7 @@ namespace GemRB {
 
 template<typename PT>
 struct Predicate : std::unary_function<PT, bool> {
-	virtual ~Predicate() {};
+	virtual ~Predicate() = default;
 	virtual bool operator()(PT param) const=0;
 };
 

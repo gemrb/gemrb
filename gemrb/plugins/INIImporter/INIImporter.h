@@ -188,7 +188,7 @@ private:
 	std::vector< INITag*> tags;
 
 public:
-	INIImporter(void);
+	INIImporter() = default;
 	~INIImporter(void) override;
 	bool Open(DataStream* stream) override;
 	int GetTagsCount() const override

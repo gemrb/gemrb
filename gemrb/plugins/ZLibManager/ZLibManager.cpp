@@ -26,16 +26,6 @@
 
 using namespace GemRB;
 
-
-ZLibManager::ZLibManager(void)
-{
-}
-
-ZLibManager::~ZLibManager(void)
-{
-}
-
-
 #define INPUTSIZE  8192
 #define OUTPUTSIZE 8192
 

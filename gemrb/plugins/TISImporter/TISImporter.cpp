@@ -28,10 +28,6 @@
 
 using namespace GemRB;
 
-TISImporter::TISImporter(void)
-{
-}
-
 TISImporter::~TISImporter(void)
 {
 	delete str;

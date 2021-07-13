@@ -50,10 +50,6 @@ MVEPlay::MVEPlay(void)
 	g_palette->col[255] = Color(50,50,50,255);
 }
 
-MVEPlay::~MVEPlay(void)
-{
-}
-
 bool MVEPlay::Open(DataStream* stream)
 {
 	str = stream;

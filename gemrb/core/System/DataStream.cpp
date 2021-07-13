@@ -36,10 +36,6 @@ DataStream::DataStream(void)
 	Encrypted = false;
 }
 
-DataStream::~DataStream(void)
-{
-}
-
 void DataStream::SetBigEndian(bool be)
 {
 	DataStream::IsBigEndian = be;

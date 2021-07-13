@@ -46,12 +46,6 @@ Animation::Animation(int count)
 	gameAnimation = false;
 }
 
-Animation::~Animation(void)
-{
-	// Empty, but having it here rather than defined implicitly means
-	// we don't have to include Sprite2D.h in the header.
-}
-
 void Animation::SetPos(unsigned int index)
 {
 	if (index<indicesCount) {

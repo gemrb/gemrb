@@ -38,7 +38,6 @@ class SDLAudioSoundHandle : public SoundHandle
 {
 public:
 	SDLAudioSoundHandle(Mix_Chunk *chunk, int channel, bool relative) : mixChunk(chunk), chunkChannel(channel), sndRelative(relative) { };
-	virtual ~SDLAudioSoundHandle() { }
 	virtual void SetPos(const Point&);
 	virtual bool Playing();
 	virtual void Stop();

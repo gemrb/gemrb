@@ -48,9 +48,7 @@ protected:
 	StringMap cache;
 
 public:
-	CachedDirectoryImporter();
-	~CachedDirectoryImporter() override;
-
+	CachedDirectoryImporter() = default;
 	bool Open(const char *dir, const char *desc) override;
 	void Refresh();
 	/** predicts the availability of a resource */

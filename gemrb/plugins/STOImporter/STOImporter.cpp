@@ -29,10 +29,6 @@
 
 using namespace GemRB;
 
-STOImporter::STOImporter(void)
-{
-}
-
 STOImporter::~STOImporter(void)
 {
 	delete str;

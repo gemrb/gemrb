@@ -68,7 +68,7 @@ private:
 	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
 
 public:
-	WEDImporter(void);
+	WEDImporter() = default;
 	~WEDImporter(void) override;
 	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it

@@ -44,7 +44,7 @@ private:
 	std::vector< InfoPoint*> infoPoints;
 	std::vector< TileObject*> tiles;
 public:
-	TileMap(void);
+	TileMap() = default;
 	~TileMap(void);
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,

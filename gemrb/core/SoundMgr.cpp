@@ -29,8 +29,4 @@ SoundMgr::SoundMgr(void)
 {
 }
 
-SoundMgr::~SoundMgr(void)
-{
-}
-
 }

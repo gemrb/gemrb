@@ -34,10 +34,6 @@ using namespace GemRB;
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
 #define WED_POLYGON_SIZE  0x12
 
-WEDImporter::WEDImporter(void)
-{
-}
-
 WEDImporter::~WEDImporter(void)
 {
 	delete str;

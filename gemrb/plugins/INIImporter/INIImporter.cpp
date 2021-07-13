@@ -24,10 +24,6 @@
 
 using namespace GemRB;
 
-INIImporter::INIImporter(void)
-{
-}
-
 INIImporter::~INIImporter(void)
 {
 	for (auto& tag : tags) {

@@ -56,7 +56,6 @@ protected:
 
 public:
 	MVEPlay(void);
-	~MVEPlay(void) override;
 	bool Open(DataStream* stream) override;
 };
 

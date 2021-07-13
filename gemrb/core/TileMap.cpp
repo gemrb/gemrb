@@ -29,10 +29,6 @@
 
 namespace GemRB {
 
-TileMap::TileMap(void)
-{
-}
-
 TileMap::~TileMap(void)
 {
 	ClearOverlays();

@@ -1,12 +1,10 @@
 ADD_DEFINITIONS(-DGEM_BUILD_DLL)
 
 FILE(GLOB gemrb_core_LIB_SRCS
-	ActorMgr.cpp
 	Ambient.cpp
 	AmbientMgr.cpp
 	Animation.cpp
 	AnimationFactory.cpp
-	AnimationMgr.cpp
 	ArchiveImporter.cpp
 	Audio.cpp
 	Bitmap.cpp
@@ -68,24 +66,19 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	ScriptedAnimation.cpp
 	SoundMgr.cpp
 	Spell.cpp
-	SpellMgr.cpp
 	Spellbook.cpp
 	Sprite2D.cpp
 	SpriteCover.cpp
 	Store.cpp
-	StoreMgr.cpp
 	StringMgr.cpp
 	SymbolMgr.cpp
 	TableMgr.cpp
 	Tile.cpp
 	TileMap.cpp
-	TileMapMgr.cpp
 	TileOverlay.cpp
-	TileSetMgr.cpp
 	Variables.cpp
 	VEFObject.cpp
 	WorldMap.cpp
-	WorldMapMgr.cpp
 	GameScript/Actions.cpp
 	GameScript/GSUtils.cpp
 	GameScript/GameScript.cpp
