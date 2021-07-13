@@ -505,7 +505,7 @@ void CharAnimations::InitAvatarsTable() const
 	}
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
 	const DataFileMgr *resdata = core->GetResDataINI();
-	for (int i = AvatarsCount; i > 0; i--) {
+	for (int i = AvatarsCount - 1; i >= 0; i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
 		AvatarTable[i].Prefixes[0] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX1));
 		AvatarTable[i].Prefixes[1] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX2));
