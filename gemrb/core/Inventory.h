@@ -321,7 +321,7 @@ public:
 	/** Creates an item in the slot*/
 	void SetSlotItemRes(const char* ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** Adds item to slot*/
-	void AddSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	void AddSlotItemRes(const ResRef& ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** returns the itemtype held in the left hand */
 	ieWord GetShieldItemType() const;
 	/** returns the itemtype of the item in the armor slot, mostly used in IWD2 */

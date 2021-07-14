@@ -1401,7 +1401,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 	return -1;
 }
 
-void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::AddSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
 	if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
