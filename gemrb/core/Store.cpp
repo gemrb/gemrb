@@ -32,13 +32,12 @@
 namespace GemRB {
 
 STOItem::STOItem() {
-	ItemResRef[0] = 0;
 	PurchasedAmount = Flags = Weight = MaxStackAmount = AmountInStock = InfiniteSupply = 0;
 	triggers = NULL;
 }
 
 STOItem::STOItem(const CREItem *item) {
-	CopyResRef(ItemResRef, item->ItemResRef);
+	ItemResRef = item->ItemResRef;
 	PurchasedAmount = 0; // Expired in STOItem
 	memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
 	Flags = item->Flags;
@@ -215,7 +214,7 @@ unsigned int Store::FindItem(const ieResRef itemname, bool usetrigger) const
 			}
 		}
 		const STOItem *temp = items[i];
-		if (!strnicmp(itemname, temp->ItemResRef, 8) ) {
+		if (itemname == temp->ItemResRef) {
 			return i;
 		}
 	}
@@ -230,7 +229,7 @@ STOItem *Store::FindItem(const CREItem *item, bool exact)
 		}
 		STOItem *temp = items[i];
 
-		if (strnicmp(item->ItemResRef, temp->ItemResRef, 8) != 0) {
+		if (item->ItemResRef != temp->ItemResRef) {
 			continue;
 		}
 		if (exact) {

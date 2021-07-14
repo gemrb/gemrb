@@ -68,7 +68,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  * Item in a store, together with available amount etc.
  */
 struct GEM_EXPORT STOItem {
-	ieResRef ItemResRef;
+	ResRef ItemResRef;
 	ieWord PurchasedAmount;
 	ieWord Usages[CHARGE_COUNTERS] = {};
 	ieDword Flags;

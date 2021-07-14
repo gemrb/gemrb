@@ -7643,8 +7643,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			break;
 		}
 		// save the resref, since the pointer may get freed
-		ieResRef itemResRef;
-		CopyResRef(itemResRef, si->ItemResRef);
+		ResRef itemResRef = si->ItemResRef;
 		//if no item remained, remove it
 		if (si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
