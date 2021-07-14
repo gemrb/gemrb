@@ -36,8 +36,6 @@ Animation::Animation(int count)
 	indicesCount = count;
 	frameIdx = RAND(0, count-1);
 	starttime = 0;
-	x = 0;
-	y = 0;
 	Flags = A_ANI_ACTIVE;
 	fps = ANI_DEFAULT_FRAMERATE;
 	endReached = false;

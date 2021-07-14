@@ -3914,8 +3914,7 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	anim->gameAnimation = true;
 	anim->SetFrame(frame); // sanity check it first
 	anim->Flags = Flags;
-	anim->x = Pos.x;
-	anim->y = Pos.y;
+	anim->pos = Pos;
 	if (anim->Flags&A_ANI_MIRROR) {
 		anim->MirrorAnimation();
 	}

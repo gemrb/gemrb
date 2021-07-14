@@ -43,7 +43,7 @@ private:
 public:
 	bool endReached;
 	unsigned int frameIdx;
-	int x, y;
+	Point pos;
 	unsigned char fps;
 	bool playReversed;
 	bool gameAnimation;
