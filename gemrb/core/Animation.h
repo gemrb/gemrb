@@ -42,7 +42,7 @@ private:
 	tick_t starttime;
 public:
 	bool endReached;
-	unsigned int pos;
+	unsigned int frameIdx;
 	int x, y;
 	unsigned char fps;
 	bool playReversed;
@@ -64,7 +64,7 @@ public:
 	/** Mirrors all the frames horizontally */
 	void MirrorAnimation();
 	/** sets frame index */
-	void SetPos(unsigned int index);
+	void SetFrame(unsigned int index);
 	/** Sets ScriptName for area animation */
 	void SetScriptName(const char *name);
 	/** returns the frame count */

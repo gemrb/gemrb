@@ -114,7 +114,7 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 			anim->MirrorAnimationVert();
 		}
 		//creature anims may start at random position, vvcs always start on 0
-		anim->pos = 0;
+		anim->frameIdx = 0;
 		//vvcs are always paused
 		anim->gameAnimation = true;
 		if (!loop) {
@@ -196,7 +196,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 
 		anims[p] = af->GetCycle(c);
 		if (anims[p]) {
-			anims[p]->pos = 0;
+			anims[p]->frameIdx = 0;
 			if (mirror) {
 				anims[p]->MirrorAnimation();
 			}

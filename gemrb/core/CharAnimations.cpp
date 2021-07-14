@@ -1009,7 +1009,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		previousStanceID = stanceID;
 
 		if (lastFrameOnly) {
-			anims[0]->SetPos(anims[0]->GetFrameCount() - 1);
+			anims[0]->SetFrame(anims[0]->GetFrameCount() - 1);
 		}
 
 		return anims;
@@ -1147,9 +1147,9 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		//animation is affected by game flags
 		a->gameAnimation = true;
 		if (lastFrameOnly) {
-			a->SetPos(a->GetFrameCount() - 1);
+			a->SetFrame(a->GetFrameCount() - 1);
 		} else {
-			a->SetPos(0);
+			a->SetFrame(0);
 		}
 
 		//setting up the sequencing of animation cycles
@@ -1358,7 +1358,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		}
 
 		animation->gameAnimation = true;
-		animation->SetPos(0);
+		animation->SetFrame(0);
 		animations[0]->AddAnimArea(animation);
 
 		orientation &= ~1;

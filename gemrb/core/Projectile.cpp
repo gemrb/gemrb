@@ -149,7 +149,7 @@ void Projectile::CreateCompositeAnimation(Animation **anims, AnimationFactory *a
 		//animations are started at a random frame position
 		//Always start from 0, unless set otherwise
 		if (!(ExtFlags&PEF_RANDOM)) {
-			a->SetPos(0);
+			a->SetFrame(0);
 		}
 
 		a->gameAnimation = true;
@@ -199,7 +199,7 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 		//animations are started at a random frame position
 		//Always start from 0, unless set otherwise
 		if (!(ExtFlags&PEF_RANDOM)) {
-			a->SetPos(0);
+			a->SetFrame(0);
 		}
 
 		if (mirror) {
@@ -1664,10 +1664,10 @@ int Projectile::GetShadowPos(int face) const
 void Projectile::SetPos(int face, int frame1, int frame2)
 {
 	if (travel[face]) {
-		travel[face]->SetPos(frame1);
+		travel[face]->SetFrame(frame1);
 	}
 	if (shadow[face]) {
-		shadow[face]->SetPos(frame2);
+		shadow[face]->SetFrame(frame2);
 	}
 }
 
@@ -1790,7 +1790,7 @@ void Projectile::DrawTravel(const Region& viewport)
 					frame = travel[0]->NextFrame();
 					if (travel[0]->endReached) {
 						travel[0]->playReversed = true;
-						travel[0]->SetPos(0);
+						travel[0]->SetFrame(0);
 						ExtFlags |= PEF_UNPOP;
 						frame = shadow[0]->NextFrame();
 					}

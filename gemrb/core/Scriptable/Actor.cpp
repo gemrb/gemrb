@@ -7838,12 +7838,12 @@ void Actor::UpdateActorState()
 			if (HandleActorStance()) {
 				// restart animation for next time it is needed
 				first->endReached = false;
-				first->SetPos(0);
+				first->SetFrame(0);
 
 				Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
 				if (firstShadow) {
 					firstShadow->endReached = false;
-					firstShadow->SetPos(0);
+					firstShadow->SetFrame(0);
 				}
 			}
 		} else {
