@@ -781,7 +781,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				case WSTC_SETTYPE:
 					seh = &spl->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
-						seh->features[i].Target = caster->wildSurgeMods.target_type;
+						seh->features[i]->Target = caster->wildSurgeMods.target_type;
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
@@ -794,11 +794,11 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					// caster gets selftargeting fx when the projectile is fetched above
 					seh = &spl->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i].Target == FX_TARGET_SELF) {
-							seh->features[i].Target = caster->wildSurgeMods.target_type;
+						if (seh->features[i]->Target == FX_TARGET_SELF) {
+							seh->features[i]->Target = caster->wildSurgeMods.target_type;
 						} else {
 							// also apply to the caster
-							fx = seh->features+i;
+							fx = seh->features[i];
 							core->ApplyEffect(fx, caster, caster);
 						}
 					}
@@ -827,8 +827,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					// change the payload or this was all in vain
 					seh = &spl->ext_headers[SpellHeader];
 					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i].Target == FX_TARGET_SELF) {
-							seh->features[i].Target = FX_TARGET_PRESET;
+						if (seh->features[i]->Target == FX_TARGET_SELF) {
+							seh->features[i]->Target = FX_TARGET_PRESET;
 						}
 					}
 					// we need to fetch the projectile, so the effect queue is created
@@ -845,7 +845,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			if (caster->wildSurgeMods.saving_throw_mod) {
 				seh = &spl->ext_headers[SpellHeader];
 				for (i=0; i < seh->FeatureCount; i++) {
-					seh->features[i].SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+					seh->features[i]->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 				}
 			}
 
@@ -856,8 +856,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				// change the payload or this was all in vain
 				seh = &spl->ext_headers[SpellHeader];
 				for (i=0; i < seh->FeatureCount; i++) {
-					if (seh->features[i].Target == FX_TARGET_SELF) {
-						seh->features[i].Target = FX_TARGET_PRESET;
+					if (seh->features[i]->Target == FX_TARGET_SELF) {
+						seh->features[i]->Target = FX_TARGET_PRESET;
 					}
 				}
 				// we need to refetch the projectile, so the new one is used

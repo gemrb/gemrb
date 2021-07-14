@@ -1591,11 +1591,7 @@ void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword Effe
 	eM->Open(ds);
 
 	for (unsigned int i = 0; i < EffectsCount; i++) {
-		Effect fx;
-
-		eM->GetEffectV20( &fx );
-		// NOTE: AddEffect() allocates a new effect
-		fxqueue->AddEffect( &fx );
+		fxqueue->AddEffect(eM->GetEffectV20());
 	}
 }
 

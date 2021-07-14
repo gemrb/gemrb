@@ -997,7 +997,6 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 		EffectQueue *fxqueue = new EffectQueue();
 		fxqueue->SetOwner(Owner);
 		fxqueue->AddEffect(newfx);
-		delete newfx;
 
 		//don't detect self? if yes, then use NULL as last parameter
 		fxqueue->AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10, target);

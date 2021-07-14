@@ -1327,22 +1327,19 @@ void CREImporter::ReadEffects(Actor *act)
 	str->Seek( EffectsOffset+CREOffset, GEM_STREAM_START );
 
 	for (unsigned int i = 0; i < EffectsCount; i++) {
-		Effect fx;
-		GetEffect( &fx );
-		// NOTE: AddEffect() allocates a new effect
-		act->fxqueue.AddEffect( &fx ); // FIXME: don't reroll dice, time, etc!!
+		act->fxqueue.AddEffect(GetEffect()); // FIXME: don't reroll dice, time, etc!!
 	}
 }
 
-void CREImporter::GetEffect(Effect *fx)
+Effect *CREImporter::GetEffect()
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 
 	eM->Open( str, false );
 	if (TotSCEFF) {
-		eM->GetEffectV20( fx );
+		return eM->GetEffectV20();
 	} else {
-		eM->GetEffectV1( fx );
+		return eM->GetEffectV1();
 	}
 }
 

@@ -3934,7 +3934,6 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 	Actor* target = ( Actor* ) tar;
 	Effect *fx = EffectQueue::CreateEffect(fx_death_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	target->fxqueue.AddEffect(fx, false);
-	delete fx;
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
@@ -3987,10 +3986,8 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 	act->SetMCFlag(MC_FALLEN_PALADIN, OP_OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_TURN, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
-	delete fx;
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
-	delete fx;
 	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_PALADIN_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -4004,10 +4001,8 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 	act->SetMCFlag(MC_FALLEN_RANGER, OP_OR);
 	Effect *fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
-	delete fx;
 	fx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_CAST, FX_DURATION_INSTANT_PERMANENT);
 	act->fxqueue.AddEffect(fx, false);
-	delete fx;
 	if (act->InParty && core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_RANGER_FALL, DMC_BG2XPGREEN, act);
 }
 
@@ -7321,7 +7316,6 @@ void GameScript::ChunkCreature(Scriptable *Sender, Action* parameters)
 	Actor *target = (Actor *) tar;
 	Effect *fx = EffectQueue::CreateEffect(fx_death_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
 	target->fxqueue.AddEffect(fx, false);
-	delete fx;
 }
 
 void GameScript::MultiPlayerSync(Scriptable* Sender, Action* /*parameters*/)

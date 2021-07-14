@@ -354,7 +354,7 @@ Effect* GameData::GetEffect(const ResRef &resname)
 		return NULL;
 	}
 
-	effect = em->GetEffect(new Effect() );
+	effect = em->GetEffect();
 	if (effect == NULL) {
 		return NULL;
 	}

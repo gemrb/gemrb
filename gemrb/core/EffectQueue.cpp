@@ -420,7 +420,7 @@ EffectQueue *EffectQueue::CopySelf() const
 	Effect *fx;
 
 	while( (fx = GetNextEffect(fxit))) {
-		effects->AddEffect(fx, false);
+		effects->AddEffect(new Effect(*fx), false);
 	}
 	effects->SetOwner(GetOwner());
 	return effects;
@@ -472,14 +472,12 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 	return newfx;
 }
 
-void EffectQueue::AddEffect(const Effect* fx, bool insert)
+void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
-	Effect* new_fx = new Effect;
-	memcpy( new_fx, fx, sizeof( Effect ) );
-	if( insert) {
-		effects.insert( effects.begin(), new_fx );
+	if (insert) {
+		effects.insert(effects.begin(), fx);
 	} else {
-		effects.push_back( new_fx );
+		effects.push_back(fx);
 	}
 }
 
@@ -539,7 +537,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 	int flg;
 	ieDword spec = 0;
 	Actor *st = (self && (self->Type==ST_ACTOR)) ?(Actor *) self:NULL;
-	Effect* new_fx;
 	// HACK: 00p2229.baf in ar1006 does this silly thing, crashing later
 	if (!st && self && (self->Type==ST_CONTAINER) && (fx->Target == FX_TARGET_SELF)) {
 		fx->Target = FX_TARGET_PRESET;
@@ -587,7 +584,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	case FX_TARGET_ALL_BUT_SELF:
 		assert(self != NULL);
-		new_fx = new Effect;
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
@@ -596,7 +592,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( st==actor) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -604,7 +600,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -615,7 +610,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		map = self->GetCurrentArea();
 		spec = st->GetStat(IE_SPECIFIC);
 
-		new_fx = new Effect;
 		//GetActorCount(false) returns all nonparty critters
 		i = map->GetActorCount(false);
 		while(i--) {
@@ -623,7 +617,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( actor->GetStat(IE_SPECIFIC)!=spec) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -631,7 +625,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_OTHER_SIDE:
@@ -642,7 +635,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		map = self->GetCurrentArea();
 		spec = pretarget->GetStat(IE_SPECIFIC);
 
-		new_fx = new Effect;
 		//GetActorCount(false) returns all nonparty critters
 		i = map->GetActorCount(false);
 		while(i--) {
@@ -650,7 +642,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 			if( actor->GetStat(IE_SPECIFIC)!=spec) {
 				continue;
 			}
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -659,7 +651,6 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_PRESET:
@@ -677,12 +668,11 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	case FX_TARGET_PARTY:
 all_party:
-		new_fx = new Effect;
 		game = core->GetGame();
 		i = game->GetPartySize(false);
 		while(i--) {
 			Actor* actor = game->GetPC( i, false );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -690,18 +680,16 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_ALL:
 		assert(self != NULL);
-		new_fx = new Effect;
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(true);
 		while(i--) {
 			Actor* actor = map->GetActor( i, true );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -709,18 +697,16 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_ALL_BUT_PARTY:
 		assert(self != NULL);
-		new_fx = new Effect;
 		map = self->GetCurrentArea();
 		i = map->GetActorCount(false);
 		while(i--) {
 			Actor* actor = map->GetActor( i, false );
-			memcpy( new_fx, fx, sizeof( Effect ) );
+			Effect* new_fx = new Effect(*fx);
 			new_fx->SetPosition(actor->Pos);
 
 			flg = ApplyEffect( actor, new_fx, 1 );
@@ -729,7 +715,6 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
-		delete new_fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -764,7 +749,7 @@ int EffectQueue::AddAllEffects(Actor* target, const Point &destination) const
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 
-		int tmp = AddEffect(*f, Owner, target, destination);
+		int tmp = AddEffect(new Effect(**f), Owner, target, destination);
 		//lets try without Owner, any crash?
 		//If yes, then try to fix the individual effect
 		//If you use target for Owner here, the wand in chateau irenicus will work
@@ -1419,7 +1404,7 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
 	for (int i=0; i < sph->FeatureCount; i++) {
-		const Effect *origfx = sph->features+i;
+		const Effect *origfx = sph->features[i];
 
 		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;

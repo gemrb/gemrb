@@ -74,22 +74,15 @@ void ReleaseMemorySpell()
 
 SPLExtHeader::SPLExtHeader(void)
 {
-	features = NULL;
 	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
 	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
 	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
 	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
 }
 
-SPLExtHeader::~SPLExtHeader(void)
-{
-	delete [] features;
-}
-
 Spell::Spell(void)
 {
 	ext_headers = NULL;
-	casting_features = NULL;
 	if (!inited) {
 		inited = true;
 		InitSpellTables();
@@ -109,7 +102,6 @@ Spell::~Spell(void)
 	//Spell is in the core, so this is not needed, i guess (Avenger)
 	//core->FreeSPLExt(ext_headers, casting_features);
 	delete [] ext_headers;
-	delete [] casting_features;
 }
 
 int Spell::GetHeaderIndexFromLevel(int level) const
@@ -185,8 +177,6 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 	fx->InventorySlot = 0xffff;
 	fx->Projectile = 0;
 	fxqueue->AddEffect(fx);
-	//AddEffect creates a copy, we need to destroy the original
-	delete fx;
 }
 
 EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
@@ -198,17 +188,17 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
-			features = ext_headers[0].features;
+			features = ext_headers[0].features[0];
 			count = ext_headers[0].FeatureCount;
 		} else {
-			features = ext_headers[block_index].features;
+			features = ext_headers[block_index].features[0];
 			count = ext_headers[block_index].FeatureCount;
 			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
 	} else {
-		features = casting_features;
+		features = casting_features[0];
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
@@ -219,8 +209,6 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
-			//fxqueue->AddEffect will copy the effect,
-			//so we don't risk any overwriting
 			if (EffectQueue::HasDuration(features+i)) {
 				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
@@ -274,7 +262,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
-			fxqueue->AddEffect( fx );
+			fxqueue->AddEffect(new Effect(*fx));
 		} else {
 			fx->Projectile = 0;
 			fx->PosX=pos.x;
@@ -285,7 +273,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			selfqueue->AddEffect( fx );
+			selfqueue->AddEffect(new Effect(*fx));
 		}
 	}
 	if (self && selfqueue) {
@@ -347,7 +335,7 @@ bool Spell::ContainsDamageOpcode() const
 {
 	for (int h=0; h< ExtHeaderCount; h++) {
 		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
-			const Effect *fx = ext_headers[h].features + i;
+			const Effect *fx = ext_headers[h].features[i];
 			if (fx->Opcode == damageOpcode) {
 				return true;
 			}

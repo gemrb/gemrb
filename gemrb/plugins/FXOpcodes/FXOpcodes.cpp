@@ -5118,8 +5118,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!newfx)
 		return FX_NOT_APPLIED;
 
-	Effect *myfx = new Effect;
-	memcpy(myfx, newfx, sizeof(Effect));
+	Effect *myfx = new Effect(*newfx);
 	myfx->random_value = core->Roll(1,100,-1);
 	myfx->Target = FX_TARGET_PRESET;
 	myfx->TimingMode = fx->TimingMode;
@@ -5134,7 +5133,6 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			//that must be put directly in the effect queue to have any impact (to be counted by BonusAgainstCreature, etc)
 			CopyResRef(myfx->Source, fx->Source); // more?
 			target->fxqueue.AddEffect(myfx);
-			delete myfx;
 			return FX_NOT_APPLIED;
 		}
 		ret = target->fxqueue.ApplyEffect(target, myfx, fx->FirstApply, !fx->Parameter3);

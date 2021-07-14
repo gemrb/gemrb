@@ -94,7 +94,7 @@ private:
 	void ReadInventory(Actor*, unsigned int);
 	void ReadSpellbook(Actor* act);
 	void ReadEffects(Actor* actor);
-	void GetEffect(Effect *fx);
+	Effect* GetEffect();
 	void ReadScript(Actor *actor, int ScriptLevel);
 	void ReadDialog(Actor *actor);
 	CREKnownSpell* GetKnownSpell();

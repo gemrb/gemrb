@@ -33,22 +33,15 @@ namespace GemRB {
 
 ITMExtHeader::ITMExtHeader(void)
 {
-	features = NULL;
 	Location = Range = RechargeFlags = IDReq = 0;
 	Charges = ChargeDepletion = Tooltip = Target = TargetNumber = 0;
 	AttackType = THAC0Bonus = DiceSides = DiceThrown = DamageBonus = DamageType = 0;
 	ProjectileAnimation = ProjectileQualifier = FeatureCount = FeatureOffset = 0;
 }
 
-ITMExtHeader::~ITMExtHeader(void)
-{
-	delete [] features;
-}
-
 Item::Item(void)
 {
 	ext_headers = NULL;
-	equipping_features = NULL;
 	MinStrength = MinStrengthBonus = MinLevel = Weight = MaxStackAmount = ItemType = 0;
 	MinIntelligence = MinDexterity = MinWisdom = MinConstitution = MinCharisma = 0;
 	WeaProf = WieldColor = Enchantment = KitUsability = Flags = UsabilityBitmask = 0;
@@ -62,24 +55,23 @@ Item::Item(void)
 Item::~Item(void)
 {
 	delete [] ext_headers;
-	delete [] equipping_features;
 }
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
 EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage, ieDwordSigned invslot, ieDword pro) const
 {
-	Effect *features;
+	Effect *const *features = nullptr;
 	int count;
 
 	if (usage>=ExtHeaderCount) {
 		return NULL;
 	}
 	if (usage>=0) {
-		features = ext_headers[usage].features;
+		features = ext_headers[usage].features.data();
 		count = ext_headers[usage].FeatureCount;
 	} else {
-		features = equipping_features;
+		features = equipping_features.data();
 		count = EquippingFeatureCount;
 	}
 
@@ -89,7 +81,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 
 	for (int i=0;i<count;i++) {
-		Effect *fx = features+i;
+		Effect *fx = features[i];
 		fx->InventorySlot = invslot;
 		fx->CasterLevel = ITEM_CASTERLEVEL; //items all have casterlevel 10
 		fx->CasterID = self->GetGlobalID();
@@ -106,7 +98,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
-			fxqueue->AddEffect( fx );
+			fxqueue->AddEffect(new Effect(*fx));
 		} else {
 			//Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 			fx->Projectile = 0;
@@ -114,7 +106,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 			fx->PosY=pos.y;
 			if (target) {
 				//core->ApplyEffect(fx, target, self);
-				selfqueue->AddEffect(fx);
+				selfqueue->AddEffect(new Effect(*fx));
 			}
 		}
 	}
@@ -130,8 +122,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		if (tmp) {
 			tmp->InventorySlot = invslot;
 			tmp->Projectile=pro;
-			fxqueue->AddEffect( tmp );
-			delete tmp;
+			fxqueue->AddEffect(tmp);
 		}
 	}
 	return fxqueue;
@@ -282,7 +273,7 @@ std::vector<DMGOpcodeInfo> Item::GetDamageOpcodesDetails(const ITMExtHeader *hea
 	std::vector<DMGOpcodeInfo> damage_opcodes;
 	if (!header) return damage_opcodes;
 	for (int i=0; i< header->FeatureCount; i++) {
-		Effect *fx = header->features+i;
+		Effect *fx = header->features[i];
 		if (fx->Opcode == damage_opcode) {
 			// damagetype is the same as in dmgtype.ids but GemRB uses those values
 			// shifted by two bytes

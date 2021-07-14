@@ -44,11 +44,11 @@ public:
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 
 	/** Fills fx with Effect data loaded from the stream */
-	virtual Effect* GetEffect(Effect *fx) = 0;
+	virtual Effect* GetEffect() = 0;
 	/** Fills fx with Effect v1 data loaded from the stream*/
-	virtual Effect* GetEffectV1(Effect *fx) = 0;
+	virtual Effect* GetEffectV1() = 0;
 	/** Fills fx with Effect v2.0 data loaded from the stream*/
-	virtual Effect* GetEffectV20(Effect *fx) = 0;
+	virtual Effect* GetEffectV20() = 0;
 	/** Fills the stream with Effect v2 data loaded from the effect*/
 	virtual void PutEffectV2(DataStream *stream, const Effect *fx) = 0;
 };

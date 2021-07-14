@@ -183,11 +183,11 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		GetExtHeader( s, s->ext_headers+i );
 	}
 
-	s->casting_features = new Effect[s->CastingFeatureCount];
+	s->casting_features.reserve(s->CastingFeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (int i = 0; i < s->CastingFeatureCount; i++) {
-		GetFeature(s, s->casting_features+i);
+		s->casting_features.push_back(GetFeature(s));
 	}
 
 	return s;
@@ -233,21 +233,22 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
 	}
-	eh->features = new Effect[eh->FeatureCount];
+	eh->features.reserve(eh->FeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(s, eh->features+i);
+		eh->features.push_back(GetFeature(s));
 	}
 }
 
-void SPLImporter::GetFeature(Spell *s, Effect *fx)
+Effect *SPLImporter::GetFeature(Spell *s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
-	eM->GetEffect( fx );
+	Effect* fx = eM->GetEffect();
 	memcpy(fx->Source, s->Name.CString(), 9);
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
+	return fx;
 }
 
 #include "plugindef.h"

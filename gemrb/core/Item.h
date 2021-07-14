@@ -132,7 +132,6 @@ struct DMGOpcodeInfo {
 class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader();
-	~ITMExtHeader();
 	ieByte AttackType;
 	ieByte IDReq;
 	ieByte Location;
@@ -164,7 +163,7 @@ public:
 	ieWord MeleeAnimation[3];
 	//this value is set in projectiles and launchers too
 	int ProjectileQualifier; //this is a derived value determined on load time
-	Effect *features;
+	std::vector<Effect*> features;
 };
 
 /**
@@ -178,7 +177,7 @@ public:
 	~Item();
 
 	ITMExtHeader *ext_headers;
-	Effect *equipping_features;
+	std::vector<Effect*> equipping_features;
 	ieResRef Name; //the resref of the item itself!
 
 	ieStrRef ItemName;

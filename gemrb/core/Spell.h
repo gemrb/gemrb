@@ -78,7 +78,6 @@ extern void ReleaseMemorySpell();
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader();
-	~SPLExtHeader();
 
 	ieByte SpellForm;
 	ieByte Hostile;
@@ -99,7 +98,7 @@ public:
 	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieWord ProjectileAnimation;
-	Effect* features;
+	std::vector<Effect*> features;
 };
 
 /**
@@ -114,7 +113,7 @@ public:
 	~Spell();
 
 	SPLExtHeader *ext_headers;
-	Effect* casting_features;
+	std::vector<Effect*> casting_features;
 
 	/** Resref of the spell itself */
 	ResRef Name;

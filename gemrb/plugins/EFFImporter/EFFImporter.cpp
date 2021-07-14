@@ -72,24 +72,24 @@ static inline void fixAffectedLevels(Effect *fx) {
 	}
 }
 
-Effect* EFFImporter::GetEffect(Effect *fx)
+Effect* EFFImporter::GetEffect()
 {
 	if (version == 1) {
-		return GetEffectV1( fx );
+		return GetEffectV1();
 	}
 	else {
 		// Skip over Signature1
 		str->Seek( 8, GEM_CURRENT_POS );
-		return GetEffectV20( fx );
+		return GetEffectV20();
 	}
 }
 
-Effect* EFFImporter::GetEffectV1(Effect *fx)
+Effect* EFFImporter::GetEffectV1()
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	memset( fx, 0, sizeof( Effect ) );
+	Effect* fx = new Effect;
 
 	str->ReadWord(tmpWord);
 	fx->Opcode = tmpWord;
@@ -124,10 +124,10 @@ Effect* EFFImporter::GetEffectV1(Effect *fx)
 	return fx;
 }
 
-Effect* EFFImporter::GetEffectV20(Effect *fx)
+Effect* EFFImporter::GetEffectV20()
 {
 	ieDword tmp;
-	memset( fx, 0, sizeof( Effect ) );
+	Effect* fx = new Effect;
 
 	str->Seek(8, GEM_CURRENT_POS);
 	str->ReadDword(fx->Opcode);

@@ -163,7 +163,7 @@ static void AddZZFeatures(Item *s)
 		fx->Parameter3 = bonus;
 		CopyResRef(fx->Source, s->Name);
 		// use the space reserved earlier
-		memcpy(s->equipping_features + (s->EquippingFeatureCount - 1 - i), fx, sizeof(Effect));
+		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
 		delete fx;
 	}
 }
@@ -289,12 +289,12 @@ Item* ITMImporter::GetItem(Item *s)
 	}
 
 	//48 is the size of the feature block
-	s->equipping_features = new Effect[s->EquippingFeatureCount + extraFeatureCount];
+	s->equipping_features.reserve(s->EquippingFeatureCount + extraFeatureCount);
 
 	str->Seek( s->FeatureBlockOffset + 48*s->EquippingFeatureOffset,
 			GEM_STREAM_START );
 	for (unsigned int i = 0; i < s->EquippingFeatureCount; i++) {
-		GetFeature(s->equipping_features+i, s);
+		s->equipping_features.push_back(GetFeature(s));
 	}
 
 	// add remaining features
@@ -387,19 +387,20 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
-	eh->features = new Effect[eh->FeatureCount];
+	eh->features.reserve(eh->FeatureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(eh->features+i, s);
+		eh->features.push_back(GetFeature(s));
 	}
 }
 
-void ITMImporter::GetFeature(Effect *fx, Item *s)
+Effect* ITMImporter::GetFeature(Item *s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
-	eM->GetEffect( fx );
+	Effect* fx = eM->GetEffect();
 	CopyResRef(fx->Source, s->Name);
+	return fx;
 }
 
 #include "plugindef.h"
