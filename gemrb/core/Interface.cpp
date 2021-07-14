@@ -1215,9 +1215,9 @@ int Interface::Init(InterfaceConfig* cfg)
 #ifdef PLUGIN_DIR
 	CONFIG_PATH("PluginsPath", config.PluginsPath, PLUGIN_DIR);
 #else
-	CONFIG_PATH("PluginsPath", PluginsPath, "");
-	if (!PluginsPath[0]) {
-		PathJoin(PluginsPath, GemRBPath, "plugins", nullptr);
+	CONFIG_PATH("PluginsPath", config.PluginsPath, "");
+	if (!config.PluginsPath[0]) {
+		PathJoin(config.PluginsPath, GemRBPath, "plugins", nullptr);
 	}
 #endif
 
@@ -1302,7 +1302,7 @@ int Interface::Init(InterfaceConfig* cfg)
 #endif
 #endif
 #ifndef STATIC_LINK
-	LoadPlugins(PluginsPath);
+	LoadPlugins(config.PluginsPath);
 #endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
