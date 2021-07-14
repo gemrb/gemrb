@@ -139,7 +139,7 @@ bool ITMImporter::Open(DataStream* stream)
 static void AddZZFeatures(Item *s)
 {
 	// the targeting code (3rd char) is: digit = align(ment), letter = race
-	char targetIDS = toupper(s->Name[2]);
+	char targetIDS = toupper(s->Name.CString()[2]);
 	ieByte IDSval = zzmap[targetIDS];
 	ieByte IDSfile = 4;
 	if (targetIDS <= '9') {
@@ -150,7 +150,7 @@ static void AddZZFeatures(Item *s)
 	// 0: -5, 1: -4, 2: -3, 3: -2, 4: -1,
 	// 5: +1, 6: +2 ... 9: +5
 	// this bonus is on top of the default one, so less descriptions are wrong than it may seem
-	int bonus = atoi(&s->Name[3]);
+	int bonus = atoi(&s->Name.CString()[3]);
 	if (bonus < 5) {
 		bonus -= 5;
 	} else {
@@ -253,10 +253,10 @@ Item* ITMImporter::GetItem(Item *s)
 		//all non pst
 		int row = dialogTable->GetRowIndex(s->Name);
 		s->DialogName = atoi(dialogTable->QueryField(row, 0));
-		CopyResRef(s->Dialog, dialogTable->QueryField(row, 1));
+		s->Dialog = dialogTable->QueryField(row, 1);
 	} else {
 		s->DialogName = -1;
-		s->Dialog[0] = '\0';
+		s->Dialog.Reset();
 	}
 
 	if (exclusionTable) {

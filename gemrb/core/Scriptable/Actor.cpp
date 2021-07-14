@@ -9913,7 +9913,7 @@ no_resolve:
 }
 
 //this one is the same, but returns strrefs based on effects
-ieStrRef Actor::Disabled(const ieResRef name, ieDword type) const
+ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 {
 	Effect *fx;
 

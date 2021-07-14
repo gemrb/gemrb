@@ -3758,7 +3758,7 @@ void Interface::ReleaseDraggedItem()
 	winmgr->GetGameWindow()->SetCursor(nullptr);
 }
 
-void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
+void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 {
 	//We should drop the dragged item and pick this up,
 	//we shouldn't have a valid DraggedItem at this point.

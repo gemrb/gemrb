@@ -280,7 +280,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 
 	item = new Item();
 	//this is required for storing the 'source'
-	strnlwrcpy(item->Name, resname, 8);
+	item->Name = ResRef::MakeLowerCase(resname);
 	sm->GetItem( item );
 
 	ItemCache.SetAt(resname, (void *) item);

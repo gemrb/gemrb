@@ -7166,7 +7166,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		}
 		const Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
-			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->ReplacementItem.IsEmpty()) {
 				Sound = item->ReplacementItem;
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
@@ -7196,7 +7196,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		}
 		const Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
-			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->DescriptionIcon.IsEmpty()) {
 				Sound = item->DescriptionIcon;
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
@@ -7654,20 +7654,18 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 
 		// play the item's inventory sound
-		ieResRef Sound;
-		ResRef Sound2;
+		ResRef SoundItem;
 		const Item *item = gamedata->GetItem(itemResRef);
 		if (item) {
-			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
-				memcpy(Sound, item->ReplacementItem, sizeof(ieResRef));
-				Sound2 = Sound;
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->ReplacementItem.IsEmpty()) {
+				SoundItem = item->ReplacementItem;
 			} else {
-				gamedata->GetItemSound(Sound2, item->ItemType, item->AnimationType, IS_DROP);
+				gamedata->GetItemSound(SoundItem, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			gamedata->FreeItem(item, itemResRef, false);
-			if (Sound2[0]) {
+			if (SoundItem[0]) {
 				// speech means we'll only play the last sound if multiple items were bought
-				core->GetAudioDrv()->Play(Sound2, SFX_CHAN_GUI, Point(), GEM_SND_SPEECH|GEM_SND_RELATIVE);
+				core->GetAudioDrv()->Play(SoundItem, SFX_CHAN_GUI, Point(), GEM_SND_SPEECH|GEM_SND_RELATIVE);
 			}
 		}
 		res = ASI_SUCCESS;
@@ -9500,7 +9498,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 
 	const Item *item = gamedata->GetItem(si->ItemResRef);
 	if (item) {
-		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
+		if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->DescriptionIcon.IsEmpty()) {
 			Sound = item->DescriptionIcon;
 		} else {
 			gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
@@ -9584,7 +9582,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		res = cc->AddItem(si);
 		const Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
-			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+			if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->ReplacementItem.IsEmpty()) {
 				Sound = item->ReplacementItem;
 			} else {
 				gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
@@ -9674,7 +9672,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	Slottype = core->CanUseItemType (Slottype, item, actor, true);
 	//resolve the equipping sound, it needs to be resolved before
 	//the item is freed
-	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+	if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->ReplacementItem.IsEmpty()) {
 		Sound = item->ReplacementItem;
 	} else {
 		gamedata->GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);

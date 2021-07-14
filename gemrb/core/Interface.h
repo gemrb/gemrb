@@ -640,7 +640,7 @@ public:
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
-	void DragItem(CREItem* item, const ieResRef Picture);
+	void DragItem(CREItem* item, const ResRef& Picture);
 	const ItemDragOp* GetDraggedItem() const { return DraggedItem.get(); }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();

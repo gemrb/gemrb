@@ -1422,7 +1422,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	}
 }
 
-void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::SetSlotItemRes(const char* ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	if(ItemResRef[0]) {
 		CREItem *TmpItem = new CREItem();
@@ -1471,7 +1471,7 @@ ieWord Inventory::GetArmorItemType() const
 
 void Inventory::BreakItemSlot(ieDword slot)
 {
-	ieResRef newItem;
+	ResRef newItem;
 	CREItem *Slot;
 
 	const Item *itm = GetItemPointer(slot, Slot);
@@ -1479,9 +1479,9 @@ void Inventory::BreakItemSlot(ieDword slot)
 	//if it is the magic weapon slot, don't break it, just remove it, because it couldn't be removed
 	//or for pst, just remove it as there is no breaking (the replacement item is a sound)
 	if (slot == (unsigned int) SLOT_MAGIC || core->HasFeature(GF_HAS_PICK_SOUND)) {
-		newItem[0]=0;
+		newItem.Reset();
 	} else {
-		memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
+		newItem = itm->ReplacementItem;
 	}
 	gamedata->FreeItem( itm, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem

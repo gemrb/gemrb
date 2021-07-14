@@ -178,11 +178,11 @@ public:
 
 	ITMExtHeader *ext_headers;
 	std::vector<Effect*> equipping_features;
-	ieResRef Name; //the resref of the item itself!
+	ResRef Name; //the resref of the item itself!
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;
-	ieResRef ReplacementItem;
+	ResRef ReplacementItem;
 	ieDword Flags;
 	ieWord ItemType;
 	ieDword UsabilityBitmask;
@@ -206,13 +206,13 @@ public:
 	ieDword KitUsability;
 	ieDword Price;
 	ieWord MaxStackAmount;
-	ieResRef ItemIcon;
+	ResRef ItemIcon;
 	ieWord LoreToID;
-	ieResRef GroundIcon;
+	ResRef GroundIcon;
 	ieDword Weight;
 	ieStrRef ItemDesc;
 	ieStrRef ItemDescIdentified;
-	ieResRef DescriptionIcon;
+	ResRef DescriptionIcon;
 	ieDword Enchantment;
 	ieDword ExtHeaderOffset;
 	ieWord ExtHeaderCount;
@@ -221,7 +221,7 @@ public:
 	ieWord EquippingFeatureCount;
 
 	// PST and BG2 only
-	ieResRef Dialog;
+	ResRef Dialog;
 	ieStrRef DialogName;
 
 	// PST only
