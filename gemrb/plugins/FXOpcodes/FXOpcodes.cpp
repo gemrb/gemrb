@@ -2493,13 +2493,11 @@ int fx_alignment_change (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_dispel_effects (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_dispel_effects(%2d): Value: %d, IDS: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	ieResRef Removed;
-
 	switch (fx->Parameter2) {
 	case 0:
 	default:
 		// dispel everything
-		target->fxqueue.RemoveLevelEffects(Removed, 0xffffffff, RL_DISPELLABLE, 0);
+		target->fxqueue.RemoveLevelEffects(0xffffffff, RL_DISPELLABLE, 0);
 		break;
 	case 1:
 		//same level: 50% success, positive level diff modifies it by 5%, negative by -10%
@@ -5935,19 +5933,15 @@ int fx_stoneskin_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //0xdc DispelSchool
 int fx_dispel_school (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_school(%2d): Level: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 //0xdd DispelSecondaryType
 int fx_dispel_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_secondary_type(%2d): Level: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -6058,17 +6052,15 @@ int fx_dispel_school_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	ieResRef Removed;
 
 	// print("fx_dispel_school_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
 //0xe6 DispelSecondaryTypeOne
 int fx_dispel_secondary_type_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_secondary_type_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	target->fxqueue.RemoveLevelEffects(Removed, fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
+	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
