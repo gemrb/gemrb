@@ -93,7 +93,7 @@ static int UsedItemsCount = -1;
 #define MAX_DISTANCE 500
 
 struct UsedItemType {
-	ieResRef itemname;
+	ResRef itemname;
 	ieVariable username; //death variable
 	ieStrRef value;
 	int flags;
@@ -7915,7 +7915,7 @@ static void ReadUsedItems()
 		size_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
 		for (size_t i = 0; i < UsedItemsCount; i++) {
-			strnlwrcpy(UsedItems[i].itemname, table->GetRowName(i), 8);
+			UsedItems[i].itemname = ResRef::MakeLowerCase(table->GetRowName(i));
 			strnlwrcpy(UsedItems[i].username, table->QueryField(i, 0), 32);
 			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username[0] = 0;
@@ -9317,7 +9317,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 	unsigned int i=UsedItemsCount;
 
 	while(i--) {
-		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) != 0) {
+		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != si->ItemResRef) {
 			continue;
 		}
 		//true if names don't match
@@ -9367,7 +9367,7 @@ static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	unsigned int i=UsedItemsCount;
 
 	while(i--) {
-		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, NewItem->ItemResRef, 8) != 0) {
+		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != NewItem->ItemResRef) {
 			continue;
 		}
 
