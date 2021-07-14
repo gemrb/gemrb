@@ -107,7 +107,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	event_timer = 0;
 	event_handler = NULL;
 	weather = new Particles(200);
-	weather->SetRegion(0, 0, core->Width, core->Height);
+	weather->SetRegion(0, 0, core->config.Width, core->config.Height);
 	LastScriptUpdate = 0;
 	WhichFormation = 0;
 	CurrentLink = 0;

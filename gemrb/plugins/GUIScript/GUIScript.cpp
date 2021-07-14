@@ -4623,7 +4623,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 		return PyInt_FromLong(sgip->CreateSaveGame(save, folder) );
 	} else {
-		return PyInt_FromLong(sgip->CreateSaveGame(slot, core->MultipleQuickSaves) );
+		return PyInt_FromLong(sgip->CreateSaveGame(slot, core->config.MultipleQuickSaves));
 	}
 }
 
@@ -9770,12 +9770,12 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 	char path[_MAX_PATH] = { '\0' };
 	PARSE_ARGS( args,  "i", &Variable);
 	switch(Variable) {
-		case SV_BPP: value = core->Bpp; break;
-		case SV_WIDTH: value = core->Width; break;
-		case SV_HEIGHT: value = core->Height; break;
-		case SV_GAMEPATH: strlcpy(path, core->GamePath, _MAX_PATH); break;
+		case SV_BPP: value = core->config.Bpp; break;
+		case SV_WIDTH: value = core->config.Width; break;
+		case SV_HEIGHT: value = core->config.Height; break;
+		case SV_GAMEPATH: strlcpy(path, core->config.GamePath, _MAX_PATH); break;
 		case SV_TOUCH: value = EventMgr::TouchInputEnabled; break;
-		case SV_SAVEPATH: strlcpy(path, core->SavePath, _MAX_PATH); break;
+		case SV_SAVEPATH: strlcpy(path, core->config.SavePath, _MAX_PATH); break;
 		default: value = -1; break;
 	}
 	if (path[0]) {
@@ -13616,7 +13616,7 @@ bool GUIScript::Init(void)
 	/* pMainDic is a borrowed reference */
 
 	char path[_MAX_PATH];
-	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
+	PathJoin(path, core->config.GUIScriptsPath, "GUIScripts", nullptr);
 
 	char string[256] = "path";
 	PyObject* sysPath = PySys_GetObject(string);
@@ -13641,22 +13641,22 @@ bool GUIScript::Init(void)
 	PyRun_SimpleString(string);
 
 	// Detect GameType if it was set to auto
-	if (stricmp( core->GameType, "auto" ) == 0) {
+	if (stricmp(core->config.GameType, "auto") == 0) {
 		Autodetect();
 	}
 
 	// use the iwd guiscripts for how, but leave its override
 	char path2[_MAX_PATH];
-	if (stricmp( core->GameType, "how" ) == 0) {
+	if (stricmp(core->config.GameType, "how") == 0) {
 		PathJoin(path2, path, "iwd", nullptr);
 	} else {
-		PathJoin(path2, path, core->GameType, nullptr);
+		PathJoin(path2, path, core->config.GameType, nullptr);
 	}
 
 	// GameType-specific import path must have a higher priority than
 	// the generic one, so insert it before it
 	PyList_Insert(sysPath, -1, PyString_FromString(path2));
-	PyModule_AddStringConstant(pGemRB, "GameType", core->GameType);
+	PyModule_AddStringConstant(pGemRB, "GameType", core->config.GameType);
 
 #if PY_MAJOR_VERSION == 2 && PY_MINOR_VERSION > 5
 	// warn about python stuff that will go away in 3.0
@@ -13683,7 +13683,7 @@ bool GUIScript::Autodetect(void)
 	Log(MESSAGE, "GUIScript", "Detecting GameType.");
 
 	char path[_MAX_PATH];
-	PathJoin(path, core->GUIScriptsPath, "GUIScripts", nullptr);
+	PathJoin(path, core->config.GUIScriptsPath, "GUIScripts", nullptr);
 	DirectoryIterator iter( path );
 	if (!iter)
 		return false;
@@ -13698,7 +13698,7 @@ bool GUIScript::Autodetect(void)
 
 		// NOTE: these methods subtly differ in sys.path content, need for __init__.py files ...
 		// Method1:
-		PathJoin(moduleName, core->GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
+		PathJoin(moduleName, core->config.GUIScriptsPath, "GUIScripts", dirent, "Autodetect.py", nullptr);
 		ExecFile(moduleName);
 		// Method2:
 		//strcpy( module, dirent );
@@ -13708,7 +13708,7 @@ bool GUIScript::Autodetect(void)
 
 	if (gametype_hint[0]) {
 		Log(MESSAGE, "GUIScript", "Detected GameType: %s", gametype_hint);
-		strcpy(core->GameType, gametype_hint);
+		strcpy(core->config.GameType, gametype_hint);
 		return true;
 	}
 	else {

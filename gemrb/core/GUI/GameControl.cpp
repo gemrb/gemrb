@@ -2522,7 +2522,7 @@ void GameControl::SetCutSceneMode(bool active)
 		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
 		ScreenFlags &= ~SF_CUTSCENE;
-		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
+		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
 	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
 }

@@ -320,6 +320,55 @@ private:
 	static Control dragDummy;
 };
 
+struct CFGConfigData {
+	char GamePath[_MAX_PATH]{};
+	char GameDataPath[_MAX_PATH]{};
+	char GameOverridePath[_MAX_PATH]{};
+	char GameSoundsPath[_MAX_PATH]{};
+	char GameScriptsPath[_MAX_PATH]{};
+	char GamePortraitsPath[_MAX_PATH]{};
+	char GameCharactersPath[_MAX_PATH]{};
+	char SavePath[_MAX_PATH]{};
+	char CachePath[_MAX_PATH]{};
+	std::vector<std::string> CD[MAX_CD];
+	std::vector<std::string> ModPath;
+	char CustomFontPath[_MAX_PATH]{};
+
+	char GemRBPath[_MAX_PATH]{};
+	char GemRBOverridePath[_MAX_PATH]{};
+	char GemRBUnhardcodedPath[_MAX_PATH]{};
+	char PluginsPath[_MAX_PATH]{};
+	char GUIScriptsPath[_MAX_PATH]{};
+	bool CaseSensitive = false;
+
+	char GameName[_MAX_PATH]{};
+	char GameType[10]{};
+	int IgnoreOriginalINI = 0; // TODO: deprecate
+	std::string Encoding = "default";
+
+	int GamepadPointerSpeed = 10;
+	bool UseSoftKeyboard = false; // TODO: reevaluate the need for this, see comments in StartTextInput
+	unsigned short NumFingScroll = 2;
+	unsigned short NumFingKboard = 3;
+	unsigned short NumFingInfo = 2;
+	int MouseFeedback = 0;
+
+	int Width = 640;
+	int Height = 480;
+	int Bpp = 32;
+	bool DrawFPS = false;
+	int debugMode = 0;
+	bool CheatFlag = false; /** Cheats enabled? */
+	int MaxPartySize = 6;
+
+	bool KeepCache = false;
+	bool MultipleQuickSaves = false;
+	// once GemRB own format is working well, this might be set to 0
+	int SaveAsOriginal = 1; // if true, saves files in compatible mode
+	std::string VideoDriverName = "sdl"; // consider deprecating? It's now a hidden option
+	std::string AudioDriverName = "openal";
+};
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -333,8 +382,6 @@ private:
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
 
-	std::string VideoDriverName;
-	std::string AudioDriverName;
 	ProjectileServer * projserv;
 
 	WindowManager* winmgr;
@@ -400,9 +447,7 @@ private:
 	std::deque<Timer> timers;
 	std::vector<SpecialSpellType> SpecialSpells;
 	KeyMap *keymap;
-	std::string Encoding;
 	Scriptable *CutSceneRunner;
-	int debugMode = 0;
 
 public:
 	const char * SystemEncoding;
@@ -411,7 +456,6 @@ public:
 	Holder<StringMgr> strings2;
 	GlobalTimer timer;
 	Color InfoTextColor;
-	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int EventFlag;
 	Holder<SaveGame> LoadGameIndex;
@@ -592,8 +636,8 @@ public:
 	bool ProtectedExtension(const char *filename);
 	/*returns true if the directory path isn't good as a Cache */
 	bool StupidityDetector(const char* Pt);
-	bool InDebugMode(int mode) const { return debugMode & mode; };
-	void SetDebugMode(int mode) { debugMode = mode; };
+	bool InDebugMode(int mode) const { return config.debugMode & mode; };
+	void SetDebugMode(int mode) { config.debugMode = mode; };
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
@@ -755,40 +799,13 @@ private:
 	ieDword *GetListFrom2DAInternal(const ieResRef resref);
 
 public:
-	char GameDataPath[_MAX_PATH];
-	char GameOverridePath[_MAX_PATH];
-	char GameSoundsPath[_MAX_PATH];
-	char GameScriptsPath[_MAX_PATH];
-	char GamePortraitsPath[_MAX_PATH];
-	char GameCharactersPath[_MAX_PATH];
-	char GemRBOverridePath[_MAX_PATH];
-	char GemRBUnhardcodedPath[_MAX_PATH];
+	CFGConfigData config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
-	char CustomFontPath[_MAX_PATH];
-	char GameName[_MAX_PATH];
-	char GameType[10];
-	int GamepadPointerSpeed = 10;
-	char GemRBPath[_MAX_PATH];
-	char PluginsPath[_MAX_PATH];
-	char CachePath[_MAX_PATH];
-	char GUIScriptsPath[_MAX_PATH];
-	char SavePath[_MAX_PATH];
+
 	char INIConfig[_MAX_PATH];
-	char GamePath[_MAX_PATH];
-	std::vector<std::string> CD[MAX_CD];
-	std::vector<std::string> ModPath;
-	int Width = 640, Height = 480, Bpp = 32;
-	int IgnoreOriginalINI;
 	bool DitherSprites = true;
-	bool CaseSensitive = true, DrawFPS = false;
-	bool UseSoftKeyboard; // TODO: reevaluate the need for this, see comments in StartTextInput
-	unsigned short NumFingScroll, NumFingKboard, NumFingInfo;
-	int MouseFeedback;
-	int MaxPartySize;
-	bool KeepCache;
-	bool MultipleQuickSaves;
 	bool UseCorruptedHack;
 	int FeedbackLevel;
 
@@ -802,12 +819,12 @@ public:
 	/** CheatKey support */
 	inline void EnableCheatKeys(int Flag)
 	{
-		CheatFlag=(Flag > 0);
+		config.CheatFlag = Flag > 0;
 	}
 
 	inline bool CheatEnabled() const
 	{
-		return CheatFlag;
+		return config.CheatFlag;
 	}
 
 	inline void SetEventFlag(int Flag)
@@ -823,8 +840,6 @@ public:
 
 	/** Set Next Script */
 	void SetNextScript(const char *script);
-	/** Cheats enabled? */
-	bool CheatFlag;
 
 	Audio* GetAudioDrv(void) const;
 

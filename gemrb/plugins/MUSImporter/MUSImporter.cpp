@@ -40,7 +40,7 @@ MUSImporter::MUSImporter()
 	PLNameNew[0] = '\0';
 	lastSound = 0xffffffff;
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, nullptr);
+	PathJoin(path, core->config.GamePath, musicsubfolder, nullptr);
 	manager.AddSource(path, "Music", PLUGIN_RESOURCE_DIRECTORY);
 }
 
@@ -70,7 +70,7 @@ bool MUSImporter::OpenPlaylist(const char* name)
 		return false;
 	}
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, musicsubfolder, name, nullptr);
+	PathJoin(path, core->config.GamePath, musicsubfolder, name, nullptr);
 	Log(MESSAGE, "MUSImporter", "Loading %s...", path);
 	if (!str->Open(path)) {
 		Log(ERROR, "MUSImporter", "Didn't find playlist '%s'.", path);

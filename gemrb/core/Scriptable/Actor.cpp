@@ -9116,7 +9116,7 @@ void Actor::SetSoundFolder(const char *soundset) const
 		char filepath[_MAX_PATH];
 
 		strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
-		PathJoin(filepath, core->GamePath, "sounds", PCStats->SoundFolder, NULL);
+		PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
 
 		DirectoryIterator dirIt(filepath);
 		dirIt.SetFilterPredicate(new EndsWithFilter("01"));

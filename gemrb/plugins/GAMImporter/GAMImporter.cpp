@@ -110,7 +110,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 {
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
-	if (core->SaveAsOriginal) {
+	if (core->config.SaveAsOriginal) {
 		// HACK: default icewind2.gam is 2.0! handled by script
 		if(ver_override) {
 			newGame->version = ver_override;
@@ -925,9 +925,9 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	tmpWord = ac->Pos.y;
 	stream->WriteWord(tmpWord);
 	//no viewport, we cheat
-	tmpWord = ac->Pos.x-core->Width/2;
+	tmpWord = ac->Pos.x - core->config.Width / 2;
 	stream->WriteWord(tmpWord);
-	tmpWord = ac->Pos.y-core->Height/2;
+	tmpWord = ac->Pos.y - core->config.Height / 2;
 	stream->WriteWord(tmpWord);
 	tmpWord = (ieWord) ac->Modal.State;
 	stream->WriteWord(tmpWord);

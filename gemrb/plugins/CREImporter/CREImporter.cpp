@@ -931,7 +931,7 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 	}
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
-	if (core->SaveAsOriginal) {
+	if (core->config.SaveAsOriginal) {
 		act->version = CREVersion;
 	}
 	str->ReadResRef( act->SmallPortrait );

@@ -178,11 +178,11 @@ static void addGemRBLog()
 {
 	char log_path[_MAX_PATH];
 	FileStream* log_file = new FileStream();
-	PathJoin(log_path, core->GamePath, "GemRB.log", NULL);
+	PathJoin(log_path, core->config.GamePath, "GemRB.log", nullptr);
 	if (log_file->Create(log_path)) {
 		AddLogWriter(createStreamLogWriter(log_file));
 	} else {
-		PathJoin(log_path, core->CachePath, "GemRB.log", NULL);
+		PathJoin(log_path, core->config.CachePath, "GemRB.log", nullptr);
 		if (log_file->Create(log_path)) {
 			AddLogWriter(createStreamLogWriter(log_file));
 		} else {

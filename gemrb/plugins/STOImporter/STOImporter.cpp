@@ -67,7 +67,7 @@ Store* STOImporter::GetStore(Store *s)
 
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
-	if (core->SaveAsOriginal) {
+	if (core->config.SaveAsOriginal) {
 		s->version = version;
 	}
 

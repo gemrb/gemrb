@@ -86,7 +86,7 @@ static void ReadAutonoteINI()
 {
 	INInote = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	char tINInote[_MAX_PATH];
-	PathJoin( tINInote, core->GamePath, "autonote.ini", NULL );
+	PathJoin(tINInote, core->config.GamePath, "autonote.ini", nullptr);
 	FileStream* fs = FileStream::OpenFile( tINInote );
 	INInote->Open(fs);
 }
@@ -396,7 +396,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		Log(ERROR, "AREImporter", "Can't allocate map (out of memory).");
 		return NULL;
 	}
-	if (core->SaveAsOriginal) {
+	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;
 	}
 

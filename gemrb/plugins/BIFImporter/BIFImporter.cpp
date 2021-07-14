@@ -113,7 +113,7 @@ int BIFImporter::OpenArchive(const char* path)
 	ExtractFileFromPath(filename, path);
 
 	char cachePath[_MAX_PATH];
-	PathJoin(cachePath, core->CachePath, filename, NULL);
+	PathJoin(cachePath, core->config.CachePath, filename, nullptr);
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};

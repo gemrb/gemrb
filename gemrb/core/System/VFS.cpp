@@ -224,7 +224,7 @@ static bool FindInDir(const char* Dir, char *Filename)
 		return true;
 	}
 
-	if (!core->CaseSensitive) {
+	if (!core->config.CaseSensitive) {
 		return false;
 	}
 
@@ -340,7 +340,7 @@ void ResolveFilePath(char* FilePath)
 		}
 	}
 
-	if (core && !core->CaseSensitive) {
+	if (core && !core->config.CaseSensitive) {
 		return;
 	}
 	if (strlcpy(TempFilePath, FilePath, _MAX_PATH-1) >= _MAX_PATH-1) {
@@ -362,7 +362,7 @@ void ResolveFilePath(std::string& FilePath)
 		}
 	}
 
-	if (core && !core->CaseSensitive) {
+	if (core && !core->config.CaseSensitive) {
 		return;
 	}
 	PathJoin(TempFilePath, FilePath[0] == PathDelimiter ? SPathDelimiter : "", FilePath.c_str(), nullptr);

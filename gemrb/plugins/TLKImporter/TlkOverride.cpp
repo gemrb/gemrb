@@ -345,7 +345,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char nPath[_MAX_PATH];
 	char Signature[TOH_HEADER_SIZE];
 
-	PathJoin( nPath, core->CachePath, "default.toh", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {
@@ -365,7 +365,7 @@ retry:
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
-	PathJoin( nPath, core->CachePath, "default.tot", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.tot", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {

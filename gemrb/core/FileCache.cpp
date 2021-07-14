@@ -39,7 +39,7 @@ DataStream* CacheCompressedStream(DataStream *stream, const char* filename, int 
 	char fname[_MAX_PATH];
 	ExtractFileFromPath(fname, filename);
 	char path[_MAX_PATH];
-	PathJoin(path, core->CachePath, fname, nullptr);
+	PathJoin(path, core->config.CachePath, fname, nullptr);
 
 	if (overwrite || !file_exists(path)) {
 		FileStream out;
