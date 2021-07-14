@@ -67,14 +67,14 @@ Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
 }
 
 //this function can return only projectiles listed in projectl.ids
-Projectile *ProjectileServer::GetProjectileByName(const ieResRef resname)
+Projectile *ProjectileServer::GetProjectileByName(const ResRef &resname)
 {
 	if (!core->IsAvailable(IE_PRO_CLASS_ID)) {
 		return NULL;
 	}
 	unsigned int idx=GetHighestProjectileNumber();
 	while(idx--) {
-		if (!strnicmp(resname, projectiles[idx].resname,8) ) {
+		if (resname == projectiles[idx].resname) {
 			return GetProjectile(idx);
 		}
 	}
@@ -126,12 +126,12 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		Type = pro->Extension->ExplType;
 	}
 	if(Type<0xff) {
-		ieResRef const *res;
+		ResRef res;
 
 		//fill the spread field according to the hardcoded explosion type
 		res = GetExplosion(Type,0);
-		if(res) {
-			strnuprcpy(pro->Extension->Spread,*res,sizeof(ieResRef)-1);
+		if (res) {
+			pro->Extension->Spread = res;
 		}
 	
 		//if the hardcoded explosion type has a center animation
@@ -139,26 +139,26 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		res = GetExplosion(Type,1);
 		if(res) {
 			pro->Extension->AFlags|=PAF_VVC;
-			strnuprcpy(pro->Extension->VVCRes,*res,sizeof(ieResRef)-1);
+			pro->Extension->VVCRes = res;
 		}
 
 		//fill the secondary spread field out
 		res = GetExplosion(Type,2);
 		if(res) {
-			strnuprcpy(pro->Extension->Secondary,*res,sizeof(ieResRef)-1);
+			pro->Extension->Secondary = res;
 		}
 
 		//the explosion sound, used for the first explosion
 		//(overrides an original field)
 		res = GetExplosion(Type,3);
 		if(res) {
-			strnuprcpy(pro->Extension->SoundRes,*res,sizeof(ieResRef)-1);
+			pro->Extension->SoundRes = res;
 		}
 
 		//the area sound (used for subsequent explosions)
 		res = GetExplosion(Type,4);
 		if(res) {
-			strnuprcpy(pro->Extension->AreaSound,*res,sizeof(ieResRef)-1);
+			pro->Extension->AreaSound = res;
 		}
 
 		//fill the explosion/spread animation flags
@@ -191,7 +191,7 @@ int ProjectileServer::InitExplosion()
 			int i;
 
 			for(i=0;i<AP_RESCNT;i++) {
-				strnuprcpy(explosions[rows].resources[i], explist->QueryField(rows, i), 8);
+				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
 			}
 			//using i so the flags field will always be after the resources
 			explosions[rows].flags = atoi(explist->QueryField(rows,i));
@@ -230,7 +230,7 @@ void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
 			// this should never happen!
 			error("ProjectileServer", "Too high projectilenumber while adding projectiles\n");
 		}
-		strnuprcpy(projectiles[value].resname, projlist->GetStringIndex(rows), 8);
+		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
 	}
 }
 
@@ -294,7 +294,7 @@ int ProjectileServer::GetExplosionFlags(unsigned int idx)
 	return explosions[idx].flags;
 }
 
-ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
+ResRef ProjectileServer::GetExplosion(unsigned int idx, int type)
 {
 	if (explosioncount==-1) {
 		if (InitExplosion()<0) {
@@ -305,12 +305,10 @@ ieResRef const *ProjectileServer::GetExplosion(unsigned int idx, int type)
 	if (idx>=(unsigned int) explosioncount) {
 		return NULL;
 	}
-	ieResRef const *ret = NULL;
+	ResRef const *ret = &explosions[idx].resources[type];
+	if (ret && ret->IsStar()) return ResRef();
 
-	ret = &explosions[idx].resources[type];
-	if (ret && *ret[0]=='*') ret = NULL;
-
-	return ret;
+	return *ret;
 }
 
 }

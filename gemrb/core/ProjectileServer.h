@@ -38,7 +38,6 @@ class ProjectileEntry
 public:
 	ProjectileEntry()
 	{
-		resname[0] = 0;
 		projectile = NULL;
 	}
 	~ProjectileEntry()
@@ -47,19 +46,15 @@ public:
 			delete projectile;
 	}
 
-	ieResRef resname;
+	ResRef resname;
 	Projectile *projectile;
 };
 
 class ExplosionEntry
 {
 public:
-	ExplosionEntry()
-	{
-		memset(this,0,sizeof(ExplosionEntry));
-	}
-	ieResRef resources[AP_RESCNT];
-	int flags;
+	ResRef resources[AP_RESCNT];
+	int flags = 0;
 };
 
 //this singleton object serves the projectile objects
@@ -71,12 +66,12 @@ public:
 
 	Projectile *GetProjectileByIndex(unsigned int idx);
 	//it is highly unlikely we need this function
-	Projectile *GetProjectileByName(const ieResRef resname);
+	Projectile *GetProjectileByName(const ResRef &resname);
 	//returns the highest projectile id
 	unsigned int GetHighestProjectileNumber();
 	int InitExplosion();
 	int GetExplosionFlags(unsigned int idx);
-	ieResRef const *GetExplosion(unsigned int idx, int type);
+	ResRef GetExplosion(unsigned int idx, int type);
 	//creates an empty projectile on the fly
 	Projectile *CreateDefaultProjectile(unsigned int idx);
 private:

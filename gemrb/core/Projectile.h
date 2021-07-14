@@ -169,7 +169,7 @@ struct ProjectileExtension : Held<ProjectileExtension>
 	ieDword AFlags;
 	ieWord TriggerRadius;
 	ieWord ExplosionRadius;
-	ieResRef SoundRes; //used for areapro.2da explosion sound
+	ResRef SoundRes; //used for areapro.2da explosion sound
 	ieWord Delay;
 	ieWord FragAnimID;
 	ieWord FragProjIdx;
@@ -177,13 +177,13 @@ struct ProjectileExtension : Held<ProjectileExtension>
 	ieByte ExplType;
 	ieWord ExplColor; // a byte in the original, followed by padding
 	ieWord ExplProjIdx;
-	ieResRef VVCRes;  //used for areapro.2da second resref (center animation)
+	ResRef VVCRes;  //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
 	//these are GemRB specific (from areapro.2da)
 	ieDword APFlags;    //areapro.2da flags
-	ieResRef Spread;    //areapro.2da first resref
-	ieResRef Secondary; //areapro.2da third resref
-	ieResRef AreaSound; //areapro.2da second sound resource
+	ResRef Spread;    //areapro.2da first resref
+	ResRef Secondary; //areapro.2da third resref
+	ResRef AreaSound; //areapro.2da second sound resource
 	//used for target or HD counting
 	ieWord DiceCount;
 	ieWord DiceSize;
