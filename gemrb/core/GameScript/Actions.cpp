@@ -3438,7 +3438,7 @@ void GameScript::GlobalXor(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMax(Scriptable* Sender, Action* parameters)
 {
-	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	int value1 = CheckVariable( Sender, parameters->string0Parameter );
 	if (value1 > parameters->int0Parameter) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
@@ -3446,7 +3446,7 @@ void GameScript::GlobalMax(Scriptable* Sender, Action* parameters)
 
 void GameScript::GlobalMin(Scriptable* Sender, Action* parameters)
 {
-	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
+	int value1 = CheckVariable( Sender, parameters->string0Parameter );
 	if (value1 < parameters->int0Parameter) {
 		SetVariable( Sender, parameters->string0Parameter, value1 );
 	}
