@@ -182,34 +182,34 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
 {
 	bool pst_hostile = false;
-	Effect *features;
+	Effect *const *features;
 	int count;
 
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
-			features = ext_headers[0].features[0];
+			features = ext_headers[0].features.data();
 			count = ext_headers[0].FeatureCount;
 		} else {
-			features = ext_headers[block_index].features[0];
+			features = ext_headers[block_index].features.data();
 			count = ext_headers[block_index].FeatureCount;
 			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
 	} else {
-		features = casting_features[0];
+		features = casting_features.data();
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
 	EffectQueue *selfqueue = NULL;
 
 	for (int i=0;i<count;i++) {
-		Effect *fx = features+i;
+		Effect *fx = features[i];
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
-			if (EffectQueue::HasDuration(features+i)) {
+			if (EffectQueue::HasDuration(features[i])) {
 				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}
