@@ -165,7 +165,7 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, const WMPA
 	area_links.insert(area_links.begin()+idx,al);
 
 	WMPAreaEntry *ae;
-	unsigned int max = area_entries.size();
+	size_t max = area_entries.size();
 	for (unsigned int pos = 0; pos < max; pos++) {
 		ae = area_entries[pos];
 		for (unsigned int k=0;k<4;k++) {
@@ -491,7 +491,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	lsrc->DistanceScale /= 2;
 	lsrc->EncounterChance = 0;
 
-	unsigned int idx = area_links.size();
+	size_t idx = area_links.size();
 	AddAreaLink(ldest);
 	AddAreaLink(lsrc);
 
@@ -506,7 +506,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 
 void WorldMap::ClearEncounterArea()
 {
-	if (encounterArea == -1) {
+	if (encounterArea >= area_entries.size()) {
 		return;
 	}
 

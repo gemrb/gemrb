@@ -99,7 +99,7 @@ char* IDSImporter::GetValue(int val) const
 	return NULL;
 }
 
-char* IDSImporter::GetStringIndex(unsigned int Index) const
+char* IDSImporter::GetStringIndex(size_t Index) const
 {
 	if (Index >= pairs.size()) {
 		return NULL;
@@ -107,7 +107,7 @@ char* IDSImporter::GetStringIndex(unsigned int Index) const
 	return pairs[Index].str;
 }
 
-int IDSImporter::GetValueIndex(unsigned int Index) const
+int IDSImporter::GetValueIndex(size_t Index) const
 {
 	if (Index >= pairs.size()) {
 		return 0;
@@ -117,7 +117,7 @@ int IDSImporter::GetValueIndex(unsigned int Index) const
 
 int IDSImporter::FindString(char *str, int len) const
 {
-	int i=pairs.size();
+	size_t i = pairs.size();
 	while(i--) {
 		if (strnicmp(pairs[i].str, str, len) == 0) {
 			return i;
@@ -128,7 +128,7 @@ int IDSImporter::FindString(char *str, int len) const
 
 int IDSImporter::FindValue(int val) const
 {
-	int i=pairs.size();
+	size_t i = pairs.size();
 	while(i--) {
 		if(pairs[i].val==val) {
 			return i;

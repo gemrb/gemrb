@@ -939,11 +939,11 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
-	int CursorCount = 0;
+	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
 		Cursors.reserve(CursorCount);
-		for (int i = 0; i < CursorCount; i++) {
+		for (size_t i = 0; i < CursorCount; i++) {
 			Cursors.push_back(anim->GetFrame(0, (ieByte) i));
 		}
 	} else {
@@ -952,7 +952,7 @@ int Interface::LoadSprites()
 		// same layout as in the originals, with odd indices having the pressed cursor image
 		char fileName[32];
 		while (CursorCount < 99) {
-			snprintf(fileName, sizeof(fileName), "%.29s%02d", MainCursorsImage.CString(), CursorCount);
+			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), CursorCount);
 			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
@@ -962,7 +962,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors (%d < %d).",
+		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).",
 				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}

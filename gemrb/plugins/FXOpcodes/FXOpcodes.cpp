@@ -3290,7 +3290,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	int damage;
 	int tmp = fx->Parameter1;
 	ieDword gameTime = core->GetGame()->GameTime;
-	int timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
+	tick_t timeStep = target->GetAdjustedTime(AI_UPDATE_TIME);
 
 	if (fx->FirstApply) {
 		//ensure we prepare Parameter3 now

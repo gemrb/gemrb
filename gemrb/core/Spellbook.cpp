@@ -587,7 +587,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(int type, bool real) const
 	size_t i=GetSpellLevelCount(type);
 	while(i--) {
 		if (real) {
-			int j = spells[type][i]->memorized_spells.size();
+			size_t j = spells[type][i]->memorized_spells.size();
 			while(j--) {
 				if (spells[type][i]->memorized_spells[j]->Flags) count++;
 			}
@@ -606,7 +606,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level, bo
 		return 0;
 	if (real) {
 		unsigned int count = 0;
-		int j = spells[type][level]->memorized_spells.size();
+		size_t j = spells[type][level]->memorized_spells.size();
 		while(j--) {
 			if (spells[type][level]->memorized_spells[j]->Flags) count++;
 		}
@@ -630,7 +630,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(const ieResRef name, int type, b
 	while(t>=0) {
 		unsigned int level = GetSpellLevelCount(t);
 		while(level--) {
-			int i = spells[t][level]->memorized_spells.size();
+			size_t i = spells[t][level]->memorized_spells.size();
 			while(i--) {
 				CREMemorizedSpell *cms = spells[t][level]->memorized_spells[i];
 

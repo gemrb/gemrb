@@ -99,7 +99,7 @@ Variables::iterator Variables::GetNextAssoc(iterator rNextPosition, const char*&
 	Variables::MyAssoc* pAssocNext;
 	if (( pAssocNext = pAssocRet->pNext ) == NULL) {
 		// go to next bucket
-		for (unsigned int nBucket = pAssocRet->nHashValue + 1;
+		for (size_t nBucket = pAssocRet->nHashValue + 1;
 			nBucket < m_nHashTableSize;
 			nBucket++)
 			if (( pAssocNext = m_pHashTable[nBucket] ) != NULL)

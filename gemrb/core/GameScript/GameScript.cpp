@@ -1424,7 +1424,7 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
-	int j = table->GetSize();
+	size_t j = table->GetSize();
 	while (j--) {
 		int i = table->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
@@ -1509,10 +1509,8 @@ void InitializeIEScript()
 	memset( actionflags, 0, sizeof( actionflags ) );
 	memset( objects, 0, sizeof( objects ) );
 
-	int max;
-
-	max = triggersTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	size_t max = triggersTable->GetSize();
+	for (size_t j = 0; j < max; j++) {
 		int i = triggersTable->GetValueIndex(j);
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 
@@ -1582,7 +1580,7 @@ void InitializeIEScript()
 	}
 
 	max = actionsTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	for (size_t j = 0; j < max; j++) {
 		int i = actionsTable->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1626,7 +1624,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideActionsTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideActionsTable->GetValueIndex(j);
 			if (i >= MAX_ACTIONS) {
 				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1665,7 +1663,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideTriggersTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
@@ -1730,7 +1728,7 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	int j = objectsTable->GetSize();
+	size_t j = objectsTable->GetSize();
 	while (j--) {
 		int i = objectsTable->GetValueIndex(j);
 		if (i >= MAX_OBJECTS) {
@@ -1831,7 +1829,6 @@ GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
 	: MySelf(MySelf)
 {
 	scriptlevel = ScriptLevel;
-	lastAction = (unsigned int) ~0;
 
 	strnlwrcpy( Name, ResRef, 8 );
 

@@ -1146,7 +1146,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 		return PyInt_FromLong( val );
 	}
 	if (PyObject_TypeCheck( sym, &PyInt_Type )) {
-		long symi = PyInt_AsLong( sym );
+		int symi = PyInt_AsLong( sym );
 
 		const char* str = sm->GetValue( symi );
 		return PyString_FromString( str );
@@ -12693,9 +12693,9 @@ static PyObject* GemRB_GetSelectedActors(PyObject* /*self*/, PyObject* /*args*/)
 {
 	GET_GAME();
 
-	int count = game->selected.size();
+	size_t count = game->selected.size();
 	PyObject* actor_list = PyTuple_New(count);
-	for (int i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		PyTuple_SetItem(actor_list, i, PyInt_FromLong( game->selected[i]->GetGlobalID() ) );
 	}
 	return actor_list;

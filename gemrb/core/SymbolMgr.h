@@ -41,8 +41,8 @@ public:
 	/// Returns -1 if string isn't found.
 	virtual int GetValue(const char* text) const = 0;
 	virtual char* GetValue(int val) const = 0;
-	virtual char* GetStringIndex(unsigned int Index) const = 0;
-	virtual int GetValueIndex(unsigned int Index) const = 0;
+	virtual char* GetStringIndex(size_t Index) const = 0;
+	virtual int GetValueIndex(size_t Index) const = 0;
 	virtual int FindValue(int val) const = 0;
 	virtual int FindString(char *str, int len) const = 0;
 	virtual size_t GetSize() const = 0;

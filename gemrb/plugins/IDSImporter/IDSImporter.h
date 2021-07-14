@@ -43,8 +43,8 @@ public:
 	bool Open(DataStream* stream) override;
 	int GetValue(const char* txt) const override;
 	char* GetValue(int val) const override;
-	char* GetStringIndex(unsigned int Index) const override;
-	int GetValueIndex(unsigned int Index) const override;
+	char* GetStringIndex(size_t Index) const override;
+	int GetValueIndex(size_t Index) const override;
 	int FindString(char *str, int len) const override;
 	int FindValue(int val) const override;
 	size_t GetSize() const override { return pairs.size(); }

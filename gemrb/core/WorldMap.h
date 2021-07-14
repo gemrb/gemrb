@@ -139,7 +139,7 @@ private: //non-struct members
 	std::vector< WMPAreaLink*> area_links;
 	int *Distances;
 	int *GotHereFrom;
-	int encounterArea;
+	size_t encounterArea;
 public:
 	void SetMapIcons(AnimationFactory *bam);
 	Holder<Sprite2D> GetMapMOS() const { return MapMOS; }
