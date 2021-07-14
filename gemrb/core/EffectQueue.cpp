@@ -2082,7 +2082,7 @@ void EffectQueue::dump(StringBuffer& buffer) const
 			Log(FATAL, "EffectQueue", "Encountered opcode off the charts: %d! Report this immediately!", fx->Opcode);
 			return;
 		}
-		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->Source);
+		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef.CString());
 	}
 }
 /*
