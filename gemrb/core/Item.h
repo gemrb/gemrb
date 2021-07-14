@@ -136,7 +136,7 @@ public:
 	ieByte IDReq;
 	ieByte Location;
 	ieByte AltDiceSides = 0;
-	ieResRef UseIcon;
+	ResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
