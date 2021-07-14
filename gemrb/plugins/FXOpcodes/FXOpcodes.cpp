@@ -6049,8 +6049,6 @@ int fx_bounce_secondary_type_dec (Scriptable* /*Owner*/, Actor* target, Effect* 
 //0xe5 DispelSchoolOne
 int fx_dispel_school_one (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieResRef Removed;
-
 	// print("fx_dispel_school_one(%2d): Level: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
