@@ -171,6 +171,10 @@ public:
 		// must define our own empty ctor due to union type
 		// union is already 0 initialized so there is nothing else to do
 	}
+	
+	bool operator==(const Effect& rhs) const noexcept {
+		return this == &rhs || memcmp(&rhs, this, sizeof(Effect)) == 0;
+	}
 };
 
 }

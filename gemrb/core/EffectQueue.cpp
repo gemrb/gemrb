@@ -483,12 +483,9 @@ void EffectQueue::AddEffect(Effect* fx, bool insert)
 //an exact matching effect
 bool EffectQueue::RemoveEffect(const Effect* fx)
 {
-	int invariant_size = offsetof( Effect, random_value );
-
 	for (std::list<Effect*>::iterator f = effects.begin(); f != effects.end(); ++f) {
 		Effect* fx2 = *f;
-
-		if( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
+		if (*fx == *fx2) {
 			delete fx2;
 			effects.erase( f );
 			return true;
