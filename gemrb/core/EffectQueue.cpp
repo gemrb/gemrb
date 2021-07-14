@@ -595,6 +595,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -620,6 +621,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_OTHER_SIDE:
@@ -646,6 +648,7 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 	case FX_TARGET_PRESET:
@@ -675,6 +678,7 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -692,6 +696,7 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -710,6 +715,7 @@ all_party:
 				actor->fxqueue.AddEffect( new_fx, flg==FX_INSERT );
 			}
 		}
+		delete fx;
 		flg = FX_APPLIED;
 		break;
 
@@ -717,6 +723,7 @@ all_party:
 	default:
 		Log(MESSAGE, "EffectQueue", "Unknown FX target type: %d", fx->Target);
 		flg = FX_ABORT;
+		delete fx;
 		break;
 	}
 
