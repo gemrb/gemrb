@@ -1694,7 +1694,7 @@ void InitializeIEScript()
 					printFunction(buffer, triggersTable, x);
 				} else {
 					x = overrideTriggersTable->FindValue(i);
-					if (x<0 || x>=j) x = overrideTriggersTable->FindValue(i|0x4000);
+					if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i|0x4000);
 					printFunction(buffer, overrideTriggersTable, x);
 				}
 				Log(MESSAGE, "GameScript", buffer);
