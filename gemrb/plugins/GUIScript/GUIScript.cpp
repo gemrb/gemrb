@@ -111,7 +111,7 @@ static std::vector<SpellDescType> StoreSpells;
 
 static std::vector<ItemExtHeader> ItemArray(GUIBT_COUNT);
 static SpellExtHeader *SpellArray = NULL;
-static UsedItemType *UsedItems = NULL;
+static std::vector<UsedItemType> UsedItems;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -7910,30 +7910,25 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 
 static void ReadUsedItems()
 {
-	UsedItemsCount = 0;
-	int table = gamedata->LoadTable("item_use");
-	if (table>=0) {
-		Holder<TableMgr> tab = gamedata->GetTable(table);
-		if (!tab) goto table_loaded;
-		UsedItemsCount = tab->GetRowCount();
-		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
-		for (int i = 0; i < UsedItemsCount; i++) {
-			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
-			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
-			if (UsedItems[i].username[0]=='*') {
+	AutoTable table("item_use");
+	if (table) {
+		size_t UsedItemsCount = table->GetRowCount();
+		UsedItems.resize(UsedItemsCount);
+		for (size_t i = 0; i < UsedItemsCount; i++) {
+			strnlwrcpy(UsedItems[i].itemname, table->GetRowName(i), 8);
+			strnlwrcpy(UsedItems[i].username, table->QueryField(i, 0), 32);
+			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username[0] = 0;
 			}
 			//this is an strref
-			UsedItems[i].value = atoi(tab->QueryField(i,1) );
+			UsedItems[i].value = atoi(table->QueryField(i, 1));
 			//1 - named actor cannot remove it
 			//2 - anyone else cannot equip it
 			//4 - can only swap it for something else
 			//8 - (pst) can only be equipped in eye slots
 			//16 - (pst) can only be equipped in ear slots
-			UsedItems[i].flags = atoi(tab->QueryField(i,2) );
+			UsedItems[i].flags = atoi(table->QueryField(i, 2));
 		}
-table_loaded:
-		gamedata->DelTable(table);
 	}
 }
 
@@ -13512,12 +13507,8 @@ GUIScript::~GUIScript(void)
 	}
 	StoreSpells.clear();
 	SpecialItems.clear();
-	if (UsedItems) {
-		free(UsedItems);
-		UsedItems=NULL;
-	}
+	UsedItems.clear();
 
-	UsedItemsCount = -1;
 	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
 	ReputationDonation[0]=(int) UNINIT_IEDWORD;
 	GUIAction[0]=UNINIT_IEDWORD;
