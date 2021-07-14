@@ -33,26 +33,19 @@ class SymbolMgr;
 #define AP_RESCNT 5
 
 //this represents a line of projectl.ids
-class ProjectileEntry
+struct ProjectileEntry
 {
-public:
-	ProjectileEntry()
-	{
-		projectile = NULL;
-	}
 	~ProjectileEntry()
 	{
-		if (projectile)
-			delete projectile;
+		delete projectile;
 	}
 
 	ResRef resname;
-	Projectile *projectile;
+	Projectile *projectile = nullptr;
 };
 
-class ExplosionEntry
+struct ExplosionEntry
 {
-public:
 	ResRef resources[AP_RESCNT];
 	int flags = 0;
 };
