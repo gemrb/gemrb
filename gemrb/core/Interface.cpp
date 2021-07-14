@@ -1217,7 +1217,7 @@ int Interface::Init(InterfaceConfig* cfg)
 #else
 	CONFIG_PATH("PluginsPath", config.PluginsPath, "");
 	if (!config.PluginsPath[0]) {
-		PathJoin(config.PluginsPath, GemRBPath, "plugins", nullptr);
+		PathJoin(config.PluginsPath, config.GemRBPath, "plugins", nullptr);
 	}
 #endif
 
