@@ -53,12 +53,9 @@ private:
 template <class T>
 class Holder final {
 public:
-	Holder() noexcept
-	: ptr(nullptr)
-	{}
+	Holder() noexcept = default;
 
 	Holder(std::nullptr_t) noexcept
-	: ptr(nullptr)
 	{}
 
 	explicit Holder(T* ptr) noexcept
