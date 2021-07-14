@@ -1136,10 +1136,6 @@ int Interface::Init(InterfaceConfig* cfg)
 
 	CONFIG_STRING("GameName", config.GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
 	CONFIG_STRING("GameType", config.GameType, "auto");
-	// tob type is obsolete
-	if (stricmp(config.GameType, "tob") == 0) {
-		strlcpy(config.GameType, "bg2", sizeof(config.GameType));
-	}
 
 #undef CONFIG_STRING
 
