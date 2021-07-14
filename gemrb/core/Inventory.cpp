@@ -64,6 +64,34 @@ static void InvalidSlot(int slot)
 	error("Inventory", "Invalid slot: %d!\n", slot);
 }
 
+void ItemExtHeader::CopyITMExtHeader(const ITMExtHeader &src)
+{
+	AttackType = src.AttackType;
+	IDReq = src.IDReq;
+	Location = src.Location;
+	UseIcon = src.UseIcon;
+	Tooltip = src.Tooltip;
+	Target = src.Target;
+	TargetNumber = src.TargetNumber;
+	Range = src.Range;
+	Speed = src.Speed;
+	THAC0Bonus = src.THAC0Bonus;
+	DiceSides = src.DiceSides;
+	DiceThrown = src.DiceThrown;
+	DamageBonus = src.DamageBonus;
+	DamageType = src.DamageType;
+	FeatureCount = src.FeatureCount;
+	FeatureOffset = src.FeatureOffset;
+	Charges = src.Charges;
+	ChargeDepletion = src.ChargeDepletion;
+	RechargeFlags = src.RechargeFlags;
+	ProjectileAnimation = src.ProjectileAnimation;
+	MeleeAnimation[0] = src.MeleeAnimation[0];
+	MeleeAnimation[1] = src.MeleeAnimation[1];
+	MeleeAnimation[2] = src.MeleeAnimation[2];
+	ProjectileQualifier = src.ProjectileQualifier;
+}
+
 //This inline function returns both an item pointer and the slot data.
 //slot is a dynamic slot number (SLOT_*)
 inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
@@ -1610,12 +1638,10 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 					return true;
 				}
 				count--;
-				memcpy(headerList[pos].itemname, slot->ItemResRef, sizeof(ieResRef));
+				headerList[pos].CopyITMExtHeader(*ext_header);
+				headerList[pos].itemName = slot->ItemResRef;
 				headerList[pos].slot = idx;
 				headerList[pos].headerindex = ehc;
-				headerList[pos].Tooltip = ext_header->Tooltip;
-				int slen = ((char *) &(headerList[pos].itemname)) - ((char *) &(headerList[pos].AttackType));
-				memcpy(&(headerList[pos].AttackType), &(ext_header->AttackType), slen);
 				if (ext_header->Charges) {
 					//don't modify ehc, it is a counter
 					if (ehc>=CHARGE_COUNTERS) {

@@ -5900,11 +5900,10 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
 	//item has no extended header, or header index is wrong
 	if (!ext_header) return;
-	memcpy(item->itemname, slot->ItemResRef, sizeof(ieResRef) );
+	item->CopyITMExtHeader(*ext_header);
+	item->itemName = slot->ItemResRef;
 	item->slot = idx;
 	item->headerindex = headerindex;
-	memcpy(&(item->AttackType), &(ext_header->AttackType),
-		((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
 	if (headerindex>=CHARGE_COUNTERS) {
 		item->Charges=0;
 	} else {

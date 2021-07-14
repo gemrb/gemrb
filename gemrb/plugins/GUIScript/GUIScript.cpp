@@ -10791,7 +10791,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		const ItemExtHeader& item = ItemArray[i];
 		Holder<Sprite2D> Picture;
 
-		if (item.UseIcon[0]) {
+		if (!item.UseIcon.IsEmpty()) {
 			Picture = gamedata->GetBAMSprite(item.UseIcon, 1, 0, true);
 			// try cycle 0 if cycle 1 doesn't exist
 			// (needed for e.g. sppr707b which is used by Daystar's Sunray)
@@ -11818,13 +11818,13 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	//is there any better check for a non existent item?
-	if (!itemdata.itemname[0]) {
+	if (itemdata.itemName.IsEmpty()) {
 		Log(WARNING, "GUIScript", "Empty slot used?");
 		Py_RETURN_NONE;
 	}
 
 	/// remove this after projectile is done
-	print("Use item: %s", itemdata.itemname);
+	print("Use item: %s", itemdata.itemName.CString());
 	print("Extended header: %d", itemdata.headerindex);
 	print("Attacktype: %d", itemdata.AttackType);
 	print("Range: %d", itemdata.Range);

@@ -133,7 +133,7 @@ struct ItemExtHeader {
 	ieByte IDReq;
 	ieByte Location;
 	ieByte unknown1;
-	ieResRef UseIcon;
+	ResRef UseIcon;
 	ieStrRef Tooltip;
 	ieByte Target;
 	ieByte TargetNumber;
@@ -155,7 +155,10 @@ struct ItemExtHeader {
 	ieWord MeleeAnimation[3];
 	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
-	ieResRef itemname;
+	ResRef itemName;
+
+	// copy over shared fields
+	void CopyITMExtHeader(const ITMExtHeader& src);
 };
 
 /**
