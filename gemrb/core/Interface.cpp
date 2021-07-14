@@ -4277,8 +4277,7 @@ Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
 		level = 1;
 	}
 	effect->Power = level;
-	effect->PosX=p.x;
-	effect->PosY=p.y;
+	effect->Pos = p;
 	return effect;
 }
 

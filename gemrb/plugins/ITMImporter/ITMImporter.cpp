@@ -161,7 +161,7 @@ static void AddZZFeatures(Item *s)
 	for (unsigned int i=0; i < sizeof(zzRefs)/sizeof(*zzRefs); i++) {
 		Effect *fx = EffectQueue::CreateEffect(zzRefs[i], IDSval, IDSfile, FX_DURATION_INSTANT_WHILE_EQUIPPED);
 		fx->Parameter3 = bonus;
-		CopyResRef(fx->Source, s->Name);
+		fx->SourceRef = s->Name;
 		// use the space reserved earlier
 		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
 		delete fx;
@@ -399,7 +399,7 @@ Effect* ITMImporter::GetFeature(Item *s)
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	Effect* fx = eM->GetEffect();
-	CopyResRef(fx->Source, s->Name);
+	fx->SourceRef = s->Name;
 	return fx;
 }
 

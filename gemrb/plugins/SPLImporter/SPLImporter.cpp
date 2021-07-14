@@ -245,7 +245,7 @@ Effect *SPLImporter::GetFeature(Spell *s)
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );
 	Effect* fx = eM->GetEffect();
-	memcpy(fx->Source, s->Name.CString(), 9);
+	fx->SourceRef = s->Name;
 	fx->PrimaryType = s->PrimaryType;
 	fx->SecondaryType = s->SecondaryType;
 	return fx;

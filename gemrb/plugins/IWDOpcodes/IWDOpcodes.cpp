@@ -606,7 +606,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 	newfx->Power = fx->Power;
 	newfx->DiceThrown = fx->DiceThrown;
 	newfx->DiceSides = fx->DiceSides;
-	memcpy(newfx->Resource, fx->Resource,sizeof(newfx->Resource) );
+	newfx->Resource = fx->Resource;
 	//applyeffectcopy on everyone near us
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
@@ -780,8 +780,7 @@ int fx_iwd_visual_spell_hit (Scriptable* Owner, Actor* target, Effect* fx)
 		//i believe the spell hit projectiles don't follow anyone
 		map->AddProjectile(pro, target->Pos, target->GetGlobalID(), true);
 	} else {
-		Point pos(fx->PosX, fx->PosY);
-		map->AddProjectile( pro, pos, pos);
+		map->AddProjectile(pro, fx->Pos, fx->Pos);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -917,9 +916,8 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(iwd_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -978,9 +976,8 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(animate_dead_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -1040,9 +1037,8 @@ int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(summon_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -1120,9 +1116,8 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetResRefFrom2DA(summon_shadow_monster_2da[fx->Parameter2], monster, hit, areahit);
 
 	//the monster should appear near the effect position
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -1281,7 +1276,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->Power = fx->Power;
 	newfx->DiceThrown = fx->DiceThrown;
 	newfx->DiceSides = fx->DiceSides;
-	memcpy(newfx->Resource, fx->Resource,sizeof(newfx->Resource) );
+	newfx->Resource = fx->Resource;
 
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
@@ -1321,7 +1316,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
-	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
+	newfx2->Resource = fx->SourceRef;
 
 	//collect targets and apply effect on targets
 	Map *area = target->GetCurrentArea();
@@ -1388,7 +1383,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
-	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
+	newfx2->Resource = fx->SourceRef;
 
 	//collect targets and apply effect on targets
 	Map *area = target->GetCurrentArea();
@@ -1448,8 +1443,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 		if (fx->Parameter2 == 3) { // summon at source
 			pos = Owner->Pos;
 		} else if (fx->Target == FX_TARGET_PRESET) {
-			pos.x = fx->PosX;
-			pos.y = fx->PosY;
+			pos = fx->Pos;
 		}
 		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
 	}
@@ -1481,7 +1475,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 
 	ieResRef tableResRef;
 
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		strnlwrcpy(tableResRef, fx->Resource, 8);
 	} else {
 		memcpy(tableResRef,"pomab",6);
@@ -1605,7 +1599,7 @@ int fx_static_charge(Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Parameter1--;
 
 	//iwd2 style
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 		return ret;
 	}
@@ -1643,7 +1637,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	fx->Parameter1--;
 
 	//iwd2 style
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 		return FX_APPLIED;
 	}
@@ -1781,7 +1775,7 @@ int fx_remove_seven_eyes (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 int fx_remove_effect (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_remove_effect(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (fx->Resource[0])
+	if (!fx->Resource.IsEmpty())
 	{
 		target->fxqueue.RemoveAllEffectsWithResource(fx->Parameter2, fx->Resource);
 	}
@@ -1822,9 +1816,8 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 
 		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
 		//the monster should appear near the effect position
-		Point p(fx->PosX, fx->PosY);
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-		core->SummonCreature(monster, areahit, Owner, target, p, EAM_SOURCEALLY, fx->Parameter1, newfx);
+		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
 		delete newfx;
 
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
@@ -1935,7 +1928,7 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//apply resource on owner
 	//actually, this should be a list of triggers
 	ieResRef firedmg;
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		CopyResRef(firedmg, fx->Resource);
 	} else {
 		CopyResRef(firedmg, resref_sof1);
@@ -2083,8 +2076,8 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_APPLIED;
 
 		EXTSTATE_SET(EXTSTATE_FLOATTEXTS);
-		if (!fx->Resource[0]) {
-			strnuprcpy(fx->Resource,"cynicism",sizeof(ieResRef)-1);
+		if (fx->Resource.IsEmpty()) {
+			fx->Resource = "CYNICISM";
 		}
 		if (fx->Parameter1) {
 			fx->Parameter1--;
@@ -2213,7 +2206,7 @@ int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
+	if (fx->Resource != fx->SourceRef) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -2234,7 +2227,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	//in case it lingers
 	fx->Opcode=EffectQueue::ResolveEffect(fx_resist_spell_ref);
 
-	if (strnicmp(fx->Resource, fx->Source, sizeof(fx->Resource)) != 0) {
+	if (fx->Resource != fx->SourceRef) {
 		return FX_APPLIED;
 	}
 	//display message too
@@ -2306,8 +2299,8 @@ int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_beholder_dispel_magic(%2d): Spell: %s", fx->Opcode, fx->Resource);
-	if (!fx->Resource[0]) {
-		strcpy(fx->Resource,"SPIN164");
+	if (fx->Resource.IsEmpty()) {
+		fx->Resource = "SPIN164";
 	}
 
 	//if the target is dead, this effect ceases to exist
@@ -2334,11 +2327,11 @@ int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_harpy_wail(%2d): Spell: %s", fx->Opcode, fx->Resource);
-	if (!fx->Resource[0]) {
-		strcpy(fx->Resource,"SPIN166");
+	if (fx->Resource.IsEmpty()) {
+		fx->Resource = "SPIN166";
 	}
 	if (!fx->Resource2[0]) {
-		strcpy(fx->Resource2,"EFF_P111");
+		fx->Resource2 = "EFF_P111";
 	}
 
 	//if the target is dead, this effect ceases to exist
@@ -2366,8 +2359,8 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_jackalwere_gaze(%2d): Spell: %s", fx->Opcode, fx->Resource);
-	if (!fx->Resource[0]) {
-		strcpy(fx->Resource,"SPIN179");
+	if (fx->Resource.IsEmpty()) {
+		fx->Resource = "SPIN179";
 	}
 
 	//if the target is dead, this effect ceases to exist
@@ -2632,8 +2625,8 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		Effect *fx2 = EffectQueue::CreateEffect(fx_cast_spell_on_condition_ref, 1, COND_GOTHIT, FX_DURATION_ABSOLUTE);
 		assert(fx2);
 		fx2->Duration = fx->Duration;
-		CopyResRef(fx2->Source, fx->Source);
-		CopyResRef(fx2->Resource, fx->Resource);
+		fx2->Source = fx->Source;
+		fx2->Resource = fx->Resource;
 		core->ApplyEffect(fx2, target, target);
 		delete fx2;
 	}
@@ -2688,9 +2681,8 @@ int fx_righteous_wrath (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //410 SummonAllyIWD2
 int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ALLY, 0, newfx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ALLY, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -2698,9 +2690,8 @@ int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 //411 SummonEnemyIWD2
 int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	Point p(fx->PosX, fx->PosY);
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, EAM_ENEMY, 0, newfx);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ENEMY, 0, newfx);
 	delete newfx;
 	return FX_NOT_APPLIED;
 }
@@ -2967,17 +2958,16 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	fx->Parameter4 = game->GameTime+fx->Parameter3;
-	Point pos(fx->PosX, fx->PosY);
 
 	Spell *spell = gamedata->GetSpell(fx->Resource);
 	if (!spell) {
 		return FX_NOT_APPLIED;
 	}
 
-	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, pos, 0, fx->CasterLevel);
+	EffectQueue *fxqueue = spell->GetEffectBlock(Owner, fx->Pos, 0, fx->CasterLevel);
 	fxqueue->SetOwner(Owner);
 	//bit 2 original target is excluded or not excluded
-	fxqueue->AffectAllInRange(map, pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
+	fxqueue->AffectAllInRange(map, fx->Pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
 	delete fxqueue;
 
 	//bit 1 repeat or only once
@@ -3030,8 +3020,8 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_entropy_shield(%2d)", fx->Opcode);
 	if (target->SetSpellState( SS_ENTROPY)) return FX_APPLIED;
-	if (!fx->Resource[0]) {
-		strnuprcpy(fx->Resource, "entropy", sizeof(ieResRef)-1);
+	if (fx->Resource.IsEmpty()) {
+		fx->Resource = "ENTROPY";
 	}
 	//immunity to certain projectiles
 	ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
@@ -3195,10 +3185,9 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
 
 	if (pro) {
-		Point p(fx->PosX, fx->PosY);
+		Point origin = fx->Pos;
 
-		pro->SetEffects(spl->GetEffectBlock(Owner, p, 0, fx->CasterLevel, fx->Parameter2));
-		Point origin(fx->PosX, fx->PosY);
+		pro->SetEffects(spl->GetEffectBlock(Owner, origin, 0, fx->CasterLevel, fx->Parameter2));
 		pro->SetCaster(fx->CasterID, fx->CasterLevel);
 		if (target) {
 			map->AddProjectile( pro, origin, target->GetGlobalID(), false);
@@ -3637,7 +3626,7 @@ int fx_call_lightning (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//iwd2 style
-	if (fx->Resource[0]) {
+	if (!fx->Resource.IsEmpty()) {
 		core->ApplySpell(fx->Resource, victim, target, fx->Power);
 		return ret;
 	}
@@ -3800,8 +3789,8 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target->SetSpellState( SS_ARTERIAL)) return FX_NOT_APPLIED; //don't apply it twice
 
 		if (fx->FirstApply) {
-			if (!fx->Resource[0]) {
-				strnuprcpy(fx->Resource, "artstr", sizeof(ieResRef)-1);
+			if (fx->Resource.IsEmpty()) {
+				fx->Resource = "ARTSTR";
 			}
 			//disable mutually exclusive feats
 			target->PCStats->ExtraSettings[ES_HAMSTRING] = 0;
@@ -3833,8 +3822,8 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		if (target->SetSpellState( SS_HAMSTRING)) return FX_NOT_APPLIED; //don't apply it twice
 
 		if (fx->FirstApply) {
-			if (!fx->Resource[0]) {
-				strnuprcpy(fx->Resource, "hamstr", sizeof(ieResRef)-1);
+			if (fx->Resource.IsEmpty()) {
+				fx->Resource = "HAMSTR";
 			}
 			//disable mutually exclusive feats
 			target->PCStats->ExtraSettings[ES_ARTERIAL] = 0;

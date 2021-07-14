@@ -207,7 +207,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2&2) {
-		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->Pos = fx->Pos;
 		area->AddVVCell( new VEFObject(sca));
 	} else {
 		assert(target);
@@ -321,12 +321,12 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			y = (tmp>>5)&31;
 		}
 		
-		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->Pos = fx->Pos;
 		sca->XOffset -= x;
 		sca->YOffset -= y;
 
 		if (twin) {
-			twin->Pos = Point(fx->PosX, fx->PosY);
+			twin->Pos = fx->Pos;
 			twin->XOffset -= x;
 			twin->YOffset -= y;
 			area->AddVVCell( new VEFObject(twin) );
@@ -446,13 +446,13 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//TODO: create the spells
 	switch(fx->Parameter2) {
 		case 0:
-			strnuprcpy(fx->Resource,"adder",8);
+			fx->Resource = "ADDER";
 			break;
 		case 1:
-			strnuprcpy(fx->Resource,"ball",8);
+			fx->Resource = "BALL";
 			break;
 		case 2:
-			strnuprcpy(fx->Resource,"rdead",8);
+			fx->Resource = "RDEAD";
 			break;
 	}
 
@@ -551,7 +551,7 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2<<16, FX_DURATION_INSTANT_PERMANENT);
 				newfx->Target = FX_TARGET_PRESET;
 				newfx->Power = fx->Power;
-				memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );
+				newfx->Source = fx->Source;
 				core->ApplyEffect(newfx, actor, target);
 				if (fx->Parameter3!=0xffffffff) {
 					fx->Parameter3--;
@@ -724,7 +724,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			ConvertTiming (fx, duration);
 
 			// improved strength also has a pulse we need to adjust
-			Effect *efx = target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->Source);
+			Effect *efx = target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->SourceRef);
 			if (efx) {
 				ConvertTiming (efx, duration);
 			}
@@ -889,7 +889,7 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 	Map *map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
 	Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
-	memcpy(newfx, fx->Source,sizeof(ieResRef));
+	newfx->Source = fx->Source;
 	newfx->Duration = 60;
 	while(i--) {
 		Actor *tar=map->GetActor(i,true);
@@ -913,7 +913,7 @@ int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	// print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
-		core->timer.SetMoveViewPort( Point(fx->PosX, fx->PosY), fx->Parameter1, true);
+		core->timer.SetMoveViewPort(fx->Pos, fx->Parameter1, true);
 	}
 	return FX_NOT_APPLIED;
 }

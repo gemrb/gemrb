@@ -1114,7 +1114,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	gamedata->FreeSpell(spl, spellname, false);
 }
 
-void Spellbook::SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int type)
+void Spellbook::SetCustomSpellInfo(const ieResRef *data, const ResRef &spell, int type)
 {
 	ClearSpellInfo();
 	if (data) {

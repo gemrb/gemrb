@@ -265,8 +265,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 			fxqueue->AddEffect(new Effect(*fx));
 		} else {
 			fx->Projectile = 0;
-			fx->PosX=pos.x;
-			fx->PosY=pos.y;
+			fx->Pos = pos;
 			if (!selfqueue) {
 				selfqueue = new EffectQueue();
 			}

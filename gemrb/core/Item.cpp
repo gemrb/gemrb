@@ -102,8 +102,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 		} else {
 			//Actor *target = (self->Type==ST_ACTOR)?(Actor *) self:NULL;
 			fx->Projectile = 0;
-			fx->PosX=pos.x;
-			fx->PosY=pos.y;
+			fx->Pos = pos;
 			if (target) {
 				//core->ApplyEffect(fx, target, self);
 				selfqueue->AddEffect(new Effect(*fx));

@@ -242,7 +242,7 @@ public:
 	unsigned int GetSpellInfoSize(int type);
 
 	/** generates a custom spellinfo list for fx_select_spell */
-	void SetCustomSpellInfo(const ieResRef *data, ieResRef spell, int type);
+	void SetCustomSpellInfo(const ieResRef *data, const ResRef &spell, int type);
 
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();

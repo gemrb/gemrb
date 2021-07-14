@@ -1293,7 +1293,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
-	strnuprcpy(fx->Resource, area, 8);
+	fx->Resource = ResRef::MakeUpperCase(area);
 	core->ApplyEffect(fx, actor, actor);
 	delete fx;
 	return true;

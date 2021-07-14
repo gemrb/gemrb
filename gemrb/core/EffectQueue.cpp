@@ -363,8 +363,7 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	fx->Parameter1 = param1;
 	fx->Parameter2 = param2;
 	fx->TimingMode = timing;
-	fx->PosX = 0xffffffff;
-	fx->PosY = 0xffffffff;
+	fx->Pos = Point(-1, -1);
 	return fx;
 }
 
@@ -396,8 +395,7 @@ void EffectQueue::ModifyAllEffectSources(const Point &source)
 	std::list< Effect* >::const_iterator f;
 
 	for (f = effects.begin(); f != effects.end(); ++f) {
-		(*f)->SourceX = source.x;
-		(*f)->SourceY = source.y;
+		(*f)->Source = source;
 	}
 }
 
@@ -462,7 +460,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 		newfx = CreateEffectCopy(fx, fx_unsummon_creature_ref, 0, 0);
 		newfx->TimingMode = FX_DURATION_DELAY_PERMANENT;
 		newfx->Target = FX_TARGET_PRESET;
-		strnuprcpy(newfx->Resource, newfx->Resource3[0] ? newfx->Resource3 : "SPGFLSH1", sizeof(ieResRef) - 1);
+		newfx->Resource =  newfx->Resource3.IsEmpty() ? "SPGFLSH1" : newfx->Resource3;
 		if( fx->TimingMode == FX_DURATION_ABSOLUTE) {
 			//unprepare duration
 			newfx->Duration = (newfx->Duration-core->GetGame()->GameTime)/AI_UPDATE_TIME;
@@ -860,14 +858,14 @@ static int check_type(const Actor *actor, const Effect *fx)
 
 	//source immunity (spell name)
 	//if source is unspecified, don't resist it
-	if( fx->Source[0]) {
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
-			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->Source);
+	if(!fx->SourceRef.IsEmpty()) {
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->SourceRef) ) {
+			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (%s)", fx->SourceRef.CString());
 			return 0;
 		}
-		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-			if (strnicmp(fx->Source, "detect", 6) != 0) { // our secret door pervasive effect
-				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->Source);
+		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->SourceRef) ) {
+			if (strnicmp(fx->SourceRef, "detect", 6) != 0) { // our secret door pervasive effect
+				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->SourceRef.CString());
 			}
 			return 0;
 		}
@@ -900,8 +898,8 @@ static int check_type(const Actor *actor, const Effect *fx)
 	}
 
 	//decrementing spell immunity
-	if( fx->Source[0]) {
-		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
+	if(!fx->SourceRef.IsEmpty()) {
+		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->SourceRef);
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Resisted by spell immunity (decrementing)");
 			return 0;
@@ -958,7 +956,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 		return -1;
 	}
 
-	if( fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
+	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->SourceRef) ) {
 		Log(DEBUG, "EffectQueue", "Bounced by resource");
 		return -1;
 	}
@@ -989,7 +987,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 		}
 	}
 
-	if( fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
+	if(!fx->SourceRef.IsEmpty() && (bounce&BNC_RESOURCE_DEC)) {
 		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
 		if (efx && DecreaseEffect(efx)) {
 			Log(DEBUG, "EffectQueue", "Bounced by resource (decrementing)");
@@ -1338,7 +1336,7 @@ static inline bool IsLive(ieByte timingmode)
 #define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
 #define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
 #define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
-#define MATCH_SOURCE() if( strnicmp( (*f)->Source, Removed, 8) ) { continue; }
+#define MATCH_SOURCE() if( strnicmp( (*f)->SourceRef, Removed, 8) ) { continue; }
 #define MATCH_TIMING() if( (*f)->TimingMode!=timing) { continue; }
 
 //call this from an applied effect, after it returns, these effects
@@ -1622,7 +1620,7 @@ void EffectQueue::RemoveLevelEffects(ieResRef &Removed, ieDword level, ieDword F
 		}
 		(*f)->TimingMode = FX_DURATION_JUST_EXPIRED;
 		if( Flags&RL_REMOVEFIRST) {
-			memcpy(Removed,(*f)->Source, sizeof(Removed));
+			memcpy(Removed,(*f)->SourceRef, sizeof(Removed));
 		}
 	}
 }
@@ -2210,8 +2208,7 @@ void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
 
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE()
-		(*f)->PosX=x;
-		(*f)->PosY=y;
+		(*f)->Pos = Point(x, y);
 		(*f)->Parameter3=0;
 		return;
 	}

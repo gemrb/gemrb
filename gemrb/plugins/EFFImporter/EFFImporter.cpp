@@ -117,10 +117,8 @@ Effect* EFFImporter::GetEffectV1()
 	str->ReadWord(fx->IsSaveForHalfDamage);
 	fixAffectedLevels( fx );
 
-	fx->PosX=0xffffffff;
-	fx->PosY=0xffffffff;
-	fx->SourceX=0xffffffff;
-	fx->SourceY=0xffffffff;
+	fx->Pos = Point(-1, -1);
+	fx->Source = Point(-1, -1);
 	return fx;
 }
 
@@ -158,12 +156,16 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->Parameter6);
 	str->ReadResRef( fx->Resource2 );
 	str->ReadResRef( fx->Resource3 );
-	str->ReadDword(fx->SourceX);
-	str->ReadDword(fx->SourceY);
-	str->ReadDword(fx->PosX);
-	str->ReadDword(fx->PosY);
+	str->ReadDword(tmp);
+	fx->Source.x = tmp;
+	str->ReadDword(tmp);
+	fx->Source.y = tmp;
+	str->ReadDword(tmp);
+	fx->Pos.x = tmp;
+	str->ReadDword(tmp);
+	fx->Pos.y = tmp;
 	str->ReadDword(fx->SourceType);
-	str->ReadResRef( fx->Source );
+	str->ReadResRef(fx->SourceRef);
 	str->ReadDword(fx->SourceFlags);
 	str->ReadDword(fx->Projectile);
 	str->ReadDword(tmp);
@@ -171,8 +173,8 @@ Effect* EFFImporter::GetEffectV20()
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
 	if (fx->IsVariable) {
-		str->Read( fx->Resource, 32 );
-		strnlwrcpy( fx->Resource, fx->Resource, 32 );
+		str->Read(fx->VariableName, 32);
+		strnlwrcpy(fx->VariableName, fx->Resource, 32);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
@@ -225,16 +227,16 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 		stream->WriteResRef(fx->Resource2);
 		stream->WriteResRef(fx->Resource3);
 	}
-	tmpDword1 = fx->SourceX;
-	tmpDword2 = fx->SourceY;
+	tmpDword1 = fx->Source.x;
+	tmpDword2 = fx->Source.y;
 	stream->WriteDword(tmpDword1);
 	stream->WriteDword(tmpDword2);
-	tmpDword1 = fx->PosX;
-	tmpDword2 = fx->PosY;
+	tmpDword1 = fx->Pos.x;
+	tmpDword2 = fx->Pos.y;
 	stream->WriteDword(tmpDword1);
 	stream->WriteDword(tmpDword2);
 	stream->WriteDword(fx->SourceType);
-	stream->WriteResRef( fx->Source );
+	stream->WriteResRef(fx->SourceRef);
 	stream->WriteDword(fx->SourceFlags);
 	stream->WriteDword(fx->Projectile);
 	tmpDword1 = (ieDword) fx->InventorySlot;

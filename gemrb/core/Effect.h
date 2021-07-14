@@ -87,6 +87,14 @@ class Actor;
  * @class Effect
  * Structure holding information about single spell or spell-like effect.
  */
+struct ResourceGroup {
+	//keep these four in one bunch, VariableName will
+	//spread across them
+	ResRef Resource;
+	ResRef Resource2; //vvc in a lot of effects
+	ResRef Resource3;
+	ResRef Resource4;
+};
 
 // the same as ITMFeature and SPLFeature
 struct Effect {
@@ -101,17 +109,22 @@ struct Effect {
 	ieDword Duration;
 	ieWord ProbabilityRangeMax;
 	ieWord ProbabilityRangeMin;
-	//keep these four in one bunch, VariableName will
-	//spread across them
-	ieResRef Resource;
-	ieResRef Resource2; //vvc in a lot of effects
-	ieResRef Resource3;
-	ieResRef Resource4;
+	
+	union {
+		ResourceGroup resources; // keep largest type first to 0 fill everythings
+		char VariableName[32] {'\0'};
+	};
+
+	ResRef& Resource = resources.Resource;
+	ResRef& Resource2 = resources.Resource2; //vvc in a lot of effects
+	ResRef& Resource3 = resources.Resource3;
+	ResRef& Resource4 = resources.Resource4;
+
 	ieDword DiceThrown;
 	ieDword DiceSides;
 	ieDword SavingThrowType;
 	ieDword SavingThrowBonus;
-	ieWord IsVariable;
+	ieWord IsVariable = 0;
 	ieWord IsSaveForHalfDamage;
 
 	// EFF V2.0 fields:
@@ -122,10 +135,10 @@ struct Effect {
 	ieDword Parameter4;
 	ieDword Parameter5;
 	ieDword Parameter6;
-	ieDword SourceX, SourceY;
-	ieDword PosX, PosY;
+	Point Source;
+	Point Pos;
 	ieDword SourceType; //1-item, 2-spell
-	ieResRef Source;
+	ResRef SourceRef;
 	ieDword SourceFlags;
 	ieDword Projectile;          //9c
 	ieDwordSigned InventorySlot; //a0
@@ -142,16 +155,21 @@ struct Effect {
 public:
 	//don't modify position in case it was already set
 	void SetPosition(const Point &p) {
-		if(PosX==0xffffffff && PosY==0xffffffff) {
-			PosX=p.x;
-			PosY=p.y;
+		if (Pos.IsInvalid()) {
+			Pos = p;
 		}
 	}
 	void SetSourcePosition(const Point &p) {
-		if(SourceX==0xffffffff && SourceY==0xffffffff) {
-			SourceX=p.x;
-			SourceY=p.y;
+		if (Source.IsInvalid()) {
+			Source = p;
 		}
+	}
+	
+	Effect() noexcept
+	: resources()
+	{
+		// must define our own empty ctor due to union type
+		// union is already 0 initialized so there is nothing else to do
 	}
 };
 

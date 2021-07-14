@@ -7109,8 +7109,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->ProbabilityRangeMax = 100;
 	fx->ProbabilityRangeMin = 0;
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
-	fx->PosX=tar->Pos.x;
-	fx->PosY=tar->Pos.y;
+	fx->Pos = tar->Pos;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, (Actor *) tar, src);
 	delete fx;
@@ -7140,11 +7139,9 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	// iwd2 with [-1.-1] again
 	if (parameters->pointParameter.x == -1) {
-		fx->PosX = src->Pos.x;
-		fx->PosY = src->Pos.y;
+		fx->Pos = src->Pos;
 	} else {
-		fx->PosX = parameters->pointParameter.x;
-		fx->PosY = parameters->pointParameter.y;
+		fx->Pos = parameters->pointParameter;
 	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);

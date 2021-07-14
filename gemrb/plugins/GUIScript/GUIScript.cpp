@@ -9281,7 +9281,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		//maybe further checks for school exclusion?
 		//no, those were done by CanUseItemType
 		function|=CAN_READ;
-		PyDict_SetItemString(dict, "Spell", PyString_FromIEResRef (f->Resource));
+		PyDict_SetItemString(dict, "Spell", PyString_FromResRef (f->Resource));
 	} else if (ehc>1) {
 		function|=CAN_SELECT;
 	}
@@ -12254,16 +12254,16 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Invalid effect name!\n" );
 	}
 	if (resref1) {
-		strnlwrcpy(fx->Resource, resref1, 8);
+		fx->Resource = ResRef::MakeLowerCase(resref1);
 	}
 	if (resref2) {
-		strnlwrcpy(fx->Resource2, resref2, 8);
+		fx->Resource2 = ResRef::MakeLowerCase(resref2);
 	}
 	if (resref3) {
-		strnlwrcpy(fx->Resource3, resref3, 8);
+		fx->Resource3 = ResRef::MakeLowerCase(resref3);
 	}
 	if (source) {
-		strnlwrcpy(fx->Source, source, 8);
+		fx->SourceRef = ResRef::MakeLowerCase(source);
 	}
 	//This is a hack...
 	fx->Parameter3=1;
