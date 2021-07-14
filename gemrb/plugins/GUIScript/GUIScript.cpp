@@ -109,7 +109,7 @@ typedef char EventNameType[17];
 static std::vector<SpellDescType> SpecialItems;
 static std::vector<SpellDescType> StoreSpells;
 
-static ItemExtHeader *ItemArray = NULL;
+static std::vector<ItemExtHeader> ItemArray(GUIBT_COUNT);
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL;
 
@@ -10759,9 +10759,6 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	GET_ACTOR_GLOBAL();
 
 	//-2 because of the left/right scroll icons
-	if (!ItemArray) {
-		ItemArray = (ItemExtHeader *) malloc((GUIBT_COUNT) * sizeof (ItemExtHeader) );
-	}
 	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start||more) {
@@ -10791,15 +10788,15 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 		strcpy(btn->VarName,"Equipment");
 		btn->SetValue( Start+i );
 
-		const ItemExtHeader *item = ItemArray + i;
+		const ItemExtHeader& item = ItemArray[i];
 		Holder<Sprite2D> Picture;
 
-		if (item->UseIcon[0]) {
-			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0, true);
+		if (item.UseIcon[0]) {
+			Picture = gamedata->GetBAMSprite(item.UseIcon, 1, 0, true);
 			// try cycle 0 if cycle 1 doesn't exist
 			// (needed for e.g. sppr707b which is used by Daystar's Sunray)
 			if (!Picture)
-				Picture = gamedata->GetBAMSprite(item->UseIcon, 0, 0, true);
+				Picture = gamedata->GetBAMSprite(item.UseIcon, 0, 0, true);
 		}
 
 		if (!Picture) {
@@ -10815,11 +10812,11 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, OP_SET);
 
-			SetViewTooltipFromRef(btn, item->Tooltip);
+			SetViewTooltipFromRef(btn, item.Tooltip);
 
-			if (item->Charges && (item->Charges!=0xffff) ) {
-				SetItemText(btn, item->Charges, false);
-			} else if (!item->Charges && (item->ChargeDepletion==CHG_NONE) ) {
+			if (item.Charges && item.Charges != 0xffff) {
+				SetItemText(btn, item.Charges, false);
+			} else if (!item.Charges && item.ChargeDepletion == CHG_NONE) {
 				btn->SetState(IE_GUI_BUTTON_DISABLED);
 			}
 		}
@@ -10981,6 +10978,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->Modal.State;
 		int type;
+		std::vector<ItemExtHeader> itemdata; // not really used!
 		switch (action) {
 		case ACT_INNATE:
 			if (actor->spellbook.IsIWDSpellBook()) {
@@ -11038,8 +11036,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 			break;
 		case ACT_USE:
 			//returns true if there is ANY equipment
-			ItemExtHeader itemdata;
-			if (!actor->inventory.GetEquipmentInfo(&itemdata, 0, 0)) {
+			if (!actor->inventory.GetEquipmentInfo(itemdata, 0, 0)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -11791,13 +11788,15 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	GET_GAMECONTROL();
 	GET_ACTOR_GLOBAL();
 
+	std::vector<ItemExtHeader> itemData(1);
 	ItemExtHeader itemdata;
 	int flags = 0;
 
 	switch (slot) {
 		case -1:
 			//some equipment
-			actor->inventory.GetEquipmentInfo(&itemdata, header, 1);
+			actor->inventory.GetEquipmentInfo(itemData, header, 1);
+			itemdata = itemData[0];
 			break;
 		case -2:
 			//quickslot
@@ -13508,10 +13507,7 @@ GUIScript::~GUIScript(void)
 		}
 		Py_Finalize();
 	}
-	if (ItemArray) {
-		free(ItemArray);
-		ItemArray=NULL;
-	}
+	ItemArray.clear();
 	if (SpellArray) {
 		free(SpellArray);
 		SpellArray=NULL;

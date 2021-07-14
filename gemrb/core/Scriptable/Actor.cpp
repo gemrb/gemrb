@@ -5882,7 +5882,6 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	ieWord idx;
 	ieWord headerindex;
 
-	memset(item, 0, sizeof(ItemExtHeader) );
 	if (header<0) {
 		if (!PCStats) return; //not a player character
 		PCStats->GetSlotAndIndex(which,idx,headerindex);

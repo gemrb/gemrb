@@ -1568,12 +1568,11 @@ void Inventory::EquipBestWeapon(int flags)
 #define ID_NEED    1   //id is important
 #define ID_NO      2   //shouldn't id
 
-/* returns true if there are more item usages not fitting in given array */
-bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count)
+// returns true if there are more item usages not fitting in given vector
+bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count)
 {
 	int pos = 0;
 	int actual = 0;
-	memset(array, 0, count * sizeof(ItemExtHeader) );
 	for(unsigned int idx=0;idx<Slots.size();idx++) {
 		if (!core->QuerySlotEffects(idx)) {
 			continue;
@@ -1611,21 +1610,21 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 					return true;
 				}
 				count--;
-				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
-				array[pos].slot = idx;
-				array[pos].headerindex = ehc;
-				array[pos].Tooltip = ext_header->Tooltip;
-				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
-				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
+				memcpy(headerList[pos].itemname, slot->ItemResRef, sizeof(ieResRef));
+				headerList[pos].slot = idx;
+				headerList[pos].headerindex = ehc;
+				headerList[pos].Tooltip = ext_header->Tooltip;
+				int slen = ((char *) &(headerList[pos].itemname)) - ((char *) &(headerList[pos].AttackType));
+				memcpy(&(headerList[pos].AttackType), &(ext_header->AttackType), slen);
 				if (ext_header->Charges) {
 					//don't modify ehc, it is a counter
 					if (ehc>=CHARGE_COUNTERS) {
-						array[pos].Charges=slot->Usages[0];
+						headerList[pos].Charges = slot->Usages[0];
 					} else {
-						array[pos].Charges=slot->Usages[ehc];
+						headerList[pos].Charges = slot->Usages[ehc];
 					}
 				} else {
-					array[pos].Charges=0xffff;
+					headerList[pos].Charges = 0xffff;
 				}
 				pos++;
 			}

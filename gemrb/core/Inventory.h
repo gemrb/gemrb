@@ -332,7 +332,7 @@ public:
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
-	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
+	bool GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count);
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion(int index) const;
 	/** returns if a slot is temporarily blocked */
