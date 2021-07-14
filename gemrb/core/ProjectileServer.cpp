@@ -303,10 +303,10 @@ ResRef ProjectileServer::GetExplosion(unsigned int idx, int type)
 		}
 	}
 	if (idx>=(unsigned int) explosioncount) {
-		return NULL;
+		return ResRef();
 	}
 	ResRef const *ret = &explosions[idx].resources[type];
-	if (ret && ret->IsStar()) return ResRef();
+	if (!ret || ret->IsStar()) return ResRef();
 
 	return *ret;
 }
