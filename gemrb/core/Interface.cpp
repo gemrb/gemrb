@@ -3960,7 +3960,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
-				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef);
+				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
 			return true;
@@ -3987,20 +3987,20 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceThrows = 1;
 		}
 		if (*endptr) {
-			strnlwrcpy(itm->ItemResRef, NewItem, 8);
+			itm->ItemResRef = ResRef::MakeLowerCase(NewItem);
 		} else {
-			strnlwrcpy(itm->ItemResRef, GoldResRef, 8);
+			itm->ItemResRef = GoldResRef;
 		}
-		if ( !memcmp( itm->ItemResRef,"no_drop",8 ) ) {
-			itm->ItemResRef[0]=0;
+		if (itm->ItemResRef == "no_drop") {
+			itm->ItemResRef.Reset();
 		}
-		if (!itm->ItemResRef[0]) {
+		if (itm->ItemResRef.IsEmpty()) {
 			return false;
 		}
 		itm->Usages[0] = (ieWord) Roll(diceThrows, diceSides, 0);
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item:%s",
-		itm->ItemResRef);
+		itm->ItemResRef.CString());
 	return false;
 }
 

@@ -236,17 +236,17 @@ ieDword ResolveSpellNumber(const ieResRef spellres)
 	return 0xffffffff;
 }
 
-bool ResolveItemName(ieResRef itemres, Actor *act, ieDword Slot)
+bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 {
-	CREItem *itm = act->inventory.GetSlotItem(Slot);
+	const CREItem *itm = act->inventory.GetSlotItem(Slot);
 	if(itm) {
-		strnlwrcpy(itemres, itm->ItemResRef, 8);
+		itemres = ResRef::MakeLowerCase(itm->ItemResRef);
 		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
 	return false;
 }
 
-bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
+bool StoreHasItemCore(const char* storename, const char* itemname)
 {
 	CREItem item;
 
@@ -1403,8 +1403,7 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 
 bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
-	//copy the whole resref, including the terminating zero
-	strnuprcpy(item->ItemResRef, resref, 8);
+	item->ItemResRef = ResRef::MakeUpperCase(resref);
 	if (!core->ResolveRandomItem(item))
 		return false;
 	if (a==-1) {
@@ -2488,13 +2487,13 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
 
 /* returns an item's casting distance, it depends on the used header, and targeting mode too
  the used header is explictly given */
-unsigned int GetItemDistance(const ieResRef itemres, int header)
+unsigned int GetItemDistance(const ResRef& itemres, int header)
 {
 	unsigned int dist;
 
 	Item* itm = gamedata->GetItem( itemres );
 	if (!itm) {
-		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres);
+		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres.CString());
 		return 0;
 	}
 	dist=itm->GetCastingDistance(header);

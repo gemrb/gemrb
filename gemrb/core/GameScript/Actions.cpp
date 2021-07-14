@@ -6536,7 +6536,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	Actor *act = (Actor *) Sender;
 	int Slot;
 	ieDword header, flags;
-	ieResRef itemres;
+	ResRef itemres;
 
 	if (parameters->string0Parameter[0]) {
 		Slot = act->inventory.FindItem(parameters->string0Parameter, IE_INV_ITEM_UNDROPPABLE);
@@ -6581,7 +6581,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 	Actor *act = (Actor *) Sender;
 	int Slot;
 	ieDword header;
-	ieResRef itemres;
+	ResRef itemres;
 	ieDword flags;
 
 	if (parameters->string0Parameter[0]) {

@@ -98,7 +98,7 @@ inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 {
 	item = GetSlotItem(slot);
 	if (!item) return NULL;
-	if (!item->ItemResRef[0]) return NULL;
+	if (item->ItemResRef.IsEmpty()) return nullptr;
 	return gamedata->GetItem(item->ItemResRef);
 }
 
@@ -207,7 +207,7 @@ void Inventory::CalculateWeight()
 					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 				}
 			} else {
-				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef);
+				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef.CString());
 				slot->Weight = 0;
 			}
 		} else {
@@ -297,7 +297,7 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
 	if (!resref[0]) {
 		return true;
 	}
-	if (strnicmp( item->ItemResRef, resref, 8 )==0) {
+	if (item->ItemResRef == resref) {
 		return true;
 	}
 	return false;
@@ -323,7 +323,7 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 			continue;
 		}
 		if (resref && resref[0]) {
-			if (strnicmp(resref, item->ItemResRef, 8) != 0)
+			if (item->ItemResRef != resref)
 				continue;
 		}
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
@@ -351,7 +351,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags) const
 		if ( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
+		if (resref[0] && item->ItemResRef != resref) {
 			continue;
 		}
 		return true;
@@ -386,7 +386,7 @@ void Inventory::KillSlot(unsigned int index)
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
-		error("Inventory", "Invalid item: %s!", item->ItemResRef);
+		error("Inventory", "Invalid item: %s!", item->ItemResRef.CString());
 	}
 	ItemExcl &= ~itm->ItemExcl;
 	int eqslot = GetEquippedSlot();
@@ -485,7 +485,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		if ( (flags&item->Flags)!=flags) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
+		if (resref[0] && item->ItemResRef != resref) {
 			continue;
 		}
 		//we need to acknowledge that the item was destroyed
@@ -562,7 +562,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!flags && (mask&item->Flags)!=0) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
+		if (resref[0] && item->ItemResRef != resref) {
 			continue;
 		}
 		*res_item=RemoveItem( (unsigned int) slot, count);
@@ -705,10 +705,7 @@ bool Inventory::ItemsAreCompatible(const CREItem* target, const CREItem* source)
 		return false;
 	}
 
-	if (!strnicmp( target->ItemResRef, source->ItemResRef,8 )) {
-		return true;
-	}
-	return false;
+	return target->ItemResRef == source->ItemResRef;
 }
 
 //depletes a magical item
@@ -731,7 +728,7 @@ int Inventory::DepleteItem(ieDword flags) const
 		if (!flags) {
 			const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 			if (!itm) {
-				Log(WARNING, "Inventory", "Invalid item to deplete: %s!", item->ItemResRef);
+				Log(WARNING, "Inventory", "Invalid item to deplete: %s!", item->ItemResRef.CString());
 				continue;
 			}
 			//if the item is usable in weapon slot, then it is weapon
@@ -765,7 +762,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags, unsigned int ski
 		if ( mask & item->Flags ) {
 			continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
+		if (resref[0] && item->ItemResRef != resref) {
 			continue;
 		}
 		if (skip) {
@@ -827,7 +824,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) != 0) {
+		if (resref[0] && item->ItemResRef != resref) {
 			continue;
 		}
 		// mark it as unequipped, so it doesn't cause problems in stores
@@ -904,7 +901,7 @@ bool Inventory::EquipItem(ieDword slot)
 	int effect = core->QuerySlotEffects( slot );
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (!itm) {
-		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef, slot);
+		print("Invalid item Equipped: %s Slot: %d", item->ItemResRef.CString(), slot);
 		return false;
 	}
 	
@@ -1331,7 +1328,7 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright, int &slot) const
 	if (SLOT_MAGIC!=-1) {
 		slot = SLOT_MAGIC;
 		ret = GetSlotItem(slot);
-		if (ret && ret->ItemResRef[0]) {
+		if (ret && !ret->ItemResRef.IsEmpty()) {
 			return ret;
 		}
 	}
@@ -1388,7 +1385,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 		if (!(item->Flags&IE_INV_ITEM_STACKED) ) {
 			continue;
 		}
-		if (strnicmp( item->ItemResRef, resref, 8 )!=0) {
+		if (item->ItemResRef != resref) {
 			continue;
 		}
 		// check if the item fits in this slot, we use the cached
@@ -1505,7 +1502,7 @@ void Inventory::dump(StringBuffer& buffer) const
 			continue;
 		}
 
-		buffer.appendFormatted( "%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight );
+		buffer.appendFormatted("%2u: %8.8s - (%d %d %d) Fl:0x%x Wt: %d x %dLb\n", i, itm->ItemResRef.CString(), itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->MaxStackAmount, itm->Weight);
 	}
 
 	buffer.appendFormatted("Equipped: %d       EquippedHeader: %d\n", Equipped, EquippedHeader);

@@ -7064,7 +7064,7 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 
 	const Item *item = gamedata->GetItem(ci->ItemResRef, true);
 	if (!item) {
-		Log(MESSAGE, "GUIScript", "Cannot find container (%s) item %s!", container->GetScriptName(), ci->ItemResRef);
+		Log(MESSAGE, "GUIScript", "Cannot find container (%s) item %s!", container->GetScriptName(), ci->ItemResRef.CString());
 		Py_RETURN_NONE;
 	}
 
@@ -7382,7 +7382,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 
-	const char *ItemResRef;
+	ResRef ItemResRef;
 	ieDword Flags;
 
 	if (type) {
@@ -7408,7 +7408,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	const Item *item = gamedata->GetItem(ItemResRef, true);
 	if (!item) {
 		Log(ERROR, "GUIScript", "Invalid resource reference: %s",
-			ItemResRef);
+			ItemResRef.CString());
 		return PyInt_FromLong(0);
 	}
 
@@ -8946,7 +8946,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemResRef", PyString_FromIEResRef (si->ItemResRef));
+	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef (si->ItemResRef));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
@@ -12541,7 +12541,7 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 	}
 	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef);
+		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
 		return dict;
 	}
 

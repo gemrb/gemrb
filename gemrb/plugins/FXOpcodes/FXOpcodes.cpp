@@ -1934,7 +1934,7 @@ int fx_remove_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		while(i--) {
 			//does this slot need unequipping
 			if (core->QuerySlotEffects(i) ) {
-				if (!fx->Resource.IsEmpty() && strnicmp(inv->GetSlotItem(i)->ItemResRef, fx->Resource, 8) != 0) {
+				if (!fx->Resource.IsEmpty() && inv->GetSlotItem(i)->ItemResRef != fx->Resource) {
 					continue;
 				}
 				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {

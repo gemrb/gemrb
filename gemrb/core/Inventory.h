@@ -170,7 +170,7 @@ struct ItemExtHeader {
 
 class GEM_EXPORT CREItem {
 public:
-	ieResRef ItemResRef;
+	ResRef ItemResRef;
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
 	ieWord Expired;
@@ -195,7 +195,7 @@ public:
 	};
 	void CopySTOItem(STOItem *item)
 	{
-		CopyResRef(ItemResRef, item->ItemResRef);
+		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem
 		memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
 		Flags = item->Flags;

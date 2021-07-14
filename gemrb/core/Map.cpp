@@ -3567,7 +3567,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
 			if (slot == -1) {
 				// probably an inventory bug, shouldn't happen
-				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef.CString());
 				skipped--;
 				continue;
 			}

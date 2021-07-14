@@ -102,7 +102,7 @@ typedef ieResRef FistResType[MAX_LEVEL+1];
 
 static FistResType *fistres = NULL;
 static int *fistresclass = NULL;
-static ieResRef DefaultFist = {"FIST"};
+static ResRef DefaultFist = { "FIST" };
 
 //verbal constant specific data
 static int VCMap[VCONST_COUNT];
@@ -147,7 +147,7 @@ static AutoTable wspecial;
 
 //item animation override array
 struct ItemAnimType {
-	ieResRef itemname;
+	ResRef itemname;
 	ieByte animation;
 };
 
@@ -2107,7 +2107,7 @@ static void InitActorTables()
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
 		for (int i = 0; i < animcount; i++) {
-			strnlwrcpy(itemanim[i].itemname, tm->QueryField(i,0),8 );
+			itemanim[i].itemname = ResRef::MakeLowerCase(tm->QueryField(i, 0));
 			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
 	}
@@ -5894,7 +5894,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	if (!slot) return; //quick item slot is empty
 	Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef);
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef.CString());
 		return; //quick item slot contains invalid item resref
 	}
 	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
@@ -6270,7 +6270,7 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef);
+		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef.CString());
 		return NULL;
 	}
 	//The magic of the bow and the arrow do not add up
@@ -6297,7 +6297,7 @@ int Actor::IsDualWielding() const
 
 	Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef);
+		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
 	}
 
@@ -6321,7 +6321,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	}
 	Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
-		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef);
+		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
 	}
 
@@ -9333,14 +9333,14 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
-	ieResRef tmpresref;
-	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
-
-	Item *itm = gamedata->GetItem(tmpresref, true);
+	ResRef tmp = ResRef::MakeUpperCase(item->ItemResRef);
+	Item *itm = gamedata->GetItem(tmp, true);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmpresref);
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
 		return false; //quick item slot contains invalid item resref
 	}
+	gamedata->FreeItem(itm, tmp, false);
+
 	//item is depleted for today
 	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
@@ -9348,7 +9348,6 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 
 	Projectile *pro = itm->GetProjectile(this, header, target, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
-	gamedata->FreeItem(itm,tmpresref, false);
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
@@ -9530,14 +9529,14 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	if (!item)
 		return false;
 
-	ieResRef tmpresref;
-	strnuprcpy(tmpresref, item->ItemResRef, sizeof(ieResRef)-1);
-
-	Item *itm = gamedata->GetItem(tmpresref);
+	ResRef tmp = item->ItemResRef;
+	Item *itm = gamedata->GetItem(tmp);
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmpresref);
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
 		return false; //quick item slot contains invalid item resref
 	}
+	gamedata->FreeItem(itm, tmp, false);
+
 	//item is depleted for today
 	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
 		return false;
@@ -9545,7 +9544,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 
 	Projectile *pro = itm->GetProjectile(this, header, target->Pos, slot, flags&UI_MISS);
 	ChargeItem(slot, header, item, itm, flags&UI_SILENT, !(flags&UI_NOCHARGE));
-	gamedata->FreeItem(itm,tmpresref, false);
+
 	ResetCommentTime();
 	if (pro) {
 		pro->SetCaster(GetGlobalID(), ITEM_CASTERLEVEL);
@@ -9589,7 +9588,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		itm = gamedata->GetItem(item->ItemResRef, true);
 	}
 	if (!itm) {
-		Log(WARNING, "Actor", "Invalid quick slot item: %s!", item->ItemResRef);
+		Log(WARNING, "Actor", "Invalid quick slot item: %s!", item->ItemResRef.CString());
 		return; //quick item slot contains invalid item resref
 	}
 
@@ -9600,7 +9599,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 	if (!silent) {
 		ieByte stance = AttackStance;
 		for (int i=0;i<animcount;i++) {
-			if ( strnicmp(item->ItemResRef, itemanim[i].itemname, 8) == 0) {
+			if (item->ItemResRef == itemanim[i].itemname) {
 				stance = itemanim[i].animation;
 			}
 		}
@@ -9780,7 +9779,7 @@ void Actor::SetupFistData() const
 	FistRows = 0;
 	AutoTable fist("fistweap");
 	if (fist) {
-		strnlwrcpy(DefaultFist, fist->QueryDefault(), 8);
+		DefaultFist = ResRef::MakeLowerCase(fist->QueryDefault());
 		FistRows = fist->GetRowCount();
 		fistres = new FistResType[FistRows];
 		fistresclass = new int[FistRows];
@@ -9807,14 +9806,14 @@ void Actor::SetupFist()
 
 	SetupFistData();
 
-	const char *ItemResRef = DefaultFist;
+	ResRef ItemResRef = DefaultFist;
 	for (int i = 0;i<FistRows;i++) {
 		if (fistresclass[i] == row) {
 			ItemResRef = fistres[i][col];
 		}
 	}
 	CREItem *currentFist = inventory.GetSlotItem(slot);
-	if (!currentFist || stricmp(currentFist->ItemResRef, ItemResRef) != 0) {
+	if (!currentFist || currentFist->ItemResRef != ItemResRef) {
 		inventory.SetSlotItemRes(ItemResRef, slot);
 	}
 }
