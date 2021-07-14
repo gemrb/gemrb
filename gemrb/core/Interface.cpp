@@ -4229,7 +4229,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
-	if (item->ItemResRef != GoldResRef) {
+	if (GoldResRef != item->ItemResRef) {
 		return -1;
 	}
 	//gold, returns the gold value (stack size)
