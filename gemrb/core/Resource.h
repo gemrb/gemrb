@@ -59,9 +59,7 @@ public:
 		operator=(str);
 	};
 
-	ResRef(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-	}
+	ResRef(const ResRef& rhs) = default;
 	
 	void Reset() {
 		memset(ref, 0, sizeof(ref));
@@ -89,10 +87,7 @@ public:
 		va_end(args);
 	}
 
-	ResRef& operator=(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-		return *this;
-	}
+	ResRef& operator=(const ResRef& rhs) = default;
 	
 	ResRef& operator=(const char* str) {
 		if (str == NULL) {
