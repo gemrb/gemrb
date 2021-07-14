@@ -61,8 +61,8 @@ public:
 	explicit Holder(T* ptr) noexcept
 	: ptr(ptr)
 	{
-		if (ptr)
-			ptr->acquire();
+		assert(ptr);
+		ptr->acquire();
 	}
 
 	Holder(const Holder& rhs) noexcept
