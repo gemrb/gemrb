@@ -55,10 +55,6 @@ ProjectileServer::~ProjectileServer()
 Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
 {
 	Projectile *pro = new Projectile();
-	//int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
-	//memset(&pro->Type, 0, strlength );
-	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Speed);
-	memset(&pro->Speed, 0, strlength );
 
 	//take care, this projectile is not freed up by the server
 	if(idx==(unsigned int) ~0 ) {
