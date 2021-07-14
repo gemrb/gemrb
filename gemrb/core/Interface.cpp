@@ -1095,7 +1095,6 @@ int Interface::Init(InterfaceConfig* cfg)
 	int touchInput = -1;
 	CONFIG_INT("TouchInput", touchInput =);
 	CONFIG_INT("Width", config.Width =);
-	CONFIG_INT("IgnoreOriginalINI", config.IgnoreOriginalINI =);
 	CONFIG_INT("UseSoftKeyboard", config.UseSoftKeyboard =);
 	CONFIG_INT("NumFingScroll", config.NumFingScroll =);
 	CONFIG_INT("NumFingKboard", config.NumFingKboard =);
@@ -1489,7 +1488,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	if (file_exists(ini_path)) {
 		strlcpy(tmp, INIConfig, sizeof(tmp));
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
-	} else if (!config.IgnoreOriginalINI) {
+	} else {
 		PathJoin(ini_path, config.GamePath, INIConfig, nullptr);
 		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}

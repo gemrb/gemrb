@@ -343,7 +343,6 @@ struct CFGConfigData {
 
 	char GameName[_MAX_PATH]{};
 	char GameType[10]{};
-	int IgnoreOriginalINI = 0; // TODO: deprecate
 	std::string Encoding = "default";
 
 	int GamepadPointerSpeed = 10;

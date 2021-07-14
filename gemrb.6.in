@@ -457,13 +457,6 @@ Set this parameter to
 if you want to keep the cache after exiting GemRB. It is disabled by default.
 
 .TP
-.BR IgnoreOriginalINI =(0|1)
-Set this parameter to
-.IR 1 ,
-if you want to ignore the settings from the original configuration files - baldur.ini
-/ icewind.ini / torment.ini. It is disabled by default.
-
-.TP
 .BR GamepadPointerSpeed =INT
 Pointer movement speed with gamepads. The default is 10.
 
