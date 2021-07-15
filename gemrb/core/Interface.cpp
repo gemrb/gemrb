@@ -1799,9 +1799,15 @@ bool Interface::IsAvailable(SClass_ID filetype) const
 	return PluginMgr::Get()->IsAvailable( filetype );
 }
 
-WorldMap *Interface::GetWorldMap(const char *map)
+WorldMap *Interface::GetWorldMap() const
 {
-	int index = worldmap->FindAndSetCurrentMap(map?map:game->CurrentArea);
+	int index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
+	return worldmap->GetWorldMap(index);
+}
+
+WorldMap *Interface::GetWorldMap(const ResRef& area) const
+{
+	int index = worldmap->FindAndSetCurrentMap(area);
 	return worldmap->GetWorldMap(index);
 }
 

@@ -132,9 +132,9 @@ struct PCStruct {
 	ieWord   PartyOrder;
 	ieDword  OffsetToCRE;
 	ieDword  CRESize;
-	ieResRef CREResRef;
+	ResRef CREResRef;
 	ieDword  Orientation;
-	ieResRef Area;
+	ResRef Area;
 	ieWord   XPos;
 	ieWord   YPos;
 	ieWord   ViewXPos;
@@ -271,7 +271,7 @@ public:
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
-	ieResRef Familiars[9];
+	ResRef Familiars[9];
 	ieDword CombatCounter;
 	ieDword StateOverrideFlag, StateOverrideTime;
 	ieDword BanterBlockFlag, BanterBlockTime;
@@ -297,9 +297,9 @@ public:
 	ieDword Reputation;
 	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
 	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
-	ieResRef AnotherArea;
-	ieResRef CurrentArea;
-	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
+	ResRef AnotherArea;
+	ResRef CurrentArea;
+	ResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ResRef LoadMos;
 	ResRef TextScreen;
 	Particles *weather;
@@ -412,7 +412,7 @@ public:
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
-	char *GetFamiliar(unsigned int Index);
+	ResRef& GetFamiliar(unsigned int Index);
 
 	bool IsBeastKnown(unsigned int Index) const {
 		if (!beasts) {

@@ -339,7 +339,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 		case 0: // STR_LOADMOS
 			return PyString_FromResRef(game->LoadMos);
 		case 1: // STR_AREANAME
-			return PyString_FromString( game->CurrentArea );
+			return PyString_FromResRef(game->CurrentArea);
 		case 2: // STR_TEXTSCREEN
 			return PyString_FromResRef(game->TextScreen);
 		}
@@ -3108,7 +3108,7 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	//the area the user clicked on
 	PyObject* dict = Py_BuildValue("{s:s,s:s}", "Target", wmc->Area->AreaName.CString(), "Destination", wmc->Area->AreaName.CString());
 
-	if (!strnicmp(wmc->Area->AreaName, core->GetGame()->CurrentArea, 8)) {
+	if (wmc->Area->AreaName == core->GetGame()->CurrentArea) {
 		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
 		return dict;
 	}
@@ -8146,7 +8146,7 @@ static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 {
 	GET_GAME();
 
-	return PyString_FromString( game->CurrentArea );
+	return PyString_FromResRef(game->CurrentArea);
 }
 
 PyDoc_STRVAR( GemRB_MoveToArea__doc,

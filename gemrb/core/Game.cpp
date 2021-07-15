@@ -733,7 +733,7 @@ Map *Game::GetMap(const char *areaname, bool change)
 
 	MapIndex = index;
 	area = GetMap(index);
-	memcpy(CurrentArea, areaname, 8);
+	CurrentArea = areaname;
 	// change the tileset if needed
 	area->ChangeMap(IsDay());
 	area->SetupAmbients();
@@ -825,8 +825,7 @@ int Game::DelMap(unsigned int index, int forced)
 	Map *map = Maps[index];
 
 	if (MapIndex == (int) index) { //can't remove current map in any case
-		const char *name = map->GetScriptName();
-		memcpy(AnotherArea, name, sizeof(AnotherArea));
+		AnotherArea = map->GetScriptName();
 		return -1;
 	}
 
@@ -843,7 +842,7 @@ int Game::DelMap(unsigned int index, int forced)
 		//keep at least one master
 		const char *name = map->GetScriptName();
 		if (MasterArea(name) && !AnotherArea[0]) {
-			memcpy(AnotherArea, name, sizeof(AnotherArea));
+			AnotherArea = name;
 			if (!forced) {
 				return -1;
 			}
@@ -1202,7 +1201,7 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 	return planepositions[i];
 }
 
-char *Game::GetFamiliar(unsigned int Index)
+ResRef& Game::GetFamiliar(unsigned int Index)
 {
 	return Familiars[Index];
 }
@@ -2264,7 +2263,7 @@ void Game::dump() const
 	for (auto map : Maps) {
 		print("%s", map->GetScriptName());
 	}
-	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea, PreviousArea);
+	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea.CString(), PreviousArea.CString());
 	if (Scripts[0]) {
 		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
 	}

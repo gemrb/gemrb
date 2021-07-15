@@ -156,7 +156,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			MazeOffset = 0;
 			str->ReadDword(newGame->Reputation);
 			str->ReadResRef( newGame->CurrentArea ); // FIXME: this is the 'master area'
-			memcpy(newGame->AnotherArea, newGame->CurrentArea, sizeof(ieResRef) );
+			newGame->AnotherArea = newGame->CurrentArea;
 			str->ReadDword(newGame->ControlStatus);
 			str->ReadDword(newGame->Expansion);
 			str->ReadDword(FamiliarsOffset);
@@ -201,8 +201,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		const char* resref = tm->QueryField( playmode );
-		strnlwrcpy( newGame->CurrentArea, resref, 8 );
+		newGame->CurrentArea = ResRef::MakeLowerCase(tm->QueryField(playmode));
 	}
 
 	//Loading PCs
@@ -285,7 +284,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		} else {
 			//clear these fields up
 			for (unsigned int i = 0; i < 9; i++) {
-				memset(newGame->GetFamiliar(i), 0, sizeof(ieResRef));
+				newGame->GetFamiliar(i).Reset();
 			}
 		}
 	}

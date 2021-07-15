@@ -2553,11 +2553,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		overContainer = NULL;
 		overDoor = NULL;
 		/*this is loadmap, because we need the index, not the pointer*/
-		char *areaname = game->CurrentArea;
 		if (pc) {
-			areaname = pc->Area;
+			game->GetMap(pc->Area, true);
+		} else {
+			game->GetMap(game->CurrentArea, true);
 		}
-		game->GetMap( areaname, true );
 
 		if (!core->InCutSceneMode()) {
 			// don't interfere with any scripted moves of the viewport

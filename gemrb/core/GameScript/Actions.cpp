@@ -6123,7 +6123,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
 {
-	const WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
+	const WorldMap *wmap = core->GetWorldMap(ResRef(parameters->string0Parameter));
 	if (!wmap) {
 		//no such starting area
 		return;

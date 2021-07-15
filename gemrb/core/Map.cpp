@@ -512,7 +512,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 
 		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area, index);
 		if (entry) {
-			memcpy (game->PreviousArea, entry->AreaName, 8);
+			game->PreviousArea = entry->AreaName;
 		}
 
 		//perform autosave

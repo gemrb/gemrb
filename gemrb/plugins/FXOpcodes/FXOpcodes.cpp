@@ -5177,7 +5177,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//remove actor from current map, and set destination map
 	if (fx->FirstApply) {
 		//if current area is different from target area
-		if (strnicmp(game->CurrentArea, fx->Resource, 8) != 0) {
+		if (game->CurrentArea != fx->Resource) {
 			//make global
 			game->AddNPC( target );
 			//remove from current area
@@ -5191,7 +5191,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	if (!strnicmp(game->CurrentArea, fx->Resource, 8) ) {
+	if (game->CurrentArea == fx->Resource) {
 		//UnMakeGlobal only if it was not in the party
 		int slot = core->GetGame()->InStore( target );
 		if (slot >= 0) {
@@ -5381,7 +5381,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		Game *game = core->GetGame();
 
-		ieResRef familiar;
+		char familiar[9];
 		memcpy(familiar, game->Familiars[alignment], sizeof(ieResRef));
 		//ToB familiars
 		if (game->Expansion==5) {
