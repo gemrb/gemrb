@@ -7413,7 +7413,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	ret = store->AcceptableItemType( item->ItemType, Flags, type == 0 || type == 2 );
 
 	//don't allow putting a bag into itself
-	if (!strnicmp(ItemResRef, store->Name, sizeof(ieResRef)) ) {
+	if (ItemResRef == store->Name) {
 		ret &= ~IE_STORE_SELL;
 	}
 	//this is a hack to report on selected items

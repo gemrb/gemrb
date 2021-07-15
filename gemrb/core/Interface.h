@@ -654,7 +654,7 @@ public:
 	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
 	Store *GetCurrentStore();
 	void CloseCurrentStore();
-	Store *SetCurrentStore(const ieResRef resname, ieDword owner);
+	Store *SetCurrentStore(const char* resName, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed() const;
 

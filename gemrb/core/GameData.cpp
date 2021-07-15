@@ -520,7 +520,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return NULL;
 	}
 	
-	strnlwrcpy(store->Name, resRef, 8);
+	store->Name = ResRef::MakeLowerCase(resRef);
 	// The key needs to last as long as the store,
 	// so use the one we just copied.
 	stores[store->Name] = store;

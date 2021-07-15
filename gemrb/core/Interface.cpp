@@ -4057,10 +4057,10 @@ void Interface::CloseCurrentStore()
 	CurrentStore = NULL;
 }
 
-Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
+Store *Interface::SetCurrentStore(const char* resName, ieDword owner)
 {
 	if (CurrentStore) {
-		if (!strnicmp(CurrentStore->Name, resname, 8)) {
+		if (CurrentStore->Name == resName) {
 			return CurrentStore;
 		}
 
@@ -4068,7 +4068,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 		CloseCurrentStore();
 	}
 
-	CurrentStore = gamedata->GetStore(resname);
+	CurrentStore = gamedata->GetStore(resName);
 	if (CurrentStore == NULL) {
 		return NULL;
 	}

@@ -95,7 +95,7 @@ struct GEM_EXPORT STOItem {
  */
 
 struct STODrink {
-	ieResRef RumourResRef;
+	ResRef RumourResRef;
 	ieStrRef DrinkName;
 	ieDword Price;
 	ieDword Strength;
@@ -108,7 +108,7 @@ struct STODrink {
  */
 
 struct STOCure {
-	ieResRef CureResRef;
+	ResRef CureResRef;
 	ieDword Price;
 };
 
@@ -127,7 +127,7 @@ public:
 	std::vector<STOCure*> cures;
 	std::vector<ieDword> purchased_categories;
 
-	ieResRef Name;
+	ResRef Name;
 	ieDword Type;
 	ieStrRef StoreName;
 	ieDword Flags;
@@ -144,10 +144,10 @@ public:
 	ieDword ItemsCount;
 	ieDword Lore;
 	ieDword IDPrice;
-	ieResRef RumoursTavern;
+	ResRef RumoursTavern;
 	ieDword DrinksOffset;
 	ieDword DrinksCount;
-	ieResRef RumoursTemple;
+	ResRef RumoursTemple;
 	ieDword AvailableRooms;
 	ieDword RoomPrices[4];
 	ieDword CuresOffset;
@@ -177,7 +177,7 @@ public: //queries
 	void AddItem(CREItem* item);
 	void RemoveItem(const STOItem *itm);
 	/** Returns index of item */
-	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
+	unsigned int FindItem(const char* item, bool usetrigger) const;
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);

@@ -6096,7 +6096,7 @@ item_is_gold: //we take gold!
 void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 {
 	bool has_current = false;
-	ieResRef current;
+	ResRef current;
 	ieDword owner;
 
 	Store *store = core->GetCurrentStore();
@@ -6106,7 +6106,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 		if (strnicmp(store->Name, parameters->string0Parameter, 8) != 0) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			strnlwrcpy(current, store->Name, sizeof(ieResRef)-1);
+			current = ResRef::MakeLowerCase(store->Name);
 			owner = store->GetOwnerID();
 		}
 	}
