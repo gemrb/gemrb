@@ -119,7 +119,7 @@ struct STOCure {
 
 class GEM_EXPORT Store {
 public:
-	Store();
+	Store() = default;
 	~Store();
 
 	std::vector<STOItem*> items;
@@ -128,39 +128,39 @@ public:
 	std::vector<ieDword> purchased_categories;
 
 	ResRef Name;
-	ieDword Type;
-	ieStrRef StoreName;
-	ieDword Flags;
-	ieDword SellMarkup;
-	ieDword BuyMarkup;
-	ieDword DepreciationRate;
-	ieWord StealFailureChance;
-	ieWord Capacity;
+	ieDword Type = 0;
+	ieStrRef StoreName = 0;
+	ieDword Flags = 0;
+	ieDword SellMarkup = 0;
+	ieDword BuyMarkup = 0;
+	ieDword DepreciationRate = 0;
+	ieWord StealFailureChance = 0;
+	ieWord Capacity = 0;
 	char unknown[8];
-	ieDword PurchasedCategoriesOffset;
-	ieDword PurchasedCategoriesCount;
-	ieDword ItemsOffset;
+	ieDword PurchasedCategoriesOffset = 0;
+	ieDword PurchasedCategoriesCount = 0;
+	ieDword ItemsOffset = 0;
 	//don't use this value directly, use GetRealStockSize
-	ieDword ItemsCount;
-	ieDword Lore;
-	ieDword IDPrice;
+	ieDword ItemsCount = 0;
+	ieDword Lore = 0;
+	ieDword IDPrice = 0;
 	ResRef RumoursTavern;
-	ieDword DrinksOffset;
-	ieDword DrinksCount;
+	ieDword DrinksOffset = 0;
+	ieDword DrinksCount = 0;
 	ResRef RumoursTemple;
-	ieDword AvailableRooms;
+	ieDword AvailableRooms = 0;
 	ieDword RoomPrices[4];
-	ieDword CuresOffset;
-	ieDword CuresCount;
-	bool HasTriggers;
+	ieDword CuresOffset = 0;
+	ieDword CuresCount = 0;
+	bool HasTriggers = false;
 	char unknown2[36];
 
 	// IWD2 only
 	char unknown3[80];
 
-	int version;
+	int version = 0;
 	// the scripting name of the owner
-	ieDword StoreOwnerID;
+	ieDword StoreOwnerID = 0;
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;

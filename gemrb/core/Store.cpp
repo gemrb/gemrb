@@ -54,18 +54,6 @@ STOItem::~STOItem(void)
 	if (triggers) triggers->Release();
 }
 
-Store::Store(void)
-{
-	HasTriggers = false;
-	version = 0;
-	StoreOwnerID = 0;
-	StoreName = 0;
-	Type = Flags = Lore = IDPrice = AvailableRooms = Capacity = 0;
-	SellMarkup = BuyMarkup = DepreciationRate = StealFailureChance = 0;
-	PurchasedCategoriesOffset = DrinksOffset = CuresOffset = ItemsOffset = 0;
-	PurchasedCategoriesCount = DrinksCount = CuresCount = ItemsCount = 0;
-}
-
 Store::~Store(void)
 {
 	for (auto item : items) {
