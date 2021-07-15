@@ -166,9 +166,9 @@ public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
-	STOItem *GetItem(unsigned int idx, bool usetrigger);
+	STOItem *GetItem(unsigned int idx, bool usetrigger) const;
 	/** Evaluates item availability triggers */
-	int GetRealStockSize();
+	int GetRealStockSize() const;
 	/** Recharges item */
 	void RechargeItem(CREItem *item) const;
 	/** Identifies item according to store lore */
@@ -184,7 +184,7 @@ public: //queries
 	bool IsBag() const;
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
-	STOItem *FindItem(const CREItem *item, bool exact);
+	STOItem *FindItem(const CREItem *item, bool exact) const;
 	bool IsItemAvailable(unsigned int slot) const;
 };
 

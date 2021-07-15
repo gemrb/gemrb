@@ -94,7 +94,7 @@ bool Store::IsItemAvailable(unsigned int slot) const
 	return true;
 }
 
-int Store::GetRealStockSize()
+int Store::GetRealStockSize() const
 {
 	int count=ItemsCount;
 	if (!HasTriggers) {
@@ -184,7 +184,7 @@ STODrink *Store::GetDrink(unsigned int idx) const
 }
 
 //We need this weirdness for PST item lookup
-STOItem *Store::GetItem(unsigned int idx, bool usetrigger)
+STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 {
 	if (!HasTriggers || !usetrigger) {
 		if (idx >= items.size()) {
@@ -220,7 +220,7 @@ unsigned int Store::FindItem(const char* itemname, bool usetrigger) const
 	return (unsigned int) -1;
 }
 
-STOItem *Store::FindItem(const CREItem *item, bool exact)
+STOItem *Store::FindItem(const CREItem *item, bool exact) const
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (!IsItemAvailable(i) ) {

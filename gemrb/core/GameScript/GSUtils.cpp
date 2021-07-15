@@ -248,9 +248,7 @@ bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 
 bool StoreHasItemCore(const char* storename, const char* itemname)
 {
-	CREItem item;
-
-	Store* store = gamedata->GetStore(storename);
+	const Store* store = gamedata->GetStore(storename);
 	if (!store) {
 		Log(ERROR, "GameScript", "Store cannot be opened!");
 		return false;
