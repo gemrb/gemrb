@@ -78,8 +78,6 @@ GUIScript *GemRB::gs = NULL;
 // a shorthand for declaring methods in method table
 #define METHOD(name, args) {#name, GemRB_ ## name, args, GemRB_ ## name ## __doc}
 
-static int UsedItemsCount = -1;
-
 //Check removal/equip/swap of item based on item name and actor's scriptname
 #define CRI_REMOVE 0
 #define CRI_EQUIP  1
@@ -9310,10 +9308,10 @@ static void DragItem(CREItem *si)
 static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 {
 	///check if item is undroppable because the actor likes it
-	if (UsedItemsCount==-1) {
+	if (UsedItems.empty()) {
 		ReadUsedItems();
 	}
-	unsigned int i=UsedItemsCount;
+	unsigned int i = UsedItems.size();
 
 	while(i--) {
 		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != si->ItemResRef) {
@@ -9360,10 +9358,10 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 // TNO has an ear and an eye slot that share the same slot type, so normal checks fail
 // return false if we're trying to stick an earing into our eye socket or vice versa
 static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
-	if (UsedItemsCount==-1) {
+	if (UsedItems.empty()) {
 		ReadUsedItems();
 	}
-	unsigned int i=UsedItemsCount;
+	unsigned int i = UsedItems.size();
 
 	while(i--) {
 		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != NewItem->ItemResRef) {
