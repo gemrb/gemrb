@@ -7375,7 +7375,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	Store *store = core->GetCurrentStore();
+	const Store *store = core->GetCurrentStore();
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -7466,7 +7466,7 @@ static PyObject* GemRB_FindStoreItem(PyObject * /*self*/, PyObject* args)
 	char *resref;
 	PARSE_ARGS( args,  "s", &resref);
 
-	Store *store = core->GetCurrentStore();
+	const Store *store = core->GetCurrentStore();
 	if (!store) {
 		return RuntimeError("No current store!");
 	}
@@ -7519,7 +7519,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetPurchasedAmount__doc );
 	}
 	amount = (ieDword) tmp;
-	Store *store;
+	const Store *store;
 	if (type) {
 		store = rhstore;
 	} else {
@@ -7808,7 +7808,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i|i", &index, &rh )) {
 		return AttributeError( GemRB_GetStoreItem__doc );
 	}
-	Store *store;
+	const Store *store;
 	if (rh) {
 		store = rhstore;
 	} else {

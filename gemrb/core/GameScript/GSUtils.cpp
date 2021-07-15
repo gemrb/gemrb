@@ -295,7 +295,7 @@ static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieRe
 void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 {
 	Point mp = me.Pos();
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	if (!map) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -356,7 +356,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
 	while(i--) {
-		CREItem *item = actor->inventory.GetSlotItem(i);
+		const CREItem *item = actor->inventory.GetSlotItem(i);
 		if (!item) {
 			continue;
 		}
@@ -379,10 +379,10 @@ bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword fl
 	int i=inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem *itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = false;
@@ -404,10 +404,10 @@ static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieR
 	int i=inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
-		CREItem *itemslot = inventory->GetSlotItem(i);
+		const CREItem *itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		Item *item = gamedata->GetItem(itemslot->ItemResRef);
+		const Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = core->CanUseItemType(SLOT_BAG,item,NULL);
@@ -1096,7 +1096,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			return;
 		}
 		//making sure speaker is the protagonist, player, actor
-		Actor *protagonist = core->GetGame()->GetPC(0, false);
+		const Actor *protagonist = core->GetGame()->GetPC(0, false);
 		if (target == protagonist) swap = true;
 		else if (speaker != protagonist && target->InParty) swap = true;
 		//CHECKDIST works only for mobile scriptables
@@ -1182,7 +1182,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			Game *game = core->GetGame();
+			const Game *game = core->GetGame();
 			if (game->BanterBlockFlag || game->BanterBlockTime) {
 				Log(MESSAGE, "GameScript", "Banterblock disabled interaction.");
 				Sender->ReleaseCurrentAction();
@@ -2284,11 +2284,9 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	} else if (game->locals->Lookup(VarName, value)) {
 		return true;
 	} else {
-		Map *map = game->GetMap(game->FindMap(newVarName));
-		if (map) {
-			if (map->locals->Lookup(VarName, value)) {
-				return true;
-			}
+		const Map *map = game->GetMap(game->FindMap(newVarName));
+		if (map && map->locals->Lookup(VarName, value)) {
+			return true;
 		}
 	}
 	return false;
@@ -2486,14 +2484,12 @@ unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
  the used header is explictly given */
 unsigned int GetItemDistance(const ResRef& itemres, int header)
 {
-	unsigned int dist;
-
-	Item* itm = gamedata->GetItem( itemres );
+	const Item* itm = gamedata->GetItem(itemres);
 	if (!itm) {
 		Log(ERROR, "GameScript", "Item couldn't be found:%.8s.", itemres.CString());
 		return 0;
 	}
-	dist=itm->GetCastingDistance(header);
+	unsigned int dist = itm->GetCastingDistance(header);
 	gamedata->FreeItem(itm, itemres, false);
 
 	//make possible special return values (like 0xffffffff means the item doesn't need distance)
@@ -2660,7 +2656,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
 					Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 					if (!spl) return false;
-					SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+					const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
 					bool invalidTarget = seh && seh->Target != TARGET_DEAD;
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					if (invalidTarget) {
