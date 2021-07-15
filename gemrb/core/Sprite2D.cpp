@@ -27,23 +27,27 @@ const TypeID Sprite2D::ID = { "Sprite2D" };
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir)
 {
-	return Iterator(pixels, pitch, format, xdir, ydir, Region(Point(), Frame.size));
+	return GetIterator(xdir, ydir, Region(Point(), Frame.size));
 }
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
 										 const Region& clip)
 {
+	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
+	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
 	return Iterator(pixels, pitch, format, xdir, ydir, clip);
 }
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir) const
 {
-	return Iterator(pixels, pitch, format, xdir, ydir, Region(Point(), Frame.size));
+	return GetIterator(xdir, ydir, Region(Point(), Frame.size));
 }
 
 Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
 										 const Region& clip) const
 {
+	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
+	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
 	return Iterator(pixels, pitch, format, xdir, ydir, clip);
 }
 
@@ -78,9 +82,7 @@ Sprite2D::~Sprite2D() noexcept
 Color Sprite2D::GetPixel(const Point& p) const noexcept
 {
 	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
-		IPixelIterator::Direction xdir = (renderFlags & BlitFlags::MIRRORX) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		IPixelIterator::Direction ydir = (renderFlags & BlitFlags::MIRRORY) ? IPixelIterator::Reverse : IPixelIterator::Forward;
-		Iterator it = GetIterator(xdir, ydir);
+		Iterator it = GetIterator();
 		it.Advance(p.y * Frame.w + p.x);
 		return it.ReadRGBA();
 	}
