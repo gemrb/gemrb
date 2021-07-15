@@ -1519,7 +1519,7 @@ void Projectile::DrawExplosion(const Region& vp)
 	
 	//the spreading animation is in the first column
 	const char *tmp = Extension->Spread;
-	if(tmp[0]) {
+	if (tmp) {
 		//i'm unsure about the need of this
 		//returns if the explosion animation is fake coloured
 		if (!children) {
