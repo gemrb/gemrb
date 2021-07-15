@@ -146,44 +146,44 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 	count++;
 }
 
-static bool IsInnate(const ResRef& name)
+static int IsInnate(const ResRef& name)
 {
-	size_t innateCount = innlist.size();
-	for (size_t i = 0; i < innateCount; i++) {
+	int innateCount = innlist.size();
+	for (int i = 0; i < innateCount; i++) {
 		if (name == innlist[i]) {
-			return true;
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
-static bool IsSong(const ResRef& name)
+static int IsSong(const ResRef& name)
 {
-	size_t sngCount = snglist.size();
-	for (size_t i = 0; i < sngCount; i++) {
+	int sngCount = snglist.size();
+	for (int i = 0; i < sngCount; i++) {
 		if (name == snglist[i]) {
-			return true;
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
-static bool IsShape(const ResRef& name)
+static int IsShape(const ResRef& name)
 {
-	size_t shpCount = shplist.size();
-	for (size_t i = 0; i < shpCount; i++) {
+	int shpCount = shplist.size();
+	for (int i = 0; i < shpCount; i++) {
 		if (name == shplist[i]) {
-			return true;
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
 static std::vector<SpellEntry*> splList;
 static std::vector<SpellEntry*> domList;
 static std::vector<SpellEntry*> magList;
 
-static bool IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
+static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
 	size_t splCount = splList.size();
 	for (size_t i = 0; i < splCount; i++) {
@@ -191,10 +191,10 @@ static bool IsDomain(const ResRef& name, unsigned short &level, unsigned int kit
 			int lev = domList[i]->FindSpell(kit);
 			if (lev == -1) return -1;
 			level = lev;
-			return true;
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
 /*static int IsSpecial(ResRef name, unsigned short &level, unsigned int kit)
@@ -211,9 +211,9 @@ static bool IsDomain(const ResRef& name, unsigned short &level, unsigned int kit
 int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const
 {
 	level = 0;
-	if (IsSong(name)) return IE_IWD2_SPELL_SONG;
-	if (IsShape(name)) return IE_IWD2_SPELL_SHAPE;
-	if (IsInnate(name)) return IE_IWD2_SPELL_INNATE;
+	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
+	if (IsShape(name)>=0) return IE_IWD2_SPELL_SHAPE;
+	if (IsInnate(name)>=0) return IE_IWD2_SPELL_INNATE;
 // there is no gui page for specialists spells, so let's skip them here
 // otherwise their overlap causes bards and sorcerers to have their spells
 // on the wizard page
@@ -224,7 +224,7 @@ int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsign
 	// first translate the actual kit to a column index to make them comparable
 	// luckily they are in order
 	int kit2 = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
-	if (IsDomain(name, level, kit2)) return IE_IWD2_SPELL_DOMAIN;
+	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
 	size_t splCount = splList.size();
