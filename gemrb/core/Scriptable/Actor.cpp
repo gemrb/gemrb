@@ -258,7 +258,7 @@ static void InitActorTables();
 #define TURN_DEATH_LVL_MOD 7
 #define REPUTATION_FALL 60
 
-static ieResRef d_main[DAMAGE_LEVELS] = {
+static ResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
@@ -267,7 +267,7 @@ static ieResRef d_main[DAMAGE_LEVELS] = {
 	"SHACID","SHACID","SHACID",           //acid
 	"SPDUSTY2","SPDUSTY2","SPDUSTY2"      //disintegrate
 };
-static ieResRef d_splash[DAMAGE_LEVELS] = {
+static ResRef d_splash[DAMAGE_LEVELS] = {
 	"","","","",
 	"SPBURN","SPBURN","SPBURN", //flames
 	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
@@ -367,9 +367,9 @@ static EffectRef fx_missile_damage_reduction_ref = { "MissileDamageReduction", -
 static EffectRef fx_smite_evil_ref = { "SmiteEvil", -1 };
 
 //used by iwd2
-static const ieResRef resref_cripstr = { "cripstr" };
-static const ieResRef resref_dirty = { "dirty" };
-static const ieResRef resref_arterial = { "artstr" };
+static const ResRef CripplingStrikeRef = { "cripstr" };
+static const ResRef DirtyFightingRef = { "dirty" };
+static const ResRef ArterialStrikeRef = { "artstr" };
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
@@ -512,7 +512,6 @@ Actor::Actor()
 	Modal.LastApplyTime = 0;
 	Modal.LingeringCount = 0;
 	Modal.FirstApply = true;
-	BackstabResRef[0] = '*';
 	//this one is not saved
 	GotLUFeedback = false;
 	RollSaves();
@@ -1821,7 +1820,7 @@ static void ReadModalStates()
 
 	ModalStatesStruct ms;
 	for (unsigned short i = 0; i < table->GetRowCount(); i++) {
-		CopyResRef(ms.spell, table->QueryField(i, 0));
+		ms.spell = table->QueryField(i, 0);
 		strlcpy(ms.action, table->QueryField(i, 1), 16);
 		ms.entering_str = atoi(table->QueryField(i, 2));
 		ms.leaving_str = atoi(table->QueryField(i, 3));
@@ -2004,14 +2003,14 @@ static void InitActorTables()
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
-			strnlwrcpy(d_main[i], tmp, 8);
-			if (d_main[i][0]=='*') {
-				d_main[i][0]=0;
+			d_main[i] = ResRef::MakeLowerCase(tmp);
+			if (d_main[i].IsStar()) {
+				d_main[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_SPARKS );
-			strnlwrcpy(d_splash[i], tmp, 8);
-			if (d_splash[i][0]=='*') {
-				d_splash[i][0]=0;
+			d_splash[i] = ResRef::MakeLowerCase(tmp);
+			if (d_splash[i].IsStar()) {
+				d_splash[i].Reset();;
 			}
 			tmp = tm->QueryField( i, COL_GRADIENT );
 			d_gradient[i]=atoi(tmp);
@@ -2713,7 +2712,7 @@ void Actor::UnlockPalette()
 	anims->SetColors(Modified+IE_COLORS);
 }
 
-void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int flags)
+void Actor::AddAnimation(const ResRef& resource, int gradient, int height, int flags)
 {
 	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(resource, false);
 	if (!sca)
@@ -2821,7 +2820,7 @@ void Actor::PlayCritDamageAnimation(int type)
 	int row = tm->FindTableValue (1, type);
 	if (row>=0) {
 		//the animations are listed in column 0
-		AddAnimation(tm->QueryField(row, 0), -1, 45, AA_PLAYONCE|AA_BLEND);
+		AddAnimation(ResRef(tm->QueryField(row, 0)), -1, 45, AA_PLAYONCE|AA_BLEND);
 	}
 }
 
@@ -3101,7 +3100,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		anims->CheckColorMod();
 	}
 	spellbook.ClearBonus();
-	memset(BardSong,0,sizeof(ieResRef));
+	BardSong.Reset();
 	memset(projectileImmunity,0,ProjectileSize*sizeof(ieDword));
 
 	//initialize base stats
@@ -5855,7 +5854,7 @@ ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const
 }
 
 /* this will create a heap at location, and transfer the item(s) */
-void Actor::DropItem(const ieResRef resref, unsigned int flags)
+void Actor::DropItem(const ResRef& resref, unsigned int flags)
 {
 	if (inventory.DropItemAtLocation( resref, flags, area, Pos )) {
 		ReinitQuickSlots();
@@ -6569,11 +6568,9 @@ void Actor::SetModalSpell(ieDword state, const char *spell)
 		if (state >= ModalStates.size()) {
 			Modal.Spell[0] = 0;
 		} else {
-			if (state==MS_BATTLESONG) {
-				if (BardSong[0]) {
-					strnlwrcpy(Modal.Spell, BardSong, 8);
-					return;
-				}
+			if (state == MS_BATTLESONG && !BardSong.IsEmpty()) {
+				strnlwrcpy(Modal.Spell, BardSong, 8);
+				return;
 			}
 			strnlwrcpy(Modal.Spell, ModalStates[state].spell, 8);
 		}
@@ -9405,7 +9402,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 
 			//apply the dirty fighting spell
 			if (HasFeat(FEAT_DIRTY_FIGHTING) ) {
-				core->ApplySpell(resref_dirty, target, this, multiplier);
+				core->ApplySpell(DirtyFightingRef.CString(), target, this, multiplier);
 			}
 		}
 	}
@@ -9437,8 +9434,8 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 				// first check for feats that change the sneak dice
 				// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
 				// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
-				if (BackstabResRef[0]!='*') {
-					if (stricmp(BackstabResRef, resref_arterial) != 0) {
+				if (!BackstabResRef.IsStar()) {
+					if (BackstabResRef != ArterialStrikeRef) {
 						// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 						multiplier -= 2;
 						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
@@ -9449,11 +9446,11 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
 						displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
 					}
-					core->ApplySpell(BackstabResRef, target, this, multiplier);
+					core->ApplySpell(BackstabResRef.CString(), target, this, multiplier);
 					//do we need this?
-					BackstabResRef[0]='*';
+					BackstabResRef.Reset();
 					if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-						core->ApplySpell(resref_cripstr, target, this, multiplier);
+						core->ApplySpell(CripplingStrikeRef.CString(), target, this, multiplier);
 					}
 				}
 				if (!sneakAttackDamage) {
@@ -10491,7 +10488,7 @@ void Actor::UseExit(ieDword exitID) {
 		InternalFlags|=IF_USEEXIT;
 	} else {
 		InternalFlags&=~IF_USEEXIT;
-		memcpy(LastArea, Area, 8);
+		LastArea = Area;
 		memset(UsedExit, 0, sizeof(ieVariable));
 		if (LastExit) {
 			const char *ipName = NULL;

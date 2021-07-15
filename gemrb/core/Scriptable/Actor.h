@@ -271,7 +271,7 @@ struct BABTable {
 };
 
 struct ModalStatesStruct {
-	ieResRef spell;
+	ResRef spell;
 	char action[16];
 	unsigned int entering_str;
 	unsigned int leaving_str;
@@ -304,8 +304,8 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef BardSong;               //custom bard song (updated by fx)
-	ieResRef BackstabResRef;         //apply on successful backstab
+	ResRef BardSong;               //custom bard song (updated by fx)
+	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;
@@ -341,7 +341,7 @@ public:
 
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
-	ieResRef LastArea;
+	ResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
@@ -636,7 +636,7 @@ public:
 	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
 	void PlaySwingSound(WeaponInfo &wi) const;
 	/* drops items from inventory to current spot */
-	void DropItem(const ieResRef resref, unsigned int flags);
+	void DropItem(const ResRef& resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
 	/* returns item information in quickitem slot */
 	void GetItemSlotInfo(ItemExtHeader *item, int which, int header) const;
@@ -788,7 +788,7 @@ public:
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
-	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);
+	void AddAnimation(const ResRef& resource, int gradient, int height, int flags);
 	/* plays damage animation, if hit is not set, then plays only the splash part */
 	void PlayDamageAnimation(int x, bool hit=true);
 	void PlayCritDamageAnimation(int x);

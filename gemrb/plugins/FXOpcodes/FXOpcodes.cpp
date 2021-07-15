@@ -6684,7 +6684,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			target->fxqueue.RemoveAllEffectsWithParam(fx_change_bardsong_ref, i);
 		}
 	}
-	memcpy(target->BardSong, fx->Resource, 8);
+	target->BardSong = fx->Resource;
 	return FX_APPLIED;
 }
 

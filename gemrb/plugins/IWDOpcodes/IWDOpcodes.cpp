@@ -3798,8 +3798,8 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_ARTERIAL, target);
 		}
-		if (target->BackstabResRef[0]=='*') {
-			memcpy(target->BackstabResRef, fx->Resource, sizeof(ieResRef));
+		if (target->BackstabResRef.IsStar()) {
+			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;
 	}
@@ -3831,8 +3831,8 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_HAMSTRING, target);
 		}
-		if (target->BackstabResRef[0]=='*') {
-			memcpy(target->BackstabResRef, fx->Resource, sizeof(ieResRef));
+		if (target->BackstabResRef.IsStar()) {
+			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;
 	}

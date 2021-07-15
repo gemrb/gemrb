@@ -4232,7 +4232,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	if (!actor->LastArea[0]) {
+	if (actor->LastArea.IsEmpty()) {
 		return 0;
 	}
 
@@ -4244,7 +4244,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 	int count = tm->GetRowCount();
 	for (int i=0;i<count;i++) {
 		const char *area = tm->QueryField( i, 0 );
-		if (strnicmp(actor->LastArea, area, 8) != 0) {
+		if (actor->LastArea != area) {
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );

@@ -906,7 +906,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'l': //play an animation (vvc/bam) over an actor
 				//the original engine was able to swap through all animations
 				if (lastActor) {
-					lastActor->AddAnimation("S056ICBL", 0, 0, 0);
+					lastActor->AddAnimation(ResRef("S056ICBL"), 0, 0, 0);
 				}
 				break;
 			case 'M':
