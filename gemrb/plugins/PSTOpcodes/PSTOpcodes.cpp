@@ -555,7 +555,6 @@ static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int pa
 				if (fx->Parameter3!=0xffffffff) {
 					fx->Parameter3--;
 				}
-				delete newfx;
 			}
 		}
 	}
@@ -633,7 +632,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
 				newfx->Power = 10;
 				core->ApplyEffect(newfx, target, Owner);
-				delete newfx;
 
 				for (int i = 0; i < 2; i++) {
 					target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
@@ -658,7 +656,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			//wtf is this
 			newfx->IsVariable = 0x23;
 			core->ApplyEffect(newfx, target, Owner);
-			delete newfx;
 
 			target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);
 			target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 50, 1);
@@ -902,7 +899,6 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 		//the effect is copied to a new memory area
 		core->ApplyEffect(newfx, tar, Owner);
 	}
-	delete newfx;
 	return FX_APPLIED;
 }
 

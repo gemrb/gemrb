@@ -12260,9 +12260,6 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	//fx is not freed by this function
 	core->ApplyEffect(fx, actor, actor);
 
-	//lets kill it
-	delete fx;
-
 	Py_RETURN_NONE;
 }
 

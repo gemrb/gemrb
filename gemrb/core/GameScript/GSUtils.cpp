@@ -1293,7 +1293,6 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	fx->SetPosition(position);
 	fx->Resource = ResRef::MakeUpperCase(area);
 	core->ApplyEffect(fx, actor, actor);
-	delete fx;
 	return true;
 }
 

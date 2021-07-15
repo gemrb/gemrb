@@ -983,7 +983,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					if (fx) {
 						core->ApplyEffect(fx, lastActor, lastActor);
 					}
-					delete fx;
 				}
 				break;
 			case 's': //switches through the stance animations
@@ -1019,7 +1018,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 						core->ApplyEffect(newfx, victim, victim);
 					}
 				}
-				delete newfx;
 				}
 				// fallthrough
 			case 'y': //kills actor
@@ -1031,14 +1029,11 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					Effect *newfx;
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 					core->ApplyEffect(newfx, lastActor, lastActor);
-					delete newfx;
 					if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
-						delete newfx;
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
-						delete newfx;
 					}
 				} else if (overContainer) {
 					overContainer->SetContainerLocked(false);

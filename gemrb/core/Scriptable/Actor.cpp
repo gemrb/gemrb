@@ -4533,7 +4533,6 @@ void Actor::CheckCleave()
 		if (fx) {
 			fx->Duration = core->Time.round_sec;
 			core->ApplyEffect(fx, this, this);
-			delete fx;
 			// ~Cleave feat adds another level %d attack.~
 			// uses the max tohit bonus (tested), but game always displayed "level 1"
 			displaymsg->DisplayRollStringName(39846, DMC_LIGHTGREY, this, ToHit.GetTotal());
@@ -4648,7 +4647,6 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 				Effect *fx = EffectQueue::CreateEffect(fx_sleep_ref, 0, 0, FX_DURATION_INSTANT_LIMITED);
 				fx->Duration = core->Time.round_sec; // 1 round
 				core->ApplyEffect(fx, this, this);
-				delete fx;
 			}
 			//reduce damage to keep 1 hp
 			damage = Modified[IE_HITPOINTS] - 1;
@@ -5409,7 +5407,6 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 				fx->Duration = core->Time.round_sec;
 				fx->Target = FX_TARGET_PRESET;
 				core->ApplyEffect(fx, this, cleric);
-				delete fx;
 				return;
 			}
 			//fallthrough for bg1
@@ -5538,19 +5535,18 @@ void Actor::Die(Scriptable *killer, bool grantXP)
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_cure_poisoned_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
+
 	newfx = EffectQueue::CreateEffect(fx_cure_hold_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
+
 	newfx = EffectQueue::CreateEffect(fx_unpause_caster_ref, 0, 100, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
+
 	newfx = EffectQueue::CreateEffect(fx_cure_stun_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
+
 	newfx = EffectQueue::CreateEffect(fx_remove_portrait_icon_ref, 0, 37, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
 
 	// clearing the search map here means it's not blocked during death animations
 	// this is perhaps not ideal, but matches other searchmap code which uses
@@ -10594,8 +10590,6 @@ void Actor::CureInvisibility()
 		newfx = EffectQueue::CreateEffect(fx_remove_invisible_state_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, this, this);
 
-		delete newfx;
-
 		//not sure, but better than nothing
 		if (! (Modified[IE_STATE_ID]&state_invisible)) {
 			AddTrigger(TriggerEntry(trigger_becamevisible));
@@ -10612,7 +10606,6 @@ void Actor::CureSanctuary()
 	Effect *newfx;
 	newfx = EffectQueue::CreateEffect(fx_remove_sanctuary_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, this, this);
-	delete newfx;
 }
 
 void Actor::ResetState()
@@ -10695,7 +10688,6 @@ inline void HideFailed(Actor* actor, int reason = -1, int skill = 0, int roll = 
 	newfx = EffectQueue::CreateEffect(fx_disable_button_ref, 0, ACT_STEALTH, FX_DURATION_INSTANT_LIMITED);
 	newfx->Duration = core->Time.round_sec; // 90 ticks, 1 round
 	core->ApplyEffect(newfx, actor, actor);
-	delete newfx;
 
 	if (!third) {
 		return;
@@ -11265,7 +11257,6 @@ void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner,
 	Effect *newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
 	if (newfx) {
 		core->ApplyEffect(newfx, this, Owner);
-		delete newfx;
 	} else {
 		Log(ERROR, "Actor", "Failed to create effect copy for %s! Target: %s, Owner: %s", newref.Name, GetName(1), Owner->GetName(1));
 	}
