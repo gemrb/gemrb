@@ -9798,6 +9798,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	int Charge0=1,Charge1=0,Charge2=0;
 	const char *ItemResRef;
 	PARSE_ARGS( args,  "is|iiii", &globalID, &ItemResRef, &SlotID, &Charge0, &Charge1, &Charge2);
+	ResRef itemRef = ItemResRef;
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
@@ -9823,7 +9824,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		// Note: this forcefully gets rid of any item currently
 		// in the slot without properly unequipping it
-		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
+		actor->inventory.SetSlotItemRes(itemRef, SlotID, Charge0, Charge1, Charge2);
 		actor->inventory.EquipItem(SlotID);
 		//EquipItem already called RefreshEffects
 		actor->ReinitQuickSlots();

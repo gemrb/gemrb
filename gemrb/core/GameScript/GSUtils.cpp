@@ -363,7 +363,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) != 0) {
 			continue;
 		}
-		actor->inventory.SetSlotItemRes(parameters->string1Parameter,i,parameters->int0Parameter,parameters->int1Parameter,parameters->int2Parameter);
+		actor->inventory.SetSlotItemRes(ResRef(parameters->string1Parameter), i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 		if (onlyone) {
 			break;
 		}

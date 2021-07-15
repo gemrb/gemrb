@@ -321,7 +321,7 @@ public:
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL) const;
 	/** Creates an item in the slot*/
-	void SetSlotItemRes(const char* ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
+	void SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** Adds item to slot*/
 	void AddSlotItemRes(const ResRef& ItemResRef, int Slot, int Charge0 = 1, int Charge1 = 0, int Charge2 = 0);
 	/** returns the itemtype held in the left hand */

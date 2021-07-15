@@ -1419,9 +1419,9 @@ void Inventory::AddSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0
 	}
 }
 
-void Inventory::SetSlotItemRes(const char* ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::SetSlotItemRes(const ResRef& ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
-	if(ItemResRef[0]) {
+	if (!ItemResRef.IsEmpty()) {
 		CREItem *TmpItem = new CREItem();
 		if (CreateItemCore(TmpItem, ItemResRef, Charge0, Charge1, Charge2)) {
 			SetSlotItem( TmpItem, SlotID );
