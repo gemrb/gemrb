@@ -665,10 +665,12 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 // it's used both for tooltips everywhere and hp display on game control
 bool GameControl::DispatchEvent(const Event& event) const
 {
-	const Game *game = core->GetGame();
-	if (!game) return false;
+	if (!window || window->IsDisabled() || (Flags()&IgnoreEvents)) {
+		return false;
+	}
 
 	if (event.keyboard.keycode == GEM_TAB) {
+		const Game *game = core->GetGame();
 		// show partymember hp/maxhp as overhead text
 		for (int pm=0; pm < game->GetPartySize(false); pm++) {
 			Actor *pc = game->GetPC(pm, true);
