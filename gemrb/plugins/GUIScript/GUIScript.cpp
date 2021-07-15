@@ -12242,16 +12242,16 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError( "Invalid effect name!\n" );
 	}
-	if (resref1) {
+	if (resref1 && resref1[0]) {
 		fx->Resource = ResRef::MakeLowerCase(resref1);
 	}
-	if (resref2) {
+	if (resref2 && resref2[0]) {
 		fx->Resource2 = ResRef::MakeLowerCase(resref2);
 	}
-	if (resref3) {
+	if (resref3 && resref3[0]) {
 		fx->Resource3 = ResRef::MakeLowerCase(resref3);
 	}
-	if (source) {
+	if (source && source[0]) {
 		fx->SourceRef = ResRef::MakeLowerCase(source);
 	}
 	//This is a hack...

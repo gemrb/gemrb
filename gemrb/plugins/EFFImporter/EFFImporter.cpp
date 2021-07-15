@@ -174,7 +174,7 @@ Effect* EFFImporter::GetEffectV20()
 	//They have to be continuous
 	if (fx->IsVariable) {
 		str->Read(fx->VariableName, 32);
-		strnlwrcpy(fx->VariableName, fx->Resource, 32);
+		strlcpy(fx->VariableName, ResRef::MakeLowerCase(fx->VariableName).CString(), 32);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
