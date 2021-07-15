@@ -197,7 +197,9 @@ public:
 	{
 		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem
-		memcpy(Usages, item->Usages, sizeof(ieWord)*CHARGE_COUNTERS);
+		Usages[0] = item->Usages[0];
+		Usages[1] = item->Usages[1];
+		Usages[2] = item->Usages[2];
 		Flags = item->Flags;
 		Weight = item->Weight;
 		MaxStackAmount = item->MaxStackAmount;
