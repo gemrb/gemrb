@@ -186,7 +186,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		f->ReadDword(ResLocator);
 
 		// seems to be always the last entry?
-		if (key.ref[0] != 0)
+		if (!key.ref.IsEmpty())
 			resources.set(key, ResLocator);
 	}
 
@@ -197,7 +197,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 bool KEYImporter::HasResource(const char* resname, SClass_ID type)
 {
-	return resources.has(resname, type);
+	return resources.has(ResRef(resname), type);
 }
 
 bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
@@ -210,7 +210,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	if (type == 0)
 		return NULL;
 
-	const ieDword *ResLocator = resources.get(resname, type);
+	const ieDword *ResLocator = resources.get(ResRef(resname), type);
 	if (!ResLocator)
 		return 0;
 

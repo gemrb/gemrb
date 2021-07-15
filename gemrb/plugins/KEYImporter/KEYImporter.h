@@ -53,7 +53,7 @@ struct KEYCache {
 
 // the key for this specific hashmap
 struct MapKey {
-	ieResRef ref;
+	ResRef ref;
 	ieWord type;
 
 	MapKey() : type(0)
@@ -65,12 +65,12 @@ struct MapKey {
 template<>
 struct HashKey<MapKey> {
 	// hash without MapKey construction
-	static inline uint32_t hash(const ieResRef ref, SClass_ID type)
+	static inline uint32_t hash(const ResRef& ref, SClass_ID type)
 	{
 		unsigned long h = type;
 		const char *c = ref;
 
-		for (unsigned int i = 0; *c && i < sizeof(ieResRef); ++i)
+		for (unsigned int i = 0; *c && i < 9; ++i)
 			h = (h << 5) + h + tolower(*c++);
 
 		return uint32_t(h);
@@ -82,7 +82,7 @@ struct HashKey<MapKey> {
 	}
 
 	// equal check without MapKey construction
-	static inline bool equals(const MapKey &a, const ieResRef ref, SClass_ID type)
+	static inline bool equals(const MapKey &a, const ResRef& ref, SClass_ID type)
 	{
 		if (a.type != type)
 			return false;
@@ -98,14 +98,14 @@ struct HashKey<MapKey> {
 	static inline void copy(MapKey &a, const MapKey &b)
 	{
 		a.type = b.type;
-		strncpy(a.ref, b.ref, sizeof(ieResRef));
+		a.ref = b.ref;
 	}
 };
 
 class KEYImpMap : public HashMap<MapKey, ieDword> {
 public:
 	// lookup without MapKey construction
-	const ieDword *get(const ieResRef ref, SClass_ID type) const
+	const ieDword *get(const ResRef& ref, SClass_ID type) const
 	{
 		if (!isInitialized())
 			return NULL;
@@ -120,7 +120,7 @@ public:
 	}
 
 	// lookup without MapKey construction
-	bool has(const ieResRef ref, SClass_ID type) const
+	bool has(const ResRef& ref, SClass_ID type) const
 	{
 		return get(ref, type) != NULL;
 	}
