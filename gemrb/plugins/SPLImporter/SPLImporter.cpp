@@ -133,7 +133,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	//this hack is needed in ToB at least
 	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
 		size_t i = strlen(s->SpellbookIcon);
-		ieResRef tmp;
+		char tmp[9];
 		CopyResRef(tmp, s->SpellbookIcon);
 		if (i) tmp[i-1]='c';
 		s->SpellbookIcon = tmp;

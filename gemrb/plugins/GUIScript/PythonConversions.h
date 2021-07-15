@@ -131,7 +131,6 @@ Holder<Sprite2D> SpriteFromPy(PyObject* obj);
 */
 
 // Like PyString_FromString(), but for (ie)ResRef
-PyObject* PyString_FromIEResRef(const ieResRef& ResRef);
 PyObject* PyString_FromResRef(const ResRef& resRef);
 
 PyObject* PyString_FromAnimID(const char* AnimID);
