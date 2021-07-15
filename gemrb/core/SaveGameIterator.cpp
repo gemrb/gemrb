@@ -622,34 +622,26 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	}
 	char Path[_MAX_PATH];
 	GameControl *gc = core->GetGameControl();
-
+	assert(gc);
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
+		gc->SetDisplayText(STR_CANTSAVE, 30);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
+		gc->SetDisplayText(STR_CANTSAVE, 30);
 		return GEM_ERROR;
 	}
 
 	// Save successful / Quick-save successful
 	if (qsave) {
 		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_QSAVESUCCEED, 30);
-		}
+		gc->SetDisplayText(STR_QSAVESUCCEED, 30);
 	} else {
 		displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_SAVESUCCEED, 30);
-		}
+		gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	}
 	return GEM_OK;
 }
@@ -663,7 +655,6 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	if (int cansave = CanSave())
 		return cansave;
 
-	GameControl *gc = core->GetGameControl();
 	int index;
 	bool overrideRunning = false;
 
@@ -691,28 +682,24 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		}
 	}
 
+	GameControl *gc = core->GetGameControl();
+	assert(gc); //this is already checked in CanSave and core only has one if there is a game anyway
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
+		gc->SetDisplayText(STR_CANTSAVE, 30);
 		return GEM_ERROR;
 	}
 
 	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
+		gc->SetDisplayText(STR_CANTSAVE, 30);
 		return GEM_ERROR;
 	}
 
 	// Save successful
 	displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
-	if (gc) {
-		gc->SetDisplayText(STR_SAVESUCCEED, 30);
-	}
+	gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	return GEM_OK;
 }
 
