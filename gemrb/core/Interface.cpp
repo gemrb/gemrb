@@ -2171,7 +2171,7 @@ bool Interface::LoadGemRBINI()
 			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
-				ieResRef tmp;
+				char tmp[9];
 				strlcpy(tmp, s, pos - s + 1);
 				GroundCircleBam[size] = tmp;
 			} else {
@@ -3961,7 +3961,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 	if (!RtRows) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
 		char *endptr;
-		ieResRef NewItem;
+		char NewItem[9];
 
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {

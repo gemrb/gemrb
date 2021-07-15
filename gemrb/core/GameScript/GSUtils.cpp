@@ -1034,7 +1034,7 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 	}
 }
 
-static ieResRef PlayerDialogRes = "PLAYERx\0";
+static char PlayerDialogRes[] = "PLAYERx\0";
 
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {

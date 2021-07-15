@@ -8908,7 +8908,7 @@ bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
 		if (*resource == ',') resource++;
 	}
 	size_t len = strcspn(resource, ",");
-	assert(len < sizeof(ieResRef));
+	assert(len < 9);
 	strlcpy(Sound, resource, len + 1);
 
 	return true;
@@ -8942,13 +8942,13 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 			return;
 		} else if (csound[index]) {
 			len = snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
-			if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
+			if (len > 9) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 			return;
 		}
 
 		//icewind style
 		len = snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
-		if (len > sizeof(ieResRef)) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
+		if (len > 9) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
 		return;
 	}
 
