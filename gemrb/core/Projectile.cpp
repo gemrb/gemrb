@@ -1848,7 +1848,7 @@ int Projectile::GetZPos() const
 
 void Projectile::SetIdentifiers(const char *resref, ieWord id)
 {
-	strnuprcpy(name, resref, 8);
+	if (resref) strnuprcpy(name, resref, 8);
 	type=id;
 }
 
