@@ -98,17 +98,17 @@ struct ResourceGroup {
 
 // the same as ITMFeature and SPLFeature
 struct Effect {
-	ieDword Opcode;
-	ieDword Target;
-	ieDword Power;
-	ieDword Parameter1;
-	ieDword Parameter2;
-	ieWord TimingMode;   //0x1000 -- no need of conversion
-	ieWord unknown2;
-	ieDword Resistance;
-	ieDword Duration;
-	ieWord ProbabilityRangeMax;
-	ieWord ProbabilityRangeMin;
+	ieDword Opcode = 0;
+	ieDword Target = 0;
+	ieDword Power = 0;
+	ieDword Parameter1 = 0;
+	ieDword Parameter2 = 0;
+	ieWord TimingMode = 0;   //0x1000 -- no need of conversion
+	ieWord unknown2 = 0;
+	ieDword Resistance = 0;
+	ieDword Duration = 0;
+	ieWord ProbabilityRangeMax = 0;
+	ieWord ProbabilityRangeMin = 0;
 	
 	union {
 		ResourceGroup resources; // keep largest type first to 0 fill everythings
@@ -120,38 +120,38 @@ struct Effect {
 	ResRef& Resource3 = resources.Resource3;
 	ResRef& Resource4 = resources.Resource4;
 
-	ieDword DiceThrown;
-	ieDword DiceSides;
-	ieDword SavingThrowType;
-	ieDword SavingThrowBonus;
+	ieDword DiceThrown = 0;
+	ieDword DiceSides = 0;
+	ieDword SavingThrowType = 0;
+	ieDword SavingThrowBonus = 0;
 	ieWord IsVariable = 0;
-	ieWord IsSaveForHalfDamage;
+	ieWord IsSaveForHalfDamage = 0;
 
 	// EFF V2.0 fields:
-	ieDword PrimaryType; //school
-	ieDword MinAffectedLevel;
-	ieDword MaxAffectedLevel;
-	ieDword Parameter3;
-	ieDword Parameter4;
-	ieDword Parameter5;
-	ieDword Parameter6;
+	ieDword PrimaryType = 0; //school
+	ieDword MinAffectedLevel = 0;
+	ieDword MaxAffectedLevel = 0;
+	ieDword Parameter3 = 0;
+	ieDword Parameter4 = 0;
+	ieDword Parameter5 = 0;
+	ieDword Parameter6 = 0;
 	Point Source;
 	Point Pos;
-	ieDword SourceType; //1-item, 2-spell
-	ResRef SourceRef;
-	ieDword SourceFlags;
-	ieDword Projectile;          //9c
-	ieDwordSigned InventorySlot; //a0
+	ieDword SourceType = 0; //1-item, 2-spell
+	ResRef SourceRef = 0;
+	ieDword SourceFlags = 0;
+	ieDword Projectile = 0;          //9c
+	ieDwordSigned InventorySlot = 0; //a0
 	//Original engine had a VariableName here, but it is stored in the resource fields
-	ieDword CasterLevel;  //c4 in both
-	ieDword FirstApply;   //c8 in bg2, cc in iwd2
-	ieDword SecondaryType;
-	ieDword SecondaryDelay; //still not sure about this
-	ieDword CasterID;       //10c in bg2 (not saved?)
+	ieDword CasterLevel = 0;  //c4 in both
+	ieDword FirstApply = 0;   //c8 in bg2, cc in iwd2
+	ieDword SecondaryType = 0;
+	ieDword SecondaryDelay = 0; //still not sure about this
+	ieDword CasterID = 0;       //10c in bg2 (not saved?)
 	// These are not in the IE files, but are our precomputed values
-	ieDword random_value;
+	ieDword random_value = 0;
 
-	ieDword SpellLevel; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
+	ieDword SpellLevel = 0; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
 public:
 	//don't modify position in case it was already set
 	void SetPosition(const Point &p) {
