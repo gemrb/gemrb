@@ -173,7 +173,50 @@ public:
 	}
 	
 	bool operator==(const Effect& rhs) const noexcept {
-		return this == &rhs || memcmp(&rhs, this, sizeof(Effect)) == 0;
+		if (this == &rhs) return true;
+		
+		if (Opcode != rhs.Opcode) return false;
+		if (Target != rhs.Target) return false;
+		if (Power != rhs.Power) return false;
+		if (Parameter1 != rhs.Parameter1) return false;
+		if (Parameter2 != rhs.Parameter2) return false;
+		if (TimingMode != rhs.TimingMode) return false;
+		// skip unknown2
+		if (Resistance != rhs.Resistance) return false;
+		if (Duration != rhs.Duration) return false;
+		if (ProbabilityRangeMax != rhs.ProbabilityRangeMax) return false;
+		if (ProbabilityRangeMin != rhs.ProbabilityRangeMin) return false;
+		if (DiceThrown != rhs.DiceThrown) return false;
+		if (DiceSides != rhs.DiceSides) return false;
+		if (SavingThrowType != rhs.SavingThrowType) return false;
+		if (SavingThrowBonus != rhs.SavingThrowBonus) return false;
+		if (IsVariable != rhs.IsVariable) return false;
+		if (IsSaveForHalfDamage != rhs.IsSaveForHalfDamage) return false;
+		if (PrimaryType != rhs.PrimaryType) return false;
+		if (MinAffectedLevel != rhs.MinAffectedLevel) return false;
+		if (MaxAffectedLevel != rhs.MaxAffectedLevel) return false;
+		if (Parameter3 != rhs.Parameter3) return false;
+		if (Parameter4 != rhs.Parameter4) return false;
+		if (Parameter5 != rhs.Parameter5) return false;
+		if (Parameter6 != rhs.Parameter6) return false;
+		if (Source != rhs.Source) return false;
+		if (Pos != rhs.Pos) return false;
+		if (SourceType != rhs.SourceType) return false;
+		if (SourceRef != rhs.SourceRef) return false;
+		if (SourceFlags != rhs.SourceFlags) return false;
+		if (Projectile != rhs.Projectile) return false;
+		if (InventorySlot != rhs.InventorySlot) return false;
+		if (CasterLevel != rhs.CasterLevel) return false;
+		if (FirstApply != rhs.FirstApply) return false;
+		if (SecondaryType != rhs.SecondaryType) return false;
+		if (SecondaryDelay != rhs.SecondaryDelay) return false;
+		if (CasterID != rhs.CasterID) return false;
+		if (random_value != rhs.random_value) return false;
+		if (SpellLevel != rhs.SpellLevel) return false;
+
+		if (IsVariable && strnicmp(VariableName, rhs.VariableName, sizeof(VariableName)) != 0) return false;
+		else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
+		
 	}
 };
 
