@@ -481,7 +481,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	if ((Strref != -1) && !soundRef[0]) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
-		memcpy(Sound, sb.Sound, sizeof(ieResRef) );
+		memcpy(Sound, sb.Sound.CString(), 9);
 		if (sb.text) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action

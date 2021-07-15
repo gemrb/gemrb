@@ -24,10 +24,10 @@
 namespace GemRB {
 
 struct GEM_EXPORT PolymorphCache {
-	ieResRef Resource;
-	ieDword *stats;
+	ResRef Resource;
+	ieDword *stats = nullptr;
 
-	PolymorphCache() : stats(NULL) { Resource[0] = 0; }
+	PolymorphCache() = default;
 	~PolymorphCache() {
 		delete[] stats;
 	}

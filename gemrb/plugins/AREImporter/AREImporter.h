@@ -36,7 +36,7 @@ class AREImporter : public MapMgr {
 private:
 	DataStream* str;
 	int bigheader;
-	ieResRef WEDResRef;
+	ResRef WEDResRef;
 	ieDword LastSave;
 	ieDword AreaFlags;
 	ieWord  AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
@@ -57,15 +57,16 @@ private:
 	ieDword TrapOffset, TrapCount;  //only in ToB?
 	proIterator piter; //iterator for saving projectiles
 	ieDword EffectOffset;
-	ieResRef Script;
-	ieResRef Dream1, Dream2; //only in ToB
+	ResRef Script;
+	ResRef Dream1; // only in ToB
+	ResRef Dream2; // only in ToB
 	ieByte AreaDifficulty;
 public:
 	AREImporter(void);
 	~AREImporter(void) override;
 	bool Open(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
-	Map* GetMap(const char* ResRef, bool day_or_night) override;
+	Map* GetMap(const char* resRef, bool day_or_night) override;
 	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map) override;

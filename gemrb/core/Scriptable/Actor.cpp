@@ -4319,7 +4319,7 @@ void Actor::PlayExistenceSounds()
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
 		if (strref != (ieStrRef) -1) {
 			StringBlock sb = core->strings->GetStringBlock(strref);
-			if (sb.Sound[0]) {
+			if (!sb.Sound.IsEmpty()) {
 				unsigned int vol = 100;
 				core->GetDictionary()->Lookup("Volume Ambients", vol);
 				int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE

@@ -39,18 +39,17 @@ namespace GemRB {
  */
 
 struct StringBlock {
-	const String* text;
-	ieResRef Sound;
+	const String* text = nullptr;
+	ResRef Sound;
 
-	StringBlock(const String* text, const ieResRef soundRef)
+	StringBlock() = default;
+	StringBlock(const String* text, const ResRef& soundRef)
 	: text(text) {
-		memcpy(Sound, soundRef, sizeof(ieResRef));
+		Sound = soundRef;
 	}
 	~StringBlock() {
 		delete text;
 	}
-	StringBlock()
-	: text(), Sound() {}
 };
 
 /**

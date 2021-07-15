@@ -2806,8 +2806,8 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	ieResRef arearesref;
-	snprintf(arearesref, 8, "AR%04d", parameters->int0Parameter);
+	ResRef arearesref;
+	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
 	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, 8)) {
 		return 1;
 	}
@@ -2823,11 +2823,11 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	if (!tar) {
 		return 0;
 	}
-	ieResRef arearesref;
+	ResRef arearesref;
 	if (parameters->string0Parameter[0]) {
-		strnlwrcpy(arearesref, parameters->string0Parameter, 8);
+		arearesref = ResRef::MakeLowerCase(parameters->string0Parameter);
 	} else {
-		strnlwrcpy(arearesref, "AR30", 8); //InWatchersKeep
+		arearesref = "ar30"; //InWatchersKeep
 	}
 	size_t i = strlen(arearesref);
 	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, i)) {

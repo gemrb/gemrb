@@ -4201,7 +4201,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		cached = false;
 		target->polymorphCache = new PolymorphCache();
 	}
-	if (!cached || strnicmp(fx->Resource, target->polymorphCache->Resource, sizeof(fx->Resource)) != 0) {
+	if (!cached || fx->Resource != target->polymorphCache->Resource) {
 		Actor *newCreature = gamedata->GetCreature(fx->Resource,0);
 
 		//I don't know how could this happen, existance of the resource was already checked
@@ -4209,7 +4209,7 @@ int fx_polymorph (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 
-		memcpy(target->polymorphCache->Resource, fx->Resource, sizeof(fx->Resource));
+		target->polymorphCache->Resource = fx->Resource;
 		CopyPolymorphStats(newCreature, target);
 
 		delete newCreature;

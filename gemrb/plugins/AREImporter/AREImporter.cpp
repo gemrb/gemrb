@@ -264,13 +264,13 @@ bool AREImporter::Open(DataStream* stream)
 //return true, if change happened, in which case a movie is played by the Game object
 bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 {
-	ieResRef TmpResRef;
+	ResRef TmpResRef;
 
 	//get the right tilemap name
 	if (day_or_night) {
-		memcpy( TmpResRef, map->WEDResRef, 9);
+		TmpResRef = map->WEDResRef;
 	} else {
-		snprintf( TmpResRef, 9, "%.7sN", map->WEDResRef.CString());
+		TmpResRef.SNPrintF("%.7sN", map->WEDResRef.CString());
 	}
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
 	DataStream* wedfile = gamedata->GetResource( TmpResRef, IE_WED_CLASS_ID );
@@ -306,9 +306,9 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 
 	//get the lightmap name
 	if (day_or_night) {
-		snprintf( TmpResRef, 9, "%.6sLM", map->WEDResRef.CString());
+		TmpResRef.SNPrintF("%.6sLM", map->WEDResRef.CString());
 	} else {
-		snprintf( TmpResRef, 9, "%.6sLN", map->WEDResRef.CString());
+		TmpResRef.SNPrintF("%.6sLN", map->WEDResRef.CString());
 	}
 
 	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
@@ -385,7 +385,7 @@ static Ambient* SetupMainAmbients(Map *map, bool day_or_night) {
 	return ambi;
 }
 
-Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
+Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 {
 	// if this area does not have extended night, force it to day mode
 	if (!(AreaFlags & AT_EXTENDED_NIGHT))
@@ -414,8 +414,8 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
-	map->SetScriptName( ResRef );
-	int idx = GetTrackString( ResRef );
+	map->SetScriptName(resRef);
+	int idx = GetTrackString(resRef);
 	if (idx>=0) {
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
 	} else {
@@ -427,12 +427,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		delete map;
 		return NULL;
 	}
-	ieResRef TmpResRef;
 
+	ResRef TmpResRef;
 	if (day_or_night) {
-		memcpy( TmpResRef, WEDResRef, 9);
+		TmpResRef = WEDResRef;
 	} else {
-		snprintf( TmpResRef, 9, "%.7sN", WEDResRef);
+		TmpResRef.SNPrintF("%.7sN", WEDResRef.CString());
 	}
 
 	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
@@ -456,11 +456,11 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 
 	//if the Script field is empty, the area name will be copied into it on first load
 	//this works only in the iwd branch of the games
-	if (!Script[0] && core->HasFeature(GF_FORCE_AREA_SCRIPT) ) {
-		memcpy(Script, ResRef, sizeof(ieResRef) );
+	if (Script.IsEmpty() && core->HasFeature(GF_FORCE_AREA_SCRIPT)) {
+		Script = resRef;
 	}
 
-	if (Script[0]) {
+	if (!Script.IsEmpty()) {
 		//for some reason the area's script is run from the last slot
 		//at least one area script depends on this, if you need something
 		//more customisable, add a game flag
@@ -468,9 +468,9 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	if (day_or_night) {
-		snprintf( TmpResRef, 9, "%.6sLM", WEDResRef);
+		TmpResRef.SNPrintF("%.6sLM", WEDResRef.CString());
 	} else {
-		snprintf( TmpResRef, 9, "%.6sLN", WEDResRef);
+		TmpResRef.SNPrintF("%.6sLN", WEDResRef.CString());
 	}
 
 	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
@@ -479,7 +479,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		return NULL;
 	}
 
-	snprintf( TmpResRef, 9, "%.6sSR", WEDResRef);
+	TmpResRef.SNPrintF("%.6sSR", WEDResRef.CString());
 
 	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!sr) {
@@ -487,7 +487,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 		return NULL;
 	}
 
-	snprintf( TmpResRef, 9, "%.6sHT", WEDResRef);
+	TmpResRef.SNPrintF("%.6sHT", WEDResRef.CString());
 
 	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
 	if (!hm) {
@@ -811,13 +811,12 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 			c->AddItem( core->ReadItem(str));
 		}
 
-		if (Type==IE_CONTAINER_PILE)
-			Script[0]=0;
+		if (Type == IE_CONTAINER_PILE) Script.Reset();
 
-		if (Script[0]) {
-			c->Scripts[0] = new GameScript( Script, c );
+		if (Script.IsEmpty()) {
+			c->Scripts[0] = nullptr;
 		} else {
-			c->Scripts[0] = NULL;
+			c->Scripts[0] = new GameScript(Script, c);
 		}
 		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
 		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
@@ -1291,7 +1290,7 @@ Map* AREImporter::GetMap(const char *ResRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading variables");
-	map->locals->LoadInitialValues(ResRef);
+	map->locals->LoadInitialValues(resRef);
 	str->Seek( VariablesOffset, GEM_STREAM_START );
 	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;

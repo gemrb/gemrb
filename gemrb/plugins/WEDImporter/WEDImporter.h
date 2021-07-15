@@ -31,7 +31,7 @@ namespace GemRB {
 struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
-	ieResRef TilesetResRef;
+	ResRef TilesetResRef;
 	ieWord UniqueTileCount; // nNumUniqueTiles in the original (currently unused)
 	ieWord MovementType; // nMovementType in the original (currently unused)
 	ieDword TilemapOffset;

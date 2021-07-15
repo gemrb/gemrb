@@ -3135,10 +3135,10 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 			}
 
 			//bounty encounter
-			ieResRef tmpresref;
+			ResRef tmpresref;
 			const WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
 
-			CopyResRef(tmpresref, linkdest->AreaResRef);
+			tmpresref = linkdest->AreaResRef;
 			if (core->GetGame()->RandomEncounter(tmpresref)) {
 				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
 				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, tmpresref));

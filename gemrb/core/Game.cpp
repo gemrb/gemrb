@@ -137,11 +137,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	}
 
 	//loading npc starting levels
-	ieResRef tn;
+	ResRef tn = "npclevel";
 	if (Expansion == 5) { // tob is special
-		CopyResRef(tn, "npclvl25");
-	} else {
-		CopyResRef(tn, "npclevel");
+		tn = "npclvl25";
 	}
 	if (table.load(tn)) {
 		int cols = table->GetColumnCount();
@@ -773,7 +771,7 @@ Map* Game::GetMasterArea(const char *area)
 	unsigned int areaNum;
 	unsigned int masterNum;
 	unsigned int prevDiff = 0;
-	ieResRef prevArea;
+	ResRef prevArea;
 	sscanf(area, "%*c%*c%u%*c", &areaNum);
 
 	// mastarea.2da is not sorted, so make sure to check all the rows/areas
@@ -788,7 +786,7 @@ Map* Game::GetMasterArea(const char *area)
 		if (prevDiff == 0 || (prevDiff > masterNum - areaNum && masterNum < areaNum)) {
 			// first master bigger than us or
 			// this area is numerically closer than the last choice, but still smaller
-			CopyResRef(prevArea, mastarea[i+1]);
+			prevArea = mastarea[i+1];
 			prevDiff = masterNum - areaNum;
 		}
 	}
@@ -2315,7 +2313,7 @@ bool Game::IsTimestopActive() const
 	return timestop_end > GameTime;
 }
 
-bool Game::RandomEncounter(ieResRef &BaseArea)
+bool Game::RandomEncounter(ResRef &BaseArea)
 {
 	if (bntrows<0) {
 		AutoTable table;
@@ -2335,7 +2333,8 @@ bool Game::RandomEncounter(ieResRef &BaseArea)
 	if (rep>=bntrows) return false;
 	if (core->Roll(1, 100, 0)>bntchnc[rep]) return false;
 	//TODO: unhardcode this
-	memcpy(BaseArea+4,"10",3);
+	ResRef tmp = BaseArea;
+	BaseArea.SNPrintF("%.4s10", tmp.CString());
 	return gamedata->Exists(BaseArea, IE_ARE_CLASS_ID);
 }
 
