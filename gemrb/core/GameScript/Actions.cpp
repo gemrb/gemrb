@@ -4372,7 +4372,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 
 	if (parameters->string0Parameter[0]) {
 		//dropping location isn't exactly our place, this is why i didn't use a simple DropItem
-		scr->inventory.DropItemAtLocation(parameters->string0Parameter,
+		scr->inventory.DropItemAtLocation(ResRef(parameters->string0Parameter),
 0, map, parameters->pointParameter);
 	} else {
 		//this should be converted from scripting slot to physical slot

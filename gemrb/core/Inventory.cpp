@@ -801,7 +801,7 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	return true;
 }
 
-bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, const Point &loc)
+bool Inventory::DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map *map, const Point &loc)
 {
 	bool dropped = false;
 
@@ -824,7 +824,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && item->ItemResRef != resref) {
+		if (!resRef.IsEmpty() && item->ItemResRef != resRef) {
 			continue;
 		}
 		// mark it as unequipped, so it doesn't cause problems in stores
@@ -833,12 +833,12 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		dropped = true;
 		KillSlot((unsigned int) i);
 		//if it isn't all items then we stop here
-		if (resref[0])
+		if (!resRef.IsEmpty())
 			break;
 	}
 
 	//dropping gold too
-	if (!resref[0]) {
+	if (resRef.IsEmpty()) {
 		if (!Owner->GetBase(IE_GOLD)) {
 			return dropped;
 		}
