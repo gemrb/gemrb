@@ -2460,17 +2460,17 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 
 /* returns a spell's casting distance, it depends on the caster (level), and targeting mode too
  the used header is calculated from the caster level */
-unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender)
+unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender)
 {
 	unsigned int dist;
 
-	Spell* spl = gamedata->GetSpell( spellres );
+	Spell* spl = gamedata->GetSpell(spellRes);
 	if (!spl) {
-		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellres);
+		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellRes.CString());
 		return 0;
 	}
 	dist = spl->GetCastingDistance(Sender);
-	gamedata->FreeSpell(spl, spellres, false);
+	gamedata->FreeSpell(spl, spellRes, false);
 
 	//make possible special return values (like 0xffffffff means the spell doesn't need distance)
 	//this is used with special targeting mode (3)
@@ -2724,7 +2724,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	//parse target
 	int seeflag = 0;
-	unsigned int dist = GetSpellDistance(spellres, Sender);
+	unsigned int dist = GetSpellDistance(ResRef(spellres), Sender);
 	if ((flags&SC_NO_DEAD) && dist != 0xffffffff) {
 		seeflag = GA_NO_DEAD;
 	}
@@ -2845,7 +2845,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	if(Sender->Type==ST_ACTOR) {
-		unsigned int dist = GetSpellDistance(spellres, Sender);
+		unsigned int dist = GetSpellDistance(ResRef(spellres), Sender);
 
 		Actor *act = (Actor *) Sender;
 		//move near to target

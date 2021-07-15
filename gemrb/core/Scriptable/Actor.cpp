@@ -10909,13 +10909,13 @@ bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 	//cheap substitute of the original hardcoded feature, returns true if already affected by the exact spell
 	//no (spell)state checks based on every effect in the spell
 	//FIXME: create a more compatible version if needed
-	if (fxqueue.HasSource(spellres)) return true;
+	if (fxqueue.HasSource(ResRef(spellres))) return true;
 	//return true if caster cannot cast
 	if (!caster->CanCast(spellres, false)) return true;
 
 	if (!range) return false;
 
-	int srange = GetSpellDistance(spellres, caster);
+	int srange = GetSpellDistance(ResRef(spellres), caster);
 	return srange<range;
 }
 

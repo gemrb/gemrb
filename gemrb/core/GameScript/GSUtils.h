@@ -131,7 +131,7 @@ GEM_EXPORT Point CheckPointVariable(const Scriptable *Sender, const char *VarNam
 GEM_EXPORT bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context);
 Action* GenerateActionCore(const char *src, const char *str, unsigned short actionID);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
-GEM_EXPORT unsigned int GetSpellDistance(const ieResRef spellres, Scriptable *Sender);
+GEM_EXPORT unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender);
 unsigned int GetItemDistance(const ResRef& itemres, int header);
 void SetupWishCore(Scriptable *Sender, int column, int picks);
 void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag);
