@@ -1721,14 +1721,14 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 		target=Sender;
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
-
-	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	ResRef src = parameters->string0Parameter;
+	SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
 	DisplayStringCore(target, rndstr->at(RAND<size_t>(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
-	FreeSrc(rndstr, parameters->string0Parameter);
+	FreeSrc(rndstr, src);
 }
 
 void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
@@ -1739,13 +1739,14 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 
-	SrcVector *rndstr=LoadSrc(parameters->string0Parameter);
+	ResRef src = parameters->string0Parameter;
+	SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
 	}
 	DisplayStringCore(target, rndstr->at(RAND<size_t>(0, rndstr->size()-1)), DS_CONSOLE|DS_HEAD);
-	FreeSrc(rndstr, parameters->string0Parameter);
+	FreeSrc(rndstr, src);
 }
 
 //apparently this should not display over head (for actors)
@@ -7005,7 +7006,7 @@ void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameter
 }
 
 //the PST crew apparently loved hardcoding stuff
-ieResRef RebusResRef={"DABUS1"};
+char RebusResRef[9] = { "DABUS1" };
 
 void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 {

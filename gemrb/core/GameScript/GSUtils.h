@@ -111,8 +111,8 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int no_releas
 GEM_EXPORT int GetGroup(const Actor *actor);
 GEM_EXPORT Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho);
 GEM_EXPORT Actor *GetNearestEnemyOf(const Map *map, const Actor *origin, int whoseeswho);
-GEM_EXPORT void FreeSrc(SrcVector *poi, const ieResRef key);
-GEM_EXPORT SrcVector *LoadSrc(const ieResRef resname);
+GEM_EXPORT void FreeSrc(SrcVector *poi, const ResRef& key);
+GEM_EXPORT SrcVector *LoadSrc(const ResRef& resname);
 bool IsInObjectRect(const Point &pos, const Region &rect);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);

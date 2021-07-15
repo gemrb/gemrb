@@ -197,7 +197,7 @@ static bool IsDomain(const ResRef& name, unsigned short &level, unsigned int kit
 	return false;
 }
 
-/*static int IsSpecial(ieResRef name, unsigned short &level, unsigned int kit)
+/*static int IsSpecial(ResRef name, unsigned short &level, unsigned int kit)
 {
 	for(int i=0;i<magcount;i++) {
 		if (maglist[i].Equals(name) ) {
@@ -867,12 +867,12 @@ void CREImporter::SetupColor(ieDword &stat)
 
 void CREImporter::ReadDialog(Actor *act)
 {
-	ieResRef Dialog;
+	ResRef Dialog;
 
 	str->ReadResRef(Dialog);
-	//Hacking NONE to no error
-	if (strnicmp(Dialog,"NONE",8) == 0) {
-		Dialog[0]=0;
+	// avoiding a literal NONE to not error, since the file doesn't exist
+	if (Dialog == "NONE") {
+		Dialog.Reset();
 	}
 	act->SetDialog(Dialog);
 }

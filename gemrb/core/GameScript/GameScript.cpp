@@ -1830,7 +1830,7 @@ GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
 {
 	scriptlevel = ScriptLevel;
 
-	strnlwrcpy( Name, ResRef, 8 );
+	Name = ResRef::MakeLowerCase(ResRef);
 
 	script = CacheScript( Name, AIScript);
 }
@@ -1844,7 +1844,7 @@ GameScript::~GameScript(void)
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
-			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name);
+			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
 		}
 		if (!res) {
 			//print("Freeing script %s because its refcount has reached 0.", Name);
@@ -1854,19 +1854,19 @@ GameScript::~GameScript(void)
 	}
 }
 
-Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
+Script* GameScript::CacheScript(ResRef& resRef, bool AIScript)
 {
 	char line[10];
 
 	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
-	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
+	Script *newScript = (Script *) BcsCache.GetResource(resRef);
 	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", ResRef, BcsCache.RefCount(ResRef));
+		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef, BcsCache.RefCount(resRef));
 		return newScript;
 	}
 
-	DataStream* stream = gamedata->GetResource( ResRef, type );
+	DataStream* stream = gamedata->GetResource(resRef, type);
 	if (!stream) {
 		return NULL;
 	}
@@ -1877,8 +1877,8 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 		return NULL;
 	}
 	newScript = new Script( );
-	BcsCache.SetAt( ResRef, (void *) newScript );
-	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", ResRef, BcsCache.RefCount(ResRef));
+	BcsCache.SetAt(resRef, (void *) newScript);
+	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef, BcsCache.RefCount(resRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );

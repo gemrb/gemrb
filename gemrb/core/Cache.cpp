@@ -184,7 +184,7 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 	return pAssocNext;
 }
 
-Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
+Cache::MyAssoc* Cache::GetAssocAt(const ResRef& key) const
 	// find association (or return NULL)
 {
 	if (m_pHashTable == NULL) {
@@ -202,7 +202,7 @@ Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
 	return NULL;
 }
 
-void *Cache::GetResource(const ieResRef key) const
+void *Cache::GetResource(const ResRef& key) const
 {
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {
@@ -214,7 +214,7 @@ void *Cache::GetResource(const ieResRef key) const
 }
 
 //returns true if it was successful
-bool Cache::SetAt(const ieResRef key, void *rValue)
+bool Cache::SetAt(const ResRef& key, void *rValue)
 {
 	int i;
 
@@ -249,7 +249,7 @@ bool Cache::SetAt(const ieResRef key, void *rValue)
 	return true;
 }
 
-int Cache::RefCount(const ieResRef key) const
+int Cache::RefCount(const ResRef& key) const
 {
 	Cache::MyAssoc* pAssoc=GetAssocAt( key );
 	if (pAssoc) {
@@ -258,11 +258,11 @@ int Cache::RefCount(const ieResRef key) const
 	return -1;
 }
 
-int Cache::DecRef(const void *data, const ieResRef key, bool remove)
+int Cache::DecRef(const void *data, const ResRef& key, bool remove)
 {
 	Cache::MyAssoc* pAssoc;
 
-	if (key) {
+	if (!key.IsEmpty()) {
 		pAssoc=GetAssocAt( key );
 		if (pAssoc && (pAssoc->data==data) ) {
 			if (!pAssoc->nRefCount) {

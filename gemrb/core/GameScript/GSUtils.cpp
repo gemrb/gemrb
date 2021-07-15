@@ -1936,18 +1936,18 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	return 0;
 }
 
-void FreeSrc(SrcVector *poi, const ieResRef key)
+void FreeSrc(SrcVector *poi, const ResRef& key)
 {
 	int res = SrcCache.DecRef((void *) poi, key, true);
 	if (res<0) {
-		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key);
+		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key.CString());
 	}
 	if (!res) {
 		delete poi;
 	}
 }
 
-SrcVector *LoadSrc(const ieResRef resname)
+SrcVector *LoadSrc(const ResRef& resname)
 {
 	SrcVector *src = (SrcVector *) SrcCache.GetResource(resname);
 	if (src) {
