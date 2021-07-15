@@ -31,12 +31,12 @@
 
 namespace GemRB {
 
-STOItem::STOItem() {
-	PurchasedAmount = Flags = Weight = MaxStackAmount = AmountInStock = InfiniteSupply = 0;
-	triggers = NULL;
+STOItem::STOItem(const CREItem *item) {
+	CopyCREItem(item);
 }
 
-STOItem::STOItem(const CREItem *item) {
+// beware of triggers leaking if you're writing to a non-blank STOItem
+void STOItem::CopyCREItem(const CREItem *item) {
 	ItemResRef = item->ItemResRef;
 	PurchasedAmount = 0; // Expired in STOItem
 	Usages[0] = item->Usages[0];
@@ -46,7 +46,7 @@ STOItem::STOItem(const CREItem *item) {
 	Weight = item->Weight;
 	MaxStackAmount = item->MaxStackAmount;
 	AmountInStock = InfiniteSupply = 0;
-	triggers = NULL;
+	triggers = nullptr;
 }
 
 STOItem::~STOItem(void)
@@ -57,9 +57,6 @@ STOItem::~STOItem(void)
 Store::Store(void)
 {
 	HasTriggers = false;
-	purchased_categories = NULL;
-	drinks = NULL;
-	cures = NULL;
 	version = 0;
 	StoreOwnerID = 0;
 	StoreName = 0;
@@ -74,12 +71,12 @@ Store::~Store(void)
 	for (auto item : items) {
 		delete item;
 	}
-	if(drinks)
-		free(drinks);
-	if(cures)
-		free(cures);
-	if (purchased_categories)
-		free( purchased_categories );
+	for (auto cure : cures) {
+		delete cure;
+	}
+	for (auto drink : drinks) {
+		delete drink;
+	}
 }
 
 bool Store::IsItemAvailable(unsigned int slot) const
@@ -160,8 +157,8 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 		return ret;
 	}
 
-	for (ieDword i=0;i<PurchasedCategoriesCount;i++) {
-		if (type==purchased_categories[i]) {
+	for (const auto& category : purchased_categories) {
+		if (type == category) {
 			return ret;
 		}
 	}
@@ -172,26 +169,26 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 
 STOCure *Store::GetCure(unsigned int idx) const
 {
-	if (idx>=CuresCount) {
-		return NULL;
+	if (idx >= CuresCount) {
+		return nullptr;
 	}
-	return cures+idx;
+	return cures[idx];
 }
 
 STODrink *Store::GetDrink(unsigned int idx) const
 {
-	if (idx>=DrinksCount) {
-		return NULL;
+	if (idx >= DrinksCount) {
+		return nullptr;
 	}
-	return drinks+idx;
+	return drinks[idx];
 }
 
 //We need this weirdness for PST item lookup
 STOItem *Store::GetItem(unsigned int idx, bool usetrigger)
 {
 	if (!HasTriggers || !usetrigger) {
-		if (idx>=items.size()) {
-			return NULL;
+		if (idx >= items.size()) {
+			return nullptr;
 		}
 		return items[idx];
 	}
@@ -236,7 +233,7 @@ STOItem *Store::FindItem(const CREItem *item, bool exact)
 		}
 		if (exact) {
 			// Infinite supply means we don't have to worry about keeping track of amounts.
-			if (temp->InfiniteSupply==-1) {
+			if (temp->InfiniteSupply == -1) {
 				return temp;
 			}
 			// Check if we have a non-stackable item with a different number of charges.
@@ -246,7 +243,7 @@ STOItem *Store::FindItem(const CREItem *item, bool exact)
 		}
 		return temp;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //some stores can recharge items - in original engine apparently all stores

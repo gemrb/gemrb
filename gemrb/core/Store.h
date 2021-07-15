@@ -69,22 +69,23 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  */
 struct GEM_EXPORT STOItem {
 	ResRef ItemResRef;
-	ieWord PurchasedAmount;
+	ieWord PurchasedAmount = 0;
 	ieWord Usages[CHARGE_COUNTERS] = {};
-	ieDword Flags;
+	ieDword Flags = 0;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
-	int Weight;
-	int MaxStackAmount;
-	ieDword AmountInStock;
-	ieDwordSigned InfiniteSupply;
+	int Weight = 0;
+	int MaxStackAmount = 0;
+	ieDword AmountInStock = 0;
+	ieDwordSigned InfiniteSupply = 0;
 	// V1.1
-	Condition *triggers;
+	Condition *triggers = nullptr;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 
-	STOItem();
+	STOItem() = default;
 	explicit STOItem(const CREItem *item);
 	~STOItem();
+	void CopyCREItem(const CREItem *item);
 };
 
 
@@ -121,10 +122,10 @@ public:
 	Store();
 	~Store();
 
-	std::vector< STOItem*> items;
-	STODrink* drinks;
-	STOCure* cures;
-	ieDword* purchased_categories;
+	std::vector<STOItem*> items;
+	std::vector<STODrink*> drinks;
+	std::vector<STOCure*> cures;
+	std::vector<ieDword> purchased_categories;
 
 	ieResRef Name;
 	ieDword Type;
