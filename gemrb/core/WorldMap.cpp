@@ -616,7 +616,7 @@ WorldMapArray::~WorldMapArray()
 unsigned int WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 {
 	unsigned int idx;
-	for (unsigned int i = 0; i < CurrentMap; i++) {
+	for (unsigned int i = 0; i < MapCount; i++) {
 		if (all_maps[i]->GetArea (area, idx) ) {
 			CurrentMap = i;
 			return i;
