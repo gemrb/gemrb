@@ -199,9 +199,9 @@ public:
 
 	ieWord Speed;
 	ieDword SFlags;
-	ieResRef FiringSound;
-	ieResRef ArrivalSound;
-	ieResRef TravelVVC;
+	ResRef FiringSound;
+	ResRef ArrivalSound;
+	ResRef TravelVVC;
 	ieDword SparkColor;
 	ieDword ExtFlags;
 	ieDword StrRef;
@@ -216,19 +216,19 @@ public:
 	ieResRef SuccSpell;
 	////// gap
 	ieDword TFlags;
-	ieResRef BAMRes1;
-	ieResRef BAMRes2;
+	ResRef BAMRes1;
+	ResRef BAMRes2;
 	ieByte Seq1, Seq2;
 	ieWord LightX;
 	ieWord LightY;
 	ieWord LightZ;
-	ieResRef PaletteRes;
+	ResRef PaletteRes;
 	ieByte Gradients[7];
 	ieByte SmokeSpeed;
 	ieByte SmokeGrad[7];
 	ieByte Aim; // original bg2: m_numDirections // list of {1, 5, 9}
 	ieWord SmokeAnimID;
-	ieResRef TrailBAM[3];
+	ResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
 	unsigned int Range;
 	//these are public but not in the .pro file
@@ -236,7 +236,7 @@ public:
 	PaletteHolder palette;
 	//internals
 protected:
-	ieResRef smokebam;
+	ResRef smokebam;
 	ieDword timeStartStep;
 	//attributes from moveable object
 	unsigned char Orientation, NewOrientation;
@@ -361,7 +361,7 @@ public:
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
-	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
+	void CreateAnimations(Animation **anims, const ResRef& bam, int Seq);
 	//pillar type animations
 	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
@@ -383,7 +383,7 @@ private:
 	//reached end of single travel missile, explode or expire now
 	void ChangePhase();
 	//drop a BAM or VVC on the trail path, return the length of the animation
-	int AddTrail(const ieResRef BAM, const ieByte *pal) const;
+	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
 	void LineTarget() const;      //line projectiles (walls, scorchers)
 	void LineTarget(const PathNode *beg, const PathNode *end) const;

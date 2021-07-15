@@ -61,8 +61,6 @@ Projectile::Projectile()
 	child_size = 0;
 	memset(travel, 0, sizeof(travel)) ;
 	memset(shadow, 0, sizeof(shadow)) ;
-	memset(PaletteRes,0,sizeof(PaletteRes));
-	memset(smokebam, 0, sizeof(smokebam));
 	light = NULL;
 	pathcounter = 0x7fff;
 	FakeTarget = 0;
@@ -108,7 +106,7 @@ Projectile::~Projectile()
 	}
 }
 
-void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
+void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
 		gamedata->GetFactoryResource(bamres, IE_BAM_CLASS_ID);
@@ -284,7 +282,7 @@ void Projectile::GetSmokeAnim()
 	for(int i=0;i<AvatarsRowNum;i++) {
 		AvatarStruct *as = CharAnimations::GetAvatarStruct(i);
 		if (as->AnimID==SmokeAnimID) {
-			memcpy(smokebam, as->Prefixes[0].CString(), sizeof(ieResRef));
+			smokebam = as->Prefixes[0];
 			return;
 		}
 	}
@@ -743,7 +741,7 @@ void Projectile::EndTravel()
 }
 
 //Note: trails couldn't be higher than VVC, but this shouldn't be a problem
-int Projectile::AddTrail(const ieResRef BAM, const ieByte *pal) const
+int Projectile::AddTrail(const ResRef& BAM, const ieByte *pal) const
 {
 /*
 	VEFObject *vef=gamedata->GetVEFObject(BAM,0);
@@ -785,7 +783,7 @@ void Projectile::DoStep(unsigned int walk_speed)
 	//intro trailing, drawn only once at the beginning
 	if (pathcounter==0x7ffe) {
 		for(int i=0;i<3;i++) {
-			if(!TrailSpeed[i] && TrailBAM[i][0]) {
+			if (!TrailSpeed[i] && !TrailBAM[i].IsEmpty()) {
 				extension_delay = AddTrail(TrailBAM[i], (ExtFlags&PEF_TINT)?Gradients:NULL);
 			}
 		}
@@ -1552,7 +1550,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			}
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
-			strnlwrcpy(pro->BAMRes1, tmp, 8);
+			pro->BAMRes1 = ResRef::MakeLowerCase(tmp);
 			if (ExtFlags&PEF_TRAIL) {
 				pro->Aim = Aim;
 			}
