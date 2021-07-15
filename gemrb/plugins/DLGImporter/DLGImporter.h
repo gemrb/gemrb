@@ -27,31 +27,6 @@
 
 namespace GemRB {
 
-/*
-struct State {
-	ieStrRef StrRef;
-	ieDword  FirstTransitionIndex;
-	ieDword  TransitionsCount;
-	ieDword  TriggerIndex;
-};
-*/
-/*
-struct Transition {
-	ieDword  Flags;
-	ieStrRef AnswerStrRef;
-	ieStrRef JournalStrRef;
-	ieDword  TriggerIndex;
-	ieDword  ActionIndex;
-	ieResRef DLGResRef;
-	ieDword  NextStateIndex;
-};
-*/
-/*
-struct VarOffset {
-	ieDword Offset;
-	ieDword Length;
-};
-*/
 class DLGImporter : public DialogMgr {
 private:
 	DataStream* str;
