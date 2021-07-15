@@ -884,9 +884,6 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Map *map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
-	newfx->Source = fx->Source;
-	newfx->Duration = 60;
 	while(i--) {
 		Actor *tar=map->GetActor(i,true);
 		ea = tar->GetStat(IE_EA);
@@ -897,6 +894,9 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 		//lets assume it is never resisted
 		//the effect will be destructed by ApplyEffect (not anymore)
 		//the effect is copied to a new memory area
+		Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		newfx->Source = fx->Source;
+		newfx->Duration = 60;
 		core->ApplyEffect(newfx, tar, Owner);
 	}
 	return FX_APPLIED;
