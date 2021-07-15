@@ -125,7 +125,7 @@ static int NUM_RARE_SELECT_SOUNDS = 2; //in bg and pst it is actually 4
 
 //item usability array
 struct ItemUseType {
-	ieResRef table; //which table contains the stat usability flags
+	ResRef table; //which table contains the stat usability flags
 	ieByte stat;	//which actor stat we talk about
 	ieByte mcol;	//which column should be matched against the stat
 	ieByte vcol;	//which column has the bit value for it
@@ -389,7 +389,7 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 
 static int avBase, avStance;
 struct avType {
-	ieResRef avresref;
+	ResRef avresref;
 	AutoTable avtable;
 	int stat;
 };
@@ -2090,7 +2090,7 @@ static void InitActorTables()
 		itemuse = new ItemUseType[usecount];
 		for (int i = 0; i < usecount; i++) {
 			itemuse[i].stat = (ieByte) core->TranslateStat( tm->QueryField(i,0) );
-			strnlwrcpy(itemuse[i].table, tm->QueryField(i,1),8 );
+			itemuse[i].table = ResRef::MakeLowerCase(tm->QueryField(i, 1));
 			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
 			itemuse[i].vcol = (ieByte) atoi( tm->QueryField(i,3) );
 			itemuse[i].which = (ieByte) atoi( tm->QueryField(i,4) );
@@ -2653,7 +2653,7 @@ static void InitActorTables()
 				avStance = -1;
 			}
 			for (int i = 0; i < avCount; i++) {
-				strnuprcpy(avPrefix[i].avresref, tm->QueryField(i+1), 8);
+				avPrefix[i].avresref = ResRef::MakeUpperCase(tm->QueryField(i + 1));
 				avPrefix[i].avtable.load(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
@@ -4888,7 +4888,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		default: return;                       //other
 	}
 
-	ieResRef Sound;
+
 	int armor = 0;
 
 	if (resdata) {
@@ -4915,6 +4915,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 		}
 	}
 
+	ResRef Sound;
 	if (core->HasFeature(GF_IWD2_SCRIPTNAME)) {
 		// TODO: RE and unhardcode, especially the "armor" mapping
 		// no idea what RK stands for, so use it for everything else
@@ -4928,12 +4929,12 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 			default: armor = 6; break;
 		}
 
-		snprintf(Sound, 9, "H_%s_%s%d", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
+		Sound.SNPrintF("H_%s_%s%d", dmg_types[type-1], armor_types[armor], core->Roll(1, 3, 0));
 	} else {
 		if (levels) {
-			snprintf(Sound, 9, "HIT_0%d%c%c", type, armor+'A', suffix?'1':0);
+			Sound.SNPrintF("HIT_0%d%c%c", type, armor + 'A', suffix ? '1' : 0);
 		} else {
-			snprintf(Sound, 9, "HIT_0%d%c", type, suffix?'1':0);
+			Sound.SNPrintF("HIT_0%d%c", type, suffix ? '1' : 0);
 		}
 	}
 	core->GetAudioDrv()->Play(Sound, SFX_CHAN_HITS, Pos);

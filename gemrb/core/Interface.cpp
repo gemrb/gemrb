@@ -695,9 +695,9 @@ int Interface::GetSpecialSpell(const ResRef& resref) const
 }
 
 //disable spells based on some circumstances
-int Interface::CheckSpecialSpell(const ieResRef resref, const Actor *actor) const
+int Interface::CheckSpecialSpell(const ResRef& resRef, const Actor *actor) const
 {
-	int sp = GetSpecialSpell(resref);
+	int sp = GetSpecialSpell(resRef);
 
 	//the identify spell is always disabled on the menu
 	if (sp&SP_IDENTIFY) {
@@ -742,9 +742,7 @@ bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 
 	int idx = aa->GetRowCount();
 	while (idx--) {
-		ieResRef key;
-
-		strnlwrcpy(key,aa->GetRowName(idx),8);
+		ResRef key = ResRef::MakeLowerCase(aa->GetRowName(idx));
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
@@ -3790,11 +3788,11 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 
 	int i = tab->GetRowCount();
 	for (int j = 0; j < i; j++) {
-		ieResRef ItemName;
+		ResRef ItemName;
 		if (Prefix) {
-			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, (j+1)%100);
+			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			strnlwrcpy(ItemName,tab->GetRowName(j), 8);
+			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
 		}
 		//Variable elements are free'd, so we have to use malloc
 		//well, not anymore, we can use ReleaseFunction

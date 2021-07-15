@@ -8534,7 +8534,7 @@ static PyObject* GemRB_CheckSpecialSpell(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found!\n" );
 	}
 
-	int ret = core->CheckSpecialSpell( SpellResRef, actor );
+	int ret = core->CheckSpecialSpell(ResRef(SpellResRef), actor );
 	return PyInt_FromLong( ret );
 }
 

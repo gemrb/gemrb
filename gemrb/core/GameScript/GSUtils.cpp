@@ -2597,7 +2597,7 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 //read a polygon 2da
 Gem_Polygon *GetPolygon2DA(ieDword index)
 {
-	ieResRef resref;
+	ResRef resRef;
 
 	if (index>=MAX_ISLAND_POLYGONS) {
 		return NULL;
@@ -2609,8 +2609,8 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (polygons[index]) {
 		return polygons[index];
 	}
-	snprintf(resref, sizeof(ieResRef), "ISLAND%02d", index);
-	AutoTable tm(resref);
+	resRef.SNPrintF("ISLAND%02d", index);
+	AutoTable tm(resRef);
 	if (!tm) {
 		return NULL;
 	}
