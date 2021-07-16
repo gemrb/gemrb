@@ -14,6 +14,8 @@ only_commits:
     - cmake/**/*
     - platforms/windows/**/*
     - .appveyor.yml
+matrix:
+  fast_finish: true
 environment:
   SF_ACC:
     secure: gnSOiLDvnkRuEcD9+silVao5mf7D/pX2mo6tkfVIMas=
