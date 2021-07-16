@@ -388,6 +388,8 @@ void Variables::SetAt(const char* key, char* value)
 	if (pAssoc->key) {
 		pAssoc->Value.sValue = value;
 		pAssoc->nHashValue = nHash;
+	} else {
+		free(value);
 	}
 }
 
