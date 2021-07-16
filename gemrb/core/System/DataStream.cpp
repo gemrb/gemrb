@@ -129,6 +129,16 @@ int DataStream::WriteResRef(const ResRef& src)
 	return Write(src.CString(), 8);
 }
 
+int DataStream::WriteResRefLC(const ResRef& src)
+{
+	return WriteResRef(ResRef::MakeLowerCase(src));
+}
+
+int DataStream::WriteResRefUC(const ResRef& src)
+{
+	return WriteResRef(ResRef::MakeUpperCase(src));
+}
+
 int DataStream::ReadPoint(Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish

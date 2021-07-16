@@ -92,6 +92,8 @@ public:
 	
 	int WriteResRef(const ieResRef src);
 	int WriteResRef(const ResRef& src);
+	int WriteResRefLC(const ResRef& src);
+	int WriteResRefUC(const ResRef& src);
 	
 	int ReadPoint(Point&);
 	int WritePoint(const Point&);
