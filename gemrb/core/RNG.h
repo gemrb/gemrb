@@ -28,6 +28,7 @@
 #include <cassert>
 #include <limits>
 #include <random>
+#include <type_traits>
 
 #define RAND_ALL() RAND()
 
@@ -52,7 +53,7 @@ class GEM_EXPORT RNG {
 		if (min == max) {
 			// For complete fairness and equal timing, this should be a roll, but let's skip it anyway
 			return max;
-		} else if (min == 0 && max < 0) {
+		} else if (std::is_signed<NUM_T>::value && min == 0 && max < 0) {
 			// Someone wants rand() % -foo, so we compute -rand(0, +foo)
 			// This is the only time where min > max is (sort of) legal.
 			// Not handling this will cause the application to crash.
