@@ -4016,7 +4016,6 @@ Effect *Interface::GetEffect(ieDword opcode)
 	if (!fx) {
 		return NULL;
 	}
-	memset(fx,0,sizeof(Effect));
 	fx->Opcode=opcode;
 	return fx;
 }

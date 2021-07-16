@@ -356,7 +356,7 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	if( !fx) {
 		return NULL;
 	}
-	memset(fx,0,sizeof(Effect));
+
 	fx->Target = FX_TARGET_SELF;
 	fx->Opcode = opcode;
 	fx->ProbabilityRangeMax = 100;
