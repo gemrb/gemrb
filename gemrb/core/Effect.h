@@ -223,6 +223,8 @@ public:
 		Resource4 = resources.Resource4;
 	}
 
+	~Effect() = default;
+
 	bool operator==(const Effect& rhs) const noexcept {
 		if (this == &rhs) return true;
 		
