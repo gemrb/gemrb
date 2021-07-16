@@ -181,7 +181,6 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	MusicSource = num_streams = 0;
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	ambim = NULL;
-	stayAlive = false;
 	hasReverbProperties = false;
 #ifdef HAVE_OPENAL_EFX_H
 	hasEFX = false;
@@ -244,8 +243,6 @@ bool OpenALAudioDriver::Init(void)
 
 	Log(MESSAGE, "OpenAL", "Allocated %d streams.%s",
 		num_streams, (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ));
-
-	stayAlive = true;
 
 	musicThread = std::thread(&OpenALAudioDriver::MusicManager, this);
 

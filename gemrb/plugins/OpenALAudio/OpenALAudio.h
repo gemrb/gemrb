@@ -143,7 +143,7 @@ private:
 	void clearBufferCache(bool force);
 	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
-	bool stayAlive;
+	std::atomic_bool stayAlive {true};
 	short* music_memory;
 	std::thread musicThread;
 
