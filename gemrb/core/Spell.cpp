@@ -128,7 +128,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 {
 	char g, t;
 	Effect *fx;
-	ieResRef Resource;
+	ResRef Resource;
 
 	int cgsound = CastingSound;
 	if (cgsound>=0 && duration > 1) {
@@ -161,11 +161,9 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 		}
 		//check if bg1
 		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
-			ieResRef s;
-			snprintf(s, 9, "CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
-			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
+			Resource.SNPrintF("CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, std::min(cgsound&0xff, 99));
+			Resource.SNPrintF("CHA_%c%c%02d", g, t, std::min(cgsound & 0xff, 99));
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
