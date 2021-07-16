@@ -107,14 +107,15 @@ static inline int CountElements(const char *s, char separator)
 	return ret;
 }
 
-static inline void GetElements(const char *s, ieResRef *storage, int count)
+static inline void GetElements(const char *s, ResRef *storage, int count)
 {
 	while(count--) {
-		ieResRef *field = storage+count;
-		strnuprcpy(*field, s, sizeof(ieResRef)-1);
-		for(size_t i=0;i<sizeof(ieResRef) && (*field)[i];i++) {
-			if ((*field)[i]==',') {
-				(*field)[i]='\0';
+		ResRef *field = &storage[count];
+		*field = ResRef::MakeUpperCase(s);
+		const char *tmp = *field;
+		for (size_t i = 0; i < 9 && tmp[i]; i++) {
+			if (tmp[i] == ',') {
+				(*field).Reset();
 				break;
 			}
 		}
@@ -253,7 +254,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"cre_file",NULL);
 	if (s) {
 		critter.creaturecount = CountElements(s,',');
-		critter.CreFile=new ieResRef[critter.creaturecount];
+		critter.CreFile = new ResRef[critter.creaturecount];
 		GetElements(s, critter.CreFile, critter.creaturecount);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);

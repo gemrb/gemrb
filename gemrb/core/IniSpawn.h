@@ -80,7 +80,7 @@ class Map;
 
 struct CritterEntry {
 	int creaturecount;
-	ieResRef *CreFile;        //spawn one of these creatures
+	ResRef *CreFile;        //spawn one of these creatures
 	ieByte Spec[9];		  //existance check IDS qualifier
 	ieByte SetSpec[9];	  //set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
