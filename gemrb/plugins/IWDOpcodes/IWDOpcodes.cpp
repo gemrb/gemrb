@@ -454,14 +454,14 @@ static void RegisterIWDOpcodes()
 //diffmode for gemrb. (Thus scripts can use the very same relation
 //functions).
 
-static void ReadSpellProtTable(const ieResRef tablename)
+static void ReadSpellProtTable(const char* tableName)
 {
 	if (spellres) {
 		free(spellres);
 	}
 	spellres = NULL;
 	spellrescnt = 0;
-	AutoTable tab(tablename);
+	AutoTable tab(tableName);
 	if (!tab) {
 		return;
 	}
@@ -1473,12 +1473,11 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	ieResRef tableResRef;
-
-	if (!fx->Resource.IsEmpty()) {
-		strnlwrcpy(tableResRef, fx->Resource, 8);
+	ResRef tableResRef;
+	if (fx->Resource.IsEmpty()) {
+		tableResRef = "pomab";
 	} else {
-		memcpy(tableResRef,"pomab",6);
+		tableResRef = fx->Resource; // gemrb extension
 	}
 
 	AutoTable tab(tableResRef);

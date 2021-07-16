@@ -4990,7 +4990,7 @@ int fx_remove_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	default:
 		// in yet another poor IE design decision ...
-		onlyknown = strnlen(fx->Resource, sizeof(ieResRef)) == 8;
+		onlyknown = strnlen(fx->Resource, 9) == 8;
 		target->spellbook.RemoveSpell(fx->Resource, onlyknown);
 		break;
 	case 1: //forget all spells of Resource
@@ -5382,7 +5382,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		Game *game = core->GetGame();
 
 		char familiar[9];
-		memcpy(familiar, game->Familiars[alignment], sizeof(ieResRef));
+		memcpy(familiar, game->Familiars[alignment], 9);
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
@@ -5456,16 +5456,14 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//upgrade familiar to ToB version
 	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
-		ieResRef resource;
-
-		memset(resource,0,sizeof(resource));
-		memcpy(resource,target->GetScriptName(),6);
-		strncat(resource,"25",8);
+		char resource[9]{};
+		memcpy(resource, target->GetScriptName(), 6);
+		strncat(resource, "25", 8);
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 
 		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
-		Actor *fam = GetFamiliar(NULL, target, fx, resource);
+		Actor *fam = GetFamiliar(nullptr, target, fx, ResRef(resource));
 
 		if (fam) {
 			//upgrade successful
@@ -6451,8 +6449,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		delete newfx;
 	}
 
-	ieResRef script;
-
+	char script[9];
 	//intentionally 7, to leave room for the last letter
 	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
 	//no need of buffer defense as long as you don't mess with the 7 above
@@ -6724,8 +6721,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		//failure
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
-			ieResRef spl;
-
+			char spl[9];
 			strnuprcpy(spl, fx->Resource, 8);
 			if (strlen(spl)<8) {
 				strcat(spl,"F");
@@ -7398,7 +7394,6 @@ int fx_protection_from_turn (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	Game *game;
-	ieResRef resref;
 
 	// print("fx_cutscene2(%2d): Locations: %d Resource: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (core->InCutSceneMode()) return FX_NOT_APPLIED;
@@ -7433,14 +7428,15 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 	core->SetCutSceneMode(true);
 
+	ResRef resRef;
 	//GemRB enhancement: allow a custom resource
 	if (fx->Parameter2) {
-		strnlwrcpy(resref,fx->Resource, 8);
+		resRef = ResRef::MakeLowerCase(fx->Resource);
 	} else {
-		strnlwrcpy(resref,"cut250a",8);
+		resRef = "cut250a";
 	}
 
-	GameScript* gs = new GameScript( resref, game );
+	GameScript* gs = new GameScript(resRef, game);
 	gs->EvaluateAllBlocks();
 	delete( gs );
 	return FX_NOT_APPLIED;
