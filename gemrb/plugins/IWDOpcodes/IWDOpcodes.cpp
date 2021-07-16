@@ -918,7 +918,6 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -978,7 +977,6 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 //f4 Prayer
@@ -1039,7 +1037,6 @@ int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -1118,7 +1115,6 @@ int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 //0xf9 Recitation
@@ -1447,7 +1443,6 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 		}
 		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
 	}
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -1817,7 +1812,6 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 		//the monster should appear near the effect position
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);
-		delete newfx;
 
 		// for each kill the caster receives a +1 bonus to Str, Dex and Con for 1 turn
 		if (Owner->Type == ST_ACTOR) {
