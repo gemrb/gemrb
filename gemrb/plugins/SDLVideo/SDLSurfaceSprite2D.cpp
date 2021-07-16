@@ -168,14 +168,13 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	int ret = SDL_SetColorKey(*surface, SDL_bool(format.HasColorKey), ck);
+	SDL_SetColorKey(*surface, SDL_bool(format.HasColorKey), ck);
 	// don't RLE with SDL 2
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
 #else
 	Uint32 flag = format.HasColorKey ? SDL_SRCCOLORKEY : 0;
-	int ret = SDL_SetColorKey(*surface, flag | SDL_RLEACCEL, ck);
+	SDL_SetColorKey(*surface, flag | SDL_RLEACCEL, ck);
 #endif
-	assert(ret == 0);
 }
 
 bool SDLSurfaceSprite2D::HasTransparency() const noexcept
