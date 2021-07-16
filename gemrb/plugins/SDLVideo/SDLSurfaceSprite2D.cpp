@@ -45,8 +45,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 	
 	if (format.palette)
 		SetPaletteColors(format.palette->col);
-	if (format.HasColorKey)
-		UpdateColorKey(format.ColorKey);
+	UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, format.palette);
 	
@@ -79,7 +78,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 	if (format.palette) {
 		SetPaletteColors(format.palette->col);
 	}
-	SetColorKey(obj.GetColorKey());
+	UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, obj.format.palette);
 	if (pixels == nullptr) {
@@ -169,11 +168,12 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
-	int ret = SDL_SetColorKey(*surface, SDL_TRUE, ck);
+	int ret = SDL_SetColorKey(*surface, SDL_bool(format.HasColorKey), ck);
 	// don't RLE with SDL 2
 	// this only benifits SDL_BlitSurface which we don't use. its a slowdown for us.
 #else
-	int ret = SDL_SetColorKey(*surface, SDL_SRCCOLORKEY | SDL_RLEACCEL, ck);
+	Uint32 flag = format.HasColorKey ? SDL_SRCCOLORKEY : 0;
+	int ret = SDL_SetColorKey(*surface, flag | SDL_RLEACCEL, ck);
 #endif
 	assert(ret == 0);
 }
