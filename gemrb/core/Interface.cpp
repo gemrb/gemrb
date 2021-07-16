@@ -175,7 +175,6 @@ Interface::Interface()
 	}
 
 	TooltipBG = NULL;
-	DefSound = NULL;
 	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
@@ -293,7 +292,7 @@ Interface::~Interface(void)
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 
-	FreeResRefTable(DefSound, DSCount);
+	FreeResRefTable(gamedata->DefSound, DSCount);
 
 	slotTypes.clear();
 	free( slotmatrix );
@@ -1562,7 +1561,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
-	DSCount = ReadResRefTable ("defsound", DefSound);
+	DSCount = ReadResRefTable("defsound", gamedata->DefSound);
 	if (DSCount == 0) {
 		Log(FATAL, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
@@ -4118,7 +4117,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 Holder<SoundHandle> Interface::PlaySound(int index, unsigned int channel)
 {
 	if (index<=DSCount) {
-		return AudioDriver->Play(DefSound[index], channel);
+		return AudioDriver->Play(gamedata->DefSound[index], channel);
 	}
 	return NULL;
 }

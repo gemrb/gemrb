@@ -415,7 +415,6 @@ private:
 	std::string DefaultWindowTitle;
 
 	TooltipBackground* TooltipBG;
-	ieResRef *DefSound; //default sounds
 	int DSCount;
 
 	ResRef Palette16;

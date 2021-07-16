@@ -158,6 +158,9 @@ private:
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
+
+public:
+	ieResRef *DefSound = nullptr; //default sounds
 };
 
 extern GEM_EXPORT GameData * gamedata;

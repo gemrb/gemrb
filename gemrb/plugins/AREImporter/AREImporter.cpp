@@ -54,14 +54,8 @@ using namespace GemRB;
 #define DEF_HOPEN  2
 #define DEF_HCLOSE 3
 
-#define DEF_COUNT 4
-
 //something non signed, non ascii
 #define UNINITIALIZED_BYTE  0x11
-
-static ieResRef Sounds[DEF_COUNT] = {
-	{UNINITIALIZED_BYTE},
-};
 
 struct ResRefToStrRef {
 	ieResRef areaName;
@@ -139,24 +133,11 @@ AREImporter::AREImporter(void)
 	LastSave = 0;
 
 	str = NULL;
-	if (Sounds[0][0] == UNINITIALIZED_BYTE) {
-		memset( Sounds, 0, sizeof( Sounds ) );
-		AutoTable at("defsound");
-		if (at.ok()) {
-			for (int i = 0; i < DEF_COUNT; i++) {
-				strncpy( Sounds[i], at->QueryField( i, 0 ), 8 );
-				if(Sounds[i][0]=='*') {
-					Sounds[i][0]=0;
-				}
-			}
-		}
-	}
 }
 
 AREImporter::~AREImporter(void)
 {
 	delete str;
-	Sounds[0][0]=UNINITIALIZED_BYTE;
 }
 
 bool AREImporter::Open(DataStream* stream)
@@ -1016,17 +997,17 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			door->OpenSound = OpenResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				door->OpenSound = Sounds[DEF_HOPEN];
+				door->OpenSound = gamedata->DefSound[DEF_HOPEN];
 			else
-				door->OpenSound = Sounds[DEF_OPEN];
+				door->OpenSound = gamedata->DefSound[DEF_OPEN];
 		}
 		if (!CloseResRef.IsEmpty())
 			door->CloseSound = CloseResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				door->CloseSound = Sounds[DEF_HCLOSE];
+				door->CloseSound = gamedata->DefSound[DEF_HCLOSE];
 			else
-				door->CloseSound = Sounds[DEF_CLOSE];
+				door->CloseSound = gamedata->DefSound[DEF_CLOSE];
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
