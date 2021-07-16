@@ -841,7 +841,7 @@ int Game::DelMap(unsigned int index, int forced)
 	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
 		const char *name = map->GetScriptName();
-		if (MasterArea(name) && !AnotherArea[0]) {
+		if (MasterArea(name) && AnotherArea.IsEmpty()) {
 			AnotherArea = name;
 			if (!forced) {
 				return -1;
