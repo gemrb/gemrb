@@ -142,7 +142,7 @@ private:
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 	/** Depletes a sorcerer type spellpage by one */
-	void DepleteLevel(CRESpellMemorization* sm, const ResRef& except);
+	void DepleteLevel(CRESpellMemorization* sm, const ResRef& except) const;
 	/** Adds a single spell to the spell info list */
 	void AddSpellInfo(unsigned int level, unsigned int type, const ResRef& name, unsigned int idx);
 	/** regenerates the spellinfo list */

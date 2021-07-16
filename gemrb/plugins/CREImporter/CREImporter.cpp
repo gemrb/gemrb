@@ -208,7 +208,7 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 	return -1;
 }*/
 
-int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const
+ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const
 {
 	level = 0;
 	if (IsSong(name)>=0) return IE_IWD2_SPELL_SONG;
@@ -231,7 +231,7 @@ int CREImporter::FindSpellType(const ResRef& name, unsigned short &level, unsign
 	for (size_t i = 0; i < splCount; i++) {
 		if (splList[i]->Equals(name) ) {
 			// iterate over table columns ("kits" - book types)
-			for(int type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			for (ieWord type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
 				if (clsMask & (1 << type)) {
 					int level2 = splList[i]->FindSpell(type);
 					if (level2 == -1) {

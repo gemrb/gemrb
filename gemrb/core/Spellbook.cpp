@@ -39,7 +39,7 @@ static int NUM_BOOK_TYPES = 3;
 static bool IWD2Style = false;
 
 //spell header-->spell book type conversion (iwd2 is different)
-static const int spelltypes[NUM_SPELL_TYPES]={
+static const ieWord spelltypes[NUM_SPELL_TYPES] = {
 	IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_PRIEST,
 	IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_SONG
 };
@@ -126,9 +126,8 @@ void Spellbook::CopyFrom(const Actor *source)
 	const Spellbook &wikipedia = source->spellbook;
 
 	for (int t = 0; t < NUM_BOOK_TYPES; t++) {
-		for (size_t i = 0; i < wikipedia.spells[t].size(); i++) {
+		for (const auto& wm: wikipedia.spells[t]) {
 			unsigned int k;
-			CRESpellMemorization *wm = wikipedia.spells[t][i];
 			CRESpellMemorization *sm = new CRESpellMemorization();
 			spells[t].push_back(sm);
 			sm->Level = wm->Level;
@@ -157,7 +156,7 @@ const int sections[] = { 3, 0, 1, 2, 2 };
 // ignore songs and shapes altogether
 const int arcanetypes[] = { IE_IWD2_SPELL_BARD, IE_IWD2_SPELL_SORCERER, IE_IWD2_SPELL_WIZARD, IE_IWD2_SPELL_DOMAIN };
 const int divinetypes[] = { IE_IWD2_SPELL_CLERIC, IE_IWD2_SPELL_DRUID, IE_IWD2_SPELL_PALADIN, IE_IWD2_SPELL_RANGER, IE_IWD2_SPELL_DOMAIN };
-const int *alltypes[2] = { divinetypes, arcanetypes };
+const int* const alltypes[2] = { divinetypes, arcanetypes };
 
 int inline GetType(int spellid, unsigned int &bookcount, int &idx)
 {
@@ -212,20 +211,19 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 }
 bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 {
-	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
+	unsigned int count = GetSpellLevelCount(type);
+	for (unsigned int j = 0; j < count; j++) {
 		CRESpellMemorization* sm = spells[type][j];
-		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-			CREMemorizedSpell* ms = sm->memorized_spells[k];
-			if (ms->Flags) {
-				if (atoi(ms->SpellResRef.CString() + 4) == spellid) {
-					if (flags&HS_DEPLETE) {
-						if (DepleteSpell(ms) && (sorcerer & (1<<type) ) ) {
-							DepleteLevel (sm, ms->SpellResRef);
-						}
-					}
-					return true;
-				}
+		for (auto& ms : sm->memorized_spells) {
+			if (!ms->Flags) continue;
+			if (atoi(ms->SpellResRef.CString() + 4) != spellid) continue;
+
+			if (!(flags & HS_DEPLETE)) return true;
+
+			if (DepleteSpell(ms) && (sorcerer & (1 << type))) {
+				DepleteLevel(sm, ms->SpellResRef);
 			}
+			return true;
 		}
 	}
 	return false;
@@ -317,11 +315,8 @@ bool Spellbook::KnowSpell(const char *resref) const
 bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-				CREMemorizedSpell* ms = sm->memorized_spells[k];
-
+		for (auto& sm : spells[i]) {
+			for (const auto& ms : sm->memorized_spells) {
 				if (!ms->Flags) continue;
 				if (resref[0] && ms->SpellResRef != resref) {
 					continue;
@@ -521,7 +516,7 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 		if (level == -1) {
 			level = spell->SpellLevel-1;
 		}
-		spl->Level = level;
+		spl->Level = static_cast<ieWord>(level);
 		spl->Type = gm->FindSpellType(spell->Name, spl->Level, clsmsk, kit);
 	} else {
 		//not IWD2
@@ -530,7 +525,7 @@ int Spellbook::LearnSpell(Spell *spell, int memo, unsigned int clsmsk, unsigned 
 			if (spell->SpellLevel == 0) { // totemic druid has some broken innates (fixed by fixpack)
 				spell->SpellLevel = 1;
 			}
-			spl->Level = spell->SpellLevel-1;
+			spl->Level = static_cast<ieWord>(spell->SpellLevel - 1);
 		} else {
 			spl->Type = IE_SPELL_TYPE_INNATE;
 		}
@@ -632,7 +627,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(const ieResRef name, int type, b
 		while(level--) {
 			size_t i = spells[t][level]->memorized_spells.size();
 			while(i--) {
-				CREMemorizedSpell *cms = spells[t][level]->memorized_spells[i];
+				const CREMemorizedSpell *cms = spells[t][level]->memorized_spells[i];
 
 				if (cms->SpellResRef != name) continue;
 				if (!real || cms->Flags) j++;
@@ -761,7 +756,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 {
 	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type))
 		return 0;
-	CRESpellMemorization* sm = spells[type][level];
+	const CRESpellMemorization* sm = spells[type][level];
 	if (bonus)
 		return sm->SlotCountWithBonus;
 	return sm->SlotCount;
@@ -869,8 +864,7 @@ void Spellbook::CreateSorcererMemory(int type)
 			delete spellMemo->memorized_spells[cnt];
 		}
 		spellMemo->memorized_spells.clear();
-		for (unsigned int k = 0; k < spellMemo->known_spells.size(); k++) {
-			const CREKnownSpell *ck = spellMemo->known_spells[k];
+		for (const auto& ck : spellMemo->known_spells) {
 			cnt = spellMemo->SlotCountWithBonus;
 			while(cnt--) {
 				MemorizeSpell(ck, true);
@@ -908,10 +902,10 @@ bool Spellbook::DepleteSpell(int type)
 	while(j--) {
 		CRESpellMemorization* sm = spells[type][j];
 
-		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-			if (DepleteSpell( sm->memorized_spells[k] )) {
+		for (auto& spell : sm->memorized_spells) {
+			if (DepleteSpell(spell)) {
 				if (sorcerer & (1<<type) ) {
-					DepleteLevel (sm, sm->memorized_spells[k]->SpellResRef);
+					DepleteLevel(sm, spell->SpellResRef);
 				}
 				return true;
 			}
@@ -920,23 +914,15 @@ bool Spellbook::DepleteSpell(int type)
 	return false;
 }
 
-void Spellbook::DepleteLevel(CRESpellMemorization* sm, const ResRef& except)
+void Spellbook::DepleteLevel(CRESpellMemorization* sm, const ResRef& except) const
 {
-	size_t cnt = sm->memorized_spells.size();
 	ResRef last;
 
-	for (size_t i = 0; i < cnt && cnt>0; i++) {
-		CREMemorizedSpell *cms = sm->memorized_spells[i];
+	for (auto& cms : sm->memorized_spells) {
 		//sorcerer spells are created in orderly manner
 		if (cms->Flags && last != cms->SpellResRef && except != cms->SpellResRef) {
 			last = cms->SpellResRef;
 			cms->Flags=0;
-/*
-			delete cms;
-			sm->memorized_spells.erase(sm->memorized_spells.begin()+i);
-			i--;
-			cnt--;
-*/
 		}
 	}
 }
@@ -1097,7 +1083,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 		}
 	}
 
-	SPLExtHeader *ext_header = spl->ext_headers+ehc;
+	const SPLExtHeader *ext_header = spl->ext_headers + ehc;
 	seh->headerindex = ehc;
 	seh->level = sm_level;
 	seh->type = sm_type;

@@ -69,7 +69,7 @@ public:
 	bool Open(DataStream* stream) override;
 	Actor* GetActor(unsigned char is_in_party) override;
 
-	int FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
+	ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
 
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac) override;
