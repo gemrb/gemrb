@@ -191,7 +191,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			break;
 	}
 
-	if (!newGame->CurrentArea[0]) {
+	if (newGame->CurrentArea.IsEmpty()) {
 		// 0 - normal, 1 - tutorial, 2 - extension
 		AutoTable tm("STARTARE");
 		ieDword playmode = 0;

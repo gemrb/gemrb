@@ -5957,7 +5957,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "KillsTotalXP", DecRef(PyInt_FromLong, ps->KillsTotalXP));
 	PyDict_SetItemString(dict, "KillsTotalCount", DecRef(PyInt_FromLong, ps->KillsTotalCount));
 
-	if (ps->FavouriteSpells[0][0]) {
+	if (!ps->FavouriteSpells[0].IsEmpty()) {
 		int largest = 0;
 
 		// 0 already has the top candidate, but we double check for old saves
@@ -5979,7 +5979,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "FavouriteSpell", DecRef(PyInt_FromLong, -1));
 	}
 
-	if (ps->FavouriteWeapons[0][0]) {
+	if (!ps->FavouriteWeapons[0].IsEmpty()) {
 		int largest = 0;
 
 		for (int i = 1; i < 4; ++i) {
