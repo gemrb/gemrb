@@ -101,9 +101,9 @@ protected:
 	unsigned short autoresizeFlags; // these flags don't produce notifications
 
 private:
-	void DirtyBGRect(const Region&);
+	void DirtyBGRect(const Region&, bool force = false);
 	void DrawBackground(const Region*) const;
-	void DrawSubviews() const;
+	void DrawSubviews();
 	void MarkDirty(const Region*);
 	bool NeedsDrawRecursive() const;
 

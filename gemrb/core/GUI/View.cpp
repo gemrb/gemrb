@@ -182,16 +182,16 @@ bool View::IsReceivingEvents() const
 	return getEvents;
 }
 
-void View::DirtyBGRect(const Region& r)
+void View::DirtyBGRect(const Region& r, bool force)
 {
 	// no need to draw the parent BG for opaque views
 	if (superView && !IsOpaque()) {
 		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.origin), r.size));
-		superView->DirtyBGRect(rgn);
+		superView->DirtyBGRect(rgn, force);
 	}
 
 	// if we are going to draw the entire BG, no need to compute and store this
-	if (NeedsDrawRecursive())
+	if (!force && NeedsDrawRecursive())
 		return;
 
 	// do we want to intersect this too?
@@ -203,11 +203,13 @@ void View::DirtyBGRect(const Region& r)
 	MarkDirty(&dirty);
 }
 
-void View::DrawSubviews() const
+void View::DrawSubviews()
 {
-	std::list<View*>::const_iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		(*it)->Draw();
+	for (View* subview : subViews) {
+		subview->Draw();
+		if (subview->IsAnimated() && !subview->IsOpaque()) {
+			DirtyBGRect(subview->frame, true);
+		}
 	}
 }
 
@@ -282,11 +284,6 @@ void View::Draw()
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
-	if (superView && IsAnimated() && !IsOpaque()) {
-		// TODO: this should actually be superView->MarkDirty(frame) but we dont handle partial redraws so I'm avoiding the extra work...
-		// change it if we encounter an animated transparent subview overlapping with the parents drawing (or better yet implement partial redraws)
-		superView->DirtyBGRect(frame);
-	}
 	dirty = false;
 
 	if (core->InDebugMode(ID_VIEWS)) {
