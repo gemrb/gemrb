@@ -43,8 +43,9 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 	assert(*surface);
 	pitch = (*surface)->pitch;
 	
-	if (format.palette)
-		SetPaletteColors(format.palette->col);
+	if (format.palette) {
+		UpdatePalette(format.palette);
+	}
 	UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, format.palette);
@@ -76,11 +77,12 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 		);
 	
 	if (format.palette) {
-		SetPaletteColors(format.palette->col);
+		UpdatePalette(format.palette);
 	}
 	UpdateColorKey(format.ColorKey);
 	
 	format = PixelFormatForSurface(*surface, obj.format.palette);
+
 	if (pixels == nullptr) {
 		pixels = (*surface)->pixels;
 	}
@@ -150,11 +152,9 @@ bool SDLSurfaceSprite2D::IsPaletteStale() const
 void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 {
 	// we don't use shared palettes because it is a performance bottleneck on SDL2
-	assert(pal != surface->palette);
+	assert(pal && pal != surface->palette);
 
-	if (version == 0) {
-		original->palette = nullptr;
-	} else {
+	if (version != 0) {
 		Restore();
 	}
 
