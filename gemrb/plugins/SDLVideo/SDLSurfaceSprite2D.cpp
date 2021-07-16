@@ -157,12 +157,12 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 	if (version != 0) {
 		Restore();
 	}
-
-	if (pal && SetPaletteColors(pal->col) == 0) {
-		surface->palette = pal;
-	} else {
-		SetPaletteFromSurface();
-	}
+	
+	surface->palette = pal;
+	bool ret = SetPaletteColors(pal->col);
+	assert(ret);
+	
+	palVersion = pal->GetVersion();
 }
 
 void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
@@ -240,10 +240,6 @@ void* SDLSurfaceSprite2D::NewVersion(version_t newversion) const
 	}
 
 	if (format.Bpp == 1) {
-		PaletteHolder pal = GetPalette(); // generate the backup
-
-		palVersion = pal->GetVersion();
-
 		// we just allow overwritting the palette
 		return surface->surface->format->palette;
 	}
