@@ -86,9 +86,13 @@ public:
 	Holder& operator=(const Holder& rhs) noexcept
 	{
 		if (&rhs != this) {
+			if (rhs.ptr) {
+				rhs.ptr->acquire();
+			}
+			if (ptr) {
+				ptr->release();
+			}
 			ptr = rhs.ptr;
-			if (ptr)
-				ptr->acquire();
 		}
 		return *this;
 	}
