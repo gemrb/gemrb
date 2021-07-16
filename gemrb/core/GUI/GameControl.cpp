@@ -59,6 +59,13 @@ static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
 
+static Actor* GetMainSelectedActor()
+{
+	auto actor = core->GetFirstSelectedPC(false);
+	if (actor) return actor;
+	return core->GetFirstSelectedActor();
+}
+
 //If one of the actors has tracking on, the gamecontrol needs to display
 //arrow markers on the edges to point at detected monsters
 //tracterID is the tracker actor's global ID
@@ -2065,11 +2072,7 @@ void GameControl::InitFormation(const Point &clickPoint)
 		return;
 	}
 
-	const Game *game = core->GetGame();
-	const Actor *selectedActor = core->GetFirstSelectedPC(false);
-	if (!selectedActor) {
-		selectedActor = game->selected[0];
-	}
+	const Actor *selectedActor = GetMainSelectedActor();
 
 	isFormationRotation = true;
 	formationBaseAngle = AngleFromPoints(clickPoint, selectedActor->Pos);
@@ -2214,7 +2217,12 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		
 		if (overContainer || overDoor || (overInfoPoint && overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE)) {
 			// move to the object before trying to interact with it
-			CommandSelectedMovement(p, false, isDoubleClick);
+			Actor* mainActor = GetMainSelectedActor();
+			if (mainActor && overContainer) {
+				CreateMovement(mainActor, p, false, isDoubleClick);	// let one actor handle loot and containers
+			} else {
+				CommandSelectedMovement(p, false, isDoubleClick);
+			}
 		}
 		
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
@@ -2245,11 +2253,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
 
-	Actor* selectedActor = core->GetFirstSelectedPC(false);
-	if (!selectedActor) {
-		//this could be a non-PC
-		selectedActor = game->selected[0];
-	}
+	Actor* selectedActor = GetMainSelectedActor();
 
 	//add a check if you don't want some random monster handle doors and such
 	if (targetActor) {
