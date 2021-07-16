@@ -1824,14 +1824,12 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ResRef& ResRef, Scriptable* MySelf,
+GameScript::GameScript(const ResRef& resref, Scriptable* MySelf,
 	int ScriptLevel, bool AIScript)
 	: MySelf(MySelf)
 {
 	scriptlevel = ScriptLevel;
-
-	Name = ResRef::MakeLowerCase(ResRef);
-
+	Name = resref;
 	script = CacheScript( Name, AIScript);
 }
 

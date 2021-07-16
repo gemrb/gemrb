@@ -319,7 +319,7 @@ public:
 	}
 	void SetDialog(const ResRef &resref);
 	void SetFloatingText(char*);
-	void SetScript(const char* aScript, int idx, bool ai = false);
+	void SetScript(const ResRef &aScript, int idx, bool ai = false);
 	void SetSpellResRef(const ResRef& resref);
 	void SetWait(tick_t time);
 	tick_t GetWait() const;

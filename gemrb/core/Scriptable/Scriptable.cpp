@@ -176,7 +176,7 @@ void Scriptable::SetMap(Map *map)
 //ai is nonzero if this is an actor currently in the party
 //if the script level is AI_SCRIPT_LEVEL, then we need to
 //load an AI script (.bs) instead of (.bcs)
-void Scriptable::SetScript(const char* aScript, int idx, bool ai)
+void Scriptable::SetScript(const ResRef &aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
@@ -189,9 +189,9 @@ void Scriptable::SetScript(const char* aScript, int idx, bool ai)
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
-	if (aScript[0] && stricmp(aScript, "NONE") != 0) {
+	if (!aScript.IsEmpty() && aScript != "NONE") {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
-		Scripts[idx] = new GameScript(ResRef(aScript), this, idx, ai);
+		Scripts[idx] = new GameScript(aScript, this, idx, ai);
 	}
 }
 
