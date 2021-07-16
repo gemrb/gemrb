@@ -415,7 +415,6 @@ private:
 	std::string DefaultWindowTitle;
 
 	TooltipBackground* TooltipBG;
-	int DSCount;
 
 	ResRef Palette16;
 	ResRef Palette32;
@@ -661,7 +660,7 @@ public:
 	//creates a standalone effect with opcode
 	Effect *GetEffect(ieDword opcode);
 	/** plays stock gui sound referenced by index */
-	Holder<SoundHandle> PlaySound(int idx, unsigned int channel);
+	Holder<SoundHandle> PlaySound(size_t idx, unsigned int channel);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
@@ -715,9 +714,7 @@ public:
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, const EffectDesc *opcodes);
 	/** reads a list of resrefs into an array, returns array size */
-	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
-	/** frees the data */
-	void FreeResRefTable(ieResRef *&table, int &count);
+	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly

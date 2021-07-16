@@ -11589,7 +11589,8 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	// deplete original memorisation
 	actor->spellbook.UnmemorizeSpell(spell, true);
 	// set spellinfo to all known spells of desired type
-	actor->spellbook.SetCustomSpellInfo(NULL, NULL, 1<<type);
+	std::vector<ResRef> data;
+	actor->spellbook.SetCustomSpellInfo(data, NULL, 1 << type);
 	SpellExtHeader spelldata{};
 	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1<<type);
 
@@ -11625,7 +11626,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	unsigned int globalID;
 	int type;
 	unsigned int spell;
-	ieResRef *resRef;
+	const char *resRef;
 	PARSE_ARGS( args,  "iii|s", &globalID, &type, &spell, &resRef);
 
 	GET_GAME();
@@ -11638,8 +11639,10 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	}
 
 	SpellExtHeader spelldata{};
+	std::vector<ResRef> data;
 	if (type == -3) {
-		actor->spellbook.SetCustomSpellInfo(resRef, nullptr, 1);
+		data.push_back(resRef);
+		actor->spellbook.SetCustomSpellInfo(data, nullptr, 0);
 		actor->spellbook.GetSpellInfo(&spelldata, 255, 0, 1);
 	} else if (type == -2) {
 		//resolve quick spell slot
@@ -11654,7 +11657,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);
 		if (ActionLevel == 5) {
 			// get the right spell, since the lookup below only checks the memorized list
-			actor->spellbook.SetCustomSpellInfo(NULL, NULL, type);
+			actor->spellbook.SetCustomSpellInfo(data, NULL, type);
 		}
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}

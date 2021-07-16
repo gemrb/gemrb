@@ -144,11 +144,11 @@ private:
 	/** Depletes a sorcerer type spellpage by one */
 	void DepleteLevel(CRESpellMemorization* sm, const ResRef& except);
 	/** Adds a single spell to the spell info list */
-	void AddSpellInfo(unsigned int level, unsigned int type, const ieResRef name, unsigned int idx);
+	void AddSpellInfo(unsigned int level, unsigned int type, const ResRef& name, unsigned int idx);
 	/** regenerates the spellinfo list */
 	void GenerateSpellInfo();
 	/** looks up the spellinfo list for an element */
-	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name) const;
+	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ResRef& name) const;
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ResRef& resRef);
 	/** adds a spell to the book, internal */
@@ -242,7 +242,7 @@ public:
 	unsigned int GetSpellInfoSize(int type);
 
 	/** generates a custom spellinfo list for fx_select_spell */
-	void SetCustomSpellInfo(const ieResRef *data, const ResRef &spell, int type);
+	void SetCustomSpellInfo(std::vector<ResRef>& data, const ResRef &spell, int type);
 
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();

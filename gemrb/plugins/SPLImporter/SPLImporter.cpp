@@ -27,53 +27,46 @@
 
 using namespace GemRB;
 
-int *cgsounds = NULL;
-int cgcount = -1;
-
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	if (cgsounds) {
-		free(cgsounds);
-		cgsounds = NULL;
-	}
-	cgcount = 0;
 	AutoTable tm("cgtable");
 	if (!tm) {
 		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;
 	}
-	cgcount = tm->GetRowCount();
-	cgsounds = (int *) calloc( cgcount, sizeof(int) );
-	for (int i = 0; i < cgcount; i++) {
-		cgsounds[i] = atoi(tm->QueryField( i, 1 ) );
-	}
-}
 
-static void ReleaseMemorySPL()
-{
-	free(cgsounds);
-	cgsounds = NULL;
-	cgcount = -1;
+	size_t count = tm->GetRowCount();
+	gamedata->castingGlows.resize(count);
+	gamedata->castingSounds.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		gamedata->castingGlows[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
+		// * marks an empty resource
+		if (gamedata->castingGlows[i].IsStar()) {
+			gamedata->castingGlows[i].Reset();
+		}
+	}
+
 }
 
 static int GetCGSound(ieDword CastingGraphics)
 {
-	if (cgcount<0) {
+	if (gamedata->castingGlows.empty()) {
 		Initializer();
 	}
 
-	if (CastingGraphics>=(ieDword) cgcount) {
+	if (CastingGraphics >= gamedata->castingSounds.size()) {
 		return -1;
 	}
 	int ret = -1;
 	if (core->HasFeature(GF_CASTING_SOUNDS) ) {
-		ret = cgsounds[CastingGraphics];
+		ret = gamedata->castingSounds[CastingGraphics];
 		if (core->HasFeature(GF_CASTING_SOUNDS2) ) {
 			ret |= 0x100;
 		}
 	} else if (!core->HasFeature(GF_CASTING_SOUNDS2)) {
-		ret = cgsounds[CastingGraphics];
+		ret = gamedata->castingSounds[CastingGraphics];
 	}
 	return ret;
 }
@@ -255,5 +248,4 @@ Effect *SPLImporter::GetFeature(Spell *s)
 
 GEMRB_PLUGIN(0xA8D1014, "SPL File Importer")
 PLUGIN_CLASS(IE_SPL_CLASS_ID, SPLImporter)
-PLUGIN_CLEANUP(ReleaseMemorySPL)
 END_PLUGIN()

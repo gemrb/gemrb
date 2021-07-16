@@ -90,10 +90,6 @@ using namespace GemRB;
 #define PI_CSHIELD  162
 #define PI_CSHIELD2 163
 
-static ieResRef *casting_glows = NULL;
-static int cgcount = -1;
-static ieResRef *spell_hits = NULL;
-static int shcount = -1;
 static int *polymorph_stats = NULL;
 static int polystatcount = 0;
 
@@ -851,8 +847,6 @@ static EffectRef fx_chr_ref = { "CharismaModifier", -1 };
 
 static void Cleanup()
 {
-	core->FreeResRefTable(casting_glows, cgcount);
-	core->FreeResRefTable(spell_hits, shcount);
 	if(polymorph_stats) free(polymorph_stats);
 	polymorph_stats=NULL;
 }
@@ -4332,12 +4326,8 @@ static const int xpos_by_direction[16]={0,-10,-12,-14,-16,-14,-12,-10,0,10,12,14
 int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_casting_glow(%2d): Type: %d", fx->Opcode, fx->Parameter2);
-	if (cgcount<0) {
-		cgcount = core->ReadResRefTable("cgtable",casting_glows);
-	}
-
-	if (fx->Parameter2<(ieDword) cgcount) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
+	if (fx->Parameter2 < gamedata->castingGlows.size()) {
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(gamedata->castingGlows[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -4369,16 +4359,16 @@ int fx_casting_glow (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_visual_spell_hit(%2d): Target: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	if (shcount<0) {
-		shcount = core->ReadResRefTable("shtable",spell_hits);
+	if (gamedata->spellHits.empty()) {
+		core->ReadResRefTable(ResRef("shtable"), gamedata->spellHits);
 	}
 	//remove effect if map is not loaded
 	Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
+	if (fx->Parameter2 < gamedata->spellHits.size()) {
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(gamedata->spellHits[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -5746,11 +5736,10 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->GetDictionary()->SetAt("ActionLevel", 5);
 	} else {
 		//all spells listed in 2da
-		ieResRef *data = NULL;
+		std::vector<ResRef> data;
+		core->ReadResRefTable(fx->Resource, data);
+		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
-		int count = core->ReadResRefTable(fx->Resource, data);
-		sb->SetCustomSpellInfo(data, fx->SourceRef, count);
-		core->FreeResRefTable(data, count);
 		core->GetDictionary()->SetAt("ActionLevel", 11);
 	}
 	// force a redraw of the action bar

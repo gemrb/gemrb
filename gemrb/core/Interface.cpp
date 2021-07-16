@@ -175,7 +175,6 @@ Interface::Interface()
 	}
 
 	TooltipBG = NULL;
-	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
 	//GameFeatures2 = 0;
@@ -242,14 +241,6 @@ static void FreeAbilityTables()
 #undef NULL_FREE
 }
 
-void Interface::FreeResRefTable(ieResRef *&table, int &count)
-{
-	if (table) {
-		free( table );
-		count = -1;
-	}
-}
-
 Interface::~Interface(void)
 {
 	WindowManager::CursorMouseUp = NULL;
@@ -291,8 +282,6 @@ Interface::~Interface(void)
 	ReleaseMemorySpell();
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
-
-	FreeResRefTable(gamedata->DefSound, DSCount);
 
 	slotTypes.clear();
 	free( slotmatrix );
@@ -901,29 +890,27 @@ void Interface::Main()
 	QuitGame(0);
 }
 
-int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
+bool Interface::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data)
 {
-	int count = 0;
-
-	if (data) {
-		free(data);
-		data = NULL;
+	if (!data.empty()) {
+		data.clear();
 	}
-	AutoTable tm(tablename);
+	AutoTable tm(tableName);
 	if (!tm) {
-		Log(ERROR, "Core", "Cannot find %s.2da.", tablename);
-		return 0;
+		Log(ERROR, "Core", "Cannot find %s.2da.", tableName.CString());
+		return false;
 	}
-	count = tm->GetRowCount();
-	data = (ieResRef *) calloc( count, sizeof(ieResRef) );
-	for (int i = 0; i < count; i++) {
-		strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
+
+	size_t count = tm->GetRowCount();
+	data.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
 		// * marks an empty resource
-		if (data[i][0]=='*') {
-			data[i][0]=0;
+		if (data[i].IsStar()) {
+			data[i].Reset();
 		}
 	}
-	return count;
+	return true;
 }
 
 int Interface::LoadSprites()
@@ -1561,8 +1548,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
-	DSCount = ReadResRefTable("defsound", gamedata->DefSound);
-	if (DSCount == 0) {
+	if (!ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
 		Log(FATAL, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
 	}
@@ -4113,10 +4099,10 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(int index, unsigned int channel)
+Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
 {
-	if (index<=DSCount) {
-		return AudioDriver->Play(gamedata->DefSound[index], channel);
+	if (index <= gamedata->defaultSounds.size()) {
+		return AudioDriver->Play(gamedata->defaultSounds[index], channel);
 	}
 	return NULL;
 }

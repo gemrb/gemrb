@@ -160,7 +160,10 @@ private:
 	Size weaponStyleAPRBonusMax{};
 
 public:
-	ieResRef *DefSound = nullptr; //default sounds
+	std::vector<ResRef> defaultSounds;
+	std::vector<ResRef> castingGlows;
+	std::vector<int> castingSounds;
+	std::vector<ResRef> spellHits;
 };
 
 extern GEM_EXPORT GameData * gamedata;

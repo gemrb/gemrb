@@ -1057,7 +1057,7 @@ int Spellbook::FindSpellInfo(SpellExtHeader *array, const ResRef& spellName, uns
 	return 0;
 }
 
-SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname) const
+SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ResRef& spellname) const
 {
 	size_t i = spellinfo.size();
 	while (i--) {
@@ -1070,7 +1070,7 @@ SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, 
 	return nullptr;
 }
 
-void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const ieResRef spellname, unsigned int idx)
+void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const ResRef& spellname, unsigned int idx)
 {
 	Spell *spl = gamedata->GetSpell(spellname, true);
 	if (!spl)
@@ -1114,12 +1114,12 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	gamedata->FreeSpell(spl, spellname, false);
 }
 
-void Spellbook::SetCustomSpellInfo(const ieResRef *data, const ResRef &spell, int type)
+void Spellbook::SetCustomSpellInfo(std::vector<ResRef>& data, const ResRef &spell, int type)
 {
 	ClearSpellInfo();
-	if (data) {
-		for(int i = 0; i<type;i++) {
-			AddSpellInfo(0,0,data[i],-1);
+	if (!data.empty()) {
+		for (const auto& datum : data) {
+			AddSpellInfo(0, 0, datum, -1);
 		}
 		return;
 	}

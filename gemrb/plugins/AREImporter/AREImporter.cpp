@@ -1001,17 +1001,17 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			door->OpenSound = OpenResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				door->OpenSound = gamedata->DefSound[DEF_HOPEN];
+				door->OpenSound = gamedata->defaultSounds[DEF_HOPEN];
 			else
-				door->OpenSound = gamedata->DefSound[DEF_OPEN];
+				door->OpenSound = gamedata->defaultSounds[DEF_OPEN];
 		}
 		if (!CloseResRef.IsEmpty())
 			door->CloseSound = CloseResRef;
 		else {
 			if (Flags & DOOR_SECRET)
-				door->CloseSound = gamedata->DefSound[DEF_HCLOSE];
+				door->CloseSound = gamedata->defaultSounds[DEF_HCLOSE];
 			else
-				door->CloseSound = gamedata->DefSound[DEF_CLOSE];
+				door->CloseSound = gamedata->defaultSounds[DEF_CLOSE];
 		}
 		door->DiscoveryDiff=DiscoveryDiff;
 		door->LockDifficulty=LockRemoval;
