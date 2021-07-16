@@ -3911,8 +3911,8 @@ int fx_movement_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 #define FX_MS 10
-static const ieResRef monster_summoning_2da[FX_MS]={"MONSUM01","MONSUM02","MONSUM03",
- "ANISUM01","ANISUM02", "MONSUM01", "MONSUM02","MONSUM03","ANISUM01","ANISUM02"};
+static const ResRef monster_summoning_2da[FX_MS] = { "MONSUM01", "MONSUM02", "MONSUM03",
+ "ANISUM01", "ANISUM02", "MONSUM01", "MONSUM02", "MONSUM03", "ANISUM01", "ANISUM02" };
 
 // 0x7f MonsterSummoning
 int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
@@ -3928,28 +3928,28 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
-	ieResRef table;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
+	ResRef table;
 	int level = fx->Parameter1;
 
 	if (!fx->Resource.IsEmpty()) {
-		strnuprcpy(table, fx->Resource, 8);
+		table = ResRef::MakeUpperCase(fx->Resource);
 	} else {
 		if (fx->Parameter2 >= FX_MS) {
-			strnuprcpy(table, "ANISUM03", 8);
+			table = "ANISUM03";
 		} else {
-			strnuprcpy(table, monster_summoning_2da[fx->Parameter2], 8);
+			table = ResRef::MakeUpperCase(monster_summoning_2da[fx->Parameter2]);
 		}
 	}
 	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
-	if (!hit[0]) {
-		strnuprcpy(hit, fx->Resource2, 8);
+	if (hit.IsEmpty()) {
+		hit = ResRef::MakeUpperCase(fx->Resource2);
 	}
-	if (!areahit[0]) {
-		strnuprcpy(areahit, fx->Resource3, 8);
+	if (areahit.IsEmpty()) {
+		areahit = ResRef::MakeUpperCase(fx->Resource3);
 	}
 
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);

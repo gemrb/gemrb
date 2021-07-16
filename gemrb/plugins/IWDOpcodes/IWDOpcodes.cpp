@@ -895,7 +895,7 @@ int fx_slow_poison (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define IWD_MSC 13
 
 //this requires the FXOpcode package
-const ieResRef iwd_monster_2da[IWD_MSC] = { "MSUMMO1", "MSUMMO2", "MSUMMO3", "MSUMMO4",
+const ResRef iwd_monster_2da[IWD_MSC] = { "MSUMMO1", "MSUMMO2", "MSUMMO3", "MSUMMO4",
  "MSUMMO5", "MSUMMO6", "MSUMMO7", "ASUMMO1", "ASUMMO2", "ASUMMO3", "GINSECT", "CDOOM",
  "MSUMMOM" };
 
@@ -906,9 +906,9 @@ int fx_iwd_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//check the summoning limit?
 
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
 
 	if (fx->Parameter2>=IWD_MSC) {
 		fx->Parameter2 = 0;
@@ -951,7 +951,7 @@ int fx_vampiric_touch (Scriptable* Owner, Actor* target, Effect* fx)
 }
 
 #define IWD_AD 2
-const ieResRef animate_dead_2da[IWD_AD] = { "ADEAD", "ADEADL" };
+const ResRef animate_dead_2da[IWD_AD] = { "ADEAD", "ADEADL" };
 
 //0xf3 AnimateDead
 int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
@@ -966,9 +966,9 @@ int fx_animate_dead (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
 
 	if (fx->Parameter2>=IWD_AD) {
 		fx->Parameter2 = 0;
@@ -1020,16 +1020,16 @@ int fx_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //0xf6 SummonMonster2
 #define IWD_SM2 11
-const ieResRef summon_monster_2da[IWD_SM2] = { "SLIZARD", "STROLLS", "SSHADOW", "ISTALKE", 
+const ResRef summon_monster_2da[IWD_SM2] = { "SLIZARD", "STROLLS", "SSHADOW", "ISTALKE",
  "CFELEMW", "CEELEMW", "CWELEMW", "CFELEMP", "CEELEMP", "CWELEMP", "CEELEMM" };
 
 int fx_summon_monster2 (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_summon_monster2(%2d): ResRef:%s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
 
 	if (fx->Parameter2>=IWD_SM2) {
 		fx->Parameter2 = 0;
@@ -1100,15 +1100,15 @@ int fx_burning_blood2 (Scriptable* Owner, Actor* target, Effect* fx)
 //0xf8 SummonShadowMonster
 
 #define IWD_SSM 3
-const ieResRef summon_shadow_monster_2da[IWD_SM2] = { "SMONSTE", "DSMONST", "SHADES" };
+const ResRef summon_shadow_monster_2da[IWD_SM2] = { "SMONSTE", "DSMONST", "SHADES" };
 
 int fx_summon_shadow_monster (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_summon_shadow_monster(%2d): ResRef:%s Type: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 
-	ieResRef monster;
-	ieResRef hit;
-	ieResRef areahit;
+	ResRef monster;
+	ResRef hit;
+	ResRef areahit;
 
 	if (fx->Parameter2>=IWD_SSM) {
 		fx->Parameter2 = 0;
@@ -1492,7 +1492,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	int real = core->Roll(1,cnt,-1);
-	const char *resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
+	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
 	for (int i=0;i<cnt;i++) {
 		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
@@ -1810,11 +1810,11 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 	//the state is not set soon enough!
 	//if (STATE_GET(STATE_DEAD) ) {
 	if (target->GetInternalFlag() & IF_REALLYDIED) {
-		ieResRef monster;
-		ieResRef hit;
-		ieResRef areahit;
+		ResRef monster;
+		ResRef hit;
+		ResRef areahit;
 
-		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
+		core->GetResRefFrom2DA(ResRef("souleatr"), monster, hit, areahit);
 		//the monster should appear near the effect position
 		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(monster, areahit, Owner, target, fx->Pos, EAM_SOURCEALLY, fx->Parameter1, newfx);

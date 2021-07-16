@@ -507,7 +507,7 @@ public:
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
+	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
@@ -723,7 +723,7 @@ public:
 	int GetAreaAlias(const ResRef &areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
-	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = nullptr, ieResRef resource3 = nullptr) const;
+	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
 	ieDword *GetListFrom2DA(const ieResRef resref);
 	/** translates a stat symbol to numeric value */

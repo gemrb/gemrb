@@ -2303,7 +2303,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
+Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -2414,8 +2414,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
 		}
 
-		if (vvcres[0]) {
-			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
+		if (!animRes.IsEmpty()) {
+			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(animRes, false);
 			if (vvc) {
 				//This is the final position of the summoned creature
 				//not the original target point
@@ -4678,27 +4678,23 @@ void Interface::SetInfoTextColor(const Color &color)
 }
 
 //todo row?
-void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3) const
+void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const
 {
-	if (!resource1) {
-		return;
-	}
-	resource1[0]=0;
-	if (resource2) {
-		resource2[0]=0;
-	}
-	if (resource3) {
-		resource3[0]=0;
-	}
+	resource1.Reset();
+	resource2.Reset();
+	resource3.Reset();
+
 	AutoTable tab(resref);
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
-		strnuprcpy(resource1, tab->QueryField(row,0), 8);
-		if (resource2 && cols>1)
-			strnuprcpy(resource2, tab->QueryField(row,1), 8);
-		if (resource3 && cols>2)
-			strnuprcpy(resource3, tab->QueryField(row,2), 8);
+		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
+		if (cols > 1) {
+			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
+		}
+		if (cols > 2) {
+			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
+		}
 	}
 }
 
