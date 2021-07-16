@@ -257,7 +257,7 @@ void Container::dump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key: %s\n", name, KeyResRef );
+	buffer.appendFormatted("Script: %s, Key: %s\n", name, KeyResRef.CString());
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }

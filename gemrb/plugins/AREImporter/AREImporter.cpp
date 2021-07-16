@@ -58,7 +58,7 @@ using namespace GemRB;
 #define UNINITIALIZED_BYTE  0x11
 
 struct ResRefToStrRef {
-	ieResRef areaName;
+	ResRef areaName;
 	ieStrRef text;
 	bool trackFlag;
 	int difficulty;
@@ -85,7 +85,7 @@ static void ReadAutonoteINI()
 	INInote->Open(fs);
 }
 
-static int GetTrackString(const ieResRef areaName)
+static int GetTrackString(const char* areaName)
 {
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
@@ -105,12 +105,12 @@ static int GetTrackString(const ieResRef areaName)
 			}
 			tracks[i].text = ieStrRef(atoi(poi));
 			tracks[i].difficulty=atoi(tm->QueryField(i,1));
-			strnlwrcpy(tracks[i].areaName, tm->GetRowName(i), 8 );
+			tracks[i].areaName = ResRef::MakeLowerCase(tm->GetRowName(i));
 		}
 	}
 
 	for (int i = 0; i < trackcount; i++) {
-		if (!strnicmp(tracks[i].areaName, areaName, 8)) {
+		if (tracks[i].areaName == areaName) {
 			return i;
 		}
 	}
@@ -554,9 +554,12 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Point pos;
 		Point talkPos;
 		ieVariable Name, Entrance;
-		ieResRef Script, KeyResRef;
+		ResRef Script;
+		ResRef KeyResRef;
 		struct ResRef Destination;
-		ieResRef DialogResRef, WavResRef; //adopted pst specific fields
+		// two adopted pst specific fields
+		ResRef DialogResRef;
+		ResRef WavResRef;
 		ieStrRef DialogName;
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -607,9 +610,9 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadDword(DialogName);
 			str->ReadResRef( DialogResRef );
 		} else {
-			memset(WavResRef, 0, sizeof(WavResRef));
+			WavResRef.Reset();
 			DialogName = -1;
-			memset(DialogResRef, 0, sizeof(DialogResRef));
+			DialogResRef.Reset();
 		}
 
 		InfoPoint* ip = nullptr;
@@ -678,7 +681,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		}
 		ip->Destination = Destination;
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
-		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
+		ip->KeyResRef = KeyResRef;
 
 		//these appear only in PST, but we could support them everywhere
 		// HOWEVER they did not use them as witnessed in ar0101 (0101prt1 and 0101prt2) :(
@@ -690,10 +693,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ip->SetDialog(DialogResRef);
 		ip->SetEnter(WavResRef);
 
-		if (Script[0]) {
-			ip->Scripts[0] = new GameScript( Script, ip );
+		if (Script.IsEmpty()) {
+			ip->Scripts[0] = nullptr;
 		} else {
-			ip->Scripts[0] = NULL;
+			ip->Scripts[0] = new GameScript(Script, ip);
 		}
 	}
 
@@ -707,7 +710,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Point pos;
 		Point launchPos;
 		ieDword ItemIndex, ItemCount;
-		ieResRef KeyResRef;
+		ResRef KeyResRef;
 		ieStrRef OpenFail;
 
 		str->Read( Name, 32 );
@@ -799,7 +802,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			c->Scripts[0] = new GameScript(Script, c);
 		}
-		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
+		c->KeyResRef = KeyResRef.IsEmpty() ? nullptr : ResRef::MakeLowerCase(KeyResRef);
 		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
@@ -817,7 +820,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		struct ResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
-		ieResRef KeyResRef, Script;
+		ResRef KeyResRef;
+		ResRef Script;
 		ieWord TrapDetect, TrapRemoval;
 		ieWord Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
@@ -825,7 +829,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Region BBClosed, BBOpen;
 		ieStrRef OpenStrRef;
 		ieStrRef NameStrRef;
-		ieResRef Dialog;
+		ResRef Dialog;
 		ieWord hp, ac;
 
 		str->Read( LongName, 32 );
@@ -983,11 +987,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		door->TrapLaunch.y = LaunchY;
 
 		door->Cursor = cursor;
-		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
-		if (Script[0]) {
-			door->Scripts[0] = new GameScript( Script, door );
+		door->KeyResRef = KeyResRef;
+		if (Script.IsEmpty()) {
+			door->Scripts[0] = nullptr;
 		} else {
-			door->Scripts[0] = NULL;
+			door->Scripts[0] = new GameScript(Script, door);
 		}
 
 		door->toOpen[0] = toOpen[0];
@@ -1082,14 +1086,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		PluginHolder<ActorMgr> actmgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 		for (int i = 0; i < ActorCount; i++) {
 			ieVariable DefaultName;
-			ieResRef CreResRef;
+			ResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule, RemovalTime;
 			Point pos;
 			Point des;
 			ieWord MaxDistance, Spawned;
-			ieResRef Dialog;
-			ieResRef Scripts[8]; //the original order is shown in scrlev.ids
+			ResRef Dialog;
+			ResRef Scripts[8]; //the original order is shown in scrlev.ids
 			ieDword Flags;
 			ieByte DifficultyMargin;
 
@@ -1110,7 +1114,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadDword(TalkCount);
 			str->ReadResRef( Dialog );
 
-			memset(Scripts, 0, sizeof(Scripts));
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
 			str->ReadResRef( Scripts[SCR_GENERAL] );
 			str->ReadResRef( Scripts[SCR_CLASS] );
@@ -1128,7 +1131,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->Seek( 120, GEM_CURRENT_POS );
 			//not iwd2, this field is garbage
 			if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
-				Scripts[SCR_AREA][0]=0;
+				Scripts[SCR_AREA].Reset();
 			}
 			//actually, Flags&1 signs that the creature
 			//is not loaded yet, so !(Flags&1) means it is embedded
@@ -1138,7 +1141,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				crefile = gamedata->GetResource( CreResRef, IE_CRE_CLASS_ID );
 			}
 			if(!actmgr->Open(crefile)) {
-				Log(ERROR, "AREImporter", "Couldn't read actor: %s!", CreResRef);
+				Log(ERROR, "AREImporter", "Couldn't read actor: %s!", CreResRef.CString());
 				continue;
 			}
 			ab = actmgr->GetActor(0);
@@ -1187,12 +1190,12 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			}
 			ab->DifficultyMargin = DifficultyMargin;
 
-			if (Dialog[0]) {
+			if (!Dialog.IsEmpty()) {
 				ab->SetDialog(Dialog);
 			}
 			for (int j=0;j<8;j++) {
-				if (Scripts[j][0]) {
-					ab->SetScript(Scripts[j],j);
+				if (!Scripts[j].IsEmpty()) {
+					ab->SetScript(Scripts[j], j);
 				}
 			}
 			ab->SetOrientation(Orientation, false);
@@ -1422,7 +1425,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	//this is a ToB feature (saves the unexploded projectiles)
 	Log(DEBUG, "AREImporter", "Loading traps");
 	for (ieDword i = 0; i < TrapCount; i++) {
-		ieResRef TrapResRef;
+		ResRef TrapResRef;
 		ieDword TrapEffOffset;
 		ieWord TrapSize, ProID;
 		ieWord X,Y,Z;
@@ -1478,7 +1481,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	str->Seek( TileOffset, GEM_STREAM_START );
 	for (ieDword i = 0; i < TileCount; i++) {
 		ieVariable Name;
-		ieResRef ID;
+		ResRef ID;
 		ieDword Flags;
 		// these fields could be different size: ieDword ClosedCount, OpenCount;
 		ieWord ClosedCount, OpenCount;
@@ -2436,7 +2439,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 {
 	ieDword Offset;
 	ieDword tmpDword;
-	ieResRef name;
+	ResRef name;
 	ieWord type = 0;
 	Point dest(0,0);
 
@@ -2451,7 +2454,8 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 			//off by one compared to projectl.ids
 			type = pro->GetType()+1;
 			dest = pro->GetDestination();
-			strnuprcpy(name, pro->GetName(), 8);
+			const char* proName = pro->GetName();
+			name = proName ? ResRef::MakeUpperCase(proName) : nullptr;
 			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();

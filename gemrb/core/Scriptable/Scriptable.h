@@ -439,7 +439,7 @@ public:
 	ieWord TrapRemovalDiff;
 	ieWord Trapped;
 	ieWord TrapDetected;
-	ieResRef KeyResRef;
+	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
 	ieResRef EnterWav;
 public:
@@ -448,8 +448,11 @@ public:
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{
-		if (KeyResRef[0]) return KeyResRef;
-		return NULL;
+		if (KeyResRef.IsEmpty()) {
+			return nullptr;
+		} else {
+			return KeyResRef.CString();
+		}
 	}
 	void SetTrapDetected(int x);
 	void TryDisarm(const Actor *actor);

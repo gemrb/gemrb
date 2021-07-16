@@ -260,7 +260,7 @@ void InfoPoint::dump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog.CString());
+	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef.CString(), Dialog.CString());
 	buffer.appendFormatted( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
 	buffer.appendFormatted( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", buffer);
