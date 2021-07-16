@@ -545,8 +545,7 @@ public:
 	{
 		return scriptName;
 	}
-	/** Gets a Script ResRef */
-	const char* GetScript(int ScriptIndex) const;
+	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
 	/** Guesses the (base) casting level */

@@ -6506,12 +6506,12 @@ void Actor::CreateStats()
 	}
 }
 
-const char* Actor::GetScript(int ScriptIndex) const
+ResRef Actor::GetScript(int ScriptIndex) const
 {
 	if (Scripts[ScriptIndex]) {
 		return Scripts[ScriptIndex]->GetName();
 	} else {
-		return "NONE\0\0\0\0";
+		return "NONE";
 	}
 }
 
