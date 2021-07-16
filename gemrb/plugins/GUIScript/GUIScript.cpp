@@ -10191,13 +10191,13 @@ PyDoc_STRVAR( GemRB_GetRumour__doc,
 static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 {
 	int percent;
-	const char *ResRef;
-	PARSE_ARGS( args,  "is", &percent, &ResRef);
+	const char *rumourRef;
+	PARSE_ARGS(args, "is", &percent, &rumourRef);
 	if (RAND(0, 99) >= percent) {
 		return PyInt_FromLong( -1 );
 	}
 
-	ieStrRef strref = core->GetRumour( ResRef );
+	ieStrRef strref = core->GetRumour(ResRef(rumourRef));
 	return PyInt_FromLong( strref );
 }
 

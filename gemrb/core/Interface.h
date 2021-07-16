@@ -648,7 +648,7 @@ public:
 	CREItem *ReadItem(DataStream *str, CREItem *itm) const;
 	void SanitizeItem(CREItem *item) const;
 	bool ResolveRandomItem(CREItem *itm) const;
-	ieStrRef GetRumour(const ieResRef resname);
+	ieStrRef GetRumour(const ResRef& resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
 	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
@@ -695,7 +695,7 @@ public:
 	/** applies an effect queue on the target */
 	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster);
 	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p);
-	Effect *GetEffect(const ieResRef resname, int level, const Point &p);
+	Effect *GetEffect(const ResRef& resname, int level, const Point &p);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves (exports a character to the characters folder */
@@ -724,7 +724,7 @@ public:
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const;
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
-	ieDword *GetListFrom2DA(const ieResRef resref);
+	ieDword *GetListFrom2DA(const ResRef& resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
 	/** resolves a stat bonus based on multiple stats */
@@ -795,7 +795,7 @@ private:
 	/** Executes everything (non graphical) in the main game loop */
 	void GameLoop(void);
 	/** the internal (without cache) part of GetListFrom2DA */
-	ieDword *GetListFrom2DAInternal(const ieResRef resref);
+	ieDword *GetListFrom2DAInternal(const ResRef& resref);
 
 public:
 	CFGConfigData config;

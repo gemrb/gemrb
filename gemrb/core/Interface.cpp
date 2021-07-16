@@ -4088,14 +4088,14 @@ int Interface::GetMouseScrollSpeed() const {
 	return mousescrollspd;
 }
 
-ieStrRef Interface::GetRumour(const ieResRef dlgref)
+ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
 	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
+		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref.CString());
 		return ieStrRef(-1);
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
@@ -4268,7 +4268,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 	return res;
 }
 
-Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
+Effect *Interface::GetEffect(const ResRef& resname, int level, const Point &p)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
@@ -4696,7 +4696,7 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	}
 }
 
-ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
+ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
 	ieDword *ret;
 
@@ -4716,7 +4716,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 	return ret;
 }
 
-ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
+ieDword* Interface::GetListFrom2DA(const ResRef& tablename)
 {
 	ieDword *list = NULL;
 

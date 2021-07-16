@@ -7093,7 +7093,7 @@ int fx_remove_projectile (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2) {
 	case 0: //standard bg2
-		projectilelist = core->GetListFrom2DA("clearair");
+		projectilelist = core->GetListFrom2DA(ResRef("clearair"));
 		break;
 	case 1: //you can give a 2da for projectile list (gemrb)
 		projectilelist = core->GetListFrom2DA(fx->Resource);
