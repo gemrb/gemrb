@@ -662,7 +662,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 			stream->WriteWord(tmpWord);
 		}
 		stream->Write( act->PCStats->SoundFolder, 32);
-		stream->Write( act->PCStats->SoundSet, 8);
+		stream->WriteResRef(act->PCStats->SoundSet);
 		for (const auto& setting : act->PCStats->ExtraSettings) {
 			stream->WriteDword(setting);
 		}
@@ -749,7 +749,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 		}
 		str->Seek(26, GEM_CURRENT_POS);
 		str->Read( act->PCStats->SoundFolder, 32);
-		str->Read( act->PCStats->SoundSet, 8);
+		str->ReadResRef(act->PCStats->SoundSet);
 		for (auto& setting : act->PCStats->ExtraSettings) {
 			str->ReadDword(setting);
 		}

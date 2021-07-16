@@ -3926,7 +3926,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	bool found = false;
-	if (PCStats && PCStats->SoundSet[0]) {
+	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		ResRef soundRef;
 		char chrsound[256];
 		do {
@@ -4177,7 +4177,7 @@ void Actor::PlaySelectionSound()
 		VerbalConstant(VB_SELECT_RARE, NUM_RARE_SELECT_SOUNDS, DS_CIRCLE);
 	} else {
 		//checks if we are main character to limit select sounds
-		if (PCStats && PCStats->SoundSet[0]) {
+		if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 			VerbalConstant(VB_SELECT, NUM_MC_SELECT_SOUNDS, DS_CIRCLE);
 		} else {
 			VerbalConstant(VB_SELECT, NUM_SELECT_SOUNDS, DS_CIRCLE);
@@ -4845,7 +4845,7 @@ void Actor::PlayWalkSound()
 	if (Sound.IsStar()) return;
 
 	int l = strlen(Sound);
-	ieResRef Sound2; // bleh
+	char Sound2[9]; // bleh
 	CopyResRef(Sound2, Sound.CString());
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
@@ -8919,11 +8919,11 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 
 void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
 {
-	if (PCStats && PCStats->SoundSet[0]) {
+	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		//resolving soundset (bg1/bg2 style)
 
 		// handle nonstandard bg1 "default" soundsets first
-		if (!strnicmp(PCStats->SoundSet, "main", 4)) {
+		if (PCStats->SoundSet == "main") {
 			static const char *suffixes[] = { "03", "08", "09", "10", "11", "17", "18", "19", "20", "21", "22", "38", "39" };
 			static unsigned int VB2Suffix[] = { 9, 6, 7, 8, 20, 26, 27, 28, 32, 33, 34, 18, 19 };
 			bool found = false;
@@ -8940,15 +8940,15 @@ void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
 				return;
 			}
 
-			Sound.SNPrintF("%.5s%.2s", PCStats->SoundSet, suffixes[index]);
+			Sound.SNPrintF("%.5s%.2s", PCStats->SoundSet.CString(), suffixes[index]);
 			return;
 		} else if (csound[index]) {
-			Sound.SNPrintF("%s%c", PCStats->SoundSet, csound[index]);
+			Sound.SNPrintF("%s%c", PCStats->SoundSet.CString(), csound[index]);
 			return;
 		}
 
 		//icewind style
-		Sound.SNPrintF("%s%02d", PCStats->SoundSet, VCMap[index]);
+		Sound.SNPrintF("%s%02d", PCStats->SoundSet.CString(), VCMap[index]);
 		return;
 	}
 
@@ -9114,14 +9114,15 @@ void Actor::SetSoundFolder(const char *soundset) const
 				const char* name = dirIt.GetName();
 				const char* end = strchr(name, '.');
 				if (end != NULL) {
-					// need to truncate the "01" from the name
-					strnlwrcpy(PCStats->SoundSet, name, int(end - 2 - name));
+					// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
+					// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
+					PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
 					break;
 				}
 			} while (++dirIt);
 		}
 	} else {
-		CopyResRef(PCStats->SoundSet, soundset);
+		PCStats->SoundSet = soundset;
 		PCStats->SoundFolder[0]=0;
 	}
 }

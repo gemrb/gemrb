@@ -3983,7 +3983,7 @@ static PyObject* GemRB_VerbalConstant(PyObject * /*self*/, PyObject* args)
 
 	//get soundset based string constant
 	snprintf(Sound, _MAX_PATH, "%s/%s%02d",
-		actor->PCStats->SoundFolder, actor->PCStats->SoundSet, str);
+		actor->PCStats->SoundFolder, actor->PCStats->SoundSet.CString(), str);
 	channel = actor->InParty ? SFX_CHAN_CHAR0 + actor->InParty - 1 : SFX_CHAN_DIALOG;
 	core->GetAudioDrv()->Play(Sound, channel, Point(), GEM_SND_RELATIVE|GEM_SND_SPEECH);
 	Py_RETURN_NONE;

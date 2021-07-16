@@ -1056,7 +1056,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	for (unsigned short& favCount : ac->PCStats->FavouriteWeaponsCount) {
 		stream->WriteWord(favCount);
 	}
-	stream->Write( ac->PCStats->SoundSet, 8); //soundset
+	stream->WriteResRef(ac->PCStats->SoundSet);
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}

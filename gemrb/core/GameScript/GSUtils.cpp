@@ -429,7 +429,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		return;
 	}
 
-	ResRef Sound;
+	char Sound[_MAX_PATH];
 	ResRef soundRef;
 	unsigned int channel = SFX_CHAN_DIALOG;
 
@@ -450,9 +450,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			//get soundset based string constant
 			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-				Sound.SNPrintF("%s/%s", actor->PCStats->SoundFolder, soundRef.CString());
+				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
-				Sound = soundRef;
+				strlcpy(Sound, soundRef.CString(), sizeof(Sound));
 			}
 		}
 		Strref = tmp;
@@ -480,7 +480,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 
 	if (Strref != -1 && soundRef.IsEmpty()) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
-		Sound = sb.Sound;
+		if (!sb.Sound.IsEmpty()) {
+			strlcpy(Sound, sb.Sound, sizeof(Sound));
+		}
 		if (sb.text) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
@@ -499,7 +501,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			}
 		}
 	}
-	if (!Sound.IsEmpty() && !(flags & DS_SILENT)) {
+	if (Sound[0] && !(flags & DS_SILENT)) {
 		ieDword speech = 0;
 		Point pos = Sender->Pos;
 		if (flags&DS_SPEECH) {

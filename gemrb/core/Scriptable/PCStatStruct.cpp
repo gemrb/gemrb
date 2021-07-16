@@ -53,7 +53,6 @@ void PCStatsStruct::Init(bool all)
 	AwayTime = 0;
 	unknown10 = 0;
 	Happiness = 0;
-	SoundSet[0]=0;
 	SoundFolder[0]=0;
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
 	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
@@ -101,7 +100,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	AwayTime = source.AwayTime;
 	unknown10 = source.unknown10;
 	Happiness = source.Happiness;
-	strlcpy(SoundSet, source.SoundSet, sizeof(ieResRef));
+	SoundSet = source.SoundSet;
 	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
 	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
 	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
