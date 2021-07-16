@@ -68,8 +68,8 @@ public:
 	Holder(const Holder& rhs) noexcept
 	: ptr(rhs.ptr)
 	{
-		if (ptr)
-			ptr->acquire();
+		if (rhs.ptr)
+			rhs.ptr->acquire();
 	}
 	
 	Holder(Holder&& rhs) noexcept
