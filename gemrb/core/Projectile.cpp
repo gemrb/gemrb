@@ -121,7 +121,7 @@ void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int S
 	}
 
 	if((ExtFlags&PEF_CYCLE) && !Seq) {
-		Seq = RAND(0ul, Max-1);
+		Seq = RAND(size_t(0), Max - 1);
 	}
 
 	//this hack is needed because bioware .pro files are sometimes
