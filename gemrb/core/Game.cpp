@@ -2265,7 +2265,7 @@ void Game::dump() const
 	}
 	buffer.appendFormatted("Current area: %s   Previous area: %s\n", CurrentArea.CString(), PreviousArea.CString());
 	if (Scripts[0]) {
-		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName());
+		buffer.appendFormatted("Global script: %s\n", Scripts[0]->GetName().CString());
 	}
 	int hours = GameTime/core->Time.hour_size;
 	buffer.appendFormatted("Game time: %d (%d days, %d hours)\n", GameTime.load(), hours/24, hours%24);
