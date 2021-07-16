@@ -98,9 +98,8 @@ static int luckadjustments[6]={0, 0, 0, 0, 0, 0};
 
 static int FistRows = -1;
 static int *wmlevels[20];
-typedef ieResRef FistResType[MAX_LEVEL+1];
-
-static FistResType *fistres = NULL;
+using FistResType = ResRef[MAX_LEVEL + 1];
+static FistResType *fistres;
 static int *fistresclass = NULL;
 static ResRef DefaultFist = { "FIST" };
 
@@ -406,9 +405,7 @@ void ReleaseMemoryActor()
 
 	if (fistres) {
 		delete [] fistres;
-		fistres = NULL;
 		delete [] fistresclass;
-		fistresclass = NULL;
 	}
 
 	if (itemuse) {
@@ -9788,7 +9785,7 @@ void Actor::SetupFistData() const
 		for (int i = 0; i < FistRows; i++) {
 			int maxcol = fist->GetColumnCount(i) - 1;
 			for (int cols = 0; cols < MAX_LEVEL; cols++) {
-				strnlwrcpy(fistres[i][cols], fist->QueryField(i, cols > maxcol ? maxcol : cols), 8);
+				fistres[i][cols] = ResRef::MakeLowerCase(fist->QueryField(i, cols > maxcol ? maxcol : cols));
 			}
 			fistresclass[i] = atoi(fist->GetRowName(i));
 		}
