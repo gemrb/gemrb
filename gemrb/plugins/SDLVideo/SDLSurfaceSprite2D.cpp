@@ -112,6 +112,10 @@ bool SDLSurfaceSprite2D::SetPaletteColors(const Color* pal) const noexcept
 	bool ret = SDLVideoDriver::SetSurfacePalette(*surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << format.Depth);
 	if (ret) {
 		SetPaletteFromSurface();
+#if SDL_VERSION_ATLEAST(1,3,0)
+		// must reset the color key or SDL 2 wont render properly
+		SDL_SetColorKey(*surface, SDL_TRUE, GetColorKey());
+#endif
 	}
 	return ret;
 }
@@ -155,11 +159,8 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 		Restore();
 	}
 
-	colorkey_t ck = GetColorKey();
 	if (pal && SetPaletteColors(pal->col) == 0) {
 		surface->palette = pal;
-		// must reset the color key or SDL 2 wont render properly
-		SetColorKey(ck);
 	} else {
 		SetPaletteFromSurface();
 	}
