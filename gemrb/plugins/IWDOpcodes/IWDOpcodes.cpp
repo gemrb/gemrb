@@ -2682,7 +2682,6 @@ int fx_summon_ally (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ALLY, 0, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -2691,7 +2690,6 @@ int fx_summon_enemy (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, EAM_ENEMY, 0, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 

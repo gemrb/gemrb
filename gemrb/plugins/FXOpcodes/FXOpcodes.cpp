@@ -2705,7 +2705,6 @@ int fx_summon_creature (Scriptable* Owner, Actor* target, Effect* fx)
 	//the monster should appear near the effect position
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, fx->Pos, eamod, 0, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -3971,7 +3970,6 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	Scriptable *caster = GetCasterObject();
 	//the monster should appear near the effect position
 	core->SummonCreature(monster, hit, caster, target, fx->Pos, eamod, level, newfx);
-	delete newfx;
 	return FX_NOT_APPLIED;
 }
 
@@ -6446,7 +6444,6 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	if (newfx) {
 		core->ApplyEffect(newfx, copy, copy);
-		delete newfx;
 	}
 
 	char script[9];
