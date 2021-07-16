@@ -441,7 +441,7 @@ public:
 	ieWord TrapDetected;
 	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
-	ieResRef EnterWav;
+	ResRef EnterWav;
 public:
 	bool IsOver(const Point &Place) const;
 	void DrawOutline(Point origin) const;
@@ -499,7 +499,7 @@ public:
 	explicit Movable(ScriptableType type);
 	~Movable(void) override;
 	Point Destination;
-	ieResRef Area;
+	ResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
@@ -567,7 +567,7 @@ public:
 
 public:
 	ieVariable Name;
-	ieResRef Tileset; //or wed door ID?
+	ResRef Tileset; //or wed door ID?
 	ieDword Flags;
 	unsigned short* opentiles;
 	ieDword opencount;

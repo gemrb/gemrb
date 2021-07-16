@@ -62,7 +62,7 @@ TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flag
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
 	strnspccpy(tile->Name, Name, 32);
-	strnlwrcpy(tile->Tileset, ID, 8);
+	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );
 	tiles.push_back(tile);

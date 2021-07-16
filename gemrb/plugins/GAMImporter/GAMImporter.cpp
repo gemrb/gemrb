@@ -514,7 +514,7 @@ Actor* GAMImporter::GetActor(const Holder<ActorMgr>& aM, bool is_in_party)
 	actor->ReinitQuickSlots();
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
-	strcpy( actor->Area, pcInfo.Area );
+	actor->Area = pcInfo.Area;
 	actor->SetOrientation(pcInfo.Orientation, false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;

@@ -2542,7 +2542,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 {
 	//swap in the area of the actor
 	Game* game = core->GetGame();
-	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
+	if (forced || (pc && pc->Area != game->CurrentArea)) {
 		// disable so that drawing and events dispatched doesn't happen while there is not an area
 		// we are single threaded, but game loading runs its own event loop which will cause events/drawing to come in
 		SetDisabled(true);

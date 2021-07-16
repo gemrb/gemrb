@@ -1803,7 +1803,6 @@ Highlightable::Highlightable(ScriptableType type)
 	outline = NULL;
 	Highlight = false;
 	Cursor = IE_CURSOR_NORMAL;
-	EnterWav[0] = 0;
 	outlineColor = ColorBlack;
 	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
@@ -1843,7 +1842,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	//actually this could be script name[0]
-	if (!Scripts[0] && !EnterWav[0]) {
+	if (!Scripts[0] && EnterWav.IsEmpty()) {
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
@@ -1945,7 +1944,6 @@ Movable::Movable(ScriptableType type)
 	path = NULL;
 	step = NULL;
 	timeStartStep = 0;
-	Area[0] = 0;
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
 	AttackMovements[2] = 0;

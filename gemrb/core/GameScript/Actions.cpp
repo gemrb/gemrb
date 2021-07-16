@@ -641,7 +641,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		//if the actor isn't in the source area, we don't care
-		if (strnicmp(tar->Area, parameters->string0Parameter, 8) != 0) {
+		if (tar->Area != parameters->string0Parameter) {
 			continue;
 		}
 		// no need of CreateMovementEffect, party members are always moved immediately
@@ -652,7 +652,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	while (i--) {
 		Actor *tar = game->GetNPC(i);
 		//if the actor isn't in the source area, we don't care
-		if (strnicmp(tar->Area, parameters->string0Parameter, 8) != 0) {
+		if (tar->Area != parameters->string0Parameter) {
 			continue;
 		}
 		//if the actor is currently in a loaded area, remove it from there
@@ -661,9 +661,9 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			map->RemoveActor(tar);
 		}
 		//update the target's area to the destination
-		strnuprcpy(tar->Area, parameters->string1Parameter, 8);
+		tar->Area = ResRef::MakeUpperCase(parameters->string1Parameter);
 		//if the destination area is currently loaded, move the actor there now
-		if (game->FindMap(tar->Area) ) {
+		if (game->FindMap(tar->Area)) {
 			MoveBetweenAreasCore( tar, parameters->string1Parameter, parameters->pointParameter, -1, true);
 		}
 	}

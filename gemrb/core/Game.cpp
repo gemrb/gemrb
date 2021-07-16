@@ -459,9 +459,9 @@ void Game::InitActorPos(Actor *actor) const
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
 	if (strta.load("startare")) {
-		strnlwrcpy(actor->Area, strta->QueryField( strta->GetRowIndex(area), 0 ), 8 );
+		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0));
 	} else {
-		strnlwrcpy(actor->Area, CurrentArea, 8 );
+		actor->Area = ResRef::MakeLowerCase(CurrentArea);
 	}
 }
 
@@ -858,7 +858,7 @@ int Game::DelMap(unsigned int index, int forced)
 		//unselect them now before they get axed
 		std::vector< Actor*>::iterator m;
 		for (m = selected.begin(); m != selected.end();) {
-			if (!(*m)->InParty && !stricmp(Maps[index]->GetScriptName(), (*m)->Area)) {
+			if (!(*m)->InParty && (*m)->Area == Maps[index]->GetScriptName()) {
 				m = selected.erase(m);
 			} else {
 				++m;
@@ -885,7 +885,7 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 	// if their max level is still lower than ours, each check would also result in a substitution
 	unsigned int last = NPCs.size() - 1;
 	for (unsigned int i = 0; i < NPCs.size(); i++) {
-		if (stricmp( NPCs[i]->Area, ResRef ) == 0) {
+		if (NPCs[i]->Area == ResRef) {
 			if (i <= last && CheckForReplacementActor(i)) {
 				i--;
 				last--;
@@ -941,7 +941,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	for (size_t i = 0; i < PCs.size(); i++) {
 		Actor *pc = PCs[i];
-		if (stricmp(pc->Area, ResRef) == 0) {
+		if (pc->Area == ResRef) {
 			newMap->AddActor(pc, false);
 		}
 	}
@@ -996,7 +996,7 @@ bool Game::CheckForReplacementActor(int i)
 				newact->Pos = act->Pos; // the map is not loaded yet, so no SetPosition
 				newact->TalkCount = act->TalkCount;
 				newact->InteractCount = act->InteractCount;
-				CopyResRef(newact->Area, act->Area);
+				newact->Area = act->Area;
 				DelNPC(InStore(act), true);
 				return true;
 			}

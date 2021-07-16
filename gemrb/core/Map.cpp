@@ -2034,7 +2034,7 @@ void Map::InitActor(const Actor *actor)
 void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
-	strnlwrcpy(actor->Area, scriptName, 8);
+	actor->Area = ResRef::MakeLowerCase(scriptName);
 	if (!HasActor(actor)) {
 		actors.push_back( actor );
 	}
@@ -2073,7 +2073,7 @@ void Map::DeleteActor(int i)
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
-		CopyResRef(actor->Area, "");
+		actor->Area.Reset();
 		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
@@ -2916,7 +2916,7 @@ void Map::RemoveActor(Actor* actor)
 			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
-			CopyResRef(actor->Area, "");
+			actor->Area.Reset();
 			actors.erase( actors.begin()+i );
 			return;
 		}

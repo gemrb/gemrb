@@ -136,7 +136,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	}
 
 	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, core->GetGame()->CurrentArea.CString(), sizeof(actor->Area));
+	actor->Area = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
 	} else {
