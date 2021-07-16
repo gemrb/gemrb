@@ -5837,7 +5837,8 @@ static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	actor->GetSoundFolder(Sound, flag);
+	ResRef ignore;
+	actor->GetSoundFolder(Sound, flag, ignore);
 	return PyString_FromString(Sound);
 }
 

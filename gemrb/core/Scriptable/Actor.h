@@ -530,7 +530,7 @@ public:
 	void SetPortrait(const char* ResRef, int Which=0);
 	void SetSoundFolder(const char *soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
-	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
+	void GetSoundFolder(char *soundset, int flag, ResRef& overrideSet) const;
 	/** Gets the Character Long Name/Short Name */
 	const char* GetName(int which) const override
 	{
@@ -741,10 +741,10 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void ResolveStringConstant(ieResRef& sound, unsigned int index) const;
-	bool GetSoundFromFile(ieResRef &Sound, unsigned int index) const;
-	bool GetSoundFromINI(ieResRef &Sound, unsigned int index) const;
-	bool GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const;
+	void ResolveStringConstant(ResRef& sound, unsigned int index) const;
+	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ResRef &Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */

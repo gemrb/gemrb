@@ -429,8 +429,8 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		return;
 	}
 
-	char Sound[_MAX_PATH] = "";
-	ieResRef soundRef = {};
+	ResRef Sound;
+	ResRef soundRef;
 	unsigned int channel = SFX_CHAN_DIALOG;
 
 	Log(MESSAGE, "GameScript", "Displaying string on: %s", Sender->GetScriptName() );
@@ -450,10 +450,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			//get soundset based string constant
 			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
-				snprintf(Sound, _MAX_PATH, "%s/%s",
-					actor->PCStats->SoundFolder, soundRef);
+				Sound.SNPrintF("%s/%s", actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
-				memcpy(Sound, soundRef, sizeof(ieResRef) );
+				Sound = soundRef;
 			}
 		}
 		Strref = tmp;
@@ -479,9 +478,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		flags &= ~DS_CONSOLE;
 	}
 
-	if ((Strref != -1) && !soundRef[0]) {
+	if (Strref != -1 && soundRef.IsEmpty()) {
 		StringBlock sb = core->strings->GetStringBlock( Strref );
-		memcpy(Sound, sb.Sound.CString(), 9);
+		Sound = sb.Sound;
 		if (sb.text) {
 			if (flags & DS_CONSOLE) {
 				//can't play the sound here, we have to delay action
@@ -500,7 +499,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			}
 		}
 	}
-	if (Sound[0] && !(flags&DS_SILENT) ) {
+	if (!Sound.IsEmpty() && !(flags & DS_SILENT)) {
 		ieDword speech = 0;
 		Point pos = Sender->Pos;
 		if (flags&DS_SPEECH) {
@@ -1490,7 +1489,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 			if (!actor->PlayWarCry(5)) {
 				// for monsters also try their 2da/ini file sounds
 				if (!actor->InParty) {
-					ieResRef sound;
+					ResRef sound;
 					actor->GetSoundFromFile(sound, 200);
 					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
 				}

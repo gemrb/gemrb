@@ -3927,12 +3927,12 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 	//If we are main character (has SoundSet) we have to check a corresponding wav file exists
 	bool found = false;
 	if (PCStats && PCStats->SoundSet[0]) {
-		ieResRef soundref;
+		ResRef soundRef;
 		char chrsound[256];
 		do {
 			count--;
-			ResolveStringConstant(soundref, start+count);
-			GetSoundFolder(chrsound, 1, soundref);
+			ResolveStringConstant(soundRef, start + count);
+			GetSoundFolder(chrsound, 1, soundRef);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
 				found = true;
@@ -4944,8 +4944,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 // pst has a lot of duplicates (1&3&6, 2&5, 8&9, 4, 7, 10) and little variation (all 6 entries for 8 are identical)
 void Actor::PlaySwingSound(WeaponInfo &wi) const
 {
-	ieResRef sound;
-	ResRef sound2;
+	ResRef sound;
 	ieDword itemType = wi.itemtype;
 	int isCount = gamedata->GetSwingCount(itemType);
 
@@ -4953,16 +4952,15 @@ void Actor::PlaySwingSound(WeaponInfo &wi) const
 		// monsters with non-standard items, none or something else
 		int stance = GetStance();
 		if (stance == IE_ANI_ATTACK_SLASH || stance == IE_ANI_ATTACK_BACKSLASH || stance == IE_ANI_ATTACK_JAB || stance == IE_ANI_SHOOT) {
-			GetSoundFromFile(sound, 100+stance);
-			sound2 = sound;
+			GetSoundFromFile(sound, 100 + stance);
 		}
 	} else {
 		// swing sounds start at column 3 (index 2)
 		int isChoice = core->Roll(1, isCount, -1) + 2;
-		if (!gamedata->GetItemSound(sound2, itemType, NULL, isChoice)) return;
+		if (!gamedata->GetItemSound(sound, itemType, nullptr, isChoice)) return;
 	}
 
-	core->GetAudioDrv()->Play(sound2, SFX_CHAN_SWINGS, Pos);
+	core->GetAudioDrv()->Play(sound, SFX_CHAN_SWINGS, Pos);
 }
 
 //Just to quickly inspect debug maximum values
@@ -8773,7 +8771,7 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-bool Actor::GetSoundFromFile(ieResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFromFile(ResRef &Sound, unsigned int index) const
 {
 	// only dying ignores the incapacity to vocalize
 	if (index != VB_DIE) {
@@ -8787,7 +8785,7 @@ bool Actor::GetSoundFromFile(ieResRef &Sound, unsigned int index) const
 	}
 }
 
-bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
@@ -8838,13 +8836,13 @@ bool Actor::GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
 		anims->ResRefBase.CString(), tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
-	strnlwrcpy(Sound, tab->QueryField (index, col), 8);
+	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
 	return true;
 }
 
 //Get the monster sound from a global .ini file.
 //It is ResData.ini in PST and Sounds.ini in IWD/HoW
-bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
+bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 {
 	const char *resource = "";
 	char section[12];
@@ -8907,16 +8905,15 @@ bool Actor::GetSoundFromINI(ieResRef &Sound, unsigned int index) const
 	}
 	size_t len = strcspn(resource, ",");
 	assert(len < 9);
-	strlcpy(Sound, resource, len + 1);
+	Sound = resource;
 
 	return true;
 }
 
-void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
+void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
 {
 	if (PCStats && PCStats->SoundSet[0]) {
 		//resolving soundset (bg1/bg2 style)
-		size_t len;
 
 		// handle nonstandard bg1 "default" soundsets first
 		if (!strnicmp(PCStats->SoundSet, "main", 4)) {
@@ -8932,25 +8929,23 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 				}
 			}
 			if (!found) {
-				Sound[0] = 0;
+				Sound.Reset();
 				return;
 			}
 
-			snprintf(Sound, sizeof(ieResRef), "%.5s%.2s", PCStats->SoundSet, suffixes[index]);
+			Sound.SNPrintF("%.5s%.2s", PCStats->SoundSet, suffixes[index]);
 			return;
 		} else if (csound[index]) {
-			len = snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
-			if (len > 9) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
+			Sound.SNPrintF("%s%c", PCStats->SoundSet, csound[index]);
 			return;
 		}
 
 		//icewind style
-		len = snprintf(Sound, sizeof(ieResRef), "%s%02d", PCStats->SoundSet, VCMap[index]);
-		if (len > 9) Log(ERROR, "Actor", "Actor %s has too long soundset name: %s", LongName, PCStats->SoundSet);
+		Sound.SNPrintF("%s%02d", PCStats->SoundSet, VCMap[index]);
 		return;
 	}
 
-	Sound[0]=0;
+	Sound.Reset();
 
 	if (core->HasFeature(GF_RESDATA_INI)) {
 		GetSoundFromINI(Sound, index);
@@ -8959,10 +8954,8 @@ void Actor::ResolveStringConstant(ieResRef& Sound, unsigned int index) const
 	}
 
 	//Empty resrefs
-	if (Sound[0] == '*') {
-		Sound[0] = 0;
-	} else if (!strncmp(Sound, "nosound", 7)) {
-		Sound[0] = 0;
+	if (Sound.IsStar() || Sound == "nosound") {
+		Sound.Reset();
 	}
 }
 
@@ -9126,24 +9119,23 @@ void Actor::SetSoundFolder(const char *soundset) const
 	}
 }
 
-void Actor::GetSoundFolder(char *soundset, int full, ieResRef overrideSet) const
+void Actor::GetSoundFolder(char *soundset, int full, ResRef& overrideSet) const
 {
-	ieResRef set;
-	if (overrideSet) {
-		CopyResRef(set, overrideSet);
+	ResRef set;
+	if (overrideSet.IsEmpty()) {
+		set = PCStats->SoundSet;
 	} else {
-		CopyResRef(set, PCStats->SoundSet);
+		set = overrideSet;
 	}
 
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
 		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
 		if (full) {
 			strcat(soundset,"/");
-			strncat(soundset, set, 9);
+			strncat(soundset, set.CString(), 9);
 		}
-	}
-	else {
-		strnlwrcpy(soundset, set, 8);
+	} else {
+		strnlwrcpy(soundset, set.CString(), 8);
 	}
 }
 
