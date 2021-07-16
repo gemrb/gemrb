@@ -186,9 +186,8 @@ tick_t AmbientMgrAL::AmbientSource::tick(tick_t ticks, Point listener, ieDword t
 		}
 	}
 
-	tick_t left = lastticks - ticks + nextdelay;
-	if (left > 0) {	// keep waiting
-		return left;
+	if (lastticks + nextdelay > ticks) {	// keep waiting
+		return lastticks + nextdelay - ticks;
 	}
 
 	lastticks = ticks;
