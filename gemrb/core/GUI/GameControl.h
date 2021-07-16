@@ -234,7 +234,7 @@ public:
 	Actor *GetLastActor();
 	void SetLastActor(Actor* lastActor);
 	/** changes map to the current PC */
-	void ChangeMap(Actor *pc, bool forced);
+	void ChangeMap(const Actor *pc, bool forced);
 	/** Sets up targeting with spells or items */
 	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
 	/** Page is the spell type + spell level info */

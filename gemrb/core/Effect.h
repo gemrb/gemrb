@@ -138,7 +138,7 @@ struct Effect {
 	Point Source;
 	Point Pos;
 	ieDword SourceType = 0; //1-item, 2-spell
-	ResRef SourceRef = 0;
+	ResRef SourceRef;
 	ieDword SourceFlags = 0;
 	ieDword Projectile = 0;          //9c
 	ieDwordSigned InventorySlot = 0; //a0

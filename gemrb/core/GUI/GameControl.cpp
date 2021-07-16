@@ -2538,7 +2538,7 @@ void GameControl::DisplayString(const Scriptable* target) const
 }
 
 /** changes displayed map to the currently selected PC */
-void GameControl::ChangeMap(Actor *pc, bool forced)
+void GameControl::ChangeMap(const Actor *pc, bool forced)
 {
 	//swap in the area of the actor
 	Game* game = core->GetGame();

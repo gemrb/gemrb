@@ -177,7 +177,7 @@ private:
 	int GetDiffMode(const char *keyword) const;
 public:
 	/* called by action of the same name */
-	void SetNamelessDeath(const ResRef& area, Point &pos, ieDword state);
+	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);
 	void InitSpawn(const ResRef& DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();

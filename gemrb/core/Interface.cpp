@@ -2302,7 +2302,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
+Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
 	//maximum number of monsters summoned
 	int cnt=10;

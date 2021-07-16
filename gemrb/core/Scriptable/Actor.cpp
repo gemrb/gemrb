@@ -2010,7 +2010,7 @@ static void InitActorTables()
 			tmp = tm->QueryField( i, COL_SPARKS );
 			d_splash[i] = ResRef::MakeLowerCase(tmp);
 			if (d_splash[i].IsStar()) {
-				d_splash[i].Reset();;
+				d_splash[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_GRADIENT );
 			d_gradient[i]=atoi(tmp);

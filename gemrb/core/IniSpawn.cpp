@@ -527,7 +527,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 }
 
 /* set by action */
-void IniSpawn::SetNamelessDeath(const ResRef& area, Point &pos, ieDword state)
+void IniSpawn::SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state)
 {
 	NamelessSpawnArea = ResRef::MakeUpperCase(area);
 	NamelessSpawnPoint = pos;

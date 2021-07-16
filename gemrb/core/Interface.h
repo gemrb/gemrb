@@ -506,7 +506,7 @@ public:
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** core for summoning creatures, returns the last created Actor
 	may apply a single fx on the summoned creature normally an unsummon effect */
-	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
+	Actor *SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod = true);
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */

@@ -554,7 +554,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Point pos;
 		Point talkPos;
 		ieVariable Name, Entrance;
-		ResRef Script;
+		ResRef script0;
 		ResRef KeyResRef;
 		struct ResRef Destination;
 		// two adopted pst specific fields
@@ -592,7 +592,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadWord(LaunchX);
 		str->ReadWord(LaunchY);
 		str->ReadResRef( KeyResRef );
-		str->ReadResRef( Script );
+		str->ReadResRef(script0);
 		/* ARE 9.1: 4B per position after that. */
 		if (16 == map->version) {
 			str->ReadScalar(pos.x);
@@ -693,10 +693,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ip->SetDialog(DialogResRef);
 		ip->SetEnter(WavResRef);
 
-		if (Script.IsEmpty()) {
+		if (script0.IsEmpty()) {
 			ip->Scripts[0] = nullptr;
 		} else {
-			ip->Scripts[0] = new GameScript(Script, ip);
+			ip->Scripts[0] = new GameScript(script0, ip);
 		}
 	}
 
@@ -821,7 +821,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
 		ResRef KeyResRef;
-		ResRef Script;
+		ResRef script0;
 		ieWord TrapDetect, TrapRemoval;
 		ieWord Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
@@ -877,7 +877,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadWord(LaunchX);
 		str->ReadWord(LaunchY);
 		str->ReadResRef( KeyResRef );
-		str->ReadResRef( Script );
+		str->ReadResRef(script0);
 		str->ReadDword(DiscoveryDiff);
 		str->ReadDword(LockRemoval);
 		Point toOpen[2];
@@ -988,10 +988,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 		door->Cursor = cursor;
 		door->KeyResRef = KeyResRef;
-		if (Script.IsEmpty()) {
+		if (script0.IsEmpty()) {
 			door->Scripts[0] = nullptr;
 		} else {
-			door->Scripts[0] = new GameScript(Script, door);
+			door->Scripts[0] = new GameScript(script0, door);
 		}
 
 		door->toOpen[0] = toOpen[0];

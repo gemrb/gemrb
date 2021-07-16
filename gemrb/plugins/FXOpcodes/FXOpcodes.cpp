@@ -5461,7 +5461,7 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter1 = 2;
 
 		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
-		Actor *fam = GetFamiliar(nullptr, target, fx, ResRef(resource));
+		const Actor *fam = GetFamiliar(nullptr, target, fx, ResRef(resource));
 
 		if (fam) {
 			//upgrade successful
