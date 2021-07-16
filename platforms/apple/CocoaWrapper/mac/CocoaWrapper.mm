@@ -251,23 +251,17 @@ using namespace GemRB;
 /* Main entry point to executable - should *not* be GemRB_main! */
 int main (int __unused argc, char ** __unused argv)
 {
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
+	@autoreleasepool {
+		/* Ensure the application object is initialized */
+		NSApplication* app = [NSApplication sharedApplication];
 
-    /* Ensure the application object is initialized */
-    NSApplication* app = [NSApplication sharedApplication];
-
-    /* Set up the menubar */
-    [NSApp setMainMenu:[[NSMenu alloc] init]];
-
-    CocoaWrapper* wrapper = [[CocoaWrapper alloc] init];
-    [app setDelegate:wrapper];
-
-    /* Start the main event loop */
-	[pool drain];
-    [NSApp run];
-
-    [wrapper release];
-    [pool release];
-
+		/* Set up the menubar */
+		[NSApp setMainMenu:[[[NSMenu alloc] init] autorelease]];
+		[app setDelegate:wrapper];
+	}
+	[NSApp run];
+	[wrapper release];
     return 0;
 }
+  
