@@ -542,7 +542,7 @@ public:
 	bool dead = false;      // Script replaced itself with another and should be deleted when done running
 	bool running = false;   // Script is currently running so defer any deletion to caller
 
-	const char *GetName() const { return Name; }
+	ResRef GetName() const { return Name; }
 	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);

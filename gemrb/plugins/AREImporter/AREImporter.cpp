@@ -1770,7 +1770,7 @@ int AREImporter::PutHeader(DataStream *stream, const Map *map) const
 	//the saved area script is in the last script slot!
 	const GameScript *s = map->Scripts[MAX_SCRIPTS - 1];
 	if (s) {
-		stream->WriteResRef( s->GetName() );
+		stream->WriteResRefLC(s->GetName());
 	} else {
 		stream->Write( Signature, 8);
 	}
@@ -1872,7 +1872,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteResRef( d->KeyResRef);
 		const GameScript *s = d->Scripts[0];
 		if (s) {
-			stream->WriteResRef( s->GetName() );
+			stream->WriteResRefLC(s->GetName());
 		} else {
 			stream->Write( filling, 8);
 		}
@@ -2013,7 +2013,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		ItemIndex +=tmpDword;
 		const GameScript *s = c->Scripts[0];
 		if (s) {
-			stream->WriteResRef( s->GetName() );
+			stream->WriteResRefLC(s->GetName() );
 		} else {
 			stream->Write( filling, 8);
 		}
@@ -2080,7 +2080,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteResRef( ip->KeyResRef);
 		const GameScript *s = ip->Scripts[0];
 		if (s) {
-			stream->WriteResRef( s->GetName() );
+			stream->WriteResRefLC(s->GetName());
 		} else {
 			stream->Write( filling, 8);
 		}
@@ -2154,7 +2154,7 @@ void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int in
 
 	const GameScript *s = ac->Scripts[index];
 	if (s) {
-		stream->WriteResRef( s->GetName() );
+		stream->WriteResRefLC(s->GetName());
 	} else {
 		memset(filling,0,sizeof(filling));
 		stream->Write( filling, 8);
