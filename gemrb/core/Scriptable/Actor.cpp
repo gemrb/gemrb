@@ -4004,7 +4004,7 @@ void Actor::ReactToDeath(const char * deadname)
 		resRef.SNPrintF("%.*s", count, value);
 	}
 
-	unsigned int len = 0;
+	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
 	core->GetAudioDrv()->Play(resRef, channel, &len);
 
@@ -4327,7 +4327,7 @@ void Actor::PlayExistenceSounds()
 				core->GetDictionary()->Lookup("Volume Ambients", vol);
 				int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
 				if (stream != -1) {
-					int audioLength = audio->QueueAmbient(stream, sb.Sound);
+					tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
 					if (audioLength > 0) {
 						SetAnimatedTalking(audioLength);
 					}
@@ -4863,7 +4863,7 @@ void Actor::PlayWalkSound()
 	}
 	Sound = Sound2;
 
-	unsigned int len = 0;
+	tick_t len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
 	core->GetAudioDrv()->Play(Sound, channel, Pos, 0, &len);
 	nextWalk = thisTime + len;

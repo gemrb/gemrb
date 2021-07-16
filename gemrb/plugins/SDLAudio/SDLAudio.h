@@ -65,7 +65,7 @@ public:
 	~SDLAudio(void) override;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-		const Point&, unsigned int flags = 0, unsigned int *length = 0) override;
+		const Point&, unsigned int flags = 0, tick_t *length = 0) override;
 	int CreateStream(Holder<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
@@ -78,7 +78,7 @@ public:
 	void UpdateVolume(unsigned int) override {}
 
 	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, int ambientRange) override;
-	int QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const char* sound) override;
 	bool ReleaseStream(int stream, bool hardstop) override;
 	void SetAmbientStreamVolume(int stream, int gain) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
@@ -93,7 +93,7 @@ private:
 	static void buffer_callback(void *udata, uint8_t *stream, int len);
 	bool evictBuffer();
 	void clearBufferCache();
-	Mix_Chunk* loadSound(const char *ResRef, unsigned int &time_length);
+	Mix_Chunk* loadSound(const char *ResRef, tick_t &time_length);
 
 	Point listenerPos;
 	Holder<SoundMgr> MusicReader;

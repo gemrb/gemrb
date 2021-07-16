@@ -1309,8 +1309,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		}
 		str->ReadWord(tmpWord);
 		str->Seek( 2, GEM_CURRENT_POS );
-		str->ReadDword(ambi->interval);
-		str->ReadDword(ambi->intervalVariance);
+		ieDword interval;
+		str->ReadDword(interval);
+		ambi->interval = interval * 1000;;
+		str->ReadDword(interval);
+		ambi->intervalVariance = interval * 1000;
 		// schedule bits
 		str->ReadDword(ambi->appearance);
 		str->ReadDword(ambi->flags);
@@ -2340,8 +2343,8 @@ int AREImporter::PutAmbients(DataStream *stream, const Map *map)
 		}
 		stream->WriteWord(tmpWord);
 		stream->Write( filling, 2 );
-		stream->WriteDword(am->interval);
-		stream->WriteDword(am->intervalVariance);
+		stream->WriteDword(ieDword(am->interval / 1000));
+		stream->WriteDword(ieDword(am->intervalVariance / 1000));
 		stream->WriteDword(am->appearance);
 		stream->WriteDword(am->flags);
 		stream->Write( filling, 64);

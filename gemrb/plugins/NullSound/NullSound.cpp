@@ -40,7 +40,7 @@ bool NullSound::Init(void)
 	return true;
 }
 
-Holder<SoundHandle> NullSound::Play(const char*, unsigned int, const Point&, unsigned int, unsigned int *len)
+Holder<SoundHandle> NullSound::Play(const char*, unsigned int, const Point&, unsigned int, tick_t *len)
 {
 	if (len) *len = 1000; //Returning 1 Second Length
 	return Holder<SoundHandle>();
@@ -95,7 +95,7 @@ int NullSound::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, int)
 	return -1;
 }
 
-int NullSound::QueueAmbient(int, const char*)
+tick_t NullSound::QueueAmbient(int, const char*)
 {
 	return -1;
 }

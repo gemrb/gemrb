@@ -514,9 +514,9 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 			pos.reset();
 		}
 		if (flags&DS_QUEUE) speech|=GEM_SND_QUEUE;
-		unsigned int len = 0;
+		tick_t len = 0;
 		core->GetAudioDrv()->Play(Sound, channel, pos, speech, &len);
-		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+		tick_t counter = ( AI_UPDATE_TIME * len ) / 1000;
 
 		if (Sender->Type == ST_ACTOR && len > 0 && flags & DS_CIRCLE) {
 			static_cast<Actor*>(Sender)->SetAnimatedTalking(len);

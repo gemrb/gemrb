@@ -103,8 +103,8 @@ public:
 	~Audio() override;
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
-	const Point&, unsigned int flags = 0, unsigned int *length = 0) = 0;
-	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel, unsigned int *length = 0)
+	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;
+	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel, tick_t *length = 0)
 			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
@@ -120,7 +120,7 @@ public:
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
 	virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
 				ieWord gain, bool point, int ambientRange) = 0;
-	virtual int QueueAmbient(int stream, const char* sound) = 0;
+	virtual tick_t QueueAmbient(int stream, const char* sound) = 0;
 	virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
 	virtual void SetAmbientStreamPitch(int stream, int pitch) = 0;
 	virtual void QueueBuffer(int stream, unsigned short bits,

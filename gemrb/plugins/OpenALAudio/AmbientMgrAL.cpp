@@ -106,21 +106,17 @@ int AmbientMgrAL::play()
 {
 	while (playing) {
 		std::unique_lock<std::recursive_mutex> l(mutex);
-		using namespace std::chrono;
-		using Clock = high_resolution_clock;
-		high_resolution_clock::time_point time = Clock::now();
-		milliseconds ms = duration_cast<milliseconds>(time.time_since_epoch());
-		
-		uint64_t delay = tick(ms.count());
+		tick_t time = GetTicks();
+		tick_t delay = tick(time);
 		assert(delay > 0);
-		cond.wait_for(l, milliseconds(delay));
+		cond.wait_for(l, std::chrono::milliseconds(delay));
 	}
 	return 0;
 }
 
-uint64_t AmbientMgrAL::tick(uint64_t ticks) const
+tick_t AmbientMgrAL::tick(tick_t ticks) const
 {
-	uint64_t delay = 60000; // wait one minute if all sources are off
+	tick_t delay = 60000; // wait one minute if all sources are off
 
 	if (!active)
 		return delay;
@@ -135,7 +131,7 @@ uint64_t AmbientMgrAL::tick(uint64_t ticks) const
 
 	std::lock_guard<std::recursive_mutex> l(mutex);
 	for (auto source : ambientSources) {
-		uint64_t newdelay = source->tick(ticks, listener, timeslice);
+		tick_t newdelay = source->tick(ticks, listener, timeslice);
 		if (newdelay < delay) delay = newdelay;
 	}
 	return delay;
@@ -163,11 +159,11 @@ AmbientMgrAL::AmbientSource::~AmbientSource()
 	}
 }
 
-uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDword timeslice)
+tick_t AmbientMgrAL::AmbientSource::tick(tick_t ticks, Point listener, ieDword timeslice)
 {
 	/* if we are out of sounds do nothing */
 	if (ambient->sounds.empty()) {
-		return std::numeric_limits<uint64_t>::max();
+		return std::numeric_limits<tick_t>::max();
 	}
 
 	if (!(ambient->getFlags() & IE_AMBI_ENABLED) || !(ambient->getAppearance() & timeslice)) {
@@ -178,19 +174,19 @@ uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDwo
 			core->GetAudioDrv()->ReleaseStream(stream, false);
 			stream = -1;
 		}
-		return std::numeric_limits<uint64_t>::max();
+		return std::numeric_limits<tick_t>::max();
 	}
 
-	ieDword interval = ambient->getInterval();
+	tick_t interval = ambient->getInterval();
 	if (lastticks == 0) {
 		// initialize
 		lastticks = ticks;
 		if (interval > 0) {
-			nextdelay = ambient->getTotalInterval() * 1000;
+			nextdelay = ambient->getTotalInterval();
 		}
 	}
 
-	uint64_t left = lastticks - ticks + nextdelay;
+	tick_t left = lastticks - ticks + nextdelay;
 	if (left > 0) {	// keep waiting
 		return left;
 	}
@@ -204,7 +200,7 @@ uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDwo
 	}
 
 	if (interval > 0) {
-		nextdelay = ambient->getTotalInterval() * 1000;
+		nextdelay = ambient->getTotalInterval();
 	} else {
 		// let's wait a second by default if anything goes wrong
 		nextdelay = 1000;
@@ -239,7 +235,7 @@ uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDwo
 		core->GetAudioDrv()->SetAmbientStreamPitch(stream, ambient->getTotalPitch());
 	}
 
-	int length = enqueue();
+	tick_t length = enqueue();
 
 	if (interval == 0) { // continuous ambient
 		nextdelay = length;
@@ -249,7 +245,7 @@ uint64_t AmbientMgrAL::AmbientSource::tick(uint64_t ticks, Point listener, ieDwo
 }
 
 /* enqueues a random sound and returns its length */
-int AmbientMgrAL::AmbientSource::enqueue()
+tick_t AmbientMgrAL::AmbientSource::enqueue()
 {
 	if (stream < 0) return -1;
 	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);

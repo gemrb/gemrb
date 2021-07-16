@@ -43,9 +43,9 @@ ieWord Ambient::getTotalGain() const
 	return g;
 }
 
-ieDword Ambient::getTotalInterval() const
+tick_t Ambient::getTotalInterval() const
 {
-	ieDword i = interval;
+	tick_t i = interval;
 	if (intervalVariance != 0) {
 		ieWord var = std::min(intervalVariance, interval / 2);
 		i += RAND(0, 2 * var) - var;

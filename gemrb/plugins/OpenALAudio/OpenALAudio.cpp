@@ -378,7 +378,7 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	delete ambim;
 }
 
-ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_length)
+ALuint OpenALAudioDriver::loadSound(const char *ResRef, tick_t &time_length)
 {
 	ALuint Buffer = 0;
 
@@ -441,10 +441,9 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 }
 
 Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int channel, const Point& p,
-	unsigned int flags, unsigned int *length)
+	unsigned int flags, tick_t *length)
 {
 	ALuint Buffer;
-	unsigned int time_length;
 
 	if (ResRef == NULL || !ResRef[0]) {
 		if((flags & GEM_SND_SPEECH) && (speech.Source && alIsSource(speech.Source))) {
@@ -456,6 +455,7 @@ Holder<SoundHandle> OpenALAudioDriver::Play(const char* ResRef, unsigned int cha
 		return Holder<SoundHandle>();
 	}
 
+	tick_t time_length;
 	Buffer = loadSound( ResRef, time_length );
 	if (Buffer == 0) {
 		return Holder<SoundHandle>();
@@ -772,7 +772,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	return stream;
 }
 
-int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
+tick_t OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 {
 	if (streams[stream].free || !streams[stream].ambient)
 		return -1;
@@ -785,7 +785,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	if (sound == 0)
 		return 0;
 
-	unsigned int time_length;
+	tick_t time_length;
 	ALuint Buffer = loadSound(sound, time_length);
 	if (0 == Buffer) {
 		return -1;
