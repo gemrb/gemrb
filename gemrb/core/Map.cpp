@@ -3185,7 +3185,7 @@ void Map::LoadIniSpawn()
 	INISpawn = new IniSpawn(this);
 	if (core->HasFeature(GF_RESDATA_INI)) {
 		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
-		INISpawn->InitSpawn(scriptName);
+		INISpawn->InitSpawn(ResRef(scriptName));
 	} else {
 		INISpawn->InitSpawn(WEDResRef);
 	}

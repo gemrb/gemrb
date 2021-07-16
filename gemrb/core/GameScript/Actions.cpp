@@ -7293,9 +7293,8 @@ void GameScript::BanterBlockTime(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetNamelessDeath(Scriptable* Sender, Action* parameters)
 {
-	ieResRef area;
-
-	snprintf(area,8,"AR%04d", parameters->int0Parameter);
+	ResRef area;
+	area.SNPrintF("AR%04d", parameters->int0Parameter);
 	IniSpawn *sp = Sender->GetCurrentArea()->INISpawn;
 	if (!sp) {
 		return;

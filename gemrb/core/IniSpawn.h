@@ -85,15 +85,15 @@ struct CritterEntry {
 	ieByte SetSpec[9];	  //set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
 	ieVariable SpecVar;       //condition variable
-	ieResRef SpecContext;     //condition variable context
-	ieResRef OverrideScript;  //override override script
-	ieResRef ClassScript;     //overrride class script
-	ieResRef RaceScript;      //override race script
-	ieResRef GeneralScript;   //override general script
-	ieResRef DefaultScript;   //override default script
-	ieResRef AreaScript;      //override area script
-	ieResRef SpecificScript;  //override specific script
-	ieResRef Dialog;          //override dialog
+	ResRef SpecContext;     //condition variable context
+	ResRef OverrideScript;  //override override script
+	ResRef ClassScript;     //overrride class script
+	ResRef RaceScript;      //override race script
+	ResRef GeneralScript;   //override general script
+	ResRef DefaultScript;   //override default script
+	ResRef AreaScript;      //override area script
+	ResRef SpecificScript;  //override specific script
+	ResRef Dialog;          //override dialog
 	ieVariable SpawnPointVar; //spawn point saved location
 	Point SpawnPoint;         //spawn point
 	int SpecVarOperator;      //operation performed on spec var
@@ -151,14 +151,14 @@ public:
 
 private:
 	Map *map; //owner
-	ieResRef NamelessSpawnArea;
+	ResRef NamelessSpawnArea;
 	int namelessvarcount;
 	VariableSpec *NamelessVar;
 	int localscount;
 	VariableSpec *Locals;
 	Point NamelessSpawnPoint;
 	Point PartySpawnPoint;
-	ieResRef PartySpawnArea;
+	ResRef PartySpawnArea;
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
@@ -177,8 +177,8 @@ private:
 	int GetDiffMode(const char *keyword) const;
 public:
 	/* called by action of the same name */
-	void SetNamelessDeath(const ieResRef area, Point &pos, ieDword state);
-	void InitSpawn(const ieResRef DefaultArea);
+	void SetNamelessDeath(const ResRef& area, Point &pos, ieDword state);
+	void InitSpawn(const ResRef& DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();
 	void ExitSpawn();

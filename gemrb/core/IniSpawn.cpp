@@ -44,7 +44,6 @@ IE_SEX, IE_ALIGNMENT };
 IniSpawn::IniSpawn(Map *owner)
 {
 	map = owner;
-	NamelessSpawnArea[0] = 0;
 	NamelessState = 35;
 	NamelessVar = NULL;
 	namelessvarcount = 0;
@@ -75,7 +74,7 @@ IniSpawn::~IniSpawn()
 	}
 }
 
-static Holder<DataFileMgr> GetIniFile(const ieResRef DefaultArea)
+static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
@@ -226,10 +225,12 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
 		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			strnuprcpy(critter.SpecContext, s, 6);
+			char tmp[9];
+			strnuprcpy(tmp, s, 6);
+			critter.SpecContext = tmp;
 			strnlwrcpy(critter.SpecVar, s+8, 32);
 		} else {
-			strnuprcpy(critter.SpecContext, "GLOBAL", 6);
+			critter.SpecContext = "GLOBAL";
 			strnlwrcpy(critter.SpecVar, s, 32);
 		}
 	}
@@ -380,67 +381,67 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//special 1 == area
 	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
 	if (s) {
-		strnuprcpy(critter.AreaScript,s, 8);
+		critter.AreaScript = ResRef::MakeUpperCase(s);
 	}
 	//special 2 == class
 	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
 	if (s) {
-		strnuprcpy(critter.ClassScript,s, 8);
+		critter.ClassScript = ResRef::MakeUpperCase(s);
 	}
 	//special 3 == general
 	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
 	if (s) {
-		strnuprcpy(critter.GeneralScript,s, 8);
+		critter.GeneralScript = ResRef::MakeUpperCase(s);
 	}
 	//team == specific
 	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
 	if (s) {
-		strnuprcpy(critter.SpecificScript,s, 8);
+		critter.SpecificScript = ResRef::MakeUpperCase(s);
 	}
 
 	//combat == race
 	s = inifile->GetKeyAsString(crittername,"script_combat",NULL);
 	if (s) {
-		strnuprcpy(critter.RaceScript,s, 8);
+		critter.RaceScript = ResRef::MakeUpperCase(s);
 	}
 	//movement == default
 	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
 	if (s) {
-		strnuprcpy(critter.DefaultScript,s, 8);
+		critter.DefaultScript = ResRef::MakeUpperCase(s);
 	}
 
 	//pst script names
 	s = inifile->GetKeyAsString(crittername,"script_override",NULL);
 	if (s) {
-		strnuprcpy(critter.OverrideScript,s, 8);
+		critter.OverrideScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_class",NULL);
 	if (s) {
-		strnuprcpy(critter.ClassScript,s, 8);
+		critter.ClassScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_race",NULL);
 	if (s) {
-		strnuprcpy(critter.RaceScript,s, 8);
+		critter.RaceScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_general",NULL);
 	if (s) {
-		strnuprcpy(critter.GeneralScript,s, 8);
+		critter.GeneralScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_default",NULL);
 	if (s) {
-		strnuprcpy(critter.DefaultScript,s, 8);
+		critter.DefaultScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_area",NULL);
 	if (s) {
-		strnuprcpy(critter.AreaScript,s, 8);
+		critter.AreaScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_specifics",NULL);
 	if (s) {
-		strnuprcpy(critter.SpecificScript,s, 8);
+		critter.SpecificScript = ResRef::MakeUpperCase(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"dialog",NULL);
 	if (s) {
-		strnuprcpy(critter.Dialog,s, 8);
+		critter.Dialog = ResRef::MakeUpperCase(s);
 	}
 
 	//flags
@@ -526,25 +527,25 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 }
 
 /* set by action */
-void IniSpawn::SetNamelessDeath(const ieResRef area, Point &pos, ieDword state) 
+void IniSpawn::SetNamelessDeath(const ResRef& area, Point &pos, ieDword state)
 {
-	strnuprcpy(NamelessSpawnArea, area, 8);
+	NamelessSpawnArea = ResRef::MakeUpperCase(area);
 	NamelessSpawnPoint = pos;
 	NamelessState = state;
 }
 
-void IniSpawn::InitSpawn(const ieResRef DefaultArea)
+void IniSpawn::InitSpawn(const ResRef& DefaultArea)
 {
 	const char *s;
 
 	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
-		strnuprcpy(NamelessSpawnArea, DefaultArea, 8);
+		NamelessSpawnArea = ResRef::MakeUpperCase(DefaultArea);
 		return;
 	}
 
 	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
-	strnuprcpy(NamelessSpawnArea, s, 8);
+	NamelessSpawnArea = ResRef::MakeUpperCase(s);
 	s = inifile->GetKeyAsString("nameless","point","[0.0]");
 	int x,y;
 	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
@@ -555,7 +556,7 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	NamelessSpawnPoint.y=y;
 
 	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
-	strnuprcpy(PartySpawnArea, s, 8);
+	PartySpawnArea = ResRef::MakeUpperCase(s);
 	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
 	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
 		x = NamelessSpawnPoint.x;
@@ -635,7 +636,7 @@ void IniSpawn::RespawnNameless()
 	if (NamelessSpawnPoint.IsZero()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
-		strnuprcpy(NamelessSpawnArea, nameless->Area, 8);
+		NamelessSpawnArea = ResRef::MakeUpperCase(nameless->Area);
 	}
 
 	nameless->Resurrect(NamelessSpawnPoint);
@@ -798,28 +799,28 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 		cre->AppearanceFlags|=APP_BUDDY;
 	}
 
-	if (critter.OverrideScript[0]) {
+	if (!critter.OverrideScript.IsEmpty()) {
 		cre->SetScript(critter.OverrideScript, SCR_OVERRIDE);
 	}
-	if (critter.ClassScript[0]) {
+	if (!critter.ClassScript.IsEmpty()) {
 		cre->SetScript(critter.ClassScript, SCR_CLASS);
 	}
-	if (critter.RaceScript[0]) {
+	if (!critter.RaceScript.IsEmpty()) {
 		cre->SetScript(critter.RaceScript, SCR_RACE);
 	}
-	if (critter.GeneralScript[0]) {
+	if (!critter.GeneralScript.IsEmpty()) {
 		cre->SetScript(critter.GeneralScript, SCR_GENERAL);
 	}
-	if (critter.DefaultScript[0]) {
+	if (!critter.DefaultScript.IsEmpty()) {
 		cre->SetScript(critter.DefaultScript, SCR_DEFAULT);
 	}
-	if (critter.AreaScript[0]) {
+	if (!critter.AreaScript.IsEmpty()) {
 		cre->SetScript(critter.AreaScript, SCR_AREA);
 	}
-	if (critter.SpecificScript[0]) {
+	if (!critter.SpecificScript.IsEmpty()) {
 		cre->SetScript(critter.SpecificScript, SCR_SPECIFICS);
 	}
-	if (critter.Dialog[0]) {
+	if (!critter.Dialog.IsEmpty()) {
 		cre->SetDialog(critter.Dialog);
 	}
 }

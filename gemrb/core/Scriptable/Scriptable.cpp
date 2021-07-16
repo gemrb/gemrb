@@ -176,7 +176,7 @@ void Scriptable::SetMap(Map *map)
 //ai is nonzero if this is an actor currently in the party
 //if the script level is AI_SCRIPT_LEVEL, then we need to
 //load an AI script (.bs) instead of (.bcs)
-void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
+void Scriptable::SetScript(const char* aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
