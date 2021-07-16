@@ -535,7 +535,7 @@ extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
 public:
-	GameScript(const ieResRef ResRef, Scriptable* Myself,
+	GameScript(const ResRef& ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 

@@ -1824,7 +1824,7 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
+GameScript::GameScript(const ResRef& ResRef, Scriptable* MySelf,
 	int ScriptLevel, bool AIScript)
 	: MySelf(MySelf)
 {

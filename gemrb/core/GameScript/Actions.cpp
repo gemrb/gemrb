@@ -818,7 +818,7 @@ void GameScript::EndCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
 
 void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
-	GameScript* gs = new GameScript( parameters->string0Parameter, Sender );
+	GameScript* gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
 	gs->EvaluateAllBlocks();
 	delete( gs );
 }
@@ -831,7 +831,7 @@ void GameScript::StartCutSceneEx(Scriptable* Sender, Action* parameters)
 		// not needed in pst, since the only two uses just have True conditions
 		// see ifdef in GameScript::EvaluateAllBlocks
 	}
-	GameScript *gs = new GameScript(parameters->string0Parameter, Sender);
+	GameScript *gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
 	gs->EvaluateAllBlocks();
 	delete gs;
 }

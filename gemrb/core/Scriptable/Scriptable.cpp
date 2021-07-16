@@ -191,7 +191,7 @@ void Scriptable::SetScript(const char* aScript, int idx, bool ai)
 	// This check is to prevent flooding of the console
 	if (aScript[0] && stricmp(aScript, "NONE") != 0) {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
-		Scripts[idx] = new GameScript( aScript, this, idx, ai );
+		Scripts[idx] = new GameScript(ResRef(aScript), this, idx, ai);
 	}
 }
 

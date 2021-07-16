@@ -793,9 +793,9 @@ CREKnownSpell* CREImporter::GetKnownSpell()
 
 void CREImporter::ReadScript(Actor *act, int ScriptLevel)
 {
-	ieResRef aScript;
-	str->ReadResRef( aScript );
-	act->SetScript( aScript, ScriptLevel, act->InParty!=0);
+	ResRef aScript;
+	str->ReadResRef(aScript);
+	act->SetScript(aScript, ScriptLevel, act->InParty != 0);
 }
 
 CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)

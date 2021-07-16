@@ -1655,7 +1655,7 @@ void Game::PlayerDream() const
 	Scriptable *Sender = GetPC(0,true);
 	if (!Sender) return;
 
-	GameScript* gs = new GameScript("player1d", Sender, 0, false);
+	GameScript* gs = new GameScript(ResRef("player1d"), Sender, 0, false);
 	gs->Update();
 	delete( gs );
 }

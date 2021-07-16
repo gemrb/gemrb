@@ -11985,13 +11985,13 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 			Actor *tar = game->GetPC(ii, true);
 			const char* scriptname = tar->GetScriptName();
 			if (pdtable->GetRowIndex(scriptname) != -1) {
-				ieResRef resref;
+				ResRef resRef;
 				if (bg2expansion) {
-					strnlwrcpy(resref, pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+					resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE");
 				} else {
-					strnlwrcpy(resref, pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE"), sizeof(ieResRef)-1);
+					resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE");
 				}
-				GameScript* restscript = new GameScript(resref, tar, 0, false);
+				GameScript* restscript = new GameScript(resRef, tar, 0, false);
 				if (restscript->Update()) {
 					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
 					dreamed = 1;
