@@ -171,7 +171,58 @@ public:
 		// must define our own empty ctor due to union type
 		// union is already 0 initialized so there is nothing else to do
 	}
-	
+
+	Effect(const Effect& rhs) noexcept {
+		Opcode = rhs.Opcode;
+		Target = rhs.Target;
+		Power = rhs.Power;
+		Parameter1 = rhs.Parameter1;
+		Parameter2 = rhs.Parameter2;
+		TimingMode = rhs.TimingMode;
+		// skip unknown2
+		Resistance = rhs.Resistance;
+		Duration = rhs.Duration;
+		ProbabilityRangeMax = rhs.ProbabilityRangeMax;
+		ProbabilityRangeMin = rhs.ProbabilityRangeMin;
+		DiceThrown = rhs.DiceThrown;
+		DiceSides = rhs.DiceSides;
+		SavingThrowType = rhs.SavingThrowType;
+		SavingThrowBonus = rhs.SavingThrowBonus;
+		IsVariable = rhs.IsVariable;
+		IsSaveForHalfDamage = rhs.IsSaveForHalfDamage;
+		PrimaryType = rhs.PrimaryType;
+		MinAffectedLevel = rhs.MinAffectedLevel;
+		MaxAffectedLevel = rhs.MaxAffectedLevel;
+		Parameter3 = rhs.Parameter3;
+		Parameter4 = rhs.Parameter4;
+		Parameter5 = rhs.Parameter5;
+		Parameter6 = rhs.Parameter6;
+		Source = rhs.Source;
+		Pos = rhs.Pos;
+		SourceType = rhs.SourceType;
+		SourceRef = rhs.SourceRef;
+		SourceFlags = rhs.SourceFlags;
+		Projectile = rhs.Projectile;
+		InventorySlot = rhs.InventorySlot;
+		CasterLevel = rhs.CasterLevel;
+		FirstApply = rhs.FirstApply;
+		SecondaryType = rhs.SecondaryType;
+		SecondaryDelay = rhs.SecondaryDelay;
+		CasterID = rhs.CasterID;
+		random_value = rhs.random_value;
+		SpellLevel = rhs.SpellLevel;
+
+		IsVariable = rhs.IsVariable;
+		if (rhs.VariableName[0]) {
+			strlcpy(VariableName, rhs.VariableName, sizeof(VariableName));
+		}
+		// reset references
+		Resource = resources.Resource;
+		Resource2 = resources.Resource2;
+		Resource3 = resources.Resource3;
+		Resource4 = resources.Resource4;
+	}
+
 	bool operator==(const Effect& rhs) const noexcept {
 		if (this == &rhs) return true;
 		

@@ -7254,8 +7254,7 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//this effect too
 		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 		if (newfx) {
-			Effect *myfx = new Effect;
-			memcpy(myfx, newfx, sizeof(Effect));
+			Effect *myfx = new Effect(*newfx);
 			myfx->random_value = fx->random_value;
 			myfx->TimingMode=fx->TimingMode;
 			myfx->Duration=fx->Duration;

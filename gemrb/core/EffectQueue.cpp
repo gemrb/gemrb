@@ -433,11 +433,9 @@ Effect *EffectQueue::CreateEffectCopy(const Effect *oldfx, ieDword opcode, ieDwo
 	if( opcode==0xffffffff) {
 		return NULL;
 	}
-	Effect *fx = new Effect();
-	if( !fx) {
-		return NULL;
-	}
-	memcpy(fx,oldfx,sizeof(Effect) );
+	Effect *fx = new Effect(*oldfx);
+	if (!fx) return nullptr;
+
 	fx->Opcode=opcode;
 	fx->Parameter1=param1;
 	fx->Parameter2=param2;
