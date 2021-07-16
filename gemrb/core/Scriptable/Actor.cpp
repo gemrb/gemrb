@@ -3974,36 +3974,43 @@ void Actor::ReactToDeath(const char * deadname)
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	const char *value = tm->QueryField (scriptName, deadname);
-	switch (value[0]) {
-	case '0':
+	const char *value = tm->QueryField(scriptName, deadname);
+	if (value[0] == '0') {
 		VerbalConstant(VB_REACT, 1, DS_QUEUE);
-		break;
-	case '1':
+		return;
+	} else if (value[0] == '1') {
 		VerbalConstant(VB_REACT_S, 1, DS_QUEUE);
-		break;
-	default:
-		{
-			int count = CountElements(value,',');
-			if (count<=0) break;
-			count = core->Roll(1,count,-1);
-			ieResRef resref;
-			while(count--) {
-				while(*value && *value!=',') value++;
-				if (*value==',') value++;
-			}
-			CopyResRef(resref, value);
-			for(count=0;count<8 && resref[count]!=',';count++) {};
-			resref[count]=0;
+		return;
+	}
 
-			unsigned int len = 0;
-			unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
-			core->GetAudioDrv()->Play(resref, channel, &len);
-			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
-			if (counter != 0)
-				SetWait( counter );
-			break;
-		}
+	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
+	int count = CountElements(value, ',');
+	if (count <= 0) return;
+
+	ResRef resRef;
+	count = core->Roll(1, count, -1);
+	// remove prefixed choices
+	while (count--) {
+		while (*value && *value != ',') value++;
+		if (*value == ',') value++;
+	}
+	// remove suffixed choices
+	count = 8;
+	while (count >= 0 && value[count] != ',') count--;
+	if (count == -1) {
+		// it was the last choice, so there's no garbage afterwards
+		resRef = value;
+	} else {
+		resRef.SNPrintF("%.*s", count, value);
+	}
+
+	unsigned int len = 0;
+	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
+	core->GetAudioDrv()->Play(resRef, channel, &len);
+
+	tick_t counter = (AI_UPDATE_TIME * len) / 1000;
+	if (counter != 0) { // don't nullify it in case we're waiting already
+		SetWait(counter);
 	}
 }
 
