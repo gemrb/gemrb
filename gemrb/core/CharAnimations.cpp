@@ -2872,7 +2872,7 @@ void CharAnimations::PulseRGBModifiers()
 
 	if (time - lastModUpdate > 400) lastModUpdate = time - 40;
 
-	int inc = (time - lastModUpdate)/40;
+	tick_t inc = (time - lastModUpdate)/40;
 	
 	if (GlobalColorMod.type != RGBModifier::NONE &&
 		GlobalColorMod.speed > 0)

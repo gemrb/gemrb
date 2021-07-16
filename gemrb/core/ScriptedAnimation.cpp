@@ -505,7 +505,7 @@ bool ScriptedAnimation::UpdatePhase()
 		if (starttime == 0) {
 			starttime = time;
 		}
-		unsigned int inc = 0;
+		tick_t inc = 0;
 		if ((time - starttime) >= tick_t(1000 / FrameRate)) {
 			inc = (time - starttime) * FrameRate / 1000;
 			starttime += inc * 1000 / FrameRate;
