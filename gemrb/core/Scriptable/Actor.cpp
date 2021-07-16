@@ -9419,53 +9419,59 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	// TODO: should be rate limited (web says to once per 4 rounds?)
 	// rogue is hidden or flanking OR the target is immobile (sleep ... stun)
 	// or one of the stat overrides is set (unconfirmed for iwd2!)
-	if (invisible || always || target->Immobile() || IsBehind(target)) {
-		bool dodgy = target->GetStat(IE_UNCANNY_DODGE) & 0x200;
-		// if true, we need to be 4+ levels higher to still manage a sneak attack
-		if (dodgy) {
-			if (GetStat(IE_CLASSLEVELSUM) >= target->GetStat(IE_CLASSLEVELSUM) + 4) {
-				dodgy = false;
-			}
-		}
-		if (target->Modified[IE_DISABLEBACKSTAB] || weaponImmunity || dodgy) {
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-			wi.backstabbing = false;
+	if (!invisible && !always && !target->Immobile() && !IsBehind(target)) {
+		return 0;
+	}
+
+	bool dodgy = target->GetStat(IE_UNCANNY_DODGE) & 0x200;
+	// if true, we need to be 4+ levels higher to still manage a sneak attack
+	if (dodgy && GetStat(IE_CLASSLEVELSUM) >= target->GetStat(IE_CLASSLEVELSUM) + 4) {
+		dodgy = false;
+	}
+
+	if (!target->Modified[IE_DISABLEBACKSTAB] && !weaponImmunity && !dodgy) {
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, DMC_WHITE);
+		wi.backstabbing = false;
+		return 0;
+	}
+
+	if (!wi.backstabbing) {
+		// weapon is unsuitable for sneak attack
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, DMC_WHITE);
+		return 0;
+	}
+
+	// first check for feats that change the sneak dice
+	// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
+	// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
+	if (!BackstabResRef.IsStar()) {
+		if (BackstabResRef != ArterialStrikeRef) {
+			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
+			multiplier -= 2;
+			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+			displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, sneakAttackDamage);
 		} else {
-			if (wi.backstabbing) {
-				// first check for feats that change the sneak dice
-				// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
-				// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
-				if (!BackstabResRef.IsStar()) {
-					if (BackstabResRef != ArterialStrikeRef) {
-						// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
-						multiplier -= 2;
-						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-						displaymsg->DisplayRollStringName(39829, DMC_LIGHTGREY, this, sneakAttackDamage);
-					} else {
-						// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
-						multiplier--;
-						sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-						displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
-					}
-					core->ApplySpell(BackstabResRef.CString(), target, this, multiplier);
-					//do we need this?
-					BackstabResRef.Reset();
-					if (HasFeat(FEAT_CRIPPLING_STRIKE) ) {
-						core->ApplySpell(CripplingStrikeRef.CString(), target, this, multiplier);
-					}
-				}
-				if (!sneakAttackDamage) {
-					sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
-					// ~Sneak Attack for %d~
-					//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
-					if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
-				}
-			} else {
-				// weapon is unsuitable for sneak attack
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-			}
+			// ~Sneak attack for %d scores arterial strike (Inflicts bleeding wound)~
+			multiplier--;
+			sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+			displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
+		}
+
+		core->ApplySpell(BackstabResRef.CString(), target, this, multiplier);
+		// do we need this?
+		BackstabResRef.Reset();
+		if (HasFeat(FEAT_CRIPPLING_STRIKE)) {
+			core->ApplySpell(CripplingStrikeRef.CString(), target, this, multiplier);
 		}
 	}
+
+	if (!sneakAttackDamage) {
+		sneakAttackDamage = LuckyRoll(multiplier, 6, 0, 0, target);
+		// ~Sneak Attack for %d~
+		//displaymsg->DisplayRollStringName(25053, DMC_LIGHTGREY, this, extraDamage);
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, DMC_WHITE, sneakAttackDamage);
+	}
+
 	return sneakAttackDamage;
 }
 
@@ -9483,20 +9489,22 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 		return backstabDamage;
 	}
 
-	if (!(core->HasFeature(GF_PROPER_BACKSTAB) && !IsBehind(target)) || (always&0x5)) {
-		if (target->Modified[IE_DISABLEBACKSTAB]) {
-			// The backstab seems to have failed
-			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_FAIL, DMC_WHITE);
-			wi.backstabbing = false;
-		} else {
-			if (wi.backstabbing) {
-				backstabDamage = multiplier * damage;
-				// display a simple message instead of hardcoding multiplier names
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue (STR_BACKSTAB, DMC_WHITE, multiplier);
-			} else {
-				// weapon is unsuitable for backstab
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString (STR_BACKSTAB_BAD, DMC_WHITE);
-			}
+	if ((!core->HasFeature(GF_PROPER_BACKSTAB) || !IsBehind(target)) && !(always & 0x5)) {
+		return backstabDamage;
+	}
+
+	if (target->Modified[IE_DISABLEBACKSTAB]) {
+		// The backstab seems to have failed
+		if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantString(STR_BACKSTAB_FAIL, DMC_WHITE);
+		wi.backstabbing = false;
+	} else {
+		if (wi.backstabbing) {
+			backstabDamage = multiplier * damage;
+			// display a simple message instead of hardcoding multiplier names
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringValue(STR_BACKSTAB, DMC_WHITE, multiplier);
+		} else if (core->HasFeedback(FT_COMBAT)) {
+			// weapon is unsuitable for backstab
+			displaymsg->DisplayConstantString(STR_BACKSTAB_BAD, DMC_WHITE);
 		}
 	}
 
