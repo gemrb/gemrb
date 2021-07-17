@@ -90,7 +90,7 @@ unsigned long DataStream::Remains() const
 	return size-Pos;
 }
 
-int DataStream::ReadResRef(ieResRef dest)
+int DataStream::ReadResRef(char dest[9])
 {
 	int len = Read(dest, 8);
 	if (len == GEM_ERROR) {
@@ -119,7 +119,7 @@ int DataStream::ReadResRef(ResRef& dest)
 	return len;
 }
 
-int DataStream::WriteResRef(const ieResRef src)
+int DataStream::WriteResRef(const char src[9])
 {
 	return Write( src, 8);
 }

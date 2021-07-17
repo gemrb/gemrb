@@ -87,10 +87,10 @@ public:
 		return len;
 	}
 
-	int ReadResRef(ieResRef dest);
+	int ReadResRef(char dest[9]);
 	int ReadResRef(ResRef& dest);
 	
-	int WriteResRef(const ieResRef src);
+	int WriteResRef(const char src[9]);
 	int WriteResRef(const ResRef& src);
 	int WriteResRefLC(const ResRef& src);
 	int WriteResRefUC(const ResRef& src);
