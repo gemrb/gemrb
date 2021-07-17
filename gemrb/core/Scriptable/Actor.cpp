@@ -4842,7 +4842,7 @@ void Actor::PlayWalkSound()
 
 	int l = strlen(Sound);
 	char Sound2[9]; // bleh
-	CopyResRef(Sound2, Sound.CString());
+	strlcpy(Sound2, Sound.CString(), sizeof(Sound2));
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
 		if (l < 8) {

@@ -127,7 +127,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
 		size_t i = strlen(s->SpellbookIcon);
 		char tmp[9];
-		CopyResRef(tmp, s->SpellbookIcon);
+		strlcpy(tmp, s->SpellbookIcon, sizeof(tmp));
 		if (i) tmp[i-1]='c';
 		s->SpellbookIcon = tmp;
 	}

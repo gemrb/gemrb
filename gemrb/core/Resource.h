@@ -39,13 +39,6 @@ namespace GemRB {
 !!!!!!!!!!!!!!!!!!!!!!!!!!! */
 typedef char ieResRef[9];
 
-// safely copies a ResRef (ie. nulls out the unused buffer size)
-inline void CopyResRef(ieResRef& d, const ieResRef s)
-{
-	strncpy(d, s, sizeof(ieResRef) - 1);
-	d[sizeof(ieResRef) - 1] = '\0';
-}
-
 class DataStream;
 
 /* Hopefully we can slowly replace the char array version with this struct... */
