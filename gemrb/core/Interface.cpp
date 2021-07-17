@@ -493,7 +493,7 @@ void Interface::HandleFlags()
 			guiscript->RunFunction( "Game", "EnterGame" );
 
 			//switch map to protagonist
-			Actor* actor = GetFirstSelectedPC(true);
+			const Actor* actor = GetFirstSelectedPC(true);
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}

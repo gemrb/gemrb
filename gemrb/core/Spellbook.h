@@ -142,7 +142,7 @@ private:
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 	/** Depletes a sorcerer type spellpage by one */
-	void DepleteLevel(CRESpellMemorization* sm, const ResRef& except) const;
+	void DepleteLevel(const CRESpellMemorization* sm, const ResRef& except) const;
 	/** Adds a single spell to the spell info list */
 	void AddSpellInfo(unsigned int level, unsigned int type, const ResRef& name, unsigned int idx);
 	/** regenerates the spellinfo list */
@@ -242,7 +242,7 @@ public:
 	unsigned int GetSpellInfoSize(int type);
 
 	/** generates a custom spellinfo list for fx_select_spell */
-	void SetCustomSpellInfo(std::vector<ResRef>& data, const ResRef &spell, int type);
+	void SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef &spell, int type);
 
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();

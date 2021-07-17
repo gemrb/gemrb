@@ -429,7 +429,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		return;
 	}
 
-	char Sound[_MAX_PATH];
+	char Sound[_MAX_PATH] = {};
 	ResRef soundRef;
 	unsigned int channel = SFX_CHAN_DIALOG;
 

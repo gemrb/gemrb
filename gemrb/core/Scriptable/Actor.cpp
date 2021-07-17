@@ -609,7 +609,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 				recover = gamedata->GetPalette(paletteResRef);
 			}
 		}
-		delete( anims );
+		delete anims;
 	}
 	//hacking PST no palette
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
@@ -6982,7 +6982,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 
 		style = 1000*stars + IE_PROFICIENCY2WEAPON;
 		prof += wsdualwield[stars][leftorright?1:0];
-	} else if (wi.itemflags&(IE_INV_ITEM_TWOHANDED) && (wi.wflags&WEAPON_MELEE) && wstwohanded) {
+	} else if (wi.itemflags & IE_INV_ITEM_TWOHANDED && wi.wflags & WEAPON_MELEE && wstwohanded) {
 		//add two handed profs bonus
 		stars = GetStat(IE_PROFICIENCY2HANDED)&PROFS_MASK;
 		if (stars > STYLE_MAX) stars = STYLE_MAX;
@@ -7512,7 +7512,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	bool critical = criticalroll>=ATTACKROLL;
 	bool success = critical;
 	int defense = target->GetDefense(damagetype, wi.wflags, this);
-	int rollMod = (ReverseToHit) ? defense : tohit;
+	int rollMod = ReverseToHit ? defense : tohit;
 	if (!critical) {
 		// autohit immobile enemies (true for atleast stun, sleep, timestop)
 		if (target->Immobile() || (target->GetStat(IE_STATE_ID) & STATE_SLEEP)) {
@@ -7520,7 +7520,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		} else if (roll == 1) {
 			success = false;
 		} else {
-			success = (roll + rollMod) > ((ReverseToHit) ? tohit : defense);
+			success = (roll + rollMod) > (ReverseToHit ? tohit : defense);
 		}
 	}
 
@@ -9126,7 +9126,7 @@ void Actor::SetSoundFolder(const char *soundset) const
 	}
 }
 
-void Actor::GetSoundFolder(char *soundset, int full, ResRef& overrideSet) const
+void Actor::GetSoundFolder(char *soundset, int full, const ResRef& overrideSet) const
 {
 	ResRef set;
 	if (overrideSet.IsEmpty()) {
@@ -9136,13 +9136,13 @@ void Actor::GetSoundFolder(char *soundset, int full, ResRef& overrideSet) const
 	}
 
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
-		strnlwrcpy(soundset, PCStats->SoundFolder, 32);
 		if (full) {
-			strcat(soundset,"/");
-			strncat(soundset, set.CString(), 9);
+			snprintf(soundset, sizeof(PCStats->SoundFolder) + 9, "%s/%s", PCStats->SoundFolder, set.CString());
+		} else {
+			snprintf(soundset, sizeof(PCStats->SoundFolder), "%s", PCStats->SoundFolder);
 		}
 	} else {
-		strnlwrcpy(soundset, set.CString(), 8);
+		strlcpy(soundset, set.CString(), 9);
 	}
 }
 

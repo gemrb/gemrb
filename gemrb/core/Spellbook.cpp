@@ -914,7 +914,7 @@ bool Spellbook::DepleteSpell(int type)
 	return false;
 }
 
-void Spellbook::DepleteLevel(CRESpellMemorization* sm, const ResRef& except) const
+void Spellbook::DepleteLevel(const CRESpellMemorization* sm, const ResRef& except) const
 {
 	ResRef last;
 
@@ -1100,7 +1100,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	gamedata->FreeSpell(spl, spellname, false);
 }
 
-void Spellbook::SetCustomSpellInfo(std::vector<ResRef>& data, const ResRef &spell, int type)
+void Spellbook::SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef &spell, int type)
 {
 	ClearSpellInfo();
 	if (!data.empty()) {

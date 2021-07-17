@@ -5830,13 +5830,13 @@ PyDoc_STRVAR( GemRB_GetPlayerSound__doc,
 
 static PyObject* GemRB_GetPlayerSound(PyObject * /*self*/, PyObject* args)
 {
-	char Sound[42];
 	int globalID;
 	int flag = 0;
 	PARSE_ARGS( args,  "i|i", &globalID, &flag );
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
+	char Sound[42];
 	ResRef ignore;
 	actor->GetSoundFolder(Sound, flag, ignore);
 	return PyString_FromString(Sound);
@@ -6429,7 +6429,7 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 	if (scr.IsEmpty()) {
 		Py_RETURN_NONE;
 	}
-	return PyString_FromString( scr );
+	return PyString_FromResRef(scr);
 }
 
 PyDoc_STRVAR( GemRB_SetPlayerScript__doc,
@@ -13692,7 +13692,7 @@ bool GUIScript::Autodetect(void)
 
 	if (gametype_hint[0]) {
 		Log(MESSAGE, "GUIScript", "Detected GameType: %s", gametype_hint);
-		strcpy(core->config.GameType, gametype_hint);
+		strlcpy(core->config.GameType, gametype_hint, sizeof(core->config.GameType));
 		return true;
 	}
 	else {
