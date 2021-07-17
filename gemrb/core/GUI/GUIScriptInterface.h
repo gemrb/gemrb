@@ -37,7 +37,7 @@ public:
 	}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override {
 		return {"View"};
 	};
 
@@ -56,7 +56,7 @@ public:
 	: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override {
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
@@ -74,7 +74,7 @@ public:
 	: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override {
 		Control* ctrl = static_cast<Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
