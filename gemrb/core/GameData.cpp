@@ -771,4 +771,27 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
 }
 
+bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const
+{
+	if (!data.empty()) {
+		data.clear();
+	}
+	AutoTable tm(tableName);
+	if (!tm) {
+		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
+		return false;
+	}
+
+	size_t count = tm->GetRowCount();
+	data.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		// * marks an empty resource
+		if (data[i].IsStar()) {
+			data[i].Reset();
+		}
+	}
+	return true;
+}
+
 }

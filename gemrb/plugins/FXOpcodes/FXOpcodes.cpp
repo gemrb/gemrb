@@ -4360,7 +4360,7 @@ int fx_visual_spell_hit (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_visual_spell_hit(%2d): Target: %d Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	if (gamedata->spellHits.empty()) {
-		core->ReadResRefTable(ResRef("shtable"), gamedata->spellHits);
+		gamedata->ReadResRefTable(ResRef("shtable"), gamedata->spellHits);
 	}
 	//remove effect if map is not loaded
 	Map *map = target->GetCurrentArea();
@@ -5737,7 +5737,7 @@ int fx_select_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		//all spells listed in 2da
 		std::vector<ResRef> data;
-		core->ReadResRefTable(fx->Resource, data);
+		gamedata->ReadResRefTable(fx->Resource, data);
 		sb->SetCustomSpellInfo(data, fx->SourceRef, 0);
 
 		core->GetDictionary()->SetAt("ActionLevel", 11);

@@ -890,29 +890,6 @@ void Interface::Main()
 	QuitGame(0);
 }
 
-bool Interface::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data)
-{
-	if (!data.empty()) {
-		data.clear();
-	}
-	AutoTable tm(tableName);
-	if (!tm) {
-		Log(ERROR, "Core", "Cannot find %s.2da.", tableName.CString());
-		return false;
-	}
-
-	size_t count = tm->GetRowCount();
-	data.resize(count);
-	for (size_t i = 0; i < count; i++) {
-		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
-		// * marks an empty resource
-		if (data[i].IsStar()) {
-			data[i].Reset();
-		}
-	}
-	return true;
-}
-
 int Interface::LoadSprites()
 {
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
@@ -1548,7 +1525,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
-	if (!ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
+	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
 		Log(FATAL, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
 	}
