@@ -996,8 +996,12 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				game->AdvanceTime(core->Time.hour_size);
 				//refresh gui here once we got it
 				break;
-			// u
-			case 'V': //
+			case 'u': // dump GameScript GLOBAL vars
+				core->GetGame()->locals->DebugDump();
+			case 'U': // dump death vars
+				core->GetGame()->kaputz->DebugDump();
+				break;
+			case 'V': // dump GemRB vars like the game ini settings
 				core->GetDictionary()->DebugDump();
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
