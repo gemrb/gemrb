@@ -175,7 +175,6 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 // inc_spawn_point_index
 //*find_safest_point
 //#spawn_time_of_day
-// exit - similar to enter[spawn], this is a spawn branch type (on exiting an area?)
 // PST only
 //*auto_buddy
 //*detail_level
@@ -873,7 +872,6 @@ void IniSpawn::InitialSpawn()
 	}
 }
 
-//FIXME:call this at the right time (this feature is not explored yet, and unused in original dataset)
 void IniSpawn::ExitSpawn()
 {
 	SpawnGroup(exitspawn);

@@ -838,6 +838,10 @@ int Game::DelMap(unsigned int index, int forced)
 		return 1;
 	}
 
+	// this was not used in the originals and may be in the wrong place
+	// (definitely if MAX_MAPS_LOADED gets bumped)
+	map->INISpawn->ExitSpawn();
+
 	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
 		const char *name = map->GetScriptName();
