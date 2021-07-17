@@ -6425,8 +6425,8 @@ static PyObject* GemRB_GetPlayerScript(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	const char *scr = actor->GetScript(Index);
-	if (scr[0]==0) {
+	ResRef scr = actor->GetScript(Index);
+	if (scr.IsEmpty()) {
 		Py_RETURN_NONE;
 	}
 	return PyString_FromString( scr );
