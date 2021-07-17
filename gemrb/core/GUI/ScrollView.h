@@ -75,7 +75,7 @@ namespace GemRB {
 		void SetVScroll(ScrollBar* sb);
 		void SetHScroll(ScrollBar* sb);
 		
-		bool IsAnimated() const override { return animation; }
+		bool IsAnimated() const override { return static_cast<bool>(animation); }
 
 		void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 		View* RemoveSubview(const View*);

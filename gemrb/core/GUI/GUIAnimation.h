@@ -39,7 +39,7 @@ public:
 	
 	virtual ~GUIAnimation() = default;
 	
-	operator bool() const {
+	explicit operator bool() const {
 		return !HasEnded();
 	}
 
