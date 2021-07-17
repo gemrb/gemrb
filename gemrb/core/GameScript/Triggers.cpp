@@ -1078,7 +1078,7 @@ int GameScript::Contains(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Container *cnt = (const Container *) tar;
-	if (HasItemCore(&cnt->inventory, parameters->string0Parameter, parameters->int0Parameter)) {
+	if (HasItemCore(&cnt->inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1086,7 +1086,7 @@ int GameScript::Contains(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::StoreHasItem(Scriptable */*Sender*/, const Trigger *parameters)
 {
-	return StoreHasItemCore(parameters->string0Parameter, parameters->string1Parameter);
+	return StoreHasItemCore(ResRef(parameters->string0Parameter), ResRef(parameters->string1Parameter));
 }
 
 //the int0 parameter is an addition, normally it is 0
@@ -1107,7 +1107,7 @@ int GameScript::HasItem(Scriptable *Sender, const Trigger *parameters)
 		default:
 			break;
 	}
-	if (inventory && HasItemCore(inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
+	if (inventory && HasItemCore(inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -1126,7 +1126,7 @@ int GameScript::ItemIsIdentified(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	if (HasItemCore(&actor->inventory, parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
+	if (HasItemCore(&actor->inventory, ResRef(parameters->string0Parameter), IE_INV_ITEM_IDENTIFIED) ) {
 		return 1;
 	}
 	return 0;
@@ -1214,7 +1214,7 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, const Trigger *parameters)
 	int i = game->GetPartySize(true);
 	while(i--) {
 		const Actor *actor = game->GetPC(i, true);
-		if (HasItemCore(&actor->inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
+		if (HasItemCore(&actor->inventory, ResRef(parameters->string0Parameter), parameters->int0Parameter) ) {
 			return 1;
 		}
 	}

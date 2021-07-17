@@ -245,7 +245,7 @@ bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 	return false;
 }
 
-bool StoreHasItemCore(const char* storename, const char* itemname)
+bool StoreHasItemCore(const ResRef& storename, const ResRef& itemname)
 {
 	const Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -262,7 +262,7 @@ bool StoreHasItemCore(const char* storename, const char* itemname)
 	return ret;
 }
 
-static bool StoreGetItemCore(CREItem &item, const ieResRef storename, const ieResRef itemname, unsigned int count)
+static bool StoreGetItemCore(CREItem &item, const ResRef& storename, const ResRef& itemname, unsigned int count)
 {
 	Store* store = gamedata->GetStore(storename);
 	if (!store) {
@@ -370,7 +370,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword flags)
+bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword flags)
 {
 	if (inventory->HasItem(itemname, flags)) {
 		return true;
@@ -398,7 +398,7 @@ bool HasItemCore(const Inventory *inventory, const ieResRef itemname, ieDword fl
 }
 
 //finds and takes an item from a container in the given inventory
-static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ieResRef itemname, int count)
+static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ResRef& itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {
@@ -642,7 +642,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		item = new CREItem();
 
 		if (count <= 0) count = 1;
-		if (!GetItemContainer(*item, myinv, resref, count)) {
+		if (!GetItemContainer(*item, myinv, ResRef(resref), count)) {
 			delete item;
 			item = NULL;
 		}
@@ -1581,9 +1581,9 @@ static int ParseIntParam(const char *&src, const char *&str)
 	}
 	if (*str=='*') { //there may be an IDS table
 		str++;
-		ieResRef idsTabName;
+		char idsTabName[9];
 		char *cur = idsTabName;
-		const char *end = idsTabName + sizeof(ieResRef) - 1;
+		const char *end = idsTabName + 9 - 1;
 		while (*str != ',' && *str != ')') {
 			// limit IDS file length to 8 characters
 			 if (cur != end) {

@@ -117,7 +117,7 @@ static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 //there are additional fake action buttons
 static ieDword GUIAction[MAX_ACT_COUNT]={UNINIT_IEDWORD};
 static ieDword GUITooltip[MAX_ACT_COUNT]={UNINIT_IEDWORD};
-static ieResRef GUIResRef[MAX_ACT_COUNT];
+static ResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
 static Store *rhstore = NULL;
 
@@ -7944,7 +7944,7 @@ static void ReadSpecialItems()
 	}
 }
 
-static ieStrRef GetSpellDesc(const ieResRef CureResRef)
+static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 {
 	if (StoreSpells.empty()) {
 		AutoTable tab("speldesc");
@@ -10570,7 +10570,6 @@ static void ReadActionButtons()
 {
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
-	memset(GUIResRef, 0, sizeof(GUIResRef));
 	memset(GUIEvent, 0, sizeof(GUIEvent));
 	int table = gamedata->LoadTable( "guibtact" );
 	if (table<0) {
@@ -10586,7 +10585,7 @@ static void ReadActionButtons()
 		row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
 		GUIAction[i] = row.data;
 		GUITooltip[i] = atoi( tab->QueryField(i,4) );
-		strnlwrcpy(GUIResRef[i], tab->QueryField(i,5), 8);
+		GUIResRef[i] = tab->QueryField(i, 5);
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
 	gamedata->DelTable( table );
@@ -10645,7 +10644,7 @@ static PyObject* SetActionIcon(Button* btn, PyObject *dict, int Index, int Funct
 	if (!bam) {
 		char tmpstr[24];
 
-		snprintf(tmpstr,sizeof(tmpstr),"%s BAM not found", GUIResRef[Index]);
+		snprintf(tmpstr, sizeof(tmpstr), "%s BAM not found", GUIResRef[Index].CString());
 		return RuntimeError( tmpstr );
 	}
 	packtype row;
