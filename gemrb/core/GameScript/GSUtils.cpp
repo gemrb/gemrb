@@ -193,10 +193,10 @@ static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "S
 
 //this function handles the polymorphism of Spell[RES] actions
 //it returns spellres
-bool ResolveSpellName(ieResRef spellres, Action *parameters)
+bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		strnlwrcpy(spellres, parameters->string0Parameter, 8);
+		spellRes = ResRef::MakeLowerCase(parameters->string0Parameter);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -204,12 +204,12 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 		if (type>4) {
 			return false;
 		}
-		snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
+		spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
 	}
-	return gamedata->Exists(spellres, IE_SPL_CLASS_ID);
+	return gamedata->Exists(spellRes, IE_SPL_CLASS_ID);
 }
 
-void ResolveSpellName(ieResRef spellres, ieDword number)
+void ResolveSpellName(ResRef& spellRes, ieDword number)
 {
 	//resolve spell
 	unsigned int type = number/1000;
@@ -217,7 +217,7 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 	if (type>4) {
 		type=0;
 	}
-	snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
+	spellRes.SNPrintF("%s%03d", spell_suffices[type], spellid);
 }
 
 ieDword ResolveSpellNumber(const ResRef& spellRef)
@@ -2677,7 +2677,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 // shared spellcasting action code for casting on scriptables
 void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres = {};
+	ResRef spellResRef;
 	int level = 0;
 	static bool third = core->HasFeature(GF_3ED_RULES);
 
@@ -2689,15 +2689,14 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ResolveSpellName(spellres, Sender->LastMarkedSpell);
+		ResolveSpellName(spellResRef, Sender->LastMarkedSpell);
 	}
 
 	//resolve spellname
-	if (!spellres[0] && !ResolveSpellName(spellres, parameters)) {
+	if (spellResRef.IsEmpty() && !ResolveSpellName(spellResRef, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		ResRef spellResRef(spellres);
 		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellCore: Action (%d) lost spell somewhere!", parameters->actionID);
@@ -2725,7 +2724,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 
 	//parse target
 	int seeflag = 0;
-	unsigned int dist = GetSpellDistance(ResRef(spellres), Sender);
+	unsigned int dist = GetSpellDistance(spellResRef, Sender);
 	if ((flags&SC_NO_DEAD) && dist != 0xffffffff) {
 		seeflag = GA_NO_DEAD;
 	}
@@ -2816,15 +2815,14 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 // shared spellcasting action code for casting on the ground
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 {
-	ieResRef spellres;
+	ResRef spellResRef;
 	int level = 0;
 
 	//resolve spellname
-	if (!ResolveSpellName( spellres, parameters) ) {
+	if (!ResolveSpellName(spellResRef, parameters)) {
 		Sender->ReleaseCurrentAction();
 		return;
 	} else {
-		ResRef spellResRef(spellres);
 		if (Sender->SpellResRef.IsEmpty() || Sender->SpellResRef != spellResRef) {
 			if (Sender->CurrentActionTicks) {
 				Log(WARNING, "GameScript", "SpellPointCore: Action (%d) lost spell somewhere!", parameters->actionID);
@@ -2846,7 +2844,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	}
 
 	if(Sender->Type==ST_ACTOR) {
-		unsigned int dist = GetSpellDistance(ResRef(spellres), Sender);
+		unsigned int dist = GetSpellDistance(spellResRef, Sender);
 
 		Actor *act = (Actor *) Sender;
 		//move near to target

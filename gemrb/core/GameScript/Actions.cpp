@@ -5242,7 +5242,7 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->LearnSpell (parameters->string0Parameter, parameters->int0Parameter|LS_MEMO|LS_LEARN);
+	actor->LearnSpell(ResRef(parameters->string0Parameter), parameters->int0Parameter | LS_MEMO | LS_LEARN);
 	core->SetEventFlag(EF_ACTION);
 }
 
@@ -5251,13 +5251,13 @@ void GameScript::AddSpecialAbility( Scriptable* Sender, Action* parameters)
 //from the spell memorization schedule (also from the spellbook)
 void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
+	ResRef spellRes;
 	int type;
 
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	if (!ResolveSpellName( spellres, parameters) ) {
+	if (!ResolveSpellName(spellRes, parameters)) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
@@ -5270,12 +5270,12 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 	}
 	if (type==2) {
 	//remove spell from both book and memorization
-		actor->spellbook.RemoveSpell(spellres);
+		actor->spellbook.RemoveSpell(spellRes);
 		return;
 	}
 	//type == 1 remove spell only from memorization
 	//type == 0 original behaviour: deplete only
-	actor->spellbook.UnmemorizeSpell(spellres, type);
+	actor->spellbook.UnmemorizeSpell(spellRes, type);
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
@@ -6171,9 +6171,8 @@ void GameScript::SpawnPtSpawn(Scriptable* Sender, Action* parameters)
 
 void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
+	ResRef spellRes;
+	if (!ResolveSpellName(spellRes, parameters)) {
 		return;
 	}
 
@@ -6183,34 +6182,23 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 	}
 	if (tar->Type==ST_ACTOR) {
 		//apply spell on target
-/*
-		Actor *owner;
-
-		if (Sender->Type==ST_ACTOR) {
-			owner = (Actor *) Sender;
-		} else {
-			owner = (Actor *) tar;
-		}
-*/
-		//core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
-		core->ApplySpell(spellres, (Actor *) tar, Sender, parameters->int1Parameter);
+		core->ApplySpell(spellRes, (Actor *) tar, Sender, parameters->int1Parameter);
 	} else {
 		//apply spell on point
 		Point d;
 		GetPositionFromScriptable(tar, d, false);
-		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, Sender, parameters->int1Parameter);
+		core->ApplySpellPoint(spellRes, tar->GetCurrentArea(), d, Sender, parameters->int1Parameter);
 	}
 }
 
 void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 {
-	ieResRef spellres;
-
-	if (!ResolveSpellName( spellres, parameters) ) {
+	ResRef spellRes;
+	if (!ResolveSpellName(spellRes, parameters)) {
 		return;
 	}
 
-	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, Sender, parameters->int1Parameter);
+	core->ApplySpellPoint(spellRes, Sender->GetCurrentArea(), parameters->pointParameter, Sender, parameters->int1Parameter);
 }
 
 //this is a gemrb extension

@@ -371,7 +371,7 @@ public:
 	void DrawOverheadText();
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellRef, bool verbose = true);
+	int CanCast(const ResRef& SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
 	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);

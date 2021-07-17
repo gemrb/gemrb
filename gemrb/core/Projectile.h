@@ -212,8 +212,8 @@ public:
 	ieWord IDSValue;
 	ieWord IDSType2;
 	ieWord IDSValue2;
-	ieResRef FailSpell;
-	ieResRef SuccSpell;
+	ResRef failureSpell;
+	ResRef successSpell;
 	////// gap
 	ieDword TFlags;
 	ResRef BAMRes1;
@@ -254,7 +254,7 @@ protected:
 	ieDword FakeTarget; //a globalID for target that isn't followed
 	int phase;
 	//saved in area
-	ieResRef name;
+	ResRef projectileName; // used also for namesake externalized spells
 	ieWord type;
 	//these come from the extension area
 	int extension_delay;
@@ -284,7 +284,7 @@ public:
 	void Cleanup();
 
 	inline Point GetDestination() const { return Destination; }
-	inline const char * GetName() const { return name; }
+	inline const ResRef& GetName() const { return projectileName; }
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation

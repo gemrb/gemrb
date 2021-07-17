@@ -130,7 +130,7 @@ struct ItemUseType {
 	ieByte which;	//which item dword should be used (1 = kit)
 };
 
-static ieResRef featspells[ES_COUNT];
+static ResRef featSpells[ES_COUNT];
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static bool pstflags = false;
@@ -501,8 +501,6 @@ Actor::Actor()
 	//this one is saved only for PC's
 	Modal.State = MS_NONE;
 	//set it to a neutral value
-	Modal.Spell[0] = '*';
-	Modal.LingeringSpell[0] = '*';
 	Modal.LastApplyTime = 0;
 	Modal.LingeringCount = 0;
 	Modal.FirstApply = true;
@@ -778,36 +776,37 @@ static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool r
 			const char *res = table->QueryField(j,i);
 			if (res[0]=='*') continue;
 
+			ResRef clabRef(res + 3);
 			if (!memcmp(res,"AP_",3)) {
 				if (remove) {
-					actor->fxqueue.RemoveAllEffects(res+3);
+					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
-					core->ApplySpell(res+3, actor, actor, 0);
+					core->ApplySpell(clabRef, actor, actor, 0);
 				}
 			} else if (!memcmp(res,"GA_",3)) {
 				if (remove) {
-					actor->spellbook.RemoveSpell(res+3);
+					actor->spellbook.RemoveSpell(clabRef);
 				} else {
-					actor->LearnSpell(res+3, LS_MEMO);
+					actor->LearnSpell(clabRef, LS_MEMO);
 				}
 			} else if (!memcmp(res,"FA_",3)) {//iwd2 only: innate name strref
 				//memorize these?
 				// we now learn them just to get the feedback string out
 				if (remove) {
-					actor->fxqueue.RemoveAllEffects(res+3);
+					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
-					actor->LearnSpell(res+3, LS_MEMO|LS_LEARN, IE_IWD2_SPELL_INNATE);
-					actor->spellbook.RemoveSpell(res+3);
-					core->ApplySpell(res+3, actor, actor, 0);
+					actor->LearnSpell(clabRef, LS_MEMO | LS_LEARN, IE_IWD2_SPELL_INNATE);
+					actor->spellbook.RemoveSpell(clabRef);
+					core->ApplySpell(clabRef, actor, actor, 0);
 				}
 			} else if (!memcmp(res,"FS_",3)) {//iwd2 only: song name strref (used by unused kits)
 				//don't memorize these?
 				if (remove) {
-					actor->fxqueue.RemoveAllEffects(res+3);
+					actor->fxqueue.RemoveAllEffects(clabRef);
 				} else {
-					actor->LearnSpell(res+3, LS_LEARN, IE_IWD2_SPELL_SONG);
-					actor->spellbook.RemoveSpell(res+3);
-					core->ApplySpell(res+3, actor, actor, 0);
+					actor->LearnSpell(clabRef, LS_LEARN, IE_IWD2_SPELL_SONG);
+					actor->spellbook.RemoveSpell(clabRef);
+					core->ApplySpell(clabRef, actor, actor, 0);
 				}
 			} else if (!memcmp(res,"RA_",3)) {//iwd2 only
 				//remove ability
@@ -2074,7 +2073,7 @@ static void InitActorTables()
 	tm.load("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
-			strnuprcpy(featspells[i], tm->QueryField(i,0), sizeof(ieResRef)-1 );
+			featSpells[i] = tm->QueryField(i, 0);
 		}
 	}
 
@@ -4490,10 +4489,10 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 	return true;
 }
 
-bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant)
+bool Actor::HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant)
 {
 	if (deplete) {
-		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+		if (!spellbook.HaveSpell(spellResRef, HS_DEPLETE)) {
 			SetStance(IE_ANI_READY);
 			return true;
 		}
@@ -5380,7 +5379,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 			AddTrigger(TriggerEntry(trigger_turnedby, cleric->GetGlobalID()));
 			if (turnlevel >= level+TURN_DEATH_LVL_MOD) {
 				if (gamedata->Exists("panic", IE_SPL_CLASS_ID)) {
-					core->ApplySpell("panic", this, cleric, level);
+					core->ApplySpell(ResRef("panic"), this, cleric, level);
 				} else {
 					print("Panic from turning!");
 					Panic(cleric, PANIC_RUNAWAY);
@@ -6101,11 +6100,11 @@ void Actor::InitStatsOnLoad()
 //most feats are simulated via spells (feat<xx>)
 void Actor::ApplyFeats()
 {
-	ieResRef feat;
+	ResRef feat;
 
 	for(int i=0;i<MAX_FEATS;i++) {
 		int level = GetFeat(i);
-		snprintf(feat, sizeof(ieResRef), "FEAT%02x", i);
+		feat.SNPrintF("FEAT%02x", i);
 		if (level) {
 			if (gamedata->Exists(feat, IE_SPL_CLASS_ID, true)) {
 				core->ApplySpell(feat, this, this, level);
@@ -6124,9 +6123,9 @@ void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
 	for (int i=0;i<ES_COUNT;i++) {
-		if (featspells[i][0] && featspells[i][0] != '*') {
+		if (!featSpells[i].IsEmpty() && !featSpells[i].IsStar()) {
 			if (PCStats->ExtraSettings[i]) {
-				core->ApplySpell(featspells[i], this, this, PCStats->ExtraSettings[i]);
+				core->ApplySpell(featSpells[i], this, this, PCStats->ExtraSettings[i]);
 			}
 		}
 	}
@@ -6380,7 +6379,7 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-int Actor::LearnSpell(const ieResRef spellname, ieDword flags, int bookmask, int level)
+int Actor::LearnSpell(const ResRef& spellname, ieDword flags, int bookmask, int level)
 {
 	//don't fail if the spell is also memorized (for innates)
 	if (! (flags&LS_MEMO)) {
@@ -6534,7 +6533,7 @@ void Actor::SetModal(ieDword newstate, bool force)
 	}
 
 	if (Modal.State == MS_BATTLESONG && Modal.State != newstate && HasFeat(FEAT_LINGERING_SONG)) {
-		strnlwrcpy(Modal.LingeringSpell, Modal.Spell, 8);
+		Modal.LingeringSpell = Modal.Spell;
 		Modal.LingeringCount = 2;
 	}
 
@@ -6563,16 +6562,16 @@ void Actor::SetModal(ieDword newstate, bool force)
 void Actor::SetModalSpell(ieDword state, const char *spell)
 {
 	if (spell) {
-		strnlwrcpy(Modal.Spell, spell, 8);
+		Modal.Spell = spell;
 	} else {
 		if (state >= ModalStates.size()) {
-			Modal.Spell[0] = 0;
+			Modal.Spell.Reset();
 		} else {
 			if (state == MS_BATTLESONG && !BardSong.IsEmpty()) {
-				strnlwrcpy(Modal.Spell, BardSong, 8);
+				Modal.Spell = BardSong;
 				return;
 			}
-			strnlwrcpy(Modal.Spell, ModalStates[state].spell, 8);
+			Modal.Spell = ModalStates[state].spell;
 		}
 	}
 }
@@ -7864,7 +7863,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//apply the modal effect about every second (pst and iwds have round sizes that are not multiples of 15)
 	// FIXME: split dayblindness out of detect.spl and only run that each tick + simplify this check
 	if (InParty && core->HasFeature(GF_AUTOSEARCH_HIDDEN) && (third || ((roundFraction%AI_UPDATE_TIME) == 0))) {
-		core->ApplySpell("detect", this, this, 0);
+		core->ApplySpell(ResRef("detect"), this, this, 0);
 	}
 
 	ieDword state = Modified[IE_STATE_ID];
@@ -7934,7 +7933,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	//apply the modal effect on the beginning of each round
 	if (roundFraction == 0) {
 		// handle lingering modal spells like bardsong in iwd2
-		if (Modal.LingeringCount && Modal.LingeringSpell[0]) {
+		if (Modal.LingeringCount && !Modal.LingeringSpell.IsEmpty()) {
 			Modal.LingeringCount--;
 			ApplyModal(Modal.LingeringSpell);
 		}
@@ -7951,10 +7950,11 @@ void Actor::UpdateModalState(ieDword gameTime)
 		//we can set this to 0
 		Modal.LastApplyTime = gameTime;
 
-		if (!Modal.Spell[0]) {
+		if (Modal.Spell.IsEmpty()) {
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
-			Modal.Spell[0]='*';
-		} else if (Modal.Spell[0]!='*') {
+			ResRef tmp("*");
+			Modal.Spell = tmp;
+		} else if (!Modal.Spell.IsStar()) {
 			if (ModalSpellSkillCheck()) {
 				ApplyModal(Modal.Spell);
 
@@ -7977,7 +7977,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	}
 }
 
-void Actor::ApplyModal(ieResRef modalSpell)
+void Actor::ApplyModal(const ResRef& modalSpell)
 {
 	unsigned int aoe = ModalStates[Modal.State].aoe_spell;
 	if (aoe == 1) {
@@ -9392,7 +9392,7 @@ void Actor::ModifyWeaponDamage(WeaponInfo &wi, Actor *target, int &damage, bool 
 
 			//apply the dirty fighting spell
 			if (HasFeat(FEAT_DIRTY_FIGHTING) ) {
-				core->ApplySpell(DirtyFightingRef.CString(), target, this, multiplier);
+				core->ApplySpell(DirtyFightingRef, target, this, multiplier);
 			}
 		}
 	}
@@ -9446,11 +9446,11 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 			displaymsg->DisplayRollStringName(39828, DMC_LIGHTGREY, this, sneakAttackDamage);
 		}
 
-		core->ApplySpell(BackstabResRef.CString(), target, this, multiplier);
+		core->ApplySpell(BackstabResRef, target, this, multiplier);
 		// do we need this?
 		BackstabResRef.Reset();
 		if (HasFeat(FEAT_CRIPPLING_STRIKE)) {
-			core->ApplySpell(CripplingStrikeRef.CString(), target, this, multiplier);
+			core->ApplySpell(CripplingStrikeRef, target, this, multiplier);
 		}
 	}
 
@@ -10900,20 +10900,19 @@ bool Actor::InvalidSpellTarget() const
 
 bool Actor::InvalidSpellTarget(int spellnum, Actor *caster, int range) const
 {
-	ieResRef spellres;
-
-	ResolveSpellName(spellres, spellnum);
+	ResRef spellRes;
+	ResolveSpellName(spellRes, spellnum);
 
 	//cheap substitute of the original hardcoded feature, returns true if already affected by the exact spell
 	//no (spell)state checks based on every effect in the spell
 	//FIXME: create a more compatible version if needed
-	if (fxqueue.HasSource(ResRef(spellres))) return true;
+	if (fxqueue.HasSource(spellRes)) return true;
 	//return true if caster cannot cast
-	if (!caster->CanCast(spellres, false)) return true;
+	if (!caster->CanCast(spellRes, false)) return true;
 
 	if (!range) return false;
 
-	int srange = GetSpellDistance(ResRef(spellres), caster);
+	int srange = GetSpellDistance(spellRes, caster);
 	return srange<range;
 }
 

@@ -8644,7 +8644,7 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	int ret = actor->LearnSpell(Spell, Flags, Booktype, Level); // returns 0 on success
+	int ret = actor->LearnSpell(ResRef(Spell), Flags, Booktype, Level); // returns 0 on success
 	if (!ret) core->SetEventFlag( EF_ACTION );
 	return PyInt_FromLong( ret );
 }
@@ -8743,7 +8743,7 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	if (PyArg_ParseTuple( args, "is", &globalID, &SpellResRef) ) {
 		GET_ACTOR_GLOBAL();
 		int ret = actor->spellbook.KnowSpell(SpellResRef);
-		actor->spellbook.RemoveSpell(SpellResRef);
+		actor->spellbook.RemoveSpell(ResRef(SpellResRef));
 		return PyInt_FromLong(ret);
 	}
 	PyErr_Clear(); //clear the type exception from above
@@ -11586,7 +11586,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	GET_ACTOR_GLOBAL();
 
 	// deplete original memorisation
-	actor->spellbook.UnmemorizeSpell(spell, true);
+	actor->spellbook.UnmemorizeSpell(ResRef(spell), true);
 	// set spellinfo to all known spells of desired type
 	std::vector<ResRef> data;
 	actor->spellbook.SetCustomSpellInfo(data, NULL, 1 << type);
@@ -11742,7 +11742,7 @@ static PyObject* GemRB_ApplySpell(PyObject * /*self*/, PyObject* args)
 	if (!caster) caster = game->GetActorByGlobalID(casterID);
 	if (!caster) caster = actor;
 
-	core->ApplySpell(spell, actor, caster, 0);
+	core->ApplySpell(ResRef(spell), actor, caster, 0);
 
 	Py_RETURN_NONE;
 }
@@ -12715,19 +12715,14 @@ PyDoc_STRVAR( GemRB_GetSpellCastOn__doc,
 static PyObject* GemRB_GetSpellCastOn(PyObject* /*self*/, PyObject* args)
 {
 	int globalID;
-	ieResRef splname;
+	ResRef splName;
 	PARSE_ARGS( args, "i", &globalID );
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
-/*
-	Actor* actor = game->FindPC( globalID );
-	if (!actor) {
-		return RuntimeError( "Actor not found!\n" );
-	}
-*/
-	ResolveSpellName(splname, actor->LastSpellOnMe);
-	return PyString_FromString(splname);
+
+	ResolveSpellName(splName, actor->LastSpellOnMe);
+	return PyString_FromResRef(splName);
 }
 
 PyDoc_STRVAR( GemRB_SetTimer__doc,

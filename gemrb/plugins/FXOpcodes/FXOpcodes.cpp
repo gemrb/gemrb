@@ -6423,8 +6423,6 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0xec ProjectImage
 int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
-	const char * resref = NULL;
-
 	// print("fx_puppet_master(%2d): Value: %d, Stat: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//copyself doesn't copy scripts, so the script clearing code is not needed
@@ -6443,20 +6441,21 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//if the caster is inparty, the script is turned off by the AI disable flag
 	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
+	ResRef puppetRef;
 	switch(fx->Parameter2)
 	{
 	case 1:
-		resref = "mislead";
+		puppetRef = "mislead";
 		//set the gender to illusionary, so ids matching will work
 		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		copy->SetBase(IE_MAXHITPOINTS, copy->GetBase(IE_MAXHITPOINTS)/2);
 		break;
 	case 2:
-		resref = "projimg";
+		puppetRef = "projimg";
 		copy->SetBase(IE_SEX, SEX_ILLUSION);
 		break;
 	case 3:
-		resref = "simulacr";
+		puppetRef = "simulacr";
 		// healable level drain
 		// second generation simulacri are supposedly at a different level, but that makes little sense:
 		// level = original caster - caster / 2; eg. lvl 32 -> 16 -> 24 -> 20 -> 22 -> 21
@@ -6467,11 +6466,11 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 		break;
 	default:
-		resref = fx->Resource;
+		puppetRef = fx->Resource;
 		break;
 	}
-	if (resref[0]) {
-		core->ApplySpell(resref,copy,copy,0);
+	if (!puppetRef.IsEmpty()) {
+		core->ApplySpell(puppetRef, copy, copy, 0);
 	}
 
 	copy->ApplyEffectCopy(fx, fx_puppetmarker_ref, copy, fx->CasterID, fx->Parameter2);
@@ -6714,7 +6713,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 			} else {
 				spl[7]='F';
 			}
-			core->ApplySpell(spl, target, Owner, fx->Power);
+			core->ApplySpell(ResRef(spl), target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;
 	}
@@ -7569,8 +7568,6 @@ int fx_timeless_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //GemRB extension: you can use different tables and not only wisdom stat
 int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	ieResRef spl;
-
 	// print("fx_generate_wish(%2d): Mod: %d", fx->Opcode, fx->Parameter2);
 	if (!fx->Parameter2) {
 		fx->Parameter2=IE_WIS;
@@ -7597,7 +7594,9 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 		int max = atoi(tm->QueryField(i, 2));
 		if (stat>=min && stat<=max) break;
 	}
-	strnuprcpy(spl, tm->QueryField(i,0), 8);
+
+	ResRef spl;
+	spl = tm->QueryField(i, 0);
 	core->ApplySpell(spl, target, Owner, fx->Power);
 	return FX_NOT_APPLIED;
 }

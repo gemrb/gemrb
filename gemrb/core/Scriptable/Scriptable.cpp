@@ -1108,7 +1108,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 }
 
 // check for input sanity and good casting conditions
-int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
+int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
 	const Spell* spl = gamedata->GetSpell(SpellRef);
 	if (!spl) {
 		SpellHeader = -1;

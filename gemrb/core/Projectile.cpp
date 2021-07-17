@@ -536,7 +536,7 @@ void Projectile::Payload()
 	}
 
 	//allow area affecting projectile with a spell
-	if(!(effects || SuccSpell[0] || (!Target && FailSpell[0]))) {
+	if (!(effects || !successSpell.IsEmpty() || (!Target && !failureSpell.IsEmpty()))) {
 		return;
 	}
 
@@ -577,18 +577,18 @@ void Projectile::Payload()
 		}
 		//apply this spell on target when the projectile fails
 		if (FailedIDS(target)) {
-			if (FailSpell[0]) {
+			if (!failureSpell.IsEmpty()) {
 				if (Target) {
-					core->ApplySpell(FailSpell, target, Owner, Level);
+					core->ApplySpell(failureSpell, target, Owner, Level);
 				} else {
 					//no Target, using the fake target as owner
-					core->ApplySpellPoint(FailSpell, area, Destination, target, Level);
+					core->ApplySpellPoint(failureSpell, area, Destination, target, Level);
 				}
 			}
 		} else {
 			//apply this spell on the target when the projectile succeeds
-			if (SuccSpell[0]) {
-				core->ApplySpell(SuccSpell, target, Owner, Level);
+			if (!successSpell.IsEmpty()) {
+				core->ApplySpell(successSpell, target, Owner, Level);
 			}
 
 			if(ExtFlags&PEF_RGB) {
@@ -612,7 +612,7 @@ void Projectile::ApplyDefault()
 	if (actor) {
 		//name is the projectile's name
 		//for simplicity, we apply a spell of the same name
-		core->ApplySpell(name, actor, actor, Level);
+		core->ApplySpell(projectileName, actor, actor, Level);
 	}
 }
 
@@ -1238,8 +1238,9 @@ void Projectile::SecondaryTarget()
 		pro->SetEffectsCopy(effects, Pos);
 		//copy the additional effects reference to the child projectile
 		//but only when there is a spell to copy
-		if (SuccSpell[0])
-			memcpy(pro->SuccSpell, SuccSpell, sizeof(ieResRef) );
+		if (!successSpell.IsEmpty()) {
+			pro->successSpell = successSpell;
+		}
 		pro->SetCaster(Caster, Level);
 		//this is needed to apply the success spell on the center point
 		pro->SetTarget(Pos);
@@ -1845,7 +1846,7 @@ int Projectile::GetZPos() const
 
 void Projectile::SetIdentifiers(const char *resref, ieWord id)
 {
-	if (resref) strnuprcpy(name, resref, 8);
+	if (resref) projectileName = resref;
 	type=id;
 }
 

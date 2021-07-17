@@ -282,8 +282,8 @@ struct ModalStatesStruct {
 
 struct ModalState {
 	ieDword State;
-	ieResRef Spell;             //apply this spell once per round
-	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
+	ResRef Spell;               //apply this spell once per round
+	ResRef LingeringSpell;      //apply this spell once per round if the effects are lingering
 	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword LastApplyTime;      //last time the modal effect used
 	bool FirstApply;            //running for the first time?
@@ -618,7 +618,7 @@ public:
 	/* checks whether taking damage should disrupt spellcasting */
 	bool CheckSpellDisruption(int damage, int spellLevel) const;
 	/* called when actor starts to cast a spell*/
-	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant);
+	bool HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant);
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
@@ -672,7 +672,7 @@ public:
 	void GetNextStance();
 	void ClearCurrentStanceAnims();
 	/* learns the given spell, possibly receive XP */
-	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
+	int LearnSpell(const ResRef& resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
 	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
@@ -691,7 +691,7 @@ public:
 	/* Sets the modal spell after checks */
 	void SetModalSpell(ieDword state, const char *spell);
 	/* casts the modal spell if any */
-	void ApplyModal(ieResRef modalSpell);
+	void ApplyModal(const ResRef& modalSpell);
 	/* returns current attack style */
 	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */

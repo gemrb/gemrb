@@ -471,7 +471,7 @@ void Spellbook::RemoveSpell(int spellid, int type)
 }
 
 //removes spell from both memorized/book
-void Spellbook::RemoveSpell(const ieResRef resRef, bool onlyknown)
+void Spellbook::RemoveSpell(const ResRef& resRef, bool onlyknown)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -801,14 +801,14 @@ bool Spellbook::UnmemorizeSpell(const CREMemorizedSpell* spell)
 	return false;
 }
 
-bool Spellbook::UnmemorizeSpell(const ieResRef ResRef, bool deplete, bool onlydepleted)
+bool Spellbook::UnmemorizeSpell(const ResRef& spellRef, bool deplete, bool onlydepleted)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
 		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
 			std::vector< CREMemorizedSpell* >::iterator s;
 			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
-				if (ResRef != (*s)->SpellResRef) {
+				if (spellRef != (*s)->SpellResRef) {
 					continue;
 				}
 				if (onlydepleted && (*s)->Flags != 0) {

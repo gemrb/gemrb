@@ -1684,7 +1684,7 @@ void Game::TextDream()
 			int row = drm->GetRowIndex(repLabel);
 			if (row != -1) {
 				Actor *actor = GetPC(0, false);
-				actor->LearnSpell(drm->QueryField(row, 0), LS_MEMO|LS_LEARN);
+				actor->LearnSpell(ResRef(drm->QueryField(row, 0)), LS_MEMO | LS_LEARN);
 			}
 		}
 

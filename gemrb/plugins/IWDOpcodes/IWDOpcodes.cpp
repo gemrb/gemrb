@@ -1889,8 +1889,8 @@ int fx_shroud_of_flame (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 //apply effsof1 on target
 //apply effsof2 on nearby
-static const ieResRef resref_sof1 = { "effsof1" };
-static const ieResRef resref_sof2 = { "effsof2" };
+static const ResRef resref_sof1("effsof1");
+static const ResRef resref_sof2("effsof2");
 
 //0x116 ShroudOfFlame (iwd2)
 int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
@@ -1920,11 +1920,11 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//apply resource on owner
 	//actually, this should be a list of triggers
-	ieResRef firedmg;
-	if (!fx->Resource.IsEmpty()) {
-		CopyResRef(firedmg, fx->Resource);
+	ResRef firedmg;
+	if (fx->Resource.IsEmpty()) {
+		firedmg = resref_sof1;
 	} else {
-		CopyResRef(firedmg, resref_sof1);
+		firedmg = fx->Resource;
 	}
 	Actor *caster = GetCasterObject();
 	core->ApplySpell(firedmg, target, caster, fx->Power);
@@ -3393,7 +3393,7 @@ int fx_heroic_inspiration (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //440 BarbarianRage
 // both normal and greater rage bonuses are handled by the innate itself
 // we use this effect to add the fatigue maluses that follow afterwards
-static const ieResRef FatigueRef = { "FATIGUE" };
+static const ResRef FatigueRef("FATIGUE");
 int fx_barbarian_rage (Scriptable* /*Owner*/, Actor *target, Effect* fx)
 {
 	// print("fx_barbarian_rage(%2d) Amount:%d", fx->Opcode, fx->Parameter1);

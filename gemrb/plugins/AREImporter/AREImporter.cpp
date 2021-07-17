@@ -2457,8 +2457,8 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 			//off by one compared to projectl.ids
 			type = pro->GetType()+1;
 			dest = pro->GetDestination();
-			const char* proName = pro->GetName();
-			name = proName ? ResRef::MakeUpperCase(proName) : nullptr;
+			const ResRef& proName = pro->GetName();
+			name = proName.IsEmpty() ? nullptr : ResRef::MakeUpperCase(proName);
 			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();

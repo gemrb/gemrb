@@ -685,9 +685,9 @@ public:
 	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ieResRef resname, Actor *target, Scriptable *caster, int level);
+	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level);
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ieResRef resname, Map *area, const Point &pos, Scriptable *caster, int level);
+	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level);
 	/** applies a single effect on the target */
 	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
 	/** applies an effect queue on the target */

@@ -193,7 +193,7 @@ public:
 	/** removes a spell from memory/book */
 	bool RemoveSpell(const CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
-	void RemoveSpell(const ieResRef resRef, bool onlyknown = false);
+	void RemoveSpell(const ResRef& resRef, bool onlyknown = false);
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 
@@ -217,7 +217,7 @@ public:
 	bool UnmemorizeSpell(const CREMemorizedSpell* spl);
 
 	/** Removes (or just depletes) memorized spell by ResRef */
-	bool UnmemorizeSpell(const char *resref, bool deplete, bool onlydepleted=false);
+	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, bool onlydepleted = false);
 
 	/** finds the first spell needing to rememorize */
 	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0) const;
