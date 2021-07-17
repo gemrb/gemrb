@@ -48,11 +48,11 @@ public:
 	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) const = 0;
 	virtual int GetKeyAsInt(const char* Tag, const char* Key,
-		const int Default) const = 0;
+		int Default) const = 0;
 	virtual float GetKeyAsFloat(const char* Tag, const char* Key,
-		const float Default) const = 0;
+		float Default) const = 0;
 	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
-		const bool Default) const = 0;
+		bool Default) const = 0;
 };
 
 }

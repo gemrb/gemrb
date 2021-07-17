@@ -205,11 +205,11 @@ public:
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) const override;
 	int GetKeyAsInt(const char* Tag, const char* Key, 
-		const int Default) const override;
+		int Default) const override;
 	float GetKeyAsFloat(const char* Tag, const char* Key, 
-		const float Default) const override;
+		float Default) const override;
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
-		const bool Default) const override;
+		bool Default) const override;
 };
 
 }

@@ -439,7 +439,7 @@ private:
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
 	/* Gets the given ISCLASS level */
-	ieDword GetClassLevel (const ieDword isclass) const;
+	ieDword GetClassLevel(ieDword isclass) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
@@ -870,7 +870,7 @@ public:
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
-	static ieDword GetClassID (const ieDword isclass);
+	static ieDword GetClassID(ieDword isclass);
 	const char *GetClassName(ieDword classID) const;
 	const char *GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */
@@ -926,7 +926,7 @@ public:
 	or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
 	/* function to get a class level used by scripting */
-	ieDword GetLevelInClass (const ieDword classid) const;
+	ieDword GetLevelInClass(ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */
 	int GetClassMask() const;
 	/* computes the actor's usable books (iwd2) */

@@ -159,7 +159,7 @@ done:
 CFGConfig::~CFGConfig()
 {}
 
-bool CFGConfig::InitWithINIData(DataStream* const cfgStream)
+bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 {
 	if (cfgStream == NULL) {
 		return false;
