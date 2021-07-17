@@ -998,6 +998,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				break;
 			case 'u': // dump GameScript GLOBAL vars
 				core->GetGame()->locals->DebugDump();
+				break;
 			case 'U': // dump death vars
 				core->GetGame()->kaputz->DebugDump();
 				break;
