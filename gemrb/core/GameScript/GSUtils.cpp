@@ -76,8 +76,7 @@ bool HasTriggerPoint = false;
 //don't create new variables
 bool NoCreate = false;
 bool HasKaputz = false;
-//released by ReleaseMemory
-ieResRef *ObjectIDSTableNames;
+std::vector<ResRef> ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int RandomNumValue;

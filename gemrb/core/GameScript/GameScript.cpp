@@ -1392,9 +1392,6 @@ static void CleanupIEScript()
 	objectsTable.release();
 	overrideActionsTable.release();
 	overrideTriggersTable.release();
-	if (ObjectIDSTableNames)
-		free(ObjectIDSTableNames);
-	ObjectIDSTableNames = NULL;
 }
 
 static void printFunction(StringBuffer& buffer, const Holder<SymbolMgr>& table, int index)
@@ -1479,7 +1476,7 @@ void InitializeIEScript()
 		error("GameScript", "The IDS Count shouldn't be more than 10!\n");
 	}
 
-	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
+	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
 		const char *idsname;
 		idsname=objNameTable->QueryField( 0, i + 1 );
@@ -1490,7 +1487,7 @@ void InitializeIEScript()
 		else {
 			idtargets[i]=poi->Function;
 		}
-		strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
+		ObjectIDSTableNames[i] = ResRef::MakeLowerCase(idsname);
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {

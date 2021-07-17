@@ -53,7 +53,7 @@ extern bool HasAdditionalRect;
 extern bool HasTriggerPoint;
 extern bool NoCreate;
 extern bool HasKaputz;
-extern ieResRef *ObjectIDSTableNames;
+extern std::vector<ResRef> ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
 extern Gem_Polygon **polygons;

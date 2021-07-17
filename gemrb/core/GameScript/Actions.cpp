@@ -6726,31 +6726,31 @@ void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 	for (int i=0;i<MAX_OBJECT_FIELDS;i++) {
 		int val = ob->objectFields[i];
 		if (!val) continue;
-		if (!strnicmp(ObjectIDSTableNames[i],"ea",8)) {
+		if (ObjectIDSTableNames[i] == "ea") {
 			scr->SetBase(IE_EA, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"general",8)) {
+		if (ObjectIDSTableNames[i] == "general") {
 			scr->SetBase(IE_GENERAL, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"race",8)) {
+		if (ObjectIDSTableNames[i] == "race") {
 			scr->SetBase(IE_RACE, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"class",8)) {
+		if (ObjectIDSTableNames[i] == "class") {
 			scr->SetBase(IE_CLASS, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"gender",8)) {
+		if (ObjectIDSTableNames[i] == "gender") {
 			scr->SetBase(IE_SEX, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"specific",8)) {
+		if (ObjectIDSTableNames[i] == "specific") {
 			scr->SetBase(IE_SPECIFIC, val);
 			continue;
 		}
-		if (!strnicmp(ObjectIDSTableNames[i],"align",8)) {
+		if (ObjectIDSTableNames[i] == "align") {
 			scr->SetBase(IE_ALIGNMENT, val);
 			continue;
 		}
