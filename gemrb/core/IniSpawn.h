@@ -72,12 +72,6 @@ class Map;
 #define AI_GENDER	7
 #define AI_ALIGNMENT	8
 
-//spawn point could be:
-// s - single
-// r - random
-// e - preset
-// save_select_point saves the spawnpoint
-
 struct CritterEntry {
 	int creaturecount;
 	ResRef *CreFile;        //spawn one of these creatures

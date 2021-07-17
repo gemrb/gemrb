@@ -251,25 +251,29 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
 
+	//spawn point could be (point_select):
+	// s - single
+	// r - random
+	// e - preset
+	// NOTE: it affects several following keys
 	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
-	
+	char spawnMode = 0;
 	if (s) {
-		ps=s[0];
-	} else {
-		ps=0;
+		spawnMode = s[0];
 	}
 
 	s = inifile->GetKeyAsString(crittername,"spawn_point",NULL);
 	if (s) {
+		// only spawn_point_global / spawn_facing_global support 'e'
 		//expect more than one spawnpoint
-		if (ps=='r') {
+		if (spawnMode == 'r') {
 			//select one of the spawnpoints randomly
 			int count = core->Roll(1,CountElements(s,']'),-1);
 			//go to the selected spawnpoint
 			while(count--) {
 				while(*s++!=']') ;
 			}
-		}
+		} // else is 's' mode - single
 		//parse the selected spawnpoint
 		Point p;
 		int o;
@@ -285,7 +289,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//store or retrieve spawn point
 	s = inifile->GetKeyAsString(crittername,"spawn_point_global", NULL);
 	if (s) {
-		switch (ps) {
+		switch (spawnMode) {
 		case 'e':
 			critter.SpawnPoint = CheckPointVariable(map, s+8, s);
 			break;
@@ -299,7 +303,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//take facing from variable
 	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
 	if (s) {
-		switch (ps) {
+		switch (spawnMode) {
 		case 'e':
 			critter.Orientation=(int) CheckVariable(map, s+8,s);
 			break;
