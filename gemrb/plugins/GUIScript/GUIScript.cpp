@@ -7997,7 +7997,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 	const STOCure *cure = store->GetCure(index);
-	return Py_BuildValue("{s:s,s:i,s:i}", "CureResRef", cure->CureResRef, "Price",
+	return Py_BuildValue("{s:s,s:i,s:i}", "CureResRef", cure->CureResRef.CString(), "Price",
 						 cure->Price, "Description", (signed) GetSpellDesc(cure->CureResRef));
 }
 
