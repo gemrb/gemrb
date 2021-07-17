@@ -69,9 +69,9 @@ public:
 
 	Holder<Sprite2D> CreateSprite(const Region& rgn, void* pixels, const PixelFormat&) override;
 
-	void BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+	void BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 					BlitFlags flags, Color tint = Color()) override;
-	void BlitGameSprite(const Holder<Sprite2D> spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
+	void BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color tint = Color()) override;
 
 protected:
 #if SDL_VERSION_ATLEAST(1,3,0)
@@ -93,7 +93,7 @@ protected:
 	
 	BlitFlags RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* = NULL);
 
-	virtual void BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
+	virtual void BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL)=0;
 	virtual void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL)=0;
 	void BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags = BlitFlags::NONE, const Color* tint = nullptr);
 

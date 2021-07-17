@@ -70,7 +70,7 @@ private:
 
 	int ProcessEvent(const SDL_Event & event) override;
 
-	void BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
+	void BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const Region& src, const Region& dst,
 							  BlitFlags flags = BlitFlags::NONE, const Color* tint = NULL) override;
 	void BlitSpriteNativeClipped(const sprite_t* spr, const Region& src, const Region& dst,
 								 BlitFlags flags = BlitFlags::NONE, const SDL_Color* tint = NULL) override;

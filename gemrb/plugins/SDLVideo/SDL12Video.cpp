@@ -166,7 +166,7 @@ IAlphaIterator* SDL12VideoDriver::StencilIterator(BlitFlags flags, const Region&
 	return maskit;
 }
 
-void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D> spr, const Region& src, const Region& dst,
+void SDL12VideoDriver::BlitSpriteRLEClipped(const Holder<Sprite2D>& spr, const Region& src, const Region& dst,
 											BlitFlags flags, const Color* t)
 {
 	Color tint(255,255,255,255);
