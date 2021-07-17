@@ -99,6 +99,7 @@ static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 
 /*** initializations ***/
 
+// explode a CSV resref list into separate storage
 static inline void GetElements(const char *s, ResRef *storage, int count)
 {
 	while(count--) {
@@ -155,21 +156,25 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
-//unimplemented tags (* marks partially implemented, # marks not working in original either):
-//*check_crowd
+// TODO: unimplemented tags (* marks partially implemented, # marks not working in original either):
 // control_var
 // spec_area
-//*death_faction
-//*death_team
 // check_by_view_port
-//*do_not_spawn
 // hold_selected_point_key
 // inc_spawn_point_index
-//*find_safest_point
 //#spawn_time_of_day
+//
 // PST only
 //*auto_buddy
 //*detail_level
+// point_select_var: unknown, but present at least in pst; wasn't seen to work
+//
+// PSTEE only
+// disable_renderer = boolean_value
+//   Argent says: It looks like this attribute simply skips the rendering pass for the spawned creature.
+//   This state is not saved. This attribute seems to have the side effect that filtering is ignored —
+//   in my tests the creature was spawned continuously even if spec_qty and create_qty are defined.
+//   This attribute seems to be related to the script action SetRenderable.
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
@@ -482,11 +487,11 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
 		critter.Flags|=CF_CHECKVIEWPORT;
 	}
-	//unknown, this is used only in pst
+	// TODO: unknown, this is used only in pst; perhaps skipping the spawn if too many actors are present in general
 	if (inifile->GetKeyAsBool(crittername,"check_crowd", false)) {
 		critter.Flags|=CF_CHECKCROWD;
 	}
-	//unknown, this is used only in pst
+	// TODO: unknown, this is used only in pst; perhaps tries to avoid enemies
 	if (inifile->GetKeyAsBool(crittername,"find_safest_point", false)) {
 		critter.Flags|=CF_SAFESTPOINT;
 	}
@@ -561,6 +566,7 @@ void IniSpawn::InitSpawn(const ResRef& DefaultArea)
 	PartySpawnPoint.x = x;
 	PartySpawnPoint.y = y;
 
+	// animstat.ids values
 	//35 - already standing
 	//36 - getting up
 	NamelessState = inifile->GetKeyAsInt("nameless","state",36);

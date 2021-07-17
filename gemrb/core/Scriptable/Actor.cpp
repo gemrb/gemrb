@@ -5788,7 +5788,7 @@ bool Actor::CheckOnDeath()
 		}
 	}
 
-	//death counters for PST
+	// death counters for PST: APP_GOOD, APP_LAW, APP_LADY, APP_MURDER
 	for (int i = 0, j = APP_GOOD; i < 4; i++) {
 		if (AppearanceFlags & j) {
 			value = 0;
