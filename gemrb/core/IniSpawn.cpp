@@ -23,6 +23,8 @@
 
 #include "IniSpawn.h"
 
+#include "globals.h"
+
 #include "CharAnimations.h"
 #include "Game.h"
 #include "GameData.h"
@@ -96,16 +98,6 @@ static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 }
 
 /*** initializations ***/
-
-static inline int CountElements(const char *s, char separator)
-{
-	int ret = 1;
-	while(*s) {
-		if (*s==separator) ret++;
-		s++;
-	}
-	return ret;
-}
 
 static inline void GetElements(const char *s, ResRef *storage, int count)
 {

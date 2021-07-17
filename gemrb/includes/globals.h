@@ -198,6 +198,7 @@ GEM_EXPORT bool WithinRange(const Actor *actor, const Point &dest, int distance)
 GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance);
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
+GEM_EXPORT int CountElements(const char *str, char separator);
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 

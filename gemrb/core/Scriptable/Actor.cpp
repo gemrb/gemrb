@@ -3846,16 +3846,6 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return BaseStats[StatIndex] - oldmod;
 }
 
-inline int CountElements(const char *s, char separator)
-{
-	int ret = 1;
-	while(*s) {
-		if (*s==separator) ret++;
-		s++;
-	}
-	return ret;
-}
-
 void Actor::Interact(int type) const
 {
 	int start;
