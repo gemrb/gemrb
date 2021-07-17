@@ -718,7 +718,7 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 	return NULL;
 }
 
-void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
+void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	Actor *caster = NULL;
@@ -1189,13 +1189,13 @@ int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
 
 // checks if a party-friendly actor is nearby and if so, if it recognizes the spell
 // this enemy just started casting
-void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
+void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 {
 	if (!third || !caster || caster->GetStat(IE_EA) <= EA_CONTROLLABLE || !area) {
 		return;
 	}
 
-	Spell* spl = gamedata->GetSpell(SpellRef);
+	Spell* spl = gamedata->GetSpell(spellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
@@ -1228,7 +1228,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 			break;
 		}
 	}
-	gamedata->FreeSpell(spl, SpellRef, false);
+	gamedata->FreeSpell(spl, spellRef, false);
 }
 
 // shortcut for internal use when there is no wait
@@ -1451,12 +1451,12 @@ int Scriptable::CheckWildSurge()
 
 	int roll = core->Roll(1, 100, 0);
 	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
-		ieResRef OldSpellResRef;
-		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
-		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
+		ResRef oldSpellResRef;
+		oldSpellResRef = SpellResRef;
+		Spell *spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
 		// ignore non-magic "spells"
 		if (spl->Flags&(SF_HLA|SF_TRIGGER)) {
-			gamedata->FreeSpell(spl, OldSpellResRef, false);
+			gamedata->FreeSpell(spl, oldSpellResRef, false);
 			return 1;
 		}
 
@@ -1482,14 +1482,12 @@ int Scriptable::CheckWildSurge()
 			delete s2;
 
 			// lookup the spell in the "check" row of wildmag.2da
-			ieResRef surgeSpellRef;
-			CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
-
+			ResRef surgeSpellRef = core->SurgeSpells[check-1].spell;
 			if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
 				// handle the hardcoded cases - they'll also fail here
 				if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
 					//free the spell handle because we need to return
-					gamedata->FreeSpell(spl, OldSpellResRef, false);
+					gamedata->FreeSpell(spl, oldSpellResRef, false);
 					return 0;
 				}
 			} else {
@@ -1500,13 +1498,13 @@ int Scriptable::CheckWildSurge()
 		}
 
 		//free the spell handle
-		gamedata->FreeSpell(spl, OldSpellResRef, false);
+		gamedata->FreeSpell(spl, oldSpellResRef, false);
 	}
 
 	return 1;
 }
 
-bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, Actor *caster)
+bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster)
 {
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
@@ -1514,12 +1512,14 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, 
 	int count, i, tmp, tmp3;
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
-	ieResRef newspl;
-
+	ResRef newSpell;
+	char surgeSpellRef[9];
+	strlcpy(surgeSpellRef, surgeSpell.CString(), 9);
+	
 	int level = caster->GetCasterLevel(spl->SpellType);
 	switch (surgeSpellRef[0]) {
 		case '+': // cast normally, but also cast SPELLREF first
-			core->ApplySpell(surgeSpellRef+1, caster, caster, level);
+			core->ApplySpell(ResRef(surgeSpellRef + 1), caster, caster, level);
 			break;
 		case '0': // cast spell param1 times
 			strtok(surgeSpellRef,".");
@@ -1561,17 +1561,17 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, 
 			for (i=0; i<count; i++) {
 				if (target) {
 					caster->CastSpell(target, false, true);
-					CopyResRef(newspl, SpellResRef);
+					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellEnd(level, 1);
 				} else {
 					caster->CastSpellPoint(targetpos, false, true);
-					CopyResRef(newspl, SpellResRef);
+					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellPointEnd(level, 1);
 				}
 				// reset the ref, since CastSpell*End destroyed it
-				SpellResRef = newspl;
+				SpellResRef = newSpell;
 			}
 			caster->Modified[IE_FORCESURGE] = tmp;
 			break;

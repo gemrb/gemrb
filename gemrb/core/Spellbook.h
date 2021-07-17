@@ -204,7 +204,7 @@ public:
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type, bool real) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level, bool real) const;
-	unsigned int GetMemorizedSpellsCount(const ieResRef name, int type, bool real) const;
+	unsigned int GetMemorizedSpellsCount(const ResRef& name, int type, bool real) const;
 	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index) const;
 
 	int GetMemorizableSpellsCount(int type, unsigned int level, bool bonus) const;

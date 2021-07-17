@@ -220,16 +220,17 @@ void ResolveSpellName(ieResRef spellres, ieDword number)
 	snprintf(spellres, sizeof(ieResRef), "%s%03d", spell_suffices[type], spellid);
 }
 
-ieDword ResolveSpellNumber(const ieResRef spellres)
+ieDword ResolveSpellNumber(const ResRef& spellRef)
 {
+	ResRef tmp;
 	for (int i = 0; i < 5; i++) {
-		if(!strnicmp(spellres, spell_suffices[i], 4)) {
-			int n = -1;
-			sscanf(spellres+4,"%d", &n);
-			if (n<0) {
+		if (spellRef == spell_suffices[i]) {
+			tmp = spellRef + 4;
+			long n = strtol(tmp.CString(), nullptr, 10);
+			if (!n) {
 				return 0xffffffff;
 			}
-			return i*1000+n;
+			return i * 1000 + static_cast<ieDword>(n);
 		}
 	}
 	return 0xffffffff;

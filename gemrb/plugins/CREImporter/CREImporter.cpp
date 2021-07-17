@@ -58,7 +58,7 @@ public:
 	const ResRef& GetSpell() const;
 	const ResRef& FindSpell(unsigned int level, unsigned int kit) const;
 	int FindSpell(unsigned int kit) const;
-	bool Equals(const char *spl) const;
+	bool Equals(const ResRef& spl) const;
 	void SetSpell(const char *spl);
 	void AddLevel(unsigned int level, unsigned int kit);
 private:
@@ -117,7 +117,7 @@ static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
 	return -1;
 }
 
-bool SpellEntry::Equals(const char *spl) const
+bool SpellEntry::Equals(const ResRef& spl) const
 {
 	return spell == spl;
 }
@@ -251,7 +251,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 	return IE_IWD2_SPELL_WIZARD;
 }
 
-static int ResolveSpellName(const ieResRef name, int level, ieIWD2SpellType type)
+static int ResolveSpellName(const ResRef& name, int level, ieIWD2SpellType type)
 {
 	if (level>=MAX_SPELL_LEVEL) {
 		return -1;

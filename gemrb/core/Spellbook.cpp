@@ -610,7 +610,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level, bo
 	return (unsigned int) spells[type][level]->memorized_spells.size();
 }
 
-unsigned int Spellbook::GetMemorizedSpellsCount(const ieResRef name, int type, bool real) const
+unsigned int Spellbook::GetMemorizedSpellsCount(const ResRef& name, int type, bool real) const
 {
 	if (type >= NUM_BOOK_TYPES)
 		return 0;

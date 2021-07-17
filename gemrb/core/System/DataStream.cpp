@@ -113,7 +113,7 @@ int DataStream::ReadResRef(ieResRef dest)
 
 int DataStream::ReadResRef(ResRef& dest)
 {
-	ieResRef ref;
+	char ref[9];
 	int len = ReadResRef(ref);
 	dest = ref;
 	return len;

@@ -374,7 +374,7 @@ public:
 	int CanCast(const ieResRef SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
+	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
 	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
@@ -395,9 +395,9 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
+	void CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
-	bool HandleHardcodedSurge(ieResRef surgeSpellRef, const Spell *spl, Actor *caster);
+	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
 	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
 };
