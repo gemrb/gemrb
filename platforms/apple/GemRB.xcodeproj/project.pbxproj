@@ -311,7 +311,6 @@
 		A29BF8BC13A04A6F00C812DD /* Game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC41395FF61006ADC12 /* Game.cpp */; };
 		A29BF8BD13A04A6F00C812DD /* GameData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FC61395FF62006ADC12 /* GameData.cpp */; };
 		A29BF8BE13A04A6F00C812DD /* GlobalTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD21395FF62006ADC12 /* GlobalTimer.cpp */; };
-		A29BF8BF13A04A6F00C812DD /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF21395FF62006ADC12 /* Image.cpp */; };
 		A29BF8C013A04A6F00C812DD /* ImageFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF41395FF62006ADC12 /* ImageFactory.cpp */; };
 		A29BF8C113A04A6F00C812DD /* ImageMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF61395FF62006ADC12 /* ImageMgr.cpp */; };
 		A29BF8C313A04A6F00C812DD /* IniSpawn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FFA1395FF62006ADC12 /* IniSpawn.cpp */; };
@@ -482,8 +481,6 @@
 		A2E66388139E883700310FC8 /* GlobalTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FD21395FF62006ADC12 /* GlobalTimer.cpp */; };
 		A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FD31395FF62006ADC12 /* GlobalTimer.h */; };
 		A2E6638A139E883E00310FC8 /* Holder.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FF11395FF62006ADC12 /* Holder.h */; };
-		A2E6638B139E883E00310FC8 /* Image.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF21395FF62006ADC12 /* Image.cpp */; };
-		A2E6638C139E883E00310FC8 /* Image.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FF31395FF62006ADC12 /* Image.h */; };
 		A2E6638D139E883E00310FC8 /* ImageFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF41395FF62006ADC12 /* ImageFactory.cpp */; };
 		A2E6638E139E883E00310FC8 /* ImageFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FF51395FF62006ADC12 /* ImageFactory.h */; };
 		A2E6638F139E883E00310FC8 /* ImageMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FF61395FF62006ADC12 /* ImageMgr.cpp */; };
@@ -1588,8 +1585,6 @@
 		A2BF9FEF1395FF62006ADC12 /* WorldMapControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WorldMapControl.cpp; sourceTree = "<group>"; };
 		A2BF9FF01395FF62006ADC12 /* WorldMapControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WorldMapControl.h; sourceTree = "<group>"; };
 		A2BF9FF11395FF62006ADC12 /* Holder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Holder.h; sourceTree = "<group>"; };
-		A2BF9FF21395FF62006ADC12 /* Image.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Image.cpp; sourceTree = "<group>"; };
-		A2BF9FF31395FF62006ADC12 /* Image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Image.h; sourceTree = "<group>"; };
 		A2BF9FF41395FF62006ADC12 /* ImageFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageFactory.cpp; sourceTree = "<group>"; };
 		A2BF9FF51395FF62006ADC12 /* ImageFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageFactory.h; sourceTree = "<group>"; };
 		A2BF9FF61395FF62006ADC12 /* ImageMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageMgr.cpp; sourceTree = "<group>"; };
@@ -5153,8 +5148,6 @@
 				A2BF9FD31395FF62006ADC12 /* GlobalTimer.h */,
 				A2BF9FD41395FF62006ADC12 /* GUI */,
 				A2BF9FF11395FF62006ADC12 /* Holder.h */,
-				A2BF9FF21395FF62006ADC12 /* Image.cpp */,
-				A2BF9FF31395FF62006ADC12 /* Image.h */,
 				A2BF9FF41395FF62006ADC12 /* ImageFactory.cpp */,
 				A2BF9FF51395FF62006ADC12 /* ImageFactory.h */,
 				A2BF9FF61395FF62006ADC12 /* ImageMgr.cpp */,
@@ -7905,7 +7898,6 @@
 				A2E66389139E883700310FC8 /* GlobalTimer.h in Headers */,
 				A2E6638A139E883E00310FC8 /* Holder.h in Headers */,
 				A20E4ADC197344BD00A6BC96 /* FileCache.h in Headers */,
-				A2E6638C139E883E00310FC8 /* Image.h in Headers */,
 				A2E6638E139E883E00310FC8 /* ImageFactory.h in Headers */,
 				A2E66390139E883E00310FC8 /* ImageMgr.h in Headers */,
 				A2E66392139E883E00310FC8 /* ImageWriter.h in Headers */,
@@ -9484,7 +9476,6 @@
 				A29BF8BC13A04A6F00C812DD /* Game.cpp in Sources */,
 				A29BF8BD13A04A6F00C812DD /* GameData.cpp in Sources */,
 				A29BF8BE13A04A6F00C812DD /* GlobalTimer.cpp in Sources */,
-				A29BF8BF13A04A6F00C812DD /* Image.cpp in Sources */,
 				A29BF8C013A04A6F00C812DD /* ImageFactory.cpp in Sources */,
 				A29BF8C113A04A6F00C812DD /* ImageMgr.cpp in Sources */,
 				A29BF8C313A04A6F00C812DD /* IniSpawn.cpp in Sources */,
@@ -9683,7 +9674,6 @@
 				A2E66384139E883100310FC8 /* Game.cpp in Sources */,
 				A2E66386139E883100310FC8 /* GameData.cpp in Sources */,
 				A2E66388139E883700310FC8 /* GlobalTimer.cpp in Sources */,
-				A2E6638B139E883E00310FC8 /* Image.cpp in Sources */,
 				A2E6638D139E883E00310FC8 /* ImageFactory.cpp in Sources */,
 				A25F91F8269BBF290045F07A /* SaveGameAREExtractor.cpp in Sources */,
 				A2E6638F139E883E00310FC8 /* ImageMgr.cpp in Sources */,

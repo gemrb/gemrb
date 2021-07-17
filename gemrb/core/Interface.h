@@ -67,7 +67,6 @@ class Game;
 class GameControl;
 class GlobalTimer;
 class ITMExtHeader;
-class Image;
 class Item;
 class KeyMap;
 class Label;
@@ -753,15 +752,14 @@ private:
 
 		ResourceHolder<ImageMgr> palim = GetResourceHolder<ImageMgr>(resref);
 		if (palim) {
-			auto image = palim->GetImage();
-			int height = image->GetSize().h;
+			auto image = palim->GetSprite2D();
+			int height = image->Frame.h;
 			palettes.resize(height);
 			for (int row = 0; row < height; ++row) {
 				for (int col = 0; col < SIZE; ++col) {
 					palettes[row][col] = image->GetPixel(Point(col, row));
 				}
 			}
-			delete image;
 			return true;
 		}
 		return false;

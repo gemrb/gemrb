@@ -642,7 +642,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// Draw lightmap
 	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
-		Holder<Sprite2D> spr = area->LightMap->GetSprite2D();
+		Holder<Sprite2D> spr = area->LightMap;
 		video->BlitSprite(spr, Point());
 		Region point(gameMousePos.x / 16, gameMousePos.y / 12, 2, 2);
 		video->DrawRect(point, ColorRed);

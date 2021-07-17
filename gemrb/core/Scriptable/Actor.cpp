@@ -37,7 +37,6 @@
 #include "GlobalTimer.h"
 #include "DisplayMessage.h"
 #include "GameData.h"
-#include "Image.h"
 #include "ImageMgr.h"
 #include "Item.h"
 #include "PolymorphCache.h" // stupid polymorph cache hack

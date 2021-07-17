@@ -299,7 +299,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	}
 
 	//alter the lightmap and the minimap (the tileset was already swapped)
-	map->ChangeTileMap(lm->GetImage(), sm?sm->GetSprite2D():NULL);
+	map->ChangeTileMap(lm->GetSprite2D(), sm?sm->GetSprite2D():NULL);
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
@@ -476,7 +476,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		return NULL;
 	}
 
-	map->AddTileMap( tm, lm->GetImage(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
+	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );

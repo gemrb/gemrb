@@ -24,7 +24,6 @@
 #include "exports.h"
 
 #include "Bitmap.h"
-#include "Image.h"
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "System/DataStream.h"
@@ -44,7 +43,6 @@ public:
 	~ImageMgr(void) override;
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
-	virtual Image* GetImage();
 	virtual Bitmap* GetBitmap();
 	/**
 	 * Returns image palette.

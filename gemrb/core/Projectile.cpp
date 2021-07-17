@@ -25,7 +25,6 @@
 #include "Game.h"
 #include "GameData.h"
 #include "GlobalTimer.h"
-#include "Image.h"
 #include "Interface.h"
 #include "ProjectileServer.h"
 #include "Sprite2D.h"

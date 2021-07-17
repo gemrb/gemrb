@@ -22,7 +22,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Game.cpp
 	GameData.cpp
 	GlobalTimer.cpp
-	Image.cpp
 	ImageFactory.cpp
 	ImageMgr.cpp
 	IniSpawn.cpp

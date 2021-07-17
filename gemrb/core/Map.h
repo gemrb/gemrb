@@ -43,7 +43,6 @@ class AnimationFactory;
 class Bitmap;
 class CREItem;
 class GameControl;
-class Image;
 class IniSpawn;
 class MapReverb;
 class Palette;
@@ -369,7 +368,7 @@ typedef std::list<Particles*>::const_iterator spaIterator;
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
-	Image* LightMap;
+	Holder<Sprite2D> LightMap;
 	Bitmap* HeightMap;
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
@@ -433,9 +432,9 @@ public:
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
 	/* low level function to perform the daylight changes */
-	void ChangeTileMap(Image *lm, Holder<Sprite2D> sm);
+	void ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm);
 	/* sets all the auxiliary maps and the tileset */
-	void AddTileMap(TileMap *tm, Image *lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
+	void AddTileMap(TileMap *tm, Holder<Sprite2D> lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
 	void AutoLockDoors() const;
 	void UpdateScripts();
 	void ResolveTerrainSound(ResRef &sound, const Point &pos) const;

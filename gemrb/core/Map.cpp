@@ -421,7 +421,6 @@ Map::~Map(void)
 	for (auto spawn : spawns) {
 		delete spawn;
 	}
-	delete LightMap;
 	delete HeightMap;
 
 	for (auto& q : queue) {
@@ -456,17 +455,15 @@ Map::~Map(void)
 	free( VisibleBitmap );
 }
 
-void Map::ChangeTileMap(Image* lm, Holder<Sprite2D> sm)
+void Map::ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm)
 {
-	delete LightMap;
-
-	LightMap = lm;
+	LightMap = std::move(lm);
 	SmallMap = std::move(sm);
 
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
+void Map::AddTileMap(TileMap* tm, Holder<Sprite2D> lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
