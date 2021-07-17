@@ -672,7 +672,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
 		const char *name = "none";
 		if (area) {
-			Scriptable *scr = area->GetScriptableByGlobalID(globalID);
+			const Scriptable *scr = area->GetScriptableByGlobalID(globalID);
 			if (scr) {
 				name = scr->GetScriptName();
 			}
@@ -774,7 +774,7 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 		if (caster) {
 			// check for target (type) change
 			int count, i;
-			Actor *newact = NULL;
+			const Actor *newact = nullptr;
 			SPLExtHeader *seh = NULL;
 			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
@@ -906,7 +906,7 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 
 	// caster - Casts spellname : target OR
 	// caster - spellname : target (repeating spells)
-	Scriptable *target = NULL;
+	const Scriptable *target = nullptr;
 	if (tgt) {
 		target = area->GetActorByGlobalID(tgt);
 		if (!target) {
@@ -1109,7 +1109,7 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 
 // check for input sanity and good casting conditions
 int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
-	Spell* spl = gamedata->GetSpell(SpellRef);
+	const Spell* spl = gamedata->GetSpell(SpellRef);
 	if (!spl) {
 		SpellHeader = -1;
 		Log(ERROR, "Scriptable", "Spell not found, aborting cast!");
@@ -1132,7 +1132,7 @@ int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
 	if (Type != ST_ACTOR) {
 		return 1;
 	}
-	Actor *actor = (Actor *) this;
+	const Actor *actor = (const Actor *) this;
 
 	// check for silence
 	// only a handful of spells don't have a verbal component -
@@ -1201,7 +1201,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
 	std::vector<Actor *>::iterator neighbour;
 	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *detective = *neighbour;
+		const Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;
@@ -1217,8 +1217,8 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
-			String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
-			String* spellname = core->GetString(spl->SpellName);
+			const String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			const String* spellname = core->GetString(spl->SpellName);
 			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg->c_str(), spellname->c_str());
 			delete castmsg;
 			delete spellname;
@@ -1371,13 +1371,13 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 		SpellHeader = 0;
 	}
 
-	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
+	const SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	int casting_time = (int)header->CastingTime;
 	// how does this work for non-actors exactly?
 	if (actor) {
 		// The mental speed effect can shorten or lengthen the casting time.
 		// But first check if a special maximum is set
-		Effect *fx = actor->fxqueue.HasEffectWithParam(fx_castingspeed_modifier_ref, 2);
+		const Effect *fx = actor->fxqueue.HasEffectWithParam(fx_castingspeed_modifier_ref, 2);
 		int max = 1000;
 		if (fx) {
 			max = fx->Parameter1;
@@ -1629,7 +1629,7 @@ bool Scriptable::AuraPolluted()
 		AuraTicks = -1;
 		return false;
 	} else if (CurrentActionTicks == 0 && AuraTicks != 1) {
-		Actor *act = (Actor *) this;
+		const Actor *act = (const Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
 			if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
@@ -1906,7 +1906,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	int check = 0;
 	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
-		Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
+		const Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
 		int bonus = 0;
 		if (detective) {
 			bonus = detective->GetAbilityBonus(IE_INT);
@@ -2046,7 +2046,7 @@ void Movable::SetStance(unsigned int arg)
 	// but it is needed for the twang/clank when an actor stops moving
 	// a lot of other stances would get skipped later, since we check we're out of combat
 	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		const Actor *actor = (Actor *) this;
 		actor->PlayArmorSound();
 	}
 }
@@ -2055,7 +2055,7 @@ void Movable::SetOrientation(int value, bool slow) {
 	//MAX_ORIENT == 16, so we can do this
 	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
 	if (NewOrientation != Orientation && Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		const Actor *actor = (Actor *) this;
 		actor->PlayArmorSound();
 	}
 	if (!slow) {
@@ -2122,7 +2122,7 @@ void Movable::BumpAway()
 void Movable::BumpBack()
 {
 	if (Type != ST_ACTOR) return;
-	Actor *actor = (Actor*)this;
+	const Actor *actor = (const Actor*) this;
 	area->ClearSearchMapFor(this);
 	PathMapFlags oldPosBlockStatus = area->GetBlockedNavmap(oldPos);
 	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
@@ -2158,8 +2158,8 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (Actor*)this;
+	const Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (const Actor*) this;
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
@@ -2292,8 +2292,8 @@ void Movable::WalkTo(const Point &Des, int distance)
 		return;
 	}
 
-	Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (Actor*)this;
+	const Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (const Actor*) this;
 
 	prevTicks = Ticks;
 	Destination = Des;
