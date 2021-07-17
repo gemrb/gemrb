@@ -429,8 +429,6 @@ Actor::Actor()
 		Modified[i] = 0;
 	}
 	PrevStats = NULL;
-	SmallPortrait[0] = 0;
-	LargePortrait[0] = 0;
 
 	anims = NULL;
 	ShieldRef[0]=0;
@@ -9070,9 +9068,9 @@ void Actor::dumpQSlots() const
 	Log(DEBUG, "Actor", buffer3);
 }
 
-void Actor::SetPortrait(const char* ResRef, int Which)
+void Actor::SetPortrait(const char* portraitRef, int Which)
 {
-	if (ResRef == NULL) {
+	if (!portraitRef) {
 		return;
 	}
 	if (InParty) {
@@ -9080,20 +9078,15 @@ void Actor::SetPortrait(const char* ResRef, int Which)
 	}
 
 	if(Which!=1) {
-		CopyResRef( SmallPortrait, ResRef );
+		SmallPortrait = portraitRef;
 	}
 	if(Which!=2) {
-		CopyResRef( LargePortrait, ResRef );
+		LargePortrait = portraitRef;
 	}
 	if(!Which) {
-		int i;
-		for (i = 0; i < 8 && ResRef[i]; i++) {};
-		if (SmallPortrait[i-1] != 'S' && SmallPortrait[i-1] != 's') {
-			SmallPortrait[i] = 'S';
-		}
-		if (LargePortrait[i-1] != 'M' && LargePortrait[i-1] != 'm') {
-			LargePortrait[i] = 'M';
-		}
+		// ensure they're properly terminated
+		SmallPortrait.SNPrintF("%.*sS", 7, SmallPortrait);
+		LargePortrait.SNPrintF("%.*sM", 7, LargePortrait);
 	}
 }
 

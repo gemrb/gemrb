@@ -308,8 +308,8 @@ public:
 	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
-	ieResRef SmallPortrait;
-	ieResRef LargePortrait;
+	ResRef SmallPortrait;
+	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	ieByte InParty;
 	//32 is the maximum possible length of the actor name in the original games

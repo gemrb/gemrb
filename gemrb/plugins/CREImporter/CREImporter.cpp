@@ -935,12 +935,12 @@ Actor* CREImporter::GetActor(unsigned char is_in_party)
 		act->version = CREVersion;
 	}
 	str->ReadResRef( act->SmallPortrait );
-	if (act->SmallPortrait[0]==0) {
-		strncpy(act->SmallPortrait, "NONE", 8);
+	if (act->SmallPortrait.IsEmpty()) {
+		act->SmallPortrait = "NONE";
 	}
 	str->ReadResRef( act->LargePortrait );
-	if (act->LargePortrait[0]==0) {
-		strncpy(act->LargePortrait, "NONE", 8);
+	if (act->LargePortrait.IsEmpty()) {
+		act->LargePortrait = "NONE";
 	}
 
 	unsigned int Inventory_Size;
