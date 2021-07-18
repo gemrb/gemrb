@@ -40,11 +40,6 @@ def GetWindowPack():
 	else:
 		default = "GUIW"
 
-	# use a custom gui if there is one
-	gui = "CGUI" + str(width)[:2] + str(height)[:2]
-	if GemRB.HasResource (gui, RES_CHU, 1):
-		return gui
-
 	# select this based on height
 	# we do this because:
 	# 1. windows are never the entire width,
