@@ -3941,9 +3941,6 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	if (hit.IsEmpty()) {
 		hit = fx->Resource2;
 	}
-	if (areahit.IsEmpty()) {
-		areahit = ResRef::MakeUpperCase(fx->Resource3);
-	}
 
 	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 	//The hostile flag should cover these cases, all else is arbitrary
