@@ -308,7 +308,6 @@ std::map<unsigned int, const char *> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
-typedef std::map<char *, std::vector<BABTable> >::iterator IWD2HitTableIter;
 std::map<int, char *> BABClassMap; // maps classis (not id!) to the BAB table
 
 std::vector<ModalStatesStruct> ModalStates;
@@ -2193,7 +2192,7 @@ static void InitActorTables()
 			BABClassMap[classis] = strdup(tohit);
 			// the tables repeat, but we need to only load one copy
 			// FIXME: the attempt at skipping doesn't work!
-			IWD2HitTableIter it = IWD2HitTable.find(tohit);
+			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
 				tht.load(tohit, true);
 				if (!tht || !tohit[0]) {
@@ -6671,7 +6670,7 @@ static int SetLevelBAB(int level, ieDword index)
 	}
 	assert(index < BABClassMap.size());
 
-	IWD2HitTableIter table = IWD2HitTable.find(BABClassMap[index]);
+	const auto& table = IWD2HitTable.find(BABClassMap[index]);
 	assert(table != IWD2HitTable.end());
 	return table->second[level-1].bab;
 }
