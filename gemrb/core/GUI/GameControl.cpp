@@ -325,11 +325,7 @@ void GameControl::CreateMovement(Actor *actor, const Point &p, bool append, bool
 // can we handle it (no movement impairments)?
 bool GameControl::CanRun(const Actor *actor) const
 {
-	if (!actor) return false;
-	if (actor->GetEncumbranceFactor(true) != 1) {
-		return false;
-	}
-	return true;
+	return (actor && actor->GetEncumbranceFactor(true) != 1);
 }
 
 bool GameControl::ShouldRun(const Actor *actor) const
@@ -2079,6 +2075,15 @@ void GameControl::InitFormation(const Point &clickPoint)
 	SetCursor(core->Cursors[IE_CURSOR_USE]);
 }
 
+bool GameControl::TryDefaultTalk(Point p) const
+{
+	Actor *targetActor = core->GetGame()->GetCurrentArea()->GetActor(p,
+			target_types & ~(GA_NO_HIDDEN /*| GA_NO_ALLY | GA_NO_ENEMY*/ ));
+	if (targetActor)
+		targetActor->VerbalConstant(VB_SELECT, 4, DS_CIRCLE);
+	return true;
+}
+
 /** Mouse Button Down */
 bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 {
@@ -2087,6 +2092,8 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 
 	switch(me.button) {
 	case GEM_MB_MENU: //right click.
+		TryDefaultTalk(gameClickPoint);
+		//add a check if you don't want some random monster handle doors and such
 		if (core->HasFeature(GF_HAS_FLOAT_MENU) && !Mod) {
 			core->GetGUIScriptEngine()->RunFunction( "GUICommon", "OpenFloatMenuWindow", false, p);
 		}

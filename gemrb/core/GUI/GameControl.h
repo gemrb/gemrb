@@ -168,6 +168,8 @@ private:
 	bool CanLockFocus() const override { return true; };
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 
+	bool TryDefaultTalk(Point p) const;
+
 public:
 	explicit GameControl(const Region& frame);
 	~GameControl(void) override;
