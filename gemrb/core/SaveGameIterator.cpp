@@ -487,6 +487,8 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 static int CanSave()
 {
 	//some of these restrictions might not be needed
+	// NOTE: can't save  during a rest, chapter information or movie (ref CANTSAVEMOVIE)
+	// is handled automatically, but without a message
 	if (core->InCutSceneMode()) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return 1;
@@ -521,6 +523,13 @@ static int CanSave()
 	if (!map) {		
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
+	}
+
+	// hopefully not too strict — we check for any projectile, not just repeating AOE
+	proIterator pIter;
+	if (map->GetProjectileCount(pIter)) {
+		// can't save while AOE spells are in effect
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 	}
 
 	if (map->AreaFlags&AF_NOSAVE) {
@@ -560,9 +569,6 @@ static int CanSave()
 			return 8;
 		}
 	}
-
-	//TODO: can't save while AOE spells are in effect -> CANTSAVE
-	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
 
 	return 0;
 }
