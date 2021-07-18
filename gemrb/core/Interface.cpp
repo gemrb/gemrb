@@ -1135,6 +1135,10 @@ int Interface::Init(InterfaceConfig* cfg)
 #ifdef DATA_DIR
 	const char* appDir = getenv("APPDIR");
 	const char* appImageFile = getenv("ARGV0");
+	if (appDir) {
+		Log(DEBUG, "Interface", "Found APPDIR: %s", appDir);
+		Log(DEBUG, "Interface", "Found AppImage/ARGV0: %s", appImageFile);
+	}
 	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
 		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
 		PathJoin(config.GemRBPath, appDir, DATA_DIR, nullptr);
