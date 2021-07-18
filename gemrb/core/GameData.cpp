@@ -451,7 +451,7 @@ Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame
 
 FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
 {
-	int fobjindex = factory->IsLoaded(resname,type);
+	int fobjindex = factory->IsLoaded(ResRef(resname), type);
 	// already cached
 	if ( fobjindex != -1)
 		return factory->GetFactoryObject( fobjindex );
