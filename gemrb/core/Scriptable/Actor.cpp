@@ -836,10 +836,11 @@ static int GetIWD2KitIndex (ieDword kit, ieDword baseclass=0, bool strict=false)
 			if (kit & (*it)) return class2kits[baseclass].indices[idx];
 		}
 		if (strict) return -1;
-		Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
+		// this is also hit for kitted multiclasses like illusionist/thieves, who we take care of in the second loop
+		if (iwd2class) Log(DEBUG, "Actor", "GetIWD2KitIndex: didn't find kit %d at expected class %d, recalculating!", kit, baseclass);
 	}
 
-	// no class info passed, so infer it
+	// no class info passed or dc/mc, so infer the kit's parent single class
 	std::map<int, ClassKits>::iterator clskit = class2kits.begin();
 	for (int cidx=0; clskit != class2kits.end(); clskit++, cidx++) {
 		std::vector<ieDword> kits = class2kits[cidx].ids;
