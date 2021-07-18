@@ -3973,22 +3973,12 @@ void Actor::ReactToDeath(const char * deadname)
 	int count = CountElements(value, ',');
 	if (count <= 0) return;
 
-	ResRef resRef;
-	count = core->Roll(1, count, -1);
-	// remove prefixed choices
-	while (count--) {
-		while (*value && *value != ',') value++;
-		if (*value == ',') value++;
-	}
-	// remove suffixed choices
-	count = 8;
-	while (count >= 0 && value[count] != ',') count--;
-	if (count == -1) {
-		// it was the last choice, so there's no garbage afterwards
-		resRef = value;
-	} else {
-		resRef.SNPrintF("%.*s", count, value);
-	}
+	ResRef *elements = new ResRef[count];
+	GetElements(value, elements, count);
+
+	int choice = core->Roll(1, count, -1);
+	ResRef resRef = elements[choice];
+	delete[] elements;
 
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
@@ -8892,14 +8882,14 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 	}
 
 	int count = CountElements(resource, ',');
-	int slot = RAND(0, count - 1);
-	while (slot--) {
-		while (*resource && *resource != ',') resource++;
-		if (*resource == ',') resource++;
-	}
-	size_t len = strcspn(resource, ",");
-	assert(len < 9);
-	Sound = resource;
+	if (count <= 0) return false;
+
+	ResRef *elements = new ResRef[count];
+	GetElements(resource, elements, count);
+
+	int choice = core->Roll(1, count, -1);
+	Sound = elements[choice];
+	delete[] elements;
 
 	return true;
 }
