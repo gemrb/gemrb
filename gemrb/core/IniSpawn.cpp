@@ -97,23 +97,6 @@ static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 	return ini;
 }
 
-/*** initializations ***/
-static inline void GetElements(const char *s, ieVariable *storage, int count)
-{
-	while(count--) {
-		ieVariable *field = storage+count;
-		strnuprcpy(*field, s, sizeof(ieVariable)-1);
-		for(size_t i=0;i<sizeof(ieVariable) && (*field)[i];i++) {
-			if ((*field)[i]==',') {
-				(*field)[i]='\0';
-				break;
-			}
-		}
-		while(*s && *s!=',') s++;
-		s++;
-	}
-}
-
 // possible values implemented in DiffMode, but not needed here
 // BINARY_LESS_OR_EQUALS 6 //(left has only bits in right)
 // BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
