@@ -418,7 +418,7 @@ void CharAnimations::SetupColors(PaletteType type)
 					PaletteResRef[type].SNPrintF("%.4s_%-.2s", ResRefBase.CString(), (char *) &PType);
 				}
 			}
-			PaletteResRef[type] = ResRef::MakeLowerCase(PaletteResRef[type]);
+			PaletteResRef[type] = PaletteResRef[type];
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
 				gamedata->FreePalette(PartPalettes[type], oldResRef);
@@ -507,10 +507,10 @@ void CharAnimations::InitAvatarsTable() const
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (int i = AvatarsCount - 1; i >= 0; i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
-		AvatarTable[i].Prefixes[0] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX1));
-		AvatarTable[i].Prefixes[1] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX2));
-		AvatarTable[i].Prefixes[2] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX3));
-		AvatarTable[i].Prefixes[3] = ResRef::MakeLowerCase(Avatars->QueryField(i, AV_PREFIX4));
+		AvatarTable[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
+		AvatarTable[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
+		AvatarTable[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
+		AvatarTable[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
 		AvatarTable[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
 		AvatarTable[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
 		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
@@ -589,7 +589,7 @@ void CharAnimations::InitAvatarsTable() const
 			unsigned long rmax = 0xffff;
 			unsigned long range = 0;
 
-			value = ResRef::MakeUpperCase(walk->QueryField(i, 0));
+			value = walk->QueryField(i, 0);
 			valid_number(walk->QueryField(i,1), (long &)rmin);
 			valid_number(walk->QueryField(i,2), (long &)rmax);
 			valid_number(walk->QueryField(i,3), (long &)range);
@@ -648,7 +648,7 @@ void CharAnimations::InitAvatarsTable() const
 					break;
 				}
 				if (AvatarTable[j].AnimID == id) {
-					AvatarTable[j].ShadowAnimation = ResRef::MakeLowerCase(avatarShadows->QueryField(i, 0));
+					AvatarTable[j].ShadowAnimation = avatarShadows->QueryField(i, 0);
 					break;
 				}
 			}

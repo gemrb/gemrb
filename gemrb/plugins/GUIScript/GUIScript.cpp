@@ -7913,7 +7913,7 @@ static void ReadUsedItems()
 		size_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
 		for (size_t i = 0; i < UsedItemsCount; i++) {
-			UsedItems[i].itemname = ResRef::MakeLowerCase(table->GetRowName(i));
+			UsedItems[i].itemname = table->GetRowName(i);
 			strnlwrcpy(UsedItems[i].username, table->QueryField(i, 0), 32);
 			if (UsedItems[i].username[0] == '*') {
 				UsedItems[i].username[0] = 0;
@@ -7937,7 +7937,7 @@ static void ReadSpecialItems()
 		ieDword SpecialItemsCount = tab->GetRowCount();
 		SpecialItems.resize(SpecialItemsCount);
 		for (ieDword i = 0; i < SpecialItemsCount; i++) {
-			SpecialItems[i].resref = ResRef::MakeLowerCase(tab->GetRowName(i));
+			SpecialItems[i].resref = tab->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
 			SpecialItems[i].value = atoi(tab->QueryField(i, 0));
 		}
@@ -7952,7 +7952,7 @@ static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 			ieDword StoreSpellsCount = tab->GetRowCount();
 			StoreSpells.resize(StoreSpellsCount);
 			for (ieDword i = 0; i < StoreSpellsCount; i++) {
-				StoreSpells[i].resref = ResRef::MakeLowerCase(tab->GetRowName(i));
+				StoreSpells[i].resref = tab->GetRowName(i);
 				StoreSpells[i].value = atoi(tab->QueryField(i, 0));
 			}
 		}
@@ -11580,7 +11580,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	const char *spell2 = NULL;
 
 	PARSE_ARGS( args,  "isiis", &globalID, &spell, &type, &level, &spell2);
-	ResRef replacementSpell = ResRef::MakeLowerCase(spell2);
+	ResRef replacementSpell = spell2;
 
 	GET_GAME();
 	GET_ACTOR_GLOBAL();

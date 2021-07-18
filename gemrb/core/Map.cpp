@@ -224,7 +224,7 @@ static void InitSpawnGroups()
 			//difficulty
 			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
 			for (;j;j--) {
-				creatures->ResRefs[j-1] = ResRef::MakeLowerCase(tab->QueryField(j, i));
+				creatures->ResRefs[j - 1] = tab->QueryField(j, i);
 			}
 			GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
 			Spawns.SetAt( GroupName, (void*) creatures );
@@ -263,7 +263,7 @@ static void InitPathFinder()
 		while(rc--) {
 			terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
 			for(int i = 0; i<16;i++) {
-				terrainsounds[rc].Sounds[i] = ResRef::MakeUpperCase(tm->QueryField(rc+2, i));
+				terrainsounds[rc].Sounds[i] = tm->QueryField(rc + 2, i);
 			}
 		}
 	}

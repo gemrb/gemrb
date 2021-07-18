@@ -130,9 +130,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	std::fill(std::begin(nightmovies), std::end(nightmovies), ResRef("********"));
 	if (table.load("restmov")) {
 		for(int i=0;i<8;i++) {
-			restmovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 0));
-			daymovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 1));
-			nightmovies[i] = ResRef::MakeUpperCase(table->QueryField(i, 2));
+			restmovies[i] = table->QueryField(i, 0);
+			daymovies[i] = table->QueryField(i, 1);
+			nightmovies[i] = table->QueryField(i, 2);
 		}
 	}
 

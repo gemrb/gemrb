@@ -646,7 +646,7 @@ bool Interface::ReadSpecialSpells()
 		ieDword SpecialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(SpecialSpellsCount);
 		for (ieDword i = 0; i < SpecialSpellsCount; i++) {
-			SpecialSpells[i].resref = ResRef::MakeLowerCase(table->GetRowName(i));
+			SpecialSpells[i].resref = table->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
 			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
@@ -3793,12 +3793,12 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	GoldResRef = ResRef::MakeLowerCase(tab->QueryField(size_t(0), size_t(0)));
+	GoldResRef = tab->QueryField(size_t(0), size_t(0));
 	if (GoldResRef.IsStar()) {
 		return false;
 	}
 	ResRef randTreasureRef;
-	randTreasureRef = ResRef::MakeLowerCase(tab->QueryField(1, difflev));
+	randTreasureRef = tab->QueryField(1, difflev);
 	int i = atoi(randTreasureRef);
 	if (i<1) {
 		ReadItemTable(randTreasureRef, 0); //reading the table itself
@@ -3808,7 +3808,7 @@ bool Interface::ReadRandomItems()
 		i=5;
 	}
 	while(i--) {
-		randTreasureRef = ResRef::MakeLowerCase(tab->QueryField(2 + i, difflev));
+		randTreasureRef = tab->QueryField(2 + i, difflev);
 		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
 	}
 	return true;

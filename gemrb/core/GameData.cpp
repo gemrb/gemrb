@@ -405,7 +405,7 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 	if (Exists( effect, IE_VEF_CLASS_ID, true ) ) {
 		DataStream *ds = GetResource( effect, IE_VEF_CLASS_ID );
 		ret = new VEFObject();
-		ret->ResName = ResRef::MakeLowerCase(effect);
+		ret->ResName = effect;
 		ret->LoadVEF(ds);
 	} else {
 		if (Exists( effect, IE_2DA_CLASS_ID, true ) ) {

@@ -2825,7 +2825,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	}
 	ResRef arearesref;
 	if (parameters->string0Parameter[0]) {
-		arearesref = ResRef::MakeLowerCase(parameters->string0Parameter);
+		arearesref = parameters->string0Parameter;
 	} else {
 		arearesref = "ar30"; //InWatchersKeep
 	}

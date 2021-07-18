@@ -1550,7 +1550,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			}
 			//create a custom projectile with single traveling effect
 			Projectile *pro = server->CreateDefaultProjectile((unsigned int) ~0);
-			pro->BAMRes1 = ResRef::MakeLowerCase(tmp);
+			pro->BAMRes1 = tmp;
 			if (ExtFlags&PEF_TRAIL) {
 				pro->Aim = Aim;
 			}

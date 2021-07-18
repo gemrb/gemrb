@@ -411,10 +411,7 @@ void ScriptedAnimation::SetFullPalette(const ResRef &PaletteResRef)
 void ScriptedAnimation::SetFullPalette(int idx)
 {
 	ResRef PaletteResRef;
-
-	//make sure this field is zero terminated, or strlwr will run rampant!!!
 	PaletteResRef.SNPrintF("%.7s%d", ResName.CString(), idx);
-	PaletteResRef = ResRef::MakeLowerCase(PaletteResRef);
 	SetFullPalette(PaletteResRef);
 	//no need to call twin
 }

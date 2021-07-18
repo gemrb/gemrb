@@ -209,7 +209,7 @@ void VEFObject::Load2DA(const ResRef &resource)
 		offset.y=atoi(tab->QueryField(rows,1));
 		delay = atoi(tab->QueryField(rows,3));
 		duration = atoi(tab->QueryField(rows,4));
-		subResource = ResRef::MakeUpperCase(tab->QueryField(rows,2));
+		subResource = tab->QueryField(rows, 2);
 		AddEntry(subResource, delay, duration, offset, VEF_VVC, GameTime);
 	}
 }

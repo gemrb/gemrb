@@ -492,7 +492,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 /* set by action */
 void IniSpawn::SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state)
 {
-	NamelessSpawnArea = ResRef::MakeUpperCase(area);
+	NamelessSpawnArea = area;
 	NamelessSpawnPoint = pos;
 	NamelessState = state;
 }
@@ -503,12 +503,12 @@ void IniSpawn::InitSpawn(const ResRef& DefaultArea)
 
 	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
-		NamelessSpawnArea = ResRef::MakeUpperCase(DefaultArea);
+		NamelessSpawnArea = DefaultArea;
 		return;
 	}
 
 	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
-	NamelessSpawnArea = ResRef::MakeUpperCase(s);
+	NamelessSpawnArea = s;
 	s = inifile->GetKeyAsString("nameless","point","[0.0]");
 	int x,y;
 	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
@@ -519,7 +519,7 @@ void IniSpawn::InitSpawn(const ResRef& DefaultArea)
 	NamelessSpawnPoint.y=y;
 
 	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
-	PartySpawnArea = ResRef::MakeUpperCase(s);
+	PartySpawnArea = s;
 	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
 	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
 		x = NamelessSpawnPoint.x;
@@ -600,7 +600,7 @@ void IniSpawn::RespawnNameless()
 	if (NamelessSpawnPoint.IsZero()) {
 		core->GetGame()->JoinParty(nameless,JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
-		NamelessSpawnArea = ResRef::MakeUpperCase(nameless->Area);
+		NamelessSpawnArea = nameless->Area;
 	}
 
 	nameless->Resurrect(NamelessSpawnPoint);

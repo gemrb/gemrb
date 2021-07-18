@@ -3928,18 +3928,18 @@ int fx_monster_summoning (Scriptable* Owner, Actor* target, Effect* fx)
 	int level = fx->Parameter1;
 
 	if (!fx->Resource.IsEmpty()) {
-		table = ResRef::MakeUpperCase(fx->Resource);
+		table = fx->Resource;
 	} else {
 		if (fx->Parameter2 >= FX_MS) {
 			table = "ANISUM03";
 		} else {
-			table = ResRef::MakeUpperCase(monster_summoning_2da[fx->Parameter2]);
+			table = monster_summoning_2da[fx->Parameter2];
 		}
 	}
 	core->GetResRefFrom2DA(table, monster, hit, areahit);
 
 	if (hit.IsEmpty()) {
-		hit = ResRef::MakeUpperCase(fx->Resource2);
+		hit = fx->Resource2;
 	}
 	if (areahit.IsEmpty()) {
 		areahit = ResRef::MakeUpperCase(fx->Resource3);

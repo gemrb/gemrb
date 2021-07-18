@@ -1996,12 +1996,12 @@ static void InitActorTables()
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
-			d_main[i] = ResRef::MakeLowerCase(tmp);
+			d_main[i] = tmp;
 			if (d_main[i].IsStar()) {
 				d_main[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_SPARKS );
-			d_splash[i] = ResRef::MakeLowerCase(tmp);
+			d_splash[i] = tmp;
 			if (d_splash[i].IsStar()) {
 				d_splash[i].Reset();
 			}
@@ -2083,7 +2083,7 @@ static void InitActorTables()
 		itemuse = new ItemUseType[usecount];
 		for (int i = 0; i < usecount; i++) {
 			itemuse[i].stat = (ieByte) core->TranslateStat( tm->QueryField(i,0) );
-			itemuse[i].table = ResRef::MakeLowerCase(tm->QueryField(i, 1));
+			itemuse[i].table = tm->QueryField(i, 1);
 			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
 			itemuse[i].vcol = (ieByte) atoi( tm->QueryField(i,3) );
 			itemuse[i].which = (ieByte) atoi( tm->QueryField(i,4) );
@@ -2099,7 +2099,7 @@ static void InitActorTables()
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
 		for (int i = 0; i < animcount; i++) {
-			itemanim[i].itemname = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+			itemanim[i].itemname = tm->QueryField(i, 0);
 			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
 	}
@@ -2646,7 +2646,7 @@ static void InitActorTables()
 				avStance = -1;
 			}
 			for (int i = 0; i < avCount; i++) {
-				avPrefix[i].avresref = ResRef::MakeUpperCase(tm->QueryField(i + 1));
+				avPrefix[i].avresref = tm->QueryField(i + 1);
 				avPrefix[i].avtable.load(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
@@ -4815,7 +4815,7 @@ void Actor::PlayWalkSound()
 	if (!cnt) return;
 
 	cnt=core->Roll(1,cnt,-1);
-	ResRef Sound = ResRef::MakeUpperCase(anims->GetWalkSound());
+	ResRef Sound = anims->GetWalkSound();
 	area->ResolveTerrainSound(Sound, Pos);
 
 	if (Sound.IsStar()) return;
@@ -4824,7 +4824,7 @@ void Actor::PlayWalkSound()
 	char Sound2[9]; // bleh
 	strlcpy(Sound2, Sound.CString(), sizeof(Sound2));
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-	if (core->HasFeature(GF_SOUNDFOLDERS) && 0 == memcmp(Sound, "FS_", 3)) {
+	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound, "FS_", 3)) {
 		if (l < 8) {
 			Sound2[l] = cnt + 0x31;
 			Sound2[l+1] = 0;
@@ -9296,7 +9296,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false;
 	}
 
-	ResRef tmp = ResRef::MakeUpperCase(item->ItemResRef);
+	ResRef tmp = item->ItemResRef;
 	Item *itm = gamedata->GetItem(tmp, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
@@ -9750,14 +9750,14 @@ void Actor::SetupFistData() const
 	FistRows = 0;
 	AutoTable fist("fistweap");
 	if (fist) {
-		DefaultFist = ResRef::MakeLowerCase(fist->QueryDefault());
+		DefaultFist = fist->QueryDefault();
 		FistRows = fist->GetRowCount();
 		fistres = new FistResType[FistRows];
 		fistresclass = new int[FistRows];
 		for (int i = 0; i < FistRows; i++) {
 			int maxcol = fist->GetColumnCount(i) - 1;
 			for (int cols = 0; cols < MAX_LEVEL; cols++) {
-				fistres[i][cols] = ResRef::MakeLowerCase(fist->QueryField(i, cols > maxcol ? maxcol : cols));
+				fistres[i][cols] = fist->QueryField(i, cols > maxcol ? maxcol : cols);
 			}
 			fistresclass[i] = atoi(fist->GetRowName(i));
 		}

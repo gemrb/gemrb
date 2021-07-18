@@ -3122,7 +3122,7 @@ void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
+		core->GetGame()->LoadMos = parameters->string1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3137,7 +3137,7 @@ void GameScript::LeaveAreaLUA(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	//the LoadMos ResRef may be empty
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
+		core->GetGame()->LoadMos = parameters->string1Parameter;
 	}
 	if (actor->Persistent() || !CreateMovementEffect(actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter) ) {
 		MoveBetweenAreasCore( actor, parameters->string0Parameter, parameters->pointParameter, parameters->int0Parameter, true);
@@ -3153,7 +3153,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	}
 	Game *game = core->GetGame();
 	if (parameters->string1Parameter[0]) {
-		game->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
+		game->LoadMos = parameters->string1Parameter;
 	}
 	Point p = GetEntryPoint(parameters->string0Parameter, parameters->string1Parameter);
 	if (p.IsInvalid()) {
@@ -3175,7 +3175,7 @@ void GameScript::LeaveAreaLUAPanic(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->string1Parameter[0]) {
-		core->GetGame()->LoadMos = ResRef::MakeLowerCase(parameters->string1Parameter);
+		core->GetGame()->LoadMos = parameters->string1Parameter;
 	}
 }
 
@@ -3600,7 +3600,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	// bg2 sometimes calls IncrementChapter("") right after a TextScreen("sometable"),
 	// so we make sure they don't cancel out
 	if (parameters->string0Parameter[0]) {
-		core->GetGame()->TextScreen = ResRef::MakeLowerCase(parameters->string0Parameter);
+		core->GetGame()->TextScreen = parameters->string0Parameter;
 	}
 
 	core->SetEventFlag(EF_TEXTSCREEN);
