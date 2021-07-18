@@ -37,12 +37,12 @@ private:
 	charlist save_slots;
 
 public:
-	SaveGameIterator(void);
-	~SaveGameIterator(void);
+	SaveGameIterator() = default;
+	~SaveGameIterator() = default;
 	const charlist& GetSaveGames();
-	void DeleteSaveGame(const Holder<SaveGame>&);
-	int CreateSaveGame(Holder<SaveGame>, const char *slotname);
-	int CreateSaveGame(int index, bool mqs = false);
+	void DeleteSaveGame(const Holder<SaveGame>&) const;
+	int CreateSaveGame(Holder<SaveGame>, const char *slotname) const;
+	int CreateSaveGame(int index, bool mqs = false) const;
 	Holder<SaveGame> GetSaveGame(const char *slotname);
 private:
 	bool RescanSaveGames();

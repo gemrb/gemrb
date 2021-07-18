@@ -131,10 +131,6 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	GameDate[0] = '\0';
 }
 
-SaveGame::~SaveGame()
-{
-}
-
 Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 {
 	if (index > PortraitCount) {
@@ -178,14 +174,6 @@ const char* SaveGame::GetGameDate() const
 	return GameDate;
 }
 
-SaveGameIterator::SaveGameIterator(void)
-{
-}
-
-SaveGameIterator::~SaveGameIterator(void)
-{
-}
-
 // mission pack save dir or the main one?
 static char saveDir[10];
 static const char* SaveDir()
@@ -200,7 +188,7 @@ static const char* SaveDir()
 
 #define FormatQuickSavePath(destination, i) \
 	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
-		core->config.SavePath, SaveDir(), SPathDelimiter, i, folder);
+		core->config.SavePath, SaveDir(), SPathDelimiter, i, folder)
 
 /*
  * Returns the first 0 bit position of an integer
@@ -418,7 +406,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder) const
 /** Save game to given directory */
 static bool DoSaveGame(const char *Path, bool overrideRunning)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//saving areas to cache currently in memory
 	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
 	while (mc--) {
@@ -454,7 +442,7 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Actor *actor = game->GetPC( i, false );
+		const Actor *actor = game->GetPC( i, false );
 		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
@@ -597,7 +585,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 	return true;
 }
 
-int SaveGameIterator::CreateSaveGame(int index, bool mqs)
+int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 {
 	AutoTable tab("savegame");
 	const char *slotname = NULL;
@@ -657,7 +645,7 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	return GEM_OK;
 }
 
-int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname)
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname) const
 {
 	if (!slotname) {
 		return GEM_ERROR;
@@ -714,7 +702,7 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 	return GEM_OK;
 }
 
-void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game)
+void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game) const
 {
 	if (!game) {
 		return;
