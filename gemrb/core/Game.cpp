@@ -840,7 +840,7 @@ int Game::DelMap(unsigned int index, int forced)
 
 	// this was not used in the originals and may be in the wrong place
 	// (definitely if MAX_MAPS_LOADED gets bumped)
-	map->INISpawn->ExitSpawn();
+	if (map->INISpawn) map->INISpawn->ExitSpawn();
 
 	if (forced || Maps.size() > MAX_MAPS_LOADED) {
 		//keep at least one master
