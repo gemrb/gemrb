@@ -104,7 +104,6 @@ static void SetWindowIcon(SDL_Window* window)
 int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
 #if USE_OPENGL_BACKEND
