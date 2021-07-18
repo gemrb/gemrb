@@ -7299,7 +7299,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	PyObject* p = PyTuple_New( 4 );
 
 	int j=1;
-	int k;
+	int16_t k;
 	for (int i = 0; i < 4; i++) {
 		if (store->AvailableRooms&j) {
 			k = store->RoomPrices[i];
