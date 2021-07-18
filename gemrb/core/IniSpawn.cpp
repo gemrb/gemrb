@@ -98,22 +98,6 @@ static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 }
 
 /*** initializations ***/
-
-// explode a CSV resref list into separate storage
-static inline void GetElements(const char *s, ResRef *storage, int count)
-{
-	ResRef *field;
-	int i = 0;
-	for (char *part = strtok((char*) s, ","); part; part = strtok(nullptr, ",")) {
-		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
-		if (*part == ' ') part++;
-		field = &storage[i];
-		*field = part;
-		assert(i < count);
-		i++;
-	}
-}
-
 static inline void GetElements(const char *s, ieVariable *storage, int count)
 {
 	while(count--) {
