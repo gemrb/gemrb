@@ -497,7 +497,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 
 	for (i = 0; i < 4; ++i) {
 		ae->AreaLinksCount[i] = 2;
-		ae->AreaLinksIndex[i] = idx;
+		ae->AreaLinksIndex[i] = static_cast<ieDword>(idx);
 	}
 	
 	encounterArea = area_entries.size();

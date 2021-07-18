@@ -1542,7 +1542,7 @@ void InitializeIEScript()
 			// missing trigger which might be resolved later
 			triggers[i] = NULL;
 			triggerflags[i] = 0;
-			missing_triggers.push_back(j);
+			missing_triggers.push_back(static_cast<int>(j));
 			continue;
 		}
 		triggers[i] = poi->Function;
@@ -1608,7 +1608,7 @@ void InitializeIEScript()
 		if (poi == NULL) {
 			actions[i] = NULL;
 			actionflags[i] = 0;
-			missing_actions.push_back(j);
+			missing_actions.push_back(static_cast<int>(j));
 			continue;
 		}
 		actions[i] = poi->Function;
@@ -1633,7 +1633,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override action: ");
-				printFunction(buffer, overrideActionsTable, j);
+				printFunction(buffer, overrideActionsTable, static_cast<int>(j));
 				continue;
 			}
 			if (actions[i] && (actions[i]!=poi->Function || actionflags[i]!=poi->Flags) ) {
@@ -1677,7 +1677,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override trigger: ");
-				printFunction(buffer, overrideTriggersTable, j);
+				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
 				continue;
 			}
 			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
@@ -1752,7 +1752,7 @@ void InitializeIEScript()
 		}
 		if (poi == NULL) {
 			objects[i] = NULL;
-			missing_objects.push_back(j);
+			missing_objects.push_back(static_cast<int>(j));
 		} else {
 			objects[i] = poi->Function;
 		}
@@ -1779,7 +1779,7 @@ void InitializeIEScript()
 		}
 		StringBuffer buffer;
 		buffer.append("Couldn't assign function to object: ");
-		printFunction(buffer, objectsTable, j);
+		printFunction(buffer, objectsTable, static_cast<int>(j));
 		Log(WARNING, "GameScript", buffer);
 	}
 
@@ -1823,11 +1823,9 @@ void InitializeIEScript()
 /********************** GameScript *******************************/
 GameScript::GameScript(const ResRef& resref, Scriptable* MySelf,
 	int ScriptLevel, bool AIScript)
-	: MySelf(MySelf)
+	: MySelf(MySelf), Name(resref), scriptlevel(ScriptLevel)
 {
-	scriptlevel = ScriptLevel;
-	Name = resref;
-	script = CacheScript( Name, AIScript);
+	script = CacheScript(Name, AIScript);
 }
 
 GameScript::~GameScript(void)
@@ -1849,7 +1847,7 @@ GameScript::~GameScript(void)
 	}
 }
 
-Script* GameScript::CacheScript(ResRef& resRef, bool AIScript)
+Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 {
 	char line[10];
 

@@ -3304,16 +3304,16 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= core->Time.round_sec;
 		// fall through
 	case RPD_SECONDS:	//restore param3 hp every param1 seconds
-		fx->Parameter3 = gameTime + tmp*timeStep;
+		fx->Parameter3 = gameTime + tmp * static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	case RPD_PERCENT: // handled in HandlePercentageDamage
 	case RPD_POINTS:	//restore param1 hp every second? that's crazy!
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + timeStep;
+		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
 		break;
 	default:
-		fx->Parameter3 = gameTime + timeStep;
+		fx->Parameter3 = gameTime + static_cast<ieDword>(timeStep);
 		damage = 1;
 		break;
 	}
@@ -3322,7 +3322,7 @@ int fx_set_regenerating_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// x hp per 1 round
 	if (fx->Parameter2 == RPD_ROUNDS && core->HasFeature(GF_ENHANCED_EFFECTS)) {
 		damage = fx->Parameter1;
-		fx->Parameter3 = gameTime + core->Time.round_sec*timeStep;
+		fx->Parameter3 = gameTime + core->Time.round_sec * static_cast<ieDword>(timeStep);
 	}
 
 	if (fx->FirstApply) {

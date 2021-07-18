@@ -550,7 +550,7 @@ public:
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(ResRef& ResRef, bool AIScript);
+	Script* CacheScript(const ResRef& ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);

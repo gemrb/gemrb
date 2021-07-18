@@ -213,7 +213,7 @@ bool Spellbook::HaveSpell(int spellid, int type, ieDword flags)
 {
 	unsigned int count = GetSpellLevelCount(type);
 	for (unsigned int j = 0; j < count; j++) {
-		CRESpellMemorization* sm = spells[type][j];
+		const CRESpellMemorization* sm = spells[type][j];
 		for (auto& ms : sm->memorized_spells) {
 			if (!ms->Flags) continue;
 			if (atoi(ms->SpellResRef.CString() + 4) != spellid) continue;
@@ -900,7 +900,7 @@ bool Spellbook::DepleteSpell(int type)
 	}
 	size_t j = GetSpellLevelCount(type);
 	while(j--) {
-		CRESpellMemorization* sm = spells[type][j];
+		const CRESpellMemorization* sm = spells[type][j];
 
 		for (auto& spell : sm->memorized_spells) {
 			if (DepleteSpell(spell)) {

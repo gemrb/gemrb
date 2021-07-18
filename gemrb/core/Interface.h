@@ -746,7 +746,7 @@ private:
 	bool LoadEncoding();
 
 	template<int SIZE>
-	bool LoadPalette(ResRef resref, std::vector<ColorPal<SIZE>>& palettes)
+	bool LoadPalette(const ResRef& resref, std::vector<ColorPal<SIZE>>& palettes) const
 	{
 		static_assert(SIZE == 16 || SIZE == 32 || SIZE == 256, "invalid palette size");
 

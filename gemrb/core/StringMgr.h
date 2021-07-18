@@ -44,9 +44,8 @@ struct StringBlock {
 
 	StringBlock() = default;
 	StringBlock(const String* text, const ResRef& soundRef)
-	: text(text) {
-		Sound = soundRef;
-	}
+	: text(text), Sound(soundRef) {}
+
 	~StringBlock() {
 		delete text;
 	}

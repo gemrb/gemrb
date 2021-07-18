@@ -244,7 +244,7 @@ tick_t AmbientMgrAL::AmbientSource::tick(tick_t ticks, Point listener, ieDword t
 }
 
 /* enqueues a random sound and returns its length */
-tick_t AmbientMgrAL::AmbientSource::enqueue()
+tick_t AmbientMgrAL::AmbientSource::enqueue() const
 {
 	if (stream < 0) return -1;
 	// print("Playing ambient %s, %d/%ld on stream %d", ambient->sounds[nextref], nextref, ambient->sounds.size(), stream);

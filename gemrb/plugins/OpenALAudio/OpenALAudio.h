@@ -102,7 +102,7 @@ public:
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 					const Point&, unsigned int flags = 0,
-					tick_t *length = 0) override;
+					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
 	void ResetMusics() override;

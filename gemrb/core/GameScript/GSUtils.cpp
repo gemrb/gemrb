@@ -399,7 +399,7 @@ bool HasItemCore(const Inventory *inventory, const ResRef& itemname, ieDword fla
 }
 
 //finds and takes an item from a container in the given inventory
-static bool GetItemContainer(CREItem &itemslot2, Inventory *inventory, const ResRef& itemname, int count)
+static bool GetItemContainer(CREItem &itemslot2, const Inventory *inventory, const ResRef& itemname, int count)
 {
 	int i=inventory->GetSlotCount();
 	while (i--) {

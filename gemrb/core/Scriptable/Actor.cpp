@@ -4471,11 +4471,9 @@ bool Actor::CheckSpellDisruption(int damage, int spellLevel) const
 
 bool Actor::HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant)
 {
-	if (deplete) {
-		if (!spellbook.HaveSpell(spellResRef, HS_DEPLETE)) {
-			SetStance(IE_ANI_READY);
-			return true;
-		}
+	if (deplete && !spellbook.HaveSpell(spellResRef, HS_DEPLETE)) {
+		SetStance(IE_ANI_READY);
+		return true;
 	}
 	if (!instant) {
 		SetStance(IE_ANI_CAST);

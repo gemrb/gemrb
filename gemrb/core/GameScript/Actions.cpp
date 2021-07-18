@@ -6993,9 +6993,6 @@ void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameter
 	core->DitherSprites = false;
 }
 
-//the PST crew apparently loved hardcoding stuff
-char RebusResRef[9] = { "DABUS1" };
-
 void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -7003,6 +7000,8 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *)tar;
+	//the PST crew apparently loved hardcoding stuff
+	static char RebusResRef[9] = { "DABUS1" };
 	RebusResRef[5]=(char) core->Roll(1,5,'0');
 	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, false);
 	if (vvc) {

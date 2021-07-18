@@ -253,34 +253,20 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		}
 	}
 
-	//store or retrieve spawn point
+	// Keys that store or retrieve spawn point and orientation ("facing").
+	// take point from variable
 	s = inifile->GetKeyAsString(crittername,"spawn_point_global", NULL);
-	if (s) {
-		switch (spawnMode) {
-		case 'e':
-			critter.SpawnPoint = CheckPointVariable(map, s+8, s);
-			break;
-		default:
-			//see save_selected_point
-			//SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
-			break;
-		}
+	if (s && spawnMode == 'e') {
+		critter.SpawnPoint = CheckPointVariable(map, s + 8, s);
 	}
 
 	//take facing from variable
 	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
-	if (s) {
-		switch (spawnMode) {
-		case 'e':
-			critter.Orientation=(int) CheckVariable(map, s+8,s);
-			break;
-		default:
-			//see save_selected_point
-			//SetVariable(map, s+8, s, (ieDword) critter.Orientation);
-			break;
-		}
+	if (s && spawnMode == 'e') {
+		critter.Orientation = static_cast<int>(CheckVariable(map, s + 8, s));
 	}
 
+	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
 	if (s) {
 		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {

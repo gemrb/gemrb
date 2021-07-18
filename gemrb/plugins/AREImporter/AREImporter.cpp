@@ -1311,7 +1311,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek( 2, GEM_CURRENT_POS );
 		ieDword interval;
 		str->ReadDword(interval);
-		ambi->interval = interval * 1000;;
+		ambi->interval = interval * 1000;
 		str->ReadDword(interval);
 		ambi->intervalVariance = interval * 1000;
 		// schedule bits

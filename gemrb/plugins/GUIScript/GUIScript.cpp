@@ -9312,45 +9312,44 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 	if (UsedItems.empty()) {
 		ReadUsedItems();
 	}
-	unsigned int i = UsedItems.size();
 
-	while(i--) {
-		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != si->ItemResRef) {
+	for (const auto& usedItem : UsedItems) {
+		if (!usedItem.itemname.IsEmpty() && usedItem.itemname != si->ItemResRef) {
 			continue;
 		}
 		//true if names don't match
-		int nomatch = (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) != 0);
+		int nomatch = usedItem.username[0] && strnicmp(usedItem.username, actor->GetScriptName(), 32) != 0;
 
 		switch(action) {
 		//the named actor cannot remove it
 		case CRI_REMOVE:
-			if (UsedItems[i].flags&1) {
+			if (usedItem.flags & 1) {
 				if (nomatch) continue;
 			} else continue;
 			break;
 		//the named actor can equip it
 		case CRI_EQUIP:
-			if (UsedItems[i].flags&2) {
+			if (usedItem.flags & 2) {
 				if (!nomatch) continue;
 			} else continue;
 			break;
 		//the named actor can swap it
 		case CRI_SWAP:
-			if (UsedItems[i].flags&4) {
+			if (usedItem.flags & 4) {
 				if (!nomatch) continue;
 			} else continue;
 			break;
 		//the named actor cannot remove it except when initiating a swap (used for plain inventory slots)
 		// and make sure not to treat earrings improperly
 		case CRI_REMOVEFORSWAP:
-			int flags = UsedItems[i].flags;
+			int flags = usedItem.flags;
 			if (!(flags&1) || flags&4) {
 				continue;
 			}
 			break;
 		}
 
-		displaymsg->DisplayString(UsedItems[i].value, DMC_WHITE, IE_STR_SOUND);
+		displaymsg->DisplayString(usedItem.value, DMC_WHITE, IE_STR_SOUND);
 		return 1;
 	}
 	return 0;
@@ -9362,18 +9361,17 @@ static bool CheckEyeEarMatch(CREItem *NewItem, int Slot) {
 	if (UsedItems.empty()) {
 		ReadUsedItems();
 	}
-	unsigned int i = UsedItems.size();
 
-	while(i--) {
-		if (!UsedItems[i].itemname.IsEmpty() && UsedItems[i].itemname != NewItem->ItemResRef) {
+	for (const auto& usedItem : UsedItems) {
+		if (!usedItem.itemname.IsEmpty() && usedItem.itemname != NewItem->ItemResRef) {
 			continue;
 		}
 
 		//8 - (pst) can only be equipped in eye slots
 		//16 - (pst) can only be equipped in ear slots
-		if (UsedItems[i].flags & 8) {
+		if (usedItem.flags & 8) {
 			return Slot == 1; // eye/left ear/helmet
-		} else if (UsedItems[i].flags & 16) {
+		} else if (usedItem.flags & 16) {
 			return Slot == 7; //right ear/caleidoscope
 		}
 
@@ -11589,7 +11587,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	actor->spellbook.UnmemorizeSpell(ResRef(spell), true);
 	// set spellinfo to all known spells of desired type
 	std::vector<ResRef> data;
-	actor->spellbook.SetCustomSpellInfo(data, NULL, 1 << type);
+	actor->spellbook.SetCustomSpellInfo(data, nullptr, 1 << type);
 	SpellExtHeader spelldata{};
 	int idx = actor->spellbook.FindSpellInfo(&spelldata, replacementSpell, 1<<type);
 
@@ -11656,7 +11654,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		core->GetDictionary()->Lookup("ActionLevel", ActionLevel);
 		if (ActionLevel == 5) {
 			// get the right spell, since the lookup below only checks the memorized list
-			actor->spellbook.SetCustomSpellInfo(data, NULL, type);
+			actor->spellbook.SetCustomSpellInfo(data, nullptr, type);
 		}
 		actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 	}

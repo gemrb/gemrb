@@ -66,7 +66,7 @@ private:
 		unsigned int totalgain;
 
 		bool isHeard(const Point &listener) const;
-		tick_t enqueue();
+		tick_t enqueue() const;
 	};
 	std::vector<AmbientSource *> ambientSources;
 	

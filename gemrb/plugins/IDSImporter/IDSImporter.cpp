@@ -117,7 +117,7 @@ int IDSImporter::GetValueIndex(size_t Index) const
 
 int IDSImporter::FindString(char *str, int len) const
 {
-	size_t i = pairs.size();
+	int i = static_cast<int>(pairs.size());
 	while(i--) {
 		if (strnicmp(pairs[i].str, str, len) == 0) {
 			return i;
@@ -128,7 +128,7 @@ int IDSImporter::FindString(char *str, int len) const
 
 int IDSImporter::FindValue(int val) const
 {
-	size_t i = pairs.size();
+	size_t i = static_cast<int>(pairs.size());
 	while(i--) {
 		if(pairs[i].val==val) {
 			return i;
