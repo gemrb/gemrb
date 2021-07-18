@@ -434,8 +434,6 @@ Actor::Actor()
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
 
-	memset(ShortName, 0, sizeof(ShortName));
-	memset(LongName, 0, sizeof(LongName));
 	LongStrRef = ieStrRef(-1);
 	ShortStrRef = ieStrRef(-1);
 
