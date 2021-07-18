@@ -487,6 +487,11 @@ static bool DoSaveGame(const char *Path, bool overrideRunning)
 static int CanSave()
 {
 	//some of these restrictions might not be needed
+	if (core->InCutSceneMode()) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
+		return 1;
+	}
+
 	const Store *store = core->GetCurrentStore();
 	if (store) {
 		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, DMC_BG2XPGREEN);
