@@ -1131,9 +1131,11 @@ int Interface::Init(InterfaceConfig* cfg)
 	// AppImage doesn't support relative urls at all
 	// we set the path to the data dir to cover unhardcoded and co,
 	// while plugins are statically linked, so it doesn't matter for them
+	// Also, support running from eg. KDevelop AppImages by checking the name.
 #ifdef DATA_DIR
 	const char* appDir = getenv("APPDIR");
-	if (appDir) {
+	const char* appImageFile = getenv("ARGV0");
+	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
 		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
 		PathJoin(config.GemRBPath, appDir, DATA_DIR, nullptr);
 	}
