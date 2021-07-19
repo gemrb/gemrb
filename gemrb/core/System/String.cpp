@@ -148,7 +148,7 @@ String* StringFromCString(const char* string)
 {
 	// if multibyte is false this is basic expansion of cstring to wchar_t
 	// the only reason this is special, is because it allows characters 128-256.
-	return StringFromEncodedData((ieByte*)string, core->TLKEncoding);
+	return StringFromEncodedData((const ieByte*) string, core->TLKEncoding);
 }
 
 char* MBCStringFromString(const String& string)

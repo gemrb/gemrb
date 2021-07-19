@@ -6958,8 +6958,6 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	const char* string = pcs->GetRowName(parameters->int0Parameter);
-	char name[32];
-	strnlwrcpy(name, string, 32);
 	Actor *actor = core->GetGame()->FindNPC(string);
 	if (!actor) {
 		return;
@@ -6969,7 +6967,7 @@ void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 	}
 	actor->SetOrientation(parameters->int1Parameter, false);
 	actor->MoveTo(parameters->pointParameter);
-	actor->Die(NULL);
+	actor->Die(nullptr);
 	actor->SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 }
 

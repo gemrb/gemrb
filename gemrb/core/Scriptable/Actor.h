@@ -698,7 +698,7 @@ public:
 	/* adds the combatants to the attackers list */
 	void AttackedBy(const Actor *actor);
 	/* reorients to face target (for immediate attack) */
-	void FaceTarget(Scriptable *actor);
+	void FaceTarget(const Scriptable *actor);
 	/* returns the number of attacks (handles monk barehanded bonus) */
 	ieDword GetNumberOfAttacks();
 	/* starts combat round*/

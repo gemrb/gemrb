@@ -90,8 +90,9 @@ void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, uns
 		//bla bla, something didn't work
 	}
 
-	if(!time_base.num || !time_base.den)
-	time_base.num = time_base.den = 0;
+	if (!time_base.num || !time_base.den) {
+		time_base.num = time_base.den = 0;
+	}
 }
 
 int BIKPlayer::ReadHeader()

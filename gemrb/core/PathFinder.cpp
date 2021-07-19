@@ -315,7 +315,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			// Already visited
 			if (isClosed[smptChild.y * mapSize.w + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
-			Actor* childActor = GetActor(nmptChild, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 

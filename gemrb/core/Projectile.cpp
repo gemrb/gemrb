@@ -606,7 +606,7 @@ void Projectile::Payload()
 	effects = NULL;
 }
 
-void Projectile::ApplyDefault()
+void Projectile::ApplyDefault() const
 {
 	Actor *actor = area->GetActorByGlobalID(Caster);
 	if (actor) {
@@ -702,21 +702,20 @@ void Projectile::ChangePhase()
 }
 
 //Call this only if Extension exists!
-int Projectile::CalculateExplosionCount()
+int Projectile::CalculateExplosionCount() const
 {
 	int count = 0;
-	Actor *act = area->GetActorByGlobalID(Caster);
-	if(act) {
+	const Actor *act = area->GetActorByGlobalID(Caster);
+	if (act) {
 		if (Extension->AFlags&PAF_LEV_MAGE) {
-			count = act->GetMageLevel();
-		}
-		else if (Extension->AFlags&PAF_LEV_CLERIC) {
-			count = act->GetClericLevel();
+			count = static_cast<int>(act->GetMageLevel());
+		} else if (Extension->AFlags&PAF_LEV_CLERIC) {
+			count = static_cast<int>(act->GetClericLevel());
 		}
 	}
 
 	if (!count) {
-		 count = std::max<int>(1, Extension->ExplosionCount);
+		count = std::max<int>(1, Extension->ExplosionCount);
 	}
 	return count;
 }

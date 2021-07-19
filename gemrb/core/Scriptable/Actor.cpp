@@ -6592,7 +6592,7 @@ void Actor::AttackedBy(const Actor *attacker)
 	}
 }
 
-void Actor::FaceTarget( Scriptable *target)
+void Actor::FaceTarget(const Scriptable *target)
 {
 	if (!target) return;
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
@@ -9779,7 +9779,7 @@ void Actor::SetupFist()
 			ItemResRef = fistres[i][col];
 		}
 	}
-	CREItem *currentFist = inventory.GetSlotItem(slot);
+	const CREItem *currentFist = inventory.GetSlotItem(slot);
 	if (!currentFist || currentFist->ItemResRef != ItemResRef) {
 		inventory.SetSlotItemRes(ItemResRef, slot);
 	}

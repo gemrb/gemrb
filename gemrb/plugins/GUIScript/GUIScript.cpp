@@ -10547,8 +10547,9 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	if (initDialog) {
-		if (initDialog == 2)
-		GameScript::SetLeavePartyDialogFile(actor, NULL);
+		if (initDialog == 2) {
+			GameScript::SetLeavePartyDialogFile(actor, nullptr);
+		}
 		if(actor->GetBase(IE_HITPOINTS) > 0) {
 			actor->Stop();
 			actor->AddAction( GenerateAction("Dialogue([PC])") );

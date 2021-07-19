@@ -375,7 +375,7 @@ private:
 	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
 	//apply default spell
-	void ApplyDefault();
+	void ApplyDefault() const;
 	//stops the current sound
 	void StopSound();
 	//kickstarts the secondary sound
@@ -405,7 +405,7 @@ private:
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag() const;
 	//logic to resolve the explosion count (may be based on caster level)
-	int CalculateExplosionCount();
+	int CalculateExplosionCount() const;
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);

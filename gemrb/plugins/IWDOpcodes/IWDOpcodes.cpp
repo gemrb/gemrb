@@ -3140,7 +3140,7 @@ int fx_executioner_eyes (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 //429 EffectsOnStruck (a much simpler version of CastSpellOnCondition)
 int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect* fx)
 {
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_APPLIED;
 
 	Actor *actor = map->GetActorByGlobalID(target->LastHitter);
@@ -3149,7 +3149,7 @@ int fx_effects_on_struck (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
-	if (entry!=NULL) {
+	if (entry) {
 		ieDword dist = GetSpellDistance(fx->Resource, target);
 		if (!dist) return FX_APPLIED;
 		if (PersonalDistance(target, actor) > dist) return FX_APPLIED;
@@ -3419,14 +3419,14 @@ int fx_cleave (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// print("fx_cleave(%2d) Amount:%d", fx->Opcode, fx->Parameter1);
 	//just remain dormant after first apply for the remaining duration (possibly disabling more cleaves)
 	if (!fx->FirstApply) return FX_APPLIED;
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) return FX_NOT_APPLIED;
 
 	//reset attackcount to a previous number and hack the current opponent to another enemy nearby
 	//SeeCore returns the closest living enemy
 	//FIXME:the previous opponent must be dead by now, or this code won't work
 	if (SeeCore(target, Enemy, false) ) {
-		Actor *enemy = map->GetActorByGlobalID(target->LastSeen);
+		const Actor *enemy = map->GetActorByGlobalID(target->LastSeen);
 		//50 is more like our current weapon range
 		if (enemy && (PersonalDistance(enemy, target)<50) && target->LastSeen!=target->LastTarget) {
 			displaymsg->DisplayConstantStringNameValue(STR_CLEAVE, DMC_WHITE, target, fx->Parameter1);

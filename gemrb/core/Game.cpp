@@ -1797,11 +1797,8 @@ bool Game::RestParty(int checks, int dream, int hp)
 		if (hoursLeft) {
 			// partial rest only, so adjust the parameters for the loop below
 			if (hp) {
-				hp = hp * (hours - hoursLeft) / hours;
 				// 0 means full heal, so we need to cancel it if we rounded to 0
-				if (!hp) {
-					hp = 1;
-				}
+				hp = std::max(1, hp * (hours - hoursLeft) / hours);
 			}
 			hours -= hoursLeft;
 			// the interruption occured before any resting could be done, so just bail out

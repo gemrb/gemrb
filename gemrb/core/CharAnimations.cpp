@@ -503,7 +503,8 @@ void CharAnimations::InitAvatarsTable() const
 	if (!Avatars) {
 		error("CharAnimations", "A critical animation file is missing!\n");
 	}
-	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
+	AvatarsCount = Avatars->GetRowCount();
+	AvatarTable = (AvatarStruct *) calloc(AvatarsCount, sizeof(AvatarStruct));
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (int i = AvatarsCount - 1; i >= 0; i--) {
 		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
