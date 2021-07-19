@@ -675,10 +675,10 @@ public:
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ResRef& resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
+	const ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
 	if range is nonzero, then which is valid */
-	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
+	const ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor */
@@ -711,9 +711,9 @@ public:
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* checks if something is wrong with the weapon we are using for the attack */
-	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
+	bool WeaponIsUsable(bool leftorright, const ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
-	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
+	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);

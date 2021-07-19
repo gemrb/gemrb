@@ -1398,14 +1398,12 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
 	Spell *spell = gamedata->GetSpell(removed, true);
 	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
-	if (spell->ExtHeaderCount > 1) {
+	if (spell->ext_headers.size() > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", removed.CString());
 	}
 	const SPLExtHeader *sph = spell->GetExtHeader(0);
 	if (!sph) return; // some iwd2 clabs are only markers
-	for (int i=0; i < sph->FeatureCount; i++) {
-		const Effect *origfx = sph->features[i];
-
+	for (const Effect *origfx : sph->features) {
 		if (origfx->TimingMode != FX_DURATION_INSTANT_PERMANENT) continue;
 		if (!(Opcodes[origfx->Opcode].Flags & EFFECT_SPECIAL_UNDO)) continue;
 

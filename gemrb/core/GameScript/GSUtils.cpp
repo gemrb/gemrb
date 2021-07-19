@@ -1467,7 +1467,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	WeaponInfo wi;
 	bool leftorright = false;
-	ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
+	const ITMExtHeader *header = actor->GetWeapon(wi, leftorright);
 	//will return false on any errors (eg, unusable weapon)
 	if (!header || !actor->WeaponIsUsable(leftorright, header)) {
 		actor->StopAttack();

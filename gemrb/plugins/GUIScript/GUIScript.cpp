@@ -12459,8 +12459,8 @@ static PyObject* GemRB_GetCombatDetails(PyObject * /*self*/, PyObject* args)
 
 	leftorright = leftorright&1;
 	WeaponInfo wi;
-	ITMExtHeader *header = NULL; // contains the weapon header
-	ITMExtHeader *hittingheader = NULL; // same header, except for ranged weapons it is the ammo header
+	const ITMExtHeader *header = nullptr; // contains the weapon header
+	const ITMExtHeader *hittingheader = nullptr; // same header, except for ranged weapons it is the ammo header
 	int tohit=20;
 	int DamageBonus=0;
 	int CriticalBonus=0;

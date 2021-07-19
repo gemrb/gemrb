@@ -3410,7 +3410,7 @@ void Actor::RefreshPCStats() {
 
 	//get the wspattack bonuses for proficiencies
 	WeaponInfo wi;
-	ITMExtHeader *header = GetWeapon(wi, false);
+	const ITMExtHeader *header = GetWeapon(wi, false);
 	ieDword stars;
 	int dualwielding = IsDualWielding();
 	stars = GetProficiency(wi.prof)&PROFS_MASK;
@@ -5867,7 +5867,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef.CString());
 		return; //quick item slot contains invalid item resref
 	}
-	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
+	const ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
 	//item has no extended header, or header index is wrong
 	if (!ext_header) return;
 	item->CopyITMExtHeader(*ext_header);
@@ -5990,7 +5990,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 			assert(slotitm);
 			Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
 			assert(itm);
-			ITMExtHeader *ext_header = itm->GetExtHeader(header);
+			const ITMExtHeader *ext_header = itm->GetExtHeader(header);
 			if (ext_header) {
 				int type = ext_header->ProjectileQualifier;
 				int weaponslot = inventory.FindTypedRangedWeapon(type);
@@ -6230,7 +6230,7 @@ void Actor::GetPrevAnimation()
 
 //slot is the projectile slot
 //This will return the projectile item.
-ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
+const ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 {
 //EquippedSlot is the projectile. To get the weapon, use inventory.GetUsedWeapon()
 	wi.slot = inventory.GetEquippedSlot();
@@ -6251,7 +6251,7 @@ ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	//not resetting wi.itemtype, since we want it to remain the one of the launcher
 	//wi.range is not set, the projectile has no effect on range?
 
-	ITMExtHeader *which = item->GetWeaponHeader(true);
+	const ITMExtHeader *which = item->GetWeaponHeader(true);
 	gamedata->FreeItem(item, wield->ItemResRef, false);
 	return which;
 }
@@ -6280,7 +6280,7 @@ int Actor::IsDualWielding() const
 
 //returns weapon header currently used (bow in case of bow+arrow)
 //if range is nonzero, then the returned header is valid
-ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
+const ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 {
 	//only use the shield slot if we are dual wielding
 	leftorright = leftorright && IsDualWielding();
@@ -6304,7 +6304,7 @@ ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 
 	//select first weapon header
 	// except you can never dualwield two ranged (thrown) weapons
-	ITMExtHeader *which;
+	const ITMExtHeader *which;
 	if (!leftorright && GetAttackStyle() == WEAPON_RANGED) {
 		which = item->GetWeaponHeader(true);
 		if (which) {
@@ -6559,7 +6559,7 @@ int Actor::GetAttackStyle() const
 	// Some weapons have both melee and ranged capability, eg. bg2's rifthorne (ax1h09)
 	// so we check the equipped header's attack type: 2-projectile and 4-launcher
 	// It is more complicated than it seems because the equipped header is the one of the projectile for launchers
-	ITMExtHeader *rangedheader = GetRangedWeapon(wi);
+	const ITMExtHeader *rangedheader = GetRangedWeapon(wi);
 	if (!PCStats) {
 		// fall back to simpler logic that works most of the time
 		//Non NULL if the equipped slot is a projectile or a throwing weapon
@@ -6567,7 +6567,7 @@ int Actor::GetAttackStyle() const
 		return WEAPON_MELEE;
 	}
 
-	ITMExtHeader *eh;
+	const ITMExtHeader *eh;
 	if (inventory.MagicSlotEquipped()) {
 		// this should be fine, as long as we default to melee,
 		// since there are no "magic" weapons with switchable headers
@@ -6734,7 +6734,7 @@ int Actor::BAB2APR(int pBAB, int pBABDecrement, int CheckRapidShot) const
 {
 	if (CheckRapidShot && HasSpellState(SS_RAPIDSHOT)) {
 		WeaponInfo wi;
-		ITMExtHeader *HittingHeader = GetRangedWeapon(wi);
+		const ITMExtHeader *HittingHeader = GetRangedWeapon(wi);
 		if (HittingHeader) {
 			ieDword AttackTypeLowBits = HittingHeader->AttackType & 0xFF; // this is done by the original; leaving in case we expand
 			if (AttackTypeLowBits == ITEM_AT_BOW || AttackTypeLowBits == ITEM_AT_PROJECTILE) {
@@ -6803,7 +6803,7 @@ void Actor::InitRound(ieDword gameTime)
 }
 
 // a simplified check from GetCombatDetails for use in AttackCore
-bool Actor::WeaponIsUsable(bool leftorright, ITMExtHeader *header) const
+bool Actor::WeaponIsUsable(bool leftorright, const ITMExtHeader *header) const
 {
 	WeaponInfo wi;
 	if (!header) {
@@ -6812,7 +6812,7 @@ bool Actor::WeaponIsUsable(bool leftorright, ITMExtHeader *header) const
 			return false;
 		}
 	}
-	ITMExtHeader *rangedheader;
+	const ITMExtHeader *rangedheader;
 	switch(header->AttackType) {
 		case ITEM_AT_MELEE:
 		case ITEM_AT_PROJECTILE: //throwing weapon
@@ -6830,7 +6830,7 @@ bool Actor::WeaponIsUsable(bool leftorright, ITMExtHeader *header) const
 	return true;
 }
 
-bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader, \
+bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader, \
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target)
 {
 	SetBaseAPRandAB(true);
@@ -6843,7 +6843,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 	style = 0;
 	CriticalBonus = 0;
 	hittingheader = header;
-	ITMExtHeader *rangedheader = NULL;
+	const ITMExtHeader *rangedheader = nullptr;
 	int THAC0Bonus = hittingheader->THAC0Bonus;
 	DamageBonus = hittingheader->DamageBonus;
 
@@ -7006,9 +7006,8 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, ITMEx
 				}
 			} else {
 				// lookup the offhand
-				ITMExtHeader *header2;
 				WeaponInfo wi2;
-				header2 = GetWeapon(wi2, true);
+				const ITMExtHeader* header2 = GetWeapon(wi2, true);
 				if (header2->RechargeFlags&IE_ITEM_USEDEXTERITY) { // identical to the WEAPON_FINESSE check
 					prof += 2;
 				}
@@ -7218,8 +7217,7 @@ int Actor::GetDefense(int DamageType, ieDword wflags, const Actor *attacker) con
 	//check for s/s and single weapon ac bonuses
 	if (!IsDualWielding() && wssingle && wsswordshield) {
 		WeaponInfo wi;
-		ITMExtHeader* header;
-		header = GetWeapon(wi, false);
+		const ITMExtHeader* header = GetWeapon(wi, false);
 		//make sure we're wielding a single melee weapon
 		if (header && (header->AttackType == ITEM_AT_MELEE)) {
 			int slot;
@@ -7351,8 +7349,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 
 	WeaponInfo wi;
-	ITMExtHeader *header = NULL;
-	ITMExtHeader *hittingheader = NULL;
+	const ITMExtHeader *header = nullptr;
+	const ITMExtHeader *hittingheader = nullptr;
 	int tohit;
 	int DamageBonus, CriticalBonus;
 	int speed, style;
@@ -9519,7 +9517,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 			delete pro;
 		} else if (((int)header < 0) && !(flags&UI_MISS)) { //using a weapon
 			bool ranged = header == (ieDword)-2;
-			ITMExtHeader *which = itm->GetWeaponHeader(ranged);
+			const ITMExtHeader *which = itm->GetWeaponHeader(ranged);
 			Effect* AttackEffect = EffectQueue::CreateEffect(fx_damage_ref, damage, (weapon_damagetype[which->DamageType])<<16, FX_DURATION_INSTANT_LIMITED);
 			AttackEffect->Projectile = which->ProjectileAnimation;
 			AttackEffect->Target = FX_TARGET_PRESET;
@@ -9683,11 +9681,11 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation
 		core->SetEventFlag(EF_UPDATEANIM);
 	}
 	WeaponInfo wi;
-	ITMExtHeader *header = GetWeapon(wi);
+	const ITMExtHeader *header = GetWeapon(wi);
 
 	if(header && ((header->AttackType == ITEM_AT_BOW) ||
 		(header->AttackType == ITEM_AT_PROJECTILE && header->ProjectileQualifier))) {
-		ITMExtHeader* projHeader = GetRangedWeapon(wi);
+		const ITMExtHeader* projHeader = GetRangedWeapon(wi);
 		if (projHeader->ProjectileQualifier == 0) return; /* no ammo yet? */
 		AttackStance = IE_ANI_SHOOT;
 		anims->SetRangedType(projHeader->ProjectileQualifier-1);
