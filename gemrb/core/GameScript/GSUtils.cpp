@@ -1274,7 +1274,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
+	if (!gc->dialoghandler->InitDialog(scr, tar, ResRef(Dialog))) {
 		if (!(Flags & BD_NOEMPTY)) {
 			displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, DMC_RED, tar);
 		}

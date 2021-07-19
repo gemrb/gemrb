@@ -98,25 +98,25 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref, ieDword si)
+bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& dialogRef, ieDword si)
 {
 	delete dlg;
 	dlg = nullptr;
 
-	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
+	if (dialogRef.IsEmpty() || dialogRef.IsStar()) {
 		return false;
 	}
 
 	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
-	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
+	dm->Open(gamedata->GetResource(dialogRef, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
+		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dialogRef.CString(), spk->GetName(1), tgt->GetName(1));
 		return false;
 	}
 
-	dlg->resRef = ResRef::MakeLowerCase(dlgref); //this isn't handled by GetDialog???
+	dlg->resRef = dialogRef; //this isn't handled by GetDialog???
 
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was

@@ -43,7 +43,7 @@ public:
 	void SetSpeaker(const Scriptable *scr) { speakerID = scr->GetGlobalID(); }
 	void SetTarget(const Scriptable *scr) { targetID = scr->GetGlobalID(); }
 
-	bool InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref, ieDword si=-1);
+	bool InitDialog(Scriptable* speaker, Scriptable* target, const ResRef& dlgref, ieDword si = -1);
 	void EndDialog(bool try_to_break=false);
 	bool DialogChoose(unsigned int choose);
 
