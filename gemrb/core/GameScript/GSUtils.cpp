@@ -2940,4 +2940,70 @@ void AddXPCore(Action *parameters, bool divide)
 	core->PlaySound(DS_GOTXP, SFX_CHAN_ACTIONS);
 }
 
+int NumItemsCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target) {
+		return 0;
+	}
+
+	const Inventory *inventory = nullptr;
+	if (target->Type == ST_ACTOR) {
+		inventory = &(((const Actor *) target)->inventory);
+	} else if (target->Type == ST_CONTAINER) {
+		inventory = &(((const Container *) target)->inventory);
+	}
+	if (!inventory) {
+		return 0;
+	}
+
+	return inventory->CountItems(parameters->string0Parameter, true);
+}
+
+static EffectRef fx_level_bounce_ref = { "Bounce:SpellLevel", -1 };
+static EffectRef fx_level_bounce_dec_ref = { "Bounce:SpellLevelDec", -1 };
+unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target || target->Type != ST_ACTOR) {
+		return 0;
+	}
+	const Actor *actor = (const Actor *) target;
+
+	unsigned int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
+		bounceCount = 0xFFFFFFFF;
+	} else {
+		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount;
+}
+
+static EffectRef fx_level_immunity_ref = { "Protection:Spelllevel", -1 };
+static EffectRef fx_level_immunity_dec_ref = { "Protection:SpellLevelDec", -1 };
+int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters)
+{
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	if (!target || target->Type != ST_ACTOR) {
+		return 0;
+	}
+	const Actor *actor = (const Actor *) target;
+
+	unsigned int bounceCount = 0;
+	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
+		bounceCount = 0xFFFFFFFF;
+	} else {
+		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
+		if (fx) {
+			bounceCount = fx->Parameter1;
+		}
+	}
+
+	return bounceCount;
+}
+
 }

@@ -139,6 +139,9 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags);
 void SpellPointCore(Scriptable *Sender, Action *parameters, int flags);
 Gem_Polygon *GetPolygon2DA(ieDword index);
 void AddXPCore(Action *parameters, bool divide = false);
+int NumItemsCore(Scriptable *Sender, const Trigger *parameters);
+unsigned int NumBouncingSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
+int NumImmuneToSpellLevelCore(Scriptable *Sender, const Trigger *parameters);
 
 inline int Bones(ieDword value)
 {

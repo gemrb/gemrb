@@ -928,31 +928,6 @@ int GameScript::NumItemsPartyLT(Scriptable */*Sender*/, const Trigger *parameter
 	return cnt<parameters->int0Parameter;
 }
 
-int GameScript::NumItems(Scriptable *Sender, const Trigger *parameters)
-{
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
-
-	const Inventory *inv = nullptr;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt==parameters->int0Parameter;
-}
-
 int GameScript::TotalItemCnt(Scriptable *Sender, const Trigger *parameters)
 {
 	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
@@ -975,29 +950,22 @@ int GameScript::TotalItemCntExclude(Scriptable *Sender, const Trigger *parameter
 	return cnt==parameters->int0Parameter;
 }
 
+int GameScript::NumItems(Scriptable *Sender, const Trigger *parameters)
+{
+	int num = NumItemsCore(Sender, parameters);
+	return num == parameters->int0Parameter;
+}
+
 int GameScript::NumItemsGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
+	int num = NumItemsCore(Sender, parameters);
+	return num > parameters->int0Parameter;
+}
 
-	const Inventory *inv = NULL;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt>parameters->int0Parameter;
+int GameScript::NumItemsLT(Scriptable *Sender, const Trigger *parameters)
+{
+	int num = NumItemsCore(Sender, parameters);
+	return num < parameters->int0Parameter;
 }
 
 int GameScript::TotalItemCntGT(Scriptable *Sender, const Trigger *parameters)
@@ -1020,31 +988,6 @@ int GameScript::TotalItemCntExcludeGT(Scriptable *Sender, const Trigger *paramet
 	const Actor *actor = (const Actor *) tar;
 	int cnt = actor->inventory.CountItems("", true) - actor->inventory.CountItems(parameters->string0Parameter, true); //shall we count heaps or not?
 	return cnt>parameters->int0Parameter;
-}
-
-int GameScript::NumItemsLT(Scriptable *Sender, const Trigger *parameters)
-{
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar) {
-		return 0;
-	}
-
-	const Inventory *inv = nullptr;
-	switch (tar->Type) {
-		case ST_ACTOR:
-			inv = &(((const Actor *) tar)->inventory);
-			break;
-		case ST_CONTAINER:
-			inv = &(((const Container *) tar)->inventory);
-			break;
-		default:;
-	}
-	if (!inv) {
-		return 0;
-	}
-
-	int cnt = inv->CountItems(parameters->string0Parameter, true);
-	return cnt<parameters->int0Parameter;
 }
 
 int GameScript::TotalItemCntLT(Scriptable *Sender, const Trigger *parameters)
@@ -4388,65 +4331,20 @@ int GameScript::BouncingSpellLevel(Scriptable *Sender, const Trigger *parameters
  */
 int GameScript::NumBouncingSpellLevel(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount == (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount == static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumBouncingSpellLevelGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount > (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount > static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumBouncingSpellLevelLT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_bounce_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_bounce_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount < (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumBouncingSpellLevelCore(Sender, parameters);
+	return bounceCount < static_cast<unsigned>(parameters->int1Parameter);
 }
 
 /* Returns true if the target creature specified by Object is protected from spells of power Level.
@@ -4472,65 +4370,20 @@ int GameScript::ImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters
  */
 int GameScript::NumImmuneToSpellLevel(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount == (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount == static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumImmuneToSpellLevelGT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount > (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount > static_cast<unsigned>(parameters->int1Parameter);
 }
 
 int GameScript::NumImmuneToSpellLevelLT(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *tar = GetActorFromObject(Sender, parameters->objectParameter);
-	if (!tar || tar->Type != ST_ACTOR) {
-		return 0;
-	}
-	const Actor *actor = (const Actor *) tar;
-
-	unsigned int bounceCount = 0;
-	if (actor->fxqueue.HasEffectWithPower(fx_level_immunity_ref, parameters->int0Parameter)) {
-		bounceCount = 0xFFFFFFFF;
-	} else {
-		const Effect *fx = actor->fxqueue.HasEffectWithPower(fx_level_immunity_dec_ref, parameters->int0Parameter);
-		if (fx) {
-			bounceCount = fx->Parameter1;
-		}
-	}
-
-	return bounceCount < (unsigned) parameters->int1Parameter;
+	unsigned int bounceCount = NumImmuneToSpellLevelCore(Sender, parameters);
+	return bounceCount < static_cast<unsigned>(parameters->int1Parameter);
 }
 
 // Compares the number of ticks left of time stop to Number.
