@@ -266,7 +266,7 @@ Item* ITMImporter::GetItem(Item *s)
 		s->ItemExcl = 0;
 	}
 
-	s->ext_headers = new ITMExtHeader[s->ExtHeaderCount];
+	s->ext_headers = std::vector<ITMExtHeader>(s->ExtHeaderCount);
 
 	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
@@ -339,7 +339,8 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->ReadWord(eh->DiceThrown);
 	str->ReadScalar<ieWordSigned>(eh->DamageBonus);
 	str->ReadWord(eh->DamageType);
-	str->ReadWord(eh->FeatureCount);
+	ieWord featureCount;
+	str->ReadWord(featureCount);
 	str->ReadWord(eh->FeatureOffset);
 	str->ReadWord(eh->Charges);
 	str->ReadWord(eh->ChargeDepletion);
@@ -387,9 +388,9 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	eh->ProjectileQualifier = pq;
 
 	//48 is the size of the feature block
-	eh->features.reserve(eh->FeatureCount);
+	eh->features.reserve(featureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
+	for (ieWord i = 0; i < featureCount; i++) {
 		eh->features.push_back(GetFeature(s));
 	}
 }

@@ -154,7 +154,6 @@ public:
 	ieWord DiceThrown;
 	ieWordSigned DamageBonus; //this must be signed!!!
 	ieWord DamageType;
-	ieWord FeatureCount;
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
@@ -174,9 +173,8 @@ public:
 class GEM_EXPORT Item {
 public:
 	Item();
-	~Item();
 
-	ITMExtHeader *ext_headers;
+	std::vector<ITMExtHeader> ext_headers;
 	std::vector<Effect*> equipping_features;
 	ResRef Name; //the resref of the item itself!
 
@@ -260,14 +258,14 @@ public:
 
 	//returns the requested extended header
 	//-1 will return melee weapon header, -2 the ranged one
-	ITMExtHeader *GetExtHeader(int which) const
+	const ITMExtHeader *GetExtHeader(int which) const
 	{
 		if(which < 0)
 			return GetWeaponHeader(which == -2) ;
 		if(ExtHeaderCount<=which) {
 			return NULL;
 		}
-		return ext_headers+which;
+		return &ext_headers[which];
 	}
 	ieDword GetWieldedGradient() const
 	{
@@ -283,9 +281,9 @@ public:
 	//this stuff is not item specific, could be moved elsewhere
 	Effect *BuildGlowEffect(int gradient) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
+	int GetDamagePotential(bool ranged, const ITMExtHeader *&header) const;
 	//returns the weapon header
-	ITMExtHeader *GetWeaponHeader(bool ranged) const;
+	const ITMExtHeader *GetWeaponHeader(bool ranged) const;
 	int GetWeaponHeaderNumber(bool ranged) const;
 	int GetEquipmentHeaderNumber(int cnt) const;
 	unsigned int GetCastingDistance(int header) const;

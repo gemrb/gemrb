@@ -3877,7 +3877,7 @@ void Interface::SanitizeItem(CREItem *item) const
 			//set charge counters for non-rechargeable items if their charge is zero
 			//set charge counters for items not using charges to one
 			for (int i = 0; i < CHARGE_COUNTERS; i++) {
-				ITMExtHeader *h = itm->GetExtHeader(i);
+				const ITMExtHeader *h = itm->GetExtHeader(i);
 				if (h) {
 					if (item->Usages[i] == 0) {
 						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {

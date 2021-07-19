@@ -9234,7 +9234,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyObject* tooltiptuple = PyTuple_New(ehc);
 	PyObject* locationtuple = PyTuple_New(ehc);
 	for(int i=0;i<ehc;i++) {
-		ITMExtHeader *eh = item->ext_headers+i;
+		const ITMExtHeader *eh = &item->ext_headers[i];
 		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
 		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));
 		PyDict_SetItemString(dict, "MaxCharge", DecRef(PyInt_FromLong, eh->Charges));
@@ -9252,17 +9252,15 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			function|=CAN_DRINK;
 	}
 	if (core->CanUseItemType(SLOT_SCROLL, item, actor, false) ) {
-		const ITMExtHeader *eh;
-		const Effect *f;
 		//determining if this is a copyable scroll
 		if (ehc<2) {
 			goto not_a_scroll;
 		}
-		eh = item->ext_headers+1;
-		if (eh->FeatureCount<1) {
+		const ITMExtHeader *eh = &item->ext_headers[1];
+		if (eh->features.size() < 1) {
 			goto not_a_scroll;
 		}
-		f = eh->features[0];
+		const Effect *f = eh->features[0];
 
 		//normally the learn spell opcode is 147
 		EffectQueue::ResolveEffect(fx_learn_spell_ref);

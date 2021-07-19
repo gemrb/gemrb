@@ -80,7 +80,6 @@ void ItemExtHeader::CopyITMExtHeader(const ITMExtHeader &src)
 	DiceThrown = src.DiceThrown;
 	DamageBonus = src.DamageBonus;
 	DamageType = src.DamageType;
-	FeatureCount = src.FeatureCount;
 	FeatureOffset = src.FeatureOffset;
 	Charges = src.Charges;
 	ChargeDepletion = src.ChargeDepletion;
@@ -1290,7 +1289,7 @@ int Inventory::GetEquippedHeader() const
 }
 
 // store this internally just like Equipped/EquippedHeader if it turns into a hot path
-ITMExtHeader *Inventory::GetEquippedExtHeader(int header) const
+const ITMExtHeader *Inventory::GetEquippedExtHeader(int header) const
 {
 	int slot; // Equipped holds the projectile, not the weapon
 	const CREItem *itm = GetUsedWeapon(false, slot); // check the main hand only
@@ -1513,7 +1512,7 @@ void Inventory::EquipBestWeapon(int flags)
 {
 	int damage = -1;
 	ieDword best_slot = SLOT_FIST;
-	ITMExtHeader *header;
+	const ITMExtHeader *header;
 	CREItem *Slot;
 	char AnimationType[2]={0,0};
 	ieWord MeleeAnimation[3]={100,0,0};
@@ -1597,7 +1596,7 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 			continue;
 		}
 		for(int ehc=0;ehc<itm->ExtHeaderCount;ehc++) {
-			const ITMExtHeader *ext_header = itm->ext_headers + ehc;
+			const ITMExtHeader *ext_header = &itm->ext_headers[ehc];
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;
 			}
@@ -1696,7 +1695,7 @@ void Inventory::UpdateWeaponAnimation()
 
 	// TODO: fix bows?
 
-	ITMExtHeader *header = 0;
+	const ITMExtHeader *header = 0;
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (itm) {
 		itm->GetDamagePotential(false, header);
