@@ -1152,7 +1152,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// starting a dialog ends cutscenes!
 	core->SetCutSceneMode(false);
 
-	const char* Dialog = NULL;
+	ResRef Dialog;
 	AutoTable pdtable;
 
 	switch (Flags & BD_LOCMASK) {
@@ -1180,7 +1180,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
 			PlayerDialogRes[5] = '1';
-			Dialog = ( const char * ) PlayerDialogRes;
+			Dialog = PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
 			const Game *game = core->GetGame();
@@ -1193,7 +1193,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 			/* banter dialogue */
 			pdtable.load("interdia");
-			//Dialog is a borrowed reference, and pdtable will be freed automagically
 			if (pdtable) {
 				//5 is the magic number for the ToB expansion
 				if (game->Expansion==5) {
@@ -1274,7 +1273,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-	if (!gc->dialoghandler->InitDialog(scr, tar, ResRef(Dialog))) {
+	if (!gc->dialoghandler->InitDialog(scr, tar, Dialog)) {
 		if (!(Flags & BD_NOEMPTY)) {
 			displaymsg->DisplayConstantStringName(STR_NOTHINGTOSAY, DMC_RED, tar);
 		}
