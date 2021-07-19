@@ -233,6 +233,61 @@ void DialogHandler::EndDialog(bool try_to_break)
 	core->SetEventFlag(EF_PORTRAIT);
 }
 
+// TODO: work out if this should go somewhere more central (such
+// as GetActorByDialog), or if there's a less awful way to do this
+// (we could cache the entries, for example)
+static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
+{
+	AutoTable pdtable("interdia");
+	if (!pdtable) return 0;
+
+	int col;
+	if (core->GetGame()->Expansion == 5) {
+		col = pdtable->GetColumnIndex("25FILE");
+	} else {
+		col = pdtable->GetColumnIndex("FILE");
+	}
+	int row = pdtable->FindTableValue(col, dialog);
+	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
+}
+
+int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)
+{
+	int idx = 0;
+	// first looking for a 'continue' opportunity, the order is descending (a la IE)
+	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
+		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+			if (ds->transitions[x]->condition && !ds->transitions[x]->condition->Evaluate(target)) {
+				continue;
+			}
+		}
+
+		idx++;
+		if (ds->transitions[x]->textStrRef == 0xffffffff) {
+			// dialogchoose should be set to x
+			// it isn't important which END option was chosen, as it ends
+			core->GetDictionary()->SetAt("DialogOption", x);
+			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
+				core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
+				break;
+			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+				if (ds->transitions[x]->condition && !ds->transitions[x]->condition->Evaluate(target)) {
+					continue;
+				}
+			}
+			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
+			break;
+		} else {
+			String* string = core->GetString(ds->transitions[x]->textStrRef);
+			options.emplace_back(x, *string);
+			delete string;
+		}
+	}
+
+	std::reverse(options.begin(), options.end());
+	return idx;
+}
+
 bool DialogHandler::DialogChoose(unsigned int choose)
 {
 	TextArea* ta = core->GetMessageTextArea();
@@ -364,25 +419,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			if (!tgt) {
 				// try searching for banter dialogue: the original engine seems to
 				// happily let you randomly switch between normal and banter dialogs
-
-				// TODO: work out if this should go somewhere more central (such
-				// as GetActorByDialog), or if there's a less awful way to do this
-				// (we could cache the entries, for example)
-				AutoTable pdtable("interdia");
-				if (pdtable) {
-					int col;
-
-					if (core->GetGame()->Expansion==5) {
-						col = pdtable->GetColumnIndex("25FILE");
-					} else {
-						col = pdtable->GetColumnIndex("FILE");
-					}
-					int row = pdtable->FindTableValue( col, tr->Dialog );
-					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
-					if (tgt && tgt->Type == ST_ACTOR) {
-						tgta = (Actor *) tgt;
-					}
-				}
+				tgta = FindBanter(target, tr->Dialog);
+				tgt = tgta;
 			}
 			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
 			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
@@ -428,40 +466,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 
-	int idx = 0;
 	std::vector<SelectOption> dialogOptions;
-	//first looking for a 'continue' opportunity, the order is descending (a la IE)
-	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
-		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (ds->transitions[x]->condition &&
-				!ds->transitions[x]->condition->Evaluate(target)) {
-				continue;
-			}
-		}
-		idx++;
-		if (ds->transitions[x]->textStrRef == 0xffffffff) {
-			//dialogchoose should be set to x
-			//it isn't important which END option was chosen, as it ends
-			core->GetDictionary()->SetAt("DialogOption",x);
-			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-				gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
-				break;
-			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-				if (ds->transitions[x]->condition &&
-					!ds->transitions[x]->condition->Evaluate(target)) {
-					continue;
-				}
-			}
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
-			break;
-		} else {
-			String* string = core->GetString( ds->transitions[x]->textStrRef );
-			dialogOptions.emplace_back(x, *string);
-			delete string;
-		}
-	}
-
-	std::reverse(dialogOptions.begin(), dialogOptions.end());
+	int idx = GetDialogOptions(ds, dialogOptions, target);
 	ta->SetSelectOptions(dialogOptions, true);
 	ControlEventHandler handler = [this](const Control* c) {
 		DialogChoose(c->GetValue());
