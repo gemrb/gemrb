@@ -161,7 +161,7 @@ public:
 			which = 0;
 		}
 
-		if (ext_headers.size() <= which) {
+		if (ext_headers.size() <= size_t(which)) {
 			return NULL;
 		}
 		return &ext_headers[which];

@@ -261,7 +261,7 @@ public:
 	{
 		if(which < 0)
 			return GetWeaponHeader(which == -2) ;
-		if (ext_headers.size() <= which) {
+		if (ext_headers.size() <= size_t(which)) {
 			return NULL;
 		}
 		return &ext_headers[which];
