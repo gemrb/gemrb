@@ -397,7 +397,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
 				tgta = GetLocalActorByGlobalID(originalTargetID);
-				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
+				if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
 					tgta = nullptr;
 				} else {
 					tgt = tgta;

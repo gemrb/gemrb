@@ -292,7 +292,7 @@ int GameScript::IsValidForPartyDialog(Scriptable *Sender, const Trigger *paramet
 	//don't accept parties with the no interrupt flag
 	//this fixes bug #2573808 on gamescript level
 	//(still someone has to turn the no interrupt flag off)
-	if(!target->GetDialog(GD_CHECK)) {
+	if (target->GetDialog(GD_CHECK).IsEmpty()) {
 		return 0;
 	}
 	return CanSee( Sender, target, false, GA_NO_DEAD|GA_NO_UNSCHEDULED );
