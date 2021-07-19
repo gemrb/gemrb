@@ -323,8 +323,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 bool Spell::ContainsDamageOpcode() const
 {
 	for (const SPLExtHeader& header : ext_headers) {
-		for (size_t i = 0; i < header.features.size(); ++i) {
-			const Effect *fx = header.features[i];
+		for (const Effect *fx : header.features) {
 			if (fx->Opcode == damageOpcode) {
 				return true;
 			}

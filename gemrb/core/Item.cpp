@@ -151,7 +151,7 @@ int Item::GetWeaponHeaderNumber(bool ranged) const
 		}
 		return int(ehc);
 	}
-	return -1; //invalid extheader number
+	return 0xffff; //invalid extheader number
 }
 
 int Item::GetEquipmentHeaderNumber(int cnt) const
@@ -171,7 +171,7 @@ int Item::GetEquipmentHeaderNumber(int cnt) const
 		}
 		return int(ehc);
 	}
-	return -1; //invalid extheader number
+	return 0xffff; //invalid extheader number
 }
 
 const ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
