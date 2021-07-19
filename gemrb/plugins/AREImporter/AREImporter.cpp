@@ -802,7 +802,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			c->Scripts[0] = new GameScript(Script, c);
 		}
-		c->KeyResRef = KeyResRef.IsEmpty() ? ResRef() : ResRef::MakeLowerCase(KeyResRef);
+		c->KeyResRef = KeyResRef;
 		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
@@ -1872,7 +1872,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) d->TrapLaunch.y;
 		stream->WriteWord(tmpWord);
-		stream->WriteResRef( d->KeyResRef);
+		stream->WriteResRefLC(d->KeyResRef);
 		const GameScript *s = d->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
@@ -2029,7 +2029,7 @@ int AREImporter::PutContainers(DataStream *stream, const Map *map, ieDword &Vert
 		stream->WriteWord(tmpWord); //vertex count is made short
 		//this is the real scripting name
 		stream->Write( c->GetScriptName(), 32);
-		stream->WriteResRef( c->KeyResRef);
+		stream->WriteResRefLC(c->KeyResRef);
 		stream->WriteDword(tmpDword); //unknown80
 		stream->WriteDword(c->OpenFail);
 		stream->Write( filling, 56); //unknown or unused stuff
@@ -2080,7 +2080,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) ip->TrapLaunch.y;
 		stream->WriteWord(tmpWord);
-		stream->WriteResRef( ip->KeyResRef);
+		stream->WriteResRefLC(ip->KeyResRef);
 		const GameScript *s = ip->Scripts[0];
 		if (s) {
 			stream->WriteResRefLC(s->GetName());
@@ -2458,7 +2458,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 			type = pro->GetType()+1;
 			dest = pro->GetDestination();
 			const ResRef& proName = pro->GetName();
-			name = proName.IsEmpty() ? nullptr : ResRef::MakeUpperCase(proName);
+			name = proName;
 			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				tmpWord = fxqueue->GetSavedEffectsCount();
@@ -2471,7 +2471,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 			if (actor) tmpByte = (ieByte) (actor->InParty-1);
 		}
 
-		stream->WriteResRef( name );
+		stream->WriteResRefUC(name);
 		stream->WriteDword(Offset);
 		//size of fxqueue;
 		assert(tmpWord<256);
