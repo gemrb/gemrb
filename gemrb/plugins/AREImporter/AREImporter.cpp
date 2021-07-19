@@ -802,7 +802,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			c->Scripts[0] = new GameScript(Script, c);
 		}
-		c->KeyResRef = KeyResRef.IsEmpty() ? nullptr : ResRef::MakeLowerCase(KeyResRef);
+		c->KeyResRef = KeyResRef.IsEmpty() ? ResRef() : ResRef::MakeLowerCase(KeyResRef);
 		if (!OpenFail) OpenFail = ieStrRef(-1); // rewrite 0 to -1
 		c->OpenFail = OpenFail;
 	}
