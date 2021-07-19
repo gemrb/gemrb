@@ -233,7 +233,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 {
 	AutoTable pdtable("interdia");
-	if (!pdtable) return 0;
+	if (!pdtable) return nullptr;
 
 	int col;
 	if (core->GetGame()->Expansion == 5) {
@@ -245,7 +245,7 @@ static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
 }
 
-int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)
+static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)
 {
 	int idx = 0;
 	// first looking for a 'continue' opportunity, the order is descending (a la IE)

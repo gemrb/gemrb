@@ -4608,7 +4608,7 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 
 	GET_GAME();
 
-	SaveGameIterator *sgip = core->GetSaveGameIterator();
+	const SaveGameIterator *sgip = core->GetSaveGameIterator();
 	if (!sgip) {
 		return RuntimeError("No savegame iterator");
 	}
@@ -7248,7 +7248,7 @@ returns it in a dictionary.\n\
 
 #define STOREBUTTON_COUNT 7
 #define STORETYPE_COUNT 7
-static const int storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT] = {
+static const int16_t storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT] = {
 	//store
 	{ STA_BUYSELL, STA_IDENTIFY | STA_OPTIONAL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL, STA_DRINK | STA_OPTIONAL, STA_ROOMRENT | STA_OPTIONAL },
 	// tavern
@@ -7265,7 +7265,7 @@ static const int storebuttons[STORETYPE_COUNT][STOREBUTTON_COUNT] = {
 	{ STA_BUYSELL, STA_STEAL | STA_OPTIONAL, STA_DONATE | STA_OPTIONAL, STA_CURE | STA_OPTIONAL} };
 
 //buy/sell, identify, steal, cure, donate, drink, rent
-static const int storeBits[7] = { IE_STORE_BUY | IE_STORE_SELL, IE_STORE_ID, IE_STORE_STEAL,
+static const int16_t storeBits[7] = { IE_STORE_BUY | IE_STORE_SELL, IE_STORE_ID, IE_STORE_STEAL,
 	IE_STORE_CURE, IE_STORE_DONATE, IE_STORE_DRINK, IE_STORE_RENT };
 
 static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)

@@ -32,7 +32,6 @@ from ie_stats import *
 CommonTables.Load ()
 
 def GetWindowPack():
-	width = GemRB.GetSystemVariable (SV_WIDTH)
 	height = GemRB.GetSystemVariable (SV_HEIGHT)
 
 	if GemRB.GameType == "pst":
