@@ -106,17 +106,12 @@ struct CritterEntry {
  */
 class SpawnEntry {
 public:
-	ieDword interval;
-	ieDword lastSpawndate;
-	int crittercount;
-	CritterEntry *critters;
-	char *name;
-	SpawnEntry() {
-		interval = lastSpawndate = 0;
-		crittercount = 0;
-		critters = NULL;
-		name = NULL;
-	}
+	ieDword interval = 0;
+	ieDword lastSpawndate = 0;
+	int crittercount = 0;
+	CritterEntry *critters = nullptr;
+	char *name = nullptr;
+	SpawnEntry() = default;
 	~SpawnEntry() {
 		if (critters) {
 			for (int i=0;i<crittercount;i++) {
