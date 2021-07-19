@@ -2153,14 +2153,14 @@ InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID) const
 Actor* Map::GetActorByGlobalID(ieDword objectID) const
 {
 	if (!objectID) {
-		return NULL;
+		return nullptr;
 	}
-	for (auto actor : actors) {
+	for (const auto& actor : actors) {
 		if (actor->GetGlobalID()==objectID) {
 			return actor;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /** flags:

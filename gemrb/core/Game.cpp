@@ -2289,7 +2289,7 @@ void Game::dump() const
 
 Actor *Game::GetActorByGlobalID(ieDword globalID) const
 {
-	for (auto map : Maps) {
+	for (const auto& map : Maps) {
 		Actor *actor = map->GetActorByGlobalID(globalID);
 		if (actor) return actor;
 	}

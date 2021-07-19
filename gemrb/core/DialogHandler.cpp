@@ -128,7 +128,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 
-	Actor *oldTarget = GetActorByGlobalID(targetID);
+	Actor *oldTarget = GetLocalActorByGlobalID(targetID);
 	speakerID = spk->GetGlobalID();
 	targetID = tgt->GetGlobalID();
 	if (!originalTargetID) originalTargetID = tgt->GetGlobalID();
@@ -347,7 +347,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				// always try original target first (sometimes there are multiple
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
-				tgta = GetActorByGlobalID(originalTargetID);
+				tgta = GetLocalActorByGlobalID(originalTargetID);
 				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
 					tgta = NULL;
 				} else {
@@ -397,7 +397,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				EndDialog();
 				return false;
 			}
-			Actor *oldTarget = GetActorByGlobalID(targetID);
+			Actor *oldTarget = GetLocalActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
 			if (tgta) tgta->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
@@ -477,18 +477,16 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	return true;
 }
 
-// TODO: duplicate of the one in GameControl
-Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
+Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
 {
-	if (!ID)
-		return NULL;
-	Game* game = core->GetGame();
-	if (!game)
-		return NULL;
+	if (!ID) return nullptr;
 
-	Map* area = game->GetCurrentArea( );
-	if (!area)
-		return NULL;
+	Game* game = core->GetGame();
+	if (!game) return nullptr;
+
+	Map* area = game->GetCurrentArea();
+	if (!area) return nullptr;
+
 	return area->GetActorByGlobalID(ID);
 }
 
@@ -505,7 +503,7 @@ Scriptable *DialogHandler::GetTarget() const
 
 Actor *DialogHandler::GetSpeaker()
 {
-	return GetActorByGlobalID(speakerID);
+	return GetLocalActorByGlobalID(speakerID);
 }
 
 }
