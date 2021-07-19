@@ -246,25 +246,22 @@ public:
 
 class Spawn {
 public:
-	ieVariable Name;
+	ieVariable Name {};
 	Point Pos;
-	ResRef *Creatures;
-	unsigned int Count;
-	ieWord Difficulty;
-	ieWord Frequency;
-	ieWord Method;
-	ieDword sduration;      //spawn duration
-	ieWord rwdist, owdist;  //maximum walk distances
-	ieWord Maximum;
-	ieWord Enabled;
-	ieDword appearance;
-	ieWord DayChance;
-	ieWord NightChance;
-	ieDword NextSpawn;
+	std::vector<ResRef> Creatures;
+	ieWord Difficulty = 0;
+	ieWord Frequency = 0;
+	ieWord Method = 0;
+	ieDword sduration = 0;      //spawn duration
+	ieWord rwdist = 0;
+	ieWord owdist = 0;  //maximum walk distances
+	ieWord Maximum = 0;
+	ieWord Enabled = 0;
+	ieDword appearance = 0;
+	ieWord DayChance = 0;
+	ieWord NightChance = 0;
+	ieDword NextSpawn = 0;
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
-	Spawn();
-	~Spawn() { delete[] Creatures; }
-	unsigned int GetCreatureCount() const { return Count; }
 };
 
 class TerrainSounds {
@@ -615,7 +612,7 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(const char* Name, const Point &, const ResRef *creatures, unsigned int count);
+	Spawn *AddSpawn(const char* Name, const Point &, std::vector<ResRef>&& creatures);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name) const;

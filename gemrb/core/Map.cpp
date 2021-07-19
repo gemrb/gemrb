@@ -103,14 +103,6 @@ static void ReleaseSpawnGroup(void *poi)
 	delete (SpawnGroup *) poi;
 }
 
-Spawn::Spawn() {
-	Creatures = NULL;
-	NextSpawn = Method = sduration = Count = Maximum = Difficulty = 0;
-	DayChance = NightChance = Enabled = Frequency = 0;
-	rwdist = owdist = appearance = 0;
-	Name[0] = 0;
-}
-
 void Map::ReleaseMemory()
 {
 	if (VisibilityMasks) {
@@ -2859,19 +2851,13 @@ AreaAnimation *Map::GetAnimation(const char *Name) const
 	return NULL;
 }
 
-Spawn *Map::AddSpawn(const char* Name, const Point &p, const ResRef *creatures, unsigned int count)
+Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
 	strnspccpy(sp->Name, Name, 32);
-	if (count>MAX_RESCOUNT) {
-		count=MAX_RESCOUNT;
-	}
+	
 	sp->Pos = p;
-	sp->Count = count;
-	sp->Creatures = new ResRef[count];
-	for( unsigned int i=0;i<count;i++) {
-		sp->Creatures[i] = creatures[i];
-	}
+	sp->Creatures = std::move(creatures);
 	spawns.push_back( sp );
 	return sp;
 }
@@ -3263,12 +3249,13 @@ void Map::TriggerSpawn(Spawn *spawn)
 	}
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
-	unsigned int spawncount = 0, i = RAND(0u, spawn->Count-1);
+	unsigned int spawncount = 0;
+	size_t i = RAND(0lu, spawn->Creatures.size() - 1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;
 		}
-		if (++i >= spawn->Count) {
+		if (++i >= spawn->Creatures.size()) {
 			i = 0;
 		}
 		

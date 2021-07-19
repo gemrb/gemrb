@@ -1024,9 +1024,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		ieVariable Name;
 		Point Pos;
-		ieWord Count, Difficulty, Frequency, Method;
+		ieWord Difficulty, Frequency, Method;
 		ieWord Maximum, Enabled;
-		struct ResRef creatures[MAX_RESCOUNT];
+		
+		std::vector<ResRef> creatures(MAX_RESCOUNT);
 		ieWord DayChance, NightChance;
 		ieDword Schedule;
 		ieDword sduration;
@@ -1038,7 +1039,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		for (auto& creature : creatures) {
 			str->ReadResRef(creature);
 		}
-		str->ReadWord(Count);
+		ieWord count;
+		str->ReadWord(count);
+		assert(count <= MAX_RESCOUNT);
+		creatures.resize(count);
 		str->ReadWord(Difficulty);
 		str->ReadWord(Frequency);
 		str->ReadWord(Method);
@@ -1051,7 +1055,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadWord(DayChance);
 		str->ReadWord(NightChance);
 
-		Spawn *sp = map->AddSpawn(Name, Pos, creatures, Count);
+		Spawn *sp = map->AddSpawn(Name, Pos, std::move(creatures));
 		sp->Difficulty = Difficulty;
 		//this value is used in a division, better make it nonzero now
 		//this will fix any old gemrb saves vs. the original engine
@@ -2122,7 +2126,7 @@ int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) sp->Pos.y;
 		stream->WriteWord(tmpWord);
-		tmpWord = sp->GetCreatureCount();
+		tmpWord = ieWord(sp->Creatures.size());
 		int j;
 		for (j = 0;j < tmpWord; j++) {
 			stream->WriteResRef( sp->Creatures[j] );
