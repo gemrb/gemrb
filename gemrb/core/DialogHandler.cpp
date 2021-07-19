@@ -48,12 +48,6 @@ static const int noSections[4] = {0,0,0,0};
 
 DialogHandler::DialogHandler(void)
 {
-	dlg = NULL;
-	ds = NULL;
-	targetID = 0;
-	originalTargetID = 0;
-	speakerID = 0;
-	initialState = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
 		sectionMap = bg2Sections;
 	} else {
@@ -107,7 +101,7 @@ void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr)
 bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref, ieDword si)
 {
 	delete dlg;
-	dlg = NULL;
+	dlg = nullptr;
 
 	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
 		return false;
@@ -188,19 +182,19 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
-	if (dlg == NULL) {
+	if (dlg == nullptr) {
 		return; // no dialog, nothing to do.
 	}
 
 	// FIXME: is this useful for anything concrete? Currently never true, since nothing sets DF_UNBREAKABLE (unused since it was introduced)
-	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
+	if (try_to_break && core->GetGameControl()->GetDialogueFlags() & DF_UNBREAKABLE) {
 		return;
 	}
 
 	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		// reset the TA
-		ta->SetSpeakerPicture(NULL);
+		ta->SetSpeakerPicture(nullptr);
 		ta->ClearSelectOptions();
 	}
 
@@ -218,9 +212,9 @@ void DialogHandler::EndDialog(bool try_to_break)
 		tmp->LeftDialog();
 		tmp->SetCircleSize();
 	}
-	ds = NULL;
+	ds = nullptr;
 	delete dlg;
-	dlg = NULL;
+	dlg = nullptr;
 
 	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
@@ -310,8 +304,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	Scriptable *tgt = NULL;
-	Actor *tgta = NULL;
+	Scriptable *tgt = nullptr;
+	Actor *tgta = nullptr;
 	if (target->Type == ST_ACTOR) {
 		tgta = (Actor *)target;
 	}
@@ -396,15 +390,15 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
 			//target should be recalculated!
 			target->LeftDialog();
-			tgt = NULL;
-			tgta = NULL;
+			tgt = nullptr;
+			tgta = nullptr;
 			if (originalTargetID) {
 				// always try original target first (sometimes there are multiple
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
 				tgta = GetLocalActorByGlobalID(originalTargetID);
 				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
-					tgta = NULL;
+					tgta = nullptr;
 				} else {
 					tgt = tgta;
 				}
@@ -424,10 +418,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
 			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
-				tgt = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
-				if (tgt) { // only returns Actors
-					tgta = (Actor *) tgt;
-				}
+				tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+				tgt = tgta;
 			}
 
 			if (!tgt) {
@@ -487,10 +479,10 @@ Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
 {
 	if (!ID) return nullptr;
 
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	if (!game) return nullptr;
 
-	Map* area = game->GetCurrentArea();
+	const Map* area = game->GetCurrentArea();
 	if (!area) return nullptr;
 
 	return area->GetActorByGlobalID(ID);
@@ -498,11 +490,11 @@ Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
 
 Scriptable *DialogHandler::GetTarget() const
 {
-	Game *game = core->GetGame();
-	if (!game) return NULL;
+	const Game *game = core->GetGame();
+	if (!game) return nullptr;
 
 	Map *area = game->GetCurrentArea();
-	if (!area) return NULL;
+	if (!area) return nullptr;
 
 	return area->GetScriptableByGlobalID(targetID);
 }

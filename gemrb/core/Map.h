@@ -493,7 +493,7 @@ public:
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable *GetActorByDialog(const ResRef& resref) const;
-	Scriptable *GetItemByDialog(const ResRef& resref) const;
+	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const char *resref) const;
 	Actor *GetActorByScriptName(const char *name) const;
 	bool HasActor(const Actor *actor) const;

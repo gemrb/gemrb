@@ -52,14 +52,14 @@ private:
 	Actor *GetLocalActorByGlobalID(ieDword ID);
 	void UpdateJournalForTransition(const DialogTransition *tr);
 
-	DialogState* ds;
-	Dialog* dlg;
+	DialogState* ds = nullptr;
+	Dialog* dlg = nullptr;
 
-	ieDword speakerID;
-	ieDword targetID;
-	ieDword originalTargetID;
+	ieDword speakerID = 0;
+	ieDword targetID = 0;
+	ieDword originalTargetID = 0;
 
-	int initialState;
+	int initialState = -1;
 	Point prevViewPortLoc;
 };
 

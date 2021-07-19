@@ -2380,7 +2380,7 @@ Scriptable *Map::GetActorByDialog(const ResRef &resref) const
 // currently only looks at the party, since it is enough for the only known user
 // relies on an override item we create, with the resref matching the dialog one!
 // currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
-Scriptable *Map::GetItemByDialog(const ResRef &resref) const
+Actor *Map::GetItemByDialog(const ResRef &resref) const
 {
 	const Game *game = core->GetGame();
 	// choose the owner of the dialog via passed dialog ref
@@ -2414,7 +2414,7 @@ Scriptable *Map::GetItemByDialog(const ResRef &resref) const
 
 		return surrogate;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //this function finds an actor by its original resref (not correct yet)
