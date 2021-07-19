@@ -648,12 +648,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 #endif
 #undef MSG
 		} else {
-			Point* points = new Point[VertexCount];
+			std::vector<Point> points(VertexCount);
 			for (int x = 0; x < VertexCount; x++) {
 				str->ReadPoint(points[x]);
 			}
-			auto poly = std::make_shared<Gem_Polygon>(points, VertexCount, &bbox);
-			delete[] points;
+			auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
 			ip = tm->AddInfoPoint( Name, Type, poly );
 		}
 
@@ -766,7 +765,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			c = map->AddContainer( Name, Type, nullptr );
 			c->BBox = bbox;
 		} else {
-			Point* points = new Point[vertCount];
+			std::vector<Point> points(vertCount);
 			for (int x = 0; x < vertCount; x++) {
 				ieWord tmp;
 				str->ReadWord(tmp);
@@ -774,9 +773,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				str->ReadWord(tmp);
 				points[x].y = tmp;
 			}
-			auto poly = std::make_shared<Gem_Polygon>( points, vertCount, &bbox );
+			auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
 			c = map->AddContainer( Name, Type, poly );
-			delete[] points;
 		}
 
 		//c->SetMap(map);
@@ -907,15 +905,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		std::shared_ptr<Gem_Polygon> open = nullptr;
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
 		if (OpenVerticesCount) {
-			Point* points = new Point[OpenVerticesCount];
+			std::vector<Point> points(OpenVerticesCount);
 			for (int x = 0; x < OpenVerticesCount; x++) {
 				str->ReadWord(minX);
 				points[x].x = minX;
 				str->ReadWord(minY);
 				points[x].y = minY;
 			}
-			open = std::make_shared<Gem_Polygon>( points, OpenVerticesCount, &BBOpen );
-			delete[] points;
+			open = std::make_shared<Gem_Polygon>(std::move(points), &BBOpen );
 		}
 
 		//Reading Closed Polygon
@@ -923,15 +920,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek( VerticesOffset + ( ClosedFirstVertex * 4 ),
 				GEM_STREAM_START );
 		if (ClosedVerticesCount) {
-			Point* points = new Point[ClosedVerticesCount];
+			std::vector<Point> points(ClosedVerticesCount);
 			for (int x = 0; x < ClosedVerticesCount; x++) {
 				str->ReadWord(minX);
 				points[x].x = minX;
 				str->ReadWord(minY);
 				points[x].y = minY;
 			}
-			closed = std::make_shared<Gem_Polygon>( points, ClosedVerticesCount, &BBClosed );
-			delete[] points;
+			closed = std::make_shared<Gem_Polygon>(std::move(points), &BBClosed);
 		}
 
 		//Getting Door Information from the WED File

@@ -2618,16 +2618,14 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 	if (!cnt) {
 		return NULL;
 	}
-	Point *p = new Point[cnt];
-
-	int i = cnt;
-	while(i--) {
-		p[i].x = atoi(tm->QueryField(i, 0));
-		p[i].y = atoi(tm->QueryField(i, 1));
+	
+	std::vector<Point> p(cnt);
+	while(cnt--) {
+		p[cnt].x = atoi(tm->QueryField(cnt, 0));
+		p[cnt].y = atoi(tm->QueryField(cnt, 1));
 	}
 
-	polygons[index] = new Gem_Polygon(p, cnt, NULL);
-	delete [] p;
+	polygons[index] = new Gem_Polygon(std::move(p), nullptr);
 	return polygons[index];
 }
 

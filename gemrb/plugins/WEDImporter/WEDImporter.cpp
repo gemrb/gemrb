@@ -330,7 +330,7 @@ void WEDImporter::ReadWallPolygons()
 			str->ReadPoint(base1);
 			flags |= WF_BASELINE;
 		}
-		Point *points = new Point[count];
+		std::vector<Point> points(count);
 		for (size_t j = 0; j < count; ++j) {
 			Point vertex;
 			str->ReadPoint(vertex);
@@ -351,7 +351,7 @@ void WEDImporter::ReadWallPolygons()
 		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
 		
 		if (!rgn.size.IsInvalid()) { // PST AR0600 is known to have a polygon with 0 height
-			polygonTable[i] = std::make_shared<Wall_Polygon>(points, count, &rgn);
+			polygonTable[i] = std::make_shared<Wall_Polygon>(std::move(points), &rgn);
 			if (flags&WF_BASELINE) {
 				polygonTable[i]->SetBaseline(base0, base1);
 			}
@@ -360,8 +360,6 @@ void WEDImporter::ReadWallPolygons()
 			}
 			polygonTable[i]->SetPolygonFlag(flags);
 		}
-		
-		delete [] points;
 	}
 	delete [] PolygonHeaders;
 }

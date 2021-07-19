@@ -27,10 +27,10 @@
 
 namespace GemRB {
 
-Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
-: vertices(points, points + cnt)
+Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, Region *bbox)
+: vertices(std::move(points))
 {
-	assert(cnt >= 3);
+	assert(vertices.size() >= 3);
 
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();

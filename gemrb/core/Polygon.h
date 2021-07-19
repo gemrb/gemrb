@@ -44,7 +44,7 @@ class GEM_EXPORT Gem_Polygon {
 public:
 	using LineSegment = std::pair<Point, Point>;
 
-	Gem_Polygon(const Point* points, unsigned int count, Region *bbox = NULL);
+	Gem_Polygon(std::vector<Point>&&, Region *bbox = nullptr);
 
 	Region BBox;
 	std::vector<Point> vertices;
