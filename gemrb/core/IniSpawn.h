@@ -134,30 +134,32 @@ public:
  */
 
 struct VariableSpec {
-	ieVariable Name;
-	ieDword Value;
+	ieVariable Name {};
+	ieDword Value = 0;
+	
+	VariableSpec(const char* name, ieDword val)
+	: Value(val)
+	{
+		strnlwrcpy(Name, name, sizeof(ieVariable) - 1);
+	}
 };
 
 class GEM_EXPORT IniSpawn {
 public:
-	explicit IniSpawn(Map *owner);
-	~IniSpawn();
+	IniSpawn(Map *owner, const ResRef& DefaultArea);
 
 private:
 	Map *map; //owner
 	ResRef NamelessSpawnArea;
-	int namelessvarcount;
-	VariableSpec *NamelessVar;
-	int localscount;
-	VariableSpec *Locals;
+	std::vector<VariableSpec> NamelessVar;
+	std::vector<VariableSpec> Locals;
 	Point NamelessSpawnPoint;
 	Point PartySpawnPoint;
 	ResRef PartySpawnArea;
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
-	int eventcount;
-	SpawnEntry *eventspawns;
+	std::vector<SpawnEntry> eventspawns;
 	ieDword detail_level;
 
 	void ReadCreature(DataFileMgr *inifile,
@@ -172,7 +174,6 @@ private:
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);
-	void InitSpawn(const ResRef& DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();
 	void ExitSpawn();

@@ -3180,12 +3180,11 @@ const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius) cons
 //--------spawning------------------
 void Map::LoadIniSpawn()
 {
-	INISpawn = new IniSpawn(this);
 	if (core->HasFeature(GF_RESDATA_INI)) {
 		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
-		INISpawn->InitSpawn(ResRef(scriptName));
+		INISpawn = new IniSpawn(this, ResRef(scriptName));
 	} else {
-		INISpawn->InitSpawn(WEDResRef);
+		INISpawn = new IniSpawn(this, WEDResRef);
 	}
 }
 

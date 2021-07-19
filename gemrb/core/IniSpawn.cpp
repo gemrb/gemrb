@@ -43,39 +43,6 @@ static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
 IE_SEX, IE_ALIGNMENT };
 
-IniSpawn::IniSpawn(Map *owner)
-{
-	map = owner;
-	NamelessState = 35;
-	NamelessVar = NULL;
-	namelessvarcount = 0;
-	Locals = NULL;
-	localscount = 0;
-	eventspawns = NULL;
-	eventcount = 0;
-	//high detail level by default
-	detail_level = 2;
-	core->GetDictionary()->Lookup("Detail Level", detail_level);
-}
-
-IniSpawn::~IniSpawn()
-{
-	if (eventspawns) {
-		delete[] eventspawns;
-		eventspawns = NULL;
-	}
-
-	if (Locals) {
-		delete[] Locals;
-		Locals = NULL;
-	}
-
-	if (NamelessVar) {
-		delete[] NamelessVar;
-		NamelessVar = NULL;
-	}
-}
-
 static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
@@ -95,6 +62,89 @@ static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 	return ini;
+}
+
+IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
+{
+	map = owner;
+	NamelessState = 35;
+	//high detail level by default
+	detail_level = 2;
+	core->GetDictionary()->Lookup("Detail Level", detail_level);
+	
+	const char *s;
+
+	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
+	if (!inifile) {
+		NamelessSpawnArea = DefaultArea;
+		return;
+	}
+
+	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
+	NamelessSpawnArea = s;
+	s = inifile->GetKeyAsString("nameless","point","[0.0]");
+	int x,y;
+	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
+		x=0;
+		y=0;
+	}
+	NamelessSpawnPoint.x=x;
+	NamelessSpawnPoint.y=y;
+
+	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
+	PartySpawnArea = s;
+	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
+	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
+		x = NamelessSpawnPoint.x;
+		y = NamelessSpawnPoint.y;
+	}
+	PartySpawnPoint.x = x;
+	PartySpawnPoint.y = y;
+
+	// animstat.ids values
+	//35 - already standing
+	//36 - getting up
+	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
+
+	auto namelessvarcount = inifile->GetKeysCount("namelessvar");
+	NamelessVar.reserve(namelessvarcount);
+	for (y = 0; y < namelessvarcount; ++y) {
+		const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
+		auto val = inifile->GetKeyAsInt("namelessvar",Key,0);
+		NamelessVar.emplace_back(Key, val);
+	}
+
+	auto localscount = inifile->GetKeysCount("locals");
+	Locals.reserve(localscount);
+	for (y = 0; y < localscount; ++y) {
+		const char* Key = inifile->GetKeyNameByIndex("locals",y);
+		auto val = inifile->GetKeyAsInt("locals",Key,0);
+		Locals.emplace_back(Key, val);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
+	if (s) {
+		ReadSpawnEntry(inifile.get(), s, enterspawn);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","exit",NULL);
+	if (s) {
+		ReadSpawnEntry(inifile.get(), s, exitspawn);
+	}
+
+	s = inifile->GetKeyAsString("spawn_main","events",NULL);
+	if (s) {
+		auto eventcount = CountElements(s,',');
+		eventspawns.resize(eventcount);
+		ieVariable *events = new ieVariable[eventcount];
+		GetElements(s, events, eventcount);
+		while(eventcount--) {
+			ReadSpawnEntry(inifile.get(), events[eventcount], eventspawns[eventcount]);
+		}
+		delete[] events;
+	}
+	//maybe not correct
+	InitialSpawn();
 }
 
 // possible values implemented in DiffMode, but not needed here
@@ -483,89 +533,6 @@ void IniSpawn::SetNamelessDeath(const ResRef& area, const Point &pos, ieDword st
 	NamelessState = state;
 }
 
-void IniSpawn::InitSpawn(const ResRef& DefaultArea)
-{
-	const char *s;
-
-	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
-	if (!inifile) {
-		NamelessSpawnArea = DefaultArea;
-		return;
-	}
-
-	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
-	NamelessSpawnArea = s;
-	s = inifile->GetKeyAsString("nameless","point","[0.0]");
-	int x,y;
-	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
-		x=0;
-		y=0;
-	}
-	NamelessSpawnPoint.x=x;
-	NamelessSpawnPoint.y=y;
-
-	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
-	PartySpawnArea = s;
-	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
-	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
-		x = NamelessSpawnPoint.x;
-		y = NamelessSpawnPoint.y;
-	}
-	PartySpawnPoint.x = x;
-	PartySpawnPoint.y = y;
-
-	// animstat.ids values
-	//35 - already standing
-	//36 - getting up
-	NamelessState = inifile->GetKeyAsInt("nameless","state",36);
-
-	namelessvarcount = inifile->GetKeysCount("namelessvar");
-	if (namelessvarcount) {
-		NamelessVar = new VariableSpec[namelessvarcount];
-		for (y=0;y<namelessvarcount;y++) {
-			const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
-			strnlwrcpy(NamelessVar[y].Name, Key, 32);
-			NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
-		}
-	}
-
-	localscount = inifile->GetKeysCount("locals");
-	if (localscount) {
-		Locals = new VariableSpec[localscount];
-		for (y=0;y<localscount;y++) {
-			const char* Key = inifile->GetKeyNameByIndex("locals",y);
-			strnlwrcpy(Locals[y].Name, Key, 32);
-			Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
-		}
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
-	if (s) {
-		ReadSpawnEntry(inifile.get(), s, enterspawn);
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","exit",NULL);
-	if (s) {
-		ReadSpawnEntry(inifile.get(), s, exitspawn);
-	}
-
-	s = inifile->GetKeyAsString("spawn_main","events",NULL);
-	if (s) {
-		eventcount = CountElements(s,',');
-		eventspawns = new SpawnEntry[eventcount];
-		ieVariable *events = new ieVariable[eventcount];
-		GetElements(s, events, eventcount);
-		int ec = eventcount;
-		while(ec--) {
-			ReadSpawnEntry(inifile.get(), events[ec], eventspawns[ec]);
-		}
-		delete[] events;
-	}
-	//maybe not correct
-	InitialSpawn();
-}
-
-
 /*** events ***/
 
 //respawn nameless after he bit the dust
@@ -608,8 +575,8 @@ void IniSpawn::RespawnNameless()
 	}
 
 	//certain variables are set when nameless dies
-	for (int i = 0; i < namelessvarcount; i++) {
-		SetVariable(game, NamelessVar[i].Name, NamelessVar[i].Value, "GLOBAL");
+	for (const auto& var : NamelessVar) {
+		SetVariable(game, var.Name, var.Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
@@ -806,8 +773,8 @@ void IniSpawn::InitialSpawn()
 {
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
-	for (int i=0;i<localscount;i++) {
-		SetVariable(map, Locals[i].Name, Locals[i].Value, "LOCALS");
+	for (const auto& local : Locals) {
+		SetVariable(map, local.Name, local.Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed
@@ -830,8 +797,8 @@ void IniSpawn::ExitSpawn()
 //checks if a respawn event occurred
 void IniSpawn::CheckSpawn()
 {
-	for(int i=0;i<eventcount;i++) {
-		SpawnGroup(eventspawns[i]);
+	for (SpawnEntry& event : eventspawns) {
+		SpawnGroup(event);
 	}
 }
 
