@@ -35,7 +35,6 @@ namespace GemRB {
 /** Resource reference */
 class DataStream;
 
-/* Hopefully we can slowly replace the char array version with this struct... */
 struct ResRef {
 private:
 	char ref[9] = {'\0'};
@@ -80,9 +79,6 @@ public:
 		if (str == NULL) {
 			Reset();
 		} else {
-			// using strnlwrcpy: this wrapper is case insensitive,
-			// but many older functions (taking char[9]) will "convert" it to a cstring where it is no longer proper case
-			// typically this shouldnt matter, but some older code was lowercasing their refs
 			strncpy(ref, str, sizeof(ref) - 1);
 			ref[sizeof(ref)-1] = '\0';
 		}
