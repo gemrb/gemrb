@@ -3956,7 +3956,6 @@ void AreaAnimation::InitAnimation()
 void AreaAnimation::SetPalette(const ResRef &pal)
 {
 	Flags |= A_ANI_PALETTE;
-	gamedata->FreePalette(palette, PaletteRef);
 	PaletteRef = pal;
 	palette = gamedata->GetPalette(PaletteRef);
 	if (Flags&A_ANI_BLEND) {

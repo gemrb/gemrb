@@ -253,15 +253,6 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 	return palette;
 }
 
-void GameData::FreePalette(PaletteHolder &pal, const ResRef&)
-{
-	// This was previously much hairier, trying to keep track of two different
-	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
-	// is freed, while not bothering about freeing named palettes from the
-	// map.
-	pal = nullptr;
-}
-
 Item* GameData::GetItem(const ResRef &resname, bool silent)
 {
 	Item *item = (Item *) ItemCache.GetResource(resname);

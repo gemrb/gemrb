@@ -87,7 +87,6 @@ public:
 	bool DelTable(unsigned int index);
 
 	PaletteHolder GetPalette(const ResRef& resname);
-	void FreePalette(PaletteHolder &pal, const ResRef &name = ResRef());
 
 	Item* GetItem(const ResRef &resname, bool silent=false);
 	void FreeItem(Item const *itm, const ResRef &name, bool free=false);

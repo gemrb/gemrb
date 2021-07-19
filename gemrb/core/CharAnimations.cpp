@@ -146,7 +146,6 @@ void CharAnimations::MaybeUpdateMainPalette(Animation **anims) {
 	if (previousStanceID != stanceID) {
 		// Test if the palette in question is actually different to the one loaded.
 		if (*PartPalettes[PAL_MAIN] != *(anims[0]->GetFrame(0)->GetPalette())) {
-			gamedata->FreePalette(PartPalettes[PAL_MAIN], PaletteResRef[PAL_MAIN]);
 			PaletteResRef[PAL_MAIN].Reset();
 
 			PartPalettes[PAL_MAIN] = anims[0]->GetFrame(0)->GetPalette()->Copy();
@@ -258,8 +257,8 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_HELMET]);
-	gamedata->FreePalette(ModPartPalettes[PAL_HELMET]);
+	PartPalettes[PAL_HELMET] = nullptr;
+	ModPartPalettes[PAL_HELMET] = nullptr;
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -269,8 +268,8 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_WEAPON]);
-	gamedata->FreePalette(ModPartPalettes[PAL_WEAPON]);
+	PartPalettes[PAL_WEAPON] = nullptr;
+	ModPartPalettes[PAL_WEAPON] = nullptr;
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -280,8 +279,8 @@ void CharAnimations::SetOffhandRef(const char* ref)
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_OFFHAND]);
-	gamedata->FreePalette(ModPartPalettes[PAL_OFFHAND]);
+	PartPalettes[PAL_OFFHAND] = nullptr;
+	ModPartPalettes[PAL_OFFHAND] = nullptr;
 }
 
 void CharAnimations::LockPalette(const ieDword *gradients)
@@ -403,12 +402,11 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[PAL_MAIN] = MakeHolder<Palette>();
 			ModPartPalettes[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(ModPartPalettes[PAL_MAIN]);
+			ModPartPalettes[PAL_MAIN] = nullptr;
 		}
 	} else if (PType && (type <= PAL_MAIN_5)) {
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
-			ResRef oldResRef = PaletteResRef[type];
 			if (GetAnimType()==IE_ANI_NINE_FRAMES) {
 				PaletteResRef[type].SNPrintF("%.4s_%-.2s%c", ResRefBase.CString(), (char *) &PType, '1' + type);
 			} else {
@@ -421,7 +419,6 @@ void CharAnimations::SetupColors(PaletteType type)
 			PaletteResRef[type] = PaletteResRef[type];
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
-				gamedata->FreePalette(PartPalettes[type], oldResRef);
 				PartPalettes[type] = tmppal;
 			} else {
 				PaletteResRef[type].Reset();
@@ -433,7 +430,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[type] = MakeHolder<Palette>();
 			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(ModPartPalettes[type]);
+			ModPartPalettes[type] = nullptr;
 		}
 	} else {
 		pal->SetupPaperdollColours(Colors, type);
@@ -462,7 +459,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
 			}
 		} else {
-			gamedata->FreePalette(ModPartPalettes[type]);
+			ModPartPalettes[type] = nullptr;
 		}
 	}
 }
@@ -744,14 +741,14 @@ CharAnimations::~CharAnimations(void)
 	DropAnims();
 	int i;
 	for (i = 0; i <= PAL_MAIN_5; ++i)
-		gamedata->FreePalette(PartPalettes[i], PaletteResRef[i]);
+		PartPalettes[i] = nullptr;
 	for (; i < PAL_MAX; ++i)
-		gamedata->FreePalette(PartPalettes[i]);
+		PartPalettes[i] = nullptr;
 	for (i = 0; i < PAL_MAX; ++i)
-		gamedata->FreePalette(ModPartPalettes[i]);
+		ModPartPalettes[i] = nullptr;
 
 	if (shadowPalette) {
-		gamedata->FreePalette(shadowPalette);
+		shadowPalette = nullptr;
 	}
 
 	for (i = 0; i < MAX_ANIMS; ++i) {
