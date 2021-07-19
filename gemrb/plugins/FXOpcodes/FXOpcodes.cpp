@@ -916,7 +916,7 @@ static inline void HandleMainStatBonus(const Actor *target, int stat, Effect *fx
 	EffectRef &eff_ref = mainStatRefs[stat-IE_STR];
 
 	// maybe it's the only effect
-	if (target->fxqueue.CountEffects(eff_ref, fx->Parameter1, fx->Parameter2, NULL) == 1) {
+	if (target->fxqueue.CountEffects(eff_ref, fx->Parameter1, fx->Parameter2) == 1) {
 		return;
 	}
 
@@ -1151,7 +1151,7 @@ int fx_set_charmed_state (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	// if there are several effects on the queue, suppress all but the newest
-	unsigned int count = target->fxqueue.CountEffects(fx_set_charmed_state_ref, -1, -1, NULL);
+	unsigned int count = target->fxqueue.CountEffects(fx_set_charmed_state_ref, -1, -1);
 	if (count > 1 && target->fxqueue.GetEffectOrder(fx_set_charmed_state_ref, fx) < count) {
 		return FX_PERMANENT;
 	}
@@ -6651,7 +6651,7 @@ int fx_change_bardsong (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_change_bardsong(%2d): %s", fx->Opcode, fx->Resource);
 	// remove any previous song effects, as they are used with permanent timing
-	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1, NULL);
+	unsigned int count = target->fxqueue.CountEffects(fx_change_bardsong_ref, -1, -1);
 	unsigned int songCount = target->spellbook.GetSpellInfoSize(1<<IE_IWD2_SPELL_SONG);
 	if (count > 0 && songCount > 0) {
 		for (unsigned int i=0; i<songCount; i++) {

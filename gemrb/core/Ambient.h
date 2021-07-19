@@ -50,7 +50,7 @@ public:
 	ResRef getSound(size_t i) const
 	{
 		if (i < sounds.size()) return sounds[i];
-		return nullptr;
+		return ResRef();
 	}
 	tick_t getInterval() const { return interval; }
 	tick_t getIntervalVariance() const { return intervalVariance; }

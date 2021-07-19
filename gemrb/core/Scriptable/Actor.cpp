@@ -6445,7 +6445,7 @@ ResRef Actor::GetDialog(int flags) const
 		return Dialog;
 	}
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
-		return NULL;
+		return ResRef();
 	}
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
@@ -6453,7 +6453,7 @@ ResRef Actor::GetDialog(int flags) const
 			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName);
 			displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		}
-		return NULL;
+		return ResRef();
 	}
 	return Dialog;
 }

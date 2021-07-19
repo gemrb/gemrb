@@ -286,7 +286,7 @@ public:
 	}
 	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator &f) const;
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator &f) const;
-	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef&) const;
+	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const ResRef& = ResRef()) const;
 	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y) const;
 	void ModifyAllEffectSources(const Point &source);
 	/* returns the number of saved effects */
@@ -338,7 +338,7 @@ public:
 	bool HasHostileEffects() const;
 private:
 	/** counts effects of specific opcode, parameters and resource */
-	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef&) const;
+	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& = ResRef()) const;
 	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const;
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieWord timing);

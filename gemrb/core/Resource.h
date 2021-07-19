@@ -40,6 +40,8 @@ private:
 	char ref[9] = {'\0'};
 public:
 	ResRef() = default;
+	
+	ResRef(std::nullptr_t) = delete;
 
 	ResRef(const char* str) {
 		operator=(str);

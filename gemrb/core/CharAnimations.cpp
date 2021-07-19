@@ -258,8 +258,8 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_HELMET], 0);
-	gamedata->FreePalette(ModPartPalettes[PAL_HELMET], 0);
+	gamedata->FreePalette(PartPalettes[PAL_HELMET]);
+	gamedata->FreePalette(ModPartPalettes[PAL_HELMET]);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -269,8 +269,8 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_WEAPON], 0);
-	gamedata->FreePalette(ModPartPalettes[PAL_WEAPON], 0);
+	gamedata->FreePalette(PartPalettes[PAL_WEAPON]);
+	gamedata->FreePalette(ModPartPalettes[PAL_WEAPON]);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -280,8 +280,8 @@ void CharAnimations::SetOffhandRef(const char* ref)
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	gamedata->FreePalette(PartPalettes[PAL_OFFHAND], 0);
-	gamedata->FreePalette(ModPartPalettes[PAL_OFFHAND], 0);
+	gamedata->FreePalette(PartPalettes[PAL_OFFHAND]);
+	gamedata->FreePalette(ModPartPalettes[PAL_OFFHAND]);
 }
 
 void CharAnimations::LockPalette(const ieDword *gradients)
@@ -403,7 +403,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[PAL_MAIN] = MakeHolder<Palette>();
 			ModPartPalettes[PAL_MAIN]->SetupGlobalRGBModification(PartPalettes[PAL_MAIN], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(ModPartPalettes[PAL_MAIN], 0);
+			gamedata->FreePalette(ModPartPalettes[PAL_MAIN]);
 		}
 	} else if (PType && (type <= PAL_MAIN_5)) {
 		//handling special palettes like MBER_BL (black bear)
@@ -433,7 +433,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[type] = MakeHolder<Palette>();
 			ModPartPalettes[type]->SetupGlobalRGBModification(PartPalettes[type], GlobalColorMod);
 		} else {
-			gamedata->FreePalette(ModPartPalettes[type], 0);
+			gamedata->FreePalette(ModPartPalettes[type]);
 		}
 	} else {
 		pal->SetupPaperdollColours(Colors, type);
@@ -462,7 +462,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				ModPartPalettes[type]->SetupRGBModification(PartPalettes[type],ColorMods, type);
 			}
 		} else {
-			gamedata->FreePalette(ModPartPalettes[type], 0);
+			gamedata->FreePalette(ModPartPalettes[type]);
 		}
 	}
 }
@@ -746,12 +746,12 @@ CharAnimations::~CharAnimations(void)
 	for (i = 0; i <= PAL_MAIN_5; ++i)
 		gamedata->FreePalette(PartPalettes[i], PaletteResRef[i]);
 	for (; i < PAL_MAX; ++i)
-		gamedata->FreePalette(PartPalettes[i], 0);
+		gamedata->FreePalette(PartPalettes[i]);
 	for (i = 0; i < PAL_MAX; ++i)
-		gamedata->FreePalette(ModPartPalettes[i], 0);
+		gamedata->FreePalette(ModPartPalettes[i]);
 
 	if (shadowPalette) {
-		gamedata->FreePalette(shadowPalette, 0);
+		gamedata->FreePalette(shadowPalette);
 	}
 
 	for (i = 0; i < MAX_ANIMS; ++i) {

@@ -3055,8 +3055,8 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		/* we must reset various existing scripts */
 		act->SetScript( "DEFAULT", AI_SCRIPT_LEVEL, true );
-		act->SetScript( "", SCR_RACE, true );
-		act->SetScript( "", SCR_GENERAL, true );
+		act->SetScript(ResRef(), SCR_RACE, true);
+		act->SetScript(ResRef(), SCR_GENERAL, true);
 		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
 	AutoTable pdtable("pdialog");
