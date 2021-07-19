@@ -1523,33 +1523,21 @@ void Inventory::EquipBestWeapon(int flags)
 		return;
 	}
 
+	int maxSlot = static_cast<int>(Slots.size());
 	if (flags&EQUIP_RANGED) {
-		for (int i = SLOT_RANGED; i < LAST_RANGED; i++) {
-			const Item *itm = GetItemPointer(i, Slot);
-			if (!itm) continue;
-			//cannot change equipment when holding a cursed weapon
-			if (Slot->Flags & IE_INV_ITEM_CURSED) {
-				return;
+		for (int i = 0; i < maxSlot; i++) {
+			// look only at ranged weapons and ranged melee weapons like throwing daggers
+			if (!(i >= SLOT_RANGED && i < LAST_RANGED) && !(i >= SLOT_MELEE && i < LAST_MELEE)) {
+				continue;
 			}
-			//best ranged
-			int tmp = itm->GetDamagePotential(true, header);
-			if (tmp>damage) {
-				best_slot = i;
-				damage = tmp;
-				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
-				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
-			}
-			gamedata->FreeItem( itm, Slot->ItemResRef, false );
-		}
 
-		//ranged melee weapons like throwing daggers (not bows!)
-		for (int i = SLOT_MELEE; i <= LAST_MELEE; i++) {
 			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//cannot change equipment when holding a cursed weapon
 			if (Slot->Flags & IE_INV_ITEM_CURSED) {
 				return;
 			}
+
 			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
