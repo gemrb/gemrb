@@ -215,19 +215,20 @@ static void InitSpawnGroups()
 	int i = tab->GetColNamesCount();
 	while (i--) {
 		int j=tab->GetRowCount();
+		std::vector<ResRef> resrefs(j);
 		while (j--) {
 			const char *crename = tab->QueryField( j,i );
 			if (strcmp(crename, tab->QueryDefault()) != 0) break;
 		}
 		if (j>0) {
-			SpawnGroup *creatures = new SpawnGroup(j);
 			//difficulty
-			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
+			int level = (int)atoi(tab->QueryField(0,i));
 			for (;j;j--) {
-				creatures->ResRefs[j - 1] = tab->QueryField(j, i);
+				resrefs[j - 1] = tab->QueryField(j, i);
 			}
+			SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
 			GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
-			Spawns.SetAt( GroupName, (void*) creatures );
+			Spawns.SetAt( GroupName, creatures);
 		}
 	}
 }
@@ -3195,19 +3196,19 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
-	int count = 1;
+	size_t count = 1;
 
 	if (Spawns.Lookup(creResRef, lookup)) {
 		sg = (SpawnGroup *) lookup;
-		if (first || (level >= (int) sg->Level)) {
-			count = sg->Count;
+		if (first || (level >= sg->Level())) {
+			count = sg->Count();
 		} else {
 			count = 0;
 		}
 	}
 
 	while (count--) {
-		Actor *creature = gamedata->GetCreature(sg ? sg->ResRefs[count].CString() : creResRef);
+		Actor *creature = gamedata->GetCreature(sg ? (*sg)[count].CString() : creResRef);
 		if (creature) {
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
@@ -3229,7 +3230,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	}
 
 	if (spawned && sg && difficulty) {
-		*difficulty -= sg->Level;
+		*difficulty -= sg->Level();
 	}
 		
 	return spawned;

@@ -274,20 +274,23 @@ public:
 };
 
 class SpawnGroup {
+	std::vector<ResRef> ResRefs;
+	int level;
 public:
-	ResRef *ResRefs;
-	unsigned int Count;
-	unsigned int Level;
-
-	explicit SpawnGroup(unsigned int size) {
-		ResRefs = new ResRef[size];
-		Count = size;
-		Level = 0;
+	SpawnGroup(std::vector<ResRef>&& resrefs, int level) noexcept
+	: ResRefs(std::move(resrefs)), level(level)
+	{}
+	
+	size_t Count() const noexcept {
+		return ResRefs.size();
 	}
-	~SpawnGroup() {
-		if (ResRefs) {
-			delete[] ResRefs;
-		}
+	
+	int Level() const noexcept {
+		return level;
+	}
+	
+	const ResRef& operator[](size_t i) const {
+		return ResRefs[i];
 	}
 };
 
