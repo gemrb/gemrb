@@ -93,7 +93,6 @@ public:
 	ieWord DiceThrown;
 	ieWord DamageBonus;
 	ieWord DamageType;
-	ieWord FeatureCount;
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
@@ -110,9 +109,8 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell();
-	~Spell();
 
-	SPLExtHeader *ext_headers;
+	std::vector<SPLExtHeader> ext_headers;
 	std::vector<Effect*> casting_features;
 
 	/** Resref of the spell itself */
@@ -158,7 +156,7 @@ public:
 
 public:
 	//returns the requested extended header
-	inline SPLExtHeader *GetExtHeader(unsigned int which) const
+	inline const SPLExtHeader *GetExtHeader(unsigned int which) const
 	{
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			which = 0;
@@ -167,7 +165,7 @@ public:
 		if(ExtHeaderCount<=which) {
 			return NULL;
 		}
-		return ext_headers+which;
+		return &ext_headers[which];
 	}
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;

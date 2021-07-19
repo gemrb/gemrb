@@ -169,11 +169,11 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		}
 	}
 
-	s->ext_headers = new SPLExtHeader[s->ExtHeaderCount];
+	s->ext_headers = std::vector<SPLExtHeader>(s->ExtHeaderCount);
 
 	for (int i = 0; i < s->ExtHeaderCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
-		GetExtHeader( s, s->ext_headers+i );
+		GetExtHeader(s, &s->ext_headers[i]);
 	}
 
 	s->casting_features.reserve(s->CastingFeatureCount);
@@ -216,7 +216,8 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	str->ReadWord(eh->DiceThrown);
 	str->ReadWord(eh->DamageBonus);
 	str->ReadWord(eh->DamageType);
-	str->ReadWord(eh->FeatureCount);
+	ieWord featureCount;
+	str->ReadWord(featureCount);
 	str->ReadWord(eh->FeatureOffset);
 	str->ReadWord(eh->Charges);
 	str->ReadWord(eh->ChargeDepletion);
@@ -226,9 +227,9 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	if (eh->ProjectileAnimation) {
 		eh->ProjectileAnimation--;
 	}
-	eh->features.reserve(eh->FeatureCount);
+	eh->features.reserve(featureCount);
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
-	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
+	for (ieWord i = 0; i < featureCount; ++i) {
 		eh->features.push_back(GetFeature(s));
 	}
 }

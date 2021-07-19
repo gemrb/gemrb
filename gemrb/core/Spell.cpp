@@ -77,12 +77,11 @@ SPLExtHeader::SPLExtHeader(void)
 	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
 	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
 	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
-	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
+	FeatureOffset = Charges = ChargeDepletion = 0;
 }
 
 Spell::Spell(void)
 {
-	ext_headers = NULL;
 	if (!inited) {
 		inited = true;
 		InitSpellTables();
@@ -95,13 +94,6 @@ Spell::Spell(void)
 	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
 	TimePerLevel = TimeConstant = 0;
 	SpellName = SpellNameIdentified = Flags = SpellType = ExclusionSchool = PriestType = 0;
-}
-
-Spell::~Spell(void)
-{
-	//Spell is in the core, so this is not needed, i guess (Avenger)
-	//core->FreeSPLExt(ext_headers, casting_features);
-	delete [] ext_headers;
 }
 
 int Spell::GetHeaderIndexFromLevel(int level) const
@@ -181,16 +173,16 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 {
 	bool pst_hostile = false;
 	Effect *const *features;
-	int count;
+	size_t count;
 
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			features = ext_headers[0].features.data();
-			count = ext_headers[0].FeatureCount;
+			count = ext_headers[0].features.size();
 		} else {
 			features = ext_headers[block_index].features.data();
-			count = ext_headers[block_index].FeatureCount;
+			count = ext_headers[block_index].features.size();
 			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
@@ -202,7 +194,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	EffectQueue *fxqueue = new EffectQueue();
 	EffectQueue *selfqueue = NULL;
 
-	for (int i=0;i<count;i++) {
+	for (size_t i = 0; i < count; ++i) {
 		Effect *fx = features[i];
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
@@ -290,7 +282,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 		return NULL;
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
-	if (seh->FeatureCount) {
+	if (seh->features.size()) {
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
 	pro->Range = GetCastingDistance(self);
@@ -331,7 +323,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 bool Spell::ContainsDamageOpcode() const
 {
 	for (int h=0; h< ExtHeaderCount; h++) {
-		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
+		for (size_t i = 0; i < ext_headers[h].features.size(); ++i) {
 			const Effect *fx = ext_headers[h].features[i];
 			if (fx->Opcode == damageOpcode) {
 				return true;

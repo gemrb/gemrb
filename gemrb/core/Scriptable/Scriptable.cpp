@@ -773,15 +773,15 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 
 		if (caster) {
 			// check for target (type) change
-			int count, i;
+			int count;
 			const Actor *newact = nullptr;
-			SPLExtHeader *seh = NULL;
+			const SPLExtHeader *seh = NULL;
 			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
 				case WSTC_SETTYPE:
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						seh->features[i]->Target = caster->wildSurgeMods.target_type;
+					for (Effect* feature : seh->features) {
+						feature->Target = caster->wildSurgeMods.target_type;
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
@@ -793,12 +793,12 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 					// TODO: unhardcode to allow for mixing all the target types
 					// caster gets selftargeting fx when the projectile is fetched above
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i]->Target == FX_TARGET_SELF) {
-							seh->features[i]->Target = caster->wildSurgeMods.target_type;
+					for (Effect* feature : seh->features) {
+						if (feature->Target == FX_TARGET_SELF) {
+							feature->Target = caster->wildSurgeMods.target_type;
 						} else {
 							// also apply to the caster
-							fx = seh->features[i];
+							fx = feature;
 							core->ApplyEffect(fx, caster, caster);
 						}
 					}
@@ -826,9 +826,9 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 					// make it also work for self-targeting spells:
 					// change the payload or this was all in vain
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i]->Target == FX_TARGET_SELF) {
-							seh->features[i]->Target = FX_TARGET_PRESET;
+					for (Effect* feature : seh->features) {
+						if (feature->Target == FX_TARGET_SELF) {
+							feature->Target = FX_TARGET_PRESET;
 						}
 					}
 					// we need to fetch the projectile, so the effect queue is created
@@ -844,8 +844,8 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 			// apply the saving throw mod
 			if (caster->wildSurgeMods.saving_throw_mod) {
 				seh = &spl->ext_headers[SpellHeader];
-				for (i=0; i < seh->FeatureCount; i++) {
-					seh->features[i]->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+				for (Effect* feature : seh->features) {
+					feature->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 				}
 			}
 
@@ -855,9 +855,9 @@ void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int le
 				// make it also work for self-targeting spells:
 				// change the payload or this was all in vain
 				seh = &spl->ext_headers[SpellHeader];
-				for (i=0; i < seh->FeatureCount; i++) {
-					if (seh->features[i]->Target == FX_TARGET_SELF) {
-						seh->features[i]->Target = FX_TARGET_PRESET;
+				for (Effect* feature : seh->features) {
+					if (feature->Target == FX_TARGET_SELF) {
+						feature->Target = FX_TARGET_PRESET;
 					}
 				}
 				// we need to refetch the projectile, so the new one is used
