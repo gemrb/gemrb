@@ -178,8 +178,6 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 //
 // PST only
 //*auto_buddy
-//*detail_level
-// point_select_var: unknown, but present at least in pst; wasn't seen to work
 //
 // PSTEE only
 // disable_renderer = boolean_value
@@ -277,6 +275,15 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	char spawnMode = 0;
 	if (s) {
 		spawnMode = s[0];
+	}
+
+	// making point_select_var an override of point_select if both are present
+	s = inifile->GetKeyAsString(crittername,"point_select_var", nullptr);
+	if (s) {
+		char mode = static_cast<char>(CheckVariable(map, s + 8, s));
+		if (mode == 'r' || mode == 'e' || mode == 's') {
+			spawnMode = mode;
+		}
 	}
 
 	s = inifile->GetKeyAsString(crittername,"spawn_point",NULL);
