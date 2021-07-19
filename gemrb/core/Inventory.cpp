@@ -1595,7 +1595,7 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 		if (!itm) {
 			continue;
 		}
-		for(int ehc=0;ehc<itm->ExtHeaderCount;ehc++) {
+		for(size_t ehc = 0; ehc < itm->ext_headers.size(); ++ehc) {
 			const ITMExtHeader *ext_header = &itm->ext_headers[ehc];
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;

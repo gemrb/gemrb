@@ -213,7 +213,6 @@ public:
 	ResRef DescriptionIcon;
 	ieDword Enchantment;
 	ieDword ExtHeaderOffset;
-	ieWord ExtHeaderCount;
 	ieDword FeatureBlockOffset;
 	ieWord EquippingFeatureOffset;
 	ieWord EquippingFeatureCount;
@@ -262,7 +261,7 @@ public:
 	{
 		if(which < 0)
 			return GetWeaponHeader(which == -2) ;
-		if(ExtHeaderCount<=which) {
+		if (ext_headers.size() <= which) {
 			return NULL;
 		}
 		return &ext_headers[which];

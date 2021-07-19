@@ -142,7 +142,6 @@ public:
 	ieDword unknown11;
 	ieDword unknown12;
 	ieDword ExtHeaderOffset;
-	ieWord ExtHeaderCount;
 	ieDword FeatureBlockOffset;
 	ieWord CastingFeatureOffset;
 	ieWord CastingFeatureCount;
@@ -162,7 +161,7 @@ public:
 			which = 0;
 		}
 
-		if(ExtHeaderCount<=which) {
+		if (ext_headers.size() <= which) {
 			return NULL;
 		}
 		return &ext_headers[which];

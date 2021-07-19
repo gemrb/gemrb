@@ -142,7 +142,8 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadDword(s->unknown11);
 	str->ReadDword(s->unknown12);
 	str->ReadDword(s->ExtHeaderOffset);
-	str->ReadWord(s->ExtHeaderCount);
+	ieWord headerCount;
+	str->ReadWord(headerCount);
 	str->ReadDword(s->FeatureBlockOffset);
 	str->ReadWord(s->CastingFeatureOffset);
 	str->ReadWord(s->CastingFeatureCount);
@@ -169,9 +170,9 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 		}
 	}
 
-	s->ext_headers = std::vector<SPLExtHeader>(s->ExtHeaderCount);
+	s->ext_headers = std::vector<SPLExtHeader>(headerCount);
 
-	for (int i = 0; i < s->ExtHeaderCount; i++) {
+	for (ieWord i = 0; i < headerCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 40, GEM_STREAM_START );
 		GetExtHeader(s, &s->ext_headers[i]);
 	}

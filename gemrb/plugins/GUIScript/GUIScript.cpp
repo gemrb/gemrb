@@ -9229,11 +9229,11 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Enchantment", PyInt_FromLong(item->Enchantment));
 	PyDict_SetItemString(dict, "MaxCharge", PyInt_FromLong(0));
 
-	int ehc = item->ExtHeaderCount;
+	size_t ehc = item->ext_headers.size();
 
 	PyObject* tooltiptuple = PyTuple_New(ehc);
 	PyObject* locationtuple = PyTuple_New(ehc);
-	for(int i=0;i<ehc;i++) {
+	for (size_t i = 0; i < ehc; ++i) {
 		const ITMExtHeader *eh = &item->ext_headers[i];
 		PyTuple_SetItem(tooltiptuple, i, PyInt_FromLong(eh->Tooltip));
 		PyTuple_SetItem(locationtuple, i, PyInt_FromLong(eh->Location));

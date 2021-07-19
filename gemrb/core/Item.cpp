@@ -45,7 +45,7 @@ Item::Item(void)
 	MinIntelligence = MinDexterity = MinWisdom = MinConstitution = MinCharisma = 0;
 	WeaProf = WieldColor = Enchantment = KitUsability = Flags = UsabilityBitmask = 0;
 	Price = LoreToID = ItemDesc = ItemDescIdentified = ItemNameIdentified = ItemName = 0;
-	ExtHeaderOffset = ExtHeaderCount = FeatureBlockOffset = 0;
+	ExtHeaderOffset = FeatureBlockOffset = 0;
 	EquippingFeatureOffset = EquippingFeatureCount = 0;
 	unknown1 = unknown2 = unknown3 = 0;
 	ItemExcl = DialogName = 0;
@@ -58,7 +58,7 @@ EffectQueue *Item::GetEffectBlock(Scriptable *self, const Point &pos, int usage,
 	Effect *const *features = nullptr;
 	size_t count;
 
-	if (usage>=ExtHeaderCount) {
+	if (usage >= int(ext_headers.size())) {
 		return NULL;
 	}
 	if (usage>=0) {
@@ -134,8 +134,8 @@ int Item::GetDamagePotential(bool ranged, const ITMExtHeader *&header) const
 
 int Item::GetWeaponHeaderNumber(bool ranged) const
 {
-	for(int ehc=0; ehc<ExtHeaderCount; ehc++) {
-		const ITMExtHeader *ext_header = GetExtHeader(ehc);
+	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
+		const ITMExtHeader *ext_header = &ext_headers[ehc];
 		if (ext_header->Location!=ITEM_LOC_WEAPON) {
 			continue;
 		}
@@ -149,15 +149,15 @@ int Item::GetWeaponHeaderNumber(bool ranged) const
 				continue;
 			}
 		}
-		return ehc;
+		return int(ehc);
 	}
-	return 0xffff; //invalid extheader number
+	return -1; //invalid extheader number
 }
 
 int Item::GetEquipmentHeaderNumber(int cnt) const
 {
-	for(int ehc=0; ehc<ExtHeaderCount; ehc++) {
-		const ITMExtHeader *ext_header = GetExtHeader(ehc);
+	for (size_t ehc = 0; ehc < ext_headers.size(); ehc++) {
+		const ITMExtHeader *ext_header = &ext_headers[ehc];
 		if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 			continue;
 		}
@@ -169,9 +169,9 @@ int Item::GetEquipmentHeaderNumber(int cnt) const
 			cnt--;
 			continue;
 		}
-		return ehc;
+		return int(ehc);
 	}
-	return 0xffff; //invalid extheader number
+	return -1; //invalid extheader number
 }
 
 const ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
@@ -251,7 +251,7 @@ unsigned int Item::GetCastingDistance(int idx) const
 	const ITMExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Item", "Cannot retrieve item header!!! required header: %d, maximum: %d",
-			idx, (int) ExtHeaderCount);
+			idx, (int) ext_headers.size());
 		return 0;
 	}
 	return (unsigned int) seh->Range;

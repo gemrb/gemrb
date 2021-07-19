@@ -1061,7 +1061,7 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	Spell *spl = gamedata->GetSpell(spellname, true);
 	if (!spl)
 		return;
-	if (spl->ExtHeaderCount<1)
+	if (spl->ext_headers.size() < 1)
 		return;
 
 	ieDword level = 0;
@@ -1075,9 +1075,9 @@ void Spellbook::AddSpellInfo(unsigned int sm_level, unsigned int sm_type, const 
 	spellinfo.push_back( seh );
 
 	seh->spellName = spellname;
-	int ehc;
+	size_t ehc = 0;
 
-	for (ehc = 0; ehc < spl->ExtHeaderCount-1; ehc++) {
+	for (; ehc < spl->ext_headers.size() - 1; ++ehc) {
 		if (level<spl->ext_headers[ehc+1].RequiredLevel) {
 			break;
 		}

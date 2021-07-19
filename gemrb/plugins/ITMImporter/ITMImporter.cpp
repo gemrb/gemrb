@@ -227,7 +227,8 @@ Item* ITMImporter::GetItem(Item *s)
 	str->ReadResRef( s->DescriptionIcon );
 	str->ReadDword(s->Enchantment);
 	str->ReadDword(s->ExtHeaderOffset);
-	str->ReadWord(s->ExtHeaderCount);
+	ieWord headerCount;
+	str->ReadWord(headerCount);
 	str->ReadDword(s->FeatureBlockOffset);
 	str->ReadWord(s->EquippingFeatureOffset);
 	str->ReadWord(s->EquippingFeatureCount);
@@ -266,9 +267,9 @@ Item* ITMImporter::GetItem(Item *s)
 		s->ItemExcl = 0;
 	}
 
-	s->ext_headers = std::vector<ITMExtHeader>(s->ExtHeaderCount);
+	s->ext_headers = std::vector<ITMExtHeader>(headerCount);
 
-	for (unsigned int i = 0; i < s->ExtHeaderCount; i++) {
+	for (ieWord i = 0; i < headerCount; i++) {
 		str->Seek( s->ExtHeaderOffset + i * 56, GEM_STREAM_START );
 		ITMExtHeader* eh = &s->ext_headers[i];
 		GetExtHeader( s, eh );

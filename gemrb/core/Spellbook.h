@@ -112,7 +112,7 @@ struct SpellExtHeader {
 	ieDword level;
 	ieDword count;
 	ieDword type; //spelltype
-	ieDword headerindex;
+	size_t headerindex;
 	ieDword slot;
 	//these come from the header
 	ieByte SpellForm;

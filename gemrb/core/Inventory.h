@@ -127,7 +127,7 @@ typedef enum ieCREItemFlagBits : uint32_t {
 //item header itself
 struct ItemExtHeader {
 	ieDword slot;
-	ieDword headerindex;
+	size_t headerindex;
 	//from itmextheader
 	ieByte AttackType;
 	ieByte IDReq;

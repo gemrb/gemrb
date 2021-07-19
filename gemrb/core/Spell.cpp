@@ -88,7 +88,7 @@ Spell::Spell(void)
 		damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	}
 	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
-	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
+	CastingGraphics = CastingSound = ExtHeaderOffset = 0;
 	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
 	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
 	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
@@ -103,12 +103,12 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 		return level;
 	}
 
-	for (int headerIndex = 0; headerIndex < ExtHeaderCount - 1; headerIndex++) {
+	for (size_t headerIndex = 0; headerIndex < ext_headers.size() - 1; ++headerIndex) {
 		if (ext_headers[headerIndex + 1].RequiredLevel > level) {
-			return headerIndex;
+			return int(headerIndex);
 		}
 	}
-	return ExtHeaderCount-1;
+	return int(ext_headers.size()) - 1;
 }
 
 //-1 will return cfb
@@ -278,7 +278,7 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	const SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
-			header, (int) ExtHeaderCount);
+			header, (int) ext_headers.size());
 		return NULL;
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
@@ -309,7 +309,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	const SPLExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
-			idx, (int) ExtHeaderCount);
+			idx, (int) ext_headers.size());
 		return 0;
 	}
 
@@ -322,9 +322,9 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 // checks if any of the extended headers contains fx_damage
 bool Spell::ContainsDamageOpcode() const
 {
-	for (int h=0; h< ExtHeaderCount; h++) {
-		for (size_t i = 0; i < ext_headers[h].features.size(); ++i) {
-			const Effect *fx = ext_headers[h].features[i];
+	for (const SPLExtHeader& header : ext_headers) {
+		for (size_t i = 0; i < header.features.size(); ++i) {
+			const Effect *fx = header.features[i];
 			if (fx->Opcode == damageOpcode) {
 				return true;
 			}
