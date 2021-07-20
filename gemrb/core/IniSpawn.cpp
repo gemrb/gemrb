@@ -519,8 +519,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	s = inifile->GetKeyAsString(entryname,"critters","");
 	auto critters = GetElements<const char*>(s);
 	size_t crittercount = critters.size();
-	entry.crittercount=crittercount;
-	entry.critters = new CritterEntry[crittercount]();
+	entry.critters.resize(crittercount);
 	
 	while(crittercount--) {
 		ReadCreature(inifile, critters[crittercount], entry.critters[crittercount]);
@@ -583,7 +582,7 @@ void IniSpawn::RespawnNameless()
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
 
-void IniSpawn::SpawnCreature(CritterEntry &critter) const
+void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 {
 	if (critter.CreFile.empty()) {
 		return;
@@ -746,7 +745,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 
 void IniSpawn::SpawnGroup(SpawnEntry &event)
 {
-	if (!event.critters) {
+	if (event.critters.empty()) {
 		return;
 	}
 	unsigned int interval = event.interval;
@@ -758,13 +757,12 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 		}
 	}
 	
-	for(int i=0;i<event.crittercount;i++) {
-		CritterEntry* critter = event.critters+i;
-		if (!Schedule(critter->TimeOfDay, event.lastSpawndate) ) {
+	for (const auto& critter : event.critters) {
+		if (!Schedule(critter.TimeOfDay, event.lastSpawndate) ) {
 			continue;
 		}
-		for(int j=0;j<critter->SpawnCount;j++) {
-			SpawnCreature(*critter);
+		for(int j = 0; j < critter.SpawnCount; ++j) {
+			SpawnCreature(critter);
 		}
 		event.lastSpawndate = gameTime;
 	}

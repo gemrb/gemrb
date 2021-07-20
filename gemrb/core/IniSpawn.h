@@ -107,12 +107,10 @@ class SpawnEntry {
 public:
 	ieDword interval = 0;
 	ieDword lastSpawndate = 0;
-	size_t crittercount = 0;
-	CritterEntry *critters = nullptr;
+	std::vector<CritterEntry> critters;
 	char *name = nullptr;
 	SpawnEntry() = default;
 	~SpawnEntry() {
-		delete[] critters;
 		free(name);
 	}
 };
@@ -156,7 +154,7 @@ private:
 	void ReadSpawnEntry(DataFileMgr *inifile,
 		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
-	void SpawnCreature(CritterEntry &critter) const;
+	void SpawnCreature(const CritterEntry &critter) const;
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
