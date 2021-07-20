@@ -305,9 +305,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
 		Door* door = tm->GetDoor(i);
 		bool baseClosed, oldOpen = door->IsOpen();
-		int count;
-		unsigned short *indices = tmm->GetDoorIndices(door->ID, &count, baseClosed);
-		door->SetTiles(indices, count);
+		door->SetTiles(tmm->GetDoorIndices(door->ID, baseClosed));
 		// reset open state to the one in the old wed
 		door->SetDoorOpen(oldOpen, false, 0);
 	}
@@ -808,7 +806,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading doors");
 	for (ieDword i = 0; i < DoorsCount; i++) {
 		str->Seek( DoorsOffset + ( i * 0xc8 ), GEM_STREAM_START );
-		int count;
 		ieDword Flags;
 		ieDword OpenFirstVertex, ClosedFirstVertex;
 		ieDword OpenFirstImpeded, ClosedFirstImpeded;
@@ -932,7 +929,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 		//Getting Door Information from the WED File
 		bool BaseClosed;
-		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count, BaseClosed );
+		auto indices = tmm->GetDoorIndices( ShortName, BaseClosed );
 		if (core->HasFeature(GF_REVERSE_DOOR)) {
 			BaseClosed = !BaseClosed;
 		}
@@ -942,35 +939,26 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 		DoorTrigger dt(open, std::move(openPolys), closed, std::move(closedPolys));
 		Door* door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
-					indices, count, std::move(dt) );
+								 std::move(indices), std::move(dt) );
 		door->OpenBBox = BBOpen;
 		door->ClosedBBox = BBClosed;
 
 		//Reading Open Impeded blocks
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		Point* points = new Point[OpenImpededCount];
-		for (int x = 0; x < OpenImpededCount; x++) {
-			str->ReadWord(minX);
-			points[x].x = minX;
-			str->ReadWord(minY);
-			points[x].y = minY;
+		door->open_ib.resize(OpenImpededCount);
+		for (Point& point : door->open_ib) {
+			str->ReadPoint(point);
 		}
-		door->open_ib = points;
-		door->oibcount = OpenImpededCount;
 
 		//Reading Closed Impeded blocks
 		str->Seek( VerticesOffset + ( ClosedFirstImpeded * 4 ),
 				GEM_STREAM_START );
-		points = new Point[ClosedImpededCount];
-		for (int x = 0; x < ClosedImpededCount; x++) {
-			str->ReadWord(minX);
-			points[x].x = minX;
-			str->ReadWord(minY);
-			points[x].y = minY;
+		
+		door->closed_ib.resize(ClosedImpededCount);
+		for (Point& point : door->closed_ib) {
+			str->ReadPoint(point);
 		}
-		door->closed_ib = points;
-		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
 
 		door->hp = hp;
@@ -1648,7 +1636,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 		if (closed)
 			VerticesCount += closed->Count();
 
-		VerticesCount += d->oibcount+d->cibcount;
+		VerticesCount += d->open_ib.size() + d->closed_ib.size();
 	}
 	headersize += VerticesCount * 4;
 	AmbiOffset = headersize;
@@ -1852,10 +1840,10 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteWord(tmpWord);
 		//open and closed impeded blocks
 		stream->WriteDword(VertIndex);
-		tmpWord = (ieWord) d->oibcount;
+		tmpWord = (ieWord) d->open_ib.size();
 		stream->WriteWord(tmpWord);
 		VertIndex += tmpWord;
-		tmpWord = (ieWord) d->cibcount;
+		tmpWord = (ieWord) d->closed_ib.size();
 		stream->WriteWord(tmpWord);
 		stream->WriteDword(VertIndex);
 		VertIndex += tmpWord;
@@ -1947,8 +1935,8 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 			PutPoints(stream, open->vertices);
 		if (closed)
 			PutPoints(stream, closed->vertices);
-		PutPoints(stream, d->open_ib, d->oibcount);
-		PutPoints(stream, d->closed_ib, d->cibcount);
+		PutPoints(stream, d->open_ib);
+		PutPoints(stream, d->closed_ib);
 	}
 	return 0;
 }

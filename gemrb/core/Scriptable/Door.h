@@ -70,13 +70,11 @@ public:
 class GEM_EXPORT Door : public Highlightable {
 public:
 	Door(TileOverlay* Overlay, DoorTrigger&& trigger);
-	~Door(void) override;
 public:
 	ieVariable LinkedInfo;
 	ResRef ID; //WED ID
 	TileOverlay* overlay;
-	unsigned short* tiles;
-	int tilecount;
+	std::vector<ieWord> tiles;
 	ieDword Flags;
 	int closedIndex;
 	//trigger areas
@@ -84,10 +82,8 @@ public:
 	Region& OpenBBox = BBox; // an alias for the base class BBox
 	Region ClosedBBox;
 	//impeded blocks
-	Point* open_ib; //impeded blocks stored in a Point array
-	int oibcount;
-	Point* closed_ib;
-	int cibcount;
+	std::vector<Point> open_ib; //impeded blocks stored in a Point array
+	std::vector<Point> closed_ib;
 
 	Point toOpen[2];
 	ResRef OpenSound;
@@ -100,13 +96,13 @@ public:
 	ieStrRef NameStrRef;
 	ieWord hp, ac;          //unused???, but learned from IE DEV info
 private:
-	void ImpedeBlocks(int count, const Point *points, PathMapFlags value) const;
+	void ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const;
 	void UpdateDoor();
 	bool BlockedOpen(int Open, int ForceOpen) const;
 public:
 	void ToggleTiles(int State, int playsound = false);
 	void SetName(const ResRef &Name); // sets door ID
-	void SetTiles(unsigned short* Tiles, int count);
+	void SetTiles(std::vector<ieWord>);
 	bool CanDetectTrap() const override;
 	void SetDoorLocked(int Locked, int playsound);
 	void SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger = true);

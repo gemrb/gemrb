@@ -235,9 +235,9 @@ WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 	return MakeGroupFromTableEntries(index, count);
 }
 
-ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& BaseClosed)
+std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& BaseClosed)
 {
-	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
+	ieWord DoorClosed, DoorTileStart, DoorTileCount;
 	ResRef Name;
 	unsigned int i;
 
@@ -249,9 +249,8 @@ ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& Base
 	}
 	//The door has no representation in the WED file
 	if (i == DoorsCount) {
-		*count = 0;
 		Log(ERROR, "WEDImporter", "Found door without WED entry!");
-		return NULL;
+		return {};
 	}
 
 	str->ReadWord(DoorClosed);
@@ -264,12 +263,11 @@ ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& Base
 
 	//Reading Door Tile Cells
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
-	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
-	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
+	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
+	str->Read(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
 	if( DataStream::BigEndian()) {
-		swabs(DoorTiles, DoorTileCount * sizeof(ieWord));
+		swabs(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
 	}
-	*count = DoorTileCount;
 	BaseClosed = DoorClosed != 0;
 	return DoorTiles;
 }

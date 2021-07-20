@@ -79,12 +79,12 @@ TileObject* TileMap::GetTile(unsigned int idx)
 
 //doors
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt)
+	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
 	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
-	door->SetTiles( indices, count );
+	door->SetTiles(std::move(indices));
 	door->SetName( ID );
 	door->SetScriptName( Name );
 	doors.push_back( door );

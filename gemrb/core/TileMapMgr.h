@@ -31,8 +31,7 @@ class GEM_EXPORT TileMapMgr : public Plugin {
 public:
 	virtual bool Open(DataStream* stream) = 0;
 	virtual TileMap* GetTileMap(TileMap *tm) const = 0;
-	virtual ieWord* GetDoorIndices(const ResRef&, int* count,
-		bool& BaseClosed) = 0;
+	virtual std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) = 0;
 	virtual WallPolygonGroup OpenDoorPolygons() const = 0;
 	virtual WallPolygonGroup ClosedDoorPolygons() const = 0;
 	virtual void SetExtendedNight(bool night) = 0;

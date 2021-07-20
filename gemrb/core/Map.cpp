@@ -4063,20 +4063,20 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 	}
 }
 
-PathMapFlags Map::GetInternalSearchMap(int x, int y) const
+PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 {
-	if (x >= mapSize.w || y >= mapSize.h) {
+	if (p.x >= mapSize.w || p.y >= mapSize.h) {
 		return PathMapFlags::UNMARKED;
 	}
-	return SrchMap[x + y * mapSize.w];
+	return SrchMap[p.x + p.y * mapSize.w];
 }
 
-void Map::SetInternalSearchMap(int x, int y, PathMapFlags value)
+void Map::SetInternalSearchMap(const Point& p, PathMapFlags value)
 {
-	if (x >= mapSize.w || y >= mapSize.h) {
+	if (p.x >= mapSize.w || p.y >= mapSize.h) {
 		return;
 	}
-	SrchMap[x + y * mapSize.w] = value;
+	SrchMap[p.x + p.y * mapSize.w] = value;
 }
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)

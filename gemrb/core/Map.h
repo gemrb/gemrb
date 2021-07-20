@@ -634,8 +634,8 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	PathMapFlags GetInternalSearchMap(int x, int y) const;
-	void SetInternalSearchMap(int x, int y, PathMapFlags value);
+	PathMapFlags GetInternalSearchMap(const Point&) const;
+	void SetInternalSearchMap(const Point&, PathMapFlags value);
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
 

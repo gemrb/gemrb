@@ -65,13 +65,7 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
 	: Highlightable( ST_DOOR ), doorTrigger(std::move(trigger))
 {
-	tiles = NULL;
-	tilecount = 0;
 	Flags = 0;
-	open_ib = NULL;
-	oibcount = 0;
-	closed_ib = NULL;
-	cibcount = 0;
 	overlay = Overlay;
 	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
@@ -79,20 +73,11 @@ Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
 	DiscoveryDiff = LockDifficulty = 0;
 }
 
-Door::~Door(void)
+void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const
 {
-	if (tiles) {
-		free( tiles );
-	}
-	delete[] open_ib;
-	delete[] closed_ib;
-}
-
-void Door::ImpedeBlocks(int count, const Point *points, PathMapFlags value) const
-{
-	for(int i = 0;i<count;i++) {
-		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::NOTDOOR;
-		area->SetInternalSearchMap(points[i].x, points[i].y, tmp|value);
+	for (const Point& point : points) {
+		PathMapFlags tmp = area->GetInternalSearchMap(point) & PathMapFlags::NOTDOOR;
+		area->SetInternalSearchMap(point, tmp|value);
 	}
 }
 
@@ -117,12 +102,12 @@ void Door::UpdateDoor()
 		pmdflags = PathMapFlags::DOOR_OPAQUE|PathMapFlags::DOOR_IMPASSABLE;
 	}
 	if (Flags &DOOR_OPEN) {
-		ImpedeBlocks(cibcount, closed_ib, PathMapFlags::IMPASSABLE);
-		ImpedeBlocks(oibcount, open_ib, pmdflags);
+		ImpedeBlocks(closed_ib, PathMapFlags::IMPASSABLE);
+		ImpedeBlocks(open_ib, pmdflags);
 	}
 	else {
-		ImpedeBlocks(oibcount, open_ib, PathMapFlags::IMPASSABLE);
-		ImpedeBlocks(cibcount, closed_ib, pmdflags);
+		ImpedeBlocks(open_ib, PathMapFlags::IMPASSABLE);
+		ImpedeBlocks(closed_ib, pmdflags);
 	}
 
 	InfoPoint *ip = area->TMap->GetInfoPoint(LinkedInfo);
@@ -145,7 +130,7 @@ void Door::ToggleTiles(int State, int playsound)
 		if (playsound && !CloseSound.IsEmpty())
 			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
 	}
-	for (int i = 0; i < tilecount; i++) {
+	for (size_t i = 0; i < tiles.size(); ++i) {
 		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
 	}
 
@@ -159,13 +144,9 @@ void Door::SetName(const ResRef &name)
 	ID = name;
 }
 
-void Door::SetTiles(unsigned short* Tiles, int cnt)
+void Door::SetTiles(std::vector<ieWord> Tiles)
 {
-	if (tiles) {
-		free( tiles );
-	}
-	tiles = Tiles;
-	tilecount = cnt;
+	tiles = std::move(Tiles);
 }
 
 bool Door::CanDetectTrap() const
@@ -233,27 +214,17 @@ std::shared_ptr<Gem_Polygon> Door::ClosedTriggerArea() const
 //also mark actors to fix position
 bool Door::BlockedOpen(int Open, int ForceOpen) const
 {
-	bool blocked;
-	int count;
-	Point *points;
+	const std::vector<Point> *points = Open ? &open_ib : &closed_ib;
+	bool blocked = false;
 
-	blocked = false;
-	if (Open) {
-		count = oibcount;
-		points = open_ib;
-	} else {
-		count = cibcount;
-		points = closed_ib;
-	}
 	//getting all impeded actors flagged for jump
 	Region rgn;
 	rgn.w = 16;
 	rgn.h = 12;
-	for(int i = 0;i<count;i++) {
+	for(const Point& p : *points) {
 		Actor** ab;
-		rgn.x = points[i].x*16;
-		rgn.y = points[i].y*12;
-		PathMapFlags tmp = area->GetInternalSearchMap(points[i].x, points[i].y) & PathMapFlags::ACTOR;
+		rgn.origin = Map::ConvertCoordFromTile(p);
+		PathMapFlags tmp = area->GetInternalSearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
 			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			while(ac--) {
