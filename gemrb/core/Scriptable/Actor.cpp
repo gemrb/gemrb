@@ -4963,7 +4963,7 @@ void Actor::dump() const
 
 void Actor::dump(StringBuffer& buffer) const
 {
-	buffer.appendFormatted( "Debugdump of Actor %s (%s, %s):\n", LongName, ShortName, GetName(-1) );
+	buffer.appendFormatted("Debugdump of Actor %s (%s, %s):\n", LongName.CString(), ShortName.CString(), GetName(-1));
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
 		const char* poi = "<none>";
@@ -4976,7 +4976,7 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area.CString(), Pos.x, Pos.y);
 	buffer.appendFormatted("Dialog:     %.8s    TalkCount:  %d\n", Dialog.CString(), TalkCount);
 	buffer.appendFormatted("Global ID:  %d   PartySlot: %d\n", GetGlobalID(), InParty);
-	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName, CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
+	buffer.appendFormatted("Script name:%.32s    Current action: %d    Total: %ld\n", scriptName.CString(), CurrentAction ? CurrentAction->actionID : -1, (long) actionQueue.size());
 	buffer.appendFormatted("Int. Flags: 0x%x    ", InternalFlags);
 	buffer.appendFormatted("MC Flags: 0x%x    ", Modified[IE_MC_FLAGS]);
 	buffer.appendFormatted("Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );

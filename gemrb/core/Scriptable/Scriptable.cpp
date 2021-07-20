@@ -462,7 +462,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName.CString());
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
