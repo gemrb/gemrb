@@ -1610,7 +1610,7 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 		CREKnownSpell *known = new CREKnownSpell;
 		known->Level = level;
 		known->Type = type;
-		known->SpellResRef = ResRef::MakeLowerCase(tmp);
+		known->SpellResRef = tmp;
 		sm->known_spells.push_back(known);
 		while (memocount--) {
 			if (totalcount) {
@@ -1621,13 +1621,13 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 			}
 			CREMemorizedSpell *memory = new CREMemorizedSpell;
 			memory->Flags = 1;
-			memory->SpellResRef = ResRef::MakeLowerCase(tmp);
+			memory->SpellResRef = tmp;
 			sm->memorized_spells.push_back(memory);
 		}
 		while(totalcount--) {
 			CREMemorizedSpell *memory = new CREMemorizedSpell;
 			memory->Flags = 0;
-			memory->SpellResRef = ResRef::MakeLowerCase(tmp);
+			memory->SpellResRef = tmp;
 			sm->memorized_spells.push_back(memory);
 		}
 	}
