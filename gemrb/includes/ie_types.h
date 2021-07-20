@@ -51,7 +51,31 @@ typedef signed long int ieDwordSigned;
 /** string reference into TLK file */
 typedef ieDword ieStrRef;
 
-typedef char ieVariable[33];
+class ieVariable
+{
+	char var[33] {'\0'};
+	
+public:
+	ieVariable() = default;
+	ieVariable(std::nullptr_t) = delete;
+
+	ieVariable(const char* c) noexcept {
+		operator=(c);
+	}
+	
+	ieVariable& operator=(const char* c) noexcept {
+		strncpy(var, c, sizeof(var) - 1);
+		return *this;
+	}
+	
+	operator const char*() const noexcept {
+		return var;
+	}
+	
+	operator char*() noexcept {
+		return var;
+	}
+};
 
 }
 
