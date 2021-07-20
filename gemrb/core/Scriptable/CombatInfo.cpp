@@ -37,7 +37,7 @@ static void SetBonusInternal(int& current, int bonus, int mod)
 	int tmp;
 
 	switch (mod) {
-		case 0: // cummulative modifier
+		case 0: // cumulative modifier
 			if (!third) {
 				newBonus += bonus;
 				break;

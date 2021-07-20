@@ -1434,7 +1434,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadWord(X);
 		str->ReadWord(Y);
 		str->ReadWord(Z);
-		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targetting" on IESDP
+		str->Read(&TargetType, 1); //according to dev info, this is 'targettype'; "Enemy-ally targeting" on IESDP
 		str->Read(&Owner, 1); // party member index that created this projectile (0-5)
 		int TrapEffectCount = TrapSize/0x108;
 		if(TrapEffectCount*0x108!=TrapSize) {

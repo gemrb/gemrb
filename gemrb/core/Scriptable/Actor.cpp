@@ -7157,7 +7157,7 @@ void Actor::GetTHAbilityBonus(ieDword Flags)
 				} else {
 					dexbonus = core->GetDexterityBonus(STAT_DEX_MISSILE, GetStat(IE_DEX));
 				}
-				// weapon finesse is not cummulative
+				// weapon finesse is not cumulative
 				if (dexbonus > strbonus) {
 					strbonus = 0;
 				} else {
@@ -8102,7 +8102,7 @@ static bool is_zero(const int& value) {
 }
 
 // for each class pair that is out of level sync for more than 1 level and
-// one of them isn't a favored class, incur a 20% xp penalty (cummulative)
+// one of them isn't a favored class, incur a 20% xp penalty (cumulative)
 int Actor::GetFavoredPenalties() const
 {
 	if (!third) return 0;

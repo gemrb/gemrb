@@ -727,7 +727,7 @@ CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigne
 //if bonus is not set, then sets the base value (adjusts bonus too)
 //if bonus is set, then sets only the bonus
 //if the bonus value is 0, then the bonus is double base value
-//bonus is cummulative, but not saved
+//bonus is cumulative, but not saved
 void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus)
 {
 	int diff;

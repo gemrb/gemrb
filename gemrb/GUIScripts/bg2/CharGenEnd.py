@@ -150,7 +150,7 @@ def GiveEquipment(MyChar, ClassName, KitIndex):
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 
 		# a map of slots in the table to the real slots
-		# SLOT_BAG is invalid, so use the inventory (first occurence)
+		# SLOT_BAG is invalid, so use the inventory (first occurrence)
 		# SLOT_INVENTORY: use -1 instead, that's what CreateItem expects
 		RealSlots = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, -1, SLOT_RING, \
 					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \

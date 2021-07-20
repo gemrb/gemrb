@@ -209,7 +209,7 @@ void Container::TryPickLock(const Actor *actor)
 
 void Container::TryBashLock(Actor *actor)
 {
-	//Get the strength bonus agains lock difficulty
+	// Get the strength bonus against lock difficulty
 	int bonus;
 	unsigned int roll;
 

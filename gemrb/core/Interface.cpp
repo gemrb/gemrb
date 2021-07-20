@@ -1459,7 +1459,7 @@ int Interface::Init(InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
-	// set up the tooltip delay which we store in miliseconds
+	// set up the tooltip delay which we store in milliseconds
 	ieDword tooltipDelay = 0;
 	GetDictionary()->Lookup("Tooltips", tooltipDelay);
 	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
@@ -2860,7 +2860,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
 			break;
 		default:
-			error("Interface", "Uknown resource directory type: %d!", dir);
+			error("Interface", "Unknown resource directory type: %d!", dir);
 	}
 
 	PathJoin(Path, config.GamePath, resourcePath, nullptr);
