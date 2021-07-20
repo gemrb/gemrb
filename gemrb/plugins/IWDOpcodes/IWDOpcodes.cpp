@@ -475,7 +475,7 @@ static void ReadSpellProtTable(const char* tableName)
 		spellres[i].stat = (ieWord) stat;
 
 		spellres[i].value = strtounsigned<ieDword>(tab->QueryField(i,1));
-		spellres[i].relation = strtounsigned<ieWord>(tab->QueryField(i,2),NULL,0 );
+		spellres[i].relation = strtounsigned<ieWord>(tab->QueryField(i,2));
 	}
 }
 

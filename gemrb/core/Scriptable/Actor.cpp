@@ -2636,10 +2636,10 @@ static void InitActorTables()
 		if (count> 0 && count<8) {
 			avCount = count-1;
 			avPrefix = new avType[count];
-			avBase = strtosigned<int>(tm->QueryField(0),NULL, 0);
+			avBase = strtosigned<int>(tm->QueryField(0));
 			const char *poi = tm->QueryField(0,1);
 			if (*poi!='*') {
-				avStance = strtosigned<int>(tm->QueryField(0,1),NULL, 0);
+				avStance = strtosigned<int>(tm->QueryField(0,1));
 			} else {
 				avStance = -1;
 			}
@@ -2661,8 +2661,8 @@ static void InitActorTables()
 		int racesNRows = tm->GetRowCount();
 
 		for (int i = 0; i < racesNRows; i++) {
-			int raceID = strtosigned<int>(tm->QueryField(i, 3), NULL, 0);
-			int favClass = strtosigned<int>(tm->QueryField(i, 8), NULL, 0);
+			int raceID = strtosigned<int>(tm->QueryField(i, 3));
+			int favClass = strtosigned<int>(tm->QueryField(i, 8));
 			const char *raceName = tm->GetRowName(i);
 			favoredMap.insert(std::make_pair(raceID, favClass));
 			raceID2Name.insert(std::make_pair(raceID, raceName));
@@ -11121,7 +11121,7 @@ int Actor::UpdateAnimationID(bool derived)
 		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
 		const char *poi = tm->QueryField( StatID );
-		AnimID += strtosigned<int>( poi, NULL, 0 );
+		AnimID += strtosigned<int>(poi);
 	}
 	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {
 		SetBase(IE_ANIMATION_ID, (unsigned int) AnimID);
