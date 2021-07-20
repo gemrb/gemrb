@@ -608,7 +608,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 	newfx->DiceSides = fx->DiceSides;
 	newfx->Resource = fx->Resource;
 	//applyeffectcopy on everyone near us
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1274,7 +1274,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->DiceSides = fx->DiceSides;
 	newfx->Resource = fx->Resource;
 
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1315,7 +1315,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx2->Resource = fx->SourceRef;
 
 	//collect targets and apply effect on targets
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1382,7 +1382,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx2->Resource = fx->SourceRef;
 
 	//collect targets and apply effect on targets
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1642,10 +1642,10 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->Power = fx->Power;
 
 	//collect targets and apply effect on targets
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
-		Actor *victim = area->GetActor(i,true);
+		const Actor *victim = area->GetActor(i, true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			core->ApplyEffect(newfx, target, Owner);
@@ -2081,7 +2081,7 @@ int fx_floattext (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		// fall through
 	case 2:
 		if (EXTSTATE_GET(EXTSTATE_FLOATTEXTS)) {
-			ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);
+			const ieDword *CynicismList = core->GetListFrom2DA(fx->Resource);
 			ieDword i = CynicismList[0];
 			if (i) {
 				DisplayStringCore(target, CynicismList[core->Roll(1,i,0)], DS_HEAD);
@@ -2227,7 +2227,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 	int spellname = -1;
 
 	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID) ) {
-		Item *poi = gamedata->GetItem(fx->Resource);
+		const Item *poi = gamedata->GetItem(fx->Resource);
 		spellname = poi->ItemName;
 		gamedata->FreeItem(poi, fx->Resource, false);
 	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID) ) {
@@ -2301,7 +2301,7 @@ int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -2333,7 +2333,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos);
 
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -2361,7 +2361,7 @@ int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	Map *area = target->GetCurrentArea();
+	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -2695,7 +2695,7 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target->fxqueue.HasEffect(fx_protection_from_evil_ref)) return FX_NOT_APPLIED;
 
 	//check for slippery mind feat success
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (fx->FirstApply && target->HasFeat(FEAT_SLIPPERY_MIND)) {
 		fx->Parameter3 = 1;
 		fx->Parameter4 = game->GameTime+core->Time.round_size;
@@ -2709,9 +2709,9 @@ int fx_control (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 	// print("fx_control(%2d)", fx->Opcode);
 	bool enemyally = true;
-	Scriptable *caster = GetCasterObject();
+	const Scriptable *caster = GetCasterObject();
 	if (caster && caster->Type==ST_ACTOR) {
-		enemyally = ((Actor *) caster)->GetStat(IE_EA)>EA_GOODCUTOFF;
+		enemyally = ((const Actor *) caster)->GetStat(IE_EA) > EA_GOODCUTOFF;
 	}
 
 	if (fx->FirstApply) {
@@ -2923,8 +2923,8 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	// print("fx_area_effect(%2d) Radius: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
 
 	//this effect ceases to affect dead targets (probably on frozen and stoned too)
-	Game *game = core->GetGame();
-	Map *map = NULL;
+	const Game *game = core->GetGame();
+	const Map *map;
 
 	if (target) {
 		if (STATE_GET(STATE_DEAD) ) {
@@ -2950,7 +2950,7 @@ int fx_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	fx->Parameter4 = game->GameTime+fx->Parameter3;
 
-	Spell *spell = gamedata->GetSpell(fx->Resource);
+	const Spell *spell = gamedata->GetSpell(fx->Resource);
 	if (!spell) {
 		return FX_NOT_APPLIED;
 	}
@@ -3015,7 +3015,7 @@ int fx_entropy_shield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx->Resource = "ENTROPY";
 	}
 	//immunity to certain projectiles
-	ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
+	const ieDword *EntropyProjectileList = core->GetListFrom2DA(fx->Resource);
 	ieDword i = EntropyProjectileList[0];
 	//the index is handled differently because
 	//the list's first element is the element count
@@ -3170,7 +3170,7 @@ int fx_projectile_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
-	Spell* spl = gamedata->GetSpell( fx->Resource );
+	const Spell* spl = gamedata->GetSpell(fx->Resource);
 	//create projectile from known spellheader
 	//cannot get the projectile from the spell
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(fx->Parameter2);
@@ -3285,7 +3285,7 @@ int fx_persistent_use_effect_list (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_day_blindness (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_day_blindness(%2d) Amount: %d", fx->Opcode, fx->Parameter2);
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
