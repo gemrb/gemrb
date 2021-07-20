@@ -48,13 +48,15 @@ struct LevelAndKit
 {
 	unsigned int level;
 	unsigned int kit;
+	
+	LevelAndKit(unsigned int level, unsigned int kit) noexcept
+	: level(level), kit(kit)
+	{}
 };
 
 class SpellEntry
 {
 public:
-	~SpellEntry();
-	SpellEntry();
 	const ResRef& GetSpell() const;
 	const ResRef& FindSpell(unsigned int level, unsigned int kit) const;
 	int FindSpell(unsigned int kit) const;
@@ -63,21 +65,8 @@ public:
 	void AddLevel(unsigned int level, unsigned int kit);
 private:
 	ResRef spell;
-	LevelAndKit *levels;
-	int count;
+	std::vector<LevelAndKit> levels;
 };
-
-SpellEntry::SpellEntry()
-{
-	levels = NULL;
-	count = 0;
-}
-
-SpellEntry::~SpellEntry()
-{
-	free(levels);
-	levels = NULL;
-}
 
 const ResRef& SpellEntry::GetSpell() const
 {
@@ -86,9 +75,8 @@ const ResRef& SpellEntry::GetSpell() const
 
 const ResRef& SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 {
-	int i = count;
-	while(i--) {
-		if (levels[i].level==level && levels[i].kit==kit) {
+	for (const auto& entry : levels) {
+		if (entry.kit == kit && entry.level == level) {
 			return spell;
 		}
 	}
@@ -97,10 +85,9 @@ const ResRef& SpellEntry::FindSpell(unsigned int level, unsigned int kit) const
 
 int SpellEntry::FindSpell(unsigned int kit) const
 {
-	int i = count;
-	while(i--) {
-		if (levels[i].kit==kit) {
-			return levels[i].level;
+	for (const auto& entry : levels) {
+		if (entry.kit == kit) {
+			return entry.level;
 		}
 	}
 	return -1;
@@ -134,16 +121,14 @@ void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
 	}
 
 	level--; // convert to 0-based for internal use
-	for(int i=0;i<count;i++) {
-		if(levels[i].kit==kit && levels[i].level==level) {
+	for (const auto& entry : levels) {
+		if (entry.kit == kit && entry.level == level) {
 			Log(WARNING, "CREImporter", "Skipping duplicate spell list table entry for: %s", spell.CString());
 			return;
 		}
 	}
-	levels = (LevelAndKit *) realloc(levels, sizeof(LevelAndKit) * (count+1) );
-	levels[count].kit=kit;
-	levels[count].level=level;
-	count++;
+	
+	levels.emplace_back(level, kit);
 }
 
 static int IsInnate(const ResRef& name)
