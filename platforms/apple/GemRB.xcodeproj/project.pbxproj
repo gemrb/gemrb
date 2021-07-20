@@ -11486,10 +11486,9 @@
 					../gemrb/includes,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LD_RUNPATH_SEARCH_PATHS = "\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"";
+				LD_RUNPATH_SEARCH_PATHS = "$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\\\"",
 					"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib",
 				);
 				MACH_O_TYPE = mh_bundle;
@@ -11512,10 +11511,9 @@
 					../gemrb/includes,
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
-				LD_RUNPATH_SEARCH_PATHS = "\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\"";
+				LD_RUNPATH_SEARCH_PATHS = "$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib\\\"",
 					"$(SYSTEM_APPS_DIR)/VLC.app/Contents/MacOS/lib",
 				);
 				MACH_O_TYPE = mh_bundle;
