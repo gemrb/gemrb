@@ -1481,9 +1481,6 @@ int Interface::Init(InterfaceConfig* cfg)
 
 	Log(MESSAGE, "Core", "Creating Projectile Server...");
 	projserv = new ProjectileServer();
-	if (!projserv->GetHighestProjectileNumber()) {
-		Log(ERROR, "Core", "No projectiles are available...");
-	}
 
 	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {

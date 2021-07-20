@@ -36,23 +36,62 @@ namespace GemRB {
 
 ProjectileServer::ProjectileServer()
 {
-	projectilecount = -1;
-	projectiles = NULL;
-	explosioncount = -1;
-	explosions = NULL;
+	// built-in gemrb projectiles and game/mod-provided projectiles
+	unsigned int gemresource = core->LoadSymbol("gemprjtl");
+	Holder<SymbolMgr> gemprojlist = core->GetSymbol(gemresource);
+	unsigned int resource = core->LoadSymbol("projectl");
+	Holder<SymbolMgr> projlist = core->GetSymbol(resource);
+	size_t projectilecount = 0;
+	// first, we must calculate how many projectiles we have
+	if (gemprojlist) {
+		projectilecount = PrepareSymbols(gemprojlist) + 1;
+	}
+	if (projlist) {
+		size_t temp = PrepareSymbols(projlist) + 1;
+		if (temp > projectilecount)
+			projectilecount = temp;
+	}
+
+	// then, allocate space for them all
+	if (projectilecount == 0) {
+		// no valid projectiles files..
+		projectilecount = 1;
+	}
+	projectiles.resize(projectilecount);
+	
+	// finally, we must read the projectile resrefs
+	if (projlist) {
+		AddSymbols(projlist);
+		core->DelSymbol(resource);
+	}
+	// gemprojlist is second because it always overrides game/mod-supplied projectiles
+	if (gemprojlist) {
+		AddSymbols(gemprojlist);
+		core->DelSymbol(gemresource);
+	}
+	
+	AutoTable explist("areapro");
+	if (explist) {
+		unsigned int rows = explist->GetRowCount();
+		//cannot handle 0xff and it is easier to set up the fields
+		//without areapro.2da anyway. So this isn't a restriction
+		if(rows>254) {
+			rows=254;
+		}
+		explosions.resize(rows);
+		while(rows--) {
+			int i;
+
+			for(i=0;i<AP_RESCNT;i++) {
+				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
+			}
+			//using i so the flags field will always be after the resources
+			explosions[rows].flags = atoi(explist->QueryField(rows,i));
+		}
+	}
 }
 
-ProjectileServer::~ProjectileServer()
-{
-	if (projectiles) {
-		delete[] projectiles;
-	}
-	if (explosions) {
-		delete[] explosions;
-	}
-}
-
-Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
+Projectile *ProjectileServer::CreateDefaultProjectile(size_t idx)
 {
 	Projectile *pro = new Projectile();
 
@@ -72,7 +111,7 @@ Projectile *ProjectileServer::GetProjectileByName(const ResRef &resname)
 	if (!core->IsAvailable(IE_PRO_CLASS_ID)) {
 		return NULL;
 	}
-	unsigned int idx=GetHighestProjectileNumber();
+	size_t idx = GetHighestProjectileNumber();
 	while(idx--) {
 		if (resname == projectiles[idx].resname) {
 			return GetProjectile(idx);
@@ -81,7 +120,7 @@ Projectile *ProjectileServer::GetProjectileByName(const ResRef &resname)
 	return NULL;
 }
 
-Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
+Projectile *ProjectileServer::GetProjectileByIndex(size_t idx)
 {
 	if (!core->IsAvailable(IE_PRO_CLASS_ID)) {
 		return NULL;
@@ -93,7 +132,7 @@ Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
 	return GetProjectile(idx);
 }
 
-Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
+Projectile *ProjectileServer::ReturnCopy(size_t idx)
 {
 	const ProjectileEntry& old = projectiles[idx];
 	Projectile *pro = new Projectile(*old.projectile);
@@ -101,7 +140,7 @@ Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
 	return pro;
 }
 
-Projectile *ProjectileServer::GetProjectile(unsigned int idx)
+Projectile *ProjectileServer::GetProjectile(size_t idx)
 {
 	if (projectiles[idx].projectile) {
 		return ReturnCopy(idx);
@@ -162,48 +201,16 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 		}
 
 		//fill the explosion/spread animation flags
-		pro->Extension->APFlags = GetExplosionFlags(Type);
+		pro->Extension->APFlags = explosions[idx].flags;
 	}
 
 	return ReturnCopy(idx);
 }
 
-int ProjectileServer::InitExplosion()
-{
-	if (explosioncount>=0) {
-		return explosioncount;
-	}
+size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) {
+	size_t count = 0;
 
-	AutoTable explist("areapro");
-	if (explist) {
-		explosioncount = 0;
-
-		unsigned int rows = explist->GetRowCount();
-		//cannot handle 0xff and it is easier to set up the fields
-		//without areapro.2da anyway. So this isn't a restriction
-		if(rows>254) {
-			rows=254;
-		}
-		explosioncount = rows;
-		explosions = new ExplosionEntry[rows];
-
-		while(rows--) {
-			int i;
-
-			for(i=0;i<AP_RESCNT;i++) {
-				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
-			}
-			//using i so the flags field will always be after the resources
-			explosions[rows].flags = atoi(explist->QueryField(rows,i));
-		}
-	}
-	return explosioncount;
-}
-
-unsigned int ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) {
-	unsigned int count = 0;
-
-	unsigned int rows = (unsigned int) projlist->GetSize();
+	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);
 		if (value>MAX_PROJ_IDX) {
@@ -220,89 +227,24 @@ unsigned int ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist)
 }
 
 void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
-	unsigned int rows = (unsigned int) projlist->GetSize();
+	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);
 		if (value>MAX_PROJ_IDX) {
 			continue;
 		}
-		if (value >= (unsigned int)projectilecount) {
-			// this should never happen!
-			error("ProjectileServer", "Too high projectilenumber while adding projectiles\n");
-		}
 		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
 	}
 }
 
-unsigned int ProjectileServer::GetHighestProjectileNumber()
+size_t ProjectileServer::GetHighestProjectileNumber()
 {
-	if (projectilecount>=0) {
-		// already read the projectiles
-		return (unsigned int) projectilecount;
-	}
-
-	// built-in gemrb projectiles and game/mod-provided projectiles
-	unsigned int gemresource = core->LoadSymbol("gemprjtl");
-	Holder<SymbolMgr> gemprojlist = core->GetSymbol(gemresource);
-	unsigned int resource = core->LoadSymbol("projectl");
-	Holder<SymbolMgr> projlist = core->GetSymbol(resource);
-
-	// first, we must calculate how many projectiles we have
-	if (gemprojlist) {
-		projectilecount = PrepareSymbols(gemprojlist) + 1;
-	}
-	if (projlist) {
-		unsigned int temp = PrepareSymbols(projlist) + 1;
-		if (projectilecount == -1 || temp > (unsigned int)projectilecount)
-			projectilecount = temp;
-	}
-
-	// then, allocate space for them all
-	if (projectilecount == -1) {
-		// no valid projectiles files..
-		projectilecount = 1;
-	}	
-	projectiles = new ProjectileEntry[projectilecount];
-	
-	// finally, we must read the projectile resrefs
-	if (projlist) {
-		AddSymbols(projlist);
-		core->DelSymbol(resource);
-	}
-	// gemprojlist is second because it always overrides game/mod-supplied projectiles
-	if (gemprojlist) {
-		AddSymbols(gemprojlist);
-		core->DelSymbol(gemresource);
-	}
-
-	return (unsigned int) projectilecount;
+	return projectiles.size();
 }
 
-//return various flags for the explosion type
-int ProjectileServer::GetExplosionFlags(unsigned int idx)
+ResRef ProjectileServer::GetExplosion(size_t idx, int type)
 {
-	if (explosioncount==-1) {
-		if (InitExplosion()<0) {
-			Log(ERROR, "ProjectileServer", "Problem with explosions!");
-			explosioncount=0;
-		}
-	}
-	if (idx>=(unsigned int) explosioncount) {
-		return 0;
-	}
-
-	return explosions[idx].flags;
-}
-
-ResRef ProjectileServer::GetExplosion(unsigned int idx, int type)
-{
-	if (explosioncount==-1) {
-		if (InitExplosion()<0) {
-			Log(ERROR, "ProjectileServer", "Problem with explosions");
-			explosioncount=0;
-		}
-	}
-	if (idx>=(unsigned int) explosioncount) {
+	if (idx >= explosions.size()) {
 		return ResRef();
 	}
 	ResRef const *ret = &explosions[idx].resources[type];

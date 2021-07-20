@@ -55,32 +55,27 @@ class GEM_EXPORT ProjectileServer
 {
 public:
 	ProjectileServer();
-	~ProjectileServer();
 
-	Projectile *GetProjectileByIndex(unsigned int idx);
+	Projectile *GetProjectileByIndex(size_t idx);
 	//it is highly unlikely we need this function
 	Projectile *GetProjectileByName(const ResRef &resname);
 	//returns the highest projectile id
-	unsigned int GetHighestProjectileNumber();
-	int InitExplosion();
-	int GetExplosionFlags(unsigned int idx);
-	ResRef GetExplosion(unsigned int idx, int type);
+	size_t GetHighestProjectileNumber();
 	//creates an empty projectile on the fly
-	Projectile *CreateDefaultProjectile(unsigned int idx);
+	Projectile *CreateDefaultProjectile(size_t idx);
 private:
-	ProjectileEntry *projectiles; //this is the list of projectiles
-	int projectilecount;
-	ExplosionEntry *explosions;   //this is the list of explosion resources
-	int explosioncount;
+	std::vector<ProjectileEntry> projectiles; //this is the list of projectiles
+	std::vector<ExplosionEntry> explosions;   //this is the list of explosion resources
 	// internal function: what is max valid projectile id?
-	unsigned int PrepareSymbols(const Holder<SymbolMgr>& projlist);
+	size_t PrepareSymbols(const Holder<SymbolMgr>& projlist);
 	// internal function: read projectiles
 	void AddSymbols(const Holder<SymbolMgr>& projlist);
 	//this method is used internally
-	Projectile *GetProjectile(unsigned int idx);
+	Projectile *GetProjectile(size_t idx);
 	//creates a clone from the cached projectiles
-	Projectile *ReturnCopy(unsigned int idx);
+	Projectile *ReturnCopy(size_t idx);
 	//returns one of the resource names
+	ResRef GetExplosion(size_t idx, int type);
 };
 
 #endif // PROJSERVER_H
