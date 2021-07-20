@@ -57,12 +57,16 @@ public:
 	// in some cases we need lower/upper case for save compatibility with originals
 	// so we provide factories the create ResRef with the required case
 	static ResRef MakeLowerCase(const char* str) {
+		if (!str) return ResRef();
+
 		char ref[9];
 		strnlwrcpy(ref, str, sizeof(ref) - 1);
 		return ref;
 	}
 	
 	static ResRef MakeUpperCase(const char* str) {
+		if (!str) return ResRef();
+
 		char ref[9];
 		strnuprcpy(ref, str, sizeof(ref) - 1);
 		return ref;
