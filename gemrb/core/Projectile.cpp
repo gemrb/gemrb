@@ -1843,10 +1843,10 @@ int Projectile::GetZPos() const
 	return ZPos;
 }
 
-void Projectile::SetIdentifiers(const char *resref, ieWord id)
+void Projectile::SetIdentifiers(const ResRef &resref, size_t idx)
 {
-	if (resref) projectileName = resref;
-	type=id;
+	projectileName = resref;
+	type = idx;
 }
 
 bool Projectile::PointInRadius(const Point &p) const

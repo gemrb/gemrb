@@ -313,7 +313,7 @@ public:
 		return Pos.y;
 	}
 
-	void SetIdentifiers(const char *name, ieWord type);
+	void SetIdentifiers(const ResRef &name, size_t idx);
 
 	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
 
