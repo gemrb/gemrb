@@ -30,6 +30,8 @@
 
 #include "Platform.h"
 
+#include <cstring>
+
 namespace GemRB {
 
 typedef unsigned char ieByte;
