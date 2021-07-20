@@ -199,8 +199,21 @@ GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *d
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
 GEM_EXPORT int CountElements(const char *str, char separator);
-GEM_EXPORT void GetElements(const char *str, ieVariable *storage, int count);
-GEM_EXPORT void GetElements(const char *str, ResRef *storage, int count);
+
+// explode a CSV resref list into separate storage
+template<typename T>
+std::vector<T> GetElements(const char *str)
+{
+	std::vector<T> elements;
+	int i = 0;
+	for (char *part = strtok((char*) str, ","); part; part = strtok(nullptr, ",")) {
+		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
+		if (*part == ' ') part++;
+		elements.emplace_back(part);
+		i++;
+	}
+	return elements;
+}
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 

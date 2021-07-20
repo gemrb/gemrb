@@ -134,14 +134,12 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 
 	s = inifile->GetKeyAsString("spawn_main","events",NULL);
 	if (s) {
-		auto eventcount = CountElements(s,',');
+		auto events = GetElements<const char*>(s);
+		auto eventcount = events.size();
 		eventspawns.resize(eventcount);
-		ieVariable *events = new ieVariable[eventcount];
-		GetElements(s, events, eventcount);
 		while(eventcount--) {
 			ReadSpawnEntry(inifile.get(), events[eventcount], eventspawns[eventcount]);
 		}
-		delete[] events;
 	}
 	//maybe not correct
 	InitialSpawn();
@@ -259,9 +257,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//the creature resource(s)
 	s = inifile->GetKeyAsString(crittername,"cre_file",NULL);
 	if (s) {
-		critter.creaturecount = CountElements(s,',');
-		critter.CreFile = new ResRef[critter.creaturecount];
-		GetElements(s, critter.CreFile, critter.creaturecount);
+		critter.CreFile = GetElements<ResRef>(s);
 	} else {
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
@@ -521,15 +517,14 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	//don't default to NULL here, some entries may be missing in original game
 	//an empty default string here will create an empty but consistent entry
 	s = inifile->GetKeyAsString(entryname,"critters","");
-	int crittercount = CountElements(s,',');
+	auto critters = GetElements<const char*>(s);
+	size_t crittercount = critters.size();
 	entry.crittercount=crittercount;
 	entry.critters = new CritterEntry[crittercount]();
-	ieVariable *critters = new ieVariable[crittercount];
-	GetElements(s, critters, crittercount);
+	
 	while(crittercount--) {
 		ReadCreature(inifile, critters[crittercount], entry.critters[crittercount]);
 	}
-	delete[] critters;
 }
 
 /* set by action */
@@ -590,7 +585,7 @@ void IniSpawn::RespawnNameless()
 
 void IniSpawn::SpawnCreature(CritterEntry &critter) const
 {
-	if (!critter.creaturecount) {
+	if (critter.CreFile.empty()) {
 		return;
 	}
 
@@ -668,7 +663,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter) const
 		}
 	}
 
-	int x = core->Roll(1,critter.creaturecount,-1);
+	int x = core->Roll(1, int(critter.CreFile.size()), -1);
 	Actor* cre = gamedata->GetCreature(critter.CreFile[x]);
 	if (!cre) {
 		return;

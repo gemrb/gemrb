@@ -344,33 +344,4 @@ int CountElements(const char *str, char separator)
 	return count;
 }
 
-// explode a CSV resref list into separate storage
-void GetElements(const char *str, ieVariable *storage, int count)
-{
-	ieVariable *field;
-	int i = 0;
-	for (char *part = strtok((char*) str, ","); part; part = strtok(nullptr, ",")) {
-		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
-		if (*part == ' ') part++;
-		field = &storage[i];
-		strnuprcpy(*field, part, sizeof(ieVariable) - 1);
-		assert(i < count);
-		i++;
-	}
-}
-
-void GetElements(const char *str, ResRef *storage, int count)
-{
-	ieVariable *elements = new ieVariable[count];
-	GetElements(str, elements, count);
-
-	ResRef *field;
-	for (int i = 0; i < count; i++) {
-		field = &storage[i];
-		*field = elements[i];
-	}
-
-	delete[] elements;
-}
-
 }

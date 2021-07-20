@@ -73,8 +73,7 @@ class Map;
 #define AI_ALIGNMENT	8
 
 struct CritterEntry {
-	int creaturecount;
-	ResRef *CreFile;        //spawn one of these creatures
+	std::vector<ResRef> CreFile;        //spawn one of these creatures
 	ieByte Spec[9];		  //existance check IDS qualifier
 	ieByte SetSpec[9];	  //set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
@@ -108,17 +107,12 @@ class SpawnEntry {
 public:
 	ieDword interval = 0;
 	ieDword lastSpawndate = 0;
-	int crittercount = 0;
+	size_t crittercount = 0;
 	CritterEntry *critters = nullptr;
 	char *name = nullptr;
 	SpawnEntry() = default;
 	~SpawnEntry() {
-		if (critters) {
-			for (int i=0;i<crittercount;i++) {
-				delete[] critters[i].CreFile;
-			}
-			delete[] critters;
-		}
+		delete[] critters;
 		free(name);
 	}
 };

@@ -3968,15 +3968,12 @@ void Actor::ReactToDeath(const char * deadname)
 	}
 
 	// there can be several entries to choose from, eg.: NOR103,NOR104,NOR105
-	int count = CountElements(value, ',');
+	auto elements = GetElements<const char*>(value);
+	size_t count = elements.size();
 	if (count <= 0) return;
 
-	ResRef *elements = new ResRef[count];
-	GetElements(value, elements, count);
-
-	int choice = core->Roll(1, count, -1);
+	int choice = core->Roll(1, int(count), -1);
 	ResRef resRef = elements[choice];
-	delete[] elements;
 
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
@@ -8875,15 +8872,12 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 			break;
 	}
 
-	int count = CountElements(resource, ',');
-	if (count <= 0) return false;
+	auto elements = GetElements<const char*>(resource);
+	size_t count = elements.size();
+	if (count == 0) return false;
 
-	ResRef *elements = new ResRef[count];
-	GetElements(resource, elements, count);
-
-	int choice = core->Roll(1, count, -1);
+	int choice = core->Roll(1, int(count), -1);
 	Sound = elements[choice];
-	delete[] elements;
 
 	return true;
 }
