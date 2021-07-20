@@ -96,7 +96,7 @@ void InitScriptTables()
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
-				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
+				happiness[alignment][reputation] = strtosigned<int>(tab->QueryField(reputation,alignment));
 			}
 		}
 	}
@@ -106,7 +106,7 @@ void InitScriptTables()
 	AutoTable rmr("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
-			rmodrep[reputation] = strtol(rmr->QueryField(0, reputation), NULL, 0);
+			rmodrep[reputation] = strtosigned<int>(rmr->QueryField(0, reputation));
 		}
 	}
 
@@ -114,7 +114,7 @@ void InitScriptTables()
 	AutoTable rmc("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
-			rmodchr[charisma] = strtol(rmc->QueryField(0, charisma), NULL, 0);
+			rmodchr[charisma] = strtosigned<int>(rmc->QueryField(0, charisma));
 		}
 	}
 
@@ -226,11 +226,11 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	for (int i = 0; i < 5; i++) {
 		if (spellRef == spell_suffices[i]) {
 			tmp = spellRef + 4;
-			long n = strtol(tmp.CString(), nullptr, 10);
+			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
 				return 0xffffffff;
 			}
-			return i * 1000 + static_cast<ieDword>(n);
+			return i * 1000 + n;
 		}
 	}
 	return 0xffffffff;
@@ -1550,7 +1550,7 @@ inline bool ismysymbol(const char letter)
 static int GetIdsValue(const char *&symbol, const char *idsname)
 {
 	char *newsymbol;
-	int value=strtol(symbol, &newsymbol, 0);
+	int value = strtosigned<int>(symbol, &newsymbol);
 	if (symbol!=newsymbol) {
 		symbol=newsymbol;
 		return value;
@@ -1599,7 +1599,7 @@ static int ParseIntParam(const char *&src, const char *&str)
 		}
 	}
 	//no IDS table
-	return strtol(src, (char **) &src, 0);
+	return strtosigned<int>(src, (char **) &src);
 }
 
 static void ParseIdsTarget(const char *&src, Object *&object)
@@ -1705,9 +1705,9 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newAction->pointParameter.x = (int) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.x = strtosigned<int>( src, (char **) &src, 10);
 				src++; //Skip .
-				newAction->pointParameter.y = (int) strtol( src, (char **) &src, 10 );
+				newAction->pointParameter.y = strtosigned<int>( src, (char **) &src, 10);
 				src++; //Skip ]
 				break;
 
@@ -2053,9 +2053,9 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 			case 'p': //Point
 				SKIP_ARGUMENT();
 				src++; //Skip [
-				newTrigger->pointParameter.x = (int) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.x = strtosigned<int>(src, (char **) &src, 10);
 				src++; //Skip .
-				newTrigger->pointParameter.y = (int) strtol( src, (char **) &src, 10 );
+				newTrigger->pointParameter.y = strtosigned<int>(src, (char **) &src, 10);
 				src++; //Skip ]
 				break;
 

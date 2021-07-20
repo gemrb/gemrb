@@ -4295,7 +4295,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TODO: create a single list reader that handles src and 2da too
 		SrcVector *rndstr=LoadSrc(fx->Resource);
 		if (rndstr) {
-			fx->Parameter1 = rndstr->at(RAND<ieDword>(0ul, rndstr->size() - 1));
+			fx->Parameter1 = rndstr->at(RAND<size_t>(0ul, rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 			target->overColor = Color(fx->Parameter2);

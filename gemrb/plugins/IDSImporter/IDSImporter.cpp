@@ -64,7 +64,7 @@ bool IDSImporter::Open(DataStream* str)
 			line = ( char * ) realloc( line, len + 1 );
 		char* str = strtok( line, " " );
 		Pair p;
-		p.val = strtoul( str, NULL, 0 );
+		p.val = strtosigned<int>(str, nullptr, 0);
 		str = strtok( NULL, " " );
 		p.str = str;
 		if (str != NULL) {

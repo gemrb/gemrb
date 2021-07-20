@@ -84,10 +84,10 @@ unsigned char MapReverb::obtainProfile () {
 	for (int i = 0; i < rows; ++i) {
 		ResRef mapName = reverbMapping->GetRowName(i);
 		if (mapName == map.WEDResRef) {
-			long profile = strtoul(reverbMapping->QueryField(i, 0), NULL, 0);
+			uint8_t profile = strtounsigned<uint8_t>(reverbMapping->QueryField(i, 0));
 
-			if (profile >= 0 && profile < EFX_MAX_REVERB_PROFILE_INDEX) {
-				configValue = static_cast<unsigned char>(profile);
+			if (profile < EFX_MAX_REVERB_PROFILE_INDEX) {
+				configValue = profile;
 			}
 			break;
 		}

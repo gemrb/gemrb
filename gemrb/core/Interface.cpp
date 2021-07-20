@@ -565,13 +565,13 @@ bool Interface::ReadAbilityTable(const ResRef& tablename, ieWordSigned *mem, int
 		fix = atoi(tmp);
 		for (int i=0;i<fix;i++) {
 			for (int j=0;j<columns;j++) {
-				mem[rows*j+i]=(ieWordSigned) strtol(tab->QueryField(0,j),NULL,0 );
+				mem[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
 			}
 		}
 	}
 	for (int j=0;j<columns;j++) {
 		for( int i=0;i<rows-fix;i++) {
-			mem[rows*j+i+fix] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
+			mem[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
 		}
 	}
 	return true;
@@ -659,9 +659,9 @@ bool Interface::ReadSpecialSpells()
 	table.load("wildmag");
 	if (table) {
 		SurgeSpell ss;
-		for (int i = 0; (unsigned) i < table->GetRowCount(); i++) {
+		for (ieDword i = 0; i < table->GetRowCount(); i++) {
 			ss.spell = table->QueryField(i, 0);
-			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
+			ss.message = strtounsigned<ieStrRef>(table->QueryField(i, 1));
 			// comment ignored
 			SurgeSpells.push_back(ss);
 		}
@@ -768,7 +768,7 @@ bool Interface::ReadDamageTypeTable() {
 	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = displaymsg->GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
-		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
+		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
 		DamageInfoMap.insert(std::make_pair(di.value, di));
@@ -3273,7 +3273,7 @@ bool Interface::InitItemTypes()
 			unsigned int value = 0;
 			unsigned int k = 1;
 			for (int j=0;j<InvSlotTypes;j++) {
-				if (strtol(it->QueryField(i,j),NULL,0) ) {
+				if (strtosigned<long>(it->QueryField(i,j))) {
 					value |= k;
 				}
 				k <<= 1;
@@ -3320,7 +3320,7 @@ bool Interface::InitItemTypes()
 		slotTypes.resize(SlotTypes);
 		for (unsigned int row = 0; row < SlotTypes; row++) {
 			bool alias;
-			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
+			ieDword i = strtounsigned<ieDword>(st->GetRowName(row));
 			if (i>=SlotTypes) continue;
 			if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
 				slotTypes[row].slot = i;
@@ -3330,16 +3330,16 @@ bool Interface::InitItemTypes()
 				slotTypes[row].slot = i;
 				alias = false;
 			}
-			slotTypes[i].slotType = (ieDword) strtol(st->QueryField(row, 0), nullptr, 0);
-			slotTypes[i].slotID = (ieDword) strtol(st->QueryField(row, 1), nullptr, 0);
+			slotTypes[i].slotType = strtounsigned<ieDword>(st->QueryField(row, 0));
+			slotTypes[i].slotID = strtounsigned<ieDword>(st->QueryField(row, 1));
 			slotTypes[i].slotResRef = st->QueryField(row, 2);
-			slotTypes[i].slotTip = (ieDword) strtol(st->QueryField(row, 3), nullptr, 0);
-			slotTypes[i].slotFlags = (ieDword) strtol(st->QueryField(row, 5), nullptr, 0);
+			slotTypes[i].slotTip = strtounsigned<ieDword>(st->QueryField(row, 3));
+			slotTypes[i].slotFlags = strtounsigned<ieDword>(st->QueryField(row, 5));
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
 			}
-			slotTypes[i].slotEffects = (ieDword) strtol(st->QueryField(row, 4), nullptr, 0);
+			slotTypes[i].slotEffects = strtounsigned<ieDword>(st->QueryField(row, 4));
 			//setting special slots
 			if (slotTypes[i].slotType & SLOT_ITEM) {
 				if (slotTypes[i].slotType & SLOT_INVENTORY) {
@@ -3947,11 +3947,11 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		int diceSides;
 		if (p) {
 			*p=0; //doing this so endptr is ok
-			diceSides = strtol(p + 1, nullptr, 10);
+			diceSides = strtosigned<int>(p + 1, nullptr, 10);
 		} else {
 			diceSides = 1;
 		}
-		int diceThrows = strtol(NewItem, &endptr, 10);
+		int diceThrows = strtosigned<int>(NewItem, &endptr, 10);
 		if (diceThrows <1) {
 			diceThrows = 1;
 		}
@@ -4672,7 +4672,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
 		ret[0]=cnt;
 		while(cnt) {
-			ret[cnt]=strtol(tab->QueryField(cnt-1, 0),NULL, 0);
+			ret[cnt] = strtounsigned<ieDword>(tab->QueryField(cnt-1, 0));
 			cnt--;
 		}
 		return ret;
@@ -4697,10 +4697,9 @@ ieDword* Interface::GetListFrom2DA(const ResRef& tablename)
 //returns a numeric value associated with a stat name (symbol) from stats.ids
 ieDword Interface::TranslateStat(const char *stat_name)
 {
-	long tmp;
-
-	if (valid_number(stat_name, tmp)) {
-		return (ieDword) tmp;
+	ieDword tmp;
+	if (valid_unsignednumber(stat_name, tmp)) {
+		return tmp;
 	}
 
 	int symbol = LoadSymbol( "stats" );
@@ -4736,8 +4735,8 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 	// tables for additive modifiers of bonus type
 	for (int i = 0; i < count; i++) {
 		tablename = mtm->GetRowName(i);
-		int checkcol = strtol(mtm->QueryField(i,1), nullptr, 0);
-		unsigned int readcol = strtol(mtm->QueryField(i,2), nullptr, 0);
+		int checkcol = strtosigned<int>(mtm->QueryField(i,1));
+		unsigned int readcol = strtounsigned<unsigned int>(mtm->QueryField(i,2));
 		int stat = TranslateStat(mtm->QueryField(i,0) );
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
@@ -4758,7 +4757,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			row = tm->FindTableValue(checkcol, value, 0);
 		}
 		if (row>=0) {
-			ret += strtol(tm->QueryField(row, readcol), NULL, 0);
+			ret += strtosigned<int>(tm->QueryField(row, readcol));
 		}
 	}
 	return ret;

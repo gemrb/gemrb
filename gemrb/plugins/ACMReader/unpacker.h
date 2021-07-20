@@ -23,6 +23,8 @@
 
 #include "System/DataStream.h"
 
+#include <cstddef>
+
 using namespace GemRB;
 
 #define UNPACKER_BUFFER_SIZE 16384
@@ -37,7 +39,7 @@ private:
 	unsigned int next_bits; // new bits
 	int avail_bits; // count of new bits
 	unsigned char bits_buffer[UNPACKER_BUFFER_SIZE];
-	unsigned int buffer_bit_offset;
+	std::ptrdiff_t buffer_bit_offset;
 
 	int sb_size;
 	short* amp_buffer, * buff_middle;

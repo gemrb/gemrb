@@ -37,7 +37,7 @@ static void TranslateColor(const char *value, Color &color)
 {
 	//if not RGB then try to interpret it as a dword
 	if (strnicmp(value, "RGB(", 4) != 0) {
-		long c = strtol(value,NULL,0);
+		uint32_t c = strtounsigned<uint32_t>(value);
 		color = Color::FromABGR(c);
 	} else {
 		sscanf(value+4,"%hhu,%hhu,%hhu)", &color.r, &color.g, &color.b);

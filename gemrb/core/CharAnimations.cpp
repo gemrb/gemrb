@@ -504,7 +504,7 @@ void CharAnimations::InitAvatarsTable() const
 	AvatarTable = (AvatarStruct *) calloc(AvatarsCount, sizeof(AvatarStruct));
 	const DataFileMgr *resdata = core->GetResDataINI();
 	for (int i = AvatarsCount - 1; i >= 0; i--) {
-		AvatarTable[i].AnimID=(unsigned int) strtol(Avatars->GetRowName(i),NULL,0 );
+		AvatarTable[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
 		AvatarTable[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
 		AvatarTable[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
 		AvatarTable[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
@@ -555,18 +555,17 @@ void CharAnimations::InitAvatarsTable() const
 	if (blood) {
 		int rows = blood->GetRowCount();
 		for(int i=0;i<rows;i++) {
-			unsigned long value = 0;
-			unsigned long flags = 0;
-			unsigned long rmin = 0;
-			unsigned long rmax = 0xffff;
+			char value = 0;
+			unsigned int flags = 0;
+			unsigned int rmin = 0;
+			unsigned int rmax = 0xffff;
 
-			valid_number(blood->QueryField(i,0), (long &)value);
-			valid_number(blood->QueryField(i,1), (long &)rmin);
-			valid_number(blood->QueryField(i,2), (long &)rmax);
-			valid_number(blood->QueryField(i,3), (long &)flags);
-			if (value>255 || rmin>rmax || rmax>0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ",
-						(unsigned int) value, (unsigned int) rmin, (unsigned int) rmax);
+			valid_signednumber(blood->QueryField(i,0), value);
+			valid_unsignednumber(blood->QueryField(i,1), rmin);
+			valid_unsignednumber(blood->QueryField(i,2), rmax);
+			valid_unsignednumber(blood->QueryField(i,3), flags);
+			if (rmin > rmax || rmax > 0xffff) {
+				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
 				continue;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
@@ -583,28 +582,27 @@ void CharAnimations::InitAvatarsTable() const
 		int rows = walk->GetRowCount();
 		for(int i=0;i<rows;i++) {
 			ResRef value;
-			unsigned long rmin = 0;
-			unsigned long rmax = 0xffff;
-			unsigned long range = 0;
+			unsigned int rmin = 0;
+			unsigned int rmax = 0xffff;
+			ieByte range = 0;
 
 			value = walk->QueryField(i, 0);
-			valid_number(walk->QueryField(i,1), (long &)rmin);
-			valid_number(walk->QueryField(i,2), (long &)rmax);
-			valid_number(walk->QueryField(i,3), (long &)range);
+			valid_unsignednumber(walk->QueryField(i,1), rmin);
+			valid_unsignednumber(walk->QueryField(i,2), rmax);
+			valid_unsignednumber(walk->QueryField(i,3), range);
 			if (value.IsStar()) {
 				value.Reset();
 				range = 0;
 			}
-			if (range>255 || rmin>rmax || rmax>0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ",
-						(unsigned int) range, (unsigned int) rmin, (unsigned int) rmax);
+			if (rmin > rmax || rmax > 0xffff) {
+				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
 				continue;
 			}
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
 				AvatarTable[j].WalkSound = value;
-				AvatarTable[j].WalkSoundCount = (unsigned int) range;
+				AvatarTable[j].WalkSoundCount = range;
 			}
 		}
 	}
@@ -613,14 +611,13 @@ void CharAnimations::InitAvatarsTable() const
 	if (stances) {
 		int rows = stances->GetRowCount();
 		for (int i = 0; i < rows; i++) {
-			unsigned long id = 0, s1 = 0, s2 = 0;
-			valid_number(stances->GetRowName(i), (long &)id);
-			valid_number(stances->QueryField(i, 0), (long &)s1);
-			valid_number(stances->QueryField(i, 1), (long &)s2);
+			unsigned int id = 0, s1 = 0, s2 = 0;
+			valid_unsignednumber(stances->GetRowName(i), id);
+			valid_unsignednumber(stances->QueryField(i, 0), s1);
+			valid_unsignednumber(stances->QueryField(i, 1), s2);
 
 			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
-				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d",
-						(unsigned int) id, (unsigned int) s1, (unsigned int) s2);
+				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d", id, s1, s2);
 				continue;
 			}
 
@@ -638,8 +635,8 @@ void CharAnimations::InitAvatarsTable() const
 	if (avatarShadows) {
 		int rows = avatarShadows->GetRowCount();
 		for (int i = 0; i < rows; ++i) {
-			unsigned long id = 0;
-			valid_number(avatarShadows->GetRowName(i), (long &)id);
+			unsigned int id = 0;
+			valid_unsignednumber(avatarShadows->GetRowName(i), id);
 
 			for (int j = 0; j < AvatarsCount; j++) {
 				if (id < AvatarTable[j].AnimID) {

@@ -474,8 +474,8 @@ static void ReadSpellProtTable(const char* tableName)
 		ieDword stat = core->TranslateStat(tab->QueryField(i,0) );
 		spellres[i].stat = (ieWord) stat;
 
-		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
-		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
+		spellres[i].value = strtounsigned<ieDword>(tab->QueryField(i,1));
+		spellres[i].relation = strtounsigned<ieWord>(tab->QueryField(i,2),NULL,0 );
 	}
 }
 
@@ -1489,7 +1489,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 	ResRef resrefs[2] = { tab->QueryField(size_t(0), 0), tab->QueryField(0, 1) };
 
 	for (int i=0;i<cnt;i++) {
-		Point p(strtol(tab->QueryField(i+1,0),NULL,0), strtol(tab->QueryField(i+1,1), NULL, 0));
+		Point p(strtosigned<int>(tab->QueryField(i+1,0)), strtosigned<int>(tab->QueryField(i+1,1)));
 		core->SummonCreature(resrefs[real!=i], fx->Resource2, Owner,
 			target, p, EAM_DEFAULT, 0, NULL, false);
 	}

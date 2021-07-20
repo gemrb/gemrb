@@ -274,7 +274,7 @@ bool Init_EffectQueue()
 		return false;
 	}
 
-	for (long i = 0; i < MAX_EFFECTS; i++) {
+	for (int i = 0; i < MAX_EFFECTS; i++) {
 		const char* effectname = effectsTable->GetValue( i );
 
 		EffectDesc* poi = FindEffect( effectname );
@@ -284,7 +284,7 @@ bool Init_EffectQueue()
 			//reverse linking opcode number
 			//using this unused field
 			if( (poi->opcode!=-1) && effectname[0]!='*') {
-				error("EffectQueue", "Clashing Opcodes FN: %ld vs. %d, %s\n", i, poi->opcode, effectname);
+				error("EffectQueue", "Clashing Opcodes FN: %d vs. %d, %s\n", i, poi->opcode, effectname);
 			}
 			poi->opcode = i;
 		}
@@ -293,8 +293,8 @@ bool Init_EffectQueue()
 			int row = efftextTable->GetRowCount();
 			while (row--) {
 				const char* ret = efftextTable->GetRowName( row );
-				long val;
-				if( valid_number( ret, val ) && (i == val) ) {
+				int val;
+				if(valid_signednumber(ret, val) && (i == val)) {
 					Opcodes[i].Strref = atoi( efftextTable->QueryField( row, 1 ) );
 				} else {
 					Opcodes[i].Strref = -1;

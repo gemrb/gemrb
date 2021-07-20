@@ -141,7 +141,7 @@ public:
 		for (ieDword row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			long Value;
-			if (valid_number( ret, Value ) && (Value == val) )
+			if (valid_signednumber(ret, Value) && (Value == val))
 				return int(row);
 		}
 		return -1;

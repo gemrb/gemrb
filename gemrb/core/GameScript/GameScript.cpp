@@ -2221,7 +2221,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = 0;
 	stream->ReadLine( line, 1024 );
 	char *poi;
-	rE->weight = (unsigned char)strtoul(line,&poi,10);
+	rE->weight = strtounsigned<uint8_t>(line,&poi,10);
 	if (strncmp(poi, "AC", 2) != 0) {
 		free(line);
 		return rE;
@@ -2231,7 +2231,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		stream->ReadLine( line, 1024 );
-		aC->actionID = (unsigned short)strtoul(line, NULL,10);
+		aC->actionID = strtounsigned<uint16_t>(line, nullptr, 10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );

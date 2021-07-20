@@ -2058,9 +2058,9 @@ static void InitActorTables()
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
 
 		for (int i = 0; i < extraslots; i++) {
-			long tmp = 0;
-			valid_number( tm->QueryField(i,0), tmp );
-			OtherGUIButtons[i].clss = (ieByte) tmp;
+			ieByte tmp = 0;
+			valid_unsignednumber(tm->QueryField(i,0), tmp);
+			OtherGUIButtons[i].clss = tmp;
 			memcpy(OtherGUIButtons[i].buttons, &DefaultButtons, sizeof(ActionButtonRow));
 			for (int j = 0; j < GUIBT_COUNT; j++) {
 				OtherGUIButtons[i].buttons[j]=(ieByte) atoi( tm->QueryField(i,j+1) );
@@ -2164,7 +2164,7 @@ static void InitActorTables()
 			const char *clab = tm->QueryField(classname, "CLAB");
 			if (classcol) {
 				// kit ids are in hex
-				classID = strtoul(tm->QueryField(classname, "ID"), NULL, 16);
+				classID = strtounsigned<ieDword>(tm->QueryField(classname, "ID"), NULL, 16);
 				class2kits[classcol].indices.push_back(i);
 				class2kits[classcol].ids.push_back(classID);
 				class2kits[classcol].clabs.push_back(strdup(clab));
@@ -2260,9 +2260,9 @@ static void InitActorTables()
 			levelslots[tmpindex] = (int *) calloc(ISCLASSES, sizeof(int));
 
 			//single classes only worry about IE_LEVEL
-			long tmpclass = 0;
-			valid_number(tm->QueryField(classname, "MULTI"), tmpclass);
-			multi[tmpindex] = (ieDword) tmpclass;
+			ieDword tmpclass = 0;
+			valid_unsignednumber(tm->QueryField(classname, "MULTI"), tmpclass);
+			multi[tmpindex] = tmpclass;
 			if (!tmpclass) {
 				classis = IsClassFromName(classname);
 				if (classis>=0) {
@@ -2341,10 +2341,10 @@ static void InitActorTables()
 					//save the MC_WAS_ID of the first class in the dual-class
 					if (numfound==0 && tmpbits==2) {
 						if (strcmp(classnames[0], currentname) == 0) {
-							dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
+							dualswap[tmpindex] = strtosigned<int>(tm->QueryField(currentname, "MC_WAS_ID"));
 						}
 					} else if (numfound==1 && tmpbits==2 && !dualswap[tmpindex]) {
-						dualswap[tmpindex] = strtol(tm->QueryField(currentname, "MC_WAS_ID"), NULL, 0);
+						dualswap[tmpindex] = strtosigned<int>(tm->QueryField(currentname, "MC_WAS_ID"));
 					}
 					numfound++;
 				}
@@ -2399,7 +2399,7 @@ static void InitActorTables()
 			snprintf(rowName, sizeof(rowName), "%d", i);
 			// kit usability is in hex and is sometimes used as the kit ID,
 			// while other times ID is the baseclass constant or-ed with the index
-			ieDword kitUsability = strtoul(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
+			ieDword kitUsability = strtounsigned<ieDword>(tm->QueryField(rowName, "UNUSABLE"), NULL, 16);
 			int classID = atoi(tm->QueryField(rowName, "CLASS"));
 			const char *clab = tm->QueryField(rowName, "ABILITIES");
 			const char *kitName = tm->QueryField(rowName, "ROWNAME");
@@ -2490,7 +2490,7 @@ static void InitActorTables()
 			for (int j = 0; j < MAX_LEVEL; j++) {
 				int row = maxrow;
 				if (j<row) row=j;
-				wmlevels[i][j]=strtol(tm->QueryField(row,i), NULL, 0);
+				wmlevels[i][j] = strtosigned<int>(tm->QueryField(row,i));
 			}
 		}
 	}
@@ -2546,7 +2546,7 @@ static void InitActorTables()
 			while(rowcount--) {
 				afcomments[rowcount]=(int *) malloc(3*sizeof(int) );
 				for (int i = 0; i < 3; i++) {
-					afcomments[rowcount][i] = strtol(tm->QueryField(rowcount,i), NULL, 0);
+					afcomments[rowcount][i] = strtosigned<int>(tm->QueryField(rowcount,i));
 				}
 			}
 		}
@@ -2636,10 +2636,10 @@ static void InitActorTables()
 		if (count> 0 && count<8) {
 			avCount = count-1;
 			avPrefix = new avType[count];
-			avBase = strtoul(tm->QueryField(0),NULL, 0);
+			avBase = strtosigned<int>(tm->QueryField(0),NULL, 0);
 			const char *poi = tm->QueryField(0,1);
 			if (*poi!='*') {
-				avStance = strtoul(tm->QueryField(0,1),NULL, 0);
+				avStance = strtosigned<int>(tm->QueryField(0,1),NULL, 0);
 			} else {
 				avStance = -1;
 			}
@@ -2661,8 +2661,8 @@ static void InitActorTables()
 		int racesNRows = tm->GetRowCount();
 
 		for (int i = 0; i < racesNRows; i++) {
-			int raceID = strtol(tm->QueryField(i, 3), NULL, 0);
-			int favClass = strtol(tm->QueryField(i, 8), NULL, 0);
+			int raceID = strtosigned<int>(tm->QueryField(i, 3), NULL, 0);
+			int favClass = strtosigned<int>(tm->QueryField(i, 8), NULL, 0);
 			const char *raceName = tm->GetRowName(i);
 			favoredMap.insert(std::make_pair(raceID, favClass));
 			raceID2Name.insert(std::make_pair(raceID, raceName));
@@ -2792,14 +2792,14 @@ int Actor::GetWisdomAC() const
 //Returns the personal critical damage type in a binary compatible form (PST)
 int Actor::GetCriticalType() const
 {
-	long ret = 0;
 	AutoTable tm("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
 	//defaults to 0
-	valid_number(tm->QueryField(row, 1), ret);
-	return (int) ret;
+	int ret;
+	valid_signednumber(tm->QueryField(row, 1), ret);
+	return ret;
 }
 
 //Plays personal critical damage animation for PST PC's melee attacks
@@ -9778,7 +9778,6 @@ void Actor::SetupFist()
 }
 
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
-	long ret = 0;
 	//don't close this table, it can mess with the guiscripts
 	int table = gamedata->LoadTable(resref);
 	if (table == -1) return 0;
@@ -9793,8 +9792,9 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 				return 0;
 			}
 		}
-		if (valid_number(tm->QueryField(row, vcol), ret)) {
-			return (ieDword) ret;
+		ieDword ret;
+		if (valid_unsignednumber(tm->QueryField(row, vcol), ret)) {
+			return ret;
 		}
 	}
 
@@ -11121,7 +11121,7 @@ int Actor::UpdateAnimationID(bool derived)
 		StatID = derived?GetSafeStat(StatID):GetBase( StatID );
 
 		const char *poi = tm->QueryField( StatID );
-		AnimID += strtoul( poi, NULL, 0 );
+		AnimID += strtosigned<int>( poi, NULL, 0 );
 	}
 	if (BaseStats[IE_ANIMATION_ID]!=(unsigned int) AnimID) {
 		SetBase(IE_ANIMATION_ID, (unsigned int) AnimID);

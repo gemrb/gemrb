@@ -709,7 +709,7 @@ const Color& GameData::GetColor(const char *row)
 	if (colors.empty()) {
 		AutoTable colorTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
+			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
 			colors[strdup(colorTable->GetRowName(r))] = Color(c);
 		}
 	}

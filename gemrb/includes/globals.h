@@ -224,10 +224,53 @@ inline tick_t GetTicks()
 	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-inline bool valid_number(const char* string, long& val)
+template<typename T>
+T strtosigned(const char* str, char** endptr = nullptr, int base = 0)
 {
-	char* endpr;
-	val = strtol(string, &endpr, 0);
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_signed<T>::value, "Type must be signed");
+	
+	long ret = strtol(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	if (ret < std::numeric_limits<T>::min()) {
+		return std::numeric_limits<T>::min();
+	}
+	
+	return static_cast<T>(ret);
+}
+
+template<typename T>
+inline bool valid_signednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtosigned<T>(string, &endpr, 0);
+	return endpr != string;
+}
+
+template<typename T>
+T strtounsigned(const char* str, char** endptr = nullptr, int base = 0)
+{
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_unsigned<T>::value, "Type must be unsigned");
+	
+	unsigned long ret = strtoul(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	return static_cast<T>(ret);
+}
+
+template<typename T>
+inline bool valid_unsignednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtounsigned<T>(string, &endpr, 0);
 	return endpr != string;
 }
 
