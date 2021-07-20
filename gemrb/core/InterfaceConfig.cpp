@@ -168,8 +168,9 @@ bool CFGConfig::InitWithINIData(DataStream* cfgStream)
 	if (isValid) {
 		Log(WARNING, "Config", "attempting to replace config values with contents of %s", cfgStream->filename);
 	} else {
-		Log(MESSAGE, "Config", "attempting to initialize config with %s", cfgStream->filename);
+		Log(MESSAGE, "Config", "attempting to initialize config with %s found at:", cfgStream->filename);
 	}
+	Log(MESSAGE, "Config", "%s", cfgStream->originalfile);
 
 	isValid = false;
 	int lineno = 0;
