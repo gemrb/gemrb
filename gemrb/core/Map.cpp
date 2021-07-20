@@ -2013,9 +2013,9 @@ void Map::InitActor(const Actor *actor)
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
-		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName);
+		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName.CString());
 		if (len > sizeof(key)) {
-			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName);
+			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName.CString());
 		}
 		core->GetGame()->locals->SetAt(key, 1);
 	}
@@ -2934,7 +2934,7 @@ bool Map::CanFree()
 void Map::dump(bool show_actors) const
 {
 	StringBuffer buffer;
-	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName );
+	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName.CString());
 	buffer.append("Scripts:");
 
 	for (const auto script : Scripts) {

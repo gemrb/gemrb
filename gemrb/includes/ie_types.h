@@ -77,6 +77,10 @@ public:
 	operator char*() noexcept {
 		return var;
 	}
+	
+	const char* CString() const noexcept {
+		return var;
+	}
 };
 
 }

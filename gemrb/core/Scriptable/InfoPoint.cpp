@@ -244,7 +244,7 @@ void InfoPoint::dump() const
 	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
-		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName);
+		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName.CString());
 		break;
 	case ST_PROXIMITY:
 		buffer.appendFormatted( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));

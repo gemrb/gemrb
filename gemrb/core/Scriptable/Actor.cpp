@@ -617,7 +617,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (anims->ResRefBase.IsEmpty()) {
 		delete anims;
 		anims = NULL;
-		Log(ERROR, "Actor", "Missing animation for %s", LongName);
+		Log(ERROR, "Actor", "Missing animation for %s", LongName.CString());
 		return;
 	}
 	anims->SetOffhandRef(ShieldRef);
@@ -3756,14 +3756,14 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName.CString());
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] / ModifierValue, 1);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName);
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewStat: %d (%s)!", ModifierType, LongName.CString());
 				break;
 			}
 			SetStat(StatIndex, BaseStats[StatIndex] % ModifierValue, 1);
@@ -3784,7 +3784,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetStat(StatIndex, !BaseStats[StatIndex], 1);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%s)!", ModifierType, LongName);
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewStat: %d (%s)!", ModifierType, LongName.CString());
 	}
 	return Modified[StatIndex] - oldmod;
 }
@@ -3811,14 +3811,14 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_DIVISIVE:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName.CString());
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] / ModifierValue);
 			break;
 		case MOD_MODULUS:
 			if (ModifierValue == 0) {
-				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName);
+				Log(ERROR, "Actor", "Invalid modifier value (0) passed to NewBase: %d (%s)!", ModifierType, LongName.CString());
 				break;
 			}
 			SetBase(StatIndex, BaseStats[StatIndex] % ModifierValue);
@@ -3839,7 +3839,7 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			SetBase(StatIndex, !BaseStats[StatIndex]);
 			break;
 		default:
-			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%s)!", ModifierType, LongName);
+			Log(ERROR, "Actor", "Invalid modifier type passed to NewBase: %d (%s)!", ModifierType, LongName.CString());
 	}
 	return BaseStats[StatIndex] - oldmod;
 }
@@ -5412,9 +5412,9 @@ void Actor::Resurrect(const Point &destPoint)
 	//readjust death variable on resurrection
 	ieVariable DeathVar;
 	if (core->HasFeature(GF_HAS_KAPUTZ) && (AppearanceFlags&APP_DEATHVAR)) {
-		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName);
+		const size_t len = snprintf(DeathVar, sizeof(ieVariable), "%s_DEAD", scriptName.CString());
 		if (len > sizeof(ieVariable)) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName.CString(), LongName.CString());
 		}
 		ieDword value=0;
 
@@ -5426,7 +5426,7 @@ void Actor::Resurrect(const Point &destPoint)
 	} else if (!core->HasFeature(GF_HAS_KAPUTZ)) {
 		size_t len = snprintf(DeathVar, 32, core->GetDeathVarFormat(), scriptName);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals (on resurrect)!", scriptName, LongName);
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals (on resurrect)!", scriptName.CString(), LongName.CString());
 		}
 		game->locals->SetAt(DeathVar, 0, true);
 	}
@@ -5751,11 +5751,11 @@ bool Actor::CheckOnDeath()
 	if (scriptName[0] && SetDeathVar) {
 		ieVariable varname;
 		value = 0;
-		size_t len = snprintf(varname, 32, "%s_DEAD", scriptName);
+		size_t len = snprintf(varname, 32, "%s_DEAD", scriptName.CString());
 		game->locals->Lookup(varname, value);
 		game->locals->SetAt(varname, 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName, LongName);
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", scriptName.CString(), LongName.CString());
 		}
 		if (value) {
 			IncrementDeathVariable(game->locals, "%s_KILL_CNT", scriptName, 1);
@@ -5819,7 +5819,7 @@ ieDword Actor::IncrementDeathVariable(Variables *vars, const char *format, const
 		vars->Lookup(varname, start);
 		vars->SetAt(varname, start + 1, nocreate);
 		if (len > 32) {
-			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", name, LongName);
+			Log(ERROR, "Actor", "Scriptname %s (name: %s) is too long for generating death globals!", name, LongName.CString());
 		}
 	}
 	return start;
@@ -6791,7 +6791,7 @@ void Actor::InitRound(ieDword gameTime)
 
 	//print a little message :)
 	Log(MESSAGE, "InitRound", "Name: %s | Attacks: %d | Start: %d",
-		ShortName, attacksperround, gameTime);
+		ShortName.CString(), attacksperround, gameTime);
 
 	// this might not be the right place, but let's give it a go
 	if (attacksperround && InParty) {
@@ -7329,7 +7329,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		BaseStats[IE_CHECKFORBERSERK]=3;
 	}
 
-	Log(DEBUG, "Actor", "Performattack for %s, target is: %s", ShortName, target->ShortName);
+	Log(DEBUG, "Actor", "Performattack for %s, target is: %s", ShortName.CString(), target->ShortName.CString());
 
 	//which hand is used
 	//we do apr - attacksleft so we always use the main hand first

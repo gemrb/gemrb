@@ -158,7 +158,7 @@ bool KeyMap::ResolveName(const char* name, int group)
 		return false;
 	}
 
-	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName, fun->function);
+	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName.CString(), fun->function.CString());
 	core->GetGUIScriptEngine()->RunFunction(fun->moduleName, fun->function);
 	return true;
 }

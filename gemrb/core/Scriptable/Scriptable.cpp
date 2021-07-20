@@ -428,7 +428,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName.CString());
 		return;
 	}
 
