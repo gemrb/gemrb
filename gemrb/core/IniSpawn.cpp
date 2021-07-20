@@ -169,7 +169,6 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 // TODO: unimplemented tags (* marks partially implemented, # marks not working in original either):
 // control_var
 // spec_area
-// check_by_view_port
 // hold_selected_point_key
 // inc_spawn_point_index
 //#spawn_time_of_day
@@ -484,7 +483,8 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
 		critter.Flags|=CF_IGNORECANSEE;
 	}
-	//unsure, but could be similar to previous
+	// don't spawn if the spawnpoint is not outside the viewport
+	// data uses check_view_port, while the engines reference check_by_view_port
 	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
 		critter.Flags|=CF_CHECKVIEWPORT;
 	}
@@ -609,6 +609,13 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 
 	if (!(critter.Flags&CF_IGNORECANSEE)) {
 		if (map->IsVisible(critter.SpawnPoint)) {
+			return;
+		}
+	}
+
+	if (!(critter.Flags & CF_CHECKVIEWPORT)) {
+		const Region& vp = core->GetGameControl()->Viewport();
+		if (vp.PointInside(critter.SpawnPoint)) {
 			return;
 		}
 	}
