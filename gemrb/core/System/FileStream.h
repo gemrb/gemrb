@@ -63,9 +63,9 @@ public:
 		return *this;
 	}
 
-	size_t Length() {
+	strpos_t Length() {
 		fseek(file, 0, SEEK_END);
-		size_t size = ftell(file);
+		strpos_t size = ftell(file);
 		fseek(file, 0, SEEK_SET);
 		return size;
 	}
@@ -78,21 +78,21 @@ public:
 	bool OpenNew(const char *name) {
 		return (file = fopen(name, "wb"));
 	}
-	size_t Read(void* ptr, size_t length) {
+	strret_t Read(void* ptr, size_t length) {
 		return fread(ptr, 1, length, file);
 	}
-	size_t Write(const void* ptr, size_t length) {
+	strret_t Write(const void* ptr, strpos_t length) {
 		return fwrite(ptr, 1, length, file);
 	}
-	bool SeekStart(int offset)
+	bool SeekStart(stroff_t offset)
 	{
 		return !fseek(file, offset, SEEK_SET);
 	}
-	bool SeekCurrent(int offset)
+	bool SeekCurrent(stroff_t offset)
 	{
 		return !fseek(file, offset, SEEK_CUR);
 	}
-	bool SeekEnd(int offset)
+	bool SeekEnd(stroff_t offset)
 	{
 		return !fseek(file, offset, SEEK_END);
 	}
@@ -113,9 +113,9 @@ public:
 	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename);
-	int Read(void* dest, unsigned int length) override;
-	int Write(const void* src, unsigned int length) override;
-	int Seek(int pos, int startpos) override;
+	strret_t Read(void* dest, strpos_t length) override;
+	strret_t Write(const void* src, strpos_t length) override;
+	strret_t Seek(stroff_t pos, strpos_t startpos) override;
 
 	void Close();
 public:

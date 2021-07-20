@@ -63,7 +63,7 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, unsigned long size) const
+void DataStream::ReadDecrypted(void* buf, strpos_t size) const
 {
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
@@ -75,24 +75,24 @@ void DataStream::Rewind()
 	Pos = 0;
 }
 
-unsigned long DataStream::GetPos() const
+strpos_t DataStream::GetPos() const
 {
 	return Pos;
 }
 
-unsigned long DataStream::Size() const
+strpos_t DataStream::Size() const
 {
 	return size;
 }
 
-unsigned long DataStream::Remains() const
+strpos_t DataStream::Remains() const
 {
 	return size-Pos;
 }
 
-int DataStream::ReadResRef(char dest[9])
+strret_t DataStream::ReadResRef(char dest[9])
 {
-	int len = Read(dest, 8);
+	strret_t len = Read(dest, 8);
 	if (len == GEM_ERROR) {
 		dest[0] = 0;
 		return 0;
@@ -111,56 +111,56 @@ int DataStream::ReadResRef(char dest[9])
 	return len;
 }
 
-int DataStream::ReadResRef(ResRef& dest)
+strret_t DataStream::ReadResRef(ResRef& dest)
 {
 	char ref[9];
-	int len = ReadResRef(ref);
+	strret_t len = ReadResRef(ref);
 	dest = ref;
 	return len;
 }
 
-int DataStream::WriteResRef(const char src[9])
+strret_t DataStream::WriteResRef(const char src[9])
 {
 	return Write( src, 8);
 }
 
-int DataStream::WriteResRef(const ResRef& src)
+strret_t DataStream::WriteResRef(const ResRef& src)
 {
 	return Write(src.CString(), 8);
 }
 
-int DataStream::WriteResRefLC(const ResRef& src)
+strret_t DataStream::WriteResRefLC(const ResRef& src)
 {
 	return WriteResRef(ResRef::MakeLowerCase(src));
 }
 
-int DataStream::WriteResRefUC(const ResRef& src)
+strret_t DataStream::WriteResRefUC(const ResRef& src)
 {
 	return WriteResRef(ResRef::MakeUpperCase(src));
 }
 
-int DataStream::ReadPoint(Point &p)
+strret_t DataStream::ReadPoint(Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	ieWord coord;
-	int ret = ReadScalar(coord);
+	strret_t ret = ReadScalar(coord);
 	p.x = coord;
 	ret += ReadScalar(coord);
 	p.y = coord;
 	return ret;
 }
 
-int DataStream::WritePoint(const Point &p)
+strret_t DataStream::WritePoint(const Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	ieWord coord = p.x;
-	int ret = WriteScalar(coord);
+	strret_t ret = WriteScalar(coord);
 	coord = p.y;
 	ret += WriteScalar(coord);
 	return ret;
 }
 
-int DataStream::ReadLine(void* buf, unsigned long maxlen)
+strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 {
 	// FIXME: eof?
 	if (!maxlen) {

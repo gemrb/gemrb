@@ -76,9 +76,7 @@ bool MVEPlay::DecodeFrame(VideoBuffer& buf)
 
 unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 {
-	unsigned numread;
-
-	numread = str->Read( buf, count );
+	strret_t numread = str->Read( buf, count );
 	return ( numread == count );
 }
 

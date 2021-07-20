@@ -56,7 +56,8 @@ int ZLibManager::Decompress(DataStream* dest, DataStream* source, unsigned int s
 			}
 			if (!stream.avail_in || stream.avail_in > source->Remains()) {
 				//Read doesn't allow partial reads, but provides Remains
-				stream.avail_in = source->Remains();
+				unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
+				stream.avail_in = static_cast<uInt>(remains);
 			}
 			if (stream.avail_in > INPUTSIZE) {
 				stream.avail_in=INPUTSIZE;
@@ -112,7 +113,8 @@ int ZLibManager::Compress(DataStream* dest, DataStream* source) const
 		if (stream.avail_in == 0) {
 			stream.next_in = bufferin;
 			//Read doesn't allow partial reads, but provides Remains
-			stream.avail_in = source->Remains();
+			unsigned long remains = std::min<unsigned long>(source->Remains(), std::numeric_limits<uInt>::max());
+			stream.avail_in = static_cast<uInt>(remains);
 			if (stream.avail_in > INPUTSIZE) {
 				stream.avail_in=INPUTSIZE;
 			}

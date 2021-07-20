@@ -257,7 +257,7 @@ void BIKPlayer::Stop()
 	MoviePlayer::Stop();
 }
 
-unsigned int BIKPlayer::fileRead(unsigned int pos, void* buf, unsigned int count)
+strret_t BIKPlayer::fileRead(strpos_t pos, void* buf, strpos_t count)
 {
 	str->Seek(pos, GEM_STREAM_START);
 	return str->Read( buf, count );

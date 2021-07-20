@@ -36,7 +36,7 @@ bool INIImporter::Open(DataStream* str)
 	if (str == NULL) {
 		return false;
 	}
-	int cnt = 0;
+	strret_t cnt = 0;
 	char* strbuf = ( char* ) malloc( 4097 );
 	INITag* lastTag = NULL;
 	do {

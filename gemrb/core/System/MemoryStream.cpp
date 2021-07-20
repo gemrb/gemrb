@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-MemoryStream::MemoryStream(const char *name, void* data, unsigned long size)
+MemoryStream::MemoryStream(const char *name, void* data, strpos_t size)
 	: data((char*)data)
 {
 	this->size = size;
@@ -46,7 +46,7 @@ DataStream* MemoryStream::Clone()
 	return new MemoryStream(originalfile, copy, size);
 }
 
-int MemoryStream::Read(void* dest, unsigned int length)
+strret_t MemoryStream::Read(void* dest, strpos_t length)
 {
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
@@ -62,7 +62,7 @@ int MemoryStream::Read(void* dest, unsigned int length)
 	return length;
 }
 
-int MemoryStream::Write(const void* src, unsigned int length)
+strret_t MemoryStream::Write(const void* src, strpos_t length)
 {
 	if (Pos+length>size ) {
 		//error("MemoryStream", "We don't support appending to memory streams yet.");
@@ -73,7 +73,7 @@ int MemoryStream::Write(const void* src, unsigned int length)
 	return length;
 }
 
-int MemoryStream::Seek(int newpos, int type)
+stroff_t MemoryStream::Seek(stroff_t newpos, strpos_t type)
 {
 	switch (type) {
 		case GEM_CURRENT_POS:

@@ -79,7 +79,7 @@ DataStream* MappedFileMemoryStream::Clone() {
 	return new MappedFileMemoryStream(originalfile);
 }
 
-int MappedFileMemoryStream::Read(void* dest, unsigned int length) {
+strret_t MappedFileMemoryStream::Read(void* dest, strpos_t length) {
 	if (!fileMapped) {
 		return GEM_ERROR;
 	}
@@ -87,7 +87,7 @@ int MappedFileMemoryStream::Read(void* dest, unsigned int length) {
 	return MemoryStream::Read(dest, length);
 }
 
-int MappedFileMemoryStream::Seek(int pos, int startPos) {
+stroff_t MappedFileMemoryStream::Seek(stroff_t pos, strpos_t startPos) {
 	if (!fileMapped) {
 		return GEM_ERROR;
 	}
@@ -95,7 +95,7 @@ int MappedFileMemoryStream::Seek(int pos, int startPos) {
 	return MemoryStream::Seek(pos, startPos);
 }
 
-int MappedFileMemoryStream::Write(const void*, unsigned int) {
+strret_t MappedFileMemoryStream::Write(const void*, strpos_t) {
 	return GEM_ERROR;
 }
 

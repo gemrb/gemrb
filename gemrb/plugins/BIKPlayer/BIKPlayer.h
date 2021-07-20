@@ -175,8 +175,8 @@ typedef struct {
 
 typedef struct {
 	int     keyframe;
-	ieDword pos;
-	ieDword size;
+	strpos_t pos;
+	strpos_t size;
 } binkframe;
 
 typedef struct Bundle {
@@ -240,7 +240,7 @@ private:
 
 private:
 	void segment_video_play();
-	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
+	strret_t fileRead(strpos_t pos, void* buf, strpos_t count);
 
 	int setAudioStream();
 	void freeAudioStream(int stream);

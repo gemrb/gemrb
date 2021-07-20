@@ -32,8 +32,8 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	if (strncmp(Signature, "SAV V1.0", 8) != 0) {
 		return GEM_ERROR;
 	}
-	int All = compressed->Remains();
-	int Current;
+	strpos_t All = compressed->Remains();
+	strpos_t Current;
 	int percent, last_percent = 20;
 	if (!All) return GEM_ERROR;
 
@@ -106,15 +106,15 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	//baaah, we dump output right in the stream, we get the compressed length
 	//only after the compressed data was written
 	complen = 0xcdcdcdcd; //placeholder
-	unsigned long Pos = str->GetPos(); //storing the stream position
+	strpos_t Pos = str->GetPos(); //storing the stream position
 	str->WriteDword(complen);
 
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 	comp->Compress( str, uncompressed );
 
 	//writing compressed length (calculated)
-	unsigned long Pos2 = str->GetPos();
-	complen = Pos2-Pos-sizeof(ieDword); //calculating the compressed stream size
+	strpos_t Pos2 = str->GetPos();
+	complen = Pos2 - Pos - sizeof(ieDword); //calculating the compressed stream size
 	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
 	str->WriteDword(complen);       //updating size
 	str->Seek(Pos2, GEM_STREAM_START);//resuming work

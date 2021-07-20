@@ -202,7 +202,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 ieDword CTlkOverride::ClaimFreeSegment()
 {
 	ieDword offset = FreeOffset;
-	unsigned long pos = tot_str->GetPos();
+	strpos_t pos = tot_str->GetPos();
 	
 	if (offset == 0xffffffff) {
 		offset = tot_str->Size();

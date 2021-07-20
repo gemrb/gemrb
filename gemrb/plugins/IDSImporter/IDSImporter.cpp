@@ -50,7 +50,7 @@ bool IDSImporter::Open(DataStream* str)
 	}
 	while (true) {
 		char* line = ( char* ) malloc( 256 );
-		int len = str->ReadLine( line, 256 );
+		strret_t len = str->ReadLine( line, 256 );
 		strlwr( line );
 		if (len == -1) {
 			free( line );
@@ -128,7 +128,7 @@ int IDSImporter::FindString(char *str, int len) const
 
 int IDSImporter::FindValue(int val) const
 {
-	size_t i = static_cast<int>(pairs.size());
+	int i = static_cast<int>(pairs.size());
 	while(i--) {
 		if(pairs[i].val==val) {
 			return i;
@@ -139,7 +139,7 @@ int IDSImporter::FindValue(int val) const
 
 int IDSImporter::GetHighestValue() const
 {
-	int i = pairs.size();
+	int i = static_cast<int>(pairs.size());
 	if (!i) {
 		return -1;
 	}

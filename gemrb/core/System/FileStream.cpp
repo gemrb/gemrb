@@ -128,7 +128,7 @@ bool FileStream::Create(const char *path)
 	return true;
 }
 
-int FileStream::Read(void* dest, unsigned int length)
+strret_t FileStream::Read(void* dest, strpos_t length)
 {
 	if (!opened) {
 		return GEM_ERROR;
@@ -149,7 +149,7 @@ int FileStream::Read(void* dest, unsigned int length)
 	return c;
 }
 
-int FileStream::Write(const void* src, unsigned int length)
+strret_t FileStream::Write(const void* src, strpos_t length)
 {
 	if (!created) {
 		return GEM_ERROR;
@@ -167,7 +167,7 @@ int FileStream::Write(const void* src, unsigned int length)
 	return c;
 }
 
-int FileStream::Seek(int newpos, int type)
+strret_t FileStream::Seek(stroff_t newpos, strpos_t type)
 {
 	if (!opened && !created) {
 		return GEM_ERROR;
