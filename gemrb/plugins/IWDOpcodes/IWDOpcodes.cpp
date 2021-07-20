@@ -2890,24 +2890,25 @@ int fx_bleeding_wounds (Scriptable* Owner, Actor* target, Effect* fx)
 	switch(fx->Parameter2) {
 	case 0: // Parameter1 per round
 		tmp = core->Time.round_sec;
-		goto seconds;
+		break;
 	case 1: // Parameter1 per second
 		tmp = 1;
-		goto seconds;
+		break;
 	case 2: // 1 hitpoint each Parameter1 seconds
 		tmp = fx->Parameter1;
 		damage = 1;
-seconds:
-		tmp *= AI_UPDATE_TIME;
-		if (tmp && (core->GetGame()->GameTime%tmp)) {
-			return FX_APPLIED;
-		}
 		break;
 	default:
+		tmp = core->Time.round_sec;
 		Log(GemRB::ERROR, "IWDOpcodes", "Unknown type in fx_bleeding_wounds: %d!", fx->Parameter2);
 		break;
 	}
-	//percent
+
+	tmp *= AI_UPDATE_TIME;
+	if (tmp && (core->GetGame()->GameTime%tmp)) {
+		return FX_APPLIED;
+	}
+
 	target->Damage(damage, DAMAGE_POISON, Owner, fx->IsVariable, fx->SavingThrowType);
 	target->AddPortraitIcon(PI_BLEEDING);
 	return FX_APPLIED;
