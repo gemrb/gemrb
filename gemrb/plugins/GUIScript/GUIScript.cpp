@@ -791,10 +791,10 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 		case 2:
 			return PyInt_FromLong( core->TranslateStat(ret) );
 		default:
-			ieStrRef val;
-			bool valid = valid_unsignednumber(ret, val);
+			long val;
+			bool valid = valid_signednumber(ret, val);
 			if (type == 3) {
-				char* cstr = core->GetCString(val);
+				char* cstr = core->GetCString(ieStrRef(val));
 				PyObject* pystr = PyString_FromString(cstr);
 				free(cstr);
 				return pystr;
