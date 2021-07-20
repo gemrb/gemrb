@@ -123,15 +123,17 @@ void Door::ToggleTiles(int State, int playsound)
 
 	if (State) {
 		state = !closedIndex;
-		if (playsound && !OpenSound.IsEmpty())
+		if (playsound && !OpenSound.IsEmpty()) {
 			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS);
+		}
 	} else {
 		state = closedIndex;
-		if (playsound && !CloseSound.IsEmpty())
+		if (playsound && !CloseSound.IsEmpty()) {
 			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
+		}
 	}
-	for (size_t i = 0; i < tiles.size(); ++i) {
-		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
+	for (const auto& tile : tiles) {
+		overlay->tiles[tile]->tileIndex = (ieByte) state;
 	}
 
 	//set door_open as state

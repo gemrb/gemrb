@@ -7302,7 +7302,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	int16_t k;
 	for (int i = 0; i < 4; i++) {
 		if (store->AvailableRooms&j) {
-			k = store->RoomPrices[i];
+			k = static_cast<int16_t>(store->RoomPrices[i]);
 		}
 		else k=-1;
 		PyTuple_SetItem(p, i, PyInt_FromLong(k));
@@ -11830,7 +11830,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 			break;
 		case TARGET_NONE:
 			gc->ResetTargetMode();
-			actor->UseItem(itemdata.slot, itemdata.headerindex, NULL, flags);
+			actor->UseItem(itemdata.slot, static_cast<ieDword>(itemdata.headerindex), nullptr, flags);
 			break;
 		case TARGET_AREA:
 			gc->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);

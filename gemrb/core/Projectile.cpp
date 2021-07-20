@@ -1846,7 +1846,7 @@ int Projectile::GetZPos() const
 void Projectile::SetIdentifiers(const ResRef &resref, size_t idx)
 {
 	projectileName = resref;
-	type = idx;
+	type = static_cast<ieWord>(idx);
 }
 
 bool Projectile::PointInRadius(const Point &p) const

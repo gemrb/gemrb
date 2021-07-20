@@ -2647,7 +2647,7 @@ void GameControl::SetLastActor(Actor* lastActor)
 //u is the user
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, int cnt)
+void GameControl::SetupItemUse(int slot, size_t header, Actor *u, int targettype, int cnt)
 {
 	spellName.Reset();
 	spellOrItem = -1;

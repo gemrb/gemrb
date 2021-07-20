@@ -198,7 +198,7 @@ static void InitSpawnGroups()
 
 	AutoTable tab("spawngrp", true);
 
-	Spawns.RemoveAll(NULL);
+	Spawns.RemoveAll(nullptr);
 	Spawns.SetType( GEM_VARIABLES_POINTER );
 
 	if (!tab)
@@ -214,7 +214,7 @@ static void InitSpawnGroups()
 		}
 		if (j>0) {
 			//difficulty
-			int level = (int)atoi(tab->QueryField(0,i));
+			int level = atoi(tab->QueryField(0, i));
 			for (;j;j--) {
 				resrefs[j - 1] = tab->QueryField(j, i);
 			}
@@ -3250,7 +3250,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
 	unsigned int spawncount = 0;
-	size_t i = RAND(0lu, spawn->Creatures.size() - 1);
+	size_t i = RAND(0LU, spawn->Creatures.size() - 1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;

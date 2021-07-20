@@ -60,14 +60,14 @@ public:
 	//it is highly unlikely we need this function
 	Projectile *GetProjectileByName(const ResRef &resname);
 	//returns the highest projectile id
-	size_t GetHighestProjectileNumber();
+	size_t GetHighestProjectileNumber() const;
 	//creates an empty projectile on the fly
 	Projectile *CreateDefaultProjectile(size_t idx);
 private:
 	std::vector<ProjectileEntry> projectiles; //this is the list of projectiles
 	std::vector<ExplosionEntry> explosions;   //this is the list of explosion resources
 	// internal function: what is max valid projectile id?
-	size_t PrepareSymbols(const Holder<SymbolMgr>& projlist);
+	size_t PrepareSymbols(const Holder<SymbolMgr>& projlist) const;
 	// internal function: read projectiles
 	void AddSymbols(const Holder<SymbolMgr>& projlist);
 	//this method is used internally
@@ -78,7 +78,6 @@ private:
 	ResRef GetExplosion(size_t idx, int type);
 };
 
-#endif // PROJSERVER_H
 }
 
-
+#endif // PROJSERVER_H

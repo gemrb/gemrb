@@ -207,7 +207,8 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 	return ReturnCopy(idx);
 }
 
-size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) {
+size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) const
+{
 	size_t count = 0;
 
 	size_t rows = projlist->GetSize();
@@ -237,7 +238,7 @@ void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
 	}
 }
 
-size_t ProjectileServer::GetHighestProjectileNumber()
+size_t ProjectileServer::GetHighestProjectileNumber() const
 {
 	return projectiles.size();
 }

@@ -1695,7 +1695,7 @@ void Inventory::UpdateWeaponAnimation()
 
 	// TODO: fix bows?
 
-	const ITMExtHeader *header = 0;
+	const ITMExtHeader *header = nullptr;
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (itm) {
 		itm->GetDamagePotential(false, header);
