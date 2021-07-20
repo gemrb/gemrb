@@ -2005,11 +2005,11 @@ void Map::InitActors()
 		actor->SetMap(this);
 		// make sure to bump away in case someone or something is already there
 		actor->SetPosition(actor->Pos, 1);
-		InitActor(actor);
+		MarkVisited(actor);
 	}
 }
 
-void Map::InitActor(const Actor *actor)
+void Map::MarkVisited(const Actor *actor) const
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
@@ -2030,7 +2030,7 @@ void Map::AddActor(Actor* actor, bool init)
 	}
 	if (init) {
 		actor->SetMap(this);
-		InitActor(actor);
+		MarkVisited(actor);
 	}
 }
 

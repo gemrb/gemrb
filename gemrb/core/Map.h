@@ -470,7 +470,7 @@ public:
 	void ActorSpottedByPlayer(const Actor *actor) const;
 	bool HandleAutopauseForVisible(Actor *actor, bool) const;
 	void InitActors();
-	void InitActor(const Actor *actor);
+	void MarkVisited(const Actor *actor) const;
 	void AddActor(Actor* actor, bool init);
 	//counts the summons already in the area
 	int CountSummons(ieDword flag, ieDword sex) const;
