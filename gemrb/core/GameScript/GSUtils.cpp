@@ -1936,9 +1936,9 @@ int MoveNearerTo(Scriptable *Sender, const Point &p, int distance, int dont_rele
 	return 0;
 }
 
-void FreeSrc(SrcVector *poi, const ResRef& key)
+void FreeSrc(const SrcVector *poi, const ResRef& key)
 {
-	int res = SrcCache.DecRef((void *) poi, key, true);
+	int res = SrcCache.DecRef((const void *) poi, key, true);
 	if (res<0) {
 		error("GameScript", "Corrupted Src cache encountered (reference count went below zero), Src name is: %.8s\n", key.CString());
 	}
@@ -2464,7 +2464,7 @@ unsigned int GetSpellDistance(const ResRef& spellRes, Scriptable *Sender)
 {
 	unsigned int dist;
 
-	Spell* spl = gamedata->GetSpell(spellRes);
+	const Spell* spl = gamedata->GetSpell(spellRes);
 	if (!spl) {
 		Log(ERROR, "GameScript", "Spell couldn't be found:%.8s.", spellRes.CString());
 		return 0;
@@ -2652,7 +2652,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 			ieDword state = target->GetStat(IE_STATE_ID);
 			if (state & STATE_DEAD) {
 				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
-					Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+					const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
 					if (!spl) return false;
 					const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
 					bool invalidTarget = seh && seh->Target != TARGET_DEAD;
@@ -2744,7 +2744,7 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, tar->Pos)) {
-				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags&SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, tar, dist);
@@ -2851,7 +2851,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 				return;
 			}
 			if (!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, parameters->pointParameter)) {
-				Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				const Spell *spl = gamedata->GetSpell(Sender->SpellResRef, true);
 				if (!(spl->Flags&SF_NO_LOS)) {
 					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
 					MoveNearerTo(Sender, parameters->pointParameter, dist, 0);

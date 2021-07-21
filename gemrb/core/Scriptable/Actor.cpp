@@ -10846,7 +10846,7 @@ bool Actor::TryToHideIWD2()
 bool Actor::Untargetable(const ResRef& spellRef) const
 {
 	if (!spellRef.IsEmpty()) {
-		Spell *spl = gamedata->GetSpell(spellRef, true);
+		const Spell *spl = gamedata->GetSpell(spellRef, true);
 		if (spl && (spl->Flags&SF_TARGETS_INVISIBLE)) {
 			gamedata->FreeSpell(spl, spellRef, false);
 			return false;
@@ -11190,7 +11190,7 @@ bool Actor::ConcentrationCheck() const
 		bonus += 4;
 	}
 
-	Spell* spl = gamedata->GetSpell(SpellResRef, true);
+	const Spell* spl = gamedata->GetSpell(SpellResRef, true);
 	if (!spl) return true;
 	int spellLevel = spl->SpellLevel;
 	gamedata->FreeSpell(spl, SpellResRef, false);

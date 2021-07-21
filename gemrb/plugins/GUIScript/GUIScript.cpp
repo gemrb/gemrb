@@ -5968,7 +5968,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			}
 		}
 
-		Spell* spell = gamedata->GetSpell(ps->FavouriteSpells[largest]);
+		const Spell* spell = gamedata->GetSpell(ps->FavouriteSpells[largest]);
 		if (spell == NULL) {
 			return NULL;
 		}
@@ -6613,9 +6613,9 @@ static PyObject *SetSpellIcon(Button* btn, const ResRef& SpellResRef, int type, 
 		return Py_None;
 	}
 
-	Spell* spell = gamedata->GetSpell(SpellResRef, true);
-	if (spell == NULL) {
-		btn->SetPicture( NULL );
+	const Spell* spell = gamedata->GetSpell(SpellResRef, true);
+	if (!spell) {
+		btn->SetPicture(nullptr);
 		Log(ERROR, "GUIScript", "Spell not found :%.8s", SpellResRef.CString());
 		//no incref here!
 		return Py_None;
@@ -8479,8 +8479,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 		Py_RETURN_NONE;
 	}
 
-	Spell* spell = gamedata->GetSpell(ResRef, silent);
-	if (spell == NULL) {
+	const Spell* spell = gamedata->GetSpell(ResRef, silent);
+	if (!spell) {
 		Py_RETURN_NONE;
 	}
 

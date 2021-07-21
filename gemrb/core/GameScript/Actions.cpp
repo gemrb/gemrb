@@ -1722,7 +1722,7 @@ void GameScript::FloatMessageFixedRnd(Scriptable* Sender, Action* parameters)
 		Log(ERROR, "GameScript", "DisplayStringHead/FloatMessage got no target, assuming Sender!");
 	}
 	ResRef src = parameters->string0Parameter;
-	SrcVector *rndstr = LoadSrc(src);
+	const SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;
@@ -1740,7 +1740,7 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	}
 
 	ResRef src = parameters->string0Parameter;
-	SrcVector *rndstr = LoadSrc(src);
+	const SrcVector *rndstr = LoadSrc(src);
 	if (!rndstr) {
 		Log(ERROR, "GameScript", "Cannot display resource!");
 		return;

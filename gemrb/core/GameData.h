@@ -91,9 +91,9 @@ public:
 	Item* GetItem(const ResRef &resname, bool silent=false);
 	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
 	Spell* GetSpell(const ResRef &resname, bool silent=false);
-	void FreeSpell(Spell *spl, const ResRef &name, bool free=false);
+	void FreeSpell(const Spell *spl, const ResRef &name, bool free = false);
 	Effect* GetEffect(const ResRef &resname);
-	void FreeEffect(Effect *eff, const ResRef &name, bool free=false);
+	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);

@@ -4293,7 +4293,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	if (!fx->Resource.IsEmpty()) {
 		//TODO: create a single list reader that handles src and 2da too
-		SrcVector *rndstr=LoadSrc(fx->Resource);
+		const SrcVector *rndstr = LoadSrc(fx->Resource);
 		if (rndstr) {
 			fx->Parameter1 = rndstr->at(RAND<size_t>(0ul, rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);

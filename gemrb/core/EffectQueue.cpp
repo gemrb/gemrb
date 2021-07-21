@@ -1396,7 +1396,7 @@ void EffectQueue::RemoveAllEffects(const ResRef &removed) const
 	// we didn't catch effects that don't persist — they still need to be undone
 	// FX_PERMANENT returners aren't part of the queue, so permanent stat mods can't be detected
 	// good test case is the Oozemaster druid kit from Divine remix, which decreases charisma in its clab
-	Spell *spell = gamedata->GetSpell(removed, true);
+	const Spell *spell = gamedata->GetSpell(removed, true);
 	if (!spell) return; // can be hit until all the iwd2 clabs are implemented
 	if (spell->ext_headers.size() > 1) {
 		Log(WARNING, "EffectQueue", "Spell %s has more than one extended header, removing only first!", removed.CString());

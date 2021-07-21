@@ -954,7 +954,7 @@ inline void Scriptable::ResetCastingState(Actor *caster) {
 void Scriptable::CastSpellPointEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
 	}
@@ -1034,7 +1034,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 void Scriptable::CastSpellEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
 	}
@@ -1195,7 +1195,7 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 		return;
 	}
 
-	Spell* spl = gamedata->GetSpell(spellRef);
+	const Spell* spl = gamedata->GetSpell(spellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
@@ -1358,7 +1358,7 @@ static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	Actor *actor = NULL;
 	int level = 0;
 	if (Type == ST_ACTOR) {
@@ -1453,7 +1453,7 @@ int Scriptable::CheckWildSurge()
 	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
 		ResRef oldSpellResRef;
 		oldSpellResRef = SpellResRef;
-		Spell *spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
+		const Spell *spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
 		// ignore non-magic "spells"
 		if (spl->Flags&(SF_HLA|SF_TRIGGER)) {
 			gamedata->FreeSpell(spl, oldSpellResRef, false);

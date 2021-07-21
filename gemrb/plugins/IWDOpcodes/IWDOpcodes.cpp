@@ -2231,7 +2231,7 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 		spellname = poi->ItemName;
 		gamedata->FreeItem(poi, fx->Resource, false);
 	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID) ) {
-		Spell *poi = gamedata->GetSpell(fx->Resource, true);
+		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
 		spellname = poi->SpellName;
 		gamedata->FreeSpell(poi, fx->Resource, false);
 	}
