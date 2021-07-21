@@ -862,7 +862,7 @@ static int check_type(const Actor *actor, const Effect *fx)
 			return 0;
 		}
 		if( actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->SourceRef) ) {
-			if (strnicmp(fx->SourceRef, "detect", 6) != 0) { // our secret door pervasive effect
+			if (fx->SourceRef != "detect") { // our secret door pervasive effect
 				Log(DEBUG, "EffectQueue", "Resisted by spell immunity2 (%s)", fx->SourceRef.CString());
 			}
 			return 0;
