@@ -59,7 +59,7 @@ public:
 			assert(font);
 		}
 		
-		virtual ~SubtitleSet() {}
+		virtual ~SubtitleSet() = default;
 
 		virtual size_t NextSubtitleFrame() const = 0;
 		virtual const String& SubtitleAtFrame(size_t) const = 0;

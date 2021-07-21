@@ -45,13 +45,9 @@ class Window;
 class GEM_EXPORT GUIFactory : public Plugin {
 protected:
 	ResRef winPack;
-	WindowManager* winmgr;
+	WindowManager* winmgr = nullptr;
 
 public:
-	GUIFactory()
-	: winmgr(NULL) {};
-	~GUIFactory() override {};
-
 	void SetWindowManager(WindowManager& mgr) { winmgr = &mgr; }
 
 	/** This function loads all available windows from the 'stream' parameter. */

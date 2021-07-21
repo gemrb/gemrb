@@ -27,14 +27,6 @@ namespace GemRB {
 
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
-ImageMgr::ImageMgr(void)
-{
-}
-
-ImageMgr::~ImageMgr(void)
-{
-}
-
 Bitmap* ImageMgr::GetBitmap()
 {
 	Bitmap *data = new Bitmap(size);

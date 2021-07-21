@@ -61,8 +61,8 @@ public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
 private:
-	PluginMgr();
-	~PluginMgr();
+	PluginMgr() = default;
+	~PluginMgr() = default;
 private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;

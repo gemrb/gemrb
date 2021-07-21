@@ -27,10 +27,6 @@ ResourceDesc::ResourceDesc(const TypeID* type, CreateFunc create, const char *ex
 {
 }
 
-ResourceDesc::~ResourceDesc(void)
-{
-}
-
 const char* ResourceDesc::GetExt() const
 {
 	return ext;

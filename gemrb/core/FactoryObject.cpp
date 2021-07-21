@@ -30,8 +30,4 @@ FactoryObject::FactoryObject(const ResRef &name, SClass_ID SuperClassID)
 	this->SuperClassID = SuperClassID;
 }
 
-FactoryObject::~FactoryObject(void)
-{
-}
-
 }

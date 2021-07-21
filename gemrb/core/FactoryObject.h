@@ -31,7 +31,7 @@ public:
 	SClass_ID SuperClassID;
 	ResRef resRef;
 	FactoryObject(const ResRef &resRef, SClass_ID SuperClassID);
-	virtual ~FactoryObject(void);
+	virtual ~FactoryObject() noexcept = default;
 };
 
 }

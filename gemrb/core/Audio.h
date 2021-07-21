@@ -74,14 +74,12 @@ public:
 	virtual void SetPos(const Point&) = 0;
 	virtual void Stop() = 0;
 	virtual void StopLooping() = 0;
-	~SoundHandle() override;
 };
 
 class GEM_EXPORT Channel {
 public:
 	explicit Channel(const char *label) : volume(100), reverb(0.0f)
 		{ strlcpy(name, label, sizeof(name)); }
-	~Channel() {}
 
 	const char *getName() const { return name; }
 	int getVolume() const { return volume; }
@@ -100,7 +98,6 @@ public:
 	static const TypeID ID;
 public:
 	Audio(void);
-	~Audio() override;
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;

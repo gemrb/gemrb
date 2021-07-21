@@ -29,15 +29,6 @@ PluginMgr *PluginMgr::Get()
 	return &mgr;
 }
 
-PluginMgr::PluginMgr()
-{
-}
-
-PluginMgr::~PluginMgr()
-{
-}
-
-
 bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 {
 	return plugins.find(plugintype) != plugins.end();

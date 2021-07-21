@@ -22,10 +22,6 @@
 
 namespace GemRB {
 
-Factory::Factory(void)
-{
-}
-
 Factory::~Factory(void)
 {
 	for (auto& fObject : fobjects) {
