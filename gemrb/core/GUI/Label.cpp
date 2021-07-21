@@ -77,10 +77,8 @@ void Label::SetAlignment(unsigned char Alignment)
 		Alignment |= IE_FONT_NO_CALC;
 	}
 	this->Alignment = Alignment;
-	if (Alignment == IE_FONT_ALIGN_CENTER) {
-		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {
-			StringToLower(Text);
-		}
+	if (Alignment == IE_FONT_ALIGN_CENTER && core->HasFeature(GF_LOWER_LABEL_TEXT)) {
+		StringToLower(Text);
 	}
 	MarkDirty();
 }

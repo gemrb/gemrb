@@ -228,9 +228,9 @@ bool GameData::DelTable(unsigned int index)
 		return false;
 	}
 	tables[index].refcount--;
-	if (tables[index].refcount == 0)
-		if (tables[index].tm)
-			tables[index].tm.release();
+	if (tables[index].refcount == 0 && tables[index].tm) {
+		tables[index].tm.release();
+	}
 	return true;
 }
 

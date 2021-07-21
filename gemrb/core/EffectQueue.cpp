@@ -113,10 +113,8 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 3: //GENERAL
 		//this is a hack to support dead only projectiles in PST
 		//if it interferes with something feel free to remove
-		if (value==GEN_DEAD) {
-			if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
-				return true;
-			}
+		if (value == GEN_DEAD && target->GetStat(IE_STATE_ID) & STATE_DEAD) {
+			return true;
 		}
 		stat = IE_GENERAL; break;
 	case 4: //RACE
@@ -130,16 +128,12 @@ bool EffectQueue::match_ids(const Actor *target, int table, ieDword value)
 	case 8: //ALIGNMENT
 		stat = target->GetStat(IE_ALIGNMENT);
 		a = value&15;
-		if( a) {
-			if( a != ( stat & 15 )) {
-				return false;
-			}
+		if (a && a != (stat & 15)) {
+			return false;
 		}
 		a = value & 0xf0;
-		if( a) {
-			if( a != ( stat & 0xf0 )) {
-				return false;
-			}
+		if (a && a != (stat & 0xf0)) {
+			return false;
 		}
 		return true;
 	case 9:
@@ -551,29 +545,25 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
-		assert(self != NULL);
+		assert(self != nullptr);
 		fx->SetPosition(self->Pos);
 
 		flg = ApplyEffect( st, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( st) {
-				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
+			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 	case FX_TARGET_SELF:
 		fx->SetPosition(dest);
 
 		flg = ApplyEffect( st, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( st) {
-				st->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && st) {
+			st->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 
 	case FX_TARGET_ALL_BUT_SELF:
-		assert(self != NULL);
+		assert(self != nullptr);
 		map=self->GetCurrentArea();
 		i= map->GetActorCount(true);
 		while(i--) {
@@ -652,10 +642,8 @@ int EffectQueue::AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const
 		fx->SetPosition(dest);
 
 		flg = ApplyEffect( pretarget, fx, 1 );
-		if( fx->TimingMode != FX_DURATION_JUST_EXPIRED) {
-			if( pretarget) {
-				pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
-			}
+		if (fx->TimingMode != FX_DURATION_JUST_EXPIRED && pretarget) {
+			pretarget->fxqueue.AddEffect(fx, flg == FX_INSERT);
 		}
 		break;
 
@@ -801,16 +789,12 @@ static inline bool check_level(const Actor *target, Effect *fx)
 
 	ieDword level = target->GetXPLevel(true);
 	//return true if resisted
-	if ((signed)fx->MinAffectedLevel > 0) {
-		if ((signed)level < (signed)fx->MinAffectedLevel) {
-			return true;
-		}
+	if ((signed) fx->MinAffectedLevel > 0 && (signed) level < (signed) fx->MinAffectedLevel) {
+		return true;
 	}
 
-	if ((signed)fx->MaxAffectedLevel > 0) {
-		if ((signed)level > (signed)fx->MaxAffectedLevel) {
-			return true;
-		}
+	if ((signed) fx->MaxAffectedLevel > 0 && (signed) level > (signed) fx->MaxAffectedLevel) {
+		return true;
 	}
 	return false;
 }
@@ -975,13 +959,11 @@ static int check_type(const Actor *actor, const Effect *fx)
 	//decrementing bounce checks
 
 	//level decrementing bounce check
-	if (fx->Power) {
-		if (bounce & BNC_LEVEL_DEC) {
-			efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
-			if (efx && DecreaseEffect(efx)) {
-				Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
-				return -1;
-			}
+	if (fx->Power && bounce & BNC_LEVEL_DEC) {
+		efx = actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, 0, fx->Power);
+		if (efx && DecreaseEffect(efx)) {
+			Log(DEBUG, "EffectQueue", "Bounced by level (decrementing)");
+			return -1;
 		}
 	}
 
@@ -2209,10 +2191,8 @@ int EffectQueue::CheckImmunity(Actor *target) const
 		//check specific spell immunity
 		//check school/sectype immunity
 		int ret = check_type(target, fx);
-		if (ret<0) {
-			if (target->Modified[IE_SANCTUARY]&(1<<OV_BOUNCE) ) {
-				target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
-			}
+		if (ret < 0 && target->Modified[IE_SANCTUARY] & (1 << OV_BOUNCE)) {
+			target->Modified[IE_SANCTUARY]|=(1<<OV_BOUNCE2);
 		}
 		return ret;
 	}

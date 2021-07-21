@@ -1183,10 +1183,8 @@ static const TriggerLink* FindTrigger(const char* triggername)
 	}
 	int len = strlench( triggername, '(' );
 	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp( triggernames[i].Name, triggername, len )) {
-			if (!triggernames[i].Name[len]) {
-				return triggernames + i;
-			}
+		if (!strnicmp(triggernames[i].Name, triggername, len) && !triggernames[i].Name[len]) {
+			return triggernames + i;
 		}
 	}
 	return NULL;
@@ -1199,10 +1197,8 @@ static const ActionLink* FindAction(const char* actionname)
 	}
 	int len = strlench( actionname, '(' );
 	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp( actionnames[i].Name, actionname, len )) {
-			if (!actionnames[i].Name[len]) {
-				return actionnames + i;
-			}
+		if (!strnicmp(actionnames[i].Name, actionname, len) && !actionnames[i].Name[len]) {
+			return actionnames + i;
 		}
 	}
 	return NULL;
@@ -1215,10 +1211,8 @@ static const ObjectLink* FindObject(const char* objectname)
 	}
 	int len = strlench( objectname, '(' );
 	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp( objectnames[i].Name, objectname, len )) {
-			if (!objectnames[i].Name[len]) {
-				return objectnames + i;
-			}
+		if (!strnicmp(objectnames[i].Name, objectname, len) && !objectnames[i].Name[len]) {
+			return objectnames + i;
 		}
 	}
 	return NULL;
@@ -1330,10 +1324,8 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 	case ST_ACTOR:
 		//i don't know if unselectable actors are targetable by script
 		//if yes, then remove GA_SELECT
-		if (ga_flags) {
-			if (!((Actor *) target)->ValidTarget(ga_flags) ) {
-				return;
-			}
+		if (ga_flags && !((Actor *) target)->ValidTarget(ga_flags)) {
+			return;
 		}
 		break;
 	case ST_GLOBAL:
@@ -2479,12 +2471,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		//uninterruptable actions will set it back
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
-			if (actionflags[actionID]&AF_ALIVE) {
-				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death!");
-					Sender->ReleaseCurrentAction();
-					return;
-				}
+			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
+				Log(WARNING, "GameScript", "Aborted action due to death!");
+				Sender->ReleaseCurrentAction();
+				return;
 			}
 		}
 		func( Sender, aC );

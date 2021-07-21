@@ -1441,10 +1441,8 @@ void GameControl::UpdateCursor()
 	} else if (target_mode == TARGET_MODE_CAST) {
 		nextCursor = IE_CURSOR_CAST;
 		//point is always valid
-		if (!(target_types & GA_POINT)) {
-			if(!lastActor) {
-				nextCursor |= IE_CURSOR_GRAY;
-			}
+		if (!(target_types & GA_POINT) && !lastActor) {
+			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (target_mode == TARGET_MODE_DEFEND) {
 		nextCursor = IE_CURSOR_DEFEND;
@@ -2019,11 +2017,9 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->GetOverheadText().empty()) {
-				if (!trap->OverheadTextIsDisplaying()) {
-					trap->DisplayOverheadText(true);
-					DisplayString( trap );
-				}
+			if (!trap->GetOverheadText().empty() && !trap->OverheadTextIsDisplaying()) {
+				trap->DisplayOverheadText(true);
+				DisplayString(trap);
 			}
 			//the importer shouldn't load the script
 			//if it is unallowed anyway (though
@@ -2199,12 +2195,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 		}
 
-		if (target_mode == TARGET_MODE_NONE) {
-			if (isSelectionRect || lastActorID) {
-				MakeSelection(Mod&GEM_MOD_SHIFT);
-				ClearMouseState();
-				return true;
-			}
+		if (target_mode == TARGET_MODE_NONE && (isSelectionRect || lastActorID)) {
+			MakeSelection(Mod & GEM_MOD_SHIFT);
+			ClearMouseState();
+			return true;
 		}
 
 		if (lastCursor == IE_CURSOR_BLOCKED) {

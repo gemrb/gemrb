@@ -322,23 +322,19 @@ void CharAnimations::SetColors(const ieDword *arg)
 
 void CharAnimations::CheckColorMod()
 {
-	if (!GlobalColorMod.locked) {
-		if (GlobalColorMod.type != RGBModifier::NONE) {
-			GlobalColorMod.type = RGBModifier::NONE;
-			GlobalColorMod.speed = 0;
-			for (bool& c : change) {
-				c = true;
-			}
+	if (!GlobalColorMod.locked && GlobalColorMod.type != RGBModifier::NONE) {
+		GlobalColorMod.type = RGBModifier::NONE;
+		GlobalColorMod.speed = 0;
+		for (bool& c : change) {
+			c = true;
 		}
 	}
 
 	for (unsigned int location = 0; location < PAL_MAX * 8; ++location) {
-		if (!ColorMods[location].phase) {
-		  if (ColorMods[location].type != RGBModifier::NONE) {
-				ColorMods[location].type = RGBModifier::NONE;
-				ColorMods[location].speed = 0;
-		    change[location>>3]=true;
-		  }
+		if (!ColorMods[location].phase && ColorMods[location].type != RGBModifier::NONE) {
+			ColorMods[location].type = RGBModifier::NONE;
+			ColorMods[location].speed = 0;
+			change[location >> 3] = true;
 		}
 	}
 	//this is set by sanctuary and stoneskin (override global colors)

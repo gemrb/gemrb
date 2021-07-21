@@ -676,8 +676,8 @@ int GameScript::Global(Scriptable *Sender, const Trigger *parameters)
 	bool valid=true;
 
 	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, nullptr, &valid);
-	if (valid) {
-		if ( value == parameters->int0Parameter ) return 1;
+	if (valid && value == parameters->int0Parameter) {
+		return 1;
 	}
 	return 0;
 }

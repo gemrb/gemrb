@@ -688,10 +688,8 @@ int Game::GetTotalPartyLevel(bool onlyalive) const
 	int amount = 0;
 
 	for (auto pc : PCs) {
-			if (onlyalive) {
-				if (pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
-					continue;
-				}
+			if (onlyalive && pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
+				continue;
 			}
 			amount += pc->GetXPLevel(0);
 	}
@@ -1305,10 +1303,8 @@ bool Game::EveryoneStopped() const
 bool Game::EveryoneNearPoint(const Map *area, const Point &p, int flags) const
 {
 	for (auto pc : PCs) {
-		if (flags&ENP_ONLYSELECT) {
-			if(!pc->Selected) {
-				continue;
-			}
+		if (flags & ENP_ONLYSELECT && !pc->Selected) {
+			continue;
 		}
 		if (pc->GetStat(IE_STATE_ID) & STATE_DEAD) {
 			continue;
@@ -1387,10 +1383,10 @@ void Game::SetReputation(ieDword r)
 {
 	if (r<10) r=10;
 	else if (r>200) r=200;
-	if (Reputation>r) {
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation-r)/10);
-	} else if (Reputation<r) {
-		if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r-Reputation)/10);
+	if (Reputation > r && core->HasFeedback(FT_MISC)) {
+		displaymsg->DisplayConstantStringValue(STR_LOSTREP, DMC_GOLD, (Reputation - r) / 10);
+	} else if (Reputation < r && core->HasFeedback(FT_MISC)) {
+		displaymsg->DisplayConstantStringValue(STR_GOTREP, DMC_GOLD, (r - Reputation) / 10);
 	}
 	Reputation = r;
 	for (auto pc : PCs) {

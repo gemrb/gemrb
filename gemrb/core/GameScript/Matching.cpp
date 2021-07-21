@@ -209,9 +209,8 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		// unless it's pst, which relies on it in 3012cut2-3012cut7.bcs
 		// FIXME: do we need more fine-grained control?
 		// FIXME: stop abusing old GF flags
-		if (!core->HasFeature(GF_AREA_OVERRIDE)) {
-			if (ac == Sender) continue;
-		}
+		if (!core->HasFeature(GF_AREA_OVERRIDE) && ac == Sender) continue;
+
 		bool filtered = false;
 		if (DoObjectIDSCheck(oC, ac, &filtered)) {
 			// this is needed so eg. Range trigger gets a good object
@@ -310,11 +309,8 @@ Scriptable *GetStoredActorFromObject(Scriptable *Sender, const Object *oC, int g
 	// retrieve an existing target if it still exists and is valid
 	if (Sender->CurrentActionTarget) {
 		tar = core->GetGame()->GetActorByGlobalID(Sender->CurrentActionTarget);
-		if (tar) {
-			// always an actor, check if it satisfies flags
-			if (((Actor *)tar)->ValidTarget(ga_flags)) {
-				return tar;
-			}
+		if (tar && ((Actor *)tar)->ValidTarget(ga_flags)) {
+			return tar;
 		}
 		return NULL; // target invalid/gone
 	}
@@ -493,10 +489,8 @@ int GetObjectLevelCount(Scriptable *Sender, const Object *oC)
 
 Targets *GetMyTarget(const Scriptable *Sender, const Actor *actor, Targets *parameters, int ga_flags)
 {
-	if (!actor) {
-		if (Sender->Type==ST_ACTOR) {
-			actor = (const Actor *) Sender;
-		}
+	if (!actor && Sender->Type == ST_ACTOR) {
+		actor = (const Actor *) Sender;
 	}
 	parameters->Clear();
 	if (actor) {

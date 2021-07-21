@@ -678,10 +678,8 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		if (gotitem) {
-			if (target->Type == ST_ACTOR) {
-				if (((Actor *) target)->InParty) {
-					((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
-				}
+			if (target->Type == ST_ACTOR && ((Actor *) target)->InParty) {
+				((Actor *) target)->VerbalConstant(VB_INVENTORY_FULL);
 			}
 			displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		}
@@ -1319,11 +1317,9 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 			WorldMap *worldmap = core->GetWorldMap();
 			unsigned int areaindex;
 			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
-			if (entry) {
-				// make sure the area is marked as revealed and visited
-				if (!(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-					entry->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_VISITED, OP_OR);
-				}
+			// make sure the area is marked as revealed and visited
+			if (entry && !(entry->GetAreaStatus() & WMP_ENTRY_VISITED)) {
+				entry->SetAreaStatus(WMP_ENTRY_VISIBLE | WMP_ENTRY_VISITED, OP_OR);
 			}
 		}
 	}
@@ -1483,22 +1479,20 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 	if ( target->Type == ST_DOOR || target->Type == ST_CONTAINER) {
 		weaponrange += 10;
 	}
-	if (!(flags&AC_NO_SOUND) ) {
-		if (!Sender->CurrentActionTicks) {
-			// play the battle cry
-			// pick from all 5 possible verbal constants
-			if (!actor->PlayWarCry(5)) {
-				// for monsters also try their 2da/ini file sounds
-				if (!actor->InParty) {
-					ResRef sound;
-					actor->GetSoundFromFile(sound, 200);
-					core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
-				}
+	if (!(flags & AC_NO_SOUND) && !Sender->CurrentActionTicks) {
+		// play the battle cry
+		// pick from all 5 possible verbal constants
+		if (!actor->PlayWarCry(5)) {
+			// for monsters also try their 2da/ini file sounds
+			if (!actor->InParty) {
+				ResRef sound;
+				actor->GetSoundFromFile(sound, 200);
+				core->GetAudioDrv()->Play(sound, SFX_CHAN_MONSTER, actor->Pos);
 			}
-			//display attack message
-			if (target->GetGlobalID() != Sender->LastTarget) {
-				displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
-			}
+		}
+		//display attack message
+		if (target->GetGlobalID() != Sender->LastTarget) {
+			displaymsg->DisplayConstantStringAction(STR_ACTION_ATTACK, DMC_WHITE, Sender, target);
 		}
 	}
 
@@ -2650,20 +2644,18 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
-			if (state & STATE_DEAD) {
-				if (state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
-					const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
-					if (!spl) return false;
-					const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
-					bool invalidTarget = seh && seh->Target != TARGET_DEAD;
-					gamedata->FreeSpell(spl, Sender->SpellResRef, false);
-					if (invalidTarget) {
-						if (caster->InParty) {
-							core->Autopause(AP_NOTARGET, caster);
-						}
-						caster->SetStance(IE_ANI_READY);
-						return true;
+			if (state & STATE_DEAD && state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
+				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+				if (!spl) return false;
+				const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+				bool invalidTarget = seh && seh->Target != TARGET_DEAD;
+				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+				if (invalidTarget) {
+					if (caster->InParty) {
+						core->Autopause(AP_NOTARGET, caster);
 					}
+					caster->SetStance(IE_ANI_READY);
+					return true;
 				}
 			}
 		}
