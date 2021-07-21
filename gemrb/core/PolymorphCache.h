@@ -25,12 +25,7 @@ namespace GemRB {
 
 struct GEM_EXPORT PolymorphCache {
 	ResRef Resource;
-	ieDword *stats = nullptr;
-
-	PolymorphCache() = default;
-	~PolymorphCache() {
-		delete[] stats;
-	}
+	std::vector<ieDword> stats;
 };
 
 }

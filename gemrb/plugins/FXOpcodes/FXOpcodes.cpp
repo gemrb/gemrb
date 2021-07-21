@@ -4156,8 +4156,8 @@ static void CopyPolymorphStats(Actor *source, Actor *target)
 
 	assert(target->polymorphCache);
 
-	if (!target->polymorphCache->stats) {
-		target->polymorphCache->stats = new ieDword[polystatcount];
+	if (target->polymorphCache->stats.empty()) {
+		target->polymorphCache->stats.resize(polystatcount);
 	}
 
 	for (int i = 0; i < polystatcount; i++) {
