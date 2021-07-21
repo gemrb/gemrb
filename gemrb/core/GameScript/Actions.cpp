@@ -6293,30 +6293,31 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 	Actor * actor = (Actor *) Sender;
 
 	Scriptable *target = GetActorFromObject(Sender, parameters->objects[1]);
-	Door *door = nullptr;
-	Container *container = nullptr;
-	const Point *pos;
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	Door *door = nullptr;
+	Container *container = nullptr;
+	Point pos;
 	if (target->Type == ST_DOOR) {
 		door = (Door *) target;
-		pos = door->toOpen;
-		const Point *otherp = door->toOpen + 1;
-		if (Distance(*pos, Sender)>Distance(*otherp, Sender)) {
-			pos=otherp;
+		pos = door->toOpen[0];
+		const Point& otherp = door->toOpen[1];
+		if (Distance(pos, Sender) > Distance(otherp, Sender)) {
+			pos = otherp;
 		}
 	} else if(target->Type == ST_CONTAINER) {
 		container = (Container *) target;
-		pos = &target->Pos;
+		pos = target->Pos;
 	} else {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
-	if (SquaredPersonalDistance(*pos, Sender) > MAX_OPERATING_DISTANCE*MAX_OPERATING_DISTANCE) {
-		MoveNearerTo(Sender, *pos, MAX_OPERATING_DISTANCE, 0);
+	if (SquaredPersonalDistance(pos, Sender) > MAX_OPERATING_DISTANCE * MAX_OPERATING_DISTANCE) {
+		MoveNearerTo(Sender, pos, MAX_OPERATING_DISTANCE, 0);
 		return;
 	}
 
