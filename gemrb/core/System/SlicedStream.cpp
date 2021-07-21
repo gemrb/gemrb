@@ -101,7 +101,7 @@ DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool 
 {
 	if (size <= 16384) {
 		// small (or empty) substream, just read it into a buffer instead of expensive file I/O
-		unsigned long oldpos;
+		strpos_t oldpos;
 		if (preservepos)
 			oldpos = str->GetPos();
 		str->Seek(startpos, GEM_STREAM_START);

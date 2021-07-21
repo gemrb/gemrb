@@ -100,9 +100,9 @@ public:
 	strret_t WritePoint(const Point&);
 	
 	virtual stroff_t Seek(stroff_t pos, strpos_t startpos) = 0;
-	unsigned long Remains() const;
-	unsigned long Size() const;
-	unsigned long GetPos() const;
+	strpos_t Remains() const;
+	strpos_t Size() const;
+	strpos_t GetPos() const;
 	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();

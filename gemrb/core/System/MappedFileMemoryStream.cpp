@@ -51,7 +51,7 @@ MappedFileMemoryStream::MappedFileMemoryStream(const std::string& fileName)
 		LARGE_INTEGER fileSize;
 		GetFileSizeEx(fileHandle, &fileSize);
 		assert(fileSize.QuadPart <= ULONG_MAX);
-		size = static_cast<unsigned long>(fileSize.QuadPart);
+		size = static_cast<strpos_t>(fileSize.QuadPart);
 	}
 #else
 	this->fileHandle = fopen(fileName.c_str(), "rb");
