@@ -554,7 +554,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieVariable Name, Entrance;
 		ResRef script0;
 		ResRef KeyResRef;
-		struct ResRef Destination;
+		ResRef Destination;
 		// two adopted pst specific fields
 		ResRef DialogResRef;
 		ResRef WavResRef;
@@ -812,7 +812,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieWord OpenVerticesCount, ClosedVerticesCount;
 		ieWord OpenImpededCount, ClosedImpededCount;
 		ieVariable LongName, LinkedInfo;
-		struct ResRef ShortName;
+		ResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
 		ResRef KeyResRef;
@@ -861,7 +861,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadDword(ClosedFirstImpeded);
 		str->ReadWord(hp); // hitpoints
 		str->ReadWord(ac); // AND armorclass, according to IE dev info
-		struct ResRef OpenResRef, CloseResRef;
+		ResRef OpenResRef, CloseResRef;
 		str->ReadResRef( OpenResRef );
 		str->ReadResRef( CloseResRef );
 		str->ReadDword(cursor);
@@ -1278,7 +1278,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading ambients");
 	str->Seek( AmbiOffset, GEM_STREAM_START );
 	for (int i = 0; i < AmbiCount; i++) {
-		struct ResRef sounds[MAX_RESCOUNT];
+		ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
 		Ambient *ambi = new Ambient();

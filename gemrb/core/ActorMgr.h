@@ -29,7 +29,7 @@ namespace GemRB {
 
 class Actor;
 class DataStream;
-struct ResRef;
+class ResRef;
 
 class GEM_EXPORT ActorMgr : public Plugin {
 public:
