@@ -292,7 +292,7 @@ public:
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
-	unsigned int GetEffectOrder(EffectRef &effect_reference, const Effect *fx) const;
+	unsigned int GetEffectOrder(EffectRef &effect_reference, const Effect *fx2) const;
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(const Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieWord timing);
