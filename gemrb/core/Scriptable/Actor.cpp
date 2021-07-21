@@ -10249,7 +10249,7 @@ void Actor::CreateDerivedStats()
 				BaseStats[IE_LEVEL3] += 12;
 			}
 			for (int savingthrow : savingthrows) {
-				BaseStats[savingthrow]++;
+				BaseStats[savingthrow]--;
 			}
 		}
 	}
