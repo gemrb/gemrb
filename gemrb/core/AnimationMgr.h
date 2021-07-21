@@ -39,7 +39,7 @@ public:
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	virtual Holder<Sprite2D> GetPalette() = 0;
-	virtual int GetCycleCount() = 0;
+	virtual size_t GetCycleCount() = 0;
 };
 
 }

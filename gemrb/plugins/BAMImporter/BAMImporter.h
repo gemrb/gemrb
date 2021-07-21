@@ -42,14 +42,11 @@ class BAMImporter : public AnimationMgr {
 private:
 	DataStream* str;
 	std::vector<FrameEntry> frames;
-	CycleEntry* cycles;
-	ieWord FramesCount;
-	ieByte CyclesCount;
+	std::vector<CycleEntry> cycles;
 	PaletteHolder palette;
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	strpos_t DataStart;
-private:
 	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
 	ieWord * CacheFLT(unsigned int &count);
 public:
@@ -61,21 +58,9 @@ public:
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Holder<Sprite2D> GetPalette() override;
-
-	/** Gets a Pixel Index from the Image, unused */
-	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
+	size_t GetCycleCount() override
 	{
-		return 0;
-	}
-	/** Gets a Pixel from the Image, unused */
-	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
-	{
-		return Color();
-	}
-public:
-	int GetCycleCount() override
-	{
-		return CyclesCount;
+		return cycles.size();
 	}
 };
 

@@ -36,9 +36,6 @@ using namespace GemRB;
 BAMImporter::BAMImporter(void)
 {
 	str = NULL;
-	cycles = NULL;
-	FramesCount = 0;
-	CyclesCount = 0;
 	CompressedColorIndex = DataStart = 0;
 	FramesOffset = PaletteOffset = FLTOffset = 0;
 }
@@ -46,7 +43,6 @@ BAMImporter::BAMImporter(void)
 BAMImporter::~BAMImporter(void)
 {
 	delete str;
-	delete[] cycles;
 }
 
 bool BAMImporter::Open(DataStream* stream)
@@ -55,12 +51,10 @@ bool BAMImporter::Open(DataStream* stream)
 		return false;
 	}
 	delete str;
-	delete[] cycles;
-	frames.clear();
-	cycles = nullptr;
-	palette = nullptr;
-
 	str = stream;
+
+	palette = nullptr;
+	
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
@@ -75,15 +69,21 @@ bool BAMImporter::Open(DataStream* stream)
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
 		return false;
 	}
-	str->ReadWord(FramesCount);
-	str->Read( &CyclesCount, 1 );
+
+	ieWord frameCount;
+	str->ReadWord(frameCount);
+	frames.resize(frameCount);
+
+	ieByte cycleCount;
+	str->Read(&cycleCount, 1);
+	cycles.resize(cycleCount);
+	
 	str->Read( &CompressedColorIndex, 1 );
 	str->ReadDword(FramesOffset);
 	str->ReadDword(PaletteOffset);
 	str->ReadDword(FLTOffset);
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	
-	frames.resize(FramesCount);
 	DataStart = str->Size();
 	for (auto& frame : frames) {
 		ieWord w, h;
@@ -103,10 +103,9 @@ bool BAMImporter::Open(DataStream* stream)
 		DataStart = std::min(DataStart, frame.dataOffset);
 	}
 	
-	cycles = new CycleEntry[CyclesCount];
-	for (unsigned int i = 0; i < CyclesCount; i++) {
-		str->ReadWord(cycles[i].FramesCount);
-		str->ReadWord(cycles[i].FirstFrame);
+	for (auto& cycle : cycles) {
+		str->ReadWord(cycle.FramesCount);
+		str->ReadWord(cycle.FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
@@ -126,12 +125,12 @@ bool BAMImporter::Open(DataStream* stream)
 	return true;
 }
 
-int BAMImporter::GetCycleSize(unsigned char Cycle)
+int BAMImporter::GetCycleSize(unsigned char cycle)
 {
-	if(Cycle >= CyclesCount ) {
+	if (cycle >= cycles.size()) {
 		return -1;
 	}
-	return cycles[Cycle].FramesCount;
+	return cycles[cycle].FramesCount;
 }
 
 Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool RLESprite, uint8_t* data)
@@ -166,8 +165,8 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 ieWord * BAMImporter::CacheFLT(unsigned int &count)
 {
 	count = 0;
-	for (int i = 0; i < CyclesCount; i++) {
-		unsigned int tmp = cycles[i].FirstFrame + cycles[i].FramesCount;
+	for (const auto& cycle : cycles) {
+		unsigned int tmp = cycle.FirstFrame + cycle.FramesCount;
 		if (tmp > count) {
 			count = tmp;
 		}
@@ -185,7 +184,7 @@ ieWord * BAMImporter::CacheFLT(unsigned int &count)
 
 AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allowCompression)
 {
-	unsigned int i, count;
+	unsigned int count;
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
 
@@ -195,14 +194,13 @@ AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allo
 	uint8_t *data = (uint8_t*)malloc(length);
 	str->Read(data, length);
 
-	for (i = 0; i < FramesCount; ++i) {
-		const FrameEntry& frameInfo = frames[i];
+	for (const auto& frameInfo : frames) {
 		bool RLECompressed = allowCompression && frameInfo.RLE;
 		Holder<Sprite2D> frame = GetFrameInternal(frameInfo, RLECompressed, data - DataStart);
 		af->AddFrame(frame);
 	}
-	for (i = 0; i < CyclesCount; ++i) {
-		af->AddCycle( cycles[i] );
+	for (const auto& cycle : cycles) {
+		af->AddCycle(cycle);
 	}
 	af->LoadFLT ( FLT, count );
 	free(data);
