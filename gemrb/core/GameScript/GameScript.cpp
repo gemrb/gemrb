@@ -1183,7 +1183,7 @@ static const TriggerLink* FindTrigger(const char* triggername)
 	}
 	int len = strlench( triggername, '(' );
 	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp(triggernames[i].Name, triggername, len) && !triggernames[i].Name[len]) {
+		if (!strnicmp(triggernames[i].Name, triggername, len)) {
 			return triggernames + i;
 		}
 	}
@@ -1197,7 +1197,7 @@ static const ActionLink* FindAction(const char* actionname)
 	}
 	int len = strlench( actionname, '(' );
 	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp(actionnames[i].Name, actionname, len) && !actionnames[i].Name[len]) {
+		if (!strnicmp(actionnames[i].Name, actionname, len)) {
 			return actionnames + i;
 		}
 	}
@@ -1211,7 +1211,7 @@ static const ObjectLink* FindObject(const char* objectname)
 	}
 	int len = strlench( objectname, '(' );
 	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp(objectnames[i].Name, objectname, len) && !objectnames[i].Name[len]) {
+		if (!strnicmp(objectnames[i].Name, objectname, len)) {
 			return objectnames + i;
 		}
 	}
