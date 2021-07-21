@@ -552,7 +552,7 @@ void IniSpawn::RespawnNameless()
 	}
 
 	if (NamelessSpawnPoint.IsZero()) {
-		core->GetGame()->JoinParty(nameless,JP_INITPOS);
+		game->JoinParty(nameless, JP_INITPOS);
 		NamelessSpawnPoint=nameless->Pos;
 		NamelessSpawnArea = nameless->Area;
 	}
@@ -564,7 +564,7 @@ void IniSpawn::RespawnNameless()
 
 	// reselect nameless, since he didn't really 'die'
 	// this matches the unconditional reselect behavior of the original
-	core->GetGame()->SelectActor(nameless, true, SELECT_NORMAL);
+	game->SelectActor(nameless, true, SELECT_NORMAL);
 
 	//hardcoded!!!
 	if (NamelessState==36) {
