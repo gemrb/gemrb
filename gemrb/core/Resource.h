@@ -30,6 +30,8 @@
 #include "Plugin.h"
 #include "System/String.h"
 
+#include <cstdarg>
+
 namespace GemRB {
 
 /** Resource reference */
