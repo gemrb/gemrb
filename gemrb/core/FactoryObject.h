@@ -24,6 +24,9 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "SClassID.h"
+#include "Resource.h"
+
 namespace GemRB {
 
 class GEM_EXPORT FactoryObject {

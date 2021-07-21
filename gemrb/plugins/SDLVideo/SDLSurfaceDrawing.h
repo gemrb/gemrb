@@ -26,6 +26,8 @@
 #include <cmath>
 
 #include "SDLPixelIterator.h"
+
+#include "System/Logging.h"
 #include "Polygon.h"
 
 namespace GemRB {
@@ -158,7 +160,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				}
 				break;
 			default:
-				Log(ERROR, "sprite_t", "Working with unknown pixel format: %s", SDL_GetError());
+				ERROR_UNKNOWN_BPP;
 				break;
 		}
 	}

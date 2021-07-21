@@ -39,7 +39,6 @@
 #define PACKAGE "GemRB"
 
 #include "RGBAColor.h"
-#include "SClassID.h"
 #include "errors.h"
 
 #include "Region.h"
@@ -47,12 +46,9 @@
 #include "System/String.h"
 
 #include <algorithm>
-#include <chrono>
-
-#include "System/Logging.h"
-
 #include <bitset>
 #include <climits>
+#include <chrono>
 
 namespace GemRB {
 
@@ -284,7 +280,6 @@ inline bool SetBits(T& flag, const T& value, int mode)
 		case OP_AND: flag &= value; break;
 		case OP_XOR: flag ^= value; break;
 		default:
-			Log(ERROR, "SetBits", "Unrecognized Bit Operation %i", mode);
 			return false;
 	}
 	return true;

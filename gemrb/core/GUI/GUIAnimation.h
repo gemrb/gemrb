@@ -20,6 +20,7 @@
 #ifndef Animations_h
 #define Animations_h
 
+#include "Holder.h"
 #include "Region.h"
 
 #include "globals.h"

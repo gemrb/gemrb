@@ -33,8 +33,6 @@
 #include "Holder.h"
 #include "TypeID.h"
 
-#include <cstddef>
-
 namespace GemRB {
 
 /**

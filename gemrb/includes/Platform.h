@@ -50,10 +50,6 @@
 	#include <unistd.h>
 #endif
 
-#include <cstdio>
-#include <cstdlib>
-
-#include "System/Logging.h"
-#include "System/String.h"
+#include <cstddef>
 
 #endif  //! PLATFORM_H
