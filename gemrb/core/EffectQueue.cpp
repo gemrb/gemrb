@@ -2056,15 +2056,6 @@ void EffectQueue::dump(StringBuffer& buffer) const
 		buffer.appendFormatted(" %2d: 0x%02x: %s (%d, %d) S:%s\n", i++, fx->Opcode, Opcodes[fx->Opcode].Name, fx->Parameter1, fx->Parameter2, fx->SourceRef.CString());
 	}
 }
-/*
-Effect *EffectQueue::GetEffect(ieDword idx) const
-{
-	if( effects.size()<=idx) {
-		return NULL;
-	}
-	return effects[idx];
-}
-*/
 
 //returns true if the effect supports simplified duration
 bool EffectQueue::HasDuration(const Effect *fx)
