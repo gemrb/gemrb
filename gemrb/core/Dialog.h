@@ -76,10 +76,6 @@ public:
 	int FindFirstState(Scriptable* target) const;
 	int FindRandomState(Scriptable* target) const;
 
-	void Release()
-	{
-		delete this;
-	}
 public:
 	ResRef resRef;
 	ieDword Flags; //freeze flags (bg2)
