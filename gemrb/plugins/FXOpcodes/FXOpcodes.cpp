@@ -984,7 +984,7 @@ int fx_ac_vs_damage_type_modifier (Scriptable* /*Owner*/, Actor* target, Effect*
 		//has a twohanded weapon equipped
 		slot = target->inventory.GetWeaponSlot();
 		if (slot>0) {
-			CREItem *item = target->inventory.GetItem(slot);
+			const CREItem *item = target->inventory.GetItem(slot);
 			if (item->Flags&IE_INV_ITEM_TWOHANDED) return FX_APPLIED;
 		}
 	}
@@ -1551,10 +1551,10 @@ int fx_set_hasted_state (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x11 CurrentHPModifier
-static int GetSpecialHealAmount(int type, Scriptable *caster)
+static int GetSpecialHealAmount(int type, const Scriptable *caster)
 {
 	if (!caster || caster->Type!=ST_ACTOR) return 0;
-	Actor *actor = (Actor *) caster;
+	const Actor *actor = (const Actor *) caster;
 	switch(type) {
 		case 3: //paladin's lay on hands, the amount is already calculated in a compatible way
 			return actor->GetSafeStat(IE_LAYONHANDSAMOUNT);
@@ -2298,7 +2298,7 @@ int fx_cure_stun_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 int fx_cure_invisible_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 {
 	// print("fx_cure_invisible_state(%2d): Mod: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!STATE_GET(STATE_NONDET) && !game->StateOverrideFlag && !game->StateOverrideTime) {
 		if (core->HasFeature(GF_PST_STATE_FLAGS)) {
 			BASE_STATE_CURE( STATE_PST_INVIS );
@@ -3511,7 +3511,7 @@ int fx_create_magic_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	//equip the weapon
 	// but don't add new effects if there are none, which is an ugly workaround
 	// fixes infinite loop with wm_sqrl spell from "wild mage additions" mod
-	Item *itm = gamedata->GetItem(fx->Resource, true);
+	const Item *itm = gamedata->GetItem(fx->Resource, true);
 	if (!itm) return FX_NOT_APPLIED;
 	target->inventory.SetEquippedSlot(slot - target->inventory.GetWeaponSlot(), 0, itm->EquippingFeatureCount == 0);
 	gamedata->FreeItem(itm, fx->Resource);
@@ -3630,7 +3630,7 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_reveal_area(%2d): Value: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Map *map = NULL;
+	const Map *map = nullptr;
 
 	if (target) {
 		map = target->GetCurrentArea();
@@ -3845,7 +3845,7 @@ int fx_dimension_door (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_knock (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_knock(%2d) [%d.%d]", fx->Opcode, fx->PosX, fx->PosY);
-	Map *map = Owner->GetCurrentArea();
+	const Map *map = Owner->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
@@ -4121,11 +4121,11 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 	target->SendDiedTrigger();
 
 	// end the game if everyone in the party gets petrified
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int partySize = game->GetPartySize(true);
 	int stoned = 0;
 	for (int j=0; j<partySize; j++) {
-		Actor *pc = game->GetPC(j, true);
+		const Actor *pc = game->GetPC(j, true);
 		if (pc->GetStat(IE_STATE_ID) & STATE_PETRIFIED) stoned++;
 	}
 	if (stoned == partySize) {
@@ -4243,7 +4243,7 @@ int fx_force_visible (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 		target->Modified[IE_PUPPETTYPE]=0;
 
 		//go after the original puppetmarker in the puppet too
-		Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
+		const Actor *puppet = core->GetGame()->GetActorByGlobalID(target->GetSafeStat(IE_PUPPETID) );
 		if (puppet) {
 			Effect *puppetmarker = puppet->fxqueue.HasEffect(fx_puppetmarker_ref);
 
@@ -4303,7 +4303,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		}
 
 		//random text for other games
-		ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
+		const ieDword *rndstr2 = core->GetListFrom2DA(fx->Resource);
 		int cnt = rndstr2[0];
 		if (cnt) {
 			fx->Parameter1 = rndstr2[core->Roll(1,cnt,0)];
@@ -4497,7 +4497,7 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
 	if (Owner->Type == ST_ACTOR) {
-		Actor *owner = (Actor *) Owner;
+		const Actor *owner = (const Actor *) Owner;
 		// prevent eg. True Sight continuing after death
 		if (!owner->ValidTarget(GA_NO_DEAD)) {
 			return FX_NOT_APPLIED;
@@ -4584,7 +4584,7 @@ int fx_find_traps (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			break;
 	}
 
-	TileMap *TMap = target->GetCurrentArea()->TMap;
+	const TileMap *TMap = target->GetCurrentArea()->TMap;
 
 	int Count = 0;
 	while (true) {
@@ -5083,7 +5083,7 @@ int fx_apply_effect (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//apply effect, if the effect is a goner, then kill
 	//this effect too
-	Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+	const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 	if (!newfx)
 		return FX_NOT_APPLIED;
 
@@ -5338,7 +5338,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//FIXME: the familiar block field is not saved in the game and not set when the
 	//familiar is itemized, so a game reload will clear it (see how this is done in original)
 	if (game->familiarBlock) {
@@ -5364,7 +5364,6 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		if (alignment>8) {
 			return FX_NOT_APPLIED;
 		}
-		Game *game = core->GetGame();
 
 		char familiar[9];
 		memcpy(familiar, game->Familiars[alignment], 9);
@@ -5695,7 +5694,7 @@ int fx_freedom (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/)
 int fx_maze (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_maze(%2d)", fx->Opcode);
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (fx->Parameter2) {
 		//this version of maze works only in combat
 		if (!fx->FirstApply && !game->CombatCounter) {
@@ -5932,7 +5931,7 @@ int fx_teleport_field (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_teleport_field(%2d): Distance: %d", fx->Opcode, fx->Parameter1);
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	if (!map) {
 		return FX_NOT_APPLIED;
 	}
@@ -6127,9 +6126,9 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	bool condition = false;
 	bool per_round = true; // 4xxx trigger?
-	const TriggerEntry *entry = NULL;
+	const TriggerEntry *entry = nullptr;
 	Trigger* parameters;
-	Actor *nearest = NULL;
+	const Actor *nearest = nullptr;
 
 	// check the condition
 	switch (fx->Parameter2) {
@@ -6246,7 +6245,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 				condition = false;
 			}
 		} else {
-			Actor *act = (Actor *) Owner;
+			const Actor *act = (const Actor *) Owner;
 			if (Owner->Ticks % act->GetAdjustedTime(core->Time.round_size)) {
 				condition = false;
 			}
@@ -6255,7 +6254,7 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 		fx->Parameter5 = 0;
 	} else {
 		// This is a normal trigger which gets a single opportunity every frame.
-		condition = (entry != NULL);
+		condition = (entry != nullptr);
 
 		// make sure we don't apply once per tick to the same target, potentially triggering 2 actor recursion
 		// there could be more than one tick in between successful triggers; trying with a half a round limit
@@ -6371,7 +6370,7 @@ int fx_wing_buffet (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (fx->FirstApply) {
 		fx->Parameter4 = game->GameTime;
@@ -6728,7 +6727,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_set_map_note(%2d): StrRef: %d Color: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	Scriptable *marker = target?target:Owner;
+	const Scriptable *marker = target ? target : Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
 	map->AddMapNote(fx->Pos, fx->Parameter2, fx->Parameter1);
@@ -6739,7 +6738,7 @@ int fx_set_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_remove_map_note (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_remove_map_note(%2d)", fx->Opcode);
-	Scriptable *marker = target?target:Owner;
+	const Scriptable *marker = target ? target : Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect
 	map->RemoveMapNote(fx->Pos);
@@ -7027,7 +7026,7 @@ int fx_apply_effect_repeat (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	// don't apply the effect if a similar one is already applied with a shorter duration
-	Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
+	const Effect *oldfx = target->fxqueue.HasEffect(fx_apply_effect_repeat_ref);
 	if (oldfx && oldfx->Duration < fx->Duration) {
 		return FX_NOT_APPLIED;
 	}
@@ -7230,7 +7229,7 @@ int fx_apply_effect_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//apply effect, if the effect is a goner, then kill
 		//this effect too
-		Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
+		const Effect *newfx = core->GetEffect(fx->Resource, fx->Power, fx->Pos);
 		if (newfx) {
 			Effect *myfx = new Effect(*newfx);
 			myfx->random_value = fx->random_value;
@@ -7386,7 +7385,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	case 1://simple party locations
 		game->ClearSavedLocations();
 		for (int i = 0; i < game->GetPartySize(false); i++) {
-			Actor* act = game->GetPC( i, false );
+			const Actor* act = game->GetPC(i, false);
 			GAMLocationEntry *gle = game->GetSavedLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
@@ -7399,7 +7398,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	default://original plane locations
 		game->ClearPlaneLocations();
 		for (int i = 0; i < game->GetPartySize(false); i++) {
-			Actor* act = game->GetPC( i, false );
+			const Actor* act = game->GetPC(i, false);
 			GAMLocationEntry *gle = game->GetPlaneLocationEntry(i);
 			if (act && gle) {
 				gle->Pos = act->Pos;
@@ -7474,8 +7473,7 @@ int fx_mass_raise_dead (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_mass_raise_dead(%2d)", fx->Opcode);
 
-	Game *game=core->GetGame();
-
+	const Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
 		Actor *actor=game->GetPC(i,false);
