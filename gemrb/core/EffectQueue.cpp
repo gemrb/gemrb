@@ -1263,53 +1263,56 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply, ieD
 	}
 
 	int res = FX_ABORT;
-	if( fx->Opcode<MAX_EFFECTS) {
-		if (!(target || (Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR))) {
-			Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
-			return FX_NOT_APPLIED;
-		}
-		
-		const EffectDesc& ed = Opcodes[fx->Opcode];
-		if (ed) {
-			if( target && fx->FirstApply ) {
-				if( !target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
-					displaymsg->DisplayStringName( Opcodes[fx->Opcode].Strref, DMC_WHITE,
-												  target, IE_STR_SOUND);
-				}
-			}
-			
-			res = ed(Owner, target, fx);
-			fx->FirstApply = 0;
+	if (fx->Opcode >= MAX_EFFECTS) {
+		return res;
+	}
 
-			switch(res) {
-				case FX_APPLIED:
-					//normal effect with duration
-					break;
-				case FX_ABORT:
-				case FX_NOT_APPLIED:
-					//instant effect, pending removal
-					//for example, a damage effect
-					fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-					break;
-				case FX_INSERT:
-					//put this effect in the beginning of the queue
-					//all known insert effects are 'permanent' too
-					//that is the AC effect only
-					//actually, permanent effects seem to be
-					//inserted by the game engine too
-				case FX_PERMANENT:
-					//don't stick around if it was executed permanently
-					//for example, a permanent strength modifier effect
-					if(fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
-						fx->TimingMode = FX_DURATION_JUST_EXPIRED;
-					}
-					break;
-				default:
-					error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
-			}
+	if (!target && !(Opcodes[fx->Opcode].Flags & EFFECT_NO_ACTOR)) {
+		Log(MESSAGE, "EffectQueue", "targetless opcode without EFFECT_NO_ACTOR: %d, skipping", fx->Opcode);
+		return FX_NOT_APPLIED;
+	}
+
+	const EffectDesc& ed = Opcodes[fx->Opcode];
+	if (!ed) {
+		return res;
+	}
+
+	if (target && fx->FirstApply) {
+		if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0)) {
+			displaymsg->DisplayStringName(Opcodes[fx->Opcode].Strref, DMC_WHITE, target, IE_STR_SOUND);
 		}
 	}
-	
+
+	res = ed(Owner, target, fx);
+	fx->FirstApply = 0;
+
+	switch (res) {
+		case FX_APPLIED:
+			// normal effect with duration
+			break;
+		case FX_ABORT:
+		case FX_NOT_APPLIED:
+			// instant effect, pending removal
+			// for example, a damage effect
+			fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			break;
+		case FX_INSERT:
+			// put this effect in the beginning of the queue
+			// all known insert effects are 'permanent' too
+			// that is the AC effect only
+			// actually, permanent effects seem to be
+			// inserted by the game engine too
+		case FX_PERMANENT:
+			// don't stick around if it was executed permanently
+			// for example, a permanent strength modifier effect
+			if (fx->TimingMode == FX_DURATION_INSTANT_PERMANENT) {
+				fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+			}
+			break;
+		default:
+			error("EffectQueue", "Unknown effect result '%x', aborting ...\n", res);
+	}
+
 	return res;
 }
 
