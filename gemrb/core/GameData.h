@@ -24,7 +24,6 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
-#include "iless.h"
 
 #include "Cache.h"
 #include "Holder.h"
@@ -144,7 +143,7 @@ private:
 	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	typedef std::map<const char*, Store*, iless> StoreMap;
+	typedef std::map<ResRef, Store*> StoreMap;
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
 	AutoTable racialInfravision;
@@ -154,7 +153,7 @@ private:
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
 	std::vector<int> weaponStyleAPRBonus;
-	std::map<const char*, Color, iless> colors;
+	std::map<std::string, Color> colors;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};

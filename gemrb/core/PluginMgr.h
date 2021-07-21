@@ -30,7 +30,6 @@
 #include "SClassID.h" // For PluginID
 #include "exports.h"
 #include "globals.h"
-#include "iless.h"
 #include "Holder.h"
 
 #include "ResourceDesc.h"
@@ -70,7 +69,7 @@ private:
 	std::vector<void (*)(void)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
-	typedef std::map<const char*, PluginFunc, iless> driver_map;
+	typedef std::map<std::string, PluginFunc> driver_map;
 	std::map<const TypeID*, driver_map> drivers;
 public:
 	size_t GetPluginCount() const { return plugins.size(); }

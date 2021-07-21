@@ -20,7 +20,6 @@
 
 #include "SaveGameIterator.h"
 
-#include "iless.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
@@ -291,18 +290,17 @@ bool SaveGameIterator::RescanSaveGames()
 		return false;
 	}
 
-	std::set<char*,iless> slots;
+	std::set<std::string> slots;
 	dir.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *name = dir.GetName();
 		if (IsSaveGameSlot( Path, name )) {
-			slots.insert(strdup(name));
+			slots.insert(name);
 		}
 	} while (++dir);
 
 	for (auto slot : slots) {
-		save_slots.push_back(BuildSaveGame(slot));
-		free(slot);
+		save_slots.push_back(BuildSaveGame(slot.c_str()));
 	}
 
 	return true;

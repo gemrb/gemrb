@@ -83,14 +83,12 @@ void GameData::ClearCaches()
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.clear ();
+	colors.clear();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
 		stores.erase(stores.begin());
 		delete store;
-	}
-	for (auto& c : colors) {
-		free(const_cast<char*>(c.first));
 	}
 }
 
@@ -706,7 +704,7 @@ const Color& GameData::GetColor(const char *row)
 		AutoTable colorTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
-			colors[strdup(colorTable->GetRowName(r))] = Color(c);
+			colors[colorTable->GetRowName(r)] = Color(c);
 		}
 	}
 	const auto it = colors.find(row);

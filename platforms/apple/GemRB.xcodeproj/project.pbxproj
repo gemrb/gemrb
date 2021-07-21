@@ -1459,6 +1459,8 @@
 		A28D249B143BEA5800A27897 /* FontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontManager.h; sourceTree = "<group>"; };
 		A28D24A0143C24C100A27897 /* BAMFontManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BAMFontManager.cpp; sourceTree = "<group>"; };
 		A28D24A3143C24E500A27897 /* BAMFontManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BAMFontManager.h; sourceTree = "<group>"; };
+		A28EE23A26A89ADC0061A813 /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Platform.h; sourceTree = "<group>"; };
+		A28EE23B26A89ADC0061A813 /* voodooconst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = voodooconst.h; sourceTree = "<group>"; };
 		A291763325A0C5E9005F727E /* SDLSpriteRendererRLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SDLSpriteRendererRLE.h; sourceTree = "<group>"; };
 		A29504771609721300BB22AA /* TTFImporter.so */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = TTFImporter.so; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2969F0D168CDC0D00D9C6FC /* CombatInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CombatInfo.cpp; sourceTree = "<group>"; };
@@ -1716,7 +1718,6 @@
 		A2D4C52313A978110086BCC4 /* ie_feats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_feats.h; sourceTree = "<group>"; };
 		A2D4C52413A978110086BCC4 /* ie_stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_stats.h; sourceTree = "<group>"; };
 		A2D4C52513A978110086BCC4 /* ie_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ie_types.h; sourceTree = "<group>"; };
-		A2D4C52613A978110086BCC4 /* iless.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = iless.h; sourceTree = "<group>"; };
 		A2D4C52813A978110086BCC4 /* opcode_params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opcode_params.h; sourceTree = "<group>"; };
 		A2D4C52A13A978110086BCC4 /* overlays.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = overlays.h; sourceTree = "<group>"; };
 		A2D4C52B13A978110086BCC4 /* plugindef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plugindef.h; sourceTree = "<group>"; };
@@ -5399,15 +5400,16 @@
 				A2D4C52313A978110086BCC4 /* ie_feats.h */,
 				A2D4C52413A978110086BCC4 /* ie_stats.h */,
 				A2D4C52513A978110086BCC4 /* ie_types.h */,
-				A2D4C52613A978110086BCC4 /* iless.h */,
 				A2D4C52813A978110086BCC4 /* opcode_params.h */,
 				A2D4C52A13A978110086BCC4 /* overlays.h */,
+				A28EE23A26A89ADC0061A813 /* Platform.h */,
 				A2D4C52B13A978110086BCC4 /* plugindef.h */,
 				A23A9EB418CD4C4B0047420C /* Predicates.h */,
 				A2D4C52C13A978110086BCC4 /* RGBAColor.h */,
 				A2D4C52D13A978110086BCC4 /* SClassID.h */,
 				A2D4C52E13A978110086BCC4 /* StringMap.h */,
 				A2D4C52F13A978110086BCC4 /* strrefs.h */,
+				A28EE23B26A89ADC0061A813 /* voodooconst.h */,
 				A2D4C53013A978110086BCC4 /* win32def.h */,
 			);
 			name = includes;
