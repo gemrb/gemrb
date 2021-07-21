@@ -24,6 +24,7 @@
 
 #include "Audio.h"
 #include "Palette.h"
+#include "Resource.h"
 #include "Video/Video.h"
 
 namespace GemRB {

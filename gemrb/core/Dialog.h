@@ -23,6 +23,7 @@
 
 #include "exports.h"
 #include "globals.h"
+#include "Resource.h"
 
 #include <vector>
 

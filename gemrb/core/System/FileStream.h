@@ -32,6 +32,7 @@
 
 #include "exports.h"
 #include "globals.h"
+#include "SClassID.h"
 
 namespace GemRB {
 

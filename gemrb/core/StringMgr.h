@@ -29,6 +29,7 @@
 #define STRINGMGR_H
 
 #include "Plugin.h"
+#include "Resource.h"
 #include "System/DataStream.h"
 
 namespace GemRB {

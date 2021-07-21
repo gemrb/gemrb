@@ -25,7 +25,7 @@
 
 #include "IndexedArchive.h"
 #include "PluginMgr.h"
-
+#include "Resource.h"
 #include "StringMap.h"
 
 #include <vector>

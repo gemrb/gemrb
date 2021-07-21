@@ -26,6 +26,7 @@
 
 #include "Animation.h"
 #include "Palette.h"
+#include "Resource.h"
 #include "TableMgr.h"
 
 #include <vector>

@@ -18,9 +18,6 @@
 
 #include "PluginMgr.h"
 
-#include "Plugin.h"
-#include "ResourceDesc.h"
-
 namespace GemRB {
 
 PluginMgr *PluginMgr::Get()

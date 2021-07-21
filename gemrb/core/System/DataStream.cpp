@@ -21,6 +21,8 @@
 #include "System/DataStream.h"
 
 #include "errors.h"
+#include "Resource.h"
+
 #include <ctype.h>
 
 namespace GemRB {

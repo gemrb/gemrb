@@ -20,6 +20,8 @@
 
 #include "Cache.h"
 
+#include "Resource.h"
+
 #include <cassert>
 #include <ctype.h>
 

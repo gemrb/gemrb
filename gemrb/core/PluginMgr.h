@@ -31,7 +31,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "Holder.h"
-
+#include "Plugin.h"
 #include "ResourceDesc.h"
 
 #include <cstring>
@@ -41,7 +41,6 @@
 
 namespace GemRB {
 
-class Plugin;
 class Resource;
 class TypeID;
 
@@ -140,6 +139,11 @@ using PluginHolder = Holder<T>;
 template <typename T>
 PluginHolder<T> MakePluginHolder(PluginID id) {
 	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
+}
+
+template <typename T>
+PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
+	return PluginHolder<ImporterPlugin<T>>(static_cast<ImporterPlugin<T>*>(PluginMgr::Get()->GetPlugin(id)));
 }
 
 }

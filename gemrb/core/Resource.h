@@ -37,8 +37,7 @@ namespace GemRB {
 /** Resource reference */
 class DataStream;
 
-struct ResRef {
-private:
+class ResRef {
 	char ref[9] = {'\0'};
 public:
 	ResRef() = default;

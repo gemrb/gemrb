@@ -23,6 +23,7 @@
 #include "exports.h"
 #include "ie_types.h"
 #include "Region.h"
+#include "Resource.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
 #include "Video/Video.h"
