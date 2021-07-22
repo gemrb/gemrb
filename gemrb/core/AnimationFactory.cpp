@@ -25,8 +25,8 @@
 
 namespace GemRB {
 
-AnimationFactory::AnimationFactory(const char* ResRef)
-	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
+AnimationFactory::AnimationFactory(const ResRef &resref)
+: FactoryObject(resref, IE_BAM_CLASS_ID)
 {
 	FLTable = NULL;
 }

@@ -37,7 +37,7 @@ private:
 	unsigned short* FLTable;	// Frame Lookup Table
 
 public:
-	explicit AnimationFactory(const char* ResRef);
+	explicit AnimationFactory(const ResRef &resref);
 	~AnimationFactory(void) override;
 	void AddFrame(const Holder<Sprite2D>& frame);
 	void AddCycle(CycleEntry cycle);

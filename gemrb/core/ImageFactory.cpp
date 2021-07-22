@@ -26,8 +26,8 @@
 
 namespace GemRB {
 
-ImageFactory::ImageFactory(const char* ResRef, Holder<Sprite2D> bitmap_)
-	: FactoryObject(ResRef, IE_BMP_CLASS_ID), bitmap(std::move(bitmap_))
+ImageFactory::ImageFactory(const ResRef &resref, Holder<Sprite2D> bitmap_)
+: FactoryObject(resref, IE_BMP_CLASS_ID), bitmap(std::move(bitmap_))
 {
 
 }
