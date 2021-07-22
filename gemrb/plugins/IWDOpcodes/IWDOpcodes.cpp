@@ -401,13 +401,6 @@ static EffectRef fx_shroud_of_flame2_ref = { "ShroudOfFlame2", -1 };
 static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 
-struct IWDIDSEntry {
-	ieDword value;
-	ieWord stat;
-	ieWord relation;
-};
-
-static std::vector<IWDIDSEntry> spellProt;
 static Variables tables;
 
 static void Cleanup()
@@ -449,22 +442,6 @@ static void RegisterIWDOpcodes()
 //diffmode for gemrb. (Thus scripts can use the very same relation
 //functions).
 
-static void ReadSpellProtTable(const char* tableName)
-{
-	AutoTable tab(tableName);
-	if (!tab) {
-		return;
-	}
-	ieDword spellrescnt = tab->GetRowCount();
-	spellProt.resize(spellrescnt);
-	for (ieDword i = 0; i < spellrescnt; i++) {
-		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
-		spellProt[i].stat = (ieWord) stat;
-		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
-		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
-	}
-}
-
 //unusual types which need hacking (fake stats)
 #define STI_SOURCE_TARGET     0x100
 #define STI_SOURCE_NOT_TARGET 0x101
@@ -483,17 +460,14 @@ static void ReadSpellProtTable(const char* tableName)
 //usually, this is used to restrict an effect to specific targets
 static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
 {
-	size_t count = spellProt.size();
-	if (count == 0) {
-		ReadSpellProtTable("splprot");
-	}
-	if (type >= (ieDword) count) {
-		return false; //not matched
+	const IWDIDSEntry& entry = gamedata->GetSpellProt(type);
+	ieDword idx = entry.stat;
+	ieDword val = entry.value;
+	ieDword rel = entry.relation;
+	if (idx == USHRT_MAX) {
+		// bad entry, don't match
 	}
 
-	ieDword idx = spellProt[type].stat;
-	ieDword val = spellProt[type].value;
-	ieDword rel = spellProt[type].relation;
 	//if IDS value is 'anything' then the supplied value is in Parameter1
 	if (val==0xffffffff) {
 		val = value;

@@ -777,4 +777,33 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	return true;
 }
 
+void GameData::ReadSpellProtTable()
+{
+	AutoTable tab("splprot");
+	if (!tab) {
+		return;
+	}
+	ieDword rowCount = tab->GetRowCount();
+	spellProt.resize(rowCount);
+	for (ieDword i = 0; i < rowCount; i++) {
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
+		spellProt[i].stat = (ieWord) stat;
+		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
+		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
+	}
+}
+
+static const IWDIDSEntry badEntry = {};
+const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
+{
+	if (spellProt.empty()) {
+		ReadSpellProtTable();
+	}
+
+	if (idx >= spellProt.size()) {
+		return badEntry;
+	}
+	return spellProt[idx];
+}
+
 }

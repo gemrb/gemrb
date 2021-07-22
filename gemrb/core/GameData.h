@@ -59,12 +59,19 @@ struct Table {
 	unsigned int refcount;
 };
 
+struct IWDIDSEntry {
+	ieDword value;
+	ieWord stat = USHRT_MAX;
+	ieWord relation;
+};
+
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
 	GameData();
 	~GameData();
 
+	using index_t = uint16_t;
 	void ClearCaches();
 
 	/** Returns actor */
@@ -130,12 +137,14 @@ public:
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
 	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const;
+	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
 	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
 private:
 	void ReadItemSounds();
+	void ReadSpellProtTable();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -154,6 +163,7 @@ private:
 	AutoTable summoningLimit;
 	std::vector<int> weaponStyleAPRBonus;
 	std::map<std::string, Color> colors;
+	std::vector<IWDIDSEntry> spellProt;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
