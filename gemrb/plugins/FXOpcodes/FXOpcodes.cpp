@@ -426,6 +426,8 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
 
+int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
+
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
 
@@ -450,6 +452,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ApplyEffectCurse", fx_apply_effect_curse, 0, -1 ),
 	EffectDesc("ApplyEffectItem", fx_apply_effect_item, 0, -1 ),
 	EffectDesc("ApplyEffectItemType", fx_apply_effect_item_type, 0, -1 ),
+	EffectDesc("ApplyEffectsList", fx_add_effects_list, 0, -1),
 	EffectDesc("ApplyEffectRepeat", fx_apply_effect_repeat, 0, -1 ),
 	EffectDesc("CutScene2", fx_cutscene2, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 ),
@@ -7760,6 +7763,16 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
 	return FX_APPLIED;
+}
+
+int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	// after iwd2 style ids targeting, apply the spell named in the resource field
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+	return FX_NOT_APPLIED;
 }
 
 // unknown

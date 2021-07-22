@@ -183,7 +183,6 @@ static int fx_alter_animation (Scriptable* Owner, Actor *target, Effect* fx); //
 //iwd2 specific effects
 static int fx_hopelessness (Scriptable* Owner, Actor* target, Effect* fx);//400
 static int fx_protection_from_evil (Scriptable* Owner, Actor* target, Effect* fx);//401
-static int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx);//402
 static int fx_armor_of_faith (Scriptable* Owner, Actor* target, Effect* fx);//403
 static int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx); //404
 static int fx_enfeeblement (Scriptable* Owner, Actor* target, Effect* fx); //405
@@ -318,7 +317,6 @@ static EffectDesc effectnames[] = {
 	//iwd2 effects
 	EffectDesc("Hopelessness", fx_hopelessness, 0, -1), //400
 	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1), //401
-	EffectDesc("AddEffectsList", fx_add_effects_list, 0, -1), //402
 	EffectDesc("ArmorOfFaith", fx_armor_of_faith, 0, -1), //403
 	EffectDesc("Nausea", fx_nausea, 0, -1), //404
 	EffectDesc("Enfeeblement", fx_enfeeblement, 0, -1), //405
@@ -2357,17 +2355,6 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	// immunity to control is handled in fx_control
 	return FX_APPLIED;
-}
-
-//402 AddEffectsList
-int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
-{
-	//after iwd2 style ids targeting, apply the spell named in the resource field
-	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
-		return FX_NOT_APPLIED;
-	}
-	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
-	return FX_NOT_APPLIED;
 }
 
 //403 ArmorOfFaith
