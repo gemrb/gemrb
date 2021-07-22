@@ -33,7 +33,11 @@ AnimationFactory::AnimationFactory(const ResRef &resref,
 frames(std::move(frames)),
 cycles(std::move(cycles)),
 FLTable(std::move(FLTable))
-{}
+{
+	assert(frames.size() < InvalidIndex);
+	assert(cycles.size() < InvalidIndex);
+	assert(FLTable.size() < InvalidIndex);
+}
 
 Animation* AnimationFactory::GetCycle(index_t cycle)
 {

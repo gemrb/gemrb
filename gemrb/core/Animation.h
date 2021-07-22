@@ -37,7 +37,7 @@ namespace GemRB {
 
 class GEM_EXPORT Animation {
 public:
-	using index_t = size_t;
+	using index_t = uint16_t;
 
 	bool endReached;
 	index_t frameIdx;
