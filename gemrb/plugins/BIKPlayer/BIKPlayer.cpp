@@ -236,7 +236,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 		//buggy frame, we stop immediately
 		//return false;
 	}
-	if (DecodeVideoFrame(inbuff+audframesize, frame.size-audframesize, buf)) {
+	if (DecodeVideoFrame(inbuff + audframesize, static_cast<int>(frame.size - audframesize), buf)) {
 		//buggy frame, we stop immediately
 		return false;
 	}

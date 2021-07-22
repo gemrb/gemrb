@@ -295,11 +295,11 @@ bool SaveGameIterator::RescanSaveGames()
 	do {
 		const char *name = dir.GetName();
 		if (IsSaveGameSlot( Path, name )) {
-			slots.insert(name);
+			slots.emplace(name);
 		}
 	} while (++dir);
 
-	for (auto slot : slots) {
+	for (const auto& slot : slots) {
 		save_slots.push_back(BuildSaveGame(slot.c_str()));
 	}
 

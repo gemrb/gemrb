@@ -2647,7 +2647,7 @@ void GameControl::SetupItemUse(int slot, size_t header, Actor *u, int targettype
 	spellOrItem = -1;
 	spellUser = u;
 	spellSlot = slot;
-	spellIndex = header;
+	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
 	SetTargetMode(TARGET_MODE_CAST);
 	target_types = targettype;

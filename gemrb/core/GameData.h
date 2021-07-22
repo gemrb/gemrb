@@ -143,7 +143,7 @@ private:
 	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	typedef std::map<ResRef, Store*> StoreMap;
+	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
 	AutoTable racialInfravision;

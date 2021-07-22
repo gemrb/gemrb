@@ -161,7 +161,7 @@ static inline bool IsInstant(ieByte timingmode)
 
 static const bool fx_equipped[MAX_TIMING_MODE] = { false, false, true, false, false, true, false, false, true, false, false, false };
 
-static inline bool IsEquipped(ieByte timingmode)
+static inline bool IsEquipped(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return false;
 	return fx_equipped[timingmode];
@@ -183,7 +183,7 @@ static inline bool NeedPrepare(ieWord timingmode)
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
 DELAYED, DELAYED, DELAYED, DELAYED, PERMANENT, PERMANENT, DURATION, PERMANENT}; //4-11
 
-static inline int DelayType(ieByte timingmode)
+static inline int DelayType(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_prepared[timingmode];
@@ -192,7 +192,7 @@ static inline int DelayType(ieByte timingmode)
 //which effects are removable
 static const bool fx_removable[MAX_TIMING_MODE] = { true, true, false, true, true, false, true, true, false, false, true, true };
 
-static inline int IsRemovable(ieByte timingmode)
+static inline int IsRemovable(ieWord timingmode)
 {
 	if( timingmode>=MAX_TIMING_MODE) return INVALID;
 	return fx_removable[timingmode];
@@ -383,7 +383,7 @@ void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDw
 	ModifyEffectPoint(effect_reference.opcode, x, y);
 }
 
-void EffectQueue::ModifyAllEffectSources(const Point &source)
+void EffectQueue::ModifyAllEffectSources(const Point &source) const
 {
 	for (const auto& fx : effects) {
 		fx->Source = source;

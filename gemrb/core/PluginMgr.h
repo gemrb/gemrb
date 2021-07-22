@@ -69,7 +69,7 @@ private:
 	std::vector<void (*)(void)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
-	typedef std::map<std::string, PluginFunc> driver_map;
+	using driver_map = std::map<std::string, PluginFunc>;
 	std::map<const TypeID*, driver_map> drivers;
 public:
 	size_t GetPluginCount() const { return plugins.size(); }

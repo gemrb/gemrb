@@ -567,8 +567,8 @@ void CharAnimations::InitAvatarsTable() const
 			for(int j=0;j<AvatarsCount;j++) {
 				if (rmax<AvatarTable[j].AnimID) break;
 				if (rmin>AvatarTable[j].AnimID) continue;
-				AvatarTable[j].BloodColor = (char) value;
-				AvatarTable[j].Flags = (unsigned int) flags;
+				AvatarTable[j].BloodColor = value;
+				AvatarTable[j].Flags = flags;
 			}
 		}
 	}

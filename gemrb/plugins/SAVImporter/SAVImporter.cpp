@@ -34,7 +34,8 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 	}
 	strpos_t All = compressed->Remains();
 	strpos_t Current;
-	int percent, last_percent = 20;
+	size_t percent;
+	size_t last_percent = 20;
 	if (!All) return GEM_ERROR;
 
 	tick_t startTime = GetTicks();
@@ -69,7 +70,7 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor
 		//starting at 20% going up to 70%
 		percent = (20 + (All - Current) * 50 / All);
 		if (percent - last_percent > 5) {
-			core->LoadProgress(percent);
+			core->LoadProgress(static_cast<int>(percent));
 			last_percent = percent;
 		}
 	}
