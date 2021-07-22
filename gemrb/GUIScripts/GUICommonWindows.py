@@ -1935,8 +1935,6 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 	if Slot != None:
 		Item = GemRB.GetItem (Slot['ItemResRef'])
 		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
-		#Button.SetVarAssoc ("LeftIndex", LeftTopIndex+i)
-		#Button.SetSprites ('IVSLOT', 0,  0, 0, 0, 0)
 		Button.SetItemIcon (Slot['ItemResRef'],0)
 
 		if Item['MaxStackAmount'] > 1:
@@ -1950,16 +1948,10 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 		else:
 			Button.SetTooltip (Item['ItemNameIdentified'])
 
-		#Button.SetFlags (IE_GUI_BUTTON_PICTURE, OP_OR)
-		#Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, PressHandler)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
 
 	else:
-		#Button.SetVarAssoc ("LeftIndex", -1)
 		Button.SetItemIcon ('')
 		Button.SetTooltip (4273)  # Ground Item
 		Button.SetText ('')
@@ -1967,8 +1959,6 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler): #rela
 
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 		Button.SetEvent (IE_GUI_BUTTON_ON_RIGHT_PRESS, None)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_SHIFT_PRESS, None)
-		#Button.SetEvent (IE_GUI_BUTTON_ON_DRAG_DROP, None)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow
