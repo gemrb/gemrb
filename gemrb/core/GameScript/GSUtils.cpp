@@ -2644,7 +2644,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 		if (!target) return false; // shouldn't happen, though perhaps it would be better to return true
 
 		ieDword state = target->GetStat(IE_STATE_ID);
-		if (!(state & STATE_DEAD && state & ~(STATE_PETRIFIED | STATE_FROZEN))) {
+		if (!(state & STATE_DEAD) || (state & ~(STATE_PETRIFIED | STATE_FROZEN)) != state) {
 			return false;
 		}
 
