@@ -29,12 +29,12 @@
 
 namespace GemRB {
 
-Animation::Animation(int count)
+Animation::Animation(index_t count)
 : frames(count, nullptr)
 {
 	assert(count > 0);
 	indicesCount = count;
-	frameIdx = RAND(0, count-1);
+	frameIdx = RAND<index_t>(0, count-1);
 	starttime = 0;
 	Flags = A_ANI_ACTIVE;
 	fps = ANI_DEFAULT_FRAMERATE;
@@ -44,7 +44,7 @@ Animation::Animation(int count)
 	gameAnimation = false;
 }
 
-void Animation::SetFrame(unsigned int index)
+void Animation::SetFrame(index_t index)
 {
 	if (index<indicesCount) {
 		frameIdx = index;
@@ -54,7 +54,7 @@ void Animation::SetFrame(unsigned int index)
 }
 
 /* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(const Holder<Sprite2D>& frame, unsigned int index)
+void Animation::AddFrame(const Holder<Sprite2D>& frame, index_t index)
 {
 	if (index>=indicesCount) {
 		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
@@ -68,7 +68,7 @@ void Animation::AddFrame(const Holder<Sprite2D>& frame, unsigned int index)
 	animArea.ExpandToRegion(r);
 }
 
-unsigned int Animation::GetCurrentFrameIndex() const
+Animation::index_t Animation::GetCurrentFrameIndex() const
 {
 	if (playReversed)
 		return indicesCount - frameIdx - 1;
@@ -174,7 +174,7 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Holder<Sprite2D> Animation::GetFrame(unsigned int i) const
+Holder<Sprite2D> Animation::GetFrame(index_t i) const
 {
 	if (i >= indicesCount) {
 		return NULL;

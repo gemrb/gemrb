@@ -23,7 +23,6 @@
 
 #include "ScriptedAnimation.h"
 
-#include "Animation.h"
 #include "AnimationFactory.h"
 #include "Audio.h"
 #include "Game.h"
@@ -436,7 +435,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	}
 }
 
-int ScriptedAnimation::GetCurrentFrame() const
+Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 {
 	Animation *anim = anims[P_HOLD*MAX_ORIENT];
 	if (anim) {

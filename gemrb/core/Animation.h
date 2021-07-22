@@ -36,13 +36,11 @@ namespace GemRB {
 #define ANI_DEFAULT_FRAMERATE	15
 
 class GEM_EXPORT Animation {
-private:
-	std::vector<Holder<Sprite2D>> frames;
-	unsigned int indicesCount;
-	tick_t starttime;
 public:
+	using index_t = size_t;
+
 	bool endReached;
-	unsigned int frameIdx;
+	index_t frameIdx;
 	Point pos;
 	unsigned char fps;
 	bool playReversed;
@@ -50,29 +48,33 @@ public:
 	Region animArea;
 	ieDword Flags;
 
-	explicit Animation(int count);
-	void AddFrame(const Holder<Sprite2D>& frame, unsigned int index);
+	explicit Animation(index_t count);
+	void AddFrame(const Holder<Sprite2D>& frame, index_t index);
 	Holder<Sprite2D> CurrentFrame() const;
 	Holder<Sprite2D> LastFrame();
 	Holder<Sprite2D> NextFrame();
 	Holder<Sprite2D> GetSyncedNextFrame(const Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
-	Holder<Sprite2D> GetFrame(unsigned int i) const;
+	Holder<Sprite2D> GetFrame(index_t i) const;
 	/** Mirrors all the frames vertically */
 	void MirrorAnimationVert();
 	/** Mirrors all the frames horizontally */
 	void MirrorAnimation();
 	/** sets frame index */
-	void SetFrame(unsigned int index);
+	void SetFrame(index_t index);
 	/** Sets ScriptName for area animation */
 	void SetScriptName(const char *name);
 	/** returns the frame count */
-	unsigned int GetFrameCount() const { return indicesCount; }
+	index_t GetFrameCount() const { return indicesCount; }
 	/** returns the current frame's index */
-	unsigned int GetCurrentFrameIndex() const;
+	index_t GetCurrentFrameIndex() const;
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
+private:
+	std::vector<Holder<Sprite2D>> frames;
+	index_t indicesCount;
+	tick_t starttime;
 };
 
 }

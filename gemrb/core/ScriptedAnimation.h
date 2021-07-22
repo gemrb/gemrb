@@ -23,13 +23,13 @@
 #include "exports.h"
 
 #include "Audio.h"
+#include "Animation.h"
 #include "Palette.h"
 #include "Resource.h"
 #include "Video/Video.h"
 
 namespace GemRB {
 
-class Animation;
 class AnimationFactory;
 class DataStream;
 class Sprite2D;
@@ -150,7 +150,7 @@ public:
 	void SetFullPalette(const ResRef &PaletteResRef);
 	//sets complete palette to own name+index
 	void SetFullPalette(int idx);
-	int GetCurrentFrame() const;
+	Animation::index_t GetCurrentFrame() const;
 	ieDword GetSequenceDuration(ieDword multiplier) const;
 	/* sets up a delay in the beginning of the vvc */
 	void SetDelay(ieDword delay);
