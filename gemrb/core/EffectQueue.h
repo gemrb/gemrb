@@ -256,6 +256,9 @@ public:
 	/* removes any effects (delayed or not) which were using projectile */
 	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
 
+	// removes any effects with matching source and chosen mode
+	void RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode) const;
+
 	/* removes equipping effects with specified inventory slot code */
 	bool RemoveEquippingEffects(ieDwordSigned slotcode) const;
 
@@ -272,6 +275,7 @@ public:
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const;
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ResRef &resource) const;
 	void RemoveAllEffectsWithParamAndResource(EffectRef &effect_reference, ieDword param2, const ResRef &resource) const;
+	void RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode) const;
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match) const;
 	void DispelEffects(Effect *dispeller, ieDword level) const;
 

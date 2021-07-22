@@ -320,4 +320,5 @@ IDS
 0x13e Stat:SetStat
 0x13f Usability:ItemUsability
 0x140 ChangeWeather
+0x141 RemoveEffectsByResource
 0x14C DamageBonusModifier2

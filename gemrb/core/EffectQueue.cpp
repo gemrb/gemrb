@@ -1449,6 +1449,36 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, cons
 	RemoveAllEffectsWithResource(effect_reference.opcode, resource);
 }
 
+//Removes all effects with a matching resource field
+void EffectQueue::RemoveAllEffectsWithSource(ieDword opcode, const ResRef &source, int mode) const
+{
+	for (const auto& fx : effects) {
+		MATCH_OPCODE()
+		if (fx->SourceRef != source) continue;
+
+		// equipping effects only
+		// IsEquipped excludes to many to match ee's opcode 321
+		if (mode == 1 && fx->TimingMode != FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+			continue;
+		}
+
+		// "timed" effects only
+		if (mode == 2 && (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED || fx->TimingMode == FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES)) {
+			continue;
+		}
+
+		// mode 0 or anything else means remove all effects that match
+
+		fx->TimingMode = FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+void EffectQueue::RemoveAllEffectsWithSource(EffectRef &effectReference, const ResRef &source, int mode) const
+{
+	ResolveEffectRef(effectReference);
+	RemoveAllEffectsWithSource(effectReference.opcode, source, mode);
+}
+
 //This method could be used to remove stat modifiers that would lower a stat
 //(works only if a higher stat means good for the target)
 void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const

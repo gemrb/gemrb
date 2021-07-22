@@ -210,4 +210,5 @@ IDS
 0xd2	DetectEvil
 0xd3	JumbleCurse
 0xd4	SpeakWithDead
+0x141	RemoveEffectsByResource
 425	ControlUndead2

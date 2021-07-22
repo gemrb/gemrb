@@ -424,8 +424,10 @@ int fx_magical_rest (Scriptable* Owner, Actor* target, Effect* fx);//13c
 int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only)
 //13f Usability:ItemUsability
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
-int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx);
-int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx);
+int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
+
+int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
+int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
 
 int fx_unknown (Scriptable* Owner, Actor* target, Effect* fx);//???
 
@@ -677,6 +679,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Reveal:Magic", fx_reveal_magic, 0, -1 ),
 	EffectDesc("Reveal:Tracks", fx_reveal_tracks, 0, -1 ),
 	EffectDesc("RemoveCurse", fx_remove_curse, 0, -1 ),
+	EffectDesc("RemoveEffectsByResource", fx_remove_effects, 0, -1),
 	EffectDesc("RemoveImmunity", fx_remove_immunity, 0, -1 ),
 	EffectDesc("RemoveMapNote", fx_remove_map_note, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("RemoveProjectile", fx_remove_projectile, 0, -1 ), //removes effects from actor and area
@@ -837,6 +840,7 @@ static EffectRef fx_eye_spirit_ref = { "EyeOfTheSpirit", -1 };
 static EffectRef fx_eye_venom_ref = { "EyeOfVenom", -1 };
 static EffectRef fx_eye_mind_ref = { "EyeOfTheMind", -1 };
 static EffectRef fx_eye_fortitude_ref = { "EyeOfFortitude", -1 };
+static EffectRef fx_remove_effects_ref = { "RemoveEffectsByResource", -1 };
 
 static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 static EffectRef fx_int_ref = { "IntelligenceModifier", -1 };
@@ -7747,6 +7751,14 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx)
 
 	target->NewStat(stat, fx->Parameter1, type);
 
+	return FX_APPLIED;
+}
+
+// remove effects matching effects in the passed item or spell
+// parameter2 dictates whether to work on all effects, equipping or non-equipping
+int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
+{
+	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
 	return FX_APPLIED;
 }
 
