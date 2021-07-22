@@ -2641,23 +2641,26 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
 	if (Sender->LastSpellTarget) {
 		const Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
-		if (target) {
-			ieDword state = target->GetStat(IE_STATE_ID);
-			if (state & STATE_DEAD && state & ~(STATE_PETRIFIED|STATE_FROZEN)) {
-				const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
-				if (!spl) return false;
-				const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
-				bool invalidTarget = seh && seh->Target != TARGET_DEAD;
-				gamedata->FreeSpell(spl, Sender->SpellResRef, false);
-				if (invalidTarget) {
-					if (caster->InParty) {
-						core->Autopause(AP_NOTARGET, caster);
-					}
-					caster->SetStance(IE_ANI_READY);
-					return true;
-				}
-			}
+		if (!target) return false; // shouldn't happen, though perhaps it would be better to return true
+
+		ieDword state = target->GetStat(IE_STATE_ID);
+		if (!(state & STATE_DEAD && state & ~(STATE_PETRIFIED | STATE_FROZEN))) {
+			return false;
 		}
+
+		const Spell* spl = gamedata->GetSpell(Sender->SpellResRef, true);
+		if (!spl) return false;
+
+		const SPLExtHeader *seh = spl->GetExtHeader(0); // potentially wrong, but none of the existing spells is problematic
+		bool invalidTarget = seh && seh->Target != TARGET_DEAD;
+		gamedata->FreeSpell(spl, Sender->SpellResRef, false);
+		if (!invalidTarget) return false;
+
+		if (caster->InParty) {
+			core->Autopause(AP_NOTARGET, caster);
+		}
+		caster->SetStance(IE_ANI_READY);
+		return true;
 	}
 	return false;
 }
