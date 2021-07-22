@@ -40,6 +40,7 @@
 	#ifdef WIN32
 		#define _MAX_PATH 260
 	#else
+		#include <cstdio> // for FILENAME_MAX...
 		#define _MAX_PATH FILENAME_MAX
 	#endif
 #endif
