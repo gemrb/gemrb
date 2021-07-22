@@ -211,4 +211,5 @@ IDS
 0xd3	JumbleCurse
 0xd4	SpeakWithDead
 0x141	RemoveEffectsByResource
+0x146	ApplyEffectsList
 425	ControlUndead2

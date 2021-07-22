@@ -318,3 +318,4 @@ IDS
 0x13c	MagicalRest
 0x13d	State:Haste2
 0x141	RemoveEffectsByResource
+0x146	ApplyEffectsList
