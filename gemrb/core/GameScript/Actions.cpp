@@ -4410,8 +4410,8 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 	Map *area = tar->GetCurrentArea();
 	while(x--) {
 		if (parameters->string0Parameter[0]) {
-			const char *itemRef = inv->GetSlotItem(x)->ItemResRef;
-			if (!strnicmp(parameters->string0Parameter, itemRef, 8)) {
+			const ResRef& itemRef = inv->GetSlotItem(x)->ItemResRef;
+			if (itemRef == parameters->string0Parameter) {
 				continue;
 			}
 		}
