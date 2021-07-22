@@ -39,7 +39,23 @@ class Palette;
 using PaletteHolder = Holder<Palette>;
 
 class BAMImporter : public AnimationMgr {
+public:
+	BAMImporter(void);
+	~BAMImporter(void) override;
+
+	bool Open(DataStream* stream) override;
+	index_t GetCycleSize(index_t Cycle) override;
+	AnimationFactory* GetAnimationFactory(const ResRef &resref, bool allowCompression = true) override;
+	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
+	If the Global Animation Palette is NULL, returns NULL. */
+	Holder<Sprite2D> GetPalette() override;
+	index_t GetCycleCount() override
+	{
+		return cycles.size();
+	}
 private:
+	using CycleEntry = AnimationFactory::CycleEntry;
+
 	DataStream* str;
 	std::vector<FrameEntry> frames;
 	std::vector<CycleEntry> cycles;
@@ -48,20 +64,7 @@ private:
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 	strpos_t DataStart;
 	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
-	ieWord * CacheFLT(unsigned int &count);
-public:
-	BAMImporter(void);
-	~BAMImporter(void) override;
-	bool Open(DataStream* stream) override;
-	int GetCycleSize(unsigned char Cycle) override;
-	AnimationFactory* GetAnimationFactory(const char* ResRef, bool allowCompression = true) override;
-	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
-	If the Global Animation Palette is NULL, returns NULL. */
-	Holder<Sprite2D> GetPalette() override;
-	size_t GetCycleCount() override
-	{
-		return cycles.size();
-	}
+	std::vector<index_t> CacheFLT();
 };
 
 }

@@ -1328,16 +1328,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			ResourceHolder<ImageMgr> roimg = GetResourceHolder<ImageMgr>("RONOTE");
 			ResourceHolder<ImageMgr> userimg = GetResourceHolder<ImageMgr>("USERNOTE");
 
-			CycleEntry rocycle = {1, 0};
-			flags = new AnimationFactory("FLAG1");
-			flags->AddCycle(rocycle);
-			flags->AddFrame(roimg->GetSprite2D());
-			CycleEntry usercycle = {1, 1};
-			flags->AddCycle(usercycle);
-			flags->AddFrame(userimg->GetSprite2D());
-
-			ieWord flt[2] = {0, 1};
-			flags->LoadFLT(flt, 2);
+			flags = new AnimationFactory("FLAG1", {roimg->GetSprite2D(), userimg->GetSprite2D()},
+										 {{1, 0}, {1, 1}}, {0, 1});
 			gamedata->AddFactoryResource(flags);
 		}
 

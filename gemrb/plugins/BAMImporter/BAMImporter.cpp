@@ -104,8 +104,11 @@ bool BAMImporter::Open(DataStream* stream)
 	}
 	
 	for (auto& cycle : cycles) {
-		str->ReadWord(cycle.FramesCount);
-		str->ReadWord(cycle.FirstFrame);
+		ieWord tmp;
+		str->ReadWord(tmp);
+		cycle.FramesCount = tmp;
+		str->ReadWord(tmp);
+		cycle.FirstFrame = tmp;
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
@@ -125,10 +128,10 @@ bool BAMImporter::Open(DataStream* stream)
 	return true;
 }
 
-int BAMImporter::GetCycleSize(unsigned char cycle)
+BAMImporter::index_t BAMImporter::GetCycleSize(index_t cycle)
 {
 	if (cycle >= cycles.size()) {
-		return -1;
+		return AnimationFactory::InvalidIndex;
 	}
 	return cycles[cycle].FramesCount;
 }
@@ -162,50 +165,44 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 	return spr;
 }
 
-ieWord * BAMImporter::CacheFLT(unsigned int &count)
+std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 {
-	count = 0;
+	index_t count = 0;
 	for (const auto& cycle : cycles) {
-		unsigned int tmp = cycle.FirstFrame + cycle.FramesCount;
+		index_t tmp = cycle.FirstFrame + cycle.FramesCount;
 		if (tmp > count) {
 			count = tmp;
 		}
 	}
-	if (count == 0) return NULL;
+	if (count == 0) return {};
 
-	ieWord * FLT = ( ieWord * ) calloc( count, sizeof(ieWord) );
+	std::vector<index_t> FLT(count);
 	str->Seek( FLTOffset, GEM_STREAM_START );
-	str->Read( FLT, count * sizeof(ieWord) );
+	str->Read(&FLT[0], count * sizeof(ieWord));
 	if( DataStream::BigEndian() ) {
-		swabs(FLT, count * sizeof(ieWord));
+		swabs(&FLT[0], count * sizeof(ieWord));
 	}
 	return FLT;
 }
 
-AnimationFactory* BAMImporter::GetAnimationFactory(const char* ResRef, bool allowCompression)
+AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
-	unsigned int count;
-	AnimationFactory* af = new AnimationFactory( ResRef );
-	ieWord *FLT = CacheFLT( count );
-
 	str->Seek( DataStart, GEM_STREAM_START );
-	unsigned long length = str->Remains();
-	if (length == 0) return af;
+	strpos_t length = str->Remains();
+	if (length == 0) return nullptr;
+	
+	auto FLT = CacheFLT();
 	uint8_t *data = (uint8_t*)malloc(length);
 	str->Read(data, length);
 
+	std::vector<Holder<Sprite2D>> animframes;
 	for (const auto& frameInfo : frames) {
 		bool RLECompressed = allowCompression && frameInfo.RLE;
-		Holder<Sprite2D> frame = GetFrameInternal(frameInfo, RLECompressed, data - DataStart);
-		af->AddFrame(frame);
+		animframes.push_back(GetFrameInternal(frameInfo, RLECompressed, data - DataStart));
 	}
-	for (const auto& cycle : cycles) {
-		af->AddCycle(cycle);
-	}
-	af->LoadFLT ( FLT, count );
 	free(data);
-	free (FLT);
-	return af;
+
+	return new AnimationFactory(resref, std::move(animframes), cycles, std::move(FLT));
 }
 
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

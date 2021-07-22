@@ -25,33 +25,39 @@
 #include "globals.h"
 
 #include "Animation.h"
-#include "AnimStructures.h"
 #include "FactoryObject.h"
 
 namespace GemRB {
 
 class GEM_EXPORT AnimationFactory : public FactoryObject {
+public:
+	using index_t = Animation::index_t;
+	static constexpr index_t InvalidIndex = -1;
+	
+	struct CycleEntry {
+		index_t FramesCount;
+		index_t FirstFrame;
+	};
+
+	AnimationFactory(const ResRef &resref,
+					 std::vector<Holder<Sprite2D>> frames,
+					 std::vector<CycleEntry> cycles,
+					 std::vector<index_t> FLTable);
+
+	Animation* GetCycle(index_t cycle);
+	/** No descriptions */
+	Holder<Sprite2D> GetFrame(index_t index, index_t cycle = 0) const;
+	Holder<Sprite2D> GetFrameWithoutCycle(index_t index) const;
+	index_t GetCycleCount() const { return cycles.size(); }
+	index_t GetFrameCount() const { return frames.size(); }
+	index_t GetCycleSize(index_t idx) const;
+	Holder<Sprite2D> GetPaperdollImage(const ieDword *Colors, Holder<Sprite2D> &Picture2,
+		unsigned int type) const;
+	
 private:
 	std::vector<Holder<Sprite2D>> frames;
 	std::vector<CycleEntry> cycles;
-	unsigned short* FLTable;	// Frame Lookup Table
-
-public:
-	explicit AnimationFactory(const ResRef &resref);
-	~AnimationFactory(void) override;
-	void AddFrame(const Holder<Sprite2D>& frame);
-	void AddCycle(CycleEntry cycle);
-	void LoadFLT(const unsigned short* buffer, int count);
-	Animation* GetCycle(unsigned char cycle);
-	/** No descriptions */
-	Holder<Sprite2D> GetFrame(unsigned short index, unsigned char cycle=0) const;
-	Holder<Sprite2D> GetFrameWithoutCycle(unsigned short index) const;
-	size_t GetCycleCount() const { return cycles.size(); }
-	size_t GetFrameCount() const { return frames.size(); }
-	int GetCycleSize(size_t idx) const;
-	Holder<Sprite2D> GetPaperdollImage(const ieDword *Colors, Holder<Sprite2D> &Picture2,
-		unsigned int type) const;
-
+	std::vector<index_t> FLTable;	// Frame Lookup Table
 };
 
 }

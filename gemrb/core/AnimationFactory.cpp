@@ -25,67 +25,45 @@
 
 namespace GemRB {
 
-AnimationFactory::AnimationFactory(const ResRef &resref)
-: FactoryObject(resref, IE_BAM_CLASS_ID)
-{
-	FLTable = NULL;
-}
+AnimationFactory::AnimationFactory(const ResRef &resref,
+								   std::vector<Holder<Sprite2D>> frames,
+								   std::vector<CycleEntry> cycles,
+								   std::vector<index_t> FLTable)
+: FactoryObject(resref, IE_BAM_CLASS_ID),
+frames(std::move(frames)),
+cycles(std::move(cycles)),
+FLTable(std::move(FLTable))
+{}
 
-AnimationFactory::~AnimationFactory(void)
-{
-	if (FLTable)
-		free( FLTable);
-}
-
-void AnimationFactory::AddFrame(const Holder<Sprite2D>& frame)
-{
-	frames.push_back( frame );
-}
-
-void AnimationFactory::AddCycle(CycleEntry cycle)
-{
-	cycles.push_back( cycle );
-}
-
-void AnimationFactory::LoadFLT(const unsigned short* buffer, int count)
-{
-	if (FLTable) {
-		free( FLTable );
-	}
-	//FLTable = new unsigned short[count];
-	FLTable = (unsigned short *) malloc(count * sizeof( unsigned short ) );
-	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
-}
-
-Animation* AnimationFactory::GetCycle(unsigned char cycle)
+Animation* AnimationFactory::GetCycle(index_t cycle)
 {
 	if (cycle >= cycles.size() || cycles[cycle].FramesCount == 0) {
 		return nullptr;
 	}
-	int ff = cycles[cycle].FirstFrame;
-	int lf = ff + cycles[cycle].FramesCount;
+	index_t ff = cycles[cycle].FirstFrame;
+	index_t lf = ff + cycles[cycle].FramesCount;
 	Animation* anim = new Animation( cycles[cycle].FramesCount );
 	int c = 0;
-	for (int i = ff; i < lf; i++) {
+	for (index_t i = ff; i < lf; i++) {
 		anim->AddFrame(frames[FLTable[i]], c++);
 	}
 	return anim;
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */
-Holder<Sprite2D> AnimationFactory::GetFrame(unsigned short index, unsigned char cycle) const
+Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 {
 	if (cycle >= cycles.size()) {
 		return NULL;
 	}
-	int ff = cycles[cycle].FirstFrame, fc = cycles[cycle].FramesCount;
+	index_t ff = cycles[cycle].FirstFrame, fc = cycles[cycle].FramesCount;
 	if(index >= fc) {
 		return NULL;
 	}
 	return frames[FLTable[ff+index]];
 }
 
-Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(unsigned short index) const
+Holder<Sprite2D> AnimationFactory::GetFrameWithoutCycle(index_t index) const
 {
 	if(index >= frames.size()) {
 		return NULL;
@@ -101,18 +79,18 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 	}
 
 	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
-	int first = -1, second = -1; // top and bottom half
-	int ff = cycles[0].FirstFrame;
-	for (int f=0; f < cycles[0].FramesCount; f++) {
-		int idx = FLTable[ff+f];
-		if (first == -1) {
+	index_t first = InvalidIndex, second = InvalidIndex; // top and bottom half
+	index_t ff = cycles[0].FirstFrame;
+	for (index_t f = 0; f < cycles[0].FramesCount; f++) {
+		index_t idx = FLTable[ff + f];
+		if (first == InvalidIndex) {
 			first = idx;
-		} else if (second == -1 && idx != first) {
+		} else if (second == InvalidIndex && idx != first) {
 			second = idx;
 			break;
 		}
 	}
-	if (second == -1) {
+	if (second == InvalidIndex) {
 		return NULL;
 	}
 
@@ -139,7 +117,7 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 	return spr;
 }
 
-int AnimationFactory::GetCycleSize(size_t idx) const
+AnimationFactory::index_t AnimationFactory::GetCycleSize(index_t idx) const
 {
 	if (idx >= cycles.size())
 		return 0;

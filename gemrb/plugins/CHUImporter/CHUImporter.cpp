@@ -195,7 +195,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 				// work around several controls not setting all the indices
-				int cycleSize = bam->GetCycleSize(Cycle);
+				AnimationFactory::index_t cycleSize = bam->GetCycleSize(Cycle);
 				bool resetIndex = false;
 				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
 						resetIndex = true;

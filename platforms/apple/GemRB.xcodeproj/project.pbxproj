@@ -440,7 +440,6 @@
 		A2E66356139E882900310FC8 /* AnimationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F951395FF61006ADC12 /* AnimationFactory.cpp */; };
 		A2E66357139E883100310FC8 /* AnimationFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F961395FF61006ADC12 /* AnimationFactory.h */; };
 		A2E66359139E883100310FC8 /* AnimationMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F981395FF61006ADC12 /* AnimationMgr.h */; };
-		A2E6635A139E883100310FC8 /* AnimStructures.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F991395FF61006ADC12 /* AnimStructures.h */; };
 		A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */; };
 		A2E6635D139E883100310FC8 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9C1395FF61006ADC12 /* Audio.cpp */; };
 		A2E6635E139E883100310FC8 /* Audio.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9D1395FF61006ADC12 /* Audio.h */; };
@@ -1509,7 +1508,6 @@
 		A2BF9F951395FF61006ADC12 /* AnimationFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AnimationFactory.cpp; sourceTree = "<group>"; };
 		A2BF9F961395FF61006ADC12 /* AnimationFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimationFactory.h; sourceTree = "<group>"; };
 		A2BF9F981395FF61006ADC12 /* AnimationMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimationMgr.h; sourceTree = "<group>"; };
-		A2BF9F991395FF61006ADC12 /* AnimStructures.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnimStructures.h; sourceTree = "<group>"; };
 		A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveImporter.h; sourceTree = "<group>"; };
 		A2BF9F9C1395FF61006ADC12 /* Audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Audio.cpp; sourceTree = "<group>"; };
 		A2BF9F9D1395FF61006ADC12 /* Audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Audio.h; sourceTree = "<group>"; };
@@ -5099,7 +5097,6 @@
 				A2BF9F951395FF61006ADC12 /* AnimationFactory.cpp */,
 				A2BF9F961395FF61006ADC12 /* AnimationFactory.h */,
 				A2BF9F981395FF61006ADC12 /* AnimationMgr.h */,
-				A2BF9F991395FF61006ADC12 /* AnimStructures.h */,
 				A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */,
 				A2BF9F9C1395FF61006ADC12 /* Audio.cpp */,
 				A2BF9F9D1395FF61006ADC12 /* Audio.h */,
@@ -7863,7 +7860,6 @@
 				A2E66355139E882900310FC8 /* Animation.h in Headers */,
 				A2E66357139E883100310FC8 /* AnimationFactory.h in Headers */,
 				A2E66359139E883100310FC8 /* AnimationMgr.h in Headers */,
-				A2E6635A139E883100310FC8 /* AnimStructures.h in Headers */,
 				A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */,
 				A2E6635E139E883100310FC8 /* Audio.h in Headers */,
 				A22A6B181994390D00488985 /* Logging.h in Headers */,
