@@ -196,6 +196,23 @@ enum EffectFlags {
 	EFFECT_SPECIAL_UNDO = 32
 };
 
+// unusual SpellProt types which need hacking (fake stats)
+enum STITypes {
+	STI_SOURCE_TARGET = 0x100,
+	STI_SOURCE_NOT_TARGET,
+	STI_CIRCLESIZE,
+	STI_TWO_ROWS,
+	STI_NOT_TWO_ROWS,
+	STI_MORAL_ALIGNMENT,
+	STI_AREATYPE,
+	STI_DAYTIME,
+	STI_EA,
+	STI_EVASION = 0x109, // note the gap to the next line!
+	STI_WATERY = 0x110,
+
+	STI_INVALID = 0xffff
+};
+
 /** Initializes table of available spell Effects used by all the queues. */
 /** The available effects should already be registered by the effect plugins */
 bool Init_EffectQueue();
@@ -340,6 +357,7 @@ public:
 	/** just checks if it is a particularly stupid effect that needs its target reset */
 	static bool OverrideTarget(const Effect *fx);
 	bool HasHostileEffects() const;
+	static bool CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr);
 private:
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const ResRef& = ResRef()) const;

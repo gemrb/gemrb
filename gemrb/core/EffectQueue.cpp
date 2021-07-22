@@ -28,6 +28,7 @@
 #include "Effect.h"
 #include "Game.h"
 #include "GameScript/GameScript.h" // only for ID_Allegiance
+#include "GameScript/GSUtils.h" // for DiffCore
 #include "Interface.h"
 #include "Map.h"
 #include "SymbolMgr.h"
@@ -2272,6 +2273,121 @@ bool EffectQueue::HasHostileEffects() const
 	}
 
 	return hostile;
+}
+
+// iwd got a weird targeting system
+// the opcode parameters are:
+//   * param1 - optional value used only rarely
+//   * param2 - a specific condition mostly based on target's stats
+//     this is partly superior, partly inferior to the bioware ids targeting:
+//       * superior because it can handle other stats and conditions
+//       * inferior because it is not so readily moddable
+//   * stat is usually a stat, but for special conditions it is a
+//     function code (>=0x100).
+//     If value is -1, then GemRB will use Param1, otherwise it is
+//     compared to the target's stat using the relation function.
+// The relation function is exactly the same as the extended
+// diffmode for gemrb. (Thus scripts can use the very same relation
+// functions).
+// The hardcoded conditions are simulated via the IWDIDSEntry
+// structure.
+
+// returns true if the target matches iwd ids targeting
+// usually this is used to restrict an effect to specific targets
+bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx)
+{
+	const IWDIDSEntry& entry = gamedata->GetSpellProt(type);
+	ieDword idx = entry.stat;
+	ieDword val = entry.value;
+	ieDword rel = entry.relation;
+	if (idx == USHRT_MAX) {
+		// bad entry, don't match
+	}
+
+	//if IDS value is 'anything' then the supplied value is in Parameter1
+	if (val == 0xffffffff) {
+		val = value;
+	}
+	switch (idx) {
+		case STI_INVALID:
+			return false;
+		case STI_EA:
+			return DiffCore(EARelation(Owner, target), val, rel);
+		case STI_DAYTIME:
+		{
+			// TODO: recheck, most of the code computes this differently (checking time of day)
+			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime) / 12;
+			return timeofday >= val && timeofday <= rel;
+		}
+		case STI_AREATYPE:
+			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
+		case STI_MORAL_ALIGNMENT:
+			if(Owner && Owner->Type==ST_ACTOR) {
+				return DiffCore(((Actor *) Owner)->GetStat(IE_ALIGNMENT) & AL_GE_MASK, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
+			} else {
+				return DiffCore(AL_TRUE_NEUTRAL, STAT_GET(IE_ALIGNMENT) & AL_GE_MASK, rel);
+			}
+		case STI_TWO_ROWS:
+			//used in checks where any of two matches are ok (golem or undead etc)
+			return CheckIWDTargeting(Owner, target, value, rel, fx) ||
+				CheckIWDTargeting(Owner, target, value, val, fx);
+		case STI_NOT_TWO_ROWS:
+			//this should be the opposite as above
+			return !(CheckIWDTargeting(Owner, target, value, rel, fx) ||
+				 CheckIWDTargeting(Owner, target, value, val, fx));
+		case STI_SOURCE_TARGET:
+			return Owner == target;
+		case STI_SOURCE_NOT_TARGET:
+			return Owner != target;
+		case STI_CIRCLESIZE:
+			return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
+		case STI_EVASION:
+			if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
+				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
+				// FIXME: check for evasion itself
+				if (target->GetThiefLevel() < 2 && target->GetMonkLevel() < 1) {
+					return false;
+				}
+				val = target->GetSavingThrow(4, 0, fx); // reflex
+			} else {
+				if (target->GetThiefLevel() < 7 ) {
+					return false;
+				}
+				val = target->GetSavingThrow(1, 0); // breath
+			}
+
+			return val;
+		case STI_WATERY:
+		{
+			// hardcoded via animation id, so we can't use STI_TWO_ROWS
+			// sahuagin x2, water elementals x2 (and water weirds)
+			ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
+			int ret = !val;
+			if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+				ret = val;
+			}
+			return ret;
+		}
+		default:
+		{
+			ieDword stat = STAT_GET(idx);
+			if (idx == IE_SUBRACE) {
+				//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
+				stat |= STAT_GET(IE_RACE) << 16;
+			} else if (idx == IE_ALIGNMENT) {
+				//alignment checks can be for good vs. evil, or chaotic vs. lawful, or both
+				ieDword almask = 0;
+				if (val & AL_GE_MASK) {
+					almask |= AL_GE_MASK;
+				}
+				if (val & AL_LC_MASK) {
+					almask |= AL_LC_MASK;
+				}
+				stat &= almask;
+			}
+			return DiffCore(stat, val, rel);
+		}
+	}
 }
 
 }
