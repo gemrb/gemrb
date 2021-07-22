@@ -9052,8 +9052,8 @@ void Actor::SetPortrait(const char* portraitRef, int Which)
 	}
 	if(!Which) {
 		// ensure they're properly terminated
-		SmallPortrait.SNPrintF("%.*sS", 7, SmallPortrait);
-		LargePortrait.SNPrintF("%.*sM", 7, LargePortrait);
+		SmallPortrait.SNPrintF("%.*sS", 7, SmallPortrait.CString());
+		LargePortrait.SNPrintF("%.*sM", 7, LargePortrait.CString());
 	}
 }
 
