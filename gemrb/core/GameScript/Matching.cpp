@@ -104,36 +104,36 @@ static inline bool DoObjectChecks(const Map *map, const Scriptable *Sender, cons
 	// non-actors have a visual range (15), we should do visual range and LOS
 	// see voodooconst.h for more info, currently the rest of the code uses 30 for non-actors
 
-	if (Sender->Type == ST_ACTOR) {
-		const Actor *source = (const Actor *) Sender;
+	if (Sender->Type != ST_ACTOR) return true;
 
-		// Detect() ignores invisibility completely
-		if (!ignoreinvis && target->IsInvisibleTo(source)) {
-			return false;
-		}
+	// Detect() ignores invisibility completely
+	const Actor *source = (const Actor *) Sender;
+	if (!ignoreinvis && target->IsInvisibleTo(source)) {
+		return false;
+	}
 
-		// visual range check
-		int visualrange = source->Modified[IE_VISUALRANGE];
-		if (dist > visualrange*visualrange) return false;
+	// visual range check
+	int visualrange = source->Modified[IE_VISUALRANGE];
+	if (dist > visualrange*visualrange) return false;
 
-		// LOS check
-		if (!map->IsVisibleLOS(Sender->Pos, target->Pos)) return false;
+	// line of sight check
+	if (!map->IsVisibleLOS(Sender->Pos, target->Pos)) return false;
 
-		// protection against creature
-		if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {
-			// TODO: de-hardcode these (may not all be correct anyway)
-			ieDword idsStat[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT };
-			for (int i=0; i<7; i++) {
-				ieDword statValue = source->Modified[idsStat[i]];
-				if (idsStat[i] == IE_CLASS) {
-					statValue = source->GetActiveClass();
-				}
-				if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, statValue, i+2)) {
-					return false;
-				}
+	// protection against creature
+	if (target->fxqueue.HasEffect(fx_protection_creature_ref)) {
+		// TODO: de-hardcode these (may not all be correct anyway)
+		ieDword idsStat[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT };
+		for (int i = 0; i < 7; i++) {
+			ieDword statValue = source->Modified[idsStat[i]];
+			if (idsStat[i] == IE_CLASS) {
+				statValue = source->GetActiveClass();
+			}
+			if (target->fxqueue.HasEffectWithParamPair(fx_protection_creature_ref, statValue, i + 2)) {
+				return false;
 			}
 		}
 	}
+
 	return true;
 }
 
@@ -212,19 +212,21 @@ static Targets *EvaluateObject(const Map *map, const Scriptable *Sender, const O
 		if (!core->HasFeature(GF_AREA_OVERRIDE) && ac == Sender) continue;
 
 		bool filtered = false;
-		if (DoObjectIDSCheck(oC, ac, &filtered)) {
-			// this is needed so eg. Range trigger gets a good object
-			// HACK: our parsing of Attack([0]) is broken
-			if (!filtered) {
-				// if no filters were applied..
-				assert(!tgts);
-				return NULL;
-			}
-			int dist;
-			if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
-				if (!tgts) tgts = new Targets();
-				tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
-			}
+		if (!DoObjectIDSCheck(oC, ac, &filtered)) {
+			continue;
+		}
+
+		// this is needed so eg. Range trigger gets a good object
+		// HACK: our parsing of Attack([0]) is broken
+		if (!filtered) {
+			// if no filters were applied..
+			assert(!tgts);
+			return nullptr;
+		}
+		int dist;
+		if (DoObjectChecks(map, Sender, ac, dist, (ga_flags & GA_DETECT) != 0)) {
+			if (!tgts) tgts = new Targets();
+			tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
 		}
 	}
 

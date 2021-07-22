@@ -97,29 +97,29 @@ void View::MarkDirty(const Region* rgn)
 	// TODO: we could implement partial redraws by storing the dirty region
 	// not much to gain at the moment, however
 
-	if (dirty == false) {
-		dirty = true;
+	if (dirty) return;
 
-		if (superView && !IsOpaque()) {
-			superView->DirtyBGRect(frame);
-		}
+	dirty = true;
 
-		std::list<View*>::iterator it;
-		for (it = subViews.begin(); it != subViews.end(); ++it) {
-			View* view = *it;
-			if (rgn) {
-				Region intersect = view->frame.Intersect(*rgn);
-				const Size& idims = intersect.size;
-				if (!idims.IsInvalid()) {
-					Point p = view->ConvertPointFromSuper(intersect.origin);
-					Region r = Region(p, idims);
-					view->MarkDirty(&r);
-				}
-			} else {
-				Point p = view->ConvertPointFromSuper(Point());
-				Region r = Region(p, Dimensions());
+	if (superView && !IsOpaque()) {
+		superView->DirtyBGRect(frame);
+	}
+
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* view = *it;
+		if (rgn) {
+			Region intersect = view->frame.Intersect(*rgn);
+			const Size& idims = intersect.size;
+			if (!idims.IsInvalid()) {
+				Point p = view->ConvertPointFromSuper(intersect.origin);
+				Region r = Region(p, idims);
 				view->MarkDirty(&r);
 			}
+		} else {
+			Point p = view->ConvertPointFromSuper(Point());
+			Region r = Region(p, Dimensions());
+			view->MarkDirty(&r);
 		}
 	}
 }

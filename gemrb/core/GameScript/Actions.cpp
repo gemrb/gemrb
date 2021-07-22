@@ -2263,11 +2263,11 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		int directions[4] = { -1, -1, -1, -1 };
 		for (int i = 0; i < game->GetPartySize(false); i++) {
 			actor = game->GetPC(i, false);
-			if (actor != Sender) {
-				int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
-				if (partydir != -1) {
-					directions[partydir]++;
-				}
+			if (actor == Sender) continue;
+
+			int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
+			if (partydir != -1) {
+				directions[partydir]++;
 			}
 		}
 		int best = 0;
@@ -4128,19 +4128,20 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	}
 	if (tar->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
-	} else {
-		const Actor *act = (const Actor *) tar;
-		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
-			Map *map=tar->GetCurrentArea();
-			// drop it at my feet
-			map->AddItemToLocation(tar->Pos, item);
-			if (act->InParty) {
-				act->VerbalConstant(VB_INVENTORY_FULL);
-				if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
-			}
-		} else {
-			if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+		return;
+	}
+
+	const Actor *act = (const Actor *) tar;
+	if (ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
+		Map *map = tar->GetCurrentArea();
+		// drop it at my feet
+		map->AddItemToLocation(tar->Pos, item);
+		if (act->InParty) {
+			act->VerbalConstant(VB_INVENTORY_FULL);
+			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		}
+	} else {
+		if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 	}
 }
 
@@ -4166,19 +4167,20 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	}
 	if (Sender->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
-	} else {
-		const Actor *act = (const Actor *) Sender;
-		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
-			Map *map=Sender->GetCurrentArea();
-			// drop it at my feet
-			map->AddItemToLocation(Sender->Pos, item);
-			if (act->InParty) {
-				act->VerbalConstant(VB_INVENTORY_FULL);
-				if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
-			}
-		} else {
-			if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
+		return;
+	}
+
+	const Actor *act = (const Actor *) Sender;
+	if (ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
+		Map *map = Sender->GetCurrentArea();
+		// drop it at my feet
+		map->AddItemToLocation(Sender->Pos, item);
+		if (act->InParty) {
+			act->VerbalConstant(VB_INVENTORY_FULL);
+			if (core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_INVFULL_ITEMDROP, DMC_BG2XPGREEN);
 		}
+	} else {
+		if (act->InParty && core->HasFeedback(FT_MISC)) displaymsg->DisplayConstantString(STR_GOTITEM, DMC_BG2XPGREEN);
 	}
 }
 
@@ -4402,18 +4404,18 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 			break;
 		default:;
 	}
-	if (inv) {
-		int x = inv->GetSlotCount();
-		Map *area = tar->GetCurrentArea();
-		while(x--) {
-			if (parameters->string0Parameter[0]) {
-				const char *resref = inv->GetSlotItem(x)->ItemResRef;
-				if (!strnicmp(parameters->string0Parameter, resref, 8)) {
-					continue;
-				}
+	if (!inv) return;
+
+	int x = inv->GetSlotCount();
+	Map *area = tar->GetCurrentArea();
+	while(x--) {
+		if (parameters->string0Parameter[0]) {
+			const char *itemRef = inv->GetSlotItem(x)->ItemResRef;
+			if (!strnicmp(parameters->string0Parameter, itemRef, 8)) {
+				continue;
 			}
-			inv->DropItemAtLocation(x, 0, area, tar->Pos);
 		}
+		inv->DropItemAtLocation(x, 0, area, tar->Pos);
 	}
 }
 

@@ -1217,15 +1217,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Scriptable *tmp = tar;
 			tar = scr;
 			scr = tmp;
-		} else {
-			if (!(Flags & BD_INTERRUPT)) {
-				// added CurrentAction as part of blocking action fixes
-				if (tar->GetCurrentAction() || tar->GetNextAction()) {
-					core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
-					displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
-					Sender->ReleaseCurrentAction();
-					return;
-				}
+		} else if (!(Flags & BD_INTERRUPT)) {
+			// added CurrentAction as part of blocking action fixes
+			if (tar->GetCurrentAction() || tar->GetNextAction()) {
+				core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
+				displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
+				Sender->ReleaseCurrentAction();
+				return;
 			}
 		}
 	}

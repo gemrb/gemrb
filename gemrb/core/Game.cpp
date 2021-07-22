@@ -147,12 +147,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		npclevels.reserve(rows);
 		for (int i = 0; i < rows; i++) {
 			npclevels.emplace_back(cols + 1);
-			for(int j = -1; j < cols; j++) {
-				if (j == -1) {
-					npclevels[i][j+1] = table->GetRowName(i);
-				} else {
-					npclevels[i][j+1] = table->QueryField(i, j);
-				}
+			npclevels[i][0] = table->GetRowName(i);
+			for (int j = 0; j < cols; j++) {
+				npclevels[i][j + 1] = table->QueryField(i, j);
 			}
 		}
 	}
