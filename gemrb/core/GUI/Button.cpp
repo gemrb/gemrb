@@ -457,7 +457,7 @@ String Button::TooltipText() const
 Holder<Sprite2D> Button::Cursor() const
 {
 	if (IS_PORTRAIT) {
-		GameControl* gc = core->GetGameControl();
+		const GameControl* gc = core->GetGameControl();
 		if (gc) {
 			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
 			if (cur) return cur;

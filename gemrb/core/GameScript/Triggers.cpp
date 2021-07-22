@@ -1742,7 +1742,7 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::CreatureHidden(Scriptable *Sender, const Trigger *parameters)
 {
-	Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
+	const Scriptable *target = GetActorFromObject(Sender, parameters->objectParameter);
 	if (!target) {
 		return 0;
 	}
@@ -2781,7 +2781,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::EntirePartyOnMap(Scriptable *Sender, const Trigger */*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(true);
 	while (i--) {
@@ -2795,7 +2795,7 @@ int GameScript::EntirePartyOnMap(Scriptable *Sender, const Trigger */*parameters
 
 int GameScript::AnyPCOnMap(Scriptable *Sender, const Trigger */*parameters*/)
 {
-	Map *map = Sender->GetCurrentArea();
+	const Map *map = Sender->GetCurrentArea();
 	const Game *game = core->GetGame();
 	int i=game->GetPartySize(true);
 	while (i--) {

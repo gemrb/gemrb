@@ -576,7 +576,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	bool drawFrame = false;
-	Window* frontWin = windows.front();
+	const Window* frontWin = windows.front();
 	Window* modalWin = ModalWindow();
 	const Region& frontWinFrame = frontWin->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last

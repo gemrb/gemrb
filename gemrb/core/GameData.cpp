@@ -411,7 +411,7 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
-	AnimationFactory* af = ( AnimationFactory* )
+	const AnimationFactory* af = (const AnimationFactory *)
 		GetFactoryResource(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return 0;
 	if (cycle == -1)

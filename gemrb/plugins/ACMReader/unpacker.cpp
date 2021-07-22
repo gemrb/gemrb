@@ -174,7 +174,7 @@ int CValueUnpacker::zero_fill(int pass, int /*ind*/)
 int CValueUnpacker::linear_fill(int pass, int ind)
 {
 	int mask = ( 1 << ind ) - 1;
-	short* lb_ptr = buff_middle + int( ((size_t)-1) << ( ind - 1 ) );
+	const short* lb_ptr = buff_middle + int(((size_t) -1) << (ind - 1));
 
 	for (int i = 0; i < subblocks; i++)
 		block_ptr[i * sb_size + pass] = lb_ptr[get_bits( ind ) & mask];

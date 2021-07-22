@@ -493,7 +493,7 @@ int Game::JoinParty(Actor* actor, int join)
 		//set the joining date
 		actor->PCStats->JoinDate = GameTime;
 		//if the protagonist has the same portrait replace it
-		Actor *prot = GetPC(0, false);
+		const Actor *prot = GetPC(0, false);
 		if (prot && (actor->SmallPortrait == prot->SmallPortrait || actor->LargePortrait == prot->LargePortrait)) {
 			AutoTable ptab("portrait");
 			if (ptab) {

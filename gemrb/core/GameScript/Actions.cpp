@@ -2129,7 +2129,7 @@ void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 //waitanimation: waiting while animation of target is of a certain type
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 {
-	Scriptable *tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		tar=Sender;
 	}
@@ -3202,7 +3202,7 @@ void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
 //Assigns the target object's name (not scriptname) to the token
 void GameScript::SetTokenObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
@@ -5363,7 +5363,7 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 //iwd2 removes effects from a single sprite
 void GameScript::ClearSpriteEffects(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
@@ -6200,7 +6200,7 @@ void GameScript::GetStat(Scriptable* Sender, Action* parameters)
 {
 	ieDword value;
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type!=ST_ACTOR) {
 		value = 0;
 	} else {
@@ -6442,7 +6442,7 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
@@ -6458,7 +6458,7 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 
 void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}

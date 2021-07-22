@@ -72,11 +72,11 @@ inline const Font* TextSpan::LayoutFont() const
 {
 	if (font) return font;
 
-	TextContainer* container = static_cast<TextContainer*>(parent);
+	const TextContainer* container = static_cast<const TextContainer*>(parent);
 	if (container) {
 		return container->TextFont();
 	}
-	return NULL;
+	return nullptr;
 }
 
 inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) const
@@ -256,7 +256,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		drawRect.y += offset.y;
 		const Font* printFont = LayoutFont();
 		const Font::PrintColors* pc = colors;
-		TextContainer* container = static_cast<TextContainer*>(parent);
+		const TextContainer* container = static_cast<const TextContainer*>(parent);
 		if (!pc && container) {
 			pc = container->TextColors();
 		}
@@ -1003,7 +1003,7 @@ TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 	size_t charCount = 0;
 	ContentList::iterator it = contents.begin();
 	while (it != contents.end()) {
-		TextSpan* ts = static_cast<TextSpan*>(*it);
+		const TextSpan* ts = static_cast<const TextSpan*>(*it);
 		size_t textLen = ts->Text().length();
 		if (charCount + textLen >= idx) {
 			break;

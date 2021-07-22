@@ -95,7 +95,7 @@ CFGConfig::CFGConfig(int argc, char *argv[])
 
 		// Find basename of this program. It does the same as basename (3),
 		// but that's probably missing on some archs
-		char* appName = strrchr( argv[0], PathDelimiter );
+		const char* appName = strrchr(argv[0], PathDelimiter);
 		if (appName) {
 			appName++;
 		} else {

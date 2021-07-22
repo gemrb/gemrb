@@ -301,7 +301,7 @@ void View::Draw()
 		if (debuginfo) {
 			const ViewScriptingRef* ref = GetScriptingRef();
 			if (ref) {
-				Font* fnt = core->GetTextFont();
+				const Font* fnt = core->GetTextFont();
 				ScriptingId id = ref->Id;
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
@@ -416,7 +416,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	std::list<View*>::iterator it;
 	it = std::find(subViews.begin(), subViews.end(), back);
 
-	View* super = front->superView;
+	const View* super = front->superView;
 	if (super == this) {
 		// already here, but may need to move the view
 		std::list<View*>::iterator cur;

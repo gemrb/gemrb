@@ -2525,8 +2525,8 @@ Trigger* GenerateTrigger(char* String)
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
 		return NULL;
 	}
-	char *src = String+len;
-	char *str = triggersTable->GetStringIndex( i )+len;
+	const char *src = String + len;
+	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
 		Log(ERROR, "GameScript", "Malformed scripting trigger: %s", String);
@@ -2544,9 +2544,9 @@ Action* GenerateAction(const char* String)
 	ScriptDebugLog(ID_ACTIONS, "Compiling: %s", String);
 
 	int len = strlench(String,'(')+1; //including (
-	char *src = actionString+len;
+	const char *src = actionString + len;
 	int i = -1;
-	char *str;
+	const char *str;
 	unsigned short actionID;
 	if (overrideActionsTable) {
 		i = overrideActionsTable->FindString(actionString, len);

@@ -34,7 +34,7 @@ namespace GemRB {
  */
 RNG::RNG() {
 	time_t now = time(NULL);
-	unsigned char *ptr = (unsigned char *) &now;
+	const unsigned char *ptr = (unsigned char *) &now;
 	uint32_t seed = 0;
 
 	/* The actual value of a time_t may not be portable, so we compute a “hash” of the

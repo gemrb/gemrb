@@ -326,7 +326,7 @@ void Window::SetAction(Responder handler, const ActionKey& key)
 
 bool Window::PerformAction(const ActionKey& key)
 {
-	auto& handler = eventHandlers[key.Value()];
+	const auto& handler = eventHandlers[key.Value()];
 	if (handler) {
 		(handler)(this);
 		return true;

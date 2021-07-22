@@ -251,7 +251,7 @@ bool Cache::SetAt(const ResRef& key, void *rValue)
 
 int Cache::RefCount(const ResRef& key) const
 {
-	Cache::MyAssoc* pAssoc=GetAssocAt( key );
+	const Cache::MyAssoc* pAssoc = GetAssocAt(key);
 	if (pAssoc) {
 		return pAssoc->nRefCount;
 	}

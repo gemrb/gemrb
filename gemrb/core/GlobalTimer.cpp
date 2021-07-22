@@ -136,7 +136,7 @@ bool GlobalTimer::Update()
 {
 	Map *map;
 	Game *game;
-	GameControl* gc;
+	const GameControl* gc;
 	tick_t thisTime = GetTicks();
 
 	if (!startTime) {

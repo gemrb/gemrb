@@ -75,7 +75,7 @@ public:
 
 	// class to instantiate on the script side (Python)
 	ScriptingClassId ScriptingClass() const override {
-		Control* ctrl = static_cast<Control*>(GetObject());
+		const Control* ctrl = static_cast<const Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
 		switch (ctrl->ControlType) {

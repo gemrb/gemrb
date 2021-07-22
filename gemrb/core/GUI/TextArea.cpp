@@ -206,7 +206,7 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
-	TextContainer* span = TextAtPoint(p);
+	const TextContainer* span = TextAtPoint(p);
 	
 	if (span) {
 		std::list<View*>::reverse_iterator it = subViews.rbegin();

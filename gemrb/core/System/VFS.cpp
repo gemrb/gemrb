@@ -284,7 +284,7 @@ bool PathJoin (char *target, const char *base, ...)
 	return true;
 
 finish:
-	while (char *source = va_arg(ap, char*)) {
+	while (const char *source = va_arg(ap, char*)) {
 		PathAppend(target, source);
 	}
 	va_end( ap );
@@ -427,7 +427,7 @@ bool MakeDirectory(const char* path)
 
 GEM_EXPORT char* CopyHomePath(char* outPath, ieWord maxLen)
 {
-	char* home = getenv( "HOME" );
+	const char* home = getenv("HOME");
 	if (home) {
 		strlcpy(outPath, home, maxLen);
 		return outPath;

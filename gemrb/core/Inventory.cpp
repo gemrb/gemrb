@@ -1495,7 +1495,7 @@ void Inventory::dump(StringBuffer& buffer) const
 {
 	buffer.append( "INVENTORY:\n" );
 	for (unsigned int i = 0; i < Slots.size(); i++) {
-		CREItem* itm = Slots[i];
+		const CREItem* itm = Slots[i];
 
 		if (!itm) {
 			continue;

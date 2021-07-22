@@ -1078,13 +1078,11 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		return;
 	}
 
-	Actor *speaker, *target;
-
-	speaker = NULL;
-	target = (Actor *) tar;
+	const Actor *speaker = nullptr;
+	Actor *target = (Actor *) tar;
 	bool swap = false;
 	if (scr->Type==ST_ACTOR) {
-		speaker = (Actor *) scr;
+		speaker = (const Actor *) scr;
 		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StringBuffer buffer;
 			buffer.append("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
@@ -1205,7 +1203,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	// moved this here from InitDialog, because InitDialog doesn't know which side is which
 	// post-swap (and non-actors always have IF_NOINT set) .. also added a check that it's
 	// actually busy doing something, for the same reason
-	Action *curact = target->GetCurrentAction();
+	const Action *curact = target->GetCurrentAction();
 	if ((speaker != target) && (target->GetInternalFlag()&IF_NOINT) && \
 	  (!curact && target->GetNextAction())) {
 		core->GetTokenDictionary()->SetAtCopy("TARGET", target->GetName(1));
@@ -1314,7 +1312,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position,
 
 		// update the worldmap if needed
 		if (actor->InParty) {
-			WorldMap *worldmap = core->GetWorldMap();
+			const WorldMap *worldmap = core->GetWorldMap();
 			unsigned int areaindex;
 			WMPAreaEntry *entry = worldmap->GetArea(area, areaindex);
 			// make sure the area is marked as revealed and visited
@@ -1441,9 +1439,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 		return;
 	}
 
-	Actor *tar = NULL;
+	const Actor *tar = nullptr;
 	if (target->Type==ST_ACTOR) {
-		tar = (Actor *) target;
+		tar = (const Actor *) target;
 
 		// release if target is invisible to sender (because of death or invisbility spell)
 		if (tar->IsInvisibleTo(Sender) || (tar->GetSafeStat(IE_STATE_ID) & STATE_DEAD)){
@@ -2642,7 +2640,7 @@ static bool InterruptSpellcasting(Scriptable* Sender) {
 	// abort casting on invisible or dead targets
 	// not all spells should be interrupted on death - some for chunking, some for raising the dead
 	if (Sender->LastSpellTarget) {
-		Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
+		const Actor *target = core->GetGame()->GetActorByGlobalID(Sender->LastSpellTarget);
 		if (target) {
 			ieDword state = target->GetStat(IE_STATE_ID);
 			if (state & STATE_DEAD && state & ~(STATE_PETRIFIED|STATE_FROZEN)) {

@@ -175,7 +175,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	video->DrawRect(vp, ColorGreen, false );
 	
 	// Draw PCs' ellipses
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(true);
 	while (i--) {
 		const Actor *actor = game->GetPC(i, true);
@@ -290,7 +290,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (val == MAP_VIEW_NOTES) {
 		Point p = ConvertPointFromScreen(me.Pos());
 
-		String* text = NULL;
+		const String* text = nullptr;
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
 			text = mn->text;

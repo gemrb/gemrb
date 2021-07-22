@@ -237,7 +237,7 @@ static EffectDesc* FindEffect(const char* effectname)
 static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if( effect_reference.opcode==-1) {
-		EffectDesc* ref = FindEffect(effect_reference.Name);
+		const EffectDesc* ref = FindEffect(effect_reference.Name);
 		if( ref && ref->opcode>=0) {
 			effect_reference.opcode = ref->opcode;
 			return;
@@ -406,7 +406,7 @@ EffectQueue *EffectQueue::CopySelf() const
 
 	effects = new EffectQueue();
 	std::list< Effect* >::const_iterator fxit = GetFirstEffect();
-	Effect *fx;
+	const Effect *fx;
 
 	while( (fx = GetNextEffect(fxit))) {
 		effects->AddEffect(new Effect(*fx), false);

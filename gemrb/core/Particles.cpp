@@ -174,7 +174,7 @@ bool Particles::AddNew(const Point &point)
 void Particles::Draw(Point p)
 {
 	Video *video=core->GetVideoDriver();
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (owner) {
 		p.x-=pos.x;
@@ -222,7 +222,7 @@ void Particles::Draw(Point p)
 				//IE_ANI_CAST stance has a simple looping animation
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
 				if (anims) {
-					Animation* anim = anims[0];
+					const Animation* anim = anims[0];
 					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
 
 					BlitFlags flags = BlitFlags::NONE;

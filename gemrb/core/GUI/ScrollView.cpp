@@ -83,7 +83,7 @@ void ScrollView::ContentView::ResizeToSubviews()
 	
 void ScrollView::ContentView::WillDraw(const Region& /*drawFrame*/, const Region& clip)
 {
-	ScrollView* parent = static_cast<ScrollView*>(superView);
+	const ScrollView* parent = static_cast<const ScrollView*>(superView);
 	
 	Region clipArea = parent->ContentRegion();
 	Point origin = parent->ConvertPointToWindow(clipArea.origin);
