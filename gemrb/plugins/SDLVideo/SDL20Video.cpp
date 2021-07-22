@@ -550,7 +550,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 
 	SDL_Texture* target = SDL_GetRenderTarget(renderer);
 	if (buf) {
-		auto texture = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+		auto texture = static_cast<SDLTextureVideoBuffer*>(buf.get())->GetTexture();
 		SDL_SetRenderTarget(renderer, texture);
 	} else {
 		SDL_SetRenderTarget(renderer, nullptr);

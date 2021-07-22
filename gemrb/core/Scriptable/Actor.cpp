@@ -8132,7 +8132,7 @@ int Actor::GetFavoredPenalties() const
 	classLevels.sort(); // ascending
 	if (flevel == -1) {
 		// any class - just remove the highest level
-		classLevels.erase((classLevels.end())--);
+		classLevels.erase(--classLevels.end());
 		classCount--;
 	} else {
 		// remove() kills all elements with the same value, so we have to jump through hoops
