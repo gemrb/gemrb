@@ -2315,9 +2315,13 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			return DiffCore(EARelation(Owner, target), val, rel);
 		case STI_DAYTIME:
 		{
-			// TODO: recheck, most of the code computes this differently (checking time of day)
-			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime) / 12;
-			return timeofday >= val && timeofday <= rel;
+			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime);
+			// handle the clock jumping at midnight
+			if (val > rel) {
+				return timeofday >= val || timeofday <= rel;
+			} else {
+				return timeofday >= val && timeofday <= rel;
+			}
 		}
 		case STI_AREATYPE:
 			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
