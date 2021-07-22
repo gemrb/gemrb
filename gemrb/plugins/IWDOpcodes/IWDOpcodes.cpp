@@ -407,8 +407,7 @@ struct IWDIDSEntry {
 	ieWord relation;
 };
 
-static int spellrescnt = -1;
-static IWDIDSEntry *spellres = NULL;
+static std::vector<IWDIDSEntry> spellProt;
 static Variables tables;
 
 static void Cleanup()
@@ -417,10 +416,6 @@ static void Cleanup()
 		delete Enemy;
 	}
 	Enemy=NULL;
-
-	if (spellres) {
-		free (spellres);
-	}
 }
 
 static void RegisterIWDOpcodes()
@@ -456,26 +451,17 @@ static void RegisterIWDOpcodes()
 
 static void ReadSpellProtTable(const char* tableName)
 {
-	if (spellres) {
-		free(spellres);
-	}
-	spellres = NULL;
-	spellrescnt = 0;
 	AutoTable tab(tableName);
 	if (!tab) {
 		return;
 	}
-	spellrescnt=tab->GetRowCount();
-	spellres = (IWDIDSEntry *) malloc(sizeof(IWDIDSEntry) * spellrescnt);
-	if (!spellres) {
-		return;
-	}
-	for( int i=0;i<spellrescnt;i++) {
-		ieDword stat = core->TranslateStat(tab->QueryField(i,0) );
-		spellres[i].stat = (ieWord) stat;
-
-		spellres[i].value = strtounsigned<ieDword>(tab->QueryField(i,1));
-		spellres[i].relation = strtounsigned<ieWord>(tab->QueryField(i,2));
+	ieDword spellrescnt = tab->GetRowCount();
+	spellProt.resize(spellrescnt);
+	for (ieDword i = 0; i < spellrescnt; i++) {
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
+		spellProt[i].stat = (ieWord) stat;
+		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
+		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
 	}
 }
 
@@ -497,16 +483,17 @@ static void ReadSpellProtTable(const char* tableName)
 //usually, this is used to restrict an effect to specific targets
 static bool check_iwd_targeting(Scriptable* Owner, Actor* target, ieDword value, ieDword type, Effect *fx = nullptr)
 {
-	if (spellrescnt==-1) {
+	size_t count = spellProt.size();
+	if (count == 0) {
 		ReadSpellProtTable("splprot");
 	}
-	if (type>=(ieDword) spellrescnt) {
+	if (type >= (ieDword) count) {
 		return false; //not matched
 	}
 
-	ieDword idx = spellres[type].stat;
-	ieDword val = spellres[type].value;
-	ieDword rel = spellres[type].relation;
+	ieDword idx = spellProt[type].stat;
+	ieDword val = spellProt[type].value;
+	ieDword rel = spellProt[type].relation;
 	//if IDS value is 'anything' then the supplied value is in Parameter1
 	if (val==0xffffffff) {
 		val = value;
