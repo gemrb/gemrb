@@ -1433,7 +1433,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Parameter2<3){
 		eamod = eamods[fx->Parameter2];
 	}
-	Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
+
 	Point pos(target->Pos);
 	while (fx->Parameter1--) {
 		if (fx->Parameter2 == 3) { // summon at source
@@ -1441,6 +1441,7 @@ int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx)
 		} else if (fx->Target == FX_TARGET_PRESET) {
 			pos = fx->Pos;
 		}
+		Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
 		core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, pos, eamod, 0, newfx);
 	}
 	return FX_NOT_APPLIED;
