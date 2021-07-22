@@ -737,21 +737,21 @@ void ScriptedAnimation::GetPaletteCopy()
 	//it is not sure that the first position will have a resource in it
 	//therefore the cycle
 	for (Animation *anim : anims) {
-		if (anim) {
-			Holder<Sprite2D> spr = anim->GetFrame(0);
-			if (spr) {
-				palette = spr->GetPalette()->Copy();
-				if ((Transparency&IE_VVC_BLENDED) && palette->HasAlpha() == false) {
-					palette->CreateShadedAlphaChannel();
-				} else {
-					Color shadowalpha = palette->col[1];
-					shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
-					palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
-				}
-				//we need only one palette, so break here
-				break;
-			}
+		if (!anim) continue;
+
+		Holder<Sprite2D> spr = anim->GetFrame(0);
+		if (!spr) continue;
+
+		palette = spr->GetPalette()->Copy();
+		if ((Transparency & IE_VVC_BLENDED) && palette->HasAlpha() == false) {
+			palette->CreateShadedAlphaChannel();
+		} else {
+			Color shadowalpha = palette->col[1];
+			shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+			palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
 		}
+		//we need only one palette, so break here
+		break;
 	}
 }
 
