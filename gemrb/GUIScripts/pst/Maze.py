@@ -414,7 +414,7 @@ def CustomizeMaze(AreaName):
 		if wallbits[i]&walls:
 			x2 = x+offx[i]
 			y2 = y+offy[i]
-			set = 0
+			unsetExit = 0
 			if x2 == nordomX and y2 == nordomY:
 				NewArea = "AR13FD"
 			elif x2 == mainX and y2 == mainY:
@@ -429,11 +429,11 @@ def CustomizeMaze(AreaName):
 					NewArea = FormatAreaName (x2+y2*MAZE_MAX_DIM)
 				else:
 					#maximum dimensions
-					set = 1
+					unsetExit = 1
 		else:
-			set = 1
+			unsetExit = 1
 
-		if set:
+		if unsetExit:
 			#remove exit
 			GemRB.SetMapExit ("exit"+str(i) )
 			GemRB.SetMapDoor (doors[i], 0)

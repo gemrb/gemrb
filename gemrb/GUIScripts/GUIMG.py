@@ -418,8 +418,8 @@ def LoadCondition ():
 
 	for i in range (CondCount):
 		#get the condition's name and description
-		tuple = (Table.GetValue (i, 0),Table.GetValue (i, 1) )
-		ContCond[i] = tuple
+		CondTuple = (Table.GetValue (i, 0), Table.GetValue (i, 1))
+		ContCond[i] = CondTuple
 
 	Table = GemRB.LoadTable ("conttarg")
 	TargCount = Table.GetRowCount ()
@@ -427,8 +427,8 @@ def LoadCondition ():
 
 	for i in range (TargCount):
 		#get the condition's name and description
-		tuple = (Table.GetValue (i, 0),Table.GetValue (i, 1) )
-		ContTarg[i] = tuple
+		CondTuple = (Table.GetValue (i, 0), Table.GetValue (i, 1))
+		ContTarg[i] = CondTuple
 	return
 
 def OpenSequencerWindow ():

@@ -109,8 +109,8 @@ def CanLevelUp(actor):
 	if GameCheck.IsIWD2():
 		import GUIREC
 		levelsum = GemRB.GetPlayerStat (actor, IE_CLASSLEVELSUM)
-		next = GUIREC.GetNextLevelExp(levelsum, GUIREC.GetECL(actor))
-		return next <= xp
+		nextXP = GUIREC.GetNextLevelExp (levelsum, GUIREC.GetECL (actor))
+		return nextXP <= xp
 
 	# hardcoded special case to handle TNO, who is usually a single class 
 	# but with three separate Levels/XP values and the ability to switch between them

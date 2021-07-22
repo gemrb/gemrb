@@ -267,9 +267,9 @@ def ChangeTooltip ():
 	tt = ""
 	area = WorldMapControl.GetDestinationArea ()
 	if area and area["Distance"] >= 0:
-		str = GemRB.GetString(23084)
-		if (str):
-			tt = "%s: %d"%(str,area["Distance"])
+		travelStr = GemRB.GetString (23084)
+		if (travelStr):
+			tt = "%s: %d" %(travelStr, area["Distance"])
 
 	WorldMapControl.SetTooltip (tt)
 	return

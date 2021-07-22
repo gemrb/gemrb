@@ -172,16 +172,16 @@ class Actor:
 
 		self.__nextlevels = []
 		for name, level in zip(self.ClassNames(), self.Levels() ):
-			next = level
+			nextLevel = level
 
 			#we only want the current level for the old part of a dual-class
 			if len(self.__nextlevels) < self.__numclasses:
 				for current in range(level+1, CommonTables.NextLevel.GetColumnCount () ):
 					if CommonTables.NextLevel.GetValue (name, str(current)) <= xp:
-						next = current
+						nextLevel = current
 					else:
 						break
-			self.__nextlevels.append(next)
+			self.__nextlevels.append(nextLevel)
 
 		return self.__nextlevels
 	
