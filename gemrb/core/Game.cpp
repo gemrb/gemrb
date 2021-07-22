@@ -2115,8 +2115,8 @@ void Game::ApplyGlobalTint(Color &tint, BlitFlags &flags) const
 bool Game::IsDay() const
 {
 	ieDword daynight = core->Time.GetHour(GameTime);
-	// FIXME: doesn't match GameScript::TimeOfDay
-	if(daynight<4 || daynight>20) {
+	// matches GameScript::TimeOfDay and splprot.2da by including dawn
+	if (daynight < 6 || daynight > 20) {
 		return false;
 	}
 	return true;
