@@ -92,38 +92,20 @@ strpos_t DataStream::Remains() const
 	return size-Pos;
 }
 
-strret_t DataStream::ReadResRef(char dest[9])
-{
-	strret_t len = Read(dest, 8);
-	if (len == GEM_ERROR) {
-		dest[0] = 0;
-		return 0;
-	}
-	// lowercase the resref
-	for (int i = 0; i < 8; i++) {
-		dest[i] = (char) tolower(dest[i]);
-	}
-	// remove trailing spaces
-	for (int i = 7; i >= 0; i--) {
-		if (dest[i] == ' ') dest[i] = 0;
-		else break;
-	}
-	// null-terminate
-	dest[8] = 0;
-	return len;
-}
-
 strret_t DataStream::ReadResRef(ResRef& dest)
 {
 	char ref[9];
-	strret_t len = ReadResRef(ref);
-	dest = ref;
+	strret_t len = Read(ref, 8);
+	ref[len] = '\0';
+	
+	// remove trailing spaces
+	for (strret_t i = len - 1; i >= 0; --i) {
+		if (ref[i] == ' ') ref[i] = '\0';
+		else break;
+	}
+	
+	dest = ResRef::MakeLowerCase(ref);
 	return len;
-}
-
-strret_t DataStream::WriteResRef(const char src[9])
-{
-	return Write( src, 8);
 }
 
 strret_t DataStream::WriteResRef(const ResRef& src)
