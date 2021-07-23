@@ -465,7 +465,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
-	DataStream* str = GetStream();
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (auto& list : map->SongHeader.SongList) {

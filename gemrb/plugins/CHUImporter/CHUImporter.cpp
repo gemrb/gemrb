@@ -59,7 +59,6 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	ieWord ControlsCount, FirstControl;
 	ResRef MosFile;
 
-	DataStream* str = GetStream();
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
 		return NULL;

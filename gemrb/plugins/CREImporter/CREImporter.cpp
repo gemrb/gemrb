@@ -661,7 +661,6 @@ void CREImporter::ReadChrHeader(Actor *act)
 	ieByte tmpByte;
 
 	act->CreateStats();
-	DataStream* str = GetStream();
 	str->Rewind();
 	str->Read (Signature, 8);
 	str->Read (name, 32);
@@ -738,7 +737,6 @@ void CREImporter::ReadChrHeader(Actor *act)
 
 bool CREImporter::SeekCreHeader(char *Signature)
 {
-	DataStream* str = GetStream();
 	str->Seek(32, GEM_CURRENT_POS);
 	str->ReadDword(CREOffset);
 	str->Seek(CREOffset, GEM_STREAM_START);
@@ -750,7 +748,6 @@ CREMemorizedSpell* CREImporter::GetMemorizedSpell()
 {
 	CREMemorizedSpell* spl = new CREMemorizedSpell();
 
-	DataStream* str = GetStream();
 	str->ReadResRef( spl->SpellResRef );
 	str->ReadDword(spl->Flags);
 
@@ -761,7 +758,6 @@ CREKnownSpell* CREImporter::GetKnownSpell()
 {
 	CREKnownSpell* spl = new CREKnownSpell();
 
-	DataStream* str = GetStream();
 	str->ReadResRef(spl->SpellResRef);
 	str->ReadWord(spl->Level);
 	str->ReadWord(spl->Type);
@@ -771,7 +767,6 @@ CREKnownSpell* CREImporter::GetKnownSpell()
 
 void CREImporter::ReadScript(Actor *act, int ScriptLevel)
 {
-	DataStream* str = GetStream();
 	ResRef aScript;
 	str->ReadResRef(aScript);
 	act->SetScript(aScript, ScriptLevel, act->InParty != 0);
@@ -781,7 +776,6 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 {
 	ieWord Level, Type, Number, Number2;
 
-	DataStream* str = GetStream();
 	str->ReadWord(Level);
 	str->ReadWord(Number);
 	str->ReadWord(Number2);
@@ -847,7 +841,6 @@ void CREImporter::SetupColor(ieDword &stat)
 
 void CREImporter::ReadDialog(Actor *act)
 {
-	DataStream* str = GetStream();
 	ResRef Dialog;
 	str->ReadResRef(Dialog);
 	// avoiding a literal NONE to not error, since the file doesn't exist
@@ -859,7 +852,6 @@ void CREImporter::ReadDialog(Actor *act)
 
 Actor* CREImporter::GetActor(unsigned char is_in_party)
 {
-	DataStream* str = GetStream();
 	Actor* act = new Actor();
 	if (!act)
 		return NULL;
@@ -975,7 +967,6 @@ void CREImporter::GetActorPST(Actor *act)
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	DataStream* str = GetStream();
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1183,8 +1174,6 @@ void CREImporter::GetActorPST(Actor *act)
 
 void CREImporter::ReadInventory(Actor *act, unsigned int Inventory_Size)
 {
-	DataStream* str = GetStream();
-
 	act->inventory.SetSlotCount(Inventory_Size + 1);
 	str->Seek(ItemSlotsOffset + CREOffset, GEM_STREAM_START);
 
@@ -1247,7 +1236,6 @@ void CREImporter::ReadSpellbook(Actor *act)
 	std::vector<CREMemorizedSpell*> memorizedSpells;
 	knownSpells.resize(KnownSpellsCount);
 	memorizedSpells.resize(MemorizedSpellsCount);
-	DataStream* str = GetStream();
 
 	str->Seek(KnownSpellsOffset + CREOffset, GEM_STREAM_START);
 	for (auto& knownSpell : knownSpells) {
@@ -1307,7 +1295,6 @@ void CREImporter::ReadSpellbook(Actor *act)
 
 void CREImporter::ReadEffects(Actor *act)
 {
-	DataStream* str = GetStream();
 	str->Seek( EffectsOffset+CREOffset, GEM_STREAM_START );
 
 	for (unsigned int i = 0; i < EffectsCount; i++) {
@@ -1319,7 +1306,7 @@ Effect *CREImporter::GetEffect()
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 
-	eM->Open(GetStream(), false);
+	eM->Open(str, false);
 	if (TotSCEFF) {
 		return eM->GetEffectV20();
 	} else {
@@ -1332,7 +1319,6 @@ ieDword CREImporter::GetActorGemRB(Actor *act)
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	DataStream* str = GetStream();
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1420,7 +1406,6 @@ void CREImporter::GetActorBG(Actor *act)
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	DataStream* str = GetStream();
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1594,7 +1579,6 @@ void CREImporter::GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, 
 	ieDword memocount;
 	ieDword tmpDword;
 
-	DataStream* str = GetStream();
 	int i = count;
 	CRESpellMemorization* sm = act->spellbook.GetSpellMemorization(type, level);
 	assert(sm && sm->SlotCount == 0 && sm->SlotCountWithBonus == 0); // unused
@@ -1654,7 +1638,6 @@ void CREImporter::GetActorIWD2(Actor *act)
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	DataStream* str = GetStream();
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1954,7 +1937,6 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	ieByte tmpByte;
 	ieWord tmpWord;
 
-	DataStream* str = GetStream();
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );

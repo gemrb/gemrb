@@ -154,7 +154,6 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	if (count == 0) return {};
 
 	std::vector<index_t> FLT(count);
-	DataStream* str = GetStream();
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read(&FLT[0], count * sizeof(ieWord));
 	if( DataStream::BigEndian() ) {
@@ -165,7 +164,6 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
-	DataStream* str = GetStream();
 	str->Seek( DataStart, GEM_STREAM_START );
 	strpos_t length = str->Remains();
 	if (length == 0) return nullptr;
