@@ -264,8 +264,7 @@ public:
 	 */
 	void AddEffect(Effect* fx, bool insert=false);
 	/** Adds an Effect to the queue, subject to level and other checks.
-	 * Returns FX_ABORT if unsuccessful. fx is just a reference, AddEffect()
-	 * will malloc its own copy */
+	 * Returns FX_ABORT if unsuccessful. */
 	int AddEffect(Effect* fx, Scriptable* self, Actor* pretarget, const Point &dest) const;
 	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
