@@ -143,7 +143,7 @@ PluginHolder<T> MakePluginHolder(PluginID id) {
 
 template <typename T>
 PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
-	return PluginHolder<ImporterPlugin<T>>(static_cast<ImporterPlugin<T>*>(PluginMgr::Get()->GetPlugin(id)));
+	return MakePluginHolder<ImporterPlugin<T>>(id);
 }
 
 }
