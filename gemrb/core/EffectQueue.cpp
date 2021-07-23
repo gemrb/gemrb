@@ -2362,16 +2362,22 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 
 			return val;
 		case STI_WATERY:
-		{
-			// hardcoded via animation id, so we can't use STI_TWO_ROWS
-			// sahuagin x2, water elementals x2 (and water weirds)
-			ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
-			int ret = !val;
-			if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
-				ret = val;
+			// NOTE: this got reused in EEs for alignment matching, while the originals were about water.
+			// Luckily the relation is unset in the later and the default 0 doesn't make sense for alignment
+			if (rel == 0) {
+				// hardcoded via animation id, so we can't use STI_TWO_ROWS
+				// sahuagin x2, water elementals x2 (and water weirds)
+				ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
+				int ret = !val;
+				if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+					ret = val;
+				}
+				return ret;
+			} else {
+				// alignment.ids check - see below
+				idx = IE_ALIGNMENT;
 			}
-			return ret;
-		}
+			// fall-through and explict values for extra EE modes, so it's clearer we implemented them
 		default:
 		{
 			ieDword stat = STAT_GET(idx);
