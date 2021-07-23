@@ -412,7 +412,6 @@ void CharAnimations::SetupColors(PaletteType type)
 					PaletteResRef[type].SNPrintF("%.4s_%-.2s", ResRefBase.CString(), (char *) &PType);
 				}
 			}
-			PaletteResRef[type] = PaletteResRef[type];
 			PaletteHolder tmppal = gamedata->GetPalette(PaletteResRef[type]);
 			if (tmppal) {
 				PartPalettes[type] = tmppal;
