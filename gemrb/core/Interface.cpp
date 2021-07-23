@@ -3137,8 +3137,6 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!new_game)
 		goto cleanup;
 
-	gam_str = NULL;
-
 	// Load WMP (WorldMap) file
 	if (!wmp_mgr)
 		goto cleanup;
@@ -3183,7 +3181,6 @@ cleanup:
 	// Something went wrong, so try to clean after itself
 	delete new_game;
 	delete new_worldmap;
-	delete gam_str;
 	delete wmp_str1;
 	delete wmp_str2;
 	delete sav_str;
