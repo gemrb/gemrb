@@ -31,11 +31,6 @@
 
 #include "Plugin.h"
 
-/* WinAPI conflict. */
-#ifdef CreateWindow
-#undef CreateWindow
-#endif
-
 namespace GemRB {
 
 class DataStream;
