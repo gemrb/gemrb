@@ -2302,6 +2302,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	ieDword rel = entry.relation;
 	if (idx == USHRT_MAX) {
 		// bad entry, don't match
+		return false;
 	}
 
 	//if IDS value is 'anything' then the supplied value is in Parameter1
