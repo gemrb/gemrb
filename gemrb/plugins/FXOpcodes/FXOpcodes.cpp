@@ -4505,7 +4505,6 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x92 Spell:Cast
-// param2 was supposedly distinguishing between normal and instant casts, but uses in bg2 disagree
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
@@ -4516,11 +4515,31 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	}
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ResRef OldSpellResRef(Owner->SpellResRef);
-	// flags: no deplete, instant, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+
+	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpell doesn't have a RES variant, so there's more work
+		char tmp[60];
+		if (target == Owner) {
+			// charname has no scriptname ...
+			snprintf(tmp, sizeof(tmp), "ForceSpell(Myself,%d)", ResolveSpellNumber(fx->Resource));
+		} else {
+			snprintf(tmp, sizeof(tmp), "ForceSpell(\"%s\",%d)", target->GetScriptName(), ResolveSpellNumber(fx->Resource));
+		}
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpell(fx->Resource, target, Owner, fx->CasterLevel);
+	} else { // ees introduce 2
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+	}
 
 	return FX_NOT_APPLIED;
 }
