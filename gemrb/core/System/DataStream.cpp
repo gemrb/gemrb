@@ -144,21 +144,16 @@ strret_t DataStream::WriteResRefUC(const ResRef& src)
 strret_t DataStream::ReadPoint(Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
-	ieWord coord;
-	strret_t ret = ReadScalar(coord);
-	p.x = coord;
-	ret += ReadScalar(coord);
-	p.y = coord;
+	strret_t ret = ReadScalar<int, ieWord>(p.x);
+	ret += ReadScalar<int, ieWord>(p.y);
 	return ret;
 }
 
 strret_t DataStream::WritePoint(const Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
-	ieWord coord = p.x;
-	strret_t ret = WriteScalar(coord);
-	coord = p.y;
-	ret += WriteScalar(coord);
+	strret_t ret = WriteScalar<int, ieWord>(p.x);
+	ret += WriteScalar<int, ieWord>(p.y);
 	return ret;
 }
 
