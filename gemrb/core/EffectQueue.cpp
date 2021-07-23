@@ -2313,6 +2313,10 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			return false;
 		case STI_EA_RELATION:
 			return DiffCore(EARelation(Owner, target), val, rel);
+		case STI_ALLIES:
+			return DiffCore(EARelation(Owner, target), EAR_FRIEND, rel);
+		case STI_ENEMIES:
+			return DiffCore(EARelation(Owner, target), EAR_HOSTILE, rel);
 		case STI_DAYTIME:
 		{
 			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime);
@@ -2345,6 +2349,21 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			return Owner != target;
 		case STI_CIRCLESIZE:
 			return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
+		case STI_SPELLSTATE:
+			// only used with 1 and 5, so we don't need another accessor
+			if (rel == EQUALS) {
+				return target->HasSpellState(val);
+			} else {
+				return !target->HasSpellState(val);
+			}
+		case STI_SUMMONED_NUM:
+			ieDword count;
+			count = target->GetCurrentArea()->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+			return DiffCore(count, val, rel);
+		case STI_CHAPTER_CHECK:
+			ieDword chapter;
+			core->GetGame()->locals->Lookup("CHAPTER", chapter);
+			return DiffCore(chapter, val, rel);
 		case STI_EVASION:
 			if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
@@ -2378,6 +2397,13 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 				idx = IE_ALIGNMENT;
 			}
 			// fall-through and explict values for extra EE modes, so it's clearer we implemented them
+		case STI_EA:
+		case STI_GENERAL:
+		case STI_RACE:
+		case STI_CLASS:
+		case STI_SPECIFIC:
+		case STI_GENDER:
+		case STI_STATE:
 		default:
 		{
 			ieDword stat = STAT_GET(idx);

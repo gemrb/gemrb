@@ -207,8 +207,20 @@ enum STITypes {
 	STI_AREATYPE,
 	STI_DAYTIME,
 	STI_EA_RELATION,
-	STI_EVASION = 0x109, // note the gap to the next line!
-	STI_WATERY = 0x110,
+	STI_EVASION,
+	STI_EA,
+	STI_GENERAL,
+	STI_RACE,
+	STI_CLASS,
+	STI_SPECIFIC,
+	STI_GENDER,
+	STI_WATERY, // ALIGNMENT in EE
+	STI_STATE,
+	STI_SPELLSTATE,
+	STI_ALLIES, // just STI_EA_RELATION, but enables negation
+	STI_ENEMIES, // just exact STI_EA_RELATION, since it would also return true for neutrals
+	STI_SUMMONED_NUM,
+	STI_CHAPTER_CHECK,
 
 	STI_INVALID = 0xffff
 };
