@@ -81,11 +81,8 @@ bool BAMImporter::Import(DataStream* str)
 	}
 	
 	for (auto& cycle : cycles) {
-		ieWord tmp;
-		str->ReadWord(tmp);
-		cycle.FramesCount = tmp;
-		str->ReadWord(tmp);
-		cycle.FirstFrame = tmp;
+		str->ReadWord(cycle.FramesCount);
+		str->ReadWord(cycle.FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
