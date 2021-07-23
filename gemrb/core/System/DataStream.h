@@ -78,6 +78,7 @@ public:
 	
 	template <typename DST, typename SRC>
 	strret_t ReadScalar(DST& dest) {
+		static_assert(sizeof(DST) > sizeof(SRC), "This flavor of ReadScalar requires DST to be the larger type.");
 		SRC src;
 		strret_t len = ReadScalar(src);
 		dest = src;
@@ -99,14 +100,12 @@ public:
 	
 	template <typename SRC, typename DST>
 	strret_t WriteScalar(const SRC& src) {
+		static_assert(sizeof(SRC) > sizeof(DST), "This flavor of WriteScalar requires SRC to be the larger type.");
 		DST dst = static_cast<DST>(src);
 		return WriteScalar<DST>(dst);
 	}
 
-	strret_t ReadResRef(char dest[9]);
 	strret_t ReadResRef(ResRef& dest);
-	
-	strret_t WriteResRef(const char src[9]);
 	strret_t WriteResRef(const ResRef& src);
 	strret_t WriteResRefLC(const ResRef& src);
 	strret_t WriteResRefUC(const ResRef& src);
