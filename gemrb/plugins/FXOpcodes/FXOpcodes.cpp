@@ -308,6 +308,7 @@ int fx_bounce_secondary_type (Scriptable* Owner, Actor* target, Effect* fx);//cb
 int fx_protection_school (Scriptable* Owner, Actor* target, Effect* fx); //cc
 int fx_protection_secondary_type (Scriptable* Owner, Actor* target, Effect* fx); //cd
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect* fx);//ce
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect* fx); // ce (iwd2, ee), remapped to 0x200 in bgs to be also available there
 int fx_resist_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
 int fx_bounce_spell (Scriptable* Owner, Actor* target, Effect* fx);//cf
 int fx_bounce_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
@@ -425,6 +426,8 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only
 //13f Usability:ItemUsability
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
+
+int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
 
 int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
 
@@ -668,6 +671,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Protection:SecondaryType",fx_protection_secondary_type, 0, -1 ),//overlay?
 	EffectDesc("Protection:SecondaryTypeDec",fx_protection_secondary_type_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:Spell",fx_resist_spell, 0, -1 ),//overlay?
+	EffectDesc("Protection:Spell2", fx_resist_spell2, 0, -1),
+	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1),
 	EffectDesc("Protection:SpellDec",fx_resist_spell_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevel",fx_protection_spelllevel, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevelDec",fx_protection_spelllevel_dec, 0, -1 ),//overlay?
@@ -823,6 +828,7 @@ static EffectRef fx_movement_modifier_ref = { "MovementRateModifier2", -1 }; //0
 static EffectRef fx_familiar_constitution_loss_ref = { "FamiliarBond", -1 }; //0xc3
 static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 }; //0xc4
 static EffectRef fx_immunity_effect_ref = { "Protection:Spell", -1 }; //0xce
+static EffectRef fx_resist_spell2_ref = { "Protection:Spell2", -1 }; //0xce (IWD2, ee), 0x200 bgs
 static EffectRef fx_imprisonment_ref = { "State:Imprisonment", -1 }; //0xd3
 static EffectRef fx_maze_ref = { "Maze", -1 }; //0xd5
 static EffectRef fx_leveldrain_ref = { "LevelDrainModifier", -1 }; //0xd8
@@ -5562,9 +5568,22 @@ int fx_protection_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect *
 //0xce Protection:Spell
 int fx_resist_spell (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 {
-	// print("fx_resist_spell(%2d): Resource: %s", fx->Opcode, fx->Resource);
 	if (fx->Resource != fx->SourceRef) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
+		return FX_APPLIED;
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+//0xce (same place as in bg2, but different targeting)
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect *fx)
+{
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (fx->Resource != fx->SourceRef) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -7765,6 +7784,56 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+// 0x122 (290) Protection:Spell3 with IWD ids targeting
+// 0x144 (324) Protection: Immunity to Resource and Message in EEs
+// this is a variant of fx_resist_spell that is used in iwd2 (different than bg2, see IWDOpcodes!)
+int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
+{
+	//changed this to the opposite (cure light wounds resisted by undead)
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	//convert effect to the normal resist spell effect (without text)
+	//in case it lingers
+	fx->Opcode = EffectQueue::ResolveEffect(fx_resist_spell2_ref);
+
+	if (fx->Resource != fx->SourceRef) {
+		return FX_APPLIED;
+	}
+	//display message too
+	ieStrRef sourceNameRef = -1;
+
+	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID)) {
+		const Item *poi = gamedata->GetItem(fx->Resource);
+		sourceNameRef = poi->ItemName;
+		gamedata->FreeItem(poi, fx->Resource, false);
+	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID)) {
+		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
+		sourceNameRef = poi->SpellName;
+		gamedata->FreeSpell(poi, fx->Resource, false);
+	} else {
+		// ees also try one char shorter resref, so eg. the sunfire child spell finds the main one
+		ResRef tmp;
+		tmp.SNPrintF("%.7s", fx->Resource.CString());
+		if (gamedata->Exists(tmp, IE_SPL_CLASS_ID)) {
+			const Spell *poi = gamedata->GetSpell(tmp, true);
+			sourceNameRef = poi->SpellName;
+			gamedata->FreeSpell(poi, tmp, false);
+		}
+	}
+
+	if (sourceNameRef != ieStrRef(-1)) {
+		char *sourceName = core->GetCString(sourceNameRef, 0);
+		core->GetTokenDictionary()->SetAtCopy("RESOURCE", sourceName);
+		free(sourceName);
+		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+// 402 in iwd2, 326 ees
 int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// after iwd2 style ids targeting, apply the spell named in the resource field
