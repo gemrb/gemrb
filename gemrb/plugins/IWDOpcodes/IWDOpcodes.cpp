@@ -2064,6 +2064,15 @@ int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
 		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
 		spellname = poi->SpellName;
 		gamedata->FreeSpell(poi, fx->Resource, false);
+	} else {
+		// ees also try one char shorter resref, so eg. the sunfire child spell finds the main one
+		ResRef tmp;
+		tmp.SNPrintF("%.7s", fx->Resource.CString());
+		if (gamedata->Exists(tmp, IE_SPL_CLASS_ID)) {
+			const Spell *poi = gamedata->GetSpell(tmp, true);
+			spellname = poi->SpellName;
+			gamedata->FreeSpell(poi, tmp, false);
+		}
 	}
 
 	if (spellname>=0) {
