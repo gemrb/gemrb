@@ -2318,15 +2318,14 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_ENEMIES:
 			return DiffCore(EARelation(Owner, target), EAR_HOSTILE, rel);
 		case STI_DAYTIME:
-		{
-			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime);
+			ieDword timeofday;
+			timeofday = core->Time.GetHour(core->GetGame()->GameTime);
 			// handle the clock jumping at midnight
 			if (val > rel) {
 				return timeofday >= val || timeofday <= rel;
 			} else {
 				return timeofday >= val && timeofday <= rel;
 			}
-		}
 		case STI_AREATYPE:
 			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
 		case STI_MORAL_ALIGNMENT:
@@ -2405,8 +2404,8 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_GENDER:
 		case STI_STATE:
 		default:
-		{
-			ieDword stat = STAT_GET(idx);
+			ieDword stat;
+			stat = STAT_GET(idx);
 			if (idx == IE_SUBRACE) {
 				//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
 				stat |= STAT_GET(IE_RACE) << 16;
@@ -2422,7 +2421,6 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 				stat &= almask;
 			}
 			return DiffCore(stat, val, rel);
-		}
 	}
 }
 
