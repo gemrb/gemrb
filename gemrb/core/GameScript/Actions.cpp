@@ -2757,7 +2757,12 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
+	// gemrb extension for internal use
+	if (parameters->int1Parameter) {
+		SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
+	} else {
+		SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
+	}
 }
 
 void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)

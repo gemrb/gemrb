@@ -4560,11 +4560,26 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x94 Spell:CastSpellPoint
 int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_cast_spell_point(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ResRef OldSpellResRef(Owner->SpellResRef);
-	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, fx->Parameter1, true, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+	if (fx->Parameter2 == 0) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpellPoint doesn't have a RES variant, so there's more work
+		char tmp[40];
+		snprintf(tmp, sizeof(tmp), "ForceSpellPoint([%d.%d],%d)", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->CasterLevel);
+	} else { // gemrb extension to mirror fx_cast_spell
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->Parameter1);
+	}
+
 	return FX_NOT_APPLIED;
 }
 
