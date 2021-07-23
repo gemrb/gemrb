@@ -223,8 +223,9 @@ void ResolveSpellName(ResRef& spellRes, ieDword number)
 ieDword ResolveSpellNumber(const ResRef& spellRef)
 {
 	ResRef tmp;
+	tmp.SNPrintF("%.4s", spellRef.CString());
 	for (int i = 0; i < 5; i++) {
-		if (spellRef == spell_suffices[i]) {
+		if (tmp == spell_suffices[i]) {
 			tmp = spellRef + 4;
 			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
