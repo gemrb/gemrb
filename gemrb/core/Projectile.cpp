@@ -482,9 +482,7 @@ bool Projectile::FailedIDS(const Actor *target) const
 				fail = !fail;
 			}
 		}
-	}
-	else
-	{
+	} else {
 		if (fail && IDSType2) {
 			fail = !EffectQueue::match_ids( target, IDSType2, IDSValue2);
 			if (ExtFlags&PEF_NOTIDS2) {
@@ -493,36 +491,42 @@ bool Projectile::FailedIDS(const Actor *target) const
 		}
 	}
 
-	if (!fail) {
-		if(ExtFlags&PEF_TOUCH) {
-			Actor *caster = core->GetGame()->GetActorByGlobalID(Caster);
-			if (caster) {
-				//TODO move this to Actor
-				//TODO some projectiles use melee attack (fist), others use projectile attack
-				//this apparently depends on the spell's SpellForm (normal vs. projectile)
-				int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
-				if (roll==1) {
-					return true; //critical failure
-				}
-				
-				if (!(target->GetStat(IE_STATE_ID)&STATE_CRIT_PROT))  {
-					if (roll >= (ATTACKROLL - (int) caster->GetStat(IE_CRITICALHITBONUS))) {
-						return false; //critical success
-					}
-				}
+	if (fail) {
+		return fail;
+	}
 
-				//handle attack type here, weapon depends on it too?
-				int tohit = caster->GetToHit(WEAPON_FIST, target);
-				//damage type, should be generic?
-				// ignore the armor bonus
-				int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
-				if(target->IsReverseToHit()) {
-					fail = roll + defense < tohit;
-				} else {
-					fail = tohit + roll < defense;
-				}        
-			}
+	if (!(ExtFlags & PEF_TOUCH)) {
+		return fail;
+	}
+
+	Actor *caster = core->GetGame()->GetActorByGlobalID(Caster);
+	if (!caster) {
+		return fail;
+	}
+
+	// TODO move this to Actor
+	// TODO some projectiles use melee attack (fist), others use projectile attack
+	//this apparently depends on the spell's SpellForm (normal vs. projectile)
+	int roll = caster->LuckyRoll(1, ATTACKROLL, 0);
+	if (roll == 1) {
+		return true; //critical failure
+	}
+	
+	if (!(target->GetStat(IE_STATE_ID) & STATE_CRIT_PROT))  {
+		if (roll >= ATTACKROLL - (int) caster->GetStat(IE_CRITICALHITBONUS)) {
+			return false; // critical success
 		}
+	}
+
+	// handle attack type here, weapon depends on it too?
+	int toHit = caster->GetToHit(WEAPON_FIST, target);
+	// damage type, should be generic?
+	// ignore the armor bonus
+	int defense = target->GetDefense(0, WEAPON_BYPASS, caster);
+	if (target->IsReverseToHit()) {
+		fail = roll + defense < toHit;
+	} else {
+		fail = toHit + roll < defense;
 	}
 
 	return fail;
