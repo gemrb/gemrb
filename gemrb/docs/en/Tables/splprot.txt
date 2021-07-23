@@ -24,6 +24,9 @@ composite conditions.
 0x107   - daytime flag
 0x108   - caster and target EA relation (using the EA fields to calculate this)
 
+See IESDP for further modes added in the EEs:
+https://gibberlings3.github.io/iesdp/files/2da/2da_bgee/splprot.htm
+
 The relation could be
 0       - less or equal
 1       - equal
