@@ -4056,8 +4056,7 @@ int Interface::GetMouseScrollSpeed() const {
 
 ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
-	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
-	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
+	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID, gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {

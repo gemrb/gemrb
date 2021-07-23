@@ -29,7 +29,6 @@ namespace GemRB {
 
 class DLGImporter : public DialogMgr {
 private:
-	DataStream* str;
 	ieDword StatesCount;
 	ieDword StatesOffset;
 	ieDword TransitionsCount;
@@ -45,11 +44,11 @@ private:
 
 public:
 	DLGImporter(void);
-	~DLGImporter(void) override;
-	bool Open(DataStream* stream) override;
+	
 	Dialog* GetDialog() const override;
 	Condition* GetCondition(char *string) const override;
 private:
+	bool Import(DataStream* stream) override;
 	DialogState* GetDialogState(Dialog *d, unsigned int index) const;
 	DialogTransition* GetTransition(unsigned int index) const;
 	Condition* GetStateTrigger(unsigned int index) const;

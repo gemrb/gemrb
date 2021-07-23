@@ -132,7 +132,7 @@ Store* STOImporter::GetStore(Store *s)
 			char *TriggerCode = core->GetCString( (ieStrRef) item->InfiniteSupply );
 			// there can be multiple triggers, so we use a Condition to handle them
 			// all and avoid the need for custom parsing
-			PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
+			PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID);
 			item->triggers = dm->GetCondition(TriggerCode);
 			free(TriggerCode);
 

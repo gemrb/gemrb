@@ -28,24 +28,13 @@ using namespace GemRB;
 
 DLGImporter::DLGImporter(void)
 {
-	str = NULL;
 	Version = Flags = 0;
 	StatesCount = TransitionsCount = StateTriggersCount = TransitionTriggersCount = ActionsCount = 0;
 	StatesOffset = TransitionsOffset = StateTriggersOffset = TransitionTriggersOffset = ActionsOffset = 0;
 }
 
-DLGImporter::~DLGImporter(void)
+bool DLGImporter::Import(DataStream* str)
 {
-	delete str;
-}
-
-bool DLGImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strnicmp( Signature, "DLG V1.0", 8 ) != 0) {
@@ -395,5 +384,5 @@ static char** GetStrings(char* string, unsigned int& count)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x1970D894, "DLG File Importer")
-PLUGIN_CLASS(IE_DLG_CLASS_ID, DLGImporter)
+PLUGIN_CLASS(IE_DLG_CLASS_ID, ImporterPlugin<DLGImporter>)
 END_PLUGIN()
