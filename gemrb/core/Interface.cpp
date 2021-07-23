@@ -3858,58 +3858,55 @@ void Interface::SanitizeItem(CREItem *item) const
 	}
 
 	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
-	if (itm) {
+	if (!itm) return;
 
-		item->MaxStackAmount = itm->MaxStackAmount;
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-			if (item->Usages[0] == 0) {
-				item->Usages[0] = 1;
+	item->MaxStackAmount = itm->MaxStackAmount;
+	//if item is stacked mark it as so
+	if (itm->MaxStackAmount) {
+		item->Flags |= IE_INV_ITEM_STACKED;
+		if (item->Usages[0] == 0) {
+			item->Usages[0] = 1;
+		}
+	} else {
+		//set charge counters for non-rechargeable items if their charge is zero
+		//set charge counters for items not using charges to one
+		for (int i = 0; i < CHARGE_COUNTERS; i++) {
+			const ITMExtHeader *h = itm->GetExtHeader(i);
+			if (!h) {
+				item->Usages[i] = 0;
+				continue;
 			}
-		} else {
-			//set charge counters for non-rechargeable items if their charge is zero
-			//set charge counters for items not using charges to one
-			for (int i = 0; i < CHARGE_COUNTERS; i++) {
-				const ITMExtHeader *h = itm->GetExtHeader(i);
-				if (h) {
-					if (item->Usages[i] == 0) {
-						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-							//HACK: the original (bg2) allows for 0 charged gems
-							if (h->Charges) {
-								item->Usages[i] = h->Charges;
-							} else {
-								item->Usages[i] = 1;
-							}
-						}
-					} else if (h->Charges == 0) {
-						item->Usages[i] = 1;
-					}
-				} else {
-					item->Usages[i] = 0;
-				}
+
+			if (item->Usages[i] != 0 && h->Charges == 0) {
+				item->Usages[i] = 1;
+				continue;
+			}
+
+			if (item->Usages[i] == 0 && !(h->RechargeFlags & IE_ITEM_RECHARGE)) {
+				// HACK: the original (bg2) allows for 0 charged gems
+				item->Usages[i] = std::max<ieWord>(1, h->Charges);
 			}
 		}
-
-		//simply adding the item flags to the slot
-		item->Flags |= (itm->Flags<<8);
-		//some slot flags might be affected by the item flags
-		if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
-			item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-		}
-
-		// pst has no stolen flag, but "steel" in its place
-		if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
-			item->Flags |= IE_INV_ITEM_STOLEN;
-		}
-
-		//auto identify basic items
-		if (!itm->LoreToID) {
-			item->Flags |= IE_INV_ITEM_IDENTIFIED;
-		}
-
-		gamedata->FreeItem(itm, item->ItemResRef, false);
 	}
+
+	// simply adding the item flags to the slot
+	item->Flags |= itm->Flags << 8;
+	// some slot flags might be affected by the item flags
+	if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
+		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+	}
+
+	// pst has no stolen flag, but "steel" in its place
+	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
+		item->Flags |= IE_INV_ITEM_STOLEN;
+	}
+
+	// auto identify basic items
+	if (!itm->LoreToID) {
+		item->Flags |= IE_INV_ITEM_IDENTIFIED;
+	}
+
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
 #define MAX_LOOP 10
