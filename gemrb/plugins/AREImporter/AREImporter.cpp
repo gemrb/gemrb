@@ -131,22 +131,10 @@ AREImporter::AREImporter(void)
 	EmbeddedCreOffset = AnimOffset = AnimCount = DoorsOffset = DoorsCount = 0;
 	ExploredBitmapSize = ExploredBitmapOffset = 0;
 	LastSave = 0;
-
-	str = NULL;
 }
 
-AREImporter::~AREImporter(void)
+bool AREImporter::Import(DataStream* str)
 {
-	delete str;
-}
-
-bool AREImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 
@@ -477,6 +465,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
+	DataStream* str = GetStream();
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (auto& list : map->SongHeader.SongList) {
@@ -1069,7 +1058,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading actors");
 	str->Seek( ActorOffset, GEM_STREAM_START );
 	assert(core->IsAvailable(IE_CRE_CLASS_ID));
-	PluginHolder<ActorMgr> actmgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto actmgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (int i = 0; i < ActorCount; i++) {
 		ieVariable defaultName;
 		ResRef creResRef;
@@ -1571,7 +1560,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	ActorCount = (ieWord) map->GetActorCount(false);
 	headersize += ActorCount * 0x110;
 
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	EmbeddedCreOffset = headersize;
 
 	for (unsigned int i = 0; i < ActorCount; i++) {
@@ -2152,7 +2141,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	ieDword CreatureOffset = EmbeddedCreOffset;
 	char filling[120];
 
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		Actor *ac = map->GetActor(i, false);
@@ -2677,6 +2666,6 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
-PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImporter)
+PLUGIN_CLASS(IE_ARE_CLASS_ID, ImporterPlugin<AREImporter>)
 PLUGIN_CLEANUP(ReleaseMemory)
 END_PLUGIN()

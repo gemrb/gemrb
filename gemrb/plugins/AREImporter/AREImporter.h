@@ -34,7 +34,6 @@ class EffectQueue;
 
 class AREImporter : public MapMgr {
 private:
-	DataStream* str;
 	int bigheader;
 	ResRef WEDResRef;
 	ieDword LastSave;
@@ -63,8 +62,7 @@ private:
 	ieByte AreaDifficulty;
 public:
 	AREImporter(void);
-	~AREImporter(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
 	Map* GetMap(const char* resRef, bool day_or_night) override;
 	int GetStoredFileSize(Map *map) override;

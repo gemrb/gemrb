@@ -6914,9 +6914,9 @@ int fx_modify_global_variable (Scriptable* /*Owner*/, Actor* /*target*/, Effect*
 	Game *game = core->GetGame();
 	if (!fx->IsVariable) {
 		//convert it to internal variable format by shifting to overwrite the null terminators
-		memmove(&fx->VariableName[8], fx->Resource2, 8);
-		memmove(&fx->VariableName[16], fx->Resource3, 8);
-		memmove(&fx->VariableName[24], fx->Resource4, 8);
+		memmove(&fx->VariableName[8], &fx->Resource2, 8);
+		memmove(&fx->VariableName[16], &fx->Resource3, 8);
+		memmove(&fx->VariableName[24], &fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
 
@@ -7538,9 +7538,9 @@ int fx_modify_local_variable (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (!fx->IsVariable) {
 		//convert it to internal variable format by shifting to overwrite the null terminators
-		memmove(&fx->VariableName[8], fx->Resource2, 8);
-		memmove(&fx->VariableName[16], fx->Resource3, 8);
-		memmove(&fx->VariableName[24], fx->Resource4, 8);
+		memmove(&fx->VariableName[8], &fx->Resource2, 8);
+		memmove(&fx->VariableName[16], &fx->Resource3, 8);
+		memmove(&fx->VariableName[24], &fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
 	// print("fx_modify_local_variable(%2d): %s, Mod: %d", fx->Opcode, fx->Resource, fx->Parameter2);

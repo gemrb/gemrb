@@ -21,7 +21,6 @@
 
 #include "BAMImporter.h"
 
-#include "FileCache.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
@@ -33,37 +32,15 @@
 
 using namespace GemRB;
 
-BAMImporter::BAMImporter(void)
+bool BAMImporter::Import(DataStream* str)
 {
-	str = NULL;
-	CompressedColorIndex = DataStart = 0;
-	FramesOffset = PaletteOffset = FLTOffset = 0;
-}
-
-BAMImporter::~BAMImporter(void)
-{
-	delete str;
-}
-
-bool BAMImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
-
-	palette = nullptr;
-	
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "BAMCV1  ", 8 ) == 0) {
 		str->Seek( 4, GEM_CURRENT_POS );
-		DataStream* cached = CacheCompressedStream(stream, stream->filename);
-		delete str;
-		if (!cached)
+		str = DecompressStream(str);
+		if (!str)
 			return false;
-		str = cached;
 		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "BAM V1  ", 8 ) != 0) {
@@ -177,6 +154,7 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	if (count == 0) return {};
 
 	std::vector<index_t> FLT(count);
+	DataStream* str = GetStream();
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read(&FLT[0], count * sizeof(ieWord));
 	if( DataStream::BigEndian() ) {
@@ -187,6 +165,7 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
+	DataStream* str = GetStream();
 	str->Seek( DataStart, GEM_STREAM_START );
 	strpos_t length = str->Remains();
 	if (length == 0) return nullptr;
@@ -224,5 +203,5 @@ Holder<Sprite2D> BAMImporter::GetPalette()
 
 GEMRB_PLUGIN(0x3AD6427A, "BAM File Importer")
 PLUGIN_IE_RESOURCE(BAMFontManager, "bam", (ieWord)IE_BAM_CLASS_ID)
-PLUGIN_CLASS(IE_BAM_CLASS_ID, BAMImporter)
+PLUGIN_CLASS(IE_BAM_CLASS_ID, ImporterPlugin<BAMImporter>)
 END_PLUGIN()

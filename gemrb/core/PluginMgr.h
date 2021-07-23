@@ -143,7 +143,17 @@ PluginHolder<T> MakePluginHolder(PluginID id) {
 
 template <typename T>
 PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
-	return PluginHolder<ImporterPlugin<T>>(static_cast<ImporterPlugin<T>*>(PluginMgr::Get()->GetPlugin(id)));
+	return MakePluginHolder<ImporterPlugin<T>>(id);
+}
+
+template <typename T>
+Holder<T> GetImporter(PluginID id, DataStream* str = nullptr) {
+	auto plugin = MakeImporterPluginHolder<T>(id);
+	if (plugin) {
+		return str ? plugin->GetImporter(str) : plugin->GetImporter();
+	}
+	delete str;
+	return nullptr;
 }
 
 }

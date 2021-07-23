@@ -28,12 +28,10 @@
 namespace GemRB {
 
 class Actor;
-class DataStream;
 class ResRef;
 
-class GEM_EXPORT ActorMgr : public Plugin {
+class GEM_EXPORT ActorMgr : public ImporterBase {
 public:
-	virtual bool Open(DataStream* stream) = 0;
 	virtual Actor* GetActor(unsigned char is_in_party) = 0;
 	virtual ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const = 0;
 
