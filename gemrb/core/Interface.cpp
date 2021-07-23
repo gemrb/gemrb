@@ -3539,32 +3539,36 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 	}
 
 	//this warning comes only when feedback is enabled
-	if (feedback) {
-		//this was, but that disabled equipping of amber earrings in PST
-		//if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-		if (ret&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-			//don't ruin the return variable, it contains the usable slot bits
-			int flg = 0;
-			if (ret&SLOT_QUIVER) {
-				if (item->GetWeaponHeader(true)) flg = 1;
-			}
+	if (!feedback) {
+		return ret;
+	}
 
-			if (ret&SLOT_WEAPON) {
-				//melee
-				if (item->GetWeaponHeader(false)) flg = 1;
-				//ranged
-				if (item->GetWeaponHeader(true)) flg = 1;
-			}
+	// this was, but that disabled equipping of amber earrings in PST
+	// if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+	if (!(ret & (SLOT_QUIVER | SLOT_WEAPON | SLOT_ITEM))) {
+		return ret;
+	}
 
-			if (ret&SLOT_ITEM) {
-				if (item->GetEquipmentHeaderNumber(0)!=0xffff) flg = 1;
-			}
+	// don't ruin the return variable, it contains the usable slot bits
+	int flg = 0;
+	if (ret & SLOT_QUIVER) {
+		if (item->GetWeaponHeader(true)) flg = 1;
+	}
 
-			if (!flg) {
-				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_WHITE);
-				return 0;
-			}
-		}
+	if (ret & SLOT_WEAPON) {
+		//melee
+		if (item->GetWeaponHeader(false)) flg = 1;
+		//ranged
+		if (!flg && item->GetWeaponHeader(true)) flg = 1;
+	}
+
+	if (ret & SLOT_ITEM) {
+		if (item->GetEquipmentHeaderNumber(0) != 0xffff) flg = 1;
+	}
+
+	if (!flg) {
+		displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_WHITE);
+		return 0;
 	}
 
 	return ret;
@@ -3656,10 +3660,11 @@ bool Interface::StupidityDetector(const char* Pt)
 	do {
 		const char *name = dir.GetName();
 		if (dir.IsDirectory()) {
-			if (name[0] == '.') {
-				if (name[1] == '\0')
+			// since we can't use DirectoryIterator::Hidden, exclude the special dirs manually
+			if (name[0] == '.' && name[1] == '\0') {
 					continue;
-				if (name[1] == '.' && name[2] == '\0')
+			}
+			if (name[0] == '.' && name[1] == '.' && name[2] == '\0') {
 					continue;
 			}
 			print("\n**contains another dir**");
@@ -4601,24 +4606,27 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	ieDword autopause_flags = 0;
 	vars->Lookup("Auto Pause State", autopause_flags);
 
-	if (autopause_flags & (1<<flag)) {
-		if (SetPause(PAUSE_ON, PF_QUIET)) {
-			displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
+	if (!(autopause_flags & (1 << flag))) {
+		return false;
+	}
 
-			ieDword autopause_center = 0;
-			vars->Lookup("Auto Pause Center", autopause_center);
-			if (autopause_center && target) {
-				GameControl* gc = GetGameControl();
-				gc->MoveViewportTo(target->Pos, true);
+	if (!SetPause(PAUSE_ON, PF_QUIET)) {
+		return false;
+	}
 
-				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
-					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
-				}
-			}
-			return true;
+	displaymsg->DisplayConstantString(STR_AP_UNUSABLE + flag, DMC_RED);
+
+	ieDword centerOnAutoPause = 0;
+	vars->Lookup("Auto Pause Center", centerOnAutoPause);
+	if (centerOnAutoPause && target) {
+		GameControl* gc = GetGameControl();
+		gc->MoveViewportTo(target->Pos, true);
+
+		if (target->Type == ST_ACTOR && ((Actor *) target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
+			core->GetGame()->SelectActor((Actor *) target, true, SELECT_REPLACE);
 		}
 	}
-	return false;
+	return true;
 }
 
 void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
