@@ -4294,7 +4294,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (!actor) {
 		return -1;
 	}
-	PluginHolder<ActorMgr> gm = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto gm = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}

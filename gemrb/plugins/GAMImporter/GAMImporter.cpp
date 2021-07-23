@@ -205,7 +205,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	}
 
 	//Loading PCs
-	PluginHolder<ActorMgr> aM = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto aM = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (unsigned int i = 0; i < PCCount; i++) {
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
@@ -622,7 +622,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	}
 	PCOffset = headersize;
 
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (unsigned int i = 0; i < PCCount; i++) {
@@ -1074,7 +1074,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 
 int GAMImporter::PutPCs(DataStream *stream, const Game *game)
 {
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	ieDword CREOffset = PCOffset + PCCount * PCSize;
 
 	for (unsigned int i = 0; i < PCCount; i++) {
@@ -1101,7 +1101,7 @@ int GAMImporter::PutPCs(DataStream *stream, const Game *game)
 
 int GAMImporter::PutNPCs(DataStream *stream, const Game *game)
 {
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	ieDword CREOffset = NPCOffset + NPCCount * PCSize;
 
 	for (unsigned int i = 0; i < NPCCount; i++) {

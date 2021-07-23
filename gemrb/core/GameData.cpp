@@ -95,11 +95,8 @@ void GameData::ClearCaches()
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 {
 	DataStream* ds = GetResource( ResRef, IE_CRE_CLASS_ID );
-	if (!ds)
-		return 0;
-
-	PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
-	if (!actormgr->Open(ds)) {
+	auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, ds);
+	if (!actormgr) {
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
@@ -116,8 +113,8 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin(nPath, core->config.GamePath, "characters", fName, nullptr);
 		stream = FileStream::OpenFile(nPath);
-		PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
-		if (!actormgr->Open(stream)) {
+		auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, stream);
+		if (!actormgr) {
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);

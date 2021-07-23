@@ -1058,7 +1058,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading actors");
 	str->Seek( ActorOffset, GEM_STREAM_START );
 	assert(core->IsAvailable(IE_CRE_CLASS_ID));
-	PluginHolder<ActorMgr> actmgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto actmgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	for (int i = 0; i < ActorCount; i++) {
 		ieVariable defaultName;
 		ResRef creResRef;
@@ -1560,7 +1560,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	ActorCount = (ieWord) map->GetActorCount(false);
 	headersize += ActorCount * 0x110;
 
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	EmbeddedCreOffset = headersize;
 
 	for (unsigned int i = 0; i < ActorCount; i++) {
@@ -2141,7 +2141,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	ieDword CreatureOffset = EmbeddedCreOffset;
 	char filling[120];
 
-	PluginHolder<ActorMgr> am = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		Actor *ac = map->GetActor(i, false);
