@@ -899,9 +899,6 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 /* Loads an area */
 int Game::LoadMap(const char* ResRef, bool loadscreen)
 {
-	int ret = -1;
-	Map *newMap;
-	PluginHolder<MapMgr> mM = MakePluginHolder<MapMgr>(IE_ARE_CLASS_ID);
 	ScriptEngine *sE = core->GetGUIScriptEngine();
 
 	int index = FindMap(ResRef);
@@ -914,24 +911,25 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
 
-	DataStream* ds = nullptr;
 	if (core->saveGameAREExtractor.extractARE(ResRef) != GEM_OK) {
-		goto failedload;
+		core->LoadProgress(100);
+		return GEM_ERROR;
 	}
 
-	ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
-	if (!ds) {
-		goto failedload;
+	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
+	auto mM = GetImporter<MapMgr>(IE_ARE_CLASS_ID, ds);
+	if (!mM) {
+		core->LoadProgress(100);
+		return GEM_ERROR;
 	}
-	if(!mM || !mM->Open(ds)) {
-		goto failedload;
-	}
-	newMap = mM->GetMap(ResRef, IsDay());
+
+	Map *newMap = mM->GetMap(ResRef, IsDay());
 	if (!newMap) {
-		goto failedload;
+		core->LoadProgress(100);
+		return GEM_ERROR;
 	}
 
-	ret = AddMap( newMap );
+	int ret = AddMap( newMap );
 	//spawn creatures on a map already in the game
 	//this feature exists in all blackisle games but not in bioware games
 	if (core->HasFeature(GF_SPAWN_INI)) {
@@ -952,7 +950,6 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
 	}
 
-failedload:
 	core->LoadProgress(100);
 	return ret;
 }

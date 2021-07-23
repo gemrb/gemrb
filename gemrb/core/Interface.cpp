@@ -4260,7 +4260,7 @@ int Interface::SwapoutArea(Map *map)
 		return 0;
 	}
 
-	PluginHolder<MapMgr> mm = MakePluginHolder<MapMgr>(IE_ARE_CLASS_ID);
+	auto mm = GetImporter<MapMgr>(IE_ARE_CLASS_ID);
 	if (mm == nullptr) {
 		return -1;
 	}

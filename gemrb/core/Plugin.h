@@ -93,6 +93,10 @@ class GEM_EXPORT ImporterPlugin final : public Plugin
 {
 	Holder<IMPORTER> importer = MakeHolder<IMPORTER>();
 public:
+	Holder<IMPORTER> GetImporter() const noexcept {
+		return importer;
+	}
+
 	Holder<IMPORTER> GetImporter(DataStream* str) noexcept {
 		if (str == nullptr) {
 			return nullptr;

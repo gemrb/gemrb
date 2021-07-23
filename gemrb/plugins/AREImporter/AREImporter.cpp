@@ -131,22 +131,10 @@ AREImporter::AREImporter(void)
 	EmbeddedCreOffset = AnimOffset = AnimCount = DoorsOffset = DoorsCount = 0;
 	ExploredBitmapSize = ExploredBitmapOffset = 0;
 	LastSave = 0;
-
-	str = NULL;
 }
 
-AREImporter::~AREImporter(void)
+bool AREImporter::Import(DataStream* str)
 {
-	delete str;
-}
-
-bool AREImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 
@@ -477,6 +465,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
+	DataStream* str = GetStream();
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (auto& list : map->SongHeader.SongList) {
@@ -2677,6 +2666,6 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
-PLUGIN_CLASS(IE_ARE_CLASS_ID, AREImporter)
+PLUGIN_CLASS(IE_ARE_CLASS_ID, ImporterPlugin<AREImporter>)
 PLUGIN_CLEANUP(ReleaseMemory)
 END_PLUGIN()
