@@ -3122,7 +3122,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	}
 
 	// These are here because of the goto
-	PluginHolder<SaveGameMgr> gam_mgr = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
+	PluginHolder<SaveGameMgr> gam_mgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gam_str);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 
@@ -3131,9 +3131,6 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 
 	// Load GAM file
 	if (!gam_mgr)
-		goto cleanup;
-
-	if (!gam_mgr->Open(gam_str))
 		goto cleanup;
 
 	new_game = gam_mgr->LoadGame(new Game(), ver_override);
@@ -4324,7 +4321,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 int Interface::WriteGame(const char *folder)
 {
-	PluginHolder<SaveGameMgr> gm = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
+	PluginHolder<SaveGameMgr> gm = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}
