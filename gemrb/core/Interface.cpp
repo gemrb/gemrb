@@ -831,7 +831,7 @@ void Interface::Main()
 	vars->Lookup("Mouse Scroll Speed", speed);
 	SetMouseScrollSpeed((int) speed);
 
-	Font* fps = GetTextFont();
+	const Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn(0, config.Height - 30, 80, 30);
 	wchar_t fpsstring[20] = {L"???.??? fps"};
@@ -898,8 +898,8 @@ int Interface::LoadSprites()
 	}
 
 	Log(MESSAGE, "Core", "Loading Cursors...");
-	AnimationFactory* anim;
-	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
+	const AnimationFactory* anim;
+	anim = (const AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
 	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
@@ -931,7 +931,7 @@ int Interface::LoadSprites()
 	WindowManager::CursorMouseDown = Cursors[1];
 
 	// Load fog-of-war bitmaps
-	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
+	anim = (const AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Fog-Of-War bitmaps...");
 	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
@@ -960,7 +960,7 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (!GroundCircleBam[size].IsEmpty()) {
-			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
+			anim = (const AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
@@ -1256,7 +1256,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	if (value) ToggleLogging(atoi(value));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
-	PluginMgr *plugin = PluginMgr::Get();
+	const PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
 	// search the bundle plugins first
 	// since bundle plugins are loaded first dyld will give them precedence
@@ -2106,7 +2106,7 @@ bool Interface::LoadGemRBINI()
 	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
 
 	if (!tooltipBG.IsEmpty()) {
-		AnimationFactory* anim = (AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
+		const AnimationFactory* anim = (const AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
@@ -2874,8 +2874,8 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
 
-	DataFileMgr* defaults = NULL;
-	DataFileMgr* overrides = NULL;
+	const DataFileMgr* defaults = nullptr;
+	const DataFileMgr* overrides = nullptr;
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
@@ -3857,7 +3857,7 @@ void Interface::SanitizeItem(CREItem *item) const
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
 	if (itm) {
 
 		item->MaxStackAmount = itm->MaxStackAmount;
@@ -4158,7 +4158,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(spellRef);
+	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -4172,7 +4172,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(spellRef);
+	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
