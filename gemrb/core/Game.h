@@ -256,7 +256,7 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< GAMLocationEntry*> savedpositions;
 	std::vector< GAMLocationEntry*> planepositions;
-	std::vector< char*> mastarea;
+	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef> > npclevels;
 	int *bntchnc;
 	int bntrows;
@@ -368,9 +368,9 @@ public:
 	int FindMap(const char *ResRef) const;
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
-	bool MasterArea(const char *area) const;
+	bool MasterArea(const ResRef &area) const;
 	/** Dynamically adding an area to master areas*/
-	void SetMasterArea(const char *area);
+	void SetMasterArea(const ResRef &area);
 	/** Guess the master area of the given area*/
 	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/

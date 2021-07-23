@@ -369,7 +369,7 @@ Map::Map(void)
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
 	version = 0;
-	MasterArea = core->GetGame()->MasterArea(scriptName);
+	MasterArea = core->GetGame()->MasterArea(scriptName.CString());
 	Background = NULL;
 	BgDuration = 0;
 	LastGoCloser = 0;

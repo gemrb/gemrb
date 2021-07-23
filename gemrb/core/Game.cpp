@@ -118,9 +118,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
-			char *tmp = (char *) malloc(9);
-			strnuprcpy(tmp, table->GetRowName(i), 8);
-			mastarea.push_back( tmp );
+			mastarea.push_back(ResRef::MakeUpperCase(table->GetRowName(i)));
 		}
 	}
 
@@ -174,9 +172,6 @@ Game::~Game(void)
 	}
 	for (auto npc : NPCs) {
 		delete npc;
-	}
-	for (auto ma : mastarea) {
-		free(ma);
 	}
 
 	if (crtable) {
@@ -746,10 +741,10 @@ Map *Game::GetMap(const char *areaname, bool change)
 	return area;
 }
 
-bool Game::MasterArea(const char *area) const
+bool Game::MasterArea(const ResRef &area) const
 {
 	for (auto ma : mastarea) {
-		if (!strnicmp(ma, area, 8)) {
+		if (ma == area) {
 			return true;
 		}
 	}
@@ -790,12 +785,10 @@ Map* Game::GetMasterArea(const char *area)
 	return GetMap(prevArea, false);
 }*/
 
-void Game::SetMasterArea(const char *area)
+void Game::SetMasterArea(const ResRef &area)
 {
 	if (MasterArea(area) ) return;
-	char *tmp = (char *) malloc(9);
-	strnlwrcpy (tmp,area,8);
-	mastarea.push_back(tmp);
+	mastarea.push_back(area);
 }
 
 int Game::AddMap(Map* map)

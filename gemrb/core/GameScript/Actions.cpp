@@ -4852,7 +4852,8 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->SetMasterArea(parameters->string0Parameter);
+	ResRef area = ResRef::MakeUpperCase(parameters->string0Parameter);
+	core->GetGame()->SetMasterArea(area);
 }
 
 void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
