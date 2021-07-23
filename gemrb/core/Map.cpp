@@ -1180,7 +1180,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 		if (d->Highlight) {
 			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS && !(d->Flags & DOOR_SECRET)) {
-			d->outlineColor = gamedata->GetColor("DOORTEST");//ColorCyan;
+			d->outlineColor = gamedata->GetColor("ALTDOOR");
 			d->DrawOutline(viewport.origin);
 		} else if (debugFlags & DEBUG_SHOW_DOORS_SECRET && d->Flags & DOOR_FOUND) {
 			d->outlineColor = ColorMagenta;
