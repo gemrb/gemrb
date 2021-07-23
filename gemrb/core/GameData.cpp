@@ -447,14 +447,18 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* ret = GetResource( resname, type, silent );
-		if (ret) {
-			PluginHolder<AnimationMgr> ani = MakePluginHolder<AnimationMgr>(IE_BAM_CLASS_ID);
-			if (!ani)
-				return NULL;
-			if (!ani->Open(ret))
-				return NULL;
-			AnimationFactory* af = ani->GetAnimationFactory(resname);
+		DataStream* str = GetResource(resname, type, silent);
+		if (str) {
+			auto ani = MakeImporterPluginHolder<AnimationMgr>(IE_BAM_CLASS_ID);
+			if (!ani) {
+				delete str;
+				return nullptr;
+			}
+			auto importer = ani->GetImporter(str);
+			
+			if (importer == nullptr)
+				return nullptr;
+			AnimationFactory* af = importer->GetAnimationFactory(resname);
 			factory->AddFactoryObject( af );
 			return af;
 		}
