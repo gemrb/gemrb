@@ -31,7 +31,6 @@
 #include "Item.h"
 #include "Plugin.h"
 #include "TableMgr.h"
-#include "System/DataStream.h"
 
 namespace GemRB {
 
@@ -40,14 +39,13 @@ namespace GemRB {
  * Abstract loader for Item objects
  */
 
-class GEM_EXPORT ItemMgr : public Plugin {
+class GEM_EXPORT ItemMgr : public ImporterBase {
 protected:
 	AutoTable tooltipTable; // tooltips (duh)
 	AutoTable exclusionTable; // a table of items that are mutually exclusive
 	AutoTable dialogTable; // dialogs attached to items (conversables such as Lilarcor)
 public:
 	ItemMgr(void);
-	virtual bool Open(DataStream* stream) = 0;
 	virtual Item* GetItem(Item *s) = 0;
 };
 
