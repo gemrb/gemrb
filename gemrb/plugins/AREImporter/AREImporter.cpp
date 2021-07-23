@@ -1829,7 +1829,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteWord(d->TrapRemovalDiff);
 		stream->WriteWord(d->Trapped);
 		stream->WriteWord(d->TrapDetected);
-		str->WritePoint(d->TrapLaunch);
+		stream->WritePoint(d->TrapLaunch);
 		stream->WriteResRefLC(d->KeyResRef);
 		const GameScript *s = d->Scripts[0];
 		if (s) {
