@@ -33,10 +33,6 @@ public:
 	// Public data members
 	static const TypeID ID;
 public:
-	// Public methods
-	FontManager();
-	~FontManager(void) override;
-
 	virtual Font* GetFont(ieWord pxSize, FontStyle style, bool background)=0;
 };
 

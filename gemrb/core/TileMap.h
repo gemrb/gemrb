@@ -44,11 +44,11 @@ private:
 	std::vector< InfoPoint*> infoPoints;
 	std::vector< TileObject*> tiles;
 public:
-	TileMap(void);
+	TileMap() = default;
 	~TileMap(void);
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
-		int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt);
+				  int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt);
 	//gets door by active region (click target)
 	Door* GetDoor(const Point &position) const;
 	//gets door by activation position (spell target)
@@ -72,7 +72,7 @@ public:
 	int CleanupContainer(Container *container);
 	size_t GetContainerCount() const { return containers.size(); }
 
-	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline);
+	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline);
 	InfoPoint* GetInfoPoint(const Point &position, bool detectable) const;
 	InfoPoint* GetInfoPoint(const char* Name) const;
 	InfoPoint* GetInfoPoint(size_t idx) const;
@@ -90,7 +90,7 @@ public:
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(const Region& screen, bool rain, BlitFlags flags);
-	Size GetMapSize();
+	Size GetMapSize() const;
 public:
 	int XCellCount = 0, YCellCount = 0;
 };

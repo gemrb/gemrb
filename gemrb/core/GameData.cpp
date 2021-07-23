@@ -83,14 +83,12 @@ void GameData::ClearCaches()
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.clear ();
+	colors.clear();
 
 	while (!stores.empty()) {
 		Store *store = stores.begin()->second;
 		stores.erase(stores.begin());
 		delete store;
-	}
-	for (auto& c : colors) {
-		free(const_cast<char*>(c.first));
 	}
 }
 
@@ -116,7 +114,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	if (character) {
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
-		PathJoin( nPath, core->GamePath, "characters", fName, NULL );
+		PathJoin(nPath, core->config.GamePath, "characters", fName, nullptr);
 		stream = FileStream::OpenFile(nPath);
 		PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
 		if (!actormgr->Open(stream)) {
@@ -136,7 +134,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 	}
 
 	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, core->GetGame()->CurrentArea, sizeof(actor->Area) );
+	actor->Area = core->GetGame()->CurrentArea;
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		actor->SetStance( IE_ANI_TWITCH );
 	} else {
@@ -228,9 +226,9 @@ bool GameData::DelTable(unsigned int index)
 		return false;
 	}
 	tables[index].refcount--;
-	if (tables[index].refcount == 0)
-		if (tables[index].tm)
-			tables[index].tm.release();
+	if (tables[index].refcount == 0 && tables[index].tm) {
+		tables[index].tm.release();
+	}
 	return true;
 }
 
@@ -246,20 +244,11 @@ PaletteHolder GameData::GetPalette(const ResRef& resname)
 		return NULL;
 	}
 
-	PaletteHolder palette = new Palette();
+	PaletteHolder palette = MakeHolder<Palette>();
 	im->GetPalette(256,palette->col);
 	palette->named=true;
 	PaletteCache[resname] = palette;
 	return palette;
-}
-
-void GameData::FreePalette(PaletteHolder &pal, const ResRef&)
-{
-	// This was previously much hairier, trying to keep track of two different
-	// palette refcounts.  Now we just rely on Holder/Held to make sure memory
-	// is freed, while not bothering about freeing named palettes from the
-	// map.
-	pal = nullptr;
 }
 
 Item* GameData::GetItem(const ResRef &resname, bool silent)
@@ -280,7 +269,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 
 	item = new Item();
 	//this is required for storing the 'source'
-	strnlwrcpy(item->Name, resname, 8);
+	item->Name = ResRef::MakeLowerCase(resname);
 	sm->GetItem( item );
 
 	ItemCache.SetAt(resname, (void *) item);
@@ -292,7 +281,7 @@ void GameData::FreeItem(Item const *itm, const ResRef &name, bool free)
 {
 	int res;
 
-	res=ItemCache.DecRef((void *) itm, name, free);
+	res = ItemCache.DecRef((const void *) itm, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Item cache encountered (reference count went below zero), Item name is: %.8s\n", name.CString());
 	}
@@ -318,21 +307,19 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 
 	spell = new Spell();
 	//this is required for storing the 'source'
-	strnlwrcpy(spell->Name, resname, 8);
+	spell->Name = ResRef::MakeLowerCase(resname);
 	sm->GetSpell( spell, silent );
 
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
 
-void GameData::FreeSpell(Spell *spl, const ResRef &name, bool free)
+void GameData::FreeSpell(const Spell *spl, const ResRef &name, bool free)
 {
-	int res;
-
-	res=SpellCache.DecRef((void *) spl, name, free);
+	int res = SpellCache.DecRef((const void *) spl, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Spell cache encountered (reference count went below zero), Spell name is: %.8s or %.8s\n",
-			name.CString(), spl->Name);
+			name.CString(), spl->Name.CString());
 	}
 	if (res) return;
 	if (free) delete spl;
@@ -354,7 +341,7 @@ Effect* GameData::GetEffect(const ResRef &resname)
 		return NULL;
 	}
 
-	effect = em->GetEffect(new Effect() );
+	effect = em->GetEffect();
 	if (effect == NULL) {
 		return NULL;
 	}
@@ -363,11 +350,9 @@ Effect* GameData::GetEffect(const ResRef &resname)
 	return effect;
 }
 
-void GameData::FreeEffect(Effect *eff, const ResRef &name, bool free)
+void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
 {
-	int res;
-
-	res=EffectCache.DecRef((void *) eff, name, free);
+	int res = EffectCache.DecRef((const void *) eff, name, free);
 	if (res<0) {
 		error("Core", "Corrupted Effect cache encountered (reference count went below zero), Effect name is: %.8s\n", name.CString());
 	}
@@ -405,7 +390,7 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 	if (Exists( effect, IE_VEF_CLASS_ID, true ) ) {
 		DataStream *ds = GetResource( effect, IE_VEF_CLASS_ID );
 		ret = new VEFObject();
-		ret->ResName = ResRef::MakeLowerCase(effect);
+		ret->ResName = effect;
 		ret->LoadVEF(ds);
 	} else {
 		if (Exists( effect, IE_2DA_CLASS_ID, true ) ) {
@@ -426,7 +411,7 @@ VEFObject* GameData::GetVEFObject(const char *effect, bool doublehint)
 Holder<Sprite2D> GameData::GetBAMSprite(const ResRef &resRef, int cycle, int frame, bool silent)
 {
 	Holder<Sprite2D> tspr;
-	AnimationFactory* af = ( AnimationFactory* )
+	const AnimationFactory* af = (const AnimationFactory *)
 		GetFactoryResource(resRef, IE_BAM_CLASS_ID, silent);
 	if (!af) return 0;
 	if (cycle == -1)
@@ -451,7 +436,7 @@ Holder<Sprite2D> GameData::GetAnySprite(const char *resRef, int cycle, int frame
 
 FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type, bool silent)
 {
-	int fobjindex = factory->IsLoaded(resname,type);
+	int fobjindex = factory->IsLoaded(ResRef(resname), type);
 	// already cached
 	if ( fobjindex != -1)
 		return factory->GetFactoryObject( fobjindex );
@@ -520,9 +505,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return NULL;
 	}
 	
-	strnlwrcpy(store->Name, resRef, 8);
-	// The key needs to last as long as the store,
-	// so use the one we just copied.
+	store->Name = ResRef::MakeLowerCase(resRef);
 	stores[store->Name] = store;
 	return store;
 }
@@ -718,8 +701,8 @@ const Color& GameData::GetColor(const char *row)
 	if (colors.empty()) {
 		AutoTable colorTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
-			ieDword c = strtol(colorTable->QueryField(r, 0), nullptr, 0);
-			colors[strdup(colorTable->GetRowName(r))] = Color(c);
+			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
+			colors[colorTable->GetRowName(r)] = Color(c);
 		}
 	}
 	const auto it = colors.find(row);
@@ -769,6 +752,58 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 		col = weaponStyleAPRBonusMax.w - 1;
 	}
 	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
+}
+
+bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const
+{
+	if (!data.empty()) {
+		data.clear();
+	}
+	AutoTable tm(tableName);
+	if (!tm) {
+		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
+		return false;
+	}
+
+	size_t count = tm->GetRowCount();
+	data.resize(count);
+	for (size_t i = 0; i < count; i++) {
+		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		// * marks an empty resource
+		if (data[i].IsStar()) {
+			data[i].Reset();
+		}
+	}
+	return true;
+}
+
+void GameData::ReadSpellProtTable()
+{
+	AutoTable tab("splprot");
+	if (!tab) {
+		return;
+	}
+	ieDword rowCount = tab->GetRowCount();
+	spellProt.resize(rowCount);
+	for (ieDword i = 0; i < rowCount; i++) {
+		ieDword stat = core->TranslateStat(tab->QueryField(i, 0));
+		spellProt[i].stat = (ieWord) stat;
+		spellProt[i].value = strtounsigned<ieDword>(tab->QueryField(i, 1));
+		spellProt[i].relation = strtounsigned<ieWord>(tab->QueryField(i, 2));
+	}
+}
+
+static const IWDIDSEntry badEntry = {};
+const IWDIDSEntry& GameData::GetSpellProt(index_t idx)
+{
+	if (spellProt.empty()) {
+		ReadSpellProtTable();
+	}
+
+	if (idx >= spellProt.size()) {
+		return badEntry;
+	}
+	return spellProt[idx];
 }
 
 }

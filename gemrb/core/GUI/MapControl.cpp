@@ -140,7 +140,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 
 Region MapControl::GetViewport() const
 {
-	GameControl* gc = core->GetGameControl();
+	const GameControl* gc = core->GetGameControl();
 	Region vp = gc->Viewport();
 	const Size& mapsize = MyMap->GetSize();
 
@@ -175,7 +175,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	video->DrawRect(vp, ColorGreen, false );
 	
 	// Draw PCs' ellipses
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	int i = game->GetPartySize(true);
 	while (i--) {
 		const Actor *actor = game->GetPC(i, true);
@@ -211,7 +211,7 @@ void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 }
 
-void MapControl::ClickHandle(const MouseEvent&)
+void MapControl::ClickHandle(const MouseEvent&) const
 {
 	core->GetDictionary()->SetAt( "MapControlX", notePos.x );
 	core->GetDictionary()->SetAt( "MapControlY", notePos.y );
@@ -290,7 +290,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (val == MAP_VIEW_NOTES) {
 		Point p = ConvertPointFromScreen(me.Pos());
 
-		String* text = NULL;
+		const String* text = nullptr;
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
 			text = mn->text;

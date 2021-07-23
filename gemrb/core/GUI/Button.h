@@ -113,7 +113,7 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
-	Button(Region& frame);
+	explicit Button(Region& frame);
 	~Button() override;
 
 	bool IsAnimated() const override;
@@ -131,7 +131,7 @@ public:
 	/** Clears the list of Pictures */
 	void ClearPictureList();
 	/** Add picture to the end of the list of Pictures */
-	void StackPicture(Holder<Sprite2D> Picture);
+	void StackPicture(const Holder<Sprite2D>& Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, const Region&, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
@@ -197,7 +197,7 @@ private: // Private attributes
 		short mod = 0;
 		bool global = false;
 
-		operator bool() const {
+		explicit operator bool() const {
 			return key != '\0';
 		}
 	} hotKey;

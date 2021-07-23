@@ -41,7 +41,7 @@
 #include "ScriptedAnimation.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMap.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
@@ -56,13 +56,15 @@
 
 #include <cassert>
 #include <limits>
+#include <utility>
+
 
 namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
 // TODO: fix this hardcoded resource reference
-static ResRef PortalResRef = "EF03TPR3";
+static const ResRef PortalResRef = "EF03TPR3";
 static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
 static int MaxVisibility = 30;
@@ -99,14 +101,6 @@ static ieDword oldGameTime = 0;
 static void ReleaseSpawnGroup(void *poi)
 {
 	delete (SpawnGroup *) poi;
-}
-
-Spawn::Spawn() {
-	Creatures = NULL;
-	NextSpawn = Method = sduration = Count = Maximum = Difficulty = 0;
-	DayChance = NightChance = Enabled = Frequency = 0;
-	rwdist = owdist = appearance = 0;
-	Name[0] = 0;
 }
 
 void Map::ReleaseMemory()
@@ -204,7 +198,7 @@ static void InitSpawnGroups()
 
 	AutoTable tab("spawngrp", true);
 
-	Spawns.RemoveAll(NULL);
+	Spawns.RemoveAll(nullptr);
 	Spawns.SetType( GEM_VARIABLES_POINTER );
 
 	if (!tab)
@@ -213,19 +207,20 @@ static void InitSpawnGroups()
 	int i = tab->GetColNamesCount();
 	while (i--) {
 		int j=tab->GetRowCount();
+		std::vector<ResRef> resrefs(j);
 		while (j--) {
 			const char *crename = tab->QueryField( j,i );
-			if (strcmp(crename, tab->QueryDefault())) break;
+			if (strcmp(crename, tab->QueryDefault()) != 0) break;
 		}
 		if (j>0) {
-			SpawnGroup *creatures = new SpawnGroup(j);
 			//difficulty
-			creatures->Level = (ieDword) atoi( tab->QueryField(0,i) );
+			int level = atoi(tab->QueryField(0, i));
 			for (;j;j--) {
-				creatures->ResRefs[j-1] = ResRef::MakeLowerCase(tab->QueryField(j, i));
+				resrefs[j - 1] = tab->QueryField(j, i);
 			}
+			SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
 			GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
-			Spawns.SetAt( GroupName, (void*) creatures );
+			Spawns.SetAt( GroupName, creatures);
 		}
 	}
 }
@@ -261,7 +256,7 @@ static void InitPathFinder()
 		while(rc--) {
 			terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
 			for(int i = 0; i<16;i++) {
-				terrainsounds[rc].Sounds[i] = ResRef::MakeUpperCase(tm->QueryField(rc+2, i));
+				terrainsounds[rc].Sounds[i] = tm->QueryField(rc + 2, i);
 			}
 		}
 	}
@@ -419,12 +414,11 @@ Map::~Map(void)
 	for (auto spawn : spawns) {
 		delete spawn;
 	}
-	delete LightMap;
 	delete HeightMap;
 
-	for (int i = 0; i < QUEUE_COUNT; i++) {
-		free(queue[i]);
-		queue[i] = NULL;
+	for (auto& q : queue) {
+		free(q);
+		q = nullptr;
 	}
 
 	for (auto projectile : projectiles) {
@@ -454,23 +448,21 @@ Map::~Map(void)
 	free( VisibleBitmap );
 }
 
-void Map::ChangeTileMap(Image* lm, Holder<Sprite2D> sm)
+void Map::ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm)
 {
-	delete LightMap;
-
-	LightMap = lm;
-	SmallMap = sm;
+	LightMap = std::move(lm);
+	SmallMap = std::move(sm);
 
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, Image* lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
+void Map::AddTileMap(TileMap* tm, Holder<Sprite2D> lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm;
 	HeightMap = hm;
-	SmallMap = sm;
+	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
 	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
 	Size size = sr->GetSize();
@@ -510,7 +502,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 
 		const WMPAreaEntry* entry = core->GetWorldMap()->FindNearestEntry(area, index);
 		if (entry) {
-			memcpy (game->PreviousArea, entry->AreaName, 8);
+			game->PreviousArea = entry->AreaName;
 		}
 
 		//perform autosave
@@ -691,7 +683,7 @@ void Map::UpdateScripts()
 	// to work ok anyway in my testing - if you change it you probably
 	// also want to change the actor updating code below so it doesn't
 	// add new actions while we are trying to get rid of the area!)
-	if (!has_pcs && !(MasterArea && actors.size()) /*&& !CanFree()*/) {
+	if (!has_pcs && !(MasterArea && !actors.empty()) /*&& !CanFree()*/) {
 		return;
 	}
 
@@ -875,12 +867,12 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-void Map::ResolveTerrainSound(ieResRef &sound, const Point &Pos) const
+void Map::ResolveTerrainSound(ResRef &sound, const Point &Pos) const
 {
 	for(int i=0;i<tsndcount;i++) {
-		if (!memcmp(sound, terrainsounds[i].Group, sizeof(ieResRef) ) ) {
+		if (sound == terrainsounds[i].Group) {
 			int type = MaterialMap[Pos.x/16 + Pos.y/12 * mapSize.w];
-			memcpy(sound, terrainsounds[i].Sounds[type], sizeof(ieResRef) );
+			sound = terrainsounds[i].Sounds[type];
 			return;
 		}
 	}
@@ -1006,11 +998,11 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 		}
 	}
 	
-	auto IsExplored = [=](int x, int y) {
+	auto IsExplored = [=, &explored_mask](int x, int y) {
 		return FogTileUncovered(Point(x, y), explored_mask);
 	};
 	
-	auto IsVisible = [=](int x, int y) {
+	auto IsVisible = [=, &visible_mask](int x, int y) {
 		return FogTileUncovered(Point(x, y), visible_mask);
 	};
 	
@@ -1159,7 +1151,7 @@ void Map::DrawHighlightables(const Region& viewport) const
 	unsigned int i = 0;
 	Container *c;
 	while ((c = TMap->GetContainer(i++)) != NULL) {
-		if (c->Type != IE_CONTAINER_PILE) {
+		if (c->containerType != IE_CONTAINER_PILE) {
 			// don't highlight containers behind closed doors
 			// how's ar9103 chest has a Pos outside itself, so we check the bounding box instead
 			// FIXME: inefficient, check for overlap in AREImporter and only recheck here if a flag was set
@@ -1209,7 +1201,7 @@ Container *Map::GetNextPile(int &index) const
 	Container *c = TMap->GetContainer(index++);
 
 	while (c) {
-		if (c->Type == IE_CONTAINER_PILE) {
+		if (c->containerType == IE_CONTAINER_PILE) {
 			return c;
 		}
 		c = TMap->GetContainer(index++);
@@ -1703,8 +1695,8 @@ void Map::SetDrawingStencilForObject(const void* object, const Region& objectRgn
 	Video* video = core->GetVideoDriver();
 	Color debugColor = ColorGray;
 	
-	const bool behindWall = walls.first.size();
-	const bool inFrontOfWall = walls.second.size();
+	const bool behindWall = !walls.first.empty();
+	const bool inFrontOfWall = !walls.second.empty();
 
 	if (behindWall && inFrontOfWall) {
 		// we need a custom stencil if both behind and in front of a wall
@@ -1768,7 +1760,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	
 	const Region& bbox = scriptable->DrawingRegion();
 	if (bbox.IntersectsRegion(vp) == false) {
-		return BlitFlags::NONE;;
+		return BlitFlags::NONE;
 	}
 	
 	WallPolygonSet walls = WallsIntersectingRegion(bbox, false, &scriptable->Pos);
@@ -1776,7 +1768,7 @@ BlitFlags Map::SetDrawingStencilForScriptable(const Scriptable* scriptable, cons
 	
 	// check this after SetDrawingStencilForObject for debug drawing purposes
 	if (walls.first.empty()) {
-		return BlitFlags::NONE;; // not behind a wall, no stencil required
+		return BlitFlags::NONE; // not behind a wall, no stencil required
 	}
 	
 	ieDword always_dither;
@@ -1887,7 +1879,7 @@ void Map::DrawSearchMap(const Region &vp) const
 }
 
 //adding animation in order, based on its height parameter
-void Map::AddAnimation(AreaAnimation* panim)
+void Map::AddAnimation(const AreaAnimation* panim)
 {
 	//copy external memory to core memory for msvc's sake
 	AreaAnimation *anim = new AreaAnimation(panim);
@@ -2013,17 +2005,17 @@ void Map::InitActors()
 		actor->SetMap(this);
 		// make sure to bump away in case someone or something is already there
 		actor->SetPosition(actor->Pos, 1);
-		InitActor(actor);
+		MarkVisited(actor);
 	}
 }
 
-void Map::InitActor(const Actor *actor)
+void Map::MarkVisited(const Actor *actor) const
 {
 	if (actor->InParty && core->HasFeature(GF_AREA_VISITED_VAR)) {
 		char key[32];
-		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName);
+		const size_t len = snprintf(key, sizeof(key),"%s_visited", scriptName.CString());
 		if (len > sizeof(key)) {
-			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName);
+			Log(ERROR, "Map", "Area %s has a too long script name for generating _visited globals!", scriptName.CString());
 		}
 		core->GetGame()->locals->SetAt(key, 1);
 	}
@@ -2032,13 +2024,13 @@ void Map::InitActor(const Actor *actor)
 void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
-	strnlwrcpy(actor->Area, scriptName, 8);
+	actor->Area = ResRef::MakeLowerCase(scriptName);
 	if (!HasActor(actor)) {
 		actors.push_back( actor );
 	}
 	if (init) {
 		actor->SetMap(this);
-		InitActor(actor);
+		MarkVisited(actor);
 	}
 }
 
@@ -2071,7 +2063,7 @@ void Map::DeleteActor(int i)
 		ClearSearchMapFor( actor );
 		//remove the area reference from the actor
 		actor->SetMap(NULL);
-		CopyResRef(actor->Area, "");
+		actor->Area.Reset();
 		objectStencils.erase(actor);
 		//don't destroy the object in case it is a persistent object
 		//otherwise there is a dead reference causing a crash on save
@@ -2154,14 +2146,14 @@ InfoPoint *Map::GetInfoPointByGlobalID(ieDword objectID) const
 Actor* Map::GetActorByGlobalID(ieDword objectID) const
 {
 	if (!objectID) {
-		return NULL;
+		return nullptr;
 	}
-	for (auto actor : actors) {
+	for (const auto& actor : actors) {
 		if (actor->GetGlobalID()==objectID) {
 			return actor;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /** flags:
@@ -2381,7 +2373,7 @@ Scriptable *Map::GetActorByDialog(const ResRef &resref) const
 // currently only looks at the party, since it is enough for the only known user
 // relies on an override item we create, with the resref matching the dialog one!
 // currently only handles dmhead, since no other users have been found yet (to avoid checking whole inventory)
-Scriptable *Map::GetItemByDialog(const ResRef &resref) const
+Actor *Map::GetItemByDialog(const ResRef &resref) const
 {
 	const Game *game = core->GetGame();
 	// choose the owner of the dialog via passed dialog ref
@@ -2415,7 +2407,7 @@ Scriptable *Map::GetItemByDialog(const ResRef &resref) const
 
 		return surrogate;
 	}
-	return NULL;
+	return nullptr;
 }
 
 //this function finds an actor by its original resref (not correct yet)
@@ -2676,7 +2668,7 @@ void Map::DrawStencil(const VideoBufferPtr& stencilBuffer, const Region& vp, con
 bool Map::BehindWall(const Point& pos, const Region& r) const
 {
 	const auto& polys = WallsIntersectingRegion(r, false, &pos);
-	return polys.first.size();
+	return !polys.first.empty();
 }
 
 //this function determines actor drawing order
@@ -2859,19 +2851,13 @@ AreaAnimation *Map::GetAnimation(const char *Name) const
 	return NULL;
 }
 
-Spawn *Map::AddSpawn(char* Name, const Point &p, ResRef *creatures, unsigned int count)
+Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
 	strnspccpy(sp->Name, Name, 32);
-	if (count>MAX_RESCOUNT) {
-		count=MAX_RESCOUNT;
-	}
+	
 	sp->Pos = p;
-	sp->Count = count;
-	sp->Creatures = new ResRef[count];
-	for( unsigned int i=0;i<count;i++) {
-		sp->Creatures[i] = creatures[i];
-	}
+	sp->Creatures = std::move(creatures);
 	spawns.push_back( sp );
 	return sp;
 }
@@ -2914,7 +2900,7 @@ void Map::RemoveActor(Actor* actor)
 			actor->ClearPath(true);
 			ClearSearchMapFor(actor);
 			actor->SetMap(NULL);
-			CopyResRef(actor->Area, "");
+			actor->Area.Reset();
 			actors.erase( actors.begin()+i );
 			return;
 		}
@@ -2948,13 +2934,13 @@ bool Map::CanFree()
 void Map::dump(bool show_actors) const
 {
 	StringBuffer buffer;
-	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName );
+	buffer.appendFormatted( "Debugdump of Area %s:\n", scriptName.CString());
 	buffer.append("Scripts:");
 
-	for (size_t i = 0; i < MAX_SCRIPTS; i++) {
+	for (const auto script : Scripts) {
 		const char* poi = "<none>";
-		if (Scripts[i]) {
-			poi = Scripts[i]->GetName();
+		if (script) {
+			poi = script->GetName();
 		}
 		buffer.appendFormatted( " %.8s", poi );
 	}
@@ -2969,7 +2955,7 @@ void Map::dump(bool show_actors) const
 
 	if (show_actors) {
 		buffer.append("\n");
-		for (auto actor : actors) {
+		for (const auto actor : actors) {
 			if (actor->ValidTarget(GA_NO_DEAD|GA_NO_UNSCHEDULED)) {
 				buffer.appendFormatted("Actor: %s (%d %s) at %d.%d\n", actor->GetName(1), actor->GetGlobalID(), actor->GetScriptName(), actor->Pos.x, actor->Pos.y);
 			}
@@ -3180,12 +3166,11 @@ const MapNote* Map::MapNoteAtPoint(const Point& point, unsigned int radius) cons
 //--------spawning------------------
 void Map::LoadIniSpawn()
 {
-	INISpawn = new IniSpawn(this);
 	if (core->HasFeature(GF_RESDATA_INI)) {
 		// 85 cases where we'd miss the ini and 1 where we'd use the wrong one
-		INISpawn->InitSpawn(scriptName);
+		INISpawn = new IniSpawn(this, ResRef(scriptName));
 	} else {
-		INISpawn->InitSpawn(WEDResRef);
+		INISpawn = new IniSpawn(this, WEDResRef);
 	}
 }
 
@@ -3196,19 +3181,19 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
-	int count = 1;
+	size_t count = 1;
 
 	if (Spawns.Lookup(creResRef, lookup)) {
 		sg = (SpawnGroup *) lookup;
-		if (first || (level >= (int) sg->Level)) {
-			count = sg->Count;
+		if (first || (level >= sg->Level())) {
+			count = sg->Count();
 		} else {
 			count = 0;
 		}
 	}
 
 	while (count--) {
-		Actor *creature = gamedata->GetCreature(sg ? sg->ResRefs[count].CString() : creResRef);
+		Actor *creature = gamedata->GetCreature(sg ? (*sg)[count].CString() : creResRef);
 		if (creature) {
 			// ensure a minimum power level, since many creatures have this as 0
 			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
@@ -3230,7 +3215,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	}
 
 	if (spawned && sg && difficulty) {
-		*difficulty -= sg->Level;
+		*difficulty -= sg->Level();
 	}
 		
 	return spawned;
@@ -3264,12 +3249,13 @@ void Map::TriggerSpawn(Spawn *spawn)
 	}
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
-	unsigned int spawncount = 0, i = RAND(0u, spawn->Count-1);
+	unsigned int spawncount = 0;
+	size_t i = RAND(0LU, spawn->Creatures.size() - 1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;
 		}
-		if (++i >= spawn->Count) {
+		if (++i >= spawn->Creatures.size()) {
 			i = 0;
 		}
 		
@@ -3364,7 +3350,7 @@ int Map::GetExploredMapSize() const
 	return (fogSize.w * fogSize.h + 7) / 8;
 }
 
-void Map::FillExplored(bool explored)
+void Map::FillExplored(bool explored) const
 {
 	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), explored ? 0xff : 0x00);
 }
@@ -3425,10 +3411,9 @@ void Map::UpdateFog()
 {
 	std::fill(VisibleBitmap, VisibleBitmap + GetExploredMapSize(), 0);
 	
-	for (size_t i = 0; i < actors.size(); i++) {
-		const Actor *actor = actors[i];
-		if (!actor->Modified[ IE_EXPLORE ] ) continue;
-		
+	for (const auto actor : actors) {
+		if (!actor->Modified[IE_EXPLORE]) continue;
+
 		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
 		
@@ -3530,7 +3515,7 @@ void Map::CopyGroundPiles(Map *othermap, const Point &Pos) const
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE) {
+		if (c->containerType == IE_CONTAINER_PILE) {
 			//creating (or grabbing) the container in the other map at the given position
 			Container *othercontainer;
 			if (Pos.IsInvalid()) {
@@ -3554,7 +3539,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 	unsigned int i = donorPile->inventory.GetSlotCount();
 	while (i--) {
 		CREItem *item = donorPile->RemoveItem(i, 0);
-		int count = pile->inventory.CountItems(item->ItemResRef, 0);
+		int count = pile->inventory.CountItems(item->ItemResRef, false);
 		if (count == 0) {
 			pile->AddItem(item);
 			continue;
@@ -3566,7 +3551,7 @@ static void MergePiles(Container *donorPile, Container *pile)
 			int slot = pile->inventory.FindItem(item->ItemResRef, 0, --count);
 			if (slot == -1) {
 				// probably an inventory bug, shouldn't happen
-				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef);
+				Log(DEBUG, "Map", "MoveVisibleGroundPiles found unaccessible pile item: %s", item->ItemResRef.CString());
 				skipped--;
 				continue;
 			}
@@ -3600,7 +3585,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
-		if (c->Type==IE_CONTAINER_PILE && IsExplored(c->Pos)) {
+		if (c->containerType == IE_CONTAINER_PILE && IsExplored(c->Pos)) {
 			//transfer the pile to the other container
 			MergePiles(c, othercontainer);
 		}
@@ -3616,7 +3601,7 @@ void Map::MoveVisibleGroundPiles(const Point &Pos)
 	// sort by removing all items that have copies and readding them at the end
 	while (i--) {
 		const CREItem *item = othercontainer->inventory.GetSlotItem(i);
-		int count = othercontainer->inventory.CountItems(item->ItemResRef, 0);
+		int count = othercontainer->inventory.CountItems(item->ItemResRef, false);
 		if (count == 1) continue;
 
 		while (count) {
@@ -3657,11 +3642,11 @@ void Map::AddItemToLocation(const Point &position, CREItem *item)
 }
 
 Container* Map::AddContainer(const char* Name, unsigned short Type,
-							 std::shared_ptr<Gem_Polygon> outline)
+							 const std::shared_ptr<Gem_Polygon>& outline)
 {
 	Container* c = new Container();
 	c->SetScriptName( Name );
-	c->Type = Type;
+	c->containerType = Type;
 	c->outline = outline;
 	c->SetMap(this);
 	if (outline) {
@@ -3899,7 +3884,7 @@ AreaAnimation::~AreaAnimation()
 	free(animation);
 }
 
-Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
+Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle) const
 {
 	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
 	if (!anim)
@@ -3911,10 +3896,9 @@ Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle)
 	//this will make the animation stop when the game is stopped
 	//a possible gemrb feature to have this flag settable in .are
 	anim->gameAnimation = true;
-	anim->SetPos(frame); // sanity check it first
+	anim->SetFrame(frame); // sanity check it first
 	anim->Flags = Flags;
-	anim->x = Pos.x;
-	anim->y = Pos.y;
+	anim->pos = Pos;
 	if (anim->Flags&A_ANI_MIRROR) {
 		anim->MirrorAnimation();
 	}
@@ -3959,7 +3943,6 @@ void AreaAnimation::InitAnimation()
 void AreaAnimation::SetPalette(const ResRef &pal)
 {
 	Flags |= A_ANI_PALETTE;
-	gamedata->FreePalette(palette, PaletteRef);
 	PaletteRef = pal;
 	palette = gamedata->GetPalette(PaletteRef);
 	if (Flags&A_ANI_BLEND) {
@@ -4050,7 +4033,7 @@ bool Map::ChangeMap(bool day_or_night)
 	//it loads the lightmap and the minimap too, besides swapping the tileset
 	if (!mM->ChangeMap(this, day_or_night) && !day_or_night) {
 		Log(WARNING, "Map", "Invalid night lightmap, falling back to day lightmap.");
-		mM->ChangeMap(this, 1);
+		mM->ChangeMap(this, true);
 		DayNight = day_or_night;
 	}
 	return true;
@@ -4080,20 +4063,20 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 	}
 }
 
-PathMapFlags Map::GetInternalSearchMap(int x, int y) const
+PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 {
-	if (x >= mapSize.w || y >= mapSize.h) {
+	if (p.x >= mapSize.w || p.y >= mapSize.h) {
 		return PathMapFlags::UNMARKED;
 	}
-	return SrchMap[x + y * mapSize.w];
+	return SrchMap[p.x + p.y * mapSize.w];
 }
 
-void Map::SetInternalSearchMap(int x, int y, PathMapFlags value)
+void Map::SetInternalSearchMap(const Point& p, PathMapFlags value)
 {
-	if (x >= mapSize.w || y >= mapSize.h) {
+	if (p.x >= mapSize.w || p.y >= mapSize.h) {
 		return;
 	}
-	SrchMap[x + y * mapSize.w] = value;
+	SrchMap[p.x + p.y * mapSize.w] = value;
 }
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)

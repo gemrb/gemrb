@@ -30,38 +30,25 @@
 #include "Plugin.h"
 #include "System/String.h"
 
+#include <cstdarg>
+
 namespace GemRB {
 
 /** Resource reference */
-/* !!!!!!!!!!!!!!!!!!!!!!!!!!!
- This type is deprecated
- Use the ResRef class wrapper
-!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-typedef char ieResRef[9];
-
-// safely copies a ResRef (ie. nulls out the unused buffer size)
-inline void CopyResRef(ieResRef& d, const ieResRef s)
-{
-	strncpy(d, s, sizeof(ieResRef) - 1);
-	d[sizeof(ieResRef) - 1] = '\0';
-}
-
 class DataStream;
 
-/* Hopefully we can slowly replace the char array version with this struct... */
-struct ResRef {
-private:
+class ResRef {
 	char ref[9] = {'\0'};
 public:
 	ResRef() = default;
+	
+	ResRef(std::nullptr_t) = delete;
 
 	ResRef(const char* str) {
 		operator=(str);
 	};
 
-	ResRef(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-	}
+	ResRef(const ResRef& rhs) = default;
 	
 	void Reset() {
 		memset(ref, 0, sizeof(ref));
@@ -71,29 +58,34 @@ public:
 	// in some cases we need lower/upper case for save compatibility with originals
 	// so we provide factories the create ResRef with the required case
 	static ResRef MakeLowerCase(const char* str) {
-		ieResRef ref;
+		if (!str) return ResRef();
+
+		char ref[9];
 		strnlwrcpy(ref, str, sizeof(ref) - 1);
 		return ref;
 	}
 	
 	static ResRef MakeUpperCase(const char* str) {
-		ieResRef ref;
+		if (!str) return ResRef();
+
+		char ref[9];
 		strnuprcpy(ref, str, sizeof(ref) - 1);
 		return ref;
 	}
 
-	ResRef& operator=(const ResRef& rhs) {
-		std::copy(std::begin(rhs.ref), std::end(rhs.ref), std::begin(ref));
-		return *this;
+	void SNPrintF(const char* format, ...) {
+		va_list args;
+		va_start(args, format);
+		vsnprintf(ref, sizeof(ref), format, args);
+		va_end(args);
 	}
+
+	ResRef& operator=(const ResRef& rhs) = default;
 	
 	ResRef& operator=(const char* str) {
 		if (str == NULL) {
 			Reset();
 		} else {
-			// using strnlwrcpy: this wrapper is case insensitive,
-			// but many older functions (taking ieResRef) will "convert" it to a cstring where it is no longer proper case
-			// typically this shouldnt matter, but some older code was lowercasing their ieResRefs
 			strncpy(ref, str, sizeof(ref) - 1);
 			ref[sizeof(ref)-1] = '\0';
 		}
@@ -109,6 +101,10 @@ public:
 
 	bool IsEmpty() const {
 		return (ref[0] == '\0');
+	}
+
+	bool IsStar() const {
+		return (ref[0] == '*');
 	}
 
 	const char* CString() const { return ref; }
@@ -132,6 +128,10 @@ public:
 
 	bool operator==(const char* str) const {
 		return strnicmp(ref, str, sizeof(ref)-1) == 0;
+	};
+
+	bool operator!=(const char* str) const {
+		return !operator==(str);
 	};
 };
 

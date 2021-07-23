@@ -31,13 +31,6 @@
 #include <cstdio>
 #include <vector>
 
-// absent from msvc6
-#ifdef _MSC_VER
-#ifndef __FUNCTION__
-#define __FUNCTION__ "no message"
-#endif
-#endif
-
 namespace GemRB {
 
 class Action;
@@ -269,10 +262,10 @@ class GEM_EXPORT Condition : protected Canary {
 public:
 	~Condition()
 	{
-		for (size_t c = 0; c < triggers.size(); ++c) {
-			if (triggers[c]) {
-				triggers[c]->Release();
-				triggers[c] = NULL;
+		for (auto& trigger : triggers) {
+			if (trigger) {
+				trigger->Release();
+				trigger = nullptr;
 			}
 		}
 	}
@@ -287,7 +280,7 @@ public:
 
 class GEM_EXPORT Action : protected Canary {
 public:
-	Action(bool autoFree)
+	explicit Action(bool autoFree)
 	{
 		actionID = 0;
 		objects[0] = NULL;
@@ -309,10 +302,10 @@ public:
 	}
 	~Action()
 	{
-		for (int c = 0; c < 3; c++) {
-			if (objects[c]) {
-				objects[c]->Release();
-				objects[c] = NULL;
+		for (auto& object : objects) {
+			if (object) {
+				object->Release();
+				object = nullptr;
 			}
 		}
 	}
@@ -329,7 +322,7 @@ public:
 private:
 	int RefCount;
 public:
-	int GetRef() {
+	int GetRef() const {
 		return RefCount;
 	}
 
@@ -338,7 +331,7 @@ public:
 
 	void Release()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		if (!RefCount) {
 			error("GameScript", "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
 				__LINE__);
@@ -350,7 +343,7 @@ public:
 	}
 	void IncRef()
 	{
-		AssertCanary(__FUNCTION__);
+		AssertCanary(__func__);
 		RefCount++;
 		if (RefCount >= 65536) {
 			error("GameScript", "Refcount increased to: %d in action %d\n", RefCount,
@@ -367,13 +360,13 @@ public:
 	}
 	~Response()
 	{
-		for (size_t c = 0; c < actions.size(); c++) {
-			if (actions[c]) {
-				if (actions[c]->GetRef()>2) {
-					print("Residue action %d with refcount %d", actions[c]->actionID, actions[c]->GetRef());
+		for (auto& action : actions) {
+			if (action) {
+				if (action->GetRef() > 2) {
+					print("Residue action %d with refcount %d", action->actionID, action->GetRef());
 				}
-				actions[c]->Release();
-				actions[c] = NULL;
+				action->Release();
+				action = nullptr;
 			}
 		}
 	}
@@ -391,9 +384,9 @@ class GEM_EXPORT ResponseSet : protected Canary {
 public:
 	~ResponseSet()
 	{
-		for (size_t b = 0; b < responses.size(); b++) {
-			responses[b]->Release();
-			responses[b] = NULL;
+		for (auto& response : responses) {
+			response->Release();
+			response = nullptr;
 		}
 	}
 	void Release()
@@ -436,10 +429,10 @@ class GEM_EXPORT Script : protected Canary {
 public:
 	~Script()
 	{
-		for (unsigned int i = 0; i < responseBlocks.size(); i++) {
-			if (responseBlocks[i]) {
-				responseBlocks[i]->Release();
-				responseBlocks[i] = NULL;
+		for (auto& responseBlock : responseBlocks) {
+			if (responseBlock) {
+				responseBlock->Release();
+				responseBlock = nullptr;
 			}
 		}
 	}
@@ -542,14 +535,14 @@ extern int RandomNumValue;
 
 class GEM_EXPORT GameScript {
 public:
-	GameScript(const ieResRef ResRef, Scriptable* Myself,
+	GameScript(const ResRef& ResRef, Scriptable* Myself,
 		int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 
 	bool dead = false;      // Script replaced itself with another and should be deleted when done running
 	bool running = false;   // Script is currently running so defer any deletion to caller
 
-	const char *GetName() const { return Name; }
+	ResRef GetName() const { return Name; }
 	static void ExecuteString(Scriptable* Sender, const char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
@@ -557,7 +550,7 @@ public:
 	bool Update(bool *continuing = NULL, bool *done = NULL);
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(ieResRef ResRef, bool AIScript);
+	Script* CacheScript(const ResRef& ResRef, bool AIScript);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
@@ -566,9 +559,9 @@ private: //Internal Functions
 
 	// Internal variables
 	Scriptable* const MySelf;
-	ieResRef Name;
+	ResRef Name;
 	Script* script;
-	unsigned int lastAction;
+	size_t lastAction = -1;
 	int scriptlevel;
 public: //Script Functions
 	static int ID_Alignment(const Actor *actor, int parameter);

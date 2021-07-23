@@ -30,7 +30,7 @@ namespace GemRB {
 
 class GEM_EXPORT Tile {
 public:
-	Tile(Animation* anim, Animation* sec = NULL);
+	explicit Tile(Animation* anim, Animation* sec = nullptr);
 	~Tile(void);
 	unsigned char tileIndex;
 	unsigned char om;

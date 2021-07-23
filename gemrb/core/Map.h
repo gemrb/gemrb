@@ -43,7 +43,6 @@ class AnimationFactory;
 class Bitmap;
 class CREItem;
 class GameControl;
-class Image;
 class IniSpawn;
 class MapReverb;
 class Palette;
@@ -213,7 +212,7 @@ public:
 			free(mbstring);
 		} else {
 			strref = core->UpdateString(-1, "?");
-			Log(WARNING, "Map", "Failed to update string from map note, possibly an enconding issue.");
+			Log(WARNING, "Map", "Failed to update string from map note, possibly an encoding issue.");
 		}
 	}
 
@@ -247,25 +246,22 @@ public:
 
 class Spawn {
 public:
-	ieVariable Name;
+	ieVariable Name {};
 	Point Pos;
-	ResRef *Creatures;
-	unsigned int Count;
-	ieWord Difficulty;
-	ieWord Frequency;
-	ieWord Method;
-	ieDword sduration;      //spawn duration
-	ieWord rwdist, owdist;  //maximum walk distances
-	ieWord Maximum;
-	ieWord Enabled;
-	ieDword appearance;
-	ieWord DayChance;
-	ieWord NightChance;
-	ieDword NextSpawn;
+	std::vector<ResRef> Creatures;
+	ieWord Difficulty = 0;
+	ieWord Frequency = 0;
+	ieWord Method = 0;
+	ieDword sduration = 0;      //spawn duration
+	ieWord rwdist = 0;
+	ieWord owdist = 0;  //maximum walk distances
+	ieWord Maximum = 0;
+	ieWord Enabled = 0;
+	ieDword appearance = 0;
+	ieWord DayChance = 0;
+	ieWord NightChance = 0;
+	ieDword NextSpawn = 0;
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
-	Spawn();
-	~Spawn() { delete[] Creatures; }
-	unsigned int GetCreatureCount() const { return Count; }
 };
 
 class TerrainSounds {
@@ -275,20 +271,23 @@ public:
 };
 
 class SpawnGroup {
+	std::vector<ResRef> ResRefs;
+	int level;
 public:
-	ResRef *ResRefs;
-	unsigned int Count;
-	unsigned int Level;
-
-	SpawnGroup(unsigned int size) {
-		ResRefs = new ResRef[size];
-		Count = size;
-		Level = 0;
+	SpawnGroup(std::vector<ResRef>&& resrefs, int level) noexcept
+	: ResRefs(std::move(resrefs)), level(level)
+	{}
+	
+	size_t Count() const noexcept {
+		return ResRefs.size();
 	}
-	~SpawnGroup() {
-		if (ResRefs) {
-			delete[] ResRefs;
-		}
+	
+	int Level() const noexcept {
+		return level;
+	}
+	
+	const ResRef& operator[](size_t i) const {
+		return ResRefs[i];
 	}
 };
 
@@ -320,7 +319,7 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
-	AreaAnimation(const AreaAnimation *src);
+	explicit AreaAnimation(const AreaAnimation *src);
 	~AreaAnimation();
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);
@@ -330,7 +329,7 @@ public:
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
 	int GetHeight() const;
 private:
-	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle);
+	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle) const;
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
@@ -369,7 +368,7 @@ typedef std::list<Particles*>::const_iterator spaIterator;
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
-	Image* LightMap;
+	Holder<Sprite2D> LightMap;
 	Bitmap* HeightMap;
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
@@ -427,18 +426,18 @@ public:
 	static Point ConvertCoordFromTile(const Point&);
 
 	/** prints useful information on console */
-	void dump(bool show_actors=0) const;
+	void dump(bool show_actors = false) const;
 	TileMap *GetTileMap() const { return TMap; }
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
 	/* low level function to perform the daylight changes */
-	void ChangeTileMap(Image *lm, Holder<Sprite2D> sm);
+	void ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm);
 	/* sets all the auxiliary maps and the tileset */
-	void AddTileMap(TileMap *tm, Image *lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
+	void AddTileMap(TileMap *tm, Holder<Sprite2D> lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
 	void AutoLockDoors() const;
 	void UpdateScripts();
-	void ResolveTerrainSound(ieResRef &sound, const Point &pos) const;
+	void ResolveTerrainSound(ResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
@@ -450,7 +449,7 @@ public:
 
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
-	void AddAnimation(AreaAnimation* anim);
+	void AddAnimation(const AreaAnimation* anim);
 	aniIterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
@@ -471,7 +470,7 @@ public:
 	void ActorSpottedByPlayer(const Actor *actor) const;
 	bool HandleAutopauseForVisible(Actor *actor, bool) const;
 	void InitActors();
-	void InitActor(const Actor *actor);
+	void MarkVisited(const Actor *actor) const;
 	void AddActor(Actor* actor, bool init);
 	//counts the summons already in the area
 	int CountSummons(ieDword flag, ieDword sex) const;
@@ -494,7 +493,7 @@ public:
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
 	Scriptable *GetActorByDialog(const ResRef& resref) const;
-	Scriptable *GetItemByDialog(const ResRef& resref) const;
+	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const char *resref) const;
 	Actor *GetActorByScriptName(const char *name) const;
 	bool HasActor(const Actor *actor) const;
@@ -546,7 +545,7 @@ public:
 	//containers
 	/* this function returns/creates a pile container at position */
 	Container* AddContainer(const char* Name, unsigned short Type,
-							std::shared_ptr<Gem_Polygon> outline);
+							const std::shared_ptr<Gem_Polygon>& outline);
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);
 
@@ -554,7 +553,7 @@ public:
 	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
 	int GetExploredMapSize() const;
-	void FillExplored(bool explored);
+	void FillExplored(bool explored) const;
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */
@@ -613,7 +612,7 @@ public:
 
 	//spawns
 	void LoadIniSpawn();
-	Spawn *AddSpawn(char* Name, const Point &, ResRef *creatures, unsigned int count);
+	Spawn *AddSpawn(const char* Name, const Point &, std::vector<ResRef>&& creatures);
 	Spawn *GetSpawn(int i) const { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name) const;
@@ -635,8 +634,8 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	PathMapFlags GetInternalSearchMap(int x, int y) const;
-	void SetInternalSearchMap(int x, int y, PathMapFlags value);
+	PathMapFlags GetInternalSearchMap(const Point&) const;
+	void SetInternalSearchMap(const Point&, PathMapFlags value);
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 	void SetupReverbInfo();
 

@@ -32,7 +32,6 @@ struct VarEntry;
 class GEM_EXPORT LRUCache {
 public:
 	LRUCache();
-	~LRUCache();
 
 	// set value, overwriting any previous entry
 	void SetAt(const char* key, void* value);

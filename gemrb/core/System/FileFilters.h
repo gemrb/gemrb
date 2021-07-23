@@ -25,7 +25,7 @@ namespace GemRB {
 
 struct ExtFilter : DirectoryIterator::FileFilterPredicate {
 	char extension[9];
-	ExtFilter(const char* ext) {
+	explicit ExtFilter(const char* ext) {
 		strncpy(extension, ext, sizeof(extension) - 1);
 	}
 
@@ -42,7 +42,7 @@ struct EndsWithFilter : DirectoryIterator::FileFilterPredicate {
 	char* endMatch;
 	size_t len;
 
-	EndsWithFilter(const char* endString) {
+	explicit EndsWithFilter(const char* endString) {
 		endMatch = strdup(endString);
 		len = strlen(endMatch);
 	}

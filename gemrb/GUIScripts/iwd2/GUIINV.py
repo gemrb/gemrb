@@ -180,14 +180,6 @@ def RefreshInventoryWindow ():
 
 	# paperdoll
 	Button = Window.GetControl (50)
-	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
-	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
-	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
-	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-
 	Button.SetFlags (IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 	pdoll = GUICommonWindows.GetActorPaperDoll (pc)+"G11"
 	if GemRB.HasResource (pdoll, RES_BAM):

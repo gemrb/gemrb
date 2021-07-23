@@ -1,7 +1,7 @@
 #include "BMPWriter.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cstring>
 
@@ -10,14 +10,6 @@ using namespace GemRB;
 #define BMP_HEADER_SIZE  54 //FIXME: duplicate
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
-
-BMPWriter::BMPWriter()
-{
-}
-
-BMPWriter::~BMPWriter()
-{
-}
 
 void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 {
@@ -60,7 +52,8 @@ void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {
 		for (unsigned int x=0;x<Width;x++) {
-			Color c = spr->GetPixel(x,Height-y-1);
+			const Point p(x, Height - y - 1);
+			const Color& c = spr->GetPixel(p);
 
 			output->Write( &c.b, 1);
 			output->Write( &c.g, 1);

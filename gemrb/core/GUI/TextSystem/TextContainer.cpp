@@ -22,7 +22,7 @@
 #include "Palette.h"
 #include "Sprite2D.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <algorithm>
 #include <climits>
@@ -72,11 +72,11 @@ inline const Font* TextSpan::LayoutFont() const
 {
 	if (font) return font;
 
-	TextContainer* container = static_cast<TextContainer*>(parent);
+	const TextContainer* container = static_cast<const TextContainer*>(parent);
 	if (container) {
 		return container->TextFont();
 	}
-	return NULL;
+	return nullptr;
 }
 
 inline Region TextSpan::LayoutInFrameAtPoint(const Point& p, const Region& rgn) const
@@ -256,7 +256,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 		drawRect.y += offset.y;
 		const Font* printFont = LayoutFont();
 		const Font::PrintColors* pc = colors;
-		TextContainer* container = static_cast<TextContainer*>(parent);
+		const TextContainer* container = static_cast<const TextContainer*>(parent);
 		if (!pc && container) {
 			pc = container->TextColors();
 		}
@@ -282,7 +282,7 @@ void TextSpan::DrawContentsInRegions(const LayoutRegions& rgns, const Point& off
 	}
 }
 
-ImageSpan::ImageSpan(Holder<Sprite2D> im)
+ImageSpan::ImageSpan(const Holder<Sprite2D>& im)
 	: Content(im->Frame.size)
 {
 	image = im;
@@ -626,7 +626,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 			assert(exContent != content);
 		}
 		const LayoutRegions& rgns = content->LayoutForPointInRegion(layoutPoint, layoutFrame);
-		layout.push_back(Layout(content, rgns));
+		layout.emplace_back(content, rgns);
 		exContent = content;
 
 		ieDword flags = Flags();
@@ -766,7 +766,7 @@ void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
 }
 
 LayoutRegions::const_iterator
-TextContainer::FindCursorRegion(const Layout& layout)
+TextContainer::FindCursorRegion(const Layout& layout) const
 {
 	auto end = layout.regions.end();
 	for (auto it = layout.regions.begin(); it != end; ++it) {
@@ -1003,7 +1003,7 @@ TextContainer::ContentIndex TextContainer::FindContentForChar(size_t idx)
 	size_t charCount = 0;
 	ContentList::iterator it = contents.begin();
 	while (it != contents.end()) {
-		TextSpan* ts = static_cast<TextSpan*>(*it);
+		const TextSpan* ts = static_cast<const TextSpan*>(*it);
 		size_t textLen = ts->Text().length();
 		if (charCount + textLen >= idx) {
 			break;

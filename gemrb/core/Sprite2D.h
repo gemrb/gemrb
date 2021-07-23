@@ -33,6 +33,7 @@
 #include "exports.h"
 
 #include "Palette.h"
+#include "Video/Pixels.h"
 #include "Region.h"
 #include "TypeID.h"
 
@@ -66,39 +67,62 @@ enum BlitFlags : uint32_t {
 class GEM_EXPORT Sprite2D : public Held<Sprite2D> {
 public:
 	static const TypeID ID;
+	
+	using Iterator = PixelFormatIterator;
+	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
+						 IPixelIterator::Direction ydir = IPixelIterator::Forward);
+
+	Iterator GetIterator(IPixelIterator::Direction xdir,
+						 IPixelIterator::Direction ydir,
+						 const Region& clip);
+	
+	Iterator GetIterator(IPixelIterator::Direction xdir = IPixelIterator::Forward,
+						 IPixelIterator::Direction ydir = IPixelIterator::Forward) const;
+
+	Iterator GetIterator(IPixelIterator::Direction xdir,
+						 IPixelIterator::Direction ydir,
+						 const Region& clip) const;
+
 protected:
-	bool freePixels;
-	void* pixels;
+	void* pixels = nullptr;
+	bool freePixels = true;
+	
+	PixelFormat format;
+	uint16_t pitch;
+	
+	virtual void UpdatePalette(PaletteHolder) noexcept {};
+	virtual void UpdateColorKey(colorkey_t) noexcept {};
 
 public:
 	Region Frame;
-	int Bpp;
-
-	bool BAM;
 	BlitFlags renderFlags = BlitFlags::NONE;
 
-	Sprite2D(const Region&, int Bpp, void* pixels);
-	Sprite2D(const Sprite2D &obj);
-	virtual Holder<Sprite2D> copy() const = 0;
-	~Sprite2D() override;
+	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept;
+	Sprite2D(const Region&, void* pixels, const PixelFormat& fmt) noexcept;
+	Sprite2D(const Sprite2D &obj) noexcept;
+	Sprite2D(Sprite2D&&) noexcept;
+	~Sprite2D() noexcept override;
 
-	bool IsPixelTransparent(const Point& p) const;
+	virtual Holder<Sprite2D> copy() const { return MakeHolder<Sprite2D>(*this); };
+
+	virtual bool HasTransparency() const noexcept;
+	bool IsPixelTransparent(const Point& p) const noexcept;
 
 	virtual const void* LockSprite() const;
 	virtual void* LockSprite();
-	virtual void UnlockSprite() const;
+	virtual void UnlockSprite() const {};
 
-	virtual PaletteHolder GetPalette() const = 0;
-	virtual void SetPalette(PaletteHolder pal) = 0;
-	virtual Color GetPixel(const Point&) const = 0;
-	Color GetPixel(int x, int y) const;
-	virtual bool HasTransparency() const = 0;
+	const PixelFormat& Format() const noexcept { return format; }
+	Color GetPixel(const Point&) const noexcept;
+	PaletteHolder GetPalette() const noexcept { return format.palette; }
+	void SetPalette(const PaletteHolder& pal);
+	
 	/* GetColorKey: either a px value or a palete index if sprite has a palette. */
-	virtual int32_t GetColorKey() const = 0;
-	/* SetColorKey: ieDword is either a px value or a palete index if sprite has a palette. */
-	virtual void SetColorKey(ieDword) = 0;
-	virtual bool ConvertFormatTo(int /*bpp*/, ieDword /*rmask*/, ieDword /*gmask*/,
-							   ieDword /*bmask*/, ieDword /*amask*/) { return false; }; // not pure virtual!
+	colorkey_t GetColorKey() const noexcept { return format.ColorKey; }
+	/* SetColorKey: either a px value or a palete index if sprite has a palette. */
+	void SetColorKey(colorkey_t);
+
+	virtual bool ConvertFormatTo(const PixelFormat&) noexcept;
 };
 
 }

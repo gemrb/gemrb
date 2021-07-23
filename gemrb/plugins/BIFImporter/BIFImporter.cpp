@@ -113,7 +113,7 @@ int BIFImporter::OpenArchive(const char* path)
 	ExtractFileFromPath(filename, path);
 
 	char cachePath[_MAX_PATH];
-	PathJoin(cachePath, core->CachePath, filename, NULL);
+	PathJoin(cachePath, core->config.CachePath, filename, nullptr);
 	char Signature[8];
 #if defined(SUPPORTS_MEMSTREAM)
 	auto cacheStream = new MappedFileMemoryStream{cachePath};
@@ -212,16 +212,15 @@ void BIFImporter::ReadBIF(void)
 		}
 		return;
 	}
-	unsigned int i;
 
-	for (i=0;i<fentcount;i++) {
+	for (unsigned int i = 0; i < fentcount; i++) {
 		stream->ReadDword(fentries[i].resLocator);
 		stream->ReadDword(fentries[i].dataOffset);
 		stream->ReadDword(fentries[i].fileSize);
 		stream->ReadWord(fentries[i].type);
 		stream->ReadWord(fentries[i].u1);
 	}
-	for (i=0;i<tentcount;i++) {
+	for (unsigned int i = 0; i < tentcount; i++) {
 		stream->ReadDword(tentries[i].resLocator);
 		stream->ReadDword(tentries[i].dataOffset);
 		stream->ReadDword(tentries[i].tilesCount);

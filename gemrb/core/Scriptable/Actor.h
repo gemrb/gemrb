@@ -26,14 +26,17 @@
 #include "Scriptable/PCStatStruct.h"
 
 #include "exports.h"
+#include "ie_stats.h" // using definitions as described in stats.ids
 #include "ie_types.h"
 
 #include "Audio.h"
 #include "CombatInfo.h"
 #include "EffectQueue.h"
+#include "Inventory.h"
 #include "Palette.h"
 #include "Polygon.h"
-#include "Video.h"
+#include "Spellbook.h"
+#include "Video/Video.h"
 
 #include <map>
 #include <set>
@@ -52,12 +55,6 @@ class ToHitStats;
 struct PolymorphCache;
 
 }
-
-/** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
-#include "ie_stats.h"
-
-#include "Inventory.h"
-#include "Spellbook.h"
 
 namespace GemRB {
 
@@ -274,7 +271,7 @@ struct BABTable {
 };
 
 struct ModalStatesStruct {
-	ieResRef spell;
+	ResRef spell;
 	char action[16];
 	unsigned int entering_str;
 	unsigned int leaving_str;
@@ -285,8 +282,8 @@ struct ModalStatesStruct {
 
 struct ModalState {
 	ieDword State;
-	ieResRef Spell;             //apply this spell once per round
-	ieResRef LingeringSpell;    //apply this spell once per round if the effects are lingering
+	ResRef Spell;               //apply this spell once per round
+	ResRef LingeringSpell;      //apply this spell once per round if the effects are lingering
 	char LingeringCount;        //the count of rounds for which the modal spell will be reapplied after the state ends
 	ieDword LastApplyTime;      //last time the modal effect used
 	bool FirstApply;            //running for the first time?
@@ -307,16 +304,17 @@ public:
 	ieDword *PrevStats;
 	ieByteSigned DeathCounters[4];   //PST specific (good, law, lady, murder)
 
-	ieResRef BardSong;               //custom bard song (updated by fx)
-	ieResRef BackstabResRef;         //apply on successful backstab
+	ResRef BardSong;               //custom bard song (updated by fx)
+	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
-	ieResRef SmallPortrait;
-	ieResRef LargePortrait;
+	ResRef SmallPortrait;
+	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
 	ieByte InParty;
 	//32 is the maximum possible length of the actor name in the original games
-	char LongName[33], ShortName[33];
+	ieVariable LongName{};
+	ieVariable ShortName{};
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[VCONST_COUNT];
 
@@ -344,7 +342,7 @@ public:
 
 	ieDword LastExit;    //the global ID of the exit to be used
 	ieVariable UsedExit; // name of the exit, since global id is not stable after loading a new area
-	ieResRef LastArea;
+	ResRef LastArea;
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
@@ -442,7 +440,7 @@ private:
 	/* Set up all the missing stats on load time, or after level up */
 	void CreateDerivedStatsIWD2();
 	/* Gets the given ISCLASS level */
-	ieDword GetClassLevel (const ieDword isclass) const;
+	ieDword GetClassLevel(ieDword isclass) const;
 	/* Returns true if the dual class is backwards */
 	bool IsDualSwap() const;
 	/* returns the weapon proficiency stat of the actor */
@@ -460,7 +458,7 @@ private:
 	void PlayExistenceSounds();
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
 	char GetArmorCode() const;
-	const char* GetArmorSound() const;
+	ResRef GetArmorSound() const;
 
 	bool AdvanceAnimations();
 	void UpdateDrawingRegion();
@@ -531,9 +529,9 @@ public:
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
-	void SetSoundFolder(const char *soundset);
+	void SetSoundFolder(const char *soundset) const;
 	/* Use overrideSet to replace PCStats->SoundSet */
-	void GetSoundFolder(char *soundset, int flag, ieResRef overrideSet = 0) const;
+	void GetSoundFolder(char *soundset, int flag, const ResRef& overrideSet) const;
 	/** Gets the Character Long Name/Short Name */
 	const char* GetName(int which) const override
 	{
@@ -548,8 +546,7 @@ public:
 	{
 		return scriptName;
 	}
-	/** Gets a Script ResRef */
-	const char* GetScript(int ScriptIndex) const;
+	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
 	ieDword GetXPLevel(int modified) const;
 	/** Guesses the (base) casting level */
@@ -622,7 +619,7 @@ public:
 	/* checks whether taking damage should disrupt spellcasting */
 	bool CheckSpellDisruption(int damage, int spellLevel) const;
 	/* called when actor starts to cast a spell*/
-	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete, bool instant);
+	bool HandleCastingStance(const ResRef& spellResRef, bool deplete, bool instant);
 	/* check if the actor should be just knocked out by a lethal hit */
 	bool AttackIsStunning(int damagetype) const;
 	/* check if the actor is silenced - for casting purposes */
@@ -639,10 +636,10 @@ public:
 	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
 	void PlaySwingSound(WeaponInfo &wi) const;
 	/* drops items from inventory to current spot */
-	void DropItem(const ieResRef resref, unsigned int flags);
+	void DropItem(const ResRef& resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
 	/* returns item information in quickitem slot */
-	void GetItemSlotInfo(ItemExtHeader *item, int which, int header);
+	void GetItemSlotInfo(ItemExtHeader *item, int which, int header) const;
 	/* returns spell information in quickspell slot */
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
@@ -657,7 +654,7 @@ public:
 	/* applies the class abilities*/
 	void ApplyClab(const char *clab, ieDword max, int remove, int diff);
 	/* calls InitQuickSlot in PCStatStruct */
-	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
+	void SetupQuickSlot(unsigned int which, int slot, int headerindex) const;
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent() const;
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
@@ -676,12 +673,12 @@ public:
 	void GetNextStance();
 	void ClearCurrentStanceAnims();
 	/* learns the given spell, possibly receive XP */
-	int LearnSpell(const ieResRef resref, ieDword flags, int bookmask=-1, int level=-1);
+	int LearnSpell(const ResRef& resref, ieDword flags, int bookmask=-1, int level=-1);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
+	const ITMExtHeader *GetRangedWeapon(WeaponInfo &wi) const;
 	/* Returns current weapon range and extended header
 	if range is nonzero, then which is valid */
-	ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
+	const ITMExtHeader* GetWeapon(WeaponInfo &wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor */
@@ -691,17 +688,17 @@ public:
 	/* Calculate experience bonus */
 	int CalculateExperience(int type, int level) const;
 	/* Sets the modal state after checks */
-	void SetModal(ieDword newstate, bool force=1);
+	void SetModal(ieDword newstate, bool force = true);
 	/* Sets the modal spell after checks */
 	void SetModalSpell(ieDword state, const char *spell);
 	/* casts the modal spell if any */
-	void ApplyModal(ieResRef modalSpell);
+	void ApplyModal(const ResRef& modalSpell);
 	/* returns current attack style */
 	int GetAttackStyle() const;
 	/* adds the combatants to the attackers list */
 	void AttackedBy(const Actor *actor);
 	/* reorients to face target (for immediate attack) */
-	void FaceTarget(Scriptable *actor);
+	void FaceTarget(const Scriptable *actor);
 	/* returns the number of attacks (handles monk barehanded bonus) */
 	ieDword GetNumberOfAttacks();
 	/* starts combat round*/
@@ -714,9 +711,9 @@ public:
 	/* gets the defense against an attack */
 	int GetDefense(int DamageType, ieDword wflags, const Actor *attacker) const;
 	/* checks if something is wrong with the weapon we are using for the attack */
-	bool WeaponIsUsable(bool leftorright, ITMExtHeader *header=NULL) const;
+	bool WeaponIsUsable(bool leftorright, const ITMExtHeader *header=NULL) const;
 	/* get the current hit bonus */
-	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, ITMExtHeader *&header, ITMExtHeader *&hittingheader,\
+	bool GetCombatDetails(int &tohit, bool leftorright, WeaponInfo &wi, const ITMExtHeader *&header, const ITMExtHeader *&hittingheader,\
 		int &DamageBonus, int &speed, int &CriticalBonus, int &style, const Actor *target);
 	/* performs attack against target */
 	void PerformAttack(ieDword gameTime);
@@ -744,10 +741,10 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void ResolveStringConstant(ieResRef& sound, unsigned int index) const;
-	bool GetSoundFromFile(ieResRef &Sound, unsigned int index) const;
-	bool GetSoundFromINI(ieResRef &Sound, unsigned int index) const;
-	bool GetSoundFrom2DA(ieResRef &Sound, unsigned int index) const;
+	void ResolveStringConstant(ResRef& sound, unsigned int index) const;
+	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
+	bool GetSoundFrom2DA(ResRef &Sound, unsigned int index) const;
 	/* generate area specific oneliner */
 	void GetAreaComment(int areaflag) const;
 	/* handle oneliner interaction, -1: unsuccessful (may comment area), 0: dialog banter, 1: oneliner */
@@ -757,7 +754,7 @@ public:
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */
-	void SetActionButtonRow(ActionButtonRow &ar);
+	void SetActionButtonRow(ActionButtonRow &ar) const;
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
@@ -791,7 +788,7 @@ public:
 
 	void SetLockedPalette(const ieDword *gradients);
 	void UnlockPalette();
-	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);
+	void AddAnimation(const ResRef& resource, int gradient, int height, int flags);
 	/* plays damage animation, if hit is not set, then plays only the splash part */
 	void PlayDamageAnimation(int x, bool hit=true);
 	void PlayCritDamageAnimation(int x);
@@ -811,9 +808,9 @@ public:
 	/* returns the portrait icons list */
 	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
-	void AddPortraitIcon(ieByte icon);
+	void AddPortraitIcon(ieByte icon) const;
 	/* disables a state icon in the list, doesn't remove it! */
-	void DisablePortraitIcon(ieByte icon);
+	void DisablePortraitIcon(ieByte icon) const;
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot) const;
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
@@ -827,7 +824,7 @@ public:
 	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override
 		previously customized or set buttons. */
-	void InitButtons(ieDword cls, bool forced);
+	void InitButtons(ieDword cls, bool forced) const;
 	int GetMaxEncumbrance() const;
 	int GetAbilityBonus(unsigned int ability, int value = -1) const;
 	int GetSkillStat(unsigned int skill) const;
@@ -843,7 +840,7 @@ public:
 	/* Returns nonzero if the caster is held */
 	int Immobile() const;
 	/* Returns strref if the item is unusable due to name/type restrictions */
-	ieStrRef Disabled(const ieResRef name, ieDword type) const;
+	ieStrRef Disabled(const ResRef& name, ieDword type) const;
 	/* Returns constant string if the item is unusable */
 	int Unusable(const Item *item) const;
 	/* Sets all clown colour to the given gradient */
@@ -851,7 +848,7 @@ public:
 	/* Enables an overlay */
 	void SetOverlay(unsigned int overlay);
 	/* Checks and sets a spellstate if it wasn't set yet */
-	bool SetSpellState(unsigned int spellstate);
+	bool SetSpellState(unsigned int spellstate) const;
 	/* Checks a spellstate */
 	bool HasSpellState(unsigned int spellstate) const;
 	/* Checks a feat */
@@ -859,7 +856,7 @@ public:
 	/* Reports projectile immunity, nonzero if immune */
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
-	void AddProjectileImmunity(ieDword projectile);
+	void AddProjectileImmunity(ieDword projectile) const;
 	/* Apply feats */
 	void ApplyFeats();
 	/* reapply modal feat spells */
@@ -874,7 +871,7 @@ public:
 	bool IsDualClassed() const;
 	/* Returns an exact copy of this actor */
 	Actor *CopySelf(bool mislead) const;
-	static ieDword GetClassID (const ieDword isclass);
+	static ieDword GetClassID(ieDword isclass);
 	const char *GetClassName(ieDword classID) const;
 	const char *GetKitName(ieDword kitID) const;
 	/* Returns the actor's level of the given class */
@@ -923,14 +920,14 @@ public:
 	/* checks if the alignment matches one of the masking constants */
 	//bool MatchesAlignmentMask(ieDword mask);
 	/** untargetable by spells/attack due to invisibility or sanctuary */
-	bool Untargetable(ResRef spellRef) const;
+	bool Untargetable(const ResRef& spellRef) const;
 	/* returns true if this it is futile to try to harm actor (dead/sanctuaried) */
 	bool InvalidSpellTarget() const;
 	/* returns true if the spell is useless to cast on target
 	or the spell's range is smaller than range */
 	bool InvalidSpellTarget(int spellnum, Actor *caster, int range) const;
 	/* function to get a class level used by scripting */
-	ieDword GetLevelInClass (const ieDword classid) const;
+	ieDword GetLevelInClass(ieDword classid) const;
 	/* computes the actor's classmask (iwd2) */
 	int GetClassMask() const;
 	/* computes the actor's usable books (iwd2) */
@@ -964,7 +961,7 @@ public:
 	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
 	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
-	tick_t GetLastRested() { return TicksLastRested; }
+	tick_t GetLastRested() const { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;
 	ieDword GetActiveClass() const;

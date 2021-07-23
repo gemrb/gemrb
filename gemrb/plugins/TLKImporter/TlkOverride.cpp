@@ -202,7 +202,7 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 ieDword CTlkOverride::ClaimFreeSegment()
 {
 	ieDword offset = FreeOffset;
-	unsigned long pos = tot_str->GetPos();
+	strpos_t pos = tot_str->GetPos();
 	
 	if (offset == 0xffffffff) {
 		offset = tot_str->Size();
@@ -345,7 +345,7 @@ DataStream* CTlkOverride::GetAuxHdr(bool create)
 	char nPath[_MAX_PATH];
 	char Signature[TOH_HEADER_SIZE];
 
-	PathJoin( nPath, core->CachePath, "default.toh", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.toh", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {
@@ -353,8 +353,7 @@ retry:
 	}
 	if (create) {
 		fs->Create( "default", IE_TOH_CLASS_ID);
-		memset(Signature,0,sizeof(Signature));
-		memcpy(Signature,"TLK ",4);
+		strncpy(Signature, "TLK ", TOH_HEADER_SIZE - 1);
 		fs->Write(Signature, sizeof(Signature));
 		create = false;
 		goto retry;
@@ -366,7 +365,7 @@ retry:
 DataStream* CTlkOverride::GetAuxTlk(bool create)
 {
 	char nPath[_MAX_PATH];
-	PathJoin( nPath, core->CachePath, "default.tot", NULL );
+	PathJoin(nPath, core->config.CachePath, "default.tot", nullptr);
 	FileStream* fs = new FileStream();
 retry:
 	if (fs->Modify(nPath)) {

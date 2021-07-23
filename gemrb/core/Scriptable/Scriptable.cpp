@@ -30,13 +30,15 @@
 #include "Projectile.h"
 #include "Spell.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GameScript/GSUtils.h"
 #include "GameScript/Matching.h" // MatchActor
 #include "GUI/GameControl.h"
 #include "GUI/TextSystem/Font.h"
 #include "RNG.h"
 #include "Scriptable/InfoPoint.h"
+ 
+#include <utility>
 
 namespace GemRB {
 
@@ -45,7 +47,7 @@ static ieDword globalActorCounter = 10000;
 static bool startActive = false;
 static bool third = false;
 static bool pst_flags = false;
-static unsigned short ClearActionsID = 133; // same for all games
+static const unsigned short ClearActionsID = 133; // same for all games
 
 /***********************
  *  Scriptable Class   *
@@ -53,10 +55,8 @@ static unsigned short ClearActionsID = 133; // same for all games
 Scriptable::Scriptable(ScriptableType type)
 {
 	Type = type;
-	for (int i = 0; i < MAX_SCRIPTS; i++) {
-		Scripts[i] = NULL;
-	}
-	overheadTextDisplaying = 0;
+
+	overheadTextDisplaying = false;
 	timeStartDisplaying = 0;
 
 	scriptName[0] = 0;
@@ -107,8 +107,6 @@ Scriptable::Scriptable(ScriptableType type)
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
 	area = 0;
-	Pos.x = 0;
-	Pos.y = 0;
 
 	LastTarget = 0;
 	LastTargetPersistent = 0;
@@ -132,8 +130,8 @@ Scriptable::~Scriptable(void)
 		ReleaseCurrentAction();
 	}
 	ClearActions();
-	for (int i = 0; i < MAX_SCRIPTS; i++) {
-		delete Scripts[i];
+	for (auto& script : Scripts) {
+		delete script;
 	}
 
 	delete( locals );
@@ -178,7 +176,7 @@ void Scriptable::SetMap(Map *map)
 //ai is nonzero if this is an actor currently in the party
 //if the script level is AI_SCRIPT_LEVEL, then we need to
 //load an AI script (.bs) instead of (.bcs)
-void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
+void Scriptable::SetScript(const ResRef &aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
 		error("Scriptable", "Invalid script index!\n");
@@ -191,13 +189,13 @@ void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, seldomly used to reset the slot, which we do above
 	// This check is to prevent flooding of the console
-	if (aScript[0] && stricmp(aScript, "NONE")) {
+	if (!aScript.IsEmpty() && aScript != "NONE") {
 		if (idx!=AI_SCRIPT_LEVEL) ai = false;
-		Scripts[idx] = new GameScript( aScript, this, idx, ai );
+		Scripts[idx] = new GameScript(aScript, this, idx, ai);
 	}
 }
 
-void Scriptable::SetSpellResRef(ResRef resref) {
+void Scriptable::SetSpellResRef(const ResRef& resref) {
 	SpellResRef = resref;
 }
 
@@ -340,7 +338,7 @@ void Scriptable::TickScripting()
 		return;
 	}
 
-	if (triggers.size())
+	if (!triggers.empty())
 		TriggerCountdown = 5;
 	IdleTicks = 0;
 	InternalFlags &= ~IF_JUSTDIED;
@@ -430,7 +428,7 @@ void Scriptable::ExecuteScript(int scriptCount)
 void Scriptable::AddAction(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AA: NULL action encountered for %s!", scriptName.CString());
 		return;
 	}
 
@@ -464,7 +462,7 @@ void Scriptable::AddAction(Action* aC)
 void Scriptable::AddActionInFront(Action* aC)
 {
 	if (!aC) {
-		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName);
+		Log(WARNING, "Scriptable", "AAIF: NULL action encountered for %s!", scriptName.CString());
 		return;
 	}
 	InternalFlags|=IF_ACTIVE;
@@ -674,7 +672,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 		//TODO: if LastTrigger is still overwritten by script action blocks, store this in a separate field and copy it back when the block ends
 		const char *name = "none";
 		if (area) {
-			Scriptable *scr = area->GetScriptableByGlobalID(globalID);
+			const Scriptable *scr = area->GetScriptableByGlobalID(globalID);
 			if (scr) {
 				name = scr->GetScriptName();
 			}
@@ -684,9 +682,9 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 	}
 }
 
-bool Scriptable::MatchTrigger(unsigned short id, ieDword param) {
-	for (std::list<TriggerEntry>::iterator m = triggers.begin(); m != triggers.end (); ++m) {
-		TriggerEntry &trigger = *m;
+bool Scriptable::MatchTrigger(unsigned short id, ieDword param) const
+{
+	for (const auto& trigger : triggers) {
 		if (trigger.triggerID != id)
 			continue;
 		if (param && trigger.param1 != param)
@@ -720,7 +718,7 @@ const TriggerEntry *Scriptable::GetMatchingTrigger(unsigned short id, unsigned i
 	return NULL;
 }
 
-void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake)
+void Scriptable::CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake)
 {
 	Spell* spl = gamedata->GetSpell( SpellResRef );
 	Actor *caster = NULL;
@@ -775,15 +773,15 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 
 		if (caster) {
 			// check for target (type) change
-			int count, i;
-			Actor *newact = NULL;
-			SPLExtHeader *seh = NULL;
+			int count;
+			const Actor *newact = nullptr;
+			const SPLExtHeader *seh = NULL;
 			Effect *fx = NULL;
 			switch (caster->wildSurgeMods.target_change_type) {
 				case WSTC_SETTYPE:
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						seh->features[i].Target = caster->wildSurgeMods.target_type;
+					for (Effect* feature : seh->features) {
+						feature->Target = caster->wildSurgeMods.target_type;
 					}
 					// we need to fetch the projectile, so the effect queue is created
 					// (skipped above)
@@ -795,12 +793,12 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					// TODO: unhardcode to allow for mixing all the target types
 					// caster gets selftargeting fx when the projectile is fetched above
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i].Target == FX_TARGET_SELF) {
-							seh->features[i].Target = caster->wildSurgeMods.target_type;
+					for (Effect* feature : seh->features) {
+						if (feature->Target == FX_TARGET_SELF) {
+							feature->Target = caster->wildSurgeMods.target_type;
 						} else {
 							// also apply to the caster
-							fx = seh->features+i;
+							fx = feature;
 							core->ApplyEffect(fx, caster, caster);
 						}
 					}
@@ -828,9 +826,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 					// make it also work for self-targeting spells:
 					// change the payload or this was all in vain
 					seh = &spl->ext_headers[SpellHeader];
-					for (i=0; i < seh->FeatureCount; i++) {
-						if (seh->features[i].Target == FX_TARGET_SELF) {
-							seh->features[i].Target = FX_TARGET_PRESET;
+					for (Effect* feature : seh->features) {
+						if (feature->Target == FX_TARGET_SELF) {
+							feature->Target = FX_TARGET_PRESET;
 						}
 					}
 					// we need to fetch the projectile, so the effect queue is created
@@ -846,8 +844,8 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 			// apply the saving throw mod
 			if (caster->wildSurgeMods.saving_throw_mod) {
 				seh = &spl->ext_headers[SpellHeader];
-				for (i=0; i < seh->FeatureCount; i++) {
-					seh->features[i].SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
+				for (Effect* feature : seh->features) {
+					feature->SavingThrowBonus += caster->wildSurgeMods.saving_throw_mod;
 				}
 			}
 
@@ -857,9 +855,9 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 				// make it also work for self-targeting spells:
 				// change the payload or this was all in vain
 				seh = &spl->ext_headers[SpellHeader];
-				for (i=0; i < seh->FeatureCount; i++) {
-					if (seh->features[i].Target == FX_TARGET_SELF) {
-						seh->features[i].Target = FX_TARGET_PRESET;
+				for (Effect* feature : seh->features) {
+					if (feature->Target == FX_TARGET_SELF) {
+						feature->Target = FX_TARGET_PRESET;
 					}
 				}
 				// we need to refetch the projectile, so the new one is used
@@ -902,13 +900,13 @@ void Scriptable::CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int l
 	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
-void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
+void Scriptable::DisplaySpellCastMessage(ieDword tgt, const Spell *spl)
 {
 	if (!core->HasFeedback(FT_CASTING)) return;
 
 	// caster - Casts spellname : target OR
 	// caster - spellname : target (repeating spells)
-	Scriptable *target = NULL;
+	const Scriptable *target = nullptr;
 	if (tgt) {
 		target = area->GetActorByGlobalID(tgt);
 		if (!target) {
@@ -916,12 +914,12 @@ void Scriptable::DisplaySpellCastMessage(ieDword tgt, Spell *spl)
 		}
 	}
 
-	String* spell = core->GetString(spl->SpellName);
+	const String* spell = core->GetString(spl->SpellName);
 	if (spell->length() && Type == ST_ACTOR) {
 		wchar_t str[256];
 
 		if (target) {
-			String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
+			const String* msg = core->GetString(displaymsg->GetStringReference(STR_ACTION_CAST), 0);
 			swprintf(str, sizeof(str)/sizeof(str[0]), L"%ls %ls : %s", msg->c_str(), spell->c_str(), target->GetName(-1));
 			delete msg;
 		} else {
@@ -956,7 +954,7 @@ inline void Scriptable::ResetCastingState(Actor *caster) {
 void Scriptable::CastSpellPointEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
 	}
@@ -1036,7 +1034,7 @@ void Scriptable::CastSpellPointEnd(int level, int no_stance)
 void Scriptable::CastSpellEnd(int level, int no_stance)
 {
 	Actor *caster = NULL;
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	if (!spl) {
 		return;
 	}
@@ -1110,8 +1108,8 @@ void Scriptable::CastSpellEnd(int level, int no_stance)
 }
 
 // check for input sanity and good casting conditions
-int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
-	Spell* spl = gamedata->GetSpell(SpellRef);
+int Scriptable::CanCast(const ResRef& SpellRef, bool verbose) {
+	const Spell* spl = gamedata->GetSpell(SpellRef);
 	if (!spl) {
 		SpellHeader = -1;
 		Log(ERROR, "Scriptable", "Spell not found, aborting cast!");
@@ -1134,7 +1132,7 @@ int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
 	if (Type != ST_ACTOR) {
 		return 1;
 	}
-	Actor *actor = (Actor *) this;
+	const Actor *actor = (const Actor *) this;
 
 	// check for silence
 	// only a handful of spells don't have a verbal component -
@@ -1191,19 +1189,19 @@ int Scriptable::CanCast(const ieResRef SpellRef, bool verbose) {
 
 // checks if a party-friendly actor is nearby and if so, if it recognizes the spell
 // this enemy just started casting
-void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
+void Scriptable::SpellcraftCheck(const Actor *caster, const ResRef& spellRef)
 {
 	if (!third || !caster || caster->GetStat(IE_EA) <= EA_CONTROLLABLE || !area) {
 		return;
 	}
 
-	Spell* spl = gamedata->GetSpell(SpellRef);
+	const Spell* spl = gamedata->GetSpell(spellRef);
 	assert(spl); // only a bad surge could make this fail and we want to catch it
 	int AdjustedSpellLevel = spl->SpellLevel + 15;
 	std::vector<Actor *> neighbours = area->GetAllActorsInRadius(caster->Pos, GA_NO_DEAD|GA_NO_ENEMY|GA_NO_SELF|GA_NO_UNSCHEDULED, caster->GetBase(IE_VISUALRANGE), this);
 	std::vector<Actor *>::iterator neighbour;
 	for (neighbour = neighbours.begin(); neighbour != neighbours.end(); ++neighbour) {
-		Actor *detective = *neighbour;
+		const Actor *detective = *neighbour;
 		// disallow neutrals from helping the party
 		if (detective->GetStat(IE_EA) > EA_CONTROLLABLE) {
 			continue;
@@ -1219,8 +1217,8 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 		if ((Spellcraft + IntMod) > AdjustedSpellLevel) {
 			wchar_t tmpstr[100];
 			// eg. .:Casts Word of Recall:.
-			String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
-			String* spellname = core->GetString(spl->SpellName);
+			const String* castmsg = core->GetString(displaymsg->GetStringReference(STR_CASTS));
+			const String* spellname = core->GetString(spl->SpellName);
 			swprintf(tmpstr, sizeof(tmpstr)/sizeof(tmpstr[0]), L".:%ls %ls:.", castmsg->c_str(), spellname->c_str());
 			delete castmsg;
 			delete spellname;
@@ -1230,12 +1228,12 @@ void Scriptable::SpellcraftCheck(const Actor *caster, const ieResRef SpellRef)
 			break;
 		}
 	}
-	gamedata->FreeSpell(spl, SpellRef, false);
+	gamedata->FreeSpell(spl, spellRef, false);
 }
 
 // shortcut for internal use when there is no wait
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete)
 {
 	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
 		return;
@@ -1257,7 +1255,7 @@ void Scriptable::DirectlyCastSpellPoint(const Point &target, ieResRef spellref, 
 
 // shortcut for internal use
 // if any user needs casting time support, they should use Spell* actions directly
-void Scriptable::DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete)
+void Scriptable::DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete)
 {
 	if (!gamedata->Exists(spellref, IE_SPL_CLASS_ID)) {
 		return;
@@ -1360,7 +1358,7 @@ static EffectRef fx_castingspeed_modifier_ref = { "CastingSpeedModifier", -1 };
 //start spellcasting (common part)
 int Scriptable::SpellCast(bool instant, Scriptable *target)
 {
-	Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
+	const Spell* spl = gamedata->GetSpell(SpellResRef); // this was checked before we got here
 	Actor *actor = NULL;
 	int level = 0;
 	if (Type == ST_ACTOR) {
@@ -1373,13 +1371,13 @@ int Scriptable::SpellCast(bool instant, Scriptable *target)
 		SpellHeader = 0;
 	}
 
-	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
+	const SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	int casting_time = (int)header->CastingTime;
 	// how does this work for non-actors exactly?
 	if (actor) {
 		// The mental speed effect can shorten or lengthen the casting time.
 		// But first check if a special maximum is set
-		Effect *fx = actor->fxqueue.HasEffectWithParam(fx_castingspeed_modifier_ref, 2);
+		const Effect *fx = actor->fxqueue.HasEffectWithParam(fx_castingspeed_modifier_ref, 2);
 		int max = 1000;
 		if (fx) {
 			max = fx->Parameter1;
@@ -1453,12 +1451,12 @@ int Scriptable::CheckWildSurge()
 
 	int roll = core->Roll(1, 100, 0);
 	if ((roll <= 5 && caster->Modified[IE_SURGEMOD]) || caster->Modified[IE_FORCESURGE]) {
-		ieResRef OldSpellResRef;
-		memcpy(OldSpellResRef, SpellResRef, sizeof(OldSpellResRef));
-		Spell *spl = gamedata->GetSpell( OldSpellResRef ); // this was checked before we got here
+		ResRef oldSpellResRef;
+		oldSpellResRef = SpellResRef;
+		const Spell *spl = gamedata->GetSpell(oldSpellResRef); // this was checked before we got here
 		// ignore non-magic "spells"
 		if (spl->Flags&(SF_HLA|SF_TRIGGER)) {
-			gamedata->FreeSpell(spl, OldSpellResRef, false);
+			gamedata->FreeSpell(spl, oldSpellResRef, false);
 			return 1;
 		}
 
@@ -1484,14 +1482,12 @@ int Scriptable::CheckWildSurge()
 			delete s2;
 
 			// lookup the spell in the "check" row of wildmag.2da
-			ieResRef surgeSpellRef;
-			CopyResRef(surgeSpellRef, core->SurgeSpells[check-1].spell);
-
+			ResRef surgeSpellRef = core->SurgeSpells[check-1].spell;
 			if (!gamedata->Exists(surgeSpellRef, IE_SPL_CLASS_ID)) {
 				// handle the hardcoded cases - they'll also fail here
 				if (!HandleHardcodedSurge(surgeSpellRef, spl, caster)) {
 					//free the spell handle because we need to return
-					gamedata->FreeSpell(spl, OldSpellResRef, false);
+					gamedata->FreeSpell(spl, oldSpellResRef, false);
 					return 0;
 				}
 			} else {
@@ -1502,13 +1498,13 @@ int Scriptable::CheckWildSurge()
 		}
 
 		//free the spell handle
-		gamedata->FreeSpell(spl, OldSpellResRef, false);
+		gamedata->FreeSpell(spl, oldSpellResRef, false);
 	}
 
 	return 1;
 }
 
-bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster)
+bool Scriptable::HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster)
 {
 	// format: ID or ID.param1 or +SPELLREF
 	int types = caster->spellbook.GetTypes();
@@ -1516,32 +1512,34 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 	int count, i, tmp, tmp3;
 	Scriptable *target = NULL;
 	Point targetpos(-1, -1);
-	ieResRef newspl;
-
+	ResRef newSpell;
+	char surgeSpellRef[9];
+	strlcpy(surgeSpellRef, surgeSpell.CString(), 9);
+	
 	int level = caster->GetCasterLevel(spl->SpellType);
 	switch (surgeSpellRef[0]) {
 		case '+': // cast normally, but also cast SPELLREF first
-			core->ApplySpell(surgeSpellRef+1, caster, caster, level);
+			core->ApplySpell(ResRef(surgeSpellRef + 1), caster, caster, level);
 			break;
 		case '0': // cast spell param1 times
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.num_castings = count;
 			break;
 		case '1': // change projectile (id) to param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.projectile_id = count;
 			break;
 		case '2': // also target target type param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_ADDTYPE;
 			break;
 		case '3': // (wild surge) roll param1 more times
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			// force surge and then cast
 			// force the surge roll to be < 100, so we cast a spell from the surge table
 			tmp = caster->Modified[IE_FORCESURGE];
@@ -1563,23 +1561,23 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			for (i=0; i<count; i++) {
 				if (target) {
 					caster->CastSpell(target, false, true);
-					CopyResRef(newspl, SpellResRef);
+					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellEnd(level, 1);
 				} else {
 					caster->CastSpellPoint(targetpos, false, true);
-					CopyResRef(newspl, SpellResRef);
+					newSpell = SpellResRef;
 					caster->WMLevelMod = tmp3;
 					caster->CastSpellPointEnd(level, 1);
 				}
 				// reset the ref, since CastSpell*End destroyed it
-				SpellResRef = newspl;
+				SpellResRef = newSpell;
 			}
 			caster->Modified[IE_FORCESURGE] = tmp;
 			break;
 		case '4': // change the target type to param1
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.target_type = count;
 			caster->wildSurgeMods.target_change_type = WSTC_SETTYPE;
 			break;
@@ -1588,7 +1586,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '6': // change saving throw (+param1)
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.saving_throw_mod = count;
 			break;
 		case '7': // random spell of the same level (FIXME: make an effect out of this?)
@@ -1597,7 +1595,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 				unsigned int spellCount = caster->spellbook.GetKnownSpellsCount(i, lvl);
 				if (!spellCount) continue;
 				int id = core->Roll(1, spellCount, -1);
-				CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
+				const CREKnownSpell *ck = caster->spellbook.GetKnownSpell(i, lvl, id);
 				if (ck) {
 					SpellResRef = ck->SpellResRef;
 					break;
@@ -1606,7 +1604,7 @@ bool Scriptable::HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor 
 			break;
 		case '8': // set projectile speed to param1 %
 			strtok(surgeSpellRef,".");
-			count = strtol(strtok(NULL,"."), NULL, 0);
+			count = strtosigned<int>(strtok(NULL,"."));
 			caster->wildSurgeMods.projectile_speed_mod = count;
 			break;
 		default:
@@ -1631,7 +1629,7 @@ bool Scriptable::AuraPolluted()
 		AuraTicks = -1;
 		return false;
 	} else if (CurrentActionTicks == 0 && AuraTicks != 1) {
-		Actor *act = (Actor *) this;
+		const Actor *act = (const Actor *) this;
 		if (act->GetStat(IE_AURACLEANSING)) {
 			AuraTicks = -1;
 			if (core->HasFeedback(FT_STATES)) displaymsg->DisplayConstantStringName(STR_AURACLEANSED, DMC_WHITE, this);
@@ -1791,8 +1789,8 @@ void Selectable::SetCircle(int circlesize, float factor, const Color &color, Hol
 	overColor.g = color.g >> 1;
 	overColor.b = color.b >> 1;
 	overColor.a = color.a;
-	circleBitmap[0] = normal_circle;
-	circleBitmap[1] = selected_circle;
+	circleBitmap[0] = std::move(normal_circle);
+	circleBitmap[1] = std::move(selected_circle);
 }
 
 /***********************
@@ -1805,8 +1803,6 @@ Highlightable::Highlightable(ScriptableType type)
 	outline = NULL;
 	Highlight = false;
 	Cursor = IE_CURSOR_NORMAL;
-	KeyResRef[0] = 0;
-	EnterWav[0] = 0;
 	outlineColor = ColorBlack;
 	TrapDetectionDiff = TrapRemovalDiff = Trapped = TrapDetected = 0;
 }
@@ -1846,7 +1842,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 		return false;
 	}
 	//actually this could be script name[0]
-	if (!Scripts[0] && !EnterWav[0]) {
+	if (!Scripts[0] && EnterWav.IsEmpty()) {
 		return false;
 	}
 	AddTrigger(TriggerEntry(trigger_entered, ID));
@@ -1862,7 +1858,7 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	return true;
 }
 
-bool Highlightable::TryUnlock(Actor *actor, bool removekey) {
+bool Highlightable::TryUnlock(Actor *actor, bool removekey) const {
 	const char *Key = GetKey();
 	Actor *haskey = NULL;
 
@@ -1910,7 +1906,7 @@ void Highlightable::DetectTrap(int skill, ieDword actorID)
 	int check = 0;
 	if (third) {
 		//~Search (detect traps) check. Search skill %d vs. trap's difficulty %d (searcher's %d INT bonus).~
-		Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
+		const Actor *detective = core->GetGame()->GetActorByGlobalID(actorID);
 		int bonus = 0;
 		if (detective) {
 			bonus = detective->GetAbilityBonus(IE_INT);
@@ -1948,12 +1944,9 @@ Movable::Movable(ScriptableType type)
 	path = NULL;
 	step = NULL;
 	timeStartStep = 0;
-	Area[0] = 0;
 	AttackMovements[0] = 100;
 	AttackMovements[1] = 0;
 	AttackMovements[2] = 0;
-	HomeLocation.x = 0;
-	HomeLocation.y = 0;
 	maxWalkDistance = 0;
 	prevTicks = 0;
 	pathTries = 0;
@@ -2053,7 +2046,7 @@ void Movable::SetStance(unsigned int arg)
 	// but it is needed for the twang/clank when an actor stops moving
 	// a lot of other stances would get skipped later, since we check we're out of combat
 	if (Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		const Actor *actor = (Actor *) this;
 		actor->PlayArmorSound();
 	}
 }
@@ -2062,7 +2055,7 @@ void Movable::SetOrientation(int value, bool slow) {
 	//MAX_ORIENT == 16, so we can do this
 	NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
 	if (NewOrientation != Orientation && Type == ST_ACTOR) {
-		Actor *actor = (Actor *) this;
+		const Actor *actor = (Actor *) this;
 		actor->PlayArmorSound();
 	}
 	if (!slow) {
@@ -2070,7 +2063,7 @@ void Movable::SetOrientation(int value, bool slow) {
 	}
 }
 
-void Movable::SetAttackMoveChances(ieWord *amc)
+void Movable::SetAttackMoveChances(const ieWord *amc)
 {
 	AttackMovements[0]=amc[0];
 	AttackMovements[1]=amc[1];
@@ -2129,7 +2122,7 @@ void Movable::BumpAway()
 void Movable::BumpBack()
 {
 	if (Type != ST_ACTOR) return;
-	Actor *actor = (Actor*)this;
+	const Actor *actor = (const Actor*) this;
 	area->ClearSearchMapFor(this);
 	PathMapFlags oldPosBlockStatus = area->GetBlockedNavmap(oldPos);
 	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
@@ -2165,8 +2158,8 @@ void Movable::BumpBack()
 // for a random time (inspired by network media access control algorithms) or just stops if
 // the goal is close enough.
 void Movable::DoStep(unsigned int walkScale, ieDword time) {
-	Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (Actor*)this;
+	const Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (const Actor*) this;
 	// Only bump back if not moving
 	// Actors can be bumped while moving if they are backing off
 	if (!path) {
@@ -2299,8 +2292,8 @@ void Movable::WalkTo(const Point &Des, int distance)
 		return;
 	}
 
-	Actor *actor = nullptr;
-	if (Type == ST_ACTOR) actor = (Actor*)this;
+	const Actor *actor = nullptr;
+	if (Type == ST_ACTOR) actor = (const Actor*) this;
 
 	prevTicks = Ticks;
 	Destination = Des;

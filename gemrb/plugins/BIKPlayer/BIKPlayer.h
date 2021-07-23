@@ -137,8 +137,8 @@ typedef struct AVFrame {
 	
 	void release_buffer()
 	{
-		for(int i=0;i<3;i++) {
-			av_free(data[i]);
+		for (auto& i : data) {
+			av_free(i);
 		}
 	}
 	
@@ -175,8 +175,8 @@ typedef struct {
 
 typedef struct {
 	int     keyframe;
-	ieDword pos;
-	ieDword size;
+	strpos_t pos;
+	strpos_t size;
 } binkframe;
 
 typedef struct Bundle {
@@ -222,12 +222,8 @@ private:
 
 	//video context (consider packing it in a struct)
 	AVRational v_timebase;
-	long timer_last_sec;
-	long timer_last_usec;
-	unsigned int frame_wait;
 	bool video_rendered_frame;
-	unsigned int video_frameskip;
-	unsigned int video_skippedframes;
+
 	//bink specific
 	ScanTable c_scantable;
 	Bundle c_bundle[BINK_NB_SRC];  ///< bundles for decoding all data types
@@ -243,10 +239,8 @@ private:
 	AVFrame *c_pic, *c_last;
 
 private:
-	void timer_start();
-	void timer_wait();
 	void segment_video_play();
-	unsigned int fileRead(unsigned int pos, void* buf, unsigned int count);
+	strret_t fileRead(strpos_t pos, void* buf, strpos_t count);
 
 	int setAudioStream();
 	void freeAudioStream(int stream);

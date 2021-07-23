@@ -26,6 +26,8 @@
 #include <cmath>
 
 #include "SDLPixelIterator.h"
+
+#include "System/Logging.h"
 #include "Polygon.h"
 
 namespace GemRB {
@@ -158,7 +160,7 @@ void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, c
 				}
 				break;
 			default:
-				Log(ERROR, "sprite_t", "Working with unknown pixel format: %s", SDL_GetError());
+				ERROR_UNKNOWN_BPP;
 				break;
 		}
 	}
@@ -199,8 +201,8 @@ void DrawHLineSurface(SDL_Surface* dst, Point p, int x2, const Region& clip, con
 	if (SHADE != SHADER::NONE) {
 		Region r = Region::RegionFromPoints(p, Point(x2, p.y));
 		r.h = 1;
-		SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
-		SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+		auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
+		auto dstend = SDLPixelIterator::end(dstit);
 		
 		if (SHADE == SHADER::TINT) {
 			const static TintDst<false> blender;
@@ -243,8 +245,8 @@ inline void DrawVLineSurface(SDL_Surface* dst, Point p, int y2, const Region& cl
 
 	Region r = Region::RegionFromPoints(p, Point(p.x, y2));
 	r.w = 1;
-	SDLPixelIterator dstit(dst, RectFromRegion(r.Intersect(clip)));
-	SDLPixelIterator dstend = SDLPixelIterator::end(dstit);
+	auto dstit = MakeSDLPixelIterator(dst, r.Intersect(clip));
+	auto dstend = SDLPixelIterator::end(dstit);
 
 	if (SHADE == SHADER::BLEND) {
 		const static OneMinusSrcA<false, false> blender;

@@ -21,11 +21,13 @@
 #include "System/DataStream.h"
 
 #include "errors.h"
+#include "Resource.h"
+
 #include <ctype.h>
 
 namespace GemRB {
 
-static const char* GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca";
+static const char* const GEM_ENCRYPTION_KEY = "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca";
 
 const static ieWord endiantest = 1;
 bool DataStream::IsBigEndian = ((char *)&endiantest)[1] == 1;
@@ -34,10 +36,6 @@ DataStream::DataStream(void)
 {
 	Pos = size = 0;
 	Encrypted = false;
-}
-
-DataStream::~DataStream(void)
-{
 }
 
 void DataStream::SetBigEndian(bool be)
@@ -67,7 +65,7 @@ bool DataStream::CheckEncrypted()
 	return false;
 }
 /** No descriptions */
-void DataStream::ReadDecrypted(void* buf, unsigned long size)
+void DataStream::ReadDecrypted(void* buf, strpos_t size) const
 {
 	for (unsigned int i = 0; i < size; i++)
 		( ( unsigned char * ) buf )[i] ^= GEM_ENCRYPTION_KEY[( Pos + i ) & 63];
@@ -79,24 +77,24 @@ void DataStream::Rewind()
 	Pos = 0;
 }
 
-unsigned long DataStream::GetPos() const
+strpos_t DataStream::GetPos() const
 {
 	return Pos;
 }
 
-unsigned long DataStream::Size() const
+strpos_t DataStream::Size() const
 {
 	return size;
 }
 
-unsigned long DataStream::Remains() const
+strpos_t DataStream::Remains() const
 {
 	return size-Pos;
 }
 
-int DataStream::ReadResRef(ieResRef dest)
+strret_t DataStream::ReadResRef(char dest[9])
 {
-	int len = Read(dest, 8);
+	strret_t len = Read(dest, 8);
 	if (len == GEM_ERROR) {
 		dest[0] = 0;
 		return 0;
@@ -115,46 +113,56 @@ int DataStream::ReadResRef(ieResRef dest)
 	return len;
 }
 
-int DataStream::ReadResRef(ResRef& dest)
+strret_t DataStream::ReadResRef(ResRef& dest)
 {
-	ieResRef ref;
-	int len = ReadResRef(ref);
+	char ref[9];
+	strret_t len = ReadResRef(ref);
 	dest = ref;
 	return len;
 }
 
-int DataStream::WriteResRef(const ieResRef src)
+strret_t DataStream::WriteResRef(const char src[9])
 {
 	return Write( src, 8);
 }
 
-int DataStream::WriteResRef(const ResRef& src)
+strret_t DataStream::WriteResRef(const ResRef& src)
 {
 	return Write(src.CString(), 8);
 }
 
-int DataStream::ReadPoint(Point &p)
+strret_t DataStream::WriteResRefLC(const ResRef& src)
+{
+	return WriteResRef(ResRef::MakeLowerCase(src));
+}
+
+strret_t DataStream::WriteResRefUC(const ResRef& src)
+{
+	return WriteResRef(ResRef::MakeUpperCase(src));
+}
+
+strret_t DataStream::ReadPoint(Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	ieWord coord;
-	int ret = ReadScalar(coord);
+	strret_t ret = ReadScalar(coord);
 	p.x = coord;
 	ret += ReadScalar(coord);
 	p.y = coord;
 	return ret;
 }
 
-int DataStream::WritePoint(const Point &p)
+strret_t DataStream::WritePoint(const Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish
 	ieWord coord = p.x;
-	int ret = WriteScalar(coord);
+	strret_t ret = WriteScalar(coord);
 	coord = p.y;
 	ret += WriteScalar(coord);
 	return ret;
 }
 
-int DataStream::ReadLine(void* buf, unsigned long maxlen)
+strret_t DataStream::ReadLine(void* buf, strpos_t maxlen)
 {
 	// FIXME: eof?
 	if (!maxlen) {

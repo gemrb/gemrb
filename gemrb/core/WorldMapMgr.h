@@ -40,8 +40,6 @@ namespace GemRB {
 
 class GEM_EXPORT WorldMapMgr : public Plugin {
 public:
-	WorldMapMgr(void);
-	~WorldMapMgr(void) override;
 	virtual bool Open(DataStream* stream1, DataStream* stream2) = 0;
 	virtual WorldMapArray* GetWorldMapArray() = 0;
 

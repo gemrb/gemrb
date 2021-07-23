@@ -40,8 +40,6 @@ namespace GemRB {
 
 class GEM_EXPORT DataFileMgr : public Plugin {
 public:
-	DataFileMgr(void);
-	~DataFileMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual int GetTagsCount() const = 0;
 	virtual const char* GetTagNameByIndex(int index) const = 0;
@@ -50,11 +48,11 @@ public:
 	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) const = 0;
 	virtual int GetKeyAsInt(const char* Tag, const char* Key,
-		const int Default) const = 0;
+		int Default) const = 0;
 	virtual float GetKeyAsFloat(const char* Tag, const char* Key,
-		const float Default) const = 0;
+		float Default) const = 0;
 	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
-		const bool Default) const = 0;
+		bool Default) const = 0;
 };
 
 }

@@ -49,7 +49,7 @@ typedef struct {
 
 class GEM_EXPORT MapReverb {
 public:
-	MapReverb(Map&);
+	explicit MapReverb(Map&);
 
 	void getReverbProperties(MapReverbProperties&);
 

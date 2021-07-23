@@ -31,7 +31,7 @@ namespace GemRB {
 struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
-	ieResRef TilesetResRef;
+	ResRef TilesetResRef;
 	ieWord UniqueTileCount; // nNumUniqueTiles in the original (currently unused)
 	ieWord MovementType; // nMovementType in the original (currently unused)
 	ieDword TilemapOffset;
@@ -68,12 +68,12 @@ private:
 	WallPolygonGroup MakeGroupFromTableEntries(size_t idx, size_t cnt) const override;
 
 public:
-	WEDImporter(void);
+	WEDImporter() = default;
 	~WEDImporter(void) override;
 	bool Open(DataStream* stream) override;
 	//if tilemap already exists, don't create it
 	TileMap* GetTileMap(TileMap *tm) const override;
-	ieWord* GetDoorIndices(const ResRef&, int* count, bool& BaseClosed) override;
+	std::vector<ieWord> GetDoorIndices(const ResRef&, bool& BaseClosed) override;
 
 	std::vector<WallPolygonGroup> GetWallGroups() const override;
 

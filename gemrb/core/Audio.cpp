@@ -57,13 +57,9 @@ Audio::Audio(void)
 	CreateChannel("ARMOR");
 }
 
-Audio::~Audio(void)
-{
-}
-
 unsigned int Audio::CreateChannel(const char *name)
 {
-	channels.push_back(Channel(name));
+	channels.emplace_back(name);
 	return channels.size() - 1;
 }
 
@@ -121,10 +117,6 @@ float Audio::GetReverb(unsigned int channel) const
 		return 0.0f;
 	}
 	return channels[channel].getReverb();
-}
-
-SoundHandle::~SoundHandle()
-{
 }
 
 }

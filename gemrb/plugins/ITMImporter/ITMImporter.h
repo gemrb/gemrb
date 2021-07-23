@@ -45,7 +45,7 @@ public:
 	Item* GetItem(Item *s) override;
 private:
 	void GetExtHeader(Item *s, ITMExtHeader* eh);
-	void GetFeature(Effect *f, Item *s);
+	Effect *GetFeature(Item *s);
 };
 
 

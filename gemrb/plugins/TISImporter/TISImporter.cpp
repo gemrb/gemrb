@@ -24,13 +24,9 @@
 
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
-
-TISImporter::TISImporter(void)
-{
-}
 
 TISImporter::~TISImporter(void)
 {
@@ -69,7 +65,7 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	//pause key stops animation
 	ani->gameAnimation = true;
 	//the turning crystal in ar3202 (bg1) requires animations to be synced
-	ani->pos = 0;
+	ani->frameIdx = 0;
 	for (int i = 0; i < count; i++) {
 		ani->AddFrame( GetTile( indexes[i] ), i );
 	}

@@ -87,71 +87,189 @@ class Actor;
  * @class Effect
  * Structure holding information about single spell or spell-like effect.
  */
+struct ResourceGroup {
+	//keep these four in one bunch, VariableName will
+	//spread across them
+	ResRef Resource;
+	ResRef Resource2; //vvc in a lot of effects
+	ResRef Resource3;
+	ResRef Resource4;
+};
 
 // the same as ITMFeature and SPLFeature
 struct Effect {
-	ieDword Opcode;
-	ieDword Target;
-	ieDword Power;
-	ieDword Parameter1;
-	ieDword Parameter2;
-	ieWord TimingMode;   //0x1000 -- no need of conversion
-	ieWord unknown2;
-	ieDword Resistance;
-	ieDword Duration;
-	ieWord ProbabilityRangeMax;
-	ieWord ProbabilityRangeMin;
-	//keep these four in one bunch, VariableName will
-	//spread across them
-	ieResRef Resource;
-	ieResRef Resource2; //vvc in a lot of effects
-	ieResRef Resource3;
-	ieResRef Resource4;
-	ieDword DiceThrown;
-	ieDword DiceSides;
-	ieDword SavingThrowType;
-	ieDword SavingThrowBonus;
-	ieWord IsVariable;
-	ieWord IsSaveForHalfDamage;
+	ieDword Opcode = 0;
+	ieDword Target = 0;
+	ieDword Power = 0;
+	ieDword Parameter1 = 0;
+	ieDword Parameter2 = 0;
+	ieWord TimingMode = 0;   //0x1000 -- no need of conversion
+	ieWord unknown2 = 0;
+	ieDword Resistance = 0;
+	ieDword Duration = 0;
+	ieWord ProbabilityRangeMax = 0;
+	ieWord ProbabilityRangeMin = 0;
+	
+	union {
+		ResourceGroup resources; // keep largest type first to 0 fill everythings
+		char VariableName[32] {'\0'};
+	};
+
+	ResRef& Resource = resources.Resource;
+	ResRef& Resource2 = resources.Resource2; //vvc in a lot of effects
+	ResRef& Resource3 = resources.Resource3;
+	ResRef& Resource4 = resources.Resource4;
+
+	ieDword DiceThrown = 0;
+	ieDword DiceSides = 0;
+	ieDword SavingThrowType = 0;
+	ieDword SavingThrowBonus = 0;
+	ieWord IsVariable = 0;
+	ieWord IsSaveForHalfDamage = 0;
 
 	// EFF V2.0 fields:
-	ieDword PrimaryType; //school
-	ieDword MinAffectedLevel;
-	ieDword MaxAffectedLevel;
-	ieDword Parameter3;
-	ieDword Parameter4;
-	ieDword Parameter5;
-	ieDword Parameter6;
-	ieDword SourceX, SourceY;
-	ieDword PosX, PosY;
-	ieDword SourceType; //1-item, 2-spell
-	ieResRef Source;
-	ieDword SourceFlags;
-	ieDword Projectile;          //9c
-	ieDwordSigned InventorySlot; //a0
+	ieDword PrimaryType = 0; //school
+	ieDword MinAffectedLevel = 0;
+	ieDword MaxAffectedLevel = 0;
+	ieDword Parameter3 = 0;
+	ieDword Parameter4 = 0;
+	ieDword Parameter5 = 0;
+	ieDword Parameter6 = 0;
+	Point Source;
+	Point Pos;
+	ieDword SourceType = 0; //1-item, 2-spell
+	ResRef SourceRef;
+	ieDword SourceFlags = 0;
+	ieDword Projectile = 0;          //9c
+	ieDwordSigned InventorySlot = 0; //a0
 	//Original engine had a VariableName here, but it is stored in the resource fields
-	ieDword CasterLevel;  //c4 in both
-	ieDword FirstApply;   //c8 in bg2, cc in iwd2
-	ieDword SecondaryType;
-	ieDword SecondaryDelay; //still not sure about this
-	ieDword CasterID;       //10c in bg2 (not saved?)
+	ieDword CasterLevel = 0;  //c4 in both
+	ieDword FirstApply = 0;   //c8 in bg2, cc in iwd2
+	ieDword SecondaryType = 0;
+	ieDword SecondaryDelay = 0; //still not sure about this
+	ieDword CasterID = 0;       //10c in bg2 (not saved?)
 	// These are not in the IE files, but are our precomputed values
-	ieDword random_value;
+	ieDword random_value = 0;
 
-	ieDword SpellLevel; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
+	ieDword SpellLevel = 0; // Power does not always contain the Source level, which is needed in iwd2; items will be left at 0
 public:
 	//don't modify position in case it was already set
 	void SetPosition(const Point &p) {
-		if(PosX==0xffffffff && PosY==0xffffffff) {
-			PosX=p.x;
-			PosY=p.y;
+		if (Pos.IsInvalid()) {
+			Pos = p;
 		}
 	}
 	void SetSourcePosition(const Point &p) {
-		if(SourceX==0xffffffff && SourceY==0xffffffff) {
-			SourceX=p.x;
-			SourceY=p.y;
+		if (Source.IsInvalid()) {
+			Source = p;
 		}
+	}
+	
+	Effect() noexcept
+	: resources()
+	{
+		// must define our own empty ctor due to union type
+		// union is already 0 initialized so there is nothing else to do
+	}
+
+	Effect(const Effect& rhs) noexcept {
+		Opcode = rhs.Opcode;
+		Target = rhs.Target;
+		Power = rhs.Power;
+		Parameter1 = rhs.Parameter1;
+		Parameter2 = rhs.Parameter2;
+		TimingMode = rhs.TimingMode;
+		// skip unknown2
+		Resistance = rhs.Resistance;
+		Duration = rhs.Duration;
+		ProbabilityRangeMax = rhs.ProbabilityRangeMax;
+		ProbabilityRangeMin = rhs.ProbabilityRangeMin;
+		DiceThrown = rhs.DiceThrown;
+		DiceSides = rhs.DiceSides;
+		SavingThrowType = rhs.SavingThrowType;
+		SavingThrowBonus = rhs.SavingThrowBonus;
+		IsVariable = rhs.IsVariable;
+		IsSaveForHalfDamage = rhs.IsSaveForHalfDamage;
+		PrimaryType = rhs.PrimaryType;
+		MinAffectedLevel = rhs.MinAffectedLevel;
+		MaxAffectedLevel = rhs.MaxAffectedLevel;
+		Parameter3 = rhs.Parameter3;
+		Parameter4 = rhs.Parameter4;
+		Parameter5 = rhs.Parameter5;
+		Parameter6 = rhs.Parameter6;
+		Source = rhs.Source;
+		Pos = rhs.Pos;
+		SourceType = rhs.SourceType;
+		SourceRef = rhs.SourceRef;
+		SourceFlags = rhs.SourceFlags;
+		Projectile = rhs.Projectile;
+		InventorySlot = rhs.InventorySlot;
+		CasterLevel = rhs.CasterLevel;
+		FirstApply = rhs.FirstApply;
+		SecondaryType = rhs.SecondaryType;
+		SecondaryDelay = rhs.SecondaryDelay;
+		CasterID = rhs.CasterID;
+		random_value = rhs.random_value;
+		SpellLevel = rhs.SpellLevel;
+
+		IsVariable = rhs.IsVariable;
+		if (rhs.VariableName[0]) {
+			strlcpy(VariableName, rhs.VariableName, sizeof(VariableName));
+		}
+		// reset references
+		Resource = resources.Resource;
+		Resource2 = resources.Resource2;
+		Resource3 = resources.Resource3;
+		Resource4 = resources.Resource4;
+	}
+
+	~Effect() = default;
+
+	bool operator==(const Effect& rhs) const noexcept {
+		if (this == &rhs) return true;
+		
+		if (Opcode != rhs.Opcode) return false;
+		if (Target != rhs.Target) return false;
+		if (Power != rhs.Power) return false;
+		if (Parameter1 != rhs.Parameter1) return false;
+		if (Parameter2 != rhs.Parameter2) return false;
+		if (TimingMode != rhs.TimingMode) return false;
+		// skip unknown2
+		if (Resistance != rhs.Resistance) return false;
+		if (Duration != rhs.Duration) return false;
+		if (ProbabilityRangeMax != rhs.ProbabilityRangeMax) return false;
+		if (ProbabilityRangeMin != rhs.ProbabilityRangeMin) return false;
+		if (DiceThrown != rhs.DiceThrown) return false;
+		if (DiceSides != rhs.DiceSides) return false;
+		if (SavingThrowType != rhs.SavingThrowType) return false;
+		if (SavingThrowBonus != rhs.SavingThrowBonus) return false;
+		if (IsVariable != rhs.IsVariable) return false;
+		if (IsSaveForHalfDamage != rhs.IsSaveForHalfDamage) return false;
+		if (PrimaryType != rhs.PrimaryType) return false;
+		if (MinAffectedLevel != rhs.MinAffectedLevel) return false;
+		if (MaxAffectedLevel != rhs.MaxAffectedLevel) return false;
+		if (Parameter3 != rhs.Parameter3) return false;
+		if (Parameter4 != rhs.Parameter4) return false;
+		if (Parameter5 != rhs.Parameter5) return false;
+		if (Parameter6 != rhs.Parameter6) return false;
+		if (Source != rhs.Source) return false;
+		if (Pos != rhs.Pos) return false;
+		if (SourceType != rhs.SourceType) return false;
+		if (SourceRef != rhs.SourceRef) return false;
+		if (SourceFlags != rhs.SourceFlags) return false;
+		if (Projectile != rhs.Projectile) return false;
+		if (InventorySlot != rhs.InventorySlot) return false;
+		if (CasterLevel != rhs.CasterLevel) return false;
+		if (FirstApply != rhs.FirstApply) return false;
+		if (SecondaryType != rhs.SecondaryType) return false;
+		if (SecondaryDelay != rhs.SecondaryDelay) return false;
+		if (CasterID != rhs.CasterID) return false;
+		if (random_value != rhs.random_value) return false;
+		if (SpellLevel != rhs.SpellLevel) return false;
+
+		if (IsVariable && strnicmp(VariableName, rhs.VariableName, sizeof(VariableName)) != 0) return false;
+		else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
+		
 	}
 };
 

@@ -52,7 +52,6 @@ public:
 	 * @param[in] keyType \iespecific Type identifier used in key/biff files.
 	 */
 	ResourceDesc(const TypeID* type, CreateFunc create, const char *ext, ieWord keyType = 0);
-	~ResourceDesc(void);
 	const char* GetExt() const;
 	const TypeID* GetType() const;
 	ieWord GetKeyType() const;

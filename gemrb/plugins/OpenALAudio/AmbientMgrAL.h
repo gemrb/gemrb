@@ -23,6 +23,7 @@
 
 #include "AmbientMgr.h"
 #include "Region.h"
+#include "globals.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -51,26 +52,26 @@ private:
 	
 	class AmbientSource {
 	public:
-		AmbientSource(const Ambient *a);
+		explicit AmbientSource(const Ambient *a);
 		~AmbientSource();
-		uint64_t tick(uint64_t ticks, Point listener, ieDword timeslice);
+		tick_t tick(tick_t ticks, Point listener, ieDword timeslice);
 		void hardStop();
-		void SetVolume(unsigned short volume);
+		void SetVolume(unsigned short volume) const;
 	private:
 		int stream;
 		const Ambient* ambient;
-		uint64_t lastticks;
-		unsigned int nextdelay;
+		tick_t lastticks;
+		tick_t nextdelay;
 		size_t nextref;
 		unsigned int totalgain;
 
 		bool isHeard(const Point &listener) const;
-		int enqueue();
+		tick_t enqueue() const;
 	};
 	std::vector<AmbientSource *> ambientSources;
 	
 	int play();
-	uint64_t tick(uint64_t ticks) const;
+	tick_t tick(tick_t ticks) const;
 	void hardStop() const;
 	
 	mutable std::recursive_mutex mutex;

@@ -60,7 +60,7 @@ public:
 	typedef MyAssoc *iterator;
 public:
 	// Construction
-	Variables(int nBlockSize = 10, int nHashTableSize = 2049);
+	explicit Variables(int nBlockSize = 10, int nHashTableSize = 2049);
 	void LoadInitialValues(const char* name);
 
 	// Attributes

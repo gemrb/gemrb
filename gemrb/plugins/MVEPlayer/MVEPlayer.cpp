@@ -26,7 +26,7 @@
 #include "Interface.h"
 #include "Palette.h"
 #include "Variables.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cassert>
 #include <cstdio>
@@ -42,16 +42,12 @@ MVEPlay::MVEPlay(void)
 	video = core->GetVideoDriver();
 	validVideo = false;
 	vidBuf = NULL;
-	g_palette = new Palette();
+	g_palette = MakeHolder<Palette>();
 
 	// these colors don't change
 	g_palette->col[0] = ColorBlack;
 	//Set color 255 to be our subtitle color
 	g_palette->col[255] = Color(50,50,50,255);
-}
-
-MVEPlay::~MVEPlay(void)
-{
 }
 
 bool MVEPlay::Open(DataStream* stream)
@@ -80,9 +76,7 @@ bool MVEPlay::DecodeFrame(VideoBuffer& buf)
 
 unsigned int MVEPlay::fileRead(void* buf, unsigned int count)
 {
-	unsigned numread;
-
-	numread = str->Read( buf, count );
+	strret_t numread = str->Read( buf, count );
 	return ( numread == count );
 }
 

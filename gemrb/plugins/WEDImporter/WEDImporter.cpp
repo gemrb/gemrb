@@ -34,10 +34,6 @@ using namespace GemRB;
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
 #define WED_POLYGON_SIZE  0x12
 
-WEDImporter::WEDImporter(void)
-{
-}
-
 WEDImporter::~WEDImporter(void)
 {
 	delete str;
@@ -96,10 +92,10 @@ bool WEDImporter::Open(DataStream* stream)
 
 int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
 {
-	ieResRef res;
+	char res[9];
 	int usedoverlays = 0;
 
-	memcpy(res, overlays->TilesetResRef, sizeof(ieResRef));
+	memcpy(res, overlays->TilesetResRef, 9);
 	size_t len = strlen(res);
 	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
@@ -176,7 +172,7 @@ TileMap* WEDImporter::GetTileMap(TileMap *tm) const
 	int usedoverlays;
 	bool freenew = false;
 
-	if (!overlays.size()) {
+	if (overlays.empty()) {
 		return NULL;
 	}
 
@@ -239,9 +235,9 @@ WallPolygonGroup WEDImporter::OpenDoorPolygons() const
 	return MakeGroupFromTableEntries(index, count);
 }
 
-ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& BaseClosed)
+std::vector<ieWord> WEDImporter::GetDoorIndices(const ResRef& resref, bool& BaseClosed)
 {
-	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
+	ieWord DoorClosed, DoorTileStart, DoorTileCount;
 	ResRef Name;
 	unsigned int i;
 
@@ -253,9 +249,8 @@ ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& Base
 	}
 	//The door has no representation in the WED file
 	if (i == DoorsCount) {
-		*count = 0;
 		Log(ERROR, "WEDImporter", "Found door without WED entry!");
-		return NULL;
+		return {};
 	}
 
 	str->ReadWord(DoorClosed);
@@ -268,12 +263,11 @@ ieWord* WEDImporter::GetDoorIndices(const ResRef& resref, int* count, bool& Base
 
 	//Reading Door Tile Cells
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
-	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
-	str->Read( DoorTiles, DoorTileCount * sizeof( ieWord ) );
+	auto DoorTiles = std::vector<ieWord>(DoorTileCount);
+	str->Read(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
 	if( DataStream::BigEndian()) {
-		swabs(DoorTiles, DoorTileCount * sizeof(ieWord));
+		swabs(&DoorTiles[0], DoorTileCount * sizeof(ieWord));
 	}
-	*count = DoorTileCount;
 	BaseClosed = DoorClosed != 0;
 	return DoorTiles;
 }
@@ -329,22 +323,16 @@ void WEDImporter::ReadWallPolygons()
 		ieDword flags = PolygonHeaders[i].Flags&~(WF_BASELINE|WF_HOVER);
 		Point base0, base1;
 		if (PolygonHeaders[i].Flags&WF_HOVER) {
-			count-=2;
-			ieWord x,y;
-			str->ReadWord(x);
-			str->ReadWord(y);
-			base0 = Point(x,y);
-			str->ReadWord(x);
-			str->ReadWord(y);
-			base1 = Point(x,y);
+			count -= 2;
+			str->ReadPoint(base0);
+			str->ReadPoint(base1);
 			flags |= WF_BASELINE;
 		}
-		Point *points = new Point[count];
-		for (size_t i = 0; i < count; ++i) {
-			ieWord x, y;
-			str->ReadWord(x);
-			str->ReadWord(y);
-			points[i] = Point(x, y);
+		std::vector<Point> points(count);
+		for (size_t j = 0; j < count; ++j) {
+			Point vertex;
+			str->ReadPoint(vertex);
+			points[j] = vertex;
 		}
 
 		if (!(flags&WF_BASELINE) ) {
@@ -361,7 +349,7 @@ void WEDImporter::ReadWallPolygons()
 		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
 		
 		if (!rgn.size.IsInvalid()) { // PST AR0600 is known to have a polygon with 0 height
-			polygonTable[i] = std::make_shared<Wall_Polygon>(points, count, &rgn);
+			polygonTable[i] = std::make_shared<Wall_Polygon>(std::move(points), &rgn);
 			if (flags&WF_BASELINE) {
 				polygonTable[i]->SetBaseline(base0, base1);
 			}
@@ -370,8 +358,6 @@ void WEDImporter::ReadWallPolygons()
 			}
 			polygonTable[i]->SetPolygonFlag(flags);
 		}
-		
-		delete [] points;
 	}
 	delete [] PolygonHeaders;
 }

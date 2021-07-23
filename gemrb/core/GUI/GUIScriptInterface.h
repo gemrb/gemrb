@@ -37,7 +37,7 @@ public:
 	}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override {
 		return {"View"};
 	};
 
@@ -56,7 +56,7 @@ public:
 	: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
+	ScriptingClassId ScriptingClass() const override {
 		static ScriptingClassId cls("Window");
 		return cls;
 	};
@@ -74,8 +74,8 @@ public:
 	: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
-	const ScriptingClassId ScriptingClass() const override {
-		Control* ctrl = static_cast<Control*>(GetObject());
+	ScriptingClassId ScriptingClass() const override {
+		const Control* ctrl = static_cast<const Control*>(GetObject());
 
 		// would just use type_info here, but its implementation specific...
 		switch (ctrl->ControlType) {
@@ -102,11 +102,11 @@ public:
 };
 
 
-Window* GetWindow(ScriptingId id, ResRef pack);
-const WindowScriptingRef* RegisterScriptableWindow(Window*, ResRef pack, ScriptingId id);
+Window* GetWindow(ScriptingId id, const ResRef& pack);
+const WindowScriptingRef* RegisterScriptableWindow(Window*, const ResRef& pack, ScriptingId id);
 
 GEM_EXPORT View* GetView(const ScriptingRefBase* base);
-GEM_EXPORT std::vector<View*> GetViews(ResRef pack);
+GEM_EXPORT std::vector<View*> GetViews(const ResRef& pack);
 GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
 GEM_EXPORT const ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing = nullptr);

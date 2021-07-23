@@ -73,8 +73,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
-	ieResRef MosFile;
-	unsigned int i;
+	ResRef MosFile;
 
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
@@ -117,7 +116,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		Log(ERROR, "CHUImporter", "No BAM Importer Available, skipping controls");
 		return win;
 	}
-	for (i = 0; i < ControlsCount; i++) {
+	for (unsigned int i = 0; i < ControlsCount; i++) {
 		Control* ctrl = NULL;
 		str->Seek( CTOffset + ( ( FirstControl + i ) * 8 ), GEM_STREAM_START );
 		ieDword COffset, CLength, ControlID;
@@ -144,7 +143,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				//Button
 				Button* btn = new Button(ctrlFrame);
 				ctrl = btn;
-				ieResRef BAMFile;
+				ResRef BAMFile;
 				ieByte Cycle, tmp;
 				ieDword Flags;
 				ieByte UnpressedIndex, x1;
@@ -178,11 +177,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					btn->SetAnchor(x1 | (x2<<8), y1 | (y2<<8));
 				}
 
-				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
-					if (UnpressedIndex == 0) {
-						//printMessage("CHUImporter", "Special Button Control, Skipping Image Loading\n",GREEN );
-						break;
-					}
+				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
+					break;
 				}
 				AnimationFactory* bam = ( AnimationFactory* )
 					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
@@ -199,7 +195,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				tspr = bam->GetFrame( PressedIndex, Cycle );
 				btn->SetImage( BUTTON_IMAGE_PRESSED, tspr );
 				// work around several controls not setting all the indices
-				int cycleSize = bam->GetCycleSize(Cycle);
+				AnimationFactory::index_t cycleSize = bam->GetCycleSize(Cycle);
 				bool resetIndex = false;
 				if (core->HasFeature(GF_IGNORE_BUTTON_FRAMES) && (cycleSize == 3 || cycleSize == 4)) {
 						resetIndex = true;
@@ -218,8 +214,9 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_PROGRESSBAR:
 			{
 				//GemRB specific, progressbar
-				ieResRef MOSFile, MOSFile2;
-				ieResRef BAMFile;
+				ResRef MOSFile;
+				ResRef MOSFile2;
+				ResRef BAMFile;
 				Point knobP;
 				Point capP;
 				ieWord KnobStepsCount;
@@ -238,11 +235,11 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				Holder<Sprite2D> img;
 				Holder<Sprite2D> img2;
 				Holder<Sprite2D> img3;
-				if ( MOSFile[0] ) {
+				if (!MOSFile.IsEmpty()) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 					img = mos->GetSprite2D();
 				}
-				if ( MOSFile2[0] ) {
+				if (!MOSFile2.IsEmpty()) {
 					ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile2);
 					img2 = mos->GetSprite2D();
 				}
@@ -255,7 +252,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 					if (af) {
 						pbar->SetAnimation(af->GetCycle( Cycle & 0xff ) );
 					} else {
-						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile);
+						Log(ERROR, "CHUImporter", "Couldn't create animationfactory for knob: %s", BAMFile.CString());
 					}
 				}
 				else {
@@ -270,7 +267,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_SLIDER:
 			{
 				//Slider
-				ieResRef MOSFile, BAMFile;
+				ResRef MOSFile;
+				ResRef BAMFile;
 				ieWord Cycle, Knob, GrabbedKnob;
 				ieWord KnobXPos, KnobYPos, KnobStep, KnobStepsCount;
 				str->ReadResRef( MOSFile );
@@ -305,8 +303,9 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_EDIT:
 			{
 				//Text Edit
-				ieResRef BGMos;
-				ieResRef FontResRef, CursorResRef;
+				ResRef BGMos;
+				ResRef FontResRef;
+				ResRef CursorResRef;
 				ieWord maxInput;
 				ieWord CurCycle, CurFrame;
 				ieWord PosX, PosY;
@@ -361,7 +360,8 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_TEXTAREA:
 			{
 				//Text Area
-				ieResRef FontResRef, InitResRef;
+				ResRef FontResRef;
+				ResRef InitResRef;
 				Color fore, init, back;
 				ieWord SBID;
 				str->ReadResRef( FontResRef );
@@ -392,7 +392,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 			case IE_GUI_LABEL:
 			{
 				//Label
-				ieResRef FontResRef;
+				ResRef FontResRef;
 				ieStrRef StrRef;
 				ieWord alignment;
 				str->ReadDword(StrRef);
@@ -445,7 +445,7 @@ endalign:
 			case IE_GUI_SCROLLBAR:
 			{
 				//ScrollBar
-				ieResRef BAMResRef;
+				ResRef BAMResRef;
 				ieWord Cycle, TAID, imgIdx;
 				str->ReadResRef( BAMResRef );
 				str->ReadWord(Cycle);
@@ -453,13 +453,13 @@ endalign:
 				AnimationFactory* bam = ( AnimationFactory* )
 				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
-					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef);
+					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef.CString());
 					break;
 				}
 				Holder<Sprite2D> images[ScrollBar::IMAGE_COUNT];
-				for (int i = 0; i < ScrollBar::IMAGE_COUNT; i++) {
+				for (auto& image : images) {
 					str->ReadWord(imgIdx);
-					images[i] = bam->GetFrame(imgIdx, Cycle);
+					image = bam->GetFrame(imgIdx, Cycle);
 				}
 				str->ReadWord(TAID);
 

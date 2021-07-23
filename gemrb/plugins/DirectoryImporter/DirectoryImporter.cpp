@@ -97,14 +97,6 @@ DataStream* DirectoryImporter::GetResource(const char* resname, const ResourceDe
 	return SearchIn( path, resname, type.GetExt() );
 }
 
-CachedDirectoryImporter::CachedDirectoryImporter()
-{
-}
-
-CachedDirectoryImporter::~CachedDirectoryImporter()
-{
-}
-
 bool CachedDirectoryImporter::Open(const char *dir, const char *desc)
 {
 	if (!DirectoryImporter::Open(dir, desc))

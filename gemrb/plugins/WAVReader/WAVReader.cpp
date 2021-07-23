@@ -65,7 +65,7 @@ bool RawPCMReader::Open(DataStream* stream)
 		samples >>= 1; // each sample has 16 bit
 	}
 	samples_left = samples;
-	return 1;
+	return true;
 }
 
 inline void fix_endian(ieDword &dest)
@@ -84,13 +84,13 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	if (count > samples_left) {
 		count = samples_left;
 	}
-	int res = 0;
+	strret_t res = 0;
 	if (count) {
 		res = str->Read(buffer, count * (is16bit ? 2 : 1));
 	}
 	if (!is16bit) {
 		char* alt_buff = ( char* ) buffer;
-		int i = res;
+		strret_t i = res;
 		while(i--) {
 			alt_buff[( i << 1 ) + 1] = ( char ) ( alt_buff[i] - 0x80 );
 			alt_buff[i << 1] = 0;

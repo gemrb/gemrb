@@ -71,7 +71,7 @@ void Control::SetAction(Responder handler, const ActionKey& key)
 		actions[key] = handler;
 	} else {
 		// delete the entry if there is one instead of setting it to NULL
-		ActionIterator it = actions.find(key);
+		const auto& it = actions.find(key);
 		if (it != actions.end()) {
 			actions.erase(it);
 		}
@@ -102,7 +102,7 @@ bool Control::PerformAction(const ActionKey& key)
 		return false;
 	}
 	
-	ActionIterator it = actions.find(key);
+	const auto& it = actions.find(key);
 	if (it != actions.end()) {
 		if (!window) {
 			Log(WARNING, "Control", "Executing event handler for a control with no window. This most likely indicates a programming or scripting error.");

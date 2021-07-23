@@ -47,7 +47,6 @@ protected:
 	AutoTable dialogTable; // dialogs attached to items (conversables such as Lilarcor)
 public:
 	ItemMgr(void);
-	~ItemMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Item* GetItem(Item *s) = 0;
 };

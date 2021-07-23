@@ -21,9 +21,12 @@
 #include "GUI/Progressbar.h"
 
 #include "Interface.h"
+
 #include "GUI/Window.h"
 
 #include <cstring>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -89,17 +92,19 @@ void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
 
 void Progressbar::UpdateState(unsigned int Sum)
 {
+	if (Sum == CTL_INVALID_VALUE) return;
+
 	SetValue(Sum);
-    if(GetValue() == 100) {
-        PerformAction(Action::EndReached);
-    }
+	if (GetValue() == 100) {
+		PerformAction(Action::EndReached);
+	}
 }
 
 /** Sets the selected image */
 void Progressbar::SetImages(Holder<Sprite2D> bg, Holder<Sprite2D> cap)
 {
-	BackGround2 = bg;
-	PBarCap = cap;
+	BackGround2 = std::move(bg);
+	PBarCap = std::move(cap);
 	MarkDirty();
 }
 

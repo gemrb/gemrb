@@ -39,7 +39,6 @@ void PCStatsStruct::Init(bool all)
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
 	memset(QSlots, 0, sizeof(QSlots));
 	QSlots[0]=0xff;
-	memset( QuickSpells, 0, sizeof(QuickSpells) );
 	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
 	memset( QuickItemSlots, -1, sizeof(QuickItemSlots) );
 	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
@@ -54,7 +53,6 @@ void PCStatsStruct::Init(bool all)
 	AwayTime = 0;
 	unknown10 = 0;
 	Happiness = 0;
-	SoundSet[0]=0;
 	SoundFolder[0]=0;
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
 	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
@@ -68,7 +66,7 @@ PCStatsStruct::PCStatsStruct()
 	Init();
 }
 
-PCStatsStruct::PCStatsStruct(std::list<int> levels)
+PCStatsStruct::PCStatsStruct(const std::list<int>& levels)
 {
 	Init();
 	UpdateClassLevels(levels);
@@ -89,7 +87,9 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	std::copy(std::begin(source.FavouriteWeapons), std::end(source.FavouriteWeapons), std::begin(FavouriteWeapons));
 	memcpy(FavouriteWeaponsCount, source.FavouriteWeaponsCount, sizeof(FavouriteWeaponsCount));
 	memcpy(QSlots, source.QSlots, sizeof(QSlots));
-	memcpy(QuickSpells, source.QuickSpells, sizeof(QuickSpells));
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		QuickSpells[i] = source.QuickSpells[i];
+	}
 	memcpy(QuickSpellClass, source.QuickSpellClass, sizeof(QuickSpellClass));
 	memcpy(QuickItemSlots, source.QuickItemSlots, sizeof(QuickItemSlots));
 	memcpy(QuickItemHeaders, source.QuickItemHeaders, sizeof(QuickItemHeaders));
@@ -100,7 +100,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	AwayTime = source.AwayTime;
 	unknown10 = source.unknown10;
 	Happiness = source.Happiness;
-	strlcpy(SoundSet, source.SoundSet, sizeof(ieResRef));
+	SoundSet = source.SoundSet;
 	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
 	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
 	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
@@ -146,16 +146,14 @@ void PCStatsStruct::SetQuickItemSlot(int idx, int slot, int headerindex)
 void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!which) {
-		int i;
-
-		for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 			if (slot==QuickItemSlots[i]) {
 				QuickItemHeaders[i]=headerindex;
 				return;
 			}
 		}
 
-		for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+		for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 			if (slot==QuickWeaponSlots[i]) {
 				QuickWeaponHeaders[i]=headerindex;
 				return;
@@ -257,13 +255,11 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 //only quickslots have this assignment, equipment items got all abilities available
 int PCStatsStruct::GetHeaderForSlot(int slot)
 {
-	int i;
-
-	for(i=0;i<MAX_QUICKITEMSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
 	}
 
-	for(i=0;i<MAX_QUICKWEAPONSLOT;i++) {
+	for (int i = 0; i < MAX_QUICKWEAPONSLOT; i++) {
 		if(QuickWeaponSlots[i]==slot) return (ieWordSigned) QuickWeaponHeaders[i];
 	}
 	return -1;
@@ -278,7 +274,7 @@ int PCStatsStruct::GetHeaderForSlot(int slot)
 //but also swap it with a previous slot if its usage count is now better, so the last slot is always the weakest
 //finally if it was not found anywhere, register it as the new candidate with 1 usage
 
-void PCStatsStruct::RegisterFavourite(ResRef fav, int what)
+void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 {
 	ResRef *respoi;
 	ieWord *cntpoi;

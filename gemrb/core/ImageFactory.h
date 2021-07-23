@@ -33,7 +33,7 @@ class GEM_EXPORT ImageFactory : public FactoryObject {
 private:
 	Holder<Sprite2D> bitmap;
 public:
-	ImageFactory(const char* ResRef, Holder<Sprite2D> bitmap);
+	ImageFactory(const ResRef& resref, Holder<Sprite2D> bitmap);
 
 	Holder<Sprite2D> GetSprite2D() const { return bitmap; }
 };

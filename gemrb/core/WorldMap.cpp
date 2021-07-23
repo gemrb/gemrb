@@ -23,10 +23,12 @@
 #include "Game.h"
 #include "Interface.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "RNG.h"
 
 #include <list>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -99,7 +101,7 @@ Holder<Sprite2D> WMPAreaEntry::GetMapIcon(const AnimationFactory *bam)
 	return MapIcon;
 }
 
-ieDword WMPAreaEntry::GetAreaStatus()
+ieDword WMPAreaEntry::GetAreaStatus() const
 {
 	ieDword tmp = AreaStatus;
 	if (core->HasFeature(GF_KNOW_WORLD) ) {
@@ -156,17 +158,15 @@ void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 	area_entries.push_back(ae);
 }
 
-void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLink *arealink)
+void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, const WMPAreaLink *arealink)
 {
-	unsigned int pos;
-	WMPAreaEntry *ae;
-
 	WMPAreaLink *al = new WMPAreaLink(*arealink);
 	unsigned int idx = area_entries[areaidx]->AreaLinksIndex[dir];
 	area_links.insert(area_links.begin()+idx,al);
 
-	unsigned int max = area_entries.size();
-	for(pos = 0; pos<max; pos++) {
+	WMPAreaEntry *ae;
+	size_t max = area_entries.size();
+	for (unsigned int pos = 0; pos < max; pos++) {
 		ae = area_entries[pos];
 		for (unsigned int k=0;k<4;k++) {
 			if ((pos==areaidx) && (k==dir)) {
@@ -180,7 +180,7 @@ void WorldMap::InsertAreaLink(unsigned int areaidx, unsigned int dir, WMPAreaLin
 	}
 }
 
-void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
+void WorldMap::SetAreaLink(unsigned int x, const WMPAreaLink *arealink)
 {
 	WMPAreaLink *al = new WMPAreaLink(*arealink);
 
@@ -202,13 +202,11 @@ void WorldMap::SetAreaLink(unsigned int x, WMPAreaLink *arealink)
 
 WorldMap::~WorldMap(void)
 {
-	unsigned int i;
-
-	for (i = 0; i < area_entries.size(); i++) {
-		delete( area_entries[i] );
+	for (auto entry : area_entries) {
+		delete entry;
 	}
-	for (i = 0; i < area_links.size(); i++) {
-		delete( area_links[i] );
+	for (auto link : area_links) {
+		delete link;
 	}
 	if (Distances) {
 		free(Distances);
@@ -226,14 +224,14 @@ void WorldMap::SetMapIcons(AnimationFactory *newicons)
 
 void WorldMap::SetMapMOS(Holder<Sprite2D> newmos)
 {
-	MapMOS = newmos;
+	MapMOS = std::move(newmos);
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ResRef& AreaName, unsigned int &i) const
+WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
 {
 	i=(unsigned int) area_entries.size();
 	while (i--) {
-		if (AreaName == area_entries[i]->AreaName) {
+		if (areaName == area_entries[i]->AreaName) {
 			return area_entries[i];
 		}
 	}
@@ -244,14 +242,14 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& AreaName, unsigned int &i) const
 //Counting backwards, stop at 1000 boundaries.
 //It is not possible to simply round to 1000, because there are 
 //WMP entries like AR8001, and we need to find the best match
-WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& AreaName, unsigned int &i) const
+WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& areaName, unsigned int &i) const
 {
 	int value = 0;
-	ieResRef tmp;
+	ResRef tmp;
 
-	sscanf(AreaName.CString() + 2,"%4d", &value);
+	sscanf(areaName.CString() + 2, "%4d", &value);
 	do {
-		snprintf(tmp, 9, "%.2s%04d", AreaName.CString(), value);
+		tmp.SNPrintF("%.2s%04d", areaName.CString(), value);
 		WMPAreaEntry* ret = GetArea(tmp, i);
 		if (ret) {
 			return ret;
@@ -259,30 +257,30 @@ WMPAreaEntry* WorldMap::FindNearestEntry(const ResRef& AreaName, unsigned int &i
 		if (value%1000 == 0) break;
 		value--;
 	}
-	while(1); //value%1000 should protect us from infinite loops
+	while (true); //value%1000 should protect us from infinite loops
 	i = -1;
 	return NULL;
 }
 
 //this is a pathfinding algorithm
 //you have to find the optimal path
-int WorldMap::CalculateDistances(const ResRef& AreaName, int direction)
+int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 {
 	//first, update reachable/visible areas by worlde.2da if exists
 	UpdateReachableAreas();
-	UpdateAreaVisibility(AreaName, direction);
+	UpdateAreaVisibility(areaName, direction);
 	if (direction==-1) {
 		return 0;
 	}
 
 	if (direction<0 || direction>3) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: %s", AreaName.CString());
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid direction: %s", areaName.CString());
 		return -1;
 	}
 
 	unsigned int i;
-	if (!GetArea(AreaName, i)) {
-		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: %s", AreaName.CString());
+	if (!GetArea(areaName, i)) {
+		Log(ERROR, "WorldMap", "CalculateDistances for invalid Area: %s", areaName.CString());
 		return -1;
 	}
 	if (Distances) {
@@ -292,7 +290,7 @@ int WorldMap::CalculateDistances(const ResRef& AreaName, int direction)
 		free(GotHereFrom);
 	}
 
-	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: %s", AreaName.CString());
+	Log(MESSAGE, "WorldMap", "CalculateDistances for Area: %s", areaName.CString());
 
 	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
@@ -372,16 +370,16 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 
 WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 {
-	unsigned int i,j,k;
-
+	unsigned int i;
 	WMPAreaEntry *ae=GetArea( A, i );
 	if (!ae) {
 		return NULL;
 	}
+
 	//looking for destination area, returning the first link found
-	for (i=0;i<4;i++) {
-		j=ae->AreaLinksCount[i];
-		k=ae->AreaLinksIndex[i];
+	for (unsigned int i = 0; i < 4; i++) {
+		unsigned int j = ae->AreaLinksCount[i];
+		unsigned int k = ae->AreaLinksIndex[i];
 		while(j--) {
 			WMPAreaLink *al = area_links[k++];
 			WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
@@ -397,19 +395,19 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 //call this function to find out which area we fall into
 //not necessarily the target area
 //if it isn't the same, then a random encounter happened!
-WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& AreaName, bool &encounter) const
+WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter) const
 {
 	if (!GotHereFrom) {
 		return NULL;
 	}
 	unsigned int i;
-	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
+	WMPAreaEntry *ae=GetArea( areaName, i ); //target area
 	if (!ae) {
-		Log(ERROR, "WorldMap", "No such area: %s", AreaName.CString());
+		Log(ERROR, "WorldMap", "No such area: %s", areaName.CString());
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;
-	Log(DEBUG, "WorldMap", "Gathering path information for: %s", AreaName.CString());
+	Log(DEBUG, "WorldMap", "Gathering path information for: %s", areaName.CString());
 	while (GotHereFrom[i]!=-1) {
 		Log(DEBUG, "WorldMap", "Adding path to %d", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
@@ -441,7 +439,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& AreaName, bool &encounter)
 //adds a temporary AreaEntry to the world map
 //this entry has two links for each direction, leading to the two areas
 //we were travelling between when using the supplied link
-void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
+void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	unsigned int i;
 	if (GetArea(area, i)) {
 		return;
@@ -493,13 +491,13 @@ void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
 	lsrc->DistanceScale /= 2;
 	lsrc->EncounterChance = 0;
 
-	unsigned int idx = area_links.size();
+	size_t idx = area_links.size();
 	AddAreaLink(ldest);
 	AddAreaLink(lsrc);
 
 	for (i = 0; i < 4; ++i) {
 		ae->AreaLinksCount[i] = 2;
-		ae->AreaLinksIndex[i] = idx;
+		ae->AreaLinksIndex[i] = static_cast<ieDword>(idx);
 	}
 	
 	encounterArea = area_entries.size();
@@ -508,7 +506,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, WMPAreaLink *link) {
 
 void WorldMap::ClearEncounterArea()
 {
-	if (encounterArea == -1) {
+	if (encounterArea >= area_entries.size()) {
 		return;
 	}
 
@@ -530,27 +528,27 @@ void WorldMap::ClearEncounterArea()
 	encounterArea = -1;
 }
 
-int WorldMap::GetDistance(const ResRef& AreaName) const
+int WorldMap::GetDistance(const ResRef& areaName) const
 {
 	if (!Distances) {
 		return -1;
 	}
 	unsigned int i;
-	if (GetArea( AreaName, i )) {
+	if (GetArea(areaName, i)) {
 		return Distances[i];
 	}
 	return -1;
 }
 
-void WorldMap::UpdateAreaVisibility(const ResRef& AreaName, int direction)
+void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 {
 	unsigned int i;
 
-	WMPAreaEntry* ae=GetArea(AreaName,i);
+	WMPAreaEntry* ae = GetArea(areaName, i);
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
-	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", AreaName.CString());
+	Log(DEBUG, "WorldMap", "Updated Area visibility: %s (visited, accessible and visible)", areaName.CString());
 
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, OP_OR);
 	if (direction<0 || direction>3)
@@ -566,16 +564,16 @@ void WorldMap::UpdateAreaVisibility(const ResRef& AreaName, int direction)
 	}
 }
 
-void WorldMap::SetAreaStatus(const ResRef& AreaName, int Bits, int Op)
+void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op) const
 {
 	unsigned int i;
-	WMPAreaEntry* ae=GetArea(AreaName,i);
+	WMPAreaEntry* ae = GetArea(areaName, i);
 	if (!ae)
 		return;
 	ae->SetAreaStatus(Bits, Op);
 }
 
-void WorldMap::UpdateReachableAreas()
+void WorldMap::UpdateReachableAreas() const
 {
 	AutoTable tab("worlde", true);
 	if (!tab) {
@@ -609,27 +607,16 @@ WorldMapArray::WorldMapArray(unsigned int count)
 
 WorldMapArray::~WorldMapArray()
 {
-	unsigned int i;
-
-	for (i = 0; i<MapCount; i++) {
-		if (all_maps[i]) {
-			delete all_maps[i];
-		}
+	for (unsigned int i = 0; i < MapCount; i++) {
+		delete all_maps[i];
 	}
 	free( all_maps );
 }
 
 unsigned int WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 {
-	unsigned int i, idx;
-
-	for (i = CurrentMap; i<MapCount; i++) {
-		if (all_maps[i]->GetArea (area, idx) ) {
-			CurrentMap = i;
-			return i;
-		}
-	}
-	for (i = 0; i<CurrentMap; i++) {
+	unsigned int idx;
+	for (unsigned int i = 0; i < MapCount; i++) {
 		if (all_maps[i]->GetArea (area, idx) ) {
 			CurrentMap = i;
 			return i;

@@ -200,7 +200,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		//the path ends here as it would go off the screen, causing problems
 		//maybe there is a better way, but i needed a quick hack to fix
 		//the crash in projectiles
-		if ((signed) p.x < 0 || (signed) p.y < 0) {
+		if (p.x < 0 || p.y < 0) {
 			return Return;
 		}
 		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
@@ -315,7 +315,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 			// Already visited
 			if (isClosed[smptChild.y * mapSize.w + smptChild.x]) continue;
 			// If there's an actor, check it can be bumped away
-			Actor* childActor = GetActor(nmptChild, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			const Actor* childActor = GetActor(nmptChild, GA_NO_DEAD | GA_NO_UNSCHEDULED);
 			bool childIsUnbumpable = childActor && childActor != caller && (flags & PF_ACTORS_ARE_BLOCKING || !childActor->ValidTarget(GA_ONLY_BUMPABLE));
 			if (childIsUnbumpable) continue;
 

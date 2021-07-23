@@ -33,7 +33,9 @@
 #include "Holder.h"
 #include "TypeID.h"
 
-#include <cstddef>
+#include "System/DataStream.h"
+
+#include <stdexcept>
 
 namespace GemRB {
 
@@ -42,10 +44,43 @@ namespace GemRB {
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin : public Held<Plugin> {
+class GEM_EXPORT Plugin : public Held<Plugin>
+{
 public:
-	Plugin(void);
-	~Plugin(void) override;
+	// declaring these here so we dont have to GEM_EXPORT every Held<T> for MSVC to be happy
+	Plugin() = default;
+	~Plugin() = default;
+};
+
+template <class IMPORTER>
+class GEM_EXPORT ImporterPlugin final : public Plugin
+{
+	IMPORTER* importer = new IMPORTER;
+public:
+	~ImporterPlugin() {
+		delete importer;
+	}
+
+	IMPORTER* GetImporter(DataStream* str) {
+		if (str == nullptr) {
+			return nullptr;
+		}
+
+		struct StreamHandle {
+			DataStream* str;
+			StreamHandle(DataStream* str) noexcept
+			: str(str) {}
+			
+			~StreamHandle() noexcept {
+				delete str;
+			}
+		} handle(str);
+
+		if (importer->Open(str) == false) {
+			return nullptr;
+		}
+		return importer;
+	}
 };
 
 }

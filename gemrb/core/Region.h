@@ -55,6 +55,8 @@ public:
 	Point& operator+=(const Point& rhs);
 	Point& operator-=(const Point& rhs);
 
+	Point& operator/(int div);
+
 	bool IsZero() const; // (0, 0)
 	bool IsInvalid() const; // (-1, -1)
 
@@ -108,7 +110,7 @@ public:
 	Region(int x, int y, int w, int h);
 	Region(const Point& p, const Size& s);
 	Region(const Region&);
-	Region(Region&&);
+	Region(Region&&) noexcept;
 	
 	Region& operator=(const Region&);
 

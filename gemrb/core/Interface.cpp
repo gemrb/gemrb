@@ -62,7 +62,7 @@
 #include "SymbolMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "WorldMapMgr.h"
 #include "GUI/Button.h"
 #include "GUI/Console.h"
@@ -80,6 +80,7 @@
 #include "System/FileFilters.h"
 #include "System/StringBuffer.h"
 
+#include <utility>
 #include <vector>
 
 #ifdef WIN32
@@ -106,10 +107,10 @@ static ieVariable IWD2DeathVarFormat = "_DEAD%s";
 static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
 static int NumRareSelectSounds = 2;
 
-static ieWord IDT_FAILURE = 0;
-static ieWord IDT_CRITRANGE = 1;
-static ieWord IDT_CRITMULTI = 2;
-static ieWord IDT_SKILLPENALTY = 3;
+static const ieWord IDT_FAILURE = 0;
+static const ieWord IDT_CRITRANGE = 1;
+static const ieWord IDT_CRITMULTI = 2;
+static const ieWord IDT_SKILLPENALTY = 3;
 
 static int MagicBit = 0;
 static const char* DefaultSystemEncoding = "UTF-8";
@@ -129,23 +130,20 @@ ItemDragOp::ItemDragOp(CREItem* item)
 	}
 
 	cursor = pic;
-	
+
 	// FIXME: this VarName is not consistant
 	strnlwrcpy(dragDummy.VarName, "itembutton", MAX_VARIABLE_LENGTH - 1);
 }
 
 Interface::Interface()
 {
-	unsigned int i;
-	for(i=0;i<256;i++) {
+	for (unsigned int i = 0; i < 256; i++) {
 		pl_uppercase[i]=(ieByte) toupper(i);
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
 	winmgr = NULL;
 	projserv = NULL;
-	VideoDriverName = "sdl";
-	AudioDriverName = "openal";
 	RtRows = NULL;
 	sgiterator = NULL;
 	game = NULL;
@@ -156,68 +154,33 @@ Interface::Interface()
 	CurrentContainer = NULL;
 	UseContainer = false;
 	displaymsg = NULL;
-	slottypes = NULL;
 	slotmatrix = NULL;
 
 	UseCorruptedHack = false;
 
 	mousescrollspd = 10;
-
-	GameType[0] = '\0';
-	CheatFlag = false;
 	QuitFlag = QF_NORMAL;
 	EventFlag = EF_CONTROL;
 #ifndef WIN32
-	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
-#else
-	CaseSensitive = false;
+	config.CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #endif
-	UseSoftKeyboard = false;
-	KeepCache = false;
-	NumFingInfo = 2;
-	NumFingKboard = 3;
-	NumFingScroll = 2;
-	MouseFeedback = 0;
-	IgnoreOriginalINI = 0;
-	GUIScriptsPath[0] = 0;
-	GamePath[0] = 0;
-	SavePath[0] = 0;
-	GemRBPath[0] = 0;
-	PluginsPath[0] = 0;
-	CachePath[0] = 0;
-	GemRBOverridePath[0] = 0;
-	GemRBUnhardcodedPath[0] = 0;
-	GameName[0] = 0;
-	CustomFontPath[0] = 0;
-	GameOverridePath[0] = 0;
-	GameSoundsPath[0] = 0;
-	GameScriptsPath[0] = 0;
-	GamePortraitsPath[0] = 0;
-	GameCharactersPath[0] = 0;
-	GameDataPath[0] = 0;
-
 	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 
 	GlobalScript = "BALDUR";
 	WorldMapName[0] = "WORLDMAP";
 
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		CopyResRef(GroundCircleBam[size], "");
+		GroundCircleBam[size].Reset();
 		GroundCircleScale[size] = 0;
 	}
 
 	TooltipBG = NULL;
-	DefSound = NULL;
-	DSCount = -1;
 	memset(GameFeatures, 0, sizeof( GameFeatures ));
 	//GameFeatures = 0;
 	//GameFeatures2 = 0;
 	memset(&Time, 0, sizeof(Time));
 	AreaAliasTable = NULL;
 	update_scripts = false;
-	SpecialSpellsCount = -1;
-	SpecialSpells = NULL;
-	Encoding = "default";
 
 	SystemEncoding = DefaultSystemEncoding;
 #if defined(WIN32) && defined(HAVE_ICONV)
@@ -238,18 +201,10 @@ Interface::Interface()
 	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
 	VersionOverride = ItemTypes = SlotTypes = 0;
-	MultipleQuickSaves = false;
-	MaxPartySize = 6;
 	FeedbackLevel = 0;
 	CutSceneRunner = NULL;
 
-	//once GemRB own format is working well, this might be set to 0
-	SaveAsOriginal = 1;
-
 	gamedata = new GameData();
-
-	//once GemRB own format is working well, this might be set to 0
-	SaveAsOriginal = 1;
 
 	plugin_flags = new Variables();
 	plugin_flags->SetType( GEM_VARIABLES_INT );
@@ -286,14 +241,6 @@ static void FreeAbilityTables()
 #undef NULL_FREE
 }
 
-void Interface::FreeResRefTable(ieResRef *&table, int &count)
-{
-	if (table) {
-		free( table );
-		count = -1;
-	}
-}
-
 Interface::~Interface(void)
 {
 	WindowManager::CursorMouseUp = NULL;
@@ -322,9 +269,7 @@ Interface::~Interface(void)
 		reputationmod=NULL;
 	}
 
-	if (SpecialSpells) {
-		free(SpecialSpells);
-	}
+	SpecialSpells.clear();
 	SurgeSpells.clear();
 
 	std::map<ResRef, Font*>::iterator fit = fonts.begin();
@@ -338,16 +283,14 @@ Interface::~Interface(void)
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 
-	FreeResRefTable(DefSound, DSCount);
-
-	free( slottypes );
+	slotTypes.clear();
 	free( slotmatrix );
 	itemtypedata.clear();
 
 	delete sgiterator;
 
-	for (size_t i = 0; i < musiclist.size(); i++) {
-		free((void *)musiclist[i]);
+	for (auto& track : musiclist) {
+		free((void *) track);
 	}
 
 	DamageInfoMap.clear();
@@ -379,7 +322,7 @@ Interface::~Interface(void)
 	gamedata = NULL;
 
 	// Removing all stuff from Cache, except bifs
-	if (!KeepCache) DelTree((const char *) CachePath, true);
+	if (!config.KeepCache) DelTree((const char *) config.CachePath, true);
 }
 
 GameControl* Interface::StartGameControl()
@@ -387,7 +330,7 @@ GameControl* Interface::StartGameControl()
 	assert(gamectrl == nullptr);
 
 	gamedata->DelTable(0xffffu); //dropping ALL tables
-	Region screen(0,0, Width, Height);
+	Region screen(0, 0, config.Width, config.Height);
 	gamectrl = new GameControl(screen);
 	gamectrl->AssignScriptingRef(0, "GC");
 
@@ -493,7 +436,7 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_TEXTSCREEN) {
 		EventFlag&=~EF_TEXTSCREEN;
-		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
+		winmgr->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 		guiscript->RunFunction( "TextScreen", "StartTextScreen" );
 		return;
 	}
@@ -516,7 +459,7 @@ void Interface::HandleFlags()
 		// if Exitgame was set, we'll set Start.py too
 		QuitGame (QuitFlag&QF_EXITGAME);
 	}
-	
+
 	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME | QF_ENTERGAME)) {
 		delete winmgr->GetGameWindow()->RemoveSubview(gamectrl);
 		gamectrl = nullptr;
@@ -528,7 +471,7 @@ void Interface::HandleFlags()
 
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
-		
+
 		LoadGame(LoadGameIndex.get(), VersionOverride );
 		LoadGameIndex.release();
 		//after loading a game, always check if the game needs to be upgraded
@@ -550,7 +493,7 @@ void Interface::HandleFlags()
 			guiscript->RunFunction( "Game", "EnterGame" );
 
 			//switch map to protagonist
-			Actor* actor = GetFirstSelectedPC(true);
+			const Actor* actor = GetFirstSelectedPC(true);
 			if (actor) {
 				gc->ChangeMap(actor, true);
 			}
@@ -609,7 +552,7 @@ static bool GenerateAbilityTables()
 	return true;
 }
 
-bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, int columns, int rows)
+bool Interface::ReadAbilityTable(const ResRef& tablename, ieWordSigned *mem, int columns, int rows)
 {
 	AutoTable tab(tablename);
 	if (!tab) {
@@ -622,13 +565,13 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, in
 		fix = atoi(tmp);
 		for (int i=0;i<fix;i++) {
 			for (int j=0;j<columns;j++) {
-				mem[rows*j+i]=(ieWordSigned) strtol(tab->QueryField(0,j),NULL,0 );
+				mem[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
 			}
 		}
 	}
 	for (int j=0;j<columns;j++) {
 		for( int i=0;i<rows-fix;i++) {
-			mem[rows*j+i+fix] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
+			mem[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
 		}
 	}
 	return true;
@@ -696,15 +639,14 @@ bool Interface::ReadGameTimeTable()
 
 bool Interface::ReadSpecialSpells()
 {
-	int i;
 	bool result = true;
 
 	AutoTable table("splspec");
 	if (table) {
-		SpecialSpellsCount = table->GetRowCount();
-		SpecialSpells = (SpecialSpellType *) malloc( sizeof(SpecialSpellType) * SpecialSpellsCount);
-		for (i=0;i<SpecialSpellsCount;i++) {
-			strnlwrcpy(SpecialSpells[i].resref, table->GetRowName(i),8 );
+		ieDword SpecialSpellsCount = table->GetRowCount();
+		SpecialSpells.resize(SpecialSpellsCount);
+		for (ieDword i = 0; i < SpecialSpellsCount; i++) {
+			SpecialSpells[i].resref = table->GetRowName(i);
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].flags = atoi(table->QueryField(i, 0));
 			SpecialSpells[i].amount = atoi(table->QueryField(i, 1));
@@ -717,9 +659,9 @@ bool Interface::ReadSpecialSpells()
 	table.load("wildmag");
 	if (table) {
 		SurgeSpell ss;
-		for (i = 0; (unsigned)i < table->GetRowCount(); i++) {
-			CopyResRef(ss.spell, table->QueryField(i, 0));
-			ss.message = strtol(table->QueryField(i, 1), NULL, 0);
+		for (ieDword i = 0; i < table->GetRowCount(); i++) {
+			ss.spell = table->QueryField(i, 0);
+			ss.message = strtounsigned<ieStrRef>(table->QueryField(i, 1));
 			// comment ignored
 			SurgeSpells.push_back(ss);
 		}
@@ -730,20 +672,20 @@ bool Interface::ReadSpecialSpells()
 	return result;
 }
 
-int Interface::GetSpecialSpell(const ieResRef resref)
+int Interface::GetSpecialSpell(const ResRef& resref) const
 {
-	for (int i=0;i<SpecialSpellsCount;i++) {
-		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
-			return SpecialSpells[i].flags;
+	for (const auto& spell : SpecialSpells) {
+		if (resref == spell.resref) {
+			return spell.flags;
 		}
 	}
 	return 0;
 }
 
 //disable spells based on some circumstances
-int Interface::CheckSpecialSpell(const ieResRef resref, Actor *actor)
+int Interface::CheckSpecialSpell(const ResRef& resRef, const Actor *actor) const
 {
-	int sp = GetSpecialSpell(resref);
+	int sp = GetSpecialSpell(resRef);
 
 	//the identify spell is always disabled on the menu
 	if (sp&SP_IDENTIFY) {
@@ -771,7 +713,7 @@ const char *Interface::GetDeathVarFormat()
 	return DeathVarFormat;
 }
 
-bool Interface::ReadAreaAliasTable(const ieResRef tablename)
+bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 {
 	if (AreaAliasTable) {
 		AreaAliasTable->RemoveAll(NULL);
@@ -788,9 +730,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 
 	int idx = aa->GetRowCount();
 	while (idx--) {
-		ieResRef key;
-
-		strnlwrcpy(key,aa->GetRowName(idx),8);
+		ResRef key = ResRef::MakeLowerCase(aa->GetRowName(idx));
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
@@ -807,7 +747,7 @@ int Interface::GetAreaAlias(const ResRef &areaname) const
 	return -1;
 }
 
-bool Interface::ReadMusicTable(const ieResRef tablename, int col) {
+bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 	AutoTable tm(tablename);
 	if (!tm)
 		return false;
@@ -828,7 +768,7 @@ bool Interface::ReadDamageTypeTable() {
 	for (ieDword i = 0; i < tm->GetRowCount(); i++) {
 		di.strref = displaymsg->GetStringReference(atoi(tm->QueryField(i, 0)));
 		di.resist_stat = TranslateStat(tm->QueryField(i, 1));
-		di.value = strtol(tm->QueryField(i, 2), (char **) NULL, 16);
+		di.value = strtounsigned<unsigned int>(tm->QueryField(i, 2), nullptr, 16);
 		di.iwd_mod_type = atoi(tm->QueryField(i, 3));
 		di.reduction = atoi(tm->QueryField(i, 4));
 		DamageInfoMap.insert(std::make_pair(di.value, di));
@@ -893,7 +833,7 @@ void Interface::Main()
 
 	Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
-	Region fpsRgn( 0, Height - 30, 80, 30 );
+	Region fpsRgn(0, config.Height - 30, 80, 30);
 	wchar_t fpsstring[20] = {L"???.??? fps"};
 	// set for printing
 	fpsRgn.x = 5;
@@ -934,7 +874,7 @@ void Interface::Main()
 		GlobalColorCycle.AdvanceTime(time);
 		winmgr->DrawWindows();
 		time = GetTicks();
-		if (DrawFPS) {
+		if (config.DrawFPS) {
 			frame++;
 			if (time - timebase > 1000) {
 				frames = ( frame * 1000.0 / ( time - timebase ) );
@@ -950,31 +890,6 @@ void Interface::Main()
 	QuitGame(0);
 }
 
-int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
-{
-	int count = 0;
-
-	if (data) {
-		free(data);
-		data = NULL;
-	}
-	AutoTable tm(tablename);
-	if (!tm) {
-		Log(ERROR, "Core", "Cannot find %s.2da.", tablename);
-		return 0;
-	}
-	count = tm->GetRowCount();
-	data = (ieResRef *) calloc( count, sizeof(ieResRef) );
-	for (int i = 0; i < count; i++) {
-		strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
-		// * marks an empty resource
-		if (data[i][0]=='*') {
-			data[i][0]=0;
-		}
-	}
-	return count;
-}
-
 int Interface::LoadSprites()
 {
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
@@ -985,11 +900,11 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Cursors...");
 	AnimationFactory* anim;
 	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
-	int CursorCount = 0;
+	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
 		Cursors.reserve(CursorCount);
-		for (int i = 0; i < CursorCount; i++) {
+		for (size_t i = 0; i < CursorCount; i++) {
 			Cursors.push_back(anim->GetFrame(0, (ieByte) i));
 		}
 	} else {
@@ -998,7 +913,7 @@ int Interface::LoadSprites()
 		// same layout as in the originals, with odd indices having the pressed cursor image
 		char fileName[32];
 		while (CursorCount < 99) {
-			snprintf(fileName, sizeof(fileName), "%.29s%02d", MainCursorsImage.CString(), CursorCount);
+			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), CursorCount);
 			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
@@ -1008,7 +923,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors (%d < %d).",
+		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).",
 				CursorCount, IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
@@ -1044,7 +959,7 @@ int Interface::LoadSprites()
 	// Load ground circle bitmaps (PST only)
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		if (GroundCircleBam[size][0]) {
+		if (!GroundCircleBam[size].IsEmpty()) {
 			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
@@ -1106,53 +1021,52 @@ int Interface::LoadFonts()
 	return GEM_OK;
 }
 
-int Interface::Init(InterfaceConfig* config)
+int Interface::Init(InterfaceConfig* cfg)
 {
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
-	if (!config) {
+	if (!cfg) {
 		Log(FATAL, "Core", "No Configuration context.");
 		return GEM_ERROR;
 	}
 
 	const char* value = NULL;
 #define CONFIG_INT(key, var) \
-		value = config->GetValueForKey(key); \
+		value = cfg->GetValueForKey(key); \
 		if (value) \
 			var ( atoi( value ) ); \
 		value = nullptr
 
-	CONFIG_INT("Bpp", Bpp =);
-	CONFIG_INT("CaseSensitive", CaseSensitive =);
+	CONFIG_INT("Bpp", config.Bpp =);
+	CONFIG_INT("CaseSensitive", config.CaseSensitive =);
 	CONFIG_INT("DoubleClickDelay", EventMgr::DCDelay = );
-	CONFIG_INT("DrawFPS", DrawFPS = );
+	CONFIG_INT("DrawFPS", config.DrawFPS =);
 	CONFIG_INT("EnableCheatKeys", EnableCheatKeys);
 	CONFIG_INT("EndianSwitch", DataStream::SetBigEndian);
 	CONFIG_INT("GCDebug", GameControl::DebugFlags = );
-	CONFIG_INT("Height", Height = );
-	CONFIG_INT("KeepCache", KeepCache = );
-	CONFIG_INT("MaxPartySize", MaxPartySize = );
-	MaxPartySize = std::min(std::max(1, MaxPartySize), 10);
-	vars->SetAt("MaxPartySize", MaxPartySize); // for simple GUIScript access
-	CONFIG_INT("MouseFeedback", MouseFeedback = );
-	CONFIG_INT("MultipleQuickSaves", MultipleQuickSaves = );
-	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay = );
-	CONFIG_INT("SaveAsOriginal", SaveAsOriginal = );
-	CONFIG_INT("DebugMode", debugMode = );
+	CONFIG_INT("Height", config.Height =);
+	CONFIG_INT("KeepCache", config.KeepCache =);
+	CONFIG_INT("MaxPartySize", config.MaxPartySize =);
+	config.MaxPartySize = std::min(std::max(1, config.MaxPartySize), 10);
+	vars->SetAt("MaxPartySize", config.MaxPartySize); // for simple GUIScript access
+	CONFIG_INT("MouseFeedback", config.MouseFeedback =);
+	CONFIG_INT("MultipleQuickSaves", config.MultipleQuickSaves =);
+	CONFIG_INT("RepeatKeyDelay", Control::ActionRepeatDelay =);
+	CONFIG_INT("SaveAsOriginal", config.SaveAsOriginal =);
+	CONFIG_INT("DebugMode", config.debugMode =);
 	int touchInput = -1;
 	CONFIG_INT("TouchInput", touchInput =);
-	CONFIG_INT("Width", Width = );
-	CONFIG_INT("IgnoreOriginalINI", IgnoreOriginalINI = );
-	CONFIG_INT("UseSoftKeyboard", UseSoftKeyboard = );
-	CONFIG_INT("NumFingScroll", NumFingScroll = );
-	CONFIG_INT("NumFingKboard", NumFingKboard = );
-	CONFIG_INT("NumFingInfo", NumFingInfo = );
-	CONFIG_INT("GamepadPointerSpeed", GamepadPointerSpeed = );
+	CONFIG_INT("Width", config.Width =);
+	CONFIG_INT("UseSoftKeyboard", config.UseSoftKeyboard =);
+	CONFIG_INT("NumFingScroll", config.NumFingScroll =);
+	CONFIG_INT("NumFingKboard", config.NumFingKboard =);
+	CONFIG_INT("NumFingInfo", config.NumFingInfo =);
+	CONFIG_INT("GamepadPointerSpeed", config.GamepadPointerSpeed =);
 
 #undef CONFIG_INT
 
 // first param is the preference name, second is the key from gemrb.cfg.
 #define CONFIG_VARS_MAP(var, key) \
-		value = config->GetValueForKey(key); \
+		value = cfg->GetValueForKey(key); \
 		if (value) \
 			vars->SetAt(var, atoi(value)); \
 		value = nullptr
@@ -1173,7 +1087,7 @@ int Interface::Init(InterfaceConfig* config)
 #undef CONFIG_VARS_MAP
 
 #define CONFIG_STRING(key, var, default) \
-		value = config->GetValueForKey(key); \
+		value = cfg->GetValueForKey(key); \
 		if (value && value[0]) { \
 			strlcpy(var, value, sizeof(var)); \
 		} else if (default && default[0]) { \
@@ -1181,18 +1095,14 @@ int Interface::Init(InterfaceConfig* config)
 		} else var[0] = '\0'; \
 		value = nullptr
 
-	CONFIG_STRING("GameName", GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
-	CONFIG_STRING("GameType", GameType, "auto");
-	// tob type is obsolete
-	if (stricmp( GameType, "tob" ) == 0) {
-		strlcpy( GameType, "bg2", sizeof(GameType) );
-	}
+	CONFIG_STRING("GameName", config.GameName, GEMRB_STRING); // NOTE: potentially overriden below, once auto GameType is resolved
+	CONFIG_STRING("GameType", config.GameType, "auto");
 
 #undef CONFIG_STRING
 
 // assumes that default value does not need to be resolved or fixed in any way
 #define CONFIG_PATH(key, var, default) \
-		value = config->GetValueForKey(key); \
+		value = cfg->GetValueForKey(key); \
 		if (value && value[0]) { \
 			strlcpy(var, value, sizeof(var)); \
 			ResolveFilePath(var); \
@@ -1202,45 +1112,51 @@ int Interface::Init(InterfaceConfig* config)
 		} else var[0] = '\0'; \
 		value = nullptr
 
-	// TODO: make CustomFontPath cross platform and possibly dynamic
-	CONFIG_PATH("CustomFontPath", CustomFontPath, "/usr/share/fonts/TTF");
-	CONFIG_PATH("GameCharactersPath", GameCharactersPath, "characters");
-	CONFIG_PATH("GameDataPath", GameDataPath, "data");
-	CONFIG_PATH("GameOverridePath", GameOverridePath, "override");
-	CONFIG_PATH("GamePortraitsPath", GamePortraitsPath, "portraits");
-	CONFIG_PATH("GameScriptsPath", GameScriptsPath, "scripts");
-	CONFIG_PATH("GameSoundsPath", GameSoundsPath, "sounds");
+	// TODO: make CustomFontPath default cross platform
+	CONFIG_PATH("CustomFontPath", config.CustomFontPath, "/usr/share/fonts/TTF");
+	CONFIG_PATH("GameCharactersPath", config.GameCharactersPath, "characters");
+	CONFIG_PATH("GameDataPath", config.GameDataPath, "data");
+	CONFIG_PATH("GameOverridePath", config.GameOverridePath, "override");
+	CONFIG_PATH("GamePortraitsPath", config.GamePortraitsPath, "portraits");
+	CONFIG_PATH("GameScriptsPath", config.GameScriptsPath, "scripts");
+	CONFIG_PATH("GameSoundsPath", config.GameSoundsPath, "sounds");
 
-	// Path configureation
-	CONFIG_PATH("GemRBPath", GemRBPath,
-				CopyGemDataPath(GemRBPath, _MAX_PATH));
+	// Path configuration
+	CONFIG_PATH("GemRBPath", config.GemRBPath,
+				CopyGemDataPath(config.GemRBPath, _MAX_PATH));
 
-	CONFIG_PATH("CachePath", CachePath, "./Cache2");
-	FixPath( CachePath, false );
+	CONFIG_PATH("CachePath", config.CachePath, "./Cache2");
+	FixPath(config.CachePath, false);
 
 	// AppImage doesn't support relative urls at all
 	// we set the path to the data dir to cover unhardcoded and co,
 	// while plugins are statically linked, so it doesn't matter for them
+	// Also, support running from eg. KDevelop AppImages by checking the name.
 #ifdef DATA_DIR
 	const char* appDir = getenv("APPDIR");
+	const char* appImageFile = getenv("ARGV0");
 	if (appDir) {
+		Log(DEBUG, "Interface", "Found APPDIR: %s", appDir);
+		Log(DEBUG, "Interface", "Found AppImage/ARGV0: %s", appImageFile);
+	}
+	if (appDir && appImageFile && strcasestr(appImageFile, "gemrb") != nullptr) {
 		assert(strnlen(appDir, _MAX_PATH/2) < _MAX_PATH/2);
-		PathJoin(GemRBPath, appDir, DATA_DIR, nullptr);
+		PathJoin(config.GemRBPath, appDir, DATA_DIR, nullptr);
 	}
 #endif
 
-	CONFIG_PATH("GUIScriptsPath", GUIScriptsPath, GemRBPath);
-	CONFIG_PATH("GamePath", GamePath, ".");
+	CONFIG_PATH("GUIScriptsPath", config.GUIScriptsPath, config.GemRBPath);
+	CONFIG_PATH("GamePath", config.GamePath, ".");
 	// guess a few paths in case this one is bad; two levels deep for the fhs layout
 	char testPath[_MAX_PATH];
 	bool gameFound = true;
-	if (!PathJoin(testPath, GamePath, "chitin.key", nullptr)) {
+	if (!PathJoin(testPath, config.GamePath, "chitin.key", nullptr)) {
 		Log(WARNING, "Interface", "Invalid GamePath detected, guessing from the current dir!");
 		if (PathJoin(testPath, "..", "chitin.key", nullptr)) {
-			strlcpy(GamePath, "..", sizeof(GamePath));
+			strlcpy(config.GamePath, "..", sizeof(config.GamePath));
 		} else {
 			if (PathJoin(testPath, "..", "..", "chitin.key", nullptr)) {
-				strlcpy(GamePath, "../..", sizeof(GamePath));
+				strlcpy(config.GamePath, "../..", sizeof(config.GamePath));
 			} else {
 				gameFound = false;
 			}
@@ -1251,93 +1167,92 @@ int Interface::Init(InterfaceConfig* config)
 	if (!gameFound) {
 		Log(WARNING, "Interface", "Invalid GamePath detected, looking for the GemRB demo!");
 		if (PathJoin(testPath, "..", "demo", "chitin.key", nullptr)) {
-			PathJoin(GamePath, "..", "demo", nullptr);
-			strlcpy(GameType, "demo", sizeof(GameType));
+			PathJoin(config.GamePath, "..", "demo", nullptr);
+			strlcpy(config.GameType, "demo", sizeof(config.GameType));
 		} else {
-			if (PathJoin(testPath, GemRBPath, "demo", "chitin.key", nullptr)) {
-				PathJoin(GamePath, GemRBPath, "demo", nullptr);
-				strlcpy(GameType, "demo", sizeof(GameType));
+			if (PathJoin(testPath, config.GemRBPath, "demo", "chitin.key", nullptr)) {
+				PathJoin(config.GamePath, config.GemRBPath, "demo", nullptr);
+				strlcpy(config.GameType, "demo", sizeof(config.GameType));
 			}
 		}
 	}
 
-	CONFIG_PATH("GemRBOverridePath", GemRBOverridePath, GemRBPath);
-	CONFIG_PATH("GemRBUnhardcodedPath", GemRBUnhardcodedPath, GemRBPath);
+	CONFIG_PATH("GemRBOverridePath", config.GemRBOverridePath, config.GemRBPath);
+	CONFIG_PATH("GemRBUnhardcodedPath", config.GemRBUnhardcodedPath, config.GemRBPath);
 #ifdef PLUGIN_DIR
-	CONFIG_PATH("PluginsPath", PluginsPath, PLUGIN_DIR);
+	CONFIG_PATH("PluginsPath", config.PluginsPath, PLUGIN_DIR);
 #else
-	CONFIG_PATH("PluginsPath", PluginsPath, "");
-	if (!PluginsPath[0]) {
-		PathJoin(PluginsPath, GemRBPath, "plugins", nullptr);
+	CONFIG_PATH("PluginsPath", config.PluginsPath, "");
+	if (!config.PluginsPath[0]) {
+		PathJoin(config.PluginsPath, config.GemRBPath, "plugins", nullptr);
 	}
 #endif
 
-	CONFIG_PATH("SavePath", SavePath, GamePath);
+	CONFIG_PATH("SavePath", config.SavePath, config.GamePath);
 #undef CONFIG_PATH
 
 #define CONFIG_STRING(key, var) \
-		value = config->GetValueForKey(key); \
+		value = cfg->GetValueForKey(key); \
 		if (value) \
 			var = value; \
 		value = nullptr
 
-	CONFIG_STRING("AudioDriver", AudioDriverName);
-	CONFIG_STRING("VideoDriver", VideoDriverName);
-	CONFIG_STRING("Encoding", Encoding);
+	CONFIG_STRING("AudioDriver", config.AudioDriverName);
+	CONFIG_STRING("VideoDriver", config.VideoDriverName);
+	CONFIG_STRING("Encoding", config.Encoding);
 #undef CONFIG_STRING
 
-	value = config->GetValueForKey("ModPath");
+	value = cfg->GetValueForKey("ModPath");
 	if (value) {
 		for (char *path = strtok((char*)value,SPathListSeparator);
 			 path;
 			 path = strtok(NULL,SPathListSeparator)) {
-			ModPath.push_back(path);
-			ResolveFilePath(ModPath.back());
+			config.ModPath.emplace_back(path);
+			ResolveFilePath(config.ModPath.back());
 		}
 	}
-	value = config->GetValueForKey("SkipPlugin");
+	value = cfg->GetValueForKey("SkipPlugin");
 	if (value) {
 		plugin_flags->SetAt( value, PLF_SKIP );
 	}
-	value = config->GetValueForKey("DelayPlugin");
+	value = cfg->GetValueForKey("DelayPlugin");
 	if (value) {
 		plugin_flags->SetAt( value, PLF_DELAY );
 	}
 
-	int i = 0;
-	for(i = 0; i < MAX_CD; i++) {
+	for (int i = 0; i < MAX_CD; i++) {
 		char keyname[] = { 'C', 'D', char('1'+i), '\0' };
-		value = config->GetValueForKey(keyname);
+		value = cfg->GetValueForKey(keyname);
 		if (value) {
 			for(char *path = strtok((char*)value, SPathListSeparator);
 				path;
 				path = strtok(NULL,SPathListSeparator)) {
-				CD[i].push_back(path);
-				ResolveFilePath(CD[i].back());
+				config.CD[i].emplace_back(path);
+				ResolveFilePath(config.CD[i].back());
 			}
 		} else {
 			// nothing in config so create our own
 			char name[_MAX_PATH];
 
-			PathJoin(name, GamePath, keyname, nullptr);
-			CD[i].push_back(name);
-			PathJoin(name, GamePath, GameDataPath, keyname, nullptr);
-			CD[i].push_back(name);
+			PathJoin(name, config.GamePath, keyname, nullptr);
+			config.CD[i].emplace_back(name);
+			PathJoin(name, config.GamePath, config.GameDataPath, keyname, nullptr);
+			config.CD[i].emplace_back(name);
 		}
 	}
 
-	if (!MakeDirectories(CachePath)) {
-		error("Core", "Unable to create cache directory '%s'", CachePath);
+	if (!MakeDirectories(config.CachePath)) {
+		error("Core", "Unable to create cache directory '%s'", config.CachePath);
 	}
 
-	if ( StupidityDetector( CachePath )) {
-		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", CachePath );
+	if (StupidityDetector(config.CachePath)) {
+		Log(ERROR, "Core", "Cache path %s doesn't exist, not a folder or contains alien files!", config.CachePath);
 		return GEM_ERROR;
 	}
-	if (!KeepCache) DelTree((const char *) CachePath, false);
-	
+	if (!config.KeepCache) DelTree((const char *) config.CachePath, false);
+
 	// potentially disable logging before plugins are loaded (the log file is a plugin)
-	value = config->GetValueForKey("Logging");
+	value = cfg->GetValueForKey("Logging");
 	if (value) ToggleLogging(atoi(value));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
@@ -1354,7 +1269,7 @@ int Interface::Init(InterfaceConfig* config)
 #endif
 #endif
 #ifndef STATIC_LINK
-	LoadPlugins(PluginsPath);
+	LoadPlugins(config.PluginsPath);
 #endif
 	if (plugin && plugin->GetPluginCount()) {
 		Log(MESSAGE, "Core", "Plugin Loading Complete...");
@@ -1366,7 +1281,7 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = ( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, VideoDriverName.c_str());
+	video = Holder<Video>(( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str()));
 	if (!video) {
 		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
@@ -1375,10 +1290,10 @@ int Interface::Init(InterfaceConfig* config)
 		Log(FATAL, "Core", "Cannot Initialize Video Driver.");
 		return GEM_ERROR;
 	}
-	
+
 	// ask the driver if a touch device is in use
 	EventMgr::TouchInputEnabled = touchInput < 0 ? video->TouchInputEnabled() : touchInput;
-	
+
 	ieDword brightness = 10;
 	ieDword contrast = 5;
 	vars->Lookup("Brightness Correction", brightness);
@@ -1395,52 +1310,52 @@ int Interface::Init(InterfaceConfig* config)
 
 		char path[_MAX_PATH];
 
-		PathJoin(path, CachePath, nullptr);
+		PathJoin(path, config.CachePath, nullptr);
 		if (!gamedata->AddSource(path, "Cache", PLUGIN_RESOURCE_DIRECTORY)) {
 			Log(FATAL, "Core", "The cache path couldn't be registered, please check!");
 			return GEM_ERROR;
 		}
 
 		size_t i;
-		for (i = 0; i < ModPath.size(); ++i)
-			gamedata->AddSource(ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
+		for (i = 0; i < config.ModPath.size(); ++i)
+			gamedata->AddSource(config.ModPath[i].c_str(), "Mod paths", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin(path, GemRBOverridePath, "override", GameType, nullptr);
-		if (!strcmp( GameType, "auto" ))
+		PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
+		if (!strcmp(config.GameType, "auto"))
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_NULL);
 		else
 			gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin(path, GemRBOverridePath, "override", "shared", nullptr);
+		PathJoin(path, config.GemRBOverridePath, "override", "shared", nullptr);
 		gamedata->AddSource(path, "shared GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin(path, GamePath, GameOverridePath, nullptr);
+		PathJoin(path, config.GamePath, config.GameOverridePath, nullptr);
 		gamedata->AddSource(path, "Override", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//GAME sounds are intentionally not cached, in IWD there are directory structures,
 		//that are not cacheable, also it is totally pointless (this fixed charsounds in IWD)
-		PathJoin(path, GamePath, GameSoundsPath, nullptr);
+		PathJoin(path, config.GamePath, config.GameSoundsPath, nullptr);
 		gamedata->AddSource(path, "Sounds", PLUGIN_RESOURCE_DIRECTORY);
 
-		PathJoin(path, GamePath, GameScriptsPath, nullptr);
+		PathJoin(path, config.GamePath, config.GameScriptsPath, nullptr);
 		gamedata->AddSource(path, "Scripts", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin(path, GamePath, GamePortraitsPath, nullptr);
+		PathJoin(path, config.GamePath, config.GamePortraitsPath, nullptr);
 		gamedata->AddSource(path, "Portraits", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
-		PathJoin(path, GamePath, GameDataPath, nullptr);
+		PathJoin(path, config.GamePath, config.GameDataPath, nullptr);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		// accomodating silly installers that create a data/Data/.* structure
-		PathJoin(path, GamePath, GameDataPath, "Data", nullptr);
+		PathJoin(path, config.GamePath, config.GameDataPath, "Data", nullptr);
 		gamedata->AddSource(path, "Data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 
 		//IWD2 movies are on the CD but not in the BIF
 		char *description = strdup("CD1/data");
 		for (i = 0; i < MAX_CD; i++) {
-			for (size_t j=0;j<CD[i].size();j++) {
+			for (size_t j = 0; j < config.CD[i].size(); j++) {
 				description[2]='1'+i;
-				PathJoin(path, CD[i][j].c_str(), GameDataPath, nullptr);
+				PathJoin(path, config.CD[i][j].c_str(), config.GameDataPath, nullptr);
 				gamedata->AddSource(path, description, PLUGIN_RESOURCE_CACHEDDIRECTORY);
 			}
 		}
@@ -1448,20 +1363,20 @@ int Interface::Init(InterfaceConfig* config)
 
 		// most of the old gemrb override files can be found here,
 		// so they have a lower priority than the game files and can more easily be modded
-		PathJoin(path, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
-		if (!strcmp(GameType, "auto")) {
+		PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
+		if (!strcmp(config.GameType, "auto")) {
 			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_NULL);
 		} else {
 			gamedata->AddSource(path, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 		}
-		PathJoin(path, GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
+		PathJoin(path, config.GemRBUnhardcodedPath, "unhardcoded", "shared", nullptr);
 		gamedata->AddSource(path, "shared GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY);
 	}
 
 	{
 		Log(MESSAGE, "Core", "Initializing KEY Importer...");
 		char ChitinPath[_MAX_PATH];
-		PathJoin(ChitinPath, GamePath, "chitin.key", nullptr);
+		PathJoin(ChitinPath, config.GamePath, "chitin.key", nullptr);
 		if (!gamedata->AddSource(ChitinPath, "chitin.key", PLUGIN_RESOURCE_KEY)) {
 			Log(FATAL, "Core", "Failed to load \"chitin.key\"");
 			Log(ERROR, "Core", "This means:\n- you set the GamePath config variable incorrectly,\n\
@@ -1472,23 +1387,6 @@ int Interface::Init(InterfaceConfig* config)
 			return GEM_ERROR;
 		}
 	}
-	
-	// fix the sample config default resolution for iwd2 and configless case also for the demo
-	// FIXME: move defaults to gemrb.ini? Needs video init to be moved after GUIScript init
-	if ((PathJoin(testPath, GamePath, "icewind2.ini", nullptr) || PathJoin(testPath, GamePath, "mapwinbg.png", nullptr)) && Width == 640 && Height == 480) {
-		Width = 800;
-		Height = 600;
-	}
-
-	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
-	// we also need the display to exist to create sprites using the display format
-	ieDword fullscreen = 0;
-	vars->Lookup("Full Screen", fullscreen);
-	if (video->CreateDisplay(Size(Width, Height), Bpp, fullscreen, GameName) == GEM_ERROR) {
-		Log(FATAL, "Core", "Cannot initialize shaders.");
-		return GEM_ERROR;
-	}
-	video->SetGamma(brightness, contrast);
 
 	Log(MESSAGE, "Core", "Initializing GUI Script Engine...");
 	SetNextScript("Start"); // Start is the first script executed
@@ -1504,14 +1402,14 @@ int Interface::Init(InterfaceConfig* config)
 
 	// re-set the gemrb override path, since we now have the correct GameType if 'auto' was used
 	char path[_MAX_PATH];
-	PathJoin(path, GemRBOverridePath, "override", GameType, nullptr);
+	PathJoin(path, config.GemRBOverridePath, "override", config.GameType, nullptr);
 	gamedata->AddSource(path, "GemRB Override", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 	char unhardcodedTypePath[_MAX_PATH * 2];
-	PathJoin(unhardcodedTypePath, GemRBUnhardcodedPath, "unhardcoded", GameType, nullptr);
+	PathJoin(unhardcodedTypePath, config.GemRBUnhardcodedPath, "unhardcoded", config.GameType, nullptr);
 	gamedata->AddSource(unhardcodedTypePath, "GemRB Unhardcoded data", PLUGIN_RESOURCE_CACHEDDIRECTORY, RM_REPLACE_SAME_SOURCE);
 
 	// Purposely add the font directory last since we will only ever need it at engine load time.
-	if (CustomFontPath[0]) gamedata->AddSource(CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
+	if (config.CustomFontPath[0]) gamedata->AddSource(config.CustomFontPath, "CustomFonts", PLUGIN_RESOURCE_DIRECTORY);
 
 	Log(MESSAGE, "Core", "Reading Game Options...");
 	if (!LoadGemRBINI()) {
@@ -1519,15 +1417,25 @@ int Interface::Init(InterfaceConfig* config)
 		return GEM_ERROR;
 	}
 
+	// SDL2 driver requires the display to be created prior to sprite creation (opengl context)
+	// we also need the display to exist to create sprites using the display format
+	ieDword fullscreen = 0;
+	vars->Lookup("Full Screen", fullscreen);
+	if (video->CreateDisplay(Size(config.Width, config.Height), config.Bpp, fullscreen, config.GameName) == GEM_ERROR) {
+		Log(FATAL, "Core", "Cannot initialize shaders.");
+		return GEM_ERROR;
+	}
+	video->SetGamma(brightness, contrast);
+	
 	// if unset, manually populate GameName (window title)
-	if (!stricmp(GameName, GEMRB_STRING)) {
-		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING)) {
+	if (!stricmp(config.GameName, GEMRB_STRING)) {
+		if (stricmp(DefaultWindowTitle.c_str(), GEMRB_STRING) != 0) {
 			std::string title = GEMRB_STRING" running " + DefaultWindowTitle;
-			strlcpy(GameName, title.c_str(), sizeof(GameName));
+			strlcpy(config.GameName, title.c_str(), sizeof(config.GameName));
 		} else {
-			strlcpy(GameName, GEMRB_STRING" running unknown game", sizeof(GameName));
+			strlcpy(config.GameName, GEMRB_STRING" running unknown game", sizeof(config.GameName));
 		}
-		video->SetWindowTitle(GameName);
+		video->SetWindowTitle(config.GameName);
 	}
 
 	// load the game ini (baldur.ini, torment.ini, icewind.ini ...)
@@ -1536,22 +1444,22 @@ int Interface::Init(InterfaceConfig* config)
 	char gemrbINI[_MAX_PATH+4] = { '\0' };
 	char tmp[_MAX_PATH+4] = { '\0' };
 	snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
-	PathJoin(ini_path, SavePath, gemrbINI, nullptr);
+	PathJoin(ini_path, config.SavePath, gemrbINI, nullptr);
 	if (!file_exists(ini_path)) {
-		PathJoin(ini_path, GamePath, gemrbINI, nullptr);
+		PathJoin(ini_path, config.GamePath, gemrbINI, nullptr);
 	}
 	if (file_exists(ini_path)) {
 		strlcpy(tmp, INIConfig, sizeof(tmp));
 		strlcpy(INIConfig, gemrbINI, sizeof(INIConfig));
-	} else if (!IgnoreOriginalINI) {
-		PathJoin(ini_path, GamePath, INIConfig, nullptr);
+	} else {
+		PathJoin(ini_path, config.GamePath, INIConfig, nullptr);
 		Log(MESSAGE,"Core", "Loading original game options from %s", ini_path);
 	}
 	if (!InitializeVarsWithINI(ini_path)) {
 		Log(WARNING, "Core", "Unable to set dictionary default values!");
 	}
 
-	// set up the tooltip delay which we store in miliseconds
+	// set up the tooltip delay which we store in milliseconds
 	ieDword tooltipDelay = 0;
 	GetDictionary()->Lookup("Tooltips", tooltipDelay);
 	WindowManager::SetTooltipDelay(tooltipDelay * Tooltip::DELAY_FACTOR / 10);
@@ -1559,14 +1467,12 @@ int Interface::Init(InterfaceConfig* config)
 	// restore the game config name if we read it from our version
 	if (tmp[0]) {
 		strlcpy(INIConfig, tmp, sizeof(INIConfig));
+	} else {
+		strlcpy(tmp, INIConfig, sizeof(tmp));
 	}
-
-	for (i = 0; i < 8; i++) {
-		if (INIConfig[i] == '.')
-			break;
-		GameNameResRef[i] = INIConfig[i];
-	}
-	GameNameResRef[i] = 0;
+	// also store it for base GAM and SAV files
+	strtok(tmp, ".");
+	GameNameResRef = tmp;
 
 	Log(MESSAGE, "Core", "Reading Encoding Table...");
 	if (!LoadEncoding()) {
@@ -1575,9 +1481,6 @@ int Interface::Init(InterfaceConfig* config)
 
 	Log(MESSAGE, "Core", "Creating Projectile Server...");
 	projserv = new ProjectileServer();
-	if (!projserv->GetHighestProjectileNumber()) {
-		Log(ERROR, "Core", "No projectiles are available...");
-	}
 
 	Log(MESSAGE, "Core", "Checking for Dialogue Manager...");
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
@@ -1587,7 +1490,7 @@ int Interface::Init(InterfaceConfig* config)
 	strings = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Dialog.tlk file...");
 	char strpath[_MAX_PATH];
-	PathJoin(strpath, GamePath, "dialog.tlk", nullptr);
+	PathJoin(strpath, config.GamePath, "dialog.tlk", nullptr);
 	FileStream* fs = FileStream::OpenFile(strpath);
 	if (!fs) {
 		Log(FATAL, "Core", "Cannot find Dialog.tlk.");
@@ -1600,7 +1503,7 @@ int Interface::Init(InterfaceConfig* config)
 		strings2 = MakePluginHolder<StringMgr>(IE_TLK_CLASS_ID);
 		Log(MESSAGE, "Core", "Loading DialogF.tlk file...");
 		char strpath[_MAX_PATH];
-		PathJoin(strpath, GamePath, "dialogf.tlk", nullptr);
+		PathJoin(strpath, config.GamePath, "dialogf.tlk", nullptr);
 		FileStream* fs = FileStream::OpenFile(strpath);
 		if (!fs) {
 			Log(ERROR, "Core", "Cannot find DialogF.tlk. Let us know which translation you are using.");
@@ -1625,8 +1528,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 
 	Log(MESSAGE, "Core", "Initializing stock sounds...");
-	DSCount = ReadResRefTable ("defsound", DefSound);
-	if (DSCount == 0) {
+	if (!gamedata->ReadResRefTable(ResRef("defsound"), gamedata->defaultSounds)) {
 		Log(FATAL, "Core", "Cannot find defsound.2da.");
 		return GEM_ERROR;
 	}
@@ -1638,9 +1540,9 @@ int Interface::Init(InterfaceConfig* config)
 	if (ret) return ret;
 
 	Log(MESSAGE, "Core", "Initializing Window Manager...");
-	winmgr = new WindowManager(video.get());
+	winmgr = new WindowManager(video);
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
-	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(MouseFeedback));
+	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
 
 	guifact = MakePluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
@@ -1652,7 +1554,7 @@ int Interface::Init(InterfaceConfig* config)
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = ( Audio * ) PluginMgr::Get()->GetDriver(&Audio::ID, AudioDriverName.c_str());
+	AudioDriver = Holder<Audio>((Audio*) PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str()));
 	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
@@ -1709,7 +1611,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading precreated teams setup...");
 		INIparty = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIparty[_MAX_PATH];
-		PathJoin(tINIparty, GamePath, "Party.ini", nullptr);
+		PathJoin(tINIparty, config.GamePath, "Party.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIparty );
 		if (!INIparty->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load precreated teams.");
@@ -1724,7 +1626,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading beasts definition File...");
 		INIbeasts = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIbeasts[_MAX_PATH];
-		PathJoin(tINIbeasts, GamePath, "beast.ini", nullptr);
+		PathJoin(tINIbeasts, config.GamePath, "beast.ini", nullptr);
 		FileStream* fs = FileStream::OpenFile( tINIbeasts );
 		if (!INIbeasts->Open(fs)) {
 			Log(WARNING, "Core", "Failed to load beast definitions.");
@@ -1733,7 +1635,7 @@ int Interface::Init(InterfaceConfig* config)
 		Log(MESSAGE, "Core", "Loading quests definition File...");
 		INIquests = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 		char tINIquests[_MAX_PATH];
-		PathJoin(tINIquests, GamePath, "quests.ini", nullptr);
+		PathJoin(tINIquests, config.GamePath, "quests.ini", nullptr);
 		FileStream* fs2 = FileStream::OpenFile( tINIquests );
 		if (!INIquests->Open(fs2)) {
 			Log(WARNING, "Core", "Failed to load quest definitions.");
@@ -1835,7 +1737,7 @@ int Interface::Init(InterfaceConfig* config)
 	}
 #endif
 	snprintf(pathString, sizeof(pathString), "GemRB_Data_Path = %s", unhardcodedTypePath);
-	PathJoin(strpath, GamePath, "gemrb_path.txt", nullptr);
+	PathJoin(strpath, config.GamePath, "gemrb_path.txt", nullptr);
 	FileStream *pathFile = new FileStream();
 	// don't abort if something goes wrong, since it should never happen and it's not critical
 	if (pathFile->Create(strpath)) {
@@ -1843,7 +1745,7 @@ int Interface::Init(InterfaceConfig* config)
 		pathFile->Close();
 	}
 	delete pathFile;
-	
+
 	EventMgr::EventCallback ToggleConsole = [this](const Event& e) {
 		if (e.type != Event::KeyDown) return false;
 
@@ -1860,9 +1762,15 @@ bool Interface::IsAvailable(SClass_ID filetype) const
 	return PluginMgr::Get()->IsAvailable( filetype );
 }
 
-WorldMap *Interface::GetWorldMap(const char *map)
+WorldMap *Interface::GetWorldMap() const
 {
-	int index = worldmap->FindAndSetCurrentMap(map?map:game->CurrentArea);
+	int index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
+	return worldmap->GetWorldMap(index);
+}
+
+WorldMap *Interface::GetWorldMap(const ResRef& area) const
+{
+	int index = worldmap->FindAndSetCurrentMap(area);
 	return worldmap->GetWorldMap(index);
 }
 
@@ -2067,7 +1975,7 @@ ieDword Interface::HasFeature(int position) const
 	return GameFeatures[position>>5] & (1<<(position&31));
 }
 
-static const char *game_flags[GF_COUNT+1]={
+static const char* const game_flags[GF_COUNT + 1]={
 		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 		"HasSongList",        //2 GF_HAS_SONGLIST
@@ -2226,9 +2134,11 @@ bool Interface::LoadGemRBINI()
 			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
-				strlcpy( GroundCircleBam[size], s, pos - s + 1 );
+				char tmp[9];
+				strlcpy(tmp, s, pos - s + 1);
+				GroundCircleBam[size] = tmp;
 			} else {
-				CopyResRef(GroundCircleBam[size], s);
+				GroundCircleBam[size] = s;
 			}
 		}
 	}
@@ -2250,25 +2160,29 @@ bool Interface::LoadGemRBINI()
 		//print("%s = %s", game_flags[i], HasFeature(i)?"yes":"no");
 	}
 
+	// fix the resolution default if needed
+	config.Width = std::max(config.Width, ini->GetKeyAsInt("resources", "MinWidth", 800));
+	config.Height = std::max(config.Height, ini->GetKeyAsInt("resources", "MinHeight", 600));
+
 	return true;
 }
 
 /** Load the encoding table selected in gemrb.cfg */
 bool Interface::LoadEncoding()
 {
-	DataStream* inifile = gamedata->GetResource( Encoding.c_str(), IE_INI_CLASS_ID );
+	DataStream* inifile = gamedata->GetResource(config.Encoding.c_str(), IE_INI_CLASS_ID);
 	if (! inifile) {
 		return false;
 	}
 
-	Log(MESSAGE, "Core", "Loading encoding definition for %s: '%s'", Encoding.c_str(),
+	Log(MESSAGE, "Core", "Loading encoding definition for %s: '%s'", config.Encoding.c_str(),
 		inifile->originalfile);
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	ini->Open(inifile);
 
 	TLKEncoding.encoding = ini->GetKeyAsString("encoding", "TLKEncoding", TLKEncoding.encoding.c_str());
-	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", 0);
+	TLKEncoding.zerospace = ini->GetKeyAsBool("encoding", "NoSpaces", false);
 
 	//TextArea::SetNoteString( ini->GetKeyAsString( "strings", "NoteString", NULL ) );
 
@@ -2354,7 +2268,7 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 static EffectRef fx_summon_disable_ref = { "AvatarRemovalModifier", -1 };
 
 //NOTE: if there were more summoned creatures, it will return only the last
-Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Scriptable *Owner, Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
+Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, Scriptable *Owner, const Actor *target, const Point &position, int eamod, int level, Effect *fx, bool sexmod)
 {
 	//maximum number of monsters summoned
 	int cnt=10;
@@ -2465,8 +2379,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			Owner->AddTrigger(TriggerEntry(trigger_summoned, ab->GetGlobalID()));
 		}
 
-		if (vvcres[0]) {
-			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
+		if (!animRes.IsEmpty()) {
+			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(animRes, false);
 			if (vvc) {
 				//This is the final position of the summoned creature
 				//not the original target point
@@ -2554,7 +2468,7 @@ void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
 	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
 }
 
-bool Interface::IsFreezed()
+bool Interface::IsFreezed() const
 {
 	return !update_scripts;
 }
@@ -2712,9 +2626,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	if (!sm->Open(str)) {
 		return -1;
 	}
-	Symbol s;
-	strlcpy(s.ResRef, ResRef, sizeof(s.ResRef));
-	s.sm = sm;
+	Symbol s = { sm, ResRef };
 	ind = -1;
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm) {
@@ -2735,7 +2647,7 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (!symbols[i].sm)
 			continue;
-		if (strnicmp( symbols[i].ResRef, ResRef, 8 ) == 0)
+		if (symbols[i].symbolName == ResRef)
 			return ( int ) i;
 	}
 	return -1;
@@ -2807,7 +2719,7 @@ int Interface::PlayMovie(const char* resref)
 
 	public:
 		// default color taken from BGEE.lua
-		IESubtitles(class Font* fnt, ResRef resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
+		IESubtitles(class Font* fnt, const ResRef& resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
 			AutoTable sttable(resref);
@@ -2876,7 +2788,7 @@ int Interface::PlayMovie(const char* resref)
 
 	// clear whatever is currently on screen
 	SetCutSceneMode(true);
-	Region screen(0,0, Width, Height);
+	Region screen(0, 0, config.Width, config.Height);
 	Window* win = winmgr->MakeWindow(screen);
 	win->SetFlags(Window::Borderless|Window::NoSounds, OP_OR);
 	winmgr->PresentModalWindow(win);
@@ -2926,7 +2838,7 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 	DirectoryIterator::FileFilterPredicate* filter = NULL;
 	switch (dir) {
 		case DIRECTORY_CHR_PORTRAITS:
-			resourcePath = GamePortraitsPath;
+			resourcePath = config.GamePortraitsPath;
 			filter = new ExtFilter("BMP");
 			if (IsAvailable(IE_PNG_CLASS_ID)) {
 				// chain an ORed filter for png
@@ -2934,24 +2846,24 @@ DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
 			}
 			break;
 		case DIRECTORY_CHR_SOUNDS:
-			resourcePath = GameSoundsPath;
+			resourcePath = config.GameSoundsPath;
 			if (!HasFeature( GF_SOUNDFOLDERS ))
 				filter = new ExtFilter("WAV");
 			break;
 		case DIRECTORY_CHR_EXPORTS:
-			resourcePath = GameCharactersPath;
+			resourcePath = config.GameCharactersPath;
 			filter = new ExtFilter("CHR");
 			break;
 		case DIRECTORY_CHR_SCRIPTS:
-			resourcePath = GameScriptsPath;
+			resourcePath = config.GameScriptsPath;
 			filter = new ExtFilter("BS");
 			filter = new OrPredicate<const char*>(filter, new ExtFilter("BCS"));
 			break;
 		default:
-			error("Interface", "Uknown resource directory type: %d!", dir);
+			error("Interface", "Unknown resource directory type: %d!", dir);
 	}
 
-	PathJoin(Path, GamePath, resourcePath, nullptr);
+	PathJoin(Path, config.GamePath, resourcePath, nullptr);
 	DirectoryIterator dirIt(Path);
 	dirIt.SetFilterPredicate(filter);
 	return dirIt;
@@ -3006,7 +2918,7 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 
 	// handle a few special cases
 	if (!overrides->GetKeyAsInt("Config", "Sound", 1))
-		AudioDriverName = "null";
+		config.AudioDriverName = "null";
 
 	if (overrides->GetKeyAsInt("Game Options", "Cheats", 1)) {
 		EnableCheatKeys(1);
@@ -3017,13 +2929,13 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 		vars->SetAt("Infravision", (ieDword)0);
 	}
 
-	if (!Width || !Height) {
-		Height = overrides->GetKeyAsInt("Config", "ConfigHeight", Height);
+	if (!config.Width || !config.Height) {
+		config.Height = overrides->GetKeyAsInt("Config", "ConfigHeight", config.Height);
 		int tmpWidth = overrides->GetKeyAsInt("Config", "ConfigWidth", 0);
 		if (!tmpWidth) {
 			// Resolution is stored as width only. assume 4|3 ratio.
-			Width = overrides->GetKeyAsInt("Program Options", "Resolution", Width);
-			Height = 0.75 * Width;
+			config.Width = overrides->GetKeyAsInt("Program Options", "Resolution", config.Width);
+			config.Height = 0.75 * config.Width;
 		}
 	}
 	return true;
@@ -3036,13 +2948,13 @@ bool Interface::SaveConfig()
 {
 	char ini_path[_MAX_PATH] = { '\0' };
 	char gemrbINI[_MAX_PATH+4] = { '\0' };
-	if (strncmp(INIConfig, "gem-", 4)) {
+	if (strncmp(INIConfig, "gem-", 4) != 0) {
 		snprintf(gemrbINI, sizeof(gemrbINI), "gem-%s", INIConfig);
 	}
-	PathJoin(ini_path, GamePath, gemrbINI, nullptr);
+	PathJoin(ini_path, config.GamePath, gemrbINI, nullptr);
 	FileStream *fs = new FileStream();
 	if (!fs->Create(ini_path)) {
-		PathJoin(ini_path, SavePath, gemrbINI, nullptr);
+		PathJoin(ini_path, config.SavePath, gemrbINI, nullptr);
 		if (!fs->Create(ini_path)) {
 			delete fs;
 			return false;
@@ -3154,7 +3066,7 @@ void Interface::QuitGame(int BackToMain)
 
 void Interface::SetupLoadGame(Holder<SaveGame> sg, int ver_override)
 {
-	LoadGameIndex = sg;
+	LoadGameIndex = std::move(sg);
 	VersionOverride = ver_override;
 	QuitFlag |= QF_LOADGAME;
 }
@@ -3183,8 +3095,10 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	WorldMapArray* new_worldmap = NULL;
 
 	LoadProgress(10);
-	if (!KeepCache) DelTree((const char *) CachePath, true);
+	if (!config.KeepCache) DelTree((const char *) config.CachePath, true);
 	LoadProgress(15);
+
+	saveGameAREExtractor.changeSaveGame(sg);
 
 	if (sg == NULL) {
 		//Load the Default Game
@@ -3245,7 +3159,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (sav_str) {
 		PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 		if (ai) {
-			if (ai->DecompressSaveGame(sav_str) != GEM_OK) {
+			if (ai->DecompressSaveGame(sav_str, saveGameAREExtractor) != GEM_OK) {
 				goto cleanup;
 			}
 		}
@@ -3281,7 +3195,7 @@ cleanup:
 }
 
 /* replace the current world map but sync areas available in old and new */
-void Interface::UpdateWorldMap(ResRef wmResRef)
+void Interface::UpdateWorldMap(const ResRef& wmResRef)
 {
 	DataStream* wmp_str = gamedata->GetResource(wmResRef, IE_WMP_CLASS_ID);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_SAV_CLASS_ID);
@@ -3292,14 +3206,14 @@ void Interface::UpdateWorldMap(ResRef wmResRef)
 	}
 
 	WorldMapArray *new_worldmap = wmp_mgr->GetWorldMapArray();
-	WorldMap *wm = worldmap->GetWorldMap(0);
-	WorldMap *nwm = new_worldmap->GetWorldMap(0);
+	const WorldMap *wm = worldmap->GetWorldMap(0);
+	const WorldMap *nwm = new_worldmap->GetWorldMap(0);
 
-	unsigned int i, ni;
+	unsigned int ni;
 	unsigned int ec = wm->GetEntryCount();
 	//update status of the previously existing areas
-	for(i=0;i<ec;i++) {
-		WMPAreaEntry *ae = wm->GetEntry(i);
+	for (unsigned int i = 0; i < ec; i++) {
+		const WMPAreaEntry *ae = wm->GetEntry(i);
 		WMPAreaEntry *nae = nwm->GetArea(ae->AreaResRef, ni);
 		if (nae != NULL) {
 			nae->SetAreaStatus(ae->GetAreaStatus(), OP_SET);
@@ -3338,8 +3252,6 @@ void Interface::UpdateMasterScript()
 
 bool Interface::InitItemTypes()
 {
-	int i;
-
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
@@ -3357,11 +3269,11 @@ bool Interface::InitItemTypes()
 		}
 		//make sure unsigned int is 32 bits
 		slotmatrix = (ieDword *) malloc(ItemTypes * sizeof(ieDword) );
-		for (i=0;i<ItemTypes;i++) {
+		for (int i = 0; i < ItemTypes; i++) {
 			unsigned int value = 0;
 			unsigned int k = 1;
 			for (int j=0;j<InvSlotTypes;j++) {
-				if (strtol(it->QueryField(i,j),NULL,0) ) {
+				if (strtosigned<long>(it->QueryField(i,j))) {
 					value |= k;
 				}
 				k <<= 1;
@@ -3373,8 +3285,8 @@ bool Interface::InitItemTypes()
 
 	//itemtype data stores (armor failure and critical damage multipliers), critical range
 	itemtypedata.reserve(ItemTypes);
-	for (i=0;i<ItemTypes;i++) {
-		itemtypedata.push_back(std::vector<int>(4));
+	for (int i = 0; i < ItemTypes; i++) {
+		itemtypedata.emplace_back(4);
 		//default values in case itemdata is missing (it is needed only for iwd2)
 		if (slotmatrix[i] & SLOT_WEAPON) {
 			itemtypedata[i][IDT_FAILURE] = 0; // armor malus
@@ -3387,12 +3299,11 @@ bool Interface::InitItemTypes()
 	if (af) {
 		int armcount = af->GetRowCount();
 		int colcount = af->GetColumnCount();
-		int j;
-		for (i = 0; i < armcount; i++) {
+		for (int i = 0; i < armcount; i++) {
 			int itemtype = (ieWord) atoi( af->QueryField(i,0) );
 			if (itemtype<ItemTypes) {
 				// we don't need the itemtype column, since it is equal to the position
-				for (j=0; j < colcount-1; j++) {
+				for (int j = 0; j < colcount - 1; j++) {
 					itemtypedata[itemtype][j] = atoi(af->QueryField(i, j+1));
 				}
 			}
@@ -3402,47 +3313,42 @@ bool Interface::InitItemTypes()
 	//slottype describes the inventory structure
 	Inventory::Init();
 	AutoTable st("slottype");
-	if (slottypes) {
-		free(slottypes);
-		slottypes = NULL;
-	}
 	SlotTypes = 0;
 	if (st) {
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
-		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
-		memset(slottypes, -1, SlotTypes * sizeof(SlotType) );
+		slotTypes.resize(SlotTypes);
 		for (unsigned int row = 0; row < SlotTypes; row++) {
 			bool alias;
-			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
+			ieDword i = strtounsigned<ieDword>(st->GetRowName(row));
 			if (i>=SlotTypes) continue;
-			if (slottypes[i].sloteffects!=0xffffffffu) {
-				slottypes[row].slot = i;
+			if (slotTypes[i].slotEffects != 100) { // SLOT_EFFECT_ALIAS
+				slotTypes[row].slot = i;
 				i=row;
 				alias = true;
 			} else {
-				slottypes[row].slot = i;
+				slotTypes[row].slot = i;
 				alias = false;
 			}
-			slottypes[i].slottype = (ieDword) strtol(st->QueryField(row,0),NULL,0 );
-			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
-			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
-			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
-			slottypes[i].slotflags = (ieDword) strtol(st->QueryField(row,5),NULL,0 );
+			slotTypes[i].slotType = strtounsigned<ieDword>(st->QueryField(row, 0));
+			slotTypes[i].slotID = strtounsigned<ieDword>(st->QueryField(row, 1));
+			slotTypes[i].slotResRef = st->QueryField(row, 2);
+			slotTypes[i].slotTip = strtounsigned<ieDword>(st->QueryField(row, 3));
+			slotTypes[i].slotFlags = strtounsigned<ieDword>(st->QueryField(row, 5));
 			//don't fill sloteffects for aliased slots (pst)
 			if (alias) {
 				continue;
 			}
-			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
+			slotTypes[i].slotEffects = strtounsigned<ieDword>(st->QueryField(row, 4));
 			//setting special slots
-			if (slottypes[i].slottype&SLOT_ITEM) {
-				if (slottypes[i].slottype&SLOT_INVENTORY) {
+			if (slotTypes[i].slotType & SLOT_ITEM) {
+				if (slotTypes[i].slotType & SLOT_INVENTORY) {
 					Inventory::SetInventorySlot(i);
 				} else {
 					Inventory::SetQuickSlot(i);
 				}
 			}
-			switch (slottypes[i].sloteffects) {
+			switch (slotTypes[i].slotEffects) {
 				//fist slot, not saved, default weapon
 			case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
 				//magic weapon slot, overrides all weapons
@@ -3466,14 +3372,12 @@ bool Interface::InitItemTypes()
 
 ieDword Interface::FindSlot(unsigned int idx) const
 {
-	ieDword i;
-
-	for (i=0;i<SlotTypes;i++) {
-		if (idx==slottypes[i].slot) {
-			break;
+	for (ieDword i = 0; i < SlotTypes; i++) {
+		if (idx == slotTypes[i].slot) {
+			return i;
 		}
 	}
-	return i;
+	return 0;
 }
 
 ieDword Interface::QuerySlot(unsigned int idx) const
@@ -3481,7 +3385,7 @@ ieDword Interface::QuerySlot(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slot;
+	return slotTypes[idx].slot;
 }
 
 ieDword Interface::QuerySlotType(unsigned int idx) const
@@ -3489,7 +3393,7 @@ ieDword Interface::QuerySlotType(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slottype;
+	return slotTypes[idx].slotType;
 }
 
 ieDword Interface::QuerySlotID(unsigned int idx) const
@@ -3497,7 +3401,7 @@ ieDword Interface::QuerySlotID(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slotid;
+	return slotTypes[idx].slotID;
 }
 
 ieDword Interface::QuerySlottip(unsigned int idx) const
@@ -3505,7 +3409,7 @@ ieDword Interface::QuerySlottip(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slottip;
+	return slotTypes[idx].slotTip;
 }
 
 ieDword Interface::QuerySlotEffects(unsigned int idx) const
@@ -3513,7 +3417,7 @@ ieDword Interface::QuerySlotEffects(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].sloteffects;
+	return slotTypes[idx].slotEffects;
 }
 
 ieDword Interface::QuerySlotFlags(unsigned int idx) const
@@ -3521,7 +3425,7 @@ ieDword Interface::QuerySlotFlags(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return 0;
 	}
-	return slottypes[idx].slotflags;
+	return slotTypes[idx].slotFlags;
 }
 
 const char *Interface::QuerySlotResRef(unsigned int idx) const
@@ -3529,7 +3433,7 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 	if (idx>=SlotTypes) {
 		return "";
 	}
-	return slottypes[idx].slotresref;
+	return slotTypes[idx].slotResRef;
 }
 
 int Interface::GetArmorFailure(unsigned int itemtype) const
@@ -3693,8 +3597,8 @@ bool Interface::HasFeedback(int type) const
 	return FeedbackLevel & type;
 }
 
-static const char *saved_extensions[]={".are",".sto",0};
-static const char *saved_extensions_last[]={".tot",".toh",0};
+static const char* const saved_extensions[] = { ".are", ".sto", ".blb", nullptr };
+static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 
 //returns the priority of the file to be saved
 //2 - save
@@ -3704,20 +3608,17 @@ int Interface::SavedExtension(const char *filename)
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return 0;
-	int i=0;
-	while(saved_extensions[i]) {
-		if (!stricmp(saved_extensions[i], str) ) return 2;
-		i++;
+
+	for (const auto ext : saved_extensions) {
+		if (ext && !stricmp(ext, str)) return 2;
 	}
-	i=0;
-	while(saved_extensions_last[i]) {
-		if (!stricmp(saved_extensions_last[i], str) ) return 1;
-		i++;
+	for (const auto ext : saved_extensions_last) {
+		if (ext && !stricmp(ext, str)) return 1;
 	}
 	return 0;
 }
 
-static const char *protected_extensions[]={".exe",".dll",".so",0};
+static const char* const protected_extensions[] = { ".exe", ".dll", ".so", nullptr };
 
 //returns true if file should be saved
 bool Interface::ProtectedExtension(const char *filename)
@@ -3732,11 +3633,11 @@ bool Interface::ProtectedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
+void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
 
-	PathJoinExt(filename, CachePath, resref, TypeExt(ClassID));
+	PathJoinExt(filename, config.CachePath, resref, TypeExt(ClassID));
 	unlink ( filename);
 }
 
@@ -3826,7 +3727,7 @@ void Interface::ReleaseDraggedItem()
 	winmgr->GetGameWindow()->SetCursor(nullptr);
 }
 
-void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
+void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 {
 	//We should drop the dragged item and pick this up,
 	//we shouldn't have a valid DraggedItem at this point.
@@ -3836,28 +3737,27 @@ void Interface::DragItem(CREItem *item, const ieResRef /*Picture*/)
 		delete DraggedItem->item;
 		DraggedItem = nullptr;
 	}
-	
+
 	if (!item) return;
-	
+
 	DraggedItem.reset(new ItemDragOp(item));
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
+bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 {
-	ieResRef ItemName;
-	int i,j;
-
 	AutoTable tab(TableName);
 	if (!tab) {
 		return false;
 	}
-	i=tab->GetRowCount();
-	for(j=0;j<i;j++) {
+
+	int i = tab->GetRowCount();
+	for (int j = 0; j < i; j++) {
+		ResRef ItemName;
 		if (Prefix) {
-			snprintf(ItemName,sizeof(ItemName),"%s%02d",Prefix, (j+1)%100);
+			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			strnlwrcpy(ItemName,tab->GetRowName(j), 8);
+			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
 		}
 		//Variable elements are free'd, so we have to use malloc
 		//well, not anymore, we can use ReleaseFunction
@@ -3866,7 +3766,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		int cl = atoi(tab->GetColumnName(0));
 		ItemList *itemlist = new ItemList(l, cl);
 		for(int k=0;k<l;k++) {
-			strnlwrcpy(itemlist->ResRefs[k],tab->QueryField(j,k), 8);
+			itemlist->ResRefs[k] = ResRef::MakeLowerCase(tab->QueryField(j, k));
 		}
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
@@ -3875,9 +3775,6 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 
 bool Interface::ReadRandomItems()
 {
-	ieResRef RtResRef;
-	int i;
-
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
 	if (RtRows) {
@@ -3899,27 +3796,28 @@ bool Interface::ReadRandomItems()
 	}
 
 	//the gold item
-	strnlwrcpy( GoldResRef, tab->QueryField(size_t(0), size_t(0)), 8);
-	if ( GoldResRef[0]=='*' ) {
+	GoldResRef = tab->QueryField(size_t(0), size_t(0));
+	if (GoldResRef.IsStar()) {
 		return false;
 	}
-	strnlwrcpy( RtResRef, tab->QueryField( 1, difflev ), 8);
-	i=atoi( RtResRef );
+	ResRef randTreasureRef;
+	randTreasureRef = tab->QueryField(1, difflev);
+	int i = atoi(randTreasureRef);
 	if (i<1) {
-		ReadItemTable( RtResRef, 0 ); //reading the table itself
+		ReadItemTable(randTreasureRef, 0); //reading the table itself
 		return true;
 	}
 	if (i>5) {
 		i=5;
 	}
 	while(i--) {
-		strnlwrcpy( RtResRef, tab->QueryField(2+i,difflev), 8);
-		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
+		randTreasureRef = tab->QueryField(2 + i, difflev);
+		ReadItemTable(randTreasureRef,tab->GetRowName(2 + i));
 	}
 	return true;
 }
 
-CREItem *Interface::ReadItem(DataStream *str)
+CREItem *Interface::ReadItem(DataStream *str) const
 {
 	CREItem *itm = new CREItem();
 	if (ReadItem(str, itm)) return itm;
@@ -3927,7 +3825,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 	return NULL;
 }
 
-CREItem *Interface::ReadItem(DataStream *str, CREItem *itm)
+CREItem *Interface::ReadItem(DataStream *str, CREItem *itm) const
 {
 	str->ReadResRef( itm->ItemResRef );
 	str->ReadWord(itm->Expired);
@@ -3976,7 +3874,7 @@ void Interface::SanitizeItem(CREItem *item) const
 			//set charge counters for non-rechargeable items if their charge is zero
 			//set charge counters for items not using charges to one
 			for (int i = 0; i < CHARGE_COUNTERS; i++) {
-				ITMExtHeader *h = itm->GetExtHeader(i);
+				const ITMExtHeader *h = itm->GetExtHeader(i);
 				if (h) {
 					if (item->Usages[i] == 0) {
 						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
@@ -4021,23 +3919,23 @@ void Interface::SanitizeItem(CREItem *item) const
 
 //This function generates random items based on the randitem.2da file
 //there could be a loop, but we don't want to freeze, so there is a limit
-bool Interface::ResolveRandomItem(CREItem *itm)
+bool Interface::ResolveRandomItem(CREItem *itm) const
 {
 	if (!RtRows) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
-		int i,j,k;
 		char *endptr;
-		ieResRef NewItem;
+		char NewItem[9];
 
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
-				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef);
+				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
 			return true;
 		}
 		ItemList *itemlist = (ItemList*)lookup;
+		int i;
 		if (itemlist->WeightOdds) {
 			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
 			i=Roll(2,(itemlist->Count+1)/2,-2);
@@ -4046,31 +3944,32 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		}
 		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
 		char *p = strchr(NewItem, '*');
+		int diceSides;
 		if (p) {
 			*p=0; //doing this so endptr is ok
-			k=strtol(p+1,NULL,10);
+			diceSides = strtosigned<int>(p + 1, nullptr, 10);
 		} else {
-			k=1;
+			diceSides = 1;
 		}
-		j=strtol(NewItem,&endptr,10);
-		if (j<1) {
-			j=1;
+		int diceThrows = strtosigned<int>(NewItem, &endptr, 10);
+		if (diceThrows <1) {
+			diceThrows = 1;
 		}
 		if (*endptr) {
-			strnlwrcpy(itm->ItemResRef, NewItem, 8);
+			itm->ItemResRef = ResRef::MakeLowerCase(NewItem);
 		} else {
-			strnlwrcpy(itm->ItemResRef, GoldResRef, 8);
+			itm->ItemResRef = GoldResRef;
 		}
-		if ( !memcmp( itm->ItemResRef,"no_drop",8 ) ) {
-			itm->ItemResRef[0]=0;
+		if (itm->ItemResRef == "no_drop") {
+			itm->ItemResRef.Reset();
 		}
-		if (!itm->ItemResRef[0]) {
+		if (itm->ItemResRef.IsEmpty()) {
 			return false;
 		}
-		itm->Usages[0]=(ieWord) Roll(j,k,0);
+		itm->Usages[0] = (ieWord) Roll(diceThrows, diceSides, 0);
 	}
 	Log(ERROR, "Interface", "Loop detected while generating random item:%s",
-		itm->ItemResRef);
+		itm->ItemResRef.CString());
 	return false;
 }
 
@@ -4083,7 +3982,6 @@ Effect *Interface::GetEffect(ieDword opcode)
 	if (!fx) {
 		return NULL;
 	}
-	memset(fx,0,sizeof(Effect));
 	fx->Opcode=opcode;
 	return fx;
 }
@@ -4127,10 +4025,10 @@ void Interface::CloseCurrentStore()
 	CurrentStore = NULL;
 }
 
-Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
+Store *Interface::SetCurrentStore(const char* resName, ieDword owner)
 {
 	if (CurrentStore) {
-		if (!strnicmp(CurrentStore->Name, resname, 8)) {
+		if (CurrentStore->Name == resName) {
 			return CurrentStore;
 		}
 
@@ -4138,7 +4036,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, ieDword owner)
 		CloseCurrentStore();
 	}
 
-	CurrentStore = gamedata->GetStore(resname);
+	CurrentStore = gamedata->GetStore(resName);
 	if (CurrentStore == NULL) {
 		return NULL;
 	}
@@ -4152,18 +4050,18 @@ void Interface::SetMouseScrollSpeed(int speed) {
 	mousescrollspd = (speed+1)*2;
 }
 
-int Interface::GetMouseScrollSpeed() {
+int Interface::GetMouseScrollSpeed() const {
 	return mousescrollspd;
 }
 
-ieStrRef Interface::GetRumour(const ieResRef dlgref)
+ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
 	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
 	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref);
+		Log(ERROR, "Interface", "Cannot load dialog: %s", dlgref.CString());
 		return ieStrRef(-1);
 	}
 	Scriptable *pc = game->GetSelectedPCSingle(false);
@@ -4181,10 +4079,10 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 }
 
 //plays stock sound listed in defsound.2da
-Holder<SoundHandle> Interface::PlaySound(int index, unsigned int channel)
+Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
 {
-	if (index<=DSCount) {
-		return AudioDriver->Play(DefSound[index], channel);
+	if (index <= gamedata->defaultSounds.size()) {
+		return AudioDriver->Play(gamedata->defaultSounds[index], channel);
 	}
 	return NULL;
 }
@@ -4213,7 +4111,7 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 
 Actor *Interface::GetFirstSelectedActor()
 {
-	if (game->selected.size()) {
+	if (!game->selected.empty()) {
 		return game->selected[0];
 	}
 	return NULL;
@@ -4254,16 +4152,17 @@ int Interface::CanMoveItem(const CREItem *item) const
 	}
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
-	if (strnicmp(item->ItemResRef, GoldResRef, 8 ) )
+	if (GoldResRef != item->ItemResRef) {
 		return -1;
+	}
 	//gold, returns the gold value (stack size)
 	return item->Usages[0];
 }
 
 // dealing with applying effects
-void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *caster, int level)
+void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(resname);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -4275,9 +4174,9 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Scriptable *cas
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ieResRef resname, Map* area, const Point &pos, Scriptable *caster, int level)
+void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(resname);
+	Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -4335,7 +4234,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 	return res;
 }
 
-Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
+Effect *Interface::GetEffect(const ResRef& resname, int level, const Point &p)
 {
 	//Don't free this reference, it is cached!
 	Effect *effect = gamedata->GetEffect(resname);
@@ -4346,8 +4245,7 @@ Effect *Interface::GetEffect(const ieResRef resname, int level, const Point &p)
 		level = 1;
 	}
 	effect->Power = level;
-	effect->PosX=p.x;
-	effect->PosY=p.y;
+	effect->Pos = p;
 	return effect;
 }
 
@@ -4392,7 +4290,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 {
 	char Path[_MAX_PATH];
 
-	PathJoin(Path, GamePath, GameCharactersPath, nullptr);
+	PathJoin(Path, config.GamePath, config.GameCharactersPath, nullptr);
 	if (!actor) {
 		return -1;
 	}
@@ -4492,17 +4390,35 @@ int Interface::WriteWorldMap(const char *folder)
 	return 0;
 }
 
-int Interface::CompressSave(const char *folder)
+static bool IsBlobSaveItem(const char *path) {
+	if (path == nullptr) {
+		return false;
+	}
+
+	auto areExt = strstr(path, ".blb");
+	auto pathLength = strlen(path);
+	return areExt != nullptr && path + pathLength - 4 == areExt;
+}
+
+int Interface::CompressSave(const char *folder, bool overrideRunning)
 {
 	FileStream str;
 
 	str.Create( folder, GameNameResRef, IE_SAV_CLASS_ID );
-	DirectoryIterator dir(CachePath);
+	DirectoryIterator dir(config.CachePath);
 	if (!dir) {
-		return -1;
+		return GEM_ERROR;
 	}
 	PluginHolder<ArchiveImporter> ai = MakePluginHolder<ArchiveImporter>(IE_SAV_CLASS_ID);
 	ai->CreateArchive( &str);
+
+	tick_t startTime = GetTicks();
+	// If we override the savegame we are running to fetch AREs from, it has already dumped
+	// itself as "ares.blb" into the cache folder. Otherwise, just copy directly.
+	if (!overrideRunning && saveGameAREExtractor.copyRetainedAREs(&str) == GEM_ERROR) {
+		Log(ERROR, "Interface", "Failed to copy ARE files into new save game.");
+		return GEM_ERROR;
+	}
 
 	dir.SetFlags(DirectoryIterator::Files);
 	//.tot and .toh should be saved last, because they are updated when an .are is saved
@@ -4517,7 +4433,15 @@ int Interface::CompressSave(const char *folder)
 				if (!fs.Open(dtmp)) {
 					Log(ERROR, "Interface", "Failed to open \"%s\".", dtmp);
 				}
-				ai->AddToSaveGame(&str, &fs);
+
+				if (IsBlobSaveItem(dtmp)) {
+					if (overrideRunning) {
+						saveGameAREExtractor.updateSaveGame(str.GetPos());
+						ai->AddToSaveGameCompressed(&str, &fs);
+					}
+				} else {
+					ai->AddToSaveGame(&str, &fs);
+				}
 			}
 		} while (++dir);
 		//reopen list for the second round
@@ -4526,7 +4450,10 @@ int Interface::CompressSave(const char *folder)
 			dir.Rewind();
 		}
 	}
-	return 0;
+
+	tick_t endTime = GetTicks();
+	Log(WARNING, "Core", "%lu ms (compressing SAV file)", endTime - startTime);
+	return GEM_OK;
 }
 
 int Interface::GetRareSelectSoundCount() const { return NumRareSelectSounds; }
@@ -4645,7 +4572,7 @@ int Interface::GetReputationMod(int column) const
 	return reputationmod[reputation][column];
 }
 
-PauseSetting Interface::TogglePause()
+PauseSetting Interface::TogglePause() const
 {
 	const GameControl *gc = GetGameControl();
 	if (!gc) return PAUSE_OFF;
@@ -4654,7 +4581,7 @@ PauseSetting Interface::TogglePause()
 	return (PauseSetting)(gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS);
 }
 
-bool Interface::SetPause(PauseSetting pause, int flags)
+bool Interface::SetPause(PauseSetting pause, int flags) const
 {
 	GameControl *gc = GetGameControl();
 
@@ -4715,31 +4642,27 @@ void Interface::SetInfoTextColor(const Color &color)
 }
 
 //todo row?
-void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3)
+void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef& resource2, ResRef& resource3) const
 {
-	if (!resource1) {
-		return;
-	}
-	resource1[0]=0;
-	if (resource2) {
-		resource2[0]=0;
-	}
-	if (resource3) {
-		resource3[0]=0;
-	}
+	resource1.Reset();
+	resource2.Reset();
+	resource3.Reset();
+
 	AutoTable tab(resref);
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
-		strnuprcpy(resource1, tab->QueryField(row,0), 8);
-		if (resource2 && cols>1)
-			strnuprcpy(resource2, tab->QueryField(row,1), 8);
-		if (resource3 && cols>2)
-			strnuprcpy(resource3, tab->QueryField(row,2), 8);
+		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
+		if (cols > 1) {
+			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
+		}
+		if (cols > 2) {
+			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
+		}
 	}
 }
 
-ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
+ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
 	ieDword *ret;
 
@@ -4749,7 +4672,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
 		ret[0]=cnt;
 		while(cnt) {
-			ret[cnt]=strtol(tab->QueryField(cnt-1, 0),NULL, 0);
+			ret[cnt] = strtounsigned<ieDword>(tab->QueryField(cnt-1, 0));
 			cnt--;
 		}
 		return ret;
@@ -4759,7 +4682,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ieResRef resref)
 	return ret;
 }
 
-ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
+ieDword* Interface::GetListFrom2DA(const ResRef& tablename)
 {
 	ieDword *list = NULL;
 
@@ -4774,10 +4697,9 @@ ieDword* Interface::GetListFrom2DA(const ieResRef tablename)
 //returns a numeric value associated with a stat name (symbol) from stats.ids
 ieDword Interface::TranslateStat(const char *stat_name)
 {
-	long tmp;
-
-	if (valid_number(stat_name, tmp)) {
-		return (ieDword) tmp;
+	ieDword tmp;
+	if (valid_unsignednumber(stat_name, tmp)) {
+		return tmp;
 	}
 
 	int symbol = LoadSymbol( "stats" );
@@ -4813,8 +4735,8 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 	// tables for additive modifiers of bonus type
 	for (int i = 0; i < count; i++) {
 		tablename = mtm->GetRowName(i);
-		int checkcol = strtol(mtm->QueryField(i,1), nullptr, 0);
-		unsigned int readcol = strtol(mtm->QueryField(i,2), nullptr, 0);
+		int checkcol = strtosigned<int>(mtm->QueryField(i,1));
+		unsigned int readcol = strtounsigned<unsigned int>(mtm->QueryField(i,2));
 		int stat = TranslateStat(mtm->QueryField(i,0) );
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
@@ -4835,23 +4757,23 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 			row = tm->FindTableValue(checkcol, value, 0);
 		}
 		if (row>=0) {
-			ret += strtol(tm->QueryField(row, readcol), NULL, 0);
+			ret += strtosigned<int>(tm->QueryField(row, readcol));
 		}
 	}
 	return ret;
 }
 
-void Interface::WaitForDisc(int disc_number, const char* path)
+void Interface::WaitForDisc(int disc_number, const char* path) const
 {
 	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
 
 	GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 	do {
 		winmgr->DrawWindows();
-		for (size_t i=0;i<CD[disc_number-1].size();i++) {
+		for (const auto& cd : config.CD[disc_number - 1]) {
 			char name[_MAX_PATH];
 
-			PathJoin(name, CD[disc_number-1][i].c_str(), path, nullptr);
+			PathJoin(name, cd.c_str(), path, nullptr);
 			if (file_exists (name)) {
 				GetGUIScriptEngine()->RunFunction( "GUICommonWindows", "OpenWaitForDiscWindow" );
 				return;
@@ -4863,7 +4785,7 @@ void Interface::WaitForDisc(int disc_number, const char* path)
 
 Timer& Interface::SetTimer(const EventHandler& handler, tick_t interval, int repeats)
 {
-	timers.push_back(Timer(interval, handler, repeats));
+	timers.emplace_back(interval, handler, repeats);
 	return timers.back();
 }
 
@@ -4874,7 +4796,7 @@ void Interface::SetNextScript(const char *script)
 }
 
 void Interface::SanityCheck(const char *ver) {
-	if (strcmp(ver, VERSION_GEMRB)) {
+	if (strcmp(ver, VERSION_GEMRB) != 0) {
 		error("Core", "version check failed: core version %s doesn't match caller's version %s\n", VERSION_GEMRB, ver);
 	}
 }

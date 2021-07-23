@@ -214,7 +214,7 @@ enum {
 };
 
 struct TriggerEntry {
-	TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
+	explicit TriggerEntry(unsigned short id) : triggerID(id), param1(0), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1) : triggerID(id), param1(p1), param2(0), flags(0) { }
 	TriggerEntry(unsigned short id, ieDword p1, ieDword p2) : triggerID(id), param1(p1), param2(p2), flags(0) { }
 
@@ -231,7 +231,7 @@ struct TriggerEntry {
 
 class GEM_EXPORT Scriptable {
 public:
-	Scriptable(ScriptableType type);
+	explicit Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
 	tick_t WaitCounter;
@@ -278,7 +278,7 @@ public:
 
 	ieStrRef DialogName;
 
-	GameScript* Scripts[MAX_SCRIPTS];
+	GameScript* Scripts[MAX_SCRIPTS] = {};
 	int scriptlevel;
 
 	ieDword UnselectableTimer;
@@ -319,8 +319,8 @@ public:
 	}
 	void SetDialog(const ResRef &resref);
 	void SetFloatingText(char*);
-	void SetScript(const ieResRef aScript, int idx, bool ai=false);
-	void SetSpellResRef(ResRef resref);
+	void SetScript(const ResRef &aScript, int idx, bool ai = false);
+	void SetSpellResRef(const ResRef& resref);
 	void SetWait(tick_t time);
 	tick_t GetWait() const;
 	void LeftDialog();
@@ -363,7 +363,7 @@ public:
 	void ClearTriggers();
 	void AddTrigger(TriggerEntry trigger);
 	void SetLastTrigger(ieDword triggerID, ieDword globalID);
-	bool MatchTrigger(unsigned short id, ieDword param = 0);
+	bool MatchTrigger(unsigned short id, ieDword param = 0) const;
 	bool MatchTriggerWithObject(short unsigned int id, const Object *obj, ieDword param = 0) const;
 	const TriggerEntry *GetMatchingTrigger(unsigned short id, unsigned int notflags = 0) const;
 	void SendTriggerToAll(TriggerEntry entry);
@@ -371,13 +371,13 @@ public:
 	void DrawOverheadText();
 	virtual Region DrawingRegion() const;
 	/* check if casting is allowed at all */
-	int CanCast(const ieResRef SpellRef, bool verbose = true);
+	int CanCast(const ResRef& SpellRef, bool verbose = true);
 	/* check for and trigger a wild surge */
 	int CheckWildSurge();
-	void SpellcraftCheck(const Actor *caster, const ieResRef SpellRef);
+	void SpellcraftCheck(const Actor *caster, const ResRef& spellRef);
 	/* internal spellcasting shortcuts */
-	void DirectlyCastSpellPoint(const Point &target, ieResRef spellref, int level, int no_stance, bool deplete);
-	void DirectlyCastSpell(Scriptable *target, ieResRef spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpellPoint(const Point &target, const ResRef& spellref, int level, int no_stance, bool deplete);
+	void DirectlyCastSpell(Scriptable *target, const ResRef& spellref, int level, int no_stance, bool deplete);
 	/* actor/scriptable casts spell */
 	int CastSpellPoint( const Point &Target, bool deplete, bool instant = false, bool nointerrupt = false );
 	int CastSpell( Scriptable* Target, bool deplete, bool instant = false, bool nointerrupt = false );
@@ -395,16 +395,16 @@ private:
 	/* used internally to handle start of spellcasting */
 	int SpellCast(bool instant, Scriptable *target = NULL);
 	/* also part of the spellcasting process, creating the projectile */
-	void CreateProjectile(const ieResRef SpellResRef, ieDword tgt, int level, bool fake);
+	void CreateProjectile(const ResRef& SpellResRef, ieDword tgt, int level, bool fake);
 	/* do some magic for the weird/awesome wild surges */
-	bool HandleHardcodedSurge(ieResRef surgeSpellRef, Spell *spl, Actor *caster);
+	bool HandleHardcodedSurge(const ResRef& surgeSpell, const Spell *spl, Actor *caster);
 	void ResetCastingState(Actor* caster);
-	void DisplaySpellCastMessage(ieDword tgt, Spell *spl);
+	void DisplaySpellCastMessage(ieDword tgt, const Spell *spl);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
 public:
-	Selectable(ScriptableType type);
+	explicit Selectable(ScriptableType type);
 public:
 	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
@@ -425,7 +425,7 @@ public:
 
 class GEM_EXPORT Highlightable : public Scriptable {
 public:
-	Highlightable(ScriptableType type);
+	explicit Highlightable(ScriptableType type);
 	virtual int TrapResets() const = 0;
 	virtual bool CanDetectTrap() const { return true; }
 	virtual bool PossibleToSeeTrap() const;
@@ -439,17 +439,20 @@ public:
 	ieWord TrapRemovalDiff;
 	ieWord Trapped;
 	ieWord TrapDetected;
-	ieResRef KeyResRef;
+	ResRef KeyResRef;
 	//play this wav file when stepping on the trap (on PST)
-	ieResRef EnterWav;
+	ResRef EnterWav;
 public:
 	bool IsOver(const Point &Place) const;
 	void DrawOutline(Point origin) const;
 	void SetCursor(unsigned char CursorIndex);
 	const char* GetKey(void) const
 	{
-		if (KeyResRef[0]) return KeyResRef;
-		return NULL;
+		if (KeyResRef.IsEmpty()) {
+			return nullptr;
+		} else {
+			return KeyResRef.CString();
+		}
 	}
 	void SetTrapDetected(int x);
 	void TryDisarm(const Actor *actor);
@@ -460,7 +463,7 @@ public:
 	bool VisibleTrap(int only_detected) const;
 	//returns true if trap has been triggered, tumble skill???
 	virtual bool TriggerTrap(int skill, ieDword ID);
-	bool TryUnlock(Actor *actor, bool removekey);
+	bool TryUnlock(Actor *actor, bool removekey) const;
 };
 
 class GEM_EXPORT Movable : public Selectable {
@@ -493,10 +496,10 @@ public:
 	{
 		randomBackoff--;
 	}
-	Movable(ScriptableType type);
+	explicit Movable(ScriptableType type);
 	~Movable(void) override;
 	Point Destination;
-	ieResRef Area;
+	ResRef Area;
 	Point HomeLocation;//spawnpoint, return here after rest
 	ieWord maxWalkDistance;//maximum random walk distance from home
 public:
@@ -535,7 +538,7 @@ public:
 
 	void SetStance(unsigned int arg);
 	void SetOrientation(int value, bool slow);
-	void SetAttackMoveChances(ieWord *amc);
+	void SetAttackMoveChances(const ieWord *amc);
 	virtual void DoStep(unsigned int walkScale, ieDword time = 0);
 	void AddWayPoint(const Point &Des);
 	void RunAwayFrom(const Point &Des, int PathLength, bool noBackAway);
@@ -564,7 +567,7 @@ public:
 
 public:
 	ieVariable Name;
-	ieResRef Tileset; //or wed door ID?
+	ResRef Tileset; //or wed door ID?
 	ieDword Flags;
 	unsigned short* opentiles;
 	ieDword opencount;

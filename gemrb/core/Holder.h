@@ -30,7 +30,7 @@ namespace GemRB {
 template <class T>
 class Held {
 public:
-	Held() noexcept : RefCount(0) {}
+	Held() noexcept = default;
 	virtual ~Held() noexcept = default;
 	void acquire() noexcept { ++RefCount; }
 	void release() noexcept {
@@ -38,7 +38,7 @@ public:
 		if (--RefCount == 0) delete static_cast<T*>(this);
 	}
 private:
-	size_t RefCount;
+	size_t RefCount = 0;
 };
 
 /**
@@ -53,7 +53,12 @@ private:
 template <class T>
 class Holder final {
 public:
-	Holder(T* ptr = nullptr) noexcept
+	Holder() noexcept = default;
+
+	Holder(std::nullptr_t) noexcept
+	{}
+
+	explicit Holder(T* ptr) noexcept
 	: ptr(ptr)
 	{
 		if (ptr)
@@ -63,8 +68,13 @@ public:
 	Holder(const Holder& rhs) noexcept
 	: ptr(rhs.ptr)
 	{
-		if (ptr)
-			ptr->acquire();
+		if (rhs.ptr)
+			rhs.ptr->acquire();
+	}
+	
+	Holder(Holder&& rhs) noexcept
+	{
+		std::swap(rhs.ptr, ptr);
 	}
 	
 	~Holder() noexcept
@@ -73,9 +83,32 @@ public:
 			ptr->release();
 	}
 	
-	Holder& operator=(Holder rhs) noexcept
+	Holder& operator=(const Holder& rhs) noexcept
 	{
-		std::swap(rhs.ptr, ptr);
+		if (&rhs != this) {
+			if (rhs.ptr) {
+				rhs.ptr->acquire();
+			}
+			if (ptr) {
+				ptr->release();
+			}
+			ptr = rhs.ptr;
+		}
+		return *this;
+	}
+	
+	Holder& operator=(Holder&& rhs) noexcept
+	{
+		if (&rhs != this) {
+			std::swap(rhs.ptr, ptr);
+		}
+		return *this;
+	}
+	
+	Holder& operator=(std::nullptr_t) noexcept
+	{
+		if (ptr) ptr->release();
+		ptr = nullptr;
 		return *this;
 	}
 	
@@ -101,7 +134,7 @@ public:
 		ptr = nullptr;
 	}
 
-protected:
+private:
 	T *ptr = nullptr;
 };
 
@@ -114,13 +147,13 @@ inline bool operator==(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator==(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return !bool(lhs);
+	return !bool(lhs);
 }
 
 template<class T>
 inline bool operator==(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return !bool(rhs);
+	return !bool(rhs);
 }
 
 template<class T>
@@ -132,20 +165,19 @@ inline bool operator!=(const Holder<T>& lhs, const Holder<T>& rhs) noexcept
 template<class T>
 inline bool operator!=(const Holder<T>& lhs, std::nullptr_t) noexcept
 {
-    return bool(lhs);
+	return bool(lhs);
 }
 
 template<class T>
 inline bool operator!=(std::nullptr_t, const Holder<T>& rhs) noexcept
 {
-    return bool(rhs);
+	return bool(rhs);
 }
 
 template<class T, typename... ARGS>
 inline Holder<T> MakeHolder(ARGS&&... args) noexcept
 {
-	Holder<T> holder(new T(std::forward<ARGS>(args)...));
-	return holder;
+	return Holder<T>(new T(std::forward<ARGS>(args)...));
 }
 
 }

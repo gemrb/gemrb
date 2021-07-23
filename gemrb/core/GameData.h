@@ -24,7 +24,6 @@
 #include "SClassID.h"
 #include "exports.h"
 #include "ie_types.h"
-#include "iless.h"
 
 #include "Cache.h"
 #include "Holder.h"
@@ -60,12 +59,19 @@ struct Table {
 	unsigned int refcount;
 };
 
+struct IWDIDSEntry {
+	ieDword value;
+	ieWord stat = USHRT_MAX;
+	ieWord relation;
+};
+
 class GEM_EXPORT GameData : public ResourceManager
 {
 public:
 	GameData();
 	~GameData();
 
+	using index_t = uint16_t;
 	void ClearCaches();
 
 	/** Returns actor */
@@ -87,14 +93,13 @@ public:
 	bool DelTable(unsigned int index);
 
 	PaletteHolder GetPalette(const ResRef& resname);
-	void FreePalette(PaletteHolder &pal, const ResRef &name = nullptr);
 
 	Item* GetItem(const ResRef &resname, bool silent=false);
 	void FreeItem(Item const *itm, const ResRef &name, bool free=false);
 	Spell* GetSpell(const ResRef &resname, bool silent=false);
-	void FreeSpell(Spell *spl, const ResRef &name, bool free=false);
+	void FreeSpell(const Spell *spl, const ResRef &name, bool free = false);
 	Effect* GetEffect(const ResRef &resname);
-	void FreeEffect(Effect *eff, const ResRef &name, bool free=false);
+	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
@@ -131,12 +136,15 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
-	inline int GetStepTime() { return stepTime; }
+	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const;
+	const IWDIDSEntry& GetSpellProt(index_t idx);
+	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
 	inline int GetTextSpeed() const { return TextScreenSpeed; }
 	inline void SetTextSpeed(int speed) { TextScreenSpeed = speed; }
 private:
 	void ReadItemSounds();
+	void ReadSpellProtTable();
 private:
 	Cache ItemCache;
 	Cache SpellCache;
@@ -144,7 +152,7 @@ private:
 	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
-	typedef std::map<const char*, Store*, iless> StoreMap;
+	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
 	std::map<ieDword, std::vector<const char*> > ItemSounds;
 	AutoTable racialInfravision;
@@ -154,10 +162,17 @@ private:
 	AutoTable trapLimit;
 	AutoTable summoningLimit;
 	std::vector<int> weaponStyleAPRBonus;
-	std::map<const char*, Color, iless> colors;
+	std::map<std::string, Color> colors;
+	std::vector<IWDIDSEntry> spellProt;
 	int stepTime = 0;
 	int TextScreenSpeed = 0;
 	Size weaponStyleAPRBonusMax{};
+
+public:
+	std::vector<ResRef> defaultSounds;
+	std::vector<ResRef> castingGlows;
+	std::vector<int> castingSounds;
+	std::vector<ResRef> spellHits;
 };
 
 extern GEM_EXPORT GameData * gamedata;

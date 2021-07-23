@@ -42,7 +42,7 @@ public:
 		View* dragView = nullptr;
 		View* dropView = nullptr;
 		
-		Holder<Sprite2D> cursor = nullptr;
+		Holder<Sprite2D> cursor;
 		
 		DragOp(View* v, Holder<Sprite2D> cursor);
 		virtual ~DragOp();
@@ -101,9 +101,9 @@ protected:
 	unsigned short autoresizeFlags; // these flags don't produce notifications
 
 private:
-	void DirtyBGRect(const Region&);
+	void DirtyBGRect(const Region&, bool force = false);
 	void DrawBackground(const Region*) const;
-	void DrawSubviews() const;
+	void DrawSubviews();
 	void MarkDirty(const Region*);
 	bool NeedsDrawRecursive() const;
 
@@ -257,8 +257,8 @@ public:
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting
-	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, ResRef group);
-	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group);
+	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, const ResRef& group);
+	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ResRef& group);
 	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
 	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ResRef group) const;

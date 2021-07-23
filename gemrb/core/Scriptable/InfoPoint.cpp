@@ -60,14 +60,10 @@ InfoPoint::InfoPoint(void)
 	StrRef = 0;
 }
 
-InfoPoint::~InfoPoint(void)
-{
-}
-
 void InfoPoint::SetEnter(const char *resref)
 {
 	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {
-		strnuprcpy(EnterWav, resref, 8);
+		EnterWav = ResRef::MakeUpperCase(resref);
 	}
 }
 
@@ -78,7 +74,7 @@ ieDword InfoPoint::GetUsePoint() const {
 //checks if the actor may use this travel trigger
 //bit 1 : can use
 //bit 2 : whole team
-int InfoPoint::CheckTravel(Actor *actor)
+int InfoPoint::CheckTravel(Actor *actor) const
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	bool pm = actor->IsPartyMember();
@@ -248,7 +244,7 @@ void InfoPoint::dump() const
 	buffer.appendFormatted( "UsePoint: %d.%d  (on: %s)\n", UsePoint.x, UsePoint.y, YESNO(GetUsePoint()));
 	switch(Type) {
 	case ST_TRAVEL:
-		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName);
+		buffer.appendFormatted( "Destination Area: %s Entrance: %s\n", Destination.CString(), EntranceName.CString());
 		break;
 	case ST_PROXIMITY:
 		buffer.appendFormatted( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
@@ -264,7 +260,7 @@ void InfoPoint::dump() const
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog.CString());
+	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef.CString(), Dialog.CString());
 	buffer.appendFormatted( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
 	buffer.appendFormatted( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", buffer);

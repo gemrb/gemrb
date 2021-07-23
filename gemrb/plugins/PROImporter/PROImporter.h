@@ -36,7 +36,7 @@ private:
 	int version = 0;
 
 public:
-	PROImporter(void);
+	PROImporter() = default;
 	~PROImporter(void) override;
 	bool Open(DataStream* stream) override;
 	Projectile* GetProjectile(Projectile *s) override;

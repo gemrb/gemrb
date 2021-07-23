@@ -27,14 +27,6 @@
 
 namespace GemRB {
 
-TableMgr::TableMgr()
-{
-}
-TableMgr::~TableMgr()
-{
-}
-
-
 AutoTable::AutoTable()
 {
 	tableref = 0;

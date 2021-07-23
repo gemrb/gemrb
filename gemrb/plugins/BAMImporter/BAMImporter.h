@@ -30,57 +30,41 @@
 namespace GemRB {
 
 struct FrameEntry {
-	ieWord Width;
-	ieWord  Height;
-	ieWord  XPos;
-	ieWord  YPos;
-	ieDword FrameData;
+	Region bounds;
+	bool RLE = false;
+	strpos_t dataOffset = 0;
 };
 
 class Palette;
 using PaletteHolder = Holder<Palette>;
 
 class BAMImporter : public AnimationMgr {
-private:
-	DataStream* str;
-	FrameEntry* frames;
-	CycleEntry* cycles;
-	ieWord FramesCount;
-	ieByte CyclesCount;
-	PaletteHolder palette;
-	ieByte CompressedColorIndex;
-	ieDword FramesOffset, PaletteOffset, FLTOffset;
-	unsigned long DataStart;
-private:
-	Holder<Sprite2D> GetFrameInternal(unsigned short findex,
-									  bool RLESprite, unsigned char* data);
-	void* GetFramePixels(unsigned short findex);
-	ieWord * CacheFLT(unsigned int &count);
 public:
 	BAMImporter(void);
 	~BAMImporter(void) override;
+
 	bool Open(DataStream* stream) override;
-	int GetCycleSize(unsigned char Cycle) override;
-	AnimationFactory* GetAnimationFactory(const char* ResRef, bool allowCompression = true) override;
+	index_t GetCycleSize(index_t Cycle) override;
+	AnimationFactory* GetAnimationFactory(const ResRef &resref, bool allowCompression = true) override;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Holder<Sprite2D> GetPalette() override;
+	index_t GetCycleCount() override
+	{
+		return cycles.size();
+	}
+private:
+	using CycleEntry = AnimationFactory::CycleEntry;
 
-	/** Gets a Pixel Index from the Image, unused */
-	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
-	{
-		return 0;
-	}
-	/** Gets a Pixel from the Image, unused */
-	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
-	{
-		return Color();
-	}
-public:
-	int GetCycleCount() override
-	{
-		return CyclesCount;
-	}
+	DataStream* str;
+	std::vector<FrameEntry> frames;
+	std::vector<CycleEntry> cycles;
+	PaletteHolder palette;
+	ieByte CompressedColorIndex;
+	ieDword FramesOffset, PaletteOffset, FLTOffset;
+	strpos_t DataStart;
+	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
+	std::vector<index_t> CacheFLT();
 };
 
 }

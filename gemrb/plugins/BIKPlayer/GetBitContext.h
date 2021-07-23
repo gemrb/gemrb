@@ -93,13 +93,13 @@ public:
 	int size_in_bits;
 public:
 	GetBitContext() : buffer(NULL), buffer_end(NULL), index(0), size_in_bits(0) {};
-	void debug(const char *prefix);
+	void debug(const char *prefix) const;
 	float get_float();
 	void skip_bits(int x) { index+=x; }
-	int get_bits_count() { return index; }
+	int get_bits_count() const { return index; }
 	void get_bits_align32();
 	unsigned int get_bits(int x);
-	unsigned int peek_bits(int x);
+	unsigned int peek_bits(int x) const;
 	unsigned int get_bits_long(int n);
 	void init_get_bits(const uint8_t *b, int bit_size);
 	void read_tree(Tree *tree);

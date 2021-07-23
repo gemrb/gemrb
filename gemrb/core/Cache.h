@@ -38,7 +38,7 @@ protected:
 	struct MyAssoc {
 		MyAssoc* pNext;
 		MyAssoc** pPrev;
-		char key[KEYSIZE]; //not ieResRef!
+		char key[KEYSIZE]; //not (ie)ResRef!
 		ieDword nRefCount;
 		void* data;
 	};
@@ -48,7 +48,7 @@ protected:
 
 public:
 	// Construction
-	Cache(int nBlockSize = 10, int nHashTableSize = 129);
+	explicit Cache(int nBlockSize = 10, int nHashTableSize = 129);
 
 	// Attributes
 	// number of elements
@@ -61,13 +61,13 @@ public:
 		return m_nCount==0;
 	}
 	// Lookup
-	void *GetResource(const ieResRef key) const;
+	void *GetResource(const ResRef& key) const;
 	// Operations
-	bool SetAt(const ieResRef key, void *rValue);
+	bool SetAt(const ResRef& key, void *rValue);
 	// decreases refcount or drops data
 	//if name is supplied it is faster, it will use rValue to validate the request
-	int DecRef(void *rValue, const ieResRef name, bool free);
-	int RefCount(const ieResRef key) const;
+	int DecRef(const void *rValue, const ResRef& name, bool free);
+	int RefCount(const ResRef& key) const;
 	void RemoveAll(ReleaseFun fun);//removes all refcounts
 	void Cleanup();  //removes only zero refcounts
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
@@ -83,9 +83,9 @@ protected:
 
 	Cache::MyAssoc* NewAssoc();
 	void FreeAssoc(Cache::MyAssoc*);
-	Cache::MyAssoc* GetAssocAt(const ieResRef) const;
+	Cache::MyAssoc* GetAssocAt(const ResRef&) const;
 	Cache::MyAssoc *GetNextAssoc(Cache::MyAssoc * rNextPosition) const;
-	unsigned int MyHashKey(const ieResRef) const;
+	unsigned int MyHashKey(const char*) const;
 
 public:
 	~Cache();

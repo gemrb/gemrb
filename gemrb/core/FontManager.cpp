@@ -24,14 +24,4 @@ namespace GemRB {
 
 const TypeID FontManager::ID = { "FontMgr" };
 
-FontManager::FontManager(void)
-{
-
-}
-
-FontManager::~FontManager(void)
-{
-
-}
-
 }

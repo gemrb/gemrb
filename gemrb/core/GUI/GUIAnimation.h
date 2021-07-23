@@ -20,6 +20,7 @@
 #ifndef Animations_h
 #define Animations_h
 
+#include "Holder.h"
 #include "Region.h"
 
 #include "globals.h"
@@ -39,7 +40,7 @@ public:
 	
 	virtual ~GUIAnimation() = default;
 	
-	operator bool() const {
+	explicit operator bool() const {
 		return !HasEnded();
 	}
 
@@ -82,7 +83,7 @@ class ColorCycle {
 	uint8_t speed;
 
 public:
-	ColorCycle(uint8_t speed) : step(0), speed(speed) {}
+	explicit ColorCycle(uint8_t speed) : step(0), speed(speed) {}
 
 	void AdvanceTime(tick_t time);
 	Color Blend(const Color& c1, const Color& c2) const;
@@ -141,14 +142,14 @@ private:
 	tick_t nextFrameTime = 0;
 
 	tick_t CalculateNextFrameDelta();
-	Holder<Sprite2D> GenerateNext(tick_t time);
+	Holder<Sprite2D> GenerateNext(tick_t time) override;
 public:
-	SpriteAnimation(AnimationFactory* af, int Cycle = 0);
+	explicit SpriteAnimation(AnimationFactory* af, int Cycle = 0);
 	//report if the current resource is the same as descripted by the params
-	void SetPaletteGradients(ieDword *col);
+	void SetPaletteGradients(const ieDword *col);
 	bool SameResource(const SpriteAnimation*) const;
 	void SetBlend(bool b);
-	bool HasEnded() const;
+	bool HasEnded() const override;
 
 	tick_t Time() const { return nextFrameTime; }
 	

@@ -58,7 +58,7 @@ void Slider::DrawSelf(Region rgn, const Region& /*clip*/)
 }
 
 /** Returns the actual Slider Position */
-unsigned int Slider::GetPosition()
+unsigned int Slider::GetPosition() const
 {
 	return Pos;
 }
@@ -74,29 +74,28 @@ void Slider::SetPosition(unsigned int pos)
 	}
 	MarkDirty();
 }
-    
+
 void Slider::SetPosition(const Point& p)
 {
-    int mx = KnobPos.x;
-    int xmx = p.x - mx;
+	int mx = KnobPos.x;
+	int xmx = p.x - mx;
 	unsigned int oldPos = Pos;
 	
-    if (p.x < mx) {
-        SetPosition( 0 );
-    } else {
-        int befst = xmx / KnobStep;
-        if (befst >= KnobStepsCount) {
-            SetPosition( KnobStepsCount - 1 );
-        } else {
-            short aftst = befst + KnobStep;
-            if (( xmx - ( befst * KnobStep ) ) < ( ( aftst * KnobStep ) - xmx )) {
-                SetPosition( befst );
-            } else {
-                SetPosition( aftst );
-            }
-            
-        }
-    }
+	if (p.x < mx) {
+		SetPosition(0);
+	} else {
+		int befst = xmx / KnobStep;
+		if (befst >= KnobStepsCount) {
+			SetPosition(KnobStepsCount - 1);
+		} else {
+			short aftst = befst + KnobStep;
+			if ((xmx - befst * KnobStep) < (aftst * KnobStep - xmx)) {
+				SetPosition(befst);
+			} else {
+				SetPosition(aftst);
+			}
+		}
+	}
 
 	if (oldPos != Pos) {
 		PerformAction(Control::ValueChange);
@@ -114,7 +113,7 @@ void Slider::UpdateState(unsigned int Sum)
 }
 
 /** Sets the selected image */
-void Slider::SetImage(unsigned char type, Holder<Sprite2D> img)
+void Slider::SetImage(unsigned char type, const Holder<Sprite2D>& img)
 {
 	switch (type) {
 		case IE_GUI_SLIDER_KNOB:
@@ -146,7 +145,7 @@ bool Slider::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 	if (( p.x >= mx ) && ( p.y >= my )) {
 		if (( p.x <= Mx ) && ( p.y <= My )) {
 			State = IE_GUI_SLIDER_GRABBEDKNOB;
-            return true;
+			return true;
 		}
 	}
 

@@ -26,6 +26,7 @@
 
 #include "Animation.h"
 #include "Palette.h"
+#include "Resource.h"
 #include "TableMgr.h"
 
 #include <vector>
@@ -130,7 +131,7 @@ struct AvatarStruct {
 	/* entries from avatars.2da */
 	unsigned int AnimID;
 	unsigned int PaletteType;
-	ieResRef Prefixes[4];
+	ResRef Prefixes[4];
 	unsigned char AnimationType;
 	unsigned char CircleSize;
 	char Size;
@@ -145,13 +146,13 @@ struct AvatarStruct {
 	int Bestiary;
 
 	/* comes from walksnd.2da */
-	ieResRef WalkSound;
+	ResRef WalkSound;
 	ieByte WalkSoundCount;
 
 	/* comes from stances.2da */
 	unsigned char StanceOverride[MAX_ANIMS];
 
-	ieResRef ShadowAnimation;
+	ResRef ShadowAnimation;
 };
 
 struct EquipResRefData;
@@ -175,9 +176,11 @@ public:
 	PaletteHolder shadowPalette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
-	ieResRef ResRef;
-	ieResRef PaletteResRef[5];
-	unsigned char previousStanceID, nextStanceID, StanceID;
+	ResRef ResRefBase;
+	ResRef PaletteResRef[5] = {};
+	unsigned char previousStanceID = 0;
+	unsigned char nextStanceID = 0;
+	unsigned char stanceID = 0;
 	bool autoSwitchOnEnd;
 	bool lockPalette;
 public:
@@ -198,11 +201,11 @@ public:
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
 	int GetTotalPartCount() const;
-	const int* GetZOrder(unsigned char Orient);
+	const int* GetZOrder(unsigned char Orient) const;
 	Animation** GetShadowAnimation(unsigned char Stance, unsigned char Orient);
 
 	// returns Palette for a given part (unlocked)
-	PaletteHolder GetPartPalette(int part); // TODO: clean this up
+	PaletteHolder GetPartPalette(int part) const; // TODO: clean this up
 	PaletteHolder GetShadowPalette() const;
 
 public: //attribute functions
@@ -215,63 +218,63 @@ public: //attribute functions
 	int GetSize() const;
 	int GetBloodColor() const;
 	unsigned int GetFlags() const;
-	const ieResRef &GetWalkSound() const;
+	const ResRef &GetWalkSound() const;
 	int GetWalkSoundCount() const;
-	const ieResRef &GetArmourLevel(int ArmourLevel) const;
+	const ResRef &GetArmourLevel(int ArmourLevel) const;
 	void PulseRGBModifiers();
-	void DebugDump();
+	void DebugDump() const;
 private:
 	void DropAnims();
-	void InitAvatarsTable();
+	void InitAvatarsTable() const;
 	int GetActorPartCount() const;
-	void AddPSTSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddFFSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddFF2Suffix(char *dest, unsigned char AnimID,
+	void AddPSTSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddFFSuffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, int Part) const;
-	void AddHLSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddNFSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddVHR2Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddVHRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void AddVHR3Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void GetVHREquipmentRef(char *dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddSixSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoPieceSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, int Part);
-	void AddMHRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void GetMHREquipmentRef(char *dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddMMRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, bool mirror);
-	void AddMMR2Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoFileSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddTwoFiles5Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddLRSuffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
-	void AddLRSuffix2( char *dest, unsigned char StanceID,
-		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData);
-	void GetLREquipmentRef(char *dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip);
-	void AddLR2Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void AddLR3Suffix(char *dest, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
+	void AddFF2Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, int Part) const;
+	void AddHLSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddNFSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, int Part) const;
+	void AddVHR2Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddVHRSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+	void AddVHR3Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+	void AddSixSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddTwoPieceSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, int Part) const;
+	void AddMHRSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+	void GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+	void AddMMRSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, bool mirror) const;
+	void AddMMR2Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddTwoFileSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddTwoFiles5Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddLRSuffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
+	void AddLRSuffix2( std::string& dest, unsigned char StanceID,
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData) const;
+	void GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+	void AddLR2Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
+	void AddLR3Suffix(std::string& dest, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient) const;
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
-		char *dest, unsigned char& Cycle, int Part, EquipResRefData*& equip);
+		std::string& dest, unsigned char& Cycle, int Part, EquipResRefData*& equip) const;
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
-		char *dest, unsigned char& Cycle, EquipResRefData* equip);
+		std::string& dest, unsigned char& Cycle, EquipResRefData* equip) const;
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
 	void MaybeUpdateMainPalette(Animation**);
 };

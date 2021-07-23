@@ -44,10 +44,10 @@ namespace GemRB {
 class VLCPlayer : public MoviePlayer {
 private:
 	enum {Y, U, V};
-	char* planes[3];
+	char* planes[3]{};
 
 	libvlc_instance_t *libvlc;
-	libvlc_media_player_t *mediaPlayer;
+	libvlc_media_player_t *mediaPlayer = nullptr;
 
 	// libvlc_video_set_callbacks
 	static void display(void *data, void *id);

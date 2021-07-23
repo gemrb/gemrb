@@ -30,9 +30,8 @@
 #include "SClassID.h" // For PluginID
 #include "exports.h"
 #include "globals.h"
-#include "iless.h"
 #include "Holder.h"
-
+#include "Plugin.h"
 #include "ResourceDesc.h"
 
 #include <cstring>
@@ -42,7 +41,6 @@
 
 namespace GemRB {
 
-class Plugin;
 class Resource;
 class TypeID;
 
@@ -61,9 +59,8 @@ public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();
 private:
-	PluginMgr();
-public: // HACK: MSVC6 is buggy.
-	~PluginMgr();
+	PluginMgr() = default;
+	~PluginMgr() = default;
 private:
 	std::map< SClass_ID, PluginFunc> plugins;
 	std::map< const TypeID*, std::vector<ResourceDesc> > resources;
@@ -71,7 +68,7 @@ private:
 	std::vector<void (*)(void)> initializerFunctions;
 	/** Array of cleanup functions */
 	std::vector<void (*)(void)> cleanupFunctions;
-	typedef std::map<const char*, PluginFunc, iless> driver_map;
+	using driver_map = std::map<std::string, PluginFunc>;
 	std::map<const TypeID*, driver_map> drivers;
 public:
 	size_t GetPluginCount() const { return plugins.size(); }
@@ -142,6 +139,11 @@ using PluginHolder = Holder<T>;
 template <typename T>
 PluginHolder<T> MakePluginHolder(PluginID id) {
 	return PluginHolder<T>(static_cast<T*>(PluginMgr::Get()->GetPlugin(id)));
+}
+
+template <typename T>
+PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
+	return PluginHolder<ImporterPlugin<T>>(static_cast<ImporterPlugin<T>*>(PluginMgr::Get()->GetPlugin(id)));
 }
 
 }

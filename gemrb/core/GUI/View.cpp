@@ -24,14 +24,16 @@
 #include "GUI/TextSystem/Font.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <typeinfo>
+#include <utility>
+
 
 namespace GemRB {
 
 View::DragOp::DragOp(View* v, Holder<Sprite2D> cursor)
-: dragView(v), cursor(cursor)
+: dragView(v), cursor(std::move(cursor))
 {}
 
 View::DragOp::~DragOp() {
@@ -67,7 +69,7 @@ View::~View()
 
 void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 {
-	background = bg;
+	background = std::move(bg);
 	if (c) backgroundColor = *c;
 
 	MarkDirty();
@@ -75,7 +77,7 @@ void View::SetBackground(Holder<Sprite2D> bg, const Color* c)
 
 void View::SetCursor(Holder<Sprite2D> c)
 {
-	cursor = c;
+	cursor = std::move(c);
 }
 
 void View::SetEventProxy(View* proxy)
@@ -95,29 +97,29 @@ void View::MarkDirty(const Region* rgn)
 	// TODO: we could implement partial redraws by storing the dirty region
 	// not much to gain at the moment, however
 
-	if (dirty == false) {
-		dirty = true;
+	if (dirty) return;
 
-		if (superView && !IsOpaque()) {
-			superView->DirtyBGRect(frame);
-		}
+	dirty = true;
 
-		std::list<View*>::iterator it;
-		for (it = subViews.begin(); it != subViews.end(); ++it) {
-			View* view = *it;
-			if (rgn) {
-				Region intersect = view->frame.Intersect(*rgn);
-				const Size& idims = intersect.size;
-				if (!idims.IsInvalid()) {
-					Point p = view->ConvertPointFromSuper(intersect.origin);
-					Region r = Region(p, idims);
-					view->MarkDirty(&r);
-				}
-			} else {
-				Point p = view->ConvertPointFromSuper(Point());
-				Region r = Region(p, Dimensions());
+	if (superView && !IsOpaque()) {
+		superView->DirtyBGRect(frame);
+	}
+
+	std::list<View*>::iterator it;
+	for (it = subViews.begin(); it != subViews.end(); ++it) {
+		View* view = *it;
+		if (rgn) {
+			Region intersect = view->frame.Intersect(*rgn);
+			const Size& idims = intersect.size;
+			if (!idims.IsInvalid()) {
+				Point p = view->ConvertPointFromSuper(intersect.origin);
+				Region r = Region(p, idims);
 				view->MarkDirty(&r);
 			}
+		} else {
+			Point p = view->ConvertPointFromSuper(Point());
+			Region r = Region(p, Dimensions());
+			view->MarkDirty(&r);
 		}
 	}
 }
@@ -180,16 +182,16 @@ bool View::IsReceivingEvents() const
 	return getEvents;
 }
 
-void View::DirtyBGRect(const Region& r)
+void View::DirtyBGRect(const Region& r, bool force)
 {
 	// no need to draw the parent BG for opaque views
 	if (superView && !IsOpaque()) {
 		Region rgn = frame.Intersect(Region(ConvertPointToSuper(r.origin), r.size));
-		superView->DirtyBGRect(rgn);
+		superView->DirtyBGRect(rgn, force);
 	}
 
 	// if we are going to draw the entire BG, no need to compute and store this
-	if (NeedsDrawRecursive())
+	if (!force && NeedsDrawRecursive())
 		return;
 
 	// do we want to intersect this too?
@@ -201,11 +203,13 @@ void View::DirtyBGRect(const Region& r)
 	MarkDirty(&dirty);
 }
 
-void View::DrawSubviews() const
+void View::DrawSubviews()
 {
-	std::list<View*>::const_iterator it;
-	for (it = subViews.begin(); it != subViews.end(); ++it) {
-		(*it)->Draw();
+	for (View* subview : subViews) {
+		subview->Draw();
+		if (subview->IsAnimated() && !subview->IsOpaque()) {
+			DirtyBGRect(subview->frame, true);
+		}
 	}
 }
 
@@ -280,11 +284,6 @@ void View::Draw()
 	// always call draw on subviews because they can be dirty without us
 	DrawSubviews();
 	DidDraw(drawFrame, intersect); // notify subclasses that drawing finished
-	if (superView && IsAnimated() && !IsOpaque()) {
-		// TODO: this should actually be superView->MarkDirty(frame) but we dont handle partial redraws so I'm avoiding the extra work...
-		// change it if we encounter an animated transparent subview overlapping with the parents drawing (or better yet implement partial redraws)
-		superView->DirtyBGRect(frame);
-	}
 	dirty = false;
 
 	if (core->InDebugMode(ID_VIEWS)) {
@@ -302,7 +301,7 @@ void View::Draw()
 		if (debuginfo) {
 			const ViewScriptingRef* ref = GetScriptingRef();
 			if (ref) {
-				Font* fnt = core->GetTextFont();
+				const Font* fnt = core->GetTextFont();
 				ScriptingId id = ref->Id;
 				id &= 0x00000000ffffffff; // control id is lower 32bits
 
@@ -417,7 +416,7 @@ void View::AddSubviewInFrontOfView(View* front, const View* back)
 	std::list<View*>::iterator it;
 	it = std::find(subViews.begin(), subViews.end(), back);
 
-	View* super = front->superView;
+	const View* super = front->superView;
 	if (super == this) {
 		// already here, but may need to move the view
 		std::list<View*>::iterator cur;
@@ -907,7 +906,7 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 	return OnKeyRelease(ke, 0);
 }
 
-const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, ResRef group)
+const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ResRef& group)
 {
 	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
 	if (it != scriptingRefs.end()) {
@@ -951,7 +950,7 @@ ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ResRef group)
 	return new ViewScriptingRef(this, id, group);
 }
 	
-const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, ResRef group)
+const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ResRef& group)
 {
 	ViewScriptingRef* ref = CreateScriptingRef(id, group);
 	if (ScriptEngine::RegisterScriptingRef(ref)) {

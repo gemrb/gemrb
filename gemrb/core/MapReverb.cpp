@@ -82,14 +82,12 @@ unsigned char MapReverb::obtainProfile () {
 	unsigned char configValue = 0;
 
 	for (int i = 0; i < rows; ++i) {
-		char mapName[8] = {0};
-		strnlwrcpy(mapName, reverbMapping->GetRowName(i), 7);
+		ResRef mapName = reverbMapping->GetRowName(i);
+		if (mapName == map.WEDResRef) {
+			uint8_t profile = strtounsigned<uint8_t>(reverbMapping->QueryField(i, 0));
 
-		if (0 == strncmp(mapName, map.WEDResRef, 8)) {
-			long profile = strtoul(reverbMapping->QueryField(i, 0), NULL, 0);
-
-			if (profile >= 0 && profile < EFX_MAX_REVERB_PROFILE_INDEX) {
-				configValue = static_cast<unsigned char>(profile);
+			if (profile < EFX_MAX_REVERB_PROFILE_INDEX) {
+				configValue = profile;
 			}
 			break;
 		}

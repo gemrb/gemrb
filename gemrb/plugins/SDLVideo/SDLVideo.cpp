@@ -21,7 +21,7 @@
 #include "SDLVideo.h"
 
 #include "Interface.h"
-#include "Palette.h"
+#include "Video/RLE.h"
 #include "SDLPixelIterator.h"
 
 using namespace GemRB;
@@ -238,17 +238,22 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 
 Holder<Sprite2D> SDLVideoDriver::CreateSprite(const Region& rgn, void* pixels, const PixelFormat& fmt)
 {
-	Holder<Sprite2D> spr = new sprite_t(rgn, fmt.Depth, pixels, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask);
-	if (fmt.palette) {
-		spr->SetPalette(fmt.palette);
+	if (fmt.RLE) {
+#if SDL_VERSION_ATLEAST(1,3,0)
+		// SDL2 should not allow RLE sprites so convert it
+		void* newpixels = DecodeRLEData(static_cast<uint8_t*>(pixels), rgn.size, fmt.ColorKey);
+		free(pixels);
+		PixelFormat newfmt = fmt;
+		newfmt.RLE = false;
+		return Holder<Sprite2D>(new sprite_t(rgn, newpixels, newfmt));
+#else
+		return MakeHolder<Sprite2D>(rgn, pixels, fmt);
+#endif
 	}
-	if (fmt.HasColorKey) {
-		spr->SetColorKey(fmt.ColorKey);
-	}
-	return spr;
+	return Holder<Sprite2D>(new sprite_t(rgn, pixels, fmt));
 }
 
-void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, Region dst,
+void SDLVideoDriver::BlitSprite(const Holder<Sprite2D>& spr, const Region& src, Region dst,
 								BlitFlags flags, Color tint)
 {
 	dst.x -= spr->Frame.x;
@@ -256,7 +261,7 @@ void SDLVideoDriver::BlitSprite(const Holder<Sprite2D> spr, const Region& src, R
 	BlitSpriteClipped(spr, src, dst, flags, &tint);
 }
 
-void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D> spr, const Point& p,
+void SDLVideoDriver::BlitGameSprite(const Holder<Sprite2D>& spr, const Point& p,
 									BlitFlags flags, Color tint)
 {
 	Region srect(Point(0, 0), spr->Frame.size);
@@ -287,14 +292,11 @@ if (_r.PointInside(_p)) { points.push_back(_p); } }
 void SDLVideoDriver::DrawCircleImp(const Point& c, unsigned short r, const Color& color, BlitFlags flags)
 {
 	//Uses the Breshenham's Circle Algorithm
-	long xc, yc, re;
-	int x, y;
-
-	x = r;
-	y = 0;
-	xc = 1 - ( 2 * r );
-	yc = 1;
-	re = 0;
+	int x = r;
+	int y = 0;
+	long xc = 1 - ( 2 * r );
+	long yc = 1;
+	long re = 0;
 
 	std::vector<SDL_Point> points;
 
@@ -432,7 +434,7 @@ void SDLVideoDriver::DrawEllipseSegmentImp(const Point& c, unsigned short xr,
 
 #undef SetPixel
 
-void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
+void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, const Region& dst, BlitFlags flags, const Color* tint)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
 	// in SDL2 SDL_RenderCopyEx will flip the src rect internally if BlitFlags::MIRRORX or BlitFlags::MIRRORY is set
@@ -485,13 +487,11 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D> spr, Region src, c
 		flags &= ~BlitFlags::BLENDED;
 	}
 
-	if (spr->BAM) {
-		BlitSpriteBAMClipped(spr, src, dclipped, flags, tint);
+	if (spr->Format().RLE) {
+		BlitSpriteRLEClipped(spr, src, dclipped, flags, tint);
 	} else {
-		SDL_Rect srect = RectFromRegion(src);
-		SDL_Rect drect = RectFromRegion(dclipped);
 		const sprite_t* native = static_cast<const sprite_t*>(spr.get ());
-		BlitSpriteNativeClipped(native, srect, drect, flags, reinterpret_cast<const SDL_Color*>(tint));
+		BlitSpriteNativeClipped(native, src, dclipped, flags, reinterpret_cast<const SDL_Color*>(tint));
 	}
 }
 
@@ -501,7 +501,7 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;
 	auto ret = (BlitFlags::GREY | BlitFlags::SEPIA) & newVersion;
 	
-	if (spr->Bpp == 8) {
+	if (spr->Format().Bpp == 1) {
 		if (tint) {
 			assert(renderflags & (BlitFlags::COLOR_MOD | BlitFlags::ALPHA_MOD));
 			uint64_t tintv = *reinterpret_cast<const uint32_t*>(tint);
@@ -543,8 +543,8 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 		SDL_Surface* newV = (SDL_Surface*)spr->NewVersion(newVersion);
 		SDL_LockSurface(newV);
 
-		SDL_Rect r = {0, 0, (unsigned short)newV->w, (unsigned short)newV->h};
-		SDLPixelIterator beg(newV, r);
+		const Region& r = {0, 0, newV->w, newV->h};
+		SDLPixelIterator beg = MakeSDLPixelIterator(newV, r);
 		SDLPixelIterator end = SDLPixelIterator::end(beg);
 		StaticAlphaIterator alpha(0xff);
 
@@ -562,11 +562,11 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 
 // static class methods
 
-int SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
+bool SDLVideoDriver::SetSurfacePalette(SDL_Surface* surf, const SDL_Color* pal, int numcolors)
 {
 	if (pal) {
 #if SDL_VERSION_ATLEAST(1,3,0)
-		return SDL_SetPaletteColors( surf->format->palette, pal, 0, numcolors );
+		return SDL_SetPaletteColors(surf->format->palette, pal, 0, numcolors) == 0;
 #else
 		// const_cast because SDL doesnt alter this and we want our interface to be const correct
 		return SDL_SetPalette( surf, SDL_LOGPAL, const_cast<SDL_Color*>(pal), 0, numcolors );

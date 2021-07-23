@@ -32,12 +32,12 @@ namespace GemRB {
 
 GEM_EXPORT DisplayMessage * displaymsg = NULL;
 
-static const wchar_t* DisplayFormatName = L"[color=%08X]%ls - [/color][p][color=%08X]%ls[/color][/p]";
-static const wchar_t* DisplayFormatAction = L"[color=%08X]%ls - [/color][p][color=%08X]%ls %ls[/color][/p]";
-static const wchar_t* DisplayFormat = L"[p][color=%08X]%ls[/color][/p]";
-static const wchar_t* DisplayFormatValue = L"[p][color=%08X]%ls: %d[/color][/p]";
-static const wchar_t* DisplayFormatNameString = L"[color=%08X]%ls - [/color][p][color=%08X]%ls: %ls[/color][/p]";
-static const wchar_t* DisplayFormatSimple = L"[p]%ls[/p]";
+static const wchar_t* const DisplayFormatName = L"[color=%08X]%ls - [/color][p][color=%08X]%ls[/color][/p]";
+static const wchar_t* const DisplayFormatAction = L"[color=%08X]%ls - [/color][p][color=%08X]%ls %ls[/color][/p]";
+static const wchar_t* const DisplayFormat = L"[p][color=%08X]%ls[/color][/p]";
+static const wchar_t* const DisplayFormatValue = L"[p][color=%08X]%ls: %d[/color][/p]";
+static const wchar_t* const DisplayFormatNameString = L"[color=%08X]%ls - [/color][p][color=%08X]%ls: %ls[/color][/p]";
+static const wchar_t* const DisplayFormatSimple = L"[p]%ls[/p]";
 
 DisplayMessage::StrRefs DisplayMessage::SRefs;
 
@@ -181,7 +181,7 @@ void DisplayMessage::DisplayString(const String& text, const Color &color, Scrip
 		l->SetText(text);
 	}
 
-	TextArea* ta = core->GetMessageTextArea();
+	const TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		size_t newlen = wcslen( DisplayFormat) + text.length() + 12;
 		wchar_t* newstr = ( wchar_t* ) malloc( newlen * sizeof(wchar_t) );

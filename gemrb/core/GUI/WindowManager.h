@@ -24,7 +24,7 @@
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "Tooltip.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <deque>
 
@@ -42,7 +42,7 @@ struct ToolTipData
 	Holder<SoundHandle> tooltip_sound;
 	bool reset = false;
 	
-	ToolTipData(Tooltip tt)
+	explicit ToolTipData(Tooltip tt)
 	: tt(std::move(tt)) {}
 };
 
@@ -63,7 +63,7 @@ public:
 	struct HUDLock {
 		const WindowManager& wm;
 
-		HUDLock(WindowManager& wm)
+		explicit HUDLock(WindowManager& wm)
 		: wm(wm) {
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
@@ -109,10 +109,10 @@ private:
 	bool HotKey(const Event&);
 
 	inline void DestroyWindows(WindowList& list);
-	void MarkAllDirty();
+	void MarkAllDirty() const;
 
 public:
-	WindowManager(Video* vid);
+	explicit WindowManager(Holder<Video> vid);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;

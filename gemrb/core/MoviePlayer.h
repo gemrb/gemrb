@@ -35,7 +35,7 @@
 #include "GUI/TextSystem/Font.h"
 #include "GUI/Window.h"
 #include "System/String.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -53,13 +53,13 @@ public:
 		Font* font;
 	
 	public:
-		SubtitleSet(Font* fnt, Color col = ColorWhite)
+		explicit SubtitleSet(Font* fnt, Color col = ColorWhite)
 		: col(col) {
 			font = fnt;
 			assert(font);
 		}
 		
-		virtual ~SubtitleSet() {}
+		virtual ~SubtitleSet() = default;
 
 		virtual size_t NextSubtitleFrame() const = 0;
 		virtual const String& SubtitleAtFrame(size_t) const = 0;
@@ -85,9 +85,19 @@ protected:
 	Size movieSize;
 	size_t framePos;
 
+	long timer_last_sec = 0;
+	long timer_last_usec = 0;
+	unsigned int frame_wait = 0;
+	unsigned int video_frameskip = 0;
+	unsigned int video_skippedframes = 0;
+
 protected:
 	void DisplaySubtitle(const String& sub);
 	void PresentMovie(const Region&, Video::BufferFormat fmt);
+
+	void get_current_time(long &sec, long &usec) const;
+	void timer_start();
+	void timer_wait(unsigned int frame_wait);
 
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 
@@ -131,7 +141,7 @@ private:
 	}
 
 public:
-	MoviePlayerControls(MoviePlayer& player)
+	explicit MoviePlayerControls(MoviePlayer& player)
 	: View(Region(Point(), player.Dimensions())), player(player) {}
 };
 

@@ -52,10 +52,10 @@ private:
 
 	WMPAreaEntry* GetAreaEntry(DataStream *str, WMPAreaEntry* ae);
 	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al);
-	int PutMaps(DataStream *stream1, DataStream *stream2, WorldMapArray *wmap);
-	int PutMap(DataStream *stream, WorldMapArray *wmap, unsigned int index);
-	int PutLinks(DataStream *stream, WorldMap *wmap);
-	int PutAreas(DataStream *stream, WorldMap *wmap);
+	int PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap);
+	int PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index);
+	int PutLinks(DataStream *stream, const WorldMap *wmap);
+	int PutAreas(DataStream *stream, const WorldMap *wmap);
 };
 
 

@@ -133,7 +133,7 @@ public:
 	 * WARNING: the lifetime of path must be longer than the lifetime
 	 * of DirectoryIterator.
 	 */
-	DirectoryIterator(const char *path);
+	explicit DirectoryIterator(const char *path);
 	~DirectoryIterator();
 
 	void SetFilterPredicate(FileFilterPredicate* p, bool chain = false);

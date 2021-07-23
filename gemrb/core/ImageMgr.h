@@ -24,7 +24,6 @@
 #include "exports.h"
 
 #include "Bitmap.h"
-#include "Image.h"
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "System/DataStream.h"
@@ -40,11 +39,8 @@ class GEM_EXPORT ImageMgr : public Resource {
 public:
 	static const TypeID ID;
 public:
-	ImageMgr(void);
-	~ImageMgr(void) override;
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
-	virtual Image* GetImage();
 	virtual Bitmap* GetBitmap();
 	/**
 	 * Returns image palette.
@@ -56,7 +52,7 @@ public:
 	 */
 	virtual int GetPalette(int colors, Color* pal);
 	
-	Size GetSize() { return size; }
+	Size GetSize() const { return size; }
 
 	/**
 	 * Returns a \ref ImageFactory for the current image.

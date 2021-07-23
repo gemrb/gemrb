@@ -23,6 +23,7 @@
 
 #include "exports.h"
 #include "globals.h"
+#include "Resource.h"
 
 #include <vector>
 
@@ -72,14 +73,10 @@ private:
 	void FreeDialogState(DialogState* ds);
 public:
 	void AddState(DialogState* ds);
-	DialogState* GetState(unsigned int index);
-	int FindFirstState(Scriptable* target);
-	int FindRandomState(Scriptable* target);
+	DialogState* GetState(unsigned int index) const;
+	int FindFirstState(Scriptable* target) const;
+	int FindRandomState(Scriptable* target) const;
 
-	void Release()
-	{
-		delete this;
-	}
 public:
 	ResRef resRef;
 	ieDword Flags; //freeze flags (bg2)

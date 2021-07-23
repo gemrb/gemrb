@@ -33,6 +33,7 @@
 
 #include "DataFileMgr.h"
 #include "Region.h"
+#include "Resource.h"
 
 namespace GemRB {
 
@@ -72,28 +73,21 @@ class Map;
 #define AI_GENDER	7
 #define AI_ALIGNMENT	8
 
-//spawn point could be:
-// s - single
-// r - random
-// e - preset
-// save_select_point saves the spawnpoint
-
 struct CritterEntry {
-	int creaturecount;
-	ieResRef *CreFile;        //spawn one of these creatures
+	std::vector<ResRef> CreFile;        //spawn one of these creatures
 	ieByte Spec[9];		  //existance check IDS qualifier
 	ieByte SetSpec[9];	  //set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
 	ieVariable SpecVar;       //condition variable
-	ieResRef SpecContext;     //condition variable context
-	ieResRef OverrideScript;  //override override script
-	ieResRef ClassScript;     //overrride class script
-	ieResRef RaceScript;      //override race script
-	ieResRef GeneralScript;   //override general script
-	ieResRef DefaultScript;   //override default script
-	ieResRef AreaScript;      //override area script
-	ieResRef SpecificScript;  //override specific script
-	ieResRef Dialog;          //override dialog
+	ResRef SpecContext;     //condition variable context
+	ResRef OverrideScript;  //override override script
+	ResRef ClassScript;     //overrride class script
+	ResRef RaceScript;      //override race script
+	ResRef GeneralScript;   //override general script
+	ResRef DefaultScript;   //override default script
+	ResRef AreaScript;      //override area script
+	ResRef SpecificScript;  //override specific script
+	ResRef Dialog;          //override dialog
 	ieVariable SpawnPointVar; //spawn point saved location
 	Point SpawnPoint;         //spawn point
 	int SpecVarOperator;      //operation performed on spec var
@@ -112,24 +106,12 @@ struct CritterEntry {
  */
 class SpawnEntry {
 public:
-	ieDword interval;
-	ieDword lastSpawndate;
-	int crittercount;
-	CritterEntry *critters;
-	char *name;
-	SpawnEntry() {
-		interval = lastSpawndate = 0;
-		crittercount = 0;
-		critters = NULL;
-		name = NULL;
-	}
+	ieDword interval = 0;
+	ieDword lastSpawndate = 0;
+	std::vector<CritterEntry> critters;
+	char *name = nullptr;
+	SpawnEntry() = default;
 	~SpawnEntry() {
-		if (critters) {
-			for (int i=0;i<crittercount;i++) {
-				delete[] critters[i].CreFile;
-			}
-			delete[] critters;
-		}
 		free(name);
 	}
 };
@@ -140,30 +122,32 @@ public:
  */
 
 struct VariableSpec {
-	ieVariable Name;
-	ieDword Value;
+	ieVariable Name {};
+	ieDword Value = 0;
+	
+	VariableSpec(const char* name, ieDword val)
+	: Value(val)
+	{
+		strnlwrcpy(Name, name, sizeof(ieVariable) - 1);
+	}
 };
 
 class GEM_EXPORT IniSpawn {
 public:
-	IniSpawn(Map *owner);
-	~IniSpawn();
+	IniSpawn(Map *owner, const ResRef& DefaultArea);
 
 private:
 	Map *map; //owner
-	ieResRef NamelessSpawnArea;
-	int namelessvarcount;
-	VariableSpec *NamelessVar;
-	int localscount;
-	VariableSpec *Locals;
+	ResRef NamelessSpawnArea;
+	std::vector<VariableSpec> NamelessVar;
+	std::vector<VariableSpec> Locals;
 	Point NamelessSpawnPoint;
 	Point PartySpawnPoint;
-	ieResRef PartySpawnArea;
+	ResRef PartySpawnArea;
 	int NamelessState;
 	SpawnEntry enterspawn;
 	SpawnEntry exitspawn;
-	int eventcount;
-	SpawnEntry *eventspawns;
+	std::vector<SpawnEntry> eventspawns;
 	ieDword detail_level;
 
 	void ReadCreature(DataFileMgr *inifile,
@@ -171,14 +155,13 @@ private:
 	void ReadSpawnEntry(DataFileMgr *inifile,
 		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
-	void SpawnCreature(CritterEntry &critter) const;
+	void SpawnCreature(const CritterEntry &critter) const;
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
 public:
 	/* called by action of the same name */
-	void SetNamelessDeath(const ieResRef area, Point &pos, ieDword state);
-	void InitSpawn(const ieResRef DefaultArea);
+	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);
 	void RespawnNameless();
 	void InitialSpawn();
 	void ExitSpawn();

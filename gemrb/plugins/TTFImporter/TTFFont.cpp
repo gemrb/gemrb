@@ -21,9 +21,11 @@
 #include "TTFFont.h"
 #include "Interface.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cstdint>
+#include <utility>
+
 
 #if HAVE_ICONV
 #include <iconv.h>
@@ -188,7 +190,7 @@ int TTFFont::GetKerningOffset(ieWord leftChr, ieWord rightChr) const
 }
 
 TTFFont::TTFFont(PaletteHolder pal, FT_Face face, int lineheight, int baseline)
-: Font(pal, lineheight, baseline, false), face(face)
+: Font(std::move(pal), lineheight, baseline, false), face(face)
 {
 // on FT < 2.4.2 the manager will defer ownership to this object
 #if FREETYPE_VERSION_ATLEAST(2,4,2)

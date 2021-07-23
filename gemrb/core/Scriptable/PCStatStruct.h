@@ -110,10 +110,10 @@ public:
 	ieWord    FavouriteSpellsCount[MAX_FAVOURITES];
 	ResRef  FavouriteWeapons[MAX_FAVOURITES];
 	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
-	ieResRef  SoundSet;
+	ResRef  SoundSet;
 	char      SoundFolder[SOUNDFOLDERSIZE];
 	ieDword   ExtraSettings[ES_COUNT];     //iwd2 - expertise, hamstring, arterial strike, etc
-	ieResRef  QuickSpells[MAX_QSLOTS];     //iwd2 uses 9, others use only 3
+	ResRef    QuickSpells[MAX_QSLOTS]; //iwd2 uses 9, others use only 3
 	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT]; //iwd2 uses 8, others use only 4
 	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];
 	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT];           //pst has 5, others use only 3
@@ -132,7 +132,7 @@ private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
 	PCStatsStruct();
-	PCStatsStruct(std::list<int> levels);
+	explicit PCStatsStruct(const std::list<int>& levels);
 	PCStatsStruct& operator=(const PCStatsStruct &source);
 	void Init(bool all=true);
 	void IncrementChapter();
@@ -141,7 +141,7 @@ public:
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 	int GetHeaderForSlot(int slot);
-	void RegisterFavourite(ResRef fav, int what);
+	void RegisterFavourite(const ResRef& fav, int what);
 	void UpdateClassLevels(const std::list<int> &levels);
 };
 }

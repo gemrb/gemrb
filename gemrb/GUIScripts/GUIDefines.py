@@ -397,3 +397,8 @@ ITM_F_DRINK = 1
 ITM_F_READ = 2
 ITM_F_CONTAINER = 4
 ITM_F_ABILITIES = 8
+
+# modifier keys - keep in sync with EventMgr.h
+GEM_MOD_SHIFT = 1
+GEM_MOD_CTRL = 2
+GEM_MOD_ALT = 4

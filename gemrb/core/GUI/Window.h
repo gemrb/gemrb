@@ -147,7 +147,7 @@ public:
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
-	bool UnRegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);
+	bool UnRegisterHotKeyCallback(const EventMgr::EventCallback&, KeyboardKey key);
 	
 	bool IsOpaque() const override { return (Flags()&AlphaChannel) == 0; }
 	bool HitTest(const Point& p) const override;

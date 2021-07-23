@@ -396,7 +396,6 @@ def OpenKeyboardMappingsWindow ():
 def keys_setup_page (Window, pageno):
 	# Page n of n
 	Label = Window.GetControl (0x10000001)
-	#txt = GemRB.ReplaceVarsInText (49053, {'PAGE': str (pageno + 1), 'NUMPAGES': str (KEYS_PAGE_COUNT)})
 	GemRB.SetToken ('PAGE', str (pageno + 1))
 	GemRB.SetToken ('NUMPAGES', str (KEYS_PAGE_COUNT))
 	Label.SetText (49053)

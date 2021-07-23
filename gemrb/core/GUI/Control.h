@@ -54,13 +54,13 @@ namespace GemRB {
 
 class Control;
 class Sprite2D;
-    
+
 #define ACTION_CAST(a) \
 static_cast<Control::Action>(a)
-	
+
 #define ACTION_IS_SCREEN(a) \
 (a <= Control::HoverEnd)
-    
+
 #define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
@@ -98,14 +98,14 @@ public: // Public attributes
 		ValueChange, // many times we only care that the value has changed, not about the event that changed it
 
 		DragDropCreate,
-		DragDropSource, // a DragOp was succesfully taken from here
+		DragDropSource, // a DragOp was successfully taken from here
 		DragDropDest, // a DragOp was successfully dropped here
 
 		CustomAction // entry value for defining custom actions in subclasses. Must be last in enum.
 	};
 	
 	struct ControlDragOp : public DragOp {
-		ControlDragOp(Control* c)
+		explicit ControlDragOp(Control* c)
 		: DragOp(c, c->DragCursor()){}
 		
 		Control* Source() const {
@@ -160,7 +160,7 @@ public:
 	/** Returns the Owner */
 	virtual void SetFocus();
 	bool IsFocused();
-    
+
 	bool TracksMouseDown() const override { return bool(actionTimer); }
 	
 	UniqueDragOp DragOperation() override;
@@ -226,7 +226,6 @@ private:
 	// if the input is held: fires the action at the interval specified by ActionRepeatDelay
 	// otherwise action fires on input release up only
 	unsigned int repeatDelay;
-	typedef std::map<ActionKey, ControlEventHandler>::iterator ActionIterator;
 	std::map<ActionKey, ControlEventHandler> actions;
 	Timer* actionTimer;
 

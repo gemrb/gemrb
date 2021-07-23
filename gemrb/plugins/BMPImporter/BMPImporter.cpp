@@ -23,7 +23,7 @@
 #include "RGBAColor.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 
@@ -285,36 +285,6 @@ Bitmap* BMPImporter::GetBitmap()
 			}
 		}
 		break;
-	}
-
-	return data;
-}
-
-Image* BMPImporter::GetImage()
-{
-	Image *data = new Image(size);
-
-	switch (BitCount) {
-	case 8: {
-		unsigned char *p = ( unsigned char * ) pixels;
-		for (int y = 0; y < size.h; y++) {
-			for (int x = 0; x < size.w; x++) {
-				data->SetPixel(Point(x,y), PaletteColors[p[y * size.w + x] % NumColors]);
-			}
-		}
-		break;
-	}
-	case 32: {
-		unsigned int *p = ( unsigned int * ) pixels;
-		for (int y = 0; y < size.h; ++y) {
-			for (int x = 0; x < size.w; ++x) {
-				unsigned int col = *p++;
-				Color c(col, (col >> 8), (col >> 16), 0xFF);
-				data->SetPixel(Point(x, y), c);
-			}
-		}
-		break;
-	}
 	}
 
 	return data;

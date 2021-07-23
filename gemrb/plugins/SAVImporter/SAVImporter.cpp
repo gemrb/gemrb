@@ -25,25 +25,20 @@
 
 using namespace GemRB;
 
-SAVImporter::SAVImporter()
-{
-}
-
-SAVImporter::~SAVImporter()
-{
-}
-
-int SAVImporter::DecompressSaveGame(DataStream *compressed)
+int SAVImporter::DecompressSaveGame(DataStream *compressed, SaveGameAREExtractor& areExtractor)
 {
 	char Signature[8];
 	compressed->Read( Signature, 8 );
-	if (strncmp( Signature, "SAV V1.0", 8 ) ) {
+	if (strncmp(Signature, "SAV V1.0", 8) != 0) {
 		return GEM_ERROR;
 	}
-	int All = compressed->Remains();
-	int Current;
-	int percent, last_percent = 20;
+	strpos_t All = compressed->Remains();
+	strpos_t Current;
+	size_t percent;
+	size_t last_percent = 20;
 	if (!All) return GEM_ERROR;
+
+	tick_t startTime = GetTicks();
 	do {
 		ieDword fnlen, complen, declen;
 		compressed->ReadDword(fnlen);
@@ -54,23 +49,35 @@ int SAVImporter::DecompressSaveGame(DataStream *compressed)
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		strlwr(fname);
+		auto position = compressed->GetPos();
 		compressed->ReadDword(declen);
 		compressed->ReadDword(complen);
-		print("Decompressing %s", fname);
-		DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
-		free( fname );
-		if (!cached)
-			return GEM_ERROR;
-		delete cached;
+
+		auto areExt = strstr(fname, ".are");
+		if (areExt != nullptr && fname + fnlen - 5 == areExt) {
+			areExtractor.registerLocation(fname, position);
+			compressed->Seek(complen, GEM_CURRENT_POS);
+		} else {
+			Log(MESSAGE, "SAVImporter", "Decompressing %s", fname);
+			DataStream* cached = CacheCompressedStream(compressed, fname, complen, true);
+			free( fname );
+			if (!cached)
+				return GEM_ERROR;
+			delete cached;
+		}
+
 		Current = compressed->Remains();
 		//starting at 20% going up to 70%
 		percent = (20 + (All - Current) * 50 / All);
 		if (percent - last_percent > 5) {
-			core->LoadProgress(percent);
+			core->LoadProgress(static_cast<int>(percent));
 			last_percent = percent;
 		}
 	}
 	while(Current);
+
+	tick_t endTime = GetTicks();
+	Log(WARNING, "Core", "%lu ms (extracting the SAV)", endTime - startTime);
 	return GEM_OK;
 }
 
@@ -80,9 +87,9 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 	if (!compressed) {
 		return GEM_ERROR;
 	}
-	char Signature[8];
 
-	memcpy(Signature,"SAV V1.0",8);
+	char Signature[9];
+	strlcpy(Signature, "SAV V1.0", 9);
 	compressed->Write(Signature, 8);
 
 	return GEM_OK;
@@ -100,18 +107,33 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	//baaah, we dump output right in the stream, we get the compressed length
 	//only after the compressed data was written
 	complen = 0xcdcdcdcd; //placeholder
-	unsigned long Pos = str->GetPos(); //storing the stream position
+	strpos_t Pos = str->GetPos(); //storing the stream position
 	str->WriteDword(complen);
 
 	PluginHolder<Compressor> comp = MakePluginHolder<Compressor>(PLUGIN_COMPRESSION_ZLIB);
 	comp->Compress( str, uncompressed );
 
 	//writing compressed length (calculated)
-	unsigned long Pos2 = str->GetPos();
-	complen = Pos2-Pos-sizeof(ieDword); //calculating the compressed stream size
+	strpos_t Pos2 = str->GetPos();
+	complen = Pos2 - Pos - sizeof(ieDword); //calculating the compressed stream size
 	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
 	str->WriteDword(complen);       //updating size
 	str->Seek(Pos2, GEM_STREAM_START);//resuming work
+	return GEM_OK;
+}
+
+int SAVImporter::AddToSaveGameCompressed(DataStream *str, DataStream *compressed) {
+	using BufferT = std::array<uint8_t, 4096>;
+	BufferT buffer{};
+
+	BufferT::size_type remaining = compressed->Size();
+	while (remaining > 0) {
+		auto copySize = std::min(buffer.size(), remaining);
+		compressed->Read(buffer.data(), copySize);
+		str->Write(buffer.data(), copySize);
+		remaining -= copySize;
+	}
+
 	return GEM_OK;
 }
 

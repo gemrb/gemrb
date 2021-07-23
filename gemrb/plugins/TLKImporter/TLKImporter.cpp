@@ -300,7 +300,7 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 	if (Decoded) {
 		size_t TokenLength = strlen(Decoded);
 		if (dest) {
-			memcpy( dest, Decoded, TokenLength );
+			memcpy(dest, Decoded, TokenLength);
 		}
 		//Decoded is always a copy
 		free( Decoded );
@@ -394,7 +394,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
 	int Length;
-	ieResRef SoundResRef;
+	ResRef SoundResRef;
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
 		if (OverrideTLK) {
@@ -405,7 +405,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 			string[0] = 0;
 		}
 		type = 0;
-		SoundResRef[0]=0;
+		SoundResRef.Reset();
 	} else {
 		ieDword Volume, Pitch, StrOffset;
 		ieDword l;
@@ -450,7 +450,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 			string = string2;
 		}
 	}
-	if (type & 2 && flags & IE_STR_SOUND && SoundResRef[0] != 0) {
+	if (type & 2 && flags & IE_STR_SOUND && !SoundResRef.IsEmpty()) {
 		// GEM_SND_SPEECH will stop the previous sound source
 		unsigned int flag = GEM_SND_RELATIVE | (flags & (GEM_SND_SPEECH | GEM_SND_QUEUE));
 		core->GetAudioDrv()->Play(SoundResRef, SFX_CHAN_DIALOG, Point(), flag);
@@ -480,7 +480,7 @@ StringBlock TLKImporter::GetStringBlock(ieStrRef strref, unsigned int flags)
 	ieWord type;
 	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
 	str->ReadWord(type);
-	ieResRef soundRef;
+	ResRef soundRef;
 	str->ReadResRef( soundRef );
 	return StringBlock(GetString( strref, flags ), soundRef);
 }

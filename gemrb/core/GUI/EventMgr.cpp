@@ -20,7 +20,7 @@
 
 #include "GUI/EventMgr.h"
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "globals.h"
 
@@ -178,7 +178,7 @@ void EventMgr::DispatchEvent(Event&& e)
 
 		KeyMap::const_iterator hit = HotKeys.find(flags);
 		if (hit != HotKeys.end()) {
-			assert(hit->second.size() > 0);
+			assert(!hit->second.empty());
 			KeyMap::value_type::second_type list = hit->second;
 			EventCallback cb = hit->second.front();
 			if (cb(e)) {
@@ -281,7 +281,7 @@ void EventMgr::DispatchEvent(Event&& e)
 	}
 }
 
-bool EventMgr::RegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
+bool EventMgr::RegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, short mod)
 {
 	if (key < ' ') { // allowing certain non printables (eg 'F' keys)
 		return false;
@@ -320,7 +320,7 @@ void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short
 	}
 }
 
-EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(EventCallback cb, Event::EventTypeMask mask)
+EventMgr::TapMonitorId EventMgr::RegisterEventMonitor(const EventCallback& cb, Event::EventTypeMask mask)
 {
 	static size_t id = 0;
 	Taps[id] = std::make_pair(mask, cb);

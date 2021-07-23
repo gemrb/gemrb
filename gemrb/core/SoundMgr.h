@@ -36,7 +36,6 @@ public:
 	static const TypeID ID;
 public:
 	SoundMgr(void);
-	~SoundMgr(void) override;
 	/**
 	 * Read up to cnt samples into memory
 	 *

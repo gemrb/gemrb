@@ -27,6 +27,7 @@
 #include "Sprite2D.h"
 #include "TableMgr.h"
 #include "SymbolMgr.h"
+#include "System/Logging.h"
 
 namespace GemRB {
 
@@ -52,7 +53,7 @@ public:
 		return ptr;
 	}
 
-	CObject(PyObject *obj)
+	explicit CObject(PyObject *obj)
 	{
 		if (obj == Py_None)
 			return;
@@ -62,7 +63,7 @@ public:
 		else
 			PyErr_Clear();
 
-		ptr = static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description));
+		ptr = Holder<T>(static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description)));
 		if (ptr) {
 			ptr->acquire();
 		} else {
@@ -71,11 +72,11 @@ public:
 		Py_XDECREF(id);
 	}
 
-	CObject(const Holder<T>& ptr)
+	explicit CObject(const Holder<T>& ptr)
 	: ptr(ptr)
 	{}
 
-	operator bool () const
+	explicit operator bool () const
 	{
 		return ptr != nullptr;
 	}
@@ -130,10 +131,9 @@ Holder<Sprite2D> SpriteFromPy(PyObject* obj);
  Conversions to PyObject
 */
 
-// Like PyString_FromString(), but for ResRef
-PyObject* PyString_FromResRef(const ieResRef& ResRef);
+// Like PyString_FromString(), but for (ie)ResRef
+PyObject* PyString_FromResRef(const ResRef& resRef);
 
-// Like PyString_FromString(), but for ResRef
 PyObject* PyString_FromAnimID(const char* AnimID);
 	
 PyObject* PyString_FromStringObj(const std::string&);
@@ -176,7 +176,7 @@ class DecRef
 	PyObject* obj = nullptr;
 public:
 	template<typename FUNC, typename... ARGS>
-	DecRef(FUNC fn, ARGS&&... args) {
+	explicit DecRef(FUNC fn, ARGS&&... args) {
 		obj = fn(std::forward<ARGS>(args)...);
 	}
 	

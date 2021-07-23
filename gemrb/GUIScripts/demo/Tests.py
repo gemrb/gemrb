@@ -149,7 +149,6 @@ def TA_SetSupercali(TA):
 	return TA_SetText (TA, Me(), fmline)
 
 def TA_SetSupercali2(TA):
-	line = "[color=7b7a4e]" + fmline * 3 + "[/color]"
 	return TA_SetText (TA, Me(), fmline*3)
 
 str2 = GemRB.GetString (2)

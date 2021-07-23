@@ -23,12 +23,6 @@
 
 namespace GemRB {
 
-StringBuffer::StringBuffer()
-{}
-
-StringBuffer::~StringBuffer()
-{}
-
 void StringBuffer::appendFormatted(const char* message, ...)
 {
 	va_list ap;
@@ -43,7 +37,7 @@ void StringBuffer::appendFormatted(const char* message, ...)
 	va_end(ap);
 
 	// TODO: If we manage the string ourselves, we can avoid this extra copy.
-	buffer += buf;
+	buffer += buf.c_str();
 }
 
 void StringBuffer::append(const char* message)

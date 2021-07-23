@@ -222,7 +222,7 @@ void SDLAudio::clearBufferCache()
 	}
 }
 
-Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
+Mix_Chunk* SDLAudio::loadSound(const char *ResRef, tick_t &time_length)
 {
 	Mix_Chunk *chunk = nullptr;
 	CacheEntry *e;
@@ -287,10 +287,9 @@ Mix_Chunk* SDLAudio::loadSound(const char *ResRef, unsigned int &time_length)
 }
 
 Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
-	const Point& p, unsigned int flags, unsigned int *length)
+	const Point& p, unsigned int flags, tick_t *length)
 {
 	Mix_Chunk *chunk;
-	unsigned int time_length;
 
 	if (!ResRef) {
 		if (flags & GEM_SND_SPEECH) {
@@ -315,6 +314,7 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		return Holder<SoundHandle>();
 	}
 
+	tick_t time_length;
 	chunk = loadSound(ResRef, time_length);
 	if (chunk == nullptr) {
 		return Holder<SoundHandle>();
@@ -336,7 +336,8 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 		SetChannelPosition(listenerPos, p, chan);
 	}
 
-	return new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE);
+	// TODO: we need something like static_ptr_cast
+	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE));
 }
 
 int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
@@ -460,7 +461,7 @@ int SDLAudio::SetupNewStream(ieWord x, ieWord y, ieWord z,
 	return 0;
 }
 
-int SDLAudio::QueueAmbient(int, const char*)
+tick_t SDLAudio::QueueAmbient(int, const char*)
 {
 	// TODO: ambient sounds
 	return -1;

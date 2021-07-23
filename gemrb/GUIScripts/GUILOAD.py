@@ -76,7 +76,7 @@ def OnLoad ():
 	ScrollBar=LoadWindow.GetControl (25)
 	ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ScrollBarUpdated)
 	Games=GemRB.GetSaveGames ()
-	TopIndex = max (1, len(Games) - 4)
+	TopIndex = max (0, len(Games) - 4)
 	ScrollBar.SetVarAssoc ("TopIndex", TopIndex, 0, TopIndex)
 	LoadWindow.SetEventProxy(ScrollBar)
 	LoadWindow.Focus()

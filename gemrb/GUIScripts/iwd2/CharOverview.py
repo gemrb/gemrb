@@ -190,7 +190,6 @@ def UpdateOverview(CurrentStep):
 		SkillColumn = Tables[0].GetValue(RaceName, 'SKILL_COLUMN', GTV_INT) + 1
 		Lookup = {'STR': 0, 'DEX': 1, 'CON': 2, 'INT': 3, 'WIS': 4, 'CHR': 5} # Probably a better way to do this
 		for i in range(Tables[4].GetRowCount()):
-			SkillName = Tables[5].GetRowName(i)
 			Abl = Tables[4].GetValue(i, 1, GTV_STR)
 			Ranks = GemRB.GetVar('Skill ' + str(i))
 			value = Ranks

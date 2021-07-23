@@ -25,7 +25,7 @@
 
 #include "Inventory.h"
 #include "Scriptable/Scriptable.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -64,7 +64,7 @@ private:
 	void FreeGroundIcons();
 public:
 	Point toOpen;
-	ieWord Type;
+	ieWord containerType;
 	ieDword Flags;
 	ieWord LockDifficulty;
 	Inventory inventory;

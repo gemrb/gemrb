@@ -62,7 +62,7 @@ protected:
 	struct AudioStream *parent;
 
 public:
-	OpenALSoundHandle(AudioStream *p) : parent(p) { }
+	explicit OpenALSoundHandle(AudioStream *p) : parent(p) { }
 	~OpenALSoundHandle() override { }
 	void SetPos(const Point&) override;
 	bool Playing() override;
@@ -83,7 +83,7 @@ struct AudioStream {
 	bool delete_buffers;
 
 	void ClearIfStopped();
-	void ClearProcessedBuffers();
+	void ClearProcessedBuffers() const;
 	void ForceClear();
 
 	Holder<OpenALSoundHandle> handle;
@@ -91,7 +91,7 @@ struct AudioStream {
 
 struct CacheEntry {
 	ALuint Buffer;
-	unsigned int Length;
+	tick_t Length;
 };
 
 class OpenALAudioDriver : public Audio {
@@ -102,7 +102,7 @@ public:
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 					const Point&, unsigned int flags = 0,
-					unsigned int *length = 0) override;
+					tick_t *length = nullptr) override;
 	void UpdateVolume(unsigned int flags) override;
 	bool CanPlay() override;
 	void ResetMusics() override;
@@ -116,7 +116,7 @@ public:
 	bool ReleaseStream(int stream, bool HardStop) override;
 	int SetupNewStream( ieWord x, ieWord y, ieWord z,
 					ieWord gain, bool point, int ambientRange) override;
-	int QueueAmbient(int stream, const char* sound) override;
+	tick_t QueueAmbient(int stream, const char* sound) override;
 	void SetAmbientStreamVolume(int stream, int volume) override;
 	void SetAmbientStreamPitch(int stream, int pitch) override;
 	void QueueBuffer(int stream, unsigned short bits,
@@ -136,14 +136,14 @@ private:
 	LRUCache buffercache;
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
-	ALuint loadSound(const char* ResRef, unsigned int &time_length);
+	ALuint loadSound(const char* ResRef, tick_t &time_length);
 	int num_streams;
 	int CountAvailableSources(int limit);
 	bool evictBuffer();
 	void clearBufferCache(bool force);
 	ALenum GetFormatEnum(int channels, int bits) const;
 	static int MusicManager(void* args);
-	bool stayAlive;
+	std::atomic_bool stayAlive {true};
 	short* music_memory;
 	std::thread musicThread;
 

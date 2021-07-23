@@ -20,9 +20,12 @@
 
 #include "Window.h"
 
-#include "GUI/GUIScriptInterface.h"
 #include "Interface.h"
 #include "ScrollBar.h"
+
+#include "GUI/GUIScriptInterface.h"
+
+#include <utility>
 
 namespace GemRB {
 
@@ -120,9 +123,8 @@ void Window::SubviewRemoved(View* subview, View* parent)
 	if (subview->ContainsView(focusView)) {
 		focusView->DidUnFocus();
 		focusView = NULL;
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
-			if (TrySetFocus(ctrl) == ctrl) {
+		for (auto control : Controls) {
+			if (TrySetFocus(control) == control) {
 				break;
 			}
 		}
@@ -265,9 +267,8 @@ void Window::SetPosition(WindowPosition pos)
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
-		ctrl->UpdateState( VarName, Sum);
+	for (auto ctrl : Controls) {
+		ctrl->UpdateState(VarName, Sum);
 	}
 }
 
@@ -308,8 +309,7 @@ bool Window::HitTest(const Point& p) const
 	bool hit = View::HitTest(p);
 	if (hit == false){
 		// check the control list. we could make View::HitTest optionally recursive, but this is cheaper
-		for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-			Control* ctrl = *c;
+		for (const auto ctrl : Controls) {
 			if (ctrl->IsVisible() && ctrl->View::HitTest(ctrl->ConvertPointFromWindow(p))) {
 				hit = true;
 				break;
@@ -326,7 +326,7 @@ void Window::SetAction(Responder handler, const ActionKey& key)
 
 bool Window::PerformAction(const ActionKey& key)
 {
-	auto& handler = eventHandlers[key.Value()];
+	const auto& handler = eventHandlers[key.Value()];
 	if (handler) {
 		(handler)(this);
 		return true;
@@ -561,8 +561,7 @@ bool Window::DispatchEvent(const Event& event)
 	
 bool Window::InActionHandler() const
 {
-	for (std::set<Control *>::iterator c = Controls.begin(); c != Controls.end(); ++c) {
-		Control* ctrl = *c;
+	for (const auto ctrl : Controls) {
 		if (ctrl->IsExecutingResponseHandler()) {
 			return true;
 		}
@@ -584,11 +583,11 @@ bool Window::RegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
 		HotKeys.erase(it);
 	}
 
-	HotKeys[key] = cb;
+	HotKeys[key] = std::move(cb);
 	return true;
 }
 
-bool Window::UnRegisterHotKeyCallback(EventMgr::EventCallback cb, KeyboardKey key)
+bool Window::UnRegisterHotKeyCallback(const EventMgr::EventCallback& cb, KeyboardKey key)
 {
 	KeyMap::iterator it = HotKeys.find(key);
 	if (it != HotKeys.end() && FunctionTargetsEqual(it->second, cb)) {

@@ -30,7 +30,7 @@
 #include "PluginMgr.h"
 #include "ScriptEngine.h"
 #include "TableMgr.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "GameScript/GameScript.h"
 #include "GameScript/GSUtils.h"
 #include "GUI/GameControl.h"
@@ -48,12 +48,6 @@ static const int noSections[4] = {0,0,0,0};
 
 DialogHandler::DialogHandler(void)
 {
-	dlg = NULL;
-	ds = NULL;
-	targetID = 0;
-	originalTargetID = 0;
-	speakerID = 0;
-	initialState = -1;
 	if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
 		sectionMap = bg2Sections;
 	} else {
@@ -66,7 +60,7 @@ DialogHandler::~DialogHandler(void)
 	delete dlg;
 }
 
-void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
+void DialogHandler::UpdateJournalForTransition(const DialogTransition* tr)
 {
 	if (!tr || !(tr->Flags&IE_DLG_TR_JOURNAL)) return;
 
@@ -104,31 +98,31 @@ void DialogHandler::UpdateJournalForTransition(DialogTransition* tr)
 }
 
 //Try to start dialogue between two actors (one of them could be inanimate)
-bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref, ieDword si)
+bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& dialogRef, ieDword si)
 {
 	delete dlg;
-	dlg = NULL;
+	dlg = nullptr;
 
-	if (!dlgref || dlgref[0] == '\0' || dlgref[0] == '*') {
+	if (dialogRef.IsEmpty() || dialogRef.IsStar()) {
 		return false;
 	}
 
 	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
-	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
+	dm->Open(gamedata->GetResource(dialogRef, IE_DLG_CLASS_ID));
 	dlg = dm->GetDialog();
 
 	if (!dlg) {
-		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dlgref, spk->GetName(1), tgt->GetName(1));
+		Log(ERROR, "DialogHandler", "Cannot start dialog (%s): %s with %s", dialogRef.CString(), spk->GetName(1), tgt->GetName(1));
 		return false;
 	}
 
-	dlg->resRef = ResRef::MakeLowerCase(dlgref); //this isn't handled by GetDialog???
+	dlg->resRef = dialogRef; //this isn't handled by GetDialog???
 
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 
-	Actor *oldTarget = GetActorByGlobalID(targetID);
+	Actor *oldTarget = GetLocalActorByGlobalID(targetID);
 	speakerID = spk->GetGlobalID();
 	targetID = tgt->GetGlobalID();
 	if (!originalTargetID) originalTargetID = tgt->GetGlobalID();
@@ -188,19 +182,19 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlg
 /*try to break will only try to break it, false means unconditional stop*/
 void DialogHandler::EndDialog(bool try_to_break)
 {
-	if (dlg == NULL) {
+	if (dlg == nullptr) {
 		return; // no dialog, nothing to do.
 	}
 
 	// FIXME: is this useful for anything concrete? Currently never true, since nothing sets DF_UNBREAKABLE (unused since it was introduced)
-	if (try_to_break && (core->GetGameControl()->GetDialogueFlags()&DF_UNBREAKABLE) ) {
+	if (try_to_break && core->GetGameControl()->GetDialogueFlags() & DF_UNBREAKABLE) {
 		return;
 	}
 
 	TextArea* ta = core->GetMessageTextArea();
 	if (ta) {
 		// reset the TA
-		ta->SetSpeakerPicture(NULL);
+		ta->SetSpeakerPicture(nullptr);
 		ta->ClearSelectOptions();
 	}
 
@@ -218,9 +212,9 @@ void DialogHandler::EndDialog(bool try_to_break)
 		tmp->LeftDialog();
 		tmp->SetCircleSize();
 	}
-	ds = NULL;
+	ds = nullptr;
 	delete dlg;
-	dlg = NULL;
+	dlg = nullptr;
 
 	core->ToggleViewsEnabled(true, "NOT_DLG");
 	// FIXME: it's not so nice having this here, but things call EndDialog directly :(
@@ -231,6 +225,61 @@ void DialogHandler::EndDialog(bool try_to_break)
 	gc->SetDialogueFlags(0, OP_SET);
 	gc->MoveViewportTo(prevViewPortLoc, false, DIALOG_MOVE_SPEED);
 	core->SetEventFlag(EF_PORTRAIT);
+}
+
+// TODO: work out if this should go somewhere more central (such
+// as GetActorByDialog), or if there's a less awful way to do this
+// (we could cache the entries, for example)
+static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
+{
+	AutoTable pdtable("interdia");
+	if (!pdtable) return nullptr;
+
+	int col;
+	if (core->GetGame()->Expansion == 5) {
+		col = pdtable->GetColumnIndex("25FILE");
+	} else {
+		col = pdtable->GetColumnIndex("FILE");
+	}
+	int row = pdtable->FindTableValue(col, dialog);
+	return target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
+}
+
+static int GetDialogOptions(const DialogState *ds, std::vector<SelectOption>& options, Scriptable* target)
+{
+	int idx = 0;
+	// first looking for a 'continue' opportunity, the order is descending (a la IE)
+	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
+		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+			if (ds->transitions[x]->condition && !ds->transitions[x]->condition->Evaluate(target)) {
+				continue;
+			}
+		}
+
+		idx++;
+		if (ds->transitions[x]->textStrRef == 0xffffffff) {
+			// dialogchoose should be set to x
+			// it isn't important which END option was chosen, as it ends
+			core->GetDictionary()->SetAt("DialogOption", x);
+			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
+				core->GetGameControl()->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
+				break;
+			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+				if (ds->transitions[x]->condition && !ds->transitions[x]->condition->Evaluate(target)) {
+					continue;
+				}
+			}
+			core->GetGameControl()->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
+			break;
+		} else {
+			String* string = core->GetString(ds->transitions[x]->textStrRef);
+			options.emplace_back(x, *string);
+			delete string;
+		}
+	}
+
+	std::reverse(options.begin(), options.end());
+	return idx;
 }
 
 bool DialogHandler::DialogChoose(unsigned int choose)
@@ -255,8 +304,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		EndDialog();
 		return false;
 	}
-	Scriptable *tgt = NULL;
-	Actor *tgta = NULL;
+	Scriptable *tgt = nullptr;
+	Actor *tgta = nullptr;
 	if (target->Type == ST_ACTOR) {
 		tgta = (Actor *)target;
 	}
@@ -304,7 +353,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		target->ImmediateEvent();
 		target->ProcessActions(); //run the action queue now
 
-		if (tr->actions.size()) {
+		if (!tr->actions.empty()) {
 			if (!(target->GetInternalFlag() & IF_NOINT)) {
 				target->ReleaseCurrentAction();
 			}
@@ -325,7 +374,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->Flags & IE_DLG_TR_FINAL) {
-			if (tr->actions.size()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
+			if (!tr->actions.empty()) gc->SetDialogueFlags(DF_POSTPONE_SCRIPTS, OP_OR);
 			EndDialog();
 			ta->AppendText(L"\n");
 			return false;
@@ -341,15 +390,15 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		if (!tr->Dialog.IsEmpty() && tr->Dialog != dlg->resRef) {
 			//target should be recalculated!
 			target->LeftDialog();
-			tgt = NULL;
-			tgta = NULL;
+			tgt = nullptr;
+			tgta = nullptr;
 			if (originalTargetID) {
 				// always try original target first (sometimes there are multiple
 				// actors with the same dialog in an area, we want to pick the one
 				// we were talking to)
-				tgta = GetActorByGlobalID(originalTargetID);
-				if (tgta && strnicmp(tgta->GetDialog(GD_NORMAL), tr->Dialog, 8) != 0) {
-					tgta = NULL;
+				tgta = GetLocalActorByGlobalID(originalTargetID);
+				if (tgta && tgta->GetDialog(GD_NORMAL) != tr->Dialog) {
+					tgta = nullptr;
 				} else {
 					tgt = tgta;
 				}
@@ -364,32 +413,13 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			if (!tgt) {
 				// try searching for banter dialogue: the original engine seems to
 				// happily let you randomly switch between normal and banter dialogs
-
-				// TODO: work out if this should go somewhere more central (such
-				// as GetActorByDialog), or if there's a less awful way to do this
-				// (we could cache the entries, for example)
-				AutoTable pdtable("interdia");
-				if (pdtable) {
-					int col;
-
-					if (core->GetGame()->Expansion==5) {
-						col = pdtable->GetColumnIndex("25FILE");
-					} else {
-						col = pdtable->GetColumnIndex("FILE");
-					}
-					int row = pdtable->FindTableValue( col, tr->Dialog );
-					tgt = target->GetCurrentArea()->GetActorByScriptName(pdtable->GetRowName(row));
-					if (tgt && tgt->Type == ST_ACTOR) {
-						tgta = (Actor *) tgt;
-					}
-				}
+				tgta = FindBanter(target, tr->Dialog);
+				tgt = tgta;
 			}
 			// pst: check if we're carrying any items with the needed dialog (eg. mertwyn's head)
 			if (!tgt && core->HasFeature(GF_AREA_OVERRIDE)) {
-				tgt = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
-				if (tgt) { // only returns Actors
-					tgta = (Actor *) tgt;
-				}
+				tgta = target->GetCurrentArea()->GetItemByDialog(tr->Dialog);
+				tgt = tgta;
 			}
 
 			if (!tgt) {
@@ -397,7 +427,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 				EndDialog();
 				return false;
 			}
-			Actor *oldTarget = GetActorByGlobalID(targetID);
+			Actor *oldTarget = GetLocalActorByGlobalID(targetID);
 			targetID = tgt->GetGlobalID();
 			if (tgta) tgta->SetCircleSize();
 			if (oldTarget) oldTarget->SetCircleSize();
@@ -428,40 +458,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 		displaymsg->DisplayStringName( ds->StrRef, DMC_DIALOG, target, IE_STR_SOUND|IE_STR_SPEECH);
 	}
 
-	int idx = 0;
 	std::vector<SelectOption> dialogOptions;
-	//first looking for a 'continue' opportunity, the order is descending (a la IE)
-	for (int x = ds->transitionsCount - 1; x >= 0; x--) {
-		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-			if (ds->transitions[x]->condition &&
-				!ds->transitions[x]->condition->Evaluate(target)) {
-				continue;
-			}
-		}
-		idx++;
-		if (ds->transitions[x]->textStrRef == 0xffffffff) {
-			//dialogchoose should be set to x
-			//it isn't important which END option was chosen, as it ends
-			core->GetDictionary()->SetAt("DialogOption",x);
-			if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
-				gc->SetDialogueFlags(DF_OPENENDWINDOW, OP_OR);
-				break;
-			} else if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
-				if (ds->transitions[x]->condition &&
-					!ds->transitions[x]->condition->Evaluate(target)) {
-					continue;
-				}
-			}
-			gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW, OP_OR);
-			break;
-		} else {
-			String* string = core->GetString( ds->transitions[x]->textStrRef );
-			dialogOptions.push_back(std::make_pair(x, *string));
-			delete string;
-		}
-	}
-
-	std::reverse(dialogOptions.begin(), dialogOptions.end());
+	int idx = GetDialogOptions(ds, dialogOptions, target);
 	ta->SetSelectOptions(dialogOptions, true);
 	ControlEventHandler handler = [this](const Control* c) {
 		DialogChoose(c->GetValue());
@@ -477,35 +475,33 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 	return true;
 }
 
-// TODO: duplicate of the one in GameControl
-Actor *DialogHandler::GetActorByGlobalID(ieDword ID)
+Actor *DialogHandler::GetLocalActorByGlobalID(ieDword ID)
 {
-	if (!ID)
-		return NULL;
-	Game* game = core->GetGame();
-	if (!game)
-		return NULL;
+	if (!ID) return nullptr;
 
-	Map* area = game->GetCurrentArea( );
-	if (!area)
-		return NULL;
+	const Game* game = core->GetGame();
+	if (!game) return nullptr;
+
+	const Map* area = game->GetCurrentArea();
+	if (!area) return nullptr;
+
 	return area->GetActorByGlobalID(ID);
 }
 
-Scriptable *DialogHandler::GetTarget()
+Scriptable *DialogHandler::GetTarget() const
 {
-	Game *game = core->GetGame();
-	if (!game) return NULL;
+	const Game *game = core->GetGame();
+	if (!game) return nullptr;
 
 	Map *area = game->GetCurrentArea();
-	if (!area) return NULL;
+	if (!area) return nullptr;
 
 	return area->GetScriptableByGlobalID(targetID);
 }
 
 Actor *DialogHandler::GetSpeaker()
 {
-	return GetActorByGlobalID(speakerID);
+	return GetLocalActorByGlobalID(speakerID);
 }
 
 }

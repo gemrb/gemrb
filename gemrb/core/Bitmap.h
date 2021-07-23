@@ -25,7 +25,7 @@ namespace GemRB {
 
 class GEM_EXPORT Bitmap {
 public:
-	Bitmap(const Size& size);
+	explicit Bitmap(const Size& size);
 	~Bitmap();
 	unsigned char GetAt(const Point& p) const
 	{

@@ -38,8 +38,8 @@ p2DAImporter::p2DAImporter(void)
 
 p2DAImporter::~p2DAImporter(void)
 {
-	for (unsigned int i = 0; i < ptrs.size(); i++) {
-		free( ptrs[i] );
+	for (auto& ptr : ptrs) {
+		free(ptr);
 	}
 }
 
@@ -73,7 +73,7 @@ bool p2DAImporter::Open(DataStream* str)
 	int row = 0;
 	while (true) {
 		char* line = ( char* ) malloc( MAXLENGTH );
-		int len = str->ReadLine( line, MAXLENGTH-1 );
+		strret_t len = str->ReadLine( line, MAXLENGTH-1 );
 		if (len <= 0) {
 			free( line );
 			break;

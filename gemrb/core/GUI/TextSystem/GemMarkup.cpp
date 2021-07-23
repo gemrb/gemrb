@@ -43,9 +43,9 @@ GemMarkupParser::GemMarkupParser(const Font* ftext, Font::PrintColors textCols,
 
 void GemMarkupParser::ResetAttributes(const Font* ftext, Font::PrintColors textCols, const Font* finit, Font::PrintColors initCols)
 {
-	while(context.size()) context.pop();
+	while(!context.empty()) context.pop();
 	textBg = textCols.bg;
-	context.push(TextAttributes(ftext, textCols, finit, initCols));
+	context.emplace(ftext, textCols, finit, initCols);
 }
 
 void GemMarkupParser::Reset()
@@ -77,7 +77,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 	assert(tagPos < text.length());
 	String::const_iterator it = text.begin() + tagPos;
 	for (; it != text.end(); ++it) {
-		assert(context.size());
+		assert(!context.empty());
 		TextAttributes& attributes = context.top();
 
 		switch (state) {
@@ -144,7 +144,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 			case COLOR:
 				switch (*it) {
 					case L']':
-						context.push(TextAttributes(attributes));
+						context.emplace(attributes);
 						context.top().SetTextColor({ParseColor(token), textBg});
 						state = TEXT;
 						token.clear();

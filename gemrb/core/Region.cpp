@@ -56,6 +56,13 @@ Point& Point::operator-=(const Point& rhs)
 	return *this;
 }
 
+Point& Point::operator/(int div)
+{
+	x /= div;
+	y /= div;
+	return *this;
+}
+
 Point::Point(int x, int y)
 {
 	this->x = x;
@@ -123,7 +130,7 @@ Region::Region(const Region &r)
 : origin(r.origin), size(r.size)
 {}
 
-Region::Region(Region&& r)
+Region::Region(Region&& r) noexcept
 : origin(r.origin), size(r.size)
 {}
 

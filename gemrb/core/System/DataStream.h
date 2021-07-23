@@ -30,10 +30,11 @@
 
 #include "Platform.h"
 #include "Region.h"
-#include "Resource.h"
 #include "System/swab.h"
 
 namespace GemRB {
+
+class ResRef;
 
 #define GEM_CURRENT_POS 0
 #define GEM_STREAM_START 1
@@ -49,25 +50,26 @@ namespace GemRB {
 #define WriteWord WriteScalar<ieWord>
 #define WriteDword WriteScalar<ieDword>
 
-class GEM_EXPORT DataStream {
-protected:
-	unsigned long Pos;
-	unsigned long size;
-	bool Encrypted;
+// represents the byte position of the stream
+using strpos_t = size_t;
+// represents the number of bytes read or written. -1 on error
+using strret_t = typename std::make_signed<strpos_t>::type;
+// represents on offset to a strpos_t
+using stroff_t = typename std::make_signed<strpos_t>::type;
 
-	static bool IsBigEndian;
+class GEM_EXPORT DataStream {
 public:
 	char filename[16]; //8+1+3+1 padded to dword
 	char originalfile[_MAX_PATH];
 public:
 	DataStream(void);
-	virtual ~DataStream(void);
-	virtual int Read(void* dest, unsigned int len) = 0;
-	virtual int Write(const void* src, unsigned int len) = 0;
+	virtual ~DataStream() = default;
+	virtual strret_t Read(void* dest, strpos_t len) = 0;
+	virtual strret_t Write(const void* src, strpos_t len) = 0;
 	
 	template <typename T>
-	int ReadScalar(T& dest) {
-		int len = Read(&dest, sizeof(T));
+	strret_t ReadScalar(T& dest) {
+		strret_t len = Read(&dest, sizeof(T));
 		if (IsBigEndian) {
 			swabs(&dest, sizeof(T));
 		}
@@ -75,8 +77,8 @@ public:
 	}
 	
 	template <typename T>
-	int WriteScalar(const T& src) {
-		int len;
+	strret_t WriteScalar(const T& src) {
+		strret_t len;
 		if (IsBigEndian) {
 			T tmp;
 			swab_const(&src, &tmp, sizeof(T));
@@ -87,24 +89,26 @@ public:
 		return len;
 	}
 
-	int ReadResRef(ieResRef dest);
-	int ReadResRef(ResRef& dest);
+	strret_t ReadResRef(char dest[9]);
+	strret_t ReadResRef(ResRef& dest);
 	
-	int WriteResRef(const ieResRef src);
-	int WriteResRef(const ResRef& src);
+	strret_t WriteResRef(const char src[9]);
+	strret_t WriteResRef(const ResRef& src);
+	strret_t WriteResRefLC(const ResRef& src);
+	strret_t WriteResRefUC(const ResRef& src);
 	
-	int ReadPoint(Point&);
-	int WritePoint(const Point&);
+	strret_t ReadPoint(Point&);
+	strret_t WritePoint(const Point&);
 	
-	virtual int Seek(int pos, int startpos) = 0;
-	unsigned long Remains() const;
-	unsigned long Size() const;
-	unsigned long GetPos() const;
+	virtual stroff_t Seek(stroff_t pos, strpos_t startpos) = 0;
+	strpos_t Remains() const;
+	strpos_t Size() const;
+	strpos_t GetPos() const;
 	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
-	void ReadDecrypted(void* buf, unsigned long size);
-	int ReadLine(void* buf, unsigned long maxlen);
+	void ReadDecrypted(void* buf, strpos_t size) const;
+	strret_t ReadLine(void* buf, strpos_t maxlen);
 	/** Endian Switch setup */
 	static void SetBigEndian(bool be);
 	static bool BigEndian();
@@ -113,6 +117,12 @@ public:
 	 *  Returns NULL on failure.
 	 **/
 	virtual DataStream* Clone();
+protected:
+	strpos_t Pos;
+	strpos_t size;
+	bool Encrypted;
+
+	static bool IsBigEndian;
 private:
 	DataStream(const DataStream&);
 };

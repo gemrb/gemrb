@@ -46,7 +46,6 @@ public:
 	bool Open(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	Bitmap* GetBitmap() override;
-	Image* GetImage() override;
 	int GetPalette(int colors, Color* pal) override;
 
 private:

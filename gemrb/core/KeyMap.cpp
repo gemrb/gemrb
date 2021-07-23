@@ -61,7 +61,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 	}
 
 	char tINIkeymap[_MAX_PATH];
-	PathJoin(tINIkeymap, core->GamePath, inifile, nullptr);
+	PathJoin(tINIkeymap, core->config.GamePath, inifile, nullptr);
 	FileStream* config = FileStream::OpenFile( tINIkeymap );
 
 	if (config == NULL) {
@@ -158,7 +158,7 @@ bool KeyMap::ResolveName(const char* name, int group)
 		return false;
 	}
 
-	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName, fun->function);
+	Log(MESSAGE, "KeyMap", "RunFunction(%s::%s)", fun->moduleName.CString(), fun->function.CString());
 	core->GetGUIScriptEngine()->RunFunction(fun->moduleName, fun->function);
 	return true;
 }

@@ -31,6 +31,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "ie_types.h"
+#include "Resource.h"
 
 #include <vector>
 
@@ -43,7 +44,7 @@ class Condition;
 typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
 STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
 
-typedef enum StoreActionType : uint8_t { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
+typedef enum StoreActionType : int16_t { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
 STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
 
 #define IE_STORE_BUY      1
@@ -68,23 +69,24 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  * Item in a store, together with available amount etc.
  */
 struct GEM_EXPORT STOItem {
-	ieResRef ItemResRef;
-	ieWord PurchasedAmount;
-	ieWord Usages[CHARGE_COUNTERS];
-	ieDword Flags;
+	ResRef ItemResRef;
+	ieWord PurchasedAmount = 0;
+	ieWord Usages[CHARGE_COUNTERS] = {};
+	ieDword Flags = 0;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
-	int Weight;
-	int MaxStackAmount;
-	ieDword AmountInStock;
-	ieDwordSigned InfiniteSupply;
+	int Weight = 0;
+	int MaxStackAmount = 0;
+	ieDword AmountInStock = 0;
+	ieDwordSigned InfiniteSupply = 0;
 	// V1.1
-	Condition *triggers;
+	Condition *triggers = nullptr;
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 
-	STOItem();
-	STOItem(CREItem *item);
+	STOItem() = default;
+	explicit STOItem(const CREItem *item);
 	~STOItem();
+	void CopyCREItem(const CREItem *item);
 };
 
 
@@ -94,7 +96,7 @@ struct GEM_EXPORT STOItem {
  */
 
 struct STODrink {
-	ieResRef RumourResRef;
+	ResRef RumourResRef;
 	ieStrRef DrinkName;
 	ieDword Price;
 	ieDword Strength;
@@ -107,7 +109,7 @@ struct STODrink {
  */
 
 struct STOCure {
-	ieResRef CureResRef;
+	ResRef CureResRef;
 	ieDword Price;
 };
 
@@ -118,72 +120,72 @@ struct STOCure {
 
 class GEM_EXPORT Store {
 public:
-	Store();
+	Store() = default;
 	~Store();
 
-	std::vector< STOItem*> items;
-	STODrink* drinks;
-	STOCure* cures;
-	ieDword* purchased_categories;
+	std::vector<STOItem*> items;
+	std::vector<STODrink*> drinks;
+	std::vector<STOCure*> cures;
+	std::vector<ieDword> purchased_categories;
 
-	ieResRef Name;
-	ieDword Type;
-	ieStrRef StoreName;
-	ieDword Flags;
-	ieDword SellMarkup;
-	ieDword BuyMarkup;
-	ieDword DepreciationRate;
-	ieWord StealFailureChance;
-	ieWord Capacity;
+	ResRef Name;
+	ieDword Type = 0;
+	ieStrRef StoreName = 0;
+	ieDword Flags = 0;
+	ieDword SellMarkup = 0;
+	ieDword BuyMarkup = 0;
+	ieDword DepreciationRate = 0;
+	ieWord StealFailureChance = 0;
+	ieWord Capacity = 0;
 	char unknown[8];
-	ieDword PurchasedCategoriesOffset;
-	ieDword PurchasedCategoriesCount;
-	ieDword ItemsOffset;
+	ieDword PurchasedCategoriesOffset = 0;
+	ieDword PurchasedCategoriesCount = 0;
+	ieDword ItemsOffset = 0;
 	//don't use this value directly, use GetRealStockSize
-	ieDword ItemsCount;
-	ieDword Lore;
-	ieDword IDPrice;
-	ieResRef RumoursTavern;
-	ieDword DrinksOffset;
-	ieDword DrinksCount;
-	ieResRef RumoursTemple;
-	ieDword AvailableRooms;
+	ieDword ItemsCount = 0;
+	ieDword Lore = 0;
+	ieDword IDPrice = 0;
+	ResRef RumoursTavern;
+	ieDword DrinksOffset = 0;
+	ieDword DrinksCount = 0;
+	ResRef RumoursTemple;
+	ieDword AvailableRooms = 0;
 	ieDword RoomPrices[4];
-	ieDword CuresOffset;
-	ieDword CuresCount;
-	bool HasTriggers;
+	ieDword CuresOffset = 0;
+	ieDword CuresCount = 0;
+	bool HasTriggers = false;
 	char unknown2[36];
 
 	// IWD2 only
 	char unknown3[80];
 
-	int version;
+	int version = 0;
 	// the scripting name of the owner
-	ieDword StoreOwnerID;
+	ieDword StoreOwnerID = 0;
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
-	STOItem *GetItem(unsigned int idx, bool usetrigger);
+	STOItem *GetItem(unsigned int idx, bool usetrigger) const;
 	/** Evaluates item availability triggers */
-	int GetRealStockSize();
+	int GetRealStockSize() const;
 	/** Recharges item */
-	void RechargeItem(CREItem *item);
+	void RechargeItem(CREItem *item) const;
 	/** Identifies item according to store lore */
 	void IdentifyItem(CREItem *item) const;
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
-	void RemoveItem( STOItem *itm);
+	void RemoveItem(const STOItem *itm);
 	/** Returns index of item */
-	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
+	unsigned int FindItem(const char* item, bool usetrigger) const;
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);
 	bool IsBag() const;
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
-	STOItem *FindItem(CREItem *item, bool exact);
+	STOItem *FindItem(const CREItem *item, bool exact) const;
 	bool IsItemAvailable(unsigned int slot) const;
 };
 

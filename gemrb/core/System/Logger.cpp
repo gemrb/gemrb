@@ -28,8 +28,8 @@ Logger::Logger(std::deque<WriterPtr> writers)
 : writers(std::move(writers))
 {
 	loggingThread = std::thread([this] {
-		QueueType queue;
 		while (running) {
+			QueueType queue;
 			std::unique_lock<std::mutex> lk(queueLock);
 			cv.wait(lk, [this]() { return !messageQueue.empty() || !running; });
 			queue.swap(messageQueue);
@@ -55,7 +55,7 @@ void Logger::AddLogWriter(WriterPtr writer)
 void Logger::ProcessMessages(QueueType queue)
 {
 	std::lock_guard<std::mutex> l(writerLock);
-	while (queue.size()) {
+	while (!queue.empty()) {
 		for (const auto& writer : writers) {
 			writer->WriteLogMessage(queue.front());
 		}
@@ -78,7 +78,7 @@ void Logger::LogMsg(LogMessage&& msg)
 		// fatal errors must happen now!
 		std::lock_guard<std::mutex> l(writerLock);
 		for (const auto& writer : writers) {
-			writer->WriteLogMessage(std::move(msg));
+			writer->WriteLogMessage(msg);
 		}
 	} else {
 		std::lock_guard<std::mutex> l(queueLock);
@@ -87,7 +87,7 @@ void Logger::LogMsg(LogMessage&& msg)
 	}
 }
 
-const char* log_level_text[] = {
+const char* const log_level_text[] = {
 	"FATAL",
 	"ERROR",
 	"WARNING",

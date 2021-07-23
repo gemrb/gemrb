@@ -23,7 +23,7 @@
 #include "RGBAColor.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 

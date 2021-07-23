@@ -21,17 +21,13 @@
 #include "TileMap.h"
 
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include "Scriptable/Container.h"
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
 namespace GemRB {
-
-TileMap::TileMap(void)
-{
-}
 
 TileMap::~TileMap(void)
 {
@@ -66,7 +62,7 @@ TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flag
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
 	strnspccpy(tile->Name, Name, 32);
-	strnlwrcpy(tile->Tileset, ID, 8);
+	tile->Tileset = ID;
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );
 	tiles.push_back(tile);
@@ -83,12 +79,12 @@ TileObject* TileMap::GetTile(unsigned int idx)
 
 //doors
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indices, int count, DoorTrigger&& dt)
+	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
 	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
-	door->SetTiles( indices, count );
+	door->SetTiles(std::move(indices));
 	door->SetName( ID );
 	door->SetScriptName( Name );
 	doors.push_back( door );
@@ -217,14 +213,14 @@ Container* TileMap::GetContainer(const char* Name) const
 Container* TileMap::GetContainer(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
 		if (!container->BBox.PointInside(position)) continue;
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
@@ -241,7 +237,7 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 Container* TileMap::GetContainerByPosition(const Point &position, int type) const
 {
 	for (Container *container : containers) {
-		if (type != -1 && type != container->Type) {
+		if (type != -1 && type != container->containerType) {
 			continue;
 		}
 
@@ -250,7 +246,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 		}
 
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (container->Type == IE_CONTAINER_PILE) {
+		if (container->containerType == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
 			//if we looked only for piles, then we still return them
 			if ((type == -1) && !container->inventory.GetSlotCount()) {
@@ -265,7 +261,7 @@ Container* TileMap::GetContainerByPosition(const Point &position, int type) cons
 
 int TileMap::CleanupContainer(Container *container)
 {
-	if (container->Type!=IE_CONTAINER_PILE)
+	if (container->containerType != IE_CONTAINER_PILE)
 		return 0;
 	if (container->inventory.GetSlotCount())
 		return 0;
@@ -283,7 +279,7 @@ int TileMap::CleanupContainer(Container *container)
 }
 
 //infopoints
-InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, std::shared_ptr<Gem_Polygon> outline)
+InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, const std::shared_ptr<Gem_Polygon>& outline)
 {
 	InfoPoint* ip = new InfoPoint();
 	ip->SetScriptName( Name );
@@ -395,7 +391,7 @@ InfoPoint *TileMap::AdjustNearestTravel(Point &p)
 	return best;
 }
 
-Size TileMap::GetMapSize()
+Size TileMap::GetMapSize() const
 {
 	return Size((XCellCount*64), (YCellCount*64));
 }

@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "globals.h"
 #include "ie_types.h"
+#include "Resource.h"
 
 #include <bitset>
 #include <string>
@@ -50,11 +51,11 @@ public:
 	ResRef getSound(size_t i) const
 	{
 		if (i < sounds.size()) return sounds[i];
-		return nullptr;
+		return ResRef();
 	}
-	ieDword getInterval() const { return interval; }
-	ieDword getIntervalVariance() const { return intervalVariance; }
-	ieDword getTotalInterval() const;
+	tick_t getInterval() const { return interval; }
+	tick_t getIntervalVariance() const { return intervalVariance; }
+	tick_t getTotalInterval() const;
 	ieDword getTotalPitch() const;
 	ieDword getAppearance() const { return appearance; }
 	ieDword getFlags() const { return flags; }
@@ -69,8 +70,8 @@ public:
 	ieWord radius;
 	ieWord gain;	// percent
 	ieWord gainVariance;
-	ieDword interval;	// no pauses if zero
-	ieDword intervalVariance;
+	tick_t interval;	// no pauses if zero
+	tick_t intervalVariance;
 	ieDword pitchVariance;
 	ieDword appearance;
 	ieDword flags;

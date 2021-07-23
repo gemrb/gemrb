@@ -24,6 +24,8 @@
 
 #include "globals.h"
 
+#include "System/Logging.h"
+
 using namespace GemRB;
 
 #define G_UNLIKELY(x) (x)

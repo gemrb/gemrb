@@ -78,13 +78,12 @@ extern void ReleaseMemorySpell();
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader();
-	~SPLExtHeader();
 
 	ieByte SpellForm;
 	ieByte Hostile;
 	ieByte Location;
 	ieByte unknown2;
-	ieResRef MemorisedIcon;
+	ResRef memorisedIcon;
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
@@ -94,12 +93,11 @@ public:
 	ieWord DiceThrown;
 	ieWord DamageBonus;
 	ieWord DamageType;
-	ieWord FeatureCount;
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieWord ProjectileAnimation;
-	Effect* features;
+	std::vector<Effect*> features;
 };
 
 /**
@@ -111,16 +109,15 @@ public:
 class GEM_EXPORT Spell {
 public:
 	Spell();
-	~Spell();
 
-	SPLExtHeader *ext_headers;
-	Effect* casting_features;
+	std::vector<SPLExtHeader> ext_headers;
+	std::vector<Effect*> casting_features;
 
 	/** Resref of the spell itself */
-	ieResRef Name;
+	ResRef Name;
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
-	ieResRef CompletionSound;
+	ResRef CompletionSound;
 	ieDword Flags;
 	ieWord SpellType;
 	ieWord ExclusionSchool;
@@ -134,7 +131,7 @@ public:
 	ieDword unknown4;
 	ieDword SpellLevel;
 	ieWord unknown5;
-	ieResRef SpellbookIcon;
+	ResRef SpellbookIcon;
 	ieWord unknown6;
 	ieDword unknown7;
 	ieDword unknown8;
@@ -145,7 +142,6 @@ public:
 	ieDword unknown11;
 	ieDword unknown12;
 	ieDword ExtHeaderOffset;
-	ieWord ExtHeaderCount;
 	ieDword FeatureBlockOffset;
 	ieWord CastingFeatureOffset;
 	ieWord CastingFeatureCount;
@@ -159,16 +155,16 @@ public:
 
 public:
 	//returns the requested extended header
-	inline SPLExtHeader *GetExtHeader(unsigned int which) const
+	inline const SPLExtHeader *GetExtHeader(size_t which) const
 	{
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			which = 0;
 		}
 
-		if(ExtHeaderCount<=which) {
+		if (ext_headers.size() <= which) {
 			return NULL;
 		}
-		return ext_headers+which;
+		return &ext_headers[which];
 	}
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;

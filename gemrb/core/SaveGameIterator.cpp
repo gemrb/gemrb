@@ -20,7 +20,6 @@
 
 #include "SaveGameIterator.h"
 
-#include "iless.h"
 #include "strrefs.h"
 
 #include "DisplayMessage.h"
@@ -62,7 +61,7 @@ static void ParseGameDate(DataStream *ds, char *Date)
 	ds->Read(Signature, 8);
 	ds->ReadDword(GameTime);
 	delete ds;
-	if (memcmp(Signature,"GAME",4) ) {
+	if (memcmp(Signature, "GAME", 4) != 0) {
 		strcpy(Date, "ERROR");
 		return;
 	}
@@ -131,10 +130,6 @@ SaveGame::SaveGame(const char* path, const char* name, const char* prefix, const
 	GameDate[0] = '\0';
 }
 
-SaveGame::~SaveGame()
-{
-}
-
 Holder<Sprite2D> SaveGame::GetPortrait(int index) const
 {
 	if (index > PortraitCount) {
@@ -178,14 +173,6 @@ const char* SaveGame::GetGameDate() const
 	return GameDate;
 }
 
-SaveGameIterator::SaveGameIterator(void)
-{
-}
-
-SaveGameIterator::~SaveGameIterator(void)
-{
-}
-
 // mission pack save dir or the main one?
 static char saveDir[10];
 static const char* SaveDir()
@@ -200,7 +187,7 @@ static const char* SaveDir()
 
 #define FormatQuickSavePath(destination, i) \
 	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
-		core->SavePath,SaveDir(), SPathDelimiter,i,folder);
+		core->config.SavePath, SaveDir(), SPathDelimiter, i, folder)
 
 /*
  * Returns the first 0 bit position of an integer
@@ -227,7 +214,7 @@ static int IsQuickSaveSlot(const char* match, const char* slotname)
 	if (cnt != 2) {
 		return 0;
 	}
-	if (stricmp(savegameName, match) )
+	if (stricmp(savegameName, match) != 0)
 	{
 		return 0;
 	}
@@ -288,7 +275,7 @@ bool SaveGameIterator::RescanSaveGames()
 	save_slots.clear();
 
 	char Path[_MAX_PATH];
-	PathJoin(Path, core->SavePath, SaveDir(), nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir(), nullptr);
 
 	DirectoryIterator dir(Path);
 	// create the save game directory at first access
@@ -303,18 +290,17 @@ bool SaveGameIterator::RescanSaveGames()
 		return false;
 	}
 
-	std::set<char*,iless> slots;
+	std::set<std::string> slots;
 	dir.SetFlags(DirectoryIterator::Directories);
 	do {
 		const char *name = dir.GetName();
 		if (IsSaveGameSlot( Path, name )) {
-			slots.insert(strdup(name));
+			slots.emplace(name);
 		}
 	} while (++dir);
 
-	for (std::set<char*,iless>::iterator i = slots.begin(); i != slots.end(); ++i) {
-		save_slots.push_back(BuildSaveGame(*i));
-		free(*i);
+	for (const auto& slot : slots) {
+		save_slots.push_back(BuildSaveGame(slot.c_str()));
 	}
 
 	return true;
@@ -331,9 +317,9 @@ Holder<SaveGame> SaveGameIterator::GetSaveGame(const char *name)
 {
 	RescanSaveGames();
 
-	for (std::vector<Holder<SaveGame> >::iterator i = save_slots.begin(); i != save_slots.end(); ++i) {
-		if (strcmp(name, (*i)->GetName()) == 0)
-			return *i;
+	for (const auto& saveSlot : save_slots) {
+		if (strcmp(name, saveSlot->GetName()) == 0)
+			return saveSlot;
 	}
 	return NULL;
 }
@@ -347,7 +333,7 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 	int prtrt = 0;
 	char Path[_MAX_PATH];
 	//lets leave space for the filenames
-	PathJoin(Path, core->SavePath, SaveDir(), slotname, nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir(), slotname, nullptr);
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
@@ -368,11 +354,10 @@ Holder<SaveGame> SaveGameIterator::BuildSaveGame(const char *slotname)
 			prtrt++;
 	} while (++dir);
 
-	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber );
-	return sg;
+	return MakeHolder<SaveGame>(Path, savegameName, core->GameNameResRef, slotname, prtrt, savegameNumber);
 }
 
-void SaveGameIterator::PruneQuickSave(const char *folder)
+void SaveGameIterator::PruneQuickSave(const char *folder) const
 {
 	// FormatQuickSavePath needs: _MAX_PATH + 6 + 1 + 9 + 17
 	char from[_MAX_PATH + 40];
@@ -380,8 +365,8 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
-	for (charlist::iterator m = save_slots.begin(); m != save_slots.end(); ++m) {
-		int tmp = IsQuickSaveSlot(folder, (*m)->GetSlotName() );
+	for (const auto& saveSlot : save_slots) {
+		int tmp = IsQuickSaveSlot(folder, saveSlot->GetSlotName());
 		if (tmp) {
 			size_t pos = myslots.size();
 			while(pos-- && myslots[pos]>tmp) ;
@@ -397,7 +382,6 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	int n=myslots[size-1];
 	size_t hole = GetHole(n);
-	size_t i;
 	if (hole<size) {
 		//prune second path
 		FormatQuickSavePath(from, myslots[hole]);
@@ -407,7 +391,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	}
 	//shift paths, always do this, because they are aging
 	size = myslots.size();
-	for(i=size;i--;) {
+	for (size_t i = size; i > 0; i--) {
 		FormatQuickSavePath(from, myslots[i]);
 		FormatQuickSavePath(to, myslots[i]+1);
 		int errnum = rename(from, to);
@@ -418,9 +402,9 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 }
 
 /** Save game to given directory */
-static bool DoSaveGame(const char *Path)
+static bool DoSaveGame(const char *Path, bool overrideRunning)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//saving areas to cache currently in memory
 	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
 	while (mc--) {
@@ -434,7 +418,7 @@ static bool DoSaveGame(const char *Path)
 
 	//compress files in cache named: .STO and .ARE
 	//no .CRE would be saved in cache
-	if (core->CompressSave(Path)) {
+	if (core->CompressSave(Path, overrideRunning)) {
 		return false;
 	}
 
@@ -456,7 +440,7 @@ static bool DoSaveGame(const char *Path)
 
 	//Create portraits
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Actor *actor = game->GetPC( i, false );
+		const Actor *actor = game->GetPC( i, false );
 		Holder<Sprite2D> portrait = actor->CopyPortrait(true);
 
 		if (portrait) {
@@ -489,6 +473,13 @@ static bool DoSaveGame(const char *Path)
 static int CanSave()
 {
 	//some of these restrictions might not be needed
+	// NOTE: can't save  during a rest, chapter information or movie (ref CANTSAVEMOVIE)
+	// is handled automatically, but without a message
+	if (core->InCutSceneMode()) {
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
+		return 1;
+	}
+
 	const Store *store = core->GetCurrentStore();
 	if (store) {
 		displaymsg->DisplayConstantString(STR_CANTSAVESTORE, DMC_BG2XPGREEN);
@@ -518,6 +509,13 @@ static int CanSave()
 	if (!map) {		
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 		return -1;
+	}
+
+	// hopefully not too strict — we check for any projectile, not just repeating AOE
+	proIterator pIter;
+	if (map->GetProjectileCount(pIter)) {
+		// can't save while AOE spells are in effect
+		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
 	}
 
 	if (map->AreaFlags&AF_NOSAVE) {
@@ -558,16 +556,13 @@ static int CanSave()
 		}
 	}
 
-	//TODO: can't save while AOE spells are in effect -> CANTSAVE
-	//TODO: can't save  during a rest, chapter information or movie -> CANTSAVEMOVIE
-
 	return 0;
 }
 
 static bool CreateSavePath(char *Path, int index, const char *slotname) WARN_UNUSED;
 static bool CreateSavePath(char *Path, int index, const char *slotname)
 {
-	PathJoin(Path, core->SavePath, SaveDir(), nullptr);
+	PathJoin(Path, core->config.SavePath, SaveDir(), nullptr);
 
 	//if the path exists in different case, don't make it again
 	if (!MakeDirectory(Path)) {
@@ -588,7 +583,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 	return true;
 }
 
-int SaveGameIterator::CreateSaveGame(int index, bool mqs)
+int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 {
 	AutoTable tab("savegame");
 	const char *slotname = NULL;
@@ -607,62 +602,68 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs)
 	if (int cansave = CanSave())
 		return cansave;
 
+	bool overrideRunning = false;
 	//if index is not an existing savegame, we create a unique slotname
-	for (size_t i = 0; i < save_slots.size(); ++i) {
-		Holder<SaveGame> save = save_slots[i];
-		if (save->GetSaveID() == index) {
-			DeleteSaveGame(save);
-			break;
+	for (const auto& save : save_slots) {
+		if (save->GetSaveID() != index) continue;
+
+		if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
+			overrideRunning = true;
+			if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
+				return GEM_ERROR;
+			}
 		}
+
+		DeleteSaveGame(save);
+		break;
 	}
 	char Path[_MAX_PATH];
 	GameControl *gc = core->GetGameControl();
-
+	assert(gc);
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
-		return -1;
+		gc->SetDisplayText(STR_CANTSAVE, 30);
+		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
-		return -1;
+		gc->SetDisplayText(STR_CANTSAVE, 30);
+		return GEM_ERROR;
 	}
 
 	// Save successful / Quick-save successful
 	if (qsave) {
 		displaymsg->DisplayConstantString(STR_QSAVESUCCEED, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_QSAVESUCCEED, 30);
-		}
+		gc->SetDisplayText(STR_QSAVESUCCEED, 30);
 	} else {
 		displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_SAVESUCCEED, 30);
-		}
+		gc->SetDisplayText(STR_SAVESUCCEED, 30);
 	}
-	return 0;
+	return GEM_OK;
 }
 
-int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname)
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname) const
 {
 	if (!slotname) {
-		return -1;
+		return GEM_ERROR;
 	}
 
 	if (int cansave = CanSave())
 		return cansave;
 
-	GameControl *gc = core->GetGameControl();
 	int index;
+	bool overrideRunning = false;
 
 	if (save) {
 		index = save->GetSaveID();
+		if (core->saveGameAREExtractor.isRunningSaveGame(*save)) {
+			overrideRunning = true;
+
+			if (core->saveGameAREExtractor.createCacheBlob() == GEM_ERROR) {
+				return GEM_ERROR;
+			}
+		}
 
 		DeleteSaveGame(save);
 		save.release();
@@ -671,40 +672,35 @@ int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname
 		//probably the hardcoded slot names should be read by this object
 		//in that case 7 == size of hardcoded slot names array (savegame.2da)
 		index = 7;
-		for (size_t i = 0; i < save_slots.size(); ++i) {
-			Holder<SaveGame> save = save_slots[i];
-			if (save->GetSaveID() >= index) {
-				index = save->GetSaveID() + 1;
+		for (const auto& save2 : save_slots) {
+			if (save2->GetSaveID() >= index) {
+				index = save2->GetSaveID() + 1;
 			}
 		}
 	}
 
+	GameControl *gc = core->GetGameControl();
+	assert(gc); //this is already checked in CanSave and core only has one if there is a game anyway
 	char Path[_MAX_PATH];
 	if (!CreateSavePath(Path, index, slotname)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
-		return -1;
+		gc->SetDisplayText(STR_CANTSAVE, 30);
+		return GEM_ERROR;
 	}
 
-	if (!DoSaveGame(Path)) {
+	if (!DoSaveGame(Path, overrideRunning)) {
 		displaymsg->DisplayConstantString(STR_CANTSAVE, DMC_BG2XPGREEN);
-		if (gc) {
-			gc->SetDisplayText(STR_CANTSAVE, 30);
-		}
-		return -1;
+		gc->SetDisplayText(STR_CANTSAVE, 30);
+		return GEM_ERROR;
 	}
 
 	// Save successful
 	displaymsg->DisplayConstantString(STR_SAVESUCCEED, DMC_BG2XPGREEN);
-	if (gc) {
-		gc->SetDisplayText(STR_SAVESUCCEED, 30);
-	}
-	return 0;
+	gc->SetDisplayText(STR_SAVESUCCEED, 30);
+	return GEM_OK;
 }
 
-void SaveGameIterator::DeleteSaveGame(Holder<SaveGame> game)
+void SaveGameIterator::DeleteSaveGame(const Holder<SaveGame>& game) const
 {
 	if (!game) {
 		return;

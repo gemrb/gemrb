@@ -24,17 +24,13 @@
 
 #include "FileCache.h"
 #include "Interface.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 using namespace GemRB;
 
 MOSImporter::MOSImporter(void)
 {
 	Cols = Rows = BlockSize = PalOffset = 0;
-}
-
-MOSImporter::~MOSImporter(void)
-{
 }
 
 bool MOSImporter::Open(DataStream* stream)

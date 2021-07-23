@@ -37,7 +37,7 @@ class TextContainer;
 struct LayoutRegion {
 	Region region;
 	
-	LayoutRegion(Region r)
+	explicit LayoutRegion(Region r)
 	: region(r) {}
 };
 
@@ -54,7 +54,7 @@ protected:
 	ContentContainer* parent;
 
 public:
-	Content(const Size& size);
+	explicit Content(const Size& size);
 	virtual ~Content() = default;
 
 	virtual Size ContentFrame() const { return frame.size; };
@@ -113,7 +113,7 @@ private:
 	Holder<Sprite2D> image;
 
 public:
-	ImageSpan(Holder<Sprite2D> image);
+	explicit ImageSpan(const Holder<Sprite2D>& image);
 
 protected:
 	void DrawContentsInRegions(const LayoutRegions&, const Point&) const override;
@@ -134,7 +134,7 @@ public:
 
 		Margin() : top(0), right(0), bottom(0), left(0) {}
 
-		Margin(ieByte top)
+		explicit Margin(ieByte top)
 		: top(top), right(top), bottom(top), left(top) {}
 
 		Margin(ieByte top, ieByte right)
@@ -156,7 +156,7 @@ protected:
 		
 		Layout(const Content* c, LayoutRegions rgns)
 		: content(c), regions(std::move(rgns)) {
-			assert(regions.size());
+			assert(!regions.empty());
 		}
 
 		bool operator==(const Content* c) const {
@@ -186,7 +186,7 @@ protected:
 	Margin margin;
 
 public:
-	ContentContainer(const Region& frame);
+	explicit ContentContainer(const Region& frame);
 	~ContentContainer() override;
 
 	// append a container to the end of the container. The container takes ownership of the span.
@@ -253,16 +253,7 @@ private:
 	void ContentRemoved(const Content* content) override;
 
 	void MoveCursorToPoint(const Point& p);
-	LayoutRegions::const_iterator FindCursorRegion(const Layout&);
-
-	// relative to cursor pos
-	void InsertText(const String& text);
-	void DeleteText(size_t len);
-
-	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
-	bool OnMouseDrag(const MouseEvent& /*me*/) override;
-	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
-	void OnTextInput(const TextEvent& /*te*/) override;
+	LayoutRegions::const_iterator FindCursorRegion(const Layout&) const;
 
 	void DrawSelf(Region drawFrame, const Region& clip) override;
 	void DrawContents(const Layout& layout, Point point) override;
@@ -276,6 +267,10 @@ private:
 public:
 	TextContainer(const Region& frame, Font* font);
 	~TextContainer();
+	
+	// relative to cursor pos
+	void InsertText(const String& text);
+	void DeleteText(size_t len);
 
 	void AppendText(const String& text);
 	void AppendText(const String& text, const Font* fnt, const Font::PrintColors* = nullptr);
@@ -295,6 +290,11 @@ public:
 	void CursorHome();
 	void CursorEnd();
 	void AdvanceCursor(int);
+	
+	bool OnMouseDown(const MouseEvent& /*me*/, unsigned short /*Mod*/) override;
+	bool OnMouseDrag(const MouseEvent& /*me*/) override;
+	bool OnKeyPress(const KeyboardEvent& /*Key*/, unsigned short /*Mod*/) override;
+	void OnTextInput(const TextEvent& /*te*/) override;
 
 	using EditCallback = Callback<void, TextContainer&>;
 	EditCallback callback;

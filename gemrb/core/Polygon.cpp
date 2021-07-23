@@ -27,10 +27,10 @@
 
 namespace GemRB {
 
-Gem_Polygon::Gem_Polygon(const Point* points, unsigned int cnt, Region *bbox)
-: vertices(points, points + cnt)
+Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, Region *bbox)
+: vertices(std::move(points))
 {
-	assert(cnt >= 3);
+	assert(vertices.size() >= 3);
 
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
@@ -290,9 +290,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 	ys.reserve(2*count);
 
 	// y coords of vertices
-	unsigned int i;
-
-	for (i = 0; i < count; ++i)
+	for (unsigned int i = 0; i < count; ++i)
 		ys.push_back(vertices[i].y);
 
 	Point p;
@@ -346,7 +344,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		// (We're taking the intersections along the 'upper' edge of 
 		// the nexty scanline.)
 		ints.clear();
-		for (i = 0; i < count; ++i) {
+		for (unsigned int i = 0; i < count; ++i) {
 			const Point& a = vertices[i];
 			const Point& b = vertices[(i+1)%count];
 
@@ -377,7 +375,7 @@ std::vector<Trapezoid> Gem_Polygon::ComputeTrapezoids() const
 		std::sort(ints.begin(), ints.end());
 		unsigned int newtcount = (unsigned int) (ints.size() / 2);
 
-		for (i = 0; i < newtcount; ++i) {
+		for (unsigned int i = 0; i < newtcount; ++i) {
 			t.left_edge = ints[2*i].pi;
 			t.right_edge = ints[2*i+1].pi;
 

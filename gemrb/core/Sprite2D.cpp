@@ -19,45 +19,87 @@
  */
 
 #include "Sprite2D.h"
+#include "Video/RLE.h"
 
 namespace GemRB {
 
 const TypeID Sprite2D::ID = { "Sprite2D" };
 
-Sprite2D::Sprite2D(const Region& rgn, int Bpp, void* pixels)
-	: pixels(pixels), Frame(rgn), Bpp(Bpp)
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir)
 {
-	freePixels = (pixels != NULL);
-	BAM = false;
+	return GetIterator(xdir, ydir, Region(Point(), Frame.size));
 }
 
-Sprite2D::Sprite2D(const Sprite2D &obj)
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
+										 const Region& clip)
 {
-	BAM = false;
+	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
+	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
+	return Iterator(pixels, pitch, format, xdir, ydir, clip);
+}
 
-	Frame = obj.Frame;
-	Bpp = obj.Bpp;
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir) const
+{
+	return GetIterator(xdir, ydir, Region(Point(), Frame.size));
+}
+
+Sprite2D::Iterator Sprite2D::GetIterator(IPixelIterator::Direction xdir, IPixelIterator::Direction ydir,
+										 const Region& clip) const
+{
+	if (renderFlags & BlitFlags::MIRRORX) xdir = IPixelIterator::Direction(int(xdir) * -1);
+	if (renderFlags & BlitFlags::MIRRORY) ydir = IPixelIterator::Direction(int(ydir) * -1);
+	return Iterator(pixels, pitch, format, xdir, ydir, clip);
+}
+
+Sprite2D::Sprite2D(const Region& rgn, void* pixels, const PixelFormat& fmt, uint16_t pitch) noexcept
+: pixels(pixels), freePixels(pixels), format(fmt), pitch(pitch), Frame(rgn)
+{}
+
+Sprite2D::Sprite2D(const Region& frame, void* pixels, const PixelFormat& fmt) noexcept
+: Sprite2D(frame, pixels, fmt, frame.w)
+{}
+
+Sprite2D::Sprite2D(const Sprite2D &obj) noexcept
+: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
+{
 	renderFlags = obj.renderFlags;
-
-	pixels = obj.pixels;
 	freePixels = false;
 }
 
-Sprite2D::~Sprite2D()
+Sprite2D::Sprite2D(Sprite2D&& obj) noexcept
+: Sprite2D(obj.Frame, obj.pixels, obj.format, obj.pitch)
+{
+	renderFlags = obj.renderFlags;
+}
+
+Sprite2D::~Sprite2D() noexcept
 {
 	if (freePixels) {
 		free(pixels);
 	}
 }
 
-Color Sprite2D::GetPixel(int x, int y) const
+Color Sprite2D::GetPixel(const Point& p) const noexcept
 {
-	return GetPixel(Point(x, y));
+	if (Region(0, 0, Frame.w, Frame.h).PointInside(p)) {
+		Iterator it = GetIterator();
+		it.Advance(p.y * Frame.w + p.x);
+		return it.ReadRGBA();
+	}
+	return Color();
 }
 
-bool Sprite2D::IsPixelTransparent(const Point& p) const
+bool Sprite2D::HasTransparency() const noexcept
 {
-	return GetPixel(p).a == 0;
+	return format.HasColorKey || format.Amask;
+}
+
+bool Sprite2D::IsPixelTransparent(const Point& p) const noexcept
+{
+	if (HasTransparency()) {
+		return GetPixel(p).a == 0;
+	}
+	return false;
 }
 
 const void* Sprite2D::LockSprite() const
@@ -70,7 +112,45 @@ void* Sprite2D::LockSprite()
 	return pixels;
 }
 
-void Sprite2D::UnlockSprite() const
-{}
+void Sprite2D::SetPalette(const PaletteHolder& pal)
+{
+	assert(format.Bpp == 1);
+	assert(pal != nullptr);
+
+	if (pal == format.palette) return;
+	
+	if (format.RLE) {
+		format.palette = pal;
+	} else {
+		// we don't use shared palettes because it is a performance bottleneck on SDL2
+		format.palette = pal->Copy();
+	}
+	
+	UpdatePalette(format.palette);
+}
+
+void Sprite2D::SetColorKey(colorkey_t key)
+{
+	format.ColorKey = key;
+	UpdateColorKey(key);
+}
+
+bool Sprite2D::ConvertFormatTo(const PixelFormat& newfmt) noexcept
+{
+	// we rely on the subclasses to handle most format conversions
+	if (format.RLE && newfmt.RLE == false && newfmt.Bpp == 1) {
+		uint8_t* rledata = static_cast<uint8_t*>(pixels);
+		pixels = DecodeRLEData(rledata, Frame.size, format.ColorKey);
+		if (freePixels) {
+			free(rledata);
+		} else {
+			freePixels = true;
+		}
+		format = newfmt;
+		assert(format.palette);
+		return true;
+	}
+	return false;
+}
 
 }

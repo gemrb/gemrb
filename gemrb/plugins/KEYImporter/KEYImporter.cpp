@@ -37,8 +37,8 @@ KEYImporter::KEYImporter(void)
 KEYImporter::~KEYImporter(void)
 {
 	free(description);
-	for (unsigned int i = 0; i < biffiles.size(); i++) {
-		free( biffiles[i].name );
+	for (auto& bifFile : biffiles) {
+		free(bifFile.name);
 	}
 }
 
@@ -73,10 +73,8 @@ static bool PathExists(BIFEntry *entry, const char *path)
 
 static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist)
 {
-	size_t i;
-	
-	for(i=0;i<pathlist.size();i++) {
-		if (PathExists(entry, pathlist[i].c_str() )) {
+	for (const auto& path : pathlist) {
+		if (PathExists(entry, path.c_str())) {
 			return true;
 		}
 	}
@@ -87,20 +85,20 @@ static bool PathExists(BIFEntry *entry, const std::vector<std::string> &pathlist
 static void FindBIF(BIFEntry *entry)
 {
 	entry->cd = 0;
-	entry->found = PathExists(entry, core->GamePath);
+	entry->found = PathExists(entry, core->config.GamePath);
 	if (entry->found) {
 		return;
 	}
 	// also check the data/Data path for gog
 	char path[_MAX_PATH];
-	PathJoin(path, core->GamePath, core->GameDataPath, nullptr);
+	PathJoin(path, core->config.GamePath, core->config.GameDataPath, nullptr);
 	entry->found = PathExists(entry, path);
 	if (entry->found) {
 		return;
 	}
 
 	for (int i = 0; i < MAX_CD; i++) {
-		if (PathExists(entry, core->CD[i]) ) {
+		if (PathExists(entry, core->config.CD[i])) {
 			entry->found = true;
 			entry->cd = i;
 			return;
@@ -188,7 +186,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		f->ReadDword(ResLocator);
 
 		// seems to be always the last entry?
-		if (key.ref[0] != 0)
+		if (!key.ref.IsEmpty())
 			resources.set(key, ResLocator);
 	}
 
@@ -199,7 +197,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 
 bool KEYImporter::HasResource(const char* resname, SClass_ID type)
 {
-	return resources.has(resname, type);
+	return resources.has(ResRef(resname), type);
 }
 
 bool KEYImporter::HasResource(const char* resname, const ResourceDesc &type)
@@ -212,7 +210,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 	if (type == 0)
 		return NULL;
 
-	const ieDword *ResLocator = resources.get(resname, type);
+	const ieDword *ResLocator = resources.get(ResRef(resname), type);
 	if (!ResLocator)
 		return 0;
 

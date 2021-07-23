@@ -41,15 +41,15 @@ class ScriptingRefBase {
 public:
 	const ScriptingId Id; // unique id for each object in a ScriptingGroup
 
-	ScriptingRefBase(ScriptingId id)
+	explicit ScriptingRefBase(ScriptingId id)
 	: Id(id) {}
 
-	virtual ~ScriptingRefBase() {};
+	virtual ~ScriptingRefBase() = default;
 
 	// key to separate groups of objects for faster searching and id collision prevention
 	virtual const ResRef& ScriptingGroup() const=0;
 	// class to instantiate on the script side (Python)
-	virtual const ScriptingClassId ScriptingClass() const=0;
+	virtual ScriptingClassId ScriptingClass() const=0;
 };
 
 template <class T>
@@ -95,7 +95,7 @@ public:
 
 	class Parameter {
 		struct TypeInterface {
-			virtual ~TypeInterface() {};
+			virtual ~TypeInterface() = default;
 			virtual TypeInterface* Clone() const = 0;
 			virtual const std::type_info& Type() const = 0;
 		};
@@ -103,7 +103,7 @@ public:
 		template <typename T>
 		struct ConcreteType : public TypeInterface {
 			T value;
-			ConcreteType(T value) : value(value) {}
+			explicit ConcreteType(T value) : value(value) {}
 
 			TypeInterface *Clone() const override
 			{
@@ -119,7 +119,7 @@ public:
 
 	public:
 		template <typename T>
-		Parameter(T value) {
+		explicit Parameter(T value) {
 			ptr = new ConcreteType<T>(value);
 		}
 
@@ -164,8 +164,7 @@ public:
 	static const ScriptingId InvalidId = static_cast<ScriptingId>(-1);
 
 public:
-	ScriptEngine(void) {};
-	~ScriptEngine(void) override {};
+	ScriptEngine() = default;
 	/** Initialization Routine */
 	virtual bool Init(void) = 0;
 	/** Load Script */

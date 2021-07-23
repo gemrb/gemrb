@@ -1820,10 +1820,8 @@ def GetRealPrice (pc, mode, Item, Slot):
 			                    CommonTables.ItemType.GetRowIndex ("AMULET")]:
 				count = 0
 			# give at least 20 %
-			if count * Store['Depreciation'] > 80:
-				mod = 20
-			else:
-				mod -= count * Store['Depreciation']
+			mod -= count * Store['Depreciation']
+			mod = max(mod, 20)
 	else:
 		# charisma modifier (in percent)
 		mod += GemRB.GetAbilityBonus (IE_CHR, GemRB.GetPlayerStat (BarteringPC, IE_CHR) - 1, 0)
@@ -1923,7 +1921,7 @@ def BuyHeal ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Spell = GemRB.GetSpell (Cure['CureResRef'])
 	# for anything but raise/resurrect, the talker should be the caster, so
-	# self-targetting spells work properly. Raise dead is an exception as
+	# self-targeting spells work properly. Raise dead is an exception as
 	# the teleporting to the temple would not work otherwise
 	if Spell["SpellTargetType"] == 3: # non-living
 		GemRB.ApplySpell (pc, Cure['CureResRef'], Store['StoreOwner'])

@@ -74,43 +74,26 @@ void ReleaseMemorySpell()
 
 SPLExtHeader::SPLExtHeader(void)
 {
-	features = NULL;
 	SpellForm = unknown2 = Target = TargetNumber = Hostile = 0;
 	RequiredLevel = CastingTime = ProjectileAnimation = Location = 0;
 	DiceSides = DiceThrown = DamageBonus = DamageType = Range = 0;
-	FeatureCount = FeatureOffset = Charges = ChargeDepletion = 0;
-	MemorisedIcon[0] = 0;
-}
-
-SPLExtHeader::~SPLExtHeader(void)
-{
-	delete [] features;
+	FeatureOffset = Charges = ChargeDepletion = 0;
 }
 
 Spell::Spell(void)
 {
-	ext_headers = NULL;
-	casting_features = NULL;
 	if (!inited) {
 		inited = true;
 		InitSpellTables();
 		damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
 	}
 	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
-	CastingGraphics = CastingSound = ExtHeaderOffset = ExtHeaderCount = 0;
+	CastingGraphics = CastingSound = ExtHeaderOffset = 0;
 	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
 	unknown7 = unknown8 = unknown9 = unknown10 = unknown11 = unknown12 = 0;
 	FeatureBlockOffset = CastingFeatureOffset = CastingFeatureCount = 0;
 	TimePerLevel = TimeConstant = 0;
 	SpellName = SpellNameIdentified = Flags = SpellType = ExclusionSchool = PriestType = 0;
-}
-
-Spell::~Spell(void)
-{
-	//Spell is in the core, so this is not needed, i guess (Avenger)
-	//core->FreeSPLExt(ext_headers, casting_features);
-	delete [] ext_headers;
-	delete [] casting_features;
 }
 
 int Spell::GetHeaderIndexFromLevel(int level) const
@@ -119,13 +102,13 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 	if (Flags & SF_SIMPLIFIED_DURATION) {
 		return level;
 	}
-	int block_index;
-	for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
-		if (ext_headers[block_index+1].RequiredLevel>level) {
-			return block_index;
+
+	for (size_t headerIndex = 0; headerIndex < ext_headers.size() - 1; ++headerIndex) {
+		if (ext_headers[headerIndex + 1].RequiredLevel > level) {
+			return int(headerIndex);
 		}
 	}
-	return ExtHeaderCount-1;
+	return int(ext_headers.size()) - 1;
 }
 
 //-1 will return cfb
@@ -137,7 +120,7 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 {
 	char g, t;
 	Effect *fx;
-	ieResRef Resource;
+	ResRef Resource;
 
 	int cgsound = CastingSound;
 	if (cgsound>=0 && duration > 1) {
@@ -157,10 +140,10 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 			}
 		} else {
 			//how style, no pure background sound
-
-			switch(gender) {
-			default: g = 'm'; break;
-			case SEX_FEMALE: g = 'f'; break;
+			if (gender == SEX_FEMALE) {
+				g = 'f';
+			} else {
+				g = 'm';
 			}
 		}
 		if (SpellType==IE_SPL_PRIEST) {
@@ -170,11 +153,9 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 		}
 		//check if bg1
 		if (!core->HasFeature(GF_CASTING_SOUNDS) && !core->HasFeature(GF_CASTING_SOUNDS2)) {
-			ieResRef s;
-			snprintf(s, 9, "CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
-			strnuprcpy(Resource, s, sizeof(ieResRef)-1);
+			Resource.SNPrintF("CAS_P%c%01d%c", t, std::min(cgsound, 9), g);
 		} else {
-			snprintf(Resource, 9,"CHA_%c%c%02d", g, t, std::min(cgsound&0xff, 99));
+			Resource.SNPrintF("CHA_%c%c%02d", g, t, std::min(cgsound & 0xff, 99));
 		}
 		// only actors have fxqueue's and also the parent function checks for that
 		Actor *caster = (Actor *) fxqueue->GetOwner();
@@ -186,43 +167,39 @@ void Spell::AddCastingGlow(EffectQueue *fxqueue, ieDword duration, int gender) c
 	fx->InventorySlot = 0xffff;
 	fx->Projectile = 0;
 	fxqueue->AddEffect(fx);
-	//AddEffect creates a copy, we need to destroy the original
-	delete fx;
 }
 
 EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block_index, int level, ieDword pro) const
 {
 	bool pst_hostile = false;
-	Effect *features;
-	int count;
+	Effect *const *features;
+	size_t count;
 
 	//iwd2 has this hack
 	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
-			features = ext_headers[0].features;
-			count = ext_headers[0].FeatureCount;
+			features = ext_headers[0].features.data();
+			count = ext_headers[0].features.size();
 		} else {
-			features = ext_headers[block_index].features;
-			count = ext_headers[block_index].FeatureCount;
+			features = ext_headers[block_index].features.data();
+			count = ext_headers[block_index].features.size();
 			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
 	} else {
-		features = casting_features;
+		features = casting_features.data();
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
 	EffectQueue *selfqueue = NULL;
 
-	for (int i=0;i<count;i++) {
-		Effect *fx = features+i;
+	for (size_t i = 0; i < count; ++i) {
+		Effect *fx = features[i];
 
 		if ((Flags & SF_SIMPLIFIED_DURATION) && (block_index>=0)) {
 			//hack the effect according to Level
-			//fxqueue->AddEffect will copy the effect,
-			//so we don't risk any overwriting
-			if (EffectQueue::HasDuration(features+i)) {
+			if (EffectQueue::HasDuration(features[i])) {
 				fx->Duration = (TimePerLevel*block_index+TimeConstant)*core->Time.round_sec;
 			}
 		}
@@ -275,18 +252,17 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 		if (fx->Target != FX_TARGET_SELF) {
 			fx->Projectile = pro;
-			fxqueue->AddEffect( fx );
+			fxqueue->AddEffect(new Effect(*fx));
 		} else {
 			fx->Projectile = 0;
-			fx->PosX=pos.x;
-			fx->PosY=pos.y;
+			fx->Pos = pos;
 			if (!selfqueue) {
 				selfqueue = new EffectQueue();
 			}
 			// effects should be able to affect non living targets
 			//This is done by NULL target, the position should be enough
 			//to tell which non-actor object is affected
-			selfqueue->AddEffect( fx );
+			selfqueue->AddEffect(new Effect(*fx));
 		}
 	}
 	if (self && selfqueue) {
@@ -302,11 +278,11 @@ Projectile *Spell::GetProjectile(Scriptable *self, int header, int level, const 
 	const SPLExtHeader *seh = GetExtHeader(header);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
-			header, (int) ExtHeaderCount);
+			header, (int) ext_headers.size());
 		return NULL;
 	}
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
-	if (seh->FeatureCount) {
+	if (seh->features.size()) {
 		pro->SetEffects(GetEffectBlock(self, target, header, level, seh->ProjectileAnimation));
 	}
 	pro->Range = GetCastingDistance(self);
@@ -333,7 +309,7 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 	const SPLExtHeader *seh = GetExtHeader(idx);
 	if (!seh) {
 		Log(ERROR, "Spell", "Cannot retrieve spell header!!! required header: %d, maximum: %d",
-			idx, (int) ExtHeaderCount);
+			idx, (int) ext_headers.size());
 		return 0;
 	}
 
@@ -346,9 +322,8 @@ unsigned int Spell::GetCastingDistance(Scriptable *Sender) const
 // checks if any of the extended headers contains fx_damage
 bool Spell::ContainsDamageOpcode() const
 {
-	for (int h=0; h< ExtHeaderCount; h++) {
-		for (int i=0; i< ext_headers[h].FeatureCount; i++) {
-			const Effect *fx = ext_headers[h].features + i;
+	for (const SPLExtHeader& header : ext_headers) {
+		for (const Effect *fx : header.features) {
 			if (fx->Opcode == damageOpcode) {
 				return true;
 			}

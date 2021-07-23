@@ -325,11 +325,6 @@ def UpdateFloatMenuSingleAction (i):
 
 def UpdateFloatMenuGroupAction (i):
 	Window = FloatMenuWindow
-	#butts = [ ('AMGUARD', 31657, ''),
-	#	  ('AMTLK', 41653, ''),
-	#	  ('AMATTCK', 41654, ''),
-	#	  ('AMALLSTP', 41655, ''),
-	#	  ('AMGENS', '', '') ]
 
 	butts = [ ACT_DEFEND, ACT_TALK, ACT_ATTACK, ACT_STOP, ACT_SEARCH ]
 	# Guard
@@ -338,9 +333,6 @@ def UpdateFloatMenuGroupAction (i):
 	# Abort Current Action
 	Button = Window.GetControl (CID_SLOTS + i)
 
-	#Button.SetSprites (butts[i][0], 0, 0, 1, 2, 3)
-	#Button.SetTooltip (butts[i][1])
-	#Button.SetText ('')
 	Button.SetActionIcon (globals(), butts[i], i+1 )
 	Button.SetState (IE_GUI_BUTTON_ENABLED)
 

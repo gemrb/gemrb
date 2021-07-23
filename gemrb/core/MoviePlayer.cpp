@@ -23,6 +23,9 @@
 #include "GUI/Label.h"
 #include "Interface.h"
 
+#include <chrono>
+#include <thread>
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
@@ -116,6 +119,40 @@ void MoviePlayer::Play(Window* win)
 void MoviePlayer::Stop()
 {
 	isPlaying = false;
+}
+
+void MoviePlayer::get_current_time(long &sec, long &usec) const
+{
+	auto time = GetTicks();
+
+	sec = time / 1000;
+	usec = (time % 1000) * 1000;
+}
+
+void MoviePlayer::timer_start()
+{
+	get_current_time(timer_last_sec, timer_last_usec);
+}
+
+void MoviePlayer::timer_wait(unsigned int frame_wait)
+{
+	long sec, usec;
+	get_current_time(sec, usec);
+
+	while (sec > timer_last_sec) {
+		usec += 1000000;
+		timer_last_sec++;
+	}
+
+	while (usec - timer_last_usec > (long) frame_wait) {
+		usec -= frame_wait;
+		video_frameskip++;
+	}
+
+	long to_sleep = frame_wait - (usec - timer_last_usec);
+	std::this_thread::sleep_for(std::chrono::microseconds(to_sleep));
+
+	timer_start();
 }
 
 }

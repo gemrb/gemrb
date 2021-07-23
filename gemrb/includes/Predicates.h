@@ -34,7 +34,7 @@ namespace GemRB {
 
 template<typename PT>
 struct Predicate : std::unary_function<PT, bool> {
-	virtual ~Predicate() {};
+	virtual ~Predicate() = default;
 	virtual bool operator()(PT param) const=0;
 };
 
@@ -53,7 +53,7 @@ public:
 		delete pred2;
 	}
 
-	bool operator()(PT param) const=0;
+	bool operator()(PT param) const override = 0;
 };
 
 template<typename PT>
@@ -61,7 +61,7 @@ struct AndPredicate : CompoundPredicate<PT> {
 	AndPredicate(Predicate<PT>* p1, Predicate<PT>* p2)
 	: CompoundPredicate<PT>(p1, p2) {}
 
-	bool operator()(PT param) const {
+	bool operator()(PT param) const override {
 		return (*this->pred1)(param) && (*this->pred2)(param);
 	}
 };
@@ -71,7 +71,7 @@ struct OrPredicate : CompoundPredicate<PT> {
 	OrPredicate(Predicate<PT>* p1, Predicate<PT>* p2)
 	: CompoundPredicate<PT>(p1, p2) {}
 
-	bool operator()(PT param) const {
+	bool operator()(PT param) const override {
 		return (*this->pred1)(param) || (*this->pred2)(param);
 	}
 };

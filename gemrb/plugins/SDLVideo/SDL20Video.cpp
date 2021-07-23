@@ -104,7 +104,6 @@ static void SetWindowIcon(SDL_Window* window)
 int SDL20VideoDriver::CreateSDLDisplay(const char* title)
 {
 	Log(MESSAGE, "SDL 2 Driver", "Creating display");
-	// TODO: scale methods can be nearest or linear, and should be settable in config
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "best");
 
 #if USE_OPENGL_BACKEND
@@ -300,7 +299,7 @@ int SDL20VideoDriver::UpdateRenderTarget(const Color* color, BlitFlags flags)
 	return 0;
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const SDL_Rect& src, const SDL_Rect& dst, BlitFlags flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, const Region& src, const Region& dst, BlitFlags flags, const SDL_Color* tint)
 {
 	BlitFlags version = BlitFlags::NONE;
 #if !USE_OPENGL_BACKEND
@@ -308,7 +307,7 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	version = (BlitFlags::GREY | BlitFlags::SEPIA) & flags;
 #endif
 	// WARNING: software fallback == slow
-	if (spr->Bpp == 8 && (flags & BlitFlags::ALPHA_MOD)) {
+	if (spr->Format().Bpp == 1 && (flags & BlitFlags::ALPHA_MOD)) {
 		version |= BlitFlags::ALPHA_MOD;
 		flags &= ~RenderSpriteVersion(spr, version, reinterpret_cast<const Color*>(tint));
 	} else {
@@ -319,8 +318,11 @@ void SDL20VideoDriver::BlitSpriteNativeClipped(const SDLTextureSprite2D* spr, co
 	BlitSpriteNativeClipped(tex, src, dst, flags, tint);
 }
 
-void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const SDL_Rect& srect, const SDL_Rect& drect, BlitFlags flags, const SDL_Color* tint)
+void SDL20VideoDriver::BlitSpriteNativeClipped(SDL_Texture* texSprite, const Region& srgn, const Region& drgn, BlitFlags flags, const SDL_Color* tint)
 {
+	SDL_Rect srect = RectFromRegion(srgn);
+	SDL_Rect drect = RectFromRegion(drgn);
+	
 	int ret = 0;
 	if (flags&BLIT_STENCIL_MASK) {
 		// 1. clear scratchpad segment
@@ -396,8 +398,8 @@ void SDL20VideoDriver::BlitVideoBuffer(const VideoBufferPtr& buf, const Point& p
 	const Region& r = buf->Rect();
 	Point origin = r.origin + p;
 
-	SDL_Rect srect = {0, 0, r.w, r.h};
-	SDL_Rect drect = {origin.x, origin.y, r.w, r.h};
+	const Region& srect = {0, 0, r.w, r.h};
+	const Region& drect = {origin, r.size};
 	BlitSpriteNativeClipped(tex, srect, drect, flags, reinterpret_cast<const SDL_Color*>(&tint));
 }
 
@@ -543,12 +545,12 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 	unsigned int Width = r.w ? r.w : screenSize.w;
 	unsigned int Height = r.h ? r.h : screenSize.h;
 
-	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), 24,
-															0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	static const PixelFormat fmt(3, 0x00ff0000, 0x0000ff00, 0x000000ff, 0);
+	SDLTextureSprite2D* screenshot = new SDLTextureSprite2D(Region(0,0, Width, Height), fmt);
 
 	SDL_Texture* target = SDL_GetRenderTarget(renderer);
 	if (buf) {
-		auto texture = static_cast<SDLTextureVideoBuffer*>(drawingBuffer)->GetTexture();
+		auto texture = static_cast<SDLTextureVideoBuffer*>(buf.get())->GetTexture();
 		SDL_SetRenderTarget(renderer, texture);
 	} else {
 		SDL_SetRenderTarget(renderer, nullptr);
@@ -559,7 +561,7 @@ Holder<Sprite2D> SDL20VideoDriver::GetScreenshot(Region r, const VideoBufferPtr&
 
 	SDL_SetRenderTarget(renderer, target);
 
-	return screenshot;
+	return Holder<Sprite2D>(screenshot);
 }
 
 int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], SDL_TouchID device) const

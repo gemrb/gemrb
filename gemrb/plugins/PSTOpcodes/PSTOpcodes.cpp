@@ -30,7 +30,7 @@
 #include "TableMgr.h"
 #include "TileMap.h"
 #include "VEFObject.h"
-#include "Video.h" //for tints
+#include "Video/Video.h" //for tints
 #include "Scriptable/Actor.h"
 #include "ScriptedAnimation.h"
 
@@ -207,7 +207,7 @@ int fx_play_bam_blended (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2&2) {
-		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->Pos = fx->Pos;
 		area->AddVVCell( new VEFObject(sca));
 	} else {
 		assert(target);
@@ -321,12 +321,12 @@ int fx_play_bam_not_blended (Scriptable* Owner, Actor* target, Effect* fx)
 			y = (tmp>>5)&31;
 		}
 		
-		sca->Pos = Point(fx->PosX, fx->PosY);
+		sca->Pos = fx->Pos;
 		sca->XOffset -= x;
 		sca->YOffset -= y;
 
 		if (twin) {
-			twin->Pos = Point(fx->PosX, fx->PosY);
+			twin->Pos = fx->Pos;
 			twin->XOffset -= x;
 			twin->YOffset -= y;
 			area->AddVVCell( new VEFObject(twin) );
@@ -446,19 +446,18 @@ int fx_special_effect (Scriptable* Owner, Actor* target, Effect* fx)
 	//TODO: create the spells
 	switch(fx->Parameter2) {
 		case 0:
-			strnuprcpy(fx->Resource,"adder",8);
+			fx->Resource = "ADDER";
 			break;
 		case 1:
-			strnuprcpy(fx->Resource,"ball",8);
+			fx->Resource = "BALL";
 			break;
 		case 2:
-			strnuprcpy(fx->Resource,"rdead",8);
+			fx->Resource = "RDEAD";
 			break;
 	}
 
-	ieResRef OldSpellResRef;
+	ResRef OldSpellResRef = Owner->SpellResRef;
 
-	memcpy(OldSpellResRef, Owner->SpellResRef, sizeof(OldSpellResRef));
 	// flags: no deplete, instant, no interrupt
 	Owner->DirectlyCastSpell(target, fx->Resource, fx->CasterLevel, 1, false);
 	Owner->SetSpellResRef(OldSpellResRef);
@@ -542,21 +541,22 @@ static EffectRef fx_str_ref = { "StrengthModifier", -1 };
 
 static inline int DamageLastHitter(Effect *fx, Actor *target, int param1, int param2)
 {
-	if (fx->Parameter3) {
-		Map *map = target->GetCurrentArea();
-		Actor *actor = map->GetActorByGlobalID(target->LastHitter);
-		if (actor && PersonalDistance(target, actor)<30 ) {
-			const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
-			if (entry) {
-				Effect *newfx = EffectQueue::CreateEffect( fx_damage_opcode_ref, param1, param2<<16, FX_DURATION_INSTANT_PERMANENT);
-				newfx->Target = FX_TARGET_PRESET;
-				newfx->Power = fx->Power;
-				memcpy(newfx->Source, fx->Source, sizeof(newfx->Source) );
-				core->ApplyEffect(newfx, actor, target);
-				if (fx->Parameter3!=0xffffffff) {
-					fx->Parameter3--;
-				}
-				delete newfx;
+	if (!fx->Parameter3) {
+		return FX_NOT_APPLIED;
+	}
+
+	const Map *map = target->GetCurrentArea();
+	Actor *actor = map->GetActorByGlobalID(target->LastHitter);
+	if (actor && PersonalDistance(target, actor) < 30) {
+		const TriggerEntry *entry = target->GetMatchingTrigger(trigger_hitby, TEF_PROCESSED_EFFECTS);
+		if (entry) {
+			Effect *newFX = EffectQueue::CreateEffect(fx_damage_opcode_ref, param1, param2 << 16, FX_DURATION_INSTANT_PERMANENT);
+			newFX->Target = FX_TARGET_PRESET;
+			newFX->Power = fx->Power;
+			newFX->Source = fx->Source;
+			core->ApplyEffect(newFX, actor, target);
+			if (fx->Parameter3 != 0xffffffff) {
+				fx->Parameter3--;
 			}
 		}
 	}
@@ -634,7 +634,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 				newfx = EffectQueue::CreateEffectCopy(fx, fx_dispel_ref, 100, 0);
 				newfx->Power = 10;
 				core->ApplyEffect(newfx, target, Owner);
-				delete newfx;
 
 				for (int i = 0; i < 2; i++) {
 					target->ApplyEffectCopy(fx, fx_miscast_ref, Owner, 100, i);
@@ -659,7 +658,6 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			//wtf is this
 			newfx->IsVariable = 0x23;
 			core->ApplyEffect(newfx, target, Owner);
-			delete newfx;
 
 			target->ApplyEffectCopy(fx, fx_resistfire_ref, Owner, 50, 1);
 			target->ApplyEffectCopy(fx, fx_resistmfire_ref, Owner, 50, 1);
@@ -724,7 +722,7 @@ int fx_overlay (Scriptable* Owner, Actor* target, Effect* fx)
 			ConvertTiming (fx, duration);
 
 			// improved strength also has a pulse we need to adjust
-			Effect *efx = target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->Source);
+			Effect *efx = target->fxqueue.HasEffectWithSource(fx_colorpulse_ref, fx->SourceRef);
 			if (efx) {
 				ConvertTiming (efx, duration);
 			}
@@ -888,9 +886,6 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 
 	Map *map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
-	Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
-	memcpy(newfx, fx->Source,sizeof(ieResRef));
-	newfx->Duration = 60;
 	while(i--) {
 		Actor *tar=map->GetActor(i,true);
 		ea = tar->GetStat(IE_EA);
@@ -901,9 +896,11 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 		//lets assume it is never resisted
 		//the effect will be destructed by ApplyEffect (not anymore)
 		//the effect is copied to a new memory area
+		Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		newfx->Source = fx->Source;
+		newfx->Duration = 60;
 		core->ApplyEffect(newfx, tar, Owner);
 	}
-	delete newfx;
 	return FX_APPLIED;
 }
 
@@ -913,7 +910,7 @@ int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	// print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
-		core->timer.SetMoveViewPort( Point(fx->PosX, fx->PosY), fx->Parameter1, true);
+		core->timer.SetMoveViewPort(fx->Pos, fx->Parameter1, true);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -973,9 +970,9 @@ int fx_iron_fist (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xd1 fx_hostile_image (Spell Effect: Soul Exodus)
-int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_hostile_image (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {
-	if (1) print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
+	// print("fx_hostile_image(%2d): Par1: %d Par2: %d TODO: not implemented!", fx->Opcode, fx->Parameter1, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
@@ -997,7 +994,6 @@ int fx_detect_evil (Scriptable* Owner, Actor* target, Effect* fx)
 		EffectQueue *fxqueue = new EffectQueue();
 		fxqueue->SetOwner(Owner);
 		fxqueue->AddEffect(newfx);
-		delete newfx;
 
 		//don't detect self? if yes, then use NULL as last parameter
 		fxqueue->AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10, target);

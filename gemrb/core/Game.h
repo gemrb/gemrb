@@ -37,7 +37,7 @@
 #include "Scriptable/Scriptable.h"
 #include "Scriptable/PCStatStruct.h"
 #include "Variables.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <atomic>
 #include <vector>
@@ -132,9 +132,9 @@ struct PCStruct {
 	ieWord   PartyOrder;
 	ieDword  OffsetToCRE;
 	ieDword  CRESize;
-	ieResRef CREResRef;
+	ResRef CREResRef;
 	ieDword  Orientation;
-	ieResRef Area;
+	ResRef Area;
 	ieWord   XPos;
 	ieWord   YPos;
 	ieWord   ViewXPos;
@@ -144,7 +144,7 @@ struct PCStruct {
 	ieDword  Interact[MAX_INTERACT];
 	ieWord   QuickWeaponSlot[MAX_QUICKWEAPONSLOT];
 	ieWord   QuickWeaponHeader[MAX_QUICKWEAPONSLOT];
-	ieResRef QuickSpellResRef[MAX_QSLOTS];
+	ResRef QuickSpellResRef[MAX_QSLOTS];
 	ieWord   QuickItemSlot[MAX_QUICKITEMSLOT];
 	ieWord   QuickItemHeader[MAX_QUICKITEMSLOT];
 	char Name[32];
@@ -174,7 +174,7 @@ struct GAMJournalEntry {
 
 // Saved location of party member.
 struct GAMLocationEntry {
-	ieResRef AreaResRef;
+	ResRef AreaResRef;
 	Point Pos;
 };
 
@@ -271,7 +271,7 @@ public:
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
-	ieResRef Familiars[9];
+	ResRef Familiars[9];
 	ieDword CombatCounter;
 	ieDword StateOverrideFlag, StateOverrideTime;
 	ieDword BanterBlockFlag, BanterBlockTime;
@@ -284,7 +284,6 @@ public:
 	int protagonist;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize;
-	ieDword Ticks;
 	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
 	std::atomic_uint32_t GameTime {0};
 	ieDword LastScriptUpdate; // GameTime at which UpdateScripts last ran
@@ -298,11 +297,11 @@ public:
 	ieDword Reputation;
 	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
 	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
-	ieResRef AnotherArea;
-	ieResRef CurrentArea;
-	ieResRef PreviousArea; //move here if the worldmap exit is illegal?
-	ieResRef LoadMos;
-	ieResRef TextScreen;
+	ResRef AnotherArea;
+	ResRef CurrentArea;
+	ResRef PreviousArea; //move here if the worldmap exit is illegal?
+	ResRef LoadMos;
+	ResRef TextScreen;
 	Particles *weather;
 	int event_timer;
 	EventHandler event_handler;
@@ -413,7 +412,7 @@ public:
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
-	char *GetFamiliar(unsigned int Index);
+	ResRef& GetFamiliar(unsigned int Index);
 
 	bool IsBeastKnown(unsigned int Index) const {
 		if (!beasts) {
@@ -424,7 +423,7 @@ public:
 		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) {
+	void SetBeastKnown(unsigned int Index) const {
 		if (!beasts) {
 			return;
 		}
@@ -511,7 +510,7 @@ public:
 	Actor *GetTimestopOwner() const { return timestop_owner; };
 	void SetTimestopOwner(Actor *owner) { timestop_owner = owner; };
 	/** Checks the bounty encounters (used in bg1) */
-	bool RandomEncounter(ieResRef &BaseArea);
+	bool RandomEncounter(ResRef &BaseArea);
 	/** Resets the area and bored comment timers of the whole party */
 	void ResetPartyCommentTimes() const;
 	void ReversePCs() const;
@@ -520,7 +519,7 @@ private:
 	bool DetermineStartPosType(const TableMgr *strta) const;
 	ResRef *GetDream(Map *area);
 	void CastOnRest() const;
-	void PlayerDream();
+	void PlayerDream() const;
 	void TextDream();
 };
 

@@ -37,7 +37,7 @@
 #include "Palette.h"
 #include "PathFinder.h"
 #include "Audio.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 namespace GemRB {
 
@@ -169,7 +169,7 @@ struct ProjectileExtension : Held<ProjectileExtension>
 	ieDword AFlags;
 	ieWord TriggerRadius;
 	ieWord ExplosionRadius;
-	ieResRef SoundRes; //used for areapro.2da explosion sound
+	ResRef SoundRes; //used for areapro.2da explosion sound
 	ieWord Delay;
 	ieWord FragAnimID;
 	ieWord FragProjIdx;
@@ -177,13 +177,13 @@ struct ProjectileExtension : Held<ProjectileExtension>
 	ieByte ExplType;
 	ieWord ExplColor; // a byte in the original, followed by padding
 	ieWord ExplProjIdx;
-	ieResRef VVCRes;  //used for areapro.2da second resref (center animation)
+	ResRef VVCRes;  //used for areapro.2da second resref (center animation)
 	ieWord ConeWidth;
 	//these are GemRB specific (from areapro.2da)
 	ieDword APFlags;    //areapro.2da flags
-	ieResRef Spread;    //areapro.2da first resref
-	ieResRef Secondary; //areapro.2da third resref
-	ieResRef AreaSound; //areapro.2da second sound resource
+	ResRef Spread;    //areapro.2da first resref
+	ResRef Secondary; //areapro.2da third resref
+	ResRef AreaSound; //areapro.2da second sound resource
 	//used for target or HD counting
 	ieWord DiceCount;
 	ieWord DiceSize;
@@ -199,9 +199,9 @@ public:
 
 	ieWord Speed;
 	ieDword SFlags;
-	ieResRef FiringSound;
-	ieResRef ArrivalSound;
-	ieResRef TravelVVC;
+	ResRef FiringSound;
+	ResRef ArrivalSound;
+	ResRef TravelVVC;
 	ieDword SparkColor;
 	ieDword ExtFlags;
 	ieDword StrRef;
@@ -212,23 +212,23 @@ public:
 	ieWord IDSValue;
 	ieWord IDSType2;
 	ieWord IDSValue2;
-	ieResRef FailSpell;
-	ieResRef SuccSpell;
+	ResRef failureSpell;
+	ResRef successSpell;
 	////// gap
 	ieDword TFlags;
-	ieResRef BAMRes1;
-	ieResRef BAMRes2;
+	ResRef BAMRes1;
+	ResRef BAMRes2;
 	ieByte Seq1, Seq2;
 	ieWord LightX;
 	ieWord LightY;
 	ieWord LightZ;
-	ieResRef PaletteRes;
+	ResRef PaletteRes;
 	ieByte Gradients[7];
 	ieByte SmokeSpeed;
 	ieByte SmokeGrad[7];
 	ieByte Aim; // original bg2: m_numDirections // list of {1, 5, 9}
 	ieWord SmokeAnimID;
-	ieResRef TrailBAM[3];
+	ResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
 	unsigned int Range;
 	//these are public but not in the .pro file
@@ -236,7 +236,7 @@ public:
 	PaletteHolder palette;
 	//internals
 protected:
-	ieResRef smokebam;
+	ResRef smokebam;
 	ieDword timeStartStep;
 	//attributes from moveable object
 	unsigned char Orientation, NewOrientation;
@@ -254,7 +254,7 @@ protected:
 	ieDword FakeTarget; //a globalID for target that isn't followed
 	int phase;
 	//saved in area
-	ieResRef name;
+	ResRef projectileName; // used also for namesake externalized spells
 	ieWord type;
 	//these come from the extension area
 	int extension_delay;
@@ -284,7 +284,7 @@ public:
 	void Cleanup();
 
 	inline Point GetDestination() const { return Destination; }
-	inline const char * GetName() const { return name; }
+	inline const ResRef& GetName() const { return projectileName; }
 	inline ieWord GetType() const { return type; }
 	//This assumes that the effect queue cannot be bigger than 65535
 	//which is a sane expectation
@@ -313,7 +313,7 @@ public:
 		return Pos.y;
 	}
 
-	void SetIdentifiers(const char *name, ieWord type);
+	void SetIdentifiers(const ResRef &name, size_t idx);
 
 	void SetEffectsCopy(const EffectQueue *eq, const Point &source);
 
@@ -361,11 +361,11 @@ public:
 private:
 	//creates a child projectile with current_projectile_id - 1
 	void CreateIteration();
-	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
+	void CreateAnimations(Animation **anims, const ResRef& bam, int Seq);
 	//pillar type animations
-	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq);
+	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
-	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq);
+	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const;
 	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
@@ -375,7 +375,7 @@ private:
 	//if there is an extension, convert to exploding or wait for trigger
 	void EndTravel();
 	//apply default spell
-	void ApplyDefault();
+	void ApplyDefault() const;
 	//stops the current sound
 	void StopSound();
 	//kickstarts the secondary sound
@@ -383,7 +383,7 @@ private:
 	//reached end of single travel missile, explode or expire now
 	void ChangePhase();
 	//drop a BAM or VVC on the trail path, return the length of the animation
-	int AddTrail(const ieResRef BAM, const ieByte *pal) const;
+	int AddTrail(const ResRef& BAM, const ieByte *pal) const;
 	void DoStep(unsigned int walk_speed);
 	void LineTarget() const;      //line projectiles (walls, scorchers)
 	void LineTarget(const PathNode *beg, const PathNode *end) const;
@@ -405,14 +405,14 @@ private:
 	//logic to resolve target when single projectile hit destination
 	int CalculateTargetFlag() const;
 	//logic to resolve the explosion count (may be based on caster level)
-	int CalculateExplosionCount();
+	int CalculateExplosionCount() const;
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
 	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
 
 private:
-	void Draw(Holder<Sprite2D> spr, const Point& p,
+	void Draw(const Holder<Sprite2D>& spr, const Point& p,
 			  BlitFlags flags, Color tint) const;
 };
 

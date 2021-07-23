@@ -23,9 +23,10 @@
 #include "exports.h"
 #include "ie_types.h"
 #include "Region.h"
+#include "Resource.h"
 #include "RGBAColor.h"
 #include "SClassID.h"
-#include "Video.h"
+#include "Video/Video.h"
 
 #include <cstdint>
 #include <vector>
@@ -52,7 +53,7 @@ public:
 	Point Pos; // position of the effect in game coordinates
 
 	VEFObject();
-	VEFObject(ScriptedAnimation *sca);
+	explicit VEFObject(ScriptedAnimation *sca);
 	~VEFObject();
 private:
 	std::vector<ScheduleEntry> entries;

@@ -21,10 +21,12 @@
 
 #include "Interface.h"
 
+#include <utility>
+
 namespace GemRB {
 
 TooltipBackground::TooltipBackground(Holder<Sprite2D> bg, Holder<Sprite2D> left, Holder<Sprite2D> right)
-: background(bg), leftbg(left), rightbg(right)
+: background(std::move(bg)), leftbg(std::move(left)), rightbg(std::move(right))
 {
 	assert(background);
 	assert((leftbg && rightbg) || (!leftbg && !rightbg));

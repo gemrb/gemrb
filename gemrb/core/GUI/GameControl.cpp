@@ -34,7 +34,7 @@
 #include "PathFinder.h"
 #include "ScriptEngine.h"
 #include "TileMap.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "damages.h"
 #include "ie_cursors.h"
 #include "opcode_params.h"
@@ -55,9 +55,16 @@ namespace GemRB {
 typedef Point formation_type[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
-static ResRef TestSpell = "SPWI207";
+static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
+
+static Actor* GetMainSelectedActor()
+{
+	auto actor = core->GetFirstSelectedPC(false);
+	if (actor) return actor;
+	return core->GetFirstSelectedActor();
+}
 
 //If one of the actors has tracking on, the gamecontrol needs to display
 //arrow markers on the edges to point at detected monsters
@@ -120,8 +127,8 @@ GameControl::GameControl(const Region& frame)
 
 GameControl::~GameControl()
 {
-	for (size_t i = 0; i < 2; ++i) {
-		EventMgr::UnRegisterEventMonitor(eventMonitors[i]);
+	for (unsigned long eventMonitor : eventMonitors) {
+		EventMgr::UnRegisterEventMonitor(eventMonitor);
 	}
 
 	if (formations)	{
@@ -205,7 +212,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	double stepAngle = 0.0;
 	const Point& start = vec;
 	
-	auto NextDest = [&]() -> Point {
+	auto NextDest = [&]() {
 		// adjust the point if the actor cant get to `dest`
 		// we do this by sweeping an M_PI arc a `radius` (stepVec) away from the point
 		// and oriented according to `direction`
@@ -642,7 +649,7 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 
 	// Draw lightmap
 	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
-		Holder<Sprite2D> spr = area->LightMap->GetSprite2D();
+		Holder<Sprite2D> spr = area->LightMap;
 		video->BlitSprite(spr, Point());
 		Region point(gameMousePos.x / 16, gameMousePos.y / 12, 2, 2);
 		video->DrawRect(point, ColorRed);
@@ -665,10 +672,12 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 // it's used both for tooltips everywhere and hp display on game control
 bool GameControl::DispatchEvent(const Event& event) const
 {
-	const Game *game = core->GetGame();
-	if (!game) return false;
+	if (!window || window->IsDisabled() || (Flags()&IgnoreEvents)) {
+		return false;
+	}
 
 	if (event.keyboard.keycode == GEM_TAB) {
+		const Game *game = core->GetGame();
 		// show partymember hp/maxhp as overhead text
 		for (int pm=0; pm < game->GetPartySize(false); pm++) {
 			Actor *pc = game->GetPC(pm, true);
@@ -836,7 +845,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'c': //force cast a hardcoded spell
 				//caster is the last selected actor
 				//target is the door/actor currently under the pointer
-				if (game->selected.size() > 0) {
+				if (!game->selected.empty()) {
 					Actor *src = game->selected[0];
 					Scriptable *target = lastActor;
 					if (overDoor) {
@@ -904,7 +913,7 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'l': //play an animation (vvc/bam) over an actor
 				//the original engine was able to swap through all animations
 				if (lastActor) {
-					lastActor->AddAnimation("S056ICBL", 0, 0, 0);
+					lastActor->AddAnimation(ResRef("S056ICBL"), 0, 0, 0);
 				}
 				break;
 			case 'M':
@@ -983,7 +992,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					if (fx) {
 						core->ApplyEffect(fx, lastActor, lastActor);
 					}
-					delete fx;
 				}
 				break;
 			case 's': //switches through the stance animations
@@ -995,8 +1003,13 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 				game->AdvanceTime(core->Time.hour_size);
 				//refresh gui here once we got it
 				break;
-			// u
-			case 'V': //
+			case 'u': // dump GameScript GLOBAL vars
+				core->GetGame()->locals->DebugDump();
+				break;
+			case 'U': // dump death vars
+				core->GetGame()->kaputz->DebugDump();
+				break;
+			case 'V': // dump GemRB vars like the game ini settings
 				core->GetDictionary()->DebugDump();
 				break;
 			case 'v': //marks some of the map visited (random vision distance)
@@ -1011,15 +1024,14 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 			case 'Y': // damages all enemies by 300 (resistances apply)
 				// mwahaha!
 				{
-				Effect *newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 				int i = area->GetActorCount(false);
 				while(i--) {
 					Actor *victim = area->GetActor(i, false);
 					if (victim->Modified[IE_EA] == EA_ENEMY) {
+						Effect *newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, victim, victim);
 					}
 				}
-				delete newfx;
 				}
 				// fallthrough
 			case 'y': //kills actor
@@ -1031,17 +1043,14 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					Effect *newfx;
 					newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_MAGIC<<16, FX_DURATION_INSTANT_PERMANENT);
 					core->ApplyEffect(newfx, lastActor, lastActor);
-					delete newfx;
 					if (! (lastActor->GetInternalFlag() & IF_REALLYDIED)) {
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_ACID<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
-						delete newfx;
 						newfx = EffectQueue::CreateEffect(damage_ref, 300, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 						core->ApplyEffect(newfx, lastActor, lastActor);
-						delete newfx;
 					}
 				} else if (overContainer) {
-					overContainer->SetContainerLocked(0);
+					overContainer->SetContainerLocked(false);
 				} else if (overDoor) {
 					overDoor->SetDoorLocked(0,0);
 				}
@@ -1439,10 +1448,8 @@ void GameControl::UpdateCursor()
 	} else if (target_mode == TARGET_MODE_CAST) {
 		nextCursor = IE_CURSOR_CAST;
 		//point is always valid
-		if (!(target_types & GA_POINT)) {
-			if(!lastActor) {
-				nextCursor |= IE_CURSOR_GRAY;
-			}
+		if (!(target_types & GA_POINT) && !lastActor) {
+			nextCursor |= IE_CURSOR_GRAY;
 		}
 	} else if (target_mode == TARGET_MODE_DEFEND) {
 		nextCursor = IE_CURSOR_DEFEND;
@@ -1809,7 +1816,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 		if (spellIndex<0) {
 			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", spellName.CString());
 		} else {
-			CREMemorizedSpell *si;
+			const CREMemorizedSpell *si;
 			//spell casting at target
 			si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
 			if (!si) {
@@ -1817,7 +1824,7 @@ void GameControl::TryToCast(Actor *source, const Point &tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -1884,7 +1891,7 @@ void GameControl::TryToCast(Actor *source, const Actor *tgt)
 				delete action;
 				return;
 			}
-			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef);
+			snprintf(action->string0Parameter, sizeof(action->string0Parameter), "%.8s", si->SpellResRef.CString());
 		}
 	} else {
 		action->int0Parameter = spellSlot;
@@ -2011,17 +2018,15 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 			return false;
 		case ST_TRIGGER:
 			// pst, eg. ar1500
-			if (trap->GetDialog()[0]) {
+			if (!trap->GetDialog().IsEmpty()) {
 				trap->AddAction(GenerateAction("Dialogue([PC])"));
 				return true;
 			}
 
 			// always display overhead text; totsc's ar0511 library relies on it
-			if (!trap->GetOverheadText().empty()) {
-				if (!trap->OverheadTextIsDisplaying()) {
-					trap->DisplayOverheadText(true);
-					DisplayString( trap );
-				}
+			if (!trap->GetOverheadText().empty() && !trap->OverheadTextIsDisplaying()) {
+				trap->DisplayOverheadText(true);
+				DisplayString(trap);
 			}
 			//the importer shouldn't load the script
 			//if it is unallowed anyway (though
@@ -2063,11 +2068,7 @@ void GameControl::InitFormation(const Point &clickPoint)
 		return;
 	}
 
-	const Game *game = core->GetGame();
-	const Actor *selectedActor = core->GetFirstSelectedPC(false);
-	if (!selectedActor) {
-		selectedActor = game->selected[0];
-	}
+	const Actor *selectedActor = GetMainSelectedActor();
 
 	isFormationRotation = true;
 	formationBaseAngle = AngleFromPoints(clickPoint, selectedActor->Pos);
@@ -2099,7 +2100,7 @@ bool GameControl::OnMouseDown(const MouseEvent& me, unsigned short Mod)
 }
 
 // list of allowed area and exit combinations in pst that trigger worldmap travel
-static std::map<std::string, std::vector<std::string>> pstWMapExits {
+static const std::map<std::string, std::vector<std::string>> pstWMapExits {
 	{"ar0100", {"to0300", "to0200", "to0101"}},
 	{"ar0101", {"to0100"}},
 	{"ar0200", {"to0100", "to0301", "to0400"}},
@@ -2126,7 +2127,7 @@ bool GameControl::ShouldTriggerWorldMap(const Actor *pc) const
 	teamMoved = false;
 	auto wmapExits = pstWMapExits.find(pc->GetCurrentArea()->GetScriptName());
 	if (wmapExits != pstWMapExits.end()) {
-		for (std::string exit : wmapExits->second) {
+		for (const std::string& exit : wmapExits->second) {
 			if (!stricmp(exit.c_str(), overInfoPoint->GetScriptName())) {
 				teamMoved = true;
 				break;
@@ -2197,12 +2198,10 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 			}
 		}
 
-		if (target_mode == TARGET_MODE_NONE) {
-			if (isSelectionRect || lastActorID) {
-				MakeSelection(Mod&GEM_MOD_SHIFT);
-				ClearMouseState();
-				return true;
-			}
+		if (target_mode == TARGET_MODE_NONE && (isSelectionRect || lastActorID)) {
+			MakeSelection(Mod & GEM_MOD_SHIFT);
+			ClearMouseState();
+			return true;
 		}
 
 		if (lastCursor == IE_CURSOR_BLOCKED) {
@@ -2212,7 +2211,12 @@ bool GameControl::OnMouseUp(const MouseEvent& me, unsigned short Mod)
 		
 		if (overContainer || overDoor || (overInfoPoint && overInfoPoint->Type==ST_TRAVEL && target_mode == TARGET_MODE_NONE)) {
 			// move to the object before trying to interact with it
-			CommandSelectedMovement(p, false, isDoubleClick);
+			Actor* mainActor = GetMainSelectedActor();
+			if (mainActor && overContainer) {
+				CreateMovement(mainActor, p, false, isDoubleClick);	// let one actor handle loot and containers
+			} else {
+				CommandSelectedMovement(p, false, isDoubleClick);
+			}
 		}
 		
 		if (target_mode != TARGET_MODE_NONE || overInfoPoint || overContainer || overDoor) {
@@ -2243,11 +2247,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
 
-	Actor* selectedActor = core->GetFirstSelectedPC(false);
-	if (!selectedActor) {
-		//this could be a non-PC
-		selectedActor = game->selected[0];
-	}
+	Actor* selectedActor = GetMainSelectedActor();
 
 	//add a check if you don't want some random monster handle doors and such
 	if (targetActor) {
@@ -2430,7 +2430,7 @@ void GameControl::PerformActionOn(Actor *actor)
 			}
 
 			//talk (first selected talks)
-			if (game->selected.size()) {
+			if (!game->selected.empty()) {
 				//if we are in PST modify this to NO!
 				Actor *source;
 				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {
@@ -2522,7 +2522,7 @@ void GameControl::SetCutSceneMode(bool active)
 		wm->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
 		ScreenFlags &= ~SF_CUTSCENE;
-		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->MouseFeedback));
+		wm->SetCursorFeedback(WindowManager::CursorFeedback(core->config.MouseFeedback));
 	}
 	SetFlags(IgnoreEvents, (active || DialogueFlags&DF_IN_DIALOG) ? OP_OR : OP_NAND);
 }
@@ -2541,11 +2541,11 @@ void GameControl::DisplayString(const Scriptable* target) const
 }
 
 /** changes displayed map to the currently selected PC */
-void GameControl::ChangeMap(Actor *pc, bool forced)
+void GameControl::ChangeMap(const Actor *pc, bool forced)
 {
 	//swap in the area of the actor
 	Game* game = core->GetGame();
-	if (forced || (pc && stricmp( pc->Area, game->CurrentArea) != 0) ) {
+	if (forced || (pc && pc->Area != game->CurrentArea)) {
 		// disable so that drawing and events dispatched doesn't happen while there is not an area
 		// we are single threaded, but game loading runs its own event loop which will cause events/drawing to come in
 		SetDisabled(true);
@@ -2556,11 +2556,11 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		overContainer = NULL;
 		overDoor = NULL;
 		/*this is loadmap, because we need the index, not the pointer*/
-		char *areaname = game->CurrentArea;
 		if (pc) {
-			areaname = pc->Area;
+			game->GetMap(pc->Area, true);
+		} else {
+			game->GetMap(game->CurrentArea, true);
 		}
-		game->GetMap( areaname, true );
 
 		if (!core->InCutSceneMode()) {
 			// don't interfere with any scripted moves of the viewport
@@ -2645,13 +2645,13 @@ void GameControl::SetLastActor(Actor* lastActor)
 //u is the user
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, int cnt)
+void GameControl::SetupItemUse(int slot, size_t header, Actor *u, int targettype, int cnt)
 {
 	spellName.Reset();
 	spellOrItem = -1;
 	spellUser = u;
 	spellSlot = slot;
-	spellIndex = header;
+	spellIndex = static_cast<int>(header);
 	//item use also uses the casting icon, this might be changed in some custom game?
 	SetTargetMode(TARGET_MODE_CAST);
 	target_types = targettype;
@@ -2665,7 +2665,7 @@ void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, i
 //u is the caster
 //target type is a bunch of GetActor flags that alter valid targets
 //cnt is the number of different targets (usually 1)
-void GameControl::SetupCasting(ResRef spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
+void GameControl::SetupCasting(const ResRef& spellname, int type, int level, int idx, Actor *u, int targettype, int cnt)
 {
 	spellName = spellname;
 	spellOrItem = type;

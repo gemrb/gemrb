@@ -39,7 +39,7 @@ namespace GemRB {
 			void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 			
 		public:
-			ContentView(const Region& frame)
+			explicit ContentView(const Region& frame)
 			: View(frame) {}
 			
 			bool CanLockFocus() const override { return false; }
@@ -56,7 +56,7 @@ namespace GemRB {
 
 	private:
 		void UpdateScrollbars();
-		void ScrollbarValueChange(ScrollBar*);
+		void ScrollbarValueChange(const ScrollBar*);
 		
 		void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 		void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
@@ -69,13 +69,13 @@ namespace GemRB {
 		bool OnMouseDrag(const MouseEvent&) override;
 
 	public:
-		ScrollView(const Region& frame);
+		explicit ScrollView(const Region& frame);
 		~ScrollView() override;
 		
 		void SetVScroll(ScrollBar* sb);
 		void SetHScroll(ScrollBar* sb);
 		
-		bool IsAnimated() const override { return animation; }
+		bool IsAnimated() const override { return static_cast<bool>(animation); }
 
 		void AddSubviewInFrontOfView(View*, const View* = NULL) override;
 		View* RemoveSubview(const View*);

@@ -41,8 +41,6 @@ namespace GemRB {
 
 class GEM_EXPORT StoreMgr : public Plugin {
 public:
-	StoreMgr(void);
-	~StoreMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Store* GetStore(Store *s) = 0;
 

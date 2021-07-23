@@ -32,6 +32,8 @@
 #include "GameData.h"
 #include "Palette.h"
 
+#include <utility>
+
 #define IS_PORTRAIT (Picture && ((flags&IE_GUI_BUTTON_PORTRAIT) == IE_GUI_BUTTON_PORTRAIT))
 
 namespace GemRB {
@@ -87,12 +89,12 @@ void Button::SetImage(BUTTON_IMAGE_TYPE type, Holder<Sprite2D> img)
 	}
 
 	if (type <= BUTTON_IMAGE_NONE) {
-		for (int i = 0; i < BUTTON_IMAGE_TYPE_COUNT; i++) {
-			buttonImages[i] = nullptr;
+		for (auto& buttonImage : buttonImages) {
+			buttonImage = nullptr;
 		}
 		flags &= IE_GUI_BUTTON_NO_IMAGE;
 	} else {
-		buttonImages[type] = img;
+		buttonImages[type] = std::move(img);
 		/*
 		 currently IE_GUI_BUTTON_NO_IMAGE cannot be infered from the presence or lack of images
 		 leaving this here commented out in case it may be useful in the future.
@@ -296,8 +298,8 @@ void Button::DrawSelf(Region rgn, const Region& /*clip*/)
 	}
 
 	if (! (flags&IE_GUI_BUTTON_NO_IMAGE)) {
-		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-			ButtonBorder *fr = &borders[i];
+		for (const auto& border : borders) {
+			const ButtonBorder *fr = &border;
 			if (! fr->enabled) continue;
 
 			const Region& frRect = fr->rect;
@@ -455,7 +457,7 @@ String Button::TooltipText() const
 Holder<Sprite2D> Button::Cursor() const
 {
 	if (IS_PORTRAIT) {
-		GameControl* gc = core->GetGameControl();
+		const GameControl* gc = core->GetGameControl();
 		if (gc) {
 			Holder<Sprite2D> cur = gc->GetTargetActionCursor();
 			if (cur) return cur;
@@ -501,9 +503,9 @@ Holder<Sprite2D> Button::DragCursor() const
 bool Button::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
 	ActionKey key(Action::DragDropDest);
-    if (core->GetDraggedItem() && !SupportsAction(key)) {
-        return true;
-    }
+	if (core->GetDraggedItem() && !SupportsAction(key)) {
+		return true;
+	}
     
 	if (me.button == GEM_MB_ACTION) {
 		if (State == IE_GUI_BUTTON_LOCKED) {
@@ -567,8 +569,8 @@ void Button::OnMouseEnter(const MouseEvent& me, const DragOp* dop)
 		SetState( IE_GUI_BUTTON_PRESSED );
 	}
 
-	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-		ButtonBorder *fr = &borders[i];
+	for (const auto& border : borders) {
+		const ButtonBorder *fr = &border;
 		if (fr->enabled) {
 			pulseBorder = !fr->filled;
 			MarkDirty();
@@ -666,7 +668,7 @@ void Button::DoToggle()
 void Button::SetPicture(Holder<Sprite2D> newpic)
 {
 	ClearPictureList();
-	Picture = newpic;
+	Picture = std::move(newpic);
 	if (Picture) {
 		// try fitting to width if rescaling is possible, otherwise we automatically crop
 		unsigned int ratio = CeilDiv(Picture->Frame.w, frame.w);
@@ -706,7 +708,7 @@ void Button::ClearPictureList()
 }
 
 /** Add picture to the end of the list of Pictures */
-void Button::StackPicture(Holder<Sprite2D> Picture)
+void Button::StackPicture(const Holder<Sprite2D>& Picture)
 {
 	PictureList.push_back(Picture);
 	MarkDirty();
@@ -720,7 +722,7 @@ bool Button::HitTest(const Point& p) const
 		// some buttons have hollow Image frame filled w/ Picture
 		// some buttons in BG2 are text only (if BAM == 'GUICTRL')
 		Holder<Sprite2D> Unpressed = buttonImages[BUTTON_IMAGE_UNPRESSED];
-		if (Picture || PictureList.size() || !Unpressed) return true;
+		if (Picture || !PictureList.empty() || !Unpressed) return true;
 
 		Point off;
 		off.x = (frame.w / 2) - (Unpressed->Frame.w / 2) + Unpressed->Frame.x;

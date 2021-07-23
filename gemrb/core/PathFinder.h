@@ -22,6 +22,8 @@
 
 #include "Region.h"
 
+#include <cstdint>
+
 namespace GemRB {
 
 //searchmap conversion bits

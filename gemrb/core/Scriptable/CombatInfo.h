@@ -57,9 +57,9 @@ public:
 	void dump() const;
 
 private:
-	Actor *Owner;
+	Actor *Owner = nullptr;
 	int total; // modified stat
-	int natural; // base stat
+	int natural = 0; // base stat
 
 	int deflectionBonus;
 	int armorBonus;
@@ -110,10 +110,10 @@ public:
 	void dump() const;
 
 private:
-	Actor *Owner;
+	Actor *Owner = nullptr;
 	int total; // modified stat, now really containing all the boni
-	int base; // base stat
-	int babDecrement; // 3ed, used for calculating the tohit value of succeeding attacks
+	int base = 0; // base stat
+	int babDecrement = 0; // 3ed, used for calculating the tohit value of succeeding attacks
 
 	// to-hit boni
 	int weaponBonus;

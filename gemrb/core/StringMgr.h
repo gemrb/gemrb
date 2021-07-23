@@ -29,6 +29,7 @@
 #define STRINGMGR_H
 
 #include "Plugin.h"
+#include "Resource.h"
 #include "System/DataStream.h"
 
 namespace GemRB {
@@ -39,18 +40,16 @@ namespace GemRB {
  */
 
 struct StringBlock {
-	const String* text;
-	ieResRef Sound;
+	const String* text = nullptr;
+	ResRef Sound;
 
-	StringBlock(const String* text, const ieResRef soundRef)
-	: text(text) {
-		memcpy(Sound, soundRef, sizeof(ieResRef));
-	}
+	StringBlock() = default;
+	StringBlock(const String* text, const ResRef& soundRef)
+	: text(text), Sound(soundRef) {}
+
 	~StringBlock() {
 		delete text;
 	}
-	StringBlock()
-	: text(), Sound() {}
 };
 
 /**
@@ -60,8 +59,6 @@ struct StringBlock {
 
 class GEM_EXPORT StringMgr : public Plugin {
 public:
-	StringMgr(void);
-	~StringMgr(void) override;
 	virtual void OpenAux() = 0;
 	virtual void CloseAux() = 0;
 	virtual bool Open(DataStream* stream) = 0;

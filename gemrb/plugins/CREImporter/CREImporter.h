@@ -69,7 +69,7 @@ public:
 	bool Open(DataStream* stream) override;
 	Actor* GetActor(unsigned char is_in_party) override;
 
-	int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const override;
+	ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
 
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac) override;
@@ -92,8 +92,9 @@ private:
 	ieDword GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const;
 	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
 	void ReadInventory(Actor*, unsigned int);
+	void ReadSpellbook(Actor* act);
 	void ReadEffects(Actor* actor);
-	void GetEffect(Effect *fx);
+	Effect* GetEffect();
 	void ReadScript(Actor *actor, int ScriptLevel);
 	void ReadDialog(Actor *actor);
 	CREKnownSpell* GetKnownSpell();
@@ -111,10 +112,10 @@ private:
 	int PutKnownSpells(DataStream *stream, const Actor *actor);
 	int PutSpellPages(DataStream *stream, const Actor *actor);
 	int PutMemorizedSpells(DataStream *stream, const Actor *actor);
-	int PutEffects(DataStream *stream, const Actor *actor);
-	int PutVariables(DataStream *stream, const Actor *actor);
+	int PutEffects(DataStream *stream, const Actor *actor) const;
+	int PutVariables(DataStream *stream, const Actor *actor) const;
 	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size);
-	int PutHeader(DataStream *stream, const Actor *actor);
+	int PutHeader(DataStream *stream, const Actor *actor) const;
 };
 
 }

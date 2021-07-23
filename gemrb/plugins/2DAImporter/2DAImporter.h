@@ -81,16 +81,12 @@ public:
 		 uses column name and row name to search the field */
 	inline const char* QueryField(const char* row, const char* column) const override
 	{
-		int rowi, coli;
-
-		rowi = GetRowIndex(row);
-
+		int rowi = GetRowIndex(row);
 		if (rowi < 0) {
 			return (const char *) defVal;
 		}
 
-		coli = GetColumnIndex(column);
-		 
+		int coli = GetColumnIndex(column);
 		if (coli < 0) {
 			return (const char *) defVal;
 		}
@@ -141,13 +137,11 @@ public:
 
 	inline int FindTableValue(unsigned int col, long val, int start) const override
 	{
-		ieDword row, max;
-		
-		max = GetRowCount();
-		for (row = start; row < max; row++) {
+		ieDword max = GetRowCount();
+		for (ieDword row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			long Value;
-			if (valid_number( ret, Value ) && (Value == val) )
+			if (valid_signednumber(ret, Value) && (Value == val))
 				return int(row);
 		}
 		return -1;
@@ -155,10 +149,8 @@ public:
 
 	inline int FindTableValue(unsigned int col, const char* val, int start) const override
 	{
-		ieDword row, max;
-
-		max = GetRowCount();
-		for (row = start; row < max; row++) {
+		ieDword max = GetRowCount();
+		for (ieDword row = start; row < max; row++) {
 			const char* ret = QueryField( row, col );
 			if (stricmp(ret, val) == 0)
 				return int(row);

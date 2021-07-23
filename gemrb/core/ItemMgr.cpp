@@ -30,8 +30,4 @@ ItemMgr::ItemMgr(void)
 	dialogTable.load("itemdial", true);
 }
 
-ItemMgr::~ItemMgr(void)
-{
-}
-
 }

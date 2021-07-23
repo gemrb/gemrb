@@ -23,9 +23,12 @@
 #include "GameData.h"
 #include "Interface.h"
 #include "Palette.h"
-#include "Video.h"
+
+#include "Video/Video.h"
 
 #include <cwctype>
+#include <utility>
+
 
 namespace GemRB {
 
@@ -85,7 +88,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		return false;
 	}
 	
-	ieByte* pixels = nullptr;
+	const ieByte* pixels = nullptr;
 	int glyphH = g.size.h + abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
@@ -115,7 +118,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 	BlitGlyphToCanvas(g, Point(pageXPos - g.pos.x, (g.pos.y < 0) ? -g.pos.y : 0), pageData, SheetRegion.size);
 	MapSheetSegment(chr, Region(pageXPos, (g.pos.y < 0) ? 0 : g.pos.y, g.size.w, g.size.h));
 	// make the non-temporary glyph from our own data
-	ieByte* pageLoc = pageData + pageXPos;
+	const ieByte* pageLoc = pageData + pageXPos;
 	glyphs.insert(std::make_pair(chr, Glyph(g.size, g.pos, pageLoc, SheetRegion.w)));
 
 	pageXPos = newX;
@@ -184,7 +187,7 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
-: palette(pal), LineHeight(lineheight), Baseline(baseline)
+: palette(std::move(pal)), LineHeight(lineheight), Baseline(baseline)
 {
 	CurrentAtlasPage = NULL;
 	background = bg;
@@ -209,7 +212,7 @@ void Font::CreateGlyphIndex(ieWord chr, ieWord pageIdx, const Glyph* g)
 	AtlasIndex[chr] = GlyphIndexEntry(chr, pageIdx, g);
 }
 
-const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D> spr)
+const Glyph& Font::CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>& spr)
 {
 	assert(AtlasIndex.size() <= chr || AtlasIndex[chr].pageIdx == static_cast<ieWord>(-1));
 	assert(spr);

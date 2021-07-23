@@ -24,20 +24,18 @@
 #include "Interface.h"
 #include "Map.h"
 #include "Sprite2D.h"
-#include "Video.h"
+#include "Video/Video.h"
 #include "RNG.h"
 
 namespace GemRB {
 
-Animation::Animation(int count)
+Animation::Animation(index_t count)
 : frames(count, nullptr)
 {
 	assert(count > 0);
 	indicesCount = count;
-	pos = RAND(0, count-1);
+	frameIdx = RAND<index_t>(0, count-1);
 	starttime = 0;
-	x = 0;
-	y = 0;
 	Flags = A_ANI_ACTIVE;
 	fps = ANI_DEFAULT_FRAMERATE;
 	endReached = false;
@@ -46,23 +44,17 @@ Animation::Animation(int count)
 	gameAnimation = false;
 }
 
-Animation::~Animation(void)
-{
-	// Empty, but having it here rather than defined implicitly means
-	// we don't have to include Sprite2D.h in the header.
-}
-
-void Animation::SetPos(unsigned int index)
+void Animation::SetFrame(index_t index)
 {
 	if (index<indicesCount) {
-		pos=index;
+		frameIdx = index;
 	}
 	starttime = 0;
 	endReached = false;
 }
 
 /* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(Holder<Sprite2D> frame, unsigned int index)
+void Animation::AddFrame(const Holder<Sprite2D>& frame, index_t index)
 {
 	if (index>=indicesCount) {
 		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
@@ -76,11 +68,11 @@ void Animation::AddFrame(Holder<Sprite2D> frame, unsigned int index)
 	animArea.ExpandToRegion(r);
 }
 
-unsigned int Animation::GetCurrentFrameIndex() const
+Animation::index_t Animation::GetCurrentFrameIndex() const
 {
 	if (playReversed)
-		return indicesCount-pos-1;
-	return pos;
+		return indicesCount - frameIdx - 1;
+	return frameIdx;
 }
 
 Holder<Sprite2D> Animation::CurrentFrame() const
@@ -101,9 +93,9 @@ Holder<Sprite2D> Animation::LastFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount-pos-1];
+		ret = frames[indicesCount - frameIdx - 1];
 	else
-		ret = frames[pos];
+		ret = frames[frameIdx];
 	return ret;
 }
 
@@ -122,9 +114,9 @@ Holder<Sprite2D> Animation::NextFrame(void)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount-pos-1];
+		ret = frames[indicesCount - frameIdx - 1];
 	else
-		ret = frames[pos];
+		ret = frames[frameIdx];
 
 	if (endReached && (Flags&A_ANI_PLAYONCE))
 		return ret;
@@ -135,20 +127,20 @@ Holder<Sprite2D> Animation::NextFrame(void)
 	//large, composite animations (dragons, multi-part area anims) require synchronisation
 	if ((time - starttime) >= tick_t(1000 / fps)) {
 		tick_t inc = (time-starttime) * fps / 1000;
-		pos += inc;
+		frameIdx += inc;
 		starttime += inc*1000/fps;
 	}
-	if (pos >= indicesCount ) {
+	if (frameIdx >= indicesCount ) {
 		if (indicesCount) {
 			if (Flags&A_ANI_PLAYONCE) {
-				pos = indicesCount-1;
+				frameIdx = indicesCount-1;
 				endReached = true;
 			} else {
-				pos = pos%indicesCount;
+				frameIdx %= indicesCount;
 				endReached = false; //looping, there is no end
 			}
 		} else {
-			pos = 0;
+			frameIdx = 0;
 			endReached = true;
 		}
 	}
@@ -163,15 +155,15 @@ Holder<Sprite2D> Animation::GetSyncedNextFrame(const Animation* master)
 	}
 	Holder<Sprite2D> ret;
 	if (playReversed)
-		ret = frames[indicesCount-pos-1];
+		ret = frames[indicesCount - frameIdx - 1];
 	else
-		ret = frames[pos];
+		ret = frames[frameIdx];
 
 	starttime = master->starttime;
 	endReached = master->endReached;
 
 	//return a valid frame even if the master is longer (e.g. ankhegs)
-	pos = master->pos % indicesCount;
+	frameIdx = master->frameIdx % indicesCount;
 
 	return ret;
 }
@@ -182,7 +174,7 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Holder<Sprite2D> Animation::GetFrame(unsigned int i) const
+Holder<Sprite2D> Animation::GetFrame(index_t i) const
 {
 	if (i >= indicesCount) {
 		return NULL;
@@ -214,7 +206,7 @@ void Animation::MirrorAnimationVert()
 	animArea.y = -animArea.h - animArea.y;
 }
 
-void Animation::AddAnimArea(Animation* slave)
+void Animation::AddAnimArea(const Animation* slave)
 {
 	animArea.ExpandToRegion(slave->animArea);
 }

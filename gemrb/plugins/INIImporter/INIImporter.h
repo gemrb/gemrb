@@ -39,7 +39,7 @@ private:
 	std::vector< INIPair> pairs;
 	char* TagName;
 public:
-	INITag(const char* Name)
+	explicit INITag(const char* Name)
 	{
 		int len = ( int ) strlen( Name ) + 1;
 		TagName = ( char * ) malloc( len );
@@ -49,9 +49,9 @@ public:
 	~INITag()
 	{
 		free( TagName );
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			free( pairs[i].Name );
-			free( pairs[i].Value );
+		for (auto& pair : pairs) {
+			free(pair.Name);
+			free(pair.Value);
 		}
 	}
 
@@ -123,9 +123,9 @@ public:
 
 	const char* GetKeyAsString(const char* Key, const char* Default) const
 	{
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				return pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				return pair.Value;
 			}
 		}
 		return Default;
@@ -134,9 +134,9 @@ public:
 	int GetKeyAsInt(const char* Key, const int Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}
@@ -149,9 +149,9 @@ public:
 	float GetKeyAsFloat(const char* Key, const float Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}
@@ -164,9 +164,9 @@ public:
 	bool GetKeyAsBool(const char* Key, const bool Default) const
 	{
 		const char* ret = NULL;
-		for (unsigned int i = 0; i < pairs.size(); i++) {
-			if (stricmp( Key, pairs[i].Name ) == 0) {
-				ret = pairs[i].Value;
+		for (const auto pair : pairs) {
+			if (stricmp(Key, pair.Name) == 0) {
+				ret = pair.Value;
 				break;
 			}
 		}
@@ -188,7 +188,7 @@ private:
 	std::vector< INITag*> tags;
 
 public:
-	INIImporter(void);
+	INIImporter() = default;
 	~INIImporter(void) override;
 	bool Open(DataStream* stream) override;
 	int GetTagsCount() const override
@@ -205,11 +205,11 @@ public:
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) const override;
 	int GetKeyAsInt(const char* Tag, const char* Key, 
-		const int Default) const override;
+		int Default) const override;
 	float GetKeyAsFloat(const char* Tag, const char* Key, 
-		const float Default) const override;
+		float Default) const override;
 	bool GetKeyAsBool(const char* Tag, const char* Key, 
-		const bool Default) const override;
+		bool Default) const override;
 };
 
 }

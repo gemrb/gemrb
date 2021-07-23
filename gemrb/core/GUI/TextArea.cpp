@@ -22,9 +22,12 @@
 
 #include "Interface.h"
 #include "Variables.h"
+
 #include "GUI/EventMgr.h"
 #include "GUI/ScrollBar.h"
 #include "GUI/Window.h"
+
+#include <utility>
 
 namespace GemRB {
 	
@@ -203,7 +206,7 @@ bool TextArea::SpanSelector::OnMouseOver(const MouseEvent& me)
 bool TextArea::SpanSelector::OnMouseUp(const MouseEvent& me, unsigned short /*Mod*/)
 {
 	Point p = ConvertPointFromScreen(me.Pos());
-	TextContainer* span = TextAtPoint(p);
+	const TextContainer* span = TextAtPoint(p);
 	
 	if (span) {
 		std::list<View*>::reverse_iterator it = subViews.rbegin();
@@ -273,7 +276,7 @@ void TextArea::SetSpeakerPicture(Holder<Sprite2D> pic)
 		return;
 	}
 
-	speakerPic = pic;
+	speakerPic = std::move(pic);
 	MarkDirty();
 
 	assert(textContainer);

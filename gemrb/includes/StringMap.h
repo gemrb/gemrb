@@ -97,8 +97,6 @@ public:
 	}
 };
 
-// disabled, msvc6 hates it
-#if 0
 template<unsigned int size>
 struct HashKey<char[size]> {
 	typedef char array[size];
@@ -124,7 +122,6 @@ struct HashKey<char[size]> {
 		strncpy(a, b, size);
 	}
 };
-#endif
 
 }
 

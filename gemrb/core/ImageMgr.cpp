@@ -27,17 +27,8 @@ namespace GemRB {
 
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
-ImageMgr::ImageMgr(void)
-{
-}
-
-ImageMgr::~ImageMgr(void)
-{
-}
-
 Bitmap* ImageMgr::GetBitmap()
 {
-	const Size size = GetSize();
 	Bitmap *data = new Bitmap(size);
 
 	Log(ERROR, "ImageMgr", "Don't know how to handle 24bit bitmap from %s...",
@@ -49,23 +40,6 @@ Bitmap* ImageMgr::GetBitmap()
 		for (int x = 0; x < size.w; x++) {
 			const Point p(x, y);
 			data->SetAt(p, spr->GetPixel(p).r);
-		}
-	}
-
-	return data;
-}
-
-Image* ImageMgr::GetImage()
-{
-	const Size size = GetSize();
-	Image *data = new Image(size);
-
-	Holder<Sprite2D> spr = GetSprite2D();
-
-	for (int y = 0; y < size.h; y++) {
-		for (int x = 0; x < size.w; x++) {
-			const Point p(x, y);
-			data->SetPixel(p, spr->GetPixel(p));
 		}
 	}
 

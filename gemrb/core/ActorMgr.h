@@ -21,20 +21,21 @@
 #ifndef ACTORMGR_H
 #define ACTORMGR_H
 
+#include "ie_types.h"
+
 #include "Plugin.h"
 
 namespace GemRB {
 
 class Actor;
 class DataStream;
+class ResRef;
 
 class GEM_EXPORT ActorMgr : public Plugin {
 public:
-	ActorMgr(void);
-	~ActorMgr(void) override;
 	virtual bool Open(DataStream* stream) = 0;
 	virtual Actor* GetActor(unsigned char is_in_party) = 0;
-  virtual int FindSpellType(char *name, unsigned short &level, unsigned int clsmsk, unsigned int kit) const = 0;
+	virtual ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const = 0;
 
 	//returns saved size, updates internal offsets before save
 	virtual int GetStoredFileSize(Actor *ac) = 0;

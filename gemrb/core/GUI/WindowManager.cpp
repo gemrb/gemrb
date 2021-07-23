@@ -41,7 +41,7 @@ void WindowManager::SetTooltipDelay(int delay)
 	ToolTipDelay = delay;
 }
 
-WindowManager::WindowManager(Video* vid)
+WindowManager::WindowManager(Holder<Video> vid)
 : tooltip(core->CreateTooltip())
 {
 	assert(vid);
@@ -76,9 +76,10 @@ WindowManager::WindowManager(Video* vid)
 	// TODO: how do we get notified if the Video driver changes size?
 }
 
-void WindowManager::MarkAllDirty() {
-	for (auto it = windows.begin(); it != windows.end(); ++it) {
-		(*it)->MarkDirty();
+void WindowManager::MarkAllDirty() const
+{
+	for (auto& window : windows) {
+		window->MarkDirty();
 	}
 }
 
@@ -96,7 +97,7 @@ WindowManager::~WindowManager()
 void WindowManager::DestroyWindows(WindowList& list)
 {
 	WindowList::iterator it = list.begin();
-	for (; it != list.end();) {
+	while (it != list.end()) {
 		Window* win = *it;
 		// IMPORTANT: ensure the window (a control subview) isnt executing a callback before deleting it
 		if (win->InActionHandler() == false) {
@@ -167,14 +168,14 @@ bool WindowManager::FocusWindow(Window* win)
 
 bool WindowManager::OrderFront(Window* win)
 {
-	assert(windows.size()); // win should be contained in windows
+	assert(!windows.empty()); // win should be contained in windows
 	win->SetVisible(true);
 	return OrderRelativeTo(win, windows.front(), true);
 }
 
 bool WindowManager::OrderBack(Window* win)
 {
-	assert(windows.size()); // win should be contained in windows
+	assert(!windows.empty()); // win should be contained in windows
 	return OrderRelativeTo(win, windows.back(), false);
 }
 
@@ -376,15 +377,13 @@ bool WindowManager::DispatchEvent(const Event& event)
 
 	if (eventMgr.MouseDown() == false && eventMgr.FingerDown() == false) {
 		if (event.type == Event::MouseUp || event.type == Event::TouchUp) {
-			if (trackingWin) {
-				if (trackingWin->IsDisabled() == false) {
-					trackingWin->DispatchEvent(event);
-				}
+			// we don't deliver mouse up events if there isn't a corresponding mouse down (no trackingWin).
+			if (!trackingWin) return false;
 
-				trackingWin = NULL;
+			if (trackingWin->IsDisabled() == false) {
+				trackingWin->DispatchEvent(event);
 			}
-
-			// we don't deliver mouse up events if there isn't a corresponding mouse down (trackingWin == NULL).
+			trackingWin = nullptr;
 			return false;
 		}
 
@@ -559,7 +558,7 @@ void WindowManager::DrawWindows() const
 {
 	HUDBuf->Clear();
 
-	if (!windows.size()) {
+	if (windows.empty()) {
 		return;
 	}
 
@@ -575,7 +574,7 @@ void WindowManager::DrawWindows() const
 	}
 
 	bool drawFrame = false;
-	Window* frontWin = windows.front();
+	const Window* frontWin = windows.front();
 	Window* modalWin = ModalWindow();
 	const Region& frontWinFrame = frontWin->Frame();
 	// we have to draw windows from the bottom up so the front window is drawn last

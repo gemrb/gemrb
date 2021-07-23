@@ -56,10 +56,9 @@ struct HashKey {
 		a = b;						\
 	}
 
-// MSVC6 is convinced that this the same as char[1] from StringMap.h
-//HASHMAP_DEFINE_TRIVIAL_HASHKEY(char);
-//HASHMAP_DEFINE_TRIVIAL_HASHKEY(signed char);
-//HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned char);
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(char)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(signed char)
+HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned char)
 
 HASHMAP_DEFINE_TRIVIAL_HASHKEY(short)
 HASHMAP_DEFINE_TRIVIAL_HASHKEY(unsigned short)

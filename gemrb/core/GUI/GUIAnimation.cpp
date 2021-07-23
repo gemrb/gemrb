@@ -96,7 +96,7 @@ bool SpriteAnimation::SameResource(const SpriteAnimation *anim) const
 	return true;
 }
 
-void SpriteAnimation::SetPaletteGradients(ieDword *col)
+void SpriteAnimation::SetPaletteGradients(const ieDword *col)
 {
 	memcpy(colors, col, 8*sizeof(ieDword));
 	has_palette = true;
@@ -143,6 +143,8 @@ tick_t SpriteAnimation::CalculateNextFrameDelta()
 
 Holder<Sprite2D> SpriteAnimation::GenerateNext(tick_t time)
 {
+	if (time < nextFrameTime) return current;
+
 	// even if we are paused we need to generate the first frame
 	if (current && !(flags & PLAY_ALWAYS) && core->IsFreezed()) {
 		nextFrameTime = time + 1;

@@ -1183,10 +1183,8 @@ static const TriggerLink* FindTrigger(const char* triggername)
 	}
 	int len = strlench( triggername, '(' );
 	for (int i = 0; triggernames[i].Name; i++) {
-		if (!strnicmp( triggernames[i].Name, triggername, len )) {
-			if (!triggernames[i].Name[len]) {
-				return triggernames + i;
-			}
+		if (!strnicmp(triggernames[i].Name, triggername, len)) {
+			return triggernames + i;
 		}
 	}
 	return NULL;
@@ -1199,10 +1197,8 @@ static const ActionLink* FindAction(const char* actionname)
 	}
 	int len = strlench( actionname, '(' );
 	for (int i = 0; actionnames[i].Name; i++) {
-		if (!strnicmp( actionnames[i].Name, actionname, len )) {
-			if (!actionnames[i].Name[len]) {
-				return actionnames + i;
-			}
+		if (!strnicmp(actionnames[i].Name, actionname, len)) {
+			return actionnames + i;
 		}
 	}
 	return NULL;
@@ -1215,10 +1211,8 @@ static const ObjectLink* FindObject(const char* objectname)
 	}
 	int len = strlench( objectname, '(' );
 	for (int i = 0; objectnames[i].Name; i++) {
-		if (!strnicmp( objectnames[i].Name, objectname, len )) {
-			if (!objectnames[i].Name[len]) {
-				return objectnames + i;
-			}
+		if (!strnicmp(objectnames[i].Name, objectname, len)) {
+			return objectnames + i;
 		}
 	}
 	return NULL;
@@ -1330,10 +1324,8 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 	case ST_ACTOR:
 		//i don't know if unselectable actors are targetable by script
 		//if yes, then remove GA_SELECT
-		if (ga_flags) {
-			if (!((Actor *) target)->ValidTarget(ga_flags) ) {
-				return;
-			}
+		if (ga_flags && !((Actor *) target)->ValidTarget(ga_flags)) {
+			return;
 		}
 		break;
 	case ST_GLOBAL:
@@ -1392,12 +1384,9 @@ static void CleanupIEScript()
 	objectsTable.release();
 	overrideActionsTable.release();
 	overrideTriggersTable.release();
-	if (ObjectIDSTableNames)
-		free(ObjectIDSTableNames);
-	ObjectIDSTableNames = NULL;
 }
 
-static void printFunction(StringBuffer& buffer, Holder<SymbolMgr> table, int index)
+static void printFunction(StringBuffer& buffer, const Holder<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
@@ -1424,7 +1413,7 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
-	int j = table->GetSize();
+	size_t j = table->GetSize();
 	while (j--) {
 		int i = table->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
@@ -1479,7 +1468,7 @@ void InitializeIEScript()
 		error("GameScript", "The IDS Count shouldn't be more than 10!\n");
 	}
 
-	ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
+	ObjectIDSTableNames.resize(ObjectIDSCount);
 	for (int i = 0; i < ObjectIDSCount; i++) {
 		const char *idsname;
 		idsname=objNameTable->QueryField( 0, i + 1 );
@@ -1490,7 +1479,7 @@ void InitializeIEScript()
 		else {
 			idtargets[i]=poi->Function;
 		}
-		strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
+		ObjectIDSTableNames[i] = ResRef::MakeLowerCase(idsname);
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -1509,10 +1498,8 @@ void InitializeIEScript()
 	memset( actionflags, 0, sizeof( actionflags ) );
 	memset( objects, 0, sizeof( objects ) );
 
-	int max;
-
-	max = triggersTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	size_t max = triggersTable->GetSize();
+	for (size_t j = 0; j < max; j++) {
 		int i = triggersTable->GetValueIndex(j);
 		const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ));
 
@@ -1547,7 +1534,7 @@ void InitializeIEScript()
 			// missing trigger which might be resolved later
 			triggers[i] = NULL;
 			triggerflags[i] = 0;
-			missing_triggers.push_back(j);
+			missing_triggers.push_back(static_cast<int>(j));
 			continue;
 		}
 		triggers[i] = poi->Function;
@@ -1582,7 +1569,7 @@ void InitializeIEScript()
 	}
 
 	max = actionsTable->GetSize();
-	for (int j = 0; j < max; j++) {
+	for (size_t j = 0; j < max; j++) {
 		int i = actionsTable->GetValueIndex(j);
 		if (i >= MAX_ACTIONS) {
 			Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1613,7 +1600,7 @@ void InitializeIEScript()
 		if (poi == NULL) {
 			actions[i] = NULL;
 			actionflags[i] = 0;
-			missing_actions.push_back(j);
+			missing_actions.push_back(static_cast<int>(j));
 			continue;
 		}
 		actions[i] = poi->Function;
@@ -1626,7 +1613,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideActionsTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideActionsTable->GetValueIndex(j);
 			if (i >= MAX_ACTIONS) {
 				Log(ERROR, "GameScript", "action %d (%s) is too high, ignoring",
@@ -1638,7 +1625,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override action: ");
-				printFunction(buffer, overrideActionsTable, j);
+				printFunction(buffer, overrideActionsTable, static_cast<int>(j));
 				continue;
 			}
 			if (actions[i] && (actions[i]!=poi->Function || actionflags[i]!=poi->Flags) ) {
@@ -1665,7 +1652,7 @@ void InitializeIEScript()
 		 * right now you can't print or generate these actions!
 		 */
 		max = overrideTriggersTable->GetSize();
-		for (int j = 0; j < max; j++) {
+		for (size_t j = 0; j < max; j++) {
 			int i = overrideTriggersTable->GetValueIndex( j );
 			bool was_condition = (i & 0x4000);
 			i &= 0x3fff;
@@ -1682,7 +1669,7 @@ void InitializeIEScript()
 				StringBuffer buffer;
 
 				buffer.append("Couldn't assign function to override trigger: ");
-				printFunction(buffer, overrideTriggersTable, j);
+				printFunction(buffer, overrideTriggersTable, static_cast<int>(j));
 				continue;
 			}
 			int tf = poi->Flags | (was_condition?TF_CONDITION:0);
@@ -1696,7 +1683,7 @@ void InitializeIEScript()
 					printFunction(buffer, triggersTable, x);
 				} else {
 					x = overrideTriggersTable->FindValue(i);
-					if (x<0 || x>=j) x = overrideTriggersTable->FindValue(i|0x4000);
+					if (x < 0 || size_t(x) >= j) x = overrideTriggersTable->FindValue(i|0x4000);
 					printFunction(buffer, overrideTriggersTable, x);
 				}
 				Log(MESSAGE, "GameScript", buffer);
@@ -1730,7 +1717,7 @@ void InitializeIEScript()
 		Log(WARNING, "GameScript", buffer);
 	}
 
-	int j = objectsTable->GetSize();
+	size_t j = objectsTable->GetSize();
 	while (j--) {
 		int i = objectsTable->GetValueIndex(j);
 		if (i >= MAX_OBJECTS) {
@@ -1757,7 +1744,7 @@ void InitializeIEScript()
 		}
 		if (poi == NULL) {
 			objects[i] = NULL;
-			missing_objects.push_back(j);
+			missing_objects.push_back(static_cast<int>(j));
 		} else {
 			objects[i] = poi->Function;
 		}
@@ -1784,7 +1771,7 @@ void InitializeIEScript()
 		}
 		StringBuffer buffer;
 		buffer.append("Couldn't assign function to object: ");
-		printFunction(buffer, objectsTable, j);
+		printFunction(buffer, objectsTable, static_cast<int>(j));
 		Log(WARNING, "GameScript", buffer);
 	}
 
@@ -1826,16 +1813,11 @@ void InitializeIEScript()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(const ieResRef ResRef, Scriptable* MySelf,
+GameScript::GameScript(const ResRef& resref, Scriptable* MySelf,
 	int ScriptLevel, bool AIScript)
-	: MySelf(MySelf)
+	: MySelf(MySelf), Name(resref), scriptlevel(ScriptLevel)
 {
-	scriptlevel = ScriptLevel;
-	lastAction = (unsigned int) ~0;
-
-	strnlwrcpy( Name, ResRef, 8 );
-
-	script = CacheScript( Name, AIScript);
+	script = CacheScript(Name, AIScript);
 }
 
 GameScript::~GameScript(void)
@@ -1847,7 +1829,7 @@ GameScript::~GameScript(void)
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
-			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name);
+			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
 		}
 		if (!res) {
 			//print("Freeing script %s because its refcount has reached 0.", Name);
@@ -1857,19 +1839,19 @@ GameScript::~GameScript(void)
 	}
 }
 
-Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
+Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 {
 	char line[10];
 
 	SClass_ID type = AIScript ? IE_BS_CLASS_ID : IE_BCS_CLASS_ID;
 
-	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
+	Script *newScript = (Script *) BcsCache.GetResource(resRef);
 	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", ResRef, BcsCache.RefCount(ResRef));
+		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef, BcsCache.RefCount(resRef));
 		return newScript;
 	}
 
-	DataStream* stream = gamedata->GetResource( ResRef, type );
+	DataStream* stream = gamedata->GetResource(resRef, type);
 	if (!stream) {
 		return NULL;
 	}
@@ -1880,8 +1862,8 @@ Script* GameScript::CacheScript(ieResRef ResRef, bool AIScript)
 		return NULL;
 	}
 	newScript = new Script( );
-	BcsCache.SetAt( ResRef, (void *) newScript );
-	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", ResRef, BcsCache.RefCount(ResRef));
+	BcsCache.SetAt(resRef, (void *) newScript);
+	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef, BcsCache.RefCount(resRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -1943,8 +1925,8 @@ static Object* DecodeObject(const char* line)
 	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
 		int tmp[4];
-		for (int i = 0; i < 4; i++) {
-			tmp[i] = ParseInt(line);
+		for (int& i : tmp) {
+			i = ParseInt(line);
 		}
 		oB->objectRect = Region(tmp[0], tmp[1], tmp[2] - tmp[0], tmp[3] - tmp[1]);
 		if (*line == ' ')
@@ -2159,29 +2141,26 @@ void GameScript::EvaluateAllBlocks()
 	// cutscenes don't evaluate conditions - they just choose the
 	// first response, take the object from the first action,
 	// and then add the actions to that object's queue.
-	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
-		ResponseBlock* rB = script->responseBlocks[a];
-		ResponseSet * rS = rB->responseSet;
-		if (rS->responses.size()) {
-			Response *response = rS->responses[0];
-			if (response->actions.size()) {
-				Action *action = response->actions[0];
-				Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
-				if (target) {
-					// save the target in case it selfdestructs and we need to manually exit the cutscene
-					core->SetCutSceneRunner(target);
-					// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
-					rS->responses[0]->Execute(target);
-					// NOTE: this will break blocking instants, if there are any
-					target->ReleaseCurrentAction();
-				} else {
-					Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
-					if (core->InDebugMode(ID_CUTSCENE)) {
-						if (action->objects[1]) {
-							action->objects[1]->dump();
-						}
-					}
-				}
+	for (const auto rB : script->responseBlocks) {
+		const ResponseSet *rS = rB->responseSet;
+		if (rS->responses.empty()) continue;
+
+		const Response *response = rS->responses[0];
+		if (response->actions.empty()) continue;
+
+		const Action *action = response->actions[0];
+		Scriptable *target = GetActorFromObject(MySelf, action->objects[1]);
+		if (target) {
+			// save the target in case it selfdestructs and we need to manually exit the cutscene
+			core->SetCutSceneRunner(target);
+			// TODO: sometimes SetInterrupt(false) and SetInterrupt(true) are added before/after? (is this true elsewhere than in dialog?)
+			rS->responses[0]->Execute(target);
+			// NOTE: this will break blocking instants, if there are any
+			target->ReleaseCurrentAction();
+		} else {
+			Log(ERROR, "GameScript", "Failed to find CutSceneID target!");
+			if (core->InDebugMode(ID_CUTSCENE) && action->objects[1]) {
+				action->objects[1]->dump();
 			}
 		}
 	}
@@ -2234,7 +2213,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = 0;
 	stream->ReadLine( line, 1024 );
 	char *poi;
-	rE->weight = (unsigned char)strtoul(line,&poi,10);
+	rE->weight = strtounsigned<uint8_t>(line,&poi,10);
 	if (strncmp(poi, "AC", 2) != 0) {
 		free(line);
 		return rE;
@@ -2244,7 +2223,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		stream->ReadLine( line, 1024 );
-		aC->actionID = (unsigned short)strtoul(line, NULL,10);
+		aC->actionID = strtounsigned<uint16_t>(line, nullptr, 10);
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -2327,7 +2306,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 			if (ORcount) {
 				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 				if (!subresult) {
-					return 0;
+					return false;
 				}
 			}
 			ORcount = result;
@@ -2342,14 +2321,14 @@ bool Condition::Evaluate(Scriptable *Sender) const
 			result = subresult;
 		}
 		if (!result) {
-			return 0;
+			return false;
 		}
 	}
 	if (ORcount) {
 		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
 		return subresult;
 	}
-	return 1;
+	return true;
 }
 
 /* this may return more than a boolean, in case of Or(x) */
@@ -2492,12 +2471,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		//uninterruptable actions will set it back
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
-			if (actionflags[actionID]&AF_ALIVE) {
-				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
-					Log(WARNING, "GameScript", "Aborted action due to death!");
-					Sender->ReleaseCurrentAction();
-					return;
-				}
+			if (actionflags[actionID] & AF_ALIVE && Sender->GetInternalFlag() & IF_STOPATTACK) {
+				Log(WARNING, "GameScript", "Aborted action due to death!");
+				Sender->ReleaseCurrentAction();
+				return;
 			}
 		}
 		func( Sender, aC );
@@ -2548,8 +2525,8 @@ Trigger* GenerateTrigger(char* String)
 		Log(ERROR, "GameScript", "Invalid scripting trigger: %s", String);
 		return NULL;
 	}
-	char *src = String+len;
-	char *str = triggersTable->GetStringIndex( i )+len;
+	const char *src = String + len;
+	const char *str = triggersTable->GetStringIndex(i) + len;
 	Trigger *trigger = GenerateTriggerCore(src, str, i, negate);
 	if (!trigger) {
 		Log(ERROR, "GameScript", "Malformed scripting trigger: %s", String);
@@ -2567,9 +2544,9 @@ Action* GenerateAction(const char* String)
 	ScriptDebugLog(ID_ACTIONS, "Compiling: %s", String);
 
 	int len = strlench(String,'(')+1; //including (
-	char *src = actionString+len;
+	const char *src = actionString + len;
 	int i = -1;
-	char *str;
+	const char *str;
 	unsigned short actionID;
 	if (overrideActionsTable) {
 		i = overrideActionsTable->FindString(actionString, len);
@@ -2617,7 +2594,7 @@ void Object::dump() const
 
 void Object::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	if(objectName[0]) {
 		buffer.appendFormatted("Object: %s\n",objectName);
 		return;
@@ -2660,7 +2637,7 @@ void Trigger::dump() const
 
 void Trigger::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Trigger: %d\n", triggerID);
 	buffer.appendFormatted("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
@@ -2683,7 +2660,7 @@ void Action::dump() const
 
 void Action::dump(StringBuffer& buffer) const
 {
-	AssertCanary(__FUNCTION__);
+	AssertCanary(__func__);
 	buffer.appendFormatted("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
 	buffer.appendFormatted("String0: %s, String1: %s\n", string0Parameter[0]?string0Parameter:"<NULL>", string1Parameter[0]?string1Parameter:"<NULL>");
 	buffer.appendFormatted("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);

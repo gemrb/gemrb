@@ -35,9 +35,6 @@ AppleLogger::AppleLogger()
 : Logger::LogWriter(DEBUG)
 {}
 
-AppleLogger::~AppleLogger()
-{}
-	
 void AppleLogger::WriteLogMessage(const Logger::LogMessage& msg)
 {
 	NSLog(@"%s", msg.message.c_str()); // send to OS X logging system

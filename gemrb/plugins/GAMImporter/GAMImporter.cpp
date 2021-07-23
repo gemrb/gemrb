@@ -110,7 +110,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 {
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
-	if (core->SaveAsOriginal) {
+	if (core->config.SaveAsOriginal) {
 		// HACK: default icewind2.gam is 2.0! handled by script
 		if(ver_override) {
 			newGame->version = ver_override;
@@ -125,8 +125,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	newGame->GameTime = GameTime*AI_UPDATE_TIME;
 
 	str->ReadWord(newGame->WhichFormation);
-	for (unsigned int i = 0; i < 5; i++) {
-		str->ReadWord(newGame->Formations[i]);
+	for (unsigned short& formation : newGame->Formations) {
+		str->ReadWord(formation);
 	}
 	//hack for PST
 	if (version==GAM_VER_PST) {
@@ -156,7 +156,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			MazeOffset = 0;
 			str->ReadDword(newGame->Reputation);
 			str->ReadResRef( newGame->CurrentArea ); // FIXME: this is the 'master area'
-			memcpy(newGame->AnotherArea, newGame->CurrentArea, sizeof(ieResRef) );
+			newGame->AnotherArea = newGame->CurrentArea;
 			str->ReadDword(newGame->ControlStatus);
 			str->ReadDword(newGame->Expansion);
 			str->ReadDword(FamiliarsOffset);
@@ -191,7 +191,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			break;
 	}
 
-	if (!newGame->CurrentArea[0]) {
+	if (newGame->CurrentArea.IsEmpty()) {
 		// 0 - normal, 1 - tutorial, 2 - extension
 		AutoTable tm("STARTARE");
 		ieDword playmode = 0;
@@ -201,8 +201,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		const char* resref = tm->QueryField( playmode );
-		strnlwrcpy( newGame->CurrentArea, resref, 8 );
+		newGame->CurrentArea = ResRef::MakeLowerCase(tm->QueryField(playmode));
 	}
 
 	//Loading PCs
@@ -285,7 +284,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		} else {
 			//clear these fields up
 			for (unsigned int i = 0; i < 9; i++) {
-				memset(newGame->GetFamiliar(i), 0, sizeof(ieResRef));
+				newGame->GetFamiliar(i).Reset();
 			}
 		}
 	}
@@ -340,13 +339,12 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 	}
 }
 
-Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
+Actor* GAMImporter::GetActor(const Holder<ActorMgr>& aM, bool is_in_party)
 {
-	PCStruct pcInfo;
+	PCStruct pcInfo{};
 	ieDword tmpDword;
 	ieWord tmpWord;
 
-	memset( &pcInfo,0,sizeof(pcInfo) );
 	str->ReadWord(pcInfo.Selected);
 	str->ReadWord(pcInfo.PartyOrder);
 	str->ReadDword(pcInfo.OffsetToCRE);
@@ -360,13 +358,13 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	str->ReadWord(pcInfo.ViewYPos);
 	str->ReadWord(pcInfo.ModalState); //see Modal.ids
 	str->ReadScalar<ieWordSigned>(pcInfo.Happiness);
-	for (unsigned int i = 0; i < MAX_INTERACT; i++) {
-		str->ReadDword(pcInfo.Interact[i]); //interact counters
+	for (unsigned int& interact : pcInfo.Interact) {
+		str->ReadDword(interact); //interact counters
 	}
 
 	bool extended = version==GAM_VER_GEMRB || version==GAM_VER_IWD2;
 	if (extended) {
-		ieResRef tmp;
+		ResRef tmp;
 
 		for (unsigned int i = 0; i < 4; i++) {
 			str->ReadWord(pcInfo.QuickWeaponSlot[i]);
@@ -380,8 +378,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			SanityCheck( pcInfo.QuickWeaponSlot[i+4], tmpWord, "weapon");
 			pcInfo.QuickWeaponHeader[i+4]=tmpWord;
 		}
-		for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
+		for (auto& spell : pcInfo.QuickSpellResRef) {
+			str->ReadResRef(spell);
 		}
 		str->Read( &pcInfo.QuickSpellClass, MAX_QSLOTS ); //9 bytes
 
@@ -402,18 +400,18 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			//this may be slightly buggy because IWD2 doesn't clear the
 			//fields, but QuickSpellClass is set correctly
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
-					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+				str->ReadResRef(tmp);
+				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
+					pcInfo.QuickSpellResRef[i] = tmp;
 					//innates
 					pcInfo.QuickSpellClass[i]=0xff;
 				}
 			}
 			//recently discovered fields (bard songs)
 			for (unsigned int i = 0; i < MAX_QSLOTS; i++) {
-				str->Read( tmp, 8 );
-				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[i][0]==0)) {
-					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+				str->ReadResRef(tmp);
+				if (!tmp.IsEmpty() && pcInfo.QuickSpellResRef[i].IsEmpty()) {
+					pcInfo.QuickSpellResRef[i] = tmp;
 					//bardsongs
 					pcInfo.QuickSpellClass[i]=0xfe;
 				}
@@ -439,11 +437,11 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 			pcInfo.QuickWeaponHeader[i]=tmpWord;
 		}
 		for (unsigned int i = 0; i < 3; i++) {
-			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
+			str->ReadResRef(pcInfo.QuickSpellResRef[i]);
 		}
 		if (version==GAM_VER_PST) { //Torment
-			for (unsigned int i = 0; i < 5; i++) {
-				str->ReadWord(pcInfo.QuickItemSlot[i]);
+			for (unsigned short& slot : pcInfo.QuickItemSlot) {
+				str->ReadWord(slot);
 			}
 			for (unsigned int i = 0; i < 5; i++) {
 				str->ReadWord(tmpWord);
@@ -505,7 +503,9 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	PCStatsStruct *ps = actor->PCStats;
 	GetPCStats(ps, extended);
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
-	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, MAX_QSLOTS*sizeof(ieResRef) );
+	for (int i = 0; i < MAX_QSLOTS; i++) {
+		ps->QuickSpells[i] = pcInfo.QuickSpellResRef[i];
+	}
 	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, MAX_QSLOTS );
 	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
 	memcpy(ps->QuickWeaponHeaders, pcInfo.QuickWeaponHeader, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
@@ -514,8 +514,8 @@ Actor* GAMImporter::GetActor(Holder<ActorMgr> aM, bool is_in_party )
 	actor->ReinitQuickSlots();
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
-	strcpy( actor->Area, pcInfo.Area );
-	actor->SetOrientation( pcInfo.Orientation,0 );
+	actor->Area = pcInfo.Area;
+	actor->SetOrientation(pcInfo.Orientation, false);
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->Modal.State = pcInfo.ModalState;
 	actor->SetModalSpell(pcInfo.ModalState, 0);
@@ -564,8 +564,8 @@ void GAMImporter::GetPCStats (PCStatsStruct *ps, bool extended)
 		//5 - arterial strike
 		//6 - hamstring
 		//7 - rapid shot
-		for (int i = 0; i < 16; i++) {
-			str->ReadDword(ps->ExtraSettings[i]);
+		for (unsigned int& extraSetting : ps->ExtraSettings) {
+			str->ReadDword(extraSetting);
 		}
 	}
 }
@@ -598,10 +598,6 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	}
 	switch(game->version)
 	{
-	case GAM_VER_GEMRB:
-		headersize = 0xb4;
-		PCSize = 0x160;
-		break;
 	case GAM_VER_IWD:
 		headersize = 0xb4;
 		PCSize = 0x180;
@@ -609,6 +605,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	case GAM_VER_BG:
 	case GAM_VER_BG2:
 	case GAM_VER_TOB:
+	case GAM_VER_GEMRB:
 		headersize = 0xb4;
 		PCSize = 0x160;
 		break;
@@ -692,7 +689,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	return headersize + PPLocCount * 12;
 }
 
-int GAMImporter::PutJournals(DataStream *stream, const Game *game)
+int GAMImporter::PutJournals(DataStream *stream, const Game *game) const
 {
 	for (unsigned int i=0;i<JournalCount;i++) {
 		const GAMJournalEntry *j = game->GetJournalEntry(i);
@@ -710,7 +707,7 @@ int GAMImporter::PutJournals(DataStream *stream, const Game *game)
 }
 
 //only in ToB (and iwd2)
-int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
+int GAMImporter::PutSavedLocations(DataStream *stream, Game *game) const
 {
 	ieWord tmpWord;
 	ieDword filling = 0;
@@ -735,7 +732,7 @@ int GAMImporter::PutSavedLocations(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
+int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 {
 	ieWord tmpWord;
 
@@ -752,7 +749,7 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game)
 }
 
 //only in PST
-int GAMImporter::PutKillVars(DataStream *stream, const Game *game)
+int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -774,7 +771,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutVariables(DataStream *stream, const Game *game)
+int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 {
 	char filling[40];
 	ieVariable tmpname;
@@ -809,12 +806,12 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutHeader(DataStream *stream, Game *game)
+int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 {
 	char Signature[10];
 	ieDword tmpDword;
 
-	memcpy( Signature, "GAMEV0.0", 8);
+	strlcpy(Signature, "GAMEV0.0", 9);
 	Signature[5]+=game->version/10;
 	if (game->version==GAM_VER_PST || game->version==GAM_VER_BG) { //pst/bg1 saved version
 		Signature[7]+=1;
@@ -833,8 +830,8 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game)
 		stream->Write( Signature, 10);
 	} else {
 		stream->WriteWord(game->WhichFormation);
-		for (int i = 0; i < 5; i++) {
-			stream->WriteWord(game->Formations[i]);
+		for (unsigned short& formation : game->Formations) {
+			stream->WriteWord(formation);
 		}
 	}
 	stream->WriteDword(game->PartyGold);
@@ -927,17 +924,17 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	tmpWord = ac->Pos.y;
 	stream->WriteWord(tmpWord);
 	//no viewport, we cheat
-	tmpWord = ac->Pos.x-core->Width/2;
+	tmpWord = ac->Pos.x - core->config.Width / 2;
 	stream->WriteWord(tmpWord);
-	tmpWord = ac->Pos.y-core->Height/2;
+	tmpWord = ac->Pos.y - core->config.Height / 2;
 	stream->WriteWord(tmpWord);
 	tmpWord = (ieWord) ac->Modal.State;
 	stream->WriteWord(tmpWord);
 	tmpWord = ac->PCStats->Happiness;
 	stream->WriteWord(tmpWord);
 	//interact counters
-	for (int i = 0; i < MAX_INTERACT; i++) {
-		stream->WriteDword(ac->PCStats->Interact[i]);
+	for (unsigned int& interact : ac->PCStats->Interact) {
+		stream->WriteDword(interact);
 	}
 
 	//quickweapons
@@ -965,7 +962,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 			if (ac->PCStats->QuickSpellClass[i] >= 0xfe) {
 				stream->Write(filling,8);
 			} else {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			}
 		}
 		//quick spell classes, clear the field for iwd2 if it is
@@ -982,18 +979,18 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 		memset(filling,0,sizeof(filling) );
 	} else {
 		for (int i = 0; i < 3; i++) {
-			stream->Write(ac->PCStats->QuickSpells[i],8);
+			stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 		}
 	}
 
 	//quick items
 	switch (version) {
 	case GAM_VER_PST: case GAM_VER_GEMRB:
-		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-			stream->WriteWord(ac->PCStats->QuickItemSlots[i]);
+		for (unsigned short& quickItemSlot : ac->PCStats->QuickItemSlots) {
+			stream->WriteWord(quickItemSlot);
 		}
-		for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
-			stream->WriteWord(ac->PCStats->QuickItemHeaders[i]);
+		for (unsigned short& quickItemHeader : ac->PCStats->QuickItemHeaders) {
+			stream->WriteWord(quickItemHeader);
 		}
 		break;
 	default:
@@ -1010,14 +1007,14 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xff) {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->Write(filling,8);
 			}
 		}
 		for (int i = 0; i < MAX_QSLOTS; i++) {
 			if (ac->PCStats->QuickSpellClass[i] == 0xfe) {
-				stream->Write(ac->PCStats->QuickSpells[i],8);
+				stream->WriteResRef(ac->PCStats->QuickSpells[i]);
 			} else {
 				stream->Write(filling,8);
 			}
@@ -1047,27 +1044,27 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	stream->WriteDword(ac->PCStats->KillsChapterCount);
 	stream->WriteDword(ac->PCStats->KillsTotalXP);
 	stream->WriteDword(ac->PCStats->KillsTotalCount);
-	for (int i = 0; i < 4; i++) {
-		stream->WriteResRef( ac->PCStats->FavouriteSpells[i]);
+	for (const auto& favouriteSpell : ac->PCStats->FavouriteSpells) {
+		stream->WriteResRef(favouriteSpell);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteWord(ac->PCStats->FavouriteSpellsCount[i]);
+	for (unsigned short& favCount : ac->PCStats->FavouriteSpellsCount) {
+		stream->WriteWord(favCount);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteResRef( ac->PCStats->FavouriteWeapons[i]);
+	for (const auto& favouriteWeapon : ac->PCStats->FavouriteWeapons) {
+		stream->WriteResRef(favouriteWeapon);
 	}
-	for (int i = 0; i < 4; i++) {
-		stream->WriteWord(ac->PCStats->FavouriteWeaponsCount[i]);
+	for (unsigned short& favCount : ac->PCStats->FavouriteWeaponsCount) {
+		stream->WriteWord(favCount);
 	}
-	stream->Write( ac->PCStats->SoundSet, 8); //soundset
+	stream->WriteResRef(ac->PCStats->SoundSet);
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		//I don't know how many fields are actually used in IWD2 saved game
 		//but we got at least 8 (and only 5 of those are actually used)
-		for (int i = 0; i < 16; i++) {
-			stream->WriteDword(ac->PCStats->ExtraSettings[i]);
+		for (unsigned int& extraSetting : ac->PCStats->ExtraSettings) {
+			stream->WriteDword(extraSetting);
 		}
 		stream->Write(filling, 130);
 	}
@@ -1200,7 +1197,7 @@ int GAMImporter::PutMaze(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutFamiliars(DataStream *stream, Game *game)
+int GAMImporter::PutFamiliars(DataStream *stream, Game *game) const
 {
 	int len = 0;
 	if (core->GetBeastsINI()) {

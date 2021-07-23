@@ -45,6 +45,8 @@ TextEdit::TextEdit(const Region& frame, unsigned short maxLength, Point p)
 	textContainer.SetMargin(p.y, p.x);
 
 	SetFlags(Alpha|Numeric, OP_OR);
+	
+	textContainer.SetEventProxy(this);
 }
 
 TextEdit::~TextEdit()
@@ -63,16 +65,6 @@ void TextEdit::SetFont(Font* f)
 	textContainer.SetFont(f);
 }
 
-void TextEdit::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
-{
-	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
-}
-
-void TextEdit::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
-{
-	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
-}
-
 /** Key Press Event */
 bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 {
@@ -80,37 +72,36 @@ bool TextEdit::OnKeyPress(const KeyboardEvent& key, unsigned short mod)
 		PerformAction(Action::Done);
 		return true;
 	}
-
-	if (QueryText().length() < max) {
-
-		if ((isalpha(key.character) || ispunct(key.character)) && (Flags()&Alpha) == 0) {
-			return false;
-		} else if (isdigit(key.character) && (Flags()&Numeric) == 0) {
-			return false;
-		}
-
-		textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
-		if (textContainer.KeyPress(key, mod)) {
-			textContainer.SetFlags(View::IgnoreEvents, OP_OR);
-			PerformAction(Action::Change);
-			return true;
-		}
-		textContainer.SetFlags(View::IgnoreEvents, OP_OR);
+	
+	// textContainer.OnKeyPress only handles deletion and navigation
+	// text is handled in TextEdit::OnTextInput
+	if (textContainer.OnKeyPress(key, mod)) {
+		PerformAction(Action::Change);
+		return true;
 	}
+
 	return false;
 }
 
 bool TextEdit::OnMouseDown(const MouseEvent& me, unsigned short mod)
 {
-	textContainer.SetFlags(View::IgnoreEvents, OP_NAND);
-	textContainer.MouseDown(me, mod);
-	textContainer.SetFlags(View::IgnoreEvents, OP_OR);
-	return true;
+	return textContainer.OnMouseDown(me, mod);
 }
 
 void TextEdit::OnTextInput(const TextEvent& te)
 {
-	textContainer.TextInput(te);
+	size_t allowedChars = std::min(max - QueryText().length(), te.text.length());
+	size_t i = (Flags() & (Alpha | Numeric)) ? 0 : allowedChars;
+	for (; i < allowedChars; ++i) {
+		wchar_t chr = te.text[i];
+		if ((isalpha(chr) || ispunct(chr)) && (Flags() & Alpha) == 0) {
+			break;
+		} else if (isdigit(chr) && (Flags() & Numeric) == 0) {
+			break;
+		}
+	}
+	
+	textContainer.InsertText(te.text.substr(0, i));
 }
 
 /** Sets the Text of the current control */

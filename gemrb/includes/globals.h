@@ -39,7 +39,6 @@
 #define PACKAGE "GemRB"
 
 #include "RGBAColor.h"
-#include "SClassID.h"
 #include "errors.h"
 
 #include "Region.h"
@@ -47,12 +46,9 @@
 #include "System/String.h"
 
 #include <algorithm>
-#include <chrono>
-
-#include "System/Logging.h"
-
 #include <bitset>
 #include <climits>
+#include <chrono>
 
 namespace GemRB {
 
@@ -198,20 +194,79 @@ GEM_EXPORT bool WithinRange(const Actor *actor, const Point &dest, int distance)
 GEM_EXPORT bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance);
 GEM_EXPORT int EARelation(const Scriptable *a, const Actor *b);
 GEM_EXPORT bool Schedule(ieDword schedule, ieDword time);
+GEM_EXPORT int CountElements(const char *str, char separator);
+
+// explode a CSV resref list into separate storage
+template<typename T>
+std::vector<T> GetElements(const char *str)
+{
+	std::vector<T> elements;
+	int i = 0;
+	for (char *part = strtok((char*) str, ","); part; part = strtok(nullptr, ",")) {
+		// there is one single screwed up entry in pst ar1100.ini: cre_file = bird, outlim
+		if (*part == ' ') part++;
+		elements.emplace_back(part);
+		i++;
+	}
+	return elements;
+}
 
 #define SCHEDULE_MASK(time) (1 << core->Time.GetHour(time - core->Time.hour_size/2))
 
-using tick_t = unsigned long;
+using tick_t = unsigned long; // milliseconds
 inline tick_t GetTicks()
 {
 	using namespace std::chrono;
 	return duration_cast<milliseconds>(steady_clock::now().time_since_epoch()).count();
 }
 
-inline bool valid_number(const char* string, long& val)
+template<typename T>
+T strtosigned(const char* str, char** endptr = nullptr, int base = 0)
 {
-	char* endpr;
-	val = strtol(string, &endpr, 0);
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_signed<T>::value, "Type must be signed");
+	
+	long ret = strtol(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	if (ret < std::numeric_limits<T>::min()) {
+		return std::numeric_limits<T>::min();
+	}
+	
+	return static_cast<T>(ret);
+}
+
+template<typename T>
+inline bool valid_signednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtosigned<T>(string, &endpr, 0);
+	return endpr != string;
+}
+
+template<typename T>
+T strtounsigned(const char* str, char** endptr = nullptr, int base = 0)
+{
+	static_assert(std::is_integral<T>::value, "Type must be integral.");
+	static_assert(sizeof(T) <= sizeof(long), "Type is too big for conversion.");
+	static_assert(std::is_unsigned<T>::value, "Type must be unsigned");
+	
+	unsigned long ret = strtoul(str, endptr, base);
+	if (ret > std::numeric_limits<T>::max()) {
+		return std::numeric_limits<T>::max();
+	}
+	
+	return static_cast<T>(ret);
+}
+
+template<typename T>
+inline bool valid_unsignednumber(const char* string, T& val)
+{
+	char* endpr = nullptr;
+	val = strtounsigned<T>(string, &endpr, 0);
 	return endpr != string;
 }
 
@@ -225,7 +280,6 @@ inline bool SetBits(T& flag, const T& value, int mode)
 		case OP_AND: flag &= value; break;
 		case OP_XOR: flag ^= value; break;
 		default:
-			Log(ERROR, "SetBits", "Unrecognized Bit Operation %i", mode);
 			return false;
 	}
 	return true;

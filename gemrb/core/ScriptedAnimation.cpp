@@ -23,14 +23,13 @@
 
 #include "ScriptedAnimation.h"
 
-#include "Animation.h"
 #include "AnimationFactory.h"
 #include "Audio.h"
 #include "Game.h"
 #include "GameData.h"
 #include "Interface.h"
 #include "Map.h"
-#include "Pixels.h"
+#include "Video/Pixels.h"
 #include "Sprite2D.h"
 
 namespace GemRB {
@@ -93,7 +92,7 @@ void ScriptedAnimation::Init()
 	starttime = 0;
 }
 
-Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop)
+Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned int cycle, unsigned int i, bool loop) const
 {
 	int c = cycle;
 
@@ -114,7 +113,7 @@ Animation *ScriptedAnimation::PrepareAnimation(AnimationFactory *af, unsigned in
 			anim->MirrorAnimationVert();
 		}
 		//creature anims may start at random position, vvcs always start on 0
-		anim->pos = 0;
+		anim->frameIdx = 0;
 		//vvcs are always paused
 		anim->gameAnimation = true;
 		if (!loop) {
@@ -196,7 +195,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 
 		anims[p] = af->GetCycle(c);
 		if (anims[p]) {
-			anims[p]->pos = 0;
+			anims[p]->frameIdx = 0;
 			if (mirror) {
 				anims[p]->MirrorAnimation();
 			}
@@ -410,11 +409,8 @@ void ScriptedAnimation::SetFullPalette(const ResRef &PaletteResRef)
 
 void ScriptedAnimation::SetFullPalette(int idx)
 {
-	ieResRef PaletteResRef;
-
-	//make sure this field is zero terminated, or strlwr will run rampant!!!
-	snprintf(PaletteResRef, sizeof(PaletteResRef), "%.7s%d", ResName.CString(), idx);
-	strnlwrcpy(PaletteResRef, PaletteResRef, 8);
+	ResRef PaletteResRef;
+	PaletteResRef.SNPrintF("%.7s%d", ResName.CString(), idx);
 	SetFullPalette(PaletteResRef);
 	//no need to call twin
 }
@@ -439,7 +435,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	}
 }
 
-int ScriptedAnimation::GetCurrentFrame() const
+Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 {
 	Animation *anim = anims[P_HOLD*MAX_ORIENT];
 	if (anim) {
@@ -505,7 +501,7 @@ bool ScriptedAnimation::UpdatePhase()
 		if (starttime == 0) {
 			starttime = time;
 		}
-		unsigned int inc = 0;
+		tick_t inc = 0;
 		if ((time - starttime) >= tick_t(1000 / FrameRate)) {
 			inc = (time - starttime) * FrameRate / 1000;
 			starttime += inc * 1000 / FrameRate;
@@ -678,7 +674,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 
 	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
-		video->BlitGameSpriteWithPalette(anim->CurrentFrame().get(), palette, p, flags | BlitFlags::BLENDED, tint);
+		video->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
 	if (light) {
 		video->BlitGameSprite(light, p, flags, tint);
@@ -740,21 +736,21 @@ void ScriptedAnimation::GetPaletteCopy()
 	//it is not sure that the first position will have a resource in it
 	//therefore the cycle
 	for (Animation *anim : anims) {
-		if (anim) {
-			Holder<Sprite2D> spr = anim->GetFrame(0);
-			if (spr) {
-				palette = spr->GetPalette()->Copy();
-				if ((Transparency&IE_VVC_BLENDED) && palette->HasAlpha() == false) {
-					palette->CreateShadedAlphaChannel();
-				} else {
-					Color shadowalpha = palette->col[1];
-					shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
-					palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
-				}
-				//we need only one palette, so break here
-				break;
-			}
+		if (!anim) continue;
+
+		Holder<Sprite2D> spr = anim->GetFrame(0);
+		if (!spr) continue;
+
+		palette = spr->GetPalette()->Copy();
+		if ((Transparency & IE_VVC_BLENDED) && palette->HasAlpha() == false) {
+			palette->CreateShadedAlphaChannel();
+		} else {
+			Color shadowalpha = palette->col[1];
+			shadowalpha.a /= 2; // FIXME: not sure if this should be /=2 or = 128 (they are probably the same value for all current uses);
+			palette->CopyColorRange(&shadowalpha, &shadowalpha + 1, 1);
 		}
+		//we need only one palette, so break here
+		break;
 	}
 }
 
