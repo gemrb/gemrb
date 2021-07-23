@@ -76,6 +76,14 @@ public:
 		return len;
 	}
 	
+	template <typename DST, typename SRC>
+	strret_t ReadScalar(DST& dest) {
+		SRC src;
+		strret_t len = ReadScalar(src);
+		dest = src;
+		return len;
+	}
+	
 	template <typename T>
 	strret_t WriteScalar(const T& src) {
 		strret_t len;
@@ -87,6 +95,12 @@ public:
 			len = Write(&src, sizeof(T));
 		}
 		return len;
+	}
+	
+	template <typename SRC, typename DST>
+	strret_t WriteScalar(const SRC& src) {
+		DST dst = static_cast<DST>(src);
+		return WriteScalar<DST>(dst);
 	}
 
 	strret_t ReadResRef(char dest[9]);
