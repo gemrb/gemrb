@@ -206,7 +206,7 @@ enum STITypes {
 	STI_MORAL_ALIGNMENT,
 	STI_AREATYPE,
 	STI_DAYTIME,
-	STI_EA,
+	STI_EA_RELATION,
 	STI_EVASION = 0x109, // note the gap to the next line!
 	STI_WATERY = 0x110,
 

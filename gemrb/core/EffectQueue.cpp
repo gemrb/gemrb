@@ -2311,7 +2311,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	switch (idx) {
 		case STI_INVALID:
 			return false;
-		case STI_EA:
+		case STI_EA_RELATION:
 			return DiffCore(EARelation(Owner, target), val, rel);
 		case STI_DAYTIME:
 		{
