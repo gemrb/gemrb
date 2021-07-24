@@ -6403,6 +6403,8 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		dict->SetAt( "P1", fx->Parameter1 );
 		dict->SetAt( "P2", fx->Parameter2 );
 		core->SetEventFlag(EF_SEQUENCER);
+		// set also this for GUIMG, since the spell won't be normally cast, but applied
+		target->LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
 	}
 	return FX_NOT_APPLIED;
 }
