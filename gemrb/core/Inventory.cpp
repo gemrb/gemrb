@@ -196,18 +196,19 @@ void Inventory::CalculateWeight()
 		}
 		if (slot->Weight == -1) {
 			const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
-			if (itm) {
-				slot->Weight = itm->Weight;
-				gamedata->FreeItem( itm, slot->ItemResRef, false );
-
-				// some items can't be dropped once they've been picked up,
-				// e.g. the portal key in BG2
-				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
-					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-				}
-			} else {
+			if (!itm) {
 				Log(ERROR, "Inventory", "Invalid item: %s!", slot->ItemResRef.CString());
 				slot->Weight = 0;
+				continue;
+			}
+
+			slot->Weight = itm->Weight;
+			gamedata->FreeItem(itm, slot->ItemResRef, false);
+
+			// some items can't be dropped once they've been picked up,
+			// e.g. the portal key in BG2
+			if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
+				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 			}
 		} else {
 			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
@@ -397,18 +398,16 @@ void Inventory::KillSlot(unsigned int index)
 			break;
 		case SLOT_EFFECT_MISSILE:
 			//getting a new projectile of the same type
-			if (eqslot == (int) index) {
-				if (Equipped < 0) {
-					//always get the projectile weapon header (this quiver was equipped)
-					const ITMExtHeader *header = itm->GetWeaponHeader(true);
-					//remove potential launcher effects too
-					RemoveSlotEffects(FindTypedRangedWeapon(header->ProjectileQualifier));
-					equip = FindRangedProjectile(header->ProjectileQualifier);
-					if (equip != IW_NO_EQUIPPED) {
-						EquipItem(GetWeaponSlot(equip));
-					} else {
-						EquipBestWeapon(EQUIP_MELEE);
-					}
+			if (eqslot == (int) index && Equipped < 0) {
+				// always get the projectile weapon header (this quiver was equipped)
+				const ITMExtHeader *header = itm->GetWeaponHeader(true);
+				// remove potential launcher effects too
+				RemoveSlotEffects(FindTypedRangedWeapon(header->ProjectileQualifier));
+				equip = FindRangedProjectile(header->ProjectileQualifier);
+				if (equip != IW_NO_EQUIPPED) {
+					EquipItem(GetWeaponSlot(equip));
+				} else {
+					EquipBestWeapon(EQUIP_MELEE);
 				}
 			}
 			UpdateWeaponAnimation();
@@ -418,32 +417,61 @@ void Inventory::KillSlot(unsigned int index)
 			// reset Equipped if it was the removed item
 			if (eqslot == (int)index) {
 				SetEquippedSlot(IW_NO_EQUIPPED, 0);
-			} else if (Equipped < 0) {
-				//always get the projectile weapon header (this is a bow, because Equipped is negative)
-				const ITMExtHeader *header = itm->GetWeaponHeader(true);
-				if (header) {
-					//find the equipped type
-					int type = header->ProjectileQualifier;
-					int weaponslot = FindTypedRangedWeapon(type);
-					const CREItem *item2 = Slots[weaponslot];
-					if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
-						EquipBestWeapon(EQUIP_MELEE);
-					} else if (item2) {
-						const Item *itm2 = gamedata->GetItem(item2->ItemResRef, true);
-						if (itm2) {
-							if (type == header->ProjectileQualifier) {
-								equip = FindRangedProjectile(header->ProjectileQualifier);
-								if (equip != IW_NO_EQUIPPED) {
-									EquipItem(GetWeaponSlot(equip));
-								} else {
-									EquipBestWeapon(EQUIP_MELEE);
-								}
-							}
-							gamedata->FreeItem(itm2, item2->ItemResRef, false);
-						}
-					}
-				}
+				UpdateWeaponAnimation();
+				break;
 			}
+
+			if (Equipped >= 0) {
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			// always get the projectile weapon header (this is a bow, because Equipped is negative)
+			const ITMExtHeader *header;
+			header = itm->GetWeaponHeader(true);
+			if (!header) {
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			// find the equipped type
+			int type;
+			int weaponslot;
+			type = header->ProjectileQualifier;
+			weaponslot = FindTypedRangedWeapon(type);
+			if (weaponslot == SLOT_FIST) { // a ranged weapon was not found - freshly unequipped
+				EquipBestWeapon(EQUIP_MELEE);
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			if (type != header->ProjectileQualifier) {
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			const CREItem *item2;
+			item2 = Slots[weaponslot];
+			if (!item2) {
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			const Item *itm2;
+			itm2 = gamedata->GetItem(item2->ItemResRef, true);
+			if (!itm2) {
+				UpdateWeaponAnimation();
+				break;
+			}
+
+			equip = FindRangedProjectile(header->ProjectileQualifier);
+			if (equip != IW_NO_EQUIPPED) {
+				EquipItem(GetWeaponSlot(equip));
+			} else {
+				EquipBestWeapon(EQUIP_MELEE);
+			}
+			gamedata->FreeItem(itm2, item2->ItemResRef, false);
+
 			// reset Equipped if it is a ranged weapon slot
 			// but not magic weapon slot!
 
@@ -1603,41 +1631,37 @@ bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int sta
 			//skipping if we cannot use the item
 			int idreq1 = (slot->Flags&IE_INV_ITEM_IDENTIFIED);
 			int idreq2 = ext_header->IDReq;
-			switch (idreq2) {
-				case ID_NO:
-					if (idreq1) continue;
-					break;
-				case ID_NEED:
-					if (!idreq1) continue;
-					break;
-				default:;
-			}
+			if (idreq2 == ID_NO && idreq1) continue;
+			if (idreq2 == ID_NEED && !idreq1) continue;
 
 			actual++;
-			if (actual>startindex) {
-
-				//store the item, return if we can't store more
-				if (!count) {
-					gamedata->FreeItem(itm, slot->ItemResRef, false);
-					return true;
-				}
-				count--;
-				headerList[pos].CopyITMExtHeader(*ext_header);
-				headerList[pos].itemName = slot->ItemResRef;
-				headerList[pos].slot = idx;
-				headerList[pos].headerindex = ehc;
-				if (ext_header->Charges) {
-					//don't modify ehc, it is a counter
-					if (ehc>=CHARGE_COUNTERS) {
-						headerList[pos].Charges = slot->Usages[0];
-					} else {
-						headerList[pos].Charges = slot->Usages[ehc];
-					}
-				} else {
-					headerList[pos].Charges = 0xffff;
-				}
-				pos++;
+			if (actual <= startindex) {
+				continue;
 			}
+
+			// store the item, return if we can't store more
+			if (!count) {
+				gamedata->FreeItem(itm, slot->ItemResRef, false);
+				return true;
+			}
+			count--;
+			headerList[pos].CopyITMExtHeader(*ext_header);
+			headerList[pos].itemName = slot->ItemResRef;
+			headerList[pos].slot = idx;
+			headerList[pos].headerindex = ehc;
+			if (!ext_header->Charges) {
+				headerList[pos].Charges = 0xffff;
+				pos++;
+				continue;
+			}
+
+			// don't modify ehc, it is a counter
+			if (ehc >= CHARGE_COUNTERS) {
+				headerList[pos].Charges = slot->Usages[0];
+			} else {
+				headerList[pos].Charges = slot->Usages[ehc];
+			}
+			pos++;
 		}
 		gamedata->FreeItem(itm, slot->ItemResRef, false);
 	}
@@ -1697,35 +1721,38 @@ void Inventory::UpdateWeaponAnimation()
 
 	const ITMExtHeader *header = nullptr;
 	const Item *itm = GetItemPointer(slot, Slot);
-	if (itm) {
-		itm->GetDamagePotential(false, header);
-		memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
-		//for twohanded flag, you don't need itm
-		if (Slot->Flags & IE_INV_ITEM_TWOHANDED)
-			WeaponType = IE_ANI_WEAPON_2H;
-		else {
+	if (!itm) {
+		Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
+		return;
+	}
 
-			// Examine shield slot to check if we're using two weapons
-			// TODO: for consistency, use same Item* access method as above
-			bool twoweapon = false;
-			int slot = GetShieldSlot();
-			const CREItem* si = nullptr;
-			if (slot>0) {
-				si = GetSlotItem( (ieDword) slot );
-			}
-			if (si) {
-				const Item* it = gamedata->GetItem(si->ItemResRef, true);
-				assert(it);
-				if (core->CanUseItemType(SLOT_WEAPON, it))
-					twoweapon = true;
-				gamedata->FreeItem(it, si->ItemResRef, false);
-			}
-
-			if (twoweapon)
-				WeaponType = IE_ANI_WEAPON_2W;
-			else
-				WeaponType = IE_ANI_WEAPON_1H;
+	itm->GetDamagePotential(false, header);
+	memcpy(AnimationType, itm->AnimationType, sizeof(AnimationType));
+	// for twohanded flag, you don't need itm
+	if (Slot->Flags & IE_INV_ITEM_TWOHANDED) {
+		WeaponType = IE_ANI_WEAPON_2H;
+	} else {
+		// Examine shield slot to check if we're using two weapons
+		// TODO: for consistency, use same Item* access method as above
+		bool twoweapon = false;
+		int slot = GetShieldSlot();
+		const CREItem* si = nullptr;
+		if (slot > 0) {
+			si = GetSlotItem((ieDword) slot);
 		}
+		if (si) {
+			const Item* it = gamedata->GetItem(si->ItemResRef, true);
+			assert(it);
+			if (core->CanUseItemType(SLOT_WEAPON, it)) {
+				twoweapon = true;
+			}
+			gamedata->FreeItem(it, si->ItemResRef, false);
+		}
+
+		if (twoweapon)
+			WeaponType = IE_ANI_WEAPON_2W;
+		else
+			WeaponType = IE_ANI_WEAPON_1H;
 	}
 
 	if (header)
@@ -1819,17 +1846,18 @@ void Inventory::ChargeAllItems(int hours) const
 		}
 
 		const Item *itm = gamedata->GetItem(item->ItemResRef, true);
-		if (!itm)
-			continue;
+		if (!itm) continue;
 		for(int h=0;h<CHARGE_COUNTERS;h++) {
 			const ITMExtHeader *header = itm->GetExtHeader(h);
-			if (header && (header->RechargeFlags&IE_ITEM_RECHARGE)) {
-				unsigned short add = header->Charges;
-				if (hours && add>hours) add=hours;
-				add+=item->Usages[h];
-				if(add>header->Charges) add=header->Charges;
-				item->Usages[h]=add;
+			if (!header || !(header->RechargeFlags & IE_ITEM_RECHARGE)) {
+				continue;
 			}
+
+			unsigned short add = header->Charges;
+			if (hours && add > hours) add = hours;
+			add += item->Usages[h];
+			if (add > header->Charges) add = header->Charges;
+			item->Usages[h] = add;
 		}
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 	}
