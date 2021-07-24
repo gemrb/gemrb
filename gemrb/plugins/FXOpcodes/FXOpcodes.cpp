@@ -6327,7 +6327,6 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
-		// TODO: fail remaining spells if an earlier one fails?
 		ResRef refs[4] = { fx->Resource, fx->Resource2, fx->Resource3, fx->Resource4 };
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
 		ResRef OldSpellResRef(Owner->SpellResRef);
