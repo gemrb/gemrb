@@ -166,6 +166,111 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
+void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const
+{
+	// spawn point could be (point_select):
+	// s - single
+	// r - random
+	// e - preset (read from var)
+	// i - indexed sequential (read from var)
+	// but also find_safest_point can override that
+	// NOTE: it affects several following keys
+	const char *pointSelect = iniFile->GetKeyAsString(critterName, "point_select", nullptr);
+	char spawnMode = 0;
+	if (pointSelect) {
+		spawnMode = pointSelect[0];
+	}
+
+	const char *pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var", nullptr);
+	if (pointSelectVar) {
+		critter.PointSelectVar = pointSelectVar;
+	}
+
+	// don't spawn when spawnpoint is visible
+	bool ignoreCanSee = iniFile->GetKeyAsBool(critterName, "ignore_can_see", false);
+	if (ignoreCanSee) {
+		critter.Flags |= CF_IGNORECANSEE;
+	}
+
+	// find first in fog, unless ignore_can_see is on
+	bool safestPoint = iniFile->GetKeyAsBool(critterName,"find_safest_point", false);
+	safestPoint = ignoreCanSee && safestPoint;
+
+	const char *spawnPoints = iniFile->GetKeyAsString(critterName, "spawn_point", nullptr);
+	bool incSpawnPointIndex = iniFile->GetKeyAsBool(critterName, "inc_spawn_point_index", false);
+	int spawnCount = 0;
+	if (spawnPoints) {
+		// expect more than one spawnpoint
+		spawnCount = CountElements(spawnPoints, ']');
+		Point p;
+		int o;
+
+		if (safestPoint) {
+			// try to find it, otherwise behave as if nothing happened and retry normally
+			const auto points = GetElements<const char*>(spawnPoints);
+			for (const auto& point : points) {
+				if (sscanf(spawnPoints, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) != 3) {
+					sscanf(spawnPoints, "[%d%*[,.]%d]", &p.x, &p.y);
+				}
+				if (map->IsVisible(p)) continue;
+				spawnPoints = point;
+			}
+		}
+
+		// only spawn_point_global / spawn_facing_global support 'e'
+		if (spawnMode == 'r') {
+			// select one of the spawnpoints randomly
+			int count = core->Roll(1, spawnCount, -1);
+			// go to the selected spawnpoint
+			while(count--) {
+				while(*spawnPoints++!=']') ;
+			}
+		} else if (spawnMode == 'i' && pointSelectVar) {
+			// choose a point by spawn index
+			ieDword indexOverride = CheckVariable(map, pointSelectVar + 8, pointSelectVar) % spawnCount;
+			while (indexOverride--) {
+				while (*spawnPoints++ != ']') ;
+			}
+			if (incSpawnPointIndex) {
+				critter.Flags |= CF_INC_INDEX;
+			}
+		} // else is 's' mode - single
+
+		// parse the selected spawnpoint
+		if (sscanf(spawnPoints, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) == 3) {
+			critter.SpawnPoint = p;
+			critter.Orientation = o;
+		} else if (sscanf(spawnPoints, "[%d%*[,.]%d]", &p.x, &p.y) == 2) {
+			critter.SpawnPoint = p;
+			critter.Orientation = core->Roll(1, 16, -1);
+		}
+	}
+
+	// Keys that store or retrieve spawn point and orientation ("facing").
+	// take point from variable
+	const char *spawnPointGlobal = iniFile->GetKeyAsString(critterName,"spawn_point_global", nullptr);
+	if (spawnPointGlobal && spawnMode == 'e') {
+		critter.SpawnPoint = CheckPointVariable(map, spawnPointGlobal + 8, spawnPointGlobal);
+	}
+
+	// take facing from variable
+	// NOTE: not replicating original buggy behavior:
+	// Due to a bug in the implementation "point_select_var" is also used to
+	// determine the creature orientation if "point_select" is set to 'e'
+	// However, both attributes had to be specified to work
+	const char *spawnFacingGlobal = iniFile->GetKeyAsString(critterName,"spawn_facing_global", nullptr);
+	if (spawnFacingGlobal  && spawnMode == 'e') {
+		critter.Orientation = static_cast<int>(CheckVariable(map, spawnFacingGlobal + 8, spawnFacingGlobal));
+	}
+
+	// should all create_qty spawns use the same spawn point?
+	// ... which we do by default now FIXME: move point selection to SpawnCreature, so this can work
+	bool holdSelectedPointKey = iniFile->GetKeyAsBool(critterName, "hold_selected_point_key", false);
+	if (holdSelectedPointKey) {
+		critter.Flags |= CF_HOLD_POINT;
+	}
+}
+
 // tags not working in originals either, see IESDP for details:
 // control_var, spec_area, check_crowd, spawn_time_of_day
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
@@ -253,109 +358,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
 
-	// SPAWN POINT SELECTION AND SETTINGS ///////////////////////////////////////////////////
-
-	//spawn point could be (point_select):
-	// s - single
-	// r - random
-	// e - preset
-	// i - indexed sequential
-	// but also find_safest_point can override that
-	// NOTE: it affects several following keys
-	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
-	char spawnMode = 0;
-	if (s) {
-		spawnMode = s[0];
-	}
-
-	const char *pointSelectVar = inifile->GetKeyAsString(crittername, "point_select_var", nullptr);
-	if (pointSelectVar) {
-		critter.PointSelectVar = pointSelectVar;
-	}
-
-	// don't spawn when spawnpoint is visible
-	bool ignoreCanSee = inifile->GetKeyAsBool(crittername, "ignore_can_see", false);
-	if (ignoreCanSee) {
-		critter.Flags |= CF_IGNORECANSEE;
-	}
-
-	// find first in fog, unless ignore_can_see is on
-	bool safestPoint = inifile->GetKeyAsBool(crittername,"find_safest_point", false);
-	safestPoint = ignoreCanSee && safestPoint;
-
-	s = inifile->GetKeyAsString(crittername, "spawn_point", nullptr);
-	bool incSpawnPointIndex = inifile->GetKeyAsBool(crittername, "inc_spawn_point_index", false);
-	int spawnCount = 0;
-	if (s) {
-		// expect more than one spawnpoint
-		spawnCount = CountElements(s, ']');
-		Point p;
-		int o;
-
-		if (safestPoint) {
-			// try to find it, otherwise behave as if nothing happened and retry normally
-			const auto points = GetElements<const char*>(s);
-			for (const auto& point : points) {
-				if (sscanf(s, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) != 3) {
-					sscanf(s, "[%d%*[,.]%d]", &p.x, &p.y);
-				}
-				if (map->IsVisible(p)) continue;
-				s = point;
-			}
-		}
-
-		// only spawn_point_global / spawn_facing_global support 'e'
-		if (spawnMode == 'r') {
-			//select one of the spawnpoints randomly
-			int count = core->Roll(1, spawnCount, -1);
-			//go to the selected spawnpoint
-			while(count--) {
-				while(*s++!=']') ;
-			}
-		} else if (spawnMode == 'i' && pointSelectVar) {
-			// choose a point by spawn index
-			ieDword indexOverride = CheckVariable(map, pointSelectVar + 8, pointSelectVar) % spawnCount;
-			while (indexOverride--) {
-				while (*s++ != ']') ;
-			}
-			if (incSpawnPointIndex) {
-				critter.Flags |= CF_INC_INDEX;
-			}
-		} // else is 's' mode - single
-		//parse the selected spawnpoint
-		if (sscanf(s, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) == 3) {
-			critter.SpawnPoint = p;
-			critter.Orientation = o;
-		} else if (sscanf(s, "[%d%*[,.]%d]", &p.x, &p.y) == 2) {
-			critter.SpawnPoint = p;
-			critter.Orientation = core->Roll(1, 16, -1);
-		}
-	}
-
-	// Keys that store or retrieve spawn point and orientation ("facing").
-	// take point from variable
-	s = inifile->GetKeyAsString(crittername,"spawn_point_global", NULL);
-	if (s && spawnMode == 'e') {
-		critter.SpawnPoint = CheckPointVariable(map, s + 8, s);
-	}
-
-	//take facing from variable
-	// NOTE: not replicating original buggy behavior:
-	// Due to a bug in the implementation "point_select_var" is also used to determine the creature orientation if "point_select" is set to 'e'
-	// However, both attributes had to be specified to work
-	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
-	if (s && spawnMode == 'e') {
-		critter.Orientation = static_cast<int>(CheckVariable(map, s + 8, s));
-	}
-
-	// should all create_qty spawns use the same spawn point?
-	// ... which we do by default now FIXME: move point selection to SpawnCreature, so this can work
-	bool holdSelectedPointKey = inifile->GetKeyAsBool(crittername, "hold_selected_point_key", false);
-	if (holdSelectedPointKey) {
-		critter.Flags |= CF_HOLD_POINT;
-	}
-
-	// END SPAWN POINT SELECTION AND SETTINGS ///////////////////////////////////////////////
+	SelectSpawnPoint(inifile, crittername, critter);
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);

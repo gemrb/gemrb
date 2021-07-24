@@ -160,6 +160,7 @@ private:
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
+	void SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);
