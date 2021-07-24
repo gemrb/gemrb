@@ -556,7 +556,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			los = false;
 		}
 
-		if (Distance(target->Pos, Sender->Pos) > dist * VOODOO_CANSEE_F) {
+		if (WithinRange(target, Sender->Pos, dist)) {
 			return 0;
 		}
 		if (!los) {

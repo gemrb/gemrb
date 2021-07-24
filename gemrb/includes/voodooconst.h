@@ -75,7 +75,6 @@ static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
 
 // visual range stuff
-static const int VOODOO_CANSEE_F = 16;
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
 static const int VOODOO_VISUAL_RANGE = 28;
