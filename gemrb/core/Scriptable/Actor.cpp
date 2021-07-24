@@ -6119,7 +6119,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (checker && checker == this) return false;
 	}
 
-	if (ga_flags&GA_NO_UNSCHEDULED) {
+	if (ga_flags & GA_NO_UNSCHEDULED && !InParty) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
 		Game *game = core->GetGame();
