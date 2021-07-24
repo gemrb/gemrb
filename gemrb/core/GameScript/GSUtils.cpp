@@ -1495,7 +1495,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	double angle = AngleFromPoints(actor->Pos, target->Pos);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		!WithinPersonalRange(actor, target, weaponrange) ||
+		!WithinPersonalRange(actor, target->Pos, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
 		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));

@@ -1454,7 +1454,7 @@ int GameScript::PersonalSpaceDistance(Scriptable *Sender, const Trigger *paramet
 		return 0;
 	}
 
-	if (WithinPersonalRange(scr, Sender, parameters->int0Parameter)) {
+	if (WithinPersonalRange(scr, Sender->Pos, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -3558,7 +3558,7 @@ int GameScript::InWeaponRange(Scriptable *Sender, const Trigger *parameters)
 	if (header && (wi.range>wrange)) {
 		wrange = actor->GetWeaponRange(wi);
 	}
-	if (WithinPersonalRange(actor, tar, wrange)) {
+	if (WithinPersonalRange(actor, tar->Pos, wrange)) {
 		return 1;
 	}
 	return 0;

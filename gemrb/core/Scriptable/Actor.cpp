@@ -7384,7 +7384,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!WithinPersonalRange(this, target, GetWeaponRange(wi)) || (GetCurrentArea() != target->GetCurrentArea())) {
+	if (!WithinPersonalRange(this, target->Pos, GetWeaponRange(wi)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
