@@ -1539,21 +1539,19 @@ int GameScript::NearLocation(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	if (parameters->pointParameter.IsZero()) {
-		int distance;
+		Point p;
 		if (parameters->int0Parameter < 0) { // use Sender's position
-			distance = PersonalDistance(Sender, scr);
+			p = Sender->Pos;
 		} else {
-			Point p(parameters->int0Parameter, parameters->int1Parameter);
-			distance = PersonalDistance(p, scr);
+			p = Point(parameters->int0Parameter, parameters->int1Parameter);
 		}
-		if (distance <= (parameters->int2Parameter * VOODOO_NEARLOC_F)) {
+		if (WithinPersonalRange(scr, p, parameters->int2Parameter)) {
 			return 1;
 		}
 		return 0;
 	}
 	//personaldistance is needed for modron constructs in PST maze
-	int distance = PersonalDistance(parameters->pointParameter, scr);
-	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
+	if (WithinPersonalRange(scr, parameters->pointParameter, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1579,8 +1577,7 @@ int GameScript::NearSavedLocation(Scriptable *Sender, const Trigger *parameters)
 		p.y = actor->GetStat(IE_SAVEDYPOS);
 	}
 	// should this be PersonalDistance?
-	int distance = Distance(p, Sender);
-	if (distance <= (parameters->int0Parameter * VOODOO_NEARLOC_F)) {
+	if (WithinRange(Sender, p, parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;

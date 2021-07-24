@@ -69,11 +69,6 @@ static unsigned int MAX_OPERATING_DISTANCE IGNORE_UNUSED = 40; //a search square
 900 = avg. 60 s*/
 static const unsigned int VOODOO_EXISTENCE_DELAY_DEFAULT = 300;
 
-// NearLocation range multiplier (currently the same for pst and iwd2/how)
-// arbitrary, started as 20 and has no effect for callers that want exact position
-// supposedly the same feet->map conversion as usual
-static const int VOODOO_NEARLOC_F = 15; // sqrt(8*8+12+12)
-
 // visual range stuff
 // these two are well understood for actors, but could be different for other scriptables
 // eg. visual range is supposedly 15 (see note in DoObjectChecks)
