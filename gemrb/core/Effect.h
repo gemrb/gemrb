@@ -215,6 +215,8 @@ public:
 		IsVariable = rhs.IsVariable;
 		// make sure to copy the whole union to set up Resource-Resource4, since VariableName will often contain nulls
 		memcpy(VariableName, rhs.VariableName, sizeof(VariableName));
+		// but VariableName is shorter than the size of the union, so:
+		resources.Resource4 = rhs.resources.Resource4;
 	}
 
 	~Effect() = default;
