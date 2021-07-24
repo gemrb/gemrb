@@ -556,7 +556,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			los = false;
 		}
 
-		if (WithinRange(target, Sender->Pos, dist)) {
+		if (!WithinRange(target, Sender->Pos, dist)) {
 			return 0;
 		}
 		if (!los) {
