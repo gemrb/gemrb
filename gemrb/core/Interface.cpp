@@ -2394,7 +2394,6 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 				if (newfx) {
 					newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
-					delete newfx;
 				}
 			}
 		}
@@ -4191,8 +4190,6 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	}
 
 	EffectQueue *fxqueue = new EffectQueue();
-	//AddEffect now copies the fx data, please delete your effect reference
-	//if you created it. (Don't delete cached references)
 	fxqueue->AddEffect( effect );
 	int res = ApplyEffectQueue(fxqueue, actor, caster);
 	delete fxqueue;
