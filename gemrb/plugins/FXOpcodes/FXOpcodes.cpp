@@ -6492,6 +6492,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	char script[9];
 	//intentionally 7, to leave room for the last letter
+	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
 	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
 	//no need of buffer defense as long as you don't mess with the 7 above
 	strcat(script,"m");
