@@ -1853,11 +1853,7 @@ void Inventory::ChargeAllItems(int hours) const
 				continue;
 			}
 
-			unsigned short add = header->Charges;
-			if (hours && add > hours) add = hours;
-			add += item->Usages[h];
-			if (add > header->Charges) add = header->Charges;
-			item->Usages[h] = add;
+			item->Usages[h] = std::min<ieWord>(header->Charges, hours + item->Usages[h]);
 		}
 		gamedata->FreeItem( itm, item->ItemResRef, false );
 	}
