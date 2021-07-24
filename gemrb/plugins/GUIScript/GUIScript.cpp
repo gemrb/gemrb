@@ -12195,10 +12195,9 @@ This function cam be used to add stats that are stored in effect blocks.\n\
   * opcode   - the effect opcode (for values see effects.ids)\n\
   * param1   - parameter 1 for the opcode\n\
   * param2   - parameter 2 for the opcode\n\
-  * resref   - optional resource reference to set in effect\n\
+  * resref   - (optional) resource reference to set in effect\n\
   * resref2  - (optional) resource reference to set in the effect\n\
   * resref3  - (optional) resource reference to set in the effect\n\
-  * resref4  - (optional) resource reference to set in the effect\n\
   * source   - (optional) source to set in the effect\n\
   * timing   - (optional) timing mode to set in the effect\n\
 \n\
