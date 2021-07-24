@@ -2729,6 +2729,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	Sender->CurrentActionInterruptable = false;
+
 	if (act) {
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
