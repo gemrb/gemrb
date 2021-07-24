@@ -50,8 +50,8 @@ class Map;
 #define CF_NO_DIFF_2 8
 #define CF_NO_DIFF_3 16
 #define CF_CHECKVIEWPORT 32
-#define CF_CHECKCROWD 64
-#define CF_SAFESTPOINT 128
+#define CF_INC_INDEX 64
+#define CF_HOLD_POINT 128
 #define CF_NO_DIFF_MASK 28
 #define CF_CHECK_NAME 256
 #define CF_GOOD 512
@@ -61,6 +61,7 @@ class Map;
 #define CF_FACTION 8192
 #define CF_TEAM 16384
 #define CF_BUDDY 0x8000
+#define CF_DISABLE_RENDERER 0x10000
 
 //spec ids flags
 #define AI_EA		0
@@ -88,7 +89,7 @@ struct CritterEntry {
 	ResRef AreaScript;      //override area script
 	ResRef SpecificScript;  //override specific script
 	ResRef Dialog;          //override dialog
-	ieVariable SpawnPointVar; //spawn point saved location
+	ieVariable PointSelectVar; // holds spawn point index to use
 	Point SpawnPoint;         //spawn point
 	int SpecVarOperator;      //operation performed on spec var
 	int SpecVarValue;         //using this value with the operation

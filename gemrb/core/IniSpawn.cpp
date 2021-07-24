@@ -166,22 +166,8 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
-// TODO: unimplemented tags (* marks partially implemented, # marks not working in original either):
-// control_var
-// spec_area
-// hold_selected_point_key
-// inc_spawn_point_index
-//#spawn_time_of_day
-//
-// PST only
-//*auto_buddy
-//
-// PSTEE only
-// disable_renderer = boolean_value
-//   Argent says: It looks like this attribute simply skips the rendering pass for the spawned creature.
-//   This state is not saved. This attribute seems to have the side effect that filtering is ignored —
-//   in my tests the creature was spawned continuously even if spec_qty and create_qty are defined.
-//   This attribute seems to be related to the script action SetRenderable.
+// tags not working in originals either, see IESDP for details:
+// control_var, spec_area, check_crowd, spawn_time_of_day
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
@@ -225,6 +211,12 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		}
 	}
 
+	// PSTEE only
+	bool disableRenderer = inifile->GetKeyAsBool(crittername, "disable_renderer", false);
+	if (disableRenderer) {
+		critter.Flags |= CF_DISABLE_RENDERER;
+	}
+
 	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
@@ -261,10 +253,14 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
 
+	// SPAWN POINT SELECTION AND SETTINGS ///////////////////////////////////////////////////
+
 	//spawn point could be (point_select):
 	// s - single
 	// r - random
 	// e - preset
+	// i - indexed sequential
+	// but also find_safest_point can override that
 	// NOTE: it affects several following keys
 	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
 	char spawnMode = 0;
@@ -272,30 +268,61 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		spawnMode = s[0];
 	}
 
-	// making point_select_var an override of point_select if both are present
-	s = inifile->GetKeyAsString(crittername,"point_select_var", nullptr);
-	if (s) {
-		char mode = static_cast<char>(CheckVariable(map, s + 8, s));
-		if (mode == 'r' || mode == 'e' || mode == 's') {
-			spawnMode = mode;
-		}
+	const char *pointSelectVar = inifile->GetKeyAsString(crittername, "point_select_var", nullptr);
+	if (pointSelectVar) {
+		critter.PointSelectVar = pointSelectVar;
 	}
 
-	s = inifile->GetKeyAsString(crittername,"spawn_point",NULL);
+	// don't spawn when spawnpoint is visible
+	bool ignoreCanSee = inifile->GetKeyAsBool(crittername, "ignore_can_see", false);
+	if (ignoreCanSee) {
+		critter.Flags |= CF_IGNORECANSEE;
+	}
+
+	// find first in fog, unless ignore_can_see is on
+	bool safestPoint = inifile->GetKeyAsBool(crittername,"find_safest_point", false);
+	safestPoint = ignoreCanSee && safestPoint;
+
+	s = inifile->GetKeyAsString(crittername, "spawn_point", nullptr);
+	bool incSpawnPointIndex = inifile->GetKeyAsBool(crittername, "inc_spawn_point_index", false);
+	int spawnCount = 0;
 	if (s) {
+		// expect more than one spawnpoint
+		spawnCount = CountElements(s, ']');
+		Point p;
+		int o;
+
+		if (safestPoint) {
+			// try to find it, otherwise behave as if nothing happened and retry normally
+			const auto points = GetElements<const char*>(s);
+			for (const auto& point : points) {
+				if (sscanf(s, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) != 3) {
+					sscanf(s, "[%d%*[,.]%d]", &p.x, &p.y);
+				}
+				if (map->IsVisible(p)) continue;
+				s = point;
+			}
+		}
+
 		// only spawn_point_global / spawn_facing_global support 'e'
-		//expect more than one spawnpoint
 		if (spawnMode == 'r') {
 			//select one of the spawnpoints randomly
-			int count = core->Roll(1,CountElements(s,']'),-1);
+			int count = core->Roll(1, spawnCount, -1);
 			//go to the selected spawnpoint
 			while(count--) {
 				while(*s++!=']') ;
 			}
+		} else if (spawnMode == 'i' && pointSelectVar) {
+			// choose a point by spawn index
+			ieDword indexOverride = CheckVariable(map, pointSelectVar + 8, pointSelectVar) % spawnCount;
+			while (indexOverride--) {
+				while (*s++ != ']') ;
+			}
+			if (incSpawnPointIndex) {
+				critter.Flags |= CF_INC_INDEX;
+			}
 		} // else is 's' mode - single
 		//parse the selected spawnpoint
-		Point p;
-		int o;
 		if (sscanf(s, "[%d%*[,.]%d:%d]", &p.x, &p.y, &o) == 3) {
 			critter.SpawnPoint = p;
 			critter.Orientation = o;
@@ -313,10 +340,22 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 
 	//take facing from variable
+	// NOTE: not replicating original buggy behavior:
+	// Due to a bug in the implementation "point_select_var" is also used to determine the creature orientation if "point_select" is set to 'e'
+	// However, both attributes had to be specified to work
 	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
 	if (s && spawnMode == 'e') {
 		critter.Orientation = static_cast<int>(CheckVariable(map, s + 8, s));
 	}
+
+	// should all create_qty spawns use the same spawn point?
+	// ... which we do by default now FIXME: move point selection to SpawnCreature, so this can work
+	bool holdSelectedPointKey = inifile->GetKeyAsBool(crittername, "hold_selected_point_key", false);
+	if (holdSelectedPointKey) {
+		critter.Flags |= CF_HOLD_POINT;
+	}
+
+	// END SPAWN POINT SELECTION AND SETTINGS ///////////////////////////////////////////////
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
@@ -479,22 +518,10 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		critter.Flags|=CF_BUDDY;
 	}
 
-	//don't spawn when spawnpoint is visible
-	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
-		critter.Flags|=CF_IGNORECANSEE;
-	}
 	// don't spawn if the spawnpoint is not outside the viewport
 	// data uses check_view_port, while the engines reference check_by_view_port
 	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
 		critter.Flags|=CF_CHECKVIEWPORT;
-	}
-	// TODO: unknown, this is used only in pst; perhaps skipping the spawn if too many actors are present in general
-	if (inifile->GetKeyAsBool(crittername,"check_crowd", false)) {
-		critter.Flags|=CF_CHECKCROWD;
-	}
-	// TODO: unknown, this is used only in pst; perhaps tries to avoid enemies
-	if (inifile->GetKeyAsBool(crittername,"find_safest_point", false)) {
-		critter.Flags|=CF_SAFESTPOINT;
 	}
 	//disable spawn based on game difficulty
 	if (inifile->GetKeyAsBool(crittername,"area_diff_1", false)) {
@@ -673,6 +700,22 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	Actor* cre = gamedata->GetCreature(critter.CreFile[x]);
 	if (!cre) {
 		return;
+	}
+
+	// TODO: ee, verify and adjust after the action is added
+	// disable_renderer = boolean_value
+	//   Argent says: It looks like this attribute simply skips the rendering pass for the spawned creature.
+	//   This state is not saved. This attribute seems to have the side effect that filtering is ignored —
+	//   in my tests the creature was spawned continuously even if spec_qty and create_qty are defined.
+	//   This attribute seems to be related to the script action SetRenderable.
+	if (critter.Flags & CF_DISABLE_RENDERER) {
+		cre->SetBase(IE_AVATARREMOVAL, 1);
+	}
+
+	if (critter.Flags & CF_INC_INDEX) {
+		int value = CheckVariable(map, critter.PointSelectVar);
+		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
+		SetVariable(map, critter.PointSelectVar, value + 1);
 	}
 
 	SetVariable(map, critter.SpecVar, specvar+(ieDword) critter.SpecVarInc, critter.SpecContext);
