@@ -118,7 +118,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
-			mastarea.push_back(ResRef::MakeUpperCase(table->GetRowName(i)));
+			mastarea.push_back(ResRef(table->GetRowName(i)));
 		}
 	}
 

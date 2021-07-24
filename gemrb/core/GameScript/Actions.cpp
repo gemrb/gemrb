@@ -4852,7 +4852,7 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {
-	ResRef area = ResRef::MakeUpperCase(parameters->string0Parameter);
+	ResRef area = parameters->string0Parameter;
 	core->GetGame()->SetMasterArea(area);
 }
 
