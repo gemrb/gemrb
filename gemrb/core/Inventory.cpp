@@ -1734,7 +1734,6 @@ void Inventory::UpdateWeaponAnimation()
 	} else {
 		// Examine shield slot to check if we're using two weapons
 		// TODO: for consistency, use same Item* access method as above
-		bool twoweapon = false;
 		int slot = GetShieldSlot();
 		const CREItem* si = nullptr;
 		if (slot > 0) {
@@ -1744,15 +1743,14 @@ void Inventory::UpdateWeaponAnimation()
 			const Item* it = gamedata->GetItem(si->ItemResRef, true);
 			assert(it);
 			if (core->CanUseItemType(SLOT_WEAPON, it)) {
-				twoweapon = true;
+				WeaponType = IE_ANI_WEAPON_2W;
 			}
 			gamedata->FreeItem(it, si->ItemResRef, false);
 		}
 
-		if (twoweapon)
-			WeaponType = IE_ANI_WEAPON_2W;
-		else
+		if (WeaponType == -1) {
 			WeaponType = IE_ANI_WEAPON_1H;
+		}
 	}
 
 	if (header)
