@@ -1722,7 +1722,6 @@ void Inventory::UpdateWeaponAnimation()
 	const ITMExtHeader *header = nullptr;
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) {
-		Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
 		return;
 	}
 
