@@ -75,13 +75,15 @@ void Gem_Polygon::Rasterize()
 
 			bool merged = false;
 			for (auto& seg : rasterData[y]) {
-				if (rt >= seg.first.x && lt <= seg.second.x) {
-					// merge overlapping segment
-					seg.first.x = std::min<int>(seg.first.x, lt);
-					seg.second.x = std::max<int>(seg.second.x, rt);
-					merged = true;
-					break;
+				if (rt < seg.first.x || lt > seg.second.x) {
+					continue;
 				}
+
+				// merge overlapping segment
+				seg.first.x = std::min<int>(seg.first.x, lt);
+				seg.second.x = std::max<int>(seg.second.x, rt);
+				merged = true;
+				break;
 			}
 
 			if (!merged) {
@@ -171,11 +173,8 @@ bool Gem_Polygon::IntersectsRect(const Region& rect) const
 		int xmax = relative.x + rect.w;
 
 		for (const auto& seg : rasterData[y]) {
-			if (xmax >= seg.first.x) {
-				if (xmin <= seg.second.x) {
-					return true;
-				}
-				//break;
+			if (xmax >= seg.first.x && xmin <= seg.second.x) {
+				return true;
 			}
 		}
 	}

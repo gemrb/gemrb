@@ -3194,24 +3194,26 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 
 	while (count--) {
 		Actor *creature = gamedata->GetCreature(sg ? (*sg)[count].CString() : creResRef);
-		if (creature) {
-			// ensure a minimum power level, since many creatures have this as 0
-			int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
+		if (!creature) {
+			continue;
+		}
 
-			//SpawnGroups are all or nothing but make sure we spawn
-			//at least one creature if this is the first
-			if (level >= cpl || sg || first) {
-				AddActor(creature, true);
-				creature->SetPosition(pos, true, radiusx, radiusy);
-				creature->HomeLocation = pos;
-				creature->maxWalkDistance = rwdist;
-				creature->Spawned = true;
-				creature->RefreshEffects(NULL);
-				if (difficulty && !sg) *difficulty -= cpl;
-				if (creCount) (*creCount)++;
-				spawned = true;
-			}
-		} 
+		// ensure a minimum power level, since many creatures have this as 0
+		int cpl = creature->Modified[IE_XP] ? creature->Modified[IE_XP] : 1;
+
+		// SpawnGroups are all or nothing but make sure we spawn
+		// at least one creature if this is the first
+		if (level >= cpl || sg || first) {
+			AddActor(creature, true);
+			creature->SetPosition(pos, true, radiusx, radiusy);
+			creature->HomeLocation = pos;
+			creature->maxWalkDistance = rwdist;
+			creature->Spawned = true;
+			creature->RefreshEffects(NULL);
+			if (difficulty && !sg) *difficulty -= cpl;
+			if (creCount) (*creCount)++;
+			spawned = true;
+		}
 	}
 
 	if (spawned && sg && difficulty) {
