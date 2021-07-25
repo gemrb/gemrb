@@ -159,7 +159,7 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 
 inline bool VarHasContext(const char *str)
 {
-	return strlen(str) > 9 && str[6] == ':' && str[7] == ':';
+	return strnlen(str, 40) > 9 && str[6] == ':' && str[7] == ':';
 }
 
 inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient)
