@@ -157,6 +157,11 @@ int IniSpawn::GetDiffMode(const char *keyword) const
 	return NO_OPERATION;
 }
 
+inline bool VarHasContext(const char *str)
+{
+	return strlen(str) > 9 && str[6] == ':' && str[7] == ':';
+}
+
 inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient)
 {
 	int parsed = sscanf(pointString, "[%d%*[,.]%d:%d]", &destPoint.x, &destPoint.y, &orient);
@@ -218,7 +223,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 
 	// store point and/or orientation in a global var
 	if (critter.SaveSelectedPoint.CString()[0]) {
-		if ((strlen(critter.SaveSelectedPoint) > 9) && critter.SaveSelectedPoint[6] == ':' && critter.SaveSelectedPoint[7] == ':') {
+		if (VarHasContext(critter.SaveSelectedPoint)) {
 			SetPointVariable(map, critter.SaveSelectedPoint + 8, critter.SpawnPoint, critter.SaveSelectedPoint);
 		} else {
 			SetPointVariable(map, critter.SaveSelectedPoint, critter.SpawnPoint, "GLOBAL");
@@ -226,7 +231,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 	}
 
 	if (critter.SaveSelectedFacing.CString()) {
-		if ((strlen(critter.SaveSelectedFacing) > 9) && critter.SaveSelectedFacing[6] == ':' && critter.SaveSelectedFacing[7] == ':') {
+		if (VarHasContext(critter.SaveSelectedFacing)) {
 			SetVariable(map, critter.SaveSelectedFacing + 8, critter.Orientation, critter.SaveSelectedFacing);
 		} else {
 			SetVariable(map, critter.SaveSelectedFacing, critter.Orientation, "GLOBAL");
@@ -357,7 +362,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
+		if (VarHasContext(s)) {
 			char tmp[9];
 			strnuprcpy(tmp, s, 6);
 			critter.SpecContext = tmp;
