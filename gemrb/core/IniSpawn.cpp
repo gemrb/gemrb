@@ -307,7 +307,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 }
 
 // tags not working in originals either, see IESDP for details:
-// control_var, spec_area, check_crowd, spawn_time_of_day
+// control_var, spec_area, check_crowd, spawn_time_of_day, check_view_port (used!) & check_by_view_port
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
@@ -546,11 +546,6 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		critter.Flags|=CF_BUDDY;
 	}
 
-	// don't spawn if the spawnpoint is not outside the viewport
-	// data uses check_view_port, while the engines reference check_by_view_port
-	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
-		critter.Flags|=CF_CHECKVIEWPORT;
-	}
 	//disable spawn based on game difficulty
 	if (inifile->GetKeyAsBool(crittername,"area_diff_1", false)) {
 		critter.Flags|=CF_NO_DIFF_1;
@@ -664,13 +659,6 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 
 	if (!(critter.Flags&CF_IGNORECANSEE)) {
 		if (map->IsVisible(critter.SpawnPoint)) {
-			return;
-		}
-	}
-
-	if (!(critter.Flags & CF_CHECKVIEWPORT)) {
-		const Region& vp = core->GetGameControl()->Viewport();
-		if (vp.PointInside(critter.SpawnPoint)) {
 			return;
 		}
 	}

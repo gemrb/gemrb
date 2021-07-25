@@ -49,7 +49,7 @@ class Map;
 #define CF_NO_DIFF_1 4
 #define CF_NO_DIFF_2 8
 #define CF_NO_DIFF_3 16
-#define CF_CHECKVIEWPORT 32
+// 32
 #define CF_INC_INDEX 64
 #define CF_HOLD_POINT 128
 #define CF_NO_DIFF_MASK 28
