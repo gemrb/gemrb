@@ -2284,71 +2284,34 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	return false;
 }
 
-int DiffCore(ieDword a, ieDword b, int diffmode)
+bool DiffCore(ieDword a, ieDword b, int diffMode)
 {
-	switch (diffmode) {
+	switch (diffMode) {
 		case LESS_THAN:
-			if (a<b) {
-				return 1;
-			}
-			break;
+			return a < b;
 		case EQUALS:
-			if (a==b) {
-				return 1;
-			}
-			break;
+			return a == b;
 		case GREATER_THAN:
-			if (a>b) {
-				return 1;
-			}
-			break;
+			return a > b;
 		case GREATER_OR_EQUALS:
-			if (a>=b) {
-				return 1;
-			}
-			break;
+			return a >= b;
 		case NOT_EQUALS:
-			if (a!=b) {
-				return 1;
-			}
-			break;
+			return a != b;
 		case BINARY_LESS_OR_EQUALS:
-			if ((a&b) == a) {
-				return 1;
-			}
-			break;
+			return (a & b) == a;
 		case BINARY_MORE:
-			if ((a&b) != a) {
-				return 1;
-			}
-			break;
+			return (a & b) != a;
 		case BINARY_MORE_OR_EQUALS:
-			if ((a&b) == b) {
-				return 1;
-			}
-			break;
+			return (a & b) == b;
 		case BINARY_LESS:
-			if ((a&b) != b) {
-				return 1;
-			}
-			break;
+			return (a & b) != b;
 		case BINARY_INTERSECT:
-			if (a&b) {
-				return 1;
-			}
-			break;
+			return static_cast<bool>(a & b);
 		case BINARY_NOT_INTERSECT:
-			if (!(a&b)) {
-				return 1;
-			}
-			break;
+			return !(a & b);
 		default: //less or equals
-			if (a<=b) {
-				return 1;
-			}
-			break;
+			return a <= b;
 	}
-	return 0;
 }
 
 int GetGroup(const Actor *actor)

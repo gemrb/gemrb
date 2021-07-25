@@ -207,8 +207,7 @@ static int GetCreatureStrRef(const Actor *actor, unsigned int Str)
 
 static inline bool CheckStat(const Actor * actor, ieDword stat, ieDword value, int op)
 {
-	int dc = DiffCore(actor->GetBase(stat), value, op);
-	return dc;
+	return DiffCore(actor->GetBase(stat), value, op);
 }
 
 static bool StatIsASkill(unsigned int StatID) {
