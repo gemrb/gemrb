@@ -696,7 +696,6 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 			return;
 		}
 	} else {
-		//Object *object = new Object();
 		Object object;
 		//objectfields based on spec
 		object.objectFields[0]=critter.Spec[0];
