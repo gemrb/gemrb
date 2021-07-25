@@ -176,6 +176,73 @@ inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient
 	return true;
 }
 
+// determine the final spawn point
+void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
+{
+	if (critter.SpawnMode == 'e') {
+		// nothing to do, everyone will use the point stored in the var, which was handled on read
+		return;
+	}
+
+	const auto spawnPointStrings = GetElements<const char*>(critter.SpawnPointsDef.c_str());
+	int spawnCount = static_cast<int>(spawnPointStrings.size());
+	Point chosenPoint;
+	int orient = -1;
+
+	if (critter.Flags & CF_SAFEST_POINT) {
+		// try to find it, otherwise behave as if nothing happened and retry normally
+		Point tmp;
+		for (const auto& point : spawnPointStrings) {
+			if (!ParsePointDef(point, tmp, orient)) {
+				continue;
+			}
+			if (map->IsVisible(tmp)) continue;
+
+			chosenPoint = tmp;
+		}
+	}
+
+	if (chosenPoint.IsZero()) {
+		// only spawn_point_global / spawn_facing_global support 'e'
+		int idx = 0;
+		if (critter.SpawnMode == 'r') {
+			// select one of the spawnpoints randomly
+			idx = core->Roll(1, spawnCount, -1);
+		} else if (critter.SpawnMode == 'i' && critter.PointSelectVar) {
+			// choose a point by spawn index
+			idx = CheckVariable(map, critter.PointSelectVar + 8, critter.PointSelectVar) % spawnCount;
+		} // else is 's' mode - single
+
+		ParsePointDef(spawnPointStrings[idx], chosenPoint, orient);
+	}
+
+	critter.SpawnPoint = chosenPoint;
+	if (orient != -1) {
+		critter.Orientation = orient;
+	} else if (critter.Orientation2 != -1) {
+		critter.Orientation = critter.Orientation2;
+	} else {
+		critter.Orientation = core->Roll(1, 16, -1);
+	}
+
+	// store point and/or orientation in a global var
+	if (critter.SaveSelectedPoint.CString()[0]) {
+		if ((strlen(critter.SaveSelectedPoint) > 9) && critter.SaveSelectedPoint[6] == ':' && critter.SaveSelectedPoint[7] == ':') {
+			SetPointVariable(map, critter.SaveSelectedPoint + 8, critter.SpawnPoint, critter.SaveSelectedPoint);
+		} else {
+			SetPointVariable(map, critter.SaveSelectedPoint, critter.SpawnPoint, "GLOBAL");
+		}
+	}
+
+	if (critter.SaveSelectedFacing.CString()) {
+		if ((strlen(critter.SaveSelectedFacing) > 9) && critter.SaveSelectedFacing[6] == ':' && critter.SaveSelectedFacing[7] == ':') {
+			SetVariable(map, critter.SaveSelectedFacing + 8, critter.Orientation, critter.SaveSelectedFacing);
+		} else {
+			SetVariable(map, critter.SaveSelectedFacing, critter.Orientation, "GLOBAL");
+		}
+	}
+}
+
 void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const
 {
 	// spawn point could be (point_select):
@@ -221,45 +288,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 		critter.Flags |= CF_SAFEST_POINT;
 	}
 
-	// determine the final spawn point
-	const auto spawnPointStrings = GetElements<const char*>(critter.SpawnPointsDef.c_str());
-	int spawnCount = static_cast<int>(spawnPointStrings.size());
-	Point chosenPoint;
-	int orient = -1;
-
-	if (critter.Flags & CF_SAFEST_POINT) {
-		// try to find it, otherwise behave as if nothing happened and retry normally
-		Point tmp;
-		for (const auto& point : spawnPointStrings) {
-			if (!ParsePointDef(point, tmp, orient)) {
-				continue;
-			}
-			if (map->IsVisible(tmp)) continue;
-
-			chosenPoint = tmp;
-		}
-	}
-
-	if (chosenPoint.IsZero()) {
-		// only spawn_point_global / spawn_facing_global support 'e'
-		int idx = 0;
-		if (critter.SpawnMode == 'r') {
-			// select one of the spawnpoints randomly
-			idx = core->Roll(1, spawnCount, -1);
-		} else if (critter.SpawnMode == 'i' && critter.PointSelectVar) {
-			// choose a point by spawn index
-			idx = CheckVariable(map, critter.PointSelectVar + 8, critter.PointSelectVar) % spawnCount;
-		} // else is 's' mode - single
-
-		ParsePointDef(spawnPointStrings[idx], chosenPoint, orient);
-	}
-
-	critter.SpawnPoint = chosenPoint;
-	if (orient == -1) {
-		critter.Orientation = core->Roll(1, 16, -1);
-	} else {
-		critter.Orientation = orient;
-	}
+	SelectSpawnPoint(critter);
 
 	// Keys that store or retrieve spawn point and orientation ("facing").
 	// take point from variable
@@ -377,25 +406,15 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
-	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetPointVariable(map, s+8, critter.SpawnPoint, s);
-		} else {
-			SetPointVariable(map, s, critter.SpawnPoint, "GLOBAL");
-		}
-	}
+	if (s) critter.SaveSelectedPoint = s;
+
 	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
-	if (s) {
-		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
-			SetVariable(map, s+8, critter.Orientation, s);
-		} else {
-			SetVariable(map, s, critter.Orientation, "GLOBAL");
-		}
-	}
+	if (s) critter.SaveSelectedFacing = s;
 
 	//sometimes only the orientation is given, the point is stored in a variable
 	ps = inifile->GetKeyAsInt(crittername,"facing",-1);
-	if (ps!=-1) critter.Orientation = ps;
+	critter.Orientation2 = ps;
+
 	ps = inifile->GetKeyAsInt(crittername, "ai_ea",-1);
 	if (ps!=-1) critter.SetSpec[AI_EA] = (ieByte) ps;
 	ps = inifile->GetKeyAsInt(crittername, "ai_team",-1);
