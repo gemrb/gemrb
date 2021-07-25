@@ -72,34 +72,25 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
 	
-	const char *s;
-
 	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
 		NamelessSpawnArea = DefaultArea;
 		return;
 	}
 
-	s = inifile->GetKeyAsString("nameless","destare",DefaultArea);
+	const char *s = inifile->GetKeyAsString("nameless", "destare", DefaultArea);
 	NamelessSpawnArea = s;
 	s = inifile->GetKeyAsString("nameless","point","[0.0]");
-	int x,y;
-	if (sscanf(s,"[%d.%d]", &x, &y)!=2) {
-		x=0;
-		y=0;
+	if (sscanf(s, "[%d.%d]", &NamelessSpawnPoint.x, &NamelessSpawnPoint.y) != 2) {
+		NamelessSpawnPoint.reset();
 	}
-	NamelessSpawnPoint.x=x;
-	NamelessSpawnPoint.y=y;
 
 	s = inifile->GetKeyAsString("nameless", "partyarea", DefaultArea);
 	PartySpawnArea = s;
 	s = inifile->GetKeyAsString("nameless", "partypoint", "[0.0]");
-	if (sscanf(s,"[%d.%d]", &x, &y) != 2) {
-		x = NamelessSpawnPoint.x;
-		y = NamelessSpawnPoint.y;
+	if (sscanf(s, "[%d.%d]", &PartySpawnPoint.x, &PartySpawnPoint.y) != 2) {
+		PartySpawnPoint = NamelessSpawnPoint;
 	}
-	PartySpawnPoint.x = x;
-	PartySpawnPoint.y = y;
 
 	// animstat.ids values
 	//35 - already standing
@@ -108,7 +99,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 
 	auto namelessvarcount = inifile->GetKeysCount("namelessvar");
 	NamelessVar.reserve(namelessvarcount);
-	for (y = 0; y < namelessvarcount; ++y) {
+	for (int y = 0; y < namelessvarcount; ++y) {
 		const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
 		auto val = inifile->GetKeyAsInt("namelessvar",Key,0);
 		NamelessVar.emplace_back(Key, val);
@@ -116,7 +107,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 
 	auto localscount = inifile->GetKeysCount("locals");
 	Locals.reserve(localscount);
-	for (y = 0; y < localscount; ++y) {
+	for (int y = 0; y < localscount; ++y) {
 		const char* Key = inifile->GetKeyNameByIndex("locals",y);
 		auto val = inifile->GetKeyAsInt("locals",Key,0);
 		Locals.emplace_back(Key, val);
