@@ -1825,7 +1825,7 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name, BcsCache.RefCount(Name));
+		ScriptDebugLog(ID_REFERENCE, "One instance of %s is dropped from %d.", Name.CString(), BcsCache.RefCount(Name));
 		int res = BcsCache.DecRef(script, Name, true);
 
 		if (res<0) {
@@ -1847,7 +1847,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 
 	Script *newScript = (Script *) BcsCache.GetResource(resRef);
 	if ( newScript ) {
-		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef, BcsCache.RefCount(resRef));
+		ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time\n", resRef.CString(), BcsCache.RefCount(resRef));
 		return newScript;
 	}
 
@@ -1863,7 +1863,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 	}
 	newScript = new Script( );
 	BcsCache.SetAt(resRef, (void *) newScript);
-	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef, BcsCache.RefCount(resRef));
+	ScriptDebugLog(ID_REFERENCE, "Caching %s for the %d-th time", resRef.CString(), BcsCache.RefCount(resRef));
 
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
