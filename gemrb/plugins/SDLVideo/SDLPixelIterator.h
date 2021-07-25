@@ -89,7 +89,7 @@ inline SDLPixelIteratorWrapper MakeSDLPixelIterator(SDL_Surface* surf, const Reg
 
 template<class BLENDER>
 static void ColorFill(const Color& c,
-				 SDLPixelIterator dst, SDLPixelIterator dstend,
+				 SDLPixelIterator dst, const SDLPixelIterator& dstend,
 				 const BLENDER& blender)
 {
 	for (; dst != dstend; ++dst) {
@@ -104,7 +104,7 @@ static void ColorFill(const Color& c,
 
 template<class BLENDER>
 static void Blit(SDLPixelIterator src,
-				 SDLPixelIterator dst, SDLPixelIterator dstend,
+				 SDLPixelIterator dst, const SDLPixelIterator& dstend,
 				 IAlphaIterator& mask,
 				 const BLENDER& blender)
 {

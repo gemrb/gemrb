@@ -460,7 +460,7 @@ void Map::AddTileMap(TileMap* tm, Holder<Sprite2D> lm, Bitmap* sr, Holder<Sprite
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
-	LightMap = lm;
+	LightMap = std::move(lm);
 	HeightMap = hm;
 	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;

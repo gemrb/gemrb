@@ -20,11 +20,13 @@
 #define TEXTCONTAINER_H
 
 #include "Font.h"
-#include "GUI/View.h"
 #include "Region.h"
+
+#include "GUI/View.h"
 #include "System/String.h"
 
 #include <deque>
+#include <utility>
 
 namespace GemRB {
 
@@ -38,7 +40,7 @@ struct LayoutRegion {
 	Region region;
 	
 	explicit LayoutRegion(Region r)
-	: region(r) {}
+	: region(std::move(r)) {}
 };
 
 using LayoutRegions = std::vector<std::shared_ptr<LayoutRegion>>;
@@ -80,7 +82,7 @@ private:
 		size_t endCharIdx;
 		
 		TextLayoutRegion(Region r, size_t begin, size_t end)
-		: LayoutRegion(r), beginCharIdx(begin), endCharIdx(end) {}
+		: LayoutRegion(std::move(r)), beginCharIdx(begin), endCharIdx(end) {}
 	};
 
 public:
