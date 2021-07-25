@@ -889,12 +889,8 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	int ret = AddMap( newMap );
-	//spawn creatures on a map already in the game
-	//this feature exists in all blackisle games but not in bioware games
-	if (core->HasFeature(GF_SPAWN_INI)) {
-		newMap->LoadIniSpawn();
-	}
 
+	// spawn creatures on a map already in the game
 	for (size_t i = 0; i < PCs.size(); i++) {
 		Actor *pc = PCs[i];
 		if (pc->Area == ResRef) {
@@ -904,6 +900,14 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	PlacePersistents(newMap, ResRef);
 	newMap->InitActors();
+
+	//this feature exists in all blackisle games but not in bioware games
+	// make sure to do it after other actors, so UpdateFog can run and
+	// the ignore_can_see key actually filters spawns
+	if (core->HasFeature(GF_SPAWN_INI)) {
+		newMap->UpdateFog();
+		newMap->LoadIniSpawn();
+	}
 
 	if (newMap->reverb) {
 		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
