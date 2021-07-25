@@ -230,7 +230,7 @@ void IniSpawn::SelectSpawnPoint(CritterEntry &critter) const
 		}
 	}
 
-	if (critter.SaveSelectedFacing.CString()) {
+	if (critter.SaveSelectedFacing.CString()[0]) {
 		if (VarHasContext(critter.SaveSelectedFacing)) {
 			SetVariable(map, critter.SaveSelectedFacing + 8, critter.Orientation, critter.SaveSelectedFacing);
 		} else {
