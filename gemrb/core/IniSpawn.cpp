@@ -634,6 +634,13 @@ void IniSpawn::RespawnNameless()
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
 
+inline void SetScript(Actor *cre, const ResRef& script, int slot)
+{
+	if (!script.IsEmpty()) {
+		cre->SetScript(script, slot);
+	}
+}
+
 void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 {
 	if (critter.CreFile.empty()) {
@@ -698,15 +705,10 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	} else {
 		Object object;
 		//objectfields based on spec
-		object.objectFields[0]=critter.Spec[0];
-		object.objectFields[1]=critter.Spec[1];
-		object.objectFields[2]=critter.Spec[2];
-		object.objectFields[3]=critter.Spec[3];
-		object.objectFields[4]=critter.Spec[4];
-		object.objectFields[5]=critter.Spec[5];
-		object.objectFields[6]=critter.Spec[6];
-		object.objectFields[7]=critter.Spec[7];
-		object.objectFields[8]=critter.Spec[8];
+		for (int i = 0; i <= 8; i++) {
+			object.objectFields[i] = critter.Spec[i];
+		}
+
 		int cnt = GetObjectCount(map, &object);
 		if (cnt>=critter.TotalQuantity) {
 			return;
@@ -744,9 +746,9 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 	cre->SetPosition( critter.SpawnPoint, 0, 0);//maybe critters could be repositioned
 	cre->SetOrientation(critter.Orientation,false);
-	if (critter.ScriptName[0]) {
-		cre->SetScriptName(critter.ScriptName);
-	}
+
+	cre->SetScriptName(critter.ScriptName);
+
 	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {
 		cre->AppearanceFlags|=APP_DEATHVAR;
@@ -784,27 +786,14 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 		cre->AppearanceFlags|=APP_BUDDY;
 	}
 
-	if (!critter.OverrideScript.IsEmpty()) {
-		cre->SetScript(critter.OverrideScript, SCR_OVERRIDE);
-	}
-	if (!critter.ClassScript.IsEmpty()) {
-		cre->SetScript(critter.ClassScript, SCR_CLASS);
-	}
-	if (!critter.RaceScript.IsEmpty()) {
-		cre->SetScript(critter.RaceScript, SCR_RACE);
-	}
-	if (!critter.GeneralScript.IsEmpty()) {
-		cre->SetScript(critter.GeneralScript, SCR_GENERAL);
-	}
-	if (!critter.DefaultScript.IsEmpty()) {
-		cre->SetScript(critter.DefaultScript, SCR_DEFAULT);
-	}
-	if (!critter.AreaScript.IsEmpty()) {
-		cre->SetScript(critter.AreaScript, SCR_AREA);
-	}
-	if (!critter.SpecificScript.IsEmpty()) {
-		cre->SetScript(critter.SpecificScript, SCR_SPECIFICS);
-	}
+	SetScript(cre, critter.OverrideScript, SCR_OVERRIDE);
+	SetScript(cre, critter.ClassScript, SCR_CLASS);
+	SetScript(cre, critter.RaceScript, SCR_RACE);
+	SetScript(cre, critter.GeneralScript, SCR_GENERAL);
+	SetScript(cre, critter.DefaultScript, SCR_DEFAULT);
+	SetScript(cre, critter.AreaScript, SCR_AREA);
+	SetScript(cre, critter.SpecificScript, SCR_SPECIFICS);
+
 	if (!critter.Dialog.IsEmpty()) {
 		cre->SetDialog(critter.Dialog);
 	}
