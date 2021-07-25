@@ -8441,6 +8441,11 @@ bool Actor::HasBodyHeat() const
 
 uint8_t Actor::GetElevation() const
 {
+	// pst heightmaps are all uniform and shouldn't be used
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		return 0;
+	}
+
 	uint8_t height = area ? area->HeightMap->GetAt(Map::ConvertCoordToTile(Pos)) : 0;
 	if (height > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
