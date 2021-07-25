@@ -62,6 +62,7 @@ class Map;
 #define CF_TEAM 16384
 #define CF_BUDDY 0x8000
 #define CF_DISABLE_RENDERER 0x10000
+#define CF_SAFEST_POINT 0x20000
 
 //spec ids flags
 #define AI_EA		0
@@ -91,6 +92,8 @@ struct CritterEntry {
 	ResRef Dialog;          //override dialog
 	ieVariable PointSelectVar; // holds spawn point index to use
 	Point SpawnPoint;         //spawn point
+	std::string SpawnPointsDef; // the unparsed available spawn points
+	char SpawnMode;           // the spawn point selection mode
 	int SpecVarOperator;      //operation performed on spec var
 	int SpecVarValue;         //using this value with the operation
 	int SpecVarInc;           //add this to spec var at each spawn
@@ -160,7 +163,7 @@ private:
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
-	void SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;
+	void PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);

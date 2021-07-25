@@ -176,7 +176,7 @@ inline bool ParsePointDef(const char* pointString, Point& destPoint, int& orient
 	return true;
 }
 
-void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const
+void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const
 {
 	// spawn point could be (point_select):
 	// s - single
@@ -190,12 +190,14 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 	if (pointSelect) {
 		spawnMode = pointSelect[0];
 	}
+	critter.SpawnMode = spawnMode;
 
 	const char *spawnPoints = iniFile->GetKeyAsString(critterName, "spawn_point", nullptr);
 	if (!spawnPoints) {
 		Log(ERROR, "IniSpawn", "No spawn points defined, skipping creature: %s", critterName);
 		return;
 	}
+	critter.SpawnPointsDef = spawnPoints;
 
 	// indexed sequential mode
 	const char *pointSelectVar = iniFile->GetKeyAsString(critterName, "point_select_var", nullptr);
@@ -203,7 +205,7 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 		critter.PointSelectVar = pointSelectVar;
 	}
 	bool incSpawnPointIndex = iniFile->GetKeyAsBool(critterName, "inc_spawn_point_index", false);
-	if (incSpawnPointIndex && spawnMode == 'i') {
+	if (incSpawnPointIndex && critter.SpawnMode == 'i') {
 		critter.Flags |= CF_INC_INDEX;
 	}
 
@@ -215,15 +217,17 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 
 	// find first in fog, unless ignore_can_see is on
 	bool safestPoint = iniFile->GetKeyAsBool(critterName,"find_safest_point", false);
-	safestPoint = ignoreCanSee && safestPoint;
+	if (safestPoint && !ignoreCanSee) {
+		critter.Flags |= CF_SAFEST_POINT;
+	}
 
 	// determine the final spawn point
-	const auto spawnPointStrings = GetElements<const char*>(spawnPoints);
+	const auto spawnPointStrings = GetElements<const char*>(critter.SpawnPointsDef.c_str());
 	int spawnCount = static_cast<int>(spawnPointStrings.size());
 	Point chosenPoint;
 	int orient = -1;
 
-	if (safestPoint) {
+	if (critter.Flags & CF_SAFEST_POINT) {
 		// try to find it, otherwise behave as if nothing happened and retry normally
 		Point tmp;
 		for (const auto& point : spawnPointStrings) {
@@ -239,12 +243,12 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 	if (chosenPoint.IsZero()) {
 		// only spawn_point_global / spawn_facing_global support 'e'
 		int idx = 0;
-		if (spawnMode == 'r') {
+		if (critter.SpawnMode == 'r') {
 			// select one of the spawnpoints randomly
 			idx = core->Roll(1, spawnCount, -1);
-		} else if (spawnMode == 'i' && pointSelectVar) {
+		} else if (critter.SpawnMode == 'i' && critter.PointSelectVar) {
 			// choose a point by spawn index
-			idx = CheckVariable(map, pointSelectVar + 8, pointSelectVar) % spawnCount;
+			idx = CheckVariable(map, critter.PointSelectVar + 8, critter.PointSelectVar) % spawnCount;
 		} // else is 's' mode - single
 
 		ParsePointDef(spawnPointStrings[idx], chosenPoint, orient);
@@ -260,7 +264,7 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 	// Keys that store or retrieve spawn point and orientation ("facing").
 	// take point from variable
 	const char *spawnPointGlobal = iniFile->GetKeyAsString(critterName,"spawn_point_global", nullptr);
-	if (spawnPointGlobal && spawnMode == 'e') {
+	if (spawnPointGlobal && critter.SpawnMode == 'e') {
 		critter.SpawnPoint = CheckPointVariable(map, spawnPointGlobal + 8, spawnPointGlobal);
 	}
 
@@ -270,7 +274,7 @@ void IniSpawn::SelectSpawnPoint(const DataFileMgr *iniFile, const char *critterN
 	// determine the creature orientation if "point_select" is set to 'e'
 	// However, both attributes had to be specified to work
 	const char *spawnFacingGlobal = iniFile->GetKeyAsString(critterName,"spawn_facing_global", nullptr);
-	if (spawnFacingGlobal  && spawnMode == 'e') {
+	if (spawnFacingGlobal  && critter.SpawnMode == 'e') {
 		critter.Orientation = static_cast<int>(CheckVariable(map, spawnFacingGlobal + 8, spawnFacingGlobal));
 	}
 
@@ -369,7 +373,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		Log(ERROR, "IniSpawn", "Invalid spawn entry: %s", crittername);
 	}
 
-	SelectSpawnPoint(inifile, crittername, critter);
+	PrepareSpawnPoints(inifile, crittername, critter);
 
 	// store point and/or orientation in a global var
 	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
