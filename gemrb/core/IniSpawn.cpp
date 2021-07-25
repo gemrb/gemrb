@@ -279,8 +279,6 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 		critter.Flags |= CF_SAFEST_POINT;
 	}
 
-	SelectSpawnPoint(critter);
-
 	// Keys that store or retrieve spawn point and orientation ("facing").
 	// take point from variable
 	const char *spawnPointGlobal = iniFile->GetKeyAsString(critterName,"spawn_point_global", nullptr);
@@ -299,7 +297,6 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 	}
 
 	// should all create_qty spawns use the same spawn point?
-	// ... which we do by default now FIXME: move point selection to SpawnCreature, so this can work
 	bool holdSelectedPointKey = iniFile->GetKeyAsBool(critterName, "hold_selected_point_key", false);
 	if (holdSelectedPointKey) {
 		critter.Flags |= CF_HOLD_POINT;
@@ -823,11 +820,15 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 		}
 	}
 	
-	for (const auto& critter : event.critters) {
+	for (auto& critter : event.critters) {
 		if (!Schedule(critter.TimeOfDay, event.lastSpawndate) ) {
 			continue;
 		}
 		for(int j = 0; j < critter.SpawnCount; ++j) {
+			// try a potentially different location unless specified
+			if (j == 0 || !(critter.Flags & CF_HOLD_POINT)) {
+				SelectSpawnPoint(critter);
+			}
 			SpawnCreature(critter);
 		}
 		event.lastSpawndate = gameTime;
