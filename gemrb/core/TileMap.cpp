@@ -309,7 +309,7 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type, const st
 }
 
 //if detectable is set, then only detectable infopoints will be returned
-InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
+InfoPoint* TileMap::GetInfoPoint(const Point &p, bool skipSilent) const
 {
 	for (InfoPoint *infoPoint : infoPoints) {
 		//these flags disable any kind of user interaction
@@ -317,14 +317,17 @@ InfoPoint* TileMap::GetInfoPoint(const Point &p, bool detectable) const
 		if (infoPoint->Flags & (INFO_DOOR | TRAP_DEACTIVATED))
 			continue;
 
-		if (detectable) {
-			if (infoPoint->Type == ST_PROXIMITY && !infoPoint->VisibleTrap(0)) {
+		if (infoPoint->Type == ST_PROXIMITY && !infoPoint->VisibleTrap(0)) {
+			continue;
+		}
+
+		// skip portals without PORTAL_CURSOR set
+		if (infoPoint->IsPortal() && !(infoPoint->Trapped & PORTAL_CURSOR)) {
 				continue;
-			}
-			// skip portals without PORTAL_CURSOR set
-			if (infoPoint->IsPortal() && !(infoPoint->Trapped & PORTAL_CURSOR)) {
-					continue;
-			}
+		}
+
+		if (skipSilent && infoPoint->Flags & TRAP_SILENT) {
+			continue;
 		}
 
 		if (!(infoPoint->GetInternalFlag() & IF_ACTIVE))
