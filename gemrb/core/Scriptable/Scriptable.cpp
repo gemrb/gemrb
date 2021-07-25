@@ -245,9 +245,9 @@ void Scriptable::DrawOverheadText()
 		return;
 	} else {
 		time = (MAX_DELAY-time)/10;
-		if (time<256) {
-			ieByte time2 = time; // shut up narrowing warnings
-			color.fg = Color(time2, time2, time2, time2);
+		// rapid fade-out
+		if (time < 256) {
+			color.fg.a = static_cast<unsigned char>(255 - time);
 		}
 	}
 
