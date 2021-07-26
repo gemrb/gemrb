@@ -287,24 +287,32 @@ void Store::AddItem(CREItem *item)
 	STOItem *temp = FindItem(item, true);
 
 	if (temp) {
-		if (temp->InfiniteSupply!=-1) {
-			if (item->MaxStackAmount) {
-				// Stacked, so increase usages.
-				ieDword newAmount = 1;
-				if (!temp->Usages[0]) temp->Usages[0] = 1;
-				if (item->Usages[0] != temp->Usages[0] && item->Usages[0] > 0) {
-					// Stack sizes differ!
-					// For now, we do what bg2 does and just round up.
-					newAmount = item->Usages[0] / temp->Usages[0];
-					if (item->Usages[0] % temp->Usages[0])
-						newAmount++;
-				}
-				temp->AmountInStock += newAmount;
-			} else {
-				// Not stacked, so just increase the amount.
-				temp->AmountInStock++;
-			}
+		if (temp->InfiniteSupply == -1) {
+			return;
 		}
+
+		if (!item->MaxStackAmount) {
+			// Not stacked, so just increase the amount.
+			temp->AmountInStock++;
+			return;
+		}
+
+		// Stacked, so increase usages.
+		ieDword newAmount = 1;
+		if (!temp->Usages[0]) temp->Usages[0] = 1;
+		if (item->Usages[0] == temp->Usages[0] || item->Usages[0] == 0) {
+			// same stack size
+			temp->AmountInStock += newAmount;
+			return;
+		}
+
+		// Stack sizes differ!
+		// For now, we do what bg2 does and just round up.
+		newAmount = item->Usages[0] / temp->Usages[0];
+		if (item->Usages[0] % temp->Usages[0]) {
+			newAmount++;
+		}
+		temp->AmountInStock += newAmount;
 		return;
 	}
 

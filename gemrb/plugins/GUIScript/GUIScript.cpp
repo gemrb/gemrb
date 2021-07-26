@@ -3123,46 +3123,49 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 	PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, wal->DirectionFlags));
 	distance = wm->GetDistance(wmc->Area->AreaName);
 
-	if (eval) {
-		wm->ClearEncounterArea();
+	if (!eval) {
+		PyDict_SetItemString(dict, "Distance", DecRef(PyInt_FromLong, distance));
+		return dict;
+	}
 
-		//evaluate the area the user will fall on in a random encounter
-		if (encounter) {
+	wm->ClearEncounterArea();
 
-			if(wal->EncounterChance>=100) {
-				wal->EncounterChance-=100;
-			}
+	// evaluate the area the user will fall on in a random encounter
+	if (!encounter) {
+		PyDict_SetItemString(dict, "Distance", DecRef(PyInt_FromLong, distance));
+		return dict;
+	}
 
-			//bounty encounter
-			ResRef tmpresref;
-			const WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
+	if (wal->EncounterChance >= 100) {
+		wal->EncounterChance -= 100;
+	}
 
-			tmpresref = linkdest->AreaResRef;
-			if (core->GetGame()->RandomEncounter(tmpresref)) {
+	// bounty encounter
+	const WMPAreaEntry *linkdest = wm->GetEntry(wal->AreaIndex);
+	ResRef tmpresref = linkdest->AreaResRef;
+	if (core->GetGame()->RandomEncounter(tmpresref)) {
+		displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
+		PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, tmpresref));
+		PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
+		distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
+		wm->SetEncounterArea(tmpresref, wal);
+	} else {
+		// regular random encounter, find a valid encounter area
+		int i = RAND(0, 4);
+
+		for (int j = 0; j < 5; j++) {
+			const char *area = wal->EncounterAreaResRef[(i + j) % 5];
+
+			if (area[0]) {
 				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, tmpresref));
+				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, area));
+				//drop player in the middle of the map
 				PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
+				PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, ADIRF_CENTER));
+				//only count half the distance of the final link
 				distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
-				wm->SetEncounterArea(tmpresref, wal);
-			} else {
-				//regular random encounter, find a valid encounter area
-				int i = RAND(0, 4);
-
-				for(int j=0;j<5;j++) {
-					const char *area = wal->EncounterAreaResRef[(i+j)%5];
-
-					if (area[0]) {
-						displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-						PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, area));
-						//drop player in the middle of the map
-						PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
-						PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, ADIRF_CENTER));
-						//only count half the distance of the final link
-						distance = wm->GetDistance(linkdest->AreaResRef) - (wal->DistanceScale * 4 / 2);
-						wm->SetEncounterArea(area, wal);
-						break;
-					}
-				}
+				wm->SetEncounterArea(area, wal);
+				break;
 			}
 		}
 	}

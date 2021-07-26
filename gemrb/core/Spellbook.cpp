@@ -896,12 +896,12 @@ bool Spellbook::DepleteSpell(int type)
 		const CRESpellMemorization* sm = spells[type][j];
 
 		for (auto& spell : sm->memorized_spells) {
-			if (DepleteSpell(spell)) {
-				if (sorcerer & (1<<type) ) {
-					DepleteLevel(sm, spell->SpellResRef);
-				}
-				return true;
+			if (!DepleteSpell(spell)) continue;
+
+			if (sorcerer & (1 << type)) {
+				DepleteLevel(sm, spell->SpellResRef);
 			}
+			return true;
 		}
 	}
 	return false;

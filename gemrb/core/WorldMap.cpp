@@ -357,11 +357,11 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 		for (int direction=0;direction<4;direction++)
 		{
 			int j=ae->AreaLinksIndex[direction];
-			if (link_index>=j) {
-				j+=ae->AreaLinksCount[direction];
-				if(link_index<j) {
-					return i;
-				}
+			if (link_index < j) continue;
+
+			j += ae->AreaLinksCount[direction];
+			if (link_index < j) {
+				return i;
 			}
 		}
 	}
