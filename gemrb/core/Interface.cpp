@@ -4121,13 +4121,9 @@ bool Interface::HasCurrentArea() const
 Holder<Sprite2D> Interface::GetCursorSprite()
 {
 	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
-	if (spr)
-	{
-		if(HasFeature(GF_OVERRIDE_CURSORPOS))
-		{
-			spr->Frame.x=1;
-			spr->Frame.y=spr->Frame.h-1;
-		}
+	if (spr && HasFeature(GF_OVERRIDE_CURSORPOS)) {
+		spr->Frame.x = 1;
+		spr->Frame.y = spr->Frame.h - 1;
 	}
 	return spr;
 }
