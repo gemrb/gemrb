@@ -20,9 +20,7 @@
 
 #include "GUI/Console.h"
 
-#include "GameData.h"
 #include "Interface.h"
-#include "ScriptEngine.h"
 
 namespace GemRB {
 
