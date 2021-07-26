@@ -831,7 +831,7 @@ void Interface::Main()
 	vars->Lookup("Mouse Scroll Speed", speed);
 	SetMouseScrollSpeed((int) speed);
 
-	Font* fps = GetTextFont();
+	const Font* fps = GetTextFont();
 	// TODO: if we ever want to support dynamic resolution changes this will break
 	Region fpsRgn(0, config.Height - 30, 80, 30);
 	wchar_t fpsstring[20] = {L"???.??? fps"};
@@ -898,8 +898,8 @@ int Interface::LoadSprites()
 	}
 
 	Log(MESSAGE, "Core", "Loading Cursors...");
-	AnimationFactory* anim;
-	anim = (AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
+	const AnimationFactory* anim;
+	anim = (const AnimationFactory*) gamedata->GetFactoryResource(MainCursorsImage, IE_BAM_CLASS_ID);
 	size_t CursorCount = 0;
 	if (anim) {
 		CursorCount = anim->GetCycleCount();
@@ -931,7 +931,7 @@ int Interface::LoadSprites()
 	WindowManager::CursorMouseDown = Cursors[1];
 
 	// Load fog-of-war bitmaps
-	anim = (AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
+	anim = (const AnimationFactory*) gamedata->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	Log(MESSAGE, "Core", "Loading Fog-Of-War bitmaps...");
 	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
@@ -960,7 +960,7 @@ int Interface::LoadSprites()
 	Log(MESSAGE, "Core", "Loading Ground circle bitmaps...");
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (!GroundCircleBam[size].IsEmpty()) {
-			anim = (AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
+			anim = (const AnimationFactory*) gamedata->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				Log(ERROR, "Core", "Failed Loading Ground circle bitmaps...");
@@ -1256,7 +1256,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	if (value) ToggleLogging(atoi(value));
 
 	Log(MESSAGE, "Core", "Starting Plugin Manager...");
-	PluginMgr *plugin = PluginMgr::Get();
+	const PluginMgr *plugin = PluginMgr::Get();
 #if TARGET_OS_MAC
 	// search the bundle plugins first
 	// since bundle plugins are loaded first dyld will give them precedence
@@ -2106,7 +2106,7 @@ bool Interface::LoadGemRBINI()
 	int ttMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", 10 );
 
 	if (!tooltipBG.IsEmpty()) {
-		AnimationFactory* anim = (AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
+		const AnimationFactory* anim = (const AnimationFactory*) gamedata->GetFactoryResource(tooltipBG, IE_BAM_CLASS_ID);
 		Log(MESSAGE, "Core", "Initializing Tooltips...");
 		if (anim) {
 			TooltipBG = new TooltipBackground(anim->GetFrame(0, 0), anim->GetFrame(0, 1), anim->GetFrame(0, 2) );
@@ -2394,7 +2394,6 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 				if (newfx) {
 					newfx->Duration = vvc->GetSequenceDuration(AI_UPDATE_TIME)*9/10 + core->GetGame()->GameTime;
 					ApplyEffect(newfx, ab, ab);
-					delete newfx;
 				}
 			}
 		}
@@ -2874,8 +2873,8 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	if (!core->IsAvailable( IE_INI_CLASS_ID ))
 		return false;
 
-	DataFileMgr* defaults = NULL;
-	DataFileMgr* overrides = NULL;
+	const DataFileMgr* defaults = nullptr;
+	const DataFileMgr* overrides = nullptr;
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
 	FileStream* iniStream = FileStream::OpenFile(iniFileName);
@@ -3122,7 +3121,7 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	}
 
 	// These are here because of the goto
-	PluginHolder<SaveGameMgr> gam_mgr = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
+	PluginHolder<SaveGameMgr> gam_mgr = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID, gam_str);
 	PluginHolder<WorldMapMgr> wmp_mgr = MakePluginHolder<WorldMapMgr>(IE_WMP_CLASS_ID);
 	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 
@@ -3133,14 +3132,9 @@ void Interface::LoadGame(SaveGame *sg, int ver_override)
 	if (!gam_mgr)
 		goto cleanup;
 
-	if (!gam_mgr->Open(gam_str))
-		goto cleanup;
-
 	new_game = gam_mgr->LoadGame(new Game(), ver_override);
 	if (!new_game)
 		goto cleanup;
-
-	gam_str = NULL;
 
 	// Load WMP (WorldMap) file
 	if (!wmp_mgr)
@@ -3186,7 +3180,6 @@ cleanup:
 	// Something went wrong, so try to clean after itself
 	delete new_game;
 	delete new_worldmap;
-	delete gam_str;
 	delete wmp_str1;
 	delete wmp_str2;
 	delete sav_str;
@@ -3545,32 +3538,36 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 	}
 
 	//this warning comes only when feedback is enabled
-	if (feedback) {
-		//this was, but that disabled equipping of amber earrings in PST
-		//if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-		if (ret&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
-			//don't ruin the return variable, it contains the usable slot bits
-			int flg = 0;
-			if (ret&SLOT_QUIVER) {
-				if (item->GetWeaponHeader(true)) flg = 1;
-			}
+	if (!feedback) {
+		return ret;
+	}
 
-			if (ret&SLOT_WEAPON) {
-				//melee
-				if (item->GetWeaponHeader(false)) flg = 1;
-				//ranged
-				if (item->GetWeaponHeader(true)) flg = 1;
-			}
+	// this was, but that disabled equipping of amber earrings in PST
+	// if (slotmatrix[item->ItemType]&(SLOT_QUIVER|SLOT_WEAPON|SLOT_ITEM)) {
+	if (!(ret & (SLOT_QUIVER | SLOT_WEAPON | SLOT_ITEM))) {
+		return ret;
+	}
 
-			if (ret&SLOT_ITEM) {
-				if (item->GetEquipmentHeaderNumber(0)!=0xffff) flg = 1;
-			}
+	// don't ruin the return variable, it contains the usable slot bits
+	int flg = 0;
+	if (ret & SLOT_QUIVER) {
+		if (item->GetWeaponHeader(true)) flg = 1;
+	}
 
-			if (!flg) {
-				displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_WHITE);
-				return 0;
-			}
-		}
+	if (ret & SLOT_WEAPON) {
+		//melee
+		if (item->GetWeaponHeader(false)) flg = 1;
+		//ranged
+		if (!flg && item->GetWeaponHeader(true)) flg = 1;
+	}
+
+	if (ret & SLOT_ITEM) {
+		if (item->GetEquipmentHeaderNumber(0) != 0xffff) flg = 1;
+	}
+
+	if (!flg) {
+		displaymsg->DisplayConstantString(STR_UNUSABLEITEM, DMC_WHITE);
+		return 0;
 	}
 
 	return ret;
@@ -3662,10 +3659,11 @@ bool Interface::StupidityDetector(const char* Pt)
 	do {
 		const char *name = dir.GetName();
 		if (dir.IsDirectory()) {
-			if (name[0] == '.') {
-				if (name[1] == '\0')
+			// since we can't use DirectoryIterator::Hidden, exclude the special dirs manually
+			if (name[0] == '.' && name[1] == '\0') {
 					continue;
-				if (name[1] == '.' && name[2] == '\0')
+			}
+			if (name[0] == '.' && name[1] == '.' && name[2] == '\0') {
 					continue;
 			}
 			print("\n**contains another dir**");
@@ -3860,59 +3858,56 @@ void Interface::SanitizeItem(CREItem *item) const
 		item->Flags &= ~IE_INV_ITEM_UNDROPPABLE;
 	}
 
-	Item *itm = gamedata->GetItem(item->ItemResRef, true);
-	if (itm) {
+	const Item *itm = gamedata->GetItem(item->ItemResRef, true);
+	if (!itm) return;
 
-		item->MaxStackAmount = itm->MaxStackAmount;
-		//if item is stacked mark it as so
-		if (itm->MaxStackAmount) {
-			item->Flags |= IE_INV_ITEM_STACKED;
-			if (item->Usages[0] == 0) {
-				item->Usages[0] = 1;
+	item->MaxStackAmount = itm->MaxStackAmount;
+	//if item is stacked mark it as so
+	if (itm->MaxStackAmount) {
+		item->Flags |= IE_INV_ITEM_STACKED;
+		if (item->Usages[0] == 0) {
+			item->Usages[0] = 1;
+		}
+	} else {
+		//set charge counters for non-rechargeable items if their charge is zero
+		//set charge counters for items not using charges to one
+		for (int i = 0; i < CHARGE_COUNTERS; i++) {
+			const ITMExtHeader *h = itm->GetExtHeader(i);
+			if (!h) {
+				item->Usages[i] = 0;
+				continue;
 			}
-		} else {
-			//set charge counters for non-rechargeable items if their charge is zero
-			//set charge counters for items not using charges to one
-			for (int i = 0; i < CHARGE_COUNTERS; i++) {
-				const ITMExtHeader *h = itm->GetExtHeader(i);
-				if (h) {
-					if (item->Usages[i] == 0) {
-						if (!(h->RechargeFlags&IE_ITEM_RECHARGE)) {
-							//HACK: the original (bg2) allows for 0 charged gems
-							if (h->Charges) {
-								item->Usages[i] = h->Charges;
-							} else {
-								item->Usages[i] = 1;
-							}
-						}
-					} else if (h->Charges == 0) {
-						item->Usages[i] = 1;
-					}
-				} else {
-					item->Usages[i] = 0;
-				}
+
+			if (item->Usages[i] != 0 && h->Charges == 0) {
+				item->Usages[i] = 1;
+				continue;
+			}
+
+			if (item->Usages[i] == 0 && !(h->RechargeFlags & IE_ITEM_RECHARGE)) {
+				// HACK: the original (bg2) allows for 0 charged gems
+				item->Usages[i] = std::max<ieWord>(1, h->Charges);
 			}
 		}
-
-		//simply adding the item flags to the slot
-		item->Flags |= (itm->Flags<<8);
-		//some slot flags might be affected by the item flags
-		if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
-			item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-		}
-
-		// pst has no stolen flag, but "steel" in its place
-		if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
-			item->Flags |= IE_INV_ITEM_STOLEN;
-		}
-
-		//auto identify basic items
-		if (!itm->LoreToID) {
-			item->Flags |= IE_INV_ITEM_IDENTIFIED;
-		}
-
-		gamedata->FreeItem(itm, item->ItemResRef, false);
 	}
+
+	// simply adding the item flags to the slot
+	item->Flags |= itm->Flags << 8;
+	// some slot flags might be affected by the item flags
+	if (!(item->Flags & IE_INV_ITEM_CRITICAL)) {
+		item->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+	}
+
+	// pst has no stolen flag, but "steel" in its place
+	if ((item->Flags & IE_INV_ITEM_STOLEN2) && !HasFeature(GF_PST_STATE_FLAGS)) {
+		item->Flags |= IE_INV_ITEM_STOLEN;
+	}
+
+	// auto identify basic items
+	if (!itm->LoreToID) {
+		item->Flags |= IE_INV_ITEM_IDENTIFIED;
+	}
+
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 
 #define MAX_LOOP 10
@@ -4056,8 +4051,7 @@ int Interface::GetMouseScrollSpeed() const {
 
 ieStrRef Interface::GetRumour(const ResRef& dlgref)
 {
-	PluginHolder<DialogMgr> dm = MakePluginHolder<DialogMgr>(IE_DLG_CLASS_ID);
-	dm->Open(gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
+	PluginHolder<DialogMgr> dm = GetImporter<DialogMgr>(IE_DLG_CLASS_ID, gamedata->GetResource(dlgref, IE_DLG_CLASS_ID));
 	Dialog *dlg = dm->GetDialog();
 
 	if (!dlg) {
@@ -4162,7 +4156,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(spellRef);
+	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -4176,7 +4170,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 
 void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level)
 {
-	Spell *spell = gamedata->GetSpell(spellRef);
+	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
 		return;
 	}
@@ -4196,8 +4190,6 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	}
 
 	EffectQueue *fxqueue = new EffectQueue();
-	//AddEffect now copies the fx data, please delete your effect reference
-	//if you created it. (Don't delete cached references)
 	fxqueue->AddEffect( effect );
 	int res = ApplyEffectQueue(fxqueue, actor, caster);
 	delete fxqueue;
@@ -4325,7 +4317,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 
 int Interface::WriteGame(const char *folder)
 {
-	PluginHolder<SaveGameMgr> gm = MakePluginHolder<SaveGameMgr>(IE_GAM_CLASS_ID);
+	PluginHolder<SaveGameMgr> gm = GetImporter<SaveGameMgr>(IE_GAM_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}
@@ -4611,24 +4603,27 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	ieDword autopause_flags = 0;
 	vars->Lookup("Auto Pause State", autopause_flags);
 
-	if (autopause_flags & (1<<flag)) {
-		if (SetPause(PAUSE_ON, PF_QUIET)) {
-			displaymsg->DisplayConstantString(STR_AP_UNUSABLE+flag, DMC_RED);
+	if (!(autopause_flags & (1 << flag))) {
+		return false;
+	}
 
-			ieDword autopause_center = 0;
-			vars->Lookup("Auto Pause Center", autopause_center);
-			if (autopause_center && target) {
-				GameControl* gc = GetGameControl();
-				gc->MoveViewportTo(target->Pos, true);
+	if (!SetPause(PAUSE_ON, PF_QUIET)) {
+		return false;
+	}
 
-				if (target->Type == ST_ACTOR && ((Actor *)target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
-					core->GetGame()->SelectActor((Actor *)target, true, SELECT_REPLACE);
-				}
-			}
-			return true;
+	displaymsg->DisplayConstantString(STR_AP_UNUSABLE + flag, DMC_RED);
+
+	ieDword centerOnAutoPause = 0;
+	vars->Lookup("Auto Pause Center", centerOnAutoPause);
+	if (centerOnAutoPause && target) {
+		GameControl* gc = GetGameControl();
+		gc->MoveViewportTo(target->Pos, true);
+
+		if (target->Type == ST_ACTOR && ((Actor *) target)->GetStat(IE_EA) < EA_GOODCUTOFF) {
+			core->GetGame()->SelectActor((Actor *) target, true, SELECT_REPLACE);
 		}
 	}
-	return false;
+	return true;
 }
 
 void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)

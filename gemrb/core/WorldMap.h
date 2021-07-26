@@ -183,26 +183,23 @@ private:
 };
 
 class GEM_EXPORT WorldMapArray {
-public:
-	explicit WorldMapArray(unsigned int count);
-	~WorldMapArray();
-	void SetWorldMap(WorldMap *m, unsigned int index);
 private:
-	WorldMap **all_maps;
-	unsigned int MapCount;
-	unsigned int CurrentMap;
-	bool single;
+	mutable std::vector<WorldMap> maps; // FIXME: our constness is all screwed up
+	size_t CurrentMap = 0;
+	bool single = true;
 public:
+	explicit WorldMapArray(size_t count);
+
 	bool IsSingle() const { return single; }
 	void SetSingle(bool arg) { single = arg; }
-	unsigned int GetMapCount() const { return MapCount; }
-	unsigned int GetCurrentMapIndex() const { return CurrentMap; }
-	WorldMap *NewWorldMap(unsigned int index);
-	WorldMap *GetWorldMap(unsigned int index) const { return all_maps[index]; }
-	WorldMap *GetCurrentMap() const { return all_maps[CurrentMap]; }
-	void SetWorldMap(unsigned int index);
-	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
-	unsigned int FindAndSetCurrentMap(const ResRef& area);
+	size_t GetMapCount() const { return maps.size(); }
+	size_t GetCurrentMapIndex() const { return CurrentMap; }
+	WorldMap *NewWorldMap(size_t index);
+	WorldMap *GetWorldMap(size_t index) const { return &maps[index]; }
+	WorldMap *GetCurrentMap() const { return &maps[CurrentMap]; }
+	void SetWorldMap(size_t index);
+	void SetCurrentMap(size_t index) { CurrentMap = index; }
+	size_t FindAndSetCurrentMap(const ResRef& area);
 };
 
 }

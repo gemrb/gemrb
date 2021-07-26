@@ -77,7 +77,7 @@ class Sprite2D;
 //#define TRAP_ENEMY	 16 // "trap set off by enemy" in NI, unused
 #define TRAP_TUTORIAL	 32 //active only when in tutorial mode
 #define TRAP_NPC	64 // "trap set off by NPC"
-//#define TRAP_SILENT	128 // "trigger silent", unused
+#define TRAP_SILENT	128 // "trigger silent" / "no string", used in pst
 #define TRAP_DEACTIVATED  256
 #define _TRAVEL_NONPC      512
 #define _TRAP_USEPOINT       1024 //override usage point of travel regions (used for sound in PST traps)

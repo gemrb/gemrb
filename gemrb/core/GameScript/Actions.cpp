@@ -2739,7 +2739,12 @@ void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
-	SpellCore(Sender, parameters, SC_NOINTERRUPT);
+	// gemrb extension for internal use
+	if (parameters->int1Parameter) {
+		SpellCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
+	} else {
+		SpellCore(Sender, parameters, SC_NOINTERRUPT);
+	}
 }
 
 void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
@@ -2752,7 +2757,12 @@ void GameScript::ForceSpellRange(Scriptable* Sender, Action* parameters)
 //FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
-	SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
+	// gemrb extension for internal use
+	if (parameters->int1Parameter) {
+		SpellPointCore(Sender, parameters, SC_NOINTERRUPT | SC_SETLEVEL);
+	} else {
+		SpellPointCore(Sender, parameters, SC_NOINTERRUPT);
+	}
 }
 
 void GameScript::ForceSpellPointRange(Scriptable* Sender, Action* parameters)
@@ -4842,7 +4852,8 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->SetMasterArea(parameters->string0Parameter);
+	ResRef area = parameters->string0Parameter;
+	core->GetGame()->SetMasterArea(area);
 }
 
 void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)

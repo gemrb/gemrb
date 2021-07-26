@@ -245,9 +245,9 @@ void Scriptable::DrawOverheadText()
 		return;
 	} else {
 		time = (MAX_DELAY-time)/10;
-		if (time<256) {
-			ieByte time2 = time; // shut up narrowing warnings
-			color.fg = Color(time2, time2, time2, time2);
+		// rapid fade-out
+		if (time < 256) {
+			color.fg.a = static_cast<unsigned char>(255 - time);
 		}
 	}
 
@@ -677,7 +677,7 @@ void Scriptable::SetLastTrigger(ieDword triggerID, ieDword globalID)
 				name = scr->GetScriptName();
 			}
 		}
-		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName, globalID, name, triggerID);
+		ScriptDebugLog(ID_TRIGGERS, "Scriptable", "%s: Added LastTrigger: %d (%s) for trigger %d\n", scriptName.CString(), globalID, name, triggerID);
 		LastTrigger = globalID;
 	}
 }

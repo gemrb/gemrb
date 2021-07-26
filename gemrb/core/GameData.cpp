@@ -255,13 +255,9 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 		return item;
 	}
 	DataStream* str = GetResource(resname, IE_ITM_CLASS_ID, silent);
-	PluginHolder<ItemMgr> sm = MakePluginHolder<ItemMgr>(IE_ITM_CLASS_ID);
+	PluginHolder<ItemMgr> sm = GetImporter<ItemMgr>(IE_ITM_CLASS_ID, str);
 	if (!sm) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	item = new Item();

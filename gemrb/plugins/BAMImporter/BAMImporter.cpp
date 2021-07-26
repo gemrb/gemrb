@@ -81,11 +81,8 @@ bool BAMImporter::Import(DataStream* str)
 	}
 	
 	for (auto& cycle : cycles) {
-		ieWord tmp;
-		str->ReadWord(tmp);
-		cycle.FramesCount = tmp;
-		str->ReadWord(tmp);
-		cycle.FirstFrame = tmp;
+		str->ReadWord(cycle.FramesCount);
+		str->ReadWord(cycle.FirstFrame);
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
 	palette = MakeHolder<Palette>();
@@ -154,7 +151,6 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 	if (count == 0) return {};
 
 	std::vector<index_t> FLT(count);
-	DataStream* str = GetStream();
 	str->Seek( FLTOffset, GEM_STREAM_START );
 	str->Read(&FLT[0], count * sizeof(ieWord));
 	if( DataStream::BigEndian() ) {
@@ -165,7 +161,6 @@ std::vector<BAMImporter::index_t> BAMImporter::CacheFLT()
 
 AnimationFactory* BAMImporter::GetAnimationFactory(const ResRef &resref, bool allowCompression)
 {
-	DataStream* str = GetStream();
 	str->Seek( DataStart, GEM_STREAM_START );
 	strpos_t length = str->Remains();
 	if (length == 0) return nullptr;

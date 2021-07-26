@@ -465,7 +465,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
-	DataStream* str = GetStream();
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
 	for (auto& list : map->SongHeader.SongList) {
@@ -754,11 +753,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			std::vector<Point> points(vertCount);
 			for (int x = 0; x < vertCount; x++) {
-				ieWord tmp;
-				str->ReadWord(tmp);
-				points[x].x = tmp;
-				str->ReadWord(tmp);
-				points[x].y = tmp;
+				str->ReadPoint(points[x]);
 			}
 			auto poly = std::make_shared<Gem_Polygon>(std::move(points), &bbox);
 			c = map->AddContainer( Name, Type, poly );
@@ -1272,10 +1267,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 
 		Ambient *ambi = new Ambient();
 		str->Read( &ambi->name, 32 );
-		str->ReadWord(tmpWord);
-		ambi->origin.x = tmpWord;
-		str->ReadWord(tmpWord);
-		ambi->origin.y = tmpWord;
+		str->ReadPoint(ambi->origin);
 		str->ReadWord(ambi->radius);
 		str->Seek( 2, GEM_CURRENT_POS );
 		str->ReadDword(ambi->pitchVariance);
@@ -1837,10 +1829,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		stream->WriteWord(d->TrapRemovalDiff);
 		stream->WriteWord(d->Trapped);
 		stream->WriteWord(d->TrapDetected);
-		tmpWord = (ieWord) d->TrapLaunch.x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->TrapLaunch.y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(d->TrapLaunch);
 		stream->WriteResRefLC(d->KeyResRef);
 		const GameScript *s = d->Scripts[0];
 		if (s) {
@@ -1852,14 +1841,8 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		//lock difficulty field
 		stream->WriteDword(d->LockDifficulty);
 		//opening locations
-		tmpWord = (ieWord) d->toOpen[0].x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->toOpen[0].y;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->toOpen[1].x;
-		stream->WriteWord(tmpWord);
-		tmpWord = (ieWord) d->toOpen[1].y;
-		stream->WriteWord(tmpWord);
+		stream->WritePoint(d->toOpen[0]);
+		stream->WritePoint(d->toOpen[1]);
 		stream->WriteDword(d->OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			stream->Write( d->LinkedInfo, 24);

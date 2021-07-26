@@ -41,7 +41,6 @@ using namespace GemRB;
 
 GAMImporter::GAMImporter(void)
 {
-	str = NULL;
 	version = PCSize = PCOffset = PCCount = 0;
 	MazeOffset = NPCOffset = NPCCount = GlobalOffset = GlobalCount = 0;
 	JournalOffset = JournalCount = KillVarsOffset = KillVarsCount = 0;
@@ -49,20 +48,8 @@ GAMImporter::GAMImporter(void)
 	PPLocOffset = PPLocCount = 0;
 }
 
-GAMImporter::~GAMImporter(void)
+bool GAMImporter::Import(DataStream* str)
 {
-	delete str;
-}
-
-bool GAMImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	if (str) {
-		return false;
-	}
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "GAMEV0.0", 8 ) == 0) {
@@ -1296,5 +1283,5 @@ int GAMImporter::PutGame(DataStream *stream, Game *game)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD7F7040, "GAM File Importer")
-PLUGIN_CLASS(IE_GAM_CLASS_ID, GAMImporter)
+PLUGIN_CLASS(IE_GAM_CLASS_ID, ImporterPlugin<GAMImporter>)
 END_PLUGIN()

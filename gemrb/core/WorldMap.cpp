@@ -597,27 +597,16 @@ void WorldMap::UpdateReachableAreas() const
 }
 
 /****************** WorldMapArray *******************/
-WorldMapArray::WorldMapArray(unsigned int count)
+WorldMapArray::WorldMapArray(size_t count)
 {
-	CurrentMap = 0;
-	MapCount = count;
-	all_maps = (WorldMap **) calloc(count, sizeof(WorldMap *) );
-	single = true;
+	maps.resize(count);
 }
 
-WorldMapArray::~WorldMapArray()
-{
-	for (unsigned int i = 0; i < MapCount; i++) {
-		delete all_maps[i];
-	}
-	free( all_maps );
-}
-
-unsigned int WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
+size_t WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 {
 	unsigned int idx;
-	for (unsigned int i = 0; i < MapCount; i++) {
-		if (all_maps[i]->GetArea (area, idx) ) {
+	for (size_t i = 0; i < maps.size(); ++i) {
+		if (maps[i].GetArea (area, idx) ) {
 			CurrentMap = i;
 			return i;
 		}
@@ -625,20 +614,9 @@ unsigned int WorldMapArray::FindAndSetCurrentMap(const ResRef& area)
 	return CurrentMap;
 }
 
-void WorldMapArray::SetWorldMap(WorldMap *m, unsigned int index)
+WorldMap *WorldMapArray::NewWorldMap(size_t index)
 {
-	if (index<MapCount) {
-		all_maps[index]=m;
-	}
-}
-
-WorldMap *WorldMapArray::NewWorldMap(unsigned int index)
-{
-	if (all_maps[index]) {
-		delete all_maps[index];
-	}
-	all_maps[index] = new WorldMap();
-	return all_maps[index];
+	return &maps[index];
 }
 
 }

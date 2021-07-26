@@ -97,25 +97,8 @@ static int GetProficiency(ieDword ItemType)
 	return profs[ItemType];
 }
 
-ITMImporter::ITMImporter(void)
+bool ITMImporter::Import(DataStream* str)
 {
-	str = NULL;
-	version = 0;
-}
-
-ITMImporter::~ITMImporter(void)
-{
-	delete str;
-	str = NULL;
-}
-
-bool ITMImporter::Open(DataStream* stream)
-{
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "ITM V1  ", 8 ) == 0) {
@@ -408,6 +391,6 @@ Effect* ITMImporter::GetFeature(Item *s)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
-PLUGIN_CLASS(IE_ITM_CLASS_ID, ITMImporter)
+PLUGIN_CLASS(IE_ITM_CLASS_ID, ImporterPlugin<ITMImporter>)
 PLUGIN_CLEANUP(ReleaseMemoryITM)
 END_PLUGIN()

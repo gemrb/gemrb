@@ -221,16 +221,18 @@ void Particles::Draw(Point p)
 			if (fragments) {
 				//IE_ANI_CAST stance has a simple looping animation
 				Animation** anims = fragments->GetAnimation( IE_ANI_CAST, i );
-				if (anims) {
-					const Animation* anim = anims[0];
-					Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
-
-					BlitFlags flags = BlitFlags::NONE;
-					if (game) game->ApplyGlobalTint(clr, flags);
-
-					video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
-													 points[i].pos - p, flags, clr);
+				if (!anims) {
+					break;
 				}
+
+				const Animation* anim = anims[0];
+				Holder<Sprite2D> nextFrame = anim->GetFrame(anim->GetCurrentFrameIndex());
+
+				BlitFlags flags = BlitFlags::NONE;
+				if (game) game->ApplyGlobalTint(clr, flags);
+
+				video->BlitGameSpriteWithPalette(nextFrame, fragments->GetPartPalette(0),
+													points[i].pos - p, flags, clr);
 			}
 			break;
 		case SP_TYPE_CIRCLE:

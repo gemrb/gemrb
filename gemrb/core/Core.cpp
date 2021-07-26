@@ -275,15 +275,15 @@ bool WithinAudibleRange(const Actor *actor, const Point &dest)
 	return WithinRange(actor, dest, distance);
 }
 
-bool WithinRange(const Actor *actor, const Point &dest, int distance)
+bool WithinRange(const Scriptable *actor, const Point &dest, int distance)
 {
 	double angle = AngleFromPoints(actor->Pos, dest);
 	return Distance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 
-bool WithinPersonalRange(const Scriptable *actor, const Scriptable *dest, int distance)
+bool WithinPersonalRange(const Scriptable *actor, const Point &dest, int distance)
 {
-	double angle = AngleFromPoints(actor->Pos, dest->Pos);
+	double angle = AngleFromPoints(actor->Pos, dest);
 	return PersonalDistance(dest, actor) <= Feet2Pixels(distance, angle);
 }
 

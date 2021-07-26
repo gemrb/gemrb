@@ -49,9 +49,9 @@ class Map;
 #define CF_NO_DIFF_1 4
 #define CF_NO_DIFF_2 8
 #define CF_NO_DIFF_3 16
-#define CF_CHECKVIEWPORT 32
-#define CF_CHECKCROWD 64
-#define CF_SAFESTPOINT 128
+// 32
+#define CF_INC_INDEX 64
+#define CF_HOLD_POINT 128
 #define CF_NO_DIFF_MASK 28
 #define CF_CHECK_NAME 256
 #define CF_GOOD 512
@@ -61,6 +61,8 @@ class Map;
 #define CF_FACTION 8192
 #define CF_TEAM 16384
 #define CF_BUDDY 0x8000
+#define CF_DISABLE_RENDERER 0x10000
+#define CF_SAFEST_POINT 0x20000
 
 //spec ids flags
 #define AI_EA		0
@@ -88,12 +90,17 @@ struct CritterEntry {
 	ResRef AreaScript;      //override area script
 	ResRef SpecificScript;  //override specific script
 	ResRef Dialog;          //override dialog
-	ieVariable SpawnPointVar; //spawn point saved location
+	ieVariable PointSelectVar; // holds spawn point index to use
+	ieVariable SaveSelectedPoint; // a var to save the selected spawn point location to
+	ieVariable SaveSelectedFacing; // a var to save the selected spawn point orientation to
 	Point SpawnPoint;         //spawn point
+	std::string SpawnPointsDef; // the unparsed available spawn points
+	char SpawnMode;           // the spawn point selection mode
 	int SpecVarOperator;      //operation performed on spec var
 	int SpecVarValue;         //using this value with the operation
 	int SpecVarInc;           //add this to spec var at each spawn
 	int Orientation;          //spawn orientation
+	int Orientation2;          // spawn orientation if the spawn point doesn't specify it
 	int Flags;                //CF_IGNORENOSEE, CF_DEATHVAR, etc
 	int TotalQuantity;        //total number
 	int SpawnCount;           //create quantity
@@ -159,6 +166,8 @@ private:
 	void SpawnGroup(SpawnEntry &event);
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
+	void PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;
+	void SelectSpawnPoint(CritterEntry &critter) const;
 public:
 	/* called by action of the same name */
 	void SetNamelessDeath(const ResRef& area, const Point &pos, ieDword state);

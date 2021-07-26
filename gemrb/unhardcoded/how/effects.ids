@@ -299,4 +299,5 @@ IDS
 0x129	HideInShadowsModifier
 0x12a	UseMagicDeviceModifier
 0x141	RemoveEffectsByResource
+0x146	ApplyEffectsList
 399     AlterAnimation

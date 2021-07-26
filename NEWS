@@ -1,11 +1,12 @@
-GemRB git (a022c50a5):
+GemRB git (ab01a3):
   New features:
     - 
     - faster loading and saving
 
   Improved features:
     - 
-    - audio, appimage
+    - spellcaster ai, effects
+    - audio, appimage, ini spawns
     - bugfixes
 
 GemRB v0.9.0 (2021-06-18):

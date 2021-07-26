@@ -118,9 +118,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
-			char *tmp = (char *) malloc(9);
-			strnuprcpy(tmp, table->GetRowName(i), 8);
-			mastarea.push_back( tmp );
+			mastarea.push_back(ResRef(table->GetRowName(i)));
 		}
 	}
 
@@ -174,9 +172,6 @@ Game::~Game(void)
 	}
 	for (auto npc : NPCs) {
 		delete npc;
-	}
-	for (auto ma : mastarea) {
-		free(ma);
 	}
 
 	if (crtable) {
@@ -746,56 +741,20 @@ Map *Game::GetMap(const char *areaname, bool change)
 	return area;
 }
 
-bool Game::MasterArea(const char *area) const
+bool Game::MasterArea(const ResRef &area) const
 {
 	for (auto ma : mastarea) {
-		if (!strnicmp(ma, area, 8)) {
+		if (ma == area) {
 			return true;
 		}
 	}
 	return false;
 }
 
-// guess the master area by comparing the area name to entries in mastarea.2da
-// returns the area numerically closest to the passed one
-// pst has also areas named arNNNNc, bgt araNNNN (which we mishandle)
-// TODO: consider caching with an internal field or even a separate table to map the relation
-/*
-Map* Game::GetMasterArea(const char *area)
-{
-	unsigned int areaNum;
-	unsigned int masterNum;
-	unsigned int prevDiff = 0;
-	ResRef prevArea;
-	sscanf(area, "%*c%*c%u%*c", &areaNum);
-
-	// mastarea.2da is not sorted, so make sure to check all the rows/areas
-	unsigned int i=(int) mastarea.size();
-	while(i--) {
-		sscanf(mastarea[i], "%*c%*c%u%*c", &masterNum);
-		if (areaNum > masterNum) {
-			continue;
-		} else if (areaNum == masterNum) {
-			return NULL; // optimisation, should never be called with a masterarea already
-		}
-		if (prevDiff == 0 || (prevDiff > masterNum - areaNum && masterNum < areaNum)) {
-			// first master bigger than us or
-			// this area is numerically closer than the last choice, but still smaller
-			prevArea = mastarea[i+1];
-			prevDiff = masterNum - areaNum;
-		}
-	}
-	// this could be slow, loading a full map!
-	// luckily when queried from subareas, it should already be cached and fast
-	return GetMap(prevArea, false);
-}*/
-
-void Game::SetMasterArea(const char *area)
+void Game::SetMasterArea(const ResRef &area)
 {
 	if (MasterArea(area) ) return;
-	char *tmp = (char *) malloc(9);
-	strnlwrcpy (tmp,area,8);
-	mastarea.push_back(tmp);
+	mastarea.push_back(area);
 }
 
 int Game::AddMap(Map* map)
@@ -930,12 +889,8 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	}
 
 	int ret = AddMap( newMap );
-	//spawn creatures on a map already in the game
-	//this feature exists in all blackisle games but not in bioware games
-	if (core->HasFeature(GF_SPAWN_INI)) {
-		newMap->LoadIniSpawn();
-	}
 
+	// spawn creatures on a map already in the game
 	for (size_t i = 0; i < PCs.size(); i++) {
 		Actor *pc = PCs[i];
 		if (pc->Area == ResRef) {
@@ -945,6 +900,14 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 
 	PlacePersistents(newMap, ResRef);
 	newMap->InitActors();
+
+	//this feature exists in all blackisle games but not in bioware games
+	// make sure to do it after other actors, so UpdateFog can run and
+	// the ignore_can_see key actually filters spawns
+	if (core->HasFeature(GF_SPAWN_INI)) {
+		newMap->UpdateFog();
+		newMap->LoadIniSpawn();
+	}
 
 	if (newMap->reverb) {
 		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
@@ -2115,8 +2078,8 @@ void Game::ApplyGlobalTint(Color &tint, BlitFlags &flags) const
 bool Game::IsDay() const
 {
 	ieDword daynight = core->Time.GetHour(GameTime);
-	// FIXME: doesn't match GameScript::TimeOfDay
-	if(daynight<4 || daynight>20) {
+	// matches GameScript::TimeOfDay and splprot.2da by including dawn
+	if (daynight < 6 || daynight > 20) {
 		return false;
 	}
 	return true;

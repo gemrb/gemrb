@@ -122,7 +122,6 @@ static int fx_remove_effects (Scriptable* Owner, Actor* target, Effect* fx); //f
 static int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx); //ff
 static int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx); //100
 static int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx); //101, duff in iwd2
-static int fx_resist_spell (Scriptable* Owner, Actor* target, Effect* fx); //102
 static int fx_summon_creature2 (Scriptable* Owner, Actor* target, Effect* fx); //103
 static int fx_avatar_removal (Scriptable* Owner, Actor* target, Effect* fx); //104
 //int fx_immunity_effect2 (Scriptable* Owner, Actor* target, Effect* fx); //105
@@ -155,8 +154,6 @@ static int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx);
 //0x11f Protection:Backstab (same as bg2)
 static int fx_set_state (Scriptable* Owner, Actor* target, Effect* fx); //120
 static int fx_cutscene (Scriptable* Owner, Actor* target, Effect* fx);//121
-static int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx);//ce
-static int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx);//122
 static int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx); //123
 //0x124 MagicalRest (same as bg2)
 static int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx); //125
@@ -183,7 +180,6 @@ static int fx_alter_animation (Scriptable* Owner, Actor *target, Effect* fx); //
 //iwd2 specific effects
 static int fx_hopelessness (Scriptable* Owner, Actor* target, Effect* fx);//400
 static int fx_protection_from_evil (Scriptable* Owner, Actor* target, Effect* fx);//401
-static int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx);//402
 static int fx_armor_of_faith (Scriptable* Owner, Actor* target, Effect* fx);//403
 static int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx); //404
 static int fx_enfeeblement (Scriptable* Owner, Actor* target, Effect* fx); //405
@@ -297,8 +293,6 @@ static EffectDesc effectnames[] = {
 	EffectDesc("MaceOfDisruption", fx_mace_of_disruption, 0, -1), //11c
 	EffectDesc("State:Set", fx_set_state, 0, -1), //120
 	EffectDesc("CutScene", fx_cutscene, EFFECT_NO_ACTOR, -1), //121
-	EffectDesc("Protection:Spell2", fx_resist_spell, 0, -1), //ce
-	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1), //122
 	EffectDesc("RodOfSmithing", fx_rod_of_smithing, 0, -1), //123
 	EffectDesc("BeholderDispelMagic", fx_beholder_dispel_magic, 0, -1),//125
 	EffectDesc("HarpyWail", fx_harpy_wail, 0, -1), //126
@@ -318,7 +312,6 @@ static EffectDesc effectnames[] = {
 	//iwd2 effects
 	EffectDesc("Hopelessness", fx_hopelessness, 0, -1), //400
 	EffectDesc("ProtectionFromEvil", fx_protection_from_evil, 0, -1), //401
-	EffectDesc("AddEffectsList", fx_add_effects_list, 0, -1), //402
 	EffectDesc("ArmorOfFaith", fx_armor_of_faith, 0, -1), //403
 	EffectDesc("Nausea", fx_nausea, 0, -1), //404
 	EffectDesc("Enfeeblement", fx_enfeeblement, 0, -1), //405
@@ -391,7 +384,7 @@ static EffectRef fx_confusion_ref = { "State:Confused", -1 }; //0x80
 static EffectRef fx_bless_ref = { "BlessNonCumulative", -1 }; //0x82
 static EffectRef fx_fear_ref = { "State:Panic", -1 }; //0xa1
 static EffectRef fx_hold_creature_ref = { "State:Hold", -1 }; //0xaf
-static EffectRef fx_resist_spell_ref = { "Protection:Spell2", -1 }; //0xce (IWD2)
+static EffectRef fx_resist_spell2_ref = { "Protection:Spell2", -1 }; //0xce
 static EffectRef fx_iwd_visual_spell_hit_ref = { "IWDVisualSpellHit", -1 }; //0xe9
 static EffectRef fx_umberhulk_gaze_ref = { "UmberHulkGaze", -1 }; //0x100
 static EffectRef fx_protection_from_evil_ref = { "ProtectionFromEvil", -1 }; //401
@@ -1140,7 +1133,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx1->Duration = fx->Parameter1;
 
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
 	newfx2->Resource = fx->SourceRef;
@@ -1207,7 +1200,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx1->Duration = fx->Parameter1;
 
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell_ref, 0, 0);
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
 	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	newfx2->Duration = fx->Parameter1;
 	newfx2->Resource = fx->SourceRef;
@@ -2023,61 +2016,6 @@ int fx_cutscene (Scriptable* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 	return FX_NOT_APPLIED;
 }
 
-//0xce (same place as in bg2, but different targeting)
-int fx_resist_spell (Scriptable* Owner, Actor* target, Effect *fx)
-{
-	//check iwd ids targeting
-	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
-		return FX_NOT_APPLIED;
-	}
-
-	if (fx->Resource != fx->SourceRef) {
-		return FX_APPLIED;
-	}
-	//this has effect only on first apply, it will stop applying the spell
-	return FX_ABORT;
-}
-
-//0x122 Protection:Spell3 ??? IWD ids targeting
-// this is a variant of resist spell, used in iwd2
-int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
-{
-	//check iwd ids targeting
-	//changed this to the opposite (cure light wounds resisted by undead)
-	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
-		return FX_NOT_APPLIED;
-	}
-
-	//convert effect to the normal resist spell effect (without text)
-	//in case it lingers
-	fx->Opcode=EffectQueue::ResolveEffect(fx_resist_spell_ref);
-
-	if (fx->Resource != fx->SourceRef) {
-		return FX_APPLIED;
-	}
-	//display message too
-	int spellname = -1;
-
-	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID) ) {
-		const Item *poi = gamedata->GetItem(fx->Resource);
-		spellname = poi->ItemName;
-		gamedata->FreeItem(poi, fx->Resource, false);
-	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID) ) {
-		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
-		spellname = poi->SpellName;
-		gamedata->FreeSpell(poi, fx->Resource, false);
-	}
-
-	if (spellname>=0) {
-		char *tmpstr = core->GetCString(spellname, 0);
-		core->GetTokenDictionary()->SetAtCopy("RESOURCE", tmpstr);
-		free(tmpstr);
-		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
-	}
-	//this has effect only on first apply, it will stop applying the spell
-	return FX_ABORT;
-}
-
 //0x123 RodOfSmithing
 //if golem: 5% death or 1d8+3 damage
 //if outsider: 5% 8d3 damage or nothing
@@ -2357,17 +2295,6 @@ int fx_protection_from_evil (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	// immunity to control is handled in fx_control
 	return FX_APPLIED;
-}
-
-//402 AddEffectsList
-int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
-{
-	//after iwd2 style ids targeting, apply the spell named in the resource field
-	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
-		return FX_NOT_APPLIED;
-	}
-	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
-	return FX_NOT_APPLIED;
 }
 
 //403 ArmorOfFaith

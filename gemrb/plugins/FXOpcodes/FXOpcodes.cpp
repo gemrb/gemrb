@@ -308,6 +308,7 @@ int fx_bounce_secondary_type (Scriptable* Owner, Actor* target, Effect* fx);//cb
 int fx_protection_school (Scriptable* Owner, Actor* target, Effect* fx); //cc
 int fx_protection_secondary_type (Scriptable* Owner, Actor* target, Effect* fx); //cd
 int fx_resist_spell (Scriptable* Owner, Actor* target, Effect* fx);//ce
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect* fx); // ce (iwd2, ee), remapped to 0x200 in bgs to be also available there
 int fx_resist_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
 int fx_bounce_spell (Scriptable* Owner, Actor* target, Effect* fx);//cf
 int fx_bounce_spell_dec (Scriptable* Owner, Actor* target, Effect* fx);//??
@@ -426,6 +427,10 @@ int fx_set_stat (Scriptable* Owner, Actor* target, Effect* fx);//13e (tobex only
 int fx_change_weather (Scriptable* Owner, Actor* target, Effect* fx);//140 ChangeWeather
 int fx_remove_effects(Scriptable* Owner, Actor* target, Effect* fx); // 0x141 - 321
 
+int fx_resist_spell_and_message(Scriptable* Owner, Actor* target, Effect *fx); // 0x144 (0x122) - 324
+
+int fx_add_effects_list(Scriptable* Owner, Actor* target, Effect* fx); // 402 in iwd2, 326 in ees
+
 int fx_set_concealment (Scriptable* Owner, Actor* target, Effect* fx); // 1ca - 458
 int fx_uncanny_dodge (Scriptable* Owner, Actor* target, Effect* fx); // 1cb - 459
 
@@ -450,6 +455,7 @@ static EffectDesc effectnames[] = {
 	EffectDesc("ApplyEffectCurse", fx_apply_effect_curse, 0, -1 ),
 	EffectDesc("ApplyEffectItem", fx_apply_effect_item, 0, -1 ),
 	EffectDesc("ApplyEffectItemType", fx_apply_effect_item_type, 0, -1 ),
+	EffectDesc("ApplyEffectsList", fx_add_effects_list, 0, -1),
 	EffectDesc("ApplyEffectRepeat", fx_apply_effect_repeat, 0, -1 ),
 	EffectDesc("CutScene2", fx_cutscene2, EFFECT_NO_ACTOR, -1 ),
 	EffectDesc("AttackSpeedModifier", fx_attackspeed_modifier, 0, -1 ),
@@ -665,6 +671,8 @@ static EffectDesc effectnames[] = {
 	EffectDesc("Protection:SecondaryType",fx_protection_secondary_type, 0, -1 ),//overlay?
 	EffectDesc("Protection:SecondaryTypeDec",fx_protection_secondary_type_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:Spell",fx_resist_spell, 0, -1 ),//overlay?
+	EffectDesc("Protection:Spell2", fx_resist_spell2, 0, -1),
+	EffectDesc("Protection:Spell3", fx_resist_spell_and_message, 0, -1),
 	EffectDesc("Protection:SpellDec",fx_resist_spell_dec, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevel",fx_protection_spelllevel, 0, -1 ),//overlay?
 	EffectDesc("Protection:SpellLevelDec",fx_protection_spelllevel_dec, 0, -1 ),//overlay?
@@ -820,6 +828,7 @@ static EffectRef fx_movement_modifier_ref = { "MovementRateModifier2", -1 }; //0
 static EffectRef fx_familiar_constitution_loss_ref = { "FamiliarBond", -1 }; //0xc3
 static EffectRef fx_familiar_marker_ref = { "FamiliarMarker", -1 }; //0xc4
 static EffectRef fx_immunity_effect_ref = { "Protection:Spell", -1 }; //0xce
+static EffectRef fx_resist_spell2_ref = { "Protection:Spell2", -1 }; //0xce (IWD2, ee), 0x200 bgs
 static EffectRef fx_imprisonment_ref = { "State:Imprisonment", -1 }; //0xd3
 static EffectRef fx_maze_ref = { "Maze", -1 }; //0xd5
 static EffectRef fx_leveldrain_ref = { "LevelDrainModifier", -1 }; //0xd8
@@ -4496,7 +4505,6 @@ int fx_disable_spellcasting (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x92 Spell:Cast
-// param2 was supposedly distinguishing between normal and instant casts, but uses in bg2 disagree
 int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 {
 	// print("fx_cast_spell(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
@@ -4507,11 +4515,31 @@ int fx_cast_spell (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 	}
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ResRef OldSpellResRef(Owner->SpellResRef);
-	// flags: no deplete, instant, no interrupt
-	Owner->DirectlyCastSpell(target, fx->Resource, fx->Parameter1, fx->Parameter2, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+
+	if (fx->Parameter2 == 0 || target->Type == ST_CONTAINER) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpell doesn't have a RES variant, so there's more work
+		char tmp[60];
+		if (target == Owner) {
+			// charname has no scriptname ...
+			snprintf(tmp, sizeof(tmp), "ForceSpell(Myself,%d)", ResolveSpellNumber(fx->Resource));
+		} else {
+			snprintf(tmp, sizeof(tmp), "ForceSpell(\"%s\",%d)", target->GetScriptName(), ResolveSpellNumber(fx->Resource));
+		}
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpell(fx->Resource, target, Owner, fx->CasterLevel);
+	} else { // ees introduce 2
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpell(fx->Resource, target, Owner, fx->Parameter1);
+	}
 
 	return FX_NOT_APPLIED;
 }
@@ -4532,11 +4560,26 @@ int fx_learn_spell (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 // 0x94 Spell:CastSpellPoint
 int fx_cast_spell_point (Scriptable* Owner, Actor* /*target*/, Effect* fx)
 {
-	// print("fx_cast_spell_point(%2d): Resource:%s Mode: %d", fx->Opcode, fx->Resource, fx->Parameter2);
-	// save the current spell ref, so the rest of its effects can be applied afterwards
-	ResRef OldSpellResRef(Owner->SpellResRef);
-	Owner->DirectlyCastSpellPoint(fx->Pos, fx->Resource, fx->Parameter1, true, false);
-	Owner->SetSpellResRef(OldSpellResRef);
+	if (fx->Parameter2 == 0) {
+		// no deplete, no interrupt, caster or provided level
+		// ForceSpellPoint doesn't have a RES variant, so there's more work
+		char tmp[40];
+		snprintf(tmp, sizeof(tmp), "ForceSpellPoint([%d.%d],%d)", fx->Pos.x, fx->Pos.y, ResolveSpellNumber(fx->Resource));
+		Action *forceSpellAction = GenerateAction(tmp);
+		if (fx->Parameter1 != 0) {
+			// override casting level
+			forceSpellAction->int1Parameter = fx->Parameter1;
+		}
+		Owner->AddActionInFront(forceSpellAction);
+		Owner->ImmediateEvent();
+	} else if (fx->Parameter2 == 1) {
+		// no deplete, instant, no interrupt, caster level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->CasterLevel);
+	} else { // gemrb extension to mirror fx_cast_spell
+		// no deplete, instant, no interrupt, provided level
+		core->ApplySpellPoint(fx->Resource, Owner->GetCurrentArea(), fx->Pos, Owner, fx->Parameter1);
+	}
+
 	return FX_NOT_APPLIED;
 }
 
@@ -5559,9 +5602,22 @@ int fx_protection_secondary_type (Scriptable* /*Owner*/, Actor* target, Effect *
 //0xce Protection:Spell
 int fx_resist_spell (Scriptable* /*Owner*/, Actor* target, Effect *fx)
 {
-	// print("fx_resist_spell(%2d): Resource: %s", fx->Opcode, fx->Resource);
 	if (fx->Resource != fx->SourceRef) {
 		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
+		return FX_APPLIED;
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+//0xce (same place as in bg2, but different targeting)
+int fx_resist_spell2(Scriptable* Owner, Actor* target, Effect *fx)
+{
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (fx->Resource != fx->SourceRef) {
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -6271,7 +6327,6 @@ int fx_cast_spell_on_condition (Scriptable* Owner, Actor* target, Effect* fx)
 
 	if (condition) {
 		// The trigger was evaluated as true, cast the spells now.
-		// TODO: fail remaining spells if an earlier one fails?
 		ResRef refs[4] = { fx->Resource, fx->Resource2, fx->Resource3, fx->Resource4 };
 		// save the current spell ref, so the rest of its effects can be applied afterwards (in case of a surge)
 		ResRef OldSpellResRef(Owner->SpellResRef);
@@ -6347,6 +6402,8 @@ int fx_create_contingency (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		dict->SetAt( "P1", fx->Parameter1 );
 		dict->SetAt( "P2", fx->Parameter2 );
 		core->SetEventFlag(EF_SEQUENCER);
+		// set also this for GUIMG, since the spell won't be normally cast, but applied
+		target->LastSpellOnMe = ResolveSpellNumber(fx->SourceRef);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -6435,6 +6492,7 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	char script[9];
 	//intentionally 7, to leave room for the last letter
+	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
 	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
 	//no need of buffer defense as long as you don't mess with the 7 above
 	strcat(script,"m");
@@ -7760,6 +7818,66 @@ int fx_remove_effects(Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	target->fxqueue.RemoveAllEffectsWithSource(fx_remove_effects_ref, fx->Resource, fx->Parameter2);
 	return FX_APPLIED;
+}
+
+// 0x122 (290) Protection:Spell3 with IWD ids targeting
+// 0x144 (324) Protection: Immunity to Resource and Message in EEs
+// this is a variant of fx_resist_spell that is used in iwd2 (different than bg2, see IWDOpcodes!)
+int fx_resist_spell_and_message (Scriptable* Owner, Actor* target, Effect *fx)
+{
+	//changed this to the opposite (cure light wounds resisted by undead)
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+
+	//convert effect to the normal resist spell effect (without text)
+	//in case it lingers
+	fx->Opcode = EffectQueue::ResolveEffect(fx_resist_spell2_ref);
+
+	if (fx->Resource != fx->SourceRef) {
+		return FX_APPLIED;
+	}
+	//display message too
+	ieStrRef sourceNameRef = -1;
+
+	if(gamedata->Exists(fx->Resource, IE_ITM_CLASS_ID)) {
+		const Item *poi = gamedata->GetItem(fx->Resource);
+		sourceNameRef = poi->ItemName;
+		gamedata->FreeItem(poi, fx->Resource, false);
+	} else if (gamedata->Exists(fx->Resource, IE_SPL_CLASS_ID)) {
+		const Spell *poi = gamedata->GetSpell(fx->Resource, true);
+		sourceNameRef = poi->SpellName;
+		gamedata->FreeSpell(poi, fx->Resource, false);
+	} else {
+		// ees also try one char shorter resref, so eg. the sunfire child spell finds the main one
+		ResRef tmp;
+		tmp.SNPrintF("%.7s", fx->Resource.CString());
+		if (gamedata->Exists(tmp, IE_SPL_CLASS_ID)) {
+			const Spell *poi = gamedata->GetSpell(tmp, true);
+			sourceNameRef = poi->SpellName;
+			gamedata->FreeSpell(poi, tmp, false);
+		}
+	}
+
+	if (sourceNameRef != ieStrRef(-1)) {
+		char *sourceName = core->GetCString(sourceNameRef, 0);
+		core->GetTokenDictionary()->SetAtCopy("RESOURCE", sourceName);
+		free(sourceName);
+		displaymsg->DisplayConstantStringName(STR_RES_RESISTED, DMC_WHITE, target);
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+// 402 in iwd2, 326 ees
+int fx_add_effects_list (Scriptable* Owner, Actor* target, Effect* fx)
+{
+	// after iwd2 style ids targeting, apply the spell named in the resource field
+	if (!EffectQueue::CheckIWDTargeting(Owner, target, fx->Parameter1, fx->Parameter2, fx)) {
+		return FX_NOT_APPLIED;
+	}
+	core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+	return FX_NOT_APPLIED;
 }
 
 // unknown

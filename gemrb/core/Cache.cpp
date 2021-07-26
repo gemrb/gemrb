@@ -189,8 +189,8 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 Cache::MyAssoc* Cache::GetAssocAt(const ResRef& key) const
 	// find association (or return NULL)
 {
-	if (m_pHashTable == NULL) {
-		return NULL;
+	if (m_pHashTable == nullptr || key.IsEmpty()) {
+		return nullptr;
 	}
 
 	unsigned int nHash = MyHashKey( key );
@@ -218,7 +218,7 @@ void *Cache::GetResource(const ResRef& key) const
 //returns true if it was successful
 bool Cache::SetAt(const ResRef& key, void *rValue)
 {
-	int i;
+	if (key.IsEmpty()) return false;
 
 	if (m_pHashTable == NULL) {
 		InitHashTable( m_nHashTableSize );
@@ -233,6 +233,7 @@ bool Cache::SetAt(const ResRef& key, void *rValue)
 
 	// it doesn't exist, add a new Association
 	pAssoc = NewAssoc();
+	int i;
 	for (i=0;i<KEYSIZE && key[i];i++) {
 		pAssoc->key[i]=tolower(key[i]);
 	}

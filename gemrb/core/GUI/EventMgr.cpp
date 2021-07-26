@@ -236,7 +236,7 @@ void EventMgr::DispatchEvent(Event&& e)
 			mouseButtonFlags = e.mouse.buttonStates;
 			mousePos = e.mouse.Pos();
 		} else { // touch
-			TouchEvent& te = (e.type == Event::TouchGesture) ? static_cast<TouchEvent&>(e.gesture) : static_cast<TouchEvent&>(e.touch);
+			const TouchEvent& te = e.type == Event::TouchGesture ? static_cast<const TouchEvent&>(e.gesture) : static_cast<const TouchEvent&>(e.touch);
 			uint64_t id = te.fingers[0].id;
 
 			switch (e.type) {

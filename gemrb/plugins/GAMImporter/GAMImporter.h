@@ -37,7 +37,6 @@ namespace GemRB {
 
 class GAMImporter : public SaveGameMgr {
 private:
-	DataStream* str;
 	int version;
 	unsigned int PCSize;
 	ieDword PCOffset, PCCount;
@@ -51,14 +50,15 @@ private:
 	ieDword PPLocOffset, PPLocCount;
 public:
 	GAMImporter(void);
-	~GAMImporter(void) override;
-	bool Open(DataStream* stream) override;
+
 	Game* LoadGame(Game *newGame, int ver_override = 0) override;
 
 	int GetStoredFileSize(Game *game) override;
 	/* stores a gane in the savegame folder */
 	int PutGame(DataStream *stream, Game *game) override;
 private:
+	bool Import(DataStream* stream) override;
+
 	Actor* GetActor(const Holder<ActorMgr>& aM, bool is_in_party);
 	void GetPCStats(PCStatsStruct* ps, bool extended);
 	GAMJournalEntry* GetJournalEntry();

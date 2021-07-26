@@ -213,14 +213,10 @@ public:
 		SpellLevel = rhs.SpellLevel;
 
 		IsVariable = rhs.IsVariable;
-		if (rhs.VariableName[0]) {
-			strlcpy(VariableName, rhs.VariableName, sizeof(VariableName));
-		}
-		// reset references
-		Resource = resources.Resource;
-		Resource2 = resources.Resource2;
-		Resource3 = resources.Resource3;
-		Resource4 = resources.Resource4;
+		// make sure to copy the whole union to set up Resource-Resource4, since VariableName will often contain nulls
+		memcpy(VariableName, rhs.VariableName, sizeof(VariableName));
+		// but VariableName is shorter than the size of the union, so:
+		resources.Resource4 = rhs.resources.Resource4;
 	}
 
 	~Effect() = default;

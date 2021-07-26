@@ -22,9 +22,11 @@
 #define SPRITESHEET_H
 
 #include "Sprite2D.h"
+
 #include "Video/Video.h"
 
 #include <map>
+#include <utility>
 
 namespace GemRB {
 
@@ -43,7 +45,7 @@ public:
 
 public:
 	SpriteSheet(Video* video, Holder<Sprite2D> sheet)
-	: Sheet(sheet), video(video) {
+	: Sheet(std::move(sheet)), video(video) {
 		SheetRegion = Sheet->Frame;
 	};
 
@@ -54,7 +56,7 @@ public:
 	}
 
 	// return the passed in region, clipped to the sprite dimensions or a region with -1 w/h if outside the sprite bounds
-	const Region& MapSheetSegment(KeyType key, Region rgn) {
+	const Region& MapSheetSegment(KeyType key, const Region& rgn) {
 		Region intersection = rgn.Intersect(SheetRegion);
 		if (!intersection.size.IsInvalid()) {
 			if (RegionMap.insert(std::make_pair(key, intersection)).second) {

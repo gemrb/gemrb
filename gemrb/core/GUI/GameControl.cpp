@@ -1380,7 +1380,7 @@ void GameControl::UpdateCursor()
 			overDoor = nullptr;
 		}
 	} else {
-		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, true);
+		overInfoPoint = area->TMap->GetInfoPoint(gameMousePos, false);
 		if (overInfoPoint) {
 			nextCursor = GetCursorOverInfoPoint(overInfoPoint);
 		}
@@ -2045,6 +2045,18 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point
 					trap->ProcessActions();
 				}
 			}
+
+			// bleh, pst has this infopoint that needs to trigger, but covers two others that also do
+			if (trap->Flags & TRAP_SILENT) {
+				// recheck if there are other infopoints at this position
+				const Map* map = trap->GetCurrentArea();
+				InfoPoint* ip2 = map->TMap->GetInfoPoint(p, true);
+				if (ip2 && !ip2->GetOverheadText().empty() && !ip2->OverheadTextIsDisplaying()) {
+					ip2->DisplayOverheadText(true);
+					DisplayString(ip2);
+				}
+			}
+
 			if (trap->GetUsePoint() ) {
 				char Tmp[256];
 				sprintf(Tmp, "TriggerWalkTo(\"%s\")", trap->GetScriptName());

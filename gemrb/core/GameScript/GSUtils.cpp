@@ -223,8 +223,9 @@ void ResolveSpellName(ResRef& spellRes, ieDword number)
 ieDword ResolveSpellNumber(const ResRef& spellRef)
 {
 	ResRef tmp;
+	tmp.SNPrintF("%.4s", spellRef.CString());
 	for (int i = 0; i < 5; i++) {
-		if (spellRef == spell_suffices[i]) {
+		if (tmp == spell_suffices[i]) {
 			tmp = spellRef + 4;
 			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
@@ -555,7 +556,7 @@ int CanSee(const Scriptable *Sender, const Scriptable *target, bool range, int s
 			los = false;
 		}
 
-		if (Distance(target->Pos, Sender->Pos) > dist * VOODOO_CANSEE_F) {
+		if (!WithinRange(target, Sender->Pos, dist)) {
 			return 0;
 		}
 		if (!los) {
@@ -1494,7 +1495,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, int flags)
 
 	double angle = AngleFromPoints(actor->Pos, target->Pos);
 	if ( Sender->GetCurrentArea()!=target->GetCurrentArea() ||
-		!WithinPersonalRange(actor, target, weaponrange) ||
+		!WithinPersonalRange(actor, target->Pos, weaponrange) ||
 		(!Sender->GetCurrentArea()->IsVisibleLOS(Sender->Pos, target->Pos)) ||
 		!CanSee(Sender, target, true, 0)) {
 		MoveNearerTo(Sender, target, Feet2Pixels(weaponrange, angle));
@@ -2283,71 +2284,34 @@ bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context
 	return false;
 }
 
-int DiffCore(ieDword a, ieDword b, int diffmode)
+bool DiffCore(ieDword a, ieDword b, int diffMode)
 {
-	switch (diffmode) {
+	switch (diffMode) {
 		case LESS_THAN:
-			if (a<b) {
-				return 1;
-			}
-			break;
+			return a < b;
 		case EQUALS:
-			if (a==b) {
-				return 1;
-			}
-			break;
+			return a == b;
 		case GREATER_THAN:
-			if (a>b) {
-				return 1;
-			}
-			break;
+			return a > b;
 		case GREATER_OR_EQUALS:
-			if (a>=b) {
-				return 1;
-			}
-			break;
+			return a >= b;
 		case NOT_EQUALS:
-			if (a!=b) {
-				return 1;
-			}
-			break;
+			return a != b;
 		case BINARY_LESS_OR_EQUALS:
-			if ((a&b) == a) {
-				return 1;
-			}
-			break;
+			return (a & b) == a;
 		case BINARY_MORE:
-			if ((a&b) != a) {
-				return 1;
-			}
-			break;
+			return (a & b) != a;
 		case BINARY_MORE_OR_EQUALS:
-			if ((a&b) == b) {
-				return 1;
-			}
-			break;
+			return (a & b) == b;
 		case BINARY_LESS:
-			if ((a&b) != b) {
-				return 1;
-			}
-			break;
+			return (a & b) != b;
 		case BINARY_INTERSECT:
-			if (a&b) {
-				return 1;
-			}
-			break;
+			return static_cast<bool>(a & b);
 		case BINARY_NOT_INTERSECT:
-			if (!(a&b)) {
-				return 1;
-			}
-			break;
+			return !(a & b);
 		default: //less or equals
-			if (a<=b) {
-				return 1;
-			}
-			break;
+			return a <= b;
 	}
-	return 0;
 }
 
 int GetGroup(const Actor *actor)
@@ -2727,6 +2691,10 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		}
 		return;
 	}
+
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	Sender->CurrentActionInterruptable = false;
 
 	if (act) {
 		//move near to target

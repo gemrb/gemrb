@@ -6119,7 +6119,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 		if (checker && checker == this) return false;
 	}
 
-	if (ga_flags&GA_NO_UNSCHEDULED) {
+	if (ga_flags & GA_NO_UNSCHEDULED && !InParty) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
 		Game *game = core->GetGame();
@@ -7384,7 +7384,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		}
 	}
 
-	if (!WithinPersonalRange(this, target, GetWeaponRange(wi)) || (GetCurrentArea() != target->GetCurrentArea())) {
+	if (!WithinPersonalRange(this, target->Pos, GetWeaponRange(wi)) || GetCurrentArea() != target->GetCurrentArea()) {
 		// this is a temporary double-check, remove when bugfixed
 		Log(ERROR, "Actor", "Attack action didn't bring us close enough!");
 		return;
@@ -8441,6 +8441,11 @@ bool Actor::HasBodyHeat() const
 
 uint8_t Actor::GetElevation() const
 {
+	// pst heightmaps are all uniform and shouldn't be used
+	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
+		return 0;
+	}
+
 	uint8_t height = area ? area->HeightMap->GetAt(Map::ConvertCoordToTile(Pos)) : 0;
 	if (height > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie

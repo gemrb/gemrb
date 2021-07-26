@@ -112,7 +112,7 @@ private:
 	void MarkAllDirty() const;
 
 public:
-	explicit WindowManager(Holder<Video> vid);
+	explicit WindowManager(const Holder<Video>& vid);
 	~WindowManager();
 	
 	WindowManager(const WindowManager&) = delete;

@@ -22,13 +22,11 @@
 
 #include "Game.h"
 #include "Plugin.h"
-#include "System/DataStream.h"
 
 namespace GemRB {
 
-class GEM_EXPORT SaveGameMgr : public Plugin {
+class GEM_EXPORT SaveGameMgr : public ImporterBase {
 public:
-	virtual bool Open(DataStream* stream) = 0;
 	virtual Game* LoadGame(Game *newGame, int ver_override = 0) = 0;
 
 	virtual int GetStoredFileSize(Game *game) = 0;

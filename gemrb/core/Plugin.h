@@ -55,7 +55,7 @@ public:
 
 class GEM_EXPORT ImporterBase : public Held<ImporterBase>
 {
-private:
+protected:
 	DataStream* str = nullptr;
 	virtual bool Import(DataStream* stream) = 0;
 	
@@ -71,10 +71,6 @@ protected:
 			str = cstream;
 		}
 		return cstream;
-	}
-	
-	DataStream* GetStream() const {
-		return str;
 	}
 	
 public:

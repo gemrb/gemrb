@@ -2302,6 +2302,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	ieDword rel = entry.relation;
 	if (idx == USHRT_MAX) {
 		// bad entry, don't match
+		return false;
 	}
 
 	//if IDS value is 'anything' then the supplied value is in Parameter1
@@ -2311,14 +2312,21 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	switch (idx) {
 		case STI_INVALID:
 			return false;
-		case STI_EA:
+		case STI_EA_RELATION:
 			return DiffCore(EARelation(Owner, target), val, rel);
+		case STI_ALLIES:
+			return DiffCore(EARelation(Owner, target), EAR_FRIEND, rel);
+		case STI_ENEMIES:
+			return DiffCore(EARelation(Owner, target), EAR_HOSTILE, rel);
 		case STI_DAYTIME:
-		{
-			// TODO: recheck, most of the code computes this differently (checking time of day)
-			ieDword timeofday = core->Time.GetHour(core->GetGame()->GameTime) / 12;
-			return timeofday >= val && timeofday <= rel;
-		}
+			ieDword timeofday;
+			timeofday = core->Time.GetHour(core->GetGame()->GameTime);
+			// handle the clock jumping at midnight
+			if (val > rel) {
+				return timeofday >= val || timeofday <= rel;
+			} else {
+				return timeofday >= val && timeofday <= rel;
+			}
 		case STI_AREATYPE:
 			return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, rel);
 		case STI_MORAL_ALIGNMENT:
@@ -2341,6 +2349,21 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 			return Owner != target;
 		case STI_CIRCLESIZE:
 			return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, rel);
+		case STI_SPELLSTATE:
+			// only used with 1 and 5, so we don't need another accessor
+			if (rel == EQUALS) {
+				return target->HasSpellState(val);
+			} else {
+				return !target->HasSpellState(val);
+			}
+		case STI_SUMMONED_NUM:
+			ieDword count;
+			count = target->GetCurrentArea()->CountSummons(GA_NO_DEAD, SEX_SUMMON);
+			return DiffCore(count, val, rel);
+		case STI_CHAPTER_CHECK:
+			ieDword chapter;
+			core->GetGame()->locals->Lookup("CHAPTER", chapter);
+			return DiffCore(chapter, val, rel);
 		case STI_EVASION:
 			if (core->HasFeature(GF_ENHANCED_EFFECTS)) {
 				// NOTE: no idea if this is used in iwd2 too (00misc32 has it set)
@@ -2358,19 +2381,32 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 
 			return val;
 		case STI_WATERY:
-		{
-			// hardcoded via animation id, so we can't use STI_TWO_ROWS
-			// sahuagin x2, water elementals x2 (and water weirds)
-			ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
-			int ret = !val;
-			if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
-				ret = val;
+			// NOTE: this got reused in EEs for alignment matching, while the originals were about water.
+			// Luckily the relation is unset in the later and the default 0 doesn't make sense for alignment
+			if (rel == 0) {
+				// hardcoded via animation id, so we can't use STI_TWO_ROWS
+				// sahuagin x2, water elementals x2 (and water weirds)
+				ieDword animID = target->GetSafeStat(IE_ANIMATION_ID);
+				int ret = !val;
+				if (animID == 0xf40b || animID == 0xf41b || animID == 0xe238 || animID == 0xe298 || animID == 0xe252) {
+					ret = val;
+				}
+				return ret;
+			} else {
+				// alignment.ids check - see below
+				idx = IE_ALIGNMENT;
 			}
-			return ret;
-		}
+			// fall-through and explict values for extra EE modes, so it's clearer we implemented them
+		case STI_EA:
+		case STI_GENERAL:
+		case STI_RACE:
+		case STI_CLASS:
+		case STI_SPECIFIC:
+		case STI_GENDER:
+		case STI_STATE:
 		default:
-		{
-			ieDword stat = STAT_GET(idx);
+			ieDword stat;
+			stat = STAT_GET(idx);
 			if (idx == IE_SUBRACE) {
 				//subraces are not stand alone stats, actually, this hack should affect the CheckStat action too
 				stat |= STAT_GET(IE_RACE) << 16;
@@ -2386,7 +2422,6 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 				stat &= almask;
 			}
 			return DiffCore(stat, val, rel);
-		}
 	}
 }
 
