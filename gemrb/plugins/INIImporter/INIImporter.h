@@ -37,18 +37,12 @@ struct INIPair {
 class INITag {
 private:
 	std::vector< INIPair> pairs;
-	char* TagName;
+	std::string TagName;
 public:
-	explicit INITag(const char* Name)
-	{
-		int len = ( int ) strlen( Name ) + 1;
-		TagName = ( char * ) malloc( len );
-		memcpy( TagName, Name, len );
-	}
+	explicit INITag(const char* Name) : TagName(Name) {};
 
 	~INITag()
 	{
-		free( TagName );
 		for (auto& pair : pairs) {
 			free(pair.Name);
 			free(pair.Value);
@@ -57,7 +51,7 @@ public:
 
 	const char* GetTagName() const
 	{
-		return TagName;
+		return TagName.c_str();
 	}
 
 	int GetKeyCount() const
