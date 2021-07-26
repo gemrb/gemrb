@@ -77,7 +77,11 @@ public:
 	operator const char*() const noexcept {
 		return var;
 	}
-	
+
+	char operator[](size_t i) const noexcept {
+		return var[i];
+	}
+
 	operator char*() noexcept {
 		return var;
 	}
