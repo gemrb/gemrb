@@ -174,15 +174,7 @@ bool BMPImporter::Open(DataStream* stream)
 		}
 		BitCount = 32;
 	} else if (BitCount == 8) {
-		pixels = malloc(size.Area());
-		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = size.h; i; i--) {
-			dest -= size.w;
-			memcpy(dest, src, size.w);
-			src += PaddedRowLength;
-		}
+		Read8To8(rpixels);
 	} else if (BitCount == 4) {
 		Read4To8(rpixels);
 	}
