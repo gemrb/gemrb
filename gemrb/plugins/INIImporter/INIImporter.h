@@ -57,7 +57,7 @@ public:
 		return pairs[index].Name.c_str();
 	}
 
-	bool AddLine(char* Line)
+	bool AddLine(const char* Line)
 	{
 		std::string iniLine = Line;
 		auto equalsPos = iniLine.find_first_of('=');

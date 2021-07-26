@@ -179,7 +179,7 @@ void Console::LoadHistory()
 
 			// set history
 			wchar_t tmp[100];
-			swprintf(tmp, sizeof(tmp), L"%s", line);
+			swprintf(tmp, 100, L"%s", line);
 			History.Append(std::make_pair(-1, tmp));
 		}
 	}
