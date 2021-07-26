@@ -87,7 +87,7 @@ struct PathFinder {
 	int NormalCost = 10;
 	int AdditionalCost = 4;
 	
-	static PathFinder& Get() {
+	static const PathFinder& Get() {
 		static PathFinder pathfinder;
 		return pathfinder;
 	}
@@ -132,7 +132,7 @@ private:
 struct Spawns {
 	Variables vars;
 	
-	static Spawns& Get() {
+	static const Spawns& Get() {
 		static Spawns spawns;
 		return spawns;
 	}
@@ -183,7 +183,7 @@ struct Explore {
 	int VisibilityPerimeter; //calculated from MaxVisibility
 	Point **VisibilityMasks=NULL;
 
-	static Explore& Get() {
+	static const Explore& Get() {
 		static Explore explore;
 		return explore;
 	}
