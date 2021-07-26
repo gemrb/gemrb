@@ -145,11 +145,11 @@ public:
 
 class INIImporter : public DataFileMgr {
 private:
-	std::vector< INITag*> tags;
+	std::vector<INITag> tags;
 
 public:
 	INIImporter() = default;
-	~INIImporter(void) override;
+	~INIImporter(void) override = default;
 	bool Open(DataStream* stream) override;
 	int GetTagsCount() const override
 	{
@@ -157,7 +157,7 @@ public:
 	}
 	const char* GetTagNameByIndex(int index) const override
 	{
-		return tags[index]->GetTagName();
+		return tags[index].GetTagName();
 	}
 
 	int GetKeysCount(const char* Tag) const override;
