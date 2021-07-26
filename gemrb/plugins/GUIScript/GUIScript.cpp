@@ -3259,13 +3259,13 @@ static PyObject* GemRB_Button_SetHotKey(PyObject* self, PyObject* args)
 		btn = GetView<Button>(self);
 		assert(btn);
 
-		PyObject* moduleName = PyImport_ImportModule(func->moduleName);
+		PyObject* moduleName = PyImport_ImportModule(func->moduleName.CString());
 		if (moduleName == nullptr) {
 			return RuntimeError("Hot key map referenced a moduleName that doesnt exist.");
 		}
 		PyObject* dict = PyModule_GetDict(moduleName);
 
-		PyObject* pFunc = PyDict_GetItemString(dict, func->function);
+		PyObject* pFunc = PyDict_GetItemString(dict, func->function.CString());
 		/* pFunc: Borrowed reference */
 		if (!PyCallable_Check(pFunc)) {
 			Py_DECREF(moduleName);
@@ -9318,7 +9318,7 @@ static int CheckRemoveItem(const Actor *actor, const CREItem *si, int action)
 			continue;
 		}
 		//true if names don't match
-		int nomatch = usedItem.username[0] && strnicmp(usedItem.username, actor->GetScriptName(), 32) != 0;
+		int nomatch = usedItem.username[0] && strnicmp(usedItem.username.CString(), actor->GetScriptName(), 32) != 0;
 
 		switch(action) {
 		//the named actor cannot remove it

@@ -3946,7 +3946,7 @@ bool Actor::HasSpecialDeathReaction(const char *deadname) const
 {
 	AutoTable tm("death");
 	if (!tm) return false;
-	const char *value = tm->QueryField (scriptName, deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname);
 	return value && value[0] != '0';
 }
 
@@ -3958,7 +3958,7 @@ void Actor::ReactToDeath(const char * deadname)
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	const char *value = tm->QueryField(scriptName, deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname);
 	if (value[0] == '0') {
 		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		return;
@@ -4050,7 +4050,7 @@ void Actor::HandleInteractV1(const Actor *target)
 
 int Actor::HandleInteract(const Actor *target) const
 {
-	int type = CheckInteract(scriptName, target->GetScriptName());
+	int type = CheckInteract(scriptName.CString(), target->GetScriptName());
 
 	//no interaction at all
 	if (type==I_NONE) return -1;
@@ -5782,8 +5782,8 @@ bool Actor::CheckOnDeath()
 	for (int i = 0, j = APP_GOOD; i < 4; i++) {
 		if (AppearanceFlags & j) {
 			value = 0;
-			game->locals->Lookup(CounterNames[i], value);
-			game->locals->SetAt(CounterNames[i], value + DeathCounters[i], nocreate);
+			game->locals->Lookup(CounterNames[i].CString(), value);
+			game->locals->SetAt(CounterNames[i].CString(), value + DeathCounters[i], nocreate);
 		}
 		j += j;
 	}
@@ -6454,7 +6454,7 @@ ResRef Actor::GetDialog(int flags) const
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags>1) {
-			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName);
+			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName.CString());
 			displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		}
 		return ResRef();

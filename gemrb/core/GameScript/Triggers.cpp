@@ -3151,7 +3151,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	if (!strnicmp(actor->ShortName, parameters->string0Parameter, 32) ) {
+	if (!strnicmp(actor->ShortName.CString(), parameters->string0Parameter, 32)) {
 		return 1;
 	}
 	return 0;
@@ -4188,7 +4188,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(actor->UsedExit, exit, 32) != 0) {
+		if (strnicmp(actor->UsedExit.CString(), exit, 32) != 0) {
 			continue;
 		}
 		return 1;

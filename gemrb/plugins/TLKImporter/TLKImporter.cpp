@@ -158,7 +158,7 @@ char *TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }
@@ -167,7 +167,7 @@ char *TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }

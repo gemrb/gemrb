@@ -74,7 +74,7 @@ public:
 		return *this;
 	}
 	
-	operator const char*() const noexcept {
+	explicit operator const char*() const noexcept {
 		return var;
 	}
 

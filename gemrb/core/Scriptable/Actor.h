@@ -537,14 +537,14 @@ public:
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
-			return LongName;
+			return LongName.CString();
 		}
-		return ShortName;
+		return ShortName.CString();
 	}
 	/** Gets the DeathVariable */
 	const char* GetScriptName(void) const
 	{
-		return scriptName;
+		return scriptName.CString();
 	}
 	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */

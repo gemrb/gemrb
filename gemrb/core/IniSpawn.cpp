@@ -627,7 +627,7 @@ void IniSpawn::RespawnNameless()
 
 	//certain variables are set when nameless dies
 	for (const auto& var : NamelessVar) {
-		SetVariable(game, var.Name, var.Value, "GLOBAL");
+		SetVariable(game, var.Name.CString(), var.Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
@@ -645,7 +645,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 		return;
 	}
 
-	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
+	ieDword specvar = CheckVariable(map, critter.SpecVar.CString(), critter.SpecContext);
 
 	if (critter.SpecVar[0]) {
 		if (critter.SpecVarOperator>=0) {
@@ -697,7 +697,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	if (critter.ScriptName[0] && (critter.Flags&CF_CHECK_NAME) ) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
-		if (map->GetActor( critter.ScriptName, 0 )) {
+		if (map->GetActor(critter.ScriptName.CString(), 0)) {
 			return;
 		}
 	} else {
@@ -730,12 +730,12 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 
 	if (critter.Flags & CF_INC_INDEX) {
-		int value = CheckVariable(map, critter.PointSelectVar);
+		int value = CheckVariable(map, critter.PointSelectVar.CString());
 		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
-		SetVariable(map, critter.PointSelectVar, value + 1);
+		SetVariable(map, critter.PointSelectVar.CString(), value + 1);
 	}
 
-	SetVariable(map, critter.SpecVar, specvar+(ieDword) critter.SpecVarInc, critter.SpecContext);
+	SetVariable(map, critter.SpecVar.CString(), specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
@@ -745,7 +745,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	cre->SetPosition( critter.SpawnPoint, 0, 0);//maybe critters could be repositioned
 	cre->SetOrientation(critter.Orientation,false);
 
-	cre->SetScriptName(critter.ScriptName);
+	cre->SetScriptName(critter.ScriptName.CString());
 
 	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {
@@ -832,7 +832,7 @@ void IniSpawn::InitialSpawn()
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
 	for (const auto& local : Locals) {
-		SetVariable(map, local.Name, local.Value, "LOCALS");
+		SetVariable(map, local.Name.CString(), local.Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed
