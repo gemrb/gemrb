@@ -3832,7 +3832,6 @@ AreaAnimation::AreaAnimation()
 	appearance = sequence = frame = transparency = height = 0;
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
-	Name[0] = 0;
 }
 
 AreaAnimation::AreaAnimation(const AreaAnimation *src)

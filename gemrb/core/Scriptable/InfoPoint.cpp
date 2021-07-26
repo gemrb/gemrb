@@ -42,7 +42,6 @@ static bool inited = false;
 InfoPoint::InfoPoint(void)
 	: Highlightable( ST_TRIGGER )
 {
-	EntranceName[0] = 0;
 	Flags = 0;
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;

@@ -67,7 +67,6 @@ Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
 {
 	Flags = 0;
 	overlay = Overlay;
-	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
 	closedIndex = NameStrRef = hp = ac = 0;
 	DiscoveryDiff = LockDifficulty = 0;

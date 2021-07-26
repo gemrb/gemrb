@@ -59,7 +59,6 @@ Scriptable::Scriptable(ScriptableType type)
 	overheadTextDisplaying = false;
 	timeStartDisplaying = 0;
 
-	scriptName[0] = 0;
 	scriptlevel = 0;
 
 	LastAttacker = 0;
