@@ -4971,11 +4971,11 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Debugdump of Actor %s (%s, %s):\n", LongName.CString(), ShortName.CString(), GetName(-1));
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
-		const char* poi = "<none>";
+		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();
 		}
-		buffer.appendFormatted( " %.8s", poi );
+		buffer.appendFormatted(" %.8s", poi.CString());
 	}
 	buffer.append("\n");
 	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area.CString(), Pos.x, Pos.y);
