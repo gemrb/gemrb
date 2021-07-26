@@ -450,6 +450,12 @@ void Interface::HandleFlags()
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
 
+	// save console history, so it's preserved between runs and games
+	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME)) {
+		const Console* console = GetControl<Console>("CONSOLE_CTL", 1);
+		if (console) console->SaveHistory();
+	}
+
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// closing windows must come before tearing anything else down
 		// some window close handlers expect game/gamecontrol to be valid
@@ -2589,6 +2595,9 @@ void Interface::AskAndExit()
 
 void Interface::ExitGemRB()
 {
+	const Console* console = GetControl<Console>("CONSOLE_CTL", 1);
+	if (console) console->SaveHistory();
+
 	QuitFlag |= QF_KILL;
 }
 /** Returns the variables dictionary */

@@ -20,6 +20,7 @@ def OnLoad():
 	
 	console = consoleWin.GetControl(0)
 	console = consoleWin.ReplaceSubview (0, IE_GUI_CONSOLE, hist)
+	console.AddAlias ("CONSOLE_CTL", 1);
 	
 	consoleWin.SetAction(lambda: console.Focus(), ACTION_WINDOW_FOCUS_GAINED)
 	
