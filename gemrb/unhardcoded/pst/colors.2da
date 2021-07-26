@@ -5,4 +5,5 @@ TOOLTIP			0xffffffff
 TOOLTIPBG		0x00000000
 MAPICNBG		0x1e0800ff
 MAPTXTBG		0xa1754eff
-ALTDOOR		    0xff00ffff
+ALTDOOR			0xff00ffff
+HOVERDOOR               0x1919e1ff
