@@ -1898,7 +1898,7 @@ int AREImporter::PutItems(DataStream *stream, const Map *map) const
 		for(int j=0;j<c->inventory.GetSlotCount();j++) {
 			const CREItem *ci = c->inventory.GetSlotItem(j);
 
-			stream->WriteResRef( ci->ItemResRef);
+			stream->WriteResRefUC(ci->ItemResRef);
 			stream->WriteWord(ci->Expired);
 			stream->WriteWord(ci->Usages[0]);
 			stream->WriteWord(ci->Usages[1]);

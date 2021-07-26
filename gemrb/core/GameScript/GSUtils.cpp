@@ -1391,9 +1391,9 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	Sender->ReleaseCurrentAction();
 }
 
-bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
 {
-	item->ItemResRef = ResRef::MakeUpperCase(resref);
+	item->ItemResRef = resref;
 	if (!core->ResolveRandomItem(item))
 		return false;
 	if (a==-1) {

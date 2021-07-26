@@ -6110,10 +6110,10 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	if (!store) {
 		store = core->SetCurrentStore(parameters->string0Parameter, 0);
 	} else {
-		if (strnicmp(store->Name, parameters->string0Parameter, 8) != 0) {
+		if (store->Name != parameters->string0Parameter) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			current = ResRef::MakeLowerCase(store->Name);
+			current = store->Name;
 			owner = store->GetOwnerID();
 		}
 	}

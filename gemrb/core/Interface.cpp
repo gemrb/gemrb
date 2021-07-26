@@ -4029,7 +4029,7 @@ void Interface::CloseCurrentStore()
 	CurrentStore = NULL;
 }
 
-Store *Interface::SetCurrentStore(const char* resName, ieDword owner)
+Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
 {
 	if (CurrentStore) {
 		if (CurrentStore->Name == resName) {

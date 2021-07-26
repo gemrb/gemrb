@@ -367,7 +367,7 @@ InfoPoint* TileMap::GetTravelTo(const char* Destination) const
 	for (InfoPoint *infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		if (strnicmp(infoPoint->Destination, Destination, 8) == 0) {
+		if (infoPoint->Destination == Destination) {
 			return infoPoint;
 		}
 	}

@@ -383,7 +383,7 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 			WMPAreaLink *al = area_links[k++];
 			WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
 			//or arearesref?
-			if (strnicmp(ae2->AreaName, B, 8)==0) {
+			if (ae2->AreaName == B) {
 				return al;
 			}
 		}
