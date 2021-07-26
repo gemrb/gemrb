@@ -61,7 +61,7 @@ public:
 	ieVariable() = default;
 	ieVariable(std::nullptr_t) = delete;
 
-	ieVariable(const char* c) noexcept {
+	explicit ieVariable(const char* c) noexcept {
 		operator=(c);
 	}
 	

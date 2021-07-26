@@ -86,7 +86,7 @@ static std::map<int, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
-static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
+static const char* CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 //I keep the zero index the same as core rules (default setting)
 static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
 //XP adjustments on easy setting (need research on the amount)
@@ -5782,8 +5782,8 @@ bool Actor::CheckOnDeath()
 	for (int i = 0, j = APP_GOOD; i < 4; i++) {
 		if (AppearanceFlags & j) {
 			value = 0;
-			game->locals->Lookup(CounterNames[i].CString(), value);
-			game->locals->SetAt(CounterNames[i].CString(), value + DeathCounters[i], nocreate);
+			game->locals->Lookup(CounterNames[i], value);
+			game->locals->SetAt(CounterNames[i], value + DeathCounters[i], nocreate);
 		}
 		j += j;
 	}
