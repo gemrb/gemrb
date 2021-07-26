@@ -31,7 +31,8 @@
 namespace GemRB {
 
 struct INIPair {
-	char* Name, * Value;
+	std::string Name;
+	std::string Value;
 };
 
 class INITag {
@@ -40,14 +41,6 @@ private:
 	std::string TagName;
 public:
 	explicit INITag(const char* Name) : TagName(Name) {};
-
-	~INITag()
-	{
-		for (auto& pair : pairs) {
-			free(pair.Name);
-			free(pair.Value);
-		}
-	}
 
 	const char* GetTagName() const
 	{
@@ -61,65 +54,38 @@ public:
 
 	const char* GetKeyNameByIndex(int index) const
 	{
-		return pairs[index].Name;
+		return pairs[index].Name.c_str();
 	}
 
 	bool AddLine(char* Line)
 	{
-		INIPair p;
-		char* equal = strchr( Line, '=' );
-		if(!equal) {
+		std::string iniLine = Line;
+		auto equalsPos = iniLine.find_first_of('=');
+		if (equalsPos == std::string::npos) {
 			return true;
 		}
-		*equal = 0;
-		char* NameKey = Line;
-		char* ValueKey = equal + 1;
-		if (!NameKey || !ValueKey) return true; // line starting or ending with sole =
 
-		//Left Trimming
-		while (*NameKey != '\0') {
-			if (*NameKey != ' ')
-				break;
-			NameKey++;
-		}
-		while (*ValueKey != '\0') {
-			if (*ValueKey != ' ')
-				break;
-			ValueKey++;
-		}
-		//Right Trimming
-		int NameKeyLen = ( int ) strlen( NameKey );
-		int ValueKeyLen = ( int ) strlen( ValueKey );
-		char* endNameKey = NameKey + NameKeyLen - 1;
-		char* endValueKey = ValueKey + ValueKeyLen - 1;
-		while (endNameKey != NameKey) {
-			if (*endNameKey != ' ')
-				break;
-			*endNameKey-- = 0;
-			NameKeyLen--;
-		}
-		while (endValueKey != ValueKey) {
-			if (*endValueKey != ' ')
-				break;
-			*endValueKey-- = 0;
-			ValueKeyLen--;
-		}
-		//Allocating Buffers
-		p.Name = ( char * ) malloc( NameKeyLen + 1 );
-		p.Value = ( char * ) malloc( ValueKeyLen + 1 );
-		//Copying buffers
-		memcpy( p.Name, NameKey, NameKeyLen + 1 );
-		memcpy( p.Value, ValueKey, ValueKeyLen + 1 );
-		//Adding to Tag Pairs
-		pairs.push_back( p );
+		auto keyStart = iniLine.find_first_not_of(' ');
+		if (keyStart == std::string::npos) return true;
+		std::string key = iniLine.substr(keyStart, equalsPos - keyStart);
+		key = key.substr(0, key.find_last_not_of(' ') + 1); // right trimming
+
+		auto valueStart = iniLine.find_first_not_of(' ', equalsPos + 1);
+		auto valueEnd = iniLine.find_last_not_of(' ');
+		if (valueStart == std::string::npos) return true;
+		if (valueEnd == std::string::npos) return true;
+		std::string value = iniLine.substr(valueStart, valueEnd - valueStart + 1);
+
+		INIPair p = { key, value };
+		pairs.push_back(p);
 		return false;
 	}
 
 	const char* GetKeyAsString(const char* Key, const char* Default) const
 	{
-		for (const auto pair : pairs) {
-			if (stricmp(Key, pair.Name) == 0) {
-				return pair.Value;
+		for (const auto& pair : pairs) {
+			if (stricmp(Key, pair.Name.c_str()) == 0) {
+				return pair.Value.c_str();
 			}
 		}
 		return Default;
@@ -128,9 +94,9 @@ public:
 	int GetKeyAsInt(const char* Key, const int Default) const
 	{
 		const char* ret = NULL;
-		for (const auto pair : pairs) {
-			if (stricmp(Key, pair.Name) == 0) {
-				ret = pair.Value;
+		for (const auto& pair : pairs) {
+			if (stricmp(Key, pair.Name.c_str()) == 0) {
+				ret = pair.Value.c_str();
 				break;
 			}
 		}
@@ -143,9 +109,9 @@ public:
 	float GetKeyAsFloat(const char* Key, const float Default) const
 	{
 		const char* ret = NULL;
-		for (const auto pair : pairs) {
-			if (stricmp(Key, pair.Name) == 0) {
-				ret = pair.Value;
+		for (const auto& pair : pairs) {
+			if (stricmp(Key, pair.Name.c_str()) == 0) {
+				ret = pair.Value.c_str();
 				break;
 			}
 		}
@@ -158,9 +124,9 @@ public:
 	bool GetKeyAsBool(const char* Key, const bool Default) const
 	{
 		const char* ret = NULL;
-		for (const auto pair : pairs) {
-			if (stricmp(Key, pair.Name) == 0) {
-				ret = pair.Value;
+		for (const auto& pair : pairs) {
+			if (stricmp(Key, pair.Name.c_str()) == 0) {
+				ret = pair.Value.c_str();
 				break;
 			}
 		}
