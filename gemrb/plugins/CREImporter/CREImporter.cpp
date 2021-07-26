@@ -571,7 +571,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 	memset( Signature,0,sizeof(Signature));
 	memset( name,0,sizeof(name));
 	strlcpy(name, act->GetName(0), sizeof(name));
-	stream->Write( name, 32);
+	stream->WriteVariable(name);
 
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
@@ -663,8 +663,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	act->CreateStats();
 	str->Rewind();
 	str->Read (Signature, 8);
-	str->Read (name, 32);
-	name[32]=0;
+	str->ReadVariable(name);
 	if (name[0]) {
 		act->SetName( name, 0 ); //setting longname
 	}
@@ -1111,8 +1110,7 @@ void CREImporter::GetActorPST(Actor *act)
 		counter = (ieByteSigned) tmpByte;
 	}
 	ieVariable KillVar; //use this as needed
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
 
 	str->Read( &tmpByte, 1 );
@@ -1150,8 +1148,7 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 	strnspccpy(act->KillVar, KillVar, 32);
 	memset(act->IncKillVar, 0, 32);
@@ -1550,8 +1547,7 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 	memset(act->KillVar, 0, 32);
 	memset(act->IncKillVar, 0, 32);
@@ -1823,11 +1819,9 @@ void CREImporter::GetActorIWD2(Actor *act)
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	ieVariable KillVar;
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->KillVar, KillVar, 32);
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
@@ -1865,8 +1859,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 
 	KnownSpellsOffset = 0;
@@ -2075,11 +2068,9 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	ieVariable KillVar;
-	str->Read(KillVar,32); //use these as needed
-	KillVar[32]=0;
+	str->ReadVariable(KillVar); // use these as needed
 	strnspccpy(act->KillVar, KillVar, 32);
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
@@ -2106,8 +2097,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 
 	str->ReadDword(KnownSpellsOffset);
@@ -2687,7 +2677,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 		tmpByte = (ieByte) counter;
 		stream->Write( &tmpByte, 1);
 	}
-	stream->Write( actor->KillVar, 32);
+	stream->WriteVariable(actor->KillVar);
 	stream->Write( filling,3); //unknown
 	tmpByte=actor->BaseStats[IE_COLORCOUNT];
 	stream->Write( &tmpByte, 1);
@@ -2742,8 +2732,8 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
+	stream->WriteVariable(actor->KillVar); // some variable names in iwd
+	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);
@@ -2790,8 +2780,8 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
+	stream->WriteVariable(actor->KillVar); // some variable names in iwd
+	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);

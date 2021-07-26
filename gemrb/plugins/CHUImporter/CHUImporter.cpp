@@ -313,8 +313,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->Seek( 2, GEM_CURRENT_POS );
 				//This is really a text field, but apparently the original engine
 				//always writes it over, and never uses it
-				str->Read( Initial, 32 );
-				Initial[32]=0;
+				str->ReadVariable(Initial);
 				str->ReadWord(maxInput);
 				Font* fnt = core->GetFont( FontResRef );
 

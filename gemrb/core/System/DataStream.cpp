@@ -123,6 +123,27 @@ strret_t DataStream::WriteResRefUC(const ResRef& src)
 	return WriteResRef(ResRef::MakeUpperCase(src));
 }
 
+strret_t DataStream::ReadVariable(ieVariable& dest)
+{
+	char ref[33];
+	strret_t len = Read(ref, 32);
+	ref[len] = '\0';
+
+	// remove trailing spaces
+	for (strret_t i = len - 1; i >= 0; --i) {
+		if (ref[i] == ' ') ref[i] = '\0';
+		else break;
+	}
+
+	dest = ref;
+	return len;
+}
+
+strret_t DataStream::WriteVariable(const ieVariable& src)
+{
+	return Write(src.CString(), 32);
+}
+
 strret_t DataStream::ReadPoint(Point &p)
 {
 	// in the data files Points are 16bit per coord as opposed to our 32ish

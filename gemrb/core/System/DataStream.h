@@ -109,7 +109,10 @@ public:
 	strret_t WriteResRef(const ResRef& src);
 	strret_t WriteResRefLC(const ResRef& src);
 	strret_t WriteResRefUC(const ResRef& src);
-	
+
+	strret_t ReadVariable(ieVariable& dest);
+	strret_t WriteVariable(const ieVariable& src);
+
 	strret_t ReadPoint(Point&);
 	strret_t WritePoint(const Point&);
 	

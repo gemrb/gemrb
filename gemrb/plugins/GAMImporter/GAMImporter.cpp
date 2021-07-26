@@ -216,11 +216,10 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 
 	//Loading Global Variables
 	ieVariable Name;
-	Name[32] = 0;
 	str->Seek( GlobalOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < GlobalCount; i++) {
 		ieDword Value;
-		str->Read( Name, 32 );
+		str->ReadVariable(Name);
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword(Value);
 		str->Seek( 40, GEM_CURRENT_POS );
@@ -235,7 +234,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < KillVarsCount; i++) {
 			ieDword Value;
-			str->Read( Name, 32 );
+			str->ReadVariable(Name);
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword(Value);
 			str->Seek( 40, GEM_CURRENT_POS );
@@ -749,7 +748,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
 		strnspccpy(tmpname, name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
-		stream->Write( tmpname, 32);
+		stream->WriteVariable(tmpname);
 		stream->Write( filling, 8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
@@ -783,7 +782,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 			strnspccpy(tmpname, name, 32);
 		}
 
-		stream->Write( tmpname, 32);
+		stream->WriteVariable(tmpname);
 		stream->Write( filling, 8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap

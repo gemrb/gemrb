@@ -541,8 +541,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ResRef DialogResRef;
 		ResRef WavResRef;
 		ieStrRef DialogName;
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->ReadWord(Type);
 		Region bbox;
 		ieWord tmp;
@@ -560,8 +559,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadDword(tmp2); //named triggerValue in the IE source
 		str->ReadDword(Cursor);
 		str->ReadResRef( Destination );
-		str->Read( Entrance, 32 );
-		Entrance[32] = 0;
+		str->ReadVariable(Entrance);
 		str->ReadDword(Flags);
 		ieStrRef StrRef;
 		str->ReadDword(StrRef);
@@ -692,8 +690,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ResRef KeyResRef;
 		ieStrRef OpenFail;
 
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->ReadPoint(pos);
 		str->ReadWord(Type);
 		str->ReadWord(LockDiff);
@@ -805,8 +802,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ResRef Dialog;
 		ieWord hp, ac;
 
-		str->Read( LongName, 32 );
-		LongName[32] = 0;
+		str->ReadVariable(LongName);
 		str->ReadResRef( ShortName );
 		str->ReadDword(Flags);
 		if (map->version == 16) {
@@ -867,7 +863,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->Read( LinkedInfo, 24);
 			LinkedInfo[24] = 0; // LinkedInfo unused in pst anyway?
 		} else {
-			str->Read( LinkedInfo, 32);
+			str->ReadVariable(LinkedInfo);
 		}
 		str->ReadDword(NameStrRef);
 		str->ReadResRef( Dialog );
@@ -999,8 +995,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieDword sduration;
 		ieWord rwdist, owdist;
 
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->ReadPoint(Pos);
 		for (auto& creature : creatures) {
 			str->ReadResRef(creature);
@@ -1064,8 +1059,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieDword flags;
 		ieByte difficultyMargin;
 
-		str->Read(defaultName, 32);
-		defaultName[32] = 0;
+		str->ReadVariable(defaultName);
 		str->ReadPoint(pos);
 		str->ReadPoint(des);
 		str->ReadDword(flags);
@@ -1179,7 +1173,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	} else {
 		for (ieDword i = 0; i < AnimCount; i++) {
 			AreaAnimation* anim = new AreaAnimation();
-			str->Read(anim->Name, 32);
+			str->ReadVariable(anim->Name);
 			ieWord animX, animY, startFrameRange;
 			str->ReadWord(animX);
 			str->ReadWord(animY);
@@ -1231,8 +1225,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieVariable Name;
 		Point Pos;
 		ieWord Face;
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->ReadPoint(Pos);
 		str->ReadWord(Face);
 		str->Seek( 66, GEM_CURRENT_POS );
@@ -1245,8 +1238,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	for (ieDword i = 0; i < VariablesCount; i++) {
 		ieVariable Name;
 		ieDword Value;
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword(Value);
 		str->Seek( 40, GEM_CURRENT_POS );
@@ -1444,8 +1436,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		// these fields could be different size: ieDword ClosedCount, OpenCount;
 		ieWord ClosedCount, OpenCount;
 		ieDword ClosedIndex, OpenIndex;
-		str->Read( Name, 32 );
-		Name[32] = 0;
+		str->ReadVariable(Name);
 		str->ReadResRef( ID );
 		str->ReadDword(Flags);
 		//IE dev info says this:
@@ -1841,7 +1832,7 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			stream->Write( d->LinkedInfo, 24);
 		} else {
-			stream->Write( d->LinkedInfo, 32);
+			stream->WriteVariable(d->LinkedInfo);
 		}
 		stream->WriteDword(d->NameStrRef);
 		stream->WriteResRef( d->GetDialog());
@@ -2015,7 +2006,7 @@ int AREImporter::PutRegions(DataStream *stream, const Map *map, ieDword &VertInd
 		stream->WriteDword(tmpDword); //unknown30
 		stream->WriteDword(ip->Cursor);
 		stream->WriteResRef( ip->Destination);
-		stream->Write( ip->EntranceName, 32);
+		stream->WriteVariable(ip->EntranceName);
 		stream->WriteDword(ip->Flags);
 		stream->WriteDword(ip->StrRef);
 		stream->WriteWord(ip->TrapDetectionDiff);
@@ -2067,7 +2058,7 @@ int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 	for (unsigned int i=0;i<SpawnCount;i++) {
 		const Spawn *sp = map->GetSpawn(i);
 
-		stream->Write( sp->Name, 32);
+		stream->WriteVariable(sp->Name);
 		tmpWord = (ieWord) sp->Pos.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) sp->Pos.y;
@@ -2187,7 +2178,7 @@ int AREImporter::PutAnimations(DataStream *stream, const Map *map)
 
 	aniIterator iter = map->GetFirstAnimation();
 	while(const AreaAnimation *an = map->GetNextAnimation(iter)) {
-		stream->Write( an->Name, 32);
+		stream->WriteVariable(an->Name);
 		tmpWord = (ieWord) an->Pos.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) an->Pos.y;
@@ -2225,7 +2216,7 @@ int AREImporter::PutEntrances(DataStream *stream, const Map *map) const
 	for (unsigned int i=0;i<EntrancesCount;i++) {
 		const Entrance *e = map->GetEntrance(i);
 
-		stream->Write( e->Name, 32);
+		stream->WriteVariable(e->Name);
 		tmpWord = (ieWord) e->Pos.x;
 		stream->WriteWord(tmpWord);
 		tmpWord = (ieWord) e->Pos.y;
@@ -2453,7 +2444,7 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<TileCount;i++) {
 		const TileObject *am = map->TMap->GetTile(i);
-		stream->Write( am->Name, 32 );
+		stream->WriteVariable(am->Name);
 		stream->WriteResRef( am->Tileset );
 		stream->WriteDword(am->Flags);
 		stream->WriteDword(am->opencount);
