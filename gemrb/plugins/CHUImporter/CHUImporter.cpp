@@ -37,25 +37,9 @@
 
 using namespace GemRB;
 
-CHUImporter::CHUImporter()
-{
-	str = NULL;
-	WindowCount = CTOffset = WEOffset = 0;
-}
-
-CHUImporter::~CHUImporter()
-{
-	delete str;
-}
-
 /** This function loads all available windows from the 'stream' parameter. */
-bool CHUImporter::Open(DataStream* stream)
+bool CHUImporter::Import(DataStream* str)
 {
-	if (stream == NULL) {
-		return false;
-	}
-	delete str;
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {
@@ -75,6 +59,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	ieWord ControlsCount, FirstControl;
 	ResRef MosFile;
 
+	DataStream* str = GetStream();
 	if (!str) {
 		Log(ERROR, "CHUImporter", "No data stream to read from, skipping controls");
 		return NULL;
@@ -525,5 +510,5 @@ bool CHUImporter::LoadWindowPack(const ResRef& ref)
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0x23A7F6CA, "CHU File Importer")
-PLUGIN_CLASS(IE_CHU_CLASS_ID, CHUImporter)
+PLUGIN_CLASS(IE_CHU_CLASS_ID, ImporterPlugin<CHUImporter>)
 END_PLUGIN()

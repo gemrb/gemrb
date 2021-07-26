@@ -31,11 +31,10 @@ namespace GemRB {
 
 class Font;
 
-class GEM_EXPORT AnimationMgr : public Plugin {
+class GEM_EXPORT AnimationMgr : public ImporterBase {
 public:
 	using index_t = AnimationFactory::index_t;
 	
-	virtual bool Open(DataStream* stream) = 0;
 	virtual index_t GetCycleSize(index_t Cycle) = 0;
 	virtual AnimationFactory* GetAnimationFactory(const ResRef &resref, bool allowCompression = true) = 0;
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.

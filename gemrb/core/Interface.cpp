@@ -1544,7 +1544,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	RegisterScriptableWindow(winmgr->GetGameWindow(), "GAMEWIN", 0);
 	winmgr->SetCursorFeedback(WindowManager::CursorFeedback(config.MouseFeedback));
 
-	guifact = MakePluginHolder<GUIFactory>(IE_CHU_CLASS_ID);
+	guifact = GetImporter<GUIFactory>(IE_CHU_CLASS_ID);
 	if (!guifact) {
 		Log(FATAL, "Core", "Failed to load Window Manager.");
 		return GEM_ERROR;
@@ -4260,7 +4260,7 @@ int Interface::SwapoutArea(Map *map)
 		return 0;
 	}
 
-	PluginHolder<MapMgr> mm = MakePluginHolder<MapMgr>(IE_ARE_CLASS_ID);
+	auto mm = GetImporter<MapMgr>(IE_ARE_CLASS_ID);
 	if (mm == nullptr) {
 		return -1;
 	}
@@ -4294,7 +4294,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 	if (!actor) {
 		return -1;
 	}
-	PluginHolder<ActorMgr> gm = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
+	auto gm = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	if (gm == nullptr) {
 		return -1;
 	}

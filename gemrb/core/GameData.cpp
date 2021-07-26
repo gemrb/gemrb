@@ -95,11 +95,8 @@ void GameData::ClearCaches()
 Actor *GameData::GetCreature(const char* ResRef, unsigned int PartySlot)
 {
 	DataStream* ds = GetResource( ResRef, IE_CRE_CLASS_ID );
-	if (!ds)
-		return 0;
-
-	PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
-	if (!actormgr->Open(ds)) {
+	auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, ds);
+	if (!actormgr) {
 		return 0;
 	}
 	Actor* actor = actormgr->GetActor(PartySlot);
@@ -116,8 +113,8 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin(nPath, core->config.GamePath, "characters", fName, nullptr);
 		stream = FileStream::OpenFile(nPath);
-		PluginHolder<ActorMgr> actormgr = MakePluginHolder<ActorMgr>(IE_CRE_CLASS_ID);
-		if (!actormgr->Open(stream)) {
+		auto actormgr = GetImporter<ActorMgr>(IE_CRE_CLASS_ID, stream);
+		if (!actormgr) {
 			return -1;
 		}
 		actor = actormgr->GetActor(PartySlot);
@@ -447,14 +444,14 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	switch (type) {
 	case IE_BAM_CLASS_ID:
 	{
-		DataStream* ret = GetResource( resname, type, silent );
-		if (ret) {
-			PluginHolder<AnimationMgr> ani = MakePluginHolder<AnimationMgr>(IE_BAM_CLASS_ID);
-			if (!ani)
-				return NULL;
-			if (!ani->Open(ret))
-				return NULL;
-			AnimationFactory* af = ani->GetAnimationFactory(resname);
+		DataStream* str = GetResource(resname, type, silent);
+		if (str) {
+			auto importer = GetImporter<AnimationMgr>(IE_BAM_CLASS_ID, str);
+			if (importer == nullptr) {
+				return nullptr;
+			}
+
+			AnimationFactory* af = importer->GetAnimationFactory(resname);
 			factory->AddFactoryObject( af );
 			return af;
 		}

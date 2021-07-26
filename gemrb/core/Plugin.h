@@ -33,6 +33,7 @@
 #include "Holder.h"
 #include "TypeID.h"
 
+#include "FileCache.h"
 #include "System/DataStream.h"
 
 #include <stdexcept>
@@ -52,33 +53,59 @@ public:
 	~Plugin() = default;
 };
 
+class GEM_EXPORT ImporterBase : public Held<ImporterBase>
+{
+private:
+	DataStream* str = nullptr;
+	virtual bool Import(DataStream* stream) = 0;
+	
+protected:
+	DataStream* DecompressStream(DataStream* stream) {
+		DataStream* cstream = CacheCompressedStream(stream, stream->filename);
+		if (!cstream) {
+			return nullptr;
+		}
+		
+		if (stream == str) {
+			delete stream;
+			str = cstream;
+		}
+		return cstream;
+	}
+	
+	DataStream* GetStream() const {
+		return str;
+	}
+	
+public:
+	bool Open(DataStream* stream) noexcept {
+		str = stream;
+		return Import(str);
+	}
+
+	~ImporterBase() {
+		delete str;
+	}
+};
+
 template <class IMPORTER>
 class GEM_EXPORT ImporterPlugin final : public Plugin
 {
-	IMPORTER* importer = new IMPORTER;
+	Holder<IMPORTER> importer = MakeHolder<IMPORTER>();
 public:
-	~ImporterPlugin() {
-		delete importer;
+	Holder<IMPORTER> GetImporter() const noexcept {
+		return importer;
 	}
 
-	IMPORTER* GetImporter(DataStream* str) {
+	Holder<IMPORTER> GetImporter(DataStream* str) noexcept {
 		if (str == nullptr) {
 			return nullptr;
 		}
 
-		struct StreamHandle {
-			DataStream* str;
-			StreamHandle(DataStream* str) noexcept
-			: str(str) {}
-			
-			~StreamHandle() noexcept {
-				delete str;
-			}
-		} handle(str);
-
 		if (importer->Open(str) == false) {
 			return nullptr;
 		}
+
 		return importer;
 	}
 };

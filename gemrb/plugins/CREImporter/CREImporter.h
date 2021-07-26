@@ -38,7 +38,6 @@ struct Effect;
 
 class CREImporter : public ActorMgr {
 private:
-	DataStream* str;
 	unsigned char CREVersion;
 	ieDword KnownSpellsOffset;
 	ieDword KnownSpellsCount;
@@ -65,8 +64,8 @@ private:
 	int QITCount; //items
 public:
 	CREImporter(void);
-	~CREImporter(void) override;
-	bool Open(DataStream* stream) override;
+
+	bool Import(DataStream* stream) override;
 	Actor* GetActor(unsigned char is_in_party) override;
 
 	ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
