@@ -81,6 +81,22 @@ public:
 		}
 		return data[p.y * size.w + p.x];
 	}
+	
+	uint8_t* begin() noexcept {
+		return data;
+	}
+	
+	uint8_t* end() noexcept {
+		return data + size.Area();
+	}
+	
+	const uint8_t* begin() const noexcept {
+		return data;
+	}
+	
+	const uint8_t* end() const noexcept {
+		return data + size.Area();
+	}
 
 	Size GetSize() const noexcept {
 		return size;

@@ -3643,7 +3643,7 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_reveal_area(%2d): Value: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	const Map *map = nullptr;
+	Map *map = nullptr;
 
 	if (target) {
 		map = target->GetCurrentArea();

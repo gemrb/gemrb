@@ -356,9 +356,9 @@ Point Map::ConvertCoordFromTile(const Point& p)
 }
 
 Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm)
-: Scriptable(ST_AREA), HeightMap(std::move(hm))
+: Scriptable(ST_AREA), TMap(tm), HeightMap(std::move(hm)),
+ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize())
 {
-	TMap = tm;
 	LightMap = std::move(lm);
 	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
@@ -391,8 +391,6 @@ Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitma
 	lastActorCount[PR_DISPLAY] = 0;
 	//no one needs this
 	//lastActorCount[PR_IGNORE] = 0;
-	ExploredBitmap = NULL;
-	VisibleBitmap = NULL;
 	version = 0;
 	MasterArea = core->GetGame()->MasterArea(scriptName.CString());
 	Background = NULL;
@@ -465,10 +463,6 @@ Map::~Map(void)
 	if (reverb) {
 		delete reverb;
 	}
-
-	//malloc-d in AREImp
-	free( ExploredBitmap );
-	free( VisibleBitmap );
 }
 
 void Map::ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm)
@@ -1555,8 +1549,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		DrawSearchMap(viewport);
 	}
 	
-	const uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap;
-	const uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap;
+	const uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap.begin();
+	const uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap.begin();
 	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
@@ -3069,12 +3063,12 @@ Point Map::ConvertPointToFog(const Point &p) const
 
 bool Map::IsVisible(const Point &pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), VisibleBitmap);
+	return FogTileUncovered(ConvertPointToFog(pos), VisibleBitmap.begin());
 }
 
 bool Map::IsExplored(const Point &pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), ExploredBitmap);
+	return FogTileUncovered(ConvertPointToFog(pos), ExploredBitmap.begin());
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
@@ -3352,9 +3346,9 @@ int Map::GetExploredMapSize() const
 	return (fogSize.w * fogSize.h + 7) / 8;
 }
 
-void Map::FillExplored(bool explored) const
+void Map::FillExplored(bool explored)
 {
-	std::fill(ExploredBitmap, ExploredBitmap + GetExploredMapSize(), explored ? 0xff : 0x00);
+	std::fill(ExploredBitmap.begin(), ExploredBitmap.end(), explored ? 0xff : 0x00);
 }
 
 void Map::ExploreTile(const Point &p)
@@ -3412,7 +3406,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	std::fill(VisibleBitmap, VisibleBitmap + GetExploredMapSize(), 0);
+	std::fill(VisibleBitmap.begin(), VisibleBitmap.end(), 0);
 	
 	for (const auto actor : actors) {
 		if (!actor->Modified[IE_EXPLORE]) continue;

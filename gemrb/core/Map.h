@@ -375,8 +375,8 @@ public:
 	ieDword AreaFlags;
 	ieWord AreaType;
 	ieWord Rain, Snow, Fog, Lightning;
-	ieByte* ExploredBitmap;
-	ieByte* VisibleBitmap;
+	Bitmap ExploredBitmap;
+	Bitmap VisibleBitmap;
 	int version;
 	ResRef WEDResRef;
 	bool MasterArea;
@@ -550,7 +550,7 @@ public:
 	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
 	int GetExploredMapSize() const;
-	void FillExplored(bool explored) const;
+	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */

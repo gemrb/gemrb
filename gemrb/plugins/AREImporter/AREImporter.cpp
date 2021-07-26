@@ -1455,19 +1455,9 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading explored bitmap");
 	unsigned int mapSize = map->GetExploredMapSize();
 	if (ExploredBitmapSize == mapSize) {
-		map->ExploredBitmap = (ieByte *) malloc(mapSize);
 		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-		str->Read(map->ExploredBitmap, mapSize);
+		str->Read(map->ExploredBitmap.begin(), mapSize);
 	}
-	else {
-		if( ExploredBitmapSize ) {
-			Log(ERROR, "AREImporter", "ExploredBitmapSize in game: %d != %d. Clearing it",
-				ExploredBitmapSize, mapSize);
-		}
-		ExploredBitmapSize = mapSize;
-		map->ExploredBitmap = (ieByte *) calloc(mapSize, 1);
-	}
-	map->VisibleBitmap = (ieByte *) calloc(mapSize, 1);
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
@@ -2432,7 +2422,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 
 int AREImporter::PutExplored(DataStream *stream, const Map *map) const
 {
-	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
+	stream->Write(map->ExploredBitmap.begin(), ExploredBitmapSize);
 	return 0;
 }
 
