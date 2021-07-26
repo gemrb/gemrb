@@ -579,15 +579,14 @@ CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned i
 unsigned int Spellbook::GetMemorizedSpellsCount(int type, bool real) const
 {
 	unsigned int count = 0;
-	size_t i=GetSpellLevelCount(type);
-	while(i--) {
-		if (real) {
-			size_t j = spells[type][i]->memorized_spells.size();
-			while(j--) {
-				if (spells[type][i]->memorized_spells[j]->Flags) count++;
-			}
-		} else {
-			count += (unsigned int) spells[type][i]->memorized_spells.size();
+	for (const auto& spellMemo : spells[type]) {
+		if (!real) {
+			count += (unsigned int) spellMemo->memorized_spells.size();
+			continue;
+		}
+
+		for (const auto& memorized : spellMemo->memorized_spells) {
+			if (memorized->Flags) count++;
 		}
 	}
 	return count;
@@ -595,15 +594,13 @@ unsigned int Spellbook::GetMemorizedSpellsCount(int type, bool real) const
 
 unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level, bool real) const
 {
-	if (type >= NUM_BOOK_TYPES)
-		return 0;
-	if (level >= GetSpellLevelCount(type))
-		return 0;
+	if (type >= NUM_BOOK_TYPES) return 0;
+	if (level >= GetSpellLevelCount(type)) return 0;
+
 	if (real) {
 		unsigned int count = 0;
-		size_t j = spells[type][level]->memorized_spells.size();
-		while(j--) {
-			if (spells[type][level]->memorized_spells[j]->Flags) count++;
+		for (const auto& memorized : spells[type][level]->memorized_spells) {
+			if (memorized->Flags) count++;
 		}
 		return count;
 	}
@@ -622,18 +619,14 @@ unsigned int Spellbook::GetMemorizedSpellsCount(const ResRef& name, int type, bo
 	}
 
 	int j = 0;
-	while(t>=0) {
-		unsigned int level = GetSpellLevelCount(t);
-		while(level--) {
-			size_t i = spells[t][level]->memorized_spells.size();
-			while(i--) {
-				const CREMemorizedSpell *cms = spells[t][level]->memorized_spells[i];
-
+	while (t >= 0) {
+		for (const auto& spellMemo : spells[t]) {
+			for (const auto& cms : spellMemo->memorized_spells) {
 				if (cms->SpellResRef != name) continue;
 				if (!real || cms->Flags) j++;
 			}
 		}
-		if (type>=0) break;
+		if (type >= 0) break;
 		t--;
 	}
 	return j;
