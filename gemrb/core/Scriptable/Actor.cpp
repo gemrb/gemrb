@@ -10468,7 +10468,7 @@ void Actor::UseExit(ieDword exitID) {
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 		LastArea = Area;
-		UsedExit[0] = 0;
+		UsedExit = nullptr;
 		if (LastExit) {
 			const char *ipName = NULL;
 			Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);

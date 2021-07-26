@@ -7918,7 +7918,7 @@ static void ReadUsedItems()
 			UsedItems[i].itemname = table->GetRowName(i);
 			strnlwrcpy(UsedItems[i].username, table->QueryField(i, 0), 32);
 			if (UsedItems[i].username[0] == '*') {
-				UsedItems[i].username[0] = 0;
+				UsedItems[i].username = nullptr;
 			}
 			//this is an strref
 			UsedItems[i].value = atoi(table->QueryField(i, 1));

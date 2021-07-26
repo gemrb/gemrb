@@ -1151,7 +1151,7 @@ void CREImporter::GetActorPST(Actor *act)
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 	strnspccpy(act->KillVar, KillVar, 32);
-	memset(act->IncKillVar, 0, 32);
+	act->IncKillVar = nullptr;
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);
@@ -1549,8 +1549,8 @@ void CREImporter::GetActorBG(Actor *act)
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
-	memset(act->KillVar, 0, 32);
-	memset(act->IncKillVar, 0, 32);
+	act->KillVar = nullptr;
+	act->IncKillVar = nullptr;
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);

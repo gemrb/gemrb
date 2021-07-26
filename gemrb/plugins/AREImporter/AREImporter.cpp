@@ -861,7 +861,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadDword(OpenStrRef);
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			str->Read( LinkedInfo, 24);
-			LinkedInfo[24] = 0; // LinkedInfo unused in pst anyway?
+			LinkedInfo = nullptr; // LinkedInfo unused in pst anyway?
 		} else {
 			str->ReadVariable(LinkedInfo);
 		}

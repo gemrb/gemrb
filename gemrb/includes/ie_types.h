@@ -66,7 +66,11 @@ public:
 	}
 	
 	ieVariable& operator=(const char* c) noexcept {
-		strncpy(var, c, sizeof(var) - 1);
+		if (c) {
+			strncpy(var, c, sizeof(var) - 1);
+		} else {
+			memset(var, 0, sizeof(var));
+		}
 		return *this;
 	}
 	
