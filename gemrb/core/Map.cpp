@@ -63,62 +63,216 @@ namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
+struct PathFinder {
+	PathMapFlags Passable[16] = {
+		PathMapFlags::NO_SEE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::SIDEWALL,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::PASSABLE | PathMapFlags::TRAVEL,
+		PathMapFlags::PASSABLE
+	};
+	
+	std::vector<TerrainSounds> terrainsounds;
+	int NormalCost = 10;
+	int AdditionalCost = 4;
+	
+	static PathFinder& Get() {
+		static PathFinder pathfinder;
+		return pathfinder;
+	}
+	
+private:
+	PathFinder() noexcept {
+		AutoTable tm("pathfind");
+
+		if (!tm) {
+			return;
+		}
+
+		const char* poi;
+
+		for (int i = 0; i < 16; i++) {
+			poi = tm->QueryField( 0, i );
+			if (*poi != '*')
+				Passable[i] = PathMapFlags(atoi(poi));
+		}
+		poi = tm->QueryField( 1, 0 );
+		if (*poi != '*')
+			NormalCost = atoi( poi );
+		poi = tm->QueryField( 1, 1 );
+		if (*poi != '*')
+			AdditionalCost = atoi( poi );
+		int rc = tm->GetRowCount()-2;
+		if (rc>0) {
+			terrainsounds.resize(rc);
+			while(rc--) {
+				terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
+				for(int i = 0; i<16;i++) {
+					terrainsounds[rc].Sounds[i] = tm->QueryField(rc + 2, i);
+				}
+			}
+		}
+	}
+	
+	PathFinder(const PathFinder&) = delete;
+	PathFinder(PathFinder&&) = delete;
+};
+
+struct Spawns {
+	Variables vars;
+	
+	static Spawns& Get() {
+		static Spawns spawns;
+		return spawns;
+	}
+
+private:
+	Spawns() noexcept {
+		ResRef GroupName;
+
+		AutoTable tab("spawngrp", true);
+
+		vars.RemoveAll(nullptr);
+		vars.SetType( GEM_VARIABLES_POINTER );
+
+		if (!tab)
+			return;
+
+		int i = tab->GetColNamesCount();
+		while (i--) {
+			int j=tab->GetRowCount();
+			std::vector<ResRef> resrefs(j);
+			while (j--) {
+				const char *crename = tab->QueryField( j,i );
+				if (strcmp(crename, tab->QueryDefault()) != 0) break;
+			}
+			if (j>0) {
+				//difficulty
+				int level = atoi(tab->QueryField(0, i));
+				for (;j;j--) {
+					resrefs[j - 1] = tab->QueryField(j, i);
+				}
+				SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
+				GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
+				vars.SetAt( GroupName, creatures);
+			}
+		}
+	}
+	
+	~Spawns() noexcept {
+		vars.RemoveAll([](void* obj) {
+			delete (SpawnGroup *)obj;
+		});
+	}
+};
+
+struct Explore {
+	int LargeFog;
+	int MaxVisibility = 30;
+	int VisibilityPerimeter; //calculated from MaxVisibility
+	Point **VisibilityMasks=NULL;
+
+	static Explore& Get() {
+		static Explore explore;
+		return explore;
+	}
+
+private:
+	void AddLOS(int destx, int desty, int slot)
+	{
+		for (int i=0;i<MaxVisibility;i++) {
+			int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
+			int y = ((desty*i + MaxVisibility/2) / MaxVisibility) * 12;
+			if (LargeFog) {
+				x += 16;
+				y += 12;
+			}
+			VisibilityMasks[i][slot].x = x;
+			VisibilityMasks[i][slot].y = y;
+		}
+	}
+
+	Explore() noexcept {
+		LargeFog = !core->HasFeature(GF_SMALL_FOG);
+
+		//circle perimeter size for MaxVisibility
+		int x = MaxVisibility;
+		int y = 0;
+		int xc = 1 - ( 2 * MaxVisibility );
+		int yc = 1;
+		int re = 0;
+		VisibilityPerimeter = 0;
+		while (x>=y) {
+			VisibilityPerimeter+=8;
+			y++;
+			re += yc;
+			yc += 2;
+			if (( ( 2 * re ) + xc ) > 0) {
+				x--;
+				re += xc;
+				xc += 2;
+			}
+		}
+
+		VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
+		for (int i = 0; i < MaxVisibility; i++) {
+			VisibilityMasks[i] = (Point *) malloc(VisibilityPerimeter*sizeof(Point) );
+		}
+
+		x = MaxVisibility;
+		y = 0;
+		xc = 1 - ( 2 * MaxVisibility );
+		yc = 1;
+		re = 0;
+		VisibilityPerimeter = 0;
+		while (x>=y) {
+			AddLOS (x, y, VisibilityPerimeter++);
+			AddLOS (-x, y, VisibilityPerimeter++);
+			AddLOS (-x, -y, VisibilityPerimeter++);
+			AddLOS (x, -y, VisibilityPerimeter++);
+			AddLOS (y, x, VisibilityPerimeter++);
+			AddLOS (-y, x, VisibilityPerimeter++);
+			AddLOS (-y, -x, VisibilityPerimeter++);
+			AddLOS (y, -x, VisibilityPerimeter++);
+			y++;
+			re += yc;
+			yc += 2;
+			if (( ( 2 * re ) + xc ) > 0) {
+				x--;
+				re += xc;
+				xc += 2;
+			}
+		}
+	}
+	
+	~Explore() {
+		if (VisibilityMasks) {
+			for (int i=0;i<MaxVisibility;i++) {
+				free(VisibilityMasks[i]);
+			}
+			free(VisibilityMasks);
+			VisibilityMasks = NULL;
+		}
+	}
+};
+
 // TODO: fix this hardcoded resource reference
 static const ResRef PortalResRef = "EF03TPR3";
 static unsigned int PortalTime = 15;
 static unsigned int MAX_CIRCLESIZE = 8;
-static int MaxVisibility = 30;
-static int VisibilityPerimeter; //calculated from MaxVisibility
-static int NormalCost = 10;
-static int AdditionalCost = 4;
-static PathMapFlags Passable[16] = {
-	PathMapFlags::NO_SEE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::IMPASSABLE,
-	PathMapFlags::PASSABLE,
-	PathMapFlags::SIDEWALL,
-	PathMapFlags::IMPASSABLE,
-	PathMapFlags::IMPASSABLE,
-	PathMapFlags::IMPASSABLE,
-	PathMapFlags::PASSABLE | PathMapFlags::TRAVEL,
-	PathMapFlags::PASSABLE
-};
-static Point **VisibilityMasks=NULL;
 
-static bool PathFinderInited = false;
-static Variables Spawns;
-static int LargeFog;
-static TerrainSounds *terrainsounds=NULL;
-static int tsndcount = -1;
 static ieDword oldGameTime = 0;
-
-static void ReleaseSpawnGroup(void *poi)
-{
-	delete (SpawnGroup *) poi;
-}
-
-void Map::ReleaseMemory()
-{
-	if (VisibilityMasks) {
-		for (int i=0;i<MaxVisibility;i++) {
-			free(VisibilityMasks[i]);
-		}
-		free(VisibilityMasks);
-		VisibilityMasks = NULL;
-	}
-	Spawns.RemoveAll(ReleaseSpawnGroup);
-	PathFinderInited = false;
-	if (terrainsounds) {
-		delete [] terrainsounds;
-		terrainsounds = NULL;
-	}
-}
 
 static inline AnimationObjectType SelectObject(const Actor *actor, int q, const AreaAnimation *a, const VEFObject *sca, const Particles *spark, const Projectile *pro, const Container *pile)
 {
@@ -191,145 +345,6 @@ static inline bool MustSave(const Actor *actor)
 	return true;
 }
 
-//Preload spawn group entries (creature resrefs that reference groups of creatures)
-static void InitSpawnGroups()
-{
-	ResRef GroupName;
-
-	AutoTable tab("spawngrp", true);
-
-	Spawns.RemoveAll(nullptr);
-	Spawns.SetType( GEM_VARIABLES_POINTER );
-
-	if (!tab)
-		return;
-
-	int i = tab->GetColNamesCount();
-	while (i--) {
-		int j=tab->GetRowCount();
-		std::vector<ResRef> resrefs(j);
-		while (j--) {
-			const char *crename = tab->QueryField( j,i );
-			if (strcmp(crename, tab->QueryDefault()) != 0) break;
-		}
-		if (j>0) {
-			//difficulty
-			int level = atoi(tab->QueryField(0, i));
-			for (;j;j--) {
-				resrefs[j - 1] = tab->QueryField(j, i);
-			}
-			SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
-			GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
-			Spawns.SetAt( GroupName, creatures);
-		}
-	}
-}
-
-//Preload the searchmap configuration
-static void InitPathFinder()
-{
-	PathFinderInited = true;
-	tsndcount = 0;
-	AutoTable tm("pathfind");
-
-	if (!tm) {
-		return;
-	}
-
-	const char* poi;
-
-	for (int i = 0; i < 16; i++) {
-		poi = tm->QueryField( 0, i );
-		if (*poi != '*')
-			Passable[i] = PathMapFlags(atoi(poi));
-	}
-	poi = tm->QueryField( 1, 0 );
-	if (*poi != '*')
-		NormalCost = atoi( poi );
-	poi = tm->QueryField( 1, 1 );
-	if (*poi != '*')
-		AdditionalCost = atoi( poi );
-	int rc = tm->GetRowCount()-2;
-	if (rc>0) {
-		terrainsounds = new TerrainSounds[rc];
-		tsndcount = rc;
-		while(rc--) {
-			terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
-			for(int i = 0; i<16;i++) {
-				terrainsounds[rc].Sounds[i] = tm->QueryField(rc + 2, i);
-			}
-		}
-	}
-}
-
-static void AddLOS(int destx, int desty, int slot)
-{
-	for (int i=0;i<MaxVisibility;i++) {
-		int x = ((destx*i + MaxVisibility/2) / MaxVisibility) * 16;
-		int y = ((desty*i + MaxVisibility/2) / MaxVisibility) * 12;
-		if (LargeFog) {
-			x += 16;
-			y += 12;
-		}
-		VisibilityMasks[i][slot].x = x;
-		VisibilityMasks[i][slot].y = y;
-	}
-}
-
-static void InitExplore()
-{
-	LargeFog = !core->HasFeature(GF_SMALL_FOG);
-
-	//circle perimeter size for MaxVisibility
-	int x = MaxVisibility;
-	int y = 0;
-	int xc = 1 - ( 2 * MaxVisibility );
-	int yc = 1;
-	int re = 0;
-	VisibilityPerimeter = 0;
-	while (x>=y) {
-		VisibilityPerimeter+=8;
-		y++;
-		re += yc;
-		yc += 2;
-		if (( ( 2 * re ) + xc ) > 0) {
-			x--;
-			re += xc;
-			xc += 2;
-		}
-	}
-
-	VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
-	for (int i = 0; i < MaxVisibility; i++) {
-		VisibilityMasks[i] = (Point *) malloc(VisibilityPerimeter*sizeof(Point) );
-	}
-
-	x = MaxVisibility;
-	y = 0;
-	xc = 1 - ( 2 * MaxVisibility );
-	yc = 1;
-	re = 0;
-	VisibilityPerimeter = 0;
-	while (x>=y) {
-		AddLOS (x, y, VisibilityPerimeter++);
-		AddLOS (-x, y, VisibilityPerimeter++);
-		AddLOS (-x, -y, VisibilityPerimeter++);
-		AddLOS (x, -y, VisibilityPerimeter++);
-		AddLOS (y, x, VisibilityPerimeter++);
-		AddLOS (-y, x, VisibilityPerimeter++);
-		AddLOS (-y, -x, VisibilityPerimeter++);
-		AddLOS (y, -x, VisibilityPerimeter++);
-		y++;
-		re += yc;
-		yc += 2;
-		if (( ( 2 * re ) + xc ) > 0) {
-			x--;
-			re += xc;
-			xc += 2;
-		}
-	}
-}
-
 Point Map::ConvertCoordToTile(const Point& p)
 {
 	return Point(p.x / 16, p.y / 12);
@@ -357,7 +372,7 @@ Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitma
 		for (int x = 0; x < size.w; ++x) {
 			uint8_t value = uint8_t(PathMapFlags(sr[Point(x,y)]) & PathMapFlags::AREAMASK);
 			size_t index = y * mapSize.w + x;
-			SrchMap[index] = Passable[value];
+			SrchMap[index] = PathFinder::Get().Passable[value];
 			MaterialMap[index] = value;
 		}
 	}
@@ -376,11 +391,6 @@ Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitma
 	lastActorCount[PR_DISPLAY] = 0;
 	//no one needs this
 	//lastActorCount[PR_IGNORE] = 0;
-	if (!PathFinderInited) {
-		InitPathFinder();
-		InitSpawnGroups();
-		InitExplore();
-	}
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
 	version = 0;
@@ -854,15 +864,16 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-void Map::ResolveTerrainSound(ResRef &sound, const Point &Pos) const
+ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &Pos) const
 {
-	for(int i=0;i<tsndcount;i++) {
-		if (sound == terrainsounds[i].Group) {
+	const auto& terrainsounds = PathFinder::Get().terrainsounds;
+	for (const auto& sound : terrainsounds) {
+		if (resref == sound.Group) {
 			int type = MaterialMap[Pos.x/16 + Pos.y/12 * mapSize.w];
-			sound = terrainsounds[i].Sounds[type];
-			return;
+			return sound.Sounds[type];
 		}
 	}
+	return ResRef();
 }
 
 void Map::DoStepForActor(Actor *actor, ieDword time) const
@@ -897,7 +908,8 @@ Size Map::FogMapSize() const
 {
 	// Ratio of bg tile size and fog tile size
 	constexpr int CELL_RATIO = 2;
-	return Size(TMap->XCellCount * CELL_RATIO + LargeFog, TMap->YCellCount * CELL_RATIO + LargeFog);
+	const int largefog = Explore::Get().LargeFog;
+	return Size(TMap->XCellCount * CELL_RATIO + largefog, TMap->YCellCount * CELL_RATIO + largefog);
 }
 
 bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
@@ -926,10 +938,11 @@ void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, 
 	// size for explored_mask and visible_mask
 	const Size fogSize = FogMapSize();
 
+	const int largefog = Explore::Get().LargeFog;
 	const Point start = Clamp(ConvertPointToFog(vp.origin), Point(), Point(fogSize.w, fogSize.h));
-	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + LargeFog, 2 + LargeFog), Point(), Point(fogSize.w, fogSize.h));
-	const int x0 = (start.x * CELL_SIZE - vp.x) - (LargeFog * CELL_SIZE / 2);
-	const int y0 = (start.y * CELL_SIZE - vp.y) - (LargeFog * CELL_SIZE / 2);
+	const Point end = Clamp(ConvertPointToFog(vp.Maximum()) + Point(2 + largefog, 2 + largefog), Point(), Point(fogSize.w, fogSize.h));
+	const int x0 = (start.x * CELL_SIZE - vp.x) - (largefog * CELL_SIZE / 2);
+	const int y0 = (start.y * CELL_SIZE - vp.y) - (largefog * CELL_SIZE / 2);
 	
 	const Size mapSize = GetSize();
 	
@@ -3170,7 +3183,7 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
 	size_t count = 1;
 
-	if (Spawns.Lookup(creResRef, lookup)) {
+	if (Spawns::Get().vars.Lookup(creResRef, lookup)) {
 		sg = (SpawnGroup *) lookup;
 		if (first || (level >= sg->Level())) {
 			count = sg->Count();
@@ -3361,18 +3374,19 @@ void Map::ExploreTile(const Point &p)
 void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 {
 	Point Tile;
+	const Explore& explore = Explore::Get();
 
-	if (range>MaxVisibility) {
-		range=MaxVisibility;
+	if (range > explore.MaxVisibility) {
+		range = explore.MaxVisibility;
 	}
-	int p=VisibilityPerimeter;
+	int p = explore.VisibilityPerimeter;
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
 		bool sidewall = false ;
 		for (int i=0;i<range;i++) {
-			Tile.x = Pos.x+VisibilityMasks[i][p].x;
-			Tile.y = Pos.y+VisibilityMasks[i][p].y;
+			Tile.x = Pos.x + explore.VisibilityMasks[i][p].x;
+			Tile.y = Pos.y + explore.VisibilityMasks[i][p].y;
 
 			if (los) {
 				if (!block) {

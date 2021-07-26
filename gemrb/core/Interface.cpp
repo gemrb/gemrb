@@ -314,7 +314,6 @@ Interface::~Interface(void)
 		delete RtRows;
 	}
 
-	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
 
 	gamedata->ClearCaches();

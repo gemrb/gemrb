@@ -4813,8 +4813,7 @@ void Actor::PlayWalkSound()
 	if (!cnt) return;
 
 	cnt=core->Roll(1,cnt,-1);
-	ResRef Sound = anims->GetWalkSound();
-	area->ResolveTerrainSound(Sound, Pos);
+	ResRef Sound = area->ResolveTerrainSound(anims->GetWalkSound(), Pos);
 
 	if (Sound.IsStar()) return;
 

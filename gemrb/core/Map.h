@@ -420,7 +420,6 @@ private:
 public:
 	Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm);
 	~Map(void) override;
-	static void ReleaseMemory();
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
 	static Point ConvertCoordFromTile(const Point&);
@@ -435,7 +434,7 @@ public:
 	void ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm);
 	void AutoLockDoors() const;
 	void UpdateScripts();
-	void ResolveTerrainSound(ResRef &sound, const Point &pos) const;
+	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
