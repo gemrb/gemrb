@@ -30,7 +30,6 @@
 #include "opcode_params.h"
 #include "voodooconst.h"
 
-#include "Bitmap.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h" // checking for dialog
 #include "Game.h"
@@ -8457,7 +8456,7 @@ uint8_t Actor::GetElevation() const
 		return 0;
 	}
 
-	uint8_t height = area ? area->HeightMap->GetAt(Map::ConvertCoordToTile(Pos)) : 0;
+	uint8_t height = area ? area->HeightMap.GetAt(Map::ConvertCoordToTile(Pos), 0) : 0;
 	if (height > 15) {
 		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
 		// cannot work out how they work, so here is an incorrect

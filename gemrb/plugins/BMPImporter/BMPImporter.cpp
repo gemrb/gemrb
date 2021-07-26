@@ -264,30 +264,19 @@ int BMPImporter::GetPalette(int colors, Color* pal)
 	return -1;
 }
 
-Bitmap* BMPImporter::GetBitmap()
+Bitmap BMPImporter::GetBitmap()
 {
-	Bitmap *data = new Bitmap(size);
-
 	unsigned char *p = ( unsigned char * ) pixels;
-	switch (BitCount) {
-	case 8:
-		for (int y = 0; y < size.h; ++y) {
-			for (int x = 0; x < size.w; ++x) {
-				data->SetAt(Point(x, y), p[y * size.w + x]);
-			}
-		}
-		break;
-	case 32:
+	if (BitCount == 32) {
 		Log(ERROR, "BMPImporter", "Don't know how to handle 32bpp bitmap from %s...", str->filename);
-		for (int y = 0; y < size.h; ++y) {
-			for (int x = 0; x < size.w; ++x) {
-				data->SetAt(Point(x, y), p[4 * (y * size.w + x)]);
-			}
+		Bitmap bitmap(size);
+		for (int i = 0; i < size.Area(); ++i) {
+			bitmap[i] = *(p + (i * 4));
 		}
-		break;
 	}
 
-	return data;
+	assert(BitCount == 8);
+	return Bitmap(size, p);;
 }
 
 #include "plugindef.h"

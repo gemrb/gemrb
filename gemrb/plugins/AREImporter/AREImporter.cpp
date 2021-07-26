@@ -357,8 +357,61 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	// if this area does not have extended night, force it to day mode
 	if (!(AreaFlags & AT_EXTENDED_NIGHT))
 		day_or_night = true;
+	
+	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
+	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
+	tmm->Open( wedfile );
 
-	Map* map = new Map();
+	//there was no tilemap set yet, so lets just send a NULL
+	TileMap* tm = tmm->GetTileMap(NULL);
+	if (!tm) {
+		Log(ERROR, "AREImporter", "No tile map available.");
+		return nullptr;
+	}
+	
+	ResRef TmpResRef;
+	if (day_or_night) {
+		TmpResRef = WEDResRef;
+	} else {
+		TmpResRef.SNPrintF("%.7sN", WEDResRef.CString());
+	}
+
+	// Small map for MapControl
+	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!sm) {
+		//fall back to day minimap
+		sm = GetResourceHolder<ImageMgr>(WEDResRef);
+	}
+
+	if (day_or_night) {
+		TmpResRef.SNPrintF("%.6sLM", WEDResRef.CString());
+	} else {
+		TmpResRef.SNPrintF("%.6sLN", WEDResRef.CString());
+	}
+
+	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!lm) {
+		Log(ERROR, "AREImporter", "No lightmap available.");
+		return NULL;
+	}
+
+	TmpResRef.SNPrintF("%.6sSR", WEDResRef.CString());
+
+	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!sr) {
+		Log(ERROR, "AREImporter", "No searchmap available.");
+		return NULL;
+	}
+
+	TmpResRef.SNPrintF("%.6sHT", WEDResRef.CString());
+
+	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!hm) {
+		Log(ERROR, "AREImporter", "No heightmap available.");
+		return NULL;
+	}
+
+	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : nullptr, hm->GetBitmap());
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;
@@ -391,33 +444,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		delete map;
 		return NULL;
 	}
-
-	ResRef TmpResRef;
-	if (day_or_night) {
-		TmpResRef = WEDResRef;
-	} else {
-		TmpResRef.SNPrintF("%.7sN", WEDResRef.CString());
-	}
-
-	PluginHolder<TileMapMgr> tmm = MakePluginHolder<TileMapMgr>(IE_WED_CLASS_ID);
-	DataStream* wedfile = gamedata->GetResource( WEDResRef, IE_WED_CLASS_ID );
-	tmm->Open( wedfile );
-
-	//there was no tilemap set yet, so lets just send a NULL
-	TileMap* tm = tmm->GetTileMap(NULL);
-	if (!tm) {
-		Log(ERROR, "AREImporter", "No tile map available.");
-		delete map;
-		return NULL;
-	}
-
-	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!sm) {
-		//fall back to day minimap
-		sm = GetResourceHolder<ImageMgr>(map->WEDResRef);
-	}
-
+	
 	//if the Script field is empty, the area name will be copied into it on first load
 	//this works only in the iwd branch of the games
 	if (Script.IsEmpty() && core->HasFeature(GF_FORCE_AREA_SCRIPT)) {
@@ -430,36 +457,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		//more customisable, add a game flag
 		map->Scripts[MAX_SCRIPTS-1] = new GameScript( Script, map );
 	}
-
-	if (day_or_night) {
-		TmpResRef.SNPrintF("%.6sLM", WEDResRef.CString());
-	} else {
-		TmpResRef.SNPrintF("%.6sLN", WEDResRef.CString());
-	}
-
-	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!lm) {
-		Log(ERROR, "AREImporter", "No lightmap available.");
-		return NULL;
-	}
-
-	TmpResRef.SNPrintF("%.6sSR", WEDResRef.CString());
-
-	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!sr) {
-		Log(ERROR, "AREImporter", "No searchmap available.");
-		return NULL;
-	}
-
-	TmpResRef.SNPrintF("%.6sHT", WEDResRef.CString());
-
-	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!hm) {
-		Log(ERROR, "AREImporter", "No heightmap available.");
-		return NULL;
-	}
-
-	map->AddTileMap( tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : NULL, hm->GetBitmap() );
 
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );

@@ -20,37 +20,76 @@
 #define BITMAP_H
 
 #include "Region.h"
+#include "Video/Pixels.h"
 
 namespace GemRB {
 
-class GEM_EXPORT Bitmap {
+class GEM_EXPORT Bitmap final
+{
+	uint8_t* data = nullptr;
+	Size size;
+	
 public:
-	explicit Bitmap(const Size& size);
-	~Bitmap();
-	unsigned char GetAt(const Point& p) const
-	{
-		if (p.x >= size.w || p.y >= size.h)
-			return 0;
-		return data[size.w * p.y + p.x];
-
+	explicit Bitmap(const Size& size) noexcept
+	: data(new uint8_t[size.Area()]), size(size)
+	{}
+	
+	Bitmap(const Size& size, const uint8_t* in) noexcept
+	: Bitmap(size) {
+		std::copy(in, in + size.Area(), data);
 	}
-	void SetAt(const Point& p, unsigned char idx)
-	{
-		if (p.x >= size.w || p.y >= size.h)
-			return;
-		data[size.w * p.y + p.x] = idx;
 
+	~Bitmap() noexcept {
+		delete [] data;
 	}
 	
-	Size GetSize() const
-	{
-		return size;
+	Bitmap(const Bitmap&) = delete;
+	Bitmap& operator=(const Bitmap&) = delete;
+	
+	Bitmap(Bitmap&& other) noexcept {
+		std::swap(data, other.data);
+		size = other.size;
 	}
 
-	void dump() const;
-private:
-	Size size;
-	unsigned char *data;
+	Bitmap& operator=(Bitmap&& other) noexcept {
+		if (&other != this) {
+			std::swap(data, other.data);
+			size = other.size;
+		}
+		return *this;
+	}
+	
+	uint8_t& operator[](size_t i) noexcept {
+		return data[i];
+	}
+	
+	const uint8_t& operator[](size_t i) const noexcept {
+		return data[i];
+	}
+	
+	uint8_t& operator[](const Point& p) noexcept {
+		return data[p.y * size.w + p.x];
+	}
+	
+	const uint8_t& operator[](const Point& p) const noexcept {
+		return data[p.y * size.w + p.x];
+	}
+	
+	uint8_t GetAt(const Point& p, uint8_t oobval) const noexcept {
+		if (p.x >= size.w || p.y >= size.h) {
+			return oobval;
+		}
+		return data[p.y * size.w + p.x];
+	}
+
+	Size GetSize() const noexcept {
+		return size;
+	}
+	
+	template <typename... ARGS>
+	PixelIterator<uint8_t> GetIterator(ARGS&&... args) noexcept {
+		return PixelIterator<uint8_t>(std::forward<ARGS>(args)...);
+	}
 };
 
 }

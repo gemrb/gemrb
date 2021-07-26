@@ -340,14 +340,29 @@ Point Map::ConvertCoordFromTile(const Point& p)
 	return Point(p.x * 16, p.y * 12);
 }
 
-Map::Map(void)
-	: Scriptable( ST_AREA )
+Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm)
+: Scriptable(ST_AREA), HeightMap(std::move(hm))
 {
+	TMap = tm;
+	LightMap = std::move(lm);
+	SmallMap = std::move(sm);
+	mapSize.w = TMap->XCellCount * 4;
+	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
+	Size size = sr.GetSize();
+	assert(mapSize.w >= size.w && mapSize.h >= size.h);
+	//Internal Searchmap
+	SrchMap = (PathMapFlags *) calloc(mapSize.Area(), sizeof(PathMapFlags));
+	MaterialMap = (unsigned short *) calloc(mapSize.Area(), sizeof(unsigned short));
+	for (int y = 0; y < size.h; ++y) {
+		for (int x = 0; x < size.w; ++x) {
+			uint8_t value = uint8_t(PathMapFlags(sr[Point(x,y)]) & PathMapFlags::AREAMASK);
+			size_t index = y * mapSize.w + x;
+			SrchMap[index] = Passable[value];
+			MaterialMap[index] = value;
+		}
+	}
+	
 	area=this;
-	TMap = NULL;
-	LightMap = NULL;
-	HeightMap = NULL;
-	SrchMap = NULL;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
 	INISpawn = NULL;
@@ -380,7 +395,6 @@ Map::Map(void)
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
 	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
 	reverb = NULL;
-	MaterialMap = NULL;
 	wallStencil = NULL;
 }
 
@@ -414,7 +428,6 @@ Map::~Map(void)
 	for (auto spawn : spawns) {
 		delete spawn;
 	}
-	delete HeightMap;
 
 	for (auto& q : queue) {
 		free(q);
@@ -456,32 +469,6 @@ void Map::ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm)
 	TMap->UpdateDoors();
 }
 
-void Map::AddTileMap(TileMap* tm, Holder<Sprite2D> lm, Bitmap* sr, Holder<Sprite2D> sm, Bitmap* hm)
-{
-	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
-	TMap = tm;
-	LightMap = std::move(lm);
-	HeightMap = hm;
-	SmallMap = std::move(sm);
-	mapSize.w = TMap->XCellCount * 4;
-	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
-	Size size = sr->GetSize();
-	assert(mapSize.w >= size.w && mapSize.h >= size.h);
-	//Internal Searchmap
-	SrchMap = (PathMapFlags *) calloc(mapSize.Area(), sizeof(PathMapFlags));
-	MaterialMap = (unsigned short *) calloc(mapSize.Area(), sizeof(unsigned short));
-	for (int y = 0; y < size.h; ++y) {
-		for (int x = 0; x < size.w; ++x) {
-			uint8_t value = uint8_t(PathMapFlags(sr->GetAt(Point(x,y))) & PathMapFlags::AREAMASK);
-			size_t index = y * mapSize.w + x;
-			SrchMap[index] = Passable[value];
-			MaterialMap[index] = value;
-		}
-	}
-
-	//delete the original searchmap
-	delete sr;
-}
 void Map::AutoLockDoors() const
 {
 	GetTileMap()->AutoLockDoors();

@@ -296,7 +296,6 @@
 		A29BF8A513A04A6F00C812DD /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F931395FF61006ADC12 /* Animation.cpp */; };
 		A29BF8A613A04A6F00C812DD /* AnimationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F951395FF61006ADC12 /* AnimationFactory.cpp */; };
 		A29BF8A913A04A6F00C812DD /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9C1395FF61006ADC12 /* Audio.cpp */; };
-		A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */; };
 		A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA01395FF61006ADC12 /* Cache.cpp */; };
 		A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA21395FF61006ADC12 /* Calendar.cpp */; };
 		A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */; };
@@ -443,7 +442,6 @@
 		A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */; };
 		A2E6635D139E883100310FC8 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9C1395FF61006ADC12 /* Audio.cpp */; };
 		A2E6635E139E883100310FC8 /* Audio.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9D1395FF61006ADC12 /* Audio.h */; };
-		A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */; };
 		A2E66360139E883100310FC8 /* Bitmap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9F1395FF61006ADC12 /* Bitmap.h */; };
 		A2E66361139E883100310FC8 /* Cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA01395FF61006ADC12 /* Cache.cpp */; };
 		A2E66362139E883100310FC8 /* Cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA11395FF61006ADC12 /* Cache.h */; };
@@ -1511,7 +1509,6 @@
 		A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveImporter.h; sourceTree = "<group>"; };
 		A2BF9F9C1395FF61006ADC12 /* Audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Audio.cpp; sourceTree = "<group>"; };
 		A2BF9F9D1395FF61006ADC12 /* Audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Audio.h; sourceTree = "<group>"; };
-		A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bitmap.cpp; sourceTree = "<group>"; };
 		A2BF9F9F1395FF61006ADC12 /* Bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bitmap.h; sourceTree = "<group>"; };
 		A2BF9FA01395FF61006ADC12 /* Cache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cache.cpp; sourceTree = "<group>"; };
 		A2BF9FA11395FF61006ADC12 /* Cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cache.h; sourceTree = "<group>"; };
@@ -5100,7 +5097,6 @@
 				A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */,
 				A2BF9F9C1395FF61006ADC12 /* Audio.cpp */,
 				A2BF9F9D1395FF61006ADC12 /* Audio.h */,
-				A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */,
 				A2BF9F9F1395FF61006ADC12 /* Bitmap.h */,
 				A2BF9FA01395FF61006ADC12 /* Cache.cpp */,
 				A2BF9FA11395FF61006ADC12 /* Cache.h */,
@@ -9456,7 +9452,6 @@
 				A29BF8A513A04A6F00C812DD /* Animation.cpp in Sources */,
 				A29BF8A613A04A6F00C812DD /* AnimationFactory.cpp in Sources */,
 				A29BF8A913A04A6F00C812DD /* Audio.cpp in Sources */,
-				A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */,
 				A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */,
 				A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */,
 				A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */,
@@ -9655,7 +9650,6 @@
 				A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
 				A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */,
-				A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
 				A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */,
