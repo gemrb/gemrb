@@ -65,7 +65,7 @@ bool INIImporter::Open(DataStream* str)
 		}
 		if (lastTag == NULL)
 			continue;
-		if (lastTag->AddLine( strbuf )) {
+		if (!lastTag->AddLine(strbuf)) {
 			Log(ERROR, "INIImporter", "Bad Line in file: %s, Section: [%s], Entry: '%s'",
 				str->filename, lastTag->GetTagName(), strbuf);
 		}

@@ -62,7 +62,7 @@ public:
 		std::string iniLine = Line;
 		auto equalsPos = iniLine.find_first_of('=');
 		if (equalsPos == std::string::npos) {
-			return true;
+			return false;
 		}
 
 		auto keyStart = iniLine.find_first_not_of(' ');
@@ -78,7 +78,7 @@ public:
 
 		INIPair p = { key, value };
 		pairs.push_back(p);
-		return false;
+		return true;
 	}
 
 	const char* GetKeyAsString(const char* Key, const char* Default) const
