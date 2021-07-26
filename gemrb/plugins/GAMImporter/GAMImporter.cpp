@@ -775,7 +775,6 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
-				memset(tmpname, 0, sizeof(ieVariable));
 				strncpy(tmpname, "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
 			} else {
 				strnspccpy(tmpname, name, 32, true);

@@ -1625,7 +1625,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	}
 
 	if (HasFeature(GF_IWD2_DEATHVARFORMAT)) {
-		memcpy(DeathVarFormat, IWD2DeathVarFormat, sizeof(ieVariable));
+		DeathVarFormat = IWD2DeathVarFormat;
 	}
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {

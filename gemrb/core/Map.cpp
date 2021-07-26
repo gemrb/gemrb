@@ -3867,7 +3867,7 @@ AreaAnimation::AreaAnimation(const AreaAnimation *src)
 	unknown48 = 0;
 
 	PaletteRef = src->PaletteRef;
-	memcpy(Name, src->Name, sizeof(ieVariable));
+	Name = src->Name;
 	BAM = src->BAM;
 
 	palette = src->palette ? src->palette->Copy() : NULL;
