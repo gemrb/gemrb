@@ -1061,11 +1061,10 @@ void Projectile::CheckTrigger(unsigned int radius)
 	if (phase == P_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
 		//passed a hardcoded sequence number
-		if (Extension->AFlags&PAF_TRIGGER_D) {
-			if (travel[Orientation]) {
-				int anim = travel[Orientation]->GetCurrentFrameIndex();
-				if (anim<30)
-					return;
+		if (Extension->AFlags & PAF_TRIGGER_D && travel[Orientation]) {
+			int anim = travel[Orientation]->GetCurrentFrameIndex();
+			if (anim < 30) {
+				return;
 			}
 		}
 	}
@@ -1223,12 +1222,10 @@ void Projectile::SecondaryTarget()
 				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
 				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
 				deg = ((deg % 360) + 360 + degOffset) % 360;
+			} else if (xdiff < 0) {
+				deg = 180;
 			} else {
-				if (xdiff < 0) {
-					deg = 180;
-				} else {
-					deg = 0;
-				}
+				deg = 0;
 			}
 
 			//not in the right sector of circle
@@ -1342,17 +1339,17 @@ bool Projectile::DrawChildren(const Region& vp)
 {
 	bool drawn = false;
 
-	if (children) {
-		for(int i=0;i<child_size;i++){
-			if(children[i]) {
-				if (children[i]->Update()) {
-					children[i]->DrawTravel(vp);
-					drawn = true;
-				} else {
-					delete children[i];
-					children[i]=NULL;
-				}
-			}
+	if (!children) return false;
+
+	for (int i = 0; i < child_size; i++){
+		if (!children[i]) continue;
+
+		if (children[i]->Update()) {
+			children[i]->DrawTravel(vp);
+			drawn = true;
+		} else {
+			delete children[i];
+			children[i] = nullptr;
 		}
 	}
 
@@ -1584,18 +1581,14 @@ void Projectile::DrawExplosion(const Region& vp)
 			pro->ColorSpeed = ColorSpeed;
 
 			if (apflags&APF_FILL) {
-				int delay;
-
 				//a bit of difference in case crowding is needed
 				//make this a separate flag if speed difference
 				//is not always wanted
 				pro->Speed-=RAND(0,7);
 
-				delay = Extension->Delay*extension_explosioncount;
-				if(apflags&APF_BOTH) {
-					if (delay) {
-						delay = RAND(0, delay-1);
-					}
+				int delay = Extension->Delay * extension_explosioncount;
+				if (apflags & APF_BOTH && delay) {
+					delay = RAND(0, delay - 1);
 				}
 				//this needs to be commented out for ToB horrid wilting
 				//if(ExtFlags&PEF_FREEZE) {

@@ -2878,14 +2878,16 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 
 ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
 {
-	if (StatIndex < MAX_STATS) {
-		if ((signed) Value < -100) {
-			Value = (ieDword) -100;
-		} else {
-			if (maximum_values[StatIndex] > 0) {
-				if ((signed)Value > 0 && Value > maximum_values[StatIndex]) {
-					Value = maximum_values[StatIndex];
-				}
+	if (StatIndex >= MAX_STATS) {
+		return Value;
+	}
+
+	if ((signed) Value < -100) {
+		Value = (ieDword) -100;
+	} else {
+		if (maximum_values[StatIndex] > 0) {
+			if ((signed) Value > 0 && Value > maximum_values[StatIndex]) {
+				Value = maximum_values[StatIndex];
 			}
 		}
 	}
@@ -3990,10 +3992,8 @@ void Actor::GetAreaComment(int areaflag) const
 	for(int i=0;i<afcount;i++) {
 		if (afcomments[i][0]&areaflag) {
 			int vc = afcomments[i][1];
-			if (afcomments[i][2]) {
-				if (!core->GetGame()->IsDay()) {
-					vc++;
-				}
+			if (afcomments[i][2] && !core->GetGame()->IsDay()) {
+				vc++;
 			}
 			VerbalConstant(vc);
 			return;
@@ -4284,31 +4284,38 @@ void Actor::PlayExistenceSounds()
 
 	ieDword delay = Modified[IE_EXISTANCEDELAY];
 	if (delay == (ieDword) -1) return;
+	if (delay == 0) {
+		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
+	}
 
 	Audio *audio = core->GetAudioDrv();
 	Point listener = audio->GetListenerPos();
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
-		if (strref != (ieStrRef) -1) {
-			StringBlock sb = core->strings->GetStringBlock(strref);
-			if (!sb.Sound.IsEmpty()) {
-				unsigned int vol = 100;
-				core->GetDictionary()->Lookup("Volume Ambients", vol);
-				int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
-				if (stream != -1) {
-					tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
-					if (audioLength > 0) {
-						SetAnimatedTalking(audioLength);
-					}
-					audio->ReleaseStream(stream, false);
-				}
+		if (strref == (ieStrRef) -1) {
+			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			return;
+		}
+
+		StringBlock sb = core->strings->GetStringBlock(strref);
+		if (sb.Sound.IsEmpty()) {
+			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			return;
+		}
+
+		unsigned int vol = 100;
+		core->GetDictionary()->Lookup("Volume Ambients", vol);
+		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
+		if (stream != -1) {
+			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
+			if (audioLength > 0) {
+				SetAnimatedTalking(audioLength);
 			}
+			audio->ReleaseStream(stream, false);
 		}
 	}
-	if (delay == 0) {
-		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
-	}
+
 	nextComment = time + RAND(delay*1/4, delay*7/4);
 }
 
@@ -5196,26 +5203,29 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 
 int Actor::GetWildMod(int level)
 {
-	if (GetStat(IE_KIT) == KIT_WILDMAGE) {
-		// avoid rerolling the mod, since we get called multiple times per each cast
-		// TODO: also handle a reroll to 0
-		if (!WMLevelMod) {
-			if (level>=MAX_LEVEL) level=MAX_LEVEL;
-			if(level<1) level=1;
-			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
-
-			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
-			if (core->HasFeedback(FT_STATES)) {
-				if (WMLevelMod > 0) {
-					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
-				} else if (WMLevelMod < 0) {
-					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
-				}
-			}
-		}
-		return WMLevelMod;
+	if (GetStat(IE_KIT) != KIT_WILDMAGE) {
+		return 0;
 	}
-	return 0;
+
+	// avoid rerolling the mod, since we get called multiple times per each cast
+	// TODO: also handle a reroll to 0
+	if (WMLevelMod) {
+		return 0;
+	}
+
+	if (level >= MAX_LEVEL) level = MAX_LEVEL;
+	if (level < 1) level = 1;
+	WMLevelMod = wmlevels[core->Roll(1, 20, -1)][level - 1];
+
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
+	if (core->HasFeedback(FT_STATES)) {
+		if (WMLevelMod > 0) {
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
+		} else if (WMLevelMod < 0) {
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+		}
+	}
+	return WMLevelMod;
 }
 
 int Actor::CastingLevelBonus(int level, int type)
@@ -6685,25 +6695,25 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 
 	for (int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
-		if (level) {
-			// silly monks, always wanting to be special
-			if (i == ISMONK) {
-				MonkLevel = level;
-				if (MonkLevel+LevelSum == Modified[IE_CLASSLEVELSUM]) {
-					// only the monk left to check, so skip the rest
-					break;
-				} else {
-					continue;
-				}
+		if (!level) continue;
+
+		// silly monks, always wanting to be special
+		if (i == ISMONK) {
+			MonkLevel = level;
+			if (MonkLevel + LevelSum == Modified[IE_CLASSLEVELSUM]) {
+				// only the monk left to check, so skip the rest
+				break;
+			} else {
+				continue;
 			}
-			pBAB += SetLevelBAB(level, i);
-			LevelSum += level;
-			if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
-				// skip to apr calc, no need to check the other classes
-				ToHit.SetBase(pBAB);
-				ToHit.SetBABDecrement(pBABDecrement);
-				return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
-			}
+		}
+		pBAB += SetLevelBAB(level, i);
+		LevelSum += level;
+		if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
+			// skip to apr calc, no need to check the other classes
+			ToHit.SetBase(pBAB);
+			ToHit.SetBABDecrement(pBABDecrement);
+			return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 		}
 	}
 
@@ -7424,18 +7434,16 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	// check for concealment first (iwd2), both our enemies' and from our phasing problems
 	int concealment = (GetStat(IE_ETHEREALNESS)>>8) + (target->GetStat(IE_ETHEREALNESS) & 0x64);
-	if (concealment) {
-		if (LuckyRoll(1, 100, 0) < concealment) {
-			// can we retry?
-			if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
-				// Missed <TARGETNAME> due to concealment.
-				core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
-				buffer.append("[Concealment Miss]");
-				Log(COMBAT, "Attack", buffer);
-				ResetState();
-				return;
-			}
+	if (concealment && LuckyRoll(1, 100, 0) < concealment) {
+		// can we retry?
+		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
+			// Missed <TARGETNAME> due to concealment.
+			core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+			buffer.append("[Concealment Miss]");
+			Log(COMBAT, "Attack", buffer);
+			ResetState();
+			return;
 		}
 	}
 
@@ -7789,30 +7797,33 @@ void Actor::UpdateActorState()
 		}
 	}
 	
-	if (!anim.empty()) {
-		Animation* first = anim[0].first;
-		
-		if (first->endReached) {
-			// possible stance change
-			if (HandleActorStance()) {
-				// restart animation for next time it is needed
-				first->endReached = false;
-				first->SetFrame(0);
+	if (anim.empty()) {
+		UpdateModalState(game->GameTime);
+		return;
+	}
 
-				Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
-				if (firstShadow) {
-					firstShadow->endReached = false;
-					firstShadow->SetFrame(0);
-				}
+	Animation* first = anim[0].first;
+	
+	if (first->endReached) {
+		// possible stance change
+		if (HandleActorStance()) {
+			// restart animation for next time it is needed
+			first->endReached = false;
+			first->SetFrame(0);
+
+			Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+			if (firstShadow) {
+				firstShadow->endReached = false;
+				firstShadow->SetFrame(0);
 			}
-		} else {
-			//check if walk sounds need to be played
-			//dialog, pause game
-			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-				//footsteps option set, stance
-				if (footsteps && (GetStance() == IE_ANI_WALK)) {
-					PlayWalkSound();
-				}
+		}
+	} else {
+		// check if walk sounds need to be played
+		// dialog, pause game
+		if (!(core->GetGameControl()->GetDialogueFlags() & (DF_IN_DIALOG | DF_FREEZE_SCRIPTS))) {
+			// footsteps option set, stance
+			if (footsteps && GetStance() == IE_ANI_WALK) {
+				PlayWalkSound();
 			}
 		}
 	}
@@ -9064,30 +9075,31 @@ void Actor::SetPortrait(const char* portraitRef, int Which)
 
 void Actor::SetSoundFolder(const char *soundset) const
 {
-	if (core->HasFeature(GF_SOUNDFOLDERS)) {
-		char filepath[_MAX_PATH];
-
-		strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
-		PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
-
-		DirectoryIterator dirIt(filepath);
-		dirIt.SetFilterPredicate(new EndsWithFilter("01"));
-		dirIt.SetFlags(DirectoryIterator::Directories);
-		if (dirIt) {
-			do {
-				const char* name = dirIt.GetName();
-				const char* end = strchr(name, '.');
-				if (end != NULL) {
-					// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
-					// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
-					PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
-					break;
-				}
-			} while (++dirIt);
-		}
-	} else {
+	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
 		PCStats->SoundSet = soundset;
-		PCStats->SoundFolder[0]=0;
+		PCStats->SoundFolder[0] = 0;
+		return;
+	}
+
+	char filepath[_MAX_PATH];
+
+	strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
+	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
+
+	DirectoryIterator dirIt(filepath);
+	dirIt.SetFilterPredicate(new EndsWithFilter("01"));
+	dirIt.SetFlags(DirectoryIterator::Directories);
+	if (dirIt) {
+		do {
+			const char* name = dirIt.GetName();
+			const char* end = strchr(name, '.');
+			if (end != nullptr) {
+				// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
+				// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
+				PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
+				break;
+			}
+		} while (++dirIt);
 	}
 }
 
