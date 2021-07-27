@@ -909,9 +909,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		newMap->LoadIniSpawn();
 	}
 
-	if (newMap->reverb) {
-		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
-	}
+	core->GetAudioDrv()->UpdateMapAmbient(newMap->reverb);
 
 	core->LoadProgress(100);
 	return ret;

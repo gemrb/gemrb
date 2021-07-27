@@ -30,7 +30,6 @@
 #include "GameData.h"
 #include "IniSpawn.h"
 #include "MapMgr.h"
-#include "MapReverb.h"
 #include "MusicMgr.h"
 #include "ImageMgr.h"
 #include "Palette.h"
@@ -357,7 +356,8 @@ Point Map::ConvertCoordFromTile(const Point& p)
 
 Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm)
 : Scriptable(ST_AREA), TMap(tm), HeightMap(std::move(hm)),
-ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize())
+ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize()),
+reverb(*this)
 {
 	LightMap = std::move(lm);
 	SmallMap = std::move(sm);
@@ -402,7 +402,6 @@ ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize())
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
 	SongHeader.reverbID = SongHeader.MainDayAmbientVol = SongHeader.MainNightAmbientVol = 0;
-	reverb = NULL;
 	wallStencil = NULL;
 }
 
@@ -458,10 +457,6 @@ Map::~Map(void)
 	ambim->reset();
 	for (auto ambient : ambients) {
 		delete ambient;
-	}
-
-	if (reverb) {
-		delete reverb;
 	}
 }
 
@@ -4081,12 +4076,6 @@ void Map::SetBackground(const ResRef &bgResRef, ieDword duration)
 
 	Background = bmp->GetSprite2D();
 	BgDuration = duration;
-}
-
-void Map::SetupReverbInfo() {
-	if (!reverb) {
-		reverb = new MapReverb(*this);
-	}
 }
 
 }

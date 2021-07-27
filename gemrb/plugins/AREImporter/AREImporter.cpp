@@ -500,7 +500,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		// all data has it at 0, so we don't bother reading
 		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
 	}
-	map->SetupReverbInfo();
 
 	str->Seek( RestHeader + 32, GEM_STREAM_START );
 	for (auto& ref : map->RestHeader.Strref) {

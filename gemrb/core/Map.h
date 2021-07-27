@@ -25,6 +25,7 @@
 #include "globals.h"
 
 #include "Interface.h"
+#include "MapReverb.h"
 #include "Scriptable/Scriptable.h"
 #include "PathFinder.h"
 
@@ -44,7 +45,6 @@ class Bitmap;
 class CREItem;
 class GameControl;
 class IniSpawn;
-class MapReverb;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class Particles;
@@ -387,7 +387,7 @@ public:
 	Holder<Sprite2D> Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
-	MapReverb *reverb;
+	MapReverb reverb;
 
 private:
 	uint32_t debugFlags = 0;
@@ -634,7 +634,6 @@ public:
 	PathMapFlags GetInternalSearchMap(const Point&) const;
 	void SetInternalSearchMap(const Point&, PathMapFlags value);
 	void SetBackground(const ResRef &bgResref, ieDword duration);
-	void SetupReverbInfo();
 
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
