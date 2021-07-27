@@ -11585,7 +11585,7 @@ static PyObject* GemRB_PrepareSpontaneousCast(PyObject * /*self*/, PyObject* arg
 	GET_ACTOR_GLOBAL();
 
 	// deplete original memorisation
-	actor->spellbook.UnmemorizeSpell(ResRef(spell), true);
+	actor->spellbook.UnmemorizeSpell(ResRef(spell), true, 2);
 	// set spellinfo to all known spells of desired type
 	std::vector<ResRef> data;
 	actor->spellbook.SetCustomSpellInfo(data, ResRef(), 1 << type);
