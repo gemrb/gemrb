@@ -49,7 +49,6 @@ public:
 	};
 
 	ResRef(const ResRef& rhs) = default;
-	ResRef(ResRef&& rhs) = default;
 	
 	void Reset() {
 		memset(ref, 0, sizeof(ref));

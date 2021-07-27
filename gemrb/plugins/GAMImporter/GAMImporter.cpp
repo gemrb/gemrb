@@ -267,7 +267,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			for (unsigned int i = 0; i < 9; i++) {
 				ResRef tmp;
 				str->ReadResRef(tmp);
-				newGame->SetFamiliar(std::move(tmp), i);
+				newGame->SetFamiliar(tmp, i);
 			}
 		}
 	}
