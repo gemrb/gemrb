@@ -147,7 +147,6 @@ static void AddZZFeatures(Item *s)
 		fx->SourceRef = s->Name;
 		// use the space reserved earlier
 		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
-		delete fx;
 	}
 }
 
