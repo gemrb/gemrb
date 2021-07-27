@@ -4817,24 +4817,18 @@ void Actor::PlayWalkSound()
 
 	if (Sound.IsStar()) return;
 
-	int l = strlen(Sound);
-	char Sound2[9]; // bleh
-	strlcpy(Sound2, Sound.CString(), sizeof(Sound2));
+	ResRef tmp = Sound;
+	char suffix = 0;
+	int l = strlen(Sound.CString());
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound, "FS_", 3)) {
-		if (l < 8) {
-			Sound2[l] = cnt + 0x31;
-			Sound2[l+1] = 0;
-		}
-	} else {
-		if (cnt) {
-			if (l < 8) {
-				Sound2[l] = cnt + 0x60; // append 'a'-'g'
-				Sound2[l+1] = 0;
-			}
-		}
+		suffix = cnt + 0x31;
+	} else if (cnt) {
+		suffix = cnt + 0x60; // 'a'-'g'
 	}
-	Sound = Sound2;
+	if (l < 8 && suffix != 0) {
+		Sound.SNPrintF("%.8s%c", tmp.CString(), suffix);
+	}
 
 	tick_t len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
