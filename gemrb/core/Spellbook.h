@@ -217,7 +217,7 @@ public:
 	bool UnmemorizeSpell(const CREMemorizedSpell* spl);
 
 	/** Removes (or just depletes) memorized spell by ResRef */
-	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, bool onlydepleted = false);
+	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, uint8_t flags = 0);
 
 	/** finds the first spell needing to rememorize */
 	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0) const;

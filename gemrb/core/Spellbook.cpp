@@ -794,24 +794,29 @@ bool Spellbook::UnmemorizeSpell(const CREMemorizedSpell* spell)
 	return false;
 }
 
-bool Spellbook::UnmemorizeSpell(const ResRef& spellRef, bool deplete, bool onlydepleted)
+bool Spellbook::UnmemorizeSpell(const ResRef& spellRef, bool deplete, uint8_t flags)
 {
 	for (int type = 0; type<NUM_BOOK_TYPES; type++) {
-		std::vector< CRESpellMemorization* >::iterator sm;
-		for (sm = spells[type].begin(); sm != spells[type].end(); ++sm) {
+		for (const auto& sm : spells[type]) {
 			std::vector< CREMemorizedSpell* >::iterator s;
-			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); ++s) {
+			for (s = sm->memorized_spells.begin(); s != sm->memorized_spells.end(); ++s) {
 				if (spellRef != (*s)->SpellResRef) {
 					continue;
 				}
-				if (onlydepleted && (*s)->Flags != 0) {
+				// only depleted?
+				if (flags == 1 && (*s)->Flags != 0) {
 					continue;
 				}
+				// only non-depleted?
+				if (flags == 2 && (*s)->Flags == 0) {
+					continue;
+				}
+
 				if (deplete) {
 					(*s)->Flags = 0;
 				} else {
 					delete *s;
-					(*sm)->memorized_spells.erase( s );
+					sm->memorized_spells.erase(s);
 				}
 				ClearSpellInfo();
 				return true;

@@ -8847,18 +8847,18 @@ static PyObject* GemRB_MemorizeSpell(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_UnmemorizeSpell__doc,
 "===== UnmemorizeSpell =====\n\
 \n\
-**Prototype:** GemRB.UnmemorizeSpell (PartyID, SpellType, Level, Index[, onlydepleted])\n\
+**Prototype:** GemRB.UnmemorizeSpell (PartyID, SpellType, Level, Index[, flags])\n\
 \n\
-**Description:** Unmemorizes specified memorized spell. If onlydepleted is \n\
-set, it will only remove an already depleted spell (with the same resref as \n\
-the provided spell).\n\
+**Description:** Unmemorizes specified memorized spell. If flags are set, \n\
+they will limit removal to a spell with specified depletion (and the same \n\
+resref as the provided spell).\n\
 \n\
 **Parameters:**\n\
   * PartyID      - the PC's position in the party\n\
   * SpellType    - 0 - priest, 1 - wizard, 2 - innate\n\
   * Level        - the memorized spell's level\n\
   * Index        - the memorized spell's index\n\
-  * onlydepleted - remove only an already depleted spell with the same resref as the specified spell\n\
+  * flags        - optional, remove only an already depleted (1) or non-depleted (2) spell\n\
 \n\
 **Return value:** boolean, 1 on success\n\
 \n\
