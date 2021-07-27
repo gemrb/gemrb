@@ -38,6 +38,7 @@ namespace GemRB {
 class GEM_EXPORT Animation {
 public:
 	using index_t = uint16_t;
+	using frame_t = Holder<Sprite2D>;
 
 	bool endReached;
 	index_t frameIdx;
@@ -49,14 +50,14 @@ public:
 	ieDword Flags;
 
 	explicit Animation(index_t count);
-	void AddFrame(const Holder<Sprite2D>& frame, index_t index);
-	Holder<Sprite2D> CurrentFrame() const;
-	Holder<Sprite2D> LastFrame();
-	Holder<Sprite2D> NextFrame();
-	Holder<Sprite2D> GetSyncedNextFrame(const Animation* master);
+	void AddFrame(const frame_t& frame, index_t index);
+	frame_t CurrentFrame() const;
+	frame_t LastFrame();
+	frame_t NextFrame();
+	frame_t GetSyncedNextFrame(const Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
-	Holder<Sprite2D> GetFrame(index_t i) const;
+	frame_t GetFrame(index_t i) const;
 	/** Mirrors all the frames vertically */
 	void MirrorAnimationVert();
 	/** Mirrors all the frames horizontally */
@@ -72,7 +73,7 @@ public:
 	/** add other animation's animarea to self */
 	void AddAnimArea(const Animation* slave);
 private:
-	std::vector<Holder<Sprite2D>> frames;
+	std::vector<frame_t> frames;
 	index_t indicesCount;
 	tick_t starttime;
 };

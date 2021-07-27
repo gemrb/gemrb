@@ -54,7 +54,7 @@ void Animation::SetFrame(index_t index)
 }
 
 /* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(const Holder<Sprite2D>& frame, index_t index)
+void Animation::AddFrame(const frame_t& frame, index_t index)
 {
 	if (index>=indicesCount) {
 		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
@@ -75,12 +75,12 @@ Animation::index_t Animation::GetCurrentFrameIndex() const
 	return frameIdx;
 }
 
-Holder<Sprite2D> Animation::CurrentFrame() const
+Animation::frame_t Animation::CurrentFrame() const
 {
 	return GetFrame(GetCurrentFrameIndex());
 }
 
-Holder<Sprite2D> Animation::LastFrame(void)
+Animation::frame_t Animation::LastFrame(void)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive1!");
@@ -99,7 +99,7 @@ Holder<Sprite2D> Animation::LastFrame(void)
 	return ret;
 }
 
-Holder<Sprite2D> Animation::NextFrame(void)
+Animation::frame_t Animation::NextFrame(void)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive2!");
@@ -147,7 +147,7 @@ Holder<Sprite2D> Animation::NextFrame(void)
 	return ret;
 }
 
-Holder<Sprite2D> Animation::GetSyncedNextFrame(const Animation* master)
+Animation::frame_t Animation::GetSyncedNextFrame(const Animation* master)
 {
 	if (!(Flags&A_ANI_ACTIVE)) {
 		Log(MESSAGE, "Sprite2D", "Frame fetched while animation is inactive!");
@@ -174,7 +174,7 @@ void Animation::release(void)
 	delete this;
 }
 /** Gets the i-th frame */
-Holder<Sprite2D> Animation::GetFrame(index_t i) const
+Animation::frame_t Animation::GetFrame(index_t i) const
 {
 	if (i >= indicesCount) {
 		return NULL;
