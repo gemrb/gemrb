@@ -119,7 +119,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 	}
 	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
-	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
+	TileOverlay *over = new TileOverlay(Size(overlays->Width, overlays->Height));
 	for (int y = 0; y < overlays->Height; y++) {
 		for (int x = 0; x < overlays->Width; x++) {
 			str->Seek( overlays->TilemapOffset +
@@ -153,7 +153,8 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 			tile->GetAnimation(0)->fps = animspeed;
 			tile->om = overlaymask;
 			usedoverlays |= overlaymask;
-			over->AddTile( tile );
+			over->AddTile(std::move(*tile));
+			delete tile;
 			free( indices );
 		}
 	}

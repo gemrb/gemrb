@@ -26,25 +26,13 @@
 
 namespace GemRB {
 
-TileOverlay::TileOverlay(int Width, int Height)
-{
-	w = Width;
-	h = Height;
-	count = 0;
-	tiles = ( Tile * * ) calloc( w * h, sizeof( Tile * ) );
-}
+TileOverlay::TileOverlay(Size size)
+: size(size)
+{}
 
-TileOverlay::~TileOverlay(void)
+void TileOverlay::AddTile(Tile tile)
 {
-	for (int i = 0; i < count; i++) {
-		delete( tiles[i] );
-	}
-	free( tiles );
-}
-
-void TileOverlay::AddTile(Tile* tile)
-{
-	tiles[count++] = tile;
+	tiles.push_back(std::move(tile));
 }
 
 void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const
@@ -64,35 +52,35 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overla
 	const Color tintcol = globalTint ? * globalTint : Color();
 
 	Video* vid = core->GetVideoDriver();
-	for (int y = sy; y < dy && y < h; y++) {
-		for (int x = sx; x < dx && x < w; x++) {
-			Tile* tile = tiles[( y* w ) + x];
+	for (int y = sy; y < dy && y < size.h; y++) {
+		for (int x = sx; x < dx && x < size.w; x++) {
+			const Tile &tile = tiles[(y * size.w) + x];
 
 			//draw door tiles if there are any
-			Animation* anim = tile->GetAnimation();
+			Animation* anim = tile.GetAnimation();
 			assert(anim);
 
 			// this is the base terrain tile
 			Point p = Point(x * 64, y * 64) - viewport.origin;
 			vid->BlitGameSprite(anim->NextFrame(), p, flags, tintcol);
 
-			if (!tile->om || tile->tileIndex) {
+			if (!tile.om || tile.tileIndex) {
 				continue;
 			}
 
 			int mask = 2;
 			for (size_t z = 1;z<overlays.size();z++) {
 				TileOverlay * ov = overlays[z];
-				if (ov && ov->count > 0) {
-					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
-					if (tile->om & mask) {
+				if (ov && ov->tiles.size() > 0) {
+					const Tile &ovtile = ov->tiles[0]; //allow only 1x1 tiles now
+					if (tile.om & mask) {
 						//draw overlay tiles, they should be half transparent except for BG1
 						BlitFlags transFlag = (core->HasFeature(GF_LAYERED_WATER_TILES)) ? BlitFlags::HALFTRANS : BlitFlags::NONE;
 						// this is the water (or whatever)
-						vid->BlitGameSprite(ovtile->GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
+						vid->BlitGameSprite(ovtile.GetAnimation(0)->NextFrame(), p, flags | transFlag, tintcol);
 
 						if (core->HasFeature(GF_LAYERED_WATER_TILES)) {
-							Animation* anim1 = tile->GetAnimation(1);
+							Animation* anim1 = tile.GetAnimation(1);
 							if (anim1) {
 								// this is the mask to blend the terrain tile with the water for everything but BG1
 								vid->BlitGameSprite(anim1->NextFrame(), p,
@@ -100,7 +88,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overla
 							}
 						} else {
 							// in BG 1 this is the mask to blend the terrain tile with the water
-							vid->BlitGameSprite(tile->GetAnimation(0)->NextFrame(), p,
+							vid->BlitGameSprite(tile.GetAnimation(0)->NextFrame(), p,
 												flags | BlitFlags::BLENDED, tintcol);
 						}
 					}

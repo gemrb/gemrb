@@ -32,14 +32,12 @@ namespace GemRB {
 
 class GEM_EXPORT TileOverlay {
 public:
-	int w, h;
-	//std::vector<Tile*> tiles;
-	Tile** tiles;
-	int count;
+	Size size;
+	std::vector<Tile> tiles;
 public:
-	TileOverlay(int Width, int Height);
-	~TileOverlay(void);
-	void AddTile(Tile* tile);
+	TileOverlay(Size size);
+
+	void AddTile(Tile tile);
 	void Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const;
 };
 

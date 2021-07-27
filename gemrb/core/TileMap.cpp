@@ -155,11 +155,11 @@ void TileMap::AutoLockDoors() const
 void TileMap::AddOverlay(TileOverlay* overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
+		if (overlay->size.w > XCellCount) {
+			XCellCount = overlay->size.w;
 		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
+		if (overlay->size.h > YCellCount) {
+			YCellCount = overlay->size.h;
 		}
 	}
 	overlays.push_back( overlay );
@@ -168,11 +168,11 @@ void TileMap::AddOverlay(TileOverlay* overlay)
 void TileMap::AddRainOverlay(TileOverlay* overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
+		if (overlay->size.w > XCellCount) {
+			XCellCount = overlay->size.w;
 		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
+		if (overlay->size.h > YCellCount) {
+			YCellCount = overlay->size.h;
 		}
 	}
 	rain_overlays.push_back( overlay );

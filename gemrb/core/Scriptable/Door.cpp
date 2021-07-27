@@ -132,7 +132,7 @@ void Door::ToggleTiles(int State, int playsound)
 		}
 	}
 	for (const auto& tile : tiles) {
-		overlay->tiles[tile]->tileIndex = (ieByte) state;
+		overlay->tiles[tile].tileIndex = (ieByte) state;
 	}
 
 	//set door_open as state
