@@ -39,11 +39,11 @@ static inline int64_t av_gcd(int64_t a, int64_t b){
 int av_reduce(int &dst_num, int &dst_den, int64_t num, int64_t den, int64_t max) {
     AVRational a0={0,1}, a1={1,0};
     int sign= (num<0) ^ (den<0);
-    int64_t gcd= av_gcd(abs(num), abs(den));
+    int64_t gcd= av_gcd(std::abs(num), std::abs(den));
 
     if(gcd){
-        num = abs(num)/gcd;
-        den = abs(den)/gcd;
+        num = std::abs(num) / gcd;
+        den = std::abs(den) / gcd;
     }
     if(num<=max && den<=max){
       a1.num = num;
