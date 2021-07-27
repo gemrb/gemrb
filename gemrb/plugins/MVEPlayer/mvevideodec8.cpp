@@ -22,7 +22,7 @@
  */
 
 #include "gstmvedemux.h"
-#include <string.h>
+#include <cstring>
 
 #define CHECK_STREAM(l, n) \
 	do { \

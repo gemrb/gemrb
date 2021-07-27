@@ -23,7 +23,7 @@
 #include "Resource.h"
 
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 
 namespace GemRB {
 

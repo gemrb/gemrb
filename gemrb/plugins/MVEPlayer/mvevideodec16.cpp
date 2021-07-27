@@ -22,7 +22,7 @@
  */
 
 #include "gstmvedemux.h"
-#include <string.h>
+#include <cstring>
 
 #define PIXEL(s) GST_READ_UINT16_LE (s)
 

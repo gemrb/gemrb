@@ -29,7 +29,7 @@
 
 #if HAVE_ICONV
 #include <iconv.h>
-#include <errno.h>
+#include <cerrno>
 #endif
 
 namespace GemRB {

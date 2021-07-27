@@ -23,7 +23,7 @@
 #include "errors.h"
 #include "Resource.h"
 
-#include <ctype.h>
+#include <cctype>
 
 namespace GemRB {
 

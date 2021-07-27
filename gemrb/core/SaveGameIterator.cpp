@@ -41,7 +41,7 @@
 
 #include <cassert>
 #include <set>
-#include <time.h>
+#include <ctime>
 
 #ifdef VITA
 #include <dirent.h>

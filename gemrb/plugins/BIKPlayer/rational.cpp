@@ -25,8 +25,8 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
 
-#include <assert.h>
-#include <limits.h>
+#include <cassert>
+#include <climits>
 
 #include "common.h"
 #include "rational.h"

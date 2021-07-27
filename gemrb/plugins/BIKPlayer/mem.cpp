@@ -24,9 +24,9 @@
  * default memory allocator for libavutil
  */
 
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
+#include <climits>
+#include <cstdlib>
+#include <cstring>
 #if HAVE_MALLOC_H
 #include <malloc.h>
 #endif

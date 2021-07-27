@@ -26,7 +26,7 @@
 #include <archive_entry.h>
 
 #include <sys/stat.h> 
-#include <stdio.h> 
+#include <cstdio> 
 #include <fcntl.h>
 
 enum ConfigTableSection {

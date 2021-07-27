@@ -45,7 +45,7 @@
 #include "System/FileStream.h"
 #include "System/SlicedStream.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 
 using namespace GemRB;
 

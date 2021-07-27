@@ -35,7 +35,7 @@
 #endif
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
-# include <assert.h>
+# include <cassert>
 #endif
 
 namespace GemRB {
