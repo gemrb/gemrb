@@ -150,7 +150,7 @@ void Console::SaveHistory() const
 	std::string commands;
 	char command[100];
 
-	size_t histSize = std::min(History.Size(), 10UL);
+	size_t histSize = std::min<size_t>(History.Size(), 10UL);
 	for (size_t i = histSize - 1; signed(i) >= 0; i--) {
 		const String& cmd = History.Retrieve(i).second;
 		snprintf(command, sizeof(command), "%ls\n", cmd.c_str());
