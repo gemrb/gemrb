@@ -134,10 +134,10 @@ struct TimeStruct {
 
 struct EncodingStruct
 {
-	std::string encoding;
-	bool widechar;
-	bool multibyte;
-	bool zerospace;
+	std::string encoding = "ISO-8859-1";
+	bool widechar = false;
+	bool multibyte = false;
+	bool zerospace = false;
 };
 
 // cache of speldesc.2da entries
@@ -338,7 +338,7 @@ struct CFGConfigData {
 	char GemRBUnhardcodedPath[_MAX_PATH]{};
 	char PluginsPath[_MAX_PATH]{};
 	char GUIScriptsPath[_MAX_PATH]{};
-	bool CaseSensitive = false;
+	bool CaseSensitive = true;
 
 	char GameName[_MAX_PATH]{};
 	char GameType[10]{};
@@ -380,13 +380,13 @@ private:
 	Holder<Video> video;
 	Holder<Audio> AudioDriver;
 
-	ProjectileServer * projserv;
+	ProjectileServer* projserv = nullptr;
 
-	WindowManager* winmgr;
+	WindowManager* winmgr = nullptr;
 	Holder<GUIFactory> guifact;
 	Holder<ScriptEngine> guiscript;
 	GameControl* gamectrl = nullptr;
-	SaveGameIterator *sgiterator;
+	SaveGameIterator *sgiterator = nullptr;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
@@ -396,15 +396,15 @@ private:
 	Holder<DataFileMgr> INIbeasts;
 	Holder<DataFileMgr> INIquests;
 	Holder<DataFileMgr> INIresdata;
-	Game * game;
-	Calendar * calendar;
-	WorldMapArray* worldmap;
-	ieDword GameFeatures[(GF_COUNT+31)/32];
+	Game* game = nullptr;
+	Calendar* calendar = nullptr;
+	WorldMapArray* worldmap = nullptr;
+	ieDword GameFeatures[(GF_COUNT+31)/32]{};
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
 	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
-	int GroundCircleScale[MAX_CIRCLE_SIZE];
+	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
 
 	std::map<ResRef, Font*> fonts;
 	ResRef ButtonFontResRef;
@@ -413,7 +413,7 @@ private:
 	ResRef TooltipFontResRef;
 	std::string DefaultWindowTitle;
 
-	TooltipBackground* TooltipBG;
+	TooltipBackground* TooltipBG = nullptr;
 
 	ResRef Palette16;
 	ResRef Palette32;
@@ -422,28 +422,28 @@ private:
 	std::vector<ColorPal<32>>  palettes32;
 	std::vector<ColorPal<16>>  palettes16;
 
-	ieDword* slotmatrix; //itemtype vs slottype
+	ieDword* slotmatrix = nullptr; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
-	int ItemTypes;
+	int ItemTypes = 0;
 
 	// Currently dragged item or NULL
 	std::unique_ptr<ItemDragOp> DraggedItem;
 	// Current Store
-	Store* CurrentStore;
+	Store* CurrentStore = nullptr;
 	// Index of current container
-	Container* CurrentContainer;
-	bool UseContainer;
+	Container* CurrentContainer = nullptr;
+	bool UseContainer = false;
 	// Scrolling speed
-	int mousescrollspd;
-	bool update_scripts;
+	int mousescrollspd = 10;
+	bool update_scripts = false;
 	/** Next Script Name */
 	char NextScript[64];
 
 	std::deque<Timer> timers;
 	std::vector<SpecialSpellType> SpecialSpells;
-	KeyMap *keymap;
-	Scriptable *CutSceneRunner;
+	KeyMap *keymap = nullptr;
+	Scriptable *CutSceneRunner = nullptr;
 
 public:
 	const char * SystemEncoding;
@@ -452,21 +452,21 @@ public:
 	Holder<StringMgr> strings2;
 	GlobalTimer timer;
 	Color InfoTextColor;
-	int QuitFlag;
-	int EventFlag;
+	int QuitFlag = QF_NORMAL;
+	int EventFlag = EF_CONTROL;
 	Holder<SaveGame> LoadGameIndex;
 	SaveGameAREExtractor saveGameAREExtractor;
-	int VersionOverride;
-	unsigned int SlotTypes; //this is the same as the inventory size
-	ResRef GlobalScript;
-	ResRef WorldMapName[2];
-	Variables * AreaAliasTable;
+	int VersionOverride = 0;
+	unsigned int SlotTypes = 0; // this is the same as the inventory size
+	ResRef GlobalScript = "BALDUR";
+	ResRef WorldMapName[2] = { "WORLDMAP", "" };
+	Variables* AreaAliasTable = nullptr;
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	TimeStruct Time;
+	TimeStruct Time{};
 	std::vector<SurgeSpell> SurgeSpells;
 public:
 	Interface();
@@ -796,12 +796,12 @@ public:
 	CFGConfigData config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
-	Variables *RtRows;
+	Variables *RtRows = nullptr;
 
-	char INIConfig[_MAX_PATH];
+	char INIConfig[_MAX_PATH] = "baldur.ini";
 	bool DitherSprites = true;
-	bool UseCorruptedHack;
-	int FeedbackLevel;
+	bool UseCorruptedHack = false;
+	int FeedbackLevel = 0;
 
 	Variables *plugin_flags;
 	/** The Main program loop */

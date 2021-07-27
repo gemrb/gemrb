@@ -142,45 +142,11 @@ Interface::Interface()
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
-	winmgr = NULL;
-	projserv = NULL;
-	RtRows = NULL;
-	sgiterator = NULL;
-	game = NULL;
-	calendar = NULL;
-	keymap = NULL;
-	worldmap = NULL;
-	CurrentStore = NULL;
-	CurrentContainer = NULL;
-	UseContainer = false;
-	displaymsg = NULL;
-	slotmatrix = NULL;
+	displaymsg = nullptr;
 
-	UseCorruptedHack = false;
-
-	mousescrollspd = 10;
-	QuitFlag = QF_NORMAL;
-	EventFlag = EF_CONTROL;
-#ifndef WIN32
-	config.CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
+#ifdef WIN32
+	config.CaseSensitive = false; // this is just the default value, so CD1/CD2 will be resolved
 #endif
-	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-
-	GlobalScript = "BALDUR";
-	WorldMapName[0] = "WORLDMAP";
-
-	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		GroundCircleBam[size].Reset();
-		GroundCircleScale[size] = 0;
-	}
-
-	TooltipBG = NULL;
-	memset(GameFeatures, 0, sizeof( GameFeatures ));
-	//GameFeatures = 0;
-	//GameFeatures2 = 0;
-	memset(&Time, 0, sizeof(Time));
-	AreaAliasTable = NULL;
-	update_scripts = false;
 
 	SystemEncoding = DefaultSystemEncoding;
 #if defined(WIN32) && defined(HAVE_ICONV)
@@ -195,14 +161,7 @@ Interface::Interface()
 	SystemEncoding = nl_langinfo(CODESET);
 #endif
 
-	TLKEncoding.encoding = "ISO-8859-1";
-	TLKEncoding.widechar = false;
-	TLKEncoding.multibyte = false;
-	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
-	VersionOverride = ItemTypes = SlotTypes = 0;
-	FeedbackLevel = 0;
-	CutSceneRunner = NULL;
 
 	gamedata = new GameData();
 
