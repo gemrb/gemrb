@@ -5281,7 +5281,7 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 	}
 	//type == 1 remove spell only from memorization
 	//type == 0 original behaviour: deplete only
-	actor->spellbook.UnmemorizeSpell(spellRes, type);
+	actor->spellbook.UnmemorizeSpell(spellRes, !type, 2);
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
