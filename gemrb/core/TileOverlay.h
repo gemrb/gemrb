@@ -23,6 +23,7 @@
 
 #include "exports.h"
 
+#include "Holder.h"
 #include "Tile.h"
 #include "Video/Video.h"
 
@@ -30,12 +31,12 @@
 
 namespace GemRB {
 
-class GEM_EXPORT TileOverlay {
+class GEM_EXPORT TileOverlay : public Held<TileOverlay> {
 public:
 	Size size;
 	std::vector<Tile> tiles;
 public:
-	using TileOverlayPtr = std::unique_ptr<TileOverlay>;
+	using TileOverlayPtr = Holder<TileOverlay>;
 
 	TileOverlay(Size size);
 

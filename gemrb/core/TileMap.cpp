@@ -73,7 +73,7 @@ TileObject* TileMap::GetTile(unsigned int idx)
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
 	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
-	Door* door = new Door(overlays[0].get(), std::move(dt));
+	Door* door = new Door(overlays[0], std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles(std::move(indices));
@@ -127,7 +127,7 @@ Door* TileMap::GetDoor(const char* Name) const
 void TileMap::UpdateDoors()
 {
 	for (Door *door : doors) {
-		door->SetNewOverlay(overlays[0].get());
+		door->SetNewOverlay(overlays[0]);
 	}
 }
 

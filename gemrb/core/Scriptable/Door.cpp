@@ -62,11 +62,10 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 	return open ? openTrigger : closedTrigger;
 }
 
-Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
-	: Highlightable( ST_DOOR ), doorTrigger(std::move(trigger))
+Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
+: Highlightable( ST_DOOR ), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
 {
 	Flags = 0;
-	overlay = Overlay;
 	OpenStrRef = (ieDword) -1;
 	closedIndex = NameStrRef = hp = ac = 0;
 	DiscoveryDiff = LockDifficulty = 0;
@@ -312,8 +311,8 @@ bool Door::Visible() const
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
 
-void Door::SetNewOverlay(TileOverlay *Overlay) {
-	overlay = Overlay;
+void Door::SetNewOverlay(Holder<TileOverlay> Overlay) {
+	overlay = std::move(Overlay);
 	ToggleTiles(IsOpen(), false);
 }
 
