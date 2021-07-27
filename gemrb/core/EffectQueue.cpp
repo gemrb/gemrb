@@ -463,7 +463,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
 	if (insert) {
-		effects.insert(effects.begin(), fx);
+		effects.push_front(fx);
 	} else {
 		effects.push_back(fx);
 	}
