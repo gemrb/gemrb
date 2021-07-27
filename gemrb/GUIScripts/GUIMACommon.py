@@ -22,7 +22,7 @@
 import GemRB
 import GameCheck
 import GUICommonWindows
-from GUIDefines import STR_AREANAME, LOG_MESSAGE
+from GUIDefines import STR_AREANAME, LOG_MESSAGE, ColorWhite
 
 def MoveToNewArea ():
 	import GUIMA
