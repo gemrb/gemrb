@@ -71,7 +71,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 			int mask = 2;
 			for (size_t z = 1; z < overlays.size(); ++z) {
 				const auto& ov = overlays[z];
-				if (ov->tiles.size() > 0) {
+				if (!ov->tiles.empty()) {
 					const Tile &ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile.om & mask) {
 						//draw overlay tiles, they should be half transparent except for BG1

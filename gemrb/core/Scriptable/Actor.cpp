@@ -86,7 +86,7 @@ static std::map<int, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
-static const char* CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
+static const char* const CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 //I keep the zero index the same as core rules (default setting)
 static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
 //XP adjustments on easy setting (need research on the amount)

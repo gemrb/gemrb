@@ -103,7 +103,7 @@ static ieWordSigned *chrmod = NULL;
 static ieWordSigned *lorebon = NULL;
 static ieWordSigned *wisbon = NULL;
 static int **reputationmod = NULL;
-static const char* IWD2DeathVarFormat = "_DEAD%s";
+static const char* const IWD2DeathVarFormat = "_DEAD%s";
 static const char* DeathVarFormat = "SPRITE_IS_DEAD%s";
 static int NumRareSelectSounds = 2;
 

@@ -38,7 +38,7 @@ public:
 public:
 	using TileOverlayPtr = Holder<TileOverlay>;
 
-	TileOverlay(Size size);
+	explicit TileOverlay(Size size);
 
 	void AddTile(Tile tile);
 	void Draw(const Region& viewport, std::vector<TileOverlayPtr> &overlays, BlitFlags flags) const;

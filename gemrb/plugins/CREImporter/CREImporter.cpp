@@ -212,22 +212,23 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
-	size_t splCount = splList.size();
-	for (size_t i = 0; i < splCount; i++) {
-		if (splList[i]->Equals(name) ) {
-			// iterate over table columns ("kits" - book types)
-			for (ieWord type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
-				if (!(clsMask & (1 << type))) continue;
+	for (const auto& spell : splList) {
+		if (!spell->Equals(name)) {
+			continue;
+		}
 
-				int level2 = splList[i]->FindSpell(type);
-				if (level2 == -1) {
-					Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
-					level2 = 0; // internal 0-indexed level
-				}
-				level = level2;
-				// FIXME: returning the first will misplace spells for multiclasses
-				return type;
+		// iterate over table columns ("kits" - book types)
+		for (ieWord type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			if (!(clsMask & (1 << type))) continue;
+
+			int level2 = spell->FindSpell(type);
+			if (level2 == -1) {
+				Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
+				level2 = 0; // internal 0-indexed level
 			}
+			level = level2;
+			// FIXME: returning the first will misplace spells for multiclasses
+			return type;
 		}
 	}
 

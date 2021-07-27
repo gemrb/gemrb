@@ -268,7 +268,7 @@ Bitmap BMPImporter::GetBitmap()
 	}
 
 	assert(BitCount == 8);
-	return Bitmap(size, p);;
+	return Bitmap(size, p);
 }
 
 #include "plugindef.h"
