@@ -53,6 +53,7 @@
 #include "Scriptable/InfoPoint.h"
 #include "System/StringBuffer.h"
 
+#include <array>
 #include <cassert>
 #include <limits>
 #include <utility>
@@ -178,9 +179,9 @@ private:
 
 struct Explore {
 	int LargeFog;
-	int MaxVisibility = 30;
+	static constexpr int MaxVisibility = 30;
 	int VisibilityPerimeter; //calculated from MaxVisibility
-	Point **VisibilityMasks=NULL;
+	std::array<std::vector<Point>, MaxVisibility> VisibilityMasks;
 
 	static const Explore& Get() {
 		static Explore explore;
@@ -224,9 +225,8 @@ private:
 			}
 		}
 
-		VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
 		for (int i = 0; i < MaxVisibility; i++) {
-			VisibilityMasks[i] = (Point *) malloc(VisibilityPerimeter*sizeof(Point) );
+			VisibilityMasks[i].resize(VisibilityPerimeter);
 		}
 
 		x = MaxVisibility;
@@ -252,16 +252,6 @@ private:
 				re += xc;
 				xc += 2;
 			}
-		}
-	}
-	
-	~Explore() {
-		if (VisibilityMasks) {
-			for (int i=0;i<MaxVisibility;i++) {
-				free(VisibilityMasks[i]);
-			}
-			free(VisibilityMasks);
-			VisibilityMasks = NULL;
 		}
 	}
 };
