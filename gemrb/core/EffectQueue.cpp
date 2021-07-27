@@ -47,8 +47,7 @@ namespace GemRB {
 static EffectDesc Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
-static EffectDesc *effectnames = NULL;
-static int effectnames_count = 0;
+static std::vector<EffectDesc> effectnames;
 static int pstflags = false;
 static bool iwd2fx = false;
 
@@ -225,10 +224,10 @@ static int find_effect(const void *a, const void *b)
 
 static EffectDesc* FindEffect(const char* effectname)
 {
-	if( !effectname || !effectnames) {
+	if (!effectname || effectnames.empty()) {
 		return NULL;
 	}
-	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
+	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
 	if( !tmp) {
 		Log(WARNING, "EffectQueue", "Couldn't assign effect: %s", effectname);
 	}
@@ -302,31 +301,17 @@ bool Init_EffectQueue()
 	return true;
 }
 
-void EffectQueue_ReleaseMemory()
-{
-	if( effectnames) {
-		free (effectnames);
-	}
-	effectnames_count = 0;
-	effectnames = NULL;
-}
-
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 {
-	if( ! effectnames) {
-		effectnames = (EffectDesc*) malloc( (count+1) * sizeof( EffectDesc ) );
-	} else {
-		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
-	}
+	size_t oldc = effectnames.size();
+	effectnames.resize(effectnames.size() + count);
 
-	std::copy(opcodes, opcodes + count, effectnames + effectnames_count);
-	effectnames_count += count;
-	effectnames[effectnames_count].Name = NULL;
+	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
 
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(effectnames, effectnames_count, sizeof(EffectDesc), compare_effects);
+	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
 EffectQueue::EffectQueue()

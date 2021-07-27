@@ -232,9 +232,6 @@ bool Init_EffectQueue();
 /** Registers opcodes implemented by an effect plugin */
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc *opcodes);
 
-/** release effect list when Interface is destroyed */
-void EffectQueue_ReleaseMemory();
-
 /** Check if opcode is for an effect that takes a color slot as parameter. */
 bool IsColorslotEffect(int opcode);
 

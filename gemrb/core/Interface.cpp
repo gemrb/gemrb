@@ -304,7 +304,6 @@ Interface::~Interface(void)
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
-	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 
 	slotTypes.clear();
