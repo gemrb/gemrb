@@ -21,6 +21,7 @@
 #include "SClassID.h" // For PluginID
 
 #include "Interface.h"
+#include "Platform.h"
 #include "PluginMgr.h"
 #include "System/FileFilters.h"
 #include "Variables.h"
@@ -29,12 +30,7 @@
 #include <cstdlib>
 #include <set>
 
-#ifdef WIN32
-#include <string.h>
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
-#elif defined(HAVE_DLFCN_H)
+#if defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif
 
