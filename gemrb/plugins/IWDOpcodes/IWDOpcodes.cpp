@@ -434,6 +434,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 	//applyeffectcopy on everyone near us
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		//not sure if this is needed
@@ -441,10 +442,10 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 		if (PersonalDistance(target, victim)<20) {
 			//this function deletes newfx (not anymore)
 			core->ApplyEffect(newfx, victim, Owner);
+			applied = true;
 		}
 	}
-	//finally remove the master copy
-	delete newfx;
+	if (!applied) delete newfx;
 }
 
 //this function implements AC bonus handling
@@ -1100,14 +1101,17 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (PersonalDistance(target, victim)>20) continue;
 		if (victim->GetSafeStat(mystat)>=100) continue;
 		//apply the damage opcode
 		core->ApplyEffect(newfx, victim, Owner);
+		applied = true;
 	}
-	delete newfx;
+	if (!applied) delete newfx;
+
 	return FX_APPLIED;
 }
 
@@ -1141,6 +1145,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1165,9 +1170,12 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
+		applied = true;
 	}
-	delete newfx1;
-	delete newfx2;
+	if (!applied) {
+		delete newfx1;
+		delete newfx2;
+	}
 
 	return FX_APPLIED;
 }
@@ -1208,6 +1216,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1226,9 +1235,13 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
+
+		applied = true;
 	}
-	delete newfx1;
-	delete newfx2;
+	if (!applied) {
+		delete newfx1;
+		delete newfx2;
+	}
 
 	return FX_APPLIED;
 }
@@ -1469,14 +1482,16 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		const Actor *victim = area->GetActor(i, true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			core->ApplyEffect(newfx, target, Owner);
+			applied = true;
 		}
 	}
-	delete newfx;
+	if (!applied) delete newfx;
 
 	return FX_APPLIED;
 }
