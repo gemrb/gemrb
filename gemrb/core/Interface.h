@@ -444,6 +444,8 @@ private:
 	std::vector<SpecialSpellType> SpecialSpells;
 	KeyMap *keymap = nullptr;
 	Scriptable *CutSceneRunner = nullptr;
+	
+	int MaximumAbility = 0;
 
 public:
 	const char * SystemEncoding;
@@ -769,8 +771,6 @@ private:
 	bool InitItemTypes();
 	bool ReadRandomItems();
 	bool ReadItemTable(const ResRef& item, const char *Prefix) const;
-	bool ReadAbilityTables();
-	bool ReadAbilityTable(const ResRef& name, ieWordSigned *mem, int cols, int rows);
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadReputationModTable();

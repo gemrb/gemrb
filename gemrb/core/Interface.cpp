@@ -93,15 +93,99 @@ namespace GemRB {
 
 GEM_EXPORT Interface* core = NULL;
 
-static int MaximumAbility = 25;
-static ieWordSigned *strmod = NULL;
-static ieWordSigned *strmodex = NULL;
-static ieWordSigned *intmod = NULL;
-static ieWordSigned *dexmod = NULL;
-static ieWordSigned *conmod = NULL;
-static ieWordSigned *chrmod = NULL;
-static ieWordSigned *lorebon = NULL;
-static ieWordSigned *wisbon = NULL;
+struct AbilityTables {
+	using AbilityTable = std::vector<ieWordSigned>;
+	
+	const int tableSize = 0;
+	AbilityTable strmod;
+	AbilityTable strmodex;
+	AbilityTable intmod;
+	AbilityTable dexmod;
+	AbilityTable conmod;
+	AbilityTable chrmod;
+	AbilityTable lorebon;
+	AbilityTable wisbon;
+	
+	AbilityTables(int MaximumAbility) noexcept
+	: tableSize(MaximumAbility + 1),
+	strmod(tableSize * 4),
+	strmodex(101 * 4),
+	intmod(tableSize * 5),
+	dexmod(tableSize * 3),
+	conmod(tableSize * 5),
+	chrmod(tableSize),
+	lorebon(tableSize),
+	wisbon(tableSize)
+	{
+		if (!ReadAbilityTable("strmod", strmod, 4, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'strmod' ability table!");
+		}
+		
+		//3rd ed doesn't have strmodex, but has a maximum of 40
+		if (!ReadAbilityTable("strmodex", strmodex, 4, 101) && MaximumAbility <= 25) {
+			Log(ERROR, "Interface", "unable to read 'strmodex' ability table!");
+		}
+		
+		if (!ReadAbilityTable("intmod", intmod, 5, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'intmod' ability table!");
+		}
+		
+		if (!ReadAbilityTable("hpconbon", conmod, 5, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'hpconbon' ability table!");
+		}
+		
+		if (!core->HasFeature(GF_3ED_RULES)) {
+			//no lorebon in iwd2???
+			if (!ReadAbilityTable("lorebon", lorebon, 1, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'lorebon' ability table!");
+			}
+			
+			//no dexmod in iwd2???
+			if (!ReadAbilityTable("dexmod", dexmod, 3, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'dexmod' ability table!");
+			}
+		}
+		//this table is a single row (not a single column)
+		if (!ReadAbilityTable("chrmodst", chrmod, tableSize, 1)) {
+			Log(ERROR, "Interface", "unable to read 'chrmodst' ability table!");
+		}
+
+		if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
+			if (!ReadAbilityTable("wisxpbon", wisbon, 1, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'wisxpbon' ability table!");
+			}
+		}
+	}
+	
+private:
+	bool ReadAbilityTable(const ResRef& tablename, AbilityTable& table, int columns, int rows)
+	{
+		AutoTable tab(tablename);
+		if (!tab) {
+			return false;
+		}
+		//this is a hack for rows not starting at 0 in some cases
+		int fix = 0;
+		const char * tmp = tab->GetRowName(0);
+		if (tmp && (tmp[0]!='0')) {
+			fix = atoi(tmp);
+			for (int i=0;i<fix;i++) {
+				for (int j=0;j<columns;j++) {
+					table[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
+				}
+			}
+		}
+		for (int j=0;j<columns;j++) {
+			for( int i=0;i<rows-fix;i++) {
+				table[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
+			}
+		}
+		return true;
+	}
+};
+
+static std::unique_ptr<AbilityTables> abilityTables;
+
 static int **reputationmod = NULL;
 static const char* const IWD2DeathVarFormat = "_DEAD%s";
 static const char* DeathVarFormat = "SPRITE_IS_DEAD%s";
@@ -184,22 +268,6 @@ static void ReleaseItemList(void *poi)
 	delete ((ItemList *) poi);
 }
 
-static void FreeAbilityTables()
-{
-#define NULL_FREE(ptr)\
-	free(ptr); ptr = nullptr
-
-	NULL_FREE(strmod);
-	NULL_FREE(strmodex);
-	NULL_FREE(intmod);
-	NULL_FREE(dexmod);
-	NULL_FREE(conmod);
-	NULL_FREE(chrmod);
-	NULL_FREE(lorebon);
-	NULL_FREE(wisbon);
-#undef NULL_FREE
-}
-
 Interface::~Interface(void)
 {
 	WindowManager::CursorMouseUp = NULL;
@@ -215,8 +283,6 @@ Interface::~Interface(void)
 	delete calendar;
 	delete worldmap;
 	delete keymap;
-
-	FreeAbilityTables();
 
 	if (reputationmod) {
 		for (unsigned int i=0; i<20; i++) {
@@ -480,104 +546,6 @@ void Interface::HandleFlags()
 		guiscript->LoadScript( NextScript );
 		guiscript->RunFunction( NextScript, "OnLoad" );
 	}
-}
-
-static bool GenerateAbilityTables()
-{
-	FreeAbilityTables();
-
-	//range is: 0 - maximumability
-	int tablesize = MaximumAbility+1;
-	strmod = (ieWordSigned *) malloc (tablesize * 4 * sizeof(ieWordSigned) );
-	if (!strmod)
-		return false;
-	strmodex = (ieWordSigned *) malloc (101 * 4 * sizeof(ieWordSigned) );
-	if (!strmodex)
-		return false;
-	intmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
-	if (!intmod)
-		return false;
-	dexmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
-	if (!dexmod)
-		return false;
-	conmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
-	if (!conmod)
-		return false;
-	chrmod = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
-	if (!chrmod)
-		return false;
-	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
-	if (!lorebon)
-		return false;
-	wisbon = (ieWordSigned *) calloc (tablesize * 1, sizeof(ieWordSigned));
-	if (!wisbon)
-		return false;
-	return true;
-}
-
-bool Interface::ReadAbilityTable(const ResRef& tablename, ieWordSigned *mem, int columns, int rows)
-{
-	AutoTable tab(tablename);
-	if (!tab) {
-		return false;
-	}
-	//this is a hack for rows not starting at 0 in some cases
-	int fix = 0;
-	const char * tmp = tab->GetRowName(0);
-	if (tmp && (tmp[0]!='0')) {
-		fix = atoi(tmp);
-		for (int i=0;i<fix;i++) {
-			for (int j=0;j<columns;j++) {
-				mem[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
-			}
-		}
-	}
-	for (int j=0;j<columns;j++) {
-		for( int i=0;i<rows-fix;i++) {
-			mem[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
-		}
-	}
-	return true;
-}
-
-bool Interface::ReadAbilityTables()
-{
-	bool ret = GenerateAbilityTables();
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("strmod", strmod, 4, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("strmodex", strmodex, 4, 101);
-	//3rd ed doesn't have strmodex, but has a maximum of 40
-	if (!ret && (MaximumAbility<=25) )
-		return ret;
-	ret = ReadAbilityTable("intmod", intmod, 5, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	if (!HasFeature(GF_3ED_RULES)) {
-		//no lorebon in iwd2???
-		ret = ReadAbilityTable("lorebon", lorebon, 1, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-		//no dexmod in iwd2???
-		ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-	}
-	//this table is a single row (not a single column)
-	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
-	if (!ret)
-		return ret;
-	if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
-		ret = ReadAbilityTable("wisxpbon", wisbon, 1, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-	}
-	return true;
 }
 
 bool Interface::ReadGameTimeTable()
@@ -1634,13 +1602,8 @@ int Interface::Init(InterfaceConfig* cfg)
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
-
-	Log(MESSAGE, "Core", "Initializing ability tables...");
-	ret = ReadAbilityTables();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to initialize ability tables...");
-		return GEM_ERROR;
-	}
+	
+	abilityTables = make_unique<AbilityTables>(MaximumAbility);
 
 	Log(MESSAGE, "Core", "Reading reputation mod table...");
 	ret = ReadReputationModTable();
@@ -4432,10 +4395,10 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 			ex=0;
 		else if (ex>100)
 			ex=100;
-		bonus += strmodex[column*101+ex];
+		bonus += abilityTables->strmodex[column*101+ex];
 	}
 
-	return strmod[column*(MaximumAbility+1)+value] + bonus;
+	return abilityTables->strmod[column*(MaximumAbility+1)+value] + bonus;
 }
 
 //The maze columns are used only in the maze spell, no need to restrict them further
@@ -4444,7 +4407,7 @@ int Interface::GetIntelligenceBonus(int column, int value) const
 	//learn spell, max spell level, max spell number on level, maze duration dice, maze duration dice size
 	if (column<0 || column>4) return -9999;
 
-	return intmod[column*(MaximumAbility+1)+value];
+	return abilityTables->intmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetDexterityBonus(int column, int value) const
@@ -4458,7 +4421,7 @@ int Interface::GetDexterityBonus(int column, int value) const
 	if (column<0 || column>2)
 		return -9999;
 
-	return dexmod[column*(MaximumAbility+1)+value];
+	return abilityTables->dexmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetConstitutionBonus(int column, int value) const
@@ -4475,7 +4438,7 @@ int Interface::GetConstitutionBonus(int column, int value) const
 	if (column<0 || column>4)
 		return -9999;
 
-	return conmod[column*(MaximumAbility+1)+value];
+	return abilityTables->conmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetCharismaBonus(int column, int /*value*/) const
@@ -4484,7 +4447,7 @@ int Interface::GetCharismaBonus(int column, int /*value*/) const
 	if (column<0 || column>(MaximumAbility-1))
 		return -9999;
 
-	return chrmod[column];
+	return abilityTables->chrmod[column];
 }
 
 int Interface::GetLoreBonus(int column, int value) const
@@ -4495,18 +4458,18 @@ int Interface::GetLoreBonus(int column, int value) const
 	if (column<0 || column>0)
 		return -9999;
 
-	return lorebon[value];
+	return abilityTables->lorebon[value];
 }
 
 int Interface::GetWisdomBonus(int column, int value) const
 {
-	if (!wisbon) return 0;
+	if (abilityTables->wisbon.empty()) return 0;
 
 	// xp bonus
 	if (column<0 || column>0)
 		return -9999;
 
-	return wisbon[value];
+	return abilityTables->wisbon[value];
 }
 
 int Interface::GetReputationMod(int column) const
