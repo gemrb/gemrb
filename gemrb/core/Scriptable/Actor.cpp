@@ -5312,12 +5312,12 @@ int Actor::CalculateSpeedFromINI(bool feedback) const
 		animid = animid & 0xff;
 	}
 	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
-	const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	const AvatarStruct &avatar = CharAnimations::GetAvatarStruct(animid);
 	int newSpeed = 0;
-	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
-		newSpeed = avatar->RunScale;
-	} else if (avatar->WalkScale) {
-		newSpeed = avatar->WalkScale;
+	if (avatar.RunScale && (GetInternalFlag() & IF_RUNNING)) {
+		newSpeed = avatar.RunScale;
+	} else if (avatar.WalkScale) {
+		newSpeed = avatar.WalkScale;
 	} else {
 		// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
 	}
@@ -6217,7 +6217,7 @@ void Actor::GetNextAnimation()
 	int RowNum = anims->AvatarsRowNum - 1;
 	if (RowNum<0)
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
-	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
+	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
@@ -6227,7 +6227,7 @@ void Actor::GetPrevAnimation()
 	int RowNum = anims->AvatarsRowNum + 1;
 	if (RowNum>=CharAnimations::GetAvatarsCount() )
 		RowNum = 0;
-	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
+	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }

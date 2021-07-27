@@ -304,7 +304,6 @@ Interface::~Interface(void)
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
-	CharAnimations::ReleaseMemory();
 
 	slotTypes.clear();
 	free( slotmatrix );

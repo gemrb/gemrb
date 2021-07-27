@@ -159,6 +159,21 @@ struct EquipResRefData;
 
 class GEM_EXPORT CharAnimations {
 private:
+	using AvatarTable_t = std::vector<AvatarStruct>;
+	struct AvatarTableLoader final {
+		AvatarTable_t table;
+		
+		static const AvatarTable_t& Get() {
+			static AvatarTableLoader loader;
+			return loader.table;
+		}
+		
+	private:
+		AvatarTableLoader() noexcept;
+	};
+	
+	const AvatarTable_t& AvatarTable = AvatarTableLoader::Get();
+	
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
 	Animation** shadowAnimations[MAX_ANIMS][MAX_ORIENT];
 	char HelmetRef[2];
@@ -186,7 +201,7 @@ public:
 public:
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	~CharAnimations(void);
-	static void ReleaseMemory();
+
 	void SetArmourLevel(int ArmourLevel);
 	void SetRangedType(int Ranged);
 	void SetWeaponType(int WeaponType);
@@ -209,8 +224,8 @@ public:
 	PaletteHolder GetShadowPalette() const;
 
 public: //attribute functions
-	static int GetAvatarsCount();
-	static AvatarStruct *GetAvatarStruct(int RowNum);
+	static size_t GetAvatarsCount();
+	static const AvatarStruct &GetAvatarStruct(int RowNum);
 	unsigned int GetAnimationID() const;
 	int GetCircleSize() const;
 	int NoPalette() const;

@@ -1946,8 +1946,8 @@ void Map::ActorSpottedByPlayer(const Actor *actor) const
 			animid&=0xff;
 		}
 		if (animid < (ieDword)CharAnimations::GetAvatarsCount()) {
-			const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
-			core->GetGame()->SetBeastKnown(avatar->Bestiary);
+			const AvatarStruct &avatar = CharAnimations::GetAvatarStruct(animid);
+			core->GetGame()->SetBeastKnown(avatar.Bestiary);
 		}
 	}
 }
