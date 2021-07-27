@@ -1643,15 +1643,14 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
+
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
+
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
 		}
 	}
 	return FX_NOT_APPLIED;
@@ -1754,7 +1753,7 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Actor *caster = GetCasterObject();
 	core->ApplySpell(firedmg, target, caster, fx->Power);
 
-	if (fx->Resource2[0]) {
+	if (!fx->Resource2.IsEmpty()) {
 		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
 	} else {
 		core->ApplySpell(resref_sof2, target, caster, fx->Power);
@@ -1972,14 +1971,12 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
-	delete newfx;
 
 	newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -2049,7 +2046,6 @@ int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 				0, FX_DURATION_INSTANT_PERMANENT);
 		}
 		core->ApplyEffect(newfx, target, Owner);
-		delete newfx;
 	}
 
 	return FX_NOT_APPLIED;
@@ -2093,7 +2089,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Resource.IsEmpty()) {
 		fx->Resource = "SPIN166";
 	}
-	if (!fx->Resource2[0]) {
+	if (fx->Resource2.IsEmpty()) {
 		fx->Resource2 = "EFF_P111";
 	}
 
@@ -2337,7 +2333,6 @@ int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx)
 		newfx->Power = fx->Power;
 		core->ApplyEffect(newfx, target, Owner);
 
-		delete newfx;
 		fx->Parameter3=1;
 	}
 	//end of unsure part

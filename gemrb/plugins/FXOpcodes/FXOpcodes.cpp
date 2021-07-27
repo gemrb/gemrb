@@ -3788,8 +3788,8 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// EEs added randomness that can't hurt elsewhere
 	ResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
 	char count = 1;
-	if (fx->Resource2[0]) count++;
-	if (fx->Resource3[0]) count++;
+	if (!fx->Resource2.IsEmpty()) count++;
+	if (!fx->Resource3.IsEmpty()) count++;
 	int choice = RAND(0, count - 1);
 
 	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
@@ -5338,7 +5338,6 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, const Re
 	//Add some essential effects
 	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//the familiar marker needs to be set to 2 in case of ToB
 	ieDword fm = 0;
@@ -5347,17 +5346,15 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, const Re
 	}
 	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//maximum hp bonus of half the familiar's hp, there is no hp new bonus upgrade when upgrading familiar
 	//this is a bug even in the original engine, so I don't care
 	if (Owner) {
 		newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, (Actor *) Owner, Owner);
-		delete newfx;
 	}
 
-	if (fx->Resource2[0]) {
+	if (!fx->Resource2.IsEmpty()) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
 		if (vvc) {
 			//This is the final position of the summoned creature
@@ -5458,17 +5455,14 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	//lose 1 point of constitution
 	newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//remove the maximum hp bonus
 	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//damage for half of the familiar's hitpoints
 	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -6515,7 +6509,6 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		newfx = EffectQueue::CreateEffect(fx_leveldrain_ref, copy->GetXPLevel(1)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 		if (newfx) {
 			core->ApplyEffect(newfx, copy, copy);
-			delete newfx;
 		}
 		break;
 	default:
