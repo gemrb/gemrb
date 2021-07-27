@@ -5412,15 +5412,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 
-		char familiar[9];
-		memcpy(familiar, game->Familiars[alignment], 9);
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			familiar[6] = '2';
-			familiar[7] = '5';
+			fx->Resource.SNPrintF("%.6s25");
+		} else {
+			fx->Resource = game->Familiars[alignment];
 		}
-		fx->Resource = familiar;
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
 
@@ -5487,14 +5485,13 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//upgrade familiar to ToB version
 	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
-		char resource[9]{};
-		memcpy(resource, target->GetScriptName(), 6);
-		strncat(resource, "25", 8);
+		ResRef resource;
+		resource.SNPrintF("%.6s25", target->GetScriptName());
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 
 		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
-		const Actor *fam = GetFamiliar(nullptr, target, fx, ResRef(resource));
+		const Actor *fam = GetFamiliar(nullptr, target, fx, resource);
 
 		if (fam) {
 			//upgrade successful
@@ -6490,12 +6487,10 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplyEffect(newfx, copy, copy);
 	}
 
-	char script[9];
+	ResRef script;
 	//intentionally 7, to leave room for the last letter
 	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
-	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
-	//no need of buffer defense as long as you don't mess with the 7 above
-	strcat(script,"m");
+	script.SNPrintF("%.7sm", target->GetScript(SCR_CLASS).CString());
 	//if the caster is inparty, the script is turned off by the AI disable flag
 	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
@@ -6764,13 +6759,8 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		//failure
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
-			char spl[9];
-			strnuprcpy(spl, fx->Resource, 8);
-			if (strlen(spl)<8) {
-				strcat(spl,"F");
-			} else {
-				spl[7]='F';
-			}
+			ResRef spl;
+			spl.SNPrintF("%.7sF", fx->Resource.CString());
 			core->ApplySpell(ResRef(spl), target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;

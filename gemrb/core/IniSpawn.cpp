@@ -363,9 +363,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
 		if (VarHasContext(s)) {
-			char tmp[9];
-			strnuprcpy(tmp, s, 6);
-			critter.SpecContext = tmp;
+			critter.SpecContext.SNPrintF("%.6s", s);
 			strnlwrcpy(critter.SpecVar, s+8, 32);
 		} else {
 			critter.SpecContext = "GLOBAL";
