@@ -303,7 +303,7 @@ std::vector<std::vector<int> > skillrac;
 
 // subset of races.2da
 std::map<unsigned int, int> favoredMap;
-std::map<unsigned int, const char *> raceID2Name;
+std::map<unsigned int, std::string> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
@@ -11443,7 +11443,7 @@ bool Actor::ShouldModifyMorale() const
 const char* Actor::GetRaceName() const
 {
 	if (raceID2Name.count(BaseStats[IE_RACE])) {
-		return raceID2Name[BaseStats[IE_RACE]];
+		return raceID2Name[BaseStats[IE_RACE]].c_str();
 	} else {
 		return nullptr;
 	}
