@@ -29,9 +29,10 @@
 
 namespace GemRB {
 
-Animation::Animation(index_t count)
-: frames(count, nullptr)
+Animation::Animation(std::vector<frame_t> fr)
+: frames(std::move(fr))
 {
+	size_t count = frames.size();
 	assert(count > 0);
 	indicesCount = count;
 	frameIdx = RAND<index_t>(0, count-1);
@@ -42,6 +43,13 @@ Animation::Animation(index_t count)
 	//behaviour flags
 	playReversed = false;
 	gameAnimation = false;
+	
+	for (const frame_t& frame : frames) {
+		Region r = frame->Frame;
+		r.x = -r.x;
+		r.y = -r.y;
+		animArea.ExpandToRegion(r);
+	}
 }
 
 void Animation::SetFrame(index_t index)
@@ -51,21 +59,6 @@ void Animation::SetFrame(index_t index)
 	}
 	starttime = 0;
 	endReached = false;
-}
-
-/* when adding NULL, it means we already added a frame of index */
-void Animation::AddFrame(const frame_t& frame, index_t index)
-{
-	if (index>=indicesCount) {
-		error("Animation", "You tried to write past a buffer in animation, BAD!\n");
-	}
-	frames[index] = frame;
-
-	Region r = frame->Frame;
-	r.x = -r.x;
-	r.y = -r.y;
-	
-	animArea.ExpandToRegion(r);
 }
 
 Animation::index_t Animation::GetCurrentFrameIndex() const

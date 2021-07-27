@@ -61,22 +61,27 @@ bool TISImporter::Open(DataStream* stream)
 Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	unsigned short* secondary)
 {
-	Animation* ani = new Animation( count );
-	//pause key stops animation
-	ani->gameAnimation = true;
-	//the turning crystal in ar3202 (bg1) requires animations to be synced
-	ani->frameIdx = 0;
+	std::vector<Animation::frame_t> frames;
+	frames.reserve(count);
 	for (int i = 0; i < count; i++) {
-		ani->AddFrame( GetTile( indexes[i] ), i );
+		frames.push_back(GetTile(indexes[i]));
 	}
+	
+	Animation ani = Animation(std::move(frames));
+	//pause key stops animation
+	ani.gameAnimation = true;
+	//the turning crystal in ar3202 (bg1) requires animations to be synced
+	ani.frameIdx = 0;
+	
 	if (secondary) {
-		Animation* sec = new Animation( count );
+		frames.clear();
 		for (int i = 0; i < count; i++) {
-			sec->AddFrame( GetTile( secondary[i] ), i );
+			frames.push_back(GetTile(secondary[i]));
 		}
-		return new Tile( ani, sec );
+		Animation sec = Animation(frames);
+		return new Tile(ani, sec);
 	}
-	return new Tile( ani );
+	return new Tile(ani);
 }
 
 Holder<Sprite2D> TISImporter::GetTile(int index)

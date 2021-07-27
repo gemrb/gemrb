@@ -46,12 +46,13 @@ Animation* AnimationFactory::GetCycle(index_t cycle)
 	}
 	index_t ff = cycles[cycle].FirstFrame;
 	index_t lf = ff + cycles[cycle].FramesCount;
-	Animation* anim = new Animation( cycles[cycle].FramesCount );
-	int c = 0;
+	std::vector<Animation::frame_t> animframes;
+	animframes.reserve(cycles[cycle].FramesCount);
 	for (index_t i = ff; i < lf; i++) {
-		anim->AddFrame(frames[FLTable[i]], c++);
+		animframes.push_back(frames[FLTable[i]]);
 	}
-	return anim;
+	assert(cycles[cycle].FramesCount == animframes.size());
+	return new Animation(std::move(animframes));
 }
 
 /* returns the required frame of the named cycle, cycle defaults to 0 */

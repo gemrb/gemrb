@@ -26,19 +26,43 @@
 
 #include "Animation.h"
 
+#include <array>
+
 namespace GemRB {
 
 class GEM_EXPORT Tile {
 public:
-	explicit Tile(Animation* anim, Animation* sec = nullptr);
-	~Tile(void);
-	unsigned char tileIndex;
-	unsigned char om;
-	Color SearchMap[16]{};
-	Color HeightMap[16]{};
-	Color LightMap[16]{};
-	Color NLightMap[16]{};
-	Animation* anim[2];
+	using Map = std::array<Color, 16>;
+	
+	Tile(Animation a1, Animation a2) noexcept
+	: anim{make_unique<Animation>(std::move(a1)), make_unique<Animation>(std::move(a2))}
+	{}
+
+	explicit Tile(Animation animation) noexcept
+	: anim{make_unique<Animation>(std::move(animation)), nullptr }
+	{}
+	
+	Animation* GetAnimation() const noexcept {
+		if (anim[tileIndex]) {
+			return anim[tileIndex].get();
+		}
+		return anim[0].get();
+	}
+	
+	Animation* GetAnimation(int idx) const noexcept {
+		return anim[idx].get();
+	}
+
+	unsigned char tileIndex = 0;
+	unsigned char om = 0;
+	
+	Map SearchMap;
+	Map HeightMap;
+	Map LightMap;
+	Map NLightMap;
+	
+private:
+	std::unique_ptr<Animation> anim[2];
 };
 
 }

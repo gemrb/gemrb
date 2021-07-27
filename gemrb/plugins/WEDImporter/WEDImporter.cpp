@@ -148,9 +148,9 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 				tile = tis->GetTile( indices, count );
 			} else {
 				tile = tis->GetTile( indices, 1, &secondary );
-				tile->anim[1]->fps = animspeed;
+				tile->GetAnimation(1)->fps = animspeed;
 			}
-			tile->anim[0]->fps = animspeed;
+			tile->GetAnimation(0)->fps = animspeed;
 			tile->om = overlaymask;
 			usedoverlays |= overlaymask;
 			over->AddTile( tile );

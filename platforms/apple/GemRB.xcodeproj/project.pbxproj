@@ -340,7 +340,6 @@
 		A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */; };
 		A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04F1395FF62006ADC12 /* Store.cpp */; };
 		A29BF8E913A04A6F00C812DD /* TableMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0681395FF62006ADC12 /* TableMgr.cpp */; };
-		A29BF8EA13A04A6F00C812DD /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06A1395FF62006ADC12 /* Tile.cpp */; };
 		A29BF8EB13A04A6F00C812DD /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06C1395FF62006ADC12 /* TileMap.cpp */; };
 		A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */; };
 		A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0751395FF62006ADC12 /* Variables.cpp */; };
@@ -552,7 +551,6 @@
 		A2E663E1139E884500310FC8 /* SymbolMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0561395FF62006ADC12 /* SymbolMgr.h */; };
 		A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0681395FF62006ADC12 /* TableMgr.cpp */; };
 		A2E663E3139E884B00310FC8 /* TableMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0691395FF62006ADC12 /* TableMgr.h */; };
-		A2E663E4139E884B00310FC8 /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06A1395FF62006ADC12 /* Tile.cpp */; };
 		A2E663E5139E884B00310FC8 /* Tile.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06B1395FF62006ADC12 /* Tile.h */; };
 		A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06C1395FF62006ADC12 /* TileMap.cpp */; };
 		A2E663E7139E884B00310FC8 /* TileMap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06D1395FF62006ADC12 /* TileMap.h */; };
@@ -1678,7 +1676,6 @@
 		A2BFA0671395FF62006ADC12 /* VFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFS.h; sourceTree = "<group>"; };
 		A2BFA0681395FF62006ADC12 /* TableMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TableMgr.cpp; sourceTree = "<group>"; };
 		A2BFA0691395FF62006ADC12 /* TableMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableMgr.h; sourceTree = "<group>"; };
-		A2BFA06A1395FF62006ADC12 /* Tile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tile.cpp; sourceTree = "<group>"; };
 		A2BFA06B1395FF62006ADC12 /* Tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tile.h; sourceTree = "<group>"; };
 		A2BFA06C1395FF62006ADC12 /* TileMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
 		A2BFA06D1395FF62006ADC12 /* TileMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileMap.h; sourceTree = "<group>"; };
@@ -5233,7 +5230,6 @@
 				A2BFA0571395FF62006ADC12 /* System */,
 				A2BFA0681395FF62006ADC12 /* TableMgr.cpp */,
 				A2BFA0691395FF62006ADC12 /* TableMgr.h */,
-				A2BFA06A1395FF62006ADC12 /* Tile.cpp */,
 				A2BFA06B1395FF62006ADC12 /* Tile.h */,
 				A2BFA06C1395FF62006ADC12 /* TileMap.cpp */,
 				A2BFA06D1395FF62006ADC12 /* TileMap.h */,
@@ -9503,7 +9499,6 @@
 				A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */,
 				A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */,
 				A29BF8E913A04A6F00C812DD /* TableMgr.cpp in Sources */,
-				A29BF8EA13A04A6F00C812DD /* Tile.cpp in Sources */,
 				A29BF8EB13A04A6F00C812DD /* TileMap.cpp in Sources */,
 				A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */,
 				A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */,
@@ -9708,7 +9703,6 @@
 				A25F91EA269931220045F07A /* Video.cpp in Sources */,
 				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
 				A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */,
-				A2E663E4139E884B00310FC8 /* Tile.cpp in Sources */,
 				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,

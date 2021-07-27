@@ -49,8 +49,8 @@ public:
 	Region animArea;
 	ieDword Flags;
 
-	explicit Animation(index_t count);
-	void AddFrame(const frame_t& frame, index_t index);
+	explicit Animation(std::vector<frame_t>);
+
 	frame_t CurrentFrame() const;
 	frame_t LastFrame();
 	frame_t NextFrame();
