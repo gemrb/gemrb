@@ -49,18 +49,6 @@ Container::Container(void)
 	OpenFail = 0;
 }
 
-void Container::FreeGroundIcons()
-{
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
-		groundicons[i] = nullptr;
-	}
-}
-
-Container::~Container()
-{
-	FreeGroundIcons();
-}
-
 Region Container::DrawingRegion() const
 {
 	Region r(Pos.x, Pos.y, 0, 0);
@@ -148,7 +136,11 @@ void Container::RefreshGroundIcons()
 	int i = inventory.GetSlotCount();
 	if (i>MAX_GROUND_ICON_DRAWN)
 		i = MAX_GROUND_ICON_DRAWN;
-	FreeGroundIcons();
+
+	int count = MAX_GROUND_ICON_DRAWN;
+	while (count > i) {
+		groundicons[count--] = nullptr;
+	}
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
 		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference

@@ -40,7 +40,6 @@ namespace GemRB {
 class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
-	~Container(void) override;
 	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();
@@ -61,7 +60,6 @@ public:
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
-	void FreeGroundIcons();
 public:
 	Point toOpen;
 	ieWord containerType;
