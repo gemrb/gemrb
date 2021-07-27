@@ -35,7 +35,7 @@ void TileOverlay::AddTile(Tile tile)
 	tiles.push_back(std::move(tile));
 }
 
-void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const
+void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &overlays, BlitFlags flags) const
 {
 	// determine which tiles are visible
 	int sx = std::max(viewport.x / 64, 0);
@@ -69,9 +69,9 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlay*> &overla
 			}
 
 			int mask = 2;
-			for (size_t z = 1;z<overlays.size();z++) {
-				TileOverlay * ov = overlays[z];
-				if (ov && ov->tiles.size() > 0) {
+			for (size_t z = 1; z < overlays.size(); ++z) {
+				const auto& ov = overlays[z];
+				if (ov->tiles.size() > 0) {
 					const Tile &ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile.om & mask) {
 						//draw overlay tiles, they should be half transparent except for BG1

@@ -31,8 +31,6 @@ namespace GemRB {
 
 TileMap::~TileMap(void)
 {
-	ClearOverlays();
-
 	for (const InfoPoint *infoPoint : infoPoints) {
 		delete infoPoint;
 	}
@@ -45,12 +43,6 @@ TileMap::~TileMap(void)
 //this needs in case of a tileset switch (for extended night)
 void TileMap::ClearOverlays()
 {
-	for (const TileOverlay *overlay : overlays) {
-		delete overlay;
-	}
-	for (const TileOverlay *rain : rain_overlays) {
-		delete rain;
-	}
 	overlays.clear();
 	rain_overlays.clear();
 }
@@ -81,7 +73,7 @@ TileObject* TileMap::GetTile(unsigned int idx)
 Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
 	int ClosedIndex, std::vector<ieWord> indices, DoorTrigger&& dt)
 {
-	Door* door = new Door(overlays[0], std::move(dt));
+	Door* door = new Door(overlays[0].get(), std::move(dt));
 	door->Flags = Flags;
 	door->closedIndex = ClosedIndex;
 	door->SetTiles(std::move(indices));
@@ -135,7 +127,7 @@ Door* TileMap::GetDoor(const char* Name) const
 void TileMap::UpdateDoors()
 {
 	for (Door *door : doors) {
-		door->SetNewOverlay(overlays[0]);
+		door->SetNewOverlay(overlays[0].get());
 	}
 }
 
@@ -152,30 +144,22 @@ void TileMap::AutoLockDoors() const
 }
 
 //overlays, allow pushing of NULL
-void TileMap::AddOverlay(TileOverlay* overlay)
+void TileMap::AddOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->size.w > XCellCount) {
-			XCellCount = overlay->size.w;
-		}
-		if (overlay->size.h > YCellCount) {
-			YCellCount = overlay->size.h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	overlays.push_back( overlay );
+	overlays.push_back(std::move(overlay));
 }
 
-void TileMap::AddRainOverlay(TileOverlay* overlay)
+void TileMap::AddRainOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->size.w > XCellCount) {
-			XCellCount = overlay->size.w;
-		}
-		if (overlay->size.h > YCellCount) {
-			YCellCount = overlay->size.h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	rain_overlays.push_back( overlay );
+	rain_overlays.push_back(std::move(overlay));
 }
 
 void TileMap::DrawOverlays(const Region& viewport, bool rain, BlitFlags flags)

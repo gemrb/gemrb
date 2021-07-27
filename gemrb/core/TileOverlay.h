@@ -35,10 +35,12 @@ public:
 	Size size;
 	std::vector<Tile> tiles;
 public:
+	using TileOverlayPtr = std::unique_ptr<TileOverlay>;
+
 	TileOverlay(Size size);
 
 	void AddTile(Tile tile);
-	void Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const;
+	void Draw(const Region& viewport, std::vector<TileOverlayPtr> &overlays, BlitFlags flags) const;
 };
 
 }
