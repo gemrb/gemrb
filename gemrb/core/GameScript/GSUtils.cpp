@@ -2534,16 +2534,10 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		return;
 	}
 
-	if (flag) {
-		anim->Flags |= A_ANI_ACTIVE;
-		for (int i = 0; i < anim->animcount; i++) {
-			anim->animation[i]->Flags |= A_ANI_ACTIVE;
-		}
-	} else {
-		anim->Flags &= ~A_ANI_ACTIVE;
-		for (int i = 0; i < anim->animcount; i++) {
-			anim->animation[i]->Flags &= ~A_ANI_ACTIVE;
-		}
+	flag = flag ? OP_OR : OP_NAND;
+	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, flag);
+	for (size_t i = 0; i < anim->animation.size(); ++i) {
+		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, flag);
 	}
 }
 

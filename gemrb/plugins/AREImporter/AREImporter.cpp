@@ -1173,39 +1173,36 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Log(WARNING, "AREImporter", "No Animation Manager Available, skipping animations");
 	} else {
 		for (ieDword i = 0; i < AnimCount; i++) {
-			AreaAnimation* anim = new AreaAnimation();
-			str->ReadVariable(anim->Name);
-			ieWord animX, animY, startFrameRange;
-			str->ReadWord(animX);
-			str->ReadWord(animY);
-			anim->Pos.x=animX;
-			anim->Pos.y=animY;
-			str->ReadDword(anim->appearance);
-			str->ReadResRef( anim->BAM );
-			str->ReadWord(anim->sequence);
-			str->ReadWord(anim->frame);
-			str->ReadDword(anim->Flags);
-			anim->originalFlags = anim->Flags;
-			str->ReadScalar(anim->height);
-			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && anim->height <= 0) {
-				anim->height = ANI_PRI_BACKGROUND;
-				anim->Flags |= A_ANI_NO_WALL;
+			AreaAnimation anim = AreaAnimation();
+			str->ReadVariable(anim.Name);
+			ieWord startFrameRange;
+			str->ReadPoint(anim.Pos);
+			str->ReadDword(anim.appearance);
+			str->ReadResRef(anim.BAM);
+			str->ReadWord(anim.sequence);
+			str->ReadWord(anim.frame);
+			str->ReadDword(anim.Flags);
+			anim.originalFlags = anim.Flags;
+			str->ReadScalar(anim.height);
+			if (core->HasFeature(GF_IMPLICIT_AREAANIM_BACKGROUND) && anim.height <= 0) {
+				anim.height = ANI_PRI_BACKGROUND;
+				anim.Flags |= A_ANI_NO_WALL;
 			}
-			str->ReadWord(anim->transparency);
+			str->ReadWord(anim.transparency);
 			str->ReadWord(startFrameRange);
-			str->Read( &anim->startchance,1 );
-			if (anim->startchance<=0) {
-				anim->startchance=100; //percentage of starting a cycle
+			str->Read( &anim.startchance,1 );
+			if (anim.startchance<=0) {
+				anim.startchance=100; //percentage of starting a cycle
 			}
-			if (startFrameRange && (anim->Flags&A_ANI_RANDOM_START) ) {
-				anim->frame = RAND(0, startFrameRange - 1);
+			if (startFrameRange && (anim.Flags&A_ANI_RANDOM_START) ) {
+				anim.frame = RAND(0, startFrameRange - 1);
 			}
-			anim->startFrameRange = 0; //this will never get resaved (iirc)
-			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)
-			str->ReadResRef( anim->PaletteRef );
+			anim.startFrameRange = 0; //this will never get resaved (iirc)
+			str->Read( &anim.skipcycle,1 ); //how many cycles are skipped	(100% skippage)
+			str->ReadResRef( anim.PaletteRef );
 			// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
 			// 0x4a holds the height
-			str->ReadDword(anim->unknown48);
+			str->ReadDword(anim.unknown48);
 
 			if (pst) {
 				AdjustPSTFlags(anim);
@@ -1214,9 +1211,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			//set up the animation, it cannot be done here
 			//because a StaticSequence action can change
 			//it later
-			map->AddAnimation( anim );
-			//the animation was safely transferred to internal memory
-			delete anim;
+			map->AddAnimation(std::move(anim));
 		}
 	}
 
@@ -1471,7 +1466,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	return map;
 }
 
-void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
+void AREImporter::AdjustPSTFlags(AreaAnimation &areaAnim) {
 	/**
 	 * For PST, map animation flags work differently to a degree that they
 	 * should not be mixed together with the rest as they even tend to
@@ -1491,20 +1486,20 @@ void AREImporter::AdjustPSTFlags(AreaAnimation *areaAnim) {
 	#define PST_ANI_NO_WALL 0x0008  // A_ANI_PLAYONCE in other games
 	#define PST_ANI_BLEND 0x0100  // A_ANI_BACKGROUND in other games
 
-	areaAnim->Flags = 0;             // Clear everything
+	areaAnim.Flags = 0;             // Clear everything
 
 	// Set default-on flags (currently only A_ANI_SYNC)
-	areaAnim->Flags |= A_ANI_SYNC;
+	areaAnim.Flags |= A_ANI_SYNC;
 
 	// Copy still-relevant A_ANI_* flags
-	areaAnim->Flags |= areaAnim->originalFlags & A_ANI_ACTIVE;
+	areaAnim.Flags |= areaAnim.originalFlags & A_ANI_ACTIVE;
 
 	// Map known flags
-	if (areaAnim->originalFlags & PST_ANI_BLEND) {
-		areaAnim->Flags |= A_ANI_BLEND;
+	if (areaAnim.originalFlags & PST_ANI_BLEND) {
+		areaAnim.Flags |= A_ANI_BLEND;
 	}
-	if (areaAnim->originalFlags & PST_ANI_NO_WALL) {
-		areaAnim->Flags |= A_ANI_NO_WALL;
+	if (areaAnim.originalFlags & PST_ANI_NO_WALL) {
+		areaAnim.Flags |= A_ANI_NO_WALL;
 	}
 }
 
@@ -2163,7 +2158,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutAnimations(DataStream *stream, const Map *map)
+int AREImporter::PutAnimations(DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
 

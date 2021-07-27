@@ -9901,7 +9901,7 @@ static PyObject* GemRB_SetMapAnimation(PyObject * /*self*/, PyObject* args)
 	anim.sequence=Cycle;
 	anim.height=Height;
 	if (Flags&A_ANI_ACTIVE) {
-		map->AddAnimation(&anim);
+		map->AddAnimation(std::move(anim));
 	}
 	Py_RETURN_NONE;
 }

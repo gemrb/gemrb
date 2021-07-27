@@ -69,7 +69,7 @@ public:
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map) override;
 private:
-	void AdjustPSTFlags(AreaAnimation*);
+	void AdjustPSTFlags(AreaAnimation&);
 	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, const Map *map) const;
@@ -83,7 +83,7 @@ private:
 	int PutSpawns(DataStream *stream, const Map *map) const;
 	void PutScript(DataStream *stream, const Actor *ac, unsigned int index);
 	int PutActors(DataStream *stream, const Map *map);
-	int PutAnimations(DataStream *stream, const Map *map);
+	int PutAnimations(DataStream *stream, Map *map);
 	int PutEntrances(DataStream *stream, const Map *map) const;
 	int PutVariables(DataStream *stream, const Map *map) const;
 	int PutAmbients(DataStream *stream, const Map *map);

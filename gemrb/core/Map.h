@@ -40,7 +40,6 @@ namespace GemRB {
 class Actor;
 class Ambient;
 class Animation;
-class AnimationFactory;
 class Bitmap;
 class CREItem;
 class GameControl;
@@ -293,8 +292,7 @@ public:
 
 class GEM_EXPORT AreaAnimation {
 public:
-	Animation **animation;
-	int animcount;
+	mutable std::vector<Animation> animation; // FIXME: we need an "update" step, currently we do it in Draw() wich should remian const
 	//dwords, or stuff combining to a dword
 	Point Pos;
 	ieDword appearance;
@@ -319,8 +317,8 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
-	explicit AreaAnimation(const AreaAnimation *src);
-	~AreaAnimation();
+	AreaAnimation(const AreaAnimation& src);
+
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);
 	void BlendAnimation();
@@ -328,8 +326,6 @@ public:
 	Region DrawingRegion() const;
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
 	int GetHeight() const;
-private:
-	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle) const;
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
@@ -359,7 +355,7 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE),
 };
 
-typedef std::list<AreaAnimation*>::const_iterator aniIterator;
+typedef std::list<AreaAnimation>::iterator aniIterator;
 typedef std::list<VEFObject*>::const_iterator scaIterator;
 typedef std::list<Projectile*>::const_iterator proIterator;
 typedef std::list<Particles*>::const_iterator spaIterator;
@@ -397,7 +393,7 @@ private:
 	PathMapFlags* SrchMap; //internal searchmap
 	unsigned short* MaterialMap;
 	Size mapSize;
-	std::list< AreaAnimation*> animations;
+	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
 	std::vector<WallPolygonGroup> wallGroups;
 	std::list< VEFObject*> vvcCells;
@@ -446,16 +442,16 @@ public:
 
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
-	void AddAnimation(const AreaAnimation* anim);
-	aniIterator GetFirstAnimation() const { return animations.begin(); }
+	void AddAnimation(AreaAnimation anim);
+	aniIterator GetFirstAnimation() { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
 		if (iter == animations.end()) {
 			return NULL;
 		}
-		return *iter++;
+		return &*iter++;
 	}
-	AreaAnimation *GetAnimation(const char *Name) const;
+	AreaAnimation *GetAnimation(const char *Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
 	void SetWallGroups(std::vector<WallPolygonGroup>&& walls)
@@ -636,7 +632,7 @@ public:
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
 private:
-	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
+	const AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
 	Particles *GetNextSpark(const spaIterator &iter) const;
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, int &index) const;

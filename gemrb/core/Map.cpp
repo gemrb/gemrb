@@ -408,9 +408,6 @@ Map::~Map(void)
 
 	delete TMap;
 	delete INISpawn;
-	 for (auto anim : animations) {
-		delete anim;
-	}
 
 	for (auto actor : actors) {
 		//don't delete NPC/PC
@@ -1208,21 +1205,21 @@ retry:
 	}
 }
 
-AreaAnimation *Map::GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const
+const AreaAnimation *Map::GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const
 {
 retry:
 	if (iter==animations.end()) {
 		return NULL;
 	}
-	AreaAnimation *a = *(iter++);
-	if (!a->Schedule(gametime) ) {
+	const AreaAnimation &a = *(iter++);
+	if (!a.Schedule(gametime) ) {
 		goto retry;
 	}
-	if ((a->Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a->Pos) : !IsExplored(a->Pos)) {
+	if ((a.Flags & A_ANI_NOT_IN_FOG) ? !IsVisible(a.Pos) : !IsExplored(a.Pos)) {
 		goto retry;
 	}
 
-	return a;
+	return &a;
 }
 
 Particles *Map::GetNextSpark(const spaIterator &iter) const
@@ -1858,16 +1855,12 @@ void Map::DrawSearchMap(const Region &vp) const
 }
 
 //adding animation in order, based on its height parameter
-void Map::AddAnimation(const AreaAnimation* panim)
+void Map::AddAnimation(AreaAnimation anim)
 {
-	//copy external memory to core memory for msvc's sake
-	AreaAnimation *anim = new AreaAnimation(panim);
-
-	aniIterator iter;
-
-	int Height = anim->GetHeight();
-	for (iter = animations.begin(); (iter != animations.end()) && ((*iter)->GetHeight() < Height); ++iter) ;
-	animations.insert(iter, anim);
+	int Height = anim.GetHeight();
+	auto iter = animations.begin();
+	for (; (iter != animations.end()) && (iter->GetHeight() < Height); ++iter) ;
+	animations.insert(iter, std::move(anim));
 }
 
 //reapplying all of the effects on the actors of this map
@@ -2820,14 +2813,14 @@ void Map::AddVVCell(VEFObject* vvc)
 	vvcCells.insert(iter, vvc);
 }
 
-AreaAnimation *Map::GetAnimation(const char *Name) const
+AreaAnimation *Map::GetAnimation(const char *Name)
 {
-	for (auto anim : animations) {
-		if (anim->Name[0] && (strnicmp(anim->Name, Name, 32) == 0)) {
-			return anim;
+	for (auto& anim : animations) {
+		if (anim.Name[0] && (strnicmp(anim.Name, Name, 32) == 0)) {
+			return &anim;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& creatures)
@@ -3820,71 +3813,35 @@ unsigned int Map::GetLightLevel(const Point &Pos) const
 
 AreaAnimation::AreaAnimation()
 {
-	animation=NULL;
-	animcount=0;
 	appearance = sequence = frame = transparency = height = 0;
 	Flags = originalFlags = startFrameRange = skipcycle = startchance = 0;
 	unknown48 = 0;
 }
 
-AreaAnimation::AreaAnimation(const AreaAnimation *src)
+AreaAnimation::AreaAnimation(const AreaAnimation &src)
 {
-	animcount = src->animcount;
-	sequence = src->sequence;
-	animation = NULL;
-	Flags = src->Flags;
-	originalFlags = src->originalFlags;
-	Pos.x = src->Pos.x;
-	Pos.y = src->Pos.y;
-	appearance = src->appearance;
-	frame = src->frame;
-	transparency = src->transparency;
-	height = src->height;
-	startFrameRange = src->startFrameRange;
-	skipcycle = src->skipcycle;
-	startchance = src->startchance;
+	animation = src.animation;
+	sequence = src.sequence;
+	Flags = src.Flags;
+	originalFlags = src.originalFlags;
+	Pos = src.Pos;
+	appearance = src.appearance;
+	frame = src.frame;
+	transparency = src.transparency;
+	height = src.height;
+	startFrameRange = src.startFrameRange;
+	skipcycle = src.skipcycle;
+	startchance = src.startchance;
 	unknown48 = 0;
 
-	PaletteRef = src->PaletteRef;
-	Name = src->Name;
-	BAM = src->BAM;
+	PaletteRef = src.PaletteRef;
+	Name = src.Name;
+	BAM = src.BAM;
 
-	palette = src->palette ? src->palette->Copy() : NULL;
+	palette = src.palette ? src.palette->Copy() : NULL;
 
 	// handles the rest: animation, resets animcount
 	InitAnimation();
-}
-
-AreaAnimation::~AreaAnimation()
-{
-	for(int i=0;i<animcount;i++) {
-		if (animation[i]) {
-			delete (animation[i]);
-		}
-	}
-	free(animation);
-}
-
-Animation *AreaAnimation::GetAnimationPiece(AnimationFactory *af, int animCycle) const
-{
-	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
-	if (!anim)
-		anim = af->GetCycle( 0 );
-	if (!anim) {
-		print("Cannot load animation: %s", BAM.CString());
-		return NULL;
-	}
-	//this will make the animation stop when the game is stopped
-	//a possible gemrb feature to have this flag settable in .are
-	anim->gameAnimation = true;
-	anim->SetFrame(frame); // sanity check it first
-	anim->Flags = Flags;
-	anim->pos = Pos;
-	if (anim->Flags&A_ANI_MIRROR) {
-		anim->MirrorAnimation();
-	}
-
-	return anim;
 }
 
 void AreaAnimation::InitAnimation()
@@ -3895,24 +3852,40 @@ void AreaAnimation::InitAnimation()
 		print("Cannot load animation: %s", BAM.CString());
 		return;
 	}
-
-	//freeing up the previous animation
-	for (int i=0; i<animcount && animation; i++) {
-		delete animation[i];
-	}
-	free(animation);
-
-	animcount = (int) af->GetCycleCount();
-	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
-		animation = (Animation **) malloc(animcount * sizeof(Animation *) );
-		for(int j=0;j<animcount;j++) {
-			animation[j]=GetAnimationPiece(af, j);
+	
+	auto GetAnimationPiece = [af, this](Animation::index_t animCycle)
+	{
+		Animation *anim = af->GetCycle(animCycle);
+		if (!anim)
+			anim = af->GetCycle(0);
+		
+		assert(anim);
+		//this will make the animation stop when the game is stopped
+		//a possible gemrb feature to have this flag settable in .are
+		anim->gameAnimation = true;
+		anim->SetFrame(frame); // sanity check it first
+		anim->Flags = Flags;
+		anim->pos = Pos;
+		if (anim->Flags&A_ANI_MIRROR) {
+			anim->MirrorAnimation();
 		}
-	} else {
-		animcount = 1;
-		animation = (Animation **) malloc( sizeof(Animation *) );
-		animation[0]=GetAnimationPiece(af, sequence);
+
+		return *anim;
+	};
+
+	size_t animcount = af->GetCycleCount();
+	std::vector<Animation> newanim;
+	newanim.reserve(animcount);
+
+	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
+		for (size_t j = 0; j < animation.size(); ++j) {
+			newanim.push_back(GetAnimationPiece(j));
+		}
+	} else if (animcount) {
+		newanim.push_back(GetAnimationPiece(sequence));
 	}
+	animation = std::move(newanim);
+	
 	if (Flags & A_ANI_PALETTE) {
 		SetPalette(PaletteRef);
 	}
@@ -3939,8 +3912,8 @@ void AreaAnimation::BlendAnimation()
 		// CHECKME: what should we do here? Currently copying palette
 		// from first frame of first animation
 
-		if (animcount == 0 || !animation[0]) return;
-		Holder<Sprite2D> spr = animation[0]->GetFrame(0);
+		if (animation.size() == 0) return;
+		Holder<Sprite2D> spr = animation[0].GetFrame(0);
 		if (!spr) return;
 		palette = spr->GetPalette()->Copy();
 		PaletteRef.Reset();
@@ -3966,10 +3939,10 @@ int AreaAnimation::GetHeight() const
 Region AreaAnimation::DrawingRegion() const
 {
 	Region r(Pos, Size());
-	int ac = animcount;
+	size_t ac = animation.size();
 	while (ac--) {
-		const Animation *anim = animation[ac];
-		Region animRgn = anim->animArea;
+		const Animation &anim = animation[ac];
+		Region animRgn = anim.animArea;
 		animRgn.x += Pos.x;
 		animRgn.y += Pos.y;
 		
@@ -3989,10 +3962,10 @@ void AreaAnimation::Draw(const Region &viewport, Color tint, BlitFlags flags) co
 		tint.a = 255;
 	}
 
-	int ac = animcount;
+	size_t ac = animation.size();
 	while (ac--) {
-		Animation *anim = animation[ac];
-		Holder<Sprite2D> frame = anim->NextFrame();
+		Animation &anim = animation[ac];
+		Holder<Sprite2D> frame = anim.NextFrame();
 		
 		video->BlitGameSpriteWithPalette(frame, palette, Pos - viewport.origin, flags, tint);
 	}
