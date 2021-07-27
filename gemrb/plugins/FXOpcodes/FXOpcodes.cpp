@@ -5415,9 +5415,9 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			fx->Resource.SNPrintF("%.6s25", game->Familiars[alignment]);
+			fx->Resource.SNPrintF("%.6s25", game->GetFamiliar(alignment).CString());
 		} else {
-			fx->Resource = game->Familiars[alignment];
+			fx->Resource = game->GetFamiliar(alignment);
 		}
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}

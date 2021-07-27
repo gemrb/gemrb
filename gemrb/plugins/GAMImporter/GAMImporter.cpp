@@ -265,12 +265,9 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		if (FamiliarsOffset) {
 			str->Seek( FamiliarsOffset, GEM_STREAM_START );
 			for (unsigned int i = 0; i < 9; i++) {
-				str->ReadResRef( newGame->GetFamiliar(i) );
-			}
-		} else {
-			//clear these fields up
-			for (unsigned int i = 0; i < 9; i++) {
-				newGame->GetFamiliar(i).Reset();
+				ResRef tmp;
+				str->ReadResRef(tmp);
+				newGame->SetFamiliar(std::move(tmp), i);
 			}
 		}
 	}

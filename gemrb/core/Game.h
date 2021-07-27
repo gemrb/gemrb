@@ -265,13 +265,13 @@ private:
 	ResRef daymovies[8];
 	ResRef nightmovies[8];
 	int MapIndex;
+	ResRef Familiars[9];
 public:
 	std::vector< Actor*> selected;
 	int version;
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
-	ResRef Familiars[9];
 	ieDword CombatCounter;
 	ieDword StateOverrideFlag, StateOverrideTime;
 	ieDword BanterBlockFlag, BanterBlockTime;
@@ -412,7 +412,8 @@ public:
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
-	ResRef& GetFamiliar(unsigned int Index);
+	const ResRef& GetFamiliar(size_t index) const;
+	void SetFamiliar(const ResRef&& familiar, size_t index);
 
 	bool IsBeastKnown(unsigned int Index) const {
 		if (!beasts) {

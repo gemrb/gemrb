@@ -1158,9 +1158,14 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 	return planepositions[i];
 }
 
-ResRef& Game::GetFamiliar(unsigned int Index)
+const ResRef& Game::GetFamiliar(size_t index) const
 {
-	return Familiars[Index];
+	return Familiars[index];
+}
+
+void Game::SetFamiliar(const ResRef&& familiar, size_t index)
+{
+	Familiars[index] = familiar;
 }
 
 //reading the challenge rating table for iwd2 (only when needed)
