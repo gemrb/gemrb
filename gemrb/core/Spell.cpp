@@ -33,44 +33,43 @@
 
 namespace GemRB {
 
-struct SpellFocus {
-	ieDword stat;
-	ieDword val1;
-	ieDword val2;
-};
+struct SpellTables {
+	struct SpellFocus {
+		ieDword stat;
+		ieDword val1;
+		ieDword val2;
+	};
+	
+	std::vector<SpellFocus> spellfocus;
+	unsigned int damageOpcode = 0;
+	bool pstflags = false;
+	
+	static const SpellTables& Get() {
+		static SpellTables tables;
+		return tables;
+	}
+private:
+	SpellTables() {
+		EffectRef dmgref = { "Damage", -1 };
+		damageOpcode = EffectQueue::ResolveEffect(dmgref);
 
-static int pstflags = false;
-static int inited = false;
-SpellFocus *spellfocus = NULL;
-int schoolcount = 0;
-static EffectRef fx_damage_ref = { "Damage", -1 };
-static unsigned int damageOpcode = 0;
+		pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
+		AutoTable tm("splfocus", true);
+		if (tm) {
+			size_t schoolcount = tm->GetRowCount();
 
-static void InitSpellTables()
-{
-	pstflags = !!core->HasFeature(GF_PST_STATE_FLAGS);
-	AutoTable tm("splfocus", true);
-	if (tm) {
-		schoolcount = tm->GetRowCount();
-
-		spellfocus = new SpellFocus [schoolcount];
-		for(int i = 0; i<schoolcount; i++) {
-			ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
-			ieDword val1 = atoi(tm->QueryField(i, 1));
-			ieDword val2 = atoi(tm->QueryField(i, 2));
-			spellfocus[i].stat = stat;
-			spellfocus[i].val1 = val1;
-			spellfocus[i].val2 = val2;
+			spellfocus.resize(schoolcount);
+			for (size_t i = 0; i < schoolcount; i++) {
+				ieDword stat = core->TranslateStat(tm->QueryField(i, 0));
+				ieDword val1 = atoi(tm->QueryField(i, 1));
+				ieDword val2 = atoi(tm->QueryField(i, 2));
+				spellfocus[i].stat = stat;
+				spellfocus[i].val1 = val1;
+				spellfocus[i].val2 = val2;
+			}
 		}
 	}
-}
-
-
-void ReleaseMemorySpell()
-{
-	inited = false;
-	delete [] spellfocus;
-}
+};
 
 SPLExtHeader::SPLExtHeader(void)
 {
@@ -82,11 +81,6 @@ SPLExtHeader::SPLExtHeader(void)
 
 Spell::Spell(void)
 {
-	if (!inited) {
-		inited = true;
-		InitSpellTables();
-		damageOpcode = EffectQueue::ResolveEffect(fx_damage_ref);
-	}
 	SpellLevel = PrimaryType = SecondaryType = SpellDesc = SpellDescIdentified = 0;
 	CastingGraphics = CastingSound = ExtHeaderOffset = 0;
 	unknown1 = unknown2 = unknown3 = unknown4 = unknown5 = unknown6 = 0;
@@ -174,6 +168,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 	bool pst_hostile = false;
 	Effect *const *features;
 	size_t count;
+	const auto& tables = SpellTables::Get();
 
 	//iwd2 has this hack
 	if (block_index>=0) {
@@ -183,7 +178,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		} else {
 			features = ext_headers[block_index].features.data();
 			count = ext_headers[block_index].features.size();
-			if (pstflags && !(ext_headers[block_index].Hostile&4)) {
+			if (tables.pstflags && !(ext_headers[block_index].Hostile&4)) {
 				pst_hostile = true;
 			}
 		}
@@ -211,7 +206,7 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 		fx->SourceFlags = Flags;
 		//pst spells contain a friendly flag in the spell header
 		// while iwd spells never set this bit
-		if (pst_hostile || fx->Opcode == damageOpcode) {
+		if (pst_hostile || fx->Opcode == tables.damageOpcode) {
 			fx->SourceFlags|=SF_HOSTILE;
 		}
 		fx->CasterID = self ? self->GetGlobalID() : 0; // needed early for check_type, reset later
@@ -229,13 +224,13 @@ EffectQueue *Spell::GetEffectBlock(Scriptable *self, const Point &pos, int block
 
 			//evaluate spell focus feats
 			//TODO: the usual problem: which saving throw is better? Easy fix in the data file.
-			if (fx->PrimaryType<(ieDword) schoolcount) {
-				ieDword stat = spellfocus[fx->PrimaryType].stat;
+			if (fx->PrimaryType < tables.spellfocus.size()) {
+				ieDword stat = tables.spellfocus[fx->PrimaryType].stat;
 				if (stat>0) {
 					switch (caster->Modified[stat]) {
 						case 0: break;
-						case 1: fx->SavingThrowBonus += spellfocus[fx->PrimaryType].val1; break;
-						default: fx->SavingThrowBonus += spellfocus[fx->PrimaryType].val2; break;
+						case 1: fx->SavingThrowBonus += tables.spellfocus[fx->PrimaryType].val1; break;
+						default: fx->SavingThrowBonus += tables.spellfocus[fx->PrimaryType].val2; break;
 					}
 				}
 			}
@@ -324,7 +319,7 @@ bool Spell::ContainsDamageOpcode() const
 {
 	for (const SPLExtHeader& header : ext_headers) {
 		for (const Effect *fx : header.features) {
-			if (fx->Opcode == damageOpcode) {
+			if (fx->Opcode == SpellTables::Get().damageOpcode) {
 				return true;
 			}
 		}

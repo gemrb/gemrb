@@ -68,8 +68,6 @@ class Projectile;
 #define SPEC_SILENCE   2  //spells that can be cast when silenced
 #define SPEC_DEAD      4  //spells that can target dead actors despite their target type is 1 (pst hack)
 
-extern void ReleaseMemorySpell();
-
 /**
  * @class SPLExtHeader
  * Header for Spell special effects

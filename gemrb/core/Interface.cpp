@@ -238,7 +238,6 @@ Interface::~Interface(void)
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
-	ReleaseMemorySpell();
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 
