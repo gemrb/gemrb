@@ -844,7 +844,7 @@ int Interface::LoadSprites()
 		// same layout as in the originals, with odd indices having the pressed cursor image
 		char fileName[32];
 		while (CursorCount < 99) {
-			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), CursorCount);
+			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), long(CursorCount));
 			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
@@ -854,8 +854,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).",
-				CursorCount, IE_CURSOR_WAY);
+		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).", long(CursorCount), IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
 	WindowManager::CursorMouseUp = Cursors[0];
@@ -1063,7 +1062,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	// we set the path to the data dir to cover unhardcoded and co,
 	// while plugins are statically linked, so it doesn't matter for them
 	// Also, support running from eg. KDevelop AppImages by checking the name.
-#ifdef DATA_DIR
+#if defined(DATA_DIR) && defined(__linux__)
 	const char* appDir = getenv("APPDIR");
 	const char* appImageFile = getenv("ARGV0");
 	if (appDir) {
