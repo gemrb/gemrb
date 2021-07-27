@@ -6208,8 +6208,8 @@ bool Actor::Persistent() const
 
 void Actor::GetNextAnimation()
 {
-	int RowNum = anims->AvatarsRowNum - 1;
-	if (RowNum<0)
+	size_t RowNum = anims->AvatarsRowNum - 1;
+	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);
@@ -6218,8 +6218,8 @@ void Actor::GetNextAnimation()
 
 void Actor::GetPrevAnimation()
 {
-	int RowNum = anims->AvatarsRowNum + 1;
-	if (RowNum>=CharAnimations::GetAvatarsCount() )
+	size_t RowNum = anims->AvatarsRowNum + 1;
+	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = 0;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);

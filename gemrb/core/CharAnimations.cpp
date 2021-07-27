@@ -235,7 +235,7 @@ size_t CharAnimations::GetAvatarsCount()
 	return AvatarTableLoader::Get().size();
 }
 
-const AvatarStruct &CharAnimations::GetAvatarStruct(int RowNum)
+const AvatarStruct &CharAnimations::GetAvatarStruct(size_t RowNum)
 {
 	return AvatarTableLoader::Get()[RowNum];
 }
@@ -1466,7 +1466,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part];
 			break;
 		default:
-			error("CharAnimations", "Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
+			error("CharAnimations", "Unknown animation type in avatars.2da row: %ld\n", AvatarsRowNum);
 	}
 }
 

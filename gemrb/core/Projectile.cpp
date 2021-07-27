@@ -274,11 +274,11 @@ void Projectile::CreateIteration()
 
 void Projectile::GetSmokeAnim()
 {
-	int AvatarsRowNum=CharAnimations::GetAvatarsCount();
+	size_t AvatarsRowNum = CharAnimations::GetAvatarsCount();
 
 	SmokeAnimID&=0xfff0; //this is a hack, i'm too lazy to figure out the subtypes
 
-	for(int i=0;i<AvatarsRowNum;i++) {
+	for (size_t i = 0; i < AvatarsRowNum; ++i) {
 		const AvatarStruct &as = CharAnimations::GetAvatarStruct(i);
 		if (as.AnimID==SmokeAnimID) {
 			smokebam = as.Prefixes[0];

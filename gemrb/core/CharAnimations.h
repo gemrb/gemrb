@@ -189,7 +189,7 @@ public:
 	PaletteHolder PartPalettes[PAL_MAX];
 	PaletteHolder ModPartPalettes[PAL_MAX];
 	PaletteHolder shadowPalette;
-	unsigned int AvatarsRowNum;
+	size_t AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ResRef ResRefBase;
 	ResRef PaletteResRef[5] = {};
@@ -225,7 +225,7 @@ public:
 
 public: //attribute functions
 	static size_t GetAvatarsCount();
-	static const AvatarStruct &GetAvatarStruct(int RowNum);
+	static const AvatarStruct &GetAvatarStruct(size_t RowNum);
 	unsigned int GetAnimationID() const;
 	int GetCircleSize() const;
 	int NoPalette() const;
