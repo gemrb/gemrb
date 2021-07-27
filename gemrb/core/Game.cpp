@@ -277,7 +277,7 @@ Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 	return NULL;
 }
 
-Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
+Actor* Game::GetPC(size_t slot, bool onlyalive) const
 {
 	if (slot >= PCs.size()) {
 		return NULL;
@@ -841,8 +841,8 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 {
 	// count the number of replaced actors, so we don't need to recheck them
 	// if their max level is still lower than ours, each check would also result in a substitution
-	unsigned int last = NPCs.size() - 1;
-	for (unsigned int i = 0; i < NPCs.size(); i++) {
+	size_t last = NPCs.size() - 1;
+	for (size_t i = 0; i < NPCs.size(); i++) {
 		if (NPCs[i]->Area == ResRef) {
 			if (i <= last && CheckForReplacementActor(i)) {
 				i--;
@@ -916,7 +916,7 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 }
 
 // check if the actor is in npclevel.2da and replace accordingly
-bool Game::CheckForReplacementActor(int i)
+bool Game::CheckForReplacementActor(size_t i)
 {
 	if (core->InCutSceneMode() || npclevels.empty()) {
 		return false;
@@ -1291,7 +1291,7 @@ void Game::PartyMemberDied(const Actor *actor)
 	//this could be null, in some extreme cases...
 	const Map *area = actor->GetCurrentArea();
 
-	unsigned int size = PCs.size();
+	size_t size = PCs.size();
 	Actor *react = NULL;
 	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
 		Actor *pc = PCs[i%size];

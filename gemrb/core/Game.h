@@ -318,7 +318,7 @@ public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
-	Actor* GetPC(unsigned int slot, bool onlyalive) const;
+	Actor* GetPC(size_t slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID) const;
 	Actor* FindNPC(unsigned int partyID) const;
@@ -385,7 +385,7 @@ public:
 	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
 	bool IsDay() const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
-	bool CheckForReplacementActor(int i);
+	bool CheckForReplacementActor(size_t i);
 
 	//journal entries
 	/** Deletes one or all journal entries if strref is -1 */

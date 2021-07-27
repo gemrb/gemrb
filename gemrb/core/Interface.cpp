@@ -1769,13 +1769,13 @@ bool Interface::IsAvailable(SClass_ID filetype) const
 
 WorldMap *Interface::GetWorldMap() const
 {
-	int index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
+	size_t index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
 	return worldmap->GetWorldMap(index);
 }
 
 WorldMap *Interface::GetWorldMap(const ResRef& area) const
 {
-	int index = worldmap->FindAndSetCurrentMap(area);
+	size_t index = worldmap->FindAndSetCurrentMap(area);
 	return worldmap->GetWorldMap(index);
 }
 
