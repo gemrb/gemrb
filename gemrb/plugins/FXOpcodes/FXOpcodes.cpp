@@ -5415,7 +5415,7 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			fx->Resource.SNPrintF("%.6s25");
+			fx->Resource.SNPrintF("%.6s25", game->Familiars[alignment]);
 		} else {
 			fx->Resource = game->Familiars[alignment];
 		}
@@ -6761,7 +6761,7 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		if (target->LuckyRoll(1,100,0)<25) {
 			ResRef spl;
 			spl.SNPrintF("%.7sF", fx->Resource.CString());
-			core->ApplySpell(ResRef(spl), target, Owner, fx->Power);
+			core->ApplySpell(spl, target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;
 	}
