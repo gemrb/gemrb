@@ -1163,7 +1163,7 @@ const ResRef& Game::GetFamiliar(size_t index) const
 	return Familiars[index];
 }
 
-void Game::SetFamiliar(const ResRef&& familiar, size_t index)
+void Game::SetFamiliar(ResRef&& familiar, size_t index)
 {
 	Familiars[index] = familiar;
 }

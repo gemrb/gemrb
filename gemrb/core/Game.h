@@ -413,7 +413,7 @@ public:
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
 	const ResRef& GetFamiliar(size_t index) const;
-	void SetFamiliar(const ResRef&& familiar, size_t index);
+	void SetFamiliar(ResRef&& familiar, size_t index);
 
 	bool IsBeastKnown(unsigned int Index) const {
 		if (!beasts) {
