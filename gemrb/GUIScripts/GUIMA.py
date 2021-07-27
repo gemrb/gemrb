@@ -182,7 +182,12 @@ def InitWorldMapWindow (Window):
 
 	# Done
 	Button = Window.GetControl (0)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	if GemRB.GetVar ("Travel") == -1:
+		Button.SetState (IE_GUI_BUTTON_ENABLED)
+		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMapWindow ())
+	else:
+		Button.SetState (IE_GUI_BUTTON_DISABLED)
+
 	Button.SetHotKey('m')
 
 	return
