@@ -221,7 +221,7 @@ View::UniqueDragOp Control::DragOperation()
 
 		actionTimer = &core->SetTimer(h, 0, 0);
 	}
-	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+	return make_unique<ControlDragOp>(this);
 }
 
 bool Control::AcceptsDragOperation(const DragOp& dop) const
