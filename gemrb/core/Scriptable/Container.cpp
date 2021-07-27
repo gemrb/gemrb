@@ -139,7 +139,7 @@ void Container::RefreshGroundIcons()
 
 	int count = MAX_GROUND_ICON_DRAWN;
 	while (count > i) {
-		groundicons[count--] = nullptr;
+		groundicons[--count] = nullptr;
 	}
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
