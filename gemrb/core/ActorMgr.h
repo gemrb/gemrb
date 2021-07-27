@@ -36,9 +36,9 @@ public:
 	virtual ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const = 0;
 
 	//returns saved size, updates internal offsets before save
-	virtual int GetStoredFileSize(Actor *ac) = 0;
+	virtual int GetStoredFileSize(const Actor *ac) = 0;
 	//saves file
-	virtual int PutActor(DataStream *stream, Actor *actor, bool chr=false) = 0;
+	virtual int PutActor(DataStream *stream, const Actor *actor, bool chr = false) = 0;
 };
 
 }
