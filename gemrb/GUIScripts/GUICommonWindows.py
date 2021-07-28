@@ -1728,6 +1728,8 @@ def UpdatePortraitWindow ():
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		if pic == None:
+			pic = ""
 		Button.SetPicture (pic, "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 

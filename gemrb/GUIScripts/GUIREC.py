@@ -127,6 +127,8 @@ def UpdateRecordsWindow (Window):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	pic = GemRB.GetPlayerPortrait (pc, 0)["Sprite"]
+	if not pic:
+		pic = ""
 	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
 		Button.SetPicture (pic, "NOPORTMD")
 	else:
