@@ -3224,7 +3224,7 @@ void Map::TriggerSpawn(Spawn *spawn)
 	//create spawns
 	int difficulty = spawn->Difficulty * core->GetGame()->GetTotalPartyLevel(true);
 	unsigned int spawncount = 0;
-	size_t i = RAND(0LU, spawn->Creatures.size() - 1);
+	size_t i = RAND(size_t(0), spawn->Creatures.size() - 1);
 	while (difficulty >= 0 && spawncount < spawn->Maximum) {
 		if (!SpawnCreature(spawn->Pos, spawn->Creatures[i], 0, 0, spawn->rwdist, &difficulty, &spawncount)) {
 			break;
