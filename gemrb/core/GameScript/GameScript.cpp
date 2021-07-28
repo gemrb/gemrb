@@ -2349,7 +2349,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s", triggerID, tmpstr);
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %s)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName(1));
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
