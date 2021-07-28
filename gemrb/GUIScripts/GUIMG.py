@@ -244,7 +244,7 @@ def RefreshMageLevel ():
 	return
 
 def OpenMageSpellInfoWindow ():
-	Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3, "GUIMG")
 
 	#back
 	Button = Window.GetControl (5)
@@ -302,9 +302,9 @@ def OnMageMemorizeSpell ():
 
 def OpenMageSpellRemoveWindow ():
 	if GameCheck.IsBG2():
-		Window = GemRB.LoadWindow (101)
+		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
-		Window = GemRB.LoadWindow (5)
+		Window = GemRB.LoadWindow (5, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -332,9 +332,9 @@ def OpenMageSpellRemoveWindow ():
 
 def OpenMageSpellUnmemorizeWindow (btn, val):
 	if GameCheck.IsBG2():
-		Window = GemRB.LoadWindow (101)
+		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
-		Window = GemRB.LoadWindow (5)
+		Window = GemRB.LoadWindow (5, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
