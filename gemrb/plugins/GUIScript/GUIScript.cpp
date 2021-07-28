@@ -3154,11 +3154,11 @@ static PyObject* GemRB_WorldMap_GetDestinationArea(PyObject* self, PyObject* arg
 		int i = RAND(0, 4);
 
 		for (int j = 0; j < 5; j++) {
-			const char *area = wal->EncounterAreaResRef[(i + j) % 5];
+			ResRef &area = wal->EncounterAreaResRef[(i + j) % 5];
 
-			if (area[0]) {
+			if (!area.IsEmpty()) {
 				displaymsg->DisplayConstantString(STR_AMBUSH, DMC_BG2XPGREEN);
-				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromString, area));
+				PyDict_SetItemString(dict, "Destination", DecRef(PyString_FromResRef, area));
 				//drop player in the middle of the map
 				PyDict_SetItemString(dict, "Entrance", DecRef(PyString_FromString, ""));
 				PyDict_SetItemString(dict, "Direction", DecRef(PyInt_FromLong, ADIRF_CENTER));
