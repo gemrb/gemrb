@@ -2224,9 +2224,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	}
 	
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		if (!Sender->locals->Lookup(poi, value) && valid) {
-			*valid = false;
-		}
+		Sender->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
