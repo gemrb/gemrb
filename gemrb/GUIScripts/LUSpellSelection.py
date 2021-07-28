@@ -174,7 +174,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 
 	# adjust the table for the amount of spells available for learning for free
 	# bg2 had SPLSRCKN, iwd2 also SPLBRDKN, but all the others lacked the tables
-	if SpellLearnTable == "MXSPLSOR":
+	if SpellLearnTable == "MXSPLSOR" or SpellLearnTable == "MXSPLSRC":
 		SpellLearnTable = "SPLSRCKN"
 	elif SpellLearnTable == "MXSPLBRD":
 		SpellLearnTable = "SPLBRDKN"
