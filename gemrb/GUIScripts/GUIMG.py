@@ -33,7 +33,6 @@ from ie_stats import *
 from ie_spells import LS_MEMO
 
 MageWindow = None
-MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
 
@@ -246,20 +245,12 @@ def RefreshMageLevel ():
 	return
 
 def OpenMageSpellInfoWindow ():
-	global MageSpellInfoWindow
-
-	if MageSpellInfoWindow != None:
-		if MageSpellInfoWindow:
-			MageSpellInfoWindow.Unload ()
-		MageSpellInfoWindow = None
-		return
-
-	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")

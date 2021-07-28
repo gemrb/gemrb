@@ -32,7 +32,6 @@ from ie_stats import *
 from ie_action import ACT_CAST
 
 PriestSpellWindow = None
-PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 
@@ -195,20 +194,12 @@ def RefreshPriestLevel ():
 	return
 
 def OpenPriestSpellInfoWindow ():
-	global PriestSpellInfoWindow
-
-	if PriestSpellInfoWindow != None:
-		if PriestSpellInfoWindow:
-			PriestSpellInfoWindow.Unload ()
-		PriestSpellInfoWindow = None
-		return
-
-	PriestSpellInfoWindow = Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3)
 
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
