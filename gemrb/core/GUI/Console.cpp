@@ -25,7 +25,7 @@
 
 namespace GemRB {
 
-constexpr size_t HistoryMaxSize = 5;
+constexpr size_t HistoryMaxSize = 10;
 
 Console::Console(const Region& frame, TextArea* ta)
 : TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
@@ -150,7 +150,7 @@ void Console::SaveHistory() const
 	std::string commands;
 	char command[100];
 
-	size_t histSize = std::min<size_t>(History.Size(), 10UL);
+	size_t histSize = std::min(History.Size(), HistoryMaxSize);
 	for (size_t i = histSize - 1; signed(i) >= 0; i--) {
 		const String& cmd = History.Retrieve(i).second;
 		snprintf(command, sizeof(command), "%ls\n", cmd.c_str());
