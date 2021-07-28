@@ -1,7 +1,8 @@
-GemRB git (ab01a3):
+GemRB git (fad7b1a23):
   New features:
     - 
     - faster loading and saving
+    - console history is now preserved
 
   Improved features:
     - 
