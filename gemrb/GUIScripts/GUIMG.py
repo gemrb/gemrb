@@ -259,7 +259,7 @@ def OpenMageSpellInfoWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellRemoveWindow)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellRemoveWindow(Window))
 			Button.SetText (63668)
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
@@ -300,7 +300,7 @@ def OnMageMemorizeSpell ():
 		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
-def OpenMageSpellRemoveWindow ():
+def OpenMageSpellRemoveWindow (parentWin):
 	if GameCheck.IsBG2():
 		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
@@ -317,6 +317,7 @@ def OpenMageSpellRemoveWindow ():
 	def RemoveSpell ():
 		OnMageRemoveSpell()
 		Window.Close()
+		parentWin.Close()
 	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveSpell)
 	Button.MakeDefault()
@@ -377,8 +378,6 @@ def OnMageUnmemorizeSpell (btn, index):
 	return
 
 def OnMageRemoveSpell ():
-	OpenMageSpellInfoWindow()
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
