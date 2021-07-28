@@ -81,6 +81,8 @@ static inline voidvoid my_dlsym(void *handle, const char *symbol)
 #endif
 
 #ifdef WIN32
+#define STRSAFE_NO_DEPRECATE
+#include <strsafe.h>
 #define FREE_PLUGIN( handle )  FreeLibrary( handle )
 #define GET_PLUGIN_SYMBOL( handle, name )  GetProcAddress( handle, name )
 #else
