@@ -386,7 +386,7 @@ reverb(*this)
 	Background = NULL;
 	BgDuration = 0;
 	LastGoCloser = 0;
-	AreaFlags = AreaType = AreaDifficulty = 0;
+	AreaFlags = AreaDifficulty = 0;
 	Rain = Snow = Fog = Lightning = DayNight = 0;
 	trackString = trackFlag = trackDiff = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;

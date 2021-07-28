@@ -125,7 +125,7 @@ AREImporter::AREImporter(void)
 	ItemsCount = VariablesCount = AmbiCount = TileCount = TrapCount = 0;
 	ActorCount = VerticesCount = NoteCount = 0;
 	ActorOffset = VerticesOffset = NoteOffset = EffectOffset = 0;
-	AreaDifficulty = AreaFlags = AreaType = 0;
+	AreaDifficulty = AreaFlags = 0;
 	SongHeader = RestHeader = bigheader = 0;
 	WRain = WSnow = WFog = WLightning = WUnknown = 0;
 	EmbeddedCreOffset = AnimOffset = AnimCount = DoorsOffset = DoorsCount = 0;
@@ -153,7 +153,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadDword(AreaFlags);
 	//skipping bg1 area connection fields
 	str->Seek( 0x48, GEM_STREAM_START );
-	str->ReadWord(AreaType);
+	str->ReadScalar<MapEnv, ieWord>(AreaType);
 	str->ReadWord(WRain);
 	str->ReadWord(WSnow);
 	str->ReadWord(WFog);

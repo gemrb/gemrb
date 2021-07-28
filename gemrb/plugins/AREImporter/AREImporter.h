@@ -38,7 +38,8 @@ private:
 	ResRef WEDResRef;
 	ieDword LastSave;
 	ieDword AreaFlags;
-	ieWord  AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
+	MapEnv AreaType = AT_UNINITIALIZED;
+	ieWord WRain, WSnow, WFog, WLightning, WUnknown;
 	ieDword ActorOffset, EmbeddedCreOffset, AnimOffset, AnimCount;
 	ieDword VerticesOffset;
 	ieDword DoorsCount, DoorsOffset;

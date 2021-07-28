@@ -101,13 +101,13 @@ void GameScript::SetAreaFlags(Scriptable* Sender, Action* parameters)
 void GameScript::AddAreaType(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->AreaType|=parameters->int0Parameter;
+	map->AreaType |= MapEnv(parameters->int0Parameter);
 }
 
 void GameScript::RemoveAreaType(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->AreaType&=~parameters->int0Parameter;
+	map->AreaType &= ~MapEnv(parameters->int0Parameter);
 }
 
 void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)

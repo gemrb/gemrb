@@ -75,17 +75,18 @@ class Wall_Polygon;
 #define AF_NOTRAVEL      64 // Travel not allowed
 */
 
-//area types
-#define AT_OUTDOOR        1
-#define AT_DAYNIGHT       2
-#define AT_WEATHER        4
-#define AT_CITY           8
-#define AT_FOREST         0x10
-#define AT_DUNGEON        0x20
-#define AT_EXTENDED_NIGHT 0x40
-#define AT_CAN_REST_INDOORS 0x80
-//...
-#define AT_PST_DAYNIGHT 0x400
+enum MapEnv : ieWord {
+	AT_UNINITIALIZED	= 0,
+	AT_OUTDOOR        	= 1,
+	AT_DAYNIGHT       	= 2,
+	AT_WEATHER        	= 4,
+	AT_CITY           	= 8,
+	AT_FOREST         	= 0x10,
+	AT_DUNGEON        	= 0x20,
+	AT_EXTENDED_NIGHT 	= 0x40,
+	AT_CAN_REST_INDOORS = 0x80,
+	AT_PST_DAYNIGHT 	= 0x400
+};
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible
@@ -369,7 +370,7 @@ public:
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
-	ieWord AreaType;
+	MapEnv AreaType = AT_UNINITIALIZED;
 	ieWord Rain, Snow, Fog, Lightning;
 	Bitmap ExploredBitmap;
 	Bitmap VisibleBitmap;
