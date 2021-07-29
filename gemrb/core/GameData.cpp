@@ -148,7 +148,7 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const ResRef &resRef, bool silent)
+int GameData::LoadTable(const char *resRef, bool silent)
 {
 	int ind = GetTableIndex(resRef);
 	if (ind != -1) {

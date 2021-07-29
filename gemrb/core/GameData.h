@@ -84,7 +84,7 @@ public:
 	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const ResRef &ResRef, bool silent=false);
+	int LoadTable(const char *ResRef, bool silent=false);
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const ResRef& resRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
