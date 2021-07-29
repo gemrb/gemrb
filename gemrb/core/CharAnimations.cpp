@@ -1466,7 +1466,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part];
 			break;
 		default:
-			error("CharAnimations", "Unknown animation type in avatars.2da row: %ld\n", AvatarsRowNum);
+			error("CharAnimations", "Unknown animation type in avatars.2da row: %lu\n", static_cast<unsigned long>(AvatarsRowNum));
 	}
 }
 
