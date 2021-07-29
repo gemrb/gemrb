@@ -306,13 +306,17 @@ def SpellsDonePress ():
 				if ScrollBar:
 					if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 						ScrollBar.SetVisible(True)
+						ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
+
 						if chargen:
 							ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount ) , 6 ) + 1 )
 						else:
-							ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount-1 ) , 5 ) + 1 )
+							extraRowCount = GUICommon.ceildiv (len (Spells[i]) - ButtonCount - 1, 5) + 1
+							ScrollBar.SetVarAssoc ("SpellTopIndex", extraRowCount, 0, extraRowCount)
 					else:
 						ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
 						ScrollBar.SetVisible(False)
+						ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
 
 				# show the spells and set the done button to off
 				ShowSpells ()
