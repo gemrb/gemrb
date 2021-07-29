@@ -92,6 +92,7 @@ public:
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, char*& dest) const;
 	bool Lookup(const char* key, void*& dest) const;
+	bool HasKey(const char* key) const;
 
 	// Operations
 	void SetAtCopy(const char* key, const char* newValue);

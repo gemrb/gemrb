@@ -103,9 +103,8 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 		int l = strlen(value);
 		Function *fun;
-		void *tmp;
 
-		if (l<0 || l>1 || keymap.Lookup(value, tmp) ) {
+		if (l < 0 || l > 1 || keymap.HasKey(value)) {
 			print("Ignoring key %s", value);
 			continue;
 		}

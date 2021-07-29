@@ -403,9 +403,7 @@ void Interface::HandleEvents()
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "OtherWindow", tmp );
-		if (tmp == (ieDword) ~0) {
+		if (!vars->HasKey("OtherWindow")) {
 			EventFlag &= ~EF_SHOWMAP;
 			guiscript->RunFunction( "GUIMA", "ShowMap" );
 		}
@@ -2831,10 +2829,9 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
 		const char* tag = defaults->GetTagNameByIndex(i);
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
-			ieDword nothing;
 			const char* key = defaults->GetKeyNameByIndex(tag, j);
 			//skip any existing entries. GemRB.cfg has priority
-			if (!vars->Lookup(key, nothing)) {
+			if (!vars->HasKey(key)) {
 				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
 				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
 			}

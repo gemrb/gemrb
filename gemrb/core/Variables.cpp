@@ -340,6 +340,12 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 	return true;
 }
 
+bool Variables::HasKey(const char* key) const
+{
+	unsigned int nHash;
+	return GetAssocAt(key, nHash) != nullptr;
+}
+
 void Variables::SetAtCopy(const char* key, const char* value)
 {
 	size_t len = strlen(value)+1;
