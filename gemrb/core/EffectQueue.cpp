@@ -2285,7 +2285,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	ieDword idx = entry.stat;
 	ieDword val = entry.value;
 	ieDword rel = entry.relation;
-	if (idx == USHRT_MAX) {
+	if (idx == STI_INVALID) {
 		// bad entry, don't match
 		return false;
 	}
@@ -2295,8 +2295,6 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		val = value;
 	}
 	switch (idx) {
-		case STI_INVALID:
-			return false;
 		case STI_EA_RELATION:
 			return DiffCore(EARelation(Owner, target), val, rel);
 		case STI_ALLIES:
