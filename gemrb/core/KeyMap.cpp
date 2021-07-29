@@ -101,10 +101,8 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		//change internal spaces to underscore
 		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';
 
-		int l = strlen(value);
-		Function *fun;
-
-		if (l < 0 || l > 1 || keymap.HasKey(value)) {
+		size_t l = strlen(value);
+		if (l > 1 || keymap.HasKey(value)) {
 			print("Ignoring key %s", value);
 			continue;
 		}
@@ -123,7 +121,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			group = kmtable->QueryField("Default","GROUP");
 			print("Adding key %s with function %s::%s", value, moduleName, function);
 		}
-		fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
+		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
 
 		// lookup by either key or name
 		keymap.SetAt(value, fun);
