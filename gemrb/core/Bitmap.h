@@ -113,6 +113,10 @@ public:
 	PixelIterator<uint8_t> GetIterator(ARGS&&... args) noexcept {
 		return PixelIterator<uint8_t>(std::forward<ARGS>(args)...);
 	}
+	
+	void fill(uint8_t val) noexcept {
+		std::fill(begin(), end(), val);
+	}
 };
 
 }

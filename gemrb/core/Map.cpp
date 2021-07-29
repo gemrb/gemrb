@@ -349,6 +349,9 @@ Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitma
 ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize()),
 reverb(*this)
 {
+	ExploredBitmap.fill(0);
+	VisibleBitmap.fill(0);
+
 	LightMap = std::move(lm);
 	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
@@ -3326,7 +3329,7 @@ int Map::GetExploredMapSize() const
 
 void Map::FillExplored(bool explored)
 {
-	std::fill(ExploredBitmap.begin(), ExploredBitmap.end(), explored ? 0xff : 0x00);
+	ExploredBitmap.fill(explored ? 0xff : 0x00);
 }
 
 void Map::ExploreTile(const Point &p)
@@ -3384,7 +3387,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	std::fill(VisibleBitmap.begin(), VisibleBitmap.end(), 0);
+	VisibleBitmap.fill(0);
 	
 	for (const auto actor : actors) {
 		if (!actor->Modified[IE_EXPLORE]) continue;
