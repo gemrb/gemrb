@@ -43,8 +43,15 @@ public:
 		delete [] data;
 	}
 	
-	Bitmap(const Bitmap&) = delete;
-	Bitmap& operator=(const Bitmap&) = delete;
+	Bitmap(const Bitmap& bm)
+	: Bitmap(bm.size, bm.data) {}
+	
+	Bitmap& operator=(const Bitmap& bm) {
+		if (&bm != this) {
+			std::copy(bm.data, bm.data + size.Area(), data);
+		}
+		return *this;
+	}
 	
 	Bitmap(Bitmap&& other) noexcept {
 		std::swap(data, other.data);
