@@ -894,7 +894,7 @@ bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
 {
 	// Returns true if map at (x;y) was explored, else false.
 	const Size fogSize = FogMapSize();
-	if (p.x < 0 || p.x >= fogSize.w || p.y < 0 || p.y >= fogSize.h) {
+	if (!fogSize.PointInside(p)) {
 		// out of bounds is always foggy
 		return false;
 	}
@@ -3336,7 +3336,7 @@ void Map::ExploreTile(const Point &p)
 	Point fogP = ConvertPointToFog(p);
 
 	const Size fogSize = FogMapSize();
-	if (fogP.x < 0 || fogP.x >= fogSize.w || fogP.y < 0 || fogP.y >= fogSize.h) {
+	if (!fogSize.PointInside(p)) {
 		return;
 	}
 	

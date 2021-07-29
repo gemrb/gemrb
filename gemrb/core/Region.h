@@ -86,6 +86,8 @@ public:
 	int Area() const { return w * h; }
 	bool IsZero() const { return w == 0 && h == 0; }
 	bool IsInvalid() const { return w <= 0 || h <= 0; }
+	
+	bool PointInside(const Point& p) const { return p.x >= 0 && p.x < w && p.y >= 0 && p.y < h; }
 };
 
 /**
