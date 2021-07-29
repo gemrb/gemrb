@@ -182,12 +182,8 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	ambim = NULL;
 	hasReverbProperties = false;
-#ifdef HAVE_OPENAL_EFX_H
-	hasEFX = false;
-	efxEffectSlot = efxEffect = 0;
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
-#endif
 }
 
 void OpenALAudioDriver::PrintDeviceList ()
@@ -1063,12 +1059,11 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 	return GEM_OK;
 }
 
-#ifdef HAVE_OPENAL_EFX_H
 void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 	if (hasEFX) {
 		mapReverb.getReverbProperties(reverbProperties);
 		hasReverbProperties = true;
-
+#ifdef HAVE_OPENAL_EFX_H
 		alDeleteEffects(1, &efxEffect);
 		alGenEffects(1, &efxEffect);
 
@@ -1093,12 +1088,9 @@ void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 		}
 
 		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+#endif
 	}
 }
-#else
-void OpenALAudioDriver::UpdateMapAmbient(MapReverb&) {
-}
-#endif
 
 #ifdef __clang__
 #pragma clang diagnostic pop

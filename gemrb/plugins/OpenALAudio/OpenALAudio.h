@@ -150,12 +150,10 @@ private:
 	bool InitEFX(void);
 	bool hasReverbProperties;
 
-#ifdef HAVE_OPENAL_EFX_H
-	bool hasEFX;
-	ALuint efxEffectSlot;
-	ALuint efxEffect;
+	bool hasEFX = false;
+	ALuint efxEffectSlot = 0;
+	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
-#endif
 };
 
 }
