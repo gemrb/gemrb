@@ -2388,6 +2388,11 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_GENDER:
 		case STI_STATE:
 		default:
+			if (idx >= STI_EA) {
+				// the 0 will never be hit, since that is for STI_SUMMONED_NUM
+				static const size_t fake2real[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, 0, IE_STATE_ID };
+				idx = fake2real[idx - STI_EA];
+			}
 			ieDword stat;
 			stat = STAT_GET(idx);
 			if (idx == IE_SUBRACE) {
