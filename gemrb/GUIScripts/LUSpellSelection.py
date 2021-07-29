@@ -57,6 +57,8 @@ SpellBookType = IE_SPELL_TYPE_WIZARD
 if GameCheck.IsIWD2():
 	IWD2 = True
 
+NewScrollBarID = 1000
+
 def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, booktype=0):
 	"""Opens the spells selection window.
 
@@ -121,7 +123,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellsTextArea = SpellsWindow.GetControl (27)
 		SpellPointsLeftLabel = SpellsWindow.GetControl (0x1000001b)
 		if (EnhanceGUI):
-			sb = SpellsWindow.CreateScrollBar (1000, {'x' : 325, 'y' : 42, 'w' : 16, 'h' :252})
+			sb = SpellsWindow.CreateScrollBar (NewScrollBarID, {'x' : 325, 'y' : 42, 'w' : 16, 'h' : 252})
 			sb.SetVisible(False)
 		SpellStart = 2
 
@@ -149,7 +151,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellsTextArea = SpellsWindow.GetControl(26)
 			SpellPointsLeftLabel = SpellsWindow.GetControl (0x10000018)
 		if(EnhanceGUI):
-			sb = SpellsWindow.CreateScrollBar (1000, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252})
+			sb = SpellsWindow.CreateScrollBar (NewScrollBarID, {'x' : 290, 'y' : 142, 'w' : 16, 'h' : 252})
 			sb.SetVisible(False)
 			#25th spell button for sorcerers
 			SpellsWindow.CreateButton (24, 231, 345, 42, 42)
@@ -233,7 +235,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellLevel = i
 			SpellBook = [0]*len(Spells[i])
 
-			ScrollBar = SpellsWindow.GetControl (1000)
+			ScrollBar = SpellsWindow.GetControl (NewScrollBarID)
 			if ScrollBar:
 				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
 				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
@@ -300,7 +302,7 @@ def SpellsDonePress ():
 				if not (chargen and GameCheck.IsBG1()):
 					SpellBook = [0]*len(Spells[i])
 
-				ScrollBar = SpellsWindow.GetControl (1000)
+				ScrollBar = SpellsWindow.GetControl (NewScrollBarID)
 				if ScrollBar:
 					if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
 						ScrollBar.SetVisible(True)
