@@ -411,6 +411,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		return NULL;
 	}
 
+	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
+		Log(ERROR, "AREImporter", "No tile map manager available.");
+		return nullptr;
+	}
+	
 	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : nullptr, hm->GetBitmap());
 	
 	if (core->config.SaveAsOriginal) {
@@ -437,12 +442,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
 	} else {
 		map->SetTrackString(ieStrRef(-1), false, 0);
-	}
-
-	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
-		Log(ERROR, "AREImporter", "No tile map manager available.");
-		delete map;
-		return NULL;
 	}
 	
 	//if the Script field is empty, the area name will be copied into it on first load
