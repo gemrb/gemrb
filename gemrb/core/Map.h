@@ -24,6 +24,7 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "Bitmap.h"
 #include "Interface.h"
 #include "MapReverb.h"
 #include "Scriptable/Scriptable.h"

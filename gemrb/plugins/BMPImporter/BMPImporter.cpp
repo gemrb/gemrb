@@ -256,21 +256,6 @@ int BMPImporter::GetPalette(int colors, Color* pal)
 	return -1;
 }
 
-Bitmap BMPImporter::GetBitmap()
-{
-	unsigned char *p = ( unsigned char * ) pixels;
-	if (BitCount == 32) {
-		Log(ERROR, "BMPImporter", "Don't know how to handle 32bpp bitmap from %s...", str->filename);
-		Bitmap bitmap(size);
-		for (int i = 0; i < size.Area(); ++i) {
-			bitmap[i] = *(p + (i * 4));
-		}
-	}
-
-	assert(BitCount == 8);
-	return Bitmap(size, p);
-}
-
 #include "plugindef.h"
 
 GEMRB_PLUGIN(0xD768B1, "BMP File Reader")

@@ -27,19 +27,6 @@ namespace GemRB {
 
 const TypeID ImageMgr::ID = { "ImageMgr" };
 
-Bitmap ImageMgr::GetBitmap()
-{
-	Bitmap bitmap(size);
-
-	Holder<Sprite2D> spr = GetSprite2D();
-	auto it = spr->GetIterator();
-	for (int i = 0; i < size.Area(); ++i) {
-		bitmap[i] = *it;
-		++it;
-	}
-	return bitmap;
-}
-
 int ImageMgr::GetPalette(int /*colors*/, Color* /*pal*/)
 {
 	return -1;
