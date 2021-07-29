@@ -115,7 +115,13 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 		}
 
 		if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
-			video->BlitSprite(areaIndicator, offset);
+			Point indicatorPos = offset - icon->Frame.origin;
+			indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
+			// bg2 centered also vertically, while the rest didn't
+			if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+				indicatorPos.y += areaIndicator->Frame.y + icon->Frame.h / 2 - areaIndicator->Frame.h / 2;
+			}
+			video->BlitSprite(areaIndicator, indicatorPos);
 		}
 	}
 
