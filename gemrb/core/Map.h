@@ -471,6 +471,7 @@ public:
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
+	int GetHeight(const Point &p) const;
 	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const Point&) const;
 	PathMapFlags GetBlocked(const Point&, int size) const;

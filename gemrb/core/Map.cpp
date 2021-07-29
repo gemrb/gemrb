@@ -2465,6 +2465,18 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	}
 }
 
+int Map::GetHeight(const Point &p) const
+{
+	// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
+	// this covers the range -7 – +7
+	// since the image is grey we can use any channel for the mapping
+	int val = HeightMap->GetPixel(Map::ConvertCoordToTile(p)).r;
+	constexpr uint8_t input_range = 255;
+	constexpr uint8_t output_range = 14;
+
+	return val * output_range / input_range;
+}
+
 // a more thorough, but more expensive version for the cases when it matters
 PathMapFlags Map::GetBlocked(const Point &p, int size) const
 {

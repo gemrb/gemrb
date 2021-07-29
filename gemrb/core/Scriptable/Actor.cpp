@@ -8444,22 +8444,7 @@ bool Actor::HasBodyHeat() const
 
 uint8_t Actor::GetElevation() const
 {
-	// pst heightmaps are all uniform and shouldn't be used
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		return 0;
-	}
-
-	uint8_t height = area ? area->HeightMap->GetPixel(Map::ConvertCoordToTile(Pos)).r : 0;
-	if (height > 15) {
-		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
-		// cannot work out how they work, so here is an incorrect
-		// hack (probably). please fix!
-		
-		// FIXME: is it possible that this is signed instead of unsigned?
-		// or just the 4 least significant bits? sign magnitude?
-		height = 15;
-	}
-	return height;
+	return area ? area->GetHeight(Pos) : 0;
 }
 
 bool Actor::UpdateDrawingState()
