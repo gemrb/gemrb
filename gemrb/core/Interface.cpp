@@ -403,10 +403,8 @@ void Interface::HandleEvents()
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
-		if (!vars->HasKey("OtherWindow")) {
-			EventFlag &= ~EF_SHOWMAP;
-			guiscript->RunFunction( "GUIMA", "ShowMap" );
-		}
+		EventFlag &= ~EF_SHOWMAP;
+		guiscript->RunFunction("GUIMA", "ShowMap");
 		return;
 	}
 
