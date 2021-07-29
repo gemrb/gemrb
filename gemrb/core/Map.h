@@ -366,7 +366,7 @@ class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
 	Holder<Sprite2D> LightMap;
-	Bitmap HeightMap;
+	Holder<Sprite2D> HeightMap;
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
@@ -415,7 +415,7 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 public:
-	Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm);
+	Map(TileMap *tm, Holder<Sprite2D> lm, Holder<Sprite2D> sr, Holder<Sprite2D> sm, Holder<Sprite2D> hm);
 	~Map(void) override;
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);

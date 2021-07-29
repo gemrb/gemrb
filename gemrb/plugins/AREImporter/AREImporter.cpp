@@ -416,7 +416,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		return nullptr;
 	}
 	
-	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetBitmap(), sm ? sm->GetSprite2D() : nullptr, hm->GetBitmap());
+	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetSprite2D(), sm ? sm->GetSprite2D() : nullptr, hm->GetSprite2D());
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;

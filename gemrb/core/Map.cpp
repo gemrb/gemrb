@@ -344,7 +344,7 @@ Point Map::ConvertCoordFromTile(const Point& p)
 	return Point(p.x * 16, p.y * 12);
 }
 
-Map::Map(TileMap *tm, Holder<Sprite2D> lm, Bitmap sr, Holder<Sprite2D> sm, Bitmap hm)
+Map::Map(TileMap *tm, Holder<Sprite2D> lm, Holder<Sprite2D> sr, Holder<Sprite2D> sm, Holder<Sprite2D> hm)
 : Scriptable(ST_AREA), TMap(tm), HeightMap(std::move(hm)),
 ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize()),
 reverb(*this)
@@ -356,18 +356,17 @@ reverb(*this)
 	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
 	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
-	Size size = sr.GetSize();
-	assert(mapSize.w >= size.w && mapSize.h >= size.h);
+
 	//Internal Searchmap
 	SrchMap = (PathMapFlags *) calloc(mapSize.Area(), sizeof(PathMapFlags));
 	MaterialMap = (unsigned short *) calloc(mapSize.Area(), sizeof(unsigned short));
-	for (int y = 0; y < size.h; ++y) {
-		for (int x = 0; x < size.w; ++x) {
-			uint8_t value = uint8_t(PathMapFlags(sr[Point(x,y)]) & PathMapFlags::AREAMASK);
-			size_t index = y * mapSize.w + x;
-			SrchMap[index] = PathFinder::Get().Passable[value];
-			MaterialMap[index] = value;
-		}
+	assert(sr->Format().Bpp == 1);
+	auto it = sr->GetIterator();
+	auto end = it.end(it);
+	for (size_t index = 0; it != end; ++it, ++index) {
+		uint8_t value = uint8_t(PathMapFlags(*it) & PathMapFlags::AREAMASK);
+		SrchMap[index] = PathFinder::Get().Passable[value];
+		MaterialMap[index] = value;
 	}
 	
 	area=this;
