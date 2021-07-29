@@ -236,22 +236,7 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 			SpellBook = [0]*len(Spells[i])
 
 			ScrollBar = SpellsWindow.GetControl (NewScrollBarID)
-			if ScrollBar:
-				# only scroll if we have more than 24 spells or 25 if extra 25th spell slot is available in sorcs LevelUp
-				if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
-					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
-					ScrollBar.SetVisible(True)
-					extraCount = len (Spells[i]) - ButtonCount
-					if chargen:
-						count = GUICommon.ceildiv (extraCount, 6) + 1
-						ScrollBar.SetVarAssoc ("SpellTopIndex", count, 0, count)
-					else: #there are five rows of 5 spells in level up of sorcs
-						count = GUICommon.ceildiv (extraCount-1, 5) + 1
-						ScrollBar.SetVarAssoc ("SpellTopIndex", count, 0, count)
-				else:
-					ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
-					ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
-					ScrollBar.SetVisible(False)
+			UpdateScrollBar (ScrollBar, len (Spells[i]))
 
 			# show our spells
 			ShowSpells ()
@@ -267,6 +252,27 @@ def OpenSpellsWindow (actor, table, level, diff, kit=0, gen=0, recommend=True, b
 		SpellsWindow.ShowModal (MODAL_SHADOW_GRAY)
 
 	return
+
+def UpdateScrollBar (ScrollBar, SpellCount):
+	if not ScrollBar:
+		return
+
+	# only scroll if we have more spells than buttons
+	# that's 25 if the extra 25th spell slot is available in sorcerer level up
+	if SpellCount > ButtonCount + ExtraSpellButtons():
+		ScrollBar.SetVisible (True)
+		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
+
+		extraCount = SpellCount - ButtonCount
+		if chargen:
+			count = GUICommon.ceildiv (extraCount, 6) + 1
+		else: # there are five rows of 5 spells in level up of sorcerers
+			count = GUICommon.ceildiv (extraCount - 1, 5) + 1
+		ScrollBar.SetVarAssoc ("SpellTopIndex", count, 0, count)
+	else:
+		ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
+		ScrollBar.SetVisible (False)
+		ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
 
 def SpellsDonePress ():
 	"""Move to the next assignable level.
@@ -303,20 +309,7 @@ def SpellsDonePress ():
 					SpellBook = [0]*len(Spells[i])
 
 				ScrollBar = SpellsWindow.GetControl (NewScrollBarID)
-				if ScrollBar:
-					if len (Spells[i]) > ( ButtonCount + ExtraSpellButtons() ):
-						ScrollBar.SetVisible(True)
-						ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, ShowSpells)
-
-						if chargen:
-							ScrollBar.SetVarAssoc ("SpellTopIndex", GUICommon.ceildiv ( ( len (Spells[i])-ButtonCount ) , 6 ) + 1 )
-						else:
-							extraRowCount = GUICommon.ceildiv (len (Spells[i]) - ButtonCount - 1, 5) + 1
-							ScrollBar.SetVarAssoc ("SpellTopIndex", extraRowCount, 0, extraRowCount)
-					else:
-						ScrollBar.SetVarAssoc ("SpellTopIndex", 0)
-						ScrollBar.SetVisible(False)
-						ScrollBar.SetEvent (IE_GUI_SCROLLBAR_ON_CHANGE, None)
+				UpdateScrollBar (ScrollBar, len (Spells[i]))
 
 				# show the spells and set the done button to off
 				ShowSpells ()
