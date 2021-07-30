@@ -410,11 +410,6 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		Log(ERROR, "AREImporter", "No heightmap available.");
 		return NULL;
 	}
-
-	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
-		Log(ERROR, "AREImporter", "No tile map manager available.");
-		return nullptr;
-	}
 	
 	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetSprite2D(), sm ? sm->GetSprite2D() : nullptr, hm->GetSprite2D());
 	
