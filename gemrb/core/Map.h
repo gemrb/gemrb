@@ -265,12 +265,6 @@ public:
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 };
 
-class TerrainSounds {
-public:
-	ResRef Group;
-	ResRef Sounds[16];
-};
-
 class SpawnGroup {
 	std::vector<ResRef> ResRefs;
 	int level;
