@@ -539,8 +539,6 @@ public:
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);
 
-	int GetWidth() const { return mapSize.w; }
-	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
 	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
