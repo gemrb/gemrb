@@ -142,8 +142,8 @@ void Container::RefreshGroundIcons()
 		groundicons[--count] = nullptr;
 	}
 	while (i--) {
-		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
-		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference
+		const CREItem* slot = inventory.GetSlotItem(i); //borrowed reference
+		const Item* itm = gamedata->GetItem(slot->ItemResRef); //cached reference
 		if (!itm) continue;
 		//well, this is required in PST, needs more work if some other
 		//game is broken by not using -1,0

@@ -126,7 +126,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 	 font styles are non functional too
 	 */
 
-	FT_Bitmap* bitmap;
+	const FT_Bitmap* bitmap;
 	uint8_t* pixels = NULL;
 
 	/* Render the glyph */
@@ -153,7 +153,7 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 
 	pixels = (uint8_t*)malloc(sprSize.w * sprSize.h);
 	uint8_t* dest = pixels;
-	uint8_t* src = bitmap->buffer;
+	const uint8_t* src = bitmap->buffer;
 
 	for( int row = 0; row < sprSize.h; row++ ) {
 		// TODO: handle italics. we will need to offset the row by font->glyph_italics * row i think.

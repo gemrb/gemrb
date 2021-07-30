@@ -301,7 +301,7 @@ void Projectile::Setup()
 	timeStartStep = time;
 
 	if(ExtFlags&PEF_TEXT) {
-		Actor *act = area->GetActorByGlobalID(Caster);
+		const Actor *act = area->GetActorByGlobalID(Caster);
 		if(act) {
 			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act,0);
 		}
@@ -647,7 +647,7 @@ void Projectile::UpdateSound()
 void Projectile::ChangePhase()
 {
 	if (Target) {
-		Actor *target = area->GetActorByGlobalID(Target);
+		const Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
 			phase = P_EXPIRED;
 			return;
@@ -933,7 +933,7 @@ void Projectile::SetTarget(const Point &p)
 
 void Projectile::SetTarget(ieDword tar, bool fake)
 {
-	Actor *target = NULL;
+	const Actor *target = nullptr;
 
 	if (fake) {
 		Target = 0;
@@ -965,7 +965,7 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 
 		//replan the path in case the source moved (only for line projectiles)
 		if(ExtFlags&PEF_LINE) {
-			Actor *c = area->GetActorByGlobalID(Caster);
+			const Actor *c = area->GetActorByGlobalID(Caster);
 			if(c && c->Pos!=Pos) {
 				Pos=c->Pos;
 				NextTarget(target->Pos);
@@ -1676,7 +1676,7 @@ void Projectile::SetupWall()
 
 void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	PathNode *iter = path;
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
@@ -1702,7 +1702,7 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 
 void Projectile::DrawTravel(const Region& viewport)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	BlitFlags flag;
 
 	if(ExtFlags&PEF_HALFTRANS) {

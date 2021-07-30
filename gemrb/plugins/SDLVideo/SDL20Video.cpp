@@ -570,7 +570,7 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 	int numf = SDL_GetNumTouchFingers(device);
 
 	for (int i = 0; i < numf; ++i) {
-		SDL_Finger* finger = SDL_GetTouchFinger(device, i);
+		const SDL_Finger* finger = SDL_GetTouchFinger(device, i);
 		assert(finger);
 
 		fingers[i].id = finger->id;
@@ -595,7 +595,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
-				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
 				if (removedController == gameController) {
 					SDL_GameControllerClose(gameController);
 					gameController = nullptr;

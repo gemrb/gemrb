@@ -43,7 +43,7 @@ void TileOverlay::Draw(const Region& viewport, std::vector<TileOverlayPtr> &over
 	int dx = ( std::max(viewport.x, 0) + viewport.w + 63 ) / 64;
 	int dy = ( std::max(viewport.y, 0) + viewport.h + 63 ) / 64;
 
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	assert(game);
 	const Color* globalTint = game->GetGlobalTint();
 	if (globalTint) {

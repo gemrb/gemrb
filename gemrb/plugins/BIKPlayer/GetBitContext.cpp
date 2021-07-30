@@ -135,7 +135,7 @@ void GetBitContext::read_tree(Tree *tree)
  */
 void GetBitContext::merge( uint8_t *dst, uint8_t *src, int size)
 {
-	uint8_t *src2 = src + size;
+	const uint8_t *src2 = src + size;
 	int size2 = size;
 
 	do {

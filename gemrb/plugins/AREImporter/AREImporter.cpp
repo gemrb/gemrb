@@ -1402,7 +1402,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		DataStream *fs = new SlicedStream( str, TrapEffOffset, TrapSize);
 
 		ReadEffects(fs, fxqueue, TrapEffectCount);
-		Actor *caster = core->GetGame()->FindPC(Owner + 1);
+		const Actor *caster = core->GetGame()->FindPC(Owner + 1);
 		pro->SetEffects(fxqueue);
 		if (caster) {
 			// Since the level info isn't stored, we assume it's the same as if the trap was just placed.
@@ -1553,7 +1553,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 
 	VerticesCount = 0;
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
-		InfoPoint *ip=map->TMap->GetInfoPoint(i);
+		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
 			VerticesCount+=ip->outline->Count();
 		} else {
@@ -1561,12 +1561,12 @@ int AREImporter::GetStoredFileSize(Map *map)
 		}
 	}
 	for (unsigned int i = 0; i < ContainersCount; i++) {
-		Container *c=map->TMap->GetContainer(i);
+		const Container *c = map->TMap->GetContainer(i);
 		if (c->outline)
 			VerticesCount+=c->outline->Count();
 	}
 	for (unsigned int i = 0; i < DoorsCount; i++) {
-		Door *d=map->TMap->GetDoor(i);
+		const Door *d = map->TMap->GetDoor(i);
 		auto open = d->OpenTriggerArea();
 		auto closed = d->ClosedTriggerArea();
 		if (open)
@@ -1603,7 +1603,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	for (unsigned int i = 0; i < TrapCount; i++) {
 		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
-			EffectQueue *fxqueue = pro->GetEffects();
+			const EffectQueue *fxqueue = pro->GetEffects();
 			if (fxqueue) {
 				headersize += fxqueue->GetSavedEffectsCount() * 0x108;
 			}
@@ -1840,7 +1840,7 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map)
 {
 	//regions
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
-		InfoPoint *ip = map->TMap->GetInfoPoint(i);
+		const InfoPoint *ip = map->TMap->GetInfoPoint(i);
 		if (ip->outline) {
 			PutPoints(stream, ip->outline->vertices);
 		} else {
@@ -2092,7 +2092,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i = 0; i < ActorCount; i++) {
-		Actor *ac = map->GetActor(i, false);
+		const Actor *ac = map->GetActor(i, false);
 
 		stream->Write( ac->GetScriptName(), 32);
 		tmpWord = (ieWord) ac->Pos.x;
@@ -2141,7 +2141,7 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	CreatureOffset = EmbeddedCreOffset;
 	for (unsigned int i = 0; i < ActorCount; i++) {
 		assert(stream->GetPos() == CreatureOffset);
-		Actor *ac = map->GetActor(i, false);
+		const Actor *ac = map->GetActor(i, false);
 
 		//reconstructing offsets again
 		CreatureOffset += am->GetStoredFileSize(ac);
@@ -2368,7 +2368,7 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 	while(i--) {
 		ieWord tmpWord = 0;
 		ieByte tmpByte = 0xff;
-		Projectile *pro = map->GetNextTrap(piter);
+		const Projectile *pro = map->GetNextTrap(piter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
 			//off by one compared to projectl.ids

@@ -313,7 +313,7 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 	while(!pending.empty()) {
 		i=pending.front();
 		pending.pop_front();
-		WMPAreaEntry* ae=area_entries[i];
+		const WMPAreaEntry* ae = area_entries[i];
 		memset( seen_entry, -1, memsize );
 		//all directions should be used
 		for(int d=0;d<4;d++) {
@@ -325,8 +325,8 @@ int WorldMap::CalculateDistances(const ResRef& areaName, int direction)
 				break;
 			}
 			for(;j<k;j++) {
-				WMPAreaLink* al = area_links[j];
-				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
+				const WMPAreaLink* al = area_links[j];
+				const WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 				unsigned int mydistance = (unsigned int) Distances[i];
 
 				// we must only process the FIRST seen link to each area from this one
@@ -359,7 +359,7 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 {
 	unsigned int cnt = GetEntryCount();
 	for (unsigned int i = 0; i < cnt; i++) {
-		WMPAreaEntry *ae=area_entries[i];
+		const WMPAreaEntry *ae = area_entries[i];
 		for (int direction=0;direction<4;direction++)
 		{
 			int j=ae->AreaLinksIndex[direction];
@@ -377,7 +377,7 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index) const
 WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 {
 	unsigned int i;
-	WMPAreaEntry *ae=GetArea( A, i );
+	const WMPAreaEntry *ae = GetArea(A, i);
 	if (!ae) {
 		return NULL;
 	}
@@ -388,7 +388,7 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 		unsigned int k = ae->AreaLinksIndex[i];
 		while(j--) {
 			WMPAreaLink *al = area_links[k++];
-			WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
+			const WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
 			//or arearesref?
 			if (ae2->AreaName == B) {
 				return al;
@@ -407,7 +407,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ResRef& areaName, bool &encounter)
 		return NULL;
 	}
 	unsigned int i;
-	WMPAreaEntry *ae=GetArea( areaName, i ); //target area
+	const WMPAreaEntry *ae = GetArea(areaName, i); //target area
 	if (!ae) {
 		Log(ERROR, "WorldMap", "No such area: %s", areaName.CString());
 		return NULL;
@@ -474,8 +474,8 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 	ae->IconSeq = -1;
 	ae->LoadScreenResRef.Reset();
 
-	WMPAreaEntry *src = area_entries[i];
-	WMPAreaEntry *dest = area_entries[link->AreaIndex];
+	const WMPAreaEntry *src = area_entries[i];
+	const WMPAreaEntry *dest = area_entries[link->AreaIndex];
 	ae->pos.x = src->pos.x + (dest->pos.x - src->pos.x) / 2;
 	ae->pos.y = src->pos.y + (dest->pos.y - src->pos.y) / 2;
 
@@ -561,7 +561,7 @@ void WorldMap::UpdateAreaVisibility(const ResRef& areaName, int direction)
 		return;
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
-		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];
+		const WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction] + i];
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
 			Log(DEBUG, "WorldMap", "Updated Area visibility: %s (accessible and visible)", ae2->AreaName.CString());
@@ -585,7 +585,7 @@ void WorldMap::UpdateReachableAreas() const
 	if (!tab) {
 		return;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) {
 		return;
 	}

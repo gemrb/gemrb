@@ -88,7 +88,7 @@ Holder<Sprite2D> MOSImporter::GetSprite2D()
 				( Rows * Cols * 4 ) + blockoffset,
 				GEM_STREAM_START );
 			str->Read( blockpixels, bw * bh );
-			unsigned char * bp = blockpixels;
+			const unsigned char* bp = blockpixels;
 			unsigned char * startpixel = pixels +
 				( ( size.w * 4 * y ) * 64 ) +
 				( 4 * x * 64 );

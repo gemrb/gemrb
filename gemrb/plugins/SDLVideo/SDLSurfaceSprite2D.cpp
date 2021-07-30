@@ -92,7 +92,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D(const SDLSurfaceSprite2D &obj) noexcept
 
 void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
 {
-	SDL_PixelFormat* fmt = (*surface)->format;
+	const SDL_PixelFormat* fmt = (*surface)->format;
 	if (fmt->BytesPerPixel != 1) {
 		return;
 	}
@@ -179,7 +179,7 @@ void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
 
 bool SDLSurfaceSprite2D::HasTransparency() const noexcept
 {
-	SDL_PixelFormat* fmt = (*surface)->format;
+	const SDL_PixelFormat* fmt = (*surface)->format;
 #if SDL_VERSION_ATLEAST(1,3,0)
 	return SDL_ISPIXELFORMAT_ALPHA(fmt->format) || SDL_GetColorKey(*surface, NULL) != -1;
 #else

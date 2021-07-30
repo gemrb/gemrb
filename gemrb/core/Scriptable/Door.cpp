@@ -44,10 +44,10 @@ openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
 void DoorTrigger::SetState(bool open)
 {
 	isOpen = open;
-	for (auto& wp : openWalls) {
+	for (const auto& wp : openWalls) {
 		wp->SetDisabled(!isOpen);
 	}
-	for (auto& wp : closedWalls) {
+	for (const auto& wp : closedWalls) {
 		wp->SetDisabled(isOpen);
 	}
 }

@@ -609,7 +609,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (unsigned int i = 0; i < PCCount; i++) {
-		Actor *ac = game->GetPC(i, false);
+		const Actor *ac = game->GetPC(i, false);
 		headersize += am->GetStoredFileSize(ac);
 	}
 	NPCOffset = headersize;
@@ -617,7 +617,7 @@ int GAMImporter::GetStoredFileSize(const Game *game)
 	NPCCount = game->GetNPCCount();
 	headersize += NPCCount * PCSize;
 	for (unsigned int i = 0; i < NPCCount; i++) {
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		headersize += am->GetStoredFileSize(ac);
 	}
 
@@ -1088,7 +1088,7 @@ int GAMImporter::PutNPCs(DataStream *stream, const Game *game) const
 
 	for (unsigned int i = 0; i < NPCCount; i++) {
 		assert(stream->GetPos() == NPCOffset + i * PCSize);
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
@@ -1098,7 +1098,7 @@ int GAMImporter::PutNPCs(DataStream *stream, const Game *game) const
 
 	for (unsigned int  i = 0; i < NPCCount; i++) {
 		assert(stream->GetPos() == CREOffset);
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		//reconstructing offsets again
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
@@ -1141,7 +1141,7 @@ void GAMImporter::GetMazeEntry(void *memory) const
 
 void GAMImporter::PutMazeHeader(DataStream *stream, void *memory) const
 {
-	maze_header *m = (maze_header *) memory;
+	const maze_header *m = (maze_header *) memory;
 	stream->WriteDword(m->maze_sizex);
 	stream->WriteDword(m->maze_sizey);
 	stream->WriteDword(m->pos1x);
@@ -1160,7 +1160,7 @@ void GAMImporter::PutMazeHeader(DataStream *stream, void *memory) const
 
 void GAMImporter::PutMazeEntry(DataStream *stream, void *memory) const
 {
-	maze_entry *h = (maze_entry *) memory;
+	const maze_entry *h = (maze_entry *) memory;
 	stream->WriteDword(h->me_override);
 	stream->WriteDword(h->valid);
 	stream->WriteDword(h->accessible);

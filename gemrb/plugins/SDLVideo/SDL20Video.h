@@ -168,7 +168,7 @@ public:
 			// SDL_ConvertPixels doesn't support palettes... must do it ourselves
 			va_list args;
 			va_start(args, pitch);
-			Palette *pal = va_arg(args, Palette *);
+			const Palette *pal = va_arg(args, Palette *);
 			va_end(args);
 
 			Uint32* dst = static_cast<Uint32*>(conversionBuffer->pixels);

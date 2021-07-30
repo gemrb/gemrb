@@ -1319,7 +1319,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	proIterator proidx = projectiles.begin();
 	spaIterator spaidx = particles.begin();
 	int pileidx = 0;
-	Container *pile = GetNextPile(pileidx);
+	const Container *pile = GetNextPile(pileidx);
 
 	VEFObject *sca = GetNextScriptedAnimation(scaidx);
 	Projectile *pro = GetNextProjectile(proidx);

@@ -88,7 +88,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 template<SHADER SHADE = SHADER::NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
-	SDL_PixelFormat* fmt = surface->format;
+	const SDL_PixelFormat* fmt = surface->format;
 	SDL_LockSurface( surface );
 
 	std::vector<Point>::const_iterator it;

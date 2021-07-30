@@ -608,7 +608,7 @@ int BIKPlayer::DecodeAudioFrame(void *data, int data_size)
 	}
 
 	ieWordSigned *outbuf = samples;
-	ieWordSigned *samples_end  = samples+reported_size/sizeof(ieWordSigned);
+	const ieWordSigned *samples_end  = samples + reported_size / sizeof(ieWordSigned);
 
 	//s_block_size is in sample units
 	while (s_gb.get_bits_count() < bits && outbuf + s_block_size <= samples_end) {
@@ -1239,7 +1239,8 @@ static void idct_add(uint8_t *dest, int line_size, DCTELEM *block)
 int BIKPlayer::DecodeVideoFrame(void *data, int data_size, VideoBuffer& buf)
 {
 	int i;
-	uint8_t *dst, *prev;
+	uint8_t* dst;
+	const uint8_t* prev;
 	int v, c1, c2;
 	const uint8_t *scan;
 	int xoff, yoff;

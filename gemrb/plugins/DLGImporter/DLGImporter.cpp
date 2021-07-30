@@ -297,7 +297,7 @@ static char** GetStrings(char* string, unsigned int& count)
 	int level = 0;
 	bool quotes = true;
 	bool ignore = false;
-	char* poi = string;
+	const char* poi = string;
 
 	count = 0;
 	while (*poi) {

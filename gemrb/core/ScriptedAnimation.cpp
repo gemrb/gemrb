@@ -437,7 +437,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 
 Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 {
-	Animation *anim = anims[P_HOLD*MAX_ORIENT];
+	const Animation *anim = anims[P_HOLD * MAX_ORIENT];
 	if (anim) {
 		return anim->GetCurrentFrameIndex();
 	}
@@ -447,7 +447,7 @@ Animation::index_t ScriptedAnimation::GetCurrentFrame() const
 ieDword ScriptedAnimation::GetSequenceDuration(ieDword multiplier) const
 {
 	//P_HOLD * MAX_ORIENT == MAX_ORIENT
-	Animation *anim = anims[P_HOLD*MAX_ORIENT];
+	const Animation *anim = anims[P_HOLD * MAX_ORIENT];
 	if (anim) {
 		return anim->GetFrameCount()*multiplier/FrameRate;
 	}
@@ -490,7 +490,7 @@ void ScriptedAnimation::SetOrientation(int orientation)
 
 bool ScriptedAnimation::UpdatePhase()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	if (justCreated) {
 		if (Phase == P_NOTINITED) {
@@ -672,7 +672,7 @@ void ScriptedAnimation::Draw(const Region &vp, Color tint, int height, BlitFlags
 		flags &= ~BLIT_STENCIL_MASK;
 	}
 
-	Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
+	const Animation *anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim)
 		video->BlitGameSpriteWithPalette(anim->CurrentFrame(), palette, p, flags | BlitFlags::BLENDED, tint);
 
@@ -685,7 +685,7 @@ Region ScriptedAnimation::DrawingRegion() const
 {
 	Region r = twin ? twin->DrawingRegion() : Region(Pos, Size());
 
-	Animation* anim = anims[Phase*MAX_ORIENT+Orientation];
+	const Animation* anim = anims[Phase * MAX_ORIENT + Orientation];
 	if (anim) {
 		Region animArea = anim->animArea;
 		animArea.x += XOffset + Pos.x;
@@ -735,7 +735,7 @@ void ScriptedAnimation::GetPaletteCopy()
 		return;
 	//it is not sure that the first position will have a resource in it
 	//therefore the cycle
-	for (Animation *anim : anims) {
+	for (const Animation *anim : anims) {
 		if (!anim) continue;
 
 		Holder<Sprite2D> spr = anim->GetFrame(0);

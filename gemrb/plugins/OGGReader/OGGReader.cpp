@@ -65,7 +65,7 @@ static int ovfd_close(void * /*datasource*/) {
 }
 
 static long ovfd_tell(void *datasource) {
-	DataStream *vb = (DataStream *) datasource;
+	const DataStream *vb = (const DataStream *) datasource;
 	return (long) vb->GetPos();
 }
 
@@ -80,7 +80,7 @@ bool OGGReader::Open(DataStream* stream)
 	if(strnicmp(Signature, "oggs", 4) != 0)
 		return false;
 
-	vorbis_info *info;
+	const vorbis_info *info;
 	int res;
 	ov_callbacks cbstruct = {
 		ovfd_read, ovfd_seek, ovfd_close, ovfd_tell

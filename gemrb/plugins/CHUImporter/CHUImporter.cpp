@@ -164,7 +164,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
 					break;
 				}
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if (!bam ) {
 					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
@@ -269,7 +269,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				Holder<Sprite2D> img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
@@ -317,7 +317,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord(maxInput);
 				Font* fnt = core->GetFont( FontResRef );
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
 				Holder<Sprite2D> cursor;
 				if (bam) {
@@ -433,7 +433,7 @@ endalign:
 				str->ReadResRef( BAMResRef );
 				str->ReadWord(Cycle);
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
 					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef.CString());

@@ -391,7 +391,7 @@ int fx_transfer_hp (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_flash_screen (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_flash_screen(%2d): Par2: %d", fx->Opcode, fx->Parameter2);
-	unsigned char* bytes = (unsigned char *)&fx->Parameter1;
+	const unsigned char* bytes = (const unsigned char *) &fx->Parameter1;
 	Color c(bytes[0], bytes[1], bytes[2], 0xff);
 	core->GetWindowManager()->FadeColor = c;
 	//this needs to be at least 2 for any effect
@@ -884,7 +884,7 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 	else if (ea<EA_GOODCUTOFF) type = 0;
 	else return FX_NOT_APPLIED;  //what happens if the target goes neutral during the effect? if the effect remains, make this FX_APPLIED
 
-	Map *map = target->GetCurrentArea();
+	const Map *map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
 	while(i--) {
 		Actor *tar=map->GetActor(i,true);
@@ -908,7 +908,7 @@ int fx_prayer (Scriptable* Owner, Actor* target, Effect* fx)
 int fx_move_view (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	// print("fx_move_view(%2d): Speed: %d", fx->Opcode, fx->Parameter1);
-	Map *map = core->GetGame()->GetCurrentArea();
+	const Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
 		core->timer.SetMoveViewPort(fx->Pos, fx->Parameter1, true);
 	}
@@ -1010,7 +1010,7 @@ int fx_jumble_curse (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//do a hiccup every 75th refresh
 	if (fx->Parameter3/75!=fx->Parameter4/75) {
 		//hiccups

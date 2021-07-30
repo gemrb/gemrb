@@ -148,7 +148,7 @@ bool BMPImporter::Open(DataStream* stream)
 		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
 		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
+		const unsigned char* src = (const unsigned char *) rpixels;
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// BGRX
@@ -163,7 +163,7 @@ bool BMPImporter::Open(DataStream* stream)
 		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
 		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
+		const unsigned char* src = (const unsigned char *) rpixels;
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// BGR
@@ -187,7 +187,7 @@ void BMPImporter::Read8To8(void *rpixels)
 	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
 	dest += size.Area();
-	unsigned char * src = ( unsigned char * ) rpixels;
+	const unsigned char* src = (const unsigned char *) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		memcpy(dest, src, size.w);
@@ -201,7 +201,7 @@ void BMPImporter::Read4To8(void *rpixels)
 	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
 	dest += size.Area();
-	unsigned char * src = ( unsigned char * ) rpixels;
+	const unsigned char* src = (const unsigned char *) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		for (int j = 0; j < size.w; ++j) {
