@@ -59,8 +59,8 @@ private:
 	ieByte CompressedColorIndex = 0;
 	ieDword FramesOffset = 0;
 	ieDword PaletteOffset = 0;
-	ieDword FLTOffset;
-	strpos_t DataStart;
+	ieDword FLTOffset = 0;
+	strpos_t DataStart = 0;
 	Holder<Sprite2D> GetFrameInternal(const FrameEntry& frame, bool RLESprite, uint8_t* data);
 	std::vector<index_t> CacheFLT();
 };

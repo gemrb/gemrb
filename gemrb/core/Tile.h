@@ -42,6 +42,8 @@ public:
 	: anim{make_unique<Animation>(std::move(animation)), nullptr }
 	{}
 	
+	Tile(Tile&&) noexcept = default;
+	
 	Animation* GetAnimation() const noexcept {
 		if (anim[tileIndex]) {
 			return anim[tileIndex].get();

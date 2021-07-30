@@ -3809,7 +3809,7 @@ void AreaAnimation::InitAnimation()
 			anim->MirrorAnimation();
 		}
 
-		return *anim;
+		return std::move(*anim);
 	};
 
 	size_t animcount = af->GetCycleCount();
