@@ -824,7 +824,7 @@ Size Map::FogMapSize() const
 	return Size(TMap->XCellCount * CELL_RATIO + largefog, TMap->YCellCount * CELL_RATIO + largefog);
 }
 
-bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
+bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
 {
 	// Returns true if map at (x;y) was explored, else false.
 	const Size fogSize = FogMapSize();
@@ -835,11 +835,10 @@ bool Map::FogTileUncovered(const Point &p, const uint8_t* mask) const
 	
 	if (mask == nullptr) return true;
 
-	div_t res = div(fogSize.w * p.y + p.x, 8);
-	return bool(mask[res.quot] & (1 << res.rem));
+	return (*mask)[p];
 }
 
-void Map::DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, const Region& vp)
+void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& vp)
 {
 	// Size of Fog-Of-War shadow tile (and bitmap)
 	constexpr int CELL_SIZE = 32;
@@ -1467,8 +1466,8 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		DrawSearchMap(viewport);
 	}
 	
-	const uint8_t* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : ExploredBitmap.begin();
-	const uint8_t* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : VisibleBitmap.begin();
+	const Bitmap* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : &ExploredBitmap;
+	const Bitmap* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : &VisibleBitmap;
 	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
@@ -2989,12 +2988,12 @@ Point Map::ConvertPointToFog(const Point &p) const
 
 bool Map::IsVisible(const Point &pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), VisibleBitmap.begin());
+	return FogTileUncovered(ConvertPointToFog(pos), &VisibleBitmap);
 }
 
 bool Map::IsExplored(const Point &pos) const
 {
-	return FogTileUncovered(ConvertPointToFog(pos), ExploredBitmap.begin());
+	return FogTileUncovered(ConvertPointToFog(pos), &ExploredBitmap);
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
