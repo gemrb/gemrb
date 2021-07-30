@@ -54,7 +54,7 @@ static void Initializer()
 	// check for iwd1 zz-weapon bonus table
 	AutoTable tm2("zzweaps");
 	int indR = core->LoadSymbol("race");
-	Holder<SymbolMgr> sm = core->GetSymbol(indR);
+	auto sm = core->GetSymbol(indR);
 	if (!tm2 || !sm || indR == -1) {
 		return;
 	}

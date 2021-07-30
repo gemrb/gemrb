@@ -60,7 +60,7 @@ public:
 	Resource* GetResource(const char* resname, const TypeID *type, bool silent = false, bool useCorrupt = false) const;
 
 private:
-	std::vector<Holder<ResourceSource> > searchPath;
+	std::vector<std::shared_ptr<ResourceSource> > searchPath;
 };
 
 }

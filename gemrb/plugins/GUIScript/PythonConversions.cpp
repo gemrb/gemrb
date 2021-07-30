@@ -88,8 +88,8 @@ ResRef ResRefFromPy(PyObject* obj) {
 	return ResRef();
 }
 
-Holder<TableMgr> GetTable(PyObject* obj) {
-	Holder<TableMgr> tm;
+std::shared_ptr<TableMgr> GetTable(PyObject* obj) {
+	std::shared_ptr<TableMgr> tm;
 
 	PyObject* id = PyObject_GetAttrString(obj, "ID");
 	if (!id) {
@@ -100,9 +100,9 @@ Holder<TableMgr> GetTable(PyObject* obj) {
 	return tm;
 }
 
-Holder<SymbolMgr> GetSymbols(PyObject* obj)
+std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 {
-	Holder<SymbolMgr> sm;
+	std::shared_ptr<SymbolMgr> sm;
 
 	PyObject* id = PyObject_GetAttrString(obj, "ID");
 	if (!id) {

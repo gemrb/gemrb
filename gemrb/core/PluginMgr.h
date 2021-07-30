@@ -30,7 +30,6 @@
 #include "SClassID.h" // For PluginID
 #include "exports.h"
 #include "globals.h"
-#include "Holder.h"
 #include "Plugin.h"
 #include "ResourceDesc.h"
 
@@ -134,7 +133,7 @@ public:
 };
 
 template <typename T>
-using PluginHolder = Holder<T>;
+using PluginHolder = std::shared_ptr<T>;
 
 template <typename T>
 PluginHolder<T> MakePluginHolder(PluginID id) {
@@ -147,7 +146,7 @@ PluginHolder<ImporterPlugin<T>> MakeImporterPluginHolder(PluginID id) {
 }
 
 template <typename T>
-Holder<T> GetImporter(PluginID id) {
+PluginHolder<T> GetImporter(PluginID id) {
 	auto plugin = MakeImporterPluginHolder<T>(id);
 	if (plugin) {
 		return plugin->GetImporter();
@@ -156,7 +155,7 @@ Holder<T> GetImporter(PluginID id) {
 }
 
 template <typename T>
-Holder<T> GetImporter(PluginID id, DataStream* str) {
+PluginHolder<T> GetImporter(PluginID id, DataStream* str) {
 	auto plugin = MakeImporterPluginHolder<T>(id);
 	if (plugin) {
 		return plugin->GetImporter(str);

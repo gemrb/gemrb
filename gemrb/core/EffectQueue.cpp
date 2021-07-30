@@ -262,7 +262,7 @@ bool Init_EffectQueue()
 		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
 		return false;
 	}
-	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
+	auto effectsTable = core->GetSymbol( eT );
 	if (!effectsTable) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
 		return false;

@@ -649,12 +649,12 @@ bool OpenALAudioDriver::Resume()
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
+int OpenALAudioDriver::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
 
 	// Free old MusicReader
-	MusicReader = newMusic;
+	MusicReader = std::move(newMusic);
 	if (!MusicReader) {
 		MusicPlaying = false;
 	}

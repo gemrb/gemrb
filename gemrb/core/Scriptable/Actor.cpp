@@ -888,7 +888,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
-	Holder<TableMgr> tm;
+	std::shared_ptr<TableMgr> tm;
 
 	// iwd2 has support for multikit characters, so we have more work
 	// at the same time each baseclass has its own level stat, so the logic is cleaner
@@ -2579,8 +2579,8 @@ static void InitActorTables()
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
 	int subracetable = core->LoadSymbol("subrace");
-	Holder<SymbolMgr> race = NULL;
-	Holder<SymbolMgr> subrace = NULL;
+	std::shared_ptr<SymbolMgr> race;
+	std::shared_ptr<SymbolMgr> subrace;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
 	}
@@ -2674,7 +2674,7 @@ static void InitActorTables()
 	// IWD, IWD2 and BG:EE have this
 	int splstatetable = core->LoadSymbol("splstate");
 	if (splstatetable != -1) {
-		Holder<SymbolMgr> splstate = core->GetSymbol(splstatetable);
+		auto splstate = core->GetSymbol(splstatetable);
 		int numstates = splstate->GetHighestValue();
 		if (numstates > 0) {
 			//rounding up
@@ -5443,7 +5443,7 @@ static const char *GetVarName(const char *table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {
-		Holder<SymbolMgr> sym = core->GetSymbol( symbol );
+		auto sym = core->GetSymbol( symbol );
 		return sym->GetValue( value );
 	}
 	return NULL;
@@ -5770,7 +5770,7 @@ bool Actor::CheckOnDeath()
 		// racial dead count
 		int racetable = core->LoadSymbol("race");
 		if (racetable != -1) {
-			Holder<SymbolMgr> race = core->GetSymbol(racetable);
+			auto race = core->GetSymbol(racetable);
 			IncrementDeathVariable(game->locals, "KILL_%s_CNT", race->GetValue(Modified[IE_RACE]));
 		}
 	}
@@ -9870,7 +9870,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	//don't close this table, it can mess with the guiscripts
 	int table = gamedata->LoadTable(resref);
 	if (table == -1) return 0;
-	Holder<TableMgr> tm = gamedata->GetTable(table);
+	auto tm = gamedata->GetTable(table);
 	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {

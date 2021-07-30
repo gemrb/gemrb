@@ -40,23 +40,23 @@
 namespace GemRB {
 
 static const int StatValues[9]={
-IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
+IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
 IE_SEX, IE_ALIGNMENT };
 
-static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
+static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
-		return NULL;
+		return {};
 	}
 
 	DataStream* inifile = gamedata->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
-		return NULL;
+		return {};
 	}
 	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
 		Log(ERROR, "IniSpawn", "No INI Importer Available.");
-		return NULL;
+		return {};
 	}
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
@@ -71,8 +71,8 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	//high detail level by default
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
-	
-	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
+
+	auto inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
 		NamelessSpawnArea = DefaultArea;
 		return;

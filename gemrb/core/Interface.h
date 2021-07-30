@@ -95,7 +95,7 @@ class WorldMap;
 class WorldMapArray;
 
 struct Symbol {
-	Holder<SymbolMgr> sm;
+	std::shared_ptr<SymbolMgr> sm;
 	ResRef symbolName;
 };
 
@@ -377,25 +377,25 @@ class GEM_EXPORT Interface
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	Holder<Video> video;
-	Holder<Audio> AudioDriver;
+	std::shared_ptr<Video> video;
+	std::shared_ptr<Audio> AudioDriver;
 
 	ProjectileServer* projserv = nullptr;
 
 	WindowManager* winmgr = nullptr;
-	Holder<GUIFactory> guifact;
-	Holder<ScriptEngine> guiscript;
+	std::shared_ptr<GUIFactory> guifact;
+	std::shared_ptr<ScriptEngine> guiscript;
 	GameControl* gamectrl = nullptr;
 	SaveGameIterator *sgiterator = nullptr;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
-	Holder<MusicMgr> music;
+	std::shared_ptr<MusicMgr> music;
 	std::vector<Symbol> symbols;
-	Holder<DataFileMgr> INIparty;
-	Holder<DataFileMgr> INIbeasts;
-	Holder<DataFileMgr> INIquests;
-	Holder<DataFileMgr> INIresdata;
+	std::shared_ptr<DataFileMgr> INIparty;
+	std::shared_ptr<DataFileMgr> INIbeasts;
+	std::shared_ptr<DataFileMgr> INIquests;
+	std::shared_ptr<DataFileMgr> INIresdata;
 	Game* game = nullptr;
 	Calendar* calendar = nullptr;
 	WorldMapArray* worldmap = nullptr;
@@ -444,14 +444,14 @@ private:
 	std::vector<SpecialSpellType> SpecialSpells;
 	KeyMap *keymap = nullptr;
 	Scriptable *CutSceneRunner = nullptr;
-	
+
 	int MaximumAbility = 0;
 
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
-	Holder<StringMgr> strings;
-	Holder<StringMgr> strings2;
+	std::shared_ptr<StringMgr> strings;
+	std::shared_ptr<StringMgr> strings2;
 	GlobalTimer timer;
 	Color InfoTextColor;
 	int QuitFlag = QF_NORMAL;
@@ -538,7 +538,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	Holder<SymbolMgr> GetSymbol(unsigned int index) const;
+	std::shared_ptr<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */

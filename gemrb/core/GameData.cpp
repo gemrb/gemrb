@@ -198,13 +198,13 @@ int GameData::GetTableIndex(const ResRef &resRef) const
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-Holder<TableMgr> GameData::GetTable(size_t index) const
+std::shared_ptr<TableMgr> GameData::GetTable(size_t index) const
 {
 	if (index >= tables.size()) {
-		return NULL;
+		return {};
 	}
 	if (tables[index].refcount == 0) {
-		return NULL;
+		return {};
 	}
 	return tables[index].tm;
 }
@@ -224,7 +224,7 @@ bool GameData::DelTable(unsigned int index)
 	}
 	tables[index].refcount--;
 	if (tables[index].refcount == 0 && tables[index].tm) {
-		tables[index].tm.release();
+		tables[index].tm.reset();
 	}
 	return true;
 }

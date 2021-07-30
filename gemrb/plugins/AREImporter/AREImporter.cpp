@@ -65,8 +65,8 @@ struct ResRefToStrRef {
 	int difficulty;
 };
 
-Holder<DataFileMgr> INInote;
 static std::vector<ResRefToStrRef> tracks;
+std::shared_ptr<DataFileMgr> INInote;
 
 static void ReadAutonoteINI()
 {

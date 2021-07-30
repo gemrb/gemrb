@@ -36,6 +36,7 @@
 #include "FileCache.h"
 #include "System/DataStream.h"
 
+#include <memory>
 #include <stdexcept>
 
 namespace GemRB {
@@ -45,12 +46,10 @@ namespace GemRB {
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin : public Held<Plugin>
+class GEM_EXPORT Plugin
 {
 public:
-	// declaring these here so we dont have to GEM_EXPORT every Held<T> for MSVC to be happy
-	Plugin() = default;
-	~Plugin() = default;
+	virtual ~Plugin() = default;
 };
 
 class GEM_EXPORT ImporterBase : public Held<ImporterBase>
@@ -87,13 +86,13 @@ public:
 template <class IMPORTER>
 class GEM_EXPORT ImporterPlugin final : public Plugin
 {
-	Holder<IMPORTER> importer = MakeHolder<IMPORTER>();
+	std::shared_ptr<IMPORTER> importer = std::make_shared<IMPORTER>();
 public:
-	Holder<IMPORTER> GetImporter() const noexcept {
+	std::shared_ptr<IMPORTER> GetImporter() const noexcept {
 		return importer;
 	}
 
-	Holder<IMPORTER> GetImporter(DataStream* str) noexcept {
+	std::shared_ptr<IMPORTER> GetImporter(DataStream* str) noexcept {
 		if (str == nullptr) {
 			return nullptr;
 		}

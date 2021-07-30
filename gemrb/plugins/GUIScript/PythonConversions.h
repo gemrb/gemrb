@@ -121,9 +121,9 @@ Region RectFromPy(PyObject* obj);
 
 ResRef ResRefFromPy(PyObject* obj);
 
-Holder<TableMgr> GetTable(PyObject* obj);
+std::shared_ptr<TableMgr> GetTable(PyObject* obj);
 
-Holder<SymbolMgr> GetSymbols(PyObject* obj);
+std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj);
 
 Holder<Sprite2D> SpriteFromPy(PyObject* obj);
 
