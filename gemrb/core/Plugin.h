@@ -57,21 +57,21 @@ class GEM_EXPORT ImporterBase : public Held<ImporterBase>
 protected:
 	DataStream* str = nullptr;
 	virtual bool Import(DataStream* stream) = 0;
-	
+
 protected:
 	DataStream* DecompressStream(DataStream* stream) {
 		DataStream* cstream = CacheCompressedStream(stream, stream->filename);
 		if (!cstream) {
 			return nullptr;
 		}
-		
+
 		if (stream == str) {
 			delete stream;
 			str = cstream;
 		}
 		return cstream;
 	}
-	
+
 public:
 	bool Open(DataStream* stream) noexcept {
 		str = stream;
@@ -83,10 +83,23 @@ public:
 	}
 };
 
+/* MSVC must not see an abstract type _anywhere_ going into a `new` or `make_shared`. */
+template<class T>
+	std::shared_ptr<typename std::enable_if<!std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return std::make_shared<T>();
+}
+
+template<class T>
+	std::shared_ptr<typename std::enable_if<std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return {};
+}
+
 template <class IMPORTER>
 class GEM_EXPORT ImporterPlugin final : public Plugin
 {
-	std::shared_ptr<IMPORTER> importer = std::make_shared<IMPORTER>();
+	std::shared_ptr<IMPORTER> importer = MakeImporter<IMPORTER>();
 public:
 	std::shared_ptr<IMPORTER> GetImporter() const noexcept {
 		return importer;
