@@ -234,6 +234,13 @@ WMPAreaEntry* WorldMap::GetArea(const ResRef& areaName, unsigned int &i) const
 			return area_entries[i];
 		}
 	}
+	// try also with the original name (needed for centering on Candlekeep)
+	i = (unsigned int) area_entries.size();
+	while (i--) {
+		if (areaName == area_entries[i]->AreaResRef) {
+			return area_entries[i];
+		}
+	}
 	return NULL;
 }
 
