@@ -768,7 +768,7 @@ public:
 	/* update internal per frame state and return true if state is suitable for drawing the actor */
 	bool UpdateDrawingState();
 	Region DrawingRegion() const override;
-	uint8_t GetElevation() const;
+	int GetElevation() const;
 	bool ShouldDrawReticle() const;
 	void DoStep(unsigned int walkScale, ieDword time = 0) override;
 	void Draw(const Region &screen, Color baseTint, Color tint, BlitFlags flags) const;

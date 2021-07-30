@@ -8442,7 +8442,7 @@ bool Actor::HasBodyHeat() const
 	return true;
 }
 
-uint8_t Actor::GetElevation() const
+int Actor::GetElevation() const
 {
 	return area ? area->GetHeight(Pos) : 0;
 }

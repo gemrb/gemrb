@@ -2407,7 +2407,7 @@ int Map::GetHeight(const Point &p) const
 	constexpr uint8_t input_range = 255;
 	constexpr uint8_t output_range = 14;
 
-	return val * output_range / input_range;
+	return val * output_range / input_range - 7;
 }
 
 // a more thorough, but more expensive version for the cases when it matters
