@@ -3282,13 +3282,12 @@ void Map::ExploreTile(const Point &p)
 	Point fogP = ConvertPointToFog(p);
 
 	const Size fogSize = FogMapSize();
-	if (!fogSize.PointInside(p)) {
+	if (!fogSize.PointInside(fogP)) {
 		return;
 	}
 	
-	div_t res = div(fogSize.w * fogP.y + fogP.x, 8);
-	ExploredBitmap[res.quot] |= (1 << res.rem);
-	VisibleBitmap[res.quot] |= (1 << res.rem);
+	ExploredBitmap[fogP] = true;
+	VisibleBitmap[fogP] = true;
 }
 
 void Map::ExploreMapChunk(const Point &Pos, int range, int los)

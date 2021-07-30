@@ -20,7 +20,6 @@
 #define BITMAP_H
 
 #include "Region.h"
-#include "Video/Pixels.h"
 
 namespace GemRB {
 
@@ -28,15 +27,36 @@ class GEM_EXPORT Bitmap final
 {
 	uint8_t* data = nullptr;
 	Size size;
+	int bytes;
+	
+	struct BitProxy {
+		uint8_t& byte;
+		uint8_t bit;
+		
+		BitProxy(uint8_t& byte, uint8_t bit) noexcept
+		: byte(byte), bit(bit)
+		{}
+		
+		void operator=(bool set) noexcept {
+			if (set) {
+				byte |= (1 << bit);
+			} else {
+				byte &= ~(1 << bit);
+			}
+		}
+	};
 	
 public:
 	explicit Bitmap(const Size& size) noexcept
-	: data(new uint8_t[size.Area()]), size(size)
-	{}
+	: size(size)
+	{
+		bytes = CeilDiv<int>(size.w * size.h, 8);
+		data = new uint8_t[bytes];
+	}
 	
 	Bitmap(const Size& size, const uint8_t* in) noexcept
 	: Bitmap(size) {
-		std::copy(in, in + size.Area(), data);
+		std::copy(in, in + bytes, data);
 	}
 
 	~Bitmap() noexcept {
@@ -48,7 +68,9 @@ public:
 	
 	Bitmap& operator=(const Bitmap& bm) {
 		if (&bm != this) {
-			std::copy(bm.data, bm.data + size.Area(), data);
+			size = bm.size;
+			bytes = bm.bytes;
+			std::copy(bm.data, bm.data + bm.bytes, data);
 		}
 		return *this;
 	}
@@ -56,37 +78,41 @@ public:
 	Bitmap(Bitmap&& other) noexcept {
 		std::swap(data, other.data);
 		size = other.size;
+		bytes = other.bytes;
 	}
 
 	Bitmap& operator=(Bitmap&& other) noexcept {
 		if (&other != this) {
 			std::swap(data, other.data);
 			size = other.size;
+			bytes = other.bytes;
 		}
 		return *this;
 	}
 	
-	uint8_t& operator[](size_t i) noexcept {
-		return data[i];
+	BitProxy operator[](int i) noexcept {
+		div_t res = div(i, 8);
+		return BitProxy(data[res.quot], res.rem);
 	}
 	
-	const uint8_t& operator[](size_t i) const noexcept {
-		return data[i];
+	bool operator[](int i) const noexcept {
+		div_t res = div(i, 8);
+		return data[res.quot] & (1 << res.rem);
 	}
 	
-	uint8_t& operator[](const Point& p) noexcept {
-		return data[p.y * size.w + p.x];
+	BitProxy operator[](const Point& p) noexcept {
+		return operator[](p.y * size.w + p.x);
 	}
 	
-	const uint8_t& operator[](const Point& p) const noexcept {
-		return data[p.y * size.w + p.x];
+	bool operator[](const Point& p) const noexcept {
+		return operator[](p.y * size.w + p.x);
 	}
 	
-	uint8_t GetAt(const Point& p, uint8_t oobval) const noexcept {
-		if (p.x >= size.w || p.y >= size.h) {
+	bool GetAt(const Point& p, bool oobval) const noexcept {
+		if (!size.PointInside(p)) {
 			return oobval;
 		}
-		return data[p.y * size.w + p.x];
+		return operator[](p.y * size.w + p.x);
 	}
 	
 	uint8_t* begin() noexcept {
@@ -94,7 +120,7 @@ public:
 	}
 	
 	uint8_t* end() noexcept {
-		return data + size.Area();
+		return data + bytes;
 	}
 	
 	const uint8_t* begin() const noexcept {
@@ -102,16 +128,15 @@ public:
 	}
 	
 	const uint8_t* end() const noexcept {
-		return data + size.Area();
+		return data + bytes;
 	}
 
 	Size GetSize() const noexcept {
 		return size;
 	}
 	
-	template <typename... ARGS>
-	PixelIterator<uint8_t> GetIterator(ARGS&&... args) noexcept {
-		return PixelIterator<uint8_t>(std::forward<ARGS>(args)...);
+	int Bytes() const noexcept {
+		return bytes;
 	}
 	
 	void fill(uint8_t val) noexcept {
