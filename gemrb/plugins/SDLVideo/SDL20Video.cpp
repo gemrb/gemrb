@@ -70,13 +70,14 @@ int SDL20VideoDriver::Init()
 
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
 		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
-	} else {
-		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-			if (SDL_IsGameController(i)) {
-				gameController = SDL_GameControllerOpen(i);
-				if (gameController != nullptr) {
-					break;
-				}
+		return ret;
+	}
+
+	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+		if (SDL_IsGameController(i)) {
+			gameController = SDL_GameControllerOpen(i);
+			if (gameController != nullptr) {
+				break;
 			}
 		}
 	}

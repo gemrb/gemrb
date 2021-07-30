@@ -189,34 +189,36 @@ bool SDLSurfaceSprite2D::HasTransparency() const noexcept
 
 bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 {
-	if (tofmt.Bpp >= 1) {
+	if (tofmt.Bpp == 0) {
+		return false;
+	}
+
 #if SDL_VERSION_ATLEAST(1,3,0)
-		Uint32 fmt = SDL_MasksToPixelFormatEnum(tofmt.Bpp * 8, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
-		if (fmt != SDL_PIXELFORMAT_UNKNOWN) {
-			SDL_Surface* ns = SDL_ConvertSurfaceFormat( *surface, fmt, 0);
+	Uint32 fmt = SDL_MasksToPixelFormatEnum(tofmt.Bpp * 8, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
+	if (fmt != SDL_PIXELFORMAT_UNKNOWN) {
+		SDL_Surface* ns = SDL_ConvertSurfaceFormat(*surface, fmt, 0);
 #else
-		SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Frame.w, Frame.h, tofmt.Depth, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
-		if (tmp) {
-			SDL_Surface* ns = SDL_ConvertSurface( *surface, tmp->format, 0);
-			SDL_FreeSurface(tmp);
+	SDL_Surface* tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, Frame.w, Frame.h, tofmt.Depth, tofmt.Rmask, tofmt.Gmask, tofmt.Bmask, tofmt.Amask);
+	if (tmp) {
+		SDL_Surface* ns = SDL_ConvertSurface(*surface, tmp->format, 0);
+		SDL_FreeSurface(tmp);
 #endif
-			if (ns) {
-				if (freePixels) {
-					free(pixels);
-				}
-				freePixels = false;
-				surface = MakeHolder<SurfaceHolder>(ns);
-				format.Bpp = tofmt.Bpp;
-				return true;
-			} else {
-				Log(MESSAGE, "SDLSurfaceSprite2D",
-#if SDL_VERSION_ATLEAST(1,3,0)
-					"Cannot convert sprite to format: %s\nError: %s", SDL_GetPixelFormatName(fmt),
-#else
-					"Cannot convert sprite to format: %s",
-#endif
-					SDL_GetError());
+		if (ns) {
+			if (freePixels) {
+				free(pixels);
 			}
+			freePixels = false;
+			surface = MakeHolder<SurfaceHolder>(ns);
+			format.Bpp = tofmt.Bpp;
+			return true;
+		} else {
+			Log(MESSAGE, "SDLSurfaceSprite2D",
+#if SDL_VERSION_ATLEAST(1,3,0)
+				"Cannot convert sprite to format: %s\nError: %s", SDL_GetPixelFormatName(fmt),
+#else
+				"Cannot convert sprite to format: %s",
+#endif
+				SDL_GetError());
 		}
 	}
 	return false;

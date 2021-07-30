@@ -11465,15 +11465,17 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	GET_ACTOR_GLOBAL();
 
 	int ret = actor->inventory.GetEquippedSlot();
-	if (actor->PCStats) {
-		for(int i=0;i<4;i++) {
-			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
-				if (NoTrans) {
-					return PyInt_FromLong(i);
-				}
-				ret = i+actor->inventory.GetWeaponSlot();
-				break;
+	if (!actor->PCStats) {
+		return PyInt_FromLong(core->FindSlot(ret));
+	}
+
+	for (int i = 0; i < 4; i++) {
+		if (ret == actor->PCStats->QuickWeaponSlots[i]) {
+			if (NoTrans) {
+				return PyInt_FromLong(i);
 			}
+			ret = i + actor->inventory.GetWeaponSlot();
+			break;
 		}
 	}
 	return PyInt_FromLong( core->FindSlot(ret) );
@@ -11978,27 +11980,29 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 		AutoTable pdtable("pdialog");
 		dreamer = pdtable->GetColumnIndex("DREAM_SCRIPT_FILE");
 	}
-	if (dreamer >= 0) {
-		AutoTable pdtable("pdialog");
-		int ii = game->GetPartySize(true); // party size, only alive
-		bool bg2expansion = core->GetGame()->Expansion == 5;
-		while (ii--) {
-			Actor *tar = game->GetPC(ii, true);
-			const char* scriptname = tar->GetScriptName();
-			if (pdtable->GetRowIndex(scriptname) != -1) {
-				ResRef resRef;
-				if (bg2expansion) {
-					resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE");
-				} else {
-					resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE");
-				}
-				GameScript* restscript = new GameScript(resRef, tar, 0, false);
-				if (restscript->Update()) {
-					// there could be several steps involved, so we can't reliably check tar->GetLastRested()
-					dreamed = 1;
-				}
-				delete restscript;
+	if (dreamer < 0) {
+		return PyInt_FromLong(dreamed);
+	}
+
+	AutoTable pdtable("pdialog");
+	int ii = game->GetPartySize(true); // party size, only alive
+	bool bg2expansion = core->GetGame()->Expansion == 5;
+	while (ii--) {
+		Actor *tar = game->GetPC(ii, true);
+		const char* scriptname = tar->GetScriptName();
+		if (pdtable->GetRowIndex(scriptname) != -1) {
+			ResRef resRef;
+			if (bg2expansion) {
+				resRef = pdtable->QueryField(scriptname, "25DREAM_SCRIPT_FILE");
+			} else {
+				resRef = pdtable->QueryField(scriptname, "DREAM_SCRIPT_FILE");
 			}
+			GameScript* restscript = new GameScript(resRef, tar, 0, false);
+			if (restscript->Update()) {
+				// there could be several steps involved, so we can't reliably check tar->GetLastRested()
+				dreamed = 1;
+			}
+			delete restscript;
 		}
 	}
 
@@ -13861,20 +13865,24 @@ bool GUIScript::ExecString(const char* string, bool feedback)
 
 	if (run) {
 		// success
-		if (feedback) {
-			PyObject* pyGUI = PyImport_ImportModule("GUICommon");
-			if (pyGUI) {
-				PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
-				if (catcher) {
-					PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
-					String* msg = StringFromCString(PyString_AsString(output));
-					displaymsg->DisplayString(*msg, DMC_WHITE, NULL);
-					delete msg;
-					Py_DECREF(catcher);
-				}
-				Py_DECREF(pyGUI);
-			}
+		if (!feedback) {
+			Py_DECREF(run);
+			return true;
 		}
+
+		PyObject* pyGUI = PyImport_ImportModule("GUICommon");
+		if (pyGUI) {
+			PyObject* catcher = PyObject_GetAttrString(pyGUI, "outputFunnel");
+			if (catcher) {
+				PyObject* output = PyObject_GetAttrString(catcher, "lastLine");
+				String* msg = StringFromCString(PyString_AsString(output));
+				displaymsg->DisplayString(*msg, DMC_WHITE, nullptr);
+				delete msg;
+				Py_DECREF(catcher);
+			}
+			Py_DECREF(pyGUI);
+		}
+
 		Py_DECREF(run);
 		return true;
 	} else {

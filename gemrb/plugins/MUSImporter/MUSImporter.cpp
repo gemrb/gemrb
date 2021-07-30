@@ -178,38 +178,41 @@ bool MUSImporter::OpenPlaylist(const char* name)
 /** Start the PlayList Music Execution */
 void MUSImporter::Start()
 {
-	if (!Playing) {
-		PLpos = 0;
-		if (playlist.empty()) return;
-		if (playlist[PLpos].PLLoop[0] != 0) {
-			for (unsigned int i = 0; i < playlist.size(); i++) {
-				if (stricmp( playlist[i].PLFile, playlist[PLpos].PLLoop ) == 0) {
-					PLnext = i;
-					break;
-				}
+	if (Playing) return;
+	if (playlist.empty()) return;
+
+	PLpos = 0;
+	if (playlist[PLpos].PLLoop[0] != 0) {
+		for (unsigned int i = 0; i < playlist.size(); i++) {
+			if (stricmp(playlist[i].PLFile, playlist[PLpos].PLLoop) == 0) {
+				PLnext = i;
+				break;
 			}
-		} else {
-			PLnext = PLpos + 1;
-			if ((unsigned int) PLnext >= playlist.size())
-				PLnext = 0;
 		}
-		PlayMusic( PLpos );
-		core->GetAudioDrv()->Play();
-		lastSound = playlist[PLpos].soundID;
-		Playing = true;
+	} else {
+		PLnext = PLpos + 1;
+		if ((unsigned int) PLnext >= playlist.size()) {
+			PLnext = 0;
+		}
 	}
+
+	PlayMusic(PLpos);
+	core->GetAudioDrv()->Play();
+	lastSound = playlist[PLpos].soundID;
+	Playing = true;
 }
 /** Ends the Current PlayList Execution */
 void MUSImporter::End()
 {
-	if (Playing) {
-		if (playlist.empty()) return;
-		if (playlist[PLpos].PLEnd[0] != 0) {
-			if (stricmp( playlist[PLpos].PLEnd, "end" ) != 0)
-				PlayMusic( playlist[PLpos].PLEnd );
+	if (!Playing) return;
+	if (playlist.empty()) return;
+
+	if (playlist[PLpos].PLEnd[0] != 0) {
+		if (stricmp(playlist[PLpos].PLEnd, "end") != 0) {
+			PlayMusic(playlist[PLpos].PLEnd);
 		}
-		PLnext = -1;
 	}
+	PLnext = -1;
 }
 
 void MUSImporter::HardEnd()
