@@ -2993,7 +2993,7 @@ const unsigned char *Actor::GetStateString() const
 		return NULL;
 	}
 	ieByte *tmp = PCStats->PortraitIconString;
-	ieWord *Icons = PCStats->PortraitIcons;
+	const ieWord *Icons = PCStats->PortraitIcons;
 	int j=0;
 	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
 		if (!(Icons[i]&0xff00)) {
@@ -3172,7 +3172,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 		// snap out of charm if the charmer hurt us
 		if (trigger.triggerID == trigger_attackedby) {
-			Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
+			const Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
 			if (attacker) {
 				int revertToEA = 0;
 				if (Modified[IE_EA] == EA_CHARMED && attacker->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -3182,7 +3182,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 				}
 				if (revertToEA) {
 					// remove only the plain charm effect
-					Effect *charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1);
+					const Effect *charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1);
 					if (!charmfx) charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1001);
 					if (charmfx) {
 						SetStat(IE_EA, revertToEA, 1);
@@ -3386,7 +3386,7 @@ void Actor::RefreshHP() {
 void Actor::RefreshPCStats() {
 	RefreshHP();
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec && ShouldModifyMorale()) {
@@ -3506,7 +3506,7 @@ void Actor::RefreshPCStats() {
 int Actor::GetConHealAmount() const
 {
 	int rate = 0;
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) return rate;
 
 	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
@@ -3521,7 +3521,7 @@ int Actor::GetConHealAmount() const
 // add fatigue every 4 hours since resting and check if the actor is penalised for it
 void Actor::UpdateFatigue()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!InParty || !game->GameTime) {
 		return;
 	}
@@ -3628,7 +3628,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		static ieDword prevType = -1;
 		static int prevRoll = -1;
-		static Actor *prevActor = NULL;
+		static const Actor *prevActor = nullptr;
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
@@ -4072,7 +4072,7 @@ int Actor::HandleInteract(const Actor *target) const
 
 bool Actor::GetPartyComment()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	//not an NPC
 	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
@@ -4202,12 +4202,12 @@ void Actor::CommandActor(Action* action, bool clearPath)
 void Actor::IdleActions(bool nonidle)
 {
 	//do we have an area
-	Map *map = GetCurrentArea();
+	const Map *map = GetCurrentArea();
 	if (!map) return;
 	//and not in panic
 	if (panicMode!=PANIC_NONE) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//there is no combat
 	if (game->CombatCounter) {
 		ResetCommentTime();
@@ -4273,7 +4273,7 @@ void Actor::PlayExistenceSounds()
 	//only non-joinable chars can have existence sounds
 	if (Persistent()) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	ieDword time = game->GameTime;
 	if (time/nextComment > 1) { // first run, not adjusted for game time yet
 		nextComment += time;
@@ -4324,7 +4324,7 @@ bool Actor::OverrideActions()
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	Action *action;
 	if ((Modified[IE_STATE_ID] & STATE_CHARMED) && (BaseStats[IE_EA] <= EA_GOODCUTOFF) && Modified[IE_EA] == EA_CHARMEDPC) {
-		Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
+		const Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
 		if (!charm) return false;
 
 		// skip regular charm
@@ -5024,7 +5024,7 @@ void Actor::dump(StringBuffer& buffer) const
 
 const char* Actor::GetActorNameByID(ieDword ID) const
 {
-	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
+	const Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
 	if (!actor) {
 		return "<NULL>";
 	}
@@ -5695,7 +5695,7 @@ bool Actor::CheckOnDeath()
 		return false;
 	}
 	// don't destroy actors currently in a dialog
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (gc && gc->dialoghandler->InDialog(this)) {
 		return false;
 	}
@@ -5860,7 +5860,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	}
 	const CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
-	Item *itm = gamedata->GetItem(slot->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef.CString());
 		return; //quick item slot contains invalid item resref
@@ -5986,7 +5986,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
 			const CREItem *slotitm = inventory.GetSlotItem(slot);
 			assert(slotitm);
-			Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
+			const Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
 			assert(itm);
 			const ITMExtHeader *ext_header = itm->GetExtHeader(header);
 			if (ext_header) {
@@ -6124,7 +6124,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 	if (ga_flags & GA_NO_UNSCHEDULED && !InParty) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
-		Game *game = core->GetGame();
+		const Game *game = core->GetGame();
 		if (game) {
 			if (!Schedule(game->GameTime, true)) return false;
 		}
@@ -6236,7 +6236,7 @@ const ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	if (!wield) {
 		return NULL;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef.CString());
 		return NULL;
@@ -6263,7 +6263,7 @@ int Actor::IsDualWielding() const
 		return 0;
 	}
 
-	Item *itm = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
@@ -6287,7 +6287,7 @@ const ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	if (!wield) {
 		return 0;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
@@ -6964,7 +6964,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		speed += wstwohanded[stars][2];
 	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
-		CREItem *weapon = inventory.GetUsedWeapon(true, slot);
+		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
 		if(wssingle && weapon == NULL) {
 			//NULL return from GetUsedWeapon means no shield slot
 			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
@@ -7361,7 +7361,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (PCStats) {
 		// make a copy of wi.slot, since GetUsedWeapon can modify it
 		int wislot = wi.slot;
-		CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
+		const CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
 		//if slot was null, then GetCombatDetails returned false
 		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
 	}
@@ -7889,7 +7889,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	// wandered away, the action code should probably be responsible somehow
 	// see also line above (search for comment containing UpdateActorState)!
 	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
-		Actor *target = area->GetActorByGlobalID(LastTarget);
+		const Actor *target = area->GetActorByGlobalID(LastTarget);
 		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StopAttack();
 		} else {
@@ -8074,7 +8074,7 @@ void Actor::AddExperience(int exp, int combat)
 	int xpStat = IE_XP;
 
 	// decide which particular XP stat to add to (only for TNO's switchable classes)
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	if (pstflags && this == game->GetPC(0, false)) { // rule only applies to the protagonist
 		switch (BaseStats[IE_CLASS]) {
 			case 4:
@@ -8246,7 +8246,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 	Video* video = core->GetVideoDriver();
 
 	for (const auto& part : animParts) {
-		Animation* anim = part.first;
+		const Animation* anim = part.first;
 		PaletteHolder palette = part.second;
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
@@ -8484,7 +8484,7 @@ void Actor::UpdateDrawingRegion()
 	
 	auto ExpandBoxForAnimationParts = [&box, this](const std::vector<AnimationPart>& parts) {
 		for (const auto& part : parts) {
-			Animation* anim = part.first;
+			const Animation* anim = part.first;
 			Holder<Sprite2D> animframe = anim->CurrentFrame();
 			assert(animframe);
 			Region partBBox = animframe->Frame;
@@ -8579,7 +8579,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
 	for (; it != vfxQueue.cend(); ++it) {
-		ScriptedAnimation* vvc = *it;
+		const ScriptedAnimation* vvc = *it;
 		if (vvc->YOffset >= 0) {
 			break;
 		}
@@ -8648,7 +8648,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		}
 
 		if (!currentStance.shadow.empty()) {
-			Game* game = core->GetGame();
+			const Game* game = core->GetGame();
 			// infravision, independent of light map and global light
 			if (HasBodyHeat() &&
 				game->PartyHasInfravision() &&
@@ -8701,7 +8701,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
-		ScriptedAnimation* vvc = *it;
+		const ScriptedAnimation* vvc = *it;
 		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 }
@@ -9476,7 +9476,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 	}
 
-	Actor *tar = (Actor *) target;
+	const Actor *tar = (const Actor *) target;
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
@@ -9866,9 +9866,7 @@ no_resolve:
 //this one is the same, but returns strrefs based on effects
 ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 {
-	Effect *fx;
-
-	fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
+	const Effect *fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
 	if (fx) {
 		return fx->Parameter1;
 	}
@@ -10449,7 +10447,7 @@ void Actor::UseExit(ieDword exitID) {
 		UsedExit = nullptr;
 		if (LastExit) {
 			const char *ipName = NULL;
-			Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
+			const Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
 			if (ip) ipName = ip->GetScriptName();
 			if (ipName && ipName[0]) {
 				snprintf(UsedExit, sizeof(ieVariable), "%s", ipName);
@@ -10955,7 +10953,7 @@ bool Actor::IsPartyMember() const
 
 void Actor::ResetCommentTime()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (bored_time) {
 		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
 		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
@@ -10989,7 +10987,7 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 	}
 	bool magical = false;
 	int armorSlot = inventory.GetArmorSlot();
-	CREItem *armorItem = inventory.GetSlotItem(armorSlot);
+	const CREItem *armorItem = inventory.GetSlotItem(armorSlot);
 	if (armorItem) {
 		magical = armorItem->Flags&IE_INV_ITEM_MAGICAL;
 	}
@@ -11333,9 +11331,9 @@ char Actor::GetArmorCode() const
 {
 	bool mageAnimation = (BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200;
 	// IE_ARMOR_TYPE + 1 is the armor code, but we also need to look up robes specifically as they have 3 types :(
-	CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
+	const CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
 	if (!itm) return '1';
-	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	const Item *item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return '1';
 	bool wearingRobes = item->AnimationType[1] == 'W';
 
@@ -11394,11 +11392,11 @@ void Actor::PlayArmorSound() const
 	// pst is missing the resources
 	if (pstflags) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) return;
 	if (game->CombatCounter) return;
 
-	ResRef armorSound = GetArmorSound();
+	const ResRef armorSound = GetArmorSound();
 	if (!armorSound.IsEmpty()) {
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos);
 	}
