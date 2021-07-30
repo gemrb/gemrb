@@ -3915,7 +3915,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		char chrsound[256];
 		do {
 			count--;
-			ResolveStringConstant(soundRef, start + count);
+			GetVerbalConstantSound(soundRef, start + count);
 			GetSoundFolder(chrsound, 1, soundRef);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
@@ -8874,7 +8874,7 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 	return true;
 }
 
-void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
+void Actor::GetVerbalConstantSound(ResRef& Sound, unsigned int index) const
 {
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		//resolving soundset (bg1/bg2 style)

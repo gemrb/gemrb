@@ -449,7 +449,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		int tmp=(int) actor->GetVerbalConstant(Strref);
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
-			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
+			actor->GetVerbalConstantSound(soundRef, static_cast<unsigned int>(Strref));
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
