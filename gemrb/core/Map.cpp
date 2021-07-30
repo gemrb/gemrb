@@ -3265,13 +3265,6 @@ Size Map::GetSize() const
 	return TMap->GetMapSize();
 }
 
-//--------explored bitmap-----------
-int Map::GetExploredMapSize() const
-{
-	Size fogSize = FogMapSize();
-	return (fogSize.w * fogSize.h + 7) / 8;
-}
-
 void Map::FillExplored(bool explored)
 {
 	ExploredBitmap.fill(explored ? 0xff : 0x00);

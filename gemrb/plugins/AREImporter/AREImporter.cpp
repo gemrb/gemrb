@@ -1443,11 +1443,11 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	}
 
 	Log(DEBUG, "AREImporter", "Loading explored bitmap");
-	unsigned int mapSize = map->GetExploredMapSize();
-	if (ExploredBitmapSize == mapSize) {
-		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-		str->Read(map->ExploredBitmap.begin(), mapSize);
-	}
+	ieDword mapSize = ieDword(map->ExploredBitmap.Bytes());
+	assert(ExploredBitmapSize <= mapSize);
+	mapSize = std::min(mapSize, ExploredBitmapSize);
+	str->Seek(ExploredBitmapOffset, GEM_STREAM_START);
+	str->Read(map->ExploredBitmap.begin(), mapSize);
 
 	Log(DEBUG, "AREImporter", "Loading wallgroups");
 	map->SetWallGroups(tmm->GetWallGroups());
@@ -1595,7 +1595,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += TileCount * 0x6c;
 	ExploredBitmapOffset = headersize;
 
-	ExploredBitmapSize = map->GetExploredMapSize();
+	ExploredBitmapSize = map->ExploredBitmap.Bytes();
 	headersize += ExploredBitmapSize;
 	EffectOffset = headersize;
 

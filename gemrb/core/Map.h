@@ -542,7 +542,6 @@ public:
 	int GetWidth() const { return mapSize.w; }
 	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
-	int GetExploredMapSize() const;
 	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point&);
