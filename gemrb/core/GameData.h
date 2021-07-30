@@ -54,7 +54,7 @@ class TableMgr;
 class VEFObject;
 
 struct Table {
-	Holder<TableMgr> tm;
+	std::shared_ptr<TableMgr> tm;
 	ResRef resRef;
 	unsigned int refcount;
 };
@@ -88,7 +88,7 @@ public:
 	/** Gets the index of a loaded table, returns -1 on error */
 	int GetTableIndex(const ResRef& resRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	Holder<TableMgr> GetTable(size_t index) const;
+	std::shared_ptr<TableMgr> GetTable(size_t index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 
@@ -178,30 +178,30 @@ public:
 extern GEM_EXPORT GameData * gamedata;
 
 template <class T>
-using ResourceHolder = Holder<T>;
+using ResourceHolder = std::shared_ptr<T>;
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
 {
-	return Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
 {
-	return Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, bool silent = false, bool useCorrupt = false)
 {
-	return Holder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, const ResourceManager& manager, bool silent = false)
 {
-	return Holder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
 }
 
 }

@@ -1379,14 +1379,14 @@ void Targets::FilterObjectRect(const Object *oC)
 /** releasing global memory */
 static void CleanupIEScript()
 {
-	triggersTable.release();
-	actionsTable.release();
-	objectsTable.release();
-	overrideActionsTable.release();
-	overrideTriggersTable.release();
+	triggersTable.reset();
+	actionsTable.reset();
+	objectsTable.reset();
+	overrideActionsTable.reset();
+	overrideTriggersTable.reset();
 }
 
-static void printFunction(StringBuffer& buffer, const Holder<SymbolMgr>& table, int index)
+static void printFunction(StringBuffer& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
@@ -1409,7 +1409,7 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 			return;
 		}
 	}
-	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
+	auto table = core->GetSymbol(tableIndex);
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
@@ -1789,7 +1789,7 @@ void InitializeIEScript()
 		// leaving this as not strictly necessary, for now
 		Log(WARNING, "GameScript", "Couldn't find saved trigger symbols!");
 	} else {
-		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
+		auto savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
 			error("GameScript", "Couldn't load saved trigger symbols!\n");
 		}

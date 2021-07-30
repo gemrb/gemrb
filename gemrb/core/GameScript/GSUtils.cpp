@@ -56,11 +56,11 @@
 namespace GemRB {
 
 //these tables will get freed by Core
-Holder<SymbolMgr> triggersTable;
-Holder<SymbolMgr> actionsTable;
-Holder<SymbolMgr> overrideTriggersTable;
-Holder<SymbolMgr> overrideActionsTable;
-Holder<SymbolMgr> objectsTable;
+std::shared_ptr<SymbolMgr> triggersTable;
+std::shared_ptr<SymbolMgr> actionsTable;
+std::shared_ptr<SymbolMgr> overrideTriggersTable;
+std::shared_ptr<SymbolMgr> overrideActionsTable;
+std::shared_ptr<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];
 ActionFunction actions[MAX_ACTIONS];
 short actionflags[MAX_ACTIONS];
@@ -1548,7 +1548,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	}
 
 	int idsfile = core->LoadSymbol(idsname);
-	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
+	auto valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;

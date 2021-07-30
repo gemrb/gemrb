@@ -34,11 +34,11 @@ namespace GemRB {
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
 
-extern Holder<SymbolMgr> triggersTable;
-extern Holder<SymbolMgr> actionsTable;
-extern Holder<SymbolMgr> overrideTriggersTable;
-extern Holder<SymbolMgr> overrideActionsTable;
-extern Holder<SymbolMgr> objectsTable;
+extern std::shared_ptr<SymbolMgr> triggersTable;
+extern std::shared_ptr<SymbolMgr> actionsTable;
+extern std::shared_ptr<SymbolMgr> overrideTriggersTable;
+extern std::shared_ptr<SymbolMgr> overrideActionsTable;
+extern std::shared_ptr<SymbolMgr> objectsTable;
 extern TriggerFunction triggers[MAX_TRIGGERS];
 extern ActionFunction actions[MAX_ACTIONS];
 extern short actionflags[MAX_ACTIONS];

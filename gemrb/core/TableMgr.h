@@ -96,7 +96,7 @@ public:
 	const TableMgr* ptr() const { return &*table; }
 
 private:
-	Holder<TableMgr> table;
+	std::shared_ptr<TableMgr> table;
 	unsigned int tableref;
 };
 

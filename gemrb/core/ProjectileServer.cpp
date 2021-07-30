@@ -38,9 +38,9 @@ ProjectileServer::ProjectileServer()
 {
 	// built-in gemrb projectiles and game/mod-provided projectiles
 	unsigned int gemresource = core->LoadSymbol("gemprjtl");
-	Holder<SymbolMgr> gemprojlist = core->GetSymbol(gemresource);
+	auto gemprojlist = core->GetSymbol(gemresource);
 	unsigned int resource = core->LoadSymbol("projectl");
-	Holder<SymbolMgr> projlist = core->GetSymbol(resource);
+	auto projlist = core->GetSymbol(resource);
 	size_t projectilecount = 0;
 	// first, we must calculate how many projectiles we have
 	if (gemprojlist) {
@@ -207,7 +207,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 	return ReturnCopy(idx);
 }
 
-size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) const
+size_t ProjectileServer::PrepareSymbols(const std::shared_ptr<SymbolMgr>& projlist) const
 {
 	size_t count = 0;
 
@@ -227,7 +227,7 @@ size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) const
 	return count;
 }
 
-void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
+void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
 	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);

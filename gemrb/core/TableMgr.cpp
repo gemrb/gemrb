@@ -49,7 +49,7 @@ AutoTable& AutoTable::operator=(const AutoTable& other)
 		tableref = other.tableref;
 		table = gamedata->GetTable(tableref);
 	} else {
-		table.release();
+		table.reset();
 	}
 	return *this;
 }
@@ -76,7 +76,7 @@ void AutoTable::release()
 {
 	if (table) {
 		gamedata->DelTable(tableref);
-		table.release();
+		table.reset();
 	}
 }
 

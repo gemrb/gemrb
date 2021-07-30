@@ -340,12 +340,12 @@ Holder<SoundHandle> SDLAudio::Play(const char* ResRef, unsigned int channel,
 	return Holder<SoundHandle>(new SDLAudioSoundHandle(chunk, chan, flags & GEM_SND_RELATIVE));
 }
 
-int SDLAudio::CreateStream(Holder<SoundMgr> newMusic)
+int SDLAudio::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(MusicMutex);
 
 	print("SDLAudio setting new music");
-	MusicReader = newMusic;
+	MusicReader = std::move(newMusic);
 
 	return 0;
 }

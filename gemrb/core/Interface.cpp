@@ -1207,7 +1207,7 @@ int Interface::Init(InterfaceConfig* cfg)
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = Holder<Video>(( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str()));
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
 	if (!video) {
 		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
@@ -1480,7 +1480,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = Holder<Audio>((Audio*) PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str()));
+	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
 	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
@@ -2576,13 +2576,13 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-Holder<SymbolMgr> Interface::GetSymbol(unsigned int index) const
+std::shared_ptr<SymbolMgr> Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
-		return Holder<SymbolMgr>();
+		return {};
 	}
 	if (!symbols[index].sm) {
-		return Holder<SymbolMgr>();
+		return {};
 	}
 	return symbols[index].sm;
 }
@@ -2595,7 +2595,7 @@ bool Interface::DelSymbol(unsigned int index)
 	if (!symbols[index].sm) {
 		return false;
 	}
-	symbols[index].sm.release();
+	symbols[index].sm.reset();
 	return true;
 }
 /** Plays a Movie */
@@ -4621,7 +4621,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 
 	int symbol = LoadSymbol( "stats" );
-	Holder<SymbolMgr> sym = GetSymbol( symbol );
+	auto sym = GetSymbol( symbol );
 	if (!sym) {
 		error("Core", "Cannot load statistic name mappings.\n");
 	}
@@ -4640,7 +4640,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 {
 	int mastertable = gamedata->LoadTable( tablename );
 	if (mastertable == -1) return -1;
-	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+	auto mtm = gamedata->GetTable( mastertable );
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
@@ -4661,7 +4661,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 		}
 		int table = gamedata->LoadTable( tablename );
 		if (table == -1) continue;
-		Holder<TableMgr> tm = gamedata->GetTable( table );
+		auto tm = gamedata->GetTable( table );
 		if (!tm) continue;
 
 		int row;

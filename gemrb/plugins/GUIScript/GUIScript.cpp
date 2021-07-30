@@ -769,7 +769,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
 	}
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	const char* ret;
@@ -844,7 +844,7 @@ static PyObject* GemRB_Table_FindValue(PyObject* self, PyObject* args)
 		PyErr_Clear(); //clearing the exception
 	}
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	if (col == -1) {
@@ -879,7 +879,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 	char* rowname;
 	PARSE_ARGS( args, "Os", &self, &rowname );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	int row = tm->GetRowIndex( rowname );
@@ -910,7 +910,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject* self, PyObject* args)
 	int row;
 	PARSE_ARGS( args, "Oi", &self, &row );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	const char* str = tm->GetRowName( row );
@@ -942,7 +942,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 	char* colname;
 	PARSE_ARGS( args, "Os", &self, &colname );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	int col = tm->GetColumnIndex( colname );
@@ -973,7 +973,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject* self, PyObject* args)
 	int col;
 	PARSE_ARGS( args, "Oi", &self, &col );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	const char* str = tm->GetColumnName( col );
@@ -1002,7 +1002,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS( args, "O", &self );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetRowCount() );
@@ -1031,7 +1031,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject* self, PyObject* args)
 	int row = 0;
 	PARSE_ARGS( args, "O|i", &self, &row );
 
-	Holder<TableMgr> tm = GetTable(self);
+	auto tm = GetTable(self);
 	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetColumnCount(row) );
@@ -1130,7 +1130,7 @@ static PyObject* GemRB_Symbol_GetValue(PyObject* self, PyObject* args)
 
 	PARSE_ARGS( args, "OO", &self, &sym );
 
-	Holder<SymbolMgr> sm = GetSymbols(self);
+	auto sm = GetSymbols(self);
 
 	if (sm == NULL) {
 		return AttributeError("No such symbols");
@@ -10534,7 +10534,7 @@ static void ReadActionButtons()
 	if (table<0) {
 		return;
 	}
-	Holder<TableMgr> tab = gamedata->GetTable( table );
+	auto tab = gamedata->GetTable( table );
 	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
