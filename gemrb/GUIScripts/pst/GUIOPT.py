@@ -471,6 +471,7 @@ def OpenMoviesWindow ():
 	# movie list
 	List = Window.GetControl (0)
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
+	GemRB.SetVar ('SelectedMovie', 0)
 	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())], 'SelectedMovie', -1)
 
 	Window.ShowModal (MODAL_SHADOW_BLACK)
@@ -478,11 +479,6 @@ def OpenMoviesWindow ():
 ###################################################
 def OnPlayMoviePress ():
 	selected = GemRB.GetVar ('SelectedMovie')
-
-	# FIXME: This should not happen, when the PlayMovie button gets
-	#   properly disabled/enabled, but it does not now
-	if selected == -1:
-		return
 	
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	key = MovieTable.GetRowName (selected)
