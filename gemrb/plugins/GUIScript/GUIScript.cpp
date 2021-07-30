@@ -294,7 +294,7 @@ Sets the color of floating messages in GameControl. Floating messages are\n\
 \n\
 **Return value:** N/A\n\
 \n\
-**See also:** [[guiscript:Label_SetTextColor]], [[guiscript:Button_SetTextColor]], [[guiscript:WorldMap_SetTextColor]]"
+**See also:** [[guiscript:Control_SetColor]]"
 );
 
 static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
@@ -1350,6 +1350,56 @@ static PyObject* GemRB_Scrollable_Scroll(PyObject* self, PyObject* args)
 		scroller->ScrollDelta(p);
 	} else {
 		scroller->ScrollTo(p);
+	}
+
+	Py_RETURN_NONE;
+}
+
+PyDoc_STRVAR( GemRB_Control_SetColor__doc,
+"===== Control_SetColor =====\n\
+\n\
+**Metaclass Prototype:** SetColor (Color[, Index])\n\
+\n\
+**Description:** Set the control's desired text color as a rgb dict.\n\
+Specifics depend on control type:\n\
+  * text area: set the text color coresponding to the index, which is from GUIDefines:\n\
+    * TA_COLOR_NORMAL: text color\n\
+    * TA_COLOR_INITIALS: color of the artful initial\n\
+    * TA_COLOR_BACKGROUND: text background color\n\
+    * TA_COLOR_OPTIONS: color of pick-one selection options\n\
+    * TA_COLOR_HOVER: color of options on hover\n\
+    * TA_COLOR_SELECTED: color of the selected option\n\
+  * button: set the text color\n\
+  * label: set the text color and enable color mode (black backgroud by default)\n\
+\n\
+**Parameters:**\n\
+  * GTextArea - the TextArea to set a color for\n\
+  * Color - Python dictionary of r,g,b,a color values\n\
+  * Index - the COLOR_TYPE\n\
+\n\
+**Return value:** N/A"
+);
+
+static PyObject* GemRB_Control_SetColor(PyObject* self, PyObject* args)
+{
+	PyObject* pyColor;
+	TextArea::COLOR_TYPE colorType = TextArea::COLOR_NORMAL;
+	PARSE_ARGS(args, "OO|i", &self, &pyColor, &colorType);
+
+	const Control *ctrl = GetView<Control>(self);
+	ABORT_IF_NULL(ctrl);
+	const Color color = ColorFromPy(pyColor);
+
+	if (ctrl->ControlType == IE_GUI_BUTTON) {
+		Button* button = GetView<Button>(self);
+		button->SetTextColor(color);
+	} else if (ctrl->ControlType == IE_GUI_LABEL) {
+		Label* label = GetView<Label>(self);
+		label->SetColors(color, ColorBlack);
+		label->SetFlags(Label::UseColor, OP_OR);
+	} else if (ctrl->ControlType == IE_GUI_TEXTAREA) {
+		TextArea* textArea = GetView<TextArea>(self);
+		textArea->SetColor(color, colorType);
 	}
 
 	Py_RETURN_NONE;
@@ -2528,37 +2578,6 @@ static PyObject* GemRB_View_Focus(PyObject* self, PyObject* args)
 	Py_RETURN_NONE;
 }
 
-PyDoc_STRVAR( GemRB_Label_SetTextColor__doc,
-"===== Label_SetTextColor =====\n\
-\n\
-**Prototype:** GemRB.SetLabelTextColor (GLabel, color)\n\
-\n\
-**Metaclass Prototype:** SetTextColor (color)\n\
-\n\
-**Description:** Sets the Text Color of a Label Control.\n\
-\n\
-**Parameters:**\n\
-  * GLabel - the control's reference\n\
-  * color - the control's desired text color as a rgb dict\n\
-\n\
-**Return value:** N/A"
-);
-
-static PyObject* GemRB_Label_SetTextColor(PyObject* self, PyObject* args)
-{
-	PyObject* pyColor;
-	PARSE_ARGS( args, "OO", &self, &pyColor);
-
-	Label* lab = GetView<Label>(self);
-	ABORT_IF_NULL(lab);
-
-	const Color color = ColorFromPy(pyColor);
-	lab->SetColors(color, ColorBlack);
-	lab->SetFlags(Label::UseColor, OP_OR);
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Button_SetSprites__doc,
 "===== Button_SetSprites =====\n\
 \n\
@@ -2828,37 +2847,6 @@ static PyObject* GemRB_Button_SetPushOffset(PyObject* self, PyObject* args)
 	ABORT_IF_NULL(btn);
 
 	btn->SetPushOffset(x, y);
-
-	Py_RETURN_NONE;
-}
-
-PyDoc_STRVAR( GemRB_Button_SetTextColor__doc,
-"===== Button_SetTextColor =====\n\
-\n\
-**Prototype:** GemRB.SetButtonTextColor (WindowIndex, ControlIndex, red, green, blue[, invert=0])\n\
-\n\
-**Metaclass Prototype:** SetTextColor (red, green, blue[, invert=0])\n\
-\n\
-**Description:** Sets the text color of a Button control.\n\
-\n\
-**Parameters:**\n\
-  * WindowIndex, ControlIndex - the control's reference\n\
-  * red, green, blue - the rgb color values as a rgb dict\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:Label_SetTextColor]]"
-);
-
-static PyObject* GemRB_Button_SetTextColor(PyObject* self, PyObject* args)
-{
-	PyObject* pyColor;
-	PARSE_ARGS(args,  "OO", &self, &pyColor);
-
-	Button* but = GetView<Button>(self);
-	ABORT_IF_NULL(but);
-
-	but->SetTextColor(ColorFromPy(pyColor));
 
 	Py_RETURN_NONE;
 }
@@ -4940,36 +4928,6 @@ static PyObject* GemRB_TextArea_ListResources(PyObject* self, PyObject* args)
 	ta->SetSelectOptions(TAOptions, false);
 
 	return MakePyList<const String&, PyString_FromStringObj>(strings);
-}
-
-PyDoc_STRVAR( GemRB_TextArea_SetColor__doc,
-"===== TextArea_SeColor =====\n\
-\n\
-**Prototype:** GemRB.SetColor (GTextArea, Color [, Index])\n\
-\n\
-**Metaclass Prototype:** SetColor (Options)\n\
-\n\
-**Description:** Set the color coresponding to the index for a TextArea\n\
-\n\
-**Parameters:** \n\
-  * GTextArea - the TextArea to set a color for\n\
-  * Color - Python dictionary of r,g,b,a color values\n\
-  * Index - the COLOR_TYPE\n\
-\n\
-**Return value:** N/A"
-);
-
-static PyObject* GemRB_TextArea_SetColor(PyObject* self, PyObject* args)
-{
-	PyObject* pycolor;
-	TextArea::COLOR_TYPE index = TextArea::COLOR_NORMAL;
-	PARSE_ARGS(args,  "OO|i", &self, &pycolor, &index);
-
-	TextArea* ta = GetView<TextArea>(self);
-	ABORT_IF_NULL(ta);
-	ta->SetColor(ColorFromPy(pycolor), index);
-
-	Py_RETURN_NONE;
 }
 
 PyDoc_STRVAR( GemRB_TextArea_SetOptions__doc,
@@ -13425,15 +13383,14 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Button_SetSpellIcon, METH_VARARGS),
 	METHOD(Button_SetSprites, METH_VARARGS),
 	METHOD(Button_SetState, METH_VARARGS),
-	METHOD(Button_SetTextColor, METH_VARARGS),
 	METHOD(Control_QueryText, METH_VARARGS),
 	METHOD(Control_SetAction, METH_VARARGS),
 	METHOD(Control_SetActionInterval, METH_VARARGS),
+	METHOD(Control_SetColor, METH_VARARGS),
 	METHOD(Control_SetStatus, METH_VARARGS),
 	METHOD(Control_SetText, METH_VARARGS),
 	METHOD(Control_SetVarAssoc, METH_VARARGS),
 	METHOD(Label_SetFont, METH_VARARGS),
-	METHOD(Label_SetTextColor, METH_VARARGS),
 	METHOD(SaveGame_GetDate, METH_VARARGS),
 	METHOD(SaveGame_GetGameDate, METH_VARARGS),
 	METHOD(SaveGame_GetName, METH_VARARGS),
@@ -13454,7 +13411,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Table_Unload, METH_VARARGS),
 	METHOD(TextArea_Append, METH_VARARGS),
 	METHOD(TextArea_ListResources, METH_VARARGS),
-	METHOD(TextArea_SetColor, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
 	METHOD(TextArea_SetChapterText, METH_VARARGS),
 	METHOD(TextEdit_SetBufferLength, METH_VARARGS),

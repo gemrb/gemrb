@@ -46,7 +46,7 @@ def OnLoad():
 
 	Label = StartWindow.CreateLabel(0x0fff0000, 0,415,640,30, "FONTDLG", "", IE_FONT_SINGLE_LINE | IE_FONT_ALIGN_CENTER)
 	Label.SetText(GemRB.Version)
-	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 	StartWindow.Focus()
 
