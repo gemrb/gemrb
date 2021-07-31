@@ -10406,8 +10406,6 @@ bool Actor::IsDualSwap() const
 
 ieDword Actor::GetWarriorLevel() const
 {
-	if (!IsWarrior()) return 0;
-
 	ieDword warriorlevels[4] = {
 		GetBarbarianLevel(),
 		GetFighterLevel(),
