@@ -234,7 +234,7 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		void* p = malloc(size.Area());
 		memcpy(p, pixels, size.Area());
 		PaletteHolder pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
-		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->col[0] == ColorGreen, 0);
 		fmt.Depth = NumColors == 16 ? 4 : 8;
 		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
 	}
