@@ -33,6 +33,7 @@
 #include "GameData.h"
 #include "ImageMgr.h"
 #include "Interface.h"
+#include "PathFinder.h"
 #include "Palette.h"
 #include "PluginMgr.h"
 #include "ProjectileServer.h"
@@ -115,6 +116,70 @@ static int GetTrackString(const char* areaName)
 		}
 	}
 	return -1;
+}
+
+static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
+{
+	ResRef TmpResRef;
+
+	if (day_or_night) {
+		TmpResRef.SNPrintF("%.6sLM", wedref.CString());
+	} else {
+		TmpResRef.SNPrintF("%.6sLN", wedref.CString());
+	}
+
+	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!lm) {
+		Log(ERROR, "AREImporter", "No lightmap available.");
+		return NULL;
+	}
+
+	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
+
+	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!sr) {
+		Log(ERROR, "AREImporter", "No searchmap available.");
+		return NULL;
+	}
+
+	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
+
+	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
+	if (!hm) {
+		Log(ERROR, "AREImporter", "No heightmap available.");
+		return NULL;
+	}
+	
+	assert(lm->GetSize() == sr->GetSize() && lm->GetSize() == hm->GetSize());
+	
+	auto lightmap = lm->GetSprite2D();
+	auto heightmap = hm->GetSprite2D();
+	auto searchmap = sr->GetSprite2D();
+	
+	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp);
+
+	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
+					Map::heightMapMask, Map::lightMapMask);
+	fmt.palette = lightmap->GetPalette();
+	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), lm->GetSize()), nullptr, fmt);
+
+	auto propit = tileProps->GetIterator();
+	auto end = propit.end(propit);
+	
+	auto hmpal = heightmap->GetPalette();
+	auto smit = searchmap->GetIterator();
+	auto hmit = heightmap->GetIterator();
+	auto lmit = lightmap->GetIterator();
+	for (; propit != end; ++propit, ++lmit, ++hmit, ++smit) {
+		uint8_t smval = *smit; // r + g
+		assert((smval & 0xf0) == 0);
+		uint8_t r = uint8_t(PathFinder::Get().Passable[smval]);
+		uint8_t g = smval;
+		uint8_t b = hmpal->col[*hmit].r; // pick any channel, they are all the same
+		uint8_t a = *lmit;
+		propit.WriteRGBA(r, g, b, a);
+	}
+	return tileProps;
 }
 
 AREImporter::AREImporter(void)
@@ -269,25 +334,17 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		//fall back to day minimap
 		sm = GetResourceHolder<ImageMgr>(map->WEDResRef);
 	}
-
+	
+	if (sm) {
+		map->SmallMap = sm->GetSprite2D();
+	}
+	
 	//the map state was altered, no need to hold this off for any later
 	map->DayNight = day_or_night;
-
-	//get the lightmap name
-	if (day_or_night) {
-		TmpResRef.SNPrintF("%.6sLM", map->WEDResRef.CString());
-	} else {
-		TmpResRef.SNPrintF("%.6sLN", map->WEDResRef.CString());
-	}
-
-	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!lm) {
-		Log(ERROR, "AREImporter", "No lightmap available.");
-		return false;
-	}
-
-	//alter the lightmap and the minimap (the tileset was already swapped)
-	map->ChangeTileMap(lm->GetSprite2D(), sm?sm->GetSprite2D():NULL);
+	
+	tm->UpdateDoors();
+	
+	map->SetTileMapProps(MakeTileProps(map->WEDResRef, day_or_night));
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
@@ -383,35 +440,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		sm = GetResourceHolder<ImageMgr>(WEDResRef);
 	}
 
-	if (day_or_night) {
-		TmpResRef.SNPrintF("%.6sLM", WEDResRef.CString());
-	} else {
-		TmpResRef.SNPrintF("%.6sLN", WEDResRef.CString());
-	}
-
-	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!lm) {
-		Log(ERROR, "AREImporter", "No lightmap available.");
-		return NULL;
-	}
-
-	TmpResRef.SNPrintF("%.6sSR", WEDResRef.CString());
-
-	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!sr) {
-		Log(ERROR, "AREImporter", "No searchmap available.");
-		return NULL;
-	}
-
-	TmpResRef.SNPrintF("%.6sHT", WEDResRef.CString());
-
-	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!hm) {
-		Log(ERROR, "AREImporter", "No heightmap available.");
-		return NULL;
-	}
-	
-	Map* map = new Map(tm, lm->GetSprite2D(), sr->GetSprite2D(), sm ? sm->GetSprite2D() : nullptr, hm->GetSprite2D());
+	Map* map = new Map(tm, MakeTileProps(WEDResRef, day_or_night), sm->GetSprite2D());
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;

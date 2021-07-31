@@ -278,30 +278,17 @@ Point Map::ConvertCoordFromTile(const Point& p)
 	return Point(p.x * 16, p.y * 12);
 }
 
-Map::Map(TileMap *tm, Holder<Sprite2D> lm, Holder<Sprite2D> sr, Holder<Sprite2D> sm, Holder<Sprite2D> hm)
-: Scriptable(ST_AREA), TMap(tm), HeightMap(std::move(hm)),
+Map::Map(TileMap *tm, Holder<Sprite2D> props, Holder<Sprite2D> sm)
+: Scriptable(ST_AREA), TMap(tm), SmallMap(std::move(sm)),
 ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize()),
-reverb(*this)
+reverb(*this),
+tileProps(std::move(props))
 {
 	ExploredBitmap.fill(0);
 	VisibleBitmap.fill(0);
 
-	LightMap = std::move(lm);
-	SmallMap = std::move(sm);
 	mapSize.w = TMap->XCellCount * 4;
 	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
-
-	//Internal Searchmap
-	SrchMap = (PathMapFlags *) calloc(mapSize.Area(), sizeof(PathMapFlags));
-	MaterialMap = (unsigned short *) calloc(mapSize.Area(), sizeof(unsigned short));
-	assert(sr->Format().Bpp == 1);
-	auto it = sr->GetIterator();
-	auto end = it.end(it);
-	for (size_t index = 0; it != end; ++it, ++index) {
-		uint8_t value = uint8_t(PathMapFlags(*it) & PathMapFlags::AREAMASK);
-		SrchMap[index] = PathFinder::Get().Passable[value];
-		MaterialMap[index] = value;
-	}
 	
 	area=this;
 	queue[PR_SCRIPT] = NULL;
@@ -333,9 +320,6 @@ reverb(*this)
 
 Map::~Map(void)
 {
-	free( SrchMap );
-	free( MaterialMap );
-
 	//close the current container if it was owned by this map, this avoids a crash
 	const Container *c = core->GetCurrentContainer();
 	if (c && c->GetCurrentArea()==this) {
@@ -383,12 +367,9 @@ Map::~Map(void)
 	}
 }
 
-void Map::ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm)
+void Map::SetTileMapProps(Holder<Sprite2D> props)
 {
-	LightMap = std::move(lm);
-	SmallMap = std::move(sm);
-
-	TMap->UpdateDoors();
+	tileProps = std::move(props);
 }
 
 void Map::AutoLockDoors() const
@@ -776,12 +757,12 @@ void Map::UpdateScripts()
 	SortQueues();
 }
 
-ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &Pos) const
+ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 {
 	const auto& terrainsounds = PathFinder::Get().terrainsounds;
 	for (const auto& sound : terrainsounds) {
 		if (resref == sound.Group) {
-			int type = MaterialMap[Pos.x/16 + Pos.y/12 * mapSize.w];
+			uint8_t type = tileProps->GetPixel(Map::ConvertCoordToTile(p)).g;
 			return sound.Sounds[type];
 		}
 	}
@@ -1289,7 +1270,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 		
 		Color tint = ColorWhite;
 		if (a->Flags & A_ANI_NO_SHADOW) {
-			tint = LightMap->GetPixel(Map::ConvertCoordToTile(a->Pos));
+			tint = GetLighting(a->Pos);
 		}
 		
 		game->ApplyGlobalTint(tint, flags);
@@ -1346,7 +1327,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 							flags |= BlitFlags::GREY;
 						}
 						
-						Color baseTint = area->LightMap->GetPixel(Map::ConvertCoordToTile(actor->Pos));
+						Color baseTint = area->GetLighting(actor->Pos);
 						Color tint(baseTint);
 						game->ApplyGlobalTint(tint, flags);
 						actor->Draw(viewport, baseTint, tint, flags|BlitFlags::BLENDED);
@@ -1374,7 +1355,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					flags |= BlitFlags::GREY;
 				}
 				
-				Color tint = LightMap->GetPixel(Map::ConvertCoordToTile(c->Pos));
+				Color tint = GetLighting(c->Pos);
 				game->ApplyGlobalTint(tint, flags);
 
 				if (c->Highlight || (debugFlags & DEBUG_SHOW_CONTAINERS)) {
@@ -1398,7 +1379,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					scaidx = vvcCells.erase(scaidx);
 				} else {
 					video->SetStencilBuffer(wallStencil);
-					Color tint = LightMap->GetPixel(Map::ConvertCoordToTile(sca->Pos));
+					Color tint = GetLighting(sca->Pos);
 					tint.a = 255;
 					
 					// FIXME: these should actually make use of SetDrawingStencilForObject too
@@ -1462,12 +1443,13 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	bool update_scripts = (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) == 0;
 	game->DrawWeather(update_scripts);
 	
-	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
-		DrawSearchMap(viewport);
+	if (dFlags & (DEBUG_SHOW_LIGHTMAP | DEBUG_SHOW_HEIGHTMAP | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_SEARCHMAP)) {
+		DrawDebugOverlay(viewport, dFlags);
 	}
 	
 	const Bitmap* exploredBits = (dFlags & DEBUG_SHOW_FOG_UNEXPLORED) ? nullptr : &ExploredBitmap;
 	const Bitmap* visibleBits = (dFlags & DEBUG_SHOW_FOG_INVISIBLE) ? nullptr : &VisibleBitmap;
+
 	DrawFogOfWar(exploredBits, visibleBits, viewport);
 
 	int ipCount = 0;
@@ -1733,59 +1715,108 @@ BlitFlags Map::SetDrawingStencilForAreaAnimation(const AreaAnimation* anim, cons
 	return (anim->Flags & A_ANI_NO_WALL) ? BlitFlags::NONE : BlitFlags::STENCIL_GREEN;
 }
 
-void Map::DrawSearchMap(const Region &vp) const
+void Map::DrawDebugOverlay(const Region &vp, uint32_t dFlags) const
 {
-	assert(SrchMap);
-
-	static const Color inaccessible = ColorGray;
-	static const Color impassible(128, 64, 64, 0xff); // red-ish
-	static const Color sidewall(64, 64, 128, 0xff); // blue-ish
-	static const Color actor(128, 64, 128, 128); // purple-ish
-	static const BlitFlags flags = BlitFlags::BLENDED | BlitFlags::HALFTRANS;
-
+	const static struct DebugPalettes {
+		PaletteHolder searchMapPal;
+		PaletteHolder materialMapPal;
+		PaletteHolder heightMapPal;
+		// lightmap pal is the sprite pal
+		
+		DebugPalettes() noexcept {
+			searchMapPal = MakeHolder<Palette>();
+			std::fill(&searchMapPal->col[0], &searchMapPal->col[255], Color()); // passable is transparent
+			searchMapPal->col[0] = Color(128, 64, 64, 128); // IMPASSABLE, red-ish
+			
+			for (uint8_t i = 1; i < 255; ++i) {
+				if (i & uint8_t(PathMapFlags::SIDEWALL)) {
+					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(64, 64, 128, 128); // blues-ish
+				} else if (i & uint8_t(PathMapFlags::ACTOR)) {
+					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = Color(128, 64, 128, 128); // actor, purple-ish
+				} else if ((i & uint8_t(PathMapFlags::PASSABLE)) == 0) {
+					// anything else that isnt PASSABLE
+					searchMapPal->col[uint8_t(PathMapFlags::SIDEWALL)] = ColorGray;
+				}
+			}
+			
+			materialMapPal = MakeHolder<Palette>();
+			materialMapPal->col[0] = ColorBlack; // impassable, light blocking
+			materialMapPal->col[1] = Color(0xB9, 0xAB, 0x79, 128); // sand
+			materialMapPal->col[2] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			materialMapPal->col[3] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			materialMapPal->col[4] = Color(0x84, 0x86, 0x80, 128); // stone
+			materialMapPal->col[5] = Color(0, 0xFF, 0, 128); // grass
+			materialMapPal->col[6] = ColorBlue; // water
+			materialMapPal->col[7] = Color(0x84, 0x86, 0x80, 128); // stone
+			materialMapPal->col[8] = ColorWhite; // obstacle, non light blocking
+			materialMapPal->col[9] = Color(0x6C, 0x4D, 0x2E, 128); // wood
+			materialMapPal->col[10] = ColorGray; // wall, impassable
+			materialMapPal->col[11] = ColorBlue; // water
+			materialMapPal->col[12] = ColorBlueDark; // water, impassable
+			materialMapPal->col[13] = Color(0xFF, 0x00, 0xFF, 128); // roof
+			materialMapPal->col[14] = Color(128, 0, 128, 128); // exit
+			materialMapPal->col[15] = Color(0, 0xFF, 0, 128); // grass
+			
+			heightMapPal = MakeHolder<Palette>();
+			for (uint8_t i = 0; i < 255; ++i) {
+				heightMapPal->col[i] = Color(i, i, i, 128);
+			}
+		}
+	} debugPalettes;
+	
 	Video *vid=core->GetVideoDriver();
 	Region block(0,0,16,12);
 
 	int w = vp.w/16+2;
 	int h = vp.h/12+2;
+	
+	BlitFlags flags = BlitFlags::BLENDED;
+	if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+		flags |= BlitFlags::HALFTRANS;
+	}
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			PathMapFlags blockvalue = GetBlocked(Point(x, y) + ConvertCoordToTile(vp.origin));
 			block.x = x * 16 - (vp.x % 16);
 			block.y = y * 12 - (vp.y % 12);
-			if (!(blockvalue & PathMapFlags::PASSABLE)) {
-				if (blockvalue == PathMapFlags::IMPASSABLE) { // 0
-					vid->DrawRect(block, impassible, true, flags);
-				} else if (bool(blockvalue & PathMapFlags::SIDEWALL)) {
-					vid->DrawRect(block, sidewall, true, flags);
-				} else if (!(blockvalue & PathMapFlags::ACTOR)){
-					vid->DrawRect(block, inaccessible, true, flags);
-				}
+			
+			Point p = Point(x, y) + ConvertCoordToTile(vp.origin);
+
+			Color col;
+			Color vals = tileProps->GetPixel(p);
+			if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+				col = debugPalettes.searchMapPal->col[vals.r];
+			} else if (dFlags & DEBUG_SHOW_MATERIALMAP) {
+				col = debugPalettes.materialMapPal->col[vals.g];
+			} else if (dFlags & DEBUG_SHOW_HEIGHTMAP) {
+				col = debugPalettes.heightMapPal->col[vals.b];
+			} else if (dFlags & DEBUG_SHOW_LIGHTMAP) {
+				col = tileProps->GetPalette()->col[vals.a];
 			}
-			if (bool(blockvalue & PathMapFlags::ACTOR)) {
-				vid->DrawRect(block, actor);
-			}
+			
+			vid->DrawRect(block, col, true, flags);
 		}
 	}
-
-	// draw also pathfinding waypoints
-	const Actor *act = core->GetFirstSelectedActor();
-	if (!act) return;
-	const PathNode *path = act->GetPath();
-	if (!path) return;
-	const PathNode *step = path->Next;
-	Color waypoint(0, 64, 128, 128); // darker blue-ish
-	int i = 0;
-	block.w = 8;
-	block.h = 6;
-	while (step) {
-		block.x = (step->x+64) - vp.x;
-		block.y = (step->y+6) - vp.y;
-		print("Waypoint %d at (%d, %d)", i, step->x, step->y);
-		vid->DrawRect(block, waypoint);
-		step = step->Next;
-		i++;
+	
+	if (dFlags & DEBUG_SHOW_SEARCHMAP) {
+		// draw also pathfinding waypoints
+		const Actor *act = core->GetFirstSelectedActor();
+		if (!act) return;
+		const PathNode *path = act->GetPath();
+		if (!path) return;
+		const PathNode *step = path->Next;
+		Color waypoint(0, 64, 128, 128); // darker blue-ish
+		int i = 0;
+		block.w = 8;
+		block.h = 6;
+		while (step) {
+			block.x = (step->x+64) - vp.x;
+			block.y = (step->y+6) - vp.y;
+			print("Waypoint %d at (%d, %d)", i, step->x, step->y);
+			vid->DrawRect(block, waypoint);
+			step = step->Next;
+			i++;
+		}
 	}
 }
 
@@ -2400,14 +2431,37 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 
 int Map::GetHeight(const Point &p) const
 {
-	// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
-	// this covers the range -7 – +7
-	// since the image is grey we can use any channel for the mapping
-	int val = HeightMap->GetPixel(Map::ConvertCoordToTile(p)).r;
-	constexpr uint8_t input_range = 255;
-	constexpr uint8_t output_range = 14;
+	Point tilePos = Map::ConvertCoordToTile(p);
+	if (mapSize.PointInside(tilePos)) {
+		// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
+		// this covers the range -7 – +7
+		// since the image is grey we can use any channel for the mapping
+		int val = tileProps->GetPixel(tilePos).b;
+		constexpr uint8_t input_range = 255;
+		constexpr uint8_t output_range = 14;
 
-	return val * output_range / input_range - 7;
+		return val * output_range / input_range - 7;
+	}
+	return 0;
+}
+
+Color Map::GetLighting(const Point &p) const
+{
+	Point tilePos = Map::ConvertCoordToTile(p);
+	if (mapSize.PointInside(tilePos)) {
+		uint8_t val = tileProps->GetPixel(tilePos).a;
+		return tileProps->GetPalette()->col[val];
+	}
+	return Color();
+}
+
+PathMapFlags Map::QuerySearchMap(const Point &p) const
+{
+	// p is already in search map coords
+	if (mapSize.PointInside(p)) {
+		return PathMapFlags(tileProps->GetPixel(p).r);
+	}
+	return PathMapFlags::IMPASSABLE;
 }
 
 // a more thorough, but more expensive version for the cases when it matters
@@ -2430,10 +2484,7 @@ PathMapFlags Map::GetBlockedNavmap(const Point &c) const
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
 PathMapFlags Map::GetBlocked(const Point &p) const
 {
-	if (p.y >= mapSize.h || p.x >= mapSize.w) {
-		return PathMapFlags::IMPASSABLE;
-	}
-	PathMapFlags ret = SrchMap[p.y * mapSize.w + p.x];
+	PathMapFlags ret = QuerySearchMap(p);
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
@@ -3358,6 +3409,20 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value
 	int ppx = Pos.x/16;
 	int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
+	uint32_t* SrchMap = (uint32_t*)tileProps->LockSprite();
+	auto readSrchMap = [&](int pos) -> PathMapFlags {
+		if (pos < 0 || pos > mapSize.Area()) {
+			return PathMapFlags::IMPASSABLE;
+		}
+		uint32_t pixel = SrchMap[pos];
+		return PathMapFlags((pixel & searchMapMask) >> tileProps->Format().Rshift);
+	};
+	
+	auto writeSrchMap = [&](int pos, PathMapFlags val) -> void {
+		uint32_t& pixel = SrchMap[pos];
+		pixel = (pixel & ~searchMapMask) | (uint32_t(val) << tileProps->Format().Rshift);
+	};
+	
 	for (unsigned int i=0; i<size; i++) {
 		for (unsigned int j=0; j<size; j++) {
 			if (i*i+j*j <= r) {
@@ -3365,25 +3430,30 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value
 				unsigned int ppypj = ppy+j;
 				unsigned int ppxmi = ppx-i;
 				unsigned int ppymj = ppy-j;
-				unsigned int pos = ppypj * mapSize.w + ppxpi;
-				if (ppxpi < (unsigned)mapSize.w && ppypj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
+				int pos = ppypj * mapSize.w + ppxpi;
+				PathMapFlags mapval = readSrchMap(pos);
+				if (mapval != PathMapFlags::IMPASSABLE) {
+					writeSrchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = ppymj * mapSize.w + ppxpi;
-				if (ppxpi < (unsigned)mapSize.w && ppymj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
+				mapval = readSrchMap(pos);
+				if (mapval != PathMapFlags::IMPASSABLE) {
+					writeSrchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = ppypj * mapSize.w + ppxmi;
-				if (ppxmi < (unsigned)mapSize.w && ppypj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
+				mapval = readSrchMap(pos);
+				if (mapval != PathMapFlags::IMPASSABLE) {
+					writeSrchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 				pos = ppymj * mapSize.w + ppxmi;
-				if (ppxmi < (unsigned)mapSize.w && ppymj < (unsigned)mapSize.h && SrchMap[pos] != PathMapFlags::IMPASSABLE) {
-					SrchMap[pos] = (SrchMap[pos] & PathMapFlags::NOTACTOR) | value;
+				mapval = readSrchMap(pos);
+				if (mapval != PathMapFlags::IMPASSABLE) {
+					writeSrchMap(pos, (mapval & PathMapFlags::NOTACTOR) | value);
 				}
 			}
 		}
 	}
+	tileProps->UnlockSprite();
 }
 
 Spawn* Map::GetSpawn(const char *Name) const
@@ -3736,9 +3806,9 @@ bool Map::DisplayTrackString(const Actor *target) const
 
 // returns a lightness level in the range of [0-100]
 // since the lightmap is much smaller than the area, we need to interpolate
-unsigned int Map::GetLightLevel(const Point &Pos) const
+unsigned int Map::GetLightLevel(const Point &p) const
 {
-	Color c = LightMap->GetPixel(Map::ConvertCoordToTile(Pos));
+	Color c = GetLighting(p);
 	// at night/dusk/dawn the lightmap color is adjusted by the color overlay. (Only get's darker.)
 	const Color *tint = core->GetGame()->GetGlobalTint();
 	if (tint) {
@@ -3958,18 +4028,26 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 
 PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 {
-	if (p.x >= mapSize.w || p.y >= mapSize.h) {
+	// TODO: the subtle difference betweenm GetInternalSearchMap and QuerySearchMap
+	// is that this returns PathMapFlags::UNMARKED instead of PathMapFlags::IMPASSABLE
+	// for out of bounds points. I dont know if that is an important distiction
+	if (!mapSize.PointInside(p)) {
 		return PathMapFlags::UNMARKED;
 	}
-	return SrchMap[p.x + p.y * mapSize.w];
+	return QuerySearchMap(p);
 }
 
 void Map::SetInternalSearchMap(const Point& p, PathMapFlags value)
 {
-	if (p.x >= mapSize.w || p.y >= mapSize.h) {
+	if (!mapSize.PointInside(p)) {
 		return;
 	}
-	SrchMap[p.x + p.y * mapSize.w] = value;
+
+	auto it = tileProps->GetIterator();
+	it.Advance(p.x + p.y * mapSize.w);
+	
+	Color values = it.ReadRGBA();
+	it.WriteRGBA(uint8_t(value), values.g, values.b, values.a);
 }
 
 void Map::SetBackground(const ResRef &bgResRef, ieDword duration)

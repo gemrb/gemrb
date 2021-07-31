@@ -341,13 +341,15 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_DOORS_SECRET		= 0x08,
 	DEBUG_SHOW_DOORS_DISABLED	= 0x10,
 	DEBUG_SHOW_DOORS_ALL		= (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET|DEBUG_SHOW_DOORS_DISABLED),
-	DEBUG_SHOW_LIGHTMAP     	= 0x20,
-	DEBUG_SHOW_WALLS			= 0x40,
-	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x80,
+	DEBUG_SHOW_SEARCHMAP		= 0x20,
+	DEBUG_SHOW_MATERIALMAP     	= 0x40,
+	DEBUG_SHOW_HEIGHTMAP		= 0x80,
+	DEBUG_SHOW_LIGHTMAP			= 0x0100,
+	DEBUG_SHOW_WALLS			= 0x0200,
+	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x0400,
 	DEBUG_SHOW_WALLS_ALL		= (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER),
-	DEBUG_SHOW_SEARCHMAP		= 0x0100,
-	DEBUG_SHOW_FOG_UNEXPLORED	= 0x0200,
-	DEBUG_SHOW_FOG_INVISIBLE	= 0x0400,
+	DEBUG_SHOW_FOG_UNEXPLORED	= 0x0800,
+	DEBUG_SHOW_FOG_INVISIBLE	= 0x1000,
 	DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE),
 };
 
@@ -360,8 +362,6 @@ typedef std::list<Particles*>::const_iterator spaIterator;
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
-	Holder<Sprite2D> LightMap;
-	Holder<Sprite2D> HeightMap;
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
@@ -386,8 +386,10 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	PathMapFlags* SrchMap; //internal searchmap
-	unsigned short* MaterialMap;
+	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
+	// the assigned palette is the palette for the lightmap
+	Holder<Sprite2D> tileProps;
+
 	Size mapSize;
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
@@ -410,7 +412,12 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 public:
-	Map(TileMap *tm, Holder<Sprite2D> lm, Holder<Sprite2D> sr, Holder<Sprite2D> sm, Holder<Sprite2D> hm);
+	static constexpr uint32_t searchMapMask = 0xff000000;
+	static constexpr uint32_t materialMapMask = 0x00ff0000;
+	static constexpr uint32_t heightMapMask = 0x0000ff00;
+	static constexpr uint32_t lightMapMask = 0x000000ff;
+
+	Map(TileMap *tm, Holder<Sprite2D> tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
@@ -422,8 +429,7 @@ public:
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
-	/* low level function to perform the daylight changes */
-	void ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm);
+	void SetTileMapProps(Holder<Sprite2D> props);
 	void AutoLockDoors() const;
 	void UpdateScripts();
 	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
@@ -465,7 +471,11 @@ public:
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
+	
+	
 	int GetHeight(const Point &p) const;
+	Color GetLighting(const Point &p) const;
+
 	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const Point&) const;
 	PathMapFlags GetBlocked(const Point&, int size) const;
@@ -640,7 +650,7 @@ private:
 	BlitFlags SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
 	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	
-	void DrawSearchMap(const Region &vp) const;
+	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
 	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport);
@@ -659,6 +669,7 @@ private:
 	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
+	PathMapFlags QuerySearchMap(const Point&) const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 
 };

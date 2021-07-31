@@ -1718,7 +1718,7 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
-		tint = area->LightMap->GetPixel(Map::ConvertCoordToTile(Pos));
+		tint = area->GetLighting(Pos);
 		tint.a = 255;
 		flag |= BlitFlags::COLOR_MOD;
 	}
