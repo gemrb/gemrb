@@ -39,9 +39,9 @@ extern GEM_EXPORT unsigned char pl_uppercase[256];
 extern GEM_EXPORT unsigned char pl_lowercase[256];
 
 #ifdef HAS_WSTRING
-typedef std::wstring String;
+using String = std::wstring;
 #else
-typedef std::basic_string<wchar_t> String;
+using String = std::basic_string<wchar_t>;
 #endif
 
 // String creators

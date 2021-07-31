@@ -31,7 +31,7 @@
 #ifdef CACHE_TLK_OVERRIDE
 #include <map>
 
-typedef std::map<ieStrRef, char *> StringMapType;
+using StringMapType = std::map<ieStrRef, char *>;
 #endif
 
 namespace GemRB {

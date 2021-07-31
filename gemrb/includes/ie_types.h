@@ -34,24 +34,24 @@
 
 namespace GemRB {
 
-typedef unsigned char ieByte;
-typedef signed char ieByteSigned;
-typedef unsigned short ieWord;
-typedef signed short ieWordSigned;
+using ieByte = unsigned char;
+using ieByteSigned = signed char;
+using ieWord = unsigned short;
+using ieWordSigned = signed short;
 
 #if (SIZEOF_INT == 4)
-typedef unsigned int ieDword;
-typedef signed int ieDwordSigned;
+using ieDword = unsigned int;
+using ieDwordSigned = signed int;
 #elif (SIZE_LONG_INT == 4)
-typedef unsigned long int ieDword;
-typedef signed long int ieDwordSigned;
+using ieDword = unsigned long int;
+using ieDwordSigned = signed long int;
 #else
-typedef unsigned long int ieDword;
-typedef signed long int ieDwordSigned;
+using ieDword = unsigned long int;
+using ieDwordSigned = signed long int;
 #endif
 
 /** string reference into TLK file */
-typedef ieDword ieStrRef;
+using ieStrRef = ieDword;
 
 class ieVariable
 {

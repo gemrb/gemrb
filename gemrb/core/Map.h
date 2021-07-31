@@ -351,10 +351,10 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE),
 };
 
-typedef std::list<AreaAnimation>::iterator aniIterator;
-typedef std::list<VEFObject*>::const_iterator scaIterator;
-typedef std::list<Projectile*>::const_iterator proIterator;
-typedef std::list<Particles*>::const_iterator spaIterator;
+using aniIterator = std::list<AreaAnimation>::iterator;
+using scaIterator = std::list<VEFObject*>::const_iterator;
+using proIterator = std::list<Projectile*>::const_iterator;
+using spaIterator = std::list<Particles*>::const_iterator;
 
 
 class GEM_EXPORT Map : public Scriptable {

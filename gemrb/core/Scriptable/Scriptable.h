@@ -224,7 +224,7 @@ struct TriggerEntry {
 	unsigned int flags;
 };
 
-//typedef std::list<ieDword *> TriggerObjects;
+//using TriggerObjects = std::list<ieDword *>;
 
 //#define SEA_RESET		0x00000002
 //#define SEA_PARTY_REQUIRED	0x00000004

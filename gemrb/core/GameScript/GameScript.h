@@ -133,14 +133,14 @@ class StringBuffer;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-typedef std::vector<ieDword> SrcVector;
+using SrcVector = std::vector<ieDword>;
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door
 	unsigned int distance;
 };
 
-typedef std::list<targettype> targetlist;
+using targetlist = std::list<targettype>;
 
 class GEM_EXPORT Targets {
 public:

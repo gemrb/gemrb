@@ -1868,8 +1868,8 @@ inline static int CastOnRestHealingAmount(const Actor *caster, const SpecialSpel
 // heal on rest and similar
 void Game::CastOnRest() const
 {
-	typedef std::vector<HealingResource> RestSpells;
-	typedef std::vector<Injured> RestTargets;
+	using RestSpells = std::vector<HealingResource>;
+	using RestTargets = std::vector<Injured>;
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);

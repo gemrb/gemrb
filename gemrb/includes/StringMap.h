@@ -99,7 +99,7 @@ public:
 
 template<unsigned int size>
 struct HashKey<char[size]> {
-	typedef char array[size];
+	using array = char[size];
 
 	static inline unsigned int hash(const array &key)
 	{

@@ -106,9 +106,9 @@ enum ControllerButton : int8_t {
 	CONTROLLER_BUTTON_DPAD_RIGHT
 };
 
-typedef unsigned char EventButton;
-typedef unsigned short KeyboardKey;
-typedef unsigned short ButtonMask;
+using EventButton = unsigned char;
+using KeyboardKey = unsigned short;
+using ButtonMask = unsigned short;
 
 struct EventBase {
 	unsigned short repeats; // number of times this event has been repeated (within the repeat time interval)
@@ -241,7 +241,7 @@ struct GEM_EXPORT Event {
 
 	TextEvent text; // text is nontrivial so it stands alone (until C++11 is allowed)
 
-	typedef unsigned short EventMods;
+	using EventMods = unsigned short;
 
 	EventType type;
 	tick_t time;
@@ -261,9 +261,9 @@ KeyboardEvent KeyEventFromController(const ControllerEvent& ce);
 
 class GEM_EXPORT EventMgr {
 public:
-	typedef std::bitset<sizeof(short) * CHAR_BIT> buttonbits;
+	using buttonbits = std::bitset<sizeof(short) * CHAR_BIT>;
 	using EventCallback = Callback<bool, const Event&>;
-	typedef size_t TapMonitorId;
+	using TapMonitorId = size_t;
 	
 	static constexpr int mouseClickRadius = 5; // radius for reapeat click events
 	static constexpr int mouseDragRadius = 10; // radius for drag events
@@ -298,8 +298,8 @@ private:
 	// FIXME: this shouldnt really be static... but im not sure we want direct access to the EventMgr instance...
 	// currently the delays are static so it makes sense for now that the HotKeys are...
 	// map combination of keyboard key and modifier keys to a callback
-	typedef std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback> > EventTaps;
-	typedef std::map<int, std::list<EventCallback> > KeyMap;
+	using EventTaps = std::map<TapMonitorId, std::pair<Event::EventTypeMask, EventCallback>>;
+	using KeyMap = std::map<int, std::list<EventCallback>>;
 
 	static EventTaps Taps;
 	static KeyMap HotKeys;

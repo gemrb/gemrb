@@ -52,7 +52,7 @@
 namespace GemRB {
 
 #define FORMATIONSIZE 10
-typedef Point formation_type[FORMATIONSIZE];
+using formation_type = Point[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
 static const ResRef TestSpell = "SPWI207";

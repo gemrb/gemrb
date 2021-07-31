@@ -42,10 +42,10 @@ namespace GemRB {
 
 #ifdef WIN32
 #define TCHAR_FORMAT "%ls"
-typedef HMODULE LibHandle;
+using LibHandle = HMODULE;
 #else
 #define TCHAR_FORMAT "%s"
-typedef void *LibHandle;
+using LibHandle = void*;
 #endif
 
 namespace GemRB {
@@ -181,7 +181,7 @@ void LoadPlugins(const char* pluginpath)
 	dirIt.SetFlags(DirectoryIterator::Files);
 	dirIt.SetFilterPredicate(new ExtFilter(pluginExt)); // rewinds
 
-	typedef std::set<std::string> PathSet;
+	using PathSet = std::set<std::string>;
 	PathSet delayedPlugins;
 
 	if (!dirIt) {

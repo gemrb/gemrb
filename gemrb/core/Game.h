@@ -238,7 +238,7 @@ struct maze_header {
 
 #define MAX_CRLEVEL 32
 
-typedef int CRRow[MAX_CRLEVEL];
+using CRRow = int[MAX_CRLEVEL];
 
 /**
  * @class Game

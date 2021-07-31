@@ -97,7 +97,7 @@ struct UsedItemType {
 	int flags;
 };
 
-typedef char EventNameType[17];
+using EventNameType = char[17];
 #define IS_DROP	0
 #define IS_GET	1
 #define IS_SWINGOFFSET 2 // offset to the swing sound columns

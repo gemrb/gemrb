@@ -57,7 +57,7 @@ protected:
 	};
 public:
 	// abstract iteration position
-	typedef MyAssoc *iterator;
+	using iterator = MyAssoc*;
 public:
 	// Construction
 	explicit Variables(int nBlockSize = 10, int nHashTableSize = 2049);

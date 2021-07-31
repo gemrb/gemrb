@@ -179,7 +179,7 @@ public:
 
 	virtual String QueryText() const { return String(); }
 
-	typedef std::pair<ieDword, ieDword> ValueRange;
+	using ValueRange = std::pair<ieDword, ieDword>;
 	const static ValueRange MaxValueRange;
 	
 	ieDword GetValue() const { return Value; }
