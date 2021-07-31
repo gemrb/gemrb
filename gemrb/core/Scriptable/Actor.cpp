@@ -142,6 +142,9 @@ static ieDword state_invisible = STATE_INVISIBLE;
 static AutoTable extspeed;
 static AutoTable wspecial;
 
+static constexpr ieWord IT_SCROLL = 11;
+static constexpr ieWord IT_WAND = 35;
+
 //item animation override array
 struct ItemAnimType {
 	ResRef itemname;
@@ -9830,6 +9833,15 @@ int Actor::CheckUsability(const Item *item) const
 			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
 			// but the kit check would fail, since paladins and their kits aren't.
 			stat = GetClassMask();
+
+			// Use Magic Device can only be used on wands and scrolls, but also
+			// only by bards and thieves (restriction handled by skilcost.2da)
+			// the actual roll happens when the actor tries to use it
+			if ((item->ItemType == IT_WAND || item->ItemType == IT_SCROLL) && GetSkill(IE_MAGICDEVICE) > 0) {
+				continue;
+			}
+
+			// check everyone else
 			if (stat & ~itemvalue) {
 				if (Modified[IE_KIT] == 0) continue;
 			} else {
