@@ -138,16 +138,16 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 			}
 			str->Seek( overlays->TILOffset + ( startindex * 2 ),
 				GEM_STREAM_START );
-			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
-			str->Read( indices, count * sizeof(ieWord) );
+			std::vector<ieWord> indices(count);
+			str->Read(&indices[0], count * sizeof(ieWord));
 			if( DataStream::BigEndian()) {
-				swabs(indices, count * sizeof(ieWord));
+				swabs(&indices[0], count * sizeof(ieWord));
 			}
 			Tile* tile;
 			if (secondary == 0xffff) {
-				tile = tis->GetTile( indices, count );
+				tile = tis->GetTile(indices);
 			} else {
-				tile = tis->GetTile( indices, 1, &secondary );
+				tile = tis->GetTile(indices, &secondary);
 				tile->GetAnimation(1)->fps = animspeed;
 			}
 			tile->GetAnimation(0)->fps = animspeed;
@@ -155,7 +155,6 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 			usedoverlays |= overlaymask;
 			over->AddTile(std::move(*tile));
 			delete tile;
-			free( indices );
 		}
 	}
 	

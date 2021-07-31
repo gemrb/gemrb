@@ -58,12 +58,13 @@ bool TISImporter::Open(DataStream* stream)
 	return true;
 }
 
-Tile* TISImporter::GetTile(unsigned short* indexes, int count,
-	unsigned short* secondary)
+Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
+						   unsigned short* secondary)
 {
+	size_t count = indexes.size();
 	std::vector<Animation::frame_t> frames;
 	frames.reserve(count);
-	for (int i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		frames.push_back(GetTile(indexes[i]));
 	}
 	
@@ -75,7 +76,7 @@ Tile* TISImporter::GetTile(unsigned short* indexes, int count,
 	
 	if (secondary) {
 		frames.clear();
-		for (int i = 0; i < count; i++) {
+		for (size_t i = 0; i < count; i++) {
 			frames.push_back(GetTile(secondary[i]));
 		}
 		Animation sec = Animation(frames);
