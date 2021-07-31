@@ -65,16 +65,7 @@ struct ResRefToStrRef {
 };
 
 Holder<DataFileMgr> INInote;
-ResRefToStrRef *tracks = NULL;
-int trackcount = 0;
-
-static void ReleaseMemory()
-{
-	INInote.release();
-
-	delete [] tracks;
-	tracks = NULL;
-}
+static std::vector<ResRefToStrRef> tracks;
 
 static void ReadAutonoteINI()
 {
@@ -89,12 +80,12 @@ static int GetTrackString(const char* areaName)
 {
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
-	if (!tracks) {
+	if (tracks.empty()) {
 		AutoTable tm("tracking", true);
 		if (!tm.ok())
 			return -1;
-		trackcount = tm->GetRowCount();
-		tracks = new ResRefToStrRef[trackcount];
+		int trackcount = tm->GetRowCount();
+		tracks.resize(trackcount);
 		for (int i = 0; i < trackcount; i++) {
 			const char *poi = tm->QueryField(i,0);
 			if (poi[0]=='O' && poi[1]=='_') {
@@ -109,7 +100,7 @@ static int GetTrackString(const char* areaName)
 		}
 	}
 
-	for (int i = 0; i < trackcount; i++) {
+	for (int i = 0; i < int(tracks.size()); i++) {
 		if (tracks[i].areaName == areaName) {
 			return i;
 		}
@@ -2615,5 +2606,4 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 
 GEMRB_PLUGIN(0x145B60F0, "ARE File Importer")
 PLUGIN_CLASS(IE_ARE_CLASS_ID, ImporterPlugin<AREImporter>)
-PLUGIN_CLEANUP(ReleaseMemory)
 END_PLUGIN()
