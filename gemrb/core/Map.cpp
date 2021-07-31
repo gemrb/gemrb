@@ -3809,21 +3809,30 @@ void AreaAnimation::InitAnimation()
 			anim->MirrorAnimation();
 		}
 
-		return std::move(*anim);
+		return anim;
 	};
 
 	size_t animcount = af->GetCycleCount();
-	std::vector<Animation> newanim;
-	newanim.reserve(animcount);
+	animation.reserve(animcount);
+	size_t existingcount = std::min(animation.size(), animcount);
 
 	if (Flags & A_ANI_ALLCYCLES && animcount > 0) {
-		for (size_t j = 0; j < animation.size(); ++j) {
-			newanim.push_back(GetAnimationPiece(j));
+		size_t i = 0;
+		for (; i < existingcount; ++i) {
+			Animation* anim = GetAnimationPiece(i);
+			animation[i] = std::move(*anim);
+			delete anim;
+		}
+		for (; i < animcount; ++i) {
+			Animation* anim = GetAnimationPiece(i);
+			animation.push_back(std::move(*anim));
+			delete anim;
 		}
 	} else if (animcount) {
-		newanim.push_back(GetAnimationPiece(sequence));
+		Animation* anim = GetAnimationPiece(sequence);
+		animation.push_back(std::move(*anim));
+		delete anim;
 	}
-	animation = std::move(newanim);
 	
 	if (Flags & A_ANI_PALETTE) {
 		SetPalette(PaletteRef);
