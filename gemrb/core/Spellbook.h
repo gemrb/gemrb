@@ -62,7 +62,7 @@ class StringBuffer;
 #define LSR_FULL    6  //can't learn more spells of this level (due to level)
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-using ieSpellType = enum {
+using ieSpellType = enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
 	IE_SPELL_TYPE_INNATE = 2,
@@ -71,7 +71,7 @@ using ieSpellType = enum {
 
 #define NUM_SPELLTYPES 3
 
-using ieIWD2SpellType = enum {
+using ieIWD2SpellType = enum ieIWD2SpellType {
 	IE_IWD2_SPELL_BARD = 0,
 	IE_IWD2_SPELL_CLERIC = 1,
 	IE_IWD2_SPELL_DRUID = 2,

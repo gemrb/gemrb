@@ -44,7 +44,7 @@ class Condition;
 enum class StoreType { STORE = 0, TAVERN = 1, INN = 2, TEMPLE = 3,
 BG2CONT = 4, IWD2CONT = 5, BAG = 6 };
 
-using StoreActionType = enum : int16_t { STA_BUYSELL = 0, STA_IDENTIFY = 1, STA_STEAL = 2,
+using StoreActionType = enum StoreActionType : int16_t { STA_BUYSELL = 0, STA_IDENTIFY = 1, STA_STEAL = 2,
 STA_CURE = 3, STA_DONATE = 4, STA_DRINK = 5, STA_ROOMRENT = 6, STA_OPTIONAL = 0x80 };
 
 #define IE_STORE_BUY      1
