@@ -36,14 +36,14 @@ namespace GemRB {
 class DataStream;
 class ScriptedAnimation;
 
-using VEF_TYPES = enum {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA};
+enum class VEFTypes { INVALID = -1, BAM, VVC, VEF, _2DA };
 
 struct ScheduleEntry {
 	ResRef resourceName;
 	ieDword start;
 	ieDword length;
 	Point offset;
-	ieDword type;
+	VEFTypes type;
 	void *ptr;
 };
 
@@ -61,7 +61,7 @@ private:
 	bool SingleObject;
 public:
 	//adds a new entry (use when loading)
-	void AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime);
+	void AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime);
 	//renders the object
 	bool UpdateDrawingState(int orientation);
 	void Draw(const Region &screen, const Color &p_tint, int height, BlitFlags flags) const;
