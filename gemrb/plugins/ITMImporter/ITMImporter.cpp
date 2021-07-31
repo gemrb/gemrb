@@ -30,8 +30,7 @@
 
 using namespace GemRB;
 
-int *profs = NULL;
-int profcount = -1;
+static std::vector<int> profs;
 
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
@@ -41,18 +40,13 @@ std::map<char,int> zzmap;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	if (profs) {
-		free(profs);
-		profs = NULL;
-	}
-	profcount = 0;
 	AutoTable tm("proftype");
 	if (!tm) {
 		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
 	}
-	profcount = tm->GetRowCount();
-	profs = (int *) calloc( profcount, sizeof(int) );
+	int profcount = tm->GetRowCount();
+	profs.resize(profcount);
 	for (int i = 0; i < profcount; i++) {
 		profs[i] = atoi(tm->QueryField( i, 0 ) );
 	}
@@ -78,20 +72,13 @@ static void Initializer()
 	}
 }
 
-static void ReleaseMemoryITM()
-{
-	free(profs);
-	profs = NULL;
-	profcount = -1;
-}
-
 static int GetProficiency(ieDword ItemType)
 {
-	if (profcount<0) {
+	if (profs.empty()) {
 		Initializer();
 	}
 
-	if (ItemType>=(ieDword) profcount) {
+	if (ItemType >= profs.size()) {
 		return 0;
 	}
 	return profs[ItemType];
@@ -391,5 +378,4 @@ Effect* ITMImporter::GetFeature(Item *s)
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
 PLUGIN_CLASS(IE_ITM_CLASS_ID, ImporterPlugin<ITMImporter>)
-PLUGIN_CLEANUP(ReleaseMemoryITM)
 END_PLUGIN()
