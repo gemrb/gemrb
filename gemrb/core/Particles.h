@@ -32,6 +32,8 @@
 
 #include "Region.h"
 
+#include <memory>
+
 namespace GemRB {
 
 class CharAnimations;
