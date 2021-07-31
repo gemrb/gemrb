@@ -9262,13 +9262,14 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	return STR_MAGICWEAPON;
 }
 
-bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
+// do we need Use magic device to succeed on a class usability check?
+bool Actor::RequiresUMD(const Item* item) const
 {
 	if (!third) {
-		return true;
+		return false;
 	}
 	if (item->ItemType != IT_WAND && item->ItemType != IT_SCROLL) {
-		return true;
+		return false;
 	}
 
 	// we have to repeat some usability checks in case a thief or
@@ -9276,7 +9277,7 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 	// OR, especially in the bard's case, if she already has access,
 	// which is true for arcane scrolls and wands, but not divine.
 	// Since it's a per-item thing, there might be exceptions as well
-	if (!GetThiefLevel() && !GetBardLevel()) return true;
+	if (!GetThiefLevel() && !GetBardLevel()) return false;
 
 	// go through each class and check again
 	ieDword levelSum = BaseStats[IE_CLASSLEVELSUM];
@@ -9291,9 +9292,16 @@ bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
 		unsigned int classBit = 1 << (classesiwd2[i] - 1);
 		ieDword itemvalue = item->UsabilityBitmask;
 		if (classBit & ~itemvalue) {
-			return true;
+			return false;
 		}
 	}
+
+	return true;
+}
+
+bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
+{
+	if (!RequiresUMD(item)) return true;
 
 	// from here on we know we have either a single class thief or
 	// bard or one of them with a useless mixin class.
