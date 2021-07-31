@@ -91,7 +91,6 @@ struct Element {
 class GEM_EXPORT Particles {
 public:
 	explicit Particles(int s);
-	~Particles();
 
 	void SetBitmap(unsigned int FragAnimID);
 	void SetPhase(ieByte ph) { phase = ph; }
@@ -121,7 +120,7 @@ public:
 	int Update();
 	int GetHeight() const { return pos.y+pos.h; }
 private:
-	Element *points = nullptr;
+	std::vector<Element> points;
 	ieDword timetolive = 0;
 //	ieDword target;    //could be 0, in that case target is pos
 	ieWord size = 0;       // spark number
