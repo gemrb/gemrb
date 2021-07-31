@@ -159,7 +159,7 @@ public:
 
 	/** Returns the Owner */
 	virtual void SetFocus();
-	bool IsFocused();
+	bool IsFocused() const;
 
 	bool TracksMouseDown() const override { return bool(actionTimer); }
 	

@@ -105,7 +105,7 @@ public:
 	MoviePlayer(void);
 	~MoviePlayer(void) override;
 
-	Size Dimensions() { return movieSize; }
+	Size Dimensions() const { return movieSize; }
 	void Play(Window* win);
 	void Stop();
 

@@ -2302,7 +2302,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 }
 
-void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun)
+void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun) const
 {
 	const Game* game = core->GetGame();
 

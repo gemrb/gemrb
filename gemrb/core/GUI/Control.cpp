@@ -134,7 +134,7 @@ void Control::SetFocus()
 	MarkDirty();
 }
 
-bool Control::IsFocused()
+bool Control::IsFocused() const
 {
 	return window->FocusedView() == this;
 }

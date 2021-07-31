@@ -155,7 +155,7 @@ private:
 	bool IsDisabledCursor() const override;
 
 	void PerformSelectedAction(const Point& p);
-	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false);
+	void CommandSelectedMovement(const Point& p, bool append = false, bool tryToRun = false) const;
 
 	//infopoints
 	int GetCursorOverInfoPoint(const InfoPoint *overInfoPoint) const;

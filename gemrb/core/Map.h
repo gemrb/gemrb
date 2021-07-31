@@ -643,7 +643,7 @@ private:
 	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
-	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport);
+	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport) const;
 	
 	Size PropsSize() const noexcept;
 	Size FogMapSize() const;

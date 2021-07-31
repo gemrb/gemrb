@@ -51,7 +51,7 @@ using PaletteHolder = Holder<Palette>;
 class GEM_EXPORT Palette : public Held<Palette>
 {
 private:
-	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst);
+	void CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const;
 	void UpdateAlpha();
 public:
 	Palette(const Color &color, const Color &back);

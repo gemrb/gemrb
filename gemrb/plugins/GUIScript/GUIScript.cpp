@@ -2064,7 +2064,7 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	ieDword curVal = CTL_INVALID_VALUE;
 	core->GetDictionary()->Lookup(VarName, curVal);
 
-	Window* win = ctrl->GetWindow();
+	const Window* win = ctrl->GetWindow();
 	if (win) {
 		win->RedrawControls(VarName, curVal);
 	} else {

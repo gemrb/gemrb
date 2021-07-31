@@ -1608,7 +1608,7 @@ void Inventory::EquipBestWeapon(int flags)
 #define ID_NO      2   //shouldn't id
 
 // returns true if there are more item usages not fitting in given vector
-bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count)
+bool Inventory::GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count) const
 {
 	int pos = 0;
 	int actual = 0;

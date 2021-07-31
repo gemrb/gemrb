@@ -838,7 +838,7 @@ bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
 	return (*mask)[p];
 }
 
-void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& vp)
+void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& vp) const
 {
 	// Size of Fog-Of-War shadow tile (and bitmap)
 	constexpr int CELL_SIZE = 32;

@@ -106,7 +106,7 @@ private:
 
 	Window* NextEventWindow(const Event& event, WindowList::const_iterator& current);
 	bool DispatchEvent(const Event&);
-	bool HotKey(const Event&);
+	bool HotKey(const Event&) const;
 
 	inline void DestroyWindows(WindowList& list);
 	void MarkAllDirty() const;

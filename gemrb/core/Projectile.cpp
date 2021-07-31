@@ -223,7 +223,7 @@ void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByt
 	}
 }
 
-void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal)
+void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal) const
 {
 	if (pal)
 		return;
@@ -1655,7 +1655,7 @@ int Projectile::GetShadowPos(int face) const
 	return 0;
 }
 
-void Projectile::SetPos(int face, int frame1, int frame2)
+void Projectile::SetPos(int face, int frame1, int frame2) const
 {
 	if (travel[face]) {
 		travel[face]->SetFrame(frame1);

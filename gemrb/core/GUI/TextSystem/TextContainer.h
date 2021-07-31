@@ -201,7 +201,7 @@ public:
 	virtual void DeleteContentsInRect(Region);
 
 	Content* ContentAtPoint(const Point& p) const;
-	const ContentList& Contents() { return contents; }
+	const ContentList& Contents() const { return contents; }
 
 	const Region* ContentRegionForRect(const Region& rect) const;
 	Region BoundingBoxForContent(const Content*) const;

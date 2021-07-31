@@ -295,7 +295,7 @@ void WindowManager::DestroyAllWindows()
 	}
 }
 
-bool WindowManager::HotKey(const Event& event)
+bool WindowManager::HotKey(const Event& event) const
 {
 	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
 		switch (event.keyboard.keycode) {

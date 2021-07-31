@@ -132,7 +132,7 @@ private:
 		// we need a non-const version of Draw here that will call the base const version
 		using SpriteSheet<ieWord>::Draw;
 		void Draw(ieWord chr, const Region& dest, const PrintColors* colors);
-		void DumpToScreen(const Region&);
+		void DumpToScreen(const Region&) const;
 	};
 
 	struct GlyphIndexEntry {

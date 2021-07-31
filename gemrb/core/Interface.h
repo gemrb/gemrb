@@ -515,9 +515,9 @@ public:
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&);
 	void ToggleViewsVisible(bool visible, const ResRef& group);
-	void ToggleViewsEnabled(bool enabled, const ResRef& group);
+	void ToggleViewsEnabled(bool enabled, const ResRef& group) const;
 
-	Tooltip CreateTooltip();
+	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
@@ -606,7 +606,7 @@ public:
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
-	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY);
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
 
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
@@ -626,15 +626,15 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	/*removes single file from cache*/
-	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID);
+	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID) const;
 	/*removes all files from directory*/
-	void DelTree(const char *path, bool onlysaved);
+	void DelTree(const char *path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
-	int SavedExtension(const char *filename);
+	int SavedExtension(const char *filename) const;
 	/*returns true if the file should never be deleted accidentally */
-	bool ProtectedExtension(const char *filename);
+	bool ProtectedExtension(const char *filename) const;
 	/*returns true if the directory path isn't good as a Cache */
-	bool StupidityDetector(const char* Pt);
+	bool StupidityDetector(const char* Pt) const;
 	bool InDebugMode(int mode) const { return config.debugMode & mode; };
 	void SetDebugMode(int mode) { config.debugMode = mode; };
 	/*handles the load screen*/
@@ -687,17 +687,17 @@ public:
 	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level);
+	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level) const;
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level);
+	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level) const;
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
+	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster) const;
 	/** applies an effect queue on the target */
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster);
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p);
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const;
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const;
 	Effect *GetEffect(const ResRef& resname, int level, const Point &p);
 	/** dumps an area object to the cache */
-	int SwapoutArea(Map *map);
+	int SwapoutArea(Map *map) const;
 	/** saves (exports a character to the characters folder */
 	int WriteCharacter(const char *name, Actor *actor);
 	/** saves the game object to the destination folder */
@@ -711,9 +711,9 @@ public:
 	/** returns true the passed pause setting was applied. false otherwise. */
 	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
-	bool Autopause(ieDword flag, Scriptable *target);
+	bool Autopause(ieDword flag, Scriptable *target) const;
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, const EffectDesc *opcodes);
+	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */
 	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
 	/** Returns the virtual worldmap entry of a sub-area */
@@ -773,10 +773,10 @@ private:
 	bool ReadItemTable(const ResRef& item, const char *Prefix) const;
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
-	bool ReadReputationModTable();
+	bool ReadReputationModTable() const;
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	bool ReadSoundChannelsTable();
+	bool ReadSoundChannelsTable() const;
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ResRef& name);
 	/** handles the QuitFlag bits (main loop events) */

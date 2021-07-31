@@ -30,7 +30,8 @@ MapReverb::MapReverb (Map& _map) :
 	}
 }
 
-void MapReverb::getReverbProperties (MapReverbProperties& props) {
+void MapReverb::getReverbProperties(MapReverbProperties& props) const
+{
 	memcpy(&props, &properties, sizeof(MapReverbProperties));
 }
 

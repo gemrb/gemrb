@@ -797,7 +797,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 }
 
-void IniSpawn::SpawnGroup(SpawnEntry &event)
+void IniSpawn::SpawnGroup(SpawnEntry &event) const
 {
 	if (event.critters.empty()) {
 		return;

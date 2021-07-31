@@ -158,7 +158,7 @@ struct AbilityTables {
 	}
 	
 private:
-	bool ReadAbilityTable(const ResRef& tablename, AbilityTable& table, int columns, int rows)
+	bool ReadAbilityTable(const ResRef& tablename, AbilityTable& table, int columns, int rows) const
 	{
 		AutoTable tab(tablename);
 		if (!tab) {
@@ -702,7 +702,8 @@ bool Interface::ReadDamageTypeTable() {
 	return true;
 }
 
-bool Interface::ReadReputationModTable() {
+bool Interface::ReadReputationModTable() const
+{
 	AutoTable tm("reputati");
 	if (!tm)
 		return false;
@@ -719,7 +720,8 @@ bool Interface::ReadReputationModTable() {
 	return true;
 }
 
-bool Interface::ReadSoundChannelsTable() {
+bool Interface::ReadSoundChannelsTable() const
+{
 	AutoTable tm("sndchann");
 	if (!tm) {
 		return false;
@@ -2380,7 +2382,7 @@ void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
-void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
+void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group) const
 {
 	std::vector<View*> views = GetViews(group);
 	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
@@ -2470,7 +2472,7 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 	//end of gui hacks
 }
 
-Tooltip Interface::CreateTooltip()
+Tooltip Interface::CreateTooltip() const
 {
 	Font::PrintColors colors;
 	colors.fg = gamedata->GetColor("TOOLTIP");
@@ -2752,7 +2754,7 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
+DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 {
 	char Path[_MAX_PATH];
 	const char* resourcePath = NULL;
@@ -3526,7 +3528,7 @@ static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 //2 - save
 //1 - save last
 //0 - don't save
-int Interface::SavedExtension(const char *filename)
+int Interface::SavedExtension(const char *filename) const
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return 0;
@@ -3543,7 +3545,7 @@ int Interface::SavedExtension(const char *filename)
 static const char* const protected_extensions[] = { ".exe", ".dll", ".so", nullptr };
 
 //returns true if file should be saved
-bool Interface::ProtectedExtension(const char *filename)
+bool Interface::ProtectedExtension(const char *filename) const
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return false;
@@ -3555,7 +3557,7 @@ bool Interface::ProtectedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
+void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 {
 	char filename[_MAX_PATH];
 
@@ -3566,7 +3568,7 @@ void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
 //this function checks if the path is eligible as a cache
 //if it contains a directory, or suspicious file extensions
 //we bail out, because the cache will be purged regularly.
-bool Interface::StupidityDetector(const char* Pt)
+bool Interface::StupidityDetector(const char* Pt) const
 {
 	char Path[_MAX_PATH];
 	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
@@ -3603,7 +3605,7 @@ bool Interface::StupidityDetector(const char* Pt)
 	return false;
 }
 
-void Interface::DelTree(const char* Pt, bool onlysave)
+void Interface::DelTree(const char* Pt, bool onlysave) const
 {
 	char Path[_MAX_PATH];
 
@@ -3635,7 +3637,7 @@ void Interface::LoadProgress(int percent)
 	winmgr->DrawWindows();
 	winmgr->SetCursorFeedback(cur);
 
-	Window* loadwin = GetWindow(0, "LOADWIN");
+	const Window* loadwin = GetWindow(0, "LOADWIN");
 	if (loadwin) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
 		loadwin->RedrawControls("Progress", percent);
@@ -4075,7 +4077,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 }
 
 // dealing with applying effects
-void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level)
+void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level) const
 {
 	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
@@ -4089,7 +4091,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level)
+void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level) const
 {
 	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
@@ -4104,7 +4106,7 @@ void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &
 //-1 means the effect was reflected back to the caster
 //0 means the effect was resisted and should be removed
 //1 means the effect was applied
-int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
+int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster) const
 {
 	if (!effect) {
 		return 0;
@@ -4117,7 +4119,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	return res;
 }
 
-int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster)
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const
 {
 	Point p(-1, -1); //the effect should have all its coordinates already set
 	return ApplyEffectQueue(fxqueue, actor, caster, p);
@@ -4127,7 +4129,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 //This means, pcf functions may not be executed when the effect is first applied
 //Adding this new effect block via RefreshEffects is possible, but that might apply existing effects twice
 
-int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p)
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const
 {
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
@@ -4163,7 +4165,7 @@ Effect *Interface::GetEffect(const ResRef& resname, int level, const Point &p)
 }
 
 // dealing with saved games
-int Interface::SwapoutArea(Map *map)
+int Interface::SwapoutArea(Map *map) const
 {
 	//refuse to save ambush areas, for example
 	if (map->AreaFlags & AF_NOSAVE) {
@@ -4519,7 +4521,7 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 	return false;
 }
 
-bool Interface::Autopause(ieDword flag, Scriptable* target)
+bool Interface::Autopause(ieDword flag, Scriptable* target) const
 {
 	ieDword autopause_flags = 0;
 	vars->Lookup("Auto Pause State", autopause_flags);
@@ -4547,7 +4549,7 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	return true;
 }
 
-void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
+void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes) const
 {
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }

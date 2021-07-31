@@ -50,7 +50,7 @@ void GlobalTimer::Freeze()
 	game->RealTime++;
 }
 
-bool GlobalTimer::ViewportIsMoving()
+bool GlobalTimer::ViewportIsMoving() const
 {
 	return shakeCounter || (!goal.IsInvalid() && goal != currentVP.origin);
 }

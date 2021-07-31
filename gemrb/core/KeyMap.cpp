@@ -133,7 +133,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 //group can be:
 //main gamecontrol
-bool KeyMap::ResolveKey(unsigned short key, int group)
+bool KeyMap::ResolveKey(unsigned short key, int group) const
 {
 	// FIXME: key is 2 bytes, but we ignore one. Some non english keyboards wont like this.
 	char keystr[2] = {(char)key, 0};
@@ -142,7 +142,7 @@ bool KeyMap::ResolveKey(unsigned short key, int group)
 	return ResolveName(keystr, group);
 }
 
-bool KeyMap::ResolveName(const char* name, int group)
+bool KeyMap::ResolveName(const char* name, int group) const
 {
 	void *tmp;
 	if (!keymap.Lookup(name, tmp) ) {

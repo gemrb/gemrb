@@ -143,7 +143,7 @@ public:
 	bool IsReceivingEvents() const override { return true; }
 
 	const VideoBufferPtr& DrawWithoutComposition();
-	void RedrawControls(const char* VarName, unsigned int Sum);
+	void RedrawControls(const char* VarName, unsigned int Sum) const;
 
 	bool DispatchEvent(const Event&);
 	bool RegisterHotKeyCallback(EventMgr::EventCallback, KeyboardKey key);

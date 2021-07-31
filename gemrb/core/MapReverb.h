@@ -52,7 +52,7 @@ class GEM_EXPORT MapReverb {
 public:
 	explicit MapReverb(Map&);
 
-	void getReverbProperties(MapReverbProperties&);
+	void getReverbProperties(MapReverbProperties&) const;
 
 private:
 	AutoTable reverbMapping;
