@@ -71,7 +71,9 @@ Store* STOImporter::GetStore(Store *s)
 		s->version = version;
 	}
 
-	str->ReadDword(s->Type);
+	ieDword shopType;
+	str->ReadDword(shopType);
+	s->Type = static_cast<StoreType>(shopType);
 	str->ReadDword(s->StoreName);
 	str->ReadDword(s->Flags);
 	str->ReadDword(s->SellMarkup);
@@ -282,7 +284,7 @@ void STOImporter::PutHeader(DataStream *stream, const Store *s)
 	Signature[5]+=version/10;
 	Signature[7]+=version%10;
 	stream->Write( Signature, 8);
-	stream->WriteDword(s->Type);
+	stream->WriteDword(static_cast<ieDword>(s->Type));
 	stream->WriteDword(s->StoreName);
 	stream->WriteDword(s->Flags);
 	stream->WriteDword(s->SellMarkup);

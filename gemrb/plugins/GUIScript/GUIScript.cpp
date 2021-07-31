@@ -7244,12 +7244,12 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	if (!store) {
 		Py_RETURN_NONE;
 	}
-	if (store->Type>STORETYPE_COUNT-1) {
-		store->Type=STORETYPE_COUNT-1;
+	if (store->Type > StoreType::BAG) {
+		store->Type = StoreType::BAG;
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "StoreType", DecRef(PyInt_FromLong, store->Type ));
+	PyDict_SetItemString(dict, "StoreType", DecRef(PyInt_FromLong, static_cast<int>(store->Type)));
 	PyDict_SetItemString(dict, "StoreName", DecRef(PyInt_FromLong, store->StoreName ));
 	PyDict_SetItemString(dict, "StoreDrinkCount", DecRef(PyInt_FromLong, store->DrinksCount ));
 	PyDict_SetItemString(dict, "StoreCureCount", DecRef(PyInt_FromLong, store->CuresCount ));
@@ -7273,7 +7273,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	p = PyTuple_New( STOREBUTTON_COUNT );
 	j=0;
 	for (int i = 0; i < STOREBUTTON_COUNT; i++) {
-		k = storebuttons[store->Type][i];
+		k = storebuttons[static_cast<int>(store->Type)][i];
 		if (k&STA_OPTIONAL) {
 			k&=~STA_OPTIONAL;
 			//check if the type was disabled

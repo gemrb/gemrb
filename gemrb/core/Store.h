@@ -41,8 +41,8 @@ namespace GemRB {
 class CREItem;
 class Condition;
 
-using StoreType = enum { STT_STORE = 0, STT_TAVERN = 1, STT_INN = 2, STT_TEMPLE = 3,
-STT_BG2CONT = 4, STT_IWD2CONT = 5 };
+enum class StoreType { STORE = 0, TAVERN = 1, INN = 2, TEMPLE = 3,
+BG2CONT = 4, IWD2CONT = 5, BAG = 6 };
 
 using StoreActionType = enum : int16_t { STA_BUYSELL = 0, STA_IDENTIFY = 1, STA_STEAL = 2,
 STA_CURE = 3, STA_DONATE = 4, STA_DRINK = 5, STA_ROOMRENT = 6, STA_OPTIONAL = 0x80 };
@@ -129,7 +129,7 @@ public:
 	std::vector<ieDword> purchased_categories;
 
 	ResRef Name;
-	ieDword Type = 0;
+	StoreType Type = StoreType::STORE;
 	ieStrRef StoreName = 0;
 	ieDword Flags = 0;
 	ieDword SellMarkup = 0;
