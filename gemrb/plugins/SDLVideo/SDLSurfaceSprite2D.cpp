@@ -35,6 +35,7 @@ SDLSurfaceSprite2D::SDLSurfaceSprite2D (const Region& rgn, void* px, const Pixel
 		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurfaceFrom(px, Frame.w, Frame.h, fmt.Depth, Frame.w * fmt.Bpp,
 															 fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 	} else {
+		assert(fmt.Depth >= 8);
 		surface = MakeHolder<SurfaceHolder>(SDL_CreateRGBSurface(0, Frame.w, Frame.h, fmt.Depth, fmt.Rmask, fmt.Gmask, fmt.Bmask, fmt.Amask));
 		SDL_FillRect(*surface, NULL, 0);
 		pixels = (*surface)->pixels;
