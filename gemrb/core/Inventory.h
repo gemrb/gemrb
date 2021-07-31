@@ -77,9 +77,9 @@ class StringBuffer;
 #define IW_NO_EQUIPPED  1000
 
 /** Inventory types */
-using ieInventoryType = enum  {
-	INVENTORY_HEAP = 0,
-	INVENTORY_CREATURE = 1
+enum class ieInventoryType {
+	HEAP = 0,
+	CREATURE = 1
 };
 
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -217,7 +217,7 @@ class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
-	int InventoryType;
+	ieInventoryType InventoryType = ieInventoryType::HEAP;
 	/** Total weight of all items in Inventory */
 	int Weight;
 
@@ -247,7 +247,7 @@ public:
 	 * flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags) const;
 
-	void SetInventoryType(int arg);
+	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
 	/** returns number of all slots in the inventory */

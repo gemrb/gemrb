@@ -120,7 +120,6 @@ void Inventory::Init()
 Inventory::Inventory()
 {
 	Owner = NULL;
-	InventoryType = INVENTORY_HEAP;
 	Weight = 0;
 	Equipped = IW_NO_EQUIPPED;
 	EquippedHeader = 0;
@@ -269,7 +268,7 @@ void Inventory::RemoveSlotEffects(ieDword index)
 	}
 }
 
-void Inventory::SetInventoryType(int arg)
+void Inventory::SetInventoryType(ieInventoryType arg)
 {
 	InventoryType = arg;
 }
@@ -361,7 +360,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags) const
 
 void Inventory::KillSlot(unsigned int index)
 {
-	if (InventoryType==INVENTORY_HEAP) {
+	if (InventoryType == ieInventoryType::HEAP) {
 		Slots.erase(Slots.begin()+index);
 		return;
 	}

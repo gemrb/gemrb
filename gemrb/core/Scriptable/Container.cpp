@@ -45,7 +45,7 @@ Container::Container(void)
 	TrapRemovalDiff = 0;
 	Trapped = 0;
 	TrapDetected = 0;
-	inventory.SetInventoryType(INVENTORY_HEAP);
+	inventory.SetInventoryType(ieInventoryType::HEAP);
 	OpenFail = 0;
 }
 

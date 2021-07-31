@@ -463,7 +463,7 @@ Actor::Actor()
 	nextBored = 0;
 	FatigueComplaintDelay = 0;
 
-	inventory.SetInventoryType(INVENTORY_CREATURE);
+	inventory.SetInventoryType(ieInventoryType::CREATURE);
 
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
