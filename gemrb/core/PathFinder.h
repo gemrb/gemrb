@@ -50,46 +50,6 @@ enum class PathMapFlags : uint8_t {
 	NOTACTOR = (DOOR | AREAMASK)
 };
 
-struct PathFinder {
-	PathMapFlags Passable[16] = {
-		PathMapFlags::NO_SEE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::IMPASSABLE,
-		PathMapFlags::PASSABLE,
-		PathMapFlags::SIDEWALL,
-		PathMapFlags::IMPASSABLE,
-		PathMapFlags::IMPASSABLE,
-		PathMapFlags::IMPASSABLE,
-		PathMapFlags::PASSABLE | PathMapFlags::TRAVEL,
-		PathMapFlags::PASSABLE
-	};
-	
-	struct TerrainSounds {
-		ResRef Group;
-		ResRef Sounds[16];
-	};
-	
-	std::vector<TerrainSounds> terrainsounds;
-	int NormalCost = 10;
-	int AdditionalCost = 4;
-	
-	static const PathFinder& Get() {
-		static PathFinder pathfinder;
-		return pathfinder;
-	}
-	
-private:
-	PathFinder() noexcept;
-	PathFinder(const PathFinder&) = delete;
-	PathFinder(PathFinder&&) = delete;
-};
-
 struct PathNode {
 	PathNode* Parent;
 	PathNode* Next;

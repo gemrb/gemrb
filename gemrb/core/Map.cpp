@@ -756,13 +756,30 @@ void Map::UpdateScripts()
 
 ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 {
-	const auto& terrainsounds = PathFinder::Get().terrainsounds;
-	for (const auto& sound : terrainsounds) {
-		if (resref == sound.Group) {
-			uint8_t type = tileProps->GetPixel(Map::ConvertCoordToTile(p)).g;
-			return sound.Sounds[type];
+	struct TerrainSounds {
+		std::map<ResRef, std::array<ResRef, 16>> refs;
+		
+		TerrainSounds() noexcept {
+			AutoTable tm("terrain");
+			
+			int rc = tm->GetRowCount() - 2;
+			while (rc--) {
+				ResRef group = tm->GetRowName(rc+2);
+				refs[group] = {};
+				int i = 0;
+				for (auto& ref : refs[group]) {
+					ref = tm->QueryField(rc + 2, i++);
+				}
+			}
 		}
+	} static const terrainsounds;
+	
+	if (terrainsounds.refs.count(resref)) {
+		uint8_t type = tileProps->GetPixel(Map::ConvertCoordToTile(p)).g;
+		const auto& array = terrainsounds.refs.at(resref);
+		return array[type];
 	}
+
 	return ResRef();
 }
 

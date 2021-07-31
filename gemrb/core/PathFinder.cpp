@@ -57,39 +57,6 @@ constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dxRand{{0.000, -0.383, -0.
 // Sines
 constexpr std::array<double, RAND_DEGREES_OF_FREEDOM> dyRand{{1.000, 0.924, 0.707, 0.383, 0.000, -0.383, -0.707, -0.924, -1.000, -0.924, -0.707, -0.383, 0.000, 0.383, 0.707, 0.924}};
 
-PathFinder::PathFinder() noexcept
-{
-	AutoTable tm("pathfind");
-
-	if (!tm) {
-		return;
-	}
-
-	const char* poi;
-
-	for (int i = 0; i < 16; i++) {
-		poi = tm->QueryField( 0, i );
-		if (*poi != '*')
-			Passable[i] = PathMapFlags(atoi(poi));
-	}
-	poi = tm->QueryField( 1, 0 );
-	if (*poi != '*')
-		NormalCost = atoi( poi );
-	poi = tm->QueryField( 1, 1 );
-	if (*poi != '*')
-		AdditionalCost = atoi( poi );
-	int rc = tm->GetRowCount()-2;
-	if (rc>0) {
-		terrainsounds.resize(rc);
-		while(rc--) {
-			terrainsounds[rc].Group = ResRef::MakeUpperCase(tm->GetRowName(rc+2));
-			for(int i = 0; i<16;i++) {
-				terrainsounds[rc].Sounds[i] = tm->QueryField(rc + 2, i);
-			}
-		}
-	}
-}
-
 // Find the best path of limited length that brings us the farthest from d
 PathNode *Map::RunAway(const Point &s, const Point &d, unsigned int size, int maxPathLength, bool backAway, const Actor *caller) const
 {

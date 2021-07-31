@@ -77,6 +77,61 @@ static void ReadAutonoteINI()
 	INInote->Open(fs);
 }
 
+struct PathFinderCosts {
+	PathMapFlags Passable[16] = {
+		PathMapFlags::NO_SEE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::PASSABLE,
+		PathMapFlags::SIDEWALL,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::IMPASSABLE,
+		PathMapFlags::PASSABLE | PathMapFlags::TRAVEL,
+		PathMapFlags::PASSABLE
+	};
+
+	int NormalCost = 10;
+	int AdditionalCost = 4;
+	
+	static const PathFinderCosts& Get() {
+		static PathFinderCosts pathfinder;
+		return pathfinder;
+	}
+	
+private:
+	PathFinderCosts() noexcept {
+		AutoTable tm("terrain");
+
+		if (!tm) {
+			return;
+		}
+
+		const char* poi;
+
+		for (int i = 0; i < 16; i++) {
+			poi = tm->QueryField( 0, i );
+			if (*poi != '*')
+				Passable[i] = PathMapFlags(atoi(poi));
+		}
+		poi = tm->QueryField( 1, 0 );
+		if (*poi != '*')
+			NormalCost = atoi( poi );
+		poi = tm->QueryField( 1, 1 );
+		if (*poi != '*')
+			AdditionalCost = atoi( poi );
+	}
+
+	PathFinderCosts(const PathFinderCosts&) = delete;
+	PathFinderCosts(PathFinderCosts&&) = delete;
+};
+
 static int GetTrackString(const char* areaName)
 {
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
@@ -164,7 +219,7 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 	for (; propit != end; ++propit, ++lmit, ++hmit, ++smit) {
 		uint8_t smval = *smit; // r + g
 		assert((smval & 0xf0) == 0);
-		uint8_t r = uint8_t(PathFinder::Get().Passable[smval]);
+		uint8_t r = uint8_t(PathFinderCosts::Get().Passable[smval]);
 		uint8_t g = smval;
 		uint8_t b = hmpal->col[*hmit].r; // pick any channel, they are all the same
 		uint8_t a = *lmit;
