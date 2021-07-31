@@ -219,9 +219,6 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
-		void* p = malloc(size.Area() * 4 );
-		memcpy( p, pixels, size.Area() * 4 );
-		
 		constexpr uint32_t red_mask = 0x000000ff;
 		constexpr uint32_t green_mask = 0x0000ff00;
 		constexpr uint32_t blue_mask = 0x00ff0000;
@@ -229,14 +226,15 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		fmt.HasColorKey = true;
 		fmt.ColorKey = green_mask | (0xff << 24);
 
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
 	} else if (BitCount == 8) {
-		void* p = malloc(size.Area());
-		memcpy(p, pixels, size.Area());
 		PaletteHolder pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
 		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->col[0] == ColorGreen, 0);
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
 	}
+	
+	memcpy(spr->LockSprite(), pixels, size.Area() * BitCount / 8);
+	spr->UnlockSprite();
 	return spr;
 }
 
