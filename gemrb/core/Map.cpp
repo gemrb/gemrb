@@ -286,9 +286,6 @@ tileProps(std::move(props))
 {
 	ExploredBitmap.fill(0);
 	VisibleBitmap.fill(0);
-
-	mapSize.w = TMap->XCellCount * 4;
-	mapSize.h = (TMap->YCellCount * 64 + 63) / 12;
 	
 	area=this;
 	queue[PR_SCRIPT] = NULL;
@@ -803,6 +800,11 @@ Size Map::FogMapSize() const
 	constexpr int CELL_RATIO = 2;
 	const int largefog = Explore::Get().LargeFog;
 	return Size(TMap->XCellCount * CELL_RATIO + largefog, TMap->YCellCount * CELL_RATIO + largefog);
+}
+
+Size Map::PropsSize() const noexcept
+{
+	return tileProps->Frame.size;
 }
 
 bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
@@ -2432,7 +2434,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 int Map::GetHeight(const Point &p) const
 {
 	Point tilePos = Map::ConvertCoordToTile(p);
-	if (mapSize.PointInside(tilePos)) {
+	if (PropsSize().PointInside(tilePos)) {
 		// Heightmaps are greyscale images where the top of the world is white and the bottom is black.
 		// this covers the range -7 – +7
 		// since the image is grey we can use any channel for the mapping
@@ -2448,7 +2450,7 @@ int Map::GetHeight(const Point &p) const
 Color Map::GetLighting(const Point &p) const
 {
 	Point tilePos = Map::ConvertCoordToTile(p);
-	if (mapSize.PointInside(tilePos)) {
+	if (PropsSize().PointInside(tilePos)) {
 		uint8_t val = tileProps->GetPixel(tilePos).a;
 		return tileProps->GetPalette()->col[val];
 	}
@@ -2458,7 +2460,7 @@ Color Map::GetLighting(const Point &p) const
 PathMapFlags Map::QuerySearchMap(const Point &p) const
 {
 	// p is already in search map coords
-	if (mapSize.PointInside(p)) {
+	if (PropsSize().PointInside(p)) {
 		return PathMapFlags(tileProps->GetPixel(p).r);
 	}
 	return PathMapFlags::IMPASSABLE;
@@ -2940,6 +2942,9 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 	if (goal.x > radiusx)
 		minx = goal.x - radiusx;
 	int maxx = goal.x + radiusx + 1;
+	
+	const Size& mapSize = PropsSize();
+	
 	if (maxx > mapSize.w)
 		maxx = mapSize.w;
 
@@ -2968,6 +2973,8 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 	if (goal.y > radiusy)
 		miny = goal.y - radiusy;
 	int maxy = goal.y + radiusy + 1;
+	
+	const Size& mapSize = PropsSize();
 	if (maxy > mapSize.h)
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
@@ -2999,6 +3006,8 @@ void Map::AdjustPositionNavmap(NavmapPoint &goal, int radiusx, int radiusy) cons
 
 void Map::AdjustPosition(SearchmapPoint &goal, int radiusx, int radiusy, int size) const
 {
+	const Size& mapSize = PropsSize();
+
 	if (goal.x > mapSize.w) {
 		goal.x = mapSize.w;
 	}
@@ -3057,6 +3066,7 @@ WMPDirection Map::WhichEdge(const Point &s) const
 		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
+	const Size& mapSize = PropsSize();
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
@@ -3410,6 +3420,8 @@ void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value
 	int ppy = Pos.y/12;
 	unsigned int r=(size-1)*(size-1)+1;
 	uint32_t* SrchMap = (uint32_t*)tileProps->LockSprite();
+	const Size& mapSize = PropsSize();
+
 	auto readSrchMap = [&](int pos) -> PathMapFlags {
 		if (pos < 0 || pos > mapSize.Area()) {
 			return PathMapFlags::IMPASSABLE;
@@ -4040,7 +4052,7 @@ PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 	// TODO: the subtle difference betweenm GetInternalSearchMap and QuerySearchMap
 	// is that this returns PathMapFlags::UNMARKED instead of PathMapFlags::IMPASSABLE
 	// for out of bounds points. I dont know if that is an important distiction
-	if (!mapSize.PointInside(p)) {
+	if (!PropsSize().PointInside(p)) {
 		return PathMapFlags::UNMARKED;
 	}
 	return QuerySearchMap(p);
@@ -4048,6 +4060,7 @@ PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 
 void Map::SetInternalSearchMap(const Point& p, PathMapFlags value)
 {
+	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(p)) {
 		return;
 	}

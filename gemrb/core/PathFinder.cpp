@@ -154,6 +154,7 @@ PathNode *Map::RandomWalk(const Point &s, int size, int radius, const Actor *cal
 	PathNode *step = new PathNode;
 	step->x = p.x;
 	step->y = p.y;
+	const Size& mapSize = PropsSize();
 	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
 	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
 	step->Parent = nullptr;
@@ -236,6 +237,8 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		if (p.x < 0 || p.y < 0) {
 			return Return;
 		}
+		
+		const Size& mapSize = PropsSize();
 		if (p.x > mapSize.w * 16 || p.y > mapSize.h * 12) {
 			return Return;
 		}
@@ -274,6 +277,7 @@ PathNode *Map::GetLine(const Point &p, int steps, unsigned int orient) const
 	PathNode *step = new PathNode;
 	step->x = p.x + steps * SEARCHMAP_SQUARE_DIAGONAL * dxRand[orient];
 	step->y = p.y + steps * SEARCHMAP_SQUARE_DIAGONAL * dyRand[orient];
+	const Size& mapSize = PropsSize();
 	step->x = Clamp<unsigned int>(step->x, 1u, (mapSize.w - 1) * 16);
 	step->y = Clamp<unsigned int>(step->y, 1u, (mapSize.h - 1) * 12);
 	step->orient = GetOrient(Point(step->x, step->y), p);
@@ -305,6 +309,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	if (smptDest == smptSource) return nullptr;
 
 	// Initialize data structures
+	const Size& mapSize = PropsSize();
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(mapSize.Area(), false);
 	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
