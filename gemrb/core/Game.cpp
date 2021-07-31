@@ -100,7 +100,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	BanterBlockFlag = 0;
 	WeatherBits = 0;
 	kaputz = NULL;
-	beasts = NULL;
 	mazedata = NULL;
 	timestop_owner = NULL;
 	timestop_end = 0;
@@ -184,9 +183,7 @@ Game::~Game(void)
 	if (kaputz) {
 		delete kaputz;
 	}
-	if (beasts) {
-		free (beasts);
-	}
+
 	for (auto journal : Journals) {
 		delete journal;
 	}

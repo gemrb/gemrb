@@ -274,9 +274,8 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 	// Loading known creatures array (beasts)
 	if(core->GetBeastsINI() != NULL) {
 		int beasts_count = BESTIARY_SIZE;
-		newGame->beasts = (ieByte*)calloc(sizeof(ieByte),beasts_count);
 		if(FamiliarsOffset) {
-			str->Read( newGame->beasts, beasts_count );
+			str->Read(newGame->beasts.data(), beasts_count);
 		}
 	}
 
@@ -1187,7 +1186,7 @@ int GAMImporter::PutFamiliars(DataStream *stream, const Game *game) const
 		if (game->version==GAM_VER_PST) {
 			//only GemRB version can have all features, return when it is PST
 			//gemrb version will have the beasts after the familiars
-			stream->Write( game->beasts, len );
+			stream->Write(game->beasts.data(), len);
 			return 0;
 		}
 	}
@@ -1200,7 +1199,7 @@ int GAMImporter::PutFamiliars(DataStream *stream, const Game *game) const
 	}
 	stream->WriteDword(SavedLocOffset);
 	if (len) {
-		stream->Write( game->beasts, len );
+		stream->Write(game->beasts.data(), len);
 	}
 	stream->Write( filling, FAMILIAR_FILL_SIZE - len);
 	return 0;

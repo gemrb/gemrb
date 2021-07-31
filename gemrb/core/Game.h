@@ -40,6 +40,7 @@
 #include "Video/Video.h"
 
 #include <atomic>
+#include <array>
 #include <vector>
 
 namespace GemRB {
@@ -270,7 +271,7 @@ public:
 	std::vector< Actor*> selected;
 	int version;
 	Variables* kaputz;
-	ieByte* beasts;
+	std::array<ieByte, BESTIARY_SIZE> beasts;
 	ieByte* mazedata; //only in PST
 	ieDword CombatCounter;
 	ieDword StateOverrideFlag, StateOverrideTime;
@@ -416,18 +417,12 @@ public:
 	void SetFamiliar(const ResRef& familiar, size_t index);
 
 	bool IsBeastKnown(unsigned int Index) const {
-		if (!beasts) {
-			return false;
-		}
 		if (Index>=BESTIARY_SIZE) {
 			return false;
 		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) const {
-		if (!beasts) {
-			return;
-		}
+	void SetBeastKnown(unsigned int Index) {
 		if (Index>=BESTIARY_SIZE) {
 			return;
 		}
