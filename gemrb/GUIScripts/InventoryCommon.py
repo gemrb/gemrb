@@ -1042,8 +1042,9 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 	Button.SetBorder (0, color, 0,1)
 	color = {'r' : 32, 'g' : 32, 'b' : 255, 'a' : 255}
 	Button.SetBorder (1, color, 0,0, Button.GetInsetFrame(2))
-	color = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
-	Button.SetBorder (2, color, 0,1)
+	colorUnusable = {'r' : 255, 'g' : 128, 'b' : 128, 'a' : 64}
+	Button.SetBorder (2, colorUnusable, 0, 1)
+	colorUMD = {'r' : 255, 'g' : 255, 'b' : 0, 'a' : 64}
 
 	Button.SetText ("")
 	Button.SetFlags (IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -1084,10 +1085,15 @@ def UpdateInventorySlot (pc, Button, Slot, Type, Equipped=False):
 			else:
 				Button.EnableBorder (1, 0)
 
-		if GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped):
-			Button.EnableBorder (2, 0)
+		usable = GemRB.CanUseItemType (SLOT_ALL, Slot['ItemResRef'], pc, Equipped)
+		if usable:
+			# enable yellow overlay for "use magical device"
+			if usable & 0x100000:
+				Button.SetBorder (2, colorUMD, 1, 1)
+			else:
+				Button.EnableBorder (2, 0)
 		else:
-			Button.EnableBorder (2, 1)
+			Button.SetBorder (2, colorUnusable, 1, 1)
 
 		Button.SetItemIcon (Slot['ItemResRef'], 0)
 
