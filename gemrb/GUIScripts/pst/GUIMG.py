@@ -30,9 +30,7 @@ from GUIDefines import *
 from ie_stats import *
 
 MageWindow = None
-MageSpellInfoWindow = None
 MageSpellLevel = 0
-MageSpellUnmemorizeWindow = None
 
 def InitMageWindow (Window):
 	global MageWindow
@@ -152,20 +150,11 @@ def MageNextLevelPress ():
 		UpdateMageWindow ()
 
 def OpenMageSpellInfoWindow ():
-	global MageSpellInfoWindow
-
-	if MageSpellInfoWindow != None:
-		if MageSpellInfoWindow:
-			MageSpellInfoWindow.Unload ()
-		MageSpellInfoWindow = None
-
-		return
-
-	MageSpellInfoWindow = Window = GemRB.LoadWindow (4)
+	Window = GemRB.LoadWindow (4)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -207,14 +196,7 @@ def OnMageMemorizeSpell ():
 
 
 def OpenMageSpellUnmemorizeWindow (btn, val):
-	global MageSpellUnmemorizeWindow
-
-	if MageSpellUnmemorizeWindow != None:
-		MageSpellUnmemorizeWindow.Unload ()
-		MageSpellUnmemorizeWindow = None
-		return
-
-	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)
@@ -223,21 +205,21 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageUnmemorizeSpell)
+	def Unmemorize(btn, val):
+		OnMageUnmemorizeSpell(btn, val)
+		Window.Close()
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
 	Button.MakeDefault()
 
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellUnmemorizeWindow(btn, val))
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
 def OnMageUnmemorizeSpell (btn, index):
-	if MageSpellUnmemorizeWindow:
-		OpenMageSpellUnmemorizeWindow (btn, index)
-
 	index = GemRB.GetVar ("SpellButton")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
