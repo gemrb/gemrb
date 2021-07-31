@@ -2256,7 +2256,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 
 	//travel direction passed to guiscript
 	WMPDirection direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
-	Log(MESSAGE, "Actions", "Travel direction returned: %d", direction);
+	Log(MESSAGE, "Actions", "Travel direction returned: %d", static_cast<int>(direction));
 	//this is notoriously flaky
 	//if it doesn't work for the sender try other party members, too
 	if (direction == WMPDirection::NONE) {
@@ -2279,7 +2279,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		if (directions[best] != -1) {
 			direction = static_cast<WMPDirection>(best);
 		}
-		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
+		Log(DEBUG, "Actions", "Travel direction determined by party: %d", static_cast<int>(direction));
 	}
 
 	// pst enables worldmap travel only after visiting the lower ward
