@@ -816,6 +816,7 @@ public:
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
 	int SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
+	bool TryUsingMagicDevice(const Item* item, ieDword header);
 	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */

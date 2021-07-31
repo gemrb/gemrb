@@ -9262,6 +9262,81 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	return STR_MAGICWEAPON;
 }
 
+bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
+{
+	if (!third) {
+		return true;
+	}
+	if (item->ItemType != IT_WAND && item->ItemType != IT_SCROLL) {
+		return true;
+	}
+
+	// we have to repeat some usability checks in case a thief or
+	// bard got access via multiclassing and should skip the checks
+	// OR, especially in the bard's case, if she already has access,
+	// which is true for arcane scrolls and wands, but not divine.
+	// Since it's a per-item thing, there might be exceptions as well
+	if (!GetThiefLevel() && !GetBardLevel()) return true;
+
+	// go through each class and check again
+	ieDword levelSum = BaseStats[IE_CLASSLEVELSUM];
+	for (ieDword i = 0; i < ISCLASSES; ++i) {
+		if (!levelSum) break;
+		ieDword level = GetClassLevel(i);
+		if (!level) continue;
+		levelSum -= level;
+
+		// check if this class grants usability
+		// stolen from CheckUsability() - refactor iff kits require it
+		unsigned int classBit = 1 << (classesiwd2[i] - 1);
+		ieDword itemvalue = item->UsabilityBitmask;
+		if (classBit & ~itemvalue) {
+			return true;
+		}
+	}
+
+	// from here on we know we have either a single class thief or
+	// bard or one of them with a useless mixin class.
+	// Nothing limiting left to check, as they must have positive
+	// skill to get this far (or they couldn't have equipped the item)
+	// and no usability yet.
+	int skill = GetSkill(IE_MAGICDEVICE); // includes the charisma mod
+	assert(skill > 0);
+
+	int roll = LuckyRoll(1, 20, 0);
+	// wands use effects directly -> fx->Power
+	// scrolls use fx_cast_spell -> fx->Parameter1 (with 0 Power)
+	const auto& effects = item->GetExtHeader(header)->features;
+	const auto& fx = effects[0];
+	int level = fx->Parameter1;
+	if (fx->Power) {
+		level = fx->Power;
+	}
+
+	// sorcerers.net suggests it's: 1d100 <= (skill + chaMod * 5) - level * 5;
+	// other skill messages use a bunch of 7
+	// but the string seems to be true in the original, which is also much more lenient
+	bool success = (skill + roll) >= (level + 20);
+	// 39304 = ~Use magic device check. Use magic device (skill + d20 roll + CHA modifier) = %d vs. (device's spell level + 20) = %d ( Spell level = %d ).~
+	displaymsg->DisplayRollStringName(39304, DMC_LIGHTGREY, this, skill + roll, level + 20, level);
+
+	if (success) {
+		if (core->HasFeedback(FT_CASTING)) {
+			const String *txt = core->GetString(24198);
+			displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+		}
+		return true;
+	}
+
+	// don't play with powers you don't comprehend!
+	if (core->HasFeedback(FT_CASTING)) {
+		const String *txt = core->GetString(24197);
+		displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+	}
+	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
+	return false;
+}
+
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
@@ -9287,6 +9362,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
+
+	if (!TryUsingMagicDevice(itm, header)) {
+		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		return false;
+	}
 
 	//item is depleted for today
 	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
@@ -9491,6 +9571,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
+
+	if (!TryUsingMagicDevice(itm, header)) {
+		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		return false;
+	}
 
 	//item is depleted for today
 	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
