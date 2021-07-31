@@ -109,7 +109,9 @@ void SDLSurfaceSprite2D::SetPaletteFromSurface() const noexcept
 
 bool SDLSurfaceSprite2D::SetPaletteColors(const Color* pal) const noexcept
 {
-	assert(format.Depth <= 8);
+	if (format.Depth > 8) {
+		return false;
+	}
 	bool ret = SDLVideoDriver::SetSurfacePalette(*surface, reinterpret_cast<const SDL_Color*>(pal), 0x01 << format.Depth);
 	if (ret) {
 		SetPaletteFromSurface();
@@ -159,9 +161,8 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 	}
 	
 	surface->palette = pal;
-	bool ret = SetPaletteColors(pal->col);
-	assert(ret);
-	
+	SetPaletteColors(pal->col);
+
 	palVersion = pal->GetVersion();
 }
 
