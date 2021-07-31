@@ -9618,7 +9618,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	//CanUseItemType will check actor's class bits too
-	Slottype = core->CanUseItemType (Slottype, item, actor, true);
+	Slottype = core->CanUseItemType (Slottype, item, actor, true) & SLOT_UMD_MASK;
 	//resolve the equipping sound, it needs to be resolved before
 	//the item is freed
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && !item->ReplacementItem.IsEmpty()) {

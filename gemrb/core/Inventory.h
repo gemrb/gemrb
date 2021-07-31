@@ -70,6 +70,8 @@ class StringBuffer;
 #define SLOT_ANY       32767
 #define SLOT_INVENTORY 32768
 #define SLOT_ALL       65535
+#define SLOT_UMD       0x100000 // marker for a use magic device-d slot item
+#define SLOT_UMD_MASK  (0x100000 - 1)
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000

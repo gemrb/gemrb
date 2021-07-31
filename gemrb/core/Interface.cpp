@@ -3452,6 +3452,10 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
+	if (ret && actor && actor->RequiresUMD(item)) {
+		// set an ugly marker for Use magic device, but only if the item is already known to be usable
+		ret |= SLOT_UMD;
+	}
 
 	if (!ret) {
 		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
