@@ -329,13 +329,9 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	// Small map for MapControl
 	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
 
-	// night small map is *optional*!
-	if (!sm) {
-		//fall back to day minimap
-		sm = GetResourceHolder<ImageMgr>(map->WEDResRef);
-	}
-	
 	if (sm) {
+		// night small map is *optional*!
+		// keep the exising map if this one is null
 		map->SmallMap = sm->GetSprite2D();
 	}
 	
