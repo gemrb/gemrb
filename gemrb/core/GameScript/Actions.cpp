@@ -2255,19 +2255,19 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 	}
 
 	//travel direction passed to guiscript
-	int direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
+	WMPDirection direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
 	Log(MESSAGE, "Actions", "Travel direction returned: %d", direction);
 	//this is notoriously flaky
 	//if it doesn't work for the sender try other party members, too
-	if (direction == -1) {
+	if (direction == WMPDirection::NONE) {
 		int directions[4] = { -1, -1, -1, -1 };
 		for (int i = 0; i < game->GetPartySize(false); i++) {
 			actor = game->GetPC(i, false);
 			if (actor == Sender) continue;
 
-			int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
-			if (partydir != -1) {
-				directions[partydir]++;
+			WMPDirection partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
+			if (partydir != WMPDirection::NONE) {
+				directions[static_cast<int>(partydir)]++;
 			}
 		}
 		int best = 0;
@@ -2277,22 +2277,22 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 			}
 		}
 		if (directions[best] != -1) {
-			direction = best;
+			direction = static_cast<WMPDirection>(best);
 		}
 		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
 	}
 
 	// pst enables worldmap travel only after visiting the lower ward
 	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
-	if (direction == -1 && !keyAreaVisited) {
+	if (direction == WMPDirection::NONE && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (direction == -1 && keyAreaVisited) {
+	if (direction == WMPDirection::NONE && keyAreaVisited) {
 		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
 		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
 		// DestEntryPoint is all zeroes, pst just didn't use it
-		direction = 1;
+		direction = WMPDirection::WEST;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );

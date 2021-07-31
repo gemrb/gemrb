@@ -2897,10 +2897,10 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		int label          = atoi(newarea->QueryField(i,6));
 		int name           = atoi(newarea->QueryField(i,7));
 		const char *ltab   = newarea->QueryField(i,8);
-		links[WMP_NORTH]   = atoi(newarea->QueryField(i,9));
-		links[WMP_EAST]    = atoi(newarea->QueryField(i,10));
-		links[WMP_SOUTH]   = atoi(newarea->QueryField(i,11));
-		links[WMP_WEST]    = atoi(newarea->QueryField(i,12));
+		links[static_cast<int>(WMPDirection::NORTH)] = atoi(newarea->QueryField(i, 9));
+		links[static_cast<int>(WMPDirection::EAST)] = atoi(newarea->QueryField(i, 10));
+		links[static_cast<int>(WMPDirection::SOUTH)] = atoi(newarea->QueryField(i, 11));
+		links[static_cast<int>(WMPDirection::WEST)] = atoi(newarea->QueryField(i, 12));
 		//this is the number of links in the 2da, we don't need it
 		int linksto        = atoi(newarea->QueryField(i,13));
 

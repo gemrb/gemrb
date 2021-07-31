@@ -51,13 +51,6 @@ namespace GemRB {
 /** Area can be passed through when travelling directly to some more distant area on WorldMap */
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
-/** this is the physical order the links appear in WMPAreaEntry */
-using ieDirectionType = enum {
-	WMP_NORTH=0,
-	WMP_WEST=1,
-	WMP_SOUTH=2, 
-	WMP_EAST=3
-};
 
 /**
  * @class WMPAreaEntry

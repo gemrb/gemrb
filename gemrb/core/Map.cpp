@@ -2997,28 +2997,28 @@ bool Map::IsExplored(const Point &pos) const
 }
 
 //returns direction of area boundary, returns -1 if it isn't a boundary
-int Map::WhichEdge(const Point &s) const
+WMPDirection Map::WhichEdge(const Point &s) const
 {
 	Point tileP = ConvertCoordToTile(s);
 	if (!(GetBlocked(tileP) & PathMapFlags::TRAVEL)) {
 		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
 			tileP.x, tileP.y);
-		return -1;
+		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
 		if (mapSize.w * mapSize.h > tileP.x + tileP.y) { //
-			return WMP_NORTH;
+			return WMPDirection::NORTH;
 		}
-		return WMP_EAST;
+		return WMPDirection::EAST;
 	}
 	//south or west
 	if (mapSize.w * mapSize.h < tileP.x + tileP.y) { //
-		return WMP_SOUTH;
+		return WMPDirection::SOUTH;
 	}
-	return WMP_WEST;
+	return WMPDirection::WEST;
 }
 
 //--------ambients----------------

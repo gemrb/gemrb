@@ -575,7 +575,7 @@ public:
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
-	int WhichEdge(const Point &s) const;
+	WMPDirection WhichEdge(const Point &s) const;
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
