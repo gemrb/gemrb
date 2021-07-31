@@ -100,16 +100,13 @@ Particles::~Particles()
 		delete( bitmap[i]);
 	}
 	*/
-	delete fragments;
 }
 
 void Particles::SetBitmap(unsigned int FragAnimID)
 {
 	//int i;
 
-	delete fragments;
-
-	fragments = new CharAnimations(FragAnimID, 0);
+	fragments = make_unique<CharAnimations>(FragAnimID, 0);
 /*
 	for (i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i] );
