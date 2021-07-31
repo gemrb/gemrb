@@ -52,12 +52,12 @@ namespace GemRB {
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
 /** this is the physical order the links appear in WMPAreaEntry */
-typedef enum ieDirectionType {
+using ieDirectionType = enum {
 	WMP_NORTH=0,
 	WMP_WEST=1,
 	WMP_SOUTH=2, 
 	WMP_EAST=3
-} ieDirectionType;
+};
 
 /**
  * @class WMPAreaEntry

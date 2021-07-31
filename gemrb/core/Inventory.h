@@ -77,13 +77,13 @@ class StringBuffer;
 #define IW_NO_EQUIPPED  1000
 
 /** Inventory types */
-typedef enum ieInventoryType {
+using ieInventoryType = enum  {
 	INVENTORY_HEAP = 0,
 	INVENTORY_CREATURE = 1
-} ieInventoryType;
+};
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieCREItemFlagBits : uint32_t {
+using ieCREItemFlagBits = enum : uint32_t {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
@@ -113,7 +113,7 @@ typedef enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_STOLEN2 = 0x40000, //same as 4
 	IE_INV_ITEM_CONVERSABLE = 0x80000,
 	IE_INV_ITEM_PULSATING = 0x100000
-} ieCREItemFlagBits;
+};
 
 #define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
 

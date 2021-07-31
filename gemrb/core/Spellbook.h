@@ -62,16 +62,16 @@ class StringBuffer;
 #define LSR_FULL    6  //can't learn more spells of this level (due to level)
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieSpellType {
+using ieSpellType = enum {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
 	IE_SPELL_TYPE_INNATE = 2,
 	IE_SPELL_TYPE_SONG = 3     //not in spellbook
-} ieSpellType;
+};
 
 #define NUM_SPELLTYPES 3
 
-typedef enum ieIWD2SpellType {
+using ieIWD2SpellType = enum {
 	IE_IWD2_SPELL_BARD = 0,
 	IE_IWD2_SPELL_CLERIC = 1,
 	IE_IWD2_SPELL_DRUID = 2,
@@ -83,7 +83,7 @@ typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_INNATE = 8,
 	IE_IWD2_SPELL_SONG = 9,
 	IE_IWD2_SPELL_SHAPE = 10
-} ieIWD2SpellType;
+};
 
 #define NUM_IWD2_SPELLTYPES 11
 

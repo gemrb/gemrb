@@ -36,7 +36,7 @@ namespace GemRB {
 class DataStream;
 class ScriptedAnimation;
 
-typedef enum VEF_TYPES {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA} VEF_TYPES;
+using VEF_TYPES = enum {VEF_INVALID = -1, VEF_BAM, VEF_VVC, VEF_VEF, VEF_2DA};
 
 struct ScheduleEntry {
 	ResRef resourceName;
