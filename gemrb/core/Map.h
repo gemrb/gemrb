@@ -390,7 +390,6 @@ private:
 	// the assigned palette is the palette for the lightmap
 	Holder<Sprite2D> tileProps;
 
-	Size mapSize;
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
 	std::vector<WallPolygonGroup> wallGroups;
@@ -654,6 +653,8 @@ private:
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
 	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport);
+	
+	Size PropsSize() const noexcept;
 	Size FogMapSize() const;
 	bool FogTileUncovered(const Point &p, const Bitmap*) const;
 	Point ConvertPointToFog(const Point &p) const;
