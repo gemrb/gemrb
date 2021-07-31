@@ -89,7 +89,6 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	PaletteHolder pal = MakeHolder<Palette>();
 	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
 	
-	void* pixels = calloc(4096, 1);
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
@@ -101,7 +100,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
 		pal->col[0].g = 200;
-		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
+		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	}
 	str->Seek( pos, GEM_STREAM_START );
 	Color Col[256];
@@ -118,8 +117,10 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 			fmt.ColorKey = i;
 		}
 	}
-	str->Read( pixels, 4096 );
-	return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
+	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	str->Read(spr->LockSprite(), 4096);
+	spr->UnlockSprite();
+	return spr;
 }
 
 #include "plugindef.h"
