@@ -140,7 +140,7 @@ class StringBuffer;
 #define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID, ( mod ), false )
 
 /** Prototype of a function implementing a particular Effect opcode */
-typedef int (* EffectFunction)(Scriptable*, Actor*, Effect*);
+using EffectFunction = int (*)(Scriptable*, Actor*, Effect*);
 
 
 /** Cached Effect -> opcode mapping */

@@ -31,7 +31,7 @@
 namespace GemRB {
 
 #ifndef ReleaseFun
-typedef void (*ReleaseFun)(void *);
+using ReleaseFun = void (*)(void*);
 #endif
 
 #define GEM_VARIABLES_INT      0

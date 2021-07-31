@@ -1563,7 +1563,7 @@ MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL
 MAX_LEVEL,MAX_LEVEL,0,0,0,0,0,0//ff
 };
 
-typedef void (*PostChangeFunctionType)(Actor *actor, ieDword oldValue, ieDword newValue);
+using PostChangeFunctionType = void (*)(Actor *actor, ieDword oldValue, ieDword newValue);
 static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f

@@ -28,7 +28,7 @@ namespace GemRB {
 #define KEYSIZE 8
 
 #ifndef ReleaseFun
-typedef void (*ReleaseFun)(void *);
+using ReleaseFun = void (*)(void*);
 #endif
 
 class Cache

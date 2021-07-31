@@ -53,8 +53,8 @@ class TypeID;
 
 class GEM_EXPORT PluginMgr {
 public:
-	typedef Resource* (*ResourceFunc)(DataStream*);
-	typedef Plugin* (*PluginFunc)();
+	using ResourceFunc = Resource* (*)(DataStream*);
+	using PluginFunc = Plugin* (*)();
 public:
 	/** Return global instance of PluginMgr */
 	static PluginMgr* Get();

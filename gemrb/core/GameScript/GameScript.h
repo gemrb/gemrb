@@ -445,10 +445,10 @@ public:
 	}
 };
 
-typedef int (* TriggerFunction)(Scriptable *, const Trigger *);
-typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef Targets *(* ObjectFunction)(const Scriptable *, Targets*, int ga_flags);
-typedef int (* IDSFunction)(const Actor *, int parameter);
+using TriggerFunction = int (*)(Scriptable*, const Trigger*);
+using ActionFunction = void (*)(Scriptable*, Action*);
+using ObjectFunction = Targets* (*)(const Scriptable*, Targets*, int ga_flags);
+using IDSFunction = int (*)(const Actor*, int parameter);
 
 #define TF_NONE		0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
