@@ -31,10 +31,7 @@ from ie_stats import *
 from ie_action import ACT_CAST
 
 PriestWindow = None
-PriestSpellInfoWindow = None
 PriestSpellLevel = 0
-PriestSpellUnmemorizeWindow = None
-
 
 def InitPriestWindow (Window):
 	global PriestSpellWindow
@@ -155,20 +152,11 @@ def PriestNextLevelPress ():
 
 
 def OpenPriestSpellInfoWindow ():
-	global PriestSpellInfoWindow
-
-	if PriestSpellInfoWindow != None:
-		if PriestSpellInfoWindow:
-			PriestSpellInfoWindow.Unload ()
-		PriestSpellInfoWindow = None
-
-		return
-
-	PriestSpellInfoWindow = Window = GemRB.LoadWindow (4)
+	Window = GemRB.LoadWindow (4)
 
 	Button = Window.GetControl (4)
 	Button.SetText (1403)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
@@ -209,14 +197,7 @@ def OnPriestMemorizeSpell ():
 
 
 def OpenPriestSpellUnmemorizeWindow (btn, val):
-	global PriestSpellUnmemorizeWindow
-
-	if PriestSpellUnmemorizeWindow != None:
-		PriestSpellUnmemorizeWindow.Unload ()
-		PriestSpellUnmemorizeWindow = None
-		return
-
-	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (6)
+	Window = GemRB.LoadWindow (6)
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (2)
@@ -225,22 +206,23 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (42514)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnPriestUnmemorizeSpell(btn, val))
+	def Unmemorize(btn, val):
+		OnPriestUnmemorizeSpell(btn, val)
+		Window.Close()
+	
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, Unmemorize)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (4196)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenPriestSpellUnmemorizeWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 
 
 def OnPriestUnmemorizeSpell (btn, index):
-	if PriestSpellUnmemorizeWindow:
-		OpenPriestSpellUnmemorizeWindow (btn, index)
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
