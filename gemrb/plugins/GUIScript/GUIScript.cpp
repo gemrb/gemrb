@@ -9887,7 +9887,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 	Point point;
 	ieWord color = 0;
 	const char *txt = NULL;
-	PARSE_ARGS( args,  "hh|hs", &point.x, &point.y, &color, &txt);
+	PARSE_ARGS( args,  "ii|hs", &point.x, &point.y, &color, &txt);
 
 	GET_GAME();
 	GET_MAP();
