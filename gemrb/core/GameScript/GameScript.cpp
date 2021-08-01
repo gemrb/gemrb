@@ -2304,7 +2304,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+				Log(WARNING, "GameScript", "Unfinished OR block encountered! 1");
 				if (!subresult) {
 					return false;
 				}
@@ -2325,7 +2325,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 		}
 	}
 	if (ORcount) {
-		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+		Log(WARNING, "GameScript", "Unfinished OR block encountered! 2");
 		return subresult;
 	}
 	return true;
