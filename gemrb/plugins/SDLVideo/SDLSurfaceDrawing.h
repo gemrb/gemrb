@@ -49,7 +49,7 @@ inline bool PointClipped(SDL_Surface* surf, const Point& p)
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 template<typename T>
-inline const SDL_Rect& RectFromRegion(T&& rgn)
+inline const SDL_Rect& RectFromRegion(T& rgn)
 {
 	return reinterpret_cast<const SDL_Rect&>(rgn);
 }
