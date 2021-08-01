@@ -202,7 +202,7 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 	auto heightmap = hm->GetSprite2D();
 	auto searchmap = sr->GetSprite2D();
 	
-	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp);
+	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp == 1);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
