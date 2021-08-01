@@ -134,11 +134,6 @@ void WorldMap::AddAreaLink(WMPAreaLink *al)
 	area_links.push_back(al);
 }
 
-WMPAreaEntry *WorldMap::GetNewAreaEntry() const
-{
-	return new WMPAreaEntry();
-}
-
 void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
 {
 	//if index is too large, we break
@@ -465,7 +460,7 @@ void WorldMap::SetEncounterArea(const ResRef& area, const WMPAreaLink *link) {
 		return;
 	}
 
-	WMPAreaEntry *ae = GetNewAreaEntry();
+	WMPAreaEntry *ae = new WMPAreaEntry();
 	ae->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED, OP_SET);
 	ae->AreaName = area;
 	ae->AreaResRef = area;

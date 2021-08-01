@@ -2918,7 +2918,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "invalid links 2da!");
 		}
 
-		WMPAreaEntry *entry = wmap->GetNewAreaEntry();
+		WMPAreaEntry *entry = new WMPAreaEntry();
 		entry->AreaName = ResRef::MakeUpperCase(area);
 		entry->AreaResRef = ResRef::MakeUpperCase(area);
 		strnuprcpy(entry->AreaLongName, script, 32);

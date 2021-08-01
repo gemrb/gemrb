@@ -141,7 +141,6 @@ public:
 	WMPAreaEntry *GetEntry(unsigned int index) const { return area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
-	WMPAreaEntry *GetNewAreaEntry() const;
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
 	void InsertAreaLink(unsigned int idx, unsigned int dir, const WMPAreaLink *arealink);
 	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);
