@@ -590,12 +590,10 @@ static int
 ipvideo_decode_0xb (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int y;
-
 	/* 64-color encoding (each pixel in block is a different color) */
 	CHECK_STREAM (len, 64);
 
-	for (y = 0; y < 8; ++y) {
+	for (int y = 0; y < 8; ++y) {
 		memcpy (frame, *data, 8);
 		frame += s->width;
 		(*data) += 8;
@@ -608,14 +606,13 @@ static int
 ipvideo_decode_0xc (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int x, y;
 	unsigned char pix;
 
 	/* 16-color block encoding: each 2x2 block is a different color */
 	CHECK_STREAM (len, 16);
 
-	for (y = 0; y < 8; y += 2) {
-		for (x = 0; x < 8; x += 2) {
+	for (int y = 0; y < 8; y += 2) {
+		for (int x = 0; x < 8; x += 2) {
 			pix = *(*data)++;
 			*(frame + x) = pix;
 			*(frame + x + 1) = pix;
@@ -632,7 +629,6 @@ static int
 ipvideo_decode_0xd (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int x, y;
 	unsigned char P[4];
 	unsigned char index = 0;
 
@@ -645,13 +641,13 @@ ipvideo_decode_0xd (const GstMveDemuxStream * s, unsigned char *frame,
 	P[3] = (*data)[3];
 	(*data) += 4;
 
-	for (y = 0; y < 8; ++y) {
+	for (int y = 0; y < 8; ++y) {
 		if (y < 4)
 			index = 0;
 		else
 			index = 2;
 
-		for (x = 0; x < 8; ++x) {
+		for (int x = 0; x < 8; ++x) {
 			if (x == 4)
 				++index;
 			*frame++ = P[index];
@@ -666,14 +662,11 @@ static int
 ipvideo_decode_0xe (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int y;
-	unsigned char pix;
-
 	/* 1-color encoding: the whole block is 1 solid color */
 	CHECK_STREAM (len, 1);
-	pix = *(*data)++;
+	unsigned char pix = *(*data)++;
 
-	for (y = 0; y < 8; ++y) {
+	for (int y = 0; y < 8; ++y) {
 		memset (frame, pix, 8);
 		frame += s->width;
 	}
@@ -685,7 +678,6 @@ static int
 ipvideo_decode_0xf (const GstMveDemuxStream * s, unsigned char *frame,
 		const unsigned char **data, unsigned short *len)
 {
-	int x, y;
 	unsigned char P[2];
 
 	/* dithered encoding */
@@ -694,8 +686,8 @@ ipvideo_decode_0xf (const GstMveDemuxStream * s, unsigned char *frame,
 	P[0] = *(*data)++;
 	P[1] = *(*data)++;
 
-	for (y = 0; y < 8; ++y) {
-		for (x = 0; x < 4; ++x) {
+	for (int y = 0; y < 8; ++y) {
+		for (int x = 0; x < 4; ++x) {
 			*frame++ = P[y & 1];
 			*frame++ = P[(y & 1) ^ 1];
 		}
@@ -710,19 +702,16 @@ ipvideo_decode_frame8 (const GstMveDemuxStream * s, const unsigned char *data,
 		unsigned short len)
 {
 	int rc = 0;
-	int x, y, xx, yy;
 	int index = 0;
 	unsigned char opcode;
-	unsigned char *frame;
-
-	frame = (guint8 *) s->back_buf1;
+	unsigned char *frame = (guint8 *) s->back_buf1;
 
 	/* decoding is done in 8x8 blocks */
-	xx = s->width >> 3;
-	yy = s->height >> 3;
+	int xx = s->width >> 3;
+	int yy = s->height >> 3;
 
-	for (y = 0; y < yy; ++y) {
-		for (x = 0; x < xx; ++x) {
+	for (int y = 0; y < yy; ++y) {
+		for (int x = 0; x < xx; ++x) {
 			/* decoding map contains 4 bits of information per 8x8 block */
 			/* bottom nibble first, then top nibble */
 			if (index & 1)
