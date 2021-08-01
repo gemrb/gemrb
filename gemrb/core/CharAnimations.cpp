@@ -1735,6 +1735,7 @@ void CharAnimations::AddFFSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_SHOOT:
 			dest += "g3";
 			break;
 
