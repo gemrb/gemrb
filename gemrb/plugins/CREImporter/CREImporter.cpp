@@ -97,7 +97,7 @@ static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
 {
 	size_t i = list.size();
 	while (i--) {
-		if (list[i]->Equals(spellref)) {
+		if (list[i] && list[i]->Equals(spellref)) {
 			return static_cast<int>(i);
 		}
 	}
@@ -172,7 +172,7 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
 	size_t splCount = splList.size();
 	for (size_t i = 0; i < splCount; i++) {
-		if (domList[i]->Equals(name)) {
+		if (domList[i] && domList[i]->Equals(name)) {
 			int lev = domList[i]->FindSpell(kit);
 			if (lev == -1) return -1;
 			level = lev;
@@ -213,7 +213,7 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 
 	// try harder for the rest
 	for (const auto& spell : splList) {
-		if (!spell->Equals(name)) {
+		if (!spell || !spell->Equals(name)) {
 			continue;
 		}
 
@@ -262,7 +262,7 @@ static int ResolveSpellName(const ResRef& name, int level, ieIWD2SpellType type)
 	case IE_IWD2_SPELL_DOMAIN:
 	default:
 		for (size_t i = 0; i < splCount; i++) {
-			if (splList[i]->Equals(name)) return static_cast<int>(i);
+			if (splList[i] && splList[i]->Equals(name)) return static_cast<int>(i);
 		}
 	}
 	return -1;
