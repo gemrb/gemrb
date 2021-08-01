@@ -45,6 +45,7 @@ Animation::Animation(std::vector<frame_t> fr)
 	gameAnimation = false;
 	
 	for (const frame_t& frame : frames) {
+		if (!frame) continue;
 		Region r = frame->Frame;
 		r.x = -r.x;
 		r.y = -r.y;
