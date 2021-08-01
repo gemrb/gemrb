@@ -2362,19 +2362,17 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 			stream->WriteDword(tmpDword);
 
 			int len = 0;
-			if (mn.text) {
-				// limited to 500 *bytes* of text, convert to a multibyte encoding.
-				// we convert to MB because it fits more than if we wrote the wide characters
-				char* mbstring = MBCStringFromString(*mn.text);
-				// FIXME: depends on locale blah blah (see MBCStringFromString definition)
-				if (mbstring) {
-					// only care about number of bytes before null so strlen is what we want despite being MB string
-					len = std::min(static_cast<int>(strlen(mbstring)), 500);
-					stream->Write( mbstring, len);
-					free(mbstring);
-				} else {
-					Log(WARNING, "AREImporter", "MapNote converted to an invalid multibyte sequence; cannot write it to file.\nFailed Note: %ls", mn.text->c_str());
-				}
+			// limited to 500 *bytes* of text, convert to a multibyte encoding.
+			// we convert to MB because it fits more than if we wrote the wide characters
+			char* mbstring = MBCStringFromString(mn.text);
+			// FIXME: depends on locale blah blah (see MBCStringFromString definition)
+			if (mbstring) {
+				// only care about number of bytes before null so strlen is what we want despite being MB string
+				len = std::min(static_cast<int>(strlen(mbstring)), 500);
+				stream->Write( mbstring, len);
+				free(mbstring);
+			} else {
+				Log(WARNING, "AREImporter", "MapNote converted to an invalid multibyte sequence; cannot write it to file.\nFailed Note: %ls", mn.text.c_str());
 			}
 
 			// pad the remaining space

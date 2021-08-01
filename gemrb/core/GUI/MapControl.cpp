@@ -293,7 +293,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 		const String* text = nullptr;
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
-			text = mn->text;
+			text = &mn->text;
 			notePos = mn->Pos;
 		}
 

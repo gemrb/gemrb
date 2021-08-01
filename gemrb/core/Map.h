@@ -183,7 +183,7 @@ public:
 	// FIXME: things can get messed up by exposing these (specifically strref and text)
 	ieStrRef strref;
 	ieWord color;
-	String* text;
+	String text;
 	Point Pos;
 	bool readonly;
 
@@ -193,21 +193,12 @@ public:
 		return *this;
 	}
 
-	MapNote( const MapNote& mn )
-	: strref(mn.strref), color(mn.color), Pos(mn.Pos), readonly(mn.readonly) {
-		if (mn.text) {
-			text = new String(*mn.text);
-		} else {
-			text = NULL;
-		}
-	}
-
-	MapNote(String* text, ieWord c, bool readonly)
-	: strref(-1), text(text), readonly(readonly)
+	MapNote(String text, ieWord c, bool readonly)
+	: strref(-1), text(std::move(text)), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
-		char* mbstring = MBCStringFromString(*text);
+		char* mbstring = MBCStringFromString(text);
 		if (mbstring) {
 			strref = core->UpdateString(-1, mbstring);
 			free(mbstring);
@@ -221,11 +212,11 @@ public:
 	: strref(ref), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
-		text = core->GetString(ref);
-	}
-
-	~MapNote() {
-		delete text;
+		String* tmp = core->GetString(ref);
+		if (tmp) {
+			text = std::move(*tmp);
+			delete tmp;
+		}
 	}
 
 	const Color& GetColor() const {

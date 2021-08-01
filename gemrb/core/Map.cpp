@@ -3119,11 +3119,9 @@ ieWord Map::GetAmbientCount(bool toSave) const
 	return ambiCount;
 }
 
-//--------mapnotes----------------
-//text must be a pointer we can claim ownership of
 void Map::AddMapNote(const Point& point, ieWord color, String* text, bool readonly)
 {
-	AddMapNote(point, MapNote(text, color, readonly));
+	AddMapNote(point, MapNote(text ? *text : L"", color, readonly));
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly)
