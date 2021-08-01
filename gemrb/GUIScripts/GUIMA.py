@@ -216,6 +216,7 @@ def AddNoteWindow ():
 		#convert to multiline, destroy unwanted resources
 		NoteLabel = NoteWindow.ReplaceSubview(1, IE_GUI_TEXTAREA, "NORMAL")
 		NoteLabel.SetFlags(IE_GUI_TEXTAREA_EDITABLE, OP_OR)
+		NoteLabel.SetColor (ColorWhitish, TA_COLOR_NORMAL)
 
 		# center relative to map
 		mapframe = MapWindow.GetFrame()
