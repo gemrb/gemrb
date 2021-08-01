@@ -155,7 +155,7 @@ int GameData::LoadTable(const char *resRef, bool silent)
 		tables[ind].refcount++;
 		return ind;
 	}
-	//print("(%s) Table not found... Loading from file", ResRef);
+
 	DataStream* str = GetResource(resRef, IE_2DA_CLASS_ID, silent);
 	if (!str) {
 		return -1;

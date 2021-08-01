@@ -601,14 +601,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 		if (select) {
 			area->SelectActors();
-/*
-			for ( m = PCs.begin(); m != PCs.end(); ++m) {
-				if (! *m) {
-					continue;
-				}
-				SelectActor( *m, true, SELECT_QUIET );
-			}
-*/
 		}
 
 		if (! (flags & SELECT_QUIET)) {
@@ -647,11 +639,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		if (!actor->IsSelected()) {
 			// already not selected
 			return true;
-
-			/*for ( m = selected.begin(); m != selected.end(); ++m) {
-				assert((*m) != actor);
-			}
-			return true;*/
 		}
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {

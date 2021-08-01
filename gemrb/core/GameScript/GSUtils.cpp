@@ -1757,7 +1757,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'o': //Object
 				if (objectCount==3) {
 					Log(ERROR, "GSUtils", "Invalid object count!");
-					//abort();
 					delete newAction;
 					return NULL;
 				}
@@ -1814,7 +1813,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newAction;
 						return NULL;
 					}
@@ -2111,7 +2109,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newTrigger;
 						return NULL;
 					}

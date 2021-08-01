@@ -1832,7 +1832,6 @@ GameScript::~GameScript(void)
 			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
 		}
 		if (!res) {
-			//print("Freeing script %s because its refcount has reached 0.", Name);
 			script->Release();
 		}
 		script = NULL;
