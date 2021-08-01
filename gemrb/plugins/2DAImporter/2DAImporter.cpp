@@ -97,8 +97,7 @@ bool p2DAImporter::Open(DataStream* str)
 			if (str == NULL)
 				continue;
 			rowNames.push_back( str );
-			RowEntry r;
-			rows.push_back( r );
+			rows.emplace_back();
 			rows[row].reserve(10);
 			while (( str = strtok( NULL, " " ) ) != NULL) {
 				rows[row].push_back( str );
