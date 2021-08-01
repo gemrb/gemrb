@@ -121,6 +121,7 @@ Holder<Sprite2D> BAMImporter::GetFrameInternal(const FrameEntry& frameInfo, bool
 		PixelFormat fmt = PixelFormat::RLE8Bit(palette, CompressedColorIndex);
 		const uint8_t* dataEnd = FindRLEPos(dataBegin, rgn.w, Point(rgn.w, rgn.h - 1), CompressedColorIndex);
 		ptrdiff_t dataLen = dataEnd - dataBegin;
+		if (dataLen == 0) return nullptr;
 		void* pixels = malloc(dataLen);
 		memcpy(pixels, dataBegin, dataLen);
 		spr = video->CreateSprite(rgn, pixels, fmt);

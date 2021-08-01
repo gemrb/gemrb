@@ -52,8 +52,6 @@ public:
 		delete pred1;
 		delete pred2;
 	}
-
-	bool operator()(PT param) const override = 0;
 };
 
 template<typename PT>

@@ -210,7 +210,7 @@ enum class SHADER {
 // using a template to avoid runtime branch evaluation
 // by optimizing down to a single case
 template <SHADER SHADE, bool SRCALPHA>
-class RGBBlendingPipeline : RGBBlender {
+class RGBBlendingPipeline : private RGBBlender {
 	Color tint;
 	unsigned int shift;
 	void (*blender)(const Color& src, Color& dst);

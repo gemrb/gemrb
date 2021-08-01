@@ -13893,7 +13893,7 @@ PyObject* GUIScript::ConstructObjectForScriptable(const ScriptingRefBase* ref)
 	return obj;
 }
 
-PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
+static PyObject* ConstructObjectForScriptableView(const ViewScriptingRef* ref)
 {
 	PyObject* pyView = gs->ConstructObjectForScriptable(ref);
 	if (pyView) {

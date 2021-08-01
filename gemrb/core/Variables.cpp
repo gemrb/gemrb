@@ -279,7 +279,7 @@ Variables::MyAssoc* Variables::GetAssocAt(const char* key, unsigned int& nHash) 
 int Variables::GetValueLength(const char* key) const
 {
 	unsigned int nHash;
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return 0; // not in map
 	}
@@ -291,7 +291,7 @@ bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
 {
 	unsigned int nHash;
 	assert( m_type == GEM_VARIABLES_STRING );
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		dest[0] = 0;
 		return false; // not in map
@@ -305,7 +305,7 @@ bool Variables::Lookup(const char* key, char *&dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_STRING);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map
@@ -318,7 +318,7 @@ bool Variables::Lookup(const char* key, void *&dest) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_POINTER);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map
@@ -331,7 +331,7 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 {
 	unsigned int nHash;
 	assert(m_type==GEM_VARIABLES_INT);
-	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	const Variables::MyAssoc* pAssoc = GetAssocAt(key, nHash);
 	if (pAssoc == NULL) {
 		return false;
 	} // not in map

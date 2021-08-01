@@ -49,7 +49,7 @@ public:
 	GlobalTimer(void);
 	
 	GlobalTimer(GlobalTimer&&) = default;
-	GlobalTimer& operator=(GlobalTimer&&) = default;
+	GlobalTimer& operator=(GlobalTimer&&) noexcept = default;
 
 	void Freeze();
 	bool Update();

@@ -197,7 +197,7 @@ void LoadPlugins(const char* pluginpath)
 		// module is sent to the back
 		if (flags == PLF_DELAY) {
 			Log(MESSAGE, "PluginLoader", "Loading \"%s\" delayed.", name);
-			delayedPlugins.insert( name );
+			delayedPlugins.emplace(name);
 			continue;
 		}
 

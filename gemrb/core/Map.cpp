@@ -307,7 +307,6 @@ tileProps(std::move(props))
 	BgDuration = 0;
 	LastGoCloser = 0;
 	AreaFlags = AreaDifficulty = 0;
-	Rain = Snow = Fog = Lightning = DayNight = 0;
 	trackString = trackFlag = trackDiff = 0;
 	RestHeader.Difficulty = RestHeader.CreatureNum = RestHeader.Maximum = RestHeader.Enabled = 0;
 	RestHeader.DayChance = RestHeader.NightChance = RestHeader.sduration = RestHeader.rwdist = RestHeader.owdist = 0;
@@ -3957,7 +3956,7 @@ void AreaAnimation::BlendAnimation()
 		// CHECKME: what should we do here? Currently copying palette
 		// from first frame of first animation
 
-		if (animation.size() == 0) return;
+		if (animation.empty()) return;
 		Holder<Sprite2D> spr = animation[0].GetFrame(0);
 		if (!spr) return;
 		palette = spr->GetPalette()->Copy();

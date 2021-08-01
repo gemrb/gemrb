@@ -827,13 +827,13 @@ void CREImporter::SetupColor(ieDword &stat) const
 	// assuming an ordered list, so looking in the middle first
 	for (int i = (int) stat; i >= 0; i--) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
 			return;
 		}
 	}
 	for (unsigned int i = stat + 1; i < RandColor; i++) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
 			return;
 		}
 	}
@@ -3101,7 +3101,6 @@ int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 	stream->WriteDword(EffectsOffset);
 	tmpDword = EffectsCount+VariablesCount;
 	stream->WriteDword(tmpDword);
-	tmpDword = 0;
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 

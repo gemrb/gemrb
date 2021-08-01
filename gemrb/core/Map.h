@@ -172,7 +172,7 @@ struct Entrance {
 };
 
 class MapNote {
-	void swap(MapNote& mn) {
+	void swap(MapNote& mn) noexcept {
 		if (&mn == this) return;
 		std::swap(strref, mn.strref);
 		std::swap(color, mn.color);
@@ -358,14 +358,17 @@ public:
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
 	MapEnv AreaType = AT_UNINITIALIZED;
-	ieWord Rain, Snow, Fog, Lightning;
+	ieWord Rain = 0;
+	ieWord Snow = 0;
+	ieWord Fog = 0;
+	ieWord Lightning = 0;
 	Bitmap ExploredBitmap;
 	Bitmap VisibleBitmap;
 	int version;
 	ResRef WEDResRef;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
-	bool DayNight;
+	bool DayNight = false;
 	//movies for day/night (only in ToB)
 	ResRef Dream[2];
 	Holder<Sprite2D> Background;
