@@ -50,7 +50,7 @@ public:
 private:
 	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) const;
 
-	WMPAreaEntry* GetAreaEntry(DataStream *str, WMPAreaEntry* ae) const;
+	WMPAreaEntry* GetAreaEntry(DataStream *str) const;
 	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al) const;
 	int PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap) const;
 	int PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index) const;

@@ -154,8 +154,7 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 
 	WMPAreaLink al;
 	for (unsigned int i = 0; i < AreaEntriesCount; i++) {
-		WMPAreaEntry *wmpAE = new WMPAreaEntry();
-		m->SetAreaEntry(i, GetAreaEntry(str, wmpAE));
+		m->SetAreaEntry(i, GetAreaEntry(str));
 	}
 
 	str->Seek( AreaLinksOffset, GEM_STREAM_START );
@@ -165,8 +164,10 @@ void WMPImporter::GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) 
 
 }
 
-WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str, WMPAreaEntry* ae) const
+WMPAreaEntry* WMPImporter::GetAreaEntry(DataStream *str) const
 {
+	WMPAreaEntry *ae = new WMPAreaEntry();
+
 	str->ReadResRef( ae->AreaName );
 	str->ReadResRef( ae->AreaResRef );
 	str->ReadVariable(ae->AreaLongName);
