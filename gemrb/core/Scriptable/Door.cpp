@@ -286,7 +286,8 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 	core->SetEventFlag(EF_TARGETMODE);
 }
 
-bool Door::TryUnlock(Actor *actor) {
+bool Door::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&DOOR_LOCKED)) return true;
 
 	// don't remove key in PS:T!

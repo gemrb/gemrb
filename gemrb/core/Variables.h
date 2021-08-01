@@ -108,7 +108,7 @@ public:
 		ieDword& rValue) const;
 
 	// Debugging
-	void DebugDump();
+	void DebugDump() const;
 	// Implementation
 protected:
 	Variables::MyAssoc** m_pHashTable;

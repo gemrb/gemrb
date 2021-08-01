@@ -153,7 +153,7 @@ public:
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual void CaptureMouse(bool enabled) = 0;
-	const Size& GetScreenSize() { return screenSize; }
+	const Size& GetScreenSize() const { return screenSize; }
 
 	virtual void StartTextInput() = 0;
 	virtual void StopTextInput() = 0;
@@ -207,7 +207,7 @@ public:
 	/** Sets Clip Rectangle */
 	void SetScreenClip(const Region* clip);
 	/** Gets Clip Rectangle */
-	const Region& GetScreenClip() { return screenClip; }
+	const Region& GetScreenClip() const { return screenClip; }
 	virtual void SetGamma(int brightness, int contrast) = 0;
 
 	/** Scales down a sprite by a ratio */
@@ -216,7 +216,7 @@ public:
 	 *  for projectile light spots */
 	Holder<Sprite2D> CreateLight(int radius, int intensity);
 
-	Color SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
+	Color SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const;
 };
 
 }

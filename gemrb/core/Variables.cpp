@@ -519,7 +519,7 @@ void Variables::LoadInitialValues(const char* name)
 	}  
 }
 
-void Variables::DebugDump()
+void Variables::DebugDump() const
 {
 	const char *poi;
 

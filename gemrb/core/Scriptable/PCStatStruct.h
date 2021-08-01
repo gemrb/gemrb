@@ -139,8 +139,8 @@ public:
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, int slot, int headerindex);
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
-	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
-	int GetHeaderForSlot(int slot);
+	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const;
+	int GetHeaderForSlot(int slot) const;
 	void RegisterFavourite(const ResRef& fav, int what);
 	void UpdateClassLevels(const std::list<int> &levels);
 };

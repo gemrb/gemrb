@@ -92,7 +92,7 @@ void MVEPlay::showFrame(const unsigned char* buf, unsigned int bufw, unsigned in
 	vidBuf->CopyPixels(Region(dest_x, dest_y, bufw, bufh), buf, NULL, g_palette.get());
 }
 
-void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
+void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count) const
 {
 	p = p + (start * 3);
 	for (unsigned int i = start; i < start+count; i++) {
@@ -103,7 +103,7 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 	}
 }
 
-int MVEPlay::setAudioStream()
+int MVEPlay::setAudioStream() const
 {
 	ieDword volume ;
 	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
@@ -111,7 +111,7 @@ int MVEPlay::setAudioStream()
 	return source;
 }
 
-void MVEPlay::freeAudioStream(int stream)
+void MVEPlay::freeAudioStream(int stream) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->ReleaseStream(stream, true);
@@ -119,7 +119,7 @@ void MVEPlay::freeAudioStream(int stream)
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
 			int channels, short* memory,
-			int size, int samplerate)
+			int size, int samplerate) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;

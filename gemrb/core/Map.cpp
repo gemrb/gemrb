@@ -1174,9 +1174,9 @@ Projectile *Map::GetNextProjectile(const proIterator &iter) const
 	return *iter;
 }
 
-Projectile *Map::GetNextTrap(proIterator &iter) const
+const Projectile *Map::GetNextTrap(proIterator &iter) const
 {
-	Projectile *pro;
+	const Projectile *pro;
 
 	do {
 		pro=GetNextProjectile(iter);

@@ -54,7 +54,7 @@ public:
 	int IsOpen() const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor *actor);
-	bool TryUnlock(Actor *actor);
+	bool TryUnlock(Actor *actor) const;
 	void dump() const;
 	int TrapResets() const override { return Flags & CONT_RESET; }
 private:

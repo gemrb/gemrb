@@ -432,7 +432,7 @@ private:
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
 	const char* GetActorNameByID(ieDword ID) const;
 	/* checks a weapon quick slot and resets it to fist if it is empty */
-	void CheckWeaponQuickSlot(unsigned int which);
+	void CheckWeaponQuickSlot(unsigned int which) const;
 	/* helper for usability checks */
 	int CheckUsability(const Item *item) const;
 	/* Set up all the missing stats on load time, or after level up */
@@ -643,7 +643,7 @@ public:
 	/* returns spell information in quickspell slot */
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
-	void ReinitQuickSlots();
+	void ReinitQuickSlots() const;
 	/* actor is in trap */
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */

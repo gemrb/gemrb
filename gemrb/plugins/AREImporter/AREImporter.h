@@ -55,7 +55,6 @@ private:
 	ieDword TileOffset, TileCount;
 	ieDword NoteOffset, NoteCount;
 	ieDword TrapOffset, TrapCount;  //only in ToB?
-	proIterator piter; //iterator for saving projectiles
 	ieDword EffectOffset;
 	ResRef Script;
 	ResRef Dream1; // only in ToB
@@ -68,33 +67,33 @@ public:
 	Map* GetMap(const char* resRef, bool day_or_night) override;
 	int GetStoredFileSize(Map *map) override;
 	/* stores an area in the Cache (swaps it out) */
-	int PutArea(DataStream *stream, Map *map) override;
+	int PutArea(DataStream *stream, const Map *map) const override;
 private:
-	void AdjustPSTFlags(AreaAnimation&);
-	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount);
+	void AdjustPSTFlags(AreaAnimation&) const;
+	void ReadEffects(DataStream *ds, EffectQueue *fx, ieDword EffectsCount) const;
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, const Map *map) const;
-	int PutPoints(DataStream *stream, const std::vector<Point>&);
-	int PutPoints(DataStream *stream, const Point *p, size_t count);
+	int PutPoints(DataStream *stream, const std::vector<Point>&) const;
+	int PutPoints(DataStream *stream, const Point *p, size_t count) const;
 	int PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex) const;
 	int PutItems(DataStream *stream, const Map *map) const;
 	int PutContainers(DataStream *stream, const Map *map, ieDword &VertIndex) const;
 	int PutRegions(DataStream *stream, const Map *map, ieDword &VertIndex) const;
-	int PutVertices(DataStream *stream, const Map *map);
+	int PutVertices(DataStream *stream, const Map *map) const;
 	int PutSpawns(DataStream *stream, const Map *map) const;
-	void PutScript(DataStream *stream, const Actor *ac, unsigned int index);
-	int PutActors(DataStream *stream, const Map *map);
-	int PutAnimations(DataStream *stream, Map *map);
+	void PutScript(DataStream *stream, const Actor *ac, unsigned int index) const;
+	int PutActors(DataStream *stream, const Map *map) const;
+	int PutAnimations(DataStream *stream, const Map *map) const;
 	int PutEntrances(DataStream *stream, const Map *map) const;
 	int PutVariables(DataStream *stream, const Map *map) const;
-	int PutAmbients(DataStream *stream, const Map *map);
+	int PutAmbients(DataStream *stream, const Map *map) const;
 	int PutMapnotes(DataStream *stream, const Map *map) const;
-	int PutEffects( DataStream *stream, const EffectQueue *fxqueue);
-	int PutTraps(DataStream *stream, const Map *map);
+	int PutEffects(DataStream *stream, const EffectQueue *fxqueue) const;
+	int PutTraps(DataStream *stream, const Map *map) const;
 	int PutExplored(DataStream *stream, const Map *map) const;
 	int PutTiles(DataStream *stream, const Map *map) const;
-	int PutRestHeader(DataStream *stream, const Map *map);
-	int PutSongHeader(DataStream *stream, const Map *map);
+	int PutRestHeader(DataStream *stream, const Map *map) const;
+	int PutSongHeader(DataStream *stream, const Map *map) const;
 };
 
 }

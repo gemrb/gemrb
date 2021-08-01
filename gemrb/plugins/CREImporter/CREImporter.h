@@ -100,7 +100,7 @@ private:
 	CRESpellMemorization* GetSpellMemorization(Actor *act);
 	CREMemorizedSpell* GetMemorizedSpell();
 	CREItem* GetItem();
-	void SetupColor(ieDword&);
+	void SetupColor(ieDword&) const;
 
 	int PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const;
 	int PutActorPST(DataStream *stream, const Actor *actor) const;

@@ -437,6 +437,7 @@ public:
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
 	void AddAnimation(AreaAnimation anim);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
+	std::list<AreaAnimation>::const_iterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
 		if (iter == animations.end()) {
@@ -444,6 +445,14 @@ public:
 		}
 		return &*iter++;
 	}
+	const AreaAnimation *GetNextAnimation(std::list<AreaAnimation>::const_iterator &iter) const
+	{
+		if (iter == animations.end()) {
+			return nullptr;
+		}
+		return &*iter++;
+	}
+
 	AreaAnimation *GetAnimation(const char *Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
@@ -510,7 +519,7 @@ public:
 	//count of unexploded projectiles that are saved
 	int GetTrapCount(proIterator &iter) const;
 	//get the next saved projectile
-	Projectile *GetNextTrap(proIterator &iter) const;
+	const Projectile *GetNextTrap(proIterator &iter) const;
 	//add a projectile to the area
 	void AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);

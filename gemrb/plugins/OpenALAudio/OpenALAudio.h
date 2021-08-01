@@ -98,7 +98,7 @@ class OpenALAudioDriver : public Audio {
 public:
 	OpenALAudioDriver(void);
 	~OpenALAudioDriver(void) override;
-	void PrintDeviceList();
+	void PrintDeviceList() const;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 					const Point&, unsigned int flags = 0,
@@ -124,7 +124,7 @@ public:
 				int size, int samplerate) override;
 	void UpdateMapAmbient(MapReverb&) override;
 private:
-	int QueueALBuffer(ALuint source, ALuint buffer);
+	int QueueALBuffer(ALuint source, ALuint buffer) const;
 
 private:
 	ALCcontext *alutContext;

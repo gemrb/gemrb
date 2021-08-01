@@ -254,7 +254,8 @@ void Container::dump() const
 	Log(DEBUG, "Container", buffer);
 }
 
-bool Container::TryUnlock(Actor *actor) {
+bool Container::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&CONT_LOCKED)) return true;
 
 	return Highlightable::TryUnlock(actor, false);

@@ -204,7 +204,7 @@ int TLKImporter::RaceStrRef(int slot) const
 	return atoi(tab->QueryField(row,0) );
 }
 
-int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
+int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {

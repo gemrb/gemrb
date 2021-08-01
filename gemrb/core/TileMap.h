@@ -50,7 +50,7 @@ public:
 	Door* GetDoorByPosition(const Point &position) const;
 	Door* GetDoor(size_t idx) const;
 	Door* GetDoor(const char* Name) const;
-	size_t GetDoorCount() { return doors.size(); }
+	size_t GetDoorCount() const { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
 	void AutoLockDoors() const;
@@ -79,7 +79,7 @@ public:
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);
-	size_t GetTileCount() { return tiles.size(); }
+	size_t GetTileCount() const { return tiles.size(); }
 
 	void ClearOverlays();
 	void AddOverlay(TileOverlayPtr overlay);

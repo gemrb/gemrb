@@ -83,7 +83,7 @@ BIKPlayer::~BIKPlayer(void)
 	Stop();
 }
 
-void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den)
+void BIKPlayer::av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den) const
 {
 	//pts_wrap_bits, if needed, is always 64
 	if(av_reduce(time_base.num, time_base.den, pts_num, pts_den, INT_MAX)) {
@@ -263,7 +263,7 @@ strret_t BIKPlayer::fileRead(strpos_t pos, void* buf, strpos_t count)
 	return str->Read( buf, count );
 }
 
-int BIKPlayer::setAudioStream()
+int BIKPlayer::setAudioStream() const
 {
 	ieDword volume;
 	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
@@ -271,13 +271,13 @@ int BIKPlayer::setAudioStream()
 	return source;
 }
 
-void BIKPlayer::freeAudioStream(int stream)
+void BIKPlayer::freeAudioStream(int stream) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->ReleaseStream(stream, true);
 }
 
-void BIKPlayer::queueBuffer(int stream, unsigned short bits, int channels, short* memory, int size, int samplerate)
+void BIKPlayer::queueBuffer(int stream, unsigned short bits, int channels, short* memory, int size, int samplerate) const
 {
 	if (stream > -1)
 		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate);
@@ -377,7 +377,8 @@ int BIKPlayer::sound_init(bool need_init)
 	return ret;
 }
 
-void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable){
+void BIKPlayer::ff_init_scantable(ScanTable *st, const uint8_t *src_scantable) const
+{
 	st->scantable= src_scantable;
 
 	for (int i = 0; i < 64; i++){

@@ -186,7 +186,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	reverbProperties.reverbDisabled = true;
 }
 
-void OpenALAudioDriver::PrintDeviceList ()
+void OpenALAudioDriver::PrintDeviceList() const
 {
 	const char *deviceList;
 
@@ -1021,7 +1021,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 // Private Methods
 // !!!!!!!!!!!!!!!
 
-int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
 {
 #ifdef DEBUG_AUDIO
 	ALint frequency, bits, channels;

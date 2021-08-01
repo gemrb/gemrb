@@ -43,19 +43,19 @@ public:
 	WMPImporter(void);
 	~WMPImporter(void) override;
 	bool Open(DataStream* stream1, DataStream* stream2) override;
-	WorldMapArray *GetWorldMapArray() override;
+	WorldMapArray *GetWorldMapArray() const override;
 
 	int GetStoredFileSize(WorldMapArray *wmap, unsigned int index) override;
-	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) override;
+	int PutWorldMap(DataStream* stream1, DataStream* stream2, WorldMapArray *wmap) const override;
 private:
-	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index);
+	void GetWorldMap(DataStream *str, WorldMap *m, unsigned int index) const;
 
-	WMPAreaEntry* GetAreaEntry(DataStream *str, WMPAreaEntry* ae);
-	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al);
-	int PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap);
-	int PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index);
-	int PutLinks(DataStream *stream, const WorldMap *wmap);
-	int PutAreas(DataStream *stream, const WorldMap *wmap);
+	WMPAreaEntry* GetAreaEntry(DataStream *str, WMPAreaEntry* ae) const;
+	WMPAreaLink* GetAreaLink(DataStream *str, WMPAreaLink* al) const;
+	int PutMaps(DataStream *stream1, DataStream *stream2, const WorldMapArray *wmap) const;
+	int PutMap(DataStream *stream, const WorldMapArray *wmap, unsigned int index) const;
+	int PutLinks(DataStream *stream, const WorldMap *wmap) const;
+	int PutAreas(DataStream *stream, const WorldMap *wmap) const;
 };
 
 

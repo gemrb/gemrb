@@ -68,7 +68,7 @@ private:
 	int BuiltinToken(const char* Token, char* dest);
 	int ClassStrRef(int slot) const;
 	int RaceStrRef(int slot) const;
-	int GenderStrRef(int slot, int malestrref, int femalestrref);
+	int GenderStrRef(int slot, int malestrref, int femalestrref) const;
 	char *Gabber() const;
 	char *CharName(int slot) const;
 };

@@ -5883,7 +5883,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	gamedata->FreeItem(itm,slot->ItemResRef, false);
 }
 
-void Actor::ReinitQuickSlots()
+void Actor::ReinitQuickSlots() const
 {
 	if (!PCStats) {
 		return;
@@ -5972,7 +5972,7 @@ void Actor::ReinitQuickSlots()
 	}
 }
 
-void Actor::CheckWeaponQuickSlot(unsigned int which)
+void Actor::CheckWeaponQuickSlot(unsigned int which) const
 {
 	if (!PCStats) return;
 

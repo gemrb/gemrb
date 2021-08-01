@@ -110,7 +110,7 @@ public:
 	bool HitTest(const Point& p) const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor* actor) ;
-	bool TryUnlock(Actor *actor);
+	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
 	void dump() const;

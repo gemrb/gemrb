@@ -1531,7 +1531,8 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	return map;
 }
 
-void AREImporter::AdjustPSTFlags(AreaAnimation &areaAnim) {
+void AREImporter::AdjustPSTFlags(AreaAnimation &areaAnim) const
+{
 	/**
 	 * For PST, map animation flags work differently to a degree that they
 	 * should not be mixed together with the rest as they even tend to
@@ -1568,7 +1569,7 @@ void AREImporter::AdjustPSTFlags(AreaAnimation &areaAnim) {
 	}
 }
 
-void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount)
+void AREImporter::ReadEffects(DataStream *ds, EffectQueue *fxqueue, ieDword EffectsCount) const
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open(ds);
@@ -1670,6 +1671,7 @@ int AREImporter::GetStoredFileSize(Map *map)
 	headersize += ExploredBitmapSize;
 	EffectOffset = headersize;
 
+	proIterator piter;
 	TrapCount = (ieDword) map->GetTrapCount(piter);
 	for (unsigned int i = 0; i < TrapCount; i++) {
 		const Projectile *pro = map->GetNextTrap(piter);
@@ -1894,12 +1896,12 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p)
+int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p) const
 {
 	return PutPoints(stream, &p[0], p.size());
 }
 
-int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
+int AREImporter::PutPoints(DataStream *stream, const Point *p, size_t count) const
 {
 	for(size_t j=0;j<count;j++) {
 		stream->WritePoint(p[j]);
@@ -1907,7 +1909,7 @@ int AREImporter::PutPoints( DataStream *stream, const Point *p, size_t count)
 	return 0;
 }
 
-int AREImporter::PutVertices(DataStream *stream, const Map *map)
+int AREImporter::PutVertices(DataStream *stream, const Map *map) const
 {
 	//regions
 	for (unsigned int i = 0; i < InfoPointsCount; i++) {
@@ -2139,7 +2141,7 @@ int AREImporter::PutSpawns(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int index)
+void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int index) const
 {
 	char filling[8];
 
@@ -2152,7 +2154,7 @@ void AREImporter::PutScript(DataStream *stream, const Actor *ac, unsigned int in
 	}
 }
 
-int AREImporter::PutActors(DataStream *stream, const Map *map)
+int AREImporter::PutActors(DataStream *stream, const Map *map) const
 {
 	ieDword tmpDword = 0;
 	ieWord tmpWord;
@@ -2223,11 +2225,11 @@ int AREImporter::PutActors(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutAnimations(DataStream *stream, Map *map)
+int AREImporter::PutAnimations(DataStream *stream, const Map *map) const
 {
 	ieWord tmpWord;
 
-	aniIterator iter = map->GetFirstAnimation();
+	auto iter = map->GetFirstAnimation();
 	while(const AreaAnimation *an = map->GetNextAnimation(iter)) {
 		stream->WriteVariable(an->Name);
 		tmpWord = (ieWord) an->Pos.x;
@@ -2301,7 +2303,7 @@ int AREImporter::PutVariables(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutAmbients(DataStream *stream, const Map *map)
+int AREImporter::PutAmbients(DataStream *stream, const Map *map) const
 {
 	char filling[64];
 	ieWord tmpWord;
@@ -2407,7 +2409,7 @@ int AREImporter::PutMapnotes(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue)
+int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue) const
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	assert(eM != nullptr);
@@ -2424,7 +2426,7 @@ int AREImporter::PutEffects(DataStream *stream, const EffectQueue *fxqueue)
 	return 0;
 }
 
-int AREImporter::PutTraps( DataStream *stream, const Map *map)
+int AREImporter::PutTraps(DataStream *stream, const Map *map) const
 {
 	ieDword Offset;
 	ieDword tmpDword;
@@ -2433,11 +2435,12 @@ int AREImporter::PutTraps( DataStream *stream, const Map *map)
 	Point dest(0,0);
 
 	Offset = EffectOffset;
-	ieDword i = map->GetTrapCount(piter);
+	proIterator iter;
+	ieDword i = map->GetTrapCount(iter);
 	while(i--) {
 		ieWord tmpWord = 0;
 		ieByte tmpByte = 0xff;
-		const Projectile *pro = map->GetNextTrap(piter);
+		const Projectile *pro = map->GetNextTrap(iter);
 		if (pro) {
 			//The projectile ID is based on missile.ids which is
 			//off by one compared to projectl.ids
@@ -2507,7 +2510,7 @@ int AREImporter::PutTiles(DataStream *stream, const Map *map) const
 	return 0;
 }
 
-int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
+int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 {
 	char filling[8];
 	ieDword tmpDword = 0;
@@ -2533,7 +2536,7 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map)
 	return 0;
 }
 
-int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
+int AREImporter::PutRestHeader(DataStream *stream, const Map *map) const
 {
 	ieDword tmpDword = 0;
 
@@ -2562,7 +2565,7 @@ int AREImporter::PutRestHeader(DataStream *stream, const Map *map)
 }
 
 /* no saving of tiled objects, are they used anywhere? */
-int AREImporter::PutArea(DataStream *stream, Map *map)
+int AREImporter::PutArea(DataStream *stream, const Map *map) const
 {
 	ieDword VertIndex = 0;
 	int ret;
@@ -2641,9 +2644,10 @@ int AREImporter::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ieDword i = map->GetTrapCount(piter);
+	proIterator iter;
+	ieDword i = map->GetTrapCount(iter);
 	while(i--) {
-		const Projectile *trap = map->GetNextTrap(piter);
+		const Projectile *trap = map->GetNextTrap(iter);
 		if (!trap) {
 			continue;
 		}

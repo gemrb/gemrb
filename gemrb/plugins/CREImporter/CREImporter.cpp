@@ -791,7 +791,7 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 	return spl;
 }
 
-void CREImporter::SetupColor(ieDword &stat)
+void CREImporter::SetupColor(ieDword &stat) const
 {
 	if (stat < 200 || RandColor == 0) return;
 
