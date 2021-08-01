@@ -8489,7 +8489,7 @@ void Actor::UpdateDrawingRegion()
 		for (const auto& part : parts) {
 			const Animation* anim = part.first;
 			Holder<Sprite2D> animframe = anim->CurrentFrame();
-			assert(animframe);
+			if (!animframe) continue;
 			Region partBBox = animframe->Frame;
 			partBBox.x = Pos.x - partBBox.x;
 			partBBox.y = Pos.y - partBBox.y;

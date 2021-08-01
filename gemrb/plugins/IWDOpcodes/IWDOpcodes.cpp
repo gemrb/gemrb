@@ -2390,7 +2390,6 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx2->Source = fx->Source;
 		fx2->Resource = fx->Resource;
 		core->ApplyEffect(fx2, target, target);
-		delete fx2;
 	}
 	return FX_APPLIED;
 }
