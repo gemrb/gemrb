@@ -192,6 +192,7 @@ public:
 		mn.swap(*this);
 		return *this;
 	}
+	MapNote(const MapNote &rhs) = default;
 
 	MapNote(String text, ieWord c, bool readonly)
 	: strref(-1), text(std::move(text)), readonly(readonly)
