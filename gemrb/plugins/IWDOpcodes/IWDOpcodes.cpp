@@ -2533,6 +2533,10 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case OV_GLATH1:
 			target->SetOverlay(OV_GLATH2);
 			break;
+		case OV_BOUNCE: // TODO: blur
+		case OV_BOUNCE2: // TODO: invisibility
+			// why tf is this an overlay in iwd2?
+			return FX_NOT_APPLIED;
 		case OV_FIRESHIELD1:
 			target->SetOverlay(OV_FIRESHIELD2);
 			break;
