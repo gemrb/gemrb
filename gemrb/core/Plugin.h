@@ -30,7 +30,6 @@
 #include "SClassID.h" // FIXME
 #include "exports.h"
 
-#include "Holder.h"
 #include "TypeID.h"
 
 #include "FileCache.h"
@@ -52,7 +51,7 @@ public:
 	virtual ~Plugin() = default;
 };
 
-class GEM_EXPORT ImporterBase : public Held<ImporterBase>
+class GEM_EXPORT ImporterBase
 {
 protected:
 	DataStream* str = nullptr;
