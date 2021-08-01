@@ -300,7 +300,7 @@ bool EventMgr::RegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, 
 	return true;
 }
 
-void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short mod)
+void EventMgr::UnRegisterHotKeyCallback(const EventCallback& cb, KeyboardKey key, short mod)
 {
 	int flags = mod << 16;
 	flags |= key;
@@ -308,7 +308,7 @@ void EventMgr::UnRegisterHotKeyCallback(EventCallback cb, KeyboardKey key, short
 	KeyMap::iterator it = HotKeys.find(flags);
 	if (it != HotKeys.end()) {
 		KeyMap::value_type::second_type::iterator cbit;
-		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](const decltype(cb)& item) {
+		cbit = std::find_if(it->second.begin(), it->second.end(), [&cb](decltype(cb)& item) {
 			return FunctionTargetsEqual(cb, item);
 		});
 		if (cbit != it->second.end()) {

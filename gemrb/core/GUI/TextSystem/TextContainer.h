@@ -198,7 +198,7 @@ public:
 	// removes the span from the container and transfers ownership to the caller.
 	// Returns a non-const pointer to the removed span.
 	Content* RemoveContent(const Content* content);
-	virtual void DeleteContentsInRect(Region);
+	virtual void DeleteContentsInRect(const Region&);
 
 	Content* ContentAtPoint(const Point& p) const;
 	const ContentList& Contents() const { return contents; }
@@ -224,7 +224,7 @@ protected:
 	const Layout& LayoutForContent(const Content*) const;
 	const Layout* LayoutAtPoint(const Point& p) const;
 
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	virtual void DrawContents(const Layout& layout, Point point);
 	
 	void SizeChanged(const Size& oldSize) override;
@@ -257,7 +257,7 @@ private:
 	void MoveCursorToPoint(const Point& p);
 	LayoutRegions::const_iterator FindCursorRegion(const Layout&) const;
 
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void DrawContents(const Layout& layout, Point point) override;
 
 	virtual bool Editable() const { return IsReceivingEvents(); }

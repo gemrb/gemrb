@@ -491,7 +491,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 }
 
 /** Draws the Control on the Output Display */
-void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
+void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 {
 	const Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();

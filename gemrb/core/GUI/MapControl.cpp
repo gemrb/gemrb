@@ -155,7 +155,7 @@ Region MapControl::GetViewport() const
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
+void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
 	video->DrawRect(rgn, ColorBlack, true);

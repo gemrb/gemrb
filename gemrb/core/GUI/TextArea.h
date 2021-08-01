@@ -48,7 +48,7 @@ static const Color SelectOptionSelected(55, 100, 0, 255);// default selected col
 class GEM_EXPORT TextArea : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	
 	class SpanSelector : public ContentContainer {
 		struct OptSpan : public TextContainer {

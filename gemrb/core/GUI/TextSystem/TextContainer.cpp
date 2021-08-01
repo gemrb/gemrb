@@ -349,7 +349,7 @@ void ContentContainer::DidDraw(const Region& /*drawFrame*/, const Region& clip)
 	core->GetVideoDriver()->SetScreenClip(&clip);
 }
 
-void ContentContainer::DrawSelf(Region drawFrame, const Region& clip)
+void ContentContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
 	Video* video = core->GetVideoDriver();
 	if (core->InDebugMode(ID_TEXT)) {
@@ -649,7 +649,7 @@ void ContentContainer::LayoutContentsFrom(ContentList::const_iterator it)
 	ResizeSubviews(oldSize);
 }
 
-void ContentContainer::DeleteContentsInRect(Region exclusion)
+void ContentContainer::DeleteContentsInRect(const Region& exclusion)
 {
 	int top = exclusion.y;
 	int bottom = top;
@@ -753,7 +753,7 @@ String TextContainer::TextFrom(ContentList::const_iterator it) const
 	return text;
 }
 
-void TextContainer::DrawSelf(Region drawFrame, const Region& clip)
+void TextContainer::DrawSelf(const Region& drawFrame, const Region& clip)
 {
 	printPos = 0;
 	ContentContainer::DrawSelf(drawFrame, clip);

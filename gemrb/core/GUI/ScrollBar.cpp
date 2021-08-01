@@ -135,7 +135,7 @@ bool ScrollBar::IsOpaque() const
 }
 
 /** Draws the ScrollBar control */
-void ScrollBar::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void ScrollBar::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
 	Video *video=core->GetVideoDriver();
 	int upMy = GetFrameHeight(IMAGE_UP_UNPRESSED);

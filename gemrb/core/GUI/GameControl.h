@@ -162,7 +162,7 @@ private:
 	bool OnGlobalMouseMove(const Event&);
 
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	
 	bool CanLockFocus() const override { return true; };

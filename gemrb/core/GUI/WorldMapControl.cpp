@@ -85,7 +85,7 @@ void WorldMapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
+void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	auto MapToScreen = [&rgn, this](const Point& p) {
 		return rgn.origin - Pos + p;

@@ -49,7 +49,7 @@ namespace GemRB {
 class GEM_EXPORT Slider : public Control  {
 private:
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	
 	// set postion pased on a point expressed in local (frame) coordinates
 	void SetPosition(const Point& p);

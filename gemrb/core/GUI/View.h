@@ -110,7 +110,7 @@ private:
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
 	// subclasses can then use the list to efficiently redraw only those sections that are dirty
-	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
+	virtual void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) {};
 	Region DrawingFrame() const;
 
 	void AddedToWindow(Window*);

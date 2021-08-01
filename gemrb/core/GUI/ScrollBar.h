@@ -102,7 +102,7 @@ private:
 		SetFrameSize(s);
 	}
 
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	Point AxisPosFromValue() const;
 	int GetFrameHeight(int frame) const;
 	/** Range of the slider in pixels. The height - buttons - slider */
