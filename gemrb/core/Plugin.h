@@ -77,7 +77,7 @@ public:
 		return Import(str);
 	}
 
-	~ImporterBase() {
+	virtual ~ImporterBase() {
 		delete str;
 	}
 };
