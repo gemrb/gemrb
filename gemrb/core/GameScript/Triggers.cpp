@@ -1680,20 +1680,26 @@ int GameScript::IsOverMe(Scriptable *Sender, const Trigger *parameters)
 	const Highlightable *trap = (Highlightable *) Sender;
 
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-	int ret = 0;
+	ieDword ret = 0;
 	if (tgts) {
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			const Actor *actor = (Actor *) tt->actor;
 			if (trap->IsOver(actor->Pos)) {
-				ret = 1;
+				ret = actor->GetGlobalID();
 				break;
 			}
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
 	}
 	delete tgts;
+
+	// manually set LastTrigger, since IsOverMe is not in svtriobj
+	if (ret != 0) {
+		Sender->LastTrigger = ret;
+		ret = 1;
+	}
 	return ret;
 }
 
