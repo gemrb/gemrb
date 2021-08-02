@@ -115,6 +115,7 @@ public:
 
 	/** returns factory resource, currently works only with animations */
 	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);
+	FactoryObject* GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent = false);
 
 	void AddFactoryResource(FactoryObject* res);
 

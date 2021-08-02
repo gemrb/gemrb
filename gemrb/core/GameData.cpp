@@ -471,6 +471,11 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 }
 
+FactoryObject* GameData::GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent)
+{
+	return GetFactoryResource(resname.CString(), type, silent);
+}
+
 void GameData::AddFactoryResource(FactoryObject* res)
 {
 	factory->AddFactoryObject(res);
