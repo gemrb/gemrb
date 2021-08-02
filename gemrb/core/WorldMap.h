@@ -38,6 +38,15 @@
 
 namespace GemRB {
 
+/** this is the physical order the links appear in WMPAreaEntry */
+enum class WMPDirection {
+	NONE = -1,
+	NORTH = 0,
+	WEST = 1,
+	SOUTH = 2,
+	EAST = 3
+};
+
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1
 /** Area is visible on WorldMap only when party is in adjacent area */

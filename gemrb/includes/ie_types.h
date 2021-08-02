@@ -91,14 +91,6 @@ public:
 	}
 };
 
-/** this is the physical order the links appear in WMPAreaEntry */
-enum class WMPDirection {
-	NONE = -1,
-	NORTH = 0,
-	WEST = 1,
-	SOUTH = 2,
-	EAST = 3
-};
 
 }
 

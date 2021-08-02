@@ -29,6 +29,7 @@
 #include "MapReverb.h"
 #include "Scriptable/Scriptable.h"
 #include "PathFinder.h"
+#include "WorldMap.h"
 
 #include <algorithm>
 #include <queue>

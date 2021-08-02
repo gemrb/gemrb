@@ -41,7 +41,6 @@
 #include "TileMap.h"
 #include "VEFObject.h"
 #include "Video/Video.h"
-#include "WorldMap.h"
 #include "strrefs.h"
 #include "ie_cursors.h"
 #include "GameScript/GSUtils.h"
