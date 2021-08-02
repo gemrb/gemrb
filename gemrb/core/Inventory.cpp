@@ -312,7 +312,7 @@ bool Inventory::HasItemType(ieDword type) const
 
 /** counts the items in the inventory, if stacks == 1 then stacks are
 		accounted for their heap size */
-int Inventory::CountItems(const char *resref, bool stacks) const
+int Inventory::CountItems(const ResRef &resref, bool stacks) const
 {
 	int count = 0;
 	size_t slot = Slots.size();
@@ -321,10 +321,8 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 		if (!item) {
 			continue;
 		}
-		if (resref && resref[0]) {
-			if (item->ItemResRef != resref)
-				continue;
-		}
+		if (item->ItemResRef != resref)
+			continue;
 		if (stacks && (item->Flags&IE_INV_ITEM_STACKED) ) {
 			count+=item->Usages[0];
 			assert(count!=0);
@@ -339,7 +337,7 @@ int Inventory::CountItems(const char *resref, bool stacks) const
 /** this function can look for stolen, equipped, identified, destructible
 		etc, items. You just have to specify the flags in the bitmask
 		specifying 1 in a bit signifies a requirement */
-bool Inventory::HasItem(const char *resref, ieDword flags) const
+bool Inventory::HasItem(const ResRef &resref, ieDword flags) const
 {
 	size_t slot = Slots.size();
 	while(slot--) {
@@ -350,7 +348,7 @@ bool Inventory::HasItem(const char *resref, ieDword flags) const
 		if ( (flags&item->Flags)!=flags) {
 				continue;
 		}
-		if (resref[0] && item->ItemResRef != resref) {
+		if (item->ItemResRef != resref) {
 			continue;
 		}
 		return true;
@@ -774,7 +772,7 @@ int Inventory::DepleteItem(ieDword flags) const
 // if flags is 0, skips undroppable items
 // if flags is IE_INV_ITEM_UNDROPPABLE, doesn't skip undroppable items
 // TODO: once all callers have been checked, this can be reversed to make more sense
-int Inventory::FindItem(const char *resref, unsigned int flags, unsigned int skip) const
+int Inventory::FindItem(const ResRef &resref, unsigned int flags, unsigned int skip) const
 {
 	unsigned int mask = (flags^IE_INV_ITEM_UNDROPPABLE);
 	if (core->HasFeature(GF_NO_DROP_CAN_MOVE) ) {
@@ -788,7 +786,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags, unsigned int ski
 		if ( mask & item->Flags ) {
 			continue;
 		}
-		if (resref[0] && item->ItemResRef != resref) {
+		if (item->ItemResRef != resref) {
 			continue;
 		}
 		if (skip) {

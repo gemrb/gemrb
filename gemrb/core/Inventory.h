@@ -238,14 +238,14 @@ public:
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
-	int CountItems(const char *resref, bool charges) const;
+	int CountItems(const ResRef &resref, bool charges) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
 	 * flags: see ieCREItemFlagBits */
-	bool HasItem(const char *resref, ieDword flags) const;
+	bool HasItem(const ResRef &resref, ieDword flags) const;
 
 	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }
@@ -288,7 +288,7 @@ public:
 	//charges recharging items
 	void ChargeAllItems(int hours) const;
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
+	int FindItem(const ResRef &resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
 	bool DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map *map, const Point &loc);
 	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
