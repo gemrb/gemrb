@@ -30,7 +30,7 @@ TileOverlay::TileOverlay(Size size)
 : size(size)
 {}
 
-void TileOverlay::AddTile(Tile tile)
+void TileOverlay::AddTile(Tile&& tile)
 {
 	tiles.push_back(std::move(tile));
 }

@@ -42,7 +42,11 @@ public:
 	: anim{make_unique<Animation>(std::move(animation)), nullptr }
 	{}
 	
+	Tile(const Tile&) noexcept = delete;
+	Tile& operator=(const Tile& rhs) noexcept = delete;
+	
 	Tile(Tile&&) noexcept = default;
+	Tile& operator=(Tile&&) noexcept = default;
 	
 	Animation* GetAnimation() const noexcept {
 		if (anim[tileIndex]) {
