@@ -250,12 +250,12 @@ void VEFObject::LoadVEF(DataStream *stream)
 		return;
 	}
 	ieDword i;
-	ResRef Signature;
+	char Signature[8];
 	ieDword offset1, offset2;
 	ieDword count1, count2;
 
-	stream->ReadResRef( Signature);
-	if (strncmp( Signature, "VEF V1.0", 8 ) != 0) {
+	stream->Read(Signature, 8);
+	if (memcmp( Signature, "VEF V1.0", 8 ) != 0) {
 		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName.CString());
 		delete stream;
 		return;
