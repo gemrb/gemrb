@@ -81,6 +81,10 @@ public:
 	char operator[](size_t i) const noexcept {
 		return var[i];
 	}
+	
+	char& operator[](size_t i) noexcept {
+		return var[i];
+	}
 
 	operator char*() noexcept {
 		return var;
