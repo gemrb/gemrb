@@ -173,8 +173,9 @@ Effect* EFFImporter::GetEffectV20()
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
 	if (fx->IsVariable) {
-		str->Read(fx->VariableName, 32);
-		strlcpy(fx->VariableName, ResRef::MakeLowerCase(fx->VariableName).CString(), 32);
+		ieVariable tmp;
+		str->Read(tmp, 32);
+		strnlwrcpy(fx->VariableName, tmp, 32);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
