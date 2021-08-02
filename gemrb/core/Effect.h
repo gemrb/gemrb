@@ -100,7 +100,7 @@ struct ResourceGroup {
 struct Effect {
 	ieDword Opcode = 0;
 	ieDword Target = 0;
-	ieDword Power = 0;
+	ieDword Power = 0; // the effect level
 	ieDword Parameter1 = 0;
 	ieDword Parameter2 = 0;
 	ieWord TimingMode = 0;   //0x1000 -- no need of conversion
