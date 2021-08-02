@@ -822,18 +822,13 @@ Size Map::PropsSize() const noexcept
 	return tileProps->Frame.size;
 }
 
+// Returns true if map at (x;y) was explored, else false.
 bool Map::FogTileUncovered(const Point &p, const Bitmap* mask) const
 {
-	// Returns true if map at (x;y) was explored, else false.
-	const Size fogSize = FogMapSize();
-	if (!fogSize.PointInside(p)) {
-		// out of bounds is always foggy
-		return false;
-	}
-	
 	if (mask == nullptr) return true;
 
-	return (*mask)[p];
+	// out of bounds is always foggy
+	return mask->GetAt(p, false);
 }
 
 void Map::DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& vp) const
