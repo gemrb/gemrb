@@ -24,10 +24,9 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "Scriptable/Scriptable.h"
+#include "TileOverlay.h"
 
 namespace GemRB {
-
-class TileOverlay;
 
 //door flags
 #define DOOR_OPEN        1
