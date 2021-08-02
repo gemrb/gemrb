@@ -37,6 +37,10 @@ AutoTable::AutoTable(const char* ResRef, bool silent)
 	load(ResRef, silent);
 }
 
+AutoTable::AutoTable(const ResRef &resRef, bool silent)
+: AutoTable(resRef.CString(), silent)
+{}
+
 AutoTable::AutoTable(const AutoTable& other)
 {
 	*this = other;

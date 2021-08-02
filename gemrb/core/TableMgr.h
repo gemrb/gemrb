@@ -82,6 +82,8 @@ class GEM_EXPORT AutoTable
 public:
 	AutoTable();
 	explicit AutoTable(const char* ResRef, bool silent = false);
+	explicit AutoTable(const ResRef &resRef, bool silent = false);
+	
 	~AutoTable();
 	AutoTable(const AutoTable &);
 	AutoTable& operator=(const AutoTable&);
