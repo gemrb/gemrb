@@ -186,9 +186,9 @@ public:
 	ieDword UsabilityBitmask;
 	char AnimationType[2];
 	ieByte MinLevel;
-	ieByte unknown1;
+	ieByte unknown1; // ee docs say it's part of MinLevel read as a word, so useless
 	ieByte MinStrength;
-	ieByte unknown2;
+	ieByte unknown2; // ee docs say it's part of MinStrength read as a word, so useless
 	ieByte MinStrengthBonus;
 	//kit1
 	ieByte MinIntelligence;
@@ -200,7 +200,7 @@ public:
 	ieByte MinConstitution;
 	ieByte WeaProf;
 	ieByte MinCharisma;
-	ieByte unknown3;
+	ieByte unknown3; // ee docs say it's part of MinCharisma read as a word, so useless
 	ieDword KitUsability;
 	ieDword Price;
 	ieWord MaxStackAmount;

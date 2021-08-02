@@ -749,7 +749,7 @@ CREMemorizedSpell* CREImporter::GetMemorizedSpell()
 	CREMemorizedSpell* spl = new CREMemorizedSpell();
 
 	str->ReadResRef( spl->SpellResRef );
-	str->ReadDword(spl->Flags);
+	str->ReadDword(spl->Flags); // was split into flags word and two alignment bytes
 
 	return spl;
 }
@@ -786,7 +786,7 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 	CRESpellMemorization* spl = act->spellbook.GetSpellMemorization(Type, Level);
 	assert(spl && spl->SlotCount == 0 && spl->SlotCountWithBonus == 0); // unused
 	spl->SlotCount = Number;
-	spl->SlotCountWithBonus = Number;
+	spl->SlotCountWithBonus = Number; // Number2? Doesn't look like it's different in the data
 
 	return spl;
 }
@@ -1409,7 +1409,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord(tmpWord);
-	//skipping a word
+	//skipping a word, labeled ArmorClass vs ArmorClassBase, so probably just the last computed value and thus useless
 	str->ReadWord(tmpWord);
 	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord(tmpWord);
@@ -1495,7 +1495,7 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_LEVEL2]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL3]=tmpByte;
-	//this is rumoured to be IE_SEX, but we use the gender field for this
+	//this is IE_SEX, but we use the gender field for this
 	str->Read( &tmpByte, 1);
 	//skipping a byte
 	str->Read( &tmpByte, 1);
@@ -1521,7 +1521,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
 	str->Read( &tmpByte, 1);
-	//skipping a byte
+	//skipping a byte, labeled MageSpecUpperWorld, while kit was MageSpecialization
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	act->BaseStats[IE_KIT] = ((act->BaseStats[IE_KIT] & 0xffff) << 16) +
 		((act->BaseStats[IE_KIT] & 0xffff0000) >> 16);
@@ -1543,10 +1543,10 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_SPECIFIC]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_SEX]=tmpByte;
-	str->Seek( 5, GEM_CURRENT_POS );
+	str->Seek(5, GEM_CURRENT_POS); // 5x SpecialCase in bg2/ee
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->Seek(4, GEM_CURRENT_POS); // dword labeled Instance
 	ieVariable scriptname;
 	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);

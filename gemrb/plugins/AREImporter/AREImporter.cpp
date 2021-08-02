@@ -315,7 +315,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadDword(AmbiOffset);
 	str->ReadDword(VariablesOffset);
 	str->ReadDword(VariablesCount);
-	ieDword tmp;
+	ieDword tmp; // unused TiledObjectFlagCount and TiledObjectFlagOffset
 	str->ReadDword(tmp);
 	str->ReadResRef( Script );
 	str->ReadDword(ExploredBitmapSize);
@@ -337,6 +337,7 @@ bool AREImporter::Import(DataStream* str)
 	str->ReadDword(TrapCount);
 	str->ReadResRef( Dream1 );
 	str->ReadResRef( Dream2 );
+	// 56 bytes of reserved space
 	return true;
 }
 
@@ -566,7 +567,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		map->SongHeader.reverbID = EFX_PROFILE_REVERB_INVALID;
 	}
 
-	str->Seek( RestHeader + 32, GEM_STREAM_START );
+	str->Seek(RestHeader + 32, GEM_STREAM_START); // skip the name
 	for (auto& ref : map->RestHeader.Strref) {
 		str->ReadDword(ref);
 	}
@@ -578,13 +579,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
 	str->ReadWord(map->RestHeader.Difficulty);  //difficulty?
-	str->ReadDword(map->RestHeader.sduration);  //spawn duration
-	str->ReadWord(map->RestHeader.rwdist);      //random walk distance
-	str->ReadWord(map->RestHeader.owdist);      //other walk distance
+	str->ReadDword(map->RestHeader.sduration);  //spawn duration, lifespan
+	str->ReadWord(map->RestHeader.rwdist);      //random walk distance, hunting range
+	str->ReadWord(map->RestHeader.owdist);      //other walk distance, follow range
 	str->ReadWord(map->RestHeader.Maximum);     //maximum number of creatures
 	str->ReadWord(map->RestHeader.Enabled);
 	str->ReadWord(map->RestHeader.DayChance);
 	str->ReadWord(map->RestHeader.NightChance);
+	// 14 reserved dwords
 
 	Log(DEBUG, "AREImporter", "Loading regions");
 	core->LoadProgress(70);
@@ -641,8 +643,10 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadScalar(pos.y);
 			str->Seek(30, GEM_CURRENT_POS);
 		} else {
-			str->ReadPoint(pos);
+			str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
 			//maybe we have to store this
+			// bg2: 15 reserved dwords, the above point is actually in dwords (+1),
+			// but since it's the last thing the underseek doesn't matter
 			str->Seek( 36, GEM_CURRENT_POS );
 		}
 
@@ -789,6 +793,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadResRef( KeyResRef);
 		str->Seek( 4, GEM_CURRENT_POS); //break difficulty
 		str->ReadDword(OpenFail);
+		// 14 reserved dwords
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
 
@@ -931,7 +936,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		} else {
 			str->ReadVariable(LinkedInfo);
 		}
-		str->ReadDword(NameStrRef);
+		str->ReadDword(NameStrRef); // trigger name
 		str->ReadResRef( Dialog );
 		if (core->HasFeature(GF_AUTOMAP_INI) ) {
 			// maybe this is important? but seems not
@@ -1074,13 +1079,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadWord(Frequency);
 		str->ReadWord(Method);
 		str->ReadDword(sduration); //time to live for spawns
-		str->ReadWord(rwdist);     //random walk distance (0 is unlimited)
-		str->ReadWord(owdist);     //other walk distance (inactive in all engines?)
+		str->ReadWord(rwdist);     // random walk distance (0 is unlimited), hunting range
+		str->ReadWord(owdist);     // other walk distance (inactive in all engines?), follow range
 		str->ReadWord(Maximum);
 		str->ReadWord(Enabled);
 		str->ReadDword(Schedule);
 		str->ReadWord(DayChance);
 		str->ReadWord(NightChance);
+		// 14 reserved dwords
 
 		Spawn *sp = map->AddSpawn(Name, Pos, std::move(creatures));
 		sp->Difficulty = Difficulty;
@@ -1129,14 +1135,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadPoint(pos);
 		str->ReadPoint(des);
 		str->ReadDword(flags);
-		str->ReadWord(spawned);
+		str->ReadWord(spawned); // "type"
 		str->Seek(1, GEM_CURRENT_POS); // one letter of a ResRef, changed to * at runtime, purpose unknown (portraits?), but not needed either
-		str->Read(&difficultyMargin, 1); // iwd2 only
+		str->Read(&difficultyMargin, 1); // iwd2 only, "alignbyte" in bg2 (padding)
 		str->Seek(4, GEM_CURRENT_POS); //actor animation, unused
-		str->ReadDword(orientation);
+		str->ReadDword(orientation); // was word + padding in bg2
 		str->ReadDword(removalTime);
-		str->ReadWord(maxDistance);
-		str->Seek(2, GEM_CURRENT_POS); // apparently unused https://gibberlings3.net/forums/topic/21724-a
+		str->ReadWord(maxDistance); // hunting range
+		str->Seek(2, GEM_CURRENT_POS); // apparently unused https://gibberlings3.net/forums/topic/21724-a (follow range)
 		str->ReadDword(schedule);
 		str->ReadDword(talkCount);
 		str->ReadResRef(dialog);
@@ -1263,7 +1269,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 				anim.frame = RAND(0, startFrameRange - 1);
 			}
 			anim.startFrameRange = 0; //this will never get resaved (iirc)
-			str->Read( &anim.skipcycle,1 ); //how many cycles are skipped	(100% skippage)
+			str->Read(&anim.skipcycle, 1); //how many cycles are skipped (100% skippage), "period" in bg2
 			str->ReadResRef( anim.PaletteRef );
 			// TODO: EE: word with anim width for PVRZ/WBM resources (if flag bits are set, see A_ANI_ defines)
 			// 0x4a holds the height
@@ -1289,7 +1295,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadVariable(Name);
 		str->ReadPoint(Pos);
 		str->ReadWord(Face);
-		str->Seek( 66, GEM_CURRENT_POS );
+		str->Seek(66, GEM_CURRENT_POS); // just reserved bytes
 		map->AddEntrance(Name, Pos, Face);
 	}
 
@@ -1300,9 +1306,9 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ieVariable Name;
 		ieDword Value;
 		str->ReadVariable(Name);
-		str->Seek( 8, GEM_CURRENT_POS );
+		str->Seek(8, GEM_CURRENT_POS); // type + resreftype, part of the partly implemented type system (uint, int, float, str)
 		str->ReadDword(Value);
-		str->Seek( 40, GEM_CURRENT_POS );
+		str->Seek(40, GEM_CURRENT_POS); // values as an int32, float64, string
 		map->locals->SetAt( Name, Value );
 	}
 
@@ -1316,7 +1322,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Read( &ambi->name, 32 );
 		str->ReadPoint(ambi->origin);
 		str->ReadWord(ambi->radius);
-		str->Seek( 2, GEM_CURRENT_POS );
+		str->Seek(2, GEM_CURRENT_POS); // alignment padding
 		str->ReadDword(ambi->pitchVariance);
 		str->ReadWord(ambi->gainVariance);
 		str->ReadWord(ambi->gain);
@@ -1324,7 +1330,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadResRef(sound);
 		}
 		str->ReadWord(tmpWord);
-		str->Seek( 2, GEM_CURRENT_POS );
+		str->Seek(2, GEM_CURRENT_POS); // alignment padding
 		ieDword interval;
 		str->ReadDword(interval);
 		ambi->interval = interval * 1000;
@@ -1427,6 +1433,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			str->ReadWord(location);
 			ieWord color;
 			str->ReadWord(color);
+			// dword: ID in bg2
 			str->Seek( 40, GEM_CURRENT_POS );
 			// FIXME: do any other games have read only notes?
 			// BG2 allows editing the builtin notes, PST does not, what about others?
@@ -1502,13 +1509,13 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadResRef( ID );
 		str->ReadDword(Flags);
 		//IE dev info says this:
-		str->ReadDword(OpenIndex);
-		str->ReadWord(OpenCount);
-		str->ReadWord(ClosedCount);
-		str->ReadDword(ClosedIndex);
+		str->ReadDword(OpenIndex); // PrimarySearchSquareStart in bg2
+		str->ReadWord(OpenCount); // PrimarySearchSquareCount
+		str->ReadWord(ClosedCount); // SecondarySearchSquareCount
+		str->ReadDword(ClosedIndex); // SecondarySearcHSquareStart
 		//end of disputed section
 
-		str->Seek( 48, GEM_CURRENT_POS );
+		str->Seek(48, GEM_CURRENT_POS); // 12 reserved dwords
 		//absolutely no idea where these 'tile indices' are stored
 		//are they tileset tiles or impeded block tiles
 		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );

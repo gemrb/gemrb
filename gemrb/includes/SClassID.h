@@ -73,8 +73,8 @@ using SClass_ID = unsigned long;
 // TGA was at 0x3, but never used
 #define IE_TIS_CLASS_ID			0x000003EB
 #define IE_TLK_CLASS_ID			0x00060000
-#define IE_TOH_CLASS_ID			0x00070000 // 0x407 in docs! But why would anyone bif this?
-#define IE_TOT_CLASS_ID			0x00080000 // 0x406 in docs! But why would anyone bif this?
+#define IE_TOH_CLASS_ID			0x00070000 // 0x407 in ee, merged with tot as toh v2
+#define IE_TOT_CLASS_ID			0x00080000 // 0x406 in ee, but unused
 #define IE_VAR_CLASS_ID			0x00090000
 #define IE_VEF_CLASS_ID			0x000003FC
 #define IE_VVC_CLASS_ID			0x000003FB

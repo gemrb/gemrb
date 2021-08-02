@@ -58,7 +58,7 @@ bool WEDImporter::Open(DataStream* stream)
 	str->ReadDword(SecHeaderOffset);
 	str->ReadDword(DoorsOffset);
 	str->ReadDword(DoorTilesOffset);
-	// currently unused fields from the original
+	// currently unused fields from the original; likely unused completely — even commented out in wed.go implementation
 	//   WORD    nVisiblityRange;
 	//   WORD    nChanceOfRain; - likely unused, since it's present in the ARE file
 	//   WORD    nChanceOfFog; - most likely unused, since it's present in the ARE file
@@ -304,7 +304,7 @@ void WEDImporter::ReadWallPolygons()
 	for (ieDword i=0; i < polygonCount; i++) {
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
-		str->ReadWord(PolygonHeaders[i].Flags);
+		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
 		str->ReadWord(PolygonHeaders[i].MinX);
 		str->ReadWord(PolygonHeaders[i].MaxX);
 		str->ReadWord(PolygonHeaders[i].MinY);
