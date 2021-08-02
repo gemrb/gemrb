@@ -132,7 +132,7 @@ private:
 	PathFinderCosts(PathFinderCosts&&) = delete;
 };
 
-static int GetTrackString(const char* areaName)
+static int GetTrackString(const ResRef &areaName)
 {
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 

@@ -1291,15 +1291,15 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	return true;
 }
 
-void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
+void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
-		actor->GetName(0), area, position.x, position.y, face);
+		actor->GetName(0), area.CString(), position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
 	bool newSong = false;
-	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()) != 0)) { //do we need to switch area?
+	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptName())) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);

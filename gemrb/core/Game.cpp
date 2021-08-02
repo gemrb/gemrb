@@ -674,12 +674,12 @@ int Game::GetTotalPartyLevel(bool onlyalive) const
 }
 
 // Returns map structure (ARE) if it is already loaded in memory
-int Game::FindMap(const char *ResRef) const
+int Game::FindMap(const ResRef &resRef) const
 {
 	int index = (int) Maps.size();
 	while (index--) {
 		const Map *map = Maps[index];
-		if (strnicmp(ResRef, map->GetScriptName(), 8) == 0) {
+		if (resRef == map->GetScriptName()) {
 			return index;
 		}
 	}
@@ -694,7 +694,7 @@ Map* Game::GetMap(unsigned int index) const
 	return Maps[index];
 }
 
-Map *Game::GetMap(const char *areaname, bool change)
+Map *Game::GetMap(const ResRef &areaname, bool change)
 {
 	int index = LoadMap(areaname, change);
 	if (index < 0) {
@@ -821,13 +821,13 @@ int Game::DelMap(unsigned int index, int forced)
 	return 0;
 }
 
-void Game::PlacePersistents(Map *newMap, const char *ResRef)
+void Game::PlacePersistents(Map *newMap, const ResRef &resRef)
 {
 	// count the number of replaced actors, so we don't need to recheck them
 	// if their max level is still lower than ours, each check would also result in a substitution
 	size_t last = NPCs.size() - 1;
 	for (size_t i = 0; i < NPCs.size(); i++) {
-		if (NPCs[i]->Area == ResRef) {
+		if (NPCs[i]->Area == resRef) {
 			if (i <= last && CheckForReplacementActor(i)) {
 				i--;
 				last--;
@@ -840,11 +840,11 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 }
 
 /* Loads an area */
-int Game::LoadMap(const char* ResRef, bool loadscreen)
+int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 {
 	ScriptEngine *sE = core->GetGUIScriptEngine();
 
-	int index = FindMap(ResRef);
+	int index = FindMap(resRef);
 	if (index>=0) {
 		return index;
 	}
@@ -854,19 +854,19 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
 
-	if (core->saveGameAREExtractor.extractARE(ResRef) != GEM_OK) {
+	if (core->saveGameAREExtractor.extractARE(resRef) != GEM_OK) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
 	}
 
-	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
+	DataStream* ds = gamedata->GetResource(resRef, IE_ARE_CLASS_ID);
 	auto mM = GetImporter<MapMgr>(IE_ARE_CLASS_ID, ds);
 	if (!mM) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
 	}
 
-	Map *newMap = mM->GetMap(ResRef, IsDay());
+	Map *newMap = mM->GetMap(resRef, IsDay());
 	if (!newMap) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
@@ -877,12 +877,12 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	// spawn creatures on a map already in the game
 	for (size_t i = 0; i < PCs.size(); i++) {
 		Actor *pc = PCs[i];
-		if (pc->Area == ResRef) {
+		if (pc->Area == resRef) {
 			newMap->AddActor(pc, false);
 		}
 	}
 
-	PlacePersistents(newMap, ResRef);
+	PlacePersistents(newMap, resRef);
 	newMap->InitActors();
 
 	//this feature exists in all blackisle games but not in bioware games
