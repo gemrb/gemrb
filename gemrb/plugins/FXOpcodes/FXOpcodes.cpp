@@ -5061,7 +5061,7 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target) {
 		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
+		core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;

@@ -2706,7 +2706,7 @@ int Interface::PlayMovie(const char* resref)
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
-		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
+		sound_override = AudioDriver->PlayRelative(sound_resref, SFX_CHAN_NARRATOR);
 	}
 
 	// clear whatever is currently on screen
@@ -4003,7 +4003,7 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
 {
 	if (index <= gamedata->defaultSounds.size()) {
-		return AudioDriver->Play(gamedata->defaultSounds[index], channel);
+		return AudioDriver->PlayRelative(gamedata->defaultSounds[index], channel);
 	}
 	return NULL;
 }

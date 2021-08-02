@@ -7173,7 +7173,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
+		core->GetAudioDrv()->PlayRelative(Sound, SFX_CHAN_GUI);
 	}
 	Py_RETURN_NONE;
 }
@@ -9455,7 +9455,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		gamedata->FreeItem(item, si->ItemResRef, false);
 	}
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
+		core->GetAudioDrv()->PlayRelative(Sound, SFX_CHAN_GUI);
 	}
 
 	//if res is positive, it is gold!
@@ -9538,7 +9538,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			}
 			gamedata->FreeItem(item, si->ItemResRef, false);
 			if (Sound && Sound[0]) {
-				core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
+				core->GetAudioDrv()->PlayRelative(Sound, SFX_CHAN_GUI);
 			}
 		}
 		if (res == 2) {
@@ -9675,7 +9675,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound && Sound[0]) {
-		core->GetAudioDrv()->Play(Sound, SFX_CHAN_GUI);
+		core->GetAudioDrv()->PlayRelative(Sound, SFX_CHAN_GUI);
 	}
 	return PyInt_FromLong( res );
 }

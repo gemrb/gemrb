@@ -3980,7 +3980,7 @@ void Actor::ReactToDeath(const char * deadname)
 
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
-	core->GetAudioDrv()->Play(resRef, channel, &len);
+	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
 
 	tick_t counter = (AI_UPDATE_TIME * len) / 1000;
 	if (counter != 0) { // don't nullify it in case we're waiting already
