@@ -3118,9 +3118,9 @@ ieWord Map::GetAmbientCount(bool toSave) const
 	return ambiCount;
 }
 
-void Map::AddMapNote(const Point& point, ieWord color, String* text, bool readonly)
+void Map::AddMapNote(const Point& point, ieWord color, const String &text, bool readonly)
 {
-	AddMapNote(point, MapNote(text ? *text : L"", color, readonly));
+	AddMapNote(point, MapNote(text, color, readonly));
 }
 
 void Map::AddMapNote(const Point& point, ieWord color, ieStrRef strref, bool readonly)

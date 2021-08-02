@@ -597,7 +597,7 @@ public:
 	ieWord GetAmbientCount(bool toSave = false) const;
 
 	//mapnotes
-	void AddMapNote(const Point &point, ieWord color, String* text, bool readonly = false);
+	void AddMapNote(const Point &point, ieWord color, const String &text, bool readonly = false);
 	void AddMapNote(const Point &point, ieWord color, ieStrRef strref, bool readonly = false);
 	void AddMapNote(const Point &point, const MapNote& note);
 	void RemoveMapNote(const Point &point);
