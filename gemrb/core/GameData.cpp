@@ -600,7 +600,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 {
 	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
-		raceTHAC0Bonus.load("racethac", true);
+		raceTHAC0Bonus = AutoTable("racethac", true);
 		loadedRacialTHAC0 = true;
 	}
 
@@ -614,8 +614,8 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 
 bool GameData::HasInfravision(const char *raceName)
 {
-	if (!racialInfravision.ok()) {
-		racialInfravision.load("racefeat", true);
+	if (!racialInfravision) {
+		racialInfravision = AutoTable("racefeat", true);
 	}
 	if (!raceName) return false;
 
@@ -626,7 +626,8 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
 	static bool loadedSpellAbilityDie = false;
 	if (!loadedSpellAbilityDie) {
-		if (!spellAbilityDie.load("clssplab", true)) {
+		spellAbilityDie = AutoTable("clssplab", true);
+		if (!spellAbilityDie) {
 			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
 			return 6;
 		}
@@ -642,8 +643,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
-	if (!trapSaveBonus.ok()) {
-		trapSaveBonus.load("trapsave", true);
+	if (!trapSaveBonus) {
+		trapSaveBonus = AutoTable("trapsave", true);
 	}
 
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
@@ -651,8 +652,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 
 int GameData::GetTrapLimit(Scriptable *trapper)
 {
-	if (!trapLimit.ok()) {
-		trapLimit.load("traplimt", true);
+	if (!trapLimit) {
+		trapLimit = AutoTable("traplimt", true);
 	}
 
 	if (trapper->Type != ST_ACTOR) {
@@ -674,8 +675,8 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 
 int GameData::GetSummoningLimit(ieDword sex)
 {
-	if (!summoningLimit.ok()) {
-		summoningLimit.load("summlimt", true);
+	if (!summoningLimit) {
+		summoningLimit = AutoTable("summlimt", true);
 	}
 
 	unsigned int row = 1000;
@@ -716,7 +717,7 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 	// preload optimized version, since this gets called each tick several times
 	if (weaponStyleAPRBonusMax.IsZero()) {
 		AutoTable bonusTable("wspatck", true);
-		if (!bonusTable.ok()) {
+		if (!bonusTable) {
 			weaponStyleAPRBonusMax.w = -1;
 			return 0;
 		}

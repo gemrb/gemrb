@@ -112,8 +112,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	CurrentLink = 0;
 
 	//loading master areas
-	AutoTable table;
-	if (table.load("mastarea")) {
+	AutoTable table = AutoTable("mastarea");
+	if (table) {
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
@@ -125,7 +125,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	std::fill(std::begin(restmovies), std::end(restmovies), ResRef("********"));
 	std::fill(std::begin(daymovies), std::end(daymovies), ResRef("********"));
 	std::fill(std::begin(nightmovies), std::end(nightmovies), ResRef("********"));
-	if (table.load("restmov")) {
+	table = AutoTable("restmov");
+	if (table) {
 		for(int i=0;i<8;i++) {
 			restmovies[i] = table->QueryField(i, 0);
 			daymovies[i] = table->QueryField(i, 1);
@@ -138,7 +139,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	if (Expansion == 5) { // tob is special
 		tn = "npclvl25";
 	}
-	if (table.load(tn)) {
+	table = AutoTable(tn);
+	if (table) {
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
 		npclevels.reserve(rows);
@@ -447,7 +449,8 @@ void Game::InitActorPos(Actor *actor) const
 	actor->HomeLocation = actor->Pos;
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
-	if (strta.load("startare")) {
+	strta = AutoTable("startare");
+	if (strta) {
 		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0));
 	} else {
 		actor->Area = ResRef::MakeLowerCase(CurrentArea);
@@ -1156,7 +1159,7 @@ void Game::SetFamiliar(const ResRef& familiar, size_t index)
 void Game::LoadCRTable()
 {
 	AutoTable table("moncrate");
-	if (table.ok()) {
+	if (table) {
 		int maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
 		for(int i=0;i<MAX_LEVEL;i++) {
@@ -2256,9 +2259,9 @@ bool Game::IsTimestopActive() const
 bool Game::RandomEncounter(ResRef &BaseArea)
 {
 	if (bntrows<0) {
-		AutoTable table;
+		AutoTable table("bntychnc");
 
-		if (table.load("bntychnc")) {
+		if (table) {
 			bntrows = table->GetRowCount();
 			bntchnc = (int *) calloc(sizeof(int),bntrows);
 			for(int i = 0; i<bntrows; i++) {

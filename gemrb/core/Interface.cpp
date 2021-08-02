@@ -581,7 +581,7 @@ bool Interface::ReadSpecialSpells()
 		result = false;
 	}
 
-	table.load("wildmag");
+	table = AutoTable("wildmag");
 	if (table) {
 		SurgeSpell ss;
 		for (ieDword i = 0; i < table->GetRowCount(); i++) {
@@ -2605,8 +2605,8 @@ int Interface::PlayMovie(const char* resref)
 
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
-	AutoTable mvesnd;
-	if (mvesnd.load("mvesnd", true)) {
+	AutoTable mvesnd = AutoTable("mvesnd", true);
+	if (mvesnd) {
 		int row = mvesnd->GetRowIndex(resref);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");

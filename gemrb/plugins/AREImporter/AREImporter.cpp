@@ -138,7 +138,7 @@ static int GetTrackString(const ResRef &areaName)
 
 	if (tracks.empty()) {
 		AutoTable tm("tracking", true);
-		if (!tm.ok())
+		if (!tm)
 			return -1;
 		int trackcount = tm->GetRowCount();
 		tracks.resize(trackcount);

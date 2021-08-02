@@ -24,9 +24,9 @@ namespace GemRB {
 
 ItemMgr::ItemMgr(void)
 {
-	tooltipTable.load("tooltip", true);
-	exclusionTable.load("itemexcl", true);
-	dialogTable.load("itemdial", true);
+	tooltipTable = AutoTable("tooltip", true);
+	exclusionTable = AutoTable("itemexcl", true);
+	dialogTable = AutoTable("itemdial", true);
 }
 
 }

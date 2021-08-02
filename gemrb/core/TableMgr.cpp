@@ -27,62 +27,25 @@
 
 namespace GemRB {
 
-AutoTable::AutoTable()
-{
-	tableref = 0;
-}
-
 AutoTable::AutoTable(const char* ResRef, bool silent)
 {
-	load(ResRef, silent);
+	int ref = gamedata->LoadTable(ResRef, silent);
+	if (ref == -1)
+		return;
+
+	tableref = (unsigned int)ref;
+	table = gamedata->GetTable(tableref);
 }
 
 AutoTable::AutoTable(const ResRef &resRef, bool silent)
 : AutoTable(resRef.CString(), silent)
 {}
 
-AutoTable::AutoTable(const AutoTable& other)
-{
-	*this = other;
-}
-
-AutoTable& AutoTable::operator=(const AutoTable& other)
-{
-	if (&other == this) return *this;
-	if (other.table) {
-		tableref = other.tableref;
-		table = gamedata->GetTable(tableref);
-	} else {
-		table.reset();
-	}
-	return *this;
-}
-
-bool AutoTable::load(const char* ResRef, bool silent)
-{
-	release();
-
-	int ref = gamedata->LoadTable(ResRef, silent);
-	if (ref == -1)
-		return false;
-
-	tableref = (unsigned int)ref;
-	table = gamedata->GetTable(tableref);
-	return true;
-}
-
 AutoTable::~AutoTable()
-{
-	release();
-}
-
-void AutoTable::release()
 {
 	if (table) {
 		gamedata->DelTable(tableref);
-		table.reset();
 	}
 }
-
 
 }

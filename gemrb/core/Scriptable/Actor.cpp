@@ -418,8 +418,6 @@ void ReleaseMemoryActor()
 		itemanim = NULL;
 	}
 	FistRows = -1;
-	extspeed.release();
-	wspecial.release();
 }
 
 Actor::Actor()
@@ -648,7 +646,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (!core->HasFeature(GF_RESDATA_INI)) {
 		// handle default speed and per-animation overrides
 		int row = -1;
-		if (extspeed.ok()) {
+		if (extspeed) {
 			char animHex[10];
 			snprintf(animHex, 10, "0x%04X", AnimID);
 			row = extspeed->FindTableValue((unsigned int) 0, animHex);
@@ -1876,7 +1874,7 @@ static void InitActorTables()
 	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	tm.load("clskills");
+	tm = AutoTable("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -1992,7 +1990,7 @@ static void InitActorTables()
 	}
 
 	//initializing the vvc resource references
-	tm.load("damage");
+	tm = AutoTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
@@ -2010,7 +2008,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("overlay");
+	tm = AutoTable("overlay");
 	if (tm) {
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
@@ -2027,7 +2025,7 @@ static void InitActorTables()
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
-		tm.load("csound");
+		tm = AutoTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
 				const char *tmp = tm->QueryField( i, 0 );
@@ -2041,7 +2039,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("qslots");
+	tm = AutoTable("qslots");
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
 
 	//leave room for default row at 0
@@ -2054,7 +2052,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("qslot2", true);
+	tm = AutoTable("qslot2", true);
 	if (tm) {
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
@@ -2070,14 +2068,14 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("mdfeats", true);
+	tm = AutoTable("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
 			featSpells[i] = tm->QueryField(i, 0);
 		}
 	}
 
-	tm.load("itemuse");
+	tm = AutoTable("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
@@ -2094,7 +2092,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("itemanim", true);
+	tm = AutoTable("itemanim", true);
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -2107,9 +2105,9 @@ static void InitActorTables()
 	// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
 	// luckily, they both use the same format
 	if (third) {
-		tm.load("mxsplbon");
+		tm = AutoTable("mxsplbon");
 	} else {
-		tm.load("mxsplwis");
+		tm = AutoTable("mxsplwis");
 	}
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
@@ -2125,7 +2123,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("featreq", true);
+	tm = AutoTable("featreq", true);
 	if (tm) {
 		unsigned int stat, max;
 
@@ -2150,7 +2148,7 @@ static void InitActorTables()
 	AutoTable xpcapt("xpcap");
 	std::map<std::string, int> className2ID;
 
-	tm.load("classes");
+	tm = AutoTable("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
 	}
@@ -2194,7 +2192,7 @@ static void InitActorTables()
 			// FIXME: the attempt at skipping doesn't work!
 			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht.load(tohit, true);
+				tht = AutoTable(tohit, true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for %s does not exist!", classname);
 				}
@@ -2274,7 +2272,7 @@ static void InitActorTables()
 					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm.load(tm->QueryField(classname, "HP"), true);
+					hptm = AutoTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2327,7 +2325,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm.load(tm->QueryField(currentname, "HP"), true);
+							hptm = AutoTable(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
 								int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2376,7 +2374,7 @@ static void InitActorTables()
 
 	// set the default weapon slot count for the inventory gui — if we're not in iwd2 already
 	if (!iwd2class) {
-		tm.load("numwslot", true);
+		tm = AutoTable("numwslot", true);
 		if (tm) {
 			int rowcount = tm->GetRowCount();
 			for (int i = 0; i < rowcount; i++) {
@@ -2392,7 +2390,7 @@ static void InitActorTables()
 
 	// slurp up kitlist.2da; only iwd2 has both class and kit info in the same table
 	if (!iwd2class) {
-		tm.load("kitlist", true);
+		tm = AutoTable("kitlist", true);
 		if (!tm) {
 			error("Actor", "Missing kitlist.2da!");
 		}
@@ -2413,10 +2411,10 @@ static void InitActorTables()
 	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
-	wspecial.load("wspecial", true);
+	wspecial = AutoTable("wspecial", true);
 
 	//dual-wielding table
-	tm.load("wstwowpn", true);
+	tm = AutoTable("wstwowpn", true);
 	if (tm) {
 		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2429,7 +2427,7 @@ static void InitActorTables()
 	}
 
 	//two-handed table
-	tm.load("wstwohnd", true);
+	tm = AutoTable("wstwohnd", true);
 	if (tm) {
 		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2442,7 +2440,7 @@ static void InitActorTables()
 	}
 
 	//shield table
-	tm.load("wsshield", true);
+	tm = AutoTable("wsshield", true);
 	if (tm) {
 		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2455,7 +2453,7 @@ static void InitActorTables()
 	}
 
 	//single-handed table
-	tm.load("wssingle");
+	tm = AutoTable("wssingle");
 	if (tm) {
 		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2468,7 +2466,7 @@ static void InitActorTables()
 	}
 
 	//unhardcoded monk bonus table
-	tm.load("monkbon", true);
+	tm = AutoTable("monkbon", true);
 	if (tm) {
 		monkbon_rows = tm->GetRowCount();
 		monkbon_cols = tm->GetColumnCount();
@@ -2485,7 +2483,7 @@ static void InitActorTables()
 	for (int i = 0; i < 20; i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
 	}
-	tm.load("lvlmodwm", true);
+	tm = AutoTable("lvlmodwm", true);
 	if (tm) {
 		int maxrow = tm->GetRowCount();
 		for (int i = 0; i < 20; i++) {
@@ -2502,7 +2500,7 @@ static void InitActorTables()
 	for (int i = 0; i < VCONST_COUNT; i++) {
 		VCMap[i]=i;
 	}
-	tm.load("vcremap");
+	tm = AutoTable("vcremap");
 	if (tm) {
 		int rows = tm->GetRowCount();
 
@@ -2516,7 +2514,7 @@ static void InitActorTables()
 	}
 
 	//initializing the skill->stats conversion table (used in iwd2)
-	tm.load("skillsta", true);
+	tm = AutoTable("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		int colcount = tm->GetColumnCount();
@@ -2539,7 +2537,7 @@ static void InitActorTables()
 	}
 
 	//initializing area flag comments
-	tm.load("comment");
+	tm = AutoTable("comment");
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		afcount = rowcount;
@@ -2555,7 +2553,7 @@ static void InitActorTables()
 	}
 
 	// dexterity modifier for thieving skills
-	tm.load("skilldex");
+	tm = AutoTable("skilldex");
 	if (tm) {
 		int skilldexNCols = tm->GetColumnCount();
 		int skilldexNRows = tm->GetRowCount();
@@ -2575,7 +2573,7 @@ static void InitActorTables()
 	}
 
 	// race modifier for thieving skills
-	tm.load("skillrac");
+	tm = AutoTable("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
 	int subracetable = core->LoadSymbol("subrace");
@@ -2616,7 +2614,7 @@ static void InitActorTables()
 	}
 
 	//difficulty level based modifiers
-	tm.load("difflvls");
+	tm = AutoTable("difflvls");
 	if (tm) {
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
@@ -2629,7 +2627,7 @@ static void InitActorTables()
 	}
 
 	//preload stat derived animation tables
-	tm.load("avprefix");
+	tm = AutoTable("avprefix");
 	delete [] avPrefix;
 	avBase = 0;
 	avCount = -1;
@@ -2647,7 +2645,7 @@ static void InitActorTables()
 			}
 			for (int i = 0; i < avCount; i++) {
 				avPrefix[i].avresref = tm->QueryField(i + 1);
-				avPrefix[i].avtable.load(avPrefix[i].avresref);
+				avPrefix[i].avtable = AutoTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
 				} else {
@@ -2658,7 +2656,7 @@ static void InitActorTables()
 	}
 
 	// races table
-	tm.load("races");
+	tm = AutoTable("races");
 	if (tm && !pstflags) {
 		int racesNRows = tm->GetRowCount();
 
@@ -2686,7 +2684,7 @@ static void InitActorTables()
 	}
 
 	// movement rate adjustments
-	extspeed.load("moverate", true);
+	extspeed = AutoTable("moverate", true);
 
 	// modal actions/state data
 	ReadModalStates();

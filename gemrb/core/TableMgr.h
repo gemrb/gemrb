@@ -80,17 +80,17 @@ public:
 class GEM_EXPORT AutoTable
 {
 public:
-	AutoTable();
+	AutoTable() = default;
 	explicit AutoTable(const char* ResRef, bool silent = false);
 	explicit AutoTable(const ResRef &resRef, bool silent = false);
 	
 	~AutoTable();
-	AutoTable(const AutoTable &);
-	AutoTable& operator=(const AutoTable&);
+	AutoTable(const AutoTable &) = default;
+	AutoTable& operator=(const AutoTable&) = default;
+	
+	AutoTable(AutoTable &&) = default;
+	AutoTable& operator=(AutoTable&&) = default;
 
-	bool load(const char* ResRef, bool silent=false);
-	void release();
-	bool ok() const noexcept { return table != nullptr; }
 	explicit operator bool() const noexcept { return table != nullptr; }
 
 	const TableMgr& operator*() const { return *table; }
@@ -99,7 +99,7 @@ public:
 
 private:
 	std::shared_ptr<TableMgr> table;
-	unsigned int tableref;
+	unsigned int tableref = 0;
 };
 
 

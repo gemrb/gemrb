@@ -1189,7 +1189,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			const char* scriptingname = scr->GetScriptName();
 
 			/* banter dialogue */
-			pdtable.load("interdia");
+			pdtable = AutoTable("interdia");
 			if (pdtable) {
 				//5 is the magic number for the ToB expansion
 				if (game->Expansion==5) {
@@ -2859,9 +2859,9 @@ void AddXPCore(Action *parameters, bool divide)
 	AutoTable xptable;
 
 	if (core->HasFeature(GF_HAS_EXPTABLE)) {
-		xptable.load("exptable");
+		xptable = AutoTable("exptable");
 	} else {
-		xptable.load("xplist");
+		xptable = AutoTable("xplist");
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
