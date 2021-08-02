@@ -192,7 +192,7 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 	return NULL;
 }
 
-unsigned int Store::FindItem(const char* itemname, bool usetrigger) const
+unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (usetrigger) {

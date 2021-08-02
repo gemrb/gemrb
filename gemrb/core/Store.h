@@ -178,7 +178,7 @@ public: //queries
 	void AddItem(CREItem* item);
 	void RemoveItem(const STOItem *itm);
 	/** Returns index of item */
-	unsigned int FindItem(const char* item, bool usetrigger) const;
+	unsigned int FindItem(const ResRef &item, bool usetrigger) const;
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);
