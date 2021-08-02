@@ -26,7 +26,7 @@
 
 namespace GemRB {
 
-TileOverlay::TileOverlay(Size size)
+TileOverlay::TileOverlay(Size size) noexcept
 : size(size)
 {}
 
