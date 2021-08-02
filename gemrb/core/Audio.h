@@ -103,6 +103,10 @@ public:
 	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;
 	Holder<SoundHandle> PlayRelative(const char* ResRef, unsigned int channel, tick_t *length = 0)
 			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
+	
+	Holder<SoundHandle> Play(const ResRef &resRef, unsigned int channel, const Point& p, unsigned int flags = 0, tick_t *length = nullptr);
+	Holder<SoundHandle> PlayRelative(const ResRef &resRef, unsigned int channel, tick_t *length = 0);
+	
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
