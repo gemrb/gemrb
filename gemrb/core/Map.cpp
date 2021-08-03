@@ -56,14 +56,14 @@
 #include <cassert>
 #include <limits>
 #include <utility>
-
+#include <unordered_map>
 
 namespace GemRB {
 
 #define YESNO(x) ( (x)?"Yes":"No")
 
 struct Spawns {
-	Variables vars;
+	std::unordered_map<ResRef, SpawnGroup, CstrHashCI<ResRef>> vars;
 	
 	static const Spawns& Get() {
 		static Spawns spawns;
@@ -72,12 +72,7 @@ struct Spawns {
 
 private:
 	Spawns() noexcept {
-		ResRef GroupName;
-
 		AutoTable tab("spawngrp", true);
-
-		vars.RemoveAll(nullptr);
-		vars.SetType( GEM_VARIABLES_POINTER );
 
 		if (!tab)
 			return;
@@ -96,17 +91,10 @@ private:
 				for (;j;j--) {
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}
-				SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
-				GroupName = MakeLowerCaseResRef(tab->GetColumnName(i));
-				vars.SetAt( GroupName, creatures);
+				ResRef GroupName = MakeLowerCaseResRef(tab->GetColumnName(i));
+				vars.insert(std::make_pair(GroupName, SpawnGroup(std::move(resrefs), level)));
 			}
 		}
-	}
-	
-	~Spawns() noexcept {
-		vars.RemoveAll([](void* obj) {
-			delete (SpawnGroup *)obj;
-		});
 	}
 };
 
@@ -3166,13 +3154,12 @@ bool Map::SpawnCreature(const Point &pos, const char *creResRef, int radiusx, in
 {
 	bool spawned = false;
 	const SpawnGroup *sg = nullptr;
-	void *lookup;
 	bool first = (creCount ? *creCount == 0 : true);
 	int level = (difficulty ? *difficulty : core->GetGame()->GetTotalPartyLevel(true));
 	size_t count = 1;
 
-	if (Spawns::Get().vars.Lookup(creResRef, lookup)) {
-		sg = (SpawnGroup *) lookup;
+	if (Spawns::Get().vars.count(creResRef)) {
+		sg = &Spawns::Get().vars.at(creResRef);
 		if (first || (level >= sg->Level())) {
 			count = sg->Count();
 		} else {
