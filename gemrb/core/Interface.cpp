@@ -2365,7 +2365,7 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 
 void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
-	if (game && group == ResRef("HIDE_CUT")) {
+	if (game && group == "HIDE_CUT") {
 		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
 	}
 
