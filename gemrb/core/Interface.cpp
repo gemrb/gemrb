@@ -329,11 +329,6 @@ Interface::~Interface(void)
 		delete lists;
 	}
 
-	if (RtRows) {
-		RtRows->RemoveAll(ReleaseItemList);
-		delete RtRows;
-	}
-
 	Actor::ReleaseMemory();
 
 	gamedata->ClearCaches();
@@ -3660,7 +3655,7 @@ void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
+bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 {
 	AutoTable tab(TableName);
 	if (!tab) {
@@ -3675,16 +3670,15 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 		} else {
 			ItemName = MakeUpperCaseResRef(tab->GetRowName(j));
 		}
-		//Variable elements are free'd, so we have to use malloc
-		//well, not anymore, we can use ReleaseFunction
+
 		int l=tab->GetColumnCount(j);
 		if (l<1) continue;
 		int cl = atoi(tab->GetColumnName(0));
-		ItemList *itemlist = new ItemList(l, cl);
+		std::vector<ResRef> refs;
 		for(int k=0;k<l;k++) {
-			itemlist->ResRefs[k] = MakeLowerCaseResRef(tab->QueryField(j, k));
+			refs.push_back(MakeLowerCaseResRef(tab->QueryField(j, k)));
 		}
-		RtRows->SetAt(ItemName, (void*)itemlist);
+		RtRows.insert(std::make_pair(ItemName, ItemList(std::move(refs), cl)));
 	}
 	return true;
 }
@@ -3693,16 +3687,8 @@ bool Interface::ReadRandomItems()
 {
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
-	if (RtRows) {
-		RtRows->RemoveAll(ReleaseItemList);
-	}
-	else {
-		RtRows=new Variables(10, 17); //block size, hash table size
-		if (!RtRows) {
-			return false;
-		}
-		RtRows->SetType( GEM_VARIABLES_POINTER );
-	}
+	RtRows.clear();
+	
 	AutoTable tab("randitem");
 	if (!tab) {
 		return false;
@@ -3834,28 +3820,27 @@ void Interface::SanitizeItem(CREItem *item) const
 //there could be a loop, but we don't want to freeze, so there is a limit
 bool Interface::ResolveRandomItem(CREItem *itm) const
 {
-	if (!RtRows) return true;
+	if (RtRows.empty()) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
 		char *endptr;
 		char NewItem[9];
 
-		void* lookup;
-		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
+		if (RtRows.count(itm->ItemResRef) == 0) {
 			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
 				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
 			return true;
 		}
-		ItemList *itemlist = (ItemList*)lookup;
+		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
 		int i;
-		if (itemlist->WeightOdds) {
+		if (itemlist.WeightOdds) {
 			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
-			i=Roll(2,(itemlist->Count+1)/2,-2);
+			i=Roll(2,(itemlist.ResRefs.size() + 1)/2, -2);
 		} else {
-			i=Roll(1,itemlist->Count,-1);
+			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
+		strnlwrcpy( NewItem, itemlist.ResRefs[i], 8);
 		char *p = strchr(NewItem, '*');
 		int diceSides;
 		if (p) {

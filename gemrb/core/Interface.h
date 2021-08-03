@@ -168,14 +168,13 @@ struct SurgeSpell {
 class ItemList {
 public:
 	std::vector<ResRef> ResRefs;
-	unsigned int Count;
 	//if count is odd and the column titles start with 2, the random roll should be 2d((c+1)/2)-1
 	bool WeightOdds;
 
-	ItemList(unsigned int size, int label) {
-		ResRefs.resize(size);
-		Count = size;
-		if ((size&1) && (label==2)) {
+	ItemList(std::vector<ResRef> refs, int label)
+	: ResRefs(std::move(refs))
+	{
+		if ((refs.size() & 1) && (label == 2)) {
 			WeightOdds=true;
 		} else {
 			WeightOdds=false;
@@ -771,7 +770,7 @@ private:
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ResRef& item, const char *Prefix) const;
+	bool ReadItemTable(const ResRef& item, const char *Prefix);
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
 	bool ReadReputationModTable() const;
@@ -797,7 +796,7 @@ public:
 	CFGConfigData config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
-	Variables *RtRows = nullptr;
+	std::unordered_map<ResRef, ItemList, CstrHashCI<ResRef>> RtRows;
 
 	char INIConfig[_MAX_PATH] = "baldur.ini";
 	bool DitherSprites = true;
