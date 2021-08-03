@@ -245,11 +245,11 @@ void Container::dump() const
 	buffer.appendFormatted( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key: %s\n", name, KeyResRef.CString());
+	buffer.appendFormatted("Script: %s, Key: %s\n", name.CString(), KeyResRef.CString());
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }

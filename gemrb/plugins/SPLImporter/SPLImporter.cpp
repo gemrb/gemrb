@@ -43,7 +43,7 @@ static void Initializer()
 		gamedata->castingGlows[i] = tm->QueryField(i, 0);
 		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
 		// * marks an empty resource
-		if (gamedata->castingGlows[i].IsStar()) {
+		if (IsStar(gamedata->castingGlows[i])) {
 			gamedata->castingGlows[i].Reset();
 		}
 	}

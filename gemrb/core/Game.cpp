@@ -451,9 +451,9 @@ void Game::InitActorPos(Actor *actor) const
 
 	strta = AutoTable("startare");
 	if (strta) {
-		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0));
+		actor->Area = MakeLowerCaseResRef(strta->QueryField(strta->GetRowIndex(area), 0));
 	} else {
-		actor->Area = ResRef::MakeLowerCase(CurrentArea);
+		actor->Area = CurrentArea;
 	}
 }
 

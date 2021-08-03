@@ -169,7 +169,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			valid_unsignednumber(walk->QueryField(i,1), rmin);
 			valid_unsignednumber(walk->QueryField(i,2), rmax);
 			valid_unsignednumber(walk->QueryField(i,3), range);
-			if (value.IsStar()) {
+			if (IsStar(value)) {
 				value.Reset();
 				range = 0;
 			}
@@ -328,13 +328,13 @@ int CharAnimations::GetActorPartCount() const
 	case IE_ANI_TWO_PIECE:   //ankheg animations
 		return 2;
 	case IE_ANI_PST_GHOST:   //special pst anims
-		if (AvatarTable[AvatarsRowNum].Prefixes[1].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[1])) {
 			return 1;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[2].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[2])) {
 			return 2;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[3].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[3])) {
 			return 3;
 		}
 		return 4;

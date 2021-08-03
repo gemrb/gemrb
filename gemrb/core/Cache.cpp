@@ -197,7 +197,7 @@ Cache::MyAssoc* Cache::GetAssocAt(const ResRef& key) const
 
 	// see if it exists
 	 for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
-		if (!strnicmp( pAssoc->key, key, KEYSIZE )) {
+		if (key == pAssoc->key) {
 			return pAssoc;
 		}
 	}

@@ -3562,7 +3562,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_ARTERIAL, target);
 		}
-		if (target->BackstabResRef.IsStar()) {
+		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;
@@ -3595,7 +3595,7 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_HAMSTRING, target);
 		}
-		if (target->BackstabResRef.IsStar()) {
+		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;

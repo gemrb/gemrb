@@ -111,7 +111,7 @@ bool SpellEntry::Equals(const ResRef& spl) const
 
 void SpellEntry::SetSpell(const char *spl)
 {
-	spell = ResRef::MakeLowerCase(spl);
+	spell = MakeLowerCaseResRef(spl);
 }
 
 void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
@@ -383,7 +383,7 @@ static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 	int count = tab->GetRowCount();
 	list.resize(count);
 	for (int i = 0; i < count; i++) {
-		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column));
+		list[i] = MakeLowerCaseResRef(tab->QueryField(i, column));
 	}
 }
 
@@ -413,9 +413,9 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		} else {
 			// find the correct index in listspll.2da
 			ResRef spellRef;
-			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol));
+			spellRef = MakeLowerCaseResRef(tab->QueryField(i, lastCol));
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
-			if (spellRef.IsStar()) {
+			if (IsStar(spellRef)) {
 				continue;
 			}
 			index = FindSpell(spellRef, splList);

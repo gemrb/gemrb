@@ -35,7 +35,6 @@ namespace GemRB {
 
 class DataStream;
 class Resource;
-class ResRef;
 class ResourceSource;
 class TypeID;
 

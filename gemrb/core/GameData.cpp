@@ -261,8 +261,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 	}
 
 	item = new Item();
-	//this is required for storing the 'source'
-	item->Name = ResRef::MakeLowerCase(resname);
+	item->Name = resname;
 	sm->GetItem( item );
 
 	ItemCache.SetAt(resname, (void *) item);
@@ -299,8 +298,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 	}
 
 	spell = new Spell();
-	//this is required for storing the 'source'
-	spell->Name = ResRef::MakeLowerCase(resname);
+	spell->Name = resname;
 	sm->GetSpell( spell, silent );
 
 	SpellCache.SetAt(resname, (void *) spell);
@@ -371,7 +369,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		}
 	}
 	if (ret) {
-		ret->ResName = ResRef::MakeLowerCase(effect);
+		ret->ResName = MakeLowerCaseResRef(effect);
 	}
 	return ret;
 }
@@ -503,7 +501,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return NULL;
 	}
 	
-	store->Name = ResRef::MakeLowerCase(resRef);
+	store->Name = resRef;
 	stores[store->Name] = store;
 	return store;
 }
@@ -554,7 +552,7 @@ void GameData::ReadItemSounds()
 	for (int i = 0; i < rowCount; i++) {
 		ItemSounds[i] = std::vector<const char*>();
 		for (int j = 0; j < colCount; j++) {
-			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j));
+			ResRef snd = MakeLowerCaseResRef(itemsnd->QueryField(i, j));
 			if (snd == ResRef("*")) break;
 			ItemSounds[i].push_back(strdup(snd));
 		}
@@ -563,7 +561,7 @@ void GameData::ReadItemSounds()
 
 bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
-	Sound = 0;
+	Sound.Reset();
 
 	if (ItemSounds.empty()) {
 		ReadItemSounds();
@@ -767,9 +765,9 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	size_t count = tm->GetRowCount();
 	data.resize(count);
 	for (size_t i = 0; i < count; i++) {
-		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		data[i] = MakeLowerCaseResRef(tm->QueryField(i, 0));
 		// * marks an empty resource
-		if (data[i].IsStar()) {
+		if (IsStar(data[i])) {
 			data[i].Reset();
 		}
 	}

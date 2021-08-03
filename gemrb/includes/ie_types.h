@@ -29,8 +29,7 @@
 #define IE_TYPES_H
 
 #include "Platform.h"
-
-#include <cstring>
+#include "System/String.h"
 
 namespace GemRB {
 
@@ -95,6 +94,7 @@ public:
 	}
 };
 
+using ResRef = FixedSizeString<8, strnicmp>;
 
 }
 

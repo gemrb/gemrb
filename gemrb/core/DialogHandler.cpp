@@ -103,7 +103,7 @@ bool DialogHandler::InitDialog(Scriptable* spk, Scriptable* tgt, const ResRef& d
 	delete dlg;
 	dlg = nullptr;
 
-	if (dialogRef.IsEmpty() || dialogRef.IsStar()) {
+	if (dialogRef.IsEmpty() || IsStar(dialogRef)) {
 		return false;
 	}
 

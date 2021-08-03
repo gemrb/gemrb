@@ -655,7 +655,7 @@ bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 
 	int idx = aa->GetRowCount();
 	while (idx--) {
-		ResRef key = ResRef::MakeLowerCase(aa->GetRowName(idx));
+		ResRef key = MakeLowerCaseResRef(aa->GetRowName(idx));
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
@@ -3682,7 +3682,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
+			ItemName = MakeUpperCaseResRef(tab->GetRowName(j));
 		}
 		//Variable elements are free'd, so we have to use malloc
 		//well, not anymore, we can use ReleaseFunction
@@ -3691,7 +3691,7 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 		int cl = atoi(tab->GetColumnName(0));
 		ItemList *itemlist = new ItemList(l, cl);
 		for(int k=0;k<l;k++) {
-			itemlist->ResRefs[k] = ResRef::MakeLowerCase(tab->QueryField(j, k));
+			itemlist->ResRefs[k] = MakeLowerCaseResRef(tab->QueryField(j, k));
 		}
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
@@ -3722,7 +3722,7 @@ bool Interface::ReadRandomItems()
 
 	//the gold item
 	GoldResRef = tab->QueryField(size_t(0), size_t(0));
-	if (GoldResRef.IsStar()) {
+	if (IsStar(GoldResRef)) {
 		return false;
 	}
 	ResRef randTreasureRef;
@@ -3878,7 +3878,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceThrows = 1;
 		}
 		if (*endptr) {
-			itm->ItemResRef = ResRef::MakeLowerCase(NewItem);
+			itm->ItemResRef = MakeLowerCaseResRef(NewItem);
 		} else {
 			itm->ItemResRef = GoldResRef;
 		}
@@ -4570,12 +4570,12 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
-		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
+		resource1 = MakeUpperCaseResRef(tab->QueryField(row, 0));
 		if (cols > 1) {
-			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
+			resource2 = MakeUpperCaseResRef(tab->QueryField(row, 1));
 		}
 		if (cols > 2) {
-			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
+			resource3 = MakeUpperCaseResRef(tab->QueryField(row, 2));
 		}
 	}
 }

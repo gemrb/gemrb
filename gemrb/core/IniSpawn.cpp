@@ -449,67 +449,67 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//special 1 == area
 	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
 	if (s) {
-		critter.AreaScript = ResRef::MakeUpperCase(s);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	//special 2 == class
 	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
 	if (s) {
-		critter.ClassScript = ResRef::MakeUpperCase(s);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	//special 3 == general
 	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
 	if (s) {
-		critter.GeneralScript = ResRef::MakeUpperCase(s);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	//team == specific
 	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
 	if (s) {
-		critter.SpecificScript = ResRef::MakeUpperCase(s);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 
 	//combat == race
 	s = inifile->GetKeyAsString(crittername,"script_combat",NULL);
 	if (s) {
-		critter.RaceScript = ResRef::MakeUpperCase(s);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	//movement == default
 	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
 	if (s) {
-		critter.DefaultScript = ResRef::MakeUpperCase(s);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 
 	//pst script names
 	s = inifile->GetKeyAsString(crittername,"script_override",NULL);
 	if (s) {
-		critter.OverrideScript = ResRef::MakeUpperCase(s);
+		critter.OverrideScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_class",NULL);
 	if (s) {
-		critter.ClassScript = ResRef::MakeUpperCase(s);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_race",NULL);
 	if (s) {
-		critter.RaceScript = ResRef::MakeUpperCase(s);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_general",NULL);
 	if (s) {
-		critter.GeneralScript = ResRef::MakeUpperCase(s);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_default",NULL);
 	if (s) {
-		critter.DefaultScript = ResRef::MakeUpperCase(s);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_area",NULL);
 	if (s) {
-		critter.AreaScript = ResRef::MakeUpperCase(s);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_specifics",NULL);
 	if (s) {
-		critter.SpecificScript = ResRef::MakeUpperCase(s);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"dialog",NULL);
 	if (s) {
-		critter.Dialog = ResRef::MakeUpperCase(s);
+		critter.Dialog = MakeUpperCaseResRef(s);
 	}
 
 	//flags

@@ -2754,7 +2754,7 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 	}
 	ResRef arearesref;
 	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, 8)) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;
@@ -2775,8 +2775,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	} else {
 		arearesref = "ar30"; //InWatchersKeep
 	}
-	size_t i = strlen(arearesref);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, i)) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;

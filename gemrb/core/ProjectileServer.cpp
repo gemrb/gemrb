@@ -83,7 +83,7 @@ ProjectileServer::ProjectileServer()
 			int i;
 
 			for(i=0;i<AP_RESCNT;i++) {
-				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
+				explosions[rows].resources[i] = MakeUpperCaseResRef(explist->QueryField(rows, i));
 			}
 			//using i so the flags field will always be after the resources
 			explosions[rows].flags = atoi(explist->QueryField(rows,i));
@@ -234,7 +234,7 @@ void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
 		if (value>MAX_PROJ_IDX) {
 			continue;
 		}
-		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
+		projectiles[value].resname = MakeUpperCaseResRef(projlist->GetStringIndex(rows));
 	}
 }
 
@@ -249,7 +249,7 @@ ResRef ProjectileServer::GetExplosion(size_t idx, int type)
 		return ResRef();
 	}
 	ResRef const *ret = &explosions[idx].resources[type];
-	if (!ret || ret->IsStar()) return ResRef();
+	if (!ret || IsStar(*ret)) return ResRef();
 
 	return *ret;
 }

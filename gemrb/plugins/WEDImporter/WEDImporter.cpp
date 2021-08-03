@@ -92,14 +92,13 @@ bool WEDImporter::Open(DataStream* stream)
 
 int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
 {
-	char res[9];
 	int usedoverlays = 0;
 
-	memcpy(res, overlays->TilesetResRef, 9);
-	size_t len = strlen(res);
+	ResRef res = overlays->TilesetResRef;
+	uint8_t len = res.CStrLen();
 	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
-		strcat(res, "N");
+		res[len] = 'N';
 		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
 			res[len] = '\0';
 		} else {
@@ -107,7 +106,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 		}
 	}
 	if (rain && len < 8) {
-		strcat(res, "R");
+		res[len] = 'R';
 		//no rain tileset available, rolling back
 		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
 			res[len] = '\0';

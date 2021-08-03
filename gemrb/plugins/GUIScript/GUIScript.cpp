@@ -2919,8 +2919,8 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 
 		WMPAreaEntry *entry = new WMPAreaEntry();
-		entry->AreaName = ResRef::MakeUpperCase(area);
-		entry->AreaResRef = ResRef::MakeUpperCase(area);
+		entry->AreaName = MakeUpperCaseResRef(area);
+		entry->AreaResRef = MakeUpperCaseResRef(area);
 		strnuprcpy(entry->AreaLongName, script, 32);
 		entry->SetAreaStatus(flags, OP_SET);
 		entry->IconSeq = icon;
@@ -2960,7 +2960,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 				if (enc[k][0]=='*') {
 					link->EncounterAreaResRef[k].Reset();
 				} else {
-					link->EncounterAreaResRef[k] = ResRef::MakeUpperCase(enc[k]);
+					link->EncounterAreaResRef[k] = MakeUpperCaseResRef(enc[k]);
 				}
 			}
 
@@ -9815,7 +9815,7 @@ static PyObject* GemRB_GetAvatarsValue(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	ResRef prefix = ResRef::MakeUpperCase(actor->GetAnims()->GetArmourLevel(col));
+	ResRef prefix = MakeUpperCaseResRef(actor->GetAnims()->GetArmourLevel(col));
 	return PyString_FromResRef(prefix);
 }
 
@@ -9979,7 +9979,7 @@ static PyObject* GemRB_SetMapExit(PyObject * /*self*/, PyObject* args)
 		//activate entrance
 		ip->Flags&=~TRAP_DEACTIVATED;
 		//set destination area
-		ip->Destination = ResRef::MakeUpperCase(NewArea);
+		ip->Destination = MakeUpperCaseResRef(NewArea);
 		//change entrance only if supplied
 		if (NewEntrance) {
 			strnuprcpy(ip->EntranceName, NewEntrance, sizeof(ieVariable)-1 );
@@ -12209,16 +12209,16 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Invalid effect name!\n" );
 	}
 	if (resref1 && resref1[0]) {
-		fx->Resource = ResRef::MakeLowerCase(resref1);
+		fx->Resource = MakeLowerCaseResRef(resref1);
 	}
 	if (resref2 && resref2[0]) {
-		fx->Resource2 = ResRef::MakeLowerCase(resref2);
+		fx->Resource2 = MakeLowerCaseResRef(resref2);
 	}
 	if (resref3 && resref3[0]) {
-		fx->Resource3 = ResRef::MakeLowerCase(resref3);
+		fx->Resource3 = MakeLowerCaseResRef(resref3);
 	}
 	if (source && source[0]) {
-		fx->SourceRef = ResRef::MakeLowerCase(source);
+		fx->SourceRef = MakeLowerCaseResRef(source);
 	}
 	//This is a hack...
 	fx->Parameter3=1;

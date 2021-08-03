@@ -1116,7 +1116,7 @@ void Spellbook::SetCustomSpellInfo(const std::vector<ResRef>& data, const ResRef
 			for (const auto slot : spellMemo->known_spells) {
 				if (!slot) continue;
 				// skip the spell itself
-				if (spell && slot->SpellResRef == spell) continue;
+				if (slot->SpellResRef == spell) continue;
 
 				AddSpellInfo(spellMemo->Level, spellMemo->Type, slot->SpellResRef, -1);
 			}

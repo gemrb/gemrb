@@ -196,7 +196,7 @@ static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "S
 bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		spellRes = ResRef::MakeLowerCase(parameters->string0Parameter);
+		spellRes = MakeLowerCaseResRef(parameters->string0Parameter);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -226,7 +226,7 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	tmp.SNPrintF("%.4s", spellRef.CString());
 	for (int i = 0; i < 5; i++) {
 		if (tmp == spell_suffices[i]) {
-			tmp = spellRef + 4;
+			tmp = spellRef.CString() + 4;
 			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
 				return 0xffffffff;
@@ -241,7 +241,7 @@ bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 {
 	const CREItem *itm = act->inventory.GetSlotItem(Slot);
 	if(itm) {
-		itemres = ResRef::MakeLowerCase(itm->ItemResRef);
+		itemres = itm->ItemResRef;
 		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
 	return false;
@@ -361,7 +361,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 		if (!item) {
 			continue;
 		}
-		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) != 0) {
+		if (item->ItemResRef != parameters->string0Parameter) {
 			continue;
 		}
 		actor->inventory.SetSlotItemRes(ResRef(parameters->string1Parameter), i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
@@ -1286,7 +1286,7 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
-	fx->Resource = ResRef::MakeUpperCase(area);
+	fx->Resource = MakeUpperCaseResRef(area);
 	core->ApplyEffect(fx, actor, actor);
 	return true;
 }

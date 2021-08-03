@@ -467,11 +467,11 @@ void Door::dump() const
 	}
 	buffer.appendFormatted( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
+	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name.CString(), Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
 
 	Log(DEBUG, "Door", buffer);
 }

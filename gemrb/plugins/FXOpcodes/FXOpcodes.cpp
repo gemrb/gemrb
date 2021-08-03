@@ -5218,7 +5218,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				map->RemoveActor( target );
 			}
 			//set the destination area
-			target->Area = ResRef::MakeUpperCase(fx->Resource);
+			target->Area = MakeUpperCaseResRef(fx->Resource);
 			return FX_APPLIED;
 		}
 	}
@@ -7457,7 +7457,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	ResRef resRef;
 	//GemRB enhancement: allow a custom resource
 	if (fx->Parameter2) {
-		resRef = ResRef::MakeLowerCase(fx->Resource);
+		resRef = MakeLowerCaseResRef(fx->Resource);
 	} else {
 		resRef = "cut250a";
 	}

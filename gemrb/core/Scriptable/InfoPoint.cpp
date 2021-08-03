@@ -62,7 +62,7 @@ InfoPoint::InfoPoint(void)
 void InfoPoint::SetEnter(const char *resref)
 {
 	if (gamedata->Exists(resref, IE_WAV_CLASS_ID) ) {
-		EnterWav = ResRef::MakeUpperCase(resref);
+		EnterWav = MakeUpperCaseResRef(resref);
 	}
 }
 
@@ -255,11 +255,11 @@ void InfoPoint::dump() const
 		break;
 	default:;
 	}
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef.CString(), Dialog.CString());
+	buffer.appendFormatted("Script: %s, Key: %s, Dialog: %s\n", name.CString(), KeyResRef.CString(), Dialog.CString());
 	buffer.appendFormatted( "Deactivated: %s\n", YESNO(Flags&TRAP_DEACTIVATED));
 	buffer.appendFormatted( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 	Log(DEBUG, "InfoPoint", buffer);

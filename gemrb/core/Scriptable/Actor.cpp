@@ -1995,12 +1995,12 @@ static void InitActorTables()
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
 			d_main[i] = tmp;
-			if (d_main[i].IsStar()) {
+			if (IsStar(d_main[i])) {
 				d_main[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_SPARKS );
 			d_splash[i] = tmp;
-			if (d_splash[i].IsStar()) {
+			if (IsStar(d_splash[i])) {
 				d_splash[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_GRADIENT );
@@ -4816,11 +4816,11 @@ void Actor::PlayWalkSound()
 	cnt=core->Roll(1,cnt,-1);
 	ResRef Sound = area->ResolveTerrainSound(anims->GetWalkSound(), Pos);
 
-	if (Sound.IsStar()) return;
+	if (IsStar(Sound)) return;
 
 	ResRef tmp = Sound;
 	char suffix = 0;
-	int l = strlen(Sound.CString());
+	uint8_t l = Sound.CStrLen();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
 	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound.CString(), "FS_", 3)) {
 		suffix = cnt + 0x31;
@@ -6098,7 +6098,7 @@ void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
 	for (int i=0;i<ES_COUNT;i++) {
-		if (!featSpells[i].IsEmpty() && !featSpells[i].IsStar()) {
+		if (!featSpells[i].IsEmpty() && !IsStar(featSpells[i])) {
 			if (PCStats->ExtraSettings[i]) {
 				core->ApplySpell(featSpells[i], this, this, PCStats->ExtraSettings[i]);
 			}
@@ -7928,7 +7928,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
 			ResRef tmp("*");
 			Modal.Spell = tmp;
-		} else if (!Modal.Spell.IsStar()) {
+		} else if (!IsStar(Modal.Spell)) {
 			if (ModalSpellSkillCheck()) {
 				ApplyModal(Modal.Spell);
 
@@ -8804,7 +8804,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
 		anims->ResRefBase.CString(), tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
-	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
+	Sound = MakeLowerCaseResRef(tab->QueryField(index, col));
 	return true;
 }
 
@@ -8919,7 +8919,7 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, unsigned int index) const
 	}
 
 	//Empty resrefs
-	if (Sound.IsStar() || Sound == "nosound") {
+	if (IsStar(Sound) || Sound == "nosound") {
 		Sound.Reset();
 	}
 }
@@ -9483,7 +9483,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	// first check for feats that change the sneak dice
 	// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
 	// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
-	if (!BackstabResRef.IsStar()) {
+	if (!IsStar(BackstabResRef)) {
 		if (BackstabResRef != ArterialStrikeRef) {
 			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 			multiplier -= 2;

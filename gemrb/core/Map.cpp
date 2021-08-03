@@ -97,7 +97,7 @@ private:
 					resrefs[j - 1] = tab->QueryField(j, i);
 				}
 				SpawnGroup *creatures = new SpawnGroup(std::move(resrefs), level);
-				GroupName = ResRef::MakeLowerCase(tab->GetColumnName(i));
+				GroupName = MakeLowerCaseResRef(tab->GetColumnName(i));
 				vars.SetAt( GroupName, creatures);
 			}
 		}
@@ -1974,7 +1974,7 @@ void Map::MarkVisited(const Actor *actor) const
 void Map::AddActor(Actor* actor, bool init)
 {
 	//setting the current area for the actor as this one
-	actor->Area = ResRef::MakeLowerCase(scriptName);
+	actor->Area = MakeLowerCaseResRef(scriptName);
 	if (!HasActor(actor)) {
 		actors.push_back( actor );
 	}
@@ -2920,11 +2920,11 @@ void Map::dump(bool show_actors) const
 	buffer.append("Scripts:");
 
 	for (const auto script : Scripts) {
-		const char* poi = "<none>";
+		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();
 		}
-		buffer.appendFormatted( " %.8s", poi );
+		buffer.appendFormatted(" %.8s", poi.CString());
 	}
 	buffer.append("\n");
 	buffer.appendFormatted( "Area Global ID:  %d\n", GetGlobalID());

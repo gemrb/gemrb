@@ -1499,7 +1499,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			}
 			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 			// until we actually need two vvc fields in the extension, let's just hack around it
-			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
+			if (Extension->VVCRes == "SPCOMEX1") {
 				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 				if (vvc) {
 					vvc->Pos = Pos;
@@ -1515,9 +1515,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos);
 	}
 	
-	//the spreading animation is in the first column
-	const char *tmp = Extension->Spread;
-	if (tmp) {
+	if (Extension->Spread) {
 		//i'm unsure about the need of this
 		//returns if the explosion animation is fake coloured
 		if (!children) {
@@ -1537,6 +1535,8 @@ void Projectile::DrawExplosion(const Region& vp)
 
 		int initial = child_size;
 		
+		//the spreading animation is in the first column
+		ResRef tmp = Extension->Spread;
 		for(int i=0;i<initial;i++) {
 			//leave this slot free, it is residue from the previous flare up
 			if (children[i])

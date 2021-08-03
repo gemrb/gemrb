@@ -28,7 +28,6 @@
 namespace GemRB {
 
 class Actor;
-class ResRef;
 
 class GEM_EXPORT ActorMgr : public ImporterBase {
 public:

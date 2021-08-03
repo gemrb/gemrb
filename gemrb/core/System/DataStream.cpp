@@ -104,7 +104,7 @@ strret_t DataStream::ReadResRef(ResRef& dest)
 		else break;
 	}
 	
-	dest = ResRef::MakeLowerCase(ref);
+	dest = MakeLowerCaseResRef(ref);
 	return len;
 }
 
@@ -115,12 +115,12 @@ strret_t DataStream::WriteResRef(const ResRef& src)
 
 strret_t DataStream::WriteResRefLC(const ResRef& src)
 {
-	return WriteResRef(ResRef::MakeLowerCase(src));
+	return WriteResRef(MakeLowerCaseResRef(src.CString()));
 }
 
 strret_t DataStream::WriteResRefUC(const ResRef& src)
 {
-	return WriteResRef(ResRef::MakeUpperCase(src));
+	return WriteResRef(MakeUpperCaseResRef(src.CString()));
 }
 
 strret_t DataStream::ReadVariable(ieVariable& dest)
