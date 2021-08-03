@@ -263,11 +263,6 @@ Interface::Interface()
 	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
-static void ReleaseItemList(void *poi)
-{
-	delete ((ItemList *) poi);
-}
-
 Interface::~Interface(void)
 {
 	WindowManager::CursorMouseUp = NULL;
