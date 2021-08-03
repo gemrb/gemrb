@@ -220,7 +220,6 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 
 
 def OnMageUnmemorizeSpell (btn, index):
-	index = GemRB.GetVar ("SpellButton")
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD

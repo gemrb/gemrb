@@ -227,8 +227,6 @@ def OnPriestUnmemorizeSpell (btn, index):
 	level = PriestSpellLevel
 	spelltype = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton")
-
 	if GemRB.UnmemorizeSpell (pc, spelltype, level, index):
 		UpdatePriestWindow (PriestSpellWindow)
 
