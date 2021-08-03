@@ -442,7 +442,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 		face = ent->Face;
 	}
 	//LeaveArea is the same in ALL engine versions
-	snprintf(command, sizeof(command), "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
+	snprintf(command, sizeof(command), "LeaveArea(\"%s\",[%d.%d],%d)", area.CString(), X, Y, face);
 
 	if (EveryOne&CT_GO_CLOSER) {
 		int i=game->GetPartySize(false);
