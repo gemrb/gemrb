@@ -155,7 +155,7 @@ private:
 	std::vector<Table> tables;
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
-	std::map<ieDword, std::vector<const char*> > ItemSounds;
+	std::map<ieDword, std::vector<ResRef>> ItemSounds;
 	AutoTable racialInfravision;
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;

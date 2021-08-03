@@ -74,7 +74,6 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
-	ItemSounds.clear();
 }
 
 void GameData::ClearCaches()
@@ -550,11 +549,11 @@ void GameData::ReadItemSounds()
 	int rowCount = itemsnd->GetRowCount();
 	int colCount = itemsnd->GetColumnCount();
 	for (int i = 0; i < rowCount; i++) {
-		ItemSounds[i] = std::vector<const char*>();
+		ItemSounds[i] = {};
 		for (int j = 0; j < colCount; j++) {
 			ResRef snd = MakeLowerCaseResRef(itemsnd->QueryField(i, j));
 			if (snd == ResRef("*")) break;
-			ItemSounds[i].push_back(strdup(snd));
+			ItemSounds[i].push_back(snd);
 		}
 	}
 }
