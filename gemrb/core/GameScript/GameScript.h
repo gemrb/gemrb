@@ -509,6 +509,7 @@ struct TriggerLink {
 #define AF_DLG_INSTANT  4096 //instant dialog actions
 #define AF_SCR_INSTANT  8192 //instant script actions
 #define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
+#define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 
 struct ActionLink {
 	const char* Name;
