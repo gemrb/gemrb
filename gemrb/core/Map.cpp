@@ -372,7 +372,7 @@ void Map::AutoLockDoors() const
 	GetTileMap()->AutoLockDoors();
 }
 
-void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const
+void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const
 {
 	char command[256];
 
@@ -395,7 +395,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	}
 	const Map *map = game->GetMap(area, false);
 	if (!map) {
-		Log(ERROR, "Map", "Invalid map: %s", area);
+		Log(ERROR, "Map", "Invalid map: %s", area.CString());
 		command[0]=0;
 		return;
 	}
@@ -403,7 +403,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, unsigned int dir
 	if (entrance[0]) {
 		ent = map->GetEntrance( entrance );
 		if (!ent) {
-			Log(ERROR, "Map", "Invalid entrance '%s' for area %s", entrance, area);
+			Log(ERROR, "Map", "Invalid entrance '%s' for area %s", entrance, area.CString());
 		}
 	}
 	int X,Y, face;

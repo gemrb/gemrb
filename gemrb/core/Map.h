@@ -624,7 +624,7 @@ public:
 	void TriggerSpawn(Spawn *spawn);
 
 	//move some or all players to a new area
-	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
+	void MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
 	bool HasWeather() const;
 	int GetWeather() const;
 	void ClearTrap(Actor *actor, ieDword InTrap) const;
