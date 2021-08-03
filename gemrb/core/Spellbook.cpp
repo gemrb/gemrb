@@ -312,13 +312,13 @@ bool Spellbook::KnowSpell(const char *resref) const
 }
 
 //if resref=="" then it is a haveanyspell
-bool Spellbook::HaveSpell(const char *resref, ieDword flags)
+bool Spellbook::HaveSpell(const ResRef &resref, ieDword flags)
 {
 	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
 		for (auto& sm : spells[i]) {
 			for (const auto& ms : sm->memorized_spells) {
 				if (!ms->Flags) continue;
-				if (resref[0] && ms->SpellResRef != resref) {
+				if (ms->SpellResRef != resref) {
 					continue;
 				}
 
