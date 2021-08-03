@@ -38,7 +38,7 @@ class CHUImporter : public GUIFactory {
 public:
 	/** Returns the number of available windows */
 	unsigned int GetWindowsCount() override;
-	bool LoadWindowPack(const ResRef&) override;
+	bool LoadWindowPack(const ScriptingGroup_t&) override;
 	/** Returns the i-th window in the Previously Loaded Stream */
 	Window* GetWindow(ScriptingId) const override;
 	/** This function loads all available windows from the 'stream' parameter. */

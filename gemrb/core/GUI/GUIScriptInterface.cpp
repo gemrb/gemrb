@@ -43,7 +43,7 @@ View* GetView(const ScriptingRefBase* base)
 
 const ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
 {
-	ResRef group = "Control";
+	ScriptingGroup_t group = "Control";
 	if (win) {
 		const WindowScriptingRef* winref = static_cast<const WindowScriptingRef*>(win->GetScriptingRef());
 		if (winref) {
@@ -61,13 +61,13 @@ Control* GetControl(ScriptingId id, Window* win)
 	return static_cast<Control*>(view);
 }
 
-Window* GetWindow(ScriptingId id, const ResRef& pack)
+Window* GetWindow(ScriptingId id, const ScriptingGroup_t& pack)
 {
 	View* view = GetView( ScriptEngine::GetScripingRef(pack, id) );
 	return dynamic_cast<Window*>(view);
 }
 
-std::vector<View*> GetViews(const ResRef& group)
+std::vector<View*> GetViews(const ScriptingGroup_t& group)
 {
 	ScriptEngine::ScriptingDefinitions defs = ScriptEngine::GetScriptingGroup(group);
 	std::vector<View*> views;
@@ -85,7 +85,7 @@ const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId 
 {
 	if (!ctrl) return NULL;
 
-	ResRef group = "Control";
+	ScriptingGroup_t group = "Control";
 	const Window* win = ctrl->GetWindow();
 	if (win) {
 		const WindowScriptingRef* winref = static_cast<const WindowScriptingRef*>(win->GetScriptingRef());
@@ -104,7 +104,7 @@ const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId 
 	}
 }
 
-const WindowScriptingRef* RegisterScriptableWindow(Window* win, const ResRef& pack, ScriptingId id)
+const WindowScriptingRef* RegisterScriptableWindow(Window* win, const ScriptingGroup_t& pack, ScriptingId id)
 {
 	if (!win) return NULL;
 	assert(win->GetScriptingRef() == NULL);

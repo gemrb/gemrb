@@ -321,7 +321,7 @@ void Control::HandleTouchActionTimer(const Control* ctrl)
 	PerformAction(key);
 }
 
-ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ControlScriptingRef(this, id, group);
 }

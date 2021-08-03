@@ -906,7 +906,7 @@ bool View::OnControllerButtonUp(const ControllerEvent& ce)
 	return OnKeyRelease(ke, 0);
 }
 
-const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ResRef& group)
+const ViewScriptingRef* View::ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ScriptingGroup_t& group)
 {
 	std::vector<ViewScriptingRef*>::iterator it = std::find(scriptingRefs.begin(), scriptingRefs.end(), old);
 	if (it != scriptingRefs.end()) {
@@ -945,12 +945,12 @@ void View::ClearScriptingRefs()
 	}
 }
 	
-ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* View::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ViewScriptingRef(this, id, group);
 }
 	
-const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ResRef& group)
+const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ScriptingGroup_t& group)
 {
 	ViewScriptingRef* ref = CreateScriptingRef(id, group);
 	if (ScriptEngine::RegisterScriptingRef(ref)) {
@@ -962,7 +962,7 @@ const ViewScriptingRef* View::AssignScriptingRef(ScriptingId id, const ResRef& g
 	}
 }
 
-const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ResRef group) const
+const ViewScriptingRef* View::GetScriptingRef(ScriptingId id, ScriptingGroup_t group) const
 {
 	auto it = std::find_if(scriptingRefs.begin(), scriptingRefs.end(), [&](const ViewScriptingRef* ref) {
 		return ref->Id == id && ref->ScriptingGroup() == group;

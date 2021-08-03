@@ -119,7 +119,7 @@ private:
 	
 	bool OnControllerButtonDown(const ControllerEvent& ce) override;
 	
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 public:
 	Window(const Region& frame, WindowManager& mgr);

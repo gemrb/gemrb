@@ -78,7 +78,7 @@ class GEM_EXPORT Control : public View, public ControlActionResponder {
 private:
 	void ClearActionTimer();
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer(const Control*);
     

@@ -2338,7 +2338,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 }
 
 /** Loads a Window in the Window Manager */
-Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition pos)
+Window* Interface::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition pos)
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
@@ -2372,7 +2372,7 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 	}
 }
 
-void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
+void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
 	if (game && group == ResRef("HIDE_CUT")) {
 		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
@@ -2382,7 +2382,7 @@ void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
-void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group) const
+void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const
 {
 	std::vector<View*> views = GetViews(group);
 	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);

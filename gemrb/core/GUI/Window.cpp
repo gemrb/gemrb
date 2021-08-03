@@ -638,7 +638,7 @@ bool Window::OnControllerButtonDown(const ControllerEvent& ce)
 	return View::OnControllerButtonDown(ce);
 }
 	
-ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new WindowScriptingRef(this, id, group);
 }

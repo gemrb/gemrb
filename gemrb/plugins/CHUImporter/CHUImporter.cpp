@@ -485,7 +485,7 @@ unsigned int CHUImporter::GetWindowsCount()
 }
 
 /** Loads a WindowPack (CHUI file) in the Window Manager */
-bool CHUImporter::LoadWindowPack(const ResRef& ref)
+bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 {
 	if (ref == winPack) {
 		return true; // already loaded

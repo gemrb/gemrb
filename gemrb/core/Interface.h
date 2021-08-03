@@ -510,12 +510,12 @@ public:
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
-	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
+	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&);
-	void ToggleViewsVisible(bool visible, const ResRef& group);
-	void ToggleViewsEnabled(bool enabled, const ResRef& group) const;
+	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
+	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 
 	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
