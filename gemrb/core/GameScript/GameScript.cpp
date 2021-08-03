@@ -2439,7 +2439,12 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (scr) {
 			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
 			scr->ReleaseCurrentAction();
-			scr->AddAction(ParamCopyNoOverride(aC));
+			Action *newAction = ParamCopyNoOverride(aC);
+			// mark the target action, so other ActionOverrides don't clear it
+			// only happened for queued actions, but since instants are gone immediately,
+			// it shouldn't matter that we set it on all
+			newAction->flags |= ACF_OVERRIDE;
+			scr->AddAction(newAction);
 			if (!(actionflags[actionID] & AF_INSTANT)) {
 				assert(scr->GetNextAction());
 				// TODO: below was written before i added instants, this might be unnecessary now
