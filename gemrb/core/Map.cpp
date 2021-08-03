@@ -3285,6 +3285,7 @@ int Map::CheckRestInterruptsAndPassTime(const Point &pos, int hours, int day)
 	// be triggered in a row (or area?), since HOFMode should increase it
 	// by 1. It doesn't look like it was stored in the header, so perhaps
 	// it was just a hardcoded limit to make the game more forgiving
+	// OR did it increase the number of spawned creatures by 1, 2?
 
 	//based on ingame timer
 	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
