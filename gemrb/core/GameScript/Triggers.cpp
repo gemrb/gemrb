@@ -630,7 +630,7 @@ int GameScript::NumDead(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value == (ieDword) parameters->int0Parameter );
@@ -644,7 +644,7 @@ int GameScript::NumDeadGT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value > (ieDword) parameters->int0Parameter );
@@ -658,8 +658,7 @@ int GameScript::NumDeadLT(Scriptable *Sender, const Trigger *parameters)
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
 		ieVariable VariableName;
-
-		snprintf(VariableName, 32, core->GetDeathVarFormat(), parameters->string0Parameter);
+		VariableName.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
 	return ( value < (ieDword) parameters->int0Parameter );
@@ -1714,10 +1713,10 @@ int GameScript::Dead(Scriptable *Sender, const Trigger *parameters)
 		size_t len;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			len = snprintf(Variable,sizeof(ieVariable),"%s_DEAD",parameters->string0Parameter);
+			len = Variable.SNPrintF("%s_DEAD",parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "KAPUTZ");
 		} else {
-			len = snprintf(Variable, sizeof(ieVariable), core->GetDeathVarFormat(), parameters->string0Parameter);
+			len = Variable.SNPrintF(core->GetDeathVarFormat(), parameters->string0Parameter);
 			value = CheckVariable( Sender, Variable, "GLOBAL" );
 		}
 		if (len > sizeof(ieVariable)) {

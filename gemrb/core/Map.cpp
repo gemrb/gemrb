@@ -2836,7 +2836,7 @@ AreaAnimation *Map::GetAnimation(const char *Name)
 Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& creatures)
 {
 	Spawn* sp = new Spawn();
-	strnspccpy(sp->Name, Name, 32);
+	strnspccpy(sp->Name.begin(), Name, 32);
 	
 	sp->Pos = p;
 	sp->Creatures = std::move(creatures);
@@ -2847,7 +2847,7 @@ Spawn *Map::AddSpawn(const char* Name, const Point &p, std::vector<ResRef>&& cre
 void Map::AddEntrance(const char* Name, const Point &p, short Face)
 {
 	Entrance* ent = new Entrance();
-	strlcpy( ent->Name, Name, sizeof(ent->Name) );
+	ent->Name = Name;
 	ent->Pos = p;
 	ent->Face = (ieWord) Face;
 	entrances.push_back( ent );

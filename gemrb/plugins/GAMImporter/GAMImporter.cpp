@@ -743,7 +743,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		strnspccpy(tmpname, name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
+		strnspccpy(tmpname.begin(), name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
 		stream->WriteVariable(tmpname);
 		stream->Write( filling, 8);
 		stream->WriteDword(value);
@@ -770,12 +770,12 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
-				strncpy(tmpname, "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
+				tmpname = "DICTIONARY_GITHZERAI_ HJACKNIR";
 			} else {
-				strnspccpy(tmpname, name, 32, true);
+				strnspccpy(tmpname.begin(), name, 32, true);
 			}
 		} else {
-			strnspccpy(tmpname, name, 32);
+			strnspccpy(tmpname.begin(), name, 32);
 		}
 
 		stream->WriteVariable(tmpname);

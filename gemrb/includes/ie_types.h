@@ -52,48 +52,7 @@ using ieDwordSigned = signed long int;
 /** string reference into TLK file */
 using ieStrRef = ieDword;
 
-class ieVariable
-{
-	char var[33] {'\0'};
-	
-public:
-	ieVariable() = default;
-	ieVariable(std::nullptr_t) = delete;
-
-	explicit ieVariable(const char* c) noexcept {
-		operator=(c);
-	}
-	
-	ieVariable& operator=(const char* c) noexcept {
-		if (c) {
-			strncpy(var, c, sizeof(var) - 1);
-		} else {
-			memset(var, 0, sizeof(var));
-		}
-		return *this;
-	}
-	
-	explicit operator const char*() const noexcept {
-		return var;
-	}
-
-	char operator[](size_t i) const noexcept {
-		return var[i];
-	}
-	
-	char& operator[](size_t i) noexcept {
-		return var[i];
-	}
-
-	operator char*() noexcept {
-		return var;
-	}
-	
-	const char* CString() const noexcept {
-		return var;
-	}
-};
-
+using ieVariable = FixedSizeString<32, strnicmp>;
 using ResRef = FixedSizeString<8, strnicmp>;
 
 }

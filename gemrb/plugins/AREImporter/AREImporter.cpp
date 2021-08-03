@@ -721,7 +721,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 			ip->Pos = bbox.Center();
 		}
 		ip->Destination = Destination;
-		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
+		ip->EntranceName = Entrance;
 		ip->KeyResRef = KeyResRef;
 
 		//these appear only in PST, but we could support them everywhere
@@ -1041,7 +1041,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		door->LockDifficulty=LockRemoval;
 		if (!OpenStrRef) OpenStrRef = ieStrRef(-1); // rewrite 0 to -1
 		door->OpenStrRef=OpenStrRef;
-		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
+		strnspccpy(door->LinkedInfo.begin(), LinkedInfo.begin(), 32);
 		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
 		door->SetDialog(Dialog);

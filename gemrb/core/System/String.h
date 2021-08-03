@@ -195,11 +195,12 @@ public:
 		std::fill(begin(), end(), '\0');
 	}
 	
-	void SNPrintF(const char* format, ...) noexcept {
+	int SNPrintF(const char* format, ...) noexcept {
 		va_list args;
 		va_start(args, format);
-		vsnprintf(str, sizeof(str), format, args);
+		int ret = vsnprintf(str, sizeof(str), format, args);
 		va_end(args);
+		return ret;
 	}
 	
 	const char* CString() const noexcept {

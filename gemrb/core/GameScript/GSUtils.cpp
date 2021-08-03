@@ -2475,7 +2475,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 
 	ieVariable varname;
 	for (int i = 0; i < 99; i++) {
-		snprintf(varname,32, "wishpower%02d", i);
+		varname.SNPrintF("wishpower%02d", i);
 		if(CheckVariable(Sender, varname, "GLOBAL") ) {
 			SetVariable(Sender, varname, 0, "GLOBAL");
 		}
@@ -2506,7 +2506,7 @@ retry:
 		if (selects[i]<0)
 			continue;
 		int spnum = atoi( tm->QueryField( selects[i], column-1 ) );
-		snprintf(varname,32,"wishpower%02d", spnum);
+		varname.SNPrintF("wishpower%02d", spnum);
 		SetVariable(Sender, varname, 1, "GLOBAL");
 	}
 	free(selects);
