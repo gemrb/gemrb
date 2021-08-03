@@ -123,7 +123,9 @@ class StringBuffer;
 #define SC_AURA_CHECK   32
 #define SC_NOINTERRUPT  64
 
-#define ACF_REALLOW_SCRIPTS 1
+#define ACF_OVERRIDE 1 // was this action invoked via ActionOverride?
+#define ACF_REALLOW_SCRIPTS 0x1000 // gemrb internal
+#define ACF_FOLLOW_DONE 0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
 
 //trigger flags stored in triggers in .bcs files
 #define TF_NEGATE  1   //negate trigger result
