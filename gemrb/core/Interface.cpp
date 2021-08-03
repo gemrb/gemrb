@@ -275,8 +275,6 @@ Interface::~Interface(void)
 
 	delete winmgr;
 
-	delete AreaAliasTable;
-
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
@@ -640,12 +638,7 @@ const char *Interface::GetDeathVarFormat()
 
 bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 {
-	if (AreaAliasTable) {
-		AreaAliasTable->RemoveAll(NULL);
-	} else {
-		AreaAliasTable = new Variables();
-		AreaAliasTable->SetType(GEM_VARIABLES_INT);
-	}
+	AreaAliasTable.clear();
 
 	AutoTable aa(tablename);
 	if (!aa) {
@@ -657,17 +650,15 @@ bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 	while (idx--) {
 		ResRef key = MakeLowerCaseResRef(aa->GetRowName(idx));
 		ieDword value = atoi(aa->QueryField(idx,0));
-		AreaAliasTable->SetAt(key, value);
+		AreaAliasTable[key] = value;
 	}
 	return true;
 }
 
 int Interface::GetAreaAlias(const ResRef &areaname) const
 {
-	ieDword value;
-
-	if (AreaAliasTable && AreaAliasTable->Lookup(areaname, value)) {
-		return (int) value;
+	if (AreaAliasTable.count(areaname)) {
+		return AreaAliasTable.at(areaname);
 	}
 	return -1;
 }

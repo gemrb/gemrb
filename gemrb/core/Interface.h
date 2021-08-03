@@ -49,6 +49,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -462,7 +463,7 @@ public:
 	unsigned int SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
-	Variables* AreaAliasTable = nullptr;
+	std::unordered_map<ResRef, ieDword, CstrHashCI<ResRef>> AreaAliasTable;
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
