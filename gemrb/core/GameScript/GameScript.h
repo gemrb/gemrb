@@ -300,7 +300,6 @@ public:
 		} else {
 			RefCount = 1; //one reference hold by the script
 		}
-		flags = 0;
 	}
 	~Action()
 	{
@@ -320,7 +319,7 @@ public:
 	int int2Parameter;
 	char string0Parameter[65];
 	char string1Parameter[65];
-	unsigned short flags;
+	uint32_t flags = 0;
 private:
 	int RefCount;
 public:
