@@ -353,7 +353,7 @@ void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doublehint)
+ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool doublehint)
 {
 	ScriptedAnimation *ret = NULL;
 
@@ -369,7 +369,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		}
 	}
 	if (ret) {
-		ret->ResName = MakeLowerCaseResRef(effect);
+		ret->ResName = effect;
 	}
 	return ret;
 }

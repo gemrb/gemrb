@@ -102,7 +102,7 @@ public:
 	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
+	ScriptedAnimation* GetScriptedAnimation(const ResRef &resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
