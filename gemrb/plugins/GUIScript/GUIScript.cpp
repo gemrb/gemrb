@@ -186,8 +186,14 @@ static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
 		return NULL;
 	}
-	ScriptingGroup_t group = PyString_AsString(attr);
+	PyObject* temp_bytes = PyUnicode_AsEncodedString(attr, "UTF-8", "strict");
 	Py_DecRef(attr);
+	if (temp_bytes == nullptr) {
+		RuntimeError("Invalid Scripting reference, failed to decode SCRIPT_GROUP attribute.");
+		return nullptr;
+	}
+	ScriptingGroup_t group = PyBytes_AS_STRING(temp_bytes);
+	Py_DecRef(temp_bytes);
 
 	return gs->GetScripingRef(group, id);
 }
