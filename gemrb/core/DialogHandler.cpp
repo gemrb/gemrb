@@ -405,7 +405,7 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			}
 			if (!tgt) {
 				// then just search the current area for an actor with the dialog
-				tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+				tgt = target->GetCurrentArea()->GetScriptableByDialog(tr->Dialog);
 				if (tgt && tgt->Type == ST_ACTOR) {
 					tgta = (Actor *) tgt;
 				}

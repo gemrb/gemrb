@@ -2273,7 +2273,7 @@ Actor* Map::GetActor(int index, bool any) const
 	return NULL;
 }
 
-Scriptable *Map::GetActorByDialog(const ResRef &resref) const
+Scriptable *Map::GetScriptableByDialog(const ResRef &resref) const
 {
 	for (auto actor : actors) {
 		//if a busy or hostile actor shouldn't be found
