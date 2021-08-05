@@ -2061,48 +2061,50 @@ bool GameScript::Update(bool *continuing, bool *done)
 	RandomNumValue = RAND_ALL();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (rB->condition->Evaluate(MySelf)) {
-			//if this isn't a continue-d block, we have to clear the queue
-			//we cannot clear the queue and cannot execute the new block
-			//if we already have stuff on the queue!
-			if (!continueExecution) {
-				if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
-					if (MySelf->GetInternalFlag()&IF_NOINT) {
-						// we presumably don't want any further execution?
-						if (done) *done = true;
-						return false;
-					}
+		if (!rB->condition->Evaluate(MySelf)) {
+			continue;
+		}
 
-					if (lastAction==a) {
-						// we presumably don't want any further execution?
-						// this one is a bit more complicated, due to possible
-						// interactions with Continue() (lastAction here is always
-						// the first block encountered), needs more testing
-						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
-						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
-						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
-						if (core->HasFeature(GF_3ED_RULES)) {
-							if (done) *done = true;
-						}
-						return false;
-					}
-
-					//movetoobjectfollow would break if this isn't called
-					//(what is broken if it is here?)
-					//IE even clears the path, shall we?
-					//yes we must :)
-					MySelf->Stop();
+		// if this isn't a continue-d block, we have to clear the queue
+		// we cannot clear the queue and cannot execute the new block
+		// if we already have stuff on the queue!
+		if (!continueExecution) {
+			if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
+				if (MySelf->GetInternalFlag() & IF_NOINT) {
+					// we presumably don't want any further execution?
+					if (done) *done = true;
+					return false;
 				}
-				lastAction=a;
+
+				if (lastAction == a) {
+					// we presumably don't want any further execution?
+					// this one is a bit more complicated, due to possible
+					// interactions with Continue() (lastAction here is always
+					// the first block encountered), needs more testing
+					// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+					// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+					// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+					if (core->HasFeature(GF_3ED_RULES) && done) {
+						*done = true;
+					}
+					return false;
+				}
+
+				// movetoobjectfollow would break if this isn't called
+				// (what is broken if it is here?)
+				// IE even clears the path, shall we?
+				// yes we must :)
+				MySelf->Stop();
 			}
-			running = true;
-			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
-			running = false;
-			if (continuing) *continuing = continueExecution;
-			if (!continueExecution) {
-				if (done) *done = true;
-				return true;
-			}
+			lastAction = a;
+		}
+		running = true;
+		continueExecution = rB->responseSet->Execute(MySelf) != 0;
+		running = false;
+		if (continuing) *continuing = continueExecution;
+		if (!continueExecution) {
+			if (done) *done = true;
+			return true;
 		}
 	}
 	return continueExecution;
