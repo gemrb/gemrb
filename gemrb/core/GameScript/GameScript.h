@@ -284,21 +284,11 @@ class GEM_EXPORT Action : protected Canary {
 public:
 	explicit Action(bool autoFree)
 	{
-		actionID = 0;
-		objects[0] = NULL;
-		objects[1] = NULL;
-		objects[2] = NULL;
-		memset(string0Parameter, 0, 65);
-		memset(string1Parameter, 0, 65);
-		int0Parameter = 0;
-		pointParameter.reset();
-		int1Parameter = 0;
-		int2Parameter = 0;
 		//changed now
 		if (autoFree) {
 			RefCount = 0; //refcount will be increased by each AddAction
 		} else {
-			RefCount = 1; //one reference hold by the script
+			RefCount = 1; //one reference held by the script
 		}
 	}
 	~Action()
@@ -311,17 +301,17 @@ public:
 		}
 	}
 
-	unsigned short actionID;
-	Object* objects[3];
-	int int0Parameter;
+	unsigned short actionID = 0;
+	Object* objects[3]{};
+	int int0Parameter = 0;
 	Point pointParameter;
-	int int1Parameter;
-	int int2Parameter;
-	char string0Parameter[65];
-	char string1Parameter[65];
+	int int1Parameter = 0;
+	int int2Parameter = 0;
+	char string0Parameter[65]{};
+	char string1Parameter[65]{};
 	uint32_t flags = 0;
 private:
-	int RefCount;
+	int RefCount = 0;
 public:
 	int GetRef() const {
 		return RefCount;
