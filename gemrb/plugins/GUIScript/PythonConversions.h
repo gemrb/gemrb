@@ -31,26 +31,24 @@
 
 namespace GemRB {
 
-template <typename T>
+template <typename T, template<class> class PTR = Holder>
 class CObject final {
 public:
+	using CAP_T = PTR<T>;
+	
 	operator PyObject* () const
 	{
-		if (ptr) {
-			ptr->acquire();
-			PyObject *obj = PyCapsule_New(ptr.get(), T::ID.description, PyRelease);
-			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
-			PyObject *ret = gs->ConstructObject(T::ID.description, NULL, kwargs);
-			Py_DECREF(kwargs);
-			return ret;
+		if (cap) {
+			Py_INCREF(pycap);
+			return pycap;
 		} else {
 			Py_RETURN_NONE;
 		}
 	}
 	
-	operator Holder<T> () const
+	operator CAP_T () const
 	{
-		return ptr;
+		return cap ? cap->ptr : nullptr;
 	}
 
 	explicit CObject(PyObject *obj)
@@ -63,31 +61,45 @@ public:
 		else
 			PyErr_Clear();
 
-		ptr = Holder<T>(static_cast<T*>(PyCapsule_GetPointer(obj, T::ID.description)));
-		if (ptr) {
-			ptr->acquire();
-		} else {
+		pycap = obj;
+		Py_INCREF(pycap);
+		cap = static_cast<Capsule*>(PyCapsule_GetPointer(obj, T::ID.description));
+		if (cap == nullptr) {
 			Log(ERROR, "GUIScript", "Bad CObject extracted.");
 		}
 		Py_XDECREF(id);
 	}
 
-	explicit CObject(const Holder<T>& ptr)
-	: ptr(ptr)
-	{}
-
-	explicit operator bool () const
+	explicit CObject(CAP_T ptr)
+	: cap(new Capsule(std::move(ptr)))
 	{
-		return ptr != nullptr;
+		PyObject *obj = PyCapsule_New(cap, T::ID.description, PyRelease);
+		PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
+		pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
+		Py_DECREF(kwargs);
 	}
+	
+	~CObject() {
+		Py_XDECREF(pycap);
+	}
+	
 private:
 	static void PyRelease(PyObject *obj)
 	{
 		void* ptr = PyCapsule_GetPointer(obj, T::ID.description);
-		static_cast<T*>(ptr)->release();
+		delete static_cast<Capsule*>(ptr);
 	}
 	
-	Holder<T> ptr;
+	struct Capsule {
+		CAP_T ptr;
+		
+		Capsule(CAP_T ptr)
+		: ptr(std::move(ptr))
+		{}
+		
+	} mutable *cap = nullptr;
+	
+	PyObject* pycap = nullptr;
 };
 
 // Python 3 forward compatibility
