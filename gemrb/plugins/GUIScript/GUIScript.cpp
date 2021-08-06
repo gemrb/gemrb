@@ -702,36 +702,6 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	return gs->ConstructObject("Table", ind);
 }
 
-PyDoc_STRVAR( GemRB_Table_Unload__doc,
-"===== UnloadTable =====\n\
-\n\
-**Prototype:** GemRB.UnloadTable (TableIndex)\n\
-\n\
-**Metaclass Prototype:** Unload ()\n\
-\n\
-**Description:** Unloads a 2DA Table.\n\
-\n\
-**Parameters:**\n\
-  * TableIndex - returned by a previous LoadTable command.\n\
-\n\
-**Return value:** N/A\n\
-\n\
-**See also:** [[guiscript:LoadTable]]"
-);
-
-static PyObject* GemRB_Table_Unload(PyObject * /*self*/, PyObject* args)
-{
-	int ti;
-	PARSE_ARGS( args, "i", &ti );
-
-	int ind = gamedata->DelTable( ti );
-	if (ind == -1) {
-		return RuntimeError("Can't find resource");
-	}
-
-	Py_RETURN_NONE;
-}
-
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
 "===== Table_GetValue =====\n\
 \n\
@@ -13410,7 +13380,6 @@ static PyMethodDef GemRBInternalMethods[] = {
 	METHOD(Table_GetRowIndex, METH_VARARGS),
 	METHOD(Table_GetRowName, METH_VARARGS),
 	METHOD(Table_GetValue, METH_VARARGS),
-	METHOD(Table_Unload, METH_VARARGS),
 	METHOD(TextArea_Append, METH_VARARGS),
 	METHOD(TextArea_ListResources, METH_VARARGS),
 	METHOD(TextArea_SetOptions, METH_VARARGS),
