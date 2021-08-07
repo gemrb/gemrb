@@ -63,7 +63,7 @@ namespace GemRB {
 #define YESNO(x) ( (x)?"Yes":"No")
 
 struct Spawns {
-	std::unordered_map<ResRef, SpawnGroup, CstrHashCI<ResRef>> vars;
+	ResRefMap<SpawnGroup> vars;
 	
 	static const Spawns& Get() {
 		static Spawns spawns;

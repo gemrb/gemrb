@@ -150,7 +150,7 @@ private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	std::unordered_map<ResRef, PaletteHolder, CstrHashCI<ResRef>> PaletteCache;
+	ResRefMap<PaletteHolder> PaletteCache;
 	Factory* factory;
 	std::vector<Table> tables;
 	using StoreMap = std::map<ResRef, Store*>;

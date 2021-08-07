@@ -30,6 +30,8 @@
 #include "Plugin.h"
 #include "System/String.h"
 
+#include <unordered_map>
+
 namespace GemRB {
 
 /** Resource reference */
@@ -57,6 +59,9 @@ inline ResRef MakeUpperCaseResRef(const char* str) {
 inline bool IsStar(const ResRef& resref) {
 	return resref[0] == '*';
 }
+
+template <typename T>
+using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
 
 /**
  * Base class for all GemRB resources

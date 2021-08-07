@@ -462,7 +462,7 @@ public:
 	unsigned int SlotTypes = 0; // this is the same as the inventory size
 	ResRef GlobalScript = "BALDUR";
 	ResRef WorldMapName[2] = { "WORLDMAP", "" };
-	std::unordered_map<ResRef, ieDword, CstrHashCI<ResRef>> AreaAliasTable;
+	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
@@ -796,7 +796,7 @@ public:
 	CFGConfigData config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
-	std::unordered_map<ResRef, ItemList, CstrHashCI<ResRef>> RtRows;
+	ResRefMap<ItemList> RtRows;
 
 	char INIConfig[_MAX_PATH] = "baldur.ini";
 	bool DitherSprites = true;
