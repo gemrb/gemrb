@@ -207,7 +207,7 @@ void LoadPlugins(const char* pluginpath)
 			continue;
 		}
 
-		PathJoin( path, pluginpath, name, NULL );
+		PathJoin(path, pluginpath, name, nullptr);
 		LoadPlugin(path);
 	} while (++dirIt);
 

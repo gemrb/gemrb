@@ -132,7 +132,7 @@ if (config->Open(path) \
 		CopyHomePath(datadir, _MAX_PATH);
 		char confpath[_MAX_PATH] = ".";
 		strcat(confpath, name);
-		PathJoin(datadir, datadir, confpath, NULL);
+		PathJoin(datadir, datadir, confpath, nullptr);
 		PathJoinExt( path, datadir, name, "cfg" );
 		ATTEMPT_INIT;
 #endif
