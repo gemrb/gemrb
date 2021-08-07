@@ -11746,7 +11746,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 
 	/// remove this after projectile is done
 	print("Use item: %s", itemdata.itemName.CString());
-	print("Extended header: %ld", itemdata.headerindex);
+	print("Extended header: %lu", static_cast<unsigned long>(itemdata.headerindex));
 	print("Attacktype: %d", itemdata.AttackType);
 	print("Range: %d", itemdata.Range);
 	print("Target: %d", forcetarget);
