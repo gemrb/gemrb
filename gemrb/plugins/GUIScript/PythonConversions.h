@@ -38,7 +38,7 @@ public:
 	
 	operator PyObject* () const
 	{
-		if (cap) {
+		if (pycap) {
 			Py_INCREF(pycap);
 			return pycap;
 		} else {
@@ -73,10 +73,12 @@ public:
 	explicit CObject(CAP_T ptr)
 	: cap(new Capsule(std::move(ptr)))
 	{
-		PyObject *obj = PyCapsule_New(cap, T::ID.description, PyRelease);
-		PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
-		pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
-		Py_DECREF(kwargs);
+		if (cap->ptr) {
+			PyObject *obj = PyCapsule_New(cap, T::ID.description, PyRelease);
+			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
+			pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
+			Py_DECREF(kwargs);
+		}
 	}
 	
 	~CObject() {
@@ -96,8 +98,7 @@ private:
 		Capsule(CAP_T ptr)
 		: ptr(std::move(ptr))
 		{}
-		
-	} mutable *cap = nullptr;
+	} *cap = nullptr;
 	
 	PyObject* pycap = nullptr;
 };
