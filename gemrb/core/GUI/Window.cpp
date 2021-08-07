@@ -475,7 +475,7 @@ bool Window::DispatchEvent(const Event& event)
 	View* target = NULL;
 
 	if (event.type == Event::TextInput) {
-		focusView->TextInput(event.text);
+		if (focusView) focusView->TextInput(event.text);
 		return true;
 	}
 
