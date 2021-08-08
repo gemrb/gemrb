@@ -184,11 +184,6 @@ AutoTable GameData::GetTable(const ResRef &resRef) const
 	return nullptr;
 }
 
-void GameData::ResetTables()
-{
-	tables.clear();
-}
-
 PaletteHolder GameData::GetPalette(const ResRef& resname)
 {
 	auto iter = PaletteCache.find(resname);

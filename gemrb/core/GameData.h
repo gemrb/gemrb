@@ -80,7 +80,6 @@ public:
 	AutoTable LoadTable(const char *ResRef, bool silent = false);
 	AutoTable LoadTable(const ResRef& resRef, bool silent = false);
 	AutoTable GetTable(const ResRef& resRef) const;
-	void ResetTables();
 
 	PaletteHolder GetPalette(const ResRef& resname);
 

@@ -497,9 +497,6 @@ void Interface::HandleFlags()
 			guiscript->RunFunction("Console", "OnLoad");
 
 			winmgr->FadeColor = Color();
-			
-			// FIXME: any table references that are still in use will be using previous data
-			gamedata->ResetTables();
 
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
