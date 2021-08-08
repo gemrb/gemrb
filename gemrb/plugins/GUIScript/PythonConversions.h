@@ -71,9 +71,9 @@ public:
 	}
 
 	explicit CObject(CAP_T ptr)
-	: cap(new Capsule(std::move(ptr)))
 	{
-		if (cap->ptr) {
+		if (ptr) {
+			cap = new Capsule(std::move(ptr));
 			PyObject *obj = PyCapsule_New(cap, T::ID.description, PyRelease);
 			PyObject* kwargs = Py_BuildValue("{s:O}", "ID", obj);
 			pycap = gs->ConstructObject(T::ID.description, nullptr, kwargs);
