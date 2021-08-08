@@ -442,8 +442,11 @@ void Scriptable::AddAction(Action* aC)
 
 	// attempt to handle 'instant' actions, from instant.ids, which run immediately
 	// when added if the action queue is empty, even on actors which are Held/etc
+	// but try to ignore iwd2 ActionOverride for 41pstail.bcs
 	// FIXME: area check hack until fuzzie fixes scripts here
-	if (!CurrentAction && !GetNextAction() && area) {
+	const Action *nextAction = GetNextAction();
+	bool ignoreQueue = !nextAction || (third && nextAction->objects[0]);
+	if (!CurrentAction && ignoreQueue && area) {
 		int instant = AF_SCR_INSTANT;
 		if (core->GetGameControl()->GetDialogueFlags() & DF_IN_DIALOG) {
 			instant = AF_DLG_INSTANT;
