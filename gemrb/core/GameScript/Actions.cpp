@@ -2247,8 +2247,13 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	const Actor *actor = (const Actor *) Sender;
-	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
+	Map* map = actor->GetCurrentArea();
+	if (!game->EveryoneNearPoint(map, actor->Pos, ENP_CANMOVE)) {
 		//we abort the command, everyone should be here
+		if (map->LastGoCloser < game->Ticks) {
+			displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE);
+			map->LastGoCloser = game->Ticks + 6000;
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
