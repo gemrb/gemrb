@@ -1662,10 +1662,9 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( target, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
-//display message over current script owner
 void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE );
+	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
 }
 
 //float message over target
