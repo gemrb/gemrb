@@ -54,7 +54,7 @@ private:
 		damageOpcode = EffectQueue::ResolveEffect(dmgref);
 
 		pstflags = core->HasFeature(GF_PST_STATE_FLAGS);
-		AutoTable tm("splfocus", true);
+		AutoTable tm = gamedata->LoadTable("splfocus", true);
 		if (tm) {
 			size_t schoolcount = tm->GetRowCount();
 

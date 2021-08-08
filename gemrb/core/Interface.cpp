@@ -160,7 +160,7 @@ struct AbilityTables {
 private:
 	bool ReadAbilityTable(const ResRef& tablename, AbilityTable& table, int columns, int rows) const
 	{
-		AutoTable tab(tablename);
+		AutoTable tab = gamedata->LoadTable(tablename);
 		if (!tab) {
 			return false;
 		}
@@ -338,7 +338,6 @@ GameControl* Interface::StartGameControl()
 {
 	assert(gamectrl == nullptr);
 
-	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0, 0, config.Width, config.Height);
 	gamectrl = new GameControl(screen);
 	gamectrl->AssignScriptingRef(0, "GC");
@@ -498,6 +497,9 @@ void Interface::HandleFlags()
 			guiscript->RunFunction("Console", "OnLoad");
 
 			winmgr->FadeColor = Color();
+			
+			// FIXME: any table references that are still in use will be using previous data
+			gamedata->ResetTables();
 
 			GameControl* gc = StartGameControl();
 			guiscript->LoadScript( "Game" );
@@ -532,7 +534,7 @@ void Interface::HandleFlags()
 
 bool Interface::ReadGameTimeTable()
 {
-	AutoTable table("gametime");
+	AutoTable table = gamedata->LoadTable("gametime");
 	if (!table) {
 		return false;
 	}
@@ -554,7 +556,7 @@ bool Interface::ReadSpecialSpells()
 {
 	bool result = true;
 
-	AutoTable table("splspec");
+	AutoTable table = gamedata->LoadTable("splspec");
 	if (table) {
 		ieDword SpecialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(SpecialSpellsCount);
@@ -569,7 +571,7 @@ bool Interface::ReadSpecialSpells()
 		result = false;
 	}
 
-	table = AutoTable("wildmag");
+	table = gamedata->LoadTable("wildmag");
 	if (table) {
 		SurgeSpell ss;
 		for (ieDword i = 0; i < table->GetRowCount(); i++) {
@@ -630,7 +632,7 @@ bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 {
 	AreaAliasTable.clear();
 
-	AutoTable aa(tablename);
+	AutoTable aa = gamedata->LoadTable(tablename);
 	if (!aa) {
 		//don't report error when the file doesn't exist
 		return true;
@@ -654,7 +656,7 @@ int Interface::GetAreaAlias(const ResRef &areaname) const
 }
 
 bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
-	AutoTable tm(tablename);
+	AutoTable tm = gamedata->LoadTable(tablename);
 	if (!tm)
 		return false;
 
@@ -666,7 +668,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 }
 
 bool Interface::ReadDamageTypeTable() {
-	AutoTable tm("dmgtypes");
+	AutoTable tm = gamedata->LoadTable("dmgtypes");
 	if (!tm)
 		return false;
 
@@ -685,7 +687,7 @@ bool Interface::ReadDamageTypeTable() {
 
 bool Interface::ReadReputationModTable() const
 {
-	AutoTable tm("reputati");
+	AutoTable tm = gamedata->LoadTable("reputati");
 	if (!tm)
 		return false;
 
@@ -703,7 +705,7 @@ bool Interface::ReadReputationModTable() const
 
 bool Interface::ReadSoundChannelsTable() const
 {
-	AutoTable tm("sndchann");
+	AutoTable tm = gamedata->LoadTable("sndchann");
 	if (!tm) {
 		return false;
 	}
@@ -890,7 +892,7 @@ int Interface::LoadSprites()
 int Interface::LoadFonts()
 {
 	Log(MESSAGE, "Core", "Loading Fonts...");
-	AutoTable tab("fonts");
+	AutoTable tab = gamedata->LoadTable("fonts");
 	if (!tab) {
 		Log(ERROR, "Core", "Cannot find fonts.2da.");
 		return GEM_ERROR;
@@ -2586,7 +2588,7 @@ int Interface::PlayMovie(const char* resref)
 
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
-	AutoTable mvesnd = AutoTable("mvesnd", true);
+	AutoTable mvesnd = gamedata->LoadTable("mvesnd", true);
 	if (mvesnd) {
 		int row = mvesnd->GetRowIndex(resref);
 		if (row != -1) {
@@ -2626,7 +2628,7 @@ int Interface::PlayMovie(const char* resref)
 		IESubtitles(class Font* fnt, const ResRef& resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
-			AutoTable sttable(resref);
+			AutoTable sttable = gamedata->LoadTable(resref);
 			cachedSub = NULL;
 			nextSubFrame = 0;
 
@@ -2665,7 +2667,7 @@ int Interface::PlayMovie(const char* resref)
 		}
 	};
 
-	AutoTable sttable(resref);
+	AutoTable sttable = gamedata->LoadTable(resref);
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
 		int r = atoi(sttable->QueryField("red", "frame"));
@@ -3153,7 +3155,7 @@ bool Interface::InitItemTypes()
 		free(slotmatrix);
 	}
 
-	AutoTable it("itemtype");
+	AutoTable it = gamedata->LoadTable("itemtype");
 	ItemTypes = 0;
 	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
@@ -3192,7 +3194,7 @@ bool Interface::InitItemTypes()
 			itemtypedata[i][IDT_SKILLPENALTY] = 0; // skill check malus
 		}
 	}
-	AutoTable af("itemdata");
+	AutoTable af = gamedata->LoadTable("itemdata");
 	if (af) {
 		int armcount = af->GetRowCount();
 		int colcount = af->GetColumnCount();
@@ -3209,7 +3211,7 @@ bool Interface::InitItemTypes()
 
 	//slottype describes the inventory structure
 	Inventory::Init();
-	AutoTable st("slottype");
+	AutoTable st = gamedata->LoadTable("slottype");
 	SlotTypes = 0;
 	if (st) {
 		SlotTypes = st->GetRowCount();
@@ -3652,7 +3654,7 @@ void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 
 bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 {
-	AutoTable tab(TableName);
+	AutoTable tab = gamedata->LoadTable(TableName);
 	if (!tab) {
 		return false;
 	}
@@ -3684,7 +3686,7 @@ bool Interface::ReadRandomItems()
 	vars->Lookup("Nightmare Mode", difflev);
 	RtRows.clear();
 	
-	AutoTable tab("randitem");
+	AutoTable tab = gamedata->LoadTable("randitem");
 	if (!tab) {
 		return false;
 	}
@@ -4537,7 +4539,7 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	resource2.Reset();
 	resource3.Reset();
 
-	AutoTable tab(resref);
+	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
@@ -4555,7 +4557,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
 	ieDword *ret;
 
-	AutoTable tab(resref);
+	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
 		ieDword cnt = tab->GetRowCount();
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
@@ -4609,9 +4611,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // Optionally an override stat value can be specified (needed for use in pcfs).
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
-	int mastertable = gamedata->LoadTable( tablename );
-	if (mastertable == -1) return -1;
-	auto mtm = gamedata->GetTable( mastertable );
+	AutoTable mtm = gamedata->LoadTable(tablename);
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
@@ -4630,9 +4630,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
 		}
-		int table = gamedata->LoadTable( tablename );
-		if (table == -1) continue;
-		auto tm = gamedata->GetTable( table );
+		auto tm = gamedata->LoadTable(tablename);
 		if (!tm) continue;
 
 		int row;

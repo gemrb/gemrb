@@ -585,7 +585,7 @@ static bool CreateSavePath(char *Path, int index, const char *slotname)
 
 int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 {
-	AutoTable tab("savegame");
+	AutoTable tab = gamedata->LoadTable("savegame");
 	const char *slotname = NULL;
 	int qsave = 0;
 

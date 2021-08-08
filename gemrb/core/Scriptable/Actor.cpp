@@ -760,7 +760,7 @@ void Actor::SetCircleSize()
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
-	AutoTable table(clab);
+	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
 
 	int row = table->GetRowCount();
@@ -1806,7 +1806,7 @@ GEM_EXPORT void UpdateActorConfig()
 
 static void ReadModalStates()
 {
-	AutoTable table("modal");
+	AutoTable table = gamedata->LoadTable("modal");
 	if (!table) return;
 
 	ModalStatesStruct ms;
@@ -1854,7 +1854,7 @@ static void InitActorTables()
 	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists various level based xp bonuses
-	AutoTable tm("xpbonus", true);
+	AutoTable tm = gamedata->LoadTable("xpbonus", true);
 	if (tm) {
 		xpbonustypes = tm->GetRowCount();
 		if (xpbonustypes == 0) {
@@ -1874,7 +1874,7 @@ static void InitActorTables()
 	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	tm = AutoTable("clskills");
+	tm  = gamedata->LoadTable("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -1990,7 +1990,7 @@ static void InitActorTables()
 	}
 
 	//initializing the vvc resource references
-	tm = AutoTable("damage");
+	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
@@ -2008,7 +2008,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("overlay");
+	tm = gamedata->LoadTable("overlay");
 	if (tm) {
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
@@ -2025,7 +2025,7 @@ static void InitActorTables()
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
-		tm = AutoTable("csound");
+		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
 				const char *tmp = tm->QueryField( i, 0 );
@@ -2039,7 +2039,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("qslots");
+	tm = gamedata->LoadTable("qslots");
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
 
 	//leave room for default row at 0
@@ -2052,7 +2052,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("qslot2", true);
+	tm = gamedata->LoadTable("qslot2", true);
 	if (tm) {
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
@@ -2068,14 +2068,14 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("mdfeats", true);
+	tm = gamedata->LoadTable("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
 			featSpells[i] = tm->QueryField(i, 0);
 		}
 	}
 
-	tm = AutoTable("itemuse");
+	tm = gamedata->LoadTable("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
@@ -2092,7 +2092,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("itemanim", true);
+	tm = gamedata->LoadTable("itemanim", true);
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -2105,9 +2105,9 @@ static void InitActorTables()
 	// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
 	// luckily, they both use the same format
 	if (third) {
-		tm = AutoTable("mxsplbon");
+		tm = gamedata->LoadTable("mxsplbon");
 	} else {
-		tm = AutoTable("mxsplwis");
+		tm = gamedata->LoadTable("mxsplwis");
 	}
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
@@ -2123,7 +2123,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm = AutoTable("featreq", true);
+	tm = gamedata->LoadTable("featreq", true);
 	if (tm) {
 		unsigned int stat, max;
 
@@ -2145,10 +2145,10 @@ static void InitActorTables()
 
 	if (classcount) maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
-	AutoTable xpcapt("xpcap");
+	AutoTable xpcapt = gamedata->LoadTable("xpcap");
 	std::map<std::string, int> className2ID;
 
-	tm = AutoTable("classes");
+	tm = gamedata->LoadTable("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
 	}
@@ -2192,7 +2192,7 @@ static void InitActorTables()
 			// FIXME: the attempt at skipping doesn't work!
 			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht = AutoTable(tohit, true);
+				tht = gamedata->LoadTable(tohit, true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for %s does not exist!", classname);
 				}
@@ -2272,7 +2272,7 @@ static void InitActorTables()
 					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm = AutoTable(tm->QueryField(classname, "HP"), true);
+					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2325,7 +2325,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm = AutoTable(tm->QueryField(currentname, "HP"), true);
+							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
 								int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2374,7 +2374,7 @@ static void InitActorTables()
 
 	// set the default weapon slot count for the inventory gui — if we're not in iwd2 already
 	if (!iwd2class) {
-		tm = AutoTable("numwslot", true);
+		tm = gamedata->LoadTable("numwslot", true);
 		if (tm) {
 			int rowcount = tm->GetRowCount();
 			for (int i = 0; i < rowcount; i++) {
@@ -2390,7 +2390,7 @@ static void InitActorTables()
 
 	// slurp up kitlist.2da; only iwd2 has both class and kit info in the same table
 	if (!iwd2class) {
-		tm = AutoTable("kitlist", true);
+		tm = gamedata->LoadTable("kitlist", true);
 		if (!tm) {
 			error("Actor", "Missing kitlist.2da!");
 		}
@@ -2411,10 +2411,10 @@ static void InitActorTables()
 	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
-	wspecial = AutoTable("wspecial", true);
+	wspecial = gamedata->LoadTable("wspecial", true);
 
 	//dual-wielding table
-	tm = AutoTable("wstwowpn", true);
+	tm = gamedata->LoadTable("wstwowpn", true);
 	if (tm) {
 		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2427,7 +2427,7 @@ static void InitActorTables()
 	}
 
 	//two-handed table
-	tm = AutoTable("wstwohnd", true);
+	tm = gamedata->LoadTable("wstwohnd", true);
 	if (tm) {
 		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2440,7 +2440,7 @@ static void InitActorTables()
 	}
 
 	//shield table
-	tm = AutoTable("wsshield", true);
+	tm = gamedata->LoadTable("wsshield", true);
 	if (tm) {
 		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2453,7 +2453,7 @@ static void InitActorTables()
 	}
 
 	//single-handed table
-	tm = AutoTable("wssingle");
+	tm = gamedata->LoadTable("wssingle");
 	if (tm) {
 		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2466,7 +2466,7 @@ static void InitActorTables()
 	}
 
 	//unhardcoded monk bonus table
-	tm = AutoTable("monkbon", true);
+	tm = gamedata->LoadTable("monkbon", true);
 	if (tm) {
 		monkbon_rows = tm->GetRowCount();
 		monkbon_cols = tm->GetColumnCount();
@@ -2483,7 +2483,7 @@ static void InitActorTables()
 	for (int i = 0; i < 20; i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
 	}
-	tm = AutoTable("lvlmodwm", true);
+	tm = gamedata->LoadTable("lvlmodwm", true);
 	if (tm) {
 		int maxrow = tm->GetRowCount();
 		for (int i = 0; i < 20; i++) {
@@ -2500,7 +2500,7 @@ static void InitActorTables()
 	for (int i = 0; i < VCONST_COUNT; i++) {
 		VCMap[i]=i;
 	}
-	tm = AutoTable("vcremap");
+	tm = gamedata->LoadTable("vcremap");
 	if (tm) {
 		int rows = tm->GetRowCount();
 
@@ -2514,7 +2514,7 @@ static void InitActorTables()
 	}
 
 	//initializing the skill->stats conversion table (used in iwd2)
-	tm = AutoTable("skillsta", true);
+	tm = gamedata->LoadTable("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		int colcount = tm->GetColumnCount();
@@ -2537,7 +2537,7 @@ static void InitActorTables()
 	}
 
 	//initializing area flag comments
-	tm = AutoTable("comment");
+	tm = gamedata->LoadTable("comment");
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		afcount = rowcount;
@@ -2553,7 +2553,7 @@ static void InitActorTables()
 	}
 
 	// dexterity modifier for thieving skills
-	tm = AutoTable("skilldex");
+	tm = gamedata->LoadTable("skilldex");
 	if (tm) {
 		int skilldexNCols = tm->GetColumnCount();
 		int skilldexNRows = tm->GetRowCount();
@@ -2573,7 +2573,7 @@ static void InitActorTables()
 	}
 
 	// race modifier for thieving skills
-	tm = AutoTable("skillrac");
+	tm = gamedata->LoadTable("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
 	int subracetable = core->LoadSymbol("subrace");
@@ -2614,7 +2614,7 @@ static void InitActorTables()
 	}
 
 	//difficulty level based modifiers
-	tm = AutoTable("difflvls");
+	tm = gamedata->LoadTable("difflvls");
 	if (tm) {
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
@@ -2627,7 +2627,7 @@ static void InitActorTables()
 	}
 
 	//preload stat derived animation tables
-	tm = AutoTable("avprefix");
+	tm = gamedata->LoadTable("avprefix");
 	delete [] avPrefix;
 	avBase = 0;
 	avCount = -1;
@@ -2645,7 +2645,7 @@ static void InitActorTables()
 			}
 			for (int i = 0; i < avCount; i++) {
 				avPrefix[i].avresref = tm->QueryField(i + 1);
-				avPrefix[i].avtable = AutoTable(avPrefix[i].avresref);
+				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
 				} else {
@@ -2656,7 +2656,7 @@ static void InitActorTables()
 	}
 
 	// races table
-	tm = AutoTable("races");
+	tm = gamedata->LoadTable("races");
 	if (tm && !pstflags) {
 		int racesNRows = tm->GetRowCount();
 
@@ -2684,7 +2684,7 @@ static void InitActorTables()
 	}
 
 	// movement rate adjustments
-	extspeed = AutoTable("moverate", true);
+	extspeed = gamedata->LoadTable("moverate", true);
 
 	// modal actions/state data
 	ReadModalStates();
@@ -2792,7 +2792,7 @@ int Actor::GetWisdomAC() const
 //Returns the personal critical damage type in a binary compatible form (PST)
 int Actor::GetCriticalType() const
 {
-	AutoTable tm("crits", true);
+	AutoTable tm = gamedata->LoadTable("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
@@ -2805,7 +2805,7 @@ int Actor::GetCriticalType() const
 //Plays personal critical damage animation for PST PC's melee attacks
 void Actor::PlayCritDamageAnimation(int type)
 {
-	AutoTable tm("crits");
+	AutoTable tm = gamedata->LoadTable("crits");
 	if (!tm) return;
 	//the ID's are in column 1, selected by specifics by GetCriticalType
 	int row = tm->FindTableValue (1, type);
@@ -3945,7 +3945,7 @@ void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) cons
 
 bool Actor::HasSpecialDeathReaction(const char *deadname) const
 {
-	AutoTable tm("death");
+	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
 	const char *value = tm->QueryField(scriptName.CString(), deadname);
 	return value && value[0] != '0';
@@ -3953,7 +3953,7 @@ bool Actor::HasSpecialDeathReaction(const char *deadname) const
 
 void Actor::ReactToDeath(const char * deadname)
 {
-	AutoTable tm("death");
+	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return;
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
@@ -4003,7 +4003,7 @@ void Actor::GetAreaComment(int areaflag) const
 
 static int CheckInteract(const char *talker, const char *target)
 {
-	AutoTable interact("interact");
+	AutoTable interact = gamedata->LoadTable("interact");
 	if (!interact)
 		return I_NONE;
 	const char *value = interact->QueryField(talker, target);
@@ -8757,7 +8757,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
-	AutoTable tab(anims->ResRefBase.CString());
+	AutoTable tab = gamedata->LoadTable(anims->ResRefBase.CString());
 	if (!tab) return false;
 
 	switch (index) {
@@ -9823,7 +9823,7 @@ void Actor::SetupFistData() const
 	}
 
 	FistRows = 0;
-	AutoTable fist("fistweap");
+	AutoTable fist = gamedata->LoadTable("fistweap");
 	if (fist) {
 		DefaultFist = fist->QueryDefault();
 		FistRows = fist->GetRowCount();
@@ -9866,9 +9866,7 @@ void Actor::SetupFist()
 
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
 	//don't close this table, it can mess with the guiscripts
-	int table = gamedata->LoadTable(resref);
-	if (table == -1) return 0;
-	auto tm = gamedata->GetTable(table);
+	auto tm = gamedata->LoadTable(resref);
 	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {
@@ -10196,7 +10194,7 @@ void Actor::CreateDerivedStatsBG()
 		if (BaseStats[IE_KIT] == KIT_SWASHBUCKLER) {
 			backstabdamagemultiplier = 1;
 		} else {
-			AutoTable tm("backstab");
+			AutoTable tm = gamedata->LoadTable("backstab");
 			//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
 			// assassin's AP_SPCL332 (increase backstab by one) is not effecting this at all,
 			// it's just applied later
@@ -11205,7 +11203,7 @@ int Actor::UpdateAnimationID(bool derived)
 
 	// tables for additive modifiers of the animation id (race, gender, class)
 	for (int i = 0; i < avCount; i++) {
-		const TableMgr *tm = avPrefix[i].avtable.ptr();
+		const AutoTable tm = avPrefix[i].avtable;
 		if (!tm) {
 			return -3;
 		}

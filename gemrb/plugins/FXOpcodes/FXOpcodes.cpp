@@ -4154,7 +4154,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 static void CopyPolymorphStats(Actor *source, Actor *target)
 {
 	if(!polymorph_stats) {
-		AutoTable tab("polystat");
+		AutoTable tab = gamedata->LoadTable("polystat");
 		if (!tab) {
 			polymorph_stats = NULL;
 			polystatcount=0;
@@ -7616,7 +7616,7 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Resource.IsEmpty()) {
 		fx->Resource = "wishcode";
 	}
-	AutoTable tm(fx->Resource);
+	AutoTable tm = gamedata->LoadTable(fx->Resource);
 	if (!tm) {
 		return FX_NOT_APPLIED;
 	}

@@ -4,8 +4,8 @@
 namespace GemRB {
 
 MapReverb::MapReverb (Map& _map) :
-		reverbMapping(AutoTable("area_reverbs"))
-	, reverbs(AutoTable("reverb"))
+		reverbMapping(gamedata->LoadTable("area_reverbs"))
+	, reverbs(gamedata->LoadTable("reverb"))
 	, map(_map)
 	, reverbProfile(EFX_PROFILE_REVERB_INVALID) {
 	MapReverbProperties _properties = {EFX_REVERB_GENERIC, true};

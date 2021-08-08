@@ -88,18 +88,6 @@ ResRef ResRefFromPy(PyObject* obj) {
 	return ResRef();
 }
 
-std::shared_ptr<TableMgr> GetTable(PyObject* obj) {
-	std::shared_ptr<TableMgr> tm;
-
-	PyObject* id = PyObject_GetAttrString(obj, "ID");
-	if (!id) {
-		RuntimeError("Invalid Table reference, no ID attribute.");
-	} else {
-		tm = gamedata->GetTable( PyInt_AsLong( id ) );
-	}
-	return tm;
-}
-
 std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 {
 	std::shared_ptr<SymbolMgr> sm;

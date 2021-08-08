@@ -3069,7 +3069,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		act->SetScript(ResRef(), SCR_GENERAL, true);
 		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
-	AutoTable pdtable("pdialog");
+	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	if (pdtable) {
 		const char* scriptname = act->GetScriptName();
 		ResRef resRef;
@@ -3588,7 +3588,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	AutoTable pdtable("pdialog");
+	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	Actor* act = ( Actor* ) Sender;
 	const char* scriptname = act->GetScriptName();
 	if (pdtable->GetRowIndex( scriptname ) != -1) {
@@ -4622,7 +4622,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4635,7 +4635,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4652,7 +4652,7 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -5908,7 +5908,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
 		const char *basename = "Auto-Save";
-		AutoTable tab("savegame");
+		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
@@ -6960,7 +6960,7 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 // pst spawning
 void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable pcs("bios");
+	AutoTable pcs = gamedata->LoadTable("bios");
 	if (!pcs) {
 		return;
 	}
@@ -7236,7 +7236,7 @@ void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 //the row label column sets the token names
 void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable tm(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tm) {
 		Log(ERROR, "Actions", "Cannot find %s.2da.", parameters->string0Parameter);
 		return;

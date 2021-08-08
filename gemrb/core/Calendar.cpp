@@ -29,7 +29,7 @@ namespace GemRB {
 Calendar::Calendar(void)
 {
 	daysinyear = 0;
-	AutoTable tab("months");
+	AutoTable tab = gamedata->LoadTable("months");
 	if (!tab) {
 		monthnamecount=-1;
 		monthnames = NULL;

@@ -56,7 +56,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Sprite2D.cpp
 	SpriteCover.cpp
 	Store.cpp
-	TableMgr.cpp
 	TileMap.cpp
 	TileOverlay.cpp
 	Variables.cpp

@@ -1313,7 +1313,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		tableResRef = fx->Resource; // gemrb extension
 	}
 
-	AutoTable tab(tableResRef);
+	AutoTable tab = gamedata->LoadTable(tableResRef);
 	if (!tab) {
 		return FX_NOT_APPLIED;
 	}

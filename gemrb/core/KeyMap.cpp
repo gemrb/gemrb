@@ -54,7 +54,7 @@ KeyMap::~KeyMap()
 
 bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 {
-	AutoTable kmtable(tablefile);
+	AutoTable kmtable = gamedata->LoadTable(tablefile);
 
 	if (!kmtable) {
 		return false;

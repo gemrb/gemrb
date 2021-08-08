@@ -73,7 +73,7 @@ struct EquipResRefData {
 };
 
 CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
-	AutoTable Avatars("avatars");
+	AutoTable Avatars = gamedata->LoadTable("avatars");
 	if (!Avatars) {
 		error("CharAnimations", "A critical animation file is missing!\n");
 	}
@@ -130,7 +130,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		return a.AnimID < b.AnimID;
 	});
 
-	AutoTable blood("bloodclr");
+	AutoTable blood = gamedata->LoadTable("bloodclr");
 	if (blood) {
 		int rows = blood->GetRowCount();
 		for(int i=0;i<rows;i++) {
@@ -156,7 +156,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		}
 	}
 
-	AutoTable walk("walksnd");
+	AutoTable walk = gamedata->LoadTable("walksnd");
 	if (walk) {
 		int rows = walk->GetRowCount();
 		for(int i=0;i<rows;i++) {
@@ -186,7 +186,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		}
 	}
 
-	AutoTable stances("stances", true);
+	AutoTable stances = gamedata->LoadTable("stances", true);
 	if (stances) {
 		int rows = stances->GetRowCount();
 		for (int i = 0; i < rows; i++) {
@@ -210,7 +210,7 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		}
 	}
 
-	AutoTable avatarShadows("avatar_shadows");
+	AutoTable avatarShadows = gamedata->LoadTable("avatar_shadows");
 	if (avatarShadows) {
 		int rows = avatarShadows->GetRowCount();
 		for (int i = 0; i < rows; ++i) {

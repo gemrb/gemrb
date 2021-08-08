@@ -147,85 +147,46 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const char *resRef, bool silent)
+AutoTable GameData::LoadTable(const char *tabname, bool silent)
 {
-	int ind = GetTableIndex(resRef);
-	if (ind != -1) {
-		tables[ind].refcount++;
-		return ind;
+	ResRef resRef = tabname;
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
 
-	DataStream* str = GetResource(resRef, IE_2DA_CLASS_ID, silent);
+	DataStream* str = GetResource(tabname, IE_2DA_CLASS_ID, silent);
 	if (!str) {
-		return -1;
+		return nullptr;
 	}
 	PluginHolder<TableMgr> tm = MakePluginHolder<TableMgr>(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
-		return -1;
+		return nullptr;
 	}
 	if (!tm->Open(str)) {
-		return -1;
+		return nullptr;
 	}
-	Table t;
-	t.refcount = 1;
-	t.resRef = resRef;
-	t.tm = tm;
-	ind = -1;
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0) {
-			ind = ( int ) i;
-			break;
-		}
-	}
-	if (ind != -1) {
-		tables[ind] = t;
-		return ind;
-	}
-	tables.push_back( t );
-	return ( int ) tables.size() - 1;
-}
-/** Gets the index of a loaded table, returns -1 on error */
-int GameData::GetTableIndex(const ResRef &resRef) const
-{
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0)
-			continue;
-		if (tables[i].resRef == resRef)
-			return ( int ) i;
-	}
-	return -1;
-}
-/** Gets a Loaded Table by its index, returns NULL on error */
-std::shared_ptr<TableMgr> GameData::GetTable(size_t index) const
-{
-	if (index >= tables.size()) {
-		return {};
-	}
-	if (tables[index].refcount == 0) {
-		return {};
-	}
-	return tables[index].tm;
+	
+	tables[resRef] = tm;
+	return tm;
 }
 
-/** Frees a Loaded Table, returns false on error, true on success */
-bool GameData::DelTable(unsigned int index)
+AutoTable GameData::LoadTable(const ResRef& resRef, bool silent)
 {
-	if (index==0xffffffff) {
-		tables.clear();
-		return true;
+	return LoadTable(resRef.CString(), silent);
+}
+/** Gets the index of a loaded table, returns -1 on error */
+AutoTable GameData::GetTable(const ResRef &resRef) const
+{
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
-	if (index >= tables.size()) {
-		return false;
-	}
-	if (tables[index].refcount == 0) {
-		return false;
-	}
-	tables[index].refcount--;
-	if (tables[index].refcount == 0 && tables[index].tm) {
-		tables[index].tm.reset();
-	}
-	return true;
+	return nullptr;
+}
+
+void GameData::ResetTables()
+{
+	tables.clear();
 }
 
 PaletteHolder GameData::GetPalette(const ResRef& resname)
@@ -541,7 +502,7 @@ void GameData::SaveAllStores()
 
 void GameData::ReadItemSounds()
 {
-	AutoTable itemsnd("itemsnd");
+	AutoTable itemsnd = LoadTable("itemsnd");
 	if (!itemsnd) {
 		return;
 	}
@@ -597,7 +558,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 {
 	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
-		raceTHAC0Bonus = AutoTable("racethac", true);
+		raceTHAC0Bonus = LoadTable("racethac", true);
 		loadedRacialTHAC0 = true;
 	}
 
@@ -612,7 +573,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 bool GameData::HasInfravision(const char *raceName)
 {
 	if (!racialInfravision) {
-		racialInfravision = AutoTable("racefeat", true);
+		racialInfravision = LoadTable("racefeat", true);
 	}
 	if (!raceName) return false;
 
@@ -623,7 +584,7 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
 	static bool loadedSpellAbilityDie = false;
 	if (!loadedSpellAbilityDie) {
-		spellAbilityDie = AutoTable("clssplab", true);
+		spellAbilityDie = LoadTable("clssplab", true);
 		if (!spellAbilityDie) {
 			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
 			return 6;
@@ -641,7 +602,7 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
 	if (!trapSaveBonus) {
-		trapSaveBonus = AutoTable("trapsave", true);
+		trapSaveBonus = LoadTable("trapsave", true);
 	}
 
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
@@ -650,7 +611,7 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 int GameData::GetTrapLimit(Scriptable *trapper)
 {
 	if (!trapLimit) {
-		trapLimit = AutoTable("traplimt", true);
+		trapLimit = LoadTable("traplimt", true);
 	}
 
 	if (trapper->Type != ST_ACTOR) {
@@ -673,7 +634,7 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 int GameData::GetSummoningLimit(ieDword sex)
 {
 	if (!summoningLimit) {
-		summoningLimit = AutoTable("summlimt", true);
+		summoningLimit = LoadTable("summlimt", true);
 	}
 
 	unsigned int row = 1000;
@@ -695,7 +656,7 @@ const Color& GameData::GetColor(const char *row)
 {
 	// preload converted colors
 	if (colors.empty()) {
-		AutoTable colorTable("colors", true);
+		AutoTable colorTable = LoadTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
 			colors[colorTable->GetRowName(r)] = Color(c);
@@ -713,7 +674,7 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 {
 	// preload optimized version, since this gets called each tick several times
 	if (weaponStyleAPRBonusMax.IsZero()) {
-		AutoTable bonusTable("wspatck", true);
+		AutoTable bonusTable = LoadTable("wspatck", true);
 		if (!bonusTable) {
 			weaponStyleAPRBonusMax.w = -1;
 			return 0;
@@ -750,12 +711,12 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
 }
 
-bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const
+bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data)
 {
 	if (!data.empty()) {
 		data.clear();
 	}
-	AutoTable tm(tableName);
+	AutoTable tm = LoadTable(tableName);
 	if (!tm) {
 		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
 		return false;
@@ -775,7 +736,7 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 
 void GameData::ReadSpellProtTable()
 {
-	AutoTable tab("splprot");
+	AutoTable tab = LoadTable("splprot");
 	if (!tab) {
 		return;
 	}

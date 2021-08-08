@@ -72,7 +72,7 @@ struct Spawns {
 
 private:
 	Spawns() noexcept {
-		AutoTable tab("spawngrp", true);
+		AutoTable tab = gamedata->LoadTable("spawngrp", true);
 
 		if (!tab)
 			return;
@@ -746,7 +746,7 @@ ResRef Map::ResolveTerrainSound(const ResRef& resref, const Point &p) const
 		std::map<ResRef, std::array<ResRef, 16>> refs;
 		
 		TerrainSounds() noexcept {
-			AutoTable tm("terrain");
+			AutoTable tm = gamedata->LoadTable("terrain");
 			
 			int rc = tm->GetRowCount() - 2;
 			while (rc--) {

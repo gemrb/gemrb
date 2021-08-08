@@ -30,7 +30,7 @@ using namespace GemRB;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	AutoTable tm("cgtable");
+	AutoTable tm = gamedata->LoadTable("cgtable");
 	if (!tm) {
 		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;

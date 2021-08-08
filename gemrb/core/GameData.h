@@ -50,14 +50,7 @@ class ScriptedAnimation;
 class Spell;
 class Sprite2D;
 class Store;
-class TableMgr;
 class VEFObject;
-
-struct Table {
-	std::shared_ptr<TableMgr> tm;
-	ResRef resRef;
-	unsigned int refcount;
-};
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -84,13 +77,10 @@ public:
 	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const char *ResRef, bool silent=false);
-	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const ResRef& resRef) const;
-	/** Gets a Loaded Table by its index, returns NULL on error */
-	std::shared_ptr<TableMgr> GetTable(size_t index) const;
-	/** Frees a Loaded Table, returns false on error, true on success */
-	bool DelTable(unsigned int index);
+	AutoTable LoadTable(const char *ResRef, bool silent = false);
+	AutoTable LoadTable(const ResRef& resRef, bool silent = false);
+	AutoTable GetTable(const ResRef& resRef) const;
+	void ResetTables();
 
 	PaletteHolder GetPalette(const ResRef& resname);
 
@@ -137,7 +127,7 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
-	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const;
+	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -152,7 +142,7 @@ private:
 	Cache EffectCache;
 	ResRefMap<PaletteHolder> PaletteCache;
 	Factory* factory;
-	std::vector<Table> tables;
+	ResRefMap<AutoTable> tables;
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
 	std::map<ieDword, std::vector<ResRef>> ItemSounds;

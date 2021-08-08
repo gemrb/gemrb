@@ -107,7 +107,7 @@ struct PathFinderCosts {
 	
 private:
 	PathFinderCosts() noexcept {
-		AutoTable tm("terrain");
+		AutoTable tm = gamedata->LoadTable("terrain");
 
 		if (!tm) {
 			return;
@@ -137,7 +137,7 @@ static int GetTrackString(const ResRef &areaName)
 	bool trackflag = displaymsg->HasStringReference(STR_TRACKING);
 
 	if (tracks.empty()) {
-		AutoTable tm("tracking", true);
+		AutoTable tm = gamedata->LoadTable("tracking", true);
 		if (!tm)
 			return -1;
 		int trackcount = tm->GetRowCount();

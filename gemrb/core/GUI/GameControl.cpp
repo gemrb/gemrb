@@ -145,7 +145,7 @@ GameControl::~GameControl()
 //so it doesn't cause problems with the original engine
 void GameControl::ReadFormations() const
 {
-	AutoTable tab("formatio");
+	AutoTable tab = gamedata->LoadTable("formatio");
 	if (!tab) {
 		// fallback
 		formationcount = 1;

@@ -374,7 +374,7 @@ static void ReleaseMemoryCRE()
 
 static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 {
-	AutoTable tab(tableRef);
+	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
 	int column = tab->GetColumnCount() - 1;
@@ -390,7 +390,7 @@ static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 // different tables, but all use listspll.2da for the spell indices
 static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 {
-	AutoTable tab(tableRef);
+	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
 	int lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
@@ -798,7 +798,7 @@ void CREImporter::SetupColor(ieDword &stat) const
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
 	ieDword RandRows = 0;
 	if (randcolors.empty()) {
-		AutoTable rndcol("randcolr", true);
+		AutoTable rndcol = gamedata->LoadTable("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();

@@ -112,7 +112,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	CurrentLink = 0;
 
 	//loading master areas
-	AutoTable table = AutoTable("mastarea");
+	AutoTable table = gamedata->LoadTable("mastarea");
 	if (table) {
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
@@ -125,7 +125,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	std::fill(std::begin(restmovies), std::end(restmovies), ResRef("********"));
 	std::fill(std::begin(daymovies), std::end(daymovies), ResRef("********"));
 	std::fill(std::begin(nightmovies), std::end(nightmovies), ResRef("********"));
-	table = AutoTable("restmov");
+	table = gamedata->LoadTable("restmov");
 	if (table) {
 		for(int i=0;i<8;i++) {
 			restmovies[i] = table->QueryField(i, 0);
@@ -139,7 +139,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	if (Expansion == 5) { // tob is special
 		tn = "npclvl25";
 	}
-	table = AutoTable(tn);
+	table = gamedata->LoadTable(tn);
 	if (table) {
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
@@ -423,8 +423,8 @@ void Game::InitActorPos(Actor *actor) const
 	const char *mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
 
 	unsigned int ip = (unsigned int) (actor->InParty-1);
-	AutoTable start("start");
-	AutoTable strta("startpos");
+	AutoTable start = gamedata->LoadTable("start");
+	AutoTable strta = gamedata->LoadTable("startpos");
 
 	if (!start || !strta) {
 		error("Game", "Game is missing character start data.\n");
@@ -449,7 +449,7 @@ void Game::InitActorPos(Actor *actor) const
 	actor->HomeLocation = actor->Pos;
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
-	strta = AutoTable("startare");
+	strta = gamedata->LoadTable("startare");
 	if (strta) {
 		actor->Area = MakeLowerCaseResRef(strta->QueryField(strta->GetRowIndex(area), 0));
 	} else {
@@ -487,7 +487,7 @@ int Game::JoinParty(Actor* actor, int join)
 		//if the protagonist has the same portrait replace it
 		const Actor *prot = GetPC(0, false);
 		if (prot && (actor->SmallPortrait == prot->SmallPortrait || actor->LargePortrait == prot->LargePortrait)) {
-			AutoTable ptab("portrait");
+			AutoTable ptab = gamedata->LoadTable("portrait");
 			if (ptab) {
 				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT");
 				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT");
@@ -1158,7 +1158,7 @@ void Game::SetFamiliar(const ResRef& familiar, size_t index)
 //reading the challenge rating table for iwd2 (only when needed)
 void Game::LoadCRTable()
 {
-	AutoTable table("moncrate");
+	AutoTable table = gamedata->LoadTable("moncrate");
 	if (table) {
 		int maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
@@ -1621,7 +1621,7 @@ void Game::TextDream()
 		&& gamedata->Exists(TextScreen, IE_2DA_CLASS_ID)) {
 
 		// give innate spell to protagonist
-		AutoTable drm(TextScreen);
+		AutoTable drm = gamedata->LoadTable(TextScreen);
 		if (drm) {
 			const char *repLabel;
 			if (Reputation >= 100)
@@ -2259,7 +2259,7 @@ bool Game::IsTimestopActive() const
 bool Game::RandomEncounter(ResRef &BaseArea)
 {
 	if (bntrows<0) {
-		AutoTable table("bntychnc");
+		AutoTable table = gamedata->LoadTable("bntychnc");
 
 		if (table) {
 			bntrows = table->GetRowCount();

@@ -20,13 +20,15 @@
 
 #include "ItemMgr.h"
 
+#include "GameData.h"
+
 namespace GemRB {
 
 ItemMgr::ItemMgr(void)
 {
-	tooltipTable = AutoTable("tooltip", true);
-	exclusionTable = AutoTable("itemexcl", true);
-	dialogTable = AutoTable("itemdial", true);
+	tooltipTable = gamedata->LoadTable("tooltip", true);
+	exclusionTable = gamedata->LoadTable("itemexcl", true);
+	dialogTable = gamedata->LoadTable("itemdial", true);
 }
 
 }

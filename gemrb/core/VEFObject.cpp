@@ -94,7 +94,7 @@ void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, 
 
 ScriptedAnimation *VEFObject::CreateCell(const ResRef &res, ieDword start, ieDword end)
 {
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(res, false);
 	if (sca && end!=0xffffffff) {
 		sca->SetDefaultDuration(AI_UPDATE_TIME*(end-start) );
 	}
@@ -195,7 +195,7 @@ void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlag
 void VEFObject::Load2DA(const ResRef &resource)
 {
 	Init();
-	AutoTable tab(resource);
+	AutoTable tab = gamedata->LoadTable(resource);
 
 	if (!tab) {
 		return;

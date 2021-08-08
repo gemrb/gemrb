@@ -255,7 +255,7 @@ bool Init_EffectQueue()
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 	initialized = 1;
 
-	AutoTable efftextTable("efftext");
+	AutoTable efftextTable = gamedata->LoadTable("efftext");
 
 	int eT = core->LoadSymbol( "effects" );
 	if (eT < 0) {

@@ -1448,7 +1448,7 @@ void InitializeIEScript()
 	int oT = core->LoadSymbol( "object" );
 	int gaT = core->LoadSymbol( "gemact" );
 	int gtT = core->LoadSymbol( "gemtrig" );
-	AutoTable objNameTable("script");
+	AutoTable objNameTable = gamedata->LoadTable("script");
 	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
 		error("GameScript", "A critical scripting file is missing!\n");
 	}

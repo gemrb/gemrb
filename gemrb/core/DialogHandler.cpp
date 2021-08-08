@@ -232,7 +232,7 @@ void DialogHandler::EndDialog(bool try_to_break)
 // (we could cache the entries, for example)
 static Actor* FindBanter(const Scriptable* target, const ResRef& dialog)
 {
-	AutoTable pdtable("interdia");
+	AutoTable pdtable = gamedata->LoadTable("interdia");
 	if (!pdtable) return nullptr;
 
 	int col;

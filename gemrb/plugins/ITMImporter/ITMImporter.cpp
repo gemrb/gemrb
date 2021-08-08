@@ -40,7 +40,7 @@ std::map<char,int> zzmap;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	AutoTable tm("proftype");
+	AutoTable tm = gamedata->LoadTable("proftype");
 	if (!tm) {
 		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
@@ -52,7 +52,7 @@ static void Initializer()
 	}
 
 	// check for iwd1 zz-weapon bonus table
-	AutoTable tm2("zzweaps");
+	AutoTable tm2 = gamedata->LoadTable("zzweaps");
 	int indR = core->LoadSymbol("race");
 	auto sm = core->GetSymbol(indR);
 	if (!tm2 || !sm || indR == -1) {

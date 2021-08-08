@@ -691,15 +691,16 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 	int noerror = 0;
 	PARSE_ARGS( args, "s|i", &tablename, &noerror );
 
-	int ind = gamedata->LoadTable( tablename );
-	if (ind == -1) {
+	auto tab = gamedata->LoadTable(tablename);
+	if (tab == nullptr) {
 		if (noerror) {
 			Py_RETURN_NONE;
 		} else {
 			return RuntimeError("Can't find resource");
 		}
 	}
-	return gs->ConstructObject("Table", ind);
+	
+	return CObject<TableMgr, std::shared_ptr>(tab);
 }
 
 PyDoc_STRVAR( GemRB_Table_GetValue__doc,
@@ -739,7 +740,7 @@ static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 		return AttributeError("RowIndex/RowString and ColIndex/ColString must be the same type.");
 	}
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	const char* ret;
@@ -814,7 +815,7 @@ static PyObject* GemRB_Table_FindValue(PyObject* self, PyObject* args)
 		PyErr_Clear(); //clearing the exception
 	}
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	if (col == -1) {
@@ -849,7 +850,7 @@ static PyObject* GemRB_Table_GetRowIndex(PyObject* self, PyObject* args)
 	char* rowname;
 	PARSE_ARGS( args, "Os", &self, &rowname );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	int row = tm->GetRowIndex( rowname );
@@ -880,7 +881,7 @@ static PyObject* GemRB_Table_GetRowName(PyObject* self, PyObject* args)
 	int row;
 	PARSE_ARGS( args, "Oi", &self, &row );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	const char* str = tm->GetRowName( row );
@@ -912,7 +913,7 @@ static PyObject* GemRB_Table_GetColumnIndex(PyObject* self, PyObject* args)
 	char* colname;
 	PARSE_ARGS( args, "Os", &self, &colname );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	int col = tm->GetColumnIndex( colname );
@@ -943,7 +944,7 @@ static PyObject* GemRB_Table_GetColumnName(PyObject* self, PyObject* args)
 	int col;
 	PARSE_ARGS( args, "Oi", &self, &col );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	const char* str = tm->GetColumnName( col );
@@ -972,7 +973,7 @@ static PyObject* GemRB_Table_GetRowCount(PyObject* self, PyObject* args)
 {
 	PARSE_ARGS( args, "O", &self );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetRowCount() );
@@ -1001,7 +1002,7 @@ static PyObject* GemRB_Table_GetColumnCount(PyObject* self, PyObject* args)
 	int row = 0;
 	PARSE_ARGS( args, "O|i", &self, &row );
 
-	auto tm = GetTable(self);
+	AutoTable tm = CObject<TableMgr, std::shared_ptr>(self);
 	ABORT_IF_NULL(tm);
 
 	return PyInt_FromLong( tm->GetColumnCount(row) );
@@ -2842,7 +2843,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 	const char *resref;
 	PARSE_ARGS( args,  "s", &resref);
 
-	AutoTable newarea(resref);
+	AutoTable newarea = gamedata->LoadTable(resref);
 	if (!newarea) {
 		return RuntimeError( "2da not found!\n");
 	}
@@ -2883,7 +2884,7 @@ static PyObject* GemRB_AddNewArea(PyObject * /*self*/, PyObject* args)
 		}
 		unsigned int total = linksto+local;
 
-		AutoTable newlinks(ltab);
+		AutoTable newlinks = gamedata->LoadTable(ltab);
 		if (!newlinks || total != newlinks->GetRowCount() ) {
 			return RuntimeError( "invalid links 2da!");
 		}
@@ -7838,7 +7839,7 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 
 static void ReadUsedItems()
 {
-	AutoTable table("item_use");
+	AutoTable table = gamedata->LoadTable("item_use");
 	if (table) {
 		size_t UsedItemsCount = table->GetRowCount();
 		UsedItems.resize(UsedItemsCount);
@@ -7862,7 +7863,7 @@ static void ReadUsedItems()
 
 static void ReadSpecialItems()
 {
-	AutoTable tab("itemspec");
+	AutoTable tab = gamedata->LoadTable("itemspec");
 	if (tab) {
 		ieDword SpecialItemsCount = tab->GetRowCount();
 		SpecialItems.resize(SpecialItemsCount);
@@ -7877,7 +7878,7 @@ static void ReadSpecialItems()
 static ieStrRef GetSpellDesc(const ResRef& CureResRef)
 {
 	if (StoreSpells.empty()) {
-		AutoTable tab("speldesc");
+		AutoTable tab = gamedata->LoadTable("speldesc");
 		if (tab) {
 			ieDword StoreSpellsCount = tab->GetRowCount();
 			StoreSpells.resize(StoreSpellsCount);
@@ -10500,11 +10501,7 @@ static void ReadActionButtons()
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
 	memset(GUIEvent, 0, sizeof(GUIEvent));
-	int table = gamedata->LoadTable( "guibtact" );
-	if (table<0) {
-		return;
-	}
-	auto tab = gamedata->GetTable( table );
+	auto tab = gamedata->LoadTable( "guibtact" );
 	for (unsigned int i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
@@ -10517,7 +10514,6 @@ static void ReadActionButtons()
 		GUIResRef[i] = tab->QueryField(i, 5);
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
-	gamedata->DelTable( table );
 }
 
 static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
@@ -11907,14 +11903,14 @@ static PyObject* GemRB_RunRestScripts(PyObject * /*self*/, PyObject* /*args*/)
 	// check if anyone wants to banter first (bg2)
 	static int dreamer = -2;
 	if (dreamer == -2) {
-		AutoTable pdtable("pdialog");
+		AutoTable pdtable = gamedata->LoadTable("pdialog");
 		dreamer = pdtable->GetColumnIndex("DREAM_SCRIPT_FILE");
 	}
 	if (dreamer < 0) {
 		return PyInt_FromLong(dreamed);
 	}
 
-	AutoTable pdtable("pdialog");
+	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	int ii = game->GetPartySize(true); // party size, only alive
 	bool bg2expansion = core->GetGame()->Expansion == 5;
 	while (ii--) {

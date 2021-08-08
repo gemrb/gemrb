@@ -46,7 +46,7 @@ static void TranslateColor(const char *value, Color &color)
 
 static void InitSparks()
 {
-	AutoTable tab("sprklclr");
+	AutoTable tab = gamedata->LoadTable("sprklclr");
 	if (!tab)
 		return;
 

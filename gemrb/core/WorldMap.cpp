@@ -576,7 +576,7 @@ void WorldMap::SetAreaStatus(const ResRef& areaName, int Bits, int Op) const
 
 void WorldMap::UpdateReachableAreas() const
 {
-	AutoTable tab("worlde", true);
+	AutoTable tab = gamedata->LoadTable("worlde", true);
 	if (!tab) {
 		return;
 	}

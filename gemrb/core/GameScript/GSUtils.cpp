@@ -92,7 +92,7 @@ void InitScriptTables()
 {
 	//initializing the happiness table
 	{
-	AutoTable tab("happy");
+	AutoTable tab = gamedata->LoadTable("happy");
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
@@ -103,7 +103,7 @@ void InitScriptTables()
 	}
 
 	//initializing the reaction mod. reputation table
-	AutoTable rmr("rmodrep");
+	AutoTable rmr = gamedata->LoadTable("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
 			rmodrep[reputation] = strtosigned<int>(rmr->QueryField(0, reputation));
@@ -111,7 +111,7 @@ void InitScriptTables()
 	}
 
 	//initializing the reaction mod. charisma table
-	AutoTable rmc("rmodchr");
+	AutoTable rmc = gamedata->LoadTable("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
 			rmodchr[charisma] = strtosigned<int>(rmc->QueryField(0, charisma));
@@ -1189,7 +1189,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			const char* scriptingname = scr->GetScriptName();
 
 			/* banter dialogue */
-			pdtable = AutoTable("interdia");
+			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
 				//5 is the magic number for the ToB expansion
 				if (game->Expansion==5) {
@@ -2398,7 +2398,7 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 
 Point GetEntryPoint(const char *areaname, const char *entryname)
 {
-	AutoTable tab("entries");
+	AutoTable tab = gamedata->LoadTable("entries");
 	if (!tab) {
 		return {};
 	}
@@ -2457,7 +2457,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
-	AutoTable tm("wish");
+	AutoTable tm = gamedata->LoadTable("wish");
 	if (!tm) {
 		Log(ERROR, "GameScript", "Cannot find wish.2da.");
 		return;
@@ -2554,7 +2554,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 		return polygons[index];
 	}
 	resRef.SNPrintF("ISLAND%02d", index);
-	AutoTable tm(resRef);
+	AutoTable tm = gamedata->LoadTable(resRef);
 	if (!tm) {
 		return NULL;
 	}
@@ -2859,9 +2859,9 @@ void AddXPCore(Action *parameters, bool divide)
 	AutoTable xptable;
 
 	if (core->HasFeature(GF_HAS_EXPTABLE)) {
-		xptable = AutoTable("exptable");
+		xptable = gamedata->LoadTable("exptable");
 	} else {
-		xptable = AutoTable("xplist");
+		xptable = gamedata->LoadTable("xplist");
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {
