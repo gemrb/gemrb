@@ -186,7 +186,7 @@ static const ScriptingRefBase* GetScriptingRef(PyObject* obj) {
 		RuntimeError("Invalid Scripting reference, must have SCRIPT_GROUP attribute.");
 		return NULL;
 	}
-	ScriptingGroup_t group = PyString_AsString(attr);
+	ScriptingGroup_t group = static_cast<const char*>(PyString_AsString(attr));
 	Py_DecRef(attr);
 
 	return gs->GetScripingRef(group, id);
