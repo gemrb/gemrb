@@ -2304,7 +2304,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			ab->SetBase(IE_XPVALUE, 0);
 		}
 		if (fx) {
-			ApplyEffect(fx, ab, Owner);
+			ApplyEffect(new Effect(*fx), ab, Owner);
 		}
 
 		//this check should happen after the fact
@@ -2314,6 +2314,8 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 
 	}
+	
+	delete fx;
 	return ab;
 }
 
