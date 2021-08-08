@@ -1674,7 +1674,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
 	int mergestrings = actionflags[newAction->actionID]&AF_MERGESTRINGS;
-	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
+	int objectCount = (newAction->actionID == 1) ? 0 : 1; // only object 2 and 3 are used by actions, 1 being reserved for ActionOverride
 	int stringsCount = 0;
 	int intCount = 0;
 	if (actionflags[newAction->actionID]&AF_DIRECT) {
@@ -1717,7 +1717,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			break;
 
 			case 'a':
-			//Action
+			// Action - only ActionOverride takes such a parameter
 			{
 				SKIP_ARGUMENT();
 				char action[257];
