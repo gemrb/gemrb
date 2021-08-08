@@ -369,7 +369,7 @@ void Map::MoveToNewArea(const ResRef &area, const char *entrance, unsigned int d
 	//make a random pick
 
 	Game* game = core->GetGame();
-	if (EveryOne==CT_WHOLE) {
+	if (EveryOne & CT_GO_CLOSER) {
 		//copy the area name if it exists on the worldmap
 		unsigned int index;
 
