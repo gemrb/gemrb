@@ -151,11 +151,15 @@ public:
 	FixedSizeString(const FixedSizeString&) noexcept = default;
 	FixedSizeString& operator=(const FixedSizeString&) noexcept = default;
 	
-	char operator[](size_t i) const noexcept {
+	template<typename T>
+	typename std::enable_if<std::is_integral<T>::value, char>::type
+	operator[](T i) const noexcept {
 		return str[i];
 	}
 	
-	char& operator[](size_t i) noexcept {
+	template<typename T>
+	typename std::enable_if<std::is_integral<T>::value, char&>::type
+	operator[](T i) noexcept {
 		return str[i];
 	}
 	
