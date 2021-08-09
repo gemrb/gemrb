@@ -66,7 +66,7 @@ public:
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 		const Point&, unsigned int flags = 0, tick_t *length = 0) override;
-	int CreateStream(Holder<SoundMgr>) override;
+	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	bool Play() override;
 	bool Stop() override;
 	bool Pause() override { return true; } /*not implemented*/
@@ -96,7 +96,7 @@ private:
 	Mix_Chunk* loadSound(const char *ResRef, tick_t &time_length);
 
 	Point listenerPos;
-	Holder<SoundMgr> MusicReader;
+	std::shared_ptr<SoundMgr> MusicReader;
 
 	bool MusicPlaying;
 	unsigned int curr_buffer_offset;

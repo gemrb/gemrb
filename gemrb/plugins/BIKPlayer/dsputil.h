@@ -33,9 +33,9 @@
 #include "common.h"
 
 /* dct code */
-typedef short DCTELEM;
-typedef int DWTELEM;
-typedef short IDWTELEM;
+using DCTELEM = short;
+using DWTELEM = int;
+using IDWTELEM = short;
 
 /**
  * Scantable.
@@ -74,7 +74,7 @@ extern int mm_flags;
 
 /* NOTE: soon integer code will be added, so you must use the
    FFTSample type */
-typedef float FFTSample;
+using FFTSample = float;
 
 struct MDCTContext;
 

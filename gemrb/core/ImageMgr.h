@@ -23,7 +23,6 @@
 
 #include "exports.h"
 
-#include "Bitmap.h"
 #include "Resource.h"
 #include "Sprite2D.h"
 #include "System/DataStream.h"
@@ -38,10 +37,10 @@ class ImageFactory;
 class GEM_EXPORT ImageMgr : public Resource {
 public:
 	static const TypeID ID;
+	
 public:
 	/** Returns a \ref Sprite2D containing the image. */
 	virtual Holder<Sprite2D> GetSprite2D() = 0;
-	virtual Bitmap* GetBitmap();
 	/**
 	 * Returns image palette.
 	 *

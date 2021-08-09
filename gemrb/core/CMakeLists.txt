@@ -6,7 +6,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Animation.cpp
 	AnimationFactory.cpp
 	Audio.cpp
-	Bitmap.cpp
 	Cache.cpp
 	Calendar.cpp
 	CharAnimations.cpp
@@ -57,8 +56,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Sprite2D.cpp
 	SpriteCover.cpp
 	Store.cpp
-	TableMgr.cpp
-	Tile.cpp
 	TileMap.cpp
 	TileOverlay.cpp
 	Variables.cpp

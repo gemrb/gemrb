@@ -22,11 +22,10 @@
 #define SCRIPTENGINE_H
 
 #include "Plugin.h"
-#include "Resource.h"
+#include "System/String.h"
 
 #include <cstdint>
 #include <map>
-#include <string>
 #include <typeinfo>
 #include <vector>
 
@@ -36,6 +35,8 @@ class Point;
 
 using ScriptingId = uint64_t;
 using ScriptingClassId = std::string;
+using ScriptingGroup_t = FixedSizeString<15, strnicmp>;
+static_assert(sizeof(ScriptingGroup_t) <= 16, "Please try to keep this sensibly small. 16 bytes fits in 2 64bit registers.");
 
 class ScriptingRefBase {
 public:
@@ -47,7 +48,7 @@ public:
 	virtual ~ScriptingRefBase() = default;
 
 	// key to separate groups of objects for faster searching and id collision prevention
-	virtual const ResRef& ScriptingGroup() const=0;
+	virtual const ScriptingGroup_t& ScriptingGroup() const=0;
 	// class to instantiate on the script side (Python)
 	virtual ScriptingClassId ScriptingClass() const=0;
 };
@@ -71,19 +72,19 @@ public:
 	using ScriptingDefinitions = std::map<ScriptingId, const ScriptingRefBase*>;
 	
 private:
-	using ScriptingDict = std::map<ResRef, ScriptingDefinitions>;
+	using ScriptingDict = std::map<ScriptingGroup_t, ScriptingDefinitions>;
 	static ScriptingDict GUIDict;
 
 public:
 	static bool RegisterScriptingRef(const ScriptingRefBase* ref);
 	static bool UnregisterScriptingRef(const ScriptingRefBase* ref);
 
-	static ScriptingDefinitions GetScriptingGroup(ResRef groupId)
+	static ScriptingDefinitions GetScriptingGroup(ScriptingGroup_t groupId)
 	{
 		return GUIDict[groupId];
 	}
 
-	static const ScriptingRefBase* GetScripingRef(ResRef group, ScriptingId id)
+	static const ScriptingRefBase* GetScripingRef(ScriptingGroup_t group, ScriptingId id)
 	{
 		const ScriptingRefBase* ref = NULL;
 		ScriptingDefinitions::iterator it = GUIDict[group].find(id);

@@ -58,7 +58,7 @@ bool WEDImporter::Open(DataStream* stream)
 	str->ReadDword(SecHeaderOffset);
 	str->ReadDword(DoorsOffset);
 	str->ReadDword(DoorTilesOffset);
-	// currently unused fields from the original
+	// currently unused fields from the original; likely unused completely — even commented out in wed.go implementation
 	//   WORD    nVisiblityRange;
 	//   WORD    nChanceOfRain; - likely unused, since it's present in the ARE file
 	//   WORD    nChanceOfFog; - most likely unused, since it's present in the ARE file
@@ -92,14 +92,13 @@ bool WEDImporter::Open(DataStream* stream)
 
 int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) const
 {
-	char res[9];
 	int usedoverlays = 0;
 
-	memcpy(res, overlays->TilesetResRef, 9);
-	size_t len = strlen(res);
+	ResRef res = overlays->TilesetResRef;
+	uint8_t len = res.CStrLen();
 	// in BG1 extended night WEDs alway reference the day TIS instead of the matching night TIS
 	if (ExtendedNight && len == 6) {
-		strcat(res, "N");
+		res[len] = 'N';
 		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
 			res[len] = '\0';
 		} else {
@@ -107,7 +106,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 		}
 	}
 	if (rain && len < 8) {
-		strcat(res, "R");
+		res[len] = 'R';
 		//no rain tileset available, rolling back
 		if (!gamedata->Exists(res, IE_TIS_CLASS_ID)) {
 			res[len] = '\0';
@@ -119,7 +118,7 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 	}
 	PluginHolder<TileSetMgr> tis = MakePluginHolder<TileSetMgr>(IE_TIS_CLASS_ID);
 	tis->Open( tisfile );
-	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
+	auto over = MakeHolder<TileOverlay>(Size(overlays->Width, overlays->Height));
 	for (int y = 0; y < overlays->Height; y++) {
 		for (int x = 0; x < overlays->Width; x++) {
 			str->Seek( overlays->TilemapOffset +
@@ -138,30 +137,30 @@ int WEDImporter::AddOverlay(TileMap *tm, const Overlay *overlays, bool rain) con
 			}
 			str->Seek( overlays->TILOffset + ( startindex * 2 ),
 				GEM_STREAM_START );
-			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
-			str->Read( indices, count * sizeof(ieWord) );
+			std::vector<ieWord> indices(count);
+			str->Read(&indices[0], count * sizeof(ieWord));
 			if( DataStream::BigEndian()) {
-				swabs(indices, count * sizeof(ieWord));
+				swabs(&indices[0], count * sizeof(ieWord));
 			}
 			Tile* tile;
 			if (secondary == 0xffff) {
-				tile = tis->GetTile( indices, count );
+				tile = tis->GetTile(indices);
 			} else {
-				tile = tis->GetTile( indices, 1, &secondary );
-				tile->anim[1]->fps = animspeed;
+				tile = tis->GetTile(indices, &secondary);
+				tile->GetAnimation(1)->fps = animspeed;
 			}
-			tile->anim[0]->fps = animspeed;
+			tile->GetAnimation(0)->fps = animspeed;
 			tile->om = overlaymask;
 			usedoverlays |= overlaymask;
-			over->AddTile( tile );
-			free( indices );
+			over->AddTile(std::move(*tile));
+			delete tile;
 		}
 	}
 	
 	if (rain) {
-		tm->AddRainOverlay( over );
+		tm->AddRainOverlay(std::move(over));
 	} else {
-		tm->AddOverlay( over );
+		tm->AddOverlay(std::move(over));
 	}
 	return usedoverlays;
 }
@@ -305,7 +304,7 @@ void WEDImporter::ReadWallPolygons()
 	for (ieDword i=0; i < polygonCount; i++) {
 		str->ReadDword(PolygonHeaders[i].FirstVertex);
 		str->ReadDword(PolygonHeaders[i].CountVertex);
-		str->ReadWord(PolygonHeaders[i].Flags);
+		str->ReadWord(PolygonHeaders[i].Flags); // two bytes: mode and height in the original bg2
 		str->ReadWord(PolygonHeaders[i].MinX);
 		str->ReadWord(PolygonHeaders[i].MaxX);
 		str->ReadWord(PolygonHeaders[i].MinY);

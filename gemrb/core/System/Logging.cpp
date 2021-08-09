@@ -47,7 +47,7 @@ std::unique_ptr<Logger> logger;
 void ToggleLogging(bool enable)
 {
 	if (enable && logger == nullptr) {
-		logger = std::unique_ptr<Logger>(new Logger(writers));
+		logger = make_unique<Logger>(writers);
 	} else if (!enable) {
 		logger = nullptr;
 	}

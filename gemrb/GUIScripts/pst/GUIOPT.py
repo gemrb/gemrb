@@ -414,7 +414,7 @@ def keys_setup_page (Window, pageno):
 
 			Label = Window.GetControl (0x10000041 + i)
 			Label.SetText (label)
-			Label.SetTextColor ({'r' : 0, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 0, 'g' : 255, 'b' : 255})
 		else:
 			Label = Window.GetControl (0x10000005 + i)
 			Label.SetText (key)
@@ -435,14 +435,14 @@ def OnActionLabelPress (Window):
 
 	if last_key_action != None:
 		Label = Window.GetControl (0x10000005 + last_key_action)
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		Label = Window.GetControl (0x10000041 + last_key_action)
-		Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+		Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		
 	Label = Window.GetControl (0x10000005 + i)
-	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	Label = Window.GetControl (0x10000041 + i)
-	Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+	Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 
 	last_key_action = i
 
@@ -471,6 +471,7 @@ def OpenMoviesWindow ():
 	# movie list
 	List = Window.GetControl (0)
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
+	GemRB.SetVar ('SelectedMovie', 0)
 	List.SetOptions([MovieTable.GetValue (i, 0) for i in range (MovieTable.GetRowCount ())], 'SelectedMovie', -1)
 
 	Window.ShowModal (MODAL_SHADOW_BLACK)
@@ -478,11 +479,6 @@ def OpenMoviesWindow ():
 ###################################################
 def OnPlayMoviePress ():
 	selected = GemRB.GetVar ('SelectedMovie')
-
-	# FIXME: This should not happen, when the PlayMovie button gets
-	#   properly disabled/enabled, but it does not now
-	if selected == -1:
-		return
 	
 	MovieTable = GemRB.LoadTable ("MOVIDESC")
 	key = MovieTable.GetRowName (selected)

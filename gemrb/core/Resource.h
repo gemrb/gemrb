@@ -30,110 +30,38 @@
 #include "Plugin.h"
 #include "System/String.h"
 
-#include <cstdarg>
+#include <unordered_map>
 
 namespace GemRB {
 
 /** Resource reference */
 class DataStream;
 
-class ResRef {
-	char ref[9] = {'\0'};
-public:
-	ResRef() = default;
-	
-	ResRef(std::nullptr_t) = delete;
+// ResRef is case insensitive, but the originals weren't always
+// in some cases we need lower/upper case for save compatibility with originals
+// so we provide factories the create ResRef with the required case
+inline ResRef MakeLowerCaseResRef(const char* str) {
+	if (!str) return ResRef();
 
-	ResRef(const char* str) {
-		operator=(str);
-	};
+	char ref[9];
+	strnlwrcpy(ref, str, sizeof(ref) - 1);
+	return ResRef(ref);
+}
 
-	ResRef(const ResRef& rhs) = default;
-	
-	void Reset() {
-		memset(ref, 0, sizeof(ref));
-	}
-	
-	// ResRef is case insensitive, but the originals weren't always
-	// in some cases we need lower/upper case for save compatibility with originals
-	// so we provide factories the create ResRef with the required case
-	static ResRef MakeLowerCase(const char* str) {
-		if (!str) return ResRef();
+inline ResRef MakeUpperCaseResRef(const char* str) {
+	if (!str) return ResRef();
 
-		char ref[9];
-		strnlwrcpy(ref, str, sizeof(ref) - 1);
-		return ref;
-	}
-	
-	static ResRef MakeUpperCase(const char* str) {
-		if (!str) return ResRef();
+	char ref[9];
+	strnuprcpy(ref, str, sizeof(ref) - 1);
+	return ResRef(ref);
+}
 
-		char ref[9];
-		strnuprcpy(ref, str, sizeof(ref) - 1);
-		return ref;
-	}
+inline bool IsStar(const ResRef& resref) {
+	return resref[0] == '*';
+}
 
-	void SNPrintF(const char* format, ...) {
-		va_list args;
-		va_start(args, format);
-		vsnprintf(ref, sizeof(ref), format, args);
-		va_end(args);
-	}
-
-	ResRef& operator=(const ResRef& rhs) = default;
-	
-	ResRef& operator=(const char* str) {
-		if (str == NULL) {
-			Reset();
-		} else {
-			strncpy(ref, str, sizeof(ref) - 1);
-			ref[sizeof(ref)-1] = '\0';
-		}
-		
-		return *this;
-	}
-
-	struct Hash
-	{
-		size_t operator() (const ResRef &) const;
-	};
-	friend struct Hash;
-
-	bool IsEmpty() const {
-		return (ref[0] == '\0');
-	}
-
-	bool IsStar() const {
-		return (ref[0] == '*');
-	}
-
-	const char* CString() const { return ref; }
-
-	operator const char*() const {
-		return (ref[0] == '\0') ? NULL : ref;
-	}
-
-	// Case insensitive
-	bool operator<(const ResRef& rhs) const {
-		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) < 0;
-	};
-
-	bool operator==(const ResRef& rhs) const {
-		return strnicmp(ref, rhs.CString(), sizeof(ref)-1) == 0;
-	};
-
-	bool operator!=(const ResRef& rhs) const {
-		return !operator==(rhs);
-	};
-
-	bool operator==(const char* str) const {
-		return strnicmp(ref, str, sizeof(ref)-1) == 0;
-	};
-
-	bool operator!=(const char* str) const {
-		return !operator==(str);
-	};
-};
+template <typename T>
+using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
 
 /**
  * Base class for all GemRB resources

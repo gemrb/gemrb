@@ -372,7 +372,8 @@ def GetMageSpells (Kit, Alignment, Level, baseClass = -1):
 		return GetIWD2Spells (Kit, Usability, Level, baseClass)
 
 	SpellsTable = GemRB.LoadTable ("spells")
-	for i in range(SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)):
+	SpellCount = SpellsTable.GetValue ("MAGE", str(Level), GTV_INT)
+	for i in range(SpellCount):
 		SpellName = "SPWI%d%02d"%(Level,i+1)
 		ms = GemRB.GetSpell (SpellName, 1)
 		if ms == None:

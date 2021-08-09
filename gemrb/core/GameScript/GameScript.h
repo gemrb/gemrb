@@ -123,7 +123,9 @@ class StringBuffer;
 #define SC_AURA_CHECK   32
 #define SC_NOINTERRUPT  64
 
-#define ACF_REALLOW_SCRIPTS 1
+#define ACF_OVERRIDE 1 // was this action invoked via ActionOverride?
+#define ACF_REALLOW_SCRIPTS 0x1000 // gemrb internal
+#define ACF_FOLLOW_DONE 0x10000000 // Bubb: written during CGameSprite::Follow(), I believe it means the MoveToPoint() ended with ACTION_DONE
 
 //trigger flags stored in triggers in .bcs files
 #define TF_NEGATE  1   //negate trigger result
@@ -133,14 +135,14 @@ class StringBuffer;
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING		5
 
-typedef std::vector<ieDword> SrcVector;
+using SrcVector = std::vector<ieDword>;
 
 struct targettype {
 	Scriptable *actor; //hmm, could be door
 	unsigned int distance;
 };
 
-typedef std::list<targettype> targetlist;
+using targetlist = std::list<targettype>;
 
 class GEM_EXPORT Targets {
 public:
@@ -282,23 +284,12 @@ class GEM_EXPORT Action : protected Canary {
 public:
 	explicit Action(bool autoFree)
 	{
-		actionID = 0;
-		objects[0] = NULL;
-		objects[1] = NULL;
-		objects[2] = NULL;
-		memset(string0Parameter, 0, 65);
-		memset(string1Parameter, 0, 65);
-		int0Parameter = 0;
-		pointParameter.reset();
-		int1Parameter = 0;
-		int2Parameter = 0;
 		//changed now
 		if (autoFree) {
 			RefCount = 0; //refcount will be increased by each AddAction
 		} else {
-			RefCount = 1; //one reference hold by the script
+			RefCount = 1; //one reference held by the script
 		}
-		flags = 0;
 	}
 	~Action()
 	{
@@ -310,17 +301,17 @@ public:
 		}
 	}
 
-	unsigned short actionID;
-	Object* objects[3];
-	int int0Parameter;
+	unsigned short actionID = 0;
+	Object* objects[3]{};
+	int int0Parameter = 0;
 	Point pointParameter;
-	int int1Parameter;
-	int int2Parameter;
-	char string0Parameter[65];
-	char string1Parameter[65];
-	unsigned short flags;
+	int int1Parameter = 0;
+	int int2Parameter = 0;
+	char string0Parameter[65]{};
+	char string1Parameter[65]{};
+	uint32_t flags = 0;
 private:
-	int RefCount;
+	int RefCount = 0;
 public:
 	int GetRef() const {
 		return RefCount;
@@ -445,10 +436,10 @@ public:
 	}
 };
 
-typedef int (* TriggerFunction)(Scriptable *, const Trigger *);
-typedef void (* ActionFunction)(Scriptable*, Action*);
-typedef Targets *(* ObjectFunction)(const Scriptable *, Targets*, int ga_flags);
-typedef int (* IDSFunction)(const Actor *, int parameter);
+using TriggerFunction = int (*)(Scriptable*, const Trigger*);
+using ActionFunction = void (*)(Scriptable*, Action*);
+using ObjectFunction = Targets* (*)(const Scriptable*, Targets*, int ga_flags);
+using IDSFunction = int (*)(const Actor*, int parameter);
 
 #define TF_NONE		0
 #define TF_CONDITION    1 //this isn't a trigger, just a condition (0x4000)
@@ -508,6 +499,7 @@ struct TriggerLink {
 #define AF_DLG_INSTANT  4096 //instant dialog actions
 #define AF_SCR_INSTANT  8192 //instant script actions
 #define AF_INSTANT      (AF_DLG_INSTANT|AF_SCR_INSTANT) //only iwd2 treats them separately; 12288
+#define AF_IWD2_OVERRIDE 16384 // marking actions that require special attention when clearing during ActionOverride
 
 struct ActionLink {
 	const char* Name;

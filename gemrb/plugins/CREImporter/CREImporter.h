@@ -71,14 +71,14 @@ public:
 	ieWord FindSpellType(const ResRef& name, unsigned short &level, unsigned int clsMask, unsigned int kit) const override;
 
 	//returns saved size, updates internal offsets before save
-	int GetStoredFileSize(Actor *ac) override;
+	int GetStoredFileSize(const Actor *ac) override;
 	//saves file
-	int PutActor(DataStream *stream, Actor *actor, bool chr=false) override;
+	int PutActor(DataStream *stream, const Actor *actor, bool chr = false) override;
 private:
 	/** sets up some variables based on creature version for serializing the object */
 	void SetupSlotCounts();
 	/** writes out the chr header */
-	void WriteChrHeader(DataStream *stream, Actor *actor);
+	void WriteChrHeader(DataStream *stream, const Actor *actor);
 	/** reads the chr header data (into PCStatStructs) */
 	void ReadChrHeader(Actor *actor);
 	/** skips the chr header */
@@ -88,7 +88,7 @@ private:
 	void GetActorBG(Actor *actor);
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
-	ieDword GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const;
+	ieDword GetIWD2SpellpageSize(const Actor *actor, ieIWD2SpellType type, int level) const;
 	void GetIWD2Spellpage(Actor *act, ieIWD2SpellType type, int level, int count);
 	void ReadInventory(Actor*, unsigned int);
 	void ReadSpellbook(Actor* act);
@@ -100,20 +100,20 @@ private:
 	CRESpellMemorization* GetSpellMemorization(Actor *act);
 	CREMemorizedSpell* GetMemorizedSpell();
 	CREItem* GetItem();
-	void SetupColor(ieDword&);
+	void SetupColor(ieDword&) const;
 
-	int PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize);
-	int PutActorPST(DataStream *stream, const Actor *actor);
-	int PutActorBG(DataStream *stream, const Actor *actor);
-	int PutActorIWD1(DataStream *stream, const Actor *actor);
-	int PutActorIWD2(DataStream *stream, const Actor *actor);
-	int PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level);
-	int PutKnownSpells(DataStream *stream, const Actor *actor);
-	int PutSpellPages(DataStream *stream, const Actor *actor);
-	int PutMemorizedSpells(DataStream *stream, const Actor *actor);
+	int PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const;
+	int PutActorPST(DataStream *stream, const Actor *actor) const;
+	int PutActorBG(DataStream *stream, const Actor *actor) const;
+	int PutActorIWD1(DataStream *stream, const Actor *actor) const;
+	int PutActorIWD2(DataStream *stream, const Actor *actor) const;
+	int PutIWD2Spellpage(DataStream *stream, const Actor *actor, ieIWD2SpellType type, int level) const;
+	int PutKnownSpells(DataStream *stream, const Actor *actor) const;
+	int PutSpellPages(DataStream *stream, const Actor *actor) const;
+	int PutMemorizedSpells(DataStream *stream, const Actor *actor) const;
 	int PutEffects(DataStream *stream, const Actor *actor) const;
 	int PutVariables(DataStream *stream, const Actor *actor) const;
-	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size);
+	int PutInventory(DataStream *stream, const Actor *actor, unsigned int size) const;
 	int PutHeader(DataStream *stream, const Actor *actor) const;
 };
 

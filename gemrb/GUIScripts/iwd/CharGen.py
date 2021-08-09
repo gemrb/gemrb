@@ -926,7 +926,7 @@ def ClassPress():
 		else:
 			ClassSelectButton = ClassWindow.GetControl (j)
 			j = j + 1
-			if Allowed > 0:
+			if Allowed == 1 or (Allowed == 2 and ClassRowName != "MAGE"):
 				ClassSelectButton.SetState (IE_GUI_BUTTON_ENABLED)
 			else:
 				ClassSelectButton.SetState (IE_GUI_BUTTON_DISABLED)
@@ -1058,12 +1058,21 @@ def KitPress():
 	GemRB.SetVar ("Class Kit",0)
 	GemRB.SetVar ("MAGESCHOOL",0)
 
+	# potentially exclude kits, eg. gnomes can only be illusionists
+	RaceRow = CommonTables.Races.FindValue (3, GemRB.GetPlayerStat (MyChar, IE_RACE))
+	RaceName = CommonTables.Races.GetRowName (RaceRow)
+	Allowed = CommonTables.Classes.GetValue ("MAGE", RaceName)
+
 	for i in range (8):
 		Button = KitWindow.GetControl (i+2)
 		Button.SetFlags (IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		Button.SetText (KitTable.GetValue (i+1, 0) )
 		Button.SetVarAssoc ("MAGESCHOOL", i+1)
 		Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, KitSelectPress)
+		if Allowed == 2 and i + 1 != 5: #illusionist
+			Button.SetState (IE_GUI_BUTTON_DISABLED)
+		else:
+			Button.SetState (IE_GUI_BUTTON_ENABLED)
 
 	KitTextArea = KitWindow.GetControl (11)
 	KitTextArea.SetText (17245)

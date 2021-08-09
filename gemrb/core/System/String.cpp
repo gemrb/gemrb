@@ -21,9 +21,9 @@
 #include "exports.h"
 #include "Interface.h"
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cerrno>
-#include <ctype.h>
+#include <cctype>
 #include <cwctype>
 
 #if HAVE_ICONV

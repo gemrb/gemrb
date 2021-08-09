@@ -65,7 +65,7 @@ def InitMapWindow (Window):
 	
 	Label = Window.GetControl (0x10000005)
 	Label.SetText (MapName)
-	#Label.SetTextColor (255, 0, 0)
+	#Label.SetColor (255, 0, 0)
 	# 2 - map name?
 	# 3 - map bitmap?
 	# 4 - ???

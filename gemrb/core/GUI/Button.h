@@ -68,9 +68,9 @@ using PaletteHolder = Holder<Palette>;
 #define IE_GUI_BUTTON_ALIGN_TOP    0x00000400
 #define IE_GUI_BUTTON_ALIGN_BOTTOM 0x00000800
 #define IE_GUI_BUTTON_ALIGNMENT_FLAGS (IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_ALIGN_RIGHT|IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_BOTTOM)
-#define IE_GUI_BUTTON_ANCHOR       0x00001000 //not implemented yet
+#define IE_GUI_BUTTON_ANCHOR       0x00001000
 #define IE_GUI_BUTTON_LOWERCASE    0x00002000
-//#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag
+//#define IE_GUI_BUTTON_MULTILINE    0x00004000 // don't set the single line flag; labeled "no word wrap"
 //end of hardcoded part
 #define IE_GUI_BUTTON_NO_TEXT      0x00010000   // don't draw button label
 #define IE_GUI_BUTTON_PLAYRANDOM   0x00020000
@@ -211,7 +211,7 @@ private: // Private attributes
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void FlagsChanged(unsigned int /*oldflags*/) override;
 	
 protected:

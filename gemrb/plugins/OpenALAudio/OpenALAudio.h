@@ -98,7 +98,7 @@ class OpenALAudioDriver : public Audio {
 public:
 	OpenALAudioDriver(void);
 	~OpenALAudioDriver(void) override;
-	void PrintDeviceList();
+	void PrintDeviceList() const;
 	bool Init(void) override;
 	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 					const Point&, unsigned int flags = 0,
@@ -110,7 +110,7 @@ public:
 	bool Stop() override;
 	bool Pause() override;
 	bool Resume() override;
-	int CreateStream(Holder<SoundMgr>) override;
+	int CreateStream(std::shared_ptr<SoundMgr>) override;
 	void UpdateListenerPos(const Point&) override;
 	Point GetListenerPos() override;
 	bool ReleaseStream(int stream, bool HardStop) override;
@@ -124,7 +124,7 @@ public:
 				int size, int samplerate) override;
 	void UpdateMapAmbient(MapReverb&) override;
 private:
-	int QueueALBuffer(ALuint source, ALuint buffer);
+	int QueueALBuffer(ALuint source, ALuint buffer) const;
 
 private:
 	ALCcontext *alutContext;
@@ -132,7 +132,7 @@ private:
 	bool MusicPlaying;
 	std::recursive_mutex musicMutex;
 	ALuint MusicBuffer[MUSICBUFFERS];
-	Holder<SoundMgr> MusicReader;
+	std::shared_ptr<SoundMgr> MusicReader;
 	LRUCache buffercache;
 	AudioStream speech;
 	AudioStream streams[MAX_STREAMS];
@@ -150,12 +150,10 @@ private:
 	bool InitEFX(void);
 	bool hasReverbProperties;
 
-#ifdef HAVE_OPENAL_EFX_H
-	bool hasEFX;
-	ALuint efxEffectSlot;
-	ALuint efxEffect;
+	bool hasEFX = false;
+	ALuint efxEffectSlot = 0;
+	ALuint efxEffect = 0;
 	MapReverbProperties reverbProperties;
-#endif
 };
 
 }

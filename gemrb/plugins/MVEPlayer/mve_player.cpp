@@ -312,7 +312,7 @@ void MVEPlayer::segment_video_data(unsigned short size) {
 	(void)x_size; (void)y_size; /* unused? */
 	unsigned short flags = GST_READ_UINT16_LE(buffer + 12);
 
-	char *data = buffer + 14;
+	const char *data = buffer + 14;
 
 	if (flags & MVE_VIDEO_DELTA_FRAME) {
 		guint16 *temp = video_data->back_buf1;
@@ -379,7 +379,7 @@ void MVEPlayer::segment_audio_data(bool silent) {
 	(void)seq_index; /* we don't care */
 	unsigned short stream_mask = GST_READ_UINT16_LE(buffer + 2);
 	unsigned short audio_size = GST_READ_UINT16_LE(buffer + 4);
-	char *data = buffer + 6;
+	const char *data = buffer + 6;
 
 	if (stream_mask & MVE_DEFAULT_AUDIO_STREAM) {
 		if (silent) {

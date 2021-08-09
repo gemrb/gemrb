@@ -36,14 +36,9 @@ class InfoPoint;
 class TileObject;
 
 class GEM_EXPORT TileMap {
-private:
-	std::vector< TileOverlay*> overlays;
-	std::vector< TileOverlay*> rain_overlays;
-	std::vector< Door*> doors;
-	std::vector< Container*> containers;
-	std::vector< InfoPoint*> infoPoints;
-	std::vector< TileObject*> tiles;
 public:
+	using TileOverlayPtr = TileOverlay::TileOverlayPtr;
+	
 	TileMap() = default;
 	~TileMap(void);
 
@@ -55,7 +50,7 @@ public:
 	Door* GetDoorByPosition(const Point &position) const;
 	Door* GetDoor(size_t idx) const;
 	Door* GetDoor(const char* Name) const;
-	size_t GetDoorCount() { return doors.size(); }
+	size_t GetDoorCount() const { return doors.size(); }
 	//update doors for a new overlay
 	void UpdateDoors();
 	void AutoLockDoors() const;
@@ -84,15 +79,22 @@ public:
 		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
 	TileObject* GetTile(unsigned int idx);
 	TileObject* GetTile(const char* Name);
-	size_t GetTileCount() { return tiles.size(); }
+	size_t GetTileCount() const { return tiles.size(); }
 
 	void ClearOverlays();
-	void AddOverlay(TileOverlay* overlay);
-	void AddRainOverlay(TileOverlay* overlay);
+	void AddOverlay(TileOverlayPtr overlay);
+	void AddRainOverlay(TileOverlayPtr overlay);
 	void DrawOverlays(const Region& screen, bool rain, BlitFlags flags);
 	Size GetMapSize() const;
-public:
+
 	int XCellCount = 0, YCellCount = 0;
+private:
+	std::vector<TileOverlayPtr> overlays;
+	std::vector<TileOverlayPtr> rain_overlays;
+	std::vector< Door*> doors;
+	std::vector< Container*> containers;
+	std::vector< InfoPoint*> infoPoints;
+	std::vector< TileObject*> tiles;
 };
 
 }

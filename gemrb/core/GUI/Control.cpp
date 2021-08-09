@@ -134,7 +134,7 @@ void Control::SetFocus()
 	MarkDirty();
 }
 
-bool Control::IsFocused()
+bool Control::IsFocused() const
 {
 	return window->FocusedView() == this;
 }
@@ -221,7 +221,7 @@ View::UniqueDragOp Control::DragOperation()
 
 		actionTimer = &core->SetTimer(h, 0, 0);
 	}
-	return std::unique_ptr<ControlDragOp>(new ControlDragOp(this));
+	return make_unique<ControlDragOp>(this);
 }
 
 bool Control::AcceptsDragOperation(const DragOp& dop) const
@@ -321,7 +321,7 @@ void Control::HandleTouchActionTimer(const Control* ctrl)
 	PerformAction(key);
 }
 
-ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Control::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new ControlScriptingRef(this, id, group);
 }

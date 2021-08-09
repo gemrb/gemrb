@@ -34,7 +34,7 @@ struct FileEntry {
 	ieDword dataOffset;
 	ieDword fileSize;
 	ieWord  type;
-	ieWord  u1; //Unknown Field
+	ieWord  u1; //Unknown Field, part of type dword in ee
 };
 
 struct TileEntry {
@@ -43,7 +43,7 @@ struct TileEntry {
 	ieDword tilesCount;
 	ieDword tileSize; //named tilesize so it isn't confused
 	ieWord  type;
-	ieWord  u1; //Unknown Field
+	ieWord  u1; //Unknown Field, part of type dword in ee
 };
 
 class BIFImporter : public IndexedArchive {

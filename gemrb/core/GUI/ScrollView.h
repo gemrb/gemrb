@@ -39,8 +39,7 @@ namespace GemRB {
 			void DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 			
 		public:
-			explicit ContentView(const Region& frame)
-			: View(frame) {}
+			using View::View;
 			
 			bool CanLockFocus() const override { return false; }
 			// TODO: this should be private and happen automatically

@@ -54,7 +54,7 @@ KeyMap::~KeyMap()
 
 bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 {
-	AutoTable kmtable(tablefile);
+	AutoTable kmtable = gamedata->LoadTable(tablefile);
 
 	if (!kmtable) {
 		return false;
@@ -101,11 +101,8 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 		//change internal spaces to underscore
 		for(int c=0;c<KEYLENGTH;c++) if (name[c]==' ') name[c]='_';
 
-		int l = strlen(value);
-		Function *fun;
-		void *tmp;
-
-		if (l<0 || l>1 || keymap.Lookup(value, tmp) ) {
+		size_t l = strlen(value);
+		if (l > 1 || keymap.HasKey(value)) {
 			print("Ignoring key %s", value);
 			continue;
 		}
@@ -124,7 +121,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 			group = kmtable->QueryField("Default","GROUP");
 			print("Adding key %s with function %s::%s", value, moduleName, function);
 		}
-		fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
+		Function *fun = new Function(moduleName, function, atoi(group), tolower(value[0]));
 
 		// lookup by either key or name
 		keymap.SetAt(value, fun);
@@ -136,7 +133,7 @@ bool KeyMap::InitializeKeyMap(const char *inifile, const char *tablefile)
 
 //group can be:
 //main gamecontrol
-bool KeyMap::ResolveKey(unsigned short key, int group)
+bool KeyMap::ResolveKey(unsigned short key, int group) const
 {
 	// FIXME: key is 2 bytes, but we ignore one. Some non english keyboards wont like this.
 	char keystr[2] = {(char)key, 0};
@@ -145,7 +142,7 @@ bool KeyMap::ResolveKey(unsigned short key, int group)
 	return ResolveName(keystr, group);
 }
 
-bool KeyMap::ResolveName(const char* name, int group)
+bool KeyMap::ResolveName(const char* name, int group) const
 {
 	void *tmp;
 	if (!keymap.Lookup(name, tmp) ) {

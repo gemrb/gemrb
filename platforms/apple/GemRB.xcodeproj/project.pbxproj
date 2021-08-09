@@ -296,7 +296,6 @@
 		A29BF8A513A04A6F00C812DD /* Animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F931395FF61006ADC12 /* Animation.cpp */; };
 		A29BF8A613A04A6F00C812DD /* AnimationFactory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F951395FF61006ADC12 /* AnimationFactory.cpp */; };
 		A29BF8A913A04A6F00C812DD /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9C1395FF61006ADC12 /* Audio.cpp */; };
-		A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */; };
 		A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA01395FF61006ADC12 /* Cache.cpp */; };
 		A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA21395FF61006ADC12 /* Calendar.cpp */; };
 		A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA61395FF61006ADC12 /* CharAnimations.cpp */; };
@@ -340,8 +339,6 @@
 		A29BF8E113A04A6F00C812DD /* Spellbook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0471395FF62006ADC12 /* Spellbook.cpp */; };
 		A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04B1395FF62006ADC12 /* Sprite2D.cpp */; };
 		A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA04F1395FF62006ADC12 /* Store.cpp */; };
-		A29BF8E913A04A6F00C812DD /* TableMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0681395FF62006ADC12 /* TableMgr.cpp */; };
-		A29BF8EA13A04A6F00C812DD /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06A1395FF62006ADC12 /* Tile.cpp */; };
 		A29BF8EB13A04A6F00C812DD /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06C1395FF62006ADC12 /* TileMap.cpp */; };
 		A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0701395FF62006ADC12 /* TileOverlay.cpp */; };
 		A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0751395FF62006ADC12 /* Variables.cpp */; };
@@ -443,7 +440,6 @@
 		A2E6635C139E883100310FC8 /* ArchiveImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */; };
 		A2E6635D139E883100310FC8 /* Audio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9C1395FF61006ADC12 /* Audio.cpp */; };
 		A2E6635E139E883100310FC8 /* Audio.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9D1395FF61006ADC12 /* Audio.h */; };
-		A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */; };
 		A2E66360139E883100310FC8 /* Bitmap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9F9F1395FF61006ADC12 /* Bitmap.h */; };
 		A2E66361139E883100310FC8 /* Cache.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BF9FA01395FF61006ADC12 /* Cache.cpp */; };
 		A2E66362139E883100310FC8 /* Cache.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BF9FA11395FF61006ADC12 /* Cache.h */; };
@@ -552,9 +548,7 @@
 		A2E663DD139E884500310FC8 /* StoreMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0521395FF62006ADC12 /* StoreMgr.h */; };
 		A2E663DF139E884500310FC8 /* StringMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0541395FF62006ADC12 /* StringMgr.h */; };
 		A2E663E1139E884500310FC8 /* SymbolMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0561395FF62006ADC12 /* SymbolMgr.h */; };
-		A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0681395FF62006ADC12 /* TableMgr.cpp */; };
 		A2E663E3139E884B00310FC8 /* TableMgr.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0691395FF62006ADC12 /* TableMgr.h */; };
-		A2E663E4139E884B00310FC8 /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06A1395FF62006ADC12 /* Tile.cpp */; };
 		A2E663E5139E884B00310FC8 /* Tile.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06B1395FF62006ADC12 /* Tile.h */; };
 		A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA06C1395FF62006ADC12 /* TileMap.cpp */; };
 		A2E663E7139E884B00310FC8 /* TileMap.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA06D1395FF62006ADC12 /* TileMap.h */; };
@@ -1511,7 +1505,6 @@
 		A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ArchiveImporter.h; sourceTree = "<group>"; };
 		A2BF9F9C1395FF61006ADC12 /* Audio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Audio.cpp; sourceTree = "<group>"; };
 		A2BF9F9D1395FF61006ADC12 /* Audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Audio.h; sourceTree = "<group>"; };
-		A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Bitmap.cpp; sourceTree = "<group>"; };
 		A2BF9F9F1395FF61006ADC12 /* Bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bitmap.h; sourceTree = "<group>"; };
 		A2BF9FA01395FF61006ADC12 /* Cache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Cache.cpp; sourceTree = "<group>"; };
 		A2BF9FA11395FF61006ADC12 /* Cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cache.h; sourceTree = "<group>"; };
@@ -1679,9 +1672,7 @@
 		A2BFA0651395FF62006ADC12 /* swab.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = swab.h; sourceTree = "<group>"; };
 		A2BFA0661395FF62006ADC12 /* VFS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VFS.cpp; sourceTree = "<group>"; };
 		A2BFA0671395FF62006ADC12 /* VFS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VFS.h; sourceTree = "<group>"; };
-		A2BFA0681395FF62006ADC12 /* TableMgr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TableMgr.cpp; sourceTree = "<group>"; };
 		A2BFA0691395FF62006ADC12 /* TableMgr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableMgr.h; sourceTree = "<group>"; };
-		A2BFA06A1395FF62006ADC12 /* Tile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tile.cpp; sourceTree = "<group>"; };
 		A2BFA06B1395FF62006ADC12 /* Tile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tile.h; sourceTree = "<group>"; };
 		A2BFA06C1395FF62006ADC12 /* TileMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TileMap.cpp; sourceTree = "<group>"; };
 		A2BFA06D1395FF62006ADC12 /* TileMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileMap.h; sourceTree = "<group>"; };
@@ -5100,7 +5091,6 @@
 				A2BF9F9B1395FF61006ADC12 /* ArchiveImporter.h */,
 				A2BF9F9C1395FF61006ADC12 /* Audio.cpp */,
 				A2BF9F9D1395FF61006ADC12 /* Audio.h */,
-				A2BF9F9E1395FF61006ADC12 /* Bitmap.cpp */,
 				A2BF9F9F1395FF61006ADC12 /* Bitmap.h */,
 				A2BF9FA01395FF61006ADC12 /* Cache.cpp */,
 				A2BF9FA11395FF61006ADC12 /* Cache.h */,
@@ -5235,9 +5225,7 @@
 				A2BFA0541395FF62006ADC12 /* StringMgr.h */,
 				A2BFA0561395FF62006ADC12 /* SymbolMgr.h */,
 				A2BFA0571395FF62006ADC12 /* System */,
-				A2BFA0681395FF62006ADC12 /* TableMgr.cpp */,
 				A2BFA0691395FF62006ADC12 /* TableMgr.h */,
-				A2BFA06A1395FF62006ADC12 /* Tile.cpp */,
 				A2BFA06B1395FF62006ADC12 /* Tile.h */,
 				A2BFA06C1395FF62006ADC12 /* TileMap.cpp */,
 				A2BFA06D1395FF62006ADC12 /* TileMap.h */,
@@ -9456,7 +9444,6 @@
 				A29BF8A513A04A6F00C812DD /* Animation.cpp in Sources */,
 				A29BF8A613A04A6F00C812DD /* AnimationFactory.cpp in Sources */,
 				A29BF8A913A04A6F00C812DD /* Audio.cpp in Sources */,
-				A29BF8AA13A04A6F00C812DD /* Bitmap.cpp in Sources */,
 				A29BF8AB13A04A6F00C812DD /* Cache.cpp in Sources */,
 				A29BF8AC13A04A6F00C812DD /* Calendar.cpp in Sources */,
 				A29BF8AE13A04A6F00C812DD /* CharAnimations.cpp in Sources */,
@@ -9507,8 +9494,6 @@
 				A29BF8E113A04A6F00C812DD /* Spellbook.cpp in Sources */,
 				A29BF8E313A04A6F00C812DD /* Sprite2D.cpp in Sources */,
 				A29BF8E513A04A6F00C812DD /* Store.cpp in Sources */,
-				A29BF8E913A04A6F00C812DD /* TableMgr.cpp in Sources */,
-				A29BF8EA13A04A6F00C812DD /* Tile.cpp in Sources */,
 				A29BF8EB13A04A6F00C812DD /* TileMap.cpp in Sources */,
 				A29BF8ED13A04A6F00C812DD /* TileOverlay.cpp in Sources */,
 				A29BF8EF13A04A6F00C812DD /* Variables.cpp in Sources */,
@@ -9655,7 +9640,6 @@
 				A2CD07B11CE2E0AB008CE1D0 /* ScrollView.cpp in Sources */,
 				A2E6635D139E883100310FC8 /* Audio.cpp in Sources */,
 				A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */,
-				A2E6635F139E883100310FC8 /* Bitmap.cpp in Sources */,
 				A2E66361139E883100310FC8 /* Cache.cpp in Sources */,
 				A2E66363139E883100310FC8 /* Calendar.cpp in Sources */,
 				A2E66367139E883100310FC8 /* CharAnimations.cpp in Sources */,
@@ -9713,8 +9697,6 @@
 				A2E663DA139E884500310FC8 /* Store.cpp in Sources */,
 				A25F91EA269931220045F07A /* Video.cpp in Sources */,
 				A2D33FED24C2035A0081AC31 /* PathFinder.cpp in Sources */,
-				A2E663E2139E884B00310FC8 /* TableMgr.cpp in Sources */,
-				A2E663E4139E884B00310FC8 /* Tile.cpp in Sources */,
 				A24454811F09BFF8008D5B5E /* GUIAnimation.cpp in Sources */,
 				A2E663E6139E884B00310FC8 /* TileMap.cpp in Sources */,
 				A2E663EA139E884B00310FC8 /* TileOverlay.cpp in Sources */,

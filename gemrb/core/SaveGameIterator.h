@@ -33,7 +33,7 @@ namespace GemRB {
 
 class GEM_EXPORT SaveGameIterator {
 private:
-	typedef std::vector<Holder<SaveGame> > charlist;
+	using charlist = std::vector<Holder<SaveGame>>;
 	charlist save_slots;
 
 public:

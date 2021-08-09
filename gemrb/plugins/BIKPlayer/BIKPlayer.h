@@ -135,7 +135,7 @@ typedef struct AVFrame {
 		linesize[2] = w2;
 	}
 	
-	void release_buffer()
+	void release_buffer() const
 	{
 		for (auto& i : data) {
 			av_free(i);
@@ -242,14 +242,14 @@ private:
 	void segment_video_play();
 	strret_t fileRead(strpos_t pos, void* buf, strpos_t count);
 
-	int setAudioStream();
-	void freeAudioStream(int stream);
+	int setAudioStream() const;
+	void freeAudioStream(int stream) const;
 	void queueBuffer(int stream, unsigned short bits,
-		int channels, short* memory, int size, int samplerate);
+		int channels, short* memory, int size, int samplerate) const;
 	int sound_init(bool need_init);
-	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable);
+	void ff_init_scantable(ScanTable *st, const uint8_t *src_scantable) const;
 	int video_init();
-	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den);
+	void av_set_pts_info(AVRational &time_base, unsigned int pts_num, unsigned int pts_den) const;
 	int ReadHeader();
 	void DecodeBlock(short *out);
 	int DecodeAudioFrame(void *data, int data_size);

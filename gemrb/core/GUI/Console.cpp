@@ -20,13 +20,12 @@
 
 #include "GUI/Console.h"
 
-#include "GameData.h"
 #include "Interface.h"
-#include "ScriptEngine.h"
+#include "System/FileStream.h"
 
 namespace GemRB {
 
-constexpr size_t HistoryMaxSize = 5;
+constexpr size_t HistoryMaxSize = 10;
 
 Console::Console(const Region& frame, TextArea* ta)
 : TextEdit(frame, -1, Point(3, 3)), History(HistoryMaxSize)
@@ -53,6 +52,8 @@ Console::Console(const Region& frame, TextArea* ta)
 		};
 		textArea->SetAction(handler, TextArea::Action::Select);
 	}
+
+	LoadHistory();
 }
 
 void Console::UpdateTextArea()
@@ -141,6 +142,50 @@ void Console::HistoryAdd(bool force)
 		UpdateTextArea();
 		HistorySetPos(History.Size());
 	}
+}
+
+// dump the last few commands to a file
+void Console::SaveHistory() const
+{
+	std::string commands;
+	char command[100];
+
+	size_t histSize = std::min(History.Size(), HistoryMaxSize);
+	for (size_t i = histSize - 1; signed(i) >= 0; i--) {
+		const String& cmd = History.Retrieve(i).second;
+		snprintf(command, sizeof(command), "%ls\n", cmd.c_str());
+		commands += command;
+	}
+
+	char filePath[_MAX_PATH + 20];
+	PathJoin(filePath, core->config.GamePath, "gemrb_console.txt", nullptr);
+	FileStream *histFile = new FileStream();
+	if (histFile->Create(filePath)) {
+		histFile->Write(commands.c_str(), commands.size());
+		histFile->Close();
+	}
+	delete histFile;
+}
+
+void Console::LoadHistory()
+{
+	char filePath[_MAX_PATH + 20];
+	PathJoin(filePath, core->config.GamePath, "gemrb_console.txt", nullptr);
+	FileStream *histFile = FileStream::OpenFile(filePath);
+	if (histFile) {
+		char line[_MAX_PATH];
+		while (histFile->Remains()) {
+			if (histFile->ReadLine(line, _MAX_PATH) == -1) break;
+
+			// set history
+			wchar_t tmp[100];
+			swprintf(tmp, 100, L"%s", line);
+			History.Append(std::make_pair(-1, tmp));
+		}
+	}
+	delete histFile;
+
+	UpdateTextArea();
 }
 
 }

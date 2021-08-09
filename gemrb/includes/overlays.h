@@ -52,8 +52,8 @@ namespace GemRB {
 #define OV_GLATH2      21
 #define OV_SEVENEYES   22
 #define OV_SEVENEYES2  23
-#define OV_BOUNCE      24  //bouncing
-#define OV_BOUNCE2     25  //bouncing activated
+#define OV_BOUNCE      24  //bouncing, but not in iwd2
+#define OV_BOUNCE2     25  //bouncing activated, but not in iwd2
 #define OV_FIRESHIELD1 26
 #define OV_FIRESHIELD2 27
 #define OV_ICESHIELD1  28

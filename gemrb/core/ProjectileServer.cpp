@@ -38,9 +38,9 @@ ProjectileServer::ProjectileServer()
 {
 	// built-in gemrb projectiles and game/mod-provided projectiles
 	unsigned int gemresource = core->LoadSymbol("gemprjtl");
-	Holder<SymbolMgr> gemprojlist = core->GetSymbol(gemresource);
+	auto gemprojlist = core->GetSymbol(gemresource);
 	unsigned int resource = core->LoadSymbol("projectl");
-	Holder<SymbolMgr> projlist = core->GetSymbol(resource);
+	auto projlist = core->GetSymbol(resource);
 	size_t projectilecount = 0;
 	// first, we must calculate how many projectiles we have
 	if (gemprojlist) {
@@ -70,7 +70,7 @@ ProjectileServer::ProjectileServer()
 		core->DelSymbol(gemresource);
 	}
 	
-	AutoTable explist("areapro");
+	AutoTable explist = gamedata->LoadTable("areapro");
 	if (explist) {
 		unsigned int rows = explist->GetRowCount();
 		//cannot handle 0xff and it is easier to set up the fields
@@ -83,7 +83,7 @@ ProjectileServer::ProjectileServer()
 			int i;
 
 			for(i=0;i<AP_RESCNT;i++) {
-				explosions[rows].resources[i] = ResRef::MakeUpperCase(explist->QueryField(rows, i));
+				explosions[rows].resources[i] = MakeUpperCaseResRef(explist->QueryField(rows, i));
 			}
 			//using i so the flags field will always be after the resources
 			explosions[rows].flags = atoi(explist->QueryField(rows,i));
@@ -207,7 +207,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 	return ReturnCopy(idx);
 }
 
-size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) const
+size_t ProjectileServer::PrepareSymbols(const std::shared_ptr<SymbolMgr>& projlist) const
 {
 	size_t count = 0;
 
@@ -227,14 +227,14 @@ size_t ProjectileServer::PrepareSymbols(const Holder<SymbolMgr>& projlist) const
 	return count;
 }
 
-void ProjectileServer::AddSymbols(const Holder<SymbolMgr>& projlist) {
+void ProjectileServer::AddSymbols(const std::shared_ptr<SymbolMgr>& projlist) {
 	size_t rows = projlist->GetSize();
 	while(rows--) {
 		unsigned int value = projlist->GetValueIndex(rows);
 		if (value>MAX_PROJ_IDX) {
 			continue;
 		}
-		projectiles[value].resname = ResRef::MakeUpperCase(projlist->GetStringIndex(rows));
+		projectiles[value].resname = MakeUpperCaseResRef(projlist->GetStringIndex(rows));
 	}
 }
 
@@ -249,7 +249,7 @@ ResRef ProjectileServer::GetExplosion(size_t idx, int type)
 		return ResRef();
 	}
 	ResRef const *ret = &explosions[idx].resources[type];
-	if (!ret || ret->IsStar()) return ResRef();
+	if (!ret || IsStar(*ret)) return ResRef();
 
 	return *ret;
 }

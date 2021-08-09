@@ -100,7 +100,7 @@ struct ResourceGroup {
 struct Effect {
 	ieDword Opcode = 0;
 	ieDword Target = 0;
-	ieDword Power = 0;
+	ieDword Power = 0; // the effect level
 	ieDword Parameter1 = 0;
 	ieDword Parameter2 = 0;
 	ieWord TimingMode = 0;   //0x1000 -- no need of conversion
@@ -112,7 +112,7 @@ struct Effect {
 	
 	union {
 		ResourceGroup resources; // keep largest type first to 0 fill everythings
-		char VariableName[32] {'\0'};
+		ieVariable VariableName;
 	};
 
 	ResRef& Resource = resources.Resource;
@@ -213,10 +213,11 @@ public:
 		SpellLevel = rhs.SpellLevel;
 
 		IsVariable = rhs.IsVariable;
-		// make sure to copy the whole union to set up Resource-Resource4, since VariableName will often contain nulls
-		memcpy(VariableName, rhs.VariableName, sizeof(VariableName));
-		// but VariableName is shorter than the size of the union, so:
-		resources.Resource4 = rhs.resources.Resource4;
+		if (IsVariable) {
+			VariableName = rhs.VariableName;
+		} else {
+			resources = rhs.resources;
+		}
 	}
 
 	~Effect() = default;
@@ -263,7 +264,7 @@ public:
 		if (random_value != rhs.random_value) return false;
 		if (SpellLevel != rhs.SpellLevel) return false;
 
-		if (IsVariable && strnicmp(VariableName, rhs.VariableName, sizeof(VariableName)) != 0) return false;
+		if (IsVariable && strnicmp(VariableName.CString(), rhs.VariableName.CString(), sizeof(VariableName)) != 0) return false;
 		else return Resource == rhs.Resource && Resource2 == rhs.Resource2 && Resource3 == rhs.Resource3 && Resource4 == rhs.Resource4;
 		
 	}

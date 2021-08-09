@@ -34,8 +34,6 @@
 
 namespace GemRB {
 
-class ResRef;
-
 #define GEM_CURRENT_POS 0
 #define GEM_STREAM_START 1
 #define GEM_STREAM_END 2
@@ -78,10 +76,10 @@ public:
 	
 	template <typename DST, typename SRC>
 	strret_t ReadScalar(DST& dest) {
-		static_assert(sizeof(DST) > sizeof(SRC), "This flavor of ReadScalar requires DST to be the larger type.");
+		static_assert(sizeof(DST) >= sizeof(SRC), "This flavor of ReadScalar requires DST to be >= SRC.");
 		SRC src;
 		strret_t len = ReadScalar(src);
-		dest = src;
+		dest = static_cast<DST>(src);
 		return len;
 	}
 	
@@ -100,7 +98,7 @@ public:
 	
 	template <typename SRC, typename DST>
 	strret_t WriteScalar(const SRC& src) {
-		static_assert(sizeof(SRC) > sizeof(DST), "This flavor of WriteScalar requires SRC to be the larger type.");
+		static_assert(sizeof(SRC) >= sizeof(DST), "This flavor of WriteScalar requires SRC to be >= DST.");
 		DST dst = static_cast<DST>(src);
 		return WriteScalar<DST>(dst);
 	}
@@ -109,7 +107,10 @@ public:
 	strret_t WriteResRef(const ResRef& src);
 	strret_t WriteResRefLC(const ResRef& src);
 	strret_t WriteResRefUC(const ResRef& src);
-	
+
+	strret_t ReadVariable(ieVariable& dest);
+	strret_t WriteVariable(const ieVariable& src);
+
 	strret_t ReadPoint(Point&);
 	strret_t WritePoint(const Point&);
 	

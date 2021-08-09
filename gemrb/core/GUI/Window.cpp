@@ -265,7 +265,7 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, unsigned int Sum)
+void Window::RedrawControls(const char* VarName, unsigned int Sum) const
 {
 	for (auto ctrl : Controls) {
 		ctrl->UpdateState(VarName, Sum);
@@ -475,7 +475,7 @@ bool Window::DispatchEvent(const Event& event)
 	View* target = NULL;
 
 	if (event.type == Event::TextInput) {
-		focusView->TextInput(event.text);
+		if (focusView) focusView->TextInput(event.text);
 		return true;
 	}
 
@@ -638,7 +638,7 @@ bool Window::OnControllerButtonDown(const ControllerEvent& ce)
 	return View::OnControllerButtonDown(ce);
 }
 	
-ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ResRef group)
+ViewScriptingRef* Window::CreateScriptingRef(ScriptingId id, ScriptingGroup_t group)
 {
 	return new WindowScriptingRef(this, id, group);
 }

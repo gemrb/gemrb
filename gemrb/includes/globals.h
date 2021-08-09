@@ -49,6 +49,7 @@
 #include <bitset>
 #include <climits>
 #include <chrono>
+#include <memory>
 
 namespace GemRB {
 
@@ -339,6 +340,13 @@ inline T CeilDiv(T dividend, T divisor)
 	} else {
 		return CeilDivSlow(dividend, divisor);
 	}
+}
+
+// TODO: remove this when we switch to c++14
+template<typename T, typename... Args>
+std::unique_ptr<T> make_unique(Args&&... args)
+{
+	return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
 }
 
 //we need 32+6 bytes at least, because we store 'context' in the variable

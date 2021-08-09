@@ -31,8 +31,6 @@ namespace GemRB {
 
 TileMap::~TileMap(void)
 {
-	ClearOverlays();
-
 	for (const InfoPoint *infoPoint : infoPoints) {
 		delete infoPoint;
 	}
@@ -45,12 +43,6 @@ TileMap::~TileMap(void)
 //this needs in case of a tileset switch (for extended night)
 void TileMap::ClearOverlays()
 {
-	for (const TileOverlay *overlay : overlays) {
-		delete overlay;
-	}
-	for (const TileOverlay *rain : rain_overlays) {
-		delete rain;
-	}
 	overlays.clear();
 	rain_overlays.clear();
 }
@@ -152,30 +144,22 @@ void TileMap::AutoLockDoors() const
 }
 
 //overlays, allow pushing of NULL
-void TileMap::AddOverlay(TileOverlay* overlay)
+void TileMap::AddOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
-		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	overlays.push_back( overlay );
+	overlays.push_back(std::move(overlay));
 }
 
-void TileMap::AddRainOverlay(TileOverlay* overlay)
+void TileMap::AddRainOverlay(TileOverlayPtr overlay)
 {
 	if (overlay) {
-		if (overlay->w > XCellCount) {
-			XCellCount = overlay->w;
-		}
-		if (overlay->h > YCellCount) {
-			YCellCount = overlay->h;
-		}
+		XCellCount = std::max(XCellCount, overlay->size.w);
+		YCellCount = std::max(YCellCount, overlay->size.h);
 	}
-	rain_overlays.push_back( overlay );
+	rain_overlays.push_back(std::move(overlay));
 }
 
 void TileMap::DrawOverlays(const Region& viewport, bool rain, BlitFlags flags)
@@ -367,7 +351,7 @@ InfoPoint* TileMap::GetTravelTo(const char* Destination) const
 	for (InfoPoint *infoPoint : infoPoints) {
 		if (infoPoint->Type != ST_TRAVEL) continue;
 
-		if (strnicmp(infoPoint->Destination, Destination, 8) == 0) {
+		if (infoPoint->Destination == Destination) {
 			return infoPoint;
 		}
 	}

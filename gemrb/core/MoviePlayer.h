@@ -105,7 +105,7 @@ public:
 	MoviePlayer(void);
 	~MoviePlayer(void) override;
 
-	Size Dimensions() { return movieSize; }
+	Size Dimensions() const { return movieSize; }
 	void Play(Window* win);
 	void Stop();
 
@@ -119,7 +119,7 @@ class MoviePlayerControls : public View {
 
 private:
 	// currently dont have any real controls
-	void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) override {}
+	void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) override {}
 	
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short /*Mod*/) override {
 		KeyboardKey keycode = Key.keycode;

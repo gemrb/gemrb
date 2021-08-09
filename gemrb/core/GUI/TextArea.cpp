@@ -261,7 +261,7 @@ TextArea::~TextArea()
 	ClearHistoryTimer();
 }
 
-void TextArea::DrawSelf(Region drawFrame, const Region& /*clip*/)
+void TextArea::DrawSelf(const Region& drawFrame, const Region& /*clip*/)
 {
 	if (speakerPic) {
 		core->GetVideoDriver()->BlitSprite(speakerPic, drawFrame.origin);

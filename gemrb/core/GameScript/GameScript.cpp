@@ -499,7 +499,7 @@ static const ActionLink actionnames[] = {
 	{"ankheghide", GameScript::AnkhegHide, AF_ALIVE},
 	{"applydamage", GameScript::ApplyDamage, 0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent, 0},
-	{"applyspell", GameScript::ApplySpell, 0},
+	{"applyspell", GameScript::ApplySpell, AF_IWD2_OVERRIDE},
 	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
 	{"attack", GameScript::Attack,AF_BLOCKING|AF_ALIVE},
@@ -665,8 +665,8 @@ static const ActionLink actionnames[] = {
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcemarkedspell", GameScript::ForceMarkedSpell, 0},
-	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE},
-	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE},
+	{"forcespell", GameScript::ForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"forcespellpointrange", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
 	{"forcespellpointrangeres", GameScript::ForceSpellPointRange, AF_BLOCKING|AF_ALIVE},
 	{"forcespellrange", GameScript::ForceSpellRange, AF_BLOCKING|AF_ALIVE},
@@ -822,8 +822,8 @@ static const ActionLink actionnames[] = {
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"randomwalkcontinuoustime", GameScript::RandomWalkContinuous, AF_BLOCKING|AF_ALIVE},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
-	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
-	{"reallyforcespellres", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},
+	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"reallyforcespellres", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelldeadres", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"reallyforcespelllevel", GameScript::ReallyForceSpell, AF_BLOCKING|AF_ALIVE},//this is the same action
@@ -956,13 +956,13 @@ static const ActionLink actionnames[] = {
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
-	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
+	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"spellcasteffect", GameScript::SpellCastEffect, 0},
 	{"spellhiteffectpoint", GameScript::SpellHitEffectPoint, 0},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
-	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE},
-	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
-	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE},
+	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
+	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE|AF_IWD2_OVERRIDE},
 	{"startcombatcounter", GameScript::StartCombatCounter, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutSceneEx, 0}, //pst (unknown), EE perhaps as of PST:EE
@@ -1379,14 +1379,14 @@ void Targets::FilterObjectRect(const Object *oC)
 /** releasing global memory */
 static void CleanupIEScript()
 {
-	triggersTable.release();
-	actionsTable.release();
-	objectsTable.release();
-	overrideActionsTable.release();
-	overrideTriggersTable.release();
+	triggersTable.reset();
+	actionsTable.reset();
+	objectsTable.reset();
+	overrideActionsTable.reset();
+	overrideTriggersTable.reset();
 }
 
-static void printFunction(StringBuffer& buffer, const Holder<SymbolMgr>& table, int index)
+static void printFunction(StringBuffer& buffer, const std::shared_ptr<SymbolMgr>& table, int index)
 {
 	const char *str = table->GetStringIndex(index);
 	int value = table->GetValueIndex(index);
@@ -1409,7 +1409,7 @@ static void LoadActionFlags(const char *tableName, int flag, bool critical)
 			return;
 		}
 	}
-	Holder<SymbolMgr> table = core->GetSymbol(tableIndex);
+	auto table = core->GetSymbol(tableIndex);
 	if (!table) {
 		error("GameScript", "Couldn't load %s symbols!\n",tableName);
 	}
@@ -1448,7 +1448,7 @@ void InitializeIEScript()
 	int oT = core->LoadSymbol( "object" );
 	int gaT = core->LoadSymbol( "gemact" );
 	int gtT = core->LoadSymbol( "gemtrig" );
-	AutoTable objNameTable("script");
+	AutoTable objNameTable = gamedata->LoadTable("script");
 	if (tT < 0 || aT < 0 || oT < 0 || !objNameTable) {
 		error("GameScript", "A critical scripting file is missing!\n");
 	}
@@ -1479,7 +1479,7 @@ void InitializeIEScript()
 		else {
 			idtargets[i]=poi->Function;
 		}
-		ObjectIDSTableNames[i] = ResRef::MakeLowerCase(idsname);
+		ObjectIDSTableNames[i] = MakeLowerCaseResRef(idsname);
 	}
 	MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 	if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -1789,7 +1789,7 @@ void InitializeIEScript()
 		// leaving this as not strictly necessary, for now
 		Log(WARNING, "GameScript", "Couldn't find saved trigger symbols!");
 	} else {
-		Holder<SymbolMgr> savedTriggersTable = core->GetSymbol(savedTriggersIndex);
+		auto savedTriggersTable = core->GetSymbol(savedTriggersIndex);
 		if (!savedTriggersTable) {
 			error("GameScript", "Couldn't load saved trigger symbols!\n");
 		}
@@ -1832,7 +1832,6 @@ GameScript::~GameScript(void)
 			error("GameScript", "Corrupted Script cache encountered (reference count went below zero), Script name is: %.8s\n", Name.CString());
 		}
 		if (!res) {
-			//print("Freeing script %s because its refcount has reached 0.", Name);
 			script->Release();
 		}
 		script = NULL;
@@ -2062,48 +2061,50 @@ bool GameScript::Update(bool *continuing, bool *done)
 	RandomNumValue = RAND_ALL();
 	for (size_t a = 0; a < script->responseBlocks.size(); a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (rB->condition->Evaluate(MySelf)) {
-			//if this isn't a continue-d block, we have to clear the queue
-			//we cannot clear the queue and cannot execute the new block
-			//if we already have stuff on the queue!
-			if (!continueExecution) {
-				if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
-					if (MySelf->GetInternalFlag()&IF_NOINT) {
-						// we presumably don't want any further execution?
-						if (done) *done = true;
-						return false;
-					}
+		if (!rB->condition->Evaluate(MySelf)) {
+			continue;
+		}
 
-					if (lastAction==a) {
-						// we presumably don't want any further execution?
-						// this one is a bit more complicated, due to possible
-						// interactions with Continue() (lastAction here is always
-						// the first block encountered), needs more testing
-						// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
-						// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
-						// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
-						if (core->HasFeature(GF_3ED_RULES)) {
-							if (done) *done = true;
-						}
-						return false;
-					}
-
-					//movetoobjectfollow would break if this isn't called
-					//(what is broken if it is here?)
-					//IE even clears the path, shall we?
-					//yes we must :)
-					MySelf->Stop();
+		// if this isn't a continue-d block, we have to clear the queue
+		// we cannot clear the queue and cannot execute the new block
+		// if we already have stuff on the queue!
+		if (!continueExecution) {
+			if (MySelf->GetCurrentAction() || MySelf->GetNextAction()) {
+				if (MySelf->GetInternalFlag() & IF_NOINT) {
+					// we presumably don't want any further execution?
+					if (done) *done = true;
+					return false;
 				}
-				lastAction=a;
+
+				if (lastAction == a) {
+					// we presumably don't want any further execution?
+					// this one is a bit more complicated, due to possible
+					// interactions with Continue() (lastAction here is always
+					// the first block encountered), needs more testing
+					// BG2 needs this, however... (eg. spirit trolls trollsp01 in ar1506)
+					// previously we thought iwd:totlm needed this bit, but it turns out only iwd2 does (bg2 breaks with it)
+					// targos goblins misbehave without it; see https://github.com/gemrb/gemrb/issues/344 for the gory details
+					if (core->HasFeature(GF_3ED_RULES) && done) {
+						*done = true;
+					}
+					return false;
+				}
+
+				// movetoobjectfollow would break if this isn't called
+				// (what is broken if it is here?)
+				// IE even clears the path, shall we?
+				// yes we must :)
+				MySelf->Stop();
 			}
-			running = true;
-			continueExecution = ( rB->responseSet->Execute(MySelf) != 0);
-			running = false;
-			if (continuing) *continuing = continueExecution;
-			if (!continueExecution) {
-				if (done) *done = true;
-				return true;
-			}
+			lastAction = a;
+		}
+		running = true;
+		continueExecution = rB->responseSet->Execute(MySelf) != 0;
+		running = false;
+		if (continuing) *continuing = continueExecution;
+		if (!continueExecution) {
+			if (done) *done = true;
+			return true;
 		}
 	}
 	return continueExecution;
@@ -2304,7 +2305,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 		if (result > 1) {
 			//we started an Or() block
 			if (ORcount) {
-				Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+				Log(WARNING, "GameScript", "Unfinished OR block encountered! 1");
 				if (!subresult) {
 					return false;
 				}
@@ -2325,7 +2326,7 @@ bool Condition::Evaluate(Scriptable *Sender) const
 		}
 	}
 	if (ORcount) {
-		Log(WARNING, "GameScript", "Unfinished OR block encountered!");
+		Log(WARNING, "GameScript", "Unfinished OR block encountered! 2");
 		return subresult;
 	}
 	return true;
@@ -2349,7 +2350,7 @@ int Trigger::Evaluate(Scriptable *Sender) const
 			triggerID, tmpstr );
 		return 0;
 	}
-	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s", triggerID, tmpstr);
+	ScriptDebugLog(ID_TRIGGERS, "Executing trigger code: 0x%04x %s (Sender: %s / %s)", triggerID, tmpstr, Sender->GetScriptName(), Sender->GetName(1));
 
 	int ret = func( Sender, this );
 	if (flags & TF_NEGATE) {
@@ -2440,7 +2441,12 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		if (scr) {
 			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
 			scr->ReleaseCurrentAction();
-			scr->AddAction(ParamCopyNoOverride(aC));
+			Action *newAction = ParamCopyNoOverride(aC);
+			// mark the target action, so other ActionOverrides don't clear it
+			// only happened for queued actions, but since instants are gone immediately,
+			// it shouldn't matter that we set it on all
+			newAction->flags |= ACF_OVERRIDE;
+			scr->AddAction(newAction);
 			if (!(actionflags[actionID] & AF_INSTANT)) {
 				assert(scr->GetNextAction());
 				// TODO: below was written before i added instants, this might be unnecessary now

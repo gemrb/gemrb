@@ -75,7 +75,7 @@ Holder<Sprite2D> PLTImporter::GetSprite2D(unsigned int type, ieDword paletteInde
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;
-	unsigned char * src = NULL;
+	const unsigned char* src = nullptr;
 	for (int y = Height - 1; y >= 0; y--) {
 		src = ( unsigned char * ) pixels + ( y * Width * 2 );
 		for (unsigned int x = 0; x < Width; x++) {

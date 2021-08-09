@@ -40,7 +40,7 @@ Label::Label(const Region& frame, Font* font, const String& string)
 }
 
 /** Draws the Control on the Output Display */
-void Label::DrawSelf(Region rgn, const Region& /*clip*/)
+void Label::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	if (font && Text.length()) {
 		if (flags & UseColor) {

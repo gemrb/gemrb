@@ -74,7 +74,6 @@ GameData::GameData()
 GameData::~GameData()
 {
 	delete factory;
-	ItemSounds.clear();
 }
 
 void GameData::ClearCaches()
@@ -148,85 +147,41 @@ int GameData::LoadCreature(const char* ResRef, unsigned int PartySlot, bool char
 }
 
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int GameData::LoadTable(const ResRef &resRef, bool silent)
+AutoTable GameData::LoadTable(const char *tabname, bool silent)
 {
-	int ind = GetTableIndex(resRef);
-	if (ind != -1) {
-		tables[ind].refcount++;
-		return ind;
+	ResRef resRef = tabname;
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
-	//print("(%s) Table not found... Loading from file", ResRef);
-	DataStream* str = GetResource(resRef, IE_2DA_CLASS_ID, silent);
+
+	DataStream* str = GetResource(tabname, IE_2DA_CLASS_ID, silent);
 	if (!str) {
-		return -1;
+		return nullptr;
 	}
 	PluginHolder<TableMgr> tm = MakePluginHolder<TableMgr>(IE_2DA_CLASS_ID);
 	if (!tm) {
 		delete str;
-		return -1;
+		return nullptr;
 	}
 	if (!tm->Open(str)) {
-		return -1;
+		return nullptr;
 	}
-	Table t;
-	t.refcount = 1;
-	t.resRef = resRef;
-	t.tm = tm;
-	ind = -1;
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0) {
-			ind = ( int ) i;
-			break;
-		}
-	}
-	if (ind != -1) {
-		tables[ind] = t;
-		return ind;
-	}
-	tables.push_back( t );
-	return ( int ) tables.size() - 1;
-}
-/** Gets the index of a loaded table, returns -1 on error */
-int GameData::GetTableIndex(const ResRef &resRef) const
-{
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].refcount == 0)
-			continue;
-		if (tables[i].resRef == resRef)
-			return ( int ) i;
-	}
-	return -1;
-}
-/** Gets a Loaded Table by its index, returns NULL on error */
-Holder<TableMgr> GameData::GetTable(size_t index) const
-{
-	if (index >= tables.size()) {
-		return NULL;
-	}
-	if (tables[index].refcount == 0) {
-		return NULL;
-	}
-	return tables[index].tm;
+	
+	tables[resRef] = tm;
+	return tm;
 }
 
-/** Frees a Loaded Table, returns false on error, true on success */
-bool GameData::DelTable(unsigned int index)
+AutoTable GameData::LoadTable(const ResRef& resRef, bool silent)
 {
-	if (index==0xffffffff) {
-		tables.clear();
-		return true;
+	return LoadTable(resRef.CString(), silent);
+}
+/** Gets the index of a loaded table, returns -1 on error */
+AutoTable GameData::GetTable(const ResRef &resRef) const
+{
+	if (tables.count(resRef)) {
+		return tables.at(resRef);
 	}
-	if (index >= tables.size()) {
-		return false;
-	}
-	if (tables[index].refcount == 0) {
-		return false;
-	}
-	tables[index].refcount--;
-	if (tables[index].refcount == 0 && tables[index].tm) {
-		tables[index].tm.release();
-	}
-	return true;
+	return nullptr;
 }
 
 PaletteHolder GameData::GetPalette(const ResRef& resname)
@@ -261,8 +216,7 @@ Item* GameData::GetItem(const ResRef &resname, bool silent)
 	}
 
 	item = new Item();
-	//this is required for storing the 'source'
-	item->Name = ResRef::MakeLowerCase(resname);
+	item->Name = resname;
 	sm->GetItem( item );
 
 	ItemCache.SetAt(resname, (void *) item);
@@ -299,8 +253,7 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 	}
 
 	spell = new Spell();
-	//this is required for storing the 'source'
-	spell->Name = ResRef::MakeLowerCase(resname);
+	spell->Name = resname;
 	sm->GetSpell( spell, silent );
 
 	SpellCache.SetAt(resname, (void *) spell);
@@ -355,7 +308,7 @@ void GameData::FreeEffect(const Effect *eff, const ResRef &name, bool free)
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doublehint)
+ScriptedAnimation* GameData::GetScriptedAnimation(const ResRef &effect, bool doublehint)
 {
 	ScriptedAnimation *ret = NULL;
 
@@ -371,7 +324,7 @@ ScriptedAnimation* GameData::GetScriptedAnimation( const char *effect, bool doub
 		}
 	}
 	if (ret) {
-		ret->ResName = ResRef::MakeLowerCase(effect);
+		ret->ResName = effect;
 	}
 	return ret;
 }
@@ -471,6 +424,11 @@ FactoryObject* GameData::GetFactoryResource(const char* resname, SClass_ID type,
 	}
 }
 
+FactoryObject* GameData::GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent)
+{
+	return GetFactoryResource(resname.CString(), type, silent);
+}
+
 void GameData::AddFactoryResource(FactoryObject* res)
 {
 	factory->AddFactoryObject(res);
@@ -498,7 +456,7 @@ Store* GameData::GetStore(const ResRef &resRef)
 		return NULL;
 	}
 	
-	store->Name = ResRef::MakeLowerCase(resRef);
+	store->Name = resRef;
 	stores[store->Name] = store;
 	return store;
 }
@@ -539,7 +497,7 @@ void GameData::SaveAllStores()
 
 void GameData::ReadItemSounds()
 {
-	AutoTable itemsnd("itemsnd");
+	AutoTable itemsnd = LoadTable("itemsnd");
 	if (!itemsnd) {
 		return;
 	}
@@ -547,18 +505,18 @@ void GameData::ReadItemSounds()
 	int rowCount = itemsnd->GetRowCount();
 	int colCount = itemsnd->GetColumnCount();
 	for (int i = 0; i < rowCount; i++) {
-		ItemSounds[i] = std::vector<const char*>();
+		ItemSounds[i] = {};
 		for (int j = 0; j < colCount; j++) {
-			ResRef snd = ResRef::MakeLowerCase(itemsnd->QueryField(i, j));
+			ResRef snd = MakeLowerCaseResRef(itemsnd->QueryField(i, j));
 			if (snd == ResRef("*")) break;
-			ItemSounds[i].push_back(strdup(snd));
+			ItemSounds[i].push_back(snd);
 		}
 	}
 }
 
 bool GameData::GetItemSound(ResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
-	Sound = 0;
+	Sound.Reset();
 
 	if (ItemSounds.empty()) {
 		ReadItemSounds();
@@ -595,7 +553,7 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 {
 	static bool loadedRacialTHAC0 = false;
 	if (!loadedRacialTHAC0) {
-		raceTHAC0Bonus.load("racethac", true);
+		raceTHAC0Bonus = LoadTable("racethac", true);
 		loadedRacialTHAC0 = true;
 	}
 
@@ -609,8 +567,8 @@ int GameData::GetRacialTHAC0Bonus(ieDword proficiency, const char *raceName)
 
 bool GameData::HasInfravision(const char *raceName)
 {
-	if (!racialInfravision.ok()) {
-		racialInfravision.load("racefeat", true);
+	if (!racialInfravision) {
+		racialInfravision = LoadTable("racefeat", true);
 	}
 	if (!raceName) return false;
 
@@ -621,7 +579,8 @@ int GameData::GetSpellAbilityDie(const Actor *target, int which)
 {
 	static bool loadedSpellAbilityDie = false;
 	if (!loadedSpellAbilityDie) {
-		if (!spellAbilityDie.load("clssplab", true)) {
+		spellAbilityDie = LoadTable("clssplab", true);
+		if (!spellAbilityDie) {
 			Log(ERROR, "GameData", "GetSpellAbilityDie failed loading clssplab.2da!");
 			return 6;
 		}
@@ -637,8 +596,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 {
 	if (!core->HasFeature(GF_3ED_RULES)) return 0;
 
-	if (!trapSaveBonus.ok()) {
-		trapSaveBonus.load("trapsave", true);
+	if (!trapSaveBonus) {
+		trapSaveBonus = LoadTable("trapsave", true);
 	}
 
 	return atoi(trapSaveBonus->QueryField(level - 1, cls - 1));
@@ -646,8 +605,8 @@ int GameData::GetTrapSaveBonus(ieDword level, int cls)
 
 int GameData::GetTrapLimit(Scriptable *trapper)
 {
-	if (!trapLimit.ok()) {
-		trapLimit.load("traplimt", true);
+	if (!trapLimit) {
+		trapLimit = LoadTable("traplimt", true);
 	}
 
 	if (trapper->Type != ST_ACTOR) {
@@ -669,8 +628,8 @@ int GameData::GetTrapLimit(Scriptable *trapper)
 
 int GameData::GetSummoningLimit(ieDword sex)
 {
-	if (!summoningLimit.ok()) {
-		summoningLimit.load("summlimt", true);
+	if (!summoningLimit) {
+		summoningLimit = LoadTable("summlimt", true);
 	}
 
 	unsigned int row = 1000;
@@ -692,7 +651,7 @@ const Color& GameData::GetColor(const char *row)
 {
 	// preload converted colors
 	if (colors.empty()) {
-		AutoTable colorTable("colors", true);
+		AutoTable colorTable = LoadTable("colors", true);
 		for (size_t r = 0; r < colorTable->GetRowCount(); r++) {
 			ieDword c = strtounsigned<ieDword>(colorTable->QueryField(r, 0));
 			colors[colorTable->GetRowName(r)] = Color(c);
@@ -710,8 +669,8 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 {
 	// preload optimized version, since this gets called each tick several times
 	if (weaponStyleAPRBonusMax.IsZero()) {
-		AutoTable bonusTable("wspatck", true);
-		if (!bonusTable.ok()) {
+		AutoTable bonusTable = LoadTable("wspatck", true);
+		if (!bonusTable) {
 			weaponStyleAPRBonusMax.w = -1;
 			return 0;
 		}
@@ -747,12 +706,12 @@ int GameData::GetWeaponStyleAPRBonus(int row, int col)
 	return weaponStyleAPRBonus[row * weaponStyleAPRBonusMax.w + col];
 }
 
-bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const
+bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data)
 {
 	if (!data.empty()) {
 		data.clear();
 	}
-	AutoTable tm(tableName);
+	AutoTable tm = LoadTable(tableName);
 	if (!tm) {
 		Log(ERROR, "GameData", "Cannot find %s.2da.", tableName.CString());
 		return false;
@@ -761,9 +720,9 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 	size_t count = tm->GetRowCount();
 	data.resize(count);
 	for (size_t i = 0; i < count; i++) {
-		data[i] = ResRef::MakeLowerCase(tm->QueryField(i, 0));
+		data[i] = MakeLowerCaseResRef(tm->QueryField(i, 0));
 		// * marks an empty resource
-		if (data[i].IsStar()) {
+		if (IsStar(data[i])) {
 			data[i].Reset();
 		}
 	}
@@ -772,7 +731,7 @@ bool GameData::ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& dat
 
 void GameData::ReadSpellProtTable()
 {
-	AutoTable tab("splprot");
+	AutoTable tab = LoadTable("splprot");
 	if (!tab) {
 		return;
 	}

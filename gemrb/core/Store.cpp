@@ -98,7 +98,7 @@ int Store::GetRealStockSize() const
 
 bool Store::IsBag() const
 {
-	return (Type==STT_BG2CONT || Type==STT_IWD2CONT);
+	return Type == StoreType::BG2CONT || Type == StoreType::IWD2CONT;
 }
 
 int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
@@ -124,7 +124,7 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 	if (!(Flags&IE_STORE_BUY))
 		ret &= ~IE_STORE_BUY;
 
-	if (pc && (Type<STT_BG2CONT) ) {
+	if (pc && Type < StoreType::BG2CONT) {
 		//don't allow selling of non destructible items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE )) {
 			ret &= ~IE_STORE_SELL;
@@ -192,7 +192,7 @@ STOItem *Store::GetItem(unsigned int idx, bool usetrigger) const
 	return NULL;
 }
 
-unsigned int Store::FindItem(const char* itemname, bool usetrigger) const
+unsigned int Store::FindItem(const ResRef &itemname, bool usetrigger) const
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (usetrigger) {
@@ -287,24 +287,32 @@ void Store::AddItem(CREItem *item)
 	STOItem *temp = FindItem(item, true);
 
 	if (temp) {
-		if (temp->InfiniteSupply!=-1) {
-			if (item->MaxStackAmount) {
-				// Stacked, so increase usages.
-				ieDword newAmount = 1;
-				if (!temp->Usages[0]) temp->Usages[0] = 1;
-				if (item->Usages[0] != temp->Usages[0] && item->Usages[0] > 0) {
-					// Stack sizes differ!
-					// For now, we do what bg2 does and just round up.
-					newAmount = item->Usages[0] / temp->Usages[0];
-					if (item->Usages[0] % temp->Usages[0])
-						newAmount++;
-				}
-				temp->AmountInStock += newAmount;
-			} else {
-				// Not stacked, so just increase the amount.
-				temp->AmountInStock++;
-			}
+		if (temp->InfiniteSupply == -1) {
+			return;
 		}
+
+		if (!item->MaxStackAmount) {
+			// Not stacked, so just increase the amount.
+			temp->AmountInStock++;
+			return;
+		}
+
+		// Stacked, so increase usages.
+		ieDword newAmount = 1;
+		if (!temp->Usages[0]) temp->Usages[0] = 1;
+		if (item->Usages[0] == temp->Usages[0] || item->Usages[0] == 0) {
+			// same stack size
+			temp->AmountInStock += newAmount;
+			return;
+		}
+
+		// Stack sizes differ!
+		// For now, we do what bg2 does and just round up.
+		newAmount = item->Usages[0] / temp->Usages[0];
+		if (item->Usages[0] % temp->Usages[0]) {
+			newAmount++;
+		}
+		temp->AmountInStock += newAmount;
 		return;
 	}
 

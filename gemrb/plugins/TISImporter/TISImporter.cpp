@@ -58,25 +58,31 @@ bool TISImporter::Open(DataStream* stream)
 	return true;
 }
 
-Tile* TISImporter::GetTile(unsigned short* indexes, int count,
-	unsigned short* secondary)
+Tile* TISImporter::GetTile(const std::vector<ieWord>& indexes,
+						   unsigned short* secondary)
 {
-	Animation* ani = new Animation( count );
+	size_t count = indexes.size();
+	std::vector<Animation::frame_t> frames;
+	frames.reserve(count);
+	for (size_t i = 0; i < count; i++) {
+		frames.push_back(GetTile(indexes[i]));
+	}
+	
+	Animation ani = Animation(std::move(frames));
 	//pause key stops animation
-	ani->gameAnimation = true;
+	ani.gameAnimation = true;
 	//the turning crystal in ar3202 (bg1) requires animations to be synced
-	ani->frameIdx = 0;
-	for (int i = 0; i < count; i++) {
-		ani->AddFrame( GetTile( indexes[i] ), i );
-	}
+	ani.frameIdx = 0;
+	
 	if (secondary) {
-		Animation* sec = new Animation( count );
-		for (int i = 0; i < count; i++) {
-			sec->AddFrame( GetTile( secondary[i] ), i );
+		frames.clear();
+		for (size_t i = 0; i < count; i++) {
+			frames.push_back(GetTile(secondary[i]));
 		}
-		return new Tile( ani, sec );
+		Animation sec = Animation(frames);
+		return new Tile(ani, sec);
 	}
-	return new Tile( ani );
+	return new Tile(ani);
 }
 
 Holder<Sprite2D> TISImporter::GetTile(int index)
@@ -84,11 +90,10 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	PaletteHolder pal = MakeHolder<Palette>();
 	PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
 	
-	void* pixels = calloc(4096, 1);
 	unsigned long pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
-		static TISImporter *last_corrupt = NULL;
+		static const TISImporter *last_corrupt = nullptr;
 		if (last_corrupt != this) {
 			Log(ERROR, "TISImporter", "Corrupt WED file encountered; couldn't find any more tiles at tile %d", index);
 			last_corrupt = this;
@@ -96,7 +101,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
 		pal->col[0].g = 200;
-		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
+		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	}
 	str->Seek( pos, GEM_STREAM_START );
 	Color Col[256];
@@ -113,8 +118,10 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 			fmt.ColorKey = i;
 		}
 	}
-	str->Read( pixels, 4096 );
-	return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), pixels, fmt);
+	auto spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+	str->Read(spr->LockSprite(), 4096);
+	spr->UnlockSprite();
+	return spr;
 }
 
 #include "plugindef.h"

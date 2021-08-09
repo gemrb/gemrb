@@ -1728,6 +1728,8 @@ def UpdatePortraitWindow ():
 		Button.SetFlags (portraitFlags, OP_SET)
 
 		Button.SetState (IE_GUI_BUTTON_LOCKED)
+		if pic == None:
+			pic = ""
 		Button.SetPicture (pic, "NOPORTSM")
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
@@ -1751,7 +1753,7 @@ def UpdatePortraitWindow ():
 		elif GameCheck.IsIWD1() or GameCheck.IsIWD2():
 			HPLabel = Window.GetControl (100+i)
 			HPLabel.SetText (ratio_str)
-			HPLabel.SetTextColor (color)
+			HPLabel.SetColor (color)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (pcID)
@@ -1828,7 +1830,7 @@ def UpdateAnimatedPortrait (Window,i):
 	g = int (255 * ratio)
 
 	ButtonHP.SetText ("%s / %d" %(hp, hp_max))
-	ButtonHP.SetTextColor ({'r' : r, 'g' : g, 'b' : 0})
+	ButtonHP.SetColor ({'r' : r, 'g' : g, 'b' : 0})
 	ButtonHP.SetBAM ('FILLBAR', 0, 0, -1)
 	ButtonHP.SetPictureClipping (ratio)
 

@@ -110,7 +110,7 @@ private:
 	// TODO: to support partial redraws, we should change the clip parameter to a list of dirty rects
 	// that have all been clipped to the video ScreenClip
 	// subclasses can then use the list to efficiently redraw only those sections that are dirty
-	virtual void DrawSelf(Region /*drawFrame*/, const Region& /*clip*/) {};
+	virtual void DrawSelf(const Region& /*drawFrame*/, const Region& /*clip*/) {};
 	Region DrawingFrame() const;
 
 	void AddedToWindow(Window*);
@@ -128,7 +128,7 @@ private:
 	
 	virtual bool IsPerPixelScrollable() const { return true; }
 	
-	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group);
+	virtual ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group);
 
 protected:
 	void ClearScriptingRefs();
@@ -257,11 +257,11 @@ public:
 	void SetEventProxy(View* proxy);
 
 	// GUIScripting
-	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, const ResRef& group);
-	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ResRef& group);
+	const ViewScriptingRef* AssignScriptingRef(ScriptingId id, const ScriptingGroup_t& group);
+	const ViewScriptingRef* ReplaceScriptingRef(const ViewScriptingRef* old, ScriptingId id, const ScriptingGroup_t& group);
 	const ViewScriptingRef* RemoveScriptingRef(const ViewScriptingRef*);
 	const ViewScriptingRef* GetScriptingRef() const;
-	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ResRef group) const;
+	const ViewScriptingRef* GetScriptingRef(ScriptingId id, ScriptingGroup_t group) const;
 };
 
 }

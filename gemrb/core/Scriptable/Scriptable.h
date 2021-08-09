@@ -132,8 +132,8 @@ class Sprite2D;
 #define MAX_BUMP_BACK_TRIES 16
 #define MAX_RAND_WALK 10
 
-typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
-ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
+using ScriptableType = enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
+	ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 };
 
 enum {
 	trigger_acquired = 0x1, // unused and broken in the original
@@ -224,7 +224,7 @@ struct TriggerEntry {
 	unsigned int flags;
 };
 
-//typedef std::list<ieDword *> TriggerObjects;
+//using TriggerObjects = std::list<ieDword *>;
 
 //#define SEA_RESET		0x00000002
 //#define SEA_PARTY_REQUIRED	0x00000004

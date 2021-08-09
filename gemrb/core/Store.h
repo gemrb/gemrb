@@ -41,11 +41,11 @@ namespace GemRB {
 class CREItem;
 class Condition;
 
-typedef enum StoreType { STT_STORE=0, STT_TAVERN=1, STT_INN=2, STT_TEMPLE=3,
-STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
+enum class StoreType { STORE = 0, TAVERN = 1, INN = 2, TEMPLE = 3,
+BG2CONT = 4, IWD2CONT = 5, BAG = 6 };
 
-typedef enum StoreActionType : int16_t { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
-STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
+using StoreActionType = enum StoreActionType : int16_t { STA_BUYSELL = 0, STA_IDENTIFY = 1, STA_STEAL = 2,
+STA_CURE = 3, STA_DONATE = 4, STA_DRINK = 5, STA_ROOMRENT = 6, STA_OPTIONAL = 0x80 };
 
 #define IE_STORE_BUY      1
 #define IE_STORE_SELL     2
@@ -129,7 +129,7 @@ public:
 	std::vector<ieDword> purchased_categories;
 
 	ResRef Name;
-	ieDword Type = 0;
+	StoreType Type = StoreType::STORE;
 	ieStrRef StoreName = 0;
 	ieDword Flags = 0;
 	ieDword SellMarkup = 0;
@@ -178,7 +178,7 @@ public: //queries
 	void AddItem(CREItem* item);
 	void RemoveItem(const STOItem *itm);
 	/** Returns index of item */
-	unsigned int FindItem(const char* item, bool usetrigger) const;
+	unsigned int FindItem(const ResRef &item, bool usetrigger) const;
 	const char *GetOwner() const;
 	ieDword GetOwnerID() const;
 	void SetOwnerID(ieDword owner);

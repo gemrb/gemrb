@@ -93,18 +93,102 @@ namespace GemRB {
 
 GEM_EXPORT Interface* core = NULL;
 
-static int MaximumAbility = 25;
-static ieWordSigned *strmod = NULL;
-static ieWordSigned *strmodex = NULL;
-static ieWordSigned *intmod = NULL;
-static ieWordSigned *dexmod = NULL;
-static ieWordSigned *conmod = NULL;
-static ieWordSigned *chrmod = NULL;
-static ieWordSigned *lorebon = NULL;
-static ieWordSigned *wisbon = NULL;
+struct AbilityTables {
+	using AbilityTable = std::vector<ieWordSigned>;
+	
+	const int tableSize = 0;
+	AbilityTable strmod;
+	AbilityTable strmodex;
+	AbilityTable intmod;
+	AbilityTable dexmod;
+	AbilityTable conmod;
+	AbilityTable chrmod;
+	AbilityTable lorebon;
+	AbilityTable wisbon;
+	
+	AbilityTables(int MaximumAbility) noexcept
+	: tableSize(MaximumAbility + 1),
+	strmod(tableSize * 4),
+	strmodex(101 * 4),
+	intmod(tableSize * 5),
+	dexmod(tableSize * 3),
+	conmod(tableSize * 5),
+	chrmod(tableSize),
+	lorebon(tableSize),
+	wisbon(tableSize)
+	{
+		if (!ReadAbilityTable("strmod", strmod, 4, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'strmod' ability table!");
+		}
+		
+		//3rd ed doesn't have strmodex, but has a maximum of 40
+		if (!ReadAbilityTable("strmodex", strmodex, 4, 101) && MaximumAbility <= 25) {
+			Log(ERROR, "Interface", "unable to read 'strmodex' ability table!");
+		}
+		
+		if (!ReadAbilityTable("intmod", intmod, 5, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'intmod' ability table!");
+		}
+		
+		if (!ReadAbilityTable("hpconbon", conmod, 5, tableSize)) {
+			Log(ERROR, "Interface", "unable to read 'hpconbon' ability table!");
+		}
+		
+		if (!core->HasFeature(GF_3ED_RULES)) {
+			//no lorebon in iwd2???
+			if (!ReadAbilityTable("lorebon", lorebon, 1, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'lorebon' ability table!");
+			}
+			
+			//no dexmod in iwd2???
+			if (!ReadAbilityTable("dexmod", dexmod, 3, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'dexmod' ability table!");
+			}
+		}
+		//this table is a single row (not a single column)
+		if (!ReadAbilityTable("chrmodst", chrmod, tableSize, 1)) {
+			Log(ERROR, "Interface", "unable to read 'chrmodst' ability table!");
+		}
+
+		if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
+			if (!ReadAbilityTable("wisxpbon", wisbon, 1, tableSize)) {
+				Log(ERROR, "Interface", "unable to read 'wisxpbon' ability table!");
+			}
+		}
+	}
+	
+private:
+	bool ReadAbilityTable(const ResRef& tablename, AbilityTable& table, int columns, int rows) const
+	{
+		AutoTable tab = gamedata->LoadTable(tablename);
+		if (!tab) {
+			return false;
+		}
+		//this is a hack for rows not starting at 0 in some cases
+		int fix = 0;
+		const char * tmp = tab->GetRowName(0);
+		if (tmp && (tmp[0]!='0')) {
+			fix = atoi(tmp);
+			for (int i=0;i<fix;i++) {
+				for (int j=0;j<columns;j++) {
+					table[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
+				}
+			}
+		}
+		for (int j=0;j<columns;j++) {
+			for( int i=0;i<rows-fix;i++) {
+				table[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
+			}
+		}
+		return true;
+	}
+};
+
+static std::unique_ptr<AbilityTables> abilityTables;
+
 static int **reputationmod = NULL;
-static ieVariable IWD2DeathVarFormat = "_DEAD%s";
-static ieVariable DeathVarFormat = "SPRITE_IS_DEAD%s";
+static const char* const IWD2DeathVarFormat = "_DEAD%s";
+static const char* DeathVarFormat = "SPRITE_IS_DEAD%s";
 static int NumRareSelectSounds = 2;
 
 static const ieWord IDT_FAILURE = 0;
@@ -142,45 +226,11 @@ Interface::Interface()
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
-	winmgr = NULL;
-	projserv = NULL;
-	RtRows = NULL;
-	sgiterator = NULL;
-	game = NULL;
-	calendar = NULL;
-	keymap = NULL;
-	worldmap = NULL;
-	CurrentStore = NULL;
-	CurrentContainer = NULL;
-	UseContainer = false;
-	displaymsg = NULL;
-	slotmatrix = NULL;
+	displaymsg = nullptr;
 
-	UseCorruptedHack = false;
-
-	mousescrollspd = 10;
-	QuitFlag = QF_NORMAL;
-	EventFlag = EF_CONTROL;
-#ifndef WIN32
-	config.CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
+#ifdef WIN32
+	config.CaseSensitive = false; // this is just the default value, so CD1/CD2 will be resolved
 #endif
-	strlcpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
-
-	GlobalScript = "BALDUR";
-	WorldMapName[0] = "WORLDMAP";
-
-	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		GroundCircleBam[size].Reset();
-		GroundCircleScale[size] = 0;
-	}
-
-	TooltipBG = NULL;
-	memset(GameFeatures, 0, sizeof( GameFeatures ));
-	//GameFeatures = 0;
-	//GameFeatures2 = 0;
-	memset(&Time, 0, sizeof(Time));
-	AreaAliasTable = NULL;
-	update_scripts = false;
 
 	SystemEncoding = DefaultSystemEncoding;
 #if defined(WIN32) && defined(HAVE_ICONV)
@@ -195,14 +245,7 @@ Interface::Interface()
 	SystemEncoding = nl_langinfo(CODESET);
 #endif
 
-	TLKEncoding.encoding = "ISO-8859-1";
-	TLKEncoding.widechar = false;
-	TLKEncoding.multibyte = false;
-	TLKEncoding.zerospace = false;
 	MagicBit = HasFeature(GF_MAGICBIT);
-	VersionOverride = ItemTypes = SlotTypes = 0;
-	FeedbackLevel = 0;
-	CutSceneRunner = NULL;
 
 	gamedata = new GameData();
 
@@ -220,27 +263,6 @@ Interface::Interface()
 	tokens->SetType( GEM_VARIABLES_STRING );
 }
 
-static void ReleaseItemList(void *poi)
-{
-	delete ((ItemList *) poi);
-}
-
-static void FreeAbilityTables()
-{
-#define NULL_FREE(ptr)\
-	free(ptr); ptr = nullptr
-
-	NULL_FREE(strmod);
-	NULL_FREE(strmodex);
-	NULL_FREE(intmod);
-	NULL_FREE(dexmod);
-	NULL_FREE(conmod);
-	NULL_FREE(chrmod);
-	NULL_FREE(lorebon);
-	NULL_FREE(wisbon);
-#undef NULL_FREE
-}
-
 Interface::~Interface(void)
 {
 	WindowManager::CursorMouseUp = NULL;
@@ -248,16 +270,12 @@ Interface::~Interface(void)
 
 	delete winmgr;
 
-	delete AreaAliasTable;
-
 	//destroy the highest objects in the hierarchy first!
 	// here gamectrl is either null (no game) or already taken out by its window (game loaded)
 	assert(game == nullptr);
 	delete calendar;
 	delete worldmap;
 	delete keymap;
-
-	FreeAbilityTables();
 
 	if (reputationmod) {
 		for (unsigned int i=0; i<20; i++) {
@@ -279,9 +297,6 @@ Interface::~Interface(void)
 	PluginMgr::Get()->RunCleanup();
 
 	ReleaseMemoryActor();
-	ReleaseMemorySpell();
-	EffectQueue_ReleaseMemory();
-	CharAnimations::ReleaseMemory();
 
 	slotTypes.clear();
 	free( slotmatrix );
@@ -309,12 +324,6 @@ Interface::~Interface(void)
 		delete lists;
 	}
 
-	if (RtRows) {
-		RtRows->RemoveAll(ReleaseItemList);
-		delete RtRows;
-	}
-
-	Map::ReleaseMemory();
 	Actor::ReleaseMemory();
 
 	gamedata->ClearCaches();
@@ -329,7 +338,6 @@ GameControl* Interface::StartGameControl()
 {
 	assert(gamectrl == nullptr);
 
-	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Region screen(0, 0, config.Width, config.Height);
 	gamectrl = new GameControl(screen);
 	gamectrl->AssignScriptingRef(0, "GC");
@@ -382,12 +390,8 @@ void Interface::HandleEvents()
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {
-		ieDword tmp = (ieDword) ~0;
-		vars->Lookup( "OtherWindow", tmp );
-		if (tmp == (ieDword) ~0) {
-			EventFlag &= ~EF_SHOWMAP;
-			guiscript->RunFunction( "GUIMA", "ShowMap" );
-		}
+		EventFlag &= ~EF_SHOWMAP;
+		guiscript->RunFunction("GUIMA", "ShowMap");
 		return;
 	}
 
@@ -449,6 +453,12 @@ void Interface::HandleFlags()
 {
 	//clear events because the context changed
 	EventFlag = EF_CONTROL;
+
+	// save console history, so it's preserved between runs and games
+	if (QuitFlag & (QF_QUITGAME | QF_EXITGAME | QF_LOADGAME)) {
+		const Console* console = GetControl<Console>("CONSOLE_CTL", 1);
+		if (console) console->SaveHistory();
+	}
 
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// closing windows must come before tearing anything else down
@@ -519,107 +529,9 @@ void Interface::HandleFlags()
 	}
 }
 
-static bool GenerateAbilityTables()
-{
-	FreeAbilityTables();
-
-	//range is: 0 - maximumability
-	int tablesize = MaximumAbility+1;
-	strmod = (ieWordSigned *) malloc (tablesize * 4 * sizeof(ieWordSigned) );
-	if (!strmod)
-		return false;
-	strmodex = (ieWordSigned *) malloc (101 * 4 * sizeof(ieWordSigned) );
-	if (!strmodex)
-		return false;
-	intmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
-	if (!intmod)
-		return false;
-	dexmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
-	if (!dexmod)
-		return false;
-	conmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
-	if (!conmod)
-		return false;
-	chrmod = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
-	if (!chrmod)
-		return false;
-	lorebon = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
-	if (!lorebon)
-		return false;
-	wisbon = (ieWordSigned *) calloc (tablesize * 1, sizeof(ieWordSigned));
-	if (!wisbon)
-		return false;
-	return true;
-}
-
-bool Interface::ReadAbilityTable(const ResRef& tablename, ieWordSigned *mem, int columns, int rows)
-{
-	AutoTable tab(tablename);
-	if (!tab) {
-		return false;
-	}
-	//this is a hack for rows not starting at 0 in some cases
-	int fix = 0;
-	const char * tmp = tab->GetRowName(0);
-	if (tmp && (tmp[0]!='0')) {
-		fix = atoi(tmp);
-		for (int i=0;i<fix;i++) {
-			for (int j=0;j<columns;j++) {
-				mem[rows*j+i] = strtosigned<ieWordSigned>(tab->QueryField(0,j));
-			}
-		}
-	}
-	for (int j=0;j<columns;j++) {
-		for( int i=0;i<rows-fix;i++) {
-			mem[rows*j+i+fix] = strtosigned<ieWordSigned>(tab->QueryField(i,j));
-		}
-	}
-	return true;
-}
-
-bool Interface::ReadAbilityTables()
-{
-	bool ret = GenerateAbilityTables();
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("strmod", strmod, 4, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("strmodex", strmodex, 4, 101);
-	//3rd ed doesn't have strmodex, but has a maximum of 40
-	if (!ret && (MaximumAbility<=25) )
-		return ret;
-	ret = ReadAbilityTable("intmod", intmod, 5, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
-	if (!ret)
-		return ret;
-	if (!HasFeature(GF_3ED_RULES)) {
-		//no lorebon in iwd2???
-		ret = ReadAbilityTable("lorebon", lorebon, 1, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-		//no dexmod in iwd2???
-		ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-	}
-	//this table is a single row (not a single column)
-	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
-	if (!ret)
-		return ret;
-	if (gamedata->Exists("wisxpbon", IE_2DA_CLASS_ID, true)) {
-		ret = ReadAbilityTable("wisxpbon", wisbon, 1, MaximumAbility + 1);
-		if (!ret)
-			return ret;
-	}
-	return true;
-}
-
 bool Interface::ReadGameTimeTable()
 {
-	AutoTable table("gametime");
+	AutoTable table = gamedata->LoadTable("gametime");
 	if (!table) {
 		return false;
 	}
@@ -641,7 +553,7 @@ bool Interface::ReadSpecialSpells()
 {
 	bool result = true;
 
-	AutoTable table("splspec");
+	AutoTable table = gamedata->LoadTable("splspec");
 	if (table) {
 		ieDword SpecialSpellsCount = table->GetRowCount();
 		SpecialSpells.resize(SpecialSpellsCount);
@@ -656,7 +568,7 @@ bool Interface::ReadSpecialSpells()
 		result = false;
 	}
 
-	table.load("wildmag");
+	table = gamedata->LoadTable("wildmag");
 	if (table) {
 		SurgeSpell ss;
 		for (ieDword i = 0; i < table->GetRowCount(); i++) {
@@ -715,14 +627,9 @@ const char *Interface::GetDeathVarFormat()
 
 bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 {
-	if (AreaAliasTable) {
-		AreaAliasTable->RemoveAll(NULL);
-	} else {
-		AreaAliasTable = new Variables();
-		AreaAliasTable->SetType(GEM_VARIABLES_INT);
-	}
+	AreaAliasTable.clear();
 
-	AutoTable aa(tablename);
+	AutoTable aa = gamedata->LoadTable(tablename);
 	if (!aa) {
 		//don't report error when the file doesn't exist
 		return true;
@@ -730,25 +637,23 @@ bool Interface::ReadAreaAliasTable(const ResRef& tablename)
 
 	int idx = aa->GetRowCount();
 	while (idx--) {
-		ResRef key = ResRef::MakeLowerCase(aa->GetRowName(idx));
+		ResRef key = MakeLowerCaseResRef(aa->GetRowName(idx));
 		ieDword value = atoi(aa->QueryField(idx,0));
-		AreaAliasTable->SetAt(key, value);
+		AreaAliasTable[key] = value;
 	}
 	return true;
 }
 
 int Interface::GetAreaAlias(const ResRef &areaname) const
 {
-	ieDword value;
-
-	if (AreaAliasTable && AreaAliasTable->Lookup(areaname, value)) {
-		return (int) value;
+	if (AreaAliasTable.count(areaname)) {
+		return AreaAliasTable.at(areaname);
 	}
 	return -1;
 }
 
 bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
-	AutoTable tm(tablename);
+	AutoTable tm = gamedata->LoadTable(tablename);
 	if (!tm)
 		return false;
 
@@ -760,7 +665,7 @@ bool Interface::ReadMusicTable(const ResRef& tablename, int col) {
 }
 
 bool Interface::ReadDamageTypeTable() {
-	AutoTable tm("dmgtypes");
+	AutoTable tm = gamedata->LoadTable("dmgtypes");
 	if (!tm)
 		return false;
 
@@ -777,8 +682,9 @@ bool Interface::ReadDamageTypeTable() {
 	return true;
 }
 
-bool Interface::ReadReputationModTable() {
-	AutoTable tm("reputati");
+bool Interface::ReadReputationModTable() const
+{
+	AutoTable tm = gamedata->LoadTable("reputati");
 	if (!tm)
 		return false;
 
@@ -794,8 +700,9 @@ bool Interface::ReadReputationModTable() {
 	return true;
 }
 
-bool Interface::ReadSoundChannelsTable() {
-	AutoTable tm("sndchann");
+bool Interface::ReadSoundChannelsTable() const
+{
+	AutoTable tm = gamedata->LoadTable("sndchann");
 	if (!tm) {
 		return false;
 	}
@@ -913,7 +820,7 @@ int Interface::LoadSprites()
 		// same layout as in the originals, with odd indices having the pressed cursor image
 		char fileName[32];
 		while (CursorCount < 99) {
-			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), CursorCount);
+			snprintf(fileName, sizeof(fileName), "%.29s%02ld", MainCursorsImage.CString(), long(CursorCount));
 			ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(fileName, true);
 			if (!im) break;
 			Cursors.push_back(im->GetSprite2D());
@@ -923,8 +830,7 @@ int Interface::LoadSprites()
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
-		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).",
-				CursorCount, IE_CURSOR_WAY);
+		Log(ERROR, "Core", "Failed to load enough cursors (%ld < %d).", long(CursorCount), IE_CURSOR_WAY);
 		return GEM_ERROR;
 	}
 	WindowManager::CursorMouseUp = Cursors[0];
@@ -983,7 +889,7 @@ int Interface::LoadSprites()
 int Interface::LoadFonts()
 {
 	Log(MESSAGE, "Core", "Loading Fonts...");
-	AutoTable tab("fonts");
+	AutoTable tab = gamedata->LoadTable("fonts");
 	if (!tab) {
 		Log(ERROR, "Core", "Cannot find fonts.2da.");
 		return GEM_ERROR;
@@ -1132,7 +1038,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	// we set the path to the data dir to cover unhardcoded and co,
 	// while plugins are statically linked, so it doesn't matter for them
 	// Also, support running from eg. KDevelop AppImages by checking the name.
-#ifdef DATA_DIR
+#if defined(DATA_DIR) && defined(__linux__)
 	const char* appDir = getenv("APPDIR");
 	const char* appImageFile = getenv("ARGV0");
 	if (appDir) {
@@ -1281,7 +1187,7 @@ int Interface::Init(InterfaceConfig* cfg)
 
 	Log(MESSAGE, "Core", "GemRB Core Initialization...");
 	Log(MESSAGE, "Core", "Initializing Video Driver...");
-	video = Holder<Video>(( Video * ) PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str()));
+	video = std::shared_ptr<Video>(static_cast<Video*>(PluginMgr::Get()->GetDriver(&Video::ID, config.VideoDriverName.c_str())));
 	if (!video) {
 		Log(FATAL, "Core", "No Video Driver Available.");
 		return GEM_ERROR;
@@ -1554,7 +1460,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	QuitFlag = QF_CHANGESCRIPT;
 
 	Log(MESSAGE, "Core", "Starting up the Sound Driver...");
-	AudioDriver = Holder<Audio>((Audio*) PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str()));
+	AudioDriver = std::shared_ptr<Audio>(static_cast<Audio*>(PluginMgr::Get()->GetDriver(&Audio::ID, config.AudioDriverName.c_str())));
 	if (AudioDriver == nullptr) {
 		Log(FATAL, "Core", "Failed to load sound driver.");
 		return GEM_ERROR;
@@ -1619,7 +1525,7 @@ int Interface::Init(InterfaceConfig* cfg)
 	}
 
 	if (HasFeature(GF_IWD2_DEATHVARFORMAT)) {
-		memcpy(DeathVarFormat, IWD2DeathVarFormat, sizeof(ieVariable));
+		DeathVarFormat = IWD2DeathVarFormat;
 	}
 
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
@@ -1671,13 +1577,8 @@ int Interface::Init(InterfaceConfig* cfg)
 	if (!ret) {
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
-
-	Log(MESSAGE, "Core", "Initializing ability tables...");
-	ret = ReadAbilityTables();
-	if (!ret) {
-		Log(FATAL, "Core", "Failed to initialize ability tables...");
-		return GEM_ERROR;
-	}
+	
+	abilityTables = make_unique<AbilityTables>(MaximumAbility);
 
 	Log(MESSAGE, "Core", "Reading reputation mod table...");
 	ret = ReadReputationModTable();
@@ -1764,13 +1665,13 @@ bool Interface::IsAvailable(SClass_ID filetype) const
 
 WorldMap *Interface::GetWorldMap() const
 {
-	int index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
+	size_t index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
 	return worldmap->GetWorldMap(index);
 }
 
 WorldMap *Interface::GetWorldMap(const ResRef& area) const
 {
-	int index = worldmap->FindAndSetCurrentMap(area);
+	size_t index = worldmap->FindAndSetCurrentMap(area);
 	return worldmap->GetWorldMap(index);
 }
 
@@ -2403,7 +2304,7 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 			ab->SetBase(IE_XPVALUE, 0);
 		}
 		if (fx) {
-			ApplyEffect(fx, ab, Owner);
+			ApplyEffect(new Effect(*fx), ab, Owner);
 		}
 
 		//this check should happen after the fact
@@ -2413,11 +2314,13 @@ Actor *Interface::SummonCreature(const ResRef& resource, const ResRef& animRes, 
 		}
 
 	}
+	
+	delete fx;
 	return ab;
 }
 
 /** Loads a Window in the Window Manager */
-Window* Interface::LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition pos)
+Window* Interface::LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition pos)
 {
 	if (ref) // is the winpack changing?
 		guifact->LoadWindowPack(ref);
@@ -2451,9 +2354,9 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 	}
 }
 
-void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
+void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
-	if (game && group == ResRef("HIDE_CUT")) {
+	if (game && group == "HIDE_CUT") {
 		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
 	}
 
@@ -2461,7 +2364,7 @@ void Interface::ToggleViewsVisible(bool visible, const ResRef& group)
 	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
 }
 
-void Interface::ToggleViewsEnabled(bool enabled, const ResRef& group)
+void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const
 {
 	std::vector<View*> views = GetViews(group);
 	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
@@ -2551,7 +2454,7 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 	//end of gui hacks
 }
 
-Tooltip Interface::CreateTooltip()
+Tooltip Interface::CreateTooltip() const
 {
 	Font::PrintColors colors;
 	colors.fg = gamedata->GetColor("TOOLTIP");
@@ -2589,6 +2492,9 @@ void Interface::AskAndExit()
 
 void Interface::ExitGemRB()
 {
+	const Console* console = GetControl<Console>("CONSOLE_CTL", 1);
+	if (console) console->SaveHistory();
+
 	QuitFlag |= QF_KILL;
 }
 /** Returns the variables dictionary */
@@ -2652,13 +2558,13 @@ int Interface::GetSymbolIndex(const char* ResRef) const
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-Holder<SymbolMgr> Interface::GetSymbol(unsigned int index) const
+std::shared_ptr<SymbolMgr> Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
-		return Holder<SymbolMgr>();
+		return {};
 	}
 	if (!symbols[index].sm) {
-		return Holder<SymbolMgr>();
+		return {};
 	}
 	return symbols[index].sm;
 }
@@ -2671,7 +2577,7 @@ bool Interface::DelSymbol(unsigned int index)
 	if (!symbols[index].sm) {
 		return false;
 	}
-	symbols[index].sm.release();
+	symbols[index].sm.reset();
 	return true;
 }
 /** Plays a Movie */
@@ -2681,8 +2587,8 @@ int Interface::PlayMovie(const char* resref)
 
 	//check whether there is an override for this movie
 	const char *sound_resref = NULL;
-	AutoTable mvesnd;
-	if (mvesnd.load("mvesnd", true)) {
+	AutoTable mvesnd = gamedata->LoadTable("mvesnd", true);
+	if (mvesnd) {
 		int row = mvesnd->GetRowIndex(resref);
 		if (row != -1) {
 			int mvecol = mvesnd->GetColumnIndex("override");
@@ -2721,7 +2627,7 @@ int Interface::PlayMovie(const char* resref)
 		IESubtitles(class Font* fnt, const ResRef& resref, const Color& col = Color(0xe9, 0xe2, 0xca, 0xff))
 		: MoviePlayer::SubtitleSet(fnt, col)
 		{
-			AutoTable sttable(resref);
+			AutoTable sttable = gamedata->LoadTable(resref);
 			cachedSub = NULL;
 			nextSubFrame = 0;
 
@@ -2760,7 +2666,7 @@ int Interface::PlayMovie(const char* resref)
 		}
 	};
 
-	AutoTable sttable(resref);
+	AutoTable sttable = gamedata->LoadTable(resref);
 	Font* font = GetFont(MovieFontResRef);
 	if (sttable && font) {
 		int r = atoi(sttable->QueryField("red", "frame"));
@@ -2782,7 +2688,7 @@ int Interface::PlayMovie(const char* resref)
 
 	Holder<SoundHandle> sound_override;
 	if (sound_resref) {
-		sound_override = AudioDriver->Play(sound_resref, SFX_CHAN_NARRATOR);
+		sound_override = AudioDriver->PlayRelative(sound_resref, SFX_CHAN_NARRATOR);
 	}
 
 	// clear whatever is currently on screen
@@ -2830,7 +2736,7 @@ int Interface::Roll(int dice, int size, int add) const
 	return add;
 }
 
-DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir)
+DirectoryIterator Interface::GetResourceDirectory(RESOURCE_DIRECTORY dir) const
 {
 	char Path[_MAX_PATH];
 	const char* resourcePath = NULL;
@@ -2905,10 +2811,9 @@ bool Interface::InitializeVarsWithINI(const char* iniFileName)
 	for (int i = 0; i < defaults->GetTagsCount(); i++) {
 		const char* tag = defaults->GetTagNameByIndex(i);
 		for (int j = 0; j < defaults->GetKeysCount(tag); j++) {
-			ieDword nothing;
 			const char* key = defaults->GetKeyNameByIndex(tag, j);
 			//skip any existing entries. GemRB.cfg has priority
-			if (!vars->Lookup(key, nothing)) {
+			if (!vars->HasKey(key)) {
 				ieDword defaultVal = defaults->GetKeyAsInt(tag, key, 0);
 				vars->SetAt(key, overrides->GetKeyAsInt(tag, key, defaultVal));
 			}
@@ -3249,7 +3154,7 @@ bool Interface::InitItemTypes()
 		free(slotmatrix);
 	}
 
-	AutoTable it("itemtype");
+	AutoTable it = gamedata->LoadTable("itemtype");
 	ItemTypes = 0;
 	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
@@ -3288,7 +3193,7 @@ bool Interface::InitItemTypes()
 			itemtypedata[i][IDT_SKILLPENALTY] = 0; // skill check malus
 		}
 	}
-	AutoTable af("itemdata");
+	AutoTable af = gamedata->LoadTable("itemdata");
 	if (af) {
 		int armcount = af->GetRowCount();
 		int colcount = af->GetColumnCount();
@@ -3305,7 +3210,7 @@ bool Interface::InitItemTypes()
 
 	//slottype describes the inventory structure
 	Inventory::Init();
-	AutoTable st("slottype");
+	AutoTable st = gamedata->LoadTable("slottype");
 	SlotTypes = 0;
 	if (st) {
 		SlotTypes = st->GetRowCount();
@@ -3531,6 +3436,10 @@ int Interface::CanUseItemType(int slottype, const Item *item, const Actor *actor
 
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
+	if (ret && actor && actor->RequiresUMD(item)) {
+		// set an ugly marker for Use magic device, but only if the item is already known to be usable
+		ret |= SLOT_UMD;
+	}
 
 	if (!ret) {
 		if (feedback) displaymsg->DisplayConstantString(STR_WRONGITEMTYPE, DMC_WHITE);
@@ -3601,7 +3510,7 @@ static const char* const saved_extensions_last[] = { ".tot", ".toh", nullptr };
 //2 - save
 //1 - save last
 //0 - don't save
-int Interface::SavedExtension(const char *filename)
+int Interface::SavedExtension(const char *filename) const
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return 0;
@@ -3618,7 +3527,7 @@ int Interface::SavedExtension(const char *filename)
 static const char* const protected_extensions[] = { ".exe", ".dll", ".so", nullptr };
 
 //returns true if file should be saved
-bool Interface::ProtectedExtension(const char *filename)
+bool Interface::ProtectedExtension(const char *filename) const
 {
 	const char *str=strchr(filename,'.');
 	if (!str) return false;
@@ -3630,7 +3539,7 @@ bool Interface::ProtectedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
+void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID) const
 {
 	char filename[_MAX_PATH];
 
@@ -3641,7 +3550,7 @@ void Interface::RemoveFromCache(const ResRef& resref, SClass_ID ClassID)
 //this function checks if the path is eligible as a cache
 //if it contains a directory, or suspicious file extensions
 //we bail out, because the cache will be purged regularly.
-bool Interface::StupidityDetector(const char* Pt)
+bool Interface::StupidityDetector(const char* Pt) const
 {
 	char Path[_MAX_PATH];
 	if (strlcpy(Path, Pt, _MAX_PATH) >= _MAX_PATH) {
@@ -3678,7 +3587,7 @@ bool Interface::StupidityDetector(const char* Pt)
 	return false;
 }
 
-void Interface::DelTree(const char* Pt, bool onlysave)
+void Interface::DelTree(const char* Pt, bool onlysave) const
 {
 	char Path[_MAX_PATH];
 
@@ -3710,7 +3619,7 @@ void Interface::LoadProgress(int percent)
 	winmgr->DrawWindows();
 	winmgr->SetCursorFeedback(cur);
 
-	Window* loadwin = GetWindow(0, "LOADWIN");
+	const Window* loadwin = GetWindow(0, "LOADWIN");
 	if (loadwin) {
 		// loadwin is NULL when LoadMap is called and passes false for the loadscreen param
 		loadwin->RedrawControls("Progress", percent);
@@ -3742,9 +3651,9 @@ void Interface::DragItem(CREItem *item, const ResRef& /*Picture*/)
 	winmgr->GetGameWindow()->SetCursor(DraggedItem->cursor);
 }
 
-bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
+bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix)
 {
-	AutoTable tab(TableName);
+	AutoTable tab = gamedata->LoadTable(TableName);
 	if (!tab) {
 		return false;
 	}
@@ -3755,18 +3664,17 @@ bool Interface::ReadItemTable(const ResRef& TableName, const char *Prefix) const
 		if (Prefix) {
 			ItemName.SNPrintF("%s%02d", Prefix, (j + 1) % 100);
 		} else {
-			ItemName = ResRef::MakeUpperCase(tab->GetRowName(j));
+			ItemName = MakeUpperCaseResRef(tab->GetRowName(j));
 		}
-		//Variable elements are free'd, so we have to use malloc
-		//well, not anymore, we can use ReleaseFunction
+
 		int l=tab->GetColumnCount(j);
 		if (l<1) continue;
 		int cl = atoi(tab->GetColumnName(0));
-		ItemList *itemlist = new ItemList(l, cl);
+		std::vector<ResRef> refs;
 		for(int k=0;k<l;k++) {
-			itemlist->ResRefs[k] = ResRef::MakeLowerCase(tab->QueryField(j, k));
+			refs.push_back(MakeLowerCaseResRef(tab->QueryField(j, k)));
 		}
-		RtRows->SetAt(ItemName, (void*)itemlist);
+		RtRows.insert(std::make_pair(ItemName, ItemList(std::move(refs), cl)));
 	}
 	return true;
 }
@@ -3775,17 +3683,9 @@ bool Interface::ReadRandomItems()
 {
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
-	if (RtRows) {
-		RtRows->RemoveAll(ReleaseItemList);
-	}
-	else {
-		RtRows=new Variables(10, 17); //block size, hash table size
-		if (!RtRows) {
-			return false;
-		}
-		RtRows->SetType( GEM_VARIABLES_POINTER );
-	}
-	AutoTable tab("randitem");
+	RtRows.clear();
+	
+	AutoTable tab = gamedata->LoadTable("randitem");
 	if (!tab) {
 		return false;
 	}
@@ -3795,7 +3695,7 @@ bool Interface::ReadRandomItems()
 
 	//the gold item
 	GoldResRef = tab->QueryField(size_t(0), size_t(0));
-	if (GoldResRef.IsStar()) {
+	if (IsStar(GoldResRef)) {
 		return false;
 	}
 	ResRef randTreasureRef;
@@ -3916,28 +3816,27 @@ void Interface::SanitizeItem(CREItem *item) const
 //there could be a loop, but we don't want to freeze, so there is a limit
 bool Interface::ResolveRandomItem(CREItem *itm) const
 {
-	if (!RtRows) return true;
+	if (RtRows.empty()) return true;
 	for(int loop=0;loop<MAX_LOOP;loop++) {
 		char *endptr;
 		char NewItem[9];
 
-		void* lookup;
-		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
+		if (RtRows.count(itm->ItemResRef) == 0) {
 			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
 				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
 			return true;
 		}
-		ItemList *itemlist = (ItemList*)lookup;
+		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
 		int i;
-		if (itemlist->WeightOdds) {
+		if (itemlist.WeightOdds) {
 			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
-			i=Roll(2,(itemlist->Count+1)/2,-2);
+			i=Roll(2,(itemlist.ResRefs.size() + 1)/2, -2);
 		} else {
-			i=Roll(1,itemlist->Count,-1);
+			i=Roll(1, itemlist.ResRefs.size(), -1);
 		}
-		strnlwrcpy( NewItem, itemlist->ResRefs[i], 8);
+		strnlwrcpy( NewItem, itemlist.ResRefs[i], 8);
 		char *p = strchr(NewItem, '*');
 		int diceSides;
 		if (p) {
@@ -3951,7 +3850,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceThrows = 1;
 		}
 		if (*endptr) {
-			itm->ItemResRef = ResRef::MakeLowerCase(NewItem);
+			itm->ItemResRef = MakeLowerCaseResRef(NewItem);
 		} else {
 			itm->ItemResRef = GoldResRef;
 		}
@@ -4020,7 +3919,7 @@ void Interface::CloseCurrentStore()
 	CurrentStore = NULL;
 }
 
-Store *Interface::SetCurrentStore(const char* resName, ieDword owner)
+Store *Interface::SetCurrentStore(const ResRef &resName, ieDword owner)
 {
 	if (CurrentStore) {
 		if (CurrentStore->Name == resName) {
@@ -4076,7 +3975,7 @@ ieStrRef Interface::GetRumour(const ResRef& dlgref)
 Holder<SoundHandle> Interface::PlaySound(size_t index, unsigned int channel)
 {
 	if (index <= gamedata->defaultSounds.size()) {
-		return AudioDriver->Play(gamedata->defaultSounds[index], channel);
+		return AudioDriver->PlayRelative(gamedata->defaultSounds[index], channel);
 	}
 	return NULL;
 }
@@ -4121,13 +4020,9 @@ bool Interface::HasCurrentArea() const
 Holder<Sprite2D> Interface::GetCursorSprite()
 {
 	Holder<Sprite2D> spr = gamedata->GetBAMSprite(TextCursorBam, 0, 0);
-	if (spr)
-	{
-		if(HasFeature(GF_OVERRIDE_CURSORPOS))
-		{
-			spr->Frame.x=1;
-			spr->Frame.y=spr->Frame.h-1;
-		}
+	if (spr && HasFeature(GF_OVERRIDE_CURSORPOS)) {
+		spr->Frame.x = 1;
+		spr->Frame.y = spr->Frame.h - 1;
 	}
 	return spr;
 }
@@ -4154,7 +4049,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 }
 
 // dealing with applying effects
-void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level)
+void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *caster, int level) const
 {
 	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
@@ -4168,7 +4063,7 @@ void Interface::ApplySpell(const ResRef& spellRef, Actor *actor, Scriptable *cas
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level)
+void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &pos, Scriptable *caster, int level) const
 {
 	const Spell *spell = gamedata->GetSpell(spellRef);
 	if (!spell) {
@@ -4183,7 +4078,7 @@ void Interface::ApplySpellPoint(const ResRef& spellRef, Map* area, const Point &
 //-1 means the effect was reflected back to the caster
 //0 means the effect was resisted and should be removed
 //1 means the effect was applied
-int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
+int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster) const
 {
 	if (!effect) {
 		return 0;
@@ -4196,7 +4091,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Scriptable *caster)
 	return res;
 }
 
-int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster)
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const
 {
 	Point p(-1, -1); //the effect should have all its coordinates already set
 	return ApplyEffectQueue(fxqueue, actor, caster, p);
@@ -4206,7 +4101,7 @@ int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *
 //This means, pcf functions may not be executed when the effect is first applied
 //Adding this new effect block via RefreshEffects is possible, but that might apply existing effects twice
 
-int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p)
+int Interface::ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const
 {
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
@@ -4242,7 +4137,7 @@ Effect *Interface::GetEffect(const ResRef& resname, int level, const Point &p)
 }
 
 // dealing with saved games
-int Interface::SwapoutArea(Map *map)
+int Interface::SwapoutArea(Map *map) const
 {
 	//refuse to save ambush areas, for example
 	if (map->AreaFlags & AF_NOSAVE) {
@@ -4470,10 +4365,10 @@ int Interface::GetStrengthBonus(int column, int value, int ex) const
 			ex=0;
 		else if (ex>100)
 			ex=100;
-		bonus += strmodex[column*101+ex];
+		bonus += abilityTables->strmodex[column*101+ex];
 	}
 
-	return strmod[column*(MaximumAbility+1)+value] + bonus;
+	return abilityTables->strmod[column*(MaximumAbility+1)+value] + bonus;
 }
 
 //The maze columns are used only in the maze spell, no need to restrict them further
@@ -4482,7 +4377,7 @@ int Interface::GetIntelligenceBonus(int column, int value) const
 	//learn spell, max spell level, max spell number on level, maze duration dice, maze duration dice size
 	if (column<0 || column>4) return -9999;
 
-	return intmod[column*(MaximumAbility+1)+value];
+	return abilityTables->intmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetDexterityBonus(int column, int value) const
@@ -4496,7 +4391,7 @@ int Interface::GetDexterityBonus(int column, int value) const
 	if (column<0 || column>2)
 		return -9999;
 
-	return dexmod[column*(MaximumAbility+1)+value];
+	return abilityTables->dexmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetConstitutionBonus(int column, int value) const
@@ -4513,7 +4408,7 @@ int Interface::GetConstitutionBonus(int column, int value) const
 	if (column<0 || column>4)
 		return -9999;
 
-	return conmod[column*(MaximumAbility+1)+value];
+	return abilityTables->conmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetCharismaBonus(int column, int /*value*/) const
@@ -4522,7 +4417,7 @@ int Interface::GetCharismaBonus(int column, int /*value*/) const
 	if (column<0 || column>(MaximumAbility-1))
 		return -9999;
 
-	return chrmod[column];
+	return abilityTables->chrmod[column];
 }
 
 int Interface::GetLoreBonus(int column, int value) const
@@ -4533,18 +4428,18 @@ int Interface::GetLoreBonus(int column, int value) const
 	if (column<0 || column>0)
 		return -9999;
 
-	return lorebon[value];
+	return abilityTables->lorebon[value];
 }
 
 int Interface::GetWisdomBonus(int column, int value) const
 {
-	if (!wisbon) return 0;
+	if (abilityTables->wisbon.empty()) return 0;
 
 	// xp bonus
 	if (column<0 || column>0)
 		return -9999;
 
-	return wisbon[value];
+	return abilityTables->wisbon[value];
 }
 
 int Interface::GetReputationMod(int column) const
@@ -4598,7 +4493,7 @@ bool Interface::SetPause(PauseSetting pause, int flags) const
 	return false;
 }
 
-bool Interface::Autopause(ieDword flag, Scriptable* target)
+bool Interface::Autopause(ieDword flag, Scriptable* target) const
 {
 	ieDword autopause_flags = 0;
 	vars->Lookup("Auto Pause State", autopause_flags);
@@ -4626,7 +4521,7 @@ bool Interface::Autopause(ieDword flag, Scriptable* target)
 	return true;
 }
 
-void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes)
+void Interface::RegisterOpcodes(int count, const EffectDesc *opcodes) const
 {
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }
@@ -4643,16 +4538,16 @@ void Interface::GetResRefFrom2DA(const ResRef& resref, ResRef& resource1, ResRef
 	resource2.Reset();
 	resource3.Reset();
 
-	AutoTable tab(resref);
+	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
-		resource1 = ResRef::MakeUpperCase(tab->QueryField(row, 0));
+		resource1 = MakeUpperCaseResRef(tab->QueryField(row, 0));
 		if (cols > 1) {
-			resource2 = ResRef::MakeUpperCase(tab->QueryField(row, 1));
+			resource2 = MakeUpperCaseResRef(tab->QueryField(row, 1));
 		}
 		if (cols > 2) {
-			resource3 = ResRef::MakeUpperCase(tab->QueryField(row, 2));
+			resource3 = MakeUpperCaseResRef(tab->QueryField(row, 2));
 		}
 	}
 }
@@ -4661,7 +4556,7 @@ ieDword *Interface::GetListFrom2DAInternal(const ResRef& resref)
 {
 	ieDword *ret;
 
-	AutoTable tab(resref);
+	AutoTable tab = gamedata->LoadTable(resref);
 	if (tab) {
 		ieDword cnt = tab->GetRowCount();
 		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
@@ -4698,7 +4593,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 
 	int symbol = LoadSymbol( "stats" );
-	Holder<SymbolMgr> sym = GetSymbol( symbol );
+	auto sym = GetSymbol( symbol );
 	if (!sym) {
 		error("Core", "Cannot load statistic name mappings.\n");
 	}
@@ -4715,9 +4610,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // Optionally an override stat value can be specified (needed for use in pcfs).
 int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
 {
-	int mastertable = gamedata->LoadTable( tablename );
-	if (mastertable == -1) return -1;
-	Holder<TableMgr> mtm = gamedata->GetTable( mastertable );
+	AutoTable mtm = gamedata->LoadTable(tablename);
 	if (!mtm) {
 		Log(ERROR, "Core", "Cannot resolve stat bonus.");
 		return -1;
@@ -4736,9 +4629,7 @@ int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword fla
 		if (!(flags&1)) {
 			value = actor->GetSafeStat(stat);
 		}
-		int table = gamedata->LoadTable( tablename );
-		if (table == -1) continue;
-		Holder<TableMgr> tm = gamedata->GetTable( table );
+		auto tm = gamedata->LoadTable(tablename);
 		if (!tm) continue;
 
 		int row;

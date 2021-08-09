@@ -242,7 +242,7 @@ struct WildSurgeSpellMods {
 	int saving_throw_mod;
 };
 
-typedef ieByte ActionButtonRow[GUIBT_COUNT];
+using ActionButtonRow = ieByte[GUIBT_COUNT];
 struct ActionButtonRow2 {
 	ActionButtonRow buttons;
 	ieByte clss;
@@ -432,7 +432,7 @@ private:
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
 	const char* GetActorNameByID(ieDword ID) const;
 	/* checks a weapon quick slot and resets it to fist if it is empty */
-	void CheckWeaponQuickSlot(unsigned int which);
+	void CheckWeaponQuickSlot(unsigned int which) const;
 	/* helper for usability checks */
 	int CheckUsability(const Item *item) const;
 	/* Set up all the missing stats on load time, or after level up */
@@ -537,14 +537,14 @@ public:
 	{
 		if(which==-1) which=TalkCount;
 		if (which) {
-			return LongName;
+			return LongName.CString();
 		}
-		return ShortName;
+		return ShortName.CString();
 	}
 	/** Gets the DeathVariable */
 	const char* GetScriptName(void) const
 	{
-		return scriptName;
+		return scriptName.CString();
 	}
 	ResRef GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
@@ -643,7 +643,7 @@ public:
 	/* returns spell information in quickspell slot */
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
-	void ReinitQuickSlots();
+	void ReinitQuickSlots() const;
 	/* actor is in trap */
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
@@ -741,7 +741,7 @@ public:
 	/* overridden method, won't walk if dead */
 	void WalkTo(const Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
-	void ResolveStringConstant(ResRef& sound, unsigned int index) const;
+	void GetVerbalConstantSound(ResRef& sound, unsigned int index) const;
 	bool GetSoundFromFile(ResRef &Sound, unsigned int index) const;
 	bool GetSoundFromINI(ResRef &Sound, unsigned int index) const;
 	bool GetSoundFrom2DA(ResRef &Sound, unsigned int index) const;
@@ -768,7 +768,7 @@ public:
 	/* update internal per frame state and return true if state is suitable for drawing the actor */
 	bool UpdateDrawingState();
 	Region DrawingRegion() const override;
-	uint8_t GetElevation() const;
+	int GetElevation() const;
 	bool ShouldDrawReticle() const;
 	void DoStep(unsigned int walkScale, ieDword time = 0) override;
 	void Draw(const Region &screen, Color baseTint, Color tint, BlitFlags flags) const;
@@ -816,6 +816,8 @@ public:
 	/* Sets equipped Quick slot, if header is -1, then use the current one */
 	int SetEquippedQuickSlot(int slot, int header);
 	/* Uses an item on the target or point */
+	bool TryUsingMagicDevice(const Item* item, ieDword header);
+	bool RequiresUMD(const Item* item) const;
 	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
 	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */

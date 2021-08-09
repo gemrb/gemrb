@@ -52,7 +52,7 @@ bool p2DAImporter::Open(DataStream* str)
 	str->CheckEncrypted();
 
 	str->ReadLine( Signature, sizeof(Signature) );
-	char* strp = Signature;
+	const char* strp = Signature;
 	while (*strp == ' ')
 		strp++;
 	if (strncmp( strp, "2DA V1.0", 8 ) != 0) {
@@ -63,7 +63,7 @@ bool p2DAImporter::Open(DataStream* str)
 	}
 	Signature[0] = 0;
 	str->ReadLine( Signature, sizeof(Signature) );
-	char* token = strtok( Signature, " " );
+	const char* token = strtok(Signature, " ");
 	if (token) {
 		strlcpy(defVal, token, sizeof(defVal));
 	} else { // no whitespace
@@ -97,8 +97,7 @@ bool p2DAImporter::Open(DataStream* str)
 			if (str == NULL)
 				continue;
 			rowNames.push_back( str );
-			RowEntry r;
-			rows.push_back( r );
+			rows.emplace_back();
 			rows[row].reserve(10);
 			while (( str = strtok( NULL, " " ) ) != NULL) {
 				rows[row].push_back( str );

@@ -45,20 +45,8 @@ Container::Container(void)
 	TrapRemovalDiff = 0;
 	Trapped = 0;
 	TrapDetected = 0;
-	inventory.SetInventoryType(INVENTORY_HEAP);
+	inventory.SetInventoryType(ieInventoryType::HEAP);
 	OpenFail = 0;
-}
-
-void Container::FreeGroundIcons()
-{
-	for (int i = 0; i < MAX_GROUND_ICON_DRAWN; i++) {
-		groundicons[i] = nullptr;
-	}
-}
-
-Container::~Container()
-{
-	FreeGroundIcons();
 }
 
 Region Container::DrawingRegion() const
@@ -148,10 +136,14 @@ void Container::RefreshGroundIcons()
 	int i = inventory.GetSlotCount();
 	if (i>MAX_GROUND_ICON_DRAWN)
 		i = MAX_GROUND_ICON_DRAWN;
-	FreeGroundIcons();
+
+	int count = MAX_GROUND_ICON_DRAWN;
+	while (count > i) {
+		groundicons[--count] = nullptr;
+	}
 	while (i--) {
-		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
-		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference
+		const CREItem* slot = inventory.GetSlotItem(i); //borrowed reference
+		const Item* itm = gamedata->GetItem(slot->ItemResRef); //cached reference
 		if (!itm) continue;
 		//well, this is required in PST, needs more work if some other
 		//game is broken by not using -1,0
@@ -253,16 +245,17 @@ void Container::dump() const
 	buffer.appendFormatted( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
 	buffer.appendFormatted( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key: %s\n", name, KeyResRef.CString());
+	buffer.appendFormatted("Script: %s, Key: %s\n", name.CString(), KeyResRef.CString());
 	inventory.dump(buffer);
 	Log(DEBUG, "Container", buffer);
 }
 
-bool Container::TryUnlock(Actor *actor) {
+bool Container::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&CONT_LOCKED)) return true;
 
 	return Highlightable::TryUnlock(actor, false);

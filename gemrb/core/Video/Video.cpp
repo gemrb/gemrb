@@ -30,8 +30,6 @@ namespace GemRB {
 
 const TypeID Video::ID = { "Video" };
 
-static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags);
-
 Video::Video(void)
 {
 	drawingBuffer = NULL;
@@ -311,7 +309,7 @@ Holder<Sprite2D> Video::CreateLight(int radius, int intensity)
 	return light;
 }
 
-Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio) const
 {
 	// TODO: turn this into one of our software "shaders"
 	Color sum;
@@ -337,7 +335,7 @@ Color Video::SpriteGetPixelSum(const Holder<Sprite2D>& sprite, unsigned short xb
 	return sum;
 }
 
-Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
+static Color ApplyFlagsForColor(const Color& inCol, BlitFlags& flags)
 {
 	Color outC = inCol;
 	if (flags & BlitFlags::HALFTRANS) {

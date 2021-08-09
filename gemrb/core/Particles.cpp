@@ -46,7 +46,7 @@ static void TranslateColor(const char *value, Color &color)
 
 static void InitSparks()
 {
-	AutoTable tab("sprklclr");
+	AutoTable tab = gamedata->LoadTable("sprklclr");
 	if (!tab)
 		return;
 
@@ -78,7 +78,7 @@ static void InitSparks()
 
 Particles::Particles(int s)
 {
-	points = (Element *) calloc(s, sizeof(Element) );
+	points.resize(s);
 	/*
 	for (int i=0;i<MAX_SPARK_PHASE;i++) {
 		bitmap[i]=NULL;
@@ -90,26 +90,11 @@ Particles::Particles(int s)
 	size = last_insert = s;
 }
 
-Particles::~Particles()
-{
-	if (points) {
-		free(points);
-	}
-	/*
-	for (int i=0;i<MAX_SPARK_PHASE;i++) {
-		delete( bitmap[i]);
-	}
-	*/
-	delete fragments;
-}
-
 void Particles::SetBitmap(unsigned int FragAnimID)
 {
 	//int i;
 
-	delete fragments;
-
-	fragments = new CharAnimations(FragAnimID, 0);
+	fragments = make_unique<CharAnimations>(FragAnimID, 0);
 /*
 	for (i=0;i<MAX_SPARK_PHASE;i++) {
 		delete( bitmap[i] );

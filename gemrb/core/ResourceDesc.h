@@ -36,7 +36,7 @@ class TypeID;
  */
 class GEM_EXPORT ResourceDesc {
 public:
-	typedef Resource* (*CreateFunc)(DataStream*);
+	using CreateFunc = Resource* (*)(DataStream*);
 private:
 	const TypeID *type;
 	const char *ext;

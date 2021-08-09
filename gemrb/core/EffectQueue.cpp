@@ -47,8 +47,7 @@ namespace GemRB {
 static EffectDesc Opcodes[MAX_EFFECTS];
 
 static int initialized = 0;
-static EffectDesc *effectnames = NULL;
-static int effectnames_count = 0;
+static std::vector<EffectDesc> effectnames;
 static int pstflags = false;
 static bool iwd2fx = false;
 
@@ -225,10 +224,10 @@ static int find_effect(const void *a, const void *b)
 
 static EffectDesc* FindEffect(const char* effectname)
 {
-	if( !effectname || !effectnames) {
+	if (!effectname || effectnames.empty()) {
 		return NULL;
 	}
-	void *tmp = bsearch(effectname, effectnames, effectnames_count, sizeof(EffectDesc), find_effect);
+	void *tmp = bsearch(effectname, effectnames.data(), effectnames.size(), sizeof(EffectDesc), find_effect);
 	if( !tmp) {
 		Log(WARNING, "EffectQueue", "Couldn't assign effect: %s", effectname);
 	}
@@ -256,14 +255,14 @@ bool Init_EffectQueue()
 	iwd2fx = !!core->HasFeature(GF_ENHANCED_EFFECTS);
 	initialized = 1;
 
-	AutoTable efftextTable("efftext");
+	AutoTable efftextTable = gamedata->LoadTable("efftext");
 
 	int eT = core->LoadSymbol( "effects" );
 	if (eT < 0) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is missing!");
 		return false;
 	}
-	Holder<SymbolMgr> effectsTable = core->GetSymbol( eT );
+	auto effectsTable = core->GetSymbol( eT );
 	if (!effectsTable) {
 		Log(ERROR, "EffectQueue", "A critical scripting file is damaged!");
 		return false;
@@ -302,31 +301,17 @@ bool Init_EffectQueue()
 	return true;
 }
 
-void EffectQueue_ReleaseMemory()
-{
-	if( effectnames) {
-		free (effectnames);
-	}
-	effectnames_count = 0;
-	effectnames = NULL;
-}
-
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc* opcodes)
 {
-	if( ! effectnames) {
-		effectnames = (EffectDesc*) malloc( (count+1) * sizeof( EffectDesc ) );
-	} else {
-		effectnames = (EffectDesc*) realloc( effectnames, (effectnames_count + count + 1) * sizeof( EffectDesc ) );
-	}
+	size_t oldc = effectnames.size();
+	effectnames.resize(effectnames.size() + count);
 
-	std::copy(opcodes, opcodes + count, effectnames + effectnames_count);
-	effectnames_count += count;
-	effectnames[effectnames_count].Name = NULL;
+	std::copy(opcodes, opcodes + count, &effectnames[0] + oldc);
 
 	//if we merge two effect lists, then we need to sort their effect tables
 	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
-	qsort(effectnames, effectnames_count, sizeof(EffectDesc), compare_effects);
+	qsort(&effectnames[0], effectnames.size(), sizeof(EffectDesc), compare_effects);
 }
 
 EffectQueue::EffectQueue()
@@ -463,7 +448,7 @@ Effect *EffectQueue::CreateUnsummonEffect(const Effect *fx)
 void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
 	if (insert) {
-		effects.insert(effects.begin(), fx);
+		effects.push_front(fx);
 	} else {
 		effects.push_back(fx);
 	}
@@ -765,7 +750,7 @@ static inline bool check_level(const Actor *target, Effect *fx)
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		//this is a hack for PST style diced effects
 		if( core->HasFeature(GF_SAVE_FOR_HALF) ) {
-			if (!fx->Resource.IsEmpty() && strnicmp(fx->Resource, "NEG", 4) != 0) {
+			if (!fx->Resource.IsEmpty() && !fx->Resource.StartsWith("NEG", 4)) {
 				fx->IsSaveForHalfDamage=1;
 			}
 		} else {
@@ -2300,7 +2285,7 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 	ieDword idx = entry.stat;
 	ieDword val = entry.value;
 	ieDword rel = entry.relation;
-	if (idx == USHRT_MAX) {
+	if (idx == STI_INVALID) {
 		// bad entry, don't match
 		return false;
 	}
@@ -2310,8 +2295,6 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		val = value;
 	}
 	switch (idx) {
-		case STI_INVALID:
-			return false;
 		case STI_EA_RELATION:
 			return DiffCore(EARelation(Owner, target), val, rel);
 		case STI_ALLIES:
@@ -2405,6 +2388,11 @@ bool EffectQueue::CheckIWDTargeting(Scriptable* Owner, Actor* target, ieDword va
 		case STI_GENDER:
 		case STI_STATE:
 		default:
+			if (idx >= STI_EA && idx <= STI_STATE) {
+				// the 0 will never be hit, since that is for STI_SUMMONED_NUM
+				static const size_t fake2real[] = { IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, 0, IE_STATE_ID };
+				idx = fake2real[idx - STI_EA];
+			}
 			ieDword stat;
 			stat = STAT_GET(idx);
 			if (idx == IE_SUBRACE) {

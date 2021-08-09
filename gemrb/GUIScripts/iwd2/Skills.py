@@ -43,9 +43,9 @@ def RedrawSkills():
 	SumLabel = SkillWindow.GetControl(0x1000000c)
 	if PointsLeft == 0 or (not CharGen and PointsLeft == 1):
 		DoneButton.SetState(IE_GUI_BUTTON_ENABLED)
-		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
+		SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 	else:
-		SumLabel.SetTextColor({'r' : 255, 'g' : 255, 'b' : 0})
+		SumLabel.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 	SumLabel.SetText(str(PointsLeft) )
 
 	maxSkill = Level + 3
@@ -65,12 +65,12 @@ def RedrawSkills():
 			#we use this function to retrieve the string
 			t=GemRB.StatComment(SkillName,0,0)
 			Label.SetText("%s (%d)"%(t,Cost) )
-			Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 			if PointsLeft < 1 or ActPoint * Cost >= maxSkill:
-				Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
+				Label.SetColor ({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
 			Label.SetText(SkillName)
-			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150}) # Grey
+			Label.SetColor ({'r' : 150, 'g' : 150, 'b' : 150}) # Grey
 
 		Button1 = SkillWindow.GetControl(i*2+14)
 		Button2 = SkillWindow.GetControl(i*2+15)
@@ -89,11 +89,11 @@ def RedrawSkills():
 		Label = SkillWindow.GetControl(0x10000069+i)
 		Label.SetText(str(ActPoint) )
 		if ActPoint > StatLowerLimit[Pos]:
-			Label.SetTextColor({'r' : 0, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 0, 'g' : 255, 'b' : 255})
 		elif Cost < 1 or PointsLeft < 1:
-			Label.SetTextColor({'r' : 150, 'g' : 150, 'b' : 150})
+			Label.SetColor ({'r' : 150, 'g' : 150, 'b' : 150})
 		else:
-			Label.SetTextColor({'r' : 255, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 	return
 

@@ -76,7 +76,7 @@ private:
 	Region GetViewport() const;
 	void WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/) override;
 	/** Draws the Control on the Output Display */
-	void DrawSelf(Region drawFrame, const Region& clip) override;
+	void DrawSelf(const Region& drawFrame, const Region& clip) override;
 	void DrawFog(const Region& rgn) const;
 	
 	Point ConvertPointToGame(Point) const;

@@ -53,7 +53,7 @@ public:
 
 	void Freeze();
 	bool Update();
-	bool ViewportIsMoving();
+	bool ViewportIsMoving() const;
 	void DoStep(int count);
 	void SetMoveViewPort(Point p, int spd, bool center);
 	void SetFadeToColor(tick_t Count, unsigned short factor = 1);

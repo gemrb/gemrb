@@ -32,8 +32,6 @@
 
 namespace GemRB {
 
-static int AvatarsCount = 0;
-static AvatarStruct *AvatarTable = NULL;
 static const ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
 
@@ -74,22 +72,172 @@ struct EquipResRefData {
 	unsigned char Cycle;
 };
 
-void CharAnimations::ReleaseMemory()
-{
-	if (AvatarTable) {
-		free(AvatarTable);
-		AvatarTable=NULL;
+CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
+	AutoTable Avatars = gamedata->LoadTable("avatars");
+	if (!Avatars) {
+		error("CharAnimations", "A critical animation file is missing!\n");
+	}
+	int AvatarsCount = Avatars->GetRowCount();
+	table.resize(AvatarsCount);
+	const DataFileMgr *resdata = core->GetResDataINI();
+	for (int i = AvatarsCount - 1; i >= 0; i--) {
+		table[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
+		table[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
+		table[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
+		table[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
+		table[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
+		table[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
+		table[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
+		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
+		//QueryField will always return a zero terminated string
+		//so tmp[0] must exist
+		if ( isalpha (tmp[0]) ) {
+			//this is a hack, we store 2 letters on an integer
+			//it was allocated with calloc, so don't bother erasing it
+			strncpy( (char *) &table[i].PaletteType, tmp, 3);
+		}
+		else {
+			table[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
+		}
+		char size = Avatars->QueryField(i,AV_SIZE)[0];
+		if (size == '*') {
+			size = 0;
+		}
+		table[i].Size = size;
+
+		table[i].WalkScale = 0;
+		table[i].RunScale = 0;
+		table[i].Bestiary = -1;
+		
+		for (int j = 0; j < MAX_ANIMS; j++)
+			table[i].StanceOverride[j] = j;
+
+		if (resdata) {
+			char section[12];
+			snprintf(section, 10, "%d", i%100000); // the mod is just to silent warnings, since we know i is small enough
+
+			if (!resdata->GetKeysCount(section)) continue;
+
+			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
+			if (walkscale != 0.0f) table[i].WalkScale = (int)(1000.0f / walkscale);
+			float runscale = resdata->GetKeyAsFloat(section, "runscale", 0.0f);
+			if (runscale != 0.0f) table[i].RunScale = (int)(1000.0f / runscale);
+			table[i].Bestiary = resdata->GetKeyAsInt(section, "bestiary", -1);
+		}
+	}
+	
+	std::sort(table.begin(), table.end(),[](const AvatarStruct &a, const AvatarStruct &b) {
+		return a.AnimID < b.AnimID;
+	});
+
+	AutoTable blood = gamedata->LoadTable("bloodclr");
+	if (blood) {
+		int rows = blood->GetRowCount();
+		for(int i=0;i<rows;i++) {
+			char value = 0;
+			unsigned int flags = 0;
+			unsigned int rmin = 0;
+			unsigned int rmax = 0xffff;
+
+			valid_signednumber(blood->QueryField(i,0), value);
+			valid_unsignednumber(blood->QueryField(i,1), rmin);
+			valid_unsignednumber(blood->QueryField(i,2), rmax);
+			valid_unsignednumber(blood->QueryField(i,3), flags);
+			if (rmin > rmax || rmax > 0xffff) {
+				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
+				continue;
+			}
+			for(int j=0;j<AvatarsCount;j++) {
+				if (rmax < table[j].AnimID) break;
+				if (rmin > table[j].AnimID) continue;
+				table[j].BloodColor = value;
+				table[j].Flags = flags;
+			}
+		}
+	}
+
+	AutoTable walk = gamedata->LoadTable("walksnd");
+	if (walk) {
+		int rows = walk->GetRowCount();
+		for(int i=0;i<rows;i++) {
+			ResRef value;
+			unsigned int rmin = 0;
+			unsigned int rmax = 0xffff;
+			ieByte range = 0;
+
+			value = walk->QueryField(i, 0);
+			valid_unsignednumber(walk->QueryField(i,1), rmin);
+			valid_unsignednumber(walk->QueryField(i,2), rmax);
+			valid_unsignednumber(walk->QueryField(i,3), range);
+			if (IsStar(value)) {
+				value.Reset();
+				range = 0;
+			}
+			if (rmin > rmax || rmax > 0xffff) {
+				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
+				continue;
+			}
+			for(int j=0;j<AvatarsCount;j++) {
+				if (rmax < table[j].AnimID) break;
+				if (rmin > table[j].AnimID) continue;
+				table[j].WalkSound = value;
+				table[j].WalkSoundCount = range;
+			}
+		}
+	}
+
+	AutoTable stances = gamedata->LoadTable("stances", true);
+	if (stances) {
+		int rows = stances->GetRowCount();
+		for (int i = 0; i < rows; i++) {
+			unsigned int id = 0, s1 = 0, s2 = 0;
+			valid_unsignednumber(stances->GetRowName(i), id);
+			valid_unsignednumber(stances->QueryField(i, 0), s1);
+			valid_unsignednumber(stances->QueryField(i, 1), s2);
+
+			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
+				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d", id, s1, s2);
+				continue;
+			}
+
+			for (int j = 0; j < AvatarsCount; j++) {
+				if (id < table[j].AnimID) break;
+				if (id == table[j].AnimID) {
+					table[j].StanceOverride[s1] = s2;
+					break;
+				}
+			}
+		}
+	}
+
+	AutoTable avatarShadows = gamedata->LoadTable("avatar_shadows");
+	if (avatarShadows) {
+		int rows = avatarShadows->GetRowCount();
+		for (int i = 0; i < rows; ++i) {
+			unsigned int id = 0;
+			valid_unsignednumber(avatarShadows->GetRowName(i), id);
+
+			for (int j = 0; j < AvatarsCount; j++) {
+				if (id < table[j].AnimID) {
+					break;
+				}
+				if (table[j].AnimID == id) {
+					table[j].ShadowAnimation = avatarShadows->QueryField(i, 0);
+					break;
+				}
+			}
+		}
 	}
 }
 
-int CharAnimations::GetAvatarsCount()
+size_t CharAnimations::GetAvatarsCount()
 {
-	return AvatarsCount;
+	return AvatarTableLoader::Get().size();
 }
 
-AvatarStruct *CharAnimations::GetAvatarStruct(int RowNum)
+const AvatarStruct &CharAnimations::GetAvatarStruct(size_t RowNum)
 {
-	return AvatarTable+RowNum;
+	return AvatarTableLoader::Get()[RowNum];
 }
 
 unsigned int CharAnimations::GetAnimationID() const
@@ -180,13 +328,13 @@ int CharAnimations::GetActorPartCount() const
 	case IE_ANI_TWO_PIECE:   //ankheg animations
 		return 2;
 	case IE_ANI_PST_GHOST:   //special pst anims
-		if (AvatarTable[AvatarsRowNum].Prefixes[1].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[1])) {
 			return 1;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[2].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[2])) {
 			return 2;
 		}
-		if (AvatarTable[AvatarsRowNum].Prefixes[3].IsStar()) {
+		if (IsStar(AvatarTable[AvatarsRowNum].Prefixes[3])) {
 			return 3;
 		}
 		return 4;
@@ -484,168 +632,6 @@ PaletteHolder CharAnimations::GetShadowPalette() const {
 	return shadowPalette;
 }
 
-static inline int compare_avatars(const void *a, const void *b)
-{
-	return (int) (((const AvatarStruct *)a)->AnimID - ((const AvatarStruct *)b)->AnimID);
-}
-
-void CharAnimations::InitAvatarsTable() const
-{
-	AutoTable Avatars("avatars");
-	if (!Avatars) {
-		error("CharAnimations", "A critical animation file is missing!\n");
-	}
-	AvatarsCount = Avatars->GetRowCount();
-	AvatarTable = (AvatarStruct *) calloc(AvatarsCount, sizeof(AvatarStruct));
-	const DataFileMgr *resdata = core->GetResDataINI();
-	for (int i = AvatarsCount - 1; i >= 0; i--) {
-		AvatarTable[i].AnimID = strtounsigned<unsigned int>(Avatars->GetRowName(i));
-		AvatarTable[i].Prefixes[0] = Avatars->QueryField(i, AV_PREFIX1);
-		AvatarTable[i].Prefixes[1] = Avatars->QueryField(i, AV_PREFIX2);
-		AvatarTable[i].Prefixes[2] = Avatars->QueryField(i, AV_PREFIX3);
-		AvatarTable[i].Prefixes[3] = Avatars->QueryField(i, AV_PREFIX4);
-		AvatarTable[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
-		AvatarTable[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
-		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
-		//QueryField will always return a zero terminated string
-		//so tmp[0] must exist
-		if ( isalpha (tmp[0]) ) {
-			//this is a hack, we store 2 letters on an integer
-			//it was allocated with calloc, so don't bother erasing it
-			strncpy( (char *) &AvatarTable[i].PaletteType, tmp, 3);
-		}
-		else {
-			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
-		}
-		char size = Avatars->QueryField(i,AV_SIZE)[0];
-		if (size == '*') {
-			size = 0;
-		}
-		AvatarTable[i].Size = size;
-
-		AvatarTable[i].WalkScale = 0;
-		AvatarTable[i].RunScale = 0;
-		AvatarTable[i].Bestiary = -1;
-		
-		for (int j = 0; j < MAX_ANIMS; j++)
-			AvatarTable[i].StanceOverride[j] = j;
-
-		if (resdata) {
-			char section[12];
-			snprintf(section, 10, "%d", i%100000); // the mod is just to silent warnings, since we know i is small enough
-
-			if (!resdata->GetKeysCount(section)) continue;
-
-			float walkscale = resdata->GetKeyAsFloat(section, "walkscale", 0.0f);
-			if (walkscale != 0.0f) AvatarTable[i].WalkScale = (int)(1000.0f / walkscale);
-			float runscale = resdata->GetKeyAsFloat(section, "runscale", 0.0f);
-			if (runscale != 0.0f) AvatarTable[i].RunScale = (int)(1000.0f / runscale);
-			AvatarTable[i].Bestiary = resdata->GetKeyAsInt(section, "bestiary", -1);
-		}
-	}
-	qsort(AvatarTable, AvatarsCount, sizeof(AvatarStruct), compare_avatars);
-
-
-	AutoTable blood("bloodclr");
-	if (blood) {
-		int rows = blood->GetRowCount();
-		for(int i=0;i<rows;i++) {
-			char value = 0;
-			unsigned int flags = 0;
-			unsigned int rmin = 0;
-			unsigned int rmax = 0xffff;
-
-			valid_signednumber(blood->QueryField(i,0), value);
-			valid_unsignednumber(blood->QueryField(i,1), rmin);
-			valid_unsignednumber(blood->QueryField(i,2), rmax);
-			valid_unsignednumber(blood->QueryField(i,3), flags);
-			if (rmin > rmax || rmax > 0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
-				continue;
-			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax<AvatarTable[j].AnimID) break;
-				if (rmin>AvatarTable[j].AnimID) continue;
-				AvatarTable[j].BloodColor = value;
-				AvatarTable[j].Flags = flags;
-			}
-		}
-	}
-
-	AutoTable walk("walksnd");
-	if (walk) {
-		int rows = walk->GetRowCount();
-		for(int i=0;i<rows;i++) {
-			ResRef value;
-			unsigned int rmin = 0;
-			unsigned int rmax = 0xffff;
-			ieByte range = 0;
-
-			value = walk->QueryField(i, 0);
-			valid_unsignednumber(walk->QueryField(i,1), rmin);
-			valid_unsignednumber(walk->QueryField(i,2), rmax);
-			valid_unsignednumber(walk->QueryField(i,3), range);
-			if (value.IsStar()) {
-				value.Reset();
-				range = 0;
-			}
-			if (rmin > rmax || rmax > 0xffff) {
-				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
-				continue;
-			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax<AvatarTable[j].AnimID) break;
-				if (rmin>AvatarTable[j].AnimID) continue;
-				AvatarTable[j].WalkSound = value;
-				AvatarTable[j].WalkSoundCount = range;
-			}
-		}
-	}
-
-	AutoTable stances("stances", true);
-	if (stances) {
-		int rows = stances->GetRowCount();
-		for (int i = 0; i < rows; i++) {
-			unsigned int id = 0, s1 = 0, s2 = 0;
-			valid_unsignednumber(stances->GetRowName(i), id);
-			valid_unsignednumber(stances->QueryField(i, 0), s1);
-			valid_unsignednumber(stances->QueryField(i, 1), s2);
-
-			if (s1 >= MAX_ANIMS || s2 >= MAX_ANIMS) {
-				Log(ERROR, "CharAnimations", "Invalid stances entry: %04x %d %d", id, s1, s2);
-				continue;
-			}
-
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < AvatarTable[j].AnimID) break;
-				if (id == AvatarTable[j].AnimID) {
-					AvatarTable[j].StanceOverride[s1] = s2;
-					break;
-				}
-			}
-		}
-	}
-
-	AutoTable avatarShadows("avatar_shadows");
-	if (avatarShadows) {
-		int rows = avatarShadows->GetRowCount();
-		for (int i = 0; i < rows; ++i) {
-			unsigned int id = 0;
-			valid_unsignednumber(avatarShadows->GetRowName(i), id);
-
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < AvatarTable[j].AnimID) {
-					break;
-				}
-				if (AvatarTable[j].AnimID == id) {
-					AvatarTable[j].ShadowAnimation = avatarShadows->QueryField(i, 0);
-					break;
-				}
-			}
-		}
-	}
-}
-
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
@@ -654,9 +640,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 	autoSwitchOnEnd = false;
 	lockPalette = false;
-	if (!AvatarsCount) {
-		InitAvatarsTable();
-	}
 
 	for (size_t i = 0; i < MAX_ANIMS; i++) {
 		for (size_t j = 0; j < MAX_ORIENT; j++) {
@@ -685,7 +668,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.rgb = Color();
 	lastModUpdate = 0;
 
-	AvatarsRowNum=AvatarsCount;
+	AvatarsRowNum = GetAvatarsCount();
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		ieDword tmp = AnimID&0xf000;
 		if (tmp==0x6000 || tmp==0xe000) {
@@ -1483,7 +1466,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			NewResRef = AvatarTable[AvatarsRowNum].Prefixes[Part];
 			break;
 		default:
-			error("CharAnimations", "Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
+			error("CharAnimations", "Unknown animation type in avatars.2da row: %lu\n", static_cast<unsigned long>(AvatarsRowNum));
 	}
 }
 
@@ -1752,6 +1735,7 @@ void CharAnimations::AddFFSuffix(std::string& dest, unsigned char StanceID,
 
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_SHOOT:
 			dest += "g3";
 			break;
 

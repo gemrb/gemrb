@@ -88,21 +88,9 @@ ResRef ResRefFromPy(PyObject* obj) {
 	return ResRef();
 }
 
-Holder<TableMgr> GetTable(PyObject* obj) {
-	Holder<TableMgr> tm;
-
-	PyObject* id = PyObject_GetAttrString(obj, "ID");
-	if (!id) {
-		RuntimeError("Invalid Table reference, no ID attribute.");
-	} else {
-		tm = gamedata->GetTable( PyInt_AsLong( id ) );
-	}
-	return tm;
-}
-
-Holder<SymbolMgr> GetSymbols(PyObject* obj)
+std::shared_ptr<SymbolMgr> GetSymbols(PyObject* obj)
 {
-	Holder<SymbolMgr> sm;
+	std::shared_ptr<SymbolMgr> sm;
 
 	PyObject* id = PyObject_GetAttrString(obj, "ID");
 	if (!id) {

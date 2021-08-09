@@ -140,7 +140,7 @@ class StringBuffer;
 #define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID, ( mod ), false )
 
 /** Prototype of a function implementing a particular Effect opcode */
-typedef int (* EffectFunction)(Scriptable*, Actor*, Effect*);
+using EffectFunction = int (*)(Scriptable*, Actor*, Effect*);
 
 
 /** Cached Effect -> opcode mapping */
@@ -231,9 +231,6 @@ bool Init_EffectQueue();
 
 /** Registers opcodes implemented by an effect plugin */
 void EffectQueue_RegisterOpcodes(int count, const EffectDesc *opcodes);
-
-/** release effect list when Interface is destroyed */
-void EffectQueue_ReleaseMemory();
 
 /** Check if opcode is for an effect that takes a color slot as parameter. */
 bool IsColorslotEffect(int opcode);

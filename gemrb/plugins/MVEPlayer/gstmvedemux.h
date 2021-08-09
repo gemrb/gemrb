@@ -72,15 +72,15 @@ G_BEGIN_DECLS
 #define GST_IS_MVE_DEMUX_CLASS(klass) \
   (G_TYPE_CHECK_CLASS_TYPE((klass),GST_TYPE_MVE_DEMUX))*/
 
-typedef int gint;
-typedef gint gboolean;
-typedef ieByte guint8;
-typedef ieWord guint16;
-typedef ieDword guint32;
 
 /*typedef struct _GstMveDemux       GstMveDemux;
 typedef struct _GstMveDemuxClass  GstMveDemuxClass;*/
 typedef struct _GstMveDemuxStream GstMveDemuxStream;
+using gint = int;
+using gboolean = gint;
+using guint8 = ieByte;
+using guint16 = ieWord;
+using guint32 = ieDword;
 
 /*struct _GstMveDemux
 {

@@ -29,8 +29,8 @@ class GEM_EXPORT SaveGameMgr : public ImporterBase {
 public:
 	virtual Game* LoadGame(Game *newGame, int ver_override = 0) = 0;
 
-	virtual int GetStoredFileSize(Game *game) = 0;
-	virtual int PutGame(DataStream* stream, Game *game) = 0;
+	virtual int GetStoredFileSize(const Game *game) = 0;
+	virtual int PutGame(DataStream* stream, Game *game) const = 0;
 };
 
 }

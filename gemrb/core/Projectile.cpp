@@ -120,7 +120,7 @@ void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int S
 	}
 
 	if((ExtFlags&PEF_CYCLE) && !Seq) {
-		Seq = static_cast<int>(RAND(0UL, Max - 1));
+		Seq = static_cast<int>(RAND(size_t(0), Max - 1));
 	}
 
 	//this hack is needed because bioware .pro files are sometimes
@@ -223,7 +223,7 @@ void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByt
 	}
 }
 
-void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal)
+void Projectile::GetPaletteCopy(Animation *anim[], PaletteHolder &pal) const
 {
 	if (pal)
 		return;
@@ -274,14 +274,14 @@ void Projectile::CreateIteration()
 
 void Projectile::GetSmokeAnim()
 {
-	int AvatarsRowNum=CharAnimations::GetAvatarsCount();
+	size_t AvatarsRowNum = CharAnimations::GetAvatarsCount();
 
 	SmokeAnimID&=0xfff0; //this is a hack, i'm too lazy to figure out the subtypes
 
-	for(int i=0;i<AvatarsRowNum;i++) {
-		AvatarStruct *as = CharAnimations::GetAvatarStruct(i);
-		if (as->AnimID==SmokeAnimID) {
-			smokebam = as->Prefixes[0];
+	for (size_t i = 0; i < AvatarsRowNum; ++i) {
+		const AvatarStruct &as = CharAnimations::GetAvatarStruct(i);
+		if (as.AnimID==SmokeAnimID) {
+			smokebam = as.Prefixes[0];
 			return;
 		}
 	}
@@ -301,7 +301,7 @@ void Projectile::Setup()
 	timeStartStep = time;
 
 	if(ExtFlags&PEF_TEXT) {
-		Actor *act = area->GetActorByGlobalID(Caster);
+		const Actor *act = area->GetActorByGlobalID(Caster);
 		if(act) {
 			displaymsg->DisplayStringName(StrRef, DMC_LIGHTGREY, act,0);
 		}
@@ -647,7 +647,7 @@ void Projectile::UpdateSound()
 void Projectile::ChangePhase()
 {
 	if (Target) {
-		Actor *target = area->GetActorByGlobalID(Target);
+		const Actor *target = area->GetActorByGlobalID(Target);
 		if (!target) {
 			phase = P_EXPIRED;
 			return;
@@ -933,7 +933,7 @@ void Projectile::SetTarget(const Point &p)
 
 void Projectile::SetTarget(ieDword tar, bool fake)
 {
-	Actor *target = NULL;
+	const Actor *target = nullptr;
 
 	if (fake) {
 		Target = 0;
@@ -965,7 +965,7 @@ void Projectile::SetTarget(ieDword tar, bool fake)
 
 		//replan the path in case the source moved (only for line projectiles)
 		if(ExtFlags&PEF_LINE) {
-			Actor *c = area->GetActorByGlobalID(Caster);
+			const Actor *c = area->GetActorByGlobalID(Caster);
 			if(c && c->Pos!=Pos) {
 				Pos=c->Pos;
 				NextTarget(target->Pos);
@@ -1061,11 +1061,10 @@ void Projectile::CheckTrigger(unsigned int radius)
 	if (phase == P_TRIGGER) {
 		//special trigger flag, explode only if the trigger animation has
 		//passed a hardcoded sequence number
-		if (Extension->AFlags&PAF_TRIGGER_D) {
-			if (travel[Orientation]) {
-				int anim = travel[Orientation]->GetCurrentFrameIndex();
-				if (anim<30)
-					return;
+		if (Extension->AFlags & PAF_TRIGGER_D && travel[Orientation]) {
+			int anim = travel[Orientation]->GetCurrentFrameIndex();
+			if (anim < 30) {
+				return;
 			}
 		}
 	}
@@ -1223,12 +1222,10 @@ void Projectile::SecondaryTarget()
 				// ensure [0,360] range: transform [-180,180] from atan2, but also take orientation correction factor into account
 				deg = (int) (std::atan2(ydiff, xdiff) * 180/M_PI);
 				deg = ((deg % 360) + 360 + degOffset) % 360;
+			} else if (xdiff < 0) {
+				deg = 180;
 			} else {
-				if (xdiff < 0) {
-					deg = 180;
-				} else {
-					deg = 0;
-				}
+				deg = 0;
 			}
 
 			//not in the right sector of circle
@@ -1342,17 +1339,17 @@ bool Projectile::DrawChildren(const Region& vp)
 {
 	bool drawn = false;
 
-	if (children) {
-		for(int i=0;i<child_size;i++){
-			if(children[i]) {
-				if (children[i]->Update()) {
-					children[i]->DrawTravel(vp);
-					drawn = true;
-				} else {
-					delete children[i];
-					children[i]=NULL;
-				}
-			}
+	if (!children) return false;
+
+	for (int i = 0; i < child_size; i++){
+		if (!children[i]) continue;
+
+		if (children[i]->Update()) {
+			children[i]->DrawTravel(vp);
+			drawn = true;
+		} else {
+			delete children[i];
+			children[i] = nullptr;
 		}
 	}
 
@@ -1502,7 +1499,7 @@ void Projectile::DrawExplosion(const Region& vp)
 			}
 			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 			// until we actually need two vvc fields in the extension, let's just hack around it
-			if (!stricmp(Extension->VVCRes, "SPCOMEX1")) {
+			if (Extension->VVCRes == "SPCOMEX1") {
 				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
 				if (vvc) {
 					vvc->Pos = Pos;
@@ -1518,9 +1515,7 @@ void Projectile::DrawExplosion(const Region& vp)
 		core->GetAudioDrv()->Play(Extension->AreaSound, SFX_CHAN_MISSILE, Pos);
 	}
 	
-	//the spreading animation is in the first column
-	const char *tmp = Extension->Spread;
-	if (tmp) {
+	if (Extension->Spread) {
 		//i'm unsure about the need of this
 		//returns if the explosion animation is fake coloured
 		if (!children) {
@@ -1540,6 +1535,8 @@ void Projectile::DrawExplosion(const Region& vp)
 
 		int initial = child_size;
 		
+		//the spreading animation is in the first column
+		ResRef tmp = Extension->Spread;
 		for(int i=0;i<initial;i++) {
 			//leave this slot free, it is residue from the previous flare up
 			if (children[i])
@@ -1584,18 +1581,14 @@ void Projectile::DrawExplosion(const Region& vp)
 			pro->ColorSpeed = ColorSpeed;
 
 			if (apflags&APF_FILL) {
-				int delay;
-
 				//a bit of difference in case crowding is needed
 				//make this a separate flag if speed difference
 				//is not always wanted
 				pro->Speed-=RAND(0,7);
 
-				delay = Extension->Delay*extension_explosioncount;
-				if(apflags&APF_BOTH) {
-					if (delay) {
-						delay = RAND(0, delay-1);
-					}
+				int delay = Extension->Delay * extension_explosioncount;
+				if (apflags & APF_BOTH && delay) {
+					delay = RAND(0, delay - 1);
 				}
 				//this needs to be commented out for ToB horrid wilting
 				//if(ExtFlags&PEF_FREEZE) {
@@ -1662,7 +1655,7 @@ int Projectile::GetShadowPos(int face) const
 	return 0;
 }
 
-void Projectile::SetPos(int face, int frame1, int frame2)
+void Projectile::SetPos(int face, int frame1, int frame2) const
 {
 	if (travel[face]) {
 		travel[face]->SetFrame(frame1);
@@ -1683,7 +1676,7 @@ void Projectile::SetupWall()
 
 void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	PathNode *iter = path;
 	Holder<Sprite2D> frame;
 	if (game && game->IsTimestopActive() && !(TFlags&PTF_TIMELESS)) {
@@ -1709,7 +1702,7 @@ void Projectile::DrawLine(const Region& vp, int face, BlitFlags flag)
 
 void Projectile::DrawTravel(const Region& viewport)
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	BlitFlags flag;
 
 	if(ExtFlags&PEF_HALFTRANS) {
@@ -1725,7 +1718,7 @@ void Projectile::DrawTravel(const Region& viewport)
 
 	//Area tint
 	if (TFlags&PTF_TINT) {
-		tint = area->LightMap->GetPixel(Map::ConvertCoordToTile(Pos));
+		tint = area->GetLighting(Pos);
 		tint.a = 255;
 		flag |= BlitFlags::COLOR_MOD;
 	}

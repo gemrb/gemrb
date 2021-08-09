@@ -70,13 +70,14 @@ int SDL20VideoDriver::Init()
 
 	if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) == -1) {
 		Log(ERROR, "SDL2", "InitSubSystem failed: %s", SDL_GetError());
-	} else {
-		for (int i = 0; i < SDL_NumJoysticks(); ++i) {
-			if (SDL_IsGameController(i)) {
-				gameController = SDL_GameControllerOpen(i);
-				if (gameController != nullptr) {
-					break;
-				}
+		return ret;
+	}
+
+	for (int i = 0; i < SDL_NumJoysticks(); ++i) {
+		if (SDL_IsGameController(i)) {
+			gameController = SDL_GameControllerOpen(i);
+			if (gameController != nullptr) {
+				break;
 			}
 		}
 	}
@@ -569,7 +570,7 @@ int SDL20VideoDriver::GetTouchFingers(TouchEvent::Finger(&fingers)[FINGER_MAX], 
 	int numf = SDL_GetNumTouchFingers(device);
 
 	for (int i = 0; i < numf; ++i) {
-		SDL_Finger* finger = SDL_GetTouchFinger(device, i);
+		const SDL_Finger* finger = SDL_GetTouchFinger(device, i);
 		assert(finger);
 
 		fingers[i].id = finger->id;
@@ -594,7 +595,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 	switch (event.type) {
 		case SDL_CONTROLLERDEVICEREMOVED:
 			if (gameController != nullptr) {
-				SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
+				const SDL_GameController *removedController = SDL_GameControllerFromInstanceID(event.jdevice.which);
 				if (removedController == gameController) {
 					SDL_GameControllerClose(gameController);
 					gameController = nullptr;

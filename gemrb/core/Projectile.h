@@ -366,7 +366,7 @@ private:
 	void CreateCompositeAnimation(Animation **anims, AnimationFactory *af, int Seq) const;
 	//oriented animations (also simple ones)
 	void CreateOrientedAnimations(Animation **anims, AnimationFactory *af, int Seq) const;
-	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal);
+	void GetPaletteCopy(Animation *anim[], PaletteHolder &pal) const;
 	void GetSmokeAnim();
 	void SetBlend(int brighten);
 	//apply spells and effects on the target, only in single travel mode
@@ -399,7 +399,7 @@ private:
 	void DrawExploded(const Region &screen);
 	int GetTravelPos(int face) const;
 	int GetShadowPos(int face) const;
-	void SetPos(int face, int frame1, int frame2);
+	void SetPos(int face, int frame1, int frame2) const;
 	inline int GetZPos() const;
 
 	//logic to resolve target when single projectile hit destination

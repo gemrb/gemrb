@@ -59,7 +59,7 @@ void CSubbandDecoder::decode_data(int* buffer, int blocks)
 	}
 }
 void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
-	int blocks)
+	int blocks) const
 {
 	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;
@@ -129,7 +129,7 @@ void CSubbandDecoder::sub_4d3fcc(short* memory, int* buffer, int sb_size,
 	}
 }
 void CSubbandDecoder::sub_4d420c(int* memory, int* buffer, int sb_size,
-	int blocks)
+	int blocks) const
 {
 	int row_0, row_1, row_2 = 0, row_3 = 0, db_0, db_1;
 	int sb_size_2 = sb_size * 2, sb_size_3 = sb_size * 3;

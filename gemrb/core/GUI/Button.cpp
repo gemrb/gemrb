@@ -139,7 +139,7 @@ void Button::DidDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 }
 
 /** Draws the Control on the Output Display */
-void Button::DrawSelf(Region rgn, const Region& /*clip*/)
+void Button::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	Video * video = core->GetVideoDriver();
 

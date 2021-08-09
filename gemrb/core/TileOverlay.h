@@ -23,6 +23,7 @@
 
 #include "exports.h"
 
+#include "Holder.h"
 #include "Tile.h"
 #include "Video/Video.h"
 
@@ -30,17 +31,22 @@
 
 namespace GemRB {
 
-class GEM_EXPORT TileOverlay {
+class GEM_EXPORT TileOverlay : public Held<TileOverlay> {
 public:
-	int w, h;
-	//std::vector<Tile*> tiles;
-	Tile** tiles;
-	int count;
+	Size size;
+	std::vector<Tile> tiles;
 public:
-	TileOverlay(int Width, int Height);
-	~TileOverlay(void);
-	void AddTile(Tile* tile);
-	void Draw(const Region& viewport, std::vector<TileOverlay*> &overlays, BlitFlags flags) const;
+	using TileOverlayPtr = Holder<TileOverlay>;
+
+	explicit TileOverlay(Size size) noexcept;
+	TileOverlay(const TileOverlay&) noexcept = delete;
+	TileOverlay& operator=(const TileOverlay&) noexcept = delete;
+	
+	TileOverlay(TileOverlay&&) noexcept = default;
+	TileOverlay& operator=(TileOverlay&&) noexcept = default;
+
+	void AddTile(Tile&& tile);
+	void Draw(const Region& viewport, std::vector<TileOverlayPtr> &overlays, BlitFlags flags) const;
 };
 
 }

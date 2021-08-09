@@ -41,7 +41,7 @@ void WindowManager::SetTooltipDelay(int delay)
 	ToolTipDelay = delay;
 }
 
-WindowManager::WindowManager(const Holder<Video>& vid)
+WindowManager::WindowManager(const std::shared_ptr<Video>& vid)
 : tooltip(core->CreateTooltip())
 {
 	assert(vid);
@@ -90,7 +90,6 @@ WindowManager::~WindowManager()
 	DestroyWindows(windows);
 	assert(windows.empty());
 
-	video.release();
 	delete gameWin;
 }
 
@@ -295,7 +294,7 @@ void WindowManager::DestroyAllWindows()
 	}
 }
 
-bool WindowManager::HotKey(const Event& event)
+bool WindowManager::HotKey(const Event& event) const
 {
 	if (event.type == Event::KeyDown && event.keyboard.repeats == 1) {
 		switch (event.keyboard.keycode) {
@@ -713,7 +712,7 @@ Holder<Sprite2D> WindowManager::WinFrameEdge(int edge) const
 	if (winframes.find(ref) != winframes.end()) {
 		frame = winframes[ref];
 	} else {
-		ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(ref);
+		auto im = GetResourceHolder<ImageMgr>(ref);
 		if (im) {
 			frame = im->GetSprite2D();
 		}

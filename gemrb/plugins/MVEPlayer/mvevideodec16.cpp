@@ -22,7 +22,7 @@
  */
 
 #include "gstmvedemux.h"
-#include <string.h>
+#include <cstring>
 
 #define PIXEL(s) GST_READ_UINT16_LE (s)
 
@@ -43,11 +43,11 @@ ipvideo_copy_block (const GstMveDemuxStream * s, unsigned short *frame,
 	ptrdiff_t frame_offset = frame - s->back_buf1 + offset;
 
 	if (G_UNLIKELY (frame_offset < 0)) {
-		GST_ERROR ("frame offset < 0 (%ld)", frame_offset);
+		GST_ERROR ("frame offset < 0 (%ld)", static_cast<long>(frame_offset));
 		return -1;
 	} else if (G_UNLIKELY ((guint32)frame_offset > s->max_block_offset)) {
 		GST_ERROR ("frame offset above limit (%ld > %u)",
-				frame_offset, s->max_block_offset);
+				static_cast<long>(frame_offset), s->max_block_offset);
 		return -1;
 	}
 

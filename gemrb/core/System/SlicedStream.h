@@ -43,7 +43,7 @@ public:
 	stroff_t Seek(stroff_t pos, strpos_t startpos) override;
 };
 
-GEM_EXPORT DataStream* SliceStream(DataStream* str, unsigned long startpos, unsigned long size, bool preservepos = false);
+GEM_EXPORT DataStream* SliceStream(DataStream* str, strpos_t startpos, strpos_t size, bool preservepos = false);
 
 }
 

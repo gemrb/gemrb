@@ -101,8 +101,12 @@ public:
 	virtual bool Init(void) = 0;
 	virtual Holder<SoundHandle> Play(const char* ResRef, unsigned int channel,
 	const Point&, unsigned int flags = 0, tick_t *length = nullptr) = 0;
-	Holder<SoundHandle> Play(const char* ResRef, unsigned int channel, tick_t *length = 0)
+	Holder<SoundHandle> PlayRelative(const char* ResRef, unsigned int channel, tick_t *length = 0)
 			{ return Play(ResRef, channel, Point(), GEM_SND_RELATIVE, length); }
+	
+	Holder<SoundHandle> Play(const ResRef &resRef, unsigned int channel, const Point& p, unsigned int flags = 0, tick_t *length = nullptr);
+	Holder<SoundHandle> PlayRelative(const ResRef &resRef, unsigned int channel, tick_t *length = 0);
+	
 	virtual AmbientMgr* GetAmbientMgr() { return ambim; }
 	virtual void UpdateVolume(unsigned int flags = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS) = 0;
 	virtual bool CanPlay() = 0;
@@ -111,7 +115,7 @@ public:
 	virtual bool Stop() = 0;
 	virtual bool Pause() = 0;
 	virtual bool Resume() = 0;
-	virtual int CreateStream(Holder<SoundMgr>) = 0;
+	virtual int CreateStream(std::shared_ptr<SoundMgr>) = 0;
 	virtual void UpdateListenerPos(const Point&) = 0;
 	virtual Point GetListenerPos() = 0;
 	virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;

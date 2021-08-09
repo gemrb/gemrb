@@ -30,7 +30,7 @@ using namespace GemRB;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	AutoTable tm("cgtable");
+	AutoTable tm = gamedata->LoadTable("cgtable");
 	if (!tm) {
 		Log(ERROR, "SPLImporter", "Cannot find cgtable.2da.");
 		return;
@@ -43,7 +43,7 @@ static void Initializer()
 		gamedata->castingGlows[i] = tm->QueryField(i, 0);
 		gamedata->castingSounds[i] = atoi(tm->QueryField(i, 1));
 		// * marks an empty resource
-		if (gamedata->castingGlows[i].IsStar()) {
+		if (IsStar(gamedata->castingGlows[i])) {
 			gamedata->castingGlows[i].Reset();
 		}
 	}
@@ -125,11 +125,8 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	str->ReadResRef( s->SpellbookIcon );
 	//this hack is needed in ToB at least
 	if (!s->SpellbookIcon.IsEmpty() && core->HasFeature(GF_SPELLBOOKICONHACK)) {
-		size_t i = strlen(s->SpellbookIcon);
-		char tmp[9];
-		strlcpy(tmp, s->SpellbookIcon, sizeof(tmp));
-		if (i) tmp[i-1]='c';
-		s->SpellbookIcon = tmp;
+		ResRef tmp = s->SpellbookIcon;
+		s->SpellbookIcon.SNPrintF("%.7sc", tmp.CString());
 	}
 
 	str->ReadWord(s->unknown6);

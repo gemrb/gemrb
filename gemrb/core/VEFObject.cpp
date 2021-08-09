@@ -49,7 +49,7 @@ VEFObject::VEFObject(ScriptedAnimation *sca)
 	if (sca->Duration==0xffffffff) entry.length = 0xffffffff;
 	else entry.length = sca->Duration+entry.start;
 	entry.offset = Point(0,0);
-	entry.type = VEF_VVC;
+	entry.type = VEFTypes::VVC;
 	entry.ptr = sca;
 	entry.resourceName = sca->ResName;
 	entries.push_back(entry);
@@ -65,12 +65,12 @@ void VEFObject::Init()
 	for(auto& entry : entries) {
 		if (!entry.ptr) continue;
 		switch(entry.type) {
-			case VEF_BAM:
-			case VEF_VVC:
+			case VEFTypes::BAM:
+			case VEFTypes::VVC:
 				delete (ScriptedAnimation *)entry.ptr;
 				break;
-			case VEF_VEF:
-			case VEF_2DA:
+			case VEFTypes::VEF:
+			case VEFTypes::_2DA:
 				delete (VEFObject *)entry.ptr;
 				break;
 			default:; //error, no suitable destructor
@@ -78,7 +78,7 @@ void VEFObject::Init()
 	}
 }
 
-void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, ieDword type, ieDword gtime)
+void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, VEFTypes type, ieDword gtime)
 {
 	ScheduleEntry entry;
 
@@ -94,7 +94,7 @@ void VEFObject::AddEntry(const ResRef &res, ieDword st, ieDword len, Point pos, 
 
 ScriptedAnimation *VEFObject::CreateCell(const ResRef &res, ieDword start, ieDword end)
 {
-	ScriptedAnimation *sca = gamedata->GetScriptedAnimation( res, false);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(res, false);
 	if (sca && end!=0xffffffff) {
 		sca->SetDefaultDuration(AI_UPDATE_TIME*(end-start) );
 	}
@@ -129,39 +129,41 @@ bool VEFObject::UpdateDrawingState(int orientation)
 
 		if (!entry.ptr) {
 			switch(entry.type) {
-				case VEF_2DA: //original gemrb implementation of composite video effects
+				case VEFTypes::_2DA: // original gemrb implementation of composite video effects
 					entry.ptr = CreateObject(entry.resourceName, IE_2DA_CLASS_ID);
 					if (entry.ptr) {
 						break;
 					}
 					// fall back to VEF
 					// intentional fallthrough
-				case VEF_VEF: //vanilla engine implementation of composite video effects
+				case VEFTypes::VEF: // vanilla engine implementation of composite video effects
 					entry.ptr = CreateObject(entry.resourceName, IE_VEF_CLASS_ID);
 					if (entry.ptr ) {
 						break;
 					}
 					// fall back to BAM or VVC
 					// intentional fallthrough
-				case VEF_BAM: //just a BAM
-				case VEF_VVC: //videocell (can contain a BAM)
+				case VEFTypes::BAM: // just a BAM
+				case VEFTypes::VVC: // videocell (can contain a BAM)
 					entry.ptr = CreateCell(entry.resourceName, entry.length, entry.start);
 					break;
 				default:;
 			}
 		}
 		
-		if (!entry.ptr) entry.type = VEF_INVALID;
+		if (!entry.ptr) entry.type = VEFTypes::INVALID;
 				
 		bool ended = true;
 		switch(entry.type) {
-		case VEF_BAM:
-		case VEF_VVC:
+		case VEFTypes::BAM:
+		case VEFTypes::VVC:
 			ended = ((ScriptedAnimation *) entry.ptr)->UpdateDrawingState(orientation);
 			break;
-		case VEF_2DA:
-		case VEF_VEF:
+		case VEFTypes::_2DA:
+		case VEFTypes::VEF:
 			ended = ((VEFObject *) entry.ptr)->UpdateDrawingState(orientation);
+			break;
+		default:
 			break;
 		}
 		
@@ -176,13 +178,15 @@ void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlag
 {
 	for (const auto& entry : drawQueue) {
 		switch (entry.type) {
-		case VEF_BAM:
-		case VEF_VVC:
+		case VEFTypes::BAM:
+		case VEFTypes::VVC:
 			((ScriptedAnimation *)entry.ptr)->Draw(vp, p_tint, height, flags);
 			break;
-		case VEF_2DA:
-		case VEF_VEF:
+		case VEFTypes::_2DA:
+		case VEFTypes::VEF:
 			((VEFObject *)entry.ptr)->Draw(vp, p_tint, height, flags);
+			break;
+		default:
 			break;
 		}
 	}
@@ -191,7 +195,7 @@ void VEFObject::Draw(const Region &vp, const Color &p_tint, int height, BlitFlag
 void VEFObject::Load2DA(const ResRef &resource)
 {
 	Init();
-	AutoTable tab(resource);
+	AutoTable tab = gamedata->LoadTable(resource);
 
 	if (!tab) {
 		return;
@@ -210,7 +214,7 @@ void VEFObject::Load2DA(const ResRef &resource)
 		delay = atoi(tab->QueryField(rows,3));
 		duration = atoi(tab->QueryField(rows,4));
 		subResource = tab->QueryField(rows, 2);
-		AddEntry(subResource, delay, duration, offset, VEF_VVC, GameTime);
+		AddEntry(subResource, delay, duration, offset, VEFTypes::VVC, GameTime);
 	}
 }
 
@@ -236,7 +240,7 @@ void VEFObject::ReadEntry(DataStream *stream)
 
 	if (continuous) length = -1;
 	ieDword GameTime = core->GetGame()->GameTime;
-	AddEntry(resource, start, length, position, type, GameTime);
+	AddEntry(resource, start, length, position, static_cast<VEFTypes>(type), GameTime);
 }
 
 void VEFObject::LoadVEF(DataStream *stream)
@@ -246,12 +250,12 @@ void VEFObject::LoadVEF(DataStream *stream)
 		return;
 	}
 	ieDword i;
-	ResRef Signature;
+	char Signature[8];
 	ieDword offset1, offset2;
 	ieDword count1, count2;
 
-	stream->ReadResRef( Signature);
-	if (strncmp( Signature, "VEF V1.0", 8 ) != 0) {
+	stream->Read(Signature, 8);
+	if (memcmp( Signature, "VEF V1.0", 8 ) != 0) {
 		Log(ERROR, "VEFObject", "Not a valid VEF File: %s", ResName.CString());
 		delete stream;
 		return;
@@ -280,7 +284,7 @@ ScriptedAnimation *VEFObject::GetSingleObject() const
 	if (SingleObject) {
 		if (!entries.empty()) {
 			const ScheduleEntry& entry = entries[0];
-			if (entry.type==VEF_VVC || entry.type==VEF_BAM) {
+			if (entry.type == VEFTypes::VVC || entry.type == VEFTypes::BAM) {
 				sca = (ScriptedAnimation *)entry.ptr;
 			}
 		}

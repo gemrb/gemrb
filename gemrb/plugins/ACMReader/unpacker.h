@@ -92,6 +92,6 @@ public:
 	int get_one_block(int* block);
 };
 
-typedef int (CValueUnpacker::* FillerProc) (int pass, int ind);
+using FillerProc = int (CValueUnpacker::*) (int pass, int ind);
 
 #endif

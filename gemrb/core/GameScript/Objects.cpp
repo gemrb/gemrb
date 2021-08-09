@@ -269,17 +269,7 @@ Targets *GameScript::ProtectorOf(const Scriptable *Sender, Targets *parameters, 
 		actor = (const Actor *) Sender;
 	}
 	parameters->Clear();
-	/*if (actor) {
-		ieWord tmp = actor->LastProtected;
-		Map *cm = Sender->GetCurrentArea();
-		int i = cm->GetActorCount(true);
-		while (i--) {
-			Actor *target=cm->GetActor(i,true);
-			if (target && (target->LastProtected ==tmp) ) {
-				parameters->AddTarget(target, 0, ga_flags);
-			}
-		}
-	}*/
+
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtector);
 		if (target) {

@@ -27,12 +27,12 @@ namespace GemRB {
 
 class ViewScriptingRef : public ScriptingRef<View> {
 private:
-	ResRef group;
+	ScriptingGroup_t group;
 public:
-	ViewScriptingRef(View* view, ScriptingId id, ResRef group)
+	ViewScriptingRef(View* view, ScriptingId id, ScriptingGroup_t group)
 	: ScriptingRef(view, id), group(group) {}
 
-	const ResRef& ScriptingGroup() const override {
+	const ScriptingGroup_t& ScriptingGroup() const override {
 		return group;
 	}
 
@@ -41,7 +41,7 @@ public:
 		return {"View"};
 	};
 
-	virtual ViewScriptingRef* Clone(ScriptingId id, ResRef group) const {
+	virtual ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const {
 		return new ViewScriptingRef(this->GetObject(), id, group);
 	}
 
@@ -52,7 +52,7 @@ class WindowScriptingRef : public ViewScriptingRef {
 public:
 	using RefType = Window*;
 	
-	WindowScriptingRef(Window* win, ScriptingId id, ResRef winpack)
+	WindowScriptingRef(Window* win, ScriptingId id, ScriptingGroup_t winpack)
 	: ViewScriptingRef(win, id, winpack) {}
 
 	// class to instantiate on the script side (Python)
@@ -61,7 +61,7 @@ public:
 		return cls;
 	};
 
-	ViewScriptingRef* Clone(ScriptingId id, ResRef group) const override {
+	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
 		return new WindowScriptingRef(static_cast<Window*>(GetObject()), id, group);
 	}
 };
@@ -70,7 +70,7 @@ class ControlScriptingRef : public ViewScriptingRef {
 public:
 	using RefType = Control*;
 	
-	ControlScriptingRef(Control* ctrl, ScriptingId id, ResRef group)
+	ControlScriptingRef(Control* ctrl, ScriptingId id, ScriptingGroup_t group)
 	: ViewScriptingRef(ctrl, id, group) {}
 
 	// class to instantiate on the script side (Python)
@@ -96,17 +96,17 @@ public:
 		}
 	};
 
-	ViewScriptingRef* Clone(ScriptingId id, ResRef group) const override {
+	ViewScriptingRef* Clone(ScriptingId id, ScriptingGroup_t group) const override {
 		return new ControlScriptingRef(static_cast<Control*>(GetObject()), id, group);
 	}
 };
 
 
-Window* GetWindow(ScriptingId id, const ResRef& pack);
-const WindowScriptingRef* RegisterScriptableWindow(Window*, const ResRef& pack, ScriptingId id);
+Window* GetWindow(ScriptingId id, const ScriptingGroup_t& pack);
+const WindowScriptingRef* RegisterScriptableWindow(Window*, const ScriptingGroup_t& pack, ScriptingId id);
 
 GEM_EXPORT View* GetView(const ScriptingRefBase* base);
-GEM_EXPORT std::vector<View*> GetViews(const ResRef& pack);
+GEM_EXPORT std::vector<View*> GetViews(const ScriptingGroup_t& pack);
 GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
 GEM_EXPORT const ControlScriptingRef* GetControlRef(ScriptingId id, Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing = nullptr);
@@ -117,7 +117,7 @@ T* GetControl(ScriptingId id, Window* win) {
 }
 
 template <class T>
-T* GetControl(ResRef group, ScriptingId id) {
+T* GetControl(ScriptingGroup_t group, ScriptingId id) {
 	const ControlScriptingRef* ref = static_cast<const ControlScriptingRef*>(ScriptEngine::GetScripingRef(group, id));
 	if (ref) {
 		return dynamic_cast<T*>(ref->GetObject());

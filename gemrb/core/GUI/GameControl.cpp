@@ -52,7 +52,7 @@
 namespace GemRB {
 
 #define FORMATIONSIZE 10
-typedef Point formation_type[FORMATIONSIZE];
+using formation_type = Point[FORMATIONSIZE];
 ieDword formationcount;
 static formation_type *formations=NULL;
 static const ResRef TestSpell = "SPWI207";
@@ -145,7 +145,7 @@ GameControl::~GameControl()
 //so it doesn't cause problems with the original engine
 void GameControl::ReadFormations() const
 {
-	AutoTable tab("formatio");
+	AutoTable tab = gamedata->LoadTable("formatio");
 	if (!tab) {
 		// fallback
 		formationcount = 1;
@@ -491,7 +491,7 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 }
 
 /** Draws the Control on the Output Display */
-void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
+void GameControl::DrawSelf(const Region& screen, const Region& /*clip*/)
 {
 	const Game* game = core->GetGame();
 	Map *area = game->GetCurrentArea();
@@ -645,14 +645,6 @@ void GameControl::DrawSelf(Region screen, const Region& /*clip*/)
 			}
 			node = node->Next;
 		}
-	}
-
-	// Draw lightmap
-	if (DebugFlags & DEBUG_SHOW_LIGHTMAP) {
-		Holder<Sprite2D> spr = area->LightMap;
-		video->BlitSprite(spr, Point());
-		Region point(gameMousePos.x / 16, gameMousePos.y / 12, 2, 2);
-		video->DrawRect(point, ColorRed);
 	}
 
 	if (core->HasFeature(GF_ONSCREEN_TEXT) && DisplayText) {
@@ -1086,12 +1078,34 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					flagIdx = flagIdx % flagCnt;
 				}
 				break;
-			case '6': //show the lightmap
-				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
-				Log(MESSAGE, "GameControl", "Show lightmap %s", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
+			case '6': //toggle between lightmap/heightmap/material/search
+				{
+					constexpr int flagCnt = 5;
+					static uint32_t flags[flagCnt]{
+						0,
+						DEBUG_SHOW_SEARCHMAP,
+						DEBUG_SHOW_MATERIALMAP,
+						DEBUG_SHOW_HEIGHTMAP,
+						DEBUG_SHOW_LIGHTMAP,
+					};
+					constexpr uint32_t mask = (DEBUG_SHOW_LIGHTMAP | DEBUG_SHOW_HEIGHTMAP
+											   | DEBUG_SHOW_MATERIALMAP | DEBUG_SHOW_SEARCHMAP);
+					
+					static uint32_t flagIdx = 0;
+					DebugFlags &= ~mask;
+					DebugFlags |= flags[flagIdx++];
+					flagIdx = flagIdx % flagCnt;
+					
+					if (DebugFlags & mask) {
+						// fog interferese with debugging the map
+						// you can manually reenable with ctrl+7
+						DebugFlags |= DEBUG_SHOW_FOG_ALL;
+					} else {
+						DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
+					}
+				}
 				break;
 			case '7': //toggles fog of war
-			case '8': // searchmap debugging
 				{
 					constexpr int flagCnt = 4;
 					static uint32_t fogFlags[flagCnt]{
@@ -1103,12 +1117,6 @@ bool GameControl::OnKeyRelease(const KeyboardEvent& Key, unsigned short Mod)
 					static uint32_t flagIdx = 0;
 					
 					DebugFlags &= ~DEBUG_SHOW_FOG_ALL;
-					if (Key.character == '8') {
-						DebugFlags ^= DEBUG_SHOW_SEARCHMAP;
-						flagIdx = (DebugFlags & DEBUG_SHOW_SEARCHMAP) ? 1 : 0;
-						Log(MESSAGE, "GameControl", "Show searchmap %s", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
-					}
-					
 					DebugFlags |= fogFlags[flagIdx++];
 					flagIdx = flagIdx % flagCnt;
 				}
@@ -2294,7 +2302,7 @@ void GameControl::PerformSelectedAction(const Point& p)
 	}
 }
 
-void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun)
+void GameControl::CommandSelectedMovement(const Point& p, bool append, bool tryToRun) const
 {
 	const Game* game = core->GetGame();
 

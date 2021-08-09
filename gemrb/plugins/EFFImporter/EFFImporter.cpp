@@ -134,7 +134,7 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->Parameter1);
 	str->ReadDword(fx->Parameter2);
 	str->ReadWord(fx->TimingMode);
-	str->ReadWord(fx->unknown2);
+	str->ReadWord(fx->unknown2); // part of a dword TimingMode (but only true for v2 effects)
 	str->ReadDword(fx->Duration);
 	str->ReadWord(fx->ProbabilityRangeMax);
 	str->ReadWord(fx->ProbabilityRangeMin);
@@ -144,9 +144,9 @@ Effect* EFFImporter::GetEffectV20()
 	str->ReadDword(fx->SavingThrowType);
 	str->ReadDword(fx->SavingThrowBonus);
 	str->ReadWord(fx->IsVariable); //if this field was set to 1, this is a variable
-	str->ReadWord(fx->IsSaveForHalfDamage); //if this field was set to 1, save for half damage
+	str->ReadWord(fx->IsSaveForHalfDamage); //if this field was set to 1, save for half damage; part of Special dword with the preceding field
 	str->ReadDword(fx->PrimaryType);
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->Seek(4, GEM_CURRENT_POS); // JeremyIsAnIdiot in the original :D
 	str->ReadDword(fx->MinAffectedLevel);
 	str->ReadDword(fx->MaxAffectedLevel);
 	str->ReadDword(fx->Resistance);
@@ -173,15 +173,16 @@ Effect* EFFImporter::GetEffectV20()
 	//Variable simply overwrites the resource fields (Keep them grouped)
 	//They have to be continuous
 	if (fx->IsVariable) {
-		str->Read(fx->VariableName, 32);
-		strlcpy(fx->VariableName, ResRef::MakeLowerCase(fx->VariableName).CString(), 32);
+		ieVariable tmp;
+		str->Read(tmp, 32);
+		strnlwrcpy(fx->VariableName, tmp, 32);
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}
 	str->ReadDword(fx->CasterLevel);
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->Seek(4, GEM_CURRENT_POS); // FirstApply
 	str->ReadDword(fx->SecondaryType);
-	str->Seek( 60, GEM_CURRENT_POS );
+	str->Seek(60, GEM_CURRENT_POS); // padding
 
 	return fx;
 }
@@ -243,7 +244,7 @@ void EFFImporter::PutEffectV2(DataStream *stream, const Effect *fx) {
 	stream->WriteDword(tmpDword1);
 	if (fx->IsVariable) {
 		//resource1-4 are used as a continuous memory
-		stream->Write(fx->Resource, 32);
+		stream->WriteVariable(fx->VariableName);
 	} else {
 		stream->Write( filling,32 );
 	}

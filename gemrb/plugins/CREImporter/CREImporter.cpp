@@ -97,7 +97,7 @@ static int FindSpell(const ResRef& spellref, std::vector<SpellEntry*>& list)
 {
 	size_t i = list.size();
 	while (i--) {
-		if (list[i]->Equals(spellref)) {
+		if (list[i] && list[i]->Equals(spellref)) {
 			return static_cast<int>(i);
 		}
 	}
@@ -111,7 +111,7 @@ bool SpellEntry::Equals(const ResRef& spl) const
 
 void SpellEntry::SetSpell(const char *spl)
 {
-	spell = ResRef::MakeLowerCase(spl);
+	spell = MakeLowerCaseResRef(spl);
 }
 
 void SpellEntry::AddLevel(unsigned int level,unsigned int kit)
@@ -172,7 +172,7 @@ static int IsDomain(const ResRef& name, unsigned short &level, unsigned int kit)
 {
 	size_t splCount = splList.size();
 	for (size_t i = 0; i < splCount; i++) {
-		if (domList[i]->Equals(name)) {
+		if (domList[i] && domList[i]->Equals(name)) {
 			int lev = domList[i]->FindSpell(kit);
 			if (lev == -1) return -1;
 			level = lev;
@@ -212,22 +212,23 @@ ieWord CREImporter::FindSpellType(const ResRef& name, unsigned short &level, uns
 	if (IsDomain(name, level, kit2) >= 0) return IE_IWD2_SPELL_DOMAIN;
 
 	// try harder for the rest
-	size_t splCount = splList.size();
-	for (size_t i = 0; i < splCount; i++) {
-		if (splList[i]->Equals(name) ) {
-			// iterate over table columns ("kits" - book types)
-			for (ieWord type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
-				if (clsMask & (1 << type)) {
-					int level2 = splList[i]->FindSpell(type);
-					if (level2 == -1) {
-						Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
-						level2 = 0; // internal 0-indexed level
-					}
-					level = level2;
-					// FIXME: returning the first will misplace spells for multiclasses
-					return type;
-				}
+	for (const auto& spell : splList) {
+		if (!spell || !spell->Equals(name)) {
+			continue;
+		}
+
+		// iterate over table columns ("kits" - book types)
+		for (ieWord type = IE_IWD2_SPELL_BARD; type < IE_IWD2_SPELL_DOMAIN; type++) {
+			if (!(clsMask & (1 << type))) continue;
+
+			int level2 = spell->FindSpell(type);
+			if (level2 == -1) {
+				Log(ERROR, "CREImporter", "Spell (%s of type %d) found without a level set! Using 1!", name.CString(), type);
+				level2 = 0; // internal 0-indexed level
 			}
+			level = level2;
+			// FIXME: returning the first will misplace spells for multiclasses
+			return type;
 		}
 	}
 
@@ -261,7 +262,7 @@ static int ResolveSpellName(const ResRef& name, int level, ieIWD2SpellType type)
 	case IE_IWD2_SPELL_DOMAIN:
 	default:
 		for (size_t i = 0; i < splCount; i++) {
-			if (splList[i]->Equals(name)) return static_cast<int>(i);
+			if (splList[i] && splList[i]->Equals(name)) return static_cast<int>(i);
 		}
 	}
 	return -1;
@@ -373,7 +374,7 @@ static void ReleaseMemoryCRE()
 
 static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 {
-	AutoTable tab(tableRef);
+	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
 	int column = tab->GetColumnCount() - 1;
@@ -382,14 +383,14 @@ static void GetSpellTable(const char* tableRef, std::vector<ResRef>& list)
 	int count = tab->GetRowCount();
 	list.resize(count);
 	for (int i = 0; i < count; i++) {
-		list[i] = ResRef::MakeLowerCase(tab->QueryField(i, column));
+		list[i] = MakeLowerCaseResRef(tab->QueryField(i, column));
 	}
 }
 
 // different tables, but all use listspll.2da for the spell indices
 static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 {
-	AutoTable tab(tableRef);
+	AutoTable tab = gamedata->LoadTable(tableRef);
 	if (!tab) return;
 
 	int lastCol = tab->GetColumnCount() - 1; // the last column is not numeric, so we'll skip it
@@ -412,9 +413,9 @@ static void GetKitSpell(const ResRef& tableRef, std::vector<SpellEntry*>& list)
 		} else {
 			// find the correct index in listspll.2da
 			ResRef spellRef;
-			spellRef = ResRef::MakeLowerCase(tab->QueryField(i, lastCol));
+			spellRef = MakeLowerCaseResRef(tab->QueryField(i, lastCol));
 			// the table has disabled spells in it and they all have the first two chars replaced by '*'
-			if (spellRef.IsStar()) {
+			if (IsStar(spellRef)) {
 				continue;
 			}
 			index = FindSpell(spellRef, splList);
@@ -523,7 +524,7 @@ void CREImporter::SetupSlotCounts()
 	}
 }
 
-void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
+void CREImporter::WriteChrHeader(DataStream *stream, const Actor *act)
 {
 	char Signature[8];
 	char filling[10];
@@ -571,7 +572,7 @@ void CREImporter::WriteChrHeader(DataStream *stream, Actor *act)
 	memset( Signature,0,sizeof(Signature));
 	memset( name,0,sizeof(name));
 	strlcpy(name, act->GetName(0), sizeof(name));
-	stream->Write( name, 32);
+	stream->WriteVariable(name);
 
 	stream->WriteDword(tmpDword); //cre offset (chr header size)
 	stream->WriteDword(CRESize);  //cre size
@@ -663,8 +664,7 @@ void CREImporter::ReadChrHeader(Actor *act)
 	act->CreateStats();
 	str->Rewind();
 	str->Read (Signature, 8);
-	str->Read (name, 32);
-	name[32]=0;
+	str->ReadVariable(name);
 	if (name[0]) {
 		act->SetName( name, 0 ); //setting longname
 	}
@@ -749,7 +749,7 @@ CREMemorizedSpell* CREImporter::GetMemorizedSpell()
 	CREMemorizedSpell* spl = new CREMemorizedSpell();
 
 	str->ReadResRef( spl->SpellResRef );
-	str->ReadDword(spl->Flags);
+	str->ReadDword(spl->Flags); // was split into flags word and two alignment bytes
 
 	return spl;
 }
@@ -786,19 +786,19 @@ CRESpellMemorization* CREImporter::GetSpellMemorization(Actor *act)
 	CRESpellMemorization* spl = act->spellbook.GetSpellMemorization(Type, Level);
 	assert(spl && spl->SlotCount == 0 && spl->SlotCountWithBonus == 0); // unused
 	spl->SlotCount = Number;
-	spl->SlotCountWithBonus = Number;
+	spl->SlotCountWithBonus = Number; // Number2? Doesn't look like it's different in the data
 
 	return spl;
 }
 
-void CREImporter::SetupColor(ieDword &stat)
+void CREImporter::SetupColor(ieDword &stat) const
 {
 	if (stat < 200 || RandColor == 0) return;
 
 	// unfortunately this can't go to Initializer, since at that point search paths aren't set up yet
 	ieDword RandRows = 0;
 	if (randcolors.empty()) {
-		AutoTable rndcol("randcolr", true);
+		AutoTable rndcol = gamedata->LoadTable("randcolr", true);
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
@@ -827,13 +827,13 @@ void CREImporter::SetupColor(ieDword &stat)
 	// assuming an ordered list, so looking in the middle first
 	for (int i = (int) stat; i >= 0; i--) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
 			return;
 		}
 	}
 	for (unsigned int i = stat + 1; i < RandColor; i++) {
 		if (randcolors[i][0] == stat) {
-			stat = randcolors[i][RAND<ieDword>(0ul, RandRows - 1)];
+			stat = randcolors[i][RAND<ieDword>(ieDword(0), RandRows - 1)];
 			return;
 		}
 	}
@@ -1111,8 +1111,7 @@ void CREImporter::GetActorPST(Actor *act)
 		counter = (ieByteSigned) tmpByte;
 	}
 	ieVariable KillVar; //use this as needed
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
 
 	str->Read( &tmpByte, 1 );
@@ -1150,11 +1149,10 @@ void CREImporter::GetActorPST(Actor *act)
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 	strnspccpy(act->KillVar, KillVar, 32);
-	memset(act->IncKillVar, 0, 32);
+	act->IncKillVar = nullptr;
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);
@@ -1411,7 +1409,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord(tmpWord);
-	//skipping a word
+	//skipping a word, labeled ArmorClass vs ArmorClassBase, so probably just the last computed value and thus useless
 	str->ReadWord(tmpWord);
 	act->AC.SetNatural((ieWordSigned) tmpWord);
 	str->ReadWord(tmpWord);
@@ -1497,7 +1495,7 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_LEVEL2]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL3]=tmpByte;
-	//this is rumoured to be IE_SEX, but we use the gender field for this
+	//this is IE_SEX, but we use the gender field for this
 	str->Read( &tmpByte, 1);
 	//skipping a byte
 	str->Read( &tmpByte, 1);
@@ -1523,7 +1521,7 @@ void CREImporter::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
 	str->Read( &tmpByte, 1);
-	//skipping a byte
+	//skipping a byte, labeled MageSpecUpperWorld, while kit was MageSpecialization
 	str->ReadDword(act->BaseStats[IE_KIT]);
 	act->BaseStats[IE_KIT] = ((act->BaseStats[IE_KIT] & 0xffff) << 16) +
 		((act->BaseStats[IE_KIT] & 0xffff0000) >> 16);
@@ -1545,16 +1543,15 @@ void CREImporter::GetActorBG(Actor *act)
 	act->BaseStats[IE_SPECIFIC]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_SEX]=tmpByte;
-	str->Seek( 5, GEM_CURRENT_POS );
+	str->Seek(5, GEM_CURRENT_POS); // 5x SpecialCase in bg2/ee
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->Seek(4, GEM_CURRENT_POS); // dword labeled Instance
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
-	memset(act->KillVar, 0, 32);
-	memset(act->IncKillVar, 0, 32);
+	act->KillVar = nullptr;
+	act->IncKillVar = nullptr;
 
 	str->ReadDword(KnownSpellsOffset);
 	str->ReadDword(KnownSpellsCount);
@@ -1823,11 +1820,9 @@ void CREImporter::GetActorIWD2(Actor *act)
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	ieVariable KillVar;
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->KillVar, KillVar, 32);
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
@@ -1865,8 +1860,7 @@ void CREImporter::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 
 	KnownSpellsOffset = 0;
@@ -2075,11 +2069,9 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	ieVariable KillVar;
-	str->Read(KillVar,32); //use these as needed
-	KillVar[32]=0;
+	str->ReadVariable(KillVar); // use these as needed
 	strnspccpy(act->KillVar, KillVar, 32);
-	str->Read(KillVar,32);
-	KillVar[32]=0;
+	str->ReadVariable(KillVar);
 	strnspccpy(act->IncKillVar, KillVar, 32);
 	str->Seek( 2, GEM_CURRENT_POS);
 	str->ReadWord(tmpWord);
@@ -2106,8 +2098,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	ieVariable scriptname;
-	str->Read( scriptname, 32);
-	scriptname[32]=0;
+	str->ReadVariable(scriptname);
 	act->SetScriptName(scriptname);
 
 	str->ReadDword(KnownSpellsOffset);
@@ -2126,7 +2117,7 @@ void CREImporter::GetActorIWD1(Actor *act) //9.0
 	ReadDialog(act);
 }
 
-int CREImporter::GetStoredFileSize(Actor *actor)
+int CREImporter::GetStoredFileSize(const Actor *actor)
 {
 	int headersize;
 	unsigned int Inventory_Size;
@@ -2230,7 +2221,7 @@ int CREImporter::GetStoredFileSize(Actor *actor)
 	return headersize;
 }
 
-int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned int size)
+int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned int size) const
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
@@ -2615,7 +2606,7 @@ int CREImporter::PutHeader(DataStream *stream, const Actor *actor) const
 	return 0;
 }
 
-int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize)
+int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword InvSize) const
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2642,7 +2633,7 @@ int CREImporter::PutActorGemRB(DataStream *stream, const Actor *actor, ieDword I
 	return 0;
 }
 
-int CREImporter::PutActorBG(DataStream *stream, const Actor *actor)
+int CREImporter::PutActorBG(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -2669,7 +2660,7 @@ int CREImporter::PutActorBG(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
+int CREImporter::PutActorPST(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2687,7 +2678,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 		tmpByte = (ieByte) counter;
 		stream->Write( &tmpByte, 1);
 	}
-	stream->Write( actor->KillVar, 32);
+	stream->WriteVariable(actor->KillVar);
 	stream->Write( filling,3); //unknown
 	tmpByte=actor->BaseStats[IE_COLORCOUNT];
 	stream->Write( &tmpByte, 1);
@@ -2726,7 +2717,7 @@ int CREImporter::PutActorPST(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
+int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2742,8 +2733,8 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
+	stream->WriteVariable(actor->KillVar); // some variable names in iwd
+	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);
@@ -2773,7 +2764,7 @@ int CREImporter::PutActorIWD1(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
+int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor) const
 {
 	ieByte tmpByte;
 	ieWord tmpWord;
@@ -2790,8 +2781,8 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord(tmpWord);
 	}
-	stream->Write( actor->KillVar, 32); //some variable names in iwd
-	stream->Write( actor->IncKillVar, 32); //some variable names in iwd
+	stream->WriteVariable(actor->KillVar); // some variable names in iwd
+	stream->WriteVariable(actor->IncKillVar); // some variable names in iwd
 	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord(tmpWord);
@@ -2835,7 +2826,7 @@ int CREImporter::PutActorIWD2(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor)
+int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor) const
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2854,7 +2845,7 @@ int CREImporter::PutKnownSpells(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor)
+int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor) const
 {
 	ieWord tmpWord;
 	ieDword tmpDword;
@@ -2881,7 +2872,7 @@ int CREImporter::PutSpellPages(DataStream *stream, const Actor *actor)
 	return 0;
 }
 
-int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor)
+int CREImporter::PutMemorizedSpells(DataStream *stream, const Actor *actor) const
 {
 	int type=actor->spellbook.GetTypes();
 	for (int i=0;i<type;i++) {
@@ -2980,18 +2971,18 @@ int CREImporter::PutVariables(DataStream *stream, const Actor *actor) const
 }
 
 //Don't forget to add 8 for the totals/bonus fields
-ieDword CREImporter::GetIWD2SpellpageSize(Actor *actor, ieIWD2SpellType type, int level) const
+ieDword CREImporter::GetIWD2SpellpageSize(const Actor *actor, ieIWD2SpellType type, int level) const
 {
-	CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
-	return ieDword(sm->known_spells.size());
+	return actor->spellbook.GetKnownSpellsCount(type, level);
 }
 
-int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellType type, int level)
+int CREImporter::PutIWD2Spellpage(DataStream *stream, const Actor *actor, ieIWD2SpellType type, int level) const
 {
 	ieDword max, known;
 
-	const CRESpellMemorization* sm = actor->spellbook.GetSpellMemorization(type, level);
-	for (auto knownSpell : sm->known_spells) {
+	int knownCount = actor->spellbook.GetKnownSpellsCount(type, level);
+	for (int i = 0; i < knownCount; i++) {
+		const CREKnownSpell* knownSpell = actor->spellbook.GetKnownSpell(type, level, i);
 		ieDword ID = ResolveSpellName(knownSpell->SpellResRef, level, type);
 		stream->WriteDword(ID);
 		max = actor->spellbook.CountSpells(knownSpell->SpellResRef, type, 1);
@@ -3003,15 +2994,15 @@ int CREImporter::PutIWD2Spellpage(DataStream *stream, Actor *actor, ieIWD2SpellT
 		stream->WriteDword(known);
 	}
 
-	max = sm->SlotCount;
-	known = sm->SlotCountWithBonus;
+	max = actor->spellbook.GetMemorizableSpellsCount(type, level, false);
+	known = actor->spellbook.GetMemorizableSpellsCount(type, level, true);
 	stream->WriteDword(max);
 	stream->WriteDword(known);
 	return 0;
 }
 
 /* this function expects GetStoredFileSize to be called before */
-int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
+int CREImporter::PutActor(DataStream *stream, const Actor *actor, bool chr)
 {
 	ieDword tmpDword=0;
 	int ret;
@@ -3110,7 +3101,6 @@ int CREImporter::PutActor(DataStream *stream, Actor *actor, bool chr)
 	stream->WriteDword(EffectsOffset);
 	tmpDword = EffectsCount+VariablesCount;
 	stream->WriteDword(tmpDword);
-	tmpDword = 0;
 	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 

@@ -246,6 +246,7 @@ class GControl(GView):
 		'SetText': _GemRB.Control_SetText,
 		'SetAction': _GemRB.Control_SetAction,
 		'SetActionInterval': _GemRB.Control_SetActionInterval,
+		'SetColor': _GemRB.Control_SetColor,
 		'SetStatus': _GemRB.Control_SetStatus
 	}
 
@@ -283,19 +284,17 @@ class GControl(GView):
 class GLabel(GControl):
 	methods = {
 		'SetFont': _GemRB.Label_SetFont,
-		'SetTextColor': _GemRB.Label_SetTextColor
 	}
 
 class GTextArea(GControl, Scrollable):
 	methods = {
 		'ChapterText': _GemRB.TextArea_SetChapterText,
 		'Append': _GemRB.TextArea_Append,
-		'SetColor': _GemRB.TextArea_SetColor
 	}
 	__slots__ = ['DefaultText']
 
 	def ListResources(self, what, opts=0):
-		_GemRB.TextArea_SetColor(self, ColorWhitish, TA_COLOR_OPTIONS)
+		_GemRB.Control_SetColor(self, ColorWhitish, TA_COLOR_OPTIONS)
 		return _GemRB.TextArea_ListResources(self, what, opts)
 
 	def Clear(self):
@@ -326,7 +325,6 @@ class GButton(GControl):
 		'SetHotKey': _GemRB.Button_SetHotKey,
 		'SetAnchor': _GemRB.Button_SetAnchor,
 		'SetPushOffset': _GemRB.Button_SetPushOffset,
-		'SetTextColor': _GemRB.Button_SetTextColor,
 		'SetState': _GemRB.Button_SetState,
 		'SetPictureClipping': _GemRB.Button_SetPictureClipping,
 		'SetPicture': _GemRB.Button_SetPicture,

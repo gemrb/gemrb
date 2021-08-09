@@ -47,7 +47,7 @@ TLKImporter::TLKImporter(void)
 		charname=-1;
 	}
 
-	AutoTable tm("gender");
+	AutoTable tm = gamedata->LoadTable("gender");
 	int gtcount = 0;
 	if (tm) {
 		gtcount = tm->GetRowCount();
@@ -158,7 +158,7 @@ char *TLKImporter::Gabber() const
 {
 	const Actor *act = core->GetGameControl()->dialoghandler->GetSpeaker();
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }
@@ -167,7 +167,7 @@ char *TLKImporter::CharName(int slot) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act) {
-		return strdup(act->LongName);
+		return strdup(act->LongName.CString());
 	}
 	return strdup("?");
 }
@@ -180,7 +180,7 @@ int TLKImporter::ClassStrRef(int slot) const
 		clss = act->GetActiveClass();
 	}
 
-	AutoTable tab("classes");
+	AutoTable tab = gamedata->LoadTable("classes");
 	if (!tab) {
 		return -1;
 	}
@@ -196,7 +196,7 @@ int TLKImporter::RaceStrRef(int slot) const
 		race=act->GetStat(IE_RACE);
 	}
 
-	AutoTable tab("races");
+	AutoTable tab = gamedata->LoadTable("races");
 	if (!tab) {
 		return -1;
 	}
@@ -204,7 +204,7 @@ int TLKImporter::RaceStrRef(int slot) const
 	return atoi(tab->QueryField(row,0) );
 }
 
-int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref)
+int TLKImporter::GenderStrRef(int slot, int malestrref, int femalestrref) const
 {
 	const Actor *act = GetActorFromSlot(slot);
 	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
@@ -282,7 +282,7 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
-		AutoTable tm("magesch");
+		AutoTable tm = gamedata->LoadTable("magesch");
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
 			Decoded = GetCString( atoi( value ), 0 );

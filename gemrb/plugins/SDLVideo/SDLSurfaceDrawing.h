@@ -49,7 +49,7 @@ inline bool PointClipped(SDL_Surface* surf, const Point& p)
 
 #if SDL_VERSION_ATLEAST(1,3,0)
 template<typename T>
-inline const SDL_Rect& RectFromRegion(T&& rgn)
+inline const SDL_Rect& RectFromRegion(T& rgn)
 {
 	return reinterpret_cast<const SDL_Rect&>(rgn);
 }
@@ -88,7 +88,7 @@ void DrawPointSurface(SDL_Surface* dst, Point p, const Region& clip, const Color
 template<SHADER SHADE = SHADER::NONE>
 void DrawPointsSurface(SDL_Surface* surface, const std::vector<Point>& points, const Region& clip, const Color& srcc)
 {
-	SDL_PixelFormat* fmt = surface->format;
+	const SDL_PixelFormat* fmt = surface->format;
 	SDL_LockSurface( surface );
 
 	std::vector<Point>::const_iterator it;

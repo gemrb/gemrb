@@ -49,7 +49,7 @@ public:
 	/** Returns the number of available windows */
 	virtual unsigned int GetWindowsCount() = 0;
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
-	virtual bool LoadWindowPack(const ResRef&) = 0;
+	virtual bool LoadWindowPack(const ScriptingGroup_t&) = 0;
 	/** Creates a Window in the Window Manager */
 	Window* CreateWindow(ScriptingId winId, const Region& rgn) const;
 

@@ -127,6 +127,8 @@ def UpdateRecordsWindow (Window):
 	Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	Button.SetState (IE_GUI_BUTTON_LOCKED)
 	pic = GemRB.GetPlayerPortrait (pc, 0)["Sprite"]
+	if not pic:
+		pic = ""
 	if GameCheck.IsBG2() and not GameCheck.IsBG2Demo():
 		Button.SetPicture (pic, "NOPORTMD")
 	else:
@@ -167,27 +169,27 @@ def UpdateRecordsWindow (Window):
 
 	Label = Window.GetControl (0x1000002f)
 	Label.SetText (sstr)
-	Label.SetTextColor (cstr)
+	Label.SetColor (cstr)
 
 	Label = Window.GetControl (0x10000009)
 	Label.SetText (sdex)
-	Label.SetTextColor (cdex)
+	Label.SetColor (cdex)
 
 	Label = Window.GetControl (0x1000000a)
 	Label.SetText (scon)
-	Label.SetTextColor (ccon)
+	Label.SetColor (ccon)
 
 	Label = Window.GetControl (0x1000000b)
 	Label.SetText (sint)
-	Label.SetTextColor (cint)
+	Label.SetColor (cint)
 
 	Label = Window.GetControl (0x1000000c)
 	Label.SetText (swis)
-	Label.SetTextColor (cwis)
+	Label.SetColor (cwis)
 
 	Label = Window.GetControl (0x1000000d)
 	Label.SetText (schr)
-	Label.SetTextColor (cchr)
+	Label.SetColor (cchr)
 
 	# class
 	ClassTitle = GUICommon.GetActorClassTitle (pc)

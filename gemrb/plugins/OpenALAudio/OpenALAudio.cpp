@@ -182,15 +182,11 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
 	ambim = NULL;
 	hasReverbProperties = false;
-#ifdef HAVE_OPENAL_EFX_H
-	hasEFX = false;
-	efxEffectSlot = efxEffect = 0;
 	memset(&reverbProperties.reverbData, 0, sizeof(reverbProperties.reverbData));
 	reverbProperties.reverbDisabled = true;
-#endif
 }
 
-void OpenALAudioDriver::PrintDeviceList ()
+void OpenALAudioDriver::PrintDeviceList() const
 {
 	const char *deviceList;
 
@@ -653,12 +649,12 @@ bool OpenALAudioDriver::Resume()
 	return true;
 }
 
-int OpenALAudioDriver::CreateStream(Holder<SoundMgr> newMusic)
+int OpenALAudioDriver::CreateStream(std::shared_ptr<SoundMgr> newMusic)
 {
 	std::lock_guard<std::recursive_mutex> l(musicMutex);
 
 	// Free old MusicReader
-	MusicReader = newMusic;
+	MusicReader = std::move(newMusic);
 	if (!MusicReader) {
 		MusicPlaying = false;
 	}
@@ -1025,7 +1021,7 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 // Private Methods
 // !!!!!!!!!!!!!!!
 
-int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
+int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer) const
 {
 #ifdef DEBUG_AUDIO
 	ALint frequency, bits, channels;
@@ -1063,12 +1059,11 @@ int OpenALAudioDriver::QueueALBuffer(ALuint source, ALuint buffer)
 	return GEM_OK;
 }
 
-#ifdef HAVE_OPENAL_EFX_H
 void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 	if (hasEFX) {
 		mapReverb.getReverbProperties(reverbProperties);
 		hasReverbProperties = true;
-
+#ifdef HAVE_OPENAL_EFX_H
 		alDeleteEffects(1, &efxEffect);
 		alGenEffects(1, &efxEffect);
 
@@ -1093,12 +1088,9 @@ void OpenALAudioDriver::UpdateMapAmbient(MapReverb& mapReverb) {
 		}
 
 		alAuxiliaryEffectSloti(efxEffectSlot, AL_EFFECTSLOT_EFFECT, efxEffect);
+#endif
 	}
 }
-#else
-void OpenALAudioDriver::UpdateMapAmbient(MapReverb&) {
-}
-#endif
 
 #ifdef __clang__
 #pragma clang diagnostic pop

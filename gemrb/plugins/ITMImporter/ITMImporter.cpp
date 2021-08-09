@@ -30,8 +30,7 @@
 
 using namespace GemRB;
 
-int *profs = NULL;
-int profcount = -1;
+static std::vector<int> profs;
 
 static EffectRef fx_tohit_vs_creature_ref = { "ToHitVsCreature", -1 };
 static EffectRef fx_damage_vs_creature_ref = { "DamageVsCreature", -1 };
@@ -41,26 +40,21 @@ std::map<char,int> zzmap;
 //cannot call this at the time of initialization because the tablemanager isn't alive yet
 static void Initializer()
 {
-	if (profs) {
-		free(profs);
-		profs = NULL;
-	}
-	profcount = 0;
-	AutoTable tm("proftype");
+	AutoTable tm = gamedata->LoadTable("proftype");
 	if (!tm) {
 		Log(ERROR, "ITMImporter", "Cannot find proftype.2da.");
 		return;
 	}
-	profcount = tm->GetRowCount();
-	profs = (int *) calloc( profcount, sizeof(int) );
+	int profcount = tm->GetRowCount();
+	profs.resize(profcount);
 	for (int i = 0; i < profcount; i++) {
 		profs[i] = atoi(tm->QueryField( i, 0 ) );
 	}
 
 	// check for iwd1 zz-weapon bonus table
-	AutoTable tm2("zzweaps");
+	AutoTable tm2 = gamedata->LoadTable("zzweaps");
 	int indR = core->LoadSymbol("race");
-	Holder<SymbolMgr> sm = core->GetSymbol(indR);
+	auto sm = core->GetSymbol(indR);
 	if (!tm2 || !sm || indR == -1) {
 		return;
 	}
@@ -78,20 +72,13 @@ static void Initializer()
 	}
 }
 
-static void ReleaseMemoryITM()
-{
-	free(profs);
-	profs = NULL;
-	profcount = -1;
-}
-
 static int GetProficiency(ieDword ItemType)
 {
-	if (profcount<0) {
+	if (profs.empty()) {
 		Initializer();
 	}
 
-	if (ItemType>=(ieDword) profcount) {
+	if (ItemType >= profs.size()) {
 		return 0;
 	}
 	return profs[ItemType];
@@ -147,7 +134,6 @@ static void AddZZFeatures(Item *s)
 		fx->SourceRef = s->Name;
 		// use the space reserved earlier
 		s->equipping_features[s->EquippingFeatureCount - 1 - i] = fx;
-		delete fx;
 	}
 }
 
@@ -392,5 +378,4 @@ Effect* ITMImporter::GetFeature(Item *s)
 
 GEMRB_PLUGIN(0xD913A54, "ITM File Importer")
 PLUGIN_CLASS(IE_ITM_CLASS_ID, ImporterPlugin<ITMImporter>)
-PLUGIN_CLEANUP(ReleaseMemoryITM)
 END_PLUGIN()

@@ -495,7 +495,7 @@ void SDLVideoDriver::BlitSpriteClipped(const Holder<Sprite2D>& spr, Region src, 
 	}
 }
 
-BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint)
+BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, BlitFlags renderflags, const Color* tint) const
 {
 	SDLSurfaceSprite2D::version_t oldVersion = spr->GetVersion();
 	SDLSurfaceSprite2D::version_t newVersion = renderflags;

@@ -23,19 +23,11 @@
 #include "Resource.h"
 
 #include <cassert>
-#include <ctype.h>
+#include <cctype>
 
 namespace GemRB {
 
-// private inlines
-inline unsigned int Cache::MyHashKey(const char* key) const
-{
-	unsigned int nHash = tolower(key[0]);
-	for (int i=1;(i<KEYSIZE) && key[i];i++) {
-		nHash = (nHash << 5) ^ tolower(key[i]);
-	}
-	return nHash % m_nHashTableSize;
-}
+static const CstrHashCI<ResRef> MyHashKey;
 
 Cache::Cache(int nBlockSize, int nHashTableSize)
 {
@@ -177,7 +169,7 @@ Cache::MyAssoc *Cache::GetNextAssoc(Cache::MyAssoc *Position) const
 	if (pAssocNext == NULL)
 	{
 		// go to next bucket
-		for (unsigned int nBucket = MyHashKey(pAssocRet->key) + 1;
+		for (size_t nBucket = MyHashKey(pAssocRet->key) % m_nHashTableSize + 1;
 			nBucket < m_nHashTableSize; nBucket++)
 			if ((pAssocNext = m_pHashTable[nBucket]) != NULL)
 				break;
@@ -193,11 +185,11 @@ Cache::MyAssoc* Cache::GetAssocAt(const ResRef& key) const
 		return nullptr;
 	}
 
-	unsigned int nHash = MyHashKey( key );
+	size_t nHash = MyHashKey(key) % m_nHashTableSize;
 
 	// see if it exists
 	 for (auto pAssoc = m_pHashTable[nHash]; pAssoc != nullptr; pAssoc = pAssoc->pNext) {
-		if (!strnicmp( pAssoc->key, key, KEYSIZE )) {
+		if (key == pAssoc->key) {
 			return pAssoc;
 		}
 	}
@@ -233,16 +225,10 @@ bool Cache::SetAt(const ResRef& key, void *rValue)
 
 	// it doesn't exist, add a new Association
 	pAssoc = NewAssoc();
-	int i;
-	for (i=0;i<KEYSIZE && key[i];i++) {
-		pAssoc->key[i]=tolower(key[i]);
-	}
-	for (;i<KEYSIZE;i++) {
-		pAssoc->key[i]=0;
-	}
+	pAssoc->key = key;
 	pAssoc->data=rValue;
 	// put into hash table
-	unsigned int nHash = MyHashKey(pAssoc->key);
+	size_t nHash = MyHashKey(pAssoc->key) % m_nHashTableSize;
 	pAssoc->pNext = m_pHashTable[nHash];
 	pAssoc->pPrev = &m_pHashTable[nHash];
 	if (pAssoc->pNext) {

@@ -38,6 +38,15 @@
 
 namespace GemRB {
 
+/** this is the physical order the links appear in WMPAreaEntry */
+enum class WMPDirection {
+	NONE = -1,
+	NORTH = 0,
+	WEST = 1,
+	SOUTH = 2,
+	EAST = 3
+};
+
 /** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1
 /** Area is visible on WorldMap only when party is in adjacent area */
@@ -51,13 +60,6 @@ namespace GemRB {
 /** Area can be passed through when travelling directly to some more distant area on WorldMap */
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
-/** this is the physical order the links appear in WMPAreaEntry */
-typedef enum ieDirectionType {
-	WMP_NORTH=0,
-	WMP_WEST=1,
-	WMP_SOUTH=2, 
-	WMP_EAST=3
-} ieDirectionType;
 
 /**
  * @class WMPAreaEntry
@@ -148,7 +150,6 @@ public:
 	WMPAreaEntry *GetEntry(unsigned int index) const { return area_entries[index]; }
 	int GetLinkCount() const { return (int) area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) const { return area_links[index]; }
-	WMPAreaEntry *GetNewAreaEntry() const;
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
 	void InsertAreaLink(unsigned int idx, unsigned int dir, const WMPAreaLink *arealink);
 	void SetAreaLink(unsigned int index, const WMPAreaLink *arealink);

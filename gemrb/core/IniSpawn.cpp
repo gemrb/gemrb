@@ -40,23 +40,23 @@
 namespace GemRB {
 
 static const int StatValues[9]={
-IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
+IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
 IE_SEX, IE_ALIGNMENT };
 
-static Holder<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
+static std::shared_ptr<DataFileMgr> GetIniFile(const ResRef& DefaultArea)
 {
 	//the lack of spawn ini files is not a serious problem, happens all the time
 	if (!gamedata->Exists( DefaultArea, IE_INI_CLASS_ID)) {
-		return NULL;
+		return {};
 	}
 
 	DataStream* inifile = gamedata->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
-		return NULL;
+		return {};
 	}
 	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
 		Log(ERROR, "IniSpawn", "No INI Importer Available.");
-		return NULL;
+		return {};
 	}
 
 	PluginHolder<DataFileMgr> ini = MakePluginHolder<DataFileMgr>(IE_INI_CLASS_ID);
@@ -71,8 +71,8 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	//high detail level by default
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
-	
-	Holder<DataFileMgr> inifile = GetIniFile(DefaultArea);
+
+	auto inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
 		NamelessSpawnArea = DefaultArea;
 		return;
@@ -363,9 +363,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
 	if (s) {
 		if (VarHasContext(s)) {
-			char tmp[9];
-			strnuprcpy(tmp, s, 6);
-			critter.SpecContext = tmp;
+			critter.SpecContext.SNPrintF("%.6s", s);
 			strnlwrcpy(critter.SpecVar, s+8, 32);
 		} else {
 			critter.SpecContext = "GLOBAL";
@@ -451,67 +449,67 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	//special 1 == area
 	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
 	if (s) {
-		critter.AreaScript = ResRef::MakeUpperCase(s);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	//special 2 == class
 	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
 	if (s) {
-		critter.ClassScript = ResRef::MakeUpperCase(s);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	//special 3 == general
 	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
 	if (s) {
-		critter.GeneralScript = ResRef::MakeUpperCase(s);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	//team == specific
 	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
 	if (s) {
-		critter.SpecificScript = ResRef::MakeUpperCase(s);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 
 	//combat == race
 	s = inifile->GetKeyAsString(crittername,"script_combat",NULL);
 	if (s) {
-		critter.RaceScript = ResRef::MakeUpperCase(s);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	//movement == default
 	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
 	if (s) {
-		critter.DefaultScript = ResRef::MakeUpperCase(s);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 
 	//pst script names
 	s = inifile->GetKeyAsString(crittername,"script_override",NULL);
 	if (s) {
-		critter.OverrideScript = ResRef::MakeUpperCase(s);
+		critter.OverrideScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_class",NULL);
 	if (s) {
-		critter.ClassScript = ResRef::MakeUpperCase(s);
+		critter.ClassScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_race",NULL);
 	if (s) {
-		critter.RaceScript = ResRef::MakeUpperCase(s);
+		critter.RaceScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_general",NULL);
 	if (s) {
-		critter.GeneralScript = ResRef::MakeUpperCase(s);
+		critter.GeneralScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_default",NULL);
 	if (s) {
-		critter.DefaultScript = ResRef::MakeUpperCase(s);
+		critter.DefaultScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_area",NULL);
 	if (s) {
-		critter.AreaScript = ResRef::MakeUpperCase(s);
+		critter.AreaScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"script_specifics",NULL);
 	if (s) {
-		critter.SpecificScript = ResRef::MakeUpperCase(s);
+		critter.SpecificScript = MakeUpperCaseResRef(s);
 	}
 	s = inifile->GetKeyAsString(crittername,"dialog",NULL);
 	if (s) {
-		critter.Dialog = ResRef::MakeUpperCase(s);
+		critter.Dialog = MakeUpperCaseResRef(s);
 	}
 
 	//flags
@@ -629,7 +627,7 @@ void IniSpawn::RespawnNameless()
 
 	//certain variables are set when nameless dies
 	for (const auto& var : NamelessVar) {
-		SetVariable(game, var.Name, var.Value, "GLOBAL");
+		SetVariable(game, var.Name.CString(), var.Value, "GLOBAL");
 	}
 	core->GetGameControl()->ChangeMap(nameless, true);
 }
@@ -647,7 +645,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 		return;
 	}
 
-	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
+	ieDword specvar = CheckVariable(map, critter.SpecVar.CString(), critter.SpecContext);
 
 	if (critter.SpecVar[0]) {
 		if (critter.SpecVarOperator>=0) {
@@ -699,7 +697,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	if (critter.ScriptName[0] && (critter.Flags&CF_CHECK_NAME) ) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
-		if (map->GetActor( critter.ScriptName, 0 )) {
+		if (map->GetActor(critter.ScriptName.CString(), 0)) {
 			return;
 		}
 	} else {
@@ -732,12 +730,12 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 
 	if (critter.Flags & CF_INC_INDEX) {
-		int value = CheckVariable(map, critter.PointSelectVar);
+		int value = CheckVariable(map, critter.PointSelectVar.CString());
 		// NOTE: not replicating bug where it would increment the index twice if create_qty > 1
-		SetVariable(map, critter.PointSelectVar, value + 1);
+		SetVariable(map, critter.PointSelectVar.CString(), value + 1);
 	}
 
-	SetVariable(map, critter.SpecVar, specvar+(ieDword) critter.SpecVarInc, critter.SpecContext);
+	SetVariable(map, critter.SpecVar.CString(), specvar + (ieDword) critter.SpecVarInc, critter.SpecContext);
 	map->AddActor(cre, true);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
@@ -747,7 +745,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	cre->SetPosition( critter.SpawnPoint, 0, 0);//maybe critters could be repositioned
 	cre->SetOrientation(critter.Orientation,false);
 
-	cre->SetScriptName(critter.ScriptName);
+	cre->SetScriptName(critter.ScriptName.CString());
 
 	//increases death variable
 	if (critter.Flags&CF_DEATHVAR) {
@@ -799,7 +797,7 @@ void IniSpawn::SpawnCreature(const CritterEntry &critter) const
 	}
 }
 
-void IniSpawn::SpawnGroup(SpawnEntry &event)
+void IniSpawn::SpawnGroup(SpawnEntry &event) const
 {
 	if (event.critters.empty()) {
 		return;
@@ -834,7 +832,7 @@ void IniSpawn::InitialSpawn()
 	SpawnGroup(enterspawn);
 	//these variables are set when entering first
 	for (const auto& local : Locals) {
-		SetVariable(map, local.Name, local.Value, "LOCALS");
+		SetVariable(map, local.Name.CString(), local.Value, "LOCALS");
 	}
 
 	// move the rest of the party if needed

@@ -176,7 +176,7 @@ void Font::GlyphAtlasPage::Draw(ieWord chr, const Region& dest, const PrintColor
 	}
 }
 
-void Font::GlyphAtlasPage::DumpToScreen(const Region& r)
+void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 {
 	Video* video = core->GetVideoDriver();
 	video->SetScreenClip(NULL);

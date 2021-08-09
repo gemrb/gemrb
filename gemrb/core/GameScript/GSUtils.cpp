@@ -56,11 +56,11 @@
 namespace GemRB {
 
 //these tables will get freed by Core
-Holder<SymbolMgr> triggersTable;
-Holder<SymbolMgr> actionsTable;
-Holder<SymbolMgr> overrideTriggersTable;
-Holder<SymbolMgr> overrideActionsTable;
-Holder<SymbolMgr> objectsTable;
+std::shared_ptr<SymbolMgr> triggersTable;
+std::shared_ptr<SymbolMgr> actionsTable;
+std::shared_ptr<SymbolMgr> overrideTriggersTable;
+std::shared_ptr<SymbolMgr> overrideActionsTable;
+std::shared_ptr<SymbolMgr> objectsTable;
 TriggerFunction triggers[MAX_TRIGGERS];
 ActionFunction actions[MAX_ACTIONS];
 short actionflags[MAX_ACTIONS];
@@ -92,7 +92,7 @@ void InitScriptTables()
 {
 	//initializing the happiness table
 	{
-	AutoTable tab("happy");
+	AutoTable tab = gamedata->LoadTable("happy");
 	if (tab) {
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<MAX_REP_COLUMN;reputation++) {
@@ -103,7 +103,7 @@ void InitScriptTables()
 	}
 
 	//initializing the reaction mod. reputation table
-	AutoTable rmr("rmodrep");
+	AutoTable rmr = gamedata->LoadTable("rmodrep");
 	if (rmr) {
 		for (int reputation=0; reputation<MAX_REP_COLUMN; reputation++) {
 			rmodrep[reputation] = strtosigned<int>(rmr->QueryField(0, reputation));
@@ -111,7 +111,7 @@ void InitScriptTables()
 	}
 
 	//initializing the reaction mod. charisma table
-	AutoTable rmc("rmodchr");
+	AutoTable rmc = gamedata->LoadTable("rmodchr");
 	if (rmc) {
 		for (int charisma=0; charisma<MAX_CHR_COLUMN; charisma++) {
 			rmodchr[charisma] = strtosigned<int>(rmc->QueryField(0, charisma));
@@ -196,7 +196,7 @@ static const char* const spell_suffices[] = { "SPIT", "SPPR", "SPWI", "SPIN", "S
 bool ResolveSpellName(ResRef& spellRes, const Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		spellRes = ResRef::MakeLowerCase(parameters->string0Parameter);
+		spellRes = MakeLowerCaseResRef(parameters->string0Parameter);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -226,7 +226,7 @@ ieDword ResolveSpellNumber(const ResRef& spellRef)
 	tmp.SNPrintF("%.4s", spellRef.CString());
 	for (int i = 0; i < 5; i++) {
 		if (tmp == spell_suffices[i]) {
-			tmp = spellRef + 4;
+			tmp = spellRef.CString() + 4;
 			ieDword n = strtounsigned<ieDword>(tmp.CString());
 			if (!n) {
 				return 0xffffffff;
@@ -241,7 +241,7 @@ bool ResolveItemName(ResRef& itemres, const Actor *act, ieDword Slot)
 {
 	const CREItem *itm = act->inventory.GetSlotItem(Slot);
 	if(itm) {
-		itemres = ResRef::MakeLowerCase(itm->ItemResRef);
+		itemres = itm->ItemResRef;
 		return gamedata->Exists(itemres, IE_ITM_CLASS_ID);
 	}
 	return false;
@@ -361,7 +361,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 		if (!item) {
 			continue;
 		}
-		if (strnicmp(item->ItemResRef, parameters->string0Parameter, 8) != 0) {
+		if (item->ItemResRef != parameters->string0Parameter) {
 			continue;
 		}
 		actor->inventory.SetSlotItemRes(ResRef(parameters->string1Parameter), i, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
@@ -449,7 +449,7 @@ void DisplayStringCore(Scriptable* const Sender, int Strref, int flags)
 		int tmp=(int) actor->GetVerbalConstant(Strref);
 		if (tmp <= 0 || (actor->GetStat(IE_MC_FLAGS) & MC_EXPORTABLE)) {
 			//get soundset based string constant
-			actor->ResolveStringConstant(soundRef, (unsigned int) Strref);
+			actor->GetVerbalConstantSound(soundRef, static_cast<unsigned int>(Strref));
 			if (actor->PCStats && actor->PCStats->SoundFolder[0]) {
 				snprintf(Sound, _MAX_PATH, "%s/%s",actor->PCStats->SoundFolder, soundRef.CString());
 			} else {
@@ -1189,7 +1189,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			const char* scriptingname = scr->GetScriptName();
 
 			/* banter dialogue */
-			pdtable.load("interdia");
+			pdtable = gamedata->LoadTable("interdia");
 			if (pdtable) {
 				//5 is the magic number for the ToB expansion
 				if (game->Expansion==5) {
@@ -1286,20 +1286,20 @@ bool CreateMovementEffect(Actor* actor, const char *area, const Point &position,
 	Effect *fx = EffectQueue::CreateEffect(fx_movetoarea_ref, 0, face, FX_DURATION_INSTANT_PERMANENT);
 	if (!fx) return false;
 	fx->SetPosition(position);
-	fx->Resource = ResRef::MakeUpperCase(area);
+	fx->Resource = MakeUpperCaseResRef(area);
 	core->ApplyEffect(fx, actor, actor);
 	return true;
 }
 
-void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust)
+void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust)
 {
 	Log(MESSAGE, "GameScript", "MoveBetweenAreas: %s to %s [%d.%d] face: %d",
-		actor->GetName(0), area, position.x, position.y, face);
+		actor->GetName(0), area.CString(), position.x, position.y, face);
 	Map* map1 = actor->GetCurrentArea();
 	Map* map2;
 	Game* game = core->GetGame();
 	bool newSong = false;
-	if (area[0] && (!map1 || stricmp(area, map1->GetScriptName()) != 0)) { //do we need to switch area?
+	if (!area.IsEmpty() && (!map1 || area != map1->GetScriptName())) { //do we need to switch area?
 		//we have to change the pathfinder
 		//to the target area if adjust==true
 		map2 = game->GetMap(area, false);
@@ -1391,9 +1391,9 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 	Sender->ReleaseCurrentAction();
 }
 
-bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c)
 {
-	item->ItemResRef = ResRef::MakeUpperCase(resref);
+	item->ItemResRef = resref;
 	if (!core->ResolveRandomItem(item))
 		return false;
 	if (a==-1) {
@@ -1548,7 +1548,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	}
 
 	int idsfile = core->LoadSymbol(idsname);
-	Holder<SymbolMgr> valHook = core->GetSymbol(idsfile);
+	auto valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		Log(ERROR, "GameScript", "Missing IDS file %s for symbol %s!", idsname, symbol);
 		return -1;
@@ -1674,7 +1674,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
 	int mergestrings = actionflags[newAction->actionID]&AF_MERGESTRINGS;
-	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
+	int objectCount = (newAction->actionID == 1) ? 0 : 1; // only object 2 and 3 are used by actions, 1 being reserved for ActionOverride
 	int stringsCount = 0;
 	int intCount = 0;
 	if (actionflags[newAction->actionID]&AF_DIRECT) {
@@ -1717,7 +1717,7 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			break;
 
 			case 'a':
-			//Action
+			// Action - only ActionOverride takes such a parameter
 			{
 				SKIP_ARGUMENT();
 				char action[257];
@@ -1757,7 +1757,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 			case 'o': //Object
 				if (objectCount==3) {
 					Log(ERROR, "GSUtils", "Invalid object count!");
-					//abort();
 					delete newAction;
 					return NULL;
 				}
@@ -1814,7 +1813,6 @@ Action* GenerateActionCore(const char *src, const char *str, unsigned short acti
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newAction;
 						return NULL;
 					}
@@ -2111,7 +2109,6 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					str++;
 					if (*str!='s') {
 						Log(ERROR, "GSUtils", "Invalid mergestrings:%s", str);
-						//abort();
 						delete newTrigger;
 						return NULL;
 					}
@@ -2224,9 +2221,7 @@ ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char 
 	}
 	
 	if (stricmp( newVarName, "LOCALS" ) == 0) {
-		if (!Sender->locals->Lookup(poi, value) && valid) {
-			*valid = false;
-		}
+		Sender->locals->Lookup(poi, value);
 		ScriptDebugLog(ID_VARIABLES, "CheckVariable %s%s: %d", Context, VarName, value);
 		return value;
 	}
@@ -2403,7 +2398,7 @@ Actor *GetNearestOf(const Map *map, const Actor *origin, int whoseeswho)
 
 Point GetEntryPoint(const char *areaname, const char *entryname)
 {
-	AutoTable tab("entries");
+	AutoTable tab = gamedata->LoadTable("entries");
 	if (!tab) {
 		return {};
 	}
@@ -2462,7 +2457,7 @@ void SetupWishCore(Scriptable *Sender, int column, int picks)
 	// but then it was hard coded to 5 (and SetupWishObject disused)
 	if (picks == 1) picks = 5;
 
-	AutoTable tm("wish");
+	AutoTable tm = gamedata->LoadTable("wish");
 	if (!tm) {
 		Log(ERROR, "GameScript", "Cannot find wish.2da.");
 		return;
@@ -2534,16 +2529,10 @@ void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
 		return;
 	}
 
-	if (flag) {
-		anim->Flags |= A_ANI_ACTIVE;
-		for (int i = 0; i < anim->animcount; i++) {
-			anim->animation[i]->Flags |= A_ANI_ACTIVE;
-		}
-	} else {
-		anim->Flags &= ~A_ANI_ACTIVE;
-		for (int i = 0; i < anim->animcount; i++) {
-			anim->animation[i]->Flags &= ~A_ANI_ACTIVE;
-		}
+	flag = flag ? OP_OR : OP_NAND;
+	SetBits<ieDword>(anim->Flags, A_ANI_ACTIVE, flag);
+	for (size_t i = 0; i < anim->animation.size(); ++i) {
+		SetBits<ieDword>(anim->animation[i].Flags, A_ANI_ACTIVE, flag);
 	}
 }
 
@@ -2565,7 +2554,7 @@ Gem_Polygon *GetPolygon2DA(ieDword index)
 		return polygons[index];
 	}
 	resRef.SNPrintF("ISLAND%02d", index);
-	AutoTable tm(resRef);
+	AutoTable tm = gamedata->LoadTable(resRef);
 	if (!tm) {
 		return NULL;
 	}
@@ -2870,9 +2859,9 @@ void AddXPCore(Action *parameters, bool divide)
 	AutoTable xptable;
 
 	if (core->HasFeature(GF_HAS_EXPTABLE)) {
-		xptable.load("exptable");
+		xptable = gamedata->LoadTable("exptable");
 	} else {
-		xptable.load("xplist");
+		xptable = gamedata->LoadTable("xplist");
 	}
 
 	if (parameters->int0Parameter > 0 && core->HasFeedback(FT_MISC)) {

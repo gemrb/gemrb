@@ -78,7 +78,7 @@ class GEM_EXPORT Control : public View, public ControlActionResponder {
 private:
 	void ClearActionTimer();
 	Timer* StartActionTimer(const ControlEventHandler& action, unsigned int delay = 0);
-	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ResRef group) override;
+	ViewScriptingRef* CreateScriptingRef(ScriptingId id, ScriptingGroup_t group) override;
 
 	void HandleTouchActionTimer(const Control*);
     
@@ -159,7 +159,7 @@ public:
 
 	/** Returns the Owner */
 	virtual void SetFocus();
-	bool IsFocused();
+	bool IsFocused() const;
 
 	bool TracksMouseDown() const override { return bool(actionTimer); }
 	
@@ -179,7 +179,7 @@ public:
 
 	virtual String QueryText() const { return String(); }
 
-	typedef std::pair<ieDword, ieDword> ValueRange;
+	using ValueRange = std::pair<ieDword, ieDword>;
 	const static ValueRange MaxValueRange;
 	
 	ieDword GetValue() const { return Value; }

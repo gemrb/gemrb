@@ -163,7 +163,7 @@ private:
 		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
 	void SpawnCreature(const CritterEntry &critter) const;
-	void SpawnGroup(SpawnEntry &event);
+	void SpawnGroup(SpawnEntry &event) const;
 	//gets the spec var operation code from a keyword
 	int GetDiffMode(const char *keyword) const;
 	void PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critterName, CritterEntry &critter) const;

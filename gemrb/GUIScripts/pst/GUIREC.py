@@ -214,9 +214,9 @@ def UpdateRecordsWindow (Window):
 	for i in range (6):
 		Label = Window.GetControl (0x1000000e + i)
 		if stats[i]!=basestats[i]:
-			Label.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
+			Label.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		else:
-			Label.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+			Label.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 		Label.SetText (str (stats[i]))
 
 	# race
@@ -758,28 +758,28 @@ def OpenInformationWindow ():
 
 	White = {'r' : 255, 'g' : 255, 'b' : 255}
 	Label = Window.GetControl (0x1000000B)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x1000000C)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x1000000D)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x1000000E)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x1000000F)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x10000010)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x10000011)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Label = Window.GetControl (0x10000012)
-	Label.SetTextColor (White)
+	Label.SetColor (White)
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 

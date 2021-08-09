@@ -34,11 +34,11 @@ namespace GemRB {
 #define ENEMY_SEES_ORIGIN 1
 #define ORIGIN_SEES_ENEMY 2
 
-extern Holder<SymbolMgr> triggersTable;
-extern Holder<SymbolMgr> actionsTable;
-extern Holder<SymbolMgr> overrideTriggersTable;
-extern Holder<SymbolMgr> overrideActionsTable;
-extern Holder<SymbolMgr> objectsTable;
+extern std::shared_ptr<SymbolMgr> triggersTable;
+extern std::shared_ptr<SymbolMgr> actionsTable;
+extern std::shared_ptr<SymbolMgr> overrideTriggersTable;
+extern std::shared_ptr<SymbolMgr> overrideActionsTable;
+extern std::shared_ptr<SymbolMgr> objectsTable;
 extern TriggerFunction triggers[MAX_TRIGGERS];
 extern ActionFunction actions[MAX_ACTIONS];
 extern short actionflags[MAX_ACTIONS];
@@ -80,7 +80,7 @@ void PolymorphCopyCore(const Actor *src, Actor *tar);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag, int count = 0);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
-GEM_EXPORT bool CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
+GEM_EXPORT bool CreateItemCore(CREItem *item, const ResRef &resref, int a, int b, int c);
 void AttackCore(Scriptable *Sender, Scriptable *target, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
@@ -125,7 +125,7 @@ GEM_EXPORT int SeeCore(Scriptable *Sender, const Trigger *parameters, int justlo
 GEM_EXPORT bool DiffCore(ieDword a, ieDword b, int diffMode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 bool CreateMovementEffect(Actor* actor, const char *area, const Point &position, int face);
-GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, const Point &position, int face, bool adjust);
+GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
 GEM_EXPORT Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const char *Context = nullptr, bool *valid = nullptr);
 GEM_EXPORT bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context);

@@ -278,14 +278,14 @@ def SetEncumbranceLabels (Window, ControlID, Control2ID, pc):
 	ratio = encumbrance / max_encumb
 	if GameCheck.IsIWD2 () or GameCheck.IsPST ():
 		if ratio > 1.0:
-			Control.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
+			Control.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
 		elif ratio > 0.8:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 0})
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 0})
 		else:
-			Control.SetTextColor ({'r' : 255, 'g' : 255, 'b' : 255})
+			Control.SetColor ({'r' : 255, 'g' : 255, 'b' : 255})
 
 		if Control2ID:
-			Control2.SetTextColor ({'r' : 255, 'g' : 0, 'b' : 0})
+			Control2.SetColor ({'r' : 255, 'g' : 0, 'b' : 0})
 
 	else:
 		if ratio > 1.0:

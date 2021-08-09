@@ -3643,7 +3643,7 @@ int fx_detect_alignment (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 int fx_reveal_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 {
 	// print("fx_reveal_area(%2d): Value: %d, Type: %d", fx->Opcode, fx->Parameter1, fx->Parameter2);
-	const Map *map = nullptr;
+	Map *map = nullptr;
 
 	if (target) {
 		map = target->GetCurrentArea();
@@ -3788,8 +3788,8 @@ int fx_create_inventory_item (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	// EEs added randomness that can't hurt elsewhere
 	ResRef *refs[] = { &fx->Resource, &fx->Resource2, &fx->Resource3 };
 	char count = 1;
-	if (fx->Resource2[0]) count++;
-	if (fx->Resource3[0]) count++;
+	if (!fx->Resource2.IsEmpty()) count++;
+	if (!fx->Resource3.IsEmpty()) count++;
 	int choice = RAND(0, count - 1);
 
 	target->inventory.AddSlotItemRes(*refs[choice], SLOT_ONLYINVENTORY, fx->Parameter1, fx->Parameter3, fx->Parameter4);
@@ -4154,7 +4154,7 @@ int fx_set_petrified_state (Scriptable* /*Owner*/, Actor* target, Effect* /*fx*/
 static void CopyPolymorphStats(Actor *source, Actor *target)
 {
 	if(!polymorph_stats) {
-		AutoTable tab("polystat");
+		AutoTable tab = gamedata->LoadTable("polystat");
 		if (!tab) {
 			polymorph_stats = NULL;
 			polystatcount=0;
@@ -4308,7 +4308,7 @@ int fx_display_string (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		//TODO: create a single list reader that handles src and 2da too
 		const SrcVector *rndstr = LoadSrc(fx->Resource);
 		if (rndstr) {
-			fx->Parameter1 = rndstr->at(RAND<size_t>(0ul, rndstr->size() - 1));
+			fx->Parameter1 = rndstr->at(RAND<size_t>(size_t(0), rndstr->size() - 1));
 			FreeSrc(rndstr, fx->Resource);
 			DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 			target->overColor = Color(fx->Parameter2);
@@ -5061,7 +5061,7 @@ int fx_playsound (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	if (target) {
 		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS, target->Pos);
 	} else {
-		core->GetAudioDrv()->Play(fx->Resource, SFX_CHAN_HITS);
+		core->GetAudioDrv()->PlayRelative(fx->Resource, SFX_CHAN_HITS);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;
@@ -5218,7 +5218,7 @@ int fx_move_to_area (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 				map->RemoveActor( target );
 			}
 			//set the destination area
-			target->Area = ResRef::MakeUpperCase(fx->Resource);
+			target->Area = MakeUpperCaseResRef(fx->Resource);
 			return FX_APPLIED;
 		}
 	}
@@ -5338,7 +5338,6 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, const Re
 	//Add some essential effects
 	Effect *newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, fam->GetBase(IE_HITPOINTS)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//the familiar marker needs to be set to 2 in case of ToB
 	ieDword fm = 0;
@@ -5347,17 +5346,15 @@ static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, const Re
 	}
 	newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, fm, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, fam, fam);
-	delete newfx;
 
 	//maximum hp bonus of half the familiar's hp, there is no hp new bonus upgrade when upgrading familiar
 	//this is a bug even in the original engine, so I don't care
 	if (Owner) {
 		newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fam->GetBase(IE_HITPOINTS)/2, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, (Actor *) Owner, Owner);
-		delete newfx;
 	}
 
-	if (fx->Resource2[0]) {
+	if (!fx->Resource2.IsEmpty()) {
 		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(fx->Resource2, false);
 		if (vvc) {
 			//This is the final position of the summoned creature
@@ -5412,15 +5409,13 @@ int fx_find_familiar (Scriptable* Owner, Actor* target, Effect* fx)
 			return FX_NOT_APPLIED;
 		}
 
-		char familiar[9];
-		memcpy(familiar, game->Familiars[alignment], 9);
 		//ToB familiars
 		if (game->Expansion==5) {
 			// just appending 25 breaks the quasit, fairy dragon and dust mephit upgrade
-			familiar[6] = '2';
-			familiar[7] = '5';
+			fx->Resource.SNPrintF("%.6s25", game->GetFamiliar(alignment).CString());
+		} else {
+			fx->Resource = game->GetFamiliar(alignment);
 		}
-		fx->Resource = familiar;
 		fx->Parameter2=FAMILIAR_RESOURCE;
 	}
 
@@ -5460,17 +5455,14 @@ int fx_familiar_constitution_loss (Scriptable* /*Owner*/, Actor* target, Effect*
 	//lose 1 point of constitution
 	newfx = EffectQueue::CreateEffect(fx_constitution_modifier_ref, (ieDword) -1, MOD_ADDITIVE, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//remove the maximum hp bonus
 	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, -fx->Parameter1, 3, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	//damage for half of the familiar's hitpoints
 	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, DAMAGE_CRUSHING<<16, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -5487,14 +5479,13 @@ int fx_familiar_marker (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 
 	//upgrade familiar to ToB version
 	if ((fx->Parameter1!=2) && (game->Expansion == 5) ) {
-		char resource[9]{};
-		memcpy(resource, target->GetScriptName(), 6);
-		strncat(resource, "25", 8);
+		ResRef resource;
+		resource.SNPrintF("%.6s25", target->GetScriptName());
 		//set this field, so the upgrade is triggered only once
 		fx->Parameter1 = 2;
 
 		//the NULL here is probably fine when upgrading, Owner (Original summoner) is not needed.
-		const Actor *fam = GetFamiliar(nullptr, target, fx, ResRef(resource));
+		const Actor *fam = GetFamiliar(nullptr, target, fx, resource);
 
 		if (fam) {
 			//upgrade successful
@@ -6490,12 +6481,10 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		core->ApplyEffect(newfx, copy, copy);
 	}
 
-	char script[9];
+	ResRef script;
 	//intentionally 7, to leave room for the last letter
 	// if this ever breaks, try with the CRE file name as the prefix (sources disagree)
-	strnlwrcpy(script,target->GetScript(SCR_CLASS),7);
-	//no need of buffer defense as long as you don't mess with the 7 above
-	strcat(script,"m");
+	script.SNPrintF("%.7sm", target->GetScript(SCR_CLASS).CString());
 	//if the caster is inparty, the script is turned off by the AI disable flag
 	copy->SetScript(script, SCR_CLASS, target->InParty!=0);
 
@@ -6520,7 +6509,6 @@ int fx_puppet_master (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		newfx = EffectQueue::CreateEffect(fx_leveldrain_ref, copy->GetXPLevel(1)/2, 0, FX_DURATION_INSTANT_PERMANENT);
 		if (newfx) {
 			core->ApplyEffect(newfx, copy, copy);
-			delete newfx;
 		}
 		break;
 	default:
@@ -6764,14 +6752,9 @@ int fx_set_area_effect (Scriptable* Owner, Actor* target, Effect* fx)
 		//failure
 		displaymsg->DisplayConstantStringName(STR_SNAREFAILED, DMC_WHITE, target);
 		if (target->LuckyRoll(1,100,0)<25) {
-			char spl[9];
-			strnuprcpy(spl, fx->Resource, 8);
-			if (strlen(spl)<8) {
-				strcat(spl,"F");
-			} else {
-				spl[7]='F';
-			}
-			core->ApplySpell(ResRef(spl), target, Owner, fx->Power);
+			ResRef spl;
+			spl.SNPrintF("%.7sF", fx->Resource.CString());
+			core->ApplySpell(spl, target, Owner, fx->Power);
 		}
 		return FX_NOT_APPLIED;
 	}
@@ -7474,7 +7457,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 	ResRef resRef;
 	//GemRB enhancement: allow a custom resource
 	if (fx->Parameter2) {
-		resRef = ResRef::MakeLowerCase(fx->Resource);
+		resRef = MakeLowerCaseResRef(fx->Resource);
 	} else {
 		resRef = "cut250a";
 	}
@@ -7633,7 +7616,7 @@ int fx_generate_wish (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Resource.IsEmpty()) {
 		fx->Resource = "wishcode";
 	}
-	AutoTable tm(fx->Resource);
+	AutoTable tm = gamedata->LoadTable(fx->Resource);
 	if (!tm) {
 		return FX_NOT_APPLIED;
 	}

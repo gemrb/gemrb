@@ -101,13 +101,13 @@ void GameScript::SetAreaFlags(Scriptable* Sender, Action* parameters)
 void GameScript::AddAreaType(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->AreaType|=parameters->int0Parameter;
+	map->AreaType |= MapEnv(parameters->int0Parameter);
 }
 
 void GameScript::RemoveAreaType(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->AreaType&=~parameters->int0Parameter;
+	map->AreaType &= ~MapEnv(parameters->int0Parameter);
 }
 
 void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -661,7 +661,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 			map->RemoveActor(tar);
 		}
 		//update the target's area to the destination
-		tar->Area = ResRef::MakeUpperCase(parameters->string1Parameter);
+		tar->Area = MakeUpperCaseResRef(parameters->string1Parameter);
 		//if the destination area is currently loaded, move the actor there now
 		if (game->FindMap(tar->Area)) {
 			MoveBetweenAreasCore( tar, parameters->string1Parameter, parameters->pointParameter, -1, true);
@@ -1662,10 +1662,9 @@ void GameScript::DisplayStringNoNameHead(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( target, parameters->int0Parameter, DS_HEAD|DS_CONSOLE|DS_NONAME);
 }
 
-//display message over current script owner
 void GameScript::DisplayMessage(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE );
+	DisplayStringCore(Sender, parameters->int0Parameter, DS_CONSOLE|DS_NONAME);
 }
 
 //float message over target
@@ -2248,26 +2247,31 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	const Actor *actor = (const Actor *) Sender;
-	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
+	Map* map = actor->GetCurrentArea();
+	if (!game->EveryoneNearPoint(map, actor->Pos, ENP_CANMOVE)) {
 		//we abort the command, everyone should be here
+		if (map->LastGoCloser < game->Ticks) {
+			displaymsg->DisplayConstantString(STR_WHOLEPARTY, DMC_WHITE);
+			map->LastGoCloser = game->Ticks + 6000;
+		}
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	//travel direction passed to guiscript
-	int direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
-	Log(MESSAGE, "Actions", "Travel direction returned: %d", direction);
+	WMPDirection direction = Sender->GetCurrentArea()->WhichEdge(actor->Pos);
+	Log(MESSAGE, "Actions", "Travel direction returned: %d", static_cast<int>(direction));
 	//this is notoriously flaky
 	//if it doesn't work for the sender try other party members, too
-	if (direction == -1) {
+	if (direction == WMPDirection::NONE) {
 		int directions[4] = { -1, -1, -1, -1 };
 		for (int i = 0; i < game->GetPartySize(false); i++) {
 			actor = game->GetPC(i, false);
 			if (actor == Sender) continue;
 
-			int partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
-			if (partydir != -1) {
-				directions[partydir]++;
+			WMPDirection partydir = actor->GetCurrentArea()->WhichEdge(actor->Pos);
+			if (partydir != WMPDirection::NONE) {
+				directions[static_cast<int>(partydir)]++;
 			}
 		}
 		int best = 0;
@@ -2277,22 +2281,22 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 			}
 		}
 		if (directions[best] != -1) {
-			direction = best;
+			direction = static_cast<WMPDirection>(best);
 		}
-		Log(DEBUG, "Actions", "Travel direction determined by party: %d", direction);
+		Log(DEBUG, "Actions", "Travel direction determined by party: %d", static_cast<int>(direction));
 	}
 
 	// pst enables worldmap travel only after visiting the lower ward
 	bool keyAreaVisited = core->HasFeature(GF_TEAM_MOVEMENT) && CheckVariable(Sender, "AR0500_Visited", "GLOBAL") == 1;
-	if (direction == -1 && !keyAreaVisited) {
+	if (direction == WMPDirection::NONE && !keyAreaVisited) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (direction == -1 && keyAreaVisited) {
+	if (direction == WMPDirection::NONE && keyAreaVisited) {
 		// FIXME: not ideal, pst uses the infopoint links (ip->EntranceName), so direction doesn't matter
 		// but we're not travelling through them (the whole point of the world map), so how to pick a good entrance?
 		// DestEntryPoint is all zeroes, pst just didn't use it
-		direction = 1;
+		direction = WMPDirection::WEST;
 	}
 	core->GetDictionary()->SetAt("Travel", (ieDword) direction);
 	core->GetGUIScriptEngine()->RunFunction( "GUIMA", "OpenTravelWindow" );
@@ -3069,16 +3073,16 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		act->SetScript(ResRef(), SCR_GENERAL, true);
 		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
-	AutoTable pdtable("pdialog");
+	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	if (pdtable) {
 		const char* scriptname = act->GetScriptName();
 		ResRef resRef;
 		//set dialog only if we got a row
 		if (pdtable->GetRowIndex( scriptname ) != -1) {
 			if (game->Expansion==5) {
-				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
+				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25JOIN_DIALOG_FILE"));
 			} else {
-				resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
+				resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "JOIN_DIALOG_FILE"));
 			}
 			act->SetDialog(resRef);
 		}
@@ -3588,16 +3592,16 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	AutoTable pdtable("pdialog");
+	AutoTable pdtable = gamedata->LoadTable("pdialog");
 	Actor* act = ( Actor* ) Sender;
 	const char* scriptname = act->GetScriptName();
 	if (pdtable->GetRowIndex( scriptname ) != -1) {
 		ResRef resRef;
 
 		if (core->GetGame()->Expansion==5) {
-			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
+			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "25POST_DIALOG_FILE"));
 		} else {
-			resRef = ResRef::MakeLowerCase(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));
+			resRef = MakeLowerCaseResRef(pdtable->QueryField(scriptname, "POST_DIALOG_FILE"));
 		}
 		act->SetDialog(resRef);
 	}
@@ -4622,7 +4626,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4635,7 +4639,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -4652,7 +4656,7 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 
 void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 {
-	AutoTable tab(parameters->string0Parameter);
+	AutoTable tab = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tab) {
 		return;
 	}
@@ -5281,7 +5285,7 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 	}
 	//type == 1 remove spell only from memorization
 	//type == 0 original behaviour: deplete only
-	actor->spellbook.UnmemorizeSpell(spellRes, type);
+	actor->spellbook.UnmemorizeSpell(spellRes, !type, 2);
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
@@ -5908,7 +5912,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	if (core->HasFeature(GF_STRREF_SAVEGAME)) {
 		const char *basename = "Auto-Save";
-		AutoTable tab("savegame");
+		AutoTable tab = gamedata->LoadTable("savegame");
 		if (tab) {
 			basename = tab->QueryDefault();
 		}
@@ -6110,10 +6114,10 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	if (!store) {
 		store = core->SetCurrentStore(parameters->string0Parameter, 0);
 	} else {
-		if (strnicmp(store->Name, parameters->string0Parameter, 8) != 0) {
+		if (store->Name != parameters->string0Parameter) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			current = ResRef::MakeLowerCase(store->Name);
+			current = store->Name;
 			owner = store->GetOwnerID();
 		}
 	}
@@ -6396,7 +6400,7 @@ void GameScript::ChangeDestination(Scriptable* Sender, Action* parameters)
 	InfoPoint *ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	if (ip && (ip->Type==ST_TRAVEL) ) {
 		//alter the destination area, don't touch the entrance variable link
-		ip->Destination = ResRef::MakeLowerCase(parameters->string0Parameter);
+		ip->Destination = MakeLowerCaseResRef(parameters->string0Parameter);
 	}
 }
 
@@ -6960,7 +6964,7 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 // pst spawning
 void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable pcs("bios");
+	AutoTable pcs = gamedata->LoadTable("bios");
 	if (!pcs) {
 		return;
 	}
@@ -7069,7 +7073,6 @@ void GameScript::SpellCastEffect(Scriptable* Sender, Action* parameters)
 	//int2param isn't actually used in the original engine
 
 	core->ApplyEffect(fx, (Actor *) src, src);
-	delete fx;
 }
 
 //this action plays a vvc animation over target
@@ -7105,7 +7108,6 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	fx->Pos = tar->Pos;
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, (Actor *) tar, src);
-	delete fx;
 }
 
 void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
@@ -7138,7 +7140,6 @@ void GameScript::SpellHitEffectPoint(Scriptable* Sender, Action* parameters)
 	}
 	fx->Target = FX_TARGET_PRESET;
 	core->ApplyEffect(fx, NULL, src);
-	delete fx;
 }
 
 
@@ -7239,7 +7240,7 @@ void GameScript::SetupWishObject(Scriptable* Sender, Action* parameters)
 //the row label column sets the token names
 void GameScript::SetToken2DA(Scriptable* /*Sender*/, Action* parameters)
 {
-	AutoTable tm(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tm) {
 		Log(ERROR, "Actions", "Cannot find %s.2da.", parameters->string0Parameter);
 		return;

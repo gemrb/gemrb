@@ -30,7 +30,6 @@
 #include "opcode_params.h"
 #include "voodooconst.h"
 
-#include "Bitmap.h"
 #include "DataFileMgr.h"
 #include "DialogHandler.h" // checking for dialog
 #include "Game.h"
@@ -87,7 +86,7 @@ static std::map<int, std::vector<int> > skillstats;
 static std::map<int, int> stat2skill;
 static int **afcomments = NULL;
 static int afcount = -1;
-static const ieVariable CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
+static const char* const CounterNames[4] = { "GOOD", "LAW", "LADY", "MURDER" };
 //I keep the zero index the same as core rules (default setting)
 static int dmgadjustments[6]={0, -50, -25, 0, 50, 100}; //default, easy, normal, core rules, hard, nightmare
 //XP adjustments on easy setting (need research on the amount)
@@ -142,6 +141,9 @@ static bool iwd2class = false;
 static ieDword state_invisible = STATE_INVISIBLE;
 static AutoTable extspeed;
 static AutoTable wspecial;
+
+static constexpr ieWord IT_SCROLL = 11;
+static constexpr ieWord IT_WAND = 35;
 
 //item animation override array
 struct ItemAnimType {
@@ -304,7 +306,7 @@ std::vector<std::vector<int> > skillrac;
 
 // subset of races.2da
 std::map<unsigned int, int> favoredMap;
-std::map<unsigned int, const char *> raceID2Name;
+std::map<unsigned int, std::string> raceID2Name;
 
 // iwd2 class to-hit and apr tables read into a single object
 std::map<char *, std::vector<BABTable> > IWD2HitTable;
@@ -416,8 +418,6 @@ void ReleaseMemoryActor()
 		itemanim = NULL;
 	}
 	FistRows = -1;
-	extspeed.release();
-	wspecial.release();
 }
 
 Actor::Actor()
@@ -461,7 +461,7 @@ Actor::Actor()
 	nextBored = 0;
 	FatigueComplaintDelay = 0;
 
-	inventory.SetInventoryType(INVENTORY_CREATURE);
+	inventory.SetInventoryType(ieInventoryType::CREATURE);
 
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
@@ -646,7 +646,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (!core->HasFeature(GF_RESDATA_INI)) {
 		// handle default speed and per-animation overrides
 		int row = -1;
-		if (extspeed.ok()) {
+		if (extspeed) {
 			char animHex[10];
 			snprintf(animHex, 10, "0x%04X", AnimID);
 			row = extspeed->FindTableValue((unsigned int) 0, animHex);
@@ -760,7 +760,7 @@ void Actor::SetCircleSize()
 
 static void ApplyClab_internal(Actor *actor, const char *clab, int level, bool remove, int diff)
 {
-	AutoTable table(clab);
+	AutoTable table = gamedata->LoadTable(clab);
 	if (!table) return;
 
 	int row = table->GetRowCount();
@@ -886,7 +886,7 @@ bool Actor::ApplyKit(bool remove, ieDword baseclass, int diff)
 	const char *clab = NULL;
 	ieDword max = 0;
 	ieDword cls = GetStat(IE_CLASS);
-	Holder<TableMgr> tm;
+	std::shared_ptr<TableMgr> tm;
 
 	// iwd2 has support for multikit characters, so we have more work
 	// at the same time each baseclass has its own level stat, so the logic is cleaner
@@ -1561,7 +1561,7 @@ MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL
 MAX_LEVEL,MAX_LEVEL,0,0,0,0,0,0//ff
 };
 
-typedef void (*PostChangeFunctionType)(Actor *actor, ieDword oldValue, ieDword newValue);
+using PostChangeFunctionType = void (*)(Actor *actor, ieDword oldValue, ieDword newValue);
 static const PostChangeFunctionType post_change_functions[MAX_STATS] = {
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
@@ -1806,7 +1806,7 @@ GEM_EXPORT void UpdateActorConfig()
 
 static void ReadModalStates()
 {
-	AutoTable table("modal");
+	AutoTable table = gamedata->LoadTable("modal");
 	if (!table) return;
 
 	ModalStatesStruct ms;
@@ -1854,7 +1854,7 @@ static void InitActorTables()
 	NUM_RARE_SELECT_SOUNDS = core->GetRareSelectSoundCount();
 
 	//this table lists various level based xp bonuses
-	AutoTable tm("xpbonus", true);
+	AutoTable tm = gamedata->LoadTable("xpbonus", true);
 	if (tm) {
 		xpbonustypes = tm->GetRowCount();
 		if (xpbonustypes == 0) {
@@ -1874,7 +1874,7 @@ static void InitActorTables()
 	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	tm.load("clskills");
+	tm  = gamedata->LoadTable("clskills");
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -1990,17 +1990,17 @@ static void InitActorTables()
 	}
 
 	//initializing the vvc resource references
-	tm.load("damage");
+	tm = gamedata->LoadTable("damage");
 	if (tm) {
 		for (int i = 0; i < DAMAGE_LEVELS; i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
 			d_main[i] = tmp;
-			if (d_main[i].IsStar()) {
+			if (IsStar(d_main[i])) {
 				d_main[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_SPARKS );
 			d_splash[i] = tmp;
-			if (d_splash[i].IsStar()) {
+			if (IsStar(d_splash[i])) {
 				d_splash[i].Reset();
 			}
 			tmp = tm->QueryField( i, COL_GRADIENT );
@@ -2008,7 +2008,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("overlay");
+	tm = gamedata->LoadTable("overlay");
 	if (tm) {
 		ieDword mask = 1;
 		for (int i =  0; i < OVERLAY_COUNT; i++) {
@@ -2025,7 +2025,7 @@ static void InitActorTables()
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
-		tm.load("csound");
+		tm = gamedata->LoadTable("csound");
 		if (tm) {
 			for (int i = 0; i < VCONST_COUNT; i++) {
 				const char *tmp = tm->QueryField( i, 0 );
@@ -2039,7 +2039,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("qslots");
+	tm = gamedata->LoadTable("qslots");
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount+1,sizeof(ActionButtonRow) );
 
 	//leave room for default row at 0
@@ -2052,7 +2052,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("qslot2", true);
+	tm = gamedata->LoadTable("qslot2", true);
 	if (tm) {
 		extraslots = tm->GetRowCount();
 		OtherGUIButtons = (ActionButtonRow2 *) calloc( extraslots, sizeof (ActionButtonRow2) );
@@ -2068,14 +2068,14 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("mdfeats", true);
+	tm = gamedata->LoadTable("mdfeats", true);
 	if (tm) {
 		for (int i = 0; i < ES_COUNT; i++) {
 			featSpells[i] = tm->QueryField(i, 0);
 		}
 	}
 
-	tm.load("itemuse");
+	tm = gamedata->LoadTable("itemuse");
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
@@ -2092,7 +2092,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("itemanim", true);
+	tm = gamedata->LoadTable("itemanim", true);
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -2105,9 +2105,9 @@ static void InitActorTables()
 	// iwd2 has mxsplbon instead, since all casters get a bonus with high enough stats (which are not always wisdom)
 	// luckily, they both use the same format
 	if (third) {
-		tm.load("mxsplbon");
+		tm = gamedata->LoadTable("mxsplbon");
 	} else {
-		tm.load("mxsplwis");
+		tm = gamedata->LoadTable("mxsplwis");
 	}
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
@@ -2123,7 +2123,7 @@ static void InitActorTables()
 		}
 	}
 
-	tm.load("featreq", true);
+	tm = gamedata->LoadTable("featreq", true);
 	if (tm) {
 		unsigned int stat, max;
 
@@ -2145,10 +2145,10 @@ static void InitActorTables()
 
 	if (classcount) maxLevelForHpRoll = (int *) calloc(classcount, sizeof(int));
 	xpcap = (int *) calloc(classcount, sizeof(int));
-	AutoTable xpcapt("xpcap");
+	AutoTable xpcapt = gamedata->LoadTable("xpcap");
 	std::map<std::string, int> className2ID;
 
-	tm.load("classes");
+	tm = gamedata->LoadTable("classes");
 	if (!tm) {
 		error("Actor", "Missing classes.2da!");
 	}
@@ -2192,7 +2192,7 @@ static void InitActorTables()
 			// FIXME: the attempt at skipping doesn't work!
 			const auto& it = IWD2HitTable.find(tohit);
 			if (it == IWD2HitTable.end()) {
-				tht.load(tohit, true);
+				tht = gamedata->LoadTable(tohit, true);
 				if (!tht || !tohit[0]) {
 					error("Actor", "TOHIT table for %s does not exist!", classname);
 				}
@@ -2272,7 +2272,7 @@ static void InitActorTables()
 					buffer.appendFormatted("Classis: %d ", classis);
 					levelslots[tmpindex][classis] = IE_LEVEL;
 					//get the last level when we can roll for HP
-					hptm.load(tm->QueryField(classname, "HP"), true);
+					hptm = gamedata->LoadTable(tm->QueryField(classname, "HP"), true);
 					if (hptm) {
 						int tmphp = 0;
 						int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2325,7 +2325,7 @@ static void InitActorTables()
 						if (!foundwarrior) {
 							foundwarrior = (classis==ISFIGHTER||classis==ISRANGER||classis==ISPALADIN||
 								classis==ISBARBARIAN);
-							hptm.load(tm->QueryField(currentname, "HP"), true);
+							hptm = gamedata->LoadTable(tm->QueryField(currentname, "HP"), true);
 							if (hptm) {
 								int tmphp = 0;
 								int rollscolumn = hptm->GetColumnIndex("ROLLS");
@@ -2374,7 +2374,7 @@ static void InitActorTables()
 
 	// set the default weapon slot count for the inventory gui — if we're not in iwd2 already
 	if (!iwd2class) {
-		tm.load("numwslot", true);
+		tm = gamedata->LoadTable("numwslot", true);
 		if (tm) {
 			int rowcount = tm->GetRowCount();
 			for (int i = 0; i < rowcount; i++) {
@@ -2390,7 +2390,7 @@ static void InitActorTables()
 
 	// slurp up kitlist.2da; only iwd2 has both class and kit info in the same table
 	if (!iwd2class) {
-		tm.load("kitlist", true);
+		tm = gamedata->LoadTable("kitlist", true);
 		if (!tm) {
 			error("Actor", "Missing kitlist.2da!");
 		}
@@ -2411,10 +2411,10 @@ static void InitActorTables()
 	}
 
 	//pre-cache hit/damage/speed bonuses for weapons
-	wspecial.load("wspecial", true);
+	wspecial = gamedata->LoadTable("wspecial", true);
 
 	//dual-wielding table
-	tm.load("wstwowpn", true);
+	tm = gamedata->LoadTable("wstwowpn", true);
 	if (tm) {
 		wsdualwield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2427,7 +2427,7 @@ static void InitActorTables()
 	}
 
 	//two-handed table
-	tm.load("wstwohnd", true);
+	tm = gamedata->LoadTable("wstwohnd", true);
 	if (tm) {
 		wstwohanded = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2440,7 +2440,7 @@ static void InitActorTables()
 	}
 
 	//shield table
-	tm.load("wsshield", true);
+	tm = gamedata->LoadTable("wsshield", true);
 	if (tm) {
 		wsswordshield = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2453,7 +2453,7 @@ static void InitActorTables()
 	}
 
 	//single-handed table
-	tm.load("wssingle");
+	tm = gamedata->LoadTable("wssingle");
 	if (tm) {
 		wssingle = (int **) calloc(STYLE_MAX+1, sizeof(int *));
 		int cols = tm->GetColumnCount();
@@ -2466,7 +2466,7 @@ static void InitActorTables()
 	}
 
 	//unhardcoded monk bonus table
-	tm.load("monkbon", true);
+	tm = gamedata->LoadTable("monkbon", true);
 	if (tm) {
 		monkbon_rows = tm->GetRowCount();
 		monkbon_cols = tm->GetColumnCount();
@@ -2483,7 +2483,7 @@ static void InitActorTables()
 	for (int i = 0; i < 20; i++) {
 		wmlevels[i]=(int *) calloc(MAX_LEVEL,sizeof(int) );
 	}
-	tm.load("lvlmodwm", true);
+	tm = gamedata->LoadTable("lvlmodwm", true);
 	if (tm) {
 		int maxrow = tm->GetRowCount();
 		for (int i = 0; i < 20; i++) {
@@ -2500,7 +2500,7 @@ static void InitActorTables()
 	for (int i = 0; i < VCONST_COUNT; i++) {
 		VCMap[i]=i;
 	}
-	tm.load("vcremap");
+	tm = gamedata->LoadTable("vcremap");
 	if (tm) {
 		int rows = tm->GetRowCount();
 
@@ -2514,7 +2514,7 @@ static void InitActorTables()
 	}
 
 	//initializing the skill->stats conversion table (used in iwd2)
-	tm.load("skillsta", true);
+	tm = gamedata->LoadTable("skillsta", true);
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		int colcount = tm->GetColumnCount();
@@ -2537,7 +2537,7 @@ static void InitActorTables()
 	}
 
 	//initializing area flag comments
-	tm.load("comment");
+	tm = gamedata->LoadTable("comment");
 	if (tm) {
 		int rowcount = tm->GetRowCount();
 		afcount = rowcount;
@@ -2553,7 +2553,7 @@ static void InitActorTables()
 	}
 
 	// dexterity modifier for thieving skills
-	tm.load("skilldex");
+	tm = gamedata->LoadTable("skilldex");
 	if (tm) {
 		int skilldexNCols = tm->GetColumnCount();
 		int skilldexNRows = tm->GetRowCount();
@@ -2573,12 +2573,12 @@ static void InitActorTables()
 	}
 
 	// race modifier for thieving skills
-	tm.load("skillrac");
+	tm = gamedata->LoadTable("skillrac");
 	int value = 0;
 	int racetable = core->LoadSymbol("race");
 	int subracetable = core->LoadSymbol("subrace");
-	Holder<SymbolMgr> race = NULL;
-	Holder<SymbolMgr> subrace = NULL;
+	std::shared_ptr<SymbolMgr> race;
+	std::shared_ptr<SymbolMgr> subrace;
 	if (racetable != -1) {
 		race = core->GetSymbol(racetable);
 	}
@@ -2614,7 +2614,7 @@ static void InitActorTables()
 	}
 
 	//difficulty level based modifiers
-	tm.load("difflvls");
+	tm = gamedata->LoadTable("difflvls");
 	if (tm) {
 		memset(xpadjustments, 0, sizeof(xpadjustments) );
 		memset(dmgadjustments, 0, sizeof(dmgadjustments) );
@@ -2627,7 +2627,7 @@ static void InitActorTables()
 	}
 
 	//preload stat derived animation tables
-	tm.load("avprefix");
+	tm = gamedata->LoadTable("avprefix");
 	delete [] avPrefix;
 	avBase = 0;
 	avCount = -1;
@@ -2645,7 +2645,7 @@ static void InitActorTables()
 			}
 			for (int i = 0; i < avCount; i++) {
 				avPrefix[i].avresref = tm->QueryField(i + 1);
-				avPrefix[i].avtable.load(avPrefix[i].avresref);
+				avPrefix[i].avtable = gamedata->LoadTable(avPrefix[i].avresref);
 				if (avPrefix[i].avtable) {
 					avPrefix[i].stat = core->TranslateStat(avPrefix[i].avtable->QueryField(0));
 				} else {
@@ -2656,7 +2656,7 @@ static void InitActorTables()
 	}
 
 	// races table
-	tm.load("races");
+	tm = gamedata->LoadTable("races");
 	if (tm && !pstflags) {
 		int racesNRows = tm->GetRowCount();
 
@@ -2672,7 +2672,7 @@ static void InitActorTables()
 	// IWD, IWD2 and BG:EE have this
 	int splstatetable = core->LoadSymbol("splstate");
 	if (splstatetable != -1) {
-		Holder<SymbolMgr> splstate = core->GetSymbol(splstatetable);
+		auto splstate = core->GetSymbol(splstatetable);
 		int numstates = splstate->GetHighestValue();
 		if (numstates > 0) {
 			//rounding up
@@ -2684,7 +2684,7 @@ static void InitActorTables()
 	}
 
 	// movement rate adjustments
-	extspeed.load("moverate", true);
+	extspeed = gamedata->LoadTable("moverate", true);
 
 	// modal actions/state data
 	ReadModalStates();
@@ -2792,7 +2792,7 @@ int Actor::GetWisdomAC() const
 //Returns the personal critical damage type in a binary compatible form (PST)
 int Actor::GetCriticalType() const
 {
-	AutoTable tm("crits", true);
+	AutoTable tm = gamedata->LoadTable("crits", true);
 	if (!tm) return 0;
 	//the ID of this PC (first 2 rows are empty)
 	int row = BaseStats[IE_SPECIFIC];
@@ -2805,7 +2805,7 @@ int Actor::GetCriticalType() const
 //Plays personal critical damage animation for PST PC's melee attacks
 void Actor::PlayCritDamageAnimation(int type)
 {
-	AutoTable tm("crits");
+	AutoTable tm = gamedata->LoadTable("crits");
 	if (!tm) return;
 	//the ID's are in column 1, selected by specifics by GetCriticalType
 	int row = tm->FindTableValue (1, type);
@@ -2878,14 +2878,16 @@ void Actor::PlayDamageAnimation(int type, bool hit)
 
 ieDword Actor::ClampStat(unsigned int StatIndex, ieDword Value) const
 {
-	if (StatIndex < MAX_STATS) {
-		if ((signed) Value < -100) {
-			Value = (ieDword) -100;
-		} else {
-			if (maximum_values[StatIndex] > 0) {
-				if ((signed)Value > 0 && Value > maximum_values[StatIndex]) {
-					Value = maximum_values[StatIndex];
-				}
+	if (StatIndex >= MAX_STATS) {
+		return Value;
+	}
+
+	if ((signed) Value < -100) {
+		Value = (ieDword) -100;
+	} else {
+		if (maximum_values[StatIndex] > 0) {
+			if ((signed) Value > 0 && Value > maximum_values[StatIndex]) {
+				Value = maximum_values[StatIndex];
 			}
 		}
 	}
@@ -2992,7 +2994,7 @@ const unsigned char *Actor::GetStateString() const
 		return NULL;
 	}
 	ieByte *tmp = PCStats->PortraitIconString;
-	ieWord *Icons = PCStats->PortraitIcons;
+	const ieWord *Icons = PCStats->PortraitIcons;
 	int j=0;
 	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
 		if (!(Icons[i]&0xff00)) {
@@ -3171,7 +3173,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 		// snap out of charm if the charmer hurt us
 		if (trigger.triggerID == trigger_attackedby) {
-			Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
+			const Actor *attacker = core->GetGame()->GetActorByGlobalID(LastAttacker);
 			if (attacker) {
 				int revertToEA = 0;
 				if (Modified[IE_EA] == EA_CHARMED && attacker->GetStat(IE_EA) <= EA_GOODCUTOFF) {
@@ -3181,7 +3183,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 				}
 				if (revertToEA) {
 					// remove only the plain charm effect
-					Effect *charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1);
+					const Effect *charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1);
 					if (!charmfx) charmfx = fxqueue.HasEffectWithParam(fx_set_charmed_state_ref, 1001);
 					if (charmfx) {
 						SetStat(IE_EA, revertToEA, 1);
@@ -3385,7 +3387,7 @@ void Actor::RefreshHP() {
 void Actor::RefreshPCStats() {
 	RefreshHP();
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//morale recovery every xth AI cycle ... except for pst pcs
 	int mrec = GetStat(IE_MORALERECOVERYTIME);
 	if (mrec && ShouldModifyMorale()) {
@@ -3505,7 +3507,7 @@ void Actor::RefreshPCStats() {
 int Actor::GetConHealAmount() const
 {
 	int rate = 0;
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) return rate;
 
 	if (core->HasFeature(GF_AREA_OVERRIDE) && game->GetPC(0, false) == this) {
@@ -3520,7 +3522,7 @@ int Actor::GetConHealAmount() const
 // add fatigue every 4 hours since resting and check if the actor is penalised for it
 void Actor::UpdateFatigue()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!InParty || !game->GameTime) {
 		return;
 	}
@@ -3627,7 +3629,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 		// potentially display feedback, but do some rate limiting, since each effect in a spell ends up here
 		static ieDword prevType = -1;
 		static int prevRoll = -1;
-		static Actor *prevActor = NULL;
+		static const Actor *prevActor = nullptr;
 		if (core->HasFeedback(FT_COMBAT) && prevType != type && prevActor != this && prevRoll != ret) {
 			// "Save Vs Death" in all games except pst: "Save Vs. Death:"
 			String *str = core->GetString(displaymsg->GetStringReference(STR_SAVE_SPELL + type));
@@ -3914,7 +3916,7 @@ bool Actor::VerbalConstant(int start, int count, int flags) const
 		char chrsound[256];
 		do {
 			count--;
-			ResolveStringConstant(soundRef, start + count);
+			GetVerbalConstantSound(soundRef, start + count);
 			GetSoundFolder(chrsound, 1, soundRef);
 			if (gamedata->Exists(chrsound, IE_WAV_CLASS_ID, true) || gamedata->Exists(chrsound, IE_OGG_CLASS_ID, true)) {
 				DisplayStringCore((Scriptable *) this, start + RAND(0, count), flags|DS_CONST);
@@ -3943,21 +3945,21 @@ void Actor::DisplayStringOrVerbalConstant(int str, int vcstat, int vccount) cons
 
 bool Actor::HasSpecialDeathReaction(const char *deadname) const
 {
-	AutoTable tm("death");
+	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return false;
-	const char *value = tm->QueryField (scriptName, deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname);
 	return value && value[0] != '0';
 }
 
 void Actor::ReactToDeath(const char * deadname)
 {
-	AutoTable tm("death");
+	AutoTable tm = gamedata->LoadTable("death");
 	if (!tm) return;
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	const char *value = tm->QueryField(scriptName, deadname);
+	const char *value = tm->QueryField(scriptName.CString(), deadname);
 	if (value[0] == '0') {
 		VerbalConstant(VB_REACT, 1, DS_QUEUE);
 		return;
@@ -3976,7 +3978,7 @@ void Actor::ReactToDeath(const char * deadname)
 
 	tick_t len = 0;
 	unsigned int channel = SFX_CHAN_CHAR0 + InParty - 1;
-	core->GetAudioDrv()->Play(resRef, channel, &len);
+	core->GetAudioDrv()->PlayRelative(resRef, channel, &len);
 
 	tick_t counter = (AI_UPDATE_TIME * len) / 1000;
 	if (counter != 0) { // don't nullify it in case we're waiting already
@@ -3990,10 +3992,8 @@ void Actor::GetAreaComment(int areaflag) const
 	for(int i=0;i<afcount;i++) {
 		if (afcomments[i][0]&areaflag) {
 			int vc = afcomments[i][1];
-			if (afcomments[i][2]) {
-				if (!core->GetGame()->IsDay()) {
-					vc++;
-				}
+			if (afcomments[i][2] && !core->GetGame()->IsDay()) {
+				vc++;
 			}
 			VerbalConstant(vc);
 			return;
@@ -4003,7 +4003,7 @@ void Actor::GetAreaComment(int areaflag) const
 
 static int CheckInteract(const char *talker, const char *target)
 {
-	AutoTable interact("interact");
+	AutoTable interact = gamedata->LoadTable("interact");
 	if (!interact)
 		return I_NONE;
 	const char *value = interact->QueryField(talker, target);
@@ -4051,7 +4051,7 @@ void Actor::HandleInteractV1(const Actor *target)
 
 int Actor::HandleInteract(const Actor *target) const
 {
-	int type = CheckInteract(scriptName, target->GetScriptName());
+	int type = CheckInteract(scriptName.CString(), target->GetScriptName());
 
 	//no interaction at all
 	if (type==I_NONE) return -1;
@@ -4073,7 +4073,7 @@ int Actor::HandleInteract(const Actor *target) const
 
 bool Actor::GetPartyComment()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 
 	//not an NPC
 	if (BaseStats[IE_MC_FLAGS] & MC_EXPORTABLE) return false;
@@ -4203,12 +4203,12 @@ void Actor::CommandActor(Action* action, bool clearPath)
 void Actor::IdleActions(bool nonidle)
 {
 	//do we have an area
-	Map *map = GetCurrentArea();
+	const Map *map = GetCurrentArea();
 	if (!map) return;
 	//and not in panic
 	if (panicMode!=PANIC_NONE) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	//there is no combat
 	if (game->CombatCounter) {
 		ResetCommentTime();
@@ -4274,7 +4274,7 @@ void Actor::PlayExistenceSounds()
 	//only non-joinable chars can have existence sounds
 	if (Persistent()) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	ieDword time = game->GameTime;
 	if (time/nextComment > 1) { // first run, not adjusted for game time yet
 		nextComment += time;
@@ -4284,31 +4284,38 @@ void Actor::PlayExistenceSounds()
 
 	ieDword delay = Modified[IE_EXISTANCEDELAY];
 	if (delay == (ieDword) -1) return;
+	if (delay == 0) {
+		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
+	}
 
 	Audio *audio = core->GetAudioDrv();
 	Point listener = audio->GetListenerPos();
 	if (nextComment && !Immobile() && WithinAudibleRange(this, listener)) {
 		//setup as an ambient
 		ieStrRef strref = GetVerbalConstant(VB_EXISTENCE, 5);
-		if (strref != (ieStrRef) -1) {
-			StringBlock sb = core->strings->GetStringBlock(strref);
-			if (!sb.Sound.IsEmpty()) {
-				unsigned int vol = 100;
-				core->GetDictionary()->Lookup("Volume Ambients", vol);
-				int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
-				if (stream != -1) {
-					tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
-					if (audioLength > 0) {
-						SetAnimatedTalking(audioLength);
-					}
-					audio->ReleaseStream(stream, false);
-				}
+		if (strref == (ieStrRef) -1) {
+			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			return;
+		}
+
+		StringBlock sb = core->strings->GetStringBlock(strref);
+		if (sb.Sound.IsEmpty()) {
+			nextComment = time + RAND(delay * 1 / 4, delay * 7 / 4);
+			return;
+		}
+
+		unsigned int vol = 100;
+		core->GetDictionary()->Lookup("Volume Ambients", vol);
+		int stream = audio->SetupNewStream(Pos.x, Pos.y, 0, vol, true, 50); // REFERENCE_DISTANCE
+		if (stream != -1) {
+			tick_t audioLength = audio->QueueAmbient(stream, sb.Sound);
+			if (audioLength > 0) {
+				SetAnimatedTalking(audioLength);
 			}
+			audio->ReleaseStream(stream, false);
 		}
 	}
-	if (delay == 0) {
-		delay = VOODOO_EXISTENCE_DELAY_DEFAULT;
-	}
+
 	nextComment = time + RAND(delay*1/4, delay*7/4);
 }
 
@@ -4318,7 +4325,7 @@ bool Actor::OverrideActions()
 	// domination and dire charm: force the actors to be useful (trivial ai)
 	Action *action;
 	if ((Modified[IE_STATE_ID] & STATE_CHARMED) && (BaseStats[IE_EA] <= EA_GOODCUTOFF) && Modified[IE_EA] == EA_CHARMEDPC) {
-		Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
+		const Effect *charm = fxqueue.HasEffect(fx_set_charmed_state_ref);
 		if (!charm) return false;
 
 		// skip regular charm
@@ -4807,29 +4814,22 @@ void Actor::PlayWalkSound()
 	if (!cnt) return;
 
 	cnt=core->Roll(1,cnt,-1);
-	ResRef Sound = anims->GetWalkSound();
-	area->ResolveTerrainSound(Sound, Pos);
+	ResRef Sound = area->ResolveTerrainSound(anims->GetWalkSound(), Pos);
 
-	if (Sound.IsStar()) return;
+	if (IsStar(Sound)) return;
 
-	int l = strlen(Sound);
-	char Sound2[9]; // bleh
-	strlcpy(Sound2, Sound.CString(), sizeof(Sound2));
+	ResRef tmp = Sound;
+	char suffix = 0;
+	uint8_t l = Sound.CStrLen();
 	/* IWD1, HOW, IWD2 sometimes append numbers here, not letters. */
-	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound, "FS_", 3)) {
-		if (l < 8) {
-			Sound2[l] = cnt + 0x31;
-			Sound2[l+1] = 0;
-		}
-	} else {
-		if (cnt) {
-			if (l < 8) {
-				Sound2[l] = cnt + 0x60; // append 'a'-'g'
-				Sound2[l+1] = 0;
-			}
-		}
+	if (core->HasFeature(GF_SOUNDFOLDERS) && !strnicmp(Sound.CString(), "FS_", 3)) {
+		suffix = cnt + 0x31;
+	} else if (cnt) {
+		suffix = cnt + 0x60; // 'a'-'g'
 	}
-	Sound = Sound2;
+	if (l < 8 && suffix != 0) {
+		Sound.SNPrintF("%.8s%c", tmp.CString(), suffix);
+	}
 
 	tick_t len = 0;
 	unsigned int channel = InParty ? SFX_CHAN_WALK_CHAR : SFX_CHAN_WALK_MONSTER;
@@ -4965,11 +4965,11 @@ void Actor::dump(StringBuffer& buffer) const
 	buffer.appendFormatted("Debugdump of Actor %s (%s, %s):\n", LongName.CString(), ShortName.CString(), GetName(-1));
 	buffer.append("Scripts:");
 	for (const auto script : Scripts) {
-		const char* poi = "<none>";
+		ResRef poi = "<none>";
 		if (script) {
 			poi = script->GetName();
 		}
-		buffer.appendFormatted( " %.8s", poi );
+		buffer.appendFormatted(" %.8s", poi.CString());
 	}
 	buffer.append("\n");
 	buffer.appendFormatted("Area:       %.8s ([%d.%d])\n", Area.CString(), Pos.x, Pos.y);
@@ -5025,7 +5025,7 @@ void Actor::dump(StringBuffer& buffer) const
 
 const char* Actor::GetActorNameByID(ieDword ID) const
 {
-	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
+	const Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
 	if (!actor) {
 		return "<NULL>";
 	}
@@ -5196,26 +5196,29 @@ ieDword Actor::GetBaseCasterLevel(int spelltype, int flags) const
 
 int Actor::GetWildMod(int level)
 {
-	if (GetStat(IE_KIT) == KIT_WILDMAGE) {
-		// avoid rerolling the mod, since we get called multiple times per each cast
-		// TODO: also handle a reroll to 0
-		if (!WMLevelMod) {
-			if (level>=MAX_LEVEL) level=MAX_LEVEL;
-			if(level<1) level=1;
-			WMLevelMod = wmlevels[core->Roll(1,20,-1)][level-1];
-
-			core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
-			if (core->HasFeedback(FT_STATES)) {
-				if (WMLevelMod > 0) {
-					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
-				} else if (WMLevelMod < 0) {
-					displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
-				}
-			}
-		}
-		return WMLevelMod;
+	if (GetStat(IE_KIT) != KIT_WILDMAGE) {
+		return 0;
 	}
-	return 0;
+
+	// avoid rerolling the mod, since we get called multiple times per each cast
+	// TODO: also handle a reroll to 0
+	if (WMLevelMod) {
+		return 0;
+	}
+
+	if (level >= MAX_LEVEL) level = MAX_LEVEL;
+	if (level < 1) level = 1;
+	WMLevelMod = wmlevels[core->Roll(1, 20, -1)][level - 1];
+
+	core->GetTokenDictionary()->SetAtCopy("LEVELDIF", abs(WMLevelMod));
+	if (core->HasFeedback(FT_STATES)) {
+		if (WMLevelMod > 0) {
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_INC, DMC_WHITE, this);
+		} else if (WMLevelMod < 0) {
+			displaymsg->DisplayConstantStringName(STR_CASTER_LVL_DEC, DMC_WHITE, this);
+		}
+	}
+	return WMLevelMod;
 }
 
 int Actor::CastingLevelBonus(int level, int type)
@@ -5304,12 +5307,12 @@ int Actor::CalculateSpeedFromINI(bool feedback) const
 		animid = animid & 0xff;
 	}
 	assert(animid < (ieDword)CharAnimations::GetAvatarsCount());
-	const AvatarStruct *avatar = CharAnimations::GetAvatarStruct(animid);
+	const AvatarStruct &avatar = CharAnimations::GetAvatarStruct(animid);
 	int newSpeed = 0;
-	if (avatar->RunScale && (GetInternalFlag() & IF_RUNNING)) {
-		newSpeed = avatar->RunScale;
-	} else if (avatar->WalkScale) {
-		newSpeed = avatar->WalkScale;
+	if (avatar.RunScale && (GetInternalFlag() & IF_RUNNING)) {
+		newSpeed = avatar.RunScale;
+	} else if (avatar.WalkScale) {
+		newSpeed = avatar.WalkScale;
 	} else {
 		// 3 pst animations don't have a walkscale set, but they're immobile, so the default of 0 is fine
 	}
@@ -5438,7 +5441,7 @@ static const char *GetVarName(const char *table, int value)
 {
 	int symbol = core->LoadSymbol( table );
 	if (symbol!=-1) {
-		Holder<SymbolMgr> sym = core->GetSymbol( symbol );
+		auto sym = core->GetSymbol( symbol );
 		return sym->GetValue( value );
 	}
 	return NULL;
@@ -5693,7 +5696,7 @@ bool Actor::CheckOnDeath()
 		return false;
 	}
 	// don't destroy actors currently in a dialog
-	GameControl *gc = core->GetGameControl();
+	const GameControl *gc = core->GetGameControl();
 	if (gc && gc->dialoghandler->InDialog(this)) {
 		return false;
 	}
@@ -5765,7 +5768,7 @@ bool Actor::CheckOnDeath()
 		// racial dead count
 		int racetable = core->LoadSymbol("race");
 		if (racetable != -1) {
-			Holder<SymbolMgr> race = core->GetSymbol(racetable);
+			auto race = core->GetSymbol(racetable);
 			IncrementDeathVariable(game->locals, "KILL_%s_CNT", race->GetValue(Modified[IE_RACE]));
 		}
 	}
@@ -5858,7 +5861,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	}
 	const CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
-	Item *itm = gamedata->GetItem(slot->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(slot->ItemResRef, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", slot->ItemResRef.CString());
 		return; //quick item slot contains invalid item resref
@@ -5878,7 +5881,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header) const
 	gamedata->FreeItem(itm,slot->ItemResRef, false);
 }
 
-void Actor::ReinitQuickSlots()
+void Actor::ReinitQuickSlots() const
 {
 	if (!PCStats) {
 		return;
@@ -5967,7 +5970,7 @@ void Actor::ReinitQuickSlots()
 	}
 }
 
-void Actor::CheckWeaponQuickSlot(unsigned int which)
+void Actor::CheckWeaponQuickSlot(unsigned int which) const
 {
 	if (!PCStats) return;
 
@@ -5984,7 +5987,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
 			const CREItem *slotitm = inventory.GetSlotItem(slot);
 			assert(slotitm);
-			Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
+			const Item *itm = gamedata->GetItem(slotitm->ItemResRef, true);
 			assert(itm);
 			const ITMExtHeader *ext_header = itm->GetExtHeader(header);
 			if (ext_header) {
@@ -6095,7 +6098,7 @@ void Actor::ApplyExtraSettings()
 {
 	if (!PCStats) return;
 	for (int i=0;i<ES_COUNT;i++) {
-		if (!featSpells[i].IsEmpty() && !featSpells[i].IsStar()) {
+		if (!featSpells[i].IsEmpty() && !IsStar(featSpells[i])) {
 			if (PCStats->ExtraSettings[i]) {
 				core->ApplySpell(featSpells[i], this, this, PCStats->ExtraSettings[i]);
 			}
@@ -6122,7 +6125,7 @@ bool Actor::ValidTarget(int ga_flags, const Scriptable *checker) const
 	if (ga_flags & GA_NO_UNSCHEDULED && !InParty) {
 		if (Modified[IE_AVATARREMOVAL]) return false;
 
-		Game *game = core->GetGame();
+		const Game *game = core->GetGame();
 		if (game) {
 			if (!Schedule(game->GameTime, true)) return false;
 		}
@@ -6206,20 +6209,20 @@ bool Actor::Persistent() const
 
 void Actor::GetNextAnimation()
 {
-	int RowNum = anims->AvatarsRowNum - 1;
-	if (RowNum<0)
+	size_t RowNum = anims->AvatarsRowNum - 1;
+	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
-	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
+	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
 
 void Actor::GetPrevAnimation()
 {
-	int RowNum = anims->AvatarsRowNum + 1;
-	if (RowNum>=CharAnimations::GetAvatarsCount() )
+	size_t RowNum = anims->AvatarsRowNum + 1;
+	if (RowNum >= CharAnimations::GetAvatarsCount())
 		RowNum = 0;
-	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
+	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum).AnimID;
 	print("AnimID: %04X", NewAnimID);
 	SetBase( IE_ANIMATION_ID, NewAnimID);
 }
@@ -6234,7 +6237,7 @@ const ITMExtHeader *Actor::GetRangedWeapon(WeaponInfo &wi) const
 	if (!wield) {
 		return NULL;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "Actor", "Missing or invalid ranged weapon item: %s!", wield->ItemResRef.CString());
 		return NULL;
@@ -6261,7 +6264,7 @@ int Actor::IsDualWielding() const
 		return 0;
 	}
 
-	Item *itm = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *itm = gamedata->GetItem(wield->ItemResRef, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Missing or invalid wielded weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
@@ -6285,7 +6288,7 @@ const ITMExtHeader *Actor::GetWeapon(WeaponInfo &wi, bool leftorright) const
 	if (!wield) {
 		return 0;
 	}
-	Item *item = gamedata->GetItem(wield->ItemResRef, true);
+	const Item *item = gamedata->GetItem(wield->ItemResRef, true);
 	if (!item) {
 		Log(WARNING, "Actor", "Missing or invalid weapon item: %s!", wield->ItemResRef.CString());
 		return 0;
@@ -6446,7 +6449,7 @@ ResRef Actor::GetDialog(int flags) const
 
 	if ( (InternalFlags & IF_NOINT) && CurrentAction) {
 		if (flags>1) {
-			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName);
+			core->GetTokenDictionary()->SetAtCopy("TARGET", ShortName.CString());
 			displaymsg->DisplayConstantString(STR_TARGETBUSY, DMC_RED);
 		}
 		return ResRef();
@@ -6685,25 +6688,25 @@ int Actor::SetBaseAPRandAB(bool CheckRapidShot)
 
 	for (int i = 0; i < ISCLASSES; i++) {
 		int level = GetClassLevel(i);
-		if (level) {
-			// silly monks, always wanting to be special
-			if (i == ISMONK) {
-				MonkLevel = level;
-				if (MonkLevel+LevelSum == Modified[IE_CLASSLEVELSUM]) {
-					// only the monk left to check, so skip the rest
-					break;
-				} else {
-					continue;
-				}
+		if (!level) continue;
+
+		// silly monks, always wanting to be special
+		if (i == ISMONK) {
+			MonkLevel = level;
+			if (MonkLevel + LevelSum == Modified[IE_CLASSLEVELSUM]) {
+				// only the monk left to check, so skip the rest
+				break;
+			} else {
+				continue;
 			}
-			pBAB += SetLevelBAB(level, i);
-			LevelSum += level;
-			if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
-				// skip to apr calc, no need to check the other classes
-				ToHit.SetBase(pBAB);
-				ToHit.SetBABDecrement(pBABDecrement);
-				return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
-			}
+		}
+		pBAB += SetLevelBAB(level, i);
+		LevelSum += level;
+		if (LevelSum == Modified[IE_CLASSLEVELSUM]) {
+			// skip to apr calc, no need to check the other classes
+			ToHit.SetBase(pBAB);
+			ToHit.SetBABDecrement(pBABDecrement);
+			return BAB2APR(pBAB, pBABDecrement, CheckRapidShot);
 		}
 	}
 
@@ -6962,7 +6965,7 @@ bool Actor::GetCombatDetails(int &tohit, bool leftorright, WeaponInfo& wi, const
 		speed += wstwohanded[stars][2];
 	} else if (wi.wflags&WEAPON_MELEE) {
 		int slot;
-		CREItem *weapon = inventory.GetUsedWeapon(true, slot);
+		const CREItem *weapon = inventory.GetUsedWeapon(true, slot);
 		if(wssingle && weapon == NULL) {
 			//NULL return from GetUsedWeapon means no shield slot
 			stars = GetStat(IE_PROFICIENCYSINGLEWEAPON)&PROFS_MASK;
@@ -7359,7 +7362,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	if (PCStats) {
 		// make a copy of wi.slot, since GetUsedWeapon can modify it
 		int wislot = wi.slot;
-		CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
+		const CREItem *slot = inventory.GetUsedWeapon(leftorright && IsDualWielding(), wislot);
 		//if slot was null, then GetCombatDetails returned false
 		PCStats->RegisterFavourite(slot->ItemResRef, FAV_WEAPON);
 	}
@@ -7424,18 +7427,16 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	// check for concealment first (iwd2), both our enemies' and from our phasing problems
 	int concealment = (GetStat(IE_ETHEREALNESS)>>8) + (target->GetStat(IE_ETHEREALNESS) & 0x64);
-	if (concealment) {
-		if (LuckyRoll(1, 100, 0) < concealment) {
-			// can we retry?
-			if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
-				// Missed <TARGETNAME> due to concealment.
-				core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
-				if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
-				buffer.append("[Concealment Miss]");
-				Log(COMBAT, "Attack", buffer);
-				ResetState();
-				return;
-			}
+	if (concealment && LuckyRoll(1, 100, 0) < concealment) {
+		// can we retry?
+		if (!HasFeat(FEAT_BLIND_FIGHT) || LuckyRoll(1, 100, 0) < concealment) {
+			// Missed <TARGETNAME> due to concealment.
+			core->GetTokenDictionary()->SetAtCopy("TARGETNAME", target->GetName(-1));
+			if (core->HasFeedback(FT_COMBAT)) displaymsg->DisplayConstantStringName(STR_CONCEALED_MISS, DMC_WHITE, this);
+			buffer.append("[Concealment Miss]");
+			Log(COMBAT, "Attack", buffer);
+			ResetState();
+			return;
 		}
 	}
 
@@ -7789,30 +7790,33 @@ void Actor::UpdateActorState()
 		}
 	}
 	
-	if (!anim.empty()) {
-		Animation* first = anim[0].first;
-		
-		if (first->endReached) {
-			// possible stance change
-			if (HandleActorStance()) {
-				// restart animation for next time it is needed
-				first->endReached = false;
-				first->SetFrame(0);
+	if (anim.empty()) {
+		UpdateModalState(game->GameTime);
+		return;
+	}
 
-				Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
-				if (firstShadow) {
-					firstShadow->endReached = false;
-					firstShadow->SetFrame(0);
-				}
+	Animation* first = anim[0].first;
+	
+	if (first->endReached) {
+		// possible stance change
+		if (HandleActorStance()) {
+			// restart animation for next time it is needed
+			first->endReached = false;
+			first->SetFrame(0);
+
+			Animation* firstShadow = currentStance.shadow.empty() ? nullptr : currentStance.shadow[0].first;
+			if (firstShadow) {
+				firstShadow->endReached = false;
+				firstShadow->SetFrame(0);
 			}
-		} else {
-			//check if walk sounds need to be played
-			//dialog, pause game
-			if (!(core->GetGameControl()->GetDialogueFlags()&(DF_IN_DIALOG|DF_FREEZE_SCRIPTS) ) ) {
-				//footsteps option set, stance
-				if (footsteps && (GetStance() == IE_ANI_WALK)) {
-					PlayWalkSound();
-				}
+		}
+	} else {
+		// check if walk sounds need to be played
+		// dialog, pause game
+		if (!(core->GetGameControl()->GetDialogueFlags() & (DF_IN_DIALOG | DF_FREEZE_SCRIPTS))) {
+			// footsteps option set, stance
+			if (footsteps && GetStance() == IE_ANI_WALK) {
+				PlayWalkSound();
 			}
 		}
 	}
@@ -7886,7 +7890,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 	// wandered away, the action code should probably be responsible somehow
 	// see also line above (search for comment containing UpdateActorState)!
 	if (LastTarget && lastattack && lastattack < (gameTime - 1)) {
-		Actor *target = area->GetActorByGlobalID(LastTarget);
+		const Actor *target = area->GetActorByGlobalID(LastTarget);
 		if (!target || target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			StopAttack();
 		} else {
@@ -7924,7 +7928,7 @@ void Actor::UpdateModalState(ieDword gameTime)
 			Log(WARNING, "Actor", "Modal Spell Effect was not set!");
 			ResRef tmp("*");
 			Modal.Spell = tmp;
-		} else if (!Modal.Spell.IsStar()) {
+		} else if (!IsStar(Modal.Spell)) {
 			if (ModalSpellSkillCheck()) {
 				ApplyModal(Modal.Spell);
 
@@ -8071,7 +8075,7 @@ void Actor::AddExperience(int exp, int combat)
 	int xpStat = IE_XP;
 
 	// decide which particular XP stat to add to (only for TNO's switchable classes)
-	Game* game = core->GetGame();
+	const Game* game = core->GetGame();
 	if (pstflags && this == game->GetPC(0, false)) { // rule only applies to the protagonist
 		switch (BaseStats[IE_CLASS]) {
 			case 4:
@@ -8243,7 +8247,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 	Video* video = core->GetVideoDriver();
 
 	for (const auto& part : animParts) {
-		Animation* anim = part.first;
+		const Animation* anim = part.first;
 		PaletteHolder palette = part.second;
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
@@ -8439,24 +8443,9 @@ bool Actor::HasBodyHeat() const
 	return true;
 }
 
-uint8_t Actor::GetElevation() const
+int Actor::GetElevation() const
 {
-	// pst heightmaps are all uniform and shouldn't be used
-	if (core->HasFeature(GF_PST_STATE_FLAGS)) {
-		return 0;
-	}
-
-	uint8_t height = area ? area->HeightMap->GetAt(Map::ConvertCoordToTile(Pos)) : 0;
-	if (height > 15) {
-		// there are 8bpp lightmaps (eg, bg2's AR1300) and fuzzie
-		// cannot work out how they work, so here is an incorrect
-		// hack (probably). please fix!
-		
-		// FIXME: is it possible that this is signed instead of unsigned?
-		// or just the 4 least significant bits? sign magnitude?
-		height = 15;
-	}
-	return height;
+	return area ? area->GetHeight(Pos) : 0;
 }
 
 bool Actor::UpdateDrawingState()
@@ -8496,9 +8485,9 @@ void Actor::UpdateDrawingRegion()
 	
 	auto ExpandBoxForAnimationParts = [&box, this](const std::vector<AnimationPart>& parts) {
 		for (const auto& part : parts) {
-			Animation* anim = part.first;
+			const Animation* anim = part.first;
 			Holder<Sprite2D> animframe = anim->CurrentFrame();
-			assert(animframe);
+			if (!animframe) continue;
 			Region partBBox = animframe->Frame;
 			partBBox.x = Pos.x - partBBox.x;
 			partBBox.y = Pos.y - partBBox.y;
@@ -8591,7 +8580,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 	//draw videocells under the actor
 	auto it = vfxQueue.cbegin();
 	for (; it != vfxQueue.cend(); ++it) {
-		ScriptedAnimation* vvc = *it;
+		const ScriptedAnimation* vvc = *it;
 		if (vvc->YOffset >= 0) {
 			break;
 		}
@@ -8660,7 +8649,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 		}
 
 		if (!currentStance.shadow.empty()) {
-			Game* game = core->GetGame();
+			const Game* game = core->GetGame();
 			// infravision, independent of light map and global light
 			if (HasBodyHeat() &&
 				game->PartyHasInfravision() &&
@@ -8713,7 +8702,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 
 	//draw videocells over the actor
 	for (; it != vfxQueue.cend(); ++it) {
-		ScriptedAnimation* vvc = *it;
+		const ScriptedAnimation* vvc = *it;
 		vvc->Draw(vp, baseTint, BBox.h, flags & (BLIT_STENCIL_MASK | BlitFlags::ALPHA_MOD));
 	}
 }
@@ -8768,7 +8757,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 {
 	if (!anims) return false;
 
-	AutoTable tab(anims->ResRefBase.CString());
+	AutoTable tab = gamedata->LoadTable(anims->ResRefBase.CString());
 	if (!tab) return false;
 
 	switch (index) {
@@ -8815,7 +8804,7 @@ bool Actor::GetSoundFrom2DA(ResRef &Sound, unsigned int index) const
 	Log(MESSAGE, "Actor", "Getting sound 2da %.8s entry: %s",
 		anims->ResRefBase.CString(), tab->GetRowName(index));
 	int col = core->Roll(1,tab->GetColumnCount(index),-1);
-	Sound = ResRef::MakeLowerCase(tab->QueryField(index, col));
+	Sound = MakeLowerCaseResRef(tab->QueryField(index, col));
 	return true;
 }
 
@@ -8886,7 +8875,7 @@ bool Actor::GetSoundFromINI(ResRef &Sound, unsigned int index) const
 	return true;
 }
 
-void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
+void Actor::GetVerbalConstantSound(ResRef& Sound, unsigned int index) const
 {
 	if (PCStats && !PCStats->SoundSet.IsEmpty()) {
 		//resolving soundset (bg1/bg2 style)
@@ -8930,7 +8919,7 @@ void Actor::ResolveStringConstant(ResRef& Sound, unsigned int index) const
 	}
 
 	//Empty resrefs
-	if (Sound.IsStar() || Sound == "nosound") {
+	if (IsStar(Sound) || Sound == "nosound") {
 		Sound.Reset();
 	}
 }
@@ -9064,30 +9053,31 @@ void Actor::SetPortrait(const char* portraitRef, int Which)
 
 void Actor::SetSoundFolder(const char *soundset) const
 {
-	if (core->HasFeature(GF_SOUNDFOLDERS)) {
-		char filepath[_MAX_PATH];
-
-		strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
-		PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
-
-		DirectoryIterator dirIt(filepath);
-		dirIt.SetFilterPredicate(new EndsWithFilter("01"));
-		dirIt.SetFlags(DirectoryIterator::Directories);
-		if (dirIt) {
-			do {
-				const char* name = dirIt.GetName();
-				const char* end = strchr(name, '.');
-				if (end != NULL) {
-					// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
-					// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
-					PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
-					break;
-				}
-			} while (++dirIt);
-		}
-	} else {
+	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
 		PCStats->SoundSet = soundset;
-		PCStats->SoundFolder[0]=0;
+		PCStats->SoundFolder[0] = 0;
+		return;
+	}
+
+	char filepath[_MAX_PATH];
+
+	strnlwrcpy(PCStats->SoundFolder, soundset, SOUNDFOLDERSIZE-1);
+	PathJoin(filepath, core->config.GamePath, "sounds", PCStats->SoundFolder, nullptr);
+
+	DirectoryIterator dirIt(filepath);
+	dirIt.SetFilterPredicate(new EndsWithFilter("01"));
+	dirIt.SetFlags(DirectoryIterator::Directories);
+	if (dirIt) {
+		do {
+			const char* name = dirIt.GetName();
+			const char* end = strchr(name, '.');
+			if (end != nullptr) {
+				// need to truncate the "01" from the name, eg. HaFT_01.wav -> HaFT
+				// but also 2df_007.wav -> 2df_0, meaning the data is less diverse than it may seem
+				PCStats->SoundSet.SNPrintF("%.*s", int(end - 2 - name), name);
+				break;
+			}
+		} while (++dirIt);
 	}
 }
 
@@ -9270,6 +9260,89 @@ int Actor::SetEquippedQuickSlot(int slot, int header)
 	return STR_MAGICWEAPON;
 }
 
+// do we need Use magic device to succeed on a class usability check?
+bool Actor::RequiresUMD(const Item* item) const
+{
+	if (!third) {
+		return false;
+	}
+	if (item->ItemType != IT_WAND && item->ItemType != IT_SCROLL) {
+		return false;
+	}
+
+	// we have to repeat some usability checks in case a thief or
+	// bard got access via multiclassing and should skip the checks
+	// OR, especially in the bard's case, if she already has access,
+	// which is true for arcane scrolls and wands, but not divine.
+	// Since it's a per-item thing, there might be exceptions as well
+	if (!GetThiefLevel() && !GetBardLevel()) return false;
+
+	// go through each class and check again
+	ieDword levelSum = BaseStats[IE_CLASSLEVELSUM];
+	for (ieDword i = 0; i < ISCLASSES; ++i) {
+		if (!levelSum) break;
+		ieDword level = GetClassLevel(i);
+		if (!level) continue;
+		levelSum -= level;
+
+		// check if this class grants usability
+		// stolen from CheckUsability() - refactor iff kits require it
+		unsigned int classBit = 1 << (classesiwd2[i] - 1);
+		ieDword itemvalue = item->UsabilityBitmask;
+		if (classBit & ~itemvalue) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Actor::TryUsingMagicDevice(const Item* item, ieDword header)
+{
+	if (!RequiresUMD(item)) return true;
+
+	// from here on we know we have either a single class thief or
+	// bard or one of them with a useless mixin class.
+	// Nothing limiting left to check, as they must have positive
+	// skill to get this far (or they couldn't have equipped the item)
+	// and no usability yet.
+	int skill = GetSkill(IE_MAGICDEVICE); // includes the charisma mod
+	assert(skill > 0);
+
+	int roll = LuckyRoll(1, 20, 0);
+	// wands use effects directly -> fx->Power
+	// scrolls use fx_cast_spell -> fx->Parameter1 (with 0 Power)
+	const auto& effects = item->GetExtHeader(header)->features;
+	const auto& fx = effects[0];
+	int level = fx->Parameter1;
+	if (fx->Power) {
+		level = fx->Power;
+	}
+
+	// sorcerers.net suggests it's: 1d100 <= (skill + chaMod * 5) - level * 5;
+	// other skill messages use a bunch of 7
+	// but the string seems to be true in the original, which is also much more lenient
+	bool success = (skill + roll) >= (level + 20);
+	// 39304 = ~Use magic device check. Use magic device (skill + d20 roll + CHA modifier) = %d vs. (device's spell level + 20) = %d ( Spell level = %d ).~
+	displaymsg->DisplayRollStringName(39304, DMC_LIGHTGREY, this, skill + roll, level + 20, level);
+
+	if (success) {
+		if (core->HasFeedback(FT_CASTING)) {
+			const String *txt = core->GetString(24198);
+			displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+		}
+		return true;
+	}
+
+	// don't play with powers you don't comprehend!
+	if (core->HasFeedback(FT_CASTING)) {
+		const String *txt = core->GetString(24197);
+		displaymsg->DisplayStringName(*txt, DMC_WHITE, this);
+	}
+	Damage(core->Roll(level, 6, 0), DAMAGE_MAGIC, nullptr);
+	return false;
+}
+
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
@@ -9295,6 +9368,11 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
+
+	if (!TryUsingMagicDevice(itm, header)) {
+		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		return false;
+	}
 
 	//item is depleted for today
 	if(itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
@@ -9405,7 +9483,7 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	// first check for feats that change the sneak dice
 	// special effects on hit for arterial strike (-1d6) and hamstring (-2d6)
 	// both are available at level 10+ (5d6), so it's safe to decrease multiplier without checking
-	if (!BackstabResRef.IsStar()) {
+	if (!IsStar(BackstabResRef)) {
 		if (BackstabResRef != ArterialStrikeRef) {
 			// ~Sneak attack for %d inflicts hamstring damage (Slowed)~
 			multiplier -= 2;
@@ -9487,7 +9565,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 	}
 
-	Actor *tar = (Actor *) target;
+	const Actor *tar = (const Actor *) target;
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
@@ -9499,6 +9577,11 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false; //quick item slot contains invalid item resref
 	}
 	gamedata->FreeItem(itm, tmp, false);
+
+	if (!TryUsingMagicDevice(itm, header)) {
+		ChargeItem(slot, header, item, itm, flags & UI_SILENT, !(flags & UI_NOCHARGE));
+		return false;
+	}
 
 	//item is depleted for today
 	if (itm->UseCharge(item->Usages, header, false)==CHG_DAY) {
@@ -9740,7 +9823,7 @@ void Actor::SetupFistData() const
 	}
 
 	FistRows = 0;
-	AutoTable fist("fistweap");
+	AutoTable fist = gamedata->LoadTable("fistweap");
 	if (fist) {
 		DefaultFist = fist->QueryDefault();
 		FistRows = fist->GetRowCount();
@@ -9783,9 +9866,7 @@ void Actor::SetupFist()
 
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
 	//don't close this table, it can mess with the guiscripts
-	int table = gamedata->LoadTable(resref);
-	if (table == -1) return 0;
-	Holder<TableMgr> tm = gamedata->GetTable(table);
+	auto tm = gamedata->LoadTable(resref);
 	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {
@@ -9841,6 +9922,15 @@ int Actor::CheckUsability(const Item *item) const
 			// Eg. a paladin of Mystra/sorcerer is allowed to use wands,
 			// but the kit check would fail, since paladins and their kits aren't.
 			stat = GetClassMask();
+
+			// Use Magic Device can only be used on wands and scrolls, but also
+			// only by bards and thieves (restriction handled by skilcost.2da)
+			// the actual roll happens when the actor tries to use it
+			if ((item->ItemType == IT_WAND || item->ItemType == IT_SCROLL) && GetSkill(IE_MAGICDEVICE) > 0) {
+				continue;
+			}
+
+			// check everyone else
 			if (stat & ~itemvalue) {
 				if (Modified[IE_KIT] == 0) continue;
 			} else {
@@ -9877,9 +9967,7 @@ no_resolve:
 //this one is the same, but returns strrefs based on effects
 ieStrRef Actor::Disabled(const ResRef& name, ieDword type) const
 {
-	Effect *fx;
-
-	fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
+	const Effect *fx = fxqueue.HasEffectWithResource(fx_cant_use_item_ref, name);
 	if (fx) {
 		return fx->Parameter1;
 	}
@@ -10106,7 +10194,7 @@ void Actor::CreateDerivedStatsBG()
 		if (BaseStats[IE_KIT] == KIT_SWASHBUCKLER) {
 			backstabdamagemultiplier = 1;
 		} else {
-			AutoTable tm("backstab");
+			AutoTable tm = gamedata->LoadTable("backstab");
 			//fallback to a general algorithm (bg2 backstab.2da version) if we can't find backstab.2da
 			// assassin's AP_SPCL332 (increase backstab by one) is not effecting this at all,
 			// it's just applied later
@@ -10407,8 +10495,6 @@ bool Actor::IsDualSwap() const
 
 ieDword Actor::GetWarriorLevel() const
 {
-	if (!IsWarrior()) return 0;
-
 	ieDword warriorlevels[4] = {
 		GetBarbarianLevel(),
 		GetFighterLevel(),
@@ -10457,10 +10543,10 @@ void Actor::UseExit(ieDword exitID) {
 	} else {
 		InternalFlags&=~IF_USEEXIT;
 		LastArea = Area;
-		memset(UsedExit, 0, sizeof(ieVariable));
+		UsedExit = nullptr;
 		if (LastExit) {
 			const char *ipName = NULL;
-			Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
+			const Scriptable *ip = area->GetInfoPointByGlobalID(LastExit);
 			if (ip) ipName = ip->GetScriptName();
 			if (ipName && ipName[0]) {
 				snprintf(UsedExit, sizeof(ieVariable), "%s", ipName);
@@ -10966,7 +11052,7 @@ bool Actor::IsPartyMember() const
 
 void Actor::ResetCommentTime()
 {
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (bored_time) {
 		nextBored = game->GameTime + core->Roll(1, 30, bored_time);
 		nextComment = game->GameTime + core->Roll(5, 1000, bored_time/2);
@@ -11000,7 +11086,7 @@ int Actor::GetArmorSkillPenalty(int profcheck, int &armor, int &shield) const
 	}
 	bool magical = false;
 	int armorSlot = inventory.GetArmorSlot();
-	CREItem *armorItem = inventory.GetSlotItem(armorSlot);
+	const CREItem *armorItem = inventory.GetSlotItem(armorSlot);
 	if (armorItem) {
 		magical = armorItem->Flags&IE_INV_ITEM_MAGICAL;
 	}
@@ -11117,7 +11203,7 @@ int Actor::UpdateAnimationID(bool derived)
 
 	// tables for additive modifiers of the animation id (race, gender, class)
 	for (int i = 0; i < avCount; i++) {
-		const TableMgr *tm = avPrefix[i].avtable.ptr();
+		const AutoTable tm = avPrefix[i].avtable;
 		if (!tm) {
 			return -3;
 		}
@@ -11344,9 +11430,9 @@ char Actor::GetArmorCode() const
 {
 	bool mageAnimation = (BaseStats[IE_ANIMATION_ID] & 0xF00) == 0x200;
 	// IE_ARMOR_TYPE + 1 is the armor code, but we also need to look up robes specifically as they have 3 types :(
-	CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
+	const CREItem *itm = inventory.GetSlotItem(inventory.GetArmorSlot());
 	if (!itm) return '1';
-	Item *item = gamedata->GetItem(itm->ItemResRef, true);
+	const Item *item = gamedata->GetItem(itm->ItemResRef, true);
 	if (!item) return '1';
 	bool wearingRobes = item->AnimationType[1] == 'W';
 
@@ -11405,11 +11491,11 @@ void Actor::PlayArmorSound() const
 	// pst is missing the resources
 	if (pstflags) return;
 
-	Game *game = core->GetGame();
+	const Game *game = core->GetGame();
 	if (!game) return;
 	if (game->CombatCounter) return;
 
-	ResRef armorSound = GetArmorSound();
+	const ResRef armorSound = GetArmorSound();
 	if (!armorSound.IsEmpty()) {
 		core->GetAudioDrv()->Play(armorSound, SFX_CHAN_ARMOR, Pos);
 	}
@@ -11433,7 +11519,7 @@ bool Actor::ShouldModifyMorale() const
 const char* Actor::GetRaceName() const
 {
 	if (raceID2Name.count(BaseStats[IE_RACE])) {
-		return raceID2Name[BaseStats[IE_RACE]];
+		return raceID2Name[BaseStats[IE_RACE]].c_str();
 	} else {
 		return nullptr;
 	}

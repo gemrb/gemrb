@@ -76,7 +76,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	if (!found) {
 		return NULL;
 	}
-	str->Seek( 2, GEM_CURRENT_POS );
+	str->Seek(2, GEM_CURRENT_POS); // windowID was a dword in bg2
 	str->ReadWord(XPos);
 	str->ReadWord(YPos);
 	str->ReadWord(Width);
@@ -85,6 +85,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 	str->ReadWord(ControlsCount);
 	str->ReadResRef( MosFile );
 	str->ReadWord(FirstControl);
+	// also a word for Flags with only bit 0 relating to modal windows known ("don't dim the bg" in NI)
 
 	Window* win = CreateWindow(WindowID, Region(XPos, YPos, Width, Height));
 	Holder<Sprite2D> bg;
@@ -120,7 +121,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 		str->ReadWord(tmp);
 		ctrlFrame.h = tmp;
 		str->Read( &ControlType, 1 );
-		str->Read( &temp, 1 );
+		str->Read(&temp, 1); // in bg2 ControlType was a word
 		switch (ControlType) {
 			case IE_GUI_BUTTON:
 			{
@@ -164,7 +165,7 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				if (BAMFile == "guictrl" && UnpressedIndex == 0) {
 					break;
 				}
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if (!bam ) {
 					Log(ERROR, "CHUImporter", "Cannot Load Button Images, skipping control");
@@ -264,12 +265,13 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				str->ReadWord(KnobYPos);
 				str->ReadWord(KnobStep);
 				str->ReadWord(KnobStepsCount);
+				// ee documents 4 more words: ActiveBarTop, bottom, left, right
 				Slider* sldr = new Slider(ctrlFrame, Point(KnobXPos, KnobYPos), KnobStep, KnobStepsCount);
 				ResourceHolder<ImageMgr> mos = GetResourceHolder<ImageMgr>(MOSFile);
 				Holder<Sprite2D> img = mos->GetSprite2D();
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(BAMFile, IE_BAM_CLASS_ID);
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
@@ -297,28 +299,30 @@ Window* CHUImporter::GetWindow(ScriptingId wid) const
 				ieVariable Initial;
 
 				str->ReadResRef( BGMos );
-				//These are two more MOS resrefs, probably unused
+				//These are two more MOS resrefs, probably unused, labeled EditClientFocus EditClientNoFocus
 				str->Seek( 16, GEM_CURRENT_POS );
 				str->ReadResRef( CursorResRef );
 				str->ReadWord(CurCycle);
 				str->ReadWord(CurFrame);
-				str->ReadWord(PosX);
-				str->ReadWord(PosY);
+				str->ReadWord(PosX); // "XEditClientOffset"
+				str->ReadWord(PosY); // "YEditClientOffset"
 				//FIXME: I still don't know what to do with this point
 				//Contrary to forum posts, it is definitely not a scrollbar ID
+				// ee docs call them XEditCaretOffset and YEditCaretOffset
 				str->ReadWord(Pos2X);
 				str->ReadWord(Pos2Y);
 				str->ReadResRef( FontResRef );
-				//this field is still unknown or unused
+				//this field is still unknown or unused, labeled SequenceText
 				str->Seek( 2, GEM_CURRENT_POS );
 				//This is really a text field, but apparently the original engine
-				//always writes it over, and never uses it
-				str->Read( Initial, 32 );
-				Initial[32]=0;
+				//always writes it over, and never uses it (labeled DefaultString)
+				str->ReadVariable(Initial);
 				str->ReadWord(maxInput);
+				// word: caseformat: 0 normal, 1 upper, 2 lower TODO (Allowed case in NI)
+				// word: typeformat, unknown
 				Font* fnt = core->GetFont( FontResRef );
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 					gamedata->GetFactoryResource(CursorResRef, IE_BAM_CLASS_ID);
 				Holder<Sprite2D> cursor;
 				if (bam) {
@@ -434,7 +438,7 @@ endalign:
 				str->ReadResRef( BAMResRef );
 				str->ReadWord(Cycle);
 
-				AnimationFactory* bam = ( AnimationFactory* )
+				const AnimationFactory* bam = (const AnimationFactory *)
 				gamedata->GetFactoryResource(BAMResRef, IE_BAM_CLASS_ID);
 				if (!bam) {
 					Log(ERROR, "CHUImporter", "Unable to create scrollbar, no BAM: %s", BAMResRef.CString());
@@ -486,7 +490,7 @@ unsigned int CHUImporter::GetWindowsCount()
 }
 
 /** Loads a WindowPack (CHUI file) in the Window Manager */
-bool CHUImporter::LoadWindowPack(const ResRef& ref)
+bool CHUImporter::LoadWindowPack(const ScriptingGroup_t& ref)
 {
 	if (ref == winPack) {
 		return true; // already loaded

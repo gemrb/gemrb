@@ -434,6 +434,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 	//applyeffectcopy on everyone near us
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		//not sure if this is needed
@@ -441,10 +442,10 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 		if (PersonalDistance(target, victim)<20) {
 			//this function deletes newfx (not anymore)
 			core->ApplyEffect(newfx, victim, Owner);
+			applied = true;
 		}
 	}
-	//finally remove the master copy
-	delete newfx;
+	if (!applied) delete newfx;
 }
 
 //this function implements AC bonus handling
@@ -1100,14 +1101,17 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (PersonalDistance(target, victim)>20) continue;
 		if (victim->GetSafeStat(mystat)>=100) continue;
 		//apply the damage opcode
 		core->ApplyEffect(newfx, victim, Owner);
+		applied = true;
 	}
-	delete newfx;
+	if (!applied) delete newfx;
+
 	return FX_APPLIED;
 }
 
@@ -1141,6 +1145,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1165,9 +1170,12 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
+		applied = true;
 	}
-	delete newfx1;
-	delete newfx2;
+	if (!applied) {
+		delete newfx1;
+		delete newfx2;
+	}
 
 	return FX_APPLIED;
 }
@@ -1208,6 +1216,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1226,9 +1235,13 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
+
+		applied = true;
 	}
-	delete newfx1;
-	delete newfx2;
+	if (!applied) {
+		delete newfx1;
+		delete newfx2;
+	}
 
 	return FX_APPLIED;
 }
@@ -1300,7 +1313,7 @@ int fx_summon_pomab (Scriptable* Owner, Actor* target, Effect* fx)
 		tableResRef = fx->Resource; // gemrb extension
 	}
 
-	AutoTable tab(tableResRef);
+	AutoTable tab = gamedata->LoadTable(tableResRef);
 	if (!tab) {
 		return FX_NOT_APPLIED;
 	}
@@ -1469,14 +1482,16 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
+	bool applied = false;
 	while(i--) {
 		const Actor *victim = area->GetActor(i, true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			core->ApplyEffect(newfx, target, Owner);
+			applied = true;
 		}
 	}
-	delete newfx;
+	if (!applied) delete newfx;
 
 	return FX_APPLIED;
 }
@@ -1643,15 +1658,14 @@ int fx_soul_eater (Scriptable* Owner, Actor* target, Effect* fx)
 			newfx = EffectQueue::CreateEffect(fx_str_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
+
 			newfx = EffectQueue::CreateEffect(fx_dex_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
+
 			newfx = EffectQueue::CreateEffect(fx_con_ref, 1, MOD_ADDITIVE, FX_DURATION_INSTANT_LIMITED);
 			newfx->Duration = core->Time.turn_sec;
 			core->ApplyEffect(newfx, (Actor *)Owner, Owner);
-			delete newfx;
 		}
 	}
 	return FX_NOT_APPLIED;
@@ -1754,7 +1768,7 @@ int fx_shroud_of_flame2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 	Actor *caster = GetCasterObject();
 	core->ApplySpell(firedmg, target, caster, fx->Power);
 
-	if (fx->Resource2[0]) {
+	if (!fx->Resource2.IsEmpty()) {
 		core->ApplySpell(fx->Resource2, target, caster, fx->Power);
 	} else {
 		core->ApplySpell(resref_sof2, target, caster, fx->Power);
@@ -1972,14 +1986,12 @@ int fx_mace_of_disruption (Scriptable* Owner, Actor* target, Effect* fx)
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
-	delete newfx;
 
 	newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Target=FX_TARGET_PRESET;
 	newfx->Power=fx->Power;
 	core->ApplyEffect(newfx, target, Owner);
-	delete newfx;
 
 	return FX_NOT_APPLIED;
 }
@@ -2049,7 +2061,6 @@ int fx_rod_of_smithing (Scriptable* Owner, Actor* target, Effect* fx)
 				0, FX_DURATION_INSTANT_PERMANENT);
 		}
 		core->ApplyEffect(newfx, target, Owner);
-		delete newfx;
 	}
 
 	return FX_NOT_APPLIED;
@@ -2093,7 +2104,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	if (fx->Resource.IsEmpty()) {
 		fx->Resource = "SPIN166";
 	}
-	if (!fx->Resource2[0]) {
+	if (fx->Resource2.IsEmpty()) {
 		fx->Resource2 = "EFF_P111";
 	}
 
@@ -2337,7 +2348,6 @@ int fx_nausea (Scriptable* Owner, Actor* target, Effect* fx)
 		newfx->Power = fx->Power;
 		core->ApplyEffect(newfx, target, Owner);
 
-		delete newfx;
 		fx->Parameter3=1;
 	}
 	//end of unsure part
@@ -2380,7 +2390,6 @@ int fx_fireshield (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		fx2->Source = fx->Source;
 		fx2->Resource = fx->Resource;
 		core->ApplyEffect(fx2, target, target);
-		delete fx2;
 	}
 	return FX_APPLIED;
 }
@@ -2524,6 +2533,10 @@ int fx_visual_effect_iwd2 (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 		case OV_GLATH1:
 			target->SetOverlay(OV_GLATH2);
 			break;
+		case OV_BOUNCE: // TODO: blur
+		case OV_BOUNCE2: // TODO: invisibility
+			// why tf is this an overlay in iwd2?
+			return FX_NOT_APPLIED;
 		case OV_FIRESHIELD1:
 			target->SetOverlay(OV_FIRESHIELD2);
 			break;
@@ -3549,7 +3562,7 @@ int fx_arterial_strike (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_ARTERIAL, target);
 		}
-		if (target->BackstabResRef.IsStar()) {
+		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;
@@ -3582,7 +3595,7 @@ int fx_hamstring (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 			//set new modal feat
 			displaymsg->DisplayConstantStringNameString(STR_USING_FEAT, DMC_WHITE, STR_HAMSTRING, target);
 		}
-		if (target->BackstabResRef.IsStar()) {
+		if (IsStar(target->BackstabResRef)) {
 			target->BackstabResRef = fx->Resource;
 		}
 		return FX_APPLIED;

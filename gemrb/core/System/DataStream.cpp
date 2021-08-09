@@ -23,7 +23,7 @@
 #include "errors.h"
 #include "Resource.h"
 
-#include <ctype.h>
+#include <cctype>
 
 namespace GemRB {
 
@@ -104,7 +104,7 @@ strret_t DataStream::ReadResRef(ResRef& dest)
 		else break;
 	}
 	
-	dest = ResRef::MakeLowerCase(ref);
+	dest = MakeLowerCaseResRef(ref);
 	return len;
 }
 
@@ -115,12 +115,33 @@ strret_t DataStream::WriteResRef(const ResRef& src)
 
 strret_t DataStream::WriteResRefLC(const ResRef& src)
 {
-	return WriteResRef(ResRef::MakeLowerCase(src));
+	return WriteResRef(MakeLowerCaseResRef(src.CString()));
 }
 
 strret_t DataStream::WriteResRefUC(const ResRef& src)
 {
-	return WriteResRef(ResRef::MakeUpperCase(src));
+	return WriteResRef(MakeUpperCaseResRef(src.CString()));
+}
+
+strret_t DataStream::ReadVariable(ieVariable& dest)
+{
+	char ref[33];
+	strret_t len = Read(ref, 32);
+	ref[len] = '\0';
+
+	// remove trailing spaces
+	for (strret_t i = len - 1; i >= 0; --i) {
+		if (ref[i] == ' ') ref[i] = '\0';
+		else break;
+	}
+
+	dest = ref;
+	return len;
+}
+
+strret_t DataStream::WriteVariable(const ieVariable& src)
+{
+	return Write(src.CString(), 32);
 }
 
 strret_t DataStream::ReadPoint(Point &p)

@@ -56,7 +56,7 @@ bool Progressbar::IsOpaque() const
 }
 
 /** Draws the Control on the Output Display */
-void Progressbar::DrawSelf(Region rgn, const Region& /*clip*/)
+void Progressbar::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	ieDword val = GetValue();
 

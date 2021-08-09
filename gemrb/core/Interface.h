@@ -49,6 +49,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 namespace GemRB {
 
@@ -95,7 +96,7 @@ class WorldMap;
 class WorldMapArray;
 
 struct Symbol {
-	Holder<SymbolMgr> sm;
+	std::shared_ptr<SymbolMgr> sm;
 	ResRef symbolName;
 };
 
@@ -134,10 +135,10 @@ struct TimeStruct {
 
 struct EncodingStruct
 {
-	std::string encoding;
-	bool widechar;
-	bool multibyte;
-	bool zerospace;
+	std::string encoding = "ISO-8859-1";
+	bool widechar = false;
+	bool multibyte = false;
+	bool zerospace = false;
 };
 
 // cache of speldesc.2da entries
@@ -167,14 +168,13 @@ struct SurgeSpell {
 class ItemList {
 public:
 	std::vector<ResRef> ResRefs;
-	unsigned int Count;
 	//if count is odd and the column titles start with 2, the random roll should be 2d((c+1)/2)-1
 	bool WeightOdds;
 
-	ItemList(unsigned int size, int label) {
-		ResRefs.resize(size);
-		Count = size;
-		if ((size&1) && (label==2)) {
+	ItemList(std::vector<ResRef> refs, int label)
+	: ResRefs(std::move(refs))
+	{
+		if ((refs.size() & 1) && (label == 2)) {
 			WeightOdds=true;
 		} else {
 			WeightOdds=false;
@@ -338,7 +338,7 @@ struct CFGConfigData {
 	char GemRBUnhardcodedPath[_MAX_PATH]{};
 	char PluginsPath[_MAX_PATH]{};
 	char GUIScriptsPath[_MAX_PATH]{};
-	bool CaseSensitive = false;
+	bool CaseSensitive = true;
 
 	char GameName[_MAX_PATH]{};
 	char GameType[10]{};
@@ -377,34 +377,34 @@ class GEM_EXPORT Interface
 private:
 	// dirvers must be deallocated last (keep them at the top)
 	// we hold onto resources (sprites etc) in Interface that must be destroyed prior to the respective driver
-	Holder<Video> video;
-	Holder<Audio> AudioDriver;
+	std::shared_ptr<Video> video;
+	std::shared_ptr<Audio> AudioDriver;
 
-	ProjectileServer * projserv;
+	ProjectileServer* projserv = nullptr;
 
-	WindowManager* winmgr;
-	Holder<GUIFactory> guifact;
-	Holder<ScriptEngine> guiscript;
+	WindowManager* winmgr = nullptr;
+	std::shared_ptr<GUIFactory> guifact;
+	std::shared_ptr<ScriptEngine> guiscript;
 	GameControl* gamectrl = nullptr;
-	SaveGameIterator *sgiterator;
+	SaveGameIterator *sgiterator = nullptr;
 	Variables * vars;
 	Variables * tokens;
 	Variables * lists;
-	Holder<MusicMgr> music;
+	std::shared_ptr<MusicMgr> music;
 	std::vector<Symbol> symbols;
-	Holder<DataFileMgr> INIparty;
-	Holder<DataFileMgr> INIbeasts;
-	Holder<DataFileMgr> INIquests;
-	Holder<DataFileMgr> INIresdata;
-	Game * game;
-	Calendar * calendar;
-	WorldMapArray* worldmap;
-	ieDword GameFeatures[(GF_COUNT+31)/32];
+	std::shared_ptr<DataFileMgr> INIparty;
+	std::shared_ptr<DataFileMgr> INIbeasts;
+	std::shared_ptr<DataFileMgr> INIquests;
+	std::shared_ptr<DataFileMgr> INIresdata;
+	Game* game = nullptr;
+	Calendar* calendar = nullptr;
+	WorldMapArray* worldmap = nullptr;
+	ieDword GameFeatures[(GF_COUNT+31)/32]{};
 	ResRef MainCursorsImage;
 	ResRef TextCursorBam;
 	ResRef ScrollCursorBam;
 	ResRef GroundCircleBam[MAX_CIRCLE_SIZE];
-	int GroundCircleScale[MAX_CIRCLE_SIZE];
+	int GroundCircleScale[MAX_CIRCLE_SIZE]{};
 
 	std::map<ResRef, Font*> fonts;
 	ResRef ButtonFontResRef;
@@ -413,7 +413,7 @@ private:
 	ResRef TooltipFontResRef;
 	std::string DefaultWindowTitle;
 
-	TooltipBackground* TooltipBG;
+	TooltipBackground* TooltipBG = nullptr;
 
 	ResRef Palette16;
 	ResRef Palette32;
@@ -422,51 +422,53 @@ private:
 	std::vector<ColorPal<32>>  palettes32;
 	std::vector<ColorPal<16>>  palettes16;
 
-	ieDword* slotmatrix; //itemtype vs slottype
+	ieDword* slotmatrix = nullptr; // itemtype vs slottype
 	std::vector<std::vector<int> > itemtypedata; //armor failure, critical multiplier, critical range
 	std::vector<SlotType> slotTypes;
-	int ItemTypes;
+	int ItemTypes = 0;
 
 	// Currently dragged item or NULL
 	std::unique_ptr<ItemDragOp> DraggedItem;
 	// Current Store
-	Store* CurrentStore;
+	Store* CurrentStore = nullptr;
 	// Index of current container
-	Container* CurrentContainer;
-	bool UseContainer;
+	Container* CurrentContainer = nullptr;
+	bool UseContainer = false;
 	// Scrolling speed
-	int mousescrollspd;
-	bool update_scripts;
+	int mousescrollspd = 10;
+	bool update_scripts = false;
 	/** Next Script Name */
 	char NextScript[64];
 
 	std::deque<Timer> timers;
 	std::vector<SpecialSpellType> SpecialSpells;
-	KeyMap *keymap;
-	Scriptable *CutSceneRunner;
+	KeyMap *keymap = nullptr;
+	Scriptable *CutSceneRunner = nullptr;
+
+	int MaximumAbility = 0;
 
 public:
 	const char * SystemEncoding;
 	EncodingStruct TLKEncoding;
-	Holder<StringMgr> strings;
-	Holder<StringMgr> strings2;
+	std::shared_ptr<StringMgr> strings;
+	std::shared_ptr<StringMgr> strings2;
 	GlobalTimer timer;
 	Color InfoTextColor;
-	int QuitFlag;
-	int EventFlag;
+	int QuitFlag = QF_NORMAL;
+	int EventFlag = EF_CONTROL;
 	Holder<SaveGame> LoadGameIndex;
 	SaveGameAREExtractor saveGameAREExtractor;
-	int VersionOverride;
-	unsigned int SlotTypes; //this is the same as the inventory size
-	ResRef GlobalScript;
-	ResRef WorldMapName[2];
-	Variables * AreaAliasTable;
+	int VersionOverride = 0;
+	unsigned int SlotTypes = 0; // this is the same as the inventory size
+	ResRef GlobalScript = "BALDUR";
+	ResRef WorldMapName[2] = { "WORLDMAP", "" };
+	ResRefMap<ieDword> AreaAliasTable;
 	std::vector<Holder<Sprite2D> > Cursors;
 	Holder<Sprite2D> FogSprites[16] {};
 	Holder<Sprite2D> GroundCircles[MAX_CIRCLE_SIZE][6] {};
 	std::vector<char *> musiclist;
 	std::multimap<ieDword, DamageInfoStruct> DamageInfoMap;
-	TimeStruct Time;
+	TimeStruct Time{};
 	std::vector<SurgeSpell> SurgeSpells;
 public:
 	Interface();
@@ -508,14 +510,14 @@ public:
 	/** Get the Window Manager */
 	WindowManager *GetWindowManager() const { return winmgr; };
 	/** Loads a Window in the Window Manager */
-	Window* LoadWindow(ScriptingId WindowID, const ResRef& ref, Window::WindowPosition = Window::PosCentered);
+	Window* LoadWindow(ScriptingId WindowID, const ScriptingGroup_t& ref, Window::WindowPosition = Window::PosCentered);
 	/** Creates a Window in the Window Manager */
 #undef CreateWindow // Win32 might define this, so nix it
 	Window* CreateWindow(unsigned short WindowID, const Region&);
-	void ToggleViewsVisible(bool visible, const ResRef& group);
-	void ToggleViewsEnabled(bool enabled, const ResRef& group);
+	void ToggleViewsVisible(bool visible, const ScriptingGroup_t& group);
+	void ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const;
 
-	Tooltip CreateTooltip();
+	Tooltip CreateTooltip() const;
 	/** returns the label which should receive game messages (overrides messagetextarea) */
 	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
@@ -536,7 +538,7 @@ public:
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
 	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	Holder<SymbolMgr> GetSymbol(unsigned int index) const;
+	std::shared_ptr<SymbolMgr> GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
@@ -604,7 +606,7 @@ public:
 	/** fix changes in global script/worldmap*/
 	void UpdateMasterScript();
 
-	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY);
+	DirectoryIterator GetResourceDirectory(RESOURCE_DIRECTORY) const;
 
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
@@ -624,15 +626,15 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int slottype, const Item *item, const Actor *actor = nullptr, bool feedback = false, bool equipped = false) const;
 	/*removes single file from cache*/
-	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID);
+	void RemoveFromCache(const ResRef& resref, SClass_ID SClassID) const;
 	/*removes all files from directory*/
-	void DelTree(const char *path, bool onlysaved);
+	void DelTree(const char *path, bool onlysaved) const;
 	/*returns 0,1,2 based on how the file should be saved */
-	int SavedExtension(const char *filename);
+	int SavedExtension(const char *filename) const;
 	/*returns true if the file should never be deleted accidentally */
-	bool ProtectedExtension(const char *filename);
+	bool ProtectedExtension(const char *filename) const;
 	/*returns true if the directory path isn't good as a Cache */
-	bool StupidityDetector(const char* Pt);
+	bool StupidityDetector(const char* Pt) const;
 	bool InDebugMode(int mode) const { return config.debugMode & mode; };
 	void SetDebugMode(int mode) { config.debugMode = mode; };
 	/*handles the load screen*/
@@ -652,7 +654,7 @@ public:
 	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
 	Store *GetCurrentStore();
 	void CloseCurrentStore();
-	Store *SetCurrentStore(const char* resName, ieDword owner);
+	Store *SetCurrentStore(const ResRef &resName, ieDword owner);
 	void SetMouseScrollSpeed(int speed);
 	int GetMouseScrollSpeed() const;
 
@@ -685,17 +687,17 @@ public:
 	int GetReputationMod(int column) const;
 
 	/** applies the spell on the target */
-	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level);
+	void ApplySpell(const ResRef& spellRef, Actor *target, Scriptable *caster, int level) const;
 	/** applies the spell on the area or on a scriptable object */
-	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level);
+	void ApplySpellPoint(const ResRef& spellRef, Map *area, const Point &pos, Scriptable *caster, int level) const;
 	/** applies a single effect on the target */
-	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster);
+	int ApplyEffect(Effect *fx, Actor *target, Scriptable *caster) const;
 	/** applies an effect queue on the target */
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster);
-	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p);
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster) const;
+	int ApplyEffectQueue(EffectQueue *fxqueue, Actor *actor, Scriptable *caster, Point p) const;
 	Effect *GetEffect(const ResRef& resname, int level, const Point &p);
 	/** dumps an area object to the cache */
-	int SwapoutArea(Map *map);
+	int SwapoutArea(Map *map) const;
 	/** saves (exports a character to the characters folder */
 	int WriteCharacter(const char *name, Actor *actor);
 	/** saves the game object to the destination folder */
@@ -709,9 +711,9 @@ public:
 	/** returns true the passed pause setting was applied. false otherwise. */
 	bool SetPause(PauseSetting pause, int flags = 0) const;
 	/** receives an autopause reason, returns true if autopause was accepted and successful */
-	bool Autopause(ieDword flag, Scriptable *target);
+	bool Autopause(ieDword flag, Scriptable *target) const;
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, const EffectDesc *opcodes);
+	void RegisterOpcodes(int count, const EffectDesc *opcodes) const;
 	/** reads a list of resrefs into an array, returns array size */
 	bool ReadResRefTable(const ResRef& tablename, std::vector<ResRef>& data);
 	/** Returns the virtual worldmap entry of a sub-area */
@@ -768,15 +770,13 @@ private:
 	bool InitializeVarsWithINI(const char * iniFileName);
 	bool InitItemTypes();
 	bool ReadRandomItems();
-	bool ReadItemTable(const ResRef& item, const char *Prefix) const;
-	bool ReadAbilityTables();
-	bool ReadAbilityTable(const ResRef& name, ieWordSigned *mem, int cols, int rows);
+	bool ReadItemTable(const ResRef& item, const char *Prefix);
 	bool ReadMusicTable(const ResRef& name, int col);
 	bool ReadDamageTypeTable();
-	bool ReadReputationModTable();
+	bool ReadReputationModTable() const;
 	bool ReadGameTimeTable();
 	bool ReadSpecialSpells();
-	bool ReadSoundChannelsTable();
+	bool ReadSoundChannelsTable() const;
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ResRef& name);
 	/** handles the QuitFlag bits (main loop events) */
@@ -796,12 +796,12 @@ public:
 	CFGConfigData config;
 	ResRef GameNameResRef;
 	ResRef GoldResRef; //MISC07.itm
-	Variables *RtRows;
+	ResRefMap<ItemList> RtRows;
 
-	char INIConfig[_MAX_PATH];
+	char INIConfig[_MAX_PATH] = "baldur.ini";
 	bool DitherSprites = true;
-	bool UseCorruptedHack;
-	int FeedbackLevel;
+	bool UseCorruptedHack = false;
+	int FeedbackLevel = 0;
 
 	Variables *plugin_flags;
 	/** The Main program loop */

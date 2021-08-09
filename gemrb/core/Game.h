@@ -40,6 +40,7 @@
 #include "Video/Video.h"
 
 #include <atomic>
+#include <array>
 #include <vector>
 
 namespace GemRB {
@@ -238,7 +239,7 @@ struct maze_header {
 
 #define MAX_CRLEVEL 32
 
-typedef int CRRow[MAX_CRLEVEL];
+using CRRow = int[MAX_CRLEVEL];
 
 /**
  * @class Game
@@ -265,13 +266,13 @@ private:
 	ResRef daymovies[8];
 	ResRef nightmovies[8];
 	int MapIndex;
+	ResRef Familiars[9];
 public:
 	std::vector< Actor*> selected;
 	int version;
 	Variables* kaputz;
-	ieByte* beasts;
+	std::array<ieByte, BESTIARY_SIZE> beasts;
 	ieByte* mazedata; //only in PST
-	ResRef Familiars[9];
 	ieDword CombatCounter;
 	ieDword StateOverrideFlag, StateOverrideTime;
 	ieDword BanterBlockFlag, BanterBlockTime;
@@ -318,7 +319,7 @@ public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
 	/** Returns actor by slot */
-	Actor* GetPC(unsigned int slot, bool onlyalive) const;
+	Actor* GetPC(size_t slot, bool onlyalive) const;
 	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID) const;
 	Actor* FindNPC(unsigned int partyID) const;
@@ -363,9 +364,9 @@ public:
 	Map* GetMap(unsigned int index) const;
 	/** Returns a map from area name, loads it if needed
 	 * use it for the biggest safety, change = true will change the current map */
-	Map* GetMap(const char *areaname, bool change);
+	Map* GetMap(const ResRef &areaname, bool change);
 	/** Returns slot of the map if found */
-	int FindMap(const char *ResRef) const;
+	int FindMap(const ResRef &resRef) const;
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
 	bool MasterArea(const ResRef &area) const;
@@ -374,18 +375,18 @@ public:
 	/** Guess the master area of the given area*/
 	//Map* GetMasterArea(const char *area);
 	/** place persistent actors in the fresly loaded area*/
-	void PlacePersistents(Map *map, const char *ResRef);
+	void PlacePersistents(Map *map, const ResRef &resRef);
 	/** Returns slot of the map, if it was already loaded,
 	 * don't load it again, set changepf == true,
 	 * if you want to change the pathfinder too. */
-	int LoadMap(const char* ResRef, bool loadscreen);
+	int LoadMap(const ResRef &ResRef, bool loadscreen);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index) const;
 	void SwapPCs(unsigned int pc1, unsigned int pc2) const;
 	bool IsDay() const;
 	/** checks if the actor should be replaced via npclevel.2da and then does it */
-	bool CheckForReplacementActor(int i);
+	bool CheckForReplacementActor(size_t i);
 
 	//journal entries
 	/** Deletes one or all journal entries if strref is -1 */
@@ -412,21 +413,16 @@ public:
 	void ClearPlaneLocations();
 	GAMLocationEntry* GetPlaneLocationEntry(unsigned int Index);
 
-	ResRef& GetFamiliar(unsigned int Index);
+	const ResRef& GetFamiliar(size_t index) const;
+	void SetFamiliar(const ResRef& familiar, size_t index);
 
 	bool IsBeastKnown(unsigned int Index) const {
-		if (!beasts) {
-			return false;
-		}
 		if (Index>=BESTIARY_SIZE) {
 			return false;
 		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) const {
-		if (!beasts) {
-			return;
-		}
+	void SetBeastKnown(unsigned int Index) {
 		if (Index>=BESTIARY_SIZE) {
 			return;
 		}

@@ -100,7 +100,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	BanterBlockFlag = 0;
 	WeatherBits = 0;
 	kaputz = NULL;
-	beasts = NULL;
 	mazedata = NULL;
 	timestop_owner = NULL;
 	timestop_end = 0;
@@ -113,8 +112,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	CurrentLink = 0;
 
 	//loading master areas
-	AutoTable table;
-	if (table.load("mastarea")) {
+	AutoTable table = gamedata->LoadTable("mastarea");
+	if (table) {
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
 		while(i--) {
@@ -126,7 +125,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	std::fill(std::begin(restmovies), std::end(restmovies), ResRef("********"));
 	std::fill(std::begin(daymovies), std::end(daymovies), ResRef("********"));
 	std::fill(std::begin(nightmovies), std::end(nightmovies), ResRef("********"));
-	if (table.load("restmov")) {
+	table = gamedata->LoadTable("restmov");
+	if (table) {
 		for(int i=0;i<8;i++) {
 			restmovies[i] = table->QueryField(i, 0);
 			daymovies[i] = table->QueryField(i, 1);
@@ -139,7 +139,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	if (Expansion == 5) { // tob is special
 		tn = "npclvl25";
 	}
-	if (table.load(tn)) {
+	table = gamedata->LoadTable(tn);
+	if (table) {
 		int cols = table->GetColumnCount();
 		int rows = table->GetRowCount();
 		npclevels.reserve(rows);
@@ -184,9 +185,7 @@ Game::~Game(void)
 	if (kaputz) {
 		delete kaputz;
 	}
-	if (beasts) {
-		free (beasts);
-	}
+
 	for (auto journal : Journals) {
 		delete journal;
 	}
@@ -277,7 +276,7 @@ Actor *Game::GetGlobalActorByGlobalID(ieDword globalID) const
 	return NULL;
 }
 
-Actor* Game::GetPC(unsigned int slot, bool onlyalive) const
+Actor* Game::GetPC(size_t slot, bool onlyalive) const
 {
 	if (slot >= PCs.size()) {
 		return NULL;
@@ -424,8 +423,8 @@ void Game::InitActorPos(Actor *actor) const
 	const char *mode[PMODE_COUNT] = { "NORMAL", "TUTORIAL", "EXPANSION" };
 
 	unsigned int ip = (unsigned int) (actor->InParty-1);
-	AutoTable start("start");
-	AutoTable strta("startpos");
+	AutoTable start = gamedata->LoadTable("start");
+	AutoTable strta = gamedata->LoadTable("startpos");
 
 	if (!start || !strta) {
 		error("Game", "Game is missing character start data.\n");
@@ -450,10 +449,11 @@ void Game::InitActorPos(Actor *actor) const
 	actor->HomeLocation = actor->Pos;
 	actor->SetOrientation( atoi( strta->QueryField( strta->GetRowIndex(rot), ip) ), false );
 
-	if (strta.load("startare")) {
-		actor->Area = ResRef::MakeLowerCase(strta->QueryField(strta->GetRowIndex(area), 0));
+	strta = gamedata->LoadTable("startare");
+	if (strta) {
+		actor->Area = MakeLowerCaseResRef(strta->QueryField(strta->GetRowIndex(area), 0));
 	} else {
-		actor->Area = ResRef::MakeLowerCase(CurrentArea);
+		actor->Area = CurrentArea;
 	}
 }
 
@@ -487,7 +487,7 @@ int Game::JoinParty(Actor* actor, int join)
 		//if the protagonist has the same portrait replace it
 		const Actor *prot = GetPC(0, false);
 		if (prot && (actor->SmallPortrait == prot->SmallPortrait || actor->LargePortrait == prot->LargePortrait)) {
-			AutoTable ptab("portrait");
+			AutoTable ptab = gamedata->LoadTable("portrait");
 			if (ptab) {
 				actor->SmallPortrait = ptab->QueryField(actor->SmallPortrait, "REPLACEMENT");
 				actor->LargePortrait = ptab->QueryField(actor->LargePortrait, "REPLACEMENT");
@@ -604,14 +604,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 		if (select) {
 			area->SelectActors();
-/*
-			for ( m = PCs.begin(); m != PCs.end(); ++m) {
-				if (! *m) {
-					continue;
-				}
-				SelectActor( *m, true, SELECT_QUIET );
-			}
-*/
 		}
 
 		if (! (flags & SELECT_QUIET)) {
@@ -650,11 +642,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 		if (!actor->IsSelected()) {
 			// already not selected
 			return true;
-
-			/*for ( m = selected.begin(); m != selected.end(); ++m) {
-				assert((*m) != actor);
-			}
-			return true;*/
 		}
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {
@@ -690,12 +677,12 @@ int Game::GetTotalPartyLevel(bool onlyalive) const
 }
 
 // Returns map structure (ARE) if it is already loaded in memory
-int Game::FindMap(const char *ResRef) const
+int Game::FindMap(const ResRef &resRef) const
 {
 	int index = (int) Maps.size();
 	while (index--) {
 		const Map *map = Maps[index];
-		if (strnicmp(ResRef, map->GetScriptName(), 8) == 0) {
+		if (resRef == map->GetScriptName()) {
 			return index;
 		}
 	}
@@ -710,7 +697,7 @@ Map* Game::GetMap(unsigned int index) const
 	return Maps[index];
 }
 
-Map *Game::GetMap(const char *areaname, bool change)
+Map *Game::GetMap(const ResRef &areaname, bool change)
 {
 	int index = LoadMap(areaname, change);
 	if (index < 0) {
@@ -837,13 +824,13 @@ int Game::DelMap(unsigned int index, int forced)
 	return 0;
 }
 
-void Game::PlacePersistents(Map *newMap, const char *ResRef)
+void Game::PlacePersistents(Map *newMap, const ResRef &resRef)
 {
 	// count the number of replaced actors, so we don't need to recheck them
 	// if their max level is still lower than ours, each check would also result in a substitution
-	unsigned int last = NPCs.size() - 1;
-	for (unsigned int i = 0; i < NPCs.size(); i++) {
-		if (NPCs[i]->Area == ResRef) {
+	size_t last = NPCs.size() - 1;
+	for (size_t i = 0; i < NPCs.size(); i++) {
+		if (NPCs[i]->Area == resRef) {
 			if (i <= last && CheckForReplacementActor(i)) {
 				i--;
 				last--;
@@ -856,11 +843,11 @@ void Game::PlacePersistents(Map *newMap, const char *ResRef)
 }
 
 /* Loads an area */
-int Game::LoadMap(const char* ResRef, bool loadscreen)
+int Game::LoadMap(const ResRef &resRef, bool loadscreen)
 {
 	ScriptEngine *sE = core->GetGUIScriptEngine();
 
-	int index = FindMap(ResRef);
+	int index = FindMap(resRef);
 	if (index>=0) {
 		return index;
 	}
@@ -870,19 +857,19 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		sE->RunFunction("LoadScreen", "SetLoadScreen");
 	}
 
-	if (core->saveGameAREExtractor.extractARE(ResRef) != GEM_OK) {
+	if (core->saveGameAREExtractor.extractARE(resRef) != GEM_OK) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
 	}
 
-	DataStream* ds = gamedata->GetResource( ResRef, IE_ARE_CLASS_ID );
+	DataStream* ds = gamedata->GetResource(resRef, IE_ARE_CLASS_ID);
 	auto mM = GetImporter<MapMgr>(IE_ARE_CLASS_ID, ds);
 	if (!mM) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
 	}
 
-	Map *newMap = mM->GetMap(ResRef, IsDay());
+	Map *newMap = mM->GetMap(resRef, IsDay());
 	if (!newMap) {
 		core->LoadProgress(100);
 		return GEM_ERROR;
@@ -893,12 +880,12 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 	// spawn creatures on a map already in the game
 	for (size_t i = 0; i < PCs.size(); i++) {
 		Actor *pc = PCs[i];
-		if (pc->Area == ResRef) {
+		if (pc->Area == resRef) {
 			newMap->AddActor(pc, false);
 		}
 	}
 
-	PlacePersistents(newMap, ResRef);
+	PlacePersistents(newMap, resRef);
 	newMap->InitActors();
 
 	//this feature exists in all blackisle games but not in bioware games
@@ -909,16 +896,14 @@ int Game::LoadMap(const char* ResRef, bool loadscreen)
 		newMap->LoadIniSpawn();
 	}
 
-	if (newMap->reverb) {
-		core->GetAudioDrv()->UpdateMapAmbient(*newMap->reverb);
-	}
+	core->GetAudioDrv()->UpdateMapAmbient(newMap->reverb);
 
 	core->LoadProgress(100);
 	return ret;
 }
 
 // check if the actor is in npclevel.2da and replace accordingly
-bool Game::CheckForReplacementActor(int i)
+bool Game::CheckForReplacementActor(size_t i)
 {
 	if (core->InCutSceneMode() || npclevels.empty()) {
 		return false;
@@ -1160,16 +1145,21 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 	return planepositions[i];
 }
 
-ResRef& Game::GetFamiliar(unsigned int Index)
+const ResRef& Game::GetFamiliar(size_t index) const
 {
-	return Familiars[Index];
+	return Familiars[index];
+}
+
+void Game::SetFamiliar(const ResRef& familiar, size_t index)
+{
+	Familiars[index] = familiar;
 }
 
 //reading the challenge rating table for iwd2 (only when needed)
 void Game::LoadCRTable()
 {
-	AutoTable table("moncrate");
-	if (table.ok()) {
+	AutoTable table = gamedata->LoadTable("moncrate");
+	if (table) {
 		int maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
 		for(int i=0;i<MAX_LEVEL;i++) {
@@ -1293,9 +1283,9 @@ void Game::PartyMemberDied(const Actor *actor)
 	//this could be null, in some extreme cases...
 	const Map *area = actor->GetCurrentArea();
 
-	unsigned int size = PCs.size();
+	size_t size = PCs.size();
 	Actor *react = NULL;
-	for (unsigned int i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
+	for (size_t i = core->Roll(1, size, 0), n = 0; n < size; i++, n++) {
 		Actor *pc = PCs[i%size];
 		if (pc == actor) {
 			continue;
@@ -1631,7 +1621,7 @@ void Game::TextDream()
 		&& gamedata->Exists(TextScreen, IE_2DA_CLASS_ID)) {
 
 		// give innate spell to protagonist
-		AutoTable drm(TextScreen);
+		AutoTable drm = gamedata->LoadTable(TextScreen);
 		if (drm) {
 			const char *repLabel;
 			if (Reputation >= 100)
@@ -1865,8 +1855,8 @@ inline static int CastOnRestHealingAmount(const Actor *caster, const SpecialSpel
 // heal on rest and similar
 void Game::CastOnRest() const
 {
-	typedef std::vector<HealingResource> RestSpells;
-	typedef std::vector<Injured> RestTargets;
+	using RestSpells = std::vector<HealingResource>;
+	using RestTargets = std::vector<Injured>;
 
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Heal Party on Rest", tmp);
@@ -2269,9 +2259,9 @@ bool Game::IsTimestopActive() const
 bool Game::RandomEncounter(ResRef &BaseArea)
 {
 	if (bntrows<0) {
-		AutoTable table;
+		AutoTable table = gamedata->LoadTable("bntychnc");
 
-		if (table.load("bntychnc")) {
+		if (table) {
 			bntrows = table->GetRowCount();
 			bntchnc = (int *) calloc(sizeof(int),bntrows);
 			for(int i = 0; i<bntrows; i++) {

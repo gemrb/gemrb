@@ -33,9 +33,7 @@ from ie_stats import *
 from ie_spells import LS_MEMO
 
 MageWindow = None
-MageSpellInfoWindow = None
 MageSpellLevel = 0
-MageSpellUnmemorizeWindow = None
 
 # bg2 stuff for handling triggers and contingencies
 Sorcerer = None
@@ -246,20 +244,12 @@ def RefreshMageLevel ():
 	return
 
 def OpenMageSpellInfoWindow ():
-	global MageSpellInfoWindow
-
-	if MageSpellInfoWindow != None:
-		if MageSpellInfoWindow:
-			MageSpellInfoWindow.Unload ()
-		MageSpellInfoWindow = None
-		return
-
-	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
+	Window = GemRB.LoadWindow (3, "GUIMG")
 
 	#back
 	Button = Window.GetControl (5)
 	Button.SetText (15416)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellInfoWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 
 	#erase
 	index = GemRB.GetVar ("SpellButton")
@@ -269,7 +259,7 @@ def OpenMageSpellInfoWindow ():
 			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, None)
 			Button.SetFlags (IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
-			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenMageSpellRemoveWindow)
+			Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OpenMageSpellRemoveWindow(Window))
 			Button.SetText (63668)
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
@@ -310,23 +300,11 @@ def OnMageMemorizeSpell ():
 		Button.SetAnimation ("FLASH", 0, blend)
 	return
 
-def CloseMageSpellUnmemorizeWindow ():
-	global MageSpellUnmemorizeWindow
-
-	if MageSpellUnmemorizeWindow:
-		MageSpellUnmemorizeWindow.Unload ()
-	MageSpellUnmemorizeWindow = None
-	return
-
-def OpenMageSpellRemoveWindow ():
-	global MageSpellUnmemorizeWindow
-
+def OpenMageSpellRemoveWindow (parentWin):
 	if GameCheck.IsBG2():
-		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
+		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
-		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
-
-	Window = MageSpellUnmemorizeWindow
+		Window = GemRB.LoadWindow (5, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -335,26 +313,29 @@ def OpenMageSpellRemoveWindow ():
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, OnMageRemoveSpell)
+	
+	def RemoveSpell ():
+		OnMageRemoveSpell()
+		Window.Close()
+		parentWin.Close()
+	
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, RemoveSpell)
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OpenMageSpellUnmemorizeWindow (btn, val):
-	global MageSpellUnmemorizeWindow
-
 	if GameCheck.IsBG2():
-		MageSpellUnmemorizeWindow = GemRB.LoadWindow (101)
+		Window = GemRB.LoadWindow (101, "GUIMG")
 	else:
-		MageSpellUnmemorizeWindow = GemRB.LoadWindow (5)
-	Window = MageSpellUnmemorizeWindow
+		Window = GemRB.LoadWindow (5, "GUIMG")
 
 	# "Are you sure you want to ....?"
 	TextArea = Window.GetControl (3)
@@ -363,22 +344,24 @@ def OpenMageSpellUnmemorizeWindow (btn, val):
 	# Remove
 	Button = Window.GetControl (0)
 	Button.SetText (17507)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: OnMageUnmemorizeSpell(btn, val))
+	
+	def Unmemorize(btn, val):
+		OnMageUnmemorizeSpell(btn, val)
+		Window.Close()
+			 
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Unmemorize(btn, val))
 	Button.MakeDefault()
 
 	# Cancel
 	Button = Window.GetControl (1)
 	Button.SetText (13727)
-	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, CloseMageSpellUnmemorizeWindow)
+	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Window.Close())
 	Button.MakeEscape()
 
 	Window.ShowModal (MODAL_SHADOW_GRAY)
 	return
 
 def OnMageUnmemorizeSpell (btn, index):
-	if MageSpellUnmemorizeWindow:
-		CloseMageSpellUnmemorizeWindow()
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD
@@ -395,9 +378,6 @@ def OnMageUnmemorizeSpell (btn, index):
 	return
 
 def OnMageRemoveSpell ():
-	CloseMageSpellUnmemorizeWindow()
-	OpenMageSpellInfoWindow()
-
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = MageSpellLevel
 	spelltype = IE_SPELL_TYPE_WIZARD

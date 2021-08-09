@@ -50,14 +50,7 @@ class ScriptedAnimation;
 class Spell;
 class Sprite2D;
 class Store;
-class TableMgr;
 class VEFObject;
-
-struct Table {
-	Holder<TableMgr> tm;
-	ResRef resRef;
-	unsigned int refcount;
-};
 
 struct IWDIDSEntry {
 	ieDword value;
@@ -84,13 +77,9 @@ public:
 	// (See also the AutoTable class)
 
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const ResRef &ResRef, bool silent=false);
-	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const ResRef& resRef) const;
-	/** Gets a Loaded Table by its index, returns NULL on error */
-	Holder<TableMgr> GetTable(size_t index) const;
-	/** Frees a Loaded Table, returns false on error, true on success */
-	bool DelTable(unsigned int index);
+	AutoTable LoadTable(const char *ResRef, bool silent = false);
+	AutoTable LoadTable(const ResRef& resRef, bool silent = false);
+	AutoTable GetTable(const ResRef& resRef) const;
 
 	PaletteHolder GetPalette(const ResRef& resname);
 
@@ -102,7 +91,7 @@ public:
 	void FreeEffect(const Effect *eff, const ResRef &name, bool free = false);
 
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
+	ScriptedAnimation* GetScriptedAnimation(const ResRef &resRef, bool doublehint);
 
 	/** creates a composite vef/2da animation */
 	VEFObject* GetVEFObject( const char *ResRef, bool doublehint);
@@ -115,6 +104,7 @@ public:
 
 	/** returns factory resource, currently works only with animations */
 	FactoryObject* GetFactoryResource(const char* resname, SClass_ID type, bool silent=false);
+	FactoryObject* GetFactoryResource(const ResRef& resname, SClass_ID type, bool silent = false);
 
 	void AddFactoryResource(FactoryObject* res);
 
@@ -136,7 +126,7 @@ public:
 	int GetSummoningLimit(ieDword sex);
 	const Color& GetColor(const char *row);
 	int GetWeaponStyleAPRBonus(int row, int col);
-	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data) const;
+	bool ReadResRefTable(const ResRef& tableName, std::vector<ResRef>& data);
 	const IWDIDSEntry& GetSpellProt(index_t idx);
 	inline int GetStepTime() const { return stepTime; }
 	inline void SetStepTime(int st) { stepTime = st; }
@@ -149,12 +139,12 @@ private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
-	std::unordered_map<ResRef, PaletteHolder, ResRef::Hash> PaletteCache;
+	ResRefMap<PaletteHolder> PaletteCache;
 	Factory* factory;
-	std::vector<Table> tables;
+	ResRefMap<AutoTable> tables;
 	using StoreMap = std::map<ResRef, Store*>;
 	StoreMap stores;
-	std::map<ieDword, std::vector<const char*> > ItemSounds;
+	std::map<ieDword, std::vector<ResRef>> ItemSounds;
 	AutoTable racialInfravision;
 	AutoTable raceTHAC0Bonus;
 	AutoTable spellAbilityDie;
@@ -178,30 +168,30 @@ public:
 extern GEM_EXPORT GameData * gamedata;
 
 template <class T>
-using ResourceHolder = Holder<T>;
+using ResourceHolder = std::shared_ptr<T>;
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, bool silent = false, bool useCorrupt = false)
 {
-	return Holder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resname, &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const char* resname, const ResourceManager& manager, bool silent = false)
 {
-	return Holder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resname,&T::ID,silent)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, bool silent = false, bool useCorrupt = false)
 {
-	return Holder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
+	return ResourceHolder<T>(static_cast<T*>(gamedata->GetResource(resref.CString(), &T::ID, silent, useCorrupt)));
 }
 
 template <class T>
 inline ResourceHolder<T> GetResourceHolder(const ResRef &resref, const ResourceManager& manager, bool silent = false)
 {
-	return Holder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
+	return ResourceHolder<T>(static_cast<T*>(manager.GetResource(resref.CString(), &T::ID,silent)));
 }
 
 }

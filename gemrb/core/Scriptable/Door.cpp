@@ -44,10 +44,10 @@ openTrigger(std::move(openTrigger)), closedTrigger(std::move(closedTrigger))
 void DoorTrigger::SetState(bool open)
 {
 	isOpen = open;
-	for (auto& wp : openWalls) {
+	for (const auto& wp : openWalls) {
 		wp->SetDisabled(!isOpen);
 	}
-	for (auto& wp : closedWalls) {
+	for (const auto& wp : closedWalls) {
 		wp->SetDisabled(isOpen);
 	}
 }
@@ -62,12 +62,10 @@ std::shared_ptr<Gem_Polygon> DoorTrigger::StatePolygon(bool open) const
 	return open ? openTrigger : closedTrigger;
 }
 
-Door::Door(TileOverlay* Overlay, DoorTrigger&& trigger)
-	: Highlightable( ST_DOOR ), doorTrigger(std::move(trigger))
+Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
+: Highlightable( ST_DOOR ), overlay(std::move(Overlay)), doorTrigger(std::move(trigger))
 {
 	Flags = 0;
-	overlay = Overlay;
-	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
 	closedIndex = NameStrRef = hp = ac = 0;
 	DiscoveryDiff = LockDifficulty = 0;
@@ -124,16 +122,16 @@ void Door::ToggleTiles(int State, int playsound)
 	if (State) {
 		state = !closedIndex;
 		if (playsound && !OpenSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(OpenSound, SFX_CHAN_ACTIONS);
+			core->GetAudioDrv()->PlayRelative(OpenSound, SFX_CHAN_ACTIONS);
 		}
 	} else {
 		state = closedIndex;
 		if (playsound && !CloseSound.IsEmpty()) {
-			core->GetAudioDrv()->Play(CloseSound, SFX_CHAN_ACTIONS);
+			core->GetAudioDrv()->PlayRelative(CloseSound, SFX_CHAN_ACTIONS);
 		}
 	}
 	for (const auto& tile : tiles) {
-		overlay->tiles[tile]->tileIndex = (ieByte) state;
+		overlay->tiles[tile].tileIndex = (ieByte) state;
 	}
 
 	//set door_open as state
@@ -166,13 +164,13 @@ void Door::SetDoorLocked(int Locked, int playsound)
 		// only close it in pst, needed for Dead nations (see 4a3e1cb4ef)
 		if (core->HasFeature(GF_REVERSE_DOOR)) SetDoorOpen(false, playsound, 0);
 		if (playsound && !LockSound.IsEmpty())
-			core->GetAudioDrv()->Play(LockSound, SFX_CHAN_ACTIONS);
+			core->GetAudioDrv()->PlayRelative(LockSound, SFX_CHAN_ACTIONS);
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
 		if (playsound && !UnLockSound.IsEmpty())
-			core->GetAudioDrv()->Play(UnLockSound, SFX_CHAN_ACTIONS);
+			core->GetAudioDrv()->PlayRelative(UnLockSound, SFX_CHAN_ACTIONS);
 	}
 }
 
@@ -288,7 +286,8 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 	core->SetEventFlag(EF_TARGETMODE);
 }
 
-bool Door::TryUnlock(Actor *actor) {
+bool Door::TryUnlock(Actor *actor) const
+{
 	if (!(Flags&DOOR_LOCKED)) return true;
 
 	// don't remove key in PS:T!
@@ -313,8 +312,8 @@ bool Door::Visible() const
 	return (!(Flags & DOOR_SECRET) || (Flags & DOOR_FOUND)) && !(Flags & DOOR_HIDDEN);
 }
 
-void Door::SetNewOverlay(TileOverlay *Overlay) {
-	overlay = Overlay;
+void Door::SetNewOverlay(Holder<TileOverlay> Overlay) {
+	overlay = std::move(Overlay);
 	ToggleTiles(IsOpen(), false);
 }
 
@@ -468,11 +467,11 @@ void Door::dump() const
 	}
 	buffer.appendFormatted( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
-	const char *name = "NONE";
+	ResRef name = "NONE";
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
+	buffer.appendFormatted("Script: %s, Key (%s) removed: %s, Dialog: %s\n", name.CString(), Key?Key:"NONE", YESNO(Flags&DOOR_KEY), Dialog.CString());
 
 	Log(DEBUG, "Door", buffer);
 }

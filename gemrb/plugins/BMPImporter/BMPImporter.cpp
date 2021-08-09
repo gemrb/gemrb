@@ -148,7 +148,7 @@ bool BMPImporter::Open(DataStream* stream)
 		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
 		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
+		const unsigned char* src = (const unsigned char *) rpixels;
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// BGRX
@@ -163,7 +163,7 @@ bool BMPImporter::Open(DataStream* stream)
 		pixels = malloc(numbytes);
 		unsigned int * dest = ( unsigned int * ) pixels;
 		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
+		const unsigned char* src = (const unsigned char *) rpixels;
 		for (int i = size.h; i; i--) {
 			dest -= size.w;
 			// BGR
@@ -174,15 +174,7 @@ bool BMPImporter::Open(DataStream* stream)
 		}
 		BitCount = 32;
 	} else if (BitCount == 8) {
-		pixels = malloc(size.Area());
-		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += size.Area();
-		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = size.h; i; i--) {
-			dest -= size.w;
-			memcpy(dest, src, size.w);
-			src += PaddedRowLength;
-		}
+		Read8To8(rpixels);
 	} else if (BitCount == 4) {
 		Read4To8(rpixels);
 	}
@@ -195,7 +187,7 @@ void BMPImporter::Read8To8(void *rpixels)
 	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
 	dest += size.Area();
-	unsigned char * src = ( unsigned char * ) rpixels;
+	const unsigned char* src = (const unsigned char *) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		memcpy(dest, src, size.w);
@@ -209,7 +201,7 @@ void BMPImporter::Read4To8(void *rpixels)
 	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
 	dest += size.Area();
-	unsigned char * src = ( unsigned char * ) rpixels;
+	const unsigned char* src = (const unsigned char *) rpixels;
 	for (int i = size.h; i; i--) {
 		dest -= size.w;
 		for (int j = 0; j < size.w; ++j) {
@@ -227,9 +219,6 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 {
 	Holder<Sprite2D> spr;
 	if (BitCount == 32) {
-		void* p = malloc(size.Area() * 4 );
-		memcpy( p, pixels, size.Area() * 4 );
-		
 		constexpr uint32_t red_mask = 0x000000ff;
 		constexpr uint32_t green_mask = 0x0000ff00;
 		constexpr uint32_t blue_mask = 0x00ff0000;
@@ -237,15 +226,21 @@ Holder<Sprite2D> BMPImporter::GetSprite2D()
 		fmt.HasColorKey = true;
 		fmt.ColorKey = green_mask | (0xff << 24);
 
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
+		memcpy(spr->LockSprite(), pixels, size.Area() * 4);
+		spr->UnlockSprite();
 	} else if (BitCount == 8) {
-		void* p = malloc(size.Area());
-		memcpy(p, pixels, size.Area());
 		PaletteHolder pal = MakeHolder<Palette>(PaletteColors, PaletteColors + NumColors);
-		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
-		fmt.Depth = NumColors == 16 ? 4 : 8;
-		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), p, fmt);
+		PixelFormat fmt = PixelFormat::Paletted8Bit(pal, pal->col[0] == ColorGreen, 0);
+		spr = core->GetVideoDriver()->CreateSprite(Region(0,0, size.w, size.h), nullptr, fmt);
+		uint8_t* src = static_cast<uint8_t*>(pixels);
+		uint8_t* end = src + size.Area();
+		auto dst = spr->GetIterator();
+		for (; src != end; ++src, ++dst) {
+			*dst = *src;
+		}
 	}
+
 	return spr;
 }
 
@@ -262,32 +257,6 @@ int BMPImporter::GetPalette(int colors, Color* pal)
 		pal[i].a = 0xff;
 	}
 	return -1;
-}
-
-Bitmap* BMPImporter::GetBitmap()
-{
-	Bitmap *data = new Bitmap(size);
-
-	unsigned char *p = ( unsigned char * ) pixels;
-	switch (BitCount) {
-	case 8:
-		for (int y = 0; y < size.h; ++y) {
-			for (int x = 0; x < size.w; ++x) {
-				data->SetAt(Point(x, y), p[y * size.w + x]);
-			}
-		}
-		break;
-	case 32:
-		Log(ERROR, "BMPImporter", "Don't know how to handle 32bpp bitmap from %s...", str->filename);
-		for (int y = 0; y < size.h; ++y) {
-			for (int x = 0; x < size.w; ++x) {
-				data->SetAt(Point(x, y), p[4 * (y * size.w + x)]);
-			}
-		}
-		break;
-	}
-
-	return data;
 }
 
 #include "plugindef.h"

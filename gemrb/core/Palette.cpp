@@ -55,7 +55,7 @@ void Palette::UpdateAlpha()
 	alpha = false;
 }
 
-void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst)
+void Palette::CopyColorRangePrivate(const Color* srcBeg, const Color* srcEnd, Color* dst) const
 {
 	// no update to alpha or version, hence being private
 	std::copy(srcBeg, srcEnd, dst);

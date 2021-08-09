@@ -180,7 +180,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 
 	if (newGame->CurrentArea.IsEmpty()) {
 		// 0 - normal, 1 - tutorial, 2 - extension
-		AutoTable tm("STARTARE");
+		AutoTable tm = gamedata->LoadTable("STARTARE");
 		ieDword playmode = 0;
 		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
 		if (tm && tm->GetRowCount()==9) {
@@ -188,7 +188,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 			playmode *= 3;
 		}
 
-		newGame->CurrentArea = ResRef::MakeLowerCase(tm->QueryField(playmode));
+		newGame->CurrentArea = MakeLowerCaseResRef(tm->QueryField(playmode));
 	}
 
 	//Loading PCs
@@ -216,11 +216,10 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 
 	//Loading Global Variables
 	ieVariable Name;
-	Name[32] = 0;
 	str->Seek( GlobalOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < GlobalCount; i++) {
 		ieDword Value;
-		str->Read( Name, 32 );
+		str->ReadVariable(Name);
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword(Value);
 		str->Seek( 40, GEM_CURRENT_POS );
@@ -235,7 +234,7 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		str->Seek( KillVarsOffset, GEM_STREAM_START );
 		for (unsigned int i = 0; i < KillVarsCount; i++) {
 			ieDword Value;
-			str->Read( Name, 32 );
+			str->ReadVariable(Name);
 			str->Seek( 8, GEM_CURRENT_POS );
 			str->ReadDword(Value);
 			str->Seek( 40, GEM_CURRENT_POS );
@@ -266,21 +265,17 @@ Game* GAMImporter::LoadGame(Game *newGame, int ver_override)
 		if (FamiliarsOffset) {
 			str->Seek( FamiliarsOffset, GEM_STREAM_START );
 			for (unsigned int i = 0; i < 9; i++) {
-				str->ReadResRef( newGame->GetFamiliar(i) );
-			}
-		} else {
-			//clear these fields up
-			for (unsigned int i = 0; i < 9; i++) {
-				newGame->GetFamiliar(i).Reset();
+				ResRef tmp;
+				str->ReadResRef(tmp);
+				newGame->SetFamiliar(tmp, i);
 			}
 		}
 	}
 	// Loading known creatures array (beasts)
 	if(core->GetBeastsINI() != NULL) {
 		int beasts_count = BESTIARY_SIZE;
-		newGame->beasts = (ieByte*)calloc(sizeof(ieByte),beasts_count);
 		if(FamiliarsOffset) {
-			str->Read( newGame->beasts, beasts_count );
+			str->Read(newGame->beasts.data(), beasts_count);
 		}
 	}
 
@@ -326,7 +321,7 @@ static void SanityCheck(ieWord a,ieWord &b,const char *message)
 	}
 }
 
-Actor* GAMImporter::GetActor(const Holder<ActorMgr>& aM, bool is_in_party)
+Actor* GAMImporter::GetActor(const std::shared_ptr<ActorMgr>& aM, bool is_in_party)
 {
 	PCStruct pcInfo{};
 	ieDword tmpDword;
@@ -572,7 +567,7 @@ GAMJournalEntry* GAMImporter::GetJournalEntry()
 	return j;
 }
 
-int GAMImporter::GetStoredFileSize(Game *game)
+int GAMImporter::GetStoredFileSize(const Game *game)
 {
 	int headersize;
 
@@ -613,7 +608,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (unsigned int i = 0; i < PCCount; i++) {
-		Actor *ac = game->GetPC(i, false);
+		const Actor *ac = game->GetPC(i, false);
 		headersize += am->GetStoredFileSize(ac);
 	}
 	NPCOffset = headersize;
@@ -621,7 +616,7 @@ int GAMImporter::GetStoredFileSize(Game *game)
 	NPCCount = game->GetNPCCount();
 	headersize += NPCCount * PCSize;
 	for (unsigned int i = 0; i < NPCCount; i++) {
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		headersize += am->GetStoredFileSize(ac);
 	}
 
@@ -708,7 +703,7 @@ int GAMImporter::PutSavedLocations(DataStream *stream, Game *game) const
 	}
 
 	for (unsigned int i=0;i<SavedLocCount;i++) {
-			GAMLocationEntry *j = game->GetSavedLocationEntry(i);
+			const GAMLocationEntry *j = game->GetSavedLocationEntry(i);
 
 			stream->WriteResRef(j->AreaResRef);
 			tmpWord = j->Pos.x;
@@ -724,7 +719,7 @@ int GAMImporter::PutPlaneLocations(DataStream *stream, Game *game) const
 	ieWord tmpWord;
 
 	for (unsigned int i=0;i<PPLocCount;i++) {
-			GAMLocationEntry *j = game->GetPlaneLocationEntry(i);
+			const GAMLocationEntry *j = game->GetPlaneLocationEntry(i);
 
 			stream->WriteResRef(j->AreaResRef);
 			tmpWord = j->Pos.x;
@@ -749,7 +744,7 @@ int GAMImporter::PutKillVars(DataStream *stream, const Game *game) const
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
 		strnspccpy(tmpname, name, 32, core->HasFeature(GF_NO_NEW_VARIABLES));
-		stream->Write( tmpname, 32);
+		stream->WriteVariable(tmpname);
 		stream->Write( filling, 8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
@@ -775,7 +770,6 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 		if (core->HasFeature(GF_NO_NEW_VARIABLES)) {
 			/* This is one anomaly that must have a space injected (PST crashes otherwise). */
 			if (strcmp("dictionary_githzerai_hjacknir", name) == 0) {
-				memset(tmpname, 0, sizeof(ieVariable));
 				strncpy(tmpname, "DICTIONARY_GITHZERAI_ HJACKNIR", sizeof(ieVariable));
 			} else {
 				strnspccpy(tmpname, name, 32, true);
@@ -784,7 +778,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 			strnspccpy(tmpname, name, 32);
 		}
 
-		stream->Write( tmpname, 32);
+		stream->WriteVariable(tmpname);
 		stream->Write( filling, 8);
 		stream->WriteDword(value);
 		//40 bytes of empty crap
@@ -793,7 +787,7 @@ int GAMImporter::PutVariables(DataStream *stream, const Game *game) const
 	return 0;
 }
 
-int GAMImporter::PutHeader(DataStream *stream, Game *game) const
+int GAMImporter::PutHeader(DataStream *stream, const Game *game) const
 {
 	char Signature[10];
 	ieDword tmpDword;
@@ -817,14 +811,14 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 		stream->Write( Signature, 10);
 	} else {
 		stream->WriteWord(game->WhichFormation);
-		for (unsigned short& formation : game->Formations) {
+		for (const unsigned short& formation : game->Formations) {
 			stream->WriteWord(formation);
 		}
 	}
 	stream->WriteDword(game->PartyGold);
 	// we don't need this field, since you can only save if everyone is in the same area
-	game->NPCAreaViewed = PCCount - 1;
-	stream->WriteWord(game->NPCAreaViewed);
+	ieWord tmp = static_cast<ieWord>(PCCount) - 1;
+	stream->WriteWord(tmp);
 	stream->WriteWord(game->WeatherBits);
 	stream->WriteDword(PCOffset);
 	stream->WriteDword(PCCount);
@@ -880,7 +874,7 @@ int GAMImporter::PutHeader(DataStream *stream, Game *game) const
 	return 0;
 }
 
-int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version)
+int GAMImporter::PutActor(DataStream *stream, const Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version) const
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
@@ -1013,7 +1007,7 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	}
 
 	if (ac->LongStrRef==0xffffffff) {
-		strncpy(filling, ac->LongName, 33);
+		strncpy(filling, ac->LongName.CString(), 33);
 	} else {
 		char *tmpstr = core->GetCString(ac->LongStrRef, IE_STR_STRREFOFF);
 		strncpy(filling, tmpstr, 32);
@@ -1059,14 +1053,14 @@ int GAMImporter::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDwor
 	return 0;
 }
 
-int GAMImporter::PutPCs(DataStream *stream, const Game *game)
+int GAMImporter::PutPCs(DataStream *stream, const Game *game) const
 {
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	ieDword CREOffset = PCOffset + PCCount * PCSize;
 
 	for (unsigned int i = 0; i < PCCount; i++) {
 		assert(stream->GetPos() == PCOffset + i * PCSize);
-		Actor *ac = game->GetPC(i, false);
+		const Actor *ac = game->GetPC(i, false);
 		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
@@ -1077,7 +1071,7 @@ int GAMImporter::PutPCs(DataStream *stream, const Game *game)
 
 	for (unsigned int i = 0; i < PCCount; i++) {
 		assert(stream->GetPos() == CREOffset);
-		Actor *ac = game->GetPC(i, false);
+		const Actor *ac = game->GetPC(i, false);
 		//reconstructing offsets again
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
@@ -1086,14 +1080,14 @@ int GAMImporter::PutPCs(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutNPCs(DataStream *stream, const Game *game)
+int GAMImporter::PutNPCs(DataStream *stream, const Game *game) const
 {
 	auto am = GetImporter<ActorMgr>(IE_CRE_CLASS_ID);
 	ieDword CREOffset = NPCOffset + NPCCount * PCSize;
 
 	for (unsigned int i = 0; i < NPCCount; i++) {
 		assert(stream->GetPos() == NPCOffset + i * PCSize);
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
@@ -1103,7 +1097,7 @@ int GAMImporter::PutNPCs(DataStream *stream, const Game *game)
 
 	for (unsigned int  i = 0; i < NPCCount; i++) {
 		assert(stream->GetPos() == CREOffset);
-		Actor *ac = game->GetNPC(i);
+		const Actor *ac = game->GetNPC(i);
 		//reconstructing offsets again
 		CREOffset += am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
@@ -1112,7 +1106,7 @@ int GAMImporter::PutNPCs(DataStream *stream, const Game *game)
 	return 0;
 }
 
-void GAMImporter::GetMazeHeader(void *memory)
+void GAMImporter::GetMazeHeader(void *memory) const
 {
 	maze_header *m = (maze_header *) memory;
 	str->ReadDword(m->maze_sizex);
@@ -1131,7 +1125,7 @@ void GAMImporter::GetMazeHeader(void *memory)
 	str->ReadDword(m->unknown30);
 }
 
-void GAMImporter::GetMazeEntry(void *memory)
+void GAMImporter::GetMazeEntry(void *memory) const
 {
 	maze_entry *h = (maze_entry *) memory;
 
@@ -1144,9 +1138,9 @@ void GAMImporter::GetMazeEntry(void *memory)
 	str->ReadDword(h->visited);
 }
 
-void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
+void GAMImporter::PutMazeHeader(DataStream *stream, void *memory) const
 {
-	maze_header *m = (maze_header *) memory;
+	const maze_header *m = (maze_header *) memory;
 	stream->WriteDword(m->maze_sizex);
 	stream->WriteDword(m->maze_sizey);
 	stream->WriteDword(m->pos1x);
@@ -1163,9 +1157,9 @@ void GAMImporter::PutMazeHeader(DataStream *stream, void *memory)
 	stream->WriteDword(m->unknown30);
 }
 
-void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
+void GAMImporter::PutMazeEntry(DataStream *stream, void *memory) const
 {
-	maze_entry *h = (maze_entry *) memory;
+	const maze_entry *h = (maze_entry *) memory;
 	stream->WriteDword(h->me_override);
 	stream->WriteDword(h->valid);
 	stream->WriteDword(h->accessible);
@@ -1175,7 +1169,7 @@ void GAMImporter::PutMazeEntry(DataStream *stream, void *memory)
 	stream->WriteDword(h->visited);
 }
 
-int GAMImporter::PutMaze(DataStream *stream, const Game *game)
+int GAMImporter::PutMaze(DataStream *stream, const Game *game) const
 {
 	for(int i=0;i<MAZE_ENTRY_COUNT;i++) {
 		PutMazeEntry(stream, game->mazedata+i*MAZE_ENTRY_SIZE);
@@ -1184,7 +1178,7 @@ int GAMImporter::PutMaze(DataStream *stream, const Game *game)
 	return 0;
 }
 
-int GAMImporter::PutFamiliars(DataStream *stream, Game *game) const
+int GAMImporter::PutFamiliars(DataStream *stream, const Game *game) const
 {
 	int len = 0;
 	if (core->GetBeastsINI()) {
@@ -1192,7 +1186,7 @@ int GAMImporter::PutFamiliars(DataStream *stream, Game *game) const
 		if (game->version==GAM_VER_PST) {
 			//only GemRB version can have all features, return when it is PST
 			//gemrb version will have the beasts after the familiars
-			stream->Write( game->beasts, len );
+			stream->Write(game->beasts.data(), len);
 			return 0;
 		}
 	}
@@ -1205,13 +1199,13 @@ int GAMImporter::PutFamiliars(DataStream *stream, Game *game) const
 	}
 	stream->WriteDword(SavedLocOffset);
 	if (len) {
-		stream->Write( game->beasts, len );
+		stream->Write(game->beasts.data(), len);
 	}
 	stream->Write( filling, FAMILIAR_FILL_SIZE - len);
 	return 0;
 }
 
-int GAMImporter::PutGame(DataStream *stream, Game *game)
+int GAMImporter::PutGame(DataStream *stream, Game *game) const
 {
 	int ret;
 

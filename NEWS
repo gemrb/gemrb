@@ -1,7 +1,9 @@
-GemRB git (ab01a3):
+GemRB git (1c95b0944):
   New features:
     - 
     - faster loading and saving
+    - Use magic device skill
+    - console history is now preserved
 
   Improved features:
     - 

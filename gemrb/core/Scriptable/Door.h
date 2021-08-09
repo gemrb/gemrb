@@ -24,10 +24,9 @@
 #include "PathFinder.h"
 #include "Polygon.h"
 #include "Scriptable/Scriptable.h"
+#include "TileOverlay.h"
 
 namespace GemRB {
-
-class TileOverlay;
 
 //door flags
 #define DOOR_OPEN        1
@@ -69,11 +68,11 @@ public:
 
 class GEM_EXPORT Door : public Highlightable {
 public:
-	Door(TileOverlay* Overlay, DoorTrigger&& trigger);
+	Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger);
 public:
 	ieVariable LinkedInfo;
 	ResRef ID; //WED ID
-	TileOverlay* overlay;
+	Holder<TileOverlay> overlay;
 	std::vector<ieWord> tiles;
 	ieDword Flags;
 	int closedIndex;
@@ -110,13 +109,13 @@ public:
 	bool HitTest(const Point& p) const;
 	void TryPickLock(const Actor *actor);
 	void TryBashLock(Actor* actor) ;
-	bool TryUnlock(Actor *actor);
+	bool TryUnlock(Actor *actor) const;
 	void TryDetectSecret(int skill, ieDword actorID);
 	bool Visible() const;
 	void dump() const;
 	int TrapResets() const override { return Flags & DOOR_RESET; }
 	bool CantAutoClose() const { return Flags & (DOOR_CANTCLOSE | DOOR_LOCKED); }
-	void SetNewOverlay(TileOverlay *Overlay);
+	void SetNewOverlay(Holder<TileOverlay> Overlay);
 
 	std::shared_ptr<Gem_Polygon> OpenTriggerArea() const;
 	std::shared_ptr<Gem_Polygon> ClosedTriggerArea() const;

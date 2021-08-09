@@ -260,7 +260,7 @@ int GameScript::IsTeamBitOn(Scriptable *Sender, const Trigger *parameters)
 
 int GameScript::NearbyDialog(Scriptable *Sender, const Trigger *parameters)
 {
-	const Scriptable *target = Sender->GetCurrentArea()->GetActorByDialog(parameters->string0Parameter);
+	const Scriptable *target = Sender->GetCurrentArea()->GetScriptableByDialog(parameters->string0Parameter);
 	if ( !target ) {
 		return 0;
 	}
@@ -1680,20 +1680,26 @@ int GameScript::IsOverMe(Scriptable *Sender, const Trigger *parameters)
 	const Highlightable *trap = (Highlightable *) Sender;
 
 	Targets *tgts = GetAllObjects(Sender->GetCurrentArea(), Sender, parameters->objectParameter, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-	int ret = 0;
+	ieDword ret = 0;
 	if (tgts) {
 		targetlist::iterator m;
 		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
 			const Actor *actor = (Actor *) tt->actor;
 			if (trap->IsOver(actor->Pos)) {
-				ret = 1;
+				ret = actor->GetGlobalID();
 				break;
 			}
 			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
 	}
 	delete tgts;
+
+	// manually set LastTrigger, since IsOverMe is not in svtriobj
+	if (ret != 0) {
+		Sender->LastTrigger = ret;
+		ret = 1;
+	}
 	return ret;
 }
 
@@ -2748,7 +2754,7 @@ int GameScript::CurrentAreaIs(Scriptable *Sender, const Trigger *parameters)
 	}
 	ResRef arearesref;
 	arearesref.SNPrintF("AR%04d", parameters->int0Parameter);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, 8)) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;
@@ -2769,8 +2775,7 @@ int GameScript::AreaStartsWith(Scriptable *Sender, const Trigger *parameters)
 	} else {
 		arearesref = "ar30"; //InWatchersKeep
 	}
-	size_t i = strlen(arearesref);
-	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, i)) {
+	if (arearesref == tar->GetCurrentArea()->GetScriptName()) {
 		return 1;
 	}
 	return 0;
@@ -3151,7 +3156,7 @@ int GameScript::CharName(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 	const Actor *actor = (const Actor *) scr;
-	if (!strnicmp(actor->ShortName, parameters->string0Parameter, 32) ) {
+	if (!strnicmp(actor->ShortName.CString(), parameters->string0Parameter, 32)) {
 		return 1;
 	}
 	return 0;
@@ -4176,7 +4181,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 		return 0;
 	}
 
-	AutoTable tm(parameters->string0Parameter);
+	AutoTable tm = gamedata->LoadTable(parameters->string0Parameter);
 	if (!tm) {
 		return 0;
 	}
@@ -4188,7 +4193,7 @@ int GameScript::UsedExit(Scriptable *Sender, const Trigger *parameters)
 			continue;
 		}
 		const char *exit = tm->QueryField( i, 1 );
-		if (strnicmp(actor->UsedExit, exit, 32) != 0) {
+		if (strnicmp(actor->UsedExit.CString(), exit, 32) != 0) {
 			continue;
 		}
 		return 1;

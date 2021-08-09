@@ -85,7 +85,7 @@ void WorldMapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip
 }
 
 /** Draws the Control on the Output Display */
-void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
+void WorldMapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	auto MapToScreen = [&rgn, this](const Point& p) {
 		return rgn.origin - Pos + p;
@@ -112,10 +112,16 @@ void WorldMapControl::DrawSelf(Region rgn, const Region& /*clip*/)
 			} else {
 				video->BlitGameSprite(icon, offset, flags, gamedata->GetColor("MAPICNBG"));
 			}
-		}
-
-		if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
-			video->BlitSprite(areaIndicator, offset);
+			
+			if (areaIndicator && (m->AreaResRef == currentArea || m->AreaName == currentArea)) {
+				Point indicatorPos = offset - icon->Frame.origin;
+				indicatorPos.x += areaIndicator->Frame.x + icon->Frame.w / 2 - areaIndicator->Frame.w / 2;
+				// bg2 centered also vertically, while the rest didn't
+				if (core->HasFeature(GF_JOURNAL_HAS_SECTIONS)) {
+					indicatorPos.y += areaIndicator->Frame.y + icon->Frame.h / 2 - areaIndicator->Frame.h / 2;
+				}
+				video->BlitSprite(areaIndicator, indicatorPos);
+			}
 		}
 	}
 

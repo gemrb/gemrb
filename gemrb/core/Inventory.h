@@ -70,18 +70,20 @@ class StringBuffer;
 #define SLOT_ANY       32767
 #define SLOT_INVENTORY 32768
 #define SLOT_ALL       65535
+#define SLOT_UMD       0x100000 // marker for a use magic device-d slot item
+#define SLOT_UMD_MASK  (0x100000 - 1)
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000
 
 /** Inventory types */
-typedef enum ieInventoryType {
-	INVENTORY_HEAP = 0,
-	INVENTORY_CREATURE = 1
-} ieInventoryType;
+enum class ieInventoryType {
+	HEAP = 0,
+	CREATURE = 1
+};
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieCREItemFlagBits : uint32_t {
+using ieCREItemFlagBits = enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4, // denotes steel items in pst
@@ -111,7 +113,7 @@ typedef enum ieCREItemFlagBits : uint32_t {
 	IE_INV_ITEM_STOLEN2 = 0x40000, //same as 4
 	IE_INV_ITEM_CONVERSABLE = 0x80000,
 	IE_INV_ITEM_PULSATING = 0x100000
-} ieCREItemFlagBits;
+};
 
 #define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
 
@@ -215,7 +217,7 @@ class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
-	int InventoryType;
+	ieInventoryType InventoryType = ieInventoryType::HEAP;
 	/** Total weight of all items in Inventory */
 	int Weight;
 
@@ -236,16 +238,16 @@ public:
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
-	int CountItems(const char *resref, bool charges) const;
+	int CountItems(const ResRef &resref, bool charges) const;
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, unsigned int slot) const;
 	/** returns true if contains one itemtype equipped */
 	bool HasItemType(ieDword type) const;
 	/** Looks for a particular item in the inventory.
 	 * flags: see ieCREItemFlagBits */
-	bool HasItem(const char *resref, ieDword flags) const;
+	bool HasItem(const ResRef &resref, ieDword flags) const;
 
-	void SetInventoryType(int arg);
+	void SetInventoryType(ieInventoryType arg);
 	void SetOwner(Actor* act) { Owner = act; }
 
 	/** returns number of all slots in the inventory */
@@ -286,7 +288,7 @@ public:
 	//charges recharging items
 	void ChargeAllItems(int hours) const;
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const char *resref, unsigned int flags, unsigned int skip=0) const;
+	int FindItem(const ResRef &resref, unsigned int flags, unsigned int skip=0) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, const Point &loc);
 	bool DropItemAtLocation(const ResRef& resRef, unsigned int flags, Map *map, const Point &loc);
 	bool SetEquippedSlot(ieWordSigned slotcode, ieWord header, bool noFX=false);
@@ -337,7 +339,7 @@ public:
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
-	bool GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count);
+	bool GetEquipmentInfo(std::vector<ItemExtHeader>& headerList, int startindex, int count) const;
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion(int index) const;
 	/** returns if a slot is temporarily blocked */

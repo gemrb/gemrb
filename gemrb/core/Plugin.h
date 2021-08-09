@@ -30,12 +30,12 @@
 #include "SClassID.h" // FIXME
 #include "exports.h"
 
-#include "Holder.h"
 #include "TypeID.h"
 
 #include "FileCache.h"
 #include "System/DataStream.h"
 
+#include <memory>
 #include <stdexcept>
 
 namespace GemRB {
@@ -45,55 +45,66 @@ namespace GemRB {
  * Base class for all GemRB plugins
  */
 
-class GEM_EXPORT Plugin : public Held<Plugin>
+class GEM_EXPORT Plugin
 {
 public:
-	// declaring these here so we dont have to GEM_EXPORT every Held<T> for MSVC to be happy
-	Plugin() = default;
-	~Plugin() = default;
+	virtual ~Plugin() = default;
 };
 
-class GEM_EXPORT ImporterBase : public Held<ImporterBase>
+class GEM_EXPORT ImporterBase
 {
 protected:
 	DataStream* str = nullptr;
 	virtual bool Import(DataStream* stream) = 0;
-	
+
 protected:
 	DataStream* DecompressStream(DataStream* stream) {
 		DataStream* cstream = CacheCompressedStream(stream, stream->filename);
 		if (!cstream) {
 			return nullptr;
 		}
-		
+
 		if (stream == str) {
 			delete stream;
 			str = cstream;
 		}
 		return cstream;
 	}
-	
+
 public:
 	bool Open(DataStream* stream) noexcept {
 		str = stream;
 		return Import(str);
 	}
 
-	~ImporterBase() {
+	virtual ~ImporterBase() {
 		delete str;
 	}
 };
 
+/* MSVC must not see an abstract type _anywhere_ going into a `new` or `make_shared`. */
+template<class T>
+	std::shared_ptr<typename std::enable_if<!std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return std::make_shared<T>();
+}
+
+template<class T>
+	std::shared_ptr<typename std::enable_if<std::is_abstract<T>::value, T>::type>
+MakeImporter() noexcept {
+	return {};
+}
+
 template <class IMPORTER>
 class GEM_EXPORT ImporterPlugin final : public Plugin
 {
-	Holder<IMPORTER> importer = MakeHolder<IMPORTER>();
+	std::shared_ptr<IMPORTER> importer = MakeImporter<IMPORTER>();
 public:
-	Holder<IMPORTER> GetImporter() const noexcept {
+	std::shared_ptr<IMPORTER> GetImporter() const noexcept {
 		return importer;
 	}
 
-	Holder<IMPORTER> GetImporter(DataStream* str) noexcept {
+	std::shared_ptr<IMPORTER> GetImporter(DataStream* str) noexcept {
 		if (str == nullptr) {
 			return nullptr;
 		}

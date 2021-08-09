@@ -24,9 +24,12 @@
 #include "exports.h"
 #include "globals.h"
 
+#include "Bitmap.h"
 #include "Interface.h"
+#include "MapReverb.h"
 #include "Scriptable/Scriptable.h"
 #include "PathFinder.h"
+#include "WorldMap.h"
 
 #include <algorithm>
 #include <queue>
@@ -39,12 +42,10 @@ namespace GemRB {
 class Actor;
 class Ambient;
 class Animation;
-class AnimationFactory;
 class Bitmap;
 class CREItem;
 class GameControl;
 class IniSpawn;
-class MapReverb;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class Particles;
@@ -76,17 +77,18 @@ class Wall_Polygon;
 #define AF_NOTRAVEL      64 // Travel not allowed
 */
 
-//area types
-#define AT_OUTDOOR        1
-#define AT_DAYNIGHT       2
-#define AT_WEATHER        4
-#define AT_CITY           8
-#define AT_FOREST         0x10
-#define AT_DUNGEON        0x20
-#define AT_EXTENDED_NIGHT 0x40
-#define AT_CAN_REST_INDOORS 0x80
-//...
-#define AT_PST_DAYNIGHT 0x400
+enum MapEnv : ieWord {
+	AT_UNINITIALIZED	= 0,
+	AT_OUTDOOR        	= 1,
+	AT_DAYNIGHT       	= 2,
+	AT_WEATHER        	= 4,
+	AT_CITY           	= 8,
+	AT_FOREST         	= 0x10,
+	AT_DUNGEON        	= 0x20,
+	AT_EXTENDED_NIGHT 	= 0x40,
+	AT_CAN_REST_INDOORS = 0x80,
+	AT_PST_DAYNIGHT 	= 0x400
+};
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible
@@ -171,7 +173,7 @@ struct Entrance {
 };
 
 class MapNote {
-	void swap(MapNote& mn) {
+	void swap(MapNote& mn) noexcept {
 		if (&mn == this) return;
 		std::swap(strref, mn.strref);
 		std::swap(color, mn.color);
@@ -182,7 +184,7 @@ public:
 	// FIXME: things can get messed up by exposing these (specifically strref and text)
 	ieStrRef strref;
 	ieWord color;
-	String* text;
+	String text;
 	Point Pos;
 	bool readonly;
 
@@ -191,22 +193,14 @@ public:
 		mn.swap(*this);
 		return *this;
 	}
+	MapNote(const MapNote &rhs) = default;
 
-	MapNote( const MapNote& mn )
-	: strref(mn.strref), color(mn.color), Pos(mn.Pos), readonly(mn.readonly) {
-		if (mn.text) {
-			text = new String(*mn.text);
-		} else {
-			text = NULL;
-		}
-	}
-
-	MapNote(String* text, ieWord c, bool readonly)
-	: strref(-1), text(text), readonly(readonly)
+	MapNote(String text, ieWord c, bool readonly)
+	: strref(-1), text(std::move(text)), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
-		char* mbstring = MBCStringFromString(*text);
+		char* mbstring = MBCStringFromString(text);
 		if (mbstring) {
 			strref = core->UpdateString(-1, mbstring);
 			free(mbstring);
@@ -220,11 +214,11 @@ public:
 	: strref(ref), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
-		text = core->GetString(ref);
-	}
-
-	~MapNote() {
-		delete text;
+		String* tmp = core->GetString(ref);
+		if (tmp) {
+			text = std::move(*tmp);
+			delete tmp;
+		}
 	}
 
 	const Color& GetColor() const {
@@ -264,12 +258,6 @@ public:
 	// TODO: EE added several extra fields: Spawn frequency (another?), Countdown, Spawn weights for all Creatures
 };
 
-class TerrainSounds {
-public:
-	ResRef Group;
-	ResRef Sounds[16];
-};
-
 class SpawnGroup {
 	std::vector<ResRef> ResRefs;
 	int level;
@@ -293,8 +281,7 @@ public:
 
 class GEM_EXPORT AreaAnimation {
 public:
-	Animation **animation;
-	int animcount;
+	mutable std::vector<Animation> animation; // FIXME: we need an "update" step, currently we do it in Draw() wich should remian const
 	//dwords, or stuff combining to a dword
 	Point Pos;
 	ieDword appearance;
@@ -319,8 +306,8 @@ public:
 	// TODO: EE stores also the width/height for WBM and PVRZ resources (see Flags bit 13/15)
 	PaletteHolder palette;
 	AreaAnimation();
-	explicit AreaAnimation(const AreaAnimation *src);
-	~AreaAnimation();
+	AreaAnimation(const AreaAnimation& src);
+
 	void InitAnimation();
 	void SetPalette(const ResRef &PaletteRef);
 	void BlendAnimation();
@@ -328,8 +315,6 @@ public:
 	Region DrawingRegion() const;
 	void Draw(const Region &screen, Color tint, BlitFlags flags) const;
 	int GetHeight() const;
-private:
-	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle) const;
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE, AOT_PILE};
@@ -349,55 +334,59 @@ enum MAP_DEBUG_FLAGS : uint32_t {
 	DEBUG_SHOW_DOORS_SECRET		= 0x08,
 	DEBUG_SHOW_DOORS_DISABLED	= 0x10,
 	DEBUG_SHOW_DOORS_ALL		= (DEBUG_SHOW_DOORS|DEBUG_SHOW_DOORS_SECRET|DEBUG_SHOW_DOORS_DISABLED),
-	DEBUG_SHOW_LIGHTMAP     	= 0x20,
-	DEBUG_SHOW_WALLS			= 0x40,
-	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x80,
+	DEBUG_SHOW_SEARCHMAP		= 0x20,
+	DEBUG_SHOW_MATERIALMAP     	= 0x40,
+	DEBUG_SHOW_HEIGHTMAP		= 0x80,
+	DEBUG_SHOW_LIGHTMAP			= 0x0100,
+	DEBUG_SHOW_WALLS			= 0x0200,
+	DEBUG_SHOW_WALLS_ANIM_COVER	= 0x0400,
 	DEBUG_SHOW_WALLS_ALL		= (DEBUG_SHOW_WALLS|DEBUG_SHOW_WALLS_ANIM_COVER),
-	DEBUG_SHOW_SEARCHMAP		= 0x0100,
-	DEBUG_SHOW_FOG_UNEXPLORED	= 0x0200,
-	DEBUG_SHOW_FOG_INVISIBLE	= 0x0400,
+	DEBUG_SHOW_FOG_UNEXPLORED	= 0x0800,
+	DEBUG_SHOW_FOG_INVISIBLE	= 0x1000,
 	DEBUG_SHOW_FOG_ALL			= (DEBUG_SHOW_FOG_UNEXPLORED|DEBUG_SHOW_FOG_INVISIBLE),
 };
 
-typedef std::list<AreaAnimation*>::const_iterator aniIterator;
-typedef std::list<VEFObject*>::const_iterator scaIterator;
-typedef std::list<Projectile*>::const_iterator proIterator;
-typedef std::list<Particles*>::const_iterator spaIterator;
+using aniIterator = std::list<AreaAnimation>::iterator;
+using scaIterator = std::list<VEFObject*>::const_iterator;
+using proIterator = std::list<Projectile*>::const_iterator;
+using spaIterator = std::list<Particles*>::const_iterator;
 
 
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
-	Holder<Sprite2D> LightMap;
-	Bitmap* HeightMap;
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
-	ieWord AreaType;
-	ieWord Rain, Snow, Fog, Lightning;
-	ieByte* ExploredBitmap;
-	ieByte* VisibleBitmap;
+	MapEnv AreaType = AT_UNINITIALIZED;
+	ieWord Rain = 0;
+	ieWord Snow = 0;
+	ieWord Fog = 0;
+	ieWord Lightning = 0;
+	Bitmap ExploredBitmap;
+	Bitmap VisibleBitmap;
 	int version;
 	ResRef WEDResRef;
 	bool MasterArea;
 	//this is set by the importer (not stored in the file)
-	bool DayNight;
+	bool DayNight = false;
 	//movies for day/night (only in ToB)
 	ResRef Dream[2];
 	Holder<Sprite2D> Background;
 	ieDword BgDuration;
 	ieDword LastGoCloser;
-	MapReverb *reverb;
+	MapReverb reverb;
 
 private:
 	uint32_t debugFlags = 0;
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	PathMapFlags* SrchMap; //internal searchmap
-	unsigned short* MaterialMap;
-	Size mapSize;
-	std::list< AreaAnimation*> animations;
+	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
+	// the assigned palette is the palette for the lightmap
+	Holder<Sprite2D> tileProps;
+
+	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
 	std::vector<WallPolygonGroup> wallGroups;
 	std::list< VEFObject*> vvcCells;
@@ -418,9 +407,13 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 public:
-	Map(void);
+	static constexpr uint32_t searchMapMask = 0xff000000;
+	static constexpr uint32_t materialMapMask = 0x00ff0000;
+	static constexpr uint32_t heightMapMask = 0x0000ff00;
+	static constexpr uint32_t lightMapMask = 0x000000ff;
+
+	Map(TileMap *tm, Holder<Sprite2D> tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
-	static void ReleaseMemory();
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
 	static Point ConvertCoordFromTile(const Point&);
@@ -431,13 +424,10 @@ public:
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
-	/* low level function to perform the daylight changes */
-	void ChangeTileMap(Holder<Sprite2D> lm, Holder<Sprite2D> sm);
-	/* sets all the auxiliary maps and the tileset */
-	void AddTileMap(TileMap *tm, Holder<Sprite2D> lm, Bitmap *sr, Holder<Sprite2D> sm, Bitmap *hm);
+	void SetTileMapProps(Holder<Sprite2D> props);
 	void AutoLockDoors() const;
 	void UpdateScripts();
-	void ResolveTerrainSound(ResRef &sound, const Point &pos) const;
+	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
 	void DoStepForActor(Actor *actor, ieDword time) const;
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
@@ -449,16 +439,25 @@ public:
 
 	void DrawMap(const Region& viewport, uint32_t debugFlags);
 	void PlayAreaSong(int SongType, bool restart = true, bool hard = false) const;
-	void AddAnimation(const AreaAnimation* anim);
-	aniIterator GetFirstAnimation() const { return animations.begin(); }
+	void AddAnimation(AreaAnimation anim);
+	aniIterator GetFirstAnimation() { return animations.begin(); }
+	std::list<AreaAnimation>::const_iterator GetFirstAnimation() const { return animations.begin(); }
 	AreaAnimation *GetNextAnimation(aniIterator &iter) const
 	{
 		if (iter == animations.end()) {
 			return NULL;
 		}
-		return *iter++;
+		return &*iter++;
 	}
-	AreaAnimation *GetAnimation(const char *Name) const;
+	const AreaAnimation *GetNextAnimation(std::list<AreaAnimation>::const_iterator &iter) const
+	{
+		if (iter == animations.end()) {
+			return nullptr;
+		}
+		return &*iter++;
+	}
+
+	AreaAnimation *GetAnimation(const char *Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
 	void SetWallGroups(std::vector<WallPolygonGroup>&& walls)
@@ -476,6 +475,11 @@ public:
 	int CountSummons(ieDword flag, ieDword sex) const;
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(const Point &p) const;
+	
+	
+	int GetHeight(const Point &p) const;
+	Color GetLighting(const Point &p) const;
+
 	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const Point&) const;
 	PathMapFlags GetBlocked(const Point&, int size) const;
@@ -492,7 +496,7 @@ public:
 	Actor* GetActor(const char* Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
-	Scriptable *GetActorByDialog(const ResRef& resref) const;
+	Scriptable *GetScriptableByDialog(const ResRef& resref) const;
 	Actor *GetItemByDialog(const ResRef& resref) const;
 	Actor *GetActorByResource(const char *resref) const;
 	Actor *GetActorByScriptName(const char *name) const;
@@ -519,7 +523,7 @@ public:
 	//count of unexploded projectiles that are saved
 	int GetTrapCount(proIterator &iter) const;
 	//get the next saved projectile
-	Projectile *GetNextTrap(proIterator &iter) const;
+	const Projectile *GetNextTrap(proIterator &iter) const;
 	//add a projectile to the area
 	void AddProjectile(Projectile *pro, const Point &source, ieDword actorID, bool fake);
 	void AddProjectile(Projectile* pro, const Point &source, const Point &dest);
@@ -549,11 +553,8 @@ public:
 	Container *GetPile(Point position);
 	void AddItemToLocation(const Point &position, CREItem *item);
 
-	int GetWidth() const { return mapSize.w; }
-	int GetHeight() const { return mapSize.h; }
 	Size GetSize() const;
-	int GetExploredMapSize() const;
-	void FillExplored(bool explored) const;
+	void FillExplored(bool explored);
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */
@@ -588,7 +589,7 @@ public:
 	bool IsWalkableTo(const Point &s, const Point &d, bool actorsAreBlocking, const Actor *caller) const;
 
 	/* returns edge direction of map boundary, only worldmap regions */
-	int WhichEdge(const Point &s) const;
+	WMPDirection WhichEdge(const Point &s) const;
 
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
@@ -597,7 +598,7 @@ public:
 	ieWord GetAmbientCount(bool toSave = false) const;
 
 	//mapnotes
-	void AddMapNote(const Point &point, ieWord color, String* text, bool readonly = false);
+	void AddMapNote(const Point &point, ieWord color, const String &text, bool readonly = false);
 	void AddMapNote(const Point &point, ieWord color, ieStrRef strref, bool readonly = false);
 	void AddMapNote(const Point &point, const MapNote& note);
 	void RemoveMapNote(const Point &point);
@@ -623,7 +624,7 @@ public:
 	void TriggerSpawn(Spawn *spawn);
 
 	//move some or all players to a new area
-	void MoveToNewArea(const char *area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
+	void MoveToNewArea(const ResRef &area, const char *entrance, unsigned int direction, int EveryOne, Actor *actor) const;
 	bool HasWeather() const;
 	int GetWeather() const;
 	void ClearTrap(Actor *actor, ieDword InTrap) const;
@@ -637,10 +638,9 @@ public:
 	PathMapFlags GetInternalSearchMap(const Point&) const;
 	void SetInternalSearchMap(const Point&, PathMapFlags value);
 	void SetBackground(const ResRef &bgResref, ieDword duration);
-	void SetupReverbInfo();
 
 private:
-	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
+	const AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime) const;
 	Particles *GetNextSpark(const spaIterator &iter) const;
 	VEFObject *GetNextScriptedAnimation(const scaIterator &iter) const;
 	Actor *GetNextActor(int &q, int &index) const;
@@ -654,12 +654,14 @@ private:
 	BlitFlags SetDrawingStencilForScriptable(const Scriptable*, const Region& viewPort);
 	BlitFlags SetDrawingStencilForAreaAnimation(const AreaAnimation*, const Region& viewPort);
 	
-	void DrawSearchMap(const Region &vp) const;
+	void DrawDebugOverlay(const Region &vp, uint32_t dFlags) const;
 	void DrawPortal(const InfoPoint *ip, int enable);
 	void DrawHighlightables(const Region& viewport) const;
-	void DrawFogOfWar(const ieByte* explored_mask, const ieByte* visible_mask, const Region& viewport);
+	void DrawFogOfWar(const Bitmap* explored_mask, const Bitmap* visible_mask, const Region& viewport) const;
+	
+	Size PropsSize() const noexcept;
 	Size FogMapSize() const;
-	bool FogTileUncovered(const Point &p, const uint8_t*) const;
+	bool FogTileUncovered(const Point &p, const Bitmap*) const;
 	Point ConvertPointToFog(const Point &p) const;
 	
 	void GenerateQueues();
@@ -673,6 +675,7 @@ private:
 	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
+	PathMapFlags QuerySearchMap(const Point&) const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 
 };

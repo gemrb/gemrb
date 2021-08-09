@@ -54,6 +54,7 @@ private:
 public:
 	Console(const Region& frame, TextArea* ta);
 	bool Execute(const String&);
+	void SaveHistory() const;
 
 private:
 	void UpdateTextArea();
@@ -61,7 +62,8 @@ private:
 	void HistoryForward();
 	void HistoryAdd(bool force = false);
 	void HistorySetPos(size_t);
-	
+	void LoadHistory();
+
 protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;

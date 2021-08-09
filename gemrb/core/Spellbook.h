@@ -62,16 +62,16 @@ class StringBuffer;
 #define LSR_FULL    6  //can't learn more spells of this level (due to level)
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-typedef enum ieSpellType {
+using ieSpellType = enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
 	IE_SPELL_TYPE_INNATE = 2,
 	IE_SPELL_TYPE_SONG = 3     //not in spellbook
-} ieSpellType;
+};
 
 #define NUM_SPELLTYPES 3
 
-typedef enum ieIWD2SpellType {
+using ieIWD2SpellType = enum ieIWD2SpellType {
 	IE_IWD2_SPELL_BARD = 0,
 	IE_IWD2_SPELL_CLERIC = 1,
 	IE_IWD2_SPELL_DRUID = 2,
@@ -83,7 +83,7 @@ typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_INNATE = 8,
 	IE_IWD2_SPELL_SONG = 9,
 	IE_IWD2_SPELL_SHAPE = 10
-} ieIWD2SpellType;
+};
 
 #define NUM_IWD2_SPELLTYPES 11
 
@@ -169,7 +169,7 @@ public:
 	/** duplicates the source spellbook into the current one */
 	void CopyFrom(const Actor *source);
 	/** Check if the spell is memorised, optionally deplete it (casting) */
-	bool HaveSpell(const char *resref, ieDword flags);
+	bool HaveSpell(const ResRef &resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
 	int CountSpells(const char *resref, unsigned int type, int flag) const;
@@ -217,7 +217,7 @@ public:
 	bool UnmemorizeSpell(const CREMemorizedSpell* spl);
 
 	/** Removes (or just depletes) memorized spell by ResRef */
-	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, bool onlydepleted = false);
+	bool UnmemorizeSpell(const ResRef& spellRef, bool deplete, uint8_t flags = 0);
 
 	/** finds the first spell needing to rememorize */
 	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0) const;

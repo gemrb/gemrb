@@ -36,17 +36,4 @@ Resource::~Resource(void)
 	}
 }
 
-// Very similar to Cache::MyHashKey, but returns size_t and can be used from
-// things like unordered_map.
-size_t ResRef::Hash::operator() (const ResRef &k) const
-{
-	size_t nHash = 0;
-	for (char c: k.ref) {
-		if (c == 0)
-			break;
-		nHash = (nHash << 5) ^ tolower(c);
-	}
-	return nHash;
-}
-
 }

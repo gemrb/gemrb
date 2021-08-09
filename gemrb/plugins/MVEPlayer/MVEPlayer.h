@@ -43,13 +43,13 @@ private:
 	int doPlay();
 	unsigned int fileRead(void* buf, unsigned int count);
 	void showFrame(const unsigned char* buf, unsigned int bufw, unsigned int bufh);
-	void setPalette(unsigned char* p, unsigned start, unsigned count);
+	void setPalette(unsigned char* p, unsigned start, unsigned count) const;
 	int pollEvents();
-	int setAudioStream();
-	void freeAudioStream(int stream);
+	int setAudioStream() const;
+	void freeAudioStream(int stream) const;
 	void queueBuffer(int stream, unsigned short bits,
 				int channels, short* memory,
-				int size, int samplerate);
+				int size, int samplerate) const;
 
 protected:
 	bool DecodeFrame(VideoBuffer&) override;

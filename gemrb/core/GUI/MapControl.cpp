@@ -155,7 +155,7 @@ Region MapControl::GetViewport() const
 }
 
 /** Draws the Control on the Output Display */
-void MapControl::DrawSelf(Region rgn, const Region& /*clip*/)
+void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 {
 	Video* video = core->GetVideoDriver();
 	video->DrawRect(rgn, ColorBlack, true);
@@ -293,7 +293,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 		const String* text = nullptr;
 		const MapNote* mn = MapNoteAtPoint(p);
 		if (mn) {
-			text = mn->text;
+			text = &mn->text;
 			notePos = mn->Pos;
 		}
 

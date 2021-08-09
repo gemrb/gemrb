@@ -25,10 +25,8 @@
 
 namespace GemRB {
 
-#define KEYSIZE 8
-
 #ifndef ReleaseFun
-typedef void (*ReleaseFun)(void *);
+using ReleaseFun = void (*)(void*);
 #endif
 
 class Cache
@@ -38,7 +36,7 @@ protected:
 	struct MyAssoc {
 		MyAssoc* pNext;
 		MyAssoc** pPrev;
-		char key[KEYSIZE]; //not (ie)ResRef!
+		ResRef key;
 		ieDword nRefCount;
 		void* data;
 	};
@@ -85,7 +83,6 @@ protected:
 	void FreeAssoc(Cache::MyAssoc*);
 	Cache::MyAssoc* GetAssocAt(const ResRef&) const;
 	Cache::MyAssoc *GetNextAssoc(Cache::MyAssoc * rNextPosition) const;
-	unsigned int MyHashKey(const char*) const;
 
 public:
 	~Cache();

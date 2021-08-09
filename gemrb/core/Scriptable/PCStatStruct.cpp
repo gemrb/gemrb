@@ -223,7 +223,7 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, int slot, int headerindex)
 }
 
 //returns both the inventory slot and the header index associated to a quickslot
-void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex)
+void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex) const
 {
 	int idx;
 
@@ -253,7 +253,7 @@ void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &he
 
 //return the item extended header assigned to an inventory slot (the ability to use)
 //only quickslots have this assignment, equipment items got all abilities available
-int PCStatsStruct::GetHeaderForSlot(int slot)
+int PCStatsStruct::GetHeaderForSlot(int slot) const
 {
 	for (int i = 0; i < MAX_QUICKITEMSLOT; i++) {
 		if(QuickItemSlots[i]==slot) return (ieWordSigned) QuickItemHeaders[i];
