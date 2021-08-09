@@ -2406,7 +2406,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	//Ok, we use a non constant pointer here, so it is easy to disable
 	//a faulty music list on the fly. I don't want to add a method just for that
 	//crap when we already have that pointer at hand!
-	char* poi = core->GetMusicPlaylist( SongHeader.SongList[SongType] );
+	char* poi = core->GetMusicPlaylist(SongList[SongType]);
 	// for subareas fall back to the main list
 	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
 	// it's not the correct music, perhaps it needs the one from the master area

@@ -1918,7 +1918,7 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 	if (parameters->int0Parameter >= 10) return;
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->SongHeader.SongList[parameters->int0Parameter]=parameters->int1Parameter;
+	map->SongList[parameters->int0Parameter] = parameters->int1Parameter;
 }
 
 //optional integer parameter (isSpeech)

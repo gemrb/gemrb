@@ -141,7 +141,6 @@ enum MapEnv : ieWord {
 #define MAX_RESCOUNT 10
 
 struct SongHeaderType {
-	ieDword SongList[MAX_RESCOUNT];
 	// used in bg1, set for a few copied areas in bg2 (but no files!)
 	// everyone else uses the normal ARE ambients instead
 	ResRef MainDayAmbient1;
@@ -512,6 +511,7 @@ public:
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 
+	ieDword SongList[MAX_RESCOUNT];
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
 	int AreaDifficulty;

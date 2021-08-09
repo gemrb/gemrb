@@ -527,7 +527,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (auto& list : map->SongHeader.SongList) {
+	for (auto& list : map->SongList) {
 		str->ReadDword(list);
 	}
 
@@ -2524,7 +2524,7 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
-	for (const auto& list : map->SongHeader.SongList) {
+	for (const auto& list : map->SongList) {
 		stream->WriteDword(list);
 	}
 	//day
