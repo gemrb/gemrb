@@ -496,7 +496,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		break;
 	}
 
-	if (ip->Destination[0] != 0) {
+	if (!ip->Destination.IsEmpty()) {
 		// the 0 here is default orientation, can infopoints specify that or
 		// is an entrance always provided?
 		MoveToNewArea(ip->Destination, ip->EntranceName, 0, EveryOne, actor);
