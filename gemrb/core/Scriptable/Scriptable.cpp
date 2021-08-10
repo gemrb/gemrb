@@ -487,21 +487,37 @@ Action* Scriptable::PopNextAction()
 	return aC;
 }
 
-void Scriptable::ClearActions()
+// clear all actions, unless some are marked to be preserved
+void Scriptable::ClearActions(int skipFlags)
 {
 	// pst sometimes uses clearactions in the middle of a cutscene (eg. 1203cd21)
 	// and expect it to clear only the previous actions, not the whole queue
+	bool savedCurrentAction = false;
 	if (pst_flags && CurrentAction && CurrentAction->actionID == ClearActionsID) {
 		ReleaseCurrentAction();
 	} else {
-		ReleaseCurrentAction();
+		if (skipFlags == 1 && CurrentAction && CurrentAction->flags & ACF_OVERRIDE) {
+			savedCurrentAction = true;
+		} else if (skipFlags == 2 && CurrentAction && actionflags[CurrentAction->actionID] & AF_IWD2_OVERRIDE) {
+			savedCurrentAction = true;
+		} else if (skipFlags == 3 && (CurrentActionInterruptable == false || InternalFlags & IF_NOINT)) {
+			savedCurrentAction = true;
+		} else {
+			ReleaseCurrentAction();
+		}
+
 		for (unsigned int i = 0; i < actionQueue.size(); i++) {
 			Action* aC = actionQueue.front();
+			if (skipFlags == 1 && aC->flags & ACF_OVERRIDE) continue;
+			if (skipFlags == 2 && actionflags[aC->actionID] & AF_IWD2_OVERRIDE) continue;
+			if (skipFlags == 3 && aC == CurrentAction && savedCurrentAction) continue;
+
 			actionQueue.pop_front();
 			aC->Release();
 		}
-		actionQueue.clear();
 	}
+	if (savedCurrentAction) return;
+
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos = Point(-1, -1);
@@ -515,9 +531,9 @@ void Scriptable::ClearActions()
 	}
 }
 
-void Scriptable::Stop()
+void Scriptable::Stop(int flags)
 {
-	ClearActions();
+	ClearActions(flags);
 }
 
 void Scriptable::ReleaseCurrentAction()
@@ -2418,9 +2434,9 @@ void Movable::MoveTo(const Point &Des)
 	}
 }
 
-void Movable::Stop()
+void Movable::Stop(int flags)
 {
-	Scriptable::Stop();
+	Scriptable::Stop(flags);
 	ClearPath(true);
 }
 
