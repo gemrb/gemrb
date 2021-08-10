@@ -2421,6 +2421,38 @@ static void PrintAction(StringBuffer& buffer, int actionID)
 	buffer.appendFormatted("Action: %d %s\n", actionID, actionsTable->GetValue(actionID));
 }
 
+static void HandleActionOverride(Scriptable* target, const Action* aC)
+{
+	Action *newAction = ParamCopyNoOverride(aC);
+	// mark the target action, so other ActionOverrides don't clear it
+	// only happened for queued actions, but since instants are gone immediately,
+	// it shouldn't matter that we set it on all
+	newAction->flags |= ACF_OVERRIDE;
+
+	if (core->HasFeature(GF_CLEARING_ACTIONOVERRIDE)) {
+		// bg2, but not iwd2, clears the previous non-actionoverriden actions in the queue
+		target->ClearActions(1);
+	} else if (core->HasFeature(GF_3ED_RULES)) { // iwd2
+		// it was more complicated, always releasing if the game was paused — not something to replicate
+		if (target->CurrentActionInterruptable) {
+			target->ReleaseCurrentAction();
+		}
+	} else { // for all the games we don't understand fully yet
+		target->ReleaseCurrentAction();
+	}
+
+	target->AddAction(newAction);
+	if (!(actionflags[aC->actionID] & AF_INSTANT)) {
+		assert(target->GetNextAction());
+		// TODO: below was written before i added instants, this might be unnecessary now
+
+		// there are plenty of places where it's vital that ActionOverride is not interrupted and if
+		// there are actions left on the queue after the release above, we can't instant-execute,
+		// so this is my best guess for now..
+		target->CurrentActionInterruptable = false;
+	}
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
 	int actionID = aC->actionID;
@@ -2434,47 +2466,17 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	// actions use the second and third object, so this is only set when overriden (see GenerateActionCore)
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0], GA_NO_DEAD);
-
 		aC->IncRef(); // if aC is us, we don't want it deleted!
 		Sender->ReleaseCurrentAction();
 
 		if (scr) {
 			ScriptDebugLog(ID_ACTIONS, "Sender %s ran ActionOverride on %s", Sender->GetScriptName(), scr->GetScriptName());
-
-			Action *newAction = ParamCopyNoOverride(aC);
-			// mark the target action, so other ActionOverrides don't clear it
-			// only happened for queued actions, but since instants are gone immediately,
-			// it shouldn't matter that we set it on all
-			newAction->flags |= ACF_OVERRIDE;
-
-			if (core->HasFeature(GF_CLEARING_ACTIONOVERRIDE)) {
-				// bg2, but not iwd2, clears the previous non-actionoverriden actions in the queue
-				scr->ClearActions(1);
-			} else if (core->HasFeature(GF_3ED_RULES)) { // iwd2
-				// it was more complicated, always releasing if the game was paused — not something to replicate
-				if (scr->CurrentActionInterruptable) {
-					scr->ReleaseCurrentAction();
-				}
-			} else { // for all the games we don't understand fully yet
-				scr->ReleaseCurrentAction();
-			}
-
-			scr->AddAction(newAction);
-			if (!(actionflags[actionID] & AF_INSTANT)) {
-				assert(scr->GetNextAction());
-				// TODO: below was written before i added instants, this might be unnecessary now
-
-				// there are plenty of places where it's vital that ActionOverride is not interrupted and if
-				// there are actions left on the queue after the release above, we can't instant-execute,
-				// so this is my best guess for now..
-				scr->CurrentActionInterruptable = false;
-			}
+			HandleActionOverride(scr, aC);
 		} else {
 			Log(ERROR, "GameScript", "ActionOverride failed for object and action: ");
 			aC->objects[0]->dump();
 			aC->dump();
 		}
-
 		aC->Release();
 		return;
 	}
