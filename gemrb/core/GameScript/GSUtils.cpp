@@ -1229,6 +1229,16 @@ void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 		}
 	}
 
+	// When dialog is initiated in IWD2 it directly clears the action queue of all party members.
+	// Bubb: in this case, and only this case as far as I can tell, it specifically preserves spell actions.
+	if (core->HasFeature(GF_3ED_RULES)) {
+		const Game* game = core->GetGame();
+		for (int i = game->GetPartySize(false) - 1; i >= 0; --i) {
+			Actor *pc = game->GetPC(i, false);
+			pc->ClearActions(2);
+		}
+	}
+
 	//don't clear target's actions, because a sequence like this will be broken:
 	//StartDialog([PC]); SetGlobal("Talked","LOCALS",1);
 	// Update orientation and potentially stance
