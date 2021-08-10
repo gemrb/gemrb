@@ -2444,11 +2444,8 @@ static void HandleActionOverride(Scriptable* target, const Action* aC)
 	target->AddAction(newAction);
 	if (!(actionflags[aC->actionID] & AF_INSTANT)) {
 		assert(target->GetNextAction());
-		// TODO: below was written before i added instants, this might be unnecessary now
-
-		// there are plenty of places where it's vital that ActionOverride is not interrupted and if
-		// there are actions left on the queue after the release above, we can't instant-execute,
-		// so this is my best guess for now..
+		// there are plenty of places where it's vital that ActionOverride is not interrupted,
+		// so make double sure it doesn't happen
 		target->CurrentActionInterruptable = false;
 	}
 }
