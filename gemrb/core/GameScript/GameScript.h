@@ -145,18 +145,10 @@ struct targettype {
 using targetlist = std::list<targettype>;
 
 class GEM_EXPORT Targets {
-public:
-	Targets()
-	{
-	}
-
-	~Targets()
-	{
-		Clear();
-	}
-private:
 	targetlist objects;
 public:
+	Targets() noexcept = default;
+	
 	int Count() const;
 	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
@@ -177,7 +169,7 @@ protected:
 	{
 		canary = (unsigned long) 0xdeadbeef;
 	}
-	~Canary() // protected destructor
+	virtual ~Canary() // protected destructor
 	{
 		AssertCanary("Destroying Canary");
 		canary = 0xdddddddd;
