@@ -2681,10 +2681,6 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 		return;
 	}
 
-	// mark as uninterruptible in the action sense, so further script
-	// updates don't remove the action before the casting is done
-	Sender->CurrentActionInterruptable = false;
-
 	if (act) {
 		//move near to target
 		if ((flags&SC_RANGE_CHECK) && dist != 0xffffffff) {
@@ -2715,6 +2711,13 @@ void SpellCore(Scriptable *Sender, Action *parameters, int flags)
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
+
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	// the originals or at least iwd2 even marked it as IF_NOINT,
+	// so it also guarded against the ClearActions action
+	// ... but just for the actual spellcasting part
+	Sender->CurrentActionInterruptable = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
@@ -2819,6 +2822,13 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	if ((flags&SC_AURA_CHECK) && parameters->int2Parameter && Sender->AuraPolluted()) {
 		return;
 	}
+
+	// mark as uninterruptible in the action sense, so further script
+	// updates don't remove the action before the casting is done
+	// the originals or at least iwd2 even marked it as IF_NOINT,
+	// so it also guarded against the ClearActions action
+	// ... but just for the actual spellcasting part
+	Sender->CurrentActionInterruptable = false;
 
 	int duration;
 	if (!parameters->int2Parameter) {
