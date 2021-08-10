@@ -3570,6 +3570,10 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 	if (!(tar->GetInternalFlag() & IF_NOINT) && !tar->CurrentActionInterruptable) {
 		tar->Stop();
 	}
+	if (tar->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) tar;
+		actor->SetModal(MS_NONE);
+	}
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
