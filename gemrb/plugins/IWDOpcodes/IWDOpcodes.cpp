@@ -425,27 +425,24 @@ static void RegisterIWDOpcodes()
 
 static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effect *fx, ieDword damagetype)
 {
-	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype<<16, FX_DURATION_INSTANT_PERMANENT);
-	newfx->Target = FX_TARGET_PRESET;
-	newfx->Power = fx->Power;
-	newfx->DiceThrown = fx->DiceThrown;
-	newfx->DiceSides = fx->DiceSides;
-	newfx->Resource = fx->Resource;
 	//applyeffectcopy on everyone near us
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
-	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		//not sure if this is needed
 		if (target==victim) continue;
+
 		if (PersonalDistance(target, victim)<20) {
-			//this function deletes newfx (not anymore)
+			Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype << 16, FX_DURATION_INSTANT_PERMANENT);
+			newfx->Target = FX_TARGET_PRESET;
+			newfx->Power = fx->Power;
+			newfx->DiceThrown = fx->DiceThrown;
+			newfx->DiceSides = fx->DiceSides;
+			newfx->Resource = fx->Resource;
 			core->ApplyEffect(newfx, victim, Owner);
-			applied = true;
 		}
 	}
-	if (!applied) delete newfx;
 }
 
 //this function implements AC bonus handling
@@ -1092,25 +1089,22 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 		break;
 	}
 
-	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage<<16, FX_DURATION_INSTANT_PERMANENT);
-	newfx->Target = FX_TARGET_PRESET;
-	newfx->Power = fx->Power;
-	newfx->DiceThrown = fx->DiceThrown;
-	newfx->DiceSides = fx->DiceSides;
-	newfx->Resource = fx->Resource;
-
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
-	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (PersonalDistance(target, victim)>20) continue;
 		if (victim->GetSafeStat(mystat)>=100) continue;
+
 		//apply the damage opcode
+		Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damage << 16, FX_DURATION_INSTANT_PERMANENT);
+		newfx->Target = FX_TARGET_PRESET;
+		newfx->Power = fx->Power;
+		newfx->DiceThrown = fx->DiceThrown;
+		newfx->DiceSides = fx->DiceSides;
+		newfx->Resource = fx->Resource;
 		core->ApplyEffect(newfx, victim, Owner);
-		applied = true;
 	}
-	if (!applied) delete newfx;
 
 	return FX_APPLIED;
 }
@@ -1130,22 +1124,9 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
-	//build effects to apply
-	Effect * newfx1, *newfx2;
-
-	newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
-	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	newfx1->Duration = fx->Parameter1;
-
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
-	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	newfx2->Duration = fx->Parameter1;
-	newfx2->Resource = fx->SourceRef;
-
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
-	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1165,16 +1146,21 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 			continue;
 		}
 
+		// build effects to apply
+		Effect* newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
+		newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx1->Duration = fx->Parameter1;
+
+		Effect* newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
+		newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx2->Duration = fx->Parameter1;
+		newfx2->Resource = fx->SourceRef;
+
 		//apply a confusion opcode on target (0x80)
 		core->ApplyEffect(newfx1, victim, Owner);
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
-		applied = true;
-	}
-	if (!applied) {
-		delete newfx1;
-		delete newfx2;
 	}
 
 	return FX_APPLIED;
@@ -1201,22 +1187,9 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration = core->GetGame()->GameTime + core->Time.round_size;
 
-	//build effects to apply
-	Effect * newfx1, *newfx2;
-
-	newfx1 = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
-	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	newfx1->Duration = fx->Parameter1;
-
-	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
-	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
-	newfx2->Duration = fx->Parameter1;
-	newfx2->Resource = fx->SourceRef;
-
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
-	bool applied = false;
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
@@ -1230,17 +1203,21 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 			continue;
 		}
 
+		// build effects to apply
+		Effect* newfx1 = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
+		newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx1->Duration = fx->Parameter1;
+
+		Effect* newfx2 = EffectQueue::CreateEffectCopy(fx, fx_resist_spell2_ref, 0, 0);
+		newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx2->Duration = fx->Parameter1;
+		newfx2->Resource = fx->SourceRef;
+
 		//apply a panic opcode on target (0x18)
 		core->ApplyEffect(newfx1, victim, Owner);
 
 		//apply a resource resistance against this spell to block flood
 		core->ApplyEffect(newfx2, victim, Owner);
-
-		applied = true;
-	}
-	if (!applied) {
-		delete newfx1;
-		delete newfx2;
 	}
 
 	return FX_APPLIED;
@@ -1474,24 +1451,19 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 
-	//how style (probably better would be to provide effcof.spl)
-	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
-		8, FX_DURATION_INSTANT_PERMANENT);
-	newfx->Power = fx->Power;
-
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
-	bool applied = false;
 	while(i--) {
 		const Actor *victim = area->GetActor(i, true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
+			// how style (probably better would be to provide effcof.spl)
+			Effect* newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0, 8, FX_DURATION_INSTANT_PERMANENT);
+			newfx->Power = fx->Power;
 			core->ApplyEffect(newfx, target, Owner);
-			applied = true;
 		}
 	}
-	if (!applied) delete newfx;
 
 	return FX_APPLIED;
 }
