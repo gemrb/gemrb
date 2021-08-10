@@ -191,11 +191,11 @@ Game::~Game(void)
 	}
 
 	for (auto sp : savedpositions) {
-		free(sp);
+		delete sp;
 	}
 
 	for (auto pp : planepositions) {
-		free(pp);
+		delete pp;
 	}
 }
 
@@ -1111,7 +1111,7 @@ GAMLocationEntry* Game::GetSavedLocationEntry(unsigned int i)
 		}
 		savedpositions.resize(i+1);
 		while(current<=i) {
-			savedpositions[current++]=(GAMLocationEntry *) calloc(1, sizeof(GAMLocationEntry) );
+			savedpositions[current++] = new GAMLocationEntry;
 		}
 	}
 	return savedpositions[i];
@@ -1139,7 +1139,7 @@ GAMLocationEntry* Game::GetPlaneLocationEntry(unsigned int i)
 		}
 		planepositions.resize(i+1);
 		while(current<=i) {
-			planepositions[current++]=(GAMLocationEntry *) calloc(1, sizeof(GAMLocationEntry) );
+			planepositions[current++] = new GAMLocationEntry;
 		}
 	}
 	return planepositions[i];
