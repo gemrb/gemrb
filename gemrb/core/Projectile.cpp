@@ -56,8 +56,6 @@ Projectile::Projectile()
 	timeStartStep = 0;
 	phase = P_UNINITED;
 	effects = NULL;
-	children = NULL;
-	child_size = 0;
 	memset(travel, 0, sizeof(travel)) ;
 	memset(shadow, 0, sizeof(shadow)) ;
 	light = NULL;
@@ -96,12 +94,9 @@ Projectile::~Projectile()
 			delete shadow[i];
 		}
 	}
-
-	if(children) {
-		for (int i = 0; i < child_size; i++) {
-			delete children[i];
-		}
-		free (children);
+	
+	for (auto child : children) {
+		delete child;
 	}
 }
 
@@ -1338,18 +1333,15 @@ void Projectile::Draw(const Region& viewport)
 bool Projectile::DrawChildren(const Region& vp)
 {
 	bool drawn = false;
+	for (auto& child : children){
+		if (!child) continue;
 
-	if (!children) return false;
-
-	for (int i = 0; i < child_size; i++){
-		if (!children[i]) continue;
-
-		if (children[i]->Update()) {
-			children[i]->DrawTravel(vp);
+		if (child->Update()) {
+			child->DrawTravel(vp);
 			drawn = true;
 		} else {
-			delete children[i];
-			children[i] = nullptr;
+			delete child;
+			child = nullptr;
 		}
 	}
 
@@ -1518,28 +1510,25 @@ void Projectile::DrawExplosion(const Region& vp)
 	if (Extension->Spread) {
 		//i'm unsure about the need of this
 		//returns if the explosion animation is fake coloured
-		if (!children) {
-			child_size = (Extension->ExplosionRadius+15)/16;
+
+		//zero cone width means single line area of effect
+		if((aoeflags&PAF_CONE) && !Extension->ConeWidth) {
+			children.resize(1);
+		} else if (children.empty()) {
+			auto child_size = (Extension->ExplosionRadius + 15) / 16;
 			//more sprites if the whole area needs to be filled
 			if (apflags&APF_FILL) child_size*=2;
 			if (apflags&APF_SPREAD) child_size*=2;
 			if (apflags&APF_BOTH) child_size/=2; //intentionally decreases
 			if (apflags&APF_MORE) child_size*=2;
-			children = (Projectile **) calloc(sizeof(Projectile *), child_size);
+			children.resize(child_size);
 		}
-		
-		//zero cone width means single line area of effect
-		if((aoeflags&PAF_CONE) && !Extension->ConeWidth) {
-			child_size = 1;
-		}
-
-		int initial = child_size;
 		
 		//the spreading animation is in the first column
 		ResRef tmp = Extension->Spread;
-		for(int i=0;i<initial;i++) {
+		for (auto& child : children) {
 			//leave this slot free, it is residue from the previous flare up
-			if (children[i])
+			if (child)
 				continue;
 			if(apflags&APF_BOTH) {
 				if(RAND(0,1)) {
@@ -1628,7 +1617,7 @@ void Projectile::DrawExplosion(const Region& vp)
 				}
 			}
 
-			children[i]=pro;
+			child = pro;
 		}
 	}
 
