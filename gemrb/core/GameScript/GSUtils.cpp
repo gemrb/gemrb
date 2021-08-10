@@ -324,7 +324,7 @@ void ClickCore(Scriptable *Sender, const MouseEvent& me, int speed)
 	Sender->ReleaseCurrentAction();
 }
 
-void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value)
+void PlaySequenceCore(Scriptable *Sender, const Action *parameters, ieDword value)
 {
 	Scriptable* tar;
 
@@ -353,7 +353,7 @@ void PlaySequenceCore(Scriptable *Sender, Action *parameters, ieDword value)
 	actor->SetStance( value );
 }
 
-void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
+void TransformItemCore(Actor *actor, const Action *parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();
 	while(i--) {
@@ -913,7 +913,7 @@ void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
 	}
 }
 
-void CreateVisualEffectCore(Scriptable *Sender, const Point &position, const char *effect, int iterations)
+void CreateVisualEffectCore(const Scriptable *Sender, const Point &position, const char *effect, int iterations)
 {
 	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
 	if (vvc) {
@@ -1036,7 +1036,7 @@ void GetPositionFromScriptable(const Scriptable *scr, Point &position, bool dest
 
 static char PlayerDialogRes[] = "PLAYERx\0";
 
-void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
+void BeginDialog(Scriptable* Sender, const Action* parameters, int Flags)
 {
 	Scriptable* tar = NULL, *scr = NULL;
 
@@ -1978,7 +1978,7 @@ bool IsInObjectRect(const Point &pos, const Region &rect)
 
 #define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
 
-static Object *ObjectCopy(Object *object)
+static Object *ObjectCopy(const Object *object)
 {
 	if (!object) return NULL;
 	Object *newObject = new Object();
@@ -1989,7 +1989,7 @@ static Object *ObjectCopy(Object *object)
 	return newObject;
 }
 
-Action *ParamCopy(Action *parameters)
+Action *ParamCopy(const Action *parameters)
 {
 	Action *newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
@@ -2005,7 +2005,7 @@ Action *ParamCopy(Action *parameters)
 	return newAction;
 }
 
-Action *ParamCopyNoOverride(Action *parameters)
+Action *ParamCopyNoOverride(const Action *parameters)
 {
 	Action *newAction = new Action(true);
 	newAction->actionID = parameters->actionID;
@@ -2255,7 +2255,7 @@ Point CheckPointVariable(const Scriptable *Sender, const char *VarName, const ch
 }
 
 // checks if a variable exists in any context
-bool VariableExists(Scriptable *Sender, const char *VarName, const char *Context)
+bool VariableExists(const Scriptable *Sender, const char *VarName, const char *Context)
 {
 	ieDword value = 0;
 	char newVarName[8];
@@ -2512,7 +2512,7 @@ retry:
 	free(selects);
 }
 
-void AmbientActivateCore(Scriptable *Sender, Action *parameters, int flag)
+void AmbientActivateCore(const Scriptable *Sender, const Action *parameters, int flag)
 {
 	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 	if (!anim) {
@@ -2864,7 +2864,7 @@ void SpellPointCore(Scriptable *Sender, Action *parameters, int flags)
 	Sender->ReleaseCurrentAction();
 }
 
-void AddXPCore(Action *parameters, bool divide)
+void AddXPCore(const Action *parameters, bool divide)
 {
 	AutoTable xptable;
 
