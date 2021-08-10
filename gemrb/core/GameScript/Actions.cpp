@@ -3554,6 +3554,15 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 			}
 		}
 	}
+
+	// bg2 also sometimes cleared baldur.bcs, while area scripts were left untouched
+	const Map* area = Sender->GetCurrentArea();
+	if (!area) return;
+	if (Sender->Type != ST_GLOBAL && area->MasterArea) {
+		// clear game script if area is a master area
+		// clear game script if Sender is in master area
+		core->GetGame()->Stop();
+	}
 }
 
 void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
