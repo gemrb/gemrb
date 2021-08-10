@@ -3548,10 +3548,8 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
 		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
-			if (!(act->GetInternalFlag() & IF_NOINT) && !act->CurrentActionInterruptable) {
-				act->Stop();
-				act->SetModal(MS_NONE);
-			}
+			act->Stop(3);
+			act->SetModal(MS_NONE);
 		}
 	}
 
@@ -3565,6 +3563,7 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 	}
 }
 
+// clear the queue, leaving the current action intact if it is non-interruptible
 void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = Sender;
@@ -3576,9 +3575,9 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 			return;
 		}
 	}
-	if (!(tar->GetInternalFlag() & IF_NOINT) && !tar->CurrentActionInterruptable) {
-		tar->Stop();
-	}
+
+	tar->Stop(3);
+
 	if (tar->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) tar;
 		actor->SetModal(MS_NONE);
