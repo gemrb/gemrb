@@ -1,4 +1,4 @@
-GemRB git (1c95b0944):
+GemRB git (d5e95b9e):
   New features:
     - 
     - faster loading and saving
@@ -7,7 +7,7 @@ GemRB git (1c95b0944):
 
   Improved features:
     - 
-    - spellcaster ai, effects
+    - spellcaster ai, effects, scripting
     - audio, appimage, ini spawns
     - bugfixes
 
