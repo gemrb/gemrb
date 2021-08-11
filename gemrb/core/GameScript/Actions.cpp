@@ -2436,6 +2436,11 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 		flag&=~DOOR_OPEN;
 		door->SetDoorOpen(parameters->int1Parameter!=0, false, 0);
 	}
+	// take care of iwd2 flag bit differences as in AREIMporter's FixIWD2DoorFlags
+	// ... it matters for exactly 1 user from the original data (20ctord3.bcs)
+	if (core->HasFeature(GF_3ED_RULES) && flag == DOOR_KEY) {
+		flag = DOOR_TRANSPARENT;
+	}
 
 	if (parameters->int1Parameter) {
 		door->Flags|=flag;
