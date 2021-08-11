@@ -643,14 +643,16 @@ int SaveGameIterator::CreateSaveGame(int index, bool mqs) const
 	return GEM_OK;
 }
 
-int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname) const
+int SaveGameIterator::CreateSaveGame(Holder<SaveGame> save, const char *slotname, bool force) const
 {
 	if (!slotname) {
 		return GEM_ERROR;
 	}
 
-	if (int cansave = CanSave())
-		return cansave;
+	int cannotSave = CanSave();
+	if (cannotSave && !force) {
+		return cannotSave;
+	}
 
 	int index;
 	bool overrideRunning = false;
