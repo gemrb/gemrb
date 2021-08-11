@@ -639,9 +639,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadResRef(script0);
 		/* ARE 9.1: 4B per position after that. */
 		if (16 == map->version) {
-			str->ReadScalar(pos.x);
-			str->ReadScalar(pos.y);
-			str->Seek(30, GEM_CURRENT_POS);
+			str->ReadPoint(pos); // OverridePoint in NI
+			if (pos.IsZero()) {
+				str->ReadScalar(pos.x); // AlternatePoint in NI
+				str->ReadScalar(pos.y);
+			} else {
+				str->Seek(8, GEM_CURRENT_POS);
+			}
+			str->Seek(26, GEM_CURRENT_POS);
 		} else {
 			str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
 			//maybe we have to store this
