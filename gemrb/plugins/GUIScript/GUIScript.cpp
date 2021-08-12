@@ -2190,7 +2190,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 						"ssi", &font, &text, &align );
 
 			String* string = StringFromCString(text);
-			Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
+			Label* lbl = new Label(rgn, core->GetFont(font), string ? *string : L"");
 			delete string;
 
 			lbl->SetAlignment( align );

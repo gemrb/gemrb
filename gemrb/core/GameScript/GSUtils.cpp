@@ -1967,7 +1967,7 @@ SrcVector *LoadSrc(const ResRef& resname)
 		src->at(size)=tmp;
 		str->ReadDword(tmp);
 	}
-	delete ( str );
+	delete str;
 	return src;
 }
 

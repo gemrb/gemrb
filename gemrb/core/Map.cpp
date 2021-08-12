@@ -1428,7 +1428,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					spark->Draw(viewport.origin);
 					spaidx++;
 				} else {
-					delete( spark );
+					delete spark;
 					spaidx=particles.erase(spaidx);
 				}
 			}

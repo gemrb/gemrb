@@ -75,7 +75,7 @@ Color ColorAnimation::GenerateNext(tick_t time)
 
 bool ColorAnimation::HasEnded() const
 {
-	return (repeat) ? false : current == end;
+	return repeat ? false : current == end;
 }
 
 SpriteAnimation::SpriteAnimation(AnimationFactory* af, int cycle)

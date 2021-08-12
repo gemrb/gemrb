@@ -982,11 +982,11 @@ void Projectile::ClearPath()
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;
-		delete( thisNode );
+		delete thisNode;
 		thisNode = nextNode;
 	}
-	path = NULL;
-	step = NULL;
+	path = nullptr;
+	step = nullptr;
 }
 
 int Projectile::CalculateTargetFlag() const

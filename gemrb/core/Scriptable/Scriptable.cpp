@@ -133,7 +133,7 @@ Scriptable::~Scriptable(void)
 		delete script;
 	}
 
-	delete( locals );
+	delete locals;
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -2459,11 +2459,11 @@ void Movable::ClearPath(bool resetDestination)
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;
-		delete( thisNode );
+		delete thisNode;
 		thisNode = nextNode;
 	}
-	path = NULL;
-	step = NULL;
+	path = nullptr;
+	step = nullptr;
 	//don't call ReleaseCurrentAction
 }
 

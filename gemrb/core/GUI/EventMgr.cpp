@@ -47,7 +47,7 @@ MouseEvent MouseEventFromTouch(const TouchEvent& te, bool down)
 	me.deltaX = te.deltaX;
 	me.deltaY = te.deltaY;
 
-	me.buttonStates = (down) ? GEM_MB_ACTION : 0;
+	me.buttonStates = down ? GEM_MB_ACTION : 0;
 	me.button = GEM_MB_ACTION;
 	me.repeats = 1;
 
@@ -83,7 +83,7 @@ MouseEvent MouseEventFromController(const ControllerEvent& ce, bool down)
 			break;
 	}
 
-	me.buttonStates = (down) ? btn : 0;
+	me.buttonStates = down ? btn : 0;
 	me.button = btn;
 
 	return me;
@@ -231,7 +231,7 @@ void EventMgr::DispatchEvent(Event&& e) const
 			se.repeats = repeatCount;
 		}
 
-		if (e.EventMaskFromType(e.type) & (Event::AllMouseMask)) {
+		if (e.EventMaskFromType(e.type) & Event::AllMouseMask) {
 			// set/clear the appropriate buttons
 			mouseButtonFlags = e.mouse.buttonStates;
 			mousePos = e.mouse.Pos();
@@ -383,7 +383,7 @@ Event EventMgr::CreateKeyEvent(KeyboardKey key, bool down, int mod)
 {
 	Event e = {}; // initialize all members to 0
 	e.mod = mod;
-	e.type = (down) ? Event::KeyDown : Event::KeyUp;
+	e.type = down ? Event::KeyDown : Event::KeyUp;
 	e.keyboard.keycode = key;
 	e.isScreen = false;
 
@@ -410,7 +410,7 @@ Event EventMgr::CreateTouchEvent(const TouchEvent::Finger fingers[], int numFing
 	Event e = {};
 	e.isScreen = true;
 	e.mod = 0;
-	e.type = (down) ? Event::TouchDown : Event::TouchUp;
+	e.type = down ? Event::TouchDown : Event::TouchUp;
 
 	if (numFingers) {
 		for (int i = 0; i < numFingers; ++i) {

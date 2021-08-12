@@ -2196,7 +2196,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	ItemSlotsOffset = headersize;
 
 	//adding itemslot table size and equipped slot fields
-	headersize += (Inventory_Size) * sizeof(ieWord) + sizeof(ieWord) * 2;
+	headersize += Inventory_Size * sizeof(ieWord) + sizeof(ieWord) * 2;
 	ItemsOffset = headersize;
 
 	//counting items (calculating item storage)

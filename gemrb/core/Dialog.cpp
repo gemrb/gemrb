@@ -63,13 +63,13 @@ void Dialog::FreeDialogState(DialogState* ds)
 		}
 		if (trans->condition)
 			delete trans->condition;
-		delete( trans );
+		delete trans;
 	}
 	free( ds->transitions );
 	if (ds->condition) {
 		delete ds->condition;
 	}
-	delete( ds );
+	delete ds;
 }
 
 int Dialog::FindFirstState(Scriptable* target) const

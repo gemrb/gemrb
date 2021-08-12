@@ -613,7 +613,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 				float pct = event.caxis.value / float(sizeof(Sint16));
 				bool xaxis = event.caxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
-				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.caxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));
@@ -689,7 +689,7 @@ int SDL20VideoDriver::ProcessEvent(const SDL_Event & event)
 					unitIsPixels = true;
 				}
 				
-				int speed = (unitIsPixels) ? 1 : core->GetMouseScrollSpeed();
+				int speed = unitIsPixels ? 1 : core->GetMouseScrollSpeed();
 				if (SDL_GetModState() & KMOD_SHIFT) {
 					e = EvntManager->CreateMouseWheelEvent(Point(event.wheel.y * speed, event.wheel.x * speed));
 				} else {

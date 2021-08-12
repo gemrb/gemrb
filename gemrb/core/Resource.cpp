@@ -31,9 +31,7 @@ Resource::Resource(void)
 
 Resource::~Resource(void)
 {
-	if (str) {
-		delete( str );
-	}
+	delete str;
 }
 
 }

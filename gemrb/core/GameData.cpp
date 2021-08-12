@@ -245,11 +245,11 @@ Spell* GameData::GetSpell(const ResRef &resname, bool silent)
 	DataStream* str = GetResource( resname, IE_SPL_CLASS_ID, silent );
 	PluginHolder<SpellMgr> sm = MakePluginHolder<SpellMgr>(IE_SPL_CLASS_ID);
 	if (!sm) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	spell = new Spell();
@@ -280,16 +280,16 @@ Effect* GameData::GetEffect(const ResRef &resname)
 	DataStream* str = GetResource( resname, IE_EFF_CLASS_ID );
 	PluginHolder<EffectMgr> em = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	if (!em) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!em->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	effect = em->GetEffect();
-	if (effect == NULL) {
-		return NULL;
+	if (effect == nullptr) {
+		return nullptr;
 	}
 
 	EffectCache.SetAt(resname, (void *) effect);
@@ -444,16 +444,16 @@ Store* GameData::GetStore(const ResRef &resRef)
 	DataStream* str = gamedata->GetResource(resRef, IE_STO_CLASS_ID);
 	PluginHolder<StoreMgr> sm = MakePluginHolder<StoreMgr>(IE_STO_CLASS_ID);
 	if (sm == nullptr) {
-		delete ( str );
-		return NULL;
+		delete str;
+		return nullptr;
 	}
 	if (!sm->Open(str)) {
-		return NULL;
+		return nullptr;
 	}
 
 	Store* store = sm->GetStore(new Store());
-	if (store == NULL) {
-		return NULL;
+	if (store == nullptr) {
+		return nullptr;
 	}
 	
 	store->Name = resRef;

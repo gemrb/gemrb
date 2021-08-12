@@ -1604,7 +1604,7 @@ void Game::PlayerDream() const
 
 	GameScript* gs = new GameScript(ResRef("player1d"), Sender, 0, false);
 	gs->Update();
-	delete( gs );
+	delete gs;
 }
 
 //Start a TextScreen dream for the protagonist

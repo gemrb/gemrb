@@ -798,7 +798,7 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	int active = parameters->int0Parameter;
 
 	Game *game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
+	game->SetControlStatus(CS_HIDEGUI, active ? OP_OR : OP_NAND);
 	if (active) {
 		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
@@ -820,7 +820,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
 	GameScript* gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
 	gs->EvaluateAllBlocks();
-	delete( gs );
+	delete gs;
 }
 
 // StartCutScene("my_nifty_cut_scene") = StartCutSceneEx("my_nifty_cut_scene",FALSE)

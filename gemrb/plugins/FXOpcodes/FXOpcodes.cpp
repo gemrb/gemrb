@@ -7464,7 +7464,7 @@ int fx_cutscene2 (Scriptable* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 	GameScript* gs = new GameScript(resRef, game);
 	gs->EvaluateAllBlocks();
-	delete( gs );
+	delete gs;
 	return FX_NOT_APPLIED;
 }
 //0x12b ChaosShieldModifier

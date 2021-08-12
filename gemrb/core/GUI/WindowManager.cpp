@@ -195,7 +195,7 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 		windows.erase(it);
 		// it2 may have become invalid after erase
 		it2 = WIN_IT(win2);
-		windows.insert((front) ? it2 : ++it2, win);
+		windows.insert(front ? it2 : ++it2, win);
 	}
 
 	Window* frontWin = windows.front();

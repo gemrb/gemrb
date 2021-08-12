@@ -136,7 +136,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	f->Read( Signature, 8 );
 	if (strncmp( Signature, "KEY V1  ", 8 ) != 0) {
 		Log(ERROR, "KEYImporter", "File has an Invalid Signature.");
-		delete( f );
+		delete f;
 		return false;
 	}
 	Log(MESSAGE, "KEYImporter", "Reading Resources...");
@@ -191,7 +191,7 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 	}
 
 	Log(MESSAGE, "KEYImporter", "Resources Loaded...");
-	delete( f );
+	delete f;
 	return true;
 }
 

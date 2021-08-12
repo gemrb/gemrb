@@ -1265,18 +1265,18 @@ const targettype *Targets::GetLastTarget(int Type)
 {
 	targetlist::const_iterator m = objects.end();
 	while (m--!=objects.begin() ) {
-		if ( (Type==-1) || ((*m).actor->Type==Type) ) {
-			return &(*(m));
+		if (Type == -1 || (*m).actor->Type == Type) {
+			return &(*m);
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
 {
 	m=objects.begin();
 	while (m!=objects.end() ) {
-		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+		if (Type != -1 && (*m).actor->Type != Type) {
 			m++;
 			continue;
 		}
@@ -1289,7 +1289,7 @@ const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
 {
 	m++;
 	while (m!=objects.end() ) {
-		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+		if (Type != -1 && (*m).actor->Type != Type) {
 			m++;
 			continue;
 		}
@@ -1302,7 +1302,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 {
 	targetlist::iterator m = objects.begin();
 	while(m!=objects.end() ) {
-		if ( (Type==-1) || ((*m).actor->Type==Type)) {
+		if (Type == -1 || (*m).actor->Type == Type) {
 			if (!index) {
 				return (*m).actor;
 			}
@@ -1857,8 +1857,8 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 	stream->ReadLine( line, 10 );
 	if (strncmp( line, "SC", 2 ) != 0) {
 		Log(WARNING, "GameScript", "Not a Compiled Script file");
-		delete( stream );
-		return NULL;
+		delete stream;
+		return nullptr;
 	}
 	newScript = new Script( );
 	BcsCache.SetAt(resRef, (void *) newScript);
@@ -1871,7 +1871,7 @@ Script* GameScript::CacheScript(const ResRef& resRef, bool AIScript)
 		newScript->responseBlocks.push_back( rB );
 		stream->ReadLine( line, 10 );
 	}
-	delete( stream );
+	delete stream;
 	return newScript;
 }
 

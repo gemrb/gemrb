@@ -2358,17 +2358,17 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
 	if (game && group == "HIDE_CUT") {
-		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
+		game->SetControlStatus(CS_HIDEGUI, visible ? OP_NAND : OP_OR);
 	}
 
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Invisible, visible ? OP_NAND : OP_OR);
 }
 
 void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const
 {
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Disabled, enabled ? OP_NAND : OP_OR);
 }
 
 bool Interface::IsFreezed() const

@@ -268,7 +268,7 @@ size_t Font::RenderText(const String& string, Region& rgn, ieByte alignment, con
 	// it should have been calculated previously and passed in via the "point" parameter
 
 	bool singleLine = (alignment&IE_FONT_SINGLE_LINE);
-	Point dp((point) ? point->x : 0, (point) ? point->y : 0);
+	Point dp = point ? *point : Point();
 	const Region& sclip = core->GetVideoDriver()->GetScreenClip();
 
 	size_t charCount = 0;
@@ -585,7 +585,7 @@ size_t Font::Print(Region rgn, const String& string, ieByte alignment, const Pri
 {
 	if (rgn.size.IsInvalid()) return 0;
 
-	Point p = (point) ? *point : Point();
+	Point p = point ? *point : Point();
 	if (alignment&(IE_FONT_ALIGN_MIDDLE|IE_FONT_ALIGN_BOTTOM)) {
 		// we assume that point will be an offset from midde/bottom position
 		Size stringSize;
@@ -660,7 +660,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
 	bool newline = false, eos = false, ws = false, forceBreak = false;
 	size_t i = 0, charCount = 0;
-	const Size* stop = (metrics) ? &metrics->size : NULL;
+	const Size* stop = metrics ? &metrics->size : nullptr;
 	for (; i < string.length(); i++) {
 		const Glyph& curGlyph = GetGlyph(string[i]);
 		eos = (i == string.length() - 1);
