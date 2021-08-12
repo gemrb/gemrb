@@ -7123,6 +7123,14 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 			generic += GetRacialEnemyBonus(target);
 		}
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
+
+		// close-quarter ranged penalties; let's say roughly max 1 foot apart
+		if (third && (Flags & WEAPON_STYLEMASK) == WEAPON_RANGED && WithinPersonalRange(target, Pos, 2)) {
+			generic -= 4;
+			if (!HasFeat(FEAT_PRECISE_SHOT)) {
+				generic -= 4;
+			}
+		}
 	}
 
 	// add generic bonus
