@@ -122,7 +122,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		lineRgn.y -= lineheight;
 		Region lineSegment;
 
-#define LINE_REMAINDER lineRgn.w - lineSegment.x;
+#define LINE_REMAINDER (lineRgn.w - lineSegment.x)
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		bool newline = true;

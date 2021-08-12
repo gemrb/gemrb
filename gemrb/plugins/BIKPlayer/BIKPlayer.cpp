@@ -1087,7 +1087,7 @@ inline int BIKPlayer::get_value(int bundle)
 	dst[(x)*2 +     (y)*2       * stride] = \
 	dst[(x)*2 + 1 + (y)*2       * stride] = \
 	dst[(x)*2 +     ((y)*2 + 1) * stride] = \
-	dst[(x)*2 + 1 + ((y)*2 + 1) * stride] = pix;
+	dst[(x)*2 + 1 + ((y)*2 + 1) * stride] = pix
 
 static void get_pixels(DCTELEM *block, const uint8_t *pixels, int line_size)
 {
@@ -1146,7 +1146,7 @@ static inline void copy_block(DCTELEM block[64], const uint8_t *src, uint8_t *ds
 	put_pixels_nonclamped(block, dst, stride);
 }
 
-#define clear_block(block) memset( (block), 0, sizeof(DCTELEM)*64);
+#define clear_block(block) memset((block), 0, sizeof(DCTELEM) * 64)
 
 //This replaces the j_rev_dct module
 static void bink_idct(DCTELEM *block)

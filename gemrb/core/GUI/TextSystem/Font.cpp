@@ -654,7 +654,7 @@ Size Font::StringSize(const String& string, StringSizeMetrics* metrics) const
 	(stop && stop->w && lineW + val > stop->w)
 
 #define APPEND_TO_LINE(val) \
-	lineW += val; charCount = i + 1; val = 0;
+	lineW += val; charCount = i + 1; val = 0
 	
 	ieWord w = 0, lines = 1;
 	ieWord lineW = 0, wordW = 0, spaceW = 0;
