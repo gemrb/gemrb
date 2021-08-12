@@ -3823,11 +3823,13 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		char NewItem[9];
 
 		if (RtRows.count(itm->ItemResRef) == 0) {
-			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
+			const Item* item = gamedata->GetItem(itm->ItemResRef, true);
+			if (!item) {
 				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
-			return true;
+			// try detecting malformed / placeholder items, present in iwd2
+			return item->ItemName != (ieStrRef) -1 || item->ItemNameIdentified != (ieStrRef) -1;
 		}
 		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
 		int i;
