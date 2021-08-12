@@ -69,7 +69,7 @@ protected:
 
 
 // Content classes
-class TextSpan : public Content
+class TextSpan final : public Content
 {
 friend class TextContainer;
 private:
@@ -90,7 +90,7 @@ public:
 	// TODO: we should probably be able to align the text in the frame
 	TextSpan(const String& string, const Font* font, const Size* = nullptr);
 	TextSpan(const String& string, const Font* font, Font::PrintColors cols, const Size* = nullptr);
-	~TextSpan();
+	~TextSpan() final;
 	
 	void ClearColors();
 	void SetColors(const Color& fg, const Color& bg);
@@ -268,7 +268,7 @@ private:
 
 public:
 	TextContainer(const Region& frame, Font* font);
-	~TextContainer();
+	~TextContainer() override;
 	
 	// relative to cursor pos
 	void InsertText(const String& text);

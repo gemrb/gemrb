@@ -210,7 +210,7 @@ public:
 	bool isNull() const;
 };
 
-class GEM_EXPORT Trigger : protected Canary {
+class GEM_EXPORT Trigger final : protected Canary {
 public:
 	Trigger()
 	{
@@ -224,7 +224,7 @@ public:
 		int2Parameter = 0;
 		pointParameter.reset();
 	}
-	~Trigger()
+	~Trigger() final
 	{
 		if (objectParameter) {
 			objectParameter->Release();
@@ -252,9 +252,9 @@ public:
 	}
 };
 
-class GEM_EXPORT Condition : protected Canary {
+class GEM_EXPORT Condition final : protected Canary {
 public:
-	~Condition()
+	~Condition() final
 	{
 		for (auto& trigger : triggers) {
 			if (trigger) {
@@ -272,7 +272,7 @@ public:
 	std::vector<Trigger*> triggers;
 };
 
-class GEM_EXPORT Action : protected Canary {
+class GEM_EXPORT Action final : protected Canary {
 public:
 	explicit Action(bool autoFree)
 	{
@@ -283,7 +283,7 @@ public:
 			RefCount = 1; //one reference held by the script
 		}
 	}
-	~Action()
+	~Action() final
 	{
 		for (auto& object : objects) {
 			if (object) {
@@ -335,13 +335,13 @@ public:
 	}
 };
 
-class GEM_EXPORT Response : protected Canary {
+class GEM_EXPORT Response final : protected Canary {
 public:
 	Response()
 	{
 		weight = 0;
 	}
-	~Response()
+	~Response() final
 	{
 		for (auto& action : actions) {
 			if (action) {
@@ -363,9 +363,9 @@ public:
 	std::vector<Action*> actions;
 };
 
-class GEM_EXPORT ResponseSet : protected Canary {
+class GEM_EXPORT ResponseSet final : protected Canary {
 public:
-	~ResponseSet()
+	~ResponseSet() final
 	{
 		for (auto& response : responses) {
 			response->Release();
@@ -381,14 +381,14 @@ public:
 	std::vector<Response*> responses;
 };
 
-class GEM_EXPORT ResponseBlock : protected Canary {
+class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
 	ResponseBlock()
 	{
 		condition = NULL;
 		responseSet = NULL;
 	}
-	~ResponseBlock()
+	~ResponseBlock() final
 	{
 		if (condition) {
 			condition->Release();
@@ -408,9 +408,9 @@ public:
 	ResponseSet* responseSet;
 };
 
-class GEM_EXPORT Script : protected Canary {
+class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script()
+	~Script() final
 	{
 		for (auto& responseBlock : responseBlocks) {
 			if (responseBlock) {

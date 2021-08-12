@@ -36,19 +36,19 @@ namespace GemRB {
 
 class Ambient;
 
-class AmbientMgrAL : public AmbientMgr {
+class AmbientMgrAL final : public AmbientMgr {
 public:
 	AmbientMgrAL();
-	~AmbientMgrAL();
+	~AmbientMgrAL() final;
 
-	void activate(const std::string &name) override;
-	void activate() override;
-	void deactivate(const std::string &name) override;
-	void deactivate() override;
+	void activate(const std::string &name) final;
+	void activate() final;
+	void deactivate(const std::string &name) final;
+	void deactivate() final;
 
 	void UpdateVolume(unsigned short value);
 private:
-	void ambientsSet(const std::vector<Ambient *>&) override;
+	void ambientsSet(const std::vector<Ambient *>&) final;
 	
 	class AmbientSource {
 	public:

@@ -48,7 +48,7 @@ public:
 		pred1 = p1;
 		pred2 = p2;
 	}
-	~CompoundPredicate() {
+	~CompoundPredicate() override {
 		delete pred1;
 		delete pred2;
 	}
