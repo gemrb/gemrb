@@ -3677,7 +3677,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	if (savingthrows[type] == IE_SAVEWILL) {
 		// aura of courage
-		if (Modified[IE_EA] < EA_GOODCUTOFF && fx->SourceRef != "SPWI420") {
+		if (Modified[IE_EA] < EA_GOODCUTOFF && fx->SourceRef != "SPWI420" && area) {
 			// look if an ally paladin of at least level 2 is near
 			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
 			for (const Actor *ally : neighbours) {
