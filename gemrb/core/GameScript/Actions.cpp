@@ -1413,7 +1413,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* target = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1422,7 +1422,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 	//follow leader from a distance of 5
 	//could also follow the leader with a point offset
 	if (target->Type==ST_ACTOR) {
-		actor->SetLeader( (Actor *) target, 5);
+		actor->SetLeader((const Actor *) target, 5);
 	}
 	MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 }
@@ -6545,7 +6545,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
