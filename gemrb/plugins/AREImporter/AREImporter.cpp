@@ -164,12 +164,21 @@ static int GetTrackString(const ResRef &areaName)
 	return -1;
 }
 
-static void ConvertTo8bit(Holder<Sprite2D> spr)
+static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 {
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resref);
+	if (!im) {
+		return nullptr;
+	}
+	
+	auto spr = im->GetSprite2D();
 	if (spr->Format().Bpp > 1) {
 		static const PixelFormat fmt = PixelFormat::Paletted8Bit(nullptr, false);
 		spr->ConvertFormatTo(fmt);
 	}
+	
+	assert(spr->Format().Bpp == 1); // convert format can fail (but never should here)
+	return spr;
 }
 
 static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
@@ -182,39 +191,29 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 		TmpResRef.SNPrintF("%.6sLN", wedref.CString());
 	}
 
-	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!lm) {
+	auto lightmap = LoadImageAs8bit(TmpResRef);
+	if (!lightmap) {
 		Log(ERROR, "AREImporter", "No lightmap available.");
-		return NULL;
+		return nullptr;
 	}
 
 	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
 
-	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!sr) {
+	auto searchmap = LoadImageAs8bit(TmpResRef);
+	if (!searchmap) {
 		Log(ERROR, "AREImporter", "No searchmap available.");
-		return NULL;
+		return nullptr;
 	}
 
 	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
 
-	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!hm) {
+	auto heightmap = LoadImageAs8bit(TmpResRef);
+	if (!heightmap) {
 		Log(ERROR, "AREImporter", "No heightmap available.");
-		return NULL;
+		return nullptr;
 	}
 	
-	assert(lm->GetSize() == sr->GetSize() && lm->GetSize() == hm->GetSize());
-	
-	auto lightmap = lm->GetSprite2D();
-	auto heightmap = hm->GetSprite2D();
-	auto searchmap = sr->GetSprite2D();
-	
-	ConvertTo8bit(lightmap);
-	ConvertTo8bit(heightmap);
-	ConvertTo8bit(searchmap);
-	
-	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp == 1);
+	assert(lightmap->Frame.size == searchmap->Frame.size && lightmap->Frame.size == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
