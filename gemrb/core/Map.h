@@ -52,7 +52,6 @@ class Particles;
 struct PathNode;
 class Projectile;
 class ScriptedAnimation;
-class SpriteCover;
 class TileMap;
 class VEFObject;
 class Wall_Polygon;
