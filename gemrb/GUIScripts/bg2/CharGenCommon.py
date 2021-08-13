@@ -299,12 +299,11 @@ def SetButtonStateFromStep (buttonName, button, step):
 def CancelPress():
 	"""Revert back to the first step; if there, free the actor."""
 
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
-
 	step = GemRB.GetVar ("Step")
 	if step == 1:
+		global CharGenWindow
+		if CharGenWindow:
+			CharGenWindow.Close ()
 		#free up the slot before exiting
 		MyChar = GemRB.GetVar ("Slot")
 		GemRB.CreatePlayer ("", MyChar | 0x8000 )
