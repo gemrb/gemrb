@@ -213,7 +213,7 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 		return nullptr;
 	}
 	
-	Size propsize = lightmap->Frame.size;
+	const Size propsize = lightmap->Frame.size;
 	assert(propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
