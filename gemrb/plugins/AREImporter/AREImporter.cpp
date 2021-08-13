@@ -213,12 +213,13 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 		return nullptr;
 	}
 	
-	assert(lightmap->Frame.size == searchmap->Frame.size && lightmap->Frame.size == heightmap->Frame.size);
+	Size propsize = lightmap->Frame.size;
+	assert(propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
 	fmt.palette = lightmap->GetPalette();
-	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), lm->GetSize()), nullptr, fmt);
+	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
 	auto propit = tileProps->GetIterator();
 	auto end = propit.end(propit);
