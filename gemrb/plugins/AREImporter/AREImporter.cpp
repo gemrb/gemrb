@@ -164,6 +164,14 @@ static int GetTrackString(const ResRef &areaName)
 	return -1;
 }
 
+static void ConvertTo8bit(Holder<Sprite2D> spr)
+{
+	if (spr->Format().Bpp > 1) {
+		static const PixelFormat fmt = PixelFormat::Paletted8Bit(nullptr, false);
+		spr->ConvertFormatTo(fmt);
+	}
+}
+
 static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
@@ -201,6 +209,10 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 	auto lightmap = lm->GetSprite2D();
 	auto heightmap = hm->GetSprite2D();
 	auto searchmap = sr->GetSprite2D();
+	
+	ConvertTo8bit(lightmap);
+	ConvertTo8bit(heightmap);
+	ConvertTo8bit(searchmap);
 	
 	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp == 1);
 
