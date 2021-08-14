@@ -426,16 +426,10 @@ def GetEffectIcons(pc,LevelDiff):
 	# but don't display them in levelup stat view
 	if sum (LevelDiff) == 0:
 		effects = GemRB.GetPlayerStates (pc)
-		print(222, effects)
 		if len (effects):
 			for c in effects:
-				c2 = c
-				if isinstance(c, int):
-					c2 = "".join(chr(x) for x in bytes([c]))
-				else:
-					c = ord(c)
 				tmp = StateTable.GetValue (str(c - 66), "DESCRIPTION")
-				stats.append ((tmp, c2, 'a'))
+				stats.append ((tmp, c, 'a'))
 	return TypeSetStats (stats, pc)
 
 ########################################################################
@@ -461,10 +455,11 @@ def GetProficiencies(pc, cdet):
 		stats.append ( (9457, str(tohit["Base"])+" ("+str(tohit["Total"])+")", '0') )
 
 	tmp = cdet["APR"]
+	# FIXME: this is messed up
+	tmp2 = "[int]" + str(tmp // 2) + "[/int]"
 	if (tmp&1):
-		tmp2 = str (tmp // 2) + chr (189) #must use one higher than the frame count
-	else:
-		tmp2 = str (tmp // 2)
+		tmp2 += "[int]" + str(189) + "[/int]" #must use one higher than the frame count
+
 	stats.append ( (9458, tmp2, '') )
 	return TypeSetStats (stats, pc)
 
@@ -776,7 +771,7 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif stattype == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				res.append ("[cap]" + val + "%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				res.append ("[cap][int]" + str(val) + "[/int]%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif stattype == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
