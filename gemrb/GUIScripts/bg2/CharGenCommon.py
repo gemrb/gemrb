@@ -119,6 +119,7 @@ def DisplayOverview(step):
 		CancelButton.SetText (13727) # Cancel
 	else:
 		CancelButton.SetText (8159) # Start over
+		CancelButton.SetDisabled(False)
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
 
@@ -344,6 +345,7 @@ def NextPress():
 
 	step = GemRB.GetVar ("Step")
 	if step == 1:
+		CharGenWindow.GetControl(15).SetDisabled(True)
 		GemRB.SetNextScript ("GUICG1")
 	elif step == 2:
 		GemRB.SetNextScript ("GUICG8")
