@@ -33,7 +33,8 @@ public:
 		TEXT = 0,
 		OPEN_TAG,
 		CLOSE_TAG,
-		COLOR
+		COLOR,
+		INT
 	};
 
 	GemMarkupParser();
