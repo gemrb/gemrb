@@ -675,7 +675,6 @@
 		A2EC8063146056490033754A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8062146056490033754A /* QuartzCore.framework */; };
 		A2EC8065146056900033754A /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8064146056900033754A /* AudioToolbox.framework */; };
 		A2EC8067146056B40033754A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EC8066146056B40033754A /* CoreGraphics.framework */; };
-		A2EDA0461F99B39600F0866A /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2EDA0451F99B39600F0866A /* Python.framework */; };
 		A2F0505613ABB82D0023B7EB /* SAVImporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A27979AC13ABA4F7009A6FEF /* SAVImporter.cpp */; };
 		A2F0505B13ABB84C0023B7EB /* libgemrb_core.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E6646F139E8DFA00310FC8 /* libgemrb_core.dylib */; };
 		A2F5F069246102D70073802C /* CodepageToIconv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2F5F062246102D60073802C /* CodepageToIconv.cpp */; };
@@ -686,6 +685,7 @@
 		A2F5F070246103C30073802C /* libiconv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F5F06F246103B90073802C /* libiconv.tbd */; };
 		A2F7538A266A1DA800C3A764 /* SDL2_mixer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; };
 		A2F7538B266A1DA800C3A764 /* SDL2_mixer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A2F94A1526C73E2E00928E46 /* Python.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F94A1426C73E2D00928E46 /* Python.framework */; };
 		A2FA1E071EE788C600E51C25 /* libfreetype.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */; };
 		A2FA8E4E1FB8C483004AAEF9 /* MapReverb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */; };
 		A2FA8E4F1FB8C483004AAEF9 /* MapReverb.h in Headers */ = {isa = PBXBuildFile; fileRef = A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */; };
@@ -3892,6 +3892,7 @@
 		A2F5F067246102D70073802C /* CodepageToIconvMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CodepageToIconvMap.cpp; sourceTree = "<group>"; };
 		A2F5F06F246103B90073802C /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_mixer.framework; path = ../../../../../../Library/Frameworks/SDL2_mixer.framework; sourceTree = "<group>"; };
+		A2F94A1426C73E2D00928E46 /* Python.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Python.framework; path = ../../../../../../Library/Frameworks/Python.framework; sourceTree = "<group>"; };
 		A2FA1E061EE788C600E51C25 /* libfreetype.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libfreetype.6.dylib; path = ../../../../../opt/X11/lib/libfreetype.6.dylib; sourceTree = "<group>"; };
 		A2FA8E4C1FB8C482004AAEF9 /* MapReverb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MapReverb.cpp; sourceTree = "<group>"; };
 		A2FA8E4D1FB8C482004AAEF9 /* MapReverb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapReverb.h; sourceTree = "<group>"; };
@@ -4014,7 +4015,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2EDA0461F99B39600F0866A /* Python.framework in Frameworks */,
+				A2F94A1526C73E2E00928E46 /* Python.framework in Frameworks */,
 				A276B53013A28D0000D41A8A /* libgemrb_core.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -7808,6 +7809,7 @@
 		A2FA1E051EE788C600E51C25 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A2F94A1426C73E2D00928E46 /* Python.framework */,
 				A2F75389266A1DA800C3A764 /* SDL2_mixer.framework */,
 				A2C1E13A262A2AA60024D213 /* CoreHaptics.framework */,
 				A2C1E106262A2A920024D213 /* Metal.framework */,
@@ -10428,13 +10430,16 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				HEADER_SEARCH_PATHS = (
-					/System/Library/Frameworks/Python.framework/Versions/2.7/Headers,
+					/Library/Frameworks/Python.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.7/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Debug;
@@ -10447,13 +10452,16 @@
 				DYLIB_CURRENT_VERSION = "";
 				EXECUTABLE_EXTENSION = so;
 				EXECUTABLE_PREFIX = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(LOCAL_LIBRARY_DIR)/Frameworks",
+				);
 				HEADER_SEARCH_PATHS = (
-					/System/Library/Frameworks/Python.framework/Versions/2.7/Headers,
+					/Library/Frameworks/Python.framework/Headers,
 					"$(HEADER_SEARCH_PATHS)",
 				);
 				INSTALL_PATH = "~/Library/Application Support/GemRB/plugins";
 				MACH_O_TYPE = mh_bundle;
-				OTHER_LDFLAGS = /System/Library/Frameworks/Python.framework/Versions/2.7/Python;
 				PRODUCT_NAME = GUIScript;
 			};
 			name = Release;
