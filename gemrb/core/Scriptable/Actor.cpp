@@ -2988,39 +2988,12 @@ bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
 	return true;
 }
 
-const unsigned char *Actor::GetStateString() const
-{
-	if (!PCStats) {
-		return NULL;
-	}
-	ieByte *tmp = PCStats->PortraitIconString;
-	const ieWord *Icons = PCStats->PortraitIcons;
-	int j=0;
-	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (!(Icons[i]&0xff00)) {
-			tmp[j++]=(ieByte) ((Icons[i]&0xff)+66);
-		}
-	}
-	tmp[j]=0;
-	return tmp;
-}
-
 void Actor::AddPortraitIcon(ieByte icon) const
 {
 	if (!PCStats) {
 		return;
 	}
-	ieWord *Icons = PCStats->PortraitIcons;
-
-	for(int i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (Icons[i]==0xffff) {
-			Icons[i]=icon;
-			return;
-		}
-		if (icon == (Icons[i]&0xff)) {
-			return;
-		}
-	}
+	PCStats->EnableState(icon);
 }
 
 void Actor::DisablePortraitIcon(ieByte icon) const
@@ -3028,14 +3001,7 @@ void Actor::DisablePortraitIcon(ieByte icon) const
 	if (!PCStats) {
 		return;
 	}
-	ieWord *Icons = PCStats->PortraitIcons;
-
-	for (int i = 0; i < MAX_PORTRAIT_ICONS; i++) {
-		if (icon == (Icons[i]&0xff)) {
-			Icons[i]=0xff00|icon;
-			return;
-		}
-	}
+	PCStats->DisableState(icon);
 }
 
 
@@ -3109,7 +3075,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 	if (PCStats) {
-		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
+		PCStats->States = PCStatsStruct::StateArray();
 	}
 	if (SpellStatesSize) {
 		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
@@ -3268,9 +3234,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	// check if any new portrait icon was removed or added
 	if (PCStats) {
-		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons)) != 0) {
+		if (PCStats->States != previousStates) {
 			core->SetEventFlag(EF_PORTRAIT);
-			memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
+			previousStates = PCStats->States;
 		}
 	}
 	if (Immobile()) {

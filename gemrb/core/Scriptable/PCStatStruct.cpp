@@ -60,9 +60,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	Happiness = source.Happiness;
 	SoundSet = source.SoundSet;
 	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
-	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
-	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
-	memcpy(PortraitIconString, source.PortraitIconString, sizeof(PortraitIconString));
+	States = source.States;
 	LastLeft = source.LastLeft;
 	LastJoined = source.LastJoined;
 	UpdateClassLevels(source.ClassLevels);
@@ -294,6 +292,42 @@ void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 		cntpoi[minpos] = cntpoi[pos];
 		//store the old count to the last position
 		cntpoi[pos] = mincnt;
+	}
+}
+
+std::string PCStatsStruct::GetStateString() const
+{
+	std::string str;
+	str.reserve(MAX_PORTRAIT_ICONS);
+	for (const auto& state : States) {
+		if (state.enabled) {
+			str.push_back(state.state + 66);
+		}
+	}
+	return str;
+}
+
+void PCStatsStruct::EnableState(state_t icon)
+{	
+	for (auto& state : States) {
+		if (state.state == InvalidState) {
+			state.state = icon;
+			state.enabled = true;
+			return;
+		} else if (state.state == icon) {
+			state.enabled = true;
+			return;
+		}
+	}
+}
+
+void PCStatsStruct::DisableState(state_t icon)
+{
+	for (auto& state : States) {
+		if (state.state == icon) {
+			state.enabled = false;
+			return;
+		}
 	}
 }
 

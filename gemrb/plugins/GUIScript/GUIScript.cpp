@@ -5578,11 +5578,11 @@ static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	const char* stats = (const char *)actor->GetStateString();
+	auto stats = actor->PCStats->GetStateString();
 #if PY_MAJOR_VERSION >= 3
-	return PyBytes_FromString(stats);
+	return PyBytes_FromString(stats.c_str());
 #else
-	return PyString_FromString(stats);
+	return PyString_FromString(stats.c_str());
 #endif
 }
 
@@ -6507,9 +6507,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.LastLeft = oldstats.LastLeft;
 		newstats.LastJoined = oldstats.LastJoined;
 		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
-		std::copy(std::begin(oldstats.PortraitIcons), std::end(oldstats.PortraitIcons), newstats.PortraitIcons);
-		std::copy(std::begin(oldstats.PreviousPortraitIcons), std::end(oldstats.PreviousPortraitIcons), newstats.PreviousPortraitIcons);
-		std::copy(std::begin(oldstats.PortraitIconString), std::end(oldstats.PortraitIconString), newstats.PortraitIconString);
+		std::copy(oldstats.States.begin(), oldstats.States.end(), newstats.States.begin());
 		
 		oldstats = newstats;
 	}

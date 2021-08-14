@@ -25,6 +25,7 @@
 #include "ie_types.h"
 #include "Resource.h"
 
+#include <array>
 #include <list>
 
 namespace GemRB {
@@ -97,6 +98,20 @@ namespace GemRB {
 
 class GEM_EXPORT PCStatsStruct {
 public:
+	using state_t = char;
+	static constexpr state_t InvalidState = -1;
+	
+	struct State {
+		bool enabled = false;
+		state_t state = InvalidState;
+		
+		bool operator==(const State& rhs) const {
+			return enabled == rhs.enabled && state == rhs.state;
+		}
+	};
+	
+	using StateArray = std::array<State, MAX_PORTRAIT_ICONS>;
+
 	ieStrRef  BestKilledName = -1;
 	ieDword   BestKilledXP = 0;
 	ieDword   AwayTime = 0;
@@ -120,9 +135,7 @@ public:
 	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT] {0xffff};
 	ieByte    QSlots[GUIBT_COUNT] {0xff, 0};          //iwd2 specific
 	ieByte    QuickSpellClass[MAX_QSLOTS] {0xff};
-	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS] {0xffff};
-	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS] {0xffff};
-	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2] {0};
+	StateArray States;
 	ieDword   LastLeft = 0;   //trigger
 	ieDword   LastJoined = 0; //trigger
 	ieDword   Interact[MAX_INTERACT] {0};
@@ -142,6 +155,10 @@ public:
 	int GetHeaderForSlot(int slot) const;
 	void RegisterFavourite(const ResRef& fav, int what);
 	void UpdateClassLevels(const std::list<int> &levels);
+	
+	std::string GetStateString() const;
+	void EnableState(state_t state);
+	void DisableState(state_t state);
 };
 }
 

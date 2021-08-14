@@ -308,6 +308,7 @@ public:
 	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
+	PCStatsStruct::StateArray previousStates;
 	ResRef SmallPortrait;
 	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
@@ -805,8 +806,6 @@ public:
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
 	int GetConHealAmount() const;
-	/* returns the portrait icons list */
-	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
 	void AddPortraitIcon(ieByte icon) const;
 	/* disables a state icon in the list, doesn't remove it! */
