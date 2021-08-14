@@ -6498,7 +6498,20 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// clear several fields (only useful for cg; currently needed only in iwd2, but that will change if its system is ported to the rest)
 	// fixes random action bar mess, kill stats, join time ...
 	if (clear) {
-		actor->PCStats->Init(false);
+		PCStatsStruct& oldstats = *actor->PCStats;
+		PCStatsStruct newstats;
+		newstats.ClassLevels = oldstats.ClassLevels;
+		newstats.AwayTime = oldstats.AwayTime;
+		newstats.unknown10 = oldstats.unknown10;
+		newstats.Happiness = oldstats.Happiness;
+		newstats.LastLeft = oldstats.LastLeft;
+		newstats.LastJoined = oldstats.LastJoined;
+		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
+		std::copy(std::begin(oldstats.PortraitIcons), std::end(oldstats.PortraitIcons), newstats.PortraitIcons);
+		std::copy(std::begin(oldstats.PreviousPortraitIcons), std::end(oldstats.PreviousPortraitIcons), newstats.PreviousPortraitIcons);
+		std::copy(std::begin(oldstats.PortraitIconString), std::end(oldstats.PortraitIconString), newstats.PortraitIconString);
+		
+		oldstats = newstats;
 	}
 
 	actor->SetOver( false );

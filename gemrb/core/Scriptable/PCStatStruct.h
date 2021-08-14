@@ -97,44 +97,43 @@ namespace GemRB {
 
 class GEM_EXPORT PCStatsStruct {
 public:
-	ieStrRef  BestKilledName;
-	ieDword   BestKilledXP;
-	ieDword   AwayTime;
-	ieDword   JoinDate;
-	ieDword   unknown10;
-	ieDword   KillsChapterXP;
-	ieDword   KillsChapterCount;
-	ieDword   KillsTotalXP;
-	ieDword   KillsTotalCount;
+	ieStrRef  BestKilledName = -1;
+	ieDword   BestKilledXP = 0;
+	ieDword   AwayTime = 0;
+	ieDword   JoinDate = 0;
+	ieDword   unknown10 = 0;
+	ieDword   KillsChapterXP = 0;
+	ieDword   KillsChapterCount = 0;
+	ieDword   KillsTotalXP = 0;
+	ieDword   KillsTotalCount = 0;
 	ResRef  FavouriteSpells[MAX_FAVOURITES];
-	ieWord    FavouriteSpellsCount[MAX_FAVOURITES];
+	ieWord    FavouriteSpellsCount[MAX_FAVOURITES] {0};
 	ResRef  FavouriteWeapons[MAX_FAVOURITES];
-	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
+	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES] {0};
 	ResRef  SoundSet;
-	char      SoundFolder[SOUNDFOLDERSIZE];
-	ieDword   ExtraSettings[ES_COUNT];     //iwd2 - expertise, hamstring, arterial strike, etc
+	char      SoundFolder[SOUNDFOLDERSIZE] {0};
+	ieDword   ExtraSettings[ES_COUNT] {0};     //iwd2 - expertise, hamstring, arterial strike, etc
 	ResRef    QuickSpells[MAX_QSLOTS]; //iwd2 uses 9, others use only 3
-	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT]; //iwd2 uses 8, others use only 4
-	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];
-	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT];           //pst has 5, others use only 3
-	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT];
-	ieByte    QSlots[GUIBT_COUNT];          //iwd2 specific
-	ieByte    QuickSpellClass[MAX_QSLOTS];
-	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
-	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS];
-	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2];
-	ieDword   LastLeft;   //trigger
-	ieDword   LastJoined; //trigger
-	ieDword   Interact[MAX_INTERACT];
-	ieWordSigned Happiness;
+	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT] {0xffff}; //iwd2 uses 8, others use only 4
+	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT] {0xffff};
+	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT] {0xffff};           //pst has 5, others use only 3
+	ieWord    QuickItemHeaders[MAX_QUICKITEMSLOT] {0xffff};
+	ieByte    QSlots[GUIBT_COUNT] {0xff, 0};          //iwd2 specific
+	ieByte    QuickSpellClass[MAX_QSLOTS] {0xff};
+	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS] {0xffff};
+	ieWord    PreviousPortraitIcons[MAX_PORTRAIT_ICONS] {0xffff};
+	ieByte    PortraitIconString[MAX_PORTRAIT_ICONS+2] {0};
+	ieDword   LastLeft = 0;   //trigger
+	ieDword   LastJoined = 0; //trigger
+	ieDword   Interact[MAX_INTERACT] {0};
+	ieWordSigned Happiness = 0;
 	std::list<int> ClassLevels;
 private:
 	void SetQuickItemSlot(int x, int slot, int headerindex);
 public:
-	PCStatsStruct();
+	PCStatsStruct() = default;
 	explicit PCStatsStruct(const std::list<int>& levels);
 	PCStatsStruct& operator=(const PCStatsStruct &source);
-	void Init(bool all=true);
 	void IncrementChapter();
 	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, int slot, int headerindex);
