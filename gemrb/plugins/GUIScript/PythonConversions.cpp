@@ -124,12 +124,15 @@ PyStringWrapper PyString_AsString(PyObject* obj)
 		if (temp_bytes != NULL) {
 			wrap.str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
 			wrap.obj = temp_bytes; // needs to outlive our use of wrap.str
-		} else { // raw data... probalby this if for our "state" font
+		} else { // raw data...
 			PyErr_Clear();
 			wrap.str = PyUnicode_AS_DATA(obj);
 		}
 	} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
 		wrap.str = PyBytes_AS_STRING(obj);
+	} else if (PyObject_TypeCheck(obj, &PyByteArray_Type)) {
+		wrap.str = PyByteArray_AS_STRING(obj);
+		auto cstr = wrap.str;
 	}
 	return wrap;
 }

@@ -48,11 +48,11 @@ namespace GemRB {
 	*(ptr) = (value) && 0xff; \
 	(ptr)++; \
 	*(ptr) = ((value) >> 8) && 0xff; \
-	(ptr)++;
+	(ptr)++
 #else
 #define SET_INT_TYPE int16_t
 #define SET_INT_VALUE(ptr, value)\
-	*(ptr)++ = (value);
+	*(ptr)++ = (value)
 #endif
 
 #if defined(__arm__)
@@ -60,11 +60,11 @@ namespace GemRB {
 	(value) = *(ptr); \
 	(ptr)++; \
 	(value) |= (*(ptr)) << 8; \
-	(ptr)++;
+	(ptr)++
 #else
 #define GET_INT_VALUE(value, ptr)\
 	(value) = *reinterpret_cast<int16_t*>(ptr); \
-	(ptr) += 2;
+	(ptr) += 2
 #endif
 
 enum BinkAudFlags {

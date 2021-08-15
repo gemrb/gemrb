@@ -174,7 +174,7 @@ struct OneMinusSrcA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderBlend<SRCALPHA>(c, dst);
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -184,7 +184,7 @@ struct TintDst : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		ShaderTint(c, dst);
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -194,7 +194,7 @@ struct SrcRGBA : RGBBlender {
 	void operator()(const Color& c, Color& dst, uint8_t mask) const override {
 		dst = c;
 		if (MASKED) {
-			dst.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+			dst.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 		}
 	}
 };
@@ -238,7 +238,7 @@ public:
 		}
 		
 		Color c = src;
-		c.a = (mask) ? (255-mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
+		c.a = mask ? (255 - mask) + (c.a * mask) : c.a; // FIXME: not sure this is 100% correct, but it passes my known tests
 
 		// first apply "shader"
 		switch (SHADE) {

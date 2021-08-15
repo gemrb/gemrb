@@ -496,7 +496,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		break;
 	}
 
-	if (ip->Destination[0] != 0) {
+	if (!ip->Destination.IsEmpty()) {
 		// the 0 here is default orientation, can infopoints specify that or
 		// is an entrance always provided?
 		MoveToNewArea(ip->Destination, ip->EntranceName, 0, EveryOne, actor);
@@ -1428,7 +1428,7 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 					spark->Draw(viewport.origin);
 					spaidx++;
 				} else {
-					delete( spark );
+					delete spark;
 					spaidx=particles.erase(spaidx);
 				}
 			}
@@ -1995,6 +1995,7 @@ void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
 	if (actor) {
+		actor->Stop(); // just in case
 		Game *game = core->GetGame();
 		//this makes sure that a PC will be demoted to NPC
 		game->LeaveParty( actor );
@@ -2406,7 +2407,7 @@ void Map::PlayAreaSong(int SongType, bool restart, bool hard) const
 	//Ok, we use a non constant pointer here, so it is easy to disable
 	//a faulty music list on the fly. I don't want to add a method just for that
 	//crap when we already have that pointer at hand!
-	char* poi = core->GetMusicPlaylist( SongHeader.SongList[SongType] );
+	char* poi = core->GetMusicPlaylist(SongList[SongType]);
 	// for subareas fall back to the main list
 	// needed eg. in bg1 ar2607 (intro candlekeep ambush south)
 	// it's not the correct music, perhaps it needs the one from the master area

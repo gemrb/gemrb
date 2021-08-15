@@ -28,7 +28,7 @@ class DataStream;
 class GEM_EXPORT StreamLogWriter : public Logger::LogWriter {
 public:
 	StreamLogWriter(log_level, DataStream*);
-	~StreamLogWriter();
+	~StreamLogWriter() override;
 	
 	StreamLogWriter(const StreamLogWriter&) = delete;
 
@@ -43,10 +43,10 @@ private:
 	DataStream* stream;
 };
 
-class GEM_EXPORT StdioLogWriter : public StreamLogWriter {
+class GEM_EXPORT StdioLogWriter final : public StreamLogWriter {
 public:
 	StdioLogWriter(log_level, bool useColor);
-	~StdioLogWriter();
+	~StdioLogWriter() final;
 	
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 protected:

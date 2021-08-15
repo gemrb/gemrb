@@ -353,8 +353,8 @@ public:
 	Action* GetCurrentAction() const { return CurrentAction; }
 	Action* GetNextAction() const;
 	Action* PopNextAction();
-	void ClearActions();
-	virtual void Stop();
+	void ClearActions(int skipFlags = 0);
+	virtual void Stop(int flags = 0);
 	virtual void ReleaseCurrentAction();
 	bool InMove() const;
 	void ProcessActions();
@@ -547,7 +547,7 @@ public:
 	void MoveLine(int steps, ieDword Orient);
 	void WalkTo(const Point &Des, int MinDistance = 0);
 	void MoveTo(const Point &Des);
-	void Stop() override;
+	void Stop(int flags = 0) override;
 	void ClearPath(bool resetDestination = true);
 
 	/* returns the most likely position of this actor */

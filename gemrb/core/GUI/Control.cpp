@@ -55,7 +55,7 @@ Control::~Control()
 
 void Control::SetText(const String* string)
 {
-	SetText((string) ? *string : L"");
+	SetText(string ? *string : L"");
 }
 
 void Control::SetAction(ControlEventHandler handler, Control::Action type, EventButton button,
@@ -194,7 +194,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	};
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
-	return &core->SetTimer(h, (delay) ? delay : ActionRepeatDelay);
+	return &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
 }
 	
 bool Control::HitTest(const Point& p) const

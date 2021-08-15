@@ -148,7 +148,7 @@ Projectile *ProjectileServer::GetProjectile(size_t idx)
 	DataStream* str = gamedata->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
 	PluginHolder<ProjectileMgr> sm = MakePluginHolder<ProjectileMgr>(IE_PRO_CLASS_ID);
 	if (!sm) {
-		delete ( str );
+		delete str;
 		return CreateDefaultProjectile(idx);
 	}
 	if (!sm->Open(str)) {

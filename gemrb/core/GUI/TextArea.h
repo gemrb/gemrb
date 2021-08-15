@@ -45,7 +45,7 @@ static const Color SelectOptionSelected(55, 100, 0, 255);// default selected col
  * It is usually scrolled with a ScrollBar widget
  */
 
-class GEM_EXPORT TextArea : public Control, public View::Scrollable {
+class GEM_EXPORT TextArea final : public Control, public View::Scrollable {
 private:
 	/** Draws the Control on the Output Display */
 	void DrawSelf(const Region& drawFrame, const Region& clip) override;
@@ -116,7 +116,7 @@ public:
 	TextArea(const Region& frame, Font* text);
 	TextArea(const Region& frame, Font* text, Font* caps);
 	
-	~TextArea();
+	~TextArea() final;
 
 	bool IsOpaque() const override { return false; }
 	

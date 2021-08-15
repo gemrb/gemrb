@@ -92,7 +92,7 @@ Spell::Spell(void)
 
 int Spell::GetHeaderIndexFromLevel(int level) const
 {
-	if (level<0) return -1;
+	if (level < 0 || ext_headers.empty()) return -1;
 	if (Flags & SF_SIMPLIFIED_DURATION) {
 		return level;
 	}

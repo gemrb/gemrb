@@ -217,7 +217,7 @@ int SDLVideoDriver::ProcessEvent(const SDL_Event & event)
 				float pct = event.jaxis.value / float(sizeof(Sint16));
 				bool xaxis = event.jaxis.axis % 2;
 				// FIXME: I'm sure this delta needs to be scaled
-				int delta = (xaxis) ? pct * screenSize.w : pct * screenSize.h;
+				int delta = xaxis ? pct * screenSize.w : pct * screenSize.h;
 				InputAxis axis = InputAxis(event.jaxis.axis);
 				e = EvntManager->CreateControllerAxisEvent(axis, delta, pct);
 				EvntManager->DispatchEvent(std::move(e));

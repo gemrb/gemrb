@@ -309,7 +309,7 @@ void View::Draw()
 				swprintf(string, 255, L"id: %lu  grp: %s  \nflgs: %u\ntype:%s",
 					 id, ref->ScriptingGroup().CString(), flags, typeid(*this).name());
 				Region r = drawFrame;
-				r.w = (win) ? win->Frame().w - r.x : Frame().w - r.x;
+				r.w = win ? win->Frame().w - r.x : Frame().w - r.x;
 				Font::StringSizeMetrics metrics = {r.size, 0, 0, true};
 				fnt->StringSize(string, &metrics);
 				r.h = metrics.size.h;
@@ -536,7 +536,7 @@ View* View::SubviewAt(const Point& p, bool ignoreTransparency, bool recursive)
 		if ((ignoreTransparency && v->frame.PointInside(p)) || v->HitTest(subP)) {
 			if (recursive) {
 				View* subV = v->SubviewAt(subP, ignoreTransparency, recursive);
-				v = (subV) ? subV : v;
+				v = subV ? subV : v;
 			}
 			return v;
 		}
@@ -574,7 +574,7 @@ Window* View::GetWindow() const
 
 	if (superView) {
 		Window* win = dynamic_cast<Window*>(superView);
-		return (win) ? win : superView->GetWindow();
+		return win ? win : superView->GetWindow();
 	}
 	return NULL;
 }

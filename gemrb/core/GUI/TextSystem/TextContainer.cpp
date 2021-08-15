@@ -41,13 +41,13 @@ LayoutRegions Content::LayoutForPointInRegion(Point p, const Region& rgn) const
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt)
+	: Content(frame ? *frame : Size()), text(string), font(fnt)
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
 
 TextSpan::TextSpan(const String& string, const Font* fnt, Font::PrintColors cols, const Size* frame)
-	: Content((frame) ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
+	: Content(frame ? *frame : Size()), text(string), font(fnt), colors(new Font::PrintColors(cols))
 {
 	Alignment = IE_FONT_ALIGN_LEFT;
 }
@@ -122,7 +122,7 @@ LayoutRegions TextSpan::LayoutForPointInRegion(Point layoutPoint, const Region& 
 		lineRgn.y -= lineheight;
 		Region lineSegment;
 
-#define LINE_REMAINDER lineRgn.w - lineSegment.x;
+#define LINE_REMAINDER (lineRgn.w - lineSegment.x)
 		const Region* excluded = NULL;
 		size_t numPrinted = 0;
 		bool newline = true;

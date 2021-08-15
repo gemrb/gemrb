@@ -1761,15 +1761,14 @@ def UpdatePortraitWindow ():
 		numCols = 4 if GameCheck.IsIWD2() else 3
 		numEffects = len(effects)
 
-		states = b""
 		# calculate the partial row
 		idx = numEffects % numCols
-		states = effects[0:idx]
+		states = bytearray(effects[0:idx])
 		# now do any rows that are full
 		for x in range(idx, numEffects):
 			if (x - idx) % numCols == 0:
-				states = states + b"\n"
-			states = states + bytes(effects[x])
+				states.append(ord('\n'))
+			states.append(effects[x])
 
 		# FIXME: hack, check shouldn't be needed
 		FlagLabel = Window.GetControl (200 + i)

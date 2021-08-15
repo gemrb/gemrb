@@ -133,7 +133,7 @@ Scriptable::~Scriptable(void)
 		delete script;
 	}
 
-	delete( locals );
+	delete locals;
 }
 
 void Scriptable::SetScriptName(const char* text)
@@ -487,21 +487,37 @@ Action* Scriptable::PopNextAction()
 	return aC;
 }
 
-void Scriptable::ClearActions()
+// clear all actions, unless some are marked to be preserved
+void Scriptable::ClearActions(int skipFlags)
 {
 	// pst sometimes uses clearactions in the middle of a cutscene (eg. 1203cd21)
 	// and expect it to clear only the previous actions, not the whole queue
+	bool savedCurrentAction = false;
 	if (pst_flags && CurrentAction && CurrentAction->actionID == ClearActionsID) {
 		ReleaseCurrentAction();
 	} else {
-		ReleaseCurrentAction();
+		if (skipFlags == 1 && CurrentAction && CurrentAction->flags & ACF_OVERRIDE) {
+			savedCurrentAction = true;
+		} else if (skipFlags == 2 && CurrentAction && actionflags[CurrentAction->actionID] & AF_IWD2_OVERRIDE) {
+			savedCurrentAction = true;
+		} else if (skipFlags == 3 && (CurrentActionInterruptable == false || InternalFlags & IF_NOINT)) {
+			savedCurrentAction = true;
+		} else {
+			ReleaseCurrentAction();
+		}
+
 		for (unsigned int i = 0; i < actionQueue.size(); i++) {
 			Action* aC = actionQueue.front();
+			if (skipFlags == 1 && aC->flags & ACF_OVERRIDE) continue;
+			if (skipFlags == 2 && actionflags[aC->actionID] & AF_IWD2_OVERRIDE) continue;
+			if (skipFlags == 3 && aC == CurrentAction && savedCurrentAction) continue;
+
 			actionQueue.pop_front();
 			aC->Release();
 		}
-		actionQueue.clear();
 	}
+	if (savedCurrentAction) return;
+
 	WaitCounter = 0;
 	LastTarget = 0;
 	LastTargetPos = Point(-1, -1);
@@ -515,9 +531,9 @@ void Scriptable::ClearActions()
 	}
 }
 
-void Scriptable::Stop()
+void Scriptable::Stop(int flags)
 {
-	ClearActions();
+	ClearActions(flags);
 }
 
 void Scriptable::ReleaseCurrentAction()
@@ -1851,10 +1867,11 @@ bool Highlightable::TriggerTrap(int /*skill*/, ieDword ID)
 	AddTrigger(TriggerEntry(trigger_traptriggered, ID)); // for that one user in bg2
 
 	// the second part is a hack to deal with bg2's ar1401 lava floor trap ("muck"), which doesn't have the repeating bit set
+	// at the same time iwd2 Saablic_Greeting in ar6200 shouldn't repeat, while being practically identical
 	// should we always send Entered instead, also when !Trapped? Does not appear so, see history of InfoPoint::TriggerTrap
 	if (TrapResets()) {
 		AddTrigger(TriggerEntry(trigger_reset, GetGlobalID()));
-	} else if (TrapDetectionDiff && TrapRemovalDiff) {
+	} else if ((TrapDetectionDiff && TrapRemovalDiff) || third) {
 		Trapped = false;
 	}
 	return true;
@@ -2418,9 +2435,9 @@ void Movable::MoveTo(const Point &Des)
 	}
 }
 
-void Movable::Stop()
+void Movable::Stop(int flags)
 {
-	Scriptable::Stop();
+	Scriptable::Stop(flags);
 	ClearPath(true);
 }
 
@@ -2442,11 +2459,11 @@ void Movable::ClearPath(bool resetDestination)
 	PathNode* thisNode = path;
 	while (thisNode) {
 		PathNode* nextNode = thisNode->Next;
-		delete( thisNode );
+		delete thisNode;
 		thisNode = nextNode;
 	}
-	path = NULL;
-	step = NULL;
+	path = nullptr;
+	step = nullptr;
 	//don't call ReleaseCurrentAction
 }
 

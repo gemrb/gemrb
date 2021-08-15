@@ -2190,7 +2190,7 @@ static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 						"ssi", &font, &text, &align );
 
 			String* string = StringFromCString(text);
-			Label* lbl = new Label(rgn, core->GetFont( font ), (string) ? *string : L"" );
+			Label* lbl = new Label(rgn, core->GetFont(font), string ? *string : L"");
 			delete string;
 
 			lbl->SetAlignment( align );
@@ -5578,12 +5578,8 @@ static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
 
-	const char* stats = (const char *)actor->GetStateString();
-#if PY_MAJOR_VERSION >= 3
-	return PyBytes_FromString(stats);
-#else
-	return PyString_FromString(stats);
-#endif
+	auto stats = actor->PCStats->GetStateString();
+	return PyByteArray_FromStringAndSize(stats.c_str(), stats.length());
 }
 
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
@@ -6498,7 +6494,18 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	// clear several fields (only useful for cg; currently needed only in iwd2, but that will change if its system is ported to the rest)
 	// fixes random action bar mess, kill stats, join time ...
 	if (clear) {
-		actor->PCStats->Init(false);
+		PCStatsStruct& oldstats = *actor->PCStats;
+		PCStatsStruct newstats;
+		newstats.ClassLevels = oldstats.ClassLevels;
+		newstats.AwayTime = oldstats.AwayTime;
+		newstats.unknown10 = oldstats.unknown10;
+		newstats.Happiness = oldstats.Happiness;
+		newstats.LastLeft = oldstats.LastLeft;
+		newstats.LastJoined = oldstats.LastJoined;
+		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
+		std::copy(oldstats.States.begin(), oldstats.States.end(), newstats.States.begin());
+		
+		oldstats = newstats;
 	}
 
 	actor->SetOver( false );

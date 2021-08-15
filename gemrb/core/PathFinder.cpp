@@ -140,7 +140,7 @@ bool Map::TargetUnreachable(const Point &s, const Point &d, unsigned int size, b
 		PathNode *thisNode = path;
 		while (thisNode) {
 			PathNode *nextNode = thisNode->Next;
-			delete(thisNode);
+			delete thisNode;
 			thisNode = nextNode;
 		}
 	}

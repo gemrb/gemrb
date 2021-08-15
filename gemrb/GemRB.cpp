@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
 
 	if (core->Init( config ) == GEM_ERROR) {
 		delete config;
-		delete( core );
+		delete core;
 		Log(MESSAGE, "Main", "Aborting due to fatal error...");
 
 		return -1;
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 	delete config;
 
 	core->Main();
-	delete( core );
+	delete core;
 
 	return 0;
 }

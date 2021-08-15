@@ -446,7 +446,7 @@ void TextArea::TrimHistory(size_t lines)
 
 void TextArea::AppendText(const String& text)
 {
-	if ((flags&ClearHistory)) {
+	if (flags & ClearHistory) {
 		ClearHistoryTimer();
 
 		int heightLimit = (ftext->LineHeight * 100); // 100 lines of content
@@ -588,17 +588,17 @@ void TextArea::AddSubviewInFrontOfView(View* front, const View* back)
 {
 	// we dont have a way of retrieving a TextArea's scrollview so
 	// we have no direct way of placing subviews in front of it so we let NULL represent it
-	const View* target = (back) ? back : &scrollview;
+	const View* target = back ? back : &scrollview;
 	View::AddSubviewInFrontOfView(front, target);
 }
 	
 int TextArea::TextHeight() const
 {
-	return (textContainer) ? textContainer->Dimensions().h : 0;
+	return textContainer ? textContainer->Dimensions().h : 0;
 }
 int TextArea::OptionsHeight() const
 {
-	return (selectOptions) ? selectOptions->Dimensions().h : 0;
+	return selectOptions ? selectOptions->Dimensions().h : 0;
 }
 
 int TextArea::ContentHeight() const

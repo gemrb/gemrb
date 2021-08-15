@@ -41,7 +41,7 @@ public:
 	~SaveGameIterator() = default;
 	const charlist& GetSaveGames();
 	void DeleteSaveGame(const Holder<SaveGame>&) const;
-	int CreateSaveGame(Holder<SaveGame>, const char *slotname) const;
+	int CreateSaveGame(Holder<SaveGame>, const char *slotname, bool force = false) const;
 	int CreateSaveGame(int index, bool mqs = false) const;
 	Holder<SaveGame> GetSaveGame(const char *slotname);
 private:

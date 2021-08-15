@@ -119,6 +119,7 @@ def DisplayOverview(step):
 		CancelButton.SetText (13727) # Cancel
 	else:
 		CancelButton.SetText (8159) # Start over
+		CancelButton.SetDisabled(False)
 	CancelButton.SetState (IE_GUI_BUTTON_ENABLED)
 	CancelButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, CancelPress)
 
@@ -299,12 +300,11 @@ def SetButtonStateFromStep (buttonName, button, step):
 def CancelPress():
 	"""Revert back to the first step; if there, free the actor."""
 
-	global CharGenWindow
-	if CharGenWindow:
-		CharGenWindow.Unload ()
-
 	step = GemRB.GetVar ("Step")
 	if step == 1:
+		global CharGenWindow
+		if CharGenWindow:
+			CharGenWindow.Close ()
 		#free up the slot before exiting
 		MyChar = GemRB.GetVar ("Slot")
 		GemRB.CreatePlayer ("", MyChar | 0x8000 )
@@ -345,6 +345,7 @@ def NextPress():
 
 	step = GemRB.GetVar ("Step")
 	if step == 1:
+		CharGenWindow.GetControl(15).SetDisabled(True)
 		GemRB.SetNextScript ("GUICG1")
 	elif step == 2:
 		GemRB.SetNextScript ("GUICG8")

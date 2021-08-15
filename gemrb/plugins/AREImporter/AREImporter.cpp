@@ -164,6 +164,23 @@ static int GetTrackString(const ResRef &areaName)
 	return -1;
 }
 
+static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
+{
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(resref);
+	if (!im) {
+		return nullptr;
+	}
+	
+	auto spr = im->GetSprite2D();
+	if (spr->Format().Bpp > 1) {
+		static const PixelFormat fmt = PixelFormat::Paletted8Bit(nullptr, false);
+		spr->ConvertFormatTo(fmt);
+	}
+	
+	assert(spr->Format().Bpp == 1); // convert format can fail (but never should here)
+	return spr;
+}
+
 static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
@@ -174,40 +191,35 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 		TmpResRef.SNPrintF("%.6sLN", wedref.CString());
 	}
 
-	ResourceHolder<ImageMgr> lm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!lm) {
+	auto lightmap = LoadImageAs8bit(TmpResRef);
+	if (!lightmap) {
 		Log(ERROR, "AREImporter", "No lightmap available.");
-		return NULL;
+		return nullptr;
 	}
 
 	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
 
-	ResourceHolder<ImageMgr> sr = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!sr) {
+	auto searchmap = LoadImageAs8bit(TmpResRef);
+	if (!searchmap) {
 		Log(ERROR, "AREImporter", "No searchmap available.");
-		return NULL;
+		return nullptr;
 	}
 
 	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
 
-	ResourceHolder<ImageMgr> hm = GetResourceHolder<ImageMgr>(TmpResRef);
-	if (!hm) {
+	auto heightmap = LoadImageAs8bit(TmpResRef);
+	if (!heightmap) {
 		Log(ERROR, "AREImporter", "No heightmap available.");
-		return NULL;
+		return nullptr;
 	}
 	
-	assert(lm->GetSize() == sr->GetSize() && lm->GetSize() == hm->GetSize());
-	
-	auto lightmap = lm->GetSprite2D();
-	auto heightmap = hm->GetSprite2D();
-	auto searchmap = sr->GetSprite2D();
-	
-	assert(lightmap->Format().Bpp == 1 && heightmap->Format().Bpp == 1 && searchmap->Format().Bpp == 1);
+	const Size propsize = lightmap->Frame.size;
+	assert(propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
 	fmt.palette = lightmap->GetPalette();
-	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), lm->GetSize()), nullptr, fmt);
+	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
 	auto propit = tileProps->GetIterator();
 	auto end = propit.end(propit);
@@ -527,7 +539,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Log(DEBUG, "AREImporter", "Loading songs");
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (auto& list : map->SongHeader.SongList) {
+	for (auto& list : map->SongList) {
 		str->ReadDword(list);
 	}
 
@@ -639,9 +651,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->ReadResRef(script0);
 		/* ARE 9.1: 4B per position after that. */
 		if (16 == map->version) {
-			str->ReadScalar(pos.x);
-			str->ReadScalar(pos.y);
-			str->Seek(30, GEM_CURRENT_POS);
+			str->ReadPoint(pos); // OverridePoint in NI
+			if (pos.IsZero()) {
+				str->ReadScalar(pos.x); // AlternatePoint in NI
+				str->ReadScalar(pos.y);
+			} else {
+				str->Seek(8, GEM_CURRENT_POS);
+			}
+			str->Seek(26, GEM_CURRENT_POS);
 		} else {
 			str->ReadPoint(pos); // TransitionWalkToX, TransitionWalkToY
 			//maybe we have to store this
@@ -2524,7 +2541,7 @@ int AREImporter::PutSongHeader(DataStream *stream, const Map *map) const
 	ieDword tmpDword = 0;
 
 	memset(filling,0,sizeof(filling) );
-	for (const auto& list : map->SongHeader.SongList) {
+	for (const auto& list : map->SongList) {
 		stream->WriteDword(list);
 	}
 	//day

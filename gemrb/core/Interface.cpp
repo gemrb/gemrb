@@ -1959,6 +1959,7 @@ static const char* const game_flags[GF_COUNT + 1]={
 		"Happiness",          //80GF_HAPPINESS
 		"EfficientORTrigger", //81GF_EFFICIENT_OR
 		"LayeredWaterTiles",  //82GF_LAYERED_WATER_TILES
+		"ClearingActionOverride", // GF_CLEARING_ACTIONOVERRIDE
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -2357,17 +2358,17 @@ inline void SetGroupViewFlags(const std::vector<View*>& views, unsigned int flag
 void Interface::ToggleViewsVisible(bool visible, const ScriptingGroup_t& group)
 {
 	if (game && group == "HIDE_CUT") {
-		game->SetControlStatus(CS_HIDEGUI, (visible) ? OP_NAND : OP_OR );
+		game->SetControlStatus(CS_HIDEGUI, visible ? OP_NAND : OP_OR);
 	}
 
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Invisible, (visible) ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Invisible, visible ? OP_NAND : OP_OR);
 }
 
 void Interface::ToggleViewsEnabled(bool enabled, const ScriptingGroup_t& group) const
 {
 	std::vector<View*> views = GetViews(group);
-	SetGroupViewFlags(views, View::Disabled, (enabled) ? OP_NAND : OP_OR);
+	SetGroupViewFlags(views, View::Disabled, enabled ? OP_NAND : OP_OR);
 }
 
 bool Interface::IsFreezed() const
@@ -3822,11 +3823,13 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 		char NewItem[9];
 
 		if (RtRows.count(itm->ItemResRef) == 0) {
-			if (!gamedata->Exists(itm->ItemResRef, IE_ITM_CLASS_ID)) {
+			const Item* item = gamedata->GetItem(itm->ItemResRef, true);
+			if (!item) {
 				Log(ERROR, "Interface", "Nonexistent random item (bad table entry) detected: %s", itm->ItemResRef.CString());
 				return false;
 			}
-			return true;
+			// try detecting malformed / placeholder items, present in iwd2
+			return item->ItemName != (ieStrRef) -1 || item->ItemNameIdentified != (ieStrRef) -1;
 		}
 		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
 		int i;

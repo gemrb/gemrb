@@ -2988,39 +2988,12 @@ bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
 	return true;
 }
 
-const unsigned char *Actor::GetStateString() const
-{
-	if (!PCStats) {
-		return NULL;
-	}
-	ieByte *tmp = PCStats->PortraitIconString;
-	const ieWord *Icons = PCStats->PortraitIcons;
-	int j=0;
-	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (!(Icons[i]&0xff00)) {
-			tmp[j++]=(ieByte) ((Icons[i]&0xff)+66);
-		}
-	}
-	tmp[j]=0;
-	return tmp;
-}
-
 void Actor::AddPortraitIcon(ieByte icon) const
 {
 	if (!PCStats) {
 		return;
 	}
-	ieWord *Icons = PCStats->PortraitIcons;
-
-	for(int i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (Icons[i]==0xffff) {
-			Icons[i]=icon;
-			return;
-		}
-		if (icon == (Icons[i]&0xff)) {
-			return;
-		}
-	}
+	PCStats->EnableState(icon);
 }
 
 void Actor::DisablePortraitIcon(ieByte icon) const
@@ -3028,14 +3001,7 @@ void Actor::DisablePortraitIcon(ieByte icon) const
 	if (!PCStats) {
 		return;
 	}
-	ieWord *Icons = PCStats->PortraitIcons;
-
-	for (int i = 0; i < MAX_PORTRAIT_ICONS; i++) {
-		if (icon == (Icons[i]&0xff)) {
-			Icons[i]=0xff00|icon;
-			return;
-		}
-	}
+	PCStats->DisableState(icon);
 }
 
 
@@ -3109,7 +3075,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 	if (PCStats) {
-		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
+		PCStats->States = PCStatsStruct::StateArray();
 	}
 	if (SpellStatesSize) {
 		memset(spellStates, 0, sizeof(ieDword) * SpellStatesSize);
@@ -3268,9 +3234,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 
 	// check if any new portrait icon was removed or added
 	if (PCStats) {
-		if (memcmp(PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons)) != 0) {
+		if (PCStats->States != previousStates) {
 			core->SetEventFlag(EF_PORTRAIT);
-			memcpy( PCStats->PreviousPortraitIcons, PCStats->PortraitIcons, sizeof(PCStats->PreviousPortraitIcons) );
+			previousStates = PCStats->States;
 		}
 	}
 	if (Immobile()) {
@@ -3665,7 +3631,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 	}
 
 	// the original had a sourceType == TRIGGER check, but we handle more than ST_TRIGGER
-	Scriptable *caster = area->GetScriptableByGlobalID(fx->CasterID);
+	Scriptable *caster = area ? area->GetScriptableByGlobalID(fx->CasterID) : nullptr;
 	if (savingthrows[type] == IE_SAVEREFLEX && caster && caster->Type != ST_ACTOR) {
 		// loop over all classes and add TRAPSAVE.2DA values to the bonus
 		for (int cls = 0; cls < ISCLASSES; cls++) {
@@ -3677,7 +3643,7 @@ bool Actor::GetSavingThrow(ieDword type, int modifier, const Effect *fx)
 
 	if (savingthrows[type] == IE_SAVEWILL) {
 		// aura of courage
-		if (Modified[IE_EA] < EA_GOODCUTOFF && fx->SourceRef != "SPWI420") {
+		if (Modified[IE_EA] < EA_GOODCUTOFF && fx->SourceRef != "SPWI420" && area) {
 			// look if an ally paladin of at least level 2 is near
 			std::vector<Actor *> neighbours = area->GetAllActorsInRadius(Pos, GA_NO_LOS|GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_NO_ENEMY|GA_NO_NEUTRAL|GA_NO_SELF, 10);
 			for (const Actor *ally : neighbours) {
@@ -4710,7 +4676,7 @@ int Actor::Damage(int damage, int damagetype, Scriptable *hitter, int modtype, i
 	return damage;
 }
 
-void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter)
+void Actor::DisplayCombatFeedback(unsigned int damage, int resisted, int damagetype, const Scriptable *hitter)
 {
 	// shortcircuit for disintegration, which wouldn't hit any of the below
 	if (damage == 0 && resisted == 0) return;
@@ -4802,7 +4768,7 @@ void Actor::DisplayCombatFeedback (unsigned int damage, int resisted, int damage
 
 	hitsound:
 	//Play hit sounds, for pst, resdata contains the armor level
-	DataFileMgr *resdata = core->GetResDataINI();
+	const DataFileMgr *resdata = core->GetResDataINI();
 	PlayHitSound(resdata, damagetype, false);
 }
 
@@ -4843,7 +4809,7 @@ static const char* const dmg_types[5] = { "PC", "SL", "BL", "ML", "RK" };
 
 //Play hit sounds (HIT_0<dtype><armor>)
 //IWDs have H_<dmgtype>_<armor> (including level from 1 to max 5), eg H_ML_MM3
-void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const
+void Actor::PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix) const
 {
 	int type;
 	bool levels = true;
@@ -4917,7 +4883,7 @@ void Actor::PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) cons
 // ... so they're just fully stored in itemsnd.2da
 // iwds also have five sounds of hitting armor (SW_SWD01) that we ignore
 // pst has a lot of duplicates (1&3&6, 2&5, 8&9, 4, 7, 10) and little variation (all 6 entries for 8 are identical)
-void Actor::PlaySwingSound(WeaponInfo &wi) const
+void Actor::PlaySwingSound(const WeaponInfo &wi) const
 {
 	ResRef sound;
 	ieDword itemType = wi.itemtype;
@@ -7123,6 +7089,14 @@ int Actor::GetToHit(ieDword Flags, const Actor *target)
 			generic += GetRacialEnemyBonus(target);
 		}
 		generic += fxqueue.BonusAgainstCreature(fx_tohit_vs_creature_ref, target);
+
+		// close-quarter ranged penalties; let's say roughly max 1 foot apart
+		if (third && (Flags & WEAPON_STYLEMASK) == WEAPON_RANGED && WithinPersonalRange(target, Pos, 2)) {
+			generic -= 4;
+			if (!HasFeat(FEAT_PRECISE_SHOT)) {
+				generic -= 4;
+			}
+		}
 	}
 
 	// add generic bonus
@@ -8045,7 +8019,7 @@ void Actor::SetColorMod(ieDword location, RGBModifier::Type type, int speed,
 	}
 }
 
-void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
+void Actor::SetLeader(const Actor *actor, int xoffset, int yoffset)
 {
 	LastFollowed = actor->GetGlobalID();
 	FollowOffset.x = xoffset;
@@ -8924,7 +8898,7 @@ void Actor::GetVerbalConstantSound(ResRef& Sound, unsigned int index) const
 	}
 }
 
-void Actor::SetActionButtonRow(ActionButtonRow &ar) const
+void Actor::SetActionButtonRow(const ActionButtonRow &ar) const
 {
 	for(int i=0;i<GUIBT_COUNT;i++) {
 		PCStats->QSlots[i] = ar[i];
@@ -9362,7 +9336,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, const Point &target, ieDw
 	}
 
 	ResRef tmp = item->ItemResRef;
-	Item *itm = gamedata->GetItem(tmp, true);
+	const Item *itm = gamedata->GetItem(tmp, true);
 	if (!itm) {
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
 		return false; //quick item slot contains invalid item resref
@@ -9514,7 +9488,8 @@ int Actor::GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, 
 	return sneakAttackDamage;
 }
 
-int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const {
+int Actor::GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const
+{
 	ieDword always = Modified[IE_ALWAYSBACKSTAB];
 	bool invisible = Modified[IE_STATE_ID] & state_invisible;
 	int backstabDamage = damage;
@@ -9550,7 +9525,7 @@ int Actor::GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int 
 	return backstabDamage;
 }
 
-bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword flags, int damage)
+bool Actor::UseItem(ieDword slot, ieDword header, const Scriptable* target, ieDword flags, int damage)
 {
 	if (target->Type!=ST_ACTOR) {
 		return UseItemPoint(slot, header, target->Pos, flags);
@@ -9571,7 +9546,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 		return false;
 
 	ResRef tmp = item->ItemResRef;
-	Item *itm = gamedata->GetItem(tmp);
+	const Item *itm = gamedata->GetItem(tmp);
 	if (!itm) {
 		Log(WARNING, "Actor", "Invalid quick slot item: %s!", tmp.CString());
 		return false; //quick item slot contains invalid item resref
@@ -9625,7 +9600,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, ieDword fl
 	return false;
 }
 
-void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent, bool expend)
+void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *itm, bool silent, bool expend)
 {
 	if (!itm) {
 		item = inventory.GetSlotItem(slot);
@@ -9746,7 +9721,7 @@ void Actor::ClearCurrentStanceAnims()
 	currentStance.shadow.clear();
 }
 
-void Actor::SetUsedWeapon(const char (&AnimationType)[2], ieWord* MeleeAnimation, int wt)
+void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, int wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	if (wt != -1) WeaponType = wt;
@@ -10561,7 +10536,7 @@ void Actor::UseExit(ieDword exitID) {
 // if critical is set, it will return 1/sides on a critical, otherwise it can never
 // return a critical miss when luck is positive and can return a false critical hit
 // Callees with LR_CRITICAL should check if the result matches 1 or size*dice.
-int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, Actor* opponent) const
+int Actor::LuckyRoll(int dice, int size, int add, ieDword flags, const Actor* opponent) const
 {
 	assert(this != opponent);
 
@@ -10669,7 +10644,7 @@ void Actor::ResetState()
 
 // doesn't check the range, but only that the azimuth and the target
 // orientation match with a +/-2 allowed difference
-bool Actor::IsBehind(Actor* target) const
+bool Actor::IsBehind(const Actor* target) const
 {
 	unsigned char tar_orient = target->GetOrientation();
 	// computed, since we don't care where we face
@@ -11226,7 +11201,7 @@ int Actor::UpdateAnimationID(bool derived)
 	return 0;
 }
 
-void Actor::MovementCommand(char *command)
+void Actor::MovementCommand(const char *command)
 {
 	UseExit(0);
 	Stop();
@@ -11302,7 +11277,7 @@ bool Actor::ConcentrationCheck() const
 }
 
 // shorthand wrapper for throw-away effects
-void Actor::ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2)
+void Actor::ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2)
 {
 	Effect *newfx = EffectQueue::CreateEffectCopy(oldfx, newref, param1, param2);
 	if (newfx) {

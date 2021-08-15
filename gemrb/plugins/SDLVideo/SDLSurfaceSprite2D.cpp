@@ -212,6 +212,9 @@ bool SDLSurfaceSprite2D::ConvertFormatTo(const PixelFormat& tofmt) noexcept
 			freePixels = false;
 			surface = MakeHolder<SurfaceHolder>(ns);
 			format.Bpp = tofmt.Bpp;
+			if (ns->format->palette) {
+				SetPaletteFromSurface();
+			}
 			return true;
 		} else {
 			Log(MESSAGE, "SDLSurfaceSprite2D",

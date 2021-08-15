@@ -156,6 +156,7 @@ enum GameFeatureFlags : uint32_t {
 	GF_HAPPINESS,                   	// all except pst and iwd2
 	GF_EFFICIENT_OR,                	// does the OR trigger shortcircuit on success or not? Only in iwd2
 	GF_LAYERED_WATER_TILES,				// TileOverlay for water has an extra half transparent layer (all but BG1)
+	GF_CLEARING_ACTIONOVERRIDE, // bg2, not iwd2
 
 	GF_COUNT // sentinal count
 };

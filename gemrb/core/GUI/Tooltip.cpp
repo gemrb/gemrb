@@ -125,7 +125,7 @@ void Tooltip::SetText(const String& t)
 
 	Font::StringSizeMetrics metrics = {Size(), 0, 0, true};
 	// NOTE: arbitrary fallback size which doesn't come into play with original data
-	metrics.size = (background) ? background->MaxTextSize() : Size(128,128);
+	metrics.size = background ? background->MaxTextSize() : Size(128, 128);
 	textSize = font->StringSize( text, &metrics );
 
 	if (background)

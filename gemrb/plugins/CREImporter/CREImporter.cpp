@@ -299,9 +299,12 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		// luckily they are in order
 		kit = std::log2(kit/0x8000); // 0x8000 is the first cleric kit
 		{
-			const ResRef& ret = domList[index]->FindSpell(level, kit);
-			if (!ret.IsEmpty()) {
-				return ret;
+			const SpellEntry* entry = domList[index];
+			if (entry) {
+				const ResRef& ret = entry->FindSpell(level, kit);
+				if (!ret.IsEmpty()) {
+					return ret;
+				}
 			}
 		}
 		// sigh, retry with wizard spells, since the table does not cover everything npcs have
@@ -316,9 +319,12 @@ static const ResRef& ResolveSpellIndex(int index, int level, ieIWD2SpellType typ
 		kit = std::log2(kit/0x40); // 0x40 is the first mage kit
 		//if it is a specialist spell, return it now
 		{
-			const ResRef& ret = magList[index]->FindSpell(level, kit);
-			if (!ret.IsEmpty()) {
-				return ret;
+			const SpellEntry* entry = magList[index];
+			if (entry) {
+				const ResRef& ret = entry->FindSpell(level, kit);
+				if (!ret.IsEmpty()) {
+					return ret;
+				}
 			}
 		}
 		//fall through
@@ -2190,7 +2196,7 @@ int CREImporter::GetStoredFileSize(const Actor *actor)
 	ItemSlotsOffset = headersize;
 
 	//adding itemslot table size and equipped slot fields
-	headersize += (Inventory_Size) * sizeof(ieWord) + sizeof(ieWord) * 2;
+	headersize += Inventory_Size * sizeof(ieWord) + sizeof(ieWord) * 2;
 	ItemsOffset = headersize;
 
 	//counting items (calculating item storage)

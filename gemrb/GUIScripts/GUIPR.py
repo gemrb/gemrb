@@ -282,7 +282,7 @@ def OpenPriestSpellUnmemorizeWindow (btn, val):
 	Button.SetText (17507)
 	def Unmemorize(btn, val):
 		OnPriestUnmemorizeSpell(btn, val)
- 		Window.Close()
+		Window.Close()
 	
 	Button.SetEvent (IE_GUI_BUTTON_ON_PRESS, lambda: Unmemorize(btn, val))
 	Button.MakeDefault()

@@ -798,7 +798,7 @@ void GameScript::SetCursorState(Scriptable* /*Sender*/, Action* parameters)
 	int active = parameters->int0Parameter;
 
 	Game *game = core->GetGame();
-	game->SetControlStatus(CS_HIDEGUI, (active) ? OP_OR : OP_NAND );
+	game->SetControlStatus(CS_HIDEGUI, active ? OP_OR : OP_NAND);
 	if (active) {
 		core->GetWindowManager()->SetCursorFeedback(WindowManager::MOUSE_NONE);
 	} else {
@@ -820,7 +820,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 {
 	GameScript* gs = new GameScript(ResRef(parameters->string0Parameter), Sender);
 	gs->EvaluateAllBlocks();
-	delete( gs );
+	delete gs;
 }
 
 // StartCutScene("my_nifty_cut_scene") = StartCutSceneEx("my_nifty_cut_scene",FALSE)
@@ -1413,7 +1413,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* target = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* target = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!target) {
 		Sender->ReleaseCurrentAction();
 		return;
@@ -1422,7 +1422,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 	//follow leader from a distance of 5
 	//could also follow the leader with a point offset
 	if (target->Type==ST_ACTOR) {
-		actor->SetLeader( (Actor *) target, 5);
+		actor->SetLeader((const Actor *) target, 5);
 	}
 	MoveNearerTo(Sender, target, MAX_OPERATING_DISTANCE);
 }
@@ -1918,7 +1918,7 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 	if (parameters->int0Parameter >= 10) return;
 	Map *map = Sender->GetCurrentArea();
 	if (!map) return;
-	map->SongHeader.SongList[parameters->int0Parameter]=parameters->int1Parameter;
+	map->SongList[parameters->int0Parameter] = parameters->int1Parameter;
 }
 
 //optional integer parameter (isSpeech)
@@ -1980,7 +1980,6 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
 	// needeed in pst #532, but softly breaks bg2 #1179
@@ -2435,6 +2434,11 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	if (flag&DOOR_OPEN) {
 		flag&=~DOOR_OPEN;
 		door->SetDoorOpen(parameters->int1Parameter!=0, false, 0);
+	}
+	// take care of iwd2 flag bit differences as in AREIMporter's FixIWD2DoorFlags
+	// ... it matters for exactly 1 user from the original data (20ctord3.bcs)
+	if (core->HasFeature(GF_3ED_RULES) && flag == DOOR_KEY) {
+		flag = DOOR_TRANSPARENT;
 	}
 
 	if (parameters->int1Parameter) {
@@ -3548,14 +3552,22 @@ void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 	while(i--) {
 		Actor* act = map->GetActor(i,true);
 		if (act && act != Sender && act->ValidTarget(GA_NO_DEAD)) {
-			if (!(act->GetInternalFlag() & IF_NOINT)) {
-				act->Stop();
-				act->SetModal(MS_NONE);
-			}
+			act->Stop(3);
+			act->SetModal(MS_NONE);
 		}
+	}
+
+	// bg2 also sometimes cleared baldur.bcs, while area scripts were left untouched
+	const Map* area = Sender->GetCurrentArea();
+	if (!area) return;
+	if (Sender->Type != ST_GLOBAL && area->MasterArea) {
+		// clear game script if area is a master area
+		// clear game script if Sender is in master area
+		core->GetGame()->Stop();
 	}
 }
 
+// clear the queue, leaving the current action intact if it is non-interruptible
 void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = Sender;
@@ -3567,8 +3579,12 @@ void GameScript::ClearActions(Scriptable* Sender, Action* parameters)
 			return;
 		}
 	}
-	if (!(tar->GetInternalFlag() & IF_NOINT)) {
-		tar->Stop();
+
+	tar->Stop(3);
+
+	if (tar->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) tar;
+		actor->SetModal(MS_NONE);
 	}
 }
 
@@ -5921,7 +5937,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		snprintf (FolderName, sizeof(FolderName), "%s - %s", basename, str);
 		free(str);
 
-		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName);
+		core->GetSaveGameIterator()->CreateSaveGame(core->GetSaveGameIterator()->GetSaveGame(FolderName), FolderName, true);
 	} else {
 		core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter);
 	}
@@ -6528,7 +6544,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetStoredActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetStoredActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;

@@ -46,10 +46,9 @@ MUSImporter::MUSImporter()
 
 MUSImporter::~MUSImporter()
 {
-	if (str) {
-		delete( str );
-	}
+	delete str;
 }
+
 /** Initializes the PlayList Manager */
 bool MUSImporter::Init()
 {

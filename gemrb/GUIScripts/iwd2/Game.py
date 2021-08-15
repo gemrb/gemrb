@@ -20,6 +20,7 @@
 ###################################################
 
 import GemRB
+import GUICommon
 import MessageWindow
 from GameCheck import MAX_PARTY_SIZE
 
@@ -27,6 +28,7 @@ def EnterGame():
 	GemRB.GameSetPartySize(MAX_PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.SetDefaultActions(1,14,16,17)
+	GUICommon.SetSaveDir ()
 
 	MessageWindow.OnLoad()
 

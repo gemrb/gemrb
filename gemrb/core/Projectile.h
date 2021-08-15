@@ -267,8 +267,7 @@ protected:
 	Animation* shadow[MAX_ORIENT];
 	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
 	EffectQueue* effects;
-	Projectile **children;
-	int child_size;
+	std::vector<Projectile*> children;
 	int pathcounter;
 	int bend;
 	int drawSpark;

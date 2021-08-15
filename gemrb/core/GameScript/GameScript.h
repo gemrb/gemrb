@@ -145,18 +145,10 @@ struct targettype {
 using targetlist = std::list<targettype>;
 
 class GEM_EXPORT Targets {
-public:
-	Targets()
-	{
-	}
-
-	~Targets()
-	{
-		Clear();
-	}
-private:
 	targetlist objects;
 public:
+	Targets() noexcept = default;
+	
 	int Count() const;
 	void dump() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
@@ -177,7 +169,7 @@ protected:
 	{
 		canary = (unsigned long) 0xdeadbeef;
 	}
-	~Canary() // protected destructor
+	virtual ~Canary() // protected destructor
 	{
 		AssertCanary("Destroying Canary");
 		canary = 0xdddddddd;
@@ -196,19 +188,14 @@ protected:
 
 class GEM_EXPORT Object : protected Canary {
 public:
-	Object()
-	{
-		memset( objectName, 0, 65 );
-		memset( objectFields, 0, MAX_OBJECT_FIELDS * sizeof( int ) );
-		memset( objectFilters, 0, MAX_NESTING * sizeof( int ) );
-	}
-public:
-	int objectFields[MAX_OBJECT_FIELDS];
-	int objectFilters[MAX_NESTING];
+	int objectFields[MAX_OBJECT_FIELDS]{};
+	int objectFilters[MAX_NESTING]{};
 	Region objectRect{};
-	char objectName[65];
+	char objectName[65]{};
 
 public:
+	Object() = default;
+
 	void dump() const;
 	void dump(StringBuffer&) const;
 	void Release()
@@ -218,38 +205,27 @@ public:
 	bool isNull() const;
 };
 
-class GEM_EXPORT Trigger : protected Canary {
+class GEM_EXPORT Trigger final : protected Canary {
 public:
-	Trigger()
-	{
-		triggerID = 0;
-		flags = 0;
-		objectParameter = NULL;
-		memset(string0Parameter, 0, 65);
-		memset(string1Parameter, 0, 65);
-		int0Parameter = 0;
-		int1Parameter = 0;
-		int2Parameter = 0;
-		pointParameter.reset();
-	}
-	~Trigger()
+	Trigger() = default;
+	~Trigger() final
 	{
 		if (objectParameter) {
 			objectParameter->Release();
-			objectParameter = NULL;
+			objectParameter = nullptr;
 		}
 	}
 	int Evaluate(Scriptable *Sender) const;
 
-	unsigned short triggerID;
-	int int0Parameter;
-	int flags;
-	int int1Parameter;
-	int int2Parameter;
+	unsigned short triggerID = 0;
+	int int0Parameter = 0;
+	int flags = 0;
+	int int1Parameter = 0;
+	int int2Parameter = 0;
 	Point pointParameter;
-	char string0Parameter[65];
-	char string1Parameter[65];
-	Object* objectParameter;
+	char string0Parameter[65]{};
+	char string1Parameter[65]{};
+	Object* objectParameter = nullptr;
 
 	void dump() const;
 	void dump(StringBuffer&) const;
@@ -260,9 +236,9 @@ public:
 	}
 };
 
-class GEM_EXPORT Condition : protected Canary {
+class GEM_EXPORT Condition final : protected Canary {
 public:
-	~Condition()
+	~Condition() final
 	{
 		for (auto& trigger : triggers) {
 			if (trigger) {
@@ -280,7 +256,7 @@ public:
 	std::vector<Trigger*> triggers;
 };
 
-class GEM_EXPORT Action : protected Canary {
+class GEM_EXPORT Action final : protected Canary {
 public:
 	explicit Action(bool autoFree)
 	{
@@ -291,7 +267,7 @@ public:
 			RefCount = 1; //one reference held by the script
 		}
 	}
-	~Action()
+	~Action() final
 	{
 		for (auto& object : objects) {
 			if (object) {
@@ -343,13 +319,10 @@ public:
 	}
 };
 
-class GEM_EXPORT Response : protected Canary {
+class GEM_EXPORT Response final : protected Canary {
 public:
-	Response()
-	{
-		weight = 0;
-	}
-	~Response()
+	Response() = default;
+	~Response() final
 	{
 		for (auto& action : actions) {
 			if (action) {
@@ -367,13 +340,13 @@ public:
 	}
 	int Execute(Scriptable* Sender);
 
-	unsigned char weight;
+	unsigned char weight = 0;
 	std::vector<Action*> actions;
 };
 
-class GEM_EXPORT ResponseSet : protected Canary {
+class GEM_EXPORT ResponseSet final : protected Canary {
 public:
-	~ResponseSet()
+	~ResponseSet() final
 	{
 		for (auto& response : responses) {
 			response->Release();
@@ -389,22 +362,18 @@ public:
 	std::vector<Response*> responses;
 };
 
-class GEM_EXPORT ResponseBlock : protected Canary {
+class GEM_EXPORT ResponseBlock final : protected Canary {
 public:
-	ResponseBlock()
-	{
-		condition = NULL;
-		responseSet = NULL;
-	}
-	~ResponseBlock()
+	ResponseBlock() = default;
+	~ResponseBlock() final
 	{
 		if (condition) {
 			condition->Release();
-			condition = NULL;
+			condition = nullptr;
 		}
 		if (responseSet) {
 			responseSet->Release();
-			responseSet = NULL;
+			responseSet = nullptr;
 		}
 	}
 	void Release()
@@ -412,13 +381,13 @@ public:
 		delete this;
 	}
 
-	Condition* condition;
-	ResponseSet* responseSet;
+	Condition* condition = nullptr;
+	ResponseSet* responseSet = nullptr;
 };
 
-class GEM_EXPORT Script : protected Canary {
+class GEM_EXPORT Script final : protected Canary {
 public:
-	~Script()
+	~Script() final
 	{
 		for (auto& responseBlock : responseBlocks) {
 			if (responseBlock) {

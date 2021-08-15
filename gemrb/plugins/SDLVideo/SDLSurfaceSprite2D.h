@@ -85,12 +85,12 @@ public:
 // it would probably be better to not inherit from SDLSurfaceSprite2D
 // the hard part is handling the palettes ourselves
 class SDLTextureSprite2D : public SDLSurfaceSprite2D {
-	struct TextureHolder : public Held<TextureHolder>
+	struct TextureHolder final : public Held<TextureHolder>
 	{
 		SDL_Texture* texture;
 
 		explicit TextureHolder(SDL_Texture* tex) : texture(tex) {}
-		~TextureHolder() { SDL_DestroyTexture(texture); }
+		~TextureHolder() final { SDL_DestroyTexture(texture); }
 
 		SDL_Texture* operator->() const { return texture; }
 		operator SDL_Texture* () const { return texture; }

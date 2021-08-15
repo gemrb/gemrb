@@ -308,6 +308,7 @@ public:
 	ResRef BackstabResRef = "*";         //apply on successful backstab
 
 	PCStatsStruct*  PCStats;
+	PCStatsStruct::StateArray previousStates;
 	ResRef SmallPortrait;
 	ResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
@@ -453,7 +454,7 @@ private:
 	void SetupFistData() const;
 	void UpdateFatigue();
 	int GetSneakAttackDamage(Actor *target, WeaponInfo &wi, int &multiplier, bool weaponImmunity);
-	int GetBackstabDamage(Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
+	int GetBackstabDamage(const Actor *target, WeaponInfo &wi, int multiplier, int damage) const;
 	/** for IE_EXISTANCEDELAY */
 	void PlayExistenceSounds();
 	ieDword GetKitIndex (ieDword kit, ieDword baseclass=0) const;
@@ -525,7 +526,7 @@ public:
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	/** Modifies the base stat value in different ways, returns difference */
 	int NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
-	void SetLeader(Actor *actor, int xoffset=0, int yoffset=0);
+	void SetLeader(const Actor *actor, int xoffset = 0, int yoffset = 0);
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0);
@@ -629,12 +630,12 @@ public:
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Scriptable *hitter, int modtype=MOD_ADDITIVE, int critical=0, int saveflags=0);
 	/* displays the damage taken and other details (depends on the game type) */
-	void DisplayCombatFeedback (unsigned int damage, int resisted, int damagetype, Scriptable *hitter);
+	void DisplayCombatFeedback(unsigned int damage, int resisted, int damagetype, const Scriptable *hitter);
 	/* play a random footstep sound */
 	void PlayWalkSound();
 	/* play the proper hit sound (in pst) */
-	void PlayHitSound(DataFileMgr *resdata, int damagetype, bool suffix) const;
-	void PlaySwingSound(WeaponInfo &wi) const;
+	void PlayHitSound(const DataFileMgr *resdata, int damagetype, bool suffix) const;
+	void PlaySwingSound(const WeaponInfo &wi) const;
 	/* drops items from inventory to current spot */
 	void DropItem(const ResRef& resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
@@ -754,7 +755,7 @@ public:
 	/* generate party banter, return true if successful */
 	bool GetPartyComment();
 	/* sets the quick slots */
-	void SetActionButtonRow(ActionButtonRow &ar) const;
+	void SetActionButtonRow(const ActionButtonRow &ar) const;
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs);
 	/* converts the iwd2 qslot index to our internal representation */
@@ -805,8 +806,6 @@ public:
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
 	int GetConHealAmount() const;
-	/* returns the portrait icons list */
-	const unsigned char *GetStateString() const;
 	/* adds a state icon to the list */
 	void AddPortraitIcon(ieByte icon) const;
 	/* disables a state icon in the list, doesn't remove it! */
@@ -819,9 +818,9 @@ public:
 	bool TryUsingMagicDevice(const Item* item, ieDword header);
 	bool RequiresUMD(const Item* item) const;
 	bool UseItemPoint(ieDword slot, ieDword header, const Point &point, ieDword flags);
-	bool UseItem(ieDword slot, ieDword header, Scriptable *target, ieDword flags, int damage = 0);
+	bool UseItem(ieDword slot, ieDword header, const Scriptable *target, ieDword flags, int damage = 0);
 	/* Deducts a charge from an item */
-	void ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent, bool expend = true);
+	void ChargeItem(ieDword slot, ieDword header, CREItem *item, const Item *itm, bool silent, bool expend = true);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	static int IsReverseToHit();
 	/* initialize the action buttons based on class. If forced, it will override
@@ -834,7 +833,7 @@ public:
 	int GetFeat(unsigned int feat) const;
 	void SetFeat(unsigned int feat, int mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
-	void SetUsedWeapon(const char (&AnimationType)[2], ieWord *MeleeAnimation,
+	void SetUsedWeapon(const char (&AnimationType)[2], const ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char (&AnimationType)[2], int WeaponType=-1);
 	void SetUsedHelmet(const char (&AnimationType)[2]);
@@ -901,7 +900,7 @@ public:
 	void UseExit(ieDword exitID);
 	//int GetReaction() const;
 	/* Similar to Roll, but takes luck into account */
-	int LuckyRoll(int dice, int size, int add, ieDword flags=LR_CRITICAL, Actor* opponent=NULL) const;
+	int LuckyRoll(int dice, int size, int add, ieDword flags = LR_CRITICAL, const Actor* opponent = nullptr) const;
 	/* removes normal invisibility (type 0) */
 	void CureInvisibility();
 	/* removes sanctuary */
@@ -909,7 +908,7 @@ public:
 	/* resets the invisibility, sanctuary and modal states */
 	void ResetState();
 	/* checks whether the actor is behind the target */
-	bool IsBehind(Actor* target) const;
+	bool IsBehind(const Actor* target) const;
 	/* checks whether the target is the actor's racial enemy */
 	int GetRacialEnemyBonus(const Actor *target) const;
 	/* checks whether the actor can stay in the current modal state */
@@ -949,7 +948,7 @@ public:
 	bool IsDead() const;
 	bool IsInvisibleTo(const Scriptable *checker) const;
 	int UpdateAnimationID(bool derived);
-	void MovementCommand(char *command);
+	void MovementCommand(const char *command);
 	/* shows hp/maxhp as overhead text */
 	bool HasVisibleHP() const;
 	void DisplayHeadHPRatio();
@@ -962,7 +961,7 @@ public:
 	ieDword GetDisarmingTrap() const { return disarmTrap; }
 	void ReleaseCurrentAction() override;
 	bool ConcentrationCheck() const;
-	void ApplyEffectCopy(Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
+	void ApplyEffectCopy(const Effect *oldfx, EffectRef &newref, Scriptable *Owner, ieDword param1, ieDword param2);
 	tick_t GetLastRested() const { return TicksLastRested; }
 	void IncreaseLastRested(int inc) { TicksLastRested += inc; LastFatigueCheck += inc; }
 	bool WasClass(ieDword oldClassID) const;

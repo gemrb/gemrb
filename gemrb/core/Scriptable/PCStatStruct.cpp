@@ -25,50 +25,8 @@
 
 namespace GemRB {
 
-void PCStatsStruct::Init(bool all)
-{
-	BestKilledName = 0xffffffff;
-	BestKilledXP = 0;
-	KillsChapterXP = 0;
-	KillsChapterCount = 0;
-	KillsTotalXP = 0;
-	KillsTotalCount = 0;
-	std::fill(std::begin(FavouriteSpells), std::end(FavouriteSpells), ResRef());
-	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
-	std::fill(std::begin(FavouriteWeapons), std::end(FavouriteWeapons), ResRef());
-	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
-	memset(QSlots, 0, sizeof(QSlots));
-	QSlots[0]=0xff;
-	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
-	memset( QuickItemSlots, -1, sizeof(QuickItemSlots) );
-	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
-	memset( QuickWeaponSlots, -1, sizeof(QuickWeaponSlots) );
-	memset( QuickWeaponHeaders, -1, sizeof(QuickWeaponHeaders) );
-	memset( ExtraSettings, 0, sizeof(ExtraSettings) );
-	JoinDate = 0;
-	if (!all) {
-		return;
-	}
-	// move them up as needed
-	AwayTime = 0;
-	unknown10 = 0;
-	Happiness = 0;
-	SoundFolder[0]=0;
-	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
-	memset( PreviousPortraitIcons, -1, sizeof(PreviousPortraitIcons) );
-	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
-	LastLeft = 0;
-	LastJoined = 0;
-}
-
-PCStatsStruct::PCStatsStruct()
-{
-	Init();
-}
-
 PCStatsStruct::PCStatsStruct(const std::list<int>& levels)
 {
-	Init();
 	UpdateClassLevels(levels);
 }
 
@@ -102,9 +60,7 @@ PCStatsStruct& PCStatsStruct::operator=(const PCStatsStruct &source)
 	Happiness = source.Happiness;
 	SoundSet = source.SoundSet;
 	strlcpy(SoundFolder, source.SoundFolder, SOUNDFOLDERSIZE-1);
-	memcpy(PortraitIcons, source.PortraitIcons, sizeof(PortraitIcons));
-	memcpy(PreviousPortraitIcons, source.PreviousPortraitIcons, sizeof(PreviousPortraitIcons));
-	memcpy(PortraitIconString, source.PortraitIconString, sizeof(PortraitIconString));
+	States = source.States;
 	LastLeft = source.LastLeft;
 	LastJoined = source.LastJoined;
 	UpdateClassLevels(source.ClassLevels);
@@ -336,6 +292,42 @@ void PCStatsStruct::RegisterFavourite(const ResRef& fav, int what)
 		cntpoi[minpos] = cntpoi[pos];
 		//store the old count to the last position
 		cntpoi[pos] = mincnt;
+	}
+}
+
+std::string PCStatsStruct::GetStateString() const
+{
+	std::string str;
+	str.reserve(MAX_PORTRAIT_ICONS);
+	for (const auto& state : States) {
+		if (state.enabled) {
+			str.push_back(state.state + 66);
+		}
+	}
+	return str;
+}
+
+void PCStatsStruct::EnableState(state_t icon)
+{	
+	for (auto& state : States) {
+		if (state.state == InvalidState) {
+			state.state = icon;
+			state.enabled = true;
+			return;
+		} else if (state.state == icon) {
+			state.enabled = true;
+			return;
+		}
+	}
+}
+
+void PCStatsStruct::DisableState(state_t icon)
+{
+	for (auto& state : States) {
+		if (state.state == icon) {
+			state.enabled = false;
+			return;
+		}
 	}
 }
 

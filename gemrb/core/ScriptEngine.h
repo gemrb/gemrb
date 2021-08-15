@@ -145,7 +145,7 @@ public:
 		}
 
 		const std::type_info& Type() const {
-			return (ptr) ? ptr->Type() : typeid(void);
+			return ptr ? ptr->Type() : typeid(void);
 		}
 
 		template <typename T>

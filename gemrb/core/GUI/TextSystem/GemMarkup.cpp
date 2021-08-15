@@ -91,13 +91,15 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						// else is a parse error...
 						continue;
 					case ']':
+						state = TEXT;
 						if (token == L"cap") {
 							attributes.SwapFonts();
 							//align = IE_FONT_SINGLE_LINE;
 						} else if (token == L"p") {
 							frame.w = -1;
+						} else if (token == L"int") {
+							state = INT;
 						}
-						state = TEXT;
 						token.clear();
 						continue;
 					case '[': // wasn't actually a tag after all
@@ -124,8 +126,15 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				}
 				break;
 			case TEXT:
+			case INT:
 				switch (*it) {
 					case '[':
+						if (state == INT) {
+							// state icons, invalid as unicode, so we cant translate in Python
+							wchar_t chr = (wchar_t)wcstoul(token.c_str(), nullptr, 0);
+							token.clear();
+							token.push_back(chr);
+						}
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text

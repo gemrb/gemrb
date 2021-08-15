@@ -42,9 +42,7 @@ BIFImporter::BIFImporter(void)
 
 BIFImporter::~BIFImporter(void)
 {
-	if (stream) {
-		delete( stream );
-	}
+	delete stream;
 	if (fentries) {
 		delete[] fentries;
 	}
@@ -104,10 +102,8 @@ DataStream* BIFImporter::DecompressBIF(DataStream* compressed, const char* /*pat
 
 int BIFImporter::OpenArchive(const char* path)
 {
-	if (stream) {
-		delete( stream );
-		stream = NULL;
-	}
+	delete stream;
+	stream = nullptr;
 
 	char filename[_MAX_PATH];
 	ExtractFileFromPath(filename, path);
