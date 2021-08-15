@@ -1980,7 +1980,6 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
 	actor->DestroySelf();
 	// needeed in pst #532, but softly breaks bg2 #1179

@@ -1995,6 +1995,7 @@ void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
 	if (actor) {
+		actor->Stop(); // just in case
 		Game *game = core->GetGame();
 		//this makes sure that a PC will be demoted to NPC
 		game->LeaveParty( actor );
