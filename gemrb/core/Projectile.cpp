@@ -123,6 +123,7 @@ void Projectile::CreateAnimations(Animation **anims, const ResRef& bamres, int S
 	if (Aim>Max) Aim=Max;
 
 	if(ExtFlags&PEF_PILLAR) {
+		Aim = Max;
 		CreateCompositeAnimation(anims, af, Seq);
 	} else {
 		CreateOrientedAnimations(anims, af, Seq);
