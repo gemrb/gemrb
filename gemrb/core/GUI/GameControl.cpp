@@ -2005,6 +2005,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point& p)
 {
+	if (!actor) return false;
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
