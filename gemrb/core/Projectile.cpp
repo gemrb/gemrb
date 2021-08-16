@@ -46,35 +46,9 @@ static ProjectileServer *server = NULL;
 
 Projectile::Projectile()
 {
-	area = NULL;
-	palette = NULL;
-	Destination = Pos;
-	Orientation = 0;
-	NewOrientation = 0;
-	path = NULL;
-	step = NULL;
-	timeStartStep = 0;
-	phase = P_UNINITED;
-	effects = NULL;
-	memset(travel, 0, sizeof(travel)) ;
-	memset(shadow, 0, sizeof(shadow)) ;
-	light = NULL;
-	pathcounter = 0x7fff;
-	FakeTarget = 0;
-	bend = 0;
-	drawSpark = 0;
-	ZPos = 0;
-	extension_delay = 0;
-	Range = 0;
-	ColorSpeed = Shake = TFlags = Seq1 = Seq2 = ExtFlags = 0;
-	IDSType = IDSValue = IDSType2 = IDSValue2 = StrRef = 0;
-	LightX = LightY = LightZ = Aim = type = SparkColor = 0;
-	SmokeSpeed = SmokeAnimID = Caster = Target = Level = 0;
-	extension_explosioncount = extension_targetcount = 0;
-	Speed = 20;
-	SFlags = PSF_FLYING;
-	if (!server)
+	if (!server) {
 		server = core->GetProjectileServer();
+	}
 }
 
 Projectile::~Projectile()

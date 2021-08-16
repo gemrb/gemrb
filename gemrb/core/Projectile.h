@@ -197,80 +197,82 @@ public:
 	Projectile();
 	~Projectile();
 
-	ieWord Speed;
-	ieDword SFlags;
+	ieWord Speed = 20;
+	ieDword SFlags = PSF_FLYING;
 	ResRef FiringSound;
 	ResRef ArrivalSound;
 	ResRef TravelVVC;
-	ieDword SparkColor;
-	ieDword ExtFlags;
-	ieDword StrRef;
+	ieDword SparkColor = 0;
+	ieDword ExtFlags = 0;
+	ieDword StrRef = 0;
 	Color RGB;
-	ieWord ColorSpeed;
-	ieWord Shake;
-	ieWord IDSType;
-	ieWord IDSValue;
-	ieWord IDSType2;
-	ieWord IDSValue2;
+	ieWord ColorSpeed = 0;
+	ieWord Shake = 0;
+	ieWord IDSType = 0;
+	ieWord IDSValue = 0;
+	ieWord IDSType2 = 0;
+	ieWord IDSValue2 = 0;
 	ResRef failureSpell;
 	ResRef successSpell;
 	////// gap
-	ieDword TFlags;
+	ieDword TFlags = 0;
 	ResRef BAMRes1;
 	ResRef BAMRes2;
-	ieByte Seq1, Seq2;
-	ieWord LightX;
-	ieWord LightY;
-	ieWord LightZ;
+	ieByte Seq1 = 0;
+	ieByte Seq2 = 0;
+	ieWord LightX = 0;
+	ieWord LightY = 0;
+	ieWord LightZ = 0;
 	ResRef PaletteRes;
 	ieByte Gradients[7];
-	ieByte SmokeSpeed;
+	ieByte SmokeSpeed = 0;
 	ieByte SmokeGrad[7];
-	ieByte Aim; // original bg2: m_numDirections // list of {1, 5, 9}
-	ieWord SmokeAnimID;
+	ieByte Aim = 0; // original bg2: m_numDirections, a list of {1, 5, 9}
+	ieWord SmokeAnimID = 0;
 	ResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
-	unsigned int Range;
+	unsigned int Range = 0;
 	//these are public but not in the .pro file
 	Holder<ProjectileExtension> Extension;
-	PaletteHolder palette;
+	PaletteHolder palette = nullptr;
 	//internals
 protected:
 	ResRef smokebam;
-	ieDword timeStartStep;
+	ieDword timeStartStep = 0;
 	//attributes from moveable object
-	unsigned char Orientation, NewOrientation;
-	PathNode* path; //whole path
-	PathNode* step; //actual step
+	unsigned char Orientation = 0;
+	unsigned char NewOrientation = 0;
+	PathNode* path = nullptr; // whole path
+	PathNode* step = nullptr; // actual step
 	//similar to normal actors
-	Map *area;
+	Map *area = nullptr;
 	Point Pos = Point(-1, -1);
-	int ZPos;
-	Point Destination;
+	int ZPos = 0;
+	Point Destination = Pos;
 	Point Origin;
-	ieDword Caster;    //the globalID of the caster actor
-	int Level;         //the caster's level
-	ieDword Target;    //the globalID of target actor
-	ieDword FakeTarget; //a globalID for target that isn't followed
-	int phase;
+	ieDword Caster = 0;    // the globalID of the caster actor
+	int Level = 0;         // the caster's level
+	ieDword Target = 0;    // the globalID of target actor
+	ieDword FakeTarget = 0; // a globalID for target that isn't followed
+	int phase = P_UNINITED;
 	//saved in area
 	ResRef projectileName; // used also for namesake externalized spells
-	ieWord type;
+	ieWord type = 0;
 	//these come from the extension area
-	int extension_delay;
-	int extension_explosioncount;
-	int extension_targetcount;
+	int extension_delay = 0;
+	int extension_explosioncount = 0;
+	int extension_targetcount = 0;
 	Color tint;
 
 	//special (not using char animations)
-	Animation* travel[MAX_ORIENT];
-	Animation* shadow[MAX_ORIENT];
-	Holder<Sprite2D> light;//this is just a round/halftrans sprite, has no animation
-	EffectQueue* effects;
+	Animation* travel[MAX_ORIENT]{};
+	Animation* shadow[MAX_ORIENT]{};
+	Holder<Sprite2D> light = nullptr; // this is just a round/halftrans sprite, has no animation
+	EffectQueue* effects = nullptr;
 	std::vector<Projectile*> children;
-	int pathcounter;
-	int bend;
-	int drawSpark;
+	int pathcounter = 0x7fff;
+	int bend = 0;
+	int drawSpark = 0;
 	Holder<SoundHandle> travel_handle;
 public:
 	void SetCaster(ieDword t, int level);
