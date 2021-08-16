@@ -7114,7 +7114,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	}
 
 	//vvc type
-	fx->Parameter2 = parameters->int0Parameter;
+	fx->Parameter2 = parameters->int0Parameter + 0x1001;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
 	fx->Parameter4 = 1; // mark for special treatment
