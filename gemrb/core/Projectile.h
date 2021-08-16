@@ -236,7 +236,7 @@ public:
 	Holder<ProjectileExtension> Extension;
 	PaletteHolder palette = nullptr;
 	//internals
-protected:
+private:
 	ResRef smokebam;
 	ieDword timeStartStep = 0;
 	//attributes from moveable object
