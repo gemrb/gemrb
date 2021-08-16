@@ -6400,7 +6400,10 @@ void Actor::SetDialog(const ResRef &resref)
 
 Holder<Sprite2D> Actor::CopyPortrait(int which) const
 {
-	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(which ? SmallPortrait : LargePortrait, true);
+	ResRef portrait = which ? SmallPortrait : LargePortrait;
+	if (portrait == "none") return nullptr; // skip our fallback
+
+	ResourceHolder<ImageMgr> im = GetResourceHolder<ImageMgr>(portrait, true);
 	return im ? im->GetSprite2D() : nullptr;
 }
 
