@@ -963,7 +963,7 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
 
-//IWD2, sets the homepoint P
+// IWD2, sets the *homepoint* P — the iwd version of SetHomeLocation
 // handle [-1.-1] specially, if needed; ar6200.bcs has interesting use
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 {
@@ -971,9 +971,7 @@ void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetBase(IE_SAVEDXPOS, parameters->pointParameter.x);
-	actor->SetBase(IE_SAVEDYPOS, parameters->pointParameter.y);
-	actor->SetBase(IE_SAVEDFACE, parameters->int0Parameter);
+	actor->HomeLocation = parameters->pointParameter;
 }
 
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
