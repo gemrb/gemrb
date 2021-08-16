@@ -1973,17 +1973,28 @@ SrcVector *LoadSrc(const ResRef& resname)
 
 // checks the odd HasAdditionalRect / ADDITIONAL_RECT matching
 // also returns true if the trigger is supposed to succeed
+// formats supported by the originals:
+// Normal (disabled) - If either the first or second parameter is negative.
+// Point form: [x.y.range.unused] - If the fourth parameter is negative.
+// Rect form: [left.top.right.bottom] (which we convert to a normal Region on load)
 bool IsInObjectRect(const Point &pos, const Region &rect)
 {
 	if (!HasAdditionalRect) return true;
-	if (rect.w <= 0 || rect.h <= 0) return true;
+	if (rect.x < 0 || rect.y < 0) return true;
+	if (rect.w <= 0) return true;
 
 	// iwd2: testing shows the first point must be 0.0 for matching to work
 	if (core->HasFeature(GF_3ED_RULES) && !rect.origin.IsZero()) {
 		return false;
 	}
 
-	return rect.PointInside(pos);
+	// point or rect?
+	if (rect.h <= 0) {
+		unsigned int range = rect.w;
+		return SquaredDistance(pos, rect.origin) <= range * range;
+	} else {
+		return rect.PointInside(pos);
+	}
 }
 
 #define MEMCPY(a,b) memcpy((a),(b),sizeof(a) )
