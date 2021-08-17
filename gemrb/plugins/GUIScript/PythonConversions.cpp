@@ -132,7 +132,6 @@ PyStringWrapper PyString_AsString(PyObject* obj)
 		wrap.str = PyBytes_AS_STRING(obj);
 	} else if (PyObject_TypeCheck(obj, &PyByteArray_Type)) {
 		wrap.str = PyByteArray_AS_STRING(obj);
-		auto cstr = wrap.str;
 	}
 	return wrap;
 }
