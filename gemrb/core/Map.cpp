@@ -3769,7 +3769,7 @@ void Map::Sparkle(ieDword duration, ieDword color, ieDword type, const Point &po
 void Map::ClearTrap(Actor *actor, ieDword InTrap) const
 {
 	const InfoPoint *trap = TMap->GetInfoPoint(InTrap);
-	if (!trap) {
+	if (!trap || !trap->outline) {
 		actor->SetInTrap(0);
 	} else {
 		if(!trap->outline->PointIn(actor->Pos)) {
