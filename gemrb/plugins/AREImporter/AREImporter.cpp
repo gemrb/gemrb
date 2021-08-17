@@ -1943,15 +1943,10 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p) const
+int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& points) const
 {
-	return PutPoints(stream, &p[0], p.size());
-}
-
-int AREImporter::PutPoints(DataStream *stream, const Point *p, size_t count) const
-{
-	for(size_t j=0;j<count;j++) {
-		stream->WritePoint(p[j]);
+	for (const Point& p : points) {
+		stream->WritePoint(p);
 	}
 	return 0;
 }
@@ -1965,7 +1960,7 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map) const
 			PutPoints(stream, ip->outline->vertices);
 		} else {
 			Point origin = ip->BBox.origin;
-			PutPoints(stream, &origin, 1);
+			stream->WritePoint(origin);
 		}
 	}
 	//containers
