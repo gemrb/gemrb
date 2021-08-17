@@ -193,8 +193,8 @@ public:
 	}
 	MapNote(const MapNote &rhs) = default;
 
-	MapNote(String text, ieWord c, bool readonly)
-	: strref(-1), text(std::move(text)), readonly(readonly)
+	MapNote(String txt, ieWord c, bool readonly)
+	: strref(-1), text(std::move(txt)), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
