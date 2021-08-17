@@ -6512,7 +6512,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.LastLeft = oldstats.LastLeft;
 		newstats.LastJoined = oldstats.LastJoined;
 		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
-		std::copy(oldstats.States.begin(), oldstats.States.end(), newstats.States.begin());
+		newstats.States = oldstats.States;
 		
 		oldstats = newstats;
 	}
