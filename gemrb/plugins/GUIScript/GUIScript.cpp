@@ -1505,9 +1505,9 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		ctrl->SetText(NULL);
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
 #if PY_MAJOR_VERSION >= 3
-		char *tmp = PyString_AsString(str);
+		const char *tmp = PyString_AsString(str);
 #else // python2 has inbuilt PyString_AsString that can't handle bytearrays
-		char *tmp = PyByteArray_AS_STRING(str);
+		const char *tmp = PyByteArray_AS_STRING(str);
 #endif
 		const String* string = StringFromCString(tmp);
 		ctrl->SetText(string);
