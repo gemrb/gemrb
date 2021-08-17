@@ -107,7 +107,7 @@ GEM_EXPORT size_t strlcpy(char *d, const char *s, size_t l);
 GEM_EXPORT char* strlwr(char* string);
 #endif
 
-inline constexpr int NoTransform(int c) { return c; }
+constexpr int NoTransform(int c) { return c; }
 
 template <typename STR_T, int(*TRANS)(int) = NoTransform>
 struct CstrHash

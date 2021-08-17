@@ -3402,7 +3402,7 @@ void Map::UpdateFog()
 }
 
 // Valid values are - PathMapFlags::UNMARKED, PathMapFlags::PC, PathMapFlags::NPC
-void Map::BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value)
+void Map::BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const
 {
 	// We block a circle of radius size-1 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
@@ -4056,7 +4056,7 @@ PathMapFlags Map::GetInternalSearchMap(const Point& p) const
 	return QuerySearchMap(p);
 }
 
-void Map::SetInternalSearchMap(const Point& p, PathMapFlags value)
+void Map::SetInternalSearchMap(const Point& p, PathMapFlags value) const
 {
 	const Size& mapSize = PropsSize();
 	if (!mapSize.PointInside(p)) {

@@ -963,7 +963,7 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
 
-//IWD2, sets the homepoint P
+// IWD2, sets the *homepoint* P — the iwd version of SetHomeLocation
 // handle [-1.-1] specially, if needed; ar6200.bcs has interesting use
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 {
@@ -971,9 +971,7 @@ void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetBase(IE_SAVEDXPOS, parameters->pointParameter.x);
-	actor->SetBase(IE_SAVEDYPOS, parameters->pointParameter.y);
-	actor->SetBase(IE_SAVEDFACE, parameters->int0Parameter);
+	actor->HomeLocation = parameters->pointParameter;
 }
 
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
@@ -1948,7 +1946,7 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 // creates area vvc at position of object
 void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		return;
 	}
@@ -7114,7 +7112,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	}
 
 	//vvc type
-	fx->Parameter2 = parameters->int0Parameter;
+	fx->Parameter2 = parameters->int0Parameter + 0x1001;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
 	fx->Parameter4 = 1; // mark for special treatment

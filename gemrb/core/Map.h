@@ -559,7 +559,7 @@ public:
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
-	void BlockSearchMap(const Point &Pos, unsigned int size, PathMapFlags value);
+	void BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const;
 	void ClearSearchMapFor(const Movable *actor);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
@@ -635,7 +635,7 @@ public:
 
 	unsigned int GetLightLevel(const Point &Pos) const;
 	PathMapFlags GetInternalSearchMap(const Point&) const;
-	void SetInternalSearchMap(const Point&, PathMapFlags value);
+	void SetInternalSearchMap(const Point&, PathMapFlags value) const;
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
 private:

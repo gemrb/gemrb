@@ -345,7 +345,7 @@ public:
 	/** returns if a slot is temporarily blocked */
 	bool IsSlotBlocked(int slot) const;
 	/** returns true if a two handed weapon is in slot */
-	inline bool TwoHandedInSlot(int slot) const;
+	bool TwoHandedInSlot(int slot) const;
 	/** returns the strref for the reason why the item cannot be equipped */
 	int WhyCantEquip(int slot, int twohanded, bool ranged = false) const;
 	/** returns a slot that has a stealable item */
