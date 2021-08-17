@@ -1503,6 +1503,15 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 	} else if (str == Py_None) {
 		// clear the text
 		ctrl->SetText(NULL);
+	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
+#if PY_MAJOR_VERSION >= 3
+		char *tmp = PyString_AsString(str);
+#else // python2 has inbuilt PyString_AsString that can't handle bytearrays
+		char *tmp = PyByteArray_AS_STRING(str);
+#endif
+		const String* string = StringFromCString(tmp);
+		ctrl->SetText(string);
+		delete string;
 	} else { // string value of the object
 		const String* string = StringFromCString( PyString_AsString( str ) );
 		ctrl->SetText(string);
