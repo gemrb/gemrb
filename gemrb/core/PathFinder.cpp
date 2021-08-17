@@ -275,8 +275,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 	if (smptDest == smptSource) return nullptr;
 
-	// Initialize data structures
 	const Size& mapSize = PropsSize();
+	if (!mapSize.PointInside(smptSource)) return nullptr;
+
+	// Initialize data structures
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(mapSize.Area(), false);
 	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
