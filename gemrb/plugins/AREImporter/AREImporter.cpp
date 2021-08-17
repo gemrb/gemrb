@@ -181,7 +181,7 @@ static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 	return spr;
 }
 
-static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
+static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
 
@@ -213,8 +213,8 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 		return nullptr;
 	}
 	
-	const Size propsize = lightmap->Frame.size;
-	assert(propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
+	const Size propsize(tm->XCellCount * 4, CeilDiv(tm->YCellCount * 64, 12));
+	assert(propsize == lightmap->Frame.size && propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
@@ -399,7 +399,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 	
 	tm->UpdateDoors();
 	
-	map->SetTileMapProps(MakeTileProps(map->WEDResRef, day_or_night));
+	map->SetTileMapProps(MakeTileProps(tm, map->WEDResRef, day_or_night));
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
@@ -495,7 +495,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		sm = GetResourceHolder<ImageMgr>(WEDResRef);
 	}
 
-	Map* map = new Map(tm, MakeTileProps(WEDResRef, day_or_night), sm->GetSprite2D());
+	Map* map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm->GetSprite2D());
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;
