@@ -214,7 +214,6 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 	}
 	
 	const Size propsize(tm->XCellCount * 4, CeilDiv(tm->YCellCount * 64, 12));
-	assert(propsize == lightmap->Frame.size && propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
 
 	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
 					Map::heightMapMask, Map::lightMapMask);
@@ -228,15 +227,38 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 	auto smit = searchmap->GetIterator();
 	auto hmit = heightmap->GetIterator();
 	auto lmit = lightmap->GetIterator();
-	for (; propit != end; ++propit, ++lmit, ++hmit, ++smit) {
-		uint8_t smval = *smit; // r + g
-		assert((smval & 0xf0) == 0);
-		uint8_t r = uint8_t(PathFinderCosts::Get().Passable[smval]);
-		uint8_t g = smval;
-		uint8_t b = hmpal->col[*hmit].r; // pick any channel, they are all the same
-		uint8_t a = *lmit;
+	
+	// Sadly, the original data is occasionally cropped poorly and some images are a few pixels smaller than they ought to be
+	// an example of this is BG2 AR0325
+	// therefore, we must have some out-of-bounds defaults and only advance iterators when they are inside propsize
+	for (; propit != end; ++propit) {
+		const Point& pos = propit.Position();
+		uint8_t r = uint8_t(PathMapFlags::NO_SEE);
+		uint8_t g = 0; // Black, impassable
+		uint8_t b = 128; // sea level
+		uint8_t a = 0; // color index 0? no better idea what a good default is
+		
+		if (smit.clip.PointInside(pos)) {
+			uint8_t smval = *smit; // r + g
+			assert((smval & 0xf0) == 0);
+			r = uint8_t(PathFinderCosts::Get().Passable[smval]);
+			g = smval;
+			++smit;
+		}
+		
+		if (hmit.clip.PointInside(pos)) {
+			b = hmpal->col[*hmit].r; // pick any channel, they are all the same
+			++hmit;
+		}
+		
+		if (lmit.clip.PointInside(pos)) {
+			a = *lmit;
+			++lmit;
+		}
+		
 		propit.WriteRGBA(r, g, b, a);
 	}
+
 	return tileProps;
 }
 
