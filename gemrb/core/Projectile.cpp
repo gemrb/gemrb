@@ -180,7 +180,7 @@ void Projectile::CreateOrientedAnimations(Animation **anims, AnimationFactory *a
 }
 
 //apply gradient colors
-void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients)
+void Projectile::SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients) const
 {
 	ieDword Colors[7];
 

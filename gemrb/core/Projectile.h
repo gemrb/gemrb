@@ -410,7 +410,7 @@ private:
 
 	Actor *GetTarget();
 	void NextTarget(const Point &p);
-	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients);
+	void SetupPalette(Animation *anim[], PaletteHolder &pal, const ieByte *gradients) const;
 
 private:
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,

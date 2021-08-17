@@ -49,10 +49,10 @@ public:
 	~StdioLogWriter() final;
 	
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
-protected:
-	void textcolor(log_color);
-	bool useColor;
 private:
+	bool useColor;
+
+	void textcolor(log_color);
 	void printBracket(const char *status, log_color color);
 	void printStatus(const char* status, log_color color);
 };

@@ -1946,7 +1946,7 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 // creates area vvc at position of object
 void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	const Scriptable* tar = GetActorFromObject(Sender, parameters->objects[1]);
 	if (!tar) {
 		return;
 	}

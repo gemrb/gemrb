@@ -174,7 +174,7 @@ public:
 	ItemList(std::vector<ResRef> refs, int label)
 	: ResRefs(std::move(refs))
 	{
-		if ((refs.size() & 1) && (label == 2)) {
+		if ((ResRefs.size() & 1) && label == 2) {
 			WeightOdds=true;
 		} else {
 			WeightOdds=false;
