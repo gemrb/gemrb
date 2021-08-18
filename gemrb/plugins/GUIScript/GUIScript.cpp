@@ -2028,13 +2028,15 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	// blank out any old varname so we can set the control value without setting the old variable
 	std::fill(ctrl->VarName, ctrl->VarName + MAX_VARIABLE_LENGTH, '\0');
 	
-	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
+	ieDword val = (ieDword)PyInt_AsUnsignedLongMask(Value);
 	if (min) {
+		// this may set the value if its already set outside the range
 		ctrl->SetValueRange(ieDword(PyLong_AsUnsignedLong(min)), ieDword(PyLong_AsUnsignedLong(max)));
 	}
 	
-	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
+	// now that the value range is setup, we can change the dictionary variable
 	strnlwrcpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH - 1);
+	ctrl->SetValue(val);
 	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
 	ieDword curVal = CTL_INVALID_VALUE;
