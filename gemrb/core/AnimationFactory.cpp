@@ -26,13 +26,13 @@
 namespace GemRB {
 
 AnimationFactory::AnimationFactory(const ResRef &resref,
-								   std::vector<Holder<Sprite2D>> frames,
-								   std::vector<CycleEntry> cycles,
-								   std::vector<index_t> FLTable)
+								   std::vector<Holder<Sprite2D>> f,
+								   std::vector<CycleEntry> c,
+								   std::vector<index_t> flt)
 : FactoryObject(resref, IE_BAM_CLASS_ID),
-frames(std::move(frames)),
-cycles(std::move(cycles)),
-FLTable(std::move(FLTable))
+frames(std::move(f)),
+cycles(std::move(c)),
+FLTable(std::move(flt))
 {
 	assert(frames.size() < InvalidIndex);
 	assert(cycles.size() < InvalidIndex);
