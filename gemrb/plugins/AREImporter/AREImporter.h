@@ -34,34 +34,34 @@ class EffectQueue;
 
 class AREImporter : public MapMgr {
 private:
-	int bigheader;
+	int bigheader = 0;
 	ResRef WEDResRef;
-	ieDword LastSave;
-	ieDword AreaFlags;
+	ieDword LastSave = 0;
+	ieDword AreaFlags = 0;
 	MapEnv AreaType = AT_UNINITIALIZED;
-	ieWord WRain, WSnow, WFog, WLightning, WUnknown;
-	ieDword ActorOffset, EmbeddedCreOffset, AnimOffset, AnimCount;
-	ieDword VerticesOffset;
-	ieDword DoorsCount, DoorsOffset;
-	ieDword ExploredBitmapSize, ExploredBitmapOffset;
-	ieDword EntrancesOffset, EntrancesCount;
-	ieDword SongHeader, RestHeader;
-	ieWord  ActorCount, VerticesCount, AmbiCount;
-	ieWord  ContainersCount, InfoPointsCount, ItemsCount;
-	ieDword VariablesCount;
-	ieDword ContainersOffset, InfoPointsOffset, ItemsOffset;
-	ieDword AmbiOffset, VariablesOffset;
-	ieDword SpawnOffset, SpawnCount;
-	ieDword TileOffset, TileCount;
-	ieDword NoteOffset, NoteCount;
-	ieDword TrapOffset, TrapCount;  //only in ToB?
-	ieDword EffectOffset;
+	ieWord WRain = 0, WSnow = 0, WFog = 0, WLightning = 0, WUnknown = 0;
+	ieDword ActorOffset = 0, EmbeddedCreOffset = 0, AnimOffset = 0, AnimCount = 0;
+	ieDword VerticesOffset = 0;
+	ieDword DoorsCount = 0, DoorsOffset = 0;
+	ieDword ExploredBitmapSize = 0, ExploredBitmapOffset = 0;
+	ieDword EntrancesOffset = 0, EntrancesCount = 0;
+	ieDword SongHeader = 0, RestHeader = 0;
+	ieWord  ActorCount = 0, VerticesCount = 0, AmbiCount = 0;
+	ieWord  ContainersCount = 0, InfoPointsCount = 0, ItemsCount = 0;
+	ieDword VariablesCount = 0;
+	ieDword ContainersOffset = 0, InfoPointsOffset = 0, ItemsOffset = 0;
+	ieDword AmbiOffset = 0, VariablesOffset = 0;
+	ieDword SpawnOffset = 0, SpawnCount = 0;
+	ieDword TileOffset = 0, TileCount = 0;
+	ieDword NoteOffset = 0, NoteCount = 0;
+	ieDword TrapOffset = 0, TrapCount = 0;  // only in ToB?
+	ieDword EffectOffset = 0;
 	ResRef Script;
 	ResRef Dream1; // only in ToB
 	ResRef Dream2; // only in ToB
-	ieByte AreaDifficulty;
+	ieByte AreaDifficulty = 0;
 public:
-	AREImporter(void);
+	AREImporter() = default;
 	bool Import(DataStream* stream) override;
 	bool ChangeMap(Map *map, bool day_or_night) override;
 	Map* GetMap(const char* resRef, bool day_or_night) override;

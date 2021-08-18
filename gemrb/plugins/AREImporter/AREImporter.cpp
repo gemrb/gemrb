@@ -262,22 +262,6 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 	return tileProps;
 }
 
-AREImporter::AREImporter(void)
-{
-	EntrancesOffset = ContainersOffset = InfoPointsOffset = SpawnOffset = 0;
-	EntrancesCount = ContainersCount = InfoPointsCount = SpawnCount = 0;
-	ItemsOffset = VariablesOffset = AmbiOffset = TileOffset = TrapOffset = 0;
-	ItemsCount = VariablesCount = AmbiCount = TileCount = TrapCount = 0;
-	ActorCount = VerticesCount = NoteCount = 0;
-	ActorOffset = VerticesOffset = NoteOffset = EffectOffset = 0;
-	AreaDifficulty = AreaFlags = 0;
-	SongHeader = RestHeader = bigheader = 0;
-	WRain = WSnow = WFog = WLightning = WUnknown = 0;
-	EmbeddedCreOffset = AnimOffset = AnimCount = DoorsOffset = DoorsCount = 0;
-	ExploredBitmapSize = ExploredBitmapOffset = 0;
-	LastSave = 0;
-}
-
 bool AREImporter::Import(DataStream* str)
 {
 	char Signature[8];
