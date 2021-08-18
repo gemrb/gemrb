@@ -504,7 +504,7 @@ public:
 
 	int GetActorCount(bool any) const;
 	//fix actors position if required
-	void JumpActors(bool jump);
+	void JumpActors(bool jump) const;
 	//selects all selectable actors in the area
 	void SelectActors() const;
 	//if items == true, remove noncritical items from ground piles too
@@ -560,7 +560,7 @@ public:
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
 	void BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const;
-	void ClearSearchMapFor(const Movable *actor);
+	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder

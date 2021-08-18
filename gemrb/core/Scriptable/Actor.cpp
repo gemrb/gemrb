@@ -1506,7 +1506,7 @@ static void pcf_alignment(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue
 
 static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	Map *map = actor->GetCurrentArea();
+	const Map *map = actor->GetCurrentArea();
 	if (!map) return;
 	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PathMapFlags::UNMARKED : PathMapFlags::NPC);
 }
@@ -5067,7 +5067,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 
 	q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
-		Map *map = GetCurrentArea();
+		const Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
 		map->AdjustPosition(p, radiusx, radiusy, size);

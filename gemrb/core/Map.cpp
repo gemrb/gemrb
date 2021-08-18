@@ -783,7 +783,8 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 	}
 }
 
-void Map::ClearSearchMapFor(const Movable *actor) {
+void Map::ClearSearchMapFor(const Movable *actor) const
+{
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
 	BlockSearchMap(actor->Pos, actor->size, PathMapFlags::UNMARKED);
 
@@ -2178,7 +2179,7 @@ int Map::GetActorCount(bool any) const
 	return ret;
 }
 
-void Map::JumpActors(bool jump)
+void Map::JumpActors(bool jump) const
 {
 	for (auto actor : actors) {
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
