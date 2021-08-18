@@ -9724,10 +9724,10 @@ void Actor::ClearCurrentStanceAnims()
 	currentStance.shadow.clear();
 }
 
-void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, int wt)
+void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, unsigned char wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
-	if (wt != -1) WeaponType = wt;
+	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (!anims)
 		return;
 		
@@ -9759,10 +9759,10 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAni
 	AttackStance = IE_ANI_ATTACK;
 }
 
-void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
+void Actor::SetUsedShield(const char (&AnimationType)[2], unsigned char wt)
 {
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
-	if (wt != -1) WeaponType = wt;
+	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
 		if (WeaponType == IE_ANI_WEAPON_2W)
 			WeaponType = IE_ANI_WEAPON_1H;
