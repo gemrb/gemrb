@@ -375,7 +375,7 @@ WallPolygonGroup WEDImporter::MakeGroupFromTableEntries(size_t idx, size_t cnt) 
 std::vector<WallPolygonGroup> WEDImporter::GetWallGroups() const
 {
 	str->Seek (PLTOffset, GEM_STREAM_START);
-	size_t PLTSize = (VerticesOffset - PLTOffset) / 2;
+	size_t PLTSize = (VerticesOffset > PLTOffset ? VerticesOffset - PLTOffset : PLTOffset - VerticesOffset) / 2;
 	std::vector<ieWord> PLT(PLTSize);
 
 	for (ieWord& idx : PLT) {
