@@ -48,7 +48,8 @@ public:
 	
 	operator CAP_T () const
 	{
-		return cap ? cap->ptr : nullptr;
+		static CAP_T none;
+		return cap ? cap->ptr : none;
 	}
 
 	explicit CObject(PyObject *obj)
