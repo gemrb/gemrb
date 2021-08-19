@@ -4044,17 +4044,6 @@ void Map::SeeSpellCast(Scriptable *caster, ieDword spell) const
 	}
 }
 
-PathMapFlags Map::GetInternalSearchMap(const Point& p) const
-{
-	// TODO: the subtle difference betweenm GetInternalSearchMap and QuerySearchMap
-	// is that this returns PathMapFlags::UNMARKED instead of PathMapFlags::IMPASSABLE
-	// for out of bounds points. I dont know if that is an important distiction
-	if (!PropsSize().PointInside(p)) {
-		return PathMapFlags::UNMARKED;
-	}
-	return QuerySearchMap(p);
-}
-
 void Map::SetInternalSearchMap(const Point& p, PathMapFlags value) const
 {
 	const Size& mapSize = PropsSize();

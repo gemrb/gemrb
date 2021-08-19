@@ -633,7 +633,7 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	PathMapFlags GetInternalSearchMap(const Point&) const;
+	PathMapFlags QuerySearchMap(const Point&) const;
 	void SetInternalSearchMap(const Point&, PathMapFlags value) const;
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
@@ -673,7 +673,6 @@ private:
 	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
-	PathMapFlags QuerySearchMap(const Point&) const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 
 };

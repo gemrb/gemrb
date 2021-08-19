@@ -74,7 +74,7 @@ Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
 void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const
 {
 	for (const Point& point : points) {
-		PathMapFlags tmp = area->GetInternalSearchMap(point) & PathMapFlags::NOTDOOR;
+		PathMapFlags tmp = area->QuerySearchMap(point) & PathMapFlags::NOTDOOR;
 		area->SetInternalSearchMap(point, tmp|value);
 	}
 }
@@ -224,7 +224,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	for(const Point& p : *points) {
 		Actor** ab;
 		rgn.origin = Map::ConvertCoordFromTile(p);
-		PathMapFlags tmp = area->GetInternalSearchMap(p) & PathMapFlags::ACTOR;
+		PathMapFlags tmp = area->QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
 			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
 			while(ac--) {
