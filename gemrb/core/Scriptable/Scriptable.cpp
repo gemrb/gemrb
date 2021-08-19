@@ -2147,7 +2147,7 @@ void Movable::BumpBack()
 	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
 		// Do bump back if the actor is "blocking" itself
 		if (!((oldPosBlockStatus & PathMapFlags::ACTOR) == PathMapFlags::ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
-			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
+			area->BlockSearchMapFor(this);
 			if (actor->GetStat(IE_EA) < EA_GOODCUTOFF) {
 				bumpBackTries++;
 				if (bumpBackTries > MAX_BUMP_BACK_TRIES && SquaredDistance(Pos, oldPos) < unsigned(size * 32 * size * 32)) {
@@ -2293,7 +2293,7 @@ void Movable::AddWayPoint(const Point &Des)
 	// if the waypoint is too close to the current position, no path is generated
 	if (!path2) {
 		if (BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
+			area->BlockSearchMapFor(this);
 		}
 		return;
 	}
@@ -2341,7 +2341,7 @@ void Movable::WalkTo(const Point &Des, int distance)
 	}  else {
 		pathfindingDistance = std::max(size, distance);
 		if (BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
+			area->BlockSearchMapFor(this);
 		}
 	}
 }
@@ -2412,7 +2412,7 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	//0 - back away, 1 - face direction
 	path = area->RandomWalk(Pos, size, maxWalkDistance ? maxWalkDistance : 5, Type == ST_ACTOR ? (Actor*)this : NULL);
 	if (BlocksSearchMap()) {
-		area->BlockSearchMap(Pos, size, IsPC() ? PathMapFlags::PC : PathMapFlags::NPC);
+		area->BlockSearchMapFor(this);
 	}
 	if (path) {
 		Destination = Point(path->x, path->y);
@@ -2431,7 +2431,7 @@ void Movable::MoveTo(const Point &Des)
 	oldPos = Des;
 	Destination = Des;
 	if (BlocksSearchMap()) {
-		area->BlockSearchMap( Pos, size, IsPC()?PathMapFlags::PC:PathMapFlags::NPC);
+		area->BlockSearchMapFor(this);
 	}
 }
 

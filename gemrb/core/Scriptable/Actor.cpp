@@ -1508,7 +1508,12 @@ static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newVal
 {
 	const Map *map = actor->GetCurrentArea();
 	if (!map) return;
-	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PathMapFlags::UNMARKED : PathMapFlags::NPC);
+	
+	if (newValue) {
+		map->ClearSearchMapFor(actor);
+	} else {
+		map->BlockSearchMapFor(actor);
+	}
 }
 
 //spell casting or other buttons disabled/reenabled
@@ -5053,7 +5058,7 @@ void Actor::SetMap(Map *map)
 		inventory.EquipItem(inventory.GetEquippedSlot());
 		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
-	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
+	if (BlocksSearchMap()) map->BlockSearchMapFor(this);
 }
 
 // Position should be a navmap point

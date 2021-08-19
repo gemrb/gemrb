@@ -559,6 +559,7 @@ public:
 	void ExploreMapChunk(const Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
 	void BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const;
+	void BlockSearchMapFor(const Movable *actor) const;
 	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();

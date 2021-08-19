@@ -783,6 +783,16 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 	}
 }
 
+void Map::BlockSearchMapFor(const Movable *actor) const
+{
+	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
+	// FIXME: is this really necessary? doesn't IsPC() work for Actor too?
+	if (actor->Type == ST_ACTOR) {
+		flag = static_cast<const Actor*>(actor)->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
+	}
+	BlockSearchMap(actor->Pos, actor->size, flag);
+}
+
 void Map::ClearSearchMapFor(const Movable *actor) const
 {
 	std::vector<Actor *> nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_SELF|GA_NO_DEAD|GA_NO_LOS|GA_NO_UNSCHEDULED, MAX_CIRCLE_SIZE*3, actor);
@@ -793,7 +803,7 @@ void Map::ClearSearchMapFor(const Movable *actor) const
 	// (Necessary since blocked areas of actors may overlap.)
 	for (const Actor *neighbour : nearActors) {
 		if (neighbour->BlocksSearchMap()) {
-			BlockSearchMap(neighbour->Pos, neighbour->size, neighbour->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
+			BlockSearchMapFor(neighbour);
 		}
 	}
 }
