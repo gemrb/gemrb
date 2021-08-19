@@ -211,7 +211,7 @@ Container* TileMap::GetContainer(const Point &position, int type) const
 				continue;
 			}
 			return container;
-		} else if (container->outline->PointIn(position)) {
+		} else if (container->outline && container->outline->PointIn(position)) {
 			return container;
 		}
 	}
