@@ -1790,9 +1790,9 @@ PyDoc_STRVAR( GemRB_Window_SetAction__doc,
 
 static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 {
-	uint32_t key = -1;
+	int key = -1;
 	PyObject* func = nullptr;
-	PARSE_ARGS(args, "OOk", &self, &func, &key);
+	PARSE_ARGS(args, "OOi", &self, &func, &key);
 
 	Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
