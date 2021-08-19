@@ -1970,7 +1970,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is a door
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
-	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (!actor || actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		const Point *p = door->toOpen;
