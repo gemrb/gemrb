@@ -49,11 +49,11 @@ void BMPWriter::PutImage(DataStream *output, Holder<Sprite2D> spr)
 	output->WriteDword(tmpDword);
 	output->WriteDword(tmpDword);
 
+	auto it = spr->GetIterator(IPixelIterator::Direction::Forward, IPixelIterator::Direction::Reverse);
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {
-		for (unsigned int x=0;x<Width;x++) {
-			const Point p(x, Height - y - 1);
-			const Color& c = spr->GetPixel(p);
+		for (unsigned int x = 0; x < Width; ++x, ++it) {
+			const Color& c = it.ReadRGBA();
 
 			output->Write( &c.b, 1);
 			output->Write( &c.g, 1);
