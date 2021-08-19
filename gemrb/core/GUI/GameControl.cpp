@@ -1970,7 +1970,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is a door
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
-	if (!actor || actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
+	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the door back from the coordinates
 		const Point *p = door->toOpen;
@@ -2005,7 +2005,6 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point& p)
 {
-	if (!actor) return false;
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
@@ -2267,13 +2266,18 @@ void GameControl::PerformSelectedAction(const Point& p)
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
-
-	Actor* selectedActor = GetMainSelectedActor();
-
-	//add a check if you don't want some random monster handle doors and such
 	if (targetActor) {
 		PerformActionOn(targetActor);
-	} else if (target_mode == TARGET_MODE_CAST) {
+		return;
+	}
+
+	Actor* selectedActor = GetMainSelectedActor();
+	if (!selectedActor) {
+		return;
+	}
+
+	//add a check if you don't want some random monster handle doors and such
+	if (target_mode == TARGET_MODE_CAST) {
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
 	} else if (overDoor) {
