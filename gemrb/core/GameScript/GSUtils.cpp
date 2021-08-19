@@ -780,7 +780,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 			if (isPassable) {
 				// Check if the search map allows a creature to be at walkableStartPoint (note: ignoring creatureSize)
-				isPassable = bool(map->GetBlockedNavmap(walkableStartPoint) & PathMapFlags::PASSABLE);
+				isPassable = bool(map->GetBlocked(walkableStartPoint) & PathMapFlags::PASSABLE);
 			}
 
 			// Check if walkableStartPoint can traverse to walkableGoal

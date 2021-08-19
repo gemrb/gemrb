@@ -223,7 +223,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = bool(GetBlocked(ConvertCoordToTile(p)) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
+		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) & 15;

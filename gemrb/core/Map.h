@@ -481,7 +481,6 @@ public:
 	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const Point&) const;
 	PathMapFlags GetBlocked(const Point&, int size) const;
-	PathMapFlags GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID) const;
 	Container *GetContainerByGlobalID(ieDword objectID) const;

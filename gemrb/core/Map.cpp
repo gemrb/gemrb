@@ -2473,21 +2473,15 @@ PathMapFlags Map::GetBlocked(const Point &p, int size) const
 	if (size == -1) {
 		return GetBlocked(p);
 	} else {
-		return GetBlockedInRadius(ConvertCoordFromTile(p), size);
+		return GetBlockedInRadius(p, size);
 	}
 }
 
-PathMapFlags Map::GetBlockedNavmap(const Point &c) const
-{
-	return GetBlocked(ConvertCoordToTile(c));
-}
-
-// Args are in searchmap coordinates
 // The default behavior is for actors to be blocking
 // If they shouldn't be, the caller should check for PathMapFlags::PASSABLE | PathMapFlags::ACTOR
 PathMapFlags Map::GetBlocked(const Point &p) const
 {
-	PathMapFlags ret = QuerySearchMap(p);
+	PathMapFlags ret = QuerySearchMap(ConvertCoordToTile(p));
 	if (bool(ret & (PathMapFlags::DOOR_IMPASSABLE|PathMapFlags::ACTOR))) {
 		ret &= ~PathMapFlags::PASSABLE;
 	}
@@ -2513,10 +2507,10 @@ PathMapFlags Map::GetBlockedInRadius(const Point &p, unsigned int size, bool sto
 	for (unsigned int i = 0; i < size - 1; i++) {
 		for (unsigned int j = 0; j < size - 1; j++) {
 			if (i * i + j * j <= r) {
-				PathMapFlags retBotRight = GetBlockedNavmap(Point(p.x + i * 16, p.y + j * 12));
-				PathMapFlags retTopRight = GetBlockedNavmap(Point(p.x + i * 16, p.y - j * 12));
-				PathMapFlags retBotLeft = GetBlockedNavmap(Point(p.x - i * 16, p.y + j * 12));
-				PathMapFlags retTopLeft = GetBlockedNavmap(Point(p.x - i * 16, p.y - j * 12));
+				PathMapFlags retBotRight = GetBlocked(Point(p.x + i * 16, p.y + j * 12));
+				PathMapFlags retTopRight = GetBlocked(Point(p.x + i * 16, p.y - j * 12));
+				PathMapFlags retBotLeft = GetBlocked(Point(p.x - i * 16, p.y + j * 12));
+				PathMapFlags retTopLeft = GetBlocked(Point(p.x - i * 16, p.y - j * 12));
 				if (stopOnImpassable) {
 					if (retBotRight == PathMapFlags::IMPASSABLE || retBotLeft == PathMapFlags::IMPASSABLE || retTopRight == PathMapFlags::IMPASSABLE || retTopLeft == PathMapFlags::IMPASSABLE) {
 						return PathMapFlags::IMPASSABLE;
@@ -2547,7 +2541,7 @@ PathMapFlags Map::GetBlockedInLine(const Point &s, const Point &d, bool stopOnIm
 		NormalizeDeltas(dx, dy, factor);
 		p.x += dx;
 		p.y += dy;
-		PathMapFlags blockStatus = GetBlockedNavmap(p);
+		PathMapFlags blockStatus = GetBlocked(p);
 		if (stopOnImpassable && blockStatus == PathMapFlags::IMPASSABLE) {
 			return PathMapFlags::IMPASSABLE;
 		}
@@ -2951,14 +2945,16 @@ bool Map::AdjustPositionX(Point &goal, int radiusx, int radiusy, int size) const
 
 	for (int scanx = minx; scanx < maxx; scanx++) {
 		if (goal.y >= radiusy) {
-			if (bool(GetBlocked(Point(scanx, goal.y - radiusy), size) & PathMapFlags::PASSABLE)) {
+			const Point p(scanx * 16, (goal.y - radiusy) * 12);
+			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y - radiusy;
 				return true;
 			}
 		}
 		if (goal.y + radiusy < mapSize.h) {
-			if (bool(GetBlocked(Point(scanx, goal.y + radiusy), size) & PathMapFlags::PASSABLE)) {
+			const Point p(scanx * 16, (goal.y + radiusy) * 12);
+			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = scanx;
 				goal.y = goal.y + radiusy;
 				return true;
@@ -2980,14 +2976,16 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 		maxy = mapSize.h;
 	for (int scany = miny; scany < maxy; scany++) {
 		if (goal.x >= radiusx) {
-			if (bool(GetBlocked(Point(goal.x - radiusx, scany), size) & PathMapFlags::PASSABLE)) {
+			const Point p((goal.x - radiusx) * 16, scany * 12);
+			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x - radiusx;
 				goal.y = scany;
 				return true;
 			}
 		}
 		if (goal.x + radiusx < mapSize.w) {
-			if (bool(GetBlocked(Point(goal.x + radiusx, scany), size) & PathMapFlags::PASSABLE)) {
+			const Point p((goal.x + radiusx) * 16, scany * 12);
+			if (bool(GetBlocked(p, size) & PathMapFlags::PASSABLE)) {
 				goal.x = goal.x + radiusx;
 				goal.y = scany;
 				return true;
@@ -2999,7 +2997,7 @@ bool Map::AdjustPositionY(Point &goal, int radiusx, int radiusy, int size) const
 
 void Map::AdjustPositionNavmap(NavmapPoint &goal, int radiusx, int radiusy) const
 {
-	NavmapPoint smptGoal(goal.x / 16, goal.y / 12);
+	SearchmapPoint smptGoal = ConvertCoordToTile(goal);
 	AdjustPosition(smptGoal, radiusx, radiusy);
 	goal.x = smptGoal.x * 16 + 8;
 	goal.y = smptGoal.y * 12 + 6;
@@ -3060,14 +3058,14 @@ bool Map::IsExplored(const Point &pos) const
 //returns direction of area boundary, returns -1 if it isn't a boundary
 WMPDirection Map::WhichEdge(const Point &s) const
 {
-	Point tileP = ConvertCoordToTile(s);
-	if (!(GetBlocked(tileP) & PathMapFlags::TRAVEL)) {
+	if (!(GetBlocked(s) & PathMapFlags::TRAVEL)) {
 		Log(DEBUG, "Map", "This isn't a travel region [%d.%d]?",
-			tileP.x, tileP.y);
+			s.x, s.y);
 		return WMPDirection::NONE;
 	}
 	// FIXME: is this backwards?
 	const Size& mapSize = PropsSize();
+	Point tileP = ConvertCoordToTile(s);
 	tileP.x *= mapSize.h;
 	tileP.y *= mapSize.w;
 	if (tileP.x > tileP.y) { //north or east
@@ -3361,7 +3359,7 @@ void Map::ExploreMapChunk(const Point &Pos, int range, int los)
 
 			if (los) {
 				if (!block) {
-					PathMapFlags type = GetBlocked(ConvertCoordToTile(Tile));
+					PathMapFlags type = GetBlocked(Tile);
 					if (bool(type & PathMapFlags::NO_SEE)) {
 						block=true;
 					} else if (bool(type & PathMapFlags::SIDEWALL)) {
@@ -3656,7 +3654,7 @@ int Map::GetCursor(const Point &p) const
 	if (!IsExplored(p)) {
 		return IE_CURSOR_INVALID;
 	}
-	switch (GetBlocked(ConvertCoordToTile(p)) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL)) {
+	switch (GetBlocked(p) & (PathMapFlags::PASSABLE | PathMapFlags::TRAVEL)) {
 		case PathMapFlags::IMPASSABLE:
 			return IE_CURSOR_BLOCKED;
 		case PathMapFlags::PASSABLE:

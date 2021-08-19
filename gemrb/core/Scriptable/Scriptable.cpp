@@ -2143,7 +2143,7 @@ void Movable::BumpBack()
 	if (Type != ST_ACTOR) return;
 	const Actor *actor = (const Actor*) this;
 	area->ClearSearchMapFor(this);
-	PathMapFlags oldPosBlockStatus = area->GetBlockedNavmap(oldPos);
+	PathMapFlags oldPosBlockStatus = area->GetBlocked(oldPos);
 	if (!(oldPosBlockStatus & PathMapFlags::PASSABLE)) {
 		// Do bump back if the actor is "blocking" itself
 		if (!((oldPosBlockStatus & PathMapFlags::ACTOR) == PathMapFlags::ACTOR && area->GetActor(oldPos, GA_NO_DEAD|GA_NO_UNSCHEDULED) == actor)) {
@@ -2235,7 +2235,7 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 			}
 		}
 		// Stop if there's a door in the way
-		if (BlocksSearchMap() && bool(area->GetBlockedNavmap(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
+		if (BlocksSearchMap() && bool(area->GetBlocked(Pos + Point(dx, dy)) & PathMapFlags::SIDEWALL)) {
 			ClearPath(true);
 			NewOrientation = Orientation;
 			return;
