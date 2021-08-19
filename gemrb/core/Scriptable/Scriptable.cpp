@@ -2251,7 +2251,8 @@ void Movable::DoStep(unsigned int walkScale, ieDword time) {
 		Pos.y += dy;
 		oldPos = Pos;
 		if (actor && BlocksSearchMap()) {
-			area->BlockSearchMap(Pos, size, actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
+			auto flag = actor->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
+			area->tileProps.BlockSearchMap(Map::ConvertCoordToTile(Pos), size, flag);
 		}
 
 		SetOrientation(step->orient, false);

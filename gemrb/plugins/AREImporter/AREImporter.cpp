@@ -181,7 +181,7 @@ static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 	return spr;
 }
 
-static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day_or_night)
+static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
 
@@ -193,34 +193,30 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 
 	auto lightmap = LoadImageAs8bit(TmpResRef);
 	if (!lightmap) {
-		Log(ERROR, "AREImporter", "No lightmap available.");
-		return nullptr;
+		throw std::runtime_error("No lightmap available.");
 	}
 
 	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
 
 	auto searchmap = LoadImageAs8bit(TmpResRef);
 	if (!searchmap) {
-		Log(ERROR, "AREImporter", "No searchmap available.");
-		return nullptr;
+		throw std::runtime_error("No searchmap available.");
 	}
 
 	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
 
 	auto heightmap = LoadImageAs8bit(TmpResRef);
 	if (!heightmap) {
-		Log(ERROR, "AREImporter", "No heightmap available.");
-		return nullptr;
+		throw std::runtime_error("No heightmap available.");
 	}
 	
 	const Size propsize(tm->XCellCount * 4, CeilDiv(tm->YCellCount * 64, 12));
 
-	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
-					Map::heightMapMask, Map::lightMapMask);
+	PixelFormat fmt = TileProps::pixelFormat;
 	fmt.palette = lightmap->GetPalette();
-	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
+	auto propImg = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
-	auto propit = tileProps->GetIterator();
+	auto propit = propImg->GetIterator();
 	auto end = propit.end(propit);
 	
 	auto hmpal = heightmap->GetPalette();
@@ -233,10 +229,10 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 	// therefore, we must have some out-of-bounds defaults and only advance iterators when they are inside propsize
 	for (; propit != end; ++propit) {
 		const Point& pos = propit.Position();
-		uint8_t r = uint8_t(PathMapFlags::NO_SEE);
-		uint8_t g = 0; // Black, impassable
-		uint8_t b = 128; // sea level
-		uint8_t a = 0; // color index 0? no better idea what a good default is
+		uint8_t r = TileProps::defaultSearchMap;
+		uint8_t g = TileProps::defaultMaterial;
+		uint8_t b = TileProps::defaultElevation;
+		uint8_t a = TileProps::defaultLighting;
 		
 		if (smit.clip.PointInside(pos)) {
 			uint8_t smval = *smit; // r + g
@@ -259,7 +255,7 @@ static Holder<Sprite2D> MakeTileProps(const TileMap* tm, const ResRef& wedref, b
 		propit.WriteRGBA(r, g, b, a);
 	}
 
-	return tileProps;
+	return TileProps(propImg);
 }
 
 bool AREImporter::Import(DataStream* str)
@@ -390,22 +386,29 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		Log(ERROR, "AREImporter", "No tile map available.");
 		return false;
 	}
+	
+	try {
+		TileProps props = MakeTileProps(tm, map->WEDResRef, day_or_night);
+		
+		// Small map for MapControl
+		ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
 
-	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
-
-	if (sm) {
-		// night small map is *optional*!
-		// keep the exising map if this one is null
-		map->SmallMap = sm->GetSprite2D();
+		if (sm) {
+			// night small map is *optional*!
+			// keep the exising map if this one is null
+			map->SmallMap = sm->GetSprite2D();
+		}
+		
+		//the map state was altered, no need to hold this off for any later
+		map->DayNight = day_or_night;
+		
+		tm->UpdateDoors();
+		
+		map->SetTileMapProps(std::move(props));
+	} catch (std::exception& e) {
+		Log(ERROR, "AREImporter", "%s", e.what());
+		return false;
 	}
-	
-	//the map state was altered, no need to hold this off for any later
-	map->DayNight = day_or_night;
-	
-	tm->UpdateDoors();
-	
-	map->SetTileMapProps(MakeTileProps(tm, map->WEDResRef, day_or_night));
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
@@ -500,8 +503,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		//fall back to day minimap
 		sm = GetResourceHolder<ImageMgr>(WEDResRef);
 	}
-
-	Map* map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm->GetSprite2D());
+	
+	Map* map = nullptr;
+	try {
+		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm->GetSprite2D());
+	} catch (std::exception& e) {
+		Log(ERROR, "AREImporter", "%s", e.what());
+		return nullptr;
+	}
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;

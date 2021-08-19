@@ -349,10 +349,52 @@ using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 
+class TileProps {
+	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
+	// the assigned palette is the palette for the lightmap
+	uint32_t* propPtr = nullptr;
+	Size size;
+	Holder<Sprite2D> propImage;
+	
+	static constexpr uint32_t searchMapMask = 0xff000000;
+	static constexpr uint32_t materialMapMask = 0x00ff0000;
+	static constexpr uint32_t heightMapMask = 0x0000ff00;
+	static constexpr uint32_t lightMapMask = 0x000000ff;
+
+public:
+	static const PixelFormat pixelFormat;
+	
+	static constexpr uint8_t defaultSearchMap = uint8_t(PathMapFlags::IMPASSABLE);
+	static constexpr uint8_t defaultMaterial = 0; // Black, impassable
+	static constexpr uint8_t defaultElevation = 128; // sea level
+	static constexpr uint8_t defaultLighting = 0; // color index 0? no better idea what a good default is
+	
+	enum class Property : uint8_t {
+		SEARCH_MAP,
+		MATERIAL,
+		ELEVATION,
+		LIGHTING
+	};
+	
+	explicit TileProps(Holder<Sprite2D> props) noexcept;
+	
+	const Size& GetSize() const noexcept;
+	
+	uint8_t QueryTileProps(const Point& p, Property prop) const noexcept;
+	PathMapFlags QuerySearchMap(const Point& p) const noexcept;
+	uint8_t QueryMaterial(const Point& p) const noexcept;
+	int QueryElevation(const Point& p) const noexcept;
+	Color QueryLighting(const Point& p) const noexcept;
+	
+	void SetSearchMap(const Point&, PathMapFlags value) const noexcept;
+	void BlockSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept;
+};
 
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
+	TileProps tileProps;
+
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
@@ -380,9 +422,6 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
-	// the assigned palette is the palette for the lightmap
-	Holder<Sprite2D> tileProps;
 
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
@@ -405,12 +444,7 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 public:
-	static constexpr uint32_t searchMapMask = 0xff000000;
-	static constexpr uint32_t materialMapMask = 0x00ff0000;
-	static constexpr uint32_t heightMapMask = 0x0000ff00;
-	static constexpr uint32_t lightMapMask = 0x000000ff;
-
-	Map(TileMap *tm, Holder<Sprite2D> tileProps, Holder<Sprite2D> sm);
+	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
@@ -422,7 +456,7 @@ public:
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
-	void SetTileMapProps(Holder<Sprite2D> props);
+	void SetTileMapProps(TileProps props);
 	void AutoLockDoors() const;
 	void UpdateScripts();
 	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
@@ -557,8 +591,6 @@ public:
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
-	/* block or unblock searchmap with value */
-	void BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const;
 	void BlockSearchMapFor(const Movable *actor) const;
 	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
@@ -634,8 +666,7 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	PathMapFlags QuerySearchMap(const Point&) const;
-	void SetInternalSearchMap(const Point&, PathMapFlags value) const;
+
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
 private:
