@@ -27,7 +27,7 @@
 
 namespace GemRB {
 
-Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, Region *bbox)
+Gem_Polygon::Gem_Polygon(std::vector<Point>&& points, const Region *bbox)
 : vertices(std::move(points))
 {
 	assert(vertices.size() >= 3);

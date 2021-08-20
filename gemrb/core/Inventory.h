@@ -191,11 +191,11 @@ public:
 		Flags = 0;
 		Expired = 0;
 	};
-	explicit CREItem(STOItem *item)
+	explicit CREItem(const STOItem *item)
 	{
 		CopySTOItem(item);
 	};
-	void CopySTOItem(STOItem *item)
+	void CopySTOItem(const STOItem *item)
 	{
 		ItemResRef = item->ItemResRef;
 		Expired = 0; // PurchasedAmount in STOItem

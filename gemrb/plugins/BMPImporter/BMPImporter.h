@@ -48,8 +48,8 @@ public:
 	int GetPalette(int colors, Color* pal) override;
 
 private:
-	void Read8To8(void *rpixels);
-	void Read4To8(void *rpixels);
+	void Read8To8(const void *rpixels);
+	void Read4To8(const void *rpixels);
 };
 
 }

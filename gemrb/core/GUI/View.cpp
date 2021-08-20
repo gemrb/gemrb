@@ -499,9 +499,9 @@ void View::AddedToView(View* view)
 	}
 }
 
-void View::RemovedFromView(View*)
+void View::RemovedFromView(const View*)
 {
-	window = NULL;
+	window = nullptr;
 }
 
 bool View::IsOpaque() const

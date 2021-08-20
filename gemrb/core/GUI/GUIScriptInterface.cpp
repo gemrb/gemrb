@@ -41,7 +41,7 @@ View* GetView(const ScriptingRefBase* base)
 	return NULL;
 }
 
-const ControlScriptingRef* GetControlRef(ScriptingId id, Window* win)
+const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win)
 {
 	ScriptingGroup_t group = "Control";
 	if (win) {

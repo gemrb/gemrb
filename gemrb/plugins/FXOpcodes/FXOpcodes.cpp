@@ -5311,7 +5311,7 @@ int fx_castinglevel_modifier (Scriptable* /*Owner*/, Actor* target, Effect* fx)
 #define FAMILIAR_RESOURCE  2
 
 //returns the familiar if there was no error
-static Actor *GetFamiliar(Scriptable *Owner, Actor *target, Effect *fx, const ResRef& resource)
+static Actor *GetFamiliar(Scriptable *Owner, const Actor *target, const Effect *fx, const ResRef& resource)
 {
 	//summon familiar
 	Actor *fam = gamedata->GetCreature(resource);

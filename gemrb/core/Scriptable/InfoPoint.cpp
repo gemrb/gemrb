@@ -73,7 +73,7 @@ ieDword InfoPoint::GetUsePoint() const {
 //checks if the actor may use this travel trigger
 //bit 1 : can use
 //bit 2 : whole team
-int InfoPoint::CheckTravel(Actor *actor) const
+int InfoPoint::CheckTravel(const Actor *actor) const
 {
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	bool pm = actor->IsPartyMember();

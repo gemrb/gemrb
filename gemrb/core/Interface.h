@@ -475,7 +475,7 @@ public:
 	
 	Interface(const Interface&) = delete;
 	
-	int Init(InterfaceConfig* config);
+	int Init(const InterfaceConfig* config);
 	//TODO: Core Methods in Interface Class
 	void SetFeature(int value, int position);
 	/* don't rely on the exact return value of this function */
@@ -650,7 +650,7 @@ public:
 	ieStrRef GetRumour(const ResRef& resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
-	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
+	void SetCurrentContainer(const Actor *actor, Container *arg, bool flag = false);
 	Store *GetCurrentStore();
 	void CloseCurrentStore();
 	Store *SetCurrentStore(const ResRef &resName, ieDword owner);
@@ -698,7 +698,7 @@ public:
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map) const;
 	/** saves (exports a character to the characters folder */
-	int WriteCharacter(const char *name, Actor *actor);
+	int WriteCharacter(const char *name, const Actor *actor);
 	/** saves the game object to the destination folder */
 	int WriteGame(const char *folder);
 	/** saves the worldmap object to the destination folder */
@@ -725,7 +725,7 @@ public:
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
 	/** resolves a stat bonus based on multiple stats */
-	int ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
+	int ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags = 0, int value = 0);
 	/** Opens CD prompt window and waits for the specified disc */
 	void WaitForDisc(int disc_number, const char* path) const;
 	/** Returns the music playlist corresponding to the provided type */

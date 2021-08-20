@@ -38,7 +38,7 @@
 
 namespace GemRB {
 
-Button::Button(Region& frame)
+Button::Button(const Region& frame)
 	: Control(frame),
 	buttonImages()
 {

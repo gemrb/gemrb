@@ -1347,7 +1347,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 
 //repeat movement, until goal isn't reached
 //if int0parameter is !=0, then it will try only x times
-void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flags, bool untilsee)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();

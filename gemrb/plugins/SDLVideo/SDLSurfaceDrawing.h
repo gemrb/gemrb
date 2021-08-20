@@ -34,7 +34,7 @@ namespace GemRB {
 
 static_assert(std::is_trivially_destructible<Point>::value, "Expected Point to be trivially destructable.");
 
-inline bool PointClipped(SDL_Surface* surf, const Point& p)
+inline bool PointClipped(const SDL_Surface* surf, const Point& p)
 {
 	if (p.x < 0 || p.x >= surf->w) {
 		return true;

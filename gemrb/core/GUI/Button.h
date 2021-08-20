@@ -113,7 +113,7 @@ enum BUTTON_IMAGE_TYPE {
 
 class GEM_EXPORT Button : public Control {
 public:
-	explicit Button(Region& frame);
+	explicit Button(const Region& frame);
 	~Button() override;
 
 	bool IsAnimated() const override;

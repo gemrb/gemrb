@@ -232,7 +232,7 @@ void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	}
 }
 
-Effect *SPLImporter::GetFeature(Spell *s)
+Effect *SPLImporter::GetFeature(const Spell *s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );

@@ -1604,7 +1604,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 	}
 }
 
-void EffectQueue::DispelEffects(Effect *dispeller, ieDword level) const
+void EffectQueue::DispelEffects(const Effect *dispeller, ieDword level) const
 {
 	for (Effect *fx : effects) {
 		if (fx == dispeller) continue;

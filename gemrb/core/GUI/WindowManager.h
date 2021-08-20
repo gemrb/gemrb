@@ -63,7 +63,7 @@ public:
 	struct HUDLock {
 		const WindowManager& wm;
 
-		explicit HUDLock(WindowManager& wm)
+		explicit HUDLock(const WindowManager& wm)
 		: wm(wm) {
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}

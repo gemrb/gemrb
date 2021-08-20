@@ -90,7 +90,7 @@ typedef struct FFTContext {
     FFTComplex *exptab1; /* only used by SSE code */
     FFTComplex *tmp_buf;
     void (*fft_permute)(struct FFTContext *s, FFTComplex *z);
-    void (*fft_calc)(struct FFTContext *s, FFTComplex *z);
+    void (*fft_calc)(const struct FFTContext *s, FFTComplex *z);
     int split_radix;
     int permutation;
 #define FF_MDCT_PERM_NONE       0
@@ -147,7 +147,7 @@ extern SINTABLE(65536);
  */
 int ff_fft_init(FFTContext *s, int nbits, int inverse);
 void ff_fft_permute_c(FFTContext *s, FFTComplex *z);
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z);
+void ff_fft_calc_c(const FFTContext *s, FFTComplex *z);
 
 /**
  * Do the permutation needed BEFORE calling ff_fft_calc().

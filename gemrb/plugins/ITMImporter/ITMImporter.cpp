@@ -365,7 +365,7 @@ void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 }
 
-Effect* ITMImporter::GetFeature(Item *s)
+Effect* ITMImporter::GetFeature(const Item *s)
 {
 	PluginHolder<EffectMgr> eM = MakePluginHolder<EffectMgr>(IE_EFF_CLASS_ID);
 	eM->Open( str, false );

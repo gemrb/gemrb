@@ -181,7 +181,7 @@ bool BMPImporter::Import(DataStream* str)
 	return true;
 }
 
-void BMPImporter::Read8To8(void *rpixels)
+void BMPImporter::Read8To8(const void *rpixels)
 {
 	pixels = malloc(size.Area());
 	unsigned char * dest = ( unsigned char * ) pixels;
@@ -194,7 +194,7 @@ void BMPImporter::Read8To8(void *rpixels)
 	}
 }
 
-void BMPImporter::Read4To8(void *rpixels)
+void BMPImporter::Read4To8(const void *rpixels)
 {
 	BitCount = 8;
 	pixels = malloc(size.Area());

@@ -42,7 +42,7 @@ KEYImporter::~KEYImporter(void)
 	}
 }
 
-static char* AddCBF(char *file)
+static char* AddCBF(const char *file)
 {
 	assert(strnlen(file, _MAX_PATH/2) < _MAX_PATH/2);
 	// This is safe in single-threaded, since the

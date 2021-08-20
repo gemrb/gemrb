@@ -927,7 +927,7 @@ int Interface::LoadFonts()
 	return GEM_OK;
 }
 
-int Interface::Init(InterfaceConfig* cfg)
+int Interface::Init(const InterfaceConfig* cfg)
 {
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 	if (!cfg) {
@@ -3900,11 +3900,11 @@ int Interface::CloseCurrentContainer()
 	return 0;
 }
 
-void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
+void Interface::SetCurrentContainer(const Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
 	if (actor!=GetFirstSelectedPC(false)) {
-		CurrentContainer = NULL;
+		CurrentContainer = nullptr;
 		return;
 	}
 	CurrentContainer = arg;
@@ -4176,7 +4176,7 @@ int Interface::SwapoutArea(Map *map) const
 	return 0;
 }
 
-int Interface::WriteCharacter(const char *name, Actor *actor)
+int Interface::WriteCharacter(const char *name, const Actor *actor)
 {
 	char Path[_MAX_PATH];
 
@@ -4611,7 +4611,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // the master table contains the table names (as row names) and the used stat
 // the subtables contain stat value/bonus pairs.
 // Optionally an override stat value can be specified (needed for use in pcfs).
-int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
+int Interface::ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags, int value)
 {
 	AutoTable mtm = gamedata->LoadTable(tablename);
 	if (!mtm) {

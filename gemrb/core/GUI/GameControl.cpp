@@ -70,7 +70,7 @@ static Actor* GetMainSelectedActor()
 //arrow markers on the edges to point at detected monsters
 //tracterID is the tracker actor's global ID
 //distance is the detection distance
-void GameControl::SetTracker(Actor *actor, ieDword dist)
+void GameControl::SetTracker(const Actor *actor, ieDword dist)
 {
 	trackerID = actor->GetGlobalID();
 	distance = dist;

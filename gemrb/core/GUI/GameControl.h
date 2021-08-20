@@ -179,7 +179,7 @@ public:
 	void DrawTargetReticle(const Movable* target, const Point& point) const;
 	/** Sets multiple quicksaves flag*/
 	//static void MultipleQuickSaves(int arg);
-	void SetTracker(Actor *actor, ieDword dist);
+	void SetTracker(const Actor *actor, ieDword dist);
 
 	void DrawTooltip(const Point& p) const;
 	String TooltipText() const override;

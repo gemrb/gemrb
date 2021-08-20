@@ -43,7 +43,7 @@ public:
 private:
 	bool Import(DataStream* stream) override;
 	void GetExtHeader(Item *s, ITMExtHeader* eh);
-	Effect *GetFeature(Item *s);
+	Effect *GetFeature(const Item *s);
 };
 
 

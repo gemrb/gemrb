@@ -115,7 +115,7 @@ private:
 
 	void AddedToWindow(Window*);
 	void AddedToView(View*);
-	void RemovedFromView(View*);
+	void RemovedFromView(const View*);
 	virtual void SubviewAdded(View* /*view*/, View* /*parent*/) {};
 	virtual void SubviewRemoved(View* /*view*/, View* /*parent*/) {};
 

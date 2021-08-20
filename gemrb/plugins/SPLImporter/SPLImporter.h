@@ -42,7 +42,7 @@ public:
 	Spell* GetSpell(Spell *spl, bool silent=false) override;
 private:
 	void GetExtHeader(Spell *s, SPLExtHeader* eh);
-	Effect *GetFeature(Spell *s);
+	Effect *GetFeature(const Spell *s);
 };
 
 
