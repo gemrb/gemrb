@@ -97,16 +97,14 @@ int SAVImporter::CreateArchive(DataStream *compressed)
 
 int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 {
-	ieDword fnlen, declen, complen;
-
-	fnlen = strlen(uncompressed->filename)+1;
-	declen = uncompressed->Size();
-	str->WriteDword(fnlen);
+	size_t fnlen = strlen(uncompressed->filename)+1;
+	strpos_t declen = uncompressed->Size();
+	str->WriteScalar<size_t, ieDword>(fnlen);
 	str->Write( uncompressed->filename, fnlen);
-	str->WriteDword(declen);
+	str->WriteScalar<strpos_t, ieDword>(declen);
 	//baaah, we dump output right in the stream, we get the compressed length
 	//only after the compressed data was written
-	complen = 0xcdcdcdcd; //placeholder
+	ieDword complen = 0xcdcdcdcd; //placeholder
 	strpos_t Pos = str->GetPos(); //storing the stream position
 	str->WriteDword(complen);
 
@@ -115,7 +113,7 @@ int SAVImporter::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 
 	//writing compressed length (calculated)
 	strpos_t Pos2 = str->GetPos();
-	complen = Pos2 - Pos - sizeof(ieDword); //calculating the compressed stream size
+	complen = ieDword(Pos2 - Pos - sizeof(ieDword)); //calculating the compressed stream size
 	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
 	str->WriteDword(complen);       //updating size
 	str->Seek(Pos2, GEM_STREAM_START);//resuming work
