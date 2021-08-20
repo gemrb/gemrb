@@ -54,8 +54,7 @@ public:
 	
 	public:
 		explicit SubtitleSet(Font* fnt, Color col = ColorWhite)
-		: col(col) {
-			font = fnt;
+		: col(col), font(fnt) {
 			assert(font);
 		}
 		

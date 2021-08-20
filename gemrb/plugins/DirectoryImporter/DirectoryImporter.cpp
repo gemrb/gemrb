@@ -26,11 +26,6 @@
 
 using namespace GemRB;
 
-DirectoryImporter::DirectoryImporter(void)
-{
-	description = NULL;
-}
-
 DirectoryImporter::~DirectoryImporter(void)
 {
 	free(description);

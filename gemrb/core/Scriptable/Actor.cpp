@@ -3238,11 +3238,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// check if any new portrait icon was removed or added
-	if (PCStats) {
-		if (PCStats->States != previousStates) {
-			core->SetEventFlag(EF_PORTRAIT);
-			previousStates = PCStats->States;
-		}
+	if (PCStats && PCStats->States != previousStates) {
+		core->SetEventFlag(EF_PORTRAIT);
+		previousStates = PCStats->States;
 	}
 	if (Immobile()) {
 		timeStartStep = core->GetGame()->Ticks;

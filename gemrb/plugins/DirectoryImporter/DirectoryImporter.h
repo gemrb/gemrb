@@ -31,7 +31,7 @@ protected:
 	char path[_MAX_PATH];
 
 public:
-	DirectoryImporter(void);
+	DirectoryImporter(void) = default;
 	~DirectoryImporter(void) override;
 	bool Open(const char *dir, const char *desc) override;
 	/** predicts the availability of a resource */
