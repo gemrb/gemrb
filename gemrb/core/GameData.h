@@ -27,6 +27,7 @@
 
 #include "Cache.h"
 #include "Holder.h"
+#include "Palette.h"
 #include "Resource.h"
 #include "ResourceManager.h"
 #include "TableMgr.h"
@@ -44,8 +45,6 @@ struct Effect;
 class Factory;
 class FactoryObject;
 class Item;
-class Palette;
-using PaletteHolder = Holder<Palette>;
 class ScriptedAnimation;
 class Spell;
 class Sprite2D;
