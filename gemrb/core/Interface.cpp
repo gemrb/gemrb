@@ -1578,7 +1578,7 @@ int Interface::Init(const InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
 	
-	abilityTables = make_unique<AbilityTables>(MaximumAbility);
+	abilityTables = GemRB::make_unique<AbilityTables>(MaximumAbility);
 
 	Log(MESSAGE, "Core", "Reading reputation mod table...");
 	ret = ReadReputationModTable();
