@@ -68,7 +68,7 @@ SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible 
 SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
 
 SET(PYTHON_VERSION "Auto" CACHE STRING "Python version to use (e.g.: Auto, 2, 3, 3.6)")
-SET(SANITIZE "None" CACHE STRING "Python version to use (possible values: None, address, thread, memory, undefined)")
+SET(SANITIZE "None" CACHE STRING "Sanitizer to use (possible values: None, address, thread, memory, undefined)")
 
 OPTION(USE_SDLMIXER "Enable SDL_mixer support" ON)
 OPTION(USE_OPENAL "Enable OpenAL support" ON)
