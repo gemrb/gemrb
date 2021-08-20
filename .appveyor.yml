@@ -10,6 +10,7 @@ skip_commits:
   message: /\[ci skip\]/
 only_commits:
   files:
+    - CMakeLists.txt
     - gemrb/**/*
     - cmake/**/*
     - platforms/windows/**/*
