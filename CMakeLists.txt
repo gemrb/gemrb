@@ -68,6 +68,7 @@ SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible 
 SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
 
 SET(PYTHON_VERSION "Auto" CACHE STRING "Python version to use (e.g.: Auto, 2, 3, 3.6)")
+SET(SANITIZE "None" CACHE STRING "Python version to use (possible values: None, address, thread, memory, undefined)")
 
 OPTION(USE_SDLMIXER "Enable SDL_mixer support" ON)
 OPTION(USE_OPENAL "Enable OpenAL support" ON)
@@ -456,6 +457,14 @@ IF(USE_VORBIS)
 	ENDIF()
 ENDIF()
 
+if(NOT SANITIZE STREQUAL "None")
+	string(APPEND CMAKE_C_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+	string(APPEND CMAKE_CXX_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+	string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+	string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+	# also CMAKE_MODULE_LINKER_FLAGS for macs?
+endif()
+
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
 # This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
@@ -648,6 +657,7 @@ PRINT_OPTION(WIN32_USE_STDIO)
 PRINT_OPTION(SDL_BACKEND)
 PRINT_OPTION(PYTHON_VERSION)
 PRINT_OPTION(OPENGL_BACKEND)
+PRINT_OPTION(SANITIZE)
 message(STATUS "")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Target bitness: ${CMAKE_SIZEOF_VOID_P}*8")
