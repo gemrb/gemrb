@@ -309,15 +309,15 @@ int TLKImporter::BuiltinToken(const char* Token, char* dest)
 	return -1;
 }
 
-bool TLKImporter::ResolveTags(char* dest, const char* source, int Length)
+bool TLKImporter::ResolveTags(char* dest, const char* source, size_t Length)
 {
 	char Token[MAX_VARIABLE_LENGTH + 1];
-	int NewLength = 0;
+	size_t NewLength = 0;
 	for (int i = 0; source[i]; i++) {
 		if (source[i] == '<') {
 			i = (int) (mystrncpy( Token, source + i + 1, MAX_VARIABLE_LENGTH, '>' ) - source);
-			int TokenLength = BuiltinToken( Token, dest + NewLength );
-			if (TokenLength == -1) {
+			size_t TokenLength = BuiltinToken( Token, dest + NewLength );
+			if (TokenLength == size_t(-1)) {
 				TokenLength = core->GetTokenDictionary()->GetValueLength( Token );
 				if (TokenLength) {
 					if (TokenLength + NewLength > Length) return false;
@@ -340,12 +340,12 @@ bool TLKImporter::ResolveTags(char* dest, const char* source, int Length)
 	return true;
 }
 
-bool TLKImporter::GetNewStringLength(const char* string, int& Length)
+bool TLKImporter::GetNewStringLength(const char* string, size_t& Length)
 {
 	char Token[MAX_VARIABLE_LENGTH + 1];
 	bool lChange = false;
-	int NewLength = 0;
-	for (int i = 0; i < Length; i++) {
+	size_t NewLength = 0;
+	for (size_t i = 0; i < Length; i++) {
 		if (string[i] == '<') {
 			// token
 			lChange = true;
@@ -393,7 +393,7 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 	char* string;
 	bool empty = !(flags & IE_STR_ALLOW_ZERO) && !strref;
 	ieWord type;
-	int Length;
+	size_t Length;
 	ResRef SoundResRef;
 
 	if (empty || strref >= STRREF_START || (strref >= BIO_START && strref <= BIO_END)) {
@@ -419,12 +419,8 @@ char* TLKImporter::GetCString(ieStrRef strref, ieDword flags)
 		str->ReadDword(Pitch);
 		str->ReadDword(StrOffset);
 		str->ReadDword(l);
-		if (l > 65535) {
-			Length = 65535; //safety limit, it could be a dword actually
-		}
-		else {
-			Length = l;
-		}
+		
+		Length = l;
 		
 		if (type & 1) {
 			str->Seek( StrOffset + Offset, GEM_STREAM_START );

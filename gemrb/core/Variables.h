@@ -86,7 +86,7 @@ public:
 
 	// Lookup
 	int GetValueLength(const char* key) const;
-	bool Lookup(const char* key, char* dest, int MaxLength) const;
+	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, char*& dest) const;
 	bool Lookup(const char* key, void*& dest) const;

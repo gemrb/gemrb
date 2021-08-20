@@ -65,8 +65,7 @@ bool CTlkOverride::Init()
 	}
 	toh_str->Seek( 8, GEM_CURRENT_POS );
 	toh_str->ReadDword(AuxCount);
-
-	if (tot_str->ReadDword(FreeOffset) != 4) {
+	if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
 		FreeOffset = 0xffffffff;
 	}
 	NextStrRef = 0xffffffff;
@@ -201,14 +200,14 @@ ieStrRef CTlkOverride::UpdateString(ieStrRef strref, const char *newvalue)
 
 ieDword CTlkOverride::ClaimFreeSegment()
 {
-	ieDword offset = FreeOffset;
+	strpos_t offset = FreeOffset;
 	strpos_t pos = tot_str->GetPos();
 	
 	if (offset == 0xffffffff) {
 		offset = tot_str->Size();
 	} else {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		if (tot_str->ReadDword(FreeOffset) != 4) {
+		if (tot_str->ReadScalar<strpos_t, ieDword>(FreeOffset) != 4) {
 			FreeOffset = 0xffffffff;
 		}
 	}
@@ -224,9 +223,9 @@ ieDword CTlkOverride::ClaimFreeSegment()
 
 	//update free segment pointer
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteDword(FreeOffset);
+	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 	tot_str->Seek(pos, GEM_STREAM_START);
-	return offset;
+	return static_cast<ieDword>(offset);
 }
 
 void CTlkOverride::ReleaseSegment(ieDword offset)
@@ -234,13 +233,13 @@ void CTlkOverride::ReleaseSegment(ieDword offset)
 	// also release linked segments, if any
 	do {
 		tot_str->Seek(offset, GEM_STREAM_START);
-		tot_str->WriteDword(FreeOffset);
+		tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 		FreeOffset = offset;
 		tot_str->Seek(SEGMENT_SIZE + 4, GEM_CURRENT_POS);
 		tot_str->ReadDword(offset);
 	} while (offset != 0xffffffff);
 	tot_str->Seek(0, GEM_STREAM_START);
-	tot_str->WriteDword(FreeOffset);
+	tot_str->WriteScalar<strpos_t, ieDword>(FreeOffset);
 }
 
 ieStrRef CTlkOverride::GetNextStrRef()
@@ -311,7 +310,7 @@ ieDword CTlkOverride::LocateString(ieStrRef strref)
 //this function handles all of the .tlk override mechanism with caching
 //strings it once found
 //it is possible to turn off caching
-char* CTlkOverride::ResolveAuxString(ieStrRef strref, int &Length)
+char* CTlkOverride::ResolveAuxString(ieStrRef strref, size_t &Length)
 {
 	char *string;
 
