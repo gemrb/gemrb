@@ -21,8 +21,6 @@
 #ifndef VARIABLES_H 
 #define VARIABLES_H
 
-
-#include "SClassID.h"
 #include "exports.h"
 #include "globals.h"
 

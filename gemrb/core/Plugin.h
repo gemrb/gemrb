@@ -27,7 +27,6 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
-#include "SClassID.h" // FIXME
 #include "exports.h"
 
 #include "TypeID.h"

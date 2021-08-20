@@ -18,8 +18,6 @@
 
 #include "PluginLoader.h"
 
-#include "SClassID.h" // For PluginID
-
 #include "Interface.h"
 #include "Platform.h"
 #include "PluginMgr.h"
