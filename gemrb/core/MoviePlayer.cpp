@@ -26,6 +26,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace std::chrono;
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
@@ -121,36 +123,27 @@ void MoviePlayer::Stop()
 	isPlaying = false;
 }
 
-void MoviePlayer::get_current_time(long &sec, long &usec) const
+microseconds MoviePlayer::get_current_time() const
 {
-	auto time = GetTicks();
-
-	sec = time / 1000;
-	usec = (time % 1000) * 1000;
+	return duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 }
 
 void MoviePlayer::timer_start()
 {
-	get_current_time(timer_last_sec, timer_last_usec);
+	lastTime = get_current_time();
 }
 
-void MoviePlayer::timer_wait(unsigned int frame_wait)
+void MoviePlayer::timer_wait(microseconds frame_wait)
 {
-	long sec, usec;
-	get_current_time(sec, usec);
+	auto time = get_current_time();
 
-	while (sec > timer_last_sec) {
-		usec += 1000000;
-		timer_last_sec++;
-	}
-
-	while (usec - timer_last_usec > (long) frame_wait) {
-		usec -= frame_wait;
+	while (time - lastTime > frame_wait) {
+		time -= frame_wait;
 		video_frameskip++;
 	}
 
-	long to_sleep = frame_wait - (usec - timer_last_usec);
-	std::this_thread::sleep_for(std::chrono::microseconds(to_sleep));
+	microseconds to_sleep = frame_wait - (time - lastTime);
+	std::this_thread::sleep_for(to_sleep);
 
 	timer_start();
 }

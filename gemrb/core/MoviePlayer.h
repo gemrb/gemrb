@@ -37,6 +37,8 @@
 #include "System/String.h"
 #include "Video/Video.h"
 
+#include <chrono>
+
 namespace GemRB {
 
 /**
@@ -46,6 +48,8 @@ namespace GemRB {
 
 class GEM_EXPORT MoviePlayer : public Resource {
 public:
+	using microseconds = std::chrono::microseconds;
+
 	static const TypeID ID;
 
 	class SubtitleSet {
@@ -84,9 +88,9 @@ protected:
 	Size movieSize;
 	size_t framePos;
 
-	long timer_last_sec = 0;
-	long timer_last_usec = 0;
-	unsigned int frame_wait = 0;
+	microseconds lastTime = microseconds(0);
+
+	microseconds frame_wait = microseconds(0);
 	unsigned int video_frameskip = 0;
 	unsigned int video_skippedframes = 0;
 
@@ -94,9 +98,9 @@ protected:
 	void DisplaySubtitle(const String& sub);
 	void PresentMovie(const Region&, Video::BufferFormat fmt);
 
-	void get_current_time(long &sec, long &usec) const;
+	microseconds get_current_time() const;
 	void timer_start();
-	void timer_wait(unsigned int frame_wait);
+	void timer_wait(microseconds frame_wait);
 
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 

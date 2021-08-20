@@ -47,6 +47,7 @@
 #include <cstdio>
 
 using namespace GemRB;
+using namespace std::chrono;
 
 static const int ff_wma_critical_freqs[25] = {
 	100,   200,  300, 400,   510,  630,  770,    920,
@@ -219,9 +220,9 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 		return false;
 	}
 
-	if (timer_last_sec) {
+	if (lastTime > seconds(0)) {
 		// quick hack, we should rather use the rational time base as ffmpeg
-		timer_wait(v_timebase.num * 1000000 / v_timebase.den);
+		timer_wait(microseconds(v_timebase.num * 1000000 / v_timebase.den));
 	}
 	if(framePos >= header.framecount) {
 		return false;
@@ -239,7 +240,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 		//buggy frame, we stop immediately
 		return false;
 	}
-	if (!timer_last_sec) {
+	if (lastTime == seconds(0)) {
 		timer_start();
 	}
 
