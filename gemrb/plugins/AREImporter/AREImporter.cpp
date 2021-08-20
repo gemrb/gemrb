@@ -405,7 +405,7 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		tm->UpdateDoors();
 		
 		map->SetTileMapProps(std::move(props));
-	} catch (std::exception& e) {
+	} catch (const std::exception& e) {
 		Log(ERROR, "AREImporter", "%s", e.what());
 		return false;
 	}
@@ -507,7 +507,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	Map* map = nullptr;
 	try {
 		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm->GetSprite2D());
-	} catch (std::exception& e) {
+	} catch (const std::exception& e) {
 		Log(ERROR, "AREImporter", "%s", e.what());
 		return nullptr;
 	}

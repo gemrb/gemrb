@@ -360,7 +360,7 @@ static const int arrow_orientations[16]={
 //WARNING:don't use reference for point, because it is altered
 void GameControl::DrawArrowMarker(Point p, const Color& color) const
 {
-	WindowManager* wm = core->GetWindowManager();
+	const WindowManager* wm = core->GetWindowManager();
 	auto lock = wm->DrawHUD();
 
 	ieDword draw = 0;

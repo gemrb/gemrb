@@ -160,7 +160,7 @@ static inline void ff_fft_permute(FFTContext *s, FFTComplex *z)
  * Do a complex FFT with the parameters defined in ff_fft_init(). The
  * input data must be permuted before. No 1.0/sqrt(n) normalization is done.
  */
-static inline void ff_fft_calc(FFTContext *s, FFTComplex *z)
+static inline void ff_fft_calc(const FFTContext *s, FFTComplex *z)
 {
     s->fft_calc(s, z);
 }

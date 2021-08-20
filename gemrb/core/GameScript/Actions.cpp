@@ -5915,7 +5915,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor *actor = game->GetPC(i, false);
+		const Actor *actor = game->GetPC(i, false);
 		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
 		core->WriteCharacter(FileName, actor);
 	}

@@ -55,7 +55,7 @@ const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win)
 	return static_cast<const ControlScriptingRef*>(base);
 }
 
-Control* GetControl(ScriptingId id, Window* win)
+Control* GetControl(ScriptingId id, const Window* win)
 {
 	View* view = GetView( GetControlRef(id, win) );
 	return static_cast<Control*>(view);

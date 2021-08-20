@@ -548,7 +548,7 @@ void WindowManager::DrawWindowFrame(BlitFlags flags) const
 	}
 }
 
-WindowManager::HUDLock WindowManager::DrawHUD()
+WindowManager::HUDLock WindowManager::DrawHUD() const
 {
 	return HUDLock(*this);
 }

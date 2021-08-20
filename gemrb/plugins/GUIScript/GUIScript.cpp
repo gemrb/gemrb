@@ -1273,7 +1273,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 		const char* group = PyString_AsString(lookup);
 		ref = ScriptEngine::GetScripingRef(group, id);
 	} else {
-		Window* win = GetView<Window>(lookup);
+		const Window* win = GetView<Window>(lookup);
 		if (win) {
 			ref = GetControlRef(id, win);
 		}
@@ -10683,7 +10683,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	PyObject *dict;
 	PARSE_ARGS( args,  "OOi|ii", &self, &dict, &globalID, &Start, &Offset);
 
-	Window* win = GetView<Window>(self);
+	const Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -10830,7 +10830,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 	PyObject *Tuple = NULL;
 	PARSE_ARGS( args,  "OOi|iO", &self, &dict, &globalID, &Start, &Tuple);
 
-	Window* win = GetView<Window>(self);
+	const Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
 	GET_GAME();
 	GET_GAMECONTROL();

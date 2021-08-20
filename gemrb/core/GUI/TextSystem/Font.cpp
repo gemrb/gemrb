@@ -106,7 +106,7 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		SheetRegion.h = glyphH;
 	} else if (Sheet) {
 		// we need to lock/unlock the sprite because we are updating its pixels
-		void* pixels = Sheet->LockSprite();
+		const void* pixels = Sheet->LockSprite();
 		assert(pixels == pageData);
 	}
 

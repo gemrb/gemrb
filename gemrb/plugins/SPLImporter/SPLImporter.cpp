@@ -184,7 +184,7 @@ Spell* SPLImporter::GetSpell(Spell *s, bool /*silent*/)
 	return s;
 }
 
-void SPLImporter::GetExtHeader(Spell *s, SPLExtHeader* eh)
+void SPLImporter::GetExtHeader(const Spell *s, SPLExtHeader* eh)
 {
 	ieByte tmpByte;
 

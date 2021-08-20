@@ -159,7 +159,7 @@ private:
 
 	void ReadCreature(const DataFileMgr *inifile,
 		const char *crittername, CritterEntry &critter) const;
-	void ReadSpawnEntry(DataFileMgr *inifile,
+	void ReadSpawnEntry(const DataFileMgr *inifile,
 		const char *entryname, SpawnEntry &entry) const;
 	//spawns a single creature
 	void SpawnCreature(const CritterEntry &critter) const;

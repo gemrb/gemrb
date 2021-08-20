@@ -283,7 +283,7 @@ Item* ITMImporter::GetItem(Item *s)
 #define IT_DAGGER     0x10
 #define IT_SHORTSWORD 0x13
 
-void ITMImporter::GetExtHeader(Item *s, ITMExtHeader* eh)
+void ITMImporter::GetExtHeader(const Item *s, ITMExtHeader* eh)
 {
 	ieByte tmpByte;
 	ieWord ProjectileType;

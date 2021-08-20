@@ -107,12 +107,12 @@ const WindowScriptingRef* RegisterScriptableWindow(Window*, const ScriptingGroup
 
 GEM_EXPORT View* GetView(const ScriptingRefBase* base);
 GEM_EXPORT std::vector<View*> GetViews(const ScriptingGroup_t& pack);
-GEM_EXPORT Control* GetControl(ScriptingId id, Window* win);
+GEM_EXPORT Control* GetControl(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* GetControlRef(ScriptingId id, const Window* win);
 GEM_EXPORT const ControlScriptingRef* RegisterScriptableControl(Control* ctrl, ScriptingId id, const ControlScriptingRef* existing = nullptr);
 
 template <class T>
-T* GetControl(ScriptingId id, Window* win) {
+T* GetControl(ScriptingId id, const Window* win) {
 	return dynamic_cast<T*>(GetControl(id, win));
 }
 
