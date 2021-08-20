@@ -222,20 +222,16 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	rgn.w = 16;
 	rgn.h = 12;
 	for(const Point& p : *points) {
-		Actor** ab;
 		rgn.origin = Map::ConvertCoordFromTile(p);
 		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
-			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			while(ac--) {
-				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
+			auto ac = area->GetActorsInRect(rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			for (Actor* actor : ac) {
+				if (actor->GetBase(IE_DONOTJUMP)) {
 					continue;
 				}
-				ab[ac]->SetBase(IE_DONOTJUMP, DNJ_JUMP);
+				actor->SetBase(IE_DONOTJUMP, DNJ_JUMP);
 				blocked = true;
-			}
-			if (ab) {
-				free(ab);
 			}
 		}
 	}

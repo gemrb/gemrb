@@ -2519,9 +2519,10 @@ Actor *Map::GetActorByScriptName(const char *name) const
 	return NULL;
 }
 
-int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags) const
+std::vector<Actor*> Map::GetActorsInRect(const Region& rgn, int excludeFlags) const
 {
-	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
+	std::vector<Actor*> actorlist;
+	actorlist.reserve(actors.size());
 	int count = 0;
 	for (auto actor : actors) {
 		if (!actor->ValidTarget(excludeFlags))
@@ -2530,12 +2531,10 @@ int Map::GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags
 			&& !actor->IsOver(rgn.origin)) // imagine drawing a tiny box inside the circle, but not over the center
 			continue;
 
-		actorlist[count++] = actor;
+		actorlist.push_back(actor);
 	}
-	if (count) {
-		actorlist = (Actor **) realloc(actorlist, count * sizeof(Actor *));
-	}
-	return count;
+	
+	return actorlist;
 }
 
 bool Map::SpawnsAlive() const

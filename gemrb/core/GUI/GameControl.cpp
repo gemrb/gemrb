@@ -471,9 +471,8 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	const Map* area = CurrentArea();
 	assert(area);
 
-	Actor **ab;
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL;
-	int count = area->GetActorsInRect(ab, SelectionRect(), flags);
+	auto ab = area->GetActorsInRect(SelectionRect(), flags);
 
 	std::vector<Actor*>::iterator it = highlighted.begin();
 	for (; it != highlighted.end(); ++it) {
@@ -482,12 +481,10 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	highlighted.clear();
-	for (int i = 0; i < count; i++) {
-		Actor* actor = ab[i];
+	for (Actor* actor : ab) {
 		actor->SetOver(true);
 		highlighted.push_back(actor);
 	}
-	free( ab );
 }
 
 /** Draws the Control on the Output Display */
