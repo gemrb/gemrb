@@ -2025,17 +2025,17 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	// blank out any old varname so we can set the control value without setting the old variable
-	std::fill(ctrl->VarName, ctrl->VarName + MAX_VARIABLE_LENGTH, '\0');
-	
-	ieDword val = (ieDword)PyInt_AsUnsignedLongMask(Value);
 	if (min) {
+		// blank out any old varname so we can set the control value without setting the old variable
+		ctrl->VarName[0] = '\0';
 		// this may set the value if its already set outside the range
 		ctrl->SetValueRange(ieDword(PyLong_AsUnsignedLong(min)), ieDword(PyLong_AsUnsignedLong(max)));
 	}
 	
 	// now that the value range is setup, we can change the dictionary variable
 	strnlwrcpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH - 1);
+	
+	ieDword val = (ieDword)PyInt_AsUnsignedLongMask(Value);
 	ctrl->SetValue(val);
 	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
