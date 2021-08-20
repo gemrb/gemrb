@@ -40,7 +40,6 @@
 
 namespace GemRB {
 
-class Resource;
 class TypeID;
 
 /**

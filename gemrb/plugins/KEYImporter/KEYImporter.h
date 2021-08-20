@@ -33,7 +33,6 @@
 namespace GemRB {
 
 class DataStream;
-class Resource;
 class ResourceDesc;
 
 struct BIFEntry {

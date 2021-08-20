@@ -21,14 +21,12 @@
 #ifndef RESOURCEDESC_H
 #define RESOURCEDESC_H
 
-#include "SClassID.h"
-#include "exports.h"
 #include "ie_types.h"
+
+#include "Resource.h"
 
 namespace GemRB {
 
-class DataStream;
-class Resource;
 class TypeID;
 
 /**

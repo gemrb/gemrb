@@ -43,7 +43,6 @@ FILE(GLOB gemrb_core_LIB_SRCS
 	Projectile.cpp
 	ProjectileServer.cpp
 	Region.cpp
-	Resource.cpp
 	ResourceDesc.cpp
 	ResourceManager.cpp
 	SaveGameAREExtractor.cpp

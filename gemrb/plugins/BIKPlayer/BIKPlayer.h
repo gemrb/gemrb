@@ -275,7 +275,7 @@ protected:
 public:
 	BIKPlayer(void);
 	~BIKPlayer(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 
 	void Stop();
 };

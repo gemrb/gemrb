@@ -24,7 +24,6 @@
 
 namespace GemRB {
 
-class Resource;
 class ResourceDesc;
 
 class DirectoryImporter : public ResourceSource {

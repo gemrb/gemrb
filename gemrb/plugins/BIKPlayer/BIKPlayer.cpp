@@ -196,9 +196,8 @@ int BIKPlayer::ReadHeader()
 	return 0;
 }
 
-bool BIKPlayer::Open(DataStream* stream)
+bool BIKPlayer::Import(DataStream* str)
 {
-	str = stream;
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {

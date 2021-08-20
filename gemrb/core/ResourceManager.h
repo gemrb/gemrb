@@ -21,10 +21,10 @@
 #ifndef RESOURCEMANGER_H
 #define RESOURCEMANGER_H
 
-#include "SClassID.h"
 #include "exports.h"
 
 #include "Holder.h"
+#include "Resource.h"
 #include "ResourceSource.h"
 
 #include <vector>
@@ -33,8 +33,6 @@ namespace GemRB {
 
 #define RM_REPLACE_SAME_SOURCE 1
 
-class DataStream;
-class Resource;
 class ResourceSource;
 class TypeID;
 

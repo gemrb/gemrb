@@ -31,7 +31,7 @@ private:
 	ieDword BlockSize, PalOffset;
 public:
 	MOSImporter(void);
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 };
 

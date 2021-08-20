@@ -36,7 +36,7 @@ public:
 	PNGImporter(void);
 	~PNGImporter(void) override;
 	void Close();
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	int GetPalette(int colors, Color* pal) override;
 };

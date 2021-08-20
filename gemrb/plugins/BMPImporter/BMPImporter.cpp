@@ -42,9 +42,8 @@ BMPImporter::~BMPImporter(void)
 	free( pixels );
 }
 
-bool BMPImporter::Open(DataStream* stream)
+bool BMPImporter::Import(DataStream* str)
 {
-	str = stream;
 	//we release the previous pixel data
 	free( pixels );
 	pixels = NULL;

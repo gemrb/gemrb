@@ -328,7 +328,6 @@
 		A29BF8D313A04A6F00C812DD /* Projectile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA01D1395FF62006ADC12 /* Projectile.cpp */; };
 		A29BF8D513A04A6F00C812DD /* ProjectileServer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0211395FF62006ADC12 /* ProjectileServer.cpp */; };
 		A29BF8D613A04A6F00C812DD /* Region.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0231395FF62006ADC12 /* Region.cpp */; };
-		A29BF8D713A04A6F00C812DD /* Resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0251395FF62006ADC12 /* Resource.cpp */; };
 		A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0271395FF62006ADC12 /* ResourceDesc.cpp */; };
 		A29BF8D913A04A6F00C812DD /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0291395FF62006ADC12 /* ResourceManager.cpp */; };
 		A29BF8DB13A04A6F00C812DD /* SaveGameIterator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA02E1395FF62006ADC12 /* SaveGameIterator.cpp */; };
@@ -519,7 +518,6 @@
 		A2E663BA139E883E00310FC8 /* ProjectileServer.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0221395FF62006ADC12 /* ProjectileServer.h */; };
 		A2E663BB139E883E00310FC8 /* Region.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0231395FF62006ADC12 /* Region.cpp */; };
 		A2E663BC139E883E00310FC8 /* Region.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0241395FF62006ADC12 /* Region.h */; };
-		A2E663BD139E883E00310FC8 /* Resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0251395FF62006ADC12 /* Resource.cpp */; };
 		A2E663BE139E883E00310FC8 /* Resource.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0261395FF62006ADC12 /* Resource.h */; };
 		A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A2BFA0271395FF62006ADC12 /* ResourceDesc.cpp */; };
 		A2E663C0139E883E00310FC8 /* ResourceDesc.h in Headers */ = {isa = PBXBuildFile; fileRef = A2BFA0281395FF62006ADC12 /* ResourceDesc.h */; };
@@ -1621,7 +1619,6 @@
 		A2BFA0221395FF62006ADC12 /* ProjectileServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectileServer.h; sourceTree = "<group>"; };
 		A2BFA0231395FF62006ADC12 /* Region.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Region.cpp; sourceTree = "<group>"; };
 		A2BFA0241395FF62006ADC12 /* Region.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Region.h; sourceTree = "<group>"; };
-		A2BFA0251395FF62006ADC12 /* Resource.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Resource.cpp; sourceTree = "<group>"; };
 		A2BFA0261395FF62006ADC12 /* Resource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Resource.h; sourceTree = "<group>"; };
 		A2BFA0271395FF62006ADC12 /* ResourceDesc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceDesc.cpp; sourceTree = "<group>"; };
 		A2BFA0281395FF62006ADC12 /* ResourceDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceDesc.h; sourceTree = "<group>"; };
@@ -5190,7 +5187,6 @@
 				A2BFA0221395FF62006ADC12 /* ProjectileServer.h */,
 				A2BFA0231395FF62006ADC12 /* Region.cpp */,
 				A2BFA0241395FF62006ADC12 /* Region.h */,
-				A2BFA0251395FF62006ADC12 /* Resource.cpp */,
 				A2BFA0261395FF62006ADC12 /* Resource.h */,
 				A2BFA0271395FF62006ADC12 /* ResourceDesc.cpp */,
 				A2BFA0281395FF62006ADC12 /* ResourceDesc.h */,
@@ -9483,7 +9479,6 @@
 				A29BF8D313A04A6F00C812DD /* Projectile.cpp in Sources */,
 				A29BF8D513A04A6F00C812DD /* ProjectileServer.cpp in Sources */,
 				A29BF8D613A04A6F00C812DD /* Region.cpp in Sources */,
-				A29BF8D713A04A6F00C812DD /* Resource.cpp in Sources */,
 				A2648B8E1B28F89700725526 /* GUIScriptInterface.cpp in Sources */,
 				A2CD07B31CE2E48C008CE1D0 /* ScrollView.cpp in Sources */,
 				A29BF8D813A04A6F00C812DD /* ResourceDesc.cpp in Sources */,
@@ -9685,7 +9680,6 @@
 				A2E663B5139E883E00310FC8 /* Projectile.cpp in Sources */,
 				A2E663B9139E883E00310FC8 /* ProjectileServer.cpp in Sources */,
 				A2E663BB139E883E00310FC8 /* Region.cpp in Sources */,
-				A2E663BD139E883E00310FC8 /* Resource.cpp in Sources */,
 				A2E663BF139E883E00310FC8 /* ResourceDesc.cpp in Sources */,
 				A2E663C1139E883E00310FC8 /* ResourceManager.cpp in Sources */,
 				A2F5F06C246102D70073802C /* RNG.cpp in Sources */,

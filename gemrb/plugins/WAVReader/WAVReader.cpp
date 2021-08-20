@@ -55,10 +55,8 @@ const unsigned char data_4cc[] = {
 	'd', 'a', 't', 'a'
 };
 
-bool RawPCMReader::Open(DataStream* stream)
+bool RawPCMReader::Import(DataStream* str)
 {
-	str = stream;
-
 	samples = str->Size();
 	str->Seek( 0, GEM_STREAM_START );
 	if (is16bit) {
@@ -108,9 +106,9 @@ int RawPCMReader::read_samples(short* buffer, int count)
 	return res;
 }
 
-bool WavPCMReader::Open(DataStream* stream)
+bool WavPCMReader::Import(DataStream* stream)
 {
-	if (!RawPCMReader::Open(stream))
+	if (!RawPCMReader::Import(stream))
 		return false;
 
 	char Signature[4];

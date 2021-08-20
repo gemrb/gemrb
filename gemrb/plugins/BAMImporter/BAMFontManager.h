@@ -38,7 +38,7 @@ public:
 	~BAMFontManager(void) override;
 	BAMFontManager();
 
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 
 	Font* GetFont(ieWord pxSize, FontStyle style, bool background) override;
 };

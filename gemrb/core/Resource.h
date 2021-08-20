@@ -67,22 +67,7 @@ using ResRefMap = std::unordered_map<ResRef, T, CstrHashCI<ResRef>>;
  * Base class for all GemRB resources
  */
 
-class GEM_EXPORT Resource : public Plugin {
-protected:
-	DataStream* str;
-public:
-	Resource();
-	~Resource() override;
-	/**
-	 * Reads the resource from the given stream.
-	 *
-	 * This should only be called once for a given resource object.
-	 * @param[in] stream Non-NULL Stream containg the resource
-	 * @retval true stream contains the given resource.
-	 * @retval false stream does not contain valid resource.
-	 */
-	virtual bool Open(DataStream* stream) = 0;
-};
+using Resource = ImporterBase;
 
 }
 

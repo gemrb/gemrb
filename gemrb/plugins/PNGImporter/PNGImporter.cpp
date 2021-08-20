@@ -74,9 +74,8 @@ void PNGImporter::Close()
 	}
 }
 
-bool PNGImporter::Open(DataStream* stream)
+bool PNGImporter::Import(DataStream* stream)
 {
-	str = stream;
 	Close();
 
 	png_byte header[8];

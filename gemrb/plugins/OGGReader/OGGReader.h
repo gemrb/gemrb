@@ -50,7 +50,7 @@ public:
 	{
 		ov_clear(&OggStream);
 	}
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	int read_samples(short* buffer, int count) override;
 };
 

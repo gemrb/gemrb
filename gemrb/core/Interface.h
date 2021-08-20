@@ -76,7 +76,6 @@ class MusicMgr;
 class Palette;
 using PaletteHolder = Holder<Palette>;
 class ProjectileServer;
-class Resource;
 class SPLExtHeader;
 class SaveGame;
 class SaveGameIterator;

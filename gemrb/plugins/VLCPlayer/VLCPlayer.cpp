@@ -35,7 +35,7 @@ VLCPlayer::~VLCPlayer(void)
 	libvlc_release(libvlc);
 }
 
-bool VLCPlayer::Open(DataStream* stream)
+bool VLCPlayer::Import(DataStream* stream)
 {
 	DestroyPlayer();
 	if (stream) {
