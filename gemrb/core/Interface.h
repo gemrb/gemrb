@@ -43,6 +43,7 @@
 #include "InterfaceConfig.h"
 #include "Resource.h"
 #include "Timer.h"
+#include "Variables.h"
 #include "SaveGameAREExtractor.h"
 #include "System/VFS.h"
 
@@ -829,6 +830,11 @@ public:
 	inline void ResetEventFlag(int Flag)
 	{
 		EventFlag&=~Flag;
+	}
+	inline void ResetActionBar()
+	{
+		vars->SetAt("ActionLevel", 0, false);
+		SetEventFlag(EF_ACTION);
 	}
 
 	static void SanityCheck(const char *ver);
