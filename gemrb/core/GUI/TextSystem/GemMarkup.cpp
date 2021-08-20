@@ -73,6 +73,7 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 	// TODO: implement escaping [] ('\')
 	Size frame;
 	String token;
+	String saved;
 
 	assert(tagPos < text.length());
 	String::const_iterator it = text.begin() + tagPos;
@@ -87,6 +88,9 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						if (token == L"color") {
 							state = COLOR;
 							token.clear();
+						} else if (token == L"int") {
+							state = INT;
+							token.clear();
 						}
 						// else is a parse error...
 						continue;
@@ -97,8 +101,6 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 							//align = IE_FONT_SINGLE_LINE;
 						} else if (token == L"p") {
 							frame.w = -1;
-						} else if (token == L"int") {
-							state = INT;
 						}
 						token.clear();
 						continue;
@@ -126,27 +128,28 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 				}
 				break;
 			case TEXT:
-			case INT:
 				switch (*it) {
 					case '[':
-						if (state == INT) {
-							// state icons, invalid as unicode, so we cant translate in Python
-							wchar_t chr = (wchar_t)wcstoul(token.c_str(), nullptr, 0);
+						if (*++it == '/') {
+							state = CLOSE_TAG;
+						} else if (*it == '+') {
+							state = OPEN_TAG;
+							saved = token;
 							token.clear();
-							token.push_back(chr);
+							continue; // + means concatonate with the existing text
+						} else {
+							--it;
+							state = OPEN_TAG;
 						}
+						
+						token = saved + token;
+						saved.clear();
 						if (token.length() && token != L"\n") {
 							// FIXME: lazy hack.
 							// we ought to ignore all white space between markup unless it contains other text
 							container.AppendContent(new TextSpan(token, attributes.TextFont, attributes.TextColor(), &frame));
 						}
 						token.clear();
-						if (*++it == '/')
-							state = CLOSE_TAG;
-						else {
-							--it;
-							state = OPEN_TAG;
-						}
 						continue;
 				}
 				break;
@@ -158,6 +161,16 @@ GemMarkupParser::ParseMarkupStringIntoContainer(const String& text, TextContaine
 						state = TEXT;
 						token.clear();
 						continue;
+				}
+				break;
+			case INT:
+				if (*it == L']') {
+					// state icons, invalid as unicode, so we cant translate in Python
+					wchar_t chr = (wchar_t)wcstoul(token.c_str(), nullptr, 0);
+					token.clear();
+					token.push_back(chr);
+					state = TEXT;
+					continue;
 				}
 				break;
 			default: // parse error, not clearing token

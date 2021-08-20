@@ -455,10 +455,9 @@ def GetProficiencies(pc, cdet):
 		stats.append ( (9457, str(tohit["Base"])+" ("+str(tohit["Total"])+")", '0') )
 
 	tmp = cdet["APR"]
-	# FIXME: this is messed up
-	tmp2 = "[int]" + str(tmp // 2) + "[/int]"
+	tmp2 = str(tmp // 2)
 	if (tmp&1):
-		tmp2 += "[int]" + str(189) + "[/int]" #must use one higher than the frame count
+		tmp2 += "[+int=" + str(189) + "]" #must use one higher than the frame count
 
 	stats.append ( (9458, tmp2, '') )
 	return TypeSetStats (stats, pc)
@@ -771,7 +770,7 @@ def TypeSetStats(stats, pc=0):
 				res.append (GemRB.GetString (strref) +': x' + str (val) )
 			elif stattype == 'a': #value (portrait icon) + string
 				# '%' is the separator glyph in the states font
-				res.append ("[cap][int]" + str(val) + "[/int]%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
+				res.append ("[cap][int=" + str(val) + "]%[/cap][p]" + GemRB.GetString (strref) + "[/p]")
 				noP = True
 			elif stattype == 'b': #strref is an already resolved string
 				res.append (strref+": "+str (val))
