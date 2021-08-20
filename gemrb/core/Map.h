@@ -349,7 +349,7 @@ using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 
-class TileProps {
+class GEM_EXPORT TileProps {
 	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
 	// the assigned palette is the palette for the lightmap
 	uint32_t* propPtr = nullptr;
