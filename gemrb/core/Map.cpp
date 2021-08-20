@@ -2523,7 +2523,6 @@ std::vector<Actor*> Map::GetActorsInRect(const Region& rgn, int excludeFlags) co
 {
 	std::vector<Actor*> actorlist;
 	actorlist.reserve(actors.size());
-	int count = 0;
 	for (auto actor : actors) {
 		if (!actor->ValidTarget(excludeFlags))
 			continue;
