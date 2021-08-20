@@ -58,7 +58,6 @@ bool PLTImporter::Import(DataStream* str)
 
 	pixels = malloc( Width * Height * 2 );
 	str->Read( pixels, Width * Height * 2 );
-	delete str;
 	return true;
 }
 
