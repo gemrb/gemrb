@@ -360,6 +360,11 @@ class GEM_EXPORT TileProps {
 	static constexpr uint32_t materialMapMask = 0x00ff0000;
 	static constexpr uint32_t heightMapMask = 0x0000ff00;
 	static constexpr uint32_t lightMapMask = 0x000000ff;
+	
+	static constexpr uint32_t searchMapShift = 24;
+	static constexpr uint32_t materialMapShift = 16;
+	static constexpr uint32_t heightMapShift = 8;
+	static constexpr uint32_t lightMapShift = 0;
 
 public:
 	static const PixelFormat pixelFormat;

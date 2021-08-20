@@ -62,7 +62,9 @@ namespace GemRB {
 
 static constexpr unsigned int MAX_CIRCLESIZE = 8;
 
-const PixelFormat TileProps::pixelFormat(0, 0, 0, 0, 24, 16, 8, 0,
+const PixelFormat TileProps::pixelFormat(0, 0, 0, 0,
+										 searchMapShift, materialMapShift,
+										 heightMapShift, lightMapShift,
 										 searchMapMask, materialMapMask,
 										 heightMapMask, lightMapMask,
 										 4, 32, 0, false, false, nullptr);
@@ -88,13 +90,13 @@ uint8_t TileProps::QueryTileProps(const Point& p, Property prop) const noexcept
 		const uint32_t c = propPtr[p.y * size.w + p.x];
 		switch (prop) {
 			case Property::SEARCH_MAP:
-				return (c & searchMapMask) >> propImage->Format().Rshift;
+				return (c & searchMapMask) >> searchMapShift;
 			case Property::MATERIAL:
-				return (c & materialMapMask) >> propImage->Format().Gshift;
+				return (c & materialMapMask) >> materialMapShift;
 			case Property::ELEVATION:
-				return (c & heightMapMask) >> propImage->Format().Bshift;
+				return (c & heightMapMask) >> heightMapShift;
 			case Property::LIGHTING:
-				return (c & lightMapMask) >> propImage->Format().Ashift;
+				return (c & lightMapMask) >> lightMapShift;
 		}
 	}
 	switch (prop) {
