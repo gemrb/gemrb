@@ -453,7 +453,7 @@ def UpdateStoreShoppingWindow (Window):
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = Window.GetControlAlias ('STOSBARL')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", LeftCount)
+	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
 	if LeftTopIndex>LeftCount:
 		GemRB.SetVar ("LeftTopIndex", LeftCount)
@@ -467,7 +467,7 @@ def UpdateStoreShoppingWindow (Window):
 		RightCount=0
 
 	ScrollBar = Window.GetControlAlias ('STOSBARR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", RightCount)
+	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
 	if RightTopIndex>RightCount:
 		GemRB.SetVar ("RightTopIndex", RightCount)
@@ -546,7 +546,7 @@ def UpdateStoreIdentifyWindow (Window):
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
 	ScrollBar = Window.GetControl (7)
-	ScrollBar.SetVarAssoc ("TopIndex", max(0, Count - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count - ItemButtonCount)
 	GemRB.SetVar ("Index", -1)
 	RedrawStoreIdentifyWindow (Window)
 	return
@@ -647,13 +647,13 @@ def UpdateStoreStealWindow (Window):
 	Store = GemRB.GetStore ()
 	LeftCount = Store['StoreItemCount']
 	ScrollBar = Window.GetControlAlias ('SWLSBAR')
-	ScrollBar.SetVarAssoc ("LeftTopIndex", max(0, LeftCount - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("LeftTopIndex", 0, 0, LeftCount - ItemButtonCount)
 
 	pc = GetPC()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = Window.GetControlAlias ('SWRSBAR')
-	ScrollBar.SetVarAssoc ("RightTopIndex", max(0, RightCount - ItemButtonCount))
+	ScrollBar.SetVarAssoc ("RightTopIndex", 0, 0, RightCount - ItemButtonCount)
 	GemRB.SetVar ("LeftIndex", -1)
 	LeftButton.SetState (IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow (Window)
@@ -780,7 +780,7 @@ def InitStoreHealWindow (Window):
 		Count = Count-4
 	else:
 		Count = 0
-	ScrollBar.SetVarAssoc ("TopIndex", Count)
+	ScrollBar.SetVarAssoc ("TopIndex", 0, 0, Count)
 	return
 
 def UpdateStoreHealWindow (Window):
