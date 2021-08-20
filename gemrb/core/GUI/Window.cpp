@@ -529,9 +529,15 @@ bool Window::DispatchEvent(const Event& event)
 			}
 			return true;
 		default:
+			bool reset = false;
+			if (event.type == Event::MouseDown && event.mouse.button == GEM_MB_MENU) {
+				reset = true;
+			}
 			if (target == NULL) {
 				target = this;
+				if (reset) core->ResetActionBar();
 			} else if (target->IsDisabled()) {
+				if (reset) core->ResetActionBar();
 				return true; // we still absorb the event
 			}
 			break;
