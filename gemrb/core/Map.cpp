@@ -403,12 +403,9 @@ Map::Map(TileMap *tm, TileProps props, Holder<Sprite2D> sm)
 : Scriptable(ST_AREA),
 TMap(tm), tileProps(std::move(props)),
 SmallMap(std::move(sm)),
-ExploredBitmap(FogMapSize()), VisibleBitmap(FogMapSize()),
+ExploredBitmap(FogMapSize(), '\0'), VisibleBitmap(FogMapSize(), '\0'),
 reverb(*this)
 {
-	ExploredBitmap.fill(0);
-	VisibleBitmap.fill(0);
-	
 	area=this;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
