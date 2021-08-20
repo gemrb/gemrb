@@ -675,7 +675,8 @@ bool GameControl::DispatchEvent(const Event& event) const
 		}
 		return true;
 	} else if (event.keyboard.keycode == GEM_ESCAPE) {
-		core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+		core->ResetActionBar();
+		core->SetEventFlag(EF_RESETTARGET);
 	}
 	return false;
 }
