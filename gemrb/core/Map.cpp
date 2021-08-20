@@ -921,10 +921,6 @@ void Map::DoStepForActor(Actor *actor, ieDword time) const
 void Map::BlockSearchMapFor(const Movable *actor) const
 {
 	auto flag = actor->IsPC() ? PathMapFlags::PC : PathMapFlags::NPC;
-	// FIXME: is this really necessary? doesn't IsPC() work for Actor too?
-	if (actor->Type == ST_ACTOR) {
-		flag = static_cast<const Actor*>(actor)->IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC;
-	}
 	tileProps.BlockSearchMap(ConvertCoordToTile(actor->Pos), actor->size, flag);
 }
 
