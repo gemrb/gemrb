@@ -64,8 +64,6 @@ static_cast<Control::Action>(a)
 #define ACTION_DEFAULT ControlActionKey(Control::Click, 0, GEM_MB_ACTION, 1)
 #define ACTION_CUSTOM(x)  ACTION_CAST(Control::CustomAction + int(x))
 
-#define CTL_INVALID_VALUE ieDword(-1)
-
 /**
  * @class Control
  * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
@@ -134,6 +132,9 @@ public: // Public attributes
 			}
 		}
 	};
+	
+	using value_t = ieDword;
+	static constexpr value_t INVALID_VALUE = -1;
 
 	/** Variable length is 40-1 (zero terminator) */
 	char VarName[MAX_VARIABLE_LENGTH];
@@ -154,8 +155,8 @@ public:
 	virtual void SetText(const String&) {};
 
 	/** Update the control if it's tied to a GUI variable */
-	void UpdateState(const char*, unsigned int);
-	virtual void UpdateState(unsigned int) {}
+	void UpdateState(const char*, value_t);
+	virtual void UpdateState(value_t) {}
 
 	/** Returns the Owner */
 	virtual void SetFocus();
@@ -179,15 +180,15 @@ public:
 
 	virtual String QueryText() const { return String(); }
 
-	using ValueRange = std::pair<ieDword, ieDword>;
+	using ValueRange = std::pair<value_t, value_t>;
 	const static ValueRange MaxValueRange;
 	
-	ieDword GetValue() const { return Value; }
+	value_t GetValue() const { return Value; }
 	ValueRange GetValueRange() const { return range; }
 	
-	void SetValue(ieDword val);
+	void SetValue(value_t val);
 	void SetValueRange(ValueRange range = MaxValueRange);
-	void SetValueRange(ieDword min, ieDword max = std::numeric_limits<ieDword>::max());
+	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
 	
 	bool HitTest(const Point& p) const override;
 	
@@ -230,7 +231,7 @@ private:
 	Timer* actionTimer;
 
 	/** the value of the control to add to the variable */
-	ieDword Value = CTL_INVALID_VALUE;
+	value_t Value = INVALID_VALUE;
 	ValueRange range;
 
 };

@@ -265,10 +265,10 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, unsigned int Sum) const
+void Window::RedrawControls(const char* VarName, Control::value_t val) const
 {
 	for (auto ctrl : Controls) {
-		ctrl->UpdateState(VarName, Sum);
+		ctrl->UpdateState(VarName, val);
 	}
 }
 

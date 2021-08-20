@@ -155,7 +155,7 @@ public:
 	/** Returns the selected text */
 	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(unsigned int optIdx) override;
+	void UpdateState(value_t optIdx) override;
 	void DidFocus() override;
 	void DidUnFocus() override;
 	

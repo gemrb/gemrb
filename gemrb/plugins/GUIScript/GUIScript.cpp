@@ -2035,11 +2035,11 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	// now that the value range is setup, we can change the dictionary variable
 	strnlwrcpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH - 1);
 	
-	ieDword val = (ieDword)PyInt_AsUnsignedLongMask(Value);
+	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
 	ctrl->SetValue(val);
 	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
-	ieDword curVal = CTL_INVALID_VALUE;
+	Control::value_t curVal = Control::INVALID_VALUE;
 	core->GetDictionary()->Lookup(VarName, curVal);
 
 	const Window* win = ctrl->GetWindow();

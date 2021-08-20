@@ -189,7 +189,7 @@ void WorldMapControl::ScrollTo(const Point& pos)
 /** Mouse Over Event */
 bool WorldMapControl::OnMouseOver(const MouseEvent& me)
 {
-	if (GetValue() == CTL_INVALID_VALUE) {
+	if (GetValue() == INVALID_VALUE) {
 		return true;
 	}
 

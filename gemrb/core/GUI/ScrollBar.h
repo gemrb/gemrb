@@ -76,7 +76,7 @@ public:
 	void ScrollBySteps(int steps);
 
 	/** refreshes scrollbar if associated with VarName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 	bool TracksMouseDown() const override { return true; }
 
 private: //Private attributes

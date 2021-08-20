@@ -103,7 +103,7 @@ void Slider::SetPosition(const Point& p)
 }
 
 /** Refreshes a slider which is associated with VariableName */
-void Slider::UpdateState(unsigned int Sum)
+void Slider::UpdateState(value_t Sum)
 {
 	Sum /= GetValue();
 	if (Sum <= KnobStepsCount) {

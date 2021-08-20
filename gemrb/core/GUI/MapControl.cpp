@@ -85,9 +85,9 @@ void MapControl::DrawFog(const Region& rgn) const
 	video->DrawPoints(points, ColorBlack);
 }
 
-void MapControl::UpdateState(unsigned int Sum)
+void MapControl::UpdateState(value_t val)
 {
-	SetValue(Sum);
+	SetValue(val);
 }
 	
 Point MapControl::ConvertPointToGame(Point p) const

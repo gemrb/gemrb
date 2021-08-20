@@ -167,7 +167,7 @@ void TextArea::SpanSelector::MakeSelection(size_t idx)
 	}
 
 	// beware, this will recursively call this function.
-	ta.UpdateState(static_cast<unsigned int>(idx));
+	ta.UpdateState(static_cast<value_t>(idx));
 }
 	
 TextContainer* TextArea::SpanSelector::TextAtPoint(const Point& p)
@@ -540,7 +540,7 @@ void TextArea::ScrollToY(int y, ieDword duration)
 	scrollview.ScrollTo(Point(0, y), duration);
 }
 
-void TextArea::UpdateState(unsigned int optIdx)
+void TextArea::UpdateState(value_t optIdx)
 {
 	if (!selectOptions) {
 		// no selectable options present

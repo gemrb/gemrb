@@ -106,9 +106,9 @@ Point ScrollBar::AxisPosFromValue() const
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
-void ScrollBar::UpdateState(unsigned int Sum)
+void ScrollBar::UpdateState(value_t val)
 {
-	SetValue( Sum );
+	SetValue(val);
 }
 
 void ScrollBar::ScrollBySteps(int steps)

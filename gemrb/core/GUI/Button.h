@@ -151,7 +151,7 @@ public:
 	Holder<Sprite2D> Cursor() const override;
 
 	/** Refreshes the button from a radio group */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t Sum) override;
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(const Color &color);
 	/** Sets percent (0-1.0) of width for clipping picture */

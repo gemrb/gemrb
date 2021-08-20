@@ -610,7 +610,7 @@ void Button::SetText(const String& string)
 }
 
 /** Refresh a button from a given radio button group */
-void Button::UpdateState(unsigned int Sum)
+void Button::UpdateState(value_t Sum)
 {
 	if (IsDisabled()) {
 		return;
