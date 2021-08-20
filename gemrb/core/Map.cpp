@@ -107,12 +107,13 @@ uint8_t TileProps::QueryTileProps(const Point& p, Property prop) const noexcept
 		case Property::LIGHTING:
 			return defaultLighting;
 	}
+	return -1;
 }
 
 PathMapFlags TileProps::QuerySearchMap(const Point& p) const noexcept
 {
 	return static_cast<PathMapFlags>(QueryTileProps(p, Property::SEARCH_MAP));
-};
+}
 
 uint8_t TileProps::QueryMaterial(const Point& p) const noexcept
 {
