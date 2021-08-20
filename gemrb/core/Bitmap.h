@@ -55,7 +55,7 @@ public:
 	}
 	
 	Bitmap(const Size& s, uint8_t pattern)
-	: Bitmap(size)
+	: Bitmap(s)
 	{
 		fill(pattern);
 	}
