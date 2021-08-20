@@ -74,7 +74,7 @@ IF(APPLE) #application bundle generation
 	ENDIF()
 
 	SET(BUNDLE_LOADER "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.app/Contents/MacOS/GemRB") # BUNDLE_LOADER is used by plugins needing to extend the cocoa wrapper (SDLVideo).
-	SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -bundle_loader \"${BUNDLE_LOADER}\"")
+	STRING(APPEND CMAKE_MODULE_LINKER_FLAGS " -bundle_loader \"${BUNDLE_LOADER}\"")
 ELSE(APPLE)
 	ADD_SUBDIRECTORY( docs )
 	ADD_SUBDIRECTORY( tests )
