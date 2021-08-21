@@ -47,14 +47,45 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+#include <array>
 #include <cmath>
 
 namespace GemRB {
 
-#define FORMATIONSIZE 10
-using formation_type = Point[FORMATIONSIZE];
-ieDword formationcount;
-static formation_type *formations=NULL;
+constexpr uint8_t FORMATIONSIZE = 10;
+using formation_t = std::array<Point, FORMATIONSIZE>;
+
+class Formations {
+	std::vector<formation_t> formations;
+	
+	Formations() noexcept {
+		//TODO:
+		//There could be a custom formation which is saved in the save game
+		//alternatively, all formations could be saved in some compatible way
+		//so it doesn't cause problems with the original engine
+		AutoTable tab = gamedata->LoadTable("formatio");
+		if (!tab) {
+			// fallback
+			formations.emplace_back();
+			return;
+		}
+		auto formationcount = tab->GetRowCount();
+		formations.reserve(formationcount);
+		for (unsigned int i = 0; i < formationcount; i++) {
+			for (uint8_t j = 0; j < FORMATIONSIZE; j++) {
+				Point p(atoi(tab->QueryField(i, j*2)), atoi(tab->QueryField(i, j*2+1)));
+				formations[i][j] = p;
+			}
+		}
+	}
+public:
+	static const formation_t& GetFormation(size_t formation) noexcept {
+		static const Formations formations;
+		formation = std::min(formation, formations.formations.size() - 1);
+		return formations.formations[formation];
+	}
+};
+
 static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
@@ -79,9 +110,6 @@ void GameControl::SetTracker(const Actor *actor, ieDword dist)
 GameControl::GameControl(const Region& frame)
 : View(frame)
 {
-	if (!formations) {
-		ReadFormations();
-	}
 	//this is the default action, individual actors should have one too
 	//at this moment we use only this
 	//maybe we don't even need it
@@ -131,47 +159,17 @@ GameControl::~GameControl()
 		EventMgr::UnRegisterEventMonitor(eventMonitor);
 	}
 
-	if (formations)	{
-		free( formations );
-		formations = NULL;
-	}
 	delete dialoghandler;
 	delete DisplayText;
-}
-
-//TODO:
-//There could be a custom formation which is saved in the save game
-//alternatively, all formations could be saved in some compatible way
-//so it doesn't cause problems with the original engine
-void GameControl::ReadFormations() const
-{
-	AutoTable tab = gamedata->LoadTable("formatio");
-	if (!tab) {
-		// fallback
-		formationcount = 1;
-		formations = (formation_type *) calloc(1,sizeof(formation_type) );
-		return;
-	}
-	formationcount = tab->GetRowCount();
-	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for (unsigned int i = 0; i < formationcount; i++) {
-		for (unsigned int j = 0; j < FORMATIONSIZE; j++) {
-			short k = (short) atoi(tab->QueryField(i, j*2));
-			formations[i][j].x = k;
-			k = (short) atoi(tab->QueryField(i, j*2+1));
-			formations[i][j].y = k;
-		}
-	}
 }
 
 //returns a single point offset for a formation
 //formation: the formation type
 //pos: the actor's slot ID
-Point GameControl::GetFormationOffset(ieDword formation, ieDword pos) const
+Point GameControl::GetFormationOffset(size_t formation, uint8_t pos) const
 {
-	if (formation>=formationcount) formation = 0;
-	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-	return formations[formation][pos];
+	pos = std::min<uint8_t>(pos, FORMATIONSIZE - 1);
+	return Formations::GetFormation(formation)[pos];
 }
 
 Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, const std::vector<Point>& exclude) const
@@ -183,9 +181,9 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	assert(area);
 
 	static constexpr int radius = 36 / 2; // 36 diameter is copied from make_formation.py
-	const auto& formation = game->GetFormation();
-	assert(formation < formationcount);
-
+	const auto& formationid = game->GetFormation();
+	const auto& formation = Formations::GetFormation(formationid);
+	
 	Point stepVec;
 	int direction = (pos % 2 == 0) ? 1 : -1;
 
@@ -194,14 +192,14 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 
 	if (pos < FORMATIONSIZE) {
 		// calculate new coordinates by rotating formation around (0,0)
-		vec = RotatePoint(formations[formation][pos], angle);
+		vec = RotatePoint(formation[pos], angle);
 		stepVec.y = radius;
 	} else {
 		
 		// create a line formation perpendicular to the formation start point and beginning at the last point
 		// of the formation table. Alternate between +90 degrees and -90 degrees to keep it balanced
 		// the formation table is created along the x axis starting at (0,0)
-		Point p = formations[formation][FORMATIONSIZE-1];
+		Point p = formation[FORMATIONSIZE - 1];
 		vec = RotatePoint(p, angle);
 		stepVec.x = radius * direction;
 	}

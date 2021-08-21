@@ -134,7 +134,6 @@ private:
 	Map* CurrentArea() const;
 
 	Region SelectionRect() const;
-	void ReadFormations() const;
 	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
 	void DrawArrowMarker(Point p, const Color& color) const;
 	void DrawFormation(const std::vector<Actor*>& actors, const Point& formationPoint, double angle) const;
@@ -221,7 +220,7 @@ public:
 
 	void MakeSelection(bool extend = false);
 	void InitFormation(const Point &);
-	Point GetFormationOffset(ieDword formation, ieDword pos) const;
+	Point GetFormationOffset(size_t formation, uint8_t pos) const;
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false) const;
 	/** checks if the actor should be running instead of walking */
