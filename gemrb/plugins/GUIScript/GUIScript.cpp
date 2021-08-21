@@ -13780,25 +13780,18 @@ bool GUIScript::ExecFile(const char* file)
 	if (len <= 0)
 		return false;
 
-	char* buffer = (char *) malloc(len+1);
-	if (!buffer)
-		return false;
-
-	if (fs.Read(buffer, len) == GEM_ERROR) {
-		free(buffer);
+	std::string buffer(len, '\0');
+	if (fs.Read(&buffer[0], len) == GEM_ERROR) {
 		return false;
 	}
-	buffer[len] = 0;
 
-	bool ret = ExecString(buffer);
-	free(buffer);
-	return ret;
+	return ExecString(buffer);
 }
 
 /** Exec a single String */
-bool GUIScript::ExecString(const char* string, bool feedback)
+bool GUIScript::ExecString(const std::string &string, bool feedback)
 {
-	PyObject* run = PyRun_String(string, Py_file_input, pMainDic, pMainDic);
+	PyObject* run = PyRun_String(string.c_str(), Py_file_input, pMainDic, pMainDic);
 
 	if (run) {
 		// success
