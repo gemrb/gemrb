@@ -89,11 +89,10 @@ static void ConsoleWinLogMsg(const LogMessage& msg)
 
 		const wchar_t* fmt = L"%s%s: [/color]%s%s[/color]\n";
 		size_t len = msg.message.length() + msg.owner.length() + wcslen(fmt) + 2 * strlen(colors[0]);
-		wchar_t* text = (wchar_t*)malloc(len * sizeof(wchar_t));
+		String text(len, L'\0');
 		int level = msg.level == INTERNAL ? 0 : msg.level;
-		swprintf(text, len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[level]], msg.message.c_str());
+		swprintf(&text[0], len, fmt, colors[msg.color], msg.owner.c_str(), colors[log_level_color[level]], msg.message.c_str());
 		ta->AppendText(text);
-		free(text);
 	}
 }
 
