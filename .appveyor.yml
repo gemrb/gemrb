@@ -10,6 +10,7 @@ skip_commits:
   message: /\[ci skip\]/
 only_commits:
   files:
+    - CMakeLists.txt
     - gemrb/**/*
     - cmake/**/*
     - platforms/windows/**/*
@@ -30,7 +31,7 @@ install:
     vcpkg install zlib
     vcpkg install sdl2
     vcpkg install sdl2-mixer
-    vcpkg install python2
+    vcpkg install python3
     vcpkg install openal-soft
     vcpkg install libpng
     vcpkg install libogg

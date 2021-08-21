@@ -27,7 +27,7 @@ LIST(APPEND DLL_SET_DEBUG
 	libpng16d.dll
 	ogg.dll
 	OpenAL32.dll
-	python27_d.dll
+	python39_d.dll
 	SDL.dll
 	SDL2d.dll
 	SDL2_mixer.dll
@@ -46,7 +46,7 @@ LIST(APPEND DLL_SET_RELEASE
 	libpng16.dll
 	ogg.dll
 	OpenAL32.dll
-	python27.dll
+	python39.dll
 	SDL.dll
 	SDL2.dll
 	SDL2_mixer.dll
@@ -94,8 +94,8 @@ GET_FILENAME_COMPONENT(PYTHON_PARENT_DIR ${PYTHON_INCLUDE_DIR} DIRECTORY)
 
 IF(EXISTS ${PYTHON_PARENT_DIR}/Lib/site.py )
 	INSTALL(DIRECTORY ${PYTHON_PARENT_DIR}/Lib DESTINATION ${BIN_DIR})
-ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python2/Lib/site.py)
-	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python2/Lib DESTINATION ${BIN_DIR})
+ELSEIF(EXISTS ${VCPKG_DATAROOT}/share/python3/Lib/site.py)
+	INSTALL(DIRECTORY ${VCPKG_DATAROOT}/share/python3/Lib DESTINATION ${BIN_DIR})
 ENDIF()
 
 MESSAGE(STATUS "Dependency DLL's will be copied to the build and install directory")

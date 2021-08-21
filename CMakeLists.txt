@@ -256,13 +256,13 @@ ENDIF()
 
 # Check for all the required and optional dependencies
 IF(PYTHON_VERSION STREQUAL "Auto")
-	FIND_PACKAGE(PythonLibs 2.3)
+	FIND_PACKAGE(PythonLibs 3)
 	# Record for reporting later
-	SET(PYTHON_VERSION 2.3)
+	SET(PYTHON_VERSION 3)
 	IF(NOT PYTHONLIBS_FOUND)
-		FIND_PACKAGE(PythonLibs 3 REQUIRED)
+		FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
 		# Record for reporting later
-		SET(PYTHON_VERSION 3)
+		SET(PYTHON_VERSION 2.3)
 	ENDIF()
 ELSE()
 	FIND_PACKAGE(PythonLibs ${PYTHON_VERSION} REQUIRED)
@@ -599,10 +599,9 @@ add_custom_target(appimage
     # bundle core python modules
     # AppRun defaults PYTHONPATH to this destination
     # source is probably available in Python3_STDLIB once we switch to newer cmake
-    COMMAND cp -r /usr/lib/python2.7 AppDir/usr/share/pyshared
-    COMMAND cp /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py AppDir/usr/share/pyshared/
-    COMMAND rm -r AppDir/usr/share/pyshared/config-x86_64-linux-gnu
-    COMMAND rm -r AppDir/usr/share/pyshared/dist-packages
+    COMMAND cp -r /usr/lib/python3.6 AppDir/usr/share/pyshared
+    COMMAND rm -rf AppDir/usr/share/pyshared/config-x86_64-linux-gnu
+    COMMAND rm -rf AppDir/usr/share/pyshared/dist-packages
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
