@@ -44,6 +44,14 @@ class MapNote;
 
 class GEM_EXPORT MapControl : public Control {
 private:
+	enum NOTE_STATE : Control::value_t {
+		NO_NOTES	= 0,
+		VIEW_NOTES 	= 1,
+		SET_NOTE	= 2,
+		REVEAL		= 3,
+		EDIT_NOTE	= 4
+	};
+
 	Region mosRgn;
 	Point notePos;
 
@@ -82,7 +90,6 @@ private:
 	Point ConvertPointToGame(Point) const;
 	Point ConvertPointFromGame(Point) const;
 	
-protected:
 	/** Key Press Event */
 	bool OnKeyPress(const KeyboardEvent& Key, unsigned short Mod) override;
 	/** Mouse Over Event */

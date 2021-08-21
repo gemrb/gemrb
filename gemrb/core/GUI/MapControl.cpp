@@ -30,12 +30,6 @@
 
 namespace GemRB {
 
-#define MAP_NO_NOTES   0
-#define MAP_VIEW_NOTES 1
-#define MAP_SET_NOTE   2
-#define MAP_REVEAL     3
-#define MAP_EDIT_NOTE  4
-
 MapControl::MapControl(const Region& frame, AnimationFactory* af)
 : Control(frame), mapFlags(af)
 {
@@ -120,7 +114,7 @@ void MapControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	UpdateMap();
 
 	if (LinkedLabel) {
-		if (GetValue() == MAP_EDIT_NOTE)
+		if (GetValue() == EDIT_NOTE)
 		{
 			LinkedLabel->SetFlags(IgnoreEvents, OP_NAND);
 			LinkedLabel->SetFocus();
@@ -187,7 +181,7 @@ void MapControl::DrawSelf(const Region& rgn, const Region& /*clip*/)
 	// Draw Map notes, could be turned off in bg2
 	// we use the common control value to handle it, because then we
 	// don't need another interface
-	if (GetValue()!=MAP_NO_NOTES) {
+	if (GetValue() != NO_NOTES) {
 		i = MyMap -> GetMapNoteCount();
 		while (i--) {
 			const MapNote& mn = MyMap -> GetMapNote(i);
@@ -232,12 +226,12 @@ void MapControl::UpdateViewport(Point vp)
 
 void MapControl::UpdateCursor()
 {
-	ieDword val = GetValue();
+	value_t val = GetValue();
 	switch (val) {
-		case MAP_REVEAL: //for farsee effect
+		case REVEAL: //for farsee effect
 			SetCursor(core->Cursors[IE_CURSOR_CAST]);
 			break;
-		case MAP_SET_NOTE:
+		case SET_NOTE:
 			SetCursor(core->Cursors[IE_CURSOR_GRAB]);
 			break;
 		default:
@@ -266,7 +260,7 @@ bool MapControl::OnMouseDown(const MouseEvent& me, unsigned short /*Mod*/)
 
 	if (me.ButtonState(GEM_MB_ACTION)) {
 		Point p = ConvertPointFromScreen(me.Pos());
-		if (GetValue() == MAP_VIEW_NOTES) {
+		if (GetValue() == VIEW_NOTES) {
 			const MapNote* mn = MapNoteAtPoint(p);
 			if (!mn || mn->readonly) {
 				UpdateViewport(p);
@@ -286,8 +280,8 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	if (MyMap == NULL)
 		return false;
 
-	ieDword val = GetValue();
-	if (val == MAP_VIEW_NOTES) {
+	value_t val = GetValue();
+	if (val == VIEW_NOTES) {
 		Point p = ConvertPointFromScreen(me.Pos());
 
 		const String* text = nullptr;
@@ -308,7 +302,7 @@ bool MapControl::OnMouseOver(const MouseEvent& me)
 	
 bool MapControl::OnMouseDrag(const MouseEvent& me)
 {
-	if (GetValue() == MAP_VIEW_NOTES) {
+	if (GetValue() == VIEW_NOTES) {
 		if (me.ButtonState(GEM_MB_ACTION)) {
 			UpdateViewport(ConvertPointFromScreen(me.Pos()));
 		}
@@ -322,21 +316,21 @@ bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 	Point p = ConvertPointFromScreen(me.Pos());
 
 	switch(GetValue()) {
-		case MAP_EDIT_NOTE:
-			SetValue(MAP_VIEW_NOTES);
+		case EDIT_NOTE:
+			SetValue(VIEW_NOTES);
 			break;
-		case MAP_REVEAL:
+		case REVEAL:
 			UpdateViewport(p);
 			notePos = ConvertPointToGame(p);
 			break;
-		case MAP_SET_NOTE:
+		case SET_NOTE:
 			notePos = ConvertPointToGame(p);
-			SetValue(MAP_EDIT_NOTE);
+			SetValue(EDIT_NOTE);
 			break;
-		case MAP_NO_NOTES:
+		case NO_NOTES:
 			UpdateViewport(p);
 			break;
-		case MAP_VIEW_NOTES:
+		case VIEW_NOTES:
 			//left click allows setting only when in MAP_SET_NOTE mode
 			if (me.ButtonState(GEM_MB_ACTION)) {
 				UpdateViewport(p);
@@ -344,7 +338,7 @@ bool MapControl::OnMouseUp(const MouseEvent& me, unsigned short mod)
 				const MapNote* mn = MapNoteAtPoint(p);
 				if (mn && !mn->readonly) {
 					notePos = mn->Pos;
-					SetValue(MAP_EDIT_NOTE);
+					SetValue(EDIT_NOTE);
 				} else {
 					notePos = ConvertPointToGame(p);
 				}
