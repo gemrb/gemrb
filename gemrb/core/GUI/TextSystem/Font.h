@@ -115,7 +115,7 @@ private:
 			using GlyphMap = std::map<ieWord, Glyph>;
 			GlyphMap glyphs;
 			ieByte* pageData; // current raw page being built
-			int pageXPos; // current position on building page
+			int pageXPos = 0; // current position on building page
 			Font* font;
 			Holder<Sprite2D> invertedSheet;
 		public:
@@ -136,11 +136,11 @@ private:
 	};
 
 	struct GlyphIndexEntry {
-		ieWord chr;
-		ieWord pageIdx;
-		const Glyph* glyph;
+		ieWord chr = 0;
+		ieWord pageIdx = -1;
+		const Glyph* glyph = nullptr;
 
-		GlyphIndexEntry() : chr(0), pageIdx(-1), glyph(NULL) {}
+		GlyphIndexEntry() = default;
 		GlyphIndexEntry(ieWord c, ieWord p, const Glyph* g) : chr(c), pageIdx(p), glyph(g) {}
 	};
 
@@ -149,7 +149,7 @@ private:
 	// if we ever transition to C++11 we can use one here
 	using GlyphAtlas = std::deque<GlyphAtlasPage*>;
 
-	GlyphAtlasPage* CurrentAtlasPage;
+	GlyphAtlasPage* CurrentAtlasPage = nullptr;
 	GlyphIndex AtlasIndex;
 	GlyphAtlas Atlas;
 
@@ -173,7 +173,7 @@ private:
 	size_t Print(Region rgn, const String& string, ieByte Alignment, const PrintColors* colors, Point* point = nullptr) const;
 
 public:
-	Font(PaletteHolder, ieWord lineheight, ieWord baseline, bool background);
+	Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg);
 	virtual ~Font();
 
 	const Glyph& CreateGlyphForCharSprite(ieWord chr, const Holder<Sprite2D>&);

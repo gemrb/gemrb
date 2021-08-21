@@ -73,7 +73,6 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
 : SpriteSheet<ieWord>(core->GetVideoDriver()), font(font)
 {
-	pageXPos = 0;
 	SheetRegion.w = pageSize.w;
 	SheetRegion.h = pageSize.h;
 
@@ -183,11 +182,8 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
-: palette(std::move(pal)), LineHeight(lineheight), Baseline(baseline)
-{
-	CurrentAtlasPage = NULL;
-	background = bg;
-}
+: palette(std::move(pal)), background(bg), LineHeight(lineheight), Baseline(baseline)
+{}
 
 Font::~Font(void)
 {
