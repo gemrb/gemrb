@@ -506,7 +506,7 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 	
 	Map* map = nullptr;
 	try {
-		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm->GetSprite2D());
+		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm ? sm->GetSprite2D() : nullptr);
 	} catch (const std::exception& e) {
 		Log(ERROR, "AREImporter", "%s", e.what());
 		return nullptr;
