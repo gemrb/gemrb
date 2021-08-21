@@ -163,7 +163,7 @@ public:
 
 private: // Private attributes
 	// dialog and listbox handling
-	std::vector<ieDword> values;
+	std::vector<value_t> values;
 	const Content* dialogBeginNode;
 	Holder<Sprite2D> speakerPic;
 	// dialog options container

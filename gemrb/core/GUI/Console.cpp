@@ -65,7 +65,7 @@ void Console::UpdateTextArea()
 			options.back().first = int(History.Size() - i) + 1;
 		}
 		
-		textArea->SetValue(-1);
+		textArea->SetValue(INVALID_VALUE);
 		textArea->SetSelectOptions(options, false);
 		// TODO: if we add a method to TextArea to return the TextContainer for a given select option
 		// then we can change the color to red for failed commands and green for successfull ones

@@ -554,7 +554,7 @@ void TextArea::UpdateState(value_t optIdx)
 	}
 	
 	if (optIdx >= selectOptions->NumOpts()) {
-		SetValue(-1);
+		SetValue(INVALID_VALUE);
 		selectOptions->MakeSelection(-1);
 		return;
 	}

@@ -2029,7 +2029,8 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 		// blank out any old varname so we can set the control value without setting the old variable
 		ctrl->VarName[0] = '\0';
 		// this may set the value if its already set outside the range
-		ctrl->SetValueRange(ieDword(PyLong_AsUnsignedLong(min)), ieDword(PyLong_AsUnsignedLong(max)));
+		ctrl->SetValueRange(Control::value_t(PyLong_AsUnsignedLong(min)),
+							Control::value_t(PyLong_AsUnsignedLong(max)));
 	}
 	
 	// now that the value range is setup, we can change the dictionary variable
