@@ -32,7 +32,6 @@ protected:
 
 public:
 	DirectoryImporter(void) = default;
-	~DirectoryImporter(void) override;
 	bool Open(const char *dir, const char *desc) override;
 	/** predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type) override;

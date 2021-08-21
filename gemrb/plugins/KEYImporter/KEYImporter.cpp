@@ -29,14 +29,8 @@
 
 using namespace GemRB;
 
-KEYImporter::KEYImporter(void)
-{
-	description = NULL;
-}
-
 KEYImporter::~KEYImporter(void)
 {
-	free(description);
 	for (auto& bifFile : biffiles) {
 		free(bifFile.name);
 	}
@@ -110,8 +104,7 @@ static void FindBIF(BIFEntry *entry)
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
 {
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;

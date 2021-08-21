@@ -133,7 +133,6 @@ private:
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const char *resname, ieWord type);
 public:
-	KEYImporter(void);
 	~KEYImporter(void) override;
 	bool Open(const char *file, const char *desc) override;
 	/* predicts the availability of a resource */

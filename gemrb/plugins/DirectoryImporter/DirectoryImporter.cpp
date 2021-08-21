@@ -26,18 +26,12 @@
 
 using namespace GemRB;
 
-DirectoryImporter::~DirectoryImporter(void)
-{
-	free(description);
-}
-
 bool DirectoryImporter::Open(const char *dir, const char *desc)
 {
 	if (!dir_exists(dir))
 		return false;
 
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	if (strlcpy(path, dir, _MAX_PATH) >= _MAX_PATH) {
 		Log(ERROR, "DirectoryImporter", "Directory with too long path: %s!", dir);
 		return false;
