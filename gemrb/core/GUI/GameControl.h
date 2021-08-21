@@ -78,56 +78,56 @@ class DialogHandler;
 
 class GEM_EXPORT GameControl : public View {
 private:
-	ieDword lastActorID;
-	ieDword trackerID;
-	ieDword distance;  //tracking distance
+	ieDword lastActorID = 0;
+	ieDword trackerID = 0;
+	ieDword distance = 0;  //tracking distance
 	std::vector<Actor*> highlighted;
 
-	bool isSelectionRect;
-	bool isFormationRotation;
+	bool isSelectionRect = false;
+	bool isFormationRotation = false;
 
 	// mouse coordinates represented in game coordinates
 	Point gameClickPoint;
 	Point screenMousePos;
 	Point vpOrigin;
-	bool updateVPTimer;
+	bool updateVPTimer = true;
 	double formationBaseAngle = 0.0;
 
 	// currently selected targeting type, such as talk, attack, cast, ...
 	// private to enforce proper cursor changes
-	int target_mode;
-	int lastCursor;
+	int target_mode = TARGET_MODE_NONE;
+	int lastCursor = 0;
 	Point vpVector;
-	int numScrollCursor;
-	PathNode* drawPath;
-	unsigned int ScreenFlags;
-	unsigned int DialogueFlags;
-	String* DisplayText;
-	unsigned int DisplayTextTime;
-	bool AlwaysRun;
-	bool ShouldTriggerWorldMap(const Actor *pc) const;
-	Actor *user; //the user of item or spell
+	int numScrollCursor = 0;
+	PathNode* drawPath = nullptr;
+	unsigned int ScreenFlags = SF_CENTERONACTOR;
+	unsigned int DialogueFlags = DF_FREEZE_SCRIPTS;
+	String* DisplayText = nullptr;
+	unsigned int DisplayTextTime = 0;
+	bool AlwaysRun = false;
+	Actor *user = nullptr; //the user of item or spell
 
-	Door* overDoor;
-	Container* overContainer;
-	InfoPoint* overInfoPoint;
+	Door* overDoor = nullptr;
+	Container* overContainer = nullptr;
+	InfoPoint* overInfoPoint = nullptr;
 
 	EventMgr::TapMonitorId eventMonitors[2];
 
 public:
 	static uint32_t DebugFlags;
 
-	DialogHandler *dialoghandler;
+	DialogHandler *dialoghandler = nullptr;
 	//the name of the spell to cast
 	ResRef spellName;
 	//using spell or item
-	int spellOrItem; // -1 = item, otherwise the spell type
+	int spellOrItem = 0; // -1 = item, otherwise the spell type
 	//the user of spell or item
-	Actor *spellUser;
-	int spellSlot, spellIndex; //or inventorySlot/itemHeader
-	int spellCount; //multiple targeting
+	Actor *spellUser = nullptr;
+	int spellSlot = 0; // or inventorySlot/itemHeader
+	int spellIndex = 0;
+	int spellCount = 0; //multiple targeting
 	// allow targeting allies, enemies and/or neutrals (bitmask)
-	int target_types;
+	int target_types = 0;
 
 private:
 	using FormationPoints = std::vector<Point>;
@@ -223,6 +223,7 @@ public:
 	Point GetFormationOffset(size_t formation, uint8_t pos) const;
 	/** calls MoveToPoint or RunToPoint */
 	void CreateMovement(Actor *actor, const Point &p, bool append = true, bool tryToRun = false) const;
+	bool ShouldTriggerWorldMap(const Actor *pc) const;
 	/** checks if the actor should be running instead of walking */
 	bool CanRun(const Actor *actor) const;
 	bool ShouldRun(const Actor *actor) const;

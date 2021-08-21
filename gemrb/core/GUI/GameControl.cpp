@@ -110,42 +110,20 @@ void GameControl::SetTracker(const Actor *actor, ieDword dist)
 GameControl::GameControl(const Region& frame)
 : View(frame)
 {
-	//this is the default action, individual actors should have one too
-	//at this moment we use only this
-	//maybe we don't even need it
-	spellCount = spellIndex = spellOrItem = spellSlot = 0;
-	spellUser = NULL;
-	user = NULL;
-	lastActorID = 0;
-	trackerID = 0;
-	distance = 0;
-	overDoor = NULL;
-	overContainer = NULL;
-	overInfoPoint = NULL;
-	drawPath = NULL;
-	lastCursor = IE_CURSOR_INVALID;
-	numScrollCursor = 0;
-
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
 	AlwaysRun = tmp != 0;
 
-	ClearMouseState();
 	ResetTargetMode();
+	SetCursor(nullptr);
 
 	tmp = 0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
-		ScreenFlags = SF_ALWAYSCENTER | SF_CENTERONACTOR;
-	} else {
-		ScreenFlags = SF_CENTERONACTOR;
+		ScreenFlags |= SF_ALWAYSCENTER;
 	}
 	// the game always starts paused so nothing happens till we are ready
-	DialogueFlags = DF_FREEZE_SCRIPTS;
 	dialoghandler = new DialogHandler();
-	DisplayText = NULL;
-	DisplayTextTime = 0;
-	updateVPTimer = true;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&GameControl::OnGlobalMouseMove, this);
 	eventMonitors[0] = EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);

@@ -42,15 +42,7 @@ View::DragOp::~DragOp() {
 
 View::View(const Region& frame)
 	: frame(frame)
-{
-	eventProxy = NULL;
-	superView = NULL;
-	window = NULL;
-
-	dirty = true;
-	flags = 0;
-	autoresizeFlags = ResizeNone;
-}
+{}
 
 View::~View()
 {
