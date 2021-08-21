@@ -904,11 +904,11 @@ int BIKPlayer::get_vlc2(int16_t (*table)[2], int bits, int max_depth)
 
 int BIKPlayer::read_runs(Bundle *b)
 {
-	int t, v;
+	int t;
 
 	CHECK_READ_VAL(v_gb, b, t);
 	if (v_gb.get_bits(1)) {
-		v = v_gb.get_bits(4);
+		int v = v_gb.get_bits(4);
 		if (b->cur_dec + t > b->data_end) {
 			return -1;
 		}
@@ -916,7 +916,7 @@ int BIKPlayer::read_runs(Bundle *b)
 		b->cur_dec += t;
 	} else {
 		for (int i = 0; i < t; i++) {
-			v = GET_HUFF(b->tree);
+			int v = GET_HUFF(b->tree);
 			*b->cur_dec++ = v;
 		}
 	}

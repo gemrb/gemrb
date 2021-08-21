@@ -189,7 +189,8 @@ bool WindowManager::OrderRelativeTo(Window* win, Window* win2, bool front)
 	Window* oldFront = windows.front();
 	// if we only have one window, or the 2 windows are the same it is an automatic success
 	if (windows.size() > 1 && win != win2) {
-		WindowList::iterator it = WIN_IT(win), it2 = WIN_IT(win2);
+		WindowList::iterator it = WIN_IT(win);
+		WindowList::iterator it2 = WIN_IT(win2);
 		if (it == windows.end() || it2 == windows.end()) return false;
 
 		windows.erase(it);

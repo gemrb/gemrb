@@ -236,7 +236,8 @@ private:
 	GetBitContext v_gb;
 	
 	AVFrame c_frames[2];
-	AVFrame *c_pic, *c_last;
+	AVFrame *c_pic;
+	AVFrame *c_last;
 
 private:
 	void segment_video_play();

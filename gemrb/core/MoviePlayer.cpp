@@ -77,8 +77,9 @@ void MoviePlayer::Play(Window* win)
 	const Size& size = Dimensions();
 	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
 	center = center + winFrame.origin;
-	VideoBufferPtr subBuf = nullptr, vb = video->CreateBuffer(Region(center, size), movieFormat);
-	
+	VideoBufferPtr subBuf = nullptr;
+	VideoBufferPtr vb = video->CreateBuffer(Region(center, size), movieFormat);
+
 	if (subtitles) {
 		// FIXME: arbitrary frame of my choosing, not sure there is a better method
 		// this hould probably at least be sized according to line height

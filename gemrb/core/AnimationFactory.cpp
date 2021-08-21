@@ -59,11 +59,12 @@ Animation* AnimationFactory::GetCycle(index_t cycle)
 Holder<Sprite2D> AnimationFactory::GetFrame(index_t index, index_t cycle) const
 {
 	if (cycle >= cycles.size()) {
-		return NULL;
+		return nullptr;
 	}
-	index_t ff = cycles[cycle].FirstFrame, fc = cycles[cycle].FramesCount;
+	index_t ff = cycles[cycle].FirstFrame;
+	index_t fc = cycles[cycle].FramesCount;
 	if(index >= fc) {
-		return NULL;
+		return nullptr;
 	}
 	return frames[FLTable[ff+index]];
 }
@@ -80,11 +81,12 @@ Holder<Sprite2D> AnimationFactory::GetPaperdollImage(const ieDword *Colors,
 		Holder<Sprite2D> &Picture2, unsigned int type) const
 {
 	if (frames.size()<2) {
-		return NULL;
+		return nullptr;
 	}
 
 	// mod paperdolls can be unsorted (Longer Road Irenicus cycle: 1 1 0)
-	index_t first = InvalidIndex, second = InvalidIndex; // top and bottom half
+	index_t first = InvalidIndex; // top half
+	index_t second = InvalidIndex; // bottom half
 	index_t ff = cycles[0].FirstFrame;
 	for (index_t f = 0; f < cycles[0].FramesCount; f++) {
 		index_t idx = FLTable[ff + f];

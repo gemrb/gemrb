@@ -746,9 +746,9 @@ void Interface::Main()
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
 
-	tick_t frame = 0, time, timebase;
-	time = GetTicks();
-	timebase = time;
+	tick_t frame = 0;
+	tick_t time = GetTicks();
+	tick_t timebase = time;
 	double frames = 0.0;
 
 	do {

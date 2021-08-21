@@ -73,7 +73,8 @@ public:
 
 class GEM_EXPORT Size {
 public:
-	int w = 0, h = 0;
+	int w = 0;
+	int h = 0;
 	Size() = default;
 	Size(int, int);
 	
@@ -133,7 +134,8 @@ public:
 	void ExpandAllSides(int amt);
 	
 	static Region RegionEnclosingRegions(const Region& r1, const Region& r2) {
-		Point min, max;
+		Point min;
+		Point max;
 
 		min.x = std::min(r1.x, r2.x);
 		min.y = std::min(r1.y, r2.y);

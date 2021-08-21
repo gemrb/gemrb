@@ -47,7 +47,8 @@ const Glyph& TTFFont::GetGlyph(ieWord chr) const
 		char* oldchar = (char*)&chr;
 		ieWord unicodeChr = 0;
 		char* newchar = (char*)&unicodeChr;
-		size_t in = (core->TLKEncoding.widechar) ? 2 : 1, out = 2;
+		size_t in = (core->TLKEncoding.widechar) ? 2 : 1;
+		size_t out = 2;
 
 		// TODO: make this work on BE systems
 		// TODO: maybe we want to work with non-unicode fonts?

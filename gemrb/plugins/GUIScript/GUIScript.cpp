@@ -732,7 +732,8 @@ of the same type, unless Type is specified and different.\n\
 
 static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 {
-	PyObject* row = NULL, *col = NULL;
+	PyObject* row = nullptr;
+	PyObject* col = nullptr;
 	int type = -1;
 	PARSE_ARGS(args, "OOO|i", &self, &row, &col, &type);
 
@@ -2155,9 +2156,10 @@ PyDoc_STRVAR( GemRB_CreateView__doc,
 
 static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 {
-	int type = -1, id = -1;
+	int type = -1;
+	int id = -1;
 	PyObject* pyRect;
-	PyObject* constructArgs = NULL;
+	PyObject* constructArgs = nullptr;
 	PARSE_ARGS(args, "iiO|O",
 				&id, &type,
 				&pyRect, &constructArgs);
@@ -2691,7 +2693,8 @@ Not known spells are drawn darkened (the whole button will be overlaid).\n\
 static PyObject* GemRB_Button_SetBorder(PyObject* self, PyObject* args)
 {
 	int BorderIndex, enabled = 0, filled = 0;
-	PyObject* pyColor, *pyRect = Py_None;
+	PyObject* pyColor;
+	PyObject* pyRect = Py_None;
 	PARSE_ARGS( args, "OiO|iiO", &self,
 			   &BorderIndex, &pyColor, &enabled, &filled, &pyRect);
 
@@ -3812,7 +3815,9 @@ static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, i
 
 static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 {
-	int CycleIndex, FrameIndex, col1 = -1;
+	int CycleIndex;
+	int FrameIndex;
+	int col1 = -1;
 	char *ResRef;
 	PARSE_ARGS( args,  "Osii|i", &self,
 			   &ResRef, &CycleIndex, &FrameIndex, &col1 );
@@ -6206,7 +6211,8 @@ new character you must use FillPlayerInfo().\n\
 
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, which = 0;
+	int PartyID;
+	int which = 0;
 	PARSE_ARGS( args,  "i|i", &PartyID, &which );
 
 	GET_GAME();

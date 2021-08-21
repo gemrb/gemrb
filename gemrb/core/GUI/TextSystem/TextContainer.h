@@ -246,7 +246,8 @@ private:
 	unsigned char alignment;
 
 	size_t textLen;
-	size_t cursorPos, printPos;
+	size_t cursorPos;
+	size_t printPos;
 	Point cursorPoint;
 
 private:
