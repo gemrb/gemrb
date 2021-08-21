@@ -619,7 +619,8 @@ size_t Font::StringSizeWidth(const String& string, size_t width, size_t* numChar
 {
 	size_t size = 0;
 	size_t i = 0;
-	for (; i < string.length(); ++i) {
+	size_t length = string.length();
+	for (; i < length; ++i) {
 		wchar_t c = string[i];
 		if (c == L'\n') {
 			break;
