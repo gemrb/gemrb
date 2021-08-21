@@ -4290,9 +4290,13 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 		if (slot != slot2) {
 			// swap them first, so we equip to the desired slot
 			CREItem *si = actor->inventory.RemoveItem(slot);
+			CREItem *si2 = actor->inventory.RemoveItem(slot2);
 			if (actor->inventory.AddSlotItem(si, slot2) != ASI_SUCCESS) {
 				// should never happen, since we just made room
 				error("Actions", "XEquip: suddenly no slots left!\n");
+			}
+			if (si2) {
+				actor->inventory.AddSlotItem(si2, slot);
 			}
 		}
 		actor->inventory.EquipItem(slot2);
