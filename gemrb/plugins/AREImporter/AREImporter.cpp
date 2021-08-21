@@ -1350,14 +1350,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
-		Ambient *ambi = new Ambient();
-		str->Read( &ambi->name, 32 );
-		str->ReadPoint(ambi->origin);
-		str->ReadWord(ambi->radius);
+		Ambient *ambient = new Ambient();
+		str->Read(&ambient->name, 32);
+		str->ReadPoint(ambient->origin);
+		str->ReadWord(ambient->radius);
 		str->Seek(2, GEM_CURRENT_POS); // alignment padding
-		str->ReadDword(ambi->pitchVariance);
-		str->ReadWord(ambi->gainVariance);
-		str->ReadWord(ambi->gain);
+		str->ReadDword(ambient->pitchVariance);
+		str->ReadWord(ambient->gainVariance);
+		str->ReadWord(ambient->gain);
 		for (auto& sound : sounds) {
 			str->ReadResRef(sound);
 		}
@@ -1365,21 +1365,21 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek(2, GEM_CURRENT_POS); // alignment padding
 		ieDword interval;
 		str->ReadDword(interval);
-		ambi->interval = interval * 1000;
+		ambient->interval = interval * 1000;
 		str->ReadDword(interval);
-		ambi->intervalVariance = interval * 1000;
+		ambient->intervalVariance = interval * 1000;
 		// schedule bits
-		str->ReadDword(ambi->appearance);
-		str->ReadDword(ambi->flags);
+		str->ReadDword(ambient->appearance);
+		str->ReadDword(ambient->flags);
 		str->Seek( 64, GEM_CURRENT_POS );
 		//this is a physical limit
 		if (tmpWord>MAX_RESCOUNT) {
 			tmpWord=MAX_RESCOUNT;
 		}
 		for (int j = 0; j < tmpWord; j++) {
-			ambi->sounds.emplace_back(sounds[j]);
+			ambient->sounds.emplace_back(sounds[j]);
 		}
-		map->AddAmbient(ambi);
+		map->AddAmbient(ambient);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");

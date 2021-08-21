@@ -104,7 +104,7 @@ public:
 	void SetTiles(std::vector<ieWord>);
 	bool CanDetectTrap() const override;
 	void SetDoorLocked(int Locked, int playsound);
-	void SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger = true);
+	void SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigger = true);
 	int IsOpen() const;
 	bool HitTest(const Point& p) const;
 	void TryPickLock(const Actor *actor);

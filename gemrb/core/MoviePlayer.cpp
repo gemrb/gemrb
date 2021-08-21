@@ -133,16 +133,16 @@ void MoviePlayer::timer_start()
 	lastTime = get_current_time();
 }
 
-void MoviePlayer::timer_wait(microseconds frame_wait)
+void MoviePlayer::timer_wait(microseconds frameWait)
 {
 	auto time = get_current_time();
 
-	while (time - lastTime > frame_wait) {
-		time -= frame_wait;
+	while (time - lastTime > frameWait) {
+		time -= frameWait;
 		video_frameskip++;
 	}
 
-	microseconds to_sleep = frame_wait - (time - lastTime);
+	microseconds to_sleep = frameWait - (time - lastTime);
 	std::this_thread::sleep_for(to_sleep);
 
 	timer_start();

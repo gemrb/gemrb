@@ -332,8 +332,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float HEURISTIC_WEIGHT = 1.5;
-			SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
-			NavmapPoint nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
+			SearchmapPoint smptCurrent2(nmptCurrent.x / 16, nmptCurrent.y / 12);
+			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
 			// Theta-star path if there is LOS
 			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
@@ -345,7 +345,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				}
 			// Fall back to A-star path
 			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
-				unsigned short newDist = distFromStart[smptCurrent.y * mapSize.w + smptCurrent.x] + Distance(smptCurrent, smptChild);
+				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
 					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;

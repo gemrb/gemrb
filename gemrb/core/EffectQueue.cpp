@@ -388,17 +388,17 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 //copies the whole effectqueue (area projectiles use it)
 EffectQueue *EffectQueue::CopySelf() const
 {
-	EffectQueue *effects;
+	EffectQueue *newQueue;
 
-	effects = new EffectQueue();
+	newQueue = new EffectQueue();
 	std::list< Effect* >::const_iterator fxit = GetFirstEffect();
 	const Effect *fx;
 
 	while( (fx = GetNextEffect(fxit))) {
-		effects->AddEffect(new Effect(*fx), false);
+		newQueue->AddEffect(new Effect(*fx), false);
 	}
-	effects->SetOwner(GetOwner());
-	return effects;
+	newQueue->SetOwner(GetOwner());
+	return newQueue;
 }
 
 //create a new effect with most of the characteristics of the old effect

@@ -357,7 +357,7 @@ public:
 	int Update();
 	//draw object
 	void Draw(const Region &screen);
-	void SetGradient(int gradient, bool tint);
+	void SetGradient(int gradient, bool tinted);
 	void StaticTint(const Color &newtint);
 private:
 	//creates a child projectile with current_projectile_id - 1
@@ -414,7 +414,7 @@ private:
 
 private:
 	void Draw(const Holder<Sprite2D>& spr, const Point& p,
-			  BlitFlags flags, Color tint) const;
+			  BlitFlags flags, Color overrideTint) const;
 };
 
 }

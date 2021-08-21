@@ -100,7 +100,7 @@ protected:
 
 	microseconds get_current_time() const;
 	void timer_start();
-	void timer_wait(microseconds frame_wait);
+	void timer_wait(microseconds frameWait);
 
 	virtual bool DecodeFrame(VideoBuffer&) = 0;
 

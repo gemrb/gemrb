@@ -1727,10 +1727,10 @@ void Inventory::UpdateWeaponAnimation()
 	} else {
 		// Examine shield slot to check if we're using two weapons
 		// TODO: for consistency, use same Item* access method as above
-		int slot = GetShieldSlot();
+		int shieldSlot = GetShieldSlot();
 		const CREItem* si = nullptr;
-		if (slot > 0) {
-			si = GetSlotItem((ieDword) slot);
+		if (shieldSlot > 0) {
+			si = GetSlotItem(static_cast<ieDword>(shieldSlot));
 		}
 		if (si) {
 			const Item* it = gamedata->GetItem(si->ItemResRef, true);
