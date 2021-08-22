@@ -1453,35 +1453,33 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 	while (actor || a || sca || spark || pro || pile) {
 		switch(SelectObject(actor,q,a,sca,spark,pro,pile)) {
 		case AOT_ACTOR:
-			{
-				bool visible = false;
-				// always update the animations even if we arent visible
-				if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
-					// apparently birds and the dead are always visible?
-					visible = IsVisible(actor->Pos) || (actor->Modified[IE_DONOTJUMP] & DNJ_BIRD) || (actor->GetInternalFlag() & IF_REALLYDIED);
-					if (visible) {
-						BlitFlags flags = SetDrawingStencilForScriptable(actor, viewport);
-						if (game->TimeStoppedFor(actor)) {
-							// when time stops, almost everything turns dull grey,
-							// the caster and immune actors being the most notable exceptions
-							flags |= BlitFlags::GREY;
-						}
-						
-						Color baseTint = area->GetLighting(actor->Pos);
-						Color tint(baseTint);
-						game->ApplyGlobalTint(tint, flags);
-						actor->Draw(viewport, baseTint, tint, flags|BlitFlags::BLENDED);
+			bool visible;
+			visible = false;
+			// always update the animations even if we arent visible
+			if (actor->UpdateDrawingState() && IsExplored(actor->Pos)) {
+				// apparently birds and the dead are always visible?
+				visible = IsVisible(actor->Pos) || actor->Modified[IE_DONOTJUMP] & DNJ_BIRD || actor->GetInternalFlag() & IF_REALLYDIED;
+				if (visible) {
+					BlitFlags flags = SetDrawingStencilForScriptable(actor, viewport);
+					if (game->TimeStoppedFor(actor)) {
+						// when time stops, almost everything turns dull grey,
+						// the caster and immune actors being the most notable exceptions
+						flags |= BlitFlags::GREY;
 					}
-				}
 
-				if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED|IF_ACTIVE)) == (IF_REALLYDIED|IF_ACTIVE)) {
-					actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
-					//turning actor inactive if there is no action next turn
-					actor->HibernateIfAble();
+					Color baseTint = area->GetLighting(actor->Pos);
+					Color tint(baseTint);
+					game->ApplyGlobalTint(tint, flags);
+					actor->Draw(viewport, baseTint, tint, flags | BlitFlags::BLENDED);
 				}
-
-				actor = GetNextActor(q, index);
 			}
+
+			if (!visible || (actor->GetInternalFlag() & (IF_REALLYDIED | IF_ACTIVE)) == (IF_REALLYDIED | IF_ACTIVE)) {
+				actor->SetInternalFlag(IF_TRIGGER_AP, OP_NAND);
+				// turning actor inactive if there is no action next turn
+				actor->HibernateIfAble();
+			}
+			actor = GetNextActor(q, index);
 			break;
 		case AOT_PILE:
 			// draw piles
@@ -1507,69 +1505,58 @@ void Map::DrawMap(const Region& viewport, uint32_t dFlags)
 			}
 			break;
 		case AOT_AREA:
-			{
-				a = DrawAreaAnimation(a);
-			}
+			a = DrawAreaAnimation(a);
 			break;
 		case AOT_SCRIPTED:
-			{
-				bool endReached = sca->UpdateDrawingState(-1);
-				if (endReached) {
-					delete sca;
-					scaidx = vvcCells.erase(scaidx);
-				} else {
-					video->SetStencilBuffer(wallStencil);
-					Color tint = GetLighting(sca->Pos);
-					tint.a = 255;
-					
-					// FIXME: these should actually make use of SetDrawingStencilForObject too
-					BlitFlags flags = (core->DitherSprites) ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
-					
-					if (timestop) {
-						flags |= BlitFlags::GREY;
-					}
+			bool endReached;
+			endReached = sca->UpdateDrawingState(-1);
+			if (endReached) {
+				delete sca;
+				scaidx = vvcCells.erase(scaidx);
+			} else {
+				video->SetStencilBuffer(wallStencil);
+				Color tint = GetLighting(sca->Pos);
+				tint.a = 255;
 
-					game->ApplyGlobalTint(tint, flags);
-
-					sca->Draw(viewport, tint, 0, flags);
-					scaidx++;
+				// FIXME: these should actually make use of SetDrawingStencilForObject too
+				BlitFlags flags = core->DitherSprites ? BlitFlags::STENCIL_BLUE : BlitFlags::STENCIL_RED;
+				if (timestop) {
+					flags |= BlitFlags::GREY;
 				}
+				game->ApplyGlobalTint(tint, flags);
+				sca->Draw(viewport, tint, 0, flags);
+				scaidx++;
 			}
 			sca = GetNextScriptedAnimation(scaidx);
 			break;
 		case AOT_PROJECTILE:
-			{
-				int drawn;
-				if (gametime > oldGameTime) {
-					drawn = pro->Update();
-				} else {
-					drawn = 1;
-				}
-				if (drawn) {
-					pro->Draw( viewport );
-					proidx++;
-				} else {
-					delete pro;
-					proidx = projectiles.erase(proidx);
-				}
+			int drawn;
+			if (gametime > oldGameTime) {
+				drawn = pro->Update();
+			} else {
+				drawn = 1;
+			}
+			if (drawn) {
+				pro->Draw(viewport);
+				proidx++;
+			} else {
+				delete pro;
+				proidx = projectiles.erase(proidx);
 			}
 			pro = GetNextProjectile(proidx);
 			break;
 		case AOT_SPARK:
-			{
-				int drawn;
-				if (gametime > oldGameTime) {
-					drawn = spark->Update();
-				} else {
-					drawn = 1;
-				}
-				if (drawn) {
-					spark->Draw(viewport.origin);
-					spaidx++;
-				} else {
-					delete spark;
-					spaidx=particles.erase(spaidx);
-				}
+			if (gametime > oldGameTime) {
+				drawn = spark->Update();
+			} else {
+				drawn = 1;
+			}
+			if (drawn) {
+				spark->Draw(viewport.origin);
+				spaidx++;
+			} else {
+				delete spark;
+				spaidx = particles.erase(spaidx);
 			}
 			spark = GetNextSpark(spaidx);
 			break;
