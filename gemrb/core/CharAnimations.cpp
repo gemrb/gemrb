@@ -2835,7 +2835,7 @@ void CharAnimations::AddHLSuffix(std::string& dest, unsigned char StanceID,
 
 void CharAnimations::PulseRGBModifiers()
 {
-	unsigned long time = core->GetGame()->Ticks;
+	tick_t time = GetTicks();
 
 	if (time - lastModUpdate <= 40)
 		return;
