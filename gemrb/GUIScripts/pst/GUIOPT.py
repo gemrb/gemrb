@@ -60,7 +60,12 @@ def InitOptionsWindow (Window):
 	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
 
 	# Load Game
-	ConfigOptButton(Window.GetControl (2), 2592, OpenLoadMsgWindow)
+	# german pst has two spaces that need to be squished
+	LoadButton = Window.GetControl (2)
+	LoadGameString = GemRB.GetString (2592)
+	NewString = " ".join(LoadGameString.split())
+	LoadButton.SetText (NewString)
+	LoadButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
 
 	# Save Game
 	ConfigOptButton(Window.GetControl (3), 20639, GUISAVE.OpenSaveWindow)
