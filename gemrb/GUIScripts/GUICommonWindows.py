@@ -1734,26 +1734,30 @@ def UpdatePortraitWindow ():
 		ratio_str, color = GUICommon.SetupDamageInfo (pcID, Button, Window)
 
 		# character - 1 == bam cycle
-		talk = store = flag = blank = ' '
+		talk = store = flag = blank = bytearray([32])
 		if GameCheck.IsBG2():
 			# as far as I can tell only BG2 has icons for talk or store
-			flag = blank = chr(238)
-			talk = 154 # dialog icon
-			store = 155 # shopping icon
+			flag = blank = bytearray([238])
+			talk = bytearray([154]) # dialog icon
+			store = bytearray([155]) # shopping icon
 
 			if pc == pcID and GemRB.GetStore() != None:
-				flag = chr(store)
-
+				flag = store
 			# talk icon
-			if GemRB.GameGetSelectedPCSingle(1) == pcID:
-				flag = chr(talk)
+			elif GemRB.GameGetSelectedPCSingle(1) == pcID:
+				flag = talk
 
 		if LUCommon.CanLevelUp (pcID):
-			flag = flag + blank + chr(255)
-		elif GameCheck.IsIWD1() or GameCheck.IsIWD2():
-			HPLabel = Window.GetControl (100+i)
-			HPLabel.SetText (ratio_str)
-			HPLabel.SetColor (color)
+			flag = flag + blank + bytearray([255])
+		else:
+			flag = flag + blank + blank
+			if GameCheck.IsIWD1() or GameCheck.IsIWD2():
+				HPLabel = Window.GetControl (100+i)
+				HPLabel.SetText (ratio_str)
+				HPLabel.SetColor (color)
+			
+		FlagLabel = Window.GetControl (200 + i)
+		FlagLabel.SetText(flag)
 
 		#add effects on the portrait
 		effects = GemRB.GetPlayerStates (pcID)
@@ -1770,13 +1774,6 @@ def UpdatePortraitWindow ():
 				states.append(ord('\n'))
 			states.append(effects[x])
 
-		# FIXME: hack, check shouldn't be needed
-		FlagLabel = Window.GetControl (200 + i)
-		if FlagLabel:
-			if flag != blank:
-				FlagLabel.SetText (flag.ljust(3, blank))
-			else:
-				FlagLabel.SetText ("")
 		Button.SetText(states)
 	return
 
