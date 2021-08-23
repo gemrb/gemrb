@@ -3498,6 +3498,7 @@ void Map::UpdateFog()
 {
 	VisibleBitmap.fill(0);
 	
+	std::set<Spawn*> spawns;
 	for (const auto actor : actors) {
 		if (!actor->Modified[IE_EXPLORE]) continue;
 
@@ -3510,8 +3511,12 @@ void Map::UpdateFog()
 		
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
-			TriggerSpawn(sp);
+			spawns.insert(sp);
 		}
+	}
+	
+	for (Spawn* spawn : spawns) {
+		TriggerSpawn(spawn);
 	}
 }
 
