@@ -26,6 +26,7 @@ import GemRB
 import GameCheck
 import GUICommon
 import GUICommonWindows
+from CommonWindow import AddScrollbarProxy
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -158,20 +159,6 @@ def PositionStoreWinRelativeTo(win):
 		storeframe['y'] = winframe['y'] + winframe['h']
 
 	storewin.SetFrame(storeframe)
-	
-def AddScrollbarProxy(win, sbar, leftctl):
-	frame = sbar.GetFrame()
-	
-	ctlFrame = leftctl.GetFrame()
-	frame['w'] = frame['x'] - ctlFrame['x']
-	frame['x'] = ctlFrame['x']
-	
-	scrollview = GemRB.CreateView(AddScrollbarProxy.proxyID, IE_GUI_VIEW, frame)
-	AddScrollbarProxy.proxyID += 1
-	scrollview = win.AddSubview(scrollview, win.GetControl(99)) # just something behind all the buttons and labels
-	scrollview.SetEventProxy(sbar)
-	
-AddScrollbarProxy.proxyID = 1000
 
 def OpenStoreWindow ():
 	global Store

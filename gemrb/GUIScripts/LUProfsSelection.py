@@ -24,6 +24,7 @@ from ie_stats import *
 import GameCheck
 import GUICommon
 import CommonTables
+from CommonWindow import AddScrollbarProxy
 
 #the different types possible
 LUPROFS_TYPE_LEVELUP = 1
@@ -47,7 +48,6 @@ OddIDs = 0
 #internal variables
 ProfsPointsLeft = 0
 ProfsNumButtons = 0
-ProfsTopIndex = 0
 ProfsTextArea = 0
 ProfsColumn = 0
 ProfsTable = 0
@@ -56,7 +56,6 @@ ProfCount = 0
 # the table offset is used in bg2, since in the end they made it use different
 # profs than in bg1, but left the table entries intact
 ProfsTableOffset = 0
-ProfsScrollBar = None
 
 # iwd1/bg1 table that holds the allowed proficiency <-> class mapping
 ClassWeaponsTable = None
@@ -72,8 +71,8 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	classid is sent only during dualclassing to specify the new class."""
 
 	global ProfsOffsetSum, ProfsOffsetButton1, ProfsOffsetLabel, ProfsOffsetStar, OddIDs
-	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons, ProfsTopIndex
-	global ProfsScrollBar, ProfsTableOffset, ProfsType
+	global ProfsOffsetPress, ProfsPointsLeft, ProfsNumButtons
+	global ProfsTableOffset, ProfsType
 	global ProfsWindow, ProfsCallback, ProfsTextArea, ProfsColumn, ProfsTable, ProfCount
 	global Profs2ndOffsetButton1, Profs2ndOffsetStar, Profs2ndOffsetLabel, ClassNameSave, ClassWeaponsTable
 
@@ -179,7 +178,6 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 	#nullify internal variables
 	GemRB.SetVar ("ProfsTopIndex", 0)
 	ProfsPointsLeft = 0
-	ProfsTopIndex = 0
 
 	ProfsTable = GemRB.LoadTable ("profs")
 	if GameCheck.IsIWD1() or GameCheck.IsBG1():
@@ -318,20 +316,17 @@ def SetupProfsWindow (pc, proftype, window, callback, level1=[0,0,0], level2=[1,
 		Button.SetEvent(IE_GUI_BUTTON_ON_PRESS, ProfsRightPress)
 		Button.SetActionInterval (200)
 
+	value = ProfsRedraw (0)
 	if(ProfsScrollBar):
 		# proficiencies scrollbar
-		ProfsScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, ProfsScrollBarPress)
-		ProfsWindow.SetEventProxy(ProfsScrollBar)
-		ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
-	ProfsRedraw (1)
+		ProfsScrollBar.SetEvent(IE_GUI_SCROLLBAR_ON_CHANGE, lambda sb, val: ProfsRedraw (val))
+		Button = ProfsWindow.GetControl(ProfsOffsetPress)
+		AddScrollbarProxy(ProfsWindow, ProfsScrollBar, Button)
+		ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", value, 0, ProfCount)
 	return
 
-def ProfsRedraw (first=0):
-	"""Redraws the proficiencies part of the window.
-
-	If first is true, it skips ahead to the first assignable proficiency."""
-
-	global ProfsTopIndex, ProfsScrollBar
+def ProfsRedraw (ProfsTopIndex):
+	"""Redraws the proficiencies part of the window starting from ProfsTopIndex."""
 
 	ProfSumLabel = ProfsWindow.GetControl(0x10000000+ProfsOffsetSum)
 	ProfSumLabel.SetText(str(ProfsPointsLeft))
@@ -388,26 +383,11 @@ def ProfsRedraw (first=0):
 			else:
 				Star.SetFlags(IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 
-	if first and len (SkipProfs):
-		ProfsTopIndex += SkipProfs[-1]+1
-		GemRB.SetVar ("ProfsTopIndex", ProfsTopIndex)
-		if (ProfsScrollBar):
-			ProfsScrollBar.SetVarAssoc ("ProfsTopIndex", ProfCount)
-		ProfsRedraw ()
-	return
-
-def ProfsScrollBarPress():
-	"""Scrolls the window by reassigning ProfsTopIndex."""
-
-	global ProfsTopIndex
-
-	ProfsTopIndex = GemRB.GetVar ("ProfsTopIndex")
-	ProfsRedraw ()
-	return
+	return ProfsTopIndex + SkipProfs[-1] + 1 if len(SkipProfs) else ProfsTopIndex
 
 def ProfsJustPress(btn, val):
 	"""Updates the text area with a description of the proficiency."""
-	Pos = val+ProfsTopIndex
+	Pos = val + GemRB.GetVar("ProfsTopIndex")
 	ProfsTextArea.SetText (ProfsTable.GetValue(Pos+ProfsTableOffset, 2) )
 	return
 
@@ -416,7 +396,7 @@ def ProfsRightPress(btn, val):
 
 	global ProfsPointsLeft
 
-	Pos = val+ProfsTopIndex
+	Pos = val + GemRB.GetVar("ProfsTopIndex")
 	ProfsTextArea.SetText(ProfsTable.GetValue(Pos+ProfsTableOffset, 2) )
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 	MinPoint = GemRB.GetVar ("ProfBase "+str(Pos) )
@@ -425,7 +405,7 @@ def ProfsRightPress(btn, val):
 	GemRB.SetVar("Prof "+str(Pos),ActPoint-1)
 	ProfsPointsLeft += 1
 	GemRB.SetVar ("ProfsPointsLeft", ProfsPointsLeft)
-	ProfsRedraw ()
+	ProfsRedraw (GemRB.GetVar("ProfsTopIndex"))
 	ProfsCallback ()
 	return
 
@@ -434,7 +414,7 @@ def ProfsLeftPress(btn, val):
 
 	global ProfsPointsLeft
 
-	Pos = val+ProfsTopIndex
+	Pos = val + GemRB.GetVar("ProfsTopIndex")
 	ProfsTextArea.SetText(ProfsTable.GetValue(Pos+ProfsTableOffset, 2) )
 	if ProfsPointsLeft == 0:
 		return
@@ -455,7 +435,7 @@ def ProfsLeftPress(btn, val):
 	GemRB.SetVar("Prof "+str(Pos),ActPoint+1)
 	ProfsPointsLeft -= 1
 	GemRB.SetVar ("ProfsPointsLeft", ProfsPointsLeft)
-	ProfsRedraw ()
+	ProfsRedraw (GemRB.GetVar("ProfsTopIndex"))
 	ProfsCallback ()
 	return
 

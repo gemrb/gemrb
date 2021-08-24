@@ -36,6 +36,20 @@ def IsGameGUIHidden():
 # for keymap.2da
 def ToggleGUIHidden():
 	SetGameGUIHidden(not IsGameGUIHidden())
+	
+def AddScrollbarProxy(win, sbar, leftctl):
+	frame = sbar.GetFrame()
+	
+	ctlFrame = leftctl.GetFrame()
+	frame['w'] = frame['x'] - ctlFrame['x']
+	frame['x'] = ctlFrame['x']
+	
+	scrollview = GemRB.CreateView(AddScrollbarProxy.proxyID, IE_GUI_VIEW, frame)
+	AddScrollbarProxy.proxyID += 1
+	scrollview = win.AddSubview(scrollview, win.GetControl(99)) # just something behind all the buttons and labels
+	scrollview.SetEventProxy(sbar)
+	
+AddScrollbarProxy.proxyID = 1000
 
 
 ##################################################################
