@@ -32,7 +32,7 @@
 # 9 - Autopause options window
 
 ###################################################
-import CommonWindow
+import Container
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -47,7 +47,7 @@ def InitOptionsWindow (Window):
 	GemRB.GamePause (1, 1)
 	TrySavingConfiguration ()
 
-	CommonWindow.CloseContainerWindow ()
+	Container.CloseContainerWindow ()
 
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)

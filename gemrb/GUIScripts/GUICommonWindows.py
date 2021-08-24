@@ -36,6 +36,7 @@ import GameCheck
 import GUICommon
 import CommonTables
 import CommonWindow
+import Container
 import LUCommon
 import InventoryCommon
 if not GameCheck.IsPST():
@@ -1904,7 +1905,7 @@ def SelectionChanged ():
 		for i, Button in PortraitButtons.items():
 			Button.EnableBorder (FRAME_PC_SELECTED, i + 1 == sel)
 
-	CommonWindow.CloseContainerWindow()
+	Container.CloseContainerWindow()
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 	return

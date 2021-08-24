@@ -29,6 +29,7 @@ import GUICommon
 import GUICommonWindows
 import MessageWindow
 import CommonWindow
+import Container
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -45,7 +46,7 @@ def OpenDialogButton(id):
 def DialogStarted ():
 	global ContinueWindow
 
-	CommonWindow.CloseContainerWindow()
+	Container.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)

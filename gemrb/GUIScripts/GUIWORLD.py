@@ -30,6 +30,7 @@ from GameCheck import MAX_PARTY_SIZE
 from GUIDefines import *
 from ie_stats import *
 import CommonWindow
+import Container
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -66,7 +67,7 @@ def DialogStarted ():
 
 	# try to force-close anything which is open
 	GUICommonWindows.CloseTopWindow()
-	CommonWindow.CloseContainerWindow()
+	Container.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)

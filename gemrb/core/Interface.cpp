@@ -2444,12 +2444,12 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 	if (CurrentContainer && UseContainer) {
 		if (!(flg & DF_IN_CONTAINER) ) {
 			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
-			guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
+			guiscript->RunFunction( "Container", "OpenContainerWindow" );
 		}
 	} else {
 		if (flg & DF_IN_CONTAINER) {
 			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
-			guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
+			guiscript->RunFunction( "Container", "CloseContainerWindow" );
 		}
 	}
 	//end of gui hacks
