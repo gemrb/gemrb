@@ -3701,14 +3701,24 @@ void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
+	Map *map = Sender->GetCurrentArea();
+	if (Sender->Type != ST_ACTOR || !map) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetBase(IE_VISUALRANGE,parameters->int0Parameter);
+	int range = parameters->int0Parameter;
+	// 0 means reset back to normal
+	if (range == 0) {
+		range = VOODOO_VISUAL_RANGE / 2;
+	}
+
+	actor->SetBase(IE_VISUALRANGE, range);
 	if (actor->GetStat(IE_EA) < EA_EVILCUTOFF) {
 		actor->SetBase(IE_EXPLORE, 1);
 	}
+	// just in case, ensuring the update happens already this tick
+	// (in iwd2 script use it's not blocking, just in dialog)
+	map->UpdateFog();
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
