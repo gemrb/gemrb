@@ -380,7 +380,7 @@ bool WindowManager::DispatchEvent(const Event& event)
 			// we don't deliver mouse up events if there isn't a corresponding mouse down (no trackingWin).
 			if (!trackingWin) return false;
 
-			if (trackingWin->IsDisabled() == false) {
+			if (!trackingWin->IsDisabled() && trackingWin->IsVisible()) {
 				trackingWin->DispatchEvent(event);
 			}
 			trackingWin = nullptr;
