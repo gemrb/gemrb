@@ -8273,6 +8273,7 @@ bool Actor::HibernateIfAble()
 		return false;
 	if (GetWait()) //would never stop waiting
 		return false;
+	// the EEs also have the condition of (EA < EA_EVILCUTOFF && EA_CONTROLLABLE < EA), practically only allowing neutrals
 	
 	InternalFlags |= IF_IDLE;
 	return true;
