@@ -507,6 +507,10 @@ bool View::IsOpaque() const
 
 bool View::HitTest(const Point& p) const
 {
+	if (flags & (IgnoreEvents | Invisible)) {
+		return false;
+	}
+
 	Region r(Point(), Dimensions());
 	if (!r.PointInside(p)) {
 		return false;

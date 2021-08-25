@@ -189,9 +189,7 @@ public:
 	void SetValue(value_t val);
 	void SetValueRange(ValueRange range = MaxValueRange);
 	void SetValueRange(value_t min, value_t max = std::numeric_limits<value_t>::max());
-	
-	bool HitTest(const Point& p) const override;
-	
+
 protected:
 	using ActionKey = ControlActionResponder::ActionKey;
 	struct ControlActionKey : public ActionKey {		

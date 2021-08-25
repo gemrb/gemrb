@@ -196,14 +196,6 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
 	return &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
 }
-	
-bool Control::HitTest(const Point& p) const
-{
-	if (!(flags & (IgnoreEvents | Invisible))) {
-		return View::HitTest(p);
-	}
-	return false;
-}
 
 View::UniqueDragOp Control::DragOperation()
 {
