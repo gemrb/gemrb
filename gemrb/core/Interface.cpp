@@ -3849,7 +3849,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceSides = 1;
 		}
 		int diceThrows = strtosigned<int>(NewItem, &endptr, 10);
-		if (diceThrows <1) {
+		if (diceThrows < 1 || diceSides <= 1) {
 			diceThrows = 1;
 		}
 		if (*endptr) {
