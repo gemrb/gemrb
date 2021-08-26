@@ -3701,8 +3701,7 @@ void GameScript::GlobalBitGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 {
-	Map *map = Sender->GetCurrentArea();
-	if (Sender->Type != ST_ACTOR || !map) {
+	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
@@ -3718,7 +3717,8 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 	}
 	// just in case, ensuring the update happens already this tick
 	// (in iwd2 script use it's not blocking, just in dialog)
-	map->UpdateFog();
+	Map *map = Sender->GetCurrentArea();
+	if (map) map->UpdateFog();
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
