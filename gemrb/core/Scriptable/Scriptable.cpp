@@ -54,49 +54,16 @@ static const unsigned short ClearActionsID = 133; // same for all games
  ***********************/
 Scriptable::Scriptable(ScriptableType type)
 {
-	Type = type;
-
-	overheadTextDisplaying = false;
-	timeStartDisplaying = 0;
-
-	scriptlevel = 0;
-
-	LastAttacker = 0;
-	LastCommander = 0;
-	LastProtector = 0;
-	LastProtectee = 0;
-	LastTargetedBy = 0;
-	LastHitter = 0;
-	LastHelp = 0;
-	LastTrigger = 0;
-	LastSeen = 0;
-	LastTalker = 0;
-	LastHeard = 0;
-	LastSummoner = 0;
-	LastFollowed = 0;
-	LastMarked = 0;
-	LastMarkedSpell = 0;
-
-	DialogName = 0;
-	CurrentAction = NULL;
-	CurrentActionState = 0;
-	CurrentActionTarget = 0;
-	CurrentActionInterruptable = true;
-	CurrentActionTicks = 0;
-	UnselectableTimer = 0;
-	Ticks = 0;
-	AdjustedTicks = 0;
-	ScriptTicks = 0;
-	IdleTicks = 0;
-	AuraTicks = 100;
-	TriggerCountdown = 0;
+	startActive = core->HasFeature(GF_START_ACTIVE);
+	third = core->HasFeature(GF_3ED_RULES);
+	pst_flags = core->HasFeature(GF_PST_STATE_FLAGS);
 
 	globalID = ++globalActorCounter;
 	if (globalActorCounter == 0) {
 		error("Scriptable", "GlobalID overflowed, quitting due to too many actors.");
 	}
 
-	WaitCounter = 0;
+	Type = type;
 	if (Type == ST_ACTOR) {
 		InternalFlags = IF_VISIBLE | IF_USEDSAVE;
 		if (startActive) {
@@ -105,22 +72,13 @@ Scriptable::Scriptable(ScriptableType type)
 	} else {
 		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_NOINT;
 	}
-	area = 0;
 
-	LastTarget = 0;
-	LastTargetPersistent = 0;
-	LastSpellOnMe = 0xffffffff;
-	ResetCastingState(NULL);
-	InterruptCasting = false;
+	ResetCastingState(nullptr);
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
 	ClearTriggers();
 	AddTrigger(TriggerEntry(trigger_oncreation));
-
-	startActive = core->HasFeature(GF_START_ACTIVE);
-	third = core->HasFeature(GF_3ED_RULES);
-	pst_flags = core->HasFeature(GF_PST_STATE_FLAGS);
 }
 
 Scriptable::~Scriptable(void)

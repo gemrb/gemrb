@@ -259,53 +259,55 @@ private:
 	std::vector< GAMLocationEntry*> planepositions;
 	std::vector<ResRef> mastarea;
 	std::vector<std::vector<ResRef> > npclevels;
-	int *bntchnc;
-	int bntrows;
+	int *bntchnc = nullptr;
+	int bntrows = -1;
 	CRRow *crtable = nullptr;
 	ResRef restmovies[8];
 	ResRef daymovies[8];
 	ResRef nightmovies[8];
-	int MapIndex;
+	int MapIndex = -1;
 	ResRef Familiars[9];
 public:
 	std::vector< Actor*> selected;
-	int version;
-	Variables* kaputz;
+	int version = 0;
+	Variables* kaputz = nullptr;
 	std::array<ieByte, BESTIARY_SIZE> beasts;
-	ieByte* mazedata; //only in PST
-	ieDword CombatCounter;
-	ieDword StateOverrideFlag, StateOverrideTime;
-	ieDword BanterBlockFlag, BanterBlockTime;
+	ieByte* mazedata = nullptr; //only in PST
+	ieDword CombatCounter = 0;
+	ieDword StateOverrideFlag = 0;
+	ieDword StateOverrideTime = 0;
+	ieDword BanterBlockFlag = 0;
+	ieDword BanterBlockTime = 0;
 
 	/** Index of PC selected in non-walking environment (shops, inventory...) */
-	int SelectedSingle;
+	int SelectedSingle = 1;
 	/** 0 if the protagonist's death doesn't cause game over */
 	/** 1 if the protagonist's death causes game over */
 	/** 2 if no check is needed (pst) */
-	int protagonist;
+	int protagonist = PM_YES;
 	/** if party size exceeds this amount, a callback will be called */
-	size_t partysize;
-	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
+	size_t partysize = 6;
+	ieDword interval = 1000 / AI_UPDATE_TIME; // a tenth of a round in ms
 	std::atomic_uint32_t GameTime {0};
-	ieDword LastScriptUpdate; // GameTime at which UpdateScripts last ran
-	ieDword RealTime;
-	ieWord  WhichFormation;
-	ieWord  Formations[5];
-	ieDword PartyGold;
+	ieDword LastScriptUpdate = 0; // GameTime at which UpdateScripts last ran
+	ieDword RealTime = 0;
+	ieWord  WhichFormation = 0;
+	ieWord  Formations[5]{};
+	ieDword PartyGold = 0;
 	ieWord NPCAreaViewed = 0;
-	ieWord WeatherBits;
-	ieDword CurrentLink; //named currentLink in original engine (set to -1)
-	ieDword Reputation;
-	ieDword ControlStatus; // used in bg2, iwd (where you can switch panes off)
-	ieDword Expansion; // mostly used by BG2. IWD games set it to 3 on newgame
+	ieWord WeatherBits = 0;
+	ieDword CurrentLink = 0; //named currentLink in original engine (set to -1)
+	ieDword Reputation = 0;
+	ieDword ControlStatus = 0; // used in bg2, iwd (where you can switch panes off)
+	ieDword Expansion = 0; // mostly used by BG2. IWD games set it to 3 on newgame
 	ResRef AnotherArea;
 	ResRef CurrentArea;
 	ResRef PreviousArea; //move here if the worldmap exit is illegal?
 	ResRef LoadMos;
 	ResRef TextScreen;
-	Particles *weather;
-	int event_timer;
-	EventHandler event_handler;
+	Particles *weather = nullptr;
+	int event_timer = 0;
+	EventHandler event_handler = nullptr;
 	bool hasInfra = false;
 	bool familiarBlock = false;
 	bool PartyAttack = false;
@@ -313,8 +315,8 @@ public:
 private:
 	/** reads the challenge rating table */
 	void LoadCRTable();
-	Actor *timestop_owner;
-	ieDword timestop_end;
+	Actor *timestop_owner = nullptr;
+	ieDword timestop_end = 0;
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID) const;
