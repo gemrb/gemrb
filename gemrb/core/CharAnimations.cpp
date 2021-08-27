@@ -148,11 +148,11 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
 				continue;
 			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax < table[j].AnimID) break;
-				if (rmin > table[j].AnimID) continue;
-				table[j].BloodColor = value;
-				table[j].Flags = flags;
+			for (auto& row : table) {
+				if (rmax < row.AnimID) break;
+				if (rmin > row.AnimID) continue;
+				row.BloodColor = value;
+				row.Flags = flags;
 			}
 		}
 	}
@@ -178,11 +178,11 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
 				continue;
 			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax < table[j].AnimID) break;
-				if (rmin > table[j].AnimID) continue;
-				table[j].WalkSound = value;
-				table[j].WalkSoundCount = range;
+			for (auto& row : table) {
+				if (rmax < row.AnimID) break;
+				if (rmin > row.AnimID) continue;
+				row.WalkSound = value;
+				row.WalkSoundCount = range;
 			}
 		}
 	}
@@ -203,10 +203,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				continue;
 			}
 
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < table[j].AnimID) break;
-				if (id == table[j].AnimID) {
-					table[j].StanceOverride[s1] = static_cast<unsigned char>(s2);
+			for (auto& row : table) {
+				if (id < row.AnimID) break;
+				if (id == row.AnimID) {
+					row.StanceOverride[s1] = static_cast<unsigned char>(s2);
 					break;
 				}
 			}
@@ -220,12 +220,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int id = 0;
 			valid_unsignednumber(avatarShadows->GetRowName(i), id);
 
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < table[j].AnimID) {
-					break;
-				}
-				if (table[j].AnimID == id) {
-					table[j].ShadowAnimation = avatarShadows->QueryField(i, 0);
+			for (auto& row : table) {
+				if (id < row.AnimID) break;
+				if (id == row.AnimID) {
+					row.ShadowAnimation = avatarShadows->QueryField(i, 0);
 					break;
 				}
 			}
