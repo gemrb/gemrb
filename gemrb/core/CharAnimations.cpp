@@ -695,7 +695,7 @@ void CharAnimations::DropAnims()
 
 			// anims can only be duplicated at the Animation** level
 			for (int IDb = StanceID; IDb < MAX_ANIMS; IDb++) {
-				for (auto& orient2 : Anims[StanceID]) {
+				for (auto& orient2 : Anims[IDb]) {
 					if (orient2 == tmppoi) {
 						orient2 = nullptr;
 					}
