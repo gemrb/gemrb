@@ -8232,7 +8232,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			if (TranslucentShadows) {
+			if (TranslucentShadows && palette) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
 				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
