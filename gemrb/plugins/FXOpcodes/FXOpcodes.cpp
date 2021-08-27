@@ -4710,12 +4710,9 @@ int fx_replace_creature (Scriptable* Owner, Actor* target, Effect *fx)
 		break;
 	default:;
 	}
-	//create replacement; should we be passing the target instead of NULL?
-	//noooo, don't unsummon replacement creatures! - fuzzie
-	//Effect *newfx = EffectQueue::CreateUnsummonEffect(fx);
-	//the monster should appear near the effect position? (unsure)
+	// don't unsummon replacement creatures
+	// the monster should appear near the effect position
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, nullptr, fx->Pos, EAM_DEFAULT, -1, nullptr, false);
-	//delete newfx;
 	return FX_NOT_APPLIED;
 }
 
