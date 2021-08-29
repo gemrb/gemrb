@@ -349,7 +349,7 @@ static void (* const fft_dispatch[])(FFTComplex*) = {
     fft2048, fft4096, fft8192, fft16384, fft32768, fft65536,
 };
 
-void ff_fft_calc_c(FFTContext *s, FFTComplex *z)
+void ff_fft_calc_c(const FFTContext *s, FFTComplex *z)
 {
     fft_dispatch[s->nbits-2](z);
 }

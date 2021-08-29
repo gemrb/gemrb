@@ -35,10 +35,9 @@ namespace GemRB {
 class OGGReader : public SoundMgr {
 private:
 	OggVorbis_File OggStream;
-	int samples_left; // count of unread samples
+	int samples_left = 0; // count of unread samples
 public:
 	OGGReader()
-		: samples_left( 0 )
 	{
 		memset(&OggStream, 0, sizeof(OggStream) );
 	}
@@ -50,7 +49,7 @@ public:
 	{
 		ov_clear(&OggStream);
 	}
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	int read_samples(short* buffer, int count) override;
 };
 

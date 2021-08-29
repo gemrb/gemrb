@@ -1,12 +1,14 @@
-GemRB git (d5e95b9e):
+GemRB git (4429d1e):
   New features:
     - 
+    - iwd2 can be progressed past the battle square challenge
     - faster loading and saving
-    - Use magic device skill
+    - Use magic device skill, precise shot
     - console history is now preserved
 
   Improved features:
     - 
+    - python3 support
     - spellcaster ai, effects, scripting
     - audio, appimage, ini spawns
     - bugfixes

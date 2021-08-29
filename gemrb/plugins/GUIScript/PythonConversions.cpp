@@ -118,22 +118,7 @@ Holder<Sprite2D> SpriteFromPy(PyObject* pypic)
 #if PY_MAJOR_VERSION >= 3
 PyStringWrapper PyString_AsString(PyObject* obj)
 {
-	PyStringWrapper wrap;
-	if (PyUnicode_Check(obj)) {
-		PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, core->SystemEncoding, "strict"); // Owned reference
-		if (temp_bytes != NULL) {
-			wrap.str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
-			wrap.obj = temp_bytes; // needs to outlive our use of wrap.str
-		} else { // raw data...
-			PyErr_Clear();
-			wrap.str = PyUnicode_AS_DATA(obj);
-		}
-	} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
-		wrap.str = PyBytes_AS_STRING(obj);
-	} else if (PyObject_TypeCheck(obj, &PyByteArray_Type)) {
-		wrap.str = PyByteArray_AS_STRING(obj);
-	}
-	return wrap;
+	return PyStringWrapper(obj, core->SystemEncoding);
 }
 #endif
 

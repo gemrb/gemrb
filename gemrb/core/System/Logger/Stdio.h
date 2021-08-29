@@ -43,10 +43,10 @@ private:
 	DataStream* stream;
 };
 
-class GEM_EXPORT StdioLogWriter final : public StreamLogWriter {
+class GEM_EXPORT StdioLogWriter : public StreamLogWriter {
 public:
 	StdioLogWriter(log_level, bool useColor);
-	~StdioLogWriter() final;
+	~StdioLogWriter() override;
 	
 	void WriteLogMessage(const Logger::LogMessage& msg) override;
 private:

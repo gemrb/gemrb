@@ -26,6 +26,8 @@
 #include <chrono>
 #include <thread>
 
+using namespace std::chrono;
+
 namespace GemRB {
 
 const TypeID MoviePlayer::ID = { "MoviePlayer" };
@@ -75,8 +77,9 @@ void MoviePlayer::Play(Window* win)
 	const Size& size = Dimensions();
 	Point center(winFrame.w/2 - size.w/2, winFrame.h/2 - size.h/2);
 	center = center + winFrame.origin;
-	VideoBufferPtr subBuf = nullptr, vb = video->CreateBuffer(Region(center, size), movieFormat);
-	
+	VideoBufferPtr subBuf = nullptr;
+	VideoBufferPtr vb = video->CreateBuffer(Region(center, size), movieFormat);
+
 	if (subtitles) {
 		// FIXME: arbitrary frame of my choosing, not sure there is a better method
 		// this hould probably at least be sized according to line height
@@ -121,36 +124,27 @@ void MoviePlayer::Stop()
 	isPlaying = false;
 }
 
-void MoviePlayer::get_current_time(long &sec, long &usec) const
+microseconds MoviePlayer::get_current_time() const
 {
-	auto time = GetTicks();
-
-	sec = time / 1000;
-	usec = (time % 1000) * 1000;
+	return duration_cast<microseconds>(steady_clock::now().time_since_epoch());
 }
 
 void MoviePlayer::timer_start()
 {
-	get_current_time(timer_last_sec, timer_last_usec);
+	lastTime = get_current_time();
 }
 
-void MoviePlayer::timer_wait(unsigned int frame_wait)
+void MoviePlayer::timer_wait(microseconds frameWait)
 {
-	long sec, usec;
-	get_current_time(sec, usec);
+	auto time = get_current_time();
 
-	while (sec > timer_last_sec) {
-		usec += 1000000;
-		timer_last_sec++;
-	}
-
-	while (usec - timer_last_usec > (long) frame_wait) {
-		usec -= frame_wait;
+	while (time - lastTime > frameWait) {
+		time -= frameWait;
 		video_frameskip++;
 	}
 
-	long to_sleep = frame_wait - (usec - timer_last_usec);
-	std::this_thread::sleep_for(std::chrono::microseconds(to_sleep));
+	microseconds to_sleep = frameWait - (time - lastTime);
+	std::this_thread::sleep_for(to_sleep);
 
 	timer_start();
 }

@@ -72,7 +72,7 @@ IniSpawn::IniSpawn(Map *owner, const ResRef& DefaultArea)
 	detail_level = 2;
 	core->GetDictionary()->Lookup("Detail Level", detail_level);
 
-	auto inifile = GetIniFile(DefaultArea);
+	const auto inifile = GetIniFile(DefaultArea);
 	if (!inifile) {
 		NamelessSpawnArea = DefaultArea;
 		return;
@@ -310,7 +310,7 @@ void IniSpawn::PrepareSpawnPoints(const DataFileMgr *iniFile, const char *critte
 
 // tags not working in originals either, see IESDP for details:
 // control_var, spec_area, check_crowd, spawn_time_of_day, check_view_port (used!) & check_by_view_port
-void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
+void IniSpawn::ReadCreature(const DataFileMgr *inifile, const char *crittername, CritterEntry &critter) const
 {
 	const char *s;
 	int ps;
@@ -558,7 +558,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 }
 
-void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
+void IniSpawn::ReadSpawnEntry(const DataFileMgr *inifile, const char *entryname, SpawnEntry &entry) const
 {
 	const char *s;
 	entry.name = strdup(entryname);

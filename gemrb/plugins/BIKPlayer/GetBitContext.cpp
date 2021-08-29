@@ -133,7 +133,7 @@ void GetBitContext::read_tree(Tree *tree)
  * @param src  pointer to the head of the first list (the second lists starts at src+size)
  * @param size input lists size
  */
-void GetBitContext::merge( uint8_t *dst, uint8_t *src, int size)
+void GetBitContext::merge(uint8_t *dst, const uint8_t *src, int size)
 {
 	const uint8_t *src2 = src + size;
 	int size2 = size;

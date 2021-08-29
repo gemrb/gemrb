@@ -50,9 +50,8 @@ MVEPlay::MVEPlay(void)
 	g_palette->col[255] = Color(50,50,50,255);
 }
 
-bool MVEPlay::Open(DataStream* stream)
+bool MVEPlay::Import(DataStream* str)
 {
-	str = stream;
 	validVideo = false;
 
 	char Signature[MVE_SIGNATURE_LEN];

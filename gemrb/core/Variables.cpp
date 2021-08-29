@@ -287,7 +287,7 @@ int Variables::GetValueLength(const char* key) const
 	return ( int ) strlen( pAssoc->Value.sValue );
 }
 
-bool Variables::Lookup(const char* key, char* dest, int MaxLength) const
+bool Variables::Lookup(const char* key, char* dest, size_t MaxLength) const
 {
 	unsigned int nHash;
 	assert( m_type == GEM_VARIABLES_STRING );

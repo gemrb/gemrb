@@ -1506,9 +1506,14 @@ static void pcf_alignment(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue
 
 static void pcf_avatarremoval(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	Map *map = actor->GetCurrentArea();
+	const Map *map = actor->GetCurrentArea();
 	if (!map) return;
-	map->BlockSearchMap(actor->Pos, actor->size, newValue > 0 ? PathMapFlags::UNMARKED : PathMapFlags::NPC);
+	
+	if (newValue) {
+		map->ClearSearchMapFor(actor);
+	} else {
+		map->BlockSearchMapFor(actor);
+	}
 }
 
 //spell casting or other buttons disabled/reenabled
@@ -3233,11 +3238,9 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	}
 
 	// check if any new portrait icon was removed or added
-	if (PCStats) {
-		if (PCStats->States != previousStates) {
-			core->SetEventFlag(EF_PORTRAIT);
-			previousStates = PCStats->States;
-		}
+	if (PCStats && PCStats->States != previousStates) {
+		core->SetEventFlag(EF_PORTRAIT);
+		previousStates = PCStats->States;
 	}
 	if (Immobile()) {
 		timeStartStep = core->GetGame()->Ticks;
@@ -5053,7 +5056,7 @@ void Actor::SetMap(Map *map)
 		inventory.EquipItem(inventory.GetEquippedSlot());
 		SetEquippedQuickSlot(inventory.GetEquipped(), inventory.GetEquippedHeader());
 	}
-	if (BlocksSearchMap()) map->BlockSearchMap(Pos, size, IsPartyMember() ? PathMapFlags::PC : PathMapFlags::NPC);
+	if (BlocksSearchMap()) map->BlockSearchMapFor(this);
 }
 
 // Position should be a navmap point
@@ -5067,7 +5070,7 @@ void Actor::SetPosition(const Point &nmptTarget, int jump, int radiusx, int radi
 
 	q = p;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
-		Map *map = GetCurrentArea();
+		const Map *map = GetCurrentArea();
 		//clear searchmap so we won't block ourselves
 		map->ClearSearchMapFor(this);
 		map->AdjustPosition(p, radiusx, radiusy, size);
@@ -8229,7 +8232,7 @@ void Actor::DrawActorSprite(const Point& p, BlitFlags flags,
 
 		Holder<Sprite2D> currentFrame = anim->CurrentFrame();
 		if (currentFrame) {
-			if (TranslucentShadows) {
+			if (TranslucentShadows && palette) {
 				ieByte tmpa = palette->col[1].a;
 				palette->col[1].a /= 2;
 				video->BlitGameSpriteWithPalette(currentFrame, palette, p, flags, tint);
@@ -8270,6 +8273,7 @@ bool Actor::HibernateIfAble()
 		return false;
 	if (GetWait()) //would never stop waiting
 		return false;
+	// the EEs also have the condition of (EA < EA_EVILCUTOFF && EA_CONTROLLABLE < EA), practically only allowing neutrals
 	
 	InternalFlags |= IF_IDLE;
 	return true;
@@ -8604,7 +8608,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 				// consider the possibility the mirror image is behind a wall (walls.second)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if ((area->GetBlockedNavmap(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
+				if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
@@ -8670,7 +8674,7 @@ void Actor::Draw(const Region& vp, Color baseTint, Color tint, BlitFlags flags) 
 				// consider the possibility the mirror image is in front of a wall (walls.first)
 				// GetBlocked might be false, but we still should not draw the image
 				// maybe the mirror image coordinates can never be beyond the width of a wall?
-				if ((area->GetBlockedNavmap(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
+				if ((area->GetBlocked(iPos + vp.origin) & (PathMapFlags::PASSABLE | PathMapFlags::ACTOR)) != PathMapFlags::IMPASSABLE) {
 					DrawActorSprite(iPos, flags, currentStance.anim, tint);
 				}
 			}
@@ -9724,10 +9728,10 @@ void Actor::ClearCurrentStanceAnims()
 	currentStance.shadow.clear();
 }
 
-void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, int wt)
+void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAnimation, unsigned char wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
-	if (wt != -1) WeaponType = wt;
+	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (!anims)
 		return;
 		
@@ -9759,10 +9763,10 @@ void Actor::SetUsedWeapon(const char (&AnimationType)[2], const ieWord* MeleeAni
 	AttackStance = IE_ANI_ATTACK;
 }
 
-void Actor::SetUsedShield(const char (&AnimationType)[2], int wt)
+void Actor::SetUsedShield(const char (&AnimationType)[2], unsigned char wt)
 {
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
-	if (wt != -1) WeaponType = wt;
+	if (wt != IE_ANI_WEAPON_INVALID) WeaponType = wt;
 	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
 		if (WeaponType == IE_ANI_WEAPON_2W)
 			WeaponType = IE_ANI_WEAPON_1H;

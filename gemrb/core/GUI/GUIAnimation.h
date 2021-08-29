@@ -62,7 +62,8 @@ private:
 
 class PointAnimation : public GUIAnimation<Point> {
 public:
-	Point begin, end;
+	Point begin;
+	Point end;
 	tick_t endtime;
 	
 public:
@@ -100,7 +101,8 @@ extern ColorCycle GlobalColorCycle;
 // between 2 colors. We will create a global instance to syncronize many elements with the same animation.
 class ColorAnimation : public GUIAnimation<Color> {
 public:
-	Color begin, end;
+	Color begin;
+	Color end;
 	bool repeat;
 	ColorCycle cycle;
 	int timeOffset;

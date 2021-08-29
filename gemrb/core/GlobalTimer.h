@@ -32,8 +32,10 @@ private:
 	tick_t startTime = 0; //forcing an update;
 	tick_t interval;
 
-	tick_t fadeToCounter = 0, fadeToMax = 0;
-	tick_t fadeFromCounter = 0, fadeFromMax = 0;
+	tick_t fadeToCounter = 0;
+	tick_t fadeToMax = 0;
+	tick_t fadeFromCounter = 0;
+	tick_t fadeFromMax = 0;
 	unsigned short fadeToFactor = 1, fadeFromFactor = 1;
 	int shakeCounter = 0;
 	Point shakeVec;

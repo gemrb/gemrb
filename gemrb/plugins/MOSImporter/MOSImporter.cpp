@@ -33,18 +33,15 @@ MOSImporter::MOSImporter(void)
 	Cols = Rows = BlockSize = PalOffset = 0;
 }
 
-bool MOSImporter::Open(DataStream* stream)
+bool MOSImporter::Import(DataStream* str)
 {
-	str = stream;
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "MOSCV1  ", 8 ) == 0) {
 		str->Seek( 4, GEM_CURRENT_POS );
-		DataStream* cached = CacheCompressedStream(stream, stream->filename);
-		delete str;
-		if (!cached)
+		str = DecompressStream(str);
+		if (!str)
 			return false;
-		str = cached;
 		str->Read( Signature, 8 );
 	}
 	if (strncmp( Signature, "MOS V1  ", 8 ) != 0) {

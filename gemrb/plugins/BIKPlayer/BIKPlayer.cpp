@@ -47,6 +47,7 @@
 #include <cstdio>
 
 using namespace GemRB;
+using namespace std::chrono;
 
 static const int ff_wma_critical_freqs[25] = {
 	100,   200,  300, 400,   510,  630,  770,    920,
@@ -196,9 +197,8 @@ int BIKPlayer::ReadHeader()
 	return 0;
 }
 
-bool BIKPlayer::Open(DataStream* stream)
+bool BIKPlayer::Import(DataStream* str)
 {
-	str = stream;
 	str->Read( &header.signature, BIK_SIGNATURE_LEN );
 
 	if (memcmp( header.signature, BIK_SIGNATURE_DATA, 4 ) == 0) {
@@ -220,9 +220,9 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 		return false;
 	}
 
-	if (timer_last_sec) {
+	if (lastTime > seconds(0)) {
 		// quick hack, we should rather use the rational time base as ffmpeg
-		timer_wait(v_timebase.num * 1000000 / v_timebase.den);
+		timer_wait(microseconds(v_timebase.num * 1000000 / v_timebase.den));
 	}
 	if(framePos >= header.framecount) {
 		return false;
@@ -240,7 +240,7 @@ bool BIKPlayer::DecodeFrame(VideoBuffer& buf)
 		//buggy frame, we stop immediately
 		return false;
 	}
-	if (!timer_last_sec) {
+	if (lastTime == seconds(0)) {
 		timer_start();
 	}
 
@@ -904,11 +904,11 @@ int BIKPlayer::get_vlc2(int16_t (*table)[2], int bits, int max_depth)
 
 int BIKPlayer::read_runs(Bundle *b)
 {
-	int t, v;
+	int t;
 
 	CHECK_READ_VAL(v_gb, b, t);
 	if (v_gb.get_bits(1)) {
-		v = v_gb.get_bits(4);
+		int v = v_gb.get_bits(4);
 		if (b->cur_dec + t > b->data_end) {
 			return -1;
 		}
@@ -916,7 +916,7 @@ int BIKPlayer::read_runs(Bundle *b)
 		b->cur_dec += t;
 	} else {
 		for (int i = 0; i < t; i++) {
-			v = GET_HUFF(b->tree);
+			int v = GET_HUFF(b->tree);
 			*b->cur_dec++ = v;
 		}
 	}

@@ -34,7 +34,7 @@ namespace GemRB {
 
 unsigned int Control::ActionRepeatDelay = 250;
 
-const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<ieDword>::max());
+const Control::ValueRange Control::MaxValueRange = std::make_pair(0, std::numeric_limits<value_t>::max());
 
 Control::Control(const Region& frame)
 : View(frame) // dont pass superview to View constructor
@@ -121,7 +121,7 @@ void Control::FlagsChanged(unsigned int /*oldflags*/)
 	}
 }
 
-void Control::UpdateState(const char* varname, unsigned int val)
+void Control::UpdateState(const char* varname, value_t val)
 {
 	if (strnicmp(VarName, varname, MAX_VARIABLE_LENGTH-1) == 0) {
 		UpdateState(val);
@@ -139,9 +139,9 @@ bool Control::IsFocused() const
 	return window->FocusedView() == this;
 }
 
-void Control::SetValue(ieDword val)
+void Control::SetValue(value_t val)
 {
-	ieDword oldVal = Value;
+	value_t oldVal = Value;
 	Value = Clamp(val, range.first, range.second);
 	
 	if (VarName[0] != 0) {
@@ -160,12 +160,12 @@ void Control::SetValue(ieDword val)
 void Control::SetValueRange(ValueRange r)
 {
 	range = r;
-	if (Value != CTL_INVALID_VALUE) {
+	if (Value != INVALID_VALUE) {
 		SetValue(Value); // update the value if it falls outside the range
 	}
 }
 
-void Control::SetValueRange(ieDword min, ieDword max)
+void Control::SetValueRange(value_t min, value_t max)
 {
 	SetValueRange(ValueRange(min, max));
 }
@@ -185,7 +185,7 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 		SetActionInterval(repeatDelay);
 
 		if (VarName[0] != 0) {
-			ieDword val = GetValue();
+			value_t val = GetValue();
 			core->GetDictionary()->SetAt(VarName, val);
 			window->RedrawControls(VarName, val);
 		}
@@ -195,14 +195,6 @@ Timer* Control::StartActionTimer(const ControlEventHandler& action, unsigned int
 	// always start the timer with ActionRepeatDelay
 	// this way we have consistent behavior for the initial delay prior to switching to a faster delay
 	return &core->SetTimer(h, delay ? delay : ActionRepeatDelay);
-}
-	
-bool Control::HitTest(const Point& p) const
-{
-	if (!(flags & (IgnoreEvents | Invisible))) {
-		return View::HitTest(p);
-	}
-	return false;
 }
 
 View::UniqueDragOp Control::DragOperation()
@@ -221,7 +213,7 @@ View::UniqueDragOp Control::DragOperation()
 
 		actionTimer = &core->SetTimer(h, 0, 0);
 	}
-	return make_unique<ControlDragOp>(this);
+	return GemRB::make_unique<ControlDragOp>(this);
 }
 
 bool Control::AcceptsDragOperation(const DragOp& dop) const

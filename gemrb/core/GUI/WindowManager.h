@@ -63,7 +63,7 @@ public:
 	struct HUDLock {
 		const WindowManager& wm;
 
-		explicit HUDLock(WindowManager& wm)
+		explicit HUDLock(const WindowManager& wm)
 		: wm(wm) {
 			wm.video->PushDrawingBuffer(wm.HUDBuf);
 		}
@@ -132,7 +132,7 @@ public:
 	CursorFeedback SetCursorFeedback(CursorFeedback feedback);
 
 	// all drawing will be done directly on the screen until DrawingLock is destoryed
-	HUDLock DrawHUD();
+	HUDLock DrawHUD() const;
 
 	/*
 	 Drawing is done in layers:

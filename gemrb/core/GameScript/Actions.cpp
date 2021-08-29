@@ -3705,10 +3705,20 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetBase(IE_VISUALRANGE,parameters->int0Parameter);
+	int range = parameters->int0Parameter;
+	// 0 means reset back to normal
+	if (range == 0) {
+		range = VOODOO_VISUAL_RANGE / 2;
+	}
+
+	actor->SetBase(IE_VISUALRANGE, range);
 	if (actor->GetStat(IE_EA) < EA_EVILCUTOFF) {
 		actor->SetBase(IE_EXPLORE, 1);
 	}
+	// just in case, ensuring the update happens already this tick
+	// (in iwd2 script use it's not blocking, just in dialog)
+	Map *map = Sender->GetCurrentArea();
+	if (map) map->UpdateFog();
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
@@ -4290,9 +4300,13 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 		if (slot != slot2) {
 			// swap them first, so we equip to the desired slot
 			CREItem *si = actor->inventory.RemoveItem(slot);
+			CREItem *si2 = actor->inventory.RemoveItem(slot2);
 			if (actor->inventory.AddSlotItem(si, slot2) != ASI_SUCCESS) {
 				// should never happen, since we just made room
 				error("Actions", "XEquip: suddenly no slots left!\n");
+			}
+			if (si2) {
+				actor->inventory.AddSlotItem(si2, slot);
 			}
 		}
 		actor->inventory.EquipItem(slot2);
@@ -5915,7 +5929,7 @@ void GameScript::ExportParty(Scriptable* /*Sender*/, Action* parameters)
 	const Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor *actor = game->GetPC(i, false);
+		const Actor *actor = game->GetPC(i, false);
 		snprintf(FileName,_MAX_PATH,"%s%d",parameters->string0Parameter,i+1);
 		core->WriteCharacter(FileName, actor);
 	}

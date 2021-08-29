@@ -427,6 +427,7 @@ static void ApplyDamageNearby(Scriptable* Owner, const Actor* target, const Effe
 {
 	//applyeffectcopy on everyone near us
 	const Map *area = target->GetCurrentArea();
+	if (!area) return;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1090,6 +1091,7 @@ int fx_salamander_aura (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1126,6 +1128,7 @@ int fx_umberhulk_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1189,6 +1192,7 @@ int fx_zombielord_aura (Scriptable* Owner, Actor* target, Effect* fx)
 
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -1453,6 +1457,7 @@ int fx_cloak_of_fear(Scriptable* Owner, Actor* target, Effect* fx)
 
 	//collect targets and apply effect on targets
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		const Actor *victim = area->GetActor(i, true);
@@ -2055,6 +2060,7 @@ int fx_beholder_dispel_magic (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -2087,6 +2093,7 @@ int fx_harpy_wail (Scriptable* Owner, Actor* target, Effect* fx)
 	core->GetAudioDrv()->Play(fx->Resource2, SFX_CHAN_MONSTER, target->Pos);
 
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
@@ -2115,6 +2122,7 @@ int fx_jackalwere_gaze (Scriptable* Owner, Actor* target, Effect* fx)
 	}
 
 	const Map *area = target->GetCurrentArea();
+	if (!area) return FX_NOT_APPLIED;
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);

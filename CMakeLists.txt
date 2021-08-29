@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.4)
 if(COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 	cmake_policy(SET CMP0005 NEW)
@@ -68,6 +68,7 @@ SET(OPENGL_BACKEND "None" CACHE STRING "OpenGL support (requires SDL2, possible 
 SET_PROPERTY(CACHE OPENGL_BACKEND PROPERTY STRINGS None OpenGL GLES)
 
 SET(PYTHON_VERSION "Auto" CACHE STRING "Python version to use (e.g.: Auto, 2, 3, 3.6)")
+SET(SANITIZE "None" CACHE STRING "Sanitizer to use (possible values: None, address, thread, memory, undefined)")
 
 OPTION(USE_SDLMIXER "Enable SDL_mixer support" ON)
 OPTION(USE_OPENAL "Enable OpenAL support" ON)
@@ -197,52 +198,52 @@ MESSAGE(STATUS "Git version bool: ${GIT_VERSION}")
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	INCLUDE(CheckCXXCompilerFlag)
 	if ((NOT DISABLE_WERROR) AND GIT_VERSION)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations")
+		string(APPEND CMAKE_CXX_FLAGS " -Werror -Wno-error=inline -Wno-error=cast-align -Wmissing-declarations")
 		if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 			# clang doesn't know as many -Wno-error directives, so we don't set up these in the shared path above
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align -Winline")
+			string(APPEND CMAKE_CXX_FLAGS " -Wcast-align -Winline")
 			CHECK_CXX_COMPILER_FLAG("-Wno-error=stringop-truncation" NO_STRINGOP_TRUNCATION)
 			if (NO_STRINGOP_TRUNCATION)
-				set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=stringop-truncation")
+				string(APPEND CMAKE_CXX_FLAGS " -Wno-error=stringop-truncation")
 			endif ()
 		else()
 			# hit in python2 includes
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=deprecated-register -Wno-deprecated-register")
+			string(APPEND CMAKE_CXX_FLAGS " -Wno-error=deprecated-register -Wno-deprecated-register")
 		endif ()
 	endif ()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -W -Wpointer-arith ")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-format-y2k -Wno-long-long")
+	string(APPEND CMAKE_CXX_FLAGS " -Wall -W -Wpointer-arith")
+	string(APPEND CMAKE_CXX_FLAGS " -pedantic -Wno-format-y2k -Wno-long-long")
 	# only later c++ standards conditionally allow function/object pointer casts
 	# gcc pragmas for disabling are broken: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
 	if (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+		string(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
 	elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6 OR APPLE))
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=pedantic")
+		string(APPEND CMAKE_CXX_FLAGS " -Wno-error=pedantic")
 	endif ()
 	# mark chars explicitly signed (ARM defaults to unsigned)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsigned-char")
+	string(APPEND CMAKE_CXX_FLAGS " -fsigned-char")
 	# only export symbols explicitly marked to be exported.
 	CHECK_CXX_COMPILER_FLAG("-fvisibility=hidden" VISIBILITY_HIDDEN)
 	IF (VISIBILITY_HIDDEN AND NOT WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+		string(APPEND CMAKE_CXX_FLAGS " -fvisibility=hidden")
 	ENDIF ()
 	CHECK_CXX_COMPILER_FLAG("-fno-stack-protector" STACK_PROTECTOR)
 	IF (STACK_PROTECTOR)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-stack-protector")
+		string(APPEND CMAKE_CXX_FLAGS " -fno-stack-protector")
 	ENDIF ()
 	# use a more lenient regex for finding documented switch fallthroughs (gcc7)
 	CHECK_CXX_COMPILER_FLAG("-Wimplicit-fallthrough" FALLTHROUGH)
 	IF (FALLTHROUGH AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimplicit-fallthrough=2")
+		string(APPEND CMAKE_CXX_FLAGS " -Wimplicit-fallthrough=2")
 	ENDIF ()
 	if (WIN32)
 		# GCC 4.5.0+ has shared libstdc++ without dllimport
-		set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--enable-auto-import")
-		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--enable-auto-import")
+		string(APPEND CMAKE_SHARED_LINKER_FLAGS " -Wl,--enable-auto-import")
+		string(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--enable-auto-import")
 	endif (WIN32)
 	# Ensure all plugin symbols exist.
 	if (NOT APPLE AND NOT UNSAFE_PLUGIN)
-		set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined")
+		string(APPEND CMAKE_MODULE_LINKER_FLAGS " -Wl,--no-undefined")
 	endif (NOT APPLE AND NOT UNSAFE_PLUGIN)
 ENDIF()
 
@@ -255,13 +256,13 @@ ENDIF()
 
 # Check for all the required and optional dependencies
 IF(PYTHON_VERSION STREQUAL "Auto")
-	FIND_PACKAGE(PythonLibs 2.3)
+	FIND_PACKAGE(PythonLibs 3)
 	# Record for reporting later
-	SET(PYTHON_VERSION 2.3)
+	SET(PYTHON_VERSION 3)
 	IF(NOT PYTHONLIBS_FOUND)
-		FIND_PACKAGE(PythonLibs 3 REQUIRED)
+		FIND_PACKAGE(PythonLibs 2.3 REQUIRED)
 		# Record for reporting later
-		SET(PYTHON_VERSION 3)
+		SET(PYTHON_VERSION 2.3)
 	ENDIF()
 ELSE()
 	FIND_PACKAGE(PythonLibs ${PYTHON_VERSION} REQUIRED)
@@ -456,6 +457,14 @@ IF(USE_VORBIS)
 	ENDIF()
 ENDIF()
 
+if(NOT SANITIZE STREQUAL "None")
+	string(APPEND CMAKE_C_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+	string(APPEND CMAKE_CXX_FLAGS " -O0 -g -fsanitize=${SANITIZE} -fno-omit-frame-pointer")
+	string(APPEND CMAKE_EXE_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+	string(APPEND CMAKE_SHARED_LINKER_FLAGS " -fsanitize=${SANITIZE}")
+	# also CMAKE_MODULE_LINKER_FLAGS for macs?
+endif()
+
 # On Release builds cmake automatically defines NDEBUG, so we
 # explicitly undefine it:
 # This matches stripped (Release) and nonstripped (RelWithDebInfo) builds
@@ -497,9 +506,9 @@ IF(APPLE)
 	FIND_LIBRARY(COCOA_LIBRARY_PATH Cocoa)
 	FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation)
 	# for objective-c++
-	SET (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTARGET_OS_MAC")
+	STRING(APPEND CMAKE_CXX_FLAGS " -DTARGET_OS_MAC")
 	# for pure objective-c
-	SET (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -x objective-c -DTARGET_OS_MAC")
+	STRING(APPEND CMAKE_C_FLAGS " -x objective-c -DTARGET_OS_MAC")
 ENDIF(APPLE)
 
 IF(VITA)
@@ -590,10 +599,9 @@ add_custom_target(appimage
     # bundle core python modules
     # AppRun defaults PYTHONPATH to this destination
     # source is probably available in Python3_STDLIB once we switch to newer cmake
-    COMMAND cp -r /usr/lib/python2.7 AppDir/usr/share/pyshared
-    COMMAND cp /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py AppDir/usr/share/pyshared/
-    COMMAND rm -r AppDir/usr/share/pyshared/config-x86_64-linux-gnu
-    COMMAND rm -r AppDir/usr/share/pyshared/dist-packages
+    COMMAND cp -r /usr/lib/python3.6 AppDir/usr/share/pyshared
+    COMMAND rm -rf AppDir/usr/share/pyshared/config-x86_64-linux-gnu
+    COMMAND rm -rf AppDir/usr/share/pyshared/dist-packages
     COMMAND LD_LIBRARY_PATH=./AppDir/usr/lib/gemrb ./linuxdeploy --appdir=./AppDir --output=appimage --custom-apprun="${CMAKE_CURRENT_SOURCE_DIR}/platforms/linux/AppRun.sh"
     WORKING_DIRECTORY ${CMAKE_BUILD_DIR}
 )
@@ -648,6 +656,7 @@ PRINT_OPTION(WIN32_USE_STDIO)
 PRINT_OPTION(SDL_BACKEND)
 PRINT_OPTION(PYTHON_VERSION)
 PRINT_OPTION(OPENGL_BACKEND)
+PRINT_OPTION(SANITIZE)
 message(STATUS "")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Target bitness: ${CMAKE_SIZEOF_VOID_P}*8")

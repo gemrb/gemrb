@@ -86,7 +86,7 @@ void ScrollBar::ScrollTo(const Point& p)
 	double percent = Clamp<double>(p.y, 0, pxRange) / pxRange;
 	const ValueRange& range = GetValueRange();
 
-	ieDword newPos = round(double((percent * (range.second - range.first)) + range.first));
+	value_t newPos = round(double((percent * (range.second - range.first)) + range.first));
 	SetValue(newPos);
 }
 
@@ -106,16 +106,16 @@ Point ScrollBar::AxisPosFromValue() const
 }
 
 /** Refreshes the ScrollBar according to a guiscript variable */
-void ScrollBar::UpdateState(unsigned int Sum)
+void ScrollBar::UpdateState(value_t val)
 {
-	SetValue( Sum );
+	SetValue(val);
 }
 
 void ScrollBar::ScrollBySteps(int steps)
 {
 	int val = GetValue() + (steps * StepIncrement);
 	const ValueRange& range = GetValueRange();
-	ieDword clamped = Clamp<int>(val, range.first, range.second);
+	value_t clamped = Clamp<int>(val, range.first, range.second);
 	SetValue(clamped);
 }
 

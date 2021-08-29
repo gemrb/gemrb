@@ -33,11 +33,10 @@
 namespace GemRB {
 
 class DataStream;
-class Resource;
 class ResourceDesc;
 
 struct BIFEntry {
-	char* name;
+	std::string name;
 	ieWord BIFLocator;
 	char path[_MAX_PATH];
 	int cd;
@@ -134,8 +133,6 @@ private:
 	/** Gets the stream assoicated to a RESKey */
 	DataStream *GetStream(const char *resname, ieWord type);
 public:
-	KEYImporter(void);
-	~KEYImporter(void) override;
 	bool Open(const char *file, const char *desc) override;
 	/* predicts the availability of a resource */
 	bool HasResource(const char* resname, SClass_ID type) override;

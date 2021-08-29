@@ -30,7 +30,7 @@ bool INIImporter::Open(DataStream* str)
 		return false;
 	}
 	strret_t cnt = 0;
-	char* strbuf = ( char* ) malloc( 4097 );
+	char strbuf[4097];
 	INITag* lastTag = NULL;
 	do {
 		cnt = str->ReadLine( strbuf, 4096 );
@@ -63,7 +63,6 @@ bool INIImporter::Open(DataStream* str)
 		}
 
 	} while (true);
-	free( strbuf );
 	delete str;
 	return true;
 }

@@ -42,15 +42,7 @@ View::DragOp::~DragOp() {
 
 View::View(const Region& frame)
 	: frame(frame)
-{
-	eventProxy = NULL;
-	superView = NULL;
-	window = NULL;
-
-	dirty = true;
-	flags = 0;
-	autoresizeFlags = ResizeNone;
-}
+{}
 
 View::~View()
 {
@@ -499,9 +491,9 @@ void View::AddedToView(View* view)
 	}
 }
 
-void View::RemovedFromView(View*)
+void View::RemovedFromView(const View*)
 {
-	window = NULL;
+	window = nullptr;
 }
 
 bool View::IsOpaque() const
@@ -515,6 +507,10 @@ bool View::IsOpaque() const
 
 bool View::HitTest(const Point& p) const
 {
+	if (flags & (IgnoreEvents | Invisible)) {
+		return false;
+	}
+
 	Region r(Point(), Dimensions());
 	if (!r.PointInside(p)) {
 		return false;

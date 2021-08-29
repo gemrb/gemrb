@@ -780,7 +780,7 @@ static Point FindOffScreenPoint(const Scriptable *Sender, int flags, int creatur
 
 			if (isPassable) {
 				// Check if the search map allows a creature to be at walkableStartPoint (note: ignoring creatureSize)
-				isPassable = bool(map->GetBlockedNavmap(walkableStartPoint) & PathMapFlags::PASSABLE);
+				isPassable = bool(map->GetBlocked(walkableStartPoint) & PathMapFlags::PASSABLE);
 			}
 
 			// Check if walkableStartPoint can traverse to walkableGoal
@@ -1347,7 +1347,7 @@ void MoveBetweenAreasCore(Actor* actor, const ResRef &area, const Point &positio
 
 //repeat movement, until goal isn't reached
 //if int0parameter is !=0, then it will try only x times
-void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
+void MoveToObjectCore(Scriptable *Sender, const Action *parameters, ieDword flags, bool untilsee)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();

@@ -41,8 +41,8 @@ public:
 	bool Open(DataStream* stream) override;
 	Spell* GetSpell(Spell *spl, bool silent=false) override;
 private:
-	void GetExtHeader(Spell *s, SPLExtHeader* eh);
-	Effect *GetFeature(Spell *s);
+	void GetExtHeader(const Spell *s, SPLExtHeader* eh);
+	Effect *GetFeature(const Spell *s);
 };
 
 

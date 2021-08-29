@@ -74,31 +74,31 @@ public:
 private:
 	Color backgroundColor;
 	Holder<Sprite2D> background;
-	Holder<Sprite2D> cursor;
+	Holder<Sprite2D> cursor = nullptr;
 	std::vector<ViewScriptingRef*> scriptingRefs;
 
-	mutable bool dirty;
+	mutable bool dirty = true;
 
 	// TODO: we could/should generalize this
 	// MarkDirty could take a region, and more complicated views could potentially
 	// save a lot of drawing time by only drawing their dirty portions (GameControl?)
 	Regions dirtyBGRects;
 	
-	View* eventProxy;
+	View* eventProxy = nullptr;
 
 protected:
-	View* superView;
+	View* superView = nullptr;
 	// for convenience because we need to get this so much
 	// all it is is a saved pointer returned from View::GetWindow and is updated in AddedToView
-	Window* window;
+	Window* window = nullptr;
 
 	Region frame;
 	std::list<View*> subViews;
 	String tooltip;
 
 	// Flags: top byte is reserved for View flags, subclasses may use the remaining bits however they want
-	unsigned int flags;
-	unsigned short autoresizeFlags; // these flags don't produce notifications
+	unsigned int flags = 0;
+	unsigned short autoresizeFlags = ResizeNone; // these flags don't produce notifications
 
 private:
 	void DirtyBGRect(const Region&, bool force = false);
@@ -115,7 +115,7 @@ private:
 
 	void AddedToWindow(Window*);
 	void AddedToView(View*);
-	void RemovedFromView(View*);
+	void RemovedFromView(const View*);
 	virtual void SubviewAdded(View* /*view*/, View* /*parent*/) {};
 	virtual void SubviewRemoved(View* /*view*/, View* /*parent*/) {};
 

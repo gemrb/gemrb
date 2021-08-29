@@ -40,6 +40,12 @@ using namespace GemRB;
     return self;
 }
 
+- (void)dealloc
+{
+	[_configWindow release];
+	[super dealloc];
+}
+
 - (BOOL)application:(NSApplication *) __unused theApplication openFile:(NSString *) filename
 {
 	NSFileManager* fm = [NSFileManager defaultManager];

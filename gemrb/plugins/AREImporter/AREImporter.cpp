@@ -181,7 +181,7 @@ static Holder<Sprite2D> LoadImageAs8bit(const ResRef& resref)
 	return spr;
 }
 
-static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
+static TileProps MakeTileProps(const TileMap* tm, const ResRef& wedref, bool day_or_night)
 {
 	ResRef TmpResRef;
 
@@ -193,67 +193,69 @@ static Holder<Sprite2D> MakeTileProps(const ResRef& wedref, bool day_or_night)
 
 	auto lightmap = LoadImageAs8bit(TmpResRef);
 	if (!lightmap) {
-		Log(ERROR, "AREImporter", "No lightmap available.");
-		return nullptr;
+		throw std::runtime_error("No lightmap available.");
 	}
 
 	TmpResRef.SNPrintF("%.6sSR", wedref.CString());
 
 	auto searchmap = LoadImageAs8bit(TmpResRef);
 	if (!searchmap) {
-		Log(ERROR, "AREImporter", "No searchmap available.");
-		return nullptr;
+		throw std::runtime_error("No searchmap available.");
 	}
 
 	TmpResRef.SNPrintF("%.6sHT", wedref.CString());
 
 	auto heightmap = LoadImageAs8bit(TmpResRef);
 	if (!heightmap) {
-		Log(ERROR, "AREImporter", "No heightmap available.");
-		return nullptr;
+		throw std::runtime_error("No heightmap available.");
 	}
 	
-	const Size propsize = lightmap->Frame.size;
-	assert(propsize == searchmap->Frame.size && propsize == heightmap->Frame.size);
+	const Size propsize(tm->XCellCount * 4, CeilDiv(tm->YCellCount * 64, 12));
 
-	PixelFormat fmt(4, Map::searchMapMask, Map::materialMapMask,
-					Map::heightMapMask, Map::lightMapMask);
+	PixelFormat fmt = TileProps::pixelFormat;
 	fmt.palette = lightmap->GetPalette();
-	auto tileProps = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
+	auto propImg = core->GetVideoDriver()->CreateSprite(Region(Point(), propsize), nullptr, fmt);
 
-	auto propit = tileProps->GetIterator();
+	auto propit = propImg->GetIterator();
 	auto end = propit.end(propit);
 	
 	auto hmpal = heightmap->GetPalette();
 	auto smit = searchmap->GetIterator();
 	auto hmit = heightmap->GetIterator();
 	auto lmit = lightmap->GetIterator();
-	for (; propit != end; ++propit, ++lmit, ++hmit, ++smit) {
-		uint8_t smval = *smit; // r + g
-		assert((smval & 0xf0) == 0);
-		uint8_t r = uint8_t(PathFinderCosts::Get().Passable[smval]);
-		uint8_t g = smval;
-		uint8_t b = hmpal->col[*hmit].r; // pick any channel, they are all the same
-		uint8_t a = *lmit;
+	
+	// Sadly, the original data is occasionally cropped poorly and some images are a few pixels smaller than they ought to be
+	// an example of this is BG2 AR0325
+	// therefore, we must have some out-of-bounds defaults and only advance iterators when they are inside propsize
+	for (; propit != end; ++propit) {
+		const Point& pos = propit.Position();
+		uint8_t r = TileProps::defaultSearchMap;
+		uint8_t g = TileProps::defaultMaterial;
+		uint8_t b = TileProps::defaultElevation;
+		uint8_t a = TileProps::defaultLighting;
+		
+		if (smit.clip.PointInside(pos)) {
+			uint8_t smval = *smit; // r + g
+			assert((smval & 0xf0) == 0);
+			r = uint8_t(PathFinderCosts::Get().Passable[smval]);
+			g = smval;
+			++smit;
+		}
+		
+		if (hmit.clip.PointInside(pos)) {
+			b = hmpal->col[*hmit].r; // pick any channel, they are all the same
+			++hmit;
+		}
+		
+		if (lmit.clip.PointInside(pos)) {
+			a = *lmit;
+			++lmit;
+		}
+		
 		propit.WriteRGBA(r, g, b, a);
 	}
-	return tileProps;
-}
 
-AREImporter::AREImporter(void)
-{
-	EntrancesOffset = ContainersOffset = InfoPointsOffset = SpawnOffset = 0;
-	EntrancesCount = ContainersCount = InfoPointsCount = SpawnCount = 0;
-	ItemsOffset = VariablesOffset = AmbiOffset = TileOffset = TrapOffset = 0;
-	ItemsCount = VariablesCount = AmbiCount = TileCount = TrapCount = 0;
-	ActorCount = VerticesCount = NoteCount = 0;
-	ActorOffset = VerticesOffset = NoteOffset = EffectOffset = 0;
-	AreaDifficulty = AreaFlags = 0;
-	SongHeader = RestHeader = bigheader = 0;
-	WRain = WSnow = WFog = WLightning = WUnknown = 0;
-	EmbeddedCreOffset = AnimOffset = AnimCount = DoorsOffset = DoorsCount = 0;
-	ExploredBitmapSize = ExploredBitmapOffset = 0;
-	LastSave = 0;
+	return TileProps(propImg);
 }
 
 bool AREImporter::Import(DataStream* str)
@@ -384,22 +386,29 @@ bool AREImporter::ChangeMap(Map *map, bool day_or_night)
 		Log(ERROR, "AREImporter", "No tile map available.");
 		return false;
 	}
+	
+	try {
+		TileProps props = MakeTileProps(tm, map->WEDResRef, day_or_night);
+		
+		// Small map for MapControl
+		ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
 
-	// Small map for MapControl
-	ResourceHolder<ImageMgr> sm = GetResourceHolder<ImageMgr>(TmpResRef);
-
-	if (sm) {
-		// night small map is *optional*!
-		// keep the exising map if this one is null
-		map->SmallMap = sm->GetSprite2D();
+		if (sm) {
+			// night small map is *optional*!
+			// keep the exising map if this one is null
+			map->SmallMap = sm->GetSprite2D();
+		}
+		
+		//the map state was altered, no need to hold this off for any later
+		map->DayNight = day_or_night;
+		
+		tm->UpdateDoors();
+		
+		map->SetTileMapProps(std::move(props));
+	} catch (const std::exception& e) {
+		Log(ERROR, "AREImporter", "%s", e.what());
+		return false;
 	}
-	
-	//the map state was altered, no need to hold this off for any later
-	map->DayNight = day_or_night;
-	
-	tm->UpdateDoors();
-	
-	map->SetTileMapProps(MakeTileProps(map->WEDResRef, day_or_night));
 
 	// update the tiles and tilecount (eg. door0304 in Edwin's Docks (ar0300) entrance
 	for (size_t i = 0; i < tm->GetDoorCount(); i++) {
@@ -494,8 +503,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		//fall back to day minimap
 		sm = GetResourceHolder<ImageMgr>(WEDResRef);
 	}
-
-	Map* map = new Map(tm, MakeTileProps(WEDResRef, day_or_night), sm->GetSprite2D());
+	
+	Map* map = nullptr;
+	try {
+		map = new Map(tm, MakeTileProps(tm, WEDResRef, day_or_night), sm ? sm->GetSprite2D() : nullptr);
+	} catch (const std::exception& e) {
+		Log(ERROR, "AREImporter", "%s", e.what());
+		return nullptr;
+	}
 	
 	if (core->config.SaveAsOriginal) {
 		map->version = bigheader;
@@ -1335,14 +1350,14 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		ResRef sounds[MAX_RESCOUNT];
 		ieWord tmpWord;
 
-		Ambient *ambi = new Ambient();
-		str->Read( &ambi->name, 32 );
-		str->ReadPoint(ambi->origin);
-		str->ReadWord(ambi->radius);
+		Ambient *ambient = new Ambient();
+		str->Read(&ambient->name, 32);
+		str->ReadPoint(ambient->origin);
+		str->ReadWord(ambient->radius);
 		str->Seek(2, GEM_CURRENT_POS); // alignment padding
-		str->ReadDword(ambi->pitchVariance);
-		str->ReadWord(ambi->gainVariance);
-		str->ReadWord(ambi->gain);
+		str->ReadDword(ambient->pitchVariance);
+		str->ReadWord(ambient->gainVariance);
+		str->ReadWord(ambient->gain);
 		for (auto& sound : sounds) {
 			str->ReadResRef(sound);
 		}
@@ -1350,21 +1365,21 @@ Map* AREImporter::GetMap(const char *resRef, bool day_or_night)
 		str->Seek(2, GEM_CURRENT_POS); // alignment padding
 		ieDword interval;
 		str->ReadDword(interval);
-		ambi->interval = interval * 1000;
+		ambient->interval = interval * 1000;
 		str->ReadDword(interval);
-		ambi->intervalVariance = interval * 1000;
+		ambient->intervalVariance = interval * 1000;
 		// schedule bits
-		str->ReadDword(ambi->appearance);
-		str->ReadDword(ambi->flags);
+		str->ReadDword(ambient->appearance);
+		str->ReadDword(ambient->flags);
 		str->Seek( 64, GEM_CURRENT_POS );
 		//this is a physical limit
 		if (tmpWord>MAX_RESCOUNT) {
 			tmpWord=MAX_RESCOUNT;
 		}
 		for (int j = 0; j < tmpWord; j++) {
-			ambi->sounds.emplace_back(sounds[j]);
+			ambient->sounds.emplace_back(sounds[j]);
 		}
-		map->AddAmbient(ambi);
+		map->AddAmbient(ambient);
 	}
 
 	Log(DEBUG, "AREImporter", "Loading automap notes");
@@ -1921,15 +1936,10 @@ int AREImporter::PutDoors(DataStream *stream, const Map *map, ieDword &VertIndex
 	return 0;
 }
 
-int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& p) const
+int AREImporter::PutPoints(DataStream *stream, const std::vector<Point>& points) const
 {
-	return PutPoints(stream, &p[0], p.size());
-}
-
-int AREImporter::PutPoints(DataStream *stream, const Point *p, size_t count) const
-{
-	for(size_t j=0;j<count;j++) {
-		stream->WritePoint(p[j]);
+	for (const Point& p : points) {
+		stream->WritePoint(p);
 	}
 	return 0;
 }
@@ -1943,7 +1953,7 @@ int AREImporter::PutVertices(DataStream *stream, const Map *map) const
 			PutPoints(stream, ip->outline->vertices);
 		} else {
 			Point origin = ip->BBox.origin;
-			PutPoints(stream, &origin, 1);
+			stream->WritePoint(origin);
 		}
 	}
 	//containers

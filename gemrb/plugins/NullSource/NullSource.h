@@ -27,8 +27,6 @@ namespace GemRB {
 
 class NullSource : public ResourceSource {
 public:
-	NullSource(void);
-	~NullSource(void) override;
 	bool Open(const char *filename, const char *description) override;
 	bool HasResource(const char* resname, SClass_ID type) override;
 	bool HasResource(const char* resname, const ResourceDesc &type) override;

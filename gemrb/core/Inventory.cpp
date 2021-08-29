@@ -1686,16 +1686,13 @@ ieDword Inventory::GetEquipExclusion(int index) const
 void Inventory::UpdateShieldAnimation(const Item *it)
 {
 	char AnimationType[2]={0,0};
-	int WeaponType;
+	unsigned char WeaponType = IE_ANI_WEAPON_1H;
 
 	if (it) {
 		memcpy(AnimationType, it->AnimationType, 2);
-		if (core->CanUseItemType(SLOT_WEAPON, it))
+		if (core->CanUseItemType(SLOT_WEAPON, it)) {
 			WeaponType = IE_ANI_WEAPON_2W;
-		else
-			WeaponType = IE_ANI_WEAPON_1H;
-	} else {
-		WeaponType = IE_ANI_WEAPON_1H;
+		}
 	}
 	Owner->SetUsedShield(AnimationType, WeaponType);
 }
@@ -1708,7 +1705,7 @@ void Inventory::UpdateWeaponAnimation()
 		// ranged weapon
 		slot = FindRangedWeapon();
 	}
-	int WeaponType = -1;
+	unsigned char WeaponType = IE_ANI_WEAPON_INVALID;
 
 	char AnimationType[2]={0,0};
 	ieWord MeleeAnimation[3]={100,0,0};
@@ -1730,10 +1727,10 @@ void Inventory::UpdateWeaponAnimation()
 	} else {
 		// Examine shield slot to check if we're using two weapons
 		// TODO: for consistency, use same Item* access method as above
-		int slot = GetShieldSlot();
+		int shieldSlot = GetShieldSlot();
 		const CREItem* si = nullptr;
-		if (slot > 0) {
-			si = GetSlotItem((ieDword) slot);
+		if (shieldSlot > 0) {
+			si = GetSlotItem(static_cast<ieDword>(shieldSlot));
 		}
 		if (si) {
 			const Item* it = gamedata->GetItem(si->ItemResRef, true);
@@ -1744,7 +1741,7 @@ void Inventory::UpdateWeaponAnimation()
 			gamedata->FreeItem(it, si->ItemResRef, false);
 		}
 
-		if (WeaponType == -1) {
+		if (WeaponType == IE_ANI_WEAPON_INVALID) {
 			WeaponType = IE_ANI_WEAPON_1H;
 		}
 	}

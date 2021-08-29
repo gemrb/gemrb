@@ -21,8 +21,6 @@
 #ifndef VARIABLES_H 
 #define VARIABLES_H
 
-
-#include "SClassID.h"
 #include "exports.h"
 #include "globals.h"
 
@@ -88,7 +86,7 @@ public:
 
 	// Lookup
 	int GetValueLength(const char* key) const;
-	bool Lookup(const char* key, char* dest, int MaxLength) const;
+	bool Lookup(const char* key, char* dest, size_t MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, char*& dest) const;
 	bool Lookup(const char* key, void*& dest) const;

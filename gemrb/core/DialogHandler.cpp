@@ -363,7 +363,8 @@ bool DialogHandler::DialogChoose(unsigned int choose)
 			// delay all other actions until the next cycle (needed for the machine of Lum the Mad (gorlum2.dlg))
 			// FIXME: figure out if pst needs something similar (action missing)
 			//        (not conditional on GenerateAction to prevent console spam)
-			if (!core->HasFeature(GF_AREA_OVERRIDE) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
+			// iwd2 41nate.d breaks if this is included, since the original delayed execution in a different manner
+			if (!core->HasFeature(GF_AREA_OVERRIDE) && !core->HasFeature(GF_3ED_RULES) && !(tr->Flags & IE_DLG_IMMEDIATE)) {
 				target->AddAction(GenerateAction("BreakInstants()"));
 			}
 			for (unsigned int i = 0; i < tr->actions.size(); i++) {

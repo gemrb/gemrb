@@ -347,7 +347,7 @@ public:
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];
-	int WeaponType;
+	unsigned char WeaponType;
 	ieDword multiclass;
 	bool GotLUFeedback;
 	int WMLevelMod;
@@ -834,8 +834,8 @@ public:
 	void SetFeat(unsigned int feat, int mode);
 	void SetFeatValue(unsigned int feat, int value, bool init = true);
 	void SetUsedWeapon(const char (&AnimationType)[2], const ieWord *MeleeAnimation,
-		int WeaponType=-1);
-	void SetUsedShield(const char (&AnimationType)[2], int WeaponType=-1);
+		unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
+	void SetUsedShield(const char (&AnimationType)[2], unsigned char WeaponType = IE_ANI_WEAPON_INVALID);
 	void SetUsedHelmet(const char (&AnimationType)[2]);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */

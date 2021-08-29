@@ -32,8 +32,8 @@
  * rational number numerator/denominator
  */
 typedef struct AVRational{
-    int num; ///< numerator
-    int den; ///< denominator
+	int64_t num; ///< numerator
+	int64_t den; ///< denominator
 } AVRational;
 
 /**
@@ -43,7 +43,7 @@ typedef struct AVRational{
  * @return 0 if a==b, 1 if a>b and -1 if a<b
  */
 static inline int av_cmp_q(AVRational a, AVRational b){
-    const int64_t tmp= a.num * (int64_t)b.den - b.num * (int64_t)a.den;
+    const int64_t tmp= a.num * b.den - b.num * a.den;
 
     if(tmp) return (int) ((tmp>>63)|1);
     else    return 0;
@@ -68,7 +68,7 @@ static inline double av_q2d(AVRational a){
  * @param max the maximum allowed for dst_num & dst_den
  * @return 1 if exact, 0 otherwise
  */
-int av_reduce(int &dst_num, int &dst_den, int64_t num, int64_t den, int64_t max);
+int av_reduce(int64_t &dst_num, int64_t &dst_den, int64_t num, int64_t den, int64_t max);
 
 /**
  * Multiplies two rationals.

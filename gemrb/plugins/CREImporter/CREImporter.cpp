@@ -2232,11 +2232,7 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 	ieDword tmpDword;
 	ieWord tmpWord;
 	ieWord ItemCount = 0;
-	ieWord *indices =(ieWord *) malloc(size*sizeof(ieWord) );
-
-	for (unsigned int i = 0; i < size; i++) {
-		indices[i]=(ieWord) -1;
-	}
+	std::vector<ieWord> indices(size, -1);
 
 	for (unsigned int i = 0; i < size; i++) {
 		//ignore first element, getinventorysize makes space for fist
@@ -2247,7 +2243,7 @@ int CREImporter::PutInventory(DataStream *stream, const Actor *actor, unsigned i
 		}
 		stream->WriteWord(indices[i]);
 	}
-	free(indices);
+
 	tmpWord = (ieWord) actor->inventory.GetEquipped();
 	stream->WriteWord(tmpWord);
 	tmpWord = (ieWord) actor->inventory.GetEquippedHeader();

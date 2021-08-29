@@ -107,6 +107,7 @@ namespace GemRB {
 #define IE_ANI_WEAPON_1H		0
 #define IE_ANI_WEAPON_2H		1
 #define IE_ANI_WEAPON_2W		2
+#define IE_ANI_WEAPON_INVALID		100
 
 #define IE_ANI_RANGED_BOW		0
 #define IE_ANI_RANGED_XBOW		1
@@ -176,13 +177,13 @@ private:
 	
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
 	Animation** shadowAnimations[MAX_ANIMS][MAX_ORIENT];
-	char HelmetRef[2];
-	char WeaponRef[2];
-	char OffhandRef[2];
+	char HelmetRef[2]{};
+	char WeaponRef[2]{};
+	char OffhandRef[2]{};
 public:
-	const ieDword *Colors; //these are the custom color indices
+	const ieDword *Colors = nullptr; // these are the custom color indices
 	RGBModifier ColorMods[PAL_MAX*8]; // color modification effects
-	tick_t lastModUpdate;
+	tick_t lastModUpdate = 0;
 	RGBModifier GlobalColorMod; // global color modification effect
 
 	bool change[PAL_MAX];
@@ -190,21 +191,21 @@ public:
 	PaletteHolder ModPartPalettes[PAL_MAX];
 	PaletteHolder shadowPalette;
 	size_t AvatarsRowNum;
-	unsigned char ArmorType, WeaponType, RangedType;
+	unsigned char ArmorType = 0, WeaponType = 0, RangedType = 0;
 	ResRef ResRefBase;
 	ResRef PaletteResRef[5] = {};
 	unsigned char previousStanceID = 0;
 	unsigned char nextStanceID = 0;
 	unsigned char stanceID = 0;
-	bool autoSwitchOnEnd;
-	bool lockPalette;
+	bool autoSwitchOnEnd = false;
+	bool lockPalette = false;
 public:
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	~CharAnimations(void);
 
 	void SetArmourLevel(int ArmourLevel);
 	void SetRangedType(int Ranged);
-	void SetWeaponType(int WeaponType);
+	void SetWeaponType(unsigned char WeaponType);
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
@@ -230,7 +231,7 @@ public: //attribute functions
 	int GetCircleSize() const;
 	int NoPalette() const;
 	int GetAnimType() const;
-	int GetSize() const;
+	char GetSize() const;
 	int GetBloodColor() const;
 	unsigned int GetFlags() const;
 	const ResRef &GetWalkSound() const;
@@ -259,7 +260,7 @@ private:
 	void AddVHR3Suffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient) const;
 	void GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddSixSuffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient) const;
 	void AddTwoPieceSuffix(std::string& dest, unsigned char AnimID,
@@ -267,7 +268,7 @@ private:
 	void AddMHRSuffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip) const;
 	void GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddMMRSuffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient, bool mirror) const;
 	void AddMMR2Suffix(std::string& dest, unsigned char AnimID,
@@ -281,7 +282,7 @@ private:
 	void AddLRSuffix2( std::string& dest, unsigned char StanceID,
 		unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData) const;
 	void GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
-		const char* equipRef, bool offhand, EquipResRefData* equip) const;
+		const char* equipRef, bool offhand, const EquipResRefData* equip) const;
 	void AddLR2Suffix(std::string& dest, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient) const;
 	void AddLR3Suffix(std::string& dest, unsigned char AnimID,
@@ -289,7 +290,7 @@ private:
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 		std::string& dest, unsigned char& Cycle, int Part, EquipResRefData*& equip) const;
 	void GetEquipmentResRef(const char* equipRef, bool offhand,
-		std::string& dest, unsigned char& Cycle, EquipResRefData* equip) const;
+		std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const;
 	unsigned char MaybeOverrideStance(unsigned char stance) const;
 	void MaybeUpdateMainPalette(Animation**);
 };

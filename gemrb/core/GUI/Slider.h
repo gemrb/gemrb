@@ -67,7 +67,7 @@ public:
 	/** Sets the State of the Slider */
 	void SetState(int arg) { State=(unsigned char) arg; }
 	/** Refreshes a slider which is associated with VariableName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 
 private: // Private attributes
 	/** Knob Image */

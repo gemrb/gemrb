@@ -32,6 +32,8 @@
 
 #include "Interface.h"
 
+using namespace std::chrono;
+
 /* mvevideodec8.cpp */
 extern int ipvideo_decode_frame8 (const GstMveDemuxStream * s,
 	const unsigned char *data, unsigned short len);
@@ -104,7 +106,7 @@ bool MVEPlayer::start_playback() {
 }
 
 bool MVEPlayer::next_frame() {
-	if (host->timer_last_sec) host->timer_wait(host->frame_wait);
+	if (host->lastTime > seconds(0)) host->timer_wait(host->frame_wait);
 
 	video_rendered_frame = false;
 	while (!video_rendered_frame) {
@@ -112,7 +114,7 @@ bool MVEPlayer::next_frame() {
 		if (!process_chunk()) return false;
 	}
 
-	if (!host->timer_last_sec) host->timer_start();
+	if (host->lastTime == seconds(0)) host->timer_start();
 
 	return true;
 }
@@ -234,7 +236,7 @@ void MVEPlayer::segment_create_timer() {
 	unsigned int timer_rate = GST_READ_UINT32_LE(buffer);
 	unsigned short timer_subdiv = GST_READ_UINT16_LE(buffer + 4);
 
-	host->frame_wait = timer_rate * timer_subdiv;
+	host->frame_wait = microseconds(timer_rate * timer_subdiv);
 }
 
 /*

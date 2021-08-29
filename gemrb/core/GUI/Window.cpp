@@ -265,10 +265,10 @@ void Window::SetPosition(WindowPosition pos)
 	SetFrame(newFrame);
 }
 
-void Window::RedrawControls(const char* VarName, unsigned int Sum) const
+void Window::RedrawControls(const char* VarName, Control::value_t val) const
 {
 	for (auto ctrl : Controls) {
-		ctrl->UpdateState(VarName, Sum);
+		ctrl->UpdateState(VarName, val);
 	}
 }
 
@@ -529,9 +529,15 @@ bool Window::DispatchEvent(const Event& event)
 			}
 			return true;
 		default:
+			bool reset = false;
+			if (event.type == Event::MouseDown && event.mouse.button == GEM_MB_MENU) {
+				reset = true;
+			}
 			if (target == NULL) {
 				target = this;
+				if (reset) core->ResetActionBar();
 			} else if (target->IsDisabled()) {
+				if (reset) core->ResetActionBar();
 				return true; // we still absorb the event
 			}
 			break;

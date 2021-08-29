@@ -47,14 +47,45 @@
 #include "Scriptable/Door.h"
 #include "Scriptable/InfoPoint.h"
 
+#include <array>
 #include <cmath>
 
 namespace GemRB {
 
-#define FORMATIONSIZE 10
-using formation_type = Point[FORMATIONSIZE];
-ieDword formationcount;
-static formation_type *formations=NULL;
+constexpr uint8_t FORMATIONSIZE = 10;
+using formation_t = std::array<Point, FORMATIONSIZE>;
+
+class Formations {
+	std::vector<formation_t> formations;
+	
+	Formations() noexcept {
+		//TODO:
+		//There could be a custom formation which is saved in the save game
+		//alternatively, all formations could be saved in some compatible way
+		//so it doesn't cause problems with the original engine
+		AutoTable tab = gamedata->LoadTable("formatio");
+		if (!tab) {
+			// fallback
+			formations.emplace_back();
+			return;
+		}
+		auto formationcount = tab->GetRowCount();
+		formations.reserve(formationcount);
+		for (unsigned int i = 0; i < formationcount; i++) {
+			for (uint8_t j = 0; j < FORMATIONSIZE; j++) {
+				Point p(atoi(tab->QueryField(i, j*2)), atoi(tab->QueryField(i, j*2+1)));
+				formations[i][j] = p;
+			}
+		}
+	}
+public:
+	static const formation_t& GetFormation(size_t formation) noexcept {
+		static const Formations formations;
+		formation = std::min(formation, formations.formations.size() - 1);
+		return formations.formations[formation];
+	}
+};
+
 static const ResRef TestSpell = "SPWI207";
 
 uint32_t GameControl::DebugFlags = 0;
@@ -70,7 +101,7 @@ static Actor* GetMainSelectedActor()
 //arrow markers on the edges to point at detected monsters
 //tracterID is the tracker actor's global ID
 //distance is the detection distance
-void GameControl::SetTracker(Actor *actor, ieDword dist)
+void GameControl::SetTracker(const Actor *actor, ieDword dist)
 {
 	trackerID = actor->GetGlobalID();
 	distance = dist;
@@ -79,45 +110,20 @@ void GameControl::SetTracker(Actor *actor, ieDword dist)
 GameControl::GameControl(const Region& frame)
 : View(frame)
 {
-	if (!formations) {
-		ReadFormations();
-	}
-	//this is the default action, individual actors should have one too
-	//at this moment we use only this
-	//maybe we don't even need it
-	spellCount = spellIndex = spellOrItem = spellSlot = 0;
-	spellUser = NULL;
-	user = NULL;
-	lastActorID = 0;
-	trackerID = 0;
-	distance = 0;
-	overDoor = NULL;
-	overContainer = NULL;
-	overInfoPoint = NULL;
-	drawPath = NULL;
-	lastCursor = IE_CURSOR_INVALID;
-	numScrollCursor = 0;
-
 	ieDword tmp = 0;
 	core->GetDictionary()->Lookup("Always Run", tmp);
 	AlwaysRun = tmp != 0;
 
-	ClearMouseState();
 	ResetTargetMode();
+	SetCursor(nullptr);
 
 	tmp = 0;
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
-		ScreenFlags = SF_ALWAYSCENTER | SF_CENTERONACTOR;
-	} else {
-		ScreenFlags = SF_CENTERONACTOR;
+		ScreenFlags |= SF_ALWAYSCENTER;
 	}
 	// the game always starts paused so nothing happens till we are ready
-	DialogueFlags = DF_FREEZE_SCRIPTS;
 	dialoghandler = new DialogHandler();
-	DisplayText = NULL;
-	DisplayTextTime = 0;
-	updateVPTimer = true;
 
 	EventMgr::EventCallback cb = METHOD_CALLBACK(&GameControl::OnGlobalMouseMove, this);
 	eventMonitors[0] = EventMgr::RegisterEventMonitor(cb, Event::MouseMoveMask);
@@ -131,47 +137,17 @@ GameControl::~GameControl()
 		EventMgr::UnRegisterEventMonitor(eventMonitor);
 	}
 
-	if (formations)	{
-		free( formations );
-		formations = NULL;
-	}
 	delete dialoghandler;
 	delete DisplayText;
-}
-
-//TODO:
-//There could be a custom formation which is saved in the save game
-//alternatively, all formations could be saved in some compatible way
-//so it doesn't cause problems with the original engine
-void GameControl::ReadFormations() const
-{
-	AutoTable tab = gamedata->LoadTable("formatio");
-	if (!tab) {
-		// fallback
-		formationcount = 1;
-		formations = (formation_type *) calloc(1,sizeof(formation_type) );
-		return;
-	}
-	formationcount = tab->GetRowCount();
-	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
-	for (unsigned int i = 0; i < formationcount; i++) {
-		for (unsigned int j = 0; j < FORMATIONSIZE; j++) {
-			short k = (short) atoi(tab->QueryField(i, j*2));
-			formations[i][j].x = k;
-			k = (short) atoi(tab->QueryField(i, j*2+1));
-			formations[i][j].y = k;
-		}
-	}
 }
 
 //returns a single point offset for a formation
 //formation: the formation type
 //pos: the actor's slot ID
-Point GameControl::GetFormationOffset(ieDword formation, ieDword pos) const
+Point GameControl::GetFormationOffset(size_t formation, uint8_t pos) const
 {
-	if (formation>=formationcount) formation = 0;
-	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
-	return formations[formation][pos];
+	pos = std::min<uint8_t>(pos, FORMATIONSIZE - 1);
+	return Formations::GetFormation(formation)[pos];
 }
 
 Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double angle, const std::vector<Point>& exclude) const
@@ -183,9 +159,9 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 	assert(area);
 
 	static constexpr int radius = 36 / 2; // 36 diameter is copied from make_formation.py
-	const auto& formation = game->GetFormation();
-	assert(formation < formationcount);
-
+	const auto& formationid = game->GetFormation();
+	const auto& formation = Formations::GetFormation(formationid);
+	
 	Point stepVec;
 	int direction = (pos % 2 == 0) ? 1 : -1;
 
@@ -194,14 +170,14 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 
 	if (pos < FORMATIONSIZE) {
 		// calculate new coordinates by rotating formation around (0,0)
-		vec = RotatePoint(formations[formation][pos], angle);
+		vec = RotatePoint(formation[pos], angle);
 		stepVec.y = radius;
 	} else {
 		
 		// create a line formation perpendicular to the formation start point and beginning at the last point
 		// of the formation table. Alternate between +90 degrees and -90 degrees to keep it balanced
 		// the formation table is created along the x axis starting at (0,0)
-		Point p = formations[formation][FORMATIONSIZE-1];
+		Point p = formation[FORMATIONSIZE - 1];
 		vec = RotatePoint(p, angle);
 		stepVec.x = radius * direction;
 	}
@@ -248,7 +224,7 @@ Point GameControl::GetFormationPoint(const Point& origin, size_t pos, double ang
 			continue;
 		}
 		
-		if (area->IsExplored(dest) == false || !(area->GetBlockedNavmap(dest) & PathMapFlags::PASSABLE)) {
+		if (area->IsExplored(dest) == false || !(area->GetBlocked(dest) & PathMapFlags::PASSABLE)) {
 			dest = NextDest();
 			continue;
 		}
@@ -360,7 +336,7 @@ static const int arrow_orientations[16]={
 //WARNING:don't use reference for point, because it is altered
 void GameControl::DrawArrowMarker(Point p, const Color& color) const
 {
-	WindowManager* wm = core->GetWindowManager();
+	const WindowManager* wm = core->GetWindowManager();
 	auto lock = wm->DrawHUD();
 
 	ieDword draw = 0;
@@ -471,9 +447,8 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	const Map* area = CurrentArea();
 	assert(area);
 
-	Actor **ab;
 	int flags = GA_NO_DEAD|GA_NO_UNSCHEDULED|GA_SELECT|GA_NO_ENEMY|GA_NO_NEUTRAL;
-	int count = area->GetActorsInRect(ab, SelectionRect(), flags);
+	auto ab = area->GetActorsInRect(SelectionRect(), flags);
 
 	std::vector<Actor*>::iterator it = highlighted.begin();
 	for (; it != highlighted.end(); ++it) {
@@ -482,12 +457,10 @@ void GameControl::WillDraw(const Region& /*drawFrame*/, const Region& /*clip*/)
 	}
 
 	highlighted.clear();
-	for (int i = 0; i < count; i++) {
-		Actor* actor = ab[i];
+	for (Actor* actor : ab) {
 		actor->SetOver(true);
 		highlighted.push_back(actor);
 	}
-	free( ab );
 }
 
 /** Draws the Control on the Output Display */
@@ -678,7 +651,8 @@ bool GameControl::DispatchEvent(const Event& event) const
 		}
 		return true;
 	} else if (event.keyboard.keycode == GEM_ESCAPE) {
-		core->SetEventFlag(EF_ACTION|EF_RESETTARGET);
+		core->ResetActionBar();
+		core->SetEventFlag(EF_RESETTARGET);
 	}
 	return false;
 }
@@ -2005,7 +1979,6 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 //generate action code for actor appropriate for the target mode when the target is an active region (infopoint, trap or travel)
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, const Point& p)
 {
-	if (!actor) return false;
 	if (actor->GetStat(IE_SEX) == SEX_ILLUSION) return false;
 	if ((target_mode == TARGET_MODE_CAST) && spellCount) {
 		//we'll get the active region from the coordinates (if needed)
@@ -2267,13 +2240,18 @@ void GameControl::PerformSelectedAction(const Point& p)
 	const Game* game = core->GetGame();
 	const Map* area = game->GetCurrentArea();
 	Actor* targetActor = area->GetActor(p, target_types & ~GA_NO_HIDDEN);
-
-	Actor* selectedActor = GetMainSelectedActor();
-
-	//add a check if you don't want some random monster handle doors and such
 	if (targetActor) {
 		PerformActionOn(targetActor);
-	} else if (target_mode == TARGET_MODE_CAST) {
+		return;
+	}
+
+	Actor* selectedActor = GetMainSelectedActor();
+	if (!selectedActor) {
+		return;
+	}
+
+	//add a check if you don't want some random monster handle doors and such
+	if (target_mode == TARGET_MODE_CAST) {
 		//the player is using an item or spell on the ground
 		TryToCast(selectedActor, p);
 	} else if (overDoor) {

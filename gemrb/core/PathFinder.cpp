@@ -223,7 +223,7 @@ PathNode *Map::GetLine(const Point &start, const Point &dest, int Speed, int Ori
 		StartNode->x = p.x;
 		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = bool(GetBlocked(ConvertCoordToTile(p)) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
+		bool wall = bool(GetBlocked(p) & (PathMapFlags::DOOR_IMPASSABLE | PathMapFlags::SIDEWALL));
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) & 15;
@@ -275,8 +275,10 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 	SearchmapPoint smptDest(nmptDest.x / 16, nmptDest.y / 12);
 	if (smptDest == smptSource) return nullptr;
 
-	// Initialize data structures
 	const Size& mapSize = PropsSize();
+	if (!mapSize.PointInside(smptSource)) return nullptr;
+
+	// Initialize data structures
 	FibonacciHeap<PQNode> open;
 	std::vector<bool> isClosed(mapSize.Area(), false);
 	std::vector<NavmapPoint> parents(mapSize.Area(), Point(0, 0));
@@ -330,8 +332,8 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 
 			// Weighted heuristic. Finds sub-optimal paths but should be quite a bit faster
 			const float HEURISTIC_WEIGHT = 1.5;
-			SearchmapPoint smptCurrent(nmptCurrent.x / 16, nmptCurrent.y / 12);
-			NavmapPoint nmptParent = parents[smptCurrent.y * mapSize.w + smptCurrent.x];
+			SearchmapPoint smptCurrent2(nmptCurrent.x / 16, nmptCurrent.y / 12);
+			NavmapPoint nmptParent = parents[smptCurrent2.y * mapSize.w + smptCurrent2.x];
 			unsigned short oldDist = distFromStart[smptChild.y * mapSize.w + smptChild.x];
 			// Theta-star path if there is LOS
 			if (IsWalkableTo(nmptParent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
@@ -343,7 +345,7 @@ PathNode *Map::FindPath(const Point &s, const Point &d, unsigned int size, unsig
 				}
 			// Fall back to A-star path
 			} else if (IsWalkableTo(nmptCurrent, nmptChild, flags & PF_ACTORS_ARE_BLOCKING, caller)) {
-				unsigned short newDist = distFromStart[smptCurrent.y * mapSize.w + smptCurrent.x] + Distance(smptCurrent, smptChild);
+				unsigned short newDist = distFromStart[smptCurrent2.y * mapSize.w + smptCurrent2.x] + Distance(smptCurrent2, smptChild);
 				if (newDist < oldDist) {
 					parents[smptChild.y * mapSize.w + smptChild.x] = nmptCurrent;
 					distFromStart[smptChild.y * mapSize.w + smptChild.x] = newDist;

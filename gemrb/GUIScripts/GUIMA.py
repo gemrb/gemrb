@@ -206,11 +206,12 @@ def AddNoteWindow ():
 
 	Label = MapWindow.GetControl (0x10000003)
 	Text = Label.QueryText ()
-	if Text == "":
-		Text = "Note"
 
 	NoteWindow = GemRB.LoadWindow (5, "GUIMAP")
 	NoteWindow.SetFlags(WF_ALPHA_CHANNEL, OP_OR)
+	
+	Map = MapWindow.GetControl (2)
+	NoteWindow.SetAction (lambda: Map.SetVarAssoc("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES), ACTION_WINDOW_CLOSED)
 
 	if GameCheck.IsIWD2():
 		#convert to multiline, destroy unwanted resources

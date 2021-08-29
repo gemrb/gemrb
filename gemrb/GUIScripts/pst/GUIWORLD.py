@@ -27,6 +27,7 @@ import GemRB
 import GUICommon
 import GUICommonWindows
 import CommonWindow
+import Container
 from GUIDefines import *
 import MessageWindow
 
@@ -37,7 +38,7 @@ def DialogStarted ():
 	global ContinueWindow
 
 	GUICommonWindows.CloseTopWindow()
-	CommonWindow.CloseContainerWindow()
+	Container.CloseContainerWindow()
 
 	# opening control size to maximum, enabling dialog window
 	CommonWindow.SetGameGUIHidden(False)

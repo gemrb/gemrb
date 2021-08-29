@@ -107,6 +107,8 @@ public:
 
 	virtual bool HasTransparency() const noexcept;
 	bool IsPixelTransparent(const Point& p) const noexcept;
+	
+	uint16_t GetPitch() const noexcept { return pitch; }
 
 	virtual const void* LockSprite() const;
 	virtual void* LockSprite();

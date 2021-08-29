@@ -29,20 +29,7 @@
 
 using namespace GemRB;
 
-KEYImporter::KEYImporter(void)
-{
-	description = NULL;
-}
-
-KEYImporter::~KEYImporter(void)
-{
-	free(description);
-	for (auto& bifFile : biffiles) {
-		free(bifFile.name);
-	}
-}
-
-static char* AddCBF(char *file)
+static char* AddCBF(const char *file)
 {
 	assert(strnlen(file, _MAX_PATH/2) < _MAX_PATH/2);
 	// This is safe in single-threaded, since the
@@ -59,11 +46,11 @@ static char* AddCBF(char *file)
 
 static bool PathExists(BIFEntry *entry, const char *path)
 {
-	PathJoin(entry->path, path, entry->name, nullptr);
+	PathJoin(entry->path, path, entry->name.c_str(), nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
-	PathJoin(entry->path, path, AddCBF(entry->name), nullptr);
+	PathJoin(entry->path, path, AddCBF(entry->name.c_str()), nullptr);
 	if (file_exists(entry->path)) {
 		return true;
 	}
@@ -105,13 +92,12 @@ static void FindBIF(BIFEntry *entry)
 		}
 	}
 
-	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name);
+	Log(ERROR, "KEYImporter", "Cannot find %s...", entry->name.c_str());
 }
 
 bool KEYImporter::Open(const char *resfile, const char *desc)
 {
-	free(description);
-	description = strdup(desc);
+	description = desc;
 	if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 		Log(ERROR, "KEYImporter", "An Archive Plug-in is not Available");
 		return false;
@@ -160,9 +146,9 @@ bool KEYImporter::Open(const char *resfile, const char *desc)
 		f->ReadDword(ASCIIZOffset);
 		f->ReadWord(ASCIIZLen);
 		f->ReadWord(be.BIFLocator);
-		be.name = ( char * ) malloc( ASCIIZLen );
+		be.name.resize(ASCIIZLen);
 		f->Seek( ASCIIZOffset, GEM_STREAM_START );
-		f->Read( be.name, ASCIIZLen );
+		f->Read(&be.name[0], ASCIIZLen);
 		for (int p = 0; p < ASCIIZLen; p++) {
 			//some MAC versions use : as delimiter
 			if (be.name[p] == '\\' || be.name[p] == ':')
@@ -218,7 +204,7 @@ DataStream* KEYImporter::GetStream(const char *resname, ieWord type)
 
 	if (!biffiles[bifnum].found) {
 		print("Cannot find %s... Resource unavailable.",
-				biffiles[bifnum].name );
+				biffiles[bifnum].name.c_str());
 		return NULL;
 	}
 

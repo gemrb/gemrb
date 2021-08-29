@@ -746,9 +746,9 @@ void Interface::Main()
 	fpsRgn.x = 5;
 	fpsRgn.y = 0;
 
-	tick_t frame = 0, time, timebase;
-	time = GetTicks();
-	timebase = time;
+	tick_t frame = 0;
+	tick_t time = GetTicks();
+	tick_t timebase = time;
 	double frames = 0.0;
 
 	do {
@@ -927,7 +927,7 @@ int Interface::LoadFonts()
 	return GEM_OK;
 }
 
-int Interface::Init(InterfaceConfig* cfg)
+int Interface::Init(const InterfaceConfig* cfg)
 {
 	Log(MESSAGE, "Core", "GemRB core version v" VERSION_GEMRB " loading ...");
 	if (!cfg) {
@@ -1578,7 +1578,7 @@ int Interface::Init(InterfaceConfig* cfg)
 		Log(WARNING, "Core", "Failed to initialize random treasure.");
 	}
 	
-	abilityTables = make_unique<AbilityTables>(MaximumAbility);
+	abilityTables = GemRB::make_unique<AbilityTables>(MaximumAbility);
 
 	Log(MESSAGE, "Core", "Reading reputation mod table...");
 	ret = ReadReputationModTable();
@@ -2444,12 +2444,12 @@ void Interface::HandleGUIBehaviour(GameControl* gc)
 	if (CurrentContainer && UseContainer) {
 		if (!(flg & DF_IN_CONTAINER) ) {
 			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_OR);
-			guiscript->RunFunction( "CommonWindow", "OpenContainerWindow" );
+			guiscript->RunFunction( "Container", "OpenContainerWindow" );
 		}
 	} else {
 		if (flg & DF_IN_CONTAINER) {
 			gc->SetDialogueFlags(DF_IN_CONTAINER, OP_NAND);
-			guiscript->RunFunction( "CommonWindow", "CloseContainerWindow" );
+			guiscript->RunFunction( "Container", "CloseContainerWindow" );
 		}
 	}
 	//end of gui hacks
@@ -3829,7 +3829,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 				return false;
 			}
 			// try detecting malformed / placeholder items, present in iwd2
-			return item->ItemName != (ieStrRef) -1 || item->ItemNameIdentified != (ieStrRef) -1;
+			return item->ItemName != (ieStrRef) -1 || item->ItemNameIdentified != (ieStrRef) -1 || item->ItemType;
 		}
 		const ItemList& itemlist = RtRows.at(itm->ItemResRef);
 		int i;
@@ -3849,7 +3849,7 @@ bool Interface::ResolveRandomItem(CREItem *itm) const
 			diceSides = 1;
 		}
 		int diceThrows = strtosigned<int>(NewItem, &endptr, 10);
-		if (diceThrows <1) {
+		if (diceThrows < 1 || diceSides <= 1) {
 			diceThrows = 1;
 		}
 		if (*endptr) {
@@ -3900,11 +3900,11 @@ int Interface::CloseCurrentContainer()
 	return 0;
 }
 
-void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
+void Interface::SetCurrentContainer(const Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
 	if (actor!=GetFirstSelectedPC(false)) {
-		CurrentContainer = NULL;
+		CurrentContainer = nullptr;
 		return;
 	}
 	CurrentContainer = arg;
@@ -4176,7 +4176,7 @@ int Interface::SwapoutArea(Map *map) const
 	return 0;
 }
 
-int Interface::WriteCharacter(const char *name, Actor *actor)
+int Interface::WriteCharacter(const char *name, const Actor *actor)
 {
 	char Path[_MAX_PATH];
 
@@ -4611,7 +4611,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 // the master table contains the table names (as row names) and the used stat
 // the subtables contain stat value/bonus pairs.
 // Optionally an override stat value can be specified (needed for use in pcfs).
-int Interface::ResolveStatBonus(Actor *actor, const char *tablename, ieDword flags, int value)
+int Interface::ResolveStatBonus(const Actor *actor, const char *tablename, ieDword flags, int value)
 {
 	AutoTable mtm = gamedata->LoadTable(tablename);
 	if (!mtm) {

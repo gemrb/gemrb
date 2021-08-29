@@ -490,7 +490,7 @@ static const ActionLink actionnames[] = {
 	{"addworldmapareaflag", GameScript::AddWorldmapAreaFlag, 0},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},
-	{"addxpvar", GameScript::AddXPVar, 0},
+	{"addxpvar", GameScript::AddXPVar, AF_INSTANT},
 	{"advancetime", GameScript::AdvanceTime, 0},
 	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
@@ -906,7 +906,7 @@ static const ActionLink actionnames[] = {
 	{"sethp", GameScript::SetHP, 0},
 	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},
-	{"setinterrupt", GameScript::SetInterrupt, 0},
+	{"setinterrupt", GameScript::SetInterrupt, AF_INSTANT},
 	{"setitemflags", GameScript::SetItemFlags, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},

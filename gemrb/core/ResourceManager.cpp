@@ -38,7 +38,7 @@ bool ResourceManager::AddSource(const char *path, const char *description, Plugi
 
 	if (flags & RM_REPLACE_SAME_SOURCE) {
 		for (auto& path2 : searchPath) {
-			if (!stricmp(description, path2->GetDescription())) {
+			if (description == path2->GetDescription()) {
 				path2 = source;
 				break;
 			}
@@ -126,7 +126,7 @@ DataStream* ResourceManager::GetResource(const char* ResRef, SClass_ID type, boo
 		if (ds) {
 			if (!silent) {
 				Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-					ResRef, core->TypeExt(type), path->GetDescription());
+					ResRef, core->TypeExt(type), path->GetDescription().c_str());
 			}
 			return ds;
 		}
@@ -160,7 +160,7 @@ Resource* ResourceManager::GetResource(const char* ResRef, const TypeID *type, b
 				if (res) {
 					if (!silent) {
 						Log(MESSAGE, "ResourceManager", "Found '%s.%s' in '%s'.",
-							ResRef, type2.GetExt(), path->GetDescription());
+							ResRef, type2.GetExt(), path->GetDescription().c_str());
 					}
 					return res;
 				}

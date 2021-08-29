@@ -35,11 +35,11 @@ public:
 	using Map = std::array<Color, 16>;
 	
 	Tile(Animation a1, Animation a2) noexcept
-	: anim{make_unique<Animation>(std::move(a1)), make_unique<Animation>(std::move(a2))}
+	: anim{GemRB::make_unique<Animation>(std::move(a1)), GemRB::make_unique<Animation>(std::move(a2))}
 	{}
 
 	explicit Tile(Animation animation) noexcept
-	: anim{make_unique<Animation>(std::move(animation)), nullptr }
+	: anim{GemRB::make_unique<Animation>(std::move(animation)), nullptr }
 	{}
 	
 	Tile(const Tile&) noexcept = delete;

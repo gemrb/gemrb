@@ -35,13 +35,15 @@ BAMFontManager::BAMFontManager(void)
 	bamImp = new BAMImporter();
 }
 
-bool BAMFontManager::Open(DataStream* stream)
+bool BAMFontManager::Import(DataStream* stream)
 {
 	resRef = stream->filename;
 	// compare only first 6 chars so we can match states2 or others
 	if (strnicmp(resRef, "STATES", 6) == 0) {
 		isStateFont = true;
 	}
+	
+	str = nullptr; // hand ownership over to bamImp
 	return bamImp->Open(stream);
 }
 

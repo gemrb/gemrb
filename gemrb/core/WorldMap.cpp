@@ -378,7 +378,7 @@ WMPAreaLink *WorldMap::GetLink(const ResRef& A, const ResRef& B) const
 	}
 
 	//looking for destination area, returning the first link found
-	for (unsigned int i = 0; i < 4; i++) {
+	for (i = 0; i < 4; i++) {
 		unsigned int j = ae->AreaLinksCount[i];
 		unsigned int k = ae->AreaLinksIndex[i];
 		while(j--) {

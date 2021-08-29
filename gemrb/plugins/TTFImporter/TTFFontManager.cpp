@@ -75,7 +75,7 @@ TTFFontManager::TTFFontManager(void)
 : ftStream(NULL), face(NULL)
 {}
 
-bool TTFFontManager::Open(DataStream* stream)
+bool TTFFontManager::Import(DataStream* stream)
 {
 	Close();
 	if (stream) {

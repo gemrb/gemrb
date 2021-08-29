@@ -73,7 +73,6 @@ static void BlitGlyphToCanvas(const Glyph& glyph, const Point& p,
 Font::GlyphAtlasPage::GlyphAtlasPage(Size pageSize, Font* font)
 : SpriteSheet<ieWord>(core->GetVideoDriver()), font(font)
 {
-	pageXPos = 0;
 	SheetRegion.w = pageSize.w;
 	SheetRegion.h = pageSize.h;
 
@@ -88,7 +87,6 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		return false;
 	}
 	
-	const ieByte* pixels = nullptr;
 	int glyphH = g.size.h + abs(g.pos.y);
 	if (glyphH > SheetRegion.h) {
 		// must grow to accommodate this glyph
@@ -105,13 +103,10 @@ bool Font::GlyphAtlasPage::AddGlyph(ieWord chr, const Glyph& g)
 		
 		assert(pageData);
 		SheetRegion.h = glyphH;
-		pixels = pageData;
 	} else if (Sheet) {
 		// we need to lock/unlock the sprite because we are updating its pixels
-		pixels = (ieByte*)Sheet->LockSprite();
+		const void* pixels = Sheet->LockSprite();
 		assert(pixels == pageData);
-	} else {
-		pixels = pageData;
 	}
 
 	// have to adjust the x because BlitGlyphToCanvas will use g.pos.x, but we dont want that here.
@@ -187,11 +182,8 @@ void Font::GlyphAtlasPage::DumpToScreen(const Region& r) const
 }
 
 Font::Font(PaletteHolder pal, ieWord lineheight, ieWord baseline, bool bg)
-: palette(std::move(pal)), LineHeight(lineheight), Baseline(baseline)
-{
-	CurrentAtlasPage = NULL;
-	background = bg;
-}
+: palette(std::move(pal)), background(bg), LineHeight(lineheight), Baseline(baseline)
+{}
 
 Font::~Font(void)
 {
@@ -621,8 +613,10 @@ size_t Font::Print(Region rgn, const String& string, ieByte alignment, const Pri
 
 size_t Font::StringSizeWidth(const String& string, size_t width, size_t* numChars) const
 {
-	size_t size = 0, i = 0;
-	for (; i < string.length(); ++i) {
+	size_t size = 0;
+	size_t i = 0;
+	size_t length = string.length();
+	for (; i < length; ++i) {
 		wchar_t c = string[i];
 		if (c == L'\n') {
 			break;

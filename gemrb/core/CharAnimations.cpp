@@ -109,8 +109,9 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 		table[i].RunScale = 0;
 		table[i].Bestiary = -1;
 		
-		for (int j = 0; j < MAX_ANIMS; j++)
+		for (unsigned char j = 0; j < MAX_ANIMS; j++) {
 			table[i].StanceOverride[j] = j;
+		}
 
 		if (resdata) {
 			char section[12];
@@ -147,11 +148,11 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				Log(ERROR, "CharAnimations", "Invalid bloodclr entry: %02x %04x-%04x ", value, rmin, rmax);
 				continue;
 			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax < table[j].AnimID) break;
-				if (rmin > table[j].AnimID) continue;
-				table[j].BloodColor = value;
-				table[j].Flags = flags;
+			for (auto& row : table) {
+				if (rmax < row.AnimID) break;
+				if (rmin > row.AnimID) continue;
+				row.BloodColor = value;
+				row.Flags = flags;
 			}
 		}
 	}
@@ -177,11 +178,11 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				Log(ERROR, "CharAnimations", "Invalid walksnd entry: %02x %04x-%04x ", range, rmin, rmax);
 				continue;
 			}
-			for(int j=0;j<AvatarsCount;j++) {
-				if (rmax < table[j].AnimID) break;
-				if (rmin > table[j].AnimID) continue;
-				table[j].WalkSound = value;
-				table[j].WalkSoundCount = range;
+			for (auto& row : table) {
+				if (rmax < row.AnimID) break;
+				if (rmin > row.AnimID) continue;
+				row.WalkSound = value;
+				row.WalkSoundCount = range;
 			}
 		}
 	}
@@ -190,7 +191,9 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 	if (stances) {
 		int rows = stances->GetRowCount();
 		for (int i = 0; i < rows; i++) {
-			unsigned int id = 0, s1 = 0, s2 = 0;
+			unsigned int id = 0;
+			unsigned int s1 = 0;
+			unsigned int s2 = 0;
 			valid_unsignednumber(stances->GetRowName(i), id);
 			valid_unsignednumber(stances->QueryField(i, 0), s1);
 			valid_unsignednumber(stances->QueryField(i, 1), s2);
@@ -200,10 +203,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 				continue;
 			}
 
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < table[j].AnimID) break;
-				if (id == table[j].AnimID) {
-					table[j].StanceOverride[s1] = s2;
+			for (auto& row : table) {
+				if (id < row.AnimID) break;
+				if (id == row.AnimID) {
+					row.StanceOverride[s1] = static_cast<unsigned char>(s2);
 					break;
 				}
 			}
@@ -217,12 +220,10 @@ CharAnimations::AvatarTableLoader::AvatarTableLoader() noexcept {
 			unsigned int id = 0;
 			valid_unsignednumber(avatarShadows->GetRowName(i), id);
 
-			for (int j = 0; j < AvatarsCount; j++) {
-				if (id < table[j].AnimID) {
-					break;
-				}
-				if (table[j].AnimID == id) {
-					table[j].ShadowAnimation = avatarShadows->QueryField(i, 0);
+			for (auto& row : table) {
+				if (id < row.AnimID) break;
+				if (id == row.AnimID) {
+					row.ShadowAnimation = avatarShadows->QueryField(i, 0);
 					break;
 				}
 			}
@@ -263,7 +264,7 @@ int CharAnimations::GetAnimType() const
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
 
-int CharAnimations::GetSize() const
+char CharAnimations::GetSize() const
 {
 	if (AvatarsRowNum==~0u) return 0;
 	return AvatarTable[AvatarsRowNum].Size;
@@ -389,7 +390,7 @@ void CharAnimations::SetRangedType(int rt)
 	}
 }
 
-void CharAnimations::SetWeaponType(int wt)
+void CharAnimations::SetWeaponType(unsigned char wt)
 {
 	if (wt != WeaponType) {
 		WeaponType = wt;
@@ -536,8 +537,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 		*/
 		for (int i = 0; i < colorcount; i++) {
-			const auto& pal32 = core->GetPalette32(Colors[i]);
-			PartPalettes[PAL_MAIN]->CopyColorRange(&pal32[0], &pal32[32], dest);
+			const auto& pal32 = core->GetPalette32(static_cast<uint8_t>(Colors[i]));
+			PartPalettes[PAL_MAIN]->CopyColorRange(&pal32[0], &pal32[32], static_cast<uint8_t>(dest));
 			dest +=size;
 		}
 
@@ -615,9 +616,9 @@ PaletteHolder CharAnimations::GetPartPalette(int part) const
 		//these animations use several palettes
 		type = NINE_FRAMES_PALETTE(stanceID);
 	}
-	else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2) return NULL;
+	else if (GetAnimType() == IE_ANI_FOUR_FRAMES_2) return nullptr;
 	// always use unmodified BAM palette for the supporting part
-	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return NULL;
+	else if (GetAnimType() == IE_ANI_TWO_PIECE && part == 1) return nullptr;
 	else if (part == actorPartCount) type = PAL_WEAPON;
 	else if (part == actorPartCount+1) type = PAL_OFFHAND;
 	else if (part == actorPartCount+2) type = PAL_HELMET;
@@ -634,25 +635,17 @@ PaletteHolder CharAnimations::GetShadowPalette() const {
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
-	Colors = NULL;
 	for (bool& c : change) {
 		c = true;
 	}
-	autoSwitchOnEnd = false;
-	lockPalette = false;
 
 	for (size_t i = 0; i < MAX_ANIMS; i++) {
 		for (size_t j = 0; j < MAX_ORIENT; j++) {
-			Anims[i][j] = NULL;
-			shadowAnimations[i][j] = NULL;
+			Anims[i][j] = nullptr;
+			shadowAnimations[i][j] = nullptr;
 		}
 	}
-	ArmorType = 0;
-	RangedType = 0;
-	WeaponType = 0;
-	WeaponRef[0] = 0;
-	HelmetRef[0] = 0;
-	OffhandRef[0] = 0;
+
 	for (size_t i = 0; i < PAL_MAX * 8; ++i) {
 		ColorMods[i].type = RGBModifier::NONE;
 		ColorMods[i].speed = 0;
@@ -666,7 +659,6 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	GlobalColorMod.phase = 0;
 	GlobalColorMod.locked = false;
 	GlobalColorMod.rgb = Color();
-	lastModUpdate = 0;
 
 	AvatarsRowNum = GetAvatarsCount();
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
@@ -691,19 +683,19 @@ void CharAnimations::DropAnims()
 	Animation** tmppoi;
 	int partCount = GetTotalPartCount();
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
-		for (int i = 0; i < MAX_ORIENT; i++) {
-			if (Anims[StanceID][i]) {
-				tmppoi = Anims[StanceID][i];
-				for (int j = 0; j < partCount; j++)
-					delete Anims[StanceID][i][j];
-				delete[] tmppoi;
+		for (const auto& orient : Anims[StanceID]) {
+			if (!orient) continue;
 
-				// anims can only be duplicated at the Animation** level
-				for (int IDb=StanceID;IDb < MAX_ANIMS; IDb++) {
-					for (int i2 = 0; i2<MAX_ORIENT; i2++) {
-						if (Anims[IDb][i2] == tmppoi) {
-							Anims[IDb][i2] = 0;
-						}
+			tmppoi = orient;
+			for (int j = 0; j < partCount; j++)
+				delete orient[j];
+			delete[] tmppoi;
+
+			// anims can only be duplicated at the Animation** level
+			for (int IDb = StanceID; IDb < MAX_ANIMS; IDb++) {
+				for (auto& orient2 : Anims[IDb]) {
+					if (orient2 == tmppoi) {
+						orient2 = nullptr;
 					}
 				}
 			}
@@ -904,7 +896,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 	//probably we should feed this result back to the actor?
 	switch (AnimType) {
 		case -1: //invalid animation
-			return NULL;
+			return nullptr;
 
 		case IE_ANI_PST_STAND:
 			stanceID = IE_ANI_AWAKE;
@@ -990,13 +982,13 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 	int partCount = GetTotalPartCount();
 	int actorPartCount = GetActorPartCount();
-	if (partCount <= 0) return 0;
+	if (partCount <= 0) return nullptr;
 	anims = new Animation*[partCount];
 
-	EquipResRefData* equipdat = 0;
+	EquipResRefData* equipdat = nullptr;
 	for (int part = 0; part < partCount; ++part)
 	{
-		anims[part] = 0;
+		anims[part] = nullptr;
 
 		//newresref is based on the prefix (ResRef) and various
 		// other things, so it's longer than a typical ResRef
@@ -1013,7 +1005,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 		} else {
 			// Equipment animation parts
 
-			anims[part] = 0;
+			anims[part] = nullptr;
 			if (GetSize() == 0) continue;
 
 			if (part == actorPartCount) {
@@ -1055,7 +1047,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 					delete anims[i];
 				delete[] anims;
 				delete equipdat;
-				return 0;
+				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
 				continue;
@@ -1073,7 +1065,7 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 					delete anims[i];
 				delete[] anims;
 				delete equipdat;
-				return 0;
+				return nullptr;
 			} else {
 				// not fatal if animation for equipment is missing
 				continue;
@@ -1217,8 +1209,8 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 			break;
 		case IE_ANI_TWO_FILES_4:
 			for (auto& anim : Anims) {
-				for (int j = 0; j < MAX_ORIENT; ++j) {
-					anim[j] = anims;
+				for (auto& orient : anim) {
+					orient = anims;
 				}
 			}
 			break; 
@@ -1250,12 +1242,12 @@ Animation** CharAnimations::GetAnimation(unsigned char Stance, unsigned char Ori
 
 Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned char orientation) {
 	if (GetTotalPartCount() <= 0 || IE_ANI_TWENTYTWO != GetAnimType()) {
-		return NULL;
+		return nullptr;
 	}
 
-	unsigned char stanceID = MaybeOverrideStance(stance);
+	unsigned char newStanceID = MaybeOverrideStance(stance);
 
-	switch (stanceID) {
+	switch (newStanceID) {
 		case IE_ANI_WALK:
 		case IE_ANI_RUN:
 		case IE_ANI_CAST:
@@ -1271,14 +1263,14 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		case IE_ANI_CONJURE:
 			break;
 		default:
-			return NULL;
+			return nullptr;
 	}
 
-	if (shadowAnimations[stanceID][orientation]) {
-		return shadowAnimations[stanceID][orientation];
+	if (shadowAnimations[newStanceID][orientation]) {
+		return shadowAnimations[newStanceID][orientation];
 	}
 
-	Animation** animations = NULL;
+	Animation** animations = nullptr;
 
 	if (!AvatarTable[AvatarsRowNum].ShadowAnimation.IsEmpty()) {
 		int partCount = GetTotalPartCount();
@@ -1287,12 +1279,12 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		std::string shadowName = AvatarTable[AvatarsRowNum].ShadowAnimation.CString();
 
 		for (int i = 0; i < partCount; ++i) {
-			animations[i] = NULL;
+			animations[i] = nullptr;
 		}
 
-		EquipResRefData *dummy = NULL;
+		EquipResRefData *dummy = nullptr;
 		unsigned char cycle = 0;
-		AddMHRSuffix(shadowName, stanceID, cycle, orientation, dummy);
+		AddMHRSuffix(shadowName, newStanceID, cycle, orientation, dummy);
 		delete dummy;
 
 		AnimationFactory* af = static_cast<AnimationFactory*>(
@@ -1300,7 +1292,7 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 
 		if (!af) {
 			delete[] animations;
-			return NULL;
+			return nullptr;
 		}
 
 		Animation *animation = af->GetCycle(cycle);
@@ -1308,14 +1300,14 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 
 		if (!animation) {
 			delete[] animations;
-			return NULL;
+			return nullptr;
 		}
 
 		if (!shadowPalette) {
 			shadowPalette = animation->GetFrame(0)->GetPalette()->Copy();
 		}
 
-		switch (stanceID) {
+		switch (newStanceID) {
 			case IE_ANI_DAMAGE:
 			case IE_ANI_TWITCH:
 			case IE_ANI_DIE:
@@ -1328,6 +1320,8 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 			case IE_ANI_ATTACK_BACKSLASH:
 				animation->Flags |= A_ANI_PLAYONCE;
 				break;
+			default:
+				break;
 		}
 
 		animation->gameAnimation = true;
@@ -1335,13 +1329,13 @@ Animation** CharAnimations::GetShadowAnimation(unsigned char stance, unsigned ch
 		animations[0]->AddAnimArea(animation);
 
 		orientation &= ~1;
-		shadowAnimations[stanceID][orientation] = animations;
-		shadowAnimations[stanceID][orientation + 1] = animations;
+		shadowAnimations[newStanceID][orientation] = animations;
+		shadowAnimations[newStanceID][orientation + 1] = animations;
 
-		return shadowAnimations[stanceID][orientation];
+		return shadowAnimations[newStanceID][orientation];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 static const int one_file[MAX_ANIMS] = {2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
@@ -1351,7 +1345,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 					 std::string& NewResRef, unsigned char& Cycle,
 					 int Part, EquipResRefData*& EquipData) const
 {
-	EquipData = 0;
+	EquipData = nullptr;
 	Orient &= 15;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
@@ -1471,7 +1465,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 }
 
 void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
-	std::string& dest, unsigned char& Cycle, EquipResRefData* equip) const
+	std::string& dest, unsigned char& Cycle, const EquipResRefData* equip) const
 {
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FILES:
@@ -1497,11 +1491,11 @@ const int* CharAnimations::GetZOrder(unsigned char Orient) const
 		case IE_ANI_TWENTYTWO:
 			return zOrder_8[Orient/2];
 		case IE_ANI_FOUR_FILES:
-			return 0; // FIXME
+			return nullptr; // FIXME
 		case IE_ANI_TWO_PIECE:
 			return zOrder_TwoPiece;
 		default:
-			return 0;
+			return nullptr;
 	}
 }
 
@@ -1986,7 +1980,7 @@ void CharAnimations::AddVHRSuffix(std::string& dest, unsigned char StanceID,
 
 void CharAnimations::GetVHREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			EquipResRefData* equip) const
+			const EquipResRefData* equip) const
 {
 	Cycle = equip->Cycle;
 
@@ -2234,7 +2228,7 @@ void CharAnimations::AddMHRSuffix(std::string& dest, unsigned char StanceID,
 
 void CharAnimations::GetMHREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool offhand,
-			EquipResRefData* equip) const
+			const EquipResRefData* equip) const
 {
 	Cycle = equip->Cycle;
 	if (offhand) {
@@ -2558,7 +2552,7 @@ void CharAnimations::AddLRSuffix( std::string& dest, unsigned char StanceID,
 
 void CharAnimations::GetLREquipmentRef(std::string& dest, unsigned char& Cycle,
 			const char* equipRef, bool /*offhand*/,
-			EquipResRefData* equip) const
+			const EquipResRefData* equip) const
 {
 	Cycle = equip->Cycle;
 	dest = ResRefBase.CString();
@@ -2781,7 +2775,7 @@ void CharAnimations::AddHLSuffix(std::string& dest, unsigned char StanceID,
 	//even orientations in 'h', odd in 'l', and since the WALK animation
 	//with fewer orientations is first in h, all other stances in that
 	//file need to be offset by those cycles
-	int offset = ((Orient % 2)^1) * 8;
+	unsigned char offset = ((Orient % 2) ^ 1) * 8;
 
 	switch (StanceID) {
 
@@ -2839,7 +2833,7 @@ void CharAnimations::AddHLSuffix(std::string& dest, unsigned char StanceID,
 
 void CharAnimations::PulseRGBModifiers()
 {
-	unsigned long time = core->GetGame()->Ticks;
+	tick_t time = GetTicks();
 
 	if (time - lastModUpdate <= 40)
 		return;

@@ -48,7 +48,8 @@ Targets *GameScript::Myself(const Scriptable *Sender, Targets* parameters, int g
 		// just in case we're in the middle of a move
 		snd = core->GetGame()->GetActorByGlobalID(Sender->GetGlobalID());
 	}
-	parameters->AddTarget(snd, 0, ga_flags);
+	// you are always visible to yourself
+	parameters->AddTarget(snd, 0, ga_flags & ~GA_NO_UNSCHEDULED);
 	return parameters;
 }
 

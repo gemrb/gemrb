@@ -162,7 +162,7 @@ Store* STOImporter::GetStore(Store *s)
 	return s;
 }
 
-void STOImporter::GetItem(STOItem *it, Store *s)
+void STOImporter::GetItem(STOItem *it, const Store *s)
 {
 	CREItem *tmpCREItem = new CREItem();
 	core->ReadItem(str, tmpCREItem);

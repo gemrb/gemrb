@@ -236,7 +236,8 @@ private:
 	GetBitContext v_gb;
 	
 	AVFrame c_frames[2];
-	AVFrame *c_pic, *c_last;
+	AVFrame *c_pic;
+	AVFrame *c_last;
 
 private:
 	void segment_video_play();
@@ -275,7 +276,7 @@ protected:
 public:
 	BIKPlayer(void);
 	~BIKPlayer(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 
 	void Stop();
 };

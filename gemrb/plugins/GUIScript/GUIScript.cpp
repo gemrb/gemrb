@@ -732,7 +732,8 @@ of the same type, unless Type is specified and different.\n\
 
 static PyObject* GemRB_Table_GetValue(PyObject* self, PyObject* args)
 {
-	PyObject* row = NULL, *col = NULL;
+	PyObject* row = nullptr;
+	PyObject* col = nullptr;
 	int type = -1;
 	PARSE_ARGS(args, "OOO|i", &self, &row, &col, &type);
 
@@ -1273,7 +1274,7 @@ static PyObject* GemRB_GetView(PyObject* /*self*/, PyObject* args)
 		const char* group = PyString_AsString(lookup);
 		ref = ScriptEngine::GetScripingRef(group, id);
 	} else {
-		Window* win = GetView<Window>(lookup);
+		const Window* win = GetView<Window>(lookup);
 		if (win) {
 			ref = GetControlRef(id, win);
 		}
@@ -1504,11 +1505,7 @@ static PyObject* GemRB_Control_SetText(PyObject* self, PyObject* args)
 		// clear the text
 		ctrl->SetText(NULL);
 	} else if (PyObject_TypeCheck(str, &PyByteArray_Type)) { // state font
-#if PY_MAJOR_VERSION >= 3
-		const char *tmp = PyString_AsString(str);
-#else // python2 has inbuilt PyString_AsString that can't handle bytearrays
 		const char *tmp = PyByteArray_AS_STRING(str);
-#endif
 		const String* string = StringFromCString(tmp);
 		ctrl->SetText(string);
 		delete string;
@@ -1794,9 +1791,9 @@ PyDoc_STRVAR( GemRB_Window_SetAction__doc,
 
 static PyObject* GemRB_Window_SetAction(PyObject* self, PyObject* args)
 {
-	uint32_t key = -1;
+	int key = -1;
 	PyObject* func = nullptr;
-	PARSE_ARGS(args, "OOk", &self, &func, &key);
+	PARSE_ARGS(args, "OOi", &self, &func, &key);
 
 	Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
@@ -2029,19 +2026,22 @@ static PyObject* GemRB_Control_SetVarAssoc(PyObject* self, PyObject* args)
 	Control* ctrl = GetView<Control>(self);
 	ABORT_IF_NULL(ctrl);
 	
-	// blank out any old varname so we can set the control value without setting the old variable
-	std::fill(ctrl->VarName, ctrl->VarName + MAX_VARIABLE_LENGTH, '\0');
-	
-	ctrl->SetValue((ieDword)PyInt_AsUnsignedLongMask(Value));
 	if (min) {
-		ctrl->SetValueRange(ieDword(PyLong_AsUnsignedLong(min)), ieDword(PyLong_AsUnsignedLong(max)));
+		// blank out any old varname so we can set the control value without setting the old variable
+		ctrl->VarName[0] = '\0';
+		// this may set the value if its already set outside the range
+		ctrl->SetValueRange(Control::value_t(PyLong_AsUnsignedLong(min)),
+							Control::value_t(PyLong_AsUnsignedLong(max)));
 	}
 	
-	//max variable length is not 32, but 40 (in guiscripts), but that includes zero terminator!
+	// now that the value range is setup, we can change the dictionary variable
 	strnlwrcpy(ctrl->VarName, VarName, MAX_VARIABLE_LENGTH - 1);
 	
+	Control::value_t val = (ieDword)PyInt_AsUnsignedLongMask(Value);
+	ctrl->SetValue(val);
+	
 	/* it is possible to set up a default value, if Lookup returns false, use it */
-	ieDword curVal = CTL_INVALID_VALUE;
+	Control::value_t curVal = Control::INVALID_VALUE;
 	core->GetDictionary()->Lookup(VarName, curVal);
 
 	const Window* win = ctrl->GetWindow();
@@ -2156,9 +2156,10 @@ PyDoc_STRVAR( GemRB_CreateView__doc,
 
 static PyObject* GemRB_CreateView(PyObject * /*self*/, PyObject* args)
 {
-	int type = -1, id = -1;
+	int type = -1;
+	int id = -1;
 	PyObject* pyRect;
-	PyObject* constructArgs = NULL;
+	PyObject* constructArgs = nullptr;
 	PARSE_ARGS(args, "iiO|O",
 				&id, &type,
 				&pyRect, &constructArgs);
@@ -2692,7 +2693,8 @@ Not known spells are drawn darkened (the whole button will be overlaid).\n\
 static PyObject* GemRB_Button_SetBorder(PyObject* self, PyObject* args)
 {
 	int BorderIndex, enabled = 0, filled = 0;
-	PyObject* pyColor, *pyRect = Py_None;
+	PyObject* pyColor;
+	PyObject* pyRect = Py_None;
 	PARSE_ARGS( args, "OiO|iiO", &self,
 			   &BorderIndex, &pyColor, &enabled, &filled, &pyRect);
 
@@ -3813,7 +3815,9 @@ static PyObject* SetButtonBAM(Button* btn, const char *ResRef, int CycleIndex, i
 
 static PyObject* GemRB_Button_SetBAM(PyObject* self, PyObject* args)
 {
-	int CycleIndex, FrameIndex, col1 = -1;
+	int CycleIndex;
+	int FrameIndex;
+	int col1 = -1;
 	char *ResRef;
 	PARSE_ARGS( args,  "Osii|i", &self,
 			   &ResRef, &CycleIndex, &FrameIndex, &col1 );
@@ -6207,7 +6211,8 @@ new character you must use FillPlayerInfo().\n\
 
 static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, which = 0;
+	int PartyID;
+	int which = 0;
 	PARSE_ARGS( args,  "i|i", &PartyID, &which );
 
 	GET_GAME();
@@ -6512,7 +6517,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		newstats.LastLeft = oldstats.LastLeft;
 		newstats.LastJoined = oldstats.LastJoined;
 		std::copy(std::begin(oldstats.SoundFolder), std::end(oldstats.SoundFolder), newstats.SoundFolder);
-		std::copy(oldstats.States.begin(), oldstats.States.end(), newstats.States.begin());
+		newstats.States = oldstats.States;
 		
 		oldstats = newstats;
 	}
@@ -10685,7 +10690,7 @@ static PyObject* GemRB_Window_SetupEquipmentIcons(PyObject* self, PyObject* args
 	PyObject *dict;
 	PARSE_ARGS( args,  "OOi|ii", &self, &dict, &globalID, &Start, &Offset);
 
-	Window* win = GetView<Window>(self);
+	const Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
 	GET_GAME();
 	GET_ACTOR_GLOBAL();
@@ -10832,7 +10837,7 @@ static PyObject* GemRB_Window_SetupControls(PyObject* self, PyObject* args)
 	PyObject *Tuple = NULL;
 	PARSE_ARGS( args,  "OOi|iO", &self, &dict, &globalID, &Start, &Tuple);
 
-	Window* win = GetView<Window>(self);
+	const Window* win = GetView<Window>(self);
 	ABORT_IF_NULL(win);
 	GET_GAME();
 	GET_GAMECONTROL();
@@ -13782,25 +13787,18 @@ bool GUIScript::ExecFile(const char* file)
 	if (len <= 0)
 		return false;
 
-	char* buffer = (char *) malloc(len+1);
-	if (!buffer)
-		return false;
-
-	if (fs.Read(buffer, len) == GEM_ERROR) {
-		free(buffer);
+	std::string buffer(len, '\0');
+	if (fs.Read(&buffer[0], len) == GEM_ERROR) {
 		return false;
 	}
-	buffer[len] = 0;
 
-	bool ret = ExecString(buffer);
-	free(buffer);
-	return ret;
+	return ExecString(buffer);
 }
 
 /** Exec a single String */
-bool GUIScript::ExecString(const char* string, bool feedback)
+bool GUIScript::ExecString(const std::string &string, bool feedback)
 {
-	PyObject* run = PyRun_String(string, Py_file_input, pMainDic, pMainDic);
+	PyObject* run = PyRun_String(string.c_str(), Py_file_input, pMainDic, pMainDic);
 
 	if (run) {
 		// success

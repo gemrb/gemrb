@@ -56,9 +56,7 @@ struct HealingResource {
 	ieWord amounthealed = 0;
 	ieWord amount = 0;
 	HealingResource(const ResRef& ref, Actor *cha, ieWord ah, ieWord a)
-		: caster(cha), amounthealed(ah), amount(a) {
-		resRef = ref;
-	}
+	: resRef(ref), caster(cha), amounthealed(ah), amount(a) {}
 	HealingResource() = default;
 	bool operator < (const HealingResource &str) const {
 		return (amounthealed < str.amounthealed);
@@ -81,35 +79,9 @@ struct Injured {
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
-	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
-	partysize = 6;
-	Ticks = 0;
-	GameTime = RealTime = 0;
-	version = 0;
-	Expansion = 0;
-	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
-	PartyGold = 0;
 	SetScript( core->GlobalScript, 0 );
-	MapIndex = -1;
-	Reputation = 0;
-	ControlStatus = 0;
-	CombatCounter = 0; //stored here until we know better
-	StateOverrideTime = 0;
-	StateOverrideFlag = 0;
-	BanterBlockTime = 0;
-	BanterBlockFlag = 0;
-	WeatherBits = 0;
-	kaputz = NULL;
-	mazedata = NULL;
-	timestop_owner = NULL;
-	timestop_end = 0;
-	event_timer = 0;
-	event_handler = NULL;
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->config.Width, core->config.Height);
-	LastScriptUpdate = 0;
-	WhichFormation = 0;
-	CurrentLink = 0;
 
 	//loading master areas
 	AutoTable table = gamedata->LoadTable("mastarea");
@@ -155,11 +127,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 
 	LoadCRTable();
 
-	interval = 1000/AI_UPDATE_TIME;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
-	bntchnc = NULL;
-	bntrows = -1;
 }
 
 Game::~Game(void)

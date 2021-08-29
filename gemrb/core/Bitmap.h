@@ -54,6 +54,12 @@ public:
 		data = new uint8_t[bytes];
 	}
 	
+	Bitmap(const Size& s, uint8_t pattern)
+	: Bitmap(s)
+	{
+		fill(pattern);
+	}
+	
 	Bitmap(const Size& size, const uint8_t* in) noexcept
 	: Bitmap(size) {
 		std::copy(in, in + bytes, data);
@@ -139,8 +145,8 @@ public:
 		return bytes;
 	}
 	
-	void fill(uint8_t val) noexcept {
-		std::fill(begin(), end(), val);
+	void fill(uint8_t pattern) noexcept {
+		std::fill(begin(), end(), pattern);
 	}
 };
 

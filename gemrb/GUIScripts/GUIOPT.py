@@ -29,7 +29,7 @@
 # 9 - Autopause options window
 
 ###################################################
-import CommonWindow
+import Container
 import GameCheck
 import GemRB
 import GUICommonWindows
@@ -54,7 +54,7 @@ else:
 def InitOptionsWindow (Window):
 	"""Open main options window"""
 
-	CommonWindow.CloseContainerWindow ()
+	Container.CloseContainerWindow ()
 
 	# Return to Game
 	Button = Window.GetControl (11)

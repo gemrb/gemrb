@@ -32,7 +32,7 @@
 # 9 - Autopause options window
 
 ###################################################
-import CommonWindow
+import Container
 import GemRB
 import GUICommon
 import GUICommonWindows
@@ -47,7 +47,7 @@ def InitOptionsWindow (Window):
 	GemRB.GamePause (1, 1)
 	TrySavingConfiguration ()
 
-	CommonWindow.CloseContainerWindow ()
+	Container.CloseContainerWindow ()
 
 	def ConfigOptButton(button, strref, action):
 		button.SetText (strref)
@@ -60,7 +60,12 @@ def InitOptionsWindow (Window):
 	ConfigOptButton(Window.GetControl (1), 2595, OpenQuitMsgWindow)
 
 	# Load Game
-	ConfigOptButton(Window.GetControl (2), 2592, OpenLoadMsgWindow)
+	# german pst has two spaces that need to be squished
+	LoadButton = Window.GetControl (2)
+	LoadGameString = GemRB.GetString (2592)
+	NewString = " ".join(LoadGameString.split())
+	LoadButton.SetText (NewString)
+	LoadButton.SetEvent (IE_GUI_BUTTON_ON_PRESS, OpenLoadMsgWindow)
 
 	# Save Game
 	ConfigOptButton(Window.GetControl (3), 20639, GUISAVE.OpenSaveWindow)

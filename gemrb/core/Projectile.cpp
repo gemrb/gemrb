@@ -1467,12 +1467,12 @@ void Projectile::DrawExplosion(const Region& vp)
 			// bg2 comet has the explosion split into two vvcs, with just a starting cycle difference
 			// until we actually need two vvc fields in the extension, let's just hack around it
 			if (Extension->VVCRes == "SPCOMEX1") {
-				ScriptedAnimation* vvc = gamedata->GetScriptedAnimation("SPCOMEX2", false);
-				if (vvc) {
-					vvc->Pos = Pos;
-					vvc->PlayOnce();
-					vvc->SetBlend();
-					area->AddVVCell(new VEFObject(vvc));
+				ScriptedAnimation* secondVVC = gamedata->GetScriptedAnimation("SPCOMEX2", false);
+				if (secondVVC) {
+					secondVVC->Pos = Pos;
+					secondVVC->PlayOnce();
+					secondVVC->SetBlend();
+					area->AddVVCell(new VEFObject(secondVVC));
 				}
 			}
 		}
@@ -1827,11 +1827,11 @@ bool Projectile::PointInRadius(const Point &p) const
 }
 
 //Set gradient color, if type is true then it is static tint, otherwise it is paletted color
-void Projectile::SetGradient(int gradient, bool type)
+void Projectile::SetGradient(int gradient, bool tinted)
 {
 	//gradients are unsigned chars, so this works
 	memset(Gradients, gradient, 7);
-	if (type) {
+	if (tinted) {
 		ExtFlags|=PEF_TINT;
 	} else {
 		TFlags |= PTF_COLOUR;
@@ -1858,7 +1858,7 @@ void Projectile::Cleanup()
 	phase=P_EXPIRED;
 }
 
-void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color tint) const
+void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags flags, Color overrideTint) const
 {
 	Video *video = core->GetVideoDriver();
 	PaletteHolder pal = (spr->Format().Bpp == 1) ? palette : nullptr;
@@ -1866,7 +1866,7 @@ void Projectile::Draw(const Holder<Sprite2D>& spr, const Point& p, BlitFlags fla
 		// FIXME: this may not apply universally
 		flags |= BlitFlags::ALPHA_MOD;
 	}
-	video->BlitGameSpriteWithPalette(spr, pal, p, flags|BlitFlags::BLENDED, tint);
+	video->BlitGameSpriteWithPalette(spr, pal, p, flags | BlitFlags::BLENDED, overrideTint);
 }
 
 }

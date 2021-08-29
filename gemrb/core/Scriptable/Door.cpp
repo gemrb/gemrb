@@ -74,8 +74,8 @@ Door::Door(Holder<TileOverlay> Overlay, DoorTrigger&& trigger)
 void Door::ImpedeBlocks(const std::vector<Point> &points, PathMapFlags value) const
 {
 	for (const Point& point : points) {
-		PathMapFlags tmp = area->GetInternalSearchMap(point) & PathMapFlags::NOTDOOR;
-		area->SetInternalSearchMap(point, tmp|value);
+		PathMapFlags tmp = area->tileProps.QuerySearchMap(point) & PathMapFlags::NOTDOOR;
+		area->tileProps.SetSearchMap(point, tmp|value);
 	}
 }
 
@@ -222,20 +222,16 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	rgn.w = 16;
 	rgn.h = 12;
 	for(const Point& p : *points) {
-		Actor** ab;
 		rgn.origin = Map::ConvertCoordFromTile(p);
-		PathMapFlags tmp = area->GetInternalSearchMap(p) & PathMapFlags::ACTOR;
+		PathMapFlags tmp = area->tileProps.QuerySearchMap(p) & PathMapFlags::ACTOR;
 		if (tmp != PathMapFlags::IMPASSABLE) {
-			int ac = area->GetActorsInRect(ab, rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
-			while(ac--) {
-				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
+			auto actors = area->GetActorsInRect(rgn, GA_NO_DEAD|GA_NO_UNSCHEDULED);
+			for (Actor* actor : actors) {
+				if (actor->GetBase(IE_DONOTJUMP)) {
 					continue;
 				}
-				ab[ac]->SetBase(IE_DONOTJUMP, DNJ_JUMP);
+				actor->SetBase(IE_DONOTJUMP, DNJ_JUMP);
 				blocked = true;
-			}
-			if (ab) {
-				free(ab);
 			}
 		}
 	}
@@ -246,7 +242,7 @@ bool Door::BlockedOpen(int Open, int ForceOpen) const
 	return blocked;
 }
 
-void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
+void Door::SetDoorOpen(int Open, int playsound, ieDword openerID, bool addTrigger)
 {
 	if (playsound) {
 		//the door cannot be blocked when opening,
@@ -262,9 +258,9 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 	if (Open) {
 		if (addTrigger) {
 			if (Trapped) {
-				AddTrigger(TriggerEntry(trigger_opened, ID));
+				AddTrigger(TriggerEntry(trigger_opened, openerID));
 			} else {
-				AddTrigger(TriggerEntry(trigger_harmlessopened, ID));
+				AddTrigger(TriggerEntry(trigger_harmlessopened, openerID));
 			}
 		}
 
@@ -274,9 +270,9 @@ void Door::SetDoorOpen(int Open, int playsound, ieDword ID, bool addTrigger)
 		}
 	} else if (addTrigger) {
 		if (Trapped) {
-			AddTrigger(TriggerEntry(trigger_closed, ID));
+			AddTrigger(TriggerEntry(trigger_closed, openerID));
 		} else {
-			AddTrigger(TriggerEntry(trigger_harmlessclosed, ID));
+			AddTrigger(TriggerEntry(trigger_harmlessclosed, openerID));
 		}
 	}
 	ToggleTiles(Open, playsound);

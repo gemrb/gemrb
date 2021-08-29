@@ -48,7 +48,8 @@ public:
 	
 	operator CAP_T () const
 	{
-		return cap ? cap->ptr : nullptr;
+		static CAP_T none;
+		return cap ? cap->ptr : none;
 	}
 
 	explicit CObject(PyObject *obj)
@@ -107,16 +108,38 @@ private:
 // WARNING: dont use these for new code
 // they are temporary while we compete the transition to Python 3
 #if PY_MAJOR_VERSION >= 3
-struct PyStringWrapper {
+class PyStringWrapper {
+	wchar_t* buffer = nullptr;
 	const char* str = nullptr;
 	PyObject* obj = nullptr;
-		
-	operator const char*() const {
+	
+public:
+	PyStringWrapper(PyObject* obj, const char* encoding) noexcept {
+		if (PyUnicode_Check(obj)) {
+			PyObject * temp_bytes = PyUnicode_AsEncodedString(obj, encoding, "strict"); // Owned reference
+			if (temp_bytes != NULL) {
+				str = PyBytes_AS_STRING(temp_bytes); // Borrowed pointer
+				obj = temp_bytes; // needs to outlive our use of wrap.str
+			} else { // raw data...
+				PyErr_Clear();
+				Py_ssize_t buflen = PyUnicode_GET_LENGTH(obj);
+				buffer = new wchar_t[buflen + 1];
+				Py_ssize_t strlen = PyUnicode_AsWideChar(obj, buffer, buflen);
+				buffer[strlen] = L'\0';
+				str = reinterpret_cast<const char*>(buffer);
+			}
+		} else if (PyObject_TypeCheck(obj, &PyBytes_Type)) {
+			str = PyBytes_AS_STRING(obj);
+		}
+	}
+	
+	operator const char*() const noexcept {
 		return str;
 	}
 	
-	~PyStringWrapper() {
+	~PyStringWrapper() noexcept {
 		Py_XDECREF(obj);
+		delete[] buffer;
 	}
 };
 PyStringWrapper PyString_AsString(PyObject* obj);

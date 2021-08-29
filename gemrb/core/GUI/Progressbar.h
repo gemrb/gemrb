@@ -62,7 +62,7 @@ public:
 	/** Sets the mos coordinates for the progressbar filler mos/cap */
 	void SetSliderPos(const Point& knob, const Point& cap);
 	/** Refreshes a progressbar which is associated with VariableName */
-	void UpdateState(unsigned int Sum) override;
+	void UpdateState(value_t) override;
 
 private: // Private attributes
 	Holder<Sprite2D> BackGround2; //mos resource for the filling of the bar

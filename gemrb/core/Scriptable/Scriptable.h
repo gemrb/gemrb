@@ -234,83 +234,84 @@ public:
 	explicit Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
-	tick_t WaitCounter;
+	tick_t WaitCounter = 0;
 	std::map<ieDword,ieDword> script_timers;
-	ieDword globalID;
+	ieDword globalID = 0;
 protected: //let Actor access this
 	std::list<TriggerEntry> triggers;
-	Map *area;
+	Map *area = nullptr;
 	ieVariable scriptName;
-	ieDword InternalFlags; //for triggers
+	ieDword InternalFlags = 0; // for triggers
 	ResRef Dialog;
 	std::list< Action*> actionQueue;
-	Action* CurrentAction;
+	Action* CurrentAction = nullptr;
 
 	// Variables for overhead text.
 	Point overHeadTextPos = Point(-1, -1);
-	bool overheadTextDisplaying;
-	tick_t timeStartDisplaying;
+	bool overheadTextDisplaying = false;
+	tick_t timeStartDisplaying = 0;
 	String OverheadText;
 public:
 	Region BBox;
 	// State relating to the currently-running action.
-	int CurrentActionState;
-	ieDword CurrentActionTarget;
-	bool CurrentActionInterruptable;
-	ieDword CurrentActionTicks;
+	int CurrentActionState = 0;
+	ieDword CurrentActionTarget = 0;
+	bool CurrentActionInterruptable = true;
+	ieDword CurrentActionTicks = 0;
 
 	// The number of times this was updated.
-	ieDword Ticks;
+	ieDword Ticks = 0;
 	// The same, after adjustment for being slowed/hasted.
-	ieDword AdjustedTicks;
+	ieDword AdjustedTicks = 0;
 	// The number of times UpdateActions() was run.
-	ieDword ScriptTicks;
+	ieDword ScriptTicks = 0;
 	// The number of times since UpdateActions() tried to do anything.
-	ieDword IdleTicks;
+	ieDword IdleTicks = 0;
 	// The number of ticks since the last spellcast
-	ieDword AuraTicks;
+	ieDword AuraTicks = 0;
 	// The countdown for forced activation by triggers.
-	ieDword TriggerCountdown;
+	ieDword TriggerCountdown = 0;
 
 	Variables* locals;
-	ScriptableType Type;
+	ScriptableType Type = ST_ACTOR;
 	Point Pos;
 
-	ieStrRef DialogName;
+	ieStrRef DialogName = 0;
 
 	GameScript* Scripts[MAX_SCRIPTS] = {};
-	int scriptlevel;
+	int scriptlevel = 0;
 
-	ieDword UnselectableTimer;
+	ieDword UnselectableTimer = 0;
 
 	// Stored objects.
-	ieDword LastAttacker;
-	ieDword LastCommander;
-	ieDword LastProtector;
-	ieDword LastProtectee;
-	ieDword LastTargetedBy;
-	ieDword LastHitter;
-	ieDword LastHelp;
-	ieDword LastTrigger;
-	ieDword LastSeen;
-	ieDword LastTalker;
-	ieDword LastHeard;
-	ieDword LastSummoner;
-	ieDword LastFollowed; // gemrb extension (LeaderOf)
-	ieDword LastMarked; // iwd2
+	ieDword LastAttacker = 0;
+	ieDword LastCommander = 0;
+	ieDword LastProtector = 0;
+	ieDword LastProtectee = 0;
+	ieDword LastTargetedBy = 0;
+	ieDword LastHitter = 0;
+	ieDword LastHelp = 0;
+	ieDword LastTrigger = 0;
+	ieDword LastSeen = 0;
+	ieDword LastTalker = 0;
+	ieDword LastHeard = 0;
+	ieDword LastSummoner = 0;
+	ieDword LastFollowed = 0; // gemrb extension (LeaderOf)
+	ieDword LastMarked = 0; // iwd2
 	ieDword MyTarget = 0; // iwd2, has nothing to do with LastTarget
 
-	int LastMarkedSpell; // iwd2
+	int LastMarkedSpell = 0; // iwd2
 
 	// this is used by GUIScript :(
-	ieDword LastSpellOnMe;  //Last spell cast on this scriptable
+	ieDword LastSpellOnMe = 0xffffffff;  // Last spell cast on this scriptable
 
-	ieDword LastTarget, LastSpellTarget;
-	ieDword LastTargetPersistent; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
+	ieDword LastTarget = 0;
+	ieDword LastSpellTarget = 0;
+	ieDword LastTargetPersistent = 0; // gemrb extension, persists across actions; remove if LastTarget ever gets the same persistence
 	Point LastTargetPos;
-	int SpellHeader;
+	int SpellHeader = 0;
 	ResRef SpellResRef;
-	bool InterruptCasting;
+	bool InterruptCasting = false;
 public:
 	/** Gets the Dialog ResRef */
 	ResRef GetDialog() const

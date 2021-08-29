@@ -193,8 +193,8 @@ public:
 	}
 	MapNote(const MapNote &rhs) = default;
 
-	MapNote(String text, ieWord c, bool readonly)
-	: strref(-1), text(std::move(text)), readonly(readonly)
+	MapNote(String txt, ieWord c, bool readonly)
+	: strref(-1), text(std::move(txt)), readonly(readonly)
 	{
 		color = Clamp<ieWord>(c, 0, 8);
 		//update custom strref
@@ -349,10 +349,57 @@ using scaIterator = std::list<VEFObject*>::const_iterator;
 using proIterator = std::list<Projectile*>::const_iterator;
 using spaIterator = std::list<Particles*>::const_iterator;
 
+class GEM_EXPORT TileProps {
+	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
+	// the assigned palette is the palette for the lightmap
+	uint32_t* propPtr = nullptr;
+	Size size;
+	Holder<Sprite2D> propImage;
+	
+	static constexpr uint32_t searchMapMask = 0xff000000;
+	static constexpr uint32_t materialMapMask = 0x00ff0000;
+	static constexpr uint32_t heightMapMask = 0x0000ff00;
+	static constexpr uint32_t lightMapMask = 0x000000ff;
+	
+	static constexpr uint32_t searchMapShift = 24;
+	static constexpr uint32_t materialMapShift = 16;
+	static constexpr uint32_t heightMapShift = 8;
+	static constexpr uint32_t lightMapShift = 0;
+
+public:
+	static const PixelFormat pixelFormat;
+	
+	static constexpr uint8_t defaultSearchMap = uint8_t(PathMapFlags::IMPASSABLE);
+	static constexpr uint8_t defaultMaterial = 0; // Black, impassable
+	static constexpr uint8_t defaultElevation = 128; // sea level
+	static constexpr uint8_t defaultLighting = 0; // color index 0? no better idea what a good default is
+	
+	enum class Property : uint8_t {
+		SEARCH_MAP,
+		MATERIAL,
+		ELEVATION,
+		LIGHTING
+	};
+	
+	explicit TileProps(Holder<Sprite2D> props) noexcept;
+	
+	const Size& GetSize() const noexcept;
+	
+	uint8_t QueryTileProps(const Point& p, Property prop) const noexcept;
+	PathMapFlags QuerySearchMap(const Point& p) const noexcept;
+	uint8_t QueryMaterial(const Point& p) const noexcept;
+	int QueryElevation(const Point& p) const noexcept;
+	Color QueryLighting(const Point& p) const noexcept;
+	
+	void SetSearchMap(const Point&, PathMapFlags value) const noexcept;
+	void BlockSearchMap(const Point& Pos, unsigned int blocksize, PathMapFlags value) const noexcept;
+};
 
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
+	TileProps tileProps;
+
 	Holder<Sprite2D> SmallMap;
 	IniSpawn *INISpawn;
 	ieDword AreaFlags;
@@ -380,9 +427,6 @@ private:
 	ieStrRef trackString;
 	int trackFlag;
 	ieWord trackDiff;
-	// tileProps contains the searchmap, the lightmap, the heightmap, and the material map
-	// the assigned palette is the palette for the lightmap
-	Holder<Sprite2D> tileProps;
 
 	std::list<AreaAnimation> animations;
 	std::vector< Actor*> actors;
@@ -405,12 +449,7 @@ private:
 	std::unordered_map<const void*, std::pair<VideoBufferPtr, Region>> objectStencils;
 
 public:
-	static constexpr uint32_t searchMapMask = 0xff000000;
-	static constexpr uint32_t materialMapMask = 0x00ff0000;
-	static constexpr uint32_t heightMapMask = 0x0000ff00;
-	static constexpr uint32_t lightMapMask = 0x000000ff;
-
-	Map(TileMap *tm, Holder<Sprite2D> tileProps, Holder<Sprite2D> sm);
+	Map(TileMap *tm, TileProps tileProps, Holder<Sprite2D> sm);
 	~Map(void) override;
 	static void NormalizeDeltas(double &dx, double &dy, const double &factor = 1);
 	static Point ConvertCoordToTile(const Point&);
@@ -422,7 +461,7 @@ public:
 	/* gets the signal of daylight changes */
 	bool ChangeMap(bool day_or_night);
 	void SeeSpellCast(Scriptable *caster, ieDword spell) const;
-	void SetTileMapProps(Holder<Sprite2D> props);
+	void SetTileMapProps(TileProps props);
 	void AutoLockDoors() const;
 	void UpdateScripts();
 	ResRef ResolveTerrainSound(const ResRef &sound, const Point &pos) const;
@@ -481,7 +520,6 @@ public:
 	PathMapFlags GetBlockedInRadius(const Point&, unsigned int size, bool stopOnImpassable = true) const;
 	PathMapFlags GetBlocked(const Point&) const;
 	PathMapFlags GetBlocked(const Point&, int size) const;
-	PathMapFlags GetBlockedNavmap(const Point &c) const;
 	Scriptable *GetScriptableByGlobalID(ieDword objectID);
 	Door *GetDoorByGlobalID(ieDword objectID) const;
 	Container *GetContainerByGlobalID(ieDword objectID) const;
@@ -490,7 +528,7 @@ public:
 	Actor* GetActorInRadius(const Point &p, int flags, unsigned int radius) const;
 	std::vector<Actor *> GetAllActorsInRadius(const Point &p, int flags, unsigned int radius, const Scriptable *see = NULL) const;
 	const std::vector<Actor *> &GetAllActors() const { return actors; }
-	int GetActorsInRect(Actor**& actorlist, const Region& rgn, int excludeFlags) const;
+	std::vector<Actor*> GetActorsInRect(const Region& rgn, int excludeFlags) const;
 	Actor* GetActor(const char* Name, int flags) const;
 	Actor* GetActor(int i, bool any) const;
 	Actor* GetActor(const Point &p, int flags, const Movable *checker = NULL) const;
@@ -504,7 +542,7 @@ public:
 
 	int GetActorCount(bool any) const;
 	//fix actors position if required
-	void JumpActors(bool jump);
+	void JumpActors(bool jump) const;
 	//selects all selectable actors in the area
 	void SelectActors() const;
 	//if items == true, remove noncritical items from ground piles too
@@ -558,9 +596,8 @@ public:
 	void ExploreTile(const Point&);
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(const Point &Pos, int range, int los);
-	/* block or unblock searchmap with value */
-	void BlockSearchMap(const Point& Pos, unsigned int size, PathMapFlags value) const;
-	void ClearSearchMapFor(const Movable *actor);
+	void BlockSearchMapFor(const Movable *actor) const;
+	void ClearSearchMapFor(const Movable *actor) const;
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder
@@ -634,8 +671,7 @@ public:
 	bool DisplayTrackString(const Actor *actor) const;
 
 	unsigned int GetLightLevel(const Point &Pos) const;
-	PathMapFlags GetInternalSearchMap(const Point&) const;
-	void SetInternalSearchMap(const Point&, PathMapFlags value) const;
+
 	void SetBackground(const ResRef &bgResref, ieDword duration);
 
 private:
@@ -674,7 +710,6 @@ private:
 	bool AdjustPositionY(Point &goal, int radiusx, int radiusy, int size = -1) const;
 	
 	void UpdateSpawns() const;
-	PathMapFlags QuerySearchMap(const Point&) const;
 	PathMapFlags GetBlockedInLine(const Point &s, const Point &d, bool stopOnImpassable, const Actor *caller = NULL) const;
 
 };

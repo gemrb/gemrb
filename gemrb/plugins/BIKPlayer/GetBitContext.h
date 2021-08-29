@@ -104,5 +104,5 @@ public:
 	void init_get_bits(const uint8_t *b, int bit_size);
 	void read_tree(Tree *tree);
 private:
-	void merge( uint8_t *dst, uint8_t *src, int size);
+	void merge(uint8_t *dst, const uint8_t *src, int size);
 };

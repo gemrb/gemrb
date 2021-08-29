@@ -155,7 +155,7 @@ public:
 	/** Returns the selected text */
 	String QueryText() const override;
 	/** Marks textarea for redraw with a new value */
-	void UpdateState(unsigned int optIdx) override;
+	void UpdateState(value_t optIdx) override;
 	void DidFocus() override;
 	void DidUnFocus() override;
 	
@@ -163,7 +163,7 @@ public:
 
 private: // Private attributes
 	// dialog and listbox handling
-	std::vector<ieDword> values;
+	std::vector<value_t> values;
 	const Content* dialogBeginNode;
 	Holder<Sprite2D> speakerPic;
 	// dialog options container

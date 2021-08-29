@@ -43,13 +43,13 @@ private:
 public:
 	BMPImporter(void);
 	~BMPImporter(void) override;
-	bool Open(DataStream* stream) override;
+	bool Import(DataStream* stream) override;
 	Holder<Sprite2D> GetSprite2D() override;
 	int GetPalette(int colors, Color* pal) override;
 
 private:
-	void Read8To8(void *rpixels);
-	void Read4To8(void *rpixels);
+	void Read8To8(const void *rpixels);
+	void Read4To8(const void *rpixels);
 };
 
 }
