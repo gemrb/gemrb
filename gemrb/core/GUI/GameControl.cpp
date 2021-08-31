@@ -1706,7 +1706,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		MoveViewportUnlockedTo(p, false); // we already handled centering
 	} else {
 		updateVPTimer = true;
-		canMove = (p == vpOrigin);
+		canMove = (p != vpOrigin);
 	}
 
 	return canMove;
