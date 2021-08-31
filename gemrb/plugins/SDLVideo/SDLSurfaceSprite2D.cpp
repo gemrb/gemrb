@@ -287,12 +287,7 @@ SDL_Texture* SDLTextureSprite2D::GetTexture(SDL_Renderer* renderer) const
 		if (texFormat == surface->format->format) {
 			SDL_UpdateTexture(*texture, nullptr, surface->pixels, surface->pitch);
 		} else {
-			/* Set up a destination surface for the texture update */
-			SDL_PixelFormat *dst_fmt = SDL_AllocFormat(texFormat);
-			assert(dst_fmt);
-			
-			SDL_Surface *temp = SDL_ConvertSurface(surface, dst_fmt, 0);
-			SDL_FreeFormat(dst_fmt);
+			SDL_Surface *temp = SDL_ConvertSurfaceFormat(surface, texFormat, 0);
 			assert(temp);
 			SDL_UpdateTexture(*texture, nullptr, temp->pixels, temp->pitch);
 			SDL_FreeSurface(temp);
