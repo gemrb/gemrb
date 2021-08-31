@@ -1674,7 +1674,7 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 		}
 
 		// TODO: make the overflow more dynamic
-		if (frame.w >= mapsize.w) {
+		if (frame.w >= mapsize.w + 64) {
 			p.x = (mapsize.w - frame.w)/2;
 			canMove = false;
 		} else if (p.x + frame.w >= mapsize.w + 64) {
