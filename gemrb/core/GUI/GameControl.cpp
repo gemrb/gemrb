@@ -1685,18 +1685,18 @@ bool GameControl::MoveViewportTo(Point p, bool center, int speed)
 			canMove = false;
 		}
 
-		Region mwinframe;
+		int mwinh = 0;
 		const TextArea* mta = core->GetMessageTextArea();
 		if (mta) {
-			mwinframe = mta->GetWindow()->Frame();
+			mwinh = mta->GetWindow()->Frame().h;
 		}
 
 		constexpr int padding = 50;
-		if (frame.h >= mapsize.h + mwinframe.h + padding) {
+		if (frame.h >= mapsize.h + mwinh + padding) {
 			p.y = (mapsize.h - frame.h)/2 + padding;
 			canMove = false;
-		} else if (p.y + frame.h >= mapsize.h + mwinframe.h + padding) {
-			p.y = mapsize.h - frame.h + mwinframe.h + padding;
+		} else if (p.y + frame.h >= mapsize.h + mwinh + padding) {
+			p.y = mapsize.h - frame.h + mwinh + padding;
 			canMove = false;
 		} else if (p.y < 0) {
 			p.y = 0;
