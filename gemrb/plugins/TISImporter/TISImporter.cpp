@@ -90,7 +90,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	PaletteHolder pal = MakeHolder<Palette>();
 	PixelFormat fmt = PixelFormat::Paletted8Bit(pal, true, 0);
 	
-	unsigned long pos = index *(1024+4096) + headerShift;
+	strpos_t pos = index *(1024+4096) + headerShift;
 	if(str->Size()<pos+1024+4096) {
 		// try to only report error once per file
 		static const TISImporter *last_corrupt = nullptr;
@@ -100,7 +100,8 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 		}
 	
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-		pal->col[0].g = 200;
+		fmt.ColorKey = false;
+		pal->col[0] = ColorBlack;
 		return core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
 	}
 
