@@ -52,6 +52,10 @@ struct Color {
 		return Color(px >> 8, px >> 16, px >> 24, px);
 	}
 	
+	constexpr static Color FromARGB(uint32_t px) {
+		return Color(px >> 16, px >> 8, px, px >> 24);
+	}
+	
 	constexpr static Color FromABGR(uint32_t px) {
 		return Color(px, px >> 8, px >> 16, px >> 24);
 	}
