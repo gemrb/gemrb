@@ -148,8 +148,9 @@ void SDLSurfaceSprite2D::UnlockSprite() const
 
 bool SDLSurfaceSprite2D::IsPaletteStale() const
 {
-	PaletteHolder pal = GetPalette();
-	return pal && pal->GetVersion() != palVersion;
+	const PaletteHolder& pal = surface->palette;
+	assert(pal);
+	return pal->GetVersion() != palVersion;
 }
 
 void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
@@ -164,7 +165,7 @@ void SDLSurfaceSprite2D::UpdatePalette(PaletteHolder pal) noexcept
 	surface->palette = pal;
 	SetPaletteColors(pal->col);
 
-	palVersion = pal->GetVersion();
+	palVersion = surface->palette->GetVersion();
 }
 
 void SDLSurfaceSprite2D::UpdateColorKey(colorkey_t ck) noexcept
@@ -235,6 +236,7 @@ void SDLSurfaceSprite2D::Restore() const
 	surface = original;
 	if (format.Bpp == 1 && original->palette) {
 		SetPaletteColors(original->palette->col);
+		palVersion = surface->palette->GetVersion();
 	}
 }
 

@@ -508,11 +508,10 @@ BlitFlags SDLVideoDriver::RenderSpriteVersion(const SDLSurfaceSprite2D* spr, Bli
 			newVersion |= tintv << 32;
 		}
 		
-		if (spr->IsPaletteStale()) {
-			spr->Restore();
-		}
-		
 		if (oldVersion != newVersion) {
+			if (spr->IsPaletteStale()) {
+				spr->Restore();
+			}
 			SDL_Palette* pal = static_cast<SDL_Palette*>(spr->NewVersion(newVersion));
 
 			for (size_t i = 0; i < 256; ++i) {
