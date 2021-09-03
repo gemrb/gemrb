@@ -90,21 +90,13 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 	strpos_t pos = index *(1024+4096) + headerShift;
 	if (str->Size() < pos + 1024 + 4096) {
 		// original PS:T AR0609 and AR0612 report far more tiles than are actually present :(
-
-		class BadFrame {
+		
+		if (badTile == nullptr) {
+			// we only want to generate a single bad tile on demand
 			PaletteHolder pal = MakeHolder<Palette>();
-			Holder<Sprite2D> spr;
-		public:
-			BadFrame() noexcept {
-				pal->col[0] = ColorBlack;
-				PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
-				spr = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
-			}
-			
-			Holder<Sprite2D> GetBlank() const noexcept {
-				return spr;
-			}
-		} static badframe;
+			PixelFormat fmt = PixelFormat::Paletted8Bit(pal);
+			badTile = core->GetVideoDriver()->CreateSprite(Region(0,0,64,64), nullptr, fmt);
+		}
 		
 		// try to only report error once per file
 		static const TISImporter *last_corrupt = nullptr;
@@ -113,7 +105,7 @@ Holder<Sprite2D> TISImporter::GetTile(int index)
 			last_corrupt = this;
 		}
 	
-		return badframe.GetBlank();
+		return badTile;
 	}
 	
 	PaletteHolder pal = MakeHolder<Palette>();
